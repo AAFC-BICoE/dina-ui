@@ -1,9 +1,9 @@
-import React from 'react'
-import Link from 'next/link'
-import Head from '../components/head'
-import Nav from '../components/nav'
+import React from "react";
+import Link from "next/link";
+import Head from "../components/head";
+import Nav from "../components/nav";
 
-const Home = () => (
+const Home: React.FunctionComponent = () => (
   <div>
     <Head title="Home" />
     <Nav />
@@ -25,7 +25,7 @@ const Home = () => (
           <a className="card">
             <h3>Examples &rarr;</h3>
             <p>
-              Find other example boilerplates on the{' '}
+              Find other example boilerplates on the{" "}
               <code>create-next-app</code> site
             </p>
           </a>
@@ -86,6 +86,6 @@ const Home = () => (
       }
     `}</style>
   </div>
-)
+);
 
-export default Home
+export default Home;
