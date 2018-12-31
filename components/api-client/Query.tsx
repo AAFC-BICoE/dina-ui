@@ -1,16 +1,28 @@
-import Kitsu, { KitsuResource, KitsuResponse } from "kitsu";
+import Kitsu, {
+  FieldsParam,
+  GetParams,
+  JsonApiErrorResponse,
+  KitsuResource,
+  KitsuResponse
+} from "kitsu";
+import { isUndefined, omitBy } from "lodash";
 import React from "react";
 
 /** Query component props. */
 interface QueryProps {
+  /** JSONAPI resource URL path. */
   path: string;
+  /** Fields to include in the response data. */
+  fields?: FieldsParam;
+
   children: QueryChildren;
 }
 
 /** Query component state. */
 interface QueryState {
-  response?: KitsuResponse<KitsuResource>;
   loading: boolean;
+  error?: JsonApiErrorResponse;
+  response?: KitsuResponse<KitsuResource>;
 }
 
 /**
@@ -25,7 +37,10 @@ type QueryChildren = (state: QueryState) => React.ReactNode;
 const apiClient = new Kitsu({
   baseURL: "/api",
   pluralize: false,
-  resourceCase: "none"
+  resourceCase: "none",
+  headers: {
+    Authorization: "Basic cmVhZGVyOnJlYWRlcg=="
+  }
 });
 
 /**
@@ -39,8 +54,18 @@ export class Query extends React.Component<QueryProps, QueryState> {
   };
 
   async componentDidMount() {
-    const response = await apiClient.get(this.props.path);
-    this.setState({ loading: false, response });
+    const { path, fields } = this.props;
+
+    // Omit undefined values from the GET params, which would otherwise cause an invalid request.
+    // e.g. /api/region?fields=undefined
+    const getParams = omitBy<GetParams>({ fields }, isUndefined);
+
+    try {
+      const response = await apiClient.get(path, getParams);
+      this.setState({ loading: false, error: undefined, response });
+    } catch (error) {
+      this.setState({ loading: false, error });
+    }
   }
 
   render() {

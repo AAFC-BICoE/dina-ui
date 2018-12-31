@@ -10,12 +10,14 @@
   "dependencies": {
     "@zeit/next-typescript": "^1.1.1",
     "kitsu": "^6.5.1",
+    "lodash": "^4.17.11",
     "next": "^7.0.2",
     "react": "^16.7.0",
     "react-dom": "^16.7.0"
   },
   "devDependencies": {
     "@types/jest": "^23.3.10",
+    "@types/lodash": "^4.14.119",
     "@types/next": "^7.0.6",
     "@types/node": "^10.12.18",
     "@types/react": "^16.7.18",
