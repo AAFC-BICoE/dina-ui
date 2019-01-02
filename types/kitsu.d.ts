@@ -28,6 +28,9 @@ declare module "kitsu" {
   /** Parameters for GET requests. */
   export interface GetParams {
     fields?: FieldsParam;
+    filter?: FilterParam;
+    sort?: string;
+    include?: string;
   }
 
   /** Parameter for requesting sparse fields. */
@@ -35,10 +38,18 @@ declare module "kitsu" {
     [key: string]: string;
   }
 
-  /** The response from a Kitsu GET request. */
-  export interface KitsuResponse<TResource extends KitsuResource> {
-    data: TResource[];
+  /** Parameter for filtering listed data. */
+  export interface FilterParam {
+    [key: string]: string;
   }
+
+  /** The response from a Kitsu GET request. */
+  export interface KitsuResponse<TData extends KitsuResponseData> {
+    data: TData;
+  }
+
+  /** The Kitsu response data acn either be one resource or an array of resources. */
+  export type KitsuResponseData = KitsuResource | KitsuResource[];
 
   /** JSONAPI resource base attributes. */
   export interface KitsuResource {
@@ -46,14 +57,26 @@ declare module "kitsu" {
     type: string;
   }
 
+  /**
+   * JSONAPI error response.
+   * See https://jsonapi.org/format/#errors
+   */
   export interface JsonApiErrorResponse {
     errors: JsonApiError[];
   }
-  
+
+  /**
+   * JSONAPI error object.
+   * See https://jsonapi.org/format/#error-objects
+   */
   export interface JsonApiError {
+    id?: string
+    links?: any
     status?: string;
+    code?: string;
     title?: string;
     detail?: string;
+    source?: any;
+    meta?: any;
   }
-  
 }
