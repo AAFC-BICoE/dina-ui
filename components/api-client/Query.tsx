@@ -1,4 +1,4 @@
-import Kitsu, {
+import {
   FieldsParam,
   FilterParam,
   GetParams,
@@ -8,6 +8,7 @@ import Kitsu, {
 } from "kitsu";
 import { isUndefined, omitBy } from "lodash";
 import React from "react";
+import { ApiContext, ApiContextI } from "./ApiContext";
 
 /** Query component props. */
 interface QueryProps<TData extends KitsuResponseData, TMeta> {
@@ -28,9 +29,7 @@ interface QueryProps<TData extends KitsuResponseData, TMeta> {
    */
   sort?: string;
 
-  /**
-   * Included resources.
-   */
+  /** Included resources. */
   include?: string;
 
   /** Parameter for paginating listed data. */
@@ -56,13 +55,6 @@ type QueryChildren<TData extends KitsuResponseData, TMeta> = (
   state: QueryState<TData, TMeta>
 ) => React.ReactNode;
 
-/** JSONAPI client. */
-const apiClient = new Kitsu({
-  baseURL: "/api",
-  pluralize: false,
-  resourceCase: "none"
-});
-
 /**
  * Performs a query against the backend JSONAPI web services and passes response data to children
  * components using the render props pattern.
@@ -72,12 +64,15 @@ export class Query<
   TData extends KitsuResponseData,
   TMeta = undefined
 > extends React.Component<QueryProps<TData, TMeta>, QueryState<TData, TMeta>> {
+  static contextType = ApiContext;
+
   state = {
     loading: true
   };
 
   async componentDidMount() {
     const { path, fields, filter, sort, include, page } = this.props;
+    const { apiClient } = this.context as ApiContextI;
 
     // Omit undefined values from the GET params, which would otherwise cause an invalid request.
     // e.g. /api/region?fields=undefined

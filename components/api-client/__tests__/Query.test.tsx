@@ -1,5 +1,10 @@
-import { JsonApiErrorResponse, KitsuResource, KitsuResponse } from "kitsu";
+import Kitsu, {
+  JsonApiErrorResponse,
+  KitsuResource,
+  KitsuResponse
+} from "kitsu";
 import { create } from "react-test-renderer";
+import { ApiContext } from "../ApiContext";
 import { Query } from "../Query";
 
 /** Example of an API resource interface definition for a todo-list entry. */
@@ -64,6 +69,13 @@ jest.mock(
     }
 );
 
+/** JSONAPI client. */
+const testClient = new Kitsu({
+  baseURL: "/api",
+  pluralize: false,
+  resourceCase: "none"
+});
+
 // Spy on Kitsu class' "get" method.
 const kitsuGet = jest.spyOn(require("kitsu").prototype, "get");
 
@@ -76,53 +88,59 @@ describe("Query component", () => {
   it("Renders with loading as true before sending a request", done => {
     let renderCount = 0;
     create(
-      <Query<Todo[]> path="todo">
-        {({ loading }) => {
-          // Query should be rendered once with loading as true.
-          if (renderCount == 0) {
-            expect(loading).toEqual(true);
-            done();
-          }
-          renderCount++;
-          return <div />;
-        }}
-      </Query>
+      <ApiContext.Provider value={{ apiClient: testClient }}>
+        <Query<Todo[]> path="todo">
+          {({ loading }) => {
+            // Query should be rendered once with loading as true.
+            if (renderCount == 0) {
+              expect(loading).toEqual(true);
+              done();
+            }
+            renderCount++;
+            return <div />;
+          }}
+        </Query>
+      </ApiContext.Provider>
     );
   });
 
   it("Passes single-resource data from the mocked API to child components", done => {
     create(
-      <Query<Todo> path="todo/25">
-        {({ loading, response }) => {
-          if (response) {
-            expect(loading).toEqual(false);
-            expect(response).toEqual(MOCK_TODO_RESPONSE);
-            // Make sure the response data field has the Todo type.
-            response.data.name;
-            done();
-          }
-          return <div />;
-        }}
-      </Query>
+      <ApiContext.Provider value={{ apiClient: testClient }}>
+        <Query<Todo> path="todo/25">
+          {({ loading, response }) => {
+            if (response) {
+              expect(loading).toEqual(false);
+              expect(response).toEqual(MOCK_TODO_RESPONSE);
+              // Make sure the response data field has the Todo type.
+              response.data.name;
+              done();
+            }
+            return <div />;
+          }}
+        </Query>
+      </ApiContext.Provider>
     );
   });
 
   it("Passes list data from the mocked API to child components", done => {
     create(
-      <Query<Todo[], MetaWithTotal> path="todo">
-        {({ loading, response }) => {
-          if (response) {
-            expect(loading).toEqual(false);
-            expect(response).toEqual(MOCK_TODOS_RESPONSE);
-            // Make sure the response data field has the Todo array type.
-            response.data[0].name;
-            // Make sure the response meta field has the MetaWithTotal type.
-            response.meta.totalResourceCount;
-            done();
-          }
-          return <div />;
-        }}
-      </Query>
+      <ApiContext.Provider value={{ apiClient: testClient }}>
+        <Query<Todo[], MetaWithTotal> path="todo">
+          {({ loading, response }) => {
+            if (response) {
+              expect(loading).toEqual(false);
+              expect(response).toEqual(MOCK_TODOS_RESPONSE);
+              // Make sure the response data field has the Todo array type.
+              response.data[0].name;
+              // Make sure the response meta field has the MetaWithTotal type.
+              response.meta.totalResourceCount;
+              done();
+            }
+            return <div />;
+          }}
+        </Query>
+      </ApiContext.Provider>
     );
 
     expect(kitsuGet).toHaveBeenCalledTimes(1);
@@ -138,16 +156,18 @@ describe("Query component", () => {
 
   it("Supports JSONAPI GET params", () => {
     create(
-      <Query<Todo[]>
-        path="todo"
-        fields={{ todo: "name,description" }}
-        filter={{ name: "todo 2" }}
-        sort="name"
-        include="group"
-        page={{ offset: 200, limit: 100 }}
-      >
-        {() => <div />}
-      </Query>
+      <ApiContext.Provider value={{ apiClient: testClient }}>
+        <Query<Todo[]>
+          path="todo"
+          fields={{ todo: "name,description" }}
+          filter={{ name: "todo 2" }}
+          sort="name"
+          include="group"
+          page={{ offset: 200, limit: 100 }}
+        >
+          {() => <div />}
+        </Query>
+      </ApiContext.Provider>
     );
 
     expect(kitsuGet).toHaveBeenCalledTimes(1);
@@ -166,16 +186,18 @@ describe("Query component", () => {
   it("Renders an error to child components", done => {
     // Get an error by requesting an attribute that the resource doesn't have.
     create(
-      <Query<Todo[]> path="todo" fields={{ todo: "unknownAttribute" }}>
-        {({ loading, error, response }) => {
-          if (!loading) {
-            expect(error).toEqual(MOCK_500_ERROR);
-            expect(response).toBeUndefined();
-            done();
-          }
-          return <div />;
-        }}
-      </Query>
+      <ApiContext.Provider value={{ apiClient: testClient }}>
+        <Query<Todo[]> path="todo" fields={{ todo: "unknownAttribute" }}>
+          {({ loading, error, response }) => {
+            if (!loading) {
+              expect(error).toEqual(MOCK_500_ERROR);
+              expect(response).toBeUndefined();
+              done();
+            }
+            return <div />;
+          }}
+        </Query>
+      </ApiContext.Provider>
     );
   });
 });
