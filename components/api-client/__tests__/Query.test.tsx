@@ -4,7 +4,7 @@ import Kitsu, {
   KitsuResponse
 } from "kitsu";
 import { create } from "react-test-renderer";
-import { ApiContext } from "../ApiContext";
+import { ApiClientContext } from "../ApiClientContext";
 import { Query } from "../Query";
 
 /** Example of an API resource interface definition for a todo-list entry. */
@@ -88,7 +88,7 @@ describe("Query component", () => {
   it("Renders with loading as true before sending a request", done => {
     let renderCount = 0;
     create(
-      <ApiContext.Provider value={{ apiClient: testClient }}>
+      <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Query<Todo[]> path="todo">
           {({ loading }) => {
             // Query should be rendered once with loading as true.
@@ -100,13 +100,13 @@ describe("Query component", () => {
             return <div />;
           }}
         </Query>
-      </ApiContext.Provider>
+      </ApiClientContext.Provider>
     );
   });
 
   it("Passes single-resource data from the mocked API to child components", done => {
     create(
-      <ApiContext.Provider value={{ apiClient: testClient }}>
+      <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Query<Todo> path="todo/25">
           {({ loading, response }) => {
             if (response) {
@@ -119,13 +119,13 @@ describe("Query component", () => {
             return <div />;
           }}
         </Query>
-      </ApiContext.Provider>
+      </ApiClientContext.Provider>
     );
   });
 
   it("Passes list data from the mocked API to child components", done => {
     create(
-      <ApiContext.Provider value={{ apiClient: testClient }}>
+      <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Query<Todo[], MetaWithTotal> path="todo">
           {({ loading, response }) => {
             if (response) {
@@ -140,7 +140,7 @@ describe("Query component", () => {
             return <div />;
           }}
         </Query>
-      </ApiContext.Provider>
+      </ApiClientContext.Provider>
     );
 
     expect(kitsuGet).toHaveBeenCalledTimes(1);
@@ -156,7 +156,7 @@ describe("Query component", () => {
 
   it("Supports JSONAPI GET params", () => {
     create(
-      <ApiContext.Provider value={{ apiClient: testClient }}>
+      <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Query<Todo[]>
           path="todo"
           fields={{ todo: "name,description" }}
@@ -167,7 +167,7 @@ describe("Query component", () => {
         >
           {() => <div />}
         </Query>
-      </ApiContext.Provider>
+      </ApiClientContext.Provider>
     );
 
     expect(kitsuGet).toHaveBeenCalledTimes(1);
@@ -186,7 +186,7 @@ describe("Query component", () => {
   it("Renders an error to child components", done => {
     // Get an error by requesting an attribute that the resource doesn't have.
     create(
-      <ApiContext.Provider value={{ apiClient: testClient }}>
+      <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Query<Todo[]> path="todo" fields={{ todo: "unknownAttribute" }}>
           {({ loading, error, response }) => {
             if (!loading) {
@@ -197,7 +197,7 @@ describe("Query component", () => {
             return <div />;
           }}
         </Query>
-      </ApiContext.Provider>
+      </ApiClientContext.Provider>
     );
   });
 });

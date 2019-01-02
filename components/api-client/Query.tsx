@@ -8,7 +8,7 @@ import {
 } from "kitsu";
 import { isUndefined, omitBy } from "lodash";
 import React from "react";
-import { ApiContext, ApiContextI } from "./ApiContext";
+import { ApiClientContext, ApiClientContextI } from "./ApiClientContext";
 
 /** Query component props. */
 interface QueryProps<TData extends KitsuResponseData, TMeta> {
@@ -64,7 +64,7 @@ export class Query<
   TData extends KitsuResponseData,
   TMeta = undefined
 > extends React.Component<QueryProps<TData, TMeta>, QueryState<TData, TMeta>> {
-  static contextType = ApiContext;
+  static contextType = ApiClientContext;
 
   state = {
     loading: true
@@ -72,7 +72,7 @@ export class Query<
 
   async componentDidMount() {
     const { path, fields, filter, sort, include, page } = this.props;
-    const { apiClient } = this.context as ApiContextI;
+    const { apiClient } = this.context as ApiClientContextI;
 
     // Omit undefined values from the GET params, which would otherwise cause an invalid request.
     // e.g. /api/region?fields=undefined
