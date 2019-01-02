@@ -106,7 +106,9 @@ describe("Query component", () => {
             expect(loading).toEqual(false);
             expect(response).toEqual(MOCK_TODOS_RESPONSE);
             // Make sure the response data field has the Todo array type.
-            expect(response.data[0].name).toEqual(MOCK_TODOS_RESPONSE.data[0].name);
+            expect(response.data[0].name).toEqual(
+              MOCK_TODOS_RESPONSE.data[0].name
+            );
             done();
           }
           return <div />;
@@ -133,6 +135,7 @@ describe("Query component", () => {
         filter={{ name: "todo 2" }}
         sort="name"
         include="group"
+        page={{ offset: 200, limit: 100 }}
       >
         {() => <div />}
       </Query>
@@ -146,7 +149,8 @@ describe("Query component", () => {
       fields: { todo: "name,description" },
       filter: { name: "todo 2" },
       sort: "name",
-      include: "group"
+      include: "group",
+      page: { offset: 200, limit: 100 }
     });
   });
 

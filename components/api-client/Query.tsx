@@ -4,7 +4,8 @@ import Kitsu, {
   GetParams,
   JsonApiErrorResponse,
   KitsuResponse,
-  KitsuResponseData
+  KitsuResponseData,
+  PageParam
 } from "kitsu";
 import { isUndefined, omitBy } from "lodash";
 import React from "react";
@@ -32,6 +33,9 @@ interface QueryProps<TData extends KitsuResponseData> {
    * Included resources.
    */
   include?: string;
+
+  /** Parameter for paginating listed data. */
+  page?: PageParam;
 
   children: QueryChildren<TData>;
 }
@@ -74,12 +78,12 @@ export class Query<TData extends KitsuResponseData> extends React.Component<
   };
 
   async componentDidMount() {
-    const { path, fields, filter, sort, include } = this.props;
+    const { path, fields, filter, sort, include, page } = this.props;
 
     // Omit undefined values from the GET params, which would otherwise cause an invalid request.
     // e.g. /api/region?fields=undefined
     const getParams = omitBy<GetParams>(
-      { fields, filter, sort, include },
+      { fields, filter, sort, include, page },
       isUndefined
     );
 

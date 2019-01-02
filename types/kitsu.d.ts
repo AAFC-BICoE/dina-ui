@@ -27,6 +27,7 @@ declare module "kitsu" {
 
   /** Parameters for GET requests. */
   export interface GetParams {
+    page?: PageParam;
     fields?: FieldsParam;
     filter?: FilterParam;
     sort?: string;
@@ -41,6 +42,12 @@ declare module "kitsu" {
   /** Parameter for filtering listed data. */
   export interface FilterParam {
     [key: string]: string;
+  }
+
+  /** Parameter for paginating listed data. */
+  export interface PageParam {
+    limit: number;
+    offset: number;
   }
 
   /** The response from a Kitsu GET request. */
@@ -70,8 +77,8 @@ declare module "kitsu" {
    * See https://jsonapi.org/format/#error-objects
    */
   export interface JsonApiError {
-    id?: string
-    links?: any
+    id?: string;
+    links?: any;
     status?: string;
     code?: string;
     title?: string;
