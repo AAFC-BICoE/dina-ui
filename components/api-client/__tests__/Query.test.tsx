@@ -8,22 +8,31 @@ interface Todo extends KitsuResource {
   name: string;
 }
 
+/** Example interface of a "meta" response field. */
+interface MetaWithTotal {
+  totalResourceCount: number;
+}
+
 /**
  * Mock response for a single Todo.
  */
 const MOCK_TODO_RESPONSE: KitsuResponse<Todo> = {
-  data: { id: "25", type: "todo", name: "todo 25" }
+  data: { id: "25", type: "todo", name: "todo 25" },
+  meta: undefined
 };
 
 /**
  * Mock response for a list of todos.
  */
-const MOCK_TODOS_RESPONSE: KitsuResponse<Todo[]> = {
+const MOCK_TODOS_RESPONSE: KitsuResponse<Todo[], MetaWithTotal> = {
   data: [
     { id: "1", type: "todo", name: "todo 1" },
     { id: "2", type: "todo", name: "todo 2" },
     { id: "3", type: "todo", name: "todo 3" }
-  ]
+  ],
+  meta: {
+    totalResourceCount: 300
+  }
 };
 
 const MOCK_500_ERROR: JsonApiErrorResponse = {
@@ -37,7 +46,7 @@ const MOCK_500_ERROR: JsonApiErrorResponse = {
   ]
 };
 
-// Mock Kitsu
+// Mock Kitsu, the client class that talks to the backend.
 jest.mock(
   "kitsu",
   () =>
@@ -89,7 +98,7 @@ describe("Query component", () => {
             expect(loading).toEqual(false);
             expect(response).toEqual(MOCK_TODO_RESPONSE);
             // Make sure the response data field has the Todo type.
-            expect(response.data.name).toEqual(MOCK_TODO_RESPONSE.data.name);
+            response.data.name;
             done();
           }
           return <div />;
@@ -100,15 +109,15 @@ describe("Query component", () => {
 
   it("Passes list data from the mocked API to child components", done => {
     create(
-      <Query<Todo[]> path="todo">
+      <Query<Todo[], MetaWithTotal> path="todo">
         {({ loading, response }) => {
           if (response) {
             expect(loading).toEqual(false);
             expect(response).toEqual(MOCK_TODOS_RESPONSE);
             // Make sure the response data field has the Todo array type.
-            expect(response.data[0].name).toEqual(
-              MOCK_TODOS_RESPONSE.data[0].name
-            );
+            response.data[0].name;
+            // Make sure the response meta field has the MetaWithTotal type.
+            response.meta.totalResourceCount;
             done();
           }
           return <div />;

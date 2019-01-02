@@ -4,14 +4,13 @@ import Kitsu, {
   GetParams,
   JsonApiErrorResponse,
   KitsuResponse,
-  KitsuResponseData,
-  PageParam
+  KitsuResponseData
 } from "kitsu";
 import { isUndefined, omitBy } from "lodash";
 import React from "react";
 
 /** Query component props. */
-interface QueryProps<TData extends KitsuResponseData> {
+interface QueryProps<TData extends KitsuResponseData, TMeta> {
   /** JSONAPI resource URL path. */
   path: string;
 
@@ -35,16 +34,16 @@ interface QueryProps<TData extends KitsuResponseData> {
   include?: string;
 
   /** Parameter for paginating listed data. */
-  page?: PageParam;
+  page?: any;
 
-  children: QueryChildren<TData>;
+  children: QueryChildren<TData, TMeta>;
 }
 
 /** Query component state. */
-interface QueryState<TData extends KitsuResponseData> {
+interface QueryState<TData extends KitsuResponseData, TMeta> {
   loading: boolean;
   error?: JsonApiErrorResponse;
-  response?: KitsuResponse<TData>;
+  response?: KitsuResponse<TData, TMeta>;
 }
 
 /**
@@ -53,8 +52,8 @@ interface QueryState<TData extends KitsuResponseData> {
  * This component uses the render props pattern to pass data to children components.
  * See: https://reactjs.org/docs/render-props.html
  */
-type QueryChildren<TData extends KitsuResponseData> = (
-  state: QueryState<TData>
+type QueryChildren<TData extends KitsuResponseData, TMeta> = (
+  state: QueryState<TData, TMeta>
 ) => React.ReactNode;
 
 /** JSONAPI client. */
@@ -69,10 +68,10 @@ const apiClient = new Kitsu({
  * components using the render props pattern.
  * See: https://reactjs.org/docs/render-props.html
  */
-export class Query<TData extends KitsuResponseData> extends React.Component<
-  QueryProps<TData>,
-  QueryState<TData>
-> {
+export class Query<
+  TData extends KitsuResponseData,
+  TMeta = undefined
+> extends React.Component<QueryProps<TData, TMeta>, QueryState<TData, TMeta>> {
   state = {
     loading: true
   };

@@ -27,7 +27,7 @@ declare module "kitsu" {
 
   /** Parameters for GET requests. */
   export interface GetParams {
-    page?: PageParam;
+    page?: any;
     fields?: FieldsParam;
     filter?: FilterParam;
     sort?: string;
@@ -44,18 +44,16 @@ declare module "kitsu" {
     [key: string]: string;
   }
 
-  /** Parameter for paginating listed data. */
-  export interface PageParam {
-    limit: number;
-    offset: number;
-  }
-
   /** The response from a Kitsu GET request. */
-  export interface KitsuResponse<TData extends KitsuResponseData> {
+  export interface KitsuResponse<
+    TData extends KitsuResponseData,
+    TMeta = undefined
+  > {
     data: TData;
+    meta: TMeta;
   }
 
-  /** The Kitsu response data acn either be one resource or an array of resources. */
+  /** The Kitsu response data can either be one resource or an array of resources. */
   export type KitsuResponseData = KitsuResource | KitsuResource[];
 
   /** JSONAPI resource base attributes. */
