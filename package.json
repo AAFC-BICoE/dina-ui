@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@zeit/next-typescript": "^1.1.1",
+    "axios": "^0.18.0",
     "kitsu": "^6.5.1",
     "lodash": "^4.17.11",
     "next": "^7.0.2",

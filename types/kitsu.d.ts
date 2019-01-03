@@ -1,10 +1,14 @@
 /// <reference types="node" />
 
+import { AxiosInstance } from "axios";
+
 declare module "kitsu" {
   export default Kitsu;
 
   /** JSONAPI client. */
   declare class Kitsu {
+    axios: AxiosInstance;
+
     constructor(params: KitsuConstructorParams);
 
     delete(...args: any[]): Promise<any>;
