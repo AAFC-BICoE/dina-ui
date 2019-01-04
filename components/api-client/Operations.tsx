@@ -27,7 +27,7 @@ interface JsonApiResource {
  * "Render props" values that are passed down to children components.
  */
 interface OperationsRenderProps {
-  doOperations: (operations: Operation[]) => void;
+  doOperations: (operations: Operation[]) => Promise<void>;
 }
 
 /**
