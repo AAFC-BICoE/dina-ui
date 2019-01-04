@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/PoffM/seqdb-ui.svg?branch=Support_14621_Setup_Continuous_Integration_services)](https://travis-ci.org/PoffM/seqdb-ui)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/15ff66c6f6d19d982ee6/test_coverage)](https://codeclimate.com/github/PoffM/seqdb-ui/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/15ff66c6f6d19d982ee6/maintainability)](https://codeclimate.com/github/PoffM/seqdb-ui/maintainability)
 
 This project was bootstrapped with [Create Next App](https://github.com/segmentio/create-next-app).
 
