@@ -1,6 +1,6 @@
 env:
   global:
-    - CC_TEST_REPORTER_ID=491ba07a23e59305c5bc30017c8b9f754ab49a50f9b9da7bacaccc8e8d89fe9a
+    - CC_TEST_REPORTER_ID= #TODO test reporter ID
 language: node_js
 node_js:
   - "11"
