@@ -6,7 +6,7 @@ import {
   KitsuResponse,
   KitsuResponseData
 } from "kitsu";
-import { isUndefined, omitBy } from "lodash";
+import { isEqual, isUndefined, omitBy, pick } from "lodash";
 import React from "react";
 import { ApiClientContext, ApiClientContextI } from "./ApiClientContext";
 
@@ -70,7 +70,7 @@ export class Query<
     loading: true
   };
 
-  async componentDidMount() {
+  async fetchData(): Promise<void> {
     const { path, fields, filter, sort, include, page } = this.props;
     const { apiClient } = this.context as ApiClientContextI;
 
@@ -86,6 +86,33 @@ export class Query<
       this.setState({ loading: false, error: undefined, response });
     } catch (error) {
       this.setState({ loading: false, error });
+    }
+  }
+
+  async componentDidMount(): Promise<void> {
+    // Fetch the data when the component is mounted.
+    await this.fetchData();
+  }
+
+  async componentDidUpdate(prevProps: Readonly<QueryProps<TData, TMeta>>) {
+    // JSONAPI props that should re-fetch the data when changed.
+    const jsonapiQueryProps: (keyof typeof prevProps)[] = [
+      "path",
+      "fields",
+      "filter",
+      "sort",
+      "include",
+      "page"
+    ];
+
+    // Get the old and new query props.
+    const [oldQuery, newQuery] = [prevProps, this.props].map(props =>
+      pick(props, jsonapiQueryProps)
+    );
+
+    // Only re-fetch the data if the query props were changed.
+    if (!isEqual(oldQuery, newQuery)) {
+      await this.fetchData();
     }
   }
 

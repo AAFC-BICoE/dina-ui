@@ -51,23 +51,17 @@ const MOCK_500_ERROR: JsonApiErrorResponse = {
   ]
 };
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      async get(path, { fields }) {
-        if (path == "todo") {
-          if (fields && fields.todo == "unknownAttribute") {
-            throw MOCK_500_ERROR;
-          }
-          return MOCK_TODOS_RESPONSE;
-        } else if (path == "todo/25") {
-          return MOCK_TODO_RESPONSE;
-        }
-      }
+// Mock Kitsu class' "get" method.
+const mockGet = jest.fn((path, { fields }) => {
+  if (path == "todo") {
+    if (fields && fields.todo == "unknownAttribute") {
+      throw MOCK_500_ERROR;
     }
-);
+    return MOCK_TODOS_RESPONSE;
+  } else if (path == "todo/25") {
+    return MOCK_TODO_RESPONSE;
+  }
+});
 
 /** JSONAPI client. */
 const testClient = new Kitsu({
@@ -76,13 +70,30 @@ const testClient = new Kitsu({
   resourceCase: "none"
 });
 
-// Spy on Kitsu class' "get" method.
-const kitsuGet = jest.spyOn(require("kitsu").prototype, "get");
+/**
+ * Helper method to create a query element.
+ */
+const pagedQuery = pageSpec => (
+  <ApiClientContext.Provider value={{ apiClient: testClient }}>
+    <Query<Todo[]> path="todo" page={pageSpec}>
+      {() => null}
+    </Query>
+  </ApiClientContext.Provider>
+);
+
+// Mock Kitsu, the client class that talks to the backend.
+jest.mock(
+  "kitsu",
+  () =>
+    class {
+      get = mockGet;
+    }
+);
 
 describe("Query component", () => {
   beforeEach(() => {
     // Clear the spy's call and instance data.
-    kitsuGet.mockClear();
+    mockGet.mockClear();
   });
 
   it("Renders with loading as true before sending a request", done => {
@@ -143,10 +154,10 @@ describe("Query component", () => {
       </ApiClientContext.Provider>
     );
 
-    expect(kitsuGet).toHaveBeenCalledTimes(1);
+    expect(mockGet).toHaveBeenCalledTimes(1);
 
     // Get the params of the last call to Kitsu's GET method.
-    const [path, getParams] = kitsuGet.mock.calls.pop();
+    const [path, getParams] = mockGet.mock.calls.pop();
     expect(path).toEqual("todo");
 
     // The Query's GET params should not have any values explicitly set to undefined.
@@ -170,9 +181,9 @@ describe("Query component", () => {
       </ApiClientContext.Provider>
     );
 
-    expect(kitsuGet).toHaveBeenCalledTimes(1);
+    expect(mockGet).toHaveBeenCalledTimes(1);
     // Get the params of the last call to Kitsu's GET method.
-    const [path, getParams] = kitsuGet.mock.calls.pop();
+    const [path, getParams] = mockGet.mock.calls.pop();
     expect(path).toEqual("todo");
     expect(getParams).toEqual({
       fields: { todo: "name,description" },
@@ -199,5 +210,27 @@ describe("Query component", () => {
         </Query>
       </ApiClientContext.Provider>
     );
+  });
+
+  it("Re-fetches data if the query is changed via new props.", () => {
+    // The first render will fetch the data once.
+    const render = create(pagedQuery({ offset: 0, limit: 100 }));
+    expect(mockGet).toHaveBeenCalledTimes(1);
+
+    // The second render with different props will fetch the data again.
+    render.update(pagedQuery({ offset: 100, limit: 100 }));
+    expect(mockGet).toHaveBeenCalledTimes(2);
+  });
+
+  it("Does not re-fetch data if the same props are passed in multiple times.", () => {
+    const pageSpec = { offset: 0, limit: 100 };
+
+    // The first render will fetch the data once.
+    const render = create(pagedQuery(pageSpec));
+    expect(mockGet).toHaveBeenCalledTimes(1);
+
+    // The second render with the same props will not fetch again.
+    render.update(pagedQuery(pageSpec));
+    expect(mockGet).toHaveBeenCalledTimes(1);
   });
 });
