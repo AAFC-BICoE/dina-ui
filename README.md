@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/AAFC-BICoE/seqdb-ui.svg?branch=master)](https://travis-ci.org/AAFC-BICoE/seqdb-ui)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/cdeb77134e35deb16a65/test_coverage)](https://codeclimate.com/github/AAFC-BICoE/seqdb-ui/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/cdeb77134e35deb16a65/maintainability)](https://codeclimate.com/github/AAFC-BICoE/seqdb-ui/maintainability)
+
 This project was bootstrapped with [Create Next App](https://github.com/segmentio/create-next-app).
 
 Find the most recent version of this guide at [here](https://github.com/segmentio/create-next-app/blob/master/lib/templates/default/README.md). And check out [Next.js repo](https://github.com/zeit/next.js) for the most up-to-date info.
