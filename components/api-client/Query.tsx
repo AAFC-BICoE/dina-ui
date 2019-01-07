@@ -1,40 +1,21 @@
 import {
-  FieldsParam,
-  FilterParam,
   GetParams,
   JsonApiErrorResponse,
   KitsuResponse,
   KitsuResponseData
 } from "kitsu";
-import { isEqual, isUndefined, omitBy, pick } from "lodash";
+import { isEqual, isUndefined, omitBy } from "lodash";
 import React from "react";
 import { ApiClientContext, ApiClientContextI } from "./ApiClientContext";
 
+/** Attributes that compose a JsonApi query. */
+interface JsonApiQuerySpec extends GetParams {
+  path: string;
+}
+
 /** Query component props. */
 interface QueryProps<TData extends KitsuResponseData, TMeta> {
-  /** JSONAPI resource URL path. */
-  path: string;
-
-  /** Fields to include in the response data. */
-  fields?: FieldsParam;
-
-  /** Resource filter */
-  filter?: FilterParam;
-
-  /**
-   * Sort order + attribute.
-   * Examples:
-   *  - name
-   *  - -description
-   */
-  sort?: string;
-
-  /** Included resources. */
-  include?: string;
-
-  /** Parameter for paginating listed data. */
-  page?: any;
-
+  query: JsonApiQuerySpec;
   children: QueryChildren<TData, TMeta>;
 }
 
@@ -71,7 +52,7 @@ export class Query<
   };
 
   async fetchData(): Promise<void> {
-    const { path, fields, filter, sort, include, page } = this.props;
+    const { path, fields, filter, sort, include, page } = this.props.query;
     const { apiClient } = this.context as ApiClientContextI;
 
     // Omit undefined values from the GET params, which would otherwise cause an invalid request.
@@ -95,23 +76,8 @@ export class Query<
   }
 
   async componentDidUpdate(prevProps: Readonly<QueryProps<TData, TMeta>>) {
-    // JSONAPI props that should re-fetch the data when changed.
-    const jsonapiQueryProps: (keyof typeof prevProps)[] = [
-      "path",
-      "fields",
-      "filter",
-      "sort",
-      "include",
-      "page"
-    ];
-
-    // Get the old and new query props.
-    const [oldQuery, newQuery] = [prevProps, this.props].map(props =>
-      pick(props, jsonapiQueryProps)
-    );
-
-    // Only re-fetch the data if the query props were changed.
-    if (!isEqual(oldQuery, newQuery)) {
+    // Only re-fetch the data if the query prop was changed.
+    if (!isEqual(prevProps.query, this.props.query)) {
       await this.fetchData();
     }
   }

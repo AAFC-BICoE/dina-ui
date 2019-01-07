@@ -75,9 +75,7 @@ const testClient = new Kitsu({
  */
 const pagedQuery = pageSpec => (
   <ApiClientContext.Provider value={{ apiClient: testClient }}>
-    <Query<Todo[]> path="todo" page={pageSpec}>
-      {() => null}
-    </Query>
+    <Query<Todo[]> query={{ path: "todo", page: pageSpec }}>{() => null}</Query>
   </ApiClientContext.Provider>
 );
 
@@ -100,7 +98,7 @@ describe("Query component", () => {
     let renderCount = 0;
     create(
       <ApiClientContext.Provider value={{ apiClient: testClient }}>
-        <Query<Todo[]> path="todo">
+        <Query<Todo[]> query={{ path: "todo" }}>
           {({ loading }) => {
             // Query should be rendered once with loading as true.
             if (renderCount == 0) {
@@ -118,7 +116,7 @@ describe("Query component", () => {
   it("Passes single-resource data from the mocked API to child components", done => {
     create(
       <ApiClientContext.Provider value={{ apiClient: testClient }}>
-        <Query<Todo> path="todo/25">
+        <Query<Todo> query={{ path: "todo/25" }}>
           {({ loading, response }) => {
             if (response) {
               expect(loading).toEqual(false);
@@ -137,7 +135,7 @@ describe("Query component", () => {
   it("Passes list data from the mocked API to child components", done => {
     create(
       <ApiClientContext.Provider value={{ apiClient: testClient }}>
-        <Query<Todo[], MetaWithTotal> path="todo">
+        <Query<Todo[], MetaWithTotal> query={{ path: "todo" }}>
           {({ loading, response }) => {
             if (response) {
               expect(loading).toEqual(false);
@@ -169,12 +167,14 @@ describe("Query component", () => {
     create(
       <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Query<Todo[]>
-          path="todo"
-          fields={{ todo: "name,description" }}
-          filter={{ name: "todo 2" }}
-          sort="name"
-          include="group"
-          page={{ offset: 200, limit: 100 }}
+          query={{
+            path: "todo",
+            fields: { todo: "name,description" },
+            filter: { name: "todo 2" },
+            sort: "name",
+            include: "group",
+            page: { offset: 200, limit: 100 }
+          }}
         >
           {() => <div />}
         </Query>
@@ -198,7 +198,9 @@ describe("Query component", () => {
     // Get an error by requesting an attribute that the resource doesn't have.
     create(
       <ApiClientContext.Provider value={{ apiClient: testClient }}>
-        <Query<Todo[]> path="todo" fields={{ todo: "unknownAttribute" }}>
+        <Query<Todo[]>
+          query={{ path: "todo", fields: { todo: "unknownAttribute" } }}
+        >
           {({ loading, error, response }) => {
             if (!loading) {
               expect(error).toEqual(MOCK_500_ERROR);

@@ -31,11 +31,25 @@ declare module "kitsu" {
 
   /** Parameters for GET requests. */
   export interface GetParams {
-    page?: any;
+    /** Fields to include in the response data. */
     fields?: FieldsParam;
+
+    /** Resource filter */
     filter?: FilterParam;
+
+    /**
+     * Sort order + attribute.
+     * Examples:
+     *  - name
+     *  - -description
+     */
     sort?: string;
+
+    /** Included resources. */
     include?: string;
+
+    /** Vendor-specific parameter for paginating listed data. */
+    page?: any;
   }
 
   /** Parameter for requesting sparse fields. */
