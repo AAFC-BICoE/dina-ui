@@ -1,8 +1,9 @@
-import { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig, AxiosError } from "axios";
 import Kitsu from "kitsu";
 import { create } from "react-test-renderer";
 import { ApiClientContext } from "../ApiClientContext";
-import { Operation, Operations } from "../Operations";
+import { Operation, OperationsResponse } from "../jsonapi-types";
+import { Operations } from "../Operations";
 
 const TODO_INSERT_OPERATION: Operation[] = [
   {
@@ -30,7 +31,7 @@ const MOCK_TODO_INSERT_AXIOS_RESPONSE = {
   data: [
     {
       data: {
-        id: 1,
+        id: 123,
         type: "todo",
         attributes: {
           name: "todo 1",
@@ -39,12 +40,79 @@ const MOCK_TODO_INSERT_AXIOS_RESPONSE = {
       },
       status: 201
     }
-  ]
+  ] as OperationsResponse
 };
 
+/** Todo insert operation where the first todo is valid and the second is invalid */
+const TODO_OPERATION_1_VALID_1_INVALID: Operation[] = [
+  {
+    op: "POST",
+    path: "todo",
+    value: {
+      id: 1,
+      type: "todo",
+      attributes: {
+        name: "valid-name"
+      }
+    }
+  },
+  {
+    op: "POST",
+    path: "todo",
+    value: {
+      id: 2,
+      type: "todo",
+      attributes: {
+        name: "this-name-is-too-long"
+      }
+    }
+  }
+];
+
+/** Jsonpatch response where the first operation is valid but the second is invalid. */
+const MOCK_AXIOS_RESPONSE_1_VALID_1_INVALID = {
+  data: [
+    {
+      data: {
+        id: "1",
+        type: "todo",
+        attributes: {
+          name: "valid-name"
+        },
+        links: { self: "/api/region/1" }
+      },
+      status: 201
+    },
+    {
+      errors: [
+        {
+          status: "422",
+          title: "Constraint violation",
+          detail: "name size must be between 1 and 10"
+        }
+      ],
+      status: 422
+    }
+  ] as OperationsResponse
+};
+
+const INVALID_OPERATIONS_FORMAT_REQUEST =
+  "This is an operations request in an invalid format";
+
+const MOCK_AXIOS_ERROR: AxiosError = {
+  config: {},
+  name: "error",
+  message: "error"
+};
+
+/** Mock of Axios' patch function. */
 const mockPatch = jest.fn((_, data) => {
   if (data == TODO_INSERT_OPERATION) {
     return MOCK_TODO_INSERT_AXIOS_RESPONSE;
+  } else if (data == TODO_OPERATION_1_VALID_1_INVALID) {
+    return MOCK_AXIOS_RESPONSE_1_VALID_1_INVALID;
+  } else if (data == INVALID_OPERATIONS_FORMAT_REQUEST) {
+    throw MOCK_AXIOS_ERROR;
   }
 });
 
@@ -76,6 +144,7 @@ describe("Operations component", () => {
           {({ doOperations }) => (
             <form
               onSubmit={async () => {
+                // Send the request.
                 await doOperations(TODO_INSERT_OPERATION);
               }}
             />
@@ -95,5 +164,88 @@ describe("Operations component", () => {
       TODO_INSERT_OPERATION,
       AXIOS_JSONPATCH_REQUEST_CONFIG
     ]);
+  });
+
+  it("Renders with loading as false before sending a request", done => {
+    create(
+      <ApiClientContext.Provider value={{ apiClient: testClient }}>
+        <Operations>
+          {({ loading, response }) => {
+            expect(loading).toBeFalsy();
+            expect(response).toBeUndefined();
+            done();
+            return null;
+          }}
+        </Operations>
+      </ApiClientContext.Provider>
+    );
+  });
+
+  it("Renders with loading as true after sending a request", async done => {
+    const render = create(
+      <ApiClientContext.Provider value={{ apiClient: testClient }}>
+        <Operations>
+          {({ doOperations, loading, response }) => {
+            if (loading) {
+              expect(response).toBeUndefined();
+              done();
+            }
+
+            return (
+              <form onSubmit={() => doOperations(TODO_INSERT_OPERATION)} />
+            );
+          }}
+        </Operations>
+      </ApiClientContext.Provider>
+    );
+
+    await render.root.findByType("form").props.onSubmit();
+  });
+
+  it("Renders a jsonpatch response to child components", async done => {
+    const render = create(
+      <ApiClientContext.Provider value={{ apiClient: testClient }}>
+        <Operations>
+          {({ doOperations, loading, response }) => {
+            if (response) {
+              expect(loading).toBeFalsy();
+              expect(response).toEqual(
+                MOCK_AXIOS_RESPONSE_1_VALID_1_INVALID.data
+              );
+              done();
+            }
+
+            return (
+              <form
+                onSubmit={async () =>
+                  await doOperations(TODO_OPERATION_1_VALID_1_INVALID)
+                }
+              />
+            );
+          }}
+        </Operations>
+      </ApiClientContext.Provider>
+    );
+
+    await render.root.findByType("form").props.onSubmit();
+  });
+
+  it("Throws an error when an invalid format request is sent.", () => {
+    const render = create(
+      <ApiClientContext.Provider value={{ apiClient: testClient }}>
+        <Operations>
+          {({ doOperations }) => (
+            <form
+              onSubmit={async () =>
+                await doOperations(INVALID_OPERATIONS_FORMAT_REQUEST as any)
+              }
+            />
+          )}
+        </Operations>
+      </ApiClientContext.Provider>
+    );
+
+    const doSubmit = render.root.findByType("form").props.onSubmit();
+    expect(doSubmit).resolves.toThrow(MOCK_AXIOS_ERROR);
   });
 });

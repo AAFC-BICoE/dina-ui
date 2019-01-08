@@ -1,10 +1,7 @@
-import Kitsu, {
-  JsonApiErrorResponse,
-  KitsuResource,
-  KitsuResponse
-} from "kitsu";
+import Kitsu, { KitsuResource, KitsuResponse } from "kitsu";
 import { create } from "react-test-renderer";
 import { ApiClientContext } from "../ApiClientContext";
+import { JsonApiErrorResponse } from "../jsonapi-types";
 import { Query } from "../Query";
 
 /** Example of an API resource interface definition for a todo-list entry. */
@@ -71,7 +68,8 @@ const testClient = new Kitsu({
 });
 
 /**
- * Helper method to create a query element.
+ * Helper method to create a paged query element.
+ * @param pageSpec the pagination params.
  */
 const pagedQuery = pageSpec => (
   <ApiClientContext.Provider value={{ apiClient: testClient }}>

@@ -1,12 +1,8 @@
-import {
-  GetParams,
-  JsonApiErrorResponse,
-  KitsuResponse,
-  KitsuResponseData
-} from "kitsu";
+import { GetParams, KitsuResponse, KitsuResponseData } from "kitsu";
 import { isEqual, isUndefined, omitBy } from "lodash";
 import React from "react";
 import { ApiClientContext, ApiClientContextI } from "./ApiClientContext";
+import { JsonApiErrorResponse } from "./jsonapi-types";
 
 /** Attributes that compose a JsonApi query. */
 interface JsonApiQuerySpec extends GetParams {

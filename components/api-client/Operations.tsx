@@ -1,32 +1,13 @@
 import React from "react";
 import { ApiClientContext, ApiClientContextI } from "./ApiClientContext";
-
-/** HTTP method used to specify a jsonpatch operation type. */
-type HttpMethod = "POST" | "PATCH" | "DELETE";
-
-/**
- * A jsonpatch operation.
- *
- * See: https://github.com/json-api/json-api/blob/9c7a03dbc37f80f6ca81b16d444c960e96dd7a57/extensions/jsonpatch/index.md#-creating-resources
- */
-export interface Operation {
-  op: HttpMethod;
-  path: string;
-  value: JsonApiResource;
-}
-
-/** A single entity in JSONAPI format. */
-interface JsonApiResource {
-  id: number | string;
-  type: string;
-  attributes?: any;
-  relationships?: any;
-}
+import { Operation, OperationsResponse } from "./jsonapi-types";
 
 /**
  * "Render props" values that are passed down to children components.
  */
 interface OperationsRenderProps {
+  loading: boolean;
+  response?: OperationsResponse;
   doOperations: (operations: Operation[]) => Promise<void>;
 }
 
@@ -42,6 +23,12 @@ interface OperationsProps {
   children: OperationsChildren;
 }
 
+/** Operations component state. */
+interface OperationsState {
+  loading: boolean;
+  response?: OperationsResponse;
+}
+
 /**
  * Provides an interface for performing write operations against the backend via render props.
  * See: https://reactjs.org/docs/render-props.html
@@ -49,32 +36,53 @@ interface OperationsProps {
  * The backend must support the jsonpatch extension to JSONAPI.
  * See: https://github.com/json-api/json-api/blob/9c7a03dbc37f80f6ca81b16d444c960e96dd7a57/extensions/jsonpatch/index.md
  */
-export class Operations extends React.Component<OperationsProps> {
+export class Operations extends React.Component<
+  OperationsProps,
+  OperationsState
+> {
   static contextType = ApiClientContext;
+
+  state: OperationsState = {
+    loading: false
+  };
 
   /**
    * Performs write operations against the backend.
    *
    * @param operations the jsonpatch operations to perform
    */
-  private async doOperations(operations: Operation[]) {
+  private async doOperations(operations: Operation[]): Promise<void> {
     // Unwrap the configured axios instance from the Kitsu instance.
     const {
       apiClient: { axios }
     } = this.context as ApiClientContextI;
 
     // Do the operations request.
-    await axios.patch("operations", operations, {
-      headers: {
-        "Content-Type": "application/json-patch+json",
-        Accept: "application/json-patch+json"
-      }
-    });
+    this.setState({ loading: true, response: undefined });
+    try {
+      const axiosResponse = await axios.patch("operations", operations, {
+        headers: {
+          Authorization: "Basic cmVhZGVyOnJlYWRlcg==",
+          "Content-Type": "application/json-patch+json",
+          Accept: "application/json-patch+json"
+        }
+      });
+      this.setState({ loading: false, response: axiosResponse.data });
+    } catch(error) {
+      // Unknown errors thrown by axios.patch will be caught here.
+      // Validation errors are included in the operations response, and not caught here.
+      this.setState({ loading: false });
+      throw error;
+    }
   }
 
   render() {
+    const { loading, response } = this.state;
+
     return this.props.children({
-      doOperations: ops => this.doOperations(ops)
+      doOperations: ops => this.doOperations(ops),
+      loading,
+      response
     });
   }
 }

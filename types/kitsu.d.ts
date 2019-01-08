@@ -79,27 +79,4 @@ declare module "kitsu" {
     id: string;
     type: string;
   }
-
-  /**
-   * JSONAPI error response.
-   * See https://jsonapi.org/format/#errors
-   */
-  export interface JsonApiErrorResponse {
-    errors: JsonApiError[];
-  }
-
-  /**
-   * JSONAPI error object.
-   * See https://jsonapi.org/format/#error-objects
-   */
-  export interface JsonApiError {
-    id?: string;
-    links?: any;
-    status?: string;
-    code?: string;
-    title?: string;
-    detail?: string;
-    source?: any;
-    meta?: any;
-  }
 }
