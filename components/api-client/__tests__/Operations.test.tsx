@@ -230,7 +230,7 @@ describe("Operations component", () => {
     await render.root.findByType("form").props.onSubmit();
   });
 
-  it("Throws an error when an invalid format request is sent.", () => {
+  it("Throws an error when an invalid format request is sent.", async done => {
     const render = create(
       <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Operations>
@@ -245,7 +245,12 @@ describe("Operations component", () => {
       </ApiClientContext.Provider>
     );
 
-    const doSubmit = render.root.findByType("form").props.onSubmit();
-    expect(doSubmit).resolves.toThrow(MOCK_AXIOS_ERROR);
+    try {
+      // Expect doOperations to throw an error.
+      await render.root.findByType("form").props.onSubmit();
+    } catch(error) {
+      expect(error).toEqual(MOCK_AXIOS_ERROR);
+      done();
+    }
   });
 });
