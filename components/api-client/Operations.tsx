@@ -62,7 +62,6 @@ export class Operations extends React.Component<
     try {
       const axiosResponse = await axios.patch("operations", operations, {
         headers: {
-          Authorization: "Basic cmVhZGVyOnJlYWRlcg==",
           "Content-Type": "application/json-patch+json",
           Accept: "application/json-patch+json"
         }
