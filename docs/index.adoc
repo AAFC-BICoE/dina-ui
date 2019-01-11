@@ -2,4 +2,12 @@
 
 = seqdb-api docs
 
+React based user interface for SeqDB.
+
 :leveloffset: 1
+
+include::stack.adoc[]
+
+include::ide.adoc[]
+
+include::npm_package_scripts.adoc[]

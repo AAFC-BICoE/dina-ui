@@ -1,0 +1,8 @@
+# IDE
+
+https://code.visualstudio.com/[Visual Studio Code] is recommended for development.
+
+## Recommended Extensions
+
+- https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode[Prettier - Code formatter]: Formats your code when you press shift+alt+f.
+- https://marketplace.visualstudio.com/items?itemName=joaompinto.asciidoctor-vscode[AsciiDoc]: AsciiDoc rich language support.
