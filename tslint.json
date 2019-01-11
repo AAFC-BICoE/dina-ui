@@ -1,7 +1,12 @@
 {
-  "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
+  "extends": [
+    "tslint:recommended",
+    "tslint-react",
+    "tslint-config-prettier",
+    "tslint-plugin-prettier"
+  ],
   "rules": {
-    "interface-name": false,
-    "array-type": true
+    "prettier": true,
+    "interface-name": false
   }
 }

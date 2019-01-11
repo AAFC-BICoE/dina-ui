@@ -2,8 +2,7 @@
   "name": "create-next-example-app",
   "scripts": {
     "lint": "tslint --project tsconfig.json",
-    "lint:fix": "npm run prettier && tslint --project tsconfig.json --fix",
-    "prettier": "prettier --write \"./**/*.{ts,tsx}\"",
+    "lint:fix": "tslint --project tsconfig.json --fix",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "dev": "next",
@@ -34,6 +33,7 @@
     "ts-jest": "^23.10.5",
     "tslint": "^5.12.1",
     "tslint-config-prettier": "^1.17.0",
+    "tslint-plugin-prettier": "^2.0.1",
     "tslint-react": "^3.6.0",
     "typescript": "^3.2.2"
   }
