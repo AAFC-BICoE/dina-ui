@@ -1,3 +1,4 @@
+import "bootswatch/dist/spacelab/bootstrap.min.css";
 import NextHead from "next/head";
 import React from "react";
 
