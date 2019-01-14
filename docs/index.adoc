@@ -8,6 +8,6 @@ React based user interface for SeqDB.
 
 include::stack.adoc[]
 
-include::ide.adoc[]
+include::dev_tools.adoc[]
 
 include::npm_package_scripts.adoc[]
