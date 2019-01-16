@@ -74,6 +74,7 @@ export class Query<
   async componentDidUpdate(prevProps: Readonly<QueryProps<TData, TMeta>>) {
     // Only re-fetch the data if the query prop was changed.
     if (!isEqual(prevProps.query, this.props.query)) {
+      this.setState({ loading: true });
       await this.fetchData();
     }
   }
