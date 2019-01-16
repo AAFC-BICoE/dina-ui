@@ -1,4 +1,5 @@
 module.exports = {
+  setupFiles: ["<rootDir>/jest.setup.js"],
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|js?|tsx?|ts?)$",
   transform: {
     "^.+\\.tsx?$": "babel-jest"

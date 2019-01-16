@@ -20,6 +20,7 @@
     "react-table": "^6.8.6"
   },
   "devDependencies": {
+    "@types/enzyme": "^3.1.15",
     "@types/jest": "^23.3.10",
     "@types/lodash": "^4.14.119",
     "@types/next": "^7.0.6",
@@ -30,6 +31,8 @@
     "@types/react-test-renderer": "^16.0.3",
     "@types/styled-jsx": "^2.2.7",
     "babel-jest": "^23.6.0",
+    "enzyme": "^3.8.0",
+    "enzyme-adapter-react-16": "^1.7.1",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^23.6.0",
     "react-test-renderer": "^16.7.0",
