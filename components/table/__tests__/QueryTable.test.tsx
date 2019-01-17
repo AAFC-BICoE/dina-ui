@@ -1,6 +1,6 @@
 import { mount } from "enzyme";
 import Kitsu, { KitsuResource, KitsuResponse } from "kitsu";
-import { range, last } from "lodash";
+import { range } from "lodash";
 import { MetaWithTotal } from "../../../types/seqdb-api/meta";
 import { ApiClientContext } from "../../api-client/ApiClientContext";
 import { QueryTable } from "../QueryTable";
@@ -158,9 +158,8 @@ describe("QueryTable component", () => {
   it("Renders the total number of pages when a custom pageSize is specified.", async () => {
     const wrapper = mountWithContext(
       <QueryTable
-        initialQuery={{ path: "todo" }}
+        initialQuery={{ path: "todo", page: { limit: 40 } }}
         columns={["id", "name", "description"]}
-        pageSize={40}
       />
     );
 
@@ -176,9 +175,8 @@ describe("QueryTable component", () => {
   it("Fetches the next page when the Next button is pressed.", async done => {
     const wrapper = mountWithContext(
       <QueryTable
-        initialQuery={{ path: "todo" }}
+        initialQuery={{ path: "todo", page: { limit: 25 } }}
         columns={["id", "name", "description"]}
-        pageSize={25}
       />
     );
 
@@ -228,9 +226,8 @@ describe("QueryTable component", () => {
   it("Fetches the prevous page when the previous button is pressed.", async () => {
     const wrapper = mountWithContext(
       <QueryTable
-        initialQuery={{ path: "todo" }}
+        initialQuery={{ path: "todo", page: { limit: 25 } }}
         columns={["id", "name", "description"]}
-        pageSize={25}
       />
     );
 
@@ -351,9 +348,8 @@ describe("QueryTable component", () => {
     // Initial pageSize is 5.
     const wrapper = mountWithContext(
       <QueryTable
-        initialQuery={{ path: "todo" }}
+        initialQuery={{ path: "todo", page: { limit: 5 } }}
         columns={["id", "name", "description"]}
-        pageSize={5}
       />
     );
 

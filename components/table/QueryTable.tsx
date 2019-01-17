@@ -8,7 +8,6 @@ import { JsonApiQuerySpec, Query } from "../api-client/Query";
 interface QueryTableProps {
   initialQuery: JsonApiQuerySpec;
   columns: string[];
-  pageSize?: number;
 }
 
 interface QueryTableState {
@@ -27,12 +26,15 @@ export class QueryTable<TData extends KitsuResource[]> extends React.Component<
   constructor(props: QueryTableProps) {
     super(props);
 
-    const { initialQuery, pageSize = DEFAULT_PAGE_SIZE } = props;
+    const { initialQuery } = props;
+
+    // Set defaults for page limit and offset if they are not defined.
+    const { limit = DEFAULT_PAGE_SIZE, offset = 0 } = initialQuery.page || {};
 
     this.state = {
       query: {
         ...initialQuery,
-        page: { limit: pageSize, offset: 0 }
+        page: { limit, offset }
       }
     };
   }
