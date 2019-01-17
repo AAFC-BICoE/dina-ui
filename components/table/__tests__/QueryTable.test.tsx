@@ -346,4 +346,49 @@ describe("QueryTable component", () => {
     //  - Third request with name and description sort.
     expect(mockGet).toHaveBeenCalledTimes(3);
   });
+
+  it("Provides a dropdown to change the page size.", async () => {
+    // Initial pageSize is 5.
+    const wrapper = mountWithContext(
+      <QueryTable
+        initialQuery={{ path: "todo" }}
+        columns={["id", "name", "description"]}
+        pageSize={5}
+      />
+    );
+
+    // Wait for the initial request to finish.
+    await Promise.resolve();
+
+    // The initial request should have a pageSize of 5.
+    expect(mockGet).lastCalledWith(
+      "todo",
+      objectContaining({ page: { limit: 5, offset: 0 } })
+    );
+
+    // Expect 5 rows.
+    expect(wrapper.find(".rt-tr-group").length).toEqual(5);
+
+    // Select a new page size of 50.
+    wrapper
+      .find(".-pagination select")
+      .simulate("change", { target: { value: 100 } });
+
+    // Wait for the second request to finish.
+    await Promise.resolve();
+
+    // The second request should have a pageSize of 5.
+    expect(mockGet).lastCalledWith(
+      "todo",
+      objectContaining({ page: { limit: 100, offset: 0 } })
+    );
+
+    // Expect 100 rows.
+    expect(wrapper.find(".rt-tr-group").length).toEqual(100);
+
+    // There should have been two requests:
+    // - The initial request with page size of 5.
+    // - The second request with page size of 100.
+    expect(mockGet).toHaveBeenCalledTimes(2);
+  });
 });

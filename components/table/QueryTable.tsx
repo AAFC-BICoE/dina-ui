@@ -39,9 +39,8 @@ export class QueryTable<TData extends KitsuResource[]> extends React.Component<
 
   onFetchData = reactTableState => {
     const { query } = this.state;
-    const { page: pageNumber, sorted } = reactTableState;
+    const { page: pageNumber, sorted, pageSize } = reactTableState;
 
-    const pageSize = query.page.limit;
     const newOffset = pageNumber * pageSize;
 
     const sort: string = (sorted as { desc: boolean; id: string }[])
@@ -90,7 +89,6 @@ export class QueryTable<TData extends KitsuResource[]> extends React.Component<
               manual={true}
               onFetchData={this.onFetchData}
               pages={numberOfPages}
-              showPageSizeOptions={false}
             />
           );
         }}
