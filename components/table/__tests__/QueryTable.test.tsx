@@ -1,6 +1,6 @@
 import { mount } from "enzyme";
 import Kitsu, { KitsuResource, KitsuResponse } from "kitsu";
-import { range } from "lodash";
+import { range, last } from "lodash";
 import { MetaWithTotal } from "../../../types/seqdb-api/meta";
 import { ApiClientContext } from "../../api-client/ApiClientContext";
 import { QueryTable } from "../QueryTable";
@@ -46,6 +46,8 @@ jest.mock(
 );
 
 describe("QueryTable component", () => {
+  const { objectContaining, anything } = expect;
+
   /** JSONAPI client. */
   const testClient = new Kitsu({
     baseURL: "/api",
@@ -60,6 +62,11 @@ describe("QueryTable component", () => {
       </ApiClientContext.Provider>
     );
   }
+
+  beforeEach(() => {
+    // Clear the mock's call and instance data.
+    mockGet.mockClear();
+  });
 
   it("Renders loading state initially.", () => {
     const wrapper = mountWithContext(
@@ -262,5 +269,81 @@ describe("QueryTable component", () => {
         .find(".rt-td")
         .map(cell => cell.text())
     ).toEqual(["24", "todo 24", "todo description 24"]);
+  });
+
+  it("Fetches sorted data when the header is clicked.", async () => {
+    const wrapper = mountWithContext(
+      <QueryTable
+        initialQuery={{ path: "todo" }}
+        columns={["id", "name", "description"]}
+      />
+    );
+
+    // Wait for the initial request to finish.
+    await Promise.resolve();
+
+    // The first request should have no sort.
+    expect(mockGet).not.lastCalledWith(
+      anything(),
+      objectContaining({ sort: anything() })
+    );
+
+    const nameHeader = wrapper.find(
+      ".rt-resizable-header-content[children='name']"
+    );
+
+    // Click the "name" header.
+    nameHeader.simulate("click");
+    await Promise.resolve();
+
+    // The second request should have a "name" sort.
+    expect(mockGet).lastCalledWith("todo", objectContaining({ sort: "name" }));
+
+    // Click the "name" header again to sort by descending order.
+    nameHeader.simulate("click");
+    await Promise.resolve();
+
+    // The third request should have a "-name" sort.
+    expect(mockGet).lastCalledWith("todo", objectContaining({ sort: "-name" }));
+
+    // There should have been 3 requests: the initial one, the ascending sort and the
+    // descending sort.
+    expect(mockGet).toHaveBeenCalledTimes(3);
+  });
+
+  it("Fetches multi-sorted data when a second header is shift-clicked.", async () => {
+    const wrapper = mountWithContext(
+      <QueryTable
+        initialQuery={{ path: "todo" }}
+        columns={["id", "name", "description"]}
+      />
+    );
+
+    // Wait for the initial request to finish.
+    await Promise.resolve();
+
+    // Click the "name" header.
+    wrapper
+      .find(".rt-resizable-header-content[children='name']")
+      .simulate("click");
+    await Promise.resolve();
+
+    // Shift-click the "description" header.
+    wrapper
+      .find(".rt-resizable-header-content[children='description']")
+      .simulate("click", { shiftKey: true });
+    await Promise.resolve();
+
+    // This request should be sorted by name and description.
+    expect(mockGet).lastCalledWith(
+      "todo",
+      objectContaining({ sort: "name,description" })
+    );
+
+    // Three requests should have happened:
+    //  - Initial request with no sort.
+    //  - Second request with "name" sort.
+    //  - Third request with name and description sort.
+    expect(mockGet).toHaveBeenCalledTimes(3);
   });
 });

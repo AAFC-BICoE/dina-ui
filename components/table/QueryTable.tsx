@@ -2,8 +2,8 @@ import { KitsuResource } from "kitsu";
 import React from "react";
 import ReactTable, { Column } from "react-table";
 import "react-table/react-table.css";
-import { JsonApiQuerySpec, Query } from "../api-client/Query";
 import { MetaWithTotal } from "../../types/seqdb-api/meta";
+import { JsonApiQuerySpec, Query } from "../api-client/Query";
 
 interface QueryTableProps {
   initialQuery: JsonApiQuerySpec;
@@ -39,14 +39,20 @@ export class QueryTable<TData extends KitsuResource[]> extends React.Component<
 
   onFetchData = reactTableState => {
     const { query } = this.state;
-    const { page: pageNumber } = reactTableState;
+    const { page: pageNumber, sorted } = reactTableState;
 
     const pageSize = query.page.limit;
     const newOffset = pageNumber * pageSize;
 
+    const sort: string = (sorted as { desc: boolean; id: string }[])
+      .map<string>(({ desc, id }) => `${desc ? "-" : ""}${id}`)
+      .join();
+
     this.setState({
       query: {
         ...query,
+        // Only add the sort attribute if there is a sort.
+        ...(sort.length && { sort }),
         page: {
           limit: pageSize,
           offset: newOffset
