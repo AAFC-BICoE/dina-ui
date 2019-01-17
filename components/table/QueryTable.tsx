@@ -3,6 +3,7 @@ import React from "react";
 import ReactTable, { Column } from "react-table";
 import "react-table/react-table.css";
 import { JsonApiQuerySpec, Query } from "../api-client/Query";
+import { MetaWithTotal } from "../../types/seqdb-api/meta";
 
 interface QueryTableProps {
   initialQuery: JsonApiQuerySpec;
@@ -14,8 +15,11 @@ interface QueryTableState {
   query: JsonApiQuerySpec;
 }
 
-const DEFAULT_PAGE_LIMIT = 25;
+const DEFAULT_PAGE_SIZE = 25;
 
+/**
+ * Table component that fetches data from the backend API.
+ */
 export class QueryTable<TData extends KitsuResource[]> extends React.Component<
   QueryTableProps,
   QueryTableState
@@ -23,13 +27,33 @@ export class QueryTable<TData extends KitsuResource[]> extends React.Component<
   constructor(props: QueryTableProps) {
     super(props);
 
+    const { initialQuery, pageSize = DEFAULT_PAGE_SIZE } = props;
+
     this.state = {
       query: {
-        ...props.initialQuery,
-        page: { limit: DEFAULT_PAGE_LIMIT, offset: 0 }
+        ...initialQuery,
+        page: { limit: pageSize, offset: 0 }
       }
     };
   }
+
+  onFetchData = reactTableState => {
+    const { query } = this.state;
+    const { page: pageNumber } = reactTableState;
+
+    const pageSize = query.page.limit;
+    const newOffset = pageNumber * pageSize;
+
+    this.setState({
+      query: {
+        ...query,
+        page: {
+          limit: pageSize,
+          offset: newOffset
+        }
+      }
+    });
+  };
 
   get mappedColumns(): Column[] {
     return this.props.columns.map<Column>(column => ({
@@ -42,18 +66,28 @@ export class QueryTable<TData extends KitsuResource[]> extends React.Component<
     const { query } = this.state;
 
     return (
-      <Query<TData> query={query}>
-        {({ loading, response }) => (
+      <Query<TData, MetaWithTotal> query={query}>
+        {({ loading, response }) => {
+          let numberOfPages: number = undefined;
+          if (response && response.meta && response.meta.totalResourceCount) {
+            numberOfPages = Math.ceil(
+              response.meta.totalResourceCount / query.page.limit
+            );
+          }
+
+          return (
             <ReactTable
               columns={this.mappedColumns}
               data={response && response.data}
               defaultPageSize={query.page.limit}
               loading={loading}
               manual={true}
+              onFetchData={this.onFetchData}
+              pages={numberOfPages}
               showPageSizeOptions={false}
             />
-          )
-        }
+          );
+        }}
       </Query>
     );
   }
