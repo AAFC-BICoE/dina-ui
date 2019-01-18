@@ -123,19 +123,31 @@ describe("QueryTable component", () => {
   });
 
   it("Renders the headers defined in the columns prop.", () => {
-    const headers = ["id", "name", "description"];
-
+    // Create the table with headers
     const wrapper = mountWithContext(
-      <QueryTable initialQuery={{ path: "todo" }} columns={headers} />
+      <QueryTable
+        initialQuery={{ path: "todo" }}
+        columns={["id", "name", "description", "relatedEntity.name"]}
+      />
     );
 
-    for (const header of headers) {
-      expect(
-        wrapper.contains(
-          <div className="rt-resizable-header-content">{header}</div>
-        )
-      ).toEqual(true);
-    }
+    // Expect the headers in title case.
+    expect(
+      wrapper.find(".rt-resizable-header-content[children='Id']").exists()
+    ).toEqual(true);
+    expect(
+      wrapper.find(".rt-resizable-header-content[children='Name']").exists()
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".rt-resizable-header-content[children='Description']")
+        .exists()
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".rt-resizable-header-content[children='Related Entity Name']")
+        .exists()
+    ).toEqual(true);
   });
 
   it("Renders the total number of pages when no custom pageSize is specified.", async () => {
@@ -286,7 +298,7 @@ describe("QueryTable component", () => {
     );
 
     const nameHeader = wrapper.find(
-      ".rt-resizable-header-content[children='name']"
+      ".rt-resizable-header-content[children='Name']"
     );
 
     // Click the "name" header.
@@ -321,13 +333,13 @@ describe("QueryTable component", () => {
 
     // Click the "name" header.
     wrapper
-      .find(".rt-resizable-header-content[children='name']")
+      .find(".rt-resizable-header-content[children='Name']")
       .simulate("click");
     await Promise.resolve();
 
     // Shift-click the "description" header.
     wrapper
-      .find(".rt-resizable-header-content[children='description']")
+      .find(".rt-resizable-header-content[children='Description']")
       .simulate("click", { shiftKey: true });
     await Promise.resolve();
 

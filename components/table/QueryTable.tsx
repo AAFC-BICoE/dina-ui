@@ -2,6 +2,7 @@ import { KitsuResource } from "kitsu";
 import React from "react";
 import ReactTable, { Column } from "react-table";
 import "react-table/react-table.css";
+import titleCase from "title-case";
 import { MetaWithTotal } from "../../types/seqdb-api/meta";
 import { JsonApiQuerySpec, Query } from "../api-client/Query";
 
@@ -64,7 +65,7 @@ export class QueryTable<TData extends KitsuResource[]> extends React.Component<
 
   get mappedColumns(): Column[] {
     return this.props.columns.map<Column>(column => ({
-      Header: column,
+      Header: titleCase(column),
       accessor: column
     }));
   }
