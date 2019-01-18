@@ -1,6 +1,8 @@
 {
   "name": "create-next-example-app",
   "scripts": {
+    "lint": "tslint --project tsconfig.json",
+    "lint:fix": "tslint --project tsconfig.json --fix",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "dev": "next",
@@ -26,8 +28,13 @@
     "babel-jest": "^23.6.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^23.6.0",
+    "prettier": "^1.15.3",
     "react-test-renderer": "^16.7.0",
     "ts-jest": "^23.10.5",
+    "tslint": "^5.12.1",
+    "tslint-config-prettier": "^1.17.0",
+    "tslint-plugin-prettier": "^2.0.1",
+    "tslint-react": "^3.6.0",
     "typescript": "^3.2.2"
   }
 }
