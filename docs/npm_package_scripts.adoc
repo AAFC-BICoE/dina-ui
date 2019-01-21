@@ -1,0 +1,29 @@
+= NPM Package Scripts
+
+== `npm run docs`
+
+Compiles the docs (written in https://asciidoctor.org/docs/what-is-asciidoc/[AsciiDoc]) as a
+single HTML file in the "generated-docs" directory.
+
+== `npm test`
+
+Runs the tests (without generating the test coverage report).
+
+== `npm run test:coverage`
+
+Runs the tests. Prints the test coverage report to stdout, and writes the coverage report files
+into the "coverage" directory.
+
+== `npm run dev`
+
+Runs the UI application at localhost:3000 in dev mode using https://github.com/zeit/next.js[Next.js].
+If you edit and save a source file, the running application will reload itself.
+
+== `npm run build`
+
+Generates the production build.
+
+== `npm start`
+
+Runs the application in production mode. Requires a build first, which you can generate using
+`npm run build`.
