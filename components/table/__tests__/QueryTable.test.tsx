@@ -1,11 +1,8 @@
 import { mount } from "enzyme";
-import Kitsu, { KitsuResource, KitsuResponse, FilterParam } from "kitsu";
+import Kitsu, { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import { range } from "lodash";
 import { MetaWithTotal } from "../../../types/seqdb-api/meta";
-import {
-  ApiClientContext,
-  ApiClientContextI
-} from "../../api-client/ApiClientContext";
+import { ApiClientContext } from "../../api-client/ApiClientContext";
 import { QueryTable, QueryTableProps } from "../QueryTable";
 
 /** Example of an API resource interface definition for a todo-list entry. */
@@ -277,6 +274,25 @@ describe("QueryTable component", () => {
     ).toEqual(["24", "todo 24", "todo description 24"]);
   });
 
+  it("Fetches sorted data when the defaultSort prop is passed.", async () => {
+    mountWithContext(
+      <QueryTable
+        path="todo"
+        columns={["id", "name", "description"]}
+        defaultSort="description"
+      />
+    );
+
+    // Wait for the initial request to finish.
+    await Promise.resolve();
+
+    expect(mockGet).toHaveBeenCalledTimes(1);
+    expect(mockGet).lastCalledWith(
+      "todo",
+      objectContaining({ sort: "description" })
+    );
+  });
+
   it("Fetches sorted data when the header is clicked.", async () => {
     const wrapper = mountWithContext(
       <QueryTable path="todo" columns={["id", "name", "description"]} />
@@ -427,7 +443,7 @@ describe("QueryTable component", () => {
   });
 
   it("Sends a request for included resources when the include prop is passed.", async () => {
-    const wrapper = mountWithContext(
+    mountWithContext(
       <QueryTable
         path="todo"
         columns={["id", "name", "description"]}
