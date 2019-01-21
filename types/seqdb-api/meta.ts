@@ -1,3 +1,3 @@
 export interface MetaWithTotal {
-  totalResourceCount: number
+  totalResourceCount: number;
 }

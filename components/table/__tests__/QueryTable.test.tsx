@@ -21,10 +21,10 @@ function getMockTodos(page): KitsuResponse<Todo[], MetaWithTotal> {
 
   return {
     data: idRange.map<Todo>(i => ({
+      description: `todo description ${i}`,
       id: `${i}`,
-      type: "todo",
       name: `todo ${i}`,
-      description: `todo description ${i}`
+      type: "todo"
     })),
     meta: {
       totalResourceCount: 300
@@ -41,7 +41,7 @@ jest.mock(
   "kitsu",
   () =>
     class {
-      get = mockGet;
+      public get = mockGet;
     }
 );
 
@@ -412,9 +412,9 @@ describe("QueryTable component", () => {
     const firstFilterProp: FilterParam = { name: "todo 1" };
 
     const firstProps: QueryTableProps = {
-      path: "todo",
       columns: ["id", "name", "description"],
-      filter: firstFilterProp
+      filter: firstFilterProp,
+      path: "todo"
     };
 
     const wrapper = mountWithContext(<QueryTable {...firstProps} />);

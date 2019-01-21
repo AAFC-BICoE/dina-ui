@@ -55,38 +55,12 @@ export class QueryTable<TData extends KitsuResource[]> extends React.Component<
     const limit = defaultPageSize || DEFAULT_PAGE_SIZE;
 
     this.state = {
-      sort: defaultSort,
-      page: { limit, offset: 0 }
+      page: { limit, offset: 0 },
+      sort: defaultSort
     };
   }
 
-  onFetchData = reactTableState => {
-    const { page: newPageNumber, sorted, pageSize } = reactTableState;
-
-    const newOffset = newPageNumber * pageSize;
-
-    const newSort: string = (sorted as { desc: boolean; id: string }[])
-      .map<string>(({ desc, id }) => `${desc ? "-" : ""}${id}`)
-      .join();
-
-    this.setState({
-      // Only add the sort attribute if there is a sort.
-      ...(newSort.length && { sort: newSort }),
-      page: {
-        limit: pageSize,
-        offset: newOffset
-      }
-    });
-  };
-
-  get mappedColumns(): Column[] {
-    return this.props.columns.map<Column>(column => ({
-      Header: titleCase(column),
-      accessor: column
-    }));
-  }
-
-  render() {
+  public render() {
     const { filter, include, path } = this.props;
     const { page, sort } = this.state;
 
@@ -95,7 +69,7 @@ export class QueryTable<TData extends KitsuResource[]> extends React.Component<
     return (
       <Query<TData, MetaWithTotal> query={query}>
         {({ loading, response }) => {
-          let numberOfPages: number = undefined;
+          let numberOfPages: number;
           if (response && response.meta && response.meta.totalResourceCount) {
             numberOfPages = Math.ceil(
               response.meta.totalResourceCount / query.page.limit
@@ -116,5 +90,31 @@ export class QueryTable<TData extends KitsuResource[]> extends React.Component<
         }}
       </Query>
     );
+  }
+
+  private onFetchData = reactTableState => {
+    const { page: newPageNumber, sorted, pageSize } = reactTableState;
+
+    const newOffset = newPageNumber * pageSize;
+
+    const newSort: string = (sorted as Array<{ desc: boolean; id: string }>)
+      .map<string>(({ desc, id }) => `${desc ? "-" : ""}${id}`)
+      .join();
+
+    this.setState({
+      // Only add the sort attribute if there is a sort.
+      ...(newSort.length && { sort: newSort }),
+      page: {
+        limit: pageSize,
+        offset: newOffset
+      }
+    });
+  };
+
+  private get mappedColumns(): Column[] {
+    return this.props.columns.map<Column>(column => ({
+      Header: titleCase(column),
+      accessor: column
+    }));
   }
 }
