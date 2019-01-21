@@ -55,25 +55,25 @@ const MOCK_TODOS_RESPONSE_PAGE_2: KitsuResponse<Todo[], MetaWithTotal> = {
 const MOCK_500_ERROR: JsonApiErrorResponse = {
   errors: [
     {
-      status: "500",
-      title: "INTERNAL_SERVER_ERROR",
       detail:
-        "Unable to locate Attribute [unknownAttribute] on this ManagedType [ca.gc.aafc.seqdb.entities.Todo]"
+        "Unable to locate Attribute [unknownAttribute] on this ManagedType [ca.gc.aafc.seqdb.entities.Todo]",
+      status: "500",
+      title: "INTERNAL_SERVER_ERROR"
     }
   ]
 };
 
 // Mock Kitsu class' "get" method.
 const mockGet = jest.fn((path, { fields, page }) => {
-  if (path == "todo") {
-    if (fields && fields.todo == "unknownAttribute") {
+  if (path === "todo") {
+    if (fields && fields.todo === "unknownAttribute") {
       throw MOCK_500_ERROR;
     }
-    if (page && page.offset == 3) {
+    if (page && page.offset === 3) {
       return MOCK_TODOS_RESPONSE_PAGE_2;
     }
     return MOCK_TODOS_RESPONSE;
-  } else if (path == "todo/25") {
+  } else if (path === "todo/25") {
     return MOCK_TODO_RESPONSE;
   }
 });
@@ -102,7 +102,7 @@ jest.mock(
   "kitsu",
   () =>
     class {
-      get = mockGet;
+      public get = mockGet;
     }
 );
 
@@ -121,7 +121,7 @@ describe("Query component", () => {
         <Query<Todo[]> query={{ path: "todo" }}>
           {({ loading }) => {
             // Query should be rendered once with loading as true.
-            if (renderCount == 0) {
+            if (renderCount === 0) {
               expect(loading).toEqual(true);
               done();
             }
@@ -142,7 +142,7 @@ describe("Query component", () => {
               expect(loading).toEqual(false);
               expect(response).toEqual(MOCK_TODO_RESPONSE);
               // Make sure the response data field has the Todo type.
-              response.data.name;
+              expect(response.data.name).toBeDefined();
               done();
             }
             return <div />;
@@ -161,9 +161,9 @@ describe("Query component", () => {
               expect(loading).toEqual(false);
               expect(response).toEqual(MOCK_TODOS_RESPONSE);
               // Make sure the response data field has the Todo array type.
-              response.data[0].name;
+              expect(response.data[0].name).toBeDefined();
               // Make sure the response meta field has the MetaWithTotal type.
-              response.meta.totalResourceCount;
+              expect(response.meta.totalResourceCount).toBeDefined();
               done();
             }
             return <div />;
@@ -188,12 +188,12 @@ describe("Query component", () => {
       <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Query<Todo[]>
           query={{
-            path: "todo",
             fields: { todo: "name,description" },
             filter: { name: "todo 2" },
-            sort: "name",
             include: "group",
-            page: { offset: 200, limit: 100 }
+            page: { offset: 200, limit: 100 },
+            path: "todo",
+            sort: "name"
           }}
         >
           {() => <div />}
@@ -208,9 +208,9 @@ describe("Query component", () => {
     expect(getParams).toEqual({
       fields: { todo: "name,description" },
       filter: { name: "todo 2" },
-      sort: "name",
       include: "group",
-      page: { offset: 200, limit: 100 }
+      page: { offset: 200, limit: 100 },
+      sort: "name"
     });
   });
 

@@ -41,13 +41,32 @@ export class Query<
   TData extends KitsuResponseData,
   TMeta = undefined
 > extends React.Component<QueryProps<TData, TMeta>, QueryState<TData, TMeta>> {
-  static contextType = ApiClientContext;
+  public static contextType = ApiClientContext;
 
-  state = {
+  public state = {
     loading: true
   };
 
-  async fetchData(): Promise<void> {
+  public async componentDidMount(): Promise<void> {
+    // Fetch the data when the component is mounted.
+    await this.fetchData();
+  }
+
+  public async componentDidUpdate(
+    prevProps: Readonly<QueryProps<TData, TMeta>>
+  ) {
+    // Only re-fetch the data if the query prop was changed.
+    if (!isEqual(prevProps.query, this.props.query)) {
+      this.setState({ loading: true });
+      await this.fetchData();
+    }
+  }
+
+  public render() {
+    return this.props.children(this.state);
+  }
+
+  private async fetchData(): Promise<void> {
     const { path, fields, filter, sort, include, page } = this.props.query;
     const { apiClient } = this.context as ApiClientContextI;
 
@@ -64,22 +83,5 @@ export class Query<
     } catch (error) {
       this.setState({ loading: false, error });
     }
-  }
-
-  async componentDidMount(): Promise<void> {
-    // Fetch the data when the component is mounted.
-    await this.fetchData();
-  }
-
-  async componentDidUpdate(prevProps: Readonly<QueryProps<TData, TMeta>>) {
-    // Only re-fetch the data if the query prop was changed.
-    if (!isEqual(prevProps.query, this.props.query)) {
-      this.setState({ loading: true });
-      await this.fetchData();
-    }
-  }
-
-  render() {
-    return this.props.children(this.state);
   }
 }
