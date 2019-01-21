@@ -24,19 +24,23 @@ describe("SeqdbUiApp", () => {
   });
 
   it("Provides the API context to child components.", done => {
+    function pageComponent() {
+      return (
+        <ApiClientContext.Consumer>
+          {context => {
+            expect(context.apiClient instanceof Kitsu).toBeTruthy();
+            done();
+            return null;
+          }}
+        </ApiClientContext.Consumer>
+      );
+    }
+
     create(
       <SeqdbUiApp
         router={Router}
         pageProps={{ exampleProp: "exampleValue" }}
-        Component={() => (
-          <ApiClientContext.Consumer>
-            {context => {
-              expect(context.apiClient instanceof Kitsu).toBeTruthy();
-              done();
-              return null;
-            }}
-          </ApiClientContext.Consumer>
-        )}
+        Component={pageComponent}
       />
     );
   });

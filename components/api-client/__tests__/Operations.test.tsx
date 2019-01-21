@@ -1,4 +1,4 @@
-import { AxiosRequestConfig, AxiosError } from "axios";
+import { AxiosError, AxiosRequestConfig } from "axios";
 import Kitsu from "kitsu";
 import { create } from "react-test-renderer";
 import { ApiClientContext } from "../ApiClientContext";
@@ -10,20 +10,20 @@ const TODO_INSERT_OPERATION: Operation[] = [
     op: "POST",
     path: "todo",
     value: {
-      id: 123,
-      type: "todo",
       attributes: {
-        name: "todo 1",
-        description: "description"
-      }
+        description: "description",
+        name: "todo 1"
+      },
+      id: 123,
+      type: "todo"
     }
   }
 ];
 
 const AXIOS_JSONPATCH_REQUEST_CONFIG: AxiosRequestConfig = {
   headers: {
-    "Content-Type": "application/json-patch+json",
-    Accept: "application/json-patch+json"
+    Accept: "application/json-patch+json",
+    "Content-Type": "application/json-patch+json"
   }
 };
 
@@ -31,12 +31,12 @@ const MOCK_TODO_INSERT_AXIOS_RESPONSE = {
   data: [
     {
       data: {
-        id: 123,
-        type: "todo",
         attributes: {
-          name: "todo 1",
-          description: "description"
-        }
+          description: "description",
+          name: "todo 1"
+        },
+        id: 123,
+        type: "todo"
       },
       status: 201
     }
@@ -49,22 +49,22 @@ const TODO_OPERATION_1_VALID_1_INVALID: Operation[] = [
     op: "POST",
     path: "todo",
     value: {
-      id: 1,
-      type: "todo",
       attributes: {
         name: "valid-name"
-      }
+      },
+      id: 1,
+      type: "todo"
     }
   },
   {
     op: "POST",
     path: "todo",
     value: {
-      id: 2,
-      type: "todo",
       attributes: {
         name: "this-name-is-too-long"
-      }
+      },
+      id: 2,
+      type: "todo"
     }
   }
 ];
@@ -74,21 +74,21 @@ const MOCK_AXIOS_RESPONSE_1_VALID_1_INVALID = {
   data: [
     {
       data: {
-        id: "1",
-        type: "todo",
         attributes: {
           name: "valid-name"
         },
-        links: { self: "/api/region/1" }
+        id: "1",
+        links: { self: "/api/region/1" },
+        type: "todo"
       },
       status: 201
     },
     {
       errors: [
         {
+          detail: "name size must be between 1 and 10",
           status: "422",
-          title: "Constraint violation",
-          detail: "name size must be between 1 and 10"
+          title: "Constraint violation"
         }
       ],
       status: 422
@@ -101,17 +101,17 @@ const INVALID_OPERATIONS_FORMAT_REQUEST =
 
 const MOCK_AXIOS_ERROR: AxiosError = {
   config: {},
-  name: "error",
-  message: "error"
+  message: "error",
+  name: "error"
 };
 
 /** Mock of Axios' patch function. */
 const mockPatch = jest.fn((_, data) => {
-  if (data == TODO_INSERT_OPERATION) {
+  if (data === TODO_INSERT_OPERATION) {
     return MOCK_TODO_INSERT_AXIOS_RESPONSE;
-  } else if (data == TODO_OPERATION_1_VALID_1_INVALID) {
+  } else if (data === TODO_OPERATION_1_VALID_1_INVALID) {
     return MOCK_AXIOS_RESPONSE_1_VALID_1_INVALID;
-  } else if (data == INVALID_OPERATIONS_FORMAT_REQUEST) {
+  } else if (data === INVALID_OPERATIONS_FORMAT_REQUEST) {
     throw MOCK_AXIOS_ERROR;
   }
 });
@@ -141,14 +141,13 @@ describe("Operations component", () => {
     const wrapper = create(
       <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Operations>
-          {({ doOperations }) => (
-            <form
-              onSubmit={async () => {
-                // Send the request.
-                await doOperations(TODO_INSERT_OPERATION);
-              }}
-            />
-          )}
+          {({ doOperations }) => {
+            async function onSubmit() {
+              await doOperations(TODO_INSERT_OPERATION);
+            }
+
+            return <form onSubmit={onSubmit} />;
+          }}
         </Operations>
       </ApiClientContext.Provider>
     );
@@ -186,14 +185,16 @@ describe("Operations component", () => {
       <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Operations>
           {({ doOperations, loading, response }) => {
+            async function onSubmit() {
+              await doOperations(TODO_INSERT_OPERATION);
+            }
+
             if (loading) {
               expect(response).toBeUndefined();
               done();
             }
 
-            return (
-              <form onSubmit={() => doOperations(TODO_INSERT_OPERATION)} />
-            );
+            return <form onSubmit={onSubmit} />;
           }}
         </Operations>
       </ApiClientContext.Provider>
@@ -207,6 +208,10 @@ describe("Operations component", () => {
       <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Operations>
           {({ doOperations, loading, response }) => {
+            async function onSubmit() {
+              await doOperations(TODO_OPERATION_1_VALID_1_INVALID);
+            }
+
             if (response) {
               expect(loading).toBeFalsy();
               expect(response).toEqual(
@@ -215,13 +220,7 @@ describe("Operations component", () => {
               done();
             }
 
-            return (
-              <form
-                onSubmit={async () =>
-                  await doOperations(TODO_OPERATION_1_VALID_1_INVALID)
-                }
-              />
-            );
+            return <form onSubmit={onSubmit} />;
           }}
         </Operations>
       </ApiClientContext.Provider>
@@ -234,13 +233,13 @@ describe("Operations component", () => {
     const render = create(
       <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Operations>
-          {({ doOperations }) => (
-            <form
-              onSubmit={async () =>
-                await doOperations(INVALID_OPERATIONS_FORMAT_REQUEST as any)
-              }
-            />
-          )}
+          {({ doOperations }) => {
+            async function onSubmit() {
+              await doOperations(INVALID_OPERATIONS_FORMAT_REQUEST as any);
+            }
+
+            return <form onSubmit={onSubmit} />;
+          }}
         </Operations>
       </ApiClientContext.Provider>
     );
@@ -248,7 +247,7 @@ describe("Operations component", () => {
     try {
       // Expect doOperations to throw an error.
       await render.root.findByType("form").props.onSubmit();
-    } catch(error) {
+    } catch (error) {
       expect(error).toEqual(MOCK_AXIOS_ERROR);
       done();
     }

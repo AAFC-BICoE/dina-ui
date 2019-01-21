@@ -9,4 +9,6 @@ export interface ApiClientContextI {
 /**
  * React context that passes down a single API client to subscribed components.
  */
-export const ApiClientContext = React.createContext<ApiClientContextI>(undefined);
+export const ApiClientContext = React.createContext<ApiClientContextI>(
+  undefined
+);

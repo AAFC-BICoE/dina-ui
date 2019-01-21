@@ -9,13 +9,13 @@ import { ApiClientContext } from "../components/api-client/ApiClientContext";
  * See: https://github.com/zeit/next.js/#custom-app
  */
 export default class SeqdbUiApp extends App {
-  apiClient = new Kitsu({
+  private apiClient = new Kitsu({
     baseURL: "/api",
     pluralize: false,
     resourceCase: "none"
   });
 
-  render() {
+  public render() {
     const { Component, pageProps } = this.props;
 
     return (

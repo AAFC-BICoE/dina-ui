@@ -40,11 +40,21 @@ export class Operations extends React.Component<
   OperationsProps,
   OperationsState
 > {
-  static contextType = ApiClientContext;
+  public static contextType = ApiClientContext;
 
-  state: OperationsState = {
+  public state: OperationsState = {
     loading: false
   };
+
+  public render() {
+    const { loading, response } = this.state;
+
+    return this.props.children({
+      doOperations: ops => this.doOperations(ops),
+      loading,
+      response
+    });
+  }
 
   /**
    * Performs write operations against the backend.
@@ -62,26 +72,16 @@ export class Operations extends React.Component<
     try {
       const axiosResponse = await axios.patch("operations", operations, {
         headers: {
-          "Content-Type": "application/json-patch+json",
-          Accept: "application/json-patch+json"
+          Accept: "application/json-patch+json",
+          "Content-Type": "application/json-patch+json"
         }
       });
       this.setState({ loading: false, response: axiosResponse.data });
-    } catch(error) {
+    } catch (error) {
       // Unknown errors thrown by axios.patch will be caught here.
       // Validation errors are included in the operations response, and not caught here.
       this.setState({ loading: false });
       throw error;
     }
-  }
-
-  render() {
-    const { loading, response } = this.state;
-
-    return this.props.children({
-      doOperations: ops => this.doOperations(ops),
-      loading,
-      response
-    });
   }
 }
