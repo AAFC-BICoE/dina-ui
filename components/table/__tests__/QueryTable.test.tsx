@@ -1,9 +1,12 @@
 import { mount } from "enzyme";
-import Kitsu, { KitsuResource, KitsuResponse } from "kitsu";
+import Kitsu, { KitsuResource, KitsuResponse, FilterParam } from "kitsu";
 import { range } from "lodash";
 import { MetaWithTotal } from "../../../types/seqdb-api/meta";
-import { ApiClientContext } from "../../api-client/ApiClientContext";
-import { QueryTable } from "../QueryTable";
+import {
+  ApiClientContext,
+  ApiClientContextI
+} from "../../api-client/ApiClientContext";
+import { QueryTable, QueryTableProps } from "../QueryTable";
 
 /** Example of an API resource interface definition for a todo-list entry. */
 interface Todo extends KitsuResource {
@@ -70,10 +73,7 @@ describe("QueryTable component", () => {
 
   it("Renders loading state initially.", () => {
     const wrapper = mountWithContext(
-      <QueryTable
-        initialQuery={{ path: "todo" }}
-        columns={["id", "name", "description"]}
-      />
+      <QueryTable path="todo" columns={["id", "name", "description"]} />
     );
 
     expect(
@@ -87,10 +87,7 @@ describe("QueryTable component", () => {
 
   it("Renders the data from the mocked backend.", async () => {
     const wrapper = mountWithContext(
-      <QueryTable
-        initialQuery={{ path: "todo" }}
-        columns={["id", "name", "description"]}
-      />
+      <QueryTable path="todo" columns={["id", "name", "description"]} />
     );
 
     // Continue the test after the data fetch is done.
@@ -126,7 +123,7 @@ describe("QueryTable component", () => {
     // Create the table with headers
     const wrapper = mountWithContext(
       <QueryTable
-        initialQuery={{ path: "todo" }}
+        path="todo"
         columns={["id", "name", "description", "relatedEntity.name"]}
       />
     );
@@ -152,10 +149,7 @@ describe("QueryTable component", () => {
 
   it("Renders the total number of pages when no custom pageSize is specified.", async () => {
     const wrapper = mountWithContext(
-      <QueryTable
-        initialQuery={{ path: "todo" }}
-        columns={["id", "name", "description"]}
-      />
+      <QueryTable path="todo" columns={["id", "name", "description"]} />
     );
 
     // Wait until the data is loaded into the table.
@@ -170,7 +164,8 @@ describe("QueryTable component", () => {
   it("Renders the total number of pages when a custom pageSize is specified.", async () => {
     const wrapper = mountWithContext(
       <QueryTable
-        initialQuery={{ path: "todo", page: { limit: 40 } }}
+        path="todo"
+        defaultPageSize={40}
         columns={["id", "name", "description"]}
       />
     );
@@ -187,7 +182,8 @@ describe("QueryTable component", () => {
   it("Fetches the next page when the Next button is pressed.", async done => {
     const wrapper = mountWithContext(
       <QueryTable
-        initialQuery={{ path: "todo", page: { limit: 25 } }}
+        path="todo"
+        defaultPageSize={25}
         columns={["id", "name", "description"]}
       />
     );
@@ -235,10 +231,11 @@ describe("QueryTable component", () => {
     done();
   });
 
-  it("Fetches the prevous page when the previous button is pressed.", async () => {
+  it("Fetches the previous page when the previous button is pressed.", async () => {
     const wrapper = mountWithContext(
       <QueryTable
-        initialQuery={{ path: "todo", page: { limit: 25 } }}
+        path="todo"
+        defaultPageSize={25}
         columns={["id", "name", "description"]}
       />
     );
@@ -282,10 +279,7 @@ describe("QueryTable component", () => {
 
   it("Fetches sorted data when the header is clicked.", async () => {
     const wrapper = mountWithContext(
-      <QueryTable
-        initialQuery={{ path: "todo" }}
-        columns={["id", "name", "description"]}
-      />
+      <QueryTable path="todo" columns={["id", "name", "description"]} />
     );
 
     // Wait for the initial request to finish.
@@ -322,10 +316,7 @@ describe("QueryTable component", () => {
 
   it("Fetches multi-sorted data when a second header is shift-clicked.", async () => {
     const wrapper = mountWithContext(
-      <QueryTable
-        initialQuery={{ path: "todo" }}
-        columns={["id", "name", "description"]}
-      />
+      <QueryTable path="todo" columns={["id", "name", "description"]} />
     );
 
     // Wait for the initial request to finish.
@@ -360,7 +351,8 @@ describe("QueryTable component", () => {
     // Initial pageSize is 5.
     const wrapper = mountWithContext(
       <QueryTable
-        initialQuery={{ path: "todo", page: { limit: 5 } }}
+        path="todo"
+        defaultPageSize={5}
         columns={["id", "name", "description"]}
       />
     );
@@ -398,5 +390,58 @@ describe("QueryTable component", () => {
     // - The initial request with page size of 5.
     // - The second request with page size of 100.
     expect(mockGet).toHaveBeenCalledTimes(2);
+  });
+
+  it("Sends a request for filtered data when the filter prop is passed.", async () => {
+    const firstFilterProp: FilterParam = { name: "todo 1" };
+
+    const firstProps: QueryTableProps = {
+      path: "todo",
+      columns: ["id", "name", "description"],
+      filter: firstFilterProp
+    };
+
+    const wrapper = mountWithContext(<QueryTable {...firstProps} />);
+
+    // Wait for the first request to finish.
+    await Promise.resolve();
+
+    expect(mockGet).toHaveBeenCalledTimes(1);
+    expect(mockGet).lastCalledWith(
+      "todo",
+      objectContaining({ filter: firstFilterProp })
+    );
+
+    // Update the filter prop.
+    const secondFilterProp: FilterParam = { description: "todo 2" };
+    wrapper.setProps({
+      children: <QueryTable {...firstProps} filter={secondFilterProp} />
+    });
+
+    // When a new filter is passed, a new request is sent with the new filter.
+    expect(mockGet).toHaveBeenCalledTimes(2);
+    expect(mockGet).lastCalledWith(
+      "todo",
+      objectContaining({ filter: secondFilterProp })
+    );
+  });
+
+  it("Sends a request for included resources when the include prop is passed.", async () => {
+    const wrapper = mountWithContext(
+      <QueryTable
+        path="todo"
+        columns={["id", "name", "description"]}
+        include="relatedResource"
+      />
+    );
+
+    // Wait for the first request to finish.
+    await Promise.resolve();
+
+    expect(mockGet).toHaveBeenCalledTimes(1);
+    expect(mockGet).lastCalledWith(
+      "todo",
+      objectContaining({ include: "relatedResource" })
+    );
   });
 });
