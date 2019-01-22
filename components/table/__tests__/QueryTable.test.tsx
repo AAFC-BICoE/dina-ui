@@ -1,6 +1,7 @@
 import { mount } from "enzyme";
 import Kitsu, { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import { range } from "lodash";
+import ReactTable from "react-table";
 import { MetaWithTotal } from "../../../types/seqdb-api/meta";
 import { ApiClientContext } from "../../api-client/ApiClientContext";
 import { QueryTable, QueryTableProps } from "../QueryTable";
@@ -459,5 +460,13 @@ describe("QueryTable component", () => {
       "todo",
       objectContaining({ include: "relatedResource" })
     );
+  });
+
+  it("Is a striped table.", () => {
+    const wrapper = mountWithContext(
+      <QueryTable path="todo" columns={["id", "name", "description"]} />
+    );
+
+    expect(wrapper.find(ReactTable).hasClass("-striped")).toEqual(true);
   });
 });

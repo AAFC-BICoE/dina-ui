@@ -78,6 +78,7 @@ export class QueryTable<TData extends KitsuResource[]> extends React.Component<
 
           return (
             <ReactTable
+              className="-striped"
               columns={this.mappedColumns}
               data={response && response.data}
               defaultPageSize={query.page.limit}
