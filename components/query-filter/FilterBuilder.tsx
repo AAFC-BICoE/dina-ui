@@ -2,19 +2,26 @@ import React from "react";
 import { FilterGroup, FilterGroupModel } from "./FilterGroup";
 import { FilterRow, FilterRowModel } from "./FilterRow";
 
-interface FilterBuilderState {
-  rootFilterGroup: FilterGroupModel;
+interface FilterBuilderProps {
+  filterAttributes: string[];
 }
 
-export class FilterBuilder extends React.Component<{}, FilterBuilderState> {
+interface FilterBuilderState {
+  model: FilterGroupModel;
+}
+
+export class FilterBuilder extends React.Component<
+  FilterBuilderProps,
+  FilterBuilderState
+> {
   constructor(props) {
     super(props);
     this.state = {
-      rootFilterGroup: {
+      model: {
         children: [
           {
+            attribute: "name",
             predicate: "IS",
-            property: "name",
             type: "FILTER_ROW",
             value: ""
           }
@@ -27,8 +34,8 @@ export class FilterBuilder extends React.Component<{}, FilterBuilderState> {
 
   public render() {
     return this.renderFilter({
-      filterUnit: this.state.rootFilterGroup,
-      parent: this.state.rootFilterGroup
+      model: this.state.model,
+      parent: this.state.model
     });
   }
 
@@ -42,8 +49,8 @@ export class FilterBuilder extends React.Component<{}, FilterBuilderState> {
     operator: "AND" | "OR";
   }) {
     const newFilterRow: FilterRowModel = {
+      attribute: "name",
       predicate: "IS",
-      property: "name",
       type: "FILTER_ROW",
       value: ""
     };
@@ -62,17 +69,15 @@ export class FilterBuilder extends React.Component<{}, FilterBuilderState> {
   }
 
   private renderFilter({
-    filterUnit,
+    model,
     parent
   }: {
-    filterUnit: FilterGroupModel | FilterRowModel;
+    model: FilterGroupModel | FilterRowModel;
     parent: FilterGroupModel;
   }): JSX.Element {
-    const filterUnitModel = filterUnit;
-
     const onAndClick = () => {
       this.addFilterRow({
-        after: filterUnitModel,
+        after: model,
         operator: "AND",
         parent
       });
@@ -80,31 +85,32 @@ export class FilterBuilder extends React.Component<{}, FilterBuilderState> {
 
     const onOrClick = () => {
       this.addFilterRow({
-        after: filterUnitModel,
+        after: model,
         operator: "OR",
         parent
       });
     };
 
-    switch (filterUnitModel.type) {
+    switch (model.type) {
       case "FILTER_GROUP":
         return (
           <FilterGroup
-            model={filterUnitModel}
+            model={model}
             onAndClick={onAndClick}
             onOrClick={onOrClick}
           >
-            {filterUnitModel.children.map(child =>
-              this.renderFilter({ filterUnit: child, parent: filterUnitModel })
+            {model.children.map(child =>
+              this.renderFilter({ model: child, parent: model })
             )}
           </FilterGroup>
         );
       case "FILTER_ROW":
         return (
           <FilterRow
-            model={filterUnitModel}
+            model={model}
             onAndClick={onAndClick}
             onOrClick={onOrClick}
+            filterAttributes={this.props.filterAttributes}
           />
         );
     }
