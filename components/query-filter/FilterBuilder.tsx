@@ -6,7 +6,7 @@ interface FilterBuilderProps {
   filterAttributes: string[];
 }
 
-interface FilterBuilderState {
+export interface FilterBuilderState {
   model: FilterGroupModel;
 }
 
@@ -65,7 +65,29 @@ export class FilterBuilder extends React.Component<
       };
     }
 
+    this.flattenModel(this.state.model);
+
     this.setState({});
+  }
+
+  /**
+   * Removes filter groups that only have one child. This method is used as cleanup after
+   * adding or removing a filter row.
+   *
+   * @param model The group model to flatten.
+   */
+  private flattenModel(model: FilterGroupModel) {
+    const children = model.children;
+
+    if (children.length === 1 && children[0].type === "FILTER_GROUP") {
+      const childGroup = children[0] as FilterGroupModel;
+      model.children = childGroup.children;
+      model.operator = childGroup.operator;
+    } else {
+      children
+        .filter(child => child.type === "FILTER_GROUP")
+        .forEach((group: FilterGroupModel) => this.flattenModel(group));
+    }
   }
 
   private renderFilter({
@@ -93,15 +115,17 @@ export class FilterBuilder extends React.Component<
 
     switch (model.type) {
       case "FILTER_GROUP":
+        const children = model.children.map(child =>
+          this.renderFilter({ model: child, parent: model })
+        );
+
         return (
           <FilterGroup
             model={model}
             onAndClick={onAndClick}
             onOrClick={onOrClick}
           >
-            {model.children.map(child =>
-              this.renderFilter({ model: child, parent: model })
-            )}
+            {children}
           </FilterGroup>
         );
       case "FILTER_ROW":
