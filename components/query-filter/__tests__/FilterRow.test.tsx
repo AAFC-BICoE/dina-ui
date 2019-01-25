@@ -1,6 +1,6 @@
 import { mount } from "enzyme";
 import Select from "react-select/lib/Select";
-import { FilterRow, FilterRowModel } from "../FilterRow";
+import { FilterRow, FilterRowModel, FilterRowProps } from "../FilterRow";
 
 describe("FilterRow component", () => {
   const mockOnAndClick = jest.fn();
@@ -25,6 +25,7 @@ describe("FilterRow component", () => {
         onAndClick={mockOnAndClick}
         onRemoveClick={mockOnDeleteClick}
         onOrClick={mockOnOrClick}
+        showRemoveButton={true}
       />
     );
   }
@@ -93,5 +94,19 @@ describe("FilterRow component", () => {
       .simulate("change", { target: { value: "101F" } });
 
     expect(model.value).toEqual("101F");
+  });
+
+  it("Provides a prop to show or hide the remove button.", async () => {
+    const withRemoveButton = mountFilterRow();
+    withRemoveButton.setProps({ showRemoveButton: true });
+    expect(withRemoveButton.find("button[children='-']").exists()).toEqual(
+      true
+    );
+
+    const withoutRemoveButton = mountFilterRow();
+    withoutRemoveButton.setProps({ showRemoveButton: false });
+    expect(withoutRemoveButton.find("button[children='-']").exists()).toEqual(
+      false
+    );
   });
 });

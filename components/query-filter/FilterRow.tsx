@@ -14,6 +14,7 @@ export interface FilterRowModel {
 export interface FilterRowProps {
   filterAttributes: string[];
   model: FilterRowModel;
+  showRemoveButton: boolean;
   onAndClick: () => void;
   onRemoveClick: () => void;
   onOrClick: () => void;
@@ -21,7 +22,13 @@ export interface FilterRowProps {
 
 export class FilterRow extends React.Component<FilterRowProps> {
   public render() {
-    const { model, onAndClick, onRemoveClick, onOrClick } = this.props;
+    const {
+      model,
+      onAndClick,
+      onRemoveClick,
+      onOrClick,
+      showRemoveButton
+    } = this.props;
 
     return (
       <div className="list-inline">
@@ -61,12 +68,14 @@ export class FilterRow extends React.Component<FilterRowProps> {
         >
           OR
         </button>
-        <button
-          className="list-inline-item btn btn-dark"
-          onClick={onRemoveClick}
-        >
-          -
-        </button>
+        {showRemoveButton && (
+          <button
+            className="list-inline-item btn btn-dark"
+            onClick={onRemoveClick}
+          >
+            -
+          </button>
+        )}
       </div>
     );
   }

@@ -1,4 +1,4 @@
-import { pull } from "lodash";
+import { isEqual, pull } from "lodash";
 import React from "react";
 import { FilterGroup, FilterGroupModel } from "./FilterGroup";
 import { FilterRow, FilterRowModel } from "./FilterRow";
@@ -204,6 +204,9 @@ export class FilterBuilder extends React.Component<
           </FilterGroup>
         );
       case "FILTER_ROW":
+        // Don't show the remove button when this is the only FilterRow.
+        const showRemoveButton = !isEqual(this.state.model.children, [model]);
+
         return (
           <FilterRow
             key={model.id}
@@ -212,6 +215,7 @@ export class FilterBuilder extends React.Component<
             onRemoveClick={onRemoveClick}
             onOrClick={onOrClick}
             filterAttributes={this.props.filterAttributes}
+            showRemoveButton={showRemoveButton}
           />
         );
     }

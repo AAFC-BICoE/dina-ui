@@ -248,6 +248,7 @@ describe("FilterBuilder component", () => {
       .find("button[children='-']")
       .simulate("click");
 
+    // There should be two filter rows in one AND group.
     expect((wrapper.state() as FilterBuilderState).model).toEqual(
       objectContaining({
         children: [
@@ -258,5 +259,11 @@ describe("FilterBuilder component", () => {
         type: "FILTER_GROUP"
       })
     );
+  });
+
+  it("Hides the Remove button when there is only one filter row.", () => {
+    const wrapper = mountFilterBuilder();
+    expect(wrapper.find(FilterRow).length).toEqual(1);
+    expect(wrapper.find("button[children='-']").exists()).toEqual(false);
   });
 });
