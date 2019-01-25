@@ -27,6 +27,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
       <div className="list-inline">
         <div className="list-inline-item" style={{ width: 320 }}>
           <Select
+            instanceId={`attribute_${model.id}`}
             options={this.mappedfilterAttributes}
             onChange={this.onPropertyChanged}
             defaultValue={{ label: model.attribute, value: model.attribute }}
@@ -34,6 +35,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
         </div>
         <div className="list-inline-item" style={{ width: 120 }}>
           <Select
+            instanceId={`predicate_${model.id}`}
             options={[
               { label: "IS", value: "IS" },
               { label: "IS NOT", value: "IS NOT" }

@@ -89,7 +89,7 @@ describe("FilterBuilder component", () => {
           value: ""
         }
       ],
-      id: 2,
+      id: 4,
       operator: "OR",
       type: "FILTER_GROUP"
     });
@@ -220,6 +220,42 @@ describe("FilterBuilder component", () => {
     expect((wrapper.state() as FilterBuilderState).model).toEqual(
       objectContaining({
         children: [objectContaining({ value: "second filter value" })]
+      })
+    );
+  });
+
+  it("Removes a filter group that only has one child after a filter row is removed.", () => {
+    const wrapper = mountFilterBuilder();
+
+    // Click the initial FilterRow's AND button
+    wrapper
+      .find(FilterRow)
+      .at(0)
+      .find("button[children='AND']")
+      .simulate("click");
+
+    // Click the second FilterRow's OR button.
+    wrapper
+      .find(FilterRow)
+      .at(1)
+      .find("button[children='OR']")
+      .simulate("click");
+
+    // Click the third FilterRow's "-" button.
+    wrapper
+      .find(FilterRow)
+      .at(2)
+      .find("button[children='-']")
+      .simulate("click");
+
+    expect((wrapper.state() as FilterBuilderState).model).toEqual(
+      objectContaining({
+        children: [
+          objectContaining({ type: "FILTER_ROW" }),
+          objectContaining({ type: "FILTER_ROW" })
+        ],
+        operator: "AND",
+        type: "FILTER_GROUP"
       })
     );
   });

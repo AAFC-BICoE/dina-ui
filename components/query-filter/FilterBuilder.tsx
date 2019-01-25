@@ -11,10 +11,18 @@ export interface FilterBuilderState {
   model: FilterGroupModel;
 }
 
+/**
+ * UI component for building a query filter.
+ */
 export class FilterBuilder extends React.Component<
   FilterBuilderProps,
   FilterBuilderState
 > {
+  /**
+   * Every child filter row and group needs a unique Id to be passed into child components'
+   * "key" props.
+   * This value is incremented for every new filter row or group.
+   */
   private filterIdIncrementor = 0;
 
   constructor(props) {
@@ -37,6 +45,10 @@ export class FilterBuilder extends React.Component<
     };
   }
 
+  /**
+   * React component's render method. This component can recursively render FilterGroups and
+   * FilterRows.
+   */
   public render() {
     return this.renderFilter({
       model: this.state.model,
@@ -44,10 +56,17 @@ export class FilterBuilder extends React.Component<
     });
   }
 
+  /**
+   * Gets a new unique filter ID to be passed into child components' "key" props.
+   */
   private getNewFilterId() {
     return ++this.filterIdIncrementor;
   }
 
+  /**
+   * Adds a new FilterRow to the model. A new FilterGroup is added if the operator is different
+   * than the clicked button's FilterRow's parent group's operator.
+   */
   private addFilterRow({
     after,
     parent,
@@ -81,9 +100,14 @@ export class FilterBuilder extends React.Component<
     }
 
     this.flattenModel(this.state.model);
+
+    // Re-render the component.
     this.setState({});
   }
 
+  /**
+   * Removes a filter row.
+   */
   private removeFilter({
     filter,
     parent
@@ -91,9 +115,12 @@ export class FilterBuilder extends React.Component<
     filter: FilterRowModel | FilterGroupModel;
     parent: FilterGroupModel;
   }) {
+    // Remove the filter row from the parent's children array.
     parent.children = pull(parent.children, filter);
 
     this.flattenModel(this.state.model);
+
+    // Re-render the component.
     this.setState({});
   }
 
@@ -106,17 +133,30 @@ export class FilterBuilder extends React.Component<
   private flattenModel(model: FilterGroupModel) {
     const children = model.children;
 
-    if (children.length === 1 && children[0].type === "FILTER_GROUP") {
-      const childGroup = children[0] as FilterGroupModel;
-      model.children = childGroup.children;
-      model.operator = childGroup.operator;
-    } else {
-      children
-        .filter(child => child.type === "FILTER_GROUP")
-        .forEach((group: FilterGroupModel) => this.flattenModel(group));
+    if (
+      // Groups with one child should be flattened.
+      children.length === 1 &&
+      // The root model should be a FilterGroupModel, so don't flatten it when its only child
+      // is a FilterRow.
+      !(model === this.state.model && children[0].type === "FILTER_ROW")
+    ) {
+      // Remove all attributes from the group.
+      for (const attr of Object.keys(model)) {
+        delete model[attr];
+      }
+      // Assign all values from the child to the group. This will replace the group model with
+      // the data from the child FilterRow or FilterGroup.
+      Object.assign(model, children[0]);
     }
+
+    children
+      .filter(child => child.type === "FILTER_GROUP")
+      .forEach((group: FilterGroupModel) => this.flattenModel(group));
   }
 
+  /**
+   * Renders either a FilterRow or FilterGroup depending on the given model.
+   */
   private renderFilter({
     model,
     parent
