@@ -1,3 +1,4 @@
+import { pull } from "lodash";
 import React from "react";
 import { FilterGroup, FilterGroupModel } from "./FilterGroup";
 import { FilterRow, FilterRowModel } from "./FilterRow";
@@ -14,6 +15,8 @@ export class FilterBuilder extends React.Component<
   FilterBuilderProps,
   FilterBuilderState
 > {
+  private filterIdIncrementor = 0;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -21,11 +24,13 @@ export class FilterBuilder extends React.Component<
         children: [
           {
             attribute: "name",
+            id: this.getNewFilterId(),
             predicate: "IS",
             type: "FILTER_ROW",
             value: ""
           }
         ],
+        id: this.getNewFilterId(),
         operator: "AND",
         type: "FILTER_GROUP"
       }
@@ -39,6 +44,10 @@ export class FilterBuilder extends React.Component<
     });
   }
 
+  private getNewFilterId() {
+    return ++this.filterIdIncrementor;
+  }
+
   private addFilterRow({
     after,
     parent,
@@ -50,23 +59,41 @@ export class FilterBuilder extends React.Component<
   }) {
     const newFilterRow: FilterRowModel = {
       attribute: "name",
+      id: this.getNewFilterId(),
       predicate: "IS",
       type: "FILTER_ROW",
       value: ""
     };
 
     if (operator === parent.operator) {
-      parent.children.push(newFilterRow);
+      parent.children.splice(
+        parent.children.indexOf(after) + 1,
+        0,
+        newFilterRow
+      );
     } else {
       parent.children[parent.children.indexOf(after)] = {
         children: [after, newFilterRow],
+        id: this.getNewFilterId(),
         operator,
         type: "FILTER_GROUP"
       };
     }
 
     this.flattenModel(this.state.model);
+    this.setState({});
+  }
 
+  private removeFilter({
+    filter,
+    parent
+  }: {
+    filter: FilterRowModel | FilterGroupModel;
+    parent: FilterGroupModel;
+  }) {
+    parent.children = pull(parent.children, filter);
+
+    this.flattenModel(this.state.model);
     this.setState({});
   }
 
@@ -113,6 +140,13 @@ export class FilterBuilder extends React.Component<
       });
     };
 
+    const onRemoveClick = () => {
+      this.removeFilter({
+        filter: model,
+        parent
+      });
+    };
+
     switch (model.type) {
       case "FILTER_GROUP":
         const children = model.children.map(child =>
@@ -121,6 +155,7 @@ export class FilterBuilder extends React.Component<
 
         return (
           <FilterGroup
+            key={model.id}
             model={model}
             onAndClick={onAndClick}
             onOrClick={onOrClick}
@@ -131,8 +166,10 @@ export class FilterBuilder extends React.Component<
       case "FILTER_ROW":
         return (
           <FilterRow
+            key={model.id}
             model={model}
             onAndClick={onAndClick}
+            onRemoveClick={onRemoveClick}
             onOrClick={onOrClick}
             filterAttributes={this.props.filterAttributes}
           />

@@ -1,6 +1,7 @@
 import { FilterRowModel } from "./FilterRow";
 
 export interface FilterGroupModel {
+  id: number;
   type: "FILTER_GROUP";
   operator: "AND" | "OR";
   children: Array<FilterRowModel | FilterGroupModel>;

@@ -4,6 +4,7 @@ import { FilterRow, FilterRowModel } from "../FilterRow";
 
 describe("FilterRow component", () => {
   const mockOnAndClick = jest.fn();
+  const mockOnDeleteClick = jest.fn();
   const mockOnOrClick = jest.fn();
 
   beforeEach(() => {
@@ -16,11 +17,13 @@ describe("FilterRow component", () => {
         filterAttributes={["name", "description"]}
         model={{
           attribute: "name",
+          id: 1,
           predicate: "IS",
           type: "FILTER_ROW",
           value: ""
         }}
         onAndClick={mockOnAndClick}
+        onRemoveClick={mockOnDeleteClick}
         onOrClick={mockOnOrClick}
       />
     );

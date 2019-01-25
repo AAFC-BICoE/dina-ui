@@ -4,6 +4,7 @@ import Select from "react-select";
 export type FilterRowPredicate = "IS" | "IS NOT";
 
 export interface FilterRowModel {
+  id: number;
   type: "FILTER_ROW";
   attribute: string;
   predicate: FilterRowPredicate;
@@ -14,12 +15,13 @@ export interface FilterRowProps {
   filterAttributes: string[];
   model: FilterRowModel;
   onAndClick: () => void;
+  onRemoveClick: () => void;
   onOrClick: () => void;
 }
 
 export class FilterRow extends React.Component<FilterRowProps> {
   public render() {
-    const { model, onAndClick, onOrClick } = this.props;
+    const { model, onAndClick, onRemoveClick, onOrClick } = this.props;
 
     return (
       <div className="list-inline">
@@ -41,15 +43,27 @@ export class FilterRow extends React.Component<FilterRowProps> {
           />
         </div>
         <input
-          className="filter-value list-inline-item"
+          className="filter-value list-inline-item form-control w-auto d-inline-block"
           defaultValue={model.value}
           onChange={this.onValueChanged}
         />
-        <button className="list-inline-item" onClick={onAndClick}>
+        <button
+          className="list-inline-item btn btn-primary"
+          onClick={onAndClick}
+        >
           AND
         </button>
-        <button className="list-inline-item" onClick={onOrClick}>
+        <button
+          className="list-inline-item btn btn-primary"
+          onClick={onOrClick}
+        >
           OR
+        </button>
+        <button
+          className="list-inline-item btn btn-dark"
+          onClick={onRemoveClick}
+        >
+          -
         </button>
       </div>
     );
