@@ -1,9 +1,35 @@
 = NPM Package Scripts
 
+== `npm run build`
+
+Generates the production build.
+
+== `npm run dev`
+
+Runs the UI application at localhost:8000 in dev mode using https://github.com/zeit/next.js[Next.js].
+If you edit and save a source file, the running application will reload itself.
+
+This command also sets up an HTTP proxy that redirects requests for localhost:8000/api/* endpoints to
+localhost:8080/api/. This lets developers test the app locally with a working backend API. Note that
+you must have https://github.com/AAFC-BICoE/seqdb-api[seqdb-api] running at localhost:8080 for the UI
+to connect to the API, and you must log into the API by browsing to localhost:8080 and logging in so
+the UI can authenticate with the API.
+
 == `npm run docs`
 
 Compiles the docs (written in https://asciidoctor.org/docs/what-is-asciidoc/[AsciiDoc]) as a
 single HTML file in the "generated-docs" directory.
+
+== `npm run next`
+
+Runs the UI application at localhost:3000 in dev mode using https://github.com/zeit/next.js[Next.js].
+Note that this does not let the UI connect to the backend because there is no HTTP proxy set up. See
+the "npm run dev" section for the full dev mode with a proxy.
+
+== `npm start`
+
+Runs the application in production mode. Requires a build first, which you can generate using
+`npm run build`.
 
 == `npm test`
 
@@ -13,17 +39,3 @@ Runs the tests (without generating the test coverage report).
 
 Runs the tests. Prints the test coverage report to stdout, and writes the coverage report files
 into the "coverage" directory.
-
-== `npm run dev`
-
-Runs the UI application at localhost:3000 in dev mode using https://github.com/zeit/next.js[Next.js].
-If you edit and save a source file, the running application will reload itself.
-
-== `npm run build`
-
-Generates the production build.
-
-== `npm start`
-
-Runs the application in production mode. Requires a build first, which you can generate using
-`npm run build`.
