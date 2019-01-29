@@ -1,6 +1,10 @@
 import { isEqual, pull } from "lodash";
 import React from "react";
-import { FilterGroup, FilterGroupModel } from "./FilterGroup";
+import {
+  FilterGroup,
+  FilterGroupModel,
+  FilterGroupOperator
+} from "./FilterGroup";
 import { FilterRow, FilterRowModel } from "./FilterRow";
 
 interface FilterBuilderProps {
@@ -72,9 +76,12 @@ export class FilterBuilder extends React.Component<
     parent,
     operator
   }: {
+    /** The filter to add a new one after, e.g. the filter with the clicked button. */
     after: FilterRowModel | FilterGroupModel;
+    /** The new filter's parent group. */
     parent: FilterGroupModel;
-    operator: "AND" | "OR";
+    /** The new filter group's operator. */
+    operator: FilterGroupOperator;
   }) {
     const newFilterRow: FilterRowModel = {
       attribute: "name",
@@ -84,6 +91,8 @@ export class FilterBuilder extends React.Component<
       value: ""
     };
 
+    // When the clicked button's operatoris the same as the parent group, just add a new row to
+    // the existing group instead of creating a new group.
     if (operator === parent.operator) {
       parent.children.splice(
         parent.children.indexOf(after) + 1,
@@ -91,12 +100,27 @@ export class FilterBuilder extends React.Component<
         newFilterRow
       );
     } else {
-      parent.children[parent.children.indexOf(after)] = {
-        children: [after, newFilterRow],
-        id: this.getNewFilterId(),
-        operator,
-        type: "FILTER_GROUP"
-      };
+      const rootGroupButtonWasClicked = this.state.model === after;
+
+      // When the root Group's AND/OR button was clicked, surround the filter with a new root group.
+      if (rootGroupButtonWasClicked) {
+        this.setState(state => ({
+          model: {
+            children: [state.model, newFilterRow],
+            id: this.getNewFilterId(),
+            operator,
+            type: "FILTER_GROUP"
+          }
+        }));
+      } else {
+        // Otherwise create a new group within the parent group.
+        parent.children[parent.children.indexOf(after)] = {
+          children: [after, newFilterRow],
+          id: this.getNewFilterId(),
+          operator,
+          type: "FILTER_GROUP"
+        };
+      }
     }
 
     this.flattenModel(this.state.model);
@@ -188,10 +212,19 @@ export class FilterBuilder extends React.Component<
     };
 
     switch (model.type) {
-      case "FILTER_GROUP":
+      case "FILTER_GROUP": {
         const children = model.children.map(child =>
           this.renderFilter({ model: child, parent: model })
         );
+
+        const isRootGroup = this.state.model === model;
+
+        // Only show the remove button when the FilterGroup is not the top-level group.
+        const showRemoveButton = !isRootGroup;
+
+        // Only show the AND/OR buttons when the FilterGroup is not the top-level group
+        // with only one child, which would be a single filter row.
+        const showAndOrButtons = !(isRootGroup && model.children.length === 1);
 
         return (
           <FilterGroup
@@ -199,11 +232,15 @@ export class FilterBuilder extends React.Component<
             model={model}
             onAndClick={onAndClick}
             onOrClick={onOrClick}
+            onRemoveClick={onRemoveClick}
+            showAndOrButtons={showAndOrButtons}
+            showRemoveButton={showRemoveButton}
           >
             {children}
           </FilterGroup>
         );
-      case "FILTER_ROW":
+      }
+      case "FILTER_ROW": {
         // Don't show the remove button when this is the only FilterRow.
         const showRemoveButton = !isEqual(this.state.model.children, [model]);
 
@@ -218,6 +255,7 @@ export class FilterBuilder extends React.Component<
             showRemoveButton={showRemoveButton}
           />
         );
+      }
     }
   }
 }

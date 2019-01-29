@@ -1,6 +1,6 @@
 import { mount } from "enzyme";
 import Select from "react-select/lib/Select";
-import { FilterRow, FilterRowModel, FilterRowProps } from "../FilterRow";
+import { FilterRow, FilterRowModel } from "../FilterRow";
 
 describe("FilterRow component", () => {
   const mockOnAndClick = jest.fn();

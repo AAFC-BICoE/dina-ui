@@ -32,12 +32,11 @@ describe("FilterBuilder component", () => {
     expect(wrapper.find(FilterRow).length).toEqual(1);
   });
 
-  it("Adds a FilterRow in an AND group when the FilterRow's AND button is clicked.", async () => {
+  it("Adds a FilterRow in an AND group when the FilterRow's AND button is clicked.", () => {
     const wrapper = mountFilterBuilder();
 
     wrapper
-      .find(FilterRow)
-      .find("button[children='AND']")
+      .find(".filter-row-buttons button[children='AND']")
       .simulate("click");
 
     expect((wrapper.state() as FilterBuilderState).model).toEqual({
@@ -64,13 +63,10 @@ describe("FilterBuilder component", () => {
     expect(wrapper.find(FilterGroup).find(FilterRow).length).toEqual(2);
   });
 
-  it("Adds a FilterRow in an OR group when the FilterRow's OR button is clicked.", async () => {
+  it("Adds a FilterRow in an OR group when the FilterRow's OR button is clicked.", () => {
     const wrapper = mountFilterBuilder();
 
-    wrapper
-      .find(FilterRow)
-      .find("button[children='OR']")
-      .simulate("click");
+    wrapper.find(".filter-row-buttons button[children='OR']").simulate("click");
 
     expect((wrapper.state() as FilterBuilderState).model).toEqual({
       children: [
@@ -96,12 +92,11 @@ describe("FilterBuilder component", () => {
     expect(wrapper.find(FilterGroup).find(FilterRow).length).toEqual(2);
   });
 
-  it("Nests filter groups.", async () => {
+  it("Nests filter groups.", () => {
     const wrapper = mountFilterBuilder();
 
     wrapper
-      .find(FilterRow)
-      .find("button[children='AND']")
+      .find(".filter-row-buttons button[children='AND']")
       .simulate("click");
 
     wrapper
@@ -150,7 +145,7 @@ describe("FilterBuilder component", () => {
     expect(wrapper.find(FilterRow).length).toEqual(3);
   });
 
-  it("Inserts a new filter row immediately after the clicked AND button's row.", async () => {
+  it("Inserts a new filter row immediately after the clicked AND button's row.", () => {
     const wrapper = mountFilterBuilder();
 
     // Click the first filter row's button.
@@ -191,7 +186,7 @@ describe("FilterBuilder component", () => {
     );
   });
 
-  it("Removes a filter row when the '-' button is clicked.", async () => {
+  it("Removes a filter row when the '-' button is clicked.", () => {
     const wrapper = mountFilterBuilder();
 
     wrapper.find("button[children='AND']").simulate("click");
@@ -227,7 +222,7 @@ describe("FilterBuilder component", () => {
   it("Removes a filter group that only has one child after a filter row is removed.", () => {
     const wrapper = mountFilterBuilder();
 
-    // Click the initial FilterRow's AND button
+    // Click the initial FilterRow's AND button.
     wrapper
       .find(FilterRow)
       .at(0)
@@ -261,9 +256,81 @@ describe("FilterBuilder component", () => {
     );
   });
 
-  it("Hides the Remove button when there is only one filter row.", () => {
+  it("Hides the FilterRow's Remove button when there is only one FilterRow.", () => {
     const wrapper = mountFilterBuilder();
     expect(wrapper.find(FilterRow).length).toEqual(1);
     expect(wrapper.find("button[children='-']").exists()).toEqual(false);
+  });
+
+  it("Hides the FilterGroup's remove button when it is the top-level group.", () => {
+    const wrapper = mountFilterBuilder();
+
+    // Hides the group's remove button when the filter group is the top-level group.
+    expect(wrapper.find(FilterGroup).length).toEqual(1);
+    expect(
+      wrapper.find(".filter-group-buttons button[children='-']").length
+    ).toEqual(0);
+
+    // Click the filter row's AND button.
+    wrapper
+      .find(".filter-row-buttons button[children='AND']")
+      .simulate("click");
+
+    // There should be 2 FilterRows, but the surrounding FilterGroup should still have no remove button.
+    expect(wrapper.find(FilterRow).length).toEqual(2);
+    expect(
+      wrapper.find(".filter-group-buttons button[children='-']").length
+    ).toEqual(0);
+
+    // Click the FilterGroup's OR button.
+    wrapper
+      .find(".filter-group-buttons button[children='OR']")
+      .simulate("click");
+
+    // The filter should be "( ( predicate AND predicate ) OR predicate )".
+    expect((wrapper.state() as FilterBuilderState).model).toEqual(
+      objectContaining({
+        children: [
+          objectContaining({
+            children: [
+              objectContaining({ type: "FILTER_ROW" }),
+              objectContaining({ type: "FILTER_ROW" })
+            ],
+            operator: "AND",
+            type: "FILTER_GROUP"
+          }),
+          objectContaining({ type: "FILTER_ROW" })
+        ],
+        operator: "OR",
+        type: "FILTER_GROUP"
+      })
+    );
+  });
+
+  it("Removes a filter group when the '-' button is clicked.", () => {
+    const wrapper = mountFilterBuilder();
+
+    // Click the filter row's AND button.
+    wrapper
+      .find(".filter-row-buttons button[children='AND']")
+      .simulate("click");
+
+    // Click the FilterGroup's OR button.
+    wrapper
+      .find(".filter-group-buttons button[children='OR']")
+      .simulate("click");
+
+    // Remove the inner AND group.
+    wrapper
+      .find(".filter-group-buttons button[children='-']")
+      .simulate("click");
+
+    // The filter model should be one filter group with one inner filter row.
+    expect((wrapper.state() as FilterBuilderState).model).toEqual(
+      objectContaining({
+        children: [objectContaining({ type: "FILTER_ROW" })],
+        type: "FILTER_GROUP"
+      })
+    );
   });
 });

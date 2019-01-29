@@ -56,26 +56,28 @@ export class FilterRow extends React.Component<FilterRowProps> {
           defaultValue={model.value}
           onChange={this.onValueChanged}
         />
-        <button
-          className="list-inline-item btn btn-primary"
-          onClick={onAndClick}
-        >
-          AND
-        </button>
-        <button
-          className="list-inline-item btn btn-primary"
-          onClick={onOrClick}
-        >
-          OR
-        </button>
-        {showRemoveButton && (
+        <div className="filter-row-buttons list-inline-item">
           <button
-            className="list-inline-item btn btn-dark"
-            onClick={onRemoveClick}
+            className="list-inline-item btn btn-primary"
+            onClick={onAndClick}
           >
-            -
+            AND
           </button>
-        )}
+          <button
+            className="list-inline-item btn btn-primary"
+            onClick={onOrClick}
+          >
+            OR
+          </button>
+          {showRemoveButton && (
+            <button
+              className="list-inline-item btn btn-dark"
+              onClick={onRemoveClick}
+            >
+              -
+            </button>
+          )}
+        </div>
       </div>
     );
   }
