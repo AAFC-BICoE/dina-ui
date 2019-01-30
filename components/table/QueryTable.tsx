@@ -1,4 +1,4 @@
-import { FilterParam, KitsuResource } from "kitsu";
+import { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import React from "react";
 import ReactTable, { Column } from "react-table";
 import "react-table/react-table.css";
@@ -7,8 +7,11 @@ import { PageSpec } from "types/seqdb-api/page";
 import { MetaWithTotal } from "../../types/seqdb-api/meta";
 import { JsonApiQuerySpec, Query } from "../api-client/Query";
 
+/** Object types accepted as a column definition. */
+export type ColumnDefinition<TData> = string | Column<TData>;
+
 /** QueryTable component's props. */
-export interface QueryTableProps {
+export interface QueryTableProps<TData extends KitsuResource> {
   /** JSONAPI resource path. */
   path: string;
 
@@ -25,7 +28,7 @@ export interface QueryTableProps {
   defaultPageSize?: number;
 
   /** The columns to show in the table. */
-  columns: string[];
+  columns: Array<ColumnDefinition<TData>>;
 }
 
 /** QueryTable component's state. */
@@ -42,11 +45,11 @@ const DEFAULT_PAGE_SIZE = 25;
 /**
  * Table component that fetches data from the backend API.
  */
-export class QueryTable<TData extends KitsuResource[]> extends React.Component<
-  QueryTableProps,
+export class QueryTable<TData extends KitsuResource> extends React.Component<
+  QueryTableProps<TData>,
   QueryTableState
 > {
-  constructor(props: QueryTableProps) {
+  constructor(props: QueryTableProps<TData>) {
     super(props);
 
     const { defaultPageSize, defaultSort } = props;
@@ -67,28 +70,19 @@ export class QueryTable<TData extends KitsuResource[]> extends React.Component<
     const query: JsonApiQuerySpec = { path, filter, include, page, sort };
 
     return (
-      <Query<TData, MetaWithTotal> query={query}>
-        {({ loading, response }) => {
-          let numberOfPages: number;
-          if (response && response.meta && response.meta.totalResourceCount) {
-            numberOfPages = Math.ceil(
-              response.meta.totalResourceCount / query.page.limit
-            );
-          }
-
-          return (
-            <ReactTable
-              className="-striped"
-              columns={this.mappedColumns}
-              data={response && response.data}
-              defaultPageSize={query.page.limit}
-              loading={loading}
-              manual={true}
-              onFetchData={this.onFetchData}
-              pages={numberOfPages}
-            />
-          );
-        }}
+      <Query<TData[], MetaWithTotal> query={query}>
+        {({ loading, response }) => (
+          <ReactTable
+            className="-striped"
+            columns={this.mappedColumns}
+            data={response && response.data}
+            defaultPageSize={page.limit}
+            loading={loading}
+            manual={true}
+            onFetchData={this.onFetchData}
+            pages={this.getNumberOfPages(response)}
+          />
+        )}
       </Query>
     );
   }
@@ -112,10 +106,31 @@ export class QueryTable<TData extends KitsuResource[]> extends React.Component<
     });
   };
 
+  /** Map this component's "columns" prop to react-table's "columns" prop. */
   private get mappedColumns(): Column[] {
-    return this.props.columns.map<Column>(column => ({
-      Header: titleCase(column),
-      accessor: column
-    }));
+    return this.props.columns.map<Column>(column => {
+      // The "columns" prop can be a string or a react-table Column type.
+      if (typeof column === "string") {
+        return {
+          Header: titleCase(column),
+          accessor: column
+        };
+      } else {
+        return column;
+      }
+    });
+  }
+
+  /** Get the number of pages from the response. */
+  private getNumberOfPages(
+    response: KitsuResponse<TData[], MetaWithTotal>
+  ): number | undefined {
+    if (response && response.meta && response.meta.totalResourceCount) {
+      return Math.ceil(
+        response.meta.totalResourceCount / this.state.page.limit
+      );
+    } else {
+      return undefined;
+    }
   }
 }

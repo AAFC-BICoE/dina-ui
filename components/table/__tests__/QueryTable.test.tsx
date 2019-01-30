@@ -4,7 +4,7 @@ import { range } from "lodash";
 import ReactTable from "react-table";
 import { MetaWithTotal } from "../../../types/seqdb-api/meta";
 import { ApiClientContext } from "../../api-client/ApiClientContext";
-import { QueryTable, QueryTableProps } from "../QueryTable";
+import { ColumnDefinition, QueryTable, QueryTableProps } from "../QueryTable";
 
 /** Example of an API resource interface definition for a todo-list entry. */
 interface Todo extends KitsuResource {
@@ -71,7 +71,7 @@ describe("QueryTable component", () => {
 
   it("Renders loading state initially.", () => {
     const wrapper = mountWithContext(
-      <QueryTable path="todo" columns={["id", "name", "description"]} />
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
     );
 
     expect(
@@ -85,7 +85,7 @@ describe("QueryTable component", () => {
 
   it("Renders the data from the mocked backend.", async () => {
     const wrapper = mountWithContext(
-      <QueryTable path="todo" columns={["id", "name", "description"]} />
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
     );
 
     // Continue the test after the data fetch is done.
@@ -120,7 +120,7 @@ describe("QueryTable component", () => {
   it("Renders the headers defined in the columns prop.", () => {
     // Create the table with headers
     const wrapper = mountWithContext(
-      <QueryTable
+      <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description", "relatedEntity.name"]}
       />
@@ -147,7 +147,7 @@ describe("QueryTable component", () => {
 
   it("Renders the total number of pages when no custom pageSize is specified.", async () => {
     const wrapper = mountWithContext(
-      <QueryTable path="todo" columns={["id", "name", "description"]} />
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
     );
 
     // Wait until the data is loaded into the table.
@@ -161,7 +161,7 @@ describe("QueryTable component", () => {
 
   it("Renders the total number of pages when a custom pageSize is specified.", async () => {
     const wrapper = mountWithContext(
-      <QueryTable
+      <QueryTable<Todo>
         path="todo"
         defaultPageSize={40}
         columns={["id", "name", "description"]}
@@ -179,7 +179,7 @@ describe("QueryTable component", () => {
 
   it("Fetches the next page when the Next button is pressed.", async done => {
     const wrapper = mountWithContext(
-      <QueryTable
+      <QueryTable<Todo>
         path="todo"
         defaultPageSize={25}
         columns={["id", "name", "description"]}
@@ -231,7 +231,7 @@ describe("QueryTable component", () => {
 
   it("Fetches the previous page when the previous button is pressed.", async () => {
     const wrapper = mountWithContext(
-      <QueryTable
+      <QueryTable<Todo>
         path="todo"
         defaultPageSize={25}
         columns={["id", "name", "description"]}
@@ -277,7 +277,7 @@ describe("QueryTable component", () => {
 
   it("Fetches sorted data when the defaultSort prop is passed.", async () => {
     mountWithContext(
-      <QueryTable
+      <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
         defaultSort="description"
@@ -296,7 +296,7 @@ describe("QueryTable component", () => {
 
   it("Fetches sorted data when the header is clicked.", async () => {
     const wrapper = mountWithContext(
-      <QueryTable path="todo" columns={["id", "name", "description"]} />
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
     );
 
     // Wait for the initial request to finish.
@@ -333,7 +333,7 @@ describe("QueryTable component", () => {
 
   it("Fetches multi-sorted data when a second header is shift-clicked.", async () => {
     const wrapper = mountWithContext(
-      <QueryTable path="todo" columns={["id", "name", "description"]} />
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
     );
 
     // Wait for the initial request to finish.
@@ -367,7 +367,7 @@ describe("QueryTable component", () => {
   it("Provides a dropdown to change the page size.", async () => {
     // Initial pageSize is 5.
     const wrapper = mountWithContext(
-      <QueryTable
+      <QueryTable<Todo>
         path="todo"
         defaultPageSize={5}
         columns={["id", "name", "description"]}
@@ -412,13 +412,13 @@ describe("QueryTable component", () => {
   it("Sends a request for filtered data when the filter prop is passed.", async () => {
     const firstFilterProp: FilterParam = { name: "todo 1" };
 
-    const firstProps: QueryTableProps = {
+    const firstProps: QueryTableProps<Todo> = {
       columns: ["id", "name", "description"],
       filter: firstFilterProp,
       path: "todo"
     };
 
-    const wrapper = mountWithContext(<QueryTable {...firstProps} />);
+    const wrapper = mountWithContext(<QueryTable<Todo> {...firstProps} />);
 
     // Wait for the first request to finish.
     await Promise.resolve();
@@ -432,7 +432,7 @@ describe("QueryTable component", () => {
     // Update the filter prop.
     const secondFilterProp: FilterParam = { description: "todo 2" };
     wrapper.setProps({
-      children: <QueryTable {...firstProps} filter={secondFilterProp} />
+      children: <QueryTable<Todo> {...firstProps} filter={secondFilterProp} />
     });
 
     // When a new filter is passed, a new request is sent with the new filter.
@@ -445,7 +445,7 @@ describe("QueryTable component", () => {
 
   it("Sends a request for included resources when the include prop is passed.", async () => {
     mountWithContext(
-      <QueryTable
+      <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
         include="relatedResource"
@@ -464,9 +464,47 @@ describe("QueryTable component", () => {
 
   it("Is a striped table.", () => {
     const wrapper = mountWithContext(
-      <QueryTable path="todo" columns={["id", "name", "description"]} />
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
     );
 
     expect(wrapper.find(ReactTable).hasClass("-striped")).toEqual(true);
+  });
+
+  it("Accepts a combination of strings and column config objects as props.", async () => {
+    const columns: Array<ColumnDefinition<Todo>> = [
+      "id",
+      "name",
+      {
+        Header: "UPPERCASE NAME",
+        accessor: row => row.name.toUpperCase(),
+        id: "upperCaseName",
+        sortable: false
+      }
+    ];
+
+    // Create the table with headers
+    const wrapper = mountWithContext(
+      <QueryTable<Todo> path="todo" columns={columns} />
+    );
+
+    // Wait for the request to finish.
+    await Promise.resolve();
+    wrapper.update();
+
+    // Expect correct header name in the third header.
+    expect(
+      wrapper
+        .find(".rt-resizable-header-content")
+        .at(2)
+        .text()
+    ).toEqual("UPPERCASE NAME");
+
+    // Expect correct custom cell content in the 3rd data cell.
+    expect(
+      wrapper
+        .find(".rt-td")
+        .at(2)
+        .text()
+    ).toEqual("TODO 0");
   });
 });
