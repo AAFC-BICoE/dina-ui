@@ -1,5 +1,5 @@
 import { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
-import React from "react";
+import React, { createRef } from "react";
 import ReactTable, { Column } from "react-table";
 import "react-table/react-table.css";
 import titleCase from "title-case";
@@ -49,6 +49,9 @@ export class QueryTable<TData extends KitsuResource> extends React.Component<
   QueryTableProps<TData>,
   QueryTableState
 > {
+  /** Ref for the div that wraps this component. */
+  public divWrapperRef = createRef<HTMLDivElement>();
+
   constructor(props: QueryTableProps<TData>) {
     super(props);
 
@@ -70,20 +73,29 @@ export class QueryTable<TData extends KitsuResource> extends React.Component<
     const query: JsonApiQuerySpec = { path, filter, include, page, sort };
 
     return (
-      <Query<TData[], MetaWithTotal> query={query}>
-        {({ loading, response }) => (
-          <ReactTable
-            className="-striped"
-            columns={this.mappedColumns}
-            data={response && response.data}
-            defaultPageSize={page.limit}
-            loading={loading}
-            manual={true}
-            onFetchData={this.onFetchData}
-            pages={this.getNumberOfPages(response)}
-          />
-        )}
-      </Query>
+      <div ref={this.divWrapperRef}>
+        <style>{`
+          /* Wraps long text instead of shortening it. */
+          .rt-td {
+            white-space: unset!important;
+          }
+        `}</style>
+        <Query<TData[], MetaWithTotal> query={query}>
+          {({ loading, response }) => (
+            <ReactTable
+              className="-striped"
+              columns={this.mappedColumns}
+              data={response && response.data}
+              defaultPageSize={page.limit}
+              loading={loading}
+              manual={true}
+              onFetchData={this.onFetchData}
+              pages={this.getNumberOfPages(response)}
+              showPaginationTop={true}
+            />
+          )}
+        </Query>
+      </div>
     );
   }
 
@@ -92,9 +104,19 @@ export class QueryTable<TData extends KitsuResource> extends React.Component<
 
     const newOffset = newPageNumber * pageSize;
 
+    // Get the new sort order in JSONAPI format. e.g. "name,-description".
     const newSort: string = (sorted as Array<{ desc: boolean; id: string }>)
       .map<string>(({ desc, id }) => `${desc ? "-" : ""}${id}`)
       .join();
+
+    // When a new page is requested and the top of the window is below the top of the table,
+    // scroll to the top of the table.
+    if (
+      newOffset !== this.state.page.offset &&
+      window.scrollY > this.divWrapperRef.current.offsetTop
+    ) {
+      window.scrollTo(0, this.divWrapperRef.current.offsetTop);
+    }
 
     this.setState({
       // Only add the sort attribute if there is a sort.

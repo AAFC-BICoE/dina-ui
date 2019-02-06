@@ -155,7 +155,10 @@ describe("QueryTable component", () => {
     wrapper.update();
     expect(
       // 300 total records with a pageSize of 25 means 12 pages.
-      wrapper.find("span.-totalPages").text()
+      wrapper
+        .find("span.-totalPages")
+        .first()
+        .text()
     ).toEqual("12");
   });
 
@@ -173,7 +176,10 @@ describe("QueryTable component", () => {
     wrapper.update();
     expect(
       // 300 total records with a pageSize of 40 means 8 pages.
-      wrapper.find("span.-totalPages").text()
+      wrapper
+        .find("span.-totalPages")
+        .first()
+        .text()
     ).toEqual("8");
   });
 
@@ -201,7 +207,10 @@ describe("QueryTable component", () => {
     ).toEqual(["24", "todo 24", "todo description 24"]);
 
     // Click the "Next" button.
-    wrapper.find(".-next button").simulate("click");
+    wrapper
+      .find(".-next button")
+      .first()
+      .simulate("click");
 
     // Clicking "Next" should enable the loading screen.
     expect(wrapper.find(".-loading.-active").exists()).toEqual(true);
@@ -242,13 +251,19 @@ describe("QueryTable component", () => {
     await Promise.resolve();
 
     // Click the "Next" button.
-    wrapper.find(".-next button").simulate("click");
+    wrapper
+      .find(".-next button")
+      .first()
+      .simulate("click");
 
     // Wait for the second query to load.
     await Promise.resolve();
 
     // Click the "Previous" button.
-    wrapper.find(".-previous button").simulate("click");
+    wrapper
+      .find(".-previous button")
+      .first()
+      .simulate("click");
 
     // Clicking "Previous" should enable the loading screen.
     expect(wrapper.find(".-loading.-active").exists()).toEqual(true);
@@ -389,6 +404,7 @@ describe("QueryTable component", () => {
     // Select a new page size of 50.
     wrapper
       .find(".-pagination select")
+      .first()
       .simulate("change", { target: { value: 100 } });
 
     // Wait for the second request to finish.
@@ -506,5 +522,48 @@ describe("QueryTable component", () => {
         .at(2)
         .text()
     ).toEqual("TODO 0");
+  });
+
+  it("Scrolls to the top of the table when the page is changed.", async () => {
+    // Mock the window's scrollY value.
+    Object.defineProperty(window, "scrollY", { value: 400, writable: true });
+
+    // Mock the window's scrollTo function.
+    jest.spyOn(window, "scrollTo").mockImplementationOnce((_, y) => {
+      Object.defineProperty(window, "scrollY", { value: y, writable: true });
+    });
+
+    const wrapper = mountWithContext(
+      <QueryTable<Todo>
+        defaultPageSize={10}
+        path="todo"
+        columns={["id", "name", "description"]}
+      />
+    );
+
+    // Mock the table wrapper's Y position as 200.
+    (wrapper.instance() as any).divWrapperRef.current = { offsetTop: 200 };
+
+    // Wait until the data is loaded into the table.
+    await Promise.resolve();
+    wrapper.update();
+
+    // Click to the next page of the table.
+    wrapper
+      .find(".-next button")
+      .first()
+      .simulate("click");
+
+    // The window shoul;d have scrolled up to Y position 200.
+    expect(window.scrollY).toEqual(200);
+  });
+
+  it("Has the paginator at the top and bottom of the table.", () => {
+    const wrapper = mountWithContext(
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
+    );
+
+    expect(wrapper.find(".pagination-top").exists()).toEqual(true);
+    expect(wrapper.find(".pagination-bottom").exists()).toEqual(true);
   });
 });
