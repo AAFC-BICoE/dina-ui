@@ -3,7 +3,7 @@
 /** A sucessful response from a JSONAPI backend. */
 export interface JsonApiResponse {
   data: JsonApiResource;
-  status?: number;
+  status?: 201;
 }
 
 /** A single entity in JSONAPI format. */

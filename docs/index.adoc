@@ -17,3 +17,5 @@ include::npm_package_scripts.adoc[]
 :leveloffset: 2
 
 include::query_component.adoc[]
+
+include::operations_component.adoc[]
