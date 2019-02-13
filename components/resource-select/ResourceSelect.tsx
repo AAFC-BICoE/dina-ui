@@ -7,13 +7,21 @@ import {
   ApiClientContext,
   ApiClientContextI
 } from "../../components/api-client/ApiClientContext";
+import { JsonApiRelationship } from "../api-client/jsonapi-types";
 
+/** ResourceSelect component props. */
 interface ResourceSelectProps<TData> {
-  name: string;
-  path: string;
+  /** Function called when an option is selected. */
+  onChange?: (value: JsonApiRelationship) => void;
+
+  /** The model type to select resources from. */
+  model: string;
+
+  /** Function to get the option label for each resource. */
   optionLabel: (resource: TData) => string;
 }
 
+/** Dropdown select input for selecting a resource from the API. */
 export class ResourceSelect<
   TData extends KitsuResource
 > extends React.Component<ResourceSelectProps<TData>> {
@@ -21,35 +29,42 @@ export class ResourceSelect<
   public context!: ApiClientContextI;
 
   public render() {
-    const { name } = this.props;
-    const debouncedLoadOptions = debounce(this.loadOptions, 250);
+    // Debounces the loadOptions function to avoid sending excessive API requests.
+    const debouncedOptionLoader = debounce(this.loadOptions, 250);
 
     return (
       <AsyncSelect
         cacheOptions={true}
         defaultOptions={true}
-        loadOptions={debouncedLoadOptions}
-        name={name}
+        loadOptions={debouncedOptionLoader}
+        onChange={this.onChange}
       />
     );
   }
 
+  /** Loads options by getting a list of resources from the back-end API. */
   private loadOptions = (
     inputValue: string,
     callback: ((options: OptionsType<any>) => void)
   ) => {
-    const { optionLabel, path } = this.props;
+    const { optionLabel, model } = this.props;
     const { apiClient } = this.context;
 
-    apiClient.get(path, {}).then((response: KitsuResponse<TData[]>) => {
+    // Send the API request.
+    apiClient.get(model, {}).then((response: KitsuResponse<TData[]>) => {
       const { data } = response;
 
+      // Build the list of options from the returned resources.
       const options = data.map(resource => ({
         label: optionLabel(resource),
-        value: { type: path, id: resource.id }
+        value: { data: { type: model, id: resource.id } } as JsonApiRelationship
       }));
 
       callback(options);
     });
+  };
+
+  private onChange = option => {
+    this.props.onChange(option.value);
   };
 }
