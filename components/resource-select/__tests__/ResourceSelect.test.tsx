@@ -3,7 +3,7 @@ import Kitsu from "kitsu";
 import lodash from "lodash";
 import Select from "react-select/lib/Select";
 import { ApiClientContext } from "../../api-client/ApiClientContext";
-import { ResourceSelect } from "../ResourceSelect";
+import { ResourceSelect, ResourceSelectProps } from "../ResourceSelect";
 
 /** Mock resources to select as dropdown options. */
 const MOCK_TODOS = {
@@ -32,6 +32,12 @@ jest.mock(
 jest.spyOn(lodash, "debounce").mockImplementation(fn => fn);
 
 describe("ResourceSelect component", () => {
+  const DEFAULT_SELECT_PROPS: ResourceSelectProps<any> = {
+    filter: input => ({ name: input }),
+    model: "todo",
+    optionLabel: todo => todo.name
+  };
+
   /** JSONAPI client. */
   const testClient = new Kitsu({
     baseURL: "/api",
@@ -52,20 +58,16 @@ describe("ResourceSelect component", () => {
   });
 
   it("Renders initially with a loading indicator.", () => {
-    const optionLabel = todo => todo.name;
-
     const wrapper = mountWithContext(
-      <ResourceSelect model="todo" optionLabel={optionLabel} />
+      <ResourceSelect {...DEFAULT_SELECT_PROPS} />
     );
 
     expect((wrapper.find(Select).props() as any).isLoading).toEqual(true);
   });
 
   it("Fetches a list of options from the back-end API.", async () => {
-    const optionLabel = todo => todo.name;
-
     const wrapper = mountWithContext(
-      <ResourceSelect model="todo" optionLabel={optionLabel} />
+      <ResourceSelect {...DEFAULT_SELECT_PROPS} />
     );
 
     // Wait for the options to load.
@@ -83,16 +85,10 @@ describe("ResourceSelect component", () => {
   });
 
   it("Calls the 'onChange' prop with a JSONAPI relationship value.", async () => {
-    const optionLabel = todo => todo.name;
-
     const mockOnChange = jest.fn();
 
     const wrapper = mountWithContext(
-      <ResourceSelect
-        model="todo"
-        onChange={mockOnChange}
-        optionLabel={optionLabel}
-      />
+      <ResourceSelect {...DEFAULT_SELECT_PROPS} onChange={mockOnChange} />
     );
 
     // Wait for the options to load.
@@ -110,15 +106,8 @@ describe("ResourceSelect component", () => {
   });
 
   it("Passes optional 'sort' and 'include' props for the JSONAPI GET request.", async () => {
-    const optionLabel = todo => todo.name;
-
     const wrapper = mountWithContext(
-      <ResourceSelect
-        model="todo"
-        optionLabel={optionLabel}
-        include="group"
-        sort="name"
-      />
+      <ResourceSelect {...DEFAULT_SELECT_PROPS} include="group" sort="name" />
     );
 
     // Wait for the options to load.
@@ -130,10 +119,8 @@ describe("ResourceSelect component", () => {
   });
 
   it("Omits optional 'sort' and 'include' props from the GET request when they are not passed as props.", async () => {
-    const optionLabel = todo => todo.name;
-
     const wrapper = mountWithContext(
-      <ResourceSelect model="todo" optionLabel={optionLabel} />
+      <ResourceSelect {...DEFAULT_SELECT_PROPS} />
     );
 
     // Wait for the options to load.
@@ -149,5 +136,33 @@ describe("ResourceSelect component", () => {
     // The query's GET params should not have any values explicitly set to undefined.
     // This would create an invalid request URL, e.g. /api/todo?fields=undefined
     expect(Object.values(getParams).includes(undefined)).toBeFalsy();
+  });
+
+  it("Provides a 'filter' prop to filter results.", async () => {
+    // Filter by the "description" attribute.
+    const filter = input => ({ description: input });
+
+    const wrapper = mountWithContext(
+      <ResourceSelect {...DEFAULT_SELECT_PROPS} filter={filter} />
+    );
+
+    // Simulate the select component's input change.
+    (wrapper.find(Select).props() as any).onInputChange(
+      "test filter value",
+      "input-change"
+    );
+
+    // Wait for the options to load.
+    await Promise.resolve();
+    wrapper.update();
+
+    // The GET function shsould have been called twice: for the initial query and again for the
+    // filtered query.
+    expect(mockGet).toHaveBeenCalledTimes(2);
+    expect(mockGet).lastCalledWith("todo", {
+      filter: {
+        description: "test filter value"
+      }
+    });
   });
 });

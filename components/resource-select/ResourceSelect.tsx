@@ -1,4 +1,4 @@
-import { GetParams, KitsuResource, KitsuResponse } from "kitsu";
+import { FilterParam, GetParams, KitsuResource, KitsuResponse } from "kitsu";
 import { debounce, omitBy } from "lodash";
 import React from "react";
 import { Async as AsyncSelect } from "react-select";
@@ -11,7 +11,7 @@ import {
 import { JsonApiRelationship } from "../api-client/jsonapi-types";
 
 /** ResourceSelect component props. */
-interface ResourceSelectProps<TData> {
+export interface ResourceSelectProps<TData> {
   /** Function called when an option is selected. */
   onChange?: (value: JsonApiRelationship) => void;
 
@@ -20,6 +20,9 @@ interface ResourceSelectProps<TData> {
 
   /** Function to get the option label for each resource. */
   optionLabel: (resource: TData) => string;
+
+  /** Function that is passed the dropdown's search input value and returns a JSONAPI filter param. */
+  filter: (inputValue: string) => FilterParam;
 
   /** The JSONAPI "include" parameter. */
   include?: string;
@@ -54,12 +57,17 @@ export class ResourceSelect<
     inputValue: string,
     callback: ((options: OptionsType<any>) => void)
   ) => {
-    const { include, optionLabel, model, sort } = this.props;
+    const { filter, include, optionLabel, model, sort } = this.props;
     const { apiClient } = this.context;
+
+    const filterParam = inputValue ? filter(inputValue) : undefined;
 
     // Omit undefined values from the GET params, which would otherwise cause an invalid request.
     // e.g. /api/region?include=undefined
-    const getParams = omitBy<GetParams>({ include, sort }, isUndefined);
+    const getParams = omitBy<GetParams>(
+      { filter: filterParam, include, sort },
+      isUndefined
+    );
 
     // Send the API request.
     apiClient.get(model, getParams).then((response: KitsuResponse<TData[]>) => {
