@@ -47,6 +47,10 @@ describe("ResourceSelect component", () => {
     );
   }
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("Renders initially with a loading indicator.", () => {
     const optionLabel = todo => todo.name;
 
@@ -103,5 +107,47 @@ describe("ResourceSelect component", () => {
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).lastCalledWith({ data: { id: 3, type: "todo" } });
+  });
+
+  it("Passes optional 'sort' and 'include' props for the JSONAPI GET request.", async () => {
+    const optionLabel = todo => todo.name;
+
+    const wrapper = mountWithContext(
+      <ResourceSelect
+        model="todo"
+        optionLabel={optionLabel}
+        include="group"
+        sort="name"
+      />
+    );
+
+    // Wait for the options to load.
+    await Promise.resolve();
+    wrapper.update();
+
+    expect(mockGet).toHaveBeenCalledTimes(1);
+    expect(mockGet).lastCalledWith("todo", { include: "group", sort: "name" });
+  });
+
+  it("Omits optional 'sort' and 'include' props from the GET request when they are not passed as props.", async () => {
+    const optionLabel = todo => todo.name;
+
+    const wrapper = mountWithContext(
+      <ResourceSelect model="todo" optionLabel={optionLabel} />
+    );
+
+    // Wait for the options to load.
+    await Promise.resolve();
+    wrapper.update();
+
+    expect(mockGet).toHaveBeenCalledTimes(1);
+
+    // Get the params of the last call to Kitsu's GET method.
+    const [model, getParams] = mockGet.mock.calls[0];
+    expect(model).toEqual("todo");
+
+    // The query's GET params should not have any values explicitly set to undefined.
+    // This would create an invalid request URL, e.g. /api/todo?fields=undefined
+    expect(Object.values(getParams).includes(undefined)).toBeFalsy();
   });
 });

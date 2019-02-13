@@ -1,8 +1,9 @@
-import { KitsuResource, KitsuResponse } from "kitsu";
-import { debounce } from "lodash";
+import { GetParams, KitsuResource, KitsuResponse } from "kitsu";
+import { debounce, omitBy } from "lodash";
 import React from "react";
 import { Async as AsyncSelect } from "react-select";
 import { OptionsType } from "react-select/lib/types";
+import { isUndefined } from "util";
 import {
   ApiClientContext,
   ApiClientContextI
@@ -19,6 +20,12 @@ interface ResourceSelectProps<TData> {
 
   /** Function to get the option label for each resource. */
   optionLabel: (resource: TData) => string;
+
+  /** The JSONAPI "include" parameter. */
+  include?: string;
+
+  /** The JSONAPI "sort" parameter. */
+  sort?: string;
 }
 
 /** Dropdown select input for selecting a resource from the API. */
@@ -47,17 +54,23 @@ export class ResourceSelect<
     inputValue: string,
     callback: ((options: OptionsType<any>) => void)
   ) => {
-    const { optionLabel, model } = this.props;
+    const { include, optionLabel, model, sort } = this.props;
     const { apiClient } = this.context;
 
+    // Omit undefined values from the GET params, which would otherwise cause an invalid request.
+    // e.g. /api/region?include=undefined
+    const getParams = omitBy<GetParams>({ include, sort }, isUndefined);
+
     // Send the API request.
-    apiClient.get(model, {}).then((response: KitsuResponse<TData[]>) => {
+    apiClient.get(model, getParams).then((response: KitsuResponse<TData[]>) => {
       const { data } = response;
 
       // Build the list of options from the returned resources.
       const options = data.map(resource => ({
         label: optionLabel(resource),
-        value: { data: { type: model, id: resource.id } } as JsonApiRelationship
+        value: {
+          data: { type: model, id: resource.id }
+        } as JsonApiRelationship
       }));
 
       callback(options);
