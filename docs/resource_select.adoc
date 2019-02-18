@@ -1,0 +1,48 @@
+= Resource Select Component
+
+This is a searchable dropdown select component for selecting a back-end resource from a list.
+
+Example usage for selecting a Group from a list:
+[source,tsx]
+----
+interface ExamplePageState {
+  selectedGroup?: JsonApiRelationship;
+}
+
+/**
+ * This page shows a dropdown for selecting a Group. You can type the name of a Group you're
+ * looking for into the input, which sends a filtered query to the back-end API for a Group with
+ * that name. When you select a Group, the onChange callback function sets the selected group into
+ * the page's component state. The page displays a message with the ID of the currently selected
+ * Group.
+ */
+export default class ExamplePage extends React.Component<{}, ExamplePageState> {
+  public state: ExamplePageState = {};
+
+  public render() {
+    const { selectedGroup } = this.state;
+    return (
+      <div>
+        Selected Group ID: {selectedGroup ? selectedGroup.data.id : "None"}
+        <div className="card card-body" style={{ width: "300px" }}>
+          <ResourceSelect<Group>
+            filter={this.filter}
+            model="group"
+            optionLabel={this.optionLabel}
+            onChange={this.onChange}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  private filter = (input: string) => ({ groupName: input });
+
+  private optionLabel = (group: Group) => group.groupName;
+
+  private onChange = (relationship: JsonApiRelationship) => {
+    this.setState({ selectedGroup: relationship });
+  };
+}
+----
+

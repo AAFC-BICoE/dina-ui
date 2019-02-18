@@ -44,7 +44,6 @@ export class ResourceSelect<
 
     return (
       <AsyncSelect
-        cacheOptions={true}
         defaultOptions={true}
         loadOptions={debouncedOptionLoader}
         onChange={this.onChange}
