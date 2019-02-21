@@ -1,7 +1,7 @@
 import { mount } from "enzyme";
-import Kitsu, { KitsuResource, KitsuResponse } from "kitsu";
+import { KitsuResource, KitsuResponse } from "kitsu";
 import { last } from "lodash";
-import { ApiClientContext } from "../ApiClientContext";
+import { ApiClientContext, createContextValue } from "../ApiClientContext";
 import { JsonApiErrorResponse } from "../jsonapi-types";
 import { Query } from "../Query";
 
@@ -78,19 +78,14 @@ const mockGet = jest.fn((path, { fields, page }) => {
   }
 });
 
-/** JSONAPI client. */
-const testClient = new Kitsu({
-  baseURL: "/api",
-  pluralize: false,
-  resourceCase: "none"
-});
+const contextValue = createContextValue();
 
 /**
  * Helper method to create a paged query element with the required context.
  */
 function pagedQueryWithContext(pageSpec, childFunction?) {
   return (
-    <ApiClientContext.Provider value={{ apiClient: testClient }}>
+    <ApiClientContext.Provider value={contextValue}>
       {pagedQuery(pageSpec, childFunction)}
     </ApiClientContext.Provider>
   );
@@ -127,7 +122,7 @@ describe("Query component", () => {
   it("Renders with loading as true before sending a request", done => {
     let renderCount = 0;
     mount(
-      <ApiClientContext.Provider value={{ apiClient: testClient }}>
+      <ApiClientContext.Provider value={contextValue}>
         <Query<Todo[]> query={{ path: "todo" }}>
           {({ loading }) => {
             // Query should be rendered once with loading as true.
@@ -145,7 +140,7 @@ describe("Query component", () => {
 
   it("Passes single-resource data from the mocked API to child components", done => {
     mount(
-      <ApiClientContext.Provider value={{ apiClient: testClient }}>
+      <ApiClientContext.Provider value={contextValue}>
         <Query<Todo> query={{ path: "todo/25" }}>
           {({ loading, response }) => {
             if (response) {
@@ -164,7 +159,7 @@ describe("Query component", () => {
 
   it("Passes list data from the mocked API to child components", done => {
     mount(
-      <ApiClientContext.Provider value={{ apiClient: testClient }}>
+      <ApiClientContext.Provider value={contextValue}>
         <Query<Todo[], MetaWithTotal> query={{ path: "todo" }}>
           {({ loading, response }) => {
             if (response) {
@@ -195,7 +190,7 @@ describe("Query component", () => {
 
   it("Supports JSONAPI GET params", () => {
     mount(
-      <ApiClientContext.Provider value={{ apiClient: testClient }}>
+      <ApiClientContext.Provider value={contextValue}>
         <Query<Todo[]>
           query={{
             fields: { todo: "name,description" },
@@ -227,7 +222,7 @@ describe("Query component", () => {
   it("Renders an error to child components", done => {
     // Get an error by requesting an attribute that the resource doesn't have.
     mount(
-      <ApiClientContext.Provider value={{ apiClient: testClient }}>
+      <ApiClientContext.Provider value={contextValue}>
         <Query<Todo[]>
           query={{ path: "todo", fields: { todo: "unknownAttribute" } }}
         >
