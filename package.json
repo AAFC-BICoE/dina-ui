@@ -17,6 +17,7 @@
     "@zeit/next-typescript": "^1.1.1",
     "axios": "^0.18.0",
     "bootswatch": "^4.2.1",
+    "formik": "^1.5.1",
     "kitsu": "^6.5.1",
     "lodash": "^4.17.11",
     "next": "^7.0.2",

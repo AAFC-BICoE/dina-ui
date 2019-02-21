@@ -1,13 +1,14 @@
+import Link from "next/link";
 import Head from "../components/head";
 import Nav from "../components/nav";
-import { QueryTable } from "../components/table/QueryTable";
+import { ColumnDefinition, QueryTable } from "../components/table/QueryTable";
 import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
 
-const PCRPRIMER_TABLE_COLUMNS = [
+const PCRPRIMER_TABLE_COLUMNS: Array<ColumnDefinition<PcrPrimer>> = [
   "group.groupName",
   "region.name",
   "type",
-  "name",
+  { Header: "Name", Cell: ({ value }) => <div>{value}</div> },
   "lotNumber",
   "application",
   "direction",
@@ -22,9 +23,12 @@ export default function PcrPrimerListPage() {
       <Nav />
       <div className="container-fluid">
         <h1>PCR Primers</h1>
-        <QueryTable<PcrPrimer[]>
+        <Link href="/add-pcr-primer">
+          <a>Add PCR Primer</a>
+        </Link>
+        <QueryTable<PcrPrimer>
           columns={PCRPRIMER_TABLE_COLUMNS}
-          include="group,region"
+          include="region"
           path="pcrPrimer"
         />
       </div>
