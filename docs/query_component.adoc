@@ -1,0 +1,47 @@
+= Query component
+
+The Query component is a React-friendly way to fetch data from the backend and pass the
+query's state into child components.
+
+It implements the https://reactjs.org/docs/render-props.html[Render props] pattern to pass the
+fetch query's state into child components. This lets you render different views for loading, error
+and response.
+
+Example usage for fetching a single resource:
+[source,tsx]
+----
+function PcrPrimer1() {
+  return (
+    <Query<PcrPrimer> query={{ path: "pcrPrimer/1", include: "region" }}>
+      {({ loading, error, response }) => (
+        <div>
+          {loading && <div className="alert alert-info">Loading...</div>}
+          {error && <ErrorInfo error={error} />}
+          {response && <PcrPrimerInfo pcrPrimer={response.data} />}
+        </div>
+      )}
+    </Query>
+  );
+}
+----
+
+Example usage for fetching a resource list:
+[source,tsx]
+----
+function PcrPrimerList() {
+  return (
+    <Query<PcrPrimer[]> query={{ path: "pcrPrimer", sort: "name" }}>
+      {({ loading, error, response }) => (
+        <div>
+          {loading && <div className="alert alert-info">Loading...</div>}
+          {error && <ErrorInfo error={error} />}
+          {response &&
+            response.data.map(primer => (
+              <PcrPrimerInfo key={primer.id} primer={primer} />
+            ))}
+        </div>
+      )}
+    </Query>
+  );
+}
+----

@@ -1,6 +1,6 @@
 import { AxiosError, AxiosRequestConfig } from "axios";
+import { mount } from "enzyme";
 import Kitsu from "kitsu";
-import { create } from "react-test-renderer";
 import { ApiClientContext } from "../ApiClientContext";
 import { Operation, OperationsResponse } from "../jsonapi-types";
 import { Operations } from "../Operations";
@@ -138,7 +138,7 @@ describe("Operations component", () => {
 
   it("Provides a doOperations function to children that submits a JSONAPI jsonpatch request.", async () => {
     // Create a form element that on submit calls the provided doOperations function.
-    const wrapper = create(
+    const wrapper = mount(
       <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Operations>
           {({ doOperations }) => {
@@ -153,7 +153,7 @@ describe("Operations component", () => {
     );
 
     // Submit the form.
-    await wrapper.root.findByType("form").props.onSubmit();
+    await (wrapper.find("form").props() as any).onSubmit();
 
     // Check that the correct arguments were passed into axios' patch function.
     expect(mockPatch).toHaveBeenCalledTimes(1);
@@ -166,7 +166,7 @@ describe("Operations component", () => {
   });
 
   it("Renders with loading as false before sending a request", done => {
-    create(
+    mount(
       <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Operations>
           {({ loading, response }) => {
@@ -181,7 +181,7 @@ describe("Operations component", () => {
   });
 
   it("Renders with loading as true after sending a request", async done => {
-    const render = create(
+    const wrapper = mount(
       <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Operations>
           {({ doOperations, loading, response }) => {
@@ -200,11 +200,11 @@ describe("Operations component", () => {
       </ApiClientContext.Provider>
     );
 
-    await render.root.findByType("form").props.onSubmit();
+    await (wrapper.find("form").props() as any).onSubmit();
   });
 
   it("Renders a jsonpatch response to child components", async done => {
-    const render = create(
+    const wrapper = mount(
       <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Operations>
           {({ doOperations, loading, response }) => {
@@ -226,11 +226,11 @@ describe("Operations component", () => {
       </ApiClientContext.Provider>
     );
 
-    await render.root.findByType("form").props.onSubmit();
+    await (wrapper.find("form").props() as any).onSubmit();
   });
 
   it("Throws an error when an invalid format request is sent.", async done => {
-    const render = create(
+    const wrapper = mount(
       <ApiClientContext.Provider value={{ apiClient: testClient }}>
         <Operations>
           {({ doOperations }) => {
@@ -246,7 +246,7 @@ describe("Operations component", () => {
 
     try {
       // Expect doOperations to throw an error.
-      await render.root.findByType("form").props.onSubmit();
+      await (wrapper.find("form").props() as any).onSubmit();
     } catch (error) {
       expect(error).toEqual(MOCK_AXIOS_ERROR);
       done();

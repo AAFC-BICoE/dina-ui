@@ -11,3 +11,13 @@ include::stack.adoc[]
 include::dev_tools.adoc[]
 
 include::npm_package_scripts.adoc[]
+
+= React Components
+
+:leveloffset: 2
+
+include::query_component.adoc[]
+
+include::operations_component.adoc[]
+
+include::resource_select.adoc[]

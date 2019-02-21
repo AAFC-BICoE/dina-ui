@@ -1,0 +1,73 @@
+= Operations component
+
+The Operations component is a React-friendly way to perform write operations against the back-end
+API. Note: The back-end API must implement
+https://github.com/json-api/json-api/blob/9c7a03dbc37f80f6ca81b16d444c960e96dd7a57/extensions/jsonpatch/index.md[JSONAPI's jsonpatch extension].
+
+Example usage of a form that persists a single Region resource:
+
+[source,tsx]
+----
+function NewRegionForm() {
+  return (
+    <Operations>
+      {({ doOperations, loading, response }) => {
+        async function onSubmit(event: FormEvent<HTMLFormElement>) {
+          event.preventDefault();
+
+          const name = event.target.name.value;
+          const description = event.target.description.value;
+          const symbol = event.target.symbol.value;
+
+          await doOperations([
+            {
+              op: "POST",
+              path: "region",
+              value: {
+                attributes: {
+                  description,
+                  name,
+                  symbol
+                },
+                id: 123,
+                type: "region"
+              }
+            }
+          ]);
+        }
+
+        return (
+          <div>
+            {loading && "Loading..."}
+            {response && `Response: ${JSON.stringify(response)}`}
+            <form onSubmit={onSubmit}>
+              <div>
+                <span>Name:</span>
+                <input name="name" />
+              </div>
+              <div>
+                <span>Description:</span>
+                <input name="description" />
+              </div>
+              <div>
+                <span>Symbol:</span>
+                <input name="symbol" />
+              </div>
+              <button type="submit">Submit</button>
+            </form>
+          </div>
+        );
+      }}
+    </Operations>
+  );
+}
+----
+
+This form provides the text inputs for the region's "name", "description" and "symbol" attributes.
+When the submit button is clicked, the "Loading..." indicator shows up above the form. When the
+back-end returns a response, that response is rendered above the form, replacing the loading
+message.
+
+This example only persists one region, but multiple resources of the same or different types can
+be submitted as a single transaction by calling the "doOperations" function with multiple array
+elements.
