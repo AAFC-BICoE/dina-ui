@@ -6,7 +6,8 @@ import { Operation, OperationsResponse } from "./jsonapi-types";
 export interface ApiClientContextI {
   /** Client to talk to the back-end API. */
   apiClient: Kitsu;
-  /** Function to perform requests against a jsonpatch */
+
+  /** Function to perform requests against a jsonpatch-compliant JSONAPI server. */
   doOperations: (operations: Operation[]) => Promise<OperationsResponse>;
 }
 
@@ -42,6 +43,7 @@ export function createContextValue(): ApiClientContextI {
       }
     });
 
+    // Return the jsonpatch response.
     return axiosResponse.data;
   }
 

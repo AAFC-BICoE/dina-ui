@@ -1,5 +1,5 @@
 import { mount } from "enzyme";
-import Kitsu, { KitsuResource, KitsuResponse } from "kitsu";
+import { KitsuResource, KitsuResponse } from "kitsu";
 import { last } from "lodash";
 import { ApiClientContext, createContextValue } from "../ApiClientContext";
 import { JsonApiErrorResponse } from "../jsonapi-types";
