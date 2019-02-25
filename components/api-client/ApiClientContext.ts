@@ -1,6 +1,10 @@
 import Kitsu from "kitsu";
 import React from "react";
-import { Operation, OperationsResponse } from "./jsonapi-types";
+import {
+  JsonApiErrorResponse,
+  Operation,
+  OperationsResponse
+} from "./jsonapi-types";
 
 /** Api context interface. */
 export interface ApiClientContextI {
@@ -29,6 +33,9 @@ export function createContextValue(): ApiClientContextI {
     resourceCase: "none"
   });
 
+  /**
+   * Performs a write operation against a jsonpatch-compliant JSONAPI server.
+   */
   async function doOperations(
     operations: Operation[]
   ): Promise<OperationsResponse> {
@@ -43,7 +50,16 @@ export function createContextValue(): ApiClientContextI {
       }
     });
 
-    // Return the jsonpatch response.
+    // Check for errors. At least one error means that the entire request's transaction was
+    // cancelled.
+    const errorMessage = getErrorMessage(axiosResponse.data);
+
+    // If there is an error message, throw it.
+    if (errorMessage) {
+      throw errorMessage;
+    }
+
+    // Return the successful jsonpatch response.
     return axiosResponse.data;
   }
 
@@ -51,4 +67,27 @@ export function createContextValue(): ApiClientContextI {
     apiClient,
     doOperations
   };
+}
+
+/** Gets the error message as a string from the JSONAPI jsonpatch/operations response. */
+function getErrorMessage(
+  operationsResponse: OperationsResponse
+): string | null {
+  // Filter down to just the error responses.
+  const errorResponses = operationsResponse.filter(
+    ({ status }) => status !== 201
+  ) as JsonApiErrorResponse[];
+
+  // Map the error responses to JsonApiErrors.
+  const jsonApiErrors = errorResponses.map(response => response.errors);
+
+  // Convert the JsonApiErrors to an aggregated error string.
+  const message = jsonApiErrors
+    .map(errors =>
+      errors.map(({ title, detail }) => `${title}: ${detail}`).join("\n")
+    )
+    .join("\n");
+
+  // Return the error message if there is one, or null otherwise.
+  return message || null;
 }
