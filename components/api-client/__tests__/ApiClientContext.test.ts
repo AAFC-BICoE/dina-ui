@@ -3,6 +3,13 @@ import Kitsu from "kitsu";
 import { createContextValue } from "../ApiClientContext";
 import { Operation, OperationsResponse } from "../jsonapi-types";
 
+const AXIOS_JSONPATCH_REQUEST_CONFIG: AxiosRequestConfig = {
+  headers: {
+    Accept: "application/json-patch+json",
+    "Content-Type": "application/json-patch+json"
+  }
+};
+
 const TODO_INSERT_OPERATION: Operation[] = [
   {
     op: "POST",
@@ -17,13 +24,6 @@ const TODO_INSERT_OPERATION: Operation[] = [
     }
   }
 ];
-
-const AXIOS_JSONPATCH_REQUEST_CONFIG: AxiosRequestConfig = {
-  headers: {
-    Accept: "application/json-patch+json",
-    "Content-Type": "application/json-patch+json"
-  }
-};
 
 const MOCK_TODO_INSERT_AXIOS_RESPONSE = {
   data: [
@@ -41,10 +41,85 @@ const MOCK_TODO_INSERT_AXIOS_RESPONSE = {
   ] as OperationsResponse
 };
 
+const TODO_OPERATION_1_VALID_2_INVALID: Operation[] = [
+  {
+    op: "POST",
+    path: "todo",
+    value: {
+      attributes: {
+        name: "valid-name"
+      },
+      id: 1,
+      type: "todo"
+    }
+  },
+  {
+    op: "POST",
+    path: "todo",
+    value: {
+      attributes: {
+        name: "this-name-is-too-long"
+      },
+      id: 2,
+      type: "todo"
+    }
+  },
+  {
+    op: "POST",
+    path: "todo",
+    value: {
+      attributes: {
+        description: "this-description-is-too-long"
+      },
+      id: 3,
+      type: "todo"
+    }
+  }
+];
+
+const MOCK_AXIOS_RESPONSE_1_VALID_2_INVALID = {
+  data: [
+    {
+      data: {
+        attributes: {
+          name: "valid-name"
+        },
+        id: "1",
+        links: { self: "/api/region/1" },
+        type: "todo"
+      },
+      status: 201
+    },
+    {
+      errors: [
+        {
+          detail: "name size must be between 1 and 10",
+          status: "422",
+          title: "Constraint violation"
+        }
+      ],
+      status: 422
+    },
+    {
+      errors: [
+        {
+          detail: "description size must be between 1 and 10",
+          status: "422",
+          title: "Constraint violation"
+        }
+      ],
+      status: 422
+    }
+  ] as OperationsResponse
+};
+
 /** Mock of Axios' patch function. */
 const mockPatch = jest.fn((_, data) => {
   if (data === TODO_INSERT_OPERATION) {
     return MOCK_TODO_INSERT_AXIOS_RESPONSE;
+  }
+  if (data === TODO_OPERATION_1_VALID_2_INVALID) {
+    return MOCK_AXIOS_RESPONSE_1_VALID_2_INVALID;
   }
 });
 
@@ -77,5 +152,19 @@ describe("API client context", () => {
 
     // Check the response.
     expect(response).toEqual(MOCK_TODO_INSERT_AXIOS_RESPONSE.data);
+  });
+
+  it("Provides a doOperations function that throws an error string.", async () => {
+    const expectedErrorMessage = `Constraint violation: name size must be between 1 and 10
+Constraint violation: description size must be between 1 and 10`;
+
+    let actualErrorMessage = "";
+
+    try {
+      await doOperations(TODO_OPERATION_1_VALID_2_INVALID);
+    } catch (error) {
+      actualErrorMessage = error;
+    }
+    expect(actualErrorMessage).toEqual(expectedErrorMessage);
   });
 });
