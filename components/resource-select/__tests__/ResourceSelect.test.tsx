@@ -105,6 +105,20 @@ describe("ResourceSelect component", () => {
     expect(mockOnChange).lastCalledWith({ data: { id: 3, type: "todo" } });
   });
 
+  it("Allows the 'onChange' prop to be undefined.", () => {
+    const wrapper = mountWithContext(
+      <ResourceSelect {...DEFAULT_SELECT_PROPS} onChange={undefined} />
+    );
+
+    // Select an option.
+    (wrapper.find(Select).props() as any).onChange({
+      label: "a todo",
+      value: {}
+    });
+
+    // Nothing should happen because no onChange prop was provided.
+  });
+
   it("Passes optional 'sort' and 'include' props for the JSONAPI GET request.", async () => {
     const wrapper = mountWithContext(
       <ResourceSelect {...DEFAULT_SELECT_PROPS} include="group" sort="name" />
@@ -162,6 +176,30 @@ describe("ResourceSelect component", () => {
     expect(mockGet).lastCalledWith("todo", {
       filter: {
         description: "test filter value"
+      }
+    });
+  });
+
+  it("Provides a 'defaultValue' prop to specify initial select value.", () => {
+    const defaultValue = {
+      id: 300,
+      name: "DEFAULT TODO",
+      type: "todo"
+    };
+
+    const wrapper = mountWithContext(
+      <ResourceSelect {...DEFAULT_SELECT_PROPS} defaultValue={defaultValue} />
+    );
+
+    const currentValue = (wrapper.find(Select).props() as any).value;
+
+    expect(currentValue).toEqual({
+      label: "DEFAULT TODO",
+      value: {
+        data: {
+          id: 300,
+          type: "todo"
+        }
       }
     });
   });
