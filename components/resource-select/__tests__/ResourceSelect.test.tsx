@@ -1,8 +1,10 @@
 import { mount } from "enzyme";
-import Kitsu from "kitsu";
 import lodash from "lodash";
 import Select from "react-select/lib/Select";
-import { ApiClientContext } from "../../api-client/ApiClientContext";
+import {
+  ApiClientContext,
+  createContextValue
+} from "../../api-client/ApiClientContext";
 import { ResourceSelect, ResourceSelectProps } from "../ResourceSelect";
 
 /** Mock resources to select as dropdown options. */
@@ -38,16 +40,9 @@ describe("ResourceSelect component", () => {
     optionLabel: todo => todo.name
   };
 
-  /** JSONAPI client. */
-  const testClient = new Kitsu({
-    baseURL: "/api",
-    pluralize: false,
-    resourceCase: "none"
-  });
-
   function mountWithContext(element: JSX.Element) {
     return mount(
-      <ApiClientContext.Provider value={{ apiClient: testClient }}>
+      <ApiClientContext.Provider value={createContextValue()}>
         {element}
       </ApiClientContext.Provider>
     );
