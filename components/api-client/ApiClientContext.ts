@@ -2,6 +2,7 @@ import Kitsu from "kitsu";
 import React from "react";
 import {
   JsonApiErrorResponse,
+  JsonApiResponse,
   Operation,
   OperationsResponse
 } from "./jsonapi-types";
@@ -12,7 +13,7 @@ export interface ApiClientContextI {
   apiClient: Kitsu;
 
   /** Function to perform requests against a jsonpatch-compliant JSONAPI server. */
-  doOperations: (operations: Operation[]) => Promise<OperationsResponse>;
+  doOperations: (operations: Operation[]) => Promise<JsonApiResponse[]>;
 }
 
 /**
@@ -38,7 +39,7 @@ export function createContextValue(): ApiClientContextI {
    */
   async function doOperations(
     operations: Operation[]
-  ): Promise<OperationsResponse> {
+  ): Promise<JsonApiResponse[]> {
     // Unwrap the configured axios instance from the Kitsu instance.
     const { axios } = apiClient;
 

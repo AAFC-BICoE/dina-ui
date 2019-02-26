@@ -1,0 +1,52 @@
+= Performing write operations
+
+This application uses React's context API to pass down a "doOperations" function which allows
+you to perform write operations against the back-end API. doOperations accepts an array of
+operations to perform, so you can submit multiple resource operations in a single transaction.
+
+If one operation fails, the entire transaction is cancelled, and doOperations throws a string,
+which is an aggregation of all of the error messages. This function relies on the back-end to
+support JSONAPI's jsonpatch extension.
+
+Here is a simple example of a component that uses the doOperations function from the context to
+provide a button that creates a new Region with a random name and symbol:
+
+[source,tsx]
+----
+import React from "react";
+import {
+  ApiClientContext,
+  ApiClientContextI
+} from "../components/api-client/ApiClientContext";
+
+export class NewRegionButton extends React.Component {
+  public static contextType = ApiClientContext;
+  public context!: ApiClientContextI;
+
+  public render() {
+    return <button onClick={this.createRegion}>Create Region</button>;
+  }
+
+  private createRegion = async () => {
+    const { doOperations } = this.context;
+
+    await doOperations([
+      {
+        op: "POST",
+        path: "region",
+        value: {
+          attributes: {
+            name: `new-region-${Math.random()}`,
+            seq: "",
+            symbol: `${Math.random()}`,
+            type: "PRIMER"
+          },
+          id: -1000,
+          relationships: {},
+          type: "region"
+        }
+      }
+    ]);
+  };
+}
+----

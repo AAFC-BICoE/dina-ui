@@ -60,7 +60,8 @@ const MOCK_500_ERROR: JsonApiErrorResponse = {
       status: "500",
       title: "INTERNAL_SERVER_ERROR"
     }
-  ]
+  ],
+  status: 500
 };
 
 // Mock Kitsu class' "get" method.
