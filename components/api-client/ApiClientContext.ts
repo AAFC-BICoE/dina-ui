@@ -76,7 +76,7 @@ function getErrorMessage(
 ): string | null {
   // Filter down to just the error responses.
   const errorResponses = operationsResponse.filter(
-    ({ status }) => status !== 201
+    ({ status }) => !/2../.test(status.toString())
   ) as JsonApiErrorResponse[];
 
   // Map the error responses to JsonApiErrors.
