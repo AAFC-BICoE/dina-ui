@@ -29,6 +29,7 @@ describe("SeqdbUiApp", () => {
         <ApiClientContext.Consumer>
           {context => {
             expect(context.apiClient instanceof Kitsu).toBeTruthy();
+            expect(typeof context.doOperations).toEqual("function");
             done();
             return null;
           }}
