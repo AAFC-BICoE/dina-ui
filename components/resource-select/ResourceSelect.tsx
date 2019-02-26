@@ -12,6 +12,9 @@ import { JsonApiRelationship } from "../api-client/jsonapi-types";
 
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData> {
+  /** Optional initial value. This prop should be used when editing a field with an existing value. */
+  defaultValue?: TData;
+
   /** Function called when an option is selected. */
   onChange?: (value: JsonApiRelationship) => void;
 
@@ -39,11 +42,24 @@ export class ResourceSelect<
   public context!: ApiClientContextI;
 
   public render() {
+    const { defaultValue, model, optionLabel } = this.props;
+
     // Debounces the loadOptions function to avoid sending excessive API requests.
     const debouncedOptionLoader = debounce(this.loadOptions, 250);
 
+    // Create the default option for the Async select if the defaultValue prop was passed.
+    const defaultOption = defaultValue
+      ? {
+          label: optionLabel(defaultValue),
+          value: {
+            data: { type: model, id: defaultValue.id }
+          }
+        }
+      : undefined;
+
     return (
       <AsyncSelect
+        defaultValue={defaultOption}
         defaultOptions={true}
         loadOptions={debouncedOptionLoader}
         onChange={this.onChange}
@@ -85,6 +101,12 @@ export class ResourceSelect<
   };
 
   private onChange = option => {
+    // When there is no onChange prop, do nothing.
+    if (!this.props.onChange) {
+      return;
+    }
+
+    // Call the provided onChange method with the selected value.
     this.props.onChange(option.value);
   };
 }
