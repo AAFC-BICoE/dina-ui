@@ -14,7 +14,7 @@ export function FormikSelect({ field, options }: FormikSelectProps) {
     <Select
       options={options}
       onChange={({ value }) => setFieldValue(field, value)}
-      value={options.find(({ value: optionValue }) => optionValue === value)}
+      value={options.find(option => option.value === value)}
     />
   );
 

@@ -38,9 +38,39 @@ export default withRouter(function PcrPrimerDetailsPage({ router }) {
                     <FieldView name="group.groupName" label="Group Name" />
                   </div>
                   <div className="row">
-                    <FieldView name="name" />
                     <FieldView name="type" />
-                    <FieldView name="seq" />
+                  </div>
+                  <div className="row">
+                    <FieldView name="region.name" />
+                    <FieldView name="name" />
+                    <FieldView name="lotNumber" />
+                    <FieldView name="targetSpecies" />
+                    <FieldView name="purification" />
+                  </div>
+                  <div className="row">
+                    <FieldView name="direction" />
+                    <FieldView name="tmCalculated" />
+                    <FieldView name="dateOrdered" />
+                    <FieldView name="dateDestroyed" />
+                  </div>
+                  <div className="row">
+                    <FieldView label="Primer Sequence (5' - 3')" name="seq" />
+                  </div>
+                  <div className="row">
+                    <FieldView name="application" />
+                    <FieldView name="reference" />
+                    <FieldView name="supplier" />
+                    <FieldView name="designedBy" />
+                    <FieldView
+                      label="Stock Concentration(uM)"
+                      name="stockConcentration"
+                    />
+                  </div>
+                  <div className="row">
+                    <FieldView name="notes" />
+                  </div>
+                  <div className="row">
+                    <FieldView label="Literature Reference" name="reference" />
                   </div>
                 </div>
               </Formik>

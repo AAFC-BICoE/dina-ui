@@ -12,30 +12,30 @@ export interface FieldViewProps {
 export function FieldView(props: FieldViewProps) {
   const { name } = props;
 
-  function InnerFieldComponent({ field: { value } }: FieldProps) {
-    const { label = titleCase(name) } = props;
-
-    return (
-      <div>
-        <label>
-          <strong>{label}</strong>
-        </label>
-        <p
-          style={{
-            borderBottom: "1px solid black",
-            borderRight: "1px solid black",
-            minHeight: "25px"
-          }}
-        >
-          {value}
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="form-group col-md-2">
-      <Field name={name} component={InnerFieldComponent} />
+      <Field name={name}>
+        {({ field: { value } }: FieldProps) => {
+          const { label = titleCase(name) } = props;
+
+          return (
+            <div>
+              <label>
+                <strong>{label}</strong>
+              </label>
+              <p
+                style={{
+                  borderBottom: "1px solid black",
+                  borderRight: "1px solid black",
+                  minHeight: "25px"
+                }}
+              >
+                {value}
+              </p>
+            </div>
+          );
+        }}
+      </Field>
     </div>
   );
 }
