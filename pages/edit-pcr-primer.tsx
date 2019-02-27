@@ -2,9 +2,9 @@ import { Field, Form, Formik, FormikActions } from "formik";
 import { pick } from "lodash";
 import { SingletonRouter, withRouter } from "next/router";
 import { useContext } from "react";
-import Select from "react-select";
 import { ApiClientContext } from "../components/api-client/ApiClientContext";
 import { Query } from "../components/api-client/Query";
+import { FormikSelect } from "../components/formik-input/FormikSelect";
 import Head from "../components/head";
 import Nav from "../components/nav";
 import { ResourceSelect } from "../components/resource-select/ResourceSelect";
@@ -100,14 +100,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
 
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      {({
-        status,
-        isSubmitting,
-        setFieldValue,
-        values: {
-          attributes: { type }
-        }
-      }) => (
+      {({ status, isSubmitting, setFieldValue }) => (
         <Form>
           {status && <div className="alert alert-danger">{status}</div>}
           <div>
@@ -124,14 +117,9 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
               </div>
               <div className="form-group col-md-2">
                 <label>Primer Type:</label>
-                <Select<any>
+                <FormikSelect
+                  field="attributes.type"
                   options={PRIMER_TYPE_OPTIONS}
-                  onChange={({ value }) =>
-                    setFieldValue("attributes.type", value)
-                  }
-                  value={PRIMER_TYPE_OPTIONS.find(
-                    ({ value }) => value === type
-                  )}
                 />
               </div>
               <div className="form-group col-md-2">

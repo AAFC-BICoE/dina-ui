@@ -36,7 +36,7 @@ export default function PcrPrimerListPage() {
         </Link>
         <QueryTable<PcrPrimer>
           columns={PCRPRIMER_TABLE_COLUMNS}
-          include="region"
+          include="group,region"
           path="pcrPrimer"
         />
       </div>
