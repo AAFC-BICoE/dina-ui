@@ -41,7 +41,7 @@ export default withRouter(function PcrPrimerDetailsPage({ router }) {
                     <FieldView name="type" />
                   </div>
                   <div className="row">
-                    <FieldView name="region.name" />
+                    <FieldView label="Target Gene Region" name="region.name" />
                     <FieldView name="name" />
                     <FieldView name="lotNumber" />
                     <FieldView name="targetSpecies" />
@@ -54,7 +54,11 @@ export default withRouter(function PcrPrimerDetailsPage({ router }) {
                     <FieldView name="dateDestroyed" />
                   </div>
                   <div className="row">
-                    <FieldView label="Primer Sequence (5' - 3')" name="seq" />
+                    <FieldView
+                      colWidth={6}
+                      label="Primer Sequence (5' - 3')"
+                      name="seq"
+                    />
                   </div>
                   <div className="row">
                     <FieldView name="application" />
@@ -67,7 +71,7 @@ export default withRouter(function PcrPrimerDetailsPage({ router }) {
                     />
                   </div>
                   <div className="row">
-                    <FieldView name="notes" />
+                    <FieldView colWidth={6} name="notes" />
                   </div>
                   <div className="row">
                     <FieldView label="Literature Reference" name="reference" />

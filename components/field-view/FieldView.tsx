@@ -7,13 +7,16 @@ export interface FieldViewProps {
 
   /** The label for the field. */
   label?: string;
+
+  /** The column width used by Bootstrap */
+  colWidth?: number;
 }
 
 export function FieldView(props: FieldViewProps) {
-  const { name } = props;
+  const { colWidth = 2, name } = props;
 
   return (
-    <div className="form-group col-md-2">
+    <div className={`form-group col-md-${colWidth}`}>
       <Field name={name}>
         {({ field: { value } }: FieldProps) => {
           const { label = titleCase(name) } = props;

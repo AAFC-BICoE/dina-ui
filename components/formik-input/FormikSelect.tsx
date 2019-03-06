@@ -7,16 +7,23 @@ export interface FormikSelectProps {
 }
 
 export function FormikSelect({ field, options }: FormikSelectProps) {
-  const InnerInput = ({
+  function InnerInput({
     field: { value },
-    form: { setFieldValue }
-  }: FieldProps) => (
-    <Select
-      options={options}
-      onChange={({ value }) => setFieldValue(field, value)}
-      value={options.find(option => option.value === value)}
-    />
-  );
+    form: { setFieldValue, setFieldTouched }
+  }: FieldProps) {
+    function onChange({ value: selectValue }) {
+      setFieldValue(field, selectValue);
+      setFieldTouched(field);
+    }
+
+    return (
+      <Select
+        options={options}
+        onChange={onChange}
+        value={options.find(option => option.value === value)}
+      />
+    );
+  }
 
   return <Field name={field} component={InnerInput} />;
 }
