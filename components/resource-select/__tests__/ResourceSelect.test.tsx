@@ -79,7 +79,7 @@ describe("ResourceSelect component", () => {
     ]);
   });
 
-  it("Calls the 'onChange' prop with a JSONAPI relationship value.", async () => {
+  it("Calls the 'onChange' prop with a resource value.", async () => {
     const mockOnChange = jest.fn();
 
     const wrapper = mountWithContext(
@@ -97,7 +97,11 @@ describe("ResourceSelect component", () => {
     onChange(options[2]);
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
-    expect(mockOnChange).lastCalledWith({ data: { id: 3, type: "todo" } });
+    expect(mockOnChange).lastCalledWith({
+      id: 3,
+      name: "todo 3",
+      type: "todo"
+    });
   });
 
   it("Allows the 'onChange' prop to be undefined.", () => {
@@ -175,15 +179,15 @@ describe("ResourceSelect component", () => {
     });
   });
 
-  it("Provides a 'defaultValue' prop to specify initial select value.", () => {
-    const defaultValue = {
+  it("Provides a 'value' prop to specify the select's value.", () => {
+    const value = {
       id: 300,
       name: "DEFAULT TODO",
       type: "todo"
     };
 
     const wrapper = mountWithContext(
-      <ResourceSelect {...DEFAULT_SELECT_PROPS} defaultValue={defaultValue} />
+      <ResourceSelect {...DEFAULT_SELECT_PROPS} value={value} />
     );
 
     const currentValue = (wrapper.find(Select).props() as any).value;
@@ -191,10 +195,9 @@ describe("ResourceSelect component", () => {
     expect(currentValue).toEqual({
       label: "DEFAULT TODO",
       value: {
-        data: {
-          id: 300,
-          type: "todo"
-        }
+        id: 300,
+        name: "DEFAULT TODO",
+        type: "todo"
       }
     });
   });
