@@ -1,13 +1,13 @@
 import { Field, Form, Formik, FormikActions } from "formik";
-import { pick } from "lodash";
+import { kebab, serialise } from "kitsu-core";
 import { SingletonRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ApiClientContext } from "../components/api-client/ApiClientContext";
 import { Query } from "../components/api-client/Query";
+import { FormikResourceSelect } from "../components/formik-input/FormikResourceSelect";
 import { FormikSelect } from "../components/formik-input/FormikSelect";
 import Head from "../components/head";
 import Nav from "../components/nav";
-import { ResourceSelect } from "../components/resource-select/ResourceSelect";
 import { Group } from "../types/seqdb-api/resources/Group";
 import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
 
@@ -58,35 +58,37 @@ export default withRouter(function AddPcrPrimerPage({ router }) {
 function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
   const { doOperations } = useContext(ApiClientContext);
 
-  const initialValues = primer
-    ? {
-        attributes: pick(primer, ["name", "lotNumber", "seq", "type"]),
-        relationships: {
-          group: primer.group && {
-            data: { id: primer.group.id, type: "group" }
-          }
-        }
-      }
-    : {
-        attributes: { lotNumber: 1, type: "PRIMER", seq: "" },
-        relationships: {}
-      };
+  const initialValues = primer || { lotNumber: 1, seq: "", type: "PRIMER" };
 
   async function onSubmit(
-    { attributes, relationships },
+    values,
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
     try {
+      const skip = (s: any) => s;
+
+      const customSerialise = serialise.bind({
+        camel: skip,
+        plural: skip,
+        resCase: kebab
+      });
+
+      const verb = values.id ? "PATCH" : "POST";
+
+      delete values.links;
+      const serialized = await customSerialise("pcrPrimer", values, verb);
+
+      if (verb === "POST") {
+        serialized.data.id = -100;
+      }
+
+      serialized.data.attributes.type = values.type;
+
       const response = await doOperations([
         {
-          op: primer ? "PATCH" : "POST",
-          path: primer ? `pcrPrimer/${primer.id}` : "pcrPrimer",
-          value: {
-            attributes,
-            id: -123,
-            relationships,
-            type: "pcrPrimer"
-          }
+          op: verb,
+          path: verb === "PATCH" ? `pcrPrimer/${primer.id}` : "pcrPrimer",
+          value: serialized.data
         }
       ]);
 
@@ -100,35 +102,31 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
 
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      {({ status, isSubmitting, setFieldValue }) => (
+      {({ status, isSubmitting }) => (
         <Form>
           {status && <div className="alert alert-danger">{status}</div>}
           <div>
             <div className="row">
               <div className="form-group col-md-2">
                 <label>Group:</label>
-                <ResourceSelect<Group>
-                  defaultValue={primer && primer.group}
-                  filter={input => ({ groupName: input })}
+                <FormikResourceSelect<Group>
+                  field="group"
+                  filter={groupName => ({ groupName })}
                   model="group"
-                  onChange={val => setFieldValue("relationships.group", val)}
                   optionLabel={group => group.groupName}
                 />
               </div>
               <div className="form-group col-md-2">
                 <label>Primer Type:</label>
-                <FormikSelect
-                  field="attributes.type"
-                  options={PRIMER_TYPE_OPTIONS}
-                />
+                <FormikSelect field="type" options={PRIMER_TYPE_OPTIONS} />
               </div>
               <div className="form-group col-md-2">
                 <label>Name:</label>
-                <Field name="attributes.name" className="form-control" />
+                <Field name="name" className="form-control" />
               </div>
               <div className="form-group col-md-2">
                 <label>Lot Number:</label>
-                <Field name="attributes.lotNumber" className="form-control" />
+                <Field name="lotNumber" className="form-control" />
               </div>
             </div>
             {isSubmitting ? (
