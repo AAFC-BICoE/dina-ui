@@ -8,15 +8,14 @@ import {
   ApiClientContext,
   ApiClientContextI
 } from "../../components/api-client/ApiClientContext";
-import { JsonApiRelationship } from "../api-client/jsonapi-types";
 
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData> {
-  /** Optional initial value. This prop should be used when editing a field with an existing value. */
-  defaultValue?: TData;
+  /** Sets the input's value so the value can be controlled externally. */
+  value?: TData;
 
   /** Function called when an option is selected. */
-  onChange?: (value: JsonApiRelationship) => void;
+  onChange?: (value: TData) => void;
 
   /** The model type to select resources from. */
   model: string;
@@ -42,24 +41,19 @@ export class ResourceSelect<
   public context!: ApiClientContextI;
 
   public render() {
-    const { defaultValue, model, optionLabel } = this.props;
+    const { value, optionLabel } = this.props;
 
     // Debounces the loadOptions function to avoid sending excessive API requests.
     const debouncedOptionLoader = debounce(this.loadOptions, 250);
 
-    // Create the default option for the Async select if the defaultValue prop was passed.
-    const defaultOption = defaultValue
-      ? {
-          label: optionLabel(defaultValue),
-          value: {
-            data: { type: model, id: defaultValue.id }
-          }
-        }
+    // Set the component's value externally when used as a controlled input.
+    const selectedValue = value
+      ? { label: optionLabel(value), value }
       : undefined;
 
     return (
       <AsyncSelect
-        defaultValue={defaultOption}
+        value={selectedValue}
         defaultOptions={true}
         loadOptions={debouncedOptionLoader}
         onChange={this.onChange}
@@ -91,9 +85,7 @@ export class ResourceSelect<
       // Build the list of options from the returned resources.
       const options = data.map(resource => ({
         label: optionLabel(resource),
-        value: {
-          data: { type: model, id: resource.id }
-        } as JsonApiRelationship
+        value: resource
       }));
 
       callback(options);
