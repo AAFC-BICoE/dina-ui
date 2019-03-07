@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "target": "esnext",
     "module": "esnext",
     "jsx": "preserve",
@@ -12,6 +13,10 @@
     "noUnusedParameters": true,
     "removeComments": false,
     "preserveConstEnums": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "paths": {
+      // Use our own Kitsu type definitions instead of the incomplete provided types.
+      "kitsu": ["types/kitsu"]
+    }
   }
 }
