@@ -31,7 +31,7 @@ export default withRouter(function PcrPrimerDetailsPage({ router }) {
             {response && (
               <Formik initialValues={response.data} onSubmit={null}>
                 <div>
-                  <Link href={`edit-pcr-primer?id=${id}`}>
+                  <Link href={`pcr-primer-edit?id=${id}`}>
                     <a>Edit</a>
                   </Link>
                   <div className="row">

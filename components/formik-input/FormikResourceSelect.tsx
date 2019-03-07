@@ -18,19 +18,25 @@ export function FormikResourceSelect<TData extends KitsuResource>(
 ) {
   const { field } = topLevelProps;
 
-  function InnerInput({
-    field: { value },
-    form: { setFieldValue, setFieldTouched }
-  }: FieldProps) {
-    function onChange(resource) {
-      setFieldValue(field, resource);
-      setFieldTouched(field);
-    }
+  return (
+    <Field name={field}>
+      {({
+        field: { value },
+        form: { setFieldValue, setFieldTouched }
+      }: FieldProps) => {
+        function onChange(resource) {
+          setFieldValue(field, resource);
+          setFieldTouched(field);
+        }
 
-    return (
-      <ResourceSelect {...topLevelProps} onChange={onChange} value={value} />
-    );
-  }
-
-  return <Field name={field} component={InnerInput} />;
+        return (
+          <ResourceSelect
+            {...topLevelProps}
+            onChange={onChange}
+            value={value}
+          />
+        );
+      }}
+    </Field>
+  );
 }

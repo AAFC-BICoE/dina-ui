@@ -31,7 +31,7 @@ export default function PcrPrimerListPage() {
       <Nav />
       <div className="container-fluid">
         <h1>PCR Primers</h1>
-        <Link href="/edit-pcr-primer">
+        <Link href="/pcr-primer-edit" prefetch={true}>
           <a>Add PCR Primer</a>
         </Link>
         <QueryTable<PcrPrimer>
