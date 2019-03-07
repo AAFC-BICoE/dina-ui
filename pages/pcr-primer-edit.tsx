@@ -1,5 +1,4 @@
 import { Field, Form, Formik, FormikActions } from "formik";
-import { kebab, serialise } from "kitsu-core";
 import { SingletonRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ApiClientContext } from "../components/api-client/ApiClientContext";
@@ -10,6 +9,7 @@ import Head from "../components/head";
 import Nav from "../components/nav";
 import { Group } from "../types/seqdb-api/resources/Group";
 import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
+import { serialize } from "../util/serialize";
 
 interface PcrPrimerFormProps {
   primer?: PcrPrimer;
@@ -61,34 +61,26 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
   const initialValues = primer || { lotNumber: 1, seq: "", type: "PRIMER" };
 
   async function onSubmit(
-    values,
+    submittedValues,
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
     try {
-      const skip = (s: any) => s;
-
-      const customSerialise = serialise.bind({
-        camel: skip,
-        plural: skip,
-        resCase: kebab
+      const serialized = await serialize({
+        resource: submittedValues,
+        type: "pcrPrimer"
       });
 
-      const verb = values.id ? "PATCH" : "POST";
+      const op = submittedValues.id ? "PATCH" : "POST";
 
-      delete values.links;
-      const serialized = await customSerialise("pcrPrimer", values, verb);
-
-      if (verb === "POST") {
-        serialized.data.id = -100;
+      if (op === "POST") {
+        serialized.id = -100;
       }
-
-      serialized.data.attributes.type = values.type;
 
       const response = await doOperations([
         {
-          op: verb,
-          path: verb === "PATCH" ? `pcrPrimer/${primer.id}` : "pcrPrimer",
-          value: serialized.data
+          op,
+          path: op === "PATCH" ? `pcrPrimer/${primer.id}` : "pcrPrimer",
+          value: serialized
         }
       ]);
 
