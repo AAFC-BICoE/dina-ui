@@ -1,0 +1,16 @@
+= Technology Stack
+
+This application is developed using these technologies:
+
+- https://www.npmjs.com/[NPM]: Node.js package manager
+
+- https://www.typescriptlang.org/[TypeScript]: Superset of JavaScript with static types.
+
+- https://reactjs.org/[React]: JavaScript library for building user interfaces.
+
+- https://nextjs.org/[Next.js]: Framework for building React-based applications.
+
+- https://getbootstrap.com/[Bootstrap]: CSS framework. We use
+the https://bootswatch.com/spacelab/[Bootswatch Spacelab theme].
+
+- https://jestjs.io/[Jest]: Testing framework.

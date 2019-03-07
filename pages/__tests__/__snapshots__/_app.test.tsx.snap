@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SeqdbUiApp Renders the App wrapper.: SeqdbUiApp shallow render. 1`] = `
+<Context.Provider
+  value={
+    Object {
+      "apiClient": Kitsu {
+        "axios": [Function],
+        "camel": [Function],
+        "create": [Function],
+        "fetch": [Function],
+        "headers": Object {
+          "Accept": "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json",
+        },
+        "plural": [Function],
+        "remove": [Function],
+        "resCase": [Function],
+        "update": [Function],
+      },
+      "doOperations": [Function],
+    }
+  }
+>
+  <Container>
+    <TestComponent
+      exampleProp="exampleValue"
+    />
+  </Container>
+</Context.Provider>
+`;

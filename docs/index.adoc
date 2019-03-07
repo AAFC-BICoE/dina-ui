@@ -1,0 +1,27 @@
+:sectnums:
+
+= seqdb-api docs
+
+React based user interface for SeqDB.
+
+:leveloffset: 1
+
+include::stack.adoc[]
+
+include::dev_tools.adoc[]
+
+include::npm_package_scripts.adoc[]
+
+= React Components
+
+:leveloffset: 2
+
+include::query_component.adoc[]
+
+:leveloffset: 1
+
+= API Client
+
+:leveloffset: 2
+
+include::write_operations.adoc[]
