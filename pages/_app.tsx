@@ -1,7 +1,9 @@
-import Kitsu from "kitsu";
 import App, { Container } from "next/app";
 import React from "react";
-import { ApiClientContext } from "../components/api-client/ApiClientContext";
+import {
+  ApiClientContext,
+  createContextValue
+} from "../components/api-client/ApiClientContext";
 
 /**
  * App component that wraps every page component.
@@ -9,17 +11,13 @@ import { ApiClientContext } from "../components/api-client/ApiClientContext";
  * See: https://github.com/zeit/next.js/#custom-app
  */
 export default class SeqdbUiApp extends App {
-  private apiClient = new Kitsu({
-    baseURL: "/api",
-    pluralize: false,
-    resourceCase: "none"
-  });
+  private contextValue = createContextValue();
 
   public render() {
     const { Component, pageProps } = this.props;
 
     return (
-      <ApiClientContext.Provider value={{ apiClient: this.apiClient }}>
+      <ApiClientContext.Provider value={this.contextValue}>
         <Container>
           <Component {...pageProps} />
         </Container>

@@ -1,7 +1,7 @@
-import Kitsu, { KitsuResource, KitsuResponse } from "kitsu";
+import { mount } from "enzyme";
+import { KitsuResource, KitsuResponse } from "kitsu";
 import { last } from "lodash";
-import { create } from "react-test-renderer";
-import { ApiClientContext } from "../ApiClientContext";
+import { ApiClientContext, createContextValue } from "../ApiClientContext";
 import { JsonApiErrorResponse } from "../jsonapi-types";
 import { Query } from "../Query";
 
@@ -60,7 +60,8 @@ const MOCK_500_ERROR: JsonApiErrorResponse = {
       status: "500",
       title: "INTERNAL_SERVER_ERROR"
     }
-  ]
+  ],
+  status: 500
 };
 
 // Mock Kitsu class' "get" method.
@@ -78,24 +79,29 @@ const mockGet = jest.fn((path, { fields, page }) => {
   }
 });
 
-/** JSONAPI client. */
-const testClient = new Kitsu({
-  baseURL: "/api",
-  pluralize: false,
-  resourceCase: "none"
-});
+const contextValue = createContextValue();
 
 /**
- * Helper method to create a paged query element.
- * @param pageSpec the pagination params.
+ * Helper method to create a paged query element with the required context.
  */
-const pagedQuery = (pageSpec, childFunction?) => (
-  <ApiClientContext.Provider value={{ apiClient: testClient }}>
+function pagedQueryWithContext(pageSpec, childFunction?) {
+  return (
+    <ApiClientContext.Provider value={contextValue}>
+      {pagedQuery(pageSpec, childFunction)}
+    </ApiClientContext.Provider>
+  );
+}
+
+/**
+ * Helper method to create a paged query element without the required context.
+ */
+function pagedQuery(pageSpec, childFunction?) {
+  return (
     <Query<Todo[]> query={{ path: "todo", page: pageSpec }}>
       {childFunction || (() => null)}
     </Query>
-  </ApiClientContext.Provider>
-);
+  );
+}
 
 // Mock Kitsu, the client class that talks to the backend.
 jest.mock(
@@ -116,8 +122,8 @@ describe("Query component", () => {
 
   it("Renders with loading as true before sending a request", done => {
     let renderCount = 0;
-    create(
-      <ApiClientContext.Provider value={{ apiClient: testClient }}>
+    mount(
+      <ApiClientContext.Provider value={contextValue}>
         <Query<Todo[]> query={{ path: "todo" }}>
           {({ loading }) => {
             // Query should be rendered once with loading as true.
@@ -134,8 +140,8 @@ describe("Query component", () => {
   });
 
   it("Passes single-resource data from the mocked API to child components", done => {
-    create(
-      <ApiClientContext.Provider value={{ apiClient: testClient }}>
+    mount(
+      <ApiClientContext.Provider value={contextValue}>
         <Query<Todo> query={{ path: "todo/25" }}>
           {({ loading, response }) => {
             if (response) {
@@ -153,8 +159,8 @@ describe("Query component", () => {
   });
 
   it("Passes list data from the mocked API to child components", done => {
-    create(
-      <ApiClientContext.Provider value={{ apiClient: testClient }}>
+    mount(
+      <ApiClientContext.Provider value={contextValue}>
         <Query<Todo[], MetaWithTotal> query={{ path: "todo" }}>
           {({ loading, response }) => {
             if (response) {
@@ -184,8 +190,8 @@ describe("Query component", () => {
   });
 
   it("Supports JSONAPI GET params", () => {
-    create(
-      <ApiClientContext.Provider value={{ apiClient: testClient }}>
+    mount(
+      <ApiClientContext.Provider value={contextValue}>
         <Query<Todo[]>
           query={{
             fields: { todo: "name,description" },
@@ -216,8 +222,8 @@ describe("Query component", () => {
 
   it("Renders an error to child components", done => {
     // Get an error by requesting an attribute that the resource doesn't have.
-    create(
-      <ApiClientContext.Provider value={{ apiClient: testClient }}>
+    mount(
+      <ApiClientContext.Provider value={contextValue}>
         <Query<Todo[]>
           query={{ path: "todo", fields: { todo: "unknownAttribute" } }}
         >
@@ -234,11 +240,13 @@ describe("Query component", () => {
     );
   });
 
-  it("Re-fetches data if the query is changed via new props.", done => {
+  it("Re-fetches data if the query is changed via new props.", async () => {
     const mockChild = jest.fn(() => null);
 
     // The first render will fetch the data once.
-    const render = create(pagedQuery({ offset: 0, limit: 3 }, mockChild));
+    const wrapper = mount(
+      pagedQueryWithContext({ offset: 0, limit: 3 }, mockChild)
+    );
     expect(mockGet).toHaveBeenCalledTimes(1);
 
     // The response is undefined before sending the first request.
@@ -247,79 +255,83 @@ describe("Query component", () => {
     );
 
     // Continue the test after the first request finishes.
-    setImmediate(() => {
-      expect(mockChild).lastCalledWith(
-        objectContaining({ response: MOCK_TODOS_RESPONSE })
-      );
+    await Promise.resolve();
 
-      // The second render with different props will fetch the data again.
-      render.update(pagedQuery({ offset: 3, limit: 3 }, mockChild));
+    expect(mockChild).lastCalledWith(
+      objectContaining({ response: MOCK_TODOS_RESPONSE })
+    );
 
-      expect(mockGet).toHaveBeenCalledTimes(2);
-
-      // The first response is still rendered when waiting for the second fetch.
-      expect(mockChild).lastCalledWith(
-        objectContaining({ response: MOCK_TODOS_RESPONSE })
-      );
-
-      // Continue the test after the second request finishes.
-      setImmediate(() => {
-        expect(mockChild).lastCalledWith(
-          objectContaining({ response: MOCK_TODOS_RESPONSE_PAGE_2 })
-        );
-        done();
-      });
+    // The second render with different props will fetch the data again.
+    wrapper.setProps({
+      children: pagedQuery({ offset: 3, limit: 3 }, mockChild)
     });
+
+    expect(mockGet).toHaveBeenCalledTimes(2);
+
+    // The first response is still rendered when waiting for the second fetch.
+    expect(mockChild).lastCalledWith(
+      objectContaining({ response: MOCK_TODOS_RESPONSE })
+    );
+
+    // Continue the test after the second request finishes.
+    await Promise.resolve();
+    expect(mockChild).lastCalledWith(
+      objectContaining({ response: MOCK_TODOS_RESPONSE_PAGE_2 })
+    );
   });
 
-  it("Renders with loading as the correct value when fetching and re-fetching data.", done => {
+  it("Renders with loading as the correct value when fetching and re-fetching data.", async () => {
     // Mock Query Component's child function to check what render props are passed down.
     const mockChild = jest.fn(() => null);
 
     // Initial render.
-    const render = create(pagedQuery({ offset: 0, limit: 3 }, mockChild));
+    const wrapper = mount(
+      pagedQueryWithContext({ offset: 0, limit: 3 }, mockChild)
+    );
 
     // Renders with loading as true when initially fetching data.
     expect(mockChild).toHaveBeenCalledTimes(1);
     expect(mockChild).lastCalledWith(objectContaining({ loading: true }));
 
     // Continue the test after the first query finishes.
-    setImmediate(() => {
-      // The component renders a second time when the first query finishes.
-      expect(mockChild).toHaveBeenCalledTimes(2);
-      expect(mockChild).lastCalledWith(objectContaining({ loading: false }));
+    await Promise.resolve();
 
-      // Render the component again with new props.
-      render.update(pagedQuery({ offset: 3, limit: 3 }, mockChild));
+    // The component renders a second time when the first query finishes.
+    expect(mockChild).toHaveBeenCalledTimes(2);
+    expect(mockChild).lastCalledWith(objectContaining({ loading: false }));
 
-      // Updating causes two more renders: one to pass in the new props, and one when Query sets
-      // loading to true.
-      expect(mockChild).toHaveBeenCalledTimes(4);
-
-      // Query component renders with loading as true when re-fetching data.
-      expect(mockChild).lastCalledWith(objectContaining({ loading: true }));
-
-      // Continue the test after the second query finishes.
-      setImmediate(() => {
-        expect(mockChild).toHaveBeenCalledTimes(5);
-
-        // Renders with loading as false after the second query finishes.
-        expect(mockChild).lastCalledWith(objectContaining({ loading: false }));
-
-        done();
-      });
+    // Render the component again with new props.
+    wrapper.setProps({
+      children: pagedQuery({ offset: 3, limit: 3 }, mockChild)
     });
+
+    // Updating causes two more renders: one to pass in the new props, and one when Query sets
+    // loading to true.
+    expect(mockChild).toHaveBeenCalledTimes(4);
+
+    // Query component renders with loading as true when re-fetching data.
+    expect(mockChild).lastCalledWith(objectContaining({ loading: true }));
+
+    // Continue the test after the second query finishes.
+    await Promise.resolve();
+
+    expect(mockChild).toHaveBeenCalledTimes(5);
+
+    // Renders with loading as false after the second query finishes.
+    expect(mockChild).lastCalledWith(objectContaining({ loading: false }));
   });
 
   it("Does not re-fetch data if the same props are passed in multiple times.", () => {
     const pageSpec = { offset: 0, limit: 3 };
 
     // The first render will fetch the data once.
-    const render = create(pagedQuery(pageSpec));
+    const wrapper = mount(pagedQueryWithContext(pageSpec));
     expect(mockGet).toHaveBeenCalledTimes(1);
 
     // The second render with the same props will not fetch again.
-    render.update(pagedQuery(pageSpec));
+    wrapper.setProps({
+      children: pagedQuery(pageSpec)
+    });
     expect(mockGet).toHaveBeenCalledTimes(1);
   });
 });

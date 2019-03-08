@@ -1,12 +1,10 @@
-import { createRenderer } from "react-test-renderer/shallow";
+import { shallow } from "enzyme";
+import toJson from "enzyme-to-json";
 import IndexPage from "../index";
 
 describe("Index page", () => {
   it("Renders the index page.", () => {
-    const renderer = createRenderer();
-    renderer.render(<IndexPage />);
-    expect(renderer.getRenderOutput()).toMatchSnapshot(
-      "Index page shallow render"
-    );
+    const wrapper = shallow(<IndexPage />);
+    expect(toJson(wrapper)).toMatchSnapshot("Index page shallow render");
   });
 });
