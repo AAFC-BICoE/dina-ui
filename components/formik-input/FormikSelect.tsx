@@ -1,12 +1,14 @@
 import { Field, FieldProps } from "formik";
 import Select from "react-select";
+import { FieldWrapper, LabelParams } from "./FieldWrapper";
 
-export interface FormikSelectProps {
-  field: string;
+export interface FormikSelectProps extends LabelParams {
   options: any[];
 }
 
-export function FormikSelect({ field, options }: FormikSelectProps) {
+export function FormikSelect(props: FormikSelectProps) {
+  const { field, options } = props;
+
   return (
     <Field name={field}>
       {({
@@ -19,11 +21,13 @@ export function FormikSelect({ field, options }: FormikSelectProps) {
         }
 
         return (
-          <Select
-            options={options}
-            onChange={onChange}
-            value={options.find(option => option.value === value)}
-          />
+          <FieldWrapper {...props}>
+            <Select
+              options={options}
+              onChange={onChange}
+              value={options.find(option => option.value === value)}
+            />
+          </FieldWrapper>
         );
       }}
     </Field>

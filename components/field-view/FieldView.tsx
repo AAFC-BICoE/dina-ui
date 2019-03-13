@@ -8,37 +8,39 @@ export interface FieldViewProps {
   /** The label for the field. */
   label?: string;
 
-  /** The column width used by Bootstrap */
-  colWidth?: number;
+  /** The CSS classes of the div wrapper. */
+  className?: string;
 }
 
 export function FieldView(props: FieldViewProps) {
-  const { colWidth = 2, name } = props;
+  const { className, name } = props;
 
   return (
-    <div className={`form-group col-md-${colWidth}`}>
-      <Field name={name}>
-        {({ field: { value } }: FieldProps) => {
-          const { label = titleCase(name) } = props;
+    <div className={className}>
+      <div className="form-group">
+        <Field name={name}>
+          {({ field: { value } }: FieldProps) => {
+            const { label = titleCase(name) } = props;
 
-          return (
-            <div>
-              <label>
-                <strong>{label}</strong>
-              </label>
-              <p
-                style={{
-                  borderBottom: "1px solid black",
-                  borderRight: "1px solid black",
-                  minHeight: "25px"
-                }}
-              >
-                {value}
-              </p>
-            </div>
-          );
-        }}
-      </Field>
+            return (
+              <div>
+                <label>
+                  <strong>{label}</strong>
+                </label>
+                <p
+                  style={{
+                    borderBottom: "1px solid black",
+                    borderRight: "1px solid black",
+                    minHeight: "25px"
+                  }}
+                >
+                  {value}
+                </p>
+              </div>
+            );
+          }}
+        </Field>
+      </div>
     </div>
   );
 }

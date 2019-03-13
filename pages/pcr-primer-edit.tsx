@@ -1,10 +1,11 @@
-import { Field, Form, Formik, FormikActions } from "formik";
+import { Form, Formik, FormikActions } from "formik";
 import { SingletonRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ApiClientContext } from "../components/api-client/ApiClientContext";
 import { Query } from "../components/api-client/Query";
 import { FormikResourceSelect } from "../components/formik-input/FormikResourceSelect";
 import { FormikSelect } from "../components/formik-input/FormikSelect";
+import { TextField } from "../components/formik-input/TextField";
 import Head from "../components/head";
 import Nav from "../components/nav";
 import { Group } from "../types/seqdb-api/resources/Group";
@@ -108,18 +109,14 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
                   optionLabel={group => group.groupName}
                 />
               </div>
-              <div className="form-group col-md-2">
-                <label>Primer Type:</label>
-                <FormikSelect field="type" options={PRIMER_TYPE_OPTIONS} />
-              </div>
-              <div className="form-group col-md-2">
-                <label>Name:</label>
-                <Field name="name" className="form-control" />
-              </div>
-              <div className="form-group col-md-2">
-                <label>Lot Number:</label>
-                <Field name="lotNumber" className="form-control" />
-              </div>
+              <FormikSelect
+                className="col-md-2"
+                field="type"
+                label="Primer Type"
+                options={PRIMER_TYPE_OPTIONS}
+              />
+              <TextField className="col-md-2" field="name" />
+              <TextField className="col-md-2" field="lotNumber" />
             </div>
             {isSubmitting ? (
               <div className="spinner-border" role="status">

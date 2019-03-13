@@ -31,50 +31,63 @@ export default withRouter(function PcrPrimerDetailsPage({ router }) {
             {response && (
               <Formik initialValues={response.data} onSubmit={null}>
                 <div>
-                  <Link href={`pcr-primer-edit?id=${id}`}>
+                  <Link href={`/pcr-primer-edit?id=${id}`}>
                     <a>Edit</a>
                   </Link>
                   <div className="row">
-                    <FieldView name="group.groupName" label="Group Name" />
+                    <FieldView
+                      className="col-md-2"
+                      name="group.groupName"
+                      label="Group Name"
+                    />
                   </div>
                   <div className="row">
-                    <FieldView name="type" />
-                  </div>
-                  <div className="row">
-                    <FieldView label="Target Gene Region" name="region.name" />
-                    <FieldView name="name" />
-                    <FieldView name="lotNumber" />
-                    <FieldView name="targetSpecies" />
-                    <FieldView name="purification" />
-                  </div>
-                  <div className="row">
-                    <FieldView name="direction" />
-                    <FieldView name="tmCalculated" />
-                    <FieldView name="dateOrdered" />
-                    <FieldView name="dateDestroyed" />
+                    <FieldView className="col-md-2" name="type" />
                   </div>
                   <div className="row">
                     <FieldView
-                      colWidth={6}
+                      className="col-md-2"
+                      label="Target Gene Region"
+                      name="region.name"
+                    />
+                    <FieldView className="col-md-2" name="name" />
+                    <FieldView className="col-md-2" name="lotNumber" />
+                    <FieldView className="col-md-2" name="targetSpecies" />
+                    <FieldView className="col-md-2" name="purification" />
+                  </div>
+                  <div className="row">
+                    <FieldView className="col-md-2" name="direction" />
+                    <FieldView className="col-md-2" name="tmCalculated" />
+                    <FieldView className="col-md-2" name="dateOrdered" />
+                    <FieldView className="col-md-2" name="dateDestroyed" />
+                  </div>
+                  <div className="row">
+                    <FieldView
+                      className="col-md-6"
                       label="Primer Sequence (5' - 3')"
                       name="seq"
                     />
                   </div>
                   <div className="row">
-                    <FieldView name="application" />
-                    <FieldView name="reference" />
-                    <FieldView name="supplier" />
-                    <FieldView name="designedBy" />
+                    <FieldView className="col-md-2" name="application" />
+                    <FieldView className="col-md-2" name="reference" />
+                    <FieldView className="col-md-2" name="supplier" />
+                    <FieldView className="col-md-2" name="designedBy" />
                     <FieldView
+                      className="col-md-2"
                       label="Stock Concentration(uM)"
                       name="stockConcentration"
                     />
                   </div>
                   <div className="row">
-                    <FieldView colWidth={6} name="notes" />
+                    <FieldView className="col-md-6" name="notes" />
                   </div>
                   <div className="row">
-                    <FieldView label="Literature Reference" name="reference" />
+                    <FieldView
+                      className="col-md-2"
+                      label="Literature Reference"
+                      name="reference"
+                    />
                   </div>
                 </div>
               </Formik>
