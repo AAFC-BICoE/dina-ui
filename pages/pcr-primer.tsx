@@ -80,14 +80,7 @@ export default withRouter(function PcrPrimerDetailsPage({ router }) {
                     />
                   </div>
                   <div className="row">
-                    <FieldView className="col-md-6" name="notes" />
-                  </div>
-                  <div className="row">
-                    <FieldView
-                      className="col-md-2"
-                      label="Literature Reference"
-                      name="reference"
-                    />
+                    <FieldView className="col-md-6" name="note" />
                   </div>
                 </div>
               </Formik>

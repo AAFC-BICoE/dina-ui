@@ -10,6 +10,7 @@ import Head from "../components/head";
 import Nav from "../components/nav";
 import { Group } from "../types/seqdb-api/resources/Group";
 import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
+import { Region } from "../types/seqdb-api/resources/Region";
 import { serialize } from "../util/serialize";
 
 interface PcrPrimerFormProps {
@@ -29,7 +30,7 @@ export default withRouter(function AddPcrPrimerPage({ router }) {
           <div>
             <h1>Edit PCR Primer</h1>
             <Query<PcrPrimer>
-              query={{ include: "group", path: `pcrPrimer/${id}` }}
+              query={{ include: "group,region", path: `pcrPrimer/${id}` }}
             >
               {({ loading, response }) => (
                 <div>
@@ -107,14 +108,53 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
                 model="group"
                 optionLabel={group => group.groupName}
               />
+            </div>
+            <div className="row">
               <SelectField
                 className="col-md-2"
                 field="type"
                 label="Primer Type"
                 options={PRIMER_TYPE_OPTIONS}
               />
+            </div>
+            <div className="row">
+              <ResourceSelectField<Region>
+                className="col-md-2"
+                field="region"
+                filter={name => ({ name })}
+                label="Target Gene Region"
+                model="region"
+                optionLabel={region => region.name}
+              />
               <TextField className="col-md-2" field="name" />
               <TextField className="col-md-2" field="lotNumber" />
+              <TextField className="col-md-2" field="targetSpecies" />
+              <TextField className="col-md-2" field="purification" />
+            </div>
+            <div className="row">
+              <TextField className="col-md-2" field="direction" />
+              <TextField className="col-md-2" field="tmCalculated" />
+            </div>
+            <div className="row">
+              <TextField
+                className="col-md-6"
+                field="seq"
+                label="Primer Sequence (5' - 3')"
+              />
+            </div>
+            <div className="row">
+              <TextField className="col-md-2" field="application" />
+              <TextField className="col-md-2" field="reference" />
+              <TextField className="col-md-2" field="supplier" />
+              <TextField className="col-md-2" field="designedBy" />
+              <TextField
+                className="col-md-2"
+                field="stockConcentration"
+                label="Stock Concentration(uM)"
+              />
+            </div>
+            <div className="row">
+              <TextField className="col-md-6" field="note" />
             </div>
             {isSubmitting ? (
               <div className="spinner-border" role="status">
