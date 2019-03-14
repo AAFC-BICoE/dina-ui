@@ -42,6 +42,25 @@ interface QueryTableState {
 
 const DEFAULT_PAGE_SIZE = 25;
 
+const queryTableStyle = `
+  /* Wraps long text instead of shortening it. */
+  .rt-td {
+    white-space: unset !important;
+  }
+
+  /*
+   * Hides the page-jump input's spin button, which on this component would not
+   * otherwise trigger a page jump.
+   */
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+  }
+  input[type=number] {
+    -moz-appearance:textfield;
+  }
+`;
+
 /**
  * Table component that fetches data from the backend API.
  */
@@ -74,12 +93,7 @@ export class QueryTable<TData extends KitsuResource> extends React.Component<
 
     return (
       <div ref={this.divWrapperRef}>
-        <style>{`
-          /* Wraps long text instead of shortening it. */
-          .rt-td {
-            white-space: unset!important;
-          }
-        `}</style>
+        <style>{queryTableStyle}</style>
         <Query<TData[], MetaWithTotal> query={query}>
           {({ loading, response }) => (
             <ReactTable
