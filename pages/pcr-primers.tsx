@@ -14,7 +14,10 @@ const PCRPRIMER_TABLE_COLUMNS: Array<ColumnDefinition<PcrPrimer>> = [
     Header: "Name",
     accessor: "name"
   },
-  "group.groupName",
+  {
+    Header: "Group Name",
+    accessor: "group.groupName"
+  },
   "region.name",
   "type",
   "lotNumber",

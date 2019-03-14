@@ -100,15 +100,13 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
           {status && <div className="alert alert-danger">{status}</div>}
           <div>
             <div className="row">
-              <div className="form-group col-md-2">
-                <label>Group:</label>
-                <ResourceSelectField<Group>
-                  field="group"
-                  filter={groupName => ({ groupName })}
-                  model="group"
-                  optionLabel={group => group.groupName}
-                />
-              </div>
+              <ResourceSelectField<Group>
+                className="col-md-2"
+                field="group"
+                filter={groupName => ({ groupName })}
+                model="group"
+                optionLabel={group => group.groupName}
+              />
               <SelectField
                 className="col-md-2"
                 field="type"

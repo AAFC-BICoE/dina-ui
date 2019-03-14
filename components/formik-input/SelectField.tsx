@@ -7,7 +7,7 @@ export interface SelectFieldProps extends LabelParams {
 }
 
 export function SelectField(props: SelectFieldProps) {
-  const { field, options } = props;
+  const { className, field, label, options } = props;
 
   return (
     <Field name={field}>
@@ -21,7 +21,7 @@ export function SelectField(props: SelectFieldProps) {
         }
 
         return (
-          <FieldWrapper {...props}>
+          <FieldWrapper className={className} field={field} label={label}>
             <Select
               options={options}
               onChange={onChange}
