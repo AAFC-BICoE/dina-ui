@@ -5,7 +5,7 @@ import {
   ResourceSelectProps
 } from "../resource-select/ResourceSelect";
 
-export interface FormikResourceSelectProps<TData>
+export interface ResourceSelectFieldProps<TData>
   extends ResourceSelectProps<TData> {
   field: string;
 
@@ -13,8 +13,8 @@ export interface FormikResourceSelectProps<TData>
   value?: never;
 }
 
-export function FormikResourceSelect<TData extends KitsuResource>(
-  topLevelProps: FormikResourceSelectProps<TData>
+export function ResourceSelectField<TData extends KitsuResource>(
+  topLevelProps: ResourceSelectFieldProps<TData>
 ) {
   const { field } = topLevelProps;
 

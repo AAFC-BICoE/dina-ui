@@ -2,11 +2,11 @@ import { Field, FieldProps } from "formik";
 import Select from "react-select";
 import { FieldWrapper, LabelParams } from "./FieldWrapper";
 
-export interface FormikSelectProps extends LabelParams {
+export interface SelectFieldProps extends LabelParams {
   options: any[];
 }
 
-export function FormikSelect(props: FormikSelectProps) {
+export function SelectField(props: SelectFieldProps) {
   const { field, options } = props;
 
   return (

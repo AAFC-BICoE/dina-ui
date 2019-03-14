@@ -3,8 +3,8 @@ import { SingletonRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ApiClientContext } from "../components/api-client/ApiClientContext";
 import { Query } from "../components/api-client/Query";
-import { FormikResourceSelect } from "../components/formik-input/ResourceSelectField";
-import { FormikSelect } from "../components/formik-input/SelectField";
+import { ResourceSelectField } from "../components/formik-input/ResourceSelectField";
+import { SelectField } from "../components/formik-input/SelectField";
 import { TextField } from "../components/formik-input/TextField";
 import Head from "../components/head";
 import Nav from "../components/nav";
@@ -102,14 +102,14 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
             <div className="row">
               <div className="form-group col-md-2">
                 <label>Group:</label>
-                <FormikResourceSelect<Group>
+                <ResourceSelectField<Group>
                   field="group"
                   filter={groupName => ({ groupName })}
                   model="group"
                   optionLabel={group => group.groupName}
                 />
               </div>
-              <FormikSelect
+              <SelectField
                 className="col-md-2"
                 field="type"
                 label="Primer Type"
