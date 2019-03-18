@@ -17,21 +17,21 @@ export interface ResourceSelectFieldProps<TData>
 export function ResourceSelectField<TData extends KitsuResource>(
   topLevelProps: ResourceSelectFieldProps<TData>
 ) {
-  const { className, field, label } = topLevelProps;
+  const { className, name, label } = topLevelProps;
 
   return (
-    <Field name={field}>
+    <Field name={name}>
       {({
         field: { value },
         form: { setFieldValue, setFieldTouched }
       }: FieldProps) => {
         function onChange(resource) {
-          setFieldValue(field, resource);
-          setFieldTouched(field);
+          setFieldValue(name, resource);
+          setFieldTouched(name);
         }
 
         return (
-          <FieldWrapper className={className} field={field} label={label}>
+          <FieldWrapper className={className} name={name} label={label}>
             <ResourceSelect
               {...topLevelProps}
               onChange={onChange}

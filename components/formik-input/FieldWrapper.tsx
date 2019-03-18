@@ -2,7 +2,7 @@ import titleCase from "title-case";
 
 export interface LabelParams {
   className?: string;
-  field: string;
+  name: string;
   label?: string;
 }
 
@@ -12,8 +12,8 @@ export interface FieldWrapperProps extends LabelParams {
 
 export function FieldWrapper({
   className,
-  field,
-  label = titleCase(field),
+  name,
+  label = titleCase(name),
   children
 }: FieldWrapperProps) {
   return (

@@ -103,7 +103,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
             <div className="row">
               <ResourceSelectField<Group>
                 className="col-md-2"
-                field="group"
+                name="group"
                 filter={groupName => ({ groupName })}
                 model="group"
                 optionLabel={group => group.groupName}
@@ -112,7 +112,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
             <div className="row">
               <SelectField
                 className="col-md-2"
-                field="type"
+                name="type"
                 label="Primer Type"
                 options={PRIMER_TYPE_OPTIONS}
               />
@@ -120,41 +120,41 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
             <div className="row">
               <ResourceSelectField<Region>
                 className="col-md-2"
-                field="region"
+                name="region"
                 filter={name => ({ name })}
                 label="Target Gene Region"
                 model="region"
                 optionLabel={region => region.name}
               />
-              <TextField className="col-md-2" field="name" />
-              <TextField className="col-md-2" field="lotNumber" />
-              <TextField className="col-md-2" field="targetSpecies" />
-              <TextField className="col-md-2" field="purification" />
+              <TextField className="col-md-2" name="name" />
+              <TextField className="col-md-2" name="lotNumber" />
+              <TextField className="col-md-2" name="targetSpecies" />
+              <TextField className="col-md-2" name="purification" />
             </div>
             <div className="row">
-              <TextField className="col-md-2" field="direction" />
-              <TextField className="col-md-2" field="tmCalculated" />
+              <TextField className="col-md-2" name="direction" />
+              <TextField className="col-md-2" name="tmCalculated" />
             </div>
             <div className="row">
               <TextField
                 className="col-md-6"
-                field="seq"
+                name="seq"
                 label="Primer Sequence (5' - 3')"
               />
             </div>
             <div className="row">
-              <TextField className="col-md-2" field="application" />
-              <TextField className="col-md-2" field="reference" />
-              <TextField className="col-md-2" field="supplier" />
-              <TextField className="col-md-2" field="designedBy" />
+              <TextField className="col-md-2" name="application" />
+              <TextField className="col-md-2" name="reference" />
+              <TextField className="col-md-2" name="supplier" />
+              <TextField className="col-md-2" name="designedBy" />
               <TextField
                 className="col-md-2"
-                field="stockConcentration"
+                name="stockConcentration"
                 label="Stock Concentration(uM)"
               />
             </div>
             <div className="row">
-              <TextField className="col-md-6" field="note" />
+              <TextField className="col-md-6" name="note" />
             </div>
             {isSubmitting ? (
               <div className="spinner-border" role="status">

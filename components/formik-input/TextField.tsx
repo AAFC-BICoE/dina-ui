@@ -2,11 +2,11 @@ import { Field } from "formik";
 import { FieldWrapper, LabelParams } from "./FieldWrapper";
 
 export function TextField(props: LabelParams) {
-  const { className, field, label } = props;
+  const { className, name, label } = props;
 
   return (
-    <FieldWrapper className={className} field={field} label={label}>
-      <Field name={field} className="form-control" />
+    <FieldWrapper className={className} name={name} label={label}>
+      <Field name={name} className="form-control" />
     </FieldWrapper>
   );
 }

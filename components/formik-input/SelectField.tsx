@@ -7,21 +7,21 @@ export interface SelectFieldProps extends LabelParams {
 }
 
 export function SelectField(props: SelectFieldProps) {
-  const { className, field, label, options } = props;
+  const { className, name, label, options } = props;
 
   return (
-    <Field name={field}>
+    <Field name={name}>
       {({
         field: { value },
         form: { setFieldValue, setFieldTouched }
       }: FieldProps) => {
         function onChange({ value: selectValue }) {
-          setFieldValue(field, selectValue);
-          setFieldTouched(field);
+          setFieldValue(name, selectValue);
+          setFieldTouched(name);
         }
 
         return (
-          <FieldWrapper className={className} field={field} label={label}>
+          <FieldWrapper className={className} name={name} label={label}>
             <Select
               options={options}
               onChange={onChange}
