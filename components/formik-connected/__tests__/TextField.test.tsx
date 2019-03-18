@@ -21,7 +21,7 @@ describe("TextField component", () => {
     );
   });
 
-  it("Changes the field's value.", async () => {
+  it("Changes the field's value.", () => {
     const wrapper = mount(
       <Formik
         initialValues={{ testObject: { testField: "initial value" } }}
