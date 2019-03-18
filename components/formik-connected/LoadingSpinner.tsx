@@ -2,6 +2,7 @@ export interface LoadingSpinnerProps {
   loading: boolean;
 }
 
+/** Renders a Bootstrap loading spinner. */
 export function LoadingSpinner({ loading }: LoadingSpinnerProps) {
   return loading ? (
     <div className="spinner-border" role="status">
