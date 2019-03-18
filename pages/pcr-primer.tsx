@@ -1,10 +1,7 @@
 import { Formik } from "formik";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { Query } from "../components/api-client/Query";
-import { FieldView } from "../components/field-view/FieldView";
-import Head from "../components/head";
-import Nav from "../components/nav";
+import { FieldView, Head, LoadingSpinner, Nav, Query } from "../components";
 import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
 
 export default withRouter(function PcrPrimerDetailsPage({ router }) {
@@ -19,15 +16,11 @@ export default withRouter(function PcrPrimerDetailsPage({ router }) {
       >
         {({ loading, response }) => (
           <div className="container-fluid">
-            <Link href="pcr-primers">
+            <Link href="/pcr-primers">
               <a>PCR Primer list</a>
             </Link>
             <h1>PCR Primer Details</h1>
-            {loading && (
-              <div className="spinner-border" role="status">
-                <span className="sr-only">Loading...</span>
-              </div>
-            )}
+            <LoadingSpinner loading={loading} />
             {response && (
               <Formik<PcrPrimer> initialValues={response.data} onSubmit={null}>
                 <div>

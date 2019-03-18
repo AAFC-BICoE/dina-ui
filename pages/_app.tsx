@@ -1,9 +1,6 @@
 import App, { Container } from "next/app";
 import React from "react";
-import {
-  ApiClientContext,
-  createContextValue
-} from "../components/api-client/ApiClientContext";
+import { ApiClientContext, createContextValue } from "../components";
 
 /**
  * App component that wraps every page component.

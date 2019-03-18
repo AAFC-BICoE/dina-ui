@@ -1,7 +1,6 @@
 import Link from "next/link";
 import React from "react";
-import Head from "../components/head";
-import Nav from "../components/nav";
+import { Head, Nav } from "../components";
 
 const Home: React.FunctionComponent = () => (
   <div>

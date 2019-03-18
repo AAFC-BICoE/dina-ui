@@ -1,6 +1,5 @@
 import Link from "next/link";
-import Head from "../components/head";
-import Nav from "../components/nav";
+import { Head, Nav } from "../components";
 import { ColumnDefinition, QueryTable } from "../components/table/QueryTable";
 import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
 
