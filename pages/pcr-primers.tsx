@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { Head, Nav } from "../components";
-import { ColumnDefinition, QueryTable } from "../components/table/QueryTable";
+import { ColumnDefinition, Head, Nav, QueryTable } from "../components";
 import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
 
 const PCRPRIMER_TABLE_COLUMNS: Array<ColumnDefinition<PcrPrimer>> = [

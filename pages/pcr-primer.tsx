@@ -1,10 +1,10 @@
 import { Formik } from "formik";
 import Link from "next/link";
-import { withRouter } from "next/router";
+import { withRouter, WithRouterProps } from "next/router";
 import { FieldView, Head, LoadingSpinner, Nav, Query } from "../components";
 import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
 
-export default withRouter(function PcrPrimerDetailsPage({ router }) {
+export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
 
   return (
@@ -83,4 +83,6 @@ export default withRouter(function PcrPrimerDetailsPage({ router }) {
       </Query>
     </div>
   );
-});
+}
+
+export default withRouter(PcrPrimerDetailsPage);

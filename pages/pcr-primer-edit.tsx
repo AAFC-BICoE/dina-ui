@@ -1,5 +1,5 @@
 import { Form, Formik, FormikActions } from "formik";
-import { SingletonRouter, withRouter } from "next/router";
+import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
 import { useContext } from "react";
 import {
   ApiClientContext,
@@ -23,7 +23,7 @@ interface PcrPrimerFormProps {
   router: SingletonRouter;
 }
 
-export default withRouter(function AddPcrPrimerPage({ router }) {
+export function PcrPrimerEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
 
   return (
@@ -56,10 +56,10 @@ export default withRouter(function AddPcrPrimerPage({ router }) {
       </div>
     </div>
   );
-});
+}
 
 function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
-  const { doOperations } = useContext(ApiClientContext);
+  const { apiClient, doOperations } = useContext(ApiClientContext);
 
   const initialValues = primer || { lotNumber: 1, seq: "", type: "PRIMER" };
 
@@ -185,3 +185,5 @@ const PRIMER_TYPE_OPTIONS = [
     value: "ITRU_PRIMER"
   }
 ];
+
+export default withRouter(PcrPrimerEditPage);

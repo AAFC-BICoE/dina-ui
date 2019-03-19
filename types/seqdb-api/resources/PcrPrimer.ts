@@ -39,8 +39,8 @@ export interface PcrPrimerAttributes {
 }
 
 export interface PcrPrimerRelationships {
-  region: Region;
-  group: Group;
+  region?: Region;
+  group?: Group;
 }
 
 export type PcrPrimer = KitsuResource &
