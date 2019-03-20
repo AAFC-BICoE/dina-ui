@@ -1,5 +1,5 @@
 import { connect } from "formik";
-import { LoadingSpinner } from "./LoadingSpinner";
+import { LoadingSpinner } from "..";
 
 export const SubmitButton = connect(function SubmitButtonInternal({
   formik: { isSubmitting }

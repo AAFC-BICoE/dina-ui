@@ -18,6 +18,9 @@ export interface FieldWrapperProps extends LabelParams {
 /**
  * Wraps a field with a label of the field's name. The label can be auto-generated as a title-case
  * version of the field name, or can be specified as a custom label string.
+ *
+ * This component also wraps the field in a div with the className `${fieldName}-field` for testing purposes.
+ * e.g. select the "description" text input using wrapper.find(".description-field input").
  */
 export function FieldWrapper({
   className,
@@ -27,7 +30,7 @@ export function FieldWrapper({
 }: FieldWrapperProps) {
   return (
     <div className={className}>
-      <div className="form-group">
+      <div className={`form-group ${name}-field`}>
         <label>
           <strong>{label}:</strong>
         </label>

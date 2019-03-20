@@ -59,7 +59,7 @@ describe("PcrPrimer edit page", () => {
     );
 
     // Edit the primer name.
-    wrapper.find("input[name='name']").simulate("change", {
+    wrapper.find(".name-field input").simulate("change", {
       target: { name: "name", value: "New PcrPrimer" }
     });
 
@@ -167,12 +167,12 @@ describe("PcrPrimer edit page", () => {
     wrapper.update();
 
     // // Check that the existing primer's seq value is in the field.
-    expect(wrapper.find("input[name='seq']").prop("value")).toEqual(
+    expect(wrapper.find(".seq-field input").prop("value")).toEqual(
       "ACTACGATCAGCATCGATG"
     );
 
     // Modify the "designedBy" value.
-    wrapper.find("input[name='seq']").simulate("change", {
+    wrapper.find(".seq-field input").simulate("change", {
       target: { name: "seq", value: "new seq value" }
     });
 

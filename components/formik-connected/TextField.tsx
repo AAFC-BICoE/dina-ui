@@ -1,4 +1,4 @@
-import { Field } from "formik";
+import { Field, FieldProps } from "formik";
 import { FieldWrapper, LabelParams } from "./FieldWrapper";
 
 /**
@@ -10,7 +10,29 @@ export function TextField(props: LabelParams) {
 
   return (
     <FieldWrapper className={className} name={name} label={label}>
-      <Field name={name} className="form-control" />
+      <Field name={name}>
+        {({
+          field: { value },
+          form: { setFieldValue, setFieldTouched }
+        }: FieldProps) => {
+          function onChange(event) {
+            setFieldValue(name, event.target.value);
+            setFieldTouched(name);
+          }
+
+          // The default Field component's inner text input needs to be replaced with our own
+          // controlled input that we manually pass the "onChange" and "value" props. Otherwise
+          // we will get React's warning about switching from an uncontrolled to controlled input.
+          return (
+            <input
+              className="form-control"
+              onChange={onChange}
+              type="text"
+              value={value || ""}
+            />
+          );
+        }}
+      </Field>
     </FieldWrapper>
   );
 }
