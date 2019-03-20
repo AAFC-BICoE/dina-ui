@@ -1,8 +1,8 @@
 import { OperationsResponse } from "components/api-client/jsonapi-types";
 import { mount } from "enzyme";
-import { ApiClientContext, createContextValue } from "../../components";
-import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
-import { PcrPrimerEditPage } from "../pcr-primer-edit";
+import { ApiClientContext, createContextValue } from "../../../components";
+import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
+import { PcrPrimerEditPage } from "../edit";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -89,7 +89,7 @@ describe("PcrPrimer edit page", () => {
       );
 
       // The user should be redirected to the new primer's details page.
-      expect(mockPush).lastCalledWith("/pcr-primer?id=1");
+      expect(mockPush).lastCalledWith("/pcr-primer/view?id=1");
       done();
     });
   });
@@ -211,7 +211,7 @@ describe("PcrPrimer edit page", () => {
       );
 
       // The user should be redirected to the existing primer's details page.
-      expect(mockPush).lastCalledWith("/pcr-primer?id=1");
+      expect(mockPush).lastCalledWith("/pcr-primer/view?id=1");
       done();
     });
   });

@@ -1,8 +1,8 @@
 import { Formik } from "formik";
 import Link from "next/link";
 import { withRouter, WithRouterProps } from "next/router";
-import { FieldView, Head, LoadingSpinner, Nav, Query } from "../components";
-import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
+import { FieldView, Head, LoadingSpinner, Nav, Query } from "../../components";
+import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
 
 export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -16,7 +16,7 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
       >
         {({ loading, response }) => (
           <div className="container-fluid">
-            <Link href="/pcr-primers">
+            <Link href="/pcr-primer/list">
               <a>PCR Primer list</a>
             </Link>
             <h1>PCR Primer Details</h1>
@@ -24,7 +24,7 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
             {response && (
               <Formik<PcrPrimer> initialValues={response.data} onSubmit={null}>
                 <div>
-                  <Link href={`/pcr-primer-edit?id=${id}`}>
+                  <Link href={`/pcr-primer/edit?id=${id}`}>
                     <a>Edit</a>
                   </Link>
                   <div className="row">

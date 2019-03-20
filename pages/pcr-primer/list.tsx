@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { ColumnDefinition, Head, Nav, QueryTable } from "../components";
-import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
+import { ColumnDefinition, Head, Nav, QueryTable } from "../../components";
+import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
 
 const PCRPRIMER_TABLE_COLUMNS: Array<ColumnDefinition<PcrPrimer>> = [
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/pcr-primer?id=${id}`}>
+      <Link href={`/pcr-primer/view?id=${id}`}>
         <a>{name}</a>
       </Link>
     ),
@@ -32,7 +32,7 @@ export default function PcrPrimerListPage() {
       <Nav />
       <div className="container-fluid">
         <h1>PCR Primers</h1>
-        <Link href="/pcr-primer-edit" prefetch={true}>
+        <Link href="/pcr-primer/edit" prefetch={true}>
           <a>Add PCR Primer</a>
         </Link>
         <QueryTable<PcrPrimer>

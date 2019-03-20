@@ -12,11 +12,11 @@ import {
   SelectField,
   SubmitButton,
   TextField
-} from "../components";
-import { Group } from "../types/seqdb-api/resources/Group";
-import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
-import { Region } from "../types/seqdb-api/resources/Region";
-import { serialize } from "../util/serialize";
+} from "../../components";
+import { Group } from "../../types/seqdb-api/resources/Group";
+import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
+import { Region } from "../../types/seqdb-api/resources/Region";
+import { serialize } from "../../util/serialize";
 
 interface PcrPrimerFormProps {
   primer?: PcrPrimer;
@@ -59,7 +59,7 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
 }
 
 function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
-  const { apiClient, doOperations } = useContext(ApiClientContext);
+  const { doOperations } = useContext(ApiClientContext);
 
   const initialValues = primer || { lotNumber: 1, seq: "", type: "PRIMER" };
 
@@ -88,7 +88,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
       ]);
 
       const newId = response[0].data.id;
-      router.push(`/pcr-primer?id=${newId}`);
+      router.push(`/pcr-primer/view?id=${newId}`);
     } catch (error) {
       setStatus(error);
       setSubmitting(false);
