@@ -18,6 +18,7 @@ exports[`SeqdbUiApp Renders the App wrapper.: SeqdbUiApp shallow render. 1`] = `
         "resCase": [Function],
         "update": [Function],
       },
+      "doOperations": [Function],
     }
   }
 >

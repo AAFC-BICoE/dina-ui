@@ -5,7 +5,7 @@ import { ApiClientContext, ApiClientContextI } from "./ApiClientContext";
 import { JsonApiErrorResponse } from "./jsonapi-types";
 
 /** Attributes that compose a JsonApi query. */
-interface JsonApiQuerySpec extends GetParams {
+export interface JsonApiQuerySpec extends GetParams {
   path: string;
 }
 
