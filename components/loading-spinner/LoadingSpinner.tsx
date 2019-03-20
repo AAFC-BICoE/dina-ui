@@ -1,4 +1,5 @@
 export interface LoadingSpinnerProps {
+  /** Whether the loading spinner should be shown. */
   loading: boolean;
 }
 

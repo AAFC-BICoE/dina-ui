@@ -1,8 +1,8 @@
 import { Field, FieldProps } from "formik";
-import { FieldWrapper, LabelParams } from "./FieldWrapper";
+import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 /** Renders the label and value of a field from Formik context. */
-export function FieldView(props: LabelParams) {
+export function FieldView(props: LabelWrapperParams) {
   const { className, label, name } = props;
 
   return (

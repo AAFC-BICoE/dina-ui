@@ -1,11 +1,11 @@
 import { Field, FieldProps } from "formik";
-import { FieldWrapper, LabelParams } from "./FieldWrapper";
+import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 /**
  * Provides a text input for a Formik field. This component wraps Formik's "Field" component with
  * a wrapper that adds a label.
  */
-export function TextField(props: LabelParams) {
+export function TextField(props: LabelWrapperParams) {
   const { className, name, label } = props;
 
   return (

@@ -1,6 +1,6 @@
 import titleCase from "title-case";
 
-export interface LabelParams {
+export interface LabelWrapperParams {
   /** The CSS classes of the div wrapper. */
   className?: string;
 
@@ -11,7 +11,7 @@ export interface LabelParams {
   label?: string;
 }
 
-export interface FieldWrapperProps extends LabelParams {
+export interface FieldWrapperProps extends LabelWrapperParams {
   children: JSX.Element;
 }
 
