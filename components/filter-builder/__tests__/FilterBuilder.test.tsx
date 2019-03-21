@@ -1,5 +1,5 @@
 import { mount } from "enzyme";
-import { FilterBuilder, FilterBuilderState } from "../FilterBuilder";
+import { FilterBuilder, FilterBuilderProps } from "../FilterBuilder";
 import { FilterGroup } from "../FilterGroup";
 import { FilterRow } from "../FilterRow";
 
@@ -8,14 +8,16 @@ describe("FilterBuilder component", () => {
 
   const filterAttributes = ["name", "description"];
 
-  function mountFilterBuilder() {
-    return mount(<FilterBuilder filterAttributes={filterAttributes} />);
+  function mountFilterBuilder(propsOverride: Partial<FilterBuilderProps> = {}) {
+    return mount<FilterBuilder>(
+      <FilterBuilder filterAttributes={filterAttributes} {...propsOverride} />
+    );
   }
 
   it("Renders initially with one FilterRow.", () => {
     const wrapper = mountFilterBuilder();
 
-    expect((wrapper.state() as FilterBuilderState).model).toEqual({
+    expect(wrapper.state().model).toEqual({
       children: [
         {
           attribute: "name",
@@ -39,7 +41,7 @@ describe("FilterBuilder component", () => {
       .find(".filter-row-buttons button[children='AND']")
       .simulate("click");
 
-    expect((wrapper.state() as FilterBuilderState).model).toEqual({
+    expect(wrapper.state().model).toEqual({
       children: [
         {
           attribute: "name",
@@ -68,7 +70,7 @@ describe("FilterBuilder component", () => {
 
     wrapper.find(".filter-row-buttons button[children='OR']").simulate("click");
 
-    expect((wrapper.state() as FilterBuilderState).model).toEqual({
+    expect(wrapper.state().model).toEqual({
       children: [
         {
           attribute: "name",
@@ -105,7 +107,7 @@ describe("FilterBuilder component", () => {
       .find("button[children='OR']")
       .simulate("click");
 
-    expect((wrapper.state() as FilterBuilderState).model).toEqual({
+    expect(wrapper.state().model).toEqual({
       children: [
         {
           attribute: "name",
@@ -175,7 +177,7 @@ describe("FilterBuilder component", () => {
     ).toEqual(["first filter value", "", "second filter value"]);
 
     // Expect the same action was taken on the component's model.
-    expect((wrapper.state() as FilterBuilderState).model).toEqual(
+    expect(wrapper.state().model).toEqual(
       objectContaining({
         children: [
           objectContaining({ value: "first filter value" }),
@@ -212,7 +214,7 @@ describe("FilterBuilder component", () => {
       (wrapper.find("input.filter-value").instance() as any).value
     ).toEqual("second filter value");
 
-    expect((wrapper.state() as FilterBuilderState).model).toEqual(
+    expect(wrapper.state().model).toEqual(
       objectContaining({
         children: [objectContaining({ value: "second filter value" })]
       })
@@ -244,7 +246,7 @@ describe("FilterBuilder component", () => {
       .simulate("click");
 
     // There should be two filter rows in one AND group.
-    expect((wrapper.state() as FilterBuilderState).model).toEqual(
+    expect(wrapper.state().model).toEqual(
       objectContaining({
         children: [
           objectContaining({ type: "FILTER_ROW" }),
@@ -288,7 +290,7 @@ describe("FilterBuilder component", () => {
       .simulate("click");
 
     // The filter should be "( ( predicate AND predicate ) OR predicate )".
-    expect((wrapper.state() as FilterBuilderState).model).toEqual(
+    expect(wrapper.state().model).toEqual(
       objectContaining({
         children: [
           objectContaining({
@@ -326,11 +328,47 @@ describe("FilterBuilder component", () => {
       .simulate("click");
 
     // The filter model should be one filter group with one inner filter row.
-    expect((wrapper.state() as FilterBuilderState).model).toEqual(
+    expect(wrapper.state().model).toEqual(
       objectContaining({
         children: [objectContaining({ type: "FILTER_ROW" })],
         type: "FILTER_GROUP"
       })
     );
+  });
+
+  it("Provides an 'onChange' callback prop that provides the filter model.", async () => {
+    const onChange = jest.fn();
+
+    const wrapper = mountFilterBuilder({ onChange });
+
+    // Change a text input
+    wrapper
+      .find("input.filter-value")
+      .first()
+      .simulate("change", { target: { value: "first filter value" } });
+
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).lastCalledWith(wrapper.state().model);
+
+    // Click the AND button
+    wrapper
+      .find(".filter-row-buttons button[children='AND']")
+      .simulate("click");
+    expect(onChange).toHaveBeenCalledTimes(2);
+    expect(onChange).lastCalledWith(wrapper.state().model);
+
+    // Click the OR button
+    wrapper
+      .find(".filter-group-buttons button[children='OR']")
+      .simulate("click");
+    expect(onChange).toHaveBeenCalledTimes(3);
+    expect(onChange).lastCalledWith(wrapper.state().model);
+
+    // Click the - button
+    wrapper
+      .find(".filter-group-buttons button[children='-']")
+      .simulate("click");
+    expect(onChange).toHaveBeenCalledTimes(4);
+    expect(onChange).lastCalledWith(wrapper.state().model);
   });
 });

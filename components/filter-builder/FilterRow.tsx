@@ -16,6 +16,7 @@ export interface FilterRowProps {
   model: FilterRowModel;
   showRemoveButton: boolean;
   onAndClick: () => void;
+  onChange: () => void;
   onRemoveClick: () => void;
   onOrClick: () => void;
 }
@@ -60,12 +61,14 @@ export class FilterRow extends React.Component<FilterRowProps> {
           <button
             className="list-inline-item btn btn-primary"
             onClick={onAndClick}
+            type="button"
           >
             AND
           </button>
           <button
             className="list-inline-item btn btn-primary"
             onClick={onOrClick}
+            type="button"
           >
             OR
           </button>
@@ -73,6 +76,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
             <button
               className="list-inline-item btn btn-dark"
               onClick={onRemoveClick}
+              type="button"
             >
               -
             </button>
@@ -90,14 +94,17 @@ export class FilterRow extends React.Component<FilterRowProps> {
   }
 
   private onPropertyChanged = (value: { label: string; value: string }) => {
+    this.props.onChange();
     this.props.model.attribute = value.value;
   };
 
   private onPredicateChanged = (value: { label: string; value: string }) => {
+    this.props.onChange();
     this.props.model.predicate = value.value as FilterRowPredicate;
   };
 
   private onValueChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.props.onChange();
     this.props.model.value = e.target.value;
   };
 }

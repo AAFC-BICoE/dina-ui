@@ -3,6 +3,7 @@ import Select from "react-select/lib/Select";
 import { FilterRow, FilterRowModel } from "../FilterRow";
 
 describe("FilterRow component", () => {
+  const mockOnChange = jest.fn();
   const mockOnAndClick = jest.fn();
   const mockOnDeleteClick = jest.fn();
   const mockOnOrClick = jest.fn();
@@ -22,6 +23,7 @@ describe("FilterRow component", () => {
           type: "FILTER_ROW",
           value: ""
         }}
+        onChange={mockOnChange}
         onAndClick={mockOnAndClick}
         onRemoveClick={mockOnDeleteClick}
         onOrClick={mockOnOrClick}
@@ -108,5 +110,31 @@ describe("FilterRow component", () => {
     expect(withoutRemoveButton.find("button[children='-']").exists()).toEqual(
       false
     );
+  });
+
+  it("Provides an 'onChange' prop to notify of change events.", () => {
+    const wrapper = mountFilterRow();
+
+    // Change the filtered field.
+    wrapper
+      .find(Select)
+      .first()
+      .props()
+      .onChange({ value: "description" });
+    expect(mockOnChange).toHaveBeenCalledTimes(1);
+
+    // Change the filter predicate (IS / IS NOT).
+    wrapper
+      .find(Select)
+      .at(1)
+      .props()
+      .onChange({ value: "IS NOT" });
+    expect(mockOnChange).toHaveBeenCalledTimes(2);
+
+    // Change the filter value.
+    wrapper
+      .find("input.filter-value")
+      .simulate("change", { target: { value: "101F" } });
+    expect(mockOnChange).toHaveBeenCalledTimes(3);
   });
 });

@@ -7,8 +7,9 @@ import {
 } from "./FilterGroup";
 import { FilterRow, FilterRowModel } from "./FilterRow";
 
-interface FilterBuilderProps {
+export interface FilterBuilderProps {
   filterAttributes: string[];
+  onChange?: (state: FilterGroupModel) => void;
 }
 
 export interface FilterBuilderState {
@@ -47,6 +48,11 @@ export class FilterBuilder extends React.Component<
         type: "FILTER_GROUP"
       }
     };
+  }
+
+  public componentDidUpdate() {
+    const { onChange = () => undefined } = this.props;
+    onChange(this.state.model);
   }
 
   /**
@@ -241,6 +247,7 @@ export class FilterBuilder extends React.Component<
         );
       }
       case "FILTER_ROW": {
+        const { onChange = () => undefined } = this.props;
         // Don't show the remove button when this is the only FilterRow.
         const showRemoveButton = !isEqual(this.state.model.children, [model]);
 
@@ -249,6 +256,7 @@ export class FilterBuilder extends React.Component<
             key={model.id}
             model={model}
             onAndClick={onAndClick}
+            onChange={() => onChange(this.state.model)}
             onRemoveClick={onRemoveClick}
             onOrClick={onOrClick}
             filterAttributes={this.props.filterAttributes}

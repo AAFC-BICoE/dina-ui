@@ -43,16 +43,28 @@ export function FilterGroup({
       <div className="filter-group-buttons list-inline-item">
         {showAndOrButtons && (
           <div>
-            <button className="btn btn-primary d-block" onClick={onAndClick}>
+            <button
+              className="btn btn-primary d-block"
+              onClick={onAndClick}
+              type="button"
+            >
               AND
             </button>
-            <button className="btn btn-primary d-block" onClick={onOrClick}>
+            <button
+              className="btn btn-primary d-block"
+              onClick={onOrClick}
+              type="button"
+            >
               OR
             </button>
           </div>
         )}
         {showRemoveButton && (
-          <button className="btn btn-dark d-block" onClick={onRemoveClick}>
+          <button
+            className="btn btn-dark d-block"
+            onClick={onRemoveClick}
+            type="button"
+          >
             -
           </button>
         )}
