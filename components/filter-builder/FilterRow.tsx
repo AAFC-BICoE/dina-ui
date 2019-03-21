@@ -94,17 +94,17 @@ export class FilterRow extends React.Component<FilterRowProps> {
   }
 
   private onPropertyChanged = (value: { label: string; value: string }) => {
-    this.props.onChange();
     this.props.model.attribute = value.value;
+    this.props.onChange();
   };
 
   private onPredicateChanged = (value: { label: string; value: string }) => {
-    this.props.onChange();
     this.props.model.predicate = value.value as FilterRowPredicate;
+    this.props.onChange();
   };
 
   private onValueChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.props.onChange();
     this.props.model.value = e.target.value;
+    this.props.onChange();
   };
 }

@@ -51,6 +51,7 @@ export class FilterBuilder extends React.Component<
   }
 
   public componentDidUpdate() {
+    // Call the onChange callback when the state changes.
     const { onChange = () => undefined } = this.props;
     onChange(this.state.model);
   }
