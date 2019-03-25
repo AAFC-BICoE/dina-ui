@@ -90,7 +90,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
       const newId = response[0].data.id;
       router.push(`/pcr-primer/view?id=${newId}`);
     } catch (error) {
-      setStatus(error);
+      setStatus(error.message);
       setSubmitting(false);
     }
   }
