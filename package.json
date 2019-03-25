@@ -22,6 +22,7 @@
     "next": "^7.0.2",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
+    "react-select": "^2.3.0",
     "react-table": "6.8.6",
     "title-case": "^2.1.1"
   },
@@ -34,6 +35,7 @@
     "@types/node": "^10.12.18",
     "@types/react": "^16.7.18",
     "@types/react-dom": "^16.0.11",
+    "@types/react-select": "^2.0.11",
     "@types/styled-jsx": "^2.2.7",
     "asciidoctor.js": "^1.5.9",
     "babel-jest": "^24.3.0",
