@@ -50,10 +50,10 @@ export class FilterBuilder extends React.Component<
     };
   }
 
-  public componentDidUpdate() {
-    // Call the onChange callback when the state changes.
-    const { onChange = () => undefined } = this.props;
-    onChange(this.state.model);
+  public async componentDidMount() {
+    // Call the onChange callback to pass up the initial state on mount.
+    await Promise.resolve();
+    this.onChange();
   }
 
   /**
@@ -133,7 +133,8 @@ export class FilterBuilder extends React.Component<
     this.flattenModel(this.state.model);
 
     // Re-render the component.
-    this.setState({});
+    this.forceUpdate();
+    this.onChange();
   }
 
   /**
@@ -152,7 +153,8 @@ export class FilterBuilder extends React.Component<
     this.flattenModel(this.state.model);
 
     // Re-render the component.
-    this.setState({});
+    this.forceUpdate();
+    this.onChange();
   }
 
   /**
@@ -248,7 +250,6 @@ export class FilterBuilder extends React.Component<
         );
       }
       case "FILTER_ROW": {
-        const { onChange = () => undefined } = this.props;
         // Don't show the remove button when this is the only FilterRow.
         const showRemoveButton = !isEqual(this.state.model.children, [model]);
 
@@ -257,7 +258,7 @@ export class FilterBuilder extends React.Component<
             key={model.id}
             model={model}
             onAndClick={onAndClick}
-            onChange={() => onChange(this.state.model)}
+            onChange={this.onChange}
             onRemoveClick={onRemoveClick}
             onOrClick={onOrClick}
             filterAttributes={this.props.filterAttributes}
@@ -267,4 +268,9 @@ export class FilterBuilder extends React.Component<
       }
     }
   }
+
+  private onChange = () => {
+    const { onChange = () => undefined } = this.props;
+    onChange(this.state.model);
+  };
 }

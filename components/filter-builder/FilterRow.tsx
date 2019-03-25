@@ -38,7 +38,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
             instanceId={`attribute_${model.id}`}
             options={this.mappedfilterAttributes}
             onChange={this.onPropertyChanged}
-            defaultValue={{ label: model.attribute, value: model.attribute }}
+            value={{ label: model.attribute, value: model.attribute }}
           />
         </div>
         <div className="list-inline-item" style={{ width: 120 }}>
@@ -49,12 +49,12 @@ export class FilterRow extends React.Component<FilterRowProps> {
               { label: "IS NOT", value: "IS NOT" }
             ]}
             onChange={this.onPredicateChanged}
-            defaultValue={{ label: model.predicate, value: model.predicate }}
+            value={{ label: model.predicate, value: model.predicate }}
           />
         </div>
         <input
           className="filter-value list-inline-item form-control w-auto d-inline-block"
-          defaultValue={model.value}
+          value={model.value}
           onChange={this.onValueChanged}
         />
         <div className="filter-row-buttons list-inline-item">
@@ -96,15 +96,18 @@ export class FilterRow extends React.Component<FilterRowProps> {
   private onPropertyChanged = (value: { label: string; value: string }) => {
     this.props.model.attribute = value.value;
     this.props.onChange();
+    this.forceUpdate();
   };
 
   private onPredicateChanged = (value: { label: string; value: string }) => {
     this.props.model.predicate = value.value as FilterRowPredicate;
     this.props.onChange();
+    this.forceUpdate();
   };
 
   private onValueChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.props.model.value = e.target.value;
     this.props.onChange();
+    this.forceUpdate();
   };
 }

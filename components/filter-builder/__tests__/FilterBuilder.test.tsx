@@ -346,7 +346,6 @@ describe("FilterBuilder component", () => {
       .find("input.filter-value")
       .first()
       .simulate("change", { target: { value: "first filter value" } });
-
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).lastCalledWith(wrapper.state().model);
 
@@ -361,14 +360,16 @@ describe("FilterBuilder component", () => {
     wrapper
       .find(".filter-group-buttons button[children='OR']")
       .simulate("click");
-    expect(onChange).toHaveBeenCalledTimes(3);
+    await Promise.resolve();
+    wrapper.update();
+    expect(onChange).toHaveBeenCalledTimes(4);
     expect(onChange).lastCalledWith(wrapper.state().model);
 
     // Click the - button
     wrapper
       .find(".filter-group-buttons button[children='-']")
       .simulate("click");
-    expect(onChange).toHaveBeenCalledTimes(4);
+    expect(onChange).toHaveBeenCalledTimes(5);
     expect(onChange).lastCalledWith(wrapper.state().model);
   });
 });
