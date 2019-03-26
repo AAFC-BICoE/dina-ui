@@ -31,7 +31,7 @@ jest.mock(
 );
 
 // Mock out the debounce function to avoid waiting during tests.
-jest.spyOn(lodash, "debounce").mockImplementation(fn => fn);
+jest.spyOn(lodash, "debounce").mockImplementation(fn => fn as any);
 
 describe("ResourceSelect component", () => {
   const DEFAULT_SELECT_PROPS: ResourceSelectProps<any> = {
