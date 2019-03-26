@@ -154,17 +154,17 @@ describe("API client context", () => {
     expect(response).toEqual(MOCK_TODO_INSERT_AXIOS_RESPONSE.data);
   });
 
-  it("Provides a doOperations function that throws an error string.", async () => {
+  it("Provides a doOperations function that throws an error.", async () => {
     const expectedErrorMessage = `Constraint violation: name size must be between 1 and 10
 Constraint violation: description size must be between 1 and 10`;
 
-    let actualErrorMessage = "";
+    let actualError: Error;
 
     try {
       await doOperations(TODO_OPERATION_1_VALID_2_INVALID);
     } catch (error) {
-      actualErrorMessage = error;
+      actualError = error;
     }
-    expect(actualErrorMessage).toEqual(expectedErrorMessage);
+    expect(actualError.message).toEqual(expectedErrorMessage);
   });
 });

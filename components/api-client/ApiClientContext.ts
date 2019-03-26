@@ -57,7 +57,7 @@ export function createContextValue(): ApiClientContextI {
 
     // If there is an error message, throw it.
     if (errorMessage) {
-      throw errorMessage;
+      throw new Error(errorMessage);
     }
 
     // Return the successful jsonpatch response.
