@@ -1,12 +1,9 @@
 import { mount } from "enzyme";
-import { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
+import Kitsu, { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import { range } from "lodash";
 import ReactTable from "react-table";
 import { MetaWithTotal } from "../../../types/seqdb-api/meta";
-import {
-  ApiClientContext,
-  createContextValue
-} from "../../api-client/ApiClientContext";
+import { ApiClientContext } from "../../api-client/ApiClientContext";
 import { ColumnDefinition, QueryTable, QueryTableProps } from "../QueryTable";
 
 /** Example of an API resource interface definition for a todo-list entry. */
@@ -52,9 +49,16 @@ jest.mock(
 describe("QueryTable component", () => {
   const { objectContaining, anything } = expect;
 
+  /** JSONAPI client. */
+  const testClient = new Kitsu({
+    baseURL: "/api",
+    pluralize: false,
+    resourceCase: "none"
+  });
+
   function mountWithContext(element: JSX.Element) {
     return mount(
-      <ApiClientContext.Provider value={createContextValue()}>
+      <ApiClientContext.Provider value={{ apiClient: testClient }}>
         {element}
       </ApiClientContext.Provider>
     );
