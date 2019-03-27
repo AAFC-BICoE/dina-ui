@@ -3,6 +3,7 @@ import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
 import { useContext } from "react";
 import {
   ApiClientContext,
+  DateField,
   ErrorViewer,
   Head,
   LoadingSpinner,
@@ -134,6 +135,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
           <div className="row">
             <TextField className="col-md-2" name="direction" />
             <TextField className="col-md-2" name="tmCalculated" />
+            <DateField className="col-md-2" name="dateOrdered" />
           </div>
           <div className="row">
             <TextField
