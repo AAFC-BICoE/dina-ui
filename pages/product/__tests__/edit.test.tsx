@@ -204,7 +204,7 @@ describe("Product edit page", () => {
         expect.anything()
       );
 
-      // The user should be redirected to the existing primer's details page.
+      // The user should be redirected to the existing product's details page.
       expect(mockPush).lastCalledWith("/product/view?id=10");
       done();
     });
