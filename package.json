@@ -9,8 +9,8 @@
     "next": "next",
     "proxy": "micro-proxy -r ./dev-proxy-config.json -p 8000",
     "start": "next start",
-    "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test": "tsc && jest",
+    "test:coverage": "tsc && jest --coverage"
   },
   "dependencies": {
     "@zeit/next-css": "^1.0.1",
