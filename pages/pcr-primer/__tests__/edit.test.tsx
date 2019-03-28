@@ -8,7 +8,15 @@ import { PcrPrimerEditPage } from "../edit";
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn();
+const mockGet = jest.fn(async model => {
+  if (model === "pcrPrimer/100") {
+    // The request for the primer returns the test primer.
+    return { data: TEST_PRIMER };
+  } else {
+    // Requests for the selectable resources (linked group, region, etc.) return an empty array.
+    return { data: [] };
+  }
+});
 
 /** Mock axios for operations requests. */
 const mockPatch = jest.fn();
@@ -38,7 +46,7 @@ function mountWithContext(element: JSX.Element) {
 
 describe("PcrPrimer edit page", () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   it("Provides a form to add a PcrPrimer.", done => {
@@ -129,17 +137,6 @@ describe("PcrPrimer edit page", () => {
   });
 
   it("Provides a form to edit a PcrPrimer.", async done => {
-    // The get request will return the existing primer.
-    mockGet.mockImplementation(async model => {
-      if (model === "pcrPrimer/100") {
-        // The request for the primer returns the test primer.
-        return { data: TEST_PRIMER };
-      } else {
-        // Requests for the selectable resources (linked group, region, etc.) return an empty array.
-        return { data: [] };
-      }
-    });
-
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
       data: [
