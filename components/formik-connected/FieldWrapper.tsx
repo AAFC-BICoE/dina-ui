@@ -1,5 +1,4 @@
 import titleCase from "title-case";
-import { string } from "prop-types";
 import ReactTooltip from 'react-tooltip'
 
 export interface LabelWrapperParams {
@@ -19,7 +18,7 @@ export interface FieldWrapperProps extends LabelWrapperParams {
 
   /** Tootip Msg component ID */
   datafor?: string;
-  
+
   children: JSX.Element;
 }
 

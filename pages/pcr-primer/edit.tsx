@@ -1,6 +1,7 @@
 import { Form, Formik, FormikActions } from "formik";
 import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
 import { useContext } from "react";
+
 import {
   ApiClientContext,
   ErrorViewer,
@@ -101,13 +102,16 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
         <ErrorViewer />
         <div>
           <div className="row">
-            <ResourceSelectField<Group>
+            <ResourceSelectField<Group> 
+              datafor='group'
+              tooltipMsg='The group dropdown list'
               className="col-md-2"
               name="group"
               filter={groupName => ({ groupName })}
               model="group"
               optionLabel={group => group.groupName}
-            />
+             />
+                     
           </div>
           <div className="row">
             <SelectField
