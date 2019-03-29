@@ -4,11 +4,13 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface SelectFieldProps extends LabelWrapperParams {
   options: any[];
+  datafor?: string;
+  tooltipMsg?: string
 }
 
 /** Formik-connected select input. */
 export function SelectField(props: SelectFieldProps) {
-  const { className, name, label, options } = props;
+  const { className, name, label, options, datafor, tooltipMsg } = props;
 
   return (
     <Field name={name}>
@@ -22,7 +24,7 @@ export function SelectField(props: SelectFieldProps) {
         }
 
         return (
-          <FieldWrapper className={className} name={name} label={label}>
+          <FieldWrapper className={className} name={name} label={label} datafor={datafor} tooltipMsg={tooltipMsg}>
             <Select
               options={options}
               onChange={onChange}

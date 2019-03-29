@@ -12,13 +12,15 @@ export interface ResourceSelectFieldProps<TData>
   // These props are not required when using this Formik-controlled input.
   onChange?: never;
   value?: never;
+  datafor?: string;
+  tooltipMsg?: string
 }
 
 /** Formik-connected Dropdown select input for selecting a resource from the API. */
 export function ResourceSelectField<TData extends KitsuResource>(
   topLevelProps: ResourceSelectFieldProps<TData>
 ) {
-  const { className, name, label } = topLevelProps;
+  const { className, name, label, datafor, tooltipMsg } = topLevelProps;
 
   return (
     <Field name={name}>
@@ -32,12 +34,13 @@ export function ResourceSelectField<TData extends KitsuResource>(
         }
 
         return (
-          <FieldWrapper className={className} name={name} label={label}>
+          <FieldWrapper className={className} name={name} label={label} datafor={datafor} tooltipMsg={tooltipMsg}>
             <ResourceSelect
               {...topLevelProps}
               onChange={onChange}
               value={value}
             />
+            
           </FieldWrapper>
         );
       }}

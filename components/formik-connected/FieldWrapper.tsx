@@ -1,4 +1,6 @@
 import titleCase from "title-case";
+import { string } from "prop-types";
+import ReactTooltip from 'react-tooltip'
 
 export interface LabelWrapperParams {
   /** The CSS classes of the div wrapper. */
@@ -12,6 +14,12 @@ export interface LabelWrapperParams {
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
+  /** Tootip Msg provided for the field */
+  tooltipMsg?: string;
+
+  /** Tootip Msg component ID */
+  datafor?: string;
+  
   children: JSX.Element;
 }
 
@@ -26,15 +34,21 @@ export function FieldWrapper({
   className,
   name,
   label = titleCase(name),
+  datafor,
+  tooltipMsg,
   children
 }: FieldWrapperProps) {
   return (
-    <div className={className}>
+    <div className={className} data-tip data-for={datafor}>
       <div className={`form-group ${name}-field`}>
         <label>
           <strong>{label}:</strong>
         </label>
         {children}
+        {datafor &&
+          <ReactTooltip id={datafor} type='error'>
+            <span>{tooltipMsg}</span>
+          </ReactTooltip>}        
       </div>
     </div>
   );
