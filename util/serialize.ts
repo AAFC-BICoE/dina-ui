@@ -33,8 +33,10 @@ export async function serialize<TData extends KitsuResource>({
   const resourceCopy = { ...resource };
 
   // Delete the "links" attribute, which is sometimes included by back-ends like Crnk.
-  // The "links" attribute is not supported by kitsu-core's serializer, so we remove it here.
+  // The "links" and "relationships" attributes are not supported by kitsu-core's serializer, so
+  // we remove themhere.
   delete (resourceCopy as any).links;
+  delete (resourceCopy as any).relationships;
 
   const httpVerb = resource.id ? "PATCH" : "POST";
 
