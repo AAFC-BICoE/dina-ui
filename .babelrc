@@ -4,7 +4,19 @@
       "presets": ["next/babel", "@zeit/next-typescript/babel"]
     },
     "production": {
-      "presets": ["next/babel", "@zeit/next-typescript/babel"]
+      "presets": [
+        [
+          "next/babel",
+          {
+            "preset-env": {
+              "useBuiltIns": "usage",
+              "targets": { "ie": "11" },
+              "debug": true
+            }
+          }
+        ],
+        "@zeit/next-typescript/babel"
+      ]
     },
     "test": {
       "presets": [

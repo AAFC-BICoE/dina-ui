@@ -1,6 +1,6 @@
 import { shallow } from "enzyme";
 import toJson from "enzyme-to-json";
-import IndexPage from "../index";
+import IndexPage from "../../pages/index";
 
 describe("Index page", () => {
   it("Renders the index page.", () => {

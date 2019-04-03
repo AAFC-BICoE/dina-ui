@@ -1,7 +1,7 @@
 import { mount } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
 import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
-import { PcrPrimerDetailsPage } from "../view";
+import { PcrPrimerDetailsPage } from "../../../pages/pcr-primer/view";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);

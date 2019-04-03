@@ -4,7 +4,7 @@ import { FunctionComponent } from "react";
 import { create } from "react-test-renderer";
 import { createRenderer } from "react-test-renderer/shallow";
 import { ApiClientContext } from "../../components/api-client/ApiClientContext";
-import SeqdbUiApp from "../_app";
+import SeqdbUiApp from "../../pages/_app";
 
 jest.mock("next/router", () => ({}));
 
