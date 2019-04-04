@@ -114,8 +114,8 @@ function ProductForm({ product, router }: ProductFormProps) {
           </div>
           <div className="row">
             <TextField className="col-md-2" name="name" />
-            <TextField className="col-md-2" name="UPC" />
-            <TextField className="col-md-2" name="type " />            
+            <TextField className="col-md-2" name="upc" label="Universal Product Code (UPC)"/>
+            <TextField className="col-md-2" name="type" />            
           </div>
           <div className="row">
             <TextField className="col-md-4" name="description" />

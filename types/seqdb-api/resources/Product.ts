@@ -4,7 +4,7 @@ import { Group } from "./Group";
 export interface ProductAttributes {
   name: string;
   // Optional fields
-  UPC?: string;
+  upc?: string;
   type?: string;  
   description?: string;  
   lastModified?: string;

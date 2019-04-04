@@ -35,7 +35,7 @@ export function ProductDetailsPage({ router }: WithRouterProps) {
                   </div>
                   <div className="row">
                     <FieldView className="col-md-2" name="name" />
-                    <FieldView className="col-md-2" name="UPC" />
+                    <FieldView className="col-md-2" name="upc" label="Universal Product Code (UPC)" />
                     <FieldView className="col-md-2" name="type" />                    
                   </div>
                   <div className="row">

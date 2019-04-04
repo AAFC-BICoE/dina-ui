@@ -16,7 +16,10 @@ const PRODUCT_TABLE_COLUMNS: Array<ColumnDefinition<Product>> = [
     Header: "Group Name",
     accessor: "group.groupName"
   },
-  "UPC",
+  {
+    Header: "UPC",
+    accessor: "upc"
+  },
   "type",
   "description"
 ];
@@ -29,7 +32,7 @@ export default function ProductListPage() {
       <div className="container-fluid">
         <h1>Product Inventory</h1>
         <Link href="/product/edit" prefetch={true}>
-          <a>Add New Prudct</a>
+          <a>Add New Product</a>
         </Link>
         <QueryTable<Product>
           columns={PRODUCT_TABLE_COLUMNS}
