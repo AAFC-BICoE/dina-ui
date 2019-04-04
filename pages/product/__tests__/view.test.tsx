@@ -63,7 +63,7 @@ describe("Product details page", () => {
       wrapper.containsMatchingElement(
         <div>
           <label>
-            <strong>Name:</strong>
+            <strong>Name</strong>
           </label>
           <p>Test Product 1</p>
         </div>

@@ -64,7 +64,7 @@ describe("PcrPrimer details page", () => {
       wrapper.containsMatchingElement(
         <div>
           <label>
-            <strong>Name:</strong>
+            <strong>Name</strong>
           </label>
           <p>Test Primer</p>
         </div>
