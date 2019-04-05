@@ -25,14 +25,14 @@ export interface FieldWrapperProps extends LabelWrapperParams {
 export function FieldWrapper({
   className,
   name,
-  label,
+  label = titleCase(name),
   children
 }: FieldWrapperProps) {
   return (
     <div className={className}>
       <div className={`form-group ${name}-field`}>
         <label>
-          <strong>{label? label: titleCase(name)}</strong>
+          <strong>{label}</strong>
         </label>
         {children}
       </div>
