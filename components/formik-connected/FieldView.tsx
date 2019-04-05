@@ -1,6 +1,5 @@
 import { Field, FieldProps } from "formik";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
-import titleCase from "title-case";
 
 /** Renders the label and value of a field from Formik context. */
 export function FieldView(props: LabelWrapperParams) {
@@ -9,7 +8,7 @@ export function FieldView(props: LabelWrapperParams) {
   return (
     <Field name={name}>
       {({ field: { value } }: FieldProps) => (
-        <FieldWrapper className={className} label={label? label: titleCase(name)} name={name}>
+        <FieldWrapper className={className} label={label} name={name}>
           <p
             style={{
               borderBottom: "1px solid black",
