@@ -59,7 +59,7 @@ export function ProductEditPage({ router }: WithRouterProps) {
 function ProductForm({ product, router }: ProductFormProps) {
   const { doOperations } = useContext(ApiClientContext);
 
-  const initialValues = product || { name: "test" };
+  const initialValues = product || {};
 
   async function onSubmit(
     submittedValues,

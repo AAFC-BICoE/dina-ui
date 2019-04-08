@@ -113,6 +113,11 @@ describe("Product edit page", () => {
       <ProductEditPage router={{ query: {}, push: mockPush } as any} />
     );
 
+    // Edit the product name.
+    wrapper.find(".name-field input").simulate("change", {
+      target: { name: "name", value: "invalid name" }
+    });
+
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
