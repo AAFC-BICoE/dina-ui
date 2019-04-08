@@ -1,7 +1,7 @@
 {
   "name": "create-next-example-app",
   "scripts": {
-    "build": "next build && next export",
+    "build": "next build && next export -o ./build && babel ./build -d ./build",
     "dev": "run-p next proxy",
     "docs": "cd scripts/ && ts-node ./build-docs.ts",
     "lint": "tslint --project tsconfig.json",
@@ -30,6 +30,7 @@
     "title-case": "^2.1.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.4.3",
     "@types/enzyme": "^3.1.16",
     "@types/enzyme-to-json": "^1.5.2",
     "@types/jest": "^24.0.9",

@@ -10,8 +10,7 @@
           {
             "preset-env": {
               "useBuiltIns": "usage",
-              "targets": { "ie": "11" },
-              "debug": true
+              "targets": { "ie": "11" }
             }
           }
         ],
