@@ -13,7 +13,7 @@ describe("FieldView component", () => {
       </Formik>
     );
 
-    expect(wrapper.find("label").text()).toEqual("Test Object Name:");
+    expect(wrapper.find("label").text()).toEqual("Test Object Name");
     expect(wrapper.find("p").text()).toEqual("testName");
   });
 
@@ -27,6 +27,6 @@ describe("FieldView component", () => {
       </Formik>
     );
 
-    expect(wrapper.find("label").text()).toEqual("Custom Label:");
+    expect(wrapper.find("label").text()).toEqual("Custom Label");
   });
 });
