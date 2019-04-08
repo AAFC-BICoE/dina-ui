@@ -157,9 +157,7 @@ describe("Product edit page", () => {
     });
 
     const wrapper = mountWithContext(
-      <ProductEditPage
-        router={{ query: { id: 10 }, push: mockPush } as any}
-      />
+      <ProductEditPage router={{ query: { id: 10 }, push: mockPush } as any} />
     );
 
     // The page should load initially with a loading spinner.
@@ -176,7 +174,10 @@ describe("Product edit page", () => {
 
     // Modify the "description" value.
     wrapper.find(".description-field input").simulate("change", {
-      target: { name: "description", value: "new desc for product 10, was a null value" }
+      target: {
+        name: "description",
+        value: "new desc for product 10, was a null value"
+      }
     });
 
     // Submit the form.
@@ -194,13 +195,13 @@ describe("Product edit page", () => {
             value: {
               attributes: expect.objectContaining({
                 name: "Rapid Alkaline DNA Extraction",
-                description: "new desc for product 10, was a null value"                 
+                description: "new desc for product 10, was a null value"
               }),
               id: "10",
               relationships: {
                 group: {
                   data: expect.objectContaining({ id: "8", type: "group" })
-                }                
+                }
               },
               type: "product"
             }
@@ -216,8 +217,9 @@ describe("Product edit page", () => {
   });
 });
 
-/** Test Product with all fields defined.*/
+/** Test Product with all fields defined. */
 const TEST_PRODUCT: Required<Product> = {
+  description: "desc",
   group: {
     description: "group desc",
     groupName: "Public",
@@ -228,6 +230,5 @@ const TEST_PRODUCT: Required<Product> = {
   lastModified: "2019-03-27T04:00:00.000+0000",
   name: "Rapid Alkaline DNA Extraction",
   type: "product",
-  UPC: "Universal product code",
-  description: "desc"
+  upc: "Universal product code"
 };
