@@ -8,7 +8,16 @@ import { PcrProfileEditPage } from "../edit";
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn();
+const mockGet = jest.fn(async model => {
+  // The get request will return the existing profile.
+  if (model === "thermocyclerprofile/100") {
+    // The request for the profile returns the test profile.
+    return { data: TEST_PROFILE };
+  } else {
+    // Requests for the selectable resources (linked group, region, etc.) return an empty array.
+    return { data: [] };
+  }
+});
 
 /** Mock axios for operations requests. */
 const mockPatch = jest.fn();
@@ -38,7 +47,7 @@ function mountWithContext(element: JSX.Element) {
 
 describe("PcrProfile edit page", () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   it("Provides a form to add a PcrProfile.", done => {
@@ -126,24 +135,13 @@ describe("PcrProfile edit page", () => {
   });
 
   it("Provides a form to edit a PcrProfile.", async done => {
-    // The get request will return the existing profile.
-    mockGet.mockImplementation(async model => {
-      if (model === "thermocyclerprofile/100") {
-        // The request for the profile returns the test profile.
-        return { data: TEST_PROFILE };
-      } else {
-        // Requests for the selectable resources (linked group, region, etc.) return an empty array.
-        return { data: [] };
-      }
-    });
-
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
       data: [
         {
           data: {
             id: 1,
-            type: "thermocyclerprofile"
+            type: "thermocyclerprofile",
           },
           status: 201
         }
@@ -162,7 +160,6 @@ describe("PcrProfile edit page", () => {
     // Wait for the profile form to load.
     await Promise.resolve();
     wrapper.update();
-
     // // Check that the existing profile's app value is in the field.
     expect(wrapper.find(".application-field input").prop("value")).toEqual(
       "PCR of ITS regions"
@@ -213,7 +210,7 @@ describe("PcrProfile edit page", () => {
   });
 });
 
-/** Test Profile with all fields defined. Taken from SeqDB sample data. */
+/** Test Profile with all fields defined. */
 const TEST_PROFILE: Required<PcrProfile> = {
   type: "thermocyclerprofile",
   application: "PCR of ITS regions",
