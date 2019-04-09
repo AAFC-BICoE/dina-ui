@@ -52,7 +52,7 @@ describe("ResourceSelect component", () => {
     jest.clearAllMocks();
   });
 
-  it("Renders initially with a loading indicator.", () => {
+  it("Renders initially with a loading indicator and placeholder message.", () => {
     const wrapper = mountWithContext(
       <ResourceSelect {...DEFAULT_SELECT_PROPS} />
     );
@@ -71,8 +71,10 @@ describe("ResourceSelect component", () => {
 
     const options = (wrapper.find(Select).props() as any).options;
 
-    expect(options.length).toEqual(3);
+    // There should be 4 options including the <none> option.
+    expect(options.length).toEqual(4);
     expect(options.map(option => option.label)).toEqual([
+      "<none>",
       "todo 1",
       "todo 2",
       "todo 3"
@@ -93,8 +95,8 @@ describe("ResourceSelect component", () => {
     const selectProps = wrapper.find(Select).props();
     const { options, onChange } = selectProps;
 
-    // Select the third option
-    onChange(options[2]);
+    // Select the third option (excluding the <none option>).
+    onChange(options[3]);
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).lastCalledWith({
@@ -159,11 +161,10 @@ describe("ResourceSelect component", () => {
       <ResourceSelect {...DEFAULT_SELECT_PROPS} filter={filter} />
     );
 
+    const { onInputChange } = wrapper.find(Select).props();
+
     // Simulate the select component's input change.
-    (wrapper.find(Select).props() as any).onInputChange(
-      "test filter value",
-      "input-change"
-    );
+    onInputChange("test filter value", "input-change");
 
     // Wait for the options to load.
     await Promise.resolve();
@@ -177,6 +178,15 @@ describe("ResourceSelect component", () => {
         description: "test filter value"
       }
     });
+
+    const { options } = wrapper.find(Select).props();
+
+    // The <none> option should be hidden when a search value is specified.
+    expect(options).toEqual([
+      { label: "todo 1", value: { id: 1, name: "todo 1", type: "todo" } },
+      { label: "todo 2", value: { id: 2, name: "todo 2", type: "todo" } },
+      { label: "todo 3", value: { id: 3, name: "todo 3", type: "todo" } }
+    ]);
   });
 
   it("Provides a 'value' prop to specify the select's value.", () => {
@@ -200,5 +210,35 @@ describe("ResourceSelect component", () => {
         type: "todo"
       }
     });
+  });
+
+  it("Provides a <none> option to set the relationship as null.", async () => {
+    const mockOnChange = jest.fn();
+
+    const wrapper = mountWithContext(
+      <ResourceSelect {...DEFAULT_SELECT_PROPS} onChange={mockOnChange} />
+    );
+
+    // Wait for the options to load.
+    await Promise.resolve();
+    wrapper.update();
+
+    const { options, onChange } = wrapper.find(Select).props();
+
+    const nullOption = options[0];
+
+    expect(nullOption).toEqual({
+      label: "<none>",
+      value: {
+        id: null
+      }
+    });
+
+    // Select the null option.
+    onChange(nullOption);
+
+    // This should call the onChange prop function with { id: null }.
+    expect(mockOnChange).toHaveBeenCalledTimes(1);
+    expect(mockOnChange).lastCalledWith({ id: null });
   });
 });

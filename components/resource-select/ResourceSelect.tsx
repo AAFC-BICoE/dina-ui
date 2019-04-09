@@ -30,6 +30,9 @@ export interface ResourceSelectProps<TData> {
   sort?: string;
 }
 
+/** An option the user can select to set the relationship to null. */
+const NULL_OPTION = { label: "<none>", value: { id: null } };
+
 /** Dropdown select input for selecting a resource from the API. */
 export function ResourceSelect<TData extends KitsuResource>({
   filter,
@@ -59,10 +62,15 @@ export function ResourceSelect<TData extends KitsuResource>({
     const { data } = await apiClient.get(model, getParams);
 
     // Build the list of options from the returned resources.
-    const options = data.map(resource => ({
+    const resourceOptions = data.map(resource => ({
       label: optionLabel(resource),
       value: resource
     }));
+
+    // Only show the null option when there is no search input value.
+    const options = inputValue
+      ? resourceOptions
+      : [NULL_OPTION, ...resourceOptions];
 
     callback(options);
   }
@@ -73,17 +81,19 @@ export function ResourceSelect<TData extends KitsuResource>({
   }, 250);
 
   // Set the component's value externally when used as a controlled input.
-  const selectedValue = value
-    ? { label: optionLabel(value), value }
-    : undefined;
+  const selectedValue = !value
+    ? undefined
+    : value.id === null
+    ? NULL_OPTION
+    : { label: optionLabel(value), value };
 
   return (
     <AsyncSelect
-      value={selectedValue as any}
       defaultOptions={true}
       loadOptions={debouncedOptionLoader}
       onChange={({ value }) => onChange(value)}
       placeholder="Type here to search."
+      value={selectedValue as any}
     />
   );
 }
