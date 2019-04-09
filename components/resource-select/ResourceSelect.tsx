@@ -1,4 +1,4 @@
-import { FilterParam, GetParams, KitsuResource, KitsuResponse } from "kitsu";
+import { FilterParam, GetParams, KitsuResource } from "kitsu";
 import { debounce, omitBy } from "lodash";
 import React from "react";
 import { Async as AsyncSelect } from "react-select";
@@ -44,7 +44,9 @@ export class ResourceSelect<
     const { value, optionLabel } = this.props;
 
     // Debounces the loadOptions function to avoid sending excessive API requests.
-    const debouncedOptionLoader = debounce(this.loadOptions, 250);
+    const debouncedOptionLoader = debounce((inputValue, callback) => {
+      this.loadOptions(inputValue, callback);
+    }, 250);
 
     // Set the component's value externally when used as a controlled input.
     const selectedValue = value
@@ -62,10 +64,10 @@ export class ResourceSelect<
   }
 
   /** Loads options by getting a list of resources from the back-end API. */
-  private loadOptions = (
+  private async loadOptions(
     inputValue: string,
-    callback: ((options: OptionsType<any>) => void)
-  ) => {
+    callback: (options: OptionsType<any>) => void
+  ) {
     const { filter, include, optionLabel, model, sort } = this.props;
     const { apiClient } = this.context;
 
@@ -79,18 +81,16 @@ export class ResourceSelect<
     );
 
     // Send the API request.
-    apiClient.get(model, getParams).then((response: KitsuResponse<TData[]>) => {
-      const { data } = response;
+    const { data } = await apiClient.get(model, getParams);
 
-      // Build the list of options from the returned resources.
-      const options = data.map(resource => ({
-        label: optionLabel(resource),
-        value: resource
-      }));
+    // Build the list of options from the returned resources.
+    const options = data.map(resource => ({
+      label: optionLabel(resource),
+      value: resource
+    }));
 
-      callback(options);
-    });
-  };
+    callback(options);
+  }
 
   private onChange = option => {
     // When there is no onChange prop, do nothing.
