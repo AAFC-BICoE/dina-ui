@@ -41,7 +41,7 @@ export function FieldWrapper({
     <div className={className} data-tip data-for={datafor}>
       <div className={`form-group ${name}-field`}>
         <label>
-          <strong>{label}:</strong>
+          <strong>{label}</strong>
         </label>
         {children}
         {datafor &&
