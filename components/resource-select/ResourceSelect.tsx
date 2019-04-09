@@ -83,6 +83,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       defaultOptions={true}
       loadOptions={debouncedOptionLoader}
       onChange={({ value }) => onChange(value)}
+      placeholder="Type here to search."
     />
   );
 }
