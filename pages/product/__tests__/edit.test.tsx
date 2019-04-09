@@ -1,22 +1,14 @@
 import { OperationsResponse } from "components/api-client/jsonapi-types";
 import { mount } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
-import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
-import { PcrPrimerEditPage } from "../edit";
+import { Product } from "../../../types/seqdb-api/resources/Product";
+import { ProductEditPage } from "../edit";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async model => {
-  if (model === "pcrPrimer/100") {
-    // The request for the primer returns the test primer.
-    return { data: TEST_PRIMER };
-  } else {
-    // Requests for the selectable resources (linked group, region, etc.) return an empty array.
-    return { data: [] };
-  }
-});
+const mockGet = jest.fn();
 
 /** Mock axios for operations requests. */
 const mockPatch = jest.fn();
@@ -44,18 +36,18 @@ function mountWithContext(element: JSX.Element) {
   );
 }
 
-describe("PcrPrimer edit page", () => {
+describe("Product edit page", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
-  it("Provides a form to add a PcrPrimer.", done => {
+  it("Provides a form to add a Product.", done => {
     mockPatch.mockReturnValueOnce({
       data: [
         {
           data: {
             id: 1,
-            type: "pcrPrimer"
+            type: "product"
           },
           status: 201
         }
@@ -63,12 +55,12 @@ describe("PcrPrimer edit page", () => {
     });
 
     const wrapper = mountWithContext(
-      <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} />
+      <ProductEditPage router={{ query: {}, push: mockPush } as any} />
     );
 
-    // Edit the primer name.
+    // Edit the product name.
     wrapper.find(".name-field input").simulate("change", {
-      target: { name: "name", value: "New PcrPrimer" }
+      target: { name: "name", value: "New Product" }
     });
 
     // Submit the form.
@@ -80,24 +72,22 @@ describe("PcrPrimer edit page", () => {
         [
           {
             op: "POST",
-            path: "pcrPrimer",
+            path: "product",
             value: {
               attributes: {
-                lotNumber: 1,
-                name: "New PcrPrimer",
-                seq: "",
-                type: "PRIMER"
+                name: "New Product",
+                type: undefined
               },
               id: -100,
-              type: "pcrPrimer"
+              type: "product"
             }
           }
         ],
         expect.anything()
       );
 
-      // The user should be redirected to the new primer's details page.
-      expect(mockPush).lastCalledWith("/pcr-primer/view?id=1");
+      // The user should be redirected to the new product's details page.
+      expect(mockPush).lastCalledWith("/product/view?id=1");
       done();
     });
   });
@@ -120,8 +110,13 @@ describe("PcrPrimer edit page", () => {
     }));
 
     const wrapper = mountWithContext(
-      <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} />
+      <ProductEditPage router={{ query: {}, push: mockPush } as any} />
     );
+
+    // Edit the product name.
+    wrapper.find(".name-field input").simulate("change", {
+      target: { name: "name", value: "invalid name" }
+    });
 
     // Submit the form.
     wrapper.find("form").simulate("submit");
@@ -136,14 +131,25 @@ describe("PcrPrimer edit page", () => {
     });
   });
 
-  it("Provides a form to edit a PcrPrimer.", async done => {
+  it("Provides a form to edit a Product.", async done => {
+    // The get request will return the existing product.
+    mockGet.mockImplementation(async model => {
+      if (model === "product/10") {
+        // The request for the product returns the test product.
+        return { data: TEST_PRODUCT };
+      } else {
+        // Requests for the selectable resources (linked group) return an empty array.
+        return { data: [] };
+      }
+    });
+
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
       data: [
         {
           data: {
-            id: 1,
-            type: "pcrPrimer"
+            id: 10,
+            type: "product"
           },
           status: 201
         }
@@ -151,26 +157,27 @@ describe("PcrPrimer edit page", () => {
     });
 
     const wrapper = mountWithContext(
-      <PcrPrimerEditPage
-        router={{ query: { id: 100 }, push: mockPush } as any}
-      />
+      <ProductEditPage router={{ query: { id: 10 }, push: mockPush } as any} />
     );
 
     // The page should load initially with a loading spinner.
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
 
-    // Wait for the primer form to load.
+    // Wait for the product form to load.
     await Promise.resolve();
     wrapper.update();
 
-    // // Check that the existing primer's seq value is in the field.
-    expect(wrapper.find(".seq-field input").prop("value")).toEqual(
-      "ACTACGATCAGCATCGATG"
+    // // Check that the existing product's name value is in the field.
+    expect(wrapper.find(".name-field input").prop("value")).toEqual(
+      "Rapid Alkaline DNA Extraction"
     );
 
-    // Modify the "designedBy" value.
-    wrapper.find(".seq-field input").simulate("change", {
-      target: { name: "seq", value: "new seq value" }
+    // Modify the "description" value.
+    wrapper.find(".description-field input").simulate("change", {
+      target: {
+        name: "description",
+        value: "new desc for product 10, was a null value"
+      }
     });
 
     // Submit the form.
@@ -184,81 +191,44 @@ describe("PcrPrimer edit page", () => {
         [
           {
             op: "PATCH",
-            path: "pcrPrimer/1",
+            path: "product/10",
             value: {
               attributes: expect.objectContaining({
-                application: null,
-                name: "ITS1",
-                seq: "new seq value"
+                name: "Rapid Alkaline DNA Extraction",
+                description: "new desc for product 10, was a null value"
               }),
-              id: "1",
+              id: "10",
               relationships: {
                 group: {
                   data: expect.objectContaining({ id: "8", type: "group" })
-                },
-                region: {
-                  data: expect.objectContaining({ id: "2", type: "region" })
                 }
               },
-              type: "pcrPrimer"
+              type: "product"
             }
           }
         ],
         expect.anything()
       );
 
-      // The user should be redirected to the existing primer's details page.
-      expect(mockPush).lastCalledWith("/pcr-primer/view?id=1");
+      // The user should be redirected to the existing product's details page.
+      expect(mockPush).lastCalledWith("/product/view?id=10");
       done();
     });
   });
 });
 
-/** Test Primer with all fields defined. Taken from SeqDB sample data. */
-const TEST_PRIMER: Required<PcrPrimer> = {
-  application: null,
-  dateOrdered: null,
-  designDate: null,
-  designedBy: "Bob Jones",
-  direction: "R",
+/** Test Product with all fields defined. */
+const TEST_PRODUCT: Required<Product> = {
+  description: "desc",
   group: {
-    description: null,
+    description: "group desc",
     groupName: "Public",
     id: "8",
     type: "group"
   },
-  id: "1",
-  lastModified: "2013-03-19T04:00:00.000+0000",
-  lotNumber: 1,
-  name: "ITS1",
-  note: "ITS4 primer hybridizes at the 5' end of the 28S gene region.",
-  position: null,
-  purification: "none",
-  reference: null,
-  referenceSeqDir: null,
-  referenceSeqFile: null,
-  region: {
-    description: "ITS Region Amplification",
-    id: "2",
-    name: "Internal Transcribed Spacer",
-    symbol: "ITS",
-    type: "region"
-  },
-  restrictionSite: "600",
-  seq: "ACTACGATCAGCATCGATG",
-  stockConcentration: "10",
-  storage: null,
-  supplier: null,
-  targetSpecies: null,
-  tmCalculated: "55",
-  tmPe: null,
-  type: "PRIMER",
-  urllink: null,
-  used4cloning: true,
-  used4genotyping: false,
-  used4nestedPcr: false,
-  used4qrtpcr: false,
-  used4sequencing: true,
-  used4stdPcr: true,
-  version: null
+  id: "10",
+  lastModified: "2019-03-27T04:00:00.000+0000",
+  name: "Rapid Alkaline DNA Extraction",
+  type: "product",
+  upc: "Universal product code"
 };

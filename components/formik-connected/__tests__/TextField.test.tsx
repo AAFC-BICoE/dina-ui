@@ -15,7 +15,7 @@ describe("TextField component", () => {
       </Formik>
     );
 
-    expect(wrapper.find("label").text()).toEqual("Test Object Test Field:");
+    expect(wrapper.find("label").text()).toEqual("Test Object Test Field");
     expect((wrapper.find("input").instance() as any).value).toEqual(
       "initial value"
     );
