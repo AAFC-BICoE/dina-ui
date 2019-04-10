@@ -77,4 +77,26 @@ describe("serialize function", () => {
       type: "keyboard"
     });
   });
+
+  it("Converts an { id: null } object to a null JSONAPI relationship.", async () => {
+    const person: Person = {
+      id: "5",
+      name: "Mat",
+      relatedPerson: { id: null, type: "person" },
+      type: "person"
+    };
+
+    const serialized = await serialize({ resource: person, type: "person" });
+
+    expect(serialized).toEqual({
+      attributes: {
+        name: "Mat"
+      },
+      id: "5",
+      relationships: {
+        relatedPerson: { data: null }
+      },
+      type: "person"
+    });
+  });
 });

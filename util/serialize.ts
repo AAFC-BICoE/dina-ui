@@ -51,8 +51,8 @@ export async function serialize<TData extends KitsuResource>({
     data.attributes.type = resourceCopy.type;
   }
 
-  // Add the null relationships to the JSONAPI document.
-  if (data.relationships) {
+  // Add the null relationships to the JSONAPI document if there are any.
+  if (Object.keys(nullRelationships).length) {
     data.relationships = { ...data.relationships, ...nullRelationships };
   }
 
