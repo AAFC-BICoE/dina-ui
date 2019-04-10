@@ -9,8 +9,8 @@
     "next": "next",
     "proxy": "micro-proxy -r ./dev-proxy-config.json -p 8000",
     "start": "next start",
-    "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test": "tsc && jest",
+    "test:coverage": "tsc && jest --coverage"
   },
   "dependencies": {
     "@molgenis/rsql": "^0.1.1",
@@ -20,10 +20,11 @@
     "bootswatch": "^4.2.1",
     "formik": "^1.5.1",
     "kitsu": "^6.5.1",
+    "kitsu-core": "^7.0.0",
     "lodash": "^4.17.11",
     "next": "^7.0.2",
-    "react": "^16.7.0",
-    "react-dom": "^16.7.0",
+    "react": "^16.8.3",
+    "react-dom": "^16.8.3",
     "react-select": "^2.3.0",
     "react-table": "6.8.6",
     "title-case": "^2.1.1"
@@ -35,8 +36,8 @@
     "@types/lodash": "^4.14.119",
     "@types/next": "^7.0.6",
     "@types/node": "^10.12.18",
-    "@types/react": "^16.7.18",
-    "@types/react-dom": "^16.0.11",
+    "@types/react": "^16.8.4",
+    "@types/react-dom": "^16.8.2",
     "@types/react-select": "^2.0.11",
     "@types/react-table": "^6.7.21",
     "@types/react-test-renderer": "^16.0.3",

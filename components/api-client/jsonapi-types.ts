@@ -6,12 +6,17 @@ export interface JsonApiResponse {
   status: 201;
 }
 
+/** A JSONAPI relationship entry. */
+export interface JsonApiRelationship {
+  data: JsonApiResource;
+}
+
 /** A single entity in JSONAPI format. */
 export interface JsonApiResource {
   id: number | string;
   type: string;
   attributes?: any;
-  relationships?: any;
+  relationships?: { [key: string]: JsonApiRelationship };
 }
 
 /**

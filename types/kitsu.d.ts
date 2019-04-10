@@ -76,7 +76,7 @@ declare module "kitsu" {
 
   /** JSONAPI resource base attributes. */
   export interface KitsuResource {
-    id: string;
+    id?: string;
     type: string;
   }
 }

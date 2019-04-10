@@ -1,0 +1,55 @@
+= Forms
+
+Forms can be made in this app using https://jaredpalmer.com/formik/[Formik] .
+
+Our custom formik-integrated input field components can be found in /components/formik-connected.
+These inputs should be easily re-usable throughout the app.
+
+Example form that on submit either shows a success alert or an error message:
+[source,tsx]
+----
+import { Form, Formik, FormikActions } from "formik";
+import { ErrorViewer, SubmitButton, TextField } from "../components";
+
+export default function ExampleFormPage() {
+  function onSubmit(
+    submittedValues,
+    { setStatus, setSubmitting }: FormikActions<any>
+  ) {
+    try {
+      if (!submittedValues.name) {
+        throw "Name must be set.";
+      }
+
+      // This form just shows a success message. This could be a call to the back-end.
+      alert("success!");
+
+      // Setting status to null removes any error messages.
+      setStatus(null);
+
+      // Set submitting back to false, which will turn off any loading indicators.
+      setSubmitting(false);
+    } catch (error) {
+      // When an error occurs, you can set it as the form status, which will be rendered as an
+      // error message by <ErrorViewer />.
+      setStatus(error);
+
+      // Set submitting back to false, which will turn off any loading indicators.
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="card card-body" style={{ width: "1000px" }}>
+      <Formik initialValues={{}} onSubmit={onSubmit}>
+        <Form>
+          <ErrorViewer />
+          <TextField name="name" />
+          <TextField name="description" />
+          <SubmitButton />
+        </Form>
+      </Formik>
+    </div>
+  );
+}
+----
