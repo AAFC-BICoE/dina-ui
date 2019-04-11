@@ -45,6 +45,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
       <div className="list-inline">
         <div className="list-inline-item" style={{ width: 320 }}>
           <Select
+            className="filter-attribute"
             instanceId={`attribute_${model.id}`}
             options={this.mappedfilterAttributes}
             onChange={this.onPropertyChanged}
@@ -53,6 +54,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
         </div>
         <div className="list-inline-item" style={{ width: 120 }}>
           <Select
+            className="filter-predicate"
             instanceId={`predicate_${model.id}`}
             options={[
               { label: "IS", value: "IS" },
@@ -69,6 +71,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
         />
         <div className="list-inline-item" style={{ width: 180 }}>
           <Select
+            className="filter-search-type"
             instanceId={`searchType_${model.id}`}
             options={searchTypes}
             onChange={this.onSearchTypeChanged}

@@ -1,5 +1,9 @@
 import { mount } from "enzyme";
-import { ApiClientContext, createContextValue } from "../../../components";
+import {
+  ApiClientContext,
+  createContextValue,
+  QueryTable
+} from "../../../components";
 import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 import PcrPrimerListPage from "../list";
 
@@ -59,5 +63,33 @@ describe("PcrPrimer list page", () => {
     // Check that the table contains the links to primer details pages.
     expect(wrapper.containsMatchingElement(<a>Test Primer 1</a>)).toEqual(true);
     expect(wrapper.containsMatchingElement(<a>Test Primer 2</a>)).toEqual(true);
+  });
+
+  it("Allows a filterable search.", async done => {
+    const wrapper = mountWithContext(<PcrPrimerListPage />);
+
+    // Wait for the default search to finish.
+    await Promise.resolve();
+    wrapper.update();
+
+    // Enter a search value.
+    wrapper
+      .find("input.filter-value")
+      .simulate("change", { target: { value: "101F" } });
+
+    // Submit the search form.
+    wrapper.find("form").simulate("submit");
+
+    setImmediate(() => {
+      wrapper.update();
+      expect(mockGet).lastCalledWith(
+        "pcrPrimer",
+        expect.objectContaining({ filter: { rsql: "name==*101F*" } })
+      );
+      expect(wrapper.find(QueryTable).props().filter).toEqual({
+        rsql: "name==*101F*"
+      });
+      done();
+    });
   });
 });

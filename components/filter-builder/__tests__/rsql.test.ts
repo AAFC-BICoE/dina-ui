@@ -1,3 +1,4 @@
+import { FilterGroupModel } from "../FilterGroup";
 import { rsql } from "../rsql";
 
 describe("rsql conversion", () => {
@@ -49,5 +50,45 @@ describe("rsql conversion", () => {
   it("Returns a blank string when no filter is passed.", () => {
     const rsqlFilter = rsql(null);
     expect(rsqlFilter).toEqual("");
+  });
+
+  it("Surrounds the filter value with asterisks when a partial match is requested.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: "name",
+          id: 1,
+          predicate: "IS",
+          searchType: "PARTIAL_MATCH",
+          type: "FILTER_ROW",
+          value: "101F"
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+    const rsqlFilter = rsql(model);
+    expect(rsqlFilter).toEqual("name==*101F*");
+  });
+
+  it("Leaves the filter attribute as is when an exact match is requested.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: "name",
+          id: 1,
+          predicate: "IS",
+          searchType: "EXACT_MATCH",
+          type: "FILTER_ROW",
+          value: "101F"
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+    const rsqlFilter = rsql(model);
+    expect(rsqlFilter).toEqual("name==101F");
   });
 });

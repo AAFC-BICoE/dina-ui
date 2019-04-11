@@ -1,6 +1,6 @@
 import { mount } from "enzyme";
 import Select from "react-select/lib/Select";
-import { FilterRow, FilterRowModel } from "../FilterRow";
+import { FilterRow } from "../FilterRow";
 
 describe("FilterRow component", () => {
   const mockOnChange = jest.fn();
@@ -13,7 +13,7 @@ describe("FilterRow component", () => {
   });
 
   function mountFilterRow() {
-    return mount(
+    return mount<FilterRow>(
       <FilterRow
         filterAttributes={["name", "description"]}
         model={{
@@ -38,8 +38,8 @@ describe("FilterRow component", () => {
 
     expect(
       wrapper
+        .find(".filter-attribute")
         .find(Select)
-        .first()
         .props().options
     ).toEqual([
       { label: "name", value: "name" },
@@ -52,8 +52,8 @@ describe("FilterRow component", () => {
 
     expect(
       wrapper
+        .find(".filter-predicate")
         .find(Select)
-        .at(1)
         .props().options
     ).toEqual([
       { label: "IS", value: "IS" },
@@ -63,11 +63,11 @@ describe("FilterRow component", () => {
 
   it("Changes the model's filter attribute when a new filter attribute is selected.", () => {
     const wrapper = mountFilterRow();
-    const model: FilterRowModel = wrapper.props().model;
+    const model = wrapper.props().model;
 
     wrapper
+      .find(".filter-attribute")
       .find(Select)
-      .first()
       .props()
       .onChange({ value: "description" });
 
@@ -76,12 +76,11 @@ describe("FilterRow component", () => {
 
   it("Changes the model's predicate when a new predicate is selected.", () => {
     const wrapper = mountFilterRow();
-    const model: FilterRowModel = wrapper.props().model;
+    const model = wrapper.props().model;
 
     wrapper
+      .find(".filter-predicate")
       .find(Select)
-      // Get the second Select.
-      .at(1)
       .props()
       .onChange({ value: "IS NOT" });
 
@@ -90,13 +89,28 @@ describe("FilterRow component", () => {
 
   it("Changes the model's filter value when the filter value is changed.", () => {
     const wrapper = mountFilterRow();
-    const model: FilterRowModel = wrapper.props().model;
+    const model = wrapper.props().model;
 
     wrapper
       .find("input.filter-value")
       .simulate("change", { target: { value: "101F" } });
 
     expect(model.value).toEqual("101F");
+  });
+
+  it("Changes the model's searchType value when the search type is changed.", () => {
+    const wrapper = mountFilterRow();
+    const model = wrapper.props().model;
+
+    expect(model.searchType).toEqual("PARTIAL_MATCH");
+
+    wrapper
+      .find(".filter-search-type")
+      .find(Select)
+      .props()
+      .onChange({ value: "EXACT_MATCH" });
+
+    expect(model.searchType).toEqual("EXACT_MATCH");
   });
 
   it("Provides a prop to show or hide the remove button.", async () => {
@@ -118,16 +132,16 @@ describe("FilterRow component", () => {
 
     // Change the filtered field.
     wrapper
+      .find(".filter-attribute")
       .find(Select)
-      .first()
       .props()
       .onChange({ value: "description" });
     expect(mockOnChange).toHaveBeenCalledTimes(1);
 
     // Change the filter predicate (IS / IS NOT).
     wrapper
+      .find(".filter-predicate")
       .find(Select)
-      .at(1)
       .props()
       .onChange({ value: "IS NOT" });
     expect(mockOnChange).toHaveBeenCalledTimes(2);
@@ -137,5 +151,12 @@ describe("FilterRow component", () => {
       .find("input.filter-value")
       .simulate("change", { target: { value: "101F" } });
     expect(mockOnChange).toHaveBeenCalledTimes(3);
+
+    wrapper
+      .find(".filter-search-type")
+      .find(Select)
+      .props()
+      .onChange({ value: "EXACT_MATCH" });
+    expect(mockOnChange).toHaveBeenCalledTimes(4);
   });
 });
