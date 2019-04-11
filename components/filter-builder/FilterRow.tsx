@@ -2,12 +2,14 @@ import React from "react";
 import Select from "react-select";
 
 export type FilterRowPredicate = "IS" | "IS NOT";
+export type FilterRowSearchType = "PARTIAL_MATCH" | "EXACT_MATCH";
 
 export interface FilterRowModel {
   id: number;
   type: "FILTER_ROW";
   attribute: string;
   predicate: FilterRowPredicate;
+  searchType: FilterRowSearchType;
   value: string;
 }
 
@@ -30,6 +32,14 @@ export class FilterRow extends React.Component<FilterRowProps> {
       onOrClick,
       showRemoveButton
     } = this.props;
+
+    const searchTypes: Array<{
+      label: string;
+      value: FilterRowSearchType;
+    }> = [
+      { label: "Partial Match", value: "PARTIAL_MATCH" },
+      { label: "Exact Match", value: "EXACT_MATCH" }
+    ];
 
     return (
       <div className="list-inline">
@@ -57,6 +67,16 @@ export class FilterRow extends React.Component<FilterRowProps> {
           value={model.value}
           onChange={this.onValueChanged}
         />
+        <div className="list-inline-item" style={{ width: 180 }}>
+          <Select
+            instanceId={`searchType_${model.id}`}
+            options={searchTypes}
+            onChange={this.onSearchTypeChanged}
+            value={searchTypes.find(
+              option => option.value === model.searchType
+            )}
+          />
+        </div>
         <div className="filter-row-buttons list-inline-item">
           <button
             className="list-inline-item btn btn-primary"
@@ -101,6 +121,15 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
   private onPredicateChanged = (value: { label: string; value: string }) => {
     this.props.model.predicate = value.value as FilterRowPredicate;
+    this.props.onChange();
+    this.forceUpdate();
+  };
+
+  private onSearchTypeChanged = (value: {
+    label: string;
+    value: FilterRowSearchType;
+  }) => {
+    this.props.model.searchType = value.value;
     this.props.onChange();
     this.forceUpdate();
   };

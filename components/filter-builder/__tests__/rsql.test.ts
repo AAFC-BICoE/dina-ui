@@ -10,6 +10,7 @@ describe("rsql conversion", () => {
               attribute: "name",
               id: 1,
               predicate: "IS",
+              searchType: "EXACT_MATCH",
               type: "FILTER_ROW",
               value: "101F"
             },
@@ -17,6 +18,7 @@ describe("rsql conversion", () => {
               attribute: "group.groupName",
               id: 3,
               predicate: "IS",
+              searchType: "EXACT_MATCH",
               type: "FILTER_ROW",
               value: "poffm"
             }
@@ -29,6 +31,7 @@ describe("rsql conversion", () => {
           attribute: "name",
           id: 5,
           predicate: "IS NOT",
+          searchType: "EXACT_MATCH",
           type: "FILTER_ROW",
           value: "1075R"
         }

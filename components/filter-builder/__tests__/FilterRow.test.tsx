@@ -20,6 +20,7 @@ describe("FilterRow component", () => {
           attribute: "name",
           id: 1,
           predicate: "IS",
+          searchType: "PARTIAL_MATCH",
           type: "FILTER_ROW",
           value: ""
         }}

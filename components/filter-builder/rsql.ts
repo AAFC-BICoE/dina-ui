@@ -32,10 +32,13 @@ function toGroup(filterGroup: FilterGroupModel) {
 
 /** Converts a FilterRowModel to an RSQL expression. */
 function toPredicate(filterRow: FilterRowModel) {
-  const { attribute, predicate, value } = filterRow;
+  const { attribute, predicate, searchType, value } = filterRow;
+
+  // Surround the search value with asterisks if this is a partial match.
+  const searchValue = searchType === "PARTIAL_MATCH" ? `*${value}*` : value;
 
   return {
-    arguments: value,
+    arguments: searchValue,
     comparison: predicate === "IS NOT" ? "!=" : "==",
     selector: attribute
   };

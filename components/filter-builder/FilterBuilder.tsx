@@ -30,15 +30,16 @@ export class FilterBuilder extends React.Component<
    */
   private filterIdIncrementor = 0;
 
-  constructor(props) {
+  constructor(props: FilterBuilderProps) {
     super(props);
     this.state = {
       model: {
         children: [
           {
-            attribute: "name",
+            attribute: props.filterAttributes[0],
             id: this.getNewFilterId(),
             predicate: "IS",
+            searchType: "PARTIAL_MATCH",
             type: "FILTER_ROW",
             value: ""
           }
@@ -91,9 +92,10 @@ export class FilterBuilder extends React.Component<
     operator: FilterGroupOperator;
   }) {
     const newFilterRow: FilterRowModel = {
-      attribute: "name",
+      attribute: this.props.filterAttributes[0],
       id: this.getNewFilterId(),
       predicate: "IS",
+      searchType: "PARTIAL_MATCH",
       type: "FILTER_ROW",
       value: ""
     };
