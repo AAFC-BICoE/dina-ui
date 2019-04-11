@@ -1,0 +1,6 @@
+{
+    "change-locale": "Change locale fr",
+    "error-with-status": "A {{statusCode}} error occurred on server fr",
+    "error-without-status": "An error occurred on the server fr",
+    "Sequence Database": "Sequence Database Fr"
+}

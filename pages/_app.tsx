@@ -1,13 +1,15 @@
 import App, { Container } from "next/app";
 import React from "react";
 import { ApiClientContext, createContextValue } from "../components";
+import { appWithTranslation } from '../i18n'
+//import { nextI18Next } from '../i18n'
 
 /**
  * App component that wraps every page component.
  *
  * See: https://github.com/zeit/next.js/#custom-app
  */
-export default class SeqdbUiApp extends App {
+class SeqdbUiApp extends App {
   private contextValue = createContextValue();
 
   public render() {
@@ -22,3 +24,6 @@ export default class SeqdbUiApp extends App {
     );
   }
 }
+
+
+export default appWithTranslation(SeqdbUiApp) 
