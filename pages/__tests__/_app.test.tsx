@@ -6,13 +6,16 @@ import { createRenderer } from "react-test-renderer/shallow";
 import { ApiClientContext } from "../../components/api-client/ApiClientContext";
 import SeqdbUiApp from "../_app";
 
-jest.mock("next/router", () => ({}));
+jest.mock("next/router", () => ({
+  withRouter: () => ({})
+}));
 
 describe("SeqdbUiApp", () => {
   it("Renders the App wrapper.", () => {
     const TestComponent: FunctionComponent = () => <div />;
 
     const shallowRender = createRenderer().render(
+
       <SeqdbUiApp
         router={Router}
         pageProps={{ exampleProp: "exampleValue" }}

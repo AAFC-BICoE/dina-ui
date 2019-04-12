@@ -2,8 +2,7 @@ import Link from "next/link";
 import React from 'react';
 import { ColumnDefinition, Head, Nav, QueryTable } from "../../components";
 import { Product } from "../../types/seqdb-api/resources/Product";
-import PropTypes from 'prop-types'
-import { withNamespaces } from '../../i18n'
+import { withNamespaces, Trans } from '../../i18n'
 
 const PRODUCT_TABLE_COLUMNS: Array<ColumnDefinition<Product>> = [
   {
@@ -31,18 +30,18 @@ class ProductListPage extends React.Component {
   static async getInitialProps() {
     return {
       namespacesRequired: ['product']
+
     }
   }
   render() {
-    const { t } = this.props
     return (
       <div>
         <Head title="Product Inventory" />
         <Nav />
         <div className="container-fluid">
-          <h1>{t('Product Inventory')}</h1>
+          <h1><Trans i18nKey='Product Inventory' /></h1>
           <Link href="/product/edit" prefetch={true}>
-            <a>{t('Add New Product')}</a>
+            <a><Trans i18nKey='Add New Product' /></a>
           </Link>
           <QueryTable<Product>
             columns={PRODUCT_TABLE_COLUMNS}
@@ -53,10 +52,6 @@ class ProductListPage extends React.Component {
       </div>
     );
   }
-}
-
-ProductListPage.propTypes = {
-  t: PropTypes.func.isRequired,
 }
 
 export default withNamespaces('product')(ProductListPage)
