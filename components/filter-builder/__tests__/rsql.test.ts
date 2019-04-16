@@ -91,4 +91,46 @@ describe("rsql conversion", () => {
     const rsqlFilter = rsql(model);
     expect(rsqlFilter).toEqual("name==101F");
   });
+
+  it("Allows a filter for blank fields.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: "description",
+          id: 1,
+          predicate: "IS",
+          searchType: "BLANK_FIELD",
+          type: "FILTER_ROW",
+          value: "this attribute shouldn't matter"
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const rsqlFilter = rsql(model);
+    expect(rsqlFilter).toEqual("description==null,description==''");
+  });
+
+  it("Allows a filter for NOT blank fields.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: "description",
+          id: 1,
+          predicate: "IS NOT",
+          searchType: "BLANK_FIELD",
+          type: "FILTER_ROW",
+          value: "this attribute shouldn't matter"
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const rsqlFilter = rsql(model);
+    expect(rsqlFilter).toEqual("description!=null;description!=''");
+  });
 });

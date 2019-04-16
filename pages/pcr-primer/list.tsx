@@ -35,6 +35,22 @@ const PCRPRIMER_TABLE_COLUMNS: Array<ColumnDefinition<PcrPrimer>> = [
   "tmCalculated"
 ];
 
+const PCR_PRIMER_FILTER_ATTRIBUTES = [
+  "name",
+  "targetSpecies",
+  "application",
+  "puriication",
+  "direction",
+  "seq",
+  "length",
+  "tmCalculated",
+  "reference",
+  "supplier",
+  "dateDestroyed",
+  "region.name",
+  "group.name"
+];
+
 export default function PcrPrimerListPage() {
   const [filter, setFilter] = useState<FilterParam>();
 
@@ -55,7 +71,10 @@ export default function PcrPrimerListPage() {
         <Formik initialValues={{ filter: null }} onSubmit={onSubmit}>
           <Form>
             <h2>Search:</h2>
-            <FilterBuilderField name="filter" filterAttributes={["name"]} />
+            <FilterBuilderField
+              filterAttributes={PCR_PRIMER_FILTER_ATTRIBUTES}
+              name="filter"
+            />
             <button className="btn btn-primary" type="submit">
               Search
             </button>

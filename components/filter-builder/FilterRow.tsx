@@ -2,7 +2,10 @@ import React from "react";
 import Select from "react-select";
 
 export type FilterRowPredicate = "IS" | "IS NOT";
-export type FilterRowSearchType = "PARTIAL_MATCH" | "EXACT_MATCH";
+export type FilterRowSearchType =
+  | "PARTIAL_MATCH"
+  | "EXACT_MATCH"
+  | "BLANK_FIELD";
 
 export interface FilterRowModel {
   id: number;
@@ -38,7 +41,8 @@ export class FilterRow extends React.Component<FilterRowProps> {
       value: FilterRowSearchType;
     }> = [
       { label: "Partial Match", value: "PARTIAL_MATCH" },
-      { label: "Exact Match", value: "EXACT_MATCH" }
+      { label: "Exact Match", value: "EXACT_MATCH" },
+      { label: "Blank Field", value: "BLANK_FIELD" }
     ];
 
     return (
@@ -66,6 +70,10 @@ export class FilterRow extends React.Component<FilterRowProps> {
         </div>
         <input
           className="filter-value list-inline-item form-control w-auto d-inline-block"
+          style={{
+            visibility:
+              model.searchType === "BLANK_FIELD" ? "hidden" : undefined
+          }}
           value={model.value}
           onChange={this.onValueChanged}
         />

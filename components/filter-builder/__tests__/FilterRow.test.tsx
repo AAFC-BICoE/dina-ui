@@ -159,4 +159,26 @@ describe("FilterRow component", () => {
       .onChange({ value: "EXACT_MATCH" });
     expect(mockOnChange).toHaveBeenCalledTimes(4);
   });
+
+  it("Makes the text input invisible when the search type is 'Blank field'", () => {
+    const wrapper = mountFilterRow();
+
+    // The input is visible be default
+    expect(wrapper.find("input.filter-value").prop("style")).toEqual({
+      visibility: undefined
+    });
+
+    // Change the search type to "BLANK_FIELD".
+    wrapper
+      .find(".filter-search-type")
+      .find(Select)
+      .props()
+      .onChange({ value: "BLANK_FIELD" });
+    wrapper.update();
+
+    // The input should now be hidden.
+    expect(wrapper.find("input.filter-value").prop("style")).toEqual({
+      visibility: "hidden"
+    });
+  });
 });
