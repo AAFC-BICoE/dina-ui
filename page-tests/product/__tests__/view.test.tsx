@@ -1,18 +1,17 @@
 import { mount } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
+import { ProductDetailsPage } from "../../../pages/product/view";
 import { Product } from "../../../types/seqdb-api/resources/Product";
-import { ProductDetailsPage } from "../view";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);
 
-const TEST_PRODUCT: Product = 
-  {
-    group: { id: "1", groupName: "Test Group", type: "group" },
-    id: "4",
-    name: "Test Product 1",    
-    type: "product"
-  }
+const TEST_PRODUCT: Product = {
+  group: { id: "1", groupName: "Test Group", type: "group" },
+  id: "4",
+  name: "Test Product 1",
+  type: "product"
+};
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async () => {

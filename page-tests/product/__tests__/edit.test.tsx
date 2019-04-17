@@ -1,8 +1,8 @@
 import { OperationsResponse } from "components/api-client/jsonapi-types";
 import { mount } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
+import { ProductEditPage } from "../../../pages/product/edit";
 import { Product } from "../../../types/seqdb-api/resources/Product";
-import { ProductEditPage } from "../edit";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
