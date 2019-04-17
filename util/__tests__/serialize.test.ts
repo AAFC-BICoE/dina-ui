@@ -5,6 +5,7 @@ interface Person extends KitsuResource {
   name?: string;
   relatedPerson?: Person;
   links?: any;
+  relationships?: any;
 }
 
 interface Keyboard extends KitsuResource {
@@ -38,13 +39,14 @@ describe("serialize function", () => {
     });
   });
 
-  it("Removes the 'links' object when serializing.", async () => {
+  it("Removes the 'links' and 'relationships' attributes when serializing.", async () => {
     const resource: Person = {
       id: "1",
       links: {
         self: "http://example.com/people/1"
       },
       name: "Mat",
+      relationships: {},
       type: "person"
     };
 
