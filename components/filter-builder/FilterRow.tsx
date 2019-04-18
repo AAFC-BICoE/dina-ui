@@ -1,5 +1,6 @@
 import React from "react";
 import Select from "react-select";
+import titleCase from "title-case";
 
 export type FilterRowPredicate = "IS" | "IS NOT";
 export type FilterRowSearchType =
@@ -53,7 +54,10 @@ export class FilterRow extends React.Component<FilterRowProps> {
             instanceId={`attribute_${model.id}`}
             options={this.mappedfilterAttributes}
             onChange={this.onPropertyChanged}
-            value={{ label: model.attribute, value: model.attribute }}
+            value={{
+              label: titleCase(model.attribute),
+              value: model.attribute
+            }}
           />
         </div>
         <div className="list-inline-item" style={{ width: 120 }}>
@@ -119,7 +123,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
   get mappedfilterAttributes() {
     return this.props.filterAttributes.map(attr => ({
-      label: attr,
+      label: titleCase(attr),
       value: attr
     }));
   }

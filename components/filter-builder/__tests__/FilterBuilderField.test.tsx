@@ -29,8 +29,8 @@ describe("FilterBuilderField component", () => {
         .first()
         .props().options
     ).toEqual([
-      { label: "name", value: "name" },
-      { label: "group.groupName", value: "group.groupName" }
+      { label: "Name", value: "name" },
+      { label: "Group Group Name", value: "group.groupName" }
     ]);
   });
 

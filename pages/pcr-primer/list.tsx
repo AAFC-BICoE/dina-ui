@@ -39,16 +39,14 @@ const PCR_PRIMER_FILTER_ATTRIBUTES = [
   "name",
   "targetSpecies",
   "application",
-  "puriication",
+  "purification",
   "direction",
   "seq",
-  "length",
   "tmCalculated",
   "reference",
   "supplier",
-  "dateDestroyed",
   "region.name",
-  "group.name"
+  "group.groupName"
 ];
 
 export default function PcrPrimerListPage() {

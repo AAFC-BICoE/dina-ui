@@ -42,8 +42,8 @@ describe("FilterRow component", () => {
         .find(Select)
         .props().options
     ).toEqual([
-      { label: "name", value: "name" },
-      { label: "description", value: "description" }
+      { label: "Name", value: "name" },
+      { label: "Description", value: "description" }
     ]);
   });
 

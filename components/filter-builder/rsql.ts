@@ -1,4 +1,4 @@
-import { transformToRSQL } from "./@molgenis/rsql/rsql";
+import { transformToRSQL } from "@molgenis/rsql";
 import { FilterGroupModel } from "./FilterGroup";
 import { FilterRowModel } from "./FilterRow";
 
