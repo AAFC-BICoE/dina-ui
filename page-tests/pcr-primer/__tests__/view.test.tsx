@@ -1,23 +1,24 @@
 import { mount } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
-import { Product } from "../../../types/seqdb-api/resources/Product";
-import { ProductDetailsPage } from "../view";
+import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
+import { PcrPrimerDetailsPage } from "../../../pages/pcr-primer/view";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);
 
-const TEST_PRODUCT: Product = 
-  {
-    group: { id: "1", groupName: "Test Group", type: "group" },
-    id: "4",
-    name: "Test Product 1",    
-    type: "product"
-  }
+const TEST_PRIMER: PcrPrimer = {
+  group: { id: "1", groupName: "Test Group", type: "group" },
+  id: "5",
+  lotNumber: 1,
+  name: "Test Primer",
+  seq: "test seq",
+  type: "PRIMER"
+};
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async () => {
   return {
-    data: TEST_PRODUCT
+    data: TEST_PRIMER
   };
 });
 
@@ -30,7 +31,7 @@ jest.mock(
     }
 );
 
-describe("Product details page", () => {
+describe("PcrPrimer details page", () => {
   function mountWithContext(element: JSX.Element) {
     return mount(
       <ApiClientContext.Provider value={createContextValue()}>
@@ -41,15 +42,15 @@ describe("Product details page", () => {
 
   it("Renders initially with a loading spinner.", () => {
     const wrapper = mountWithContext(
-      <ProductDetailsPage router={{ query: { id: "100" } } as any} />
+      <PcrPrimerDetailsPage router={{ query: { id: "100" } } as any} />
     );
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
   });
 
-  it("Render the Product details", async () => {
+  it("Render the PCR primer details", async () => {
     const wrapper = mountWithContext(
-      <ProductDetailsPage router={{ query: { id: "100" } } as any} />
+      <PcrPrimerDetailsPage router={{ query: { id: "100" } } as any} />
     );
 
     // Wait for the page to load.
@@ -58,14 +59,14 @@ describe("Product details page", () => {
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
-    // The product's name should be rendered in a FieldView.
+    // The primer's name should be rendered in a FieldView.
     expect(
       wrapper.containsMatchingElement(
         <div>
           <label>
             <strong>Name</strong>
           </label>
-          <p>Test Product 1</p>
+          <p>Test Primer</p>
         </div>
       )
     ).toEqual(true);
