@@ -52,7 +52,6 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
                     <FieldView className="col-md-2" name="direction" />
                     <FieldView className="col-md-2" name="tmCalculated" />
                     <FieldView className="col-md-2" name="dateOrdered" />
-                    <FieldView className="col-md-2" name="dateDestroyed" />
                   </div>
                   <div className="row">
                     <FieldView
