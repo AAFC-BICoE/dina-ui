@@ -52,7 +52,7 @@ const PCR_PRIMER_FILTER_ATTRIBUTES = [
 export default function PcrPrimerListPage() {
   const [filter, setFilter] = useState<FilterParam>();
 
-  const onSubmit = (values, { setSubmitting }: FormikActions<any>) => {
+  function onSubmit(values, { setSubmitting }: FormikActions<any>) {
     setFilter({ rsql: rsql(values.filter) });
     setSubmitting(false);
   };

@@ -1,5 +1,9 @@
 import { mount } from "enzyme";
-import { ApiClientContext, createContextValue } from "../../../components";
+import {
+  ApiClientContext,
+  createContextValue,
+  QueryTable
+} from "../../../components";
 import { Product } from "../../../types/seqdb-api/resources/Product";
 import ProductListPage from "../list";
 
@@ -10,13 +14,13 @@ const TEST_PRODUCTS: Product[] = [
   {
     group: { id: "1", groupName: "Test Group", type: "group" },
     id: "4",
-    name: "Test Product 1",    
+    name: "Test Product 1",
     type: "PRODUCT"
   },
   {
     group: { id: "2", groupName: "Test Group", type: "group" },
     id: "5",
-    name: "Test Product 2",    
+    name: "Test Product 2",
     type: "PRODUCT"
   }
 ];
@@ -53,7 +57,39 @@ describe("Product list page", () => {
     wrapper.update();
 
     // Check that the table contains the links to product details pages.
-    expect(wrapper.containsMatchingElement(<a>Test Product 1</a>)).toEqual(true);
-    expect(wrapper.containsMatchingElement(<a>Test Product 2</a>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<a>Test Product 1</a>)).toEqual(
+      true
+    );
+    expect(wrapper.containsMatchingElement(<a>Test Product 2</a>)).toEqual(
+      true
+    );
+  });
+
+  it("Allows a filterable search.", async done => {
+    const wrapper = mountWithContext(<ProductListPage />);
+
+    // Wait for the default search to finish.
+    await Promise.resolve();
+    wrapper.update();
+
+    // Enter a search value.
+    wrapper
+      .find("input.filter-value")
+      .simulate("change", { target: { value: "omni" } });
+
+    // Submit the search form.
+    wrapper.find("form").simulate("submit");
+
+    setImmediate(() => {
+      wrapper.update();
+      expect(mockGet).lastCalledWith(
+        "product",
+        expect.objectContaining({ filter: { rsql: "name==*omni*" } })
+      );
+      expect(wrapper.find(QueryTable).props().filter).toEqual({
+        rsql: "name==*omni*"
+      });
+      done();
+    });
   });
 });
