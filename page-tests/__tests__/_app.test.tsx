@@ -1,26 +1,43 @@
+import { mount } from "enzyme";
 import Kitsu from "kitsu";
-import Router from "next/router";
 import { FunctionComponent } from "react";
-import { create } from "react-test-renderer";
-import { createRenderer } from "react-test-renderer/shallow";
 import { ApiClientContext } from "../../components/api-client/ApiClientContext";
 import SeqdbUiApp from "../../pages/_app";
 
-jest.mock("next/router", () => ({}));
+const mockPush = jest.fn();
+
+const mockRouter = {
+  asPath: "/example-path?a=b",
+  push: mockPush
+};
 
 describe("SeqdbUiApp", () => {
-  it("Renders the App wrapper.", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("Renders the App wrapper.", async () => {
     const TestComponent: FunctionComponent = () => <div />;
 
-    const shallowRender = createRenderer().render(
+    const wrapper = mount(
       <SeqdbUiApp
-        router={Router}
+        router={mockRouter as any}
         pageProps={{ exampleProp: "exampleValue" }}
         Component={TestComponent}
       />
     );
 
-    expect(shallowRender).toMatchSnapshot("SeqdbUiApp shallow render.");
+    // The first browser render should be empty.
+    expect(wrapper.html()).toEqual(null);
+
+    expect(mockPush).lastCalledWith("/example-path?a=b");
+    // Normally the router would update the app wrapper, but the mock doesn't, so we force a
+    // re-render in the test.
+    wrapper.instance().forceUpdate();
+    wrapper.update();
+
+    const innerComponent = wrapper.find(TestComponent);
+    expect(innerComponent.prop("exampleProp")).toEqual("exampleValue");
   });
 
   it("Provides the API context to child components.", done => {
@@ -37,12 +54,18 @@ describe("SeqdbUiApp", () => {
       );
     }
 
-    create(
+    const wrapper = mount(
       <SeqdbUiApp
-        router={Router}
-        pageProps={{ exampleProp: "exampleValue" }}
+        router={mockRouter as any}
+        pageProps={{}}
         Component={pageComponent}
       />
     );
+
+    expect(mockPush).lastCalledWith("/example-path?a=b");
+    // Normally the router would update the app wrapper, but the mock doesn't, so we force a
+    // re-render in the test.
+    wrapper.instance().forceUpdate();
+    wrapper.update();
   });
 });
