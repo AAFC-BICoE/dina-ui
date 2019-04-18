@@ -27,7 +27,7 @@ describe("DateField component", () => {
     );
   });
 
-  it("Sisplay a null date field as a blank input.", () => {
+  it("Display a null date field as a blank input.", () => {
     const wrapper = getWrapper(null);
 
     expect(wrapper.find(".testField-field input").prop("value")).toEqual("");
