@@ -1,10 +1,9 @@
 import { Formik } from "formik";
-import Link from "next/link";
 import { WithRouterProps, withRouter } from "next/router";
 import { FieldView, Head, LoadingSpinner, Nav, Query } from "../../components";
 import { Product } from "../../types/seqdb-api/resources/Product";
 import React from "react";
-import { withNamespaces, Trans } from '../../i18n'
+import { withNamespaces, Trans, Link } from '../../i18n'
 
 export class ProductDetailsPage extends React.Component<WithRouterProps> {
   public id = this.props.router.query.id;

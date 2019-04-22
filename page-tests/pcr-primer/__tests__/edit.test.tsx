@@ -3,6 +3,8 @@ import { mount } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
 import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 import { PcrPrimerEditPage } from "../../../pages/pcr-primer/edit";
+import { I18nextProvider } from "react-i18next"
+import i18next from "i18next";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -38,9 +40,11 @@ jest.mock(
 
 function mountWithContext(element: JSX.Element) {
   return mount(
-    <ApiClientContext.Provider value={createContextValue()}>
-      {element}
-    </ApiClientContext.Provider>
+    <I18nextProvider i18n={i18next} >
+      <ApiClientContext.Provider value={createContextValue()}>
+        {element}
+      </ApiClientContext.Provider>
+    </I18nextProvider>
   );
 }
 

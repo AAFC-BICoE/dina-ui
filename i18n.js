@@ -12,7 +12,8 @@ module.exports = {
   appWithTranslation,
   withNamespaces,
   Trans,
-  Link
+  Link,
+  Router
 } = NextI18NextInstance
 
 

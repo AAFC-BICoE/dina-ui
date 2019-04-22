@@ -1,8 +1,8 @@
-import Link from "next/link";
+//import Link from "next/link";
 import React from 'react';
 import { ColumnDefinition, Head, Nav, QueryTable } from "../../components";
 import { Product } from "../../types/seqdb-api/resources/Product";
-import { withNamespaces, Trans } from '../../i18n'
+import { withNamespaces, Trans, Link } from '../../i18n'
 
 const PRODUCT_TABLE_COLUMNS: Array<ColumnDefinition<Product>> = [
   {

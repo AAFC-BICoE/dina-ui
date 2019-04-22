@@ -14,8 +14,6 @@ module.exports = withTypescript(
       config.node = {
         fs: "empty"
       };
-<<<<<<< HEAD
-=======
 
       // Polyfill config start.
       const originalEntry = config.entry;
@@ -33,7 +31,6 @@ module.exports = withTypescript(
       };
       // Polyfill config end.
 
->>>>>>> dev
       return config;
     }
 

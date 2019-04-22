@@ -3,6 +3,8 @@ import { mount } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
 import { ProductEditPage } from "../../../pages/product/edit";
 import { Product } from "../../../types/seqdb-api/resources/Product";
+import { I18nextProvider } from "react-i18next"
+import i18next from "i18next";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -14,7 +16,7 @@ const mockGet = jest.fn();
 const mockPatch = jest.fn();
 
 /** Mock next.js' router "push" function for navigating pages. */
-const mockPush = jest.fn();
+jest.mock("next-i18next/dist/commonjs/router/wrap-router", () => ({ children }) => <div>{children}</div>);
 
 // Mock Kitsu, the client class that talks to the backend.
 jest.mock(
@@ -30,9 +32,11 @@ jest.mock(
 
 function mountWithContext(element: JSX.Element) {
   return mount(
-    <ApiClientContext.Provider value={createContextValue()}>
-      {element}
-    </ApiClientContext.Provider>
+    <I18nextProvider i18n={i18next} >
+      <ApiClientContext.Provider value={createContextValue()}>
+        {element}
+      </ApiClientContext.Provider>
+    </I18nextProvider>
   );
 }
 
@@ -55,7 +59,7 @@ describe("Product edit page", () => {
     });
 
     const wrapper = mountWithContext(
-      <ProductEditPage router={{ query: {}, push: mockPush } as any} />
+      <ProductEditPage router={{ query: {} } as any} />
     );
 
     // Edit the product name.
@@ -85,9 +89,6 @@ describe("Product edit page", () => {
         ],
         expect.anything()
       );
-
-      // The user should be redirected to the new product's details page.
-      expect(mockPush).lastCalledWith("/product/view?id=1");
       done();
     });
   });
@@ -110,7 +111,7 @@ describe("Product edit page", () => {
     }));
 
     const wrapper = mountWithContext(
-      <ProductEditPage router={{ query: {}, push: mockPush } as any} />
+      <ProductEditPage router={{ query: {} } as any} />
     );
 
     // Edit the product name.
@@ -126,7 +127,6 @@ describe("Product edit page", () => {
       expect(wrapper.find(".alert.alert-danger").text()).toEqual(
         "Constraint violation: name size must be between 1 and 10"
       );
-      expect(mockPush).toBeCalledTimes(0);
       done();
     });
   });
@@ -157,7 +157,7 @@ describe("Product edit page", () => {
     });
 
     const wrapper = mountWithContext(
-      <ProductEditPage router={{ query: { id: 10 }, push: mockPush } as any} />
+      <ProductEditPage router={{ query: { id: 10 } } as any} />
     );
 
     // The page should load initially with a loading spinner.
@@ -209,9 +209,6 @@ describe("Product edit page", () => {
         ],
         expect.anything()
       );
-
-      // The user should be redirected to the existing product's details page.
-      expect(mockPush).lastCalledWith("/product/view?id=10");
       done();
     });
   });

@@ -1,5 +1,6 @@
 import { Form, Formik, FormikActions } from "formik";
-import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
+import { Router } from "../../i18n";
+import { withRouter, WithRouterProps } from "next/router"
 import { useContext } from "react";
 import {
   ApiClientContext,
@@ -19,8 +20,8 @@ import { filterBy } from "../../util/rsql";
 import { serialize } from "../../util/serialize";
 
 interface ProductFormProps {
-  product?: Product;
-  router: SingletonRouter;
+  product?: Product
+  //router: Router;
 }
 
 export function ProductEditPage({ router }: WithRouterProps) {
@@ -38,24 +39,24 @@ export function ProductEditPage({ router }: WithRouterProps) {
                 <div>
                   <LoadingSpinner loading={loading} />
                   {response && (
-                    <ProductForm product={response.data} router={router} />
+                    <ProductForm product={response.data} />
                   )}
                 </div>
               )}
             </Query>
           </div>
         ) : (
-          <div>
-            <h1>Add Product</h1>
-            <ProductForm router={router} />
-          </div>
-        )}
+            <div>
+              <h1>Add Product</h1>
+              <ProductForm />
+            </div>
+          )}
       </div>
     </div>
   );
 }
 
-function ProductForm({ product, router }: ProductFormProps) {
+function ProductForm({ product }: ProductFormProps) {
   const { doOperations } = useContext(ApiClientContext);
 
   const initialValues = product || {};
@@ -85,7 +86,7 @@ function ProductForm({ product, router }: ProductFormProps) {
       ]);
 
       const newId = response[0].data.id;
-      router.push(`/product/view?id=${newId}`);
+      Router.push(`/product/view?id=${newId}`);
     } catch (error) {
       setStatus(error.message);
       setSubmitting(false);
