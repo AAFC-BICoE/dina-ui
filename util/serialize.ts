@@ -32,6 +32,10 @@ export async function serialize<TData extends KitsuResource>({
   // Create a copy of the resource so the original is not affected.
   const resourceCopy = { ...resource };
 
+  // kitsu's serializer doesn't handle relationships that have been set to null.
+  // Handle them manually here, where { id: null } counts as a null relationship.
+  const nullRelationships = getNullRelationships(resourceCopy);
+
   // Delete the "links" attribute, which is sometimes included by back-ends like Crnk.
   // The "links" and "relationships" attributes are not supported by kitsu-core's serializer, so
   // we remove themhere.
@@ -49,5 +53,27 @@ export async function serialize<TData extends KitsuResource>({
     data.attributes.type = resourceCopy.type;
   }
 
+  // Add the null relationships to the JSONAPI document if there are any.
+  if (Object.keys(nullRelationships).length) {
+    data.relationships = { ...data.relationships, ...nullRelationships };
+  }
+
   return data;
+}
+
+/**
+ * Gets the null relationships from the submitted KitsuResource, where { id: null } counts as
+ * a null relationship, and removes those { id: null } values from the given resource.
+ * The returned value is a JSONAPI relationships object.
+ */
+function getNullRelationships(resource: KitsuResource) {
+  const nullRelationshipFields = Object.keys(resource).filter(
+    key => resource[key] && resource[key].id === null
+  );
+  const nullRelationships = {};
+  for (const field of nullRelationshipFields) {
+    delete resource[field];
+    nullRelationships[field] = { data: null };
+  }
+  return nullRelationships;
 }

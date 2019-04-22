@@ -1,10 +1,9 @@
 import { mount } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
+import ProductListPage from "../../../pages/product/list";
 import { Product } from "../../../types/seqdb-api/resources/Product";
-import ProductListPage from "../list";
 import { I18nextProvider } from "react-i18next"
 import i18next from "i18next";
-
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 const TEST_PRODUCTS: Product[] = [

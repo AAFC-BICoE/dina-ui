@@ -17,6 +17,7 @@ import {
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
 import { Region } from "../../types/seqdb-api/resources/Region";
+import { filterBy } from "../../util/rsql";
 import { serialize } from "../../util/serialize";
 
 interface PcrPrimerFormProps {
@@ -107,7 +108,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
               tooltipMsg='The group dropdown list'
               className="col-md-2"
               name="group"
-              filter={groupName => ({ groupName })}
+              filter={filterBy(["groupName"])}
               model="group"
               optionLabel={group => group.groupName}
              />
@@ -125,7 +126,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
             <ResourceSelectField<Region>
               className="col-md-2"
               name="region"
-              filter={name => ({ name })}
+              filter={filterBy(["name"])}
               label="Target Gene Region"
               model="region"
               optionLabel={region => region.name}

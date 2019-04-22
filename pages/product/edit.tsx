@@ -12,10 +12,11 @@ import {
   SubmitButton,
   TextField
 } from "../../components";
+import { LabelView } from "../../components/LabelView";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { Product } from "../../types/seqdb-api/resources/Product";
+import { filterBy } from "../../util/rsql";
 import { serialize } from "../../util/serialize";
-import { LabelView } from "../../components/LabelView";
 
 interface ProductFormProps {
   product?: Product;
@@ -32,9 +33,7 @@ export function ProductEditPage({ router }: WithRouterProps) {
         {id ? (
           <div>
             <h1>Edit Product</h1>
-            <Query<Product>
-              query={{ include: "group", path: `product/${id}` }}
-            >
+            <Query<Product> query={{ include: "group", path: `product/${id}` }}>
               {({ loading, response }) => (
                 <div>
                   <LoadingSpinner loading={loading} />
@@ -102,24 +101,30 @@ function ProductForm({ product, router }: ProductFormProps) {
             <ResourceSelectField<Group>
               className="col-md-2"
               name="group"
-              filter={groupName => ({ groupName })}
+              filter={filterBy(["groupName"])}
               model="group"
               optionLabel={group => group.groupName}
             />
           </div>
           <div className="row">
-            <LabelView  className="col-md-2" name="labelname"
+            <LabelView
+              className="col-md-2"
+              name="labelname"
               label="Note: Universal Product Code can be read from barcode scanner in keyboard mode"
             />
           </div>
           <div className="row">
             <TextField className="col-md-2" name="name" />
-            <TextField className="col-md-2" name="upc" label="Universal Product Code (UPC)"/>
-            <TextField className="col-md-2" name="type" />            
+            <TextField
+              className="col-md-2"
+              name="upc"
+              label="Universal Product Code (UPC)"
+            />
+            <TextField className="col-md-2" name="type" />
           </div>
           <div className="row">
             <TextField className="col-md-4" name="description" />
-          </div>          
+          </div>
           <SubmitButton />
         </div>
       </Form>
