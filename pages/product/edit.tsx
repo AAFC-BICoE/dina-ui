@@ -18,42 +18,50 @@ import { Group } from "../../types/seqdb-api/resources/Group";
 import { Product } from "../../types/seqdb-api/resources/Product";
 import { filterBy } from "../../util/rsql";
 import { serialize } from "../../util/serialize";
+import React from "react";
+import { withNamespaces, Trans } from "../../i18n";
 
 interface ProductFormProps {
   product?: Product
-  //router: Router;
 }
+export class ProductEditPage extends React.Component<WithRouterProps> {
 
-export function ProductEditPage({ router }: WithRouterProps) {
-  const { id } = router.query;
-  return (
-    <div>
-      <Head title="Edit Product" />
-      <Nav />
-      <div className="container-fluid">
-        {id ? (
-          <div>
-            <h1>Edit Product</h1>
-            <Query<Product> query={{ include: "group", path: `product/${id}` }}>
-              {({ loading, response }) => (
-                <div>
-                  <LoadingSpinner loading={loading} />
-                  {response && (
-                    <ProductForm product={response.data} />
-                  )}
-                </div>
-              )}
-            </Query>
-          </div>
-        ) : (
+  public id = this.props.router.query.id;
+  static async getInitialProps() {
+    return {
+      namespacesRequired: ['product']
+    }
+  }
+  render() {
+    return (
+      <div>
+        <Head title="Edit Product" />
+        <Nav />
+        <div className="container-fluid">
+          {this.id ? (
             <div>
-              <h1>Add Product</h1>
-              <ProductForm />
+              <h1><Trans i18nKey="Edit Product" /></h1>
+              <Query<Product> query={{ include: "group", path: `product/${this.id}` }}>
+                {({ loading, response }) => (
+                  <div>
+                    <LoadingSpinner loading={loading} />
+                    {response && (
+                      <ProductForm product={response.data} />
+                    )}
+                  </div>
+                )}
+              </Query>
             </div>
-          )}
+          ) : (
+              <div>
+                <h1>Add Product</h1>
+                <ProductForm />
+              </div>
+            )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 function ProductForm({ product }: ProductFormProps) {
@@ -132,4 +140,4 @@ function ProductForm({ product }: ProductFormProps) {
     </Formik>
   );
 }
-export default withRouter(ProductEditPage);
+export default withRouter(withNamespaces('product')(ProductEditPage));
