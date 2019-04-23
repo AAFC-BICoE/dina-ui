@@ -14,8 +14,8 @@ export class Nav extends React.Component {
           </a>
         </Link>
         <div style={{ float: 'right' }}>
-          <a href="" onClick={() => i18n.changeLanguage('en')} >English |</a>
-          <a href="" onClick={() => i18n.changeLanguage('fr')} > French </a>
+          <a id="en" href="" onClick={() => i18n.changeLanguage('en')} >English |</a>
+          <a id="fr" href="" onClick={() => i18n.changeLanguage('fr')} > French </a>
         </div>
       </nav >
     );

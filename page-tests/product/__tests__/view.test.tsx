@@ -1,4 +1,4 @@
-import { mount } from "enzyme";
+import { mount, shallow } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
 import { ProductDetailsPage } from "../../../pages/product/view";
 import { Product } from "../../../types/seqdb-api/resources/Product";
@@ -41,6 +41,13 @@ describe("Product details page", () => {
       </I18nextProvider>
     );
   }
+
+  it("getInitialProps called, correct props set after page renders.", async () => {
+    await ProductDetailsPage.getInitialProps()
+    const wrapper = shallow(<ProductDetailsPage router={{ query: { id: "100" } } as any} />)
+    wrapper.update();
+    expect(wrapper.find('n[ns="product"]').exists())
+  })
 
   it("Renders initially with a loading spinner.", () => {
     const wrapper = mountWithContext(

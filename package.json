@@ -1,8 +1,7 @@
 {
   "name": "create-next-example-app",
   "scripts": {
-    "build1": "next build && next export -o ./build && babel ./build -d ./build",
-    "build": "next build",
+    "build": "next build && next export -o ./build && babel ./build -d ./build",
     "dev": "run-p next proxy",
     "dev-i18": "run-p start proxy",
     "docs": "cd scripts/ && ts-node ./build-docs.ts",

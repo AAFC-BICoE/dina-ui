@@ -1,4 +1,4 @@
-import { mount } from "enzyme";
+import { mount, shallow } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
 import ProductListPage from "../../../pages/product/list";
 import { Product } from "../../../types/seqdb-api/resources/Product";
@@ -37,6 +37,14 @@ jest.mock(
     }
 );
 
+/*const mockGetInitialProps = jest.fn(async () => {
+  return {
+    namespacesRequired: ['product']
+  };
+}
+)*/
+
+
 describe("Product list page", () => {
   function mountWithContext(element: JSX.Element) {
     return mount(
@@ -48,10 +56,19 @@ describe("Product list page", () => {
     );
   }
 
+  it("getInitialProps called, correct props set after page renders.", async () => {
+    const props = await ProductListPage.getInitialProps()
+    const wrapper = shallow(<ProductListPage {...props} />)
+    wrapper.update();
+    expect(wrapper.find('n[ns="product"]').exists())
+  })
+
   it("Renders the list page.", async () => {
+
     const wrapper = mountWithContext(<ProductListPage />);
     await new Promise(resolve => setTimeout(resolve, 3000));
     wrapper.update();
+    console.log("wrapper.context() is " + wrapper.context('pageProps'));
     expect(wrapper.containsMatchingElement(<a>Test Product 1</a>)).toEqual(true);
     expect(wrapper.containsMatchingElement(<a>Test Product 2</a>)).toEqual(true);
   }
