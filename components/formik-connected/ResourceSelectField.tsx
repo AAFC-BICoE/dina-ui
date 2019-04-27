@@ -8,11 +8,10 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface ResourceSelectFieldProps<TData>
   extends ResourceSelectProps<TData>,
-    LabelWrapperParams {
+  LabelWrapperParams {
   // These props are not required when using this Formik-controlled input.
   onChange?: never;
   value?: never;
-  datafor?: string;
   tooltipMsg?: string
 }
 
@@ -20,7 +19,7 @@ export interface ResourceSelectFieldProps<TData>
 export function ResourceSelectField<TData extends KitsuResource>(
   topLevelProps: ResourceSelectFieldProps<TData>
 ) {
-  const { className, name, label, datafor, tooltipMsg } = topLevelProps;
+  const { className, name, label, tooltipMsg } = topLevelProps;
 
   return (
     <Field name={name}>
@@ -34,13 +33,13 @@ export function ResourceSelectField<TData extends KitsuResource>(
         }
 
         return (
-          <FieldWrapper className={className} name={name} label={label} datafor={datafor} tooltipMsg={tooltipMsg}>
+          <FieldWrapper className={className} name={name} label={label} tooltipMsg={tooltipMsg}>
             <ResourceSelect
               {...topLevelProps}
               onChange={onChange}
               value={value}
             />
-            
+
           </FieldWrapper>
         );
       }}

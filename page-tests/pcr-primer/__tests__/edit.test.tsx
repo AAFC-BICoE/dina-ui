@@ -19,12 +19,13 @@ const mockGet = jest.fn(async model => {
     return { data: [] };
   }
 });
-
 /** Mock axios for operations requests. */
 const mockPatch = jest.fn();
 
 /** Mock next.js' router "push" function for navigating pages. */
 const mockPush = jest.fn();
+
+const mockT = (string) => string;
 
 // Mock Kitsu, the client class that talks to the backend.
 jest.mock(
@@ -67,7 +68,7 @@ describe("PcrPrimer edit page", () => {
     });
 
     const wrapper = mountWithContext(
-      <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} />
+      <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} t={mockT} />
     );
 
     // Edit the primer name.
@@ -124,7 +125,7 @@ describe("PcrPrimer edit page", () => {
     }));
 
     const wrapper = mountWithContext(
-      <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} />
+      <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} t={mockT} />
     );
 
     // Submit the form.
@@ -156,7 +157,7 @@ describe("PcrPrimer edit page", () => {
 
     const wrapper = mountWithContext(
       <PcrPrimerEditPage
-        router={{ query: { id: 100 }, push: mockPush } as any}
+        router={{ query: { id: 100 }, push: mockPush } as any} t={mockT}
       />
     );
 
@@ -167,7 +168,7 @@ describe("PcrPrimer edit page", () => {
     await Promise.resolve();
     wrapper.update();
 
-    // // Check that the existing primer's seq value is in the field.
+    // Check that the existing primer's seq value is in the field.
     expect(wrapper.find(".seq-field input").prop("value")).toEqual(
       "ACTACGATCAGCATCGATG"
     );

@@ -66,12 +66,12 @@ describe("PcrPrimer details page", () => {
     // The primer's name should be rendered in a FieldView.
     expect(
       wrapper.containsMatchingElement(
-        <div>
-          <label>
-            <strong>Name</strong>
-          </label>
-          <p>Test Primer</p>
-        </div>
+        <strong>Name</strong>
+      )
+    ).toEqual(true);
+    expect(
+      wrapper.containsMatchingElement(
+        <p>Test Primer</p>
       )
     ).toEqual(true);
   });

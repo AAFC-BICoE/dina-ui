@@ -1,0 +1,5 @@
+{
+    "Edit PCR Primer": "Edit PCR Primer",
+    "target gene region": "The name of the gene region amplified during the PCR reaction",
+    "primer name": "Unique code or name used to identify a primer"
+}

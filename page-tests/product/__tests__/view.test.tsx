@@ -67,16 +67,15 @@ describe("Product details page", () => {
     wrapper.update();
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
-
     // The product's name should be rendered in a FieldView.
     expect(
       wrapper.containsMatchingElement(
-        <div>
-          <label>
-            <strong>Name</strong>
-          </label>
-          <p>Test Product 1</p>
-        </div>
+        <strong>Name</strong>
+      )
+    ).toEqual(true);
+    expect(
+      wrapper.containsMatchingElement(
+        <p>Test Product 1</p>
       )
     ).toEqual(true);
   });
