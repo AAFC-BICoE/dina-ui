@@ -1,5 +1,5 @@
 import { OperationsResponse } from "components/api-client/jsonapi-types";
-import { mount } from "enzyme";
+import { mount, shallow } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
 import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 import { PcrPrimerEditPage } from "../../../pages/pcr-primer/edit";
@@ -53,6 +53,13 @@ describe("PcrPrimer edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+
+  it("getInitialProps called, correct props set after page renders.", async () => {
+    await PcrPrimerEditPage.getInitialProps()
+    const wrapper = shallow(<PcrPrimerEditPage router={{ query: { id: "100" } } as any} t={mockT} />)
+    wrapper.update();
+    expect(wrapper.find('n[ns="pcr-primer"]').exists())
+  })
 
   it("Provides a form to add a PcrPrimer.", done => {
     mockPatch.mockReturnValueOnce({

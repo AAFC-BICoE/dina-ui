@@ -1,5 +1,5 @@
 import { OperationsResponse } from "components/api-client/jsonapi-types";
-import { mount } from "enzyme";
+import { mount, shallow } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
 import { ProductEditPage } from "../../../pages/product/edit";
 import { Product } from "../../../types/seqdb-api/resources/Product";
@@ -44,6 +44,13 @@ describe("Product edit page", () => {
   beforeEach(() => {
     jest.resetAllMocks();
   });
+
+  it("getInitialProps called, correct props set after page renders.", async () => {
+    await ProductEditPage.getInitialProps()
+    const wrapper = shallow(<ProductEditPage router={{ query: { id: "100" } } as any} />)
+    wrapper.update();
+    expect(wrapper.find('n[ns="product"]').exists())
+  })
 
   it("Provides a form to add a Product.", done => {
     mockPatch.mockReturnValueOnce({
