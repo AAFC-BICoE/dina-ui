@@ -4,6 +4,11 @@ import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 
 const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
   {
+    Header: "Group Name",
+    accessor: "group.groupName"
+  },
+  "region.name",
+  {
     Cell: ({ original: { id, name } }) => (
       <Link href={`/pcr-profile/view?id=${id}`}>
         <a>{name}</a>
@@ -12,11 +17,6 @@ const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
     Header: "Name",
     accessor: "name"
   },
-  {
-    Header: "Group Name",
-    accessor: "group.groupName"
-  },
-  "region.name",
   "application",
   "step3"
 ];
@@ -27,9 +27,9 @@ export default function PcrProfileListPage() {
       <Head title="PCR Profiles" />
       <Nav />
       <div className="container-fluid">
-        <h1>PCR Profiles</h1>
+        <h1>Thermocycler Profiles</h1>
         <Link href="/pcr-profile/edit" prefetch={true}>
-          <a>Add PCR Profile</a>
+          <a>Add Thermocycler Profile</a>
         </Link>
         <QueryTable<PcrProfile>
           columns={PCRPROFILE_TABLE_COLUMNS}

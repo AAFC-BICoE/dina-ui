@@ -15,6 +15,7 @@ import {
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 import { Region } from "../../types/seqdb-api/resources/Region";
+import { filterBy } from "../../util/rsql";
 import { serialize } from "../../util/serialize";
 
 interface PcrProfileFormProps {
@@ -32,9 +33,12 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
       <div className="container-fluid">
         {id ? (
           <div>
-            <h1>Edit PCR Profile</h1>
+            <h1>Edit Thermocycler Profile</h1>
             <Query<PcrProfile>
-              query={{ include: "group,region", path: `thermocyclerprofile/${id}` }}
+              query={{
+                include: "group,region",
+                path: `thermocyclerprofile/${id}`
+              }}
             >
               {({ loading, response }) => (
                 <div>
@@ -47,11 +51,11 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
             </Query>
           </div>
         ) : (
-            <div>
-              <h1>Add PCR Profile</h1>
-              <PcrProfileForm router={router} />
-            </div>
-          )}
+          <div>
+            <h1>Add Thermocycler Profile</h1>
+            <PcrProfileForm router={router} />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -81,7 +85,10 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
       const response = await doOperations([
         {
           op,
-          path: op === "PATCH" ? `thermocyclerprofile/${profile.id}` : "thermocyclerprofile",
+          path:
+            op === "PATCH"
+              ? `thermocyclerprofile/${profile.id}`
+              : "thermocyclerprofile",
           value: serialized
         }
       ]);
@@ -103,7 +110,7 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
             <ResourceSelectField<Group>
               className="col-md-2"
               name="group"
-              filter={groupName => ({ groupName })}
+              filter={filterBy(["groupName"])}
               model="group"
               optionLabel={group => group.groupName}
             />
@@ -112,54 +119,50 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
             <ResourceSelectField<Region>
               className="col-md-2"
               name="region"
-              filter={name => ({ name })}
+              filter={filterBy(["name"])}
               label="Select Gene Region"
               model="region"
               optionLabel={region => region.name}
             />
-            <TextField className="col-md-2" name="name" label="Thermocycler Profile Name" />
+            <TextField
+              className="col-md-2"
+              name="name"
+              label="Thermocycler Profile Name"
+            />
             <TextField className="col-md-2" name="application" />
             <TextField className="col-md-2" name="cycles" />
           </div>
           <div className="row">
-            <TextField className="col-md-2" name="step 1" />
-            <TextField className="col-md-2" name="step 11" />
-          </div>
-          <div className="row">
-            <TextField className="col-md-2" name="step 2" />
-            <TextField className="col-md-2" name="step 12" />
-          </div>
-          <div className="row">
-            <TextField className="col-md-2" name="step 3" />
-            <TextField className="col-md-2" name="step 13" />
-          </div>
-          <div className="row">
-            <TextField className="col-md-2" name="step 4" />
-            <TextField className="col-md-2" name="step 14" />
-          </div>
-          <div className="row">
-            <TextField className="col-md-2" name="step 5" />
-            <TextField className="col-md-2" name="step 15" />
-          </div>
-          <div className="row">
-            <TextField className="col-md-2" name="step 6" />
-          </div>
-          <div className="row">
-            <TextField className="col-md-2" name="step 7" />
-          </div>
-          <div className="row">
-            <TextField className="col-md-2" name="step 8" />
-          </div>
-          <div className="row">
-            <TextField className="col-md-2" name="step 9" />
-          </div>
-          <div className="row">
-            <TextField className="col-md-2" name="step 10" />
+            <div className="col-md-6">
+              <div className="card-group row" style={{ padding: 15 }}>
+                <div className="card card-body col-md-4">
+                  <TextField name="step1" />
+                  <TextField name="step2" />
+                  <TextField name="step3" />
+                  <TextField name="step4" />
+                  <TextField name="step5" />
+                </div>
+                <div className="card card-body col-md-4">
+                  <TextField name="step6" />
+                  <TextField name="step7" />
+                  <TextField name="step8" />
+                  <TextField name="step9" />
+                  <TextField name="step10" />
+                </div>
+                <div className="card card-body col-md-4">
+                  <TextField name="step11" />
+                  <TextField name="step12" />
+                  <TextField name="step13" />
+                  <TextField name="step14" />
+                  <TextField name="step15" />
+                </div>
+              </div>
+            </div>
           </div>
           <SubmitButton />
         </div>
       </Form>
-    </Formik >
+    </Formik>
   );
 }
 

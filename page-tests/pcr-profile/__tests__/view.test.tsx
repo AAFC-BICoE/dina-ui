@@ -1,7 +1,7 @@
 import { mount } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
+import { PcrProfileDetailsPage } from "../../../pages/pcr-profile/view";
 import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
-import { PcrProfileDetailsPage } from "../view";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);
@@ -10,7 +10,7 @@ const TEST_PROFILE: PcrProfile = {
   group: { id: "1", groupName: "Test Group", type: "group" },
   id: "5",
   name: "Test Profile",
-  type: "PROFILE"
+  type: "thermocyclerprofile"
 };
 
 /** Mock Kitsu "get" method. */
@@ -62,7 +62,7 @@ describe("PcrProfile details page", () => {
       wrapper.containsMatchingElement(
         <div>
           <label>
-            <strong>Thermocycler Profile Name:</strong>
+            <strong>Thermocycler Profile Name</strong>
           </label>
           <p>Test Profile</p>
         </div>

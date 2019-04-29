@@ -1,7 +1,7 @@
 import { mount } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
+import PcrProfileListPage from "../../../pages/pcr-profile/list";
 import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
-import PcrProfileListPage from "../list";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -53,7 +53,11 @@ describe("PcrProfile list page", () => {
     wrapper.update();
 
     // Check that the table contains the links to profile details pages.
-    expect(wrapper.containsMatchingElement(<a>Test Profile 1</a>)).toEqual(true);
-    expect(wrapper.containsMatchingElement(<a>Test Profile 2</a>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<a>Test Profile 1</a>)).toEqual(
+      true
+    );
+    expect(wrapper.containsMatchingElement(<a>Test Profile 2</a>)).toEqual(
+      true
+    );
   });
 });

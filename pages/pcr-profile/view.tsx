@@ -40,44 +40,40 @@ export function PcrProfileDetailsPage({ router }: WithRouterProps) {
                       label="Target Gene Region"
                       name="region.name"
                     />
-                    <FieldView className="col-md-2" name="name" label="Thermocycler Profile Name" />
+                    <FieldView
+                      className="col-md-2"
+                      name="name"
+                      label="Thermocycler Profile Name"
+                    />
                     <FieldView className="col-md-2" name="application" />
                     <FieldView className="col-md-2" name="cycles" />
                   </div>
                   <div className="row">
-                    <FieldView className="col-md-2" name="step 1" />
-                    <FieldView className="col-md-2" name="step 11" />
-                  </div>
-                  <div className="row">
-                    <FieldView className="col-md-2" name="step 2" />
-                    <FieldView className="col-md-2" name="step 12" />
-                  </div>
-                  <div className="row">
-                    <FieldView className="col-md-2" name="step 3" />
-                    <FieldView className="col-md-2" name="step 13" />
-                  </div>
-                  <div className="row">
-                    <FieldView className="col-md-2" name="step 4" />
-                    <FieldView className="col-md-2" name="step 14" />
-                  </div>
-                  <div className="row">
-                    <FieldView className="col-md-2" name="step 5" />
-                    <FieldView className="col-md-2" name="step 15" />
-                  </div>
-                  <div className="row">
-                    <FieldView className="col-md-2" name="step 6" />
-                  </div>
-                  <div className="row">
-                    <FieldView className="col-md-2" name="step 7" />
-                  </div>
-                  <div className="row">
-                    <FieldView className="col-md-2" name="step 8" />
-                  </div>
-                  <div className="row">
-                    <FieldView className="col-md-2" name="step 9" />
-                  </div>
-                  <div className="row">
-                    <FieldView className="col-md-2" name="step 10" />
+                    <div className="col-md-6">
+                      <div className="card-group row" style={{ padding: 15 }}>
+                        <div className="card card-body col-md-4">
+                          <FieldView name="step1" />
+                          <FieldView name="step2" />
+                          <FieldView name="step3" />
+                          <FieldView name="step4" />
+                          <FieldView name="step5" />
+                        </div>
+                        <div className="card card-body col-md-4">
+                          <FieldView name="step6" />
+                          <FieldView name="step7" />
+                          <FieldView name="step8" />
+                          <FieldView name="step9" />
+                          <FieldView name="step10" />
+                        </div>
+                        <div className="card card-body col-md-4">
+                          <FieldView name="step11" />
+                          <FieldView name="step12" />
+                          <FieldView name="step13" />
+                          <FieldView name="step14" />
+                          <FieldView name="step15" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </Formik>

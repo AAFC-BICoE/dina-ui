@@ -1,8 +1,8 @@
 import { OperationsResponse } from "components/api-client/jsonapi-types";
 import { mount } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
+import { PcrProfileEditPage } from "../../../pages/pcr-profile/edit";
 import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
-import { PcrProfileEditPage } from "../edit";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -141,7 +141,7 @@ describe("PcrProfile edit page", () => {
         {
           data: {
             id: 1,
-            type: "thermocyclerprofile",
+            type: "thermocyclerprofile"
           },
           status: 201
         }
@@ -185,7 +185,7 @@ describe("PcrProfile edit page", () => {
             value: {
               attributes: expect.objectContaining({
                 application: "new app value",
-                name: "PROF1",
+                name: "PROF1"
               }),
               id: "1",
               relationships: {
