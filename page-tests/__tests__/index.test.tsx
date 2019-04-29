@@ -1,10 +1,11 @@
 import { shallow } from "enzyme";
-import toJson from "enzyme-to-json";
-import IndexPage from "../index";
+import IndexPage from "../../pages/index";
 
 describe("Index page", () => {
   it("Renders the index page.", () => {
     const wrapper = shallow(<IndexPage />);
-    expect(toJson(wrapper)).toMatchSnapshot("Index page shallow render");
+    expect(wrapper.containsMatchingElement(<h1>Welcome to Next!</h1>)).toEqual(
+      true
+    );
   });
 });

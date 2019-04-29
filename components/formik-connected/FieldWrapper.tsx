@@ -32,7 +32,7 @@ export function FieldWrapper({
     <div className={className}>
       <div className={`form-group ${name}-field`}>
         <label>
-          <strong>{label}:</strong>
+          <strong>{label}</strong>
         </label>
         {children}
       </div>

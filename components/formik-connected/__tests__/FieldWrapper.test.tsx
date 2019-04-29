@@ -9,7 +9,7 @@ describe("FieldWrapper component.", () => {
       </FieldWrapper>
     );
 
-    expect(wrapper.find("label").text()).toEqual("Field Name:");
+    expect(wrapper.find("label").text()).toEqual("Field Name");
   });
 
   it("Accepts a className which is applied to a surrounding div.", () => {
