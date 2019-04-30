@@ -1,7 +1,7 @@
 {
   "name": "create-next-example-app",
   "scripts": {
-    "build": "next build",
+    "build": "next build && next export -o ./build && babel ./build -d ./build",
     "dev": "run-p next proxy",
     "docs": "cd scripts/ && ts-node ./build-docs.ts",
     "lint": "tslint --project tsconfig.json",
@@ -18,18 +18,21 @@
     "@zeit/next-typescript": "^1.1.1",
     "axios": "^0.18.0",
     "bootswatch": "^4.2.1",
+    "core-js": "^2.6.5",
     "formik": "^1.5.1",
     "kitsu": "^6.5.1",
     "kitsu-core": "^7.0.0",
     "lodash": "^4.17.11",
     "next": "^7.0.2",
     "react": "^16.8.3",
+    "react-datepicker": "^2.3.0",
     "react-dom": "^16.8.3",
     "react-select": "^2.3.0",
     "react-table": "6.8.6",
     "title-case": "^2.1.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.4.3",
     "@types/enzyme": "^3.1.16",
     "@types/enzyme-to-json": "^1.5.2",
     "@types/jest": "^24.0.9",
@@ -37,6 +40,7 @@
     "@types/next": "^7.0.6",
     "@types/node": "^10.12.18",
     "@types/react": "^16.8.4",
+    "@types/react-datepicker": "^2.2.0",
     "@types/react-dom": "^16.8.2",
     "@types/react-select": "^2.0.11",
     "@types/react-table": "^6.7.21",

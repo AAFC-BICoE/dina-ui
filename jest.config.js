@@ -2,9 +2,11 @@ module.exports = {
   collectCoverageFrom: ["**/*.{ts,tsx,js,jsx}"],
   coveragePathIgnorePatterns: [
     "/coverage/",
+    "/build/",
     "jest.config.js",
     "jest.setup.js",
-    "next.config.js"
+    "next.config.js",
+    "polyfills.js"
   ],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
   moduleNameMapper: {

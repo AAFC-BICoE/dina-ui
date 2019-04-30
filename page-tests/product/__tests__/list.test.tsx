@@ -4,8 +4,8 @@ import {
   createContextValue,
   QueryTable
 } from "../../../components";
+import ProductListPage from "../../../pages/product/list";
 import { Product } from "../../../types/seqdb-api/resources/Product";
-import ProductListPage from "../list";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
