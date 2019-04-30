@@ -22,6 +22,8 @@ include::forms.adoc[]
 
 include::resource_select_field.adoc[]
 
+include::filter_builder_component.adoc[]
+
 :leveloffset: 1
 
 = API Client

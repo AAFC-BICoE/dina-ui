@@ -1,5 +1,9 @@
 import { mount } from "enzyme";
-import { ApiClientContext, createContextValue } from "../../../components";
+import {
+  ApiClientContext,
+  createContextValue,
+  QueryTable
+} from "../../../components";
 import ProductListPage from "../../../pages/product/list";
 import { Product } from "../../../types/seqdb-api/resources/Product";
 
@@ -59,5 +63,33 @@ describe("Product list page", () => {
     expect(wrapper.containsMatchingElement(<a>Test Product 2</a>)).toEqual(
       true
     );
+  });
+
+  it("Allows a filterable search.", async done => {
+    const wrapper = mountWithContext(<ProductListPage />);
+
+    // Wait for the default search to finish.
+    await Promise.resolve();
+    wrapper.update();
+
+    // Enter a search value.
+    wrapper
+      .find("input.filter-value")
+      .simulate("change", { target: { value: "omni" } });
+
+    // Submit the search form.
+    wrapper.find("form").simulate("submit");
+
+    setImmediate(() => {
+      wrapper.update();
+      expect(mockGet).lastCalledWith(
+        "product",
+        expect.objectContaining({ filter: { rsql: "name==*omni*" } })
+      );
+      expect(wrapper.find(QueryTable).props().filter).toEqual({
+        rsql: "name==*omni*"
+      });
+      done();
+    });
   });
 });
