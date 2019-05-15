@@ -7,7 +7,16 @@ const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
     Header: "Group Name",
     accessor: "group.groupName"
   },
-  "region.name",
+  {
+    Cell: ({ original: { region } }) =>
+      region ? (
+        <Link href={`/region/view?id=${region.id}`}>
+          <a>{region.name}</a>
+        </Link>
+      ) : null,
+    Header: "Region Name",
+    accessor: "region.name"
+  },
   {
     Cell: ({ original: { id, name } }) => (
       <Link href={`/pcr-profile/view?id=${id}`}>
