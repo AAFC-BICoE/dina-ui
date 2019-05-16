@@ -41,7 +41,7 @@ export function FieldWrapper({
           <div>
             <strong>{label}</strong>
             {tooltipMsg && <img src='/static/images/iconInformation.gif' data-tip data-for={tooltipMsg} ></img>}
-            <ReactTooltip id={tooltipMsg} type='error'>
+            <ReactTooltip id={tooltipMsg}>
               <span>{tooltipMsg}</span>
             </ReactTooltip>
           </div>
