@@ -9,6 +9,10 @@ module.exports = withTypescript(
         ? process.env.LOCALE_SUBPATHS
         : 'none'
     },
+    serverRuntimeConfig: {
+      NODE_ENV: "production"
+    },
+
     webpack: config => {
       // Fixes npm packages that depend on `fs` module
       config.node = {

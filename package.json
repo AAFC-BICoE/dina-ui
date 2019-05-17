@@ -2,6 +2,7 @@
   "name": "create-next-example-app",
   "scripts": {
     "build": "next build && next export -o ./build && babel ./build -d ./build",
+    "build2": "next build",
     "dev": "run-p start proxy",
     "docs": "cd scripts/ && ts-node ./build-docs.ts",
     "lint": "tslint --project tsconfig.json",

@@ -1,36 +1,44 @@
+import { mount } from "enzyme";
 import Kitsu from "kitsu";
-import Router from "next/router";
 import { FunctionComponent } from "react";
-import { create } from "react-test-renderer";
 import { ApiClientContext } from "../../components/api-client/ApiClientContext";
 import SeqdbUiApp from "../../pages/_app";
-import { shallow } from "enzyme";
-//import toJson from "enzyme-to-json";
+const mockPush = jest.fn();
 
-jest.mock("next/router", () => ({
-  withRouter: component => {
-    component.defaultProps = {
-      ...component.defaultProps,
-      router: { pathname: '' }
-    }
-    return component
-  }
-}));
+const mockRouter = {
+  asPath: "/example-path?a=b",
+  push: mockPush
+};
 
 describe("SeqdbUiApp", () => {
-  it("Renders the App wrapper.", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("Renders the App wrapper.", async () => {
     const TestComponent: FunctionComponent = () => <div />;
 
-    const wrapper = shallow(<SeqdbUiApp
-      router={Router}
-      pageProps={{ exampleProp: "exampleValue" }}
-      Component={TestComponent}
-    />)
-    //due to the travis generated snapshot has different path than local generated,
-    //snapshot only matches when runing test locallly, failed at travis build, so here is 
-    //just a replacement
-    expect(wrapper.find('LoadNamespace(NextStaticProvider)').length).toEqual(1)
+    const wrapper = mount(
+      <SeqdbUiApp
+        router={mockRouter as any}
+        pageProps={{ exampleProp: "exampleValue" }}
+        Component={TestComponent}
+      />
+    );
 
+    // The first browser render should be empty.
+    expect(wrapper.html()).toEqual(null);
+    //Wait long enough for the component to be mounted, otherwise normally the push will not be invoked
+    await new Promise(resolve => setTimeout(resolve, 4000));
+    expect(mockPush).lastCalledWith("/example-path?a=b");
+    // Normally the router would update the app wrapper, but the mock doesn't, so we force a
+    // re-render in the test.    
+    wrapper.instance().forceUpdate();
+    wrapper.update();
+    //Lauguage namespace tag added to dom node
+    expect(wrapper.find('LoadNamespace(NextStaticProvider)').length).toEqual(1)
+    const innerComponent = wrapper.find(TestComponent);
+    expect(innerComponent.prop("exampleProp")).toEqual("exampleValue");
   });
 
   it("Provides the API context to child components.", done => {
@@ -47,12 +55,18 @@ describe("SeqdbUiApp", () => {
       );
     }
 
-    create(
+    const wrapper = mount(
       <SeqdbUiApp
-        router={Router}
-        pageProps={{ exampleProp: "exampleValue" }}
+        router={mockRouter as any}
+        pageProps={{}}
         Component={pageComponent}
       />
     );
+
+    // Normally the router would update the app wrapper, but the mock doesn't, so we force a
+    // re-render in the test.
+    wrapper.instance().forceUpdate();
+    wrapper.update();
+    expect(mockPush).lastCalledWith("/example-path?a=b");
   });
 });
