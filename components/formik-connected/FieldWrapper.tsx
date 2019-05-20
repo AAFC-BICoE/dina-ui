@@ -1,6 +1,5 @@
+import ReactTooltip from "react-tooltip";
 import titleCase from "title-case";
-import ReactTooltip from 'react-tooltip'
-
 
 export interface LabelWrapperParams {
   /** The CSS classes of the div wrapper. */
@@ -40,7 +39,13 @@ export function FieldWrapper({
         <label>
           <div>
             <strong>{label}</strong>
-            {tooltipMsg && <img src='/static/images/iconInformation.gif' data-tip data-for={tooltipMsg} ></img>}
+            {tooltipMsg && (
+              <img
+                src="/static/images/iconInformation.gif"
+                data-tip={true}
+                data-for={tooltipMsg}
+              />
+            )}
             <ReactTooltip id={tooltipMsg}>
               <span>{tooltipMsg}</span>
             </ReactTooltip>

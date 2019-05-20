@@ -1,10 +1,10 @@
 import { OperationsResponse } from "components/api-client/jsonapi-types";
 import { mount, shallow } from "enzyme";
+import i18next from "i18next";
+import { I18nextProvider } from "react-i18next";
 import { ApiClientContext, createContextValue } from "../../../components";
 import { ProductEditPage } from "../../../pages/product/edit";
 import { Product } from "../../../types/seqdb-api/resources/Product";
-import { I18nextProvider } from "react-i18next"
-import i18next from "i18next";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -16,7 +16,10 @@ const mockGet = jest.fn();
 const mockPatch = jest.fn();
 
 /** Mock next.js' router "push" function for navigating pages. */
-jest.mock("next-i18next/dist/commonjs/router/wrap-router", () => ({ children }) => <div>{children}</div>);
+jest.mock(
+  "next-i18next/dist/commonjs/router/wrap-router",
+  () => ({ children }) => <div>{children}</div>
+);
 
 // Mock Kitsu, the client class that talks to the backend.
 jest.mock(
@@ -32,7 +35,7 @@ jest.mock(
 
 function mountWithContext(element: JSX.Element) {
   return mount(
-    <I18nextProvider i18n={i18next} >
+    <I18nextProvider i18n={i18next}>
       <ApiClientContext.Provider value={createContextValue()}>
         {element}
       </ApiClientContext.Provider>
@@ -46,11 +49,13 @@ describe("Product edit page", () => {
   });
 
   it("getInitialProps called, correct props set after page renders.", async () => {
-    await ProductEditPage.getInitialProps()
-    const wrapper = shallow(<ProductEditPage router={{ query: { id: "100" } } as any} />)
+    await ProductEditPage.getInitialProps();
+    const wrapper = shallow(
+      <ProductEditPage router={{ query: { id: "100" } } as any} />
+    );
     wrapper.update();
-    expect(wrapper.find('n[ns="product"]').exists())
-  })
+    expect(wrapper.find('n[ns="product"]').exists());
+  });
 
   it("Provides a form to add a Product.", done => {
     mockPatch.mockReturnValueOnce({

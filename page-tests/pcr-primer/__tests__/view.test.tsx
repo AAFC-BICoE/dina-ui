@@ -1,9 +1,9 @@
 import { mount } from "enzyme";
-import { ApiClientContext, createContextValue } from "../../../components";
-import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
-import { PcrPrimerDetailsPage } from "../../../pages/pcr-primer/view";
-import { I18nextProvider } from "react-i18next";
 import i18next from "i18next";
+import { I18nextProvider } from "react-i18next";
+import { ApiClientContext, createContextValue } from "../../../components";
+import { PcrPrimerDetailsPage } from "../../../pages/pcr-primer/view";
+import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);
@@ -36,7 +36,7 @@ jest.mock(
 describe("PcrPrimer details page", () => {
   function mountWithContext(element: JSX.Element) {
     return mount(
-      <I18nextProvider i18n={i18next} >
+      <I18nextProvider i18n={i18next}>
         <ApiClientContext.Provider value={createContextValue()}>
           {element}
         </ApiClientContext.Provider>
@@ -64,15 +64,9 @@ describe("PcrPrimer details page", () => {
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
     // The primer's name should be rendered in a FieldView.
-    expect(
-      wrapper.containsMatchingElement(
-        <strong>Name</strong>
-      )
-    ).toEqual(true);
-    expect(
-      wrapper.containsMatchingElement(
-        <p>Test Primer</p>
-      )
-    ).toEqual(true);
+    expect(wrapper.containsMatchingElement(<strong>Name</strong>)).toEqual(
+      true
+    );
+    expect(wrapper.containsMatchingElement(<p>Test Primer</p>)).toEqual(true);
   });
 });

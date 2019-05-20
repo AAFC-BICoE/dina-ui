@@ -9,7 +9,12 @@ export function TextField(props: LabelWrapperParams) {
   const { className, name, label, tooltipMsg } = props;
 
   return (
-    <FieldWrapper className={className} name={name} label={label} tooltipMsg={tooltipMsg}>
+    <FieldWrapper
+      className={className}
+      name={name}
+      label={label}
+      tooltipMsg={tooltipMsg}
+    >
       <Field name={name}>
         {({
           field: { value },

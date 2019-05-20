@@ -1,7 +1,7 @@
 import { Form, Formik, FormikActions } from "formik";
-import { Router } from "../../i18n";
-import { withRouter, WithRouterProps } from "next/router"
+import { withRouter, WithRouterProps } from "next/router";
 import { useContext } from "react";
+import React from "react";
 import {
   ApiClientContext,
   ErrorViewer,
@@ -14,25 +14,25 @@ import {
   TextField
 } from "../../components";
 import { LabelView } from "../../components/LabelView";
+import { Router } from "../../i18n";
+import { Trans, withNamespaces } from "../../i18n";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { Product } from "../../types/seqdb-api/resources/Product";
 import { filterBy } from "../../util/rsql";
 import { serialize } from "../../util/serialize";
-import React from "react";
-import { withNamespaces, Trans } from "../../i18n";
 
 interface ProductFormProps {
-  product?: Product
+  product?: Product;
 }
 export class ProductEditPage extends React.Component<WithRouterProps> {
+  public static async getInitialProps() {
+    return {
+      namespacesRequired: ["product"]
+    };
+  }
 
   public id = this.props.router.query.id;
-  static async getInitialProps() {
-    return {
-      namespacesRequired: ['product']
-    }
-  }
-  render() {
+  public render() {
     return (
       <div>
         <Head title="Edit Product" />
@@ -40,24 +40,26 @@ export class ProductEditPage extends React.Component<WithRouterProps> {
         <div className="container-fluid">
           {this.id ? (
             <div>
-              <h1><Trans i18nKey="Edit Product" /></h1>
-              <Query<Product> query={{ include: "group", path: `product/${this.id}` }}>
+              <h1>
+                <Trans i18nKey="Edit Product" />
+              </h1>
+              <Query<Product>
+                query={{ include: "group", path: `product/${this.id}` }}
+              >
                 {({ loading, response }) => (
                   <div>
                     <LoadingSpinner loading={loading} />
-                    {response && (
-                      <ProductForm product={response.data} />
-                    )}
+                    {response && <ProductForm product={response.data} />}
                   </div>
                 )}
               </Query>
             </div>
           ) : (
-              <div>
-                <h1>Add Product</h1>
-                <ProductForm />
-              </div>
-            )}
+            <div>
+              <h1>Add Product</h1>
+              <ProductForm />
+            </div>
+          )}
         </div>
       </div>
     );
@@ -140,4 +142,4 @@ function ProductForm({ product }: ProductFormProps) {
     </Formik>
   );
 }
-export default withRouter(withNamespaces('product')(ProductEditPage));
+export default withRouter(withNamespaces("product")(ProductEditPage));

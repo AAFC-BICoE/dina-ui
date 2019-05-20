@@ -1,9 +1,9 @@
 import { mount, shallow } from "enzyme";
+import i18next from "i18next";
+import { I18nextProvider } from "react-i18next";
 import { ApiClientContext, createContextValue } from "../../../components";
 import { ProductDetailsPage } from "../../../pages/product/view";
 import { Product } from "../../../types/seqdb-api/resources/Product";
-import { I18nextProvider } from "react-i18next"
-import i18next from "i18next";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);
@@ -34,7 +34,7 @@ jest.mock(
 describe("Product details page", () => {
   function mountWithContext(element: JSX.Element) {
     return mount(
-      <I18nextProvider i18n={i18next} >
+      <I18nextProvider i18n={i18next}>
         <ApiClientContext.Provider value={createContextValue()}>
           {element}
         </ApiClientContext.Provider>
@@ -43,11 +43,13 @@ describe("Product details page", () => {
   }
 
   it("getInitialProps called, correct props set after page renders.", async () => {
-    await ProductDetailsPage.getInitialProps()
-    const wrapper = shallow(<ProductDetailsPage router={{ query: { id: "100" } } as any} />)
+    await ProductDetailsPage.getInitialProps();
+    const wrapper = shallow(
+      <ProductDetailsPage router={{ query: { id: "100" } } as any} />
+    );
     wrapper.update();
-    expect(wrapper.find('n[ns="product"]').exists())
-  })
+    expect(wrapper.find('n[ns="product"]').exists());
+  });
 
   it("Renders initially with a loading spinner.", () => {
     const wrapper = mountWithContext(
@@ -68,15 +70,11 @@ describe("Product details page", () => {
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
     // The product's name should be rendered in a FieldView.
-    expect(
-      wrapper.containsMatchingElement(
-        <strong>Name</strong>
-      )
-    ).toEqual(true);
-    expect(
-      wrapper.containsMatchingElement(
-        <p>Test Product 1</p>
-      )
-    ).toEqual(true);
+    expect(wrapper.containsMatchingElement(<strong>Name</strong>)).toEqual(
+      true
+    );
+    expect(wrapper.containsMatchingElement(<p>Test Product 1</p>)).toEqual(
+      true
+    );
   });
 });

@@ -1,18 +1,18 @@
 import { Formik } from "formik";
-import { WithRouterProps, withRouter } from "next/router";
-import { FieldView, Head, LoadingSpinner, Nav, Query } from "../../components";
-import { Product } from "../../types/seqdb-api/resources/Product";
+import { withRouter, WithRouterProps } from "next/router";
 import React from "react";
-import { withNamespaces, Trans, Link } from '../../i18n'
+import { FieldView, Head, LoadingSpinner, Nav, Query } from "../../components";
+import { Link, Trans, withNamespaces } from "../../i18n";
+import { Product } from "../../types/seqdb-api/resources/Product";
 
 export class ProductDetailsPage extends React.Component<WithRouterProps> {
-  public id = this.props.router.query.id;
-  static async getInitialProps() {
+  public static async getInitialProps() {
     return {
-      namespacesRequired: ['product']
-    }
+      namespacesRequired: ["product"]
+    };
   }
-  render() {
+  public id = this.props.router.query.id;
+  public render() {
     return (
       <div>
         <Head title="Product " />
@@ -23,15 +23,21 @@ export class ProductDetailsPage extends React.Component<WithRouterProps> {
           {({ loading, response }) => (
             <div className="container-fluid">
               <Link href="/product/list">
-                <a><Trans i18nKey="Product Inventory" /></a>
+                <a>
+                  <Trans i18nKey="Product Inventory" />
+                </a>
               </Link>
-              <h1><Trans i18nKey="Product Details" /></h1>
+              <h1>
+                <Trans i18nKey="Product Details" />
+              </h1>
               <LoadingSpinner loading={loading} />
               {response && (
                 <Formik<Product> initialValues={response.data} onSubmit={null}>
                   <div>
                     <Link href={`/product/edit?id=${this.id}`}>
-                      <a><Trans i18nKey="Edit" /></a>
+                      <a>
+                        <Trans i18nKey="Edit" />
+                      </a>
                     </Link>
                     <div className="row">
                       <FieldView
@@ -42,7 +48,11 @@ export class ProductDetailsPage extends React.Component<WithRouterProps> {
                     </div>
                     <div className="row">
                       <FieldView className="col-md-2" name="name" />
-                      <FieldView className="col-md-2" name="upc" label="Universal Product Code (UPC)" />
+                      <FieldView
+                        className="col-md-2"
+                        name="upc"
+                        label="Universal Product Code (UPC)"
+                      />
                       <FieldView className="col-md-2" name="type" />
                     </div>
                     <div className="row">
@@ -59,4 +69,4 @@ export class ProductDetailsPage extends React.Component<WithRouterProps> {
   }
 }
 
-export default withRouter(withNamespaces('product')(ProductDetailsPage))
+export default withRouter(withNamespaces("product")(ProductDetailsPage));

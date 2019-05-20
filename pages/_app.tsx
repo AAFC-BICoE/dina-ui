@@ -1,8 +1,8 @@
 import App, { Container } from "next/app";
 import React from "react";
 import { ApiClientContext, createContextValue } from "../components";
-import { appWithTranslation } from '../i18n'
-//import { nextI18Next } from '../i18n'
+import { appWithTranslation } from "../i18n";
+// import { nextI18Next } from '../i18n'
 
 /**
  * App component that wraps every page component.
@@ -20,7 +20,7 @@ class SeqdbUiApp extends App {
     // Reload the page after the App is mounted in the browser, because Next.js does not pass in
     // the URL query string on the initial browser-side render.
     // https://github.com/zeit/next.js/issues/2910
-    const asPath = this.props.router.asPath.replace('/fr/', '/')
+    const asPath = this.props.router.asPath.replace("/fr/", "/");
     this.props.router.push(asPath);
   }
 
@@ -46,4 +46,4 @@ class SeqdbUiApp extends App {
   }
 }
 
-export default appWithTranslation(SeqdbUiApp) 
+export default appWithTranslation(SeqdbUiApp);

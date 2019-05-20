@@ -1,9 +1,9 @@
 import { mount, shallow } from "enzyme";
+import i18next from "i18next";
+import { I18nextProvider } from "react-i18next";
 import { ApiClientContext, createContextValue } from "../../../components";
 import ProductListPage from "../../../pages/product/list";
 import { Product } from "../../../types/seqdb-api/resources/Product";
-import { I18nextProvider } from "react-i18next"
-import i18next from "i18next";
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 const TEST_PRODUCTS: Product[] = [
@@ -40,7 +40,7 @@ jest.mock(
 describe("Product list page", () => {
   function mountWithContext(element: JSX.Element) {
     return mount(
-      <I18nextProvider i18n={i18next} >
+      <I18nextProvider i18n={i18next}>
         <ApiClientContext.Provider value={createContextValue()}>
           {element}
         </ApiClientContext.Provider>
@@ -49,20 +49,21 @@ describe("Product list page", () => {
   }
 
   it("getInitialProps called, correct props set after page renders.", async () => {
-    const props = await ProductListPage.getInitialProps()
-    const wrapper = shallow(<ProductListPage {...props} />)
+    const props = await ProductListPage.getInitialProps();
+    const wrapper = shallow(<ProductListPage {...props} />);
     wrapper.update();
-    expect(wrapper.find('n[ns="product"]').exists())
-  })
+    expect(wrapper.find('n[ns="product"]').exists());
+  });
 
   it("Renders the list page.", async () => {
-
     const wrapper = mountWithContext(<ProductListPage />);
     await new Promise(resolve => setTimeout(resolve, 3000));
     wrapper.update();
-    expect(wrapper.containsMatchingElement(<a>Test Product 1</a>)).toEqual(true);
-    expect(wrapper.containsMatchingElement(<a>Test Product 2</a>)).toEqual(true);
-  }
-  )
-
+    expect(wrapper.containsMatchingElement(<a>Test Product 1</a>)).toEqual(
+      true
+    );
+    expect(wrapper.containsMatchingElement(<a>Test Product 2</a>)).toEqual(
+      true
+    );
+  });
 });

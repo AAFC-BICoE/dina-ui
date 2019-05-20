@@ -28,15 +28,15 @@ describe("SeqdbUiApp", () => {
 
     // The first browser render should be empty.
     expect(wrapper.html()).toEqual(null);
-    //Wait long enough for the component to be mounted, otherwise normally the push will not be invoked
+    // Wait long enough for the component to be mounted, otherwise normally the push will not be invoked
     await new Promise(resolve => setTimeout(resolve, 4000));
     expect(mockPush).lastCalledWith("/example-path?a=b");
     // Normally the router would update the app wrapper, but the mock doesn't, so we force a
-    // re-render in the test.    
+    // re-render in the test.
     wrapper.instance().forceUpdate();
     wrapper.update();
-    //Lauguage namespace tag added to dom node
-    expect(wrapper.find('LoadNamespace(NextStaticProvider)').length).toEqual(1)
+    // Lauguage namespace tag added to dom node
+    expect(wrapper.find("LoadNamespace(NextStaticProvider)").length).toEqual(1);
     const innerComponent = wrapper.find(TestComponent);
     expect(innerComponent.prop("exampleProp")).toEqual("exampleValue");
   });

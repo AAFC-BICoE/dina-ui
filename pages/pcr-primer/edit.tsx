@@ -1,6 +1,7 @@
 import { Form, Formik, FormikActions } from "formik";
 import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
 import { useContext } from "react";
+import React from "react";
 import {
   ApiClientContext,
   ErrorViewer,
@@ -13,13 +14,12 @@ import {
   SubmitButton,
   TextField
 } from "../../components";
+import { Trans, withNamespaces } from "../../i18n";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
 import { Region } from "../../types/seqdb-api/resources/Region";
 import { filterBy } from "../../util/rsql";
 import { serialize } from "../../util/serialize";
-import { withNamespaces, Trans } from "../../i18n";
-import React from "react";
 
 interface PcrPrimerFormProps {
   primer?: PcrPrimer;
@@ -27,20 +27,21 @@ interface PcrPrimerFormProps {
 }
 
 interface OtherProps {
-  t?: (string) => string
+  t?: (string) => string;
 }
-export class PcrPrimerEditPage extends React.Component<WithRouterProps & OtherProps> {
+export class PcrPrimerEditPage extends React.Component<
+  WithRouterProps & OtherProps
+> {
+  public static async getInitialProps() {
+    return await {
+      namespacesRequired: ["pcr-primer"]
+    };
+  }
 
   public id = this.props.router.query.id;
   public router = this.props.router;
-
-  static async getInitialProps() {
-    return await {
-      namespacesRequired: ['pcr-primer']
-    }
-  }
-  render() {
-    const { t } = this.props
+  public render() {
+    const { t } = this.props;
     return (
       <div>
         <Head title="Edit PCR Primer" />
@@ -48,31 +49,39 @@ export class PcrPrimerEditPage extends React.Component<WithRouterProps & OtherPr
         <div className="container-fluid">
           {this.id ? (
             <div>
-              <h1><Trans i18nKey="Edit PCR Primer" /></h1>
+              <h1>
+                <Trans i18nKey="Edit PCR Primer" />
+              </h1>
               <Query<PcrPrimer>
-                query={{ include: "group,region", path: `pcrPrimer/${this.id}` }}
+                query={{
+                  include: "group,region",
+                  path: `pcrPrimer/${this.id}`
+                }}
               >
                 {({ loading, response }) => (
                   <div>
                     <LoadingSpinner loading={loading} />
                     {response && (
-                      <PcrPrimerForm primer={response.data} router={this.router} t={t} />
+                      <PcrPrimerForm
+                        primer={response.data}
+                        router={this.router}
+                        t={t}
+                      />
                     )}
                   </div>
                 )}
               </Query>
             </div>
           ) : (
-              <div>
-                <h1>Add PCR Primer</h1>
-                <PcrPrimerForm router={this.router} t={t} />
-              </div>
-            )}
+            <div>
+              <h1>Add PCR Primer</h1>
+              <PcrPrimerForm router={this.router} t={t} />
+            </div>
+          )}
         </div>
       </div>
     );
   }
-
 }
 
 function PcrPrimerForm({ primer, router, t }: PcrPrimerFormProps & OtherProps) {
@@ -124,7 +133,6 @@ function PcrPrimerForm({ primer, router, t }: PcrPrimerFormProps & OtherProps) {
               model="group"
               optionLabel={group => group.groupName}
             />
-
           </div>
           <div className="row">
             <SelectField
@@ -141,10 +149,14 @@ function PcrPrimerForm({ primer, router, t }: PcrPrimerFormProps & OtherProps) {
               filter={filterBy(["name"])}
               label="Target Gene Region"
               model="region"
-              tooltipMsg={t('target gene region')}
+              tooltipMsg={t("target gene region")}
               optionLabel={region => region.name}
             />
-            <TextField tooltipMsg={t('primer name')} className="col-md-2" name="name" />
+            <TextField
+              tooltipMsg={t("primer name")}
+              className="col-md-2"
+              name="name"
+            />
             <TextField className="col-md-2" name="lotNumber" />
             <TextField className="col-md-2" name="targetSpecies" />
             <TextField className="col-md-2" name="purification" />
@@ -204,4 +216,4 @@ const PRIMER_TYPE_OPTIONS = [
   }
 ];
 
-export default withRouter(withNamespaces('pcr-primer')(PcrPrimerEditPage));
+export default withRouter(withNamespaces("pcr-primer")(PcrPrimerEditPage));
