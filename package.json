@@ -7,7 +7,7 @@
     "lint": "tslint --project tsconfig.json",
     "lint:fix": "tslint --project tsconfig.json --fix",
     "next": "next",
-    "start": "NODE_ENV=production node index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
     "proxy": "micro-proxy -r ./dev-proxy-config.json -p 8000",
     "test": "tsc && jest",
     "test:coverage": "tsc && jest --coverage"
@@ -19,6 +19,7 @@
     "axios": "^0.18.0",
     "bootswatch": "^4.2.1",
     "core-js": "^2.6.5",
+    "cross-env": "^5.2.0",
     "express": "^4.16.4",
     "formik": "^1.5.1",
     "i18next": "^15.0.9",
