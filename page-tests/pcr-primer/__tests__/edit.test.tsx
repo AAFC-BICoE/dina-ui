@@ -25,7 +25,7 @@ const mockPatch = jest.fn();
 /** Mock next.js' router "push" function for navigating pages. */
 const mockPush = jest.fn();
 
-const mockT = string => string;
+const mockT = (key: string) => key;
 
 // Mock Kitsu, the client class that talks to the backend.
 jest.mock(

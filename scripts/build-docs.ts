@@ -1,3 +1,4 @@
+// tslint:disable-next-line: no-var-requires
 const Asciidoctor = require("asciidoctor.js");
 
 const asciidoctor = Asciidoctor();
