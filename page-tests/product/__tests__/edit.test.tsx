@@ -206,8 +206,8 @@ describe("Product edit page", () => {
             path: "product/10",
             value: {
               attributes: expect.objectContaining({
-                name: "Rapid Alkaline DNA Extraction",
-                description: "new desc for product 10, was a null value"
+                description: "new desc for product 10, was a null value",
+                name: "Rapid Alkaline DNA Extraction"
               }),
               id: "10",
               relationships: {

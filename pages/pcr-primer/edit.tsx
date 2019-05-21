@@ -27,7 +27,7 @@ interface PcrPrimerFormProps {
 }
 
 interface OtherProps {
-  t?: (string) => string;
+  t?: (arg0: string) => string;
 }
 export class PcrPrimerEditPage extends React.Component<
   WithRouterProps & OtherProps

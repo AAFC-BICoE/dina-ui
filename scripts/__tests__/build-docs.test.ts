@@ -22,10 +22,10 @@ describe("build-docs script", () => {
 
     expect(inputFilePath).toEqual("../docs/index.adoc");
     expect(options).toEqual({
-      safe: "unsafe",
+      attributes: ["copycss", "toc=left"],
       mkdirs: true,
-      to_dir: "../generated-docs/",
-      attributes: ["copycss", "toc=left"]
+      safe: "unsafe",
+      to_dir: "../generated-docs/"
     });
 
     // Expect the input file (index.adoc) to exist at the inputFilePath specified in the script.
