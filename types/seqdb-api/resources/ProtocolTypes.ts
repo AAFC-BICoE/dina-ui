@@ -1,4 +1,4 @@
-export const enum ProtocolTypes {
+export enum ProtocolTypes {
     /** The collection event. */
     COLLECTION_EVENT = "Collection Event",
 
