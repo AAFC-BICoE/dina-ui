@@ -110,7 +110,7 @@ describe("rsql conversion", () => {
     };
 
     const rsqlFilter = rsql(model);
-    expect(rsqlFilter).toEqual("description==null,description==''");
+    expect(rsqlFilter).toEqual("description==null,description==");
   });
 
   it("Allows a filter for NOT blank fields.", () => {
@@ -131,6 +131,6 @@ describe("rsql conversion", () => {
     };
 
     const rsqlFilter = rsql(model);
-    expect(rsqlFilter).toEqual("description!=null;description!=''");
+    expect(rsqlFilter).toEqual("description!=null;description!=");
   });
 });
