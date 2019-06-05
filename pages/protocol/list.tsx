@@ -35,20 +35,26 @@ const PROTOCOL_TABLE_COLUMNS: Array<ColumnDefinition<Protocol>> = [
   {
     Header: "Equipment",
     accessor: "equipment"
+  },
+  {
+    Header: "Kit Group Name",
+    accessor: "kit.group.groupname"
+  },
+  {
+    Header: "Kit Name",
+    accessor: "kit.name"
   }
-
 ];
 
 const PROTOCOL_FILTER_ATTRIBUTES = [
   "name",
   "group.groupName",
+  "type",
   "version",
   "description",
   "equipment",
-  "notes",
-  "reference",
-  "kit.name",
-  "kit.type"
+  "kit.group.groupName",
+  "kit.name"
 ];
 
 export default function ProtocolListPage() {
@@ -83,7 +89,7 @@ export default function ProtocolListPage() {
         <QueryTable<Protocol>
           columns={PROTOCOL_TABLE_COLUMNS}
           filter={filter}
-          include="group"
+          include="group,kit"
           path="protocol"
         />
       </div>
