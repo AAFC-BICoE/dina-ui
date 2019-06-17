@@ -55,7 +55,7 @@ export default function PcrPrimerListPage() {
   function onSubmit(values, { setSubmitting }: FormikActions<any>) {
     setFilter({ rsql: rsql(values.filter) });
     setSubmitting(false);
-  };
+  }
 
   return (
     <div>

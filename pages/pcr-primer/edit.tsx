@@ -50,11 +50,11 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
             </Query>
           </div>
         ) : (
-          <div>
-            <h1>Add PCR Primer</h1>
-            <PcrPrimerForm router={router} />
-          </div>
-        )}
+            <div>
+              <h1>Add PCR Primer</h1>
+              <PcrPrimerForm router={router} />
+            </div>
+          )}
       </div>
     </div>
   );
@@ -126,9 +126,14 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
               filter={filterBy(["name"])}
               label="Target Gene Region"
               model="region"
+              tooltipMsg="target gene region"
               optionLabel={region => region.name}
             />
-            <TextField className="col-md-2" name="name" />
+            <TextField
+              tooltipMsg="primer name"
+              className="col-md-2"
+              name="name"
+            />
             <TextField className="col-md-2" name="lotNumber" />
             <TextField className="col-md-2" name="targetSpecies" />
             <TextField className="col-md-2" name="purification" />

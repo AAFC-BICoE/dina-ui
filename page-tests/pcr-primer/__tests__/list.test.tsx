@@ -4,8 +4,8 @@ import {
   createContextValue,
   QueryTable
 } from "../../../components";
-import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 import PcrPrimerListPage from "../../../pages/pcr-primer/list";
+import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);

@@ -1,8 +1,14 @@
-import { FormikActions, Formik, Form } from "formik";
+import { Form, Formik, FormikActions } from "formik";
 import { FilterParam } from "kitsu";
 import Link from "next/link";
 import { useState } from "react";
-import { ColumnDefinition, Head, Nav, QueryTable, FilterBuilderField } from "../../components";
+import {
+  ColumnDefinition,
+  FilterBuilderField,
+  Head,
+  Nav,
+  QueryTable
+} from "../../components";
 import { rsql } from "../../components/filter-builder/rsql";
 import { Product } from "../../types/seqdb-api/resources/Product";
 
@@ -42,7 +48,7 @@ export default function ProductListPage() {
   function onSubmit(values, { setSubmitting }: FormikActions<any>) {
     setFilter({ rsql: rsql(values.filter) });
     setSubmitting(false);
-  };
+  }
 
   return (
     <div>

@@ -46,6 +46,8 @@ describe("FilterBuilderField component", () => {
       .simulate("change", { target: { value: "test value" } });
 
     // Formik should have the updated value.
-    expect(wrapper.state().values.filter.children[0].value).toEqual("test value");
+    expect(wrapper.state().values.filter.children[0].value).toEqual(
+      "test value"
+    );
   });
 });
