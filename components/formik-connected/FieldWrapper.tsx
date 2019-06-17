@@ -1,3 +1,4 @@
+import ReactTooltip from "react-tooltip";
 import titleCase from "title-case";
 
 export interface LabelWrapperParams {
@@ -9,6 +10,9 @@ export interface LabelWrapperParams {
 
   /** The label for the field. */
   label?: string;
+
+  /** Tootip Msg provided for the field, move to here to cover text field with tooltip case */
+  tooltipMsg?: string;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -26,13 +30,26 @@ export function FieldWrapper({
   className,
   name,
   label = titleCase(name),
+  tooltipMsg,
   children
 }: FieldWrapperProps) {
   return (
     <div className={className}>
       <div className={`form-group ${name}-field`}>
         <label>
-          <strong>{label}</strong>
+          <div>
+            <strong>{label}</strong>
+            {tooltipMsg && (
+              <img
+                src="/static/images/iconInformation.gif"
+                data-tip={true}
+                data-for={tooltipMsg}
+              />
+            )}
+            <ReactTooltip id={tooltipMsg}>
+              <span>{tooltipMsg}</span>
+            </ReactTooltip>
+          </div>
         </label>
         {children}
       </div>

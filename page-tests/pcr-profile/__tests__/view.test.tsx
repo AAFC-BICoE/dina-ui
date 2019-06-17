@@ -58,15 +58,12 @@ describe("PcrProfile details page", () => {
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
     // The profile's name should be rendered in a FieldView.
-    expect(
-      wrapper.containsMatchingElement(
-        <div>
-          <label>
-            <strong>Thermocycler Profile Name</strong>
-          </label>
-          <p>Test Profile</p>
-        </div>
-      )
-    ).toEqual(true);
+    expect(wrapper.containsMatchingElement(<strong>Thermocycler Profile Name</strong>)).toEqual(
+      true
+    );
+    expect(wrapper.containsMatchingElement(<p>Test Profile</p>)).toEqual(
+      true
+    );
+
   });
 });

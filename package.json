@@ -2,6 +2,7 @@
   "name": "create-next-example-app",
   "scripts": {
     "build": "next build && next export -o ./build && babel ./build -d ./build",
+    "build2": "next build",
     "dev": "run-p next proxy",
     "docs": "cd scripts/ && ts-node ./build-docs.ts",
     "lint": "tslint --project tsconfig.json",
@@ -29,6 +30,7 @@
     "react-dom": "^16.8.3",
     "react-select": "^2.3.0",
     "react-table": "6.8.6",
+    "react-tooltip": "^3.10.0",
     "title-case": "^2.1.1"
   },
   "devDependencies": {
