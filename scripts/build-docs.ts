@@ -1,10 +1,11 @@
+// tslint:disable-next-line: no-var-requires
 const Asciidoctor = require("asciidoctor.js");
 
 const asciidoctor = Asciidoctor();
 
 asciidoctor.convertFile("../docs/index.adoc", {
-  safe: "unsafe",
+  attributes: ["copycss", "toc=left"],
   mkdirs: true,
-  to_dir: "../generated-docs/",
-  attributes: ["copycss", "toc=left"]
+  safe: "unsafe",
+  to_dir: "../generated-docs/"
 });

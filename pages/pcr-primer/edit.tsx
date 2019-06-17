@@ -50,11 +50,11 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
             </Query>
           </div>
         ) : (
-            <div>
-              <h1>Add PCR Primer</h1>
-              <PcrPrimerForm router={router} />
-            </div>
-          )}
+          <div>
+            <h1>Add PCR Primer</h1>
+            <PcrPrimerForm router={router} />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -91,6 +91,7 @@ export function ResourceSelect<TData extends KitsuResource>({
     <AsyncSelect
       defaultOptions={true}
       loadOptions={debouncedOptionLoader}
+      /* tslint:disable-next-line */
       onChange={({ value }) => onChange(value)}
       placeholder="Type here to search."
       value={selectedValue as any}

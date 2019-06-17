@@ -82,6 +82,7 @@ describe("ResourceSelectField component", () => {
               name="group"
               model="group"
               filter={groupName => ({ groupName })}
+              /* tslint:disable-next-line */
               optionLabel={group => group.groupName}
             />
             <div id="value-display">{group && group.groupName}</div>
