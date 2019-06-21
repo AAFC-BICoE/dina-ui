@@ -8,7 +8,15 @@ import { Protocol } from "../../../types/seqdb-api/resources/Protocol";
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn();
+const mockGet = jest.fn(async model => {
+  if (model === "protocol/10") {
+    // The request for the protocol returns the test protocol.
+    return { data: TEST_PROTOCOL };
+  } else {
+    // Requests for the selectable resources (linked group, kit, etc.) return an empty array.
+    return { data: [] };
+  }
+});
 
 /** Mock axios for operations requests. */
 const mockPatch = jest.fn();
@@ -38,7 +46,7 @@ function mountWithContext(element: JSX.Element) {
 
 describe("Protocol edit page", () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   it("Provides a form to add a Protocol.", done => {
@@ -207,6 +215,7 @@ describe("Protocol edit page", () => {
 
     // Submit the form.
     wrapper.find("form").simulate("submit");
+
     setImmediate(() => {
       wrapper.update();
       expect(wrapper.find(".alert.alert-danger").text()).toEqual(
@@ -216,8 +225,6 @@ describe("Protocol edit page", () => {
       done();
     });
   });
-
-
 });
 
 /** Test Protocol with all fields defined. */
