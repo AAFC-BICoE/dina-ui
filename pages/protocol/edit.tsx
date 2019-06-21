@@ -10,13 +10,15 @@ import {
   Query,
   ResourceSelectField,
   SubmitButton,
-  TextField
+  TextField,
+  SelectField
 } from "../../components";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { filterBy } from "../../util/rsql";
 import { serialize } from "../../util/serialize";
-import { Protocol } from "types/seqdb-api/resources/Protocol";
-import { Product } from "types/seqdb-api/resources/Product";
+import { Protocol } from "../../types/seqdb-api/resources/Protocol";
+import { Product } from "../../types/seqdb-api/resources/Product";
+import { ProtocolTypes } from "../../types/seqdb-api/resources/ProtocolTypes";
 
 interface ProtocolFormProps {
   protocol?: Protocol;
@@ -33,7 +35,7 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
         {id ? (
           <div>
             <h1>Edit Protocol</h1>
-            <Query<Protocol> query={{ include: "group", path: `protocol/${id}` }}>
+            <Query<Protocol> query={{ include: "group,kit", path: `protocol/${id}` }}>
               {({ loading, response }) => (
                 <div>
                   <LoadingSpinner loading={loading} />
@@ -77,7 +79,6 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
       if (op === "POST") {
         serialized.id = -100;
       }
-
       const response = await doOperations([
         {
           op,
@@ -107,9 +108,16 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
               model="group"
               optionLabel={group => group.groupName}
             />
+
           </div>
-          <div className="row">
-            <TextField className="col-md-2" name="type" />
+
+          <div className="row" >
+            <SelectField
+              className="col-md-2"
+              name="type"
+              label="Potocol Type"
+              options={PROTOCOL_TYPE_OPTIONS}
+            />
             <TextField className="col-md-2" name="name" />
             <TextField className="col-md-2" name="version" />
             <TextField className="col-md-2" name="description" />
@@ -137,4 +145,28 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
     </Formik>
   );
 }
+
+const PROTOCOL_TYPE_OPTIONS = [
+  {
+    label: ProtocolTypes.COLLECTION_EVENT,
+    value: "COLLECTION_EVENT"
+  },
+  {
+    label: ProtocolTypes.DNA_EXTRACTION,
+    value: "DNA_EXTRACTION",
+  },
+  {
+    label: ProtocolTypes.PCR_REACTION,
+    value: "PCR_REACTION"
+  },
+  {
+    label: ProtocolTypes.SEQ_REACTION,
+    value: "SEQ_REACTION"
+  },
+  {
+    label: ProtocolTypes.SPECIMEN_PREPARATION,
+    value: "SPECIMEN_PREPARATION"
+  }
+
+]
 export default withRouter(ProtocolEditPage);

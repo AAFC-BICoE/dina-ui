@@ -1,9 +1,8 @@
 import { KitsuResource } from "kitsu";
 import { Group } from "./Group";
-import { ProtocolTypes } from "./ProtocolTypes";
 import { Product } from "./Product";
 export interface ProtocolAttributes {
-  type: ProtocolTypes;
+  type: string;
   name: String;
   version?: String;
   description?: String;

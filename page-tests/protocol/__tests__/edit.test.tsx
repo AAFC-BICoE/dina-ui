@@ -3,7 +3,6 @@ import { mount } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
 import { ProtocolEditPage } from "../../../pages/protocol/edit";
 import { Protocol } from "../../../types/seqdb-api/resources/Protocol";
-import { ProtocolTypes } from "../../../types/seqdb-api/resources/ProtocolTypes";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -42,7 +41,7 @@ describe("Protocol edit page", () => {
     jest.resetAllMocks();
   });
 
-  it("Provides a form to add a Protocol.", done => {
+  it("Provides a form to add a Protocol.", async done => {
     mockPatch.mockReturnValueOnce({
       data: [
         {
@@ -60,16 +59,15 @@ describe("Protocol edit page", () => {
     );
 
     // Edit the protocol name, adding mandatory field values
+    console.log("wrapper " + wrapper.debug());
     wrapper.find(".name-field input").simulate("change", {
       target: { name: "name", value: "New Protocol" }
     });
 
-    wrapper.find(".type-field input").simulate("change", {
-      target: { name: "type", value: ProtocolTypes.PCR_REACTION }
-    });
-
     // Submit the form.
     wrapper.find("form").simulate("submit");
+
+    //await new Promise(resolve => setTimeout(resolve, 1000));
 
     setImmediate(() => {
       expect(mockPatch).lastCalledWith(
@@ -81,7 +79,6 @@ describe("Protocol edit page", () => {
             value: {
               attributes: {
                 name: "New Protocol",
-                type: ProtocolTypes.PCR_REACTION
               },
               id: -100,
               type: "protocol"
@@ -93,45 +90,6 @@ describe("Protocol edit page", () => {
 
       // The user should be redirected to the new protocol's details page.
       expect(mockPush).lastCalledWith("/protocol/view?id=1");
-      done();
-    });
-  });
-
-  it("Renders an error after form submit if one is returned from the back-end.", done => {
-    // The patch request will return an error.
-    mockPatch.mockImplementationOnce(() => ({
-      data: [
-        {
-          errors: [
-            {
-              detail: "name size must be between 1 and 10",
-              status: "422",
-              title: "Constraint violation"
-            }
-          ],
-          status: 422
-        }
-      ] as OperationsResponse
-    }));
-
-    const wrapper = mountWithContext(
-      <ProtocolEditPage router={{ query: {}, push: mockPush } as any} />
-    );
-
-    // Edit the protocol name.
-    wrapper.find(".name-field input").simulate("change", {
-      target: { name: "name", value: "invalid name" }
-    });
-
-    // Submit the form.
-    wrapper.find("form").simulate("submit");
-
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-        "Constraint violation: name size must be between 1 and 10"
-      );
-      expect(mockPush).toBeCalledTimes(0);
       done();
     });
   });
@@ -223,6 +181,46 @@ describe("Protocol edit page", () => {
       done();
     });
   });
+
+  it("Renders an error after form submit if one is returned from the back-end.", async done => {
+    // The patch request will return an error.
+    mockPatch.mockImplementationOnce(() => ({
+      data: [
+        {
+          errors: [
+            {
+              detail: "name size must be between 1 and 10",
+              status: "422",
+              title: "Constraint violation"
+            }
+          ],
+          status: 422
+        }
+      ] as OperationsResponse
+    }));
+
+    const wrapper = mountWithContext(
+      <ProtocolEditPage router={{ query: {}, push: mockPush } as any} />
+    );
+
+    // Edit the protocol name.
+    wrapper.find(".name-field input").simulate("change", {
+      target: { name: "name", value: "invalid name" }
+    });
+
+    // Submit the form.
+    wrapper.find("form").simulate("submit");
+    setImmediate(() => {
+      wrapper.update();
+      expect(wrapper.find(".alert.alert-danger").text()).toEqual(
+        "Constraint violation: name size must be between 1 and 10"
+      );
+      expect(mockPush).toBeCalledTimes(0);
+      done();
+    });
+  });
+
+
 });
 
 /** Test Protocol with all fields defined. */
@@ -237,7 +235,7 @@ const TEST_PROTOCOL: Required<Protocol> = {
   id: "10",
   lastModified: "2019-03-27T04:00:00.000+0000",
   name: "PCR Standardized for Sequencing (10ul), +BSA",
-  type: ProtocolTypes.PCR_REACTION,
+  type: "PCR_REACTION",
   version: "1",
   steps: "step",
   notes: "some notes",

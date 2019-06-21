@@ -20,30 +20,15 @@ const PROTOCOL_TABLE_COLUMNS: Array<ColumnDefinition<Protocol>> = [
     Header: "Group Name",
     accessor: "group.groupName"
   },
-  {
-    Header: "Type",
-    accessor: "type"
-  },
-  {
-    Header: "Version",
-    accessor: "version"
-  },
-  {
-    Header: "Description",
-    accessor: "description"
-  },
-  {
-    Header: "Equipment",
-    accessor: "equipment"
-  },
+  "type",
+  "version",
+  "description",
+  "equipment",
   {
     Header: "Kit Group Name",
     accessor: "kit.group.groupname"
   },
-  {
-    Header: "Kit Name",
-    accessor: "kit.name"
-  }
+  "kit.name"
 ];
 
 const PROTOCOL_FILTER_ATTRIBUTES = [

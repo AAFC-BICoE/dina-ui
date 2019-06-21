@@ -17,7 +17,7 @@ const MOCK_TODOS = {
 };
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async (_, {}) => {
+const mockGet = jest.fn(async (_, { }) => {
   return MOCK_TODOS;
 });
 
@@ -235,7 +235,7 @@ describe("ResourceSelect component", () => {
     });
 
     // Select the null option.
-    onChange(nullOption);
+    onChange(nullOption, null);
 
     // This should call the onChange prop function with { id: null }.
     expect(mockOnChange).toHaveBeenCalledTimes(1);
