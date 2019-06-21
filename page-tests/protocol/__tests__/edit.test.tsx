@@ -41,7 +41,7 @@ describe("Protocol edit page", () => {
     jest.resetAllMocks();
   });
 
-  it("Provides a form to add a Protocol.", async done => {
+  it("Provides a form to add a Protocol.", done => {
     mockPatch.mockReturnValueOnce({
       data: [
         {
@@ -59,15 +59,12 @@ describe("Protocol edit page", () => {
     );
 
     // Edit the protocol name, adding mandatory field values
-    console.log("wrapper " + wrapper.debug());
     wrapper.find(".name-field input").simulate("change", {
       target: { name: "name", value: "New Protocol" }
     });
 
     // Submit the form.
     wrapper.find("form").simulate("submit");
-
-    //await new Promise(resolve => setTimeout(resolve, 1000));
 
     setImmediate(() => {
       expect(mockPatch).lastCalledWith(
