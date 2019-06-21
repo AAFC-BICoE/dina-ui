@@ -2,7 +2,7 @@ import { Formik } from "formik";
 import Link from "next/link";
 import { withRouter, WithRouterProps } from "next/router";
 import { FieldView, Head, LoadingSpinner, Nav, Query } from "../../components";
-import { Protocol } from "../../types/seqdb-api/resources/Protocol";
+import { Protocol, findProtocolValue } from "../../types/seqdb-api/resources/Protocol";
 
 export function ProtocolDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -21,41 +21,44 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
             <h1>Protocols Details</h1>
             <LoadingSpinner loading={loading} />
             {response && (
-              <Formik<Protocol> initialValues={response.data} onSubmit={null}>
-                <div>
-                  <Link href={`/protocol/edit?id=${id}`}>
-                    <a>Edit</a>
-                  </Link>
-                  <div className="row">
-                    <FieldView
-                      className="col-md-2"
-                      name="group.groupName"
-                      label="Group Name"
-                    />
+              response.data.type = findProtocolValue(response.data.type)
+            ) && (
+                <Formik<Protocol> initialValues={response.data} onSubmit={null}>
+
+                  <div>
+                    <Link href={`/protocol/edit?id=${id}`}>
+                      <a>Edit</a>
+                    </Link>
+                    <div className="row">
+                      <FieldView
+                        className="col-md-2"
+                        name="group.groupName"
+                        label="Group Name"
+                      />
+                    </div>
+                    <div className="row">
+                      <FieldView className="col-md-2" name="type" />
+                      <FieldView className="col-md-2" name="name" />
+                      <FieldView className="col-md-2" name="version" />
+                      <FieldView className="col-md-2" name="description" />
+                    </div>
+                    <div className="row">
+                      <FieldView className="col-md-8" name="steps" />
+                    </div>
+                    <div className="row">
+                      <FieldView className="col-md-8" name="notes" />
+                    </div>
+                    <div className="row">
+                      <FieldView className="col-md-2" name="reference" />
+                      <FieldView className="col-md-2" name="equipment" />
+                      <FieldView className="col-md-2" name="kit.name" />
+                    </div>
+                    <div className="row">
+                      <FieldView className="col-md-2" name="lastModified" />
+                    </div>
                   </div>
-                  <div className="row">
-                    <FieldView className="col-md-2" name="type" />
-                    <FieldView className="col-md-2" name="name" />
-                    <FieldView className="col-md-2" name="version" />
-                    <FieldView className="col-md-2" name="description" />
-                  </div>
-                  <div className="row">
-                    <FieldView className="col-md-8" name="steps" />
-                  </div>
-                  <div className="row">
-                    <FieldView className="col-md-8" name="notes" />
-                  </div>
-                  <div className="row">
-                    <FieldView className="col-md-2" name="reference" />
-                    <FieldView className="col-md-2" name="equipment" />
-                    <FieldView className="col-md-2" name="kit.name" />
-                  </div>
-                  <div className="row">
-                    <FieldView className="col-md-2" name="lastModified" />
-                  </div>
-                </div>
-              </Formik>
-            )}
+                </Formik>
+              )}
           </div>
         )}
       </Query>

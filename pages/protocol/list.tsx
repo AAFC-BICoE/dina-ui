@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { ColumnDefinition, Head, Nav, QueryTable, FilterBuilderField } from "../../components";
 import { rsql } from "../../components/filter-builder/rsql";
-import { Protocol } from "../../types/seqdb-api/resources/Protocol";
+import { Protocol, findProtocolValue } from "../../types/seqdb-api/resources/Protocol";
 
 const PROTOCOL_TABLE_COLUMNS: Array<ColumnDefinition<Protocol>> = [
   {
@@ -20,7 +20,11 @@ const PROTOCOL_TABLE_COLUMNS: Array<ColumnDefinition<Protocol>> = [
     Header: "Group Name",
     accessor: "group.groupName"
   },
-  "type",
+  {
+    Header: "Type",
+    id: "id",
+    accessor: (row) => findProtocolValue(row.type)
+  },
   "version",
   "description",
   "equipment",
