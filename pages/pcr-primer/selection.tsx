@@ -1,6 +1,5 @@
 import { Form, Formik, FormikActions } from "formik";
 import { FilterParam } from "kitsu";
-import { isEqual } from "lodash";
 import { useState } from "react";
 import ReactTable from "react-table";
 import {
@@ -48,15 +47,16 @@ export default function() {
       <div className="container-fluid">
         <strong>Filter records:</strong>
         <Formik initialValues={{ filter: null }} onSubmit={onFilterSubmit}>
-          <Form>
+          <Form className="form-group">
             <FilterBuilderField filterAttributes={["name"]} name="filter" />
             <button className="btn btn-primary" type="submit">
               Search
             </button>
           </Form>
         </Formik>
-        <div className="row">
+        <div className="row form-group">
           <div className="col-6">
+            <strong>Available Primers</strong>
             <QueryTable
               columns={PRIMER_COLUMNS}
               filter={filter}
@@ -66,6 +66,7 @@ export default function() {
           </div>
           <div className="col-1" />
           <div className="col-5">
+            <strong>Selected Primers</strong>
             <ReactTable
               className="-striped"
               columns={[
@@ -73,16 +74,18 @@ export default function() {
                 { accessor: "group.groupName", Header: "Group Name" },
                 {
                   Cell: ({ index }) => (
-                    <button
-                      className="btn btn-dark"
-                      onClick={() => {
-                        const newSelected = [...selected];
-                        newSelected.splice(index, 1);
-                        setSelected(newSelected);
-                      }}
-                    >
-                      Remove
-                    </button>
+                    <div>
+                      <button
+                        className="btn btn-dark"
+                        onClick={() => {
+                          const newSelected = [...selected];
+                          newSelected.splice(index, 1);
+                          setSelected(newSelected);
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </div>
                   )
                 }
               ]}
