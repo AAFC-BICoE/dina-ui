@@ -10,9 +10,7 @@ export function ProductDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title="Product " />
       <Nav />
-      <Query<Product>
-        query={{ include: "group", path: `product/${id}` }}
-      >
+      <Query<Product> query={{ include: "group", path: `product/${id}` }}>
         {({ loading, response }) => (
           <div className="container-fluid">
             <Link href="/product/list">
@@ -35,8 +33,12 @@ export function ProductDetailsPage({ router }: WithRouterProps) {
                   </div>
                   <div className="row">
                     <FieldView className="col-md-2" name="name" />
-                    <FieldView className="col-md-2" name="upc" label="Universal Product Code (UPC)" />
-                    <FieldView className="col-md-2" name="type" />                    
+                    <FieldView
+                      className="col-md-2"
+                      name="upc"
+                      label="Universal Product Code (UPC)"
+                    />
+                    <FieldView className="col-md-2" name="type" />
                   </div>
                   <div className="row">
                     <FieldView className="col-md-4" name="description" />

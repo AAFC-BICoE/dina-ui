@@ -22,7 +22,7 @@ export interface PcrProfileAttributes {
   step12?: string;
   step13?: string;
   step14?: string;
-  step15?: string
+  step15?: string;
 }
 
 export interface PcrProfileRelationships {
