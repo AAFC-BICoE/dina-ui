@@ -235,7 +235,7 @@ describe("ResourceSelect component", () => {
     });
 
     // Select the null option.
-    onChange(nullOption, null);
+    onChange(nullOption);
 
     // This should call the onChange prop function with { id: null }.
     expect(mockOnChange).toHaveBeenCalledTimes(1);

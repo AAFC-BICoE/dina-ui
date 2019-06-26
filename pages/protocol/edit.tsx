@@ -9,16 +9,18 @@ import {
   Nav,
   Query,
   ResourceSelectField,
+  SelectField,
   SubmitButton,
-  TextField,
-  SelectField
+  TextField
 } from "../../components";
 import { Group } from "../../types/seqdb-api/resources/Group";
+import { Product } from "../../types/seqdb-api/resources/Product";
+import {
+  Protocol,
+  protocolTypeLabels
+} from "../../types/seqdb-api/resources/Protocol";
 import { filterBy } from "../../util/rsql";
 import { serialize } from "../../util/serialize";
-import { Protocol } from "../../types/seqdb-api/resources/Protocol";
-import { Product } from "../../types/seqdb-api/resources/Product";
-import { ProtocolTypes } from "../../types/seqdb-api/resources/ProtocolTypes";
 
 interface ProtocolFormProps {
   protocol?: Protocol;
@@ -35,7 +37,9 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
         {id ? (
           <div>
             <h1>Edit Protocol</h1>
-            <Query<Protocol> query={{ include: "group,kit", path: `protocol/${id}` }}>
+            <Query<Protocol>
+              query={{ include: "group,kit", path: `protocol/${id}` }}
+            >
               {({ loading, response }) => (
                 <div>
                   <LoadingSpinner loading={loading} />
@@ -47,11 +51,11 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
             </Query>
           </div>
         ) : (
-            <div>
-              <h1>Add Protocol</h1>
-              <ProtocolForm router={router} />
-            </div>
-          )}
+          <div>
+            <h1>Add Protocol</h1>
+            <ProtocolForm router={router} />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -66,9 +70,10 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
     try {
-      //override the product type with "product" when kit is available
-      if (submittedValues.kit)
+      // Override the product type with "product" when kit is available
+      if (submittedValues.kit) {
         submittedValues.kit.type = "product";
+      }
 
       const serialized = await serialize({
         resource: submittedValues,
@@ -108,10 +113,8 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
               model="group"
               optionLabel={group => group.groupName}
             />
-
           </div>
-
-          <div className="row" >
+          <div className="row">
             <SelectField
               className="col-md-2"
               name="type"
@@ -147,26 +150,11 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
 }
 
 const PROTOCOL_TYPE_OPTIONS = [
-  {
-    label: ProtocolTypes.COLLECTION_EVENT,
-    value: "COLLECTION_EVENT"
-  },
-  {
-    label: ProtocolTypes.DNA_EXTRACTION,
-    value: "DNA_EXTRACTION",
-  },
-  {
-    label: ProtocolTypes.PCR_REACTION,
-    value: "PCR_REACTION"
-  },
-  {
-    label: ProtocolTypes.SEQ_REACTION,
-    value: "SEQ_REACTION"
-  },
-  {
-    label: ProtocolTypes.SPECIMEN_PREPARATION,
-    value: "SPECIMEN_PREPARATION"
-  }
+  "COLLECTION_EVENT",
+  "DNA_EXTRACTION",
+  "PCR_REACTION",
+  "SEQ_REACTION",
+  "SPECIMEN_PREPARATION"
+].map(value => ({ value, label: protocolTypeLabels[value] }));
 
-]
 export default withRouter(ProtocolEditPage);

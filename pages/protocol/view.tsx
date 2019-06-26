@@ -2,7 +2,10 @@ import { Formik } from "formik";
 import Link from "next/link";
 import { withRouter, WithRouterProps } from "next/router";
 import { FieldView, Head, LoadingSpinner, Nav, Query } from "../../components";
-import { Protocol, findProtocolValue } from "../../types/seqdb-api/resources/Protocol";
+import {
+  Protocol,
+  protocolTypeLabels
+} from "../../types/seqdb-api/resources/Protocol";
 
 export function ProtocolDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -10,21 +13,22 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title="Protocol Details" />
       <Nav />
-      <Query<Protocol>
-        query={{ include: "group,kit", path: `protocol/${id}` }}
-      >
-        {({ loading, response }) => (
-          <div className="container-fluid">
-            <Link href="/protocol/list">
-              <a>Protocols</a>
-            </Link>
-            <h1>Protocols Details</h1>
-            <LoadingSpinner loading={loading} />
-            {response && (
-              response.data.type = findProtocolValue(response.data.type)
-            ) && (
-                <Formik<Protocol> initialValues={response.data} onSubmit={null}>
+      <Query<Protocol> query={{ include: "group,kit", path: `protocol/${id}` }}>
+        {({ loading, response }) => {
+          const protocol = response && {
+            ...response.data,
+            type: protocolTypeLabels[response.data.type]
+          };
 
+          return (
+            <div className="container-fluid">
+              <Link href="/protocol/list">
+                <a>Protocols</a>
+              </Link>
+              <h1>Protocol Details</h1>
+              <LoadingSpinner loading={loading} />
+              {protocol && (
+                <Formik<Protocol> initialValues={protocol} onSubmit={null}>
                   <div>
                     <Link href={`/protocol/edit?id=${id}`}>
                       <a>Edit</a>
@@ -59,8 +63,9 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
                   </div>
                 </Formik>
               )}
-          </div>
-        )}
+            </div>
+          );
+        }}
       </Query>
     </div>
   );

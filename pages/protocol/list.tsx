@@ -1,10 +1,19 @@
-import { FormikActions, Formik, Form } from "formik";
+import { Form, Formik, FormikActions } from "formik";
 import { FilterParam } from "kitsu";
 import Link from "next/link";
 import { useState } from "react";
-import { ColumnDefinition, Head, Nav, QueryTable, FilterBuilderField } from "../../components";
+import {
+  ColumnDefinition,
+  FilterBuilderField,
+  Head,
+  Nav,
+  QueryTable
+} from "../../components";
 import { rsql } from "../../components/filter-builder/rsql";
-import { Protocol, findProtocolValue } from "../../types/seqdb-api/resources/Protocol";
+import {
+  Protocol,
+  protocolTypeLabels
+} from "../../types/seqdb-api/resources/Protocol";
 
 const PROTOCOL_TABLE_COLUMNS: Array<ColumnDefinition<Protocol>> = [
   {
@@ -22,8 +31,8 @@ const PROTOCOL_TABLE_COLUMNS: Array<ColumnDefinition<Protocol>> = [
   },
   {
     Header: "Type",
-    id: "id",
-    accessor: (row) => findProtocolValue(row.type)
+    accessor: row => protocolTypeLabels[row.type],
+    id: "type"
   },
   "version",
   "description",
@@ -52,7 +61,7 @@ export default function ProtocolListPage() {
   function onSubmit(values, { setSubmitting }: FormikActions<any>) {
     setFilter({ rsql: rsql(values.filter) });
     setSubmitting(false);
-  };
+  }
 
   return (
     <div>

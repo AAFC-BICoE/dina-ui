@@ -5,36 +5,46 @@ import {
   QueryTable
 } from "../../../components";
 import ProtocolListPage from "../../../pages/protocol/list";
-import { Protocol } from "../../../types/seqdb-api/resources/Protocol";
-import { ProtocolTypes } from "../../../types/seqdb-api/resources/ProtocolTypes";
+import {
+  Protocol,
+  protocolTypeLabels
+} from "../../../types/seqdb-api/resources/Protocol";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 const TEST_PROTOCALS: Protocol[] = [
   {
-    group: { id: "1", groupName: "Test Group", type: "group" },
+    description: "desc1 ",
+    equipment: "equip1",
+    group: {
+      groupName: "Test Group",
+      id: "1",
+      type: "group"
+    },
     id: "4",
     name: "Test Protocol 1",
-    version: "1",
-    type: ProtocolTypes.COLLECTION_EVENT,
-    description: "desc1 ",
-    steps: "steps1",
     notes: "notes1",
     reference: "ref1",
-    equipment: "equip1"
+    steps: "steps1",
+    type: protocolTypeLabels.COLLECTION_EVENT,
+    version: "1"
   },
   {
-    group: { id: "2", groupName: "Test Group", type: "group" },
+    description: "desc2 ",
+    equipment: "equip2",
+    group: {
+      groupName: "Test Group",
+      id: "2",
+      type: "group"
+    },
     id: "5",
     name: "Test Protocol 2",
-    type: ProtocolTypes.DNA_EXTRACTION,
-    version: "2",
-    description: "desc2 ",
-    steps: "steps2",
     notes: "notes2",
     reference: "ref2",
-    equipment: "equip2"
+    steps: "steps2",
+    type: protocolTypeLabels.DNA_EXTRACTION,
+    version: "2"
   }
 ];
 

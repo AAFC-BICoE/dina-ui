@@ -1,8 +1,10 @@
 import { mount } from "enzyme";
 import { ApiClientContext, createContextValue } from "../../../components";
 import { ProtocolDetailsPage } from "../../../pages/protocol/view";
-import { Protocol } from "../../../types/seqdb-api/resources/Protocol";
-import { ProtocolTypes } from "../../../types/seqdb-api/resources/ProtocolTypes";
+import {
+  Protocol,
+  protocolTypeLabels
+} from "../../../types/seqdb-api/resources/Protocol";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);
@@ -10,9 +12,9 @@ jest.mock("next/link", () => () => <div />);
 const TEST_PROTOCOL: Protocol = {
   group: { id: "1", groupName: "Test Group", type: "group" },
   id: "4",
+  kit: { name: "test kit", type: "product" },
   name: "Test Protocol",
-  type: ProtocolTypes.COLLECTION_EVENT,
-  kit: { name: "test kit", type: "product" }
+  type: protocolTypeLabels.COLLECTION_EVENT
 };
 
 /** Mock Kitsu "get" method. */
@@ -70,7 +72,7 @@ describe("Protocol details page", () => {
         </div>
       )
     ).toEqual(true);
-    wrapper.debug()
+    wrapper.debug();
     // The protol's kit name should be rendered in a FieldView.
     expect(
       wrapper.containsMatchingElement(
@@ -82,6 +84,5 @@ describe("Protocol details page", () => {
         </div>
       )
     ).toEqual(true);
-
   });
 });
