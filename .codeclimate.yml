@@ -1,4 +1,5 @@
 engines:
+  enabled: true
   duplication:
     exclude_paths:
       - "**/*.test.ts"
