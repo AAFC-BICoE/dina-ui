@@ -62,27 +62,16 @@ describe("Protocol details page", () => {
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
     // The protol's name should be rendered in a FieldView.
-    expect(
-      wrapper.containsMatchingElement(
-        <div>
-          <label>
-            <strong>Name</strong>
-          </label>
-          <p>Test Protocol</p>
-        </div>
-      )
-    ).toEqual(true);
+    expect(wrapper.containsMatchingElement(<strong>Name</strong>)).toEqual(
+      true
+    );
+    expect(wrapper.containsMatchingElement(<p>Test Protocol</p>)).toEqual(true);
     wrapper.debug();
+
     // The protol's kit name should be rendered in a FieldView.
-    expect(
-      wrapper.containsMatchingElement(
-        <div>
-          <label>
-            <strong>Kit Name</strong>
-          </label>
-          <p>test kit</p>
-        </div>
-      )
-    ).toEqual(true);
+    expect(wrapper.containsMatchingElement(<strong>Kit Name</strong>)).toEqual(
+      true
+    );
+    expect(wrapper.containsMatchingElement(<p>test kit</p>)).toEqual(true);
   });
 });
