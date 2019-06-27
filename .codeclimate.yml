@@ -1,3 +1,5 @@
 engines:
   duplication:
-    exclude_paths: "**/test.ts"
+    exclude_paths:
+      - "**/*.test.ts"
+      - "**/*.test.tsx"
