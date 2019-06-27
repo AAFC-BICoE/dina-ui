@@ -21,4 +21,13 @@ describe("FieldWrapper component.", () => {
 
     expect(wrapper.childAt(0).hasClass("col-6")).toEqual(true);
   });
+
+  it("Accepts a tooltip msg which is applied to a surrounding div.", () => {
+    const wrapper = mount(
+      <FieldWrapper tooltipMsg="Wrapper to a formick connected field" name="fieldName">
+        <div />
+      </FieldWrapper>
+    );
+    expect(wrapper.containsMatchingElement(<img src='/static/images/iconInformation.gif' />)).toBeTruthy();
+  });
 });

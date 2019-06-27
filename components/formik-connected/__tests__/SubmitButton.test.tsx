@@ -5,6 +5,7 @@ import { SubmitButton } from "../SubmitButton";
 describe("SubmitButton component", () => {
   it("Shows a submit button when the form is not submitting.", () => {
     const wrapper = mount(
+      /* tslint:disable:no-empty */
       <Formik initialValues={{}} onSubmit={() => {}}>
         <Form>
           <SubmitButton />
@@ -18,6 +19,7 @@ describe("SubmitButton component", () => {
 
   it("Shows a loading spinner when the form is submitting.", () => {
     const wrapper = mount(
+      /* tslint:disable:no-empty */
       <Formik initialValues={{}} onSubmit={() => {}}>
         <Form>
           <SubmitButton />
