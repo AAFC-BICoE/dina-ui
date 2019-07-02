@@ -10,6 +10,8 @@ include::stack.adoc[]
 
 include::dev_tools.adoc[]
 
+include::getting_started.adoc[]
+
 include::npm_package_scripts.adoc[]
 
 = React Components

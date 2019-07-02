@@ -1,0 +1,42 @@
+= Getting Started
+
+Before starting, you will need to make sure the following are installed on your computer:
+
+== NodeJS
+NodeJS can be installed or updated using the following commands:
+
+----
+sudo apt-get update
+sudo apt-get install nodejs
+----
+
+You can check which version you currently have installed with:
+
+----
+nodejs -v
+----
+
+== NPM
+
+----
+sudo apt-get update
+sudo apt-get install npm
+----
+
+You can check which version you currently have installed with:
+
+----
+npm -v
+----
+
+---
+
+== Installing the package
+
+After you have downloaded all of the required tools, you will need to install the package which will install all of the required dependencies needed to run the package.
+
+It's a good idea to run this command when checking out a new branch since the dependencies might have changed.
+
+----
+npm install
+----
