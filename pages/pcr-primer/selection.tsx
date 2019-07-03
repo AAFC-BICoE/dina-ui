@@ -24,12 +24,23 @@ export default function() {
     },
     {
       Cell: ({ original }) => (
-        <button
-          className="btn btn-primary"
-          onClick={() => setSelected([...selected, original])}
-        >
-          -->
-        </button>
+        <>
+          <div className="row">
+            <button
+              className="btn btn-primary btn-sm col-6"
+              onClick={() => setSelected([...selected, original])}
+            >
+              -->
+            </button>
+            <div className="col-6">
+              <input
+                key={original.id}
+                type="checkbox"
+                style={{ width: "20px", height: "20px" }}
+              />
+            </div>
+          </div>
+        </>
       ),
       sortable: false
     }
@@ -55,7 +66,7 @@ export default function() {
           </Form>
         </Formik>
         <div className="row form-group">
-          <div className="col-6">
+          <div className="col-5">
             <strong>Available Primers</strong>
             <QueryTable
               columns={PRIMER_COLUMNS}
@@ -64,7 +75,9 @@ export default function() {
               path="pcrPrimer"
             />
           </div>
-          <div className="col-1" />
+          <div className="col-2" style={{ marginTop: "100px" }}>
+            <button className="btn btn-primary">--></button>
+          </div>
           <div className="col-5">
             <strong>Selected Primers</strong>
             <ReactTable
