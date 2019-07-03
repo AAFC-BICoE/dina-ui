@@ -7,7 +7,8 @@ import {
   FilterBuilderField,
   Head,
   Nav,
-  QueryTable
+  QueryTable,
+  ButtonBar
 } from "../../components";
 import { rsql } from "../../components/filter-builder/rsql";
 import {
@@ -67,11 +68,14 @@ export default function ProtocolListPage() {
     <div>
       <Head title="Protocols" />
       <Nav />
+      <ButtonBar>
+        <Link href="/protocol/edit" prefetch={true}>
+          <button className="btn btn-primary">Create Protocol</button>
+        </Link>
+      </ButtonBar>
+      
       <div className="container-fluid">
         <h1>Protocols</h1>
-        <Link href="/protocol/edit" prefetch={true}>
-          <a>Add Protocol</a>
-        </Link>
         <Formik initialValues={{ filter: null }} onSubmit={onSubmit}>
           <Form>
             <h2>Search:</h2>

@@ -10,7 +10,8 @@ import {
   Query,
   ResourceSelectField,
   SubmitButton,
-  TextField
+  TextField,
+  ButtonBar
 } from "../../components";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
@@ -105,6 +106,9 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form>
         <ErrorViewer />
+        <ButtonBar>
+          <SubmitButton />
+        </ButtonBar>
         <div>
           <div className="row">
             <ResourceSelectField<Group>
@@ -159,7 +163,6 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
               </div>
             </div>
           </div>
-          <SubmitButton />
         </div>
       </Form>
     </Formik>

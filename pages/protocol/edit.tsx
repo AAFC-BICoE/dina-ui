@@ -11,7 +11,8 @@ import {
   ResourceSelectField,
   SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  ButtonBar
 } from "../../components";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { Product } from "../../types/seqdb-api/resources/Product";
@@ -104,6 +105,9 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form>
         <ErrorViewer />
+        <ButtonBar>
+          <SubmitButton />
+        </ButtonBar>
         <div>
           <div className="row">
             <ResourceSelectField<Group>
@@ -142,7 +146,6 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
               optionLabel={product => product.name}
             />
           </div>
-          <SubmitButton />
         </div>
       </Form>
     </Formik>

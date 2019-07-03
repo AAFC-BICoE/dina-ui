@@ -12,7 +12,8 @@ import {
   ResourceSelectField,
   SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  ButtonBar
 } from "../../components";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
@@ -100,6 +101,9 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form>
+        <ButtonBar>
+          <SubmitButton />
+        </ButtonBar>
         <ErrorViewer />
         <div>
           <div className="row">
@@ -162,7 +166,6 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
           <div className="row">
             <TextField className="col-md-6" name="note" />
           </div>
-          <SubmitButton />
         </div>
       </Form>
     </Formik>

@@ -14,3 +14,4 @@ export * from "./head";
 export * from "./loading-spinner/LoadingSpinner";
 export * from "./nav/nav";
 export * from "./table/QueryTable";
+export * from "./button-bar/ButtonBar";
