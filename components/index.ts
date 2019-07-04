@@ -12,5 +12,6 @@ export * from "./formik-connected/SubmitButton";
 export * from "./formik-connected/TextField";
 export * from "./head";
 export * from "./loading-spinner/LoadingSpinner";
-export * from "./nav";
+export * from "./nav/nav";
 export * from "./table/QueryTable";
+export * from "./button-bar/ButtonBar";

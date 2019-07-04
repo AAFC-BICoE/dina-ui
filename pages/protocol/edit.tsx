@@ -3,6 +3,7 @@ import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
 import { useContext } from "react";
 import {
   ApiClientContext,
+  ButtonBar,
   ErrorViewer,
   Head,
   LoadingSpinner,
@@ -104,6 +105,9 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form>
         <ErrorViewer />
+        <ButtonBar>
+          <SubmitButton />
+        </ButtonBar>
         <div>
           <div className="row">
             <ResourceSelectField<Group>
@@ -142,7 +146,6 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
               optionLabel={product => product.name}
             />
           </div>
-          <SubmitButton />
         </div>
       </Form>
     </Formik>

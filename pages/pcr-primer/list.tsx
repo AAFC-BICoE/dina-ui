@@ -3,6 +3,7 @@ import { FilterParam } from "kitsu";
 import Link from "next/link";
 import { useState } from "react";
 import {
+  ButtonBar,
   ColumnDefinition,
   FilterBuilderField,
   Head,
@@ -61,11 +62,13 @@ export default function PcrPrimerListPage() {
     <div>
       <Head title="PCR Primers" />
       <Nav />
+      <ButtonBar>
+        <Link href="/pcr-primer/edit" prefetch={true}>
+          <button className="btn btn-primary">Create PCR Primer</button>
+        </Link>
+      </ButtonBar>
       <div className="container-fluid">
         <h1>PCR Primers</h1>
-        <Link href="/pcr-primer/edit" prefetch={true}>
-          <a>Add PCR Primer</a>
-        </Link>
         <Formik initialValues={{ filter: null }} onSubmit={onSubmit}>
           <Form>
             <h2>Search:</h2>

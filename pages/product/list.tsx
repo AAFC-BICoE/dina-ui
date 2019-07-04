@@ -3,6 +3,7 @@ import { FilterParam } from "kitsu";
 import Link from "next/link";
 import { useState } from "react";
 import {
+  ButtonBar,
   ColumnDefinition,
   FilterBuilderField,
   Head,
@@ -54,11 +55,14 @@ export default function ProductListPage() {
     <div>
       <Head title="Product Inventory" />
       <Nav />
+      <ButtonBar>
+        <Link href="/product/edit" prefetch={true}>
+          <button className="btn btn-primary">Create Product</button>
+        </Link>
+      </ButtonBar>
+
       <div className="container-fluid">
         <h1>Product Inventory</h1>
-        <Link href="/product/edit" prefetch={true}>
-          <a>Add New Product</a>
-        </Link>
         <Formik initialValues={{ filter: null }} onSubmit={onSubmit}>
           <Form>
             <h2>Search:</h2>

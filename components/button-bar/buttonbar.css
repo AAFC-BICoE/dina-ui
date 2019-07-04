@@ -1,0 +1,30 @@
+/* Button bar container styling */
+.button-bar {
+  position: fixed;
+  width: 100%;
+  height: 60px;
+  top: 58px;
+  left: 0;
+  background: #f3f3f3;
+  border-bottom: 1px solid #d3d7cf;
+  z-index: 100;
+  padding: 10px;
+}
+
+/* Button Bar Button Styling */
+.button-bar > a,
+.button-bar > button {
+  margin-right: 10px;
+  float: left;
+}
+
+/* Button Bar Lines */
+.button-bar > .line {
+  display: block;
+  margin-top: 2px;
+  height: 35px;
+  width: 1px;
+  margin-right: 10px;
+  background: #d3d7cf;
+  float: left;
+}

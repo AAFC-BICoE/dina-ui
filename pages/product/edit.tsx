@@ -3,6 +3,7 @@ import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
 import { useContext } from "react";
 import {
   ApiClientContext,
+  ButtonBar,
   ErrorViewer,
   Head,
   LoadingSpinner,
@@ -96,6 +97,9 @@ function ProductForm({ product, router }: ProductFormProps) {
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form>
         <ErrorViewer />
+        <ButtonBar>
+          <SubmitButton />
+        </ButtonBar>
         <div>
           <div className="row">
             <ResourceSelectField<Group>
@@ -125,7 +129,6 @@ function ProductForm({ product, router }: ProductFormProps) {
           <div className="row">
             <TextField className="col-md-4" name="description" />
           </div>
-          <SubmitButton />
         </div>
       </Form>
     </Formik>
