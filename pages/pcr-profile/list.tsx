@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ColumnDefinition, Head, Nav, QueryTable } from "../../components";
+import { ColumnDefinition, Head, ListPageLayout, Nav } from "../../components";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 
 const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
@@ -21,6 +21,8 @@ const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
   "step3"
 ];
 
+const PCRPROFILE_FILTER_ATTRIBUTES = ["name", "application"];
+
 export default function PcrProfileListPage() {
   return (
     <div>
@@ -31,10 +33,13 @@ export default function PcrProfileListPage() {
         <Link href="/pcr-profile/edit" prefetch={true}>
           <a>Add Thermocycler Profile</a>
         </Link>
-        <QueryTable<PcrProfile>
-          columns={PCRPROFILE_TABLE_COLUMNS}
-          include="group,region"
-          path="thermocyclerprofile"
+        <ListPageLayout
+          filterAttributes={PCRPROFILE_FILTER_ATTRIBUTES}
+          queryTableProps={{
+            columns: PCRPROFILE_TABLE_COLUMNS,
+            include: "group,region",
+            path: "thermocyclerprofile"
+          }}
         />
       </div>
     </div>
