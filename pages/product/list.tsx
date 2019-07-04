@@ -3,12 +3,12 @@ import { FilterParam } from "kitsu";
 import Link from "next/link";
 import { useState } from "react";
 import {
+  ButtonBar,
   ColumnDefinition,
   FilterBuilderField,
   Head,
   Nav,
-  QueryTable,
-  ButtonBar
+  QueryTable
 } from "../../components";
 import { rsql } from "../../components/filter-builder/rsql";
 import { Product } from "../../types/seqdb-api/resources/Product";

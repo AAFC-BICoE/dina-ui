@@ -3,12 +3,12 @@ import { FilterParam } from "kitsu";
 import Link from "next/link";
 import { useState } from "react";
 import {
+  ButtonBar,
   ColumnDefinition,
   FilterBuilderField,
   Head,
   Nav,
-  QueryTable,
-  ButtonBar
+  QueryTable
 } from "../../components";
 import { rsql } from "../../components/filter-builder/rsql";
 import {
@@ -73,7 +73,7 @@ export default function ProtocolListPage() {
           <button className="btn btn-primary">Create Protocol</button>
         </Link>
       </ButtonBar>
-      
+
       <div className="container-fluid">
         <h1>Protocols</h1>
         <Formik initialValues={{ filter: null }} onSubmit={onSubmit}>

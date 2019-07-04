@@ -24,10 +24,17 @@ describe("FieldWrapper component.", () => {
 
   it("Accepts a tooltip msg which is applied to a surrounding div.", () => {
     const wrapper = mount(
-      <FieldWrapper tooltipMsg="Wrapper to a formick connected field" name="fieldName">
+      <FieldWrapper
+        tooltipMsg="Wrapper to a formick connected field"
+        name="fieldName"
+      >
         <div />
       </FieldWrapper>
     );
-    expect(wrapper.containsMatchingElement(<img src='/static/images/iconInformation.gif' />)).toBeTruthy();
+    expect(
+      wrapper.containsMatchingElement(
+        <img src="/static/images/iconInformation.gif" />
+      )
+    ).toBeTruthy();
   });
 });
