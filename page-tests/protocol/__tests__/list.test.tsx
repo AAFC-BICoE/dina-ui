@@ -109,7 +109,7 @@ describe("Protocol list page", () => {
         "protocol",
         expect.objectContaining({ filter: { rsql: "name=='*Funnel trap*'" } })
       );
-      expect(wrapper.find(QueryTable).props().filter).toEqual({
+      expect(wrapper.find(QueryTable).prop("filter")).toEqual({
         rsql: "name=='*Funnel trap*'"
       });
       done();
