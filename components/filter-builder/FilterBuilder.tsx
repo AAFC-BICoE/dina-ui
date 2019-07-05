@@ -9,6 +9,7 @@ import { FilterRow, FilterRowModel } from "./FilterRow";
 
 export interface FilterBuilderProps {
   filterAttributes: string[];
+  initialValue?: FilterGroupModel;
   onChange?: (state: FilterGroupModel) => void;
 }
 
@@ -33,7 +34,7 @@ export class FilterBuilder extends React.Component<
   constructor(props: FilterBuilderProps) {
     super(props);
     this.state = {
-      model: {
+      model: props.initialValue || {
         children: [
           {
             attribute: props.filterAttributes[0],
