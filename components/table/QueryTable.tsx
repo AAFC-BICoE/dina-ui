@@ -116,16 +116,19 @@ export function QueryTable<TData extends KitsuResource>({
   });
 
   return (
-    <div className="query-table-wrapper" ref={divWrapperRef}>
-      <style>{queryTableStyle}</style>
-      <Query<TData[], MetaWithTotal> query={query}>
-        {({ loading, response }) => {
-          const numberOfPages =
-            response && response.meta && response.meta.totalResourceCount
-              ? Math.ceil(response.meta.totalResourceCount / page.limit)
-              : undefined;
+    <Query<TData[], MetaWithTotal> query={query}>
+      {({ loading, response }) => {
+        const totalCount =
+          response && response.meta && response.meta.totalResourceCount;
 
-          return (
+        const numberOfPages = totalCount
+          ? Math.ceil(totalCount / page.limit)
+          : undefined;
+
+        return (
+          <div className="query-table-wrapper" ref={divWrapperRef}>
+            <style>{queryTableStyle}</style>
+            <span>Total matched records: {totalCount}</span>
             <ReactTable
               className="-striped"
               columns={mappedColumns}
@@ -137,9 +140,9 @@ export function QueryTable<TData extends KitsuResource>({
               pages={numberOfPages}
               showPaginationTop={true}
             />
-          );
-        }}
-      </Query>
-    </div>
+          </div>
+        );
+      }}
+    </Query>
   );
 }
