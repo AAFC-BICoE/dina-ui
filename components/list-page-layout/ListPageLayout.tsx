@@ -1,4 +1,4 @@
-import { Form, Formik, FormikActions } from "formik";
+import { Form, Formik, FormikActions, FormikProps } from "formik";
 import { FilterParam, KitsuResource } from "kitsu";
 import { useCookies } from "react-cookie";
 import { FilterBuilderField, QueryTable, QueryTableProps } from "..";
@@ -28,19 +28,34 @@ export function ListPageLayout<TData extends KitsuResource>({
     setSubmitting(false);
   }
 
+  function resetFilters({ setValues, submitForm }: FormikProps<any>) {
+    removeCookie("filterForm");
+    setValues({});
+    submitForm();
+  }
+
   return (
     <div>
       <Formik initialValues={filterForm} onSubmit={onFilterFormSubmit}>
-        <Form className="form-group">
-          <strong>Search:</strong>
-          <FilterBuilderField
-            filterAttributes={filterAttributes}
-            name="filterBuilderModel"
-          />
-          <button className="btn btn-primary" type="submit">
-            Filter List
-          </button>
-        </Form>
+        {formikProps => (
+          <Form className="form-group">
+            <strong>Filter records:</strong>
+            <FilterBuilderField
+              filterAttributes={filterAttributes}
+              name="filterBuilderModel"
+            />
+            <button className="btn btn-primary" type="submit">
+              Filter List
+            </button>
+            <button
+              className="btn btn-dark"
+              type="button"
+              onClick={() => resetFilters(formikProps)}
+            >
+              Reset
+            </button>
+          </Form>
+        )}
       </Formik>
       <QueryTable<TData> filter={filterParam} {...queryTableProps} />
     </div>

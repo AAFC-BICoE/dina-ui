@@ -24,7 +24,7 @@ export function FilterBuilderField({
         return (
           <FilterBuilder
             filterAttributes={filterAttributes}
-            initialValue={value}
+            value={value}
             onChange={onChange}
           />
         );
