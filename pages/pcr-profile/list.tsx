@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ColumnDefinition, Head, Nav, QueryTable, ButtonBar } from "../../components";
+import { ColumnDefinition, Head, Nav, QueryTable, ButtonBar, CreateButton } from "../../components";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 
 const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
@@ -27,9 +27,7 @@ export default function PcrProfileListPage() {
       <Head title="PCR Profiles" />
       <Nav />
       <ButtonBar>
-        <Link href="/pcr-profile/edit" prefetch={true}>
-          <button className="btn btn-primary">Create Thermocycler Profile</button>
-        </Link>
+        <CreateButton entityLabel="Thermocycler Profile" entityLink="pcr-profile" />
       </ButtonBar>
       <div className="container-fluid">
         <h1>Thermocycler Profiles</h1>

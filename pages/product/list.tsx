@@ -8,7 +8,8 @@ import {
   Head,
   Nav,
   QueryTable,
-  ButtonBar
+  ButtonBar,
+  CreateButton
 } from "../../components";
 import { rsql } from "../../components/filter-builder/rsql";
 import { Product } from "../../types/seqdb-api/resources/Product";
@@ -56,9 +57,7 @@ export default function ProductListPage() {
       <Head title="Product Inventory" />
       <Nav />
       <ButtonBar>
-        <Link href="/product/edit" prefetch={true}>
-          <button className="btn btn-primary">Create Product</button>
-        </Link>
+        <CreateButton entityLabel="Product" entityLink="product" />
       </ButtonBar>
 
       <div className="container-fluid">

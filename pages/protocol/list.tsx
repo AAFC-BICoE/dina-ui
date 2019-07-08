@@ -8,7 +8,8 @@ import {
   Head,
   Nav,
   QueryTable,
-  ButtonBar
+  ButtonBar,
+  CreateButton
 } from "../../components";
 import { rsql } from "../../components/filter-builder/rsql";
 import {
@@ -69,9 +70,7 @@ export default function ProtocolListPage() {
       <Head title="Protocols" />
       <Nav />
       <ButtonBar>
-        <Link href="/protocol/edit" prefetch={true}>
-          <button className="btn btn-primary">Create Protocol</button>
-        </Link>
+        <CreateButton entityLabel="Protocol" entityLink="protocol" />
       </ButtonBar>
       
       <div className="container-fluid">
