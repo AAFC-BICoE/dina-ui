@@ -1,7 +1,6 @@
 import { Formik } from "formik";
-import Link from "next/link";
 import { withRouter, WithRouterProps } from "next/router";
-import { FieldView, Head, LoadingSpinner, Nav, Query, ButtonBar } from "../../components";
+import { FieldView, Head, LoadingSpinner, Nav, Query, ButtonBar, EditButton, BackToListButton } from "../../components";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 
 export function PcrProfileDetailsPage({ router }: WithRouterProps) {
@@ -12,12 +11,8 @@ export function PcrProfileDetailsPage({ router }: WithRouterProps) {
       <Head title="Thermocycler Profile Details" />
       <Nav />
       <ButtonBar>
-        <Link href={`/pcr-profile/edit?id=${id}`}>
-          <button className="btn btn-primary">Edit</button>
-        </Link>
-        <Link href="/pcr-profile/list">
-          <button className="btn btn-secondary">Back to List</button>
-        </Link>
+        <EditButton entityId={id as string} entityLink="pcr-profile" />
+        <BackToListButton entityLink="pcr-profile" />
       </ButtonBar>
       <Query<PcrProfile>
         query={{ include: "group,region", path: `thermocyclerprofile/${id}` }}

@@ -16,3 +16,5 @@ export * from "./nav/nav";
 export * from "./table/QueryTable";
 export * from "./button-bar/ButtonBar";
 export * from "./button-bar/CreateButton";
+export * from "./button-bar/EditButton";
+export * from "./button-bar/BackToListButton";
