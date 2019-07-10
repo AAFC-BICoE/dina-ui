@@ -9,27 +9,34 @@ interface ListPageLayoutProps<TData extends KitsuResource> {
   queryTableProps: QueryTableProps<TData>;
 }
 
+const FILTER_FORM_COOKIE = "filterForm";
+
+/**
+ * Generic layout component for list pages. Renders a QueryTable with a filter builder.
+ * The filter form state is hydrated from a cookie, and is saved in a cookie on form submit.
+ */
 export function ListPageLayout<TData extends KitsuResource>({
   filterAttributes,
   queryTableProps
 }: ListPageLayoutProps<TData>) {
   // Use a cookie hook to get the cookie, and re-render when the watched cookie is changed.
   const [{ filterForm = {} }, setCookie, removeCookie] = useCookies([
-    "filterForm"
+    FILTER_FORM_COOKIE
   ]);
 
+  // Build the JSONAPI filter param to be sent to the back-end.
   const filterParam: FilterParam = {
     rsql: rsql(filterForm.filterBuilderModel)
   };
 
   function onFilterFormSubmit(values, { setSubmitting }: FormikActions<any>) {
     // On submit, put the filter form's values into a cookie.
-    setCookie("filterForm", values);
+    setCookie(FILTER_FORM_COOKIE, values);
     setSubmitting(false);
   }
 
-  function resetFilters({ setValues, submitForm }: FormikProps<any>) {
-    removeCookie("filterForm");
+  function resetFilterForm({ setValues, submitForm }: FormikProps<any>) {
+    removeCookie(FILTER_FORM_COOKIE);
     setValues({});
     submitForm();
   }
@@ -50,7 +57,7 @@ export function ListPageLayout<TData extends KitsuResource>({
             <button
               className="btn btn-dark"
               type="button"
-              onClick={() => resetFilters(formikProps)}
+              onClick={() => resetFilterForm(formikProps)}
             >
               Reset
             </button>
