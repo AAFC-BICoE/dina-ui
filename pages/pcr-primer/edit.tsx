@@ -11,9 +11,10 @@ import {
   Query,
   ResourceSelectField,
   SelectField,
-  SubmitButton,
+  SaveButton,
   TextField,
-  ButtonBar
+  ButtonBar,
+  CancelButton
 } from "../../components";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
@@ -63,6 +64,7 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
 
 function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
   const { doOperations } = useContext(ApiClientContext);
+  const { id } = router.query;
 
   const initialValues = primer || { lotNumber: 1, seq: "", type: "PRIMER" };
 
@@ -102,7 +104,8 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form>
         <ButtonBar>
-          <SubmitButton />
+          <SaveButton />
+          <CancelButton entityId={id as string} entityLink="pcr-primer" />
         </ButtonBar>
         <ErrorViewer />
         <div>

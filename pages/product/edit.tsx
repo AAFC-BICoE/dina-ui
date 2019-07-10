@@ -9,9 +9,10 @@ import {
   Nav,
   Query,
   ResourceSelectField,
-  SubmitButton,
+  SaveButton,
   TextField,
-  ButtonBar
+  ButtonBar,
+  CancelButton
 } from "../../components";
 import { LabelView } from "../../components/LabelView";
 import { Group } from "../../types/seqdb-api/resources/Group";
@@ -58,7 +59,7 @@ export function ProductEditPage({ router }: WithRouterProps) {
 
 function ProductForm({ product, router }: ProductFormProps) {
   const { doOperations } = useContext(ApiClientContext);
-
+  const { id } = router.query;
   const initialValues = product || {};
 
   async function onSubmit(
@@ -98,7 +99,8 @@ function ProductForm({ product, router }: ProductFormProps) {
       <Form>
         <ErrorViewer />
         <ButtonBar>
-          <SubmitButton />
+          <SaveButton />
+          <CancelButton entityId={id as string} entityLink="product" />
         </ButtonBar>
         <div>
           <div className="row">

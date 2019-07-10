@@ -10,9 +10,10 @@ import {
   Query,
   ResourceSelectField,
   SelectField,
-  SubmitButton,
+  SaveButton,
   TextField,
-  ButtonBar
+  ButtonBar,
+  CancelButton
 } from "../../components";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { Product } from "../../types/seqdb-api/resources/Product";
@@ -64,6 +65,7 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
 
 function ProtocolForm({ protocol, router }: ProtocolFormProps) {
   const { doOperations } = useContext(ApiClientContext);
+  const { id } = router.query;
   const initialValues = protocol || {};
 
   async function onSubmit(
@@ -106,7 +108,8 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
       <Form>
         <ErrorViewer />
         <ButtonBar>
-          <SubmitButton />
+          <SaveButton />
+          <CancelButton entityId={id as string} entityLink="protocol" />
         </ButtonBar>
         <div>
           <div className="row">

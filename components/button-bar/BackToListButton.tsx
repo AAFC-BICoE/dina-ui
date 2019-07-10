@@ -10,7 +10,7 @@ interface BackToListButtonProps {
  * 
  * @param {string} entityLink   The link type for where to redirect the user. Gets appended with "/" + entityLink + "/list/".
  */
-export function BackToListButton(props: BackToListButtonProps) {
+export const BackToListButton = function(props: BackToListButtonProps) {
     return (
         <Link href={`/${props.entityLink}/list`} prefetch={true}>
             <button className="btn btn-secondary">Back to List</button>

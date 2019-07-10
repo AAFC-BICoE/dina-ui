@@ -12,7 +12,7 @@ interface EditButtonProps {
  * @param {string} entityLink   The link type for where to redirect the user. Gets appended with "/" + entityLink + "/edit/".
  * @param {string} entityId     The id of the entity to edit.
  */
-export function EditButton(props: EditButtonProps) {
+export const EditButton = function(props: EditButtonProps) {
     return (
         <Link href={`/${props.entityLink}/edit?id=${props.entityId}`} prefetch={true}>
             <button className="btn btn-primary">Edit</button>

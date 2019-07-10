@@ -9,9 +9,10 @@ import {
   Nav,
   Query,
   ResourceSelectField,
-  SubmitButton,
+  SaveButton,
   TextField,
-  ButtonBar
+  ButtonBar,
+  CancelButton
 } from "../../components";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
@@ -64,7 +65,7 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
 
 function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
   const { doOperations } = useContext(ApiClientContext);
-
+  const { id } = router.query;
   const initialValues = profile || { type: "thermocyclerprofile" };
 
   async function onSubmit(
@@ -107,7 +108,8 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
       <Form>
         <ErrorViewer />
         <ButtonBar>
-          <SubmitButton />
+          <SaveButton />
+          <CancelButton entityId={id as string} entityLink="pcr-profile" />
         </ButtonBar>
         <div>
           <div className="row">
