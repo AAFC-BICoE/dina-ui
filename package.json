@@ -74,10 +74,11 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "tslint --project tsconfig.json",
+      "tslint --project tsconfig.json --fix",
       "git add"
     ],
-    ".{js,jsx,css,json,md}": [
+    ".{js,jsx,css,json,md}":
+    [
       "prettier --write",
       "git add"
     ]
