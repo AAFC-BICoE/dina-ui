@@ -52,8 +52,10 @@
     "enzyme": "^3.8.0",
     "enzyme-adapter-react-16": "^1.8.0",
     "enzyme-to-json": "^3.3.5",
+    "husky": "^3.0.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^24.3.0",
+    "lint-staged": "^9.2.0",
     "micro-proxy": "^1.1.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^1.15.3",
@@ -64,5 +66,20 @@
     "tslint-plugin-prettier": "^2.0.1",
     "tslint-react": "^3.6.0",
     "typescript": "^3.2.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "tslint --project tsconfig.json",
+      "git add"
+    ],
+    ".{js,jsx,css,json,md}": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }
