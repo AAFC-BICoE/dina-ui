@@ -17,7 +17,7 @@ const MOCK_TODOS = {
 };
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async (_, {}) => {
+const mockGet = jest.fn(async (_, { }) => {
   return MOCK_TODOS;
 });
 

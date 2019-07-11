@@ -212,10 +212,31 @@ describe("PcrProfile edit page", () => {
 
 /** Test Profile with all fields defined. */
 const TEST_PROFILE: Required<PcrProfile> = {
-  type: "thermocyclerprofile",
   application: "PCR of ITS regions",
   cycles: "cycles",
+  group: {
+    description: null,
+    groupName: "Public",
+    id: "8",
+    type: "group"
+  },
+  id: "1",
+  lastModified: "2013-03-19T04:00:00.000+0000",
+  name: "PROF1",
+  region: {
+    description: "ITS Region",
+    id: "2",
+    name: "Internal Transcribed Spacer",
+    symbol: "ITS",
+    type: "region"
+  },
   step1: "step1",
+  step10: null,
+  step11: null,
+  step12: null,
+  step13: null,
+  step14: null,
+  step15: null,
   step2: "step2",
   step3: "step3",
   step4: null,
@@ -224,26 +245,5 @@ const TEST_PROFILE: Required<PcrProfile> = {
   step7: null,
   step8: null,
   step9: null,
-  step10: null,
-  step11: null,
-  step12: null,
-  step13: null,
-  step14: null,
-  step15: null,
-  id: "1",
-  lastModified: "2013-03-19T04:00:00.000+0000",
-  name: "PROF1",
-  group: {
-    description: null,
-    groupName: "Public",
-    id: "8",
-    type: "group"
-  },
-  region: {
-    description: "ITS Region",
-    id: "2",
-    name: "Internal Transcribed Spacer",
-    symbol: "ITS",
-    type: "region"
-  }
+  type: "thermocyclerprofile"
 };

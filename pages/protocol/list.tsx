@@ -10,12 +10,15 @@ import {
   QueryTable
 } from "../../components";
 import { rsql } from "../../components/filter-builder/rsql";
-import { Product } from "../../types/seqdb-api/resources/Product";
+import {
+  Protocol,
+  protocolTypeLabels
+} from "../../types/seqdb-api/resources/Protocol";
 
-const PRODUCT_TABLE_COLUMNS: Array<ColumnDefinition<Product>> = [
+const PROTOCOL_TABLE_COLUMNS: Array<ColumnDefinition<Protocol>> = [
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/product/view?id=${id}`}>
+      <Link href={`/protocol/view?id=${id}`}>
         <a>{name}</a>
       </Link>
     ),
@@ -27,22 +30,32 @@ const PRODUCT_TABLE_COLUMNS: Array<ColumnDefinition<Product>> = [
     accessor: "group.groupName"
   },
   {
-    Header: "UPC",
-    accessor: "upc"
+    Header: "Type",
+    accessor: row => protocolTypeLabels[row.type],
+    id: "type"
   },
-  "type",
-  "description"
+  "version",
+  "description",
+  "equipment",
+  {
+    Header: "Kit Group Name",
+    accessor: "kit.group.groupname"
+  },
+  "kit.name"
 ];
 
-const PRODUCT_FILTER_ATTRIBUTES = [
+const PROTOCOL_FILTER_ATTRIBUTES = [
   "name",
   "group.groupName",
-  "upc",
   "type",
-  "description"
+  "version",
+  "description",
+  "equipment",
+  "kit.group.groupName",
+  "kit.name"
 ];
 
-export default function ProductListPage() {
+export default function ProtocolListPage() {
   const [filter, setFilter] = useState<FilterParam>();
 
   function onSubmit(values, { setSubmitting }: FormikActions<any>) {
@@ -52,18 +65,18 @@ export default function ProductListPage() {
 
   return (
     <div>
-      <Head title="Product Inventory" />
+      <Head title="Protocols" />
       <Nav />
       <div className="container-fluid">
-        <h1>Product Inventory</h1>
-        <Link href="/product/edit" prefetch={true}>
-          <a>Add New Product</a>
+        <h1>Protocols</h1>
+        <Link href="/protocol/edit" prefetch={true}>
+          <a>Add Protocol</a>
         </Link>
         <Formik initialValues={{ filter: null }} onSubmit={onSubmit}>
           <Form>
             <h2>Search:</h2>
             <FilterBuilderField
-              filterAttributes={PRODUCT_FILTER_ATTRIBUTES}
+              filterAttributes={PROTOCOL_FILTER_ATTRIBUTES}
               name="filter"
             />
             <button className="btn btn-primary" type="submit">
@@ -71,11 +84,11 @@ export default function ProductListPage() {
             </button>
           </Form>
         </Formik>
-        <QueryTable<Product>
-          columns={PRODUCT_TABLE_COLUMNS}
+        <QueryTable<Protocol>
+          columns={PROTOCOL_TABLE_COLUMNS}
           filter={filter}
-          include="group"
-          path="product"
+          include="group,kit"
+          path="protocol"
         />
       </div>
     </div>
