@@ -83,7 +83,7 @@ describe("Protocol edit page", () => {
             path: "protocol",
             value: {
               attributes: {
-                name: "New Protocol",
+                name: "New Protocol"
               },
               id: -100,
               type: "protocol"

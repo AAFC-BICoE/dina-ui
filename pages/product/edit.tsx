@@ -3,6 +3,7 @@ import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
 import { useContext } from "react";
 import {
   ApiClientContext,
+  ButtonBar,
   ErrorViewer,
   Head,
   LoadingSpinner,
@@ -11,7 +12,6 @@ import {
   ResourceSelectField,
   SaveButton,
   TextField,
-  ButtonBar,
   CancelButton
 } from "../../components";
 import { LabelView } from "../../components/LabelView";

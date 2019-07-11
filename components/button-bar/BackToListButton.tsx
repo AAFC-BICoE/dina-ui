@@ -13,7 +13,7 @@ interface BackToListButtonProps {
 export const BackToListButton = function(props: BackToListButtonProps) {
     return (
         <Link href={`/${props.entityLink}/list`} prefetch={true}>
-            <button className="btn btn-secondary">Back to List</button>
+            <button className="btn btn-outline-secondary">Back to List</button>
         </Link>
     );
 }

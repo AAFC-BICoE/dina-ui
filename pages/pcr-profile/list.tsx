@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { ColumnDefinition, Head, Nav, QueryTable, ButtonBar, CreateButton } from "../../components";
+import {
+  ButtonBar,
+  ColumnDefinition,
+  Head,
+  Nav,
+  QueryTable,
+  CreateButton
+} from "../../components";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 
 const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [

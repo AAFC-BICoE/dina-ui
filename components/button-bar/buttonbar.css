@@ -12,23 +12,19 @@
 }
 
 /* Button Bar Button Styling */
-.button-bar > a, .button-bar > button {
-    margin-right: 10px;
-    float: left;
+.button-bar > a,
+.button-bar > button {
+  margin-right: 10px;
+  float: left;
 }
 
 /* Button Bar Lines */
 .button-bar > .line {
-    display: block;
-    margin-top: 2px;
-    height: 35px;
-    width: 1px;
-    margin-right: 10px;
-    background: #d3d7cf;
-    float: left;
-}
-
-/* Add padding to the body so content is not hidden. */
-body {
-    padding-top: 130px !important;
+  display: block;
+  margin-top: 2px;
+  height: 35px;
+  width: 1px;
+  margin-right: 10px;
+  background: #d3d7cf;
+  float: left;
 }

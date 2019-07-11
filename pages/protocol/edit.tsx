@@ -3,6 +3,7 @@ import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
 import { useContext } from "react";
 import {
   ApiClientContext,
+  ButtonBar,
   ErrorViewer,
   Head,
   LoadingSpinner,
@@ -12,7 +13,6 @@ import {
   SelectField,
   SaveButton,
   TextField,
-  ButtonBar,
   CancelButton
 } from "../../components";
 import { Group } from "../../types/seqdb-api/resources/Group";
