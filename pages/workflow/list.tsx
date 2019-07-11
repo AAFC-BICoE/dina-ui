@@ -21,11 +21,16 @@ const WORKFLOW_TABLE_COLUMNS: Array<ColumnDefinition<any>> = [
     Header: "Name",
     accessor: "name"
   },
-  "type",
+  "dateCreated",
+  "chainTemplate.name",
   "group.groupName"
 ];
 
-const WORKFLOW_FILTER_ATTRIBUTES = ["name", "type", "group.groupName"];
+const WORKFLOW_FILTER_ATTRIBUTES = [
+  "name",
+  "chainTemplate.name",
+  "group.groupName"
+];
 
 export default function WorkflowListPage() {
   const [filter, setFilter] = useState<FilterParam>();
@@ -46,7 +51,7 @@ export default function WorkflowListPage() {
         </Link>
         <Formik initialValues={{ filter: null }} onSubmit={onSubmit}>
           <Form>
-            <strong>Search:</strong>
+            <strong>Filter records:</strong>
             <FilterBuilderField
               filterAttributes={WORKFLOW_FILTER_ATTRIBUTES}
               name="filter"
@@ -59,8 +64,8 @@ export default function WorkflowListPage() {
         <QueryTable
           columns={WORKFLOW_TABLE_COLUMNS}
           filter={filter}
-          include="group,region"
-          path="pcrPrimer"
+          include="chainTemplate,group"
+          path="chain"
         />
       </div>
     </div>
