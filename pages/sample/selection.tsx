@@ -10,18 +10,18 @@ import {
   QueryTable
 } from "../../components";
 import { rsql } from "../../components/filter-builder/rsql";
-import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
 
 export default function() {
   const [filter, setFilter] = useState<FilterParam>();
   const [selected, setSelected] = useState([]);
 
-  const PRIMER_COLUMNS: Array<ColumnDefinition<PcrPrimer>> = [
-    "name",
+  const SAMPLE_COLUMNS: Array<ColumnDefinition<any>> = [
     {
       Header: "Group Name",
       accessor: "group.groupName"
     },
+    "name",
+    "version",
     {
       Cell: ({ original }) => (
         <>
@@ -53,7 +53,7 @@ export default function() {
 
   return (
     <div>
-      <Head title="Primer Selection" />
+      <Head title="Sample Selection" />
       <Nav />
       <div className="container-fluid">
         <strong>Filter records:</strong>
@@ -67,24 +67,25 @@ export default function() {
         </Formik>
         <div className="row form-group">
           <div className="col-5">
-            <strong>Available Primers</strong>
+            <strong>Available Samples</strong>
             <QueryTable
-              columns={PRIMER_COLUMNS}
+              columns={SAMPLE_COLUMNS}
               filter={filter}
               include="group"
-              path="pcrPrimer"
+              path="sample"
             />
           </div>
           <div className="col-2" style={{ marginTop: "100px" }}>
             <button className="btn btn-primary">--></button>
           </div>
           <div className="col-5">
-            <strong>Selected Primers</strong>
+            <strong>Selected Samples</strong>
             <ReactTable
               className="-striped"
               columns={[
-                { accessor: "name", Header: "Name" },
                 { accessor: "group.groupName", Header: "Group Name" },
+                { accessor: "name", Header: "Name" },
+                { accessor: "version", Header: "Version" },
                 {
                   Cell: ({ index }) => (
                     <div>
