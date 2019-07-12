@@ -29,6 +29,7 @@
     "react-dom": "^16.8.3",
     "react-select": "^2.3.0",
     "react-table": "6.8.6",
+    "react-tabs": "^3.0.0",
     "react-tooltip": "^3.10.0",
     "title-case": "^2.1.1"
   },
@@ -45,6 +46,7 @@
     "@types/react-dom": "^16.8.2",
     "@types/react-select": "^2.0.11",
     "@types/react-table": "^6.7.21",
+    "@types/react-tabs": "^2.3.1",
     "@types/react-test-renderer": "^16.0.3",
     "@types/styled-jsx": "^2.2.7",
     "asciidoctor.js": "^1.5.9",

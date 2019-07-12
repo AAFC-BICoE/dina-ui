@@ -1,7 +1,11 @@
 import { Formik } from "formik";
 import Link from "next/link";
 import { withRouter, WithRouterProps } from "next/router";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import "react-tabs/style/react-tabs.css";
 import { FieldView, Head, LoadingSpinner, Nav, Query } from "../../components";
+import { Chain } from "../../types/seqdb-api/resources/workflow/Chain";
+import { ChainStepTemplate } from "../../types/seqdb-api/resources/workflow/ChainStepTemplate";
 
 export function WorkflowDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -10,7 +14,7 @@ export function WorkflowDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title="Workflow" />
       <Nav />
-      <Query<any>
+      <Query<Chain>
         query={{ include: "group,chainTemplate", path: `chain/${id}` }}
       >
         {({ loading, response }) => (
@@ -20,33 +24,55 @@ export function WorkflowDetailsPage({ router }: WithRouterProps) {
             </Link>
             <h1>Workflow Details</h1>
             <LoadingSpinner loading={loading} />
-            {response && (
-              <Formik initialValues={response.data} onSubmit={null}>
-                <>
-                  <div className="btn-group">
-                    {/* Replace with tabbed view */}
-                    <button className="btn btn-info">Details</button>
-                    <button className="btn btn-info">Step 1</button>
-                    <button className="btn btn-info">Step 2</button>
-                    <button className="btn btn-info">Step 3</button>
-                    <button className="btn btn-info">Step 4</button>
-                    <button className="btn btn-info">Step 5</button>
-                  </div>
-                  <div className="row">
-                    <div className="col-md-2">
-                      <FieldView label="Template" name="chainTemplate.name" />
-                      <FieldView label="Group" name="group.groupName" />
-                      <FieldView name="name" />
-                      <FieldView name="dateCreated" />
-                    </div>
-                  </div>
-                </>
-              </Formik>
-            )}
+            {response && <WorkflowSteps chain={response.data} />}
           </div>
         )}
       </Query>
     </div>
+  );
+}
+
+function WorkflowSteps({ chain }: { chain: Chain }) {
+  return (
+    <Query<ChainStepTemplate[]>
+      query={{
+        fields: { stepTemplate: "name" },
+        filter: { "chainTemplate.id": chain.chainTemplate.id },
+        include: "stepTemplate",
+        path: "chainStepTemplate"
+      }}
+    >
+      {({ loading, response }) => {
+        const steps = response ? response.data : [];
+
+        return (
+          <>
+            <LoadingSpinner loading={loading} />
+            <Tabs>
+              <TabList>
+                <Tab>Details</Tab>
+                {steps.map(step => (
+                  <Tab key={step.id}>Step {step.stepNumber}</Tab>
+                ))}
+              </TabList>
+              <TabPanel>
+                <Formik initialValues={chain} onSubmit={null}>
+                  <div className="col-md-3">
+                    <FieldView label="Template" name="chainTemplate.name" />
+                    <FieldView label="Group" name="group.groupName" />
+                    <FieldView name="name" />
+                    <FieldView name="dateCreated" />
+                  </div>
+                </Formik>
+              </TabPanel>
+              {steps.map(step => (
+                <TabPanel>Step {step.stepNumber} tab content</TabPanel>
+              ))}
+            </Tabs>
+          </>
+        );
+      }}
+    </Query>
   );
 }
 
