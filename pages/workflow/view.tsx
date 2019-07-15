@@ -4,6 +4,7 @@ import { withRouter, WithRouterProps } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import { FieldView, Head, LoadingSpinner, Nav, Query } from "../../components";
+import { SampleSelection } from "../../components/selection/SampleSelection";
 import { Chain } from "../../types/seqdb-api/resources/workflow/Chain";
 import { ChainStepTemplate } from "../../types/seqdb-api/resources/workflow/ChainStepTemplate";
 
@@ -66,7 +67,12 @@ function WorkflowSteps({ chain }: { chain: Chain }) {
                 </Formik>
               </TabPanel>
               {steps.map(step => (
-                <TabPanel>Step {step.stepNumber} tab content</TabPanel>
+                <TabPanel key={step.id}>
+                  <SampleSelection
+                    chain={chain}
+                    stepTemplate={step.stepTemplate}
+                  />
+                </TabPanel>
               ))}
             </Tabs>
           </>
