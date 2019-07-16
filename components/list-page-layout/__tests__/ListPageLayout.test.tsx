@@ -1,6 +1,11 @@
 import { mount } from "enzyme";
+import ReactTable from "react-table";
 import { act } from "react-test-renderer";
-import { ApiClientContext, createContextValue } from "../../../components";
+import {
+  ApiClientContext,
+  createContextValue,
+  QueryTable
+} from "../../../components";
 import { ListPageLayout } from "../ListPageLayout";
 
 /** Mock Kitsu "get" method. */
@@ -69,5 +74,36 @@ describe("ListPageLayout component", () => {
         filter: { rsql: "" }
       })
     );
+  });
+
+  it("Stores the table's sort and page-size in cookies.", async () => {
+    const wrapper = mountWithContext(
+      <ListPageLayout
+        filterAttributes={["name"]}
+        queryTableProps={{
+          columns: ["name", "type"],
+          path: "pcrPrimer"
+        }}
+      />
+    );
+
+    // Wait for the default search to finish.
+    await act(async () => {
+      await new Promise(setImmediate);
+    });
+    wrapper.update();
+
+    const testSort = [{ id: "type", desc: false }];
+
+    wrapper.find(ReactTable).prop("onSortedChange")(testSort, null, null);
+    wrapper.find(ReactTable).prop("onPageSizeChange")(5, null);
+
+    await act(async () => {
+      await new Promise(setImmediate);
+    });
+    wrapper.update();
+
+    expect(wrapper.find(QueryTable).prop("defaultSort")).toEqual(testSort);
+    expect(wrapper.find(QueryTable).prop("defaultPageSize")).toEqual(5);
   });
 });
