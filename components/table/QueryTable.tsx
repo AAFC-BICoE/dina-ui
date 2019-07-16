@@ -1,5 +1,5 @@
-import { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
-import React, { createRef } from "react";
+import { FilterParam, KitsuResource } from "kitsu";
+import React, { useRef, useState } from "react";
 import ReactTable, { Column } from "react-table";
 import "react-table/react-table.css";
 import titleCase from "title-case";
@@ -31,15 +31,6 @@ export interface QueryTableProps<TData extends KitsuResource> {
   columns: Array<ColumnDefinition<TData>>;
 }
 
-/** QueryTable component's state. */
-interface QueryTableState {
-  /** JSONAPI sort attribute. */
-  sort?: string;
-
-  /** JSONAPI page spec. */
-  page: PageSpec;
-}
-
 const DEFAULT_PAGE_SIZE = 25;
 
 const queryTableStyle = `
@@ -64,56 +55,25 @@ const queryTableStyle = `
 /**
  * Table component that fetches data from the backend API.
  */
-export class QueryTable<TData extends KitsuResource> extends React.Component<
-  QueryTableProps<TData>,
-  QueryTableState
-> {
-  /** Ref for the div that wraps this component. */
-  public divWrapperRef = createRef<HTMLDivElement>();
+export function QueryTable<TData extends KitsuResource>({
+  columns,
+  defaultPageSize,
+  defaultSort,
+  filter,
+  include,
+  path
+}: QueryTableProps<TData>) {
+  // JSONAPI sort attribute.
+  const [sort, setSort] = useState(defaultSort);
+  // JSONAPI page spec.
+  const [page, setPage] = useState<PageSpec>({
+    limit: defaultPageSize || DEFAULT_PAGE_SIZE,
+    offset: 0
+  });
 
-  constructor(props: QueryTableProps<TData>) {
-    super(props);
+  const divWrapperRef = useRef<HTMLDivElement>();
 
-    const { defaultPageSize, defaultSort } = props;
-
-    // Set defaults for page limit if it is not defined.
-    const limit = defaultPageSize || DEFAULT_PAGE_SIZE;
-
-    this.state = {
-      page: { limit, offset: 0 },
-      sort: defaultSort
-    };
-  }
-
-  public render() {
-    const { filter, include, path } = this.props;
-    const { page, sort } = this.state;
-
-    const query: JsonApiQuerySpec = { path, filter, include, page, sort };
-
-    return (
-      <div ref={this.divWrapperRef}>
-        <style>{queryTableStyle}</style>
-        <Query<TData[], MetaWithTotal> query={query}>
-          {({ loading, response }) => (
-            <ReactTable
-              className="-striped"
-              columns={this.mappedColumns}
-              data={response && response.data}
-              defaultPageSize={page.limit}
-              loading={loading}
-              manual={true}
-              onFetchData={this.onFetchData}
-              pages={this.getNumberOfPages(response)}
-              showPaginationTop={true}
-            />
-          )}
-        </Query>
-      </div>
-    );
-  }
-
-  private onFetchData = reactTableState => {
+  function onFetchData(reactTableState) {
     const { page: newPageNumber, sorted, pageSize } = reactTableState;
 
     const newOffset = newPageNumber * pageSize;
@@ -126,47 +86,60 @@ export class QueryTable<TData extends KitsuResource> extends React.Component<
     // When a new page is requested and the top of the window is below the top of the table,
     // scroll to the top of the table.
     if (
-      newOffset !== this.state.page.offset &&
-      window.scrollY > this.divWrapperRef.current.offsetTop
+      newOffset !== page.offset &&
+      window.scrollY > divWrapperRef.current.offsetTop
     ) {
-      window.scrollTo(0, this.divWrapperRef.current.offsetTop);
+      window.scrollTo(0, divWrapperRef.current.offsetTop);
     }
 
-    this.setState({
-      // Only add the sort attribute if there is a sort.
-      ...(newSort.length && { sort: newSort }),
-      page: {
-        limit: pageSize,
-        offset: newOffset
-      }
-    });
-  };
-
-  /** Map this component's "columns" prop to react-table's "columns" prop. */
-  private get mappedColumns(): Column[] {
-    return this.props.columns.map<Column>(column => {
-      // The "columns" prop can be a string or a react-table Column type.
-      if (typeof column === "string") {
-        return {
-          Header: titleCase(column),
-          accessor: column
-        };
-      } else {
-        return column;
-      }
+    if (newSort.length) {
+      setSort(newSort);
+    }
+    setPage({
+      limit: pageSize,
+      offset: newOffset
     });
   }
 
-  /** Get the number of pages from the response. */
-  private getNumberOfPages(
-    response: KitsuResponse<TData[], MetaWithTotal>
-  ): number | undefined {
-    if (response && response.meta && response.meta.totalResourceCount) {
-      return Math.ceil(
-        response.meta.totalResourceCount / this.state.page.limit
-      );
+  const query: JsonApiQuerySpec = { path, filter, include, page, sort };
+
+  const mappedColumns = columns.map<Column>(column => {
+    // The "columns" prop can be a string or a react-table Column type.
+    if (typeof column === "string") {
+      return {
+        Header: titleCase(column),
+        accessor: column
+      };
     } else {
-      return undefined;
+      return column;
     }
-  }
+  });
+
+  return (
+    <div className="query-table-wrapper" ref={divWrapperRef}>
+      <style>{queryTableStyle}</style>
+      <Query<TData[], MetaWithTotal> query={query}>
+        {({ loading, response }) => {
+          const numberOfPages =
+            response && response.meta && response.meta.totalResourceCount
+              ? Math.ceil(response.meta.totalResourceCount / page.limit)
+              : undefined;
+
+          return (
+            <ReactTable
+              className="-striped"
+              columns={mappedColumns}
+              data={response && response.data}
+              defaultPageSize={page.limit}
+              loading={loading}
+              manual={true}
+              onFetchData={onFetchData}
+              pages={numberOfPages}
+              showPaginationTop={true}
+            />
+          );
+        }}
+      </Query>
+    </div>
+  );
 }

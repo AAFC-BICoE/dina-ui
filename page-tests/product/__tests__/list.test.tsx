@@ -86,7 +86,7 @@ describe("Product list page", () => {
         "product",
         expect.objectContaining({ filter: { rsql: "name==*omni*" } })
       );
-      expect(wrapper.find(QueryTable).props().filter).toEqual({
+      expect(wrapper.find(QueryTable).prop("filter")).toEqual({
         rsql: "name==*omni*"
       });
       done();

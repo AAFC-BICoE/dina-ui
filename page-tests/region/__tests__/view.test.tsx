@@ -58,16 +58,8 @@ describe("Region details page", () => {
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
+    console.log(wrapper.debug());    
     // The region's name should be rendered in a FieldView.
-    expect(
-      wrapper.containsMatchingElement(
-        <div>
-          <label>
-            <strong>Name</strong>
-          </label>
-          <p>Test Region</p>
-        </div>
-      )
-    ).toEqual(true);
+    expect(wrapper.containsMatchingElement(<p>Test Region</p>)).toEqual(true);    
   });
 });
