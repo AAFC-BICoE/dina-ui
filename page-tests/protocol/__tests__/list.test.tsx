@@ -1,4 +1,5 @@
 import { mount } from "enzyme";
+import { act } from "react-test-renderer";
 import {
   ApiClientContext,
   createContextValue,
@@ -76,7 +77,9 @@ describe("Protocol list page", () => {
   it("Renders the list page.", async () => {
     const wrapper = mountWithContext(<ProtocolListPage />);
 
-    await Promise.resolve();
+    await act(async () => {
+      await new Promise(setImmediate);
+    });
     wrapper.update();
 
     // Check that the table contains the links to protocol details pages.
@@ -88,11 +91,13 @@ describe("Protocol list page", () => {
     );
   });
 
-  it("Allows a filterable search.", async done => {
+  it("Allows a filterable search.", async () => {
     const wrapper = mountWithContext(<ProtocolListPage />);
 
     // Wait for the default search to finish.
-    await Promise.resolve();
+    await act(async () => {
+      await new Promise(setImmediate);
+    });
     wrapper.update();
 
     // Enter a search value.
@@ -103,16 +108,16 @@ describe("Protocol list page", () => {
     // Submit the search form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      wrapper.update();
-      expect(mockGet).lastCalledWith(
-        "protocol",
-        expect.objectContaining({ filter: { rsql: "name=='*Funnel trap*'" } })
-      );
-      expect(wrapper.find(QueryTable).prop("filter")).toEqual({
-        rsql: "name=='*Funnel trap*'"
-      });
-      done();
+    await act(async () => {
+      await new Promise(setImmediate);
+    });
+    wrapper.update();
+    expect(mockGet).lastCalledWith(
+      "protocol",
+      expect.objectContaining({ filter: { rsql: "name=='*Funnel trap*'" } })
+    );
+    expect(wrapper.find(QueryTable).prop("filter")).toEqual({
+      rsql: "name=='*Funnel trap*'"
     });
   });
 });
