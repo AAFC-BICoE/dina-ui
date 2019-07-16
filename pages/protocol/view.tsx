@@ -1,7 +1,14 @@
 import { Formik } from "formik";
 import Link from "next/link";
 import { withRouter, WithRouterProps } from "next/router";
-import { FieldView, Head, LoadingSpinner, Nav, Query } from "../../components";
+import {
+  ButtonBar,
+  FieldView,
+  Head,
+  LoadingSpinner,
+  Nav,
+  Query
+} from "../../components";
 import {
   Protocol,
   protocolTypeLabels
@@ -13,6 +20,14 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title="Protocol Details" />
       <Nav />
+      <ButtonBar>
+        <Link href={`/protocol/edit?id=${id}`}>
+          <button className="btn btn-primary">Edit</button>
+        </Link>
+        <Link href="/protocol/list">
+          <button className="btn btn-secondary">Back to List</button>
+        </Link>
+      </ButtonBar>
       <Query<Protocol> query={{ include: "group,kit", path: `protocol/${id}` }}>
         {({ loading, response }) => {
           const protocol = response && {
@@ -22,17 +37,11 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
 
           return (
             <div className="container-fluid">
-              <Link href="/protocol/list">
-                <a>Protocols</a>
-              </Link>
               <h1>Protocol Details</h1>
               <LoadingSpinner loading={loading} />
               {protocol && (
                 <Formik<Protocol> initialValues={protocol} onSubmit={null}>
                   <div>
-                    <Link href={`/protocol/edit?id=${id}`}>
-                      <a>Edit</a>
-                    </Link>
                     <div className="row">
                       <FieldView
                         className="col-md-2"

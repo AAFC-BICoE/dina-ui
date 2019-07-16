@@ -18,7 +18,9 @@ export default class SeqdbUiApp extends App {
     // Reload the page after the App is mounted in the browser, because Next.js does not pass in
     // the URL query string on the initial browser-side render.
     // https://github.com/zeit/next.js/issues/2910
-    this.props.router.push(this.props.router.asPath);
+    if (!this.isOnErrorPage()) {
+      this.props.router.push(this.props.router.asPath);
+    }
   }
 
   public render() {
@@ -27,7 +29,7 @@ export default class SeqdbUiApp extends App {
     return (
       // Render nothing on the first browser render to avoid passing an empty query string to
       // the page component.
-      !this.isFirstBrowserRender() && (
+      this.canRender() && (
         <ApiClientContext.Provider value={this.contextValue}>
           <Container>
             <Component {...pageProps} />
@@ -37,8 +39,19 @@ export default class SeqdbUiApp extends App {
     );
   }
 
+  /** Whether the app is currently being rendered on the browser for the first time. */
   private isFirstBrowserRender() {
     const isRunningInBrowser = typeof window !== "undefined";
     return isRunningInBrowser && !this.hasMounted;
+  }
+
+  /** Whether the app is on the 404 page. */
+  private isOnErrorPage() {
+    return this.props.router.route === "/_error";
+  }
+
+  /** Whether the page is ready to be rendered. */
+  private canRender() {
+    return !this.isFirstBrowserRender() || this.isOnErrorPage();
   }
 }
