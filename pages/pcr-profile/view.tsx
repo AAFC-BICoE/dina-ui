@@ -1,7 +1,14 @@
 import { Formik } from "formik";
 import Link from "next/link";
 import { withRouter, WithRouterProps } from "next/router";
-import { FieldView, Head, LoadingSpinner, Nav, Query, ButtonBar } from "../../components";
+import {
+  ButtonBar,
+  FieldView,
+  Head,
+  LoadingSpinner,
+  Nav,
+  Query
+} from "../../components";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 
 export function PcrProfileDetailsPage({ router }: WithRouterProps) {
