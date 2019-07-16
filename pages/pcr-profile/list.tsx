@@ -1,8 +1,12 @@
 import Link from "next/link";
-import { ColumnDefinition, Head, ButtonBar } from "../../components";
+import {
+  ButtonBar,
+  ColumnDefinition,
+  Head,
+  ListPageLayout,
+  Nav
+} from "../../components";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
-import { Nav } from "../../components/nav/nav";
-import { ListPageLayout } from "../../components/list-page-layout/ListPageLayout";
 
 const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
   {
@@ -36,7 +40,7 @@ const PCRPROFILE_FILTER_ATTRIBUTES = ["name", "application"];
 
 export default function PcrProfileListPage() {
   return (
-    <div>
+    <>
       <Head title="PCR Profiles" />
       <Nav />
       <ButtonBar>
@@ -46,6 +50,8 @@ export default function PcrProfileListPage() {
           </button>
         </Link>
       </ButtonBar>
+      <div className="container-fluid">
+        <h1>Thermocycler Profiles</h1>
         <ListPageLayout
           filterAttributes={PCRPROFILE_FILTER_ATTRIBUTES}
           queryTableProps={{
@@ -54,6 +60,7 @@ export default function PcrProfileListPage() {
             path: "thermocyclerprofile"
           }}
         />
-    </div>
+      </div>
+    </>
   );
 }

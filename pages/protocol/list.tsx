@@ -1,8 +1,15 @@
 import Link from "next/link";
-import { ButtonBar, ColumnDefinition, Head, } from "../../components";
-import { Nav } from "../../components/nav/nav";
-import { Protocol, protocolTypeLabels } from "../../types/seqdb-api/resources/Protocol";
-import { ListPageLayout } from "../../components/list-page-layout/ListPageLayout";
+import {
+  ButtonBar,
+  ColumnDefinition,
+  Head,
+  ListPageLayout,
+  Nav
+} from "../../components";
+import {
+  Protocol,
+  protocolTypeLabels
+} from "../../types/seqdb-api/resources/Protocol";
 
 const PROTOCOL_TABLE_COLUMNS: Array<ColumnDefinition<Protocol>> = [
   {
@@ -46,7 +53,7 @@ const PROTOCOL_FILTER_ATTRIBUTES = [
 
 export default function ProtocolListPage() {
   return (
-    <div>
+    <>
       <Head title="Protocols" />
       <Nav />
       <ButtonBar>
@@ -54,6 +61,8 @@ export default function ProtocolListPage() {
           <button className="btn btn-primary">Create Protocol</button>
         </Link>
       </ButtonBar>
+      <div className="container-fluid">
+        <h1>Protocols</h1>
         <ListPageLayout
           filterAttributes={PROTOCOL_FILTER_ATTRIBUTES}
           queryTableProps={{
@@ -62,7 +71,7 @@ export default function ProtocolListPage() {
             path: "protocol"
           }}
         />
-      
-    </div>
+      </div>
+    </>
   );
 }
