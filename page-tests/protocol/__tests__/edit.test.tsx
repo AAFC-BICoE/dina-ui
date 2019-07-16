@@ -83,7 +83,7 @@ describe("Protocol edit page", () => {
             path: "protocol",
             value: {
               attributes: {
-                name: "New Protocol",
+                name: "New Protocol"
               },
               id: -100,
               type: "protocol"
@@ -162,8 +162,8 @@ describe("Protocol edit page", () => {
             path: "protocol/10",
             value: {
               attributes: expect.objectContaining({
-                name: "PCR Standardized for Sequencing (10ul), +BSA",
-                description: "new desc for protocol 10"
+                description: "new desc for protocol 10",
+                name: "PCR Standardized for Sequencing (10ul), +BSA"
               }),
               id: "10",
               relationships: {
@@ -230,6 +230,8 @@ describe("Protocol edit page", () => {
 /** Test Protocol with all fields defined. */
 const TEST_PROTOCOL: Required<Protocol> = {
   description: "protocol desc",
+  equipment: "equip",
+  forwardPrimerConcentration: "fPrimer",
   group: {
     description: "protocol group desc",
     groupName: "Public",
@@ -237,18 +239,6 @@ const TEST_PROTOCOL: Required<Protocol> = {
     type: "group"
   },
   id: "10",
-  lastModified: "2019-03-27T04:00:00.000+0000",
-  name: "PCR Standardized for Sequencing (10ul), +BSA",
-  type: "PCR_REACTION",
-  version: "1",
-  steps: "step",
-  notes: "some notes",
-  reference: " some ref",
-  forwardPrimerConcentration: "fPrimer",
-  reversePrimerConcentration: "rPrimer",
-  reactionMixVolume: "0.1",
-  reactionMixVolumePerTube: "0.01",
-  equipment: "equip",
   kit: {
     group: {
       description: "product group desc",
@@ -261,5 +251,15 @@ const TEST_PROTOCOL: Required<Protocol> = {
     name: "Rapid Alkaline DNA Extraction",
     type: "product",
     upc: "Universal product code"
-  }
+  },
+  lastModified: "2019-03-27T04:00:00.000+0000",
+  name: "PCR Standardized for Sequencing (10ul), +BSA",
+  notes: "some notes",
+  reactionMixVolume: "0.1",
+  reactionMixVolumePerTube: "0.01",
+  reference: " some ref",
+  reversePrimerConcentration: "rPrimer",
+  steps: "step",
+  type: "PCR_REACTION",
+  version: "1"
 };

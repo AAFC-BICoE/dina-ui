@@ -1,7 +1,7 @@
 import { Formik } from "formik";
 import Link from "next/link";
 import { withRouter, WithRouterProps } from "next/router";
-import { FieldView, Head, LoadingSpinner, Nav, Query } from "../../components";
+import { FieldView, Head, LoadingSpinner, Nav, Query, ButtonBar } from "../../components";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 
 export function PcrProfileDetailsPage({ router }: WithRouterProps) {
@@ -11,22 +11,24 @@ export function PcrProfileDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title="Thermocycler Profile Details" />
       <Nav />
+      <ButtonBar>
+        <Link href={`/pcr-profile/edit?id=${id}`}>
+          <button className="btn btn-primary">Edit</button>
+        </Link>
+        <Link href="/pcr-profile/list">
+          <button className="btn btn-secondary">Back to List</button>
+        </Link>
+      </ButtonBar>
       <Query<PcrProfile>
         query={{ include: "group,region", path: `thermocyclerprofile/${id}` }}
       >
         {({ loading, response }) => (
           <div className="container-fluid">
-            <Link href="/pcr-profile/list">
-              <a>PCR Profile List</a>
-            </Link>
             <h1>PCR Profile Details</h1>
             <LoadingSpinner loading={loading} />
             {response && (
               <Formik<PcrProfile> initialValues={response.data} onSubmit={null}>
                 <div>
-                  <Link href={`/pcr-profile/edit?id=${id}`}>
-                    <a>Edit</a>
-                  </Link>
                   <div className="row">
                     <FieldView
                       className="col-md-2"

@@ -1,6 +1,8 @@
 import Link from "next/link";
-import { ColumnDefinition, Head, ListPageLayout, Nav } from "../../components";
+import { ColumnDefinition, Head,ButtonBar } from "../../components";
 import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
+import { Nav } from "../../components/nav/nav";
+import { ListPageLayout } from "../../components/list-page-layout/ListPageLayout";
 
 const PCRPRIMER_TABLE_COLUMNS: Array<ColumnDefinition<PcrPrimer>> = [
   {
@@ -16,7 +18,16 @@ const PCRPRIMER_TABLE_COLUMNS: Array<ColumnDefinition<PcrPrimer>> = [
     Header: "Group Name",
     accessor: "group.groupName"
   },
-  "region.name",
+  {
+    Cell: ({ original: { region } }) =>
+      region ? (
+        <Link href={`/region/view?id=${region.id}`}>
+          <a>{region.name}</a>
+        </Link>
+      ) : null,
+    Header: "Region Name",
+    accessor: "region.name"
+  },
   "type",
   "lotNumber",
   "application",
@@ -44,20 +55,19 @@ export default function PcrPrimerListPage() {
     <div>
       <Head title="PCR Primers" />
       <Nav />
-      <div className="container-fluid">
-        <h1>PCR Primers</h1>
+      <ButtonBar>
         <Link href="/pcr-primer/edit" prefetch={true}>
-          <a>Add PCR Primer</a>
+          <button className="btn btn-primary">Create PCR Primer</button>
         </Link>
-        <ListPageLayout
-          filterAttributes={PCR_PRIMER_FILTER_ATTRIBUTES}
-          queryTableProps={{
-            columns: PCRPRIMER_TABLE_COLUMNS,
-            include: "group,region",
-            path: "pcrPrimer"
-          }}
-        />
-      </div>
+      </ButtonBar>        
+      <ListPageLayout
+        filterAttributes={PCR_PRIMER_FILTER_ATTRIBUTES}
+        queryTableProps={{
+          columns: PCRPRIMER_TABLE_COLUMNS,
+          include: "group,region",
+          path: "pcrPrimer"
+        }}
+      />
     </div>
-  );
+  )
 }

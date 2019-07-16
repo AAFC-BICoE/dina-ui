@@ -1,6 +1,8 @@
 import Link from "next/link";
-import { ColumnDefinition, Head, ListPageLayout, Nav } from "../../components";
+import { ColumnDefinition, Head, ButtonBar } from "../../components";
 import { Product } from "../../types/seqdb-api/resources/Product";
+import { Nav } from "../../components/nav/nav";
+import { ListPageLayout } from "../../components/list-page-layout/ListPageLayout";
 
 const PRODUCT_TABLE_COLUMNS: Array<ColumnDefinition<Product>> = [
   {
@@ -37,20 +39,19 @@ export default function ProductListPage() {
     <div>
       <Head title="Product Inventory" />
       <Nav />
-      <div className="container-fluid">
-        <h1>Product Inventory</h1>
+      <ButtonBar>
         <Link href="/product/edit" prefetch={true}>
-          <a>Add New Product</a>
+          <button className="btn btn-primary">Create Product</button>
         </Link>
-        <ListPageLayout
-          filterAttributes={PRODUCT_FILTER_ATTRIBUTES}
-          queryTableProps={{
-            columns: PRODUCT_TABLE_COLUMNS,
-            include: "group",
-            path: "product"
-          }}
-        />
-      </div>
+      </ButtonBar>
+      <ListPageLayout
+        filterAttributes={PRODUCT_FILTER_ATTRIBUTES}
+        queryTableProps={{
+          columns: PRODUCT_TABLE_COLUMNS,
+          include: "group",
+          path: "product"
+        }}
+      />      
     </div>
   );
 }
