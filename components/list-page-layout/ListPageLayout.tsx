@@ -24,13 +24,13 @@ export function ListPageLayout<TData extends KitsuResource>({
     <div>
       <Formik initialValues={{ filter: null }} onSubmit={onSubmit}>
         <Form className="form-group">
-          <strong>Search:</strong>
+          <strong>Filter records:</strong>
           <FilterBuilderField
             filterAttributes={filterAttributes}
             name="filter"
           />
           <button className="btn btn-primary" type="submit">
-            Search
+            Filter List
           </button>
         </Form>
       </Formik>

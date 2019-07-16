@@ -3,6 +3,7 @@ import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
 import { useContext } from "react";
 import {
   ApiClientContext,
+  ButtonBar,
   ErrorViewer,
   Head,
   LoadingSpinner,
@@ -105,6 +106,9 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form>
         <ErrorViewer />
+        <ButtonBar>
+          <SubmitButton />
+        </ButtonBar>
         <div>
           <div className="row">
             <ResourceSelectField<Group>
@@ -159,7 +163,6 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
               </div>
             </div>
           </div>
-          <SubmitButton />
         </div>
       </Form>
     </Formik>

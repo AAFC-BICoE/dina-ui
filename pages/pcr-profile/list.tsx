@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { ColumnDefinition, Head, ListPageLayout, Nav } from "../../components";
+import {
+  ButtonBar,
+  ColumnDefinition,
+  Head,
+  ListPageLayout,
+  Nav
+} from "../../components";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 
 const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
@@ -7,7 +13,16 @@ const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
     Header: "Group Name",
     accessor: "group.groupName"
   },
-  "region.name",
+  {
+    Cell: ({ original: { region } }) =>
+      region ? (
+        <Link href={`/region/view?id=${region.id}`}>
+          <a>{region.name}</a>
+        </Link>
+      ) : null,
+    Header: "Region Name",
+    accessor: "region.name"
+  },
   {
     Cell: ({ original: { id, name } }) => (
       <Link href={`/pcr-profile/view?id=${id}`}>
@@ -25,14 +40,18 @@ const PCRPROFILE_FILTER_ATTRIBUTES = ["name", "application"];
 
 export default function PcrProfileListPage() {
   return (
-    <div>
+    <>
       <Head title="PCR Profiles" />
       <Nav />
+      <ButtonBar>
+        <Link href="/pcr-profile/edit" prefetch={true}>
+          <button className="btn btn-primary">
+            Create Thermocycler Profile
+          </button>
+        </Link>
+      </ButtonBar>
       <div className="container-fluid">
         <h1>Thermocycler Profiles</h1>
-        <Link href="/pcr-profile/edit" prefetch={true}>
-          <a>Add Thermocycler Profile</a>
-        </Link>
         <ListPageLayout
           filterAttributes={PCRPROFILE_FILTER_ATTRIBUTES}
           queryTableProps={{
@@ -42,6 +61,6 @@ export default function PcrProfileListPage() {
           }}
         />
       </div>
-    </div>
+    </>
   );
 }

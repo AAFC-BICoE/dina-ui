@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { ColumnDefinition, Head, ListPageLayout, Nav } from "../../components";
+import {
+  ButtonBar,
+  ColumnDefinition,
+  Head,
+  ListPageLayout,
+  Nav
+} from "../../components";
 import {
   Protocol,
   protocolTypeLabels
@@ -47,14 +53,16 @@ const PROTOCOL_FILTER_ATTRIBUTES = [
 
 export default function ProtocolListPage() {
   return (
-    <div>
+    <>
       <Head title="Protocols" />
       <Nav />
+      <ButtonBar>
+        <Link href="/protocol/edit" prefetch={true}>
+          <button className="btn btn-primary">Create Protocol</button>
+        </Link>
+      </ButtonBar>
       <div className="container-fluid">
         <h1>Protocols</h1>
-        <Link href="/protocol/edit" prefetch={true}>
-          <a>Add Protocol</a>
-        </Link>
         <ListPageLayout
           filterAttributes={PROTOCOL_FILTER_ATTRIBUTES}
           queryTableProps={{
@@ -64,6 +72,6 @@ export default function ProtocolListPage() {
           }}
         />
       </div>
-    </div>
+    </>
   );
 }
