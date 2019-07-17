@@ -1,6 +1,7 @@
 import { Form, Formik, FormikActions, FormikProps } from "formik";
 import { FilterParam, KitsuResource } from "kitsu";
 import { useCookies } from "react-cookie";
+import { CookieSetOptions } from "universal-cookie";
 import { FilterBuilderField, QueryTable, QueryTableProps } from "..";
 import { rsql } from "../filter-builder/rsql";
 
@@ -12,6 +13,9 @@ interface ListPageLayoutProps<TData extends KitsuResource> {
 const FILTER_FORM_COOKIE = "filterForm";
 const TABLE_PAGE_SIZE_COOKIE = "tablePageSize";
 const TABLE_SORT_COOKIE = "tableSort";
+
+/** The cookie should not expire. */
+const COOKIE_OPTIONS: CookieSetOptions = { expires: new Date("3000-01-01") };
 
 /**
  * Generic layout component for list pages. Renders a QueryTable with a filter builder.
@@ -42,7 +46,7 @@ export function ListPageLayout<TData extends KitsuResource>({
 
   function onFilterFormSubmit(values, { setSubmitting }: FormikActions<any>) {
     // On submit, put the filter form's values into a cookie.
-    setCookie(FILTER_FORM_COOKIE, values);
+    setCookie(FILTER_FORM_COOKIE, values, COOKIE_OPTIONS);
     setSubmitting(false);
   }
 
@@ -79,8 +83,12 @@ export function ListPageLayout<TData extends KitsuResource>({
         defaultPageSize={defaultPageSize}
         defaultSort={defaultSort}
         filter={filterParam}
-        onPageSizeChange={newSize => setCookie(TABLE_PAGE_SIZE_COOKIE, newSize)}
-        onSortedChange={newSort => setCookie(TABLE_SORT_COOKIE, newSort)}
+        onPageSizeChange={newSize =>
+          setCookie(TABLE_PAGE_SIZE_COOKIE, newSize, COOKIE_OPTIONS)
+        }
+        onSortedChange={newSort =>
+          setCookie(TABLE_SORT_COOKIE, newSort, COOKIE_OPTIONS)
+        }
         {...queryTableProps}
       />
     </div>
