@@ -41,7 +41,9 @@ describe("ListPageLayout component", () => {
     );
 
     // Wait for the default search to finish.
-    await Promise.resolve();
+    await act(async () => {
+      await new Promise(setImmediate);
+    });
     wrapper.update();
 
     // Do a filtered search.
@@ -95,10 +97,10 @@ describe("ListPageLayout component", () => {
 
     const testSort = [{ id: "type", desc: false }];
 
-    wrapper.find(ReactTable).prop("onSortedChange")(testSort, null, null);
-    wrapper.find(ReactTable).prop("onPageSizeChange")(5, null);
-
     await act(async () => {
+      wrapper.find(ReactTable).prop("onSortedChange")(testSort, null, null);
+      wrapper.find(ReactTable).prop("onPageSizeChange")(5, null);
+
       await new Promise(setImmediate);
     });
     wrapper.update();
