@@ -14,6 +14,8 @@ include::getting_started.adoc[]
 
 include::npm_package_scripts.adoc[]
 
+include::continuous_integration.adoc[]
+
 = React Components
 
 :leveloffset: 2

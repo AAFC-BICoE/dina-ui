@@ -1,0 +1,17 @@
+= Continuous Integration
+
+This repository uses Travis for continuous integration and continuous delivery.
+
+On every commit and pull request, Travis runs the test suite and reports success/failure.
+
+On every commit to the "dev" branch with passing tests, Travis builds and deploys the app's
+Docker image to Docker Hub with the dev snapshot tag format, e.g. dev-1.3.0.
+
+On every tagged commit to master with passing tests, Travis builds and deploys the app's Docker
+image to Docker Hub with the Git tag (without the leading "v") as the Docker tag, (e.g. v.1.3.0 -> 1.3.0).
+
+The following Travis environment variables are required for the Docker Hub deployments:
+
+* DOCKER_IMAGE : The docker image name, e.g. AAFC-BICOE/seqdb-ui
+* DOCKER_PASSWORD : The Docker Hub username, e.g. AAFC-BICOE
+* DOCKER_USERNAME : The Docker Hub password, e.g. mypassword
