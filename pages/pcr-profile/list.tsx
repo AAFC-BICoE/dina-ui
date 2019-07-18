@@ -3,9 +3,9 @@ import {
   ButtonBar,
   ColumnDefinition,
   Head,
-  Nav,
-  QueryTable,
-  CreateButton
+  CreateButton,
+  ListPageLayout,
+  Nav
 } from "../../components";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 
@@ -14,7 +14,16 @@ const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
     Header: "Group Name",
     accessor: "group.groupName"
   },
-  "region.name",
+  {
+    Cell: ({ original: { region } }) =>
+      region ? (
+        <Link href={`/region/view?id=${region.id}`}>
+          <a>{region.name}</a>
+        </Link>
+      ) : null,
+    Header: "Region Name",
+    accessor: "region.name"
+  },
   {
     Cell: ({ original: { id, name } }) => (
       <Link href={`/pcr-profile/view?id=${id}`}>
@@ -28,9 +37,11 @@ const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
   "step3"
 ];
 
+const PCRPROFILE_FILTER_ATTRIBUTES = ["name", "application"];
+
 export default function PcrProfileListPage() {
   return (
-    <div>
+    <>
       <Head title="PCR Profiles" />
       <Nav />
       <ButtonBar>
@@ -38,12 +49,15 @@ export default function PcrProfileListPage() {
       </ButtonBar>
       <div className="container-fluid">
         <h1>Thermocycler Profiles</h1>
-        <QueryTable<PcrProfile>
-          columns={PCRPROFILE_TABLE_COLUMNS}
-          include="group,region"
-          path="thermocyclerprofile"
+        <ListPageLayout
+          filterAttributes={PCRPROFILE_FILTER_ATTRIBUTES}
+          queryTableProps={{
+            columns: PCRPROFILE_TABLE_COLUMNS,
+            include: "group,region",
+            path: "thermocyclerprofile"
+          }}
         />
       </div>
-    </div>
+    </>
   );
 }

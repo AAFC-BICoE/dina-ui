@@ -1,6 +1,15 @@
 import { Formik } from "formik";
 import { withRouter, WithRouterProps } from "next/router";
-import { FieldView, Head, LoadingSpinner, Nav, Query, ButtonBar, EditButton, BackToListButton } from "../../components";
+import {
+  ButtonBar,
+  FieldView,
+  Head,
+  LoadingSpinner,
+  Nav,
+  Query,
+  EditButton,
+  BackToListButton
+} from "../../components";
 import {
   Protocol,
   protocolTypeLabels
@@ -25,7 +34,6 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
 
           return (
             <div className="container-fluid">
-
               <h1>Protocol Details</h1>
               <LoadingSpinner loading={loading} />
               {protocol && (

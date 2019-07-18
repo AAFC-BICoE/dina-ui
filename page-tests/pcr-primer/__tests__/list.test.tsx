@@ -86,7 +86,7 @@ describe("PcrPrimer list page", () => {
         "pcrPrimer",
         expect.objectContaining({ filter: { rsql: "name==*101F*" } })
       );
-      expect(wrapper.find(QueryTable).props().filter).toEqual({
+      expect(wrapper.find(QueryTable).prop("filter")).toEqual({
         rsql: "name==*101F*"
       });
       done();
