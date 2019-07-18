@@ -1,5 +1,6 @@
 {
   "name": "create-next-example-app",
+  "version": "1.0.0",
   "scripts": {
     "build": "next build && next export -o ./build && babel ./build -d ./build",
     "dev": "run-p next proxy",
@@ -20,6 +21,7 @@
     "bootswatch": "^4.2.1",
     "core-js": "^2.6.5",
     "formik": "^1.5.1",
+    "http-server": "^0.11.1",
     "kitsu": "^6.5.1",
     "kitsu-core": "^7.0.0",
     "lodash": "^4.17.11",

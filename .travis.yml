@@ -13,3 +13,14 @@ script: npm run test:coverage
 after_script:
   # Submit the test coverage report.
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+
+deploy:
+  - provider: script
+    script: bash docker-push-prod.sh
+    on:
+      branch: master
+      tags: true
+  - provider: script
+    script: bash docker-push-dev.sh
+    on:
+      branch: dev
