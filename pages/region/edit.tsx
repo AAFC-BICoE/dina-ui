@@ -9,7 +9,9 @@ import {
   Nav,
   Query,
   SubmitButton,
-  TextField
+  TextField,
+  ButtonBar,
+  CancelButton
 } from "../../components";
 import { Region } from "../../types/seqdb-api/resources/Region";
 import { serialize } from "../../util/serialize";
@@ -54,7 +56,7 @@ export function RegionEditPage({ router }: WithRouterProps) {
 
 function RegionForm({ region, router }: RegionFormProps) {
   const { doOperations } = useContext(ApiClientContext);
-
+  const { id } = router.query;
   const initialValues = region || {};
 
   async function onSubmit(
@@ -93,6 +95,10 @@ function RegionForm({ region, router }: RegionFormProps) {
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form>
         <ErrorViewer />
+        <ButtonBar>
+          <SubmitButton />
+          <CancelButton entityId={id as string} entityLink="region" />
+        </ButtonBar>
         <div>
           <div className="row">
             <TextField className="col-md-2" name="name" />
