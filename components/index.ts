@@ -9,7 +9,6 @@ export * from "./formik-connected/FieldView";
 export * from "./formik-connected/ResourceSelectField";
 export * from "./formik-connected/SelectField";
 export * from "./formik-connected/SubmitButton";
-export * from "./formik-connected/SaveButton";
 export * from "./formik-connected/TextField";
 export * from "./head";
 export * from "./loading-spinner/LoadingSpinner";

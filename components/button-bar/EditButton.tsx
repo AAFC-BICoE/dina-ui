@@ -1,21 +1,18 @@
 import React from "react";
-import Link from "next/link";
 
 interface EditButtonProps {
+    // The link type for where to redirect the user. Gets appended with "/" + entityLink + "/edit/".
     entityLink: string,
+
+    // The id of the entity to edit.
     entityId: string
 }
 
 /**
- * Edit Button which is commonly used in the button bar.
- * 
- * @param {string} entityLink   The link type for where to redirect the user. Gets appended with "/" + entityLink + "/edit/".
- * @param {string} entityId     The id of the entity to edit.
+ * Edit Button which is commonly used in the button bar.  
  */
-export const EditButton = function(props: EditButtonProps) {
+export function EditButton(props: EditButtonProps) {
     return (
-        <Link href={`/${props.entityLink}/edit?id=${props.entityId}`} prefetch={true}>
-            <button className="btn btn-primary">Edit</button>
-        </Link>
+        <a href={`/${props.entityLink}/edit?id=${props.entityId}`} className="btn btn-primary">Edit</a>
     );
 }

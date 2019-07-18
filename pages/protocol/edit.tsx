@@ -11,7 +11,7 @@ import {
   Query,
   ResourceSelectField,
   SelectField,
-  SaveButton,
+  SubmitButton,
   TextField,
   CancelButton
 } from "../../components";
@@ -108,7 +108,7 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
       <Form>
         <ErrorViewer />
         <ButtonBar>
-          <SaveButton />
+          <SubmitButton />
           <CancelButton entityId={id as string} entityLink="protocol" />
         </ButtonBar>
         <div>

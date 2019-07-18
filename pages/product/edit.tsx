@@ -10,7 +10,7 @@ import {
   Nav,
   Query,
   ResourceSelectField,
-  SaveButton,
+  SubmitButton,
   TextField,
   CancelButton
 } from "../../components";
@@ -99,7 +99,7 @@ function ProductForm({ product, router }: ProductFormProps) {
       <Form>
         <ErrorViewer />
         <ButtonBar>
-          <SaveButton />
+          <SubmitButton />
           <CancelButton entityId={id as string} entityLink="product" />
         </ButtonBar>
         <div>

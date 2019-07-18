@@ -10,7 +10,7 @@ import {
   Nav,
   Query,
   ResourceSelectField,
-  SaveButton,
+  SubmitButton,
   TextField,
   CancelButton
 } from "../../components";
@@ -108,7 +108,7 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
       <Form>
         <ErrorViewer />
         <ButtonBar>
-          <SaveButton />
+          <SubmitButton />
           <CancelButton entityId={id as string} entityLink="pcr-profile" />
         </ButtonBar>
         <div>

@@ -12,7 +12,7 @@ import {
   Query,
   ResourceSelectField,
   SelectField,
-  SaveButton,
+  SubmitButton,
   CancelButton,
   TextField
 } from "../../components";
@@ -104,7 +104,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form>
         <ButtonBar>
-          <SaveButton />
+          <SubmitButton />
           <CancelButton entityId={id as string} entityLink="pcr-primer" />
         </ButtonBar>
         <ErrorViewer />
