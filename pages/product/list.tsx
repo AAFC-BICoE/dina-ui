@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   ButtonBar,
   ColumnDefinition,
+  CreateButton,
   Head,
   ListPageLayout,
   Nav
@@ -44,9 +45,7 @@ export default function ProductListPage() {
       <Head title="Product Inventory" />
       <Nav />
       <ButtonBar>
-        <Link href="/product/edit" prefetch={true}>
-          <button className="btn btn-primary">Create Product</button>
-        </Link>
+        <CreateButton entityLabel="Product" entityLink="product" />
       </ButtonBar>
       <div className="container-fluid">
         <h1>Product Inventory</h1>

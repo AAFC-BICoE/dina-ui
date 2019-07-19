@@ -4,6 +4,7 @@ import { useContext } from "react";
 import {
   ApiClientContext,
   ButtonBar,
+  CancelButton,
   ErrorViewer,
   Head,
   LoadingSpinner,
@@ -64,6 +65,7 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
 
 function ProtocolForm({ protocol, router }: ProtocolFormProps) {
   const { doOperations } = useContext(ApiClientContext);
+  const { id } = router.query;
   const initialValues = protocol || {};
 
   async function onSubmit(
@@ -107,6 +109,7 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />
+          <CancelButton entityId={id as string} entityLink="protocol" />
         </ButtonBar>
         <div>
           <div className="row">

@@ -1,7 +1,15 @@
 import { Formik } from "formik";
-import Link from "next/link";
 import { withRouter, WithRouterProps } from "next/router";
-import { FieldView, Head, LoadingSpinner, Nav, Query } from "../../components";
+import {
+  BackToListButton,
+  ButtonBar,
+  EditButton,
+  FieldView,
+  Head,
+  LoadingSpinner,
+  Nav,
+  Query
+} from "../../components";
 import { Region } from "../../types/seqdb-api/resources/Region";
 
 export function RegionDetailsPage({ router }: WithRouterProps) {
@@ -11,20 +19,18 @@ export function RegionDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title="Gene Region" />
       <Nav />
+      <ButtonBar>
+        <EditButton entityId={id as string} entityLink="region" />
+        <BackToListButton entityLink="region" />
+      </ButtonBar>
       <Query<Region> query={{ path: `region/${id}` }}>
         {({ loading, response }) => (
           <div className="container-fluid">
-            <Link href="/region/list">
-              <a>Gene Region list</a>
-            </Link>
             <h1>Gene Region Details</h1>
             <LoadingSpinner loading={loading} />
             {response && (
               <Formik<Region> initialValues={response.data} onSubmit={null}>
                 <div>
-                  <Link href={`/region/edit?id=${id}`}>
-                    <a>Edit</a>
-                  </Link>
                   <div className="row">
                     <FieldView className="col-md-2" name="name" />
                     <FieldView className="col-md-2" name="description" />

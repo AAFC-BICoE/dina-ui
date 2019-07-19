@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   ButtonBar,
   ColumnDefinition,
+  CreateButton,
   Head,
   ListPageLayout,
   Nav
@@ -57,9 +58,7 @@ export default function ProtocolListPage() {
       <Head title="Protocols" />
       <Nav />
       <ButtonBar>
-        <Link href="/protocol/edit" prefetch={true}>
-          <button className="btn btn-primary">Create Protocol</button>
-        </Link>
+        <CreateButton entityLabel="Protocol" entityLink="protocol" />
       </ButtonBar>
       <div className="container-fluid">
         <h1>Protocols</h1>
