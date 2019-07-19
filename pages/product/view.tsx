@@ -1,14 +1,14 @@
 import { Formik } from "formik";
 import { withRouter, WithRouterProps } from "next/router";
 import {
+  BackToListButton,
   ButtonBar,
+  EditButton,
   FieldView,
   Head,
   LoadingSpinner,
   Nav,
-  Query,
-  EditButton,
-  BackToListButton
+  Query
 } from "../../components";
 import { Product } from "../../types/seqdb-api/resources/Product";
 

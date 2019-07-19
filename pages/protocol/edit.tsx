@@ -4,6 +4,7 @@ import { useContext } from "react";
 import {
   ApiClientContext,
   ButtonBar,
+  CancelButton,
   ErrorViewer,
   Head,
   LoadingSpinner,
@@ -12,8 +13,7 @@ import {
   ResourceSelectField,
   SelectField,
   SubmitButton,
-  TextField,
-  CancelButton
+  TextField
 } from "../../components";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { Product } from "../../types/seqdb-api/resources/Product";

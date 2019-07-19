@@ -1,6 +1,15 @@
 import { Formik } from "formik";
 import { withRouter, WithRouterProps } from "next/router";
-import { FieldView, Head, LoadingSpinner, Nav, Query, ButtonBar, EditButton, BackToListButton } from "../../components";
+import {
+  BackToListButton,
+  ButtonBar,
+  EditButton,
+  FieldView,
+  Head,
+  LoadingSpinner,
+  Nav,
+  Query
+} from "../../components";
 import { Region } from "../../types/seqdb-api/resources/Region";
 
 export function RegionDetailsPage({ router }: WithRouterProps) {

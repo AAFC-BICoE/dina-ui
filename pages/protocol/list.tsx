@@ -2,8 +2,8 @@ import Link from "next/link";
 import {
   ButtonBar,
   ColumnDefinition,
-  Head,
   CreateButton,
+  Head,
   ListPageLayout,
   Nav
 } from "../../components";

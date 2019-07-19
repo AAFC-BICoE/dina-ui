@@ -3,15 +3,15 @@ import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
 import { useContext } from "react";
 import {
   ApiClientContext,
+  ButtonBar,
+  CancelButton,
   ErrorViewer,
   Head,
   LoadingSpinner,
   Nav,
   Query,
   SubmitButton,
-  TextField,
-  ButtonBar,
-  CancelButton
+  TextField
 } from "../../components";
 import { Region } from "../../types/seqdb-api/resources/Region";
 import { serialize } from "../../util/serialize";

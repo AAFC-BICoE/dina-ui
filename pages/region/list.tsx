@@ -2,10 +2,10 @@ import Link from "next/link";
 import {
   ButtonBar,
   ColumnDefinition,
+  CreateButton,
   Head,
   ListPageLayout,
-  Nav,
-  CreateButton
+  Nav
 } from "../../components";
 import { Region } from "../../types/seqdb-api/resources/Region";
 

@@ -2,8 +2,8 @@ import Link from "next/link";
 import {
   ButtonBar,
   ColumnDefinition,
-  Head,
   CreateButton,
+  Head,
   ListPageLayout,
   Nav
 } from "../../components";
@@ -45,7 +45,10 @@ export default function PcrProfileListPage() {
       <Head title="PCR Profiles" />
       <Nav />
       <ButtonBar>
-        <CreateButton entityLabel="Thermocycler Profile" entityLink="pcr-profile" />
+        <CreateButton
+          entityLabel="Thermocycler Profile"
+          entityLink="pcr-profile"
+        />
       </ButtonBar>
       <div className="container-fluid">
         <h1>Thermocycler Profiles</h1>
