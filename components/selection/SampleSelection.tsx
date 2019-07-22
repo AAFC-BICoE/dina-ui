@@ -40,6 +40,13 @@ export function SampleSelection({ chain, stepTemplate }: SampleSelectionProps) {
     {
       Header: "Version",
       accessor: "sample.version"
+    },
+    {
+      Cell: ({ original }) => (
+        <button className="btn btn-dark" onClick={() => removeSample(original)}>
+          Remove
+        </button>
+      )
     }
   ];
 
@@ -108,7 +115,26 @@ export function SampleSelection({ chain, stepTemplate }: SampleSelectionProps) {
       setRandomNumber(Math.random());
     } catch (err) {
       // tslint:disable-next-line: no-console
-      console.error(err);
+      alert(err);
+    }
+  }
+
+  async function removeSample(stepResource: StepResource) {
+    try {
+      await doOperations([
+        {
+          op: "DELETE",
+          path: `stepResource/${stepResource.id}`,
+          value: {
+            id: stepResource.id,
+            type: "stepResource"
+          }
+        }
+      ]);
+
+      setRandomNumber(Math.random());
+    } catch (err) {
+      alert(err);
     }
   }
 
