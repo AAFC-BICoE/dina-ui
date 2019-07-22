@@ -1,5 +1,5 @@
 import { GetParams, KitsuResponse, KitsuResponseData } from "kitsu";
-import { isEqual, isUndefined, omitBy } from "lodash";
+import { isEqual, isUndefined, noop, omitBy } from "lodash";
 import React from "react";
 import { ApiClientContext, ApiClientContextI } from "./ApiClientContext";
 import { JsonApiErrorResponse } from "./jsonapi-types";
@@ -10,7 +10,8 @@ export interface JsonApiQuerySpec extends GetParams {
 }
 
 /** Query component props. */
-interface QueryProps<TData extends KitsuResponseData, TMeta> {
+export interface QueryProps<TData extends KitsuResponseData, TMeta> {
+  onSuccess?: (response: KitsuResponse<TData, TMeta>) => void;
   query: JsonApiQuerySpec;
   children: QueryChildren<TData, TMeta>;
 }
@@ -67,11 +68,12 @@ export class Query<
   }
 
   private async fetchData(): Promise<void> {
-    const { path, fields, filter, sort, include, page } = this.props.query;
+    const { query, onSuccess = noop } = this.props;
     const { apiClient } = this.context as ApiClientContextI;
 
     // Omit undefined values from the GET params, which would otherwise cause an invalid request.
     // e.g. /api/region?fields=undefined
+    const { path, fields, filter, sort, include, page } = query;
     const getParams = omitBy<GetParams>(
       { fields, filter, sort, include, page },
       isUndefined
@@ -80,6 +82,7 @@ export class Query<
     try {
       const response = await apiClient.get(path, getParams);
       this.setState({ loading: false, error: undefined, response });
+      onSuccess(response);
     } catch (error) {
       this.setState({ loading: false, error });
     }

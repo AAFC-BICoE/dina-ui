@@ -1,4 +1,4 @@
-import { Form, Formik, FormikActions } from "formik";
+import { connect, Form, Formik, FormikActions } from "formik";
 import { FilterParam } from "kitsu";
 import { useContext, useState } from "react";
 import {
@@ -8,6 +8,7 @@ import {
   QueryTable
 } from "../../components";
 import { rsql } from "../../components/filter-builder/rsql";
+import { CheckBoxField } from "../../components/formik-connected/CheckBoxField";
 import { Sample } from "../../types/seqdb-api/resources/Sample";
 import { Chain } from "../../types/seqdb-api/resources/workflow/Chain";
 import { StepResource } from "../../types/seqdb-api/resources/workflow/StepResource";
@@ -27,6 +28,9 @@ export function SampleSelection({ chain, stepTemplate }: SampleSelectionProps) {
   // This number is passed into the Query component's query, which re-fetches
   // the data when any part of the query changes.
   const [randomNumber, setRandomNumber] = useState(Math.random());
+
+  const [availableSamples, setAvailableSamples] = useState<Sample[]>([]);
+  const [lastCheckedSample, setLastCheckedSample] = useState<Sample>();
 
   const SELECTED_SAMPLE_COLUMNS: Array<ColumnDefinition<any>> = [
     {
@@ -58,25 +62,44 @@ export function SampleSelection({ chain, stepTemplate }: SampleSelectionProps) {
     "name",
     "version",
     {
-      Cell: ({ original }) => (
-        <>
-          <div className="row">
-            <button
-              className="btn btn-primary btn-sm col-6"
-              onClick={() => selectSample(original)}
-            >
-              -->
-            </button>
-            <div className="col-6">
-              <input
-                key={original.id}
-                type="checkbox"
-                style={{ width: "20px", height: "20px" }}
-              />
-            </div>
+      Cell: connect(({ formik: { setFieldValue }, original }) => (
+        <div className="row" key={original.id}>
+          <button
+            className="btn btn-primary btn-sm col-6"
+            onClick={() => selectSamples([original])}
+          >
+            -->
+          </button>
+          <div className="col-6">
+            <CheckBoxField
+              onClick={e => {
+                const checkedSample = original;
+                if (lastCheckedSample && e.shiftKey) {
+                  const checked: boolean = (e.target as any).checked;
+
+                  const currentIndex = availableSamples.indexOf(checkedSample);
+                  const lastIndex = availableSamples.indexOf(lastCheckedSample);
+
+                  const [lowIndex, highIndex] = [currentIndex, lastIndex].sort(
+                    (a, b) => a - b
+                  );
+
+                  const samplesToToggle = availableSamples.slice(
+                    lowIndex,
+                    highIndex + 1
+                  );
+
+                  for (const sample of samplesToToggle) {
+                    setFieldValue(`checkedIds[${sample.id}]`, checked);
+                  }
+                }
+                setLastCheckedSample(checkedSample);
+              }}
+              name={`checkedIds[${original.id}]`}
+            />
           </div>
-        </>
-      ),
+        </div>
+      )),
       sortable: false
     }
   ];
@@ -86,35 +109,41 @@ export function SampleSelection({ chain, stepTemplate }: SampleSelectionProps) {
     setSubmitting(false);
   }
 
-  async function selectSample(sample: Sample) {
-    const newStepResource: StepResource = {
+  async function selectSamples(samples: Sample[]) {
+    const newStepResources: StepResource[] = samples.map(sample => ({
       chain,
       chainTemplateId: Number(chain.chainTemplate.id),
       sample,
       stepTemplateId: Number(stepTemplate.id),
       type: "INPUT",
       value: "SAMPLE"
-    };
+    }));
 
-    const serialized = await serialize({
-      resource: newStepResource,
-      type: "stepResource"
-    });
+    const serialized = await Promise.all(
+      newStepResources.map(newStepResource =>
+        serialize({
+          resource: newStepResource,
+          type: "stepResource"
+        })
+      )
+    );
 
-    serialized.id = -100;
+    let tempId = -100;
+    for (const s of serialized) {
+      s.id = tempId--;
+    }
 
     try {
-      await doOperations([
-        {
+      await doOperations(
+        serialized.map(s => ({
           op: "POST",
           path: "stepResource",
-          value: serialized
-        }
-      ]);
+          value: s
+        }))
+      );
 
       setRandomNumber(Math.random());
     } catch (err) {
-      // tslint:disable-next-line: no-console
       alert(err);
     }
   }
@@ -151,18 +180,25 @@ export function SampleSelection({ chain, stepTemplate }: SampleSelectionProps) {
         </Form>
       </Formik>
       <div className="row form-group">
-        <div className="col-5">
-          <strong>Available Samples</strong>
-          <QueryTable
-            columns={SELECTABLE_SAMPLE_COLUMNS}
-            filter={filter}
-            include="group"
-            path="sample"
-          />
-        </div>
-        <div className="col-2" style={{ marginTop: "100px" }}>
-          <button className="btn btn-primary">--></button>
-        </div>
+        <Formik initialValues={{}} onSubmit={null}>
+          {() => (
+            <>
+              <div className="col-5">
+                <strong>Available Samples</strong>
+                <QueryTable
+                  columns={SELECTABLE_SAMPLE_COLUMNS}
+                  filter={filter}
+                  include="group"
+                  onSuccess={response => setAvailableSamples(response.data)}
+                  path="sample"
+                />
+              </div>
+              <div className="col-2" style={{ marginTop: "100px" }}>
+                <button className="btn btn-primary">--></button>
+              </div>
+            </>
+          )}
+        </Formik>
         <div className="col-5">
           <strong>Selected Samples</strong>
           <QueryTable

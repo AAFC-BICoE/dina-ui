@@ -1,4 +1,4 @@
-import { FilterParam, KitsuResource } from "kitsu";
+import { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import React, { useRef, useState } from "react";
 import ReactTable, { Column } from "react-table";
 import "react-table/react-table.css";
@@ -29,6 +29,9 @@ export interface QueryTableProps<TData extends KitsuResource> {
 
   /** The columns to show in the table. */
   columns: Array<ColumnDefinition<TData>>;
+
+  /** Query success callback. */
+  onSuccess?: (response: KitsuResponse<TData[], MetaWithTotal>) => void;
 }
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -61,6 +64,7 @@ export function QueryTable<TData extends KitsuResource>({
   defaultSort,
   filter,
   include,
+  onSuccess,
   path
 }: QueryTableProps<TData>) {
   // JSONAPI sort attribute.
@@ -118,7 +122,7 @@ export function QueryTable<TData extends KitsuResource>({
   return (
     <div className="query-table-wrapper" ref={divWrapperRef}>
       <style>{queryTableStyle}</style>
-      <Query<TData[], MetaWithTotal> query={query}>
+      <Query<TData[], MetaWithTotal> query={query} onSuccess={onSuccess}>
         {({ loading, response }) => {
           const numberOfPages =
             response && response.meta && response.meta.totalResourceCount
