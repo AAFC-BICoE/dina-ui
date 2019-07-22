@@ -3,6 +3,8 @@ import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
 import { useContext } from "react";
 import {
   ApiClientContext,
+  ButtonBar,
+  CancelButton,
   ErrorViewer,
   Head,
   LoadingSpinner,
@@ -63,7 +65,7 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
 
 function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
   const { doOperations } = useContext(ApiClientContext);
-
+  const { id } = router.query;
   const initialValues = profile || { type: "thermocyclerprofile" };
 
   async function onSubmit(
@@ -105,6 +107,10 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form>
         <ErrorViewer />
+        <ButtonBar>
+          <SubmitButton />
+          <CancelButton entityId={id as string} entityLink="pcr-profile" />
+        </ButtonBar>
         <div>
           <div className="row">
             <ResourceSelectField<Group>
@@ -159,7 +165,6 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
               </div>
             </div>
           </div>
-          <SubmitButton />
         </div>
       </Form>
     </Formik>

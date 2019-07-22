@@ -1,6 +1,7 @@
 import { mount } from "enzyme";
 import { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import { range } from "lodash";
+import React from "react";
 import ReactTable from "react-table";
 import { MetaWithTotal } from "../../../types/seqdb-api/meta";
 import {
@@ -537,12 +538,16 @@ describe("QueryTable component", () => {
       />
     );
 
-    // Mock the table wrapper's Y position as 200.
-    (wrapper.instance() as any).divWrapperRef.current = { offsetTop: 200 };
-
     // Wait until the data is loaded into the table.
     await Promise.resolve();
     wrapper.update();
+
+    // Set the table's div wrapper's offsetTop to 200.
+    Object.defineProperty(
+      wrapper.find(".query-table-wrapper").instance(),
+      "offsetTop",
+      { value: 200 }
+    );
 
     // Click to the next page of the table.
     wrapper

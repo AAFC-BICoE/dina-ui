@@ -1,7 +1,15 @@
 import { Formik } from "formik";
-import Link from "next/link";
 import { withRouter, WithRouterProps } from "next/router";
-import { FieldView, Head, LoadingSpinner, Nav, Query } from "../../components";
+import {
+  BackToListButton,
+  ButtonBar,
+  EditButton,
+  FieldView,
+  Head,
+  LoadingSpinner,
+  Nav,
+  Query
+} from "../../components";
 import { Product } from "../../types/seqdb-api/resources/Product";
 
 export function ProductDetailsPage({ router }: WithRouterProps) {
@@ -10,20 +18,18 @@ export function ProductDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title="Product " />
       <Nav />
+      <ButtonBar>
+        <EditButton entityId={id as string} entityLink="product" />
+        <BackToListButton entityLink="product" />
+      </ButtonBar>
       <Query<Product> query={{ include: "group", path: `product/${id}` }}>
         {({ loading, response }) => (
           <div className="container-fluid">
-            <Link href="/product/list">
-              <a>Product Inventory</a>
-            </Link>
             <h1>Product Inventory</h1>
             <LoadingSpinner loading={loading} />
             {response && (
               <Formik<Product> initialValues={response.data} onSubmit={null}>
                 <div>
-                  <Link href={`/product/edit?id=${id}`}>
-                    <a>Edit</a>
-                  </Link>
                   <div className="row">
                     <FieldView
                       className="col-md-2"

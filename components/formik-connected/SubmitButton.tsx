@@ -11,7 +11,7 @@ export const SubmitButton = connect(function SubmitButtonInternal({
     <LoadingSpinner loading={isSubmitting} />
   ) : (
     <button className="btn btn-primary" type="submit">
-      Submit
+      Save
     </button>
   );
 });

@@ -3,6 +3,8 @@ import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
 import { useContext } from "react";
 import {
   ApiClientContext,
+  ButtonBar,
+  CancelButton,
   DateField,
   ErrorViewer,
   Head,
@@ -50,11 +52,11 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
             </Query>
           </div>
         ) : (
-            <div>
-              <h1>Add PCR Primer</h1>
-              <PcrPrimerForm router={router} />
-            </div>
-          )}
+          <div>
+            <h1>Add PCR Primer</h1>
+            <PcrPrimerForm router={router} />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -62,6 +64,7 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
 
 function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
   const { doOperations } = useContext(ApiClientContext);
+  const { id } = router.query;
 
   const initialValues = primer || { lotNumber: 1, seq: "", type: "PRIMER" };
 
@@ -100,6 +103,10 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form>
+        <ButtonBar>
+          <SubmitButton />
+          <CancelButton entityId={id as string} entityLink="pcr-primer" />
+        </ButtonBar>
         <ErrorViewer />
         <div>
           <div className="row">
@@ -128,10 +135,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
               model="region"
               optionLabel={region => region.name}
             />
-            <TextField
-              className="col-md-2"
-              name="name"
-            />
+            <TextField className="col-md-2" name="name" />
             <TextField className="col-md-2" name="lotNumber" />
             <TextField className="col-md-2" name="targetSpecies" />
             <TextField className="col-md-2" name="purification" />
@@ -162,7 +166,6 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
           <div className="row">
             <TextField className="col-md-6" name="note" />
           </div>
-          <SubmitButton />
         </div>
       </Form>
     </Formik>
