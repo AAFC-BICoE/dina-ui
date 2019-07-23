@@ -1,5 +1,6 @@
-import { connect, Form, Formik, FormikActions } from "formik";
+import { connect, Form, Formik, FormikActions, FormikProps } from "formik";
 import { FilterParam } from "kitsu";
+import { toPairs } from "lodash";
 import { useContext, useState } from "react";
 import {
   ApiClientContext,
@@ -148,6 +149,20 @@ export function SampleSelection({ chain, stepTemplate }: SampleSelectionProps) {
     }
   }
 
+  async function selectAllCheckedSamples(formikProps: FormikProps<any>) {
+    const { checkedIds } = formikProps.values;
+    const ids = toPairs(checkedIds)
+      .filter(pair => pair[1])
+      .map(pair => pair[0]);
+
+    const samples: Sample[] = ids.map(id => ({
+      id,
+      type: "sample"
+    })) as Sample[];
+
+    await selectSamples(samples);
+  }
+
   async function removeSample(stepResource: StepResource) {
     try {
       await doOperations([
@@ -180,8 +195,8 @@ export function SampleSelection({ chain, stepTemplate }: SampleSelectionProps) {
         </Form>
       </Formik>
       <div className="row form-group">
-        <Formik initialValues={{}} onSubmit={null}>
-          {() => (
+        <Formik initialValues={{ checkedIds: {} }} onSubmit={null}>
+          {formikProps => (
             <>
               <div className="col-5">
                 <strong>Available Samples</strong>
@@ -194,7 +209,12 @@ export function SampleSelection({ chain, stepTemplate }: SampleSelectionProps) {
                 />
               </div>
               <div className="col-2" style={{ marginTop: "100px" }}>
-                <button className="btn btn-primary">--></button>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => selectAllCheckedSamples(formikProps)}
+                >
+                  -->
+                </button>
               </div>
             </>
           )}
