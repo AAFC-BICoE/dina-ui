@@ -1,7 +1,12 @@
 import { connect, Form, Formik, FormikActions } from "formik";
 import { FilterParam } from "kitsu";
 import { useState } from "react";
-import { ColumnDefinition, FilterBuilderField, QueryTable } from "..";
+import {
+  ColumnDefinition,
+  FilterBuilderField,
+  LoadingSpinner,
+  QueryTable
+} from "..";
 import { rsql } from "../../components/filter-builder/rsql";
 import { CheckBoxField } from "../../components/formik-connected/CheckBoxField";
 import { Chain, StepTemplate } from "../../types/seqdb-api";
@@ -16,6 +21,7 @@ export function SampleSelection({ chain, stepTemplate }: SampleSelectionProps) {
   const [filter, setFilter] = useState<FilterParam>();
 
   const {
+    loading,
     onCheckBoxClick,
     randomNumber,
     removeSample,
@@ -106,12 +112,16 @@ export function SampleSelection({ chain, stepTemplate }: SampleSelectionProps) {
                 />
               </div>
               <div className="col-2" style={{ marginTop: "100px" }}>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => selectAllCheckedSamples(formikProps)}
-                >
-                  -->
-                </button>
+                {loading ? (
+                  <LoadingSpinner loading={loading} />
+                ) : (
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => selectAllCheckedSamples(formikProps)}
+                  >
+                    Select all checked samples -->
+                  </button>
+                )}
               </div>
             </>
           )}

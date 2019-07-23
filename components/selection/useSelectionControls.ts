@@ -29,9 +29,11 @@ export function useSelectionControls({
   const [availableSamples, setAvailableSamples] = useState<Sample[]>([]);
   const [lastCheckedSample, setLastCheckedSample] = useState<Sample>();
 
+  const [loading, setLoading] = useState(false);
+
   async function selectSamples(samples: Sample[]) {
     const newStepResources: StepResource[] = samples.map(sample => ({
-      chain,
+      chain: { id: chain.id, type: chain.type } as Chain,
       chainTemplateId: Number(chain.chainTemplate.id),
       sample,
       stepTemplateId: Number(stepTemplate.id),
@@ -54,6 +56,7 @@ export function useSelectionControls({
     }
 
     try {
+      setLoading(true);
       await doOperations(
         serialized.map(s => ({
           op: "POST",
@@ -66,6 +69,7 @@ export function useSelectionControls({
     } catch (err) {
       alert(err);
     }
+    setLoading(false);
   }
 
   async function selectAllCheckedSamples(formikProps: FormikProps<any>) {
@@ -84,6 +88,7 @@ export function useSelectionControls({
 
   async function removeSample(stepResource: StepResource) {
     try {
+      setLoading(true);
       await doOperations([
         {
           op: "DELETE",
@@ -99,6 +104,7 @@ export function useSelectionControls({
     } catch (err) {
       alert(err);
     }
+    setLoading(false);
   }
 
   function onCheckBoxClick(
@@ -126,6 +132,7 @@ export function useSelectionControls({
   }
 
   return {
+    loading,
     onCheckBoxClick,
     randomNumber,
     removeSample,
