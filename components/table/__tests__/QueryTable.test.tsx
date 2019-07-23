@@ -567,4 +567,18 @@ describe("QueryTable component", () => {
     expect(wrapper.find(".pagination-top").exists()).toEqual(true);
     expect(wrapper.find(".pagination-bottom").exists()).toEqual(true);
   });
+
+  it("Shows the total records count.", async () => {
+    const wrapper = mountWithContext(
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
+    );
+
+    // Wait for the initial request to finish and the total to render.
+    await Promise.resolve();
+    wrapper.update();
+
+    expect(
+      wrapper.containsMatchingElement(<span>Total matched records: 300</span>)
+    ).toEqual(true);
+  });
 });
