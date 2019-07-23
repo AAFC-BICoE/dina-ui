@@ -1,8 +1,9 @@
 import { Formik } from "formik";
-import Link from "next/link";
 import { withRouter, WithRouterProps } from "next/router";
 import {
+  BackToListButton,
   ButtonBar,
+  EditButton,
   FieldView,
   Head,
   LoadingSpinner,
@@ -19,13 +20,10 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
       <Head title="PCR Primer" />
       <Nav />
       <ButtonBar>
-        <Link href={`/pcr-primer/edit?id=${id}`}>
-          <button className="btn btn-primary">Edit</button>
-        </Link>
-        <Link href="/pcr-primer/list">
-          <button className="btn btn-secondary">Back to List</button>
-        </Link>
+        <EditButton entityId={id as string} entityLink="pcr-primer" />
+        <BackToListButton entityLink="pcr-primer" />
       </ButtonBar>
+
       <Query<PcrPrimer>
         query={{ include: "group,region", path: `pcrPrimer/${id}` }}
       >

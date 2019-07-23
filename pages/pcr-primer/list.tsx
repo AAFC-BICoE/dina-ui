@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   ButtonBar,
   ColumnDefinition,
+  CreateButton,
   Head,
   ListPageLayout,
   Nav
@@ -60,9 +61,7 @@ export default function PcrPrimerListPage() {
       <Head title="PCR Primers" />
       <Nav />
       <ButtonBar>
-        <Link href="/pcr-primer/edit" prefetch={true}>
-          <button className="btn btn-primary">Create PCR Primer</button>
-        </Link>
+        <CreateButton entityLabel="Pcr Primer" entityLink="pcr-primer" />
       </ButtonBar>
       <div className="container-fluid">
         <h1>PCR Primers</h1>

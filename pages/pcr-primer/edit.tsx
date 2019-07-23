@@ -4,6 +4,7 @@ import { useContext } from "react";
 import {
   ApiClientContext,
   ButtonBar,
+  CancelButton,
   DateField,
   ErrorViewer,
   Head,
@@ -63,6 +64,7 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
 
 function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
   const { doOperations } = useContext(ApiClientContext);
+  const { id } = router.query;
 
   const initialValues = primer || { lotNumber: 1, seq: "", type: "PRIMER" };
 
@@ -103,6 +105,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
       <Form>
         <ButtonBar>
           <SubmitButton />
+          <CancelButton entityId={id as string} entityLink="pcr-primer" />
         </ButtonBar>
         <ErrorViewer />
         <div>
