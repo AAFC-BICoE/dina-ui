@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   ButtonBar,
   ColumnDefinition,
+  CreateButton,
   Head,
   ListPageLayout,
   Nav
@@ -44,11 +45,10 @@ export default function PcrProfileListPage() {
       <Head title="PCR Profiles" />
       <Nav />
       <ButtonBar>
-        <Link href="/pcr-profile/edit" prefetch={true}>
-          <button className="btn btn-primary">
-            Create Thermocycler Profile
-          </button>
-        </Link>
+        <CreateButton
+          entityLabel="Thermocycler Profile"
+          entityLink="pcr-profile"
+        />
       </ButtonBar>
       <div className="container-fluid">
         <h1>Thermocycler Profiles</h1>

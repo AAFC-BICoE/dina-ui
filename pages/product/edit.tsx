@@ -4,6 +4,7 @@ import { useContext } from "react";
 import {
   ApiClientContext,
   ButtonBar,
+  CancelButton,
   ErrorViewer,
   Head,
   LoadingSpinner,
@@ -58,7 +59,7 @@ export function ProductEditPage({ router }: WithRouterProps) {
 
 function ProductForm({ product, router }: ProductFormProps) {
   const { doOperations } = useContext(ApiClientContext);
-
+  const { id } = router.query;
   const initialValues = product || {};
 
   async function onSubmit(
@@ -99,6 +100,7 @@ function ProductForm({ product, router }: ProductFormProps) {
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />
+          <CancelButton entityId={id as string} entityLink="product" />
         </ButtonBar>
         <div>
           <div className="row">

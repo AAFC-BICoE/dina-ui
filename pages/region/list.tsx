@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   ButtonBar,
   ColumnDefinition,
+  CreateButton,
   Head,
   ListPageLayout,
   Nav
@@ -30,9 +31,7 @@ export default function RegionListPage() {
       <Head title="Gene Regions" />
       <Nav />
       <ButtonBar>
-        <Link href="/region/edit" prefetch={true}>
-          <button className="btn btn-primary">Add Gene Region</button>
-        </Link>
+        <CreateButton entityLabel="Gene Region" entityLink="region" />
       </ButtonBar>
       <div className="container-fluid">
         <h1>Gene Regions</h1>
