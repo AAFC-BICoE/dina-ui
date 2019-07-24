@@ -1,4 +1,5 @@
 import { mount } from "enzyme";
+import { act } from "react-test-renderer";
 import {
   ApiClientContext,
   createContextValue,
@@ -53,7 +54,9 @@ describe("Product list page", () => {
   it("Renders the list page.", async () => {
     const wrapper = mountWithContext(<ProductListPage />);
 
-    await Promise.resolve();
+    await act(async () => {
+      await new Promise(setImmediate);
+    });
     wrapper.update();
 
     // Check that the table contains the links to product details pages.
@@ -65,11 +68,13 @@ describe("Product list page", () => {
     );
   });
 
-  it("Allows a filterable search.", async done => {
+  it("Allows a filterable search.", async () => {
     const wrapper = mountWithContext(<ProductListPage />);
 
     // Wait for the default search to finish.
-    await Promise.resolve();
+    await act(async () => {
+      await new Promise(setImmediate);
+    });
     wrapper.update();
 
     // Enter a search value.
@@ -80,16 +85,16 @@ describe("Product list page", () => {
     // Submit the search form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      wrapper.update();
-      expect(mockGet).lastCalledWith(
-        "product",
-        expect.objectContaining({ filter: { rsql: "name==*omni*" } })
-      );
-      expect(wrapper.find(QueryTable).prop("filter")).toEqual({
-        rsql: "name==*omni*"
-      });
-      done();
+    await act(async () => {
+      await new Promise(setImmediate);
+    });
+    wrapper.update();
+    expect(mockGet).lastCalledWith(
+      "product",
+      expect.objectContaining({ filter: { rsql: "name==*omni*" } })
+    );
+    expect(wrapper.find(QueryTable).prop("filter")).toEqual({
+      rsql: "name==*omni*"
     });
   });
 });

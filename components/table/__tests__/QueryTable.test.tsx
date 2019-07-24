@@ -292,7 +292,7 @@ describe("QueryTable component", () => {
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
-        defaultSort="description"
+        defaultSort={[{ id: "description", desc: false }]}
       />
     );
 
@@ -566,6 +566,40 @@ describe("QueryTable component", () => {
 
     expect(wrapper.find(".pagination-top").exists()).toEqual(true);
     expect(wrapper.find(".pagination-bottom").exists()).toEqual(true);
+  });
+
+  it("Provides an 'onPageSizeChange' callback prop.", async () => {
+    const mockOnPageSizeChange = jest.fn();
+
+    const wrapper = mountWithContext(
+      <QueryTable<Todo>
+        path="todo"
+        columns={["id", "name", "description"]}
+        onPageSizeChange={mockOnPageSizeChange}
+      />
+    );
+
+    // It should just pass the prop to ReactTable.
+    expect(wrapper.find(ReactTable).prop("onPageSizeChange")).toBe(
+      mockOnPageSizeChange
+    );
+  });
+
+  it("Provides an 'onSortedChange' callback prop.", async () => {
+    const mockOnSortedChange = jest.fn();
+
+    const wrapper = mountWithContext(
+      <QueryTable<Todo>
+        path="todo"
+        columns={["id", "name", "description"]}
+        onSortedChange={mockOnSortedChange}
+      />
+    );
+
+    // It should just pass the prop to ReactTable.
+    expect(wrapper.find(ReactTable).prop("onSortedChange")).toBe(
+      mockOnSortedChange
+    );
   });
 
   it("Shows the total records count.", async () => {

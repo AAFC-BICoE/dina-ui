@@ -13,7 +13,10 @@ export function FilterBuilderField({
 }: FilterBuilderFieldProps) {
   return (
     <Field name={name}>
-      {({ form: { setFieldValue, setFieldTouched } }: FieldProps) => {
+      {({
+        field: { value },
+        form: { setFieldValue, setFieldTouched }
+      }: FieldProps) => {
         function onChange(filterObject: FilterGroupModel) {
           setFieldValue(name, filterObject);
           setFieldTouched(name);
@@ -21,6 +24,7 @@ export function FilterBuilderField({
         return (
           <FilterBuilder
             filterAttributes={filterAttributes}
+            value={value}
             onChange={onChange}
           />
         );

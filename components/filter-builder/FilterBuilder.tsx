@@ -9,6 +9,7 @@ import { FilterRow, FilterRowModel } from "./FilterRow";
 
 export interface FilterBuilderProps {
   filterAttributes: string[];
+  value?: FilterGroupModel;
   onChange?: (state: FilterGroupModel) => void;
 }
 
@@ -33,21 +34,7 @@ export class FilterBuilder extends React.Component<
   constructor(props: FilterBuilderProps) {
     super(props);
     this.state = {
-      model: {
-        children: [
-          {
-            attribute: props.filterAttributes[0],
-            id: this.getNewFilterId(),
-            predicate: "IS",
-            searchType: "PARTIAL_MATCH",
-            type: "FILTER_ROW",
-            value: ""
-          }
-        ],
-        id: this.getNewFilterId(),
-        operator: "AND",
-        type: "FILTER_GROUP"
-      }
+      model: props.value || this.getInitialModel()
     };
   }
 
@@ -55,6 +42,17 @@ export class FilterBuilder extends React.Component<
     // Call the onChange callback to pass up the initial state on mount.
     await Promise.resolve();
     this.onChange();
+  }
+
+  public componentDidUpdate() {
+    const { onChange, value } = this.props;
+
+    // When a blank value is passed, reset the model to the initial state.
+    if (Object.keys(this.props).includes("value") && !value && onChange) {
+      const newModel = this.getInitialModel();
+      this.setState({ model: newModel });
+      onChange(newModel);
+    }
   }
 
   /**
@@ -73,6 +71,28 @@ export class FilterBuilder extends React.Component<
    */
   private getNewFilterId() {
     return ++this.filterIdIncrementor;
+  }
+
+  /**
+   * The default filter builder model when this component is created.
+   * It should be a filter group with one child blank filter row.
+   */
+  private getInitialModel(): FilterGroupModel {
+    return {
+      children: [
+        {
+          attribute: this.props.filterAttributes[0],
+          id: this.getNewFilterId(),
+          predicate: "IS",
+          searchType: "PARTIAL_MATCH",
+          type: "FILTER_ROW",
+          value: ""
+        }
+      ],
+      id: this.getNewFilterId(),
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
   }
 
   /**

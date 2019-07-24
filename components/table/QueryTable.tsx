@@ -1,6 +1,11 @@
 import { FilterParam, KitsuResource } from "kitsu";
 import React, { useRef, useState } from "react";
-import ReactTable, { Column } from "react-table";
+import ReactTable, {
+  Column,
+  PageSizeChangeFunction,
+  SortedChangeFunction,
+  SortingRule
+} from "react-table";
 import "react-table/react-table.css";
 import titleCase from "title-case";
 import { PageSpec } from "types/seqdb-api/page";
@@ -22,13 +27,19 @@ export interface QueryTableProps<TData extends KitsuResource> {
   include?: string;
 
   /** Default sort attribute. */
-  defaultSort?: string;
+  defaultSort?: SortingRule[];
 
   /** Default page size. */
   defaultPageSize?: number;
 
   /** The columns to show in the table. */
   columns: Array<ColumnDefinition<TData>>;
+
+  /** Called when a new page size is requested. */
+  onPageSizeChange?: PageSizeChangeFunction;
+
+  /** Called when a new sort is specified. */
+  onSortedChange?: SortedChangeFunction;
 }
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -57,17 +68,19 @@ const queryTableStyle = `
  */
 export function QueryTable<TData extends KitsuResource>({
   columns,
-  defaultPageSize,
-  defaultSort,
+  defaultPageSize = DEFAULT_PAGE_SIZE,
+  defaultSort = [],
   filter,
   include,
+  onPageSizeChange,
+  onSortedChange,
   path
 }: QueryTableProps<TData>) {
   // JSONAPI sort attribute.
-  const [sort, setSort] = useState(defaultSort);
+  const [sortingRules, setSortingRules] = useState(defaultSort);
   // JSONAPI page spec.
   const [page, setPage] = useState<PageSpec>({
-    limit: defaultPageSize || DEFAULT_PAGE_SIZE,
+    limit: defaultPageSize,
     offset: 0
   });
 
@@ -78,11 +91,6 @@ export function QueryTable<TData extends KitsuResource>({
 
     const newOffset = newPageNumber * pageSize;
 
-    // Get the new sort order in JSONAPI format. e.g. "name,-description".
-    const newSort: string = (sorted as Array<{ desc: boolean; id: string }>)
-      .map<string>(({ desc, id }) => `${desc ? "-" : ""}${id}`)
-      .join();
-
     // When a new page is requested and the top of the window is below the top of the table,
     // scroll to the top of the table.
     if (
@@ -92,14 +100,19 @@ export function QueryTable<TData extends KitsuResource>({
       window.scrollTo(0, divWrapperRef.current.offsetTop);
     }
 
-    if (newSort.length) {
-      setSort(newSort);
+    if (sorted.length) {
+      setSortingRules(sorted);
     }
     setPage({
       limit: pageSize,
       offset: newOffset
     });
   }
+
+  // Get the new sort order in JSONAPI format. e.g. "name,-description".
+  const sort =
+    sortingRules.map(({ desc, id }) => `${desc ? "-" : ""}${id}`).join() ||
+    undefined;
 
   const query: JsonApiQuerySpec = { path, filter, include, page, sort };
 
@@ -134,9 +147,12 @@ export function QueryTable<TData extends KitsuResource>({
               columns={mappedColumns}
               data={response && response.data}
               defaultPageSize={page.limit}
+              defaultSorted={sortingRules}
               loading={loading}
               manual={true}
               onFetchData={onFetchData}
+              onPageSizeChange={onPageSizeChange}
+              onSortedChange={onSortedChange}
               pages={numberOfPages}
               showPaginationTop={true}
             />
