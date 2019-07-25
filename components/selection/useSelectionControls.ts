@@ -4,21 +4,15 @@ import { useContext, useState } from "react";
 import { ApiClientContext } from "..";
 import {
   Chain,
+  ChainStepTemplate,
   Sample,
-  StepResource,
-  StepTemplate
+  StepResource
 } from "../../types/seqdb-api";
 import { serialize } from "../../util/serialize";
+import { HttpMethod } from "../api-client/jsonapi-types";
+import { StepRendererProps } from "../workflow/StepRenderer";
 
-interface UseSelectionControlsParams {
-  chain: Chain;
-  stepTemplate: StepTemplate;
-}
-
-export function useSelectionControls({
-  chain,
-  stepTemplate
-}: UseSelectionControlsParams) {
+export function useSelectionControls({ chain, step }: StepRendererProps) {
   const { doOperations } = useContext(ApiClientContext);
 
   // Random number to be changed every time a sample is selected.
@@ -34,9 +28,11 @@ export function useSelectionControls({
   async function selectSamples(samples: Sample[]) {
     const newStepResources: StepResource[] = samples.map(sample => ({
       chain: { id: chain.id, type: chain.type } as Chain,
-      chainTemplateId: Number(chain.chainTemplate.id),
+      chainStepTemplate: {
+        id: step.id,
+        type: "chainStepTemplate"
+      } as ChainStepTemplate,
       sample,
-      stepTemplateId: Number(stepTemplate.id),
       type: "INPUT",
       value: "SAMPLE"
     }));
@@ -58,10 +54,10 @@ export function useSelectionControls({
     try {
       setLoading(true);
       await doOperations(
-        serialized.map(s => ({
-          op: "POST",
+        serialized.map(value => ({
+          op: "POST" as HttpMethod,
           path: "stepResource",
-          value: s
+          value
         }))
       );
 

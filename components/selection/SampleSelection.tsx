@@ -9,15 +9,14 @@ import {
 } from "..";
 import { rsql } from "../../components/filter-builder/rsql";
 import { CheckBoxField } from "../../components/formik-connected/CheckBoxField";
-import { Chain, StepTemplate } from "../../types/seqdb-api";
+import { StepRendererProps } from "../workflow/StepRenderer";
 import { useSelectionControls } from "./useSelectionControls";
 
-interface SampleSelectionProps {
-  chain: Chain;
-  stepTemplate: StepTemplate;
-}
-
-export function SampleSelection({ chain, stepTemplate }: SampleSelectionProps) {
+export function SampleSelection({
+  chain,
+  chainStepTemplates,
+  step
+}: StepRendererProps) {
   const [filter, setFilter] = useState<FilterParam>();
 
   const {
@@ -28,7 +27,7 @@ export function SampleSelection({ chain, stepTemplate }: SampleSelectionProps) {
     selectAllCheckedSamples,
     selectSamples,
     setAvailableSamples
-  } = useSelectionControls({ chain, stepTemplate });
+  } = useSelectionControls({ chain, chainStepTemplates, step });
 
   const SELECTED_SAMPLE_COLUMNS: Array<ColumnDefinition<any>> = [
     {
@@ -132,8 +131,8 @@ export function SampleSelection({ chain, stepTemplate }: SampleSelectionProps) {
             columns={SELECTED_SAMPLE_COLUMNS}
             filter={{
               "chain.chainId": chain.id,
-              rsql: `sample.version!=${randomNumber}`,
-              stepTemplateId: stepTemplate.id
+              "chainStepTemplate.chainStepTemplateId": step.id,
+              rsql: `sample.version!=${randomNumber}`
             }}
             include="sample,sample.group"
             path="stepResource"

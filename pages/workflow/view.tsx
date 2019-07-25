@@ -4,7 +4,7 @@ import { withRouter, WithRouterProps } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import { FieldView, Head, LoadingSpinner, Nav, Query } from "../../components";
-import { SampleSelection } from "../../components/selection/SampleSelection";
+import { StepRenderer } from "../../components/workflow/StepRenderer";
 import { Chain } from "../../types/seqdb-api/resources/workflow/Chain";
 import { ChainStepTemplate } from "../../types/seqdb-api/resources/workflow/ChainStepTemplate";
 
@@ -37,7 +37,6 @@ function WorkflowSteps({ chain }: { chain: Chain }) {
   return (
     <Query<ChainStepTemplate[]>
       query={{
-        fields: { stepTemplate: "name" },
         filter: { "chainTemplate.id": chain.chainTemplate.id },
         include: "stepTemplate",
         path: "chainStepTemplate"
@@ -53,7 +52,9 @@ function WorkflowSteps({ chain }: { chain: Chain }) {
               <TabList>
                 <Tab>Details</Tab>
                 {steps.map(step => (
-                  <Tab key={step.id}>Step {step.stepNumber}</Tab>
+                  <Tab key={step.id}>
+                    Step {step.stepNumber}: {step.stepTemplate.name}
+                  </Tab>
                 ))}
               </TabList>
               <TabPanel>
@@ -68,9 +69,10 @@ function WorkflowSteps({ chain }: { chain: Chain }) {
               </TabPanel>
               {steps.map(step => (
                 <TabPanel key={step.id}>
-                  <SampleSelection
+                  <StepRenderer
+                    chainStepTemplates={steps}
                     chain={chain}
-                    stepTemplate={step.stepTemplate}
+                    step={step}
                   />
                 </TabPanel>
               ))}
