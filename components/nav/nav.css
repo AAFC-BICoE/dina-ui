@@ -1,4 +1,9 @@
 /* Add padding to the body so content is not hidden. */
 body {
   padding-top: 80px;
+  background-color: #ffffff;
+  color: #666666;
+}
+a {
+  color: #1064b4;
 }
