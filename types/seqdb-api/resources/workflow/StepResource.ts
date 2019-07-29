@@ -4,7 +4,7 @@ import { Region } from "../Region";
 import { Sample } from "../Sample";
 import { Chain } from "./Chain";
 import { ChainStepTemplate } from "./ChainStepTemplate";
-import { PreLibraryPrep } from "./PreLibraryPrep;";
+import { PreLibraryPrep } from "./PreLibraryPrep";
 
 export interface StepResourceAttributes {
   type: string;

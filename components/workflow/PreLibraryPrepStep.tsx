@@ -1,6 +1,6 @@
 import { Form, Formik, FormikActions } from "formik";
 import { useContext, useState } from "react";
-import { PreLibraryPrep } from "types/seqdb-api/resources/workflow/PreLibraryPrep;";
+import { PreLibraryPrep } from "types/seqdb-api/resources/workflow/PreLibraryPrep";
 import {
   ApiClientContext,
   ColumnDefinition,
