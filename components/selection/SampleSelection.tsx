@@ -132,7 +132,7 @@ export function SampleSelection({
             filter={{
               "chain.chainId": chain.id,
               "chainStepTemplate.chainStepTemplateId": step.id,
-              rsql: `sample.version!=${randomNumber}`
+              rsql: `sample.name!=${randomNumber}`
             }}
             include="sample,sample.group"
             path="stepResource"

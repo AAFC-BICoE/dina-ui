@@ -80,6 +80,10 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
     })) as Sample[];
 
     await selectSamples(samples);
+
+    for (const id of ids) {
+      formikProps.setFieldValue(`checkedIds[${id}]`, false);
+    }
   }
 
   async function removeSample(stepResource: StepResource) {

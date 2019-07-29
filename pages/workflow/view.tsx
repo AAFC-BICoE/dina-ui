@@ -23,7 +23,7 @@ export function WorkflowDetailsPage({ router }: WithRouterProps) {
             <Link href="/workflow/list">
               <a>Workflow list</a>
             </Link>
-            <h1>Workflow Details</h1>
+            <h1>Workflow Details{response && `: ${response.data.name}`}</h1>
             <LoadingSpinner loading={loading} />
             {response && <WorkflowSteps chain={response.data} />}
           </div>
