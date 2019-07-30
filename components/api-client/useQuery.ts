@@ -17,7 +17,11 @@ export interface QueryState<TData extends KitsuResponseData, TMeta> {
   response?: KitsuResponse<TData, TMeta>;
 }
 
-export function useQuery<TData extends KitsuResponseData, TMeta>(
+/**
+ * Back-end connected React hook for running queries agains the back-end.
+ * It fetches the data again if the passed query changes.
+ */
+export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   querySpec: JsonApiQuerySpec
 ): QueryState<TData, TMeta> {
   const { apiClient } = useContext(ApiClientContext);
