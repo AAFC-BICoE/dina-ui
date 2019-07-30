@@ -3,7 +3,7 @@ import React, { useRef, useState } from "react";
 import ReactTable, { Column } from "react-table";
 import "react-table/react-table.css";
 import titleCase from "title-case";
-import { JsonApiQuerySpec, Query } from "..";
+import { JsonApiQuerySpec, Query, useQuery } from "..";
 import { MetaWithTotal } from "../../types/seqdb-api/meta";
 import { PageSpec } from "../../types/seqdb-api/page";
 
@@ -115,34 +115,30 @@ export function QueryTable<TData extends KitsuResource>({
     }
   });
 
+  const { loading, response } = useQuery<TData[], MetaWithTotal>(query);
+
+  const totalCount =
+    response && response.meta && response.meta.totalResourceCount;
+
+  const numberOfPages = totalCount
+    ? Math.ceil(totalCount / page.limit)
+    : undefined;
+
   return (
-    <Query<TData[], MetaWithTotal> query={query}>
-      {({ loading, response }) => {
-        const totalCount =
-          response && response.meta && response.meta.totalResourceCount;
-
-        const numberOfPages = totalCount
-          ? Math.ceil(totalCount / page.limit)
-          : undefined;
-
-        return (
-          <div className="query-table-wrapper" ref={divWrapperRef}>
-            <style>{queryTableStyle}</style>
-            <span>Total matched records: {totalCount}</span>
-            <ReactTable
-              className="-striped"
-              columns={mappedColumns}
-              data={response && response.data}
-              defaultPageSize={page.limit}
-              loading={loading}
-              manual={true}
-              onFetchData={onFetchData}
-              pages={numberOfPages}
-              showPaginationTop={true}
-            />
-          </div>
-        );
-      }}
-    </Query>
+    <div className="query-table-wrapper" ref={divWrapperRef}>
+      <style>{queryTableStyle}</style>
+      <span>Total matched records: {totalCount}</span>
+      <ReactTable
+        className="-striped"
+        columns={mappedColumns}
+        data={response && response.data}
+        defaultPageSize={page.limit}
+        loading={loading}
+        manual={true}
+        onFetchData={onFetchData}
+        pages={numberOfPages}
+        showPaginationTop={true}
+      />
+    </div>
   );
 }

@@ -18,6 +18,7 @@ type QueryChildren<TData extends KitsuResponseData, TMeta> = (
   state: QueryState<TData, TMeta>
 ) => React.ReactElement;
 
+/** Back-end connected Query component. */
 export function Query<TData extends KitsuResponseData, TMeta = undefined>({
   children,
   query
