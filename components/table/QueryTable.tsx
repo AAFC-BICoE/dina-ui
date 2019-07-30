@@ -3,9 +3,9 @@ import React, { useRef, useState } from "react";
 import ReactTable, { Column } from "react-table";
 import "react-table/react-table.css";
 import titleCase from "title-case";
-import { PageSpec } from "types/seqdb-api/page";
+import { JsonApiQuerySpec, Query } from "..";
 import { MetaWithTotal } from "../../types/seqdb-api/meta";
-import { JsonApiQuerySpec, Query } from "../api-client/Query";
+import { PageSpec } from "../../types/seqdb-api/page";
 
 /** Object types accepted as a column definition. */
 export type ColumnDefinition<TData> = string | Column<TData>;
