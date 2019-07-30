@@ -49,7 +49,7 @@ describe("PcrProfile list page", () => {
   it("Renders the list page.", async () => {
     const wrapper = mountWithContext(<PcrProfileListPage />);
 
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     // Check that the table contains the links to profile details pages.

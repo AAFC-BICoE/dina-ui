@@ -55,7 +55,7 @@ describe("Region list page", () => {
   it("Renders the list page.", async () => {
     const wrapper = mountWithContext(<RegionListPage />);
 
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     // Check that the table contains the links to region details pages.
@@ -67,7 +67,7 @@ describe("Region list page", () => {
     const wrapper = mountWithContext(<RegionListPage />);
 
     // Wait for the default search to finish.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     // Enter a search value.

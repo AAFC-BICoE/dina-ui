@@ -57,7 +57,7 @@ describe("PcrPrimer list page", () => {
   it("Renders the list page.", async () => {
     const wrapper = mountWithContext(<PcrPrimerListPage />);
 
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     // Check that the table contains the links to primer details pages.
@@ -65,11 +65,11 @@ describe("PcrPrimer list page", () => {
     expect(wrapper.containsMatchingElement(<a>Test Primer 2</a>)).toEqual(true);
   });
 
-  it("Allows a filterable search.", async done => {
+  it("Allows a filterable search.", async () => {
     const wrapper = mountWithContext(<PcrPrimerListPage />);
 
     // Wait for the default search to finish.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     // Enter a search value.
@@ -80,16 +80,15 @@ describe("PcrPrimer list page", () => {
     // Submit the search form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      wrapper.update();
-      expect(mockGet).lastCalledWith(
-        "pcrPrimer",
-        expect.objectContaining({ filter: { rsql: "name==*101F*" } })
-      );
-      expect(wrapper.find(QueryTable).prop("filter")).toEqual({
-        rsql: "name==*101F*"
-      });
-      done();
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockGet).lastCalledWith(
+      "pcrPrimer",
+      expect.objectContaining({ filter: { rsql: "name==*101F*" } })
+    );
+    expect(wrapper.find(QueryTable).prop("filter")).toEqual({
+      rsql: "name==*101F*"
     });
   });
 });
