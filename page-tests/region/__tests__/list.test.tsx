@@ -1,4 +1,5 @@
 import { mount } from "enzyme";
+import { act } from "react-test-renderer";
 import {
   ApiClientContext,
   createContextValue,
@@ -55,7 +56,9 @@ describe("Region list page", () => {
   it("Renders the list page.", async () => {
     const wrapper = mountWithContext(<RegionListPage />);
 
-    await Promise.resolve();
+    await act(async () => {
+      await new Promise(setImmediate);
+    });
     wrapper.update();
 
     // Check that the table contains the links to region details pages.
@@ -67,7 +70,9 @@ describe("Region list page", () => {
     const wrapper = mountWithContext(<RegionListPage />);
 
     // Wait for the default search to finish.
-    await Promise.resolve();
+    await act(async () => {
+      await new Promise(setImmediate);
+    });
     wrapper.update();
 
     // Enter a search value.
@@ -78,7 +83,9 @@ describe("Region list page", () => {
     // Submit the search form.
     wrapper.find("form").simulate("submit");
 
-    await new Promise(setImmediate);
+    await act(async () => {
+      await new Promise(setImmediate);
+    });
     wrapper.update();
 
     expect(mockGet).lastCalledWith(
