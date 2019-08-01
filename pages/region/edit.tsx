@@ -1,5 +1,6 @@
 import { Form, Formik, FormikActions } from "formik";
-import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import {
   ApiClientContext,
@@ -16,7 +17,7 @@ import { serialize } from "../../util/serialize";
 
 interface RegionFormProps {
   region?: Region;
-  router: SingletonRouter;
+  router: NextRouter;
 }
 
 export function RegionEditPage({ router }: WithRouterProps) {

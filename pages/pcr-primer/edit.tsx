@@ -1,5 +1,6 @@
 import { Form, Formik, FormikActions } from "formik";
-import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import {
   ApiClientContext,
@@ -23,7 +24,7 @@ import { serialize } from "../../util/serialize";
 
 interface PcrPrimerFormProps {
   primer?: PcrPrimer;
-  router: SingletonRouter;
+  router: NextRouter;
 }
 
 export function PcrPrimerEditPage({ router }: WithRouterProps) {

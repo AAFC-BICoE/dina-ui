@@ -69,7 +69,7 @@ describe("FilterRow component", () => {
       .find(".filter-attribute")
       .find(Select)
       .props()
-      .onChange({ value: "description" });
+      .onChange({ value: "description" }, null);
 
     expect(model.attribute).toEqual("description");
   });
@@ -82,7 +82,7 @@ describe("FilterRow component", () => {
       .find(".filter-predicate")
       .find(Select)
       .props()
-      .onChange({ value: "IS NOT" });
+      .onChange({ value: "IS NOT" }, null);
 
     expect(model.predicate).toEqual("IS NOT");
   });
@@ -108,7 +108,7 @@ describe("FilterRow component", () => {
       .find(".filter-search-type")
       .find(Select)
       .props()
-      .onChange({ value: "EXACT_MATCH" });
+      .onChange({ value: "EXACT_MATCH" }, null);
 
     expect(model.searchType).toEqual("EXACT_MATCH");
   });
@@ -135,7 +135,7 @@ describe("FilterRow component", () => {
       .find(".filter-attribute")
       .find(Select)
       .props()
-      .onChange({ value: "description" });
+      .onChange({ value: "description" }, null);
     expect(mockOnChange).toHaveBeenCalledTimes(1);
 
     // Change the filter predicate (IS / IS NOT).
@@ -143,7 +143,7 @@ describe("FilterRow component", () => {
       .find(".filter-predicate")
       .find(Select)
       .props()
-      .onChange({ value: "IS NOT" });
+      .onChange({ value: "IS NOT" }, null);
     expect(mockOnChange).toHaveBeenCalledTimes(2);
 
     // Change the filter value.
@@ -156,7 +156,7 @@ describe("FilterRow component", () => {
       .find(".filter-search-type")
       .find(Select)
       .props()
-      .onChange({ value: "EXACT_MATCH" });
+      .onChange({ value: "EXACT_MATCH" }, null);
     expect(mockOnChange).toHaveBeenCalledTimes(4);
   });
 
@@ -173,7 +173,7 @@ describe("FilterRow component", () => {
       .find(".filter-search-type")
       .find(Select)
       .props()
-      .onChange({ value: "BLANK_FIELD" });
+      .onChange({ value: "BLANK_FIELD" }, null);
     wrapper.update();
 
     // The input should now be hidden.

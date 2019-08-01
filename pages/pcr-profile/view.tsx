@@ -1,6 +1,7 @@
 import { Formik } from "formik";
+import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
-import { withRouter, WithRouterProps } from "next/router";
+import { withRouter } from "next/router";
 import {
   ButtonBar,
   FieldView,

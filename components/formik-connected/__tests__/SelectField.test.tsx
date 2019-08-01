@@ -70,10 +70,13 @@ describe("SelectField component", () => {
     const { onChange } = wrapper.find(Select).props();
 
     // Simulate changing the selected option.
-    onChange({
-      label: "Fusion Primer",
-      value: "FUSION_PRIMER"
-    });
+    onChange(
+      {
+        label: "Fusion Primer",
+        value: "FUSION_PRIMER"
+      },
+      null
+    );
 
     // The new value should be re-rendered into the value-display div.
     expect(wrapper.find("#value-display").text()).toEqual("FUSION_PRIMER");

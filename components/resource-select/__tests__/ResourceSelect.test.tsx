@@ -96,7 +96,7 @@ describe("ResourceSelect component", () => {
     const { options, onChange } = selectProps;
 
     // Select the third option (excluding the <none option>).
-    onChange(options[3]);
+    onChange(options[3], null);
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).lastCalledWith({
@@ -164,7 +164,7 @@ describe("ResourceSelect component", () => {
     const { onInputChange } = wrapper.find(Select).props();
 
     // Simulate the select component's input change.
-    onInputChange("test filter value", "input-change");
+    onInputChange("test filter value", "input-change" as any);
 
     // Wait for the options to load.
     await Promise.resolve();
@@ -235,7 +235,7 @@ describe("ResourceSelect component", () => {
     });
 
     // Select the null option.
-    onChange(nullOption);
+    onChange(nullOption, null);
 
     // This should call the onChange prop function with { id: null }.
     expect(mockOnChange).toHaveBeenCalledTimes(1);

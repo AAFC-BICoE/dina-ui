@@ -15,8 +15,15 @@
     "preserveConstEnums": true,
     "sourceMap": true,
     "paths": {
-      // Use our own Kitsu type definitions instead of the incomplete provided types.
       "kitsu": ["types/kitsu"]
-    }
-  }
+    },
+    "allowJs": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
+  },
+  "exclude": ["node_modules", "scripts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }

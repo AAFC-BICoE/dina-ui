@@ -114,7 +114,7 @@ describe("ResourceSelectField component", () => {
     const groupToSelect = options[0];
 
     // Simulate selecting a new option.
-    onChange(groupToSelect);
+    onChange(groupToSelect, null);
 
     // The new selected group's name should be rendered into the value-display div.
     expect(wrapper.find("#value-display").text()).toEqual("Mat's Group");
