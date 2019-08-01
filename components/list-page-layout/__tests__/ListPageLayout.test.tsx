@@ -41,9 +41,7 @@ describe("ListPageLayout component", () => {
     );
 
     // Wait for the default search to finish.
-    await act(async () => {
-      await new Promise(setImmediate);
-    });
+    await new Promise(setImmediate);
     wrapper.update();
 
     // Do a filtered search.
@@ -52,9 +50,7 @@ describe("ListPageLayout component", () => {
       .simulate("change", { target: { value: "101F" } });
     wrapper.find("form").simulate("submit");
 
-    await act(async () => {
-      await new Promise(setImmediate);
-    });
+    await new Promise(setImmediate);
 
     // There should be an RSQL filter.
     expect(mockGet).lastCalledWith(
@@ -90,19 +86,15 @@ describe("ListPageLayout component", () => {
     );
 
     // Wait for the default search to finish.
-    await act(async () => {
-      await new Promise(setImmediate);
-    });
+    await new Promise(setImmediate);
     wrapper.update();
 
     const testSort = [{ id: "type", desc: false }];
 
-    await act(async () => {
-      wrapper.find(ReactTable).prop("onSortedChange")(testSort, null, null);
-      wrapper.find(ReactTable).prop("onPageSizeChange")(5, null);
+    wrapper.find(ReactTable).prop("onSortedChange")(testSort, null, null);
+    wrapper.find(ReactTable).prop("onPageSizeChange")(5, null);
 
-      await new Promise(setImmediate);
-    });
+    await new Promise(setImmediate);
     wrapper.update();
 
     expect(wrapper.find(QueryTable).prop("defaultSort")).toEqual(testSort);

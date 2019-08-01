@@ -400,10 +400,8 @@ describe("FilterBuilder component", () => {
     expect(wrapper.find(FilterBuilder).prop("value")).toEqual(null);
 
     // Wait for state update
-    await act(async () => {
-      await new Promise(setImmediate);
-      wrapper.update();
-    });
+    await new Promise(setImmediate);
+    wrapper.update();
 
     // Initially renders with the initial filter model.
     expect(wrapper.find(FilterBuilder).prop("value")).toEqual(
