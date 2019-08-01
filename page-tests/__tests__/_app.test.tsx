@@ -27,15 +27,6 @@ describe("SeqdbUiApp", () => {
       />
     );
 
-    // The first browser render should be empty.
-    expect(wrapper.html()).toEqual(null);
-
-    expect(mockPush).lastCalledWith("/example-path?a=b");
-    // Normally the router would update the app wrapper, but the mock doesn't, so we force a
-    // re-render in the test.
-    wrapper.instance().forceUpdate();
-    wrapper.update();
-
     const innerComponent = wrapper.find(TestComponent);
     expect(innerComponent.prop("exampleProp")).toEqual("exampleValue");
   });
@@ -54,18 +45,12 @@ describe("SeqdbUiApp", () => {
       );
     }
 
-    const wrapper = mount(
+    mount(
       <SeqdbUiApp
         router={mockRouter as any}
         pageProps={{}}
         Component={pageComponent}
       />
     );
-
-    expect(mockPush).lastCalledWith("/example-path?a=b");
-    // Normally the router would update the app wrapper, but the mock doesn't, so we force a
-    // re-render in the test.
-    wrapper.instance().forceUpdate();
-    wrapper.update();
   });
 });
