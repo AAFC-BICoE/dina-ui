@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
-import { kebab, serialise } from "kitsu-core";
 import { JsonApiResource } from "../components/api-client/jsonapi-types";
+import { kebab, serialise } from "../lib/kitsu-core";
 
 /** Params for the serialize util function. */
 interface SerializeParams<TData extends KitsuResource> {

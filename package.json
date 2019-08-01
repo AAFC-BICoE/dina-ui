@@ -24,7 +24,6 @@
     "kitsu-core": "^7.0.4",
     "lodash": "^4.17.11",
     "next": "^9.0.3",
-    "next-transpile-modules": "^2.3.1",
     "react": "^16.8.3",
     "react-datepicker": "^2.3.0",
     "react-dom": "^16.8.3",
