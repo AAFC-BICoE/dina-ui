@@ -1,5 +1,7 @@
-import Kitsu from "kitsu";
+import Kitsu, { KitsuResource } from "kitsu";
+import { deserialise } from "kitsu-core";
 import React from "react";
+import { serialize } from "../../util/serialize";
 import {
   JsonApiErrorResponse,
   JsonApiResponse,
@@ -14,6 +16,15 @@ export interface ApiClientContextI {
 
   /** Function to perform requests against a jsonpatch-compliant JSONAPI server. */
   doOperations: (operations: Operation[]) => Promise<JsonApiResponse[]>;
+
+  /** Creates or updates one or multiple resources. */
+  save: (saveArgs: SaveArgs[]) => Promise<KitsuResource[]>;
+}
+
+/** save function args. */
+export interface SaveArgs {
+  resource: KitsuResource;
+  type: string;
 }
 
 /**
@@ -64,9 +75,43 @@ export function createContextValue(): ApiClientContextI {
     return axiosResponse.data;
   }
 
+  /**
+   * Creates or updates one or multiple resources.
+   */
+  async function save(saveArgs: SaveArgs[]): Promise<KitsuResource[]> {
+    // Serialize the resources to JSONAPI format.
+    const serializePromises = saveArgs.map(saveArg => serialize(saveArg));
+    const serialized = await Promise.all(serializePromises);
+
+    // Temp ID iterator. This is not persisted on the back-end as the actual database ID.
+    let idIterator = -100;
+
+    // Create the jsonpatch oeprations objects.
+    const operations = serialized.map<Operation>(jsonapiResource => ({
+      op: jsonapiResource.id ? "PATCH" : "POST",
+      path: jsonapiResource.id
+        ? `${jsonapiResource.type}/${jsonapiResource.id}`
+        : jsonapiResource.type,
+      value: { ...jsonapiResource, id: jsonapiResource.id || idIterator-- }
+    }));
+
+    // Do the operations request.
+    const responses = await doOperations(operations);
+
+    // Deserialize the responses to Kitsu format.
+    const deserializePromises = responses.map(response =>
+      deserialise(response)
+    );
+    const deserialized = await Promise.all(deserializePromises);
+    const kitsuResources = deserialized.map(({ data }) => data);
+
+    return kitsuResources;
+  }
+
   return {
     apiClient,
-    doOperations
+    doOperations,
+    save
   };
 }
 

@@ -1,5 +1,6 @@
 import { AxiosRequestConfig } from "axios";
 import Kitsu from "kitsu";
+import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 import { createContextValue } from "../ApiClientContext";
 import { Operation, OperationsResponse } from "../jsonapi-types";
 
@@ -131,7 +132,7 @@ jest.mock("axios", () => ({
   }
 }));
 
-const { apiClient, doOperations } = createContextValue();
+const { apiClient, doOperations, save } = createContextValue();
 
 describe("API client context", () => {
   it("Provides an API client instance.", () => {
@@ -166,5 +167,177 @@ Constraint violation: description size must be between 1 and 10`;
       actualError = error;
     }
     expect(actualError.message).toEqual(expectedErrorMessage);
+  });
+
+  it("Provides a save function that can create resources.", async () => {
+    // Mock POST responses.
+    mockPatch.mockImplementationOnce(() => ({
+      data: [
+        {
+          data: {
+            attributes: {
+              lotNumber: 1,
+              name: "testPrimer1"
+            },
+            id: 123,
+            type: "pcrPrimer"
+          },
+          status: 201
+        },
+        {
+          data: {
+            attributes: {
+              lotNumber: 1,
+              name: "testPrimer2"
+            },
+            id: 124,
+            type: "pcrPrimer"
+          },
+          status: 201
+        }
+      ]
+    }));
+
+    const response = await save([
+      {
+        resource: {
+          lotNumber: 1,
+          name: "testPrimer1",
+          type: "pcrPrimer"
+        } as PcrPrimer,
+        type: "pcrPrimer"
+      },
+      {
+        resource: {
+          lotNumber: 1,
+          name: "testPrimer2",
+          type: "pcrPrimer"
+        } as PcrPrimer,
+        type: "pcrPrimer"
+      }
+    ]);
+
+    // Expect correct patch args.
+    expect(mockPatch).lastCalledWith(
+      "operations",
+      [
+        {
+          op: "POST",
+          path: "pcrPrimer",
+          value: {
+            attributes: { lotNumber: 1, name: "testPrimer1" },
+            id: -100,
+            type: "pcrPrimer"
+          }
+        },
+        {
+          op: "POST",
+          path: "pcrPrimer",
+          value: {
+            attributes: { lotNumber: 1, name: "testPrimer2" },
+            id: -101,
+            type: "pcrPrimer"
+          }
+        }
+      ],
+      expect.anything()
+    );
+
+    // Expect correct response.
+    expect(response).toEqual([
+      {
+        id: 123,
+        lotNumber: 1,
+        name: "testPrimer1",
+        type: "pcrPrimer"
+      },
+      {
+        id: 124,
+        lotNumber: 1,
+        name: "testPrimer2",
+        type: "pcrPrimer"
+      }
+    ]);
+  });
+
+  it("Provides a save function that can update resources.", async () => {
+    // Mock PATCH responses.
+    mockPatch.mockImplementationOnce(() => ({
+      data: [
+        {
+          data: {
+            attributes: {
+              lotNumber: 1,
+              name: "testPrimer1 edited"
+            },
+            id: 123,
+            type: "pcrPrimer"
+          },
+          status: 201
+        },
+        {
+          data: {
+            attributes: {
+              lotNumber: 1,
+              name: "testPrimer2 edited"
+            },
+            id: 124,
+            type: "pcrPrimer"
+          },
+          status: 201
+        }
+      ]
+    }));
+
+    const response = await save([
+      {
+        resource: {
+          id: "123",
+          lotNumber: 1,
+          name: "testPrimer1 edited",
+          type: "pcrPrimer"
+        } as PcrPrimer,
+        type: "pcrPrimer"
+      },
+      {
+        resource: {
+          id: "124",
+          lotNumber: 1,
+          name: "testPrimer2 edited",
+          type: "pcrPrimer"
+        } as PcrPrimer,
+        type: "pcrPrimer"
+      }
+    ]);
+
+    expect(mockPatch).lastCalledWith(
+      "operations",
+      [
+        {
+          op: "PATCH",
+          path: "pcrPrimer/123",
+          value: {
+            attributes: { lotNumber: 1, name: "testPrimer1 edited" },
+            id: "123",
+            type: "pcrPrimer"
+          }
+        },
+        {
+          op: "PATCH",
+          path: "pcrPrimer/124",
+          value: {
+            attributes: { lotNumber: 1, name: "testPrimer2 edited" },
+            id: "124",
+            type: "pcrPrimer"
+          }
+        }
+      ],
+      expect.anything()
+    );
+
+    expect(response).toEqual([
+      { id: 123, lotNumber: 1, name: "testPrimer1 edited", type: "pcrPrimer" },
+      { id: 124, lotNumber: 1, name: "testPrimer2 edited", type: "pcrPrimer" }
+    ]);
   });
 });

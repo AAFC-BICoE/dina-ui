@@ -32,6 +32,8 @@ include::filter_builder_component.adoc[]
 
 :leveloffset: 2
 
+include::useQuery_hook_function.adoc[]
+
 include::write_operations.adoc[]
 
 :leveloffset: 1

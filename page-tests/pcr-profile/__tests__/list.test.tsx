@@ -1,5 +1,4 @@
 import { mount } from "enzyme";
-import { act } from "react-test-renderer";
 import { ApiClientContext, createContextValue } from "../../../components";
 import PcrProfileListPage from "../../../pages/pcr-profile/list";
 import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
@@ -50,9 +49,7 @@ describe("PcrProfile list page", () => {
   it("Renders the list page.", async () => {
     const wrapper = mountWithContext(<PcrProfileListPage />);
 
-    await act(async () => {
-      await new Promise(setImmediate);
-    });
+    await new Promise(setImmediate);
     wrapper.update();
 
     // Check that the table contains the links to profile details pages.
