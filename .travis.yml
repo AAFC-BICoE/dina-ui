@@ -3,7 +3,7 @@ env:
     - CC_TEST_REPORTER_ID=1adf2f4c3169570205e0702dc0166037e02880f128a2bfd74d2f6102f89f699f
 language: node_js
 node_js:
-  - "11"
+  - "12"
 before_script:
   # Setup the test coverage reporter.
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
