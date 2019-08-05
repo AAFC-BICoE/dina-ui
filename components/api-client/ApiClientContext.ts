@@ -1,5 +1,5 @@
+import Kitsu from "kitsu";
 import React from "react";
-import Kitsu from "../../lib/kitsu";
 import {
   JsonApiErrorResponse,
   JsonApiResponse,
