@@ -3,6 +3,9 @@ module.exports = {
   coveragePathIgnorePatterns: [
     "/coverage/",
     "/build/",
+    // Running tests directly on this script should not be necessary.
+    // If the dependency is patched wrong then the postinstall hook or the tests would fail.
+    "/scripts/patch-kitsu.ts",
     "jest.config.js",
     "jest.setup.js",
     "next.config.js",
