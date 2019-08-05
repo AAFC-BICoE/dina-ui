@@ -1,4 +1,6 @@
 import { mount } from "enzyme";
+import { useState } from "react";
+import { act } from "react-test-renderer";
 import { FilterBuilder, FilterBuilderProps } from "../FilterBuilder";
 import { FilterGroup } from "../FilterGroup";
 import { FilterRow } from "../FilterRow";
@@ -379,5 +381,45 @@ describe("FilterBuilder component", () => {
       .simulate("click");
     expect(onChange).toHaveBeenCalledTimes(5);
     expect(onChange).lastCalledWith(wrapper.state().model);
+  });
+
+  it("Resets to the initial state when a null value is passed.", async () => {
+    function TestComponent() {
+      const [model, setModel] = useState(null);
+      return (
+        <FilterBuilder
+          filterAttributes={filterAttributes}
+          onChange={setModel}
+          value={model}
+        />
+      );
+    }
+
+    const wrapper = mount(<TestComponent />);
+
+    expect(wrapper.find(FilterBuilder).prop("value")).toEqual(null);
+
+    // Wait for state update
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Initially renders with the initial filter model.
+    expect(wrapper.find(FilterBuilder).prop("value")).toEqual(
+      expect.objectContaining({ type: "FILTER_GROUP" })
+    );
+
+    // Set the model to null.
+    act(() => {
+      wrapper.find(FilterBuilder).prop<any>("onChange")(null);
+    });
+
+    // Wait for state update.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Resets itself with the inital filter model.
+    expect(wrapper.find(FilterBuilder).prop("value")).toEqual(
+      expect.objectContaining({ type: "FILTER_GROUP" })
+    );
   });
 });

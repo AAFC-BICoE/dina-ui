@@ -1,9 +1,10 @@
 import { Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
-import Link from "next/link";
 import { withRouter } from "next/router";
 import {
+  BackToListButton,
   ButtonBar,
+  EditButton,
   FieldView,
   Head,
   LoadingSpinner,
@@ -22,12 +23,8 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
       <Head title="Protocol Details" />
       <Nav />
       <ButtonBar>
-        <Link href={`/protocol/edit?id=${id}`}>
-          <button className="btn btn-primary">Edit</button>
-        </Link>
-        <Link href="/protocol/list">
-          <button className="btn btn-secondary">Back to List</button>
-        </Link>
+        <EditButton entityId={id as string} entityLink="protocol" />
+        <BackToListButton entityLink="protocol" />
       </ButtonBar>
       <Query<Protocol> query={{ include: "group,kit", path: `protocol/${id}` }}>
         {({ loading, response }) => {

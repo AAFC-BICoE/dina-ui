@@ -4,6 +4,8 @@ import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import {
   ApiClientContext,
+  ButtonBar,
+  CancelButton,
   ErrorViewer,
   Head,
   LoadingSpinner,
@@ -13,7 +15,6 @@ import {
   TextField
 } from "../../components";
 import { Region } from "../../types/seqdb-api/resources/Region";
-import { serialize } from "../../util/serialize";
 
 interface RegionFormProps {
   region?: Region;
@@ -54,8 +55,8 @@ export function RegionEditPage({ router }: WithRouterProps) {
 }
 
 function RegionForm({ region, router }: RegionFormProps) {
-  const { doOperations } = useContext(ApiClientContext);
-
+  const { save } = useContext(ApiClientContext);
+  const { id } = router.query;
   const initialValues = region || {};
 
   async function onSubmit(
@@ -63,26 +64,14 @@ function RegionForm({ region, router }: RegionFormProps) {
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
     try {
-      const serialized = await serialize({
-        resource: submittedValues,
-        type: "region"
-      });
-
-      const op = submittedValues.id ? "PATCH" : "POST";
-
-      if (op === "POST") {
-        serialized.id = -100;
-      }
-
-      const response = await doOperations([
+      const response = await save([
         {
-          op,
-          path: op === "PATCH" ? `region/${region.id}` : "region",
-          value: serialized
+          resource: submittedValues,
+          type: "region"
         }
       ]);
 
-      const newId = response[0].data.id;
+      const newId = response[0].id;
       router.push(`/region/view?id=${newId}`);
     } catch (error) {
       setStatus(error.message);
@@ -94,6 +83,10 @@ function RegionForm({ region, router }: RegionFormProps) {
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form>
         <ErrorViewer />
+        <ButtonBar>
+          <SubmitButton />
+          <CancelButton entityId={id as string} entityLink="region" />
+        </ButtonBar>
         <div>
           <div className="row">
             <TextField className="col-md-2" name="name" />

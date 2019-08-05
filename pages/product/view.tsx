@@ -1,9 +1,10 @@
 import { Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
-import Link from "next/link";
 import { withRouter } from "next/router";
 import {
+  BackToListButton,
   ButtonBar,
+  EditButton,
   FieldView,
   Head,
   LoadingSpinner,
@@ -19,12 +20,8 @@ export function ProductDetailsPage({ router }: WithRouterProps) {
       <Head title="Product " />
       <Nav />
       <ButtonBar>
-        <Link href={`/product/edit?id=${id}`}>
-          <button className="btn btn-primary">Edit</button>
-        </Link>
-        <Link href="/product/list">
-          <button className="btn btn-secondary">Back to List</button>
-        </Link>
+        <EditButton entityId={id as string} entityLink="product" />
+        <BackToListButton entityLink="product" />
       </ButtonBar>
       <Query<Product> query={{ include: "group", path: `product/${id}` }}>
         {({ loading, response }) => (

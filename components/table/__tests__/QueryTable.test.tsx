@@ -86,7 +86,7 @@ describe("QueryTable component", () => {
     );
 
     // Continue the test after the data fetch is done.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     // The loading screen should be gone.
@@ -148,7 +148,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait until the data is loaded into the table.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
     expect(
       // 300 total records with a pageSize of 25 means 12 pages.
@@ -169,7 +169,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait until the data is loaded into the table.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
     expect(
       // 300 total records with a pageSize of 40 means 8 pages.
@@ -180,7 +180,7 @@ describe("QueryTable component", () => {
     ).toEqual("8");
   });
 
-  it("Fetches the next page when the Next button is pressed.", async done => {
+  it("Fetches the next page when the Next button is pressed.", async () => {
     const wrapper = mountWithContext(
       <QueryTable<Todo>
         path="todo"
@@ -190,7 +190,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for page 1 to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     const page1Rows = wrapper.find(".rt-tr-group");
@@ -213,7 +213,7 @@ describe("QueryTable component", () => {
     expect(wrapper.find(".-loading.-active").exists()).toEqual(true);
 
     // Wait for the second query to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     const page2Rows = wrapper.find(".rt-tr-group");
 
     // The second page should start with todo #25.
@@ -231,8 +231,6 @@ describe("QueryTable component", () => {
         .find(".rt-td")
         .map(cell => cell.text())
     ).toEqual(["49", "todo 49", "todo description 49"]);
-
-    done();
   });
 
   it("Fetches the previous page when the previous button is pressed.", async () => {
@@ -245,7 +243,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for page 1 to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     // Click the "Next" button.
     wrapper
@@ -254,7 +252,7 @@ describe("QueryTable component", () => {
       .simulate("click");
 
     // Wait for the second query to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     // Click the "Previous" button.
     wrapper
@@ -266,7 +264,7 @@ describe("QueryTable component", () => {
     expect(wrapper.find(".-loading.-active").exists()).toEqual(true);
 
     // Wait for the "Previous" request to finish.
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     const rows = wrapper.find(".rt-tr-group");
 
@@ -292,12 +290,12 @@ describe("QueryTable component", () => {
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
-        defaultSort="description"
+        defaultSort={[{ id: "description", desc: false }]}
       />
     );
 
     // Wait for the initial request to finish.
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     expect(mockGet).toHaveBeenCalledTimes(1);
     expect(mockGet).lastCalledWith(
@@ -312,7 +310,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the initial request to finish.
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     // The first request should have no sort.
     expect(mockGet).not.lastCalledWith(
@@ -326,14 +324,14 @@ describe("QueryTable component", () => {
 
     // Click the "name" header.
     nameHeader.simulate("click");
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     // The second request should have a "name" sort.
     expect(mockGet).lastCalledWith("todo", objectContaining({ sort: "name" }));
 
     // Click the "name" header again to sort by descending order.
     nameHeader.simulate("click");
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     // The third request should have a "-name" sort.
     expect(mockGet).lastCalledWith("todo", objectContaining({ sort: "-name" }));
@@ -349,19 +347,19 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the initial request to finish.
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     // Click the "name" header.
     wrapper
       .find(".rt-resizable-header-content[children='Name']")
       .simulate("click");
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     // Shift-click the "description" header.
     wrapper
       .find(".rt-resizable-header-content[children='Description']")
       .simulate("click", { shiftKey: true });
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     // This request should be sorted by name and description.
     expect(mockGet).lastCalledWith(
@@ -387,7 +385,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the initial request to finish.
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     // The initial request should have a pageSize of 5.
     expect(mockGet).lastCalledWith(
@@ -405,7 +403,7 @@ describe("QueryTable component", () => {
       .simulate("change", { target: { value: 100 } });
 
     // Wait for the second request to finish.
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     // The second request should have a pageSize of 5.
     expect(mockGet).lastCalledWith(
@@ -434,7 +432,7 @@ describe("QueryTable component", () => {
     const wrapper = mountWithContext(<QueryTable<Todo> {...firstProps} />);
 
     // Wait for the first request to finish.
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     expect(mockGet).toHaveBeenCalledTimes(1);
     expect(mockGet).lastCalledWith(
@@ -466,7 +464,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the first request to finish.
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     expect(mockGet).toHaveBeenCalledTimes(1);
     expect(mockGet).lastCalledWith(
@@ -501,7 +499,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait for the request to finish.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     // Expect correct header name in the third header.
@@ -539,7 +537,7 @@ describe("QueryTable component", () => {
     );
 
     // Wait until the data is loaded into the table.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     // Set the table's div wrapper's offsetTop to 200.
@@ -566,5 +564,53 @@ describe("QueryTable component", () => {
 
     expect(wrapper.find(".pagination-top").exists()).toEqual(true);
     expect(wrapper.find(".pagination-bottom").exists()).toEqual(true);
+  });
+
+  it("Provides an 'onPageSizeChange' callback prop.", async () => {
+    const mockOnPageSizeChange = jest.fn();
+
+    const wrapper = mountWithContext(
+      <QueryTable<Todo>
+        path="todo"
+        columns={["id", "name", "description"]}
+        onPageSizeChange={mockOnPageSizeChange}
+      />
+    );
+
+    // It should just pass the prop to ReactTable.
+    expect(wrapper.find(ReactTable).prop("onPageSizeChange")).toBe(
+      mockOnPageSizeChange
+    );
+  });
+
+  it("Provides an 'onSortedChange' callback prop.", async () => {
+    const mockOnSortedChange = jest.fn();
+
+    const wrapper = mountWithContext(
+      <QueryTable<Todo>
+        path="todo"
+        columns={["id", "name", "description"]}
+        onSortedChange={mockOnSortedChange}
+      />
+    );
+
+    // It should just pass the prop to ReactTable.
+    expect(wrapper.find(ReactTable).prop("onSortedChange")).toBe(
+      mockOnSortedChange
+    );
+  });
+
+  it("Shows the total records count.", async () => {
+    const wrapper = mountWithContext(
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
+    );
+
+    // Wait for the initial request to finish and the total to render.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper.containsMatchingElement(<span>Total matched records: 300</span>)
+    ).toEqual(true);
   });
 });

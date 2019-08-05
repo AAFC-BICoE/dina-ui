@@ -5,6 +5,7 @@ import { useContext } from "react";
 import {
   ApiClientContext,
   ButtonBar,
+  CancelButton,
   ErrorViewer,
   Head,
   LoadingSpinner,
@@ -22,7 +23,6 @@ import {
   protocolTypeLabels
 } from "../../types/seqdb-api/resources/Protocol";
 import { filterBy } from "../../util/rsql";
-import { serialize } from "../../util/serialize";
 
 interface ProtocolFormProps {
   protocol?: Protocol;
@@ -64,7 +64,8 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
 }
 
 function ProtocolForm({ protocol, router }: ProtocolFormProps) {
-  const { doOperations } = useContext(ApiClientContext);
+  const { save } = useContext(ApiClientContext);
+  const { id } = router.query;
   const initialValues = protocol || {};
 
   async function onSubmit(
@@ -77,24 +78,14 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
         submittedValues.kit.type = "product";
       }
 
-      const serialized = await serialize({
-        resource: submittedValues,
-        type: "protocol"
-      });
-      const op = submittedValues.id ? "PATCH" : "POST";
-
-      if (op === "POST") {
-        serialized.id = -100;
-      }
-      const response = await doOperations([
+      const response = await save([
         {
-          op,
-          path: op === "PATCH" ? `protocol/${protocol.id}` : "protocol",
-          value: serialized
+          resource: submittedValues,
+          type: "protocol"
         }
       ]);
 
-      const newId = response[0].data.id;
+      const newId = response[0].id;
       router.push(`/protocol/view?id=${newId}`);
     } catch (error) {
       setStatus(error.message);
@@ -108,6 +99,7 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />
+          <CancelButton entityId={id as string} entityLink="protocol" />
         </ButtonBar>
         <div>
           <div className="row">

@@ -1,9 +1,10 @@
 import { Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
-import Link from "next/link";
 import { withRouter } from "next/router";
 import {
+  BackToListButton,
   ButtonBar,
+  EditButton,
   FieldView,
   Head,
   LoadingSpinner,
@@ -20,12 +21,8 @@ export function PcrProfileDetailsPage({ router }: WithRouterProps) {
       <Head title="Thermocycler Profile Details" />
       <Nav />
       <ButtonBar>
-        <Link href={`/pcr-profile/edit?id=${id}`}>
-          <button className="btn btn-primary">Edit</button>
-        </Link>
-        <Link href="/pcr-profile/list">
-          <button className="btn btn-secondary">Back to List</button>
-        </Link>
+        <EditButton entityId={id as string} entityLink="pcr-profile" />
+        <BackToListButton entityLink="pcr-profile" />
       </ButtonBar>
       <Query<PcrProfile>
         query={{ include: "group,region", path: `thermocyclerprofile/${id}` }}

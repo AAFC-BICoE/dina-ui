@@ -10,7 +10,7 @@ describe("ErrorViewer component", () => {
       </Formik>
     );
 
-    expect(wrapper.html()).toEqual(null);
+    expect(wrapper.html()).toEqual("");
   });
 
   it("Renders the formik status as an error message.", () => {
