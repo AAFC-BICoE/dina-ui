@@ -8,12 +8,10 @@ import {
   Sample,
   StepResource
 } from "../../types/seqdb-api";
-import { serialize } from "../../util/serialize";
-import { HttpMethod } from "../api-client/jsonapi-types";
 import { StepRendererProps } from "../workflow/StepRenderer";
 
 export function useSelectionControls({ chain, step }: StepRendererProps) {
-  const { doOperations } = useContext(ApiClientContext);
+  const { doOperations, save } = useContext(ApiClientContext);
 
   // Random number to be changed every time a sample is selected.
   // This number is passed into the Query component's query, which re-fetches
@@ -37,28 +35,10 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
       value: "SAMPLE"
     }));
 
-    const serialized = await Promise.all(
-      newStepResources.map(newStepResource =>
-        serialize({
-          resource: newStepResource,
-          type: "stepResource"
-        })
-      )
-    );
-
-    let tempId = -100;
-    for (const s of serialized) {
-      s.id = tempId--;
-    }
-
     try {
       setLoading(true);
-      await doOperations(
-        serialized.map(value => ({
-          op: "POST" as HttpMethod,
-          path: "stepResource",
-          value
-        }))
+      await save(
+        newStepResources.map(sr => ({ resource: sr, type: "stepResource" }))
       );
 
       setRandomNumber(Math.random());
