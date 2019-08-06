@@ -41,6 +41,7 @@ export const ApiClientContext = React.createContext<ApiClientContextI>(
 export function createContextValue(): ApiClientContextI {
   const apiClient = new Kitsu({
     baseURL: "/api",
+    headers: { "Crnk-Compact": "true" },
     pluralize: false,
     resourceCase: "none"
   });
@@ -58,7 +59,8 @@ export function createContextValue(): ApiClientContextI {
     const axiosResponse = await axios.patch("operations", operations, {
       headers: {
         Accept: "application/json-patch+json",
-        "Content-Type": "application/json-patch+json"
+        "Content-Type": "application/json-patch+json",
+        "Crnk-Compact": "true"
       }
     });
 

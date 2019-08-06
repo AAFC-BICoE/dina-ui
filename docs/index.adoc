@@ -35,3 +35,12 @@ include::filter_builder_component.adoc[]
 include::useQuery_hook_function.adoc[]
 
 include::write_operations.adoc[]
+
+:leveloffset: 1
+
+= WCAG compliance tools setup
+
+:leveloffset: 2
+
+include::WCAG_compliance_test_tools_setup.adoc[]
+

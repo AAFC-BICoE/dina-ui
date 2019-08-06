@@ -7,7 +7,8 @@ import { Operation, OperationsResponse } from "../jsonapi-types";
 const AXIOS_JSONPATCH_REQUEST_CONFIG: AxiosRequestConfig = {
   headers: {
     Accept: "application/json-patch+json",
-    "Content-Type": "application/json-patch+json"
+    "Content-Type": "application/json-patch+json",
+    "Crnk-Compact": "true"
   }
 };
 
