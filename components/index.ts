@@ -1,5 +1,6 @@
 export * from "./api-client/ApiClientContext";
 export * from "./api-client/Query";
+export * from "./api-client/useQuery";
 export * from "./filter-builder/FilterBuilder";
 export * from "./filter-builder/FilterBuilderField";
 export * from "./filter-builder/FilterGroup";

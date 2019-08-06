@@ -1,0 +1,48 @@
+= useQuery Hook Function
+
+useQuery is an API querying function using the https://reactjs.org/docs/hooks-intro.html[React Hooks API].
+You can use it to easily query the back-end from inside a function component.
+
+Example usage for fetching a single resource:
+[source,tsx]
+----
+import { useQuery } from "../components";
+import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
+
+function ExampleComponent() {
+  const { error, loading, response } = useQuery<PcrPrimer>({ path: "pcrPrimer/1" });
+
+  if (loading) {
+    return <div>Loading...</div>;
+  } else if (error) {
+    return <ErrorInfo error={error} />;
+  } else {
+    return <div>Primer name: {response.data.name}</div>;
+  }
+}
+----
+
+Example usage for fetching a resource list:
+[source,tsx]
+----
+import { useQuery } from "../components";
+import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
+
+function ExampleComponent() {
+  const { error, loading, response } = useQuery<PcrPrimer[]>({ path: "pcrPrimer" });
+
+  if (loading) {
+    return <div>Loading...</div>;
+  } else if (error) {
+    return <ErrorInfo error={error} />;
+  } else {
+    return (
+      <div>
+        {response.data.map(primer => (
+          <PcrPrimerInfo key={primer.id} primer={primer} />
+        ))}
+      </div>
+    );
+  }
+}
+----

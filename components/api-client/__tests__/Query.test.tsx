@@ -289,15 +289,16 @@ describe("Query component", () => {
       pagedQueryWithContext({ offset: 0, limit: 3 }, mockChild)
     );
 
+    // The react async hook renders the component twice when initializing.
     // Renders with loading as true when initially fetching data.
-    expect(mockChild).toHaveBeenCalledTimes(1);
+    expect(mockChild).toHaveBeenCalledTimes(2);
     expect(mockChild).lastCalledWith(objectContaining({ loading: true }));
 
     // Continue the test after the first query finishes.
     await Promise.resolve();
 
-    // The component renders a second time when the first query finishes.
-    expect(mockChild).toHaveBeenCalledTimes(2);
+    // The component renders a third time when the first query finishes.
+    expect(mockChild).toHaveBeenCalledTimes(3);
     expect(mockChild).lastCalledWith(objectContaining({ loading: false }));
 
     // Render the component again with new props.
@@ -307,7 +308,7 @@ describe("Query component", () => {
 
     // Updating causes two more renders: one to pass in the new props, and one when Query sets
     // loading to true.
-    expect(mockChild).toHaveBeenCalledTimes(4);
+    expect(mockChild).toHaveBeenCalledTimes(5);
 
     // Query component renders with loading as true when re-fetching data.
     expect(mockChild).lastCalledWith(objectContaining({ loading: true }));
@@ -315,7 +316,7 @@ describe("Query component", () => {
     // Continue the test after the second query finishes.
     await Promise.resolve();
 
-    expect(mockChild).toHaveBeenCalledTimes(5);
+    expect(mockChild).toHaveBeenCalledTimes(6);
 
     // Renders with loading as false after the second query finishes.
     expect(mockChild).lastCalledWith(objectContaining({ loading: false }));

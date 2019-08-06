@@ -8,9 +8,9 @@ import ReactTable, {
 } from "react-table";
 import "react-table/react-table.css";
 import titleCase from "title-case";
-import { PageSpec } from "types/seqdb-api/page";
+import { JsonApiQuerySpec, useQuery } from "..";
 import { MetaWithTotal } from "../../types/seqdb-api/meta";
-import { JsonApiQuerySpec, Query } from "../api-client/Query";
+import { PageSpec } from "../../types/seqdb-api/page";
 
 /** Object types accepted as a column definition. */
 export type ColumnDefinition<TData> = string | Column<TData>;
@@ -132,37 +132,35 @@ export function QueryTable<TData extends KitsuResource>({
     }
   });
 
+  const { loading, response } = useQuery<TData[], MetaWithTotal>(query, {
+    onSuccess
+  });
+
+  const totalCount =
+    response && response.meta && response.meta.totalResourceCount;
+
+  const numberOfPages = totalCount
+    ? Math.ceil(totalCount / page.limit)
+    : undefined;
+
   return (
-    <Query<TData[], MetaWithTotal> query={query} onSuccess={onSuccess}>
-      {({ loading, response }) => {
-        const totalCount =
-          response && response.meta && response.meta.totalResourceCount;
-
-        const numberOfPages = totalCount
-          ? Math.ceil(totalCount / page.limit)
-          : undefined;
-
-        return (
-          <div className="query-table-wrapper" ref={divWrapperRef}>
-            <style>{queryTableStyle}</style>
-            <span>Total matched records: {totalCount}</span>
-            <ReactTable
-              className="-striped"
-              columns={mappedColumns}
-              data={response && response.data}
-              defaultPageSize={page.limit}
-              defaultSorted={sortingRules}
-              loading={loading}
-              manual={true}
-              onFetchData={onFetchData}
-              onPageSizeChange={onPageSizeChange}
-              onSortedChange={onSortedChange}
-              pages={numberOfPages}
-              showPaginationTop={true}
-            />
-          </div>
-        );
-      }}
-    </Query>
+    <div className="query-table-wrapper" ref={divWrapperRef}>
+      <style>{queryTableStyle}</style>
+      <span>Total matched records: {totalCount}</span>
+      <ReactTable
+        className="-striped"
+        columns={mappedColumns}
+        data={response && response.data}
+        defaultPageSize={page.limit}
+        defaultSorted={sortingRules}
+        loading={loading}
+        manual={true}
+        onFetchData={onFetchData}
+        onPageSizeChange={onPageSizeChange}
+        onSortedChange={onSortedChange}
+        pages={numberOfPages}
+        showPaginationTop={true}
+      />
+    </div>
   );
 }

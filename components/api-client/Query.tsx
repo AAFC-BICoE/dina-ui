@@ -1,26 +1,12 @@
-import { GetParams, KitsuResponse, KitsuResponseData } from "kitsu";
-import { isEqual, isUndefined, noop, omitBy } from "lodash";
+import { KitsuResponse, KitsuResponseData } from "kitsu";
 import React from "react";
-import { ApiClientContext, ApiClientContextI } from "./ApiClientContext";
-import { JsonApiErrorResponse } from "./jsonapi-types";
-
-/** Attributes that compose a JsonApi query. */
-export interface JsonApiQuerySpec extends GetParams {
-  path: string;
-}
+import { JsonApiQuerySpec, QueryState, useQuery } from "./useQuery";
 
 /** Query component props. */
 export interface QueryProps<TData extends KitsuResponseData, TMeta> {
   onSuccess?: (response: KitsuResponse<TData, TMeta>) => void;
   query: JsonApiQuerySpec;
   children: QueryChildren<TData, TMeta>;
-}
-
-/** Query component state. */
-interface QueryState<TData extends KitsuResponseData, TMeta> {
-  loading: boolean;
-  error?: JsonApiErrorResponse;
-  response?: KitsuResponse<TData, TMeta>;
 }
 
 /**
@@ -31,60 +17,14 @@ interface QueryState<TData extends KitsuResponseData, TMeta> {
  */
 type QueryChildren<TData extends KitsuResponseData, TMeta> = (
   state: QueryState<TData, TMeta>
-) => React.ReactNode;
+) => React.ReactElement;
 
-/**
- * Performs a query against the backend JSONAPI web services and passes response data to children
- * components using the render props pattern.
- * See: https://reactjs.org/docs/render-props.html
- */
-export class Query<
-  TData extends KitsuResponseData,
-  TMeta = undefined
-> extends React.Component<QueryProps<TData, TMeta>, QueryState<TData, TMeta>> {
-  public static contextType = ApiClientContext;
-
-  public state = {
-    loading: true
-  };
-
-  public async componentDidMount(): Promise<void> {
-    // Fetch the data when the component is mounted.
-    await this.fetchData();
-  }
-
-  public async componentDidUpdate(
-    prevProps: Readonly<QueryProps<TData, TMeta>>
-  ) {
-    // Only re-fetch the data if the query prop was changed.
-    if (!isEqual(prevProps.query, this.props.query)) {
-      this.setState({ loading: true });
-      await this.fetchData();
-    }
-  }
-
-  public render() {
-    return this.props.children(this.state);
-  }
-
-  private async fetchData(): Promise<void> {
-    const { query, onSuccess = noop } = this.props;
-    const { apiClient } = this.context as ApiClientContextI;
-
-    // Omit undefined values from the GET params, which would otherwise cause an invalid request.
-    // e.g. /api/region?fields=undefined
-    const { path, fields, filter, sort, include, page } = query;
-    const getParams = omitBy<GetParams>(
-      { fields, filter, sort, include, page },
-      isUndefined
-    );
-
-    try {
-      const response = await apiClient.get(path, getParams);
-      this.setState({ loading: false, error: undefined, response });
-      onSuccess(response);
-    } catch (error) {
-      this.setState({ loading: false, error });
-    }
-  }
+/** Back-end connected Query component. */
+export function Query<TData extends KitsuResponseData, TMeta = undefined>({
+  children,
+  onSuccess,
+  query
+}: QueryProps<TData, TMeta>) {
+  const queryState = useQuery<TData, TMeta>(query, { onSuccess });
+  return children(queryState);
 }
