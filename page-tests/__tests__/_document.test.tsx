@@ -26,15 +26,14 @@ const __NEXT_DATA__test = {
 };
 
 const docProps = {
+  __NEXT_DATA__: __NEXT_DATA__test,
   assetPrefix: "",
   buildManifest: ["string"],
   dev: true,
   devFiles: ["undefined"],
   dynamicImports: ["undefined"],
   files: ["undefined"],
-  staticMarkup: false,
-  /* tslint:disable-next-line */
-  __NEXT_DATA__: __NEXT_DATA__test
+  staticMarkup: false
 };
 describe("SeqdbDocument", () => {
   beforeEach(() => {
