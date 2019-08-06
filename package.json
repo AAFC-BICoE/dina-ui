@@ -8,7 +8,7 @@
     "lint": "tslint --project tsconfig.json",
     "lint:fix": "tslint --project tsconfig.json --fix",
     "next": "next",
-    "postinstall": "cd scripts/ && ts-node ./patch-kitsu.ts",
+    "postinstall": "ts-node --project ./scripts/tsconfig.json ./scripts/patch-kitsu.ts",
     "proxy": "micro-proxy -r ./dev-proxy-config.json -p 8000",
     "start": "next start",
     "test": "tsc && jest",
