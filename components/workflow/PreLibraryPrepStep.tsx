@@ -13,7 +13,6 @@ import {
 } from "..";
 import { Chain, ChainStepTemplate, StepResource } from "../../types/seqdb-api";
 import { rsql } from "../filter-builder/rsql";
-import { CheckBoxField } from "../formik-connected/CheckBoxField";
 import { StepRendererProps } from "./StepRenderer";
 
 export function PreLibraryPrepStep({
@@ -142,9 +141,7 @@ export function PreLibraryPrepStep({
     },
     {
       Cell: connect(({ original: sr }) => (
-        <div key={sr.id}>
-          <CheckBoxField name={`checkedIds[${sr.sample.id}]`} />
-        </div>
+        <div key={sr.id}>put checkbox here</div>
       )),
       sortable: false
     }

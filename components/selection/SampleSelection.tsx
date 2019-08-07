@@ -8,7 +8,7 @@ import {
   QueryTable
 } from "..";
 import { rsql } from "../../components/filter-builder/rsql";
-import { CheckBoxField } from "../../components/formik-connected/CheckBoxField";
+import { useGroupedCheckBoxes } from "../../components/formik-connected/CheckBoxField";
 import { StepRendererProps } from "../workflow/StepRenderer";
 import { useSelectionControls } from "./useSelectionControls";
 
@@ -21,13 +21,13 @@ export function SampleSelection({
 
   const {
     loading,
-    onCheckBoxClick,
     randomNumber,
     removeSample,
     selectAllCheckedSamples,
-    selectSamples,
-    setAvailableSamples
+    selectSamples
   } = useSelectionControls({ chain, chainStepTemplates, step });
+
+  const { CheckBoxField, setAvailableItems } = useGroupedCheckBoxes();
 
   const SELECTED_SAMPLE_COLUMNS: Array<ColumnDefinition<any>> = [
     {
@@ -59,7 +59,7 @@ export function SampleSelection({
     "name",
     "version",
     {
-      Cell: connect(({ formik, original: sample }) => (
+      Cell: ({ original: sample }) => (
         <div className="row" key={sample.id}>
           <button
             className="btn btn-primary btn-sm col-6"
@@ -68,13 +68,10 @@ export function SampleSelection({
             -->
           </button>
           <div className="col-6">
-            <CheckBoxField
-              onClick={e => onCheckBoxClick(e, formik, sample)}
-              name={`checkedIds[${sample.id}]`}
-            />
+            <CheckBoxField resource={sample} />
           </div>
         </div>
-      )),
+      ),
       sortable: false
     }
   ];
@@ -106,7 +103,7 @@ export function SampleSelection({
                   columns={SELECTABLE_SAMPLE_COLUMNS}
                   filter={filter}
                   include="group"
-                  onSuccess={response => setAvailableSamples(response.data)}
+                  onSuccess={response => setAvailableItems(response.data)}
                   path="sample"
                 />
               </div>

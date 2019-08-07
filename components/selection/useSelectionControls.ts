@@ -1,4 +1,4 @@
-import { FormikContext, FormikProps } from "formik";
+import { FormikProps } from "formik";
 import { toPairs } from "lodash";
 import { useContext, useState } from "react";
 import { ApiClientContext } from "..";
@@ -17,9 +17,6 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
   // This number is passed into the Query component's query, which re-fetches
   // the data when any part of the query changes.
   const [randomNumber, setRandomNumber] = useState<number>(Math.random());
-
-  const [availableSamples, setAvailableSamples] = useState<Sample[]>([]);
-  const [lastCheckedSample, setLastCheckedSample] = useState<Sample>();
 
   const [loading, setLoading] = useState(false);
 
@@ -87,37 +84,11 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
     setLoading(false);
   }
 
-  function onCheckBoxClick(
-    e: MouseEvent,
-    { setFieldValue }: FormikContext<any>,
-    checkedSample: Sample
-  ) {
-    if (lastCheckedSample && e.shiftKey) {
-      const checked: boolean = (e.target as any).checked;
-
-      const currentIndex = availableSamples.indexOf(checkedSample);
-      const lastIndex = availableSamples.indexOf(lastCheckedSample);
-
-      const [lowIndex, highIndex] = [currentIndex, lastIndex].sort(
-        (a, b) => a - b
-      );
-
-      const samplesToToggle = availableSamples.slice(lowIndex, highIndex + 1);
-
-      for (const sample of samplesToToggle) {
-        setFieldValue(`checkedIds[${sample.id}]`, checked);
-      }
-    }
-    setLastCheckedSample(checkedSample);
-  }
-
   return {
     loading,
-    onCheckBoxClick,
     randomNumber,
     removeSample,
     selectAllCheckedSamples,
-    selectSamples,
-    setAvailableSamples
+    selectSamples
   };
 }
