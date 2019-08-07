@@ -1,4 +1,4 @@
-import { connect, Form, Formik, FormikActions } from "formik";
+import { Form, Formik, FormikActions } from "formik";
 import { toPairs } from "lodash";
 import { useContext, useState } from "react";
 import { PreLibraryPrep } from "types/seqdb-api/resources/workflow/PreLibraryPrep";
@@ -8,11 +8,18 @@ import {
   FilterBuilderField,
   QueryTable,
   SelectField,
+  SubmitButton,
   TextField,
   useQuery
 } from "..";
-import { Chain, ChainStepTemplate, StepResource } from "../../types/seqdb-api";
+import {
+  Chain,
+  ChainStepTemplate,
+  Sample,
+  StepResource
+} from "../../types/seqdb-api";
 import { rsql } from "../filter-builder/rsql";
+import { useGroupedCheckBoxes } from "../formik-connected/CheckBoxField";
 import { StepRendererProps } from "./StepRenderer";
 
 export function PreLibraryPrepStep({
@@ -29,6 +36,8 @@ export function PreLibraryPrepStep({
   const [randomNumber, setRandomNumber] = useState(Math.random());
   const [rsqlFilter, setRsqlFilter] = useState<string>("");
 
+  const { CheckBoxField, setAvailableItems } = useGroupedCheckBoxes<Sample>();
+
   const visibleSampleIds = visibleSamples.length
     ? visibleSamples.map(sr => sr.sample.id).join(",")
     : 0;
@@ -39,7 +48,7 @@ export function PreLibraryPrepStep({
     filter: {
       "chain.chainId": chain.id,
       "chainStepTemplate.chainStepTemplateId": step.id,
-      rsql: `sample.sampleId=in=(${visibleSampleIds})`
+      rsql: `sample.sampleId=in=(${visibleSampleIds}) and sample.name!=${randomNumber}`
     },
     include: "sample,preLibraryPrep",
     path: "stepResource"
@@ -50,7 +59,7 @@ export function PreLibraryPrepStep({
     setSubmitting(false);
   }
 
-  async function plpFormSubmit(values) {
+  async function plpFormSubmit(values, { setSubmitting }: FormikActions<any>) {
     const { checkedIds, ...plpValues } = values;
 
     const selectedSampleIds = toPairs(checkedIds)
@@ -93,6 +102,7 @@ export function PreLibraryPrepStep({
     } catch (err) {
       alert(err);
     }
+    setSubmitting(false);
     setLoading(false);
   }
 
@@ -132,7 +142,11 @@ export function PreLibraryPrepStep({
             sr.sample.id === original.sample.id && sr.value === "SIZE_SELECTION"
         );
         if (stepResource) {
-          return <span>Size Selection Added</span>;
+          return (
+            <div style={{ backgroundColor: "rgb(222, 252, 222)" }}>
+              Size Selection Added
+            </div>
+          );
         }
         return <span>No Size Selection</span>;
       },
@@ -140,9 +154,11 @@ export function PreLibraryPrepStep({
       sortable: false
     },
     {
-      Cell: connect(({ original: sr }) => (
-        <div key={sr.id}>put checkbox here</div>
-      )),
+      Cell: ({ original: sr }) => (
+        <div key={sr.id}>
+          <CheckBoxField resource={sr.sample} />
+        </div>
+      ),
       sortable: false
     }
   ];
@@ -175,7 +191,10 @@ export function PreLibraryPrepStep({
                   rsql: rsqlFilter
                 }}
                 include="sample,sample.group"
-                onSuccess={res => setVisibleSamples(res.data)}
+                onSuccess={res => {
+                  setVisibleSamples(res.data);
+                  setAvailableItems(res.data.map(sr => sr.sample));
+                }}
                 path="stepResource"
               />
             </div>
@@ -192,9 +211,7 @@ export function PreLibraryPrepStep({
                   <TextField className="col-6" name="concentration" />
                 </div>
                 <div>
-                  <button className="btn btn-primary" type="submit">
-                    Add
-                  </button>
+                  <SubmitButton />
                 </div>
               </div>
             </div>

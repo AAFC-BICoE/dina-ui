@@ -3,15 +3,15 @@ import { KitsuResource } from "kitsu";
 import { noop } from "lodash";
 import { useState } from "react";
 
-interface CheckBoxFieldProps {
-  resource: KitsuResource;
+interface CheckBoxFieldProps<TData extends KitsuResource> {
+  resource: TData;
 }
 
-export function useGroupedCheckBoxes() {
-  const [availableItems, setAvailableItems] = useState<KitsuResource[]>([]);
-  const [lastCheckedItem, setLastCheckedItem] = useState<KitsuResource>();
+export function useGroupedCheckBoxes<TData extends KitsuResource>() {
+  const [availableItems, setAvailableItems] = useState<TData[]>([]);
+  const [lastCheckedItem, setLastCheckedItem] = useState<TData>();
 
-  function CheckBoxField({ resource }: CheckBoxFieldProps) {
+  function CheckBoxField({ resource }: CheckBoxFieldProps<TData>) {
     const fieldName = `checkedIds[${resource.id}]`;
 
     return (
