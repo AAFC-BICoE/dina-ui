@@ -1,118 +1,40 @@
 import { Form, Formik, FormikActions } from "formik";
-import { toPairs } from "lodash";
-import { useContext, useState } from "react";
-import { PreLibraryPrep } from "types/seqdb-api/resources/workflow/PreLibraryPrep";
+import { useState } from "react";
 import {
-  ApiClientContext,
   ColumnDefinition,
   FilterBuilderField,
   QueryTable,
   SelectField,
   SubmitButton,
-  TextField,
-  useQuery
+  TextField
 } from "..";
-import {
-  Chain,
-  ChainStepTemplate,
-  Sample,
-  StepResource
-} from "../../types/seqdb-api";
+import { Sample, StepResource } from "../../types/seqdb-api";
 import { rsql } from "../filter-builder/rsql";
 import { useGroupedCheckBoxes } from "../formik-connected/GroupedCheckBoxFields";
 import { StepRendererProps } from "./StepRenderer";
+import { usePreLibraryPrepControls } from "./usePreLibraryPrepControls";
 
-export function PreLibraryPrepStep({
-  chain,
-  chainStepTemplates,
-  step
-}: StepRendererProps) {
-  const { save } = useContext(ApiClientContext);
+export function PreLibraryPrepStep(props: StepRendererProps) {
+  const { chain, chainStepTemplates, step } = props;
+
+  const {
+    plpFormSubmit,
+    plpSrLoading,
+    plpSrResponse,
+    setVisibleSamples
+  } = usePreLibraryPrepControls(props);
 
   const previousStep = chainStepTemplates[chainStepTemplates.indexOf(step) - 1];
 
-  const [visibleSamples, setVisibleSamples] = useState<StepResource[]>([]);
-  const [, setLoading] = useState(false);
-  const [randomNumber, setRandomNumber] = useState(Math.random());
   const [rsqlFilter, setRsqlFilter] = useState<string>("");
 
   const { CheckBoxField, setAvailableItems } = useGroupedCheckBoxes<Sample>({
     fieldName: "checkedIds"
   });
 
-  const visibleSampleIds = visibleSamples.length
-    ? visibleSamples.map(sr => sr.sample.id).join(",")
-    : 0;
-
-  const { loading: plpSrLoading, response: plpSrResponse } = useQuery<
-    StepResource[]
-  >({
-    filter: {
-      "chain.chainId": chain.id,
-      "chainStepTemplate.chainStepTemplateId": step.id,
-      rsql: `sample.sampleId=in=(${visibleSampleIds}) and sample.name!=${randomNumber}`
-    },
-    include: "sample,preLibraryPrep",
-    path: "stepResource"
-  });
-
   function onFilterSubmit(values, { setSubmitting }: FormikActions<any>) {
     setRsqlFilter(rsql(values.filter));
     setSubmitting(false);
-  }
-
-  async function plpFormSubmit(
-    values,
-    { setFieldValue, setSubmitting }: FormikActions<any>
-  ) {
-    const { checkedIds, ...plpValues } = values;
-
-    const selectedSampleIds = toPairs(checkedIds)
-      .filter(pair => pair[1])
-      .map(pair => pair[0]);
-
-    try {
-      setLoading(true);
-
-      const plps = selectedSampleIds.map(() => ({
-        resource: plpValues,
-        type: "preLibraryPrep"
-      }));
-
-      const savedPlps = (await save(plps)) as PreLibraryPrep[];
-
-      const stepResources = selectedSampleIds.map((sampleId, i) => ({
-        chain: { id: chain.id, type: chain.type } as Chain,
-        chainStepTemplate: {
-          id: step.id,
-          type: step.type
-        } as ChainStepTemplate,
-        preLibraryPrep: {
-          id: String(savedPlps[i].id),
-          type: "preLibraryPrep"
-        } as PreLibraryPrep,
-        sample: { id: sampleId, type: "sample" },
-        type: "INPUT",
-        value: savedPlps[i].preLibraryPrepType
-      }));
-
-      await save(
-        stepResources.map(resource => ({
-          resource,
-          type: "stepResource"
-        }))
-      );
-
-      setRandomNumber(Math.random());
-
-      for (const id of selectedSampleIds) {
-        setFieldValue(`checkedIds[${id}]`, false);
-      }
-    } catch (err) {
-      alert(err);
-    }
-    setSubmitting(false);
-    setLoading(false);
   }
 
   const SAMPLE_STEP_RESOURCE_COLUMNS: Array<ColumnDefinition<StepResource>> = [
