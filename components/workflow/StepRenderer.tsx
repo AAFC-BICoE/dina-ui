@@ -9,7 +9,7 @@ export interface StepRendererProps {
 }
 
 export function StepRenderer(props: StepRendererProps) {
-  switch (props.step.stepTemplate.inputs[0]) {
+  switch (props.step.stepTemplate.outputs[0]) {
     case "SAMPLE":
       return <SampleSelection {...props} />;
     default:

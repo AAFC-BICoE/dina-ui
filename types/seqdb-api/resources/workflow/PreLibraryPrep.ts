@@ -13,7 +13,7 @@ export interface PreLibraryPrepAttributes {
 
 export interface PreLibraryPrepRelationships {
   protocol?: Protocol;
-  produt?: Product;
+  product?: Product;
 }
 
 export type PreLibraryPrep = KitsuResource &
