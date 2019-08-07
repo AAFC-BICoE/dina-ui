@@ -7,19 +7,25 @@ interface CheckBoxFieldProps<TData extends KitsuResource> {
   resource: TData;
 }
 
-export function useGroupedCheckBoxes<TData extends KitsuResource>() {
+interface GroupedCheckBoxesParams {
+  fieldName: string;
+}
+
+export function useGroupedCheckBoxes<TData extends KitsuResource>({
+  fieldName
+}: GroupedCheckBoxesParams) {
   const [availableItems, setAvailableItems] = useState<TData[]>([]);
   const [lastCheckedItem, setLastCheckedItem] = useState<TData>();
 
   function CheckBoxField({ resource }: CheckBoxFieldProps<TData>) {
-    const fieldName = `checkedIds[${resource.id}]`;
+    const thisBoxFieldName = `${fieldName}[${resource.id}]`;
 
     return (
-      <Field name={fieldName}>
+      <Field name={thisBoxFieldName}>
         {({ field: { value }, form: { setFieldValue, setFieldTouched } }) => {
           function onCheckBoxClick(e) {
-            setFieldValue(fieldName, e.target.checked);
-            setFieldTouched(fieldName);
+            setFieldValue(thisBoxFieldName, e.target.checked);
+            setFieldTouched(thisBoxFieldName);
             setLastCheckedItem(resource);
 
             if (lastCheckedItem && e.shiftKey) {
@@ -38,7 +44,7 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>() {
               );
 
               for (const item of itemsToToggle) {
-                setFieldValue(`checkedIds[${item.id}]`, checked);
+                setFieldValue(`${fieldName}[${item.id}]`, checked);
               }
             }
             setLastCheckedItem(resource);

@@ -1,4 +1,4 @@
-import { connect, Form, Formik, FormikActions } from "formik";
+import { Form, Formik, FormikActions } from "formik";
 import { FilterParam } from "kitsu";
 import { useState } from "react";
 import {
@@ -8,7 +8,7 @@ import {
   QueryTable
 } from "..";
 import { rsql } from "../../components/filter-builder/rsql";
-import { useGroupedCheckBoxes } from "../../components/formik-connected/CheckBoxField";
+import { useGroupedCheckBoxes } from "../../components/formik-connected/GroupedCheckBoxFields";
 import { StepRendererProps } from "../workflow/StepRenderer";
 import { useSelectionControls } from "./useSelectionControls";
 
@@ -27,7 +27,9 @@ export function SampleSelection({
     selectSamples
   } = useSelectionControls({ chain, chainStepTemplates, step });
 
-  const { CheckBoxField, setAvailableItems } = useGroupedCheckBoxes();
+  const { CheckBoxField, setAvailableItems } = useGroupedCheckBoxes({
+    fieldName: "sampleIdsToSelect"
+  });
 
   const SELECTED_SAMPLE_COLUMNS: Array<ColumnDefinition<any>> = [
     {
@@ -94,7 +96,7 @@ export function SampleSelection({
         </Form>
       </Formik>
       <div className="row form-group">
-        <Formik initialValues={{ checkedIds: {} }} onSubmit={null}>
+        <Formik initialValues={{ sampleIdsToSelect: {} }} onSubmit={null}>
           {formikProps => (
             <>
               <div className="col-5">

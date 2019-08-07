@@ -46,8 +46,8 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
   }
 
   async function selectAllCheckedSamples(formikProps: FormikProps<any>) {
-    const { checkedIds } = formikProps.values;
-    const ids = toPairs(checkedIds)
+    const { sampleIdsToSelect } = formikProps.values;
+    const ids = toPairs(sampleIdsToSelect)
       .filter(pair => pair[1])
       .map(pair => pair[0]);
 
@@ -59,7 +59,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
     await selectSamples(samples);
 
     for (const id of ids) {
-      formikProps.setFieldValue(`checkedIds[${id}]`, false);
+      formikProps.setFieldValue(`sampleIdsToSelect[${id}]`, false);
     }
   }
 

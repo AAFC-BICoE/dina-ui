@@ -19,7 +19,7 @@ import {
   StepResource
 } from "../../types/seqdb-api";
 import { rsql } from "../filter-builder/rsql";
-import { useGroupedCheckBoxes } from "../formik-connected/CheckBoxField";
+import { useGroupedCheckBoxes } from "../formik-connected/GroupedCheckBoxFields";
 import { StepRendererProps } from "./StepRenderer";
 
 export function PreLibraryPrepStep({
@@ -36,7 +36,9 @@ export function PreLibraryPrepStep({
   const [randomNumber, setRandomNumber] = useState(Math.random());
   const [rsqlFilter, setRsqlFilter] = useState<string>("");
 
-  const { CheckBoxField, setAvailableItems } = useGroupedCheckBoxes<Sample>();
+  const { CheckBoxField, setAvailableItems } = useGroupedCheckBoxes<Sample>({
+    fieldName: "checkedIds"
+  });
 
   const visibleSampleIds = visibleSamples.length
     ? visibleSamples.map(sr => sr.sample.id).join(",")
@@ -59,7 +61,10 @@ export function PreLibraryPrepStep({
     setSubmitting(false);
   }
 
-  async function plpFormSubmit(values, { setSubmitting }: FormikActions<any>) {
+  async function plpFormSubmit(
+    values,
+    { setFieldValue, setSubmitting }: FormikActions<any>
+  ) {
     const { checkedIds, ...plpValues } = values;
 
     const selectedSampleIds = toPairs(checkedIds)
@@ -99,6 +104,10 @@ export function PreLibraryPrepStep({
       );
 
       setRandomNumber(Math.random());
+
+      for (const id of selectedSampleIds) {
+        setFieldValue(`checkedIds[${id}]`, false);
+      }
     } catch (err) {
       alert(err);
     }
