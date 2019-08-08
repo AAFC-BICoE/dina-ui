@@ -8,6 +8,7 @@ import {
   Sample,
   StepResource
 } from "../../types/seqdb-api";
+import { HttpMethod } from "../api-client/jsonapi-types";
 import { StepRendererProps } from "../workflow/StepRenderer";
 
 export function useSelectionControls({ chain, step }: StepRendererProps) {
@@ -51,7 +52,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
       .filter(pair => pair[1])
       .map(pair => pair[0]);
 
-    const samples: Sample[] = ids.map(id => ({
+    const samples = ids.map(id => ({
       id,
       type: "sample"
     })) as Sample[];
@@ -63,19 +64,19 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
     }
   }
 
-  async function removeSample(stepResource: StepResource) {
+  async function deleteStepResources(stepResources: StepResource[]) {
     try {
       setLoading(true);
-      await doOperations([
-        {
-          op: "DELETE",
-          path: `stepResource/${stepResource.id}`,
-          value: {
-            id: stepResource.id,
-            type: "stepResource"
-          }
+      const operations = stepResources.map(sr => ({
+        op: "DELETE" as HttpMethod,
+        path: `stepResource/${sr.id}`,
+        value: {
+          id: sr.id,
+          type: "stepResource"
         }
-      ]);
+      }));
+
+      await doOperations(operations);
 
       setRandomNumber(Math.random());
     } catch (err) {
@@ -84,10 +85,35 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
     setLoading(false);
   }
 
+  async function deleteAllCheckedStepResources(formikProps: FormikProps<any>) {
+    try {
+      const { stepResourceIdsToDelete } = formikProps.values;
+
+      const ids = toPairs(stepResourceIdsToDelete)
+        .filter(pair => pair[1])
+        .map(pair => pair[0]);
+
+      const stepResources = ids.map(id => ({
+        id,
+        type: "stepResource"
+      })) as StepResource[];
+
+      await deleteStepResources(stepResources);
+
+      for (const id of ids) {
+        formikProps.setFieldValue(`stepResourceIdsToDelete[${id}]`, false);
+      }
+    } catch (err) {
+      alert(err);
+    }
+    setLoading(false);
+  }
+
   return {
+    deleteAllCheckedStepResources,
+    deleteStepResources,
     loading,
     randomNumber,
-    removeSample,
     selectAllCheckedSamples,
     selectSamples
   };

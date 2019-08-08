@@ -1,4 +1,4 @@
-import { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
+import { FieldsParam, FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import React, { useRef, useState } from "react";
 import ReactTable, {
   Column,
@@ -19,6 +19,9 @@ export type ColumnDefinition<TData> = string | Column<TData>;
 export interface QueryTableProps<TData extends KitsuResource> {
   /** JSONAPI resource path. */
   path: string;
+
+  /** JSONAPI fields param. */
+  fields?: FieldsParam;
 
   /** JSONAPI filter spec. */
   filter?: FilterParam;
@@ -73,6 +76,7 @@ export function QueryTable<TData extends KitsuResource>({
   columns,
   defaultPageSize = DEFAULT_PAGE_SIZE,
   defaultSort = [],
+  fields,
   filter,
   include,
   onPageSizeChange,
@@ -118,7 +122,7 @@ export function QueryTable<TData extends KitsuResource>({
     sortingRules.map(({ desc, id }) => `${desc ? "-" : ""}${id}`).join() ||
     undefined;
 
-  const query: JsonApiQuerySpec = { path, filter, include, page, sort };
+  const query: JsonApiQuerySpec = { path, fields, filter, include, page, sort };
 
   const mappedColumns = columns.map<Column>(column => {
     // The "columns" prop can be a string or a react-table Column type.

@@ -9,6 +9,7 @@ import {
 } from "..";
 import { rsql } from "../../components/filter-builder/rsql";
 import { useGroupedCheckBoxes } from "../../components/formik-connected/GroupedCheckBoxFields";
+import { StepResource } from "../../types/seqdb-api";
 import { StepRendererProps } from "../workflow/StepRenderer";
 import { useSelectionControls } from "./useSelectionControls";
 
@@ -20,16 +21,52 @@ export function SampleSelection({
   const [filter, setFilter] = useState<FilterParam>();
 
   const {
+    deleteAllCheckedStepResources,
     loading,
     randomNumber,
-    removeSample,
+    deleteStepResources,
     selectAllCheckedSamples,
     selectSamples
   } = useSelectionControls({ chain, chainStepTemplates, step });
 
-  const { CheckBoxField, setAvailableItems } = useGroupedCheckBoxes({
+  const {
+    CheckBoxField: SampleSelectCheckBox,
+    setAvailableItems: setAvailableSamples
+  } = useGroupedCheckBoxes({
     fieldName: "sampleIdsToSelect"
   });
+
+  const {
+    CheckBoxField: SampleDeselectCheckBox,
+    setAvailableItems: setStepResources
+  } = useGroupedCheckBoxes({
+    fieldName: "stepResourceIdsToDelete"
+  });
+
+  const SELECTABLE_SAMPLE_COLUMNS: Array<ColumnDefinition<any>> = [
+    {
+      Header: "Group",
+      accessor: "group.groupName"
+    },
+    "name",
+    "version",
+    {
+      Cell: ({ original: sample }) => (
+        <div className="row" key={sample.id}>
+          <button
+            className="btn btn-primary btn-sm col-6"
+            onClick={() => selectSamples([sample])}
+          >
+            Select
+          </button>
+          <div className="col-6">
+            <SampleSelectCheckBox resource={sample} />
+          </div>
+        </div>
+      ),
+      sortable: false
+    }
+  ];
 
   const SELECTED_SAMPLE_COLUMNS: Array<ColumnDefinition<any>> = [
     {
@@ -45,36 +82,19 @@ export function SampleSelection({
       accessor: "sample.version"
     },
     {
-      Cell: ({ original }) => (
-        <button className="btn btn-dark" onClick={() => removeSample(original)}>
-          Remove
-        </button>
-      )
-    }
-  ];
-
-  const SELECTABLE_SAMPLE_COLUMNS: Array<ColumnDefinition<any>> = [
-    {
-      Header: "Group Name",
-      accessor: "group.groupName"
-    },
-    "name",
-    "version",
-    {
-      Cell: ({ original: sample }) => (
-        <div className="row" key={sample.id}>
+      Cell: ({ original: sr }) => (
+        <div className="row" key={sr.id}>
           <button
-            className="btn btn-primary btn-sm col-6"
-            onClick={() => selectSamples([sample])}
+            className="btn btn-dark btn-sm col-6"
+            onClick={() => deleteStepResources([sr])}
           >
-            -->
+            Remove
           </button>
           <div className="col-6">
-            <CheckBoxField resource={sample} />
+            <SampleDeselectCheckBox resource={sr} />
           </div>
         </div>
-      ),
-      sortable: false
+      )
     }
   ];
 
@@ -96,7 +116,10 @@ export function SampleSelection({
         </Form>
       </Formik>
       <div className="row form-group">
-        <Formik initialValues={{ sampleIdsToSelect: {} }} onSubmit={null}>
+        <Formik
+          initialValues={{ sampleIdsToSelect: {}, stepResourcesToDelete: {} }}
+          onSubmit={null}
+        >
           {formikProps => (
             <>
               <div className="col-5">
@@ -105,7 +128,7 @@ export function SampleSelection({
                   columns={SELECTABLE_SAMPLE_COLUMNS}
                   filter={filter}
                   include="group"
-                  onSuccess={response => setAvailableItems(response.data)}
+                  onSuccess={response => setAvailableSamples(response.data)}
                   path="sample"
                 />
               </div>
@@ -113,30 +136,45 @@ export function SampleSelection({
                 {loading ? (
                   <LoadingSpinner loading={loading} />
                 ) : (
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => selectAllCheckedSamples(formikProps)}
-                  >
-                    Select all checked samples -->
-                  </button>
+                  <div className="row">
+                    <div className="col-6">
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => selectAllCheckedSamples(formikProps)}
+                      >
+                        Select all checked samples -->
+                      </button>
+                    </div>
+                    <div className="col-6">
+                      <button
+                        className="btn btn-dark"
+                        onClick={() =>
+                          deleteAllCheckedStepResources(formikProps)
+                        }
+                      >
+                        {"<--"} Deselect all checked samples
+                      </button>
+                    </div>
+                  </div>
                 )}
+              </div>
+              <div className="col-5">
+                <strong>Selected Samples</strong>
+                <QueryTable<StepResource>
+                  columns={SELECTED_SAMPLE_COLUMNS}
+                  filter={{
+                    "chain.chainId": chain.id,
+                    "chainStepTemplate.chainStepTemplateId": step.id,
+                    rsql: `sample.name!=${randomNumber}`
+                  }}
+                  include="sample,sample.group"
+                  onSuccess={res => setStepResources(res.data)}
+                  path="stepResource"
+                />
               </div>
             </>
           )}
         </Formik>
-        <div className="col-5">
-          <strong>Selected Samples</strong>
-          <QueryTable
-            columns={SELECTED_SAMPLE_COLUMNS}
-            filter={{
-              "chain.chainId": chain.id,
-              "chainStepTemplate.chainStepTemplateId": step.id,
-              rsql: `sample.name!=${randomNumber}`
-            }}
-            include="sample,sample.group"
-            path="stepResource"
-          />
-        </div>
       </div>
     </>
   );

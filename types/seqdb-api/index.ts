@@ -10,5 +10,6 @@ export * from "./resources/Sample";
 export * from "./resources/workflow/Chain";
 export * from "./resources/workflow/ChainStepTemplate";
 export * from "./resources/workflow/ChainTemplate";
+export * from "./resources/workflow/PreLibraryPrep";
 export * from "./resources/workflow/StepResource";
 export * from "./resources/workflow/StepTemplate";

@@ -1,4 +1,4 @@
-import { Form, Formik, FormikActions } from "formik";
+import { connect, Form, Formik, FormikActions } from "formik";
 import { useState } from "react";
 import {
   ColumnDefinition,
@@ -8,7 +8,7 @@ import {
   SubmitButton,
   TextField
 } from "..";
-import { Sample, StepResource } from "../../types/seqdb-api";
+import { PreLibraryPrep, Sample, StepResource } from "../../types/seqdb-api";
 import { rsql } from "../filter-builder/rsql";
 import { useGroupedCheckBoxes } from "../formik-connected/GroupedCheckBoxFields";
 import { StepRendererProps } from "./StepRenderer";
@@ -131,20 +131,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
             </div>
             <div className="col-6">
               <strong>Add New Shearing/Size Selection Details</strong>
-              <div className="card card-body">
-                <div className="row">
-                  <SelectField
-                    className="col-6"
-                    options={PREP_TYPE_OPTIONS}
-                    name="preLibraryPrepType"
-                  />
-                  <TextField className="col-6" name="inputAmount" />
-                  <TextField className="col-6" name="concentration" />
-                </div>
-                <div>
-                  <SubmitButton />
-                </div>
-              </div>
+              <PreLibraryPrepForm />
             </div>
           </div>
         </Form>
@@ -152,6 +139,29 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
     </>
   );
 }
+
+const PreLibraryPrepForm = connect<{}, PreLibraryPrep>(() => {
+  return (
+    <div className="card card-body">
+      <div className="row">
+        <SelectField
+          className="col-6"
+          options={PREP_TYPE_OPTIONS}
+          name="preLibraryPrepType"
+        />
+        <TextField className="col-6" name="inputAmount" />
+        <TextField className="col-6" name="concentration" />
+        <TextField className="col-6" name="targetDpSize" />
+        <TextField className="col-6" name="averageFragmentSize" />
+        <TextField className="col-6" name="quality" />
+        <TextField className="col-6" name="notes" />
+      </div>
+      <div>
+        <SubmitButton />
+      </div>
+    </div>
+  );
+});
 
 const PREP_TYPE_OPTIONS = [
   {
