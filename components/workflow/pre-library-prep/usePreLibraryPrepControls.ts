@@ -2,9 +2,13 @@ import { FormikActions } from "formik";
 import { toPairs } from "lodash";
 import { useContext, useState } from "react";
 import { PreLibraryPrep } from "types/seqdb-api/resources/workflow/PreLibraryPrep";
-import { ApiClientContext, useQuery } from "..";
-import { Chain, ChainStepTemplate, StepResource } from "../../types/seqdb-api";
-import { StepRendererProps } from "./StepRenderer";
+import { ApiClientContext, useQuery } from "../..";
+import {
+  Chain,
+  ChainStepTemplate,
+  StepResource
+} from "../../../types/seqdb-api";
+import { StepRendererProps } from "../StepRenderer";
 
 export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
   const { save } = useContext(ApiClientContext);

@@ -1,6 +1,6 @@
 import { Chain, ChainStepTemplate } from "../../types/seqdb-api";
-import { SampleSelection } from "../selection/SampleSelection";
-import { PreLibraryPrepStep } from "./PreLibraryPrepStep";
+import { PreLibraryPrepStep } from "./pre-library-prep/PreLibraryPrepStep";
+import { SampleSelection } from "./sample-selection/SampleSelection";
 
 export interface StepRendererProps {
   chainStepTemplates: ChainStepTemplate[];

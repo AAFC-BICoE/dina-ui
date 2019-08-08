@@ -1,15 +1,15 @@
 import { FormikProps } from "formik";
 import { toPairs } from "lodash";
 import { useContext, useState } from "react";
-import { ApiClientContext } from "..";
+import { ApiClientContext } from "../..";
 import {
   Chain,
   ChainStepTemplate,
   Sample,
   StepResource
-} from "../../types/seqdb-api";
-import { HttpMethod } from "../api-client/jsonapi-types";
-import { StepRendererProps } from "../workflow/StepRenderer";
+} from "../../../types/seqdb-api";
+import { HttpMethod } from "../../api-client/jsonapi-types";
+import { StepRendererProps } from "../StepRenderer";
 
 export function useSelectionControls({ chain, step }: StepRendererProps) {
   const { doOperations, save } = useContext(ApiClientContext);
