@@ -131,6 +131,8 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
             </div>
             <div className="col-6">
               <strong>Add New Shearing/Size Selection Details</strong>
+              {/* Spacer div to align the table with the form. */}
+              <div style={{ height: "22px" }} />
               <PreLibraryPrepForm />
             </div>
           </div>
