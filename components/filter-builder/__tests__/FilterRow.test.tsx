@@ -1,6 +1,7 @@
 import { mount } from "enzyme";
 import Select from "react-select/lib/Select";
-import { FilterRow } from "../FilterRow";
+import { FilterAttribute } from "../FilterBuilder";
+import { FilterRow, FilterRowProps } from "../FilterRow";
 
 describe("FilterRow component", () => {
   const mockOnChange = jest.fn();
@@ -12,7 +13,7 @@ describe("FilterRow component", () => {
     jest.clearAllMocks();
   });
 
-  function mountFilterRow() {
+  function mountFilterRow(propsOverride: Partial<FilterRowProps> = {}) {
     return mount<FilterRow>(
       <FilterRow
         filterAttributes={["name", "description"]}
@@ -29,6 +30,7 @@ describe("FilterRow component", () => {
         onRemoveClick={mockOnDeleteClick}
         onOrClick={mockOnOrClick}
         showRemoveButton={true}
+        {...propsOverride}
       />
     );
   }
@@ -69,7 +71,7 @@ describe("FilterRow component", () => {
       .find(".filter-attribute")
       .find(Select)
       .props()
-      .onChange({ value: "description" });
+      .onChange({ value: "description" }, null);
 
     expect(model.attribute).toEqual("description");
   });
@@ -82,7 +84,7 @@ describe("FilterRow component", () => {
       .find(".filter-predicate")
       .find(Select)
       .props()
-      .onChange({ value: "IS NOT" });
+      .onChange({ value: "IS NOT" }, null);
 
     expect(model.predicate).toEqual("IS NOT");
   });
@@ -108,7 +110,7 @@ describe("FilterRow component", () => {
       .find(".filter-search-type")
       .find(Select)
       .props()
-      .onChange({ value: "EXACT_MATCH" });
+      .onChange({ value: "EXACT_MATCH" }, null);
 
     expect(model.searchType).toEqual("EXACT_MATCH");
   });
@@ -135,7 +137,7 @@ describe("FilterRow component", () => {
       .find(".filter-attribute")
       .find(Select)
       .props()
-      .onChange({ value: "description" });
+      .onChange({ value: "description" }, null);
     expect(mockOnChange).toHaveBeenCalledTimes(1);
 
     // Change the filter predicate (IS / IS NOT).
@@ -143,7 +145,7 @@ describe("FilterRow component", () => {
       .find(".filter-predicate")
       .find(Select)
       .props()
-      .onChange({ value: "IS NOT" });
+      .onChange({ value: "IS NOT" }, null);
     expect(mockOnChange).toHaveBeenCalledTimes(2);
 
     // Change the filter value.
@@ -156,7 +158,7 @@ describe("FilterRow component", () => {
       .find(".filter-search-type")
       .find(Select)
       .props()
-      .onChange({ value: "EXACT_MATCH" });
+      .onChange({ value: "EXACT_MATCH" }, null);
     expect(mockOnChange).toHaveBeenCalledTimes(4);
   });
 
@@ -173,12 +175,69 @@ describe("FilterRow component", () => {
       .find(".filter-search-type")
       .find(Select)
       .props()
-      .onChange({ value: "BLANK_FIELD" });
+      .onChange({ value: "BLANK_FIELD" }, null);
     wrapper.update();
 
     // The input should now be hidden.
     expect(wrapper.find("input.filter-value").prop("style")).toEqual({
       visibility: "hidden"
+    });
+  });
+
+  it("Can show a custom filter attribute label.", () => {
+    const attributeObject: FilterAttribute = {
+      allowRange: true,
+      label: "Specimen Number",
+      name: "specimenReplicate.specimen.number"
+    };
+
+    const wrapper = mountFilterRow({
+      model: {
+        attribute: attributeObject,
+        id: 1,
+        predicate: "IS",
+        searchType: "PARTIAL_MATCH",
+        type: "FILTER_ROW",
+        value: ""
+      }
+    });
+
+    expect(
+      wrapper
+        .find(".filter-attribute")
+        .find(Select)
+        .prop("value")
+    ).toEqual({
+      label: "Specimen Number",
+      value: attributeObject
+    });
+  });
+
+  it("Generated a title case label for a filter attribute object.", () => {
+    const attributeObject: FilterAttribute = {
+      allowRange: true,
+      name: "specimenReplicate.specimen.number"
+    };
+
+    const wrapper = mountFilterRow({
+      model: {
+        attribute: attributeObject,
+        id: 1,
+        predicate: "IS",
+        searchType: "PARTIAL_MATCH",
+        type: "FILTER_ROW",
+        value: ""
+      }
+    });
+
+    expect(
+      wrapper
+        .find(".filter-attribute")
+        .find(Select)
+        .prop("value")
+    ).toEqual({
+      label: "Specimen Replicate Specimen Number",
+      value: attributeObject
     });
   });
 });

@@ -133,4 +133,106 @@ describe("rsql conversion", () => {
     const rsqlFilter = rsql(model);
     expect(rsqlFilter).toEqual("description!=null;description!=''");
   });
+
+  it("Allows a list and range filter.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: {
+            allowRange: true,
+            label: "Number",
+            name: "number"
+          },
+          id: 1,
+          predicate: "IS",
+          searchType: "PARTIAL_MATCH",
+          type: "FILTER_ROW",
+          value: "10,30-50,90"
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const rsqlFilter = rsql(model);
+    expect(rsqlFilter).toEqual("number=in=(10,90),number=gt=30;number=lt=50");
+  });
+
+  it("Allows a NOT list and range filter.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: {
+            allowRange: true,
+            label: "Number",
+            name: "number"
+          },
+          id: 1,
+          predicate: "IS NOT",
+          searchType: "PARTIAL_MATCH",
+          type: "FILTER_ROW",
+          value: "10,30-50,90"
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const rsqlFilter = rsql(model);
+    expect(rsqlFilter).toEqual(
+      "number=out=(10,90);(number=lt=30,number=gt=50)"
+    );
+  });
+
+  it("Allows a list filter.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: {
+            allowRange: true,
+            label: "Number",
+            name: "number"
+          },
+          id: 1,
+          predicate: "IS",
+          searchType: "PARTIAL_MATCH",
+          type: "FILTER_ROW",
+          value: "10,60,90"
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const rsqlFilter = rsql(model);
+    expect(rsqlFilter).toEqual("number=in=(10,60,90)");
+  });
+
+  it("Allows a range filter.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: {
+            allowRange: true,
+            label: "Number",
+            name: "number"
+          },
+          id: 1,
+          predicate: "IS",
+          searchType: "PARTIAL_MATCH",
+          type: "FILTER_ROW",
+          value: "100-200"
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const rsqlFilter = rsql(model);
+    expect(rsqlFilter).toEqual("number=gt=100;number=lt=200");
+  });
 });

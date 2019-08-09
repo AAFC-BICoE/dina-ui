@@ -109,7 +109,17 @@ export function SampleSelection({
       <strong>Filter available samples:</strong>
       <Formik initialValues={{ filter: null }} onSubmit={onFilterSubmit}>
         <Form className="form-group">
-          <FilterBuilderField filterAttributes={["name"]} name="filter" />
+          <FilterBuilderField
+            filterAttributes={[
+              "name",
+              {
+                allowRange: true,
+                label: "Specimen Number List/Range",
+                name: "specimenReplicate.specimen.number"
+              }
+            ]}
+            name="filter"
+          />
           <button className="btn btn-primary" type="submit">
             Search
           </button>

@@ -7,8 +7,16 @@ import {
 } from "./FilterGroup";
 import { FilterRow, FilterRowModel } from "./FilterRow";
 
+export type FilterAttribute =
+  | string
+  | {
+      name: string;
+      label?: string;
+      allowRange?: boolean;
+    };
+
 export interface FilterBuilderProps {
-  filterAttributes: string[];
+  filterAttributes: FilterAttribute[];
   value?: FilterGroupModel;
   onChange?: (state: FilterGroupModel) => void;
 }

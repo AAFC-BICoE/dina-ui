@@ -42,6 +42,8 @@ function toGroup(filterGroup: FilterGroupModel) {
 function toPredicate(filterRow: FilterRowModel) {
   const { attribute, predicate, searchType, value } = filterRow;
 
+  const selector = typeof attribute === "string" ? attribute : attribute.name;
+
   if (searchType === "BLANK_FIELD") {
     const comparison = predicate === "IS" ? "==" : "!=";
     const operator = predicate === "IS" ? "OR" : "AND";
@@ -52,15 +54,57 @@ function toPredicate(filterRow: FilterRowModel) {
         {
           arguments: "null",
           comparison,
-          selector: attribute
+          selector
         },
         {
           arguments: "",
           comparison,
-          selector: attribute
+          selector
         }
       ],
       operator
+    };
+  }
+
+  // Allow list/range filters.
+  if (typeof attribute !== "string" && attribute.allowRange) {
+    const commaSplit = value.split(",");
+
+    const singleNumbers = commaSplit.filter(e => !e.includes("-"));
+    const ranges = commaSplit.filter(e => e.includes("-"));
+
+    const listOperands = singleNumbers.length
+      ? [
+          {
+            arguments: singleNumbers,
+            comparison: predicate === "IS NOT" ? "=out=" : "=in=",
+            selector
+          }
+        ]
+      : [];
+
+    const rangeOperands = ranges.map(range => {
+      const [low, high] = range.split("-");
+      return {
+        operands: [
+          {
+            arguments: low,
+            comparison: predicate === "IS NOT" ? "=lt=" : "=gt=",
+            selector
+          },
+          {
+            arguments: high,
+            comparison: predicate === "IS NOT" ? "=gt=" : "=lt=",
+            selector
+          }
+        ],
+        operator: predicate === "IS NOT" ? "OR" : "AND"
+      };
+    });
+
+    return {
+      operands: [...listOperands, ...rangeOperands],
+      operator: predicate === "IS NOT" ? "AND" : "OR"
     };
   }
 
@@ -70,6 +114,6 @@ function toPredicate(filterRow: FilterRowModel) {
   return {
     arguments: searchValue,
     comparison: predicate === "IS NOT" ? "!=" : "==",
-    selector: attribute
+    selector
   };
 }
