@@ -1,5 +1,6 @@
 import App, { Container } from "next/app";
 import React from "react";
+import "react-tabs/style/react-tabs.css";
 import { ApiClientContext, createContextValue } from "../components";
 
 /**

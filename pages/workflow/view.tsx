@@ -2,7 +2,6 @@ import { Formik } from "formik";
 import Link from "next/link";
 import { withRouter, WithRouterProps } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import "react-tabs/style/react-tabs.css";
 import { FieldView, Head, LoadingSpinner, Nav, Query } from "../../components";
 import { StepRenderer } from "../../components/workflow/StepRenderer";
 import { Chain } from "../../types/seqdb-api/resources/workflow/Chain";

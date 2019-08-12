@@ -52,12 +52,12 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
 
           return (
             <input
-              checked={value}
+              checked={value || false}
               onClick={onCheckBoxClick}
               onChange={noop}
               style={{ height: "20px", width: "20px" }}
               type="checkbox"
-              value={value}
+              value={value || false}
             />
           );
         }}
