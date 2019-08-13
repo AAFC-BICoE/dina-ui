@@ -110,7 +110,10 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
           </button>
         </Form>
       </Formik>
-      <Formik initialValues={{ checkedIds: {} }} onSubmit={plpFormSubmit}>
+      <Formik
+        initialValues={{ checkedIds: {}, preLibraryPrepType: "SHEARING" }}
+        onSubmit={plpFormSubmit}
+      >
         <Form>
           <div className="row form-group">
             <div className="col-6">
