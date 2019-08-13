@@ -87,8 +87,10 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
     },
     {
       Cell: ({ original: sr }) => (
-        <div key={sr.id}>
-          <CheckBoxField resource={sr.sample} />
+        <div style={{ textAlign: "center" }} key={sr.id}>
+          <div className="d-block">
+            <CheckBoxField resource={sr.sample} />
+          </div>
         </div>
       ),
       sortable: false
@@ -120,6 +122,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
               <strong>Selected Samples</strong>
               <QueryTable
                 columns={SAMPLE_STEP_RESOURCE_COLUMNS}
+                defaultPageSize={100}
                 filter={{
                   "chain.chainId": chain.id,
                   "chainStepTemplate.chainStepTemplateId": previousStep.id,

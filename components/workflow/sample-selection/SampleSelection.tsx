@@ -136,6 +136,7 @@ export function SampleSelection({
                 <strong>Available Samples</strong>
                 <QueryTable
                   columns={SELECTABLE_SAMPLE_COLUMNS}
+                  defaultPageSize={100}
                   filter={filter}
                   include="group"
                   onSuccess={response => setAvailableSamples(response.data)}
@@ -172,6 +173,7 @@ export function SampleSelection({
                 <strong>Selected Samples</strong>
                 <QueryTable<StepResource>
                   columns={SELECTED_SAMPLE_COLUMNS}
+                  defaultPageSize={100}
                   filter={{
                     "chain.chainId": chain.id,
                     "chainStepTemplate.chainStepTemplateId": step.id,
