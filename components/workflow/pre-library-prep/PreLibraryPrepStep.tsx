@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
   ColumnDefinition,
   FilterBuilderField,
+  NumberField,
   QueryTable,
   SelectField,
   SubmitButton,
@@ -151,10 +152,10 @@ const PreLibraryPrepForm = connect<{}, PreLibraryPrep>(() => {
           options={PREP_TYPE_OPTIONS}
           name="preLibraryPrepType"
         />
-        <TextField className="col-6" name="inputAmount" />
-        <TextField className="col-6" name="concentration" />
-        <TextField className="col-6" name="targetDpSize" />
-        <TextField className="col-6" name="averageFragmentSize" />
+        <NumberField className="col-6" name="inputAmount" />
+        <NumberField className="col-6" name="concentration" />
+        <NumberField className="col-6" name="targetDpSize" />
+        <NumberField className="col-6" name="averageFragmentSize" />
         <TextField className="col-6" name="quality" />
         <TextField className="col-6" name="notes" />
       </div>

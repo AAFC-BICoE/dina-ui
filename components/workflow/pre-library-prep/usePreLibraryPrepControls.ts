@@ -31,6 +31,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       rsql: `sample.sampleId=in=(${visibleSampleIds}) and sample.name!=${randomNumber}`
     },
     include: "sample,preLibraryPrep",
+    page: { limit: 1000 }, // Maximum page limit. There should only be 1 or 2 prelibrarypreps per sample.
     path: "stepResource"
   });
 

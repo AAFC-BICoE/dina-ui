@@ -7,6 +7,7 @@ export * from "./filter-builder/FilterGroup";
 export * from "./formik-connected/ErrorViewer";
 export * from "./formik-connected/DateField";
 export * from "./formik-connected/FieldView";
+export * from "./formik-connected/NumberField";
 export * from "./formik-connected/ResourceSelectField";
 export * from "./formik-connected/SelectField";
 export * from "./formik-connected/SubmitButton";
