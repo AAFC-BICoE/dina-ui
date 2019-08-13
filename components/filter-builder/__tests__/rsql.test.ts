@@ -235,4 +235,29 @@ describe("rsql conversion", () => {
     const rsqlFilter = rsql(model);
     expect(rsqlFilter).toEqual("number=gt=100;number=lt=200");
   });
+
+  it("Allows a range filter written backwards.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: {
+            allowRange: true,
+            label: "Number",
+            name: "number"
+          },
+          id: 1,
+          predicate: "IS",
+          searchType: "PARTIAL_MATCH",
+          type: "FILTER_ROW",
+          value: "200-100"
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const rsqlFilter = rsql(model);
+    expect(rsqlFilter).toEqual("number=gt=100;number=lt=200");
+  });
 });

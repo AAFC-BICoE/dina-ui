@@ -84,7 +84,10 @@ function toPredicate(filterRow: FilterRowModel) {
       : [];
 
     const rangeOperands = ranges.map(range => {
-      const [low, high] = range.split("-");
+      const [low, high] = range
+        .split("-")
+        .sort((a, b) => Number(a) - Number(b));
+
       return {
         operands: [
           {

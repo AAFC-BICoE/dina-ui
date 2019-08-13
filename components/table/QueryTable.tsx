@@ -136,7 +136,7 @@ export function QueryTable<TData extends KitsuResource>({
     }
   });
 
-  const { loading, response } = useQuery<TData[], MetaWithTotal>(query, {
+  const { error, loading, response } = useQuery<TData[], MetaWithTotal>(query, {
     onSuccess
   });
 
@@ -150,6 +150,15 @@ export function QueryTable<TData extends KitsuResource>({
   return (
     <div className="query-table-wrapper" ref={divWrapperRef}>
       <style>{queryTableStyle}</style>
+      {error && (
+        <div
+          className="alert alert-danger"
+          style={{ position: "absolute", zIndex: 1 }}
+        >
+          <p>Error:</p>
+          <p>{error.errors.map(e => e.detail).join("\n")}</p>
+        </div>
+      )}
       <span>Total matched records: {totalCount}</span>
       <ReactTable
         className="-striped"
