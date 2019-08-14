@@ -14,7 +14,10 @@ export function NumberField(props: LabelWrapperParams) {
           form: { setFieldValue, setFieldTouched }
         }: FieldProps) => {
           function onValueChange({ floatValue }) {
-            setFieldValue(name, floatValue);
+            setFieldValue(
+              name,
+              typeof floatValue === "number" ? floatValue : null
+            );
             setFieldTouched(name);
           }
 

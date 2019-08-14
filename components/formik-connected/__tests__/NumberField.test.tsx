@@ -41,4 +41,20 @@ describe("NumberField component", () => {
       expect.anything()
     );
   });
+
+  it("Sets the field value as null if the input is blank.", async () => {
+    const wrapper = getWrapper({ initialValues: { testField: 123.23 } });
+
+    // Change the value to undefined.
+    wrapper.find(NumberFormat).prop<any>("onValueChange")({
+      floatValue: undefined
+    });
+
+    // Submit the form.
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+
+    // Expect the correct value to have been submitted.
+    expect(mockOnSubmit).lastCalledWith({ testField: null }, expect.anything());
+  });
 });
