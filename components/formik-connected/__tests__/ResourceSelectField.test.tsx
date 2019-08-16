@@ -114,9 +114,37 @@ describe("ResourceSelectField component", () => {
     const groupToSelect = options[0];
 
     // Simulate selecting a new option.
-    onChange(groupToSelect);
+    onChange(groupToSelect, null);
 
     // The new selected group's name should be rendered into the value-display div.
     expect(wrapper.find("#value-display").text()).toEqual("Mat's Group");
+  });
+
+  it("Provides an onChange callback prop.", () => {
+    const mockOnChange = jest.fn();
+
+    const wrapper = mountWithContext(
+      <Formik
+        initialValues={{ group: { id: 3, groupName: "Mat's Group" } }}
+        onSubmit={null}
+      >
+        <ResourceSelectField<Group>
+          name="group"
+          model="group"
+          filter={groupName => ({ groupName })}
+          optionLabel={group => group.groupName}
+          onChange={mockOnChange}
+        />
+      </Formik>
+    );
+
+    // Change the value.
+    wrapper.find(Select).prop("onChange")({ value: MOCK_GROUPS.data[1] }, null);
+
+    expect(mockOnChange).lastCalledWith({
+      groupName: "Group 2",
+      id: 2,
+      type: "group"
+    });
   });
 });

@@ -5,9 +5,11 @@ import {
   ColumnDefinition,
   FilterBuilderField,
   LoadingSpinner,
-  QueryTable
+  QueryTable,
+  ResourceSelectField
 } from "../..";
-import { StepResource } from "../../../types/seqdb-api";
+import { Group, StepResource } from "../../../types/seqdb-api";
+import { filterBy } from "../../../util/rsql";
 import { rsql } from "../../filter-builder/rsql";
 import { useGroupedCheckBoxes } from "../../formik-connected/GroupedCheckBoxFields";
 import { StepRendererProps } from "../StepRenderer";
@@ -42,6 +44,15 @@ export function SampleSelection({
   } = useGroupedCheckBoxes({
     fieldName: "stepResourceIdsToDelete"
   });
+
+  const SAMPLE_FILTER_ATTRIBUTES = [
+    "name",
+    {
+      allowRange: true,
+      label: "Specimen Number List/Range",
+      name: "specimenReplicate.specimen.number"
+    }
+  ];
 
   const SELECTABLE_SAMPLE_COLUMNS: Array<ColumnDefinition<any>> = [
     {
@@ -99,7 +110,15 @@ export function SampleSelection({
   ];
 
   function onFilterSubmit(values, { setSubmitting }: FormikActions<any>) {
-    setFilter({ rsql: rsql(values.filter) });
+    const filterParam: FilterParam = {
+      rsql: rsql(values.filter)
+    };
+
+    if (values.group && values.group.id) {
+      filterParam["group.groupId"] = values.group.id;
+    }
+
+    setFilter(filterParam);
     setSubmitting(false);
   }
 
@@ -108,22 +127,31 @@ export function SampleSelection({
       <h2>Sample Selection</h2>
       <strong>Filter available samples:</strong>
       <Formik initialValues={{ filter: null }} onSubmit={onFilterSubmit}>
-        <Form className="form-group">
-          <FilterBuilderField
-            filterAttributes={[
-              "name",
-              {
-                allowRange: true,
-                label: "Specimen Number List/Range",
-                name: "specimenReplicate.specimen.number"
-              }
-            ]}
-            name="filter"
-          />
-          <button className="btn btn-primary" type="submit">
-            Search
-          </button>
-        </Form>
+        {({ submitForm }) => (
+          <Form>
+            <div className="form-group">
+              <FilterBuilderField
+                filterAttributes={SAMPLE_FILTER_ATTRIBUTES}
+                name="filter"
+              />
+            </div>
+            <div className="form-group">
+              <div style={{ width: "300px" }}>
+                <ResourceSelectField<Group>
+                  filter={filterBy(["groupName"])}
+                  label="Filter by group"
+                  name="group"
+                  model="group"
+                  onChange={() => setImmediate(submitForm)}
+                  optionLabel={group => group.groupName}
+                />
+              </div>
+            </div>
+            <button className="btn btn-primary" type="submit">
+              Search
+            </button>
+          </Form>
+        )}
       </Formik>
       <div className="row form-group">
         <Formik
