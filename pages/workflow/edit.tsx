@@ -14,7 +14,6 @@ import {
 } from "../../components";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { filterBy } from "../../util/rsql";
-import { serialize } from "../../util/serialize";
 
 interface ChainFormProps {
   chain?: any;
