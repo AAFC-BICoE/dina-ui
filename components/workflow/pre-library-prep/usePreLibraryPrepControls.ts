@@ -41,6 +41,13 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
   ) {
     const { checkedIds, ...plpValues } = values;
 
+    if (plpValues.protocol) {
+      plpValues.protocol.type = "protocol";
+    }
+    if (plpValues.product) {
+      plpValues.product.type = "product";
+    }
+
     const selectedSampleIds = toPairs(checkedIds)
       .filter(pair => pair[1])
       .map(pair => pair[0]);

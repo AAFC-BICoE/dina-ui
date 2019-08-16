@@ -1,25 +1,33 @@
 import { Field, FieldProps } from "formik";
+import { noop } from "lodash";
 import Select from "react-select";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface SelectFieldProps extends LabelWrapperParams {
+  onChange?: (value?: string) => void;
   options: any[];
   tooltipMsg?: string;
 }
 
 /** Formik-connected select input. */
-export function SelectField(props: SelectFieldProps) {
-  const { className, name, label, options, tooltipMsg } = props;
-
+export function SelectField({
+  className,
+  name,
+  label,
+  onChange = noop,
+  options,
+  tooltipMsg
+}: SelectFieldProps) {
   return (
     <Field name={name}>
       {({
         field: { value },
         form: { setFieldValue, setFieldTouched }
       }: FieldProps) => {
-        function onChange({ value: selectValue }) {
+        function onChangeInternal({ value: selectValue }) {
           setFieldValue(name, selectValue);
           setFieldTouched(name);
+          onChange(selectValue);
         }
 
         return (
@@ -31,7 +39,7 @@ export function SelectField(props: SelectFieldProps) {
           >
             <Select
               options={options}
-              onChange={onChange}
+              onChange={onChangeInternal}
               value={options.find(option => option.value === value)}
             />
           </FieldWrapper>

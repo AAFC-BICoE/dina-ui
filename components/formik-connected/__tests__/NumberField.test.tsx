@@ -1,5 +1,5 @@
 import { mount } from "enzyme";
-import { Form, Formik } from "formik";
+import { Field, Form, Formik } from "formik";
 import NumberFormat from "react-number-format";
 import { NumberField } from "../NumberField";
 
@@ -56,5 +56,20 @@ describe("NumberField component", () => {
 
     // Expect the correct value to have been submitted.
     expect(mockOnSubmit).lastCalledWith({ testField: null }, expect.anything());
+  });
+
+  it("Shows a blank input when the formik value becomes undefined.", async () => {
+    const wrapper = getWrapper({ initialValues: { testField: 123.23 } });
+    expect(wrapper.find("input").prop("value")).toEqual("123.23");
+
+    // Change the value to undefined.
+    (wrapper.find(Formik).instance() as any).setFieldValue(
+      "testField",
+      undefined
+    );
+    wrapper.update();
+
+    // The input should become blank.
+    expect(wrapper.find("input").prop("value")).toEqual("");
   });
 });

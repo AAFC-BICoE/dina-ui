@@ -26,20 +26,31 @@ const PRIMER_TYPE_OPTIONS = [
   }
 ];
 
+function getWrapper(propsOverride = {}) {
+  return mount(
+    <Formik
+      initialValues={{
+        testField: "ITRU_PRIMER"
+      }}
+      onSubmit={null}
+    >
+      {({ values: { testField } }) => (
+        <Form>
+          <SelectField
+            name="testField"
+            options={PRIMER_TYPE_OPTIONS}
+            {...propsOverride}
+          />
+          <div id="value-display">{testField}</div>
+        </Form>
+      )}
+    </Formik>
+  );
+}
+
 describe("SelectField component", () => {
   it("Displays the Formik field's value.", () => {
-    const wrapper = mount(
-      <Formik
-        initialValues={{
-          testField: "ITRU_PRIMER"
-        }}
-        onSubmit={null}
-      >
-        <Form>
-          <SelectField name="testField" options={PRIMER_TYPE_OPTIONS} />
-        </Form>
-      </Formik>
-    );
+    const wrapper = getWrapper();
 
     const { value } = wrapper.find(Select).props();
 
@@ -51,31 +62,31 @@ describe("SelectField component", () => {
   });
 
   it("Changes the Formik field's value.", () => {
-    const wrapper = mount(
-      <Formik
-        initialValues={{
-          testField: "ITRU_PRIMER"
-        }}
-        onSubmit={null}
-      >
-        {({ values: { testField } }) => (
-          <Form>
-            <SelectField name="testField" options={PRIMER_TYPE_OPTIONS} />
-            <div id="value-display">{testField}</div>
-          </Form>
-        )}
-      </Formik>
-    );
+    const wrapper = getWrapper();
 
     const { onChange } = wrapper.find(Select).props();
 
     // Simulate changing the selected option.
-    onChange({
-      label: "Fusion Primer",
-      value: "FUSION_PRIMER"
-    });
+    onChange(
+      {
+        label: "Fusion Primer",
+        value: "FUSION_PRIMER"
+      },
+      null
+    );
 
     // The new value should be re-rendered into the value-display div.
     expect(wrapper.find("#value-display").text()).toEqual("FUSION_PRIMER");
+  });
+
+  it("Provides an onChange callback.", () => {
+    const mockOnChange = jest.fn();
+    const wrapper = getWrapper({ onChange: mockOnChange });
+
+    // Change the value.
+    wrapper.find(Select).prop("onChange")({ value: "newTestValue" }, null);
+
+    // The mock functino should have been called with the new value.
+    expect(mockOnChange).lastCalledWith("newTestValue");
   });
 });
