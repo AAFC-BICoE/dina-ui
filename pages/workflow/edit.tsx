@@ -57,7 +57,7 @@ export function ChainEditPage({ router }: WithRouterProps) {
 }
 
 function ChainForm({ chain, router }: ChainFormProps) {
-  const { doOperations } = useContext(ApiClientContext);
+  const { save } = useContext(ApiClientContext);
 
   const initialValues = chain || {};
 
@@ -67,29 +67,17 @@ function ChainForm({ chain, router }: ChainFormProps) {
   ) {
     try {
       // Current date as yyyy-mm-dd string.
-      const dateCreated = new Date().toISOString().split('T')[0];
+      const dateCreated = new Date().toISOString().split("T")[0];
       submittedValues.dateCreated = dateCreated;
 
-      const serialized = await serialize({
-        resource: submittedValues,
-        type: "chain"
-      });
-
-      const op = submittedValues.id ? "PATCH" : "POST";
-
-      if (op === "POST") {
-        serialized.id = -100;
-      }
-
-      const response = await doOperations([
+      const response = await save([
         {
-          op,
-          path: op === "PATCH" ? `chain/${chain.id}` : "chain",
-          value: serialized
+          resource: submittedValues,
+          type: "chain"
         }
       ]);
 
-      const newId = response[0].data.id;
+      const newId = response[0].id;
       router.push(`/workflow/view?id=${newId}`);
     } catch (error) {
       setStatus(error.message);

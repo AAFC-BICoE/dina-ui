@@ -1,15 +1,5 @@
-import { Form, Formik, FormikActions } from "formik";
-import { FilterParam } from "kitsu";
 import Link from "next/link";
-import { useState } from "react";
-import {
-  ColumnDefinition,
-  FilterBuilderField,
-  Head,
-  Nav,
-  QueryTable
-} from "../../components";
-import { rsql } from "../../components/filter-builder/rsql";
+import { ColumnDefinition, Head, ListPageLayout, Nav } from "../../components";
 
 const WORKFLOW_TABLE_COLUMNS: Array<ColumnDefinition<any>> = [
   {
@@ -23,7 +13,10 @@ const WORKFLOW_TABLE_COLUMNS: Array<ColumnDefinition<any>> = [
   },
   "dateCreated",
   "chainTemplate.name",
-  "group.groupName"
+  {
+    Header: "Group",
+    accessor: "group.groupName"
+  }
 ];
 
 const WORKFLOW_FILTER_ATTRIBUTES = [
@@ -33,15 +26,8 @@ const WORKFLOW_FILTER_ATTRIBUTES = [
 ];
 
 export default function WorkflowListPage() {
-  const [filter, setFilter] = useState<FilterParam>();
-
-  function onSubmit(values, { setSubmitting }: FormikActions<any>) {
-    setFilter({ rsql: rsql(values.filter) });
-    setSubmitting(false);
-  }
-
   return (
-    <div>
+    <>
       <Head title="Workflows" />
       <Nav />
       <div className="container-fluid">
@@ -49,25 +35,15 @@ export default function WorkflowListPage() {
         <Link href="/workflow/edit" prefetch={true}>
           <a>Add New Workflow</a>
         </Link>
-        <Formik initialValues={{ filter: null }} onSubmit={onSubmit}>
-          <Form>
-            <strong>Filter records:</strong>
-            <FilterBuilderField
-              filterAttributes={WORKFLOW_FILTER_ATTRIBUTES}
-              name="filter"
-            />
-            <button className="btn btn-primary" type="submit">
-              Search
-            </button>
-          </Form>
-        </Formik>
-        <QueryTable
-          columns={WORKFLOW_TABLE_COLUMNS}
-          filter={filter}
-          include="chainTemplate,group"
-          path="chain"
+        <ListPageLayout
+          filterAttributes={WORKFLOW_FILTER_ATTRIBUTES}
+          queryTableProps={{
+            columns: WORKFLOW_TABLE_COLUMNS,
+            include: "chainTemplate,group",
+            path: "chain"
+          }}
         />
       </div>
-    </div>
+    </>
   );
 }
