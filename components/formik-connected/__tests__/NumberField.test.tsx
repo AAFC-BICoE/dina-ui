@@ -1,5 +1,5 @@
 import { mount } from "enzyme";
-import { Field, Form, Formik } from "formik";
+import { Form, Formik } from "formik";
 import NumberFormat from "react-number-format";
 import { NumberField } from "../NumberField";
 

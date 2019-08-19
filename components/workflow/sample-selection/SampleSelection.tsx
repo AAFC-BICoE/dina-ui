@@ -110,13 +110,21 @@ export function SampleSelection({
   ];
 
   function onFilterSubmit(values, { setSubmitting }: FormikActions<any>) {
-    const filterParam: FilterParam = {
-      rsql: rsql(values.filter)
-    };
+    const rsqlFilters = [];
 
-    if (values.group && values.group.id) {
-      filterParam["group.groupId"] = values.group.id;
+    const filterBuilderRsql = rsql(values.filter);
+    if (filterBuilderRsql) {
+      rsqlFilters.push(filterBuilderRsql);
     }
+
+    if (values.groups && values.groups.length) {
+      const groupIds = values.groups.map(g => g.id).join(",");
+      rsqlFilters.push(`group.groupId=in=(${groupIds})`);
+    }
+
+    const filterParam: FilterParam = {
+      rsql: rsqlFilters.join(" and ")
+    };
 
     setFilter(filterParam);
     setSubmitting(false);
@@ -139,8 +147,9 @@ export function SampleSelection({
               <div style={{ width: "300px" }}>
                 <ResourceSelectField<Group>
                   filter={filterBy(["groupName"])}
+                  isMulti={true}
                   label="Filter by group"
-                  name="group"
+                  name="groups"
                   model="group"
                   onChange={() => setImmediate(submitForm)}
                   optionLabel={group => group.groupName}
