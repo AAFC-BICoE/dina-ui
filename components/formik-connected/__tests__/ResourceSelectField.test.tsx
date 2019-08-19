@@ -11,9 +11,9 @@ import { Group } from "../../../types/seqdb-api/resources/Group";
 
 const MOCK_GROUPS = {
   data: [
-    { id: 1, type: "group", groupName: "Group 1" },
-    { id: 2, type: "group", groupName: "Group 2" },
-    { id: 3, type: "group", groupName: "Mat's Group" }
+    { id: "1", type: "group", groupName: "Group 1" },
+    { id: "2", type: "group", groupName: "Group 2" },
+    { id: "3", type: "group", groupName: "Mat's Group" }
   ]
 };
 
@@ -53,7 +53,7 @@ describe("ResourceSelectField component", () => {
   it("Displays the Formik field's value.", () => {
     const wrapper = mountWithContext(
       <Formik
-        initialValues={{ group: { id: 3, groupName: "Mat's Group" } }}
+        initialValues={{ group: { id: "3", groupName: "Mat's Group" } }}
         onSubmit={null}
       >
         <ResourceSelectField<Group>
@@ -69,7 +69,8 @@ describe("ResourceSelectField component", () => {
 
     expect(value).toEqual({
       label: "Mat's Group",
-      value: { groupName: "Mat's Group", id: 3 }
+      resource: { groupName: "Mat's Group", id: "3" },
+      value: "3"
     });
   });
 
@@ -139,11 +140,14 @@ describe("ResourceSelectField component", () => {
     );
 
     // Change the value.
-    wrapper.find(Select).prop("onChange")({ value: MOCK_GROUPS.data[1] }, null);
+    wrapper.find(Select).prop("onChange")(
+      { resource: MOCK_GROUPS.data[1] },
+      null
+    );
 
     expect(mockOnChange).lastCalledWith({
       groupName: "Group 2",
-      id: 2,
+      id: "2",
       type: "group"
     });
   });
