@@ -15,11 +15,9 @@ import { useGroupedCheckBoxes } from "../../formik-connected/GroupedCheckBoxFiel
 import { StepRendererProps } from "../StepRenderer";
 import { useSelectionControls } from "./useSelectionControls";
 
-export function SampleSelection({
-  chain,
-  chainStepTemplates,
-  step
-}: StepRendererProps) {
+export function SampleSelection(props: StepRendererProps) {
+  const { chain, step } = props;
+
   const [filter, setFilter] = useState<FilterParam>();
 
   const {
@@ -29,7 +27,7 @@ export function SampleSelection({
     deleteStepResources,
     selectAllCheckedSamples,
     selectSamples
-  } = useSelectionControls({ chain, chainStepTemplates, step });
+  } = useSelectionControls(props);
 
   const {
     CheckBoxField: SampleSelectCheckBox,
@@ -65,7 +63,7 @@ export function SampleSelection({
       Cell: ({ original: sample }) => (
         <div className="row" key={sample.id}>
           <button
-            className="btn btn-primary btn-sm col-6"
+            className="btn btn-primary btn-sm col-6 single-select-button"
             onClick={() => selectSamples([sample])}
           >
             Select
@@ -96,7 +94,7 @@ export function SampleSelection({
       Cell: ({ original: sr }) => (
         <div className="row" key={sr.id}>
           <button
-            className="btn btn-dark btn-sm col-6"
+            className="btn btn-dark btn-sm col-6 single-deselect-button"
             onClick={() => deleteStepResources([sr])}
           >
             Remove
@@ -169,7 +167,7 @@ export function SampleSelection({
         >
           {formikProps => (
             <>
-              <div className="col-5">
+              <div className="col-5 available-samples">
                 <strong>Available Samples</strong>
                 <QueryTable
                   columns={SELECTABLE_SAMPLE_COLUMNS}
@@ -187,7 +185,7 @@ export function SampleSelection({
                   <div className="row">
                     <div className="col-6">
                       <button
-                        className="btn btn-primary"
+                        className="btn btn-primary select-all-checked-button"
                         onClick={() => selectAllCheckedSamples(formikProps)}
                       >
                         Select all checked samples -->
@@ -195,7 +193,7 @@ export function SampleSelection({
                     </div>
                     <div className="col-6">
                       <button
-                        className="btn btn-dark"
+                        className="btn btn-dark deselect-all-checked-button"
                         onClick={() =>
                           deleteAllCheckedStepResources(formikProps)
                         }
@@ -206,7 +204,7 @@ export function SampleSelection({
                   </div>
                 )}
               </div>
-              <div className="col-5">
+              <div className="col-5 selected-samples">
                 <strong>Selected Samples</strong>
                 <QueryTable<StepResource>
                   columns={SELECTED_SAMPLE_COLUMNS}
