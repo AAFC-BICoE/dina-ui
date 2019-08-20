@@ -59,9 +59,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
 
     await selectSamples(samples);
 
-    for (const id of ids) {
-      formikProps.setFieldValue(`sampleIdsToSelect[${id}]`, false);
-    }
+    formikProps.setFieldValue("sampleIdsToSelect", {});
   }
 
   async function deleteStepResources(stepResources: StepResource[]) {
@@ -100,9 +98,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
 
       await deleteStepResources(stepResources);
 
-      for (const id of ids) {
-        formikProps.setFieldValue(`stepResourceIdsToDelete[${id}]`, false);
-      }
+      formikProps.setFieldValue("stepResourceIdsToDelete", {});
     } catch (err) {
       alert(err);
     }
