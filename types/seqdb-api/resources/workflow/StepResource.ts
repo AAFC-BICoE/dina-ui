@@ -12,6 +12,11 @@ export interface StepResourceAttributes {
 }
 
 export interface StepResourceRelationships {
+  // Client-side only. These properties can be set on the client-side for convenience
+  // because the API can't include the prelibraryprep for a requested sample.
+  shearingPrep?: PreLibraryPrep;
+  sizeSelectionPrep?: PreLibraryPrep;
+
   chainStepTemplate: ChainStepTemplate;
   chain: Chain;
   region?: Region;

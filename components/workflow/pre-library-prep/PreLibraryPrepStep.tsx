@@ -1,25 +1,11 @@
-import { connect, Form, Formik, FormikActions } from "formik";
+import { Form, Formik, FormikActions } from "formik";
 import { useState } from "react";
-import {
-  ColumnDefinition,
-  FilterBuilderField,
-  NumberField,
-  QueryTable,
-  ResourceSelectField,
-  SelectField,
-  SubmitButton,
-  TextField
-} from "../..";
-import {
-  Product,
-  Protocol,
-  Sample,
-  StepResource
-} from "../../../types/seqdb-api";
-import { filterBy } from "../../../util/rsql";
+import { ColumnDefinition, FilterBuilderField, QueryTable } from "../..";
+import { Sample, StepResource } from "../../../types/seqdb-api";
 import { rsql } from "../../filter-builder/rsql";
 import { useGroupedCheckBoxes } from "../../formik-connected/GroupedCheckBoxFields";
 import { StepRendererProps } from "../StepRenderer";
+import { PreLibraryPrepForm } from "./PreLibraryPrepForm";
 import { usePreLibraryPrepControls } from "./usePreLibraryPrepControls";
 
 export function PreLibraryPrepStep(props: StepRendererProps) {
@@ -28,7 +14,6 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
   const {
     plpFormSubmit,
     plpSrLoading,
-    plpSrResponse,
     setVisibleSamples
   } = usePreLibraryPrepControls(props);
 
@@ -58,10 +43,9 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
           return "Loading...";
         }
 
-        const plpSr = plpSrResponse.data.find(
-          sr => sr.sample.id === original.sample.id && sr.value === "SHEARING"
-        );
-        if (plpSr) {
+        const { shearingPrep } = original;
+
+        if (shearingPrep) {
           return (
             <div style={{ backgroundColor: "rgb(222, 252, 222)" }}>Sheared</div>
           );
@@ -76,11 +60,10 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
         if (plpSrLoading || !original.sample) {
           return "Loading...";
         }
-        const stepResource = plpSrResponse.data.find(
-          sr =>
-            sr.sample.id === original.sample.id && sr.value === "SIZE_SELECTION"
-        );
-        if (stepResource) {
+
+        const { sizeSelectionPrep } = original;
+
+        if (sizeSelectionPrep) {
           return (
             <div style={{ backgroundColor: "rgb(222, 252, 222)" }}>
               Size Selection Added
@@ -156,59 +139,22 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
   );
 }
 
-const PreLibraryPrepForm = connect<{}, any>(
-  ({ formik: { values, resetForm } }) => {
-    function onTypeChange(newType?: string) {
-      const checkedIds = values.checkedIds;
-      resetForm({ checkedIds, preLibraryPrepType: newType });
-    }
-
-    return (
-      <div className="card card-body">
-        <div className="row">
-          <SelectField
-            className="col-6"
-            onChange={onTypeChange}
-            options={PREP_TYPE_OPTIONS}
-            name="preLibraryPrepType"
-          />
-          <NumberField className="col-6" name="inputAmount" />
-          <NumberField className="col-6" name="concentration" />
-          <NumberField className="col-6" name="targetDpSize" />
-          <NumberField className="col-6" name="averageFragmentSize" />
-          <TextField className="col-6" name="quality" />
-          <ResourceSelectField<Protocol>
-            className="col-6"
-            filter={filterBy(["name"])}
-            name="protocol"
-            model="protocol"
-            optionLabel={protocol => protocol.name}
-          />
-          <ResourceSelectField<Product>
-            className="col-6"
-            filter={filterBy(["name"])}
-            label="Kit"
-            model="product"
-            name="product"
-            optionLabel={kit => kit.name}
-          />
-          <TextField className="col-12" name="notes" />
-        </div>
-        <div>
-          <SubmitButton />
-        </div>
-      </div>
-    );
-  }
-);
-
-const PREP_TYPE_OPTIONS = [
-  {
-    label: "Shearing",
-    value: "SHEARING"
-  },
-  {
-    label: "Size Selection",
-    value: "SIZE_SELECTION"
-  }
-];
+// const SHEARING_COLUMNS: Array<ColumnDefinition<StepResource>> = [
+//   {
+//     Header: "Shearing Details",
+//     columns: [
+//       "inputAmount",
+//       "concentration",
+//       "targetDpSize",
+//       "averageFragmentSize",
+//       "quality",
+//       "protocol.name",
+//       "product.name",
+//       "notes"
+//     ].map(attr => ({
+//       Header: titleCase(attr),
+//       accessor: `shearingPrep.${attr}`,
+//       sortable: false
+//     }))
+//   }
+// ];
