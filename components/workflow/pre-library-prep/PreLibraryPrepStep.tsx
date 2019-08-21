@@ -50,7 +50,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
             <div style={{ backgroundColor: "rgb(222, 252, 222)" }}>Sheared</div>
           );
         }
-        return <span>Not Sheared</span>;
+        return <div>Not Sheared</div>;
       },
       Header: "Shearing",
       sortable: false
@@ -70,7 +70,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
             </div>
           );
         }
-        return <span>No Size Selection</span>;
+        return <div>No Size Selection</div>;
       },
       Header: "Size Selection",
       sortable: false
@@ -106,9 +106,9 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
         initialValues={{ checkedIds: {}, preLibraryPrepType: "SHEARING" }}
         onSubmit={plpFormSubmit}
       >
-        <Form>
+        <Form className="pre-library-prep-form">
           <div className="row form-group">
-            <div className="col-6">
+            <div className="col-6 selected-samples">
               <strong>Selected Samples</strong>
               <QueryTable
                 columns={SAMPLE_STEP_RESOURCE_COLUMNS}

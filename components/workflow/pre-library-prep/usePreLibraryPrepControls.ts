@@ -90,7 +90,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
               "preLibraryPrep.preLibraryPrepType": plpValues.preLibraryPrepType,
               rsql: `sample.sampleId=in=(${checkedSampleIds})`
             },
-            include: "preLibraryPrep,sample",
+            include: "sample,preLibraryPrep",
             page: { limit: 1000 } // Max page limit
           })).data
         : [];
@@ -147,7 +147,6 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
           type: "stepResource"
         }))
       );
-
       setRandomNumber(Math.random());
 
       setFieldValue("checkedIds", {});
