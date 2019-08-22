@@ -83,6 +83,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
           </div>
         </div>
       ),
+      Header: "Select",
       sortable: false
     }
   ];
@@ -138,23 +139,3 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
     </>
   );
 }
-
-// const SHEARING_COLUMNS: Array<ColumnDefinition<StepResource>> = [
-//   {
-//     Header: "Shearing Details",
-//     columns: [
-//       "inputAmount",
-//       "concentration",
-//       "targetDpSize",
-//       "averageFragmentSize",
-//       "quality",
-//       "protocol.name",
-//       "product.name",
-//       "notes"
-//     ].map(attr => ({
-//       Header: titleCase(attr),
-//       accessor: `shearingPrep.${attr}`,
-//       sortable: false
-//     }))
-//   }
-// ];

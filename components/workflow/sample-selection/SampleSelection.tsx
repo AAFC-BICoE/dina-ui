@@ -73,6 +73,7 @@ export function SampleSelection(props: StepRendererProps) {
           </div>
         </div>
       ),
+      Header: "Select",
       sortable: false
     }
   ];
@@ -97,13 +98,15 @@ export function SampleSelection(props: StepRendererProps) {
             className="btn btn-dark btn-sm col-6 single-deselect-button"
             onClick={() => deleteStepResources([sr])}
           >
-            Remove
+            Deselect
           </button>
           <div className="col-6">
             <SampleDeselectCheckBox resource={sr} />
           </div>
         </div>
-      )
+      ),
+      Header: "Deselect",
+      sortable: false
     }
   ];
 
