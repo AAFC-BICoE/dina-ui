@@ -544,7 +544,7 @@ describe("PreLibraryPrepStep UI", () => {
     });
 
     mockPatch.mockImplementation(async (_, operations) => {
-      // The firt patch request should edit the first two and create the third.
+      // The first patch request should edit the first two and create the third.
       if (operations[0].path === "preLibraryPrep/1") {
         return {
           data: [
@@ -708,6 +708,42 @@ describe("PreLibraryPrepStep UI", () => {
     ]);
   });
 
+  it("Does nothing if you click the Remove Shearing button without checking any sample checkboxes.", async () => {
+    const wrapper = getWrapper();
+
+    // Await initial queries.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Submit the form
+    wrapper.find("button.remove-shearing").simulate("click");
+    // Await form submit.
+    await new Promise(setImmediate);
+
+    // There should have been one empty operations call.
+    expect(mockPatch.mock.calls).toEqual([
+      ["operations", [], expect.anything()]
+    ]);
+  });
+
+  it("Does nothing if you click the Remove Size Selection button without checking any sample checkboxes.", async () => {
+    const wrapper = getWrapper();
+
+    // Await initial queries.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Submit the form
+    wrapper.find("button.remove-size-selection").simulate("click");
+    // Await form submit.
+    await new Promise(setImmediate);
+
+    // There should have been one empty operations call.
+    expect(mockPatch.mock.calls).toEqual([
+      ["operations", [], expect.anything()]
+    ]);
+  });
+
   it("Shows the Shearing and Size Selection status in the table.", async () => {
     mockGet.mockImplementation(async (path, params) => {
       // The request for the sample stepResources.
@@ -791,5 +827,77 @@ describe("PreLibraryPrepStep UI", () => {
     expect(
       rows.at(2).containsMatchingElement(<div>Size Selection Added</div>)
     ).toEqual(true);
+  });
+
+  it("Lets you delete selected shearing or size selection stepResources.", async () => {
+    mockGet.mockImplementation(async (path, params) => {
+      // Mock sample table response.
+      if (
+        path === "stepResource" &&
+        params.include.includes("sample,sample.group")
+      ) {
+        return {
+          data: [
+            { id: "5", type: "stepResource", sample: { id: "11" } },
+            { id: "6", type: "stepResource", sample: { id: "12" } },
+            { id: "7", type: "stepResource", sample: { id: "13" } },
+            { id: "8", type: "stepResource", sample: { id: "14" } }
+          ]
+        };
+      }
+
+      // Mock stepResource call from inside the deleteStepResources function.
+      if (
+        path === "stepResource" &&
+        params.include.includes("sample,preLibraryPrep")
+      ) {
+        return {
+          data: [
+            {
+              id: "100",
+              preLibraryPrep: { id: "200", type: "preLibraryPrep" },
+              sample: { id: "12", type: "sample" },
+              type: "stepResource"
+            }
+          ]
+        };
+      }
+
+      return { data: [] };
+    });
+
+    const wrapper = getWrapper();
+
+    // Await initial queries.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Select samples 2 to 4.
+    wrapper
+      .find(".selected-samples input[type='checkbox']")
+      .at(1)
+      .prop("onClick")({ target: { checked: true } } as any);
+    wrapper.update();
+    wrapper
+      .find(".selected-samples input[type='checkbox']")
+      .at(3)
+      .prop("onClick")({ shiftKey: true, target: { checked: true } } as any);
+    wrapper.update();
+
+    wrapper.find("button.remove-shearing").simulate("click");
+
+    // Await the request and page refresh.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockPatch).toHaveBeenCalledTimes(1);
+    expect(mockPatch).lastCalledWith(
+      "operations",
+      [
+        { op: "DELETE", path: "stepResource/100" },
+        { op: "DELETE", path: "preLibraryPrep/200" }
+      ],
+      expect.anything()
+    );
   });
 });

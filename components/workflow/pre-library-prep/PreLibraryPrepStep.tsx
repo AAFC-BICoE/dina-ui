@@ -1,6 +1,11 @@
 import { Form, Formik, FormikActions } from "formik";
 import { useState } from "react";
-import { ColumnDefinition, FilterBuilderField, QueryTable } from "../..";
+import {
+  ColumnDefinition,
+  FilterBuilderField,
+  LoadingSpinner,
+  QueryTable
+} from "../..";
 import { Sample, StepResource } from "../../../types/seqdb-api";
 import { rsql } from "../../filter-builder/rsql";
 import { useGroupedCheckBoxes } from "../../formik-connected/GroupedCheckBoxFields";
@@ -12,6 +17,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
   const { chain, chainStepTemplates, step } = props;
 
   const {
+    deleteStepResources,
     plpFormSubmit,
     plpSrLoading,
     setVisibleSamples
@@ -107,34 +113,62 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
         initialValues={{ checkedIds: {}, preLibraryPrepType: "SHEARING" }}
         onSubmit={plpFormSubmit}
       >
-        <Form className="pre-library-prep-form">
-          <div className="row form-group">
-            <div className="col-6 selected-samples">
-              <strong>Selected Samples</strong>
-              <QueryTable
-                columns={SAMPLE_STEP_RESOURCE_COLUMNS}
-                defaultPageSize={100}
-                filter={{
-                  "chain.chainId": chain.id,
-                  "chainStepTemplate.chainStepTemplateId": previousStep.id,
-                  rsql: rsqlFilter
-                }}
-                include="sample,sample.group"
-                onSuccess={res => {
-                  setVisibleSamples(res.data);
-                  setAvailableItems(res.data.map(sr => sr.sample));
-                }}
-                path="stepResource"
-              />
+        {formikProps => (
+          <Form className="pre-library-prep-form">
+            <div className="row form-group">
+              <div className="col-6 selected-samples">
+                <strong>Selected Samples</strong>
+                <div className="float-right">
+                  {formikProps.isSubmitting ? (
+                    <LoadingSpinner loading={true} />
+                  ) : (
+                    <>
+                      <button
+                        className="btn btn-dark remove-shearing"
+                        onClick={() =>
+                          deleteStepResources("SHEARING", formikProps)
+                        }
+                        type="button"
+                      >
+                        Remove selected Shearing details
+                      </button>
+                      <button
+                        className="btn btn-dark remove-size-selection"
+                        onClick={() =>
+                          deleteStepResources("SIZE_SELECTION", formikProps)
+                        }
+                        type="button"
+                      >
+                        Remove selected Size Selection details
+                      </button>
+                    </>
+                  )}
+                </div>
+                <QueryTable
+                  columns={SAMPLE_STEP_RESOURCE_COLUMNS}
+                  defaultPageSize={100}
+                  filter={{
+                    "chain.chainId": chain.id,
+                    "chainStepTemplate.chainStepTemplateId": previousStep.id,
+                    rsql: rsqlFilter
+                  }}
+                  include="sample,sample.group"
+                  onSuccess={res => {
+                    setVisibleSamples(res.data);
+                    setAvailableItems(res.data.map(sr => sr.sample));
+                  }}
+                  path="stepResource"
+                />
+              </div>
+              <div className="col-6">
+                <strong>Add New Shearing/Size Selection Details</strong>
+                {/* Spacer div to align the table with the form. */}
+                <div style={{ height: "22px" }} />
+                <PreLibraryPrepForm />
+              </div>
             </div>
-            <div className="col-6">
-              <strong>Add New Shearing/Size Selection Details</strong>
-              {/* Spacer div to align the table with the form. */}
-              <div style={{ height: "22px" }} />
-              <PreLibraryPrepForm />
-            </div>
-          </div>
-        </Form>
+          </Form>
+        )}
       </Formik>
     </>
   );

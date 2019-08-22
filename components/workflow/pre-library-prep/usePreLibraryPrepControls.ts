@@ -1,8 +1,8 @@
-import { FormikActions } from "formik";
+import { FormikActions, FormikProps } from "formik";
 import { toPairs } from "lodash";
 import { useContext, useState } from "react";
 import { PreLibraryPrep } from "types/seqdb-api/resources/workflow/PreLibraryPrep";
-import { ApiClientContext, useQuery } from "../..";
+import { ApiClientContext, Operation, useQuery } from "../..";
 import {
   Chain,
   ChainStepTemplate,
@@ -11,10 +11,9 @@ import {
 import { StepRendererProps } from "../StepRenderer";
 
 export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
-  const { apiClient, save } = useContext(ApiClientContext);
+  const { apiClient, doOperations, save } = useContext(ApiClientContext);
 
   const [visibleSamples, setVisibleSamples] = useState<StepResource[]>([]);
-  const [, setLoading] = useState(false);
   const [randomNumber, setRandomNumber] = useState(Math.random());
 
   const visibleSampleIds = visibleSamples.length
@@ -49,12 +48,12 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
               plpSr.value === "SIZE_SELECTION"
           );
 
-          if (shearingSr) {
-            sampleSr.shearingPrep = shearingSr.preLibraryPrep;
-          }
-          if (sizeSelectionSr) {
-            sampleSr.sizeSelectionPrep = sizeSelectionSr.preLibraryPrep;
-          }
+          sampleSr.shearingPrep = shearingSr
+            ? shearingSr.preLibraryPrep
+            : undefined;
+          sampleSr.sizeSelectionPrep = sizeSelectionSr
+            ? sizeSelectionSr.preLibraryPrep
+            : undefined;
         }
       }
     }
@@ -78,8 +77,6 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       .map(pair => pair[0]);
 
     try {
-      setLoading(true);
-
       // Find the existing PreLibraryPreps stepResources for these samples.
       // These should be edited instead of creating new ones.
       const existingStepResources: StepResource[] = checkedSampleIds.length
@@ -154,10 +151,60 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       alert(err);
     }
     setSubmitting(false);
-    setLoading(false);
+  }
+
+  async function deleteStepResources(
+    plpType: "SHEARING" | "SIZE_SELECTION",
+    formikProps: FormikProps<any>
+  ) {
+    formikProps.setSubmitting(true);
+    try {
+      const { checkedIds } = formikProps.values;
+
+      const checkedSampleIds = toPairs(checkedIds)
+        .filter(pair => pair[1])
+        .map(pair => pair[0]);
+
+      // Find the existing PreLibraryPreps stepResources for these samples.
+      // These should be edited instead of creating new ones.
+      const stepResourcesToDelete: StepResource[] = checkedSampleIds.length
+        ? (await apiClient.get("stepResource", {
+            filter: {
+              "chain.chainId": chain.id,
+              "chainStepTemplate.chainStepTemplateId": step.id,
+              "preLibraryPrep.preLibraryPrepType": plpType,
+              rsql: `sample.sampleId=in=(${checkedSampleIds})`
+            },
+            include: "sample,preLibraryPrep",
+            page: { limit: 1000 } // Max page limit
+          })).data
+        : [];
+
+      const plpsToDelete = stepResourcesToDelete.map(sr => sr.preLibraryPrep);
+
+      const plpOperations: Operation[] = plpsToDelete.map(plp => ({
+        op: "DELETE",
+        path: `preLibraryPrep/${plp.id}`
+      }));
+
+      const srOperations: Operation[] = stepResourcesToDelete.map(sr => ({
+        op: "DELETE",
+        path: `stepResource/${sr.id}`
+      }));
+
+      const operations = [...srOperations, ...plpOperations];
+
+      await doOperations(operations);
+      setRandomNumber(Math.random());
+      formikProps.setFieldValue("checkedIds", {});
+    } catch (err) {
+      alert(err);
+    }
+    formikProps.setSubmitting(false);
   }
 
   return {
+    deleteStepResources,
     plpFormSubmit,
     plpSrLoading,
     setVisibleSamples
