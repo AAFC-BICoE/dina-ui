@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { useDropzone } from "react-dropzone";
+import ReactTable from "react-table";
 
 const baseStyle = {
   alignItems: "center",
@@ -29,13 +30,14 @@ const rejectStyle = {
   borderColor: "#ff1744"
 };
 
-function StyledDropzone() {
+function MediaUploadView()  {
   const {
     getRootProps,
     getInputProps,
     isDragActive,
     isDragAccept,
-    isDragReject
+    isDragReject,
+    acceptedFiles
   } = useDropzone({});
 
   const style = useMemo(
@@ -48,14 +50,32 @@ function StyledDropzone() {
     [isDragActive, isDragReject]
   );
 
+  const files = acceptedFiles.map(file => ({ fileName: file.name }));
+
   return (
     <div className="container">
       <div {...getRootProps({ style })}>
         <input {...getInputProps()} />
         <p>Drag and drop files here or click to open browse dialog</p>
       </div>
+      <ReactTable
+        className="-striped"
+        data={files ? files : null}
+        columns={[
+          {
+            Header: "File Name",
+            accessor: "fileName"
+          },
+          {
+            Cell: () => {
+              return <input type="checkbox" />;
+            },
+            Header: "Select items"
+          }
+        ]}
+      />
     </div>
   );
 }
 
-export default StyledDropzone;
+export default MediaUploadView;
