@@ -30,7 +30,7 @@ const rejectStyle = {
   borderColor: "#ff1744"
 };
 
-function MediaUploadView()  {
+function MediaUploadView() {
   const {
     getRootProps,
     getInputProps,
@@ -60,7 +60,7 @@ function MediaUploadView()  {
       </div>
       <ReactTable
         className="-striped"
-        data={files ? files : null}
+        data={files}
         columns={[
           {
             Header: "File Name",
