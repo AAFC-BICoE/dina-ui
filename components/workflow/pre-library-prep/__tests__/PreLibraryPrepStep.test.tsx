@@ -86,6 +86,7 @@ jest.mock(
     }
 );
 
+// Mock random numbers to only return 0.5.
 const mockMath = Object.create(global.Math);
 mockMath.random = () => 0.5;
 global.Math = mockMath;
@@ -705,5 +706,90 @@ describe("PreLibraryPrepStep UI", () => {
       ["operations", [], expect.anything()],
       ["operations", [], expect.anything()]
     ]);
+  });
+
+  it("Shows the Shearing and Size Selection status in the table.", async () => {
+    mockGet.mockImplementation(async (path, params) => {
+      // The request for the sample stepResources.
+      if (
+        path === "stepResource" &&
+        params.include.includes("sample,sample.group")
+      ) {
+        // Return stepResources with samples.
+        return {
+          data: [
+            {
+              id: "1",
+              sample: { id: "5", type: "sample" },
+              type: "stepResource"
+            },
+            {
+              id: "2",
+              sample: { id: "6", type: "sample" },
+              type: "stepResource"
+            }
+          ]
+        };
+      }
+
+      // The request for the preLibraryPrep stepResources.
+      if (
+        path === "stepResource" &&
+        params.include.includes("sample,preLibraryPrep")
+      ) {
+        // Return stepResources with preLibraryPreps and samples.
+        return {
+          data: [
+            {
+              id: "3",
+              preLibraryPrep: {
+                id: "1",
+                preLibraryPrepType: "SHEARING",
+                type: "preLibraryPrep"
+              },
+              sample: { id: "5", type: "sample" },
+              type: "stepResource",
+              value: "SHEARING"
+            },
+            {
+              id: "4",
+              preLibraryPrep: {
+                id: "2",
+                preLibraryPrepType: "SIZE_SELECTION",
+                type: "preLibraryPrep"
+              },
+              sample: { id: "6", type: "sample" },
+              type: "stepResource",
+              value: "SIZE_SELECTION"
+            }
+          ]
+        };
+      }
+
+      // Empty array otherwise so the ResourceSelect doesn't get an undefined response.
+      return { data: [] };
+    });
+
+    const wrapper = getWrapper();
+
+    // Await initial queries.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    const rows = wrapper.find(".rt-tr");
+
+    // Row 1 should be sheared but not size selected. Row 2 should be size selected but not sheared.
+    expect(rows.at(1).containsMatchingElement(<div>Sheared</div>)).toEqual(
+      true
+    );
+    expect(
+      rows.at(1).containsMatchingElement(<div>No Size Selection</div>)
+    ).toEqual(true);
+    expect(rows.at(2).containsMatchingElement(<div>Not Sheared</div>)).toEqual(
+      true
+    );
+    expect(
+      rows.at(2).containsMatchingElement(<div>Size Selection Added</div>)
+    ).toEqual(true);
   });
 });
