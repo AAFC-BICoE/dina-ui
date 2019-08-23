@@ -195,12 +195,12 @@ describe("PreLibraryPrepStep UI", () => {
 
     // Select samples 3 to 5.
     wrapper
-      .find(".selected-samples input[type='checkbox']")
+      .find(".selected-samples .rt-tbody input[type='checkbox']")
       .at(2)
       .prop("onClick")({ target: { checked: true } } as any);
     wrapper.update();
     wrapper
-      .find(".selected-samples input[type='checkbox']")
+      .find(".selected-samples .rt-tbody input[type='checkbox']")
       .at(4)
       .prop("onClick")({ shiftKey: true, target: { checked: true } } as any);
     wrapper.update();
@@ -499,12 +499,12 @@ describe("PreLibraryPrepStep UI", () => {
 
     // Select samples 3 to 5.
     wrapper
-      .find(".selected-samples input[type='checkbox']")
+      .find(".selected-samples .rt-tbody input[type='checkbox']")
       .at(2)
       .prop("onClick")({ target: { checked: true } } as any);
     wrapper.update();
     wrapper
-      .find(".selected-samples input[type='checkbox']")
+      .find(".selected-samples .rt-tbody input[type='checkbox']")
       .at(4)
       .prop("onClick")({ shiftKey: true, target: { checked: true } } as any);
     wrapper.update();
@@ -874,12 +874,12 @@ describe("PreLibraryPrepStep UI", () => {
 
     // Select samples 2 to 4.
     wrapper
-      .find(".selected-samples input[type='checkbox']")
+      .find(".selected-samples .rt-tbody input[type='checkbox']")
       .at(1)
       .prop("onClick")({ target: { checked: true } } as any);
     wrapper.update();
     wrapper
-      .find(".selected-samples input[type='checkbox']")
+      .find(".selected-samples .rt-tbody input[type='checkbox']")
       .at(3)
       .prop("onClick")({ shiftKey: true, target: { checked: true } } as any);
     wrapper.update();
