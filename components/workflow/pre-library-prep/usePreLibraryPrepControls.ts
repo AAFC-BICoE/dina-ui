@@ -22,7 +22,11 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
 
   const { loading: plpSrLoading } = useQuery<StepResource[]>(
     {
-      fields: { sample: "name,version" },
+      fields: {
+        product: "name",
+        protocol: "name",
+        sample: "name,version"
+      },
       filter: {
         "chain.chainId": chain.id,
         "chainStepTemplate.chainStepTemplateId": step.id,

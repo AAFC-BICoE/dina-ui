@@ -159,6 +159,8 @@ describe("PreLibraryPrepStep UI", () => {
       "stepResource",
       {
         fields: {
+          product: "name",
+          protocol: "name",
           sample: "name,version"
         },
         filter: {
