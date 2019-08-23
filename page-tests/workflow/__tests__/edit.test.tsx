@@ -17,7 +17,7 @@ const mockGet = jest.fn(async model => {
     // The request for the primer returns the test region.
     return { data: TEST_WORKFLOW };
   } else {
-    return [];
+    return { data: [] };
   }
 });
 
