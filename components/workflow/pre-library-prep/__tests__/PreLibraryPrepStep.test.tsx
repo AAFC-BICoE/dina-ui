@@ -112,7 +112,7 @@ describe("PreLibraryPrepStep UI", () => {
       if (model === "stepResource") {
         if (params.include === "sample,sample.group") {
           return { data: TEST_SAMPLE_STEP_RESOURCES };
-        } else if (params.include === "sample,preLibraryPrep") {
+        } else if (params.include.includes("sample,preLibraryPrep")) {
           return { data: [] };
         }
       } else {
@@ -166,7 +166,8 @@ describe("PreLibraryPrepStep UI", () => {
           "chainStepTemplate.chainStepTemplateId": "2",
           rsql: "sample.sampleId=in=(1,2,3,4,5) and sample.name!=0.5"
         },
-        include: "sample,preLibraryPrep",
+        include:
+          "sample,preLibraryPrep,preLibraryPrep.protocol,preLibraryPrep.product",
         page: {
           limit: 1000
         }
@@ -518,7 +519,7 @@ describe("PreLibraryPrepStep UI", () => {
     mockGet.mockImplementation((path, params) => {
       if (
         path === "stepResource" &&
-        params.include === "sample,preLibraryPrep"
+        params.include.includes("sample,preLibraryPrep")
       ) {
         expect(params.filter.rsql).toEqual("sample.sampleId=in=(3,4,5)");
         // The first 2 samples should already have preLibraryPreps.

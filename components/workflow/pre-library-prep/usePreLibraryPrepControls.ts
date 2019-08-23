@@ -28,7 +28,8 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
         "chainStepTemplate.chainStepTemplateId": step.id,
         rsql: `sample.sampleId=in=(${visibleSampleIds}) and sample.name!=${randomNumber}`
       },
-      include: "sample,preLibraryPrep",
+      include:
+        "sample,preLibraryPrep,preLibraryPrep.protocol,preLibraryPrep.product",
       page: { limit: 1000 }, // Maximum page limit. There should only be 1 or 2 prelibrarypreps per sample.
       path: "stepResource"
     },
@@ -63,6 +64,8 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
     values,
     { setFieldValue, setSubmitting }: FormikActions<any>
   ) {
+    setSubmitting(true);
+
     const { checkedIds, ...plpValues } = values;
 
     if (plpValues.protocol) {

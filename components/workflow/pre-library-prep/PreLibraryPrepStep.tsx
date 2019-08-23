@@ -1,5 +1,6 @@
 import { Form, Formik, FormikActions } from "formik";
 import { useState } from "react";
+import titleCase from "title-case";
 import {
   ColumnDefinition,
   FilterBuilderField,
@@ -10,6 +11,10 @@ import { Sample, StepResource } from "../../../types/seqdb-api";
 import { rsql } from "../../filter-builder/rsql";
 import { useGroupedCheckBoxes } from "../../formik-connected/GroupedCheckBoxFields";
 import { StepRendererProps } from "../StepRenderer";
+import {
+  PreLibPrepViewMode,
+  PreLibPrepViewModeSelector
+} from "./PreLibPrepViewModeSelector";
 import { PreLibraryPrepForm } from "./PreLibraryPrepForm";
 import { usePreLibraryPrepControls } from "./usePreLibraryPrepControls";
 
@@ -24,6 +29,8 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
   } = usePreLibraryPrepControls(props);
 
   const previousStep = chainStepTemplates[chainStepTemplates.indexOf(step) - 1];
+
+  const [viewMode, setViewMode] = useState<PreLibPrepViewMode>("EDIT");
 
   const [rsqlFilter, setRsqlFilter] = useState<string>("");
 
@@ -40,13 +47,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
     setSubmitting(false);
   }
 
-  const SAMPLE_STEP_RESOURCE_COLUMNS: Array<ColumnDefinition<StepResource>> = [
-    {
-      Header: "Group",
-      accessor: "sample.group.groupName"
-    },
-    "sample.name",
-    "sample.version",
+  const BRIEF_PLP_DETAILS_COLUMNS: Array<ColumnDefinition<StepResource>> = [
     {
       Cell: ({ original }) => {
         if (plpSrLoading || !original.sample) {
@@ -84,7 +85,19 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
       },
       Header: "Size Selection",
       sortable: false
+    }
+  ];
+
+  const SAMPLE_STEP_RESOURCE_COLUMNS: Array<ColumnDefinition<StepResource>> = [
+    {
+      Header: "Group",
+      accessor: "sample.group.groupName"
     },
+    "sample.name",
+    "sample.version",
+    ...(viewMode === "EDIT"
+      ? BRIEF_PLP_DETAILS_COLUMNS
+      : plpDetailsColumns(viewMode)),
     {
       Cell: ({ original: sr }) => (
         <div style={{ textAlign: "center" }} key={sr.id}>
@@ -113,67 +126,104 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
           </button>
         </Form>
       </Formik>
-      <Formik
-        initialValues={{ checkedIds: {}, preLibraryPrepType: "SHEARING" }}
-        onSubmit={plpFormSubmit}
-      >
-        {formikProps => (
-          <Form className="pre-library-prep-form">
-            <div className="row form-group">
-              <div className="col-6 selected-samples">
-                <strong>Selected Samples</strong>
-                <div className="float-right">
-                  {formikProps.isSubmitting ? (
-                    <LoadingSpinner loading={true} />
-                  ) : (
-                    <>
-                      <button
-                        className="btn btn-dark remove-shearing"
-                        onClick={() =>
-                          deleteStepResources("SHEARING", formikProps)
-                        }
-                        type="button"
-                      >
-                        Remove selected Shearing details
-                      </button>
-                      <button
-                        className="btn btn-dark remove-size-selection"
-                        onClick={() =>
-                          deleteStepResources("SIZE_SELECTION", formikProps)
-                        }
-                        type="button"
-                      >
-                        Remove selected Size Selection details
-                      </button>
-                    </>
-                  )}
+      <Formik initialValues={{ checkedIds: {} }} onSubmit={null}>
+        {formikProps => {
+          async function onInnerFormSubmit(plpValues) {
+            await plpFormSubmit(
+              { ...formikProps.values, ...plpValues },
+              formikProps
+            );
+          }
+
+          return (
+            <>
+              <PreLibPrepViewModeSelector
+                onChange={setViewMode}
+                viewMode={viewMode}
+              />
+              <div className="row form-group">
+                <div
+                  className={`col-${
+                    viewMode === "EDIT" ? 6 : 12
+                  } selected-samples`}
+                >
+                  <strong>Selected Samples</strong>
+                  <div className="float-right">
+                    {formikProps.isSubmitting ? (
+                      <LoadingSpinner loading={true} />
+                    ) : (
+                      <>
+                        <button
+                          className="btn btn-dark remove-shearing"
+                          onClick={() =>
+                            deleteStepResources("SHEARING", formikProps)
+                          }
+                          type="button"
+                        >
+                          Remove selected Shearing details
+                        </button>
+                        <button
+                          className="btn btn-dark remove-size-selection"
+                          onClick={() =>
+                            deleteStepResources("SIZE_SELECTION", formikProps)
+                          }
+                          type="button"
+                        >
+                          Remove selected Size Selection details
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  <QueryTable
+                    columns={SAMPLE_STEP_RESOURCE_COLUMNS}
+                    defaultPageSize={100}
+                    filter={{
+                      "chain.chainId": chain.id,
+                      "chainStepTemplate.chainStepTemplateId": previousStep.id,
+                      rsql: rsqlFilter
+                    }}
+                    include="sample,sample.group"
+                    loading={formikProps.isSubmitting}
+                    onSuccess={res => {
+                      setVisibleSamples(res.data);
+                      setAvailableItems(res.data.map(sr => sr.sample));
+                    }}
+                    path="stepResource"
+                  />
                 </div>
-                <QueryTable
-                  columns={SAMPLE_STEP_RESOURCE_COLUMNS}
-                  defaultPageSize={100}
-                  filter={{
-                    "chain.chainId": chain.id,
-                    "chainStepTemplate.chainStepTemplateId": previousStep.id,
-                    rsql: rsqlFilter
-                  }}
-                  include="sample,sample.group"
-                  onSuccess={res => {
-                    setVisibleSamples(res.data);
-                    setAvailableItems(res.data.map(sr => sr.sample));
-                  }}
-                  path="stepResource"
-                />
+                {viewMode === "EDIT" && (
+                  <div className="col-6">
+                    <strong>Add New Shearing/Size Selection Details</strong>
+                    {/* Spacer div to align the table with the form. */}
+                    <div style={{ height: "22px" }} />
+                    <PreLibraryPrepForm onSubmit={onInnerFormSubmit} />
+                  </div>
+                )}
               </div>
-              <div className="col-6">
-                <strong>Add New Shearing/Size Selection Details</strong>
-                {/* Spacer div to align the table with the form. */}
-                <div style={{ height: "22px" }} />
-                <PreLibraryPrepForm />
-              </div>
-            </div>
-          </Form>
-        )}
+            </>
+          );
+        }}
       </Formik>
     </>
   );
+}
+
+function plpDetailsColumns(mode: PreLibPrepViewMode) {
+  const prefix =
+    mode === "SHEARING_DETAILS" ? "shearingPrep" : "sizeSelectionPrep";
+
+  return [
+    "inputAmount",
+    "concentration",
+    "targetDpSize",
+    "averageFragmentSize",
+    "quality",
+    "protocol.name",
+    "product.name",
+    "notes"
+  ].map(attr => ({
+    Header: titleCase(attr),
+    accessor: `${prefix}.${attr}`,
+    sortable: false
+  }));
 }

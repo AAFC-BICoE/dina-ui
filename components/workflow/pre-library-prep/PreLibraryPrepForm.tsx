@@ -1,4 +1,4 @@
-import { connect } from "formik";
+import { Form, Formik } from "formik";
 import { Product, Protocol } from "types/seqdb-api";
 import {
   NumberField,
@@ -9,51 +9,66 @@ import {
 } from "../..";
 import { filterBy } from "../../../util/rsql";
 
-export const PreLibraryPrepForm = connect<{}, any>(
-  ({ formik: { values, resetForm } }) => {
-    function onTypeChange(newType?: string) {
-      const checkedIds = values.checkedIds;
-      resetForm({ checkedIds, preLibraryPrepType: newType });
-    }
+interface PreLibraryPrepFormProps {
+  onSubmit: (values: any) => void;
+}
 
-    return (
-      <div className="card card-body">
-        <div className="row">
-          <SelectField
-            className="col-6"
-            onChange={onTypeChange}
-            options={PREP_TYPE_OPTIONS}
-            name="preLibraryPrepType"
-          />
-          <NumberField className="col-6" name="inputAmount" />
-          <NumberField className="col-6" name="concentration" />
-          <NumberField className="col-6" name="targetDpSize" />
-          <NumberField className="col-6" name="averageFragmentSize" />
-          <TextField className="col-6" name="quality" />
-          <ResourceSelectField<Protocol>
-            className="col-6"
-            filter={filterBy(["name"])}
-            name="protocol"
-            model="protocol"
-            optionLabel={protocol => protocol.name}
-          />
-          <ResourceSelectField<Product>
-            className="col-6"
-            filter={filterBy(["name"])}
-            label="Kit"
-            model="product"
-            name="product"
-            optionLabel={kit => kit.name}
-          />
-          <TextField className="col-12" name="notes" />
-        </div>
-        <div>
-          <SubmitButton />
-        </div>
-      </div>
-    );
+export function PreLibraryPrepForm({ onSubmit }: PreLibraryPrepFormProps) {
+  async function onSubmitInternal(values, { setSubmitting }) {
+    await onSubmit(values);
+    setSubmitting(false);
   }
-);
+
+  return (
+    <Formik
+      initialValues={{ preLibraryPrepType: "SHEARING" }}
+      onSubmit={onSubmitInternal}
+    >
+      {({ resetForm }) => {
+        function onTypeChange(newType?: string) {
+          resetForm({ preLibraryPrepType: newType });
+        }
+
+        return (
+          <Form className="card card-body pre-library-prep-form">
+            <div className="row">
+              <SelectField
+                className="col-6"
+                onChange={onTypeChange}
+                options={PREP_TYPE_OPTIONS}
+                name="preLibraryPrepType"
+              />
+              <NumberField className="col-6" name="inputAmount" />
+              <NumberField className="col-6" name="concentration" />
+              <NumberField className="col-6" name="targetDpSize" />
+              <NumberField className="col-6" name="averageFragmentSize" />
+              <TextField className="col-6" name="quality" />
+              <ResourceSelectField<Protocol>
+                className="col-6"
+                filter={filterBy(["name"])}
+                name="protocol"
+                model="protocol"
+                optionLabel={protocol => protocol.name}
+              />
+              <ResourceSelectField<Product>
+                className="col-6"
+                filter={filterBy(["name"])}
+                label="Kit"
+                model="product"
+                name="product"
+                optionLabel={kit => kit.name}
+              />
+              <TextField className="col-12" name="notes" />
+            </div>
+            <div>
+              <SubmitButton />
+            </div>
+          </Form>
+        );
+      }}
+    </Formik>
+  );
+}
 
 const PREP_TYPE_OPTIONS = [
   {

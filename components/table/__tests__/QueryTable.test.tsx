@@ -638,4 +638,20 @@ describe("QueryTable component", () => {
       )
     ).toEqual(true);
   });
+
+  it("Lets you pass in a 'loading' prop that overrides the internal loading state if true.", async () => {
+    const wrapper = mountWithContext(
+      <QueryTable<Todo>
+        loading={true}
+        path="todo"
+        columns={["id", "name", "description"]}
+      />
+    );
+
+    // Wait for the initial request to finish and render.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(ReactTable).prop("loading")).toEqual(true);
+  });
 });

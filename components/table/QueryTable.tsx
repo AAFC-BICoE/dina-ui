@@ -38,6 +38,9 @@ export interface QueryTableProps<TData extends KitsuResource> {
   /** The columns to show in the table. */
   columns: Array<ColumnDefinition<TData>>;
 
+  /** Overrides the inner loading state if set to true. */
+  loading?: boolean;
+
   /** Called when a new page size is requested. */
   onPageSizeChange?: PageSizeChangeFunction;
 
@@ -79,6 +82,7 @@ export function QueryTable<TData extends KitsuResource>({
   fields,
   filter,
   include,
+  loading: loadingProp,
   onPageSizeChange,
   onSortedChange,
   onSuccess,
@@ -136,7 +140,10 @@ export function QueryTable<TData extends KitsuResource>({
     }
   });
 
-  const { error, loading, response } = useQuery<TData[], MetaWithTotal>(query, {
+  const { error, loading: queryIsLoading, response } = useQuery<
+    TData[],
+    MetaWithTotal
+  >(query, {
     onSuccess
   });
 
@@ -166,7 +173,7 @@ export function QueryTable<TData extends KitsuResource>({
         data={response && response.data}
         defaultPageSize={page.limit}
         defaultSorted={sortingRules}
-        loading={loading}
+        loading={loadingProp || queryIsLoading}
         manual={true}
         onFetchData={onFetchData}
         onPageSizeChange={onPageSizeChange}
