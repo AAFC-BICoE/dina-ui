@@ -107,7 +107,7 @@ export function ResourceSelect<TData extends KitsuResource>({
     }));
   } else {
     selectValue = !value
-      ? undefined
+      ? null
       : (value as TData).id === null
       ? NULL_OPTION
       : {
@@ -124,7 +124,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       loadOptions={debouncedOptionLoader}
       onChange={onChangeInternal}
       placeholder="Type here to search."
-      value={selectValue as any}
+      value={selectValue}
     />
   );
 }

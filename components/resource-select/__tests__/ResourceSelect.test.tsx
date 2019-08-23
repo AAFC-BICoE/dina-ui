@@ -261,11 +261,13 @@ describe("ResourceSelect component", () => {
     // This should call the onChange prop function with { id: null }.
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).lastCalledWith({ id: null });
+  });
 
-    // Selecting the <none> option shows the "<none>" label in the select input.
+  it("Shows a <none> label when the <none> option is selected.", () => {
+    const wrapper = mountWithContext(
+      <ResourceSelect {...DEFAULT_SELECT_PROPS} value={{ id: null }} />
+    );
 
-    wrapper.setProps({ value: { id: null } });
-    wrapper.update();
     expect(wrapper.containsMatchingElement(<div>{"<none>"}</div>)).toEqual(
       true
     );
