@@ -28,6 +28,7 @@ export function PreLibPrepViewModeSelector({
         <li className="list-inline-item" key={mode}>
           <label>
             <input
+              className={`${mode}-toggle`}
               type="radio"
               checked={viewMode === mode}
               onChange={noop}

@@ -903,4 +903,62 @@ describe("PreLibraryPrepStep UI", () => {
       expect.anything()
     );
   });
+
+  it("Shows different view modes for the shearing and size selectino details", async () => {
+    mockGet.mockImplementation(async (path, params) => {
+      // The request for the sample stepResources.
+      if (
+        path === "stepResource" &&
+        params.include.includes("sample,sample.group")
+      ) {
+        return {
+          data: [{ id: "5", type: "stepResource", sample: { id: "10" } }]
+        };
+      }
+
+      // The request for the preLibraryPrep stepResources; There should be a prelibraryprep with
+      // an inputAmount for the sample.
+      if (
+        path === "stepResource" &&
+        params.include.includes("sample,preLibraryPrep")
+      ) {
+        return {
+          data: [
+            {
+              id: "100",
+              preLibraryPrep: {
+                id: "200",
+                inputAmount: 999,
+                type: "preLibraryPrep"
+              },
+              sample: { id: "10", type: "sample" },
+              type: "stepResource",
+              value: "SIZE_SELECTION"
+            }
+          ]
+        };
+      }
+
+      return { data: [] };
+    });
+
+    const wrapper = getWrapper();
+
+    // Await initial queries.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find("input.SIZE_SELECTION_DETAILS-toggle").simulate("click");
+
+    wrapper.update();
+
+    expect(
+      wrapper
+        .find("div.rt-resizable-header-content[children='Input Amount']")
+        .exists()
+    ).toEqual(true);
+
+    // The mock input amount 999 should show up in the table.
+    expect(wrapper.find("div.rt-td[children=999]").exists()).toEqual(true);
+  });
 });
