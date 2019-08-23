@@ -1,4 +1,4 @@
-import { Form, Formik, FormikActions } from "formik";
+import { connect, Form, Formik, FormikActions } from "formik";
 import { FilterParam } from "kitsu";
 import { useState } from "react";
 import {
@@ -62,11 +62,17 @@ export function SampleSelection(props: StepRendererProps) {
     "name",
     "version",
     {
-      Cell: ({ original: sample }) => (
+      Cell: connect(({ formik, original: sample }) => (
         <div className="row" key={sample.id}>
           <button
             className="btn btn-primary btn-sm col-6 single-select-button"
-            onClick={() => selectSamples([sample])}
+            onClick={() => {
+              selectSamples([sample]);
+              formik.setFieldValue(
+                `sampleIdsToSelect[${sample.id}]`,
+                undefined
+              );
+            }}
           >
             Select
           </button>
@@ -74,7 +80,7 @@ export function SampleSelection(props: StepRendererProps) {
             <SampleSelectCheckBox resource={sample} />
           </div>
         </div>
-      ),
+      )),
       Header: SampleSelectCheckBoxHeader,
       sortable: false
     }
@@ -94,11 +100,17 @@ export function SampleSelection(props: StepRendererProps) {
       accessor: "sample.version"
     },
     {
-      Cell: ({ original: sr }) => (
+      Cell: connect(({ formik, original: sr }) => (
         <div className="row" key={sr.id}>
           <button
             className="btn btn-dark btn-sm col-6 single-deselect-button"
-            onClick={() => deleteStepResources([sr])}
+            onClick={() => {
+              deleteStepResources([sr]);
+              formik.setFieldValue(
+                `stepResourceIdsToDelete[${sr.id}]`,
+                undefined
+              );
+            }}
           >
             Deselect
           </button>
@@ -106,7 +118,7 @@ export function SampleSelection(props: StepRendererProps) {
             <SampleDeselectCheckBox resource={sr} />
           </div>
         </div>
-      ),
+      )),
       Header: SampleDeselectCheckBoxHeader,
       sortable: false
     }

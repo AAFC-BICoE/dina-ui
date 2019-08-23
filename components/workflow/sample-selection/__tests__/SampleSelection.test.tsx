@@ -150,6 +150,11 @@ describe("Sample Selection UI", () => {
       ],
       expect.anything()
     );
+
+    // The checkbox should be cleared.
+    expect(wrapper.find("input[type='checkbox'][value=true]").length).toEqual(
+      0
+    );
   });
 
   it("Lets you select multiple samples using checkboxes.", async () => {
@@ -161,12 +166,12 @@ describe("Sample Selection UI", () => {
 
     // Select samples 3 to 5.
     wrapper
-      .find(".available-samples input[type='checkbox']")
+      .find(".available-samples .rt-tbody input[type='checkbox']")
       .at(2)
       .prop("onClick")({ target: { checked: true } } as any);
     wrapper.update();
     wrapper
-      .find(".available-samples input[type='checkbox']")
+      .find(".available-samples .rt-tbody input[type='checkbox']")
       .at(4)
       .prop("onClick")({ shiftKey: true, target: { checked: true } } as any);
     wrapper.update();
@@ -270,12 +275,12 @@ describe("Sample Selection UI", () => {
 
     // Deselect/delete the second to fourth stepResources.
     wrapper
-      .find(".selected-samples input[type='checkbox']")
+      .find(".selected-samples .rt-tbody input[type='checkbox']")
       .at(1)
       .prop("onClick")({ target: { checked: true } } as any);
     wrapper.update();
     wrapper
-      .find(".selected-samples input[type='checkbox']")
+      .find(".selected-samples .rt-tbody input[type='checkbox']")
       .at(3)
       .prop("onClick")({ shiftKey: true, target: { checked: true } } as any);
     wrapper.update();
