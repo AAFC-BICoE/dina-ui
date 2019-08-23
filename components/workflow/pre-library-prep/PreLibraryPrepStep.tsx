@@ -27,7 +27,11 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
 
   const [rsqlFilter, setRsqlFilter] = useState<string>("");
 
-  const { CheckBoxField, setAvailableItems } = useGroupedCheckBoxes<Sample>({
+  const {
+    CheckBoxHeader,
+    CheckBoxField,
+    setAvailableItems
+  } = useGroupedCheckBoxes<Sample>({
     fieldName: "checkedIds"
   });
 
@@ -89,7 +93,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
           </div>
         </div>
       ),
-      Header: "Select",
+      Header: CheckBoxHeader,
       sortable: false
     }
   ];

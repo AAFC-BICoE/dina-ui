@@ -30,6 +30,7 @@ export function SampleSelection(props: StepRendererProps) {
   } = useSelectionControls(props);
 
   const {
+    CheckBoxHeader: SampleSelectCheckBoxHeader,
     CheckBoxField: SampleSelectCheckBox,
     setAvailableItems: setAvailableSamples
   } = useGroupedCheckBoxes({
@@ -37,6 +38,7 @@ export function SampleSelection(props: StepRendererProps) {
   });
 
   const {
+    CheckBoxHeader: SampleDeselectCheckBoxHeader,
     CheckBoxField: SampleDeselectCheckBox,
     setAvailableItems: setStepResources
   } = useGroupedCheckBoxes({
@@ -73,7 +75,7 @@ export function SampleSelection(props: StepRendererProps) {
           </div>
         </div>
       ),
-      Header: "Select",
+      Header: SampleSelectCheckBoxHeader,
       sortable: false
     }
   ];
@@ -105,7 +107,7 @@ export function SampleSelection(props: StepRendererProps) {
           </div>
         </div>
       ),
-      Header: "Deselect",
+      Header: SampleDeselectCheckBoxHeader,
       sortable: false
     }
   ];

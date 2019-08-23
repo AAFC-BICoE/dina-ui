@@ -1,7 +1,8 @@
-import { Field } from "formik";
+import { connect, Field } from "formik";
 import { KitsuResource } from "kitsu";
 import { noop } from "lodash";
 import { useState } from "react";
+import ReactTooltip from "react-tooltip";
 
 interface CheckBoxFieldProps<TData extends KitsuResource> {
   resource: TData;
@@ -10,6 +11,9 @@ interface CheckBoxFieldProps<TData extends KitsuResource> {
 interface GroupedCheckBoxesParams {
   fieldName: string;
 }
+
+const CHECK_ALL_TOOLTIP_MESSAGE =
+  "Check this header box to check all visible items in this column.";
 
 export function useGroupedCheckBoxes<TData extends KitsuResource>({
   fieldName
@@ -65,5 +69,41 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
     );
   }
 
-  return { CheckBoxField, setAvailableItems };
+  const CheckAllCheckBox = connect(({ formik: { setFieldValue } }) => {
+    function onCheckAllCheckBoxClick(e) {
+      const { checked } = e.target;
+
+      for (const item of availableItems) {
+        setFieldValue(`${fieldName}[${item.id}]`, checked || undefined);
+      }
+    }
+
+    return (
+      <input
+        className="check-all-checkbox"
+        onClick={onCheckAllCheckBoxClick}
+        style={{ height: "20px", width: "20px" }}
+        type="checkbox"
+      />
+    );
+  });
+
+  /** Table column header with a CheckAllCheckBox for the QueryTable. */
+  function CheckBoxHeader() {
+    return (
+      <div>
+        Select <CheckAllCheckBox />
+        <img
+          src="/static/images/iconInformation.gif"
+          data-tip={true}
+          data-for={CHECK_ALL_TOOLTIP_MESSAGE}
+        />
+        <ReactTooltip id={CHECK_ALL_TOOLTIP_MESSAGE}>
+          <span>{CHECK_ALL_TOOLTIP_MESSAGE}</span>
+        </ReactTooltip>
+      </div>
+    );
+  }
+
+  return { CheckAllCheckBox, CheckBoxField, CheckBoxHeader, setAvailableItems };
 }

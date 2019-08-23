@@ -15,7 +15,11 @@ const TEST_SAMPLES: Sample[] = [
 const mockOnSubmit = jest.fn();
 
 function TestComponent() {
-  const { CheckBoxField, setAvailableItems } = useGroupedCheckBoxes<any>({
+  const {
+    CheckBoxHeader,
+    CheckBoxField,
+    setAvailableItems
+  } = useGroupedCheckBoxes<any>({
     fieldName: "checkedIds"
   });
 
@@ -29,6 +33,7 @@ function TestComponent() {
         {TEST_SAMPLES.map(s => (
           <CheckBoxField key={s.id} resource={s} />
         ))}
+        <CheckBoxHeader />
       </Form>
     </Formik>
   );
@@ -41,7 +46,9 @@ describe("Grouped check boxes hook", () => {
 
   it("Renders checkboxes.", () => {
     const wrapper = mount(<TestComponent />);
-    expect(wrapper.find("input[type='checkbox']").length).toEqual(5);
+    expect(
+      wrapper.find("CheckBoxField").find("input[type='checkbox']").length
+    ).toEqual(5);
   });
 
   it("Sets the checked ID in the formik state.", async () => {
@@ -82,7 +89,10 @@ describe("Grouped check boxes hook", () => {
 
     // Boxes 2 to 4 should be checked.
     expect(
-      wrapper.find("input[type='checkbox']").map(i => i.prop("value"))
+      wrapper
+        .find("CheckBoxField")
+        .find("input[type='checkbox']")
+        .map(i => i.prop("value"))
     ).toEqual([false, true, true, true, false]);
 
     wrapper.find("form").simulate("submit");
@@ -113,7 +123,10 @@ describe("Grouped check boxes hook", () => {
 
     // Boxes 2 to 4 should be checked.
     expect(
-      wrapper.find("input[type='checkbox']").map(i => i.prop("value"))
+      wrapper
+        .find("CheckBoxField")
+        .find("input[type='checkbox']")
+        .map(i => i.prop("value"))
     ).toEqual([false, true, true, true, false]);
 
     wrapper.find("form").simulate("submit");
@@ -123,5 +136,34 @@ describe("Grouped check boxes hook", () => {
       { checkedIds: { "2": true, "3": true, "4": true } },
       expect.anything()
     );
+  });
+
+  it("Provides a checkbox to check all boxes.", async () => {
+    const wrapper = mount(<TestComponent />);
+
+    // Check the check-all box.
+    wrapper.find("input.check-all-checkbox").prop("onClick")({
+      target: { checked: true }
+    } as any);
+    wrapper.update();
+
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+
+    expect(mockOnSubmit).lastCalledWith(
+      { checkedIds: { "1": true, "2": true, "3": true, "4": true, "5": true } },
+      expect.anything()
+    );
+
+    // Uncheck the check-all box.
+    wrapper.find("input.check-all-checkbox").prop("onClick")({
+      target: { checked: false }
+    } as any);
+    wrapper.update();
+
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+
+    expect(mockOnSubmit).lastCalledWith({ checkedIds: {} }, expect.anything());
   });
 });
