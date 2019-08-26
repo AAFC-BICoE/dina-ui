@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useDropzone } from "react-dropzone";
 import ReactTable from "react-table";
 
@@ -18,6 +18,8 @@ const baseStyle = {
   transition: "border .24s ease-in-out"
 };
 
+const fileContent = new Map();
+
 const activeStyle = {
   borderColor: "#2196f3"
 };
@@ -30,7 +32,25 @@ const rejectStyle = {
   borderColor: "#ff1744"
 };
 
-function MediaUploadView() {
+let files;
+
+function MediaUploadView({}) {
+  const onDropAccepted = useCallback(dropAcceptedFiles => {
+    dropAcceptedFiles.forEach(file => {
+      const reader = new FileReader();
+      const filename = file.name;
+      reader.onabort = () =>
+        // console.log("file reading was aborted");
+        (reader.onerror = () =>
+          // console.log("file reading has failed");
+          (reader.onload = () => {
+            const binaryStr = reader.result;
+            fileContent.set(filename, binaryStr);
+          }));
+      reader.readAsDataURL(file);
+    });
+  }, []);
+
   const {
     getRootProps,
     getInputProps,
@@ -38,7 +58,7 @@ function MediaUploadView() {
     isDragAccept,
     isDragReject,
     acceptedFiles
-  } = useDropzone({});
+  } = useDropzone({ onDropAccepted, accept: "image/*,audio/*,video/*" });
 
   const style = useMemo(
     () => ({
@@ -50,8 +70,7 @@ function MediaUploadView() {
     [isDragActive, isDragReject]
   );
 
-  const files = acceptedFiles.map(file => ({ fileName: file.name }));
-
+  files = acceptedFiles.map(file => ({ fileName: file.name }));
   return (
     <div className="container">
       <div {...getRootProps({ style })}>
