@@ -58,7 +58,10 @@ function MediaUploadView({}) {
     isDragAccept,
     isDragReject,
     acceptedFiles
-  } = useDropzone({ onDropAccepted, accept: "image/*,audio/*,video/*" });
+  } = useDropzone({
+    accept: "image/*,audio/*,video/*,.pdf,.doc,docx",
+    onDropAccepted
+  });
 
   const style = useMemo(
     () => ({
@@ -70,12 +73,20 @@ function MediaUploadView({}) {
     [isDragActive, isDragReject]
   );
 
-  files = acceptedFiles.map(file => ({ fileName: file.name }));
+  files = acceptedFiles.map(file => ({
+    fileContent: fileContent.get(file.name),
+    fileName: file.name
+  }));
   return (
     <div className="container">
       <div {...getRootProps({ style })}>
         <input {...getInputProps()} />
-        <p>Drag and drop files here or click to open browse dialog</p>
+        <div>
+          <div>Drag and drop files here or click to open browse dialog</div>
+          <div>
+            (Only image, audio, video, .pdf, .doc and docx are accepted)
+          </div>
+        </div>
       </div>
       <ReactTable
         className="-striped"
@@ -84,6 +95,11 @@ function MediaUploadView({}) {
           {
             Header: "File Name",
             accessor: "fileName"
+          },
+          {
+            Header: "File Content",
+            accessor: "fileContent",
+            show: false
           },
           {
             Cell: () => {
