@@ -67,6 +67,7 @@ export default function PcrPrimerListPage() {
         <h1>PCR Primers</h1>
         <ListPageLayout
           filterAttributes={PCR_PRIMER_FILTER_ATTRIBUTES}
+          id="primer-list"
           queryTableProps={{
             columns: PCRPRIMER_TABLE_COLUMNS,
             include: "group,region",

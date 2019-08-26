@@ -37,6 +37,7 @@ export default function RegionListPage() {
         <h1>Gene Regions</h1>
         <ListPageLayout
           filterAttributes={REGION_FILTER_ATTRIBUTES}
+          id="region-list"
           queryTableProps={{
             columns: REGION_TABLE_COLUMNS,
             path: "region"

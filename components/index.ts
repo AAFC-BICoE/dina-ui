@@ -19,6 +19,7 @@ export * from "./formik-connected/SelectField";
 export * from "./formik-connected/SubmitButton";
 export * from "./formik-connected/TextField";
 export * from "./head";
+export * from "./list-page-layout/FilterForm";
 export * from "./list-page-layout/ListPageLayout";
 export * from "./loading-spinner/LoadingSpinner";
 export * from "./nav/nav";

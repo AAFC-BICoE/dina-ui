@@ -1,9 +1,9 @@
-import { Form, Formik, FormikActions } from "formik";
+import { Formik } from "formik";
 import { useState } from "react";
 import titleCase from "title-case";
 import {
   ColumnDefinition,
-  FilterBuilderField,
+  FilterForm,
   LoadingSpinner,
   QueryTable
 } from "../..";
@@ -42,9 +42,8 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
     fieldName: "checkedIds"
   });
 
-  function onFilterSubmit(values, { setSubmitting }: FormikActions<any>) {
-    setRsqlFilter(rsql(values.filter));
-    setSubmitting(false);
+  function onFilterSubmit(values) {
+    setRsqlFilter(rsql(values.filterBuilderModel));
   }
 
   const BRIEF_PLP_DETAILS_COLUMNS: Array<ColumnDefinition<StepResource>> = [
@@ -114,18 +113,11 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
   return (
     <>
       <h2>Shearing/Size Selection</h2>
-      <strong>Filter samples:</strong>
-      <Formik initialValues={{ filter: null }} onSubmit={onFilterSubmit}>
-        <Form className="form-group">
-          <FilterBuilderField
-            filterAttributes={["sample.name"]}
-            name="filter"
-          />
-          <button className="btn btn-primary" type="submit">
-            Search
-          </button>
-        </Form>
-      </Formik>
+      <FilterForm
+        filterAttributes={["sample.name"]}
+        id="pre-library-prep-step"
+        onFilterFormSubmit={onFilterSubmit}
+      />
       <Formik initialValues={{ checkedIds: {} }} onSubmit={null}>
         {formikProps => {
           async function onInnerFormSubmit(plpValues) {

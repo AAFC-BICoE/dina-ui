@@ -1,9 +1,9 @@
-import { connect, Form, Formik, FormikActions } from "formik";
+import { connect, Formik } from "formik";
 import { FilterParam } from "kitsu";
 import { useState } from "react";
 import {
   ColumnDefinition,
-  FilterBuilderField,
+  FilterForm,
   LoadingSpinner,
   QueryTable,
   ResourceSelectField
@@ -124,10 +124,10 @@ export function SampleSelection(props: StepRendererProps) {
     }
   ];
 
-  function onFilterSubmit(values, { setSubmitting }: FormikActions<any>) {
+  function onFilterSubmit(values) {
     const rsqlFilters = [];
 
-    const filterBuilderRsql = rsql(values.filter);
+    const filterBuilderRsql = rsql(values.filterBuilderModel);
     if (filterBuilderRsql) {
       rsqlFilters.push(filterBuilderRsql);
     }
@@ -142,41 +142,32 @@ export function SampleSelection(props: StepRendererProps) {
     };
 
     setFilter(filterParam);
-    setSubmitting(false);
   }
 
   return (
     <>
       <h2>Sample Selection</h2>
-      <strong>Filter available samples:</strong>
-      <Formik initialValues={{ filter: null }} onSubmit={onFilterSubmit}>
+      <FilterForm
+        filterAttributes={SAMPLE_FILTER_ATTRIBUTES}
+        id="sample-selection"
+        onFilterFormSubmit={onFilterSubmit}
+      >
         {({ submitForm }) => (
-          <Form>
-            <div className="form-group">
-              <FilterBuilderField
-                filterAttributes={SAMPLE_FILTER_ATTRIBUTES}
-                name="filter"
+          <div className="form-group">
+            <div style={{ width: "300px" }}>
+              <ResourceSelectField<Group>
+                filter={filterBy(["groupName"])}
+                isMulti={true}
+                label="Filter by group"
+                name="groups"
+                model="group"
+                onChange={() => setImmediate(submitForm)}
+                optionLabel={group => group.groupName}
               />
             </div>
-            <div className="form-group">
-              <div style={{ width: "300px" }}>
-                <ResourceSelectField<Group>
-                  filter={filterBy(["groupName"])}
-                  isMulti={true}
-                  label="Filter by group"
-                  name="groups"
-                  model="group"
-                  onChange={() => setImmediate(submitForm)}
-                  optionLabel={group => group.groupName}
-                />
-              </div>
-            </div>
-            <button className="btn btn-primary" type="submit">
-              Search
-            </button>
-          </Form>
+          </div>
         )}
-      </Formik>
+      </FilterForm>
       <div className="row form-group">
         <Formik
           initialValues={{ sampleIdsToSelect: {}, stepResourcesToDelete: {} }}

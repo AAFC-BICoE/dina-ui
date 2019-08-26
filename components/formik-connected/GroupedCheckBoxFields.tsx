@@ -1,6 +1,6 @@
 import { connect, Field } from "formik";
 import { KitsuResource } from "kitsu";
-import { noop } from "lodash";
+import { noop, toPairs } from "lodash";
 import { useState } from "react";
 import ReactTooltip from "react-tooltip";
 
@@ -13,7 +13,7 @@ interface GroupedCheckBoxesParams {
 }
 
 const CHECK_ALL_TOOLTIP_MESSAGE =
-  "Check this header box to check all visible items in this column.";
+  "Check this header box to check all visible items in this page.";
 
 export function useGroupedCheckBoxes<TData extends KitsuResource>({
   fieldName
@@ -89,7 +89,10 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
   });
 
   /** Table column header with a CheckAllCheckBox for the QueryTable. */
-  function CheckBoxHeader() {
+  const CheckBoxHeader = connect(({ formik: { values } }) => {
+    const totalChecked = toPairs(values[fieldName]).filter(pair => pair[1])
+      .length;
+
     return (
       <div>
         Select <CheckAllCheckBox />
@@ -101,9 +104,10 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
         <ReactTooltip id={CHECK_ALL_TOOLTIP_MESSAGE}>
           <span>{CHECK_ALL_TOOLTIP_MESSAGE}</span>
         </ReactTooltip>
+        <div>({totalChecked} selected)</div>
       </div>
     );
-  }
+  });
 
   return { CheckAllCheckBox, CheckBoxField, CheckBoxHeader, setAvailableItems };
 }

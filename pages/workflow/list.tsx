@@ -37,6 +37,7 @@ export default function WorkflowListPage() {
         </Link>
         <ListPageLayout
           filterAttributes={WORKFLOW_FILTER_ATTRIBUTES}
+          id="workflow-list"
           queryTableProps={{
             columns: WORKFLOW_TABLE_COLUMNS,
             include: "chainTemplate,group",

@@ -141,11 +141,17 @@ describe("Grouped check boxes hook", () => {
   it("Provides a checkbox to check all boxes.", async () => {
     const wrapper = mount(<TestComponent />);
 
+    // The header should show the total checked count.
+    expect(wrapper.text().includes("(0 selected)")).toEqual(true);
+
     // Check the check-all box.
     wrapper.find("input.check-all-checkbox").prop("onClick")({
       target: { checked: true }
     } as any);
     wrapper.update();
+
+    // The header should show the total checked count.
+    expect(wrapper.text().includes("(5 selected)")).toEqual(true);
 
     wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
@@ -160,6 +166,9 @@ describe("Grouped check boxes hook", () => {
       target: { checked: false }
     } as any);
     wrapper.update();
+
+    // The header should show the total checked count.
+    expect(wrapper.text().includes("(0 selected)")).toEqual(true);
 
     wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);

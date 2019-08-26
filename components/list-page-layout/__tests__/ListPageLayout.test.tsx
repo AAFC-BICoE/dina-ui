@@ -32,6 +32,7 @@ describe("ListPageLayout component", () => {
   it("Has a reset button to clear the filter form.", async () => {
     const wrapper = mountWithContext(
       <ListPageLayout
+        id="test-layout"
         filterAttributes={["name"]}
         queryTableProps={{
           columns: ["name", "type"],
@@ -77,6 +78,7 @@ describe("ListPageLayout component", () => {
   it("Stores the table's sort and page-size in cookies.", async () => {
     const wrapper = mountWithContext(
       <ListPageLayout
+        id="test-layout"
         filterAttributes={["name"]}
         queryTableProps={{
           columns: ["name", "type"],

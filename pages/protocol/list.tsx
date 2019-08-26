@@ -63,6 +63,7 @@ export default function ProtocolListPage() {
       <div className="container-fluid">
         <h1>Protocols</h1>
         <ListPageLayout
+          id="protocol-list"
           filterAttributes={PROTOCOL_FILTER_ATTRIBUTES}
           queryTableProps={{
             columns: PROTOCOL_TABLE_COLUMNS,

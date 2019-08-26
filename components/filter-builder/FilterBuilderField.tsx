@@ -7,6 +7,7 @@ interface FilterBuilderFieldProps {
   name: string;
 }
 
+/** Formik-connected filter builder field. */
 export function FilterBuilderField({
   filterAttributes,
   name
