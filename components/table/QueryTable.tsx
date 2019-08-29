@@ -178,6 +178,7 @@ export function QueryTable<TData extends KitsuResource>({
         onFetchData={onFetchData}
         onPageSizeChange={onPageSizeChange}
         onSortedChange={onSortedChange}
+        pageSizeOptions={[25, 50, 100, 200, 500]}
         pages={numberOfPages}
         showPaginationTop={true}
       />

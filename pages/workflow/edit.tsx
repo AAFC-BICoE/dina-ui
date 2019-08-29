@@ -25,12 +25,12 @@ export function ChainEditPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title="Edit Workflow" />
+      <Head title="Edit NGS Workflow" />
       <Nav />
       <div className="container-fluid">
         {id ? (
           <div>
-            <h1>Edit Workflow</h1>
+            <h1>Edit NGS Workflow</h1>
             <Query<any>
               query={{ include: "chainTemplate,group", path: `workflow/${id}` }}
             >
@@ -46,7 +46,7 @@ export function ChainEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>Add Workflow</h1>
+            <h1>Add NGS Workflow</h1>
             <ChainForm router={router} />
           </div>
         )}
@@ -93,6 +93,7 @@ function ChainForm({ chain, router }: ChainFormProps) {
             <div className="row">
               <ResourceSelectField<any>
                 className="col-md-2"
+                label="Workflow Template"
                 name="chainTemplate"
                 filter={filterBy(["name"])}
                 model="chainTemplate"

@@ -28,12 +28,12 @@ const WORKFLOW_FILTER_ATTRIBUTES = [
 export default function WorkflowListPage() {
   return (
     <>
-      <Head title="Workflows" />
+      <Head title="NGS Workflows" />
       <Nav />
       <div className="container-fluid">
-        <h1>Workflows</h1>
+        <h1>NGS Workflows</h1>
         <Link href="/workflow/edit" prefetch={true}>
-          <a>Add New Workflow</a>
+          <a>Add New NGS Workflow</a>
         </Link>
         <ListPageLayout
           filterAttributes={WORKFLOW_FILTER_ATTRIBUTES}

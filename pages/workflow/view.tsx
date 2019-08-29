@@ -12,7 +12,7 @@ export function WorkflowDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title="Workflow" />
+      <Head title="NGS Workflow" />
       <Nav />
       <Query<Chain>
         query={{ include: "group,chainTemplate", path: `chain/${id}` }}
@@ -20,9 +20,9 @@ export function WorkflowDetailsPage({ router }: WithRouterProps) {
         {({ loading, response }) => (
           <div className="container-fluid">
             <Link href="/workflow/list">
-              <a>Workflow list</a>
+              <a>NGS Workflow list</a>
             </Link>
-            <h1>Workflow Details{response && `: ${response.data.name}`}</h1>
+            <h1>NGS Workflow Details{response && `: ${response.data.name}`}</h1>
             <LoadingSpinner loading={loading} />
             {response && <WorkflowSteps chain={response.data} />}
           </div>

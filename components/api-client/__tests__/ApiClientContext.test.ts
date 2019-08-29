@@ -111,6 +111,10 @@ const MOCK_AXIOS_RESPONSE_1_VALID_2_INVALID = {
         }
       ],
       status: 422
+    },
+    {
+      // The client should be able to ignore a response with no 'errors' field.
+      status: 500
     }
   ] as OperationsResponse
 };
