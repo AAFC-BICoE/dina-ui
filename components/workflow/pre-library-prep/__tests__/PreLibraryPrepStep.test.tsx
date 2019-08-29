@@ -948,7 +948,9 @@ describe("PreLibraryPrepStep UI", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    wrapper.find("input.SIZE_SELECTION_DETAILS-toggle").simulate("click");
+    wrapper
+      .find("li.react-tabs__tab.SIZE_SELECTION_DETAILS-toggle")
+      .simulate("click");
 
     wrapper.update();
 

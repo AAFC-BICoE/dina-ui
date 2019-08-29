@@ -1,4 +1,4 @@
-import { noop } from "lodash";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
 export type PreLibPrepViewMode =
   | "EDIT"
@@ -10,34 +10,48 @@ interface ViewModeSelectorProps {
   onChange: (newMode: PreLibPrepViewMode) => void;
 }
 
+const modes: Array<{ label: string; mode: PreLibPrepViewMode }> = [
+  { label: "Edit", mode: "EDIT" },
+  { label: "Shearing Details", mode: "SHEARING_DETAILS" },
+  { label: "Size Selection Details", mode: "SIZE_SELECTION_DETAILS" }
+];
+
 /** View mode selector for the Pre Lib Prep page. */
 export function PreLibPrepViewModeSelector({
   onChange,
   viewMode
 }: ViewModeSelectorProps) {
+  const selectedIndex = modes.findIndex(({ mode }) => viewMode === mode);
+
+  function onSelect(tabIndex: number) {
+    const selectedMode = modes[tabIndex];
+    onChange(selectedMode.mode);
+  }
+
   return (
-    <ul className="list-inline">
-      <li className="list-inline-item">
-        <strong>View mode:</strong>
-      </li>
-      {[
-        { label: "Edit", mode: "EDIT" },
-        { label: "Shearing Details", mode: "SHEARING_DETAILS" },
-        { label: "Size Selection Details", mode: "SIZE_SELECTION_DETAILS" }
-      ].map(({ label, mode }) => (
-        <li className="list-inline-item" key={mode}>
-          <label>
-            <input
-              className={`${mode}-toggle`}
-              type="radio"
-              checked={viewMode === mode}
-              onChange={noop}
-              onClick={() => onChange(mode as PreLibPrepViewMode)}
-            />
-            {label}
-          </label>
-        </li>
-      ))}
-    </ul>
+    <>
+      <strong className="d-inline-bloc">View mode: </strong>
+      <Tabs
+        selectedIndex={selectedIndex}
+        onSelect={onSelect}
+        className="d-inline-bloc"
+      >
+        <TabList>
+          {modes.map(({ label, mode }) => (
+            <Tab
+              className={`react-tabs__tab ${mode}-toggle`}
+              key={mode}
+              onSelect={() => onChange(mode)}
+            >
+              {label}
+            </Tab>
+          ))}
+        </TabList>
+        {modes.map(({ mode }) => (
+          // Add empty TabPanels because react-tabs requires one for each Tab.
+          <TabPanel key={mode} />
+        ))}
+      </Tabs>
+    </>
   );
 }
