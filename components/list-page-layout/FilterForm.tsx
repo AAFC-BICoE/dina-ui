@@ -56,17 +56,21 @@ export function FilterForm({
               name="filterBuilderModel"
             />
           </div>
-          {children && children(formikProps)}
-          <button className="btn btn-primary" type="submit">
-            Filter List
-          </button>
-          <button
-            className="btn btn-dark"
-            type="button"
-            onClick={() => resetFilterForm(formikProps)}
-          >
-            Reset
-          </button>
+          <div className="d-inline-block">
+            {children && children(formikProps)}
+          </div>
+          <div className="d-inline-block pl-3">
+            <button className="btn btn-primary" type="submit">
+              Filter List
+            </button>
+            <button
+              className="btn btn-dark"
+              type="button"
+              onClick={() => resetFilterForm(formikProps)}
+            >
+              Reset
+            </button>
+          </div>
         </Form>
       )}
     </Formik>
