@@ -127,7 +127,10 @@ function getErrorMessage(
   ) as JsonApiErrorResponse[];
 
   // Map the error responses to JsonApiErrors.
-  const jsonApiErrors = errorResponses.map(response => response.errors);
+  const jsonApiErrors = errorResponses
+    // Ignore any error responses without an 'errors' field.
+    .filter(response => response.errors)
+    .map(response => response.errors);
 
   // Convert the JsonApiErrors to an aggregated error string.
   const message = jsonApiErrors

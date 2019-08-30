@@ -29,8 +29,10 @@
     "react-datepicker": "^2.3.0",
     "react-dom": "^16.8.3",
     "react-hooks-async": "^3.1.0",
+    "react-number-format": "^4.2.0",
     "react-select": "^2.3.0",
     "react-table": "^6.10.0",
+    "react-tabs": "^3.0.0",
     "react-tooltip": "^3.10.0",
     "title-case": "^2.1.1"
   },
@@ -47,6 +49,7 @@
     "@types/react-dom": "^16.8.2",
     "@types/react-select": "^2.0.11",
     "@types/react-table": "^6.8.4",
+    "@types/react-tabs": "^2.3.1",
     "@types/react-test-renderer": "^16.0.3",
     "@types/styled-jsx": "^2.2.7",
     "asciidoctor.js": "^1.5.9",
@@ -68,7 +71,7 @@
     "tslint-config-prettier": "^1.17.0",
     "tslint-plugin-prettier": "^2.0.1",
     "tslint-react": "^3.6.0",
-    "typescript": "^3.2.2"
+    "typescript": "^3.5.3"
   },
   "husky": {
     "hooks": {

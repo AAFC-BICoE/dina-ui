@@ -54,6 +54,7 @@ export default function PcrProfileListPage() {
         <h1>Thermocycler Profiles</h1>
         <ListPageLayout
           filterAttributes={PCRPROFILE_FILTER_ATTRIBUTES}
+          id="pcr-profile-list"
           queryTableProps={{
             columns: PCRPROFILE_TABLE_COLUMNS,
             include: "group,region",

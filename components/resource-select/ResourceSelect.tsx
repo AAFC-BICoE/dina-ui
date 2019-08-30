@@ -9,10 +9,10 @@ import { ApiClientContext } from "../../components/api-client/ApiClientContext";
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData> {
   /** Sets the input's value so the value can be controlled externally. */
-  value?: TData;
+  value?: TData | TData[];
 
   /** Function called when an option is selected. */
-  onChange?: (value: TData) => void;
+  onChange?: (value: TData | TData[]) => void;
 
   /** The model type to select resources from. */
   model: string;
@@ -23,6 +23,9 @@ export interface ResourceSelectProps<TData> {
   /** Function that is passed the dropdown's search input value and returns a JSONAPI filter param. */
   filter: (inputValue: string) => FilterParam;
 
+  /** Whether this is a multi-select dropdown. */
+  isMulti?: boolean;
+
   /** The JSONAPI "include" parameter. */
   include?: string;
 
@@ -31,12 +34,13 @@ export interface ResourceSelectProps<TData> {
 }
 
 /** An option the user can select to set the relationship to null. */
-const NULL_OPTION = { label: "<none>", value: { id: null } };
+const NULL_OPTION = { label: "<none>", resource: { id: null }, value: null };
 
 /** Dropdown select input for selecting a resource from the API. */
 export function ResourceSelect<TData extends KitsuResource>({
   filter,
   include,
+  isMulti = false,
   model,
   onChange = () => undefined,
   optionLabel,
@@ -64,15 +68,28 @@ export function ResourceSelect<TData extends KitsuResource>({
     // Build the list of options from the returned resources.
     const resourceOptions = data.map(resource => ({
       label: optionLabel(resource),
-      value: resource
+      resource,
+      value: resource.id
     }));
 
-    // Only show the null option when there is no search input value.
-    const options = inputValue
-      ? resourceOptions
-      : [NULL_OPTION, ...resourceOptions];
+    // Only show the null option when in single-resource mode and when there is no search input value.
+    const options =
+      !isMulti && !inputValue
+        ? [NULL_OPTION, ...resourceOptions]
+        : resourceOptions;
 
     callback(options);
+  }
+
+  function onChangeInternal(selectedOption) {
+    if (selectedOption.resource) {
+      // Handle single select:
+      onChange(selectedOption.resource);
+    } else {
+      // Handle multi select:
+      const resources = selectedOption.map(o => o.resource);
+      onChange(resources);
+    }
   }
 
   // Debounces the loadOptions function to avoid sending excessive API requests.
@@ -81,20 +98,33 @@ export function ResourceSelect<TData extends KitsuResource>({
   }, 250);
 
   // Set the component's value externally when used as a controlled input.
-  const selectedValue = !value
-    ? undefined
-    : value.id === null
-    ? NULL_OPTION
-    : { label: optionLabel(value), value };
+  let selectValue;
+  if (isMulti) {
+    selectValue = ((value || []) as TData[]).map(resource => ({
+      label: optionLabel(resource),
+      resource,
+      value: resource.id
+    }));
+  } else {
+    selectValue = !value
+      ? null
+      : (value as TData).id === null
+      ? NULL_OPTION
+      : {
+          label: optionLabel(value as TData),
+          resource: value,
+          value: (value as TData).id
+        };
+  }
 
   return (
     <AsyncSelect
       defaultOptions={true}
+      isMulti={isMulti}
       loadOptions={debouncedOptionLoader}
-      /* tslint:disable-next-line */
-      onChange={({ value }) => onChange(value)}
+      onChange={onChangeInternal}
       placeholder="Type here to search."
-      value={selectedValue as any}
+      value={selectValue}
     />
   );
 }

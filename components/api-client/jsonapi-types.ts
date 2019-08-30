@@ -54,7 +54,7 @@ export type HttpMethod = "POST" | "PATCH" | "DELETE";
 export interface Operation {
   op: HttpMethod;
   path: string;
-  value: JsonApiResource;
+  value?: JsonApiResource;
 }
 
 /**

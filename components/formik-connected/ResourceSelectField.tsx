@@ -1,5 +1,6 @@
 import { Field, FieldProps } from "formik";
 import { KitsuResource } from "kitsu";
+import { noop } from "lodash";
 import {
   ResourceSelect,
   ResourceSelectProps
@@ -7,19 +8,16 @@ import {
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface ResourceSelectFieldProps<TData>
-  extends ResourceSelectProps<TData>,
+  extends Omit<ResourceSelectProps<TData>, "value">,
     LabelWrapperParams {
-  // These props are not required when using this Formik-controlled input.
-  onChange?: never;
-  value?: never;
-  tooltipMsg?: string;
+  onChange?: (value?: TData) => void;
 }
 
 /** Formik-connected Dropdown select input for selecting a resource from the API. */
 export function ResourceSelectField<TData extends KitsuResource>(
   topLevelProps: ResourceSelectFieldProps<TData>
 ) {
-  const { className, name, label, tooltipMsg } = topLevelProps;
+  const { className, name, label, onChange = noop, tooltipMsg } = topLevelProps;
 
   return (
     <Field name={name}>
@@ -27,9 +25,10 @@ export function ResourceSelectField<TData extends KitsuResource>(
         field: { value },
         form: { setFieldValue, setFieldTouched }
       }: FieldProps) => {
-        function onChange(resource) {
+        function onChangeInternal(resource) {
           setFieldValue(name, resource);
           setFieldTouched(name);
+          onChange(resource);
         }
 
         return (
@@ -41,7 +40,7 @@ export function ResourceSelectField<TData extends KitsuResource>(
           >
             <ResourceSelect
               {...topLevelProps}
-              onChange={onChange}
+              onChange={onChangeInternal}
               value={value}
             />
           </FieldWrapper>

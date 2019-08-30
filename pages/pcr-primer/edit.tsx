@@ -10,6 +10,7 @@ import {
   Head,
   LoadingSpinner,
   Nav,
+  NumberField,
   Query,
   ResourceSelectField,
   SelectField,
@@ -123,7 +124,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
               optionLabel={region => region.name}
             />
             <TextField className="col-md-2" name="name" />
-            <TextField className="col-md-2" name="lotNumber" />
+            <NumberField className="col-md-2" name="lotNumber" />
             <TextField className="col-md-2" name="targetSpecies" />
             <TextField className="col-md-2" name="purification" />
           </div>

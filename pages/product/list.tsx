@@ -51,6 +51,7 @@ export default function ProductListPage() {
         <h1>Product Inventory</h1>
         <ListPageLayout
           filterAttributes={PRODUCT_FILTER_ATTRIBUTES}
+          id="product-list"
           queryTableProps={{
             columns: PRODUCT_TABLE_COLUMNS,
             include: "group",

@@ -1,12 +1,13 @@
 import { Field, FieldProps } from "formik";
-import { FilterBuilder } from "./FilterBuilder";
+import { FilterAttribute, FilterBuilder } from "./FilterBuilder";
 import { FilterGroupModel } from "./FilterGroup";
 
 interface FilterBuilderFieldProps {
-  filterAttributes: string[];
+  filterAttributes: FilterAttribute[];
   name: string;
 }
 
+/** Formik-connected filter builder field. */
 export function FilterBuilderField({
   filterAttributes,
   name

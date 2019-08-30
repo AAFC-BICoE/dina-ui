@@ -1,9 +1,10 @@
-import { KitsuResponseData } from "kitsu";
+import { KitsuResponse, KitsuResponseData } from "kitsu";
 import React from "react";
 import { JsonApiQuerySpec, QueryState, useQuery } from "./useQuery";
 
 /** Query component props. */
 export interface QueryProps<TData extends KitsuResponseData, TMeta> {
+  onSuccess?: (response: KitsuResponse<TData, TMeta>) => void;
   query: JsonApiQuerySpec;
   children: QueryChildren<TData, TMeta>;
 }
@@ -21,8 +22,9 @@ type QueryChildren<TData extends KitsuResponseData, TMeta> = (
 /** Back-end connected Query component. */
 export function Query<TData extends KitsuResponseData, TMeta = undefined>({
   children,
+  onSuccess,
   query
 }: QueryProps<TData, TMeta>) {
-  const queryState = useQuery<TData, TMeta>(query);
+  const queryState = useQuery<TData, TMeta>(query, { onSuccess });
   return children(queryState);
 }

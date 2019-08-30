@@ -613,4 +613,45 @@ describe("QueryTable component", () => {
       wrapper.containsMatchingElement(<span>Total matched records: 300</span>)
     ).toEqual(true);
   });
+
+  it("Renders an error overlay when there is a query error.", async () => {
+    mockGet.mockImplementationOnce(() => {
+      throw {
+        errors: [{ detail: "error message 1" }, { detail: "error message 2" }]
+      };
+    });
+
+    const wrapper = mountWithContext(
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
+    );
+
+    // Wait for the initial request to finish and the result to render.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper.find(".alert.alert-danger").matchesElement(
+        <div className="alert alert-danger">
+          <p>Error:</p>
+          <p>error message 1{"\n"}error message 2</p>
+        </div>
+      )
+    ).toEqual(true);
+  });
+
+  it("Lets you pass in a 'loading' prop that overrides the internal loading state if true.", async () => {
+    const wrapper = mountWithContext(
+      <QueryTable<Todo>
+        loading={true}
+        path="todo"
+        columns={["id", "name", "description"]}
+      />
+    );
+
+    // Wait for the initial request to finish and render.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(ReactTable).prop("loading")).toEqual(true);
+  });
 });

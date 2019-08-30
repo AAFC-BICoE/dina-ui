@@ -1,6 +1,7 @@
 import React from "react";
 import Select from "react-select";
 import titleCase from "title-case";
+import { FilterAttribute } from "./FilterBuilder";
 
 export type FilterRowPredicate = "IS" | "IS NOT";
 export type FilterRowSearchType =
@@ -11,20 +12,25 @@ export type FilterRowSearchType =
 export interface FilterRowModel {
   id: number;
   type: "FILTER_ROW";
-  attribute: string;
+  attribute: FilterAttribute;
   predicate: FilterRowPredicate;
   searchType: FilterRowSearchType;
   value: string;
 }
 
 export interface FilterRowProps {
-  filterAttributes: string[];
+  filterAttributes: FilterAttribute[];
   model: FilterRowModel;
   showRemoveButton: boolean;
   onAndClick: () => void;
   onChange: () => void;
   onRemoveClick: () => void;
   onOrClick: () => void;
+}
+
+export interface FilterAttributeOption {
+  label: string;
+  value: FilterAttribute;
 }
 
 export class FilterRow extends React.Component<FilterRowProps> {
@@ -46,18 +52,21 @@ export class FilterRow extends React.Component<FilterRowProps> {
       { label: "Blank Field", value: "BLANK_FIELD" }
     ];
 
+    const attributeSelectOption = getSelectOption(model.attribute);
+
+    const mappedfilterAttributes = this.props.filterAttributes.map(
+      getSelectOption
+    );
+
     return (
       <div className="list-inline">
         <div className="list-inline-item" style={{ width: 320 }}>
-          <Select
+          <Select<FilterAttributeOption>
             className="filter-attribute"
             instanceId={`attribute_${model.id}`}
-            options={this.mappedfilterAttributes}
+            options={mappedfilterAttributes}
             onChange={this.onPropertyChanged}
-            value={{
-              label: titleCase(model.attribute),
-              value: model.attribute
-            }}
+            value={attributeSelectOption}
           />
         </div>
         <div className="list-inline-item" style={{ width: 120 }}>
@@ -121,14 +130,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
     );
   }
 
-  get mappedfilterAttributes() {
-    return this.props.filterAttributes.map(attr => ({
-      label: titleCase(attr),
-      value: attr
-    }));
-  }
-
-  private onPropertyChanged = (value: { label: string; value: string }) => {
+  private onPropertyChanged = (value: FilterAttributeOption) => {
     this.props.model.attribute = value.value;
     this.props.onChange();
     this.forceUpdate();
@@ -154,4 +156,16 @@ export class FilterRow extends React.Component<FilterRowProps> {
     this.props.onChange();
     this.forceUpdate();
   };
+}
+
+function getSelectOption(attribute: FilterAttribute): FilterAttributeOption {
+  return typeof attribute === "string"
+    ? {
+        label: titleCase(attribute),
+        value: attribute
+      }
+    : {
+        label: attribute.label || titleCase(attribute.name),
+        value: attribute
+      };
 }

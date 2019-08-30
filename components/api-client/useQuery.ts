@@ -17,12 +17,18 @@ export interface QueryState<TData extends KitsuResponseData, TMeta> {
   response?: KitsuResponse<TData, TMeta>;
 }
 
+/** Additional query options. */
+export interface QueryOptions<TData extends KitsuResponseData, TMeta> {
+  onSuccess?: (response: KitsuResponse<TData, TMeta>) => void;
+}
+
 /**
  * Back-end connected React hook for running queries agains the back-end.
  * It fetches the data again if the passed query changes.
  */
 export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
-  querySpec: JsonApiQuerySpec
+  querySpec: JsonApiQuerySpec,
+  options: QueryOptions<TData, TMeta> = {}
 ): QueryState<TData, TMeta> {
   const { apiClient } = useContext(ApiClientContext);
   const previousResponseRef = useRef<KitsuResponse<TData, TMeta>>(undefined);
@@ -37,7 +43,11 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
       isUndefined
     );
 
-    return apiClient.get(path, getParams);
+    const request = apiClient.get(path, getParams);
+    if (options.onSuccess) {
+      request.then(options.onSuccess);
+    }
+    return request;
   }, [JSON.stringify(querySpec)]);
 
   // fetchData function should re-run when the query spec changes.

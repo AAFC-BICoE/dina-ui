@@ -1,4 +1,5 @@
 import { mount } from "enzyme";
+import { KitsuResource } from "kitsu";
 import lodash from "lodash";
 import Select from "react-select/lib/Select";
 import {
@@ -7,13 +8,18 @@ import {
 } from "../../api-client/ApiClientContext";
 import { ResourceSelect, ResourceSelectProps } from "../ResourceSelect";
 
+/** Example */
+interface Todo extends KitsuResource {
+  name: string;
+}
+
 /** Mock resources to select as dropdown options. */
 const MOCK_TODOS = {
   data: [
-    { id: 1, type: "todo", name: "todo 1" },
-    { id: 2, type: "todo", name: "todo 2" },
-    { id: 3, type: "todo", name: "todo 3" }
-  ]
+    { id: "1", type: "todo", name: "todo 1" },
+    { id: "2", type: "todo", name: "todo 2" },
+    { id: "3", type: "todo", name: "todo 3" }
+  ] as Todo[]
 };
 
 /** Mock Kitsu "get" method. */
@@ -96,11 +102,11 @@ describe("ResourceSelect component", () => {
     const { options, onChange } = selectProps;
 
     // Select the third option (excluding the <none option>).
-    onChange(options[3]);
+    onChange(options[3], null);
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).lastCalledWith({
-      id: 3,
+      id: "3",
       name: "todo 3",
       type: "todo"
     });
@@ -114,7 +120,8 @@ describe("ResourceSelect component", () => {
     // Select an option.
     (wrapper.find(Select).props() as any).onChange({
       label: "a todo",
-      value: {}
+      resource: {},
+      value: "1"
     });
 
     // Nothing should happen because no onChange prop was provided.
@@ -164,7 +171,7 @@ describe("ResourceSelect component", () => {
     const { onInputChange } = wrapper.find(Select).props();
 
     // Simulate the select component's input change.
-    onInputChange("test filter value", "input-change");
+    onInputChange("test filter value", { action: "input-change" });
 
     // Wait for the options to load.
     await Promise.resolve();
@@ -183,15 +190,27 @@ describe("ResourceSelect component", () => {
 
     // The <none> option should be hidden when a search value is specified.
     expect(options).toEqual([
-      { label: "todo 1", value: { id: 1, name: "todo 1", type: "todo" } },
-      { label: "todo 2", value: { id: 2, name: "todo 2", type: "todo" } },
-      { label: "todo 3", value: { id: 3, name: "todo 3", type: "todo" } }
+      {
+        label: "todo 1",
+        resource: { id: "1", name: "todo 1", type: "todo" },
+        value: "1"
+      },
+      {
+        label: "todo 2",
+        resource: { id: "2", name: "todo 2", type: "todo" },
+        value: "2"
+      },
+      {
+        label: "todo 3",
+        resource: { id: "3", name: "todo 3", type: "todo" },
+        value: "3"
+      }
     ]);
   });
 
   it("Provides a 'value' prop to specify the select's value.", () => {
     const value = {
-      id: 300,
+      id: "300",
       name: "DEFAULT TODO",
       type: "todo"
     };
@@ -204,11 +223,12 @@ describe("ResourceSelect component", () => {
 
     expect(currentValue).toEqual({
       label: "DEFAULT TODO",
-      value: {
-        id: 300,
+      resource: {
+        id: "300",
         name: "DEFAULT TODO",
         type: "todo"
-      }
+      },
+      value: "300"
     });
   });
 
@@ -229,22 +249,25 @@ describe("ResourceSelect component", () => {
 
     expect(nullOption).toEqual({
       label: "<none>",
-      value: {
+      resource: {
         id: null
-      }
+      },
+      value: null
     });
 
     // Select the null option.
-    onChange(nullOption);
+    onChange(nullOption, null);
 
     // This should call the onChange prop function with { id: null }.
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).lastCalledWith({ id: null });
+  });
 
-    // Selecting the <none> option shows the "<none>" label in the select input.
+  it("Shows a <none> label when the <none> option is selected.", () => {
+    const wrapper = mountWithContext(
+      <ResourceSelect {...DEFAULT_SELECT_PROPS} value={{ id: null }} />
+    );
 
-    wrapper.setProps({ value: { id: null } });
-    wrapper.update();
     expect(wrapper.containsMatchingElement(<div>{"<none>"}</div>)).toEqual(
       true
     );
@@ -262,5 +285,84 @@ describe("ResourceSelect component", () => {
     expect(wrapper.containsMatchingElement(<div>{"<none>"}</div>)).toEqual(
       true
     );
+  });
+
+  it("Allows multi-select mode.", async () => {
+    const mockOnChange = jest.fn();
+
+    const wrapper = mountWithContext(
+      <ResourceSelect<Todo>
+        {...DEFAULT_SELECT_PROPS}
+        isMulti={true}
+        onChange={mockOnChange}
+      />
+    );
+
+    // Wait for the options to load.
+    await Promise.resolve();
+    wrapper.update();
+
+    const { options, onChange } = wrapper.find(Select).props();
+
+    // Select the second and third options.
+    onChange([options[1], options[2]], null);
+
+    expect(mockOnChange).toHaveBeenCalledTimes(1);
+    expect(mockOnChange).lastCalledWith([
+      {
+        id: "2",
+        name: "todo 2",
+        type: "todo"
+      },
+      {
+        id: "3",
+        name: "todo 3",
+        type: "todo"
+      }
+    ]);
+  });
+
+  it("Renders a list of selected options in multi-select mode.", async () => {
+    const TEST_MULTI_VALUE = [
+      {
+        id: "2",
+        name: "todo 2",
+        type: "todo"
+      },
+      {
+        id: "3",
+        name: "todo 3",
+        type: "todo"
+      }
+    ];
+
+    const wrapper = mountWithContext(
+      <ResourceSelect<Todo>
+        {...DEFAULT_SELECT_PROPS}
+        isMulti={true}
+        value={TEST_MULTI_VALUE}
+      />
+    );
+
+    // Wait for the options to load.
+    await Promise.resolve();
+    wrapper.update();
+
+    expect(wrapper.text()).toEqual("todo 2todo 3");
+  });
+
+  it("Does not render the 'none' option in multi-select mode.", async () => {
+    const wrapper = mountWithContext(
+      <ResourceSelect<Todo> {...DEFAULT_SELECT_PROPS} isMulti={true} />
+    );
+
+    // Wait for the options to load.
+    await Promise.resolve();
+    wrapper.update();
+
+    const { options } = wrapper.find(Select).props();
+
+    // Only the todos should be options.
+    expect((options as any[]).map(o => o.resource)).toEqual(MOCK_TODOS.data);
   });
 });
