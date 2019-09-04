@@ -2,7 +2,7 @@
 import { cleanup, render } from "@testing-library/react";
 import MediaUploadView from "../../pages/media-uploadView/upload";
 
-describe("MediaUploadView should have the styles and accepting multiple files", () => {
+describe("MediaUploadView test", () => {
   let files;
   beforeEach(() => {
     files = [createFile("file1.pdf", 1111, "application/pdf")];
@@ -10,26 +10,25 @@ describe("MediaUploadView should have the styles and accepting multiple files", 
 
   afterEach(cleanup);
 
-  describe("behavior", () => {
-    it("renders the root and input nodes with the necessary props", () => {
-      const { container } = render(<MediaUploadView />);
-      const rootDiv = container.querySelector("div");
-      expect(rootDiv).toHaveProperty("style.border-color");
-      expect(rootDiv.querySelector("div.container>div input")).toHaveProperty(
-        "multiple"
-      );
-    });
+  it("renders the root and input nodes with the necessary props", () => {
+    const { container } = render(<MediaUploadView />);
+    const rootDiv = container.querySelector("div");
+    expect(rootDiv).toHaveProperty("style.border-color");
+    expect(rootDiv.querySelector("div.container>input")).toHaveProperty(
+      "multiple"
+    );
+  });
 
-    it("When dropped the files, react table get populated with file names", async () => {
-      const event = createDtWithFiles(files);
-      const ui = <MediaUploadView />;
-      const { container } = render(ui);
-      const dropzone = container.querySelector(".container");
-      dispatchEvt(dropzone, "drop", event);
-      await flushPromises(ui, container);
-      expect(container.querySelector(".ReactTable")).toBeTruthy();
-      // expect(container.querySelector('.rt-noData')).toBeNull()
-    });
+  it("When dropped the files, react table get populated with file names", async () => {
+    const event = createDtWithFiles(files);
+    const ui = <MediaUploadView />;
+    const { container } = render(ui);
+    const dropzone = container.querySelector(".container");
+    dispatchEvt(dropzone, "drop", event);
+    await flushPromises(ui, container);
+    expect(
+      container.querySelector("div.rt-tbody div.rt-td").innerHTML
+    ).toContain("file1.pdf");
   });
 });
 

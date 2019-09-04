@@ -78,8 +78,8 @@ function MediaUploadView({}) {
     fileName: file.name
   }));
   return (
-    <div className="container">
-      <div {...getRootProps({ style })}>
+    <div>
+      <div {...getRootProps({ style })} className="container">
         <input {...getInputProps()} />
         <div>
           <div>Drag and drop files here or click to open browse dialog</div>
