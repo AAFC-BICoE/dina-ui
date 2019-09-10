@@ -19,6 +19,10 @@ export interface QueryState<TData extends KitsuResponseData, TMeta> {
 
 /** Additional query options. */
 export interface QueryOptions<TData extends KitsuResponseData, TMeta> {
+  /** Dependencies: When the values in this array are changed, re-fetch the data. */
+  deps?: any[];
+
+  /** onSuccess callback. */
   onSuccess?: (response: KitsuResponse<TData, TMeta>) => void;
 }
 
@@ -48,7 +52,7 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
       request.then(options.onSuccess);
     }
     return request;
-  }, [JSON.stringify(querySpec)]);
+  }, [JSON.stringify(querySpec), ...(options.deps ? options.deps : [])]);
 
   // fetchData function should re-run when the query spec changes.
   const task = useAsyncTask(fetchData);

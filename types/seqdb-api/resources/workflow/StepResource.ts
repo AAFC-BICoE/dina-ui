@@ -4,6 +4,7 @@ import { Region } from "../Region";
 import { Sample } from "../Sample";
 import { Chain } from "./Chain";
 import { ChainStepTemplate } from "./ChainStepTemplate";
+import { LibraryPrepBatch } from "./LibraryPrepBatch";
 import { PreLibraryPrep } from "./PreLibraryPrep";
 
 export interface StepResourceAttributes {
@@ -19,6 +20,7 @@ export interface StepResourceRelationships {
 
   chainStepTemplate: ChainStepTemplate;
   chain: Chain;
+  libraryPrepBatch?: LibraryPrepBatch;
   region?: Region;
   preLibraryPrep?: PreLibraryPrep;
   primer?: PcrPrimer;
