@@ -3,12 +3,12 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 /** Renders the label and value of a field from Formik context. */
 export function FieldView(props: LabelWrapperParams) {
-  const { className, label, name } = props;
+  const { name } = props;
 
   return (
     <Field name={name}>
       {({ field: { value } }: FieldProps) => (
-        <FieldWrapper className={className} label={label} name={name}>
+        <FieldWrapper {...props}>
           <p
             style={{
               borderBottom: "1px solid black",

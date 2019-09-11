@@ -5,6 +5,9 @@ export interface LabelWrapperParams {
   /** The CSS classes of the div wrapper. */
   className?: string;
 
+  /** Hides the label. */
+  hideLabel?: boolean;
+
   /** The name of the field. */
   name: string;
 
@@ -29,6 +32,7 @@ export interface FieldWrapperProps extends LabelWrapperParams {
 export function FieldWrapper({
   className,
   name,
+  hideLabel = false,
   label = titleCase(name),
   tooltipMsg,
   children
@@ -36,21 +40,23 @@ export function FieldWrapper({
   return (
     <div className={className}>
       <div className={`form-group ${name}-field`}>
-        <label>
-          <div>
-            <strong>{label}</strong>
-            {tooltipMsg && (
-              <img
-                src="/static/images/iconInformation.gif"
-                data-tip={true}
-                data-for={tooltipMsg}
-              />
-            )}
-            <ReactTooltip id={tooltipMsg}>
-              <span>{tooltipMsg}</span>
-            </ReactTooltip>
-          </div>
-        </label>
+        {!hideLabel && (
+          <label>
+            <div>
+              <strong>{label}</strong>
+              {tooltipMsg && (
+                <img
+                  src="/static/images/iconInformation.gif"
+                  data-tip={true}
+                  data-for={tooltipMsg}
+                />
+              )}
+              <ReactTooltip id={tooltipMsg}>
+                <span>{tooltipMsg}</span>
+              </ReactTooltip>
+            </div>
+          </label>
+        )}
         {children}
       </div>
     </div>

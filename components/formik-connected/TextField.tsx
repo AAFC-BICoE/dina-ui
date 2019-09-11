@@ -6,15 +6,10 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
  * a wrapper that adds a label.
  */
 export function TextField(props: LabelWrapperParams) {
-  const { className, name, label, tooltipMsg } = props;
+  const { name } = props;
 
   return (
-    <FieldWrapper
-      className={className}
-      name={name}
-      label={label}
-      tooltipMsg={tooltipMsg}
-    >
+    <FieldWrapper {...props}>
       <Field name={name}>
         {({
           field: { value },
