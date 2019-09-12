@@ -14,11 +14,8 @@ import { StepRendererProps } from "../StepRenderer";
 export function useSelectionControls({ chain, step }: StepRendererProps) {
   const { doOperations, save } = useContext(ApiClientContext);
 
-  // Random number to be changed every time a sample is selected.
-  // This number is passed into the Query component's query, which re-fetches
-  // the data when any part of the query changes.
-  const [randomNumber, setRandomNumber] = useState<number>(Math.random());
-
+  // Keep track of the last save operation, so the data is re-fetched immediately after saving.
+  const [lastSave, setLastSave] = useState<number>();
   const [loading, setLoading] = useState(false);
 
   async function selectSamples(samples: Sample[]) {
@@ -39,7 +36,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
         newStepResources.map(sr => ({ resource: sr, type: "stepResource" }))
       );
 
-      setRandomNumber(Math.random());
+      setLastSave(Date.now());
     } catch (err) {
       alert(err);
     }
@@ -76,7 +73,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
 
       await doOperations(operations);
 
-      setRandomNumber(Math.random());
+      setLastSave(Date.now());
     } catch (err) {
       alert(err);
     }
@@ -108,8 +105,8 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
   return {
     deleteAllCheckedStepResources,
     deleteStepResources,
+    lastSave,
     loading,
-    randomNumber,
     selectAllCheckedSamples,
     selectSamples
   };

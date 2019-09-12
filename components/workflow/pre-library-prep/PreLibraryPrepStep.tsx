@@ -175,7 +175,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                       rsql: rsqlFilter
                     }}
                     include="sample,sample.group"
-                    loading={formikProps.isSubmitting}
+                    loading={plpSrLoading || formikProps.isSubmitting}
                     onSuccess={res => {
                       setVisibleSamples(res.data);
                       setAvailableItems(res.data.map(sr => sr.sample));

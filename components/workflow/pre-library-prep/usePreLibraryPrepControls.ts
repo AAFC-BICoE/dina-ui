@@ -14,7 +14,9 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
   const { apiClient, doOperations, save } = useContext(ApiClientContext);
 
   const [visibleSamples, setVisibleSamples] = useState<StepResource[]>([]);
-  const [randomNumber, setRandomNumber] = useState(Math.random());
+
+  // Keep track of the last save operation, so the data is re-fetched immediately after saving.
+  const [lastSave, setLastSave] = useState();
 
   const visibleSampleIds = visibleSamples.length
     ? visibleSamples.map(sr => sr.sample.id).join(",")
@@ -30,7 +32,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       filter: {
         "chain.chainId": chain.id,
         "chainStepTemplate.chainStepTemplateId": step.id,
-        rsql: `sample.sampleId=in=(${visibleSampleIds}) and sample.name!=${randomNumber}`
+        rsql: `sample.sampleId=in=(${visibleSampleIds})`
       },
       include:
         "sample,preLibraryPrep,preLibraryPrep.protocol,preLibraryPrep.product",
@@ -38,6 +40,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       path: "stepResource"
     },
     {
+      deps: [lastSave],
       onSuccess: ({ data: plpSrs }) => {
         // Add client-side "shearingPrep" and "sizeSelectionPrep" properties to the sample stepResources.
         for (const sampleSr of visibleSamples) {
@@ -151,7 +154,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
           type: "stepResource"
         }))
       );
-      setRandomNumber(Math.random());
+      setLastSave(Date.now());
 
       setFieldValue("checkedIds", {});
     } catch (err) {
@@ -202,7 +205,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       const operations = [...srOperations, ...plpOperations];
 
       await doOperations(operations);
-      setRandomNumber(Math.random());
+      setLastSave(Date.now());
       formikProps.setFieldValue("checkedIds", {});
     } catch (err) {
       alert(err);

@@ -22,8 +22,8 @@ export function SampleSelection(props: StepRendererProps) {
 
   const {
     deleteAllCheckedStepResources,
+    lastSave,
     loading,
-    randomNumber,
     deleteStepResources,
     selectAllCheckedSamples,
     selectSamples
@@ -217,10 +217,10 @@ export function SampleSelection(props: StepRendererProps) {
                 <QueryTable<StepResource>
                   columns={SELECTED_SAMPLE_COLUMNS}
                   defaultPageSize={100}
+                  deps={[lastSave]}
                   filter={{
                     "chain.chainId": chain.id,
-                    "chainStepTemplate.chainStepTemplateId": step.id,
-                    rsql: `sample.name!=${randomNumber}`
+                    "chainStepTemplate.chainStepTemplateId": step.id
                   }}
                   include="sample,sample.group"
                   onSuccess={res => setStepResources(res.data)}

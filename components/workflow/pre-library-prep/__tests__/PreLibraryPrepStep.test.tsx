@@ -86,11 +86,6 @@ jest.mock(
     }
 );
 
-// Mock random numbers to only return 0.5.
-const mockMath = Object.create(global.Math);
-mockMath.random = () => 0.5;
-global.Math = mockMath;
-
 function getWrapper() {
   return mount(
     <ApiClientContext.Provider value={createContextValue()}>
@@ -166,7 +161,7 @@ describe("PreLibraryPrepStep UI", () => {
         filter: {
           "chain.chainId": "1",
           "chainStepTemplate.chainStepTemplateId": "2",
-          rsql: "sample.sampleId=in=(1,2,3,4,5) and sample.name!=0.5"
+          rsql: "sample.sampleId=in=(1,2,3,4,5)"
         },
         include:
           "sample,preLibraryPrep,preLibraryPrep.protocol,preLibraryPrep.product",
