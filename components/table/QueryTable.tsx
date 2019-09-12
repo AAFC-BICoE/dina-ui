@@ -17,6 +17,9 @@ export type ColumnDefinition<TData> = string | Column<TData>;
 
 /** QueryTable component's props. */
 export interface QueryTableProps<TData extends KitsuResource> {
+  /** Dependencies: When the values in this array are changed, re-fetch the data. */
+  deps?: any[];
+
   /** JSONAPI resource path. */
   path: string;
 
@@ -79,6 +82,7 @@ export function QueryTable<TData extends KitsuResource>({
   columns,
   defaultPageSize = DEFAULT_PAGE_SIZE,
   defaultSort = [],
+  deps,
   fields,
   filter,
   include,
@@ -144,6 +148,7 @@ export function QueryTable<TData extends KitsuResource>({
     TData[],
     MetaWithTotal
   >(query, {
+    deps,
     onSuccess
   });
 

@@ -60,18 +60,22 @@ export function LibraryPrepStep(props: StepRendererProps) {
       <>
         <h2>Library Batch Prep</h2>
         <button
-          className="btn btn-primary"
+          className="btn btn-primary float-right"
           onClick={() => setEditBatchDetails(true)}
           type="button"
         >
           Edit Batch Details
         </button>
-        <LibraryPrepBatchDetails libraryPrepBatch={libraryPrepBatch} />
-        <SampleToIndexTable
-          chain={chain}
-          libraryPrepBatch={libraryPrepBatch}
-          sampleSelectionStep={sampleSelectionStep}
-        />
+        <div className="form-group">
+          <LibraryPrepBatchDetails libraryPrepBatch={libraryPrepBatch} />
+        </div>
+        <div className="form-group">
+          <SampleToIndexTable
+            chain={chain}
+            libraryPrepBatch={libraryPrepBatch}
+            sampleSelectionStep={sampleSelectionStep}
+          />
+        </div>
       </>
     );
   }

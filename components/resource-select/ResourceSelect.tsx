@@ -1,7 +1,8 @@
-import { FilterParam, GetParams, KitsuResource } from "kitsu";
+import Kitsu, { FilterParam, GetParams, KitsuResource } from "kitsu";
 import { debounce, omitBy } from "lodash";
 import React, { useContext } from "react";
 import { Async as AsyncSelect } from "react-select";
+import { Styles } from "react-select/lib/styles";
 import { OptionsType } from "react-select/lib/types";
 import { isUndefined } from "util";
 import { ApiClientContext } from "../../components/api-client/ApiClientContext";
@@ -31,6 +32,12 @@ export interface ResourceSelectProps<TData> {
 
   /** The JSONAPI "sort" parameter. */
   sort?: string;
+
+  /** react-select styles prop. */
+  styles?: Partial<Styles>;
+
+  /** Optional query loader function for custom API request behavior (Useful for caching). */
+  customDataFetch?: typeof Kitsu.prototype.get;
 }
 
 /** An option the user can select to set the relationship to null. */
@@ -45,9 +52,13 @@ export function ResourceSelect<TData extends KitsuResource>({
   onChange = () => undefined,
   optionLabel,
   sort,
+  customDataFetch,
+  styles,
   value
 }: ResourceSelectProps<TData>) {
   const { apiClient } = useContext(ApiClientContext);
+
+  const dataFetch = customDataFetch || ((...args) => apiClient.get(...args));
 
   async function loadOptions(
     inputValue: string,
@@ -63,7 +74,7 @@ export function ResourceSelect<TData extends KitsuResource>({
     );
 
     // Send the API request.
-    const { data } = await apiClient.get(model, getParams);
+    const { data } = await dataFetch(model, getParams);
 
     // Build the list of options from the returned resources.
     const resourceOptions = data.map(resource => ({
@@ -124,6 +135,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       loadOptions={debouncedOptionLoader}
       onChange={onChangeInternal}
       placeholder="Type here to search."
+      styles={styles}
       value={selectValue}
     />
   );
