@@ -1,4 +1,4 @@
-import { Field, FieldProps } from "formik";
+import { FastField, FieldProps } from "formik";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 /**
@@ -10,7 +10,7 @@ export function TextField(props: LabelWrapperParams) {
 
   return (
     <FieldWrapper {...props}>
-      <Field name={name}>
+      <FastField name={name}>
         {({
           field: { value },
           form: { setFieldValue, setFieldTouched }
@@ -32,7 +32,7 @@ export function TextField(props: LabelWrapperParams) {
             />
           );
         }}
-      </Field>
+      </FastField>
     </FieldWrapper>
   );
 }

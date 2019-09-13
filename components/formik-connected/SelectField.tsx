@@ -1,4 +1,4 @@
-import { Field, FieldProps } from "formik";
+import { FastField, FieldProps } from "formik";
 import { noop } from "lodash";
 import Select from "react-select";
 import { Styles } from "react-select/lib/styles";
@@ -23,7 +23,7 @@ export function SelectField({
   tooltipMsg
 }: SelectFieldProps) {
   return (
-    <Field name={name}>
+    <FastField name={name}>
       {({
         field: { value },
         form: { setFieldValue, setFieldTouched }
@@ -51,6 +51,6 @@ export function SelectField({
           </FieldWrapper>
         );
       }}
-    </Field>
+    </FastField>
   );
 }

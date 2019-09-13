@@ -1,4 +1,4 @@
-import { Field, FieldProps } from "formik";
+import { FastField, FieldProps } from "formik";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 /** Renders the label and value of a field from Formik context. */
@@ -6,7 +6,7 @@ export function FieldView(props: LabelWrapperParams) {
   const { name } = props;
 
   return (
-    <Field name={name}>
+    <FastField name={name}>
       {({ field: { value } }: FieldProps) => (
         <FieldWrapper {...props}>
           <p
@@ -20,6 +20,6 @@ export function FieldView(props: LabelWrapperParams) {
           </p>
         </FieldWrapper>
       )}
-    </Field>
+    </FastField>
   );
 }

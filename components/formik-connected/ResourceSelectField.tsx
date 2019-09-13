@@ -1,4 +1,4 @@
-import { Field, FieldProps } from "formik";
+import { FastField, FieldProps } from "formik";
 import { KitsuResource } from "kitsu";
 import { noop } from "lodash";
 import {
@@ -27,7 +27,7 @@ export function ResourceSelectField<TData extends KitsuResource>(
   } = topLevelProps;
 
   return (
-    <Field name={name}>
+    <FastField name={name}>
       {({
         field: { value },
         form: { setFieldValue, setFieldTouched }
@@ -54,6 +54,6 @@ export function ResourceSelectField<TData extends KitsuResource>(
           </FieldWrapper>
         );
       }}
-    </Field>
+    </FastField>
   );
 }

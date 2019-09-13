@@ -1,4 +1,4 @@
-import { Field, FieldProps } from "formik";
+import { FastField, FieldProps } from "formik";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
@@ -9,7 +9,7 @@ export function DateField(props: LabelWrapperParams) {
 
   return (
     <FieldWrapper {...props}>
-      <Field name={name}>
+      <FastField name={name}>
         {({
           field: { value },
           form: { setFieldValue, setFieldTouched }
@@ -31,7 +31,7 @@ export function DateField(props: LabelWrapperParams) {
             />
           );
         }}
-      </Field>
+      </FastField>
     </FieldWrapper>
   );
 }
