@@ -180,6 +180,7 @@ export function QueryTable<TData extends KitsuResource>({
         defaultSorted={sortingRules}
         loading={loadingProp || queryIsLoading}
         manual={true}
+        minRows={1}
         onFetchData={onFetchData}
         onPageSizeChange={onPageSizeChange}
         onSortedChange={onSortedChange}

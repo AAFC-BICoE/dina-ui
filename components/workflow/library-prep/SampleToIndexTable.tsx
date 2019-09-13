@@ -34,12 +34,17 @@ export function SampleToIndexTable({
 }: SampleToIndexTableProps) {
   const { save } = useContext(ApiClientContext);
   const resourceSelectLoader = useCacheableQueryLoader();
+
+  // Current visible sample StepResources in the "sample selection" table.
   const [visibleSampleSrs, setVisibleSampleSrs] = useState<StepResource[]>([]);
+
+  // Timestamp of the last table save.
   const [lastPrepTableSave, setLastPrepTableSave] = useState<number>();
 
+  // Query the libraryPreps of this batch.
   const { loading: libraryPrepsLoading } = useQuery<LibraryPrep[]>(
     {
-      // Optimize query speed y reducing the amount of requested fields.
+      // Optimize query speed by reducing the amount of requested fields.
       fields: {
         pcrPrimer: "name",
         sample: "name"

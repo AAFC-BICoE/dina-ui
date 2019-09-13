@@ -386,6 +386,7 @@ describe("QueryTable component", () => {
 
     // Wait for the initial request to finish.
     await new Promise(setImmediate);
+    wrapper.update();
 
     // The initial request should have a pageSize of 5.
     expect(mockGet).lastCalledWith(
@@ -396,7 +397,7 @@ describe("QueryTable component", () => {
     // Expect 5 rows.
     expect(wrapper.find(".rt-tr-group").length).toEqual(5);
 
-    // Select a new page size of 50.
+    // Select a new page size of 100.
     wrapper
       .find(".-pagination select")
       .first()
@@ -404,8 +405,9 @@ describe("QueryTable component", () => {
 
     // Wait for the second request to finish.
     await new Promise(setImmediate);
+    wrapper.update();
 
-    // The second request should have a pageSize of 5.
+    // The second request should have a pageSize of 100.
     expect(mockGet).lastCalledWith(
       "todo",
       objectContaining({ page: { limit: 100, offset: 0 } })
