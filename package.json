@@ -28,6 +28,8 @@
     "react": "^16.8.6",
     "react-cookie": "^4.0.1",
     "react-datepicker": "^2.3.0",
+    "react-dnd-cjs": "^9.3.9",
+    "react-dnd-html5-backend-cjs": "^9.3.9",
     "react-dom": "^16.8.3",
     "react-hooks-async": "^3.1.0",
     "react-number-format": "^4.2.0",

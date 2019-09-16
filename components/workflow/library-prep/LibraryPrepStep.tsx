@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { LoadingSpinner, useQuery } from "../..";
 import { StepResource } from "../../../types/seqdb-api";
 import { StepRendererProps } from "../StepRenderer";
+import { IndexGrid } from "./IndexGrid";
 import { LibraryPrepBatchDetails } from "./LibraryPrepBatchDetails";
 import { LibraryPrepBatchForm } from "./LibraryPrepBatchForm";
+import { SampleLocationGrid } from "./SampleLocationGrid";
 import { SampleToIndexTable } from "./SampleToIndexTable";
 
 export function LibraryPrepStep(props: StepRendererProps) {
@@ -54,7 +57,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
   }
 
   if (response && response.data.length) {
-    const libraryPrepBatch = response.data[0].libraryPrepBatch;
+    const { libraryPrepBatch } = response.data[0];
 
     return (
       <>
@@ -70,11 +73,29 @@ export function LibraryPrepStep(props: StepRendererProps) {
           <LibraryPrepBatchDetails libraryPrepBatch={libraryPrepBatch} />
         </div>
         <div className="form-group">
-          <SampleToIndexTable
-            chain={chain}
-            libraryPrepBatch={libraryPrepBatch}
-            sampleSelectionStep={sampleSelectionStep}
-          />
+          <Tabs>
+            <TabList>
+              <Tab>Substep 1: Library Prep Edit Table</Tab>
+              <Tab>Substep 2: Container Grid</Tab>
+              <Tab>Substep 3: Index Grid</Tab>
+            </TabList>
+            <TabPanel>
+              <SampleToIndexTable
+                chain={chain}
+                libraryPrepBatch={libraryPrepBatch}
+                sampleSelectionStep={sampleSelectionStep}
+              />
+            </TabPanel>
+            <TabPanel>
+              <SampleLocationGrid
+                chain={chain}
+                sampleSelectionStep={sampleSelectionStep}
+              />
+            </TabPanel>
+            <TabPanel>
+              <IndexGrid libraryPrepBatch={libraryPrepBatch} />
+            </TabPanel>
+          </Tabs>
         </div>
       </>
     );
