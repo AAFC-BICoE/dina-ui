@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd-cjs";
 import HTML5Backend from "react-dnd-html5-backend-cjs";
 import ReactTable, { Column } from "react-table";
@@ -27,32 +27,96 @@ export function SampleLocationGrid({
       "chainStepTemplate.chainStepTemplateId": sampleSelectionStep.id
     },
     include: "sample",
+    page: { limit: 1000 },
     path: "stepResource"
   });
+
+  const availableSampleList = useMemo(() => {
+    if (sampleSrResponse) {
+      return sampleSrResponse.data.map(sr => sr.sample);
+    } else {
+      return [];
+    }
+  }, [sampleSrResponse]);
 
   const mockContainer = {
     containerType: { numberOfColumns: 12, numberOfRows: 8 }
   };
+
+  const [locations, setLocations] = useState<{ [key: string]: Sample }>({});
+  const [selectedSamples, setSelectedSamples] = useState<Sample[]>([]);
+  const lastSelectedSampleRef = useRef<Sample>();
 
   if (sampleSrLoading) {
     return <LoadingSpinner loading={true} />;
   }
 
   if (sampleSrResponse) {
-    const samples = sampleSrResponse.data.map(sr => sr.sample);
+    function onGridDrop(sample, coords) {
+      // Remove the sample from the sample list:
+      if (availableSampleList.includes(sample)) {
+        availableSampleList.splice(availableSampleList.indexOf(sample), 1);
+      }
+
+      // Remove the sample from the grid.
+      for (const attr in locations) {
+        if (locations[attr] === sample) {
+          setLocations(locs => ({ ...locs, [attr]: undefined }));
+        }
+      }
+
+      // Add the sample to the grid state.
+      setLocations(locs => ({ ...locs, [coords]: sample }));
+    }
 
     return (
       <DndProvider backend={HTML5Backend}>
         <div className="row">
           <div className="col-3">
             <ul className="list-group">
-              {samples.map(s => (
-                <DraggableSampleBox sample={s} />
-              ))}
+              {availableSampleList.map(s => {
+                function onClick(e) {
+                  if (lastSelectedSampleRef.current && e.shiftKey) {
+                    const currentIndex = availableSampleList.indexOf(s);
+                    const lastIndex = availableSampleList.indexOf(
+                      lastSelectedSampleRef.current
+                    );
+
+                    const [lowIndex, highIndex] = [
+                      currentIndex,
+                      lastIndex
+                    ].sort((a, b) => a - b);
+
+                    const newSelectedSamples = availableSampleList.slice(
+                      lowIndex,
+                      highIndex + 1
+                    );
+
+                    setSelectedSamples(newSelectedSamples);
+                  } else {
+                    setSelectedSamples([s]);
+                  }
+
+                  lastSelectedSampleRef.current = s;
+                }
+
+                return (
+                  <DraggableSampleBox
+                    key={s.id}
+                    sample={s}
+                    onClick={onClick}
+                    selected={selectedSamples.includes(s)}
+                  />
+                );
+              })}
             </ul>
           </div>
           <div className="col-9">
-            <ContainerGrid container={mockContainer} />
+            <ContainerGrid
+              container={mockContainer}
+              locations={locations}
+              onDrop={onGridDrop}
+            />
           </div>
         </div>
       </DndProvider>
@@ -60,21 +124,31 @@ export function SampleLocationGrid({
   }
 }
 
-function DraggableSampleBox({ sample }) {
+function DraggableSampleBox({ onClick = e => undefined, sample, selected }) {
   const [, drag] = useDrag({
     item: { sample, type: "sample" }
   });
 
   return (
-    <li ref={drag} className="list-group-item">
+    <li
+      className="list-group-item"
+      onClick={onClick}
+      ref={drag}
+      style={{
+        backgroundColor: selected && "rgb(222, 252, 222)",
+        cursor: "move"
+      }}
+    >
       {sample.name}
     </li>
   );
 }
 
-function ContainerGrid({ container }) {
-  const [locations, setLocations] = useState<{ [key: string]: Sample }>({});
-
+function ContainerGrid({
+  container,
+  locations,
+  onDrop = (sample, coords) => undefined
+}) {
   const columns: Column[] = [];
 
   // Add the letter column.
@@ -84,13 +158,12 @@ function ContainerGrid({ container }) {
         {String.fromCharCode(index + 65)}
       </div>
     ),
-    Header: "",
     resizable: false,
     sortable: false
   });
 
   for (let col = 0; col < container.containerType.numberOfColumns; col++) {
-    const columnLabel = col + 1;
+    const columnLabel = String(col + 1);
 
     columns.push({
       Cell: ({ index: row }) => {
@@ -99,10 +172,8 @@ function ContainerGrid({ container }) {
 
         return (
           <GridCell
+            onDrop={({ sample }) => onDrop(sample, coords)}
             sample={locations[coords]}
-            onDrop={({ sample }) =>
-              setLocations(locs => ({ ...locs, [coords]: sample }))
-            }
           />
         );
       },
@@ -142,7 +213,7 @@ function GridCell({ onDrop, sample }) {
 
   return (
     <div ref={drop} className="h-100 w-100">
-      {sample && sample.name}
+      {sample && <DraggableSampleBox sample={sample} selected={false} />}
     </div>
   );
 }
