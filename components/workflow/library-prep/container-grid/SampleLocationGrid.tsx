@@ -1,7 +1,12 @@
-import { useMemo, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { DndProvider } from "react-dnd-cjs";
 import HTML5Backend from "react-dnd-html5-backend-cjs";
-import { LoadingSpinner, ResourceSelect, useQuery } from "../../..";
+import {
+  ApiClientContext,
+  LoadingSpinner,
+  ResourceSelect,
+  useQuery
+} from "../../..";
 import {
   Chain,
   ChainStepTemplate,
@@ -23,7 +28,10 @@ export function SampleLocationGrid({
   chain,
   sampleSelectionStep
 }: ContainerGridProps) {
+  const { apiClient } = useContext(ApiClientContext);
+
   const [availableSampleList, setAvailableSampleList] = useState<Sample[]>([]);
+  const [containerLoading, setContainerLoading] = useState(true);
   const [container, setContainer] = useState<Container>();
   const [cellGrid, setCellGrid] = useState<CellGrid>({});
 
@@ -33,18 +41,34 @@ export function SampleLocationGrid({
         "chain.chainId": chain.id,
         "chainStepTemplate.chainStepTemplateId": sampleSelectionStep.id
       },
-      include: "sample,sample.location",
+      include: "sample,sample.location,sample.location.container",
       page: { limit: 1000 },
       path: "stepResource"
     },
     {
-      onSuccess: sampleSrResponse => {
+      onSuccess: async sampleSrResponse => {
         const newSamples = sampleSrResponse.data
           .map(sr => sr.sample)
           // Filter to just the samples without a location.
           .filter(sample => !sample.location);
 
         setAvailableSampleList(newSamples);
+
+        // Figure out what container these samples are in.
+        for (const sr of sampleSrResponse.data) {
+          if (sr.sample && sr.sample.location) {
+            const newContainer = await apiClient.get(
+              `location/${sr.sample.location.id}/container`,
+              {
+                include: "containerType,group"
+              }
+            );
+            setContainer(newContainer.data);
+            break;
+          }
+        }
+
+        setContainerLoading(false);
       }
     }
   );
@@ -71,7 +95,7 @@ export function SampleLocationGrid({
   const [selectedSamples, setSelectedSamples] = useState<Sample[]>([]);
   const lastSelectedSampleRef = useRef<Sample>();
 
-  if (sampleSrLoading || locationsLoading) {
+  if (sampleSrLoading || locationsLoading || containerLoading) {
     return <LoadingSpinner loading={true} />;
   } else {
     function onGridDrop(sample, coords) {

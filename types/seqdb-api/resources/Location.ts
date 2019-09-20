@@ -1,4 +1,5 @@
 import { KitsuResource } from "kitsu";
+import { Container } from "./Container";
 import { PcrPrimer } from "./PcrPrimer";
 import { Sample } from "./Sample";
 
@@ -10,6 +11,7 @@ export interface LocationAttributes {
 }
 
 export interface LocationRelationships {
+  container: Container;
   sample?: Sample;
   pcrPrimer?: PcrPrimer;
 }
