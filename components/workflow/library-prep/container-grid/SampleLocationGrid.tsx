@@ -31,6 +31,7 @@ export function SampleLocationGrid({
   const { apiClient } = useContext(ApiClientContext);
 
   const [availableSampleList, setAvailableSampleList] = useState<Sample[]>([]);
+  const [selectedSamples, setSelectedSamples] = useState<Sample[]>([]);
   const [containerLoading, setContainerLoading] = useState(true);
   const [container, setContainer] = useState<Container>();
   const [cellGrid, setCellGrid] = useState<CellGrid>({});
@@ -92,13 +93,12 @@ export function SampleLocationGrid({
     }
   );
 
-  const [selectedSamples, setSelectedSamples] = useState<Sample[]>([]);
   const lastSelectedSampleRef = useRef<Sample>();
 
   if (sampleSrLoading || locationsLoading || containerLoading) {
     return <LoadingSpinner loading={true} />;
   } else {
-    function onGridDrop(sample, coords) {
+    function moveSample(sample: Sample, coords: string) {
       // Remove the sample from the sample list:
       if (availableSampleList.includes(sample)) {
         availableSampleList.splice(availableSampleList.indexOf(sample), 1);
@@ -111,8 +111,21 @@ export function SampleLocationGrid({
         }
       }
 
-      // Add the sample to the grid state.
-      setCellGrid(locs => ({ ...locs, [coords]: sample }));
+      if (coords) {
+        // Add the sample to the grid state.
+        setCellGrid(locs => ({ ...locs, [coords]: sample }));
+      } else {
+        // Add the sample to the list.
+        setAvailableSampleList([...availableSampleList, sample]);
+      }
+    }
+
+    function onGridDrop(sample, coords) {
+      moveSample(sample, coords);
+    }
+
+    function onListDrop(sample: Sample) {
+      moveSample(sample, null);
     }
 
     function onSampleClick(sample, e) {
@@ -147,6 +160,7 @@ export function SampleLocationGrid({
               availableSamples={availableSampleList}
               selectedSamples={selectedSamples}
               onClick={onSampleClick}
+              onDrop={onListDrop}
             />
           </div>
           <div className="col-9">
@@ -161,7 +175,7 @@ export function SampleLocationGrid({
               onChange={(c: Container) => setContainer(c)}
               value={container}
             />
-            {container && (
+            {container && container.id && (
               <ContainerGrid
                 container={container}
                 cellGrid={cellGrid}
