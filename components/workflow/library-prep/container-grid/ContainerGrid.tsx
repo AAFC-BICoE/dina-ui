@@ -1,12 +1,29 @@
+import { noop } from "lodash";
 import { useDrop } from "react-dnd-cjs";
 import ReactTable, { Column } from "react-table";
+import { Container, Sample } from "../../../../types/seqdb-api";
 import { DraggableSampleBox } from "./DraggableSampleBox";
+
+interface ContainerGridProps {
+  container: Container;
+  cellGrid: CellGrid;
+  onDrop: (sample: Sample, coords: string) => void;
+}
+
+interface GridCellProps {
+  onDrop: (item: { sample: Sample }) => void;
+  sample: Sample;
+}
+
+export interface CellGrid {
+  [key: string]: Sample;
+}
 
 export function ContainerGrid({
   container,
-  locations,
-  onDrop = (sample, coords) => undefined
-}) {
+  cellGrid,
+  onDrop = noop
+}: ContainerGridProps) {
   const columns: Column[] = [];
 
   // Add the letter column.
@@ -30,8 +47,8 @@ export function ContainerGrid({
 
         return (
           <GridCell
-            onDrop={({ sample }) => onDrop(sample, coords)}
-            sample={locations[coords]}
+            onDrop={({ sample: newSample }) => onDrop(newSample, coords)}
+            sample={cellGrid[coords]}
           />
         );
       },
@@ -63,10 +80,10 @@ export function ContainerGrid({
   );
 }
 
-function GridCell({ onDrop, sample }) {
+function GridCell({ onDrop, sample }: GridCellProps) {
   const [, drop] = useDrop({
     accept: "sample",
-    drop: item => onDrop(item)
+    drop: item => onDrop(item as any)
   });
 
   return (

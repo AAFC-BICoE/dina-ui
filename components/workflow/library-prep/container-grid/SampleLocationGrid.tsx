@@ -1,14 +1,17 @@
 import { useMemo, useRef, useState } from "react";
 import { DndProvider } from "react-dnd-cjs";
 import HTML5Backend from "react-dnd-html5-backend-cjs";
-import { LoadingSpinner, useQuery } from "../../..";
+import { LoadingSpinner, ResourceSelect, useQuery } from "../../..";
 import {
   Chain,
   ChainStepTemplate,
+  Container,
+  Location,
   Sample,
   StepResource
 } from "../../../../types/seqdb-api";
-import { ContainerGrid } from "./ContainerGrid";
+import { filterBy } from "../../../../util/rsql";
+import { CellGrid, ContainerGrid } from "./ContainerGrid";
 import { DraggableSampleList } from "./DraggableSampleList";
 
 interface ContainerGridProps {
@@ -20,39 +23,57 @@ export function SampleLocationGrid({
   chain,
   sampleSelectionStep
 }: ContainerGridProps) {
-  const { loading: sampleSrLoading, response: sampleSrResponse } = useQuery<
-    StepResource[]
-  >({
-    filter: {
-      "chain.chainId": chain.id,
-      "chainStepTemplate.chainStepTemplateId": sampleSelectionStep.id
+  const [availableSampleList, setAvailableSampleList] = useState<Sample[]>([]);
+  const [container, setContainer] = useState<Container>();
+  const [cellGrid, setCellGrid] = useState<CellGrid>({});
+
+  const { loading: sampleSrLoading } = useQuery<StepResource[]>(
+    {
+      filter: {
+        "chain.chainId": chain.id,
+        "chainStepTemplate.chainStepTemplateId": sampleSelectionStep.id
+      },
+      include: "sample,sample.location",
+      page: { limit: 1000 },
+      path: "stepResource"
     },
-    include: "sample",
-    page: { limit: 1000 },
-    path: "stepResource"
-  });
+    {
+      onSuccess: sampleSrResponse => {
+        const newSamples = sampleSrResponse.data
+          .map(sr => sr.sample)
+          // Filter to just the samples without a location.
+          .filter(sample => !sample.location);
 
-  const availableSampleList = useMemo(() => {
-    if (sampleSrResponse) {
-      return sampleSrResponse.data.map(sr => sr.sample);
-    } else {
-      return [];
+        setAvailableSampleList(newSamples);
+      }
     }
-  }, [sampleSrResponse]);
+  );
 
-  const mockContainer = {
-    containerType: { numberOfColumns: 12, numberOfRows: 8 }
-  };
+  const { loading: locationsLoading } = useQuery<Location[]>(
+    {
+      include: "sample",
+      page: { limit: 1000 },
+      path: container ? `container/${container.id}/locations` : ""
+    },
+    {
+      onSuccess: response => {
+        const locations = response.data;
+        const newCellGrid: CellGrid = {};
+        for (const location of locations) {
+          newCellGrid[`${location.wellRow}_${location.wellColumn}`] =
+            location.sample;
+        }
+        setCellGrid(newCellGrid);
+      }
+    }
+  );
 
-  const [locations, setLocations] = useState<{ [key: string]: Sample }>({});
   const [selectedSamples, setSelectedSamples] = useState<Sample[]>([]);
   const lastSelectedSampleRef = useRef<Sample>();
 
-  if (sampleSrLoading) {
+  if (sampleSrLoading || locationsLoading) {
     return <LoadingSpinner loading={true} />;
-  }
-
-  if (sampleSrResponse) {
+  } else {
     function onGridDrop(sample, coords) {
       // Remove the sample from the sample list:
       if (availableSampleList.includes(sample)) {
@@ -60,14 +81,14 @@ export function SampleLocationGrid({
       }
 
       // Remove the sample from the grid.
-      for (const attr in locations) {
-        if (locations[attr] === sample) {
-          setLocations(locs => ({ ...locs, [attr]: undefined }));
+      for (const attr in cellGrid) {
+        if (cellGrid[attr] === sample) {
+          setCellGrid(locs => ({ ...locs, [attr]: undefined }));
         }
       }
 
       // Add the sample to the grid state.
-      setLocations(locs => ({ ...locs, [coords]: sample }));
+      setCellGrid(locs => ({ ...locs, [coords]: sample }));
     }
 
     function onSampleClick(sample, e) {
@@ -105,11 +126,24 @@ export function SampleLocationGrid({
             />
           </div>
           <div className="col-9">
-            <ContainerGrid
-              container={mockContainer}
-              locations={locations}
-              onDrop={onGridDrop}
+            <strong>Container:</strong>
+            <ResourceSelect<Container>
+              include="containerType,group"
+              filter={filterBy(["containerNumber"])}
+              model="container"
+              optionLabel={c =>
+                `${c.containerNumber}${c.group && ` (${c.group.groupName})`}`
+              }
+              onChange={(c: Container) => setContainer(c)}
+              value={container}
             />
+            {container && (
+              <ContainerGrid
+                container={container}
+                cellGrid={cellGrid}
+                onDrop={onGridDrop}
+              />
+            )}
           </div>
         </div>
       </DndProvider>
