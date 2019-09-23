@@ -1,7 +1,20 @@
 import { noop } from "lodash";
 import { useDrag } from "react-dnd-cjs";
+import { Sample } from "../../../../types/seqdb-api";
 
-export function DraggableSampleBox({ onClick = noop, sample, selected }) {
+interface DraggableSampleBoxProps {
+  onClick?: (e: any) => void;
+  sample: Sample;
+  selected: boolean;
+  wasMoved: boolean;
+}
+
+export function DraggableSampleBox({
+  onClick = noop,
+  sample,
+  selected,
+  wasMoved
+}: DraggableSampleBoxProps) {
   const [, drag] = useDrag({
     item: { sample, type: "sample" }
   });
@@ -12,7 +25,11 @@ export function DraggableSampleBox({ onClick = noop, sample, selected }) {
       onClick={onClick}
       ref={drag}
       style={{
-        backgroundColor: selected && "rgb(222, 252, 222)",
+        backgroundColor: selected
+          ? "rgb(222, 252, 222)"
+          : wasMoved
+          ? "#fff3cd"
+          : undefined,
         cursor: "move"
       }}
     >

@@ -4,6 +4,7 @@ import { DraggableSampleBox } from "./DraggableSampleBox";
 
 interface DraggableSampleListProps {
   availableSamples: Sample[];
+  movedSamples: Sample[];
   onDrop: (item: Sample) => void;
   selectedSamples: Sample[];
   onClick: (sample, e) => void;
@@ -11,6 +12,7 @@ interface DraggableSampleListProps {
 
 export function DraggableSampleList({
   availableSamples,
+  movedSamples,
   selectedSamples,
   onClick,
   onDrop
@@ -29,6 +31,7 @@ export function DraggableSampleList({
       {availableSamples.map(sample => (
         <DraggableSampleBox
           key={sample.id}
+          wasMoved={movedSamples.includes(sample)}
           sample={sample}
           onClick={e => onClick(sample, e)}
           selected={selectedSamples.includes(sample)}

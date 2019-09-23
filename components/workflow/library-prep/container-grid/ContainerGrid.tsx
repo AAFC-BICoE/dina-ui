@@ -7,11 +7,13 @@ import { DraggableSampleBox } from "./DraggableSampleBox";
 interface ContainerGridProps {
   containerType: ContainerType;
   cellGrid: CellGrid;
+  movedSamples: Sample[];
   onDrop: (sample: Sample, coords: string) => void;
 }
 
 interface GridCellProps {
   onDrop: (item: { sample: Sample }) => void;
+  movedSamples: Sample[];
   sample: Sample;
 }
 
@@ -22,6 +24,7 @@ export interface CellGrid {
 export function ContainerGrid({
   containerType,
   cellGrid,
+  movedSamples,
   onDrop = noop
 }: ContainerGridProps) {
   const columns: Column[] = [];
@@ -47,6 +50,7 @@ export function ContainerGrid({
 
         return (
           <GridCell
+            movedSamples={movedSamples}
             onDrop={({ sample: newSample }) => onDrop(newSample, coords)}
             sample={cellGrid[coords]}
           />
@@ -80,7 +84,7 @@ export function ContainerGrid({
   );
 }
 
-function GridCell({ onDrop, sample }: GridCellProps) {
+function GridCell({ onDrop, sample, movedSamples }: GridCellProps) {
   const [, drop] = useDrop({
     accept: "sample",
     drop: item => onDrop(item as any)
@@ -88,7 +92,13 @@ function GridCell({ onDrop, sample }: GridCellProps) {
 
   return (
     <div ref={drop} className="h-100 w-100">
-      {sample && <DraggableSampleBox sample={sample} selected={false} />}
+      {sample && (
+        <DraggableSampleBox
+          sample={sample}
+          selected={false}
+          wasMoved={movedSamples.includes(sample)}
+        />
+      )}
     </div>
   );
 }

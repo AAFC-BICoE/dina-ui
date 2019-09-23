@@ -25,12 +25,24 @@ export function SampleLocationGrid({
 }: ContainerGridProps) {
   const { apiClient } = useContext(ApiClientContext);
 
-  const [availableSampleList, setAvailableSampleList] = useState<Sample[]>([]);
-  const [selectedSamples, setSelectedSamples] = useState<Sample[]>([]);
-  const [cellGrid, setCellGrid] = useState<CellGrid>();
   const [samplesLoading, setSamplesLoading] = useState<boolean>(true);
 
-  const { loading: libraryPrepsLoading } = useQuery<LibraryPrep[]>(
+  // Highlighted/selected samples.
+  const [selectedSamples, setSelectedSamples] = useState<Sample[]>([]);
+
+  // Available samples with no well coordinates.
+  const [availableSampleList, setAvailableSampleList] = useState<Sample[]>([]);
+
+  // The grid of samples that have well coordinates.
+  const [cellGrid, setCellGrid] = useState<CellGrid>();
+
+  // Samples that have been moved since data initialization.
+  const [movedSamples, setMovedSamples] = useState<Sample[]>([]);
+
+  const {
+    loading: libraryPrepsLoading,
+    response: libraryPrepsResponse
+  } = useQuery<LibraryPrep[]>(
     {
       // Optimize query speed by reducing the amount of requested fields.
       fields: {
@@ -41,9 +53,7 @@ export function SampleLocationGrid({
       path: `libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`
     },
     {
-      onSuccess: async response => {
-        const libraryPreps = response.data;
-
+      onSuccess: async ({ data: libraryPreps }) => {
         const sampleIdsWithCoords = libraryPreps
           .filter(prep => prep.wellRow && prep.wellColumn)
           .map(prep => prep.sample.id)
@@ -53,6 +63,7 @@ export function SampleLocationGrid({
         for (const { wellRow, wellColumn, sample } of libraryPreps) {
           newCellGrid[`${wellRow}_${wellColumn}`] = sample;
         }
+        setCellGrid(newCellGrid);
 
         const { data: selectionStepSrs } = await apiClient.get("stepResource", {
           // Get all the sample stepResources from the sample selection step that have no coords.
@@ -69,7 +80,6 @@ export function SampleLocationGrid({
           .map(sr => sr.sample)
           .filter(({ id }) => !sampleIdsWithCoords.includes(id));
 
-        setCellGrid(newCellGrid);
         setAvailableSampleList(availableSamples);
         setSamplesLoading(false);
       }
@@ -99,7 +109,11 @@ export function SampleLocationGrid({
         setCellGrid(locs => ({ ...locs, [coords]: sample }));
       } else {
         // Add the sample to the list.
-        setAvailableSampleList([...availableSampleList, sample]);
+        setAvailableSampleList(samples => [...samples, sample]);
+      }
+
+      if (!movedSamples.includes(sample)) {
+        setMovedSamples(samples => [...samples, sample]);
       }
     }
 
@@ -142,6 +156,7 @@ export function SampleLocationGrid({
             <DraggableSampleList
               availableSamples={availableSampleList}
               selectedSamples={selectedSamples}
+              movedSamples={movedSamples}
               onClick={onSampleClick}
               onDrop={onListDrop}
             />
@@ -150,6 +165,7 @@ export function SampleLocationGrid({
             <ContainerGrid
               containerType={libraryPrepBatch.containerType}
               cellGrid={cellGrid}
+              movedSamples={movedSamples}
               onDrop={onGridDrop}
             />
           </div>
