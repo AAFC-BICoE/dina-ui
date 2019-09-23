@@ -12,7 +12,7 @@ interface LibraryPrepAttributes {
 }
 
 interface LibraryPrepRelationships {
-  libraryPrepBatch?: LibraryPrepBatch;
+  libraryPrepBatch: LibraryPrepBatch;
   sample?: Sample;
   indexI5?: PcrPrimer;
   indexI7?: PcrPrimer;
