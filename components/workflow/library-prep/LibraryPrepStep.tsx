@@ -25,7 +25,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
         "chainStepTemplate.chainStepTemplateId": step.id
       },
       include:
-        "libraryPrepBatch,libraryPrepBatch.product,libraryPrepBatch.protocol",
+        "libraryPrepBatch,libraryPrepBatch.product,libraryPrepBatch.protocol,libraryPrepBatch.containerType",
       path: "stepResource"
     },
     {

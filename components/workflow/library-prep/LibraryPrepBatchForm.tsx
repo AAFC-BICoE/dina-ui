@@ -11,6 +11,7 @@ import {
 import {
   Chain,
   ChainStepTemplate,
+  ContainerType,
   LibraryPrepBatch,
   Product,
   Protocol,
@@ -92,6 +93,13 @@ export function LibraryPrepBatchForm({
             filter={filterBy(["name"])}
             model="protocol"
             optionLabel={protocol => protocol.name}
+          />
+          <ResourceSelectField<ContainerType>
+            className="col-md-2"
+            name="containerType"
+            filter={filterBy(["name"])}
+            model="containerType"
+            optionLabel={ct => ct.name}
           />
         </div>
         <div className="row">
