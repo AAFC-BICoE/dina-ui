@@ -1,10 +1,7 @@
+import { noop } from "lodash";
 import { useDrag } from "react-dnd-cjs";
 
-export function DraggableSampleBox({
-  onClick = e => undefined,
-  sample,
-  selected
-}) {
+export function DraggableSampleBox({ onClick = noop, sample, selected }) {
   const [, drag] = useDrag({
     item: { sample, type: "sample" }
   });

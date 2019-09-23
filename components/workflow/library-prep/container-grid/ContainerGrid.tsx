@@ -1,11 +1,11 @@
 import { noop } from "lodash";
 import { useDrop } from "react-dnd-cjs";
 import ReactTable, { Column } from "react-table";
-import { Container, Sample } from "../../../../types/seqdb-api";
+import { ContainerType, Sample } from "../../../../types/seqdb-api";
 import { DraggableSampleBox } from "./DraggableSampleBox";
 
 interface ContainerGridProps {
-  container: Container;
+  containerType: ContainerType;
   cellGrid: CellGrid;
   onDrop: (sample: Sample, coords: string) => void;
 }
@@ -20,7 +20,7 @@ export interface CellGrid {
 }
 
 export function ContainerGrid({
-  container,
+  containerType,
   cellGrid,
   onDrop = noop
 }: ContainerGridProps) {
@@ -37,7 +37,7 @@ export function ContainerGrid({
     sortable: false
   });
 
-  for (let col = 0; col < container.containerType.numberOfColumns; col++) {
+  for (let col = 0; col < containerType.numberOfColumns; col++) {
     const columnLabel = String(col + 1);
 
     columns.push({
@@ -59,7 +59,7 @@ export function ContainerGrid({
   }
 
   const tableData = [];
-  for (let i = 0; i < container.containerType.numberOfRows; i++) {
+  for (let i = 0; i < containerType.numberOfRows; i++) {
     tableData.push({});
   }
 

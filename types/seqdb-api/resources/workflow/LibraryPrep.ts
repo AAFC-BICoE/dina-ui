@@ -7,6 +7,8 @@ interface LibraryPrepAttributes {
   inputNg?: number;
   quality?: string;
   size?: string;
+  wellColumn?: number;
+  wellRow?: string;
 }
 
 interface LibraryPrepRelationships {

@@ -89,6 +89,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
             <TabPanel>
               <SampleLocationGrid
                 chain={chain}
+                libraryPrepBatch={libraryPrepBatch}
                 sampleSelectionStep={sampleSelectionStep}
               />
             </TabPanel>

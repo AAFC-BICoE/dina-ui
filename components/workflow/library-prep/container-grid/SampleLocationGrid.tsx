@@ -1,101 +1,84 @@
 import { useContext, useRef, useState } from "react";
 import { DndProvider } from "react-dnd-cjs";
 import HTML5Backend from "react-dnd-html5-backend-cjs";
-import {
-  ApiClientContext,
-  LoadingSpinner,
-  ResourceSelect,
-  useQuery
-} from "../../..";
+import { ApiClientContext, LoadingSpinner, useQuery } from "../../..";
 import {
   Chain,
   ChainStepTemplate,
-  Container,
-  Location,
-  Sample,
-  StepResource
+  LibraryPrep,
+  LibraryPrepBatch,
+  Sample
 } from "../../../../types/seqdb-api";
-import { filterBy } from "../../../../util/rsql";
 import { CellGrid, ContainerGrid } from "./ContainerGrid";
 import { DraggableSampleList } from "./DraggableSampleList";
 
 interface ContainerGridProps {
   chain: Chain;
   sampleSelectionStep: ChainStepTemplate;
+  libraryPrepBatch: LibraryPrepBatch;
 }
 
 export function SampleLocationGrid({
   chain,
-  sampleSelectionStep
+  sampleSelectionStep,
+  libraryPrepBatch
 }: ContainerGridProps) {
   const { apiClient } = useContext(ApiClientContext);
 
   const [availableSampleList, setAvailableSampleList] = useState<Sample[]>([]);
   const [selectedSamples, setSelectedSamples] = useState<Sample[]>([]);
-  const [containerLoading, setContainerLoading] = useState(true);
-  const [container, setContainer] = useState<Container>();
-  const [cellGrid, setCellGrid] = useState<CellGrid>({});
+  const [cellGrid, setCellGrid] = useState<CellGrid>();
+  const [samplesLoading, setSamplesLoading] = useState<boolean>(true);
 
-  const { loading: sampleSrLoading } = useQuery<StepResource[]>(
+  const { loading: libraryPrepsLoading } = useQuery<LibraryPrep[]>(
     {
-      filter: {
-        "chain.chainId": chain.id,
-        "chainStepTemplate.chainStepTemplateId": sampleSelectionStep.id
+      // Optimize query speed by reducing the amount of requested fields.
+      fields: {
+        sample: "name"
       },
-      include: "sample,sample.location,sample.location.container",
-      page: { limit: 1000 },
-      path: "stepResource"
-    },
-    {
-      onSuccess: async sampleSrResponse => {
-        const newSamples = sampleSrResponse.data
-          .map(sr => sr.sample)
-          // Filter to just the samples without a location.
-          .filter(sample => !sample.location);
-
-        setAvailableSampleList(newSamples);
-
-        // Figure out what container these samples are in.
-        for (const sr of sampleSrResponse.data) {
-          if (sr.sample && sr.sample.location) {
-            const newContainer = await apiClient.get(
-              `location/${sr.sample.location.id}/container`,
-              {
-                include: "containerType,group"
-              }
-            );
-            setContainer(newContainer.data);
-            break;
-          }
-        }
-
-        setContainerLoading(false);
-      }
-    }
-  );
-
-  const { loading: locationsLoading } = useQuery<Location[]>(
-    {
       include: "sample",
       page: { limit: 1000 },
-      path: container ? `container/${container.id}/locations` : ""
+      path: `libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`
     },
     {
-      onSuccess: response => {
-        const locations = response.data;
+      onSuccess: async response => {
+        const libraryPreps = response.data;
+
+        const sampleIdsWithCoords = libraryPreps
+          .filter(prep => prep.wellRow && prep.wellColumn)
+          .map(prep => prep.sample.id)
+          .join();
+
         const newCellGrid: CellGrid = {};
-        for (const location of locations) {
-          newCellGrid[`${location.wellRow}_${location.wellColumn}`] =
-            location.sample;
+        for (const { wellRow, wellColumn, sample } of libraryPreps) {
+          newCellGrid[`${wellRow}_${wellColumn}`] = sample;
         }
+
+        const { data: selectionStepSrs } = await apiClient.get("stepResource", {
+          // Get all the sample stepResources from the sample selection step that have no coords.
+          filter: {
+            "chain.chainId": chain.id,
+            "chainStepTemplate.chainStepTemplateId": sampleSelectionStep.id,
+            rsql: `sample.sampleId=out=(${sampleIdsWithCoords || "0"})`
+          },
+          include: "sample",
+          page: { limit: 1000 }
+        });
+
+        const availableSamples = selectionStepSrs
+          .map(sr => sr.sample)
+          .filter(({ id }) => !sampleIdsWithCoords.includes(id));
+
         setCellGrid(newCellGrid);
+        setAvailableSampleList(availableSamples);
+        setSamplesLoading(false);
       }
     }
   );
 
   const lastSelectedSampleRef = useRef<Sample>();
 
-  if (sampleSrLoading || locationsLoading || containerLoading) {
+  if (samplesLoading || libraryPrepsLoading) {
     return <LoadingSpinner loading={true} />;
   } else {
     function moveSample(sample: Sample, coords: string) {
@@ -164,24 +147,11 @@ export function SampleLocationGrid({
             />
           </div>
           <div className="col-9">
-            <strong>Container:</strong>
-            <ResourceSelect<Container>
-              include="containerType,group"
-              filter={filterBy(["containerNumber"])}
-              model="container"
-              optionLabel={c =>
-                `${c.containerNumber}${c.group && ` (${c.group.groupName})`}`
-              }
-              onChange={(c: Container) => setContainer(c)}
-              value={container}
+            <ContainerGrid
+              containerType={libraryPrepBatch.containerType}
+              cellGrid={cellGrid}
+              onDrop={onGridDrop}
             />
-            {container && container.id && (
-              <ContainerGrid
-                container={container}
-                cellGrid={cellGrid}
-                onDrop={onGridDrop}
-              />
-            )}
           </div>
         </div>
       </DndProvider>
