@@ -1,3 +1,4 @@
+import { noop } from "lodash";
 import { DndProvider } from "react-dnd-cjs";
 import HTML5Backend from "react-dnd-html5-backend-cjs";
 import { LoadingSpinner } from "../../..";
@@ -22,6 +23,7 @@ export function SampleLocationGrid(props: ContainerGridProps) {
   const {
     availableSamples,
     cellGrid,
+    fillMode,
     gridSubmit,
     libraryPrepsLoading,
     movedSamples,
@@ -29,7 +31,8 @@ export function SampleLocationGrid(props: ContainerGridProps) {
     onListDrop,
     onSampleClick,
     samplesLoading,
-    selectedSamples
+    selectedSamples,
+    setFillMode
   } = useSampleGridControls(props);
 
   if (samplesLoading || libraryPrepsLoading) {
@@ -37,6 +40,31 @@ export function SampleLocationGrid(props: ContainerGridProps) {
   } else {
     return (
       <DndProvider backend={HTML5Backend}>
+        <div className="row">
+          <div className="col-12">
+            <ul className="list-inline">
+              <li className="list-inline-item">
+                <strong>Fill by:</strong>
+              </li>
+              {[
+                { label: "Row", mode: "ROW" },
+                { label: "Column", mode: "COLUMN" }
+              ].map(({ label, mode }) => (
+                <li className="list-inline-item" key={mode}>
+                  <label>
+                    <input
+                      type="radio"
+                      checked={fillMode === mode}
+                      onChange={noop}
+                      onClick={() => setFillMode(mode)}
+                    />
+                    {label}
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
         <div className="row">
           <div className="col-3">
             <DraggableSampleList
@@ -47,7 +75,7 @@ export function SampleLocationGrid(props: ContainerGridProps) {
               onDrop={onListDrop}
             />
           </div>
-          <div className="col-8">
+          <div className="col-9">
             <ContainerGrid
               containerType={libraryPrepBatch.containerType}
               cellGrid={cellGrid}
@@ -55,9 +83,11 @@ export function SampleLocationGrid(props: ContainerGridProps) {
               onDrop={onGridDrop}
             />
           </div>
-          <div className="col-1">
+        </div>
+        <div className="row">
+          <div className="col-12">
             <button
-              className="btn btn-primary"
+              className="col-2 btn btn-primary float-right"
               onClick={gridSubmit}
               type="button"
             >

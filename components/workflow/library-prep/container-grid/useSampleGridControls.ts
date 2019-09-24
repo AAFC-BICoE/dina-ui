@@ -34,6 +34,9 @@ export function useSampleGridControls({
   // The grid of samples that have well coordinates.
   const [cellGrid, setCellGrid] = useState<CellGrid>();
 
+  // Grid fill direction when you move multiple samples into the grid.
+  const [fillMode, setFillMode] = useState<string>("COLUMN");
+
   // Samples that have been moved since data initialization.
   const [movedSamples, setMovedSamples] = useState<Sample[]>([]);
 
@@ -105,7 +108,7 @@ export function useSampleGridControls({
 
     if (coords) {
       // Add the sample to the grid state.
-      setCellGrid(locs => ({ ...locs, [coords]: sample }));
+      setCellGrid(newGrid => ({ ...newGrid, [coords]: sample }));
     } else {
       // Add the sample to the list.
       setAvailableSamples(samples => [...samples, sample]);
@@ -114,10 +117,45 @@ export function useSampleGridControls({
     if (!movedSamples.includes(sample)) {
       setMovedSamples(samples => [...samples, sample]);
     }
+
+    setSelectedSamples([]);
   }
 
-  function onGridDrop(sample, coords) {
-    moveSample(sample, coords);
+  function onGridDrop(sample: Sample, coords: string) {
+    if (selectedSamples.includes(sample) && selectedSamples.length > 1) {
+      const [rowLetter, colNumberString] = coords.split("_");
+      const rowNumber = rowLetter.charCodeAt(0) - 64;
+      const { numberOfColumns, numberOfRows } = libraryPrepBatch.containerType;
+
+      let newCellNumber =
+        fillMode === "ROW"
+          ? (rowNumber - 1) * numberOfColumns + Number(colNumberString)
+          : (Number(colNumberString) - 1) * numberOfRows + rowNumber;
+
+      for (const selectedSample of selectedSamples) {
+        let thisSampleRowNumber: number;
+        let thisSampleColumnNumber: number;
+
+        if (fillMode === "ROW") {
+          thisSampleRowNumber = Math.ceil(newCellNumber / numberOfColumns);
+          thisSampleColumnNumber =
+            newCellNumber % numberOfColumns || numberOfColumns;
+        }
+        if (fillMode === "COLUMN") {
+          thisSampleColumnNumber = Math.ceil(newCellNumber / numberOfRows);
+          thisSampleRowNumber = newCellNumber % numberOfRows || numberOfRows;
+        }
+
+        const thisSampleCoords = `${String.fromCharCode(
+          thisSampleRowNumber + 64
+        )}_${thisSampleColumnNumber}`;
+
+        moveSample(selectedSample, thisSampleCoords);
+        newCellNumber++;
+      }
+    } else {
+      moveSample(sample, coords);
+    }
   }
 
   function onListDrop(sample: Sample) {
@@ -195,6 +233,7 @@ export function useSampleGridControls({
   return {
     availableSamples,
     cellGrid,
+    fillMode,
     gridSubmit,
     libraryPrepsLoading,
     moveSample,
@@ -205,6 +244,7 @@ export function useSampleGridControls({
     samplesLoading,
     selectedSamples,
     setCellGrid,
+    setFillMode,
     setMovedSamples,
     setSamplesLoading
   };
