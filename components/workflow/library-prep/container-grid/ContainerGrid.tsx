@@ -1,4 +1,3 @@
-import { noop } from "lodash";
 import { useDrop } from "react-dnd-cjs";
 import ReactTable, { Column } from "react-table";
 import { ContainerType, Sample } from "../../../../types/seqdb-api";
@@ -25,7 +24,7 @@ export function ContainerGrid({
   containerType,
   cellGrid,
   movedSamples,
-  onDrop = noop
+  onDrop
 }: ContainerGridProps) {
   const columns: Column[] = [];
 
@@ -62,10 +61,8 @@ export function ContainerGrid({
     });
   }
 
-  const tableData = [];
-  for (let i = 0; i < containerType.numberOfRows; i++) {
-    tableData.push({});
-  }
+  // ReactTable needs a data object in every row.
+  const tableData = new Array(containerType.numberOfRows).fill({});
 
   return (
     <div>

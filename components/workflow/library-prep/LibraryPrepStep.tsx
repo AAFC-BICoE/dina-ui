@@ -3,7 +3,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { LoadingSpinner, useQuery } from "../..";
 import { StepResource } from "../../../types/seqdb-api";
 import { StepRendererProps } from "../StepRenderer";
-import { SampleLocationGrid } from "./container-grid/SampleLocationGrid";
+import { SampleLocationGrid } from "./container-grid/SampleGrid";
 import { IndexGrid } from "./IndexGrid";
 import { LibraryPrepBatchDetails } from "./LibraryPrepBatchDetails";
 import { LibraryPrepBatchForm } from "./LibraryPrepBatchForm";
