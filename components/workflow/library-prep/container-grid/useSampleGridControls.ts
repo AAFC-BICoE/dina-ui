@@ -45,6 +45,7 @@ export function useSampleGridControls({
 
   const [lastSave, setLastSave] = useState<number>();
 
+  // Library prep and sample queries.
   const {
     loading: libraryPrepsLoading,
     response: libraryPrepsResponse
@@ -235,11 +236,18 @@ export function useSampleGridControls({
     setSubmitting(false);
   }
 
+  function clearGrid() {
+    for (const sample of Object.values(cellGrid)) {
+      moveSample(sample, null);
+    }
+  }
+
   const loading = libraryPrepsLoading || samplesLoading || submitting;
 
   return {
     availableSamples,
     cellGrid,
+    clearGrid,
     fillMode,
     gridSubmit,
     loading,
