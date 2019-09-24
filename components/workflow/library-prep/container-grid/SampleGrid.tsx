@@ -17,7 +17,7 @@ interface ContainerGridProps {
   libraryPrepBatch: LibraryPrepBatch;
 }
 
-export function SampleLocationGrid(props: ContainerGridProps) {
+export function SampleGrid(props: ContainerGridProps) {
   const { libraryPrepBatch } = props;
 
   const {
@@ -25,17 +25,16 @@ export function SampleLocationGrid(props: ContainerGridProps) {
     cellGrid,
     fillMode,
     gridSubmit,
-    libraryPrepsLoading,
+    loading,
     movedSamples,
     onGridDrop,
     onListDrop,
     onSampleClick,
-    samplesLoading,
     selectedSamples,
     setFillMode
   } = useSampleGridControls(props);
 
-  if (samplesLoading || libraryPrepsLoading) {
+  if (loading) {
     return <LoadingSpinner loading={true} />;
   } else {
     return (

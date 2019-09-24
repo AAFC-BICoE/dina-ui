@@ -24,6 +24,9 @@ export function useSampleGridControls({
 
   const [samplesLoading, setSamplesLoading] = useState<boolean>(true);
 
+  // Whether the grid is submitting.
+  const [submitting, setSubmitting] = useState(false);
+
   // Highlighted/selected samples.
   const [selectedSamples, setSelectedSamples] = useState<Sample[]>([]);
   const lastSelectedSampleRef = useRef<Sample>();
@@ -185,6 +188,7 @@ export function useSampleGridControls({
   }
 
   async function gridSubmit() {
+    setSubmitting(true);
     try {
       const existingLibraryPreps = libraryPrepsResponse.data;
 
@@ -228,24 +232,22 @@ export function useSampleGridControls({
     } catch (err) {
       alert(err);
     }
+    setSubmitting(false);
   }
+
+  const loading = libraryPrepsLoading || samplesLoading || submitting;
 
   return {
     availableSamples,
     cellGrid,
     fillMode,
     gridSubmit,
-    libraryPrepsLoading,
-    moveSample,
+    loading,
     movedSamples,
     onGridDrop,
     onListDrop,
     onSampleClick,
-    samplesLoading,
     selectedSamples,
-    setCellGrid,
-    setFillMode,
-    setMovedSamples,
-    setSamplesLoading
+    setFillMode
   };
 }
