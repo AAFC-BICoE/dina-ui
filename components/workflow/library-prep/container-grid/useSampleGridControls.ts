@@ -149,14 +149,20 @@ export function useSampleGridControls({
             thisSampleRowNumber + 64
           )}_${thisSampleColumnNumber}`;
 
+          const sampleAlreadyInThisCell = newCellGrid[thisSampleCoords];
+          if (sampleAlreadyInThisCell) {
+            newAvailableSamples.push(sampleAlreadyInThisCell);
+            if (!movedSamples.includes(sampleAlreadyInThisCell)) {
+              newMovedSamples.push(sampleAlreadyInThisCell);
+            }
+          }
+
           newCellGrid[thisSampleCoords] = sample;
           newCellNumber++;
         }
       } else {
         // Add the sample to the list.
-        newAvailableSamples = [...availableSamples, ...samples].sort(
-          sampleSort
-        );
+        newAvailableSamples = [...availableSamples, ...samples];
       }
 
       for (const sample of samples) {
@@ -166,7 +172,7 @@ export function useSampleGridControls({
       }
 
       return {
-        availableSamples: newAvailableSamples,
+        availableSamples: newAvailableSamples.sort(sampleSort),
         cellGrid: newCellGrid,
         movedSamples: newMovedSamples
       };
