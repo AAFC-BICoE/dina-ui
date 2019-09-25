@@ -89,7 +89,8 @@ export function useSampleGridControls({
 
         const newAvailableSamples = selectionStepSrs
           .map(sr => sr.sample)
-          .filter(({ id }) => !sampleIdsWithCoords.includes(id));
+          .filter(({ id }) => !sampleIdsWithCoords.includes(id))
+          .sort(sampleSort);
 
         setAvailableSamples(newAvailableSamples);
         setSamplesLoading(false);
@@ -258,4 +259,16 @@ export function useSampleGridControls({
     selectedSamples,
     setFillMode
   };
+}
+
+function sampleSort(a, b) {
+  const [[aAlpha, aNum], [bAlpha, bNum]] = [a, b].map(
+    s => s.name.match(/[^\d]+|\d+/g) || []
+  );
+
+  if (aAlpha === bAlpha) {
+    return Number(aNum) > Number(bNum) ? 1 : -1;
+  } else {
+    return aAlpha > bAlpha ? 1 : -1;
+  }
 }

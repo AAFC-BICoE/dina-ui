@@ -40,38 +40,42 @@ export function SampleGrid(props: ContainerGridProps) {
   } else {
     return (
       <DndProvider backend={HTML5Backend}>
-        <div className="form-group">
-          <ul className="list-inline d-inline">
-            <li className="list-inline-item">
-              <strong>Fill by:</strong>
-            </li>
-            {[
-              { label: "Row", mode: "ROW" },
-              { label: "Column", mode: "COLUMN" }
-            ].map(({ label, mode }) => (
-              <li className="list-inline-item" key={mode}>
-                <label>
-                  <input
-                    type="radio"
-                    checked={fillMode === mode}
-                    onChange={noop}
-                    onClick={() => setFillMode(mode)}
-                  />
-                  {label}
-                </label>
+        <div className="row">
+          <div className="col-3" />
+          <div className="col-9">
+            <ul className="list-inline d-inline">
+              <li className="list-inline-item">
+                <strong>Fill by:</strong>
               </li>
-            ))}
-          </ul>
-          <button
-            className="float-right btn btn-dark d-inline"
-            onClick={clearGrid}
-            type="button"
-          >
-            Clear Grid
-          </button>
+              {[
+                { label: "Row", mode: "ROW" },
+                { label: "Column", mode: "COLUMN" }
+              ].map(({ label, mode }) => (
+                <li className="list-inline-item" key={mode}>
+                  <label>
+                    <input
+                      type="radio"
+                      checked={fillMode === mode}
+                      onChange={noop}
+                      onClick={() => setFillMode(mode)}
+                    />
+                    {label}
+                  </label>
+                </li>
+              ))}
+            </ul>
+            <button
+              className="float-right btn btn-dark d-inline"
+              onClick={clearGrid}
+              type="button"
+            >
+              Clear Grid
+            </button>
+          </div>
         </div>
         <div className="row">
           <div className="col-3">
+            <strong>Selected samples</strong>
             <DraggableSampleList
               availableSamples={availableSamples}
               selectedSamples={selectedSamples}
@@ -81,6 +85,7 @@ export function SampleGrid(props: ContainerGridProps) {
             />
           </div>
           <div className="col-9">
+            <strong>Container wells</strong>
             <ContainerGrid
               containerType={libraryPrepBatch.containerType}
               cellGrid={cellGrid}
@@ -96,7 +101,7 @@ export function SampleGrid(props: ContainerGridProps) {
               onClick={gridSubmit}
               type="button"
             >
-              Save
+              Save changed well coordinates
             </button>
           </div>
         </div>
