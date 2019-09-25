@@ -79,6 +79,9 @@ export function useSampleGridControls({
 
         const { data: selectionStepSrs } = await apiClient.get("stepResource", {
           // Get all the sample stepResources from the sample selection step that have no coords.
+          fields: {
+            sample: "name"
+          },
           filter: {
             "chain.chainId": chain.id,
             "chainStepTemplate.chainStepTemplateId": sampleSelectionStep.id,
@@ -127,38 +130,42 @@ export function useSampleGridControls({
     setSelectedSamples([]);
   }
 
+  function moveSamples(samples: Sample[], coords: string) {
+    const [rowLetter, colNumberString] = coords.split("_");
+    const rowNumber = rowLetter.charCodeAt(0) - 64;
+    const { numberOfColumns, numberOfRows } = libraryPrepBatch.containerType;
+
+    let newCellNumber =
+      fillMode === "ROW"
+        ? (rowNumber - 1) * numberOfColumns + Number(colNumberString)
+        : (Number(colNumberString) - 1) * numberOfRows + rowNumber;
+
+    for (const sample of samples) {
+      let thisSampleRowNumber: number;
+      let thisSampleColumnNumber: number;
+
+      if (fillMode === "ROW") {
+        thisSampleRowNumber = Math.ceil(newCellNumber / numberOfColumns);
+        thisSampleColumnNumber =
+          newCellNumber % numberOfColumns || numberOfColumns;
+      }
+      if (fillMode === "COLUMN") {
+        thisSampleColumnNumber = Math.ceil(newCellNumber / numberOfRows);
+        thisSampleRowNumber = newCellNumber % numberOfRows || numberOfRows;
+      }
+
+      const thisSampleCoords = `${String.fromCharCode(
+        thisSampleRowNumber + 64
+      )}_${thisSampleColumnNumber}`;
+
+      moveSample(sample, thisSampleCoords);
+      newCellNumber++;
+    }
+  }
+
   function onGridDrop(sample: Sample, coords: string) {
     if (selectedSamples.includes(sample) && selectedSamples.length > 1) {
-      const [rowLetter, colNumberString] = coords.split("_");
-      const rowNumber = rowLetter.charCodeAt(0) - 64;
-      const { numberOfColumns, numberOfRows } = libraryPrepBatch.containerType;
-
-      let newCellNumber =
-        fillMode === "ROW"
-          ? (rowNumber - 1) * numberOfColumns + Number(colNumberString)
-          : (Number(colNumberString) - 1) * numberOfRows + rowNumber;
-
-      for (const selectedSample of selectedSamples) {
-        let thisSampleRowNumber: number;
-        let thisSampleColumnNumber: number;
-
-        if (fillMode === "ROW") {
-          thisSampleRowNumber = Math.ceil(newCellNumber / numberOfColumns);
-          thisSampleColumnNumber =
-            newCellNumber % numberOfColumns || numberOfColumns;
-        }
-        if (fillMode === "COLUMN") {
-          thisSampleColumnNumber = Math.ceil(newCellNumber / numberOfRows);
-          thisSampleRowNumber = newCellNumber % numberOfRows || numberOfRows;
-        }
-
-        const thisSampleCoords = `${String.fromCharCode(
-          thisSampleRowNumber + 64
-        )}_${thisSampleColumnNumber}`;
-
-        moveSample(selectedSample, thisSampleCoords);
-        newCellNumber++;
-      }
+      moveSamples(selectedSamples, coords);
     } else {
       moveSample(sample, coords);
     }
@@ -244,6 +251,10 @@ export function useSampleGridControls({
     }
   }
 
+  async function moveAll() {
+    // TODO
+  }
+
   const loading = libraryPrepsLoading || samplesLoading || submitting;
 
   return {
@@ -253,6 +264,7 @@ export function useSampleGridControls({
     fillMode,
     gridSubmit,
     loading,
+    moveAll,
     movedSamples,
     onGridDrop,
     onListDrop,

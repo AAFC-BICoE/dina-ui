@@ -27,6 +27,7 @@ export function SampleGrid(props: ContainerGridProps) {
     fillMode,
     gridSubmit,
     loading,
+    moveAll,
     movedSamples,
     onGridDrop,
     onListDrop,
@@ -74,7 +75,7 @@ export function SampleGrid(props: ContainerGridProps) {
           </div>
         </div>
         <div className="row">
-          <div className="col-3">
+          <div className="col-2">
             <strong>Selected samples</strong>
             <DraggableSampleList
               availableSamples={availableSamples}
@@ -83,6 +84,11 @@ export function SampleGrid(props: ContainerGridProps) {
               onClick={onSampleClick}
               onDrop={onListDrop}
             />
+          </div>
+          <div className="col-1">
+            <button className="btn btn-primary" onClick={moveAll} type="button">
+              Move all
+            </button>
           </div>
           <div className="col-9">
             <strong>Container wells</strong>
