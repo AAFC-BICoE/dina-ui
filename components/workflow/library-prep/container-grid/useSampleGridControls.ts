@@ -65,15 +65,18 @@ export function useSampleGridControls({
       onSuccess: async ({ data: libraryPreps }) => {
         setSamplesLoading(true);
 
-        const sampleIdsWithCoords = libraryPreps
-          .filter(prep => prep.wellRow && prep.wellColumn)
-          .map(prep => prep.sample.id)
-          .join();
+        const libraryPrepsWithCoords = libraryPreps.filter(
+          prep => prep.wellRow && prep.wellColumn
+        );
 
         const newCellGrid: CellGrid = {};
-        for (const { wellRow, wellColumn, sample } of libraryPreps) {
+        for (const { wellRow, wellColumn, sample } of libraryPrepsWithCoords) {
           newCellGrid[`${wellRow}_${wellColumn}`] = sample;
         }
+
+        const sampleIdsWithCoords = libraryPrepsWithCoords
+          .map(prep => prep.sample.id)
+          .join();
 
         const { data: selectionStepSrs } = await apiClient.get("stepResource", {
           // Get all the sample stepResources from the sample selection step that have no coords.
@@ -94,11 +97,11 @@ export function useSampleGridControls({
           .filter(({ id }) => !sampleIdsWithCoords.includes(id))
           .sort(sampleSort);
 
-        setGridState(() => ({
+        setGridState({
           availableSamples: newAvailableSamples,
           cellGrid: newCellGrid,
           movedSamples: []
-        }));
+        });
         setSamplesLoading(false);
       }
     }
@@ -113,47 +116,41 @@ export function useSampleGridControls({
       let newAvailableSamples = availableSamples.filter(
         s => !samples.includes(s)
       );
-      let newMovedSamples = movedSamples;
+      const newMovedSamples = [...movedSamples];
 
       if (coords) {
-        if (samples.length === 1) {
-          // Add the sample to the grid state.
-          newCellGrid[coords] = samples[0];
-        } else {
-          const [rowLetter, colNumberString] = coords.split("_");
-          const rowNumber = rowLetter.charCodeAt(0) - 64;
-          const {
-            numberOfColumns,
-            numberOfRows
-          } = libraryPrepBatch.containerType;
+        const [rowLetter, colNumberString] = coords.split("_");
+        const rowNumber = rowLetter.charCodeAt(0) - 64;
+        const {
+          numberOfColumns,
+          numberOfRows
+        } = libraryPrepBatch.containerType;
 
-          let newCellNumber =
-            fillMode === "ROW"
-              ? (rowNumber - 1) * numberOfColumns + Number(colNumberString)
-              : (Number(colNumberString) - 1) * numberOfRows + rowNumber;
+        let newCellNumber =
+          fillMode === "ROW"
+            ? (rowNumber - 1) * numberOfColumns + Number(colNumberString)
+            : (Number(colNumberString) - 1) * numberOfRows + rowNumber;
 
-          for (const sample of samples) {
-            let thisSampleRowNumber: number;
-            let thisSampleColumnNumber: number;
+        for (const sample of samples) {
+          let thisSampleRowNumber: number;
+          let thisSampleColumnNumber: number;
 
-            if (fillMode === "ROW") {
-              thisSampleRowNumber = Math.ceil(newCellNumber / numberOfColumns);
-              thisSampleColumnNumber =
-                newCellNumber % numberOfColumns || numberOfColumns;
-            }
-            if (fillMode === "COLUMN") {
-              thisSampleColumnNumber = Math.ceil(newCellNumber / numberOfRows);
-              thisSampleRowNumber =
-                newCellNumber % numberOfRows || numberOfRows;
-            }
-
-            const thisSampleCoords = `${String.fromCharCode(
-              thisSampleRowNumber + 64
-            )}_${thisSampleColumnNumber}`;
-
-            newCellGrid[thisSampleCoords] = sample;
-            newCellNumber++;
+          if (fillMode === "ROW") {
+            thisSampleRowNumber = Math.ceil(newCellNumber / numberOfColumns);
+            thisSampleColumnNumber =
+              newCellNumber % numberOfColumns || numberOfColumns;
           }
+          if (fillMode === "COLUMN") {
+            thisSampleColumnNumber = Math.ceil(newCellNumber / numberOfRows);
+            thisSampleRowNumber = newCellNumber % numberOfRows || numberOfRows;
+          }
+
+          const thisSampleCoords = `${String.fromCharCode(
+            thisSampleRowNumber + 64
+          )}_${thisSampleColumnNumber}`;
+
+          newCellGrid[thisSampleCoords] = sample;
+          newCellNumber++;
         }
       } else {
         // Add the sample to the list.
@@ -164,7 +161,7 @@ export function useSampleGridControls({
 
       for (const sample of samples) {
         if (!movedSamples.includes(sample)) {
-          newMovedSamples = [...newMovedSamples, sample];
+          newMovedSamples.push(sample);
         }
       }
 
@@ -268,7 +265,11 @@ export function useSampleGridControls({
   }
 
   async function moveAll() {
-    // TODO
+    const { availableSamples, cellGrid } = gridState;
+    const samples = [...availableSamples, ...Object.values(cellGrid)].sort(
+      sampleSort
+    );
+    moveSamples(samples, "A_1");
   }
 
   const loading = libraryPrepsLoading || samplesLoading || submitting;
