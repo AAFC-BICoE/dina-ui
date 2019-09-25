@@ -1,4 +1,4 @@
-import { omit } from "lodash";
+import { omit, omitBy, pull } from "lodash";
 import { useContext, useRef, useState } from "react";
 import { ApiClientContext, useQuery } from "../../..";
 import {
@@ -32,19 +32,19 @@ export function useSampleGridControls({
   const [selectedSamples, setSelectedSamples] = useState<Sample[]>([]);
   const lastSelectedSampleRef = useRef<Sample>();
 
-  // Available samples with no well coordinates.
-  const [availableSamples, setAvailableSamples] = useState<Sample[]>([]);
-
-  // The grid of samples that have well coordinates.
-  const [cellGrid, setCellGrid] = useState<CellGrid>();
-
   // Grid fill direction when you move multiple samples into the grid.
   const [fillMode, setFillMode] = useState<string>("COLUMN");
 
-  // Samples that have been moved since data initialization.
-  const [movedSamples, setMovedSamples] = useState<Sample[]>([]);
-
   const [lastSave, setLastSave] = useState<number>();
+
+  const [gridState, setGridState] = useState({
+    // Available samples with no well coordinates.
+    availableSamples: [] as Sample[],
+    // The grid of samples that have well coordinates.
+    cellGrid: null as CellGrid,
+    // Samples that have been moved since data initialization.
+    movedSamples: [] as Sample[]
+  });
 
   // Library prep and sample queries.
   const {
@@ -74,8 +74,6 @@ export function useSampleGridControls({
         for (const { wellRow, wellColumn, sample } of libraryPreps) {
           newCellGrid[`${wellRow}_${wellColumn}`] = sample;
         }
-        setCellGrid(newCellGrid);
-        setMovedSamples([]);
 
         const { data: selectionStepSrs } = await apiClient.get("stepResource", {
           // Get all the sample stepResources from the sample selection step that have no coords.
@@ -96,86 +94,105 @@ export function useSampleGridControls({
           .filter(({ id }) => !sampleIdsWithCoords.includes(id))
           .sort(sampleSort);
 
-        setAvailableSamples(newAvailableSamples);
+        setGridState(() => ({
+          availableSamples: newAvailableSamples,
+          cellGrid: newCellGrid,
+          movedSamples: []
+        }));
         setSamplesLoading(false);
       }
     }
   );
 
-  function moveSample(sample: Sample, coords: string) {
-    // Remove the sample from the sample list:
-    if (availableSamples.includes(sample)) {
-      availableSamples.splice(availableSamples.indexOf(sample), 1);
-    }
+  function moveSamples(samples: Sample[], coords: string) {
+    setGridState(({ availableSamples, cellGrid, movedSamples }) => {
+      // Remove the sample from the grid.
+      const newCellGrid = omitBy(cellGrid, s => samples.includes(s));
 
-    // Remove the sample from the grid.
-    for (const attr in cellGrid) {
-      if (cellGrid[attr] === sample) {
-        setCellGrid(locs => omit(locs, attr));
+      // Remove the sample from the availables samples.
+      let newAvailableSamples = availableSamples.filter(
+        s => !samples.includes(s)
+      );
+      let newMovedSamples = movedSamples;
+
+      if (coords) {
+        if (samples.length === 1) {
+          // Add the sample to the grid state.
+          newCellGrid[coords] = samples[0];
+        } else {
+          const [rowLetter, colNumberString] = coords.split("_");
+          const rowNumber = rowLetter.charCodeAt(0) - 64;
+          const {
+            numberOfColumns,
+            numberOfRows
+          } = libraryPrepBatch.containerType;
+
+          let newCellNumber =
+            fillMode === "ROW"
+              ? (rowNumber - 1) * numberOfColumns + Number(colNumberString)
+              : (Number(colNumberString) - 1) * numberOfRows + rowNumber;
+
+          for (const sample of samples) {
+            let thisSampleRowNumber: number;
+            let thisSampleColumnNumber: number;
+
+            if (fillMode === "ROW") {
+              thisSampleRowNumber = Math.ceil(newCellNumber / numberOfColumns);
+              thisSampleColumnNumber =
+                newCellNumber % numberOfColumns || numberOfColumns;
+            }
+            if (fillMode === "COLUMN") {
+              thisSampleColumnNumber = Math.ceil(newCellNumber / numberOfRows);
+              thisSampleRowNumber =
+                newCellNumber % numberOfRows || numberOfRows;
+            }
+
+            const thisSampleCoords = `${String.fromCharCode(
+              thisSampleRowNumber + 64
+            )}_${thisSampleColumnNumber}`;
+
+            newCellGrid[thisSampleCoords] = sample;
+            newCellNumber++;
+          }
+        }
+      } else {
+        // Add the sample to the list.
+        newAvailableSamples = [...availableSamples, ...samples].sort(
+          sampleSort
+        );
       }
-    }
 
-    if (coords) {
-      // Add the sample to the grid state.
-      setCellGrid(newGrid => ({ ...newGrid, [coords]: sample }));
-    } else {
-      // Add the sample to the list.
-      setAvailableSamples(samples => [...samples, sample].sort(sampleSort));
-    }
+      for (const sample of samples) {
+        if (!movedSamples.includes(sample)) {
+          newMovedSamples = [...newMovedSamples, sample];
+        }
+      }
 
-    if (!movedSamples.includes(sample)) {
-      setMovedSamples(samples => [...samples, sample]);
-    }
+      return {
+        availableSamples: newAvailableSamples,
+        cellGrid: newCellGrid,
+        movedSamples: newMovedSamples
+      };
+    });
 
     setSelectedSamples([]);
   }
 
-  function moveSamples(samples: Sample[], coords: string) {
-    const [rowLetter, colNumberString] = coords.split("_");
-    const rowNumber = rowLetter.charCodeAt(0) - 64;
-    const { numberOfColumns, numberOfRows } = libraryPrepBatch.containerType;
-
-    let newCellNumber =
-      fillMode === "ROW"
-        ? (rowNumber - 1) * numberOfColumns + Number(colNumberString)
-        : (Number(colNumberString) - 1) * numberOfRows + rowNumber;
-
-    for (const sample of samples) {
-      let thisSampleRowNumber: number;
-      let thisSampleColumnNumber: number;
-
-      if (fillMode === "ROW") {
-        thisSampleRowNumber = Math.ceil(newCellNumber / numberOfColumns);
-        thisSampleColumnNumber =
-          newCellNumber % numberOfColumns || numberOfColumns;
-      }
-      if (fillMode === "COLUMN") {
-        thisSampleColumnNumber = Math.ceil(newCellNumber / numberOfRows);
-        thisSampleRowNumber = newCellNumber % numberOfRows || numberOfRows;
-      }
-
-      const thisSampleCoords = `${String.fromCharCode(
-        thisSampleRowNumber + 64
-      )}_${thisSampleColumnNumber}`;
-
-      moveSample(sample, thisSampleCoords);
-      newCellNumber++;
-    }
-  }
-
   function onGridDrop(sample: Sample, coords: string) {
-    if (selectedSamples.includes(sample) && selectedSamples.length > 1) {
+    if (selectedSamples.includes(sample)) {
       moveSamples(selectedSamples, coords);
     } else {
-      moveSample(sample, coords);
+      moveSamples([sample], coords);
     }
   }
 
   function onListDrop(sample: Sample) {
-    moveSample(sample, null);
+    moveSamples([sample], null);
   }
 
   function onSampleClick(sample, e) {
+    const { availableSamples } = gridState;
+
     if (lastSelectedSampleRef.current && e.shiftKey) {
       const currentIndex = availableSamples.indexOf(sample);
       const lastIndex = availableSamples.indexOf(lastSelectedSampleRef.current);
@@ -200,6 +217,7 @@ export function useSampleGridControls({
   async function gridSubmit() {
     setSubmitting(true);
     try {
+      const { cellGrid, movedSamples } = gridState;
       const existingLibraryPreps = libraryPrepsResponse.data;
 
       const libraryPrepsToSave = movedSamples.map(movedSample => {
@@ -246,9 +264,7 @@ export function useSampleGridControls({
   }
 
   function clearGrid() {
-    for (const sample of Object.values(cellGrid)) {
-      moveSample(sample, null);
-    }
+    moveSamples(Object.values(gridState.cellGrid), null);
   }
 
   async function moveAll() {
@@ -258,14 +274,12 @@ export function useSampleGridControls({
   const loading = libraryPrepsLoading || samplesLoading || submitting;
 
   return {
-    availableSamples,
-    cellGrid,
+    ...gridState,
     clearGrid,
     fillMode,
     gridSubmit,
     loading,
     moveAll,
-    movedSamples,
     onGridDrop,
     onListDrop,
     onSampleClick,
