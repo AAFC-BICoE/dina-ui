@@ -1,3 +1,4 @@
+import { omit } from "lodash";
 import { useContext, useRef, useState } from "react";
 import { ApiClientContext, useQuery } from "../../..";
 import {
@@ -107,7 +108,7 @@ export function useSampleGridControls({
     // Remove the sample from the grid.
     for (const attr in cellGrid) {
       if (cellGrid[attr] === sample) {
-        setCellGrid(locs => ({ ...locs, [attr]: undefined }));
+        setCellGrid(locs => omit(locs, attr));
       }
     }
 
@@ -116,7 +117,7 @@ export function useSampleGridControls({
       setCellGrid(newGrid => ({ ...newGrid, [coords]: sample }));
     } else {
       // Add the sample to the list.
-      setAvailableSamples(samples => [...samples, sample]);
+      setAvailableSamples(samples => [...samples, sample].sort(sampleSort));
     }
 
     if (!movedSamples.includes(sample)) {
