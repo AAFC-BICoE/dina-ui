@@ -1,5 +1,4 @@
 import { Form, Formik, FormikActions } from "formik";
-import { noop } from "lodash";
 import { useContext } from "react";
 import {
   ApiClientContext,
@@ -22,14 +21,14 @@ import { filterBy } from "../../../util/rsql";
 interface LibraryPrepBatchFormProps {
   chain: Chain;
   libraryPrepBatch?: LibraryPrepBatch;
-  onSuccess?: () => void;
+  onSuccess: () => void;
   step: ChainStepTemplate;
 }
 
 export function LibraryPrepBatchForm({
   chain,
   libraryPrepBatch,
-  onSuccess = noop,
+  onSuccess,
   step
 }: LibraryPrepBatchFormProps) {
   const { save } = useContext(ApiClientContext);
