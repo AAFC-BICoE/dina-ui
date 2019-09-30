@@ -67,7 +67,7 @@ export function SampleGrid(props: ContainerGridProps) {
               ))}
             </ul>
             <button
-              className="float-right btn btn-dark d-inline"
+              className="float-right btn btn-dark d-inline grid-clear"
               onClick={clearGrid}
               type="button"
             >
@@ -87,7 +87,11 @@ export function SampleGrid(props: ContainerGridProps) {
             />
           </div>
           <div className="col-1">
-            <button className="btn btn-primary" onClick={moveAll} type="button">
+            <button
+              className="btn btn-primary move-all"
+              onClick={moveAll}
+              type="button"
+            >
               Move all
             </button>
           </div>

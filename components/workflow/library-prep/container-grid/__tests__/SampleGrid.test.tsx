@@ -6,6 +6,7 @@ import {
   Sample
 } from "../../../../../types/seqdb-api";
 import { ContainerGrid } from "../ContainerGrid";
+import { DraggableSampleBox } from "../DraggableSampleBox";
 import { DraggableSampleList } from "../DraggableSampleList";
 import { SampleGrid } from "../SampleGrid";
 
@@ -69,7 +70,7 @@ const MOCK_LIBRARY_PREPS = [
 
 const MOCK_STEPRESOURCES_NO_WELL_COORDS = [
   { sample: { id: "6", name: "SAMP600", type: "sample" } },
-  { sample: { id: "10", name: "SAMP1000", type: "sample" } },
+  { sample: { id: "10", name: "ZSAMP1000", type: "sample" } },
   { sample: { id: "8", name: "SAMP800", type: "sample" } }
 ];
 
@@ -144,7 +145,7 @@ describe("SampleGrid component", () => {
       wrapper
         .find(".available-sample-list .list-group-item")
         .map(node => node.text())
-    ).toEqual(["SAMP600", "SAMP800", "SAMP1000"]);
+    ).toEqual(["SAMP600", "SAMP800", "ZSAMP1000"]);
   });
 
   it("Renders the sample names in the grid cells.", async () => {
@@ -249,7 +250,7 @@ describe("SampleGrid component", () => {
     // sample name order.
     expect(
       wrapper.find(".available-sample-list li").map(node => node.text())
-    ).toEqual(["SAMP200", "SAMP600", "SAMP800", "SAMP1000"]);
+    ).toEqual(["SAMP200", "SAMP600", "SAMP800", "ZSAMP1000"]);
   });
 
   it("Lets you fill multiple samples by Column.", async () => {
@@ -281,7 +282,7 @@ describe("SampleGrid component", () => {
 
     expect(wrapper.find(".well-G_3").text()).toEqual("SAMP600");
     expect(wrapper.find(".well-H_3").text()).toEqual("SAMP800");
-    expect(wrapper.find(".well-A_4").text()).toEqual("SAMP1000");
+    expect(wrapper.find(".well-A_4").text()).toEqual("ZSAMP1000");
 
     // Submit the grid changes:
     wrapper.find(".grid-submit").simulate("click");
@@ -336,5 +337,136 @@ describe("SampleGrid component", () => {
         type: "libraryPrep"
       }
     ]);
+  });
+
+  it("Lets you fill multiple samples by Row.", async () => {
+    const wrapper = getWrapper();
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Change to row mode:
+    wrapper.find(".ROW-radio").simulate("click");
+    wrapper.update();
+
+    // Select the first sample:
+    wrapper
+      .find(".available-sample-list li")
+      .first()
+      .prop<any>("onClick")({});
+    wrapper.update();
+
+    // Shift-click the third sample:
+    wrapper
+      .find(".available-sample-list li")
+      .at(2)
+      .prop<any>("onClick")({ shiftKey: true });
+    wrapper.update();
+
+    // Move the selected samples:
+    wrapper.find(ContainerGrid).prop("onDrop")(
+      MOCK_STEPRESOURCES_NO_WELL_COORDS[0].sample as Sample,
+      "G_11"
+    );
+    wrapper.update();
+
+    // Submit the grid changes:
+    wrapper.find(".grid-submit").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave).lastCalledWith([
+      {
+        resource: {
+          id: "3",
+          sample: expect.objectContaining({ id: "6", type: "sample" }),
+          type: "libraryPrep",
+          wellColumn: 11,
+          wellRow: "G"
+        },
+        type: "libraryPrep"
+      },
+      {
+        resource: {
+          libraryPrepBatch: expect.objectContaining({
+            id: "5",
+            type: "libraryPrepBatch"
+          }),
+          sample: expect.objectContaining({ id: "8", type: "sample" }),
+          type: "libraryPrep",
+          wellColumn: 12,
+          wellRow: "G"
+        },
+        type: "libraryPrep"
+      },
+      {
+        resource: {
+          libraryPrepBatch: expect.objectContaining({
+            id: "5",
+            type: "libraryPrepBatch"
+          }),
+          sample: expect.objectContaining({ id: "10", type: "sample" }),
+          type: "libraryPrep",
+          wellColumn: 1,
+          wellRow: "H"
+        },
+        type: "libraryPrep"
+      }
+    ]);
+  });
+
+  it("Provides a 'Clear Grid' button to clear the grid", async () => {
+    const wrapper = getWrapper();
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find(".grid-clear").simulate("click");
+    wrapper.update();
+
+    // All 5 samples should be in the list, none in the grid:
+    expect(wrapper.find(".available-sample-list li").length).toEqual(5);
+    expect(wrapper.find(ContainerGrid).find(DraggableSampleBox).length).toEqual(
+      0
+    );
+  });
+
+  it("Provides a 'Move all' button to move all samples into the grid.", async () => {
+    const wrapper = getWrapper();
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find(".move-all").simulate("click");
+    wrapper.update();
+
+    expect(wrapper.find(".available-sample-list li").length).toEqual(0);
+    expect(wrapper.find(".well-A_1").text()).toEqual("SAMP200");
+    expect(wrapper.find(".well-B_1").text()).toEqual("SAMP400");
+    expect(wrapper.find(".well-C_1").text()).toEqual("SAMP600");
+    expect(wrapper.find(".well-D_1").text()).toEqual("SAMP800");
+    expect(wrapper.find(".well-E_1").text()).toEqual("ZSAMP1000");
+  });
+
+  it("Moves a sample back into the list if another sample is moved onto it.", async () => {
+    const wrapper = getWrapper();
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find(ContainerGrid).prop("onDrop")(
+      MOCK_STEPRESOURCES_NO_WELL_COORDS[2].sample,
+      "A_1"
+    );
+    wrapper.update();
+
+    // SAMP200 should have been moved back into the list.
+    expect(
+      wrapper.find(".available-sample-list li[children='SAMP200']").exists()
+    ).toEqual(true);
+
+    // SAMP800 should now be in the grid.
+    expect(wrapper.find(".well-A_1").text()).toEqual("SAMP800");
   });
 });
