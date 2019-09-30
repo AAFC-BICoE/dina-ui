@@ -1,5 +1,6 @@
 import { noop } from "lodash";
 import { useDrag } from "react-dnd-cjs";
+import ReactTooltip from "react-tooltip";
 import { Sample } from "../../../../types/seqdb-api";
 
 interface DraggableSampleBoxProps {
@@ -22,6 +23,8 @@ export function DraggableSampleBox({
   return (
     <li
       className="list-group-item"
+      data-tip={true}
+      data-for={sample.id}
       onClick={onClick}
       ref={drag}
       style={{
@@ -33,6 +36,9 @@ export function DraggableSampleBox({
         cursor: "move"
       }}
     >
+      <ReactTooltip id={sample.id}>
+        <span>{sample.name}</span>
+      </ReactTooltip>
       {sample.name}
     </li>
   );
