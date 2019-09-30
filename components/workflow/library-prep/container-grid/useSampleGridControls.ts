@@ -1,4 +1,4 @@
-import { omit, omitBy, pull } from "lodash";
+import { omitBy } from "lodash";
 import { useContext, useRef, useState } from "react";
 import { ApiClientContext, useQuery } from "../../..";
 import {
@@ -230,13 +230,16 @@ export function useSampleGridControls({
         );
 
         // Get this sample's library prep, or create a new one if it doesn't exist yet.
-        const libraryPrep: LibraryPrep = existingLibraryPreps.find(
+        const existingPrep = existingLibraryPreps.find(
           prep => prep.sample.id === movedSample.id
-        ) || {
-          libraryPrepBatch,
-          sample: movedSample,
-          type: "libraryPrep"
-        };
+        );
+        const libraryPrep: LibraryPrep = existingPrep
+          ? { ...existingPrep }
+          : {
+              libraryPrepBatch,
+              sample: movedSample,
+              type: "libraryPrep"
+            };
 
         let newWellColumn: number = null;
         let newWellRow: string = null;

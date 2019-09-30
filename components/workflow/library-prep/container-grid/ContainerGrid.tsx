@@ -48,11 +48,13 @@ export function ContainerGrid({
         const coords = `${rowLabel}_${columnLabel}`;
 
         return (
-          <GridCell
-            movedSamples={movedSamples}
-            onDrop={({ sample: newSample }) => onDrop(newSample, coords)}
-            sample={cellGrid[coords]}
-          />
+          <span className={`well-${coords}`}>
+            <GridCell
+              movedSamples={movedSamples}
+              onDrop={({ sample: newSample }) => onDrop(newSample, coords)}
+              sample={cellGrid[coords]}
+            />
+          </span>
         );
       },
       Header: columnLabel,

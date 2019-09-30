@@ -24,7 +24,7 @@ export function DraggableSampleList({
 
   return (
     <ul
-      className="list-group"
+      className="list-group available-sample-list"
       ref={dropRef}
       style={{ minHeight: "400px", maxHeight: "400px", overflowY: "scroll" }}
     >

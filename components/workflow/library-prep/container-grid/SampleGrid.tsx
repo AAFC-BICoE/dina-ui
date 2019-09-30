@@ -55,6 +55,7 @@ export function SampleGrid(props: ContainerGridProps) {
                 <li className="list-inline-item" key={mode}>
                   <label>
                     <input
+                      className={`${mode}-radio`}
                       type="radio"
                       checked={fillMode === mode}
                       onChange={noop}
@@ -103,7 +104,7 @@ export function SampleGrid(props: ContainerGridProps) {
         <div className="row">
           <div className="col-12">
             <button
-              className="col-2 btn btn-primary float-right"
+              className="col-2 btn btn-primary float-right grid-submit"
               onClick={gridSubmit}
               type="button"
             >
