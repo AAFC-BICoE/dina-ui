@@ -38,9 +38,11 @@ export function FieldWrapper({
   children
 }: FieldWrapperProps) {
   return (
-    <div className={className}>
-      <div className={`form-group ${name}-field`}>
-        {!hideLabel && (
+    <div className={`${className || ""} ${name}-field`}>
+      {hideLabel ? (
+        children
+      ) : (
+        <div className="form-group">
           <label>
             <div>
               <strong>{label}</strong>
@@ -56,9 +58,9 @@ export function FieldWrapper({
               </ReactTooltip>
             </div>
           </label>
-        )}
-        {children}
-      </div>
+          {children}
+        </div>
+      )}
     </div>
   );
 }

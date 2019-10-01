@@ -39,7 +39,7 @@ export function DraggableSampleBox({
       <ReactTooltip id={sample.id}>
         <span>{sample.name}</span>
       </ReactTooltip>
-      {sample.name}
+      <span className="sample-box-text">{sample.name}</span>
     </li>
   );
 }
