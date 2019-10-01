@@ -143,7 +143,7 @@ describe("SampleGrid component", () => {
 
     expect(
       wrapper
-        .find(".available-sample-list .list-group-item")
+        .find(".available-sample-list .list-group-item .sample-box-text")
         .map(node => node.text())
     ).toEqual(["SAMP600", "SAMP800", "ZSAMP1000"]);
   });
@@ -162,6 +162,7 @@ describe("SampleGrid component", () => {
         .first()
         .find(".rt-td")
         .at(1)
+        .find(".sample-box-text")
         .text()
     ).toEqual("SAMP200");
     // Expect the sample in 2B:
@@ -170,6 +171,7 @@ describe("SampleGrid component", () => {
         .at(1)
         .find(".rt-td")
         .at(2)
+        .find(".sample-box-text")
         .text()
     ).toEqual("SAMP400");
   });
@@ -208,7 +210,7 @@ describe("SampleGrid component", () => {
       .at(5)
       .find(".rt-td")
       .at(3);
-    expect(gridCell.text()).toEqual("SAMP600");
+    expect(gridCell.find(".sample-box-text").text()).toEqual("SAMP600");
     // The background color should be yellow:
     expect(gridCell.find("li").prop("style").backgroundColor).toEqual(
       "#fff3cd"
@@ -249,7 +251,9 @@ describe("SampleGrid component", () => {
     // The sample should be back in the list and in the right alphanumeric
     // sample name order.
     expect(
-      wrapper.find(".available-sample-list li").map(node => node.text())
+      wrapper
+        .find(".available-sample-list li .sample-box-text")
+        .map(node => node.text())
     ).toEqual(["SAMP200", "SAMP600", "SAMP800", "ZSAMP1000"]);
   });
 
@@ -280,9 +284,15 @@ describe("SampleGrid component", () => {
     );
     wrapper.update();
 
-    expect(wrapper.find(".well-G_3").text()).toEqual("SAMP600");
-    expect(wrapper.find(".well-H_3").text()).toEqual("SAMP800");
-    expect(wrapper.find(".well-A_4").text()).toEqual("ZSAMP1000");
+    expect(wrapper.find(".well-G_3 .sample-box-text").text()).toEqual(
+      "SAMP600"
+    );
+    expect(wrapper.find(".well-H_3 .sample-box-text").text()).toEqual(
+      "SAMP800"
+    );
+    expect(wrapper.find(".well-A_4 .sample-box-text").text()).toEqual(
+      "ZSAMP1000"
+    );
 
     // Submit the grid changes:
     wrapper.find(".grid-submit").simulate("click");
@@ -442,11 +452,21 @@ describe("SampleGrid component", () => {
     wrapper.update();
 
     expect(wrapper.find(".available-sample-list li").length).toEqual(0);
-    expect(wrapper.find(".well-A_1").text()).toEqual("SAMP200");
-    expect(wrapper.find(".well-B_1").text()).toEqual("SAMP400");
-    expect(wrapper.find(".well-C_1").text()).toEqual("SAMP600");
-    expect(wrapper.find(".well-D_1").text()).toEqual("SAMP800");
-    expect(wrapper.find(".well-E_1").text()).toEqual("ZSAMP1000");
+    expect(wrapper.find(".well-A_1 .sample-box-text").text()).toEqual(
+      "SAMP200"
+    );
+    expect(wrapper.find(".well-B_1 .sample-box-text").text()).toEqual(
+      "SAMP400"
+    );
+    expect(wrapper.find(".well-C_1 .sample-box-text").text()).toEqual(
+      "SAMP600"
+    );
+    expect(wrapper.find(".well-D_1 .sample-box-text").text()).toEqual(
+      "SAMP800"
+    );
+    expect(wrapper.find(".well-E_1 .sample-box-text").text()).toEqual(
+      "ZSAMP1000"
+    );
   });
 
   it("Moves a sample back into the list if another sample is moved onto it.", async () => {
@@ -463,10 +483,14 @@ describe("SampleGrid component", () => {
 
     // SAMP200 should have been moved back into the list.
     expect(
-      wrapper.find(".available-sample-list li[children='SAMP200']").exists()
+      wrapper
+        .find(".available-sample-list li .sample-box-text[children='SAMP200']")
+        .exists()
     ).toEqual(true);
 
     // SAMP800 should now be in the grid.
-    expect(wrapper.find(".well-A_1").text()).toEqual("SAMP800");
+    expect(wrapper.find(".well-A_1 .sample-box-text").text()).toEqual(
+      "SAMP800"
+    );
   });
 });
