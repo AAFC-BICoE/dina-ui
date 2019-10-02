@@ -1,6 +1,6 @@
 import { mount } from "enzyme";
 import NumberFormat from "react-number-format";
-import { ApiClientContext } from "../../..";
+import { ApiClientContext, ResourceSelect } from "../../..";
 import { Chain, ChainStepTemplate } from "../../../../types/seqdb-api";
 import { LibraryPrepBatchForm } from "../LibraryPrepBatchForm";
 
@@ -117,6 +117,16 @@ describe("Library Prep Batch form", () => {
       "test notes"
     );
 
+    // Change the product and protocol
+    wrapper
+      .find(".product-field")
+      .find(ResourceSelect)
+      .prop<any>("onChange")({ id: "100" });
+    wrapper
+      .find(".protocol-field")
+      .find(ResourceSelect)
+      .prop<any>("onChange")({ id: "200" });
+
     wrapper.find(".notes-field input").simulate("change", {
       target: { name: "seq", value: "new notes" }
     });
@@ -133,6 +143,14 @@ describe("Library Prep Batch form", () => {
             resource: {
               id: "2",
               notes: "new notes",
+              product: {
+                id: "100",
+                type: "product"
+              },
+              protocol: {
+                id: "200",
+                type: "protocol"
+              },
               totalLibraryYieldNm: 2.5,
               type: "libraryPrepBatch"
             },
