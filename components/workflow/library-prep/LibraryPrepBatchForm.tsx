@@ -1,9 +1,10 @@
-import { Form, Formik, FormikActions } from "formik";
+import { Form, Formik } from "formik";
 import { useContext } from "react";
 import {
   ApiClientContext,
   NumberField,
   ResourceSelectField,
+  safeSubmit,
   SubmitButton,
   TextField
 } from "../..";
@@ -33,7 +34,7 @@ export function LibraryPrepBatchForm({
 }: LibraryPrepBatchFormProps) {
   const { save } = useContext(ApiClientContext);
 
-  async function onSubmit(submittedValues, formik: FormikActions<any>) {
+  const onSubmit = safeSubmit(async submittedValues => {
     if (submittedValues.product) {
       submittedValues.product.type = "product";
     }
@@ -41,39 +42,33 @@ export function LibraryPrepBatchForm({
       submittedValues.protocol.type = "protocol";
     }
 
-    try {
-      const [newLibraryPrepBatch] = await save([
+    const [newLibraryPrepBatch] = await save([
+      {
+        resource: submittedValues,
+        type: "libraryPrepBatch"
+      }
+    ]);
+
+    // Only add a new stepResource if the LibraryPrepBatch is new.
+    if (!submittedValues.id) {
+      const newStepResource: StepResource = {
+        chain,
+        chainStepTemplate: step,
+        libraryPrepBatch: newLibraryPrepBatch,
+        type: "INPUT",
+        value: "LIBRARY_PREP_BATCH"
+      };
+
+      await save([
         {
-          resource: submittedValues,
-          type: "libraryPrepBatch"
+          resource: newStepResource,
+          type: "stepResource"
         }
       ]);
-
-      // Only add a new stepResource if the LibraryPrepBatch is new.
-      if (!submittedValues.id) {
-        const newStepResource: StepResource = {
-          chain,
-          chainStepTemplate: step,
-          libraryPrepBatch: newLibraryPrepBatch,
-          type: "INPUT",
-          value: "LIBRARY_PREP_BATCH"
-        };
-
-        await save([
-          {
-            resource: newStepResource,
-            type: "stepResource"
-          }
-        ]);
-      }
-
-      onSuccess();
-    } catch (err) {
-      alert(err);
     }
 
-    formik.setSubmitting(false);
-  }
+    onSuccess();
+  });
 
   return (
     <Formik initialValues={libraryPrepBatch || {}} onSubmit={onSubmit}>

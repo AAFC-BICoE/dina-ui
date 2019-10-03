@@ -19,6 +19,7 @@ export * from "./formik-connected/ResourceSelectField";
 export * from "./formik-connected/SelectField";
 export * from "./formik-connected/SubmitButton";
 export * from "./formik-connected/TextField";
+export * from "./formik-connected/safeSubmit";
 export * from "./head";
 export * from "./list-page-layout/FilterForm";
 export * from "./list-page-layout/ListPageLayout";

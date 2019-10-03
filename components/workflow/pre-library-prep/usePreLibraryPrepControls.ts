@@ -1,8 +1,8 @@
-import { FormikActions, FormikProps } from "formik";
+import { FormikProps } from "formik";
 import { toPairs } from "lodash";
 import { useContext, useState } from "react";
 import { PreLibraryPrep } from "types/seqdb-api/resources/workflow/PreLibraryPrep";
-import { ApiClientContext, Operation, useQuery } from "../..";
+import { ApiClientContext, Operation, safeSubmit, useQuery } from "../..";
 import {
   Chain,
   ChainStepTemplate,
@@ -67,12 +67,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
     }
   );
 
-  async function plpFormSubmit(
-    values,
-    { setFieldValue, setSubmitting }: FormikActions<any>
-  ) {
-    setSubmitting(true);
-
+  const plpFormSubmit = safeSubmit(async (values, { setFieldValue }) => {
     const { checkedIds, ...plpValues } = values;
 
     if (plpValues.protocol) {
@@ -86,82 +81,77 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       .filter(pair => pair[1])
       .map(pair => pair[0]);
 
-    try {
-      // Find the existing PreLibraryPreps stepResources for these samples.
-      // These should be edited instead of creating new ones.
-      const existingStepResources: StepResource[] = checkedSampleIds.length
-        ? (await apiClient.get("stepResource", {
-            filter: {
-              "chain.chainId": chain.id,
-              "chainStepTemplate.chainStepTemplateId": step.id,
-              "preLibraryPrep.preLibraryPrepType": plpValues.preLibraryPrepType,
-              rsql: `sample.sampleId=in=(${checkedSampleIds})`
-            },
-            include: "sample,preLibraryPrep",
-            page: { limit: 1000 } // Max page limit
-          })).data
-        : [];
+    // Find the existing PreLibraryPreps stepResources for these samples.
+    // These should be edited instead of creating new ones.
+    const existingStepResources: StepResource[] = checkedSampleIds.length
+      ? (await apiClient.get("stepResource", {
+          filter: {
+            "chain.chainId": chain.id,
+            "chainStepTemplate.chainStepTemplateId": step.id,
+            "preLibraryPrep.preLibraryPrepType": plpValues.preLibraryPrepType,
+            rsql: `sample.sampleId=in=(${checkedSampleIds})`
+          },
+          include: "sample,preLibraryPrep",
+          page: { limit: 1000 } // Max page limit
+        })).data
+      : [];
 
-      const plps = checkedSampleIds.map(checkedSampleId => {
-        const existingStepResource = existingStepResources.find(
-          sr => sr.sample.id === checkedSampleId
-        );
-
-        if (existingStepResource) {
-          return {
-            resource: {
-              ...plpValues,
-              id: existingStepResource.preLibraryPrep.id
-            },
-            type: "preLibraryPrep"
-          };
-        } else {
-          return {
-            resource: plpValues,
-            type: "preLibraryPrep"
-          };
-        }
-      });
-
-      const savedPlps = (await save(plps)) as PreLibraryPrep[];
-
-      const newStepResources = checkedSampleIds
-        .map((sampleId, i) => ({
-          chain: { id: chain.id, type: chain.type } as Chain,
-          chainStepTemplate: {
-            id: step.id,
-            type: step.type
-          } as ChainStepTemplate,
-          preLibraryPrep: {
-            id: String(savedPlps[i].id),
-            type: "preLibraryPrep"
-          } as PreLibraryPrep,
-          sample: { id: sampleId, type: "sample" },
-          type: "INPUT",
-          value: savedPlps[i].preLibraryPrepType
-        }))
-        // Don't create a new step resource if there is already one for this sample.
-        .filter(
-          newSr =>
-            !existingStepResources
-              .map(existingSr => existingSr.sample.id)
-              .includes(newSr.sample.id)
-        );
-
-      await save(
-        newStepResources.map(resource => ({
-          resource,
-          type: "stepResource"
-        }))
+    const plps = checkedSampleIds.map(checkedSampleId => {
+      const existingStepResource = existingStepResources.find(
+        sr => sr.sample.id === checkedSampleId
       );
-      setLastSave(Date.now());
 
-      setFieldValue("checkedIds", {});
-    } catch (err) {
-      alert(err);
-    }
-    setSubmitting(false);
-  }
+      if (existingStepResource) {
+        return {
+          resource: {
+            ...plpValues,
+            id: existingStepResource.preLibraryPrep.id
+          },
+          type: "preLibraryPrep"
+        };
+      } else {
+        return {
+          resource: plpValues,
+          type: "preLibraryPrep"
+        };
+      }
+    });
+
+    const savedPlps = (await save(plps)) as PreLibraryPrep[];
+
+    const newStepResources = checkedSampleIds
+      .map((sampleId, i) => ({
+        chain: { id: chain.id, type: chain.type } as Chain,
+        chainStepTemplate: {
+          id: step.id,
+          type: step.type
+        } as ChainStepTemplate,
+        preLibraryPrep: {
+          id: String(savedPlps[i].id),
+          type: "preLibraryPrep"
+        } as PreLibraryPrep,
+        sample: { id: sampleId, type: "sample" },
+        type: "INPUT",
+        value: savedPlps[i].preLibraryPrepType
+      }))
+      // Don't create a new step resource if there is already one for this sample.
+      .filter(
+        newSr =>
+          !existingStepResources
+            .map(existingSr => existingSr.sample.id)
+            .includes(newSr.sample.id)
+      );
+
+    await save(
+      newStepResources.map(resource => ({
+        resource,
+        type: "stepResource"
+      }))
+    );
+    setLastSave(Date.now());
+
+    setFieldValue("checkedIds", {});
+  });
 
   async function deleteStepResources(
     plpType: "SHEARING" | "SIZE_SELECTION",

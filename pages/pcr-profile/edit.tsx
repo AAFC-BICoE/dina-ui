@@ -1,4 +1,4 @@
-import { Form, Formik, FormikActions } from "formik";
+import { Form, Formik } from "formik";
 import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
 import { useContext } from "react";
 import {
@@ -11,6 +11,7 @@ import {
   Nav,
   Query,
   ResourceSelectField,
+  safeSubmit,
   SubmitButton,
   TextField
 } from "../../components";
@@ -67,25 +68,17 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
   const { id } = router.query;
   const initialValues = profile || { type: "thermocyclerprofile" };
 
-  async function onSubmit(
-    submittedValues,
-    { setStatus, setSubmitting }: FormikActions<any>
-  ) {
-    try {
-      const response = await save([
-        {
-          resource: submittedValues,
-          type: "thermocyclerprofile"
-        }
-      ]);
+  const onSubmit = safeSubmit(async submittedValues => {
+    const response = await save([
+      {
+        resource: submittedValues,
+        type: "thermocyclerprofile"
+      }
+    ]);
 
-      const newId = response[0].id;
-      router.push(`/pcr-profile/view?id=${newId}`);
-    } catch (error) {
-      setStatus(error.message);
-      setSubmitting(false);
-    }
-  }
+    const newId = response[0].id;
+    router.push(`/pcr-profile/view?id=${newId}`);
+  });
 
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>

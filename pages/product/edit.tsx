@@ -1,4 +1,4 @@
-import { Form, Formik, FormikActions } from "formik";
+import { Form, Formik } from "formik";
 import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
 import { useContext } from "react";
 import {
@@ -11,6 +11,7 @@ import {
   Nav,
   Query,
   ResourceSelectField,
+  safeSubmit,
   SubmitButton,
   TextField
 } from "../../components";
@@ -61,25 +62,17 @@ function ProductForm({ product, router }: ProductFormProps) {
   const { id } = router.query;
   const initialValues = product || {};
 
-  async function onSubmit(
-    submittedValues,
-    { setStatus, setSubmitting }: FormikActions<any>
-  ) {
-    try {
-      const response = await save([
-        {
-          resource: submittedValues,
-          type: "product"
-        }
-      ]);
+  const onSubmit = safeSubmit(async submittedValues => {
+    const response = await save([
+      {
+        resource: submittedValues,
+        type: "product"
+      }
+    ]);
 
-      const newId = response[0].id;
-      router.push(`/product/view?id=${newId}`);
-    } catch (error) {
-      setStatus(error.message);
-      setSubmitting(false);
-    }
-  }
+    const newId = response[0].id;
+    router.push(`/product/view?id=${newId}`);
+  });
 
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
