@@ -10,6 +10,7 @@ type OnFormikSubmit = (
  */
 export function safeSubmit(submitfn: OnFormikSubmit): OnFormikSubmit {
   return async (submittedValues: any, formik: FormikActions<any>) => {
+    formik.setStatus(null);
     try {
       await submitfn(submittedValues, formik);
     } catch (error) {

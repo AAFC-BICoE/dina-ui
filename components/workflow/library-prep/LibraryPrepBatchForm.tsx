@@ -2,6 +2,7 @@ import { Form, Formik } from "formik";
 import { useContext } from "react";
 import {
   ApiClientContext,
+  ErrorViewer,
   NumberField,
   ResourceSelectField,
   safeSubmit,
@@ -73,6 +74,7 @@ export function LibraryPrepBatchForm({
   return (
     <Formik initialValues={libraryPrepBatch || {}} onSubmit={onSubmit}>
       <Form>
+        <ErrorViewer />
         <div className="row">
           <ResourceSelectField<Product>
             className="col-md-2"

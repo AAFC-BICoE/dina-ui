@@ -3,6 +3,7 @@ import { useState } from "react";
 import titleCase from "title-case";
 import {
   ColumnDefinition,
+  ErrorViewer,
   FilterForm,
   LoadingSpinner,
   QueryTable
@@ -188,6 +189,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                     <strong>Add New Shearing/Size Selection Details</strong>
                     {/* Spacer div to align the table with the form. */}
                     <div style={{ height: "22px" }} />
+                    <ErrorViewer />
                     <PreLibraryPrepForm onSubmit={onInnerFormSubmit} />
                   </div>
                 )}
