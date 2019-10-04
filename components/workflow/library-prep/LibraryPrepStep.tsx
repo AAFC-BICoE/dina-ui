@@ -4,7 +4,7 @@ import { LoadingSpinner, useQuery } from "../..";
 import { StepResource } from "../../../types/seqdb-api";
 import { StepRendererProps } from "../StepRenderer";
 import { SampleGrid } from "./container-grid/SampleGrid";
-import { IndexGrid } from "./IndexGrid";
+import { IndexGrid } from "./index-grid/IndexGrid";
 import { LibraryPrepBatchDetails } from "./LibraryPrepBatchDetails";
 import { LibraryPrepBatchForm } from "./LibraryPrepBatchForm";
 import { SampleToIndexTable } from "./SampleToIndexTable";

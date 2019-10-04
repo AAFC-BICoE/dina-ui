@@ -1,39 +1,35 @@
-import { Formik } from "formik";
-import { Dictionary, toPairs } from "lodash";
+import { Form, Formik } from "formik";
 import ReactTable, { Column } from "react-table";
 import {
+  ErrorViewer,
   LoadingSpinner,
   ResourceSelectField,
-  useCacheableQueryLoader,
-  useQuery
-} from "../..";
+  SubmitButton,
+  useCacheableQueryLoader
+} from "../../..";
 import {
   LibraryPrep,
   LibraryPrepBatch,
   PcrPrimer
-} from "../../../types/seqdb-api";
-import { filterBy } from "../../../util/rsql";
+} from "../../../../types/seqdb-api";
+import { filterBy } from "../../../../util/rsql";
+import { useIndexGridControls } from "./useIndexGridControls";
 
-interface LibraryPrepGridProps {
+export interface IndexGridProps {
   libraryPrepBatch: LibraryPrepBatch;
 }
 
-export function IndexGrid({ libraryPrepBatch }: LibraryPrepGridProps) {
+export function IndexGrid(props: IndexGridProps) {
+  const { libraryPrepBatch } = props;
+
   const { containerType } = libraryPrepBatch;
   const resourceSelectLoader = useCacheableQueryLoader();
 
   const {
-    loading: libraryPrepsLoading,
-    response: libraryPrepsResponse
-  } = useQuery<LibraryPrep[]>({
-    fields: {
-      pcrPrimer: "name",
-      sample: "name"
-    },
-    include: "sample,indexI5,indexI7",
-    page: { limit: 1000 },
-    path: `libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`
-  });
+    libraryPrepsLoading,
+    libraryPrepsResponse,
+    onSubmit
+  } = useIndexGridControls(props);
 
   if (libraryPrepsLoading) {
     return <LoadingSpinner loading={true} />;
@@ -51,19 +47,6 @@ export function IndexGrid({ libraryPrepBatch }: LibraryPrepGridProps) {
       cellGrid[`${prep.wellRow}_${prep.wellColumn}`] = prep;
     }
 
-    const pairs = toPairs(cellGrid);
-    const indexI5s: Dictionary<PcrPrimer> = {};
-    const indexI7s: Dictionary<PcrPrimer> = {};
-    for (const [coords, prep] of pairs) {
-      const [row, col] = coords.split("_");
-      if (prep.indexI5) {
-        indexI5s[col] = prep.indexI5;
-      }
-      if (prep.indexI7) {
-        indexI7s[row] = prep.indexI7;
-      }
-    }
-
     const columns: Column[] = [];
 
     // Add the primer column:
@@ -73,6 +56,7 @@ export function IndexGrid({ libraryPrepBatch }: LibraryPrepGridProps) {
 
         return (
           <div style={{ padding: "7px 5px" }}>
+            <span>{String.fromCharCode(index + 65)}</span>
             <ResourceSelectField<PcrPrimer>
               // TODO: this should fetch the index set primers.
               customDataFetch={resourceSelectLoader}
@@ -100,13 +84,28 @@ export function IndexGrid({ libraryPrepBatch }: LibraryPrepGridProps) {
           const prep = cellGrid[coords];
 
           return prep ? (
-            <div className="h-100 w-100">
-              <div className="list-group-item">{prep.sample.name}</div>
+            <div className="h-100 w-100 list-group-item">
+              <div>{prep.sample.name}</div>
+              <div>
+                {prep.indexI5 && (
+                  <div>
+                    <strong>i5: </strong>
+                    {prep.indexI5.name}
+                  </div>
+                )}
+                {prep.indexI7 && (
+                  <div>
+                    <strong>i7: </strong>
+                    {prep.indexI7.name}
+                  </div>
+                )}
+              </div>
             </div>
           ) : null;
         },
-        Header: () => {
-          return (
+        Header: () => (
+          <>
+            {columnLabel}
             <ResourceSelectField<PcrPrimer>
               // TODO: this should fetch the index set primers.
               customDataFetch={resourceSelectLoader}
@@ -117,8 +116,8 @@ export function IndexGrid({ libraryPrepBatch }: LibraryPrepGridProps) {
               model="pcrPrimer"
               styles={{ menu: () => ({ zIndex: 5 }) }}
             />
-          );
-        },
+          </>
+        ),
         resizable: false,
         sortable: false
       });
@@ -126,13 +125,13 @@ export function IndexGrid({ libraryPrepBatch }: LibraryPrepGridProps) {
 
     const tableData = new Array(containerType.numberOfRows).fill({});
 
-    function onSubmit() {
-      // const { indexI5s, indexI7s } = values;
-    }
-
     return (
-      <Formik initialValues={{ indexI5s, indexI7s }} onSubmit={onSubmit}>
-        <>
+      <Formik
+        initialValues={{ indexI5s: {}, indexI7s: {} }}
+        onSubmit={onSubmit}
+      >
+        <Form>
+          <ErrorViewer />
           <style>{`
             .rt-td {
               padding: 0 !important;
@@ -144,7 +143,10 @@ export function IndexGrid({ libraryPrepBatch }: LibraryPrepGridProps) {
             minRows={0}
             showPagination={false}
           />
-        </>
+          <div className="float-right">
+            <SubmitButton />
+          </div>
+        </Form>
       </Formik>
     );
   }
