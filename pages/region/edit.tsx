@@ -68,7 +68,7 @@ function RegionForm({ region, router }: RegionFormProps) {
     ]);
 
     const newId = response[0].id;
-    router.push(`/region/view?id=${newId}`);
+    await router.push(`/region/view?id=${newId}`);
   });
 
   return (

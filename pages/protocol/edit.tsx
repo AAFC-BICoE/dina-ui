@@ -82,7 +82,7 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
     ]);
 
     const newId = response[0].id;
-    router.push(`/protocol/view?id=${newId}`);
+    await router.push(`/protocol/view?id=${newId}`);
   });
 
   return (

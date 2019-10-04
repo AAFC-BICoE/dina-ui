@@ -74,7 +74,7 @@ function ChainForm({ chain, router }: ChainFormProps) {
     ]);
 
     const newId = response[0].id;
-    router.push(`/workflow/view?id=${newId}`);
+    await router.push(`/workflow/view?id=${newId}`);
   });
 
   return (

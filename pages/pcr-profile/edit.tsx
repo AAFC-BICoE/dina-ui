@@ -77,7 +77,7 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
     ]);
 
     const newId = response[0].id;
-    router.push(`/pcr-profile/view?id=${newId}`);
+    await router.push(`/pcr-profile/view?id=${newId}`);
   });
 
   return (

@@ -71,7 +71,7 @@ function ProductForm({ product, router }: ProductFormProps) {
     ]);
 
     const newId = response[0].id;
-    router.push(`/product/view?id=${newId}`);
+    await router.push(`/product/view?id=${newId}`);
   });
 
   return (
