@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { LoadingSpinner, useQuery } from "../..";
@@ -57,7 +58,8 @@ export function LibraryPrepStep(props: StepRendererProps) {
   }
 
   if (response && response.data.length) {
-    const { libraryPrepBatch } = response.data[0];
+    const stepResource = response.data[0];
+    const { libraryPrepBatch } = stepResource;
 
     return (
       <>
@@ -71,6 +73,17 @@ export function LibraryPrepStep(props: StepRendererProps) {
         </button>
         <div className="form-group">
           <LibraryPrepBatchDetails libraryPrepBatch={libraryPrepBatch} />
+        </div>
+        <div className="form-group">
+          <Link
+            href={`/workflow/library-prep-worksheet?stepResourceId=${
+              stepResource.id
+            }`}
+          >
+            <a className="btn btn-primary" target="_blank">
+              Library Prep Worksheet
+            </a>
+          </Link>
         </div>
         <div className="form-group">
           <Tabs>
