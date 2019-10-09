@@ -1,10 +1,10 @@
-import { mount } from "enzyme";
-import NumberFormat from "react-number-format";
 import {
   ApiClientContext,
   createContextValue,
   ResourceSelect
-} from "../../../";
+} from "common-ui";
+import { mount } from "enzyme";
+import NumberFormat from "react-number-format";
 import {
   Chain,
   ChainStepTemplate,

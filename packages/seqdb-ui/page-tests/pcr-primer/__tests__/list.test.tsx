@@ -1,9 +1,5 @@
+import { ApiClientContext, createContextValue, QueryTable } from "common-ui";
 import { mount } from "enzyme";
-import {
-  ApiClientContext,
-  createContextValue,
-  QueryTable
-} from "../../../components";
 import PcrPrimerListPage from "../../../pages/pcr-primer/list";
 import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 

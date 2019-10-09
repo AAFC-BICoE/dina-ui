@@ -1,14 +1,13 @@
+import { ApiClientContext, HttpMethod } from "common-ui";
 import { FormikProps } from "formik";
 import { toPairs } from "lodash";
 import { useContext, useState } from "react";
-import { ApiClientContext } from "../..";
 import {
   Chain,
   ChainStepTemplate,
   Sample,
   StepResource
 } from "../../../types/seqdb-api";
-import { HttpMethod } from "../../api-client/jsonapi-types";
 import { StepRendererProps } from "../StepRenderer";
 
 export function useSelectionControls({ chain, step }: StepRendererProps) {

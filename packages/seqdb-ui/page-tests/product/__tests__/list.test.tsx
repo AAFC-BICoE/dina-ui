@@ -1,9 +1,5 @@
+import { ApiClientContext, createContextValue, QueryTable } from "common-ui";
 import { mount } from "enzyme";
-import {
-  ApiClientContext,
-  createContextValue,
-  QueryTable
-} from "../../../components";
 import ProductListPage from "../../../pages/product/list";
 import { Product } from "../../../types/seqdb-api/resources/Product";
 

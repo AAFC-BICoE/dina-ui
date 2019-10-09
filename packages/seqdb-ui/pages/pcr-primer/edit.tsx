@@ -1,26 +1,23 @@
-import { Form, Formik, FormikActions } from "formik";
-import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
-import { useContext } from "react";
 import {
   ApiClientContext,
-  ButtonBar,
-  CancelButton,
   DateField,
   ErrorViewer,
-  Head,
+  filterBy,
   LoadingSpinner,
-  Nav,
   NumberField,
   Query,
   ResourceSelectField,
   SelectField,
   SubmitButton,
   TextField
-} from "../../components";
+} from "common-ui";
+import { ButtonBar, CancelButton, Head, Nav } from "components";
+import { Form, Formik, FormikActions } from "formik";
+import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
+import { useContext } from "react";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
 import { Region } from "../../types/seqdb-api/resources/Region";
-import { filterBy } from "../../util/rsql";
 
 interface PcrPrimerFormProps {
   primer?: PcrPrimer;

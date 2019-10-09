@@ -30,5 +30,6 @@
         "@zeit/next-typescript/babel"
       ]
     }
-  }
+  },
+  "plugins": ["@babel/plugin-transform-runtime"]
 }

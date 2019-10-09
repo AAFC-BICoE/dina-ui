@@ -1,5 +1,6 @@
+import { ColumnDefinition } from "common-ui";
 import Link from "next/link";
-import { ColumnDefinition, Head, ListPageLayout, Nav } from "../../components";
+import { Head, ListPageLayout, Nav } from "../../components";
 
 const WORKFLOW_TABLE_COLUMNS: Array<ColumnDefinition<any>> = [
   {

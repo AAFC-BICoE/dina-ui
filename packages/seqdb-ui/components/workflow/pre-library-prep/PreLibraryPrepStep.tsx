@@ -1,15 +1,15 @@
+import {
+  ColumnDefinition,
+  LoadingSpinner,
+  QueryTable,
+  useGroupedCheckBoxes
+} from "common-ui";
 import { Formik } from "formik";
 import { useState } from "react";
 import titleCase from "title-case";
-import {
-  ColumnDefinition,
-  FilterForm,
-  LoadingSpinner,
-  QueryTable
-} from "../..";
 import { Sample, StepResource } from "../../../types/seqdb-api";
 import { rsql } from "../../filter-builder/rsql";
-import { useGroupedCheckBoxes } from "../../formik-connected/GroupedCheckBoxFields";
+import { FilterForm } from "../../list-page-layout/FilterForm";
 import { StepRendererProps } from "../StepRenderer";
 import {
   PreLibPrepViewMode,

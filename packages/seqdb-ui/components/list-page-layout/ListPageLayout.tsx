@@ -1,7 +1,7 @@
+import { QueryTable, QueryTableProps } from "common-ui";
 import { FilterParam, KitsuResource } from "kitsu";
 import { useCookies } from "react-cookie";
 import { CookieSetOptions } from "universal-cookie";
-import { QueryTable, QueryTableProps } from "..";
 import { rsql } from "../filter-builder/rsql";
 import { FilterForm } from "./FilterForm";
 

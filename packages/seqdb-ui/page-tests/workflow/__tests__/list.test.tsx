@@ -1,5 +1,5 @@
+import { ApiClientContext, createContextValue } from "common-ui";
 import { mount } from "enzyme";
-import { ApiClientContext, createContextValue } from "../../../components";
 import WorkflowListPage from "../../../pages/workflow/list";
 import { Chain, ChainTemplate, Group } from "../../../types/seqdb-api";
 

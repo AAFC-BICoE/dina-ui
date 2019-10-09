@@ -1,17 +1,17 @@
+import {
+  ColumnDefinition,
+  filterBy,
+  LoadingSpinner,
+  QueryTable,
+  ResourceSelectField,
+  useGroupedCheckBoxes
+} from "common-ui";
 import { connect, Formik } from "formik";
 import { FilterParam } from "kitsu";
 import { useState } from "react";
-import {
-  ColumnDefinition,
-  FilterForm,
-  LoadingSpinner,
-  QueryTable,
-  ResourceSelectField
-} from "../..";
+import { FilterForm } from "../..";
 import { Group, StepResource } from "../../../types/seqdb-api";
-import { filterBy } from "../../../util/rsql";
 import { rsql } from "../../filter-builder/rsql";
-import { useGroupedCheckBoxes } from "../../formik-connected/GroupedCheckBoxFields";
 import { StepRendererProps } from "../StepRenderer";
 import { useSelectionControls } from "./useSelectionControls";
 

@@ -1,23 +1,20 @@
-import { Form, Formik, FormikActions } from "formik";
-import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
-import { useContext } from "react";
 import {
   ApiClientContext,
-  ButtonBar,
-  CancelButton,
   ErrorViewer,
-  Head,
+  filterBy,
+  LabelView,
   LoadingSpinner,
-  Nav,
   Query,
   ResourceSelectField,
   SubmitButton,
   TextField
-} from "../../components";
-import { LabelView } from "../../components/LabelView";
+} from "common-ui";
+import { Form, Formik, FormikActions } from "formik";
+import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
+import { useContext } from "react";
+import { ButtonBar, CancelButton, Head, Nav } from "../../components";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { Product } from "../../types/seqdb-api/resources/Product";
-import { filterBy } from "../../util/rsql";
 
 interface ProductFormProps {
   product?: Product;

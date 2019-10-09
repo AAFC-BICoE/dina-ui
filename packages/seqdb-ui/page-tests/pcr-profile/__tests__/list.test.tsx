@@ -1,5 +1,5 @@
+import { ApiClientContext, createContextValue } from "common-ui";
 import { mount } from "enzyme";
-import { ApiClientContext, createContextValue } from "../../../components";
 import PcrProfileListPage from "../../../pages/pcr-profile/list";
 import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
 

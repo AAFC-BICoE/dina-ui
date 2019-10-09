@@ -1,5 +1,5 @@
+import { ApiClientContext, createContextValue } from "common-ui";
 import { mount } from "enzyme";
-import { ApiClientContext, createContextValue } from "../../../components";
 import { ProtocolDetailsPage } from "../../../pages/protocol/view";
 import {
   Protocol,

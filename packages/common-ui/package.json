@@ -7,7 +7,7 @@
     "test:coverage": "tsc && jest --coverage"
   },
   "dependencies": {
-    "@molgenis/rsql": "^0.2.5",
+    "@molgenis/rsql": "0.1.2",
     "core-js": "^3.2.1",
     "formik": "^1.5.8",
     "kitsu": "^6.5.1",

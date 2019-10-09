@@ -1,6 +1,9 @@
-import { OperationsResponse } from "components/api-client/jsonapi-types";
+import {
+  ApiClientContext,
+  createContextValue,
+  OperationsResponse
+} from "common-ui";
 import { mount } from "enzyme";
-import { ApiClientContext, createContextValue } from "../../../components";
 import { PcrProfileEditPage } from "../../../pages/pcr-profile/edit";
 import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
 

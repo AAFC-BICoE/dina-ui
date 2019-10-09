@@ -1,7 +1,7 @@
+import { ApiClientContext } from "common-ui";
 import { mount } from "enzyme";
 import Kitsu from "kitsu";
 import { FunctionComponent } from "react";
-import { ApiClientContext } from "../../components/api-client/ApiClientContext";
 import SeqdbUiApp from "../../pages/_app";
 
 const mockPush = jest.fn();

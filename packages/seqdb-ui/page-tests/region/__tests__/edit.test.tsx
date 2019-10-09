@@ -1,6 +1,9 @@
-import { OperationsResponse } from "components/api-client/jsonapi-types";
+import {
+  ApiClientContext,
+  createContextValue,
+  OperationsResponse
+} from "common-ui";
 import { mount } from "enzyme";
-import { ApiClientContext, createContextValue } from "../../../components";
 import { RegionEditPage } from "../../../pages/region/edit";
 import { Region } from "../../../types/seqdb-api/resources/Region";
 

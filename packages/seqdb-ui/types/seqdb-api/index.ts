@@ -1,5 +1,3 @@
-export * from "./meta";
-export * from "./page";
 export * from "./resources/Group";
 export * from "./resources/PcrPrimer";
 export * from "./resources/PcrProfile";

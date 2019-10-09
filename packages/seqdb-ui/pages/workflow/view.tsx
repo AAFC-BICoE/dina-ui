@@ -1,8 +1,9 @@
+import { FieldView, LoadingSpinner, Query } from "common-ui";
 import { Formik } from "formik";
 import Link from "next/link";
 import { withRouter, WithRouterProps } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { FieldView, Head, LoadingSpinner, Nav, Query } from "../../components";
+import { Head, Nav } from "../../components";
 import { StepRenderer } from "../../components/workflow/StepRenderer";
 import { Chain } from "../../types/seqdb-api/resources/workflow/Chain";
 import { ChainStepTemplate } from "../../types/seqdb-api/resources/workflow/ChainStepTemplate";

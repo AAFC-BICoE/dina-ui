@@ -1,5 +1,5 @@
+import { ApiClientContext, createContextValue } from "common-ui";
 import { mount } from "enzyme";
-import { ApiClientContext, createContextValue } from "../../../components";
 import { RegionDetailsPage } from "../../../pages/region/view";
 import { Region } from "../../../types/seqdb-api/resources/Region";
 

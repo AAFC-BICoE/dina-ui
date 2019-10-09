@@ -1,18 +1,15 @@
-import { Form, Formik, FormikActions } from "formik";
-import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
-import { useContext } from "react";
 import {
   ApiClientContext,
-  ButtonBar,
-  CancelButton,
   ErrorViewer,
-  Head,
   LoadingSpinner,
-  Nav,
   Query,
   SubmitButton,
   TextField
-} from "../../components";
+} from "common-ui";
+import { Form, Formik, FormikActions } from "formik";
+import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
+import { useContext } from "react";
+import { ButtonBar, CancelButton, Head, Nav } from "../../components";
 import { Region } from "../../types/seqdb-api/resources/Region";
 
 interface RegionFormProps {

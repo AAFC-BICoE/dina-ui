@@ -1,10 +1,10 @@
-import { mount } from "enzyme";
 import {
   ApiClientContext,
   createContextValue,
+  OperationsResponse,
   ResourceSelect
-} from "../../../components";
-import { OperationsResponse } from "../../../components/api-client/jsonapi-types";
+} from "common-ui";
+import { mount } from "enzyme";
 import { ChainEditPage } from "../../../pages/workflow/edit";
 import { Chain, ChainTemplate, Group } from "../../../types/seqdb-api";
 

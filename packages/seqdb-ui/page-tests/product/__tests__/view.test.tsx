@@ -1,5 +1,5 @@
+import { ApiClientContext, createContextValue } from "common-ui";
 import { mount } from "enzyme";
-import { ApiClientContext, createContextValue } from "../../../components";
 import { ProductDetailsPage } from "../../../pages/product/view";
 import { Product } from "../../../types/seqdb-api/resources/Product";
 

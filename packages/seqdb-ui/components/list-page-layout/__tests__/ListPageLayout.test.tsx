@@ -1,11 +1,7 @@
+import { ApiClientContext, createContextValue, QueryTable } from "common-ui";
 import { mount } from "enzyme";
 import ReactTable from "react-table";
 import { act } from "react-test-renderer";
-import {
-  ApiClientContext,
-  createContextValue,
-  QueryTable
-} from "../../../components";
 import { ListPageLayout } from "../ListPageLayout";
 
 /** Mock Kitsu "get" method. */

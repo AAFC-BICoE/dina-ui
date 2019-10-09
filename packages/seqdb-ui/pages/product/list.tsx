@@ -1,7 +1,7 @@
+import { ColumnDefinition } from "common-ui";
 import Link from "next/link";
 import {
   ButtonBar,
-  ColumnDefinition,
   CreateButton,
   Head,
   ListPageLayout,

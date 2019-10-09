@@ -1,5 +1,5 @@
+import { ApiClientContext, createContextValue } from "common-ui";
 import { mount } from "enzyme";
-import { ApiClientContext, createContextValue } from "../../../components";
 import { PcrPrimerDetailsPage } from "../../../pages/pcr-primer/view";
 import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 
@@ -23,18 +23,16 @@ const mockGet = jest.fn(async () => {
 });
 
 // Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-    }
-);
+const testCtx = {
+  apiClient: {
+    get: mockGet
+  }
+};
 
 describe("PcrPrimer details page", () => {
   function mountWithContext(element: JSX.Element) {
     return mount(
-      <ApiClientContext.Provider value={createContextValue()}>
+      <ApiClientContext.Provider value={testCtx as any}>
         {element}
       </ApiClientContext.Provider>
     );
