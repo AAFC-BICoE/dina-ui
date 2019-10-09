@@ -10,8 +10,8 @@
     "@molgenis/rsql": "0.1.2",
     "core-js": "^3.2.1",
     "formik": "^1.5.8",
-    "kitsu": "^6.5.1",
-    "kitsu-core": "^7.0.0",
+    "kitsu": "7.0.4",
+    "kitsu-core": "7.0.4",
     "react": "^16.10.2",
     "react-datepicker": "^2.9.6",
     "react-dom": "^16.10.2",
@@ -28,6 +28,7 @@
     "@babel/preset-env": "^7.6.3",
     "@babel/preset-react": "^7.6.3",
     "@babel/preset-typescript": "^7.6.0",
+    "@babel/runtime-corejs2": "^7.6.3",
     "@types/enzyme": "^3.10.3",
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.12",
@@ -40,6 +41,6 @@
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "jest": "^24.9.0",
-    "typescript": "^3.6.3"
+    "typescript": "^3.6.4"
   }
 }

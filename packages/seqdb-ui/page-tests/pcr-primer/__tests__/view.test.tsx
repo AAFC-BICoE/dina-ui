@@ -1,4 +1,4 @@
-import { ApiClientContext, createContextValue } from "common-ui";
+import { ApiClientContext } from "common-ui";
 import { mount } from "enzyme";
 import { PcrPrimerDetailsPage } from "../../../pages/pcr-primer/view";
 import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";

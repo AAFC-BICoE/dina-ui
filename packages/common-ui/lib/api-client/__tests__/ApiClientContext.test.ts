@@ -134,15 +134,10 @@ const mockPatch = jest.fn((_, data) => {
   }
 });
 
-jest.mock("axios", () => ({
-  create() {
-    return {
-      patch: mockPatch
-    };
-  }
-}));
-
 const { apiClient, doOperations, save } = createContextValue();
+
+// Add the mocked "patch" method to the Axios instance:
+apiClient.axios = { patch: mockPatch } as any;
 
 describe("API client context", () => {
   it("Provides an API client instance.", () => {

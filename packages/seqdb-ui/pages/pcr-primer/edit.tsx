@@ -11,17 +11,18 @@ import {
   SubmitButton,
   TextField
 } from "common-ui";
-import { ButtonBar, CancelButton, Head, Nav } from "components";
 import { Form, Formik, FormikActions } from "formik";
-import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
+import { ButtonBar, CancelButton, Head, Nav } from "../../components";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
 import { Region } from "../../types/seqdb-api/resources/Region";
 
 interface PcrPrimerFormProps {
   primer?: PcrPrimer;
-  router: SingletonRouter;
+  router: NextRouter;
 }
 
 export function PcrPrimerEditPage({ router }: WithRouterProps) {

@@ -1,5 +1,5 @@
 import { mount } from "enzyme";
-import Select from "react-select/lib/Select";
+import Select from "react-select/base";
 import { FilterAttribute } from "../FilterBuilder";
 import { FilterRow, FilterRowProps } from "../FilterRow";
 

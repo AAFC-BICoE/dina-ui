@@ -9,14 +9,15 @@ import {
   TextField
 } from "common-ui";
 import { Form, Formik, FormikActions } from "formik";
-import { SingletonRouter, withRouter, WithRouterProps } from "next/router";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { Head, Nav } from "../../components";
 import { Group } from "../../types/seqdb-api/resources/Group";
 
 interface ChainFormProps {
   chain?: any;
-  router: SingletonRouter;
+  router: NextRouter;
 }
 
 export function ChainEditPage({ router }: WithRouterProps) {

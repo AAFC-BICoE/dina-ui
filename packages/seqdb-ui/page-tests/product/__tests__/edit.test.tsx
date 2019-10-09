@@ -44,7 +44,7 @@ describe("Product edit page", () => {
     jest.resetAllMocks();
   });
 
-  it("Provides a form to add a Product.", done => {
+  it("Provides a form to add a Product.", async () => {
     mockPatch.mockReturnValueOnce({
       data: [
         {
@@ -69,33 +69,31 @@ describe("Product edit page", () => {
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      expect(mockPatch).lastCalledWith(
-        "operations",
-        [
-          {
-            op: "POST",
-            path: "product",
-            value: {
-              attributes: {
-                name: "New Product",
-                type: undefined
-              },
-              id: -100,
-              type: "product"
-            }
+    await new Promise(setImmediate);
+    expect(mockPatch).lastCalledWith(
+      "operations",
+      [
+        {
+          op: "POST",
+          path: "product",
+          value: {
+            attributes: {
+              name: "New Product",
+              type: undefined
+            },
+            id: -100,
+            type: "product"
           }
-        ],
-        expect.anything()
-      );
+        }
+      ],
+      expect.anything()
+    );
 
-      // The user should be redirected to the new product's details page.
-      expect(mockPush).lastCalledWith("/product/view?id=1");
-      done();
-    });
+    // The user should be redirected to the new product's details page.
+    expect(mockPush).lastCalledWith("/product/view?id=1");
   });
 
-  it("Renders an error after form submit if one is returned from the back-end.", done => {
+  it("Renders an error after form submit if one is returned from the back-end.", async () => {
     // The patch request will return an error.
     mockPatch.mockImplementationOnce(() => ({
       data: [
@@ -124,17 +122,15 @@ describe("Product edit page", () => {
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-        "Constraint violation: name size must be between 1 and 10"
-      );
-      expect(mockPush).toBeCalledTimes(0);
-      done();
-    });
+    await new Promise(setImmediate);
+    wrapper.update();
+    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
+      "Constraint violation: name size must be between 1 and 10"
+    );
+    expect(mockPush).toBeCalledTimes(0);
   });
 
-  it("Provides a form to edit a Product.", async done => {
+  it("Provides a form to edit a Product.", async () => {
     // The get request will return the existing product.
     mockGet.mockImplementation(async model => {
       if (model === "product/10") {
@@ -186,37 +182,35 @@ describe("Product edit page", () => {
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      // "patch" should have been called with a jsonpatch request containing the existing values
-      // and the modified one.
-      expect(mockPatch).lastCalledWith(
-        "operations",
-        [
-          {
-            op: "PATCH",
-            path: "product/10",
-            value: {
-              attributes: expect.objectContaining({
-                description: "new desc for product 10, was a null value",
-                name: "Rapid Alkaline DNA Extraction"
-              }),
-              id: "10",
-              relationships: {
-                group: {
-                  data: expect.objectContaining({ id: "8", type: "group" })
-                }
-              },
-              type: "product"
-            }
+    await new Promise(setImmediate);
+    // "patch" should have been called with a jsonpatch request containing the existing values
+    // and the modified one.
+    expect(mockPatch).lastCalledWith(
+      "operations",
+      [
+        {
+          op: "PATCH",
+          path: "product/10",
+          value: {
+            attributes: expect.objectContaining({
+              description: "new desc for product 10, was a null value",
+              name: "Rapid Alkaline DNA Extraction"
+            }),
+            id: "10",
+            relationships: {
+              group: {
+                data: expect.objectContaining({ id: "8", type: "group" })
+              }
+            },
+            type: "product"
           }
-        ],
-        expect.anything()
-      );
+        }
+      ],
+      expect.anything()
+    );
 
-      // The user should be redirected to the existing product's details page.
-      expect(mockPush).lastCalledWith("/product/view?id=10");
-      done();
-    });
+    // The user should be redirected to the existing product's details page.
+    expect(mockPush).lastCalledWith("/product/view?id=10");
   });
 });
 

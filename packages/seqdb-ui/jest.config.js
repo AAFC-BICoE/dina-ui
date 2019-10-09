@@ -8,7 +8,6 @@ module.exports = {
     "next.config.js",
     "polyfills.js"
   ],
-  moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
   moduleNameMapper: {
     // Mocks CSS imports to prevent throwing an error during tests.
     "\\.css$": "identity-obj-proxy"
@@ -19,5 +18,6 @@ module.exports = {
   transform: {
     "^.+\\.tsx?$": "babel-jest"
   },
+  // Transform our local common-ui package
   snapshotSerializers: ["enzyme-to-json/serializer"]
 };

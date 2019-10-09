@@ -1,6 +1,6 @@
 import { FieldView, LoadingSpinner, Query } from "common-ui";
 import { Formik } from "formik";
-import { withRouter, WithRouterProps } from "next/router";
+import withRouter, { WithRouterProps } from "next/dist/client/with-router";
 import {
   BackToListButton,
   ButtonBar,
