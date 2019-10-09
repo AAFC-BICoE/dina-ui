@@ -1,13 +1,17 @@
 import { mount } from "enzyme";
 import { Formik } from "formik";
 import lodash from "lodash";
-import Select from "react-select/lib/Select";
+import Select from "react-select/base";
 import {
   ApiClientContext,
   createContextValue,
   ResourceSelectField
 } from "../../";
-import { Group } from "../../../types/seqdb-api/resources/Group";
+import { KitsuResource } from "kitsu";
+
+interface TestGroup extends KitsuResource {
+  groupName: string;
+}
 
 const MOCK_GROUPS = {
   data: [
@@ -56,7 +60,7 @@ describe("ResourceSelectField component", () => {
         initialValues={{ group: { id: "3", groupName: "Mat's Group" } }}
         onSubmit={null}
       >
-        <ResourceSelectField<Group>
+        <ResourceSelectField<TestGroup>
           name="group"
           model="group"
           filter={groupName => ({ groupName })}
@@ -79,7 +83,7 @@ describe("ResourceSelectField component", () => {
       <Formik initialValues={{ group: null }} onSubmit={null}>
         {({ values: { group } }) => (
           <div>
-            <ResourceSelectField<Group>
+            <ResourceSelectField<TestGroup>
               name="group"
               model="group"
               filter={groupName => ({ groupName })}
@@ -129,7 +133,7 @@ describe("ResourceSelectField component", () => {
         initialValues={{ group: { id: 3, groupName: "Mat's Group" } }}
         onSubmit={null}
       >
-        <ResourceSelectField<Group>
+        <ResourceSelectField<TestGroup>
           name="group"
           model="group"
           filter={groupName => ({ groupName })}

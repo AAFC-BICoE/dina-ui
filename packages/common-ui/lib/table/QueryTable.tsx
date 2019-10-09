@@ -6,11 +6,13 @@ import ReactTable, {
   SortedChangeFunction,
   SortingRule
 } from "react-table";
-import "react-table/react-table.css";
 import titleCase from "title-case";
-import { JsonApiQuerySpec, useQuery } from "..";
-import { MetaWithTotal } from "../../types/seqdb-api/meta";
-import { PageSpec } from "../../types/seqdb-api/page";
+import {
+  JsonApiQuerySpec,
+  LimitOffsetPageSpec,
+  MetaWithTotal,
+  useQuery
+} from "..";
 
 /** Object types accepted as a column definition. */
 export type ColumnDefinition<TData> = string | Column<TData>;
@@ -91,7 +93,7 @@ export function QueryTable<TData extends KitsuResource>({
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
   // JSONAPI page spec.
-  const [page, setPage] = useState<PageSpec>({
+  const [page, setPage] = useState<LimitOffsetPageSpec>({
     limit: defaultPageSize,
     offset: 0
   });

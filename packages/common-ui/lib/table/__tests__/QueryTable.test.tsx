@@ -3,12 +3,14 @@ import { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import { range } from "lodash";
 import React from "react";
 import ReactTable from "react-table";
-import { MetaWithTotal } from "../../../types/seqdb-api/meta";
 import {
   ApiClientContext,
-  createContextValue
-} from "../../api-client/ApiClientContext";
-import { ColumnDefinition, QueryTable, QueryTableProps } from "../QueryTable";
+  ColumnDefinition,
+  createContextValue,
+  MetaWithTotal,
+  QueryTable,
+  QueryTableProps
+} from "../..";
 
 /** Example of an API resource interface definition for a todo-list entry. */
 interface Todo extends KitsuResource {

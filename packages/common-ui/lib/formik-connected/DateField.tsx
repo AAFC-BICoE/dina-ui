@@ -1,6 +1,5 @@
 import { Field, FieldProps } from "formik";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 /** Formik-connected date input. */

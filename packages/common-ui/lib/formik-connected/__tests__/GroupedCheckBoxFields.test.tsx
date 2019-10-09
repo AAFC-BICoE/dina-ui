@@ -1,15 +1,19 @@
 import { mount } from "enzyme";
 import { Form, Formik } from "formik";
 import { useEffect } from "react";
-import { Sample } from "types/seqdb-api";
 import { useGroupedCheckBoxes } from "../GroupedCheckBoxFields";
+import { KitsuResource } from "kitsu";
 
-const TEST_SAMPLES: Sample[] = [
-  { id: 1, name: "1" },
-  { id: 2, name: "2" },
-  { id: 3, name: "3" },
-  { id: 4, name: "4" },
-  { id: 5, name: "5" }
+interface TestResource extends KitsuResource {
+  name: string;
+}
+
+const TEST_SAMPLES: TestResource[] = [
+  { id: 1, name: "1", type: "testResource" },
+  { id: 2, name: "2", type: "testResource" },
+  { id: 3, name: "3", type: "testResource" },
+  { id: 4, name: "4", type: "testResource" },
+  { id: 5, name: "5", type: "testResource" }
 ] as any[];
 
 const mockOnSubmit = jest.fn();

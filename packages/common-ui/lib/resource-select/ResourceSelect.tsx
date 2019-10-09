@@ -1,10 +1,9 @@
-import { ApiClientContext } from "common-ui";
 import { FilterParam, GetParams, KitsuResource } from "kitsu";
-import { debounce, omitBy } from "lodash";
+import { debounce, isUndefined, omitBy } from "lodash";
 import React, { useContext } from "react";
-import { Async as AsyncSelect } from "react-select";
-import { OptionsType } from "react-select/lib/types";
-import { isUndefined } from "util";
+import AsyncSelect from "react-select/async";
+import { ApiClientContext } from "..";
+import { OptionsType } from "react-select/src/types";
 
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData> {
