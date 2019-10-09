@@ -1,7 +1,7 @@
 import Kitsu, { KitsuResource } from "kitsu";
 import { deserialise } from "kitsu-core";
 import React from "react";
-import { serialize } from "../../util/serialize";
+import { serialize } from "../util/serialize";
 import {
   JsonApiErrorResponse,
   JsonApiResponse,

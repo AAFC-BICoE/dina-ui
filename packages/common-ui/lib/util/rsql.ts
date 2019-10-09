@@ -7,7 +7,7 @@ import { FilterParam } from "kitsu";
  */
 export function filterBy(fields: string[]): (value: string) => FilterParam {
   return value => ({
-    rsql: transformToRSQL({
+    rsql: (transformToRSQL as any)({
       operands: fields.map(field => ({
         arguments: `*${value}*`,
         comparison: "==",

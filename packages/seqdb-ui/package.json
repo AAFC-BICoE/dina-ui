@@ -1,6 +1,6 @@
 {
-  "name": "create-next-example-app",
-  "private": true,
+  "name": "seqdb-ui",
+  "version": "0.0.0",
   "scripts": {
     "build": "next build && next export -o ./build && babel ./build -d ./build",
     "dev": "run-p next proxy",
@@ -19,6 +19,7 @@
     "@zeit/next-typescript": "^1.1.1",
     "axios": "^0.18.0",
     "bootswatch": "^4.2.1",
+    "common-ui": "^0.0.0",
     "core-js": "^3.1.4",
     "formik": "^1.5.1",
     "kitsu": "^6.5.1",

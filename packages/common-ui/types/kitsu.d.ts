@@ -3,17 +3,17 @@
 import { AxiosInstance } from "axios";
 
 declare module "kitsu" {
-  export default Kitsu;
+  // export default Kitsu;
 
   /** JSONAPI client. */
-  declare class Kitsu {
+  export default class Kitsu {
     axios: AxiosInstance;
 
     constructor(params: KitsuConstructorParams);
 
     delete(...args: any[]): Promise<any>;
 
-    get(path: string, params: GetParams): Promise<KitsuResponse>;
+    get(path: string, params: GetParams): Promise<KitsuResponse<any>>;
 
     patch(...args: any[]): Promise<any>;
 

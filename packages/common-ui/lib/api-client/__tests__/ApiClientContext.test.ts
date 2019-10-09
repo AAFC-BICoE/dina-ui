@@ -1,8 +1,13 @@
 import { AxiosRequestConfig } from "axios";
 import Kitsu from "kitsu";
-import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 import { createContextValue } from "../ApiClientContext";
 import { Operation, OperationsResponse } from "../jsonapi-types";
+
+interface TestPcrPrimer {
+  name: string;
+  lotNumber: number;
+  type: string;
+}
 
 const AXIOS_JSONPATCH_REQUEST_CONFIG: AxiosRequestConfig = {
   headers: {
@@ -209,7 +214,7 @@ Constraint violation: description size must be between 1 and 10`;
           lotNumber: 1,
           name: "testPrimer1",
           type: "pcrPrimer"
-        } as PcrPrimer,
+        } as TestPcrPrimer,
         type: "pcrPrimer"
       },
       {
@@ -217,7 +222,7 @@ Constraint violation: description size must be between 1 and 10`;
           lotNumber: 1,
           name: "testPrimer2",
           type: "pcrPrimer"
-        } as PcrPrimer,
+        } as TestPcrPrimer,
         type: "pcrPrimer"
       }
     ]);
@@ -301,7 +306,7 @@ Constraint violation: description size must be between 1 and 10`;
           lotNumber: 1,
           name: "testPrimer1 edited",
           type: "pcrPrimer"
-        } as PcrPrimer,
+        } as TestPcrPrimer,
         type: "pcrPrimer"
       },
       {
@@ -310,7 +315,7 @@ Constraint violation: description size must be between 1 and 10`;
           lotNumber: 1,
           name: "testPrimer2 edited",
           type: "pcrPrimer"
-        } as PcrPrimer,
+        } as TestPcrPrimer,
         type: "pcrPrimer"
       }
     ]);

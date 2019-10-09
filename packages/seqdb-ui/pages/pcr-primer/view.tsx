@@ -1,3 +1,4 @@
+import { Query } from "common-ui";
 import { Formik } from "formik";
 import { withRouter, WithRouterProps } from "next/router";
 import {
@@ -7,8 +8,7 @@ import {
   FieldView,
   Head,
   LoadingSpinner,
-  Nav,
-  Query
+  Nav
 } from "../../components";
 import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
 

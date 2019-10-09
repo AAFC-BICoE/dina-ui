@@ -1,5 +1,5 @@
 {
-  "name": "root",
+  "name": "dina-ui",
   "private": true,
   "scripts": {
     "bootstrap": "lerna bootstrap",
