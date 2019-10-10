@@ -12,7 +12,6 @@ React based user interface for SeqDB.
 
 ## Install the Package
 
-Install dependencies for the parent package and sub-packages using the following npm commands:
+Install dependencies for the parent package and sub-packages using the following npm command:
 
 `npm install`
-`npm run bootstrap`
