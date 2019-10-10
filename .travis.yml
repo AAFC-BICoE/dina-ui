@@ -4,6 +4,8 @@ env:
 language: node_js
 node_js:
   - "11"
+cache: npm
+install: npm install; npm run bootstrap
 before_script:
   # Setup the test coverage reporter.
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter

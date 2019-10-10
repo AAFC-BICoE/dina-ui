@@ -17,7 +17,7 @@ describe("SeqdbUiApp", () => {
   });
 
   it("Renders the App wrapper.", async () => {
-    const TestComponent: FunctionComponent = () => <div />;
+    const TestComponent: FunctionComponent = () => <div>Test Content</div>;
 
     const wrapper = mount(
       <SeqdbUiApp
@@ -27,14 +27,8 @@ describe("SeqdbUiApp", () => {
       />
     );
 
-    // The first browser render should be empty.
-    expect(wrapper.html()).toEqual(null);
-
-    expect(mockPush).lastCalledWith("/example-path?a=b");
-    // Normally the router would update the app wrapper, but the mock doesn't, so we force a
-    // re-render in the test.
-    wrapper.instance().forceUpdate();
-    wrapper.update();
+    // It should render the div from the TestComponent.
+    expect(wrapper.html()).toEqual("<div>Test Content</div>");
 
     const innerComponent = wrapper.find(TestComponent);
     expect(innerComponent.prop("exampleProp")).toEqual("exampleValue");
@@ -54,18 +48,12 @@ describe("SeqdbUiApp", () => {
       );
     }
 
-    const wrapper = mount(
+    mount(
       <SeqdbUiApp
         router={mockRouter as any}
         pageProps={{}}
         Component={pageComponent}
       />
     );
-
-    expect(mockPush).lastCalledWith("/example-path?a=b");
-    // Normally the router would update the app wrapper, but the mock doesn't, so we force a
-    // re-render in the test.
-    wrapper.instance().forceUpdate();
-    wrapper.update();
   });
 });

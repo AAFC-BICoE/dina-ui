@@ -1,6 +1,6 @@
 import { mount } from "enzyme";
 import { useState } from "react";
-import { act } from "react-test-renderer";
+import { act } from "react-dom/test-utils";
 import { FilterBuilder, FilterBuilderProps } from "../FilterBuilder";
 import { FilterGroup } from "../FilterGroup";
 import { FilterRow } from "../FilterRow";

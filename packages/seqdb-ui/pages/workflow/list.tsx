@@ -33,7 +33,7 @@ export default function WorkflowListPage() {
       <Nav />
       <div className="container-fluid">
         <h1>NGS Workflows</h1>
-        <Link href="/workflow/edit" prefetch={true}>
+        <Link href="/workflow/edit">
           <a>Add New NGS Workflow</a>
         </Link>
         <ListPageLayout

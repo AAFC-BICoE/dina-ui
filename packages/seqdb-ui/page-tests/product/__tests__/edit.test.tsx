@@ -42,6 +42,17 @@ function mountWithContext(element: JSX.Element) {
 describe("Product edit page", () => {
   beforeEach(() => {
     jest.resetAllMocks();
+
+    // The get request will return the existing product.
+    mockGet.mockImplementation(async model => {
+      if (model === "product/10") {
+        // The request for the product returns the test product.
+        return { data: TEST_PRODUCT };
+      } else {
+        // Requests for the selectable resources (linked group) return an empty array.
+        return { data: [] };
+      }
+    });
   });
 
   it("Provides a form to add a Product.", async () => {
@@ -95,7 +106,7 @@ describe("Product edit page", () => {
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
     // The patch request will return an error.
-    mockPatch.mockImplementationOnce(() => ({
+    mockPatch.mockImplementationOnce(async () => ({
       data: [
         {
           errors: [
@@ -131,17 +142,6 @@ describe("Product edit page", () => {
   });
 
   it("Provides a form to edit a Product.", async () => {
-    // The get request will return the existing product.
-    mockGet.mockImplementation(async model => {
-      if (model === "product/10") {
-        // The request for the product returns the test product.
-        return { data: TEST_PRODUCT };
-      } else {
-        // Requests for the selectable resources (linked group) return an empty array.
-        return { data: [] };
-      }
-    });
-
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
       data: [
