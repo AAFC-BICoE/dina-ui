@@ -38,7 +38,7 @@ describe("SeqdbDocument", () => {
   });
 
   it("Renders the SeqdbDocument doc wrapper.", async () => {
-    const wrapper = mount(<SeqdbDocument {...docProps as DocumentProps} />);
+    const wrapper = mount(<SeqdbDocument {...(docProps as DocumentProps)} />);
     const html = wrapper.find("html");
     expect(html.prop("lang")).toEqual("en");
   });
