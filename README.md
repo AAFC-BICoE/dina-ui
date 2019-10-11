@@ -7,11 +7,11 @@
 React based user interface for SeqDB.
 
 ## Required
-* NPM
 * NodeJS
+* Yarn
 
 ## Install the Package
 
-Install dependencies for the parent package and sub-packages using the following npm command:
+Install dependencies for the parent package and sub-packages using the following yarn command:
 
-`npm install`
+`yarn`

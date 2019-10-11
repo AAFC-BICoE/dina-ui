@@ -17,7 +17,7 @@
     "@molgenis/rsql": "0.1.2",
     "@zeit/next-css": "^1.0.1",
     "bootswatch": "^4.2.1",
-    "common-ui": "file:../common-ui",
+    "common-ui": "link:../common-ui",
     "core-js": "^3.2.1",
     "formik": "^1.5.8",
     "kitsu": "7.0.4",

@@ -8,7 +8,7 @@ React based user interface for SeqDB.
 
 ## Run Web Server
 
-`npm run dev`
+`yarn dev`
 
 More information can be found in the documentation.
 
@@ -16,12 +16,12 @@ More information can be found in the documentation.
 
 Use this NPM package script to build the application for prod:
 
-`npm run build`
+`yarn build`
 
 ## Generate Documentation
 
 You can compile the documentation using the following command:
 
-`npm run docs`
+`yarn docs`
 
 Which will generate a folder called "generated-docs", which include the full detailed documentation and instructions.

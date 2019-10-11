@@ -2600,7 +2600,7 @@ commander@^2.12.1, commander@^2.19.0, commander@^2.20.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.1.tgz#3863ce3ca92d0831dcf2a102f5fb4b5926afd0f9"
   integrity sha512-cCuLsMhJeWQ/ZpsFTbE765kvVfoeSddc4nU3up4fV+fDBcfUXnbITJ+JzhkdjzOqhURjZgujxaioam4RM9yGUg==
 
-"common-ui@file:packages/common-ui":
+"common-ui@link:packages/common-ui":
   version "0.0.0"
   dependencies:
     "@molgenis/rsql" "0.1.2"
