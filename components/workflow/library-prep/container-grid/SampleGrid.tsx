@@ -66,13 +66,22 @@ export function SampleGrid(props: ContainerGridProps) {
                 </li>
               ))}
             </ul>
-            <button
-              className="float-right btn btn-dark d-inline grid-clear"
-              onClick={clearGrid}
-              type="button"
-            >
-              Clear Grid
-            </button>
+            <div className="float-right list-inline">
+              <button
+                className="btn btn-dark list-inline-item grid-clear"
+                onClick={clearGrid}
+                type="button"
+              >
+                Clear Grid
+              </button>
+              <button
+                className="btn btn-primary list-inline-item grid-submit"
+                onClick={gridSubmit}
+                type="button"
+              >
+                Save changed well coordinates
+              </button>
+            </div>
           </div>
         </div>
         <div className="row">
@@ -103,17 +112,6 @@ export function SampleGrid(props: ContainerGridProps) {
               movedSamples={movedSamples}
               onDrop={onGridDrop}
             />
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-12">
-            <button
-              className="col-2 btn btn-primary float-right grid-submit"
-              onClick={gridSubmit}
-              type="button"
-            >
-              Save changed well coordinates
-            </button>
           </div>
         </div>
       </DndProvider>

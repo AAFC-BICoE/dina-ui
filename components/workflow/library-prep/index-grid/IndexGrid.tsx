@@ -131,21 +131,23 @@ export function IndexGrid(props: IndexGridProps) {
         onSubmit={onSubmit}
       >
         <Form>
-          <ErrorViewer />
           <style>{`
             .rt-td {
               padding: 0 !important;
             }
           `}</style>
+          <ErrorViewer />
+          <div style={{ height: "50px" }}>
+            <div className="float-right">
+              <SubmitButton />
+            </div>
+          </div>
           <ReactTable
             columns={columns}
             data={tableData}
             minRows={0}
             showPagination={false}
           />
-          <div className="float-right">
-            <SubmitButton />
-          </div>
         </Form>
       </Formik>
     );

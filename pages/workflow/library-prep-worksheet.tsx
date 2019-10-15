@@ -132,6 +132,8 @@ function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
           <th>Well Location</th>
           <th>Sample Name</th>
           <th>Sample Version</th>
+          <th>Index i5</th>
+          <th>Index i7</th>
         </tr>
       </thead>
       <tbody>
@@ -147,6 +149,8 @@ function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
               <td>{wellLocation}</td>
               <td>{prep.sample.name}</td>
               <td>{prep.sample.version}</td>
+              <td>{prep.indexI5 && prep.indexI5.name}</td>
+              <td>{prep.indexI7 && prep.indexI7.name}</td>
             </tr>
           );
         })}
