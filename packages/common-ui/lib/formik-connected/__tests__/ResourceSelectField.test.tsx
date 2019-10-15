@@ -1,5 +1,6 @@
 import { mount } from "enzyme";
 import { Formik } from "formik";
+import { KitsuResource } from "kitsu";
 import lodash from "lodash";
 import Select from "react-select/base";
 import {
@@ -7,7 +8,6 @@ import {
   createContextValue,
   ResourceSelectField
 } from "../../";
-import { KitsuResource } from "kitsu";
 
 interface TestGroup extends KitsuResource {
   groupName: string;

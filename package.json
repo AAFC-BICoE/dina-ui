@@ -10,7 +10,17 @@
     ]
   },
   "scripts": {
+    "lint": "yarn workspaces run lint",
+    "lint:fix": "yarn workspaces run lint:fix",
     "test": "yarn workspaces run test",
     "test:coverage": "yarn workspaces run test:coverage"
+  },
+  "devDependencies": {
+    "husky": "^3.0.9"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn workspaces run lint-staged"
+    }
   }
 }

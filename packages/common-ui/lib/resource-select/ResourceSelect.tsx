@@ -2,8 +2,8 @@ import { FilterParam, GetParams, KitsuResource } from "kitsu";
 import { debounce, isUndefined, omitBy } from "lodash";
 import React, { useContext } from "react";
 import AsyncSelect from "react-select/async";
-import { ApiClientContext } from "..";
 import { OptionsType } from "react-select/src/types";
+import { ApiClientContext } from "..";
 
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData> {

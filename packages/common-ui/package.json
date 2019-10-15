@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "main": "lib/index.ts",
   "scripts": {
+    "lint": "tslint --project tsconfig.json",
+    "lint:fix": "tslint --project tsconfig.json --fix",
     "test": "tsc && jest",
     "test:coverage": "tsc && jest --coverage"
   },
@@ -39,12 +41,27 @@
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "jest": "^24.9.0",
+    "lint-staged": "^9.4.2",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
+    "tslint": "^5.20.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
+    "tslint-react": "^4.1.0",
     "typescript": "^3.6.4"
   },
   "peerDependencies": {
     "react": "^16.10.2",
     "react-dom": "^16.10.2"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "tslint --project tsconfig.json --fix",
+      "git add"
+    ],
+    "*.{js,jsx,css,json,md}": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }

@@ -1,8 +1,8 @@
 import { mount } from "enzyme";
 import { Form, Formik } from "formik";
+import { KitsuResource } from "kitsu";
 import { useEffect } from "react";
 import { useGroupedCheckBoxes } from "../GroupedCheckBoxFields";
-import { KitsuResource } from "kitsu";
 
 interface TestResource extends KitsuResource {
   name: string;
