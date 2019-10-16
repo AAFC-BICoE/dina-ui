@@ -8,9 +8,9 @@ import {
   useCacheableQueryLoader
 } from "../../..";
 import {
+  IndexPrimer,
   LibraryPrep,
-  LibraryPrepBatch,
-  PcrPrimer
+  LibraryPrepBatch
 } from "../../../../types/seqdb-api";
 import { filterBy } from "../../../../util/rsql";
 import { useIndexGridControls } from "./useIndexGridControls";
@@ -57,14 +57,14 @@ export function IndexGrid(props: IndexGridProps) {
         return (
           <div style={{ padding: "7px 5px" }}>
             <span>{String.fromCharCode(index + 65)}</span>
-            <ResourceSelectField<PcrPrimer>
+            <ResourceSelectField<IndexPrimer>
               // TODO: this should fetch the index set primers.
               customDataFetch={resourceSelectLoader}
               hideLabel={true}
               filter={filterBy(["name"])}
               name={`indexI7s[${rowLetter}]`}
               optionLabel={primer => primer.name}
-              model="pcrPrimer"
+              model={`indexSet/${libraryPrepBatch.indexSet.id}/indexPrimers`}
               styles={{ menu: () => ({ zIndex: 5 }) }}
             />
           </div>
@@ -106,14 +106,14 @@ export function IndexGrid(props: IndexGridProps) {
         Header: () => (
           <>
             {columnLabel}
-            <ResourceSelectField<PcrPrimer>
+            <ResourceSelectField<IndexPrimer>
               // TODO: this should fetch the index set primers.
               customDataFetch={resourceSelectLoader}
               hideLabel={true}
               filter={filterBy(["name"])}
               name={`indexI5s[${columnLabel}]`}
               optionLabel={primer => primer.name}
-              model="pcrPrimer"
+              model={`indexSet/${libraryPrepBatch.indexSet.id}/indexPrimers`}
               styles={{ menu: () => ({ zIndex: 5 }) }}
             />
           </>

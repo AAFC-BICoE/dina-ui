@@ -1,7 +1,7 @@
 import { Dictionary, toPairs } from "lodash";
 import { useContext, useState } from "react";
 import { ApiClientContext, safeSubmit, SaveArgs, useQuery } from "../../..";
-import { LibraryPrep, PcrPrimer } from "../../../../types/seqdb-api";
+import { IndexPrimer, LibraryPrep } from "../../../../types/seqdb-api";
 import { IndexGridProps } from "./IndexGrid";
 
 export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
@@ -15,7 +15,7 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
   } = useQuery<LibraryPrep[]>(
     {
       fields: {
-        pcrPrimer: "name",
+        indexPrimer: "name",
         sample: "name"
       },
       include: "sample,indexI5,indexI7",
@@ -34,23 +34,23 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
     const edits: Dictionary<Partial<LibraryPrep>> = {};
 
     // Get the new i5 values:
-    const colPrimers = toPairs<PcrPrimer>(indexI5s);
+    const colPrimers = toPairs<IndexPrimer>(indexI5s);
     for (const [col, primer] of colPrimers) {
       const colPreps = libraryPreps.filter(it => String(it.wellColumn) === col);
       for (const prep of colPreps) {
         const edit = edits[prep.id] || {};
-        edit.indexI5 = { id: primer.id, type: "pcrPrimer" } as PcrPrimer;
+        edit.indexI5 = { id: primer.id, type: "indexPrimer" } as IndexPrimer;
         edits[prep.id] = edit;
       }
     }
 
     // Get the new i7 values:
-    const rowPrimers = toPairs<PcrPrimer>(indexI7s);
+    const rowPrimers = toPairs<IndexPrimer>(indexI7s);
     for (const [row, primer] of rowPrimers) {
       const rowPreps = libraryPreps.filter(it => it.wellRow === row);
       for (const prep of rowPreps) {
         const edit = edits[prep.id] || {};
-        edit.indexI7 = { id: primer.id, type: "pcrPrimer" } as PcrPrimer;
+        edit.indexI7 = { id: primer.id, type: "indexPrimer" } as IndexPrimer;
         edits[prep.id] = edit;
       }
     }

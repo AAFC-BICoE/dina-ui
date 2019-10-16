@@ -1,5 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { ContainerType } from "../ContainerType";
+import { IndexSet } from "../IndexSet";
 import { Product } from "../Product";
 import { Protocol } from "../Protocol";
 
@@ -14,6 +15,7 @@ interface LibraryPrepBatchRelationships {
   containerType?: ContainerType;
   product?: Product;
   protocol?: Protocol;
+  indexSet?: IndexSet;
 }
 
 export type LibraryPrepBatch = KitsuResource &

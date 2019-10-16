@@ -5,10 +5,8 @@ import {
   ColumnDefinition,
   NumberField,
   QueryTable,
-  ResourceSelectField,
   SubmitButton,
   TextField,
-  useCacheableQueryLoader,
   useQuery
 } from "../..";
 import {
@@ -16,10 +14,8 @@ import {
   ChainStepTemplate,
   LibraryPrep,
   LibraryPrepBatch,
-  PcrPrimer,
   StepResource
 } from "../../../types/seqdb-api";
-import { filterBy } from "../../../util/rsql";
 
 interface SampleToIndexTableProps {
   chain: Chain;
@@ -27,13 +23,12 @@ interface SampleToIndexTableProps {
   sampleSelectionStep: ChainStepTemplate;
 }
 
-export function SampleToIndexTable({
+export function LibraryPrepEditTable({
   chain,
   libraryPrepBatch,
   sampleSelectionStep
 }: SampleToIndexTableProps) {
   const { save } = useContext(ApiClientContext);
-  const resourceSelectLoader = useCacheableQueryLoader();
 
   // Current visible sample StepResources in the "sample selection" table.
   const [visibleSampleSrs, setVisibleSampleSrs] = useState<StepResource[]>([]);
@@ -46,10 +41,9 @@ export function SampleToIndexTable({
     {
       // Optimize query speed by reducing the amount of requested fields.
       fields: {
-        pcrPrimer: "name",
         sample: "name"
       },
-      include: "sample,indexI5,indexI7",
+      include: "sample",
       page: { limit: 1000 },
       path: `libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`
     },
@@ -83,12 +77,6 @@ export function SampleToIndexTable({
         if (sr.libraryPrep) {
           sr.libraryPrep.sample = sr.sample;
           sr.libraryPrep.libraryPrepBatch = libraryPrepBatch;
-          if (sr.libraryPrep.indexI5) {
-            sr.libraryPrep.indexI5.type = "pcrPrimer";
-          }
-          if (sr.libraryPrep.indexI7) {
-            sr.libraryPrep.indexI7.type = "pcrPrimer";
-          }
           libraryPreps.push(sr.libraryPrep);
         }
       }
@@ -140,24 +128,7 @@ export function SampleToIndexTable({
       ),
       Header: "Size",
       sortable: false
-    },
-    // i5 and i7 cells
-    ...["indexI5", "indexI7"].map(primerFieldName => ({
-      Cell: ({ index, original: sr }) => (
-        <ResourceSelectField<PcrPrimer>
-          customDataFetch={resourceSelectLoader}
-          filter={filterBy(["name"])}
-          hideLabel={true}
-          key={sr.id}
-          model="pcrPrimer"
-          name={`sampleSrs[${index}].libraryPrep.${primerFieldName}`}
-          optionLabel={primer => primer.name}
-          styles={{ menu: () => ({ zIndex: 5 }) }}
-        />
-      ),
-      Header: primerFieldName,
-      sortable: false
-    }))
+    }
   ];
 
   return (
