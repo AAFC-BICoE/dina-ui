@@ -6,7 +6,8 @@ export function LibraryPrepWorksheetPage({ router }: WithRouterProps) {
   const { stepResourceId } = router.query;
 
   const { loading: srLoading, response: srResponse } = useQuery<StepResource>({
-    include: "libraryPrepBatch,libraryPrepBatch.protocol,chain",
+    include:
+      "libraryPrepBatch,libraryPrepBatch.protocol,libraryPrepBatch.thermocyclerProfile,libraryPrepBatch.indexSet,chain",
     path: `stepResource/${stepResourceId}`
   });
 
@@ -16,7 +17,7 @@ export function LibraryPrepWorksheetPage({ router }: WithRouterProps) {
     LibraryPrep[]
   >({
     fields: {
-      pcrPrimer: "name",
+      indexPrimer: "name",
       sample: "name,version"
     },
     include: "indexI5,indexI7,sample",
@@ -83,8 +84,46 @@ export function LibraryPrepWorksheetPage({ router }: WithRouterProps) {
             <HorizontalField label="Thermocycler" />
           </div>
           <div className="col-6">
-            <HorizontalField label="Pos Control" />
-            <HorizontalField label="Neg Control" />
+            <div className="row">
+              <div className="col-12">
+                <HorizontalField label="Pos Control" />
+                <HorizontalField label="Neg Control" />
+                <div className="row form-group">
+                  <div className="col-3">
+                    <input className="form-control" />
+                  </div>
+                  <div className="col-9">
+                    <strong>ul reaction mix pipetted into each tube</strong>
+                  </div>
+                </div>
+                <HorizontalField
+                  label="Thermocycler Profile"
+                  defaultValue={batch.thermocyclerProfile.name}
+                />
+                <div className="row">
+                  <div className="col-6">
+                    {[...Array(6).keys()].map(i => (
+                      <HorizontalField
+                        label={`Step ${i + 1}`}
+                        defaultValue={batch.thermocyclerProfile[`step${i + 1}`]}
+                      />
+                    ))}
+                  </div>
+                  <div className="col-6">
+                    {[...Array(6).keys()].map(i => (
+                      <HorizontalField
+                        label={`Step ${i + 7}`}
+                        defaultValue={batch.thermocyclerProfile[`step${i + 7}`]}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <HorizontalField
+                  label="Cycles"
+                  defaultValue={batch.thermocyclerProfile.cycles}
+                />
+              </div>
+            </div>
           </div>
         </div>
         <div className="row">
