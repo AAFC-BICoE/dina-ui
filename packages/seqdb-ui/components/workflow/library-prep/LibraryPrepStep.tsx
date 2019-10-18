@@ -8,7 +8,7 @@ import { SampleGrid } from "./container-grid/SampleGrid";
 import { IndexGrid } from "./index-grid/IndexGrid";
 import { LibraryPrepBatchDetails } from "./LibraryPrepBatchDetails";
 import { LibraryPrepBatchForm } from "./LibraryPrepBatchForm";
-import { SampleToIndexTable } from "./SampleToIndexTable";
+import { LibraryPrepEditTable } from "./LibraryPrepEditTable";
 
 export function LibraryPrepStep(props: StepRendererProps) {
   const { chain, chainStepTemplates, step } = props;
@@ -26,7 +26,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
         "chainStepTemplate.chainStepTemplateId": step.id
       },
       include:
-        "libraryPrepBatch,libraryPrepBatch.product,libraryPrepBatch.protocol,libraryPrepBatch.containerType",
+        "libraryPrepBatch,libraryPrepBatch.product,libraryPrepBatch.protocol,libraryPrepBatch.containerType,libraryPrepBatch.thermocyclerProfile,libraryPrepBatch.indexSet",
       path: "stepResource"
     },
     {
@@ -91,7 +91,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
               <Tab>Substep 3: Index Grid</Tab>
             </TabList>
             <TabPanel>
-              <SampleToIndexTable
+              <LibraryPrepEditTable
                 chain={chain}
                 libraryPrepBatch={libraryPrepBatch}
                 sampleSelectionStep={sampleSelectionStep}

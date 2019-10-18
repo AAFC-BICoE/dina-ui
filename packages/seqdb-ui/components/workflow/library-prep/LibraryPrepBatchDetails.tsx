@@ -16,6 +16,8 @@ export function LibraryPrepBatchDetails({
           <FieldView className="col-md-2" name="product.name" />
           <FieldView className="col-md-2" name="protocol.name" />
           <FieldView className="col-md-2" name="containerType.name" />
+          <FieldView className="col-md-2" name="thermocyclerProfile.name" />
+          <FieldView className="col-md-2" name="indexSet.name" />
         </div>
         <div className="row">
           <FieldView className="col-md-2" name="totalLibraryYieldNm" />

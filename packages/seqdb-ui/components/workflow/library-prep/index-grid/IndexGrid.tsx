@@ -9,9 +9,9 @@ import {
 import { Form, Formik } from "formik";
 import ReactTable, { Column } from "react-table";
 import {
+  IndexPrimer,
   LibraryPrep,
-  LibraryPrepBatch,
-  PcrPrimer
+  LibraryPrepBatch
 } from "../../../../types/seqdb-api";
 import { useIndexGridControls } from "./useIndexGridControls";
 
@@ -57,14 +57,14 @@ export function IndexGrid(props: IndexGridProps) {
         return (
           <div style={{ padding: "7px 5px" }}>
             <span>{String.fromCharCode(index + 65)}</span>
-            <ResourceSelectField<PcrPrimer>
+            <ResourceSelectField<IndexPrimer>
               // TODO: this should fetch the index set primers.
               customDataFetch={resourceSelectLoader}
               hideLabel={true}
               filter={filterBy(["name"])}
               name={`indexI7s[${rowLetter}]`}
               optionLabel={primer => primer.name}
-              model="pcrPrimer"
+              model={`indexSet/${libraryPrepBatch.indexSet.id}/indexPrimers`}
               styles={{ menu: () => ({ zIndex: 5 }) }}
             />
           </div>
@@ -106,14 +106,14 @@ export function IndexGrid(props: IndexGridProps) {
         Header: () => (
           <>
             {columnLabel}
-            <ResourceSelectField<PcrPrimer>
+            <ResourceSelectField<IndexPrimer>
               // TODO: this should fetch the index set primers.
               customDataFetch={resourceSelectLoader}
               hideLabel={true}
               filter={filterBy(["name"])}
               name={`indexI5s[${columnLabel}]`}
               optionLabel={primer => primer.name}
-              model="pcrPrimer"
+              model={`indexSet/${libraryPrepBatch.indexSet.id}/indexPrimers`}
               styles={{ menu: () => ({ zIndex: 5 }) }}
             />
           </>
@@ -131,21 +131,23 @@ export function IndexGrid(props: IndexGridProps) {
         onSubmit={onSubmit}
       >
         <Form>
-          <ErrorViewer />
           <style>{`
             .rt-td {
               padding: 0 !important;
             }
           `}</style>
+          <ErrorViewer />
+          <div style={{ height: "50px" }}>
+            <div className="float-right">
+              <SubmitButton />
+            </div>
+          </div>
           <ReactTable
             columns={columns}
             data={tableData}
             minRows={0}
             showPagination={false}
           />
-          <div className="float-right">
-            <SubmitButton />
-          </div>
         </Form>
       </Formik>
     );

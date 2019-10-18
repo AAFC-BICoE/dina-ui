@@ -14,7 +14,9 @@ import {
   Chain,
   ChainStepTemplate,
   ContainerType,
+  IndexSet,
   LibraryPrepBatch,
+  PcrProfile,
   Product,
   Protocol,
   StepResource
@@ -96,6 +98,20 @@ export function LibraryPrepBatchForm({
             filter={filterBy(["name"])}
             model="containerType"
             optionLabel={ct => ct.name}
+          />
+          <ResourceSelectField<PcrProfile>
+            className="col-md-2"
+            name="thermocyclerProfile"
+            filter={filterBy(["name"])}
+            model="thermocyclerprofile"
+            optionLabel={profile => profile.name}
+          />
+          <ResourceSelectField<IndexSet>
+            className="col-md-2"
+            name="indexSet"
+            filter={filterBy(["name"])}
+            model="indexSet"
+            optionLabel={set => set.name}
           />
         </div>
         <div className="row">

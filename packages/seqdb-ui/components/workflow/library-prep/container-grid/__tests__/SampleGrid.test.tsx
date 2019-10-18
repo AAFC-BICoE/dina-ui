@@ -3,7 +3,8 @@ import { mount } from "enzyme";
 import {
   Chain,
   ChainStepTemplate,
-  Sample
+  Sample,
+  StepResource
 } from "../../../../../types/seqdb-api";
 import { ContainerGrid } from "../ContainerGrid";
 import { DraggableSampleBox } from "../DraggableSampleBox";
@@ -72,7 +73,7 @@ const MOCK_STEPRESOURCES_NO_WELL_COORDS = [
   { sample: { id: "6", name: "SAMP600", type: "sample" } },
   { sample: { id: "10", name: "ZSAMP1000", type: "sample" } },
   { sample: { id: "8", name: "SAMP800", type: "sample" } }
-];
+] as StepResource[];
 
 describe("SampleGrid component", () => {
   beforeEach(() => {

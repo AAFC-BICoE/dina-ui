@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
-import { PcrPrimer } from "../PcrPrimer";
 import { Sample } from "../Sample";
+import { IndexPrimer } from "./IndexPrimer";
 import { LibraryPrepBatch } from "./LibraryPrepBatch";
 
 interface LibraryPrepAttributes {
@@ -14,8 +14,8 @@ interface LibraryPrepAttributes {
 interface LibraryPrepRelationships {
   libraryPrepBatch: LibraryPrepBatch;
   sample?: Sample;
-  indexI5?: PcrPrimer;
-  indexI7?: PcrPrimer;
+  indexI5?: IndexPrimer;
+  indexI7?: IndexPrimer;
 }
 
 export type LibraryPrep = KitsuResource &
