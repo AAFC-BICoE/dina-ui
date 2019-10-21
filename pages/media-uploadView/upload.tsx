@@ -1,6 +1,10 @@
-import React, { useCallback, useMemo } from "react";
+import axios from "axios";
+import FormData from "form-data";
+import { Form, Formik, FormikActions } from "formik";
+import React, { useMemo } from "react";
 import { useDropzone } from "react-dropzone";
 import ReactTable from "react-table";
+import { ButtonBar, ErrorViewer, SubmitButton } from "../../components";
 
 const baseStyle = {
   alignItems: "center",
@@ -18,8 +22,6 @@ const baseStyle = {
   transition: "border .24s ease-in-out"
 };
 
-const fileContent = new Map();
-
 const activeStyle = {
   borderColor: "#2196f3"
 };
@@ -35,22 +37,6 @@ const rejectStyle = {
 let files;
 
 function MediaUploadView({}) {
-  const onDropAccepted = useCallback(dropAcceptedFiles => {
-    dropAcceptedFiles.forEach(file => {
-      const reader = new FileReader();
-      const filename = file.name;
-      reader.onabort = () =>
-        // console.log("file reading was aborted");
-        (reader.onerror = () =>
-          // console.log("file reading has failed");
-          (reader.onload = () => {
-            const binaryStr = reader.result;
-            fileContent.set(filename, binaryStr);
-          }));
-      reader.readAsDataURL(file);
-    });
-  }, []);
-
   const {
     getRootProps,
     getInputProps,
@@ -59,8 +45,7 @@ function MediaUploadView({}) {
     isDragReject,
     acceptedFiles
   } = useDropzone({
-    accept: "image/*,audio/*,video/*,.pdf,.doc,docx",
-    onDropAccepted
+    accept: "image/*,audio/*,video/*,.pdf,.doc,docx"
   });
 
   const style = useMemo(
@@ -74,42 +59,67 @@ function MediaUploadView({}) {
   );
 
   files = acceptedFiles.map(file => ({
-    fileContent: fileContent.get(file.name),
     fileName: file.name
   }));
+
+  async function onSubmit(
+    submittedValues,
+    { setStatus, setSubmitting }: FormikActions<any>
+  ) {
+    try {
+      save();
+    } catch (error) {
+      setStatus(error.message + submittedValues);
+    }
+    setSubmitting(false);
+  }
+  /*send one file to service due to current implementation */
+  function save() {
+    const formData = new FormData();
+    formData.append("file", acceptedFiles[0]);
+    axios({
+      data: formData,
+      method: "post",
+      url: "/api/v1/file/mybucket"
+    });
+  }
+
   return (
-    <div>
-      <div {...getRootProps({ style })} className="container">
-        <input {...getInputProps()} />
-        <div>
-          <div>Drag and drop files here or click to open browse dialog</div>
-          <div>
-            (Only image, audio, video, .pdf, .doc and docx are accepted)
+    <Formik initialValues={acceptedFiles} onSubmit={onSubmit}>
+      <Form>
+        <ButtonBar>
+          <SubmitButton />
+        </ButtonBar>
+        <ErrorViewer />
+        <div id="dndRoot">
+          <div {...getRootProps({ style })} className="container">
+            <input {...getInputProps()} />
+            <div>
+              <div>Drag and drop files here or click to open browse dialog</div>
+              <div>
+                (Only image, audio, video, .pdf, .doc and docx are accepted)
+              </div>
+            </div>
           </div>
+          <ReactTable
+            className="-striped"
+            data={files}
+            columns={[
+              {
+                Header: "File Name",
+                accessor: "fileName"
+              },
+              {
+                Cell: () => {
+                  return <input type="checkbox" />;
+                },
+                Header: "Select items"
+              }
+            ]}
+          />
         </div>
-      </div>
-      <ReactTable
-        className="-striped"
-        data={files}
-        columns={[
-          {
-            Header: "File Name",
-            accessor: "fileName"
-          },
-          {
-            Header: "File Content",
-            accessor: "fileContent",
-            show: false
-          },
-          {
-            Cell: () => {
-              return <input type="checkbox" />;
-            },
-            Header: "Select items"
-          }
-        ]}
-      />
-    </div>
+      </Form>
+    </Formik>
   );
 }
 

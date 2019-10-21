@@ -12,7 +12,7 @@ describe("MediaUploadView test", () => {
 
   it("renders the root and input nodes with the necessary props", () => {
     const { container } = render(<MediaUploadView />);
-    const rootDiv = container.querySelector("div");
+    const rootDiv = container.querySelector("div#dndRoot");
     expect(rootDiv).toHaveProperty("style.border-color");
     expect(rootDiv.querySelector("div.container>input")).toHaveProperty(
       "multiple"
