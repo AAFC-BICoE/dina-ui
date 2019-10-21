@@ -1,7 +1,7 @@
 import axios from "axios";
 import FormData from "form-data";
 import { Form, Formik, FormikActions } from "formik";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import ReactTable from "react-table";
 import { ButtonBar, ErrorViewer, SubmitButton } from "../../components";
@@ -58,6 +58,9 @@ function MediaUploadView({}) {
     [isDragActive, isDragReject]
   );
 
+  const [selected, setSelected] = useState({});
+  const [selectAll, setSelectAll] = useState(0);
+
   files = acceptedFiles.map(file => ({
     fileName: file.name
   }));
@@ -82,6 +85,24 @@ function MediaUploadView({}) {
       method: "post",
       url: "/api/v1/file/mybucket"
     });
+  }
+
+  function toggleRow(fileName) {
+    const newSelected = Object.assign({}, selected);
+    newSelected[fileName] = !selected[fileName];
+    setSelected(newSelected);
+  }
+
+  function toggleSelectAll() {
+    const newSelected = {};
+
+    if (selectAll === 0) {
+      acceptedFiles.forEach(x => {
+        newSelected[x.name] = true;
+      });
+    }
+    setSelected(newSelected);
+    setSelectAll(selectAll === 0 ? 1 : 0);
   }
 
   return (
@@ -110,10 +131,28 @@ function MediaUploadView({}) {
                 accessor: "fileName"
               },
               {
-                Cell: () => {
-                  return <input type="checkbox" />;
+                Cell: ({ original }) => {
+                  return (
+                    <input
+                      type="checkbox"
+                      className="checkbox"
+                      checked={selected[original.fileName] === true}
+                      onChange={() => toggleRow(original.fileName)}
+                    />
+                  );
                 },
-                Header: "Select items"
+                Header: () => {
+                  return (
+                    <input
+                      type="checkbox"
+                      className="checkbox"
+                      checked={selectAll === 1}
+                      onChange={() => toggleSelectAll()}
+                    />
+                  );
+                },
+                sortable: false,
+                width: 45
               }
             ]}
           />
