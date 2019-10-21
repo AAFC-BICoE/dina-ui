@@ -1,11 +1,17 @@
 import axios from "axios";
 import FormData from "form-data";
 import { Form, Formik, FormikActions } from "formik";
+import { any } from "prop-types";
 import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import ReactTable from "react-table";
 import { ButtonBar, ErrorViewer, SubmitButton } from "../../components";
 
+interface FileUploadResponse {
+  fileName: string;
+  fileType: string;
+  size: string;
+}
 const baseStyle = {
   alignItems: "center",
   backgroundColor: "#fafafa",
@@ -70,21 +76,25 @@ function MediaUploadView({}) {
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
     try {
-      save();
+      const response = save();
+      setStatus((await response).fileName + " submitted successfully");
     } catch (error) {
-      setStatus(error.message + submittedValues);
+      setStatus(
+        error.message + ", " + " submittedValues are: " + submittedValues
+      );
     }
     setSubmitting(false);
   }
   /*send one file to service due to current implementation */
-  function save() {
+  async function save(): Promise<FileUploadResponse> {
     const formData = new FormData();
     formData.append("file", acceptedFiles[0]);
-    axios({
+    const axiosResponse = await axios({
       data: formData,
       method: "post",
       url: "/api/v1/file/mybucket"
     });
+    return axiosResponse.data;
   }
 
   function toggleRow(fileName) {
@@ -106,7 +116,7 @@ function MediaUploadView({}) {
   }
 
   return (
-    <Formik initialValues={acceptedFiles} onSubmit={onSubmit}>
+    <Formik initialValues={any} onSubmit={onSubmit}>
       <Form>
         <ButtonBar>
           <SubmitButton />
