@@ -1,38 +1,49 @@
 import {
   ApiClientContext,
-  ColumnDefinition,
+  ErrorViewer,
+  filterBy,
   NumberField,
-  QueryTable,
+  ResourceSelectField,
   safeSubmit,
   SubmitButton,
   TextField,
+  useCacheableQueryLoader,
   useQuery
 } from "common-ui";
 import { Form, Formik } from "formik";
+import { cloneDeep, isEqual } from "lodash";
 import { useContext, useState } from "react";
+import ReactTable, { Column } from "react-table";
+import titleCase from "title-case";
 import {
   Chain,
   ChainStepTemplate,
   LibraryPrep,
   LibraryPrepBatch,
+  NgsIndex,
   StepResource
 } from "../../../types/seqdb-api";
 
-interface SampleToIndexTableProps {
+type LibraryPrepEditMode = "DETAILS" | "INDEX";
+
+interface LibraryPrepEditTableProps {
   chain: Chain;
   libraryPrepBatch: LibraryPrepBatch;
   sampleSelectionStep: ChainStepTemplate;
+  editMode: LibraryPrepEditMode;
 }
 
 export function LibraryPrepEditTable({
   chain,
+  editMode,
   libraryPrepBatch,
   sampleSelectionStep
-}: SampleToIndexTableProps) {
+}: LibraryPrepEditTableProps) {
   const { save } = useContext(ApiClientContext);
+  const resourceSelectLoader = useCacheableQueryLoader();
 
-  // Current visible sample StepResources in the "sample selection" table.
-  const [visibleSampleSrs, setVisibleSampleSrs] = useState<StepResource[]>([]);
+  // Current sample StepResources in the "sample selection" table.
+  const [sampleSrs, setSampleSrs] = useState<StepResource[]>([]);
 
   // Timestamp of the last table save.
   const [lastPrepTableSave, setLastPrepTableSave] = useState<number>();
@@ -45,18 +56,19 @@ export function LibraryPrepEditTable({
     {
       // Optimize query speed by reducing the amount of requested fields.
       fields: {
+        ngsIndex: "name",
         sample: "name"
       },
-      include: "sample",
+      include: "sample,indexI5,indexI7",
       page: { limit: 1000 },
       path: `libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`
     },
     {
       // Run this query whenever there is a new set of sample StepResources.
-      deps: [visibleSampleSrs],
+      deps: [sampleSrs],
       onSuccess: ({ data: libraryPreps }) => {
         // Attach the libraryPreps to the samples.
-        for (const sampleSr of visibleSampleSrs) {
+        for (const sampleSr of sampleSrs) {
           const libraryPrepForThisSample = libraryPreps.find(
             libraryPrep => libraryPrep.sample.id === sampleSr.sample.id
           );
@@ -67,20 +79,46 @@ export function LibraryPrepEditTable({
         }
 
         // Re-initialize formik form.
-        setFormikValues({ sampleSrs: visibleSampleSrs });
+        setFormikValues({ sampleSrs: cloneDeep(sampleSrs) });
       }
     }
   );
 
+  const { loading: sampleSrsLoading } = useQuery<StepResource[]>(
+    {
+      fields: {
+        sample: "name"
+      },
+      filter: {
+        "chain.chainId": chain.id,
+        "chainStepTemplate.chainStepTemplateId": sampleSelectionStep.id
+      },
+      include: "sample",
+      page: { limit: 1000 },
+      path: "stepResource"
+    },
+    {
+      deps: [lastPrepTableSave],
+      onSuccess: res => setSampleSrs(res.data)
+    }
+  );
+
   const onSubmit = safeSubmit(async submittedValues => {
-    const sampleSrs: StepResource[] = submittedValues.sampleSrs;
+    const submittedSampleSrs: StepResource[] = submittedValues.sampleSrs;
+
+    const touchedSampleSrs: StepResource[] = [];
+    for (const i in submittedSampleSrs) {
+      if (!isEqual(submittedSampleSrs[i], sampleSrs[i])) {
+        touchedSampleSrs.push(submittedSampleSrs[i]);
+      }
+    }
 
     const libraryPreps = [];
-    for (const sr of sampleSrs) {
-      if (sr.libraryPrep) {
-        sr.libraryPrep.sample = sr.sample;
-        sr.libraryPrep.libraryPrepBatch = libraryPrepBatch;
-        libraryPreps.push(sr.libraryPrep);
+    for (const submittedSr of touchedSampleSrs) {
+      if (submittedSr.libraryPrep) {
+        submittedSr.libraryPrep.sample = submittedSr.sample;
+        submittedSr.libraryPrep.libraryPrepBatch = libraryPrepBatch;
+        libraryPreps.push(submittedSr.libraryPrep);
       }
     }
 
@@ -94,40 +132,90 @@ export function LibraryPrepEditTable({
     setLastPrepTableSave(Date.now());
   });
 
-  const COLUMNS: Array<ColumnDefinition<StepResource>> = [
-    "sample.name",
-    // Library prep fields
-    {
-      Cell: ({ index }) => (
-        <NumberField
-          hideLabel={true}
-          name={`sampleSrs[${index}].libraryPrep.inputNg`}
-        />
-      ),
-      Header: "Input (ng)",
-      sortable: false
-    },
-    {
-      Cell: ({ index }) => (
-        <TextField
-          hideLabel={true}
-          name={`sampleSrs[${index}].libraryPrep.quality`}
-        />
-      ),
-      Header: "Quality",
-      sortable: false
-    },
-    {
-      Cell: ({ index }) => (
-        <TextField
-          hideLabel={true}
-          name={`sampleSrs[${index}].libraryPrep.size`}
-        />
-      ),
-      Header: "Size",
-      sortable: false
-    }
-  ];
+  const COLUMNS: Array<Column<StepResource>> =
+    editMode === "DETAILS"
+      ? [
+          {
+            Header: "Sample Name",
+            accessor: "sample.name"
+          },
+          // Library prep fields
+          {
+            Cell: ({ index, original }) => (
+              <NumberField
+                hideLabel={true}
+                key={original.id}
+                name={`sampleSrs[${index}].libraryPrep.inputNg`}
+              />
+            ),
+            Header: "Input (ng)",
+            sortable: false
+          },
+          {
+            Cell: ({ index, original }) => (
+              <TextField
+                hideLabel={true}
+                key={original.id}
+                name={`sampleSrs[${index}].libraryPrep.quality`}
+              />
+            ),
+            Header: "Quality",
+            sortable: false
+          },
+          {
+            Cell: ({ index, original }) => (
+              <TextField
+                hideLabel={true}
+                key={original.id}
+                name={`sampleSrs[${index}].libraryPrep.size`}
+              />
+            ),
+            Header: "Size",
+            sortable: false
+          }
+        ]
+      : editMode === "INDEX"
+      ? [
+          {
+            Cell: ({ original: sr }) => {
+              const { libraryPrep } = sr as StepResource;
+              if (!libraryPrep) {
+                return null;
+              }
+
+              const { wellColumn, wellRow } = libraryPrep;
+              const wellCoordinates =
+                wellColumn === null || !wellRow
+                  ? null
+                  : `${wellRow}${String(wellColumn).padStart(2, "0")}`;
+
+              return wellCoordinates;
+            },
+            Header: "Well Coordinates",
+            sortable: false
+          },
+          {
+            Header: "Sample Name",
+            accessor: "sample.name"
+          },
+          ...["indexI5", "indexI7"].map(fieldName => ({
+            Cell: ({ index, original }) => (
+              <ResourceSelectField<NgsIndex>
+                customDataFetch={resourceSelectLoader}
+                hideLabel={true}
+                filter={filterBy(["name"])}
+                key={original.id}
+                name={`sampleSrs[${index}].libraryPrep.${fieldName}`}
+                optionLabel={ngsIndex => ngsIndex.name}
+                model={`indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
+                styles={{ menu: () => ({ zIndex: 5 }) }}
+              />
+            ),
+            Header: titleCase(fieldName),
+            sortable: false
+          }))
+        ]
+      : [];
 
   return (
     <Formik
@@ -136,25 +224,32 @@ export function LibraryPrepEditTable({
       onSubmit={onSubmit}
     >
       <Form>
-        <strong>Selected Samples</strong>
-        <div className="float-right">
-          <SubmitButton>Save Table Values</SubmitButton>
+        <ErrorViewer />
+        <div className="row">
+          <div className="col-12">
+            <strong>Selected Samples</strong>
+            <div className="float-right">
+              <SubmitButton>Save Table Values</SubmitButton>
+            </div>
+          </div>
         </div>
-        <QueryTable
-          columns={COLUMNS}
-          loading={libraryPrepsLoading}
-          deps={[lastPrepTableSave]}
-          // Filter down to the selected samples from this chain's sample selection step.
-          filter={{
-            "chain.chainId": chain.id,
-            "chainStepTemplate.chainStepTemplateId": sampleSelectionStep.id
-          }}
-          include="sample"
-          onSuccess={res => setVisibleSampleSrs(res.data)}
-          path="stepResource"
-        />
-        <div className="float-right">
-          <SubmitButton>Save Table Values</SubmitButton>
+        <div className="row">
+          <div className="col-12">
+            <ReactTable
+              columns={COLUMNS}
+              data={formikValues.sampleSrs}
+              loading={libraryPrepsLoading || sampleSrsLoading}
+              showPagination={false}
+              pageSize={sampleSrs.length}
+            />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-12">
+            <div className="float-right">
+              <SubmitButton>Save Table Values</SubmitButton>
+            </div>
+          </div>
         </div>
       </Form>
     </Formik>

@@ -6,7 +6,6 @@ import { StepResource } from "../../../types/seqdb-api";
 import { StepRendererProps } from "../StepRenderer";
 import { SampleGrid } from "./container-grid/SampleGrid";
 import { IndexGrid } from "./index-grid/IndexGrid";
-import { IndexAssignmentTable } from "./IndexAssignmentTable";
 import { LibraryPrepBatchDetails } from "./LibraryPrepBatchDetails";
 import { LibraryPrepBatchForm } from "./LibraryPrepBatchForm";
 import { LibraryPrepEditTable } from "./LibraryPrepEditTable";
@@ -100,6 +99,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
             <TabPanel>
               <LibraryPrepEditTable
                 chain={chain}
+                editMode="DETAILS"
                 libraryPrepBatch={libraryPrepBatch}
                 sampleSelectionStep={sampleSelectionStep}
               />
@@ -121,8 +121,9 @@ export function LibraryPrepStep(props: StepRendererProps) {
                   <IndexGrid libraryPrepBatch={libraryPrepBatch} />
                 </TabPanel>
                 <TabPanel>
-                  <IndexAssignmentTable
+                  <LibraryPrepEditTable
                     chain={chain}
+                    editMode="INDEX"
                     libraryPrepBatch={libraryPrepBatch}
                     sampleSelectionStep={sampleSelectionStep}
                   />
