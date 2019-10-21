@@ -1,8 +1,8 @@
 import { KitsuResource } from "kitsu";
 import { IndexSet } from "./IndexSet";
 
-export interface IndexPrimerAttributes {
-  type: "indexPrimer";
+export interface NgsIndexAttributes {
+  type: "ngsIndex";
   name: string;
   lotNumber?: number;
   direction?: string;
@@ -22,10 +22,10 @@ export interface IndexPrimerAttributes {
   miniSeqNextSeqIndexSequence?: string;
 }
 
-export interface IndexPrimerRelationships {
+export interface NgsIndexRelationships {
   indexSet: IndexSet;
 }
 
-export type IndexPrimer = KitsuResource &
-  IndexPrimerAttributes &
-  IndexPrimerRelationships;
+export type NgsIndex = KitsuResource &
+  NgsIndexAttributes &
+  NgsIndexRelationships;

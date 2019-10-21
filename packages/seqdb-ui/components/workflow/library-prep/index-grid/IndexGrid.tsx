@@ -9,9 +9,9 @@ import {
 import { Form, Formik } from "formik";
 import ReactTable, { Column } from "react-table";
 import {
-  IndexPrimer,
   LibraryPrep,
-  LibraryPrepBatch
+  LibraryPrepBatch,
+  NgsIndex
 } from "../../../../types/seqdb-api";
 import { useIndexGridControls } from "./useIndexGridControls";
 
@@ -57,14 +57,13 @@ export function IndexGrid(props: IndexGridProps) {
         return (
           <div style={{ padding: "7px 5px" }}>
             <span>{String.fromCharCode(index + 65)}</span>
-            <ResourceSelectField<IndexPrimer>
-              // TODO: this should fetch the index set primers.
+            <ResourceSelectField<NgsIndex>
               customDataFetch={resourceSelectLoader}
               hideLabel={true}
               filter={filterBy(["name"])}
               name={`indexI7s[${rowLetter}]`}
               optionLabel={primer => primer.name}
-              model={`indexSet/${libraryPrepBatch.indexSet.id}/indexPrimers`}
+              model={`indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
               styles={{ menu: () => ({ zIndex: 5 }) }}
             />
           </div>
@@ -106,14 +105,13 @@ export function IndexGrid(props: IndexGridProps) {
         Header: () => (
           <>
             {columnLabel}
-            <ResourceSelectField<IndexPrimer>
-              // TODO: this should fetch the index set primers.
+            <ResourceSelectField<NgsIndex>
               customDataFetch={resourceSelectLoader}
               hideLabel={true}
               filter={filterBy(["name"])}
               name={`indexI5s[${columnLabel}]`}
               optionLabel={primer => primer.name}
-              model={`indexSet/${libraryPrepBatch.indexSet.id}/indexPrimers`}
+              model={`indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
               styles={{ menu: () => ({ zIndex: 5 }) }}
             />
           </>

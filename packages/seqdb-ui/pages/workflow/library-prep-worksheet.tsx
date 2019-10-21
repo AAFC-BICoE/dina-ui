@@ -19,7 +19,7 @@ export function LibraryPrepWorksheetPage({ router }: WithRouterProps) {
     LibraryPrep[]
   >({
     fields: {
-      indexPrimer: "name",
+      ngsIndex: "name",
       sample: "name,version"
     },
     include: "indexI5,indexI7,sample",

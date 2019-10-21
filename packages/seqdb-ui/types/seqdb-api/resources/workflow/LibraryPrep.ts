@@ -1,7 +1,7 @@
 import { KitsuResource } from "kitsu";
 import { Sample } from "../Sample";
-import { IndexPrimer } from "./IndexPrimer";
 import { LibraryPrepBatch } from "./LibraryPrepBatch";
+import { NgsIndex } from "./NgsIndex";
 
 interface LibraryPrepAttributes {
   inputNg?: number;
@@ -14,8 +14,8 @@ interface LibraryPrepAttributes {
 interface LibraryPrepRelationships {
   libraryPrepBatch: LibraryPrepBatch;
   sample?: Sample;
-  indexI5?: IndexPrimer;
-  indexI7?: IndexPrimer;
+  indexI5?: NgsIndex;
+  indexI7?: NgsIndex;
 }
 
 export type LibraryPrep = KitsuResource &
