@@ -182,6 +182,7 @@ export function SampleSelection(props: StepRendererProps) {
                   defaultPageSize={100}
                   filter={filter}
                   include="group"
+                  loading={loading}
                   onSuccess={response => setAvailableSamples(response.data)}
                   path="sample"
                 />
@@ -223,6 +224,7 @@ export function SampleSelection(props: StepRendererProps) {
                     "chainStepTemplate.chainStepTemplateId": step.id
                   }}
                   include="sample,sample.group"
+                  loading={loading}
                   onSuccess={res => setStepResources(res.data)}
                   path="stepResource"
                 />

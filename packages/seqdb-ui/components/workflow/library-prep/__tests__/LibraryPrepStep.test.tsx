@@ -138,7 +138,7 @@ describe("LibraryPrepStepDetails component", () => {
     expect(wrapper.find(".notes-field p").text()).toEqual("new notes");
 
     // This details state should also show the library prep sub-steps:
-    expect(wrapper.contains("Substep 1: Library Prep Edit Table")).toEqual(
+    expect(wrapper.contains("Substep 1: Library Prep Details Table")).toEqual(
       true
     );
   });

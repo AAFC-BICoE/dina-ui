@@ -86,7 +86,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
         <div className="form-group">
           <Tabs>
             <TabList>
-              <Tab>Substep 1: Library Prep Edit Table</Tab>
+              <Tab>Substep 1: Library Prep Details Table</Tab>
               <Tab>Substep 2: Container Grid</Tab>
               <Tab>Substep 3: Index Grid</Tab>
             </TabList>

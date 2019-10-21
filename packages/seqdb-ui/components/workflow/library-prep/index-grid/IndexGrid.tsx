@@ -22,7 +22,7 @@ export interface IndexGridProps {
 export function IndexGrid(props: IndexGridProps) {
   const { libraryPrepBatch } = props;
 
-  const { containerType } = libraryPrepBatch;
+  const { containerType, indexSet } = libraryPrepBatch;
   const resourceSelectLoader = useCacheableQueryLoader();
 
   const {
@@ -33,6 +33,14 @@ export function IndexGrid(props: IndexGridProps) {
 
   if (libraryPrepsLoading) {
     return <LoadingSpinner loading={true} />;
+  }
+
+  if (!containerType || !indexSet) {
+    return (
+      <span className="alert alert-warning">
+        Container Type and Index Set must be set to use the index grid.
+      </span>
+    );
   }
 
   if (libraryPrepsResponse) {
