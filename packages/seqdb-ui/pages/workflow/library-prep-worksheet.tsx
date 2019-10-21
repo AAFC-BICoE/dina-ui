@@ -100,14 +100,19 @@ export function LibraryPrepWorksheetPage({ router }: WithRouterProps) {
                 </div>
                 <HorizontalField
                   label="Thermocycler Profile"
-                  defaultValue={batch.thermocyclerProfile.name}
+                  defaultValue={
+                    batch.thermocyclerProfile && batch.thermocyclerProfile.name
+                  }
                 />
                 <div className="row">
                   <div className="col-6">
                     {[...Array(6).keys()].map(i => (
                       <HorizontalField
                         label={`Step ${i + 1}`}
-                        defaultValue={batch.thermocyclerProfile[`step${i + 1}`]}
+                        defaultValue={
+                          batch.thermocyclerProfile &&
+                          batch.thermocyclerProfile[`step${i + 1}`]
+                        }
                       />
                     ))}
                   </div>
@@ -115,14 +120,20 @@ export function LibraryPrepWorksheetPage({ router }: WithRouterProps) {
                     {[...Array(6).keys()].map(i => (
                       <HorizontalField
                         label={`Step ${i + 7}`}
-                        defaultValue={batch.thermocyclerProfile[`step${i + 7}`]}
+                        defaultValue={
+                          batch.thermocyclerProfile &&
+                          batch.thermocyclerProfile[`step${i + 7}`]
+                        }
                       />
                     ))}
                   </div>
                 </div>
                 <HorizontalField
                   label="Cycles"
-                  defaultValue={batch.thermocyclerProfile.cycles}
+                  defaultValue={
+                    batch.thermocyclerProfile &&
+                    batch.thermocyclerProfile.cycles
+                  }
                 />
               </div>
             </div>
@@ -181,7 +192,7 @@ function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
         {preps.map(prep => {
           const { wellColumn, wellRow } = prep;
           const wellLocation =
-            !String(wellColumn) || !String(wellRow)
+            wellColumn === null || !wellRow
               ? null
               : `${wellRow}${String(wellColumn).padStart(2, "0")}`;
 

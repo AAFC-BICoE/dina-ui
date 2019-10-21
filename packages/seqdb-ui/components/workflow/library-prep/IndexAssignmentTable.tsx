@@ -1,35 +1,39 @@
 import {
   ApiClientContext,
   ColumnDefinition,
-  NumberField,
+  filterBy,
   QueryTable,
+  ResourceSelectField,
   safeSubmit,
   SubmitButton,
-  TextField,
+  useCacheableQueryLoader,
   useQuery
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { useContext, useState } from "react";
+import titleCase from "title-case";
 import {
   Chain,
   ChainStepTemplate,
   LibraryPrep,
   LibraryPrepBatch,
+  NgsIndex,
   StepResource
 } from "../../../types/seqdb-api";
 
-interface SampleToIndexTableProps {
+export interface IndexAssignmentTableProps {
   chain: Chain;
   libraryPrepBatch: LibraryPrepBatch;
   sampleSelectionStep: ChainStepTemplate;
 }
 
-export function LibraryPrepEditTable({
+export function IndexAssignmentTable({
   chain,
   libraryPrepBatch,
   sampleSelectionStep
-}: SampleToIndexTableProps) {
+}: IndexAssignmentTableProps) {
   const { save } = useContext(ApiClientContext);
+  const resourceSelectLoader = useCacheableQueryLoader();
 
   // Current visible sample StepResources in the "sample selection" table.
   const [visibleSampleSrs, setVisibleSampleSrs] = useState<StepResource[]>([]);
@@ -45,9 +49,10 @@ export function LibraryPrepEditTable({
     {
       // Optimize query speed by reducing the amount of requested fields.
       fields: {
+        ngsIndex: "name",
         sample: "name"
       },
-      include: "sample",
+      include: "sample,indexI5,indexI7",
       page: { limit: 1000 },
       path: `libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`
     },
@@ -95,38 +100,40 @@ export function LibraryPrepEditTable({
   });
 
   const COLUMNS: Array<ColumnDefinition<StepResource>> = [
+    {
+      Cell: ({ original: sr }) => {
+        const { libraryPrep } = sr as StepResource;
+        if (!libraryPrep) {
+          return null;
+        }
+
+        const { wellColumn, wellRow } = libraryPrep;
+        const wellCoordinates =
+          wellColumn === null || !wellRow
+            ? null
+            : `${wellRow}${String(wellColumn).padStart(2, "0")}`;
+
+        return wellCoordinates;
+      },
+      Header: "Well Coordinates",
+      sortable: false
+    },
     "sample.name",
-    // Library prep fields
-    {
+    ...["indexI5", "indexI7"].map(fieldName => ({
       Cell: ({ index }) => (
-        <NumberField
+        <ResourceSelectField<NgsIndex>
+          customDataFetch={resourceSelectLoader}
           hideLabel={true}
-          name={`sampleSrs[${index}].libraryPrep.inputNg`}
+          filter={filterBy(["name"])}
+          name={`sampleSrs[${index}].libraryPrep.${fieldName}`}
+          optionLabel={ngsIndex => ngsIndex.name}
+          model={`indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
+          styles={{ menu: () => ({ zIndex: 5 }) }}
         />
       ),
-      Header: "Input (ng)",
+      Header: titleCase(fieldName),
       sortable: false
-    },
-    {
-      Cell: ({ index }) => (
-        <TextField
-          hideLabel={true}
-          name={`sampleSrs[${index}].libraryPrep.quality`}
-        />
-      ),
-      Header: "Quality",
-      sortable: false
-    },
-    {
-      Cell: ({ index }) => (
-        <TextField
-          hideLabel={true}
-          name={`sampleSrs[${index}].libraryPrep.size`}
-        />
-      ),
-      Header: "Size",
-      sortable: false
-    }
+    }))
   ];
 
   return (
