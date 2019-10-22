@@ -26,7 +26,7 @@ import {
 
 type LibraryPrepEditMode = "DETAILS" | "INDEX";
 
-interface LibraryPrepEditTableProps {
+export interface LibraryPrepEditTableProps {
   chain: Chain;
   libraryPrepBatch: LibraryPrepBatch;
   sampleSelectionStep: ChainStepTemplate;
@@ -102,6 +102,14 @@ export function LibraryPrepEditTable({
       onSuccess: res => setSampleSrs(res.data)
     }
   );
+
+  if (!libraryPrepBatch.indexSet || !libraryPrepBatch.containerType) {
+    return (
+      <span className="alert alert-warning">
+        Index set and container type must be set to edit library preps.
+      </span>
+    );
+  }
 
   const onSubmit = safeSubmit(async submittedValues => {
     const submittedSampleSrs: StepResource[] = submittedValues.sampleSrs;
