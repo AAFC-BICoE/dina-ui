@@ -149,6 +149,7 @@ export function useSampleGridControls({
             thisSampleRowNumber + 64
           )}_${thisSampleColumnNumber}`;
 
+          // If there is already a sample in this cell, move the existing sample back to the list.
           const sampleAlreadyInThisCell = newCellGrid[thisSampleCoords];
           if (sampleAlreadyInThisCell) {
             newAvailableSamples.push(sampleAlreadyInThisCell);
@@ -157,7 +158,14 @@ export function useSampleGridControls({
             }
           }
 
-          newCellGrid[thisSampleCoords] = sample;
+          // Only move the sample into the grid if the well is valid for this container type.
+          if (newCellNumber <= numberOfColumns * numberOfRows) {
+            // Move the sample into the grid.
+            newCellGrid[thisSampleCoords] = sample;
+          } else {
+            newAvailableSamples.push(sample);
+          }
+
           newCellNumber++;
         }
       } else {
@@ -165,6 +173,7 @@ export function useSampleGridControls({
         newAvailableSamples = [...availableSamples, ...samples];
       }
 
+      // Set every sample passed into this function as moved.
       for (const sample of samples) {
         if (!movedSamples.includes(sample)) {
           newMovedSamples.push(sample);

@@ -9,7 +9,7 @@ import {
 import { ContainerGrid } from "../ContainerGrid";
 import { DraggableSampleBox } from "../DraggableSampleBox";
 import { DraggableSampleList } from "../DraggableSampleList";
-import { SampleGrid } from "../SampleGrid";
+import { ContainerGridProps, SampleGrid } from "../SampleGrid";
 
 const mockGet = jest.fn();
 const mockSave = jest.fn();
@@ -21,7 +21,7 @@ const mockCtx = {
   save: mockSave
 };
 
-function getWrapper() {
+function getWrapper(propsOverride?: Partial<ContainerGridProps>) {
   return mount(
     <ApiClientContext.Provider value={mockCtx as any}>
       <SampleGrid
@@ -42,6 +42,7 @@ function getWrapper() {
         sampleSelectionStep={
           { id: "1", type: "chainStepTemplate" } as ChainStepTemplate
         }
+        {...propsOverride}
       />
     </ApiClientContext.Provider>
   );
@@ -492,6 +493,111 @@ describe("SampleGrid component", () => {
     // SAMP800 should now be in the grid.
     expect(wrapper.find(".well-A_1 .sample-box-text").text()).toEqual(
       "SAMP800"
+    );
+  });
+
+  it("Moves a sample back into the list if the move operation overflows into invalid well coordinates.", async () => {
+    const wrapper = getWrapper();
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Change to row mode:
+    wrapper.find(".ROW-radio").simulate("click");
+    wrapper.update();
+
+    // Select the first sample:
+    wrapper
+      .find(".available-sample-list li")
+      .first()
+      .prop<any>("onClick")({});
+    wrapper.update();
+
+    // Shift-click the third sample:
+    wrapper
+      .find(".available-sample-list li")
+      .at(2)
+      .prop<any>("onClick")({ shiftKey: true });
+    wrapper.update();
+
+    // Move the 3 selected samples, starting at the last cell:
+    wrapper.find(ContainerGrid).prop("onDrop")(
+      MOCK_STEPRESOURCES_NO_WELL_COORDS[0].sample as Sample,
+      "H_12"
+    );
+    wrapper.update();
+
+    // The 2 overflowed samples should be back in the available samples list:
+    expect(
+      wrapper
+        .find(".available-sample-list .sample-box-text")
+        .map(node => node.text())
+    ).toEqual(["SAMP800", "ZSAMP1000"]);
+
+    // Submit the grid changes:
+    wrapper.find(".grid-submit").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // SAMP600 should be submitted in well H12. The other two samples should have null well coordinates.
+    expect(mockSave).lastCalledWith([
+      {
+        resource: expect.objectContaining({
+          id: "3",
+          sample: {
+            id: "6",
+            name: "SAMP600",
+            type: "sample"
+          },
+          type: "libraryPrep",
+          wellColumn: 12,
+          wellRow: "H"
+        }),
+        type: "libraryPrep"
+      },
+      {
+        resource: expect.objectContaining({
+          sample: {
+            id: "8",
+            name: "SAMP800",
+            type: "sample"
+          },
+          type: "libraryPrep",
+          wellColumn: null,
+          wellRow: null
+        }),
+        type: "libraryPrep"
+      },
+      {
+        resource: expect.objectContaining({
+          sample: {
+            id: "10",
+            name: "ZSAMP1000",
+            type: "sample"
+          },
+          type: "libraryPrep",
+          wellColumn: null,
+          wellRow: null
+        }),
+        type: "libraryPrep"
+      }
+    ]);
+  });
+
+  it("Shows a warning box if the Container Type is absent.", async () => {
+    const wrapper = getWrapper({
+      libraryPrepBatch: {
+        id: "5",
+        type: "libraryPrepBatch"
+      }
+    });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(".alert.alert-warning").text()).toEqual(
+      "Container Type must be set to use the container grid."
     );
   });
 });

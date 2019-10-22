@@ -11,7 +11,7 @@ import { ContainerGrid } from "./ContainerGrid";
 import { DraggableSampleList } from "./DraggableSampleList";
 import { useSampleGridControls } from "./useSampleGridControls";
 
-interface ContainerGridProps {
+export interface ContainerGridProps {
   chain: Chain;
   sampleSelectionStep: ChainStepTemplate;
   libraryPrepBatch: LibraryPrepBatch;
