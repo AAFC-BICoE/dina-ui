@@ -69,7 +69,7 @@ export function IndexGrid(props: IndexGridProps) {
               customDataFetch={resourceSelectLoader}
               hideLabel={true}
               filter={filterBy(["name"])}
-              name={`indexI7s[${rowLetter}]`}
+              name={`indexI5s[${rowLetter}]`}
               optionLabel={primer => primer.name}
               model={`indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
               styles={{ menu: () => ({ zIndex: 5 }) }}
@@ -117,7 +117,7 @@ export function IndexGrid(props: IndexGridProps) {
               customDataFetch={resourceSelectLoader}
               hideLabel={true}
               filter={filterBy(["name"])}
-              name={`indexI5s[${columnLabel}]`}
+              name={`indexI7s[${columnLabel}]`}
               optionLabel={primer => primer.name}
               model={`indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
               styles={{ menu: () => ({ zIndex: 5 }) }}

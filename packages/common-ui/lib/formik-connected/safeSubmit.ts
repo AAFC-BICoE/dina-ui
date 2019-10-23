@@ -1,6 +1,6 @@
 import { FormikActions } from "formik";
 
-type OnFormikSubmit = (
+export type OnFormikSubmit = (
   submittedValues: any,
   formik: FormikActions<any>
 ) => void | Promise<void>;

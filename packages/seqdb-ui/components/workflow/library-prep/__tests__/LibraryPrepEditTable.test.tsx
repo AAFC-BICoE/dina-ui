@@ -1,11 +1,7 @@
 import { ApiClientContext, ResourceSelect } from "common-ui";
 import { mount } from "enzyme";
 import NumberFormat from "react-number-format";
-import {
-  Chain,
-  ChainStepTemplate,
-  IndexSet
-} from "../../../../types/seqdb-api";
+import { Chain, ChainStepTemplate } from "../../../../types/seqdb-api";
 import {
   LibraryPrepEditTable,
   LibraryPrepEditTableProps

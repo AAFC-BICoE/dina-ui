@@ -33,24 +33,24 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
 
     const edits: Dictionary<Partial<LibraryPrep>> = {};
 
-    // Get the new i5 values:
-    const colIndexes = toPairs<NgsIndex>(indexI5s);
+    // Get the new i7 values:
+    const colIndexes = toPairs<NgsIndex>(indexI7s);
     for (const [col, index] of colIndexes) {
       const colPreps = libraryPreps.filter(it => String(it.wellColumn) === col);
       for (const prep of colPreps) {
         const edit = edits[prep.id] || {};
-        edit.indexI5 = { id: index.id, type: "ngsIndex" } as NgsIndex;
+        edit.indexI7 = { id: index.id, type: "ngsIndex" } as NgsIndex;
         edits[prep.id] = edit;
       }
     }
 
-    // Get the new i7 values:
-    const rowIndexes = toPairs<NgsIndex>(indexI7s);
+    // Get the new i5 values:
+    const rowIndexes = toPairs<NgsIndex>(indexI5s);
     for (const [row, index] of rowIndexes) {
       const rowPreps = libraryPreps.filter(it => it.wellRow === row);
       for (const prep of rowPreps) {
         const edit = edits[prep.id] || {};
-        edit.indexI7 = { id: index.id, type: "ngsIndex" } as NgsIndex;
+        edit.indexI5 = { id: index.id, type: "ngsIndex" } as NgsIndex;
         edits[prep.id] = edit;
       }
     }
