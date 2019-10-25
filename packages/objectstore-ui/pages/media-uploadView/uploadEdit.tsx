@@ -1,10 +1,10 @@
-import { ApiClientContext } from "common-ui";
+import { ApiClientContext, SubmitButton } from "common-ui";
 import { Form, Formik, FormikActions } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
-import { useContext, useState } from "react";
-import DatePicker from "react-datepicker";
-import Select from "react-select";
+import { useContext } from "react";
+import { DateField, SelectField, TextField } from "../../lib/";
+
 import ReactTable from "react-table";
 import { Head, Nav } from "../../components";
 
@@ -35,6 +35,21 @@ function UploadEditForm({ router }: UploadEditFormProps) {
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
     try {
+      // need to manipulate submittedvalus to json api attributes
+      /*let data = {
+        type:"metadata",
+        attributes:JSON.stringify(submittedValues)
+      }
+
+      let config = {
+        headers: {
+          Accept: "application/json-patch+json",
+          "Content-Type": "application/json-patch+json",
+          "Crnk-Compact": "true"
+        }
+
+      }
+       apiClient.axios.post("/metadata", {"data": {data}} ,config);*/
       const response = await save([
         {
           resource: submittedValues,
@@ -68,13 +83,6 @@ function UploadEditForm({ router }: UploadEditFormProps) {
     }
   ];
 
-  const [startDate, setStartDate] = useState(new Date());
-  const [selectedOptions, setSelectedOptions] = useState(DC_TYPE_OPTIONS);
-
-  const handleDcTypeChange = mySelectedOptions => {
-    setSelectedOptions(mySelectedOptions);
-  };
-
   const columns = [
     {
       Header: "Property Name",
@@ -85,43 +93,35 @@ function UploadEditForm({ router }: UploadEditFormProps) {
         const key: string = original.name;
         if (key === "dcType") {
           return (
-            <Select
+            <SelectField
               options={DC_TYPE_OPTIONS}
-              onChange={handleDcTypeChange}
-              value={selectedOptions}
-              minMenuHeight={900}
+              name={key}
+              className="col-md-2"
             />
           );
         } else if (key.endsWith("Date") || key.endsWith("Time")) {
-          return (
-            <DatePicker
-              className="form-control"
-              dateFormat="yyyy-MM-dd"
-              isClearable={true}
-              onChange={setStartDate}
-              selected={startDate}
-              showYearDropdown={true}
-              todayButton="Today"
-            />
-          );
+          return <DateField className="col-md-2" name={key} />;
         } else {
-          return <input />;
+          return <TextField name={key} className="col-md-2" />;
         }
       },
-      Header: "Property Value"
+      Header: "Property Value",
+      Style: { height: "100px" }
     }
   ];
 
   return (
     <Formik initialValues={{}} onSubmit={onSubmit}>
       <Form>
-        <ReactTable className="-striped" data={metadata} columns={columns} />
-        <Select
-          options={DC_TYPE_OPTIONS}
-          onChange={handleDcTypeChange}
-          value={selectedOptions}
-          minMenuHeight={50}
-        />
+        <SubmitButton />
+        <div style={{ width: "50%" }}>
+          <ReactTable
+            className="-striped"
+            data={metadata}
+            columns={columns}
+            pageSize={10}
+          />
+        </div>
       </Form>
     </Formik>
   );

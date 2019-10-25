@@ -82,8 +82,8 @@ function UploadViewForm({ router }: UploadViewFormProps) {
       setStatus(
         error.message + ", " + " submittedValues are: " + submittedValues
       );
+      setSubmitting(false);
     }
-    setSubmitting(false);
   }
 
   return (
