@@ -12,11 +12,7 @@ describe("FilterBuilder component", () => {
 
   function mountFilterBuilder(propsOverride: Partial<FilterBuilderProps> = {}) {
     return mount<FilterBuilder>(
-      <FilterBuilder
-        filterAttributes={filterAttributes}
-        value={null}
-        {...propsOverride}
-      />
+      <FilterBuilder filterAttributes={filterAttributes} {...propsOverride} />
     );
   }
 

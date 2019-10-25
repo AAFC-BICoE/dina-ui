@@ -17,7 +17,7 @@ export type FilterAttribute =
 
 export interface FilterBuilderProps {
   filterAttributes: FilterAttribute[];
-  value: FilterGroupModel | null;
+  value?: FilterGroupModel | null;
   onChange?: (state: FilterGroupModel) => void;
 }
 
