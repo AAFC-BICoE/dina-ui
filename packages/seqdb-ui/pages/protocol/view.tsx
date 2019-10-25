@@ -1,5 +1,6 @@
 import { FieldView, LoadingSpinner, Query } from "common-ui";
 import { Formik } from "formik";
+import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import {
@@ -36,7 +37,7 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
               <h1>Protocol Details</h1>
               <LoadingSpinner loading={loading} />
               {protocol && (
-                <Formik<Protocol> initialValues={protocol} onSubmit={null}>
+                <Formik<Protocol> initialValues={protocol} onSubmit={noop}>
                   <div>
                     <div className="row">
                       <FieldView

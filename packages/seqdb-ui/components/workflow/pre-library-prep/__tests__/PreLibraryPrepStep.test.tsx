@@ -200,19 +200,22 @@ describe("PreLibraryPrepStep UI", () => {
     wrapper
       .find(".selected-samples .rt-tbody input[type='checkbox']")
       .at(2)
-      .prop("onClick")({ target: { checked: true } } as any);
+      .prop<any>("onClick")({ target: { checked: true } } as any);
     wrapper.update();
     wrapper
       .find(".selected-samples .rt-tbody input[type='checkbox']")
       .at(4)
-      .prop("onClick")({ shiftKey: true, target: { checked: true } } as any);
+      .prop<any>("onClick")({
+      shiftKey: true,
+      target: { checked: true }
+    } as any);
     wrapper.update();
 
     // Add the preLibraryPrep details.
     wrapper
       .find(".inputAmount-field")
       .find(NumberFormat)
-      .prop("onValueChange")({ floatValue: 1234 } as any);
+      .prop<any>("onValueChange")({ floatValue: 1234 } as any);
     (wrapper
       .find(".protocol-field")
       .find(ResourceSelect)
@@ -504,19 +507,22 @@ describe("PreLibraryPrepStep UI", () => {
     wrapper
       .find(".selected-samples .rt-tbody input[type='checkbox']")
       .at(2)
-      .prop("onClick")({ target: { checked: true } } as any);
+      .prop<any>("onClick")({ target: { checked: true } } as any);
     wrapper.update();
     wrapper
       .find(".selected-samples .rt-tbody input[type='checkbox']")
       .at(4)
-      .prop("onClick")({ shiftKey: true, target: { checked: true } } as any);
+      .prop<any>("onClick")({
+      shiftKey: true,
+      target: { checked: true }
+    } as any);
     wrapper.update();
 
     // Add the preLibraryPrep details.
     wrapper
       .find(".inputAmount-field")
       .find(NumberFormat)
-      .prop("onValueChange")({ floatValue: 4321 } as any);
+      .prop<any>("onValueChange")({ floatValue: 4321 } as any);
 
     mockGet.mockImplementation((path, params) => {
       if (
@@ -879,12 +885,15 @@ describe("PreLibraryPrepStep UI", () => {
     wrapper
       .find(".selected-samples .rt-tbody input[type='checkbox']")
       .at(1)
-      .prop("onClick")({ target: { checked: true } } as any);
+      .prop<any>("onClick")({ target: { checked: true } } as any);
     wrapper.update();
     wrapper
       .find(".selected-samples .rt-tbody input[type='checkbox']")
       .at(3)
-      .prop("onClick")({ shiftKey: true, target: { checked: true } } as any);
+      .prop<any>("onClick")({
+      shiftKey: true,
+      target: { checked: true }
+    } as any);
     wrapper.update();
 
     wrapper.find("button.remove-shearing").simulate("click");

@@ -1,5 +1,6 @@
 import { FieldView, LoadingSpinner, Query } from "common-ui";
 import { Formik } from "formik";
+import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import {
@@ -27,7 +28,7 @@ export function ProductDetailsPage({ router }: WithRouterProps) {
             <h1>Product Inventory</h1>
             <LoadingSpinner loading={loading} />
             {response && (
-              <Formik<Product> initialValues={response.data} onSubmit={null}>
+              <Formik<Product> initialValues={response.data} onSubmit={noop}>
                 <div>
                   <div className="row">
                     <FieldView

@@ -7,17 +7,20 @@ declare module "kitsu" {
 
   /** JSONAPI client. */
   export default class Kitsu {
-    axios: AxiosInstance;
+    public axios: AxiosInstance;
 
     constructor(params: KitsuConstructorParams);
 
-    delete(...args: any[]): Promise<any>;
+    public delete(...args: any[]): Promise<any>;
 
-    get(path: string, params: GetParams): Promise<KitsuResponse<any>>;
+    public get<TData, TMeta = undefined>(
+      path: string,
+      params: GetParams
+    ): Promise<KitsuResponse<TData, TMeta>>;
 
-    patch(...args: any[]): Promise<any>;
+    public patch(...args: any[]): Promise<any>;
 
-    post(...args: any[]): Promise<any>;
+    public post(...args: any[]): Promise<any>;
   }
 
   /** Params for the Kitsu JSONAPI client's constructor */
@@ -76,7 +79,7 @@ declare module "kitsu" {
 
   /** JSONAPI resource base attributes. */
   export interface KitsuResource {
-    id?: string;
+    id?: string | null;
     type: string;
   }
 }

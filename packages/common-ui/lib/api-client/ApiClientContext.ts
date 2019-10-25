@@ -31,7 +31,8 @@ export interface SaveArgs {
  * React context that passes down a single API client to subscribed components.
  */
 export const ApiClientContext = React.createContext<ApiClientContextI>(
-  undefined
+  // Default value is undefined. This won't matter as long as the hook is called inside the context provider.
+  undefined as any
 );
 
 /**
