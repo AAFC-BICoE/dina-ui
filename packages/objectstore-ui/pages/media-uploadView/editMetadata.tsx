@@ -49,8 +49,8 @@ function UploadEditForm({  }: UploadEditFormProps) {
       apiClient.axios.post("/metadata", { data }, config);
     } catch (error) {
       setStatus(error.message);
-      setSubmitting(false);
     }
+    setSubmitting(false);
   }
 
   const metadata = [
@@ -63,11 +63,19 @@ function UploadEditForm({  }: UploadEditFormProps) {
       value: "dcType"
     },
     {
-      name: "OffsetDateTime",
+      name: "acDigitizationDate",
       value: ""
     },
     {
       name: "xmpMetadataDate",
+      value: ""
+    },
+    {
+      name: "acHashFunction",
+      value: ""
+    },
+    {
+      name: "acHashValue",
       value: ""
     }
   ];
@@ -88,7 +96,7 @@ function UploadEditForm({  }: UploadEditFormProps) {
               className="col-md-2"
             />
           );
-        } else if (key.endsWith("Date") || key.endsWith("Time")) {
+        } else if (key.endsWith("Date")) {
           return <DateField className="col-md-2" name={key} />;
         } else {
           return <TextField name={key} className="col-md-2" />;
@@ -102,7 +110,6 @@ function UploadEditForm({  }: UploadEditFormProps) {
   return (
     <Formik initialValues={{}} onSubmit={onSubmit}>
       <Form>
-        <SubmitButton />
         <div style={{ width: "50%" }}>
           <ReactTable
             className="-striped"
@@ -110,6 +117,8 @@ function UploadEditForm({  }: UploadEditFormProps) {
             columns={columns}
             pageSize={10}
           />
+          <p />
+          <SubmitButton />
         </div>
       </Form>
     </Formik>

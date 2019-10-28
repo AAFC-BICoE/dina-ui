@@ -13,19 +13,20 @@ export function DateField(props: LabelWrapperParams) {
         form: { setFieldValue, setFieldTouched }
       }: FieldProps) => {
         function onChange(date: Date) {
-          setFieldValue(name, date && date.toISOString().slice(0, 10));
+          setFieldValue(name, date && date.toISOString());
           setFieldTouched(name);
         }
 
         return (
           <DatePicker
             className="form-control"
-            dateFormat="yyyy-MM-dd"
             isClearable={true}
             onChange={onChange}
-            selected={value ? new Date(`${value}T12:00:00Z`) : null}
+            selected={value ? new Date(`${value}`) : null}
             showYearDropdown={true}
             todayButton="Today"
+            showTimeSelect={true}
+            dateFormat="Pp"
           />
         );
       }}
