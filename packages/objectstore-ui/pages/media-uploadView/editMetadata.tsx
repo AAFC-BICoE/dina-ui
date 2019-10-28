@@ -3,10 +3,10 @@ import { Form, Formik, FormikActions } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
-import { DateField, SelectField, TextField } from "../../lib/";
+import { DateField, SelectField, TextField } from "../../lib";
 
 import ReactTable from "react-table";
-import { Head, Nav } from "../../components";
+import { Head } from "../../components";
 
 interface UploadEditFormProps {
   router: NextRouter;
@@ -16,10 +16,10 @@ export function UploadEditFormPage({ router }: WithRouterProps) {
   return (
     <div>
       <Head title="Add Metadata" />
-      <Nav />
+
       <div className="container-fluid">
         <div>
-          <h1>Add Metadata</h1>
+          <h1>Edit Metadata</h1>
           <UploadEditForm router={router} />
         </div>
       </div>
@@ -27,37 +27,26 @@ export function UploadEditFormPage({ router }: WithRouterProps) {
   );
 }
 
-function UploadEditForm({ router }: UploadEditFormProps) {
-  const { save } = useContext(ApiClientContext);
+function UploadEditForm({  }: UploadEditFormProps) {
+  const { apiClient } = useContext(ApiClientContext);
 
   async function onSubmit(
     submittedValues,
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
     try {
-      // need to manipulate submittedvalus to json api attributes
-      /*let data = {
-        type:"metadata",
-        attributes:JSON.stringify(submittedValues)
-      }
+      const data = {
+        attributes: submittedValues,
+        type: "metadata"
+      };
 
-      let config = {
+      const config = {
         headers: {
-          Accept: "application/json-patch+json",
-          "Content-Type": "application/json-patch+json",
+          "Content-Type": "application/vnd.api+json",
           "Crnk-Compact": "true"
         }
-
-      }
-       apiClient.axios.post("/metadata", {"data": {data}} ,config);*/
-      const response = await save([
-        {
-          resource: submittedValues,
-          type: "metadata"
-        }
-      ]);
-      const newId = response[0].id;
-      router.push(`/media-uploadView/uploadView/${newId}`);
+      };
+      apiClient.axios.post("/metadata", { data }, config);
     } catch (error) {
       setStatus(error.message);
       setSubmitting(false);

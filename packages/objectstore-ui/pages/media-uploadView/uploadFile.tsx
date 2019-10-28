@@ -5,6 +5,8 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter } from "next/router";
 import React, { useMemo } from "react";
 import { useDropzone } from "react-dropzone";
+import { Head } from "../../components";
+// import Link from "next/link";
 
 interface UploadViewFormProps {
   router: NextRouter;
@@ -41,6 +43,7 @@ const rejectStyle = {
 function MediaUploadViewPage({ router }: WithRouterProps) {
   return (
     <div>
+      <Head title="Upload files" />
       <div className="container-fluid">
         <div>
           <h1>Upload View Form Page</h1>
@@ -57,12 +60,19 @@ function UploadViewForm({ router }: UploadViewFormProps) {
     getInputProps,
     isDragActive,
     isDragAccept,
-    isDragReject
-    // acceptedFiles
+    isDragReject,
+    acceptedFiles
   } = useDropzone({
     accept: "image/*,audio/*,video/*,.pdf,.doc,docx,.png"
   });
 
+  const acceptedFilesItems = acceptedFiles.map(file => (
+    <li key={file.name}>
+      <p />
+      {file.name} - {file.size} bytes
+      <p />
+    </li>
+  ));
   const style = useMemo(
     () => ({
       ...baseStyle,
@@ -87,7 +97,7 @@ function UploadViewForm({ router }: UploadViewFormProps) {
   }
 
   return (
-    <Formik initialValues={router} onSubmit={onSubmit}>
+    <Formik initialValues={{}} onSubmit={onSubmit}>
       <Form>
         <div id="dndRoot">
           <div {...getRootProps({ style })} className="container">
@@ -99,7 +109,26 @@ function UploadViewForm({ router }: UploadViewFormProps) {
               </div>
             </div>
           </div>
-          <SubmitButton />
+          <div className="container">
+            <ul>{acceptedFilesItems}</ul>
+          </div>
+
+          <div className="container">
+            <div className="row">
+              <div className="col-sm-1">
+                <SubmitButton />
+              </div>
+              <div className="col-sm-2">
+                <a
+                  href={`/media-uploadView/editMetadata`}
+                  className="btn btn-info"
+                  role="button"
+                >
+                  Edit Metadata
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </Form>
     </Formik>
