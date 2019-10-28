@@ -1,9 +1,14 @@
 import { FastField, FieldProps } from "formik";
+import Link from "next/link";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
+export interface FieldViewProps extends LabelWrapperParams {
+  link?: string;
+}
+
 /** Renders the label and value of a field from Formik context. */
-export function FieldView(props: LabelWrapperParams) {
-  const { name } = props;
+export function FieldView(props: FieldViewProps) {
+  const { link, name } = props;
 
   return (
     <FastField name={name}>
@@ -16,7 +21,13 @@ export function FieldView(props: LabelWrapperParams) {
               minHeight: "25px"
             }}
           >
-            {value}
+            {link ? (
+              <Link href={link}>
+                <a>{value}</a>
+              </Link>
+            ) : (
+              value
+            )}
           </p>
         </FieldWrapper>
       )}
