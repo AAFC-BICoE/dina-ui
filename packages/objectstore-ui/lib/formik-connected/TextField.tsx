@@ -24,7 +24,7 @@ export function TextField(props: LabelWrapperParams) {
         // we will get React's warning about switching from an uncontrolled to controlled input.
         return (
           <input
-            className="form-control"
+            // className="form-control"
             onChange={onChange}
             type="text"
             value={value || ""}

@@ -46,7 +46,7 @@ function MediaUploadViewPage({ router }: WithRouterProps) {
       <Head title="Upload files" />
       <div className="container-fluid">
         <div>
-          <h1>Upload View Form Page</h1>
+          <h1>Upload File</h1>
           <UploadViewForm router={router} />
         </div>
       </div>

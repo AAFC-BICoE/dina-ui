@@ -8,11 +8,11 @@ import { DateField, SelectField, TextField } from "../../lib";
 import ReactTable from "react-table";
 import { Head } from "../../components";
 
-interface UploadEditFormProps {
+interface EditMetadataFormProps {
   router: NextRouter;
 }
 
-export function UploadEditFormPage({ router }: WithRouterProps) {
+export function EditMetadataFormPage({ router }: WithRouterProps) {
   return (
     <div>
       <Head title="Add Metadata" />
@@ -20,14 +20,14 @@ export function UploadEditFormPage({ router }: WithRouterProps) {
       <div className="container-fluid">
         <div>
           <h1>Edit Metadata</h1>
-          <UploadEditForm router={router} />
+          <EditMetadataForm router={router} />
         </div>
       </div>
     </div>
   );
 }
 
-function UploadEditForm({  }: UploadEditFormProps) {
+function EditMetadataForm({ router }: EditMetadataFormProps) {
   const { apiClient } = useContext(ApiClientContext);
 
   async function onSubmit(
@@ -47,6 +47,7 @@ function UploadEditForm({  }: UploadEditFormProps) {
         }
       };
       apiClient.axios.post("/metadata", { data }, config);
+      router.push(`/media-uploadView/editManagedAttribute`);
     } catch (error) {
       setStatus(error.message);
     }
@@ -143,4 +144,4 @@ const DC_TYPE_OPTIONS = [
   }
 ];
 
-export default withRouter(UploadEditFormPage);
+export default withRouter(EditMetadataFormPage);
