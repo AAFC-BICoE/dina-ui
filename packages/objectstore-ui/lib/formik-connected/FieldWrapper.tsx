@@ -15,6 +15,8 @@ export interface LabelWrapperParams {
   tooltipMsg?: string;
 
   readOnly?: boolean;
+
+  initialValue?: string;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -37,7 +39,7 @@ export function FieldWrapper({
 }: FieldWrapperProps) {
   return (
     <div className={className}>
-      <div className={`form-group ${name}-field`}>
+      <div className={`form-group row ${name}-field`}>
         <label>
           <div>
             <strong>{label}</strong>
@@ -53,7 +55,7 @@ export function FieldWrapper({
             </ReactTooltip>
           </div>
         </label>
-        {children}
+        <div>{children}</div>
       </div>
     </div>
   );

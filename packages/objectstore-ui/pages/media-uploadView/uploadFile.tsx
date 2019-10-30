@@ -1,12 +1,9 @@
-// import { Head, Nav, ButtonBar } from "../../components";
-import { SubmitButton } from "common-ui";
 import { Form, Formik, FormikActions } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter } from "next/router";
 import React, { useMemo } from "react";
 import { useDropzone } from "react-dropzone";
 import { Head } from "../../components";
-// import Link from "next/link";
 
 interface UploadViewFormProps {
   router: NextRouter;
@@ -115,17 +112,24 @@ function UploadViewForm({ router }: UploadViewFormProps) {
 
           <div className="container">
             <div className="row">
-              <div className="col-sm-1">
-                <SubmitButton />
-              </div>
-              <div className="col-sm-2">
-                <a
-                  href={`/media-uploadView/editMetadata`}
-                  className="btn btn-info"
-                  role="button"
-                >
-                  Edit Metadata
-                </a>
+              <div className="col-md-2">
+                {acceptedFiles && acceptedFiles.length > 0 ? (
+                  <a
+                    href={`/media-uploadView/editMetadata?fileName=${acceptedFiles[0].name}`}
+                    className="btn btn-info"
+                    role="button"
+                  >
+                    Edit Metadata
+                  </a>
+                ) : (
+                  <a
+                    href={`/media-uploadView/editMetadata`}
+                    className="btn btn-info"
+                    role="button"
+                  >
+                    Edit Metadata
+                  </a>
+                )}
               </div>
             </div>
           </div>

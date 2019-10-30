@@ -6,10 +6,9 @@ import { LabelWrapperParams } from "./FieldWrapper";
  * a wrapper that adds a label.
  */
 export function TextField(props: LabelWrapperParams) {
-  const { name } = props;
-
+  const { name, initialValue } = props;
   return (
-    <Field name={name}>
+    <Field name={name} initialValue={initialValue}>
       {({
         field: { value },
         form: { setFieldValue, setFieldTouched }
@@ -24,10 +23,10 @@ export function TextField(props: LabelWrapperParams) {
         // we will get React's warning about switching from an uncontrolled to controlled input.
         return (
           <input
-            // className="form-control"
+            className="form-control"
             onChange={onChange}
             type="text"
-            value={value || ""}
+            value={initialValue ? initialValue : value || ""}
           />
         );
       }}

@@ -1,18 +1,22 @@
-import { ApiClientContext, SubmitButton } from "common-ui";
+import { ApiClientContext, filterBy, SubmitButton } from "common-ui";
 import { Form, Formik, FormikActions } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { DateField, SelectField, TextField } from "../../lib";
 
-import ReactTable from "react-table";
+import { Agent } from "types/objectstore-api/resources/Agent";
+import { isArray } from "util";
 import { Head } from "../../components";
+import { ResourceSelectField } from "../../lib/formik-connected/ResourceSelectField";
 
 interface EditMetadataFormProps {
   router: NextRouter;
+  originalFileName: string | string[];
 }
 
 export function EditMetadataFormPage({ router }: WithRouterProps) {
+  const { fileName } = router.query;
   return (
     <div>
       <Head title="Add Metadata" />
@@ -20,14 +24,14 @@ export function EditMetadataFormPage({ router }: WithRouterProps) {
       <div className="container-fluid">
         <div>
           <h1>Edit Metadata</h1>
-          <EditMetadataForm router={router} />
+          <EditMetadataForm router={router} originalFileName={fileName} />
         </div>
       </div>
     </div>
   );
 }
 
-function EditMetadataForm({ router }: EditMetadataFormProps) {
+function EditMetadataForm({ router, originalFileName }: EditMetadataFormProps) {
   const { apiClient } = useContext(ApiClientContext);
 
   async function onSubmit(
@@ -54,73 +58,73 @@ function EditMetadataForm({ router }: EditMetadataFormProps) {
     setSubmitting(false);
   }
 
-  const metadata = [
-    {
-      name: "dcFormat",
-      value: "dcFormat"
-    },
-    {
-      name: "dcType",
-      value: "dcType"
-    },
-    {
-      name: "acDigitizationDate",
-      value: ""
-    },
-    {
-      name: "xmpMetadataDate",
-      value: ""
-    },
-    {
-      name: "acHashFunction",
-      value: ""
-    },
-    {
-      name: "acHashValue",
-      value: ""
-    }
-  ];
-
-  const columns = [
-    {
-      Header: "Property Name",
-      accessor: "name"
-    },
-    {
-      Cell: ({ original }) => {
-        const key: string = original.name;
-        if (key === "dcType") {
-          return (
-            <SelectField
-              options={DC_TYPE_OPTIONS}
-              name={key}
-              className="col-md-2"
-            />
-          );
-        } else if (key.endsWith("Date")) {
-          return <DateField className="col-md-2" name={key} />;
-        } else {
-          return <TextField name={key} className="col-md-2" />;
-        }
-      },
-      Header: "Property Value",
-      Style: { height: "100px" }
-    }
-  ];
-
   return (
     <Formik initialValues={{}} onSubmit={onSubmit}>
       <Form>
-        <div style={{ width: "50%" }}>
-          <ReactTable
-            className="-striped"
-            data={metadata}
-            columns={columns}
-            pageSize={10}
-          />
-          <p />
-          <SubmitButton />
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label">
+            <strong>FileName</strong>
+          </label>
+          <div className="col">
+            <TextField
+              name="originalFilename"
+              className="col-sm-10"
+              initialValue={
+                isArray(originalFileName)
+                  ? originalFileName[0]
+                  : originalFileName
+              }
+            />
+          </div>
         </div>
+
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label">
+            <strong>DcType</strong>
+          </label>
+          <div className="col">
+            <SelectField options={DC_TYPE_OPTIONS} name="dcType" />
+          </div>
+        </div>
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label">
+            <strong>acDigitizationDate</strong>
+          </label>
+          <div className="col">
+            <DateField className="col-sm-10" name="acDigitizationDate" />
+          </div>
+        </div>
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label">
+            <strong>xmpMetadataDate</strong>
+          </label>
+          <div className="col">
+            <DateField className="col-sm-10" name="xmpMetadataDate" />
+          </div>
+        </div>
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label">
+            <strong>DcFormat</strong>
+          </label>
+          <div className="col">
+            <TextField name="dcFormat" className="col-sm-10" />
+          </div>
+        </div>
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label">
+            <strong>Agent</strong>
+          </label>
+          <div className="col">
+            <ResourceSelectField<Agent>
+              className="col-sm-5"
+              name="acMetadataCreator"
+              filter={filterBy(["displayName"])}
+              model="agent"
+              optionLabel={agent => agent.displayName}
+            />
+          </div>
+        </div>
+        <SubmitButton />
       </Form>
     </Formik>
   );
