@@ -12,6 +12,8 @@ export * from "./resources/workflow/Chain";
 export * from "./resources/workflow/ChainStepTemplate";
 export * from "./resources/workflow/ChainTemplate";
 export * from "./resources/workflow/IndexSet";
+export * from "./resources/workflow/LibraryPool";
+export * from "./resources/workflow/LibraryPoolContent";
 export * from "./resources/workflow/LibraryPrep";
 export * from "./resources/workflow/LibraryPrepBatch";
 export * from "./resources/workflow/NgsIndex";

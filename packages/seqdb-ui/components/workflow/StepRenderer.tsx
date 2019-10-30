@@ -1,4 +1,5 @@
 import { Chain, ChainStepTemplate } from "../../types/seqdb-api";
+import { LibraryPoolingStep } from "./library-pooling/LibraryPoolingStep";
 import { LibraryPrepStep } from "./library-prep/LibraryPrepStep";
 import { PreLibraryPrepStep } from "./pre-library-prep/PreLibraryPrepStep";
 import { SampleSelection } from "./sample-selection/SampleSelection";
@@ -18,6 +19,8 @@ export function StepRenderer(props: StepRendererProps) {
     case "SIZE_SELECTION":
     case "SHEARING":
       return <PreLibraryPrepStep {...props} />;
+    case "LIBRARY_POOL":
+      return <LibraryPoolingStep {...props} />;
     default:
       return null;
   }

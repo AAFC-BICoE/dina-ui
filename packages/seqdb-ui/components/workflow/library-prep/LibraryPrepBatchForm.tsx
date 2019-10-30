@@ -57,7 +57,7 @@ export function LibraryPrepBatchForm({
       const newStepResource: StepResource = {
         chain,
         chainStepTemplate: step,
-        libraryPrepBatch: newLibraryPrepBatch,
+        libraryPrepBatch: newLibraryPrepBatch as LibraryPrepBatch,
         type: "INPUT",
         value: "LIBRARY_PREP_BATCH"
       };

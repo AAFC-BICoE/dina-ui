@@ -7,6 +7,7 @@ import { IndexSet } from "./IndexSet";
 
 interface LibraryPrepBatchAttributes {
   totalLibraryYieldNm?: number;
+  type: "libraryPrepBatch";
   notes?: string;
   cleanUpNotes?: string;
   yieldNotes?: string;
