@@ -8,6 +8,7 @@ import { DateField, SelectField, TextField } from "../../lib";
 import { Agent } from "types/objectstore-api/resources/Agent";
 import { isArray } from "util";
 import { Head } from "../../components";
+import { AttributeBuilder } from "../../components/attribute-builder/AttributeBuilder";
 import { ResourceSelectField } from "../../lib/formik-connected/ResourceSelectField";
 
 interface EditMetadataFormProps {
@@ -33,7 +34,7 @@ export function EditMetadataFormPage({ router }: WithRouterProps) {
 
 function EditMetadataForm({ router, originalFileName }: EditMetadataFormProps) {
   const { apiClient } = useContext(ApiClientContext);
-
+  const managedAttributes = [];
   async function onSubmit(
     submittedValues,
     { setStatus, setSubmitting }: FormikActions<any>
@@ -68,7 +69,7 @@ function EditMetadataForm({ router, originalFileName }: EditMetadataFormProps) {
           <div className="col">
             <TextField
               name="originalFilename"
-              className="col-sm-10"
+              className="col-sm-6"
               initialValue={
                 isArray(originalFileName)
                   ? originalFileName[0]
@@ -77,18 +78,17 @@ function EditMetadataForm({ router, originalFileName }: EditMetadataFormProps) {
             />
           </div>
         </div>
-
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
             <strong>DcType</strong>
           </label>
-          <div className="col">
+          <div className="col col-sm-6">
             <SelectField options={DC_TYPE_OPTIONS} name="dcType" />
           </div>
         </div>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
-            <strong>acDigitizationDate</strong>
+            <strong>AcDigitizationDate</strong>
           </label>
           <div className="col">
             <DateField className="col-sm-10" name="acDigitizationDate" />
@@ -96,7 +96,7 @@ function EditMetadataForm({ router, originalFileName }: EditMetadataFormProps) {
         </div>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
-            <strong>xmpMetadataDate</strong>
+            <strong>XmpMetadataDate</strong>
           </label>
           <div className="col">
             <DateField className="col-sm-10" name="xmpMetadataDate" />
@@ -106,23 +106,27 @@ function EditMetadataForm({ router, originalFileName }: EditMetadataFormProps) {
           <label className="col-sm-2 col-form-label">
             <strong>DcFormat</strong>
           </label>
-          <div className="col">
-            <TextField name="dcFormat" className="col-sm-10" />
+          <div className="col-sm-6">
+            <TextField name="dcFormat" className="col-sm-6" />
           </div>
         </div>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
             <strong>Agent</strong>
           </label>
-          <div className="col">
+          <div className="col-sm-6">
             <ResourceSelectField<Agent>
-              className="col-sm-5"
+              className="col-sm-6"
               name="acMetadataCreator"
               filter={filterBy(["displayName"])}
               model="agent"
               optionLabel={agent => agent.displayName}
             />
           </div>
+        </div>
+        <h2> Edit Managed Attribute</h2>
+        <div className="form-group row">
+          <AttributeBuilder controlledAttributes={managedAttributes} />
         </div>
         <SubmitButton />
       </Form>

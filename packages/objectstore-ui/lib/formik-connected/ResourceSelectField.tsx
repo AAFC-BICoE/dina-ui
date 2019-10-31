@@ -17,7 +17,7 @@ export interface ResourceSelectFieldProps<TData>
 export function ResourceSelectField<TData extends KitsuResource>(
   topLevelProps: ResourceSelectFieldProps<TData>
 ) {
-  const { name, onChange = noop } = topLevelProps;
+  const { name, onChange = noop, initialValue } = topLevelProps;
 
   return (
     <Field name={name}>
@@ -35,7 +35,7 @@ export function ResourceSelectField<TData extends KitsuResource>(
           <ResourceSelect
             {...topLevelProps}
             onChange={onChangeInternal}
-            value={value}
+            value={initialValue ? initialValue : value}
           />
         );
       }}

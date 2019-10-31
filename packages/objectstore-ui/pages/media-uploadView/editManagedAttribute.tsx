@@ -10,7 +10,9 @@ interface ManagedAttributeFormProps {
   router: NextRouter;
 }
 
-const managedAttributes = ["specimenView", "object ID"];
+const managedAttributes = [
+  "Please select a managed attribute to set its value for"
+];
 
 function EditManagedAttribute({ router }: WithRouterProps) {
   return (
@@ -45,7 +47,7 @@ function ManagedAttributeForm({  }: ManagedAttributeFormProps) {
     <Formik initialValues={{}} onSubmit={onSubmit}>
       <Form>
         <div>
-          <AttributeBuilder managedAttributes={managedAttributes} />
+          <AttributeBuilder controlledAttributes={managedAttributes} />
           <div className="container">
             <div className="row">
               <div className="col-sm-1">

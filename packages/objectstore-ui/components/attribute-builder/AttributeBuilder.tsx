@@ -7,16 +7,13 @@ import {
 } from "./AttributeGroup";
 import { AttributeRow, AttributeRowModel } from "./AttributeRow";
 
-export type ManagedAttribute =
-  | string
-  | {
-      name: string;
-      label?: string;
-      allowRange?: boolean;
-    };
+export interface ControlledAttribute {
+  name: string;
+  value: string;
+}
 
 export interface AttributeBuilderProps {
-  managedAttributes: ManagedAttribute[];
+  controlledAttributes: ControlledAttribute[];
   value?: AttributeGroupModel;
   onChange?: (state: AttributeGroupModel) => void;
 }
@@ -89,7 +86,7 @@ export class AttributeBuilder extends React.Component<
     return {
       children: [
         {
-          attribute: this.props.managedAttributes[0],
+          attribute: this.props.controlledAttributes[0],
           id: this.getNewAttributeId(),
           type: "ATTRIBUTE_ROW",
           value: ""
@@ -101,30 +98,25 @@ export class AttributeBuilder extends React.Component<
   }
 
   /**
-   * Adds a new AttributeRow to the model. A new AttributeGroup is added if the operator is different
-   * than the clicked button's AttributeRow's parent group's operator.
+   * Adds a new AttributeRow to the model.
    */
   private addAttributeRow({
     after,
     parent
   }: {
-    /** The attribute to add a new one after, e.g. the attribute with the clicked button. */
+    /** The attribute to add a new one before, e.g. the attribute with the clicked button. */
     after: AttributeRowModel | AttributeGroupModel;
     /** The new attribute's parent group. */
     parent: AttributeGroupModel;
   }) {
     const newAttributeRow: AttributeRowModel = {
-      attribute: this.props.managedAttributes[0],
+      attribute: this.props.controlledAttributes[0],
       id: this.getNewAttributeId(),
       type: "ATTRIBUTE_ROW",
       value: ""
     };
 
-    parent.children.splice(
-      parent.children.indexOf(after) + 1,
-      0,
-      newAttributeRow
-    );
+    parent.children.splice(parent.children.indexOf(after), 0, newAttributeRow);
 
     // Re-render the component.
     this.forceUpdate();
@@ -196,7 +188,7 @@ export class AttributeBuilder extends React.Component<
             onAndClick={onAndClick}
             onChange={this.onChange}
             onRemoveClick={onRemoveClick}
-            managedAttributes={this.props.managedAttributes}
+            controlledAttributes={this.props.controlledAttributes}
             showRemoveButton={showRemoveButton}
           />
         );
@@ -205,6 +197,7 @@ export class AttributeBuilder extends React.Component<
   }
 
   private onChange = () => {
+    // this.props.controlledAttributes =
     const { onChange = () => undefined } = this.props;
     onChange(this.state.model);
   };
