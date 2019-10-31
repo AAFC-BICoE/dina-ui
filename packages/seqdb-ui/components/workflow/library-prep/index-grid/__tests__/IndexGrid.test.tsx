@@ -25,6 +25,7 @@ const TEST_LIBRARY_PREP_BATCH: LibraryPrepBatch = {
   },
   id: "10",
   indexSet: { id: "123", name: "test index set", type: "indexSet" },
+  name: "test library prep batch",
   type: "libraryPrepBatch"
 };
 

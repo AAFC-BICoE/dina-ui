@@ -33,6 +33,7 @@ function getWrapper(propsOverride?: Partial<LibraryPrepEditTableProps>) {
           },
           id: "5",
           indexSet: { id: "1234", name: "test index set", type: "indexSet" },
+          name: "test library prep batch",
           type: "libraryPrepBatch"
         }}
         chain={{ id: "5", type: "chain" } as Chain}
@@ -253,6 +254,7 @@ describe("LibraryPrepEditTable component", () => {
     const wrapper = getWrapper({
       libraryPrepBatch: {
         id: "5",
+        name: "test library prep batch",
         type: "libraryPrepBatch"
       }
     });

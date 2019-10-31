@@ -36,6 +36,7 @@ function getWrapper(propsOverride?: Partial<ContainerGridProps>) {
             type: "containerType"
           },
           id: "5",
+          name: "test library prep batch",
           type: "libraryPrepBatch"
         }}
         chain={{ id: "5", type: "chain" } as Chain}
@@ -589,6 +590,7 @@ describe("SampleGrid component", () => {
     const wrapper = getWrapper({
       libraryPrepBatch: {
         id: "5",
+        name: "test library prep batch",
         type: "libraryPrepBatch"
       }
     });

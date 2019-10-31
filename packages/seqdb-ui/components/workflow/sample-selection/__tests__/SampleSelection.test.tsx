@@ -285,7 +285,7 @@ describe("Sample Selection UI", () => {
       .prop("onClick")({ shiftKey: true, target: { checked: true } } as any);
     wrapper.update();
 
-    wrapper.find(".deselect-all-checked-button").simulate("click");
+    wrapper.find("button.deselect-all-checked-button").simulate("click");
 
     // Await available samples and selected samples queries.
     await new Promise(setImmediate);
