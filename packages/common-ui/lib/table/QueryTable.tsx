@@ -2,6 +2,7 @@ import { FieldsParam, FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import React, { useRef, useState } from "react";
 import ReactTable, {
   Column,
+  FilteredChangeFunction,
   PageSizeChangeFunction,
   SortedChangeFunction,
   SortingRule
@@ -46,6 +47,9 @@ export interface QueryTableProps<TData extends KitsuResource> {
   /** Overrides the inner loading state if set to true. */
   loading?: boolean;
 
+  /** Called when a table header filter is changed. */
+  onFilteredChange?: FilteredChangeFunction;
+
   /** Called when a new page size is requested. */
   onPageSizeChange?: PageSizeChangeFunction;
 
@@ -89,6 +93,7 @@ export function QueryTable<TData extends KitsuResource>({
   filter,
   include,
   loading: loadingProp,
+  onFilteredChange,
   onPageSizeChange,
   onSortedChange,
   onSuccess,
@@ -175,6 +180,14 @@ export function QueryTable<TData extends KitsuResource>({
       )}
       <span>Total matched records: {totalCount}</span>
       <ReactTable
+        FilterComponent={({ filter: headerFilter, onChange }) => (
+          <input
+            className="w-100"
+            placeholder="Search..."
+            value={headerFilter ? headerFilter.value : ""}
+            onChange={event => onChange(event.target.value)}
+          />
+        )}
         className="-striped"
         columns={mappedColumns}
         data={response && response.data}
@@ -184,6 +197,7 @@ export function QueryTable<TData extends KitsuResource>({
         manual={true}
         minRows={1}
         onFetchData={onFetchData}
+        onFilteredChange={onFilteredChange}
         onPageSizeChange={onPageSizeChange}
         onSortedChange={onSortedChange}
         pageSizeOptions={[25, 50, 100, 200, 500]}

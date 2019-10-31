@@ -6,12 +6,14 @@ import {
   useGroupedCheckBoxes
 } from "common-ui";
 import { Formik } from "formik";
-import { Dictionary, noop } from "lodash";
+import { FilterParam } from "kitsu";
+import { debounce, Dictionary, noop } from "lodash";
+import { useState } from "react";
+import { FilteredChangeFunction } from "react-table";
 import {
   LibraryPool,
   LibraryPoolContent,
-  LibraryPrepBatch,
-  StepResource
+  LibraryPrepBatch
 } from "../../../types/seqdb-api";
 import { useLibraryPoolingSelectionControls } from "./useLibraryPoolingSelectionControls";
 
@@ -54,14 +56,34 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     setAvailableItems: setLibraryPoolContents
   } = useGroupedCheckBoxes({ fieldName: "libraryPoolContentIdsToDelete" });
 
+  const [batchFilter, setBatchFilter] = useState<FilterParam>({});
+  const [poolFilter, setPoolFilter] = useState<FilterParam>({
+    rsql: `libraryPoolId!=${libraryPool.id}`
+  });
+
+  const onBatchNameFilterChange: FilteredChangeFunction = debounce(
+    (_, __, value) => setBatchFilter({ rsql: `name=='*${value}*'` }),
+    200
+  );
+  const onPoolNameFilterChange: FilteredChangeFunction = debounce(
+    (_, __, value) =>
+      setPoolFilter({
+        rsql: `libraryPoolId!=${libraryPool.id} and name=='*${value}*'`
+      }),
+    200
+  );
+
   const LIBRARY_PREP_BATCH_TABLE_COLUMNS: Array<
-    ColumnDefinition<StepResource>
+    ColumnDefinition<LibraryPrepBatch>
   > = [
-    "chain.name",
-    "libraryPrepBatch.id",
+    {
+      Header: "Name",
+      accessor: "name",
+      filterable: true
+    },
     {
       Cell: ({ original }) => {
-        const batch: LibraryPrepBatch = original.libraryPrepBatch;
+        const batch: LibraryPrepBatch = original;
 
         return (
           <div className="row" key={batch.id}>
@@ -88,11 +110,15 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     }
   ];
 
-  const LIBRARY_POOL_TABLE_COLUMNS: Array<ColumnDefinition<StepResource>> = [
-    "libraryPool.name",
+  const LIBRARY_POOL_TABLE_COLUMNS: Array<ColumnDefinition<LibraryPool>> = [
+    {
+      Header: "Name",
+      accessor: "name",
+      filterable: true
+    },
     {
       Cell: ({ original }) => {
-        const pool: LibraryPool = original.libraryPool;
+        const pool: LibraryPool = original;
 
         return (
           <div className="row" key={pool.id}>
@@ -193,32 +219,24 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
           <div className="col-5">
             <div className="form-group">
               <strong>Library Prep Batches</strong>
-              <QueryTable<StepResource>
+              <QueryTable<LibraryPrepBatch>
                 columns={LIBRARY_PREP_BATCH_TABLE_COLUMNS}
                 deps={[lastSave]}
-                filter={{
-                  rsql: "libraryPrepBatch.libraryPrepBatchId!=null"
-                }}
-                include="chain,libraryPrepBatch"
-                onSuccess={res =>
-                  setAvailableBatchs(res.data.map(sr => sr.libraryPrepBatch))
-                }
-                path="stepResource"
+                filter={batchFilter}
+                onFilteredChange={onBatchNameFilterChange}
+                onSuccess={res => setAvailableBatchs(res.data)}
+                path="libraryPrepBatch"
               />
             </div>
             <div className="form-group">
               <strong>Library Pools</strong>
-              <QueryTable<StepResource>
+              <QueryTable<LibraryPool>
                 columns={LIBRARY_POOL_TABLE_COLUMNS}
                 deps={[lastSave]}
-                filter={{
-                  rsql: `libraryPool.libraryPoolId!=${libraryPool.id}`
-                }}
-                include="libraryPool"
-                onSuccess={res =>
-                  setAvailablePools(res.data.map(sr => sr.libraryPool))
-                }
-                path="stepResource"
+                filter={poolFilter}
+                onFilteredChange={onPoolNameFilterChange}
+                onSuccess={res => setAvailablePools(res.data)}
+                path="libraryPool"
               />
             </div>
           </div>
