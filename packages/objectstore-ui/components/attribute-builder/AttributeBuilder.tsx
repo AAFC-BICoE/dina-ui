@@ -113,10 +113,17 @@ export class AttributeBuilder extends React.Component<
       attribute: this.props.controlledAttributes[0],
       id: this.getNewAttributeId(),
       type: "ATTRIBUTE_ROW",
-      value: ""
+      value: "Plus"
     };
 
-    parent.children.splice(parent.children.indexOf(after), 0, newAttributeRow);
+    if (after.type === "ATTRIBUTE_ROW") {
+      after.value = "";
+    }
+    parent.children.splice(
+      parent.children.indexOf(after) + 1,
+      0,
+      newAttributeRow
+    );
 
     // Re-render the component.
     this.forceUpdate();
@@ -178,9 +185,14 @@ export class AttributeBuilder extends React.Component<
         );
       }
       case "ATTRIBUTE_ROW": {
-        // Don't show the remove button when this is the only AttributeRow.
-        const showRemoveButton = !isEqual(this.state.model.children, [model]);
-
+        // Show the add button when this is the only AttributeRow or it is the very bottom row for editing
+        const showPlusButton =
+          isEqual(model.value, "Plus") ||
+          isEqual(this.state.model.children, [model]);
+        // Don't show the remove button when this is the only AttributeRow
+        // show the remove button when there is a new row added due to user editing new attribute
+        const showRemoveButton =
+          !isEqual(this.state.model.children, [model]) && !showPlusButton;
         return (
           <AttributeRow
             key={model.id}
@@ -190,6 +202,7 @@ export class AttributeBuilder extends React.Component<
             onRemoveClick={onRemoveClick}
             controlledAttributes={this.props.controlledAttributes}
             showRemoveButton={showRemoveButton}
+            showPlusButton={showPlusButton}
           />
         );
       }

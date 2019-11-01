@@ -15,19 +15,21 @@ export interface AttributeRowProps {
   controlledAttributes: ControlledAttribute[];
   model: AttributeRowModel;
   showRemoveButton: boolean;
+  showPlusButton: boolean;
   onAndClick: () => void;
   onChange: () => void;
   onRemoveClick: () => void;
 }
 
-export interface ManagedAttributeOption {
-  label: string;
-  value: ControlledAttribute;
-}
-
 export class AttributeRow extends React.Component<AttributeRowProps> {
   public render() {
-    const { model, onAndClick, onRemoveClick, showRemoveButton } = this.props;
+    const {
+      showPlusButton,
+      model,
+      onAndClick,
+      onRemoveClick,
+      showRemoveButton
+    } = this.props;
 
     return (
       <div className="list-inline">
@@ -44,7 +46,7 @@ export class AttributeRow extends React.Component<AttributeRowProps> {
         </div>
 
         <div className="filter-row-buttons list-inline-item">
-          {model.id === 1 && (
+          {showPlusButton && (
             <button
               className="list-inline-item btn btn-primary"
               onClick={onAndClick}
@@ -54,7 +56,7 @@ export class AttributeRow extends React.Component<AttributeRowProps> {
             </button>
           )}
 
-          {showRemoveButton && model.id !== 1 && (
+          {showRemoveButton && (
             <button
               className="list-inline-item btn btn-dark"
               onClick={onRemoveClick}
