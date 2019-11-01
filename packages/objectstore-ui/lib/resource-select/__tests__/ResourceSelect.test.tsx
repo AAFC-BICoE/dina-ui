@@ -1,13 +1,13 @@
-import { mount } from "enzyme";
-import { KitsuResource } from "kitsu";
-import lodash from "lodash";
-import Select from "react-select/base";
 import {
   ApiClientContext,
   createContextValue,
   ResourceSelect,
   ResourceSelectProps
-} from "../..";
+} from "common-ui";
+import { mount } from "enzyme";
+import { KitsuResource } from "kitsu";
+import lodash from "lodash";
+import Select from "react-select/base";
 
 /** Example */
 interface Todo extends KitsuResource {
