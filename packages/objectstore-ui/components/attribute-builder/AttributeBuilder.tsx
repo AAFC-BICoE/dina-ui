@@ -1,10 +1,6 @@
 import { isEqual, pull } from "lodash";
 import React from "react";
-import {
-  // AttributeGroup,
-  AttributeGroup,
-  AttributeGroupModel
-} from "./AttributeGroup";
+import { AttributeGroup, AttributeGroupModel } from "./AttributeGroup";
 import { AttributeRow, AttributeRowModel } from "./AttributeRow";
 
 export interface ControlledAttribute {

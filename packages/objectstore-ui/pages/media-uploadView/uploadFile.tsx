@@ -97,7 +97,7 @@ function UploadViewForm({ router }: UploadViewFormProps) {
     <Formik initialValues={{}} onSubmit={onSubmit}>
       <Form>
         <div id="dndRoot">
-          <div {...getRootProps({ style })} className="container">
+          <div {...getRootProps({ style })} className="container root">
             <input {...getInputProps()} />
             <div>
               <div>Drag and drop files here or click to open browse dialog</div>

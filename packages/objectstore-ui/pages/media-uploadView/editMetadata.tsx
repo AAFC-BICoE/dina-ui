@@ -1,4 +1,4 @@
-import { ApiClientContext, filterBy, SubmitButton } from "common-ui";
+import { ApiClientContext, filterBy, serialize, SubmitButton } from "common-ui";
 import { Form, Formik, FormikActions } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
@@ -7,8 +7,7 @@ import { DateField, SelectField, TextField } from "../../lib";
 
 import { Agent } from "types/objectstore-api/resources/Agent";
 import { isArray } from "util";
-import { Head } from "../../components";
-import { AttributeBuilder } from "../../components/attribute-builder/AttributeBuilder";
+import { AttributeBuilder, Head } from "../../components";
 import { ResourceSelectField } from "../../lib/formik-connected/ResourceSelectField";
 
 interface EditMetadataFormProps {
@@ -21,7 +20,6 @@ export function EditMetadataFormPage({ router }: WithRouterProps) {
   return (
     <div>
       <Head title="Add Metadata" />
-
       <div className="container-fluid">
         <div>
           <h1>Edit Metadata</h1>
@@ -32,7 +30,7 @@ export function EditMetadataFormPage({ router }: WithRouterProps) {
   );
 }
 
-function EditMetadataForm({ router, originalFileName }: EditMetadataFormProps) {
+function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
   const { apiClient } = useContext(ApiClientContext);
   const managedAttributes = [];
   async function onSubmit(
@@ -40,23 +38,71 @@ function EditMetadataForm({ router, originalFileName }: EditMetadataFormProps) {
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
     try {
-      const data = {
-        attributes: submittedValues,
-        type: "metadata"
-      };
-
+      const metaManagedAttributes = new Array();
+      generateManagedAttributeValue(metaManagedAttributes, submittedValues);
       const config = {
         headers: {
           "Content-Type": "application/vnd.api+json",
           "Crnk-Compact": "true"
         }
       };
-      apiClient.axios.post("/metadata", { data }, config);
-      router.push(`/media-uploadView/editManagedAttribute`);
+      const serializePromises = serialize({
+        resource: submittedValues,
+        type: "metadata"
+      });
+      const serialized = await serializePromises;
+
+      let mydata = { data: serialized };
+
+      const response = await apiClient.axios.post("/metadata", mydata, config);
+
+      const metaID = response.data.data.id;
+
+      metaManagedAttributes.forEach(async a => {
+        a.relationships.objectStoreMetadata.data.id = metaID;
+        mydata = { data: a };
+        await apiClient.axios.post(
+          "/metadata-managed-attribute",
+          mydata,
+          config
+        );
+      });
+
+      // router.push(`/media-uploadView/editMetadata`);
     } catch (error) {
       setStatus(error.message);
     }
     setSubmitting(false);
+  }
+
+  function generateManagedAttributeValue(
+    metaManagedAttributes,
+    submittedValues
+  ) {
+    for (const x in submittedValues) {
+      if (/^key_/.test(x) && submittedValues["assignedValue" + x.substr(4)]) {
+        const metaManagedAttribute = {
+          attributes: {
+            assignedValue: submittedValues["assignedValue" + x.substr(4)]
+          },
+          relationships: {
+            managedAttribute: {
+              data: submittedValues[x]
+            },
+            objectStoreMetadata: {
+              data: {
+                id: "variable",
+                type: "metadata"
+              }
+            }
+          },
+          type: "metadata-managed-attribute"
+        };
+        metaManagedAttributes.push(metaManagedAttribute);
+        delete submittedValues[x];
+        delete submittedValues["assignedValue" + x.substr(4)];
+      }
+    }
   }
 
   return (

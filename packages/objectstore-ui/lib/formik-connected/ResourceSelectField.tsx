@@ -1,10 +1,7 @@
+import { ResourceSelect, ResourceSelectProps } from "common-ui";
 import { Field, FieldProps } from "formik";
 import { KitsuResource } from "kitsu";
 import { noop } from "lodash";
-import {
-  ResourceSelect,
-  ResourceSelectProps
-} from "../resource-select/ResourceSelect";
 import { LabelWrapperParams } from "./FieldWrapper";
 
 export interface ResourceSelectFieldProps<TData>
@@ -17,7 +14,7 @@ export interface ResourceSelectFieldProps<TData>
 export function ResourceSelectField<TData extends KitsuResource>(
   topLevelProps: ResourceSelectFieldProps<TData>
 ) {
-  const { name, onChange = noop, initialValue } = topLevelProps;
+  const { name, onChange = noop } = topLevelProps;
 
   return (
     <Field name={name}>
@@ -35,7 +32,7 @@ export function ResourceSelectField<TData extends KitsuResource>(
           <ResourceSelect
             {...topLevelProps}
             onChange={onChangeInternal}
-            value={initialValue ? initialValue : value}
+            value={value}
           />
         );
       }}
