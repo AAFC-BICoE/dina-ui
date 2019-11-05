@@ -10,6 +10,7 @@ import { FilterParam } from "kitsu";
 import { debounce, Dictionary, noop } from "lodash";
 import { useState } from "react";
 import { FilteredChangeFunction } from "react-table";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
   LibraryPool,
   LibraryPoolContent,
@@ -168,7 +169,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     {
       Cell: ({ original: content }) =>
         content.pooledLibraryPrepBatch
-          ? `Library ${content.pooledLibraryPrepBatch.id}`
+          ? content.pooledLibraryPrepBatch.name
           : content.pooledLibraryPool
           ? content.pooledLibraryPool.name
           : "",
@@ -217,28 +218,32 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
         <ErrorViewer />
         <div className="row">
           <div className="col-5">
-            <div className="form-group">
-              <strong>Library Prep Batches</strong>
-              <QueryTable<LibraryPrepBatch>
-                columns={LIBRARY_PREP_BATCH_TABLE_COLUMNS}
-                deps={[lastSave]}
-                filter={batchFilter}
-                onFilteredChange={onBatchNameFilterChange}
-                onSuccess={res => setAvailableBatchs(res.data)}
-                path="libraryPrepBatch"
-              />
-            </div>
-            <div className="form-group">
-              <strong>Library Pools</strong>
-              <QueryTable<LibraryPool>
-                columns={LIBRARY_POOL_TABLE_COLUMNS}
-                deps={[lastSave]}
-                filter={poolFilter}
-                onFilteredChange={onPoolNameFilterChange}
-                onSuccess={res => setAvailablePools(res.data)}
-                path="libraryPool"
-              />
-            </div>
+            <Tabs>
+              <TabList>
+                <Tab>Library Prep Batches</Tab>
+                <Tab>Library Pools</Tab>
+              </TabList>
+              <TabPanel>
+                <QueryTable<LibraryPrepBatch>
+                  columns={LIBRARY_PREP_BATCH_TABLE_COLUMNS}
+                  deps={[lastSave]}
+                  filter={batchFilter}
+                  onFilteredChange={onBatchNameFilterChange}
+                  onSuccess={res => setAvailableBatchs(res.data)}
+                  path="libraryPrepBatch"
+                />
+              </TabPanel>
+              <TabPanel>
+                <QueryTable<LibraryPool>
+                  columns={LIBRARY_POOL_TABLE_COLUMNS}
+                  deps={[lastSave]}
+                  filter={poolFilter}
+                  onFilteredChange={onPoolNameFilterChange}
+                  onSuccess={res => setAvailablePools(res.data)}
+                  path="libraryPool"
+                />
+              </TabPanel>
+            </Tabs>
           </div>
           <div className="col-2" style={{ marginTop: "100px" }}>
             <div className="row">

@@ -73,9 +73,11 @@ function WorkflowSteps({ chain }: { chain: Chain }) {
             </TabList>
           </div>
           <div className="list-inline-item">
-            <button className="btn btn-primary" onClick={goToNextStep}>
-              Next Step
-            </button>
+            {stepNumber < steps.length && (
+              <button className="btn btn-primary" onClick={goToNextStep}>
+                Next Step
+              </button>
+            )}
           </div>
         </div>
         <TabPanel>
