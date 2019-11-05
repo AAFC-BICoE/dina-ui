@@ -1,4 +1,10 @@
-import { ApiClientContext, filterBy, serialize, SubmitButton } from "common-ui";
+import {
+  ApiClientContext,
+  ErrorViewer,
+  filterBy,
+  serialize,
+  SubmitButton
+} from "common-ui";
 import { Form, Formik, FormikActions } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
@@ -51,24 +57,24 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
         type: "metadata"
       });
       const serialized = await serializePromises;
-
       let mydata = { data: serialized };
-
       const response = await apiClient.axios.post("/metadata", mydata, config);
-
-      const metaID = response.data.data.id;
-
-      metaManagedAttributes.forEach(async a => {
-        a.relationships.objectStoreMetadata.data.id = metaID;
-        mydata = { data: a };
-        await apiClient.axios.post(
-          "/metadata-managed-attribute",
-          mydata,
-          config
+      if (response.data.data) {
+        const metaID = response.data.data.id;
+        metaManagedAttributes.forEach(async a => {
+          a.relationships.objectStoreMetadata.data.id = metaID;
+          mydata = { data: a };
+          await apiClient.axios.post(
+            "/metadata-managed-attribute",
+            mydata,
+            config
+          );
+        });
+      } else {
+        setStatus(
+          response.data.errors[0].title + ": " + response.data.errors[0].detail
         );
-      });
-
-      // router.push(`/media-uploadView/editMetadata`);
+      }
     } catch (error) {
       setStatus(error.message);
     }
@@ -153,7 +159,7 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
             <strong>DcFormat</strong>
           </label>
           <div className="col-sm-6">
-            <TextField name="dcFormat" className="col-sm-6" />
+            <TextField name="dcFormat" className="col-sm-6 dcFormat" />
           </div>
         </div>
         <div className="form-group row">
@@ -175,6 +181,7 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
           <AttributeBuilder controlledAttributes={managedAttributes} />
         </div>
         <SubmitButton />
+        <ErrorViewer />
       </Form>
     </Formik>
   );
