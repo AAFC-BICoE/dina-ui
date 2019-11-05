@@ -35,11 +35,10 @@ function mountWithContext(element: JSX.Element) {
 
 describe("Metadata edit page", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
 
     mockGet.mockImplementation(async model => {
       if (model === "agent") {
-        // The request for the product returns the test product.
         return {
           data: [
             {
@@ -64,42 +63,8 @@ describe("Metadata edit page", () => {
     });
   });
 
-  it("Renders an error after form submit if one is returned from the back-end.", async () => {
-    // The patch request will return an error.
-    mockPost.mockImplementationOnce(() => ({
-      data: {
-        errors: [
-          {
-            detail: "name size must be between 1 and 10",
-            status: "422",
-            title: "Constraint violation"
-          }
-        ],
-        status: 422
-      }
-    }));
-
-    const wrapper = mountWithContext(
-      <EditMetadataFormPage router={{ query: {}, push: mockPush } as any} />
-    );
-
-    wrapper.find(".form-group.row .dcFormat").simulate("change", {
-      target: { name: "dcFormat", value: "new assigned value" }
-    });
-
-    wrapper.find("form").simulate("submit");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-      "Constraint violation: name size must be between 1 and 10"
-    );
-    expect(mockPush).toBeCalledTimes(0);
-  });
-
   it("Provides a form to edit a metadata.", async () => {
-    // The patch request will be successful.
+    // The post request will be successful.
     mockPost.mockReturnValueOnce({
       data: {
         data: {
@@ -125,43 +90,62 @@ describe("Metadata edit page", () => {
     // Check that the existing add button is displayed
     expect(addButton).toBeTruthy();
 
-    // Modify the "designedBy" value.
-    /*fireEvent.change(wrapper.find("input").getDOMNode(),
-      {target: { name: "key_1", value: "new assigned value" }}
-    );
+    wrapper.find(".dcFormat").simulate("change", {
+      target: { name: "dcFormat", value: "IMAGING" }
+    });
 
     // Submit the form.
-    container.querySelector("form").simulate("submit");
+    wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      // "patch" should have been called with a jsonpatch request containing the existing values
-      // and the modified one.
-      expect(mockPatch).lastCalledWith(
-        "post",
-        
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockPost).lastCalledWith(
+      "/metadata",
+      {
+        data: {
+          attributes: {
+            dcFormat: "IMAGING",
+            type: undefined
+          },
+
+          type: "metadata"
+        }
+      },
+      expect.anything()
+    );
+  });
+
+  it("Renders an error after form submit if one is returned from the back-end.", async () => {
+    // The post request will return an error.
+    mockPost.mockImplementationOnce(() => ({
+      data: {
+        errors: [
           {
-              attributes: expect.objectContaining({
-                assignedValue: 'new assigned value'
-              }),
-              id: "1",
-              relationships: {
-                objectStoreMetadata: {
-                  data: expect.objectContaining({ id: "1", type: "metadata" })
-                },
-                managedAttribute: {
-                  data: expect.objectContaining({ id: "2", type: "managed-attribute" })
-                }
-              },
-              type: "metadata-managed-attribute"
-            }
-               ,
-        expect.anything()
-      );
+            detail: "DcType is mandatory",
+            status: "422",
+            title: "Constraint violation"
+          }
+        ],
+        status: 422
+      }
+    }));
 
-      // The user should be redirected to the existing image's details page.
-      //expect(mockPush).lastCalledWith("/pcr-primer/view?id=1");
-      
-      done();
-    });*/
+    const wrapper = mountWithContext(
+      <EditMetadataFormPage router={{ query: {}, push: mockPush } as any} />
+    );
+
+    wrapper.find(".form-group.row .dcFormat").simulate("change", {
+      target: { name: "dcFormat", value: "new assigned value" }
+    });
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
+      "Constraint violation: DcType is mandatory"
+    );
   });
 });

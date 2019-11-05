@@ -27,6 +27,7 @@ export function TextField(props: LabelWrapperParams) {
             onChange={onChange}
             type="text"
             value={initialValue ? initialValue : value || ""}
+            id={name}
           />
         );
       }}

@@ -1,7 +1,7 @@
+import { LabelWrapperParams } from "common-ui";
 import { Field, FieldProps } from "formik";
 import { noop } from "lodash";
 import Select from "react-select";
-import { LabelWrapperParams } from "./FieldWrapper";
 
 export interface SelectFieldProps extends LabelWrapperParams {
   onChange?: (value?: string) => void;

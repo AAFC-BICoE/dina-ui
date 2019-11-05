@@ -13,7 +13,7 @@ import { DateField, SelectField, TextField } from "../../lib";
 
 import { Agent } from "types/objectstore-api/resources/Agent";
 import { isArray } from "util";
-import { AttributeBuilder, Head } from "../../components";
+import { AttributeBuilder, Head, Nav } from "../../components";
 import { ResourceSelectField } from "../../lib/formik-connected/ResourceSelectField";
 
 interface EditMetadataFormProps {
@@ -26,9 +26,10 @@ export function EditMetadataFormPage({ router }: WithRouterProps) {
   return (
     <div>
       <Head title="Add Metadata" />
+      <Nav />
       <div className="container-fluid">
         <div>
-          <h1>Edit Metadata</h1>
+          <h4>Edit Metadata</h4>
           <EditMetadataForm router={router} originalFileName={fileName} />
         </div>
       </div>
@@ -135,7 +136,11 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
             <strong>DcType</strong>
           </label>
           <div className="col col-sm-6">
-            <SelectField options={DC_TYPE_OPTIONS} name="dcType" />
+            <SelectField
+              options={DC_TYPE_OPTIONS}
+              name="dcType"
+              className="dcType"
+            />
           </div>
         </div>
         <div className="form-group row">
@@ -176,7 +181,7 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
             />
           </div>
         </div>
-        <h2> Edit Managed Attribute</h2>
+        <h4> Edit Managed Attribute</h4>
         <div className="form-group row">
           <AttributeBuilder controlledAttributes={managedAttributes} />
         </div>

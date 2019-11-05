@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { useDropzone } from "react-dropzone";
-import { Head } from "../../components";
+import { Head, Nav } from "../../components";
 
 const baseStyle = {
   alignItems: "center",
@@ -34,9 +34,10 @@ function MediaUploadViewPage() {
   return (
     <div>
       <Head title="Upload files" />
+      <Nav />
       <div className="container-fluid">
         <div>
-          <h1>Upload File</h1>
+          <h4>Upload File</h4>
           <UploadViewForm />
         </div>
       </div>

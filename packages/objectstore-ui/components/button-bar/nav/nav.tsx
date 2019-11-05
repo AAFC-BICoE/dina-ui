@@ -10,7 +10,7 @@ export function Nav() {
           className="navbar-brand"
           style={{ color: "#1465b7", fontWeight: "bold" }}
         >
-          Sequence Database
+          Object Store
         </a>
       </Link>
     </nav>
