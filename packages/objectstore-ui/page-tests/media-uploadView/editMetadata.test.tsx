@@ -89,7 +89,7 @@ describe("Metadata edit page", () => {
     expect(addButton).toBeTruthy();
 
     wrapper.find(".dcFormat-field input").simulate("change", {
-      target: { name: "dcFormat", value: "IMAGING" }
+      target: { name: "dcFormat", value: "dcFormat" }
     });
 
     // Submit the form.
@@ -101,7 +101,7 @@ describe("Metadata edit page", () => {
         {
           data: {
             attributes: {
-              dcFormat: "IMAGING",
+              dcFormat: "dcFormat",
               originalFilename: "file",
               type: undefined
             },

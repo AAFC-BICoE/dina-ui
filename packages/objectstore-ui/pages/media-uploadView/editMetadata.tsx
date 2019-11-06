@@ -40,11 +40,14 @@ export function EditMetadataFormPage({ router }: WithRouterProps) {
 
 function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
   const { apiClient } = useContext(ApiClientContext);
-  const initialValues = {
-    originalFilename: isArray(originalFileName)
-      ? originalFileName[0]
-      : originalFileName
-  };
+  let initialValues = {};
+  if (originalFileName) {
+    initialValues = {
+      originalFilename: isArray(originalFileName)
+        ? originalFileName[0]
+        : originalFileName
+    };
+  }
   const managedAttributes = [];
   async function onSubmit(
     submittedValues,
