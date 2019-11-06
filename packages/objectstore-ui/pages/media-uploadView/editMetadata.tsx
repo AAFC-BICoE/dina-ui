@@ -2,19 +2,20 @@ import {
   ApiClientContext,
   ErrorViewer,
   filterBy,
+  ResourceSelectField,
   serialize,
-  SubmitButton
+  SubmitButton,
+  TextField
 } from "common-ui";
+import { DateField, SelectField } from "common-ui";
 import { Form, Formik, FormikActions } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
-import { DateField, SelectField, TextField } from "../../lib";
 
 import { Agent } from "types/objectstore-api/resources/Agent";
 import { isArray } from "util";
 import { AttributeBuilder, Head, Nav } from "../../components";
-import { ResourceSelectField } from "../../lib/formik-connected/ResourceSelectField";
 
 interface EditMetadataFormProps {
   router: NextRouter;
@@ -39,6 +40,11 @@ export function EditMetadataFormPage({ router }: WithRouterProps) {
 
 function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
   const { apiClient } = useContext(ApiClientContext);
+  const initialValues = {
+    originalFilename: isArray(originalFileName)
+      ? originalFileName[0]
+      : originalFileName
+  };
   const managedAttributes = [];
   async function onSubmit(
     submittedValues,
@@ -113,7 +119,7 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
   }
 
   return (
-    <Formik initialValues={{}} onSubmit={onSubmit}>
+    <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
@@ -123,11 +129,7 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
             <TextField
               name="originalFilename"
               className="col-sm-6"
-              initialValue={
-                isArray(originalFileName)
-                  ? originalFileName[0]
-                  : originalFileName
-              }
+              hideLabel={true}
             />
           </div>
         </div>
@@ -140,6 +142,7 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
               options={DC_TYPE_OPTIONS}
               name="dcType"
               className="dcType"
+              hideLabel={true}
             />
           </div>
         </div>
@@ -148,7 +151,12 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
             <strong>AcDigitizationDate</strong>
           </label>
           <div className="col">
-            <DateField className="col-sm-10" name="acDigitizationDate" />
+            <DateField
+              className="col-sm-10"
+              name="acDigitizationDate"
+              hideLabel={true}
+              showTime={true}
+            />
           </div>
         </div>
         <div className="form-group row">
@@ -156,7 +164,12 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
             <strong>XmpMetadataDate</strong>
           </label>
           <div className="col">
-            <DateField className="col-sm-10" name="xmpMetadataDate" />
+            <DateField
+              className="col-sm-10"
+              name="xmpMetadataDate"
+              hideLabel={true}
+              showTime={true}
+            />
           </div>
         </div>
         <div className="form-group row">
@@ -164,7 +177,11 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
             <strong>DcFormat</strong>
           </label>
           <div className="col-sm-6">
-            <TextField name="dcFormat" className="col-sm-6 dcFormat" />
+            <TextField
+              name="dcFormat"
+              className="col-sm-6 dcFormat"
+              hideLabel={true}
+            />
           </div>
         </div>
         <div className="form-group row">
@@ -178,6 +195,7 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
               filter={filterBy(["displayName"])}
               model="agent"
               optionLabel={agent => agent.displayName}
+              hideLabel={true}
             />
           </div>
         </div>

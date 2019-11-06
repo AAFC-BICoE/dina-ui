@@ -13,6 +13,8 @@ const mockPush = jest.fn();
 
 const mockGet = jest.fn();
 
+const flushPromises = () => new Promise(setImmediate);
+
 // Mock Kitsu, the client class that talks to the backend.
 jest.mock(
   "kitsu",
@@ -36,7 +38,6 @@ function mountWithContext(element: JSX.Element) {
 describe("Metadata edit page", () => {
   beforeEach(() => {
     jest.resetAllMocks();
-
     mockGet.mockImplementation(async model => {
       if (model === "agent") {
         return {
@@ -63,7 +64,7 @@ describe("Metadata edit page", () => {
     });
   });
 
-  it("Provides a form to edit a metadata.", async () => {
+  it("Provides a form to edit a metadata.", done => {
     // The post request will be successful.
     mockPost.mockReturnValueOnce({
       data: {
@@ -82,38 +83,36 @@ describe("Metadata edit page", () => {
     );
     const wrapper = mountWithContext(ui);
 
-    await Promise.resolve();
-    wrapper.update();
-
     const addButton = wrapper.find("button.list-inline-item.btn.btn-primary");
 
     // Check that the existing add button is displayed
     expect(addButton).toBeTruthy();
 
-    wrapper.find(".dcFormat").simulate("change", {
+    wrapper.find(".dcFormat-field input").simulate("change", {
       target: { name: "dcFormat", value: "IMAGING" }
     });
 
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    await new Promise(setImmediate);
-    wrapper.update();
+    setImmediate(() => {
+      expect(mockPost).lastCalledWith(
+        "/metadata",
+        {
+          data: {
+            attributes: {
+              dcFormat: "IMAGING",
+              originalFilename: "file",
+              type: undefined
+            },
 
-    expect(mockPost).lastCalledWith(
-      "/metadata",
-      {
-        data: {
-          attributes: {
-            dcFormat: "IMAGING",
-            type: undefined
-          },
-
-          type: "metadata"
-        }
-      },
-      expect.anything()
-    );
+            type: "metadata"
+          }
+        },
+        expect.anything()
+      );
+      done();
+    });
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
@@ -135,15 +134,14 @@ describe("Metadata edit page", () => {
       <EditMetadataFormPage router={{ query: {}, push: mockPush } as any} />
     );
 
-    wrapper.find(".form-group.row .dcFormat").simulate("change", {
+    wrapper.find(".dcFormat-field input").simulate("change", {
       target: { name: "dcFormat", value: "new assigned value" }
     });
 
     wrapper.find("form").simulate("submit");
 
-    await new Promise(setImmediate);
+    await flushPromises();
     wrapper.update();
-
     expect(wrapper.find(".alert.alert-danger").text()).toEqual(
       "Constraint violation: DcType is mandatory"
     );

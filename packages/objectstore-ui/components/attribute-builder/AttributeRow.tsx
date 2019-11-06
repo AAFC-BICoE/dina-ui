@@ -1,7 +1,7 @@
 import { filterBy } from "common-ui";
+import { ResourceSelectField, TextField } from "common-ui";
 import React from "react";
 import { ManagedAttribute } from "types/objectstore-api/resources/ManagedAttribute";
-import { ResourceSelectField, TextField } from "../../lib";
 import { ControlledAttribute } from "./AttributeBuilder";
 
 export interface AttributeRowModel {
@@ -39,10 +39,11 @@ export class AttributeRow extends React.Component<AttributeRowProps> {
             filter={filterBy(["name"])}
             model="managed-attribute"
             optionLabel={managedAttribute => managedAttribute.name}
+            hideLabel={true}
           />
         </div>
         <div className="list-inline-item" style={{ width: 180 }}>
-          <TextField name={`assignedValue${model.id}`} />
+          <TextField name={`assignedValue${model.id}`} hideLabel={true} />
         </div>
 
         <div className="filter-row-buttons list-inline-item">
