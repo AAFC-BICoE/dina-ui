@@ -6,7 +6,7 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
  * a wrapper that adds a label.
  */
 export function TextField(props: LabelWrapperParams) {
-  const { className, name, label, tooltipMsg } = props;
+  const { className, name, label, tooltipMsg, hideLabel } = props;
 
   return (
     <FieldWrapper
@@ -14,6 +14,7 @@ export function TextField(props: LabelWrapperParams) {
       name={name}
       label={label}
       tooltipMsg={tooltipMsg}
+      hideLabel={hideLabel}
     >
       <Field name={name}>
         {({

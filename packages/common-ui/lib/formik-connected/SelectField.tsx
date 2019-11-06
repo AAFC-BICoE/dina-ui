@@ -6,7 +6,6 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 export interface SelectFieldProps extends LabelWrapperParams {
   onChange?: (value?: string) => void;
   options: any[];
-  tooltipMsg?: string;
 }
 
 /** Formik-connected select input. */
@@ -16,7 +15,8 @@ export function SelectField({
   label,
   onChange = noop,
   options,
-  tooltipMsg
+  tooltipMsg,
+  hideLabel
 }: SelectFieldProps) {
   return (
     <Field name={name}>
@@ -36,6 +36,7 @@ export function SelectField({
             name={name}
             label={label}
             tooltipMsg={tooltipMsg}
+            hideLabel={hideLabel}
           >
             <Select
               options={options}
