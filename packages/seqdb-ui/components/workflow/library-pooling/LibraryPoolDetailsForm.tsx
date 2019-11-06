@@ -14,7 +14,7 @@ import {
   StepResource
 } from "../../../types/seqdb-api";
 
-interface LibraryPoolDetailsFormProps {
+export interface LibraryPoolDetailsFormProps {
   chain: Chain;
   libraryPool?: LibraryPool;
   onSuccess: () => void;

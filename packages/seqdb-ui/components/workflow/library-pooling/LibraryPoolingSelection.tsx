@@ -217,7 +217,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
       <>
         <ErrorViewer />
         <div className="row">
-          <div className="col-5">
+          <div className="col-5 library-pool-content-selection-table">
             <Tabs>
               <TabList>
                 <Tab>Library Prep Batches</Tab>
@@ -265,7 +265,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
               </div>
             </div>
           </div>
-          <div className="col-5">
+          <div className="col-5 library-pool-content-table">
             <strong>Selected Pool Contents</strong>
             <QueryTable<LibraryPoolContent>
               columns={LIBRARY_POOL_CONTENTS_TABLE_COLUMNS}
