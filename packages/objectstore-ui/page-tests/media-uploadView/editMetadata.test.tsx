@@ -102,7 +102,7 @@ describe("Metadata edit page", () => {
           data: {
             attributes: {
               dcFormat: "dcFormat",
-              originalFilename: "file",
+              originalFilename: expect.anything(),
               type: undefined
             },
 
@@ -133,9 +133,8 @@ describe("Metadata edit page", () => {
     const wrapper = mountWithContext(
       <EditMetadataFormPage router={{ query: {}, push: mockPush } as any} />
     );
-
-    wrapper.find(".dcFormat-field input").simulate("change", {
-      target: { name: "dcFormat", value: "new assigned value" }
+    wrapper.find(".originalFilename-field input").simulate("change", {
+      target: { name: "originalFilename", value: "newfile" }
     });
 
     wrapper.find("form").simulate("submit");

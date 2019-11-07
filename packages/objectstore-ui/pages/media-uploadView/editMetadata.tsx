@@ -14,7 +14,6 @@ import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 
 import { Agent } from "types/objectstore-api/resources/Agent";
-import { isArray } from "util";
 import { AttributeBuilder, Head, Nav } from "../../components";
 
 interface EditMetadataFormProps {
@@ -40,14 +39,6 @@ export function EditMetadataFormPage({ router }: WithRouterProps) {
 
 function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
   const { apiClient } = useContext(ApiClientContext);
-  let initialValues = {};
-  if (originalFileName) {
-    initialValues = {
-      originalFilename: isArray(originalFileName)
-        ? originalFileName[0]
-        : originalFileName
-    };
-  }
   const managedAttributes = [];
   async function onSubmit(
     submittedValues,
@@ -55,6 +46,10 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
   ) {
     try {
       const metaManagedAttributes = new Array();
+      // add back the original file name, as this should always be there
+      if (originalFileName) {
+        submittedValues.originalFilename = originalFileName;
+      }
       generateManagedAttributeValue(metaManagedAttributes, submittedValues);
       const config = {
         headers: {
@@ -122,7 +117,7 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
   }
 
   return (
-    <Formik initialValues={initialValues} onSubmit={onSubmit}>
+    <Formik initialValues={{}} onSubmit={onSubmit}>
       <Form>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
@@ -131,8 +126,10 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
           <div className="col">
             <TextField
               name="originalFilename"
-              className="col-sm-6"
+              className="col-sm-6 originalFilename"
               hideLabel={true}
+              readOnly={true}
+              initialValue={originalFileName}
             />
           </div>
         </div>
