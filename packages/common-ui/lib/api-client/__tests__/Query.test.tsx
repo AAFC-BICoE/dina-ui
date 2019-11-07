@@ -181,7 +181,10 @@ describe("Query component", () => {
     expect(mockGet).toHaveBeenCalledTimes(1);
 
     // Get the params of the last call to Kitsu's GET method.
-    const [path, getParams] = last(mockGet.mock.calls);
+    const [path, getParams] = last(mockGet.mock.calls) || [
+      undefined,
+      undefined
+    ];
     expect(path).toEqual("todo");
 
     // The Query's GET params should not have any values explicitly set to undefined.
@@ -209,7 +212,10 @@ describe("Query component", () => {
 
     expect(mockGet).toHaveBeenCalledTimes(1);
     // Get the params of the last call to Kitsu's GET method.
-    const [path, getParams] = last(mockGet.mock.calls);
+    const [path, getParams] = last(mockGet.mock.calls) || [
+      undefined,
+      undefined
+    ];
     expect(path).toEqual("todo");
     expect(getParams).toEqual({
       fields: { todo: "name,description" },

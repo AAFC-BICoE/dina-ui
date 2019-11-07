@@ -35,7 +35,7 @@ function TestComponent() {
     <Formik initialValues={{ checkedIds: {} }} onSubmit={mockOnSubmit}>
       <Form>
         {TEST_SAMPLES.map(s => (
-          <CheckBoxField key={s.id} resource={s} />
+          <CheckBoxField key={String(s.id)} resource={s} />
         ))}
         <CheckBoxHeader />
       </Form>
@@ -61,7 +61,7 @@ describe("Grouped check boxes hook", () => {
     wrapper
       .find("input[type='checkbox']")
       .at(2)
-      .prop("onClick")({ target: { checked: true } } as any);
+      .prop<any>("onClick")({ target: { checked: true } } as any);
 
     wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
@@ -79,7 +79,7 @@ describe("Grouped check boxes hook", () => {
     wrapper
       .find("input[type='checkbox']")
       .at(1)
-      .prop("onClick")({ target: { checked: true } } as any);
+      .prop<any>("onClick")({ target: { checked: true } } as any);
 
     wrapper.update();
 
@@ -87,7 +87,10 @@ describe("Grouped check boxes hook", () => {
     wrapper
       .find("input[type='checkbox']")
       .at(3)
-      .prop("onClick")({ shiftKey: true, target: { checked: true } } as any);
+      .prop<any>("onClick")({
+      shiftKey: true,
+      target: { checked: true }
+    } as any);
 
     wrapper.update();
 
@@ -115,14 +118,17 @@ describe("Grouped check boxes hook", () => {
     wrapper
       .find("input[type='checkbox']")
       .at(3)
-      .prop("onClick")({ target: { checked: true } } as any);
+      .prop<any>("onClick")({ target: { checked: true } } as any);
     wrapper.update();
 
     // Shift+click the second checkbox.
     wrapper
       .find("input[type='checkbox']")
       .at(1)
-      .prop("onClick")({ shiftKey: true, target: { checked: true } } as any);
+      .prop<any>("onClick")({
+      shiftKey: true,
+      target: { checked: true }
+    } as any);
     wrapper.update();
 
     // Boxes 2 to 4 should be checked.
@@ -149,7 +155,7 @@ describe("Grouped check boxes hook", () => {
     expect(wrapper.text().includes("(0 selected)")).toEqual(true);
 
     // Check the check-all box.
-    wrapper.find("input.check-all-checkbox").prop("onClick")({
+    wrapper.find("input.check-all-checkbox").prop<any>("onClick")({
       target: { checked: true }
     } as any);
     wrapper.update();
@@ -166,7 +172,7 @@ describe("Grouped check boxes hook", () => {
     );
 
     // Uncheck the check-all box.
-    wrapper.find("input.check-all-checkbox").prop("onClick")({
+    wrapper.find("input.check-all-checkbox").prop<any>("onClick")({
       target: { checked: false }
     } as any);
     wrapper.update();

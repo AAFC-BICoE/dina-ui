@@ -168,12 +168,15 @@ describe("Sample Selection UI", () => {
     wrapper
       .find(".available-samples .rt-tbody input[type='checkbox']")
       .at(2)
-      .prop("onClick")({ target: { checked: true } } as any);
+      .prop<any>("onClick")({ target: { checked: true } } as any);
     wrapper.update();
     wrapper
       .find(".available-samples .rt-tbody input[type='checkbox']")
       .at(4)
-      .prop("onClick")({ shiftKey: true, target: { checked: true } } as any);
+      .prop<any>("onClick")({
+      shiftKey: true,
+      target: { checked: true }
+    } as any);
     wrapper.update();
 
     wrapper.find("button.select-all-checked-button").simulate("click");
@@ -277,12 +280,15 @@ describe("Sample Selection UI", () => {
     wrapper
       .find(".selected-samples .rt-tbody input[type='checkbox']")
       .at(1)
-      .prop("onClick")({ target: { checked: true } } as any);
+      .prop<any>("onClick")({ target: { checked: true } } as any);
     wrapper.update();
     wrapper
       .find(".selected-samples .rt-tbody input[type='checkbox']")
       .at(3)
-      .prop("onClick")({ shiftKey: true, target: { checked: true } } as any);
+      .prop<any>("onClick")({
+      shiftKey: true,
+      target: { checked: true }
+    } as any);
     wrapper.update();
 
     wrapper.find(".deselect-all-checked-button").simulate("click");
