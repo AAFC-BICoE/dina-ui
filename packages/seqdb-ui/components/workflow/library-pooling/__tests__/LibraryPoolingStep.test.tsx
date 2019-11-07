@@ -334,4 +334,192 @@ describe("LibraryPoolingStep component", () => {
       ]
     ]);
   });
+
+  it("Renders the library pool details form when there is no existing library pool for this workflow", async () => {
+    // Don't return the library pool step resource:
+    mockGet.mockImplementation(async model => {
+      if (model === "libraryPrepBatch") {
+        return { data: TEST_LIBRARY_PREP_BATCHS };
+      } else if (model === "libraryPool") {
+        return { data: TEST_LIBRARY_POOLS };
+      } else if (model === "stepResource") {
+        return { data: [] };
+      } else {
+        return { data: [] };
+      }
+    });
+
+    const wrapper = getWrapper();
+
+    // Await initial queries.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Change the name:
+    wrapper
+      .find(".name-field")
+      .find("input")
+      .simulate("change", {
+        target: { name: "name", value: "edited name" }
+      });
+
+    // Return a library pool step resource:
+    mockGet.mockImplementation(async model => {
+      if (model === "libraryPrepBatch") {
+        return { data: TEST_LIBRARY_PREP_BATCHS };
+      } else if (model === "libraryPool") {
+        return { data: TEST_LIBRARY_POOLS };
+      } else if (model === "stepResource") {
+        return { data: [TEST_LIBRARY_POOL_STEPRESOURCE] };
+      } else if (model === "libraryPool/100/contents") {
+        return { data: TEST_LIBRARY_POOL_CONTENTS };
+      } else {
+        return { data: [] };
+      }
+    });
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(".name-field p").exists()).toEqual(true);
+  });
+
+  it("Provides a button to edit the existing library pool.", async () => {
+    const wrapper = getWrapper();
+
+    // Await initial queries:
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper
+      .find("button[children='Edit Library Pool Details']")
+      .simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(".name-field input").exists()).toEqual(true);
+  });
+
+  it("Lets you select a single library prep batch for pooling.", async () => {
+    const wrapper = getWrapper();
+
+    // Await initial queries:
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper
+      .find(".library-pool-content-selection-table button.single-select-button")
+      .first()
+      .simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              libraryPool: {
+                id: "100",
+                name: "test pool",
+                type: "libraryPool"
+              },
+              pooledLibraryPool: null,
+              pooledLibraryPrepBatch: {
+                id: "1",
+                name: "test batch 1",
+                type: "libraryPrepBatch"
+              },
+              type: "libraryPoolContent"
+            },
+            type: "libraryPoolContent"
+          }
+        ]
+      ]
+    ]);
+  });
+
+  it("Lets you select a single library pool for pooling.", async () => {
+    const wrapper = getWrapper();
+
+    // Await initial queries:
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Switch to the library pools tab:
+    wrapper
+      .find("li.react-tabs__tab[children='Library Pools']")
+      .simulate("click");
+
+    // Await pools query:
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper
+      .find(".library-pool-content-selection-table button.single-select-button")
+      .first()
+      .simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              libraryPool: {
+                id: "100",
+                name: "test pool",
+                type: "libraryPool"
+              },
+              pooledLibraryPool: {
+                id: "1",
+                name: "test pool 1",
+                type: "libraryPool"
+              },
+              pooledLibraryPrepBatch: null,
+              type: "libraryPoolContent"
+            },
+            type: "libraryPoolContent"
+          }
+        ]
+      ]
+    ]);
+  });
+
+  it("Lets you delete a single LibraryPoolContent", async () => {
+    const wrapper = getWrapper();
+
+    // Await initial queries:
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper
+      .find(".library-pool-content-table button.single-remove-button")
+      .first()
+      .simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockDoOperations.mock.calls).toEqual([
+      [
+        [
+          {
+            op: "DELETE",
+            path: "libraryPoolContent/6",
+            value: {
+              id: "6",
+              type: "libraryPoolContent"
+            }
+          }
+        ]
+      ]
+    ]);
+  });
 });

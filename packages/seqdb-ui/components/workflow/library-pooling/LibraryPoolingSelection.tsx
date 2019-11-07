@@ -183,7 +183,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
         return (
           <div className="row" key={lpc.id}>
             <FormikButton
-              className="btn btn-dark btn-sm col-6 single-select-button"
+              className="btn btn-dark btn-sm col-6 single-remove-button"
               onClick={async (_, formik) => {
                 await deleteLibraryPoolContents([lpc]);
                 formik.setFieldValue(

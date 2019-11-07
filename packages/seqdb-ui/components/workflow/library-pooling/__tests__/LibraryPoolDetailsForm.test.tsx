@@ -112,7 +112,7 @@ describe("LibraryPoolDetailsForm component", () => {
       libraryPool: {
         id: "2",
         name: "existing test library pool",
-        type: "libraryPrepBatch"
+        type: "libraryPool"
       }
     });
 
@@ -140,7 +140,7 @@ describe("LibraryPoolDetailsForm component", () => {
             resource: {
               id: "2",
               name: "edited name",
-              type: "libraryPrepBatch"
+              type: "libraryPool"
             },
             type: "libraryPool"
           }
