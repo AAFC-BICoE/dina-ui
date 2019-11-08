@@ -13,16 +13,18 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 
+import { isArray } from "lodash";
 import { Agent } from "types/objectstore-api/resources/Agent";
 import { AttributeBuilder, Head, Nav } from "../../components";
 
 interface EditMetadataFormProps {
   router: NextRouter;
   originalFileName: string | string[];
+  fileIdentifier: string | string[];
 }
 
 export function EditMetadataFormPage({ router }: WithRouterProps) {
-  const { fileName } = router.query;
+  const { fileName, fileId } = router.query;
   return (
     <div>
       <Head title="Add Metadata" />
@@ -30,14 +32,21 @@ export function EditMetadataFormPage({ router }: WithRouterProps) {
       <div className="container-fluid">
         <div>
           <h4>Edit Metadata</h4>
-          <EditMetadataForm router={router} originalFileName={fileName} />
+          <EditMetadataForm
+            router={router}
+            originalFileName={fileName}
+            fileIdentifier={fileId}
+          />
         </div>
       </div>
     </div>
   );
 }
 
-function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
+function EditMetadataForm({
+  originalFileName,
+  fileIdentifier
+}: EditMetadataFormProps) {
   const { apiClient } = useContext(ApiClientContext);
   const managedAttributes = [];
   async function onSubmit(
@@ -48,8 +57,17 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
       const metaManagedAttributes = new Array();
       // add back the original file name, as this should always be there
       if (originalFileName) {
-        submittedValues.originalFilename = originalFileName;
+        submittedValues.originalFilename = isArray(originalFileName)
+          ? originalFileName[0]
+          : originalFileName;
       }
+      if (fileIdentifier) {
+        submittedValues.fileIdentifier = isArray(fileIdentifier)
+          ? fileIdentifier[0]
+          : fileIdentifier;
+      }
+      // this will be replaced by config?
+      submittedValues.bucket = "mybucket";
       generateManagedAttributeValue(metaManagedAttributes, submittedValues);
       const config = {
         headers: {
@@ -63,6 +81,7 @@ function EditMetadataForm({ originalFileName }: EditMetadataFormProps) {
       });
       const serialized = await serializePromises;
       let mydata = { data: serialized };
+
       const response = await apiClient.axios.post("/metadata", mydata, config);
       if (response.data.data) {
         const metaID = response.data.data.id;

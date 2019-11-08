@@ -78,7 +78,12 @@ describe("Metadata edit page", () => {
 
     const ui = (
       <EditMetadataFormPage
-        router={{ query: { fileName: "file" }, push: mockPush } as any}
+        router={
+          {
+            push: mockPush,
+            query: { fileName: "file", fileId: "fileId" }
+          } as any
+        }
       />
     );
     const wrapper = mountWithContext(ui);
@@ -101,8 +106,10 @@ describe("Metadata edit page", () => {
         {
           data: {
             attributes: {
+              bucket: "mybucket",
               dcFormat: "dcFormat",
-              originalFilename: expect.anything(),
+              fileIdentifier: "fileId",
+              originalFilename: "file",
               type: undefined
             },
 

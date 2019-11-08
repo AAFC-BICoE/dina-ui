@@ -1,6 +1,15 @@
-import React, { useMemo } from "react";
+import axios from "axios";
+import { ErrorViewer, SubmitButton } from "common-ui";
+import { Form, Formik, FormikActions } from "formik";
+import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Head, Nav } from "../../components";
+
+interface FileUploadResponse {
+  fileName: string;
+  fileType: string;
+  size: string;
+}
 
 const baseStyle = {
   alignItems: "center",
@@ -56,7 +65,7 @@ function UploadViewForm() {
   } = useDropzone({
     accept: "image/*,audio/*,video/*,.pdf,.doc,docx,.png"
   });
-
+  const [fileId, setFileId] = useState();
   const acceptedFilesItems = acceptedFiles.map(file => (
     <li key={file.name}>
       <p />
@@ -74,43 +83,81 @@ function UploadViewForm() {
     [isDragActive, isDragReject]
   );
 
+  async function onSubmit(
+    submittedValues,
+    { setStatus, setSubmitting }: FormikActions<any>
+  ) {
+    try {
+      const response = save();
+      setFileId((await response).fileName);
+      setStatus(acceptedFiles[0].name + " submitted successfully!");
+    } catch (error) {
+      setStatus(
+        error.message + ", " + " submittedValues are: " + submittedValues
+      );
+    }
+    setSubmitting(false);
+  }
+
+  /*send one file to service due to current implementation */
+  async function save(): Promise<FileUploadResponse> {
+    const formData = new FormData();
+    formData.append("file", acceptedFiles[0]);
+    const axiosResponse = await axios({
+      data: formData,
+      method: "post",
+      url: "/api/v1/file/mybucket"
+    });
+    return axiosResponse.data;
+  }
+
   return (
-    <div id="dndRoot">
-      <div {...getRootProps({ style })} className="container root">
-        <input {...getInputProps()} />
-        <div>
-          <div>Drag and drop files here or click to open browse dialog</div>
+    <div>
+      <div id="dndRoot">
+        <div {...getRootProps({ style })} className="container root">
+          <input {...getInputProps()} />
           <div>
-            (Only image, audio, video, .pdf, .doc and docx are accepted)
+            <div>Drag and drop files here or click to open browse dialog</div>
+            <div>
+              (Only image, audio, video, .pdf, .doc and docx are accepted)
+            </div>
           </div>
         </div>
-      </div>
-      <div className="container">
-        <ul>{acceptedFilesItems}</ul>
+        <div className="container">
+          <ul>{acceptedFilesItems}</ul>
+        </div>
       </div>
 
       <div className="container">
-        <div className="row">
-          <div className="col-md-2">
-            {acceptedFiles && acceptedFiles.length > 0 ? (
-              <a
-                href={`/media-uploadView/editMetadata?fileName=${acceptedFiles[0].name}`}
-                className="btn btn-info"
-                role="button"
-              >
-                Edit Metadata
-              </a>
-            ) : (
-              <a
-                href={`/media-uploadView/editMetadata`}
-                className="btn btn-info"
-                role="button"
-              >
-                Edit Metadata
-              </a>
-            )}
-          </div>
-        </div>
+        <Formik initialValues={{}} onSubmit={onSubmit}>
+          <Form>
+            <ErrorViewer />
+            <div className="row">
+              <div className="col-md-2">
+                <SubmitButton />
+              </div>
+              <div className="col-md-2">
+                {acceptedFiles && acceptedFiles.length > 0 ? (
+                  <a
+                    href={`/media-uploadView/editMetadata?fileName=${acceptedFiles[0].name}&fileId=${fileId}`}
+                    className="btn btn-info"
+                    role="button"
+                  >
+                    Edit Metadata
+                  </a>
+                ) : (
+                  <a
+                    href={`/media-uploadView/editMetadata`}
+                    className="btn btn-info"
+                    role="button"
+                  >
+                    Edit Metadata
+                  </a>
+                )}
+              </div>
+            </div>
+          </Form>
+        </Formik>
       </div>
     </div>
   );
