@@ -49,6 +49,9 @@ function EditMetadataForm({
 }: EditMetadataFormProps) {
   const { apiClient } = useContext(ApiClientContext);
   const managedAttributes = [];
+  const unManagedAttributes = [
+    { name: "unManagedAttribute", value: "unManagedValue" }
+  ];
   async function onSubmit(
     submittedValues,
     { setStatus, setSubmitting }: FormikActions<any>
@@ -81,7 +84,6 @@ function EditMetadataForm({
       });
       const serialized = await serializePromises;
       let mydata = { data: serialized };
-
       const response = await apiClient.axios.post("/metadata", mydata, config);
       if (response.data.data) {
         const metaID = response.data.data.id;
@@ -218,9 +220,16 @@ function EditMetadataForm({
             />
           </div>
         </div>
-        <h4> Edit Managed Attribute</h4>
-        <div className="form-group row">
-          <AttributeBuilder controlledAttributes={managedAttributes} />
+
+        <div className="row">
+          <div className="col-sm-6 ">
+            <h4> Edit Managed Attribute</h4>
+            <AttributeBuilder controlledAttributes={managedAttributes} />
+          </div>
+          <div className="col-sm-4">
+            <h4> Edit UnManaged Attribute</h4>
+            <AttributeBuilder controlledAttributes={unManagedAttributes} />
+          </div>
         </div>
         <SubmitButton />
         <ErrorViewer />
