@@ -80,12 +80,19 @@ export function LibraryPrepStep(props: StepRendererProps) {
         <div className="form-group">
           <LibraryPrepBatchDetails libraryPrepBatch={libraryPrepBatch} />
         </div>
-        <div className="form-group">
+        <div className="form-group list-inline">
           <Link
-            href={`/workflow/library-prep-worksheet?stepResourceId=${stepResource.id}`}
+            href={`/workflow/library-prep-worksheet?stepResourceId=${stepResource.id}&sampleLayout=table`}
           >
-            <a className="btn btn-primary" target="_blank">
-              Library Prep Worksheet
+            <a className="list-inline-item btn btn-primary" target="_blank">
+              Library Prep Worksheet With Table
+            </a>
+          </Link>
+          <Link
+            href={`/workflow/library-prep-worksheet?stepResourceId=${stepResource.id}&sampleLayout=grid`}
+          >
+            <a className="list-inline-item btn btn-primary" target="_blank">
+              Library Prep Worksheet With Grid
             </a>
           </Link>
         </div>

@@ -2,14 +2,24 @@ import { LoadingSpinner, useQuery } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Head } from "../../components";
-import { LibraryPrep, StepResource } from "../../types/seqdb-api";
+import {
+  LibraryPrep,
+  LibraryPrepBatch,
+  StepResource
+} from "../../types/seqdb-api";
 
 export function LibraryPrepWorksheetPage({ router }: WithRouterProps) {
-  const { stepResourceId } = router.query;
+  const { stepResourceId, sampleLayout } = router.query;
 
   const { loading: srLoading, response: srResponse } = useQuery<StepResource>({
-    include:
-      "libraryPrepBatch,libraryPrepBatch.protocol,libraryPrepBatch.thermocyclerProfile,libraryPrepBatch.indexSet,chain",
+    include: [
+      "libraryPrepBatch",
+      "libraryPrepBatch.protocol",
+      "libraryPrepBatch.thermocyclerProfile",
+      "libraryPrepBatch.indexSet",
+      "libraryPrepBatch.containerType",
+      "chain"
+    ].join(","),
     path: `stepResource/${stepResourceId}`
   });
 
@@ -144,7 +154,17 @@ export function LibraryPrepWorksheetPage({ router }: WithRouterProps) {
             <BigField label="Results and next steps" />
           </div>
         </div>
-        <LibraryPrepTable preps={prepsResponse.data} />
+        {sampleLayout === "table" ? (
+          <LibraryPrepTable
+            libraryPrepBatch={batch}
+            preps={prepsResponse.data}
+          />
+        ) : sampleLayout === "grid" ? (
+          <LibraryPrepGrid
+            libraryPrepBatch={batch}
+            preps={prepsResponse.data}
+          />
+        ) : null}
       </div>
     </div>
   );
@@ -173,6 +193,7 @@ function BigField({ label, defaultValue = "" }) {
 }
 
 interface LibraryPrepTableProps {
+  libraryPrepBatch: LibraryPrepBatch;
   preps: LibraryPrep[];
 }
 
@@ -206,6 +227,75 @@ function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
             </tr>
           );
         })}
+      </tbody>
+    </table>
+  );
+}
+
+function LibraryPrepGrid({ libraryPrepBatch, preps }: LibraryPrepTableProps) {
+  const { containerType } = libraryPrepBatch;
+
+  if (!containerType) {
+    return null;
+  }
+
+  const cellGrid: { [key: string]: LibraryPrep } = {};
+
+  const libraryPrepsWithCoords = preps.filter(
+    prep => prep.wellRow && prep.wellColumn
+  );
+  for (const prep of libraryPrepsWithCoords) {
+    cellGrid[`${prep.wellRow}_${prep.wellColumn}`] = prep;
+  }
+
+  const { numberOfColumns, numberOfRows } = containerType;
+
+  const rowLetters = [...Array(numberOfRows).keys()].map(num =>
+    String.fromCharCode(num + 65)
+  );
+  const columnNumbers = [...Array(numberOfColumns).keys()].map(num => num + 1);
+
+  return (
+    <table className="table table-bordered table-sm">
+      <tbody>
+        <tr>
+          <td />
+          {columnNumbers.map(num => (
+            <td>{num}</td>
+          ))}
+        </tr>
+        {rowLetters.map(rowLetter => (
+          <tr key={rowLetter}>
+            <td>{rowLetter}</td>
+            {columnNumbers.map(columnNumber => {
+              const prep = cellGrid[`${rowLetter}_${columnNumber}`];
+
+              return (
+                <td key={columnNumber}>
+                  {prep && (
+                    <div className="h-100 w-100">
+                      <div>{prep.sample.name}</div>
+                      <div>
+                        {prep.indexI5 && (
+                          <div>
+                            <strong>i5: </strong>
+                            {prep.indexI5.name}
+                          </div>
+                        )}
+                        {prep.indexI7 && (
+                          <div>
+                            <strong>i7: </strong>
+                            {prep.indexI7.name}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </td>
+              );
+            })}
+          </tr>
+        ))}
       </tbody>
     </table>
   );

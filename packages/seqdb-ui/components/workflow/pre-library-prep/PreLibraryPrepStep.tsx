@@ -145,9 +145,9 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                     {formikProps.isSubmitting ? (
                       <LoadingSpinner loading={true} />
                     ) : (
-                      <>
+                      <div className="list-inline">
                         <button
-                          className="btn btn-dark remove-shearing"
+                          className="list-inline-item btn btn-warning remove-shearing"
                           onClick={() =>
                             deleteStepResources("SHEARING", formikProps)
                           }
@@ -156,7 +156,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                           Remove selected Shearing details
                         </button>
                         <button
-                          className="btn btn-dark remove-size-selection"
+                          className="list-inline-item btn btn-warning remove-size-selection"
                           onClick={() =>
                             deleteStepResources("SIZE_SELECTION", formikProps)
                           }
@@ -164,7 +164,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                         >
                           Remove selected Size Selection details
                         </button>
-                      </>
+                      </div>
                     )}
                   </div>
                   <QueryTable
