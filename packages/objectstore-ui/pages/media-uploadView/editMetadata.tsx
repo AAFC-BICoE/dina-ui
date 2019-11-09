@@ -111,6 +111,7 @@ function EditMetadataForm({
     metaManagedAttributes,
     submittedValues
   ) {
+    const acTags = new Set();
     for (const x in submittedValues) {
       if (/^key_/.test(x) && submittedValues["assignedValue" + x.substr(4)]) {
         const metaManagedAttribute = {
@@ -133,7 +134,13 @@ function EditMetadataForm({
         metaManagedAttributes.push(metaManagedAttribute);
         delete submittedValues[x];
         delete submittedValues["assignedValue" + x.substr(4)];
+      } else if (/^assignedValue_un/.test(x) && submittedValues[x]) {
+        acTags.add(submittedValues[x]);
+        delete submittedValues[x];
       }
+    }
+    if (acTags.size > 0) {
+      submittedValues.acTags = acTags;
     }
   }
 

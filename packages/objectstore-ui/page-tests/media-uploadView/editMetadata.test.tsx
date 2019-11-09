@@ -122,6 +122,60 @@ describe("Metadata edit page", () => {
     });
   });
 
+  it("Provides a form to edit a metadata with unmanaged attribute.", done => {
+    // The post request will be successful.
+    mockPost.mockReturnValueOnce({
+      data: {
+        data: {
+          attributes: {
+            bucket: "mybucket"
+          },
+          id: "3406712e-1722-467a-9284-49887cb9f2d1",
+          type: "metadata"
+        },
+        status: 201
+      }
+    });
+
+    const ui = (
+      <EditMetadataFormPage
+        router={
+          {
+            push: mockPush,
+            query: {}
+          } as any
+        }
+      />
+    );
+    const wrapper = mountWithContext(ui);
+
+    wrapper.find(".assignedValue_un1-field input").simulate("change", {
+      target: { name: "assignedValue_un1", value: "anything2" }
+    });
+
+    // Submit the form.
+    wrapper.find("form").simulate("submit");
+
+    setImmediate(() => {
+      expect(mockPost).lastCalledWith(
+        "/metadata",
+        {
+          data: {
+            attributes: {
+              acTags: new Set(["anything2"]),
+              bucket: "mybucket",
+              type: undefined
+            },
+
+            type: "metadata"
+          }
+        },
+        expect.anything()
+      );
+      done();
+    });
+  });
+
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
     // The post request will return an error.
     mockPost.mockImplementationOnce(() => ({
