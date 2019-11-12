@@ -1,4 +1,4 @@
-import * as Blob from "blob-polyfill";
+import * as Blob from "blob";
 
 export interface FileDownLoadResponseAttributes {
   body: Blob;
