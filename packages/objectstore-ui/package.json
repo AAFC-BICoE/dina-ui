@@ -18,7 +18,7 @@
     "@testing-library/react": "^9.3.0",
     "@zeit/next-css": "^1.0.1",
     "axios": "^0.18.1",
-    "blob-polyfill": "^4.0.20190430",
+    "blob": "0.0.5",
     "bootswatch": "^4.2.1",
     "common-ui": "link:../common-ui",
     "core-js": "^3.2.1",

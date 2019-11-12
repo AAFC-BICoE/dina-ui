@@ -18,12 +18,13 @@ function useImageQuery(id: string): DownloadFileResponse {
 
   // Memoize the callback. Only re-create it when the query spec changes.
   const fetchData = useCallback(() => {
-    // Omit undefined values from the GET params, which would otherwise cause an invalid request.
-    // e.g. /api/region?fields=undefined
     const getParams = omitBy<GetParams>({}, isUndefined);
 
-    const request = apiClient.axios.get("/v1/file/mybucket/" + id, getParams);
-    return request;
+    const downloadResponse = apiClient.axios.get(
+      "/v1/file/mybucket/" + id,
+      getParams
+    );
+    return downloadResponse;
   }, [id]);
 
   // fetchData function should re-run when the query spec changes.
@@ -33,27 +34,57 @@ function useImageQuery(id: string): DownloadFileResponse {
   return {
     error: task.error ? task.error.message : "",
     loading: !!task.pending,
-    response: task.result ? task.result.data : undefined
+    response: task.result
+      ? {
+          body: task.result.data,
+          headers: task.result.headers,
+          status: task.result.status
+        }
+      : null
   };
 }
 
 export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
   const id = router.query.id;
-  const { error, loading, response } = useImageQuery(isArray(id) ? id[0] : id);
+  const { response } = useImageQuery(isArray(id) ? id[0] : id);
   return (
     <div>
       <Head title="Object Store Detailes Page" />
       <Nav />
       <div className="container-fluid">
         <h4>Object Store Details</h4>
-        {error.length === 0 &&
-          !loading &&
-          response &&
-          response.status === "200" && (
-            <div className="row">
-              <img src="${response.body}" />
-            </div>
-          )}
+        {response && response.headers["content-type"].indexOf("image") > -1 ? (
+          <div className="row">
+            <img
+              src={`/api/v1/file/mybucket/${id}`}
+              style={{ width: 400, height: "80%" }}
+            />
+          </div>
+        ) : response && response.headers["content-type"].indexOf("png") > -1 ? (
+          <div className="row">
+            <img
+              src={`https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg`}
+              style={{ width: 400, height: "80%" }}
+            />
+          </div>
+        ) : response &&
+          response.headers["content-type"].indexOf("/msword") > -1 ? (
+          <div className="row">
+            <img
+              src={`https://cdn2.iconfinder.com/data/icons/flat-file-types-1-1/300/icon_file-DOC_plano-512.png`}
+              style={{ width: 400, height: "80%" }}
+            />
+          </div>
+        ) : response ? (
+          <div className="row">
+            <img
+              src={`https://ya-webdesign.com/transparent250_/files-icon-png.png`}
+              style={{ width: 400, height: "80%" }}
+            />
+          </div>
+        ) : (
+          <p>No File to display</p>
+        )}
       </div>
     </div>
   );
