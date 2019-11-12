@@ -60,7 +60,7 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
               style={{ width: 400, height: "80%" }}
             />
           </div>
-        ) : response && response.headers["content-type"].indexOf("png") > -1 ? (
+        ) : response && response.headers["content-type"].indexOf("pdf") > -1 ? (
           <div className="row">
             <img
               src={`https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg`}
