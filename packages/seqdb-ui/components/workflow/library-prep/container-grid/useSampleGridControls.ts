@@ -17,6 +17,10 @@ interface ContainerGridProps {
   libraryPrepBatch: LibraryPrepBatch;
 }
 
+interface SampleStepResource {
+  sample: Sample;
+}
+
 export function useSampleGridControls({
   chain,
   libraryPrepBatch,
@@ -79,7 +83,9 @@ export function useSampleGridControls({
           .map(prep => prep.sample.id)
           .join();
 
-        const { data: selectionStepSrs } = await apiClient.get("stepResource", {
+        const { data: selectionStepSrsNoCoords } = await apiClient.get<
+          SampleStepResource[]
+        >("stepResource", {
           // Get all the sample stepResources from the sample selection step that have no coords.
           fields: {
             sample: "name"
@@ -93,9 +99,8 @@ export function useSampleGridControls({
           page: { limit: 1000 }
         });
 
-        const newAvailableSamples = selectionStepSrs
+        const newAvailableSamples = selectionStepSrsNoCoords
           .map(sr => sr.sample)
-          .filter(({ id }) => !sampleIdsWithCoords.includes(id))
           .sort(sampleSort);
 
         setGridState({
@@ -171,7 +176,7 @@ export function useSampleGridControls({
         }
       } else {
         // Add the sample to the list.
-        newAvailableSamples = [...availableSamples, ...samples];
+        newAvailableSamples = [...newAvailableSamples, ...samples];
       }
 
       // Set every sample passed into this function as moved.

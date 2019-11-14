@@ -78,6 +78,13 @@ export function LibraryPrepBatchForm({
       <Form>
         <ErrorViewer />
         <div className="row">
+          <TextField
+            className="col-md-2"
+            label="Library Prep Batch Name"
+            name="name"
+          />
+        </div>
+        <div className="row">
           <ResourceSelectField<Product>
             className="col-md-2"
             name="product"

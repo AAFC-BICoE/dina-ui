@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { Head } from "../../components";
 import { LibraryPrep, StepResource } from "../../types/seqdb-api";
 
-export function LibraryPrepWorksheetPage() {
+export default function LibraryPrepWorksheetPage() {
   const {
     query: { stepResourceId }
   } = useRouter();

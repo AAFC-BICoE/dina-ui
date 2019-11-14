@@ -71,7 +71,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
 
     return (
       <>
-        <h2>Library Batch Prep</h2>
+        <h2>Library Prep Batch</h2>
         <button
           className="btn btn-primary float-right"
           onClick={() => setEditBatchDetails(true)}
