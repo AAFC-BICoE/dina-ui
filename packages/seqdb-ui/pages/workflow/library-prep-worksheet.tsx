@@ -112,6 +112,7 @@ export default function LibraryPrepWorksheetPage() {
                     <div className="col-6">
                       {[...Array(6).keys()].map(i => (
                         <HorizontalField
+                          key={i}
                           label={`Step ${i + 1}`}
                           defaultValue={
                             batch.thermocyclerProfile &&
@@ -123,6 +124,7 @@ export default function LibraryPrepWorksheetPage() {
                     <div className="col-6">
                       {[...Array(6).keys()].map(i => (
                         <HorizontalField
+                          key={i}
                           label={`Step ${i + 7}`}
                           defaultValue={
                             batch.thermocyclerProfile &&
@@ -155,6 +157,8 @@ export default function LibraryPrepWorksheetPage() {
       </div>
     );
   }
+
+  return null;
 }
 
 function HorizontalField({ label, defaultValue = "" }) {
@@ -185,7 +189,7 @@ interface LibraryPrepTableProps {
 
 function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
   return (
-    <table className="table table-bordered table-sm">
+    <table className="table table-bordered table-sm library-prep-table">
       <thead>
         <tr>
           <th>Well Location</th>

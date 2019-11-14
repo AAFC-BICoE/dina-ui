@@ -6,6 +6,7 @@ import { Protocol } from "../Protocol";
 import { IndexSet } from "./IndexSet";
 
 interface LibraryPrepBatchAttributes {
+  name?: string;
   totalLibraryYieldNm?: number | null;
   notes?: string | null;
   cleanUpNotes?: string | null;
