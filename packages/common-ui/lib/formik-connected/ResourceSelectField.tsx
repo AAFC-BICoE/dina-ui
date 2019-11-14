@@ -17,7 +17,14 @@ export interface ResourceSelectFieldProps<TData>
 export function ResourceSelectField<TData extends KitsuResource>(
   topLevelProps: ResourceSelectFieldProps<TData>
 ) {
-  const { className, name, label, onChange = noop, tooltipMsg } = topLevelProps;
+  const {
+    className,
+    name,
+    label,
+    onChange = noop,
+    tooltipMsg,
+    hideLabel
+  } = topLevelProps;
 
   return (
     <Field name={name}>
@@ -37,6 +44,7 @@ export function ResourceSelectField<TData extends KitsuResource>(
             name={name}
             label={label}
             tooltipMsg={tooltipMsg}
+            hideLabel={hideLabel}
           >
             <ResourceSelect
               {...topLevelProps}

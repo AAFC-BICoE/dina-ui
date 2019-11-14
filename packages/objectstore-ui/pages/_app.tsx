@@ -1,9 +1,9 @@
+import { ApiClientContext, createContextValue } from "common-ui";
 import App from "next/app";
 import React from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-table/react-table.css";
 import "react-tabs/style/react-tabs.css";
-import { ApiClientContext, createContextValue } from "../../common-ui";
 
 /**
  * App component that wraps every page component.

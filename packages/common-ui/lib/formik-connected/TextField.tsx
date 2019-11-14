@@ -5,8 +5,22 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
  * Provides a text input for a Formik field. This component wraps Formik's "Field" component with
  * a wrapper that adds a label.
  */
-export function TextField(props: LabelWrapperParams) {
-  const { className, name, label, tooltipMsg } = props;
+
+export interface TextFieldProps {
+  readOnly?: boolean;
+  initialValue?: string | string[];
+}
+
+export function TextField(props: LabelWrapperParams & TextFieldProps) {
+  const {
+    className,
+    name,
+    label,
+    tooltipMsg,
+    hideLabel,
+    readOnly,
+    initialValue
+  } = props;
 
   return (
     <FieldWrapper
@@ -14,6 +28,7 @@ export function TextField(props: LabelWrapperParams) {
       name={name}
       label={label}
       tooltipMsg={tooltipMsg}
+      hideLabel={hideLabel}
     >
       <Field name={name}>
         {({
@@ -33,7 +48,8 @@ export function TextField(props: LabelWrapperParams) {
               className="form-control"
               onChange={onChange}
               type="text"
-              value={value || ""}
+              value={initialValue ? initialValue : value || ""}
+              readOnly={readOnly}
             />
           );
         }}
