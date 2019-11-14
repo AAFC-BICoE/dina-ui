@@ -1,5 +1,6 @@
 import { mount } from "enzyme";
 import { Form, Formik } from "formik";
+import { noop } from "lodash";
 import Select from "react-select";
 import { SelectField } from "../SelectField";
 
@@ -32,7 +33,7 @@ function getWrapper(propsOverride = {}) {
       initialValues={{
         testField: "ITRU_PRIMER"
       }}
-      onSubmit={null}
+      onSubmit={noop}
     >
       {({ values: { testField } }) => (
         <Form>

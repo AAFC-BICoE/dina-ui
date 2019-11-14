@@ -102,7 +102,7 @@ export function QueryTable<TData extends KitsuResource>({
     offset: 0
   });
 
-  const divWrapperRef = useRef<HTMLDivElement>();
+  const divWrapperRef = useRef<HTMLDivElement>(null);
 
   function onFetchData(reactTableState) {
     const { page: newPageNumber, sorted, pageSize } = reactTableState;
@@ -112,6 +112,7 @@ export function QueryTable<TData extends KitsuResource>({
     // When a new page is requested and the top of the window is below the top of the table,
     // scroll to the top of the table.
     if (
+      divWrapperRef.current &&
       newOffset !== page.offset &&
       window.scrollY > divWrapperRef.current.offsetTop
     ) {

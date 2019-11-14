@@ -44,4 +44,6 @@ export default function IndexSetViewPage() {
       </>
     );
   }
+
+  return null;
 }

@@ -21,10 +21,15 @@ import {
   LibraryPrep,
   LibraryPrepBatch,
   NgsIndex,
+  Sample,
   StepResource
 } from "../../../types/seqdb-api";
 
 type LibraryPrepEditMode = "DETAILS" | "INDEX";
+
+interface SampleStepResource extends StepResource {
+  sample: Sample;
+}
 
 export interface LibraryPrepEditTableProps {
   chain: Chain;
@@ -43,13 +48,15 @@ export function LibraryPrepEditTable({
   const resourceSelectLoader = useCacheableQueryLoader();
 
   // Current sample StepResources in the "sample selection" table.
-  const [sampleSrs, setSampleSrs] = useState<StepResource[]>([]);
+  const [sampleSrs, setSampleSrs] = useState<SampleStepResource[]>([]);
 
   // Timestamp of the last table save.
   const [lastPrepTableSave, setLastPrepTableSave] = useState<number>();
 
   // The values to initialize the Formik form.
-  const [formikValues, setFormikValues] = useState({ sampleSrs: [] });
+  const [formikValues, setFormikValues] = useState({
+    sampleSrs: [] as SampleStepResource[]
+  });
 
   // Query the libraryPreps of this batch.
   const { loading: libraryPrepsLoading } = useQuery<LibraryPrep[]>(
@@ -84,14 +91,14 @@ export function LibraryPrepEditTable({
     }
   );
 
-  const { loading: sampleSrsLoading } = useQuery<StepResource[]>(
+  const { loading: sampleSrsLoading } = useQuery<SampleStepResource[]>(
     {
       fields: {
         sample: "name"
       },
       filter: {
-        "chain.chainId": chain.id,
-        "chainStepTemplate.chainStepTemplateId": sampleSelectionStep.id
+        "chain.chainId": chain.id as string,
+        "chainStepTemplate.chainStepTemplateId": sampleSelectionStep.id as string
       },
       include: "sample",
       page: { limit: 1000 },
@@ -112,16 +119,16 @@ export function LibraryPrepEditTable({
   }
 
   const onSubmit = safeSubmit(async submittedValues => {
-    const submittedSampleSrs: StepResource[] = submittedValues.sampleSrs;
+    const submittedSampleSrs: SampleStepResource[] = submittedValues.sampleSrs;
 
-    const touchedSampleSrs: StepResource[] = [];
+    const touchedSampleSrs: SampleStepResource[] = [];
     for (const i in submittedSampleSrs) {
       if (!isEqual(submittedSampleSrs[i], sampleSrs[i])) {
         touchedSampleSrs.push(submittedSampleSrs[i]);
       }
     }
 
-    const libraryPreps = [];
+    const libraryPreps: LibraryPrep[] = [];
     for (const submittedSr of touchedSampleSrs) {
       if (submittedSr.libraryPrep) {
         submittedSr.libraryPrep.sample = submittedSr.sample;
@@ -207,18 +214,19 @@ export function LibraryPrepEditTable({
             accessor: "sample.name"
           },
           ...["indexI5", "indexI7"].map(fieldName => ({
-            Cell: ({ index, original }) => (
-              <ResourceSelectField<NgsIndex>
-                customDataFetch={resourceSelectLoader}
-                hideLabel={true}
-                filter={filterBy(["name"])}
-                key={original.id}
-                name={`sampleSrs[${index}].libraryPrep.${fieldName}`}
-                optionLabel={ngsIndex => ngsIndex.name}
-                model={`indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
-                styles={{ menu: () => ({ zIndex: 5 }) }}
-              />
-            ),
+            Cell: ({ index, original }) =>
+              libraryPrepBatch.indexSet && (
+                <ResourceSelectField<NgsIndex>
+                  customDataFetch={resourceSelectLoader}
+                  hideLabel={true}
+                  filter={filterBy(["name"])}
+                  key={original.id}
+                  name={`sampleSrs[${index}].libraryPrep.${fieldName}`}
+                  optionLabel={ngsIndex => ngsIndex.name}
+                  model={`indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
+                  styles={{ menu: () => ({ zIndex: 5 }) }}
+                />
+              ),
             Header: titleCase(fieldName),
             sortable: false
           }))

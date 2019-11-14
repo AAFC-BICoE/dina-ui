@@ -6,6 +6,7 @@ import { PreLibraryPrep } from "types/seqdb-api/resources/workflow/PreLibraryPre
 import {
   Chain,
   ChainStepTemplate,
+  Sample,
   StepResource
 } from "../../../types/seqdb-api";
 import { StepRendererProps } from "../StepRenderer";
@@ -19,7 +20,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
   const [lastSave, setLastSave] = useState();
 
   const visibleSampleIds = visibleSamples.length
-    ? visibleSamples.map(sr => sr.sample.id).join(",")
+    ? visibleSamples.map(sr => (sr.sample as Sample).id).join(",")
     : 0;
 
   const { loading: plpSrLoading } = useQuery<StepResource[]>(
@@ -30,8 +31,8 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
         sample: "name,version"
       },
       filter: {
-        "chain.chainId": chain.id,
-        "chainStepTemplate.chainStepTemplateId": step.id,
+        "chain.chainId": chain.id as string,
+        "chainStepTemplate.chainStepTemplateId": step.id as string,
         rsql: `sample.sampleId=in=(${visibleSampleIds})`
       },
       include:
@@ -46,13 +47,15 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
         for (const sampleSr of visibleSamples) {
           const shearingSr = plpSrs.find(
             plpSr =>
-              plpSr.sample.id === sampleSr.sample.id &&
+              plpSr.sample &&
+              plpSr.sample.id === (sampleSr.sample as Sample).id &&
               plpSr.value === "SHEARING"
           );
 
           const sizeSelectionSr = plpSrs.find(
             plpSr =>
-              plpSr.sample.id === sampleSr.sample.id &&
+              plpSr.sample &&
+              plpSr.sample.id === (sampleSr.sample as Sample).id &&
               plpSr.value === "SIZE_SELECTION"
           );
 
@@ -83,11 +86,11 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
 
     // Find the existing PreLibraryPreps stepResources for these samples.
     // These should be edited instead of creating new ones.
-    const existingStepResources: StepResource[] = checkedSampleIds.length
-      ? (await apiClient.get("stepResource", {
+    const existingStepResources = checkedSampleIds.length
+      ? (await apiClient.get<StepResource[]>("stepResource", {
           filter: {
-            "chain.chainId": chain.id,
-            "chainStepTemplate.chainStepTemplateId": step.id,
+            "chain.chainId": chain.id as string,
+            "chainStepTemplate.chainStepTemplateId": step.id as string,
             "preLibraryPrep.preLibraryPrepType": plpValues.preLibraryPrepType,
             rsql: `sample.sampleId=in=(${checkedSampleIds})`
           },
@@ -98,14 +101,14 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
 
     const plps = checkedSampleIds.map(checkedSampleId => {
       const existingStepResource = existingStepResources.find(
-        sr => sr.sample.id === checkedSampleId
+        sr => (sr.sample as Sample).id === checkedSampleId
       );
 
       if (existingStepResource) {
         return {
           resource: {
             ...plpValues,
-            id: existingStepResource.preLibraryPrep.id
+            id: (existingStepResource.preLibraryPrep as PreLibraryPrep).id
           },
           type: "preLibraryPrep"
         };
@@ -138,7 +141,8 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       .filter(
         newSr =>
           !existingStepResources
-            .map(existingSr => existingSr.sample.id)
+            // Assume the Sample is present because the query filters for only StepResources with linked Samples.
+            .map(existingSr => (existingSr.sample as Sample).id)
             .includes(newSr.sample.id)
       );
 
@@ -167,11 +171,11 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
 
       // Find the existing PreLibraryPreps stepResources for these samples.
       // These should be edited instead of creating new ones.
-      const stepResourcesToDelete: StepResource[] = checkedSampleIds.length
-        ? (await apiClient.get("stepResource", {
+      const stepResourcesToDelete = checkedSampleIds.length
+        ? (await apiClient.get<StepResource[]>("stepResource", {
             filter: {
-              "chain.chainId": chain.id,
-              "chainStepTemplate.chainStepTemplateId": step.id,
+              "chain.chainId": chain.id as string,
+              "chainStepTemplate.chainStepTemplateId": step.id as string,
               "preLibraryPrep.preLibraryPrepType": plpType,
               rsql: `sample.sampleId=in=(${checkedSampleIds})`
             },
@@ -180,7 +184,9 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
           })).data
         : [];
 
-      const plpsToDelete = stepResourcesToDelete.map(sr => sr.preLibraryPrep);
+      const plpsToDelete = stepResourcesToDelete.map(
+        sr => sr.preLibraryPrep as PreLibraryPrep
+      );
 
       const plpOperations: Operation[] = plpsToDelete.map(plp => ({
         op: "DELETE",

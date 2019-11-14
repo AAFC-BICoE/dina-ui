@@ -4,18 +4,18 @@ import { LibraryPrepBatch } from "./LibraryPrepBatch";
 import { NgsIndex } from "./NgsIndex";
 
 interface LibraryPrepAttributes {
-  inputNg?: number;
-  quality?: string;
-  size?: string;
-  wellColumn?: number;
-  wellRow?: string;
+  inputNg?: number | null;
+  quality?: string | null;
+  size?: string | null;
+  wellColumn?: number | null;
+  wellRow?: string | null;
 }
 
 interface LibraryPrepRelationships {
   libraryPrepBatch: LibraryPrepBatch;
-  sample?: Sample;
-  indexI5?: NgsIndex;
-  indexI7?: NgsIndex;
+  sample: Sample;
+  indexI5?: NgsIndex | null;
+  indexI7?: NgsIndex | null;
 }
 
 export type LibraryPrep = KitsuResource &

@@ -4,6 +4,7 @@ import { useContext, useRef, useState } from "react";
 import {
   Chain,
   ChainStepTemplate,
+  ContainerType,
   LibraryPrep,
   LibraryPrepBatch,
   Sample
@@ -41,7 +42,7 @@ export function useSampleGridControls({
     // Available samples with no well coordinates.
     availableSamples: [] as Sample[],
     // The grid of samples that have well coordinates.
-    cellGrid: null as CellGrid,
+    cellGrid: {} as CellGrid,
     // Samples that have been moved since data initialization.
     movedSamples: [] as Sample[]
   });
@@ -84,8 +85,8 @@ export function useSampleGridControls({
             sample: "name"
           },
           filter: {
-            "chain.chainId": chain.id,
-            "chainStepTemplate.chainStepTemplateId": sampleSelectionStep.id,
+            "chain.chainId": chain.id as string,
+            "chainStepTemplate.chainStepTemplateId": sampleSelectionStep.id as string,
             rsql: `sample.sampleId=out=(${sampleIdsWithCoords || "0"})`
           },
           include: "sample",
@@ -107,10 +108,10 @@ export function useSampleGridControls({
     }
   );
 
-  function moveSamples(samples: Sample[], coords: string) {
+  function moveSamples(samples: Sample[], coords?: string) {
     setGridState(({ availableSamples, cellGrid, movedSamples }) => {
       // Remove the sample from the grid.
-      const newCellGrid = omitBy(cellGrid, s => samples.includes(s));
+      const newCellGrid: CellGrid = omitBy(cellGrid, s => samples.includes(s));
 
       // Remove the sample from the availables samples.
       let newAvailableSamples = availableSamples.filter(
@@ -124,7 +125,7 @@ export function useSampleGridControls({
         const {
           numberOfColumns,
           numberOfRows
-        } = libraryPrepBatch.containerType;
+        } = libraryPrepBatch.containerType as ContainerType;
 
         let newCellNumber =
           fillMode === "ROW"
@@ -132,8 +133,8 @@ export function useSampleGridControls({
             : (Number(colNumberString) - 1) * numberOfRows + rowNumber;
 
         for (const sample of samples) {
-          let thisSampleRowNumber: number;
-          let thisSampleColumnNumber: number;
+          let thisSampleRowNumber = -1;
+          let thisSampleColumnNumber = -1;
 
           if (fillMode === "ROW") {
             thisSampleRowNumber = Math.ceil(newCellNumber / numberOfColumns);
@@ -199,7 +200,7 @@ export function useSampleGridControls({
   }
 
   function onListDrop(sample: Sample) {
-    moveSamples([sample], null);
+    moveSamples([sample]);
   }
 
   function onSampleClick(sample, e) {
@@ -230,7 +231,9 @@ export function useSampleGridControls({
     setSubmitting(true);
     try {
       const { cellGrid, movedSamples } = gridState;
-      const existingLibraryPreps = libraryPrepsResponse.data;
+      const existingLibraryPreps = libraryPrepsResponse
+        ? libraryPrepsResponse.data
+        : [];
 
       const libraryPrepsToSave = movedSamples.map(movedSample => {
         // Get the coords from the cell grid.
@@ -250,8 +253,8 @@ export function useSampleGridControls({
               type: "libraryPrep"
             };
 
-        let newWellColumn: number = null;
-        let newWellRow: string = null;
+        let newWellColumn: number | null = null;
+        let newWellRow: string | null = null;
         if (coords) {
           const [row, col] = coords.split("_");
           newWellColumn = Number(col);
@@ -279,7 +282,7 @@ export function useSampleGridControls({
   }
 
   function clearGrid() {
-    moveSamples(Object.values(gridState.cellGrid), null);
+    moveSamples(Object.values(gridState.cellGrid));
   }
 
   async function moveAll() {

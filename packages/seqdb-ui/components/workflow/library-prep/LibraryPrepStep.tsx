@@ -28,8 +28,8 @@ export function LibraryPrepStep(props: StepRendererProps) {
         thermocyclerprofile: "name"
       },
       filter: {
-        "chain.chainId": chain.id,
-        "chainStepTemplate.chainStepTemplateId": step.id
+        "chain.chainId": chain.id as string,
+        "chainStepTemplate.chainStepTemplateId": step.id as string
       },
       include:
         "libraryPrepBatch,libraryPrepBatch.product,libraryPrepBatch.protocol,libraryPrepBatch.containerType,libraryPrepBatch.thermocyclerProfile,libraryPrepBatch.indexSet",
@@ -44,6 +44,11 @@ export function LibraryPrepStep(props: StepRendererProps) {
     return <LoadingSpinner loading={true} />;
   }
 
+  const libraryPrepBatch =
+    response && response.data[0]
+      ? response.data[0].libraryPrepBatch
+      : undefined;
+
   if (
     response &&
     (!response.data.length || (response.data && editBatchDetails))
@@ -51,9 +56,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
     return (
       <LibraryPrepBatchForm
         chain={chain}
-        libraryPrepBatch={
-          response.data.length ? response.data[0].libraryPrepBatch : undefined
-        }
+        libraryPrepBatch={libraryPrepBatch}
         step={step}
         onSuccess={() => {
           setEditBatchDetails(false);
@@ -63,9 +66,8 @@ export function LibraryPrepStep(props: StepRendererProps) {
     );
   }
 
-  if (response && response.data.length) {
+  if (response && libraryPrepBatch) {
     const stepResource = response.data[0];
-    const { libraryPrepBatch } = stepResource;
 
     return (
       <>

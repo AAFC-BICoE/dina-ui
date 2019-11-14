@@ -63,18 +63,20 @@ export function IndexGrid(props: IndexGridProps) {
         const rowLetter = String.fromCharCode(index + 65);
 
         return (
-          <div style={{ padding: "7px 5px" }}>
-            <span>{String.fromCharCode(index + 65)}</span>
-            <ResourceSelectField<NgsIndex>
-              customDataFetch={resourceSelectLoader}
-              hideLabel={true}
-              filter={filterBy(["name"])}
-              name={`indexI5s[${rowLetter}]`}
-              optionLabel={primer => primer.name}
-              model={`indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
-              styles={{ menu: () => ({ zIndex: 5 }) }}
-            />
-          </div>
+          libraryPrepBatch.indexSet && (
+            <div style={{ padding: "7px 5px" }}>
+              <span>{String.fromCharCode(index + 65)}</span>
+              <ResourceSelectField<NgsIndex>
+                customDataFetch={resourceSelectLoader}
+                hideLabel={true}
+                filter={filterBy(["name"])}
+                name={`indexI5s[${rowLetter}]`}
+                optionLabel={primer => primer.name}
+                model={`indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
+                styles={{ menu: () => ({ zIndex: 5 }) }}
+              />
+            </div>
+          )
         );
       },
       resizable: false,
@@ -110,20 +112,21 @@ export function IndexGrid(props: IndexGridProps) {
             </div>
           ) : null;
         },
-        Header: () => (
-          <>
-            {columnLabel}
-            <ResourceSelectField<NgsIndex>
-              customDataFetch={resourceSelectLoader}
-              hideLabel={true}
-              filter={filterBy(["name"])}
-              name={`indexI7s[${columnLabel}]`}
-              optionLabel={primer => primer.name}
-              model={`indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
-              styles={{ menu: () => ({ zIndex: 5 }) }}
-            />
-          </>
-        ),
+        Header: () =>
+          libraryPrepBatch.indexSet && (
+            <>
+              {columnLabel}
+              <ResourceSelectField<NgsIndex>
+                customDataFetch={resourceSelectLoader}
+                hideLabel={true}
+                filter={filterBy(["name"])}
+                name={`indexI7s[${columnLabel}]`}
+                optionLabel={primer => primer.name}
+                model={`indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
+                styles={{ menu: () => ({ zIndex: 5 }) }}
+              />
+            </>
+          ),
         resizable: false,
         sortable: false
       });
@@ -158,4 +161,6 @@ export function IndexGrid(props: IndexGridProps) {
       </Formik>
     );
   }
+
+  return null;
 }

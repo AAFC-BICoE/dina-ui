@@ -65,7 +65,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
         op: "DELETE" as HttpMethod,
         path: `stepResource/${sr.id}`,
         value: {
-          id: sr.id,
+          id: sr.id as string,
           type: "stepResource"
         }
       }));

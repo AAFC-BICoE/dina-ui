@@ -35,7 +35,9 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   options: QueryOptions<TData, TMeta> = {}
 ): QueryState<TData, TMeta> {
   const { apiClient } = useContext(ApiClientContext);
-  const previousResponseRef = useRef<KitsuResponse<TData, TMeta>>(undefined);
+  const previousResponseRef = useRef<KitsuResponse<TData, TMeta> | undefined>(
+    undefined
+  );
 
   // Memoize the callback. Only re-create it when the query spec changes.
   const fetchData = useCallback(() => {
@@ -47,7 +49,7 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
       isUndefined
     );
 
-    const request = apiClient.get(path, getParams);
+    const request = apiClient.get<TData, TMeta>(path, getParams);
     if (options.onSuccess) {
       request.then(options.onSuccess);
     }

@@ -6,18 +6,18 @@ import { Protocol } from "../Protocol";
 import { IndexSet } from "./IndexSet";
 
 interface LibraryPrepBatchAttributes {
-  totalLibraryYieldNm?: number;
-  notes?: string;
-  cleanUpNotes?: string;
-  yieldNotes?: string;
+  totalLibraryYieldNm?: number | null;
+  notes?: string | null;
+  cleanUpNotes?: string | null;
+  yieldNotes?: string | null;
 }
 
 interface LibraryPrepBatchRelationships {
-  containerType?: ContainerType;
-  product?: Product;
-  protocol?: Protocol;
-  indexSet?: IndexSet;
-  thermocyclerProfile?: PcrProfile;
+  containerType?: ContainerType | null;
+  product?: Product | null;
+  protocol?: Protocol | null;
+  indexSet?: IndexSet | null;
+  thermocyclerProfile?: PcrProfile | null;
 }
 
 export type LibraryPrepBatch = KitsuResource &

@@ -30,7 +30,7 @@ export function DraggableSampleList({
     >
       {availableSamples.map(sample => (
         <DraggableSampleBox
-          key={sample.id}
+          key={String(sample.id)}
           wasMoved={movedSamples.includes(sample)}
           sample={sample}
           onClick={e => onClick(sample, e)}
