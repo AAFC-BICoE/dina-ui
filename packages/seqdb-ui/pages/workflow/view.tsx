@@ -1,5 +1,6 @@
 import { FieldView, LoadingSpinner, Query } from "common-ui";
 import { Formik } from "formik";
+import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
@@ -38,7 +39,7 @@ function WorkflowSteps({ chain }: { chain: Chain }) {
   return (
     <Query<ChainStepTemplate[]>
       query={{
-        filter: { "chainTemplate.id": chain.chainTemplate.id },
+        filter: { "chainTemplate.id": chain.chainTemplate.id as string },
         include: "stepTemplate",
         path: "chainStepTemplate"
       }}
@@ -53,13 +54,13 @@ function WorkflowSteps({ chain }: { chain: Chain }) {
               <TabList>
                 <Tab>Details</Tab>
                 {steps.map(step => (
-                  <Tab key={step.id}>
+                  <Tab key={step.id as string}>
                     Step {step.stepNumber}: {step.stepTemplate.name}
                   </Tab>
                 ))}
               </TabList>
               <TabPanel>
-                <Formik initialValues={chain} onSubmit={null}>
+                <Formik initialValues={chain} onSubmit={noop}>
                   <div className="col-md-3">
                     <FieldView label="Template" name="chainTemplate.name" />
                     <FieldView label="Group" name="group.groupName" />
@@ -69,7 +70,7 @@ function WorkflowSteps({ chain }: { chain: Chain }) {
                 </Formik>
               </TabPanel>
               {steps.map(step => (
-                <TabPanel key={step.id}>
+                <TabPanel key={step.id as string}>
                   <StepRenderer
                     chainStepTemplates={steps}
                     chain={chain}

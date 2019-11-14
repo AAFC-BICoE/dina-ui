@@ -1,11 +1,12 @@
 import { mount } from "enzyme";
 import { Formik } from "formik";
+import { noop } from "lodash";
 import { ErrorViewer } from "../ErrorViewer";
 
 describe("ErrorViewer component", () => {
   it("Renders nothing when formik has no status.", () => {
     const wrapper = mount(
-      <Formik initialValues={{}} onSubmit={null}>
+      <Formik initialValues={{}} onSubmit={noop}>
         <ErrorViewer />
       </Formik>
     );
@@ -15,7 +16,7 @@ describe("ErrorViewer component", () => {
 
   it("Renders the formik status as an error message.", () => {
     const wrapper = mount(
-      <Formik initialValues={{}} onSubmit={null}>
+      <Formik initialValues={{}} onSubmit={noop}>
         {({ setStatus }) => {
           function setError() {
             setStatus("Test error");

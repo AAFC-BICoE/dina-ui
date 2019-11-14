@@ -2,7 +2,7 @@ import { mount } from "enzyme";
 import { useState } from "react";
 import { act } from "react-dom/test-utils";
 import { FilterBuilder, FilterBuilderProps } from "../FilterBuilder";
-import { FilterGroup } from "../FilterGroup";
+import { FilterGroup, FilterGroupModel } from "../FilterGroup";
 import { FilterRow } from "../FilterRow";
 
 describe("FilterBuilder component", () => {
@@ -385,7 +385,7 @@ describe("FilterBuilder component", () => {
 
   it("Resets to the initial state when a null value is passed.", async () => {
     function TestComponent() {
-      const [model, setModel] = useState(null);
+      const [model, setModel] = useState<FilterGroupModel | null>(null);
       return (
         <FilterBuilder
           filterAttributes={filterAttributes}

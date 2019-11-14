@@ -1,7 +1,7 @@
 import { mount } from "enzyme";
 import { Formik } from "formik";
 import { KitsuResource } from "kitsu";
-import lodash from "lodash";
+import lodash, { noop } from "lodash";
 import Select from "react-select/base";
 import {
   ApiClientContext,
@@ -58,7 +58,7 @@ describe("ResourceSelectField component", () => {
     const wrapper = mountWithContext(
       <Formik
         initialValues={{ group: { id: "3", groupName: "Mat's Group" } }}
-        onSubmit={null}
+        onSubmit={noop}
       >
         <ResourceSelectField<TestGroup>
           name="group"
@@ -80,7 +80,7 @@ describe("ResourceSelectField component", () => {
 
   it("Changes the Formik field's value.", async () => {
     const wrapper = mountWithContext(
-      <Formik initialValues={{ group: null }} onSubmit={null}>
+      <Formik initialValues={{ group: null }} onSubmit={noop}>
         {({ values: { group } }) => (
           <div>
             <ResourceSelectField<TestGroup>
@@ -131,7 +131,7 @@ describe("ResourceSelectField component", () => {
     const wrapper = mountWithContext(
       <Formik
         initialValues={{ group: { id: 3, groupName: "Mat's Group" } }}
-        onSubmit={null}
+        onSubmit={noop}
       >
         <ResourceSelectField<TestGroup>
           name="group"

@@ -1,5 +1,6 @@
 import { FieldView, LoadingSpinner, Query } from "common-ui";
 import { Formik } from "formik";
+import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import {
@@ -30,7 +31,7 @@ export function PcrProfileDetailsPage({ router }: WithRouterProps) {
             <h1>PCR Profile Details</h1>
             <LoadingSpinner loading={loading} />
             {response && (
-              <Formik<PcrProfile> initialValues={response.data} onSubmit={null}>
+              <Formik<PcrProfile> initialValues={response.data} onSubmit={noop}>
                 <div>
                   <div className="row">
                     <FieldView
