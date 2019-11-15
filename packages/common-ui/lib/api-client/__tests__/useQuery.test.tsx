@@ -41,7 +41,7 @@ function MockContextProvider({ children }) {
 describe("useQuery hook", () => {
   const mockOnSuccess = jest.fn();
 
-  function TestComponent({ deps = null }) {
+  function TestComponent({ deps = [] as any[] }) {
     useQuery({ path: "todo/1" }, { deps, onSuccess: mockOnSuccess });
     return null;
   }

@@ -9,33 +9,33 @@ export interface PcrPrimerAttributes {
   lotNumber: number;
 
   // Optional fields
-  version?: number;
-  designDate?: string;
-  direction?: string;
-  tmCalculated?: string;
-  tmPe?: number;
-  position?: string;
-  storage?: string;
-  restrictionSite?: string;
-  used4sequencing?: boolean;
-  used4qrtpcr?: boolean;
-  used4nestedPcr?: boolean;
-  used4genotyping?: boolean;
-  used4cloning?: boolean;
-  used4stdPcr?: boolean;
-  referenceSeqDir?: string;
-  referenceSeqFile?: string;
-  urllink?: string;
-  note?: string;
-  lastModified?: string;
-  application?: string;
-  reference?: string;
-  targetSpecies?: string;
-  supplier?: string;
-  dateOrdered?: string;
-  purification?: string;
-  designedBy?: string;
-  stockConcentration?: string;
+  version?: number | null;
+  designDate?: string | null;
+  direction?: string | null;
+  tmCalculated?: string | null;
+  tmPe?: number | null;
+  position?: string | null;
+  storage?: string | null;
+  restrictionSite?: string | null;
+  used4sequencing?: boolean | null;
+  used4qrtpcr?: boolean | null;
+  used4nestedPcr?: boolean | null;
+  used4genotyping?: boolean | null;
+  used4cloning?: boolean | null;
+  used4stdPcr?: boolean | null;
+  referenceSeqDir?: string | null;
+  referenceSeqFile?: string | null;
+  urllink?: string | null;
+  note?: string | null;
+  lastModified?: string | null;
+  application?: string | null;
+  reference?: string | null;
+  targetSpecies?: string | null;
+  supplier?: string | null;
+  dateOrdered?: string | null;
+  purification?: string | null;
+  designedBy?: string | null;
+  stockConcentration?: string | null;
 }
 
 export interface PcrPrimerRelationships {

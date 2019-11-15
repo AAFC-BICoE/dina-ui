@@ -1,5 +1,6 @@
 import { FieldView } from "common-ui";
 import { Formik } from "formik";
+import { noop } from "lodash";
 import { LibraryPrepBatch } from "../../../types/seqdb-api";
 
 interface LibraryPrepBatchDetailsProps {
@@ -10,7 +11,7 @@ export function LibraryPrepBatchDetails({
   libraryPrepBatch
 }: LibraryPrepBatchDetailsProps) {
   return (
-    <Formik<LibraryPrepBatch> initialValues={libraryPrepBatch} onSubmit={null}>
+    <Formik<LibraryPrepBatch> initialValues={libraryPrepBatch} onSubmit={noop}>
       {({ values: batch }) => (
         <>
           <div className="row">

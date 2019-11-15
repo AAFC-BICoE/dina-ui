@@ -96,7 +96,7 @@ export function SampleGrid(props: ContainerGridProps) {
       </div>
       <div className="row">
         <div className="col-2">
-          <strong>Selected samples</strong>
+          <strong>Selected samples ({availableSamples.length} in list)</strong>
           <DraggableSampleList
             availableSamples={availableSamples}
             selectedSamples={selectedSamples}

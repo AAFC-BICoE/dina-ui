@@ -28,7 +28,7 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
   );
 
   const onSubmit = safeSubmit(async values => {
-    const libraryPreps = libraryPrepsResponse.data;
+    const libraryPreps = libraryPrepsResponse ? libraryPrepsResponse.data : [];
     const { indexI5s, indexI7s } = values;
 
     const edits: Dictionary<Partial<LibraryPrep>> = {};
@@ -38,9 +38,11 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
     for (const [col, index] of colIndexes) {
       const colPreps = libraryPreps.filter(it => String(it.wellColumn) === col);
       for (const prep of colPreps) {
-        const edit = edits[prep.id] || {};
-        edit.indexI7 = { id: index.id, type: "ngsIndex" } as NgsIndex;
-        edits[prep.id] = edit;
+        if (prep.id) {
+          const edit = edits[prep.id] || {};
+          edit.indexI7 = { id: index.id, type: "ngsIndex" } as NgsIndex;
+          edits[prep.id] = edit;
+        }
       }
     }
 
@@ -49,9 +51,11 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
     for (const [row, index] of rowIndexes) {
       const rowPreps = libraryPreps.filter(it => it.wellRow === row);
       for (const prep of rowPreps) {
-        const edit = edits[prep.id] || {};
-        edit.indexI5 = { id: index.id, type: "ngsIndex" } as NgsIndex;
-        edits[prep.id] = edit;
+        if (prep.id) {
+          const edit = edits[prep.id] || {};
+          edit.indexI5 = { id: index.id, type: "ngsIndex" } as NgsIndex;
+          edits[prep.id] = edit;
+        }
       }
     }
 

@@ -1,5 +1,6 @@
 import { mount } from "enzyme";
 import { Form, Formik } from "formik";
+import { noop } from "lodash";
 import { TextField } from "../TextField";
 
 describe("TextField component", () => {
@@ -7,7 +8,7 @@ describe("TextField component", () => {
     const wrapper = mount(
       <Formik
         initialValues={{ testObject: { testField: "initial value" } }}
-        onSubmit={null}
+        onSubmit={noop}
       >
         <Form>
           <TextField name="testObject.testField" />
@@ -25,7 +26,7 @@ describe("TextField component", () => {
     const wrapper = mount(
       <Formik
         initialValues={{ testObject: { testField: "initial value" } }}
-        onSubmit={null}
+        onSubmit={noop}
       >
         {({
           values: {

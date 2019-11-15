@@ -7,19 +7,19 @@ import { IndexSet } from "./IndexSet";
 
 interface LibraryPrepBatchAttributes {
   name: string;
-  totalLibraryYieldNm?: number;
+  totalLibraryYieldNm?: number | null;
   type: "libraryPrepBatch";
-  notes?: string;
-  cleanUpNotes?: string;
-  yieldNotes?: string;
+  notes?: string | null;
+  cleanUpNotes?: string | null;
+  yieldNotes?: string | null;
 }
 
 interface LibraryPrepBatchRelationships {
-  containerType?: ContainerType;
-  product?: Product;
-  protocol?: Protocol;
-  indexSet?: IndexSet;
-  thermocyclerProfile?: PcrProfile;
+  containerType?: ContainerType | null;
+  product?: Product | null;
+  protocol?: Protocol | null;
+  indexSet?: IndexSet | null;
+  thermocyclerProfile?: PcrProfile | null;
 }
 
 export type LibraryPrepBatch = KitsuResource &

@@ -1,4 +1,4 @@
-import Kitsu, { FilterParam, GetParams, KitsuResource } from "kitsu";
+import { FilterParam, GetParams, KitsuResource, KitsuResponse } from "kitsu";
 import { debounce, omitBy } from "lodash";
 import React, { useContext } from "react";
 import AsyncSelect from "react-select/async";
@@ -37,7 +37,10 @@ export interface ResourceSelectProps<TData> {
   styles?: Partial<Styles>;
 
   /** Optional query loader function for custom API request behavior (Useful for caching). */
-  customDataFetch?: typeof Kitsu.prototype.get;
+  customDataFetch?: (
+    path: string,
+    params: GetParams
+  ) => Promise<KitsuResponse<any, any>>;
 }
 
 /** An option the user can select to set the relationship to null. */

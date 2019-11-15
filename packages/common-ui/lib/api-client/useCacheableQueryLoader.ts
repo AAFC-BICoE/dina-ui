@@ -1,5 +1,5 @@
 import DataLoader from "dataloader";
-import Kitsu, { GetParams, KitsuResponse } from "kitsu";
+import { GetParams, KitsuResponse } from "kitsu";
 import { useContext } from "react";
 import { ApiClientContext } from "./ApiClientContext";
 
@@ -13,7 +13,7 @@ interface QueryKey {
  * Returns a GET method that works like the API client's get method, but API requests and
  * their responses are cached, so multiple duplicate API requests will only send 1 HTTP request.
  */
-export function useCacheableQueryLoader(): typeof Kitsu.prototype.get {
+export function useCacheableQueryLoader() {
   const { apiClient } = useContext(ApiClientContext);
 
   const queryLoader = new DataLoader<QueryKey, KitsuResponse<any>>(

@@ -1,5 +1,6 @@
 import { mount } from "enzyme";
 import { Formik } from "formik";
+import { noop } from "lodash";
 import { FieldView } from "../FieldView";
 
 describe("FieldView component", () => {
@@ -7,7 +8,7 @@ describe("FieldView component", () => {
     const wrapper = mount(
       <Formik
         initialValues={{ testObject: { name: "testName" } }}
-        onSubmit={null}
+        onSubmit={noop}
       >
         <FieldView name="testObject.name" />
       </Formik>
@@ -21,7 +22,7 @@ describe("FieldView component", () => {
     const wrapper = mount(
       <Formik
         initialValues={{ testObject: { name: "testName" } }}
-        onSubmit={null}
+        onSubmit={noop}
       >
         <FieldView label="Custom Label" name="testObject.name" />
       </Formik>
@@ -34,7 +35,7 @@ describe("FieldView component", () => {
     const wrapper = mount(
       <Formik
         initialValues={{ testObject: { name: "testName" } }}
-        onSubmit={null}
+        onSubmit={noop}
       >
         <FieldView link="/linked-page" name="testObject.name" />
       </Formik>

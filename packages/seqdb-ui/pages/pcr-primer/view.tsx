@@ -1,5 +1,6 @@
 import { FieldView, LoadingSpinner, Query } from "common-ui";
 import { Formik } from "formik";
+import { noop } from "lodash";
 import withRouter, { WithRouterProps } from "next/dist/client/with-router";
 import {
   BackToListButton,
@@ -30,7 +31,7 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
             <h1>PCR Primer Details</h1>
             <LoadingSpinner loading={loading} />
             {response && (
-              <Formik<PcrPrimer> initialValues={response.data} onSubmit={null}>
+              <Formik<PcrPrimer> initialValues={response.data} onSubmit={noop}>
                 <div>
                   <div className="row">
                     <FieldView

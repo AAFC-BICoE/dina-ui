@@ -3,7 +3,7 @@ import { FilterGroupModel } from "./FilterGroup";
 import { FilterRowModel } from "./FilterRow";
 
 /** Converts a FilterGroupModel to an RSQL expression. */
-export function rsql(filter?: FilterGroupModel): string {
+export function rsql(filter: FilterGroupModel | null): string {
   if (!filter) {
     return "";
   }

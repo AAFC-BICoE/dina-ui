@@ -164,7 +164,7 @@ describe("API client context", () => {
     const expectedErrorMessage = `Constraint violation: name size must be between 1 and 10
 Constraint violation: description size must be between 1 and 10`;
 
-    let actualError: Error;
+    let actualError: Error = new Error();
 
     try {
       await doOperations(TODO_OPERATION_1_VALID_2_INVALID);

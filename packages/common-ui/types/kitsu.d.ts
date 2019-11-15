@@ -13,7 +13,10 @@ declare module "kitsu" {
 
     public delete(...args: any[]): Promise<any>;
 
-    public get(path: string, params: GetParams): Promise<KitsuResponse<any>>;
+    public get<TData, TMeta = undefined>(
+      path: string,
+      params: GetParams
+    ): Promise<KitsuResponse<TData, TMeta>>;
 
     public patch(...args: any[]): Promise<any>;
 

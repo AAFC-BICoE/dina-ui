@@ -5,24 +5,24 @@ import { Region } from "./Region";
 export interface PcrProfileAttributes {
   name: string;
   // Optional fields
-  cycles?: string;
-  lastModified?: string;
-  application?: string;
-  step1?: string;
-  step2?: string;
-  step3?: string;
-  step4?: string;
-  step5?: string;
-  step6?: string;
-  step7?: string;
-  step8?: string;
-  step9?: string;
-  step10?: string;
-  step11?: string;
-  step12?: string;
-  step13?: string;
-  step14?: string;
-  step15?: string;
+  cycles?: string | null;
+  lastModified?: string | null;
+  application?: string | null;
+  step1?: string | null;
+  step2?: string | null;
+  step3?: string | null;
+  step4?: string | null;
+  step5?: string | null;
+  step6?: string | null;
+  step7?: string | null;
+  step8?: string | null;
+  step9?: string | null;
+  step10?: string | null;
+  step11?: string | null;
+  step12?: string | null;
+  step13?: string | null;
+  step14?: string | null;
+  step15?: string | null;
 }
 
 export interface PcrProfileRelationships {

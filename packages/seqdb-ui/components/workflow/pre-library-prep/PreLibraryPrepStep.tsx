@@ -6,6 +6,7 @@ import {
   useGroupedCheckBoxes
 } from "common-ui";
 import { Formik } from "formik";
+import { noop } from "lodash";
 import { useState } from "react";
 import titleCase from "title-case";
 import { FilterForm } from "../..";
@@ -119,7 +120,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
         id="pre-library-prep-step"
         onFilterFormSubmit={onFilterSubmit}
       />
-      <Formik initialValues={{ checkedIds: {} }} onSubmit={null}>
+      <Formik initialValues={{ checkedIds: {} }} onSubmit={noop}>
         {formikProps => {
           async function onInnerFormSubmit(plpValues) {
             await plpFormSubmit(
@@ -171,15 +172,17 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                     columns={SAMPLE_STEP_RESOURCE_COLUMNS}
                     defaultPageSize={100}
                     filter={{
-                      "chain.chainId": chain.id,
-                      "chainStepTemplate.chainStepTemplateId": previousStep.id,
+                      "chain.chainId": chain.id as string,
+                      "chainStepTemplate.chainStepTemplateId": previousStep.id as string,
                       rsql: rsqlFilter
                     }}
                     include="sample,sample.group"
                     loading={plpSrLoading || formikProps.isSubmitting}
                     onSuccess={res => {
                       setVisibleSamples(res.data);
-                      setAvailableItems(res.data.map(sr => sr.sample));
+                      setAvailableItems(
+                        res.data.map(sr => sr.sample as Sample)
+                      );
                     }}
                     path="stepResource"
                   />

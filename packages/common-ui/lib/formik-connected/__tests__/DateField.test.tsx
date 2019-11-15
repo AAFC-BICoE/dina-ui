@@ -1,16 +1,17 @@
 import { mount } from "enzyme";
 import { Form, Formik } from "formik";
+import { noop } from "lodash";
 import ReactDatePicker from "react-datepicker";
 import { DateField } from "../DateField";
 
 describe("DateField component", () => {
-  function getWrapper(testDate = "2019-02-02") {
+  function getWrapper(testDate: string | null = "2019-02-02") {
     return mount<Formik>(
       <Formik
         initialValues={{
           testField: testDate
         }}
-        onSubmit={null}
+        onSubmit={noop}
       >
         <Form>
           <DateField name="testField" />
@@ -37,7 +38,7 @@ describe("DateField component", () => {
     const wrapper = getWrapper();
     const { onChange } = wrapper.find(ReactDatePicker).props();
 
-    onChange(new Date("2019-05-25T12:00:00Z"), null);
+    onChange(new Date("2019-05-25T12:00:00Z"), undefined);
     expect(wrapper.state().values.testField).toEqual("2019-05-25");
   });
 
@@ -45,7 +46,7 @@ describe("DateField component", () => {
     const wrapper = getWrapper();
     const { onChange } = wrapper.find(ReactDatePicker).props();
 
-    onChange(null, null);
+    onChange(null, undefined);
     expect(wrapper.state().values.testField).toEqual(null);
   });
 });

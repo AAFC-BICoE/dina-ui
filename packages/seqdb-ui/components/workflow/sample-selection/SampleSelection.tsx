@@ -9,6 +9,7 @@ import {
 } from "common-ui";
 import { Formik } from "formik";
 import { FilterParam } from "kitsu";
+import { noop } from "lodash";
 import { useState } from "react";
 import { FilterForm } from "../..";
 import { Group, StepResource } from "../../../types/seqdb-api";
@@ -125,7 +126,7 @@ export function SampleSelection(props: StepRendererProps) {
   ];
 
   function onFilterSubmit(values) {
-    const rsqlFilters = [];
+    const rsqlFilters: string[] = [];
 
     const filterBuilderRsql = rsql(values.filterBuilderModel);
     if (filterBuilderRsql) {
@@ -170,7 +171,7 @@ export function SampleSelection(props: StepRendererProps) {
       </FilterForm>
       <Formik
         initialValues={{ sampleIdsToSelect: {}, stepResourcesToDelete: {} }}
-        onSubmit={null}
+        onSubmit={noop}
       >
         <div className="form-group">
           <ErrorViewer />
@@ -213,8 +214,8 @@ export function SampleSelection(props: StepRendererProps) {
                 defaultPageSize={100}
                 deps={[lastSave]}
                 filter={{
-                  "chain.chainId": chain.id,
-                  "chainStepTemplate.chainStepTemplateId": step.id
+                  "chain.chainId": chain.id as string,
+                  "chainStepTemplate.chainStepTemplateId": step.id as string
                 }}
                 include="sample,sample.group"
                 onSuccess={res => setStepResources(res.data)}
