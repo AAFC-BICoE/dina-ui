@@ -25,10 +25,8 @@ export function useLibraryPoolingSelectionControls({
     const newLibraryPoolContents = pooledItems.map<LibraryPoolContent>(
       item => ({
         libraryPool,
-        pooledLibraryPool:
-          item.type === "libraryPool" ? (item as LibraryPool) : null,
-        pooledLibraryPrepBatch:
-          item.type === "libraryPrepBatch" ? (item as LibraryPrepBatch) : null,
+        pooledLibraryPool: item.type === "libraryPool" ? item : null,
+        pooledLibraryPrepBatch: item.type === "libraryPrepBatch" ? item : null,
         type: "libraryPoolContent"
       })
     );
@@ -85,7 +83,7 @@ export function useLibraryPoolingSelectionControls({
       op: "DELETE" as HttpMethod,
       path: `libraryPoolContent/${item.id}`,
       value: {
-        id: item.id,
+        id: item.id as string,
         type: "libraryPoolContent"
       }
     }));

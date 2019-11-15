@@ -50,9 +50,10 @@ export function LibraryPoolingStep(props: StepRendererProps) {
     );
   }
 
-  if (response && response.data.length) {
-    const libraryPool = response.data[0].libraryPool;
+  const libraryPool =
+    response && response.data[0] && response.data[0].libraryPool;
 
+  if (libraryPool) {
     return (
       <>
         <h2>Library Pool Details</h2>

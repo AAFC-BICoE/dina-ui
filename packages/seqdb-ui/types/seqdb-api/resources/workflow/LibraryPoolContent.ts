@@ -8,8 +8,8 @@ interface LibraryPoolContentAttributes {
 
 interface LibraryPoolContentRelationships {
   libraryPool: LibraryPool;
-  pooledLibraryPrepBatch?: LibraryPrepBatch;
-  pooledLibraryPool?: LibraryPool;
+  pooledLibraryPrepBatch?: LibraryPrepBatch | null;
+  pooledLibraryPool?: LibraryPool | null;
 }
 
 export type LibraryPoolContent = KitsuResource &

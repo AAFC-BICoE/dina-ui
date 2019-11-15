@@ -87,19 +87,19 @@ const TEST_LIBRARY_POOL_STEPRESOURCE: StepResource = {
 const TEST_LIBRARY_POOL_CONTENTS: LibraryPoolContent[] = [
   {
     id: "6",
-    libraryPool: TEST_LIBRARY_POOL_STEPRESOURCE.libraryPool,
+    libraryPool: TEST_LIBRARY_POOL_STEPRESOURCE.libraryPool as LibraryPool,
     pooledLibraryPool: TEST_LIBRARY_POOLS[0],
     type: "libraryPoolContent"
   },
   {
     id: "7",
-    libraryPool: TEST_LIBRARY_POOL_STEPRESOURCE.libraryPool,
+    libraryPool: TEST_LIBRARY_POOL_STEPRESOURCE.libraryPool as LibraryPool,
     pooledLibraryPool: TEST_LIBRARY_POOLS[1],
     type: "libraryPoolContent"
   },
   {
     id: "8",
-    libraryPool: TEST_LIBRARY_POOL_STEPRESOURCE.libraryPool,
+    libraryPool: TEST_LIBRARY_POOL_STEPRESOURCE.libraryPool as LibraryPool,
     pooledLibraryPrepBatch: TEST_LIBRARY_PREP_BATCHS[0],
     type: "libraryPoolContent"
   }
@@ -208,14 +208,17 @@ describe("LibraryPoolingStep component", () => {
         ".library-pool-content-selection-table .rt-tbody input[type='checkbox']"
       )
       .at(0)
-      .prop("onClick")({ target: { checked: true } } as any);
+      .prop<any>("onClick")({ target: { checked: true } });
     wrapper.update();
     wrapper
       .find(
         ".library-pool-content-selection-table .rt-tbody input[type='checkbox']"
       )
       .at(2)
-      .prop("onClick")({ shiftKey: true, target: { checked: true } } as any);
+      .prop<any>("onClick")({
+      shiftKey: true,
+      target: { checked: true }
+    });
     wrapper.update();
 
     wrapper.find("button.select-all-checked-button").simulate("click");
@@ -290,12 +293,15 @@ describe("LibraryPoolingStep component", () => {
     wrapper
       .find(".library-pool-content-table .rt-tbody input[type='checkbox']")
       .at(0)
-      .prop("onClick")({ target: { checked: true } } as any);
+      .prop<any>("onClick")({ target: { checked: true } });
     wrapper.update();
     wrapper
       .find(".library-pool-content-table .rt-tbody input[type='checkbox']")
       .at(2)
-      .prop("onClick")({ shiftKey: true, target: { checked: true } } as any);
+      .prop<any>("onClick")({
+      shiftKey: true,
+      target: { checked: true }
+    });
     wrapper.update();
 
     wrapper.find("button.deselect-all-checked-button").simulate("click");
