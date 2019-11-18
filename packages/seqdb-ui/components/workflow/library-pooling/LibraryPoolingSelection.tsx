@@ -231,6 +231,11 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                   onFilteredChange={onBatchNameFilterChange}
                   onSuccess={res => setAvailableBatchs(res.data)}
                   path="libraryPrepBatch"
+                  reactTableProps={{
+                    getTrProps: () => ({
+                      style: { background: "rgb(222, 252, 222)" }
+                    })
+                  }}
                 />
               </TabPanel>
               <TabPanel>
@@ -241,6 +246,11 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                   onFilteredChange={onPoolNameFilterChange}
                   onSuccess={res => setAvailablePools(res.data)}
                   path="libraryPool"
+                  reactTableProps={{
+                    getTrProps: () => ({
+                      style: { background: "rgb(168, 209, 255)" }
+                    })
+                  }}
                 />
               </TabPanel>
             </Tabs>
@@ -273,6 +283,21 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
               include="pooledLibraryPrepBatch,pooledLibraryPool"
               onSuccess={res => setLibraryPoolContents(res.data)}
               path={`libraryPool/${libraryPool.id}/contents`}
+              reactTableProps={{
+                getTrProps: (_, rowInfo) => {
+                  if (rowInfo) {
+                    const lpc: LibraryPoolContent = rowInfo.original;
+                    return {
+                      style: {
+                        background: lpc.pooledLibraryPrepBatch
+                          ? "rgb(222, 252, 222)"
+                          : "rgb(168, 209, 255)"
+                      }
+                    };
+                  }
+                  return {};
+                }
+              }}
             />
           </div>
         </div>

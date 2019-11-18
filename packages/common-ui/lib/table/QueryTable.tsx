@@ -5,7 +5,8 @@ import ReactTable, {
   FilteredChangeFunction,
   PageSizeChangeFunction,
   SortedChangeFunction,
-  SortingRule
+  SortingRule,
+  TableProps
 } from "react-table";
 import titleCase from "title-case";
 import {
@@ -58,6 +59,9 @@ export interface QueryTableProps<TData extends KitsuResource> {
 
   /** Query success callback. */
   onSuccess?: (response: KitsuResponse<TData[], MetaWithTotal>) => void;
+
+  /** Override internal react-table props. */
+  reactTableProps?: Partial<TableProps>;
 }
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -97,7 +101,8 @@ export function QueryTable<TData extends KitsuResource>({
   onPageSizeChange,
   onSortedChange,
   onSuccess,
-  path
+  path,
+  reactTableProps
 }: QueryTableProps<TData>) {
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
@@ -204,6 +209,7 @@ export function QueryTable<TData extends KitsuResource>({
         pageSizeOptions={[25, 50, 100, 200, 500]}
         pages={numberOfPages}
         showPaginationTop={true}
+        {...reactTableProps}
       />
     </div>
   );
