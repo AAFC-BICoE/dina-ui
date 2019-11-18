@@ -21,7 +21,9 @@ export default function WorkflowDetailsPage() {
 
   return (
     <>
-      <Head title="NGS Workflow" />
+      <Head
+        title={`NGS Workflow${response ? `: ${response.data.name}` : ""}`}
+      />
       <Nav />
       <div className="container-fluid">
         <Link href="/workflow/list">

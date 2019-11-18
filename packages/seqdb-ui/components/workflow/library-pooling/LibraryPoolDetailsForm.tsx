@@ -1,5 +1,6 @@
 import {
   ApiClientContext,
+  DateField,
   ErrorViewer,
   safeSubmit,
   SubmitButton,
@@ -66,6 +67,7 @@ export function LibraryPoolDetailsForm({
         <ErrorViewer />
         <div className="row">
           <TextField className="col-md-2" name="name" />
+          <DateField className="col-md-2" name="dateUsed" />
         </div>
         <SubmitButton />
       </Form>

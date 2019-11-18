@@ -19,15 +19,17 @@ export function DateField(props: LabelWrapperParams) {
           }
 
           return (
-            <DatePicker
-              className="form-control"
-              dateFormat="yyyy-MM-dd"
-              isClearable={true}
-              onChange={onChange}
-              selected={value ? new Date(`${value}T12:00:00Z`) : null}
-              showYearDropdown={true}
-              todayButton="Today"
-            />
+            <div>
+              <DatePicker
+                className="form-control"
+                dateFormat="yyyy-MM-dd"
+                isClearable={true}
+                onChange={onChange}
+                selected={value ? new Date(`${value}T12:00:00Z`) : null}
+                showYearDropdown={true}
+                todayButton="Today"
+              />
+            </div>
           );
         }}
       </FastField>

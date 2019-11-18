@@ -9,6 +9,7 @@ import { Formik } from "formik";
 import { FilterParam } from "kitsu";
 import { debounce, Dictionary, noop } from "lodash";
 import { useState } from "react";
+import { useCookies } from "react-cookie";
 import { FilteredChangeFunction } from "react-table";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
@@ -27,6 +28,8 @@ export interface LibraryPoolingSelectionFormValues {
   libraryPoolIdsToSelect: Dictionary<boolean>;
   libraryPrepBatchIdsToSelect: Dictionary<boolean>;
 }
+
+const HIDE_USED_ITEMS_COOKIE = "pooling-search-hide-used";
 
 export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
   const {
@@ -57,22 +60,26 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     setAvailableItems: setLibraryPoolContents
   } = useGroupedCheckBoxes({ fieldName: "libraryPoolContentIdsToDelete" });
 
-  const [batchFilter, setBatchFilter] = useState<FilterParam>({});
-  const [poolFilter, setPoolFilter] = useState<FilterParam>({
-    rsql: `libraryPoolId!=${libraryPool.id}`
-  });
+  const [cookies, setCookie] = useCookies([HIDE_USED_ITEMS_COOKIE]);
+  const hideUsedItems = cookies[HIDE_USED_ITEMS_COOKIE] !== "false";
 
-  const onBatchNameFilterChange: FilteredChangeFunction = debounce(
-    (_, __, value) => setBatchFilter({ rsql: `name=='*${value}*'` }),
+  const [nameFilter, setNameFilter] = useState<string>("");
+
+  const onNameFilterInputChange: FilteredChangeFunction = debounce(
+    (_, __, value) => setNameFilter(value),
     200
   );
-  const onPoolNameFilterChange: FilteredChangeFunction = debounce(
-    (_, __, value) =>
-      setPoolFilter({
-        rsql: `libraryPoolId!=${libraryPool.id} and name=='*${value}*'`
-      }),
-    200
-  );
+
+  const batchFilter: FilterParam = {
+    rsql: `name=='*${nameFilter}*' ${
+      hideUsedItems ? " and dateUsed==null" : ""
+    }`
+  };
+  const poolFilter = {
+    rsql: `libraryPoolId!=${libraryPool.id} and name=='*${nameFilter}*' ${
+      hideUsedItems ? " and dateUsed==null" : ""
+    }`
+  };
 
   const LIBRARY_PREP_BATCH_TABLE_COLUMNS: Array<
     ColumnDefinition<LibraryPrepBatch>
@@ -82,6 +89,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
       accessor: "name",
       filterable: true
     },
+    "dateUsed",
     {
       Cell: ({ original }) => {
         const batch: LibraryPrepBatch = original;
@@ -117,6 +125,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
       accessor: "name",
       filterable: true
     },
+    "dateUsed",
     {
       Cell: ({ original }) => {
         const pool: LibraryPool = original;
@@ -218,6 +227,17 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
         <ErrorViewer />
         <div className="row">
           <div className="col-5 library-pool-content-selection-table">
+            <div className="float-right">
+              <strong>Hide used</strong>
+              <input
+                style={{ width: "20px", height: "20px" }}
+                type="checkbox"
+                checked={hideUsedItems}
+                onChange={e =>
+                  setCookie(HIDE_USED_ITEMS_COOKIE, e.target.checked)
+                }
+              />
+            </div>
             <Tabs>
               <TabList>
                 <Tab>Library Prep Batches</Tab>
@@ -234,7 +254,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                     getTrProps: () => ({
                       style: { background: "rgb(222, 252, 222)" }
                     }),
-                    onFilteredChange: onBatchNameFilterChange
+                    onFilteredChange: onNameFilterInputChange
                   }}
                 />
               </TabPanel>
@@ -249,7 +269,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                     getTrProps: () => ({
                       style: { background: "rgb(168, 209, 255)" }
                     }),
-                    onFilteredChange: onPoolNameFilterChange
+                    onFilteredChange: onNameFilterInputChange
                   }}
                 />
               </TabPanel>

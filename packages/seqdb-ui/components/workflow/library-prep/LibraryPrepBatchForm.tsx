@@ -1,5 +1,6 @@
 import {
   ApiClientContext,
+  DateField,
   ErrorViewer,
   filterBy,
   NumberField,
@@ -83,6 +84,7 @@ export function LibraryPrepBatchForm({
             label="Library Prep Batch Name"
             name="name"
           />
+          <DateField className="col-md-2" name="dateUsed" />
         </div>
         <div className="row">
           <ResourceSelectField<Product>

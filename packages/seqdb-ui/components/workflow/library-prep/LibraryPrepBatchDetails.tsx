@@ -20,6 +20,7 @@ export function LibraryPrepBatchDetails({
               label="Library Prep Batch Name"
               name="name"
             />
+            <FieldView className="col-md-2" name="dateUsed" />
           </div>
           <div className="row">
             <FieldView className="col-md-2" name="product.name" />
