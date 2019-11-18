@@ -228,13 +228,13 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                   columns={LIBRARY_PREP_BATCH_TABLE_COLUMNS}
                   deps={[lastSave]}
                   filter={batchFilter}
-                  onFilteredChange={onBatchNameFilterChange}
                   onSuccess={res => setAvailableBatchs(res.data)}
                   path="libraryPrepBatch"
                   reactTableProps={{
                     getTrProps: () => ({
                       style: { background: "rgb(222, 252, 222)" }
-                    })
+                    }),
+                    onFilteredChange: onBatchNameFilterChange
                   }}
                 />
               </TabPanel>
@@ -243,13 +243,13 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                   columns={LIBRARY_POOL_TABLE_COLUMNS}
                   deps={[lastSave]}
                   filter={poolFilter}
-                  onFilteredChange={onPoolNameFilterChange}
                   onSuccess={res => setAvailablePools(res.data)}
                   path="libraryPool"
                   reactTableProps={{
                     getTrProps: () => ({
                       style: { background: "rgb(168, 209, 255)" }
-                    })
+                    }),
+                    onFilteredChange: onPoolNameFilterChange
                   }}
                 />
               </TabPanel>

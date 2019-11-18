@@ -1,13 +1,6 @@
 import { FieldsParam, FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import React, { useRef, useState } from "react";
-import ReactTable, {
-  Column,
-  FilteredChangeFunction,
-  PageSizeChangeFunction,
-  SortedChangeFunction,
-  SortingRule,
-  TableProps
-} from "react-table";
+import ReactTable, { Column, SortingRule, TableProps } from "react-table";
 import titleCase from "title-case";
 import {
   JsonApiQuerySpec,
@@ -47,15 +40,6 @@ export interface QueryTableProps<TData extends KitsuResource> {
 
   /** Overrides the inner loading state if set to true. */
   loading?: boolean;
-
-  /** Called when a table header filter is changed. */
-  onFilteredChange?: FilteredChangeFunction;
-
-  /** Called when a new page size is requested. */
-  onPageSizeChange?: PageSizeChangeFunction;
-
-  /** Called when a new sort is specified. */
-  onSortedChange?: SortedChangeFunction;
 
   /** Query success callback. */
   onSuccess?: (response: KitsuResponse<TData[], MetaWithTotal>) => void;
@@ -97,9 +81,6 @@ export function QueryTable<TData extends KitsuResource>({
   filter,
   include,
   loading: loadingProp,
-  onFilteredChange,
-  onPageSizeChange,
-  onSortedChange,
   onSuccess,
   path,
   reactTableProps
@@ -203,9 +184,6 @@ export function QueryTable<TData extends KitsuResource>({
         manual={true}
         minRows={1}
         onFetchData={onFetchData}
-        onFilteredChange={onFilteredChange}
-        onPageSizeChange={onPageSizeChange}
-        onSortedChange={onSortedChange}
         pageSizeOptions={[25, 50, 100, 200, 500]}
         pages={numberOfPages}
         showPaginationTop={true}

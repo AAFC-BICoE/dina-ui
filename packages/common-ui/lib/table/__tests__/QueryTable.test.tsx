@@ -577,7 +577,9 @@ describe("QueryTable component", () => {
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
-        onPageSizeChange={mockOnPageSizeChange}
+        reactTableProps={{
+          onPageSizeChange: mockOnPageSizeChange
+        }}
       />
     );
 
@@ -594,7 +596,9 @@ describe("QueryTable component", () => {
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
-        onSortedChange={mockOnSortedChange}
+        reactTableProps={{
+          onSortedChange: mockOnSortedChange
+        }}
       />
     );
 
