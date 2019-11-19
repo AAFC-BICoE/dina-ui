@@ -45,7 +45,8 @@ export function EditMetadataFormPage({ router }: WithRouterProps) {
 
 function EditMetadataForm({
   originalFileName,
-  fileIdentifier
+  fileIdentifier,
+  router
 }: EditMetadataFormProps) {
   const { apiClient } = useContext(ApiClientContext);
   const managedAttributes = [];
@@ -96,6 +97,8 @@ function EditMetadataForm({
             config
           );
         });
+
+        router.push("/media-uploadView/detailView?id=" + fileIdentifier);
       } else {
         setStatus(
           response.data.errors[0].title + ": " + response.data.errors[0].detail
