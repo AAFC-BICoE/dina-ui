@@ -662,4 +662,38 @@ describe("QueryTable component", () => {
 
     expect(wrapper.find(ReactTable).prop("loading")).toEqual(true);
   });
+
+  it("Provides a header input for filtering.", async () => {
+    const mockOnFilteredChange = jest.fn();
+
+    const wrapper = mountWithContext(
+      <QueryTable<Todo>
+        path="todo"
+        columns={[{ accessor: "name", filterable: true }]}
+        reactTableProps={{
+          onFilteredChange: mockOnFilteredChange
+        }}
+      />
+    );
+
+    const headerInput = wrapper.find(".rt-th input");
+
+    expect(headerInput.prop("placeholder")).toEqual("Search...");
+
+    headerInput.simulate("change", {
+      target: { name: "header-input", value: "new value" }
+    });
+    expect(mockOnFilteredChange.mock.calls).toEqual([
+      [
+        [
+          {
+            id: "name",
+            value: "new value"
+          }
+        ],
+        expect.objectContaining({ id: "name" }),
+        "new value"
+      ]
+    ]);
+  });
 });

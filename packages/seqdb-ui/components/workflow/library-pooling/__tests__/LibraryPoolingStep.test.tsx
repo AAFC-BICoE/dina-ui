@@ -528,4 +528,90 @@ describe("LibraryPoolingStep component", () => {
       ]
     ]);
   });
+
+  it("Lets you filter LibraryPrepBatchs and LibraryPools by name.", async () => {
+    // Un-debounce the header filter's onChange function.
+    jest
+      .spyOn(require("lodash"), "debounce")
+      .mockImplementation(fn => fn as any);
+
+    const wrapper = getWrapper();
+
+    // Await initial queries:
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper
+      .find(
+        ".library-pool-content-selection-table .rt-th input[placeholder='Search...']"
+      )
+      .prop<any>("onChange")({
+      target: { name: "header-input", value: "test search name" }
+    });
+
+    // Await new queries:
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // The name filter should be passed in:
+    expect(mockGet).lastCalledWith("libraryPrepBatch", {
+      filter: { rsql: "name=='*test search name*' and dateUsed==null" },
+      page: { limit: 25, offset: 0 }
+    });
+
+    // Switch to the library pools tab:
+    wrapper
+      .find("li.react-tabs__tab[children='Library Pools']")
+      .simulate("click");
+
+    // Await pools query:
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // The name filter should be passed in:
+    expect(mockGet).lastCalledWith("libraryPool", {
+      filter: {
+        rsql:
+          "libraryPoolId!=100 and name=='*test search name*' and dateUsed==null"
+      },
+      page: { limit: 25, offset: 0 }
+    });
+  });
+
+  it("Lets you filter by used or not-used.", async () => {
+    const wrapper = getWrapper();
+
+    // Await initial queries:
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find("input.hide-used-checkbox").prop<any>("onChange")({
+      target: { checked: "false" }
+    } as any);
+
+    // Await new query:
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockGet).lastCalledWith("libraryPrepBatch", {
+      filter: { rsql: "name=='**' " },
+      page: { limit: 25, offset: 0 }
+    });
+
+    // Switch to the library pools tab:
+    wrapper
+      .find("li.react-tabs__tab[children='Library Pools']")
+      .simulate("click");
+
+    // Await pools query:
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockGet).lastCalledWith("libraryPool", {
+      filter: {
+        rsql: "libraryPoolId!=100 and name=='**' "
+      },
+      page: { limit: 25, offset: 0 }
+    });
+  });
 });

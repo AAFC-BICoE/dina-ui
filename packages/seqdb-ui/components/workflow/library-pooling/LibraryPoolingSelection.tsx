@@ -71,13 +71,11 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
   );
 
   const batchFilter: FilterParam = {
-    rsql: `name=='*${nameFilter}*' ${
-      hideUsedItems ? " and dateUsed==null" : ""
-    }`
+    rsql: `name=='*${nameFilter}*' ${hideUsedItems ? "and dateUsed==null" : ""}`
   };
   const poolFilter = {
     rsql: `libraryPoolId!=${libraryPool.id} and name=='*${nameFilter}*' ${
-      hideUsedItems ? " and dateUsed==null" : ""
+      hideUsedItems ? "and dateUsed==null" : ""
     }`
   };
 
@@ -230,6 +228,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
             <div className="float-right">
               <strong>Hide used</strong>
               <input
+                className="hide-used-checkbox"
                 style={{ width: "20px", height: "20px" }}
                 type="checkbox"
                 checked={hideUsedItems}
@@ -251,6 +250,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                   onSuccess={res => setAvailableBatchs(res.data)}
                   path="libraryPrepBatch"
                   reactTableProps={{
+                    defaultFiltered: [{ id: "name", value: nameFilter }],
                     getTrProps: () => ({
                       style: { background: "rgb(222, 252, 222)" }
                     }),
@@ -266,6 +266,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                   onSuccess={res => setAvailablePools(res.data)}
                   path="libraryPool"
                   reactTableProps={{
+                    defaultFiltered: [{ id: "name", value: nameFilter }],
                     getTrProps: () => ({
                       style: { background: "rgb(168, 209, 255)" }
                     }),
