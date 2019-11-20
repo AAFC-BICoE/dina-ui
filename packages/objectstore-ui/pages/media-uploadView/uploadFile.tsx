@@ -1,7 +1,6 @@
 import axios from "axios";
 import { ErrorViewer, SubmitButton } from "common-ui";
 import { Form, Formik, FormikActions } from "formik";
-import { WithRouterProps } from "next/dist/client/with-router";
 import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import useForceUpdate from "use-force-update";
@@ -44,7 +43,7 @@ const rejectStyle = {
 
 let editMetadataVisible = false;
 
-function MediaUploadViewPage({ router }: WithRouterProps) {
+function MediaUploadViewPage() {
   return (
     <div>
       <Head title="Upload files" />
@@ -52,14 +51,14 @@ function MediaUploadViewPage({ router }: WithRouterProps) {
       <div className="container-fluid">
         <div>
           <h4>Upload File</h4>
-          <UploadViewForm router={router} />
+          <UploadViewForm />
         </div>
       </div>
     </div>
   );
 }
 
-function UploadViewForm(router) {
+function UploadViewForm() {
   const {
     getRootProps,
     getInputProps,
@@ -70,6 +69,7 @@ function UploadViewForm(router) {
   } = useDropzone({
     accept: "image/*,audio/*,video/*,.pdf,.doc,docx,.png"
   });
+
   const [fileId, setFileId] = useState();
   const acceptedFilesItems = acceptedFiles.map(file => (
     <li key={file.name}>
@@ -146,13 +146,15 @@ function UploadViewForm(router) {
             </div>
           </Form>
         </Formik>
-        {editMetadataVisible && acceptedFiles && acceptedFiles.length > 0 && (
-          <EditMetadataFormPage
-            router={router}
-            fileName={acceptedFiles[0].name}
-            fileId={fileId}
-          />
-        )}
+        {editMetadataVisible &&
+          acceptedFiles &&
+          acceptedFiles.length > 0 &&
+          fileId && (
+            <EditMetadataFormPage
+              originalFileName={acceptedFiles[0].name}
+              fileIdentifier={fileId}
+            />
+          )}
       </div>
     </div>
   );

@@ -8,9 +8,6 @@ jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 /** Mock axios for operations requests. */
 const mockPost = jest.fn();
 
-/** Mock next.js' router "push" function for navigating pages. */
-const mockPush = jest.fn();
-
 const mockGet = jest.fn();
 
 const flushPromises = () => new Promise(setImmediate);
@@ -78,12 +75,8 @@ describe("Metadata edit page", () => {
 
     const ui = (
       <EditMetadataFormPage
-        router={
-          {
-            push: mockPush,
-            query: { fileName: "file", fileId: "fileId" }
-          } as any
-        }
+        originalFileName="fileName"
+        fileIdentifier="fileId"
       />
     );
     const wrapper = mountWithContext(ui);
@@ -109,7 +102,7 @@ describe("Metadata edit page", () => {
               bucket: "mybucket",
               dcFormat: "dcFormat",
               fileIdentifier: "fileId",
-              originalFilename: "file",
+              originalFilename: "fileName",
               type: undefined
             },
 
@@ -139,12 +132,8 @@ describe("Metadata edit page", () => {
 
     const ui = (
       <EditMetadataFormPage
-        router={
-          {
-            push: mockPush,
-            query: {}
-          } as any
-        }
+        originalFileName="fileName"
+        fileIdentifier="fileId"
       />
     );
     const wrapper = mountWithContext(ui);
@@ -164,6 +153,8 @@ describe("Metadata edit page", () => {
             attributes: {
               acTags: new Set(["anything2"]),
               bucket: "mybucket",
+              fileIdentifier: "fileId",
+              originalFilename: "fileName",
               type: undefined
             },
 
@@ -192,7 +183,10 @@ describe("Metadata edit page", () => {
     }));
 
     const wrapper = mountWithContext(
-      <EditMetadataFormPage router={{ query: {}, push: mockPush } as any} />
+      <EditMetadataFormPage
+        originalFileName="fileName"
+        fileIdentifier="fileId"
+      />
     );
     wrapper.find(".originalFilename-field input").simulate("change", {
       target: { name: "originalFilename", value: "newfile" }

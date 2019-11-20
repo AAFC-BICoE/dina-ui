@@ -9,37 +9,30 @@ import {
 } from "common-ui";
 import { DateField, SelectField } from "common-ui";
 import { Form, Formik, FormikActions } from "formik";
-import { NextRouter } from "next/router";
+import { useRouter } from "next/router";
 import { useContext } from "react";
 
 import { isArray } from "lodash";
 import { Agent } from "types/objectstore-api/resources/Agent";
 import { AttributeBuilder } from "../../components";
 
-interface EditMetadataFormProps {
-  router: NextRouter;
+export interface EditMetadataFormProps {
   originalFileName: string | string[];
   fileIdentifier: string | string[];
 }
 
-export interface EditMetadataFormPageProps {
-  fileName: string | string[];
-  fileId: string | string[];
-}
-
-export function EditMetadataFormPage(
-  router,
-  { fileName, fileId }: EditMetadataFormPageProps
-) {
+export function EditMetadataFormPage({
+  originalFileName,
+  fileIdentifier
+}: EditMetadataFormProps) {
   return (
     <div>
       <div className="container-fluid">
         <div>
-          <h4>Edit Metadata</h4>
+          <h5>Metadata</h5>
           <EditMetadataForm
-            router={router}
-            originalFileName={fileName}
-            fileIdentifier={fileId}
+            originalFileName={originalFileName}
+            fileIdentifier={fileIdentifier}
           />
         </div>
       </div>
@@ -49,10 +42,10 @@ export function EditMetadataFormPage(
 
 function EditMetadataForm({
   originalFileName,
-  fileIdentifier,
-  router
+  fileIdentifier
 }: EditMetadataFormProps) {
   const { apiClient } = useContext(ApiClientContext);
+  const router = useRouter();
   const managedAttributes = [];
   const unManagedAttributes = [
     { name: "unManagedAttribute", value: "unManagedValue" }
@@ -101,7 +94,6 @@ function EditMetadataForm({
             config
           );
         });
-
         router.push("/media-uploadView/detailView?id=" + fileIdentifier);
       } else {
         setStatus(
@@ -233,16 +225,15 @@ function EditMetadataForm({
             />
           </div>
         </div>
-
         <div className="form-group row">
           <div className="col col-md-6">
-            <h4>Managed Attributes</h4>
+            <h6>Managed Attributes</h6>
             <AttributeBuilder controlledAttributes={managedAttributes} />
           </div>
         </div>
         <div className="form-group row">
           <div className="col-md-4">
-            <h4>Tags</h4>
+            <h6>Tags</h6>
             <AttributeBuilder controlledAttributes={unManagedAttributes} />
           </div>
         </div>
