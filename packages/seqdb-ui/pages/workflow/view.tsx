@@ -9,7 +9,7 @@ import { StepRenderer } from "../../components/workflow/StepRenderer";
 import { Chain } from "../../types/seqdb-api/resources/workflow/Chain";
 import { ChainStepTemplate } from "../../types/seqdb-api/resources/workflow/ChainStepTemplate";
 
-export default function WorkflowDetailsPage() {
+export default function WorkflowViewPage() {
   const {
     query: { id }
   } = useRouter();
