@@ -1,9 +1,12 @@
 import axios from "axios";
 import { ErrorViewer, SubmitButton } from "common-ui";
 import { Form, Formik, FormikActions } from "formik";
+import { WithRouterProps } from "next/dist/client/with-router";
 import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import useForceUpdate from "use-force-update";
 import { Head, Nav } from "../../components";
+import { EditMetadataFormPage } from "./editMetadata";
 
 interface FileUploadResponse {
   fileName: string;
@@ -39,7 +42,9 @@ const rejectStyle = {
   borderColor: "#ff1744"
 };
 
-function MediaUploadViewPage() {
+let editMetadataVisible = false;
+
+function MediaUploadViewPage({ router }: WithRouterProps) {
   return (
     <div>
       <Head title="Upload files" />
@@ -47,14 +52,14 @@ function MediaUploadViewPage() {
       <div className="container-fluid">
         <div>
           <h4>Upload File</h4>
-          <UploadViewForm />
+          <UploadViewForm router={router} />
         </div>
       </div>
     </div>
   );
 }
 
-function UploadViewForm() {
+function UploadViewForm(router) {
   const {
     getRootProps,
     getInputProps,
@@ -82,7 +87,7 @@ function UploadViewForm() {
     }),
     [isDragActive, isDragReject]
   );
-
+  const forceUpdate = useForceUpdate();
   async function onSubmit(
     submittedValues,
     { setStatus, setSubmitting }: FormikActions<any>
@@ -91,6 +96,8 @@ function UploadViewForm() {
       const response = save();
       setFileId((await response).fileName);
       setStatus(acceptedFiles[0].name + " submitted successfully!");
+      editMetadataVisible = true;
+      forceUpdate();
     } catch (error) {
       setStatus(
         error.message + ", " + " submittedValues are: " + submittedValues
@@ -114,53 +121,40 @@ function UploadViewForm() {
   return (
     <div>
       <div id="dndRoot">
-        <div {...getRootProps({ style })} className="container root">
+        <div {...getRootProps({ style })} className="root">
           <input {...getInputProps()} />
-          <div>
-            <div>Drag and drop files here or click to open browse dialog</div>
+          <div style={{ margin: "auto" }}>
             <div>
-              (Only image, audio, video, .pdf, .doc and docx are accepted)
+              Drag and drop files here or click to open browse dialog. (Only
+              image, audio, video, .pdf, .doc and docx are accepted)
             </div>
           </div>
         </div>
-        <div className="container">
+        <div>
           <ul>{acceptedFilesItems}</ul>
         </div>
       </div>
 
-      <div className="container">
+      <div>
         <Formik initialValues={{}} onSubmit={onSubmit}>
           <Form>
             <ErrorViewer />
-            <div className="row">
+            <div className="form-group row">
               <div className="col-md-2">
                 <SubmitButton />
-              </div>
-              <div className="col-md-2">
-                {acceptedFiles && acceptedFiles.length > 0 ? (
-                  <a
-                    href={`/media-uploadView/editMetadata?fileName=${acceptedFiles[0].name}&fileId=${fileId}`}
-                    className="btn btn-info"
-                    role="button"
-                  >
-                    Edit Metadata
-                  </a>
-                ) : (
-                  <a
-                    href={`/media-uploadView/editMetadata`}
-                    className="btn btn-info"
-                    role="button"
-                  >
-                    Edit Metadata
-                  </a>
-                )}
               </div>
             </div>
           </Form>
         </Formik>
+        {editMetadataVisible && acceptedFiles && acceptedFiles.length > 0 && (
+          <EditMetadataFormPage
+            router={router}
+            fileName={acceptedFiles[0].name}
+            fileId={fileId}
+          />
+        )}
       </div>
     </div>
   );
 }
-
 export default MediaUploadViewPage;
