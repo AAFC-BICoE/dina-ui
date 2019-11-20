@@ -160,30 +160,24 @@ export default function LibraryPrepWorksheetPage() {
           <div className="row">
             <div className="col-12">
               <BigField label="Results and next steps" />
+              {prepsResponse && (
+                <>
+                  {sampleLayout === "table" ? (
+                    <LibraryPrepTable
+                      libraryPrepBatch={batch}
+                      preps={prepsResponse.data}
+                    />
+                  ) : sampleLayout === "grid" ? (
+                    <LibraryPrepGrid
+                      libraryPrepBatch={batch}
+                      preps={prepsResponse.data}
+                    />
+                  ) : null}
+                </>
+              )}
             </div>
           </div>
-          {prepsResponse && (
-            <LibraryPrepTable
-              libraryPrepBatch={batch}
-              preps={prepsResponse.data}
-            />
-          )}
         </div>
-        {prepsResponse && (
-          <>
-            {sampleLayout === "table" ? (
-              <LibraryPrepTable
-                libraryPrepBatch={batch}
-                preps={prepsResponse.data}
-              />
-            ) : sampleLayout === "grid" ? (
-              <LibraryPrepGrid
-                libraryPrepBatch={batch}
-                preps={prepsResponse.data}
-              />
-            ) : null}
-          </>
-        )}
       </div>
     );
   }
@@ -277,7 +271,7 @@ function LibraryPrepGrid({ libraryPrepBatch, preps }: LibraryPrepTableProps) {
   const columnNumbers = [...Array(numberOfColumns).keys()].map(num => num + 1);
 
   return (
-    <table className="table table-bordered table-sm">
+    <table className="table table-bordered table-sm library-prep-grid">
       <tbody>
         <tr>
           <td />
