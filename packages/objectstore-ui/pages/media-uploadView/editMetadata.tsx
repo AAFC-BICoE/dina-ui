@@ -143,11 +143,14 @@ function EditMetadataForm({
     }
   }
   return (
-    <Formik initialValues={{}} onSubmit={onSubmit}>
+    <Formik
+      initialValues={{ customButtonName: "Save Metadata" }}
+      onSubmit={onSubmit}
+    >
       <Form>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
-            <strong>FileName</strong>
+            <strong>File Name</strong>
           </label>
           <div className="col">
             <TextField
@@ -161,7 +164,7 @@ function EditMetadataForm({
         </div>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
-            <strong>DcType</strong>
+            <strong>Stored Object Type</strong>
           </label>
           <div className="col">
             <SelectField
@@ -174,7 +177,7 @@ function EditMetadataForm({
         </div>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
-            <strong>AcDigitizationDate</strong>
+            <strong>First Digital Version Created Date</strong>
           </label>
           <div className="col">
             <DateField
@@ -187,7 +190,7 @@ function EditMetadataForm({
         </div>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
-            <strong>XmpMetadataDate</strong>
+            <strong>Last Metadata Modification Time</strong>
           </label>
           <div className="col">
             <DateField
@@ -198,7 +201,7 @@ function EditMetadataForm({
             />
           </div>
         </div>
-        <div className="form-group row">
+        <div className="form-group row" style={{ display: "none" }}>
           <label className="col-sm-2 col-form-label">
             <strong>DcFormat</strong>
           </label>
@@ -212,7 +215,7 @@ function EditMetadataForm({
         </div>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
-            <strong>Agent</strong>
+            <strong>Agent(Uploaded By)</strong>
           </label>
           <div className="col-sm-6">
             <ResourceSelectField<Agent>

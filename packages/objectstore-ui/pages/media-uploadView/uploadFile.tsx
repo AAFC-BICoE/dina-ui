@@ -136,7 +136,10 @@ function UploadViewForm() {
       </div>
 
       <div>
-        <Formik initialValues={{}} onSubmit={onSubmit}>
+        <Formik
+          initialValues={{ customButtonName: "Upload File" }}
+          onSubmit={onSubmit}
+        >
           <Form>
             <ErrorViewer />
             <div className="form-group row">
