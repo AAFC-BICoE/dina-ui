@@ -100,6 +100,7 @@ describe("Metadata edit page", () => {
           data: {
             attributes: {
               bucket: "mybucket",
+              customButtonName: "Save Metadata",
               dcFormat: "dcFormat",
               fileIdentifier: "fileId",
               originalFilename: "fileName",
@@ -153,6 +154,7 @@ describe("Metadata edit page", () => {
             attributes: {
               acTags: new Set(["anything2"]),
               bucket: "mybucket",
+              customButtonName: "Save Metadata",
               fileIdentifier: "fileId",
               originalFilename: "fileName",
               type: undefined
