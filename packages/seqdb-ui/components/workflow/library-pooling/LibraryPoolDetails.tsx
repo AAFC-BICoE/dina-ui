@@ -15,6 +15,9 @@ export function LibraryPoolDetails({ libraryPool }: LibraryPoolDetailsProps) {
           <FieldView className="col-md-2" name="name" />
           <FieldView className="col-md-2" name="dateUsed" />
         </div>
+        <div className="row">
+          <FieldView className="col-md-6" name="notes" />
+        </div>
       </>
     </Formik>
   );
