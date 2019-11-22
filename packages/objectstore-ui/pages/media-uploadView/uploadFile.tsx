@@ -5,7 +5,7 @@ import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import useForceUpdate from "use-force-update";
 import { Head, Nav } from "../../components";
-import { EditMetadataFormPage } from "./editMetadata";
+import { EditMetadataFormPage } from "../../page-fragments/editMetadata";
 
 interface FileUploadResponse {
   fileName: string;
