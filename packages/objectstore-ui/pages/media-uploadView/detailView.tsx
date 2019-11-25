@@ -55,57 +55,61 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title="Object Store Detailes Page" />
       <Nav />
-      <div className="container-fluid">
+      <div>
         <h4>Object Store Details</h4>
-        {imgResponse &&
-        imgResponse.headers["content-type"].indexOf("image") > -1 ? (
+        <div className="container-fluid">
           <div className="row">
-            <img
-              src={`/api/v1/file/mybucket/${id}`}
-              style={{ width: 400, height: "80%" }}
-            />
+            {imgResponse &&
+            imgResponse.headers["content-type"].indexOf("image") > -1 ? (
+              <div className="col-sm-4">
+                <img src={`/api/v1/file/mybucket/${id}`} />
+              </div>
+            ) : imgResponse &&
+              imgResponse.headers["content-type"].indexOf("pdf") > -1 ? (
+              <div className="col-sm-4">
+                <img
+                  src={`https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg`}
+                  style={{ width: 400, height: "80%" }}
+                />
+              </div>
+            ) : imgResponse &&
+              imgResponse.headers["content-type"].indexOf("/msword") > -1 ? (
+              <div className="col-sm-4">
+                <img
+                  src={`https://cdn2.iconfinder.com/data/icons/flat-file-types-1-1/300/icon_file-DOC_plano-512.png`}
+                  style={{ width: 400, height: "80%" }}
+                />
+              </div>
+            ) : imgResponse ? (
+              <div className="col-sm-4">
+                <img
+                  src={`https://ya-webdesign.com/transparent250_/files-icon-png.png`}
+                  style={{ width: 400, height: "80%" }}
+                />
+              </div>
+            ) : (
+              <p>No File to display</p>
+            )}
+
+            <Query
+              query={{
+                filter: { fileIdentifier: `${id}` },
+                include: "acMetadataCreator,managedAttribute",
+                path: "metadata/"
+              }}
+            >
+              {({ loading, response }) => (
+                <div className="col-sm-8">
+                  <LoadingSpinner loading={loading} />
+                  {response && (
+                    <ViewMetadataFormPage metadata={response.data[0]} />
+                  )}
+                </div>
+              )}
+            </Query>
           </div>
-        ) : imgResponse &&
-          imgResponse.headers["content-type"].indexOf("pdf") > -1 ? (
-          <div className="row">
-            <img
-              src={`https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg`}
-              style={{ width: 400, height: "80%" }}
-            />
-          </div>
-        ) : imgResponse &&
-          imgResponse.headers["content-type"].indexOf("/msword") > -1 ? (
-          <div className="row">
-            <img
-              src={`https://cdn2.iconfinder.com/data/icons/flat-file-types-1-1/300/icon_file-DOC_plano-512.png`}
-              style={{ width: 400, height: "80%" }}
-            />
-          </div>
-        ) : imgResponse ? (
-          <div className="row">
-            <img
-              src={`https://ya-webdesign.com/transparent250_/files-icon-png.png`}
-              style={{ width: 400, height: "80%" }}
-            />
-          </div>
-        ) : (
-          <p>No File to display</p>
-        )}
+        </div>
       </div>
-      <Query
-        query={{
-          filter: { fileIdentifier: `${id}` },
-          include: "acMetadataCreator,managedAttribute",
-          path: "metadata/"
-        }}
-      >
-        {({ loading, response }) => (
-          <div>
-            <LoadingSpinner loading={loading} />
-            {response && <ViewMetadataFormPage metadata={response.data[0]} />}
-          </div>
-        )}
-      </Query>
     </div>
   );
 }
