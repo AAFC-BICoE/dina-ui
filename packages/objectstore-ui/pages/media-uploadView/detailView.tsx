@@ -7,7 +7,6 @@ import { useAsyncRun, useAsyncTask } from "react-hooks-async";
 import { FileDownLoadResponseAttributes } from "types/objectstore-api/resources/FileDownLoadResponse";
 import { isArray, isUndefined } from "util";
 import { Head, Nav } from "../../components";
-// import { Metadata } from "types/objectstore-api/resources/Metadata";
 import ViewMetadataFormPage from "../../page-fragments/viewMetadata";
 
 interface DownloadFileResponse {
