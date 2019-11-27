@@ -14,16 +14,14 @@ describe("MediaUploadView test", () => {
     const { container } = render(<MediaUploadViewPage />);
     const rootDiv = container.querySelector("div#dndRoot");
     expect(rootDiv).toHaveProperty("style.border-color");
-    expect(rootDiv.querySelector("div.container>input")).toHaveProperty(
-      "multiple"
-    );
+    expect(rootDiv.querySelector("div.root>input")).toHaveProperty("multiple");
   });
 
   it("When dropped the files, page shows file names", async () => {
     const event = createDtWithFiles(files);
     const ui = <MediaUploadViewPage />;
     const { container } = render(ui);
-    const dropzone = container.querySelector(".container.root");
+    const dropzone = container.querySelector(".root");
     dispatchEvt(dropzone, "drop", event);
     await flushPromises(ui, container);
     expect(container.querySelector("a[href$='file1.pdf']")).toBeDefined();

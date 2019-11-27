@@ -9,33 +9,30 @@ import {
 } from "common-ui";
 import { DateField, SelectField } from "common-ui";
 import { Form, Formik, FormikActions } from "formik";
-import { WithRouterProps } from "next/dist/client/with-router";
-import { NextRouter, withRouter } from "next/router";
+import { useRouter } from "next/router";
 import { useContext } from "react";
 
 import { isArray } from "lodash";
 import { Agent } from "types/objectstore-api/resources/Agent";
-import { AttributeBuilder, Head, Nav } from "../../components";
+import { AttributeBuilder } from "../components";
 
-interface EditMetadataFormProps {
-  router: NextRouter;
+export interface EditMetadataFormProps {
   originalFileName: string | string[];
   fileIdentifier: string | string[];
 }
 
-export function EditMetadataFormPage({ router }: WithRouterProps) {
-  const { fileName, fileId } = router.query;
+export function EditMetadataFormPage({
+  originalFileName,
+  fileIdentifier
+}: EditMetadataFormProps) {
   return (
     <div>
-      <Head title="Add Metadata" />
-      <Nav />
       <div className="container-fluid">
         <div>
-          <h4>Edit Metadata</h4>
+          <h5>Metadata</h5>
           <EditMetadataForm
-            router={router}
-            originalFileName={fileName}
-            fileIdentifier={fileId}
+            originalFileName={originalFileName}
+            fileIdentifier={fileIdentifier}
           />
         </div>
       </div>
@@ -45,10 +42,10 @@ export function EditMetadataFormPage({ router }: WithRouterProps) {
 
 function EditMetadataForm({
   originalFileName,
-  fileIdentifier,
-  router
+  fileIdentifier
 }: EditMetadataFormProps) {
   const { apiClient } = useContext(ApiClientContext);
+  const router = useRouter();
   const managedAttributes = [];
   const unManagedAttributes = [
     { name: "unManagedAttribute", value: "unManagedValue" }
@@ -97,7 +94,6 @@ function EditMetadataForm({
             config
           );
         });
-
         router.push("/media-uploadView/detailView?id=" + fileIdentifier);
       } else {
         setStatus(
@@ -146,13 +142,15 @@ function EditMetadataForm({
       submittedValues.acTags = acTags;
     }
   }
-
   return (
-    <Formik initialValues={{}} onSubmit={onSubmit}>
+    <Formik
+      initialValues={{ customButtonName: "Save Metadata" }}
+      onSubmit={onSubmit}
+    >
       <Form>
-        <div className="form-group row">
+        <div className="form-group row" style={{ display: "none" }}>
           <label className="col-sm-2 col-form-label">
-            <strong>FileName</strong>
+            <strong>File Name</strong>
           </label>
           <div className="col">
             <TextField
@@ -166,20 +164,20 @@ function EditMetadataForm({
         </div>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
-            <strong>DcType</strong>
+            <strong>Stored Object Type</strong>
           </label>
-          <div className="col col-sm-6">
+          <div className="col">
             <SelectField
               options={DC_TYPE_OPTIONS}
               name="dcType"
-              className="dcType"
+              className="col-sm-6 dcType"
               hideLabel={true}
             />
           </div>
         </div>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
-            <strong>AcDigitizationDate</strong>
+            <strong>First Digital Version Created Date</strong>
           </label>
           <div className="col">
             <DateField
@@ -192,7 +190,7 @@ function EditMetadataForm({
         </div>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
-            <strong>XmpMetadataDate</strong>
+            <strong>Last Metadata Modification Time</strong>
           </label>
           <div className="col">
             <DateField
@@ -203,7 +201,7 @@ function EditMetadataForm({
             />
           </div>
         </div>
-        <div className="form-group row">
+        <div className="form-group row" style={{ display: "none" }}>
           <label className="col-sm-2 col-form-label">
             <strong>DcFormat</strong>
           </label>
@@ -217,7 +215,7 @@ function EditMetadataForm({
         </div>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
-            <strong>Agent</strong>
+            <strong>Agent(Uploaded By)</strong>
           </label>
           <div className="col-sm-6">
             <ResourceSelectField<Agent>
@@ -230,14 +228,15 @@ function EditMetadataForm({
             />
           </div>
         </div>
-
-        <div className="row">
-          <div className="col-sm-6 ">
-            <h4> Edit Managed Attribute</h4>
+        <div className="form-group row">
+          <div className="col col-md-6">
+            <h6>Managed Attributes</h6>
             <AttributeBuilder controlledAttributes={managedAttributes} />
           </div>
-          <div className="col-sm-4">
-            <h4> Edit UnManaged Attribute</h4>
+        </div>
+        <div className="form-group row">
+          <div className="col-md-4">
+            <h6>Tags</h6>
             <AttributeBuilder controlledAttributes={unManagedAttributes} />
           </div>
         </div>
@@ -266,4 +265,4 @@ const DC_TYPE_OPTIONS = [
   }
 ];
 
-export default withRouter(EditMetadataFormPage);
+export default EditMetadataFormPage;
