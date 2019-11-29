@@ -29,8 +29,8 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
         sample: "name,version"
       },
       filter: {
-        "chain.chainId": chain.id as string,
-        "chainStepTemplate.chainStepTemplateId": step.id as string,
+        "chain.chainId": chain.id,
+        "chainStepTemplate.chainStepTemplateId": step.id,
         rsql: `sample.sampleId=in=(${visibleSampleIds}) and sample.name!=${randomNumber}`
       },
       include:
@@ -92,8 +92,8 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       const existingStepResources = checkedSampleIds.length
         ? (await apiClient.get<StepResource[]>("stepResource", {
             filter: {
-              "chain.chainId": chain.id as string,
-              "chainStepTemplate.chainStepTemplateId": step.id as string,
+              "chain.chainId": chain.id,
+              "chainStepTemplate.chainStepTemplateId": step.id,
               "preLibraryPrep.preLibraryPrepType": plpValues.preLibraryPrepType,
               rsql: `sample.sampleId=in=(${checkedSampleIds})`
             },
@@ -180,8 +180,8 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       const stepResourcesToDelete = checkedSampleIds.length
         ? (await apiClient.get<StepResource[]>("stepResource", {
             filter: {
-              "chain.chainId": chain.id as string,
-              "chainStepTemplate.chainStepTemplateId": step.id as string,
+              "chain.chainId": chain.id,
+              "chainStepTemplate.chainStepTemplateId": step.id,
               "preLibraryPrep.preLibraryPrepType": plpType,
               rsql: `sample.sampleId=in=(${checkedSampleIds})`
             },

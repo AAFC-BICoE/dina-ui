@@ -1,4 +1,9 @@
-import { FilterParam, GetParams, KitsuResource } from "kitsu";
+import {
+  FilterParam,
+  GetParams,
+  KitsuResource,
+  PersistedResource
+} from "kitsu";
 import { debounce, isUndefined, omitBy } from "lodash";
 import React, { useContext } from "react";
 import AsyncSelect from "react-select/async";
@@ -6,18 +11,20 @@ import { OptionsType } from "react-select/src/types";
 import { ApiClientContext } from "..";
 
 /** ResourceSelect component props. */
-export interface ResourceSelectProps<TData> {
+export interface ResourceSelectProps<TData extends KitsuResource> {
   /** Sets the input's value so the value can be controlled externally. */
   value?: TData | TData[];
 
   /** Function called when an option is selected. */
-  onChange?: (value: TData | TData[]) => void;
+  onChange?: (
+    value: PersistedResource<TData> | Array<PersistedResource<TData>>
+  ) => void;
 
   /** The model type to select resources from. */
   model: string;
 
   /** Function to get the option label for each resource. */
-  optionLabel: (resource: TData) => string;
+  optionLabel: (resource: PersistedResource<TData>) => string;
 
   /** Function that is passed the dropdown's search input value and returns a JSONAPI filter param. */
   filter: (inputValue: string) => FilterParam;
@@ -62,7 +69,7 @@ export function ResourceSelect<TData extends KitsuResource>({
     );
 
     // Send the API request.
-    const { data } = await apiClient.get(model, getParams);
+    const { data } = await apiClient.get<TData[]>(model, getParams);
 
     // Build the list of options from the returned resources.
     const resourceOptions = data.map(resource => ({
@@ -99,18 +106,20 @@ export function ResourceSelect<TData extends KitsuResource>({
   // Set the component's value externally when used as a controlled input.
   let selectValue;
   if (isMulti) {
-    selectValue = ((value || []) as TData[]).map(resource => ({
-      label: optionLabel(resource),
-      resource,
-      value: resource.id
-    }));
+    selectValue = ((value || []) as Array<PersistedResource<TData>>).map(
+      resource => ({
+        label: optionLabel(resource),
+        resource,
+        value: resource.id
+      })
+    );
   } else {
     selectValue = !value
       ? null
       : (value as TData).id === null
       ? NULL_OPTION
       : {
-          label: optionLabel(value as TData),
+          label: optionLabel(value as PersistedResource<TData>),
           resource: value,
           value: (value as TData).id
         };

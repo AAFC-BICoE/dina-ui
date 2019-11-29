@@ -1,6 +1,6 @@
+import { ResourceObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 import { kebab, serialise } from "kitsu-core";
-import { JsonApiResource } from "../api-client/jsonapi-types";
 
 /** Params for the serialize util function. */
 interface SerializeParams<TData extends KitsuResource> {
@@ -28,7 +28,7 @@ const customSerialise = serialise.bind({
 export async function serialize<TData extends KitsuResource>({
   resource,
   type
-}: SerializeParams<TData>): Promise<JsonApiResource> {
+}: SerializeParams<TData>): Promise<ResourceObject> {
   // Create a copy of the resource so the original is not affected.
   const resourceCopy = { ...resource };
 

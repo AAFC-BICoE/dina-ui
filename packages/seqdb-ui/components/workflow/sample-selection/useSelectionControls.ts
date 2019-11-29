@@ -1,5 +1,6 @@
-import { ApiClientContext, HttpMethod } from "common-ui";
+import { ApiClientContext, Operation } from "common-ui";
 import { FormikProps } from "formik";
+import { PersistedResource } from "kitsu";
 import { toPairs } from "lodash";
 import { useContext, useState } from "react";
 import {
@@ -61,14 +62,16 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
     formikProps.setFieldValue("sampleIdsToSelect", {});
   }
 
-  async function deleteStepResources(stepResources: StepResource[]) {
+  async function deleteStepResources(
+    stepResources: Array<PersistedResource<StepResource>>
+  ) {
     try {
       setLoading(true);
-      const operations = stepResources.map(sr => ({
-        op: "DELETE" as HttpMethod,
+      const operations = stepResources.map<Operation>(sr => ({
+        op: "DELETE",
         path: `stepResource/${sr.id}`,
         value: {
-          id: sr.id as string,
+          id: sr.id,
           type: "stepResource"
         }
       }));
@@ -93,7 +96,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
       const stepResources = ids.map(id => ({
         id,
         type: "stepResource"
-      })) as StepResource[];
+      })) as Array<PersistedResource<StepResource>>;
 
       await deleteStepResources(stepResources);
 
