@@ -7,17 +7,27 @@ import { LoadingSpinner } from "..";
 
 /* tslint:disable:no-string-literal */
 
-export const SubmitButton = connect(function SubmitButtonInternal({
-  formik: { isSubmitting, initialValues }
-}) {
-  return isSubmitting ? (
-    <LoadingSpinner loading={isSubmitting} />
-  ) : (
-    <button className="btn btn-primary" type="submit">
-      {initialValues["customButtonName"]
-        ? initialValues["customButtonName"]
-        : "Save"}
-    </button>
-  );
-});
+interface SubmitButtonProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export const SubmitButton = connect<SubmitButtonProps>(
+  function SubmitButtonInternal({
+    formik: { isSubmitting },
+    className,
+    children
+  }) {
+    return isSubmitting ? (
+      <LoadingSpinner loading={isSubmitting} />
+    ) : (
+      <button
+        className={className ? className : "btn btn-primary"}
+        type="submit"
+      >
+        {children ? children : "Save"}
+      </button>
+    );
+  }
+);
 /* tslint:enable:no-string-literal */
