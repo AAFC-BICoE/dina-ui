@@ -2,11 +2,12 @@ import { FieldView, Query } from "common-ui";
 import { Formik } from "formik";
 import { noop } from "lodash";
 import { ManagedAttribute } from "types/objectstore-api/resources/ManagedAttribute";
+import { MetaManagedAttribute } from "types/objectstore-api/resources/MetaManagedAttribute";
 
 /* tslint:disable:no-string-literal */
 export function generateManagedAttributesView(ma) {
   return (
-    <Query
+    <Query<MetaManagedAttribute>
       query={{
         include: "managedAttribute",
         path: "metadata-managed-attribute/" + ma.id

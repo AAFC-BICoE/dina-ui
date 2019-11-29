@@ -5,6 +5,7 @@ import withRouter, { WithRouterProps } from "next/dist/client/with-router";
 import { useCallback, useContext } from "react";
 import { useAsyncRun, useAsyncTask } from "react-hooks-async";
 import { FileDownLoadResponseAttributes } from "types/objectstore-api/resources/FileDownLoadResponse";
+import { Metadata } from "types/objectstore-api/resources/Metadata";
 import { isArray, isUndefined } from "util";
 import { Head, Nav } from "../../components";
 import { generateManagedAttributesView } from "../../page-fragments/viewManagedAttributes";
@@ -91,7 +92,7 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
               <p>No File to display</p>
             )}
 
-            <Query
+            <Query<Metadata>
               query={{
                 filter: { fileIdentifier: `${id}` },
                 include: "acMetadataCreator,managedAttribute",

@@ -16,32 +16,41 @@ const TEST_FILE_RESPONSE = {
   status: 200
 };
 
-/** Test file response. */
-const TEST_METADATA_RESPONSE = {
-  data: [
-    {
-      metadata: {
-        acDigitizationDate: "2019-11-25T07:30:00.175-05:00",
-        acHashFunction: "SHA-1",
-        acHashValue: "fa7b84eafd08fbc1f9d27a48b68d89b52a83f178",
-        acMetadataCreator: {
-          displayName: "Chris",
-          email: "chris.gendre@canada.ca",
-          id: "c1cd8a18-72d5-48a6-8e62-7e6aab6519ad",
-          type: "agent"
-        },
-        bucket: "mybucket",
-        dcFormat: "image/png",
-        dcType: "Image",
-        fileExtension: ".png",
-        fileIdentifier: "82f95aa2-a55d-4269-89bf-918963ccca1a",
-        id: "203f557a-bb5b-4aec-838b-c459b246de4a",
-        originalFilename: "logo_347x50_PPa11y.png",
-        type: "metadata",
-        xmpMetadataDate: "2019-11-25T09:00:00.064-05:00"
+/** Test metadata response. */
+const TEST_METADATA_RESPONSE = [
+  {
+    acDigitizationDate: "2019-11-25T07:30:00.175-05:00",
+    acHashFunction: "SHA-1",
+    acHashValue: "fa7b84eafd08fbc1f9d27a48b68d89b52a83f178",
+    acMetadataCreator: {
+      displayName: "Chris",
+      email: "chris.gendre@canada.ca",
+      id: "c1cd8a18-72d5-48a6-8e62-7e6aab6519ad",
+      type: "agent"
+    },
+    bucket: "mybucket",
+    dcFormat: "image/png",
+    dcType: "Image",
+    fileExtension: ".png",
+    fileIdentifier: "82f95aa2-a55d-4269-89bf-918963ccca1a",
+    id: "203f557a-bb5b-4aec-838b-c459b246de4a",
+    managedAttribute: [
+      {
+        assignedValue: "spiral",
+        id: "20"
       }
-    }
-  ]
+    ],
+    originalFilename: "logo_347x50_PPa11y.png",
+    type: "metadata",
+    xmpMetadataDate: "2019-11-25T09:00:00.064-05:00"
+  }
+];
+
+/** Test managed attribute response. */
+const TEST_MANAGEDDATA_RESPONSE = {
+  assignedValue: "trrr",
+  id: "088658de-3a09-46ff-9fb0-196ea60a36e5",
+  type: "metadata-managed-attribute"
 };
 
 const mockGet = jest.fn(async () => {
@@ -49,8 +58,13 @@ const mockGet = jest.fn(async () => {
 });
 
 /** Mock Kitsu "get" method. */
-const mockMetaGet = jest.fn(async () => {
-  return TEST_METADATA_RESPONSE;
+
+const mockMetaGet = jest.fn(async model => {
+  if (model === "metadata/") {
+    return { data: TEST_METADATA_RESPONSE };
+  } else if (model === "metadata-managed-attribute/20") {
+    return { data: TEST_MANAGEDDATA_RESPONSE };
+  }
 });
 
 // Mock Kitsu, the client class that talks to the backend.
@@ -80,10 +94,44 @@ describe("Metadata detail view page", () => {
       return TEST_FILE_RESPONSE;
     });
 
-    mockMetaGet.mockImplementation(async () => {
-      return TEST_METADATA_RESPONSE;
+    mockMetaGet.mockImplementation(async model => {
+      if (model === "metadata/") {
+        return { data: TEST_METADATA_RESPONSE };
+      } else if (model === "metadata-managed-attribute/20") {
+        return { data: TEST_MANAGEDDATA_RESPONSE };
+      }
     });
   });
+
+  it("Provides a form to show the managed attribute section.", async done => {
+    const wrapper = mountWithContext(
+      <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />
+    );
+
+    // Wait for the page to load.
+    await Promise.resolve();
+    wrapper.update();
+
+    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+
+    // The managed attribute section assgined value field should be rendered.
+    expect(
+      wrapper.containsMatchingElement(
+        <p
+          style={{
+            borderBottom: "1px solid black",
+            borderRight: "1px solid black",
+            minHeight: "25px"
+          }}
+        >
+          spiral
+        </p>
+      )
+    ).toEqual(true);
+
+    done();
+  });
+
   it("Provides a form to show the metadata section.", async done => {
     const wrapper = mountWithContext(
       <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />
