@@ -24,7 +24,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
         type: "chainStepTemplate"
       } as ChainStepTemplate,
       sample,
-      type: "INPUT",
+      type: "stepResource",
       value: "SAMPLE"
     }));
 

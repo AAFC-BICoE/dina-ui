@@ -7,41 +7,28 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 export interface SelectFieldProps extends LabelWrapperParams {
   onChange?: (value?: string) => void;
   options: any[];
-  tooltipMsg?: string;
   styles?: Partial<Styles>;
 }
 
 /** Formik-connected select input. */
-export function SelectField({
-  className,
-  hideLabel,
-  name,
-  label,
-  onChange = noop,
-  options,
-  styles,
-  tooltipMsg
-}: SelectFieldProps) {
+export function SelectField(props: SelectFieldProps) {
+  const { onChange = noop, options, styles, ...labelWrapperProps } = props;
+  const { name } = labelWrapperProps;
+
   return (
     <FastField name={name}>
       {({
         field: { value },
         form: { setFieldValue, setFieldTouched }
       }: FieldProps) => {
-        function onChangeInternal({ value: selectValue }) {
-          setFieldValue(name, selectValue);
+        function onChangeInternal({ value: newValue }) {
+          setFieldValue(name, newValue);
           setFieldTouched(name);
-          onChange(selectValue);
+          onChange(newValue);
         }
 
         return (
-          <FieldWrapper
-            className={className}
-            hideLabel={hideLabel}
-            name={name}
-            label={label}
-            tooltipMsg={tooltipMsg}
-          >
+          <FieldWrapper {...labelWrapperProps}>
             <Select
               options={options}
               onChange={onChangeInternal}

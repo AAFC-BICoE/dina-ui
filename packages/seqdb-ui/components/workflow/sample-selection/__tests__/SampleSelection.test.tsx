@@ -133,7 +133,7 @@ describe("Sample Selection UI", () => {
           op: "POST",
           path: "stepResource",
           value: {
-            attributes: { type: "INPUT", value: "SAMPLE" },
+            attributes: { value: "SAMPLE" },
             id: -100,
             relationships: {
               chain: { data: { id: "1", type: "chain" } },
@@ -192,7 +192,7 @@ describe("Sample Selection UI", () => {
           op: "POST",
           path: "stepResource",
           value: {
-            attributes: { type: "INPUT", value: "SAMPLE" },
+            attributes: { value: "SAMPLE" },
             id: -100,
             relationships: {
               chain: { data: { id: "1", type: "chain" } },
@@ -208,7 +208,7 @@ describe("Sample Selection UI", () => {
           op: "POST",
           path: "stepResource",
           value: {
-            attributes: { type: "INPUT", value: "SAMPLE" },
+            attributes: { value: "SAMPLE" },
             id: -101,
             relationships: {
               chain: { data: { id: "1", type: "chain" } },
@@ -224,7 +224,7 @@ describe("Sample Selection UI", () => {
           op: "POST",
           path: "stepResource",
           value: {
-            attributes: { type: "INPUT", value: "SAMPLE" },
+            attributes: { value: "SAMPLE" },
             id: -102,
             relationships: {
               chain: { data: { id: "1", type: "chain" } },

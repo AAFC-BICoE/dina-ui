@@ -88,7 +88,7 @@ describe("LibraryPoolDetailsForm component", () => {
                 id: "2",
                 type: "libraryPool"
               },
-              type: "INPUT",
+              type: "stepResource",
               value: "LIBRARY_POOL"
             },
             type: "stepResource"

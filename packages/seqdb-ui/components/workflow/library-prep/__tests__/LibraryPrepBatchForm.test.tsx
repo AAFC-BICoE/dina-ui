@@ -84,7 +84,7 @@ describe("Library Prep Batch form", () => {
                 id: "2",
                 type: "libraryPrepBatch"
               },
-              type: "INPUT",
+              type: "stepResource",
               value: "LIBRARY_PREP_BATCH"
             },
             type: "stepResource"

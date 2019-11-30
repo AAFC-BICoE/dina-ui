@@ -15,16 +15,13 @@ export interface ResourceSelectFieldProps<TData>
 
 /** Formik-connected Dropdown select input for selecting a resource from the API. */
 export function ResourceSelectField<TData extends KitsuResource>(
-  topLevelProps: ResourceSelectFieldProps<TData>
+  resourceSelectFieldProps: ResourceSelectFieldProps<TData>
 ) {
   const {
-    className,
-    hideLabel,
     name,
-    label,
     onChange = noop,
-    tooltipMsg
-  } = topLevelProps;
+    ...resourceSelectProps
+  } = resourceSelectFieldProps;
 
   return (
     <FastField name={name}>
@@ -39,15 +36,9 @@ export function ResourceSelectField<TData extends KitsuResource>(
         }
 
         return (
-          <FieldWrapper
-            className={className}
-            hideLabel={hideLabel}
-            name={name}
-            label={label}
-            tooltipMsg={tooltipMsg}
-          >
+          <FieldWrapper {...resourceSelectFieldProps}>
             <ResourceSelect
-              {...topLevelProps}
+              {...resourceSelectProps}
               onChange={onChangeInternal}
               value={value}
             />

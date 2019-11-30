@@ -1,6 +1,5 @@
 import { KitsuResource } from "kitsu";
 import { PcrPrimer } from "../PcrPrimer";
-import { Region } from "../Region";
 import { Sample } from "../Sample";
 import { Chain } from "./Chain";
 import { ChainStepTemplate } from "./ChainStepTemplate";
@@ -10,7 +9,7 @@ import { LibraryPrepBatch } from "./LibraryPrepBatch";
 import { PreLibraryPrep } from "./PreLibraryPrep";
 
 export interface StepResourceAttributes {
-  type: string;
+  type: "stepResource";
   value: string;
 }
 
@@ -25,7 +24,6 @@ export interface StepResourceRelationships {
   chain: Chain;
   libraryPrepBatch?: LibraryPrepBatch;
   libraryPool?: LibraryPool;
-  region?: Region;
   preLibraryPrep?: PreLibraryPrep;
   primer?: PcrPrimer;
   sample?: Sample;

@@ -45,7 +45,7 @@ export function LibraryPoolDetailsForm({
         chain,
         chainStepTemplate: step,
         libraryPool: savedLibraryPool as LibraryPool,
-        type: "INPUT",
+        type: "stepResource",
         value: "LIBRARY_POOL"
       };
 

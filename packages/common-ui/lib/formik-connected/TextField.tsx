@@ -1,15 +1,21 @@
 import { FastField, FieldProps } from "formik";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
+export interface TextFieldProps extends LabelWrapperParams {
+  readOnly?: boolean;
+  initialValue?: string | string[];
+}
+
 /**
  * Provides a text input for a Formik field. This component wraps Formik's "Field" component with
  * a wrapper that adds a label.
  */
-export function TextField(props: LabelWrapperParams) {
-  const { name } = props;
+export function TextField(props: TextFieldProps) {
+  const { readOnly, initialValue, ...labelWrapperProps } = props;
+  const { name } = labelWrapperProps;
 
   return (
-    <FieldWrapper {...props}>
+    <FieldWrapper {...labelWrapperProps}>
       <FastField name={name}>
         {({
           field: { value },
@@ -28,7 +34,8 @@ export function TextField(props: LabelWrapperParams) {
               className="form-control"
               onChange={onChange}
               type="text"
-              value={value || ""}
+              value={initialValue || value || ""}
+              readOnly={readOnly}
             />
           );
         }}

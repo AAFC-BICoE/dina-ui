@@ -18,6 +18,7 @@
     "@testing-library/react": "^9.3.0",
     "@zeit/next-css": "^1.0.1",
     "axios": "^0.18.1",
+    "blob": "0.0.5",
     "bootswatch": "^4.2.1",
     "common-ui": "link:../common-ui",
     "core-js": "^3.2.1",
@@ -32,9 +33,11 @@
     "react-datepicker": "^2.9.6",
     "react-dom": "^16.10.2",
     "react-dropzone": "^10.1.10",
+    "react-hooks-async": "^3.7.0",
     "react-select": "^3.0.8",
     "react-tabs": "^3.0.0",
-    "title-case": "^2.1.1"
+    "title-case": "^2.1.1",
+    "use-force-update": "^1.0.7"
   },
   "devDependencies": {
     "@types/enzyme": "^3.10.3",

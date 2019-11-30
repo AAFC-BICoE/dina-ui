@@ -31,18 +31,16 @@ export interface FieldWrapperProps extends LabelWrapperParams {
  */
 export function FieldWrapper({
   className,
-  name,
   hideLabel = false,
+  name,
   label = titleCase(name),
   tooltipMsg,
   children
 }: FieldWrapperProps) {
   return (
-    <div className={`${className || ""} ${name}-field`}>
-      {hideLabel ? (
-        children
-      ) : (
-        <div className="form-group">
+    <div className={className}>
+      <div className={`form-group ${name}-field`}>
+        {!hideLabel && (
           <label>
             <div>
               <strong>{label}</strong>
@@ -58,9 +56,9 @@ export function FieldWrapper({
               </ReactTooltip>
             </div>
           </label>
-          {children}
-        </div>
-      )}
+        )}
+        {children}
+      </div>
     </div>
   );
 }

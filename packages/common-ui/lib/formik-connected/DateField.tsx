@@ -2,9 +2,13 @@ import { FastField, FieldProps } from "formik";
 import DatePicker from "react-datepicker";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
+export interface DateFieldProps {
+  showTime?: boolean;
+}
+
 /** Formik-connected date input. */
-export function DateField(props: LabelWrapperParams) {
-  const { name } = props;
+export function DateField(props: LabelWrapperParams & DateFieldProps) {
+  const { name, showTime } = props;
 
   return (
     <FieldWrapper {...props}>
@@ -14,7 +18,11 @@ export function DateField(props: LabelWrapperParams) {
           form: { setFieldValue, setFieldTouched }
         }: FieldProps) => {
           function onChange(date: Date) {
-            setFieldValue(name, date && date.toISOString().slice(0, 10));
+            if (showTime) {
+              setFieldValue(name, date && date.toISOString());
+            } else {
+              setFieldValue(name, date && date.toISOString().slice(0, 10));
+            }
             setFieldTouched(name);
           }
 
@@ -22,10 +30,17 @@ export function DateField(props: LabelWrapperParams) {
             <div>
               <DatePicker
                 className="form-control"
-                dateFormat="yyyy-MM-dd"
+                dateFormat={showTime ? "Pp" : "yyyy-MM-dd"}
                 isClearable={true}
                 onChange={onChange}
-                selected={value ? new Date(`${value}T12:00:00Z`) : null}
+                selected={
+                  value
+                    ? showTime
+                      ? new Date(`${value}`)
+                      : new Date(`${value}T12:00:00Z`)
+                    : null
+                }
+                showTimeSelect={showTime}
                 showYearDropdown={true}
                 todayButton="Today"
               />

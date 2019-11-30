@@ -59,7 +59,7 @@ export function LibraryPrepBatchForm({
         chain,
         chainStepTemplate: step,
         libraryPrepBatch: newLibraryPrepBatch as LibraryPrepBatch,
-        type: "INPUT",
+        type: "stepResource",
         value: "LIBRARY_PREP_BATCH"
       };
 
