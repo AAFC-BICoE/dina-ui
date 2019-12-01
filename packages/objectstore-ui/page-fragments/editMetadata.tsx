@@ -97,7 +97,11 @@ function EditMetadataForm({
         router.push("/media-uploadView/detailView?id=" + fileIdentifier);
       } else {
         setStatus(
-          response.data.errors[0].title + ": " + response.data.errors[0].detail
+          response && response.data
+            ? response.data.errors[0].title +
+                ": " +
+                response.data.errors[0].detail
+            : "Response or response.data is null!"
         );
       }
     } catch (error) {
@@ -148,6 +152,7 @@ function EditMetadataForm({
       onSubmit={onSubmit}
     >
       <Form>
+        <ErrorViewer />
         <div className="form-group row" style={{ display: "none" }}>
           <label className="col-sm-2 col-form-label">
             <strong>File Name</strong>
@@ -241,7 +246,6 @@ function EditMetadataForm({
           </div>
         </div>
         <SubmitButton />
-        <ErrorViewer />
       </Form>
     </Formik>
   );
