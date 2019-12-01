@@ -106,13 +106,13 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
                   {response && (
                     <div>
                       <div style={{ marginBottom: "20px", marginTop: "20px" }}>
-                        <h5 style={{ color: "blue" }}>Metadata View</h5>
+                        <h5 style={{ color: "#1465b7" }}>Metadata View</h5>
                       </div>
                       <div>
                         <ViewMetadataFormPage metadata={response.data[0]} />
                       </div>
                       <div style={{ marginBottom: "20px", marginTop: "20px" }}>
-                        <h5 style={{ color: "blue" }}>
+                        <h5 style={{ color: "#1465b7" }}>
                           Managed Attribute View
                         </h5>
                       </div>
@@ -122,7 +122,7 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
                         )}
 
                       <div style={{ marginBottom: "20px", marginTop: "20px" }}>
-                        <h5 style={{ color: "blue" }}>Tags View</h5>
+                        <h5 style={{ color: "#1465b7" }}>Tags View</h5>
                       </div>
                       <ViewTagsForm meta={response.data[0]} />
                     </div>
