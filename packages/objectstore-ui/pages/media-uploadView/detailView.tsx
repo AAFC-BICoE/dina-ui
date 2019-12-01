@@ -10,6 +10,7 @@ import { isArray, isUndefined } from "util";
 import { Head, Nav } from "../../components";
 import { generateManagedAttributesView } from "../../page-fragments/viewManagedAttributes";
 import ViewMetadataFormPage from "../../page-fragments/viewMetadata";
+import ViewTagsForm from "../../page-fragments/viewTags";
 
 interface DownloadFileResponse {
   error?: string;
@@ -119,6 +120,11 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
                         response.data[0].managedAttribute.map(ma =>
                           generateManagedAttributesView(ma)
                         )}
+
+                      <div style={{ marginBottom: "20px", marginTop: "20px" }}>
+                        <h5 style={{ color: "blue" }}>Tags View</h5>
+                      </div>
+                      <ViewTagsForm meta={response.data[0]} />
                     </div>
                   )}
                 </div>
