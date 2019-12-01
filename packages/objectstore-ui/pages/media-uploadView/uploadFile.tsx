@@ -3,7 +3,6 @@ import { ErrorViewer, SubmitButton } from "common-ui";
 import { Form, Formik, FormikActions } from "formik";
 import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import useForceUpdate from "use-force-update";
 import { Head, Nav } from "../../components";
 import { EditMetadataFormPage } from "../../page-fragments/editMetadata";
 
@@ -40,8 +39,6 @@ const acceptStyle = {
 const rejectStyle = {
   borderColor: "#ff1744"
 };
-
-let editMetadataVisible = false;
 
 function MediaUploadViewPage() {
   return (
@@ -87,7 +84,7 @@ function UploadViewForm() {
     }),
     [isDragActive, isDragReject]
   );
-  const forceUpdate = useForceUpdate();
+  const [editMetadataVisible, setEditMetadataVisible] = useState(false);
   async function onSubmit(
     submittedValues,
     { setStatus, setSubmitting }: FormikActions<any>
@@ -103,9 +100,8 @@ function UploadViewForm() {
         );
       } else {
         setFileId((await response).fileName);
-        editMetadataVisible = true;
-        forceUpdate();
         setStatus(null);
+        setEditMetadataVisible(true);
       }
     } catch (error) {
       setStatus(
@@ -133,10 +129,7 @@ function UploadViewForm() {
   return (
     <div>
       <div>
-        <Formik
-          initialValues={{ customButtonName: "Upload File" }}
-          onSubmit={onSubmit}
-        >
+        <Formik initialValues={{}} onSubmit={onSubmit}>
           <Form>
             <ErrorViewer />
             <div id="dndRoot">
@@ -156,7 +149,7 @@ function UploadViewForm() {
 
             <div className="form-group row">
               <div className="col-md-2">
-                <SubmitButton />
+                <SubmitButton children="Upload File" />
               </div>
             </div>
           </Form>
