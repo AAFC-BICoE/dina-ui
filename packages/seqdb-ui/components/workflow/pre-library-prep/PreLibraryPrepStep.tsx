@@ -1,6 +1,7 @@
 import {
   ColumnDefinition,
   ErrorViewer,
+  FormikButton,
   LoadingSpinner,
   QueryTable,
   useGroupedCheckBoxes
@@ -143,30 +144,24 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                 >
                   <strong>Selected Samples</strong>
                   <div className="float-right">
-                    {formikProps.isSubmitting ? (
-                      <LoadingSpinner loading={true} />
-                    ) : (
-                      <div className="list-inline">
-                        <button
-                          className="list-inline-item btn btn-warning remove-shearing"
-                          onClick={() =>
-                            deleteStepResources("SHEARING", formikProps)
-                          }
-                          type="button"
-                        >
-                          Remove selected Shearing details
-                        </button>
-                        <button
-                          className="list-inline-item btn btn-warning remove-size-selection"
-                          onClick={() =>
-                            deleteStepResources("SIZE_SELECTION", formikProps)
-                          }
-                          type="button"
-                        >
-                          Remove selected Size Selection details
-                        </button>
-                      </div>
-                    )}
+                    <div className="list-inline">
+                      <FormikButton
+                        className="list-inline-item btn btn-warning remove-shearing"
+                        onClick={() =>
+                          deleteStepResources("SHEARING", formikProps)
+                        }
+                      >
+                        Remove selected Shearing details
+                      </FormikButton>
+                      <FormikButton
+                        className="list-inline-item btn btn-warning remove-size-selection"
+                        onClick={() =>
+                          deleteStepResources("SIZE_SELECTION", formikProps)
+                        }
+                      >
+                        Remove selected Size Selection details
+                      </FormikButton>
+                    </div>
                   </div>
                   <QueryTable
                     columns={SAMPLE_STEP_RESOURCE_COLUMNS}
