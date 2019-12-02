@@ -4,9 +4,6 @@
   "workspaces": {
     "packages": [
       "packages/*"
-    ],
-    "nohoist": [
-      "common-ui/react-hooks-async"
     ]
   },
   "scripts": {
