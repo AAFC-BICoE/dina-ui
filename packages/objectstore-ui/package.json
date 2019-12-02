@@ -36,8 +36,7 @@
     "react-hooks-async": "^3.7.0",
     "react-select": "^3.0.8",
     "react-tabs": "^3.0.0",
-    "title-case": "^2.1.1",
-    "use-force-update": "^1.0.7"
+    "title-case": "^2.1.1"
   },
   "devDependencies": {
     "@types/enzyme": "^3.10.3",
