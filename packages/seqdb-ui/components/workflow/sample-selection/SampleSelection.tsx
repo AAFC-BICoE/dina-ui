@@ -219,8 +219,8 @@ export function SampleSelection(props: StepRendererProps) {
                   columns={SELECTED_SAMPLE_COLUMNS}
                   defaultPageSize={100}
                   filter={{
-                    "chain.chainId": chain.id as string,
-                    "chainStepTemplate.chainStepTemplateId": step.id as string,
+                    "chain.chainId": chain.id,
+                    "chainStepTemplate.chainStepTemplateId": step.id,
                     rsql: `sample.name!=${randomNumber}`
                   }}
                   include="sample,sample.group"
