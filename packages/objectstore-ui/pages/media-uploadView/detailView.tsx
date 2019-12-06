@@ -61,6 +61,17 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
         <h4>Object Store Details</h4>
         <div className="container-fluid">
           <div className="row">
+            <div className="col-sm-4">
+              <a
+                href={`/media-uploadView/detailEdit?id=${id}`}
+                className="btn btn-info"
+                role="button"
+              >
+                Edit View
+              </a>
+            </div>
+          </div>
+          <div className="row">
             {imgResponse &&
             imgResponse.headers["content-type"].indexOf("image") > -1 ? (
               <div className="col-sm-4">
