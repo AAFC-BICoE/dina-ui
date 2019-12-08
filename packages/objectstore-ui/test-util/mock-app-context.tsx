@@ -4,7 +4,7 @@ import {
   createContextValue
 } from "common-ui";
 import { mount } from "enzyme";
-import { CommonUIIntlProvider } from "../intl/common-ui-intl";
+import { ObjectStoreIntlProvider } from "../intl/objectstore-intl";
 
 interface MockAppContextProviderProps {
   apiContext?: ApiClientContextI;
@@ -21,7 +21,7 @@ export function MockAppContextProvider({
 }: MockAppContextProviderProps) {
   return (
     <ApiClientContext.Provider value={apiContext || createContextValue()}>
-      <CommonUIIntlProvider>{children}</CommonUIIntlProvider>
+      <ObjectStoreIntlProvider>{children}</ObjectStoreIntlProvider>
     </ApiClientContext.Provider>
   );
 }
