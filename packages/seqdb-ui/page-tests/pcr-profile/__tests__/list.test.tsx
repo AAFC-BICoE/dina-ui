@@ -1,5 +1,5 @@
 import PcrProfileListPage from "../../../pages/pcr-profile/list";
-import { mountWithAppContext } from "../../../test-util/app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.

@@ -1,5 +1,5 @@
 import { ProductDetailsPage } from "../../../pages/product/view";
-import { mountWithAppContext } from "../../../test-util/app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Product } from "../../../types/seqdb-api/resources/Product";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.

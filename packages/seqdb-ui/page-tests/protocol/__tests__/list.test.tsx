@@ -1,6 +1,6 @@
 import { QueryTable } from "common-ui";
 import ProtocolListPage from "../../../pages/protocol/list";
-import { mountWithAppContext } from "../../../test-util/app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import {
   Protocol,
   protocolTypeLabels

@@ -1,5 +1,5 @@
 import { ProtocolDetailsPage } from "../../../pages/protocol/view";
-import { mountWithAppContext } from "../../../test-util/app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import {
   Protocol,
   protocolTypeLabels

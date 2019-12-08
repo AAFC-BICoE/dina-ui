@@ -1,6 +1,6 @@
 import { QueryTable } from "common-ui";
 import PcrPrimerListPage from "../../../pages/pcr-primer/list";
-import { mountWithAppContext } from "../../../test-util/app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.

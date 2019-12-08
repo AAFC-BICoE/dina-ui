@@ -1,6 +1,6 @@
 import { OperationsResponse } from "common-ui";
 import { RegionEditPage } from "../../../pages/region/edit";
-import { mountWithAppContext } from "../../../test-util/app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Region } from "../../../types/seqdb-api/resources/Region";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.

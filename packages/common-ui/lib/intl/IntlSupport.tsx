@@ -13,7 +13,9 @@ interface IntlProviderProps {
   children: React.ReactNode;
 }
 
-interface IntlContextI<TMessages extends MessageDictionary> {
+interface IntlContextI<
+  TMessages extends MessageDictionary = MessageDictionary
+> {
   locale: string;
   setLocale: (newLocale: string) => void;
   messages: TMessages;
@@ -29,12 +31,12 @@ interface IntlSupportParams<TMessages extends MessageDictionary> {
   translations?: { [key: string]: Partial<TMessages> };
 }
 
+export const intlContext = createContext<IntlContextI>(undefined as any);
+
 export function getIntlSupport<TMessages extends MessageDictionary>({
   defaultMessages,
   translations = {}
 }: IntlSupportParams<TMessages>) {
-  const intlContext = createContext<IntlContextI<TMessages>>(undefined as any);
-
   function IntlProvider({ children }: IntlProviderProps) {
     const [{ locale = "en" }, setCookie] = useCookies(["locale"]);
 
@@ -66,13 +68,9 @@ export function getIntlSupport<TMessages extends MessageDictionary>({
     );
   }
 
-  function useIntl() {
-    return useContext(intlContext);
-  }
-
   function FormattedMessage(props: FormattedMessageProps<TMessages>) {
     return <ReactFormattedMessage defaultMessage=" " {...props} />;
   }
 
-  return { FormattedMessage, IntlProvider, useIntl };
+  return { FormattedMessage, IntlProvider };
 }

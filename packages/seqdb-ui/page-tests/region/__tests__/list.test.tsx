@@ -1,6 +1,6 @@
 import { QueryTable } from "common-ui";
 import RegionListPage from "../../../pages/region/list";
-import { mountWithAppContext } from "../../../test-util/app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Region } from "../../../types/seqdb-api/resources/Region";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.

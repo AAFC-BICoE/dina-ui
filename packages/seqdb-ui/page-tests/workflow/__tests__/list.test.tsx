@@ -1,5 +1,5 @@
 import WorkflowListPage from "../../../pages/workflow/list";
-import { mountWithAppContext } from "../../../test-util/app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Chain, ChainTemplate, Group } from "../../../types/seqdb-api";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.

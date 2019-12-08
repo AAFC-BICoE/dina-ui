@@ -1,6 +1,6 @@
 import { OperationsResponse } from "common-ui";
 import { ProtocolEditPage } from "../../../pages/protocol/edit";
-import { mountWithAppContext } from "../../../test-util/app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Protocol } from "../../../types/seqdb-api/resources/Protocol";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.

@@ -1,7 +1,7 @@
 import { QueryTable } from "common-ui";
 import ReactTable from "react-table";
 import { act } from "react-test-renderer";
-import { mountWithAppContext } from "../../../test-util/app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { ListPageLayout } from "../ListPageLayout";
 
 /** Mock Kitsu "get" method. */

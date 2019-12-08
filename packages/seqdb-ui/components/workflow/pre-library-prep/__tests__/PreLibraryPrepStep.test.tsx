@@ -1,6 +1,6 @@
 import { ResourceSelect } from "common-ui";
 import NumberFormat from "react-number-format";
-import { mountWithAppContext } from "../../../../test-util/app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   Chain,
   ChainStepTemplate,

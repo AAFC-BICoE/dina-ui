@@ -1,11 +1,11 @@
-import { LanguageSelector } from "common-ui";
+import { intlContext, LanguageSelector } from "common-ui";
 import Link from "next/link";
-import React from "react";
-import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
+import React, { useContext } from "react";
+import { SeqdbMessage } from "../../intl/seqdb-intl";
 import "./nav.css";
 
 export function Nav() {
-  const { locale, setLocale } = useSeqdbIntl();
+  const { locale, setLocale } = useContext(intlContext);
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top">
