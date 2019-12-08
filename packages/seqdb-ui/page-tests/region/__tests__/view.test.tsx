@@ -1,6 +1,5 @@
-import { ApiClientContext, createContextValue } from "common-ui";
-import { mount } from "enzyme";
 import { RegionDetailsPage } from "../../../pages/region/view";
+import { mountWithAppContext } from "../../../test-util/app-context";
 import { Region } from "../../../types/seqdb-api/resources/Region";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -31,16 +30,8 @@ jest.mock(
 );
 
 describe("Region details page", () => {
-  function mountWithContext(element: JSX.Element) {
-    return mount(
-      <ApiClientContext.Provider value={createContextValue()}>
-        {element}
-      </ApiClientContext.Provider>
-    );
-  }
-
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <RegionDetailsPage router={{ query: { id: "100" } } as any} />
     );
 
@@ -48,7 +39,7 @@ describe("Region details page", () => {
   });
 
   it("Render the gene region details", async () => {
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <RegionDetailsPage router={{ query: { id: "100" } } as any} />
     );
 

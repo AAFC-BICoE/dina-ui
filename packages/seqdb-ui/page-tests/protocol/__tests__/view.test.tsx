@@ -1,6 +1,5 @@
-import { ApiClientContext, createContextValue } from "common-ui";
-import { mount } from "enzyme";
 import { ProtocolDetailsPage } from "../../../pages/protocol/view";
+import { mountWithAppContext } from "../../../test-util/app-context";
 import {
   Protocol,
   protocolTypeLabels
@@ -34,16 +33,8 @@ jest.mock(
 );
 
 describe("Protocol details page", () => {
-  function mountWithContext(element: JSX.Element) {
-    return mount(
-      <ApiClientContext.Provider value={createContextValue()}>
-        {element}
-      </ApiClientContext.Provider>
-    );
-  }
-
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ProtocolDetailsPage router={{ query: { id: "100" } } as any} />
     );
 
@@ -51,7 +42,7 @@ describe("Protocol details page", () => {
   });
 
   it("Render the Protocol details", async () => {
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ProtocolDetailsPage router={{ query: { id: "100" } } as any} />
     );
 

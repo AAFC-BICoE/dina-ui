@@ -1,6 +1,6 @@
-import { ApiClientContext, createContextValue, QueryTable } from "common-ui";
-import { mount } from "enzyme";
+import { QueryTable } from "common-ui";
 import RegionListPage from "../../../pages/region/list";
+import { mountWithAppContext } from "../../../test-util/app-context";
 import { Region } from "../../../types/seqdb-api/resources/Region";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -40,16 +40,8 @@ jest.mock(
 );
 
 describe("Region list page", () => {
-  function mountWithContext(element: JSX.Element) {
-    return mount(
-      <ApiClientContext.Provider value={createContextValue()}>
-        {element}
-      </ApiClientContext.Provider>
-    );
-  }
-
   it("Renders the list page.", async () => {
-    const wrapper = mountWithContext(<RegionListPage />);
+    const wrapper = mountWithAppContext(<RegionListPage />);
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -60,7 +52,7 @@ describe("Region list page", () => {
   });
 
   it("Allows a filterable search.", async () => {
-    const wrapper = mountWithContext(<RegionListPage />);
+    const wrapper = mountWithAppContext(<RegionListPage />);
 
     // Wait for the default search to finish.
     await new Promise(setImmediate);

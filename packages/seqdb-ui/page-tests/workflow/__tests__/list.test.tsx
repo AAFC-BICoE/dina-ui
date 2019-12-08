@@ -1,6 +1,5 @@
-import { ApiClientContext, createContextValue } from "common-ui";
-import { mount } from "enzyme";
 import WorkflowListPage from "../../../pages/workflow/list";
+import { mountWithAppContext } from "../../../test-util/app-context";
 import { Chain, ChainTemplate, Group } from "../../../types/seqdb-api";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -41,17 +40,9 @@ jest.mock(
     }
 );
 
-function mountWithContext(element: JSX.Element) {
-  return mount(
-    <ApiClientContext.Provider value={createContextValue()}>
-      {element}
-    </ApiClientContext.Provider>
-  );
-}
-
 describe("Workflow list page.", () => {
   it("Lists workflows.", async () => {
-    const wrapper = mountWithContext(<WorkflowListPage />);
+    const wrapper = mountWithAppContext(<WorkflowListPage />);
 
     await new Promise(setImmediate);
     wrapper.update();

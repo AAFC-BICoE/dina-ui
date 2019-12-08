@@ -1,11 +1,6 @@
-import {
-  ApiClientContext,
-  createContextValue,
-  OperationsResponse,
-  ResourceSelect
-} from "common-ui";
-import { mount } from "enzyme";
+import { OperationsResponse, ResourceSelect } from "common-ui";
 import { ChainEditPage } from "../../../pages/workflow/edit";
+import { mountWithAppContext } from "../../../test-util/app-context";
 import { Chain, ChainTemplate, Group } from "../../../types/seqdb-api";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -48,14 +43,6 @@ const TEST_WORKFLOW: Chain = {
   type: "chain"
 };
 
-function mountWithContext(element: JSX.Element) {
-  return mount(
-    <ApiClientContext.Provider value={createContextValue()}>
-      {element}
-    </ApiClientContext.Provider>
-  );
-}
-
 describe("Workflow edit page.", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -74,7 +61,7 @@ describe("Workflow edit page.", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ChainEditPage router={{ query: {}, push: mockPush } as any} />
     );
 

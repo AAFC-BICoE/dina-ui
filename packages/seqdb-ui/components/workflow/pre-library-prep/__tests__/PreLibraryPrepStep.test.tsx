@@ -1,10 +1,6 @@
-import {
-  ApiClientContext,
-  createContextValue,
-  ResourceSelect
-} from "common-ui";
-import { mount } from "enzyme";
+import { ResourceSelect } from "common-ui";
 import NumberFormat from "react-number-format";
+import { mountWithAppContext } from "../../../../test-util/app-context";
 import {
   Chain,
   ChainStepTemplate,
@@ -92,14 +88,12 @@ mockMath.random = () => 0.5;
 global.Math = mockMath;
 
 function getWrapper() {
-  return mount(
-    <ApiClientContext.Provider value={createContextValue()}>
-      <PreLibraryPrepStep
-        chain={TEST_CHAIN}
-        chainStepTemplates={TEST_CHAIN_STEP_TEMPLATES}
-        step={TEST_PRE_LIBRARY_PREP_CHAIN_STEP_TEMPLATE}
-      />
-    </ApiClientContext.Provider>
+  return mountWithAppContext(
+    <PreLibraryPrepStep
+      chain={TEST_CHAIN}
+      chainStepTemplates={TEST_CHAIN_STEP_TEMPLATES}
+      step={TEST_PRE_LIBRARY_PREP_CHAIN_STEP_TEMPLATE}
+    />
   );
 }
 

@@ -1,6 +1,5 @@
-import { ApiClientContext, createContextValue } from "common-ui";
-import { mount } from "enzyme";
 import PcrProfileListPage from "../../../pages/pcr-profile/list";
+import { mountWithAppContext } from "../../../test-util/app-context";
 import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -38,16 +37,8 @@ jest.mock(
 );
 
 describe("PcrProfile list page", () => {
-  function mountWithContext(element: JSX.Element) {
-    return mount(
-      <ApiClientContext.Provider value={createContextValue()}>
-        {element}
-      </ApiClientContext.Provider>
-    );
-  }
-
   it("Renders the list page.", async () => {
-    const wrapper = mountWithContext(<PcrProfileListPage />);
+    const wrapper = mountWithAppContext(<PcrProfileListPage />);
 
     await new Promise(setImmediate);
     wrapper.update();

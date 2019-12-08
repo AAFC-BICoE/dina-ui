@@ -1,6 +1,6 @@
-import { ApiClientContext, createContextValue, QueryTable } from "common-ui";
-import { mount } from "enzyme";
+import { QueryTable } from "common-ui";
 import ProtocolListPage from "../../../pages/protocol/list";
+import { mountWithAppContext } from "../../../test-util/app-context";
 import {
   Protocol,
   protocolTypeLabels
@@ -61,16 +61,8 @@ jest.mock(
 );
 
 describe("Protocol list page", () => {
-  function mountWithContext(element: JSX.Element) {
-    return mount(
-      <ApiClientContext.Provider value={createContextValue()}>
-        {element}
-      </ApiClientContext.Provider>
-    );
-  }
-
   it("Renders the list page.", async () => {
-    const wrapper = mountWithContext(<ProtocolListPage />);
+    const wrapper = mountWithAppContext(<ProtocolListPage />);
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -85,7 +77,7 @@ describe("Protocol list page", () => {
   });
 
   it("Allows a filterable search.", async () => {
-    const wrapper = mountWithContext(<ProtocolListPage />);
+    const wrapper = mountWithAppContext(<ProtocolListPage />);
 
     // Wait for the default search to finish.
     await new Promise(setImmediate);

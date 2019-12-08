@@ -15,6 +15,7 @@ export * from "./formik-connected/TextField";
 export * from "./intl/common-ui-en";
 export * from "./intl/common-ui-fr";
 export * from "./intl/IntlSupport";
+export * from "./intl/LanguageSelector";
 export * from "./LabelView";
 export * from "./loading-spinner/LoadingSpinner";
 export * from "./resource-select/ResourceSelect";

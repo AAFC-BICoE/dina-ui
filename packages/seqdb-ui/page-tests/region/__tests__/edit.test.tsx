@@ -1,10 +1,6 @@
-import {
-  ApiClientContext,
-  createContextValue,
-  OperationsResponse
-} from "common-ui";
-import { mount } from "enzyme";
+import { OperationsResponse } from "common-ui";
 import { RegionEditPage } from "../../../pages/region/edit";
+import { mountWithAppContext } from "../../../test-util/app-context";
 import { Region } from "../../../types/seqdb-api/resources/Region";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -39,14 +35,6 @@ jest.mock(
     }
 );
 
-function mountWithContext(element: JSX.Element) {
-  return mount(
-    <ApiClientContext.Provider value={createContextValue()}>
-      {element}
-    </ApiClientContext.Provider>
-  );
-}
-
 describe("Region edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -65,7 +53,7 @@ describe("Region edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <RegionEditPage router={{ query: {}, push: mockPush } as any} />
     );
 
@@ -118,7 +106,7 @@ describe("Region edit page", () => {
       ] as OperationsResponse
     }));
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <RegionEditPage router={{ query: {}, push: mockPush } as any} />
     );
 
@@ -153,7 +141,7 @@ describe("Region edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <RegionEditPage router={{ query: { id: 100 }, push: mockPush } as any} />
     );
 
