@@ -47,9 +47,7 @@ function EditMetadataForm({
   const { apiClient } = useContext(ApiClientContext);
   const router = useRouter();
   const managedAttributes = [];
-  const unManagedAttributes = [
-    { name: "unManagedAttribute", value: "unManagedValue" }
-  ];
+  const unManagedAttributes = [{ name: "unManaged", value: "unManaged" }];
   async function onSubmit(
     submittedValues,
     { setStatus, setSubmitting }: FormikActions<any>

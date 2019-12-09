@@ -44,15 +44,18 @@ export function DetailEditPage({ router }: WithRouterProps) {
 function DetailEditForm({ router }: DetailEditFormProps) {
   const id = router.query.id;
   const { apiClient } = useContext(ApiClientContext);
-  const managedAttributes = [
-    { name: "managed", value: "managed" },
-    { name: "Object Id", value: "223" }
-  ];
+  const managedAttributes = [{ name: "managed", value: "managed" }];
 
-  const unManagedAttributes = [
-    { name: "unManagedAttribute", value: "unManaged" },
-    { name: "color", value: "brown" }
-  ];
+  const unManagedAttributes = [{ name: "unManaged", value: "unManaged" }];
+
+  function generateTagsData(tags) {
+    tags.map(tag =>
+      unManagedAttributes.push({
+        name: "fakeName",
+        value: tag
+      })
+    );
+  }
 
   async function onSubmit(
     submittedValues,
@@ -128,6 +131,8 @@ function DetailEditForm({ router }: DetailEditFormProps) {
                     <AttributeBuilder
                       controlledAttributes={managedAttributes}
                     />
+                    {response.data[0] &&
+                      generateTagsData(response.data[0].acTags)}
                     <AttributeBuilder
                       controlledAttributes={unManagedAttributes}
                     />

@@ -1,11 +1,10 @@
 import { isEqual, pull } from "lodash";
 import React from "react";
-import { renameJson } from "../../utils/metaUtils";
 import { AttributeGroup, AttributeGroupModel } from "./AttributeGroup";
 import { AttributeRow, AttributeRowModel } from "./AttributeRow";
 
 export interface ControlledAttribute {
-  name: string;
+  name?: string;
   value: string;
 }
 
@@ -116,7 +115,7 @@ export class AttributeBuilder extends React.Component<
     parent,
     ca
   }: {
-    /** The attribute to add a new one before, e.g. the attribute with the clicked button. */
+    /** The attribute to add a new one after, e.g. the attribute with the clicked button. */
     after: AttributeRowModel | AttributeGroupModel;
     /** The new attribute's parent group. */
     parent: AttributeGroupModel;
@@ -124,8 +123,7 @@ export class AttributeBuilder extends React.Component<
   }) {
     const id = this.getNewAttributeId();
     const newAttributeRow: AttributeRowModel = {
-      // attribute: this.props.controlledAttributes[0],
-      attribute: renameJson(ca, "name", "key_" + id) as any,
+      attribute: undefined,
       id,
       type: "ATTRIBUTE_ROW",
       value: "Plus"
@@ -133,6 +131,7 @@ export class AttributeBuilder extends React.Component<
 
     if (after.type === "ATTRIBUTE_ROW") {
       after.value = "";
+      after.attribute = ca;
     }
     parent.children.splice(
       parent.children.indexOf(after) + 1,
@@ -153,7 +152,7 @@ export class AttributeBuilder extends React.Component<
     parent: AttributeGroupModel;
   }) {
     const newAttributeRow: AttributeRowModel = {
-      attribute: this.props.controlledAttributes[0],
+      attribute: undefined,
       id: this.getNewAttributeId(),
       type: "ATTRIBUTE_ROW",
       value: "Plus"
