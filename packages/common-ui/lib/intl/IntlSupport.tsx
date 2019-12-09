@@ -1,8 +1,10 @@
+import { PrimitiveType } from "intl-messageformat";
 import { createContext, useContext, useMemo } from "react";
 import { useCookies } from "react-cookie";
 import {
   FormattedMessage as ReactFormattedMessage,
-  IntlProvider as ReactIntlProvider
+  IntlProvider as ReactIntlProvider,
+  useIntl as useReactIntl
 } from "react-intl";
 
 interface MessageDictionary {
@@ -72,5 +74,24 @@ export function getIntlSupport<TMessages extends MessageDictionary>({
     return <ReactFormattedMessage defaultMessage=" " {...props} />;
   }
 
-  return { FormattedMessage, IntlProvider };
+  /**
+   * The app's intl hook:
+   */
+  function useIntl() {
+    const reactIntl = useReactIntl();
+
+    function formatMessage(
+      id: keyof TMessages & string,
+      values?: { [key: string]: PrimitiveType }
+    ) {
+      return reactIntl.formatMessage({ defaultMessage: " ", id }, values);
+    }
+
+    return {
+      ...(useContext(intlContext) as IntlContextI<TMessages>),
+      formatMessage
+    };
+  }
+
+  return { FormattedMessage, IntlProvider, useIntl };
 }

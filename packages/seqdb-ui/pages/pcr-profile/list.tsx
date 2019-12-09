@@ -7,6 +7,7 @@ import {
   ListPageLayout,
   Nav
 } from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 
 const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
@@ -40,18 +41,19 @@ const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
 const PCRPROFILE_FILTER_ATTRIBUTES = ["name", "application"];
 
 export default function PcrProfileListPage() {
+  const { formatMessage } = useSeqdbIntl();
+
   return (
     <>
-      <Head title="PCR Profiles" />
+      <Head title={formatMessage("pcrProfileListTitle")} />
       <Nav />
       <ButtonBar>
-        <CreateButton
-          entityLabel="Thermocycler Profile"
-          entityLink="pcr-profile"
-        />
+        <CreateButton entityLink="pcr-profile" />
       </ButtonBar>
       <div className="container-fluid">
-        <h1>Thermocycler Profiles</h1>
+        <h1>
+          <SeqdbMessage id="pcrProfileListTitle" />
+        </h1>
         <ListPageLayout
           filterAttributes={PCRPROFILE_FILTER_ATTRIBUTES}
           id="pcr-profile-list"

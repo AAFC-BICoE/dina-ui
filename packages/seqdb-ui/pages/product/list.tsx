@@ -7,6 +7,7 @@ import {
   ListPageLayout,
   Nav
 } from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { Product } from "../../types/seqdb-api/resources/Product";
 
 const PRODUCT_TABLE_COLUMNS: Array<ColumnDefinition<Product>> = [
@@ -40,15 +41,19 @@ const PRODUCT_FILTER_ATTRIBUTES = [
 ];
 
 export default function ProductListPage() {
+  const { formatMessage } = useSeqdbIntl();
+
   return (
     <>
-      <Head title="Product Inventory" />
+      <Head title={formatMessage("productListTitle")} />
       <Nav />
       <ButtonBar>
-        <CreateButton entityLabel="Product" entityLink="product" />
+        <CreateButton entityLink="product" />
       </ButtonBar>
       <div className="container-fluid">
-        <h1>Product Inventory</h1>
+        <h1>
+          <SeqdbMessage id="productListTitle" />
+        </h1>
         <ListPageLayout
           filterAttributes={PRODUCT_FILTER_ATTRIBUTES}
           id="product-list"
