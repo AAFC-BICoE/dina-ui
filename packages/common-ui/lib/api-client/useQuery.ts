@@ -31,6 +31,7 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   options: QueryOptions<TData, TMeta> = {}
 ): QueryState<TData, TMeta> {
   const { apiClient } = useContext(ApiClientContext);
+
   const previousResponseRef = useRef<KitsuResponse<TData, TMeta> | undefined>(
     undefined
   );

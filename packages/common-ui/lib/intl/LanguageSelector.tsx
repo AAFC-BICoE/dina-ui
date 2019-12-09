@@ -1,19 +1,14 @@
-import { Fragment } from "react";
-
-export interface LanguageSelectorProps {
-  locale: string;
-  onLocaleChange: (newLocale: string) => void;
-}
+import { Fragment, useContext } from "react";
+import { intlContext } from "./IntlSupport";
 
 const LANGUAGE_LABELS = {
   en: "English",
   fr: "Français"
 };
 
-export function LanguageSelector({
-  locale,
-  onLocaleChange
-}: LanguageSelectorProps) {
+export function LanguageSelector() {
+  const { locale, setLocale } = useContext(intlContext);
+
   // This component fails to server-side render because the user's locale is unknown, so only
   // render it on the client where the locale is retrieved correctly.
   if (!process.browser) {
@@ -26,7 +21,7 @@ export function LanguageSelector({
         const divider = i < arr.length - 1 && " | ";
 
         function onClick() {
-          onLocaleChange(key);
+          setLocale(key);
         }
 
         return (

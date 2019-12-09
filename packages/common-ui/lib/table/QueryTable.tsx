@@ -13,6 +13,7 @@ import {
   MetaWithTotal,
   useQuery
 } from "..";
+import { CommonMessage } from "../intl/common-ui-intl";
 
 /** Object types accepted as a column definition. */
 export type ColumnDefinition<TData> = string | Column<TData>;
@@ -169,7 +170,9 @@ export function QueryTable<TData extends KitsuResource>({
           <p>{error.errors.map(e => e.detail).join("\n")}</p>
         </div>
       )}
-      <span>Total matched records: {totalCount}</span>
+      <span>
+        <CommonMessage id="tableTotalCount" values={{ totalCount }} />
+      </span>
       <ReactTable
         className="-striped"
         columns={mappedColumns}

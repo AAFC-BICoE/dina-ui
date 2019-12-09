@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { SeqdbMessage } from "../../intl/seqdb-intl";
 
 interface CancelButtonProps {
   /** If the id is set, it will return to the view. If it's not, it will return to the list. */
@@ -21,7 +22,9 @@ export function CancelButton({ entityId, entityLink }: CancelButtonProps) {
 
   return (
     <Link href={href}>
-      <a className="btn btn-outline-secondary">Cancel</a>
+      <a className="btn btn-outline-secondary">
+        <SeqdbMessage id="cancelButtonText" />
+      </a>
     </Link>
   );
 }

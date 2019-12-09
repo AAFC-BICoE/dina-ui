@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { SeqdbMessage } from "../../intl/seqdb-intl";
 
 interface CreateButtonProps {
   // The link type for where to redirect the user. Gets appended with "/" + entityLink + "/edit/".
@@ -12,7 +13,9 @@ interface CreateButtonProps {
 export function CreateButton({ entityLink }: CreateButtonProps) {
   return (
     <Link href={`/${entityLink}/edit`}>
-      <a className="btn btn-primary">Create New</a>
+      <a className="btn btn-primary">
+        <SeqdbMessage id="createButtonText" />
+      </a>
     </Link>
   );
 }

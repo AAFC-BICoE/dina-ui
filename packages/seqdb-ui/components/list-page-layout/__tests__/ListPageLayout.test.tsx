@@ -51,7 +51,7 @@ describe("ListPageLayout component", () => {
 
     // Click the reset button.
     act(() => {
-      wrapper.find("button[children='Reset']").simulate("click");
+      wrapper.find("button.filter-reset-button").simulate("click");
     });
 
     // There should be no RSQL filter.

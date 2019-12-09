@@ -63,6 +63,7 @@ export function ProductEditPage({ router }: WithRouterProps) {
 
 function ProductForm({ product, router }: ProductFormProps) {
   const { save } = useContext(ApiClientContext);
+  const { formatMessage } = useSeqdbIntl();
   const { id } = router.query;
   const initialValues = product || {};
 
@@ -108,7 +109,7 @@ function ProductForm({ product, router }: ProductFormProps) {
             <LabelView
               className="col-md-2"
               name="labelname"
-              label="Note: Universal Product Code can be read from barcode scanner in keyboard mode"
+              label={formatMessage("productUpcFieldHelpText")}
             />
           </div>
           <div className="row">

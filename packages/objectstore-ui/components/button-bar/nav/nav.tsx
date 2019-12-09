@@ -5,8 +5,6 @@ import { ObjectStoreMessage } from "../../../intl/objectstore-intl";
 import "./nav.css";
 
 export function Nav() {
-  const { locale, setLocale } = useContext(intlContext);
-
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top">
       <div className="container-fluid p-0">
@@ -19,7 +17,7 @@ export function Nav() {
           </a>
         </Link>
         <div className="nav navbar-nav float-right">
-          <LanguageSelector locale={locale} onLocaleChange={setLocale} />
+          <LanguageSelector />
         </div>
       </div>
     </nav>

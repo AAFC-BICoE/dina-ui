@@ -1,9 +1,9 @@
+import { mount } from "enzyme";
 import {
   ApiClientContext,
   ApiClientContextI,
   createContextValue
-} from "common-ui";
-import { mount } from "enzyme";
+} from "../api-client/ApiClientContext";
 import { CommonUIIntlProvider } from "../intl/common-ui-intl";
 
 interface MockAppContextProviderProps {
