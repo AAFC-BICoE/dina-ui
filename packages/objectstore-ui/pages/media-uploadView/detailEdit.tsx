@@ -16,7 +16,7 @@ import { GetParams } from "kitsu";
 import { omitBy } from "lodash";
 import withRouter, { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter } from "next/router";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Agent } from "types/objectstore-api/resources/Agent";
 import { Metadata } from "types/objectstore-api/resources/Metadata";
 import { isArray, isUndefined } from "util";
@@ -27,6 +27,15 @@ import { generateManagedAttributeValue } from "../../utils/metaUtils";
 interface DetailEditFormProps {
   router: NextRouter;
 }
+
+const managedAttributes = [
+  {
+    ma_data: undefined,
+    metama_data: undefined,
+    name: "managed",
+    value: "managed"
+  }
+];
 
 export function DetailEditPage({ router }: WithRouterProps) {
   const id = router.query.id;
@@ -47,25 +56,36 @@ export function DetailEditPage({ router }: WithRouterProps) {
 function DetailEditForm({ router }: DetailEditFormProps) {
   const id = router.query.id;
   const { apiClient } = useContext(ApiClientContext);
-  const managedAttributes = [
-    { name: "managed", value: "managed", data: undefined }
-  ];
+  // To force rerender unpon all promises resolved
+  // when all the related managed attributes data are returned
+  const [editAttributesVisible, setEditAttributesVisible] = useState(false);
+  // Record the tags data, to be expanded by actual data for the target file
   const unManagedAttributes = [{ name: "unManaged", value: "unManaged" }];
+  // Wrapper function to avoid the react error of invalid children of promise
   function wrapper(mas) {
-    getManagedAttributeData(mas);
+    getManagedAttributesData(mas);
   }
-  async function getManagedAttributeData(mas) {
-    const promises = mas.map(ma => invokeManagedAttributes(ma));
+
+  // Organize the managed attributes with its assigned values for display purpose
+  async function getManagedAttributesData(mas) {
+    const promises = mas.map(ma => retrieveManagedAttributes(ma));
     await Promise.all(promises);
+    // Shuffle manageAttributes to replace the value with the actual assignedValue of
+    // the individual managed attribute for UI display.
     mas.map(ma => {
       managedAttributes.map(maa => {
-        if (maa.data && maa.data.uuid === ma.id) {
+        if (
+          maa.metama_data &&
+          maa.metama_data.data &&
+          maa.metama_data.data.id === ma.id
+        ) {
           maa.value = ma.assignedValue;
         }
       });
     });
+    setEditAttributesVisible(true);
   }
-
+  // Organize the tags data for display
   function generateTagsData(tags) {
     tags.map(tag =>
       unManagedAttributes.push({
@@ -74,22 +94,25 @@ function DetailEditForm({ router }: DetailEditFormProps) {
       })
     );
   }
-  async function invokeManagedAttributes(ma) {
+  // To retrieve the managed attibute based on the metadata managed attribute id
+  // for the target file
+  async function retrieveManagedAttributes(ma) {
     const path = "metadata-managed-attribute/" + ma.id;
     const getParams = omitBy<GetParams>(
       { include: "managedAttribute" },
       isUndefined
     );
-    const prom = await apiClient.get<MetaManagedAttribute, undefined>(
-      path,
-      getParams
-    );
+    const metaManagedAttribute = await apiClient.get<
+      MetaManagedAttribute,
+      undefined
+    >(path, getParams);
     managedAttributes.push({
-      data: prom.data.managedAttribute,
+      ma_data: metaManagedAttribute.data.managedAttribute,
+      metama_data: metaManagedAttribute,
       name: "fake",
       value: "assignedValue"
     });
-    return prom;
+    return metaManagedAttribute;
   }
 
   async function onSubmit(
@@ -164,14 +187,30 @@ function DetailEditForm({ router }: DetailEditFormProps) {
                     <SubmitButton />
                     <EditMetadataFormPage />
                     {wrapper(response.data[0].managedAttribute)}
-                    <AttributeBuilder
-                      controlledAttributes={managedAttributes}
-                    />
-                    {response.data[0] &&
-                      generateTagsData(response.data[0].acTags)}
-                    <AttributeBuilder
-                      controlledAttributes={unManagedAttributes}
-                    />
+                    {editAttributesVisible && (
+                      <div>
+                        <div
+                          style={{ marginBottom: "20px", marginTop: "20px" }}
+                        >
+                          <h5 style={{ color: "#1465b7" }}>
+                            Managed Attributes
+                          </h5>
+                        </div>
+                        <AttributeBuilder
+                          controlledAttributes={managedAttributes}
+                        />
+                        {response.data[0] &&
+                          generateTagsData(response.data[0].acTags)}
+                        <div
+                          style={{ marginBottom: "20px", marginTop: "20px" }}
+                        >
+                          <h5 style={{ color: "#1465b7" }}>Tags</h5>
+                        </div>
+                        <AttributeBuilder
+                          controlledAttributes={unManagedAttributes}
+                        />
+                      </div>
+                    )}
                   </Form>
                 </Formik>
               </div>
@@ -186,6 +225,9 @@ function DetailEditForm({ router }: DetailEditFormProps) {
 function EditMetadataFormPage() {
   return (
     <div>
+      <div style={{ marginBottom: "20px", marginTop: "20px" }}>
+        <h5 style={{ color: "#1465b7" }}>Metadata</h5>
+      </div>
       <div className="form-group row">
         <label className="col-sm-2 col-form-label">
           <strong>Stored Object Type</strong>

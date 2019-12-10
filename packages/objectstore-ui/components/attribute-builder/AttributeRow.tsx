@@ -60,7 +60,11 @@ export class AttributeRow extends React.Component<AttributeRowProps> {
                 model="managed-attribute"
                 optionLabel={managedAttribute => managedAttribute.name}
                 hideLabel={true}
-                initialValue={model.attribute ? model.attribute.data : null}
+                initialValue={
+                  model.attribute && model.attribute.ma_data
+                    ? model.attribute.ma_data
+                    : null
+                }
               />
             </div>
             <div className="list-inline-item" style={{ width: 180 }}>

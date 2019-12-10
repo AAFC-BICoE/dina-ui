@@ -1,13 +1,15 @@
 import { isEqual, pull } from "lodash";
 import React from "react";
 import { ManagedAttribute } from "types/objectstore-api/resources/ManagedAttribute";
+import { MetaManagedAttribute } from "types/objectstore-api/resources/MetaManagedAttribute";
 import { AttributeGroup, AttributeGroupModel } from "./AttributeGroup";
 import { AttributeRow, AttributeRowModel } from "./AttributeRow";
 
 export interface ControlledAttribute {
   name?: string;
   value: string;
-  data?: ManagedAttribute;
+  ma_data?: ManagedAttribute;
+  metama_data?: MetaManagedAttribute;
 }
 
 export interface AttributeBuilderProps {
