@@ -12,13 +12,16 @@ import {
   TextField
 } from "common-ui";
 import { Form, Formik, FormikActions } from "formik";
+import { GetParams } from "kitsu";
+import { omitBy } from "lodash";
 import withRouter, { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter } from "next/router";
 import { useContext } from "react";
 import { Agent } from "types/objectstore-api/resources/Agent";
 import { Metadata } from "types/objectstore-api/resources/Metadata";
-import { isArray } from "util";
+import { isArray, isUndefined } from "util";
 import { AttributeBuilder, Head, Nav } from "../../components";
+import { MetaManagedAttribute } from "../../types/objectstore-api/resources/MetaManagedAttribute";
 import { generateManagedAttributeValue } from "../../utils/metaUtils";
 
 interface DetailEditFormProps {
@@ -44,9 +47,24 @@ export function DetailEditPage({ router }: WithRouterProps) {
 function DetailEditForm({ router }: DetailEditFormProps) {
   const id = router.query.id;
   const { apiClient } = useContext(ApiClientContext);
-  const managedAttributes = [{ name: "managed", value: "managed" }];
-
+  const managedAttributes = [
+    { name: "managed", value: "managed", data: undefined }
+  ];
   const unManagedAttributes = [{ name: "unManaged", value: "unManaged" }];
+  function wrapper(mas) {
+    getManagedAttributeData(mas);
+  }
+  async function getManagedAttributeData(mas) {
+    const promises = mas.map(ma => invokeManagedAttributes(ma));
+    await Promise.all(promises);
+    mas.map(ma => {
+      managedAttributes.map(maa => {
+        if (maa.data && maa.data.uuid === ma.id) {
+          maa.value = ma.assignedValue;
+        }
+      });
+    });
+  }
 
   function generateTagsData(tags) {
     tags.map(tag =>
@@ -55,6 +73,23 @@ function DetailEditForm({ router }: DetailEditFormProps) {
         value: tag
       })
     );
+  }
+  async function invokeManagedAttributes(ma) {
+    const path = "metadata-managed-attribute/" + ma.id;
+    const getParams = omitBy<GetParams>(
+      { include: "managedAttribute" },
+      isUndefined
+    );
+    const prom = await apiClient.get<MetaManagedAttribute, undefined>(
+      path,
+      getParams
+    );
+    managedAttributes.push({
+      data: prom.data.managedAttribute,
+      name: "fake",
+      value: "assignedValue"
+    });
+    return prom;
   }
 
   async function onSubmit(
@@ -128,6 +163,7 @@ function DetailEditForm({ router }: DetailEditFormProps) {
                     <ErrorViewer />
                     <SubmitButton />
                     <EditMetadataFormPage />
+                    {wrapper(response.data[0].managedAttribute)}
                     <AttributeBuilder
                       controlledAttributes={managedAttributes}
                     />

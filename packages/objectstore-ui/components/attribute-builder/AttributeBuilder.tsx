@@ -1,11 +1,13 @@
 import { isEqual, pull } from "lodash";
 import React from "react";
+import { ManagedAttribute } from "types/objectstore-api/resources/ManagedAttribute";
 import { AttributeGroup, AttributeGroupModel } from "./AttributeGroup";
 import { AttributeRow, AttributeRowModel } from "./AttributeRow";
 
 export interface ControlledAttribute {
   name?: string;
   value: string;
+  data?: ManagedAttribute;
 }
 
 export interface AttributeBuilderProps {
@@ -72,8 +74,8 @@ export class AttributeBuilder extends React.Component<
     ) {
       this.props.controlledAttributes.map(ca => {
         if (
-          ca.name.indexOf("managed") === -1 &&
-          ca.name.indexOf("unManaged") === -1
+          (ca.name.indexOf("managed") === -1 &&
+            ca.name.indexOf("unManaged")) === -1
         ) {
           after = parent.children[parent.children.length - 1] as any;
           this.addAttributeRowNoUpdate({ after, parent, ca });
