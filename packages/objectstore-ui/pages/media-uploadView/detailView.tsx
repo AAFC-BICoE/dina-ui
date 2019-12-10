@@ -7,6 +7,10 @@ import { useAsyncRun, useAsyncTask } from "react-hooks-async";
 import { FileDownLoadResponseAttributes } from "types/objectstore-api/resources/FileDownLoadResponse";
 import { isArray, isUndefined } from "util";
 import { Head, Nav } from "../../components";
+import {
+  ObjectStoreMessage,
+  useObjectStoreIntl
+} from "../../intl/objectstore-intl";
 import ViewMetadataFormPage from "../../page-fragments/viewMetadata";
 
 interface DownloadFileResponse {
@@ -49,13 +53,16 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
   const id = router.query.id;
   const stringId = isArray(id) ? id[0] : id;
   const { imgResponse } = useImageQuery(stringId);
+  const { formatMessage } = useObjectStoreIntl();
 
   return (
     <div>
-      <Head title="Object Store Detailes Page" />
+      <Head title={formatMessage("objectStoreDetailsTitle")} />
       <Nav />
       <div>
-        <h4>Object Store Details</h4>
+        <h4>
+          <ObjectStoreMessage id="objectStoreDetailsTitle" />
+        </h4>
         <div className="container-fluid">
           <div className="row">
             {imgResponse &&
@@ -87,7 +94,9 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
                 />
               </div>
             ) : (
-              <p>No File to display</p>
+              <p>
+                <ObjectStoreMessage id="noFileToDisplay" />
+              </p>
             )}
 
             <Query

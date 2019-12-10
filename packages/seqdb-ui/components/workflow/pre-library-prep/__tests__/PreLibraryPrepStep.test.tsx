@@ -171,16 +171,10 @@ describe("PreLibraryPrepStep UI", () => {
     ]);
 
     // The tables should show 'not sheared' and 'no size selection'.
-    expect(wrapper.containsMatchingElement(<div>Not Sheared</div>)).toEqual(
-      true
-    );
-    expect(
-      wrapper.containsMatchingElement(<div>No Size Selection</div>)
-    ).toEqual(true);
-    expect(wrapper.containsMatchingElement(<div>Sheared</div>)).toEqual(false);
-    expect(
-      wrapper.containsMatchingElement(<div>Size Selection Added</div>)
-    ).toEqual(false);
+    expect(wrapper.contains("Not Sheared")).toEqual(true);
+    expect(wrapper.contains("No Size Selection")).toEqual(true);
+    expect(wrapper.contains("Sheared")).toEqual(false);
+    expect(wrapper.contains("Size Selection Added")).toEqual(false);
   });
 
   it("Lets you add shearing details for the checked samples.", async () => {
@@ -818,18 +812,10 @@ describe("PreLibraryPrepStep UI", () => {
     const rows = wrapper.find(".rt-tr");
 
     // Row 1 should be sheared but not size selected. Row 2 should be size selected but not sheared.
-    expect(rows.at(1).containsMatchingElement(<div>Sheared</div>)).toEqual(
-      true
-    );
-    expect(
-      rows.at(1).containsMatchingElement(<div>No Size Selection</div>)
-    ).toEqual(true);
-    expect(rows.at(2).containsMatchingElement(<div>Not Sheared</div>)).toEqual(
-      true
-    );
-    expect(
-      rows.at(2).containsMatchingElement(<div>Size Selection Added</div>)
-    ).toEqual(true);
+    expect(rows.at(1).contains("Sheared")).toEqual(true);
+    expect(rows.at(1).contains("No Size Selection")).toEqual(true);
+    expect(rows.at(2).contains("Not Sheared")).toEqual(true);
+    expect(rows.at(2).contains("Size Selection Added")).toEqual(true);
   });
 
   it("Lets you delete selected shearing or size selection stepResources.", async () => {

@@ -1,5 +1,5 @@
-import { mount } from "enzyme";
 import Select from "react-select/base";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { FilterAttribute } from "../FilterBuilder";
 import { FilterRow, FilterRowProps } from "../FilterRow";
 
@@ -14,7 +14,7 @@ describe("FilterRow component", () => {
   });
 
   function mountFilterRow(propsOverride: Partial<FilterRowProps> = {}) {
-    return mount<FilterRow>(
+    return mountWithAppContext(
       <FilterRow
         filterAttributes={["name", "description"]}
         model={{
@@ -58,14 +58,14 @@ describe("FilterRow component", () => {
         .find(Select)
         .props().options
     ).toEqual([
-      { label: "IS", value: "IS" },
-      { label: "IS NOT", value: "IS NOT" }
+      { label: expect.anything(), value: "IS" },
+      { label: expect.anything(), value: "IS NOT" }
     ]);
   });
 
   it("Changes the model's filter attribute when a new filter attribute is selected.", () => {
     const wrapper = mountFilterRow();
-    const model = wrapper.props().model;
+    const model = wrapper.find(FilterRow).props().model;
 
     wrapper
       .find(".filter-attribute")
@@ -78,7 +78,7 @@ describe("FilterRow component", () => {
 
   it("Changes the model's predicate when a new predicate is selected.", () => {
     const wrapper = mountFilterRow();
-    const model = wrapper.props().model;
+    const model = wrapper.find(FilterRow).props().model;
 
     wrapper
       .find(".filter-predicate")
@@ -91,7 +91,7 @@ describe("FilterRow component", () => {
 
   it("Changes the model's filter value when the filter value is changed.", () => {
     const wrapper = mountFilterRow();
-    const model = wrapper.props().model;
+    const model = wrapper.find(FilterRow).props().model;
 
     wrapper
       .find("input.filter-value")
@@ -102,7 +102,7 @@ describe("FilterRow component", () => {
 
   it("Changes the model's searchType value when the search type is changed.", () => {
     const wrapper = mountFilterRow();
-    const model = wrapper.props().model;
+    const model = wrapper.find(FilterRow).props().model;
 
     expect(model.searchType).toEqual("PARTIAL_MATCH");
 
@@ -116,17 +116,11 @@ describe("FilterRow component", () => {
   });
 
   it("Provides a prop to show or hide the remove button.", async () => {
-    const withRemoveButton = mountFilterRow();
-    withRemoveButton.setProps({ showRemoveButton: true });
-    expect(withRemoveButton.find("button[children='-']").exists()).toEqual(
-      true
-    );
+    const withRemoveButton = mountFilterRow({ showRemoveButton: true });
+    expect(withRemoveButton.find("button.remove").exists()).toEqual(true);
 
-    const withoutRemoveButton = mountFilterRow();
-    withoutRemoveButton.setProps({ showRemoveButton: false });
-    expect(withoutRemoveButton.find("button[children='-']").exists()).toEqual(
-      false
-    );
+    const withoutRemoveButton = mountFilterRow({ showRemoveButton: false });
+    expect(withoutRemoveButton.find("button.remove").exists()).toEqual(false);
   });
 
   it("Provides an 'onChange' prop to notify of change events.", () => {

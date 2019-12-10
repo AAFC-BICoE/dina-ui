@@ -87,9 +87,7 @@ describe("Metadata detail view page", () => {
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
     // The metadata section bucket name field should be rendered.
-    expect(
-      wrapper.containsMatchingElement(<strong>Bucket Name</strong>)
-    ).toEqual(true);
+    expect(wrapper.contains("Bucket Name")).toEqual(true);
 
     done();
   });

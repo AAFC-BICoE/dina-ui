@@ -1,13 +1,13 @@
-import { mount } from "enzyme";
 import { Form, Formik } from "formik";
 import Select from "react-select";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { FilterBuilderField } from "../FilterBuilderField";
 
 describe("FilterBuilderField component", () => {
   const mockSubmit = jest.fn();
 
   function mountForm() {
-    return mount<Formik>(
+    return mountWithAppContext(
       <Formik initialValues={{ filter: null }} onSubmit={mockSubmit}>
         <Form>
           <FilterBuilderField
@@ -38,7 +38,9 @@ describe("FilterBuilderField component", () => {
     const wrapper = mountForm();
     await Promise.resolve();
     // Formik should have the initial value.
-    expect(wrapper.state().values.filter.type).toEqual("FILTER_GROUP");
+    expect(wrapper.find(Formik).state().values.filter.type).toEqual(
+      "FILTER_GROUP"
+    );
 
     // Change an input value.
     wrapper
@@ -46,8 +48,8 @@ describe("FilterBuilderField component", () => {
       .simulate("change", { target: { value: "test value" } });
 
     // Formik should have the updated value.
-    expect(wrapper.state().values.filter.children[0].value).toEqual(
-      "test value"
-    );
+    expect(
+      wrapper.find(Formik).state().values.filter.children[0].value
+    ).toEqual("test value");
   });
 });

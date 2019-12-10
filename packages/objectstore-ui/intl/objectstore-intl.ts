@@ -2,7 +2,7 @@ import { getIntlSupport } from "common-ui";
 import { OBJECTSTORE_MESSAGES_ENGLISH } from "./objectstore-en";
 import { OBJECTSTORE_MESSAGES_FRENCH } from "./objectstore-fr";
 
-const { FormattedMessage, IntlProvider } = getIntlSupport({
+const { FormattedMessage, IntlProvider, useIntl } = getIntlSupport({
   defaultMessages: OBJECTSTORE_MESSAGES_ENGLISH,
   translations: {
     en: OBJECTSTORE_MESSAGES_ENGLISH,
@@ -12,3 +12,4 @@ const { FormattedMessage, IntlProvider } = getIntlSupport({
 
 export const ObjectStoreMessage = FormattedMessage;
 export const ObjectStoreIntlProvider = IntlProvider;
+export const useObjectStoreIntl = useIntl;
