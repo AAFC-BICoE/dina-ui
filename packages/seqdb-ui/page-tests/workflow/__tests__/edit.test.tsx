@@ -120,7 +120,7 @@ describe("Workflow edit page.", () => {
               dateCreated: today,
               name: "New Workflow"
             },
-            id: -100,
+            id: "-100",
             relationships: {
               chainTemplate: { data: { id: "1", type: "chainTemplate" } },
               group: { data: { id: "200", type: "group" } }
