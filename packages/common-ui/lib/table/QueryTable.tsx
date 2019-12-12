@@ -151,8 +151,7 @@ export function QueryTable<TData extends KitsuResource>({
     onSuccess
   });
 
-  const totalCount =
-    response && response.meta && response.meta.totalResourceCount;
+  const totalCount = response?.meta?.totalResourceCount;
 
   const numberOfPages = totalCount
     ? Math.ceil(totalCount / page.limit)

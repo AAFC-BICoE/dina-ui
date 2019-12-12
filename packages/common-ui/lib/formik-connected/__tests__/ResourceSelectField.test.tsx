@@ -27,7 +27,7 @@ const MOCK_GROUPS_FILTERED = {
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async (_, { filter }) => {
-  if (filter && filter.groupName === "Mat") {
+  if (filter?.groupName === "Mat") {
     return MOCK_GROUPS_FILTERED;
   }
   return MOCK_GROUPS;
