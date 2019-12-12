@@ -45,7 +45,7 @@ describe("Protocol edit page", () => {
       data: [
         {
           data: {
-            id: 1,
+            id: "1",
             type: "protocol"
           },
           status: 201
@@ -76,7 +76,7 @@ describe("Protocol edit page", () => {
               attributes: {
                 name: "New Protocol"
               },
-              id: -100,
+              id: "-100",
               type: "protocol"
             }
           }
@@ -107,7 +107,7 @@ describe("Protocol edit page", () => {
       data: [
         {
           data: {
-            id: 10,
+            id: "10",
             type: "protocol"
           },
           status: 201

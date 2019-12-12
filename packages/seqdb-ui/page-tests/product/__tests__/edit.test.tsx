@@ -48,7 +48,7 @@ describe("Product edit page", () => {
       data: [
         {
           data: {
-            id: 1,
+            id: "1",
             type: "product"
           },
           status: 201
@@ -80,7 +80,7 @@ describe("Product edit page", () => {
               name: "New Product",
               type: undefined
             },
-            id: -100,
+            id: "-100",
             type: "product"
           }
         }
@@ -135,7 +135,7 @@ describe("Product edit page", () => {
       data: [
         {
           data: {
-            id: 10,
+            id: "10",
             type: "product"
           },
           status: 201

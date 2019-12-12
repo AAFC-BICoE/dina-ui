@@ -4,7 +4,7 @@ import { SeqdbMessage } from "../../intl/seqdb-intl";
 
 interface CancelButtonProps {
   /** If the id is set, it will return to the view. If it's not, it will return to the list. */
-  entityId?: string | number;
+  entityId?: string;
 
   /** The link type for where to redirect the user. Gets appended with "/" + entityLink + "/edit/". */
   entityLink: string;

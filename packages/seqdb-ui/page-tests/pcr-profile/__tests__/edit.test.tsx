@@ -46,7 +46,7 @@ describe("PcrProfile edit page", () => {
       data: [
         {
           data: {
-            id: 1,
+            id: "1",
             type: "thermocyclerprofile"
           },
           status: 201
@@ -77,7 +77,7 @@ describe("PcrProfile edit page", () => {
               attributes: {
                 name: "New PcrProfile"
               },
-              id: -100,
+              id: "-100",
               type: "thermocyclerprofile"
             }
           }
@@ -131,7 +131,7 @@ describe("PcrProfile edit page", () => {
       data: [
         {
           data: {
-            id: 1,
+            id: "1",
             type: "thermocyclerprofile"
           },
           status: 201

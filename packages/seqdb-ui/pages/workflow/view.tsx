@@ -1,5 +1,6 @@
 import { FieldView, LoadingSpinner, Query } from "common-ui";
 import { Formik } from "formik";
+import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
@@ -46,11 +47,11 @@ export function WorkflowDetailsPage({ router }: WithRouterProps) {
   );
 }
 
-function WorkflowSteps({ chain }: { chain: Chain }) {
+function WorkflowSteps({ chain }: { chain: PersistedResource<Chain> }) {
   return (
     <Query<ChainStepTemplate[]>
       query={{
-        filter: { "chainTemplate.id": chain.chainTemplate.id as string },
+        filter: { "chainTemplate.id": chain.chainTemplate.id },
         include: "stepTemplate",
         path: "chainStepTemplate"
       }}
@@ -67,7 +68,7 @@ function WorkflowSteps({ chain }: { chain: Chain }) {
                   <SeqdbMessage id="workflowDetailsTab" />
                 </Tab>
                 {steps.map(step => (
-                  <Tab key={step.id as string}>
+                  <Tab key={step.id}>
                     <SeqdbMessage
                       id="workflowStepTab"
                       values={{
@@ -89,7 +90,7 @@ function WorkflowSteps({ chain }: { chain: Chain }) {
                 </Formik>
               </TabPanel>
               {steps.map(step => (
-                <TabPanel key={step.id as string}>
+                <TabPanel key={step.id}>
                   <StepRenderer
                     chainStepTemplates={steps}
                     chain={chain}
