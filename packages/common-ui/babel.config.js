@@ -1,16 +1,16 @@
 module.exports = function(api) {
   api.cache(true);
 
-  const presets = [
-    "@babel/preset-env",
-    "@babel/preset-typescript",
-    "@babel/preset-react"
-  ];
-  const plugins = [
-    "@babel/plugin-proposal-class-properties",
-    "@babel/plugin-transform-runtime",
-    "react-require"
-  ];
+  const nextPreset = ["next/babel"];
 
-  return { presets, plugins };
+  const presets = [nextPreset];
+
+  if (process.env["ENV"] !== "test") {
+    nextPreset.push({
+      useBuiltIns: "usage",
+      targets: { ie: "11" }
+    });
+  }
+
+  return { presets };
 };

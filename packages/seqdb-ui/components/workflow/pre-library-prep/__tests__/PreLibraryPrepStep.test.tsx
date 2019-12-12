@@ -70,9 +70,7 @@ const TEST_CHAIN: PersistedResource<Chain> = {
 };
 
 /** This is the first step in the chain that precedes this one. */
-const TEST_SAMPLE_SELECTION_CHAIN_STEP_TEMPLATE: PersistedResource<
-  ChainStepTemplate
-> = {
+const TEST_SAMPLE_SELECTION_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
   id: "1",
   stepNumber: 1,
@@ -83,9 +81,7 @@ const TEST_SAMPLE_SELECTION_CHAIN_STEP_TEMPLATE: PersistedResource<
 };
 
 /** This is the second and current step in the chain. */
-const TEST_PRE_LIBRARY_PREP_CHAIN_STEP_TEMPLATE: PersistedResource<
-  ChainStepTemplate
-> = {
+const TEST_PRE_LIBRARY_PREP_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
   id: "2",
   stepNumber: 2,

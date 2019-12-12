@@ -68,7 +68,7 @@ export async function serialize<TData extends KitsuResource>({
  */
 function getNullRelationships(resource: KitsuResource) {
   const nullRelationshipFields = Object.keys(resource).filter(
-    key => resource[key] && resource[key].id === null
+    key => resource[key]?.id === null
   );
   const nullRelationships = {};
   for (const field of nullRelationshipFields) {
