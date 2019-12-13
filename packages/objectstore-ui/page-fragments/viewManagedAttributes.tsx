@@ -4,8 +4,13 @@ import { noop } from "lodash";
 import { ManagedAttribute } from "types/objectstore-api/resources/ManagedAttribute";
 import { MetaManagedAttribute } from "types/objectstore-api/resources/MetaManagedAttribute";
 
+interface GenerateManagedAttributesViewProps {
+  ma: ManagedAttribute;
+}
 /* tslint:disable:no-string-literal */
-export function generateManagedAttributesView(ma) {
+export function GenerateManagedAttributesView({
+  ma
+}: GenerateManagedAttributesViewProps) {
   return (
     <Query<MetaManagedAttribute>
       query={{
@@ -40,4 +45,6 @@ export function generateManagedAttributesView(ma) {
     </Query>
   );
 }
+
+export default GenerateManagedAttributesView;
 /* tslint:enable:no-string-literal */
