@@ -105,7 +105,9 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
                 />
               </div>
             ) : (
-              <p>No File to display</p>
+              <div className="col-md-5">
+                <p>No File to display</p>
+              </div>
             )}
 
             <Query<Metadata>
@@ -126,7 +128,13 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
                       <div>
                         <ViewMetadataFormPage metadata={response.data[0]} />
                       </div>
-                      <hr style={{ borderColor: "black" }} />
+                      <hr
+                        style={{
+                          borderColor: "black",
+                          marginLeft: "0",
+                          width: "80%"
+                        }}
+                      />
                       <div style={{ marginBottom: "20px", marginTop: "20px" }}>
                         <h5 style={{ color: "#1465b7" }}>Managed Attributes</h5>
                       </div>
@@ -135,7 +143,13 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
                         response.data[0].managedAttribute.map(ma =>
                           generateManagedAttributesView(ma)
                         )}
-                      <hr style={{ borderColor: "black" }} />
+                      <hr
+                        style={{
+                          borderColor: "black",
+                          marginLeft: "0",
+                          width: "80%"
+                        }}
+                      />
                       <div style={{ marginBottom: "20px", marginTop: "20px" }}>
                         <h5 style={{ color: "#1465b7" }}>Tags</h5>
                       </div>
