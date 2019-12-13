@@ -6,5 +6,6 @@ import { SEQDB_MESSAGES_ENGLISH } from "./seqdb-en";
  */
 export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   ...COMMON_UI_MESSAGES_FR,
-  appTitle: "Sequence Database (fr)"
+  appTitle: "Sequence Database (fr)",
+  field_name: "Nom"
 };
