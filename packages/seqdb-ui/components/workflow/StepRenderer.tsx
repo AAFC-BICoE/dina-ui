@@ -1,11 +1,12 @@
+import { PersistedResource } from "kitsu";
 import { Chain, ChainStepTemplate } from "../../types/seqdb-api";
 import { PreLibraryPrepStep } from "./pre-library-prep/PreLibraryPrepStep";
 import { SampleSelection } from "./sample-selection/SampleSelection";
 
 export interface StepRendererProps {
-  chainStepTemplates: ChainStepTemplate[];
-  chain: Chain;
-  step: ChainStepTemplate;
+  chainStepTemplates: Array<PersistedResource<ChainStepTemplate>>;
+  chain: PersistedResource<Chain>;
+  step: PersistedResource<ChainStepTemplate>;
 }
 
 export function StepRenderer(props: StepRendererProps) {

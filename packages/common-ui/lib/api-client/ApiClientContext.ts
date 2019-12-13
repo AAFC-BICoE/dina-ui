@@ -1,13 +1,13 @@
-import Kitsu, { KitsuResource } from "kitsu";
+import Kitsu, { KitsuResource, PersistedResource } from "kitsu";
 import { deserialise } from "kitsu-core";
 import React from "react";
 import { serialize } from "../util/serialize";
 import {
-  JsonApiErrorResponse,
-  JsonApiResponse,
+  FailedOperation,
   Operation,
-  OperationsResponse
-} from "./jsonapi-types";
+  OperationsResponse,
+  SuccessfulOperation
+} from "./operations-types";
 
 /** Api context interface. */
 export interface ApiClientContextI {
@@ -15,10 +15,12 @@ export interface ApiClientContextI {
   apiClient: Kitsu;
 
   /** Function to perform requests against a jsonpatch-compliant JSONAPI server. */
-  doOperations: (operations: Operation[]) => Promise<JsonApiResponse[]>;
+  doOperations: (operations: Operation[]) => Promise<SuccessfulOperation[]>;
 
   /** Creates or updates one or multiple resources. */
-  save: (saveArgs: SaveArgs[]) => Promise<KitsuResource[]>;
+  save: (
+    saveArgs: SaveArgs[]
+  ) => Promise<Array<PersistedResource<KitsuResource>>>;
 }
 
 /** save function args. */
@@ -52,7 +54,7 @@ export function createContextValue(): ApiClientContextI {
    */
   async function doOperations(
     operations: Operation[]
-  ): Promise<JsonApiResponse[]> {
+  ): Promise<SuccessfulOperation[]> {
     // Unwrap the configured axios instance from the Kitsu instance.
     const { axios } = apiClient;
 
@@ -81,7 +83,9 @@ export function createContextValue(): ApiClientContextI {
   /**
    * Creates or updates one or multiple resources.
    */
-  async function save(saveArgs: SaveArgs[]): Promise<KitsuResource[]> {
+  async function save(
+    saveArgs: SaveArgs[]
+  ): Promise<Array<PersistedResource<KitsuResource>>> {
     // Serialize the resources to JSONAPI format.
     const serializePromises = saveArgs.map(saveArg => serialize(saveArg));
     const serialized = await Promise.all(serializePromises);
@@ -95,7 +99,10 @@ export function createContextValue(): ApiClientContextI {
       path: jsonapiResource.id
         ? `${jsonapiResource.type}/${jsonapiResource.id}`
         : jsonapiResource.type,
-      value: { ...jsonapiResource, id: jsonapiResource.id || idIterator-- }
+      value: {
+        ...jsonapiResource,
+        id: String(jsonapiResource.id || idIterator--)
+      }
     }));
 
     // Do the operations request.
@@ -125,7 +132,7 @@ function getErrorMessage(
   // Filter down to just the error responses.
   const errorResponses = operationsResponse.filter(
     ({ status }) => !/2../.test(status.toString())
-  ) as JsonApiErrorResponse[];
+  ) as FailedOperation[];
 
   // Map the error responses to JsonApiErrors.
   const jsonApiErrors = errorResponses
