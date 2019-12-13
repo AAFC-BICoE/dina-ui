@@ -146,7 +146,7 @@ function EditMetadataForm({
   }
   return (
     <Formik
-      initialValues={{ customButtonName: "Save Metadata" }}
+      initialValues={{ customButtonName: "Save Metadata", dcType: "image" }}
       onSubmit={onSubmit}
     >
       <Form>
@@ -165,7 +165,7 @@ function EditMetadataForm({
             />
           </div>
         </div>
-        <div className="form-group row">
+        <div className="form-group row" style={{ display: "none" }}>
           <label className="col-sm-2 col-form-label">
             <strong>Stored Object Type</strong>
           </label>
@@ -191,7 +191,7 @@ function EditMetadataForm({
             />
           </div>
         </div>
-        <div className="form-group row">
+        <div className="form-group row" style={{ display: "none" }}>
           <label className="col-sm-2 col-form-label">
             <strong>Last Metadata Modification Time</strong>
           </label>
@@ -235,6 +235,11 @@ function EditMetadataForm({
           <div className="col col-md-6">
             <h6>Managed Attributes</h6>
             <AttributeBuilder controlledAttributes={managedAttributes} />
+          </div>
+        </div>
+        <div className="row">
+          <div className="span12">
+            <hr />
           </div>
         </div>
         <div className="form-group row">

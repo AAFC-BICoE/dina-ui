@@ -186,9 +186,11 @@ function DetailEditForm({ router }: DetailEditFormProps) {
                     <ErrorViewer />
                     <SubmitButton />
                     <EditMetadataFormPage />
-                    {wrapper(response.data[0].managedAttribute)}
+                    {response.data[0] &&
+                      response.data[0].managedAttribute &&
+                      wrapper(response.data[0].managedAttribute)}
                     {editAttributesVisible && (
-                      <div>
+                      <>
                         <div
                           style={{ marginBottom: "20px", marginTop: "20px" }}
                         >
@@ -199,18 +201,18 @@ function DetailEditForm({ router }: DetailEditFormProps) {
                         <AttributeBuilder
                           controlledAttributes={managedAttributes}
                         />
-                        {response.data[0] &&
-                          generateTagsData(response.data[0].acTags)}
-                        <div
-                          style={{ marginBottom: "20px", marginTop: "20px" }}
-                        >
-                          <h5 style={{ color: "#1465b7" }}>Tags</h5>
-                        </div>
-                        <AttributeBuilder
-                          controlledAttributes={unManagedAttributes}
-                        />
-                      </div>
+                      </>
                     )}
+
+                    {response.data[0] &&
+                      response.data[0].acTags &&
+                      generateTagsData(response.data[0].acTags)}
+                    <div style={{ marginBottom: "20px", marginTop: "20px" }}>
+                      <h5 style={{ color: "#1465b7" }}>Tags</h5>
+                    </div>
+                    <AttributeBuilder
+                      controlledAttributes={unManagedAttributes}
+                    />
                   </Form>
                 </Formik>
               </div>

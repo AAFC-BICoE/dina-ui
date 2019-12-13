@@ -18,7 +18,7 @@ export function generateManagedAttributesView(ma) {
           {response && (
             <Formik<ManagedAttribute> initialValues={ma} onSubmit={noop}>
               <div className="row">
-                <label className="col-sm-2">
+                <label className="col-md-3">
                   <strong>
                     {response.data["managedAttribute"]
                       ? response.data["managedAttribute"].name
@@ -27,7 +27,7 @@ export function generateManagedAttributesView(ma) {
                 </label>
                 <div className="col">
                   <FieldView
-                    className="col-sm-6"
+                    className="col-md-9"
                     name="assignedValue"
                     hideLabel={true}
                   />
