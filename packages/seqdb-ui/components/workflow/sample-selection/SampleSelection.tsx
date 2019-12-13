@@ -57,10 +57,7 @@ export function SampleSelection(props: StepRendererProps) {
   ];
 
   const SELECTABLE_SAMPLE_COLUMNS: Array<ColumnDefinition<any>> = [
-    {
-      Header: "Group",
-      accessor: "group.groupName"
-    },
+    "group.groupName",
     "name",
     "version",
     {

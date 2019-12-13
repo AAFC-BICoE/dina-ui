@@ -20,18 +20,12 @@ const PROTOCOL_TABLE_COLUMNS: Array<ColumnDefinition<Protocol>> = [
         <a>{name}</a>
       </Link>
     ),
-    Header: "Name",
     accessor: "name"
   },
   {
-    Header: "Group Name",
     accessor: "group.groupName"
   },
-  {
-    Header: "Type",
-    accessor: row => protocolTypeLabels[row.type],
-    id: "type"
-  },
+  "type",
   "version",
   "description",
   "equipment",

@@ -17,13 +17,9 @@ const PCRPRIMER_TABLE_COLUMNS: Array<ColumnDefinition<PcrPrimer>> = [
         <a>{name}</a>
       </Link>
     ),
-    Header: "Name",
     accessor: "name"
   },
-  {
-    Header: "Group Name",
-    accessor: "group.groupName"
-  },
+  "group.groupName",
   {
     Cell: ({ original: { region } }) =>
       region ? (
@@ -31,7 +27,6 @@ const PCRPRIMER_TABLE_COLUMNS: Array<ColumnDefinition<PcrPrimer>> = [
           <a>{region.name}</a>
         </Link>
       ) : null,
-    Header: "Region Name",
     accessor: "region.name"
   },
   "type",

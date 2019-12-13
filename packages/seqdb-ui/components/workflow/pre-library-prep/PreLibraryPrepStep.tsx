@@ -103,7 +103,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
 
   const SAMPLE_STEP_RESOURCE_COLUMNS: Array<ColumnDefinition<StepResource>> = [
     {
-      Header: "Group",
+      Header: formatMessage("field_group.groupName"),
       accessor: "sample.group.groupName"
     },
     "sample.name",

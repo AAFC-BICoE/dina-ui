@@ -16,15 +16,11 @@ const WORKFLOW_TABLE_COLUMNS: Array<ColumnDefinition<any>> = [
         <a>{name}</a>
       </Link>
     ),
-    Header: "Name",
     accessor: "name"
   },
   "dateCreated",
   "chainTemplate.name",
-  {
-    Header: "Group",
-    accessor: "group.groupName"
-  }
+  "group.groupName"
 ];
 
 const WORKFLOW_FILTER_ATTRIBUTES = [

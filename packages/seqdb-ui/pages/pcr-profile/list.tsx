@@ -12,7 +12,6 @@ import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 
 const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
   {
-    Header: "Group Name",
     accessor: "group.groupName"
   },
   {
@@ -22,7 +21,6 @@ const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
           <a>{region.name}</a>
         </Link>
       ) : null,
-    Header: "Region Name",
     accessor: "region.name"
   },
   {
@@ -31,7 +29,6 @@ const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
         <a>{name}</a>
       </Link>
     ),
-    Header: "Name",
     accessor: "name"
   },
   "application",

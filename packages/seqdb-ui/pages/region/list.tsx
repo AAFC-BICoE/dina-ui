@@ -17,7 +17,6 @@ const REGION_TABLE_COLUMNS: Array<ColumnDefinition<Region>> = [
         <a>{name}</a>
       </Link>
     ),
-    Header: "Name",
     accessor: "name"
   },
   "description",

@@ -6,6 +6,7 @@ import {
 } from "kitsu";
 import { range } from "lodash";
 import React from "react";
+import { IntlProvider } from "react-intl";
 import ReactTable from "react-table";
 import {
   ColumnDefinition,
@@ -648,5 +649,22 @@ describe("QueryTable component", () => {
     wrapper.update();
 
     expect(wrapper.find(ReactTable).prop("loading")).toEqual(true);
+  });
+
+  it("Displays the intl message (if there is one) as a header.", async () => {
+    const wrapper = mountWithAppContext(
+      <IntlProvider
+        locale="en"
+        messages={{ field_testField: "My Field Label" }}
+      >
+        <QueryTable<Todo> loading={true} path="todo" columns={["testField"]} />
+      </IntlProvider>
+    );
+
+    expect(
+      wrapper
+        .find(".rt-resizable-header-content[children='My Field Label']")
+        .exists()
+    ).toEqual(true);
   });
 });
