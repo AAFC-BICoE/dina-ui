@@ -1,5 +1,10 @@
 import { mount } from "enzyme";
-import { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
+import {
+  FilterParam,
+  KitsuResource,
+  KitsuResponse,
+  PersistedResource
+} from "kitsu";
 import { range } from "lodash";
 import React from "react";
 import ReactTable from "react-table";
@@ -27,7 +32,7 @@ function getMockTodos(page): KitsuResponse<Todo[], MetaWithTotal> {
   const idRange = range(offset, offset + page.limit);
 
   return {
-    data: idRange.map<Todo>(i => ({
+    data: idRange.map<PersistedResource<Todo>>(i => ({
       description: `todo description ${i}`,
       id: `${i}`,
       name: `todo ${i}`,

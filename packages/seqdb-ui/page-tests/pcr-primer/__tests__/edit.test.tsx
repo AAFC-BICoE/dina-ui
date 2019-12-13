@@ -57,7 +57,7 @@ describe("PcrPrimer edit page", () => {
       data: [
         {
           data: {
-            id: 1,
+            id: "1",
             type: "pcrPrimer"
           },
           status: 201
@@ -91,7 +91,7 @@ describe("PcrPrimer edit page", () => {
                 seq: "",
                 type: "PRIMER"
               },
-              id: -100,
+              id: "-100",
               type: "pcrPrimer"
             }
           }
@@ -145,7 +145,7 @@ describe("PcrPrimer edit page", () => {
       data: [
         {
           data: {
-            id: 1,
+            id: "1",
             type: "pcrPrimer"
           },
           status: 201

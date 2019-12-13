@@ -4,6 +4,7 @@ import {
   ResourceSelect
 } from "common-ui";
 import { mount } from "enzyme";
+import { PersistedResource } from "kitsu";
 import NumberFormat from "react-number-format";
 import {
   Chain,
@@ -18,29 +19,49 @@ import { PreLibraryPrepStep } from "../PreLibraryPrepStep";
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
-const TEST_SAMPLES: Sample[] = [
-  { id: "1", type: "sample", name: "test sample 1" } as Sample,
-  { id: "2", type: "sample", name: "test sample 2" } as Sample,
-  { id: "3", type: "sample", name: "test sample 3" } as Sample,
-  { id: "4", type: "sample", name: "test sample 4" } as Sample,
-  { id: "5", type: "sample", name: "test sample 5" } as Sample
+const TEST_SAMPLES: Array<PersistedResource<Sample>> = [
+  { id: "1", type: "sample", name: "test sample 1" },
+  { id: "2", type: "sample", name: "test sample 2" },
+  { id: "3", type: "sample", name: "test sample 3" },
+  { id: "4", type: "sample", name: "test sample 4" },
+  { id: "5", type: "sample", name: "test sample 5" }
 ];
 
-const TEST_SAMPLE_STEP_RESOURCES: StepResource[] = [
-  { id: "1", sample: TEST_SAMPLES[0] } as StepResource,
-  { id: "2", sample: TEST_SAMPLES[1] } as StepResource,
-  { id: "3", sample: TEST_SAMPLES[2] } as StepResource,
-  { id: "4", sample: TEST_SAMPLES[3] } as StepResource,
-  { id: "5", sample: TEST_SAMPLES[4] } as StepResource
+const TEST_SAMPLE_STEP_RESOURCES: Array<PersistedResource<StepResource>> = [
+  {
+    id: "1",
+    sample: TEST_SAMPLES[0],
+    type: "stepResource"
+  } as PersistedResource<StepResource>,
+  {
+    id: "2",
+    sample: TEST_SAMPLES[1],
+    type: "stepResource"
+  } as PersistedResource<StepResource>,
+  {
+    id: "3",
+    sample: TEST_SAMPLES[2],
+    type: "stepResource"
+  } as PersistedResource<StepResource>,
+  {
+    id: "4",
+    sample: TEST_SAMPLES[3],
+    type: "stepResource"
+  } as PersistedResource<StepResource>,
+  {
+    id: "5",
+    sample: TEST_SAMPLES[4],
+    type: "stepResource"
+  } as PersistedResource<StepResource>
 ];
 
-const TEST_CHAIN_TEMPLATE: ChainTemplate = {
+const TEST_CHAIN_TEMPLATE: PersistedResource<ChainTemplate> = {
   id: "1",
   name: "WGS",
   type: "chainTemplate"
 };
 
-const TEST_CHAIN: Chain = {
+const TEST_CHAIN: PersistedResource<Chain> = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
   dateCreated: "2019-01-01",
   id: "1",
@@ -49,20 +70,24 @@ const TEST_CHAIN: Chain = {
 };
 
 /** This is the first step in the chain that precedes this one. */
-const TEST_SAMPLE_SELECTION_CHAIN_STEP_TEMPLATE: ChainStepTemplate = {
+const TEST_SAMPLE_SELECTION_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
   id: "1",
   stepNumber: 1,
-  stepTemplate: { id: "1", type: "stepTemplate" } as StepTemplate,
+  stepTemplate: { id: "1", type: "stepTemplate" } as PersistedResource<
+    StepTemplate
+  >,
   type: "chainStepTemplate"
 };
 
 /** This is the second and current step in the chain. */
-const TEST_PRE_LIBRARY_PREP_CHAIN_STEP_TEMPLATE: ChainStepTemplate = {
+const TEST_PRE_LIBRARY_PREP_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
   id: "2",
   stepNumber: 2,
-  stepTemplate: { id: "2", type: "stepTemplate" } as StepTemplate,
+  stepTemplate: { id: "2", type: "stepTemplate" } as PersistedResource<
+    StepTemplate
+  >,
   type: "chainStepTemplate"
 };
 
@@ -299,7 +324,7 @@ describe("PreLibraryPrepStep UI", () => {
               inputAmount: 1234,
               preLibraryPrepType: "SHEARING"
             },
-            id: -100,
+            id: "-100",
             relationships: {
               product: {
                 data: {
@@ -325,7 +350,7 @@ describe("PreLibraryPrepStep UI", () => {
               inputAmount: 1234,
               preLibraryPrepType: "SHEARING"
             },
-            id: -101,
+            id: "-101",
             relationships: {
               product: {
                 data: {
@@ -351,7 +376,7 @@ describe("PreLibraryPrepStep UI", () => {
               inputAmount: 1234,
               preLibraryPrepType: "SHEARING"
             },
-            id: -102,
+            id: "-102",
             relationships: {
               product: {
                 data: {
@@ -385,7 +410,7 @@ describe("PreLibraryPrepStep UI", () => {
               type: "INPUT",
               value: "SHEARING"
             },
-            id: -100,
+            id: "-100",
             relationships: {
               chain: {
                 data: {
@@ -423,7 +448,7 @@ describe("PreLibraryPrepStep UI", () => {
               type: "INPUT",
               value: "SHEARING"
             },
-            id: -101,
+            id: "-101",
             relationships: {
               chain: {
                 data: {
@@ -461,7 +486,7 @@ describe("PreLibraryPrepStep UI", () => {
               type: "INPUT",
               value: "SHEARING"
             },
-            id: -102,
+            id: "-102",
             relationships: {
               chain: {
                 data: {
@@ -643,7 +668,7 @@ describe("PreLibraryPrepStep UI", () => {
               inputAmount: 4321,
               preLibraryPrepType: "SHEARING"
             },
-            id: -100,
+            id: "-100",
             type: "preLibraryPrep"
           }
         }
@@ -663,7 +688,7 @@ describe("PreLibraryPrepStep UI", () => {
               type: "INPUT",
               value: "SHEARING"
             },
-            id: -100,
+            id: "-100",
             relationships: {
               chain: {
                 data: {
