@@ -115,19 +115,7 @@ describe("Metadata detail view page", () => {
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
     // The managed attribute section assgined value field should be rendered.
-    // tslint:disable
-    expect(
-      wrapper.containsMatchingElement(
-        <p
-          style={{
-            borderBottom: "1px solid black",
-            borderRight: "1px solid black",
-            minHeight: "25px"
-          }}
-        >spiral</p>
-      )
-    ).toEqual(true);
-    // tslint:enable
+    expect(wrapper.containsMatchingElement(<p>spiral</p>)).toEqual(true);
     done();
   });
 
