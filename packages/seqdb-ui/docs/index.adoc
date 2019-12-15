@@ -38,9 +38,16 @@ include::write_operations.adoc[]
 
 :leveloffset: 1
 
+= Internationalization
+
+:leveloffset: 2
+
+include::intl.adoc[]
+
+:leveloffset: 1
+
 = WCAG compliance tools setup
 
 :leveloffset: 2
 
 include::WCAG_compliance_test_tools_setup.adoc[]
-

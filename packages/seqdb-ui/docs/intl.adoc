@@ -1,0 +1,69 @@
+= Internationalization / Multiple Languages Support
+
+This application can display messages in multiple languages using
+https://github.com/yahoo/react-intl[react-intl].
+
+When developing UI, you should not hard-code messages into the UI, like this:
+
+[source,tsx]
+----
+<h2>PCR Primers</h2>
+----
+
+You should instead reference a message key:
+
+[source,tsx]
+----
+import { SeqDBMessage } from "../../intl/seqdb-intl.ts""
+
+...
+
+<h2><SeqDBMessage id="pcrPrimerListTitle" /></h2>
+----
+
+You can also use the "formatMessage" function if you want to reference a message outside of a JSX tree:
+
+[source,tsx]
+----
+import { useSeqdbIntl } from "../../seqdb-intl.ts""
+
+function MyComponent() {
+  const { formatMessage } = useSeqdbIntl();
+
+  useEffect(() => {
+    alert(formatMessage("greeting"));
+  }, []);
+
+  return (
+    <div>...</div>
+  );
+}
+----
+
+The actual text for these messages needs to be defined in a messages file, like seqdb-en.ts :
+
+[source,tsx]
+----
+export const SEQDB_MESSAGES_ENGLISH = {
+  ...COMMON_UI_MESSAGES_ENGLISH,
+  ...
+  greeting: "Hello!"
+  ...
+}
+----
+
+Type-checking is enabled so the message ID passed into "SeqDBMessage" or "formatMessage" MUST be a key
+in at least the English messages file. To add a French (or other language) translation
+for a message, the English version of the message must already be defined. The UI uses the English
+translation as a fallback if the message has no translation for the user's locale.
+
+[source,tsx]
+----
+export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
+  ...COMMON_UI_MESSAGES_FR,
+  ...
+  greeting: "Bonjour!", // If the key exists in the english messages file, Typescript allows it.
+  otherKey: "C'est un autre message." // If "otherKey" isn't a key in the English messages, this should show an error in your IDE.
+  ...
+};
+----
