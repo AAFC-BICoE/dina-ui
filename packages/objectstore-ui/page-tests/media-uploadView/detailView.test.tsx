@@ -115,7 +115,8 @@ describe("Metadata detail view page", () => {
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
     // The managed attribute section assgined value field should be rendered.
-    expect(wrapper.containsMatchingElement(<p>spiral</p>)).toEqual(true);
+    console.log("wrapper is " + wrapper.debug());
+    expect(wrapper.contains("spiral")).toEqual(true);
     done();
   });
 
