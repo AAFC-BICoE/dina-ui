@@ -8,7 +8,7 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface TextFieldProps {
   readOnly?: boolean;
-  initialValue?: string | string[];
+  initialValue?: any;
 }
 
 export function TextField(props: LabelWrapperParams & TextFieldProps) {
@@ -48,8 +48,9 @@ export function TextField(props: LabelWrapperParams & TextFieldProps) {
               className="form-control"
               onChange={onChange}
               type="text"
-              value={initialValue ? initialValue : value || ""}
+              value={value ? value : initialValue || ""}
               readOnly={readOnly}
+              defaultValue={initialValue}
             />
           );
         }}

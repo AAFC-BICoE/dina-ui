@@ -37,6 +37,8 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   /** The JSONAPI "sort" parameter. */
   sort?: string;
+
+  initialValue?: string;
 }
 
 /** An option the user can select to set the relationship to null. */
@@ -51,7 +53,8 @@ export function ResourceSelect<TData extends KitsuResource>({
   onChange = () => undefined,
   optionLabel,
   sort,
-  value
+  value,
+  initialValue
 }: ResourceSelectProps<TData>) {
   const { apiClient } = useContext(ApiClientContext);
 
@@ -133,6 +136,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       onChange={onChangeInternal}
       placeholder="Type here to search."
       value={selectValue}
+      defaultValue={initialValue}
     />
   );
 }

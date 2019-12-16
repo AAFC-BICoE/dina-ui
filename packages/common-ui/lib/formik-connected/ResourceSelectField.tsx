@@ -53,7 +53,7 @@ export function ResourceSelectField<TData extends KitsuResource>(
             <ResourceSelect
               {...topLevelProps}
               onChange={onChangeInternal}
-              value={initialValue ? initialValue : value}
+              value={value ? value : initialValue}
             />
           </FieldWrapper>
         );
