@@ -128,33 +128,21 @@ describe("Metadata detail view page", () => {
     done();
   });
 
-  it("Provides a form to show the managed attribute section.", async done => {
+  it("Provides a form to show the managed attribute section.", async () => {
     const wrapper = mountWithContext(
       <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />
     );
-
     // Wait for the page to load.
-    await Promise.resolve();
     wrapper.update();
-
-    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
-
-    // The managed attribute section assgined value field should be rendered.
-    expect(
-      wrapper.containsMatchingElement(
-        <p
-          style={{
-            borderBottom: "1px solid black",
-            borderRight: "1px solid black",
-            minHeight: "25px"
-          }}
-        >
-          spiral
-        </p>
-      )
-    ).toEqual(true);
-
-    done();
+    await Promise.resolve().then(() => {
+      expect(mockMetaGet).toHaveBeenCalledTimes(2);
+      expect(mockMetaGet).toHaveBeenLastCalledWith(
+        "metadata-managed-attribute/20",
+        {
+          include: "managedAttribute"
+        }
+      );
+    });
   });
 
   it("Provides a form to show the metadata section.", async done => {
