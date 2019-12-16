@@ -5,7 +5,7 @@ export default function ViewTagsForm(data) {
       {data &&
         data.meta.acTags &&
         data.meta.acTags.map(acTag => (
-          <label className="col-sm-1">
+          <label key={acTag} className="col-sm-1">
             <strong
               style={{ background: "#ffffcc", borderRadius: "100px/99px" }}
             >

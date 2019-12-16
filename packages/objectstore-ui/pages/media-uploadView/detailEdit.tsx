@@ -28,15 +28,6 @@ interface DetailEditFormProps {
   router: NextRouter;
 }
 
-const managedAttributes = [
-  {
-    ma_data: undefined,
-    metama_data: undefined,
-    name: "managed",
-    value: "managed"
-  }
-];
-
 export function DetailEditPage({ router }: WithRouterProps) {
   const id = router?.query;
   return (
@@ -53,14 +44,25 @@ export function DetailEditPage({ router }: WithRouterProps) {
   );
 }
 
+const managedAttributes = [
+  {
+    ma_data: undefined,
+    metama_data: undefined,
+    name: "managed",
+    value: "managed"
+  }
+];
+
 function DetailEditForm({ router }: DetailEditFormProps) {
   const id = router.query.id;
   const { apiClient } = useContext(ApiClientContext);
   // To force rerender unpon all promises resolved
   // when all the related managed attributes data are returned
   const [editAttributesVisible, setEditAttributesVisible] = useState(false);
+
   // Record the tags data, to be expanded by actual data for the target file
   const unManagedAttributes = [{ name: "unManaged", value: "unManaged" }];
+
   // Wrapper function to avoid the react error of invalid children of promise
   function wrapper(mas) {
     if (mas) {
@@ -141,13 +143,13 @@ function DetailEditForm({ router }: DetailEditFormProps) {
       });
       const serialized = await serializePromises;
       let mydata = { data: serialized };
-      const response = await apiClient.axios.post("/metadata", mydata, config);
+      const response = await apiClient.axios.patch("/metadata", mydata, config);
       if (response.data.data) {
         const metaID = response.data.data.id;
         metaManagedAttributes.forEach(async a => {
           a.relationships.objectStoreMetadata.data.id = metaID;
           mydata = { data: a };
-          await apiClient.axios.post(
+          await apiClient.axios.patch(
             "/metadata-managed-attribute",
             mydata,
             config
@@ -183,7 +185,11 @@ function DetailEditForm({ router }: DetailEditFormProps) {
             <LoadingSpinner loading={loading} />
             {response && (
               <div>
-                <Formik initialValues={response.data[0]} onSubmit={onSubmit}>
+                <Formik
+                  initialValues={response.data[0]}
+                  onSubmit={onSubmit}
+                  enableReinitialize={true}
+                >
                   <Form>
                     <ErrorViewer />
                     <SubmitButton />

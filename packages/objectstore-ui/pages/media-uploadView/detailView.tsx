@@ -50,7 +50,7 @@ function useImageQuery(id: string): DownloadFileResponse {
 }
 
 export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
-  const id = router.query.id;
+  const id = router?.query?.id;
   const stringId = isArray(id) ? id[0] : id;
   const { imgResponse } = useImageQuery(stringId);
 
