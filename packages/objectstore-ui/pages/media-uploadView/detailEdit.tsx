@@ -38,7 +38,7 @@ const managedAttributes = [
 ];
 
 export function DetailEditPage({ router }: WithRouterProps) {
-  const id = router.query.id;
+  const id = router?.query;
   return (
     <div>
       <Head title="Object Store Detailes Edit Page" />
@@ -63,7 +63,9 @@ function DetailEditForm({ router }: DetailEditFormProps) {
   const unManagedAttributes = [{ name: "unManaged", value: "unManaged" }];
   // Wrapper function to avoid the react error of invalid children of promise
   function wrapper(mas) {
-    getManagedAttributesData(mas);
+    if (mas) {
+      getManagedAttributesData(mas);
+    }
   }
 
   // Organize the managed attributes with its assigned values for display purpose
@@ -186,7 +188,7 @@ function DetailEditForm({ router }: DetailEditFormProps) {
                     <ErrorViewer />
                     <SubmitButton />
                     <EditMetadataFormPage />
-                    {wrapper(response.data[0].managedAttribute)}
+                    {wrapper(response?.data[0]?.managedAttribute)}
                     {editAttributesVisible && (
                       <div>
                         <div

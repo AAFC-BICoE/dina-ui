@@ -2,6 +2,7 @@ import { ApiClientContext, LoadingSpinner, Query } from "common-ui";
 import { GetParams } from "kitsu";
 import { omitBy } from "lodash";
 import withRouter, { WithRouterProps } from "next/dist/client/with-router";
+import Link from "next/link";
 import { useCallback, useContext } from "react";
 import { useAsyncRun, useAsyncTask } from "react-hooks-async";
 import { FileDownLoadResponseAttributes } from "types/objectstore-api/resources/FileDownLoadResponse";
@@ -62,13 +63,9 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
         <div className="container-fluid">
           <div className="row">
             <div className="col-sm-4">
-              <a
-                href={`/media-uploadView/detailEdit?id=${id}`}
-                className="btn btn-info"
-                role="button"
-              >
-                Edit View
-              </a>
+              <Link href={`/media-uploadView/detailEdit?id=${id}`}>
+                <a className="btn btn-primary">Edit</a>
+              </Link>
             </div>
           </div>
           <div className="row">
