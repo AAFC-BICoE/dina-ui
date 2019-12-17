@@ -3,8 +3,6 @@ import {
   DateField,
   ErrorViewer,
   filterBy,
-  LoadingSpinner,
-  Query,
   ResourceSelectField,
   SelectField,
   serialize,
@@ -16,9 +14,8 @@ import { GetParams } from "kitsu";
 import { omitBy } from "lodash";
 import withRouter, { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter } from "next/router";
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Agent } from "types/objectstore-api/resources/Agent";
-import { Metadata } from "types/objectstore-api/resources/Metadata";
 import { isArray, isUndefined } from "util";
 import { AttributeBuilder, Head, Nav } from "../../components";
 import { MetaManagedAttribute } from "../../types/objectstore-api/resources/MetaManagedAttribute";
@@ -44,6 +41,8 @@ export function DetailEditPage({ router }: WithRouterProps) {
   );
 }
 
+let metainitialValues = {};
+const unManagedAttributes = [{ name: "unManaged", value: "unManaged" }];
 const managedAttributes = [
   {
     ma_data: undefined,
@@ -56,69 +55,82 @@ const managedAttributes = [
 function DetailEditForm({ router }: DetailEditFormProps) {
   const id = router.query.id;
   const { apiClient } = useContext(ApiClientContext);
-  // To force rerender unpon all promises resolved
-  // when all the related managed attributes data are returned
   const [editAttributesVisible, setEditAttributesVisible] = useState(false);
 
-  // Record the tags data, to be expanded by actual data for the target file
-  const unManagedAttributes = [{ name: "unManaged", value: "unManaged" }];
+  if (!Object.keys(metainitialValues).length) {
+    wrapper();
+  }
 
-  // Wrapper function to avoid the react error of invalid children of promise
-  function wrapper(mas) {
-    if (mas) {
-      getManagedAttributesData(mas);
+  async function wrapper() {
+    await retrieveMetadata();
+  }
+
+  async function retrieveMetadata() {
+    const path = "metadata";
+    const getParams = omitBy<GetParams>(
+      {
+        filter: { fileIdentifier: `${id}` },
+        include: "acMetadataCreator,managedAttribute"
+      },
+      isUndefined
+    );
+    const metadata = await apiClient.get<any, undefined>(path, getParams);
+
+    if (metadata && metadata.data[0] && metadata.data[0].managedAttribute) {
+      metainitialValues = metadata.data[0];
+      let i = 10;
+      // Filling the managed attributes for UI control attributes for backplay
+      // the generation of acTags with initial values
+      metadata.data[0].acTags.map(acTag => {
+        unManagedAttributes.push({
+          name: acTag,
+          value: "" + i
+        });
+        metainitialValues["assignedValue_un" + i++] = acTag;
+      });
+      // Filling the managed attributes for UI control attributes for backplay
+      // the generation of managed attributes with initial values
+      let metaManagedAttributes: MetaManagedAttribute[];
+      metaManagedAttributes = await getManagedAttributesData(
+        metadata.data[0].managedAttribute
+      );
+
+      /* tslint:disable:no-string-literal */
+      metaManagedAttributes.map(metaMa => {
+        metainitialValues["key_" + i] = metaMa["data"]["managedAttribute"];
+        metainitialValues["assignedValue" + i] =
+          metaMa["data"]["assignedValue"];
+
+        managedAttributes.push({
+          ma_data: undefined,
+          metama_data: undefined,
+          name: "key_" + i,
+          value: "" + i++
+        });
+      });
+      /* tslint:enable:no-string-literal */
+      if (Object.keys(metainitialValues).length) {
+        setEditAttributesVisible(true);
+      }
     }
   }
 
-  // Organize the managed attributes with its assigned values for display purpose
   async function getManagedAttributesData(mas) {
-    const promises = mas.map(ma => retrieveManagedAttributes(ma));
-    await Promise.all(promises);
-    // Shuffle manageAttributes to replace the value with the actual assignedValue of
-    // the individual managed attribute for UI display.
-    mas.map(ma => {
-      managedAttributes.map(maa => {
-        if (
-          maa.metama_data &&
-          maa.metama_data.data &&
-          maa.metama_data.data.id === ma.id
-        ) {
-          maa.value = ma.assignedValue;
-        }
-      });
-    });
-    setEditAttributesVisible(true);
+    const promises = mas.map(ma => retrieveManagedAttrs(ma));
+    const metaAttrs: MetaManagedAttribute[] = await Promise.all(promises);
+    return metaAttrs;
   }
-  // Organize the tags data for display
-  function generateTagsData(tags) {
-    tags.map(tag =>
-      unManagedAttributes.push({
-        name: "fakeName",
-        value: tag
-      })
-    );
-  }
-  // To retrieve the managed attibute based on the metadata managed attribute id
-  // for the target file
-  async function retrieveManagedAttributes(ma) {
+  async function retrieveManagedAttrs(ma) {
     const path = "metadata-managed-attribute/" + ma.id;
     const getParams = omitBy<GetParams>(
       { include: "managedAttribute" },
       isUndefined
     );
-    const metaManagedAttribute = await apiClient.get<
-      MetaManagedAttribute,
-      undefined
-    >(path, getParams);
-    managedAttributes.push({
-      ma_data: metaManagedAttribute.data.managedAttribute,
-      metama_data: metaManagedAttribute,
-      name: "fake",
-      value: "assignedValue"
-    });
-    return metaManagedAttribute;
+    return await apiClient.get<MetaManagedAttribute, undefined>(
+      path,
+      getParams
+    );
   }
-
   async function onSubmit(
     submittedValues,
     { setStatus, setSubmitting }: FormikActions<any>
@@ -173,59 +185,35 @@ function DetailEditForm({ router }: DetailEditFormProps) {
 
   return (
     <div>
-      <Query<Metadata>
-        query={{
-          filter: { fileIdentifier: `${id}` },
-          include: "acMetadataCreator,managedAttribute",
-          path: "metadata/"
-        }}
-      >
-        {({ loading, response }) => (
-          <div className="col-sm-8">
-            <LoadingSpinner loading={loading} />
-            {response && (
-              <div>
-                <Formik
-                  initialValues={response.data[0]}
-                  onSubmit={onSubmit}
-                  enableReinitialize={true}
-                >
-                  <Form>
-                    <ErrorViewer />
-                    <SubmitButton />
-                    <EditMetadataFormPage />
-                    {wrapper(response?.data[0]?.managedAttribute)}
-                    {editAttributesVisible && (
-                      <div>
-                        <div
-                          style={{ marginBottom: "20px", marginTop: "20px" }}
-                        >
-                          <h5 style={{ color: "#1465b7" }}>
-                            Managed Attributes
-                          </h5>
-                        </div>
-                        <AttributeBuilder
-                          controlledAttributes={managedAttributes}
-                        />
-                        {response.data[0] &&
-                          generateTagsData(response.data[0].acTags)}
-                        <div
-                          style={{ marginBottom: "20px", marginTop: "20px" }}
-                        >
-                          <h5 style={{ color: "#1465b7" }}>Tags</h5>
-                        </div>
-                        <AttributeBuilder
-                          controlledAttributes={unManagedAttributes}
-                        />
-                      </div>
-                    )}
-                  </Form>
-                </Formik>
-              </div>
-            )}
+      <div className="col-sm-8">
+        {editAttributesVisible && (
+          <div>
+            <Formik
+              initialValues={metainitialValues}
+              onSubmit={onSubmit}
+              enableReinitialize={false}
+            >
+              <Form>
+                <ErrorViewer />
+                <SubmitButton />
+                <EditMetadataFormPage />
+                <div>
+                  <div style={{ marginBottom: "20px", marginTop: "20px" }}>
+                    <h5 style={{ color: "#1465b7" }}>Managed Attributes</h5>
+                  </div>
+                  <AttributeBuilder controlledAttributes={managedAttributes} />
+                  <div style={{ marginBottom: "20px", marginTop: "20px" }}>
+                    <h5 style={{ color: "#1465b7" }}>Tags</h5>
+                  </div>
+                  <AttributeBuilder
+                    controlledAttributes={unManagedAttributes}
+                  />
+                </div>
+              </Form>
+            </Formik>
           </div>
         )}
-      </Query>
+      </div>
     </div>
   );
 }

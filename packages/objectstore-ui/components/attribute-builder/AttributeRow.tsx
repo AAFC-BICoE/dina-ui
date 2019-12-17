@@ -39,17 +39,7 @@ export class AttributeRow extends React.Component<AttributeRowProps> {
         controlledAttributes[0].name &&
         controlledAttributes[0].name === "unManaged" ? (
           <div className="list-inline-item" style={{ width: 180 }}>
-            <TextField
-              name={`assignedValue_un${model.id}`}
-              hideLabel={true}
-              initialValue={
-                model.attribute
-                  ? model.attribute.value === "unManaged"
-                    ? null
-                    : model.attribute.value
-                  : null
-              }
-            />
+            <TextField name={`assignedValue_un${model.id}`} hideLabel={true} />
           </div>
         ) : (
           <div className="list-inline-item">
@@ -60,25 +50,10 @@ export class AttributeRow extends React.Component<AttributeRowProps> {
                 model="managed-attribute"
                 optionLabel={managedAttribute => managedAttribute.name}
                 hideLabel={true}
-                initialValue={
-                  model.attribute && model.attribute.ma_data
-                    ? model.attribute.ma_data
-                    : null
-                }
               />
             </div>
             <div className="list-inline-item" style={{ width: 180 }}>
-              <TextField
-                name={`assignedValue${model.id}`}
-                hideLabel={true}
-                initialValue={
-                  model.attribute
-                    ? model.attribute.value === "managed"
-                      ? null
-                      : model.attribute.value
-                    : null
-                }
-              />
+              <TextField name={`assignedValue${model.id}`} hideLabel={true} />
             </div>
           </div>
         )}

@@ -111,7 +111,7 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
               {({ loading, response }) => (
                 <div className="col-sm-8">
                   <LoadingSpinner loading={loading} />
-                  {response && (
+                  {response && response.data[0] && (
                     <div>
                       <div style={{ marginBottom: "20px", marginTop: "20px" }}>
                         <h5 style={{ color: "#1465b7" }}>Metadata View</h5>
