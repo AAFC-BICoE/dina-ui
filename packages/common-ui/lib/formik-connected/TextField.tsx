@@ -12,15 +12,7 @@ export interface TextFieldProps {
 }
 
 export function TextField(props: LabelWrapperParams & TextFieldProps) {
-  const {
-    className,
-    name,
-    label,
-    tooltipMsg,
-    hideLabel,
-    readOnly,
-    initialValue
-  } = props;
+  const { className, name, label, tooltipMsg, hideLabel, readOnly } = props;
 
   return (
     <FieldWrapper
@@ -48,9 +40,8 @@ export function TextField(props: LabelWrapperParams & TextFieldProps) {
               className="form-control"
               onChange={onChange}
               type="text"
-              value={value ? value : initialValue || ""}
+              value={value || ""}
               readOnly={readOnly}
-              defaultValue={initialValue}
             />
           );
         }}
