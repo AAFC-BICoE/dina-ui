@@ -187,6 +187,10 @@ export class AttributeBuilder extends React.Component<
     parent: AttributeGroupModel;
   }) {
     // Remove the attribute row from the parent's children array.
+    if (attribute.type === "ATTRIBUTE_ROW" && attribute.attribute) {
+      attribute.attribute.ma_data = null;
+      attribute.attribute.metama_data = null;
+    }
     parent.children = pull(parent.children, attribute);
 
     this.btnClicked = true;

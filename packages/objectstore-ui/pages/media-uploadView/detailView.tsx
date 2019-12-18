@@ -128,7 +128,6 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
                         response.data[0].managedAttribute.map(ma => (
                           <GenerateManagedAttributesView ma={ma} />
                         ))}
-                      )}
                       <div style={{ marginBottom: "20px", marginTop: "20px" }}>
                         <h5 style={{ color: "#1465b7" }}>Tags View</h5>
                       </div>

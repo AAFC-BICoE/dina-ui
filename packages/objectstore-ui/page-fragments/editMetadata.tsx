@@ -68,7 +68,11 @@ function EditMetadataForm({
       }
       // this will be replaced by config?
       submittedValues.bucket = "mybucket";
-      generateManagedAttributeValue(metaManagedAttributes, submittedValues);
+      generateManagedAttributeValue(
+        metaManagedAttributes,
+        submittedValues,
+        undefined
+      );
       const config = {
         headers: {
           "Content-Type": "application/vnd.api+json",

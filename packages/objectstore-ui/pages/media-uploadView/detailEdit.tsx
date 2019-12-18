@@ -75,19 +75,20 @@ function DetailEditForm({ router }: DetailEditFormProps) {
       isUndefined
     );
     const metadata = await apiClient.get<any, undefined>(path, getParams);
-
     if (metadata && metadata.data[0] && metadata.data[0].managedAttribute) {
       metainitialValues = metadata.data[0];
       let i = 10;
       // Filling the managed attributes for UI control attributes for backplay
       // the generation of acTags with initial values
-      metadata.data[0].acTags.map(acTag => {
-        unManagedAttributes.push({
-          name: acTag,
-          value: "" + i
+      if (metadata.data[0].acTags) {
+        metadata.data[0].acTags.map(acTag => {
+          unManagedAttributes.push({
+            name: acTag,
+            value: "" + i
+          });
+          metainitialValues["assignedValue_un" + i++] = acTag;
         });
-        metainitialValues["assignedValue_un" + i++] = acTag;
-      });
+      }
       // Filling the managed attributes for UI control attributes for backplay
       // the generation of managed attributes with initial values
       let metaManagedAttributes: MetaManagedAttribute[];
@@ -102,8 +103,8 @@ function DetailEditForm({ router }: DetailEditFormProps) {
           metaMa["data"]["assignedValue"];
 
         managedAttributes.push({
-          ma_data: undefined,
-          metama_data: undefined,
+          ma_data: metaMa["data"]["managedAttribute"],
+          metama_data: metaMa,
           name: "key_" + i,
           value: "" + i++
         });
@@ -142,7 +143,11 @@ function DetailEditForm({ router }: DetailEditFormProps) {
       }
       // this will be replaced by config?
       submittedValues.bucket = "mybucket";
-      generateManagedAttributeValue(metaManagedAttributes, submittedValues);
+      generateManagedAttributeValue(
+        metaManagedAttributes,
+        submittedValues,
+        managedAttributes
+      );
       const config = {
         headers: {
           "Content-Type": "application/vnd.api+json",
@@ -157,15 +162,20 @@ function DetailEditForm({ router }: DetailEditFormProps) {
       let mydata = { data: serialized };
       const response = await apiClient.axios.patch("/metadata", mydata, config);
       if (response.data.data) {
-        const metaID = response.data.data.id;
         metaManagedAttributes.forEach(async a => {
-          a.relationships.objectStoreMetadata.data.id = metaID;
           mydata = { data: a };
-          await apiClient.axios.patch(
-            "/metadata-managed-attribute",
-            mydata,
-            config
-          );
+          // if modify existing metama values, it is a patch, otherwise this a new entry
+          a.id
+            ? await apiClient.axios.patch(
+                "/metadata-managed-attribute",
+                mydata,
+                config
+              )
+            : await apiClient.axios.patch(
+                "/metadata-managed-attribute",
+                mydata,
+                config
+              );
         });
         router.push("/media-uploadView/detailView?id=" + id);
       } else {
@@ -182,7 +192,6 @@ function DetailEditForm({ router }: DetailEditFormProps) {
     }
     setSubmitting(false);
   }
-
   return (
     <div>
       <div className="col-sm-8">
