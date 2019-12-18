@@ -1,8 +1,8 @@
 :sectnums:
 
-= seqdb-api docs
+= dina-ui docs
 
-React based user interface for SeqDB.
+React based user interface for the DINA project.
 
 :leveloffset: 1
 
