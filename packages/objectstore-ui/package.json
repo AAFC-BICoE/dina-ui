@@ -9,7 +9,6 @@
     "lint:fix": "tslint --project tsconfig.json --fix",
     "next": "next",
     "proxy": "micro-proxy -r ./dev-proxy-config.json -p 8000",
-    "start": "next start",
     "test": "tsc && jest",
     "test:coverage": "tsc && jest --coverage"
   },

@@ -26,16 +26,3 @@ after_script:
   - ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -p 3
   # Upload coverage/codeclimate.json
   - if [[ "$TRAVIS_TEST_RESULT" == 0 ]]; then ./cc-test-reporter upload-coverage; fi
-
-deploy:
-  - provider: script
-    script: bash docker-push-prod.sh
-    skip_cleanup: true
-    on:
-      branch: master
-      tags: true
-  - provider: script
-    script: bash docker-push-dev.sh
-    skip_cleanup: true
-    on:
-      branch: dev
