@@ -95,7 +95,7 @@ describe("Metadata detail view page", () => {
   });
 
   it("Provides a form to show the managed attribute section.", async () => {
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />
     );
     // Wait for the page to load.
