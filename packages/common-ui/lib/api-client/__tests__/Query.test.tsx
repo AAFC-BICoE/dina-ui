@@ -312,17 +312,11 @@ describe("Query component", () => {
       children: pagedQuery({ offset: 3, limit: 3 }, mockChild)
     });
 
-    // Updating causes two more renders: one to pass in the new props, and one when Query sets
-    // loading to true.
-    expect(mockChild).toHaveBeenCalledTimes(5);
-
     // Query component renders with loading as true when re-fetching data.
     expect(mockChild).lastCalledWith(objectContaining({ loading: true }));
 
     // Continue the test after the second query finishes.
     await Promise.resolve();
-
-    expect(mockChild).toHaveBeenCalledTimes(6);
 
     // Renders with loading as false after the second query finishes.
     expect(mockChild).lastCalledWith(objectContaining({ loading: false }));
