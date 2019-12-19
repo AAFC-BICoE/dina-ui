@@ -16,10 +16,13 @@ export interface AttributeBuilderProps {
   controlledAttributes: ControlledAttribute[];
   value?: AttributeGroupModel;
   onChange?: (state: AttributeGroupModel) => void;
+  initValues?: any;
 }
 
 export interface AttributeBuilderState {
   model: AttributeGroupModel;
+  controlledAttributes: ControlledAttribute[];
+  initValues?: any;
 }
 
 /**
@@ -41,6 +44,8 @@ export class AttributeBuilder extends React.Component<
   constructor(props: AttributeBuilderProps) {
     super(props);
     this.state = {
+      controlledAttributes: props.controlledAttributes,
+      initValues: props.initValues,
       model: props.value || this.getInitialModel()
     };
   }
@@ -131,14 +136,14 @@ export class AttributeBuilder extends React.Component<
     const id = parseInt(ca.value, 10);
     this.attributeIdIncrementor = id + 1;
     const newAttributeRow: AttributeRowModel = {
-      attribute: undefined,
+      attribute: ca,
       id,
       type: "ATTRIBUTE_ROW",
       value: ""
     };
 
     if (before.type === "ATTRIBUTE_ROW") {
-      before.attribute = ca;
+      before.attribute = undefined;
     }
     parent.children.unshift(newAttributeRow);
   }
@@ -188,8 +193,11 @@ export class AttributeBuilder extends React.Component<
   }) {
     // Remove the attribute row from the parent's children array.
     if (attribute.type === "ATTRIBUTE_ROW" && attribute.attribute) {
-      attribute.attribute.ma_data = null;
-      attribute.attribute.metama_data = null;
+      if (this.state.initValues) {
+        delete this.state.initValues["key_" + attribute.id];
+        delete this.state.initValues["assignedValue" + attribute.id];
+        delete this.state.initValues["assignedValue_un" + attribute.id];
+      }
     }
     parent.children = pull(parent.children, attribute);
 

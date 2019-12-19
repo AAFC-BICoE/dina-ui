@@ -34,6 +34,7 @@ export function generateManagedAttributeValue(
         },
         type: "metadata-managed-attribute"
       };
+
       /* tslint:disable:no-string-literal */
       if (managedAttributes) {
         managedAttributes.map(ma => {
@@ -44,7 +45,9 @@ export function generateManagedAttributeValue(
                 "id"
               ]
           ) {
-            metaManagedAttribute["id"] = ma["metama_data"]["id"];
+            if (ma["metama_data"]["data"]["id"]) {
+              metaManagedAttribute["id"] = ma["metama_data"]["data"]["id"];
+            }
           }
         });
       }

@@ -70,6 +70,9 @@ const TEST_MANAGEDATTR_RESPONSE = [
 /** Mock axios for patch request. */
 const mockPatch = jest.fn();
 
+/** Mock axios for patch request. */
+const mockPost = jest.fn();
+
 /** Mock Kitsu "get" method. */
 
 const mockMetaGet = jest.fn(async model => {
@@ -91,7 +94,8 @@ jest.mock(
     class {
       public get = mockMetaGet;
       public axios = {
-        patch: mockPatch
+        patch: mockPatch,
+        post: mockPost
       };
     }
 );
@@ -147,7 +151,7 @@ describe("Detail edit page", () => {
     wrapper.find("form").simulate("submit");
     setImmediate(() => {
       expect(mockPatch).lastCalledWith(
-        "/metadata",
+        "/metadata/203f557a-bb5b-4aec-838b-c459b246de4a",
         {
           data: expect.objectContaining({
             attributes: expect.objectContaining({

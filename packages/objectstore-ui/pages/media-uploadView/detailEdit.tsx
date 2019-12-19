@@ -41,21 +41,20 @@ export function DetailEditPage({ router }: WithRouterProps) {
   );
 }
 
-let metainitialValues = {};
-const unManagedAttributes = [{ name: "unManaged", value: "unManaged" }];
-const managedAttributes = [
-  {
+function DetailEditForm({ router }: DetailEditFormProps) {
+  const id = router.query.id;
+  const { apiClient } = useContext(ApiClientContext);
+  const [metainitialValues, setMetainitialValues] = useState({});
+  let metainitialValues1 = {};
+  const unManagedCtrl = new Array();
+  unManagedCtrl.push({ name: "unManaged", value: "unManaged" });
+  const managedCtrl = new Array();
+  managedCtrl.push({
     ma_data: undefined,
     metama_data: undefined,
     name: "managed",
     value: "managed"
-  }
-];
-
-function DetailEditForm({ router }: DetailEditFormProps) {
-  const id = router.query.id;
-  const { apiClient } = useContext(ApiClientContext);
-  const [editAttributesVisible, setEditAttributesVisible] = useState(false);
+  });
 
   if (!Object.keys(metainitialValues).length) {
     wrapper();
@@ -65,6 +64,7 @@ function DetailEditForm({ router }: DetailEditFormProps) {
     await retrieveMetadata();
   }
 
+  /* tslint:disable:no-string-literal */
   async function retrieveMetadata() {
     const path = "metadata";
     const getParams = omitBy<GetParams>(
@@ -76,17 +76,19 @@ function DetailEditForm({ router }: DetailEditFormProps) {
     );
     const metadata = await apiClient.get<any, undefined>(path, getParams);
     if (metadata && metadata.data[0] && metadata.data[0].managedAttribute) {
-      metainitialValues = metadata.data[0];
+      metainitialValues1 = metadata.data[0];
+      metainitialValues1["unManagedAttributes"] = unManagedCtrl;
+      metainitialValues1["managedAttributes"] = managedCtrl;
       let i = 10;
       // Filling the managed attributes for UI control attributes for backplay
       // the generation of acTags with initial values
       if (metadata.data[0].acTags) {
         metadata.data[0].acTags.map(acTag => {
-          unManagedAttributes.push({
+          metainitialValues1["unManagedAttributes"].push({
             name: acTag,
             value: "" + i
           });
-          metainitialValues["assignedValue_un" + i++] = acTag;
+          metainitialValues1["assignedValue_un" + i++] = acTag;
         });
       }
       // Filling the managed attributes for UI control attributes for backplay
@@ -98,11 +100,11 @@ function DetailEditForm({ router }: DetailEditFormProps) {
 
       /* tslint:disable:no-string-literal */
       metaManagedAttributes.map(metaMa => {
-        metainitialValues["key_" + i] = metaMa["data"]["managedAttribute"];
-        metainitialValues["assignedValue" + i] =
+        metainitialValues1["key_" + i] = metaMa["data"]["managedAttribute"];
+        metainitialValues1["assignedValue" + i] =
           metaMa["data"]["assignedValue"];
 
-        managedAttributes.push({
+        metainitialValues1["managedAttributes"].push({
           ma_data: metaMa["data"]["managedAttribute"],
           metama_data: metaMa,
           name: "key_" + i,
@@ -110,11 +112,10 @@ function DetailEditForm({ router }: DetailEditFormProps) {
         });
       });
       /* tslint:enable:no-string-literal */
-      if (Object.keys(metainitialValues).length) {
-        setEditAttributesVisible(true);
-      }
+      setMetainitialValues(metainitialValues1);
     }
   }
+  /* tslint:enable:no-string-literal */
 
   async function getManagedAttributesData(mas) {
     const promises = mas.map(ma => retrieveManagedAttrs(ma));
@@ -136,6 +137,11 @@ function DetailEditForm({ router }: DetailEditFormProps) {
     submittedValues,
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
+    const ma = submittedValues.managedAttributes;
+    const unMa = submittedValues.unManagedAttributes;
+    delete submittedValues.managedAttributes;
+    delete submittedValues.unManagedAttributes;
+    delete submittedValues.managedAttribute;
     try {
       const metaManagedAttributes = new Array();
       if (id) {
@@ -143,40 +149,62 @@ function DetailEditForm({ router }: DetailEditFormProps) {
       }
       // this will be replaced by config?
       submittedValues.bucket = "mybucket";
+      /* tslint:disable:no-string-literal */
       generateManagedAttributeValue(
         metaManagedAttributes,
         submittedValues,
-        managedAttributes
+        metainitialValues["managedAttributes"]
       );
+      /* tslint:enable:no-string-literal */
       const config = {
         headers: {
           "Content-Type": "application/vnd.api+json",
           "Crnk-Compact": "true"
         }
       };
+      // send the relationship first, collect those ids
+      const ids = new Array();
+      let mydata;
+      metaManagedAttributes.forEach(async metaMa => {
+        mydata = { data: metaMa };
+        if (metaMa.id) {
+          ids.push(metaMa.id);
+          await apiClient.axios.patch(
+            "/metadata-managed-attribute/" + metaMa.id,
+            mydata,
+            config
+          );
+        } else {
+          const resps = await apiClient.axios.post(
+            "/metadata-managed-attribute",
+            mydata,
+            config
+          );
+          if (resps) {
+            ids.push(resps.data.id);
+          }
+        }
+      });
+      // update the metadata with new relationships
       const serializePromises = serialize({
         resource: submittedValues,
         type: "metadata"
       });
       const serialized = await serializePromises;
-      let mydata = { data: serialized };
-      const response = await apiClient.axios.patch("/metadata", mydata, config);
+      mydata = { data: serialized };
+
+      const dataArr = new Array();
+      ids.map(metaId => {
+        dataArr.push({ type: "metadata-managed-attribute", id: metaId });
+      });
+      mydata.data.relationships = { managedAttribute: { data: dataArr } };
+      // send the meta with new relationships
+      const response = await apiClient.axios.patch(
+        "/metadata/" + mydata.data.id,
+        mydata,
+        config
+      );
       if (response.data.data) {
-        metaManagedAttributes.forEach(async a => {
-          mydata = { data: a };
-          // if modify existing metama values, it is a patch, otherwise this a new entry
-          a.id
-            ? await apiClient.axios.patch(
-                "/metadata-managed-attribute",
-                mydata,
-                config
-              )
-            : await apiClient.axios.patch(
-                "/metadata-managed-attribute",
-                mydata,
-                config
-              );
-        });
         router.push("/media-uploadView/detailView?id=" + id);
       } else {
         setStatus(
@@ -188,14 +216,17 @@ function DetailEditForm({ router }: DetailEditFormProps) {
         );
       }
     } catch (error) {
+      submittedValues.unManagedAttributes = unMa;
+      submittedValues.managedAttributes = ma;
       setStatus(error.message);
     }
     setSubmitting(false);
   }
   return (
+    /* tslint:disable:no-string-literal */
     <div>
       <div className="col-sm-8">
-        {editAttributesVisible && (
+        {Object.keys(metainitialValues).length > 0 && (
           <div>
             <Formik
               initialValues={metainitialValues}
@@ -210,12 +241,20 @@ function DetailEditForm({ router }: DetailEditFormProps) {
                   <div style={{ marginBottom: "20px", marginTop: "20px" }}>
                     <h5 style={{ color: "#1465b7" }}>Managed Attributes</h5>
                   </div>
-                  <AttributeBuilder controlledAttributes={managedAttributes} />
+                  <AttributeBuilder
+                    controlledAttributes={
+                      metainitialValues["managedAttributes"]
+                    }
+                    initValues={metainitialValues}
+                  />
                   <div style={{ marginBottom: "20px", marginTop: "20px" }}>
                     <h5 style={{ color: "#1465b7" }}>Tags</h5>
                   </div>
                   <AttributeBuilder
-                    controlledAttributes={unManagedAttributes}
+                    controlledAttributes={
+                      metainitialValues["unManagedAttributes"]
+                    }
+                    initValues={metainitialValues}
                   />
                 </div>
               </Form>
@@ -224,6 +263,7 @@ function DetailEditForm({ router }: DetailEditFormProps) {
         )}
       </div>
     </div>
+    /* tslint:enable:no-string-literal */
   );
 }
 
