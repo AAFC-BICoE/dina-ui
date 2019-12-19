@@ -1,8 +1,8 @@
 import { mount } from "enzyme";
+import { DocWithErrors } from "jsonapi-typescript";
 import { KitsuResource, KitsuResponse } from "kitsu";
 import { last } from "lodash";
 import { ApiClientContext, createContextValue } from "../ApiClientContext";
-import { JsonApiErrorResponse } from "../jsonapi-types";
 import { Query } from "../Query";
 
 /** Example of an API resource interface definition for a todo-list entry. */
@@ -52,7 +52,7 @@ const MOCK_TODOS_RESPONSE_PAGE_2: KitsuResponse<Todo[], MetaWithTotal> = {
   }
 };
 
-const MOCK_500_ERROR: JsonApiErrorResponse = {
+const MOCK_500_ERROR: DocWithErrors = {
   errors: [
     {
       detail:
@@ -60,8 +60,7 @@ const MOCK_500_ERROR: JsonApiErrorResponse = {
       status: "500",
       title: "INTERNAL_SERVER_ERROR"
     }
-  ],
-  status: 500
+  ]
 };
 
 // Mock Kitsu class' "get" method.
