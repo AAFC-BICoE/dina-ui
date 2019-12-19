@@ -26,7 +26,7 @@
     "kitsu": "7.0.4",
     "kitsu-core": "7.0.4",
     "lodash": "^4.17.11",
-    "next": "^9.1.1",
+    "next": "^9.1.5",
     "next-transpile-modules": "^2.3.1",
     "react": "^16.10.2",
     "react-cookie": "^4.0.1",
@@ -52,8 +52,7 @@
     "@types/react-tabs": "^2.3.1",
     "@types/react-test-renderer": "^16.0.3",
     "@types/styled-jsx": "^2.2.7",
-    "asciidoctor.js": "^1.5.9",
-    "babel-jest": "^24.3.0",
+    "babel-jest": "^24.9.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "enzyme-to-json": "^3.3.5",
@@ -62,14 +61,13 @@
     "lint-staged": "^9.2.0",
     "micro-proxy": "^1.1.0",
     "npm-run-all": "^4.1.5",
-    "prettier": "^1.15.3",
+    "prettier": "^1.19.1",
     "react-test-renderer": "^16.8.6",
-    "ts-node": "^7.0.1",
     "tslint": "^5.12.1",
     "tslint-config-prettier": "^1.17.0",
     "tslint-plugin-prettier": "^2.0.1",
     "tslint-react": "^3.6.0",
-    "typescript": "^3.6.4"
+    "typescript": "^3.7.2"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

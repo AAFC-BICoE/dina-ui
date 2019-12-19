@@ -70,7 +70,9 @@ declare module "kitsu" {
     TData extends KitsuResponseData,
     TMeta = undefined
   > {
-    data: TData;
+    data: TData extends Array<infer R>
+      ? Array<PersistedResource<R>>
+      : PersistedResource<TData>;
     meta: TMeta;
   }
 
@@ -79,7 +81,18 @@ declare module "kitsu" {
 
   /** JSONAPI resource base attributes. */
   export interface KitsuResource {
-    id?: string | null;
+    id?: string;
     type: string;
   }
+
+  /**
+   * Makes the 'id' field required on a resource type and all of its relationships.
+   * Used when assuming that data from the back-end always has the ID set.
+   */
+  export type PersistedResource<TData extends KitsuResource = KitsuResource> = {
+    [P in keyof TData]: TData[P] extends KitsuResource
+      ? PersistedResource<TData[P]>
+      : TData[P];
+  } &
+    Required<KitsuResource>;
 }

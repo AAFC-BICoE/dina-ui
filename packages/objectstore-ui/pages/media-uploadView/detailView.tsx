@@ -8,7 +8,7 @@ import { FileDownLoadResponseAttributes } from "types/objectstore-api/resources/
 import { Metadata } from "types/objectstore-api/resources/Metadata";
 import { isArray, isUndefined } from "util";
 import { Head, Nav } from "../../components";
-import { generateManagedAttributesView } from "../../page-fragments/viewManagedAttributes";
+import { GenerateManagedAttributesView } from "../../page-fragments/viewManagedAttributes";
 import ViewMetadataFormPage from "../../page-fragments/viewMetadata";
 import ViewTagsForm from "../../page-fragments/viewTags";
 
@@ -49,7 +49,7 @@ function useImageQuery(id: string): DownloadFileResponse {
 }
 
 export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
-  const id = router.query.id;
+  const id = router?.query?.id;
   const stringId = isArray(id) ? id[0] : id;
   const { imgResponse } = useImageQuery(stringId);
 
@@ -117,12 +117,11 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
                         </h5>
                       </div>
                       {response.data[0].managedAttribute &&
-                        response.data[0].managedAttribute.map(ma =>
-                          generateManagedAttributesView(ma)
-                        )}
-
+                        response.data[0].managedAttribute.map(ma => (
+                          <GenerateManagedAttributesView ma={ma} />
+                        ))}
                       <div style={{ marginBottom: "20px", marginTop: "20px" }}>
-                        <h5 style={{ color: "#1465b7" }}>Tags View</h5>
+                        <h5 style={{ color: "blue" }}>Tags View</h5>
                       </div>
                       <ViewTagsForm meta={response.data[0]} />
                     </div>

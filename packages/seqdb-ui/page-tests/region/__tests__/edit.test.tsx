@@ -57,7 +57,7 @@ describe("Region edit page", () => {
       data: [
         {
           data: {
-            id: 1,
+            id: "1",
             type: "region"
           },
           status: 201
@@ -89,7 +89,7 @@ describe("Region edit page", () => {
             attributes: {
               name: "New Region"
             },
-            id: -100,
+            id: "-100",
             type: "region"
           }
         }
@@ -145,7 +145,7 @@ describe("Region edit page", () => {
       data: [
         {
           data: {
-            id: 1,
+            id: "1",
             type: "region"
           },
           status: 201
