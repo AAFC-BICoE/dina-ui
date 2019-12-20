@@ -2,6 +2,7 @@ import { FieldView } from "common-ui";
 import { Formik } from "formik";
 import { noop } from "lodash";
 import { Metadata } from "types/objectstore-api/resources/Metadata";
+import { ObjectStoreMessage } from "../intl/objectstore-intl";
 
 export function ViewMetadataFormPage(data) {
   return (
@@ -9,7 +10,9 @@ export function ViewMetadataFormPage(data) {
       <div>
         <div className="row">
           <label className="col-sm-2">
-            <strong>File Name</strong>
+            <strong>
+              <ObjectStoreMessage id="metadataFilenameLabel" />
+            </strong>
           </label>
           <div className="col">
             <FieldView
@@ -21,7 +24,9 @@ export function ViewMetadataFormPage(data) {
         </div>
         <div className="row">
           <label className="col-sm-2">
-            <strong>Stored Object Type</strong>
+            <strong>
+              <ObjectStoreMessage id="metadataObjectTypeLabel" />
+            </strong>
           </label>
           <div className="col">
             <FieldView name="dcType" className="col-sm-6" hideLabel={true} />
@@ -29,7 +34,9 @@ export function ViewMetadataFormPage(data) {
         </div>
         <div className="row">
           <label className="col-sm-2">
-            <strong>First Digital Version Created Date</strong>
+            <strong>
+              <ObjectStoreMessage id="metadataFirstDigitalVersionCreatedDateLabel" />
+            </strong>
           </label>
           <div className="col">
             <FieldView
@@ -41,7 +48,9 @@ export function ViewMetadataFormPage(data) {
         </div>
         <div className="row">
           <label className="col-sm-2">
-            <strong>Last Metadata Modification Time</strong>
+            <strong>
+              <ObjectStoreMessage id="metadataLastMetadataModificationTimeLabel" />
+            </strong>
           </label>
           <div className="col">
             <FieldView
@@ -53,7 +62,9 @@ export function ViewMetadataFormPage(data) {
         </div>
         <div className="row">
           <label className="col-sm-2">
-            <strong>DcFormat</strong>
+            <strong>
+              <ObjectStoreMessage id="metadataDcFormatLabel" />
+            </strong>
           </label>
           <div className="col">
             <FieldView name="dcFormat" className="col-sm-6" hideLabel={true} />
@@ -61,7 +72,9 @@ export function ViewMetadataFormPage(data) {
         </div>
         <div className="row">
           <label className="col-sm-2">
-            <strong>Agent(Uploaded By)</strong>
+            <strong>
+              <ObjectStoreMessage id="metadataAgentLabel" />
+            </strong>
           </label>
           <div className="col">
             <FieldView
@@ -73,7 +86,9 @@ export function ViewMetadataFormPage(data) {
         </div>
         <div className="row">
           <label className="col-sm-2">
-            <strong>Hash Function</strong>
+            <strong>
+              <ObjectStoreMessage id="metadataHashFunctionLabel" />
+            </strong>
           </label>
           <div className="col">
             <FieldView
@@ -85,7 +100,9 @@ export function ViewMetadataFormPage(data) {
         </div>
         <div className="row">
           <label className="col-sm-2">
-            <strong>Hash Value</strong>
+            <strong>
+              <ObjectStoreMessage id="metadataHashValueLabel" />
+            </strong>
           </label>
           <div className="col">
             <FieldView
@@ -97,7 +114,9 @@ export function ViewMetadataFormPage(data) {
         </div>
         <div className="row">
           <label className="col-sm-2">
-            <strong>File Identifier </strong>
+            <strong>
+              <ObjectStoreMessage id="metadataFileIdentifierLabel" />{" "}
+            </strong>
           </label>
           <div className="col">
             <FieldView
@@ -109,7 +128,9 @@ export function ViewMetadataFormPage(data) {
         </div>
         <div className="row">
           <label className="col-sm-2">
-            <strong>Bucket Name</strong>
+            <strong>
+              <ObjectStoreMessage id="metadataBucketNameLabel" />
+            </strong>
           </label>
           <div className="col">
             <FieldView className="col-sm-6" name="bucket" hideLabel={true} />
@@ -117,7 +138,9 @@ export function ViewMetadataFormPage(data) {
         </div>
         <div className="row">
           <label className="col-sm-2">
-            <strong>File Extension</strong>
+            <strong>
+              <ObjectStoreMessage id="metadataFileExtensionLabel" />
+            </strong>
           </label>
           <div className="col">
             <FieldView

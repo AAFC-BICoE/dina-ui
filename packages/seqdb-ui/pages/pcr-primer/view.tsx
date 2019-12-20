@@ -10,14 +10,16 @@ import {
   Head,
   Nav
 } from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
 
 export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
+  const { formatMessage } = useSeqdbIntl();
 
   return (
     <div>
-      <Head title="PCR Primer" />
+      <Head title={formatMessage("pcrPrimerViewTitle")} />
       <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="pcr-primer" />
@@ -29,7 +31,9 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
       >
         {({ loading, response }) => (
           <div className="container-fluid">
-            <h1>PCR Primer Details</h1>
+            <h1>
+              <SeqdbMessage id="pcrPrimerViewTitle" />
+            </h1>
             <LoadingSpinner loading={loading} />
             {response && (
               <Formik<PcrPrimer> initialValues={response.data} onSubmit={noop}>

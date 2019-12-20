@@ -1,7 +1,7 @@
-import { ApiClientContext, createContextValue, QueryTable } from "common-ui";
-import { mount } from "enzyme";
+import { QueryTable } from "common-ui";
 import ReactTable from "react-table";
 import { act } from "react-test-renderer";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { ListPageLayout } from "../ListPageLayout";
 
 /** Mock Kitsu "get" method. */
@@ -16,17 +16,9 @@ jest.mock(
     }
 );
 
-function mountWithContext(element: JSX.Element) {
-  return mount(
-    <ApiClientContext.Provider value={createContextValue()}>
-      {element}
-    </ApiClientContext.Provider>
-  );
-}
-
 describe("ListPageLayout component", () => {
   it("Has a reset button to clear the filter form.", async () => {
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ListPageLayout
         id="test-layout"
         filterAttributes={["name"]}
@@ -59,7 +51,7 @@ describe("ListPageLayout component", () => {
 
     // Click the reset button.
     act(() => {
-      wrapper.find("button[children='Reset']").simulate("click");
+      wrapper.find("button.filter-reset-button").simulate("click");
     });
 
     // There should be no RSQL filter.
@@ -72,7 +64,7 @@ describe("ListPageLayout component", () => {
   });
 
   it("Stores the table's sort and page-size in cookies.", async () => {
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ListPageLayout
         id="test-layout"
         filterAttributes={["name"]}
