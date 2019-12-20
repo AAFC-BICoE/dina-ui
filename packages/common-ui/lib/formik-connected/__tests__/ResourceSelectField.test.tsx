@@ -1,13 +1,9 @@
-import { mount } from "enzyme";
 import { Formik } from "formik";
 import { KitsuResource } from "kitsu";
 import lodash, { noop } from "lodash";
 import Select from "react-select/base";
-import {
-  ApiClientContext,
-  createContextValue,
-  ResourceSelectField
-} from "../../";
+import { ResourceSelectField } from "../../";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 
 interface TestGroup extends KitsuResource {
   groupName: string;
@@ -46,16 +42,8 @@ jest.mock(
 jest.spyOn(lodash, "debounce").mockImplementation((fn: any) => fn);
 
 describe("ResourceSelectField component", () => {
-  function mountWithContext(element: JSX.Element) {
-    return mount(
-      <ApiClientContext.Provider value={createContextValue()}>
-        {element}
-      </ApiClientContext.Provider>
-    );
-  }
-
   it("Displays the Formik field's value.", () => {
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <Formik
         initialValues={{ group: { id: "3", groupName: "Mat's Group" } }}
         onSubmit={noop}
@@ -79,7 +67,7 @@ describe("ResourceSelectField component", () => {
   });
 
   it("Changes the Formik field's value.", async () => {
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <Formik initialValues={{ group: null }} onSubmit={noop}>
         {({ values: { group } }) => (
           <div>
@@ -128,7 +116,7 @@ describe("ResourceSelectField component", () => {
   it("Provides an onChange callback prop.", () => {
     const mockOnChange = jest.fn();
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <Formik
         initialValues={{ group: { id: 3, groupName: "Mat's Group" } }}
         onSubmit={noop}

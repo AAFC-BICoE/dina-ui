@@ -1,10 +1,6 @@
-import {
-  ApiClientContext,
-  createContextValue,
-  OperationsResponse
-} from "common-ui";
-import { mount } from "enzyme";
+import { OperationsResponse } from "common-ui";
 import { ProtocolEditPage } from "../../../pages/protocol/edit";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Protocol } from "../../../types/seqdb-api/resources/Protocol";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -39,14 +35,6 @@ jest.mock(
     }
 );
 
-function mountWithContext(element: JSX.Element) {
-  return mount(
-    <ApiClientContext.Provider value={createContextValue()}>
-      {element}
-    </ApiClientContext.Provider>
-  );
-}
-
 describe("Protocol edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -65,7 +53,7 @@ describe("Protocol edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ProtocolEditPage router={{ query: {}, push: mockPush } as any} />
     );
 
@@ -127,7 +115,7 @@ describe("Protocol edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ProtocolEditPage router={{ query: { id: 10 }, push: mockPush } as any} />
     );
 
@@ -207,7 +195,7 @@ describe("Protocol edit page", () => {
       ] as OperationsResponse
     }));
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ProtocolEditPage router={{ query: {}, push: mockPush } as any} />
     );
 

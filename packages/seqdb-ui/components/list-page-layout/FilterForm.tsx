@@ -1,9 +1,11 @@
+import { SubmitButton } from "common-ui";
 import { Form, Formik, FormikProps } from "formik";
 import { noop } from "lodash";
 import { useEffect } from "react";
 import { useCookies } from "react-cookie";
 import { CookieSetOptions } from "universal-cookie";
 import { FilterAttribute, FilterBuilderField } from "..";
+import { SeqdbMessage } from "../../intl/seqdb-intl";
 
 interface FilterFormProps {
   children?: (formik: FormikProps<any>) => React.ReactElement;
@@ -60,15 +62,15 @@ export function FilterForm({
             {children && children(formikProps)}
           </div>
           <div className="d-inline-block pl-3">
-            <button className="btn btn-primary" type="submit">
-              Filter List
-            </button>
+            <SubmitButton>
+              <SeqdbMessage id="filterSubmitButtonText" />
+            </SubmitButton>
             <button
-              className="btn btn-dark"
+              className="btn btn-dark filter-reset-button"
               type="button"
               onClick={() => resetFilterForm(formikProps)}
             >
-              Reset
+              <SeqdbMessage id="resetButtonText" />
             </button>
           </div>
         </Form>

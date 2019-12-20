@@ -1,6 +1,5 @@
-import { ApiClientContext, createContextValue } from "common-ui";
-import { mount } from "enzyme";
 import { ProductDetailsPage } from "../../../pages/product/view";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Product } from "../../../types/seqdb-api/resources/Product";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -30,16 +29,8 @@ jest.mock(
 );
 
 describe("Product details page", () => {
-  function mountWithContext(element: JSX.Element) {
-    return mount(
-      <ApiClientContext.Provider value={createContextValue()}>
-        {element}
-      </ApiClientContext.Provider>
-    );
-  }
-
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ProductDetailsPage router={{ query: { id: "100" } } as any} />
     );
 
@@ -47,7 +38,7 @@ describe("Product details page", () => {
   });
 
   it("Render the Product details", async () => {
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ProductDetailsPage router={{ query: { id: "100" } } as any} />
     );
 

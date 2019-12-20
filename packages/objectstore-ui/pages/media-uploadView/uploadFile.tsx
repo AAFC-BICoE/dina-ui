@@ -4,6 +4,10 @@ import { Form, Formik, FormikActions } from "formik";
 import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Head, Nav } from "../../components";
+import {
+  ObjectStoreMessage,
+  useObjectStoreIntl
+} from "../../intl/objectstore-intl";
 import { EditMetadataFormPage } from "../../page-fragments/editMetadata";
 
 interface FileUploadResponse {
@@ -41,13 +45,17 @@ const rejectStyle = {
 };
 
 function MediaUploadViewPage() {
+  const { formatMessage } = useObjectStoreIntl();
+
   return (
     <div>
-      <Head title="Upload files" />
+      <Head title={formatMessage("uploadPageTitle")} />
       <Nav />
       <div className="container-fluid">
         <div>
-          <h4>Upload File</h4>
+          <h4>
+            <ObjectStoreMessage id="uploadPageTitle" />
+          </h4>
           <UploadViewForm />
         </div>
       </div>
@@ -121,8 +129,7 @@ function UploadViewForm() {
           <input {...getInputProps()} />
           <div style={{ margin: "auto" }}>
             <div>
-              Drag and drop files here or click to open browse dialog. (Only
-              image, audio, video, .pdf, .doc and docx are accepted)
+              <ObjectStoreMessage id="uploadFormInstructions" />
             </div>
           </div>
         </div>

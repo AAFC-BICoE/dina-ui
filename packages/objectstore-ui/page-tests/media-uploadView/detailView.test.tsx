@@ -1,6 +1,5 @@
-import { ApiClientContext, createContextValue } from "common-ui";
-import { mount } from "enzyme";
 import { ObjectStoreDetailsPage } from "../../pages/media-uploadView/detailView";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 
 /** Test file response. */
 const TEST_FILE_RESPONSE = {
@@ -79,14 +78,6 @@ jest.mock(
     }
 );
 
-function mountWithContext(element: JSX.Element) {
-  return mount(
-    <ApiClientContext.Provider value={createContextValue()}>
-      {element}
-    </ApiClientContext.Provider>
-  );
-}
-
 describe("Metadata detail view page", () => {
   beforeEach(() => {
     jest.resetAllMocks();
@@ -104,7 +95,7 @@ describe("Metadata detail view page", () => {
   });
 
   it("Provides a form to show the managed attribute section.", async () => {
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />
     );
     // Wait for the page to load.
@@ -121,7 +112,7 @@ describe("Metadata detail view page", () => {
   });
 
   it("Provides a form to show the metadata section.", async done => {
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />
     );
 
@@ -132,14 +123,12 @@ describe("Metadata detail view page", () => {
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
     // The metadata section bucket name field should be rendered.
-    expect(
-      wrapper.containsMatchingElement(<strong>Bucket Name</strong>)
-    ).toEqual(true);
+    expect(wrapper.contains("Bucket Name")).toEqual(true);
 
     done();
   });
   it("Provides a form to show the image.", async done => {
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />
     );
 

@@ -1,5 +1,6 @@
 import { FieldsParam, FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import React, { useRef, useState } from "react";
+import { useIntl } from "react-intl";
 import ReactTable, {
   Column,
   PageSizeChangeFunction,
@@ -13,6 +14,7 @@ import {
   MetaWithTotal,
   useQuery
 } from "..";
+import { CommonMessage } from "../intl/common-ui-intl";
 
 /** Object types accepted as a column definition. */
 export type ColumnDefinition<TData> = string | Column<TData>;
@@ -90,6 +92,8 @@ export function QueryTable<TData extends KitsuResource>({
   onSuccess,
   path
 }: QueryTableProps<TData>) {
+  const { formatMessage, messages } = useIntl();
+
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
   // JSONAPI page spec.
@@ -133,13 +137,32 @@ export function QueryTable<TData extends KitsuResource>({
 
   const mappedColumns = columns.map<Column>(column => {
     // The "columns" prop can be a string or a react-table Column type.
+    const { fieldName, customHeader } =
+      typeof column === "string"
+        ? {
+            customHeader: undefined,
+            fieldName: column
+          }
+        : {
+            customHeader: column.Header,
+            fieldName: String(column.accessor)
+          };
+
+    const messageKey = `field_${fieldName}`;
+
+    const Header =
+      customHeader ??
+      (messages[messageKey]
+        ? formatMessage({ id: messageKey as any })
+        : titleCase(fieldName));
+
     if (typeof column === "string") {
       return {
-        Header: titleCase(column),
+        Header,
         accessor: column
       };
     } else {
-      return column;
+      return { ...column, Header };
     }
   });
 
@@ -168,7 +191,9 @@ export function QueryTable<TData extends KitsuResource>({
           <p>{error.errors.map(e => e.detail).join("\n")}</p>
         </div>
       )}
-      <span>Total matched records: {totalCount}</span>
+      <span>
+        <CommonMessage id="tableTotalCount" values={{ totalCount }} />
+      </span>
       <ReactTable
         className="-striped"
         columns={mappedColumns}

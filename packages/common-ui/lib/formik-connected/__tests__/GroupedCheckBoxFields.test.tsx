@@ -1,7 +1,7 @@
-import { mount } from "enzyme";
 import { Form, Formik } from "formik";
 import { KitsuResource } from "kitsu";
 import { useEffect } from "react";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { useGroupedCheckBoxes } from "../GroupedCheckBoxFields";
 
 interface TestResource extends KitsuResource {
@@ -49,14 +49,14 @@ describe("Grouped check boxes hook", () => {
   });
 
   it("Renders checkboxes.", () => {
-    const wrapper = mount(<TestComponent />);
+    const wrapper = mountWithAppContext(<TestComponent />);
     expect(
       wrapper.find("CheckBoxField").find("input[type='checkbox']").length
     ).toEqual(5);
   });
 
   it("Sets the checked ID in the formik state.", async () => {
-    const wrapper = mount(<TestComponent />);
+    const wrapper = mountWithAppContext(<TestComponent />);
     // Check the third checkbox.
     wrapper
       .find("input[type='checkbox']")
@@ -73,7 +73,7 @@ describe("Grouped check boxes hook", () => {
   });
 
   it("Lets you shift+click to toggle multiple check boxes at a time.", async () => {
-    const wrapper = mount(<TestComponent />);
+    const wrapper = mountWithAppContext(<TestComponent />);
 
     // Check the second checkbox.
     wrapper
@@ -112,7 +112,7 @@ describe("Grouped check boxes hook", () => {
   });
 
   it("Multi-toggles checkboxes even when they are in reverse order.", async () => {
-    const wrapper = mount(<TestComponent />);
+    const wrapper = mountWithAppContext(<TestComponent />);
 
     // Click the fourth checkbox.
     wrapper
@@ -149,7 +149,7 @@ describe("Grouped check boxes hook", () => {
   });
 
   it("Provides a checkbox to check all boxes.", async () => {
-    const wrapper = mount(<TestComponent />);
+    const wrapper = mountWithAppContext(<TestComponent />);
 
     // The header should show the total checked count.
     expect(wrapper.text().includes("(0 selected)")).toEqual(true);

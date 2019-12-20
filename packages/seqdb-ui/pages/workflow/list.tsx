@@ -1,6 +1,13 @@
 import { ColumnDefinition } from "common-ui";
 import Link from "next/link";
-import { Head, ListPageLayout, Nav } from "../../components";
+import {
+  ButtonBar,
+  CreateButton,
+  Head,
+  ListPageLayout,
+  Nav
+} from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 
 const WORKFLOW_TABLE_COLUMNS: Array<ColumnDefinition<any>> = [
   {
@@ -9,15 +16,11 @@ const WORKFLOW_TABLE_COLUMNS: Array<ColumnDefinition<any>> = [
         <a>{name}</a>
       </Link>
     ),
-    Header: "Name",
     accessor: "name"
   },
   "dateCreated",
   "chainTemplate.name",
-  {
-    Header: "Group",
-    accessor: "group.groupName"
-  }
+  "group.groupName"
 ];
 
 const WORKFLOW_FILTER_ATTRIBUTES = [
@@ -27,15 +30,19 @@ const WORKFLOW_FILTER_ATTRIBUTES = [
 ];
 
 export default function WorkflowListPage() {
+  const { formatMessage } = useSeqdbIntl();
+
   return (
     <>
-      <Head title="NGS Workflows" />
+      <Head title={formatMessage("workflowListTitle")} />
       <Nav />
+      <ButtonBar>
+        <CreateButton entityLink="workflow" />
+      </ButtonBar>
       <div className="container-fluid">
-        <h1>NGS Workflows</h1>
-        <Link href="/workflow/edit">
-          <a>Add New NGS Workflow</a>
-        </Link>
+        <h1>
+          <SeqdbMessage id="workflowListTitle" />
+        </h1>
         <ListPageLayout
           filterAttributes={WORKFLOW_FILTER_ATTRIBUTES}
           id="workflow-list"

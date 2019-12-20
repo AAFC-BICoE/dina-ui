@@ -1,12 +1,12 @@
-import { mount } from "enzyme";
 import { Form, Formik } from "formik";
 import NumberFormat from "react-number-format";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { NumberField } from "../NumberField";
 
 const mockOnSubmit = jest.fn();
 
 function getWrapper({ initialValues }) {
-  return mount(
+  return mountWithAppContext(
     <Formik initialValues={initialValues} onSubmit={mockOnSubmit}>
       <Form>
         <NumberField name="testField" />

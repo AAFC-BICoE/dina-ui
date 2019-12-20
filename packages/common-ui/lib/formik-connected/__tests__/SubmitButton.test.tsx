@@ -1,10 +1,10 @@
-import { mount } from "enzyme";
 import { Form, Formik } from "formik";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { SubmitButton } from "../SubmitButton";
 
 describe("SubmitButton component", () => {
   it("Shows a submit button when the form is not submitting.", () => {
-    const wrapper = mount(
+    const wrapper = mountWithAppContext(
       /* tslint:disable:no-empty */
       <Formik initialValues={{}} onSubmit={() => {}}>
         <Form>
@@ -18,7 +18,7 @@ describe("SubmitButton component", () => {
   });
 
   it("Shows a loading spinner when the form is submitting.", () => {
-    const wrapper = mount(
+    const wrapper = mountWithAppContext(
       /* tslint:disable:no-empty */
       <Formik initialValues={{}} onSubmit={() => {}}>
         <Form>
