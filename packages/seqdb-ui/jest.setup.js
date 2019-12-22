@@ -4,6 +4,9 @@ const Adapter = require("enzyme-adapter-react-16");
 
 Enzyme.configure({ adapter: new Adapter() });
 
+// Let tests pretend they are running in the browser:
+process.browser = true;
+
 /**
  * Suppress React 16.8 act() warnings globally.
  * The react teams fix won't be out of alpha until 16.9.0.

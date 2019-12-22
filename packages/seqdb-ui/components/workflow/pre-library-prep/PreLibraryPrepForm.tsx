@@ -8,12 +8,26 @@ import {
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { Product, Protocol } from "types/seqdb-api";
+import { useSeqdbIntl } from "../../../intl/seqdb-intl";
 
 interface PreLibraryPrepFormProps {
   onSubmit: (values: any) => void;
 }
 
 export function PreLibraryPrepForm({ onSubmit }: PreLibraryPrepFormProps) {
+  const { formatMessage } = useSeqdbIntl();
+
+  const PREP_TYPE_OPTIONS = [
+    {
+      label: formatMessage("shearingLabel"),
+      value: "SHEARING"
+    },
+    {
+      label: formatMessage("sizeSelectionLabel"),
+      value: "SIZE_SELECTION"
+    }
+  ];
+
   async function onSubmitInternal(values, { setSubmitting }) {
     await onSubmit(values);
     setSubmitting(false);
@@ -69,14 +83,3 @@ export function PreLibraryPrepForm({ onSubmit }: PreLibraryPrepFormProps) {
     </Formik>
   );
 }
-
-const PREP_TYPE_OPTIONS = [
-  {
-    label: "Shearing",
-    value: "SHEARING"
-  },
-  {
-    label: "Size Selection",
-    value: "SIZE_SELECTION"
-  }
-];

@@ -10,13 +10,16 @@ import {
   Head,
   Nav
 } from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { Product } from "../../types/seqdb-api/resources/Product";
 
 export function ProductDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
+  const { formatMessage } = useSeqdbIntl();
+
   return (
     <div>
-      <Head title="Product " />
+      <Head title={formatMessage("productViewTitle")} />
       <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="product" />
@@ -25,7 +28,9 @@ export function ProductDetailsPage({ router }: WithRouterProps) {
       <Query<Product> query={{ include: "group", path: `product/${id}` }}>
         {({ loading, response }) => (
           <div className="container-fluid">
-            <h1>Product Inventory</h1>
+            <h1>
+              <SeqdbMessage id="productViewTitle" />
+            </h1>
             <LoadingSpinner loading={loading} />
             {response && (
               <Formik<Product> initialValues={response.data} onSubmit={noop}>
