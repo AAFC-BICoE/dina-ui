@@ -1,22 +1,14 @@
 import { ColumnDefinition, QueryTable } from "common-ui";
 import { useCookies } from "react-cookie";
 import { CookieSetOptions } from "universal-cookie";
-import { Head, Nav } from "../components";
-import { ManagedAttribute } from "../types/objectstore-api/resources/ManagedAttribute";
+import { Head, Nav } from "../../components";
+import { ObjectStoreMessage } from "../../intl/objectstore-intl";
+import { ManagedAttribute } from "../../types/objectstore-api/resources/ManagedAttribute";
 
 const ATTRIBUTES_LIST_COLUMNS: Array<ColumnDefinition<ManagedAttribute>> = [
-  {
-    Header: "Name",
-    accessor: "name"
-  },
-  {
-    Header: "Type",
-    accessor: "managedAttributeType"
-  },
-  {
-    Header: "Accepted Values",
-    accessor: "acceptedValues"
-  }
+  "name",
+  "managedAttributeType",
+  "acceptedValues"
 ];
 
 const TABLE_PAGE_SIZE_COOKIE = "tablePageSize";
@@ -40,10 +32,14 @@ export default function ManagedAttributesListPage() {
     <div>
       <Head title="Managed Attributes" />
       <Nav />
-      <div>
-        <h1>Managed Attributes</h1>
+      <div className="container-fluid">
+        <h1>
+          <ObjectStoreMessage id="managedAttributeListTitle" />
+        </h1>
         <br />
-        <button>Add New Managed Attribute</button>
+        <button>
+          <ObjectStoreMessage id="addManagedAttributeButtonText" />
+        </button>
         <br />
         <QueryTable
           columns={ATTRIBUTES_LIST_COLUMNS}
