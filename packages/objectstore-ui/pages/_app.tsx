@@ -1,4 +1,6 @@
+import "bootswatch/dist/spacelab/bootstrap.min.css";
 import { ApiClientContext, createContextValue } from "common-ui";
+import "handsontable/dist/handsontable.full.min.css";
 import App from "next/app";
 import React from "react";
 import "react-datepicker/dist/react-datepicker.css";

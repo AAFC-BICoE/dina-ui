@@ -88,12 +88,12 @@ export function ResourceSelect<TData extends KitsuResource>({
   }
 
   function onChangeInternal(selectedOption) {
-    if (selectedOption.resource) {
+    if (selectedOption?.resource) {
       // Handle single select:
       onChange(selectedOption.resource);
     } else {
       // Handle multi select:
-      const resources = selectedOption.map(o => o.resource);
+      const resources = selectedOption?.map(o => o.resource) || [];
       onChange(resources);
     }
   }
@@ -132,6 +132,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       loadOptions={debouncedOptionLoader}
       onChange={onChangeInternal}
       placeholder="Type here to search."
+      styles={{ menu: () => ({ zIndex: 1000 }) }}
       value={selectValue}
     />
   );

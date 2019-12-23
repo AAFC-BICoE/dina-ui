@@ -18,7 +18,7 @@ import ViewMetadataFormPage from "../../page-fragments/viewMetadata";
 interface DownloadFileResponse {
   error?: string;
   loading?: boolean;
-  imgResponse: FileDownLoadResponseAttributes;
+  imgResponse: FileDownLoadResponseAttributes | null;
 }
 function useImageQuery(id: string): DownloadFileResponse {
   const { apiClient } = useContext(ApiClientContext);

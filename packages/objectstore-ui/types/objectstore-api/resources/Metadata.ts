@@ -8,7 +8,7 @@ export interface MetadataAttributes {
   uuid: string;
   fileIdentifier: string;
   fileExtension: string;
-  dcType: DcType;
+  dcType: "Image" | "Moving Image" | "Sound" | "Text";
   // optional fields
   dcFormat?: string;
   acDigitizationDate?: string;
@@ -18,12 +18,6 @@ export interface MetadataAttributes {
 
   acHashFunction?: string;
   acHashValue?: string;
-}
-export enum DcType {
-  IMAGE = "Image",
-  MOVING_IMAGE = "Moving Image",
-  SOUND = "Sound",
-  TEXT = "Text"
 }
 
 export interface MetadataRelationships {
