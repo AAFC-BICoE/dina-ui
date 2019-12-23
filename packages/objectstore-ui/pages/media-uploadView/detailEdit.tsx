@@ -9,6 +9,7 @@ import {
   SubmitButton,
   TextField
 } from "common-ui";
+
 import { Form, Formik, FormikActions } from "formik";
 import { GetParams } from "kitsu";
 import { omitBy } from "lodash";
@@ -75,12 +76,12 @@ function DetailEditForm({ router }: DetailEditFormProps) {
       isUndefined
     );
     const metadata = await apiClient.get<any, undefined>(path, getParams);
-    if (metadata && metadata.data[0] && metadata.data[0].managedAttribute) {
+    if (metadata && metadata.data[0]) {
       metainitialValues1 = metadata.data[0];
       metainitialValues1["unManagedAttributes"] = unManagedCtrl;
       metainitialValues1["managedAttributes"] = managedCtrl;
       let i = 10;
-      // Filling the managed attributes for UI control attributes for backplay
+      // Filling the unmanaged attributes for UI control attributes for backplay
       // the generation of acTags with initial values
       if (metadata.data[0].acTags) {
         metadata.data[0].acTags.map(acTag => {
@@ -93,25 +94,25 @@ function DetailEditForm({ router }: DetailEditFormProps) {
       }
       // Filling the managed attributes for UI control attributes for backplay
       // the generation of managed attributes with initial values
-      let metaManagedAttributes: MetaManagedAttribute[];
-      metaManagedAttributes = await getManagedAttributesData(
-        metadata.data[0].managedAttribute
-      );
+      if (metadata.data[0].managedAttribute) {
+        let metaManagedAttributes: MetaManagedAttribute[];
+        metaManagedAttributes = await getManagedAttributesData(
+          metadata.data[0].managedAttribute
+        );
 
-      /* tslint:disable:no-string-literal */
-      metaManagedAttributes.map(metaMa => {
-        metainitialValues1["key_" + i] = metaMa["data"]["managedAttribute"];
-        metainitialValues1["assignedValue" + i] =
-          metaMa["data"]["assignedValue"];
+        metaManagedAttributes.map(metaMa => {
+          metainitialValues1["key_" + i] = metaMa["data"]["managedAttribute"];
+          metainitialValues1["assignedValue" + i] =
+            metaMa["data"]["assignedValue"];
 
-        metainitialValues1["managedAttributes"].push({
-          ma_data: metaMa["data"]["managedAttribute"],
-          metama_data: metaMa,
-          name: "key_" + i,
-          value: "" + i++
+          metainitialValues1["managedAttributes"].push({
+            ma_data: metaMa["data"]["managedAttribute"],
+            metama_data: metaMa,
+            name: "key_" + i,
+            value: "" + i++
+          });
         });
-      });
-      /* tslint:enable:no-string-literal */
+      }
       setMetainitialValues(metainitialValues1);
     }
   }
@@ -137,8 +138,6 @@ function DetailEditForm({ router }: DetailEditFormProps) {
     submittedValues,
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
-    const ma = submittedValues.managedAttributes;
-    const unMa = submittedValues.unManagedAttributes;
     delete submittedValues.managedAttributes;
     delete submittedValues.unManagedAttributes;
     delete submittedValues.managedAttribute;
@@ -216,8 +215,6 @@ function DetailEditForm({ router }: DetailEditFormProps) {
         );
       }
     } catch (error) {
-      submittedValues.unManagedAttributes = unMa;
-      submittedValues.managedAttributes = ma;
       setStatus(error.message);
     }
     setSubmitting(false);
@@ -231,7 +228,7 @@ function DetailEditForm({ router }: DetailEditFormProps) {
             <Formik
               initialValues={metainitialValues}
               onSubmit={onSubmit}
-              enableReinitialize={false}
+              enableReinitialize={true}
             >
               <Form>
                 <ErrorViewer />

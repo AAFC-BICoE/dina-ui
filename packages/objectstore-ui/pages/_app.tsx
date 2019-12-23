@@ -4,6 +4,7 @@ import React from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-table/react-table.css";
 import "react-tabs/style/react-tabs.css";
+import { ObjectStoreIntlProvider } from "../intl/objectstore-intl";
 
 /**
  * App component that wraps every page component.
@@ -18,7 +19,9 @@ export default class ObjectStoreUiApp extends App {
 
     return (
       <ApiClientContext.Provider value={this.contextValue}>
-        <Component {...pageProps} />
+        <ObjectStoreIntlProvider>
+          <Component {...pageProps} />
+        </ObjectStoreIntlProvider>
       </ApiClientContext.Provider>
     );
   }

@@ -4,6 +4,10 @@ import { Form, Formik, FormikActions } from "formik";
 import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Head, Nav } from "../../components";
+import {
+  ObjectStoreMessage,
+  useObjectStoreIntl
+} from "../../intl/objectstore-intl";
 import { EditMetadataFormPage } from "../../page-fragments/editMetadata";
 
 interface FileUploadResponse {
@@ -41,13 +45,17 @@ const rejectStyle = {
 };
 
 function MediaUploadViewPage() {
+  const { formatMessage } = useObjectStoreIntl();
+
   return (
     <div>
-      <Head title="Upload files" />
+      <Head title={formatMessage("uploadPageTitle")} />
       <Nav />
       <div className="container-fluid">
         <div>
-          <h4>Upload File</h4>
+          <h4>
+            <ObjectStoreMessage id="uploadPageTitle" />
+          </h4>
           <UploadViewForm />
         </div>
       </div>
@@ -127,44 +135,41 @@ function UploadViewForm() {
   }
 
   return (
-    <div>
-      <div>
-        <Formik initialValues={{}} onSubmit={onSubmit}>
-          <Form>
-            <ErrorViewer />
-            <div id="dndRoot">
-              <div {...getRootProps({ style })} className="root">
-                <input {...getInputProps()} />
-                <div style={{ margin: "auto" }}>
-                  <div>
-                    Drag and drop files here or click to open browse dialog.
-                    (Only image, audio, video, .pdf, .doc and docx are accepted)
-                  </div>
+    <>
+      <Formik initialValues={{}} onSubmit={onSubmit}>
+        <Form>
+          <ErrorViewer />
+          <div id="dndRoot">
+            <div {...getRootProps({ style })} className="root">
+              <input {...getInputProps()} />
+              <div style={{ margin: "auto" }}>
+                <div>
+                  <ObjectStoreMessage id="uploadFormInstructions" />
                 </div>
               </div>
-              <div>
-                <ul>{acceptedFilesItems}</ul>
-              </div>
             </div>
+            <div>
+              <ul>{acceptedFilesItems}</ul>
+            </div>
+          </div>
 
-            <div className="form-group row">
-              <div className="col-md-2">
-                <SubmitButton children="Upload File" />
-              </div>
+          <div className="form-group row">
+            <div className="col-md-2">
+              <SubmitButton children="Upload File" />
             </div>
-          </Form>
-        </Formik>
-        {editMetadataVisible &&
-          acceptedFiles &&
-          acceptedFiles.length > 0 &&
-          fileId && (
-            <EditMetadataFormPage
-              originalFileName={acceptedFiles[0].name}
-              fileIdentifier={fileId}
-            />
-          )}
-      </div>
-    </div>
+          </div>
+        </Form>
+      </Formik>
+      {editMetadataVisible &&
+        acceptedFiles &&
+        acceptedFiles.length > 0 &&
+        fileId && (
+          <EditMetadataFormPage
+            originalFileName={acceptedFiles[0].name}
+            fileIdentifier={fileId}
+          />
+        )}
+    </>
   );
 }
 export default MediaUploadViewPage;

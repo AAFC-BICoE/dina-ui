@@ -1,22 +1,20 @@
 import { connect } from "formik";
 import { LoadingSpinner } from "..";
+import { CommonMessage } from "../intl/common-ui-intl";
+
+interface SubmitButtonProps {
+  children?: React.ReactNode;
+  className?: string;
+}
 
 /**
  * Formik-connected submit button that shows a loading indicator instead when the form is submitting.
  */
-
-/* tslint:disable:no-string-literal */
-
-interface SubmitButtonProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
 export const SubmitButton = connect<SubmitButtonProps>(
   function SubmitButtonInternal({
-    formik: { isSubmitting },
+    children,
     className,
-    children
+    formik: { isSubmitting }
   }) {
     return isSubmitting ? (
       <LoadingSpinner loading={isSubmitting} />
@@ -25,9 +23,8 @@ export const SubmitButton = connect<SubmitButtonProps>(
         className={className ? className : "btn btn-primary"}
         type="submit"
       >
-        {children ? children : "Save"}
+        {children || <CommonMessage id="submitBtnText" />}
       </button>
     );
   }
 );
-/* tslint:enable:no-string-literal */

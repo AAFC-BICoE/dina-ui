@@ -1,0 +1,112 @@
+= Internationalization / Multiple Languages Support
+
+This application can display messages in multiple languages using
+https://github.com/yahoo/react-intl[react-intl].
+
+== Message components
+
+When developing UI, you should not hard-code messages into the UI, like this:
+
+[source,tsx]
+----
+<h2>PCR Primers</h2>
+----
+
+You should instead reference a message key:
+
+[source,tsx]
+----
+import { SeqDBMessage } from "../../intl/seqdb-intl.ts""
+
+...
+
+<h2><SeqDBMessage id="pcrPrimerListTitle" /></h2>
+----
+
+== formatMessage function
+
+You can also use the "formatMessage" function if you want to reference a message outside of a JSX tree:
+
+[source,tsx]
+----
+import { useSeqdbIntl } from "../../seqdb-intl.ts""
+
+function MyComponent() {
+  const { formatMessage } = useSeqdbIntl();
+
+  useEffect(() => {
+    alert(formatMessage("greeting"));
+  }, []);
+
+  return (
+    <div>...</div>
+  );
+}
+----
+
+== Defining messages
+
+The actual text for these messages needs to be defined in a messages file, like seqdb-en.ts. Each UI app
+( seqdb-ui, objectstore-ui, etc. ) should have its own messages files. common-ui has its own messages files
+for shared messages used by multiple apps.
+
+seqdb-en.ts:
+
+[source,tsx]
+----
+export const SEQDB_MESSAGES_ENGLISH = {
+  ...COMMON_UI_MESSAGES_ENGLISH,
+  ...
+  greeting: "Hello!"
+  ...
+}
+----
+
+Type-checking is enabled so the message ID passed into "SeqDBMessage" or "formatMessage" MUST be a key
+in at least the English messages file. To add a French (or other language) translation
+for a message, the English version of the message must already be defined. The UI uses the English
+translation as a fallback if the message has no translation for the user's locale.
+
+Example from seqdb-fr.ts:
+
+[source,tsx]
+----
+export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
+  ...COMMON_UI_MESSAGES_FR,
+  ...
+  greeting: "Bonjour!", // If the key exists in the english messages file, Typescript allows it.
+  otherKey: "C'est un autre message." // If "otherKey" isn't a key in the English messages, this should show an error in your IDE.
+  ...
+};
+----
+
+== Field label messages
+
+Some components, like QueryTable, FilterBuilder and FieldWrapper (which wraps our Formik input components)
+take in a list of field names ( e.g. ["name","version","group.groupName"] ) and display auto-generated title-case
+labels of these field names ( e.g. Name, Version, Group Group Name ). Sometimes the auto-generated labels need to
+be manually overridden, so you can define custom messages for these labels using the `field_${fieldName}` key format.
+
+Example:
+
+[source,tsx]
+----
+export const SEQDB_MESSAGES_ENGLISH = {
+  ...COMMON_UI_MESSAGES_ENGLISH,
+  ...
+  field_name: "Name",
+  "field_group.groupName": "Group Name",
+  ...
+}
+----
+
+[source,tsx]
+----
+export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
+  ...COMMON_UI_MESSAGES_FR,
+  ...
+  field_name: "Nom",
+  "field_group.groupName": "Nom de Groupe"
+  ...
+}
+----

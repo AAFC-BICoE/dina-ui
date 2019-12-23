@@ -1,7 +1,7 @@
-import { mount } from "enzyme";
 import { Form, Formik } from "formik";
 import { noop } from "lodash";
 import Select from "react-select";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { SelectField } from "../SelectField";
 
 const PRIMER_TYPE_OPTIONS = [
@@ -28,7 +28,7 @@ const PRIMER_TYPE_OPTIONS = [
 ];
 
 function getWrapper(propsOverride = {}) {
-  return mount(
+  return mountWithAppContext(
     <Formik
       initialValues={{
         testField: "ITRU_PRIMER"

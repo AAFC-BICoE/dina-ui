@@ -1,7 +1,6 @@
 import { wait } from "@testing-library/react";
-import { ApiClientContext, createContextValue } from "common-ui";
-import { mount } from "enzyme";
 import { DetailEditPage } from "../../pages/media-uploadView/detailEdit";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 
 /** Mock next.js' router "push" function for navigating pages. */
 const mockPush = jest.fn();
@@ -100,14 +99,6 @@ jest.mock(
     }
 );
 
-function mountWithContext(element: JSX.Element) {
-  return mount(
-    <ApiClientContext.Provider value={createContextValue()}>
-      {element}
-    </ApiClientContext.Provider>
-  );
-}
-
 describe("Detail edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -133,7 +124,7 @@ describe("Detail edit page", () => {
       status: 201
     });
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <DetailEditPage router={{ query: { id: 100 }, push: mockPush } as any} />
     );
 

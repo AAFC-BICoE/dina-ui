@@ -10,14 +10,16 @@ import {
   Head,
   Nav
 } from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 
 export function PcrProfileDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
+  const { formatMessage } = useSeqdbIntl();
 
   return (
     <div>
-      <Head title="Thermocycler Profile Details" />
+      <Head title={formatMessage("pcrProfileViewTitle")} />
       <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="pcr-profile" />
@@ -28,7 +30,9 @@ export function PcrProfileDetailsPage({ router }: WithRouterProps) {
       >
         {({ loading, response }) => (
           <div className="container-fluid">
-            <h1>PCR Profile Details</h1>
+            <h1>
+              <SeqdbMessage id="pcrProfileViewTitle" />
+            </h1>
             <LoadingSpinner loading={loading} />
             {response && (
               <Formik<PcrProfile> initialValues={response.data} onSubmit={noop}>
