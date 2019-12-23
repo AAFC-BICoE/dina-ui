@@ -1,10 +1,6 @@
-import {
-  ApiClientContext,
-  createContextValue,
-  OperationsResponse
-} from "common-ui";
-import { mount } from "enzyme";
+import { OperationsResponse } from "common-ui";
 import { PcrPrimerEditPage } from "../../../pages/pcr-primer/edit";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -39,14 +35,6 @@ jest.mock(
     }
 );
 
-function mountWithContext(element: JSX.Element) {
-  return mount(
-    <ApiClientContext.Provider value={createContextValue()}>
-      {element}
-    </ApiClientContext.Provider>
-  );
-}
-
 describe("PcrPrimer edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -57,7 +45,7 @@ describe("PcrPrimer edit page", () => {
       data: [
         {
           data: {
-            id: 1,
+            id: "1",
             type: "pcrPrimer"
           },
           status: 201
@@ -65,7 +53,7 @@ describe("PcrPrimer edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} />
     );
 
@@ -91,7 +79,7 @@ describe("PcrPrimer edit page", () => {
                 seq: "",
                 type: "PRIMER"
               },
-              id: -100,
+              id: "-100",
               type: "pcrPrimer"
             }
           }
@@ -122,7 +110,7 @@ describe("PcrPrimer edit page", () => {
       ] as OperationsResponse
     }));
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} />
     );
 
@@ -145,7 +133,7 @@ describe("PcrPrimer edit page", () => {
       data: [
         {
           data: {
-            id: 1,
+            id: "1",
             type: "pcrPrimer"
           },
           status: 201
@@ -153,7 +141,7 @@ describe("PcrPrimer edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <PcrPrimerEditPage
         router={{ query: { id: 100 }, push: mockPush } as any}
       />

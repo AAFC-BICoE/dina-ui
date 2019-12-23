@@ -7,6 +7,7 @@ import {
   ListPageLayout,
   Nav
 } from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
 
 const PCRPRIMER_TABLE_COLUMNS: Array<ColumnDefinition<PcrPrimer>> = [
@@ -16,13 +17,9 @@ const PCRPRIMER_TABLE_COLUMNS: Array<ColumnDefinition<PcrPrimer>> = [
         <a>{name}</a>
       </Link>
     ),
-    Header: "Name",
     accessor: "name"
   },
-  {
-    Header: "Group Name",
-    accessor: "group.groupName"
-  },
+  "group.groupName",
   {
     Cell: ({ original: { region } }) =>
       region ? (
@@ -30,7 +27,6 @@ const PCRPRIMER_TABLE_COLUMNS: Array<ColumnDefinition<PcrPrimer>> = [
           <a>{region.name}</a>
         </Link>
       ) : null,
-    Header: "Region Name",
     accessor: "region.name"
   },
   "type",
@@ -56,15 +52,19 @@ const PCR_PRIMER_FILTER_ATTRIBUTES = [
 ];
 
 export default function PcrPrimerListPage() {
+  const { formatMessage } = useSeqdbIntl();
+
   return (
     <>
-      <Head title="PCR Primers" />
+      <Head title={formatMessage("pcrPrimerListTitle")} />
       <Nav />
       <ButtonBar>
-        <CreateButton entityLabel="Pcr Primer" entityLink="pcr-primer" />
+        <CreateButton entityLink="pcr-primer" />
       </ButtonBar>
       <div className="container-fluid">
-        <h1>PCR Primers</h1>
+        <h1>
+          <SeqdbMessage id="pcrPrimerListTitle" />
+        </h1>
         <ListPageLayout
           filterAttributes={PCR_PRIMER_FILTER_ATTRIBUTES}
           id="primer-list"

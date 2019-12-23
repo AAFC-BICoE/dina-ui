@@ -1,7 +1,7 @@
 import { AxiosRequestConfig } from "axios";
 import Kitsu from "kitsu";
 import { createContextValue } from "../ApiClientContext";
-import { Operation, OperationsResponse } from "../jsonapi-types";
+import { Operation, OperationsResponse } from "../operations-types";
 
 interface TestPcrPrimer {
   name: string;
@@ -26,7 +26,7 @@ const TODO_INSERT_OPERATION: Operation[] = [
         description: "description",
         name: "todo 1"
       },
-      id: 123,
+      id: "123",
       type: "todo"
     }
   }
@@ -40,7 +40,7 @@ const MOCK_TODO_INSERT_AXIOS_RESPONSE = {
           description: "description",
           name: "todo 1"
         },
-        id: 123,
+        id: "123",
         type: "todo"
       },
       status: 201
@@ -56,7 +56,7 @@ const TODO_OPERATION_1_VALID_2_INVALID: Operation[] = [
       attributes: {
         name: "valid-name"
       },
-      id: 1,
+      id: "1",
       type: "todo"
     }
   },
@@ -67,7 +67,7 @@ const TODO_OPERATION_1_VALID_2_INVALID: Operation[] = [
       attributes: {
         name: "this-name-is-too-long"
       },
-      id: 2,
+      id: "2",
       type: "todo"
     }
   },
@@ -78,7 +78,7 @@ const TODO_OPERATION_1_VALID_2_INVALID: Operation[] = [
       attributes: {
         description: "this-description-is-too-long"
       },
-      id: 3,
+      id: "3",
       type: "todo"
     }
   }
@@ -184,7 +184,7 @@ Constraint violation: description size must be between 1 and 10`;
               lotNumber: 1,
               name: "testPrimer1"
             },
-            id: 123,
+            id: "123",
             type: "pcrPrimer"
           },
           status: 201
@@ -195,7 +195,7 @@ Constraint violation: description size must be between 1 and 10`;
               lotNumber: 1,
               name: "testPrimer2"
             },
-            id: 124,
+            id: "124",
             type: "pcrPrimer"
           },
           status: 201
@@ -231,7 +231,7 @@ Constraint violation: description size must be between 1 and 10`;
           path: "pcrPrimer",
           value: {
             attributes: { lotNumber: 1, name: "testPrimer1" },
-            id: -100,
+            id: "-100",
             type: "pcrPrimer"
           }
         },
@@ -240,7 +240,7 @@ Constraint violation: description size must be between 1 and 10`;
           path: "pcrPrimer",
           value: {
             attributes: { lotNumber: 1, name: "testPrimer2" },
-            id: -101,
+            id: "-101",
             type: "pcrPrimer"
           }
         }
@@ -251,13 +251,13 @@ Constraint violation: description size must be between 1 and 10`;
     // Expect correct response.
     expect(response).toEqual([
       {
-        id: 123,
+        id: "123",
         lotNumber: 1,
         name: "testPrimer1",
         type: "pcrPrimer"
       },
       {
-        id: 124,
+        id: "124",
         lotNumber: 1,
         name: "testPrimer2",
         type: "pcrPrimer"
@@ -275,7 +275,7 @@ Constraint violation: description size must be between 1 and 10`;
               lotNumber: 1,
               name: "testPrimer1 edited"
             },
-            id: 123,
+            id: "123",
             type: "pcrPrimer"
           },
           status: 201
@@ -286,7 +286,7 @@ Constraint violation: description size must be between 1 and 10`;
               lotNumber: 1,
               name: "testPrimer2 edited"
             },
-            id: 124,
+            id: "124",
             type: "pcrPrimer"
           },
           status: 201
@@ -341,8 +341,13 @@ Constraint violation: description size must be between 1 and 10`;
     );
 
     expect(response).toEqual([
-      { id: 123, lotNumber: 1, name: "testPrimer1 edited", type: "pcrPrimer" },
-      { id: 124, lotNumber: 1, name: "testPrimer2 edited", type: "pcrPrimer" }
+      {
+        id: "123",
+        lotNumber: 1,
+        name: "testPrimer1 edited",
+        type: "pcrPrimer"
+      },
+      { id: "124", lotNumber: 1, name: "testPrimer2 edited", type: "pcrPrimer" }
     ]);
   });
 });

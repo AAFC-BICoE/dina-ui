@@ -1,6 +1,10 @@
 import { mount } from "enzyme";
 import { useState } from "react";
 import { act } from "react-dom/test-utils";
+import {
+  MockAppContextProvider,
+  mountWithAppContext
+} from "../../../test-util/mock-app-context";
 import { FilterBuilder, FilterBuilderProps } from "../FilterBuilder";
 import { FilterGroup, FilterGroupModel } from "../FilterGroup";
 import { FilterRow } from "../FilterRow";
@@ -11,7 +15,7 @@ describe("FilterBuilder component", () => {
   const filterAttributes = ["name", "description"];
 
   function mountFilterBuilder(propsOverride: Partial<FilterBuilderProps> = {}) {
-    return mount<FilterBuilder>(
+    return mountWithAppContext(
       <FilterBuilder filterAttributes={filterAttributes} {...propsOverride} />
     );
   }
@@ -19,7 +23,7 @@ describe("FilterBuilder component", () => {
   it("Renders initially with one FilterRow.", () => {
     const wrapper = mountFilterBuilder();
 
-    expect(wrapper.state().model).toEqual({
+    expect(wrapper.find(FilterBuilder).state().model).toEqual({
       children: [
         {
           attribute: "name",
@@ -40,11 +44,9 @@ describe("FilterBuilder component", () => {
   it("Adds a FilterRow in an AND group when the FilterRow's AND button is clicked.", () => {
     const wrapper = mountFilterBuilder();
 
-    wrapper
-      .find(".filter-row-buttons button[children='AND']")
-      .simulate("click");
+    wrapper.find(".filter-row-buttons button.and").simulate("click");
 
-    expect(wrapper.state().model).toEqual({
+    expect(wrapper.find(FilterBuilder).state().model).toEqual({
       children: [
         {
           attribute: "name",
@@ -73,9 +75,9 @@ describe("FilterBuilder component", () => {
   it("Adds a FilterRow in an OR group when the FilterRow's OR button is clicked.", () => {
     const wrapper = mountFilterBuilder();
 
-    wrapper.find(".filter-row-buttons button[children='OR']").simulate("click");
+    wrapper.find(".filter-row-buttons button.or").simulate("click");
 
-    expect(wrapper.state().model).toEqual({
+    expect(wrapper.find(FilterBuilder).state().model).toEqual({
       children: [
         {
           attribute: "name",
@@ -104,17 +106,15 @@ describe("FilterBuilder component", () => {
   it("Nests filter groups.", () => {
     const wrapper = mountFilterBuilder();
 
-    wrapper
-      .find(".filter-row-buttons button[children='AND']")
-      .simulate("click");
+    wrapper.find(".filter-row-buttons button.and").simulate("click");
 
     wrapper
       .find(FilterRow)
       .at(1)
-      .find("button[children='OR']")
+      .find("button.or")
       .simulate("click");
 
-    expect(wrapper.state().model).toEqual({
+    expect(wrapper.find(FilterBuilder).state().model).toEqual({
       children: [
         {
           attribute: "name",
@@ -161,7 +161,7 @@ describe("FilterBuilder component", () => {
     const wrapper = mountFilterBuilder();
 
     // Click the first filter row's button.
-    wrapper.find("button[children='AND']").simulate("click");
+    wrapper.find("button.and").simulate("click");
 
     wrapper
       .find("input.filter-value")
@@ -175,7 +175,7 @@ describe("FilterBuilder component", () => {
 
     // Click the first filter row's button again.
     wrapper
-      .find("button[children='AND']")
+      .find("button.and")
       .first()
       .simulate("click");
 
@@ -187,7 +187,7 @@ describe("FilterBuilder component", () => {
     ).toEqual(["first filter value", "", "second filter value"]);
 
     // Expect the same action was taken on the component's model.
-    expect(wrapper.state().model).toEqual(
+    expect(wrapper.find(FilterBuilder).state().model).toEqual(
       objectContaining({
         children: [
           objectContaining({ value: "first filter value" }),
@@ -201,7 +201,7 @@ describe("FilterBuilder component", () => {
   it("Removes a filter row when the '-' button is clicked.", () => {
     const wrapper = mountFilterBuilder();
 
-    wrapper.find("button[children='AND']").simulate("click");
+    wrapper.find("button.and").simulate("click");
 
     const filterValueInputs = wrapper.find("input.filter-value");
     filterValueInputs
@@ -224,7 +224,7 @@ describe("FilterBuilder component", () => {
       (wrapper.find("input.filter-value").instance() as any).value
     ).toEqual("second filter value");
 
-    expect(wrapper.state().model).toEqual(
+    expect(wrapper.find(FilterBuilder).state().model).toEqual(
       objectContaining({
         children: [objectContaining({ value: "second filter value" })]
       })
@@ -238,14 +238,14 @@ describe("FilterBuilder component", () => {
     wrapper
       .find(FilterRow)
       .at(0)
-      .find("button[children='AND']")
+      .find("button.and")
       .simulate("click");
 
     // Click the second FilterRow's OR button.
     wrapper
       .find(FilterRow)
       .at(1)
-      .find("button[children='OR']")
+      .find("button.or")
       .simulate("click");
 
     // Click the third FilterRow's "-" button.
@@ -256,7 +256,7 @@ describe("FilterBuilder component", () => {
       .simulate("click");
 
     // There should be two filter rows in one AND group.
-    expect(wrapper.state().model).toEqual(
+    expect(wrapper.find(FilterBuilder).state().model).toEqual(
       objectContaining({
         children: [
           objectContaining({ type: "FILTER_ROW" }),
@@ -284,9 +284,7 @@ describe("FilterBuilder component", () => {
     ).toEqual(0);
 
     // Click the filter row's AND button.
-    wrapper
-      .find(".filter-row-buttons button[children='AND']")
-      .simulate("click");
+    wrapper.find(".filter-row-buttons button.and").simulate("click");
 
     // There should be 2 FilterRows, but the surrounding FilterGroup should still have no remove button.
     expect(wrapper.find(FilterRow).length).toEqual(2);
@@ -295,12 +293,10 @@ describe("FilterBuilder component", () => {
     ).toEqual(0);
 
     // Click the FilterGroup's OR button.
-    wrapper
-      .find(".filter-group-buttons button[children='OR']")
-      .simulate("click");
+    wrapper.find(".filter-group-buttons button.or").simulate("click");
 
     // The filter should be "( ( predicate AND predicate ) OR predicate )".
-    expect(wrapper.state().model).toEqual(
+    expect(wrapper.find(FilterBuilder).state().model).toEqual(
       objectContaining({
         children: [
           objectContaining({
@@ -323,14 +319,10 @@ describe("FilterBuilder component", () => {
     const wrapper = mountFilterBuilder();
 
     // Click the filter row's AND button.
-    wrapper
-      .find(".filter-row-buttons button[children='AND']")
-      .simulate("click");
+    wrapper.find(".filter-row-buttons button.and").simulate("click");
 
     // Click the FilterGroup's OR button.
-    wrapper
-      .find(".filter-group-buttons button[children='OR']")
-      .simulate("click");
+    wrapper.find(".filter-group-buttons button.or").simulate("click");
 
     // Remove the inner AND group.
     wrapper
@@ -338,7 +330,7 @@ describe("FilterBuilder component", () => {
       .simulate("click");
 
     // The filter model should be one filter group with one inner filter row.
-    expect(wrapper.state().model).toEqual(
+    expect(wrapper.find(FilterBuilder).state().model).toEqual(
       objectContaining({
         children: [objectContaining({ type: "FILTER_ROW" })],
         type: "FILTER_GROUP"
@@ -357,41 +349,39 @@ describe("FilterBuilder component", () => {
       .first()
       .simulate("change", { target: { value: "first filter value" } });
     expect(onChange).toHaveBeenCalledTimes(1);
-    expect(onChange).lastCalledWith(wrapper.state().model);
+    expect(onChange).lastCalledWith(wrapper.find(FilterBuilder).state().model);
 
     // Click the AND button
-    wrapper
-      .find(".filter-row-buttons button[children='AND']")
-      .simulate("click");
+    wrapper.find(".filter-row-buttons button.and").simulate("click");
     expect(onChange).toHaveBeenCalledTimes(2);
-    expect(onChange).lastCalledWith(wrapper.state().model);
+    expect(onChange).lastCalledWith(wrapper.find(FilterBuilder).state().model);
 
     // Click the OR button
-    wrapper
-      .find(".filter-group-buttons button[children='OR']")
-      .simulate("click");
+    wrapper.find(".filter-group-buttons button.or").simulate("click");
     await Promise.resolve();
     wrapper.update();
     expect(onChange).toHaveBeenCalledTimes(4);
-    expect(onChange).lastCalledWith(wrapper.state().model);
+    expect(onChange).lastCalledWith(wrapper.find(FilterBuilder).state().model);
 
     // Click the - button
     wrapper
       .find(".filter-group-buttons button[children='-']")
       .simulate("click");
     expect(onChange).toHaveBeenCalledTimes(5);
-    expect(onChange).lastCalledWith(wrapper.state().model);
+    expect(onChange).lastCalledWith(wrapper.find(FilterBuilder).state().model);
   });
 
   it("Resets to the initial state when a null value is passed.", async () => {
     function TestComponent() {
       const [model, setModel] = useState<FilterGroupModel | null>(null);
       return (
-        <FilterBuilder
-          filterAttributes={filterAttributes}
-          onChange={setModel}
-          value={model}
-        />
+        <MockAppContextProvider>
+          <FilterBuilder
+            filterAttributes={filterAttributes}
+            onChange={setModel}
+            value={model}
+          />
+        </MockAppContextProvider>
       );
     }
 

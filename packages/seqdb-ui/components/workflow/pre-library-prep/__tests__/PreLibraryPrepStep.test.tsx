@@ -1,10 +1,7 @@
-import {
-  ApiClientContext,
-  createContextValue,
-  ResourceSelect
-} from "common-ui";
-import { mount } from "enzyme";
+import { ResourceSelect } from "common-ui";
+import { PersistedResource } from "kitsu";
 import NumberFormat from "react-number-format";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   Chain,
   ChainStepTemplate,
@@ -18,29 +15,49 @@ import { PreLibraryPrepStep } from "../PreLibraryPrepStep";
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
-const TEST_SAMPLES: Sample[] = [
-  { id: "1", type: "sample", name: "test sample 1" } as Sample,
-  { id: "2", type: "sample", name: "test sample 2" } as Sample,
-  { id: "3", type: "sample", name: "test sample 3" } as Sample,
-  { id: "4", type: "sample", name: "test sample 4" } as Sample,
-  { id: "5", type: "sample", name: "test sample 5" } as Sample
+const TEST_SAMPLES: Array<PersistedResource<Sample>> = [
+  { id: "1", type: "sample", name: "test sample 1" },
+  { id: "2", type: "sample", name: "test sample 2" },
+  { id: "3", type: "sample", name: "test sample 3" },
+  { id: "4", type: "sample", name: "test sample 4" },
+  { id: "5", type: "sample", name: "test sample 5" }
 ];
 
-const TEST_SAMPLE_STEP_RESOURCES: StepResource[] = [
-  { id: "1", sample: TEST_SAMPLES[0] } as StepResource,
-  { id: "2", sample: TEST_SAMPLES[1] } as StepResource,
-  { id: "3", sample: TEST_SAMPLES[2] } as StepResource,
-  { id: "4", sample: TEST_SAMPLES[3] } as StepResource,
-  { id: "5", sample: TEST_SAMPLES[4] } as StepResource
+const TEST_SAMPLE_STEP_RESOURCES: Array<PersistedResource<StepResource>> = [
+  {
+    id: "1",
+    sample: TEST_SAMPLES[0],
+    type: "stepResource"
+  } as PersistedResource<StepResource>,
+  {
+    id: "2",
+    sample: TEST_SAMPLES[1],
+    type: "stepResource"
+  } as PersistedResource<StepResource>,
+  {
+    id: "3",
+    sample: TEST_SAMPLES[2],
+    type: "stepResource"
+  } as PersistedResource<StepResource>,
+  {
+    id: "4",
+    sample: TEST_SAMPLES[3],
+    type: "stepResource"
+  } as PersistedResource<StepResource>,
+  {
+    id: "5",
+    sample: TEST_SAMPLES[4],
+    type: "stepResource"
+  } as PersistedResource<StepResource>
 ];
 
-const TEST_CHAIN_TEMPLATE: ChainTemplate = {
+const TEST_CHAIN_TEMPLATE: PersistedResource<ChainTemplate> = {
   id: "1",
   name: "WGS",
   type: "chainTemplate"
 };
 
-const TEST_CHAIN: Chain = {
+const TEST_CHAIN: PersistedResource<Chain> = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
   dateCreated: "2019-01-01",
   id: "1",
@@ -49,20 +66,24 @@ const TEST_CHAIN: Chain = {
 };
 
 /** This is the first step in the chain that precedes this one. */
-const TEST_SAMPLE_SELECTION_CHAIN_STEP_TEMPLATE: ChainStepTemplate = {
+const TEST_SAMPLE_SELECTION_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
   id: "1",
   stepNumber: 1,
-  stepTemplate: { id: "1", type: "stepTemplate" } as StepTemplate,
+  stepTemplate: { id: "1", type: "stepTemplate" } as PersistedResource<
+    StepTemplate
+  >,
   type: "chainStepTemplate"
 };
 
 /** This is the second and current step in the chain. */
-const TEST_PRE_LIBRARY_PREP_CHAIN_STEP_TEMPLATE: ChainStepTemplate = {
+const TEST_PRE_LIBRARY_PREP_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
   id: "2",
   stepNumber: 2,
-  stepTemplate: { id: "2", type: "stepTemplate" } as StepTemplate,
+  stepTemplate: { id: "2", type: "stepTemplate" } as PersistedResource<
+    StepTemplate
+  >,
   type: "chainStepTemplate"
 };
 
@@ -92,14 +113,12 @@ mockMath.random = () => 0.5;
 global.Math = mockMath;
 
 function getWrapper() {
-  return mount(
-    <ApiClientContext.Provider value={createContextValue()}>
-      <PreLibraryPrepStep
-        chain={TEST_CHAIN}
-        chainStepTemplates={TEST_CHAIN_STEP_TEMPLATES}
-        step={TEST_PRE_LIBRARY_PREP_CHAIN_STEP_TEMPLATE}
-      />
-    </ApiClientContext.Provider>
+  return mountWithAppContext(
+    <PreLibraryPrepStep
+      chain={TEST_CHAIN}
+      chainStepTemplates={TEST_CHAIN_STEP_TEMPLATES}
+      step={TEST_PRE_LIBRARY_PREP_CHAIN_STEP_TEMPLATE}
+    />
   );
 }
 
@@ -177,16 +196,10 @@ describe("PreLibraryPrepStep UI", () => {
     ]);
 
     // The tables should show 'not sheared' and 'no size selection'.
-    expect(wrapper.containsMatchingElement(<div>Not Sheared</div>)).toEqual(
-      true
-    );
-    expect(
-      wrapper.containsMatchingElement(<div>No Size Selection</div>)
-    ).toEqual(true);
-    expect(wrapper.containsMatchingElement(<div>Sheared</div>)).toEqual(false);
-    expect(
-      wrapper.containsMatchingElement(<div>Size Selection Added</div>)
-    ).toEqual(false);
+    expect(wrapper.contains("Not Sheared")).toEqual(true);
+    expect(wrapper.contains("No Size Selection")).toEqual(true);
+    expect(wrapper.contains("Sheared")).toEqual(false);
+    expect(wrapper.contains("Size Selection Added")).toEqual(false);
   });
 
   it("Lets you add shearing details for the checked samples.", async () => {
@@ -299,7 +312,7 @@ describe("PreLibraryPrepStep UI", () => {
               inputAmount: 1234,
               preLibraryPrepType: "SHEARING"
             },
-            id: -100,
+            id: "-100",
             relationships: {
               product: {
                 data: {
@@ -325,7 +338,7 @@ describe("PreLibraryPrepStep UI", () => {
               inputAmount: 1234,
               preLibraryPrepType: "SHEARING"
             },
-            id: -101,
+            id: "-101",
             relationships: {
               product: {
                 data: {
@@ -351,7 +364,7 @@ describe("PreLibraryPrepStep UI", () => {
               inputAmount: 1234,
               preLibraryPrepType: "SHEARING"
             },
-            id: -102,
+            id: "-102",
             relationships: {
               product: {
                 data: {
@@ -385,7 +398,7 @@ describe("PreLibraryPrepStep UI", () => {
               type: "INPUT",
               value: "SHEARING"
             },
-            id: -100,
+            id: "-100",
             relationships: {
               chain: {
                 data: {
@@ -423,7 +436,7 @@ describe("PreLibraryPrepStep UI", () => {
               type: "INPUT",
               value: "SHEARING"
             },
-            id: -101,
+            id: "-101",
             relationships: {
               chain: {
                 data: {
@@ -461,7 +474,7 @@ describe("PreLibraryPrepStep UI", () => {
               type: "INPUT",
               value: "SHEARING"
             },
-            id: -102,
+            id: "-102",
             relationships: {
               chain: {
                 data: {
@@ -643,7 +656,7 @@ describe("PreLibraryPrepStep UI", () => {
               inputAmount: 4321,
               preLibraryPrepType: "SHEARING"
             },
-            id: -100,
+            id: "-100",
             type: "preLibraryPrep"
           }
         }
@@ -663,7 +676,7 @@ describe("PreLibraryPrepStep UI", () => {
               type: "INPUT",
               value: "SHEARING"
             },
-            id: -100,
+            id: "-100",
             relationships: {
               chain: {
                 data: {
@@ -824,18 +837,10 @@ describe("PreLibraryPrepStep UI", () => {
     const rows = wrapper.find(".rt-tr");
 
     // Row 1 should be sheared but not size selected. Row 2 should be size selected but not sheared.
-    expect(rows.at(1).containsMatchingElement(<div>Sheared</div>)).toEqual(
-      true
-    );
-    expect(
-      rows.at(1).containsMatchingElement(<div>No Size Selection</div>)
-    ).toEqual(true);
-    expect(rows.at(2).containsMatchingElement(<div>Not Sheared</div>)).toEqual(
-      true
-    );
-    expect(
-      rows.at(2).containsMatchingElement(<div>Size Selection Added</div>)
-    ).toEqual(true);
+    expect(rows.at(1).contains("Sheared")).toEqual(true);
+    expect(rows.at(1).contains("No Size Selection")).toEqual(true);
+    expect(rows.at(2).contains("Not Sheared")).toEqual(true);
+    expect(rows.at(2).contains("Size Selection Added")).toEqual(true);
   });
 
   it("Lets you delete selected shearing or size selection stepResources.", async () => {

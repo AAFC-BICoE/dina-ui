@@ -1,4 +1,5 @@
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 
 export type PreLibPrepViewMode =
   | "EDIT"
@@ -10,17 +11,19 @@ interface ViewModeSelectorProps {
   onChange: (newMode: PreLibPrepViewMode) => void;
 }
 
-const modes: Array<{ label: string; mode: PreLibPrepViewMode }> = [
-  { label: "Edit", mode: "EDIT" },
-  { label: "Shearing Details", mode: "SHEARING_DETAILS" },
-  { label: "Size Selection Details", mode: "SIZE_SELECTION_DETAILS" }
-];
-
 /** View mode selector for the Pre Lib Prep page. */
 export function PreLibPrepViewModeSelector({
   onChange,
   viewMode
 }: ViewModeSelectorProps) {
+  const { formatMessage } = useSeqdbIntl();
+
+  const modes: Array<{ label: string; mode: PreLibPrepViewMode }> = [
+    { label: formatMessage("plpEditModeLabel"), mode: "EDIT" },
+    { label: formatMessage("plpShearingModeLabel"), mode: "SHEARING_DETAILS" },
+    { label: formatMessage("plpSizeModeLabel"), mode: "SIZE_SELECTION_DETAILS" }
+  ];
+
   const selectedIndex = modes.findIndex(({ mode }) => viewMode === mode);
 
   function onSelect(tabIndex: number) {
@@ -30,7 +33,9 @@ export function PreLibPrepViewModeSelector({
 
   return (
     <>
-      <strong className="d-inline-bloc">View mode: </strong>
+      <strong className="d-inline-bloc">
+        <SeqdbMessage id="plpViewModeSelectorLabel" />
+      </strong>
       <Tabs
         selectedIndex={selectedIndex}
         onSelect={onSelect}

@@ -1,5 +1,5 @@
 import { Field, FieldProps } from "formik";
-import { KitsuResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
 import { noop } from "lodash";
 import {
   ResourceSelect,
@@ -7,10 +7,12 @@ import {
 } from "../resource-select/ResourceSelect";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
-export interface ResourceSelectFieldProps<TData>
+export interface ResourceSelectFieldProps<TData extends KitsuResource>
   extends Omit<ResourceSelectProps<TData>, "value">,
     LabelWrapperParams {
-  onChange?: (value?: TData | TData[]) => void;
+  onChange?: (
+    value?: PersistedResource<TData> | Array<PersistedResource<TData>>
+  ) => void;
   initialValue?: any;
 }
 
@@ -51,7 +53,7 @@ export function ResourceSelectField<TData extends KitsuResource>(
             <ResourceSelect
               {...topLevelProps}
               onChange={onChangeInternal}
-              value={initialValue ? initialValue : value}
+              value={value ? value : initialValue}
             />
           </FieldWrapper>
         );

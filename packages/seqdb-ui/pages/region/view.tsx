@@ -10,14 +10,16 @@ import {
   Head,
   Nav
 } from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { Region } from "../../types/seqdb-api/resources/Region";
 
 export function RegionDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
+  const { formatMessage } = useSeqdbIntl();
 
   return (
     <div>
-      <Head title="Gene Region" />
+      <Head title={formatMessage("regionViewTitle")} />
       <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="region" />
@@ -26,7 +28,9 @@ export function RegionDetailsPage({ router }: WithRouterProps) {
       <Query<Region> query={{ path: `region/${id}` }}>
         {({ loading, response }) => (
           <div className="container-fluid">
-            <h1>Gene Region Details</h1>
+            <h1>
+              <SeqdbMessage id="regionViewTitle" />
+            </h1>
             <LoadingSpinner loading={loading} />
             {response && (
               <Formik<Region> initialValues={response.data} onSubmit={noop}>

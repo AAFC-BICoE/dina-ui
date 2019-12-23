@@ -1,5 +1,5 @@
 export * from "./api-client/ApiClientContext";
-export * from "./api-client/jsonapi-types";
+export * from "./api-client/operations-types";
 export * from "./api-client/Query";
 export * from "./api-client/useQuery";
 export * from "./formik-connected/DateField";
@@ -12,6 +12,10 @@ export * from "./formik-connected/ResourceSelectField";
 export * from "./formik-connected/SelectField";
 export * from "./formik-connected/SubmitButton";
 export * from "./formik-connected/TextField";
+export * from "./intl/common-ui-en";
+export * from "./intl/common-ui-fr";
+export * from "./intl/IntlSupport";
+export * from "./intl/LanguageSelector";
 export * from "./LabelView";
 export * from "./loading-spinner/LoadingSpinner";
 export * from "./resource-select/ResourceSelect";

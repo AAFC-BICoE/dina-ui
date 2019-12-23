@@ -8,7 +8,11 @@ import { FileDownLoadResponseAttributes } from "types/objectstore-api/resources/
 import { Metadata } from "types/objectstore-api/resources/Metadata";
 import { isArray, isUndefined } from "util";
 import { Head, Nav } from "../../components";
-import { generateManagedAttributesView } from "../../page-fragments/viewManagedAttributes";
+import {
+  ObjectStoreMessage,
+  useObjectStoreIntl
+} from "../../intl/objectstore-intl";
+import { GenerateManagedAttributesView } from "../../page-fragments/viewManagedAttributes";
 import ViewMetadataFormPage from "../../page-fragments/viewMetadata";
 import ViewTagsForm from "../../page-fragments/viewTags";
 
@@ -49,16 +53,19 @@ function useImageQuery(id: string): DownloadFileResponse {
 }
 
 export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
-  const id = router.query.id;
+  const id = router?.query?.id;
   const stringId = isArray(id) ? id[0] : id;
   const { imgResponse } = useImageQuery(stringId);
+  const { formatMessage } = useObjectStoreIntl();
 
   return (
     <div>
-      <Head title="Object Store Detailes Page" />
+      <Head title={formatMessage("objectStoreDetailsTitle")} />
       <Nav />
       <div>
-        <h4>Object Store Details</h4>
+        <h4>
+          <ObjectStoreMessage id="objectStoreDetailsTitle" />
+        </h4>
         <div className="container-fluid">
           <div className="row">
             <div className="col-md-6">
@@ -106,7 +113,9 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
               </div>
             ) : (
               <div className="col-md-5">
-                <p>No File to display</p>
+                <p>
+                  <ObjectStoreMessage id="noFileToDisplay" />
+                </p>
               </div>
             )}
 
@@ -140,9 +149,9 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
                       </div>
                       {response.data[0] &&
                         response.data[0].managedAttribute &&
-                        response.data[0].managedAttribute.map(ma =>
-                          generateManagedAttributesView(ma)
-                        )}
+                        response.data[0].managedAttribute.map(ma => (
+                          <GenerateManagedAttributesView ma={ma} />
+                        ))}
                       <hr
                         style={{
                           borderColor: "black",

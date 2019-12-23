@@ -38,7 +38,7 @@ const managedAttributes = [
 ];
 
 export function DetailEditPage({ router }: WithRouterProps) {
-  const id = router.query.id;
+  const id = router?.query?.id;
   return (
     <div>
       <Head title="Object Store Detailes Edit Page" />
@@ -54,7 +54,7 @@ export function DetailEditPage({ router }: WithRouterProps) {
 }
 
 function DetailEditForm({ router }: DetailEditFormProps) {
-  const id = router.query.id;
+  const id = router?.query?.id;
   const { apiClient } = useContext(ApiClientContext);
   // To force rerender unpon all promises resolved
   // when all the related managed attributes data are returned
