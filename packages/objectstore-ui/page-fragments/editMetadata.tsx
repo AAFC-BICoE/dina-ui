@@ -1,20 +1,21 @@
 import {
   ApiClientContext,
+  DateField,
   ErrorViewer,
   filterBy,
   ResourceSelectField,
+  SelectField,
   serialize,
   SubmitButton,
   TextField
 } from "common-ui";
-import { DateField, SelectField } from "common-ui";
 import { Form, Formik, FormikActions } from "formik";
+import { isArray } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-
-import { isArray } from "lodash";
 import { Agent } from "types/objectstore-api/resources/Agent";
 import { AttributeBuilder } from "../components";
+import { ObjectStoreMessage } from "../intl/objectstore-intl";
 
 export interface EditMetadataFormProps {
   originalFileName: string | string[];
@@ -29,7 +30,9 @@ export function EditMetadataFormPage({
     <div>
       <div className="container-fluid">
         <div>
-          <h5>Metadata</h5>
+          <h5>
+            <ObjectStoreMessage id="metadataFormTitle" />
+          </h5>
           <EditMetadataForm
             originalFileName={originalFileName}
             fileIdentifier={fileIdentifier}
@@ -46,6 +49,7 @@ function EditMetadataForm({
 }: EditMetadataFormProps) {
   const { apiClient } = useContext(ApiClientContext);
   const router = useRouter();
+
   const managedAttributes = [];
   const unManagedAttributes = [
     { name: "unManagedAttribute", value: "unManagedValue" }
@@ -155,7 +159,9 @@ function EditMetadataForm({
         <ErrorViewer />
         <div className="form-group row" style={{ display: "none" }}>
           <label className="col-sm-2 col-form-label">
-            <strong>File Name</strong>
+            <strong>
+              <ObjectStoreMessage id="metadataFilenameLabel" />
+            </strong>
           </label>
           <div className="col">
             <TextField
@@ -169,7 +175,9 @@ function EditMetadataForm({
         </div>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
-            <strong>Stored Object Type</strong>
+            <strong>
+              <ObjectStoreMessage id="metadataObjectTypeLabel" />
+            </strong>
           </label>
           <div className="col">
             <SelectField
@@ -182,7 +190,9 @@ function EditMetadataForm({
         </div>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
-            <strong>First Digital Version Created Date</strong>
+            <strong>
+              <ObjectStoreMessage id="metadataFirstDigitalVersionCreatedDateLabel" />
+            </strong>
           </label>
           <div className="col">
             <DateField
@@ -195,7 +205,9 @@ function EditMetadataForm({
         </div>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
-            <strong>Last Metadata Modification Time</strong>
+            <strong>
+              <ObjectStoreMessage id="metadataLastMetadataModificationTimeLabel" />
+            </strong>
           </label>
           <div className="col">
             <DateField
@@ -208,7 +220,9 @@ function EditMetadataForm({
         </div>
         <div className="form-group row" style={{ display: "none" }}>
           <label className="col-sm-2 col-form-label">
-            <strong>DcFormat</strong>
+            <strong>
+              <ObjectStoreMessage id="metadataDcFormatLabel" />
+            </strong>
           </label>
           <div className="col-sm-6">
             <TextField
@@ -220,7 +234,9 @@ function EditMetadataForm({
         </div>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
-            <strong>Agent(Uploaded By)</strong>
+            <strong>
+              <ObjectStoreMessage id="metadataAgentLabel" />
+            </strong>
           </label>
           <div className="col-sm-6">
             <ResourceSelectField<Agent>
@@ -235,13 +251,17 @@ function EditMetadataForm({
         </div>
         <div className="form-group row">
           <div className="col col-md-6">
-            <h6>Managed Attributes</h6>
+            <h6>
+              <ObjectStoreMessage id="metadataManagedAttributesLabel" />
+            </h6>
             <AttributeBuilder controlledAttributes={managedAttributes} />
           </div>
         </div>
         <div className="form-group row">
           <div className="col-md-4">
-            <h6>Tags</h6>
+            <h6>
+              <ObjectStoreMessage id="metadataTagsLabel" />
+            </h6>
             <AttributeBuilder controlledAttributes={unManagedAttributes} />
           </div>
         </div>

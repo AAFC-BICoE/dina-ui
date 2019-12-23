@@ -7,6 +7,7 @@ import {
   ListPageLayout,
   Nav
 } from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { Region } from "../../types/seqdb-api/resources/Region";
 
 const REGION_TABLE_COLUMNS: Array<ColumnDefinition<Region>> = [
@@ -16,7 +17,6 @@ const REGION_TABLE_COLUMNS: Array<ColumnDefinition<Region>> = [
         <a>{name}</a>
       </Link>
     ),
-    Header: "Name",
     accessor: "name"
   },
   "description",
@@ -26,15 +26,19 @@ const REGION_TABLE_COLUMNS: Array<ColumnDefinition<Region>> = [
 const REGION_FILTER_ATTRIBUTES = ["name", "description", "symbol"];
 
 export default function RegionListPage() {
+  const { formatMessage } = useSeqdbIntl();
+
   return (
     <>
-      <Head title="Gene Regions" />
+      <Head title={formatMessage("regionListTitle")} />
       <Nav />
       <ButtonBar>
-        <CreateButton entityLabel="Gene Region" entityLink="region" />
+        <CreateButton entityLink="region" />
       </ButtonBar>
       <div className="container-fluid">
-        <h1>Gene Regions</h1>
+        <h1>
+          <SeqdbMessage id="regionListTitle" />
+        </h1>
         <ListPageLayout
           filterAttributes={REGION_FILTER_ATTRIBUTES}
           id="region-list"

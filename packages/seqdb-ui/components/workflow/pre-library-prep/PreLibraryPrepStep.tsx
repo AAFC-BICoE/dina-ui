@@ -8,6 +8,7 @@ import { Formik } from "formik";
 import { noop } from "lodash";
 import { useState } from "react";
 import titleCase from "title-case";
+import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Sample, StepResource } from "../../../types/seqdb-api";
 import { rsql } from "../../filter-builder/rsql";
 import { FilterForm } from "../../list-page-layout/FilterForm";
@@ -21,6 +22,8 @@ import { usePreLibraryPrepControls } from "./usePreLibraryPrepControls";
 
 export function PreLibraryPrepStep(props: StepRendererProps) {
   const { chain, chainStepTemplates, step } = props;
+
+  const { formatMessage } = useSeqdbIntl();
 
   const {
     deleteStepResources,
@@ -51,25 +54,31 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
     {
       Cell: ({ original }) => {
         if (plpSrLoading || !original.sample) {
-          return "Loading...";
+          return <SeqdbMessage id="loadingText" />;
         }
 
         const { shearingPrep } = original;
 
         if (shearingPrep) {
           return (
-            <div style={{ backgroundColor: "rgb(222, 252, 222)" }}>Sheared</div>
+            <div style={{ backgroundColor: "rgb(222, 252, 222)" }}>
+              <SeqdbMessage id="shearedStatus" />
+            </div>
           );
         }
-        return <div>Not Sheared</div>;
+        return (
+          <div>
+            <SeqdbMessage id="notShearedStatus" />
+          </div>
+        );
       },
-      Header: "Shearing",
+      Header: formatMessage("shearingLabel"),
       sortable: false
     },
     {
       Cell: ({ original }) => {
         if (plpSrLoading || !original.sample) {
-          return "Loading...";
+          return <SeqdbMessage id="loadingText" />;
         }
 
         const { sizeSelectionPrep } = original;
@@ -77,20 +86,24 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
         if (sizeSelectionPrep) {
           return (
             <div style={{ backgroundColor: "rgb(222, 252, 222)" }}>
-              Size Selection Added
+              <SeqdbMessage id="sizeSelectedStatus" />
             </div>
           );
         }
-        return <div>No Size Selection</div>;
+        return (
+          <div>
+            <SeqdbMessage id="notSizeSelectedStatus" />
+          </div>
+        );
       },
-      Header: "Size Selection",
+      Header: formatMessage("sizeSelectionLabel"),
       sortable: false
     }
   ];
 
   const SAMPLE_STEP_RESOURCE_COLUMNS: Array<ColumnDefinition<StepResource>> = [
     {
-      Header: "Group",
+      Header: formatMessage("field_group.groupName"),
       accessor: "sample.group.groupName"
     },
     "sample.name",
@@ -113,7 +126,9 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
 
   return (
     <>
-      <h2>Shearing/Size Selection</h2>
+      <h2>
+        <SeqdbMessage id="plpStepTitle" />
+      </h2>
       <FilterForm
         filterAttributes={["sample.name"]}
         id="pre-library-prep-step"
@@ -140,7 +155,9 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                     viewMode === "EDIT" ? 6 : 12
                   } selected-samples`}
                 >
-                  <strong>Selected Samples</strong>
+                  <strong>
+                    <SeqdbMessage id="selectedSamplesTitle" />
+                  </strong>
                   <div className="float-right">
                     {formikProps.isSubmitting ? (
                       <LoadingSpinner loading={true} />
@@ -153,7 +170,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                           }
                           type="button"
                         >
-                          Remove selected Shearing details
+                          <SeqdbMessage id="removeShearingDetailsButtonText" />
                         </button>
                         <button
                           className="btn btn-dark remove-size-selection"
@@ -162,7 +179,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                           }
                           type="button"
                         >
-                          Remove selected Size Selection details
+                          <SeqdbMessage id="removeSizeSelectionDetailsButtonText" />
                         </button>
                       </>
                     )}
@@ -188,7 +205,9 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                 </div>
                 {viewMode === "EDIT" && (
                   <div className="col-6">
-                    <strong>Add New Shearing/Size Selection Details</strong>
+                    <strong>
+                      <SeqdbMessage id="plpDetailsFormTitle" />
+                    </strong>
                     {/* Spacer div to align the table with the form. */}
                     <div style={{ height: "22px" }} />
                     <PreLibraryPrepForm onSubmit={onInnerFormSubmit} />

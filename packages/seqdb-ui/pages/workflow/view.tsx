@@ -3,30 +3,41 @@ import { Formik } from "formik";
 import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
-import Link from "next/link";
 import { withRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { Head, Nav } from "../../components";
+import {
+  BackToListButton,
+  ButtonBar,
+  EditButton,
+  Head,
+  Nav
+} from "../../components";
 import { StepRenderer } from "../../components/workflow/StepRenderer";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { Chain } from "../../types/seqdb-api/resources/workflow/Chain";
 import { ChainStepTemplate } from "../../types/seqdb-api/resources/workflow/ChainStepTemplate";
 
 export function WorkflowDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
+  const { formatMessage } = useSeqdbIntl();
 
   return (
     <div>
-      <Head title="NGS Workflow" />
+      <Head title={formatMessage("workflowViewTitle")} />
       <Nav />
+      <ButtonBar>
+        <EditButton entityId={id as string} entityLink="workflow" />
+        <BackToListButton entityLink="workflow" />
+      </ButtonBar>
       <Query<Chain>
         query={{ include: "group,chainTemplate", path: `chain/${id}` }}
       >
         {({ loading, response }) => (
           <div className="container-fluid">
-            <Link href="/workflow/list">
-              <a>NGS Workflow list</a>
-            </Link>
-            <h1>NGS Workflow Details{response && `: ${response.data.name}`}</h1>
+            <h1>
+              {formatMessage("workflowViewTitle")}
+              {response && `: ${response.data.name}`}
+            </h1>
             <LoadingSpinner loading={loading} />
             {response && <WorkflowSteps chain={response.data} />}
           </div>
@@ -53,10 +64,18 @@ function WorkflowSteps({ chain }: { chain: PersistedResource<Chain> }) {
             <LoadingSpinner loading={loading} />
             <Tabs>
               <TabList>
-                <Tab>Details</Tab>
+                <Tab>
+                  <SeqdbMessage id="workflowDetailsTab" />
+                </Tab>
                 {steps.map(step => (
                   <Tab key={step.id}>
-                    Step {step.stepNumber}: {step.stepTemplate.name}
+                    <SeqdbMessage
+                      id="workflowStepTab"
+                      values={{
+                        name: step.stepTemplate.name,
+                        number: step.stepNumber
+                      }}
+                    />
                   </Tab>
                 ))}
               </TabList>

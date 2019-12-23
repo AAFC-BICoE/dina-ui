@@ -13,6 +13,8 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { Head, Nav } from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
+import { Chain } from "../../types/seqdb-api";
 import { Group } from "../../types/seqdb-api/resources/Group";
 
 interface ChainFormProps {
@@ -22,16 +24,19 @@ interface ChainFormProps {
 
 export function ChainEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
+  const { formatMessage } = useSeqdbIntl();
 
   return (
     <div>
-      <Head title="Edit NGS Workflow" />
+      <Head title={formatMessage("editWorkflowTitle")} />
       <Nav />
       <div className="container-fluid">
         {id ? (
           <div>
-            <h1>Edit NGS Workflow</h1>
-            <Query<any>
+            <h1>
+              <SeqdbMessage id="editWorkflowTitle" />
+            </h1>
+            <Query<Chain>
               query={{ include: "chainTemplate,group", path: `workflow/${id}` }}
             >
               {({ loading, response }) => (
@@ -46,7 +51,9 @@ export function ChainEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>Add NGS Workflow</h1>
+            <h1>
+              <SeqdbMessage id="addWorkflowTitle" />
+            </h1>
             <ChainForm router={router} />
           </div>
         )}
