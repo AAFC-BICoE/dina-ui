@@ -136,8 +136,10 @@ function DetailEditForm({ router }: DetailEditFormProps) {
   }
   async function onSubmit(
     submittedValues,
-    { setStatus, setSubmitting }: FormikActions<any>
+    { setStatus, setSubmitting, resetForm }: FormikActions<any>
   ) {
+    const prevSubmitteValues = {};
+    Object.assign(prevSubmitteValues, submittedValues);
     delete submittedValues.managedAttributes;
     delete submittedValues.unManagedAttributes;
     delete submittedValues.managedAttribute;
@@ -206,6 +208,7 @@ function DetailEditForm({ router }: DetailEditFormProps) {
       if (response.data.data) {
         router.push("/media-uploadView/detailView?id=" + id);
       } else {
+        resetForm(prevSubmitteValues);
         setStatus(
           response && response.data
             ? response.data.errors[0].title +
@@ -215,6 +218,7 @@ function DetailEditForm({ router }: DetailEditFormProps) {
         );
       }
     } catch (error) {
+      resetForm(prevSubmitteValues);
       setStatus(error.message);
     }
     setSubmitting(false);
