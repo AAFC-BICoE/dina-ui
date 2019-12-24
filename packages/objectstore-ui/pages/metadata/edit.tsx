@@ -2,6 +2,7 @@ import {
   ApiClientContext,
   LoadingSpinner,
   ResourceSelectField,
+  SaveArgs,
   SubmitButton
 } from "common-ui";
 import { Form, Formik } from "formik";
@@ -10,8 +11,15 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { Head, Nav } from "../../components";
-import { useObjectStoreIntl } from "../../intl/objectstore-intl";
-import { ManagedAttribute, Metadata } from "../../types/objectstore-api";
+import {
+  ObjectStoreMessage,
+  useObjectStoreIntl
+} from "../../intl/objectstore-intl";
+import {
+  ManagedAttribute,
+  ManagedAttributeMap,
+  Metadata
+} from "../../types/objectstore-api";
 
 const HotTable = dynamic(
   async () => (await import("@handsontable/react")).HotTable,
@@ -20,7 +28,6 @@ const HotTable = dynamic(
 
 interface RowData {
   metadata: PersistedResource<Metadata>;
-  metaManagedAttributes: { [uuid: string]: string };
 }
 
 interface FormControls {
@@ -29,7 +36,7 @@ interface FormControls {
 
 export default function EditMetadatasPage() {
   const router = useRouter();
-  const { apiClient } = useContext(ApiClientContext);
+  const { apiClient, save } = useContext(ApiClientContext);
   const { formatMessage } = useObjectStoreIntl();
 
   const DEFAULT_COLUMNS = [
@@ -75,13 +82,14 @@ export default function EditMetadatasPage() {
 
       // TODO there should be a way to request many resources by ID in a single request.
       const metadataPromises = ids.map(id =>
-        apiClient.get<Metadata>(`metadata/${id}`, {})
+        apiClient.get<Metadata>(`metadata/${id}`, {
+          include: "managedAttributeMap"
+        })
       );
 
       const metadataResponses = await Promise.all(metadataPromises);
       setTableData(
         metadataResponses.map<RowData>(res => ({
-          metaManagedAttributes: {},
           metadata: res.data
         }))
       );
@@ -90,24 +98,38 @@ export default function EditMetadatasPage() {
 
   async function onSubmit() {
     try {
-      for (const row of tableData || []) {
-        const { metadata } = row;
-        await apiClient.patch("metadata", metadata);
-      }
+      const editedMetadatas = (tableData || []).map<SaveArgs>(row => ({
+        resource: { ...row.metadata, managedAttributeMap: null },
+        type: "metadata"
+      }));
 
-      // TODO handle managed attributes in bulk
+      const editedmanagedAttributeMaps = (tableData || []).map<SaveArgs>(
+        row => ({
+          resource: {
+            ...(row.metadata.managedAttributeMap as ManagedAttributeMap),
+            metadata: row.metadata
+          } as ManagedAttributeMap,
+          type: "managed-attribute-map"
+        })
+      );
+
+      editedmanagedAttributeMaps.forEach(saveArg => delete saveArg.resource.id);
+
+      await save([...editedMetadatas, ...editedmanagedAttributeMaps]);
 
       await router.push("/object/list");
     } catch (err) {
-      alert(JSON.stringify(err));
+      alert(err.message);
     }
   }
 
   return (
     <div className="container-fluid">
-      <Head />
+      <Head title={formatMessage("metadataBulkEditTitle")} />
       <Nav />
-      <h2>Edit Metadata</h2>
+      <h2>
+        <ObjectStoreMessage id="metadataBulkEditTitle" />
+      </h2>
       <div className="form-group">
         <Formik<FormControls>
           initialValues={{
@@ -119,7 +141,7 @@ export default function EditMetadatasPage() {
             const columns = [
               ...DEFAULT_COLUMNS,
               ...controlsForm.values.editableManagedAttributes.map(attr => ({
-                data: `metaManagedAttributes.${attr.id}`,
+                data: `metadata.managedAttributeMap.values.${attr.id}.value`,
                 title: attr.name
               }))
             ];

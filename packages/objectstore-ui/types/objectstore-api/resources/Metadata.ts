@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { Agent } from "./Agent";
-import { MetaManagedAttribute } from "./MetaManagedAttribute";
+import { ManagedAttributeMap } from "./ManagedAttributeMap";
 
 export interface MetadataAttributes {
   type: "metadata";
@@ -22,7 +22,9 @@ export interface MetadataAttributes {
 
 export interface MetadataRelationships {
   acMetadataCreator?: Agent;
-  managedAttribute?: MetaManagedAttribute;
+  managedAttributeMap?: ManagedAttributeMap;
 }
 
-export type Metadata = KitsuResource & MetadataAttributes;
+export type Metadata = KitsuResource &
+  MetadataAttributes &
+  MetadataRelationships;

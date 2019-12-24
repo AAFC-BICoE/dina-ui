@@ -19,7 +19,7 @@ describe("MediaUploadView test", () => {
     );
     const rootDiv = container.querySelector("div#dndRoot");
     expect(rootDiv).toHaveProperty("style.border-color");
-    expect(rootDiv.querySelector("div.container>input")).toHaveProperty(
+    expect(rootDiv?.querySelector("div.container>input")).toHaveProperty(
       "multiple"
     );
   });
@@ -36,7 +36,7 @@ describe("MediaUploadView test", () => {
     dispatchEvt(dropzone, "drop", event);
     await flushPromises(ui, container);
     expect(
-      container.querySelector("div.rt-tbody div.rt-td").innerHTML
+      container.querySelector("div.rt-tbody div.rt-td")?.innerHTML
     ).toContain("file1.pdf");
   });
 });
@@ -51,7 +51,7 @@ function createFile(name, size, type) {
   return file;
 }
 
-function createDtWithFiles(files = []) {
+function createDtWithFiles(files: File[] = []) {
   return {
     dataTransfer: {
       files,

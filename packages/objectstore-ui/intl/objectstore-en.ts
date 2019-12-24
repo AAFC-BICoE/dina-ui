@@ -13,6 +13,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   metadataAgentLabel: "Agent (Uploaded By)",
   metadataBucketNameLabel: "Bucket Name",
   metadataBulkEditTagsLabel: "Tags (Comma-separated)",
+  metadataBulkEditTitle: "Edit Metadata",
   metadataDcFormatLabel: "DcFormat",
   metadataFileExtensionLabel: "File Extension",
   metadataFileIdentifierLabel: "File Identifier",

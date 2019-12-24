@@ -19,7 +19,7 @@ describe("MediaUploadView test", () => {
     );
     const rootDiv = container.querySelector("div#dndRoot");
     expect(rootDiv).toHaveProperty("style.border-color");
-    expect(rootDiv.querySelector("div.root>input")).toHaveProperty("multiple");
+    expect(rootDiv?.querySelector("div.root>input")).toHaveProperty("multiple");
   });
 
   it("When dropped the files, page shows file names", async () => {
@@ -47,7 +47,7 @@ function createFile(name, size, type) {
   return file;
 }
 
-function createDtWithFiles(files = []) {
+function createDtWithFiles(files: File[] = []) {
   return {
     dataTransfer: {
       files,
