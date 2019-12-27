@@ -37,7 +37,7 @@ export class AttributeRow extends React.Component<AttributeRowProps> {
         {controlledAttributes &&
         controlledAttributes[0] &&
         controlledAttributes[0].name &&
-        controlledAttributes[0].name === "unManagedAttribute" ? (
+        controlledAttributes[0].name === "unManaged" ? (
           <div className="list-inline-item" style={{ width: 180 }}>
             <TextField name={`assignedValue_un${model.id}`} hideLabel={true} />
           </div>

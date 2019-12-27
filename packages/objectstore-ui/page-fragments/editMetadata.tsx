@@ -16,6 +16,7 @@ import { useContext } from "react";
 import { Agent } from "types/objectstore-api/resources/Agent";
 import { AttributeBuilder } from "../components";
 import { ObjectStoreMessage } from "../intl/objectstore-intl";
+import { generateManagedAttributeValue } from "../utils/metaUtils";
 
 export interface EditMetadataFormProps {
   originalFileName: string | string[];
@@ -51,9 +52,7 @@ function EditMetadataForm({
   const router = useRouter();
 
   const managedAttributes = [];
-  const unManagedAttributes = [
-    { name: "unManagedAttribute", value: "unManagedValue" }
-  ];
+  const unManagedAttributes = [{ name: "unManaged", value: "unManaged" }];
   async function onSubmit(
     submittedValues,
     { setStatus, setSubmitting }: FormikActions<any>
@@ -73,7 +72,11 @@ function EditMetadataForm({
       }
       // this will be replaced by config?
       submittedValues.bucket = "mybucket";
-      generateManagedAttributeValue(metaManagedAttributes, submittedValues);
+      generateManagedAttributeValue(
+        metaManagedAttributes,
+        submittedValues,
+        undefined
+      );
       const config = {
         headers: {
           "Content-Type": "application/vnd.api+json",
@@ -101,7 +104,11 @@ function EditMetadataForm({
         router.push("/media-uploadView/detailView?id=" + fileIdentifier);
       } else {
         setStatus(
-          response.data.errors[0].title + ": " + response.data.errors[0].detail
+          response && response.data
+            ? response.data.errors[0].title +
+                ": " +
+                response.data.errors[0].detail
+            : "Response or response.data is null!"
         );
       }
     } catch (error) {
@@ -110,48 +117,13 @@ function EditMetadataForm({
     setSubmitting(false);
   }
 
-  function generateManagedAttributeValue(
-    metaManagedAttributes,
-    submittedValues
-  ) {
-    const acTags = new Set();
-    for (const x in submittedValues) {
-      if (/^key_/.test(x) && submittedValues["assignedValue" + x.substr(4)]) {
-        const metaManagedAttribute = {
-          attributes: {
-            assignedValue: submittedValues["assignedValue" + x.substr(4)]
-          },
-          relationships: {
-            managedAttribute: {
-              data: submittedValues[x]
-            },
-            objectStoreMetadata: {
-              data: {
-                id: "variable",
-                type: "metadata"
-              }
-            }
-          },
-          type: "metadata-managed-attribute"
-        };
-        metaManagedAttributes.push(metaManagedAttribute);
-        delete submittedValues[x];
-        delete submittedValues["assignedValue" + x.substr(4)];
-      } else if (/^assignedValue_un/.test(x) && submittedValues[x]) {
-        acTags.add(submittedValues[x]);
-        delete submittedValues[x];
-      }
-    }
-    if (acTags.size > 0) {
-      submittedValues.acTags = acTags;
-    }
-  }
   return (
     <Formik
       initialValues={{ customButtonName: "Save Metadata" }}
       onSubmit={onSubmit}
     >
       <Form>
+        <ErrorViewer />
         <div className="form-group row" style={{ display: "none" }}>
           <label className="col-sm-2 col-form-label">
             <strong>
@@ -261,7 +233,6 @@ function EditMetadataForm({
           </div>
         </div>
         <SubmitButton />
-        <ErrorViewer />
       </Form>
     </Formik>
   );
