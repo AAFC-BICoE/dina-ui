@@ -1,5 +1,9 @@
-import axios from "axios";
-import { ApiClientContext, ErrorViewer, SubmitButton } from "common-ui";
+import {
+  ApiClientContext,
+  ErrorViewer,
+  SaveArgs,
+  SubmitButton
+} from "common-ui";
 import { Form, Formik, FormikActions } from "formik";
 import { useRouter } from "next/router";
 import { useContext, useMemo } from "react";
@@ -11,7 +15,7 @@ import {
   useObjectStoreIntl
 } from "../intl/objectstore-intl";
 
-interface FileUploadResponse {
+export interface FileUploadResponse {
   fileName: string;
   fileType: string;
   size: string;
@@ -50,7 +54,7 @@ const BUCKET_NAME = "mybucket";
 export default function UploadPage() {
   const router = useRouter();
   const { formatMessage } = useObjectStoreIntl();
-  const { apiClient } = useContext(ApiClientContext);
+  const { apiClient, save } = useContext(ApiClientContext);
 
   const {
     getRootProps,
@@ -76,7 +80,7 @@ export default function UploadPage() {
   async function onSubmit(_, { setStatus, setSubmitting }: FormikActions<any>) {
     setStatus(null);
     try {
-      // Upload each file in a separate request, then create each metadata in a separate request.
+      // Upload each file in a separate request, then create the metadatas in a transaction.
       // TODO: Do all of this in a single transaction.
 
       const uploadResponses: FileUploadResponse[] = [];
@@ -86,31 +90,32 @@ export default function UploadPage() {
         formData.append("file", file);
 
         // Upload the file:
-        const response = await axios({
-          data: formData,
-          method: "post",
-          url: `/api/v1/file/${BUCKET_NAME}`
-        });
+        const response = await apiClient.axios.post(
+          `/v1/file/${BUCKET_NAME}`,
+          formData
+        );
         uploadResponses.push(response.data);
       }
 
-      const newMetadatas: Metadata[] = [];
-      for (const uploadResponse of uploadResponses) {
-        const metadataInput: Partial<Metadata> = {
+      const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(res => ({
+        resource: {
           bucket: BUCKET_NAME,
           dcType: "Image",
-          fileIdentifier: uploadResponse.fileName,
+          fileExtension: "",
+          fileIdentifier: res.fileName,
           type: "metadata",
           uuid: ""
-        };
-        const newMetadata = (await apiClient.post("metadata", metadataInput))
-          .data;
-        newMetadatas.push(newMetadata);
-      }
+        },
+        type: "metadata"
+      }));
+
+      const saveResults = await save(saveOperations);
+
+      const ids = saveResults.map(res => res.id).join(",");
 
       router.push({
         pathname: "/metadata/edit",
-        query: { ids: newMetadatas.map(metadata => metadata.id).join(",") }
+        query: { ids }
       });
     } catch (err) {
       setStatus(err.message);
@@ -143,7 +148,7 @@ export default function UploadPage() {
             <Formik initialValues={{}} onSubmit={onSubmit}>
               <Form>
                 <ErrorViewer />
-                <SubmitButton>Upload File</SubmitButton>
+                <SubmitButton>Upload</SubmitButton>
               </Form>
             </Formik>
           ) : null}

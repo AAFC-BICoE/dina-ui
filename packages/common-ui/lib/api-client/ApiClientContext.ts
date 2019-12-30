@@ -23,6 +23,16 @@ export interface ApiClientContextI {
   ) => Promise<Array<PersistedResource<KitsuResource>>>;
 }
 
+/** Config for creating an API client context value. */
+export interface ApiClientContextConfig {
+  /**
+   * Temp ID iterator.
+   * This is not persisted on the back-end as the actual database ID.
+   * The generated ID should be in the back-end's expected format (e.g. number or UUID).
+   */
+  getTempIdGenerator?: () => () => string;
+}
+
 /** save function args. */
 export interface SaveArgs<T extends KitsuResource = KitsuResource> {
   resource: T;
@@ -41,7 +51,12 @@ export const ApiClientContext = React.createContext<ApiClientContextI>(
  * Creates the value of the API client context. The app should only need to call this function
  * once to initialize the context.
  */
-export function createContextValue(): ApiClientContextI {
+export function createContextValue({
+  getTempIdGenerator = () => {
+    let idIterator = -100;
+    return () => String(idIterator--);
+  }
+}: ApiClientContextConfig = {}): ApiClientContextI {
   const apiClient = new Kitsu({
     baseURL: "/api",
     headers: { "Crnk-Compact": "true" },
@@ -91,7 +106,8 @@ export function createContextValue(): ApiClientContextI {
     const serialized = await Promise.all(serializePromises);
 
     // Temp ID iterator. This is not persisted on the back-end as the actual database ID.
-    let idIterator = -100;
+    const generateId = getTempIdGenerator();
+    const idIterator = -100;
 
     // Create the jsonpatch oeprations objects.
     const operations = serialized.map<Operation>(jsonapiResource => ({
@@ -101,7 +117,7 @@ export function createContextValue(): ApiClientContextI {
         : jsonapiResource.type,
       value: {
         ...jsonapiResource,
-        id: String(jsonapiResource.id || idIterator--)
+        id: String(jsonapiResource.id || generateId())
       }
     }));
 
