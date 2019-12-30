@@ -21,6 +21,11 @@ export interface ApiClientContextI {
   save: (
     saveArgs: SaveArgs[]
   ) => Promise<Array<PersistedResource<KitsuResource>>>;
+
+  /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
+  bulkGet: <T extends KitsuResource>(
+    paths: string[]
+  ) => Promise<Array<PersistedResource<T>>>;
 }
 
 /** Config for creating an API client context value. */
@@ -107,7 +112,6 @@ export function createContextValue({
 
     // Temp ID iterator. This is not persisted on the back-end as the actual database ID.
     const generateId = getTempIdGenerator();
-    const idIterator = -100;
 
     // Create the jsonpatch oeprations objects.
     const operations = serialized.map<Operation>(jsonapiResource => ({
@@ -134,8 +138,29 @@ export function createContextValue({
     return kitsuResources;
   }
 
+  /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
+  async function bulkGet<T extends KitsuResource>(paths: string[]) {
+    const generateId = getTempIdGenerator();
+
+    const getOperations = paths.map<Operation>(path => ({
+      op: "GET",
+      path,
+      // Crnk requires the "id" and "type" but does nothing with them.
+      value: { id: generateId(), type: "" }
+    }));
+
+    const responses = await doOperations(getOperations);
+
+    const resources: Array<PersistedResource<T>> = (
+      await Promise.all(responses.map(deserialise))
+    ).map(res => res.data);
+
+    return resources;
+  }
+
   return {
     apiClient,
+    bulkGet,
     doOperations,
     save
   };

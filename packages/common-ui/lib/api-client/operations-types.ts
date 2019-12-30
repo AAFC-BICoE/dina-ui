@@ -11,7 +11,7 @@ export interface FailedOperation extends DocWithErrors {
 }
 
 /** HTTP verb used to specify a jsonpatch operation type. */
-export type OperationVerb = "POST" | "PATCH" | "DELETE";
+export type OperationVerb = "GET" | "POST" | "PATCH" | "DELETE";
 
 /**
  * A jsonpatch operation.
@@ -21,7 +21,7 @@ export type OperationVerb = "POST" | "PATCH" | "DELETE";
 export interface Operation {
   op: OperationVerb;
   path: string;
-  value?: ResourceObject;
+  value: ResourceObject;
 }
 
 /**

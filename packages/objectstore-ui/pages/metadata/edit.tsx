@@ -10,8 +10,9 @@ import {
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { PersistedResource } from "kitsu";
+import { noop } from "lodash";
 import { useRouter } from "next/router";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { Head, Nav } from "../../components";
 import {
   ObjectStoreMessage,
@@ -25,7 +26,7 @@ import {
 } from "../../types/objectstore-api";
 
 /** Editable row data */
-interface RowData {
+interface BulkMetadataEditRow {
   acTags: string;
   acMetadataCreator: string;
   metadata: PersistedResource<Metadata>;
@@ -37,7 +38,7 @@ interface FormControls {
 
 export default function EditMetadatasPage() {
   const router = useRouter();
-  const { apiClient, save } = useContext(ApiClientContext);
+  const { bulkGet, save } = useContext(ApiClientContext);
   const { formatMessage } = useObjectStoreIntl();
   const resourceSelectCell = useResourceSelectCells();
 
@@ -82,69 +83,54 @@ export default function EditMetadatasPage() {
   const idsQuery = String(router.query.ids);
   const ids = idsQuery.split(",");
 
-  const [tableData, setTableData] = useState<RowData[] | null>(null);
+  if (!idsQuery) {
+    return <LoadingSpinner loading={true} />;
+  }
 
-  useEffect(() => {
-    (async () => {
-      if (!router.query.ids) {
-        return;
-      }
+  async function loadData() {
+    const metadatas = await bulkGet<Metadata>(
+      ids.map(
+        id => `metadata/${id}?include=acMetadataCreator,managedAttributeMap`
+      )
+    );
 
-      // TODO there should be a way to request many resources by ID in a single request.
-      const metadataPromises = ids.map(id =>
-        apiClient.get<Metadata>(`metadata/${id}`, {
-          include: "acMetadataCreator,managedAttributeMap"
-        })
-      );
+    const newTableData = metadatas.map<BulkMetadataEditRow>(metadata => ({
+      acMetadataCreator: encodeResourceCell(metadata.acMetadataCreator, {
+        label: metadata.acMetadataCreator?.displayName
+      }),
+      acTags: metadata.acTags?.join(", ") ?? "",
+      metadata
+    }));
 
-      const metadataResponses = await Promise.all(metadataPromises);
+    return newTableData;
+  }
 
-      const newTableData = metadataResponses.map<RowData>(res => ({
-        acMetadataCreator: encodeResourceCell(res.data.acMetadataCreator, {
-          label: res.data.acMetadataCreator?.displayName
-        }),
-        acTags: res.data.acTags?.join(", ") ?? "",
-        metadata: res.data
-      }));
+  async function onSubmit(tableData: BulkMetadataEditRow[]) {
+    const editedMetadatas = tableData.map<SaveArgs<Metadata>>(row => ({
+      resource: {
+        ...row.metadata,
+        acMetadataCreator: decodeResourceCell(row.acMetadataCreator) as Agent,
+        acTags: row.acTags.split(",").map(t => t.trim()),
+        managedAttributeMap: null
+      },
+      type: "metadata"
+    }));
 
-      setTableData(newTableData);
-    })();
-  }, [idsQuery]);
+    const editedManagedAttributeMaps = tableData.map<
+      SaveArgs<ManagedAttributeMap>
+    >(row => ({
+      resource: {
+        ...(row.metadata.managedAttributeMap as ManagedAttributeMap),
+        metadata: row.metadata
+      },
+      type: "managed-attribute-map"
+    }));
 
-  async function onSubmit() {
-    try {
-      const editedMetadatas = (tableData || []).map<SaveArgs<Metadata>>(
-        row => ({
-          resource: {
-            ...row.metadata,
-            acMetadataCreator: decodeResourceCell(
-              row.acMetadataCreator
-            ) as Agent,
-            acTags: row.acTags.split(",").map(t => t.trim()),
-            managedAttributeMap: null
-          },
-          type: "metadata"
-        })
-      );
+    editedManagedAttributeMaps.forEach(saveArg => delete saveArg.resource.id);
 
-      const editedManagedAttributeMaps = (tableData || []).map<
-        SaveArgs<ManagedAttributeMap>
-      >(row => ({
-        resource: {
-          ...(row.metadata.managedAttributeMap as ManagedAttributeMap),
-          metadata: row.metadata
-        },
-        type: "managed-attribute-map"
-      }));
+    await save([...editedMetadatas, ...editedManagedAttributeMaps]);
 
-      editedManagedAttributeMaps.forEach(saveArg => delete saveArg.resource.id);
-
-      await save([...editedMetadatas, ...editedManagedAttributeMaps]);
-
-      await router.push("/object/list");
-    } catch (err) {
-      alert(err.message);
-    }
+    await router.push("/object/list");
   }
 
   return (
@@ -159,7 +145,7 @@ export default function EditMetadatasPage() {
           initialValues={{
             editableManagedAttributes: []
           }}
-          onSubmit={onSubmit}
+          onSubmit={noop}
         >
           {controlsForm => {
             const columns = [
@@ -180,11 +166,11 @@ export default function EditMetadatasPage() {
                   model="managed-attribute"
                   optionLabel={attr => attr.name}
                 />
-                {tableData ? (
-                  <BulkDataEditor columns={columns} data={tableData} />
-                ) : (
-                  <LoadingSpinner loading={true} />
-                )}
+                <BulkDataEditor
+                  columns={columns}
+                  loadData={loadData}
+                  onSubmit={onSubmit}
+                />
               </Form>
             );
           }}

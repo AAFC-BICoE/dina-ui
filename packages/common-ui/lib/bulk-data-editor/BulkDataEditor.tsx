@@ -1,10 +1,19 @@
+import { FormikActions } from "formik";
 import { GridSettings } from "handsontable";
 import dynamic from "next/dynamic";
-import { SubmitButton } from "../formik-connected/SubmitButton";
+import { useEffect, useState } from "react";
+import { FormikButton } from "../formik-connected/FormikButton";
+import { CommonMessage } from "../intl/common-ui-intl";
+import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 
 export interface BulkDataEditorProps<TRow> {
   columns: GridSettings[];
-  data: TRow[];
+  loadData: () => Promise<TRow[]>;
+  onSubmit: (
+    data: TRow[],
+    formikValues: any,
+    formikActions: FormikActions<any>
+  ) => Promise<void>;
 }
 
 export const BulkDataEditor = dynamic(
@@ -15,16 +24,38 @@ export const BulkDataEditor = dynamic(
 
     return function BulkDataEditorComponent<TRow>({
       columns,
-      data
+      loadData,
+      onSubmit
     }: BulkDataEditorProps<TRow>) {
+      const [tableData, setTableData] = useState<TRow[]>();
+
+      // Load the data once after mount:
+      useEffect(() => {
+        (async () => {
+          const loadedData = await loadData();
+          setTableData(loadedData);
+        })();
+      }, []);
+
+      if (!tableData) {
+        return <LoadingSpinner loading={true} />;
+      }
+
       return (
         <>
           <HotTable
             columns={columns}
-            data={data as any[]}
+            data={tableData as any}
             manualColumnResize={true}
           />
-          <SubmitButton />
+          <FormikButton
+            className="btn btn-primary"
+            onClick={(formikValues, formikActions) =>
+              onSubmit(tableData, formikValues, formikActions)
+            }
+          >
+            <CommonMessage id="submitBtnText" />
+          </FormikButton>
         </>
       );
     };

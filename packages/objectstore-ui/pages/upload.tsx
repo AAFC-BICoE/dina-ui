@@ -1,10 +1,11 @@
 import {
   ApiClientContext,
   ErrorViewer,
+  safeSubmit,
   SaveArgs,
   SubmitButton
 } from "common-ui";
-import { Form, Formik, FormikActions } from "formik";
+import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 import { useContext, useMemo } from "react";
 import { useDropzone } from "react-dropzone";
@@ -77,50 +78,44 @@ export default function UploadPage() {
     [isDragActive, isDragReject]
   );
 
-  async function onSubmit(_, { setStatus, setSubmitting }: FormikActions<any>) {
-    setStatus(null);
-    try {
-      // Upload each file in a separate request, then create the metadatas in a transaction.
-      // TODO: Do all of this in a single transaction.
+  async function onSubmit() {
+    // Upload each file in a separate request, then create the metadatas in a transaction.
+    // TODO: Do all of this in a single transaction.
 
-      const uploadResponses: FileUploadResponse[] = [];
-      for (const file of acceptedFiles) {
-        // Wrap the file in a FormData:
-        const formData = new FormData();
-        formData.append("file", file);
+    const uploadResponses: FileUploadResponse[] = [];
+    for (const file of acceptedFiles) {
+      // Wrap the file in a FormData:
+      const formData = new FormData();
+      formData.append("file", file);
 
-        // Upload the file:
-        const response = await apiClient.axios.post(
-          `/v1/file/${BUCKET_NAME}`,
-          formData
-        );
-        uploadResponses.push(response.data);
-      }
-
-      const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(res => ({
-        resource: {
-          bucket: BUCKET_NAME,
-          dcType: "Image",
-          fileExtension: "",
-          fileIdentifier: res.fileName,
-          type: "metadata",
-          uuid: ""
-        },
-        type: "metadata"
-      }));
-
-      const saveResults = await save(saveOperations);
-
-      const ids = saveResults.map(res => res.id).join(",");
-
-      router.push({
-        pathname: "/metadata/edit",
-        query: { ids }
-      });
-    } catch (err) {
-      setStatus(err.message);
+      // Upload the file:
+      const response = await apiClient.axios.post(
+        `/v1/file/${BUCKET_NAME}`,
+        formData
+      );
+      uploadResponses.push(response.data);
     }
-    setSubmitting(false);
+
+    const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(res => ({
+      resource: {
+        bucket: BUCKET_NAME,
+        dcType: "Image",
+        fileExtension: "",
+        fileIdentifier: res.fileName,
+        type: "metadata",
+        uuid: ""
+      },
+      type: "metadata"
+    }));
+
+    const saveResults = await save(saveOperations);
+
+    const ids = saveResults.map(res => res.id).join(",");
+
+    router.push({
+      pathname: "/metadata/edit",
+      query: { ids }
+    });
   }
 
   return (
@@ -145,7 +140,7 @@ export default function UploadPage() {
             ))}
           </ul>
           {acceptedFiles.length ? (
-            <Formik initialValues={{}} onSubmit={onSubmit}>
+            <Formik initialValues={{}} onSubmit={safeSubmit(onSubmit)}>
               <Form>
                 <ErrorViewer />
                 <SubmitButton>Upload</SubmitButton>
