@@ -4,6 +4,10 @@ import { Form, Formik, FormikActions } from "formik";
 import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Head, Nav } from "../../components";
+import {
+  ObjectStoreMessage,
+  useObjectStoreIntl
+} from "../../intl/objectstore-intl";
 import { EditMetadataFormPage } from "../../page-fragments/editMetadata";
 
 interface FileUploadResponse {
@@ -41,13 +45,17 @@ const rejectStyle = {
 };
 
 function MediaUploadViewPage() {
+  const { formatMessage } = useObjectStoreIntl();
+
   return (
     <div>
-      <Head title="Upload files" />
+      <Head title={formatMessage("uploadPageTitle")} />
       <Nav />
       <div className="container-fluid">
         <div>
-          <h4>Upload File</h4>
+          <h4>
+            <ObjectStoreMessage id="uploadPageTitle" />
+          </h4>
           <UploadViewForm />
         </div>
       </div>
@@ -91,12 +99,24 @@ function UploadViewForm() {
   ) {
     try {
       const response = save();
-      setFileId((await response).fileName);
-      setStatus(acceptedFiles[0].name + " submitted successfully!");
-      setEditMetadataVisible(true);
+      if (
+        (await response) === null ||
+        (await response).fileName === undefined
+      ) {
+        setStatus(
+          "Response or fileId is empty, please ensure your API and minio service are up!"
+        );
+      } else {
+        setFileId((await response).fileName);
+        setStatus(null);
+        setEditMetadataVisible(true);
+      }
     } catch (error) {
       setStatus(
-        error.message + ", " + " submittedValues are: " + submittedValues
+        error.message +
+          ", " +
+          " submittedValues are: " +
+          JSON.stringify(submittedValues)
       );
     }
     setSubmitting(false);
@@ -115,44 +135,41 @@ function UploadViewForm() {
   }
 
   return (
-    <div>
-      <div id="dndRoot">
-        <div {...getRootProps({ style })} className="root">
-          <input {...getInputProps()} />
-          <div style={{ margin: "auto" }}>
-            <div>
-              Drag and drop files here or click to open browse dialog. (Only
-              image, audio, video, .pdf, .doc and docx are accepted)
-            </div>
-          </div>
-        </div>
-        <div>
-          <ul>{acceptedFilesItems}</ul>
-        </div>
-      </div>
-
-      <div>
-        <Formik initialValues={{}} onSubmit={onSubmit}>
-          <Form>
-            <ErrorViewer />
-            <div className="form-group row">
-              <div className="col-md-2">
-                <SubmitButton children="Upload File" />
+    <>
+      <Formik initialValues={{}} onSubmit={onSubmit}>
+        <Form>
+          <ErrorViewer />
+          <div id="dndRoot">
+            <div {...getRootProps({ style })} className="root">
+              <input {...getInputProps()} />
+              <div style={{ margin: "auto" }}>
+                <div>
+                  <ObjectStoreMessage id="uploadFormInstructions" />
+                </div>
               </div>
             </div>
-          </Form>
-        </Formik>
-        {editMetadataVisible &&
-          acceptedFiles &&
-          acceptedFiles.length > 0 &&
-          fileId && (
-            <EditMetadataFormPage
-              originalFileName={acceptedFiles[0].name}
-              fileIdentifier={fileId}
-            />
-          )}
-      </div>
-    </div>
+            <div>
+              <ul>{acceptedFilesItems}</ul>
+            </div>
+          </div>
+
+          <div className="form-group row">
+            <div className="col-md-2">
+              <SubmitButton children="Upload File" />
+            </div>
+          </div>
+        </Form>
+      </Formik>
+      {editMetadataVisible &&
+        acceptedFiles &&
+        acceptedFiles.length > 0 &&
+        fileId && (
+          <EditMetadataFormPage
+            originalFileName={acceptedFiles[0].name}
+            fileIdentifier={fileId}
+          />
+        )}
+    </>
   );
 }
 export default MediaUploadViewPage;

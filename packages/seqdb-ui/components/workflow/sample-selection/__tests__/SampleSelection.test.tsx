@@ -1,6 +1,5 @@
-import { ApiClientContext, createContextValue } from "common-ui";
-import { mount } from "enzyme";
 import { PersistedResource } from "kitsu";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   Chain,
   ChainStepTemplate,
@@ -83,14 +82,12 @@ jest.mock(
 );
 
 function getWrapper() {
-  return mount(
-    <ApiClientContext.Provider value={createContextValue()}>
-      <SampleSelection
-        chain={TEST_CHAIN}
-        chainStepTemplates={TEST_CHAIN_STEP_TEMPLATES}
-        step={TEST_CHAIN_STEP_TEMPLATE}
-      />
-    </ApiClientContext.Provider>
+  return mountWithAppContext(
+    <SampleSelection
+      chain={TEST_CHAIN}
+      chainStepTemplates={TEST_CHAIN_STEP_TEMPLATES}
+      step={TEST_CHAIN_STEP_TEMPLATE}
+    />
   );
 }
 

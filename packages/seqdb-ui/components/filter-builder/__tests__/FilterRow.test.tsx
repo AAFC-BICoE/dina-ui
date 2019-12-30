@@ -1,7 +1,25 @@
-import { mount } from "enzyme";
 import Select from "react-select/base";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { FilterAttribute } from "../FilterBuilder";
+import { FilterBuilderContextProvider } from "../FilterBuilderContext";
 import { FilterRow, FilterRowProps } from "../FilterRow";
+
+const TEST_SPECIMEN_NUMBER_FILTER: FilterAttribute = {
+  allowRange: true,
+  label: "Specimen Number",
+  name: "specimenReplicate.specimen.number"
+};
+
+const TEST_REPLICATE_VERSION_FILTER: FilterAttribute = {
+  name: "specimenReplicate.version"
+};
+
+const TEST_FILTER_ATTRIBUTES: FilterAttribute[] = [
+  "name",
+  "description",
+  TEST_SPECIMEN_NUMBER_FILTER,
+  TEST_REPLICATE_VERSION_FILTER
+];
 
 describe("FilterRow component", () => {
   const mockOnChange = jest.fn();
@@ -13,25 +31,31 @@ describe("FilterRow component", () => {
     jest.clearAllMocks();
   });
 
-  function mountFilterRow(propsOverride: Partial<FilterRowProps> = {}) {
-    return mount<FilterRow>(
-      <FilterRow
-        filterAttributes={["name", "description"]}
-        model={{
-          attribute: "name",
-          id: 1,
-          predicate: "IS",
-          searchType: "PARTIAL_MATCH",
-          type: "FILTER_ROW",
-          value: ""
-        }}
-        onChange={mockOnChange}
-        onAndClick={mockOnAndClick}
-        onRemoveClick={mockOnDeleteClick}
-        onOrClick={mockOnOrClick}
-        showRemoveButton={true}
-        {...propsOverride}
-      />
+  function mountFilterRow(
+    propsOverride: Partial<FilterRowProps> = {},
+    filterAttributes?: FilterAttribute[]
+  ) {
+    return mountWithAppContext(
+      <FilterBuilderContextProvider
+        filterAttributes={filterAttributes || TEST_FILTER_ATTRIBUTES}
+      >
+        <FilterRow
+          model={{
+            attribute: "name",
+            id: 1,
+            predicate: "IS",
+            searchType: "PARTIAL_MATCH",
+            type: "FILTER_ROW",
+            value: ""
+          }}
+          onChange={mockOnChange}
+          onAndClick={mockOnAndClick}
+          onRemoveClick={mockOnDeleteClick}
+          onOrClick={mockOnOrClick}
+          showRemoveButton={true}
+          {...propsOverride}
+        />
+      </FilterBuilderContextProvider>
     );
   }
 
@@ -45,7 +69,21 @@ describe("FilterRow component", () => {
         .props().options
     ).toEqual([
       { label: "Name", value: "name" },
-      { label: "Description", value: "description" }
+      { label: "Description", value: "description" },
+      {
+        label: "Specimen Number",
+        value: {
+          allowRange: true,
+          label: "Specimen Number",
+          name: "specimenReplicate.specimen.number"
+        }
+      },
+      {
+        label: "Specimen Replicate Version",
+        value: {
+          name: "specimenReplicate.version"
+        }
+      }
     ]);
   });
 
@@ -58,14 +96,14 @@ describe("FilterRow component", () => {
         .find(Select)
         .props().options
     ).toEqual([
-      { label: "IS", value: "IS" },
-      { label: "IS NOT", value: "IS NOT" }
+      { label: expect.anything(), value: "IS" },
+      { label: expect.anything(), value: "IS NOT" }
     ]);
   });
 
   it("Changes the model's filter attribute when a new filter attribute is selected.", () => {
     const wrapper = mountFilterRow();
-    const model = wrapper.props().model;
+    const model = wrapper.find(FilterRow).props().model;
 
     wrapper
       .find(".filter-attribute")
@@ -78,7 +116,7 @@ describe("FilterRow component", () => {
 
   it("Changes the model's predicate when a new predicate is selected.", () => {
     const wrapper = mountFilterRow();
-    const model = wrapper.props().model;
+    const model = wrapper.find(FilterRow).props().model;
 
     wrapper
       .find(".filter-predicate")
@@ -91,7 +129,7 @@ describe("FilterRow component", () => {
 
   it("Changes the model's filter value when the filter value is changed.", () => {
     const wrapper = mountFilterRow();
-    const model = wrapper.props().model;
+    const model = wrapper.find(FilterRow).props().model;
 
     wrapper
       .find("input.filter-value")
@@ -102,7 +140,7 @@ describe("FilterRow component", () => {
 
   it("Changes the model's searchType value when the search type is changed.", () => {
     const wrapper = mountFilterRow();
-    const model = wrapper.props().model;
+    const model = wrapper.find(FilterRow).props().model;
 
     expect(model.searchType).toEqual("PARTIAL_MATCH");
 
@@ -116,17 +154,11 @@ describe("FilterRow component", () => {
   });
 
   it("Provides a prop to show or hide the remove button.", async () => {
-    const withRemoveButton = mountFilterRow();
-    withRemoveButton.setProps({ showRemoveButton: true });
-    expect(withRemoveButton.find("button[children='-']").exists()).toEqual(
-      true
-    );
+    const withRemoveButton = mountFilterRow({ showRemoveButton: true });
+    expect(withRemoveButton.find("button.remove").exists()).toEqual(true);
 
-    const withoutRemoveButton = mountFilterRow();
-    withoutRemoveButton.setProps({ showRemoveButton: false });
-    expect(withoutRemoveButton.find("button[children='-']").exists()).toEqual(
-      false
-    );
+    const withoutRemoveButton = mountFilterRow({ showRemoveButton: false });
+    expect(withoutRemoveButton.find("button.remove").exists()).toEqual(false);
   });
 
   it("Provides an 'onChange' prop to notify of change events.", () => {
@@ -185,15 +217,9 @@ describe("FilterRow component", () => {
   });
 
   it("Can show a custom filter attribute label.", () => {
-    const attributeObject: FilterAttribute = {
-      allowRange: true,
-      label: "Specimen Number",
-      name: "specimenReplicate.specimen.number"
-    };
-
     const wrapper = mountFilterRow({
       model: {
-        attribute: attributeObject,
+        attribute: TEST_SPECIMEN_NUMBER_FILTER,
         id: 1,
         predicate: "IS",
         searchType: "PARTIAL_MATCH",
@@ -209,19 +235,14 @@ describe("FilterRow component", () => {
         .prop("value")
     ).toEqual({
       label: "Specimen Number",
-      value: attributeObject
+      value: TEST_SPECIMEN_NUMBER_FILTER
     });
   });
 
   it("Generated a title case label for a filter attribute object.", () => {
-    const attributeObject: FilterAttribute = {
-      allowRange: true,
-      name: "specimenReplicate.specimen.number"
-    };
-
     const wrapper = mountFilterRow({
       model: {
-        attribute: attributeObject,
+        attribute: TEST_REPLICATE_VERSION_FILTER,
         id: 1,
         predicate: "IS",
         searchType: "PARTIAL_MATCH",
@@ -236,8 +257,36 @@ describe("FilterRow component", () => {
         .find(Select)
         .prop("value")
     ).toEqual({
-      label: "Specimen Replicate Specimen Number",
-      value: attributeObject
+      label: "Specimen Replicate Version",
+      value: TEST_REPLICATE_VERSION_FILTER
+    });
+  });
+
+  it("Displays the intl message for a field name if there is one.", () => {
+    const TEST_INTL_FIELD_NAME = "group.groupName";
+    const wrapper = mountFilterRow(
+      {
+        model: {
+          attribute: TEST_INTL_FIELD_NAME,
+          id: 1,
+          predicate: "IS",
+          searchType: "PARTIAL_MATCH",
+          type: "FILTER_ROW",
+          value: ""
+        }
+      },
+      [TEST_INTL_FIELD_NAME]
+    );
+
+    // The field label should be "Group Name" instead of teh auto-generated "Group Group Name":
+    expect(
+      wrapper
+        .find(".filter-attribute")
+        .find(Select)
+        .prop("value")
+    ).toEqual({
+      label: "Group Name",
+      value: TEST_INTL_FIELD_NAME
     });
   });
 });

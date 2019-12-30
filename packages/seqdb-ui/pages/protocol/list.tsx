@@ -7,6 +7,7 @@ import {
   ListPageLayout,
   Nav
 } from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import {
   Protocol,
   protocolTypeLabels
@@ -19,18 +20,12 @@ const PROTOCOL_TABLE_COLUMNS: Array<ColumnDefinition<Protocol>> = [
         <a>{name}</a>
       </Link>
     ),
-    Header: "Name",
     accessor: "name"
   },
   {
-    Header: "Group Name",
     accessor: "group.groupName"
   },
-  {
-    Header: "Type",
-    accessor: row => protocolTypeLabels[row.type],
-    id: "type"
-  },
+  "type",
   "version",
   "description",
   "equipment",
@@ -53,15 +48,19 @@ const PROTOCOL_FILTER_ATTRIBUTES = [
 ];
 
 export default function ProtocolListPage() {
+  const { formatMessage } = useSeqdbIntl();
+
   return (
     <>
-      <Head title="Protocols" />
+      <Head title={formatMessage("protocolListTitle")} />
       <Nav />
       <ButtonBar>
-        <CreateButton entityLabel="Protocol" entityLink="protocol" />
+        <CreateButton entityLink="protocol" />
       </ButtonBar>
       <div className="container-fluid">
-        <h1>Protocols</h1>
+        <h1>
+          <SeqdbMessage id="protocolListTitle" />
+        </h1>
         <ListPageLayout
           id="protocol-list"
           filterAttributes={PROTOCOL_FILTER_ATTRIBUTES}

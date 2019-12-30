@@ -1,11 +1,11 @@
-import { mount } from "enzyme";
 import { Form, Formik } from "formik";
 import { noop } from "lodash";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { TextField } from "../TextField";
 
 describe("TextField component", () => {
   it("Displays the field's label and value.", () => {
-    const wrapper = mount(
+    const wrapper = mountWithAppContext(
       <Formik
         initialValues={{ testObject: { testField: "initial value" } }}
         onSubmit={noop}
@@ -23,7 +23,7 @@ describe("TextField component", () => {
   });
 
   it("Changes the field's value.", () => {
-    const wrapper = mount(
+    const wrapper = mountWithAppContext(
       <Formik
         initialValues={{ testObject: { testField: "initial value" } }}
         onSubmit={noop}

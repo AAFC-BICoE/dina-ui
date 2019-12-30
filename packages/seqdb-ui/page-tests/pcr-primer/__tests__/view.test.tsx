@@ -1,6 +1,5 @@
-import { ApiClientContext } from "common-ui";
-import { mount } from "enzyme";
 import { PcrPrimerDetailsPage } from "../../../pages/pcr-primer/view";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -23,32 +22,26 @@ const mockGet = jest.fn(async () => {
 });
 
 // Mock Kitsu, the client class that talks to the backend.
-const testCtx = {
+const apiContext: any = {
   apiClient: {
     get: mockGet
   }
 };
 
 describe("PcrPrimer details page", () => {
-  function mountWithContext(element: JSX.Element) {
-    return mount(
-      <ApiClientContext.Provider value={testCtx as any}>
-        {element}
-      </ApiClientContext.Provider>
-    );
-  }
-
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithContext(
-      <PcrPrimerDetailsPage router={{ query: { id: "100" } } as any} />
+    const wrapper = mountWithAppContext(
+      <PcrPrimerDetailsPage router={{ query: { id: "100" } } as any} />,
+      { apiContext }
     );
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
   });
 
   it("Render the PCR primer details", async () => {
-    const wrapper = mountWithContext(
-      <PcrPrimerDetailsPage router={{ query: { id: "100" } } as any} />
+    const wrapper = mountWithAppContext(
+      <PcrPrimerDetailsPage router={{ query: { id: "100" } } as any} />,
+      { apiContext }
     );
 
     // Wait for the page to load.

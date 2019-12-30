@@ -2,14 +2,20 @@ import { ApiClientContext, LoadingSpinner, Query } from "common-ui";
 import { GetParams } from "kitsu";
 import { omitBy } from "lodash";
 import withRouter, { WithRouterProps } from "next/dist/client/with-router";
+import Link from "next/link";
 import { useCallback, useContext } from "react";
 import { useAsyncRun, useAsyncTask } from "react-hooks-async";
 import { FileDownLoadResponseAttributes } from "types/objectstore-api/resources/FileDownLoadResponse";
 import { Metadata } from "types/objectstore-api/resources/Metadata";
 import { isArray, isUndefined } from "util";
 import { Head, Nav } from "../../components";
+import {
+  ObjectStoreMessage,
+  useObjectStoreIntl
+} from "../../intl/objectstore-intl";
 import { GenerateManagedAttributesView } from "../../page-fragments/viewManagedAttributes";
 import ViewMetadataFormPage from "../../page-fragments/viewMetadata";
+import ViewTagsForm from "../../page-fragments/viewTags";
 
 interface DownloadFileResponse {
   error?: string;
@@ -48,17 +54,27 @@ function useImageQuery(id: string): DownloadFileResponse {
 }
 
 export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
-  const id = router.query.id;
+  const id = router?.query?.id;
   const stringId = isArray(id) ? id[0] : id;
   const { imgResponse } = useImageQuery(stringId);
+  const { formatMessage } = useObjectStoreIntl();
 
   return (
     <div>
-      <Head title="Object Store Detailes Page" />
+      <Head title={formatMessage("objectStoreDetailsTitle")} />
       <Nav />
       <div>
-        <h4>Object Store Details</h4>
+        <h4>
+          <ObjectStoreMessage id="objectStoreDetailsTitle" />
+        </h4>
         <div className="container-fluid">
+          <div className="row">
+            <div className="col-sm-4">
+              <Link href={`/media-uploadView/detailEdit?id=${id}`}>
+                <a className="btn btn-primary">Edit</a>
+              </Link>
+            </div>
+          </div>
           <div className="row">
             {imgResponse &&
             imgResponse.headers["content-type"].indexOf("image") > -1 ? (
@@ -89,7 +105,9 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
                 />
               </div>
             ) : (
-              <p>No File to display</p>
+              <p>
+                <ObjectStoreMessage id="noFileToDisplay" />
+              </p>
             )}
 
             <Query<Metadata>
@@ -102,16 +120,16 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
               {({ loading, response }) => (
                 <div className="col-sm-8">
                   <LoadingSpinner loading={loading} />
-                  {response && (
+                  {response && response.data[0] && (
                     <div>
                       <div style={{ marginBottom: "20px", marginTop: "20px" }}>
-                        <h5 style={{ color: "blue" }}>Metadata View</h5>
+                        <h5 style={{ color: "#1465b7" }}>Metadata View</h5>
                       </div>
                       <div>
                         <ViewMetadataFormPage metadata={response.data[0]} />
                       </div>
                       <div style={{ marginBottom: "20px", marginTop: "20px" }}>
-                        <h5 style={{ color: "blue" }}>
+                        <h5 style={{ color: "#1465b7" }}>
                           Managed Attribute View
                         </h5>
                       </div>
@@ -119,6 +137,10 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
                         response.data[0].managedAttribute.map(ma => (
                           <GenerateManagedAttributesView ma={ma} />
                         ))}
+                      <div style={{ marginBottom: "20px", marginTop: "20px" }}>
+                        <h5 style={{ color: "#1465b7" }}>Tags View</h5>
+                      </div>
+                      <ViewTagsForm meta={response.data[0]} />
                     </div>
                   )}
                 </div>

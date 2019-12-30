@@ -1,7 +1,12 @@
+import { isEqual } from "lodash";
 import React from "react";
 import Select from "react-select";
-import titleCase from "title-case";
+import { SeqdbMessage } from "../../intl/seqdb-intl";
 import { FilterAttribute } from "./FilterBuilder";
+import {
+  FilterBuilderContext,
+  FilterBuilderContextI
+} from "./FilterBuilderContext";
 
 export type FilterRowPredicate = "IS" | "IS NOT";
 export type FilterRowSearchType =
@@ -19,7 +24,6 @@ export interface FilterRowModel {
 }
 
 export interface FilterRowProps {
-  filterAttributes: FilterAttribute[];
   model: FilterRowModel;
   showRemoveButton: boolean;
   onAndClick: () => void;
@@ -34,6 +38,9 @@ export interface FilterAttributeOption {
 }
 
 export class FilterRow extends React.Component<FilterRowProps> {
+  public static contextType = FilterBuilderContext;
+  public context!: FilterBuilderContextI;
+
   public render() {
     const {
       model,
@@ -44,18 +51,19 @@ export class FilterRow extends React.Component<FilterRowProps> {
     } = this.props;
 
     const searchTypes: Array<{
-      label: string;
+      label: React.ReactNode;
       value: FilterRowSearchType;
     }> = [
-      { label: "Partial Match", value: "PARTIAL_MATCH" },
-      { label: "Exact Match", value: "EXACT_MATCH" },
-      { label: "Blank Field", value: "BLANK_FIELD" }
+      {
+        label: <SeqdbMessage id="filterPartialMatch" />,
+        value: "PARTIAL_MATCH"
+      },
+      { label: <SeqdbMessage id="filterExactMatch" />, value: "EXACT_MATCH" },
+      { label: <SeqdbMessage id="filterBlankField" />, value: "BLANK_FIELD" }
     ];
 
-    const attributeSelectOption = getSelectOption(model.attribute);
-
-    const mappedfilterAttributes = this.props.filterAttributes.map(
-      getSelectOption
+    const selectedAttribute = this.context.attributeOptions.find(option =>
+      isEqual(option.value, model.attribute)
     );
 
     return (
@@ -64,9 +72,9 @@ export class FilterRow extends React.Component<FilterRowProps> {
           <Select<FilterAttributeOption>
             className="filter-attribute"
             instanceId={`attribute_${model.id}`}
-            options={mappedfilterAttributes}
+            options={this.context.attributeOptions}
             onChange={this.onPropertyChanged}
-            value={attributeSelectOption}
+            value={selectedAttribute}
           />
         </div>
         <div className="list-inline-item" style={{ width: 120 }}>
@@ -74,8 +82,8 @@ export class FilterRow extends React.Component<FilterRowProps> {
             className="filter-predicate"
             instanceId={`predicate_${model.id}`}
             options={[
-              { label: "IS", value: "IS" },
-              { label: "IS NOT", value: "IS NOT" }
+              { label: <SeqdbMessage id="IS" />, value: "IS" },
+              { label: <SeqdbMessage id="ISNOT" />, value: "IS NOT" }
             ]}
             onChange={this.onPredicateChanged}
             value={{ label: model.predicate, value: model.predicate }}
@@ -103,22 +111,22 @@ export class FilterRow extends React.Component<FilterRowProps> {
         </div>
         <div className="filter-row-buttons list-inline-item">
           <button
-            className="list-inline-item btn btn-primary"
+            className="list-inline-item btn btn-primary and"
             onClick={onAndClick}
             type="button"
           >
-            AND
+            <SeqdbMessage id="AND" />
           </button>
           <button
-            className="list-inline-item btn btn-primary"
+            className="list-inline-item btn btn-primary or"
             onClick={onOrClick}
             type="button"
           >
-            OR
+            <SeqdbMessage id="OR" />
           </button>
           {showRemoveButton && (
             <button
-              className="list-inline-item btn btn-dark"
+              className="list-inline-item btn btn-dark remove"
               onClick={onRemoveClick}
               type="button"
             >
@@ -136,7 +144,10 @@ export class FilterRow extends React.Component<FilterRowProps> {
     this.forceUpdate();
   };
 
-  private onPredicateChanged = (value: { label: string; value: string }) => {
+  private onPredicateChanged = (value: {
+    label: React.ReactNode;
+    value: string;
+  }) => {
     this.props.model.predicate = value.value as FilterRowPredicate;
     this.props.onChange();
     this.forceUpdate();
@@ -156,16 +167,4 @@ export class FilterRow extends React.Component<FilterRowProps> {
     this.props.onChange();
     this.forceUpdate();
   };
-}
-
-function getSelectOption(attribute: FilterAttribute): FilterAttributeOption {
-  return typeof attribute === "string"
-    ? {
-        label: titleCase(attribute),
-        value: attribute
-      }
-    : {
-        label: attribute.label || titleCase(attribute.name),
-        value: attribute
-      };
 }

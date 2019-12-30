@@ -10,6 +10,7 @@ import {
   Head,
   Nav
 } from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import {
   Protocol,
   protocolTypeLabels
@@ -17,9 +18,11 @@ import {
 
 export function ProtocolDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
+  const { formatMessage } = useSeqdbIntl();
+
   return (
     <div>
-      <Head title="Protocol Details" />
+      <Head title={formatMessage("protocolViewTitle")} />
       <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="protocol" />
@@ -34,7 +37,9 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
 
           return (
             <div className="container-fluid">
-              <h1>Protocol Details</h1>
+              <h1>
+                <SeqdbMessage id="protocolViewTitle" />
+              </h1>
               <LoadingSpinner loading={loading} />
               {protocol && (
                 <Formik<Protocol> initialValues={protocol} onSubmit={noop}>

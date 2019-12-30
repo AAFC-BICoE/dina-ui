@@ -7,6 +7,7 @@ import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import ReactTable from "react-table";
 import { ButtonBar } from "../../components";
+import { ObjectStoreMessage } from "../../intl/objectstore-intl";
 
 interface FileUploadResponse {
   fileName: string;
@@ -127,10 +128,7 @@ function MediaUploadView({}) {
           <div {...getRootProps({ style })} className="container">
             <input {...getInputProps()} />
             <div>
-              <div>Drag and drop files here or click to open browse dialog</div>
-              <div>
-                (Only image, audio, video, .pdf, .doc and docx are accepted)
-              </div>
+              <ObjectStoreMessage id="uploadFormInstructions" />
             </div>
           </div>
           <ReactTable

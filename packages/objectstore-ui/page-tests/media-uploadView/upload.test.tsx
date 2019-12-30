@@ -1,6 +1,7 @@
 /* eslint react/prop-types: 0, jsx-a11y/label-has-for: 0 */
 import { cleanup, render } from "@testing-library/react";
 import MediaUploadView from "../../pages/media-uploadView/upload";
+import { MockAppContextProvider } from "../../test-util/mock-app-context";
 
 describe("MediaUploadView test", () => {
   let files;
@@ -11,7 +12,11 @@ describe("MediaUploadView test", () => {
   afterEach(cleanup);
 
   it("renders the root and input nodes with the necessary props", () => {
-    const { container } = render(<MediaUploadView />);
+    const { container } = render(
+      <MockAppContextProvider>
+        <MediaUploadView />
+      </MockAppContextProvider>
+    );
     const rootDiv = container.querySelector("div#dndRoot");
     expect(rootDiv).toHaveProperty("style.border-color");
     expect(rootDiv.querySelector("div.container>input")).toHaveProperty(
@@ -21,7 +26,11 @@ describe("MediaUploadView test", () => {
 
   it("When dropped the files, react table get populated with file names", async () => {
     const event = createDtWithFiles(files);
-    const ui = <MediaUploadView />;
+    const ui = (
+      <MockAppContextProvider>
+        <MediaUploadView />
+      </MockAppContextProvider>
+    );
     const { container } = render(ui);
     const dropzone = container.querySelector(".container");
     dispatchEvt(dropzone, "drop", event);

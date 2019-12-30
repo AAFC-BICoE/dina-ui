@@ -14,6 +14,7 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ButtonBar, CancelButton, Head, Nav } from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { Product } from "../../types/seqdb-api/resources/Product";
 
@@ -24,14 +25,18 @@ interface ProductFormProps {
 
 export function ProductEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
+  const { formatMessage } = useSeqdbIntl();
+
   return (
     <div>
-      <Head title="Edit Product" />
+      <Head title={formatMessage("editProductTitle")} />
       <Nav />
       <div className="container-fluid">
         {id ? (
           <div>
-            <h1>Edit Product</h1>
+            <h1>
+              <SeqdbMessage id="editProductTitle" />
+            </h1>
             <Query<Product> query={{ include: "group", path: `product/${id}` }}>
               {({ loading, response }) => (
                 <div>
@@ -45,7 +50,9 @@ export function ProductEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>Add Product</h1>
+            <h1>
+              <SeqdbMessage id="addProductTitle" />
+            </h1>
             <ProductForm router={router} />
           </div>
         )}
@@ -56,6 +63,7 @@ export function ProductEditPage({ router }: WithRouterProps) {
 
 function ProductForm({ product, router }: ProductFormProps) {
   const { save } = useContext(ApiClientContext);
+  const { formatMessage } = useSeqdbIntl();
   const { id } = router.query;
   const initialValues = product || {};
 
@@ -101,7 +109,7 @@ function ProductForm({ product, router }: ProductFormProps) {
             <LabelView
               className="col-md-2"
               name="labelname"
-              label="Note: Universal Product Code can be read from barcode scanner in keyboard mode"
+              label={formatMessage("productUpcFieldHelpText")}
             />
           </div>
           <div className="row">
