@@ -14,7 +14,6 @@
     "test:coverage": "tsc && jest --coverage"
   },
   "dependencies": {
-    "@handsontable/react": "^3.1.2",
     "@molgenis/rsql": "0.1.2",
     "@testing-library/react": "^9.3.0",
     "@zeit/next-css": "^1.0.1",
@@ -24,7 +23,6 @@
     "common-ui": "link:../common-ui",
     "core-js": "^3.2.1",
     "formik": "^1.5.8",
-    "handsontable": "6.2.2",
     "kitsu": "7.0.4",
     "kitsu-core": "7.0.4",
     "lodash": "^4.17.11",

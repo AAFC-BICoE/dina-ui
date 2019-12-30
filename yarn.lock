@@ -2930,8 +2930,10 @@ commander@^2.12.1, commander@^2.19.0, commander@^2.20.0:
 "common-ui@link:packages/common-ui":
   version "0.0.0"
   dependencies:
+    "@handsontable/react" "^3.1.2"
     "@molgenis/rsql" "0.1.2"
     formik "^1.5.8"
+    handsontable "6.2.2"
     kitsu "7.0.4"
     kitsu-core "7.0.4"
     next "^9.1.5"

@@ -21,8 +21,8 @@ export interface MetadataAttributes {
 }
 
 export interface MetadataRelationships {
-  acMetadataCreator?: Agent;
-  managedAttributeMap?: ManagedAttributeMap;
+  acMetadataCreator?: Agent | null;
+  managedAttributeMap?: ManagedAttributeMap | null;
 }
 
 export type Metadata = KitsuResource &

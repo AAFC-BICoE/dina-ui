@@ -1,13 +1,15 @@
 import {
   ApiClientContext,
+  BulkDataEditor,
+  decodeResourceCell,
+  encodeResourceCell,
   LoadingSpinner,
   ResourceSelectField,
   SaveArgs,
-  SubmitButton
+  useResourceSelectCells
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { PersistedResource } from "kitsu";
-import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { Head, Nav } from "../../components";
@@ -16,17 +18,16 @@ import {
   useObjectStoreIntl
 } from "../../intl/objectstore-intl";
 import {
+  Agent,
   ManagedAttribute,
   ManagedAttributeMap,
   Metadata
 } from "../../types/objectstore-api";
 
-const HotTable = dynamic(
-  async () => (await import("@handsontable/react")).HotTable,
-  { ssr: false }
-);
-
+/** Editable row data */
 interface RowData {
+  acTags: string;
+  acMetadataCreator: string;
   metadata: PersistedResource<Metadata>;
 }
 
@@ -38,6 +39,7 @@ export default function EditMetadatasPage() {
   const router = useRouter();
   const { apiClient, save } = useContext(ApiClientContext);
   const { formatMessage } = useObjectStoreIntl();
+  const resourceSelectCell = useResourceSelectCells();
 
   const DEFAULT_COLUMNS = [
     {
@@ -52,21 +54,29 @@ export default function EditMetadatasPage() {
       type: "dropdown"
     },
     {
-      data: "metadata.acTags",
+      data: "acTags",
       title: formatMessage("metadataBulkEditTagsLabel")
     },
-    {
-      data: "metadata.acDigitizationDate",
-      dateFormat: "YYYY-MM-DD",
-      title: formatMessage("metadataFirstDigitalVersionCreatedDateLabel"),
-      type: "date"
-    },
-    {
-      data: "metadata.xmpMetadataDate",
-      dateFormat: "YYYY-MM-DD",
-      title: formatMessage("metadataLastMetadataModificationTimeLabel"),
-      type: "date"
-    }
+    // TODO handle datetime cells:
+    // {
+    //   data: "metadata.acDigitizationDate",
+    //   title: formatMessage("metadataFirstDigitalVersionCreatedDateLabel")
+    // },
+    // {
+    //   data: "metadata.xmpMetadataDate",
+    //   title: formatMessage("metadataLastMetadataModificationTimeLabel")
+    // },
+    resourceSelectCell<Agent>(
+      {
+        filter: input => ({ displayName: input }),
+        label: agent => agent.displayName,
+        model: "agent"
+      },
+      {
+        data: "acMetadataCreator",
+        title: formatMessage("metadataAgentLabel")
+      }
+    )
   ];
 
   const idsQuery = String(router.query.ids);
@@ -83,39 +93,53 @@ export default function EditMetadatasPage() {
       // TODO there should be a way to request many resources by ID in a single request.
       const metadataPromises = ids.map(id =>
         apiClient.get<Metadata>(`metadata/${id}`, {
-          include: "managedAttributeMap"
+          include: "acMetadataCreator,managedAttributeMap"
         })
       );
 
       const metadataResponses = await Promise.all(metadataPromises);
-      setTableData(
-        metadataResponses.map<RowData>(res => ({
-          metadata: res.data
-        }))
-      );
+
+      const newTableData = metadataResponses.map<RowData>(res => ({
+        acMetadataCreator: encodeResourceCell(res.data.acMetadataCreator, {
+          label: res.data.acMetadataCreator?.displayName
+        }),
+        acTags: res.data.acTags?.join(", ") ?? "",
+        metadata: res.data
+      }));
+
+      setTableData(newTableData);
     })();
   }, [idsQuery]);
 
   async function onSubmit() {
     try {
-      const editedMetadatas = (tableData || []).map<SaveArgs>(row => ({
-        resource: { ...row.metadata, managedAttributeMap: null },
-        type: "metadata"
-      }));
-
-      const editedmanagedAttributeMaps = (tableData || []).map<SaveArgs>(
+      const editedMetadatas = (tableData || []).map<SaveArgs<Metadata>>(
         row => ({
           resource: {
-            ...(row.metadata.managedAttributeMap as ManagedAttributeMap),
-            metadata: row.metadata
-          } as ManagedAttributeMap,
-          type: "managed-attribute-map"
+            ...row.metadata,
+            acMetadataCreator: decodeResourceCell(
+              row.acMetadataCreator
+            ) as Agent,
+            acTags: row.acTags.split(",").map(t => t.trim()),
+            managedAttributeMap: null
+          },
+          type: "metadata"
         })
       );
 
-      editedmanagedAttributeMaps.forEach(saveArg => delete saveArg.resource.id);
+      const editedManagedAttributeMaps = (tableData || []).map<
+        SaveArgs<ManagedAttributeMap>
+      >(row => ({
+        resource: {
+          ...(row.metadata.managedAttributeMap as ManagedAttributeMap),
+          metadata: row.metadata
+        },
+        type: "managed-attribute-map"
+      }));
 
-      await save([...editedMetadatas, ...editedmanagedAttributeMaps]);
+      editedManagedAttributeMaps.forEach(saveArg => delete saveArg.resource.id);
+
+      await save([...editedMetadatas, ...editedManagedAttributeMaps]);
 
       await router.push("/object/list");
     } catch (err) {
@@ -157,14 +181,7 @@ export default function EditMetadatasPage() {
                   optionLabel={attr => attr.name}
                 />
                 {tableData ? (
-                  <>
-                    <HotTable
-                      columns={columns}
-                      data={tableData}
-                      manualColumnResize={true}
-                    />
-                    <SubmitButton />
-                  </>
+                  <BulkDataEditor columns={columns} data={tableData} />
                 ) : (
                   <LoadingSpinner loading={true} />
                 )}

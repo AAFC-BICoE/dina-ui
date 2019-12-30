@@ -24,8 +24,8 @@ export interface ApiClientContextI {
 }
 
 /** save function args. */
-export interface SaveArgs {
-  resource: KitsuResource;
+export interface SaveArgs<T extends KitsuResource = KitsuResource> {
+  resource: T;
   type: string;
 }
 
