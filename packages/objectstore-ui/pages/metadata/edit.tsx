@@ -1,10 +1,12 @@
 import {
   ApiClientContext,
   BulkDataEditor,
+  BulkEditRow,
   decodeResourceCell,
   encodeResourceCell,
   LoadingSpinner,
   ResourceSelectField,
+  RowChange,
   SaveArgs,
   useResourceSelectCells
 } from "common-ui";
@@ -90,41 +92,69 @@ export default function EditMetadatasPage() {
   async function loadData() {
     const metadatas = await bulkGet<Metadata>(
       ids.map(
-        id => `metadata/${id}?include=acMetadataCreator,managedAttributeMap`
+        id => `/metadata/${id}?include=acMetadataCreator,managedAttributeMap`
       )
     );
 
-    const newTableData = metadatas.map<BulkMetadataEditRow>(metadata => ({
-      acMetadataCreator: encodeResourceCell(metadata.acMetadataCreator, {
-        label: metadata.acMetadataCreator?.displayName
-      }),
-      acTags: metadata.acTags?.join(", ") ?? "",
-      metadata
-    }));
+    const newTableData = metadatas.map<BulkEditRow<BulkMetadataEditRow>>(
+      metadata => ({
+        data: {
+          acMetadataCreator: encodeResourceCell(metadata.acMetadataCreator, {
+            label: metadata.acMetadataCreator?.displayName
+          }),
+          acTags: metadata.acTags?.join(", ") ?? "",
+          metadata
+        },
+        identifier: { id: metadata.id, type: metadata.type }
+      })
+    );
 
     return newTableData;
   }
 
-  async function onSubmit(tableData: BulkMetadataEditRow[]) {
-    const editedMetadatas = tableData.map<SaveArgs<Metadata>>(row => ({
-      resource: {
-        ...row.metadata,
-        acMetadataCreator: decodeResourceCell(row.acMetadataCreator) as Agent,
-        acTags: row.acTags.split(",").map(t => t.trim()),
-        managedAttributeMap: null
-      },
-      type: "metadata"
-    }));
+  async function onSubmit(changes: Array<RowChange<BulkMetadataEditRow>>) {
+    const editedMetadatas = changes.map<SaveArgs<Metadata>>(row => {
+      const {
+        data: { acMetadataCreator, acTags, metadata },
+        identifier
+      } = row;
 
-    const editedManagedAttributeMaps = tableData.map<
+      const metadataEdit = {
+        ...identifier,
+        ...metadata,
+        managedAttributeMap: null
+      } as Metadata;
+
+      if (acMetadataCreator !== undefined) {
+        metadataEdit.acMetadataCreator = decodeResourceCell(
+          acMetadataCreator
+        ) as Agent;
+      }
+
+      if (acTags !== undefined) {
+        metadataEdit.acTags = acTags.split(",").map(t => t.trim());
+      }
+
+      return {
+        resource: metadataEdit,
+        type: "metadata"
+      };
+    });
+
+    const editedManagedAttributeMaps = changes.map<
       SaveArgs<ManagedAttributeMap>
-    >(row => ({
-      resource: {
-        ...(row.metadata.managedAttributeMap as ManagedAttributeMap),
-        metadata: row.metadata
-      },
-      type: "managed-attribute-map"
-    }));
+    >(row => {
+      const managedAttributeMap = row.data.metadata?.managedAttributeMap;
+
+      return {
+        resource: {
+          ...managedAttributeMap,
+          metadata: row.identifier,
+          type: "managed-attribute-map"
+        } as ManagedAttributeMap,
+        type: "managed-attribute-map"
+      };
+    });
 
     editedManagedAttributeMaps.forEach(saveArg => delete saveArg.resource.id);
 
