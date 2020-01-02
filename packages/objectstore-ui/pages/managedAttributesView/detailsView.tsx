@@ -10,6 +10,7 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext, useState } from "react";
 import { Head, Nav } from "../../components";
+import { ObjectStoreMessage } from "../../intl/objectstore-intl";
 import { ManagedAttribute } from "../../types/objectstore-api/resources/ManagedAttribute";
 
 interface ManagedAttributeFormProps {
@@ -38,12 +39,16 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
       <div>
         {id ? (
           <div>
-            <h1>Edit Managed Attribute</h1>
+            <h1>
+              <ObjectStoreMessage id="managedAttributesEditTitle" />
+            </h1>
             <ManagedAttributeForm router={router} />
           </div>
         ) : (
           <div>
-            <h1>Add Managed Attribute</h1>
+            <h1>
+              <ObjectStoreMessage id="addManagedAttributeButtonText" />
+            </h1>
             <br />
             <ManagedAttributeForm router={router} />
           </div>
@@ -55,6 +60,7 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
 
 function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
   const { save } = useContext(ApiClientContext);
+  const [type, setType] = useState();
   const initialValues = profile || { type: "managed-attribute" };
 
   async function onSubmit(
@@ -91,45 +97,67 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
         <SubmitButton />
         <a href="/managedAttributesView/listView">
           <button className="btn btn-primary" type="button">
-            Cancel
+            <ObjectStoreMessage id="cancelButtonText" />
           </button>
         </a>
-        <h4>Name</h4>
         <div>
-          <TextField name="attributeName" label="Attribute Name" />
+          <h4>
+            <ObjectStoreMessage id="field_managedAttributeName" />
+          </h4>
+          <TextField name="attributeName" hideLabel={true} />
         </div>
-        <br />
-        <h4>Type</h4>
         <div>
+          <h4>
+            <ObjectStoreMessage id="field_managedAttributeType" />
+          </h4>
           <SelectField
             name="attributeType"
-            label="Attribute Type"
             options={ATTRIBUTE_TYPE_OPTIONS}
+            onChange={selectValue => setType(selectValue)}
+            hideLabel={true}
           />
         </div>
-        <br />
-        <h4>Accepted Values</h4>
-        <div>
-          <AcceptedValueBuilder />
-        </div>
+        {type === "STRING" && (
+          <div>
+            <h4>
+              <ObjectStoreMessage id="field_managedAttributeAcceptedValue" />
+            </h4>
+            <AcceptedValueBuilder />
+          </div>
+        )}
       </Form>
     </Formik>
   );
 }
 
+/**
+ * Renders a mutable list of user inputs
+ */
 function AcceptedValueBuilder() {
-  const [values, setValues] = useState(["top"]);
+  const [values, setValues] = useState([]);
+  const [input, setInput] = useState();
 
   async function onAndClick() {
-    setValues(values);
+    if (!values.includes(input) && input !== "") {
+      const valueArray = [...values];
+      valueArray.splice(valueArray.length, 0, input);
+      setValues(valueArray);
+      setInput("");
+    }
   }
 
-  async function onRemoveClick() {
-    setValues(values);
+  async function onRemoveClick(index) {
+    if (values.length === 1) {
+      setValues([]);
+    } else {
+      const newValues = [...values];
+      newValues.splice(index, 1);
+      setValues(newValues);
+    }
   }
 
   return (
-    <div>
+    <div key="acceptedValues">
       {values &&
         values.map((value, index) => {
           return (
@@ -138,10 +166,11 @@ function AcceptedValueBuilder() {
                 type="text"
                 name={`acceptedValue_${index}`}
                 value={value}
+                readOnly={true}
               />
               <button
                 className="list-inline-item btn btn-dark"
-                onClick={onRemoveClick}
+                onClick={() => onRemoveClick(index)}
                 type="button"
               >
                 -
@@ -149,7 +178,13 @@ function AcceptedValueBuilder() {
             </div>
           );
         })}
-      <TextField className="list-inline-item" name="acceptedValue" />
+      <input
+        className="list-inline-item"
+        name="addValue"
+        type="text"
+        value={input}
+        onChange={e => setInput(e.target.value)}
+      />
       <button
         className="list-inline-item btn btn-primary"
         onClick={onAndClick}

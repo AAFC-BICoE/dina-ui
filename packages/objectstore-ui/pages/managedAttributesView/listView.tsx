@@ -2,6 +2,7 @@ import { ColumnDefinition, QueryTable } from "common-ui";
 import { useCookies } from "react-cookie";
 import { CookieSetOptions } from "universal-cookie";
 import { Head, Nav } from "../../components";
+import { ObjectStoreMessage } from "../../intl/objectstore-intl";
 import { ManagedAttribute } from "../../types/objectstore-api/resources/ManagedAttribute";
 
 const ATTRIBUTES_LIST_COLUMNS: Array<ColumnDefinition<ManagedAttribute>> = [
@@ -41,11 +42,13 @@ export default function ManagedAttributesListPage() {
       <Head title="Managed Attributes" />
       <Nav />
       <div>
-        <h1>Managed Attributes</h1>
+        <h1>
+          <ObjectStoreMessage id="managedAttributeListTitle" />
+        </h1>
         <br />
         <a href="/managedAttributesView/detailsView">
           <button className="btn btn-primary" type="button">
-            Add New Managed Attribute
+            <ObjectStoreMessage id="addManagedAttributeButtonText" />
           </button>
         </a>
         <br />
