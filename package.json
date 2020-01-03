@@ -22,7 +22,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn workspaces run lint-staged"
+      "pre-commit": "yarn workspaces run lint-staged && yarn workspace seqdb-ui run a11y-check"
     }
   }
 }

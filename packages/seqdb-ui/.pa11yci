@@ -10,7 +10,10 @@
   ],
   "urls": [
       "http://localhost:8000/pcr-primer/list",
-      "http://localhost:8000/pcr-primer/edit"
+      "http://localhost:8000/pcr-primer/edit",
+      "http://localhost:8000/pcr-primer/view",
+      "http://localhost:8000/pcr-profile/list",
+      "http://localhost:8000/pcr-profile/edit"
 ]
  
 }

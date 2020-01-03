@@ -10,7 +10,8 @@
     "proxy": "micro-proxy -r ./dev-proxy-config.json -p 8000",
     "start": "next start",
     "test": "tsc && jest",
-    "test:coverage": "tsc && jest --coverage"
+    "test:coverage": "tsc && jest --coverage",
+    "a11y-check": "pa11y-ci"
   },
   "dependencies": {
     "@molgenis/rsql": "0.1.2",

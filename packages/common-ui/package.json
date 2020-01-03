@@ -21,7 +21,8 @@
     "react-select": "^3.0.8",
     "react-table": "^6.10.3",
     "react-tooltip": "^3.11.1",
-    "title-case": "^2.1.1"
+    "title-case": "^2.1.1",
+    "pa11y-ci": "~1.0"
   },
   "devDependencies": {
     "@types/enzyme": "^3.10.3",
