@@ -118,10 +118,7 @@ function EditMetadataForm({
   }
 
   return (
-    <Formik
-      initialValues={{ customButtonName: "Save Metadata", dcType: "image" }}
-      onSubmit={onSubmit}
-    >
+    <Formik initialValues={{}} onSubmit={onSubmit}>
       <Form>
         <ErrorViewer />
         <div className="form-group row" style={{ display: "none" }}>
