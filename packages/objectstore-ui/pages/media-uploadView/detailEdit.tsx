@@ -3,22 +3,20 @@ import {
   DateField,
   ErrorViewer,
   filterBy,
-  LoadingSpinner,
-  Query,
   ResourceSelectField,
   SelectField,
   serialize,
   SubmitButton,
   TextField
 } from "common-ui";
+
 import { Form, Formik, FormikActions } from "formik";
 import { GetParams } from "kitsu";
 import { omitBy } from "lodash";
 import withRouter, { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter } from "next/router";
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Agent } from "types/objectstore-api/resources/Agent";
-import { Metadata } from "types/objectstore-api/resources/Metadata";
 import { isArray, isUndefined } from "util";
 import { AttributeBuilder, Head, Nav } from "../../components";
 import { MetaManagedAttribute } from "../../types/objectstore-api/resources/MetaManagedAttribute";
@@ -27,15 +25,6 @@ import { generateManagedAttributeValue } from "../../utils/metaUtils";
 interface DetailEditFormProps {
   router: NextRouter;
 }
-
-const managedAttributes = [
-  {
-    ma_data: undefined,
-    metama_data: undefined,
-    name: "managed",
-    value: "managed"
-  }
-];
 
 export function DetailEditPage({ router }: WithRouterProps) {
   const id = router?.query?.id;
@@ -56,69 +45,104 @@ export function DetailEditPage({ router }: WithRouterProps) {
 function DetailEditForm({ router }: DetailEditFormProps) {
   const id = router?.query?.id;
   const { apiClient } = useContext(ApiClientContext);
-  // To force rerender unpon all promises resolved
-  // when all the related managed attributes data are returned
-  const [editAttributesVisible, setEditAttributesVisible] = useState(false);
-  // Record the tags data, to be expanded by actual data for the target file
-  const unManagedAttributes = [{ name: "unManaged", value: "unManaged" }];
-  // Wrapper function to avoid the react error of invalid children of promise
-  function wrapper(mas) {
-    getManagedAttributesData(mas);
+  const [metainitialValues, setMetainitialValues] = useState({});
+  let metainitialValues1 = {};
+  const unManagedCtrl = new Array();
+  unManagedCtrl.push({ name: "unManaged", value: "unManaged" });
+  const managedCtrl = new Array();
+  managedCtrl.push({
+    ma_data: undefined,
+    metama_data: undefined,
+    name: "managed",
+    value: "managed"
+  });
+
+  if (!Object.keys(metainitialValues).length) {
+    wrapper();
   }
 
-  // Organize the managed attributes with its assigned values for display purpose
-  async function getManagedAttributesData(mas) {
-    const promises = mas.map(ma => retrieveManagedAttributes(ma));
-    await Promise.all(promises);
-    // Shuffle manageAttributes to replace the value with the actual assignedValue of
-    // the individual managed attribute for UI display.
-    mas.map(ma => {
-      managedAttributes.map(maa => {
-        if (
-          maa.metama_data &&
-          maa.metama_data.data &&
-          maa.metama_data.data.id === ma.id
-        ) {
-          maa.value = ma.assignedValue;
-        }
-      });
-    });
-    setEditAttributesVisible(true);
+  async function wrapper() {
+    await retrieveMetadata();
   }
-  // Organize the tags data for display
-  function generateTagsData(tags) {
-    tags.map(tag =>
-      unManagedAttributes.push({
-        name: "fakeName",
-        value: tag
-      })
+
+  /* tslint:disable:no-string-literal */
+  async function retrieveMetadata() {
+    const path = "metadata";
+    const getParams = omitBy<GetParams>(
+      {
+        filter: { fileIdentifier: `${id}` },
+        include: "acMetadataCreator,managedAttribute"
+      },
+      isUndefined
     );
+    const metadata = await apiClient.get<any, undefined>(path, getParams);
+    if (metadata && metadata.data[0]) {
+      metainitialValues1 = metadata.data[0];
+      metainitialValues1["unManagedAttributes"] = unManagedCtrl;
+      metainitialValues1["managedAttributes"] = managedCtrl;
+      let i = 10;
+      // Filling the unmanaged attributes for UI control attributes for backplay
+      // the generation of acTags with initial values
+      if (metadata.data[0].acTags) {
+        metadata.data[0].acTags.map(acTag => {
+          metainitialValues1["unManagedAttributes"].push({
+            name: acTag,
+            value: "" + i
+          });
+          metainitialValues1["assignedValue_un" + i++] = acTag;
+        });
+      }
+      // Filling the managed attributes for UI control attributes for backplay
+      // the generation of managed attributes with initial values
+      if (metadata.data[0].managedAttribute) {
+        let metaManagedAttributes: MetaManagedAttribute[];
+        metaManagedAttributes = await getManagedAttributesData(
+          metadata.data[0].managedAttribute
+        );
+
+        metaManagedAttributes.map(metaMa => {
+          metainitialValues1["key_" + i] = metaMa["data"]["managedAttribute"];
+          metainitialValues1["assignedValue" + i] =
+            metaMa["data"]["assignedValue"];
+
+          metainitialValues1["managedAttributes"].push({
+            ma_data: metaMa["data"]["managedAttribute"],
+            metama_data: metaMa,
+            name: "key_" + i,
+            value: "" + i++
+          });
+        });
+      }
+      setMetainitialValues(metainitialValues1);
+    }
   }
-  // To retrieve the managed attibute based on the metadata managed attribute id
-  // for the target file
-  async function retrieveManagedAttributes(ma) {
+  /* tslint:enable:no-string-literal */
+
+  async function getManagedAttributesData(mas) {
+    const promises = mas.map(ma => retrieveManagedAttrs(ma));
+    const metaAttrs: MetaManagedAttribute[] = await Promise.all(promises);
+    return metaAttrs;
+  }
+  async function retrieveManagedAttrs(ma) {
     const path = "metadata-managed-attribute/" + ma.id;
     const getParams = omitBy<GetParams>(
       { include: "managedAttribute" },
       isUndefined
     );
-    const metaManagedAttribute = await apiClient.get<
-      MetaManagedAttribute,
-      undefined
-    >(path, getParams);
-    managedAttributes.push({
-      ma_data: metaManagedAttribute.data.managedAttribute,
-      metama_data: metaManagedAttribute,
-      name: "fake",
-      value: "assignedValue"
-    });
-    return metaManagedAttribute;
+    return await apiClient.get<MetaManagedAttribute, undefined>(
+      path,
+      getParams
+    );
   }
-
   async function onSubmit(
     submittedValues,
-    { setStatus, setSubmitting }: FormikActions<any>
+    { setStatus, setSubmitting, resetForm }: FormikActions<any>
   ) {
+    const prevSubmitteValues = {};
+    Object.assign(prevSubmitteValues, submittedValues);
+    delete submittedValues.managedAttributes;
+    delete submittedValues.unManagedAttributes;
+    delete submittedValues.managedAttribute;
     try {
       const metaManagedAttributes = new Array();
       if (id) {
@@ -126,33 +150,65 @@ function DetailEditForm({ router }: DetailEditFormProps) {
       }
       // this will be replaced by config?
       submittedValues.bucket = "mybucket";
-      generateManagedAttributeValue(metaManagedAttributes, submittedValues);
+      /* tslint:disable:no-string-literal */
+      generateManagedAttributeValue(
+        metaManagedAttributes,
+        submittedValues,
+        metainitialValues["managedAttributes"]
+      );
+      /* tslint:enable:no-string-literal */
       const config = {
         headers: {
           "Content-Type": "application/vnd.api+json",
           "Crnk-Compact": "true"
         }
       };
+      // send the relationship first, collect those ids
+      const ids = new Array();
+      let mydata;
+      metaManagedAttributes.forEach(async metaMa => {
+        mydata = { data: metaMa };
+        if (metaMa.id) {
+          ids.push(metaMa.id);
+          await apiClient.axios.patch(
+            "/metadata-managed-attribute/" + metaMa.id,
+            mydata,
+            config
+          );
+        } else {
+          const resps = await apiClient.axios.post(
+            "/metadata-managed-attribute",
+            mydata,
+            config
+          );
+          if (resps) {
+            ids.push(resps.data.id);
+          }
+        }
+      });
+      // update the metadata with new relationships
       const serializePromises = serialize({
         resource: submittedValues,
         type: "metadata"
       });
       const serialized = await serializePromises;
-      let mydata = { data: serialized };
-      const response = await apiClient.axios.post("/metadata", mydata, config);
+      mydata = { data: serialized };
+
+      const dataArr = new Array();
+      ids.map(metaId => {
+        dataArr.push({ type: "metadata-managed-attribute", id: metaId });
+      });
+      mydata.data.relationships = { managedAttribute: { data: dataArr } };
+      // send the meta with new relationships
+      const response = await apiClient.axios.patch(
+        "/metadata/" + mydata.data.id,
+        mydata,
+        config
+      );
       if (response.data.data) {
-        const metaID = response.data.data.id;
-        metaManagedAttributes.forEach(async a => {
-          a.relationships.objectStoreMetadata.data.id = metaID;
-          mydata = { data: a };
-          await apiClient.axios.post(
-            "/metadata-managed-attribute",
-            mydata,
-            config
-          );
-        });
         router.push("/media-uploadView/detailView?id=" + id);
       } else {
+        resetForm(prevSubmitteValues);
         setStatus(
           response && response.data
             ? response.data.errors[0].title +
@@ -162,65 +218,53 @@ function DetailEditForm({ router }: DetailEditFormProps) {
         );
       }
     } catch (error) {
+      resetForm(prevSubmitteValues);
       setStatus(error.message);
     }
     setSubmitting(false);
   }
-
   return (
+    /* tslint:disable:no-string-literal */
     <div>
-      <Query<Metadata>
-        query={{
-          filter: { fileIdentifier: `${id}` },
-          include: "acMetadataCreator,managedAttribute",
-          path: "metadata/"
-        }}
-      >
-        {({ loading, response }) => (
-          <div className="col-sm-8">
-            <LoadingSpinner loading={loading} />
-            {response && (
-              <div>
-                <Formik initialValues={response.data[0]} onSubmit={onSubmit}>
-                  <Form>
-                    <ErrorViewer />
-                    <SubmitButton />
-                    <EditMetadataFormPage />
-                    {response.data[0] &&
-                      response.data[0].managedAttribute &&
-                      wrapper(response.data[0].managedAttribute)}
-                    {editAttributesVisible && (
-                      <>
-                        <div
-                          style={{ marginBottom: "20px", marginTop: "20px" }}
-                        >
-                          <h5 style={{ color: "#1465b7" }}>
-                            Managed Attributes
-                          </h5>
-                        </div>
-                        <AttributeBuilder
-                          controlledAttributes={managedAttributes}
-                        />
-                      </>
-                    )}
-
-                    {response.data[0] &&
-                      response.data[0].acTags &&
-                      generateTagsData(response.data[0].acTags)}
-                    <div style={{ marginBottom: "20px", marginTop: "20px" }}>
-                      <h5 style={{ color: "#1465b7" }}>Tags</h5>
-                    </div>
-                    <AttributeBuilder
-                      controlledAttributes={unManagedAttributes}
-                    />
-                  </Form>
-                </Formik>
-              </div>
-            )}
+      <div className="col-sm-8">
+        {Object.keys(metainitialValues).length > 0 && (
+          <div>
+            <Formik
+              initialValues={metainitialValues}
+              onSubmit={onSubmit}
+              enableReinitialize={true}
+            >
+              <Form>
+                <ErrorViewer />
+                <SubmitButton />
+                <EditMetadataFormPage />
+                <div>
+                  <div style={{ marginBottom: "20px", marginTop: "20px" }}>
+                    <h5 style={{ color: "#1465b7" }}>Managed Attributes</h5>
+                  </div>
+                  <AttributeBuilder
+                    controlledAttributes={
+                      metainitialValues["managedAttributes"]
+                    }
+                    initValues={metainitialValues}
+                  />
+                  <div style={{ marginBottom: "20px", marginTop: "20px" }}>
+                    <h5 style={{ color: "#1465b7" }}>Tags</h5>
+                  </div>
+                  <AttributeBuilder
+                    controlledAttributes={
+                      metainitialValues["unManagedAttributes"]
+                    }
+                    initValues={metainitialValues}
+                  />
+                </div>
+              </Form>
+            </Formik>
           </div>
         )}
-      </Query>
+      </div>
     </div>
+    /* tslint:enable:no-string-literal */
   );
 }
 

@@ -16,10 +16,13 @@ export interface AttributeBuilderProps {
   controlledAttributes: ControlledAttribute[];
   value?: AttributeGroupModel;
   onChange?: (state: AttributeGroupModel) => void;
+  initValues?: any;
 }
 
 export interface AttributeBuilderState {
   model: AttributeGroupModel;
+  controlledAttributes: ControlledAttribute[];
+  initValues?: any;
 }
 
 /**
@@ -41,6 +44,8 @@ export class AttributeBuilder extends React.Component<
   constructor(props: AttributeBuilderProps) {
     super(props);
     this.state = {
+      controlledAttributes: props.controlledAttributes,
+      initValues: props.initValues,
       model: props.value || this.getInitialModel()
     };
   }
@@ -68,8 +73,8 @@ export class AttributeBuilder extends React.Component<
    */
   public render() {
     const parent = this.state.model;
-    let after = this.state.model;
-    const model = after;
+    let before = this.state.model;
+    const model = before;
     if (
       this.props.controlledAttributes.length > 1 &&
       this.btnClicked === false
@@ -79,8 +84,8 @@ export class AttributeBuilder extends React.Component<
           (ca.name.indexOf("managed") === -1 &&
             ca.name.indexOf("unManaged")) === -1
         ) {
-          after = parent.children[parent.children.length - 1] as any;
-          this.addAttributeRowNoUpdate({ after, parent, ca });
+          before = parent.children[parent.children.length - 1] as any;
+          this.addAttributeRowNoUpdate({ before, parent, ca });
         }
       });
     }
@@ -106,7 +111,7 @@ export class AttributeBuilder extends React.Component<
           attribute: this.props.controlledAttributes[0],
           id: this.getNewAttributeId(),
           type: "ATTRIBUTE_ROW",
-          value: ""
+          value: "Plus"
         }
       ],
       id: this.getNewAttributeId(),
@@ -114,34 +119,33 @@ export class AttributeBuilder extends React.Component<
     };
   }
 
+  // Add the new row in front of the old one with the id assigned by the controlled attributes
+  // also update the gloabl row counter with id+1 in prepartion for the new row model id to
+  // be added by clicking the plus sign
   private addAttributeRowNoUpdate({
-    after,
+    before,
     parent,
     ca
   }: {
-    /** The attribute to add a new one after, e.g. the attribute with the clicked button. */
-    after: AttributeRowModel | AttributeGroupModel;
+    /** The attribute to add a new one before */
+    before: AttributeRowModel | AttributeGroupModel;
     /** The new attribute's parent group. */
     parent: AttributeGroupModel;
     ca: ControlledAttribute;
   }) {
-    const id = this.getNewAttributeId();
+    const id = parseInt(ca.value, 10);
+    this.attributeIdIncrementor = id + 1;
     const newAttributeRow: AttributeRowModel = {
-      attribute: undefined,
+      attribute: ca,
       id,
       type: "ATTRIBUTE_ROW",
-      value: "Plus"
+      value: ""
     };
 
-    if (after.type === "ATTRIBUTE_ROW") {
-      after.value = "";
-      after.attribute = ca;
+    if (before.type === "ATTRIBUTE_ROW") {
+      before.attribute = undefined;
     }
-    parent.children.splice(
-      parent.children.indexOf(after) + 1,
-      0,
-      newAttributeRow
-    );
+    parent.children.unshift(newAttributeRow);
   }
   /**
    * Adds a new AttributeRow to the model.
@@ -188,6 +192,13 @@ export class AttributeBuilder extends React.Component<
     parent: AttributeGroupModel;
   }) {
     // Remove the attribute row from the parent's children array.
+    if (attribute.type === "ATTRIBUTE_ROW" && attribute.attribute) {
+      if (this.state.initValues) {
+        delete this.state.initValues["key_" + attribute.id];
+        delete this.state.initValues["assignedValue" + attribute.id];
+        delete this.state.initValues["assignedValue_un" + attribute.id];
+      }
+    }
     parent.children = pull(parent.children, attribute);
 
     this.btnClicked = true;

@@ -11,7 +11,8 @@ export function renameJson(json, oldkey, newkey) {
 
 export function generateManagedAttributeValue(
   metaManagedAttributes,
-  submittedValues
+  submittedValues,
+  managedAttributes
 ) {
   const acTags = new Set();
   for (const x in submittedValues) {
@@ -26,13 +27,31 @@ export function generateManagedAttributeValue(
           },
           objectStoreMetadata: {
             data: {
-              id: "variable",
+              id: submittedValues.id ? submittedValues.id : "variable",
               type: "metadata"
             }
           }
         },
         type: "metadata-managed-attribute"
       };
+
+      /* tslint:disable:no-string-literal */
+      if (managedAttributes) {
+        managedAttributes.map(ma => {
+          if (
+            ma["ma_data"] &&
+            ma["ma_data"]["id"] ===
+              metaManagedAttribute["relationships"]["managedAttribute"]["data"][
+                "id"
+              ]
+          ) {
+            if (ma["metama_data"]["data"]["id"]) {
+              metaManagedAttribute["id"] = ma["metama_data"]["data"]["id"];
+            }
+          }
+        });
+      }
+      /* tslint:enable:no-string-literal */
       metaManagedAttributes.push(metaManagedAttribute);
       delete submittedValues[x];
       delete submittedValues["assignedValue" + x.substr(4)];

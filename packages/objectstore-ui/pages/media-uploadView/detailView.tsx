@@ -2,6 +2,7 @@ import { ApiClientContext, LoadingSpinner, Query } from "common-ui";
 import { GetParams } from "kitsu";
 import { omitBy } from "lodash";
 import withRouter, { WithRouterProps } from "next/dist/client/with-router";
+import Link from "next/link";
 import { useCallback, useContext } from "react";
 import { useAsyncRun, useAsyncTask } from "react-hooks-async";
 import { FileDownLoadResponseAttributes } from "types/objectstore-api/resources/FileDownLoadResponse";
@@ -129,7 +130,7 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
               {({ loading, response }) => (
                 <div className="col-md-7">
                   <LoadingSpinner loading={loading} />
-                  {response && (
+                  {response && response.data[0] && (
                     <div>
                       <div style={{ marginBottom: "20px", marginTop: "20px" }}>
                         <h5 style={{ color: "#1465b7" }}>Metadata</h5>

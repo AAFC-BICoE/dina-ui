@@ -13,7 +13,6 @@ export interface ResourceSelectFieldProps<TData extends KitsuResource>
   onChange?: (
     value?: PersistedResource<TData> | Array<PersistedResource<TData>>
   ) => void;
-  initialValue?: any;
 }
 
 /** Formik-connected Dropdown select input for selecting a resource from the API. */
@@ -26,8 +25,7 @@ export function ResourceSelectField<TData extends KitsuResource>(
     label,
     onChange = noop,
     tooltipMsg,
-    hideLabel,
-    initialValue
+    hideLabel
   } = topLevelProps;
 
   return (
@@ -53,7 +51,7 @@ export function ResourceSelectField<TData extends KitsuResource>(
             <ResourceSelect
               {...topLevelProps}
               onChange={onChangeInternal}
-              value={value ? value : initialValue}
+              value={value}
             />
           </FieldWrapper>
         );
