@@ -3,16 +3,19 @@ export default function ViewTagsForm(data) {
   return (
     <div>
       {data &&
+        data.meta &&
         data.meta.acTags &&
         data.meta.acTags.map(acTag => (
-          <label key={acTag} className="col-sm-1">
-            <strong
-              style={{ background: "#ffffcc", borderRadius: "100px/99px" }}
-            >
-              {" "}
-              &nbsp;&nbsp;{acTag}&nbsp;&nbsp;{" "}
-            </strong>
-          </label>
+          <>
+            <label>
+              <strong style={{ background: "#AEB404", borderRadius: "25px" }}>
+                <span>&nbsp;&nbsp;</span>
+                {acTag}
+                <span>&nbsp;&nbsp;</span>
+              </strong>
+            </label>
+            <span>&nbsp;&nbsp;</span>
+          </>
         ))}
     </div>
   );

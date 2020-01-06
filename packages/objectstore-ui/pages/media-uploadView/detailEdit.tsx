@@ -27,7 +27,7 @@ interface DetailEditFormProps {
 }
 
 export function DetailEditPage({ router }: WithRouterProps) {
-  const id = router?.query;
+  const id = router?.query?.id;
   return (
     <div>
       <Head title="Object Store Detailes Edit Page" />
@@ -43,7 +43,7 @@ export function DetailEditPage({ router }: WithRouterProps) {
 }
 
 function DetailEditForm({ router }: DetailEditFormProps) {
-  const id = router.query.id;
+  const id = router?.query?.id;
   const { apiClient } = useContext(ApiClientContext);
   const [metainitialValues, setMetainitialValues] = useState({});
   let metainitialValues1 = {};
