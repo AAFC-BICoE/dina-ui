@@ -2843,6 +2843,11 @@ ci-info@2.0.0, ci-info@^2.0.0:
   resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-2.0.0.tgz#67a9e964be31a51e15e5010d58e6f12834002f46"
   integrity sha512-5tK7EtrZ0N+OLFMthtqOj4fI2Jeb88C4CAZPu25LDVUgXJ0A3Js4PMGqrn0JU1W0Mh1/Z8wZzYPxqUrXeBboCQ==
 
+ci-logger@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/ci-logger/-/ci-logger-1.0.3.tgz#07c922c4169fc162396e04095704e252acafacbe"
+  integrity sha512-DmrubufTgnvx0m6kT03IDsqMp9t6k+QDwUcogSnTiR9FB50Iic9oqh5dsywPq4/KeoYvA+/l/zQ1FV4WjdwwNw==
+
 cipher-base@^1.0.0, cipher-base@^1.0.1, cipher-base@^1.0.3:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/cipher-base/-/cipher-base-1.0.4.tgz#8760e4ecc272f4c363532f926d874aae2c1397de"
@@ -2978,6 +2983,11 @@ commander@^2.12.1, commander@^2.19.0, commander@^2.20.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.1.tgz#3863ce3ca92d0831dcf2a102f5fb4b5926afd0f9"
   integrity sha512-cCuLsMhJeWQ/ZpsFTbE765kvVfoeSddc4nU3up4fV+fDBcfUXnbITJ+JzhkdjzOqhURjZgujxaioam4RM9yGUg==
 
+commander@^4.0.1:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-4.1.0.tgz#545983a0603fe425bc672d66c9e3c89c42121a83"
+  integrity sha512-NIQrwvv9V39FHgGFm36+U9SMQzbiHvU79k+iADraJTpmrFFfx7Ds0IvDoAdZsDrknlkRk14OYoWXb57uTh7/sw==
+
 "common-ui@link:packages/common-ui":
   version "0.0.0"
   dependencies:
@@ -2987,6 +2997,7 @@ commander@^2.12.1, commander@^2.19.0, commander@^2.20.0:
     kitsu-core "7.0.4"
     next "^9.1.5"
     pa11y-ci "~1.0"
+    pa11y-ci-reporter-html "^1.2.4"
     react-datepicker "^2.9.6"
     react-hooks-async "^3.4.2"
     react-intl "^3.9.1"
@@ -4637,6 +4648,17 @@ handlebars@^4.1.2:
   optionalDependencies:
     uglify-js "^3.1.4"
 
+handlebars@^4.5.3:
+  version "4.5.3"
+  resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.5.3.tgz#5cf75bd8714f7605713511a56be7c349becb0482"
+  integrity sha512-3yPecJoJHK/4c6aZhSvxOyG4vJKDshV36VHp0iVCDVh7o9w2vwi3NSnL2MMPj3YdduqaBcu7cGbggJQM0br9xA==
+  dependencies:
+    neo-async "^2.6.0"
+    optimist "^0.6.1"
+    source-map "^0.6.1"
+  optionalDependencies:
+    uglify-js "^3.1.4"
+
 har-schema@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/har-schema/-/har-schema-2.0.0.tgz#a94c2224ebcac04782a0d9035521f24735b7ec92"
@@ -4754,6 +4776,14 @@ hmac-drbg@^1.0.0:
     hash.js "^1.0.3"
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.1"
+
+hogan.js@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/hogan.js/-/hogan.js-3.0.2.tgz#4cd9e1abd4294146e7679e41d7898732b02c7bfd"
+  integrity sha1-TNnhq9QpQUbnZ55B14mHMrAse/0=
+  dependencies:
+    mkdirp "0.3.0"
+    nopt "1.0.10"
 
 hoist-non-react-statics@^3.0.0, hoist-non-react-statics@^3.3.0:
   version "3.3.0"
@@ -6584,6 +6614,11 @@ mixin-deep@^1.2.0:
     for-in "^1.0.2"
     is-extendable "^1.0.1"
 
+mkdirp@0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.3.0.tgz#1bbf5ab1ba827af23575143490426455f481fe1e"
+  integrity sha1-G79asbqCevI1dRQ0kEJkVfSB/h4=
+
 mkdirp@0.5.1, mkdirp@^0.5.0, mkdirp@^0.5.1:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
@@ -6889,6 +6924,13 @@ node.extend@^1.1.6, node.extend@~1.1.6:
   dependencies:
     has "^1.0.3"
     is "^3.2.1"
+
+nopt@1.0.10:
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/nopt/-/nopt-1.0.10.tgz#6ddd21bd2a31417b92727dd585f8a6f37608ebee"
+  integrity sha1-bd0hvSoxQXuScn3Vhfim83YI6+4=
+  dependencies:
+    abbrev "1"
 
 nopt@^4.0.1:
   version "4.0.1"
@@ -7306,6 +7348,16 @@ p-try@^2.0.0:
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
+pa11y-ci-reporter-html@^1.2.4:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/pa11y-ci-reporter-html/-/pa11y-ci-reporter-html-1.2.4.tgz#734086e7f8ca30e2d323211f8d8543f6b12fa5ea"
+  integrity sha512-aFcQ/uEeEkz6ZVFLCZjN/iooZhn7h6ompIO26fPWWkgB2l3Avyj5hIcQNKg17TijyWt0C4LpsdLkJe1Sh5JcIg==
+  dependencies:
+    ci-logger "^1.0.3"
+    commander "^4.0.1"
+    handlebars "^4.5.3"
+    pa11y-reporter-html "^1.0.0"
+
 pa11y-ci@~1.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/pa11y-ci/-/pa11y-ci-1.0.2.tgz#3ea2f79e12087712fee3fd454a9caf6bb1fdc9e7"
@@ -7319,6 +7371,13 @@ pa11y-ci@~1.0:
     node-fetch "^1"
     pa11y "^4.7.0"
     wordwrap "^1"
+
+pa11y-reporter-html@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/pa11y-reporter-html/-/pa11y-reporter-html-1.0.0.tgz#6c77b99cb612cd9abe621af6fa9177045f644673"
+  integrity sha512-xF4TQVyDgVCtfIlYBAjvEnbTfoolKPu7AfAHD67mbiqjkdw2D28av1O62s2DcW1ho8Gb1aFZT1iFeP4HSs8SeQ==
+  dependencies:
+    hogan.js "^3.0.2"
 
 pa11y@^4.7.0:
   version "4.13.2"

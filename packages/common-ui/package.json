@@ -14,6 +14,8 @@
     "kitsu": "7.0.4",
     "kitsu-core": "7.0.4",
     "next": "^9.1.5",
+    "pa11y-ci": "~1.0",
+    "pa11y-ci-reporter-html": "^1.2.4",
     "react-datepicker": "^2.9.6",
     "react-hooks-async": "^3.4.2",
     "react-intl": "^3.9.1",
@@ -21,8 +23,7 @@
     "react-select": "^3.0.8",
     "react-table": "^6.10.3",
     "react-tooltip": "^3.11.1",
-    "title-case": "^2.1.1",
-    "pa11y-ci": "~1.0"
+    "title-case": "^2.1.1"
   },
   "devDependencies": {
     "@types/enzyme": "^3.10.3",
