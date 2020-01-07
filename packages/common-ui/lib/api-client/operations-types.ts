@@ -21,7 +21,7 @@ export type OperationVerb = "GET" | "POST" | "PATCH" | "DELETE";
 export interface Operation {
   op: OperationVerb;
   path: string;
-  value: ResourceObject;
+  value?: ResourceObject;
 }
 
 /**
