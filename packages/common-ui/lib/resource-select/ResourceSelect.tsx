@@ -1,25 +1,32 @@
-import { FilterParam, GetParams, KitsuResource, KitsuResponse } from "kitsu";
-import { debounce, omitBy } from "lodash";
+import {
+  FilterParam,
+  GetParams,
+  KitsuResource,
+  KitsuResponse,
+  PersistedResource
+} from "kitsu";
+import { debounce, isUndefined, omitBy } from "lodash";
 import React, { useContext } from "react";
 import AsyncSelect from "react-select/async";
 import { Styles } from "react-select/src/styles";
 import { OptionsType } from "react-select/src/types";
-import { isUndefined } from "util";
 import { ApiClientContext } from "../..";
 
 /** ResourceSelect component props. */
-export interface ResourceSelectProps<TData> {
+export interface ResourceSelectProps<TData extends KitsuResource> {
   /** Sets the input's value so the value can be controlled externally. */
   value?: TData | TData[];
 
   /** Function called when an option is selected. */
-  onChange?: (value: TData | TData[]) => void;
+  onChange?: (
+    value: PersistedResource<TData> | Array<PersistedResource<TData>>
+  ) => void;
 
   /** The model type to select resources from. */
   model: string;
 
   /** Function to get the option label for each resource. */
-  optionLabel: (resource: TData) => string;
+  optionLabel: (resource: PersistedResource<TData>) => string;
 
   /** Function that is passed the dropdown's search input value and returns a JSONAPI filter param. */
   filter: (inputValue: string) => FilterParam;
@@ -40,7 +47,7 @@ export interface ResourceSelectProps<TData> {
   customDataFetch?: (
     path: string,
     params: GetParams
-  ) => Promise<KitsuResponse<any, any>>;
+  ) => Promise<KitsuResponse<TData[], any>>;
 }
 
 /** An option the user can select to set the relationship to null. */
@@ -61,7 +68,8 @@ export function ResourceSelect<TData extends KitsuResource>({
 }: ResourceSelectProps<TData>) {
   const { apiClient } = useContext(ApiClientContext);
 
-  const dataFetch = customDataFetch || ((...args) => apiClient.get(...args));
+  const dataFetch =
+    customDataFetch || ((...args) => apiClient.get<TData[]>(...args));
 
   async function loadOptions(
     inputValue: string,
@@ -114,18 +122,20 @@ export function ResourceSelect<TData extends KitsuResource>({
   // Set the component's value externally when used as a controlled input.
   let selectValue;
   if (isMulti) {
-    selectValue = ((value || []) as TData[]).map(resource => ({
-      label: optionLabel(resource),
-      resource,
-      value: resource.id
-    }));
+    selectValue = ((value || []) as Array<PersistedResource<TData>>).map(
+      resource => ({
+        label: optionLabel(resource),
+        resource,
+        value: resource.id
+      })
+    );
   } else {
     selectValue = !value
       ? null
       : (value as TData).id === null
       ? NULL_OPTION
       : {
-          label: optionLabel(value as TData),
+          label: optionLabel(value as PersistedResource<TData>),
           resource: value,
           value: (value as TData).id
         };

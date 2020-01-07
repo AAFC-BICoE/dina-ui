@@ -1,6 +1,6 @@
 import { ApiClientContext, ResourceSelect } from "common-ui";
-import { mount } from "enzyme";
 import NumberFormat from "react-number-format";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Chain, ChainStepTemplate } from "../../../../types/seqdb-api";
 import { LibraryPrepBatchForm } from "../LibraryPrepBatchForm";
 
@@ -16,15 +16,14 @@ const mockCtx = {
 
 const mockOnSuccess = jest.fn();
 function getWrapper(propsOverride = {}) {
-  return mount(
-    <ApiClientContext.Provider value={mockCtx as any}>
-      <LibraryPrepBatchForm
-        chain={{ id: "5", type: "chain" } as Chain}
-        step={{ id: "10", type: "chainStepTemplate" } as ChainStepTemplate}
-        onSuccess={mockOnSuccess}
-        {...propsOverride}
-      />
-    </ApiClientContext.Provider>
+  return mountWithAppContext(
+    <LibraryPrepBatchForm
+      chain={{ id: "5", type: "chain" } as Chain}
+      step={{ id: "10", type: "chainStepTemplate" } as ChainStepTemplate}
+      onSuccess={mockOnSuccess}
+      {...propsOverride}
+    />,
+    { apiContext: mockCtx as any }
   );
 }
 

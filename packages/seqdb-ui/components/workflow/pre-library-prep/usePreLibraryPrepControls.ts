@@ -31,8 +31,8 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
         sample: "name,version"
       },
       filter: {
-        "chain.chainId": chain.id as string,
-        "chainStepTemplate.chainStepTemplateId": step.id as string,
+        "chain.chainId": chain.id,
+        "chainStepTemplate.chainStepTemplateId": step.id,
         rsql: `sample.sampleId=in=(${visibleSampleIds})`
       },
       include:
@@ -87,16 +87,18 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
     // Find the existing PreLibraryPreps stepResources for these samples.
     // These should be edited instead of creating new ones.
     const existingStepResources = checkedSampleIds.length
-      ? (await apiClient.get<StepResource[]>("stepResource", {
-          filter: {
-            "chain.chainId": chain.id as string,
-            "chainStepTemplate.chainStepTemplateId": step.id as string,
-            "preLibraryPrep.preLibraryPrepType": plpValues.preLibraryPrepType,
-            rsql: `sample.sampleId=in=(${checkedSampleIds})`
-          },
-          include: "sample,preLibraryPrep",
-          page: { limit: 1000 } // Max page limit
-        })).data
+      ? (
+          await apiClient.get<StepResource[]>("stepResource", {
+            filter: {
+              "chain.chainId": chain.id,
+              "chainStepTemplate.chainStepTemplateId": step.id,
+              "preLibraryPrep.preLibraryPrepType": plpValues.preLibraryPrepType,
+              rsql: `sample.sampleId=in=(${checkedSampleIds})`
+            },
+            include: "sample,preLibraryPrep",
+            page: { limit: 1000 } // Max page limit
+          })
+        ).data
       : [];
 
     const plps = checkedSampleIds.map(checkedSampleId => {
@@ -172,16 +174,18 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       // Find the existing PreLibraryPreps stepResources for these samples.
       // These should be edited instead of creating new ones.
       const stepResourcesToDelete = checkedSampleIds.length
-        ? (await apiClient.get<StepResource[]>("stepResource", {
-            filter: {
-              "chain.chainId": chain.id as string,
-              "chainStepTemplate.chainStepTemplateId": step.id as string,
-              "preLibraryPrep.preLibraryPrepType": plpType,
-              rsql: `sample.sampleId=in=(${checkedSampleIds})`
-            },
-            include: "sample,preLibraryPrep",
-            page: { limit: 1000 } // Max page limit
-          })).data
+        ? (
+            await apiClient.get<StepResource[]>("stepResource", {
+              filter: {
+                "chain.chainId": chain.id,
+                "chainStepTemplate.chainStepTemplateId": step.id,
+                "preLibraryPrep.preLibraryPrepType": plpType,
+                rsql: `sample.sampleId=in=(${checkedSampleIds})`
+              },
+              include: "sample,preLibraryPrep",
+              page: { limit: 1000 } // Max page limit
+            })
+          ).data
         : [];
 
       const plpsToDelete = stepResourcesToDelete.map(

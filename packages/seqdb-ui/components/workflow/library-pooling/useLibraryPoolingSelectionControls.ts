@@ -1,4 +1,4 @@
-import { ApiClientContext, HttpMethod } from "common-ui";
+import { ApiClientContext, OperationVerb } from "common-ui";
 import { FormikActions } from "formik";
 import { toPairs } from "lodash";
 import { useContext, useState } from "react";
@@ -80,7 +80,7 @@ export function useLibraryPoolingSelectionControls({
 
   async function deleteLibraryPoolContents(items: LibraryPoolContent[]) {
     const operations = items.map(item => ({
-      op: "DELETE" as HttpMethod,
+      op: "DELETE" as OperationVerb,
       path: `libraryPoolContent/${item.id}`,
       value: {
         id: item.id as string,

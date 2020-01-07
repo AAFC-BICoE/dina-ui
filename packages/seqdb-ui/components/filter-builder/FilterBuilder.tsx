@@ -1,5 +1,6 @@
 import { isEqual, pull } from "lodash";
 import React from "react";
+import { FilterBuilderContextProvider } from "./FilterBuilderContext";
 import {
   FilterGroup,
   FilterGroupModel,
@@ -68,10 +69,16 @@ export class FilterBuilder extends React.Component<
    * FilterRows.
    */
   public render() {
-    return this.renderFilter({
-      model: this.state.model,
-      parent: this.state.model
-    });
+    return (
+      <FilterBuilderContextProvider
+        filterAttributes={this.props.filterAttributes}
+      >
+        {this.renderFilter({
+          model: this.state.model,
+          parent: this.state.model
+        })}
+      </FilterBuilderContextProvider>
+    );
   }
 
   /**
@@ -291,7 +298,6 @@ export class FilterBuilder extends React.Component<
             onChange={this.onChange}
             onRemoveClick={onRemoveClick}
             onOrClick={onOrClick}
-            filterAttributes={this.props.filterAttributes}
             showRemoveButton={showRemoveButton}
           />
         );

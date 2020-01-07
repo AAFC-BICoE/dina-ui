@@ -1,9 +1,9 @@
+import { DocWithErrors } from "jsonapi-typescript";
 import { GetParams, KitsuResponse, KitsuResponseData } from "kitsu";
 import { isUndefined, omitBy } from "lodash";
 import { useCallback, useContext, useRef } from "react";
 import { useAsyncRun, useAsyncTask } from "react-hooks-async";
 import { ApiClientContext } from "./ApiClientContext";
-import { JsonApiErrorResponse } from "./jsonapi-types";
 
 /** Attributes that compose a JsonApi query. */
 export interface JsonApiQuerySpec extends GetParams {
@@ -13,7 +13,7 @@ export interface JsonApiQuerySpec extends GetParams {
 /** Query hook state. */
 export interface QueryState<TData extends KitsuResponseData, TMeta> {
   loading: boolean;
-  error?: JsonApiErrorResponse;
+  error?: DocWithErrors;
   response?: KitsuResponse<TData, TMeta>;
 }
 
@@ -35,6 +35,7 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   options: QueryOptions<TData, TMeta> = {}
 ): QueryState<TData, TMeta> {
   const { apiClient } = useContext(ApiClientContext);
+
   const previousResponseRef = useRef<KitsuResponse<TData, TMeta> | undefined>(
     undefined
   );

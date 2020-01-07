@@ -1,3 +1,4 @@
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { FilterRowModel } from "./FilterRow";
 
 export type FilterGroupOperator = "AND" | "OR";
@@ -28,6 +29,8 @@ export function FilterGroup({
   showAndOrButtons,
   showRemoveButton
 }: FilterGroupProps) {
+  const { formatMessage } = useSeqdbIntl();
+
   return (
     <div className="list-inline">
       <div className="card card-body list-inline-item d-inline-block">
@@ -35,7 +38,7 @@ export function FilterGroup({
           <div key={i}>
             {element}
             <div className="text-center">
-              {i !== children.length - 1 && model.operator}
+              {i !== children.length - 1 && formatMessage(model.operator)}
             </div>
           </div>
         ))}
@@ -44,24 +47,24 @@ export function FilterGroup({
         {showAndOrButtons && (
           <div>
             <button
-              className="btn btn-primary d-block"
+              className="btn btn-primary d-block and"
               onClick={onAndClick}
               type="button"
             >
-              AND
+              <SeqdbMessage id="AND" />
             </button>
             <button
-              className="btn btn-primary d-block"
+              className="btn btn-primary d-block or"
               onClick={onOrClick}
               type="button"
             >
-              OR
+              <SeqdbMessage id="OR" />
             </button>
           </div>
         )}
         {showRemoveButton && (
           <button
-            className="btn btn-dark d-block"
+            className="btn btn-dark d-block remove"
             onClick={onRemoveClick}
             type="button"
           >

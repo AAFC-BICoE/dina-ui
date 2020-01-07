@@ -1,6 +1,7 @@
 import { ApiClientContext, LoadingSpinner } from "common-ui";
 import { mount } from "enzyme";
 import IndexSetViewPage from "../../../pages/index-set/view";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { IndexSet, NgsIndex } from "../../../types/seqdb-api";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -56,11 +57,9 @@ const mockCtx = {
 };
 
 function getWrapper() {
-  return mount(
-    <ApiClientContext.Provider value={mockCtx as any}>
-      <IndexSetViewPage />
-    </ApiClientContext.Provider>
-  );
+  return mountWithAppContext(<IndexSetViewPage />, {
+    apiContext: mockCtx as any
+  });
 }
 
 describe("Index Set View Page", () => {

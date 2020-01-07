@@ -1,10 +1,6 @@
-import {
-  ApiClientContext,
-  createContextValue,
-  OperationsResponse
-} from "common-ui";
-import { mount } from "enzyme";
+import { OperationsResponse } from "common-ui";
 import { ProductEditPage } from "../../../pages/product/edit";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Product } from "../../../types/seqdb-api/resources/Product";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -31,14 +27,6 @@ jest.mock(
     }
 );
 
-function mountWithContext(element: JSX.Element) {
-  return mount(
-    <ApiClientContext.Provider value={createContextValue()}>
-      {element}
-    </ApiClientContext.Provider>
-  );
-}
-
 describe("Product edit page", () => {
   beforeEach(() => {
     jest.resetAllMocks();
@@ -60,7 +48,7 @@ describe("Product edit page", () => {
       data: [
         {
           data: {
-            id: 1,
+            id: "1",
             type: "product"
           },
           status: 201
@@ -68,7 +56,7 @@ describe("Product edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ProductEditPage router={{ query: {}, push: mockPush } as any} />
     );
 
@@ -92,7 +80,7 @@ describe("Product edit page", () => {
               name: "New Product",
               type: undefined
             },
-            id: -100,
+            id: "-100",
             type: "product"
           }
         }
@@ -121,7 +109,7 @@ describe("Product edit page", () => {
       ] as OperationsResponse
     }));
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ProductEditPage router={{ query: {}, push: mockPush } as any} />
     );
 
@@ -147,7 +135,7 @@ describe("Product edit page", () => {
       data: [
         {
           data: {
-            id: 10,
+            id: "10",
             type: "product"
           },
           status: 201
@@ -155,7 +143,7 @@ describe("Product edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <ProductEditPage router={{ query: { id: 10 }, push: mockPush } as any} />
     );
 

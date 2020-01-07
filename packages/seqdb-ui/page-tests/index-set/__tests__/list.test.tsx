@@ -1,6 +1,7 @@
 import { ApiClientContext } from "common-ui";
 import { mount } from "enzyme";
 import IndexSetListPage from "../../../pages/index-set/list";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { IndexSet } from "../../../types/seqdb-api";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -33,11 +34,9 @@ const mockCtx = {
 };
 
 function getWrapper() {
-  return mount(
-    <ApiClientContext.Provider value={mockCtx as any}>
-      <IndexSetListPage />
-    </ApiClientContext.Provider>
-  );
+  return mountWithAppContext(<IndexSetListPage />, {
+    apiContext: mockCtx as any
+  });
 }
 
 describe("Index set list page", () => {

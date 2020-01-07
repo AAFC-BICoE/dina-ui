@@ -12,6 +12,7 @@ import { FilterParam } from "kitsu";
 import { noop } from "lodash";
 import { useState } from "react";
 import { FilterForm } from "../..";
+import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { Group, StepResource } from "../../../types/seqdb-api";
 import { rsql } from "../../filter-builder/rsql";
 import { StepRendererProps } from "../StepRenderer";
@@ -56,10 +57,7 @@ export function SampleSelection(props: StepRendererProps) {
   ];
 
   const SELECTABLE_SAMPLE_COLUMNS: Array<ColumnDefinition<any>> = [
-    {
-      Header: "Group",
-      accessor: "group.groupName"
-    },
+    "group.groupName",
     "name",
     "version",
     {
@@ -75,7 +73,7 @@ export function SampleSelection(props: StepRendererProps) {
               );
             }}
           >
-            Select
+            <SeqdbMessage id="selectButtonText" />
           </FormikButton>
           <div className="col-6">
             <SampleSelectCheckBox resource={sample} />
@@ -113,7 +111,7 @@ export function SampleSelection(props: StepRendererProps) {
               );
             }}
           >
-            Deselect
+            <SeqdbMessage id="deselectButtonText" />
           </FormikButton>
           <div className="col-6">
             <SampleDeselectCheckBox resource={sr} />
@@ -147,7 +145,9 @@ export function SampleSelection(props: StepRendererProps) {
 
   return (
     <>
-      <h2>Sample Selection</h2>
+      <h2>
+        <SeqdbMessage id="sampleSelectionTitle" />
+      </h2>
       <FilterForm
         filterAttributes={SAMPLE_FILTER_ATTRIBUTES}
         id="sample-selection"
@@ -177,7 +177,9 @@ export function SampleSelection(props: StepRendererProps) {
           <ErrorViewer />
           <div className="row">
             <div className="col-5 available-samples">
-              <strong>Available Samples</strong>
+              <strong>
+                <SeqdbMessage id="availableSamplesTitle" />
+              </strong>
               <QueryTable
                 columns={SELECTABLE_SAMPLE_COLUMNS}
                 defaultPageSize={100}
@@ -194,7 +196,7 @@ export function SampleSelection(props: StepRendererProps) {
                     className="btn btn-primary select-all-checked-button"
                     onClick={selectAllCheckedSamples}
                   >
-                    Select all checked samples -->
+                    <SeqdbMessage id="selectAllCheckedSamplesButtonText" />
                   </FormikButton>
                 </div>
                 <div className="col-6">
@@ -202,20 +204,22 @@ export function SampleSelection(props: StepRendererProps) {
                     className="btn btn-dark deselect-all-checked-button"
                     onClick={deleteAllCheckedStepResources}
                   >
-                    {"<--"} Deselect all checked samples
+                    <SeqdbMessage id="deselectAllCheckedSamplesButtonText" />
                   </FormikButton>
                 </div>
               </div>
             </div>
             <div className="col-5 selected-samples">
-              <strong>Selected Samples</strong>
+              <strong>
+                <SeqdbMessage id="selectedSamplesTitle" />
+              </strong>
               <QueryTable<StepResource>
                 columns={SELECTED_SAMPLE_COLUMNS}
                 defaultPageSize={100}
                 deps={[lastSave]}
                 filter={{
-                  "chain.chainId": chain.id as string,
-                  "chainStepTemplate.chainStepTemplateId": step.id as string
+                  "chain.chainId": chain.id,
+                  "chainStepTemplate.chainStepTemplateId": step.id
                 }}
                 include="sample,sample.group"
                 onSuccess={res => setStepResources(res.data)}

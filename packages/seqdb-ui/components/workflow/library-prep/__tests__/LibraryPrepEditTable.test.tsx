@@ -1,6 +1,6 @@
 import { ApiClientContext, ResourceSelect } from "common-ui";
-import { mount } from "enzyme";
 import NumberFormat from "react-number-format";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Chain, ChainStepTemplate } from "../../../../types/seqdb-api";
 import {
   LibraryPrepEditTable,
@@ -18,32 +18,31 @@ const mockCtx = {
 };
 
 function getWrapper(propsOverride?: Partial<LibraryPrepEditTableProps>) {
-  return mount(
-    <ApiClientContext.Provider value={mockCtx as any}>
-      <LibraryPrepEditTable
-        libraryPrepBatch={{
-          containerType: {
-            baseType: "base type",
-            id: "1",
-            name: "96 well box",
-            numberOfColumns: 12,
-            numberOfRows: 8,
-            numberOfWells: 96,
-            type: "containerType"
-          },
-          id: "5",
-          indexSet: { id: "1234", name: "test index set", type: "indexSet" },
-          name: "test library prep batch",
-          type: "libraryPrepBatch"
-        }}
-        chain={{ id: "5", type: "chain" } as Chain}
-        sampleSelectionStep={
-          { id: "1", type: "chainStepTemplate" } as ChainStepTemplate
-        }
-        editMode="DETAILS"
-        {...propsOverride}
-      />
-    </ApiClientContext.Provider>
+  return mountWithAppContext(
+    <LibraryPrepEditTable
+      libraryPrepBatch={{
+        containerType: {
+          baseType: "base type",
+          id: "1",
+          name: "96 well box",
+          numberOfColumns: 12,
+          numberOfRows: 8,
+          numberOfWells: 96,
+          type: "containerType"
+        },
+        id: "5",
+        indexSet: { id: "1234", name: "test index set", type: "indexSet" },
+        name: "test library prep batch",
+        type: "libraryPrepBatch"
+      }}
+      chain={{ id: "5", type: "chain" } as Chain}
+      sampleSelectionStep={
+        { id: "1", type: "chainStepTemplate" } as ChainStepTemplate
+      }
+      editMode="DETAILS"
+      {...propsOverride}
+    />,
+    { apiContext: mockCtx as any }
   );
 }
 

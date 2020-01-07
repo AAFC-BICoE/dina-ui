@@ -84,7 +84,7 @@ describe("serialize function", () => {
     const person: Person = {
       id: "5",
       name: "Mat",
-      relatedPerson: { id: null as any, type: "person" },
+      relatedPerson: { id: null, type: "person" } as any,
       type: "person"
     };
 

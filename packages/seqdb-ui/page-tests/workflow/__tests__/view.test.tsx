@@ -1,8 +1,7 @@
-import { ApiClientContext } from "common-ui";
-import { mount } from "enzyme";
 import { Tab } from "react-tabs";
 import { Head } from "../../../components";
 import WorkflowViewPage from "../../../pages/workflow/view";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Chain, ChainStepTemplate } from "../../../types/seqdb-api";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -23,11 +22,9 @@ const mockCtx = {
 };
 
 function getWrapper() {
-  return mount(
-    <ApiClientContext.Provider value={mockCtx as any}>
-      <WorkflowViewPage />
-    </ApiClientContext.Provider>
-  );
+  return mountWithAppContext(<WorkflowViewPage />, {
+    apiContext: mockCtx as any
+  });
 }
 
 describe("Workflow view page", () => {
@@ -110,21 +107,16 @@ describe("Workflow view page", () => {
     );
 
     expect(
-      wrapper.containsMatchingElement(
-        <h1>NGS Workflow Details: test workflow</h1>
-      )
-    ).toEqual(true);
+      wrapper
+        .find("h1")
+        .at(0)
+        .text()
+    ).toEqual("NGS Workflow: test workflow");
 
     // Renders the step tabs:
-    expect(
-      wrapper.containsMatchingElement(<Tab>Step 1: step number 1</Tab>)
-    ).toEqual(true);
-    expect(
-      wrapper.containsMatchingElement(<Tab>Step 2: step number 2</Tab>)
-    ).toEqual(true);
-    expect(
-      wrapper.containsMatchingElement(<Tab>Step 3: step number 3</Tab>)
-    ).toEqual(true);
+    expect(wrapper.contains("Step 1: step number 1")).toEqual(true);
+    expect(wrapper.contains("Step 2: step number 2")).toEqual(true);
+    expect(wrapper.contains("Step 3: step number 3")).toEqual(true);
   });
 
   it("Lets you change tabs by clicking on the header.", async () => {
@@ -146,15 +138,17 @@ describe("Workflow view page", () => {
 
     // It should be on tab #2 at first because step 2 was passed in through the router/url:
     expect(
-      wrapper.containsMatchingElement(
-        <Tab selected={true}>Step 2: step number 2</Tab>
-      )
-    ).toEqual(true);
+      wrapper
+        .find(Tab)
+        .findWhere(node => node.prop("selected") === true)
+        .text()
+    ).toEqual("Step 2: step number 2");
 
     // Switch to the #3 tab by clicking on the header:
     wrapper
       .find("li.react-tabs__tab")
       .findWhere(node => node.text() === "Step 3: step number 3")
+      .at(0)
       .simulate("click");
     wrapper.update();
 
@@ -191,10 +185,11 @@ describe("Workflow view page", () => {
 
     // It should be on tab #2 at first because step 2 was passed in through the router/url:
     expect(
-      wrapper.containsMatchingElement(
-        <Tab selected={true}>Step 2: step number 2</Tab>
-      )
-    ).toEqual(true);
+      wrapper
+        .find(Tab)
+        .findWhere(node => node.prop("selected") === true)
+        .text()
+    ).toEqual("Step 2: step number 2");
 
     wrapper.find("button[children='Next Step']").simulate("click");
     wrapper.update();

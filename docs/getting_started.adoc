@@ -2,14 +2,20 @@
 
 Before starting, you will need to setup your dev environment:
 
-== Node.js and NPM
+== Node.js and Yarn
 Install Node.js with NPM at https://nodejs.org/
+
+Install the Yarn package manager with:
+
+----
+npm i -g yarn
+----
 
 You can check which versions you currently have installed with:
 
 ----
 node -v
-npm -v
+yarn -v
 ----
 
 == Installing dependencies
@@ -19,11 +25,5 @@ After you have downloaded all of the required tools, you will need to install th
 It's a good idea to run this command when checking out a new branch since the dependencies might have changed.
 
 ----
-npm install
-----
-
-or
-
-----
-npm i
+yarn
 ----

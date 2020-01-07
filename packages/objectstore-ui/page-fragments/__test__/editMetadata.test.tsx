@@ -1,5 +1,4 @@
-import { ApiClientContext, createContextValue } from "common-ui";
-import { mount } from "enzyme";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { EditMetadataFormPage } from "../editMetadata";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -23,14 +22,6 @@ jest.mock(
       };
     }
 );
-
-function mountWithContext(element: JSX.Element) {
-  return mount(
-    <ApiClientContext.Provider value={createContextValue()}>
-      {element}
-    </ApiClientContext.Provider>
-  );
-}
 
 describe("Metadata edit page", () => {
   beforeEach(() => {
@@ -79,7 +70,7 @@ describe("Metadata edit page", () => {
         fileIdentifier="fileId"
       />
     );
-    const wrapper = mountWithContext(ui);
+    const wrapper = mountWithAppContext(ui);
 
     const addButton = wrapper.find("button.list-inline-item.btn.btn-primary");
 
@@ -137,7 +128,7 @@ describe("Metadata edit page", () => {
         fileIdentifier="fileId"
       />
     );
-    const wrapper = mountWithContext(ui);
+    const wrapper = mountWithAppContext(ui);
 
     wrapper.find(".assignedValue_un1-field input").simulate("change", {
       target: { name: "assignedValue_un1", value: "anything2" }
@@ -184,7 +175,7 @@ describe("Metadata edit page", () => {
       }
     }));
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <EditMetadataFormPage
         originalFileName="fileName"
         fileIdentifier="fileId"

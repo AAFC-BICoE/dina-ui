@@ -1,5 +1,6 @@
 import { ApiClientContext } from "common-ui";
-import { mount } from "enzyme";
+import { PersistedResource } from "kitsu";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Chain, ChainStepTemplate } from "../../../../types/seqdb-api";
 import { LibraryPrepStep } from "../LibraryPrepStep";
 
@@ -17,14 +18,13 @@ function getWrapper() {
   const step = { id: "10", type: "chainStepTemplate" };
   const steps = [{ id: "8", type: "chainStepTemplate" }, {}, step];
 
-  return mount(
-    <ApiClientContext.Provider value={mockCtx as any}>
-      <LibraryPrepStep
-        chain={{ id: "5", type: "chain" } as Chain}
-        step={step as ChainStepTemplate}
-        chainStepTemplates={steps as ChainStepTemplate[]}
-      />
-    </ApiClientContext.Provider>
+  return mountWithAppContext(
+    <LibraryPrepStep
+      chain={{ id: "5", type: "chain" } as PersistedResource<Chain>}
+      step={step as PersistedResource<ChainStepTemplate>}
+      chainStepTemplates={steps as Array<PersistedResource<ChainStepTemplate>>}
+    />,
+    { apiContext: mockCtx as any }
   );
 }
 

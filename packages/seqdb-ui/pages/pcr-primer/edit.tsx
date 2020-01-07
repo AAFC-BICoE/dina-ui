@@ -17,6 +17,7 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ButtonBar, CancelButton, Head, Nav } from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
 import { Region } from "../../types/seqdb-api/resources/Region";
@@ -28,15 +29,18 @@ interface PcrPrimerFormProps {
 
 export function PcrPrimerEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
+  const { formatMessage } = useSeqdbIntl();
 
   return (
     <div>
-      <Head title="Edit PCR Primer" />
+      <Head title={formatMessage("editPcrPrimerTitle")} />
       <Nav />
       <div className="container-fluid">
         {id ? (
           <div>
-            <h1>Edit PCR Primer</h1>
+            <h1>
+              <SeqdbMessage id="editPcrPrimerTitle" />
+            </h1>
             <Query<PcrPrimer>
               query={{ include: "group,region", path: `pcrPrimer/${id}` }}
             >
@@ -52,7 +56,9 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>Add PCR Primer</h1>
+            <h1>
+              <SeqdbMessage id="addPcrPrimerTitle" />
+            </h1>
             <PcrPrimerForm router={router} />
           </div>
         )}

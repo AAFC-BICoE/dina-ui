@@ -1,5 +1,6 @@
 import { ApiClientContext } from "common-ui";
-import { mount } from "enzyme";
+import { PersistedResource } from "kitsu";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   Chain,
   ChainStepTemplate,
@@ -12,27 +13,29 @@ import {
 } from "../../../../types/seqdb-api";
 import { LibraryPoolingStep } from "../LibraryPoolingStep";
 
-const TEST_CHAIN_TEMPLATE: ChainTemplate = {
+const TEST_CHAIN_TEMPLATE = {
   id: "1",
   name: "WGS Pooling",
   type: "chainTemplate"
-};
+} as PersistedResource<ChainTemplate>;
 
-const TEST_CHAIN: Chain = {
+const TEST_CHAIN = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
   dateCreated: "2019-01-01",
   id: "1",
   name: "Mat's pooling chain",
   type: "chain"
-};
+} as PersistedResource<Chain>;
 
-const TEST_POOLING_CHAIN_STEP_TEMPLATE: ChainStepTemplate = {
+const TEST_POOLING_CHAIN_STEP_TEMPLATE = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
   id: "2",
   stepNumber: 2,
-  stepTemplate: { id: "2", type: "stepTemplate" } as StepTemplate,
+  stepTemplate: { id: "2", type: "stepTemplate" } as PersistedResource<
+    StepTemplate
+  >,
   type: "chainStepTemplate"
-};
+} as PersistedResource<ChainStepTemplate>;
 
 const TEST_CHAIN_STEP_TEMPLATES = [TEST_POOLING_CHAIN_STEP_TEMPLATE];
 
@@ -118,14 +121,13 @@ const mockCtx = {
 };
 
 function getWrapper() {
-  return mount(
-    <ApiClientContext.Provider value={mockCtx as any}>
-      <LibraryPoolingStep
-        chain={TEST_CHAIN}
-        chainStepTemplates={TEST_CHAIN_STEP_TEMPLATES}
-        step={TEST_POOLING_CHAIN_STEP_TEMPLATE}
-      />
-    </ApiClientContext.Provider>
+  return mountWithAppContext(
+    <LibraryPoolingStep
+      chain={TEST_CHAIN}
+      chainStepTemplates={TEST_CHAIN_STEP_TEMPLATES}
+      step={TEST_POOLING_CHAIN_STEP_TEMPLATE}
+    />,
+    { apiContext: mockCtx as any }
   );
 }
 

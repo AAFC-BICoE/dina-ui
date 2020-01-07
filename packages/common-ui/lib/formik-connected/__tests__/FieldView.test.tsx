@@ -1,11 +1,11 @@
-import { mount } from "enzyme";
 import { Formik } from "formik";
 import { noop } from "lodash";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { FieldView } from "../FieldView";
 
 describe("FieldView component", () => {
   it("Renders the label and field value. ( minimal use case )", () => {
-    const wrapper = mount(
+    const wrapper = mountWithAppContext(
       <Formik
         initialValues={{ testObject: { name: "testName" } }}
         onSubmit={noop}
@@ -19,7 +19,7 @@ describe("FieldView component", () => {
   });
 
   it("Renders with a custom label.", () => {
-    const wrapper = mount(
+    const wrapper = mountWithAppContext(
       <Formik
         initialValues={{ testObject: { name: "testName" } }}
         onSubmit={noop}
@@ -32,7 +32,7 @@ describe("FieldView component", () => {
   });
 
   it("Allows an optional link prop.", () => {
-    const wrapper = mount(
+    const wrapper = mountWithAppContext(
       <Formik
         initialValues={{ testObject: { name: "testName" } }}
         onSubmit={noop}

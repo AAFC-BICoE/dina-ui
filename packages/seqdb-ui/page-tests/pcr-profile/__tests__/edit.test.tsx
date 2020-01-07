@@ -1,10 +1,6 @@
-import {
-  ApiClientContext,
-  createContextValue,
-  OperationsResponse
-} from "common-ui";
-import { mount } from "enzyme";
+import { OperationsResponse } from "common-ui";
 import { PcrProfileEditPage } from "../../../pages/pcr-profile/edit";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -40,14 +36,6 @@ jest.mock(
     }
 );
 
-function mountWithContext(element: JSX.Element) {
-  return mount(
-    <ApiClientContext.Provider value={createContextValue()}>
-      {element}
-    </ApiClientContext.Provider>
-  );
-}
-
 describe("PcrProfile edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -58,7 +46,7 @@ describe("PcrProfile edit page", () => {
       data: [
         {
           data: {
-            id: 1,
+            id: "1",
             type: "thermocyclerprofile"
           },
           status: 201
@@ -66,7 +54,7 @@ describe("PcrProfile edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <PcrProfileEditPage router={{ query: {}, push: mockPush } as any} />
     );
 
@@ -89,7 +77,7 @@ describe("PcrProfile edit page", () => {
               attributes: {
                 name: "New PcrProfile"
               },
-              id: -100,
+              id: "-100",
               type: "thermocyclerprofile"
             }
           }
@@ -120,7 +108,7 @@ describe("PcrProfile edit page", () => {
       ] as OperationsResponse
     }));
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <PcrProfileEditPage router={{ query: {}, push: mockPush } as any} />
     );
 
@@ -143,7 +131,7 @@ describe("PcrProfile edit page", () => {
       data: [
         {
           data: {
-            id: 1,
+            id: "1",
             type: "thermocyclerprofile"
           },
           status: 201
@@ -151,7 +139,7 @@ describe("PcrProfile edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithContext(
+    const wrapper = mountWithAppContext(
       <PcrProfileEditPage
         router={{ query: { id: 100 }, push: mockPush } as any}
       />

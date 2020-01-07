@@ -1,8 +1,8 @@
-import { mount } from "enzyme";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { LibraryPoolDetails } from "../LibraryPoolDetails";
 
 function getWrapper() {
-  return mount(
+  return mountWithAppContext(
     <LibraryPoolDetails
       libraryPool={{
         id: "100",

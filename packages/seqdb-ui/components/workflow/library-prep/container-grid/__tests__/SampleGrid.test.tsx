@@ -1,5 +1,6 @@
 import { ApiClientContext } from "common-ui";
 import { mount } from "enzyme";
+import { mountWithAppContext } from "../../../../../test-util/mock-app-context";
 import {
   Chain,
   ChainStepTemplate,
@@ -22,30 +23,29 @@ const mockCtx = {
 };
 
 function getWrapper(propsOverride?: Partial<ContainerGridProps>) {
-  return mount(
-    <ApiClientContext.Provider value={mockCtx as any}>
-      <SampleGrid
-        libraryPrepBatch={{
-          containerType: {
-            baseType: "base type",
-            id: "1",
-            name: "96 well box",
-            numberOfColumns: 12,
-            numberOfRows: 8,
-            numberOfWells: 96,
-            type: "containerType"
-          },
-          id: "5",
-          name: "test library prep batch",
-          type: "libraryPrepBatch"
-        }}
-        chain={{ id: "5", type: "chain" } as Chain}
-        sampleSelectionStep={
-          { id: "1", type: "chainStepTemplate" } as ChainStepTemplate
-        }
-        {...propsOverride}
-      />
-    </ApiClientContext.Provider>
+  return mountWithAppContext(
+    <SampleGrid
+      libraryPrepBatch={{
+        containerType: {
+          baseType: "base type",
+          id: "1",
+          name: "96 well box",
+          numberOfColumns: 12,
+          numberOfRows: 8,
+          numberOfWells: 96,
+          type: "containerType"
+        },
+        id: "5",
+        name: "test library prep batch",
+        type: "libraryPrepBatch"
+      }}
+      chain={{ id: "5", type: "chain" } as Chain}
+      sampleSelectionStep={
+        { id: "1", type: "chainStepTemplate" } as ChainStepTemplate
+      }
+      {...propsOverride}
+    />,
+    { apiContext: mockCtx as any }
   );
 }
 
@@ -246,8 +246,9 @@ describe("SampleGrid component", () => {
     wrapper.update();
 
     // Move SAMP200 to the list:
-    wrapper.find(DraggableSampleList).prop("onDrop")(MOCK_LIBRARY_PREPS[0]
-      .sample as Sample);
+    wrapper.find(DraggableSampleList).prop("onDrop")(
+      MOCK_LIBRARY_PREPS[0].sample as Sample
+    );
 
     wrapper.update();
 

@@ -1,5 +1,6 @@
 import { ApiClientContext, ResourceSelect } from "common-ui";
 import { mount } from "enzyme";
+import { mountWithAppContext } from "../../../../../test-util/mock-app-context";
 import { LibraryPrepBatch } from "../../../../../types/seqdb-api";
 import { IndexGrid, IndexGridProps } from "../IndexGrid";
 
@@ -30,13 +31,9 @@ const TEST_LIBRARY_PREP_BATCH: LibraryPrepBatch = {
 };
 
 function getWrapper(propsOverride?: Partial<IndexGridProps>) {
-  return mount(
-    <ApiClientContext.Provider value={mockCtx as any}>
-      <IndexGrid
-        libraryPrepBatch={TEST_LIBRARY_PREP_BATCH}
-        {...propsOverride}
-      />
-    </ApiClientContext.Provider>
+  return mountWithAppContext(
+    <IndexGrid libraryPrepBatch={TEST_LIBRARY_PREP_BATCH} {...propsOverride} />,
+    { apiContext: mockCtx as any }
   );
 }
 

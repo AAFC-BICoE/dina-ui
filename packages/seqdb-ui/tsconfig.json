@@ -9,6 +9,8 @@
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": true,
     "removeComments": false,
     "preserveConstEnums": true,
     "sourceMap": true,

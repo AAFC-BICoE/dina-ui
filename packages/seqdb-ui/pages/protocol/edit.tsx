@@ -15,6 +15,7 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ButtonBar, CancelButton, Head, Nav } from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { Product } from "../../types/seqdb-api/resources/Product";
 import {
@@ -29,14 +30,18 @@ interface ProtocolFormProps {
 
 export function ProtocolEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
+  const { formatMessage } = useSeqdbIntl();
+
   return (
     <div>
-      <Head title="Edit Protocol" />
+      <Head title={formatMessage("editProtocolTitle")} />
       <Nav />
       <div className="container-fluid">
         {id ? (
           <div>
-            <h1>Edit Protocol</h1>
+            <h1>
+              <SeqdbMessage id="editProtocolTitle" />
+            </h1>
             <Query<Protocol>
               query={{ include: "group,kit", path: `protocol/${id}` }}
             >
@@ -52,7 +57,9 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>Add Protocol</h1>
+            <h1>
+              <SeqdbMessage id="addProtocolTitle" />
+            </h1>
             <ProtocolForm router={router} />
           </div>
         )}

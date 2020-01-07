@@ -12,6 +12,7 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ButtonBar, CancelButton, Head, Nav } from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { Region } from "../../types/seqdb-api/resources/Region";
 
 interface RegionFormProps {
@@ -21,15 +22,18 @@ interface RegionFormProps {
 
 export function RegionEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
+  const { formatMessage } = useSeqdbIntl();
 
   return (
     <div>
-      <Head title="Edit Gene Region" />
+      <Head title={formatMessage("editRegionTitle")} />
       <Nav />
       <div className="container-fluid">
         {id ? (
           <div>
-            <h1>Edit Gene Region</h1>
+            <h1>
+              <SeqdbMessage id="editRegionTitle" />
+            </h1>
             <Query<Region> query={{ path: `region/${id}` }}>
               {({ loading, response }) => (
                 <div>
@@ -43,7 +47,9 @@ export function RegionEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>Add Gene Region</h1>
+            <h1>
+              <SeqdbMessage id="addRegionTitle" />
+            </h1>
             <RegionForm router={router} />
           </div>
         )}

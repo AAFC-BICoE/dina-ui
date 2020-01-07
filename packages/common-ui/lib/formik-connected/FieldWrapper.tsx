@@ -1,3 +1,4 @@
+import { useIntl } from "react-intl";
 import ReactTooltip from "react-tooltip";
 import titleCase from "title-case";
 
@@ -33,17 +34,26 @@ export function FieldWrapper({
   className,
   hideLabel = false,
   name,
-  label = titleCase(name),
+  label,
   tooltipMsg,
   children
 }: FieldWrapperProps) {
+  const { formatMessage, messages } = useIntl();
+
+  const messageKey = `field_${name}`;
+  const fieldLabel =
+    label ??
+    (messages[messageKey]
+      ? formatMessage({ id: messageKey })
+      : titleCase(name));
+
   return (
     <div className={className}>
       <div className={`form-group ${name}-field`}>
         {!hideLabel && (
           <label>
             <div>
-              <strong>{label}</strong>
+              <strong>{fieldLabel}</strong>
               {tooltipMsg && (
                 <img
                   src="/static/images/iconInformation.gif"

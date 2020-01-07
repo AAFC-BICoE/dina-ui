@@ -14,6 +14,7 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ButtonBar, CancelButton, Head, Nav } from "../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { Group } from "../../types/seqdb-api/resources/Group";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 import { Region } from "../../types/seqdb-api/resources/Region";
@@ -25,15 +26,18 @@ interface PcrProfileFormProps {
 
 export function PcrProfileEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
+  const { formatMessage } = useSeqdbIntl();
 
   return (
     <div>
-      <Head title="Edit PCR Profile" />
+      <Head title={formatMessage("editPcrProfileTitle")} />
       <Nav />
       <div className="container-fluid">
         {id ? (
           <div>
-            <h1>Edit Thermocycler Profile</h1>
+            <h1>
+              <SeqdbMessage id="editPcrProfileTitle" />
+            </h1>
             <Query<PcrProfile>
               query={{
                 include: "group,region",
@@ -52,7 +56,9 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>Add Thermocycler Profile</h1>
+            <h1>
+              <SeqdbMessage id="addPcrProfileTitle" />
+            </h1>
             <PcrProfileForm router={router} />
           </div>
         )}

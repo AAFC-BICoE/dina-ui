@@ -5,8 +5,14 @@ import withRouter, { WithRouterProps } from "next/dist/client/with-router";
 import { useCallback, useContext } from "react";
 import { useAsyncRun, useAsyncTask } from "react-hooks-async";
 import { FileDownLoadResponseAttributes } from "types/objectstore-api/resources/FileDownLoadResponse";
+import { Metadata } from "types/objectstore-api/resources/Metadata";
 import { isArray, isUndefined } from "util";
 import { Head, Nav } from "../../components";
+import {
+  ObjectStoreMessage,
+  useObjectStoreIntl
+} from "../../intl/objectstore-intl";
+import { GenerateManagedAttributesView } from "../../page-fragments/viewManagedAttributes";
 import ViewMetadataFormPage from "../../page-fragments/viewMetadata";
 
 interface DownloadFileResponse {
@@ -49,13 +55,16 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
   const id = router.query.id;
   const stringId = isArray(id) ? id[0] : id;
   const { imgResponse } = useImageQuery(stringId);
+  const { formatMessage } = useObjectStoreIntl();
 
   return (
     <div>
-      <Head title="Object Store Detailes Page" />
+      <Head title={formatMessage("objectStoreDetailsTitle")} />
       <Nav />
       <div>
-        <h4>Object Store Details</h4>
+        <h4>
+          <ObjectStoreMessage id="objectStoreDetailsTitle" />
+        </h4>
         <div className="container-fluid">
           <div className="row">
             {imgResponse &&
@@ -87,10 +96,12 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
                 />
               </div>
             ) : (
-              <p>No File to display</p>
+              <p>
+                <ObjectStoreMessage id="noFileToDisplay" />
+              </p>
             )}
 
-            <Query
+            <Query<Metadata>
               query={{
                 filter: { fileIdentifier: `${id}` },
                 include: "acMetadataCreator,managedAttribute",
@@ -101,7 +112,23 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
                 <div className="col-sm-8">
                   <LoadingSpinner loading={loading} />
                   {response && (
-                    <ViewMetadataFormPage metadata={response.data[0]} />
+                    <div>
+                      <div style={{ marginBottom: "20px", marginTop: "20px" }}>
+                        <h5 style={{ color: "blue" }}>Metadata View</h5>
+                      </div>
+                      <div>
+                        <ViewMetadataFormPage metadata={response.data[0]} />
+                      </div>
+                      <div style={{ marginBottom: "20px", marginTop: "20px" }}>
+                        <h5 style={{ color: "blue" }}>
+                          Managed Attribute View
+                        </h5>
+                      </div>
+                      {response.data[0].managedAttribute &&
+                        response.data[0].managedAttribute.map(ma => (
+                          <GenerateManagedAttributesView ma={ma} />
+                        ))}
+                    </div>
                   )}
                 </div>
               )}
