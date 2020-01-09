@@ -72,7 +72,7 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
             <div className="col-md-6">
               <a
                 href={`/media-uploadView/detailEdit?id=${id}`}
-                className="btn btn-info"
+                className="btn btn-call-to-action"
               >
                 Edit View
               </a>
