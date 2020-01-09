@@ -5,7 +5,10 @@ import { COMMON_UI_MESSAGES_ENGLISH } from "common-ui";
  */
 export const OBJECTSTORE_MESSAGES_ENGLISH = {
   ...COMMON_UI_MESSAGES_ENGLISH,
+  addManagedAttributeButtonText: "Add New Managed Attribute",
   appTitle: "Object Store",
+  field_managedAttributeType: "Type",
+  managedAttributeListTitle: "Managed Attributes",
   metadataAgentLabel: "Agent (Uploaded By)",
   metadataBucketNameLabel: "Bucket Name",
   metadataDcFormatLabel: "DcFormat",

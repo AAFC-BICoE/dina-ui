@@ -109,9 +109,10 @@ describe("Metadata detail view page", () => {
     // The managed attribute section assgined value field should be rendered.
     expect(
       wrapper.containsMatchingElement(
-        <strong style={{ background: "#ffffcc", borderRadius: "100px/99px" }}>
-          {" "}
-          &nbsp;&nbsp;765&nbsp;&nbsp;{" "}
+        <strong style={{ background: "#AEB404", borderRadius: "25px" }}>
+          <span>&nbsp;&nbsp;</span>
+          765
+          <span>&nbsp;&nbsp;</span>
         </strong>
       )
     ).toEqual(true);
