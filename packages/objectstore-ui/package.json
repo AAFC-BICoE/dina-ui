@@ -10,7 +10,9 @@
     "next": "next",
     "proxy": "micro-proxy -r ./dev-proxy-config.json -p 8000",
     "test": "tsc && jest",
-    "test:coverage": "tsc && jest --coverage"
+    "test:coverage": "tsc && jest --coverage",
+    "a11y-check": "pa11y-ci -j > pa11y-result.json",
+    "a11y-generate-report": "pa11y-ci-reporter-html -s pa11y-result.json --destination ./pa11y-html-report"
   },
   "dependencies": {
     "@molgenis/rsql": "0.1.2",
