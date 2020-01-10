@@ -103,8 +103,7 @@ describe("Upload page", () => {
           dcType: "Image",
           fileExtension: "",
           fileIdentifier: "test.png",
-          type: "metadata",
-          uuid: ""
+          type: "metadata"
         },
         type: "metadata"
       },
@@ -114,8 +113,7 @@ describe("Upload page", () => {
           dcType: "Image",
           fileExtension: "",
           fileIdentifier: "test.png",
-          type: "metadata",
-          uuid: ""
+          type: "metadata"
         },
         type: "metadata"
       },
@@ -125,8 +123,7 @@ describe("Upload page", () => {
           dcType: "Image",
           fileExtension: "",
           fileIdentifier: "test.png",
-          type: "metadata",
-          uuid: ""
+          type: "metadata"
         },
         type: "metadata"
       }

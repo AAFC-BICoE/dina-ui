@@ -140,13 +140,9 @@ export function createContextValue({
 
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
   async function bulkGet<T extends KitsuResource>(paths: string[]) {
-    const generateId = getTempIdGenerator();
-
     const getOperations = paths.map<Operation>(path => ({
       op: "GET",
-      path,
-      // Crnk requires the "id" and "type" but does nothing with them.
-      value: { id: generateId(), type: "" }
+      path
     }));
 
     const responses = await doOperations(getOperations);

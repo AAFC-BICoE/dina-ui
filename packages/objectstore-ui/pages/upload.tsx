@@ -65,7 +65,7 @@ export default function UploadPage() {
     isDragReject,
     acceptedFiles
   } = useDropzone({
-    accept: "image/*,audio/*,video/*,.pdf,.doc,docx,.png"
+    accept: "image/*,audio/*,video/*,.pdf,.doc,.docx,.png"
   });
 
   const style = useMemo(

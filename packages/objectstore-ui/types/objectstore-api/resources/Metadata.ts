@@ -8,6 +8,9 @@ export interface MetadataAttributes {
   fileIdentifier: string;
   fileExtension: string;
   dcType: "Image" | "Moving Image" | "Sound" | "Text";
+  xmpRightsWebStatement?: string;
+  ac_rights?: string;
+
   // optional fields
   dcFormat?: string;
   acDigitizationDate?: string;

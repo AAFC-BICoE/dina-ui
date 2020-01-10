@@ -4,6 +4,7 @@ import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { cloneDeep, isEmpty, zipWith } from "lodash";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import { ErrorViewer } from "../formik-connected/ErrorViewer";
 import { FormikButton } from "../formik-connected/FormikButton";
 import { OnFormikSubmit, safeSubmit } from "../formik-connected/safeSubmit";
 import { CommonMessage } from "../intl/common-ui-intl";
@@ -79,6 +80,7 @@ export const BulkDataEditorInternal = dynamic(
 
       return (
         <>
+          <ErrorViewer />
           <HotTable
             columns={columns}
             data={workingTableData as any}
