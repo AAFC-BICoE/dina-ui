@@ -5,7 +5,6 @@ import { ManagedAttributeMap } from "./ManagedAttributeMap";
 export interface MetadataAttributes {
   type: "metadata";
   bucket: string;
-  uuid: string;
   fileIdentifier: string;
   fileExtension: string;
   dcType: "Image" | "Moving Image" | "Sound" | "Text";

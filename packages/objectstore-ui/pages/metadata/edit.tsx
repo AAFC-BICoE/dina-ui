@@ -1,7 +1,6 @@
 import {
   ApiClientContext,
   BulkDataEditor,
-  BulkEditRow,
   decodeResourceCell,
   encodeResourceCell,
   LoadingSpinner,
@@ -96,18 +95,13 @@ export default function EditMetadatasPage() {
       )
     );
 
-    const newTableData = metadatas.map<BulkEditRow<BulkMetadataEditRow>>(
-      metadata => ({
-        data: {
-          acMetadataCreator: encodeResourceCell(metadata.acMetadataCreator, {
-            label: metadata.acMetadataCreator?.displayName
-          }),
-          acTags: metadata.acTags?.join(", ") ?? "",
-          metadata
-        },
-        identifier: { id: metadata.id, type: metadata.type }
-      })
-    );
+    const newTableData = metadatas.map<BulkMetadataEditRow>(metadata => ({
+      acMetadataCreator: encodeResourceCell(metadata.acMetadataCreator, {
+        label: metadata.acMetadataCreator?.displayName
+      }),
+      acTags: metadata.acTags?.join(", ") ?? "",
+      metadata
+    }));
 
     return newTableData;
   }
@@ -115,15 +109,19 @@ export default function EditMetadatasPage() {
   async function onSubmit(changes: Array<RowChange<BulkMetadataEditRow>>) {
     const editedMetadatas = changes.map<SaveArgs<Metadata>>(row => {
       const {
-        data: { acMetadataCreator, acTags, metadata },
-        identifier
+        changes: { acMetadataCreator, acTags, metadata },
+        original: {
+          metadata: { id, type }
+        }
       } = row;
 
       const metadataEdit = {
-        ...identifier,
-        ...metadata,
-        managedAttributeMap: null
+        id,
+        type,
+        ...metadata
       } as Metadata;
+
+      delete metadataEdit.managedAttributeMap;
 
       if (acMetadataCreator !== undefined) {
         metadataEdit.acMetadataCreator = decodeResourceCell(
@@ -144,12 +142,16 @@ export default function EditMetadatasPage() {
     const editedManagedAttributeMaps = changes.map<
       SaveArgs<ManagedAttributeMap>
     >(row => {
-      const managedAttributeMap = row.data.metadata?.managedAttributeMap;
+      const managedAttributeMap = row.changes.metadata?.managedAttributeMap;
+      const metadata = {
+        id: row.original.metadata.id,
+        type: row.original.metadata.type
+      };
 
       return {
         resource: {
           ...managedAttributeMap,
-          metadata: row.identifier,
+          metadata,
           type: "managed-attribute-map"
         } as ManagedAttributeMap,
         type: "managed-attribute-map"

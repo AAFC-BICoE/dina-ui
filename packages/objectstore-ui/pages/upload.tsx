@@ -102,8 +102,7 @@ export default function UploadPage() {
         dcType: "Image",
         fileExtension: "",
         fileIdentifier: res.fileName,
-        type: "metadata",
-        uuid: ""
+        type: "metadata"
       },
       type: "metadata"
     }));
