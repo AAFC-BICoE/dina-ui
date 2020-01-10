@@ -1,11 +1,12 @@
-import { SubmitButton } from "common-ui";
 import { Form, Formik, FormikProps } from "formik";
 import { noop } from "lodash";
 import { useEffect } from "react";
 import { useCookies } from "react-cookie";
 import { CookieSetOptions } from "universal-cookie";
-import { FilterAttribute, FilterBuilderField } from "..";
-import { SeqdbMessage } from "../../intl/seqdb-intl";
+import { SeqdbMessage } from "../../../seqdb-ui/intl/seqdb-intl";
+import { FilterAttribute } from "../filter-builder/FilterBuilder";
+import { FilterBuilderField } from "../filter-builder/FilterBuilderField";
+import { SubmitButton } from "../formik-connected/SubmitButton";
 
 interface FilterFormProps {
   children?: (formik: FormikProps<any>) => React.ReactElement;

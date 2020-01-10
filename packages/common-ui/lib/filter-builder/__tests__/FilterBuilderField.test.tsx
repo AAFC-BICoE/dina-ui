@@ -1,6 +1,7 @@
 import { Form, Formik } from "formik";
+import { IntlProvider } from "react-intl";
 import Select from "react-select";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { FilterBuilderField } from "../FilterBuilderField";
 
 describe("FilterBuilderField component", () => {
@@ -8,15 +9,20 @@ describe("FilterBuilderField component", () => {
 
   function mountForm() {
     return mountWithAppContext(
-      <Formik initialValues={{ filter: null }} onSubmit={mockSubmit}>
-        <Form>
-          <FilterBuilderField
-            filterAttributes={["name", "group.groupName"]}
-            name="filter"
-          />
-          <button type="submit">search</button>
-        </Form>
-      </Formik>
+      <IntlProvider
+        locale="en"
+        messages={{ "field_group.groupName": "Group Name" }}
+      >
+        <Formik initialValues={{ filter: null }} onSubmit={mockSubmit}>
+          <Form>
+            <FilterBuilderField
+              filterAttributes={["name", "group.groupName"]}
+              name="filter"
+            />
+            <button type="submit">search</button>
+          </Form>
+        </Formik>
+      </IntlProvider>
     );
   }
 

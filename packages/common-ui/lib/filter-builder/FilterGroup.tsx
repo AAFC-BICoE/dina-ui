@@ -1,4 +1,5 @@
-import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
+import { useIntl } from "react-intl";
+import { CommonMessage } from "../intl/common-ui-intl";
 import { FilterRowModel } from "./FilterRow";
 
 export type FilterGroupOperator = "AND" | "OR";
@@ -29,7 +30,7 @@ export function FilterGroup({
   showAndOrButtons,
   showRemoveButton
 }: FilterGroupProps) {
-  const { formatMessage } = useSeqdbIntl();
+  const { formatMessage } = useIntl();
 
   return (
     <div className="list-inline">
@@ -38,7 +39,8 @@ export function FilterGroup({
           <div key={i}>
             {element}
             <div className="text-center">
-              {i !== children.length - 1 && formatMessage(model.operator)}
+              {i !== children.length - 1 &&
+                formatMessage({ id: model.operator })}
             </div>
           </div>
         ))}
@@ -51,14 +53,14 @@ export function FilterGroup({
               onClick={onAndClick}
               type="button"
             >
-              <SeqdbMessage id="AND" />
+              <CommonMessage id="AND" />
             </button>
             <button
               className="btn btn-primary d-block or"
               onClick={onOrClick}
               type="button"
             >
-              <SeqdbMessage id="OR" />
+              <CommonMessage id="OR" />
             </button>
           </div>
         )}
