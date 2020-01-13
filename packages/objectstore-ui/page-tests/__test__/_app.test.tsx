@@ -28,7 +28,7 @@ describe("ObjectStoreUI App", () => {
     );
 
     // It should render the div from the TestComponent.
-    expect(wrapper.html()).toEqual("<div>Test Content</div>");
+    expect(wrapper.html()).toContain("<div>Test Content</div>");
 
     const innerComponent = wrapper.find(TestComponent);
     expect(innerComponent.prop("exampleProp")).toEqual("exampleValue");

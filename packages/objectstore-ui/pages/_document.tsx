@@ -84,12 +84,10 @@ class MyDocument extends Document {
                             <!--[if lte IE 9]>		
 		            <![endif]--></link>`}
         </WetHead>
-
         <body>
           <Main />
           <NextScript />
         </body>
-
         <WetFoot>
           {`
                     <!--[if gte IE 9 | !IE ]><!-->
