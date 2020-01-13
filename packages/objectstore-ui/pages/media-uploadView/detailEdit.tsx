@@ -20,7 +20,10 @@ import { Agent } from "types/objectstore-api/resources/Agent";
 import { isArray, isUndefined } from "util";
 import { AttributeBuilder, Head, Nav } from "../../components";
 import { MetaManagedAttribute } from "../../types/objectstore-api/resources/MetaManagedAttribute";
-import { generateManagedAttributeValue } from "../../utils/metaUtils";
+import {
+  deleteManagedAttribute,
+  generateManagedAttributeValue
+} from "../../utils/metaUtils";
 
 interface DetailEditFormProps {
   router: NextRouter;
@@ -143,66 +146,37 @@ function DetailEditForm({ router }: DetailEditFormProps) {
     delete submittedValues.managedAttributes;
     delete submittedValues.unManagedAttributes;
     delete submittedValues.managedAttribute;
+    const config = {
+      headers: {
+        "Content-Type": "application/vnd.api+json",
+        "Crnk-Compact": "true"
+      }
+    };
+    const mydata = deleteManagedAttribute(submittedValues, metainitialValues1);
     try {
+      const resps = await apiClient.axios.post(
+        "/managed-attribute-map",
+        mydata,
+        config
+      );
       const metaManagedAttributes = new Array();
       if (id) {
         submittedValues.fileIdentifier = isArray(id) ? id[0] : id;
       }
-      // this will be replaced by config?
-      submittedValues.bucket = "mybucket";
-      /* tslint:disable:no-string-literal */
       generateManagedAttributeValue(
         metaManagedAttributes,
         submittedValues,
-        metainitialValues["managedAttributes"]
+        metainitialValues.managedAttributes
       );
-      /* tslint:enable:no-string-literal */
-      const config = {
-        headers: {
-          "Content-Type": "application/vnd.api+json",
-          "Crnk-Compact": "true"
-        }
-      };
-      // send the relationship first, collect those ids
-      const ids = new Array();
-      let mydata;
-      metaManagedAttributes.forEach(async metaMa => {
-        mydata = { data: metaMa };
-        if (metaMa.id) {
-          ids.push(metaMa.id);
-          await apiClient.axios.patch(
-            "/metadata-managed-attribute/" + metaMa.id,
-            mydata,
-            config
-          );
-        } else {
-          const resps = await apiClient.axios.post(
-            "/metadata-managed-attribute",
-            mydata,
-            config
-          );
-          if (resps) {
-            ids.push(resps.data.id);
-          }
-        }
-      });
-      // update the metadata with new relationships
       const serializePromises = serialize({
         resource: submittedValues,
         type: "metadata"
       });
       const serialized = await serializePromises;
-      mydata = { data: serialized };
-
-      const dataArr = new Array();
-      ids.map(metaId => {
-        dataArr.push({ type: "metadata-managed-attribute", id: metaId });
-      });
-      mydata.data.relationships = { managedAttribute: { data: dataArr } };
-      // send the meta with new relationships
+      const metadata = { data: serialized };
       const response = await apiClient.axios.patch(
-        "/metadata/" + mydata.data.id,
-        mydata,
+        "/metadata/" + metadata.data.id,
+        metadata,
         config
       );
       if (response.data.data) {
@@ -227,41 +201,42 @@ function DetailEditForm({ router }: DetailEditFormProps) {
     /* tslint:disable:no-string-literal */
     <div>
       <div className="col-sm-8">
-        {Object.keys(metainitialValues).length > 0 && (
-          <div>
-            <Formik
-              initialValues={metainitialValues}
-              onSubmit={onSubmit}
-              enableReinitialize={true}
-            >
-              <Form>
-                <ErrorViewer />
-                <SubmitButton />
-                <EditMetadataFormPage />
-                <div>
-                  <div style={{ marginBottom: "20px", marginTop: "20px" }}>
-                    <h5 style={{ color: "#1465b7" }}>Managed Attributes</h5>
+        {Object.keys(metainitialValues).length > 0 &&
+          Object.assign(metainitialValues1, metainitialValues) && (
+            <div>
+              <Formik
+                initialValues={metainitialValues}
+                onSubmit={onSubmit}
+                enableReinitialize={true}
+              >
+                <Form>
+                  <ErrorViewer />
+                  <SubmitButton />
+                  <EditMetadataFormPage />
+                  <div>
+                    <div style={{ marginBottom: "20px", marginTop: "20px" }}>
+                      <h5 style={{ color: "#1465b7" }}>Managed Attributes</h5>
+                    </div>
+                    <AttributeBuilder
+                      controlledAttributes={
+                        metainitialValues["managedAttributes"]
+                      }
+                      initValues={metainitialValues}
+                    />
+                    <div style={{ marginBottom: "20px", marginTop: "20px" }}>
+                      <h5 style={{ color: "#1465b7" }}>Tags</h5>
+                    </div>
+                    <AttributeBuilder
+                      controlledAttributes={
+                        metainitialValues["unManagedAttributes"]
+                      }
+                      initValues={metainitialValues}
+                    />
                   </div>
-                  <AttributeBuilder
-                    controlledAttributes={
-                      metainitialValues["managedAttributes"]
-                    }
-                    initValues={metainitialValues}
-                  />
-                  <div style={{ marginBottom: "20px", marginTop: "20px" }}>
-                    <h5 style={{ color: "#1465b7" }}>Tags</h5>
-                  </div>
-                  <AttributeBuilder
-                    controlledAttributes={
-                      metainitialValues["unManagedAttributes"]
-                    }
-                    initValues={metainitialValues}
-                  />
-                </div>
-              </Form>
-            </Formik>
-          </div>
-        )}
+                </Form>
+              </Formik>
+            </div>
+          )}
       </div>
     </div>
     /* tslint:enable:no-string-literal */

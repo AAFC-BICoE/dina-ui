@@ -8,6 +8,56 @@ export function renameJson(json, oldkey, newkey) {
     {}
   );
 }
+/* Delete managed attribute */
+export function deleteManagedAttribute(submittedValues, origiValues) {
+  const deletedMAs = new Array();
+  const updatedMAs = new Array();
+  let foundMatch = false;
+  for (const x in origiValues) {
+    if (/^key_/.test(x) && origiValues["assignedValue" + x.substr(4)]) {
+      for (const y in submittedValues) {
+        if (/^key_/.test(y)) {
+          if (y === x) {
+            foundMatch = true;
+            break;
+          }
+        }
+      }
+      if (foundMatch) {
+        foundMatch = false;
+      } else {
+        deletedMAs.push(x);
+      }
+    }
+  }
+  const values = {};
+  for (const y in submittedValues) {
+    if (/^key_/.test(y)) {
+      values[submittedValues[y].id] = {
+        value: submittedValues["assignedValue" + y.substr(4)]
+      };
+    }
+  }
+  deletedMAs.map(ma => (values[origiValues[ma].id] = { value: null }));
+
+  const dataToSubmit = {
+    data: {
+      attributes: {
+        values
+      },
+      relationships: {
+        metadata: {
+          data: {
+            id: submittedValues.id,
+            type: "metadata"
+          }
+        }
+      },
+      type: "managed-attribute-map"
+    }
+  };
+  return dataToSubmit;
+}
 
 export function generateManagedAttributeValue(
   metaManagedAttributes,
