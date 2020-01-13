@@ -1,19 +1,19 @@
 import {
   ColumnDefinition,
   filterBy,
+  FilterForm,
   LoadingSpinner,
   QueryTable,
   ResourceSelectField,
+  rsql,
   useGroupedCheckBoxes
 } from "common-ui";
 import { connect, Formik } from "formik";
 import { FilterParam } from "kitsu";
 import { noop } from "lodash";
 import { useState } from "react";
-import { FilterForm } from "../..";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { Group, StepResource } from "../../../types/seqdb-api";
-import { rsql } from "../../filter-builder/rsql";
 import { StepRendererProps } from "../StepRenderer";
 import { useSelectionControls } from "./useSelectionControls";
 

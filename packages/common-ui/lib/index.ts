@@ -8,6 +8,7 @@ export * from "./bulk-data-editor/resource-select-cell";
 export * from "./filter-builder/FilterBuilder";
 export * from "./filter-builder/FilterBuilderField";
 export * from "./filter-builder/FilterGroup";
+export * from "./filter-builder/rsql";
 export * from "./formik-connected/DateField";
 export * from "./formik-connected/ErrorViewer";
 export * from "./formik-connected/FieldView";
