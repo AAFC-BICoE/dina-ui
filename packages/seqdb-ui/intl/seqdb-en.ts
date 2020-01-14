@@ -27,7 +27,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   editWorkflowTitle: "Edit NGS Workflow",
   "field_group.groupName": "Group Name",
   field_name: "Name",
-  filterSubmitButtonText: "Filter List",
   notShearedStatus: "Not Sheared",
   notSizeSelectedStatus: "No Size Selection",
   pcrPrimerListTitle: "PCR Primers",
@@ -51,7 +50,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   removeShearingDetailsButtonText: "Remove selected Shearing details",
   removeSizeSelectionDetailsButtonText:
     "Remove selected Size Selection details",
-  resetButtonText: "Reset",
   sampleSelectionTitle: "Sample Selection",
   selectAllCheckedSamplesButtonText: "Select all checked samples -->",
   selectButtonText: "Select",

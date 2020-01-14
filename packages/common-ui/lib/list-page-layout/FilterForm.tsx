@@ -3,10 +3,10 @@ import { noop } from "lodash";
 import { useEffect } from "react";
 import { useCookies } from "react-cookie";
 import { CookieSetOptions } from "universal-cookie";
-import { SeqdbMessage } from "../../../seqdb-ui/intl/seqdb-intl";
 import { FilterAttribute } from "../filter-builder/FilterBuilder";
 import { FilterBuilderField } from "../filter-builder/FilterBuilderField";
 import { SubmitButton } from "../formik-connected/SubmitButton";
+import { CommonMessage } from "../intl/common-ui-intl";
 
 interface FilterFormProps {
   children?: (formik: FormikProps<any>) => React.ReactElement;
@@ -64,14 +64,14 @@ export function FilterForm({
           </div>
           <div className="d-inline-block pl-3">
             <SubmitButton>
-              <SeqdbMessage id="filterSubmitButtonText" />
+              <CommonMessage id="filterSubmitButtonText" />
             </SubmitButton>
             <button
               className="btn btn-dark filter-reset-button"
               type="button"
               onClick={() => resetFilterForm(formikProps)}
             >
-              <SeqdbMessage id="resetButtonText" />
+              <CommonMessage id="resetButtonText" />
             </button>
           </div>
         </Form>

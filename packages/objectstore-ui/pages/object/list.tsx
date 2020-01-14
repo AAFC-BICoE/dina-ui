@@ -1,33 +1,20 @@
-import { ColumnDefinition, QueryTable, useGroupedCheckBoxes } from "common-ui";
+import {
+  ColumnDefinition,
+  FormikButton,
+  ListPageLayout,
+  useGroupedCheckBoxes
+} from "common-ui";
 import { Form, Formik } from "formik";
 import { noop, toPairs } from "lodash";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
-import { useCookies } from "react-cookie";
-import { CookieSetOptions } from "universal-cookie";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Head, Nav } from "../../components";
 import { MetadataPreview } from "../../components/MetadataPreview";
 import { ObjectStoreMessage } from "../../intl/objectstore-intl";
-import { ManagedAttribute } from "../../types/objectstore-api/resources/ManagedAttribute";
-
-const TABLE_PAGE_SIZE_COOKIE = "tablePageSize";
-const TABLE_SORT_COOKIE = "tableSort";
-
-const COOKIE_OPTIONS: CookieSetOptions = { expires: new Date("3000-01-01") };
+import { Metadata } from "../../types/objectstore-api";
 
 export default function MetadataListPage() {
   const router = useRouter();
-
-  // Use a cookie hook to get the cookies, and re-render when the watched cookies are changed.
-  const [cookies, setCookie] = useCookies([
-    TABLE_PAGE_SIZE_COOKIE,
-    TABLE_SORT_COOKIE
-  ]);
-
-  // Default sort and page-size from the QueryTable. These are only used on the initial
-  // QueryTable render, and are saved as cookies when the table's sort or page-size is changed.
-  const defaultSort = cookies[TABLE_SORT_COOKIE];
-  const defaultPageSize = cookies[TABLE_PAGE_SIZE_COOKIE];
 
   const {
     CheckBoxField,
@@ -37,7 +24,12 @@ export default function MetadataListPage() {
     fieldName: "selectedMetadatas"
   });
 
-  const [previewMetadataId, setPreviewMetadataId] = useState<string>();
+  const [previewMetadataId, setPreviewMetadataId] = useState<string | null>(
+    null
+  );
+  const [tableSectionWidth, previewSectionWidth] = previewMetadataId
+    ? [8, 4]
+    : [12, 0];
 
   const tableWrapper = useRef<HTMLDivElement>(null);
   const previewWrapper = useRef<HTMLDivElement>(null);
@@ -56,7 +48,9 @@ export default function MetadataListPage() {
     resizePreviewWrapper();
   });
 
-  const ATTRIBUTES_LIST_COLUMNS: Array<ColumnDefinition<ManagedAttribute>> = [
+  const METADATA_FILTER_ATTRIBUTES = ["originalFilename"];
+
+  const METADATA_TABLE_COLUMNS: Array<ColumnDefinition<Metadata>> = [
     {
       Cell: ({ original: metadata }) => (
         <CheckBoxField key={metadata.id} resource={metadata} />
@@ -92,6 +86,34 @@ export default function MetadataListPage() {
     }
   `;
 
+  const WrapTable = useMemo(
+    () => ({ children }) => (
+      <Formik initialValues={{ selectedMetadatas: {} }} onSubmit={noop}>
+        <Form>
+          <div style={{ height: "1rem" }}>
+            <FormikButton
+              className="btn btn-primary float-right"
+              onClick={async values => {
+                const metadataIds = toPairs(values.selectedMetadatas)
+                  .filter(pair => pair[1])
+                  .map(pair => pair[0]);
+
+                await router.push({
+                  pathname: "/metadata/edit",
+                  query: { ids: metadataIds.join(",") }
+                });
+              }}
+            >
+              Edit selected
+            </FormikButton>
+          </div>
+          {children}
+        </Form>
+      </Formik>
+    ),
+    []
+  );
+
   return (
     <div>
       <style>{OBJECT_LIST_PAGE_CSS}</style>
@@ -102,54 +124,32 @@ export default function MetadataListPage() {
           <ObjectStoreMessage id="objectListTitle" />
         </h1>
         <div className="row">
-          <div className="col-8">
+          <div className={`col-${tableSectionWidth}`}>
             <div ref={tableWrapper} style={{ overflowY: "scroll" }}>
-              <Formik initialValues={{ selectedMetadatas: {} }} onSubmit={noop}>
-                {formik => (
-                  <Form>
-                    <button
-                      className="btn btn-primary"
-                      onClick={async () => {
-                        const metadataIds = toPairs(
-                          formik.values.selectedMetadatas
-                        )
-                          .filter(pair => pair[1])
-                          .map(pair => pair[0]);
-
-                        await router.push({
-                          pathname: "/metadata/edit",
-                          query: { ids: metadataIds.join(",") }
-                        });
-                      }}
-                    >
-                      Edit selected
-                    </button>
-                    <QueryTable
-                      columns={ATTRIBUTES_LIST_COLUMNS}
-                      path="metadata"
-                      defaultPageSize={defaultPageSize}
-                      defaultSort={defaultSort}
-                      onPageSizeChange={newSize =>
-                        setCookie(
-                          TABLE_PAGE_SIZE_COOKIE,
-                          newSize,
-                          COOKIE_OPTIONS
-                        )
-                      }
-                      onSortedChange={newSort =>
-                        setCookie(TABLE_SORT_COOKIE, newSort, COOKIE_OPTIONS)
-                      }
-                      onSuccess={response =>
-                        setAvailableMetadatas(response.data)
-                      }
-                    />
-                  </Form>
-                )}
-              </Formik>
+              <ListPageLayout<Metadata>
+                filterAttributes={METADATA_FILTER_ATTRIBUTES}
+                id="metadata-list"
+                queryTableProps={{
+                  columns: METADATA_TABLE_COLUMNS,
+                  include: "acMetadataCreator",
+                  onSuccess: res => setAvailableMetadatas(res.data),
+                  path: "metadata"
+                }}
+                WrapTable={WrapTable}
+              />
             </div>
           </div>
-          <div className="col-4">
+          <div className={`col-${previewSectionWidth}`}>
             <div ref={previewWrapper} style={{ overflowY: "scroll" }}>
+              <div style={{ height: "2.5rem" }}>
+                <button
+                  className="btn btn-dark float-right"
+                  type="button"
+                  onClick={() => setPreviewMetadataId(null)}
+                >
+                  <ObjectStoreMessage id="closeButtonText" />
+                </button>
+              </div>
               {previewMetadataId && (
                 <MetadataPreview metadataId={previewMetadataId} />
               )}

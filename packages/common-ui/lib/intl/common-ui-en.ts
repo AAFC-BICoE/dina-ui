@@ -6,10 +6,13 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   IS: "IS",
   ISNOT: "IS NOT",
   OR: "OR",
+  closeButtonText: "Close",
   filterBlankField: "Blank Field",
   filterExactMatch: "Exact Match",
   filterPartialMatch: "Partial Match",
+  filterSubmitButtonText: "Filter List",
   loadingText: "Loading...",
+  resetButtonText: "Reset",
   submitBtnText: "Save",
   tableTotalCount: "Total matched records: {totalCount}"
 };
