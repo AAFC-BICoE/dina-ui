@@ -193,10 +193,12 @@ export class AttributeBuilder extends React.Component<
   }) {
     // Remove the attribute row from the parent's children array.
     if (attribute.type === "ATTRIBUTE_ROW" && attribute.attribute) {
-      if (this.state.initValues) {
-        delete this.state.initValues["key_" + attribute.id];
-        delete this.state.initValues["assignedValue" + attribute.id];
-        delete this.state.initValues["assignedValue_un" + attribute.id];
+      if (this.props.initValues) {
+        const x = this.props.initValues;
+        delete x["key_" + attribute.id];
+        delete x["assignedValue" + attribute.id];
+        delete x["assignedValue_un" + attribute.id];
+        this.setState({ initValues: x });
       }
     }
     parent.children = pull(parent.children, attribute);

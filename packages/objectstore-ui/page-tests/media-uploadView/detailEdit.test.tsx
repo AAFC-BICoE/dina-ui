@@ -36,10 +36,22 @@ const TEST_METADATA_RESPONSE = [
   }
 ];
 
+const TEST_MANAGEDATTR_RESPONSE = [
+  {
+    attributes: {
+      acceptedValues: null,
+      managedAttributeType: "STRING",
+      name: "Specimen View"
+    },
+    id: "3343b041-5476-4b79-be4a-6539a389f7fd",
+    type: "managed-attribute"
+  }
+];
 /** Test managed attribute response. */
 const TEST_MANAGEDDATA_RESPONSE = {
   assignedValue: "trrr",
   id: "088658de-3a09-46ff-9fb0-196ea60a36e5",
+  managedAttribute: TEST_MANAGEDATTR_RESPONSE[0],
   type: "metadata-managed-attribute"
 };
 
@@ -51,18 +63,6 @@ const TEST_AGENT_RESPONSE = [
     },
     id: "9414a706-acca-46fd-a2bc-82befb033397",
     type: "agent"
-  }
-];
-
-const TEST_MANAGEDATTR_RESPONSE = [
-  {
-    attributes: {
-      acceptedValues: null,
-      managedAttributeType: "STRING",
-      name: "Specimen View"
-    },
-    id: "3343b041-5476-4b79-be4a-6539a389f7fd",
-    type: "managed-attribute"
   }
 ];
 

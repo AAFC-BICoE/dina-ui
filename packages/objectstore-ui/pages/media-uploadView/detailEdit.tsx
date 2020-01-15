@@ -163,11 +163,13 @@ function DetailEditForm({ router }: DetailEditFormProps) {
       if (id) {
         submittedValues.fileIdentifier = isArray(id) ? id[0] : id;
       }
+      /* tslint:disable:no-string-literal */
       generateManagedAttributeValue(
         metaManagedAttributes,
         submittedValues,
-        metainitialValues.managedAttributes
+        metainitialValues["managedAttributes"]
       );
+      /* tslint:enable:no-string-literal */
       const serializePromises = serialize({
         resource: submittedValues,
         type: "metadata"
