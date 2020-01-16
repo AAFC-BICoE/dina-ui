@@ -3,6 +3,7 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface TextFieldProps extends LabelWrapperParams {
   readOnly?: boolean;
+  initialValue?: string;
 }
 
 /**
@@ -10,7 +11,7 @@ export interface TextFieldProps extends LabelWrapperParams {
  * a wrapper that adds a label.
  */
 export function TextField(props: TextFieldProps) {
-  const { readOnly, ...labelWrapperProps } = props;
+  const { initialValue, readOnly, ...labelWrapperProps } = props;
   const { name } = labelWrapperProps;
 
   return (
@@ -33,7 +34,7 @@ export function TextField(props: TextFieldProps) {
               className="form-control"
               onChange={onChange}
               type="text"
-              value={value || ""}
+              value={initialValue || value || ""}
               readOnly={readOnly}
             />
           );
