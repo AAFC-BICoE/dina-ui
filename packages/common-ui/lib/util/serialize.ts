@@ -46,6 +46,11 @@ export async function serialize<TData extends KitsuResource>({
 
   const { data } = await customSerialise(type, resourceCopy, httpVerb);
 
+  // Add the attributes object if it is missing.
+  if (!data.attributes) {
+    data.attributes = {};
+  }
+
   // Some resource types (e.g. PcrPrimer) have an attribute called "type", which is separate from
   // the JSONAPI resource type.
   // kitsu-core's serializer ignores attributes called "type", so we manually add it back here if it exists.

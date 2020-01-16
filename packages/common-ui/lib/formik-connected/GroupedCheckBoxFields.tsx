@@ -1,7 +1,7 @@
 import { connect, Field } from "formik";
 import { KitsuResource } from "kitsu";
 import { noop, toPairs } from "lodash";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ReactTooltip from "react-tooltip";
 
 interface CheckBoxFieldProps<TData extends KitsuResource> {
@@ -19,7 +19,7 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
   fieldName
 }: GroupedCheckBoxesParams) {
   const [availableItems, setAvailableItems] = useState<TData[]>([]);
-  const [lastCheckedItem, setLastCheckedItem] = useState<TData>();
+  const lastCheckedItemRef = useRef<TData>();
 
   function CheckBoxField({ resource }: CheckBoxFieldProps<TData>) {
     const thisBoxFieldName = `${fieldName}[${resource.id}]`;
@@ -30,13 +30,14 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
           function onCheckBoxClick(e) {
             setFieldValue(thisBoxFieldName, e.target.checked);
             setFieldTouched(thisBoxFieldName);
-            setLastCheckedItem(resource);
 
-            if (lastCheckedItem && e.shiftKey) {
+            if (lastCheckedItemRef.current && e.shiftKey) {
               const checked: boolean = (e.target as any).checked;
 
               const currentIndex = availableItems.indexOf(resource);
-              const lastIndex = availableItems.indexOf(lastCheckedItem);
+              const lastIndex = availableItems.indexOf(
+                lastCheckedItemRef.current
+              );
 
               const [lowIndex, highIndex] = [currentIndex, lastIndex].sort(
                 (a, b) => a - b
@@ -51,7 +52,7 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
                 setFieldValue(`${fieldName}[${item.id}]`, checked);
               }
             }
-            setLastCheckedItem(resource);
+            lastCheckedItemRef.current = resource;
           }
 
           return (

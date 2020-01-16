@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@molgenis/rsql": "0.1.2",
+    "dataloader": "^1.4.0",
     "formik": "^1.5.8",
     "kitsu": "7.0.4",
     "kitsu-core": "7.0.4",
