@@ -14,3 +14,5 @@ This application is developed using these technologies:
 the https://bootswatch.com/spacelab/[Bootswatch Spacelab theme].
 
 - https://jestjs.io/[Jest]: Testing framework.
+
+- https://www.docker.com/[Docker]: Application containerization
