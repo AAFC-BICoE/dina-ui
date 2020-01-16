@@ -15,7 +15,12 @@ before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
-script: yarn test:coverage
+script:
+  # Run tests in all packages:
+  - yarn test:coverage;
+  # Make sure the apps can be built:
+  - yarn workspace seqdb-ui build
+  - yarn workspace objectstore-ui build
 after_script:
   # Format common-ui coverage
   - ./cc-test-reporter format-coverage -t lcov -o coverage/codeclimate.common-ui.json packages/common-ui/coverage/lcov.info

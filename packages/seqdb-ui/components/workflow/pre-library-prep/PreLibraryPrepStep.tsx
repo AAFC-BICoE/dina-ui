@@ -1,5 +1,6 @@
 import {
   ColumnDefinition,
+  ErrorViewer,
   FilterForm,
   LoadingSpinner,
   QueryTable,
@@ -162,9 +163,9 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                     {formikProps.isSubmitting ? (
                       <LoadingSpinner loading={true} />
                     ) : (
-                      <>
+                      <div className="list-inline">
                         <button
-                          className="btn btn-dark remove-shearing"
+                          className="list-inline-item btn btn-warning remove-shearing"
                           onClick={() =>
                             deleteStepResources("SHEARING", formikProps)
                           }
@@ -173,7 +174,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                           <SeqdbMessage id="removeShearingDetailsButtonText" />
                         </button>
                         <button
-                          className="btn btn-dark remove-size-selection"
+                          className="list-inline-item btn btn-warning remove-size-selection"
                           onClick={() =>
                             deleteStepResources("SIZE_SELECTION", formikProps)
                           }
@@ -181,7 +182,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                         >
                           <SeqdbMessage id="removeSizeSelectionDetailsButtonText" />
                         </button>
-                      </>
+                      </div>
                     )}
                   </div>
                   <QueryTable
@@ -193,7 +194,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                       rsql: rsqlFilter
                     }}
                     include="sample,sample.group"
-                    loading={formikProps.isSubmitting}
+                    loading={plpSrLoading || formikProps.isSubmitting}
                     onSuccess={res => {
                       setVisibleSamples(res.data);
                       setAvailableItems(
@@ -210,6 +211,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                     </strong>
                     {/* Spacer div to align the table with the form. */}
                     <div style={{ height: "22px" }} />
+                    <ErrorViewer />
                     <PreLibraryPrepForm onSubmit={onInnerFormSubmit} />
                   </div>
                 )}

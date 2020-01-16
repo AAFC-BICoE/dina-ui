@@ -1,6 +1,7 @@
 export * from "./api-client/ApiClientContext";
 export * from "./api-client/operations-types";
 export * from "./api-client/Query";
+export * from "./api-client/useCacheableQueryLoader";
 export * from "./api-client/useQuery";
 export * from "./bulk-data-editor/BulkDataEditor";
 export * from "./bulk-data-editor/encode-resource-cell";
@@ -17,6 +18,7 @@ export * from "./formik-connected/FormikButton";
 export * from "./formik-connected/GroupedCheckBoxFields";
 export * from "./formik-connected/NumberField";
 export * from "./formik-connected/ResourceSelectField";
+export * from "./formik-connected/safeSubmit";
 export * from "./formik-connected/SelectField";
 export * from "./formik-connected/SubmitButton";
 export * from "./formik-connected/TextField";

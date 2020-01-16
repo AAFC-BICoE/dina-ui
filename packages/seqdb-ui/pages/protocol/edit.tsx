@@ -5,11 +5,12 @@ import {
   LoadingSpinner,
   Query,
   ResourceSelectField,
+  safeSubmit,
   SelectField,
   SubmitButton,
   TextField
 } from "common-ui";
-import { Form, Formik, FormikActions } from "formik";
+import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
@@ -72,30 +73,22 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
   const { id } = router.query;
   const initialValues = protocol || {};
 
-  async function onSubmit(
-    submittedValues,
-    { setStatus, setSubmitting }: FormikActions<any>
-  ) {
-    try {
-      // Override the product type with "product" when kit is available
-      if (submittedValues.kit) {
-        submittedValues.kit.type = "product";
-      }
-
-      const response = await save([
-        {
-          resource: submittedValues,
-          type: "protocol"
-        }
-      ]);
-
-      const newId = response[0].id;
-      router.push(`/protocol/view?id=${newId}`);
-    } catch (error) {
-      setStatus(error.message);
-      setSubmitting(false);
+  const onSubmit = safeSubmit(async submittedValues => {
+    // Override the product type with "product" when kit is available
+    if (submittedValues.kit) {
+      submittedValues.kit.type = "product";
     }
-  }
+
+    const response = await save([
+      {
+        resource: submittedValues,
+        type: "protocol"
+      }
+    ]);
+
+    const newId = response[0].id;
+    await router.push(`/protocol/view?id=${newId}`);
+  });
 
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>

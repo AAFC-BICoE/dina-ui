@@ -1,2 +1,4 @@
 /node_modules
 /generated-docs
+/packages/*/pa11y-result.json
+/packages/*/pa11y-html-report
