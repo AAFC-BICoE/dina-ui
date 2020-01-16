@@ -7,6 +7,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   ISNOT: "IS NOT",
   OR: "OR",
   closeButtonText: "Close",
+  editButtonText: "Edit",
   filterBlankField: "Blank Field",
   filterExactMatch: "Exact Match",
   filterPartialMatch: "Partial Match",

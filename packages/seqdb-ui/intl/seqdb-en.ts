@@ -18,7 +18,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   createButtonText: "Create New",
   deselectAllCheckedSamplesButtonText: "<-- Deselect all checked samples",
   deselectButtonText: "Deselect",
-  editButtonText: "Edit",
   editPcrPrimerTitle: "Edit PCR Primer",
   editPcrProfileTitle: "Edit Thermocycler Profile",
   editProductTitle: "Edit Product",

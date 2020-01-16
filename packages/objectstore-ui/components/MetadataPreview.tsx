@@ -1,5 +1,6 @@
 import { LoadingSpinner, useQuery } from "common-ui";
 import { isObject, toPairs } from "lodash";
+import Link from "next/link";
 import ReactTable from "react-table";
 import { ObjectStoreMessage } from "../intl/objectstore-intl";
 import { Metadata } from "../types/objectstore-api";
@@ -37,6 +38,13 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
 
     return (
       <>
+        <div>
+          <Link href={`/metadata/edit?ids=${metadataId}`}>
+            <a className="btn btn-primary">
+              <ObjectStoreMessage id="editButtonText" />
+            </a>
+          </Link>
+        </div>
         <a href={filePath}>
           <FileView filePath={filePath} fileType={fileType} />
         </a>
@@ -80,9 +88,20 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
         </div>
         <div className="form-group">
           <h4>Tags</h4>
-          {metadata.acTags?.map(tag => (
-            <div>{tag}</div>
-          ))}
+          {metadata.acTags?.length
+            ? metadata.acTags.map(tag => (
+                <span
+                  style={{
+                    background: "#AEB404",
+                    borderRadius: "25px",
+                    margin: "0.5rem",
+                    padding: "0.5rem"
+                  }}
+                >
+                  {tag}
+                </span>
+              ))
+            : "None"}
         </div>
       </>
     );
