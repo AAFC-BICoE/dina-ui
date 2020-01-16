@@ -138,7 +138,22 @@ export default function MetadataListPage() {
                   columns: METADATA_TABLE_COLUMNS,
                   include: "acMetadataCreator",
                   onSuccess: res => setAvailableMetadatas(res.data),
-                  path: "metadata"
+                  path: "metadata",
+                  reactTableProps: {
+                    getTrProps: (_, rowInfo) => {
+                      if (rowInfo) {
+                        const metadata: Metadata = rowInfo.original;
+                        return {
+                          style: {
+                            background:
+                              metadata.id === previewMetadataId &&
+                              "rgb(222, 252, 222)"
+                          }
+                        };
+                      }
+                      return {};
+                    }
+                  }
                 }}
                 WrapTable={WrapTable}
               />
