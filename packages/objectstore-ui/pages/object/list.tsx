@@ -69,7 +69,7 @@ export default function MetadataListPage() {
           onClick={() => setPreviewMetadataId(original.id)}
           type="button"
         >
-          View
+          <ObjectStoreMessage id="viewPreviewButtonText" />
         </button>
       ),
       Header: ""
@@ -147,7 +147,7 @@ export default function MetadataListPage() {
                   type="button"
                   onClick={() => setPreviewMetadataId(null)}
                 >
-                  <ObjectStoreMessage id="closeButtonText" />
+                  <ObjectStoreMessage id="closePreviewButtonText" />
                 </button>
               </div>
               {previewMetadataId && (

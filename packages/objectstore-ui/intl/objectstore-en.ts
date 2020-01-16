@@ -8,6 +8,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   addManagedAttributeButtonText: "Add New Managed Attribute",
   appTitle: "Object Store",
   attributeLabel: "Attribute",
+  closePreviewButtonText: "Close Preview",
   field_managedAttributeType: "Type",
   field_originalFilename: "Original Filename",
   managedAttributeListTitle: "Managed Attributes",
@@ -34,5 +35,6 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   objectStoreDetailsTitle: "Object Store Details",
   uploadFormInstructions:
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
-  uploadPageTitle: "Upload Files"
+  uploadPageTitle: "Upload Files",
+  viewPreviewButtonText: "View Preview"
 };
