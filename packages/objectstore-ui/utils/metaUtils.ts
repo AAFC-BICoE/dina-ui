@@ -8,10 +8,10 @@ export function renameJson(json, oldkey, newkey) {
     {}
   );
 }
-/* Delete managed attribute */
-export function deleteManagedAttribute(submittedValues, origiValues) {
+/* Generetae managed attribute map data*/
+export function generateManagedAttributesMap(submittedValues, origiValues) {
+  const values = {};
   const deletedMAs = new Array();
-  const updatedMAs = new Array();
   let foundMatch = false;
   for (const x in origiValues) {
     if (/^key_/.test(x) && origiValues["assignedValue" + x.substr(4)]) {
@@ -23,14 +23,18 @@ export function deleteManagedAttribute(submittedValues, origiValues) {
           }
         }
       }
-      if (foundMatch) {
+      if (
+        foundMatch &&
+        submittedValues["assignedValue" + x.substr(4)] === null
+      ) {
         foundMatch = false;
+        deletedMAs.push(x);
       } else {
         deletedMAs.push(x);
       }
     }
   }
-  const values = {};
+  // add new or modified ma to the values
   for (const y in submittedValues) {
     if (/^key_/.test(y)) {
       values[submittedValues[y].id] = {
@@ -38,6 +42,7 @@ export function deleteManagedAttribute(submittedValues, origiValues) {
       };
     }
   }
+  // add deleted ma to the values
   deletedMAs.map(ma => (values[origiValues[ma].id] = { value: null }));
 
   const dataToSubmit = {
@@ -62,8 +67,9 @@ export function deleteManagedAttribute(submittedValues, origiValues) {
 export function generateManagedAttributeValue(
   metaManagedAttributes,
   submittedValues,
-  managedAttributes
+  metainitialValues
 ) {
+  const managedAttributes = metainitialValues?.managedAttributes;
   const acTags = new Set();
   for (const x in submittedValues) {
     if (/^key_/.test(x) && submittedValues["assignedValue" + x.substr(4)]) {
@@ -85,6 +91,8 @@ export function generateManagedAttributeValue(
         type: "metadata-managed-attribute"
       };
 
+      // set the metamanaged attribute id if there is one based on the
+      // initial value retrieved for this metatdata
       /* tslint:disable:no-string-literal */
       if (managedAttributes) {
         managedAttributes.map(ma => {
@@ -105,9 +113,18 @@ export function generateManagedAttributeValue(
       metaManagedAttributes.push(metaManagedAttribute);
       delete submittedValues[x];
       delete submittedValues["assignedValue" + x.substr(4)];
-    } else if (/^assignedValue_un/.test(x) && submittedValues[x]) {
-      acTags.add(submittedValues[x]);
+    } else if (/^assignedValue_un/.test(x)) {
+      // either this is create new metadata or edit existing metadata
+      if (
+        !metainitialValues ||
+        (metainitialValues[x] && metainitialValues[x] !== "null") ||
+        (metainitialValues && !metainitialValues[x])
+      ) {
+        acTags.add(submittedValues[x]);
+      }
       delete submittedValues[x];
+    } else if (submittedValues["assignedValue" + x.substr(4)]) {
+      delete submittedValues["assignedValue" + x.substr(4)];
     }
   }
   if (acTags.size > 0) {

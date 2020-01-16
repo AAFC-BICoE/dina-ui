@@ -21,7 +21,7 @@ import { isArray, isUndefined } from "util";
 import { AttributeBuilder, Head, Nav } from "../../components";
 import { MetaManagedAttribute } from "../../types/objectstore-api/resources/MetaManagedAttribute";
 import {
-  deleteManagedAttribute,
+  generateManagedAttributesMap,
   generateManagedAttributeValue
 } from "../../utils/metaUtils";
 
@@ -152,7 +152,10 @@ function DetailEditForm({ router }: DetailEditFormProps) {
         "Crnk-Compact": "true"
       }
     };
-    const mydata = deleteManagedAttribute(submittedValues, metainitialValues1);
+    const mydata = generateManagedAttributesMap(
+      submittedValues,
+      metainitialValues1
+    );
     try {
       const resps = await apiClient.axios.post(
         "/managed-attribute-map",
@@ -167,7 +170,7 @@ function DetailEditForm({ router }: DetailEditFormProps) {
       generateManagedAttributeValue(
         metaManagedAttributes,
         submittedValues,
-        metainitialValues["managedAttributes"]
+        metainitialValues
       );
       /* tslint:enable:no-string-literal */
       const serializePromises = serialize({

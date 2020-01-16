@@ -193,11 +193,14 @@ export class AttributeBuilder extends React.Component<
   }) {
     // Remove the attribute row from the parent's children array.
     if (attribute.type === "ATTRIBUTE_ROW" && attribute.attribute) {
-      if (this.props.initValues) {
-        const x = this.props.initValues;
-        delete x["key_" + attribute.id];
-        delete x["assignedValue" + attribute.id];
-        delete x["assignedValue_un" + attribute.id];
+      // This block is a workaround, see https://github.com/jaredpalmer/formik/issues/529
+      if (this.state.initValues) {
+        const x = this.state.initValues;
+        if (this.props.controlledAttributes[0].name === "unManaged") {
+          x["assignedValue_un" + attribute.id] = "null";
+        } else {
+          x["assignedValue" + attribute.id] = null;
+        }
         this.setState({ initValues: x });
       }
     }
