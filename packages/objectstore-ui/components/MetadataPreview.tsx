@@ -1,20 +1,13 @@
 import { LoadingSpinner, useQuery } from "common-ui";
 import { isObject, toPairs } from "lodash";
-import dynamic from "next/dynamic";
-import { ComponentType } from "react";
 import ReactTable from "react-table";
 import { ObjectStoreMessage } from "../intl/objectstore-intl";
 import { Metadata } from "../types/objectstore-api";
+import { FileView } from "./file-view/FileView";
 
 interface MetadataPreviewProps {
   metadataId: string;
 }
-
-// The FileViewer component can't be server-side rendered:
-const FileViewer: ComponentType<any> = dynamic(
-  () => import("react-file-viewer"),
-  { ssr: false }
-);
 
 export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
   const { loading, response } = useQuery<Metadata>({
@@ -43,11 +36,9 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
       : [];
 
     return (
-      <div className="h-100">
+      <>
         <a href={filePath}>
-          <div style={{ height: "25%" }}>
-            <FileViewer filePath={filePath} fileType={fileType} />
-          </div>
+          <FileView filePath={filePath} fileType={fileType} />
         </a>
         <div className="form-group">
           <h4>Built-in Attributes</h4>
@@ -93,7 +84,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
             <div>{tag}</div>
           ))}
         </div>
-      </div>
+      </>
     );
   }
 

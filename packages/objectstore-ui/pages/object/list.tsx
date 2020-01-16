@@ -6,6 +6,7 @@ import {
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { noop, toPairs } from "lodash";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Head, Nav } from "../../components";
@@ -84,6 +85,10 @@ export default function MetadataListPage() {
     #__next {
       height: 100%;
     }
+    .file-viewer-wrapper {
+      height: 25%;
+      max-height: 25%;
+    }
   `;
 
   const WrapTable = useMemo(
@@ -141,17 +146,24 @@ export default function MetadataListPage() {
           </div>
           <div className={`col-${previewSectionWidth}`}>
             <div ref={previewWrapper} style={{ overflowY: "scroll" }}>
-              <div style={{ height: "2.5rem" }}>
-                <button
-                  className="btn btn-dark float-right"
-                  type="button"
-                  onClick={() => setPreviewMetadataId(null)}
-                >
-                  <ObjectStoreMessage id="closePreviewButtonText" />
-                </button>
-              </div>
               {previewMetadataId && (
-                <MetadataPreview metadataId={previewMetadataId} />
+                <>
+                  <div style={{ height: "2.5rem" }}>
+                    <Link href={`/object/view?id=${previewMetadataId}`}>
+                      <a>Details Page</a>
+                    </Link>
+                    <button
+                      className="btn btn-dark float-right"
+                      type="button"
+                      onClick={() => setPreviewMetadataId(null)}
+                    >
+                      <ObjectStoreMessage id="closePreviewButtonText" />
+                    </button>
+                  </div>
+                  <div className="h-100">
+                    <MetadataPreview metadataId={previewMetadataId} />
+                  </div>
+                </>
               )}
             </div>
           </div>
