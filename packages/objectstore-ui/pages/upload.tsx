@@ -111,7 +111,7 @@ export default function UploadPage() {
 
     const ids = saveResults.map(res => res.id).join(",");
 
-    router.push({
+    await router.push({
       pathname: "/metadata/edit",
       query: { ids }
     });

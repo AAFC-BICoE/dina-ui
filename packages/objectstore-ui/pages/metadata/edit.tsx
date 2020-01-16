@@ -70,7 +70,7 @@ export default function EditMetadatasPage() {
     // },
     resourceSelectCell<Agent>(
       {
-        filter: input => ({ displayName: input }),
+        filter: input => ({ rsql: `displayName==*${input}*` }),
         label: agent => agent.displayName,
         model: "agent"
       },
