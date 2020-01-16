@@ -1,15 +1,15 @@
 import { KitsuResource } from "kitsu";
 
 export interface ManagedAttributeAttributes {
-  type: "managed-attribute";
+  type: string;
   name: string;
-  managedAttributeType: ManagedAttributeType;
-  acceptedValues: string[];
+  managedAttributeType: string;
+  acceptedValues?: string[];
   uuid: string;
 }
 export enum ManagedAttributeType {
-  INTEGER,
-  STRING
+  "INTEGER",
+  "STRING"
 }
 
 export type ManagedAttribute = KitsuResource & ManagedAttributeAttributes;

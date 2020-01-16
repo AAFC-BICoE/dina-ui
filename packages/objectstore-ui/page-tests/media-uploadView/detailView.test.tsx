@@ -27,6 +27,7 @@ const TEST_METADATA_RESPONSE = [
       id: "c1cd8a18-72d5-48a6-8e62-7e6aab6519ad",
       type: "agent"
     },
+    acTags: ["765", "76757"],
     bucket: "mybucket",
     dcFormat: "image/png",
     dcType: "Image",
@@ -92,6 +93,31 @@ describe("Metadata detail view page", () => {
         return { data: TEST_MANAGEDDATA_RESPONSE };
       }
     });
+  });
+
+  it("Provides a form to show the tags section.", async done => {
+    const wrapper = mountWithAppContext(
+      <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />
+    );
+
+    // Wait for the page to load.
+    await Promise.resolve();
+    wrapper.update();
+
+    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
+
+    // The managed attribute section assgined value field should be rendered.
+    expect(
+      wrapper.containsMatchingElement(
+        <strong style={{ background: "#AEB404", borderRadius: "25px" }}>
+          <span>&nbsp;&nbsp;</span>
+          765
+          <span>&nbsp;&nbsp;</span>
+        </strong>
+      )
+    ).toEqual(true);
+
+    done();
   });
 
   it("Provides a form to show the managed attribute section.", async () => {
