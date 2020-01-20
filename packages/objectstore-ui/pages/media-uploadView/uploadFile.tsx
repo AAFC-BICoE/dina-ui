@@ -3,7 +3,7 @@ import { ErrorViewer, SubmitButton } from "common-ui";
 import { Form, Formik, FormikActions } from "formik";
 import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Head, Nav } from "../../components";
+import { Head } from "../../components";
 import {
   ObjectStoreMessage,
   useObjectStoreIntl
@@ -50,7 +50,6 @@ function MediaUploadViewPage() {
   return (
     <div>
       <Head title={formatMessage("uploadPageTitle")} />
-      <Nav />
       <div className="container-fluid">
         <div>
           <h4>

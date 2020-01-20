@@ -84,7 +84,11 @@ class MyDocument extends Document {
         </WetHead>
         <body>
           <div id="def-top" />
-          <Main />
+          <div className="container">
+            <div className="row">
+              <Main />
+            </div>
+          </div>
           <div id="def-preFooter" />
           <div id="def-footer" />
           <NextScript />
@@ -100,8 +104,8 @@ class MyDocument extends Document {
             <![endif]-->
               
             <script src="https://wet-boew.github.io/themes-dist/GCWeb/js/theme.min.js"></script>
-            <script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_28/cdts/compiled/soyutils.js"></script>
-            <script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_28/cdts/compiled/wet-en.js"></script>
+            <script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/cdts/compiled/soyutils.js"></script>
+            <script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/cdts/compiled/wet-en.js"></script>
 
             <noscript>
               <!-- Write closure fall-back static file -->
@@ -110,29 +114,42 @@ class MyDocument extends Document {
             </noscript>
 
             <script>
+                var defTop = document.getElementById("def-top");                
+                defTop.outerHTML = wet.builder.appTop({
+                  "lngLinks":
+                      [{
+                          "lang": "fr",
+                          "href": "application-fr.html",
+                          "text": "Français" }],
+
+                    "appName":
+                     [{
+                        "text": "AAFC BICOE - DINA Object Store",
+                        "href": "#" }] 
+                });
+
                 document.write(wet.builder.refTop({
                     "webAnalytics" : [{
                       "environment" : "staging",
                       "version" : 1
-                    }]
-                  }));            
-
-                var defTop = document.getElementById("def-top");                
-                defTop.outerHTML = wet.builder.top({
-                          "lngLinks":
-                      [{
-                          "lang": "fr",
-                "href": "content-fr.html",
-                "text": "Français" }]
-                  });
+                    }],
+                    "isApplication":true                    
+                  }));                  
 
                 var defPreFooter = document.getElementById("def-preFooter");
                 defPreFooter.outerHTML = wet.builder.preFooter({
-                  "dateModified": "2017-06-05"
+                  "dateModified": "2020-01-20"
                 });    
                 
                 var defFooter = document.getElementById("def-footer");
-                  defFooter.outerHTML = wet.builder.footer({
+                  defFooter.outerHTML = wet.builder.appFooter({
+                    "footerSections": [{
+                      "href": "#",
+                      "text": "Link 1"
+                    },{
+                      "href": "#",
+                      "text": "Link 2"
+                    }]                    
                 });  
 
                 document.write(wet.builder.refFooter({
