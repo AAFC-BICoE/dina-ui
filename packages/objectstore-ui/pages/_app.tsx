@@ -5,7 +5,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import "react-table/react-table.css";
 import "react-tabs/style/react-tabs.css";
 import { ObjectStoreIntlProvider } from "../intl/objectstore-intl";
-import MainLayout from "../page-fragments/wet-layout";
 
 /**
  * App component that wraps every page component.
@@ -21,9 +20,7 @@ export default class ObjectStoreUiApp extends App {
     return (
       <ApiClientContext.Provider value={this.contextValue}>
         <ObjectStoreIntlProvider>
-          <MainLayout>
-            <Component {...pageProps} />
-          </MainLayout>
+          <Component {...pageProps} />
         </ObjectStoreIntlProvider>
       </ApiClientContext.Provider>
     );

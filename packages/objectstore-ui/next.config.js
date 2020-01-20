@@ -4,6 +4,9 @@ const withTM = require("next-transpile-modules");
 module.exports = withCss(
   withTM({
     transpileModules: ["common-ui"],
+    devIndicators: {
+      autoPrerender: false
+    },
     webpack: config => {
       // Fixes npm packages that depend on `fs` module
       config.node = {
@@ -25,7 +28,6 @@ module.exports = withCss(
         return entries;
       };
       // Polyfill config end.
-
       return config;
     }
   })
