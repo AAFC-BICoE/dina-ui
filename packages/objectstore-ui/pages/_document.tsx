@@ -87,9 +87,10 @@ class MyDocument extends Document {
           <div className="container">
             <div className="row">
               <Main />
+              <div id="def-preFooter" />
             </div>
           </div>
-          <div id="def-preFooter" />
+
           <div id="def-footer" />
           <NextScript />
         </body>

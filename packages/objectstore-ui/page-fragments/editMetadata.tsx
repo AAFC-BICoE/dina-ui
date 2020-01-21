@@ -214,20 +214,15 @@ function EditMetadataForm({
           </div>
         </div>
         <div className="form-group row">
-          <div className="col col-md-6">
+          <div className="col">
             <h6>
               <ObjectStoreMessage id="metadataManagedAttributesLabel" />
             </h6>
             <AttributeBuilder controlledAttributes={managedAttributes} />
           </div>
         </div>
-        <div className="row">
-          <div className="span12">
-            <hr />
-          </div>
-        </div>
         <div className="form-group row">
-          <div className="col-md-4">
+          <div className="col">
             <h6>
               <ObjectStoreMessage id="metadataTagsLabel" />
             </h6>

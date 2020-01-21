@@ -38,12 +38,12 @@ export class AttributeRow extends React.Component<AttributeRowProps> {
         controlledAttributes[0] &&
         controlledAttributes[0].name &&
         controlledAttributes[0].name === "unManaged" ? (
-          <div className="list-inline-item" style={{ width: 180 }}>
+          <div className=" col-md-7" style={{ width: 600 }}>
             <TextField name={`assignedValue_un${model.id}`} hideLabel={true} />
           </div>
         ) : (
-          <div className="list-inline-item">
-            <div className="list-inline-item col-sm-6" style={{ width: 320 }}>
+          <div style={{ width: 800 }}>
+            <div className="col-md-7">
               <ResourceSelectField<ManagedAttribute>
                 name={`key_${model.id}`}
                 filter={filterBy(["name"])}
@@ -52,16 +52,16 @@ export class AttributeRow extends React.Component<AttributeRowProps> {
                 hideLabel={true}
               />
             </div>
-            <div className="list-inline-item" style={{ width: 180 }}>
+            <div className=" col-md-4">
               <TextField name={`assignedValue${model.id}`} hideLabel={true} />
             </div>
           </div>
         )}
 
-        <div className="filter-row-buttons list-inline-item">
+        <div className=" col-sm-2">
           {showPlusButton && (
             <button
-              className="list-inline-item btn btn-primary"
+              className=" btn btn-primary"
               onClick={onAndClick}
               type="button"
             >
@@ -71,7 +71,7 @@ export class AttributeRow extends React.Component<AttributeRowProps> {
 
           {showRemoveButton && (
             <button
-              className="list-inline-item btn btn-dark"
+              className=" btn btn-dark"
               onClick={onRemoveClick}
               type="button"
             >
