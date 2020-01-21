@@ -27,6 +27,8 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   metadataHashFunctionLabel: "Hash Function",
   metadataHashValueLabel: "Hash Value",
   metadataLastMetadataModificationTimeLabel: "Last Metadata Modification Time",
+  metadataListGalleryLayout: "Gallery",
+  metadataListTableLayout: "Table",
   metadataManagedAttributesLabel: "Managed Attributes",
   metadataObjectTypeLabel: "Stored Object Type",
   metadataTagsLabel: "Tags",

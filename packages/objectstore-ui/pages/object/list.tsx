@@ -1,4 +1,5 @@
 import {
+  CheckBoxFieldProps,
   ColumnDefinition,
   FormikButton,
   ListPageLayout,
@@ -8,15 +9,32 @@ import { Form, Formik } from "formik";
 import { noop, toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useCookies } from "react-cookie";
 import { Head, Nav } from "../../components";
 import { MetadataPreview } from "../../components/MetadataPreview";
 import { ObjectStoreMessage } from "../../intl/objectstore-intl";
 import { Metadata } from "../../types/objectstore-api";
 
-export default function MetadataListPage() {
-  const router = useRouter();
+type MetadataListLayoutType = "TABLE" | "GALLERY";
 
+const METADATA_LIST_LAYOUT_COOKIE = "metadata-list-layout";
+
+const OBJECT_LIST_PAGE_CSS = `
+  html, body {
+    margin: 0;
+    height: 100%;
+  }
+  #__next {
+    height: 100%;
+  }
+  .file-viewer-wrapper {
+    height: 25%;
+    max-height: 25%;
+  }
+`;
+
+export default function MetadataListPage() {
   const {
     CheckBoxField,
     CheckBoxHeader,
@@ -24,6 +42,10 @@ export default function MetadataListPage() {
   } = useGroupedCheckBoxes({
     fieldName: "selectedMetadatas"
   });
+
+  const [cookies, setCookie] = useCookies([METADATA_LIST_LAYOUT_COOKIE]);
+  const listLayoutType: MetadataListLayoutType =
+    cookies[METADATA_LIST_LAYOUT_COOKIE] || "TABLE";
 
   const [previewMetadataId, setPreviewMetadataId] = useState<string | null>(
     null
@@ -77,57 +99,27 @@ export default function MetadataListPage() {
     }
   ];
 
-  const OBJECT_LIST_PAGE_CSS = `
-    html, body {
-      margin: 0;
-      height: 100%;
-    }
-    #__next {
-      height: 100%;
-    }
-    .file-viewer-wrapper {
-      height: 25%;
-      max-height: 25%;
-    }
-  `;
-
-  const WrapTable = useMemo(
-    () => ({ children }) => (
-      <Formik initialValues={{ selectedMetadatas: {} }} onSubmit={noop}>
-        <Form>
-          <div style={{ height: "1rem" }}>
-            <FormikButton
-              className="btn btn-primary float-right"
-              onClick={async values => {
-                const metadataIds = toPairs(values.selectedMetadatas)
-                  .filter(pair => pair[1])
-                  .map(pair => pair[0]);
-
-                await router.push({
-                  pathname: "/metadata/edit",
-                  query: { ids: metadataIds.join(",") }
-                });
-              }}
-            >
-              Edit selected
-            </FormikButton>
-          </div>
-          {children}
-        </Form>
-      </Formik>
-    ),
-    []
-  );
-
   return (
     <div>
       <style>{OBJECT_LIST_PAGE_CSS}</style>
       <Head title="Objects" />
       <Nav />
       <div className="container-fluid">
-        <h1>
-          <ObjectStoreMessage id="objectListTitle" />
-        </h1>
+        <div className="list-inline">
+          <div className="list-inline-item">
+            <h1>
+              <ObjectStoreMessage id="objectListTitle" />
+            </h1>
+          </div>
+          <div className="list-inline-item">
+            <ListLayoutSelector
+              onChange={newValue =>
+                setCookie(METADATA_LIST_LAYOUT_COOKIE, newValue)
+              }
+              value={listLayoutType}
+            />
+          </div>
+        </div>
         <div className="row">
           <div className={`col-${tableSectionWidth}`}>
             <div ref={tableWrapper} style={{ overflowY: "scroll" }}>
@@ -139,7 +131,16 @@ export default function MetadataListPage() {
                   include: "acMetadataCreator",
                   onSuccess: res => setAvailableMetadatas(res.data),
                   path: "metadata",
-                  reactTableProps: {
+                  reactTableProps: ({ response }) => ({
+                    TbodyComponent:
+                      listLayoutType === "GALLERY"
+                        ? () => (
+                            <StoredObjectGallery
+                              CheckBoxField={CheckBoxField}
+                              metadatas={response?.data ?? []}
+                            />
+                          )
+                        : undefined,
                     getTrProps: (_, rowInfo) => {
                       if (rowInfo) {
                         const metadata: Metadata = rowInfo.original;
@@ -153,9 +154,9 @@ export default function MetadataListPage() {
                       }
                       return {};
                     }
-                  }
+                  })
                 }}
-                WrapTable={WrapTable}
+                WrapTable={MetadataTableWrapper}
               />
             </div>
           </div>
@@ -184,6 +185,101 @@ export default function MetadataListPage() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Adds additional controls around the metadata table.
+ */
+function MetadataTableWrapper({ children }) {
+  const router = useRouter();
+
+  return (
+    <Formik initialValues={{ selectedMetadatas: {} }} onSubmit={noop}>
+      <Form>
+        <div style={{ height: "1rem" }}>
+          <div className="float-right">
+            <FormikButton
+              className="btn btn-primary "
+              onClick={async values => {
+                const metadataIds = toPairs(values.selectedMetadatas)
+                  .filter(pair => pair[1])
+                  .map(pair => pair[0]);
+
+                await router.push({
+                  pathname: "/metadata/edit",
+                  query: { ids: metadataIds.join(",") }
+                });
+              }}
+            >
+              Edit selected
+            </FormikButton>
+          </div>
+        </div>
+        {children}
+      </Form>
+    </Formik>
+  );
+}
+
+interface StoredObjectGalleryProps {
+  metadatas: Metadata[];
+  CheckBoxField: React.ComponentType<CheckBoxFieldProps<Metadata>>;
+}
+
+function StoredObjectGallery({
+  metadatas,
+  CheckBoxField
+}: StoredObjectGalleryProps) {
+  return (
+    <div className="row">
+      {metadatas.map(metadata => (
+        <div className="col-md-2" key={metadata.id}>
+          <div className="card card-body">
+            <div
+              style={{
+                backgroundColor: "black",
+                height: "50px",
+                width: "100%"
+              }}
+            />
+            {metadata.id}
+            <CheckBoxField resource={metadata} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ListLayoutSelector({ value, onChange }) {
+  const items = [
+    {
+      layoutType: "TABLE",
+      message: <ObjectStoreMessage id="metadataListTableLayout" />
+    },
+    {
+      layoutType: "GALLERY",
+      message: <ObjectStoreMessage id="metadataListGalleryLayout" />
+    }
+  ];
+
+  return (
+    <div className="list-inline">
+      {items.map(({ message, layoutType }) => (
+        <div className="list-inline-item">
+          <label>
+            <input
+              key={layoutType}
+              type="radio"
+              checked={value === layoutType}
+              onChange={() => onChange(layoutType)}
+            />
+            {message}
+          </label>
+        </div>
+      ))}
     </div>
   );
 }

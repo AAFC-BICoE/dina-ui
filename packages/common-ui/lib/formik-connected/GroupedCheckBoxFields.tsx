@@ -4,11 +4,11 @@ import { noop, toPairs } from "lodash";
 import { useRef, useState } from "react";
 import ReactTooltip from "react-tooltip";
 
-interface CheckBoxFieldProps<TData extends KitsuResource> {
+export interface CheckBoxFieldProps<TData extends KitsuResource> {
   resource: TData;
 }
 
-interface GroupedCheckBoxesParams {
+export interface GroupedCheckBoxesParams {
   fieldName: string;
 }
 
