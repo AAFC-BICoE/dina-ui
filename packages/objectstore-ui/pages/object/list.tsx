@@ -6,6 +6,7 @@ import {
   useGroupedCheckBoxes
 } from "common-ui";
 import { Form, Formik } from "formik";
+import { PersistedResource } from "kitsu";
 import { noop, toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -33,6 +34,8 @@ const OBJECT_LIST_PAGE_CSS = `
     max-height: 25%;
   }
 `;
+
+const HIGHLIGHT_COLOR = "rgb(222, 252, 222)";
 
 export default function MetadataListPage() {
   const {
@@ -102,7 +105,7 @@ export default function MetadataListPage() {
   return (
     <div>
       <style>{OBJECT_LIST_PAGE_CSS}</style>
-      <Head title="Objects" />
+      <Head title="Stored Objects" />
       <Nav />
       <div className="container-fluid">
         <div className="list-inline">
@@ -118,6 +121,13 @@ export default function MetadataListPage() {
               }
               value={listLayoutType}
             />
+          </div>
+          <div className="list-inline-item float-right">
+            <Link href="/upload">
+              <a>
+                <ObjectStoreMessage id="uploadPageTitle" />
+              </a>
+            </Link>
           </div>
         </div>
         <div className="row">
@@ -138,6 +148,8 @@ export default function MetadataListPage() {
                             <StoredObjectGallery
                               CheckBoxField={CheckBoxField}
                               metadatas={response?.data ?? []}
+                              previewMetadataId={previewMetadataId}
+                              onSelectPreviewMetadataId={setPreviewMetadataId}
                             />
                           )
                         : undefined,
@@ -148,7 +160,7 @@ export default function MetadataListPage() {
                           style: {
                             background:
                               metadata.id === previewMetadataId &&
-                              "rgb(222, 252, 222)"
+                              HIGHLIGHT_COLOR
                           }
                         };
                       }
@@ -224,31 +236,55 @@ function MetadataTableWrapper({ children }) {
 }
 
 interface StoredObjectGalleryProps {
-  metadatas: Metadata[];
   CheckBoxField: React.ComponentType<CheckBoxFieldProps<Metadata>>;
+  metadatas: Array<PersistedResource<Metadata>>;
+  onSelectPreviewMetadataId: (id: string) => void;
+  previewMetadataId: string | null;
 }
 
 function StoredObjectGallery({
+  CheckBoxField,
   metadatas,
-  CheckBoxField
+  onSelectPreviewMetadataId,
+  previewMetadataId
 }: StoredObjectGalleryProps) {
   return (
-    <div className="row">
-      {metadatas.map(metadata => (
-        <div className="col-md-2" key={metadata.id}>
-          <div className="card card-body">
-            <div
-              style={{
-                backgroundColor: "black",
-                height: "50px",
-                width: "100%"
-              }}
-            />
-            {metadata.id}
-            <CheckBoxField resource={metadata} />
-          </div>
-        </div>
-      ))}
+    <div className="container-fluid">
+      <div className="row">
+        {metadatas.map(metadata => {
+          const { id, originalFilename } = metadata;
+          return (
+            <div className="col-md-2" key={id}>
+              <div
+                className="card card-body"
+                style={{
+                  backgroundColor:
+                    previewMetadataId === id ? HIGHLIGHT_COLOR : undefined
+                }}
+              >
+                <div // thumbnail placeholder
+                  style={{
+                    backgroundColor: "black",
+                    height: "50px",
+                    width: "100%"
+                  }}
+                />
+                <Link href={`/object/view?id=${id}`}>
+                  <a>{originalFilename}</a>
+                </Link>
+                <CheckBoxField resource={metadata} />
+                <button
+                  className="btn btn-info w-100 h-100"
+                  onClick={() => onSelectPreviewMetadataId(id)}
+                  type="button"
+                >
+                  <ObjectStoreMessage id="viewPreviewButtonText" />
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
