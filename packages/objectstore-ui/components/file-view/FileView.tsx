@@ -22,7 +22,6 @@ export function FileView({ filePath, fileType }: FileViewProps) {
           src={filePath}
           style={{
             display: "block",
-            height: "100%",
             marginLeft: "auto",
             marginRight: "auto"
           }}

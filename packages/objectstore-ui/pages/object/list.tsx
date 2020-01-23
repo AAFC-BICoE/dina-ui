@@ -3,6 +3,7 @@ import {
   ColumnDefinition,
   FormikButton,
   ListPageLayout,
+  SplitPagePanel,
   useGroupedCheckBoxes
 } from "common-ui";
 import { Form, Formik } from "formik";
@@ -10,30 +11,16 @@ import { PersistedResource } from "kitsu";
 import { noop, toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useCookies } from "react-cookie";
 import { Head, Nav } from "../../components";
-import { MetadataPreview } from "../../components/MetadataPreview";
+import { MetadataPreview } from "../../components/metadata/MetadataPreview";
 import { ObjectStoreMessage } from "../../intl/objectstore-intl";
 import { Metadata } from "../../types/objectstore-api";
 
 type MetadataListLayoutType = "TABLE" | "GALLERY";
 
 const METADATA_LIST_LAYOUT_COOKIE = "metadata-list-layout";
-
-const OBJECT_LIST_PAGE_CSS = `
-  html, body {
-    margin: 0;
-    height: 100%;
-  }
-  #__next {
-    height: 100%;
-  }
-  .file-viewer-wrapper {
-    height: 25%;
-    max-height: 25%;
-  }
-`;
 
 const HIGHLIGHT_COLOR = "rgb(222, 252, 222)";
 
@@ -57,23 +44,6 @@ export default function MetadataListPage() {
     ? [8, 4]
     : [12, 0];
 
-  const tableWrapper = useRef<HTMLDivElement>(null);
-  const previewWrapper = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const resizePreviewWrapper = () => {
-      if (tableWrapper.current && previewWrapper.current) {
-        for (const wrapper of [tableWrapper.current, previewWrapper.current]) {
-          const height =
-            window.innerHeight - wrapper.getBoundingClientRect().top - 1;
-          wrapper.style.height = `${height}px`;
-        }
-      }
-    };
-
-    window.onresize = resizePreviewWrapper;
-    resizePreviewWrapper();
-  });
-
   const METADATA_FILTER_ATTRIBUTES = ["originalFilename"];
 
   const METADATA_TABLE_COLUMNS: Array<ColumnDefinition<Metadata>> = [
@@ -84,10 +54,20 @@ export default function MetadataListPage() {
       Header: CheckBoxHeader,
       sortable: false
     },
-    "id",
-    "fileIdentifier",
     "originalFilename",
-    "dcType",
+    "dcFormat",
+    "acDigitizationDate",
+    {
+      Cell: ({ original: { xmpMetadataDate } }) =>
+        xmpMetadataDate ? new Date(xmpMetadataDate).toLocaleString() : "",
+      accessor: "xmpMetadataDate"
+    },
+    "xmpRightsWebStatement",
+    "dcRights",
+    {
+      Cell: ({ original: { acTags } }) => acTags?.join(", "),
+      accessor: "acTags"
+    },
     {
       Cell: ({ original }) => (
         <button
@@ -104,7 +84,6 @@ export default function MetadataListPage() {
 
   return (
     <div>
-      <style>{OBJECT_LIST_PAGE_CSS}</style>
       <Head title="Stored Objects" />
       <Nav />
       <div className="container-fluid">
@@ -132,7 +111,7 @@ export default function MetadataListPage() {
         </div>
         <div className="row">
           <div className={`col-${tableSectionWidth}`}>
-            <div ref={tableWrapper} style={{ overflowY: "scroll" }}>
+            <SplitPagePanel>
               <ListPageLayout<Metadata>
                 filterAttributes={METADATA_FILTER_ATTRIBUTES}
                 id="metadata-list"
@@ -170,10 +149,10 @@ export default function MetadataListPage() {
                 }}
                 WrapTable={MetadataTableWrapper}
               />
-            </div>
+            </SplitPagePanel>
           </div>
           <div className={`col-${previewSectionWidth}`}>
-            <div ref={previewWrapper} style={{ overflowY: "scroll" }}>
+            <SplitPagePanel>
               {previewMetadataId && (
                 <>
                   <div style={{ height: "2.5rem" }}>
@@ -188,12 +167,10 @@ export default function MetadataListPage() {
                       <ObjectStoreMessage id="closePreviewButtonText" />
                     </button>
                   </div>
-                  <div className="h-100">
-                    <MetadataPreview metadataId={previewMetadataId} />
-                  </div>
+                  <MetadataPreview metadataId={previewMetadataId} />
                 </>
               )}
-            </div>
+            </SplitPagePanel>
           </div>
         </div>
       </div>
@@ -304,7 +281,7 @@ function ListLayoutSelector({ value, onChange }) {
   return (
     <div className="list-inline">
       {items.map(({ message, layoutType }) => (
-        <div className="list-inline-item">
+        <div className="list-inline-item" key={layoutType}>
           <label>
             <input
               key={layoutType}

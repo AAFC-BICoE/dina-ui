@@ -15,6 +15,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   managedAttributeValueLabel: "Value",
   metadataAgentLabel: "Agent (Uploaded By)",
   metadataBucketNameLabel: "Bucket Name",
+  metadataBuiltInAttributesLabel: "Built-in Attributes",
   metadataBulkEditTagsLabel: "Tags (Comma-separated)",
   metadataBulkEditTitle: "Edit Metadata",
   metadataDcFormatLabel: "DcFormat",
@@ -38,5 +39,5 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   uploadFormInstructions:
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
   uploadPageTitle: "Upload Files",
-  viewPreviewButtonText: "View Preview"
+  viewPreviewButtonText: "Preview"
 };

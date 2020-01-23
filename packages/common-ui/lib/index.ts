@@ -31,6 +31,7 @@ export * from "./LabelView";
 export * from "./list-page-layout/FilterForm";
 export * from "./list-page-layout/ListPageLayout";
 export * from "./loading-spinner/LoadingSpinner";
+export * from "./page-split/SplitPagePanel";
 export * from "./resource-select/ResourceSelect";
 export * from "./table/QueryTable";
 export * from "./util/rsql";
