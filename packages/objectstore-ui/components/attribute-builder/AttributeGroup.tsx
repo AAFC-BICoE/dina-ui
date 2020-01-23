@@ -22,6 +22,27 @@ export function AttributeGroup({ children }: AttributeGroupProps) {
           </div>
         ))}
       </div>
+      <style jsx={true}>{`
+        .list-inline {
+          padding-left: 0;
+          list-style: none;
+        }
+        .list-inline-item {
+          display: inline-block;
+        }
+        .card {
+          margin-bottom: 15px;
+        }
+        .card-body {
+          -webkit-box-flex: 1;
+          -ms-flex: 1 1 auto;
+          flex: 1 1 auto;
+          padding: 1.25rem;
+        }
+        .d-inline-block {
+          display: inline-block !important;
+        }
+      `}</style>
     </div>
   );
 }

@@ -61,8 +61,6 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("objectStoreDetailsTitle")} />
-      <Nav />
       <div>
         <h4>
           <ObjectStoreMessage id="objectStoreDetailsTitle" />

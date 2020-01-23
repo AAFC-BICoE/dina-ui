@@ -82,6 +82,7 @@ class MyDocument extends Document {
             <![endif]--></link>
           `}
         </WetHead>
+        <Head />
         <body>
           <div id="def-top" />
           <div className="container">
@@ -143,19 +144,9 @@ class MyDocument extends Document {
                 });    
                 
                 var defFooter = document.getElementById("def-footer");
-                  defFooter.outerHTML = wet.builder.appFooter({
-                    "footerSections": [{
-                      "href": "#",
-                      "text": "Link 1"
-                    },{
-                      "href": "#",
-                      "text": "Link 2"
-                    }]                    
-                });  
-
-                document.write(wet.builder.refFooter({
-                  "webAnalytics": true
-                }));
+                defFooter.outerHTML = wet.builder.appFooter({
+				          "contactLink": "./contact-en.html"
+          			});
             </script>                 
                                       
         `}

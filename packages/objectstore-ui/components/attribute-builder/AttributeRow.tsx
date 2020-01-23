@@ -38,30 +38,30 @@ export class AttributeRow extends React.Component<AttributeRowProps> {
         controlledAttributes[0] &&
         controlledAttributes[0].name &&
         controlledAttributes[0].name === "unManaged" ? (
-          <div className=" col-md-7" style={{ width: 600 }}>
+          <div className="list-inline-item" style={{ width: 180 }}>
             <TextField name={`assignedValue_un${model.id}`} hideLabel={true} />
           </div>
         ) : (
-          <div style={{ width: 800 }}>
-            <div className="col-md-7">
+          <div className="list-inline-item">
+            <div className="list-inline-item col-sm-6" style={{ width: 320 }}>
               <ResourceSelectField<ManagedAttribute>
-                name={`key_${model.id}`}
-                filter={filterBy(["name"])}
                 model="managed-attribute"
                 optionLabel={managedAttribute => managedAttribute.name}
+                name={`key_${model.id}`}
+                filter={filterBy(["name"])}
                 hideLabel={true}
               />
             </div>
-            <div className=" col-md-4">
+            <div className="list-inline-item" style={{ width: 180 }}>
               <TextField name={`assignedValue${model.id}`} hideLabel={true} />
             </div>
           </div>
         )}
 
-        <div className=" col-sm-2">
+        <div className="filter-row-buttons list-inline-item">
           {showPlusButton && (
             <button
-              className=" btn btn-primary"
+              className="margin-left list-inline-item btn btn-primary"
               onClick={onAndClick}
               type="button"
             >
@@ -71,7 +71,7 @@ export class AttributeRow extends React.Component<AttributeRowProps> {
 
           {showRemoveButton && (
             <button
-              className=" btn btn-dark"
+              className="margin-left list-inline-item btn btn-dark"
               onClick={onRemoveClick}
               type="button"
             >
@@ -79,6 +79,19 @@ export class AttributeRow extends React.Component<AttributeRowProps> {
             </button>
           )}
         </div>
+
+        <style jsx={true}>{`
+          .list-inline {
+            padding-left: 0;
+            list-style: none;
+          }
+          .list-inline-item {
+            display: inline-block;
+          }
+          .margin-left {
+            margin-left: 10px;
+          }
+        `}</style>
       </div>
     );
   }
