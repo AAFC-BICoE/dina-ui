@@ -1,6 +1,6 @@
-import { ColumnDefinition } from "common-ui";
+import { ColumnDefinition, ListPageLayout } from "common-ui";
 import Link from "next/link";
-import { Head, ListPageLayout, Nav } from "../../components";
+import { Head, Nav } from "../../components";
 import { IndexSet } from "../../types/seqdb-api";
 
 const INDEX_SET_FILTER_ATTRIBUTES = [
