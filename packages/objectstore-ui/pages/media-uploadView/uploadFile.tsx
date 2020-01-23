@@ -48,7 +48,7 @@ function MediaUploadViewPage() {
   const { formatMessage } = useObjectStoreIntl();
 
   return (
-    <div>
+    <>
       <Head title={formatMessage("uploadPageTitle")} />
       <div className="container-fluid">
         <div>
@@ -58,7 +58,7 @@ function MediaUploadViewPage() {
           <UploadViewForm />
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

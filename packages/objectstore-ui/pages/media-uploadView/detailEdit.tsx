@@ -29,14 +29,15 @@ interface DetailEditFormProps {
 export function DetailEditPage({ router }: WithRouterProps) {
   const id = router?.query?.id;
   return (
-    <div>
+    <>
+      <Head />
       <div className="container-fluid">
         <div>
           <h5 style={{ color: "#1465b7" }}>Detail Edit</h5>
           {id && <DetailEditForm router={router} />}
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

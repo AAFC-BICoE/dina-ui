@@ -14,7 +14,7 @@ import { isArray } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
 import { Agent } from "types/objectstore-api/resources/Agent";
-import { AttributeBuilder } from "../components";
+import { AttributeBuilder, Head } from "../components";
 import { ObjectStoreMessage } from "../intl/objectstore-intl";
 import { generateManagedAttributeValue } from "../utils/metaUtils";
 
@@ -28,17 +28,15 @@ export function EditMetadataFormPage({
   fileIdentifier
 }: EditMetadataFormProps) {
   return (
-    <div>
-      <div className="container-fluid">
-        <div>
-          <h5>
-            <ObjectStoreMessage id="metadataFormTitle" />
-          </h5>
-          <EditMetadataForm
-            originalFileName={originalFileName}
-            fileIdentifier={fileIdentifier}
-          />
-        </div>
+    <div className="container-fluid">
+      <div>
+        <h5>
+          <ObjectStoreMessage id="metadataFormTitle" />
+        </h5>
+        <EditMetadataForm
+          originalFileName={originalFileName}
+          fileIdentifier={fileIdentifier}
+        />
       </div>
     </div>
   );

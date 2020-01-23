@@ -79,19 +79,6 @@ export class AttributeRow extends React.Component<AttributeRowProps> {
             </button>
           )}
         </div>
-
-        <style jsx={true}>{`
-          .list-inline {
-            padding-left: 0;
-            list-style: none;
-          }
-          .list-inline-item {
-            display: inline-block;
-          }
-          .margin-left {
-            margin-left: 10px;
-          }
-        `}</style>
       </div>
     );
   }
