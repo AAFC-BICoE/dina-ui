@@ -12,6 +12,13 @@ interface TestRow {
 
 const mockOnSubmit = jest.fn();
 
+// Mock out the HandsOnTable which should only be rendered in the browser.
+jest.mock("next/dynamic", () => () => {
+  return function MockDynamicComponent() {
+    return <div>Mock dynamic component</div>;
+  };
+});
+
 describe("BulkDataEditor component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -47,7 +54,7 @@ describe("BulkDataEditor component", () => {
     wrapper.update();
 
     const workingData = wrapper
-      .find("ForwardRef(LoadableComponent)")
+      .find("MockDynamicComponent")
       .prop<TestRow[]>("data");
 
     workingData[1].b = "New value";

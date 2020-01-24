@@ -84,21 +84,23 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         <h4>
           <ObjectStoreMessage id="metadataTagsLabel" />
         </h4>
-        {metadata.acTags?.length
-          ? metadata.acTags.map((tag, i) => (
-              <span
-                key={i}
-                style={{
-                  background: "#AEB404",
-                  borderRadius: "25px",
-                  margin: "0.5rem",
-                  padding: "0.5rem"
-                }}
-              >
-                {tag}
-              </span>
-            ))
-          : "None"}
+        <div className="metadata-tags">
+          {metadata.acTags?.length
+            ? metadata.acTags.map((tag, i) => (
+                <span
+                  key={i}
+                  style={{
+                    background: "#AEB404",
+                    borderRadius: "25px",
+                    margin: "0.5rem",
+                    padding: "0.5rem"
+                  }}
+                >
+                  {tag}
+                </span>
+              ))
+            : "None"}
+        </div>
       </div>
     </div>
   );

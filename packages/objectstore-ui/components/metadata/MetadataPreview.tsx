@@ -36,7 +36,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
     return (
       <>
         <style>{METADATA_PREVIEW_STYLE}</style>
-        <div>
+        <div className="metadata-edit-link">
           <Link href={`/metadata/edit?ids=${metadataId}`}>
             <a className="btn btn-primary">
               <ObjectStoreMessage id="editButtonText" />

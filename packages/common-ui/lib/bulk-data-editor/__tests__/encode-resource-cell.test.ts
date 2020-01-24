@@ -12,8 +12,21 @@ describe("encode-resource-cell", () => {
     };
 
     const encoded = encodeResourceCell(agent, {
-      label: agent.name,
-      type: agent.type
+      label: agent.name
+    });
+
+    expect(encoded).toEqual("Mat (agent/6cae3e9b-62e8-44ef-8219-60ab2e2f6898)");
+  });
+
+  it("Uses the resource's type when none is specified manually.", () => {
+    const agent = {
+      id: "6cae3e9b-62e8-44ef-8219-60ab2e2f6898",
+      name: "Mat",
+      type: "agent"
+    };
+
+    const encoded = encodeResourceCell(agent, {
+      label: agent.name
     });
 
     expect(encoded).toEqual("Mat (agent/6cae3e9b-62e8-44ef-8219-60ab2e2f6898)");

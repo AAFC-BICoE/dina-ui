@@ -147,7 +147,7 @@ export default function MetadataListPage() {
                     }
                   })
                 }}
-                WrapTable={MetadataTableWrapper}
+                WrapTable={MetadataListWrapper}
               />
             </SplitPagePanel>
           </div>
@@ -181,7 +181,7 @@ export default function MetadataListPage() {
 /**
  * Adds additional controls around the metadata table.
  */
-function MetadataTableWrapper({ children }) {
+function MetadataListWrapper({ children }) {
   const router = useRouter();
 
   return (
@@ -190,7 +190,7 @@ function MetadataTableWrapper({ children }) {
         <div style={{ height: "1rem" }}>
           <div className="float-right">
             <FormikButton
-              className="btn btn-primary "
+              className="btn btn-primary metadata-bulk-edit-button"
               onClick={async values => {
                 const metadataIds = toPairs(values.selectedMetadatas)
                   .filter(pair => pair[1])
@@ -219,7 +219,7 @@ interface StoredObjectGalleryProps {
   previewMetadataId: string | null;
 }
 
-function StoredObjectGallery({
+export function StoredObjectGallery({
   CheckBoxField,
   metadatas,
   onSelectPreviewMetadataId,
@@ -279,12 +279,11 @@ function ListLayoutSelector({ value, onChange }) {
   ];
 
   return (
-    <div className="list-inline">
+    <div className="list-layout-selector list-inline">
       {items.map(({ message, layoutType }) => (
         <div className="list-inline-item" key={layoutType}>
           <label>
             <input
-              key={layoutType}
               type="radio"
               checked={value === layoutType}
               onChange={() => onChange(layoutType)}

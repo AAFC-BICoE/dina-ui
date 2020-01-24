@@ -39,7 +39,12 @@ export function SplitPagePanel(props: HTMLAttributes<HTMLDivElement>) {
   });
 
   return (
-    <div {...props} ref={ref} style={{ overflowY: "scroll" }}>
+    <div
+      className="split-page-panel"
+      {...props}
+      ref={ref}
+      style={{ overflowY: "scroll" }}
+    >
       <style>{SPLIT_PAGE_CSS}</style>
       {props.children}
     </div>
