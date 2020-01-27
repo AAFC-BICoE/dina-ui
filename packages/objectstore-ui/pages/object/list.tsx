@@ -71,7 +71,7 @@ export default function MetadataListPage() {
     {
       Cell: ({ original }) => (
         <button
-          className="btn btn-info w-100 h-100"
+          className="btn btn-info w-100 h-100 preview-button"
           onClick={() => setPreviewMetadataId(original.id)}
           type="button"
         >
@@ -110,7 +110,7 @@ export default function MetadataListPage() {
           </div>
         </div>
         <div className="row">
-          <div className={`col-${tableSectionWidth}`}>
+          <div className={`table-section col-${tableSectionWidth}`}>
             <SplitPagePanel>
               <ListPageLayout<Metadata>
                 filterAttributes={METADATA_FILTER_ATTRIBUTES}
@@ -151,7 +151,7 @@ export default function MetadataListPage() {
               />
             </SplitPagePanel>
           </div>
-          <div className={`col-${previewSectionWidth}`}>
+          <div className={`preview-section col-${previewSectionWidth}`}>
             <SplitPagePanel>
               {previewMetadataId && (
                 <>
@@ -160,7 +160,7 @@ export default function MetadataListPage() {
                       <a>Details Page</a>
                     </Link>
                     <button
-                      className="btn btn-dark float-right"
+                      className="btn btn-dark float-right preview-button"
                       type="button"
                       onClick={() => setPreviewMetadataId(null)}
                     >

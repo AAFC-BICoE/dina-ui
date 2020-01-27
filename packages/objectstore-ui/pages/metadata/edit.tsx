@@ -27,7 +27,7 @@ import {
 } from "../../types/objectstore-api";
 
 /** Editable row data */
-interface BulkMetadataEditRow {
+export interface BulkMetadataEditRow {
   acTags: string;
   acMetadataCreator: string;
   metadata: PersistedResource<Metadata>;

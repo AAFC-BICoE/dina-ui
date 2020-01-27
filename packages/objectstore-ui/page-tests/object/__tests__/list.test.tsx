@@ -110,4 +110,26 @@ describe("Metadata List Page", () => {
       }
     });
   });
+
+  it("Shows a metadata preview when you click the 'Preview' button.", async () => {
+    const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
+
+    // Preview section is initially hidden:
+    expect(wrapper.find(".preview-section").hasClass("col-0")).toEqual(true);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Click the preview button:
+    wrapper
+      .find("button.preview-button")
+      .first()
+      .simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Preview section is visible:
+    expect(wrapper.find(".preview-section").hasClass("col-4")).toEqual(true);
+  });
 });
