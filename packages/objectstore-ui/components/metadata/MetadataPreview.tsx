@@ -10,7 +10,7 @@ interface MetadataPreviewProps {
 }
 
 const METADATA_PREVIEW_STYLE = `
-  .file-viewer-wrapper img {
+  .metadata-preview .file-viewer-wrapper img {
     height: 12rem;
   }
 `;
@@ -34,7 +34,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
     const fileType = metadata.fileExtension.replace(/\./, "").toLowerCase();
 
     return (
-      <>
+      <div className="metadata-preview">
         <style>{METADATA_PREVIEW_STYLE}</style>
         <div className="metadata-edit-link">
           <Link href={`/metadata/edit?ids=${metadataId}`}>
@@ -47,7 +47,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
           <FileView filePath={filePath} fileType={fileType} />
         </a>
         <MetadataDetails metadata={metadata} />
-      </>
+      </div>
     );
   }
 

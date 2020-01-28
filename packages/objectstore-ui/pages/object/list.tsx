@@ -1,19 +1,17 @@
 import {
-  CheckBoxFieldProps,
   ColumnDefinition,
   FormikButton,
   ListPageLayout,
   SplitPagePanel,
   useGroupedCheckBoxes
 } from "common-ui";
-import { Form, Formik } from "formik";
-import { PersistedResource } from "kitsu";
+import { Form, Formik, FormikContext } from "formik";
 import { noop, toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useCookies } from "react-cookie";
-import { Head, Nav } from "../../components";
+import { Head, Nav, StoredObjectGallery } from "../../components";
 import { MetadataPreview } from "../../components/metadata/MetadataPreview";
 import { ObjectStoreMessage } from "../../intl/objectstore-intl";
 import { Metadata } from "../../types/objectstore-api";
@@ -23,6 +21,12 @@ type MetadataListLayoutType = "TABLE" | "GALLERY";
 const METADATA_LIST_LAYOUT_COOKIE = "metadata-list-layout";
 
 const HIGHLIGHT_COLOR = "rgb(222, 252, 222)";
+
+/** Values of the Formik form that wraps the metadata list */
+interface MetadataListFormValues {
+  /** Tracks which metadata IDs are selected. */
+  selectedMetadatas: Record<string, boolean>;
+}
 
 export default function MetadataListPage() {
   const {
@@ -78,7 +82,8 @@ export default function MetadataListPage() {
           <ObjectStoreMessage id="viewPreviewButtonText" />
         </button>
       ),
-      Header: ""
+      Header: "",
+      sortable: false
     }
   ];
 
@@ -185,13 +190,23 @@ function MetadataListWrapper({ children }) {
   const router = useRouter();
 
   return (
-    <Formik initialValues={{ selectedMetadatas: {} }} onSubmit={noop}>
+    <Formik<MetadataListFormValues>
+      initialValues={{ selectedMetadatas: {} }}
+      onSubmit={noop}
+    >
       <Form>
         <div style={{ height: "1rem" }}>
           <div className="float-right">
             <FormikButton
+              buttonProps={(ctx: FormikContext<MetadataListFormValues>) => ({
+                // Disable the button if none are selected:
+                disabled: !Object.values(ctx.values.selectedMetadatas).reduce(
+                  (a, b) => a || b,
+                  false
+                )
+              })}
               className="btn btn-primary metadata-bulk-edit-button"
-              onClick={async values => {
+              onClick={async (values: MetadataListFormValues) => {
                 const metadataIds = toPairs(values.selectedMetadatas)
                   .filter(pair => pair[1])
                   .map(pair => pair[0]);
@@ -202,67 +217,13 @@ function MetadataListWrapper({ children }) {
                 });
               }}
             >
-              Edit selected
+              <ObjectStoreMessage id="editSelectedButtonText" />
             </FormikButton>
           </div>
         </div>
         {children}
       </Form>
     </Formik>
-  );
-}
-
-interface StoredObjectGalleryProps {
-  CheckBoxField: React.ComponentType<CheckBoxFieldProps<Metadata>>;
-  metadatas: Array<PersistedResource<Metadata>>;
-  onSelectPreviewMetadataId: (id: string) => void;
-  previewMetadataId: string | null;
-}
-
-export function StoredObjectGallery({
-  CheckBoxField,
-  metadatas,
-  onSelectPreviewMetadataId,
-  previewMetadataId
-}: StoredObjectGalleryProps) {
-  return (
-    <div className="container-fluid">
-      <div className="row">
-        {metadatas.map(metadata => {
-          const { id, originalFilename } = metadata;
-          return (
-            <div className="col-md-2" key={id}>
-              <div
-                className="card card-body"
-                style={{
-                  backgroundColor:
-                    previewMetadataId === id ? HIGHLIGHT_COLOR : undefined
-                }}
-              >
-                <div // thumbnail placeholder
-                  style={{
-                    backgroundColor: "black",
-                    height: "50px",
-                    width: "100%"
-                  }}
-                />
-                <Link href={`/object/view?id=${id}`}>
-                  <a>{originalFilename}</a>
-                </Link>
-                <CheckBoxField resource={metadata} />
-                <button
-                  className="btn btn-info w-100 h-100"
-                  onClick={() => onSelectPreviewMetadataId(id)}
-                  type="button"
-                >
-                  <ObjectStoreMessage id="viewPreviewButtonText" />
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
   );
 }
 

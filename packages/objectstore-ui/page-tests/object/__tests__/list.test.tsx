@@ -1,8 +1,7 @@
 import { QueryTable } from "common-ui";
 import { PersistedResource } from "kitsu";
-import MetadataListPage, {
-  StoredObjectGallery
-} from "../../../pages/object/list";
+import { StoredObjectGallery } from "../../../components";
+import MetadataListPage from "../../../pages/object/list";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Metadata } from "../../../types/objectstore-api";
 
@@ -46,7 +45,7 @@ jest.mock("next/router", () => ({
 
 describe("Metadata List Page", () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
     mockGet.mockImplementation(async path => {
       if (path === "metadata") {
         return { data: TEST_METADATAS };
@@ -70,6 +69,21 @@ describe("Metadata List Page", () => {
 
   it("Provides a toggle to see the gallery view.", async () => {
     const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
+
+    // Renders initially with the table view:
+    expect(
+      wrapper
+        .find(".list-layout-selector .list-inline-item")
+        .findWhere(node => node.text().includes("Table"))
+        .find("input")
+        .prop("checked")
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".table-section")
+        .find(QueryTable)
+        .exists()
+    ).toEqual(true);
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -131,5 +145,41 @@ describe("Metadata List Page", () => {
 
     // Preview section is visible:
     expect(wrapper.find(".preview-section").hasClass("col-4")).toEqual(true);
+  });
+
+  it("Disables the bulk edit button when no Metadatas are selected.", async () => {
+    const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Disabled initially because none are selected:
+    expect(
+      wrapper.find("button.metadata-bulk-edit-button").prop("disabled")
+    ).toEqual(true);
+
+    // Select all 3 Metadatas to edit.
+    wrapper.find(".grouped-checkbox-header input").prop<any>("onClick")({
+      target: { checked: true }
+    });
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // The button should now be enabled:
+    expect(
+      wrapper.find("button.metadata-bulk-edit-button").prop("disabled")
+    ).toEqual(false);
+
+    // Deselect all 3 Metadatas.
+    wrapper.find(".grouped-checkbox-header input").prop<any>("onClick")({
+      target: { checked: false }
+    });
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // The button should now be disabled again:
+    expect(
+      wrapper.find("button.metadata-bulk-edit-button").prop("disabled")
+    ).toEqual(true);
   });
 });

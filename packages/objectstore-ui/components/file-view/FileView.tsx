@@ -27,7 +27,15 @@ export function FileView({ filePath, fileType }: FileViewProps) {
           }}
         />
       ) : (
-        <FileViewer filePath={filePath} fileType={fileType} />
+        <FileViewer
+          filePath={filePath}
+          fileType={fileType}
+          unsupportedComponent={() => (
+            <div>
+              <a href={filePath}>{filePath}</a>
+            </div>
+          )}
+        />
       )}
     </div>
   );

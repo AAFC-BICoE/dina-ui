@@ -64,10 +64,6 @@ export default function EditMetadatasPage() {
     //   data: "metadata.acDigitizationDate",
     //   title: formatMessage("metadataFirstDigitalVersionCreatedDateLabel")
     // },
-    // {
-    //   data: "metadata.xmpMetadataDate",
-    //   title: formatMessage("metadataLastMetadataModificationTimeLabel")
-    // },
     resourceSelectCell<Agent>(
       {
         filter: input => ({ rsql: `displayName==*${input}*` }),
