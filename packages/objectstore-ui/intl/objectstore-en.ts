@@ -27,6 +27,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   metadataBulkEditTagsLabel: "Tags (Comma-separated)",
   metadataBulkEditTitle: "Edit Metadata",
   metadataDcFormatLabel: "DcFormat",
+  metadataDetailsPageLink: "Details Page",
   metadataFileExtensionLabel: "File Extension",
   metadataFileIdentifierLabel: "File Identifier",
   metadataFilenameLabel: "File Name",
@@ -44,6 +45,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   noFileToDisplay: "No file to display",
   objectListTitle: "Stored Objects",
   objectStoreDetailsTitle: "Object Store Details",
+  uploadButtonText: "Upload",
   uploadFormInstructions:
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
   uploadPageTitle: "Upload Files",

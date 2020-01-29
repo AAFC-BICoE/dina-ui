@@ -13,7 +13,10 @@ import { useState } from "react";
 import { useCookies } from "react-cookie";
 import { Head, Nav, StoredObjectGallery } from "../../components";
 import { MetadataPreview } from "../../components/metadata/MetadataPreview";
-import { ObjectStoreMessage } from "../../intl/objectstore-intl";
+import {
+  ObjectStoreMessage,
+  useObjectStoreIntl
+} from "../../intl/objectstore-intl";
 import { Metadata } from "../../types/objectstore-api";
 
 type MetadataListLayoutType = "TABLE" | "GALLERY";
@@ -29,6 +32,8 @@ interface MetadataListFormValues {
 }
 
 export default function MetadataListPage() {
+  const { formatMessage } = useObjectStoreIntl();
+
   const {
     CheckBoxField,
     CheckBoxHeader,
@@ -89,7 +94,7 @@ export default function MetadataListPage() {
 
   return (
     <div>
-      <Head title="Stored Objects" />
+      <Head title={formatMessage("objectListTitle")} />
       <Nav />
       <div className="container-fluid">
         <div className="list-inline">
@@ -162,7 +167,9 @@ export default function MetadataListPage() {
                 <>
                   <div style={{ height: "2.5rem" }}>
                     <Link href={`/object/view?id=${previewMetadataId}`}>
-                      <a>Details Page</a>
+                      <a>
+                        <ObjectStoreMessage id="metadataDetailsPageLink" />
+                      </a>
                     </Link>
                     <button
                       className="btn btn-dark float-right preview-button"

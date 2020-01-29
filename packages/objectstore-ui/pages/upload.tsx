@@ -142,7 +142,9 @@ export default function UploadPage() {
             <Formik initialValues={{}} onSubmit={safeSubmit(onSubmit)}>
               <Form>
                 <ErrorViewer />
-                <SubmitButton>Upload</SubmitButton>
+                <SubmitButton>
+                  <ObjectStoreMessage id="uploadButtonText" />
+                </SubmitButton>
               </Form>
             </Formik>
           ) : null}

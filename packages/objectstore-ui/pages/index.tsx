@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { Head, Nav } from "../components";
+import { ObjectStoreMessage } from "../intl/objectstore-intl";
 
 const Home: React.FunctionComponent = () => (
   <div>
@@ -8,16 +9,22 @@ const Home: React.FunctionComponent = () => (
     <Nav />
 
     <div className="container">
-      <h1>Object Store</h1>
+      <h1>
+        <ObjectStoreMessage id="appTitle" />
+      </h1>
       <ul>
         <li>
           <Link href="/upload">
-            <a>Upload</a>
+            <a>
+              <ObjectStoreMessage id="uploadPageTitle" />
+            </a>
           </Link>
         </li>
         <li>
           <Link href="/object/list">
-            <a>Stored Object List</a>
+            <a>
+              <ObjectStoreMessage id="objectListTitle" />
+            </a>
           </Link>
         </li>
       </ul>
