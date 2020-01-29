@@ -88,10 +88,15 @@ class MyDocument extends Document {
           <div className="container">
             <div className="row">
               <Main />
+              <nav
+                className="wb-sec"
+                typeof="SiteNavigationElement"
+                id="wb-sec"
+                role="navigation"
+              />
               <div id="def-preFooter" />
             </div>
           </div>
-
           <div id="def-footer" />
           <NextScript />
         </body>
@@ -117,15 +122,29 @@ class MyDocument extends Document {
 
             <script>
                 var defTop = document.getElementById("def-top");                
-                defTop.outerHTML = wet.builder.appTop({
+                defTop.outerHTML = wet.builder.appTop({ 
+                  "breadcrumbs": [{
+                    "title": "Home",
+                    "href": "http://localhost:8000/media-uploadView/uploadFile"
+                  },{
+                    "title": "Detail View",
+                    "acronym": "Object store metadata upladed file detail view",
+                    "href": "http://localhost:8000/media-uploadView/detailView?id=undefined#"
+                  }],                              
+                  "menuLinks": [{
+                    "href": "http://localhost:8000/media-uploadView/uploadFile",
+                    "text": "Upload Files"
+                    },{
+                    "href": "http://localhost:8000/media-uploadView/detailEdit?id=undefined#",
+                    "text": "Bulk Edit"
+                  }],                  
                   "lngLinks":
                       [{
-                          "lang": "fr",
-                          "href": "application-fr.html",
-                          "text": "Français" }],
-
-                    "appName":
-                     [{
+                        "lang": "fr",
+                        "href": "application-fr.html",
+                        "text": "Français" }],
+                  "appName":
+                    [{
                         "text": "AAFC BICOE - DINA Object Store",
                         "href": "#" }] 
                 });
@@ -146,7 +165,91 @@ class MyDocument extends Document {
                 var defFooter = document.getElementById("def-footer");
                 defFooter.outerHTML = wet.builder.appFooter({
 				          "contactLink": "./contact-en.html"
-          			});
+                });
+                
+                var secondarymenu = document.getElementById("wb-sec");
+                  secondarymenu.innerHTML = wet.builder.secmenu({
+                    "sections": [{
+                      "sectionName": "[Topic - Local navigation]",
+                      "menuLinks": [{
+                        "href": "#",
+                        "text": "Link 1",
+                        "subLinks": [{
+                          "subhref": "#11a",
+                          "subtext": "Link 1.1 a)"
+                        }, {
+                          "subhref": "#11b",
+                          "subtext": "Link 1.1 b)"
+                        }, {
+                          "subhref": "#11c",
+                          "subtext": "Opens in a new window",
+                          "newWindow": true
+                        }, {
+                          "subhref": "#11d",
+                          "subtext": "Link 1.1 d)"
+                        }]
+                      }, {
+                        "href": "#",
+                        "text": "Link 2"
+                      }, {
+                        "href": "#",
+                        "text": "Opens in a new window",
+                        "newWindow": true
+                      }, {
+                        "href": "#",
+                        "text": "Link 4"
+                      }]
+                    },{
+                      "sectionName": "Opens in a new window",
+                      "sectionLink": "#",
+                      "newWindow": true,
+                      "menuLinks": [{
+                        "href": "#",
+                        "text": "Link 1"
+                      }, {
+                        "href": "#",
+                        "text": "Link 2"
+                      }, {
+                        "href": "#",
+                        "text": "Link 3"
+                      }, {
+                        "href": "#",
+                        "text": "Link 4"
+                      }]
+                    },{
+                      // Rinse and repeat
+                      "sectionName": "Section name 3",
+                      "menuLinks": [{
+                        "href": "#",
+                        "text": "Link 1"
+                      }, {
+                        "href": "#",
+                        "text": "Link 2"
+                      }, {
+                        "href": "#",
+                        "text": "Link 3"
+                      }, {
+                        "href": "#",
+                        "text": "Link 4"
+                      }]
+                    },{
+                      // Rinse and repeat
+                      "sectionName": "Section name ... 27",
+                      "menuLinks": [{
+                        "href": "#",
+                        "text": "Link 1"
+                      }, {
+                        "href": "#",
+                        "text": "Link 2"
+                      }, {
+                        "href": "#",
+                        "text": "Link 3"
+                      }, {
+                        "href": "#",
+                        "text": "Link 4"
+                      }]
+                    }]
+                  });                
             </script>                 
                                       
         `}

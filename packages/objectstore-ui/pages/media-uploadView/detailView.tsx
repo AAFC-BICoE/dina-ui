@@ -79,6 +79,7 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
           </div>
           <div className="row">
             {imgResponse &&
+            imgResponse.headers["content-type"] &&
             imgResponse.headers["content-type"].indexOf("image") > -1 ? (
               <div className="col-md-5 ">
                 <img
@@ -88,6 +89,7 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
                 />
               </div>
             ) : imgResponse &&
+              imgResponse.headers["content-type"] &&
               imgResponse.headers["content-type"].indexOf("pdf") > -1 ? (
               <div className="col-md-5">
                 <img
@@ -96,6 +98,7 @@ export function ObjectStoreDetailsPage({ router }: WithRouterProps) {
                 />
               </div>
             ) : imgResponse &&
+              imgResponse.headers["content-type"] &&
               imgResponse.headers["content-type"].indexOf("/msword") > -1 ? (
               <div className="col-md-5">
                 <img
