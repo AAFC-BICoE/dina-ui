@@ -5,7 +5,6 @@ import { Head, Nav } from "../components";
 const Home: React.FunctionComponent = () => (
   <div>
     <Head title="Home" />
-    <Nav />
 
     <div className="hero">
       <h1 className="title">Welcome to Next!</h1>

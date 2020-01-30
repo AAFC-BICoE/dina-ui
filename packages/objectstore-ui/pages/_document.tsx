@@ -49,7 +49,7 @@ class WetHtml extends React.Component {
     return <html dangerouslySetInnerHTML={{ __html: dangerousInnerHTML }} />;
   }
 }
-class MyDocument extends Document {
+class DinaDocument extends Document {
   public static async getInitialProps(ctx) {
     const initialProps = await Document.getInitialProps(ctx);
     return { ...initialProps };
@@ -91,7 +91,7 @@ class MyDocument extends Document {
               <nav
                 className="wb-sec"
                 typeof="SiteNavigationElement"
-                id="wb-sec"
+                id="wb-sec1"
                 role="navigation"
               />
               <div id="def-preFooter" />
@@ -258,4 +258,4 @@ class MyDocument extends Document {
     );
   }
 }
-export default MyDocument;
+export default DinaDocument;

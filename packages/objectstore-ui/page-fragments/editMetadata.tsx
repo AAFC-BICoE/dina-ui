@@ -151,19 +151,15 @@ function EditMetadataForm({
           </div>
         </div>
         <div className="form-group row">
-          <label className="col-sm-2 col-form-label">
-            <strong>
-              <ObjectStoreMessage id="metadataFirstDigitalVersionCreatedDateLabel" />
-            </strong>
-          </label>
-          <div className="col">
-            <DateField
-              className="col-sm-10"
-              name="acDigitizationDate"
-              hideLabel={true}
-              showTime={true}
-            />
-          </div>
+          <h6 className="col-sm-2 col-form-label">
+            <ObjectStoreMessage id="metadataFirstDigitalVersionCreatedDateLabel" />
+          </h6>
+          <DateField
+            className="col-sm-10"
+            name="acDigitizationDate"
+            hideLabel={true}
+            showTime={true}
+          />
         </div>
         <div className="form-group row" style={{ display: "none" }}>
           <label className="col-sm-2 col-form-label">
@@ -195,37 +191,30 @@ function EditMetadataForm({
           </div>
         </div>
         <div className="form-group row">
-          <label className="col-sm-2 col-form-label">
-            <strong>
-              <ObjectStoreMessage id="metadataAgentLabel" />
-            </strong>
-          </label>
-          <div className="col-sm-6">
-            <ResourceSelectField<Agent>
-              className="col-sm-6"
-              name="acMetadataCreator"
-              filter={filterBy(["displayName"])}
-              model="agent"
-              optionLabel={agent => agent.displayName}
-              hideLabel={true}
-            />
-          </div>
+          <h6 className="col-sm-2">
+            <ObjectStoreMessage id="metadataAgentLabel" />
+          </h6>
+
+          <ResourceSelectField<Agent>
+            className="col-sm-6"
+            name="acMetadataCreator"
+            filter={filterBy(["displayName"])}
+            model="agent"
+            optionLabel={agent => agent.displayName}
+            hideLabel={true}
+          />
         </div>
         <div className="form-group row">
-          <div className="col">
-            <h6>
-              <ObjectStoreMessage id="metadataManagedAttributesLabel" />
-            </h6>
-            <AttributeBuilder controlledAttributes={managedAttributes} />
-          </div>
+          <h6 className="col-sm-2">
+            <ObjectStoreMessage id="metadataManagedAttributesLabel" />
+          </h6>
+          <AttributeBuilder controlledAttributes={managedAttributes} />
         </div>
         <div className="form-group row">
-          <div className="col">
-            <h6>
-              <ObjectStoreMessage id="metadataTagsLabel" />
-            </h6>
-            <AttributeBuilder controlledAttributes={unManagedAttributes} />
-          </div>
+          <h6 className="col-sm-2">
+            <ObjectStoreMessage id="metadataTagsLabel" />
+          </h6>
+          <AttributeBuilder controlledAttributes={unManagedAttributes} />
         </div>
         <SubmitButton />
       </Form>

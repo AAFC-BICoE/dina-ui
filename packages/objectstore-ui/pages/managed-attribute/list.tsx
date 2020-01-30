@@ -31,7 +31,6 @@ export default function ManagedAttributesListPage() {
   return (
     <div>
       <Head title="Managed Attributes" />
-      <Nav />
       <div className="container-fluid">
         <h1>
           <ObjectStoreMessage id="managedAttributeListTitle" />
