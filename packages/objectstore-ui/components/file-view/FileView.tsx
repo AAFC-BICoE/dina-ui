@@ -12,8 +12,19 @@ const FileViewer: ComponentType<any> = dynamic(
   { ssr: false }
 );
 
+const IMG_TAG_SUPPORTED_FORMATS = [
+  "apng",
+  "bmp",
+  "gif",
+  "ico",
+  "jpeg",
+  "jpg",
+  "png",
+  "svg"
+];
+
 export function FileView({ filePath, fileType }: FileViewProps) {
-  const isImage = ["jpg", "png"].includes(fileType);
+  const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
 
   return (
     <div className="file-viewer-wrapper">
