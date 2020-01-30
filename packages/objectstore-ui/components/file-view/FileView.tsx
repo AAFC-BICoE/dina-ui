@@ -19,6 +19,7 @@ export function FileView({ filePath, fileType }: FileViewProps) {
     <div className="file-viewer-wrapper">
       {isImage ? (
         <img
+          alt=""
           src={filePath}
           style={{
             display: "block",
