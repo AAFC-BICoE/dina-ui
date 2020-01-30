@@ -101,4 +101,25 @@ describe("serialize function", () => {
       type: "person"
     });
   });
+
+  it("Can serialize a resource with no attributes.", async () => {
+    const serialized = await serialize({
+      resource: { type: "person", relatedPerson: { id: "5", name: "Mat" } },
+      type: "person"
+    });
+
+    expect(serialized).toEqual({
+      attributes: {},
+      relationships: {
+        relatedPerson: {
+          data: {
+            id: "5",
+            name: "Mat",
+            type: "relatedPerson"
+          }
+        }
+      },
+      type: "person"
+    });
+  });
 });

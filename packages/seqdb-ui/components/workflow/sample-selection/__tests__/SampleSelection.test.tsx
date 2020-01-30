@@ -13,13 +13,13 @@ import { SampleSelection } from "../SampleSelection";
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
-const TEST_SAMPLES: Array<PersistedResource<Sample>> = [
+const TEST_SAMPLES = [
   { id: "1", type: "sample", name: "test sample 1" },
   { id: "2", type: "sample", name: "test sample 2" },
   { id: "3", type: "sample", name: "test sample 3" },
   { id: "4", type: "sample", name: "test sample 4" },
   { id: "5", type: "sample", name: "test sample 5" }
-];
+] as Array<PersistedResource<Sample>>;
 
 const TEST_STEP_RESOURCES: Array<PersistedResource<StepResource>> = [
   { id: "1", sample: TEST_SAMPLES[0] } as PersistedResource<StepResource>,
@@ -133,7 +133,7 @@ describe("Sample Selection UI", () => {
           op: "POST",
           path: "stepResource",
           value: {
-            attributes: { type: "INPUT", value: "SAMPLE" },
+            attributes: { value: "SAMPLE" },
             id: "-100",
             relationships: {
               chain: { data: { id: "1", type: "chain" } },
@@ -192,7 +192,7 @@ describe("Sample Selection UI", () => {
           op: "POST",
           path: "stepResource",
           value: {
-            attributes: { type: "INPUT", value: "SAMPLE" },
+            attributes: { value: "SAMPLE" },
             id: "-100",
             relationships: {
               chain: { data: { id: "1", type: "chain" } },
@@ -208,7 +208,7 @@ describe("Sample Selection UI", () => {
           op: "POST",
           path: "stepResource",
           value: {
-            attributes: { type: "INPUT", value: "SAMPLE" },
+            attributes: { value: "SAMPLE" },
             id: "-101",
             relationships: {
               chain: { data: { id: "1", type: "chain" } },
@@ -224,7 +224,7 @@ describe("Sample Selection UI", () => {
           op: "POST",
           path: "stepResource",
           value: {
-            attributes: { type: "INPUT", value: "SAMPLE" },
+            attributes: { value: "SAMPLE" },
             id: "-102",
             relationships: {
               chain: { data: { id: "1", type: "chain" } },
@@ -291,7 +291,7 @@ describe("Sample Selection UI", () => {
     } as any);
     wrapper.update();
 
-    wrapper.find(".deselect-all-checked-button").simulate("click");
+    wrapper.find("button.deselect-all-checked-button").simulate("click");
 
     // Await available samples and selected samples queries.
     await new Promise(setImmediate);

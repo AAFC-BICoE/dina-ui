@@ -1,5 +1,6 @@
 import {
   ColumnDefinition,
+  ErrorViewer,
   LoadingSpinner,
   QueryTable,
   useGroupedCheckBoxes
@@ -8,10 +9,10 @@ import { Formik } from "formik";
 import { noop } from "lodash";
 import { useState } from "react";
 import titleCase from "title-case";
+import { FilterForm } from "../..";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Sample, StepResource } from "../../../types/seqdb-api";
 import { rsql } from "../../filter-builder/rsql";
-import { FilterForm } from "../../list-page-layout/FilterForm";
 import { StepRendererProps } from "../StepRenderer";
 import {
   PreLibPrepViewMode,
@@ -162,9 +163,9 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                     {formikProps.isSubmitting ? (
                       <LoadingSpinner loading={true} />
                     ) : (
-                      <>
+                      <div className="list-inline">
                         <button
-                          className="btn btn-dark remove-shearing"
+                          className="list-inline-item btn btn-warning remove-shearing"
                           onClick={() =>
                             deleteStepResources("SHEARING", formikProps)
                           }
@@ -173,7 +174,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                           <SeqdbMessage id="removeShearingDetailsButtonText" />
                         </button>
                         <button
-                          className="btn btn-dark remove-size-selection"
+                          className="list-inline-item btn btn-warning remove-size-selection"
                           onClick={() =>
                             deleteStepResources("SIZE_SELECTION", formikProps)
                           }
@@ -181,7 +182,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                         >
                           <SeqdbMessage id="removeSizeSelectionDetailsButtonText" />
                         </button>
-                      </>
+                      </div>
                     )}
                   </div>
                   <QueryTable
@@ -193,7 +194,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                       rsql: rsqlFilter
                     }}
                     include="sample,sample.group"
-                    loading={formikProps.isSubmitting}
+                    loading={plpSrLoading || formikProps.isSubmitting}
                     onSuccess={res => {
                       setVisibleSamples(res.data);
                       setAvailableItems(
@@ -210,6 +211,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                     </strong>
                     {/* Spacer div to align the table with the form. */}
                     <div style={{ height: "22px" }} />
+                    <ErrorViewer />
                     <PreLibraryPrepForm onSubmit={onInnerFormSubmit} />
                   </div>
                 )}

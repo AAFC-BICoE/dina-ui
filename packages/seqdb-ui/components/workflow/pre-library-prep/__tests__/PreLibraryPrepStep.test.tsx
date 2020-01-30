@@ -15,13 +15,13 @@ import { PreLibraryPrepStep } from "../PreLibraryPrepStep";
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
-const TEST_SAMPLES: Array<PersistedResource<Sample>> = [
+const TEST_SAMPLES = [
   { id: "1", type: "sample", name: "test sample 1" },
   { id: "2", type: "sample", name: "test sample 2" },
   { id: "3", type: "sample", name: "test sample 3" },
   { id: "4", type: "sample", name: "test sample 4" },
   { id: "5", type: "sample", name: "test sample 5" }
-];
+] as Array<PersistedResource<Sample>>;
 
 const TEST_SAMPLE_STEP_RESOURCES: Array<PersistedResource<StepResource>> = [
   {
@@ -107,11 +107,6 @@ jest.mock(
     }
 );
 
-// Mock random numbers to only return 0.5.
-const mockMath = Object.create(global.Math);
-mockMath.random = () => 0.5;
-global.Math = mockMath;
-
 function getWrapper() {
   return mountWithAppContext(
     <PreLibraryPrepStep
@@ -185,7 +180,7 @@ describe("PreLibraryPrepStep UI", () => {
         filter: {
           "chain.chainId": "1",
           "chainStepTemplate.chainStepTemplateId": "2",
-          rsql: "sample.sampleId=in=(1,2,3,4,5) and sample.name!=0.5"
+          rsql: "sample.sampleId=in=(1,2,3,4,5)"
         },
         include:
           "sample,preLibraryPrep,preLibraryPrep.protocol,preLibraryPrep.product",

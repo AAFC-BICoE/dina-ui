@@ -7,6 +7,12 @@ import "./nav.css";
 export function Nav() {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+      <style>{`
+        body {
+          /* Add padding to the body so content is not hidden. */
+          padding-top: 80px;
+        }
+      `}</style>
       <div className="container-fluid p-0">
         <Link href="/">
           <a

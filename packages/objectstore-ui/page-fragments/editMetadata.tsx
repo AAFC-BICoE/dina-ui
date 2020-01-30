@@ -131,7 +131,7 @@ function EditMetadataForm({
               className="col-sm-6 originalFilename"
               hideLabel={true}
               readOnly={true}
-              initialValue={originalFileName}
+              initialValue={String(originalFileName)}
             />
           </div>
         </div>

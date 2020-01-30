@@ -1,12 +1,7 @@
 import { FieldsParam, FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import React, { useRef, useState } from "react";
 import { useIntl } from "react-intl";
-import ReactTable, {
-  Column,
-  PageSizeChangeFunction,
-  SortedChangeFunction,
-  SortingRule
-} from "react-table";
+import ReactTable, { Column, SortingRule, TableProps } from "react-table";
 import titleCase from "title-case";
 import {
   JsonApiQuerySpec,
@@ -21,6 +16,9 @@ export type ColumnDefinition<TData> = string | Column<TData>;
 
 /** QueryTable component's props. */
 export interface QueryTableProps<TData extends KitsuResource> {
+  /** Dependencies: When the values in this array are changed, re-fetch the data. */
+  deps?: any[];
+
   /** JSONAPI resource path. */
   path: string;
 
@@ -45,14 +43,11 @@ export interface QueryTableProps<TData extends KitsuResource> {
   /** Overrides the inner loading state if set to true. */
   loading?: boolean;
 
-  /** Called when a new page size is requested. */
-  onPageSizeChange?: PageSizeChangeFunction;
-
-  /** Called when a new sort is specified. */
-  onSortedChange?: SortedChangeFunction;
-
   /** Query success callback. */
   onSuccess?: (response: KitsuResponse<TData[], MetaWithTotal>) => void;
+
+  /** Override internal react-table props. */
+  reactTableProps?: Partial<TableProps>;
 }
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -83,14 +78,14 @@ export function QueryTable<TData extends KitsuResource>({
   columns,
   defaultPageSize = DEFAULT_PAGE_SIZE,
   defaultSort = [],
+  deps,
   fields,
   filter,
   include,
   loading: loadingProp,
-  onPageSizeChange,
-  onSortedChange,
   onSuccess,
-  path
+  path,
+  reactTableProps
 }: QueryTableProps<TData>) {
   const { formatMessage, messages } = useIntl();
 
@@ -170,6 +165,7 @@ export function QueryTable<TData extends KitsuResource>({
     TData[],
     MetaWithTotal
   >(query, {
+    deps,
     onSuccess
   });
 
@@ -195,6 +191,14 @@ export function QueryTable<TData extends KitsuResource>({
         <CommonMessage id="tableTotalCount" values={{ totalCount }} />
       </span>
       <ReactTable
+        FilterComponent={({ filter: headerFilter, onChange }) => (
+          <input
+            className="w-100"
+            placeholder="Search..."
+            value={headerFilter ? headerFilter.value : ""}
+            onChange={event => onChange(event.target.value)}
+          />
+        )}
         className="-striped"
         columns={mappedColumns}
         data={response && response.data}
@@ -202,12 +206,12 @@ export function QueryTable<TData extends KitsuResource>({
         defaultSorted={sortingRules}
         loading={loadingProp || queryIsLoading}
         manual={true}
+        minRows={1}
         onFetchData={onFetchData}
-        onPageSizeChange={onPageSizeChange}
-        onSortedChange={onSortedChange}
         pageSizeOptions={[25, 50, 100, 200, 500]}
         pages={numberOfPages}
         showPaginationTop={true}
+        {...reactTableProps}
       />
     </div>
   );

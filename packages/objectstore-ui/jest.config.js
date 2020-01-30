@@ -3,6 +3,7 @@ module.exports = {
   coveragePathIgnorePatterns: [
     "/coverage/",
     "/build/",
+    "/out/",
     "babel.config.js",
     "jest.config.js",
     "jest.setup.js",

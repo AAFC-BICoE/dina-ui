@@ -1,5 +1,5 @@
-import { ApiClientContext, Operation, useQuery } from "common-ui";
-import { FormikActions, FormikProps } from "formik";
+import { ApiClientContext, Operation, safeSubmit, useQuery } from "common-ui";
+import { FormikProps } from "formik";
 import { toPairs } from "lodash";
 import { useContext, useState } from "react";
 import { PreLibraryPrep } from "types/seqdb-api/resources/workflow/PreLibraryPrep";
@@ -15,7 +15,9 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
   const { apiClient, doOperations, save } = useContext(ApiClientContext);
 
   const [visibleSamples, setVisibleSamples] = useState<StepResource[]>([]);
-  const [randomNumber, setRandomNumber] = useState(Math.random());
+
+  // Keep track of the last save operation, so the data is re-fetched immediately after saving.
+  const [lastSave, setLastSave] = useState();
 
   const visibleSampleIds = visibleSamples.length
     ? visibleSamples.map(sr => (sr.sample as Sample).id).join(",")
@@ -31,7 +33,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       filter: {
         "chain.chainId": chain.id,
         "chainStepTemplate.chainStepTemplateId": step.id,
-        rsql: `sample.sampleId=in=(${visibleSampleIds}) and sample.name!=${randomNumber}`
+        rsql: `sample.sampleId=in=(${visibleSampleIds})`
       },
       include:
         "sample,preLibraryPrep,preLibraryPrep.protocol,preLibraryPrep.product",
@@ -39,6 +41,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       path: "stepResource"
     },
     {
+      deps: [lastSave],
       onSuccess: ({ data: plpSrs }) => {
         // Add client-side "shearingPrep" and "sizeSelectionPrep" properties to the sample stepResources.
         for (const sampleSr of visibleSamples) {
@@ -67,12 +70,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
     }
   );
 
-  async function plpFormSubmit(
-    values,
-    { setFieldValue, setSubmitting }: FormikActions<any>
-  ) {
-    setSubmitting(true);
-
+  const plpFormSubmit = safeSubmit(async (values, { setFieldValue }) => {
     const { checkedIds, ...plpValues } = values;
 
     if (plpValues.protocol) {
@@ -86,85 +84,80 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       .filter(pair => pair[1])
       .map(pair => pair[0]);
 
-    try {
-      // Find the existing PreLibraryPreps stepResources for these samples.
-      // These should be edited instead of creating new ones.
-      const existingStepResources = checkedSampleIds.length
-        ? (
-            await apiClient.get<StepResource[]>("stepResource", {
-              filter: {
-                "chain.chainId": chain.id,
-                "chainStepTemplate.chainStepTemplateId": step.id,
-                "preLibraryPrep.preLibraryPrepType":
-                  plpValues.preLibraryPrepType,
-                rsql: `sample.sampleId=in=(${checkedSampleIds})`
-              },
-              include: "sample,preLibraryPrep",
-              page: { limit: 1000 } // Max page limit
-            })
-          ).data
-        : [];
-
-      const plps = checkedSampleIds.map(checkedSampleId => {
-        const existingStepResource = existingStepResources.find(
-          sr => (sr.sample as Sample).id === checkedSampleId
-        );
-
-        if (existingStepResource) {
-          return {
-            resource: {
-              ...plpValues,
-              id: (existingStepResource.preLibraryPrep as PreLibraryPrep).id
+    // Find the existing PreLibraryPreps stepResources for these samples.
+    // These should be edited instead of creating new ones.
+    const existingStepResources = checkedSampleIds.length
+      ? (
+          await apiClient.get<StepResource[]>("stepResource", {
+            filter: {
+              "chain.chainId": chain.id,
+              "chainStepTemplate.chainStepTemplateId": step.id,
+              "preLibraryPrep.preLibraryPrepType": plpValues.preLibraryPrepType,
+              rsql: `sample.sampleId=in=(${checkedSampleIds})`
             },
-            type: "preLibraryPrep"
-          };
-        } else {
-          return {
-            resource: plpValues,
-            type: "preLibraryPrep"
-          };
-        }
-      });
+            include: "sample,preLibraryPrep",
+            page: { limit: 1000 } // Max page limit
+          })
+        ).data
+      : [];
 
-      const savedPlps = (await save(plps)) as PreLibraryPrep[];
-
-      const newStepResources = checkedSampleIds
-        .map((sampleId, i) => ({
-          chain: { id: chain.id, type: chain.type } as Chain,
-          chainStepTemplate: {
-            id: step.id,
-            type: step.type
-          } as ChainStepTemplate,
-          preLibraryPrep: {
-            id: String(savedPlps[i].id),
-            type: "preLibraryPrep"
-          } as PreLibraryPrep,
-          sample: { id: sampleId, type: "sample" },
-          type: "INPUT",
-          value: savedPlps[i].preLibraryPrepType
-        }))
-        // Don't create a new step resource if there is already one for this sample.
-        .filter(
-          newSr =>
-            !existingStepResources
-              .map(existingSr => (existingSr.sample as Sample).id)
-              .includes(newSr.sample.id)
-        );
-
-      await save(
-        newStepResources.map(resource => ({
-          resource,
-          type: "stepResource"
-        }))
+    const plps = checkedSampleIds.map(checkedSampleId => {
+      const existingStepResource = existingStepResources.find(
+        sr => (sr.sample as Sample).id === checkedSampleId
       );
-      setRandomNumber(Math.random());
 
-      setFieldValue("checkedIds", {});
-    } catch (err) {
-      alert(err);
-    }
-    setSubmitting(false);
-  }
+      if (existingStepResource) {
+        return {
+          resource: {
+            ...plpValues,
+            id: (existingStepResource.preLibraryPrep as PreLibraryPrep).id
+          },
+          type: "preLibraryPrep"
+        };
+      } else {
+        return {
+          resource: plpValues,
+          type: "preLibraryPrep"
+        };
+      }
+    });
+
+    const savedPlps = (await save(plps)) as PreLibraryPrep[];
+
+    const newStepResources = checkedSampleIds
+      .map((sampleId, i) => ({
+        chain: { id: chain.id, type: chain.type } as Chain,
+        chainStepTemplate: {
+          id: step.id,
+          type: step.type
+        } as ChainStepTemplate,
+        preLibraryPrep: {
+          id: String(savedPlps[i].id),
+          type: "preLibraryPrep"
+        } as PreLibraryPrep,
+        sample: { id: sampleId, type: "sample" },
+        type: "INPUT",
+        value: savedPlps[i].preLibraryPrepType
+      }))
+      // Don't create a new step resource if there is already one for this sample.
+      .filter(
+        newSr =>
+          !existingStepResources
+            // Assume the Sample is present because the query filters for only StepResources with linked Samples.
+            .map(existingSr => (existingSr.sample as Sample).id)
+            .includes(newSr.sample.id)
+      );
+
+    await save(
+      newStepResources.map(resource => ({
+        resource,
+        type: "stepResource"
+      }))
+    );
+    setLastSave(Date.now());
+
+    setFieldValue("checkedIds", {});
+  });
 
   async function deleteStepResources(
     plpType: "SHEARING" | "SIZE_SELECTION",
@@ -212,7 +205,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       const operations = [...srOperations, ...plpOperations];
 
       await doOperations(operations);
-      setRandomNumber(Math.random());
+      setLastSave(Date.now());
       formikProps.setFieldValue("checkedIds", {});
     } catch (err) {
       alert(err);

@@ -1,0 +1,34 @@
+= Building the app Docker images
+
+seqdb-ui and objectstore-ui can be containerized using Docker. Typically the Docker build is done automatically by
+CI/CD, and the apps should be run for local development using `yarn dev`.
+
+You can run the following commands to build the Docker images:
+
+From the top-level directory, install the dependencies:
+
+[source,bash]
+----
+yarn
+----
+
+Go into the app that you want to build:
+
+[source,bash]
+----
+cd ./packages/seqdb-ui
+----
+
+Build the app:
+
+[source,bash]
+----
+yarn build
+----
+
+Build the Docker image:
+
+[source,bash]
+----
+docker build -t myrepo/seqdb-ui:mytag .
+----

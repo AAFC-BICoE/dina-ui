@@ -45,12 +45,12 @@ export default function ManagedAttributesListPage() {
           path={"managed-attribute"}
           defaultPageSize={defaultPageSize}
           defaultSort={defaultSort}
-          onPageSizeChange={newSize =>
-            setCookie(TABLE_PAGE_SIZE_COOKIE, newSize, COOKIE_OPTIONS)
-          }
-          onSortedChange={newSort =>
-            setCookie(TABLE_SORT_COOKIE, newSort, COOKIE_OPTIONS)
-          }
+          reactTableProps={{
+            onPageSizeChange: newSize =>
+              setCookie(TABLE_PAGE_SIZE_COOKIE, newSize, COOKIE_OPTIONS),
+            onSortedChange: newSort =>
+              setCookie(TABLE_SORT_COOKIE, newSort, COOKIE_OPTIONS)
+          }}
         />
       </div>
     </div>

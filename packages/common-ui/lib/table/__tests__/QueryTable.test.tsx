@@ -384,6 +384,7 @@ describe("QueryTable component", () => {
 
     // Wait for the initial request to finish.
     await new Promise(setImmediate);
+    wrapper.update();
 
     // The initial request should have a pageSize of 5.
     expect(mockGet).lastCalledWith(
@@ -394,7 +395,7 @@ describe("QueryTable component", () => {
     // Expect 5 rows.
     expect(wrapper.find(".rt-tr-group").length).toEqual(5);
 
-    // Select a new page size of 50.
+    // Select a new page size of 100.
     wrapper
       .find(".-pagination select")
       .first()
@@ -402,8 +403,9 @@ describe("QueryTable component", () => {
 
     // Wait for the second request to finish.
     await new Promise(setImmediate);
+    wrapper.update();
 
-    // The second request should have a pageSize of 5.
+    // The second request should have a pageSize of 100.
     expect(mockGet).lastCalledWith(
       "todo",
       objectContaining({ page: { limit: 100, offset: 0 } })
@@ -571,7 +573,9 @@ describe("QueryTable component", () => {
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
-        onPageSizeChange={mockOnPageSizeChange}
+        reactTableProps={{
+          onPageSizeChange: mockOnPageSizeChange
+        }}
       />
     );
 
@@ -588,7 +592,9 @@ describe("QueryTable component", () => {
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description"]}
-        onSortedChange={mockOnSortedChange}
+        reactTableProps={{
+          onSortedChange: mockOnSortedChange
+        }}
       />
     );
 
@@ -649,6 +655,40 @@ describe("QueryTable component", () => {
     wrapper.update();
 
     expect(wrapper.find(ReactTable).prop("loading")).toEqual(true);
+  });
+
+  it("Provides a header input for filtering.", async () => {
+    const mockOnFilteredChange = jest.fn();
+
+    const wrapper = mountWithAppContext(
+      <QueryTable<Todo>
+        path="todo"
+        columns={[{ accessor: "name", filterable: true }]}
+        reactTableProps={{
+          onFilteredChange: mockOnFilteredChange
+        }}
+      />
+    );
+
+    const headerInput = wrapper.find(".rt-th input");
+
+    expect(headerInput.prop("placeholder")).toEqual("Search...");
+
+    headerInput.simulate("change", {
+      target: { name: "header-input", value: "new value" }
+    });
+    expect(mockOnFilteredChange.mock.calls).toEqual([
+      [
+        [
+          {
+            id: "name",
+            value: "new value"
+          }
+        ],
+        expect.objectContaining({ id: "name" }),
+        "new value"
+      ]
+    ]);
   });
 
   it("Displays the intl message (if there is one) as a header.", async () => {

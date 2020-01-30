@@ -6,6 +6,9 @@ export interface LabelWrapperParams {
   /** The CSS classes of the div wrapper. */
   className?: string;
 
+  /** Hides the label. */
+  hideLabel?: boolean;
+
   /** The name of the field. */
   name: string;
 
@@ -14,8 +17,6 @@ export interface LabelWrapperParams {
 
   /** Tootip Msg provided for the field, move to here to cover text field with tooltip case */
   tooltipMsg?: string;
-
-  hideLabel?: boolean;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -31,11 +32,11 @@ export interface FieldWrapperProps extends LabelWrapperParams {
  */
 export function FieldWrapper({
   className,
+  hideLabel = false,
   name,
   label,
   tooltipMsg,
-  children,
-  hideLabel
+  children
 }: FieldWrapperProps) {
   const { formatMessage, messages } = useIntl();
 

@@ -1,4 +1,4 @@
-= NPM Package Scripts
+= Yarn Package Scripts
 
 == Top-level directory
 

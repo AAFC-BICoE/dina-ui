@@ -30,4 +30,17 @@ describe("FieldView component", () => {
 
     expect(wrapper.find("label").text()).toEqual("Custom Label");
   });
+
+  it("Allows an optional link prop.", () => {
+    const wrapper = mountWithAppContext(
+      <Formik
+        initialValues={{ testObject: { name: "testName" } }}
+        onSubmit={noop}
+      >
+        <FieldView link="/linked-page" name="testObject.name" />
+      </Formik>
+    );
+
+    expect(wrapper.find("a").prop("href")).toEqual("/linked-page");
+  });
 });
