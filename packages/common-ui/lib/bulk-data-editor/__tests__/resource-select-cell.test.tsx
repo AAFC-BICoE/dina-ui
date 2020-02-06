@@ -59,4 +59,41 @@ describe("resource-select-cell", () => {
 
     mountWithAppContext(<TestComponent />, { apiContext: mockApiContext });
   });
+
+  it("Does not submit a filter when the cell already has an encoded resource in it.", async done => {
+    mockGet.mockImplementationOnce(async () => ({
+      data: [
+        { id: "1", type: "todo", name: "todo 1" },
+        { id: "2", type: "todo", name: "todo 2" }
+      ]
+    }));
+
+    function TestComponent() {
+      const resourceSelectCell = useResourceSelectCells();
+
+      const cell = resourceSelectCell<Todo>({
+        filter: input => ({ rsql: `name==*${input}*` }),
+        label: todo => todo.name,
+        model: "todo"
+      });
+
+      useEffect(() => {
+        (async () => {
+          await (cell.source as any)(
+            "Mat (todo/ee33d6ca-d232-4175-82bb-496ee7e0b028)",
+            mockProcess
+          );
+
+          // GET should be called with the supplied filter input:
+          expect(mockGet).lastCalledWith("todo", {});
+
+          done();
+        })();
+      });
+
+      return <div />;
+    }
+
+    mountWithAppContext(<TestComponent />, { apiContext: mockApiContext });
+  });
 });

@@ -1,4 +1,6 @@
-import { KitsuResource, PersistedResource } from "kitsu";
+import { KitsuResource } from "kitsu";
+
+export const ENCODED_RESOURCE_MATCHER = /(\()[^()]*(?=\)$)/;
 
 export interface EncodeResourceCellParams {
   label?: string;
@@ -28,7 +30,7 @@ export function decodeResourceCell(
   cellValue: string
 ): Required<KitsuResource> | null {
   // Get the {type}/{id} identifier from the end of the string if it exists.
-  const identifier = /(?<=\()[^()]*(?=\)$)/.exec(cellValue)?.[0];
+  const identifier = ENCODED_RESOURCE_MATCHER.exec(cellValue)?.[0].substr(1);
 
   if (identifier) {
     const [type, id] = identifier.split("/");

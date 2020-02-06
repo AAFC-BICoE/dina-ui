@@ -1,9 +1,15 @@
 import { HotColumnProps } from "@handsontable/react";
 import { GridSettings } from "handsontable";
-import { FilterParam, KitsuResource, PersistedResource } from "kitsu";
+import {
+  FilterParam,
+  GetParams,
+  KitsuResource,
+  PersistedResource
+} from "kitsu";
 import { debounce } from "lodash";
 import { useContext } from "react";
 import { ApiClientContext, encodeResourceCell } from "..";
+import { ENCODED_RESOURCE_MATCHER } from "./encode-resource-cell";
 
 interface ResourceSelectCellProps<T extends KitsuResource> {
   model: string;
@@ -20,10 +26,14 @@ export function useResourceSelectCells() {
     gridSettings?: GridSettings
   ): HotColumnProps {
     async function loadOptions(query: string, process) {
+      const isEncodedResource = ENCODED_RESOURCE_MATCHER.test(query);
+
+      const requestParams: GetParams = isEncodedResource
+        ? {}
+        : { filter: filter(query) };
+
       // Send the API request.
-      const { data } = await apiClient.get<T[]>(model, {
-        filter: filter(query)
-      });
+      const { data } = await apiClient.get<T[]>(model, requestParams);
 
       const encodedResources = data.map<string>(resource =>
         encodeResourceCell(resource, { label: label(resource), type })
