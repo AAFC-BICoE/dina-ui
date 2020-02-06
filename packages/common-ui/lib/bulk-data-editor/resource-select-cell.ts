@@ -47,7 +47,8 @@ export function useResourceSelectCells() {
     return {
       source: debouncedOptionLoader as any,
       type: "dropdown",
-      validator: (_, callback) => callback(true),
+      validator: (value, callback) =>
+        callback(ENCODED_RESOURCE_MATCHER.test(value)),
       ...gridSettings
     };
   };
