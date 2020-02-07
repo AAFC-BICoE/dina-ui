@@ -17,9 +17,16 @@ import {
 } from "../intl/objectstore-intl";
 
 export interface FileUploadResponse {
-  fileName: string;
-  fileType: string;
-  size: string;
+  fileIdentifier: string;
+  metaFileEntryVersion: string;
+  originalFilename: string;
+  sha1Hex: string;
+  receivedMediaType: string;
+  detectedMediaType: string;
+  detectedFileExtension: string;
+  evaluatedMediaType: string;
+  evaluatedFileExtension: string;
+  sizeInBytes: number;
 }
 
 const baseStyle = {
@@ -99,11 +106,9 @@ export default function UploadPage() {
     const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(res => ({
       resource: {
         bucket: BUCKET_NAME,
-        dcType: "Image",
-        fileExtension: "",
-        fileIdentifier: res.fileName,
+        fileIdentifier: res.fileIdentifier,
         type: "metadata"
-      },
+      } as Metadata,
       type: "metadata"
     }));
 

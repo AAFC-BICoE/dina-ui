@@ -48,7 +48,7 @@ describe("Upload page", () => {
     const mockPost = jest.fn(() => {
       return {
         data: {
-          fileName: "test.png",
+          fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
           fileType: "image",
           size: "500"
         }
@@ -100,9 +100,7 @@ describe("Upload page", () => {
       {
         resource: {
           bucket: "mybucket",
-          dcType: "Image",
-          fileExtension: "",
-          fileIdentifier: "test.png",
+          fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
           type: "metadata"
         },
         type: "metadata"
@@ -110,9 +108,7 @@ describe("Upload page", () => {
       {
         resource: {
           bucket: "mybucket",
-          dcType: "Image",
-          fileExtension: "",
-          fileIdentifier: "test.png",
+          fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
           type: "metadata"
         },
         type: "metadata"
@@ -120,9 +116,7 @@ describe("Upload page", () => {
       {
         resource: {
           bucket: "mybucket",
-          dcType: "Image",
-          fileExtension: "",
-          fileIdentifier: "test.png",
+          fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
           type: "metadata"
         },
         type: "metadata"
