@@ -20,7 +20,14 @@ export function MockAppContextProvider({
   children
 }: MockAppContextProviderProps) {
   return (
-    <ApiClientContext.Provider value={apiContext || createContextValue()}>
+    <ApiClientContext.Provider
+      value={
+        apiContext ||
+        createContextValue({
+          getTempIdGenerator: () => () => "00000000-0000-0000-0000-000000000000"
+        })
+      }
+    >
       <ObjectStoreIntlProvider>{children}</ObjectStoreIntlProvider>
     </ApiClientContext.Provider>
   );

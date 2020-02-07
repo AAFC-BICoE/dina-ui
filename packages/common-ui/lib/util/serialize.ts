@@ -42,6 +42,8 @@ export async function serialize<TData extends KitsuResource>({
   delete (resourceCopy as any).links;
   delete (resourceCopy as any).relationships;
 
+  const nestedObjects = getNestedObjects(resourceCopy);
+
   const httpVerb = resource.id ? "PATCH" : "POST";
 
   const { data } = await customSerialise(type, resourceCopy, httpVerb);
@@ -63,6 +65,8 @@ export async function serialize<TData extends KitsuResource>({
     data.relationships = { ...data.relationships, ...nullRelationships };
   }
 
+  data.attributes = { ...data.attributes, ...nestedObjects };
+
   return data;
 }
 
@@ -81,4 +85,17 @@ function getNullRelationships(resource: KitsuResource) {
     nullRelationships[field] = { data: null };
   }
   return nullRelationships;
+}
+
+function getNestedObjects(resource: KitsuResource) {
+  const nestedObjectFields = Object.keys(resource).filter(
+    key =>
+      Object(resource[key]) === resource[key] && resource[key]?.id === undefined
+  );
+  const nestedObjects: { [key: string]: any } = {};
+  for (const field of nestedObjectFields) {
+    nestedObjects[field] = resource[field];
+    delete resource[field];
+  }
+  return nestedObjects;
 }

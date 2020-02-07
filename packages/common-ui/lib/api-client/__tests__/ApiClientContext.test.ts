@@ -134,7 +134,7 @@ const mockPatch = jest.fn((_, data) => {
   }
 });
 
-const { apiClient, doOperations, save } = createContextValue();
+const { apiClient, bulkGet, doOperations, save } = createContextValue();
 
 // Add the mocked "patch" method to the Axios instance:
 apiClient.axios = { patch: mockPatch } as any;
@@ -348,6 +348,50 @@ Constraint violation: description size must be between 1 and 10`;
         type: "pcrPrimer"
       },
       { id: "124", lotNumber: 1, name: "testPrimer2 edited", type: "pcrPrimer" }
+    ]);
+  });
+
+  it("Provides a bulk-get-by-ID function.", async () => {
+    mockPatch.mockImplementationOnce(() => ({
+      data: [
+        {
+          data: {
+            attributes: { name: "primer 123" },
+            id: "123",
+            type: "pcrPrimer"
+          },
+          status: 201
+        },
+        {
+          data: {
+            attributes: { name: "primer 124" },
+            id: "124",
+            type: "pcrPrimer"
+          },
+          status: 201
+        }
+      ]
+    }));
+
+    const response = await bulkGet<TestPcrPrimer>([
+      "pcrPrimer/123",
+      "pcrPrimer/124"
+    ]);
+
+    // Bulk-requests by ID:
+    expect(mockPatch).lastCalledWith(
+      "operations",
+      [
+        { op: "GET", path: "pcrPrimer/123" },
+        { op: "GET", path: "pcrPrimer/124" }
+      ],
+      expect.anything()
+    );
+
+    // Returns an array of primers:
+    expect(response).toEqual([
+      { id: "123", name: "primer 123", type: "pcrPrimer" },
+      { id: "124", name: "primer 124", type: "pcrPrimer" }
     ]);
   });
 });

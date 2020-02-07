@@ -1,7 +1,7 @@
 import { isEqual } from "lodash";
 import React from "react";
 import Select from "react-select";
-import { SeqdbMessage } from "../../intl/seqdb-intl";
+import { CommonMessage } from "../intl/common-ui-intl";
 import { FilterAttribute } from "./FilterBuilder";
 import {
   FilterBuilderContext,
@@ -55,11 +55,11 @@ export class FilterRow extends React.Component<FilterRowProps> {
       value: FilterRowSearchType;
     }> = [
       {
-        label: <SeqdbMessage id="filterPartialMatch" />,
+        label: <CommonMessage id="filterPartialMatch" />,
         value: "PARTIAL_MATCH"
       },
-      { label: <SeqdbMessage id="filterExactMatch" />, value: "EXACT_MATCH" },
-      { label: <SeqdbMessage id="filterBlankField" />, value: "BLANK_FIELD" }
+      { label: <CommonMessage id="filterExactMatch" />, value: "EXACT_MATCH" },
+      { label: <CommonMessage id="filterBlankField" />, value: "BLANK_FIELD" }
     ];
 
     const selectedAttribute = this.context.attributeOptions.find(option =>
@@ -82,8 +82,8 @@ export class FilterRow extends React.Component<FilterRowProps> {
             className="filter-predicate"
             instanceId={`predicate_${model.id}`}
             options={[
-              { label: <SeqdbMessage id="IS" />, value: "IS" },
-              { label: <SeqdbMessage id="ISNOT" />, value: "IS NOT" }
+              { label: <CommonMessage id="IS" />, value: "IS" },
+              { label: <CommonMessage id="ISNOT" />, value: "IS NOT" }
             ]}
             onChange={this.onPredicateChanged}
             value={{ label: model.predicate, value: model.predicate }}
@@ -115,14 +115,14 @@ export class FilterRow extends React.Component<FilterRowProps> {
             onClick={onAndClick}
             type="button"
           >
-            <SeqdbMessage id="AND" />
+            <CommonMessage id="AND" />
           </button>
           <button
             className="list-inline-item btn btn-primary or"
             onClick={onOrClick}
             type="button"
           >
-            <SeqdbMessage id="OR" />
+            <CommonMessage id="OR" />
           </button>
           {showRemoveButton && (
             <button

@@ -1,20 +1,12 @@
-import { QueryTable } from "common-ui";
 import ReactTable from "react-table";
-import { act } from "react-test-renderer";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { QueryTable } from "../..";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { ListPageLayout } from "../ListPageLayout";
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn();
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-    }
-);
+const mockApiCtx: any = { apiClient: { get: mockGet } };
 
 describe("ListPageLayout component", () => {
   it("Has a reset button to clear the filter form.", async () => {
@@ -26,7 +18,8 @@ describe("ListPageLayout component", () => {
           columns: ["name", "type"],
           path: "pcrPrimer"
         }}
-      />
+      />,
+      { apiContext: mockApiCtx }
     );
 
     // Wait for the default search to finish.
@@ -50,9 +43,7 @@ describe("ListPageLayout component", () => {
     );
 
     // Click the reset button.
-    act(() => {
-      wrapper.find("button.filter-reset-button").simulate("click");
-    });
+    wrapper.find("button.filter-reset-button").simulate("click");
 
     // There should be no RSQL filter.
     expect(mockGet).lastCalledWith(
@@ -72,7 +63,8 @@ describe("ListPageLayout component", () => {
           columns: ["name", "type"],
           path: "pcrPrimer"
         }}
-      />
+      />,
+      { apiContext: mockApiCtx }
     );
 
     // Wait for the default search to finish.

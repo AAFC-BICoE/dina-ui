@@ -21,11 +21,26 @@ export interface ApiClientContextI {
   save: (
     saveArgs: SaveArgs[]
   ) => Promise<Array<PersistedResource<KitsuResource>>>;
+
+  /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
+  bulkGet: <T extends KitsuResource>(
+    paths: string[]
+  ) => Promise<Array<PersistedResource<T>>>;
+}
+
+/** Config for creating an API client context value. */
+export interface ApiClientContextConfig {
+  /**
+   * Temp ID iterator.
+   * This is not persisted on the back-end as the actual database ID.
+   * The generated ID should be in the back-end's expected format (e.g. number or UUID).
+   */
+  getTempIdGenerator?: () => () => string;
 }
 
 /** save function args. */
-export interface SaveArgs {
-  resource: KitsuResource;
+export interface SaveArgs<T extends KitsuResource = KitsuResource> {
+  resource: T;
   type: string;
 }
 
@@ -41,7 +56,12 @@ export const ApiClientContext = React.createContext<ApiClientContextI>(
  * Creates the value of the API client context. The app should only need to call this function
  * once to initialize the context.
  */
-export function createContextValue(): ApiClientContextI {
+export function createContextValue({
+  getTempIdGenerator = () => {
+    let idIterator = -100;
+    return () => String(idIterator--);
+  }
+}: ApiClientContextConfig = {}): ApiClientContextI {
   const apiClient = new Kitsu({
     baseURL: "/api",
     headers: { "Crnk-Compact": "true" },
@@ -91,7 +111,7 @@ export function createContextValue(): ApiClientContextI {
     const serialized = await Promise.all(serializePromises);
 
     // Temp ID iterator. This is not persisted on the back-end as the actual database ID.
-    let idIterator = -100;
+    const generateId = getTempIdGenerator();
 
     // Create the jsonpatch oeprations objects.
     const operations = serialized.map<Operation>(jsonapiResource => ({
@@ -101,7 +121,7 @@ export function createContextValue(): ApiClientContextI {
         : jsonapiResource.type,
       value: {
         ...jsonapiResource,
-        id: String(jsonapiResource.id || idIterator--)
+        id: String(jsonapiResource.id || generateId())
       }
     }));
 
@@ -118,8 +138,25 @@ export function createContextValue(): ApiClientContextI {
     return kitsuResources;
   }
 
+  /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
+  async function bulkGet<T extends KitsuResource>(paths: string[]) {
+    const getOperations = paths.map<Operation>(path => ({
+      op: "GET",
+      path
+    }));
+
+    const responses = await doOperations(getOperations);
+
+    const resources: Array<PersistedResource<T>> = (
+      await Promise.all(responses.map(deserialise))
+    ).map(res => res.data);
+
+    return resources;
+  }
+
   return {
     apiClient,
+    bulkGet,
     doOperations,
     save
   };
