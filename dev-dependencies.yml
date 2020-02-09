@@ -1,0 +1,23 @@
+version: "3.6"
+services:
+  db:
+    image: postgres:9.6
+    environment:
+      POSTGRES_DB: dina
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: p
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db-schemas.sql:/docker-entrypoint-initdb.d/1-db-schemas.sql
+  minio:
+    image: minio/minio
+    container_name: minio
+    volumes:
+        - ./volumes/minio-data:/data
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    ports:
+      - "9000:9000"
+    command: server /data
