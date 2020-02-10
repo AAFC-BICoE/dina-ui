@@ -12,7 +12,6 @@ services:
       - ./db-schemas.sql:/docker-entrypoint-initdb.d/1-db-schemas.sql
   minio:
     image: minio/minio
-    container_name: minio
     volumes:
         - ./volumes/minio-data:/data
     environment:

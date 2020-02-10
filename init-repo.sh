@@ -8,8 +8,8 @@ code --install-extension ms-vscode.vscode-typescript-tslint-plugin
 
 # Get the Dina repos:
 mkdir repos
-git clone https://github.com/AAFC-BICoE/dina-ui.git ./repos/dina-ui
-git clone https://github.com/AAFC-BICoE/object-store-api.git ./repos/objectstore-api
+git clone --branch dev https://github.com/AAFC-BICoE/dina-ui.git ./repos/dina-ui
+git clone --branch dev https://github.com/AAFC-BICoE/object-store-api.git ./repos/objectstore-api
 
 # Install dependencies:
 mvn -f ./repos/objectstore-api/ -Dmaven.test.skip=true clean install
