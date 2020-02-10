@@ -27,4 +27,4 @@ Note for linux user, due to a bug in pa11y-ci-html-reporter npm package,  will n
 
 Due to the pa11y implementation, in order to get all compliance level report (A, AA  are the currentl AAFC scope), one will need to change the .pa11yci file to manually switch between the A and AA  to cover both,as the script takes one arg only.
 
-e.g, modify the .pa11yci file to change Standards: "WCAGAA" to Standards: "WCAG2A", as Standards: "WCAG2AA" is the default, and WCAG2AAA is out of scope as of writting the doc.
+e.g, modify the .pa11yci file to change Standards: "WCAG2AA" to Standards: "WCAG2A", as Standards: "WCAG2AA" is the default, and WCAG2AAA is out of scope as of writting the doc.
