@@ -1,18 +1,18 @@
 import {
   ColumnDefinition,
   ErrorViewer,
+  FilterForm,
   LoadingSpinner,
   QueryTable,
+  rsql,
   useGroupedCheckBoxes
 } from "common-ui";
 import { Formik } from "formik";
 import { noop } from "lodash";
 import { useState } from "react";
 import titleCase from "title-case";
-import { FilterForm } from "../..";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Sample, StepResource } from "../../../types/seqdb-api";
-import { rsql } from "../../filter-builder/rsql";
 import { StepRendererProps } from "../StepRenderer";
 import {
   PreLibPrepViewMode,

@@ -79,9 +79,9 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     }`
   };
 
-  const LIBRARY_PREP_BATCH_TABLE_COLUMNS: Array<
-    ColumnDefinition<LibraryPrepBatch>
-  > = [
+  const LIBRARY_PREP_BATCH_TABLE_COLUMNS: Array<ColumnDefinition<
+    LibraryPrepBatch
+  >> = [
     {
       Header: "Name",
       accessor: "name",
@@ -153,9 +153,9 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     }
   ];
 
-  const LIBRARY_POOL_CONTENTS_TABLE_COLUMNS: Array<
-    ColumnDefinition<LibraryPoolContent>
-  > = [
+  const LIBRARY_POOL_CONTENTS_TABLE_COLUMNS: Array<ColumnDefinition<
+    LibraryPoolContent
+  >> = [
     {
       Cell: ({ original }) => {
         const lpc: LibraryPoolContent = original;

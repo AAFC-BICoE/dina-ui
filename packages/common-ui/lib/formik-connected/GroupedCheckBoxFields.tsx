@@ -4,11 +4,11 @@ import { noop, toPairs } from "lodash";
 import { useRef, useState } from "react";
 import ReactTooltip from "react-tooltip";
 
-interface CheckBoxFieldProps<TData extends KitsuResource> {
+export interface CheckBoxFieldProps<TData extends KitsuResource> {
   resource: TData;
 }
 
-interface GroupedCheckBoxesParams {
+export interface GroupedCheckBoxesParams {
   fieldName: string;
 }
 
@@ -60,7 +60,12 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
               checked={value || false}
               onClick={onCheckBoxClick}
               onChange={noop}
-              style={{ height: "20px", width: "20px" }}
+              style={{
+                display: "block",
+                height: "20px",
+                margin: "auto",
+                width: "20px"
+              }}
               type="checkbox"
               value={value || false}
             />
@@ -95,7 +100,7 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
       .length;
 
     return (
-      <div>
+      <div className="grouped-checkbox-header">
         Select <CheckAllCheckBox />
         <img
           src="/static/images/iconInformation.gif"

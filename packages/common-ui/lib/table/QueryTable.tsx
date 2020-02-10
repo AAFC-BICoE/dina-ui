@@ -9,6 +9,7 @@ import {
   MetaWithTotal,
   useQuery
 } from "..";
+import { QueryState } from "../api-client/useQuery";
 import { CommonMessage } from "../intl/common-ui-intl";
 
 /** Object types accepted as a column definition. */
@@ -46,8 +47,13 @@ export interface QueryTableProps<TData extends KitsuResource> {
   /** Query success callback. */
   onSuccess?: (response: KitsuResponse<TData[], MetaWithTotal>) => void;
 
-  /** Override internal react-table props. */
-  reactTableProps?: Partial<TableProps>;
+  /**
+   * Override internal react-table props.
+   * Pass in either the props or a function that provides the props.
+   */
+  reactTableProps?:
+    | Partial<TableProps>
+    | ((queryState: QueryState<TData[], MetaWithTotal>) => Partial<TableProps>);
 }
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -161,19 +167,23 @@ export function QueryTable<TData extends KitsuResource>({
     }
   });
 
-  const { error, loading: queryIsLoading, response } = useQuery<
-    TData[],
-    MetaWithTotal
-  >(query, {
+  const queryState = useQuery<TData[], MetaWithTotal>(query, {
     deps,
     onSuccess
   });
+
+  const { error, loading: queryIsLoading, response } = queryState;
 
   const totalCount = response?.meta?.totalResourceCount;
 
   const numberOfPages = totalCount
     ? Math.ceil(totalCount / page.limit)
     : undefined;
+
+  const resolvedReactTableProps =
+    typeof reactTableProps === "function"
+      ? reactTableProps(queryState)
+      : reactTableProps;
 
   return (
     <div className="query-table-wrapper" ref={divWrapperRef}>
@@ -211,7 +221,7 @@ export function QueryTable<TData extends KitsuResource>({
         pageSizeOptions={[25, 50, 100, 200, 500]}
         pages={numberOfPages}
         showPaginationTop={true}
-        {...reactTableProps}
+        {...resolvedReactTableProps}
       />
     </div>
   );

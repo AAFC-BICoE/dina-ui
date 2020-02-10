@@ -33,6 +33,7 @@
     "react-datepicker": "^2.9.6",
     "react-dom": "^16.10.2",
     "react-dropzone": "^10.1.10",
+    "react-file-viewer": "^1.2.1",
     "react-hooks-async": "^3.9.0",
     "react-select": "^3.0.8",
     "react-tabs": "^3.0.0",

@@ -707,4 +707,29 @@ describe("QueryTable component", () => {
         .exists()
     ).toEqual(true);
   });
+
+  it("Provides a 'reactTableProps' prop that passes in the query state.", async () => {
+    const wrapper = mountWithAppContext(
+      <QueryTable<Todo>
+        path="todo"
+        columns={[{ accessor: "name", filterable: true }]}
+        defaultPageSize={30}
+        reactTableProps={({ response }) => ({
+          TbodyComponent: () => {
+            return (
+              <div className="test-body">
+                Response length is: {response?.data.length}
+              </div>
+            );
+          }
+        })}
+      />
+    );
+
+    // Wait for the initial request to finish and the result to render.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(".test-body").text()).toEqual("Response length is: 30");
+  });
 });

@@ -1,17 +1,8 @@
-import { ColumnDefinition } from "common-ui";
+import { ColumnDefinition, ListPageLayout } from "common-ui";
 import Link from "next/link";
-import {
-  ButtonBar,
-  CreateButton,
-  Head,
-  ListPageLayout,
-  Nav
-} from "../../components";
+import { ButtonBar, CreateButton, Head, Nav } from "../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
-import {
-  Protocol,
-  protocolTypeLabels
-} from "../../types/seqdb-api/resources/Protocol";
+import { Protocol } from "../../types/seqdb-api/resources/Protocol";
 
 const PROTOCOL_TABLE_COLUMNS: Array<ColumnDefinition<Protocol>> = [
   {

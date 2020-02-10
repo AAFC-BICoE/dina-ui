@@ -1,6 +1,6 @@
 import { createContext, useMemo } from "react";
+import { useIntl } from "react-intl";
 import titleCase from "title-case";
-import { useSeqdbIntl } from "../../intl/seqdb-intl";
 import { FilterAttribute } from "./FilterBuilder";
 import { FilterAttributeOption } from "./FilterRow";
 
@@ -24,7 +24,7 @@ export function FilterBuilderContextProvider({
   children,
   filterAttributes
 }: FilterBuilderContextProviderProps) {
-  const { formatMessage, messages } = useSeqdbIntl();
+  const { formatMessage, messages } = useIntl();
 
   const attributeOptions = useMemo(
     () =>
@@ -45,7 +45,7 @@ export function FilterBuilderContextProvider({
         const optionLabel =
           customLabel ??
           (messages[messageKey]
-            ? formatMessage(messageKey as any)
+            ? formatMessage({ id: messageKey })
             : titleCase(fieldName));
 
         return { label: optionLabel, value: attr };

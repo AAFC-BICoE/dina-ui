@@ -7,7 +7,7 @@ import { ControlledAttribute } from "./AttributeBuilder";
 export interface AttributeRowModel {
   id: number;
   type: "ATTRIBUTE_ROW";
-  attribute: ControlledAttribute;
+  attribute?: ControlledAttribute;
   value: string;
 }
 

@@ -4,7 +4,7 @@ import { act } from "react-dom/test-utils";
 import {
   MockAppContextProvider,
   mountWithAppContext
-} from "../../../test-util/mock-app-context";
+} from "../../test-util/mock-app-context";
 import { FilterBuilder, FilterBuilderProps } from "../FilterBuilder";
 import { FilterGroup, FilterGroupModel } from "../FilterGroup";
 import { FilterRow } from "../FilterRow";

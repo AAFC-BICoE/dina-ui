@@ -1,5 +1,6 @@
+import { IntlProvider } from "react-intl";
 import Select from "react-select/base";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { FilterAttribute } from "../FilterBuilder";
 import { FilterBuilderContextProvider } from "../FilterBuilderContext";
 import { FilterRow, FilterRowProps } from "../FilterRow";
@@ -36,26 +37,31 @@ describe("FilterRow component", () => {
     filterAttributes?: FilterAttribute[]
   ) {
     return mountWithAppContext(
-      <FilterBuilderContextProvider
-        filterAttributes={filterAttributes || TEST_FILTER_ATTRIBUTES}
+      <IntlProvider
+        locale="en"
+        messages={{ "field_group.groupName": "Group Name" }}
       >
-        <FilterRow
-          model={{
-            attribute: "name",
-            id: 1,
-            predicate: "IS",
-            searchType: "PARTIAL_MATCH",
-            type: "FILTER_ROW",
-            value: ""
-          }}
-          onChange={mockOnChange}
-          onAndClick={mockOnAndClick}
-          onRemoveClick={mockOnDeleteClick}
-          onOrClick={mockOnOrClick}
-          showRemoveButton={true}
-          {...propsOverride}
-        />
-      </FilterBuilderContextProvider>
+        <FilterBuilderContextProvider
+          filterAttributes={filterAttributes || TEST_FILTER_ATTRIBUTES}
+        >
+          <FilterRow
+            model={{
+              attribute: "name",
+              id: 1,
+              predicate: "IS",
+              searchType: "PARTIAL_MATCH",
+              type: "FILTER_ROW",
+              value: ""
+            }}
+            onChange={mockOnChange}
+            onAndClick={mockOnAndClick}
+            onRemoveClick={mockOnDeleteClick}
+            onOrClick={mockOnOrClick}
+            showRemoveButton={true}
+            {...propsOverride}
+          />
+        </FilterBuilderContextProvider>
+      </IntlProvider>
     );
   }
 

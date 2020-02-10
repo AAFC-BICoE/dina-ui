@@ -1,7 +1,7 @@
-import { QueryTable, QueryTableProps } from "common-ui";
 import { FilterParam, KitsuResource } from "kitsu";
 import { useCookies } from "react-cookie";
 import { CookieSetOptions } from "universal-cookie";
+import { QueryTable, QueryTableProps } from "..";
 import { rsql } from "../filter-builder/rsql";
 import { FilterForm } from "./FilterForm";
 
@@ -9,6 +9,7 @@ interface ListPageLayoutProps<TData extends KitsuResource> {
   filterAttributes: string[];
   id: string;
   queryTableProps: QueryTableProps<TData>;
+  WrapTable?: React.FunctionComponent;
 }
 
 const TABLE_PAGE_SIZE_COOKIE = "tablePageSize";
@@ -24,7 +25,8 @@ const COOKIE_OPTIONS: CookieSetOptions = { expires: new Date("3000-01-01") };
 export function ListPageLayout<TData extends KitsuResource>({
   filterAttributes,
   id,
-  queryTableProps
+  queryTableProps,
+  WrapTable = ({ children }) => <>{children}</>
 }: ListPageLayoutProps<TData>) {
   // Use a cookie hook to get the cookies, and re-render when the watched cookies are changed.
   const [cookies, setCookie] = useCookies([
@@ -48,18 +50,20 @@ export function ListPageLayout<TData extends KitsuResource>({
   return (
     <div>
       <FilterForm filterAttributes={filterAttributes} id={id} />
-      <QueryTable<TData>
-        defaultPageSize={defaultPageSize}
-        defaultSort={defaultSort}
-        filter={filterParam}
-        reactTableProps={{
-          onPageSizeChange: newSize =>
-            setCookie(TABLE_PAGE_SIZE_COOKIE, newSize, COOKIE_OPTIONS),
-          onSortedChange: newSort =>
-            setCookie(TABLE_SORT_COOKIE, newSort, COOKIE_OPTIONS)
-        }}
-        {...queryTableProps}
-      />
+      <WrapTable>
+        <QueryTable<TData>
+          defaultPageSize={defaultPageSize}
+          defaultSort={defaultSort}
+          filter={filterParam}
+          reactTableProps={{
+            onPageSizeChange: newSize =>
+              setCookie(TABLE_PAGE_SIZE_COOKIE, newSize, COOKIE_OPTIONS),
+            onSortedChange: newSort =>
+              setCookie(TABLE_SORT_COOKIE, newSort, COOKIE_OPTIONS)
+          }}
+          {...queryTableProps}
+        />
+      </WrapTable>
     </div>
   );
 }
