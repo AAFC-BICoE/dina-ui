@@ -9,8 +9,11 @@
     "test:coverage": "tsc && jest --coverage"
   },
   "dependencies": {
+    "@handsontable/react": "^3.1.2",
     "@molgenis/rsql": "0.1.2",
+    "dataloader": "^1.4.0",
     "formik": "^1.5.8",
+    "handsontable": "6.2.2",
     "kitsu": "7.0.4",
     "kitsu-core": "7.0.4",
     "next": "^9.1.5",

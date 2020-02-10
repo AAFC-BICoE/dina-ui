@@ -5,10 +5,11 @@ import {
   LoadingSpinner,
   Query,
   ResourceSelectField,
+  safeSubmit,
   SubmitButton,
   TextField
 } from "common-ui";
-import { Form, Formik, FormikActions } from "formik";
+import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
@@ -67,29 +68,21 @@ function ChainForm({ chain, router }: ChainFormProps) {
 
   const initialValues = chain || {};
 
-  async function onSubmit(
-    submittedValues,
-    { setStatus, setSubmitting }: FormikActions<any>
-  ) {
-    try {
-      // Current date as yyyy-mm-dd string.
-      const dateCreated = new Date().toISOString().split("T")[0];
-      submittedValues.dateCreated = dateCreated;
+  const onSubmit = safeSubmit(async submittedValues => {
+    // Current date as yyyy-mm-dd string.
+    const dateCreated = new Date().toISOString().split("T")[0];
+    submittedValues.dateCreated = dateCreated;
 
-      const response = await save([
-        {
-          resource: submittedValues,
-          type: "chain"
-        }
-      ]);
+    const response = await save([
+      {
+        resource: submittedValues,
+        type: "chain"
+      }
+    ]);
 
-      const newId = response[0].id;
-      router.push(`/workflow/view?id=${newId}`);
-    } catch (error) {
-      setStatus(error.message);
-      setSubmitting(false);
-    }
-  }
+    const newId = response[0].id;
+    await router.push(`/workflow/view?id=${newId}`);
+  });
 
   return (
     <div>

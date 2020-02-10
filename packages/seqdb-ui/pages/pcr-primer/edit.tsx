@@ -7,11 +7,12 @@ import {
   NumberField,
   Query,
   ResourceSelectField,
+  safeSubmit,
   SelectField,
   SubmitButton,
   TextField
 } from "common-ui";
-import { Form, Formik, FormikActions } from "formik";
+import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
@@ -72,25 +73,17 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
 
   const initialValues = primer || { lotNumber: 1, seq: "", type: "PRIMER" };
 
-  async function onSubmit(
-    submittedValues,
-    { setStatus, setSubmitting }: FormikActions<any>
-  ) {
-    try {
-      const response = await save([
-        {
-          resource: submittedValues,
-          type: "pcrPrimer"
-        }
-      ]);
+  const onSubmit = safeSubmit(async submittedValues => {
+    const response = await save([
+      {
+        resource: submittedValues,
+        type: "pcrPrimer"
+      }
+    ]);
 
-      const newId = response[0].id;
-      router.push(`/pcr-primer/view?id=${newId}`);
-    } catch (error) {
-      setStatus(error.message);
-      setSubmitting(false);
-    }
-  }
+    const newId = response[0].id;
+    await router.push(`/pcr-primer/view?id=${newId}`);
+  });
 
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>

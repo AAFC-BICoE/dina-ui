@@ -80,10 +80,7 @@ export class AttributeBuilder extends React.Component<
       this.btnClicked === false
     ) {
       this.props.controlledAttributes.map(ca => {
-        if (
-          (ca.name.indexOf("managed") === -1 &&
-            ca.name.indexOf("unManaged")) === -1
-        ) {
+        if (!ca.name?.includes("managed") && !ca.name?.includes("unManaged")) {
           before = parent.children[parent.children.length - 1] as any;
           this.addAttributeRowNoUpdate({ before, parent, ca });
         }

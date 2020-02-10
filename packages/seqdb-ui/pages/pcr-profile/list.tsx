@@ -1,12 +1,6 @@
-import { ColumnDefinition } from "common-ui";
+import { ColumnDefinition, ListPageLayout } from "common-ui";
 import Link from "next/link";
-import {
-  ButtonBar,
-  CreateButton,
-  Head,
-  ListPageLayout,
-  Nav
-} from "../../components";
+import { ButtonBar, CreateButton, Head, Nav } from "../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 

@@ -2,13 +2,15 @@ import {
   FilterParam,
   GetParams,
   KitsuResource,
+  KitsuResponse,
   PersistedResource
 } from "kitsu";
 import { debounce, isUndefined, omitBy } from "lodash";
 import React, { useContext } from "react";
 import AsyncSelect from "react-select/async";
+import { Styles } from "react-select/src/styles";
 import { OptionsType } from "react-select/src/types";
-import { ApiClientContext } from "..";
+import { ApiClientContext } from "../..";
 
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData extends KitsuResource> {
@@ -37,6 +39,15 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   /** The JSONAPI "sort" parameter. */
   sort?: string;
+
+  /** react-select styles prop. */
+  styles?: Partial<Styles>;
+
+  /** Optional query loader function for custom API request behavior (Useful for caching). */
+  customDataFetch?: (
+    path: string,
+    params: GetParams
+  ) => Promise<KitsuResponse<TData[], any>>;
 }
 
 /** An option the user can select to set the relationship to null. */
@@ -51,9 +62,14 @@ export function ResourceSelect<TData extends KitsuResource>({
   onChange = () => undefined,
   optionLabel,
   sort,
+  customDataFetch,
+  styles,
   value
 }: ResourceSelectProps<TData>) {
   const { apiClient } = useContext(ApiClientContext);
+
+  const dataFetch =
+    customDataFetch || ((...args) => apiClient.get<TData[]>(...args));
 
   async function loadOptions(
     inputValue: string,
@@ -69,7 +85,7 @@ export function ResourceSelect<TData extends KitsuResource>({
     );
 
     // Send the API request.
-    const { data } = await apiClient.get<TData[]>(model, getParams);
+    const { data } = await dataFetch(model, getParams);
 
     // Build the list of options from the returned resources.
     const resourceOptions = data.map(resource => ({
@@ -88,12 +104,12 @@ export function ResourceSelect<TData extends KitsuResource>({
   }
 
   function onChangeInternal(selectedOption) {
-    if (selectedOption.resource) {
+    if (selectedOption?.resource) {
       // Handle single select:
       onChange(selectedOption.resource);
     } else {
       // Handle multi select:
-      const resources = selectedOption.map(o => o.resource);
+      const resources = selectedOption?.map(o => o.resource) || [];
       onChange(resources);
     }
   }
@@ -132,6 +148,10 @@ export function ResourceSelect<TData extends KitsuResource>({
       loadOptions={debouncedOptionLoader}
       onChange={onChangeInternal}
       placeholder="Type here to search."
+      styles={{
+        menu: () => ({ zIndex: 1000 }),
+        ...styles
+      }}
       value={selectValue}
     />
   );

@@ -1,4 +1,4 @@
-import { Field, FieldProps } from "formik";
+import { FastField, FieldProps } from "formik";
 import NumberFormat from "react-number-format";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
@@ -8,7 +8,7 @@ export function NumberField(props: LabelWrapperParams) {
 
   return (
     <FieldWrapper {...props}>
-      <Field name={name}>
+      <FastField name={name}>
         {({
           field: { value },
           form: { setFieldValue, setFieldTouched }
@@ -29,7 +29,7 @@ export function NumberField(props: LabelWrapperParams) {
             />
           );
         }}
-      </Field>
+      </FastField>
     </FieldWrapper>
   );
 }

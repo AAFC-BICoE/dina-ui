@@ -1,9 +1,9 @@
-import { FieldView, LoadingSpinner, Query } from "common-ui";
+import { FieldView, LoadingSpinner, useQuery } from "common-ui";
 import { Formik } from "formik";
 import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
-import { WithRouterProps } from "next/dist/client/with-router";
-import { withRouter } from "next/router";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
   BackToListButton,
@@ -17,93 +17,118 @@ import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { Chain } from "../../types/seqdb-api/resources/workflow/Chain";
 import { ChainStepTemplate } from "../../types/seqdb-api/resources/workflow/ChainStepTemplate";
 
-export function WorkflowDetailsPage({ router }: WithRouterProps) {
-  const { id } = router.query;
+export default function WorkflowViewPage() {
+  const {
+    query: { id }
+  } = useRouter();
   const { formatMessage } = useSeqdbIntl();
 
+  const { loading, response } = useQuery<Chain>({
+    include: "group,chainTemplate",
+    path: `chain/${id}`
+  });
+
   return (
-    <div>
-      <Head title={formatMessage("workflowViewTitle")} />
+    <>
+      <Head
+        title={`${formatMessage("workflowViewTitle")}${
+          response ? `: ${response.data.name}` : ""
+        }`}
+      />
       <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="workflow" />
         <BackToListButton entityLink="workflow" />
       </ButtonBar>
-      <Query<Chain>
-        query={{ include: "group,chainTemplate", path: `chain/${id}` }}
-      >
-        {({ loading, response }) => (
-          <div className="container-fluid">
-            <h1>
-              {formatMessage("workflowViewTitle")}
-              {response && `: ${response.data.name}`}
-            </h1>
-            <LoadingSpinner loading={loading} />
-            {response && <WorkflowSteps chain={response.data} />}
-          </div>
-        )}
-      </Query>
-    </div>
+      <div className="container-fluid">
+        <Link href="/workflow/list">
+          <a>NGS Workflow list</a>
+        </Link>
+        <h1>
+          {formatMessage("workflowViewTitle")}
+          {response && `: ${response.data.name}`}
+        </h1>
+        <LoadingSpinner loading={loading} />
+        {response && <WorkflowSteps chain={response.data} />}
+      </div>
+    </>
   );
 }
 
 function WorkflowSteps({ chain }: { chain: PersistedResource<Chain> }) {
-  return (
-    <Query<ChainStepTemplate[]>
-      query={{
-        filter: { "chainTemplate.id": chain.chainTemplate.id },
-        include: "stepTemplate",
-        path: "chainStepTemplate"
-      }}
-    >
-      {({ loading, response }) => {
-        const steps = response ? response.data : [];
+  const { loading, response } = useQuery<ChainStepTemplate[]>({
+    filter: { "chainTemplate.id": chain.chainTemplate.id as string },
+    include: "stepTemplate",
+    path: "chainStepTemplate"
+  });
 
-        return (
-          <>
-            <LoadingSpinner loading={loading} />
-            <Tabs>
-              <TabList>
-                <Tab>
-                  <SeqdbMessage id="workflowDetailsTab" />
-                </Tab>
-                {steps.map(step => (
-                  <Tab key={step.id}>
-                    <SeqdbMessage
-                      id="workflowStepTab"
-                      values={{
-                        name: step.stepTemplate.name,
-                        number: step.stepNumber
-                      }}
-                    />
-                  </Tab>
-                ))}
-              </TabList>
-              <TabPanel>
-                <Formik initialValues={chain} onSubmit={noop}>
-                  <div className="col-md-3">
-                    <FieldView label="Template" name="chainTemplate.name" />
-                    <FieldView label="Group" name="group.groupName" />
-                    <FieldView name="name" />
-                    <FieldView name="dateCreated" />
-                  </div>
-                </Formik>
-              </TabPanel>
+  const router = useRouter();
+  const stepNumber = router.query.step ? Number(router.query.step) : 0;
+
+  function goToStep(newIndex: number) {
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, step: newIndex }
+    });
+  }
+
+  function goToNextStep() {
+    goToStep(stepNumber + 1);
+  }
+
+  const steps = response ? response.data : [];
+
+  return (
+    <>
+      <LoadingSpinner loading={loading} />
+      <Tabs selectedIndex={stepNumber} onSelect={goToStep}>
+        <div className="list-inline">
+          <div className="list-inline-item">
+            <TabList>
+              <Tab>
+                <SeqdbMessage id="workflowDetailsTab" />
+              </Tab>
               {steps.map(step => (
-                <TabPanel key={step.id}>
-                  <StepRenderer
-                    chainStepTemplates={steps}
-                    chain={chain}
-                    step={step}
+                <Tab key={step.id}>
+                  <SeqdbMessage
+                    id="workflowStepTab"
+                    values={{
+                      name: step.stepTemplate.name,
+                      number: step.stepNumber
+                    }}
                   />
-                </TabPanel>
+                </Tab>
               ))}
-            </Tabs>
-          </>
-        );
-      }}
-    </Query>
+            </TabList>
+          </div>
+          <div className="list-inline-item">
+            {stepNumber < steps.length && (
+              <button className="btn btn-primary" onClick={goToNextStep}>
+                Next Step
+              </button>
+            )}
+          </div>
+        </div>
+        <TabPanel>
+          <Formik initialValues={chain} onSubmit={noop}>
+            <div className="col-md-3">
+              <FieldView label="Template" name="chainTemplate.name" />
+              <FieldView label="Group" name="group.groupName" />
+              <FieldView name="name" />
+              <FieldView name="dateCreated" />
+            </div>
+          </Formik>
+        </TabPanel>
+        {steps.map(step => (
+          <TabPanel key={step.id as string}>
+            <StepRenderer
+              chainStepTemplates={steps}
+              chain={chain}
+              step={step}
+            />
+          </TabPanel>
+        ))}
+      </Tabs>
+    </>
   );
 }
-
-export default withRouter(WorkflowDetailsPage);
