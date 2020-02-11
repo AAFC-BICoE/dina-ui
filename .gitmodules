@@ -5,3 +5,7 @@ url = https://github.com/AAFC-BICoE/dina-ui.git
 [submodule "objectstore-api"]
 path = repos/objectstore-api
 url = https://github.com/AAFC-BICoE/object-store-api.git
+
+[submodule "seqdb-api"]
+path = repos/seqdb-api
+url = https://github.com/AAFC-BICoE/seqdb-api.git

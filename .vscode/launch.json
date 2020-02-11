@@ -18,7 +18,7 @@
         "--minio.host=$(docker-machine ip)",
         "--minio.port=9000",
         "--minio.accessKey=minio",
-        "--minio.secretKey=minio123",
+        "--minio.secretKey=minio123"
       ]
     },
     {
@@ -32,11 +32,39 @@
       "type": "node",
       "request": "launch",
       "name": "os-ui",
-      "runtimeExecutable": "${workspaceFolder}/repos/dina-ui/packages/objectstore-ui/node_modules/.bin/next",
+      "program": "${workspaceFolder}/repos/dina-ui/packages/objectstore-ui/dev-server.js",
       "env": { "NODE_OPTIONS": "--inspect" },
       "port": 9229,
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/repos/dina-ui/packages/objectstore-ui",
+      "skipFiles": ["**/node_modules/**/*.js", "<node_internals>/**/*.js"]
+    },
+    // Seqdb launch configs:
+    {
+      "type": "java",
+      "name": "seqdb-api",
+      "request": "launch",
+      "mainClass": "ca.gc.aafc.seqdb.api.SeqdbApiLauncher",
+      "projectName": "seqdb.api",
+      "preLaunchTask": "docker deps",
+      "args": [
+        "--spring.datasource.url=jdbc:postgresql://$(docker-machine ip)/dina?currentSchema=seqdb",
+        "--spring.datasource.username=postgres",
+        "--spring.datasource.password=p",
+        // Don't fail if the DB isn't immediately ready:
+        "--spring.datasource.continue-on-error=true",
+        "--import-sample-accounts=true"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "seqdb-ui",
+      "program": "${workspaceFolder}/repos/dina-ui/packages/seqdb-ui/dev-server.js",
+      "env": { "NODE_OPTIONS": "--inspect" },
+      "port": 9229,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/repos/dina-ui/packages/seqdb-ui",
       "skipFiles": ["**/node_modules/**/*.js", "<node_internals>/**/*.js"]
     }
   ],
@@ -44,6 +72,10 @@
     {
       "name": "os-all",
       "configurations": ["os-api", "os-ui"]
+    },
+    {
+      "name": "seqdb-all",
+      "configurations": ["seqdb-api", "seqdb-ui"]
     }
   ]
 }
