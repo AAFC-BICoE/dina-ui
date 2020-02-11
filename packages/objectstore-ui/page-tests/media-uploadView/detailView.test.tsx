@@ -95,7 +95,7 @@ describe("Metadata detail view page", () => {
     });
   });
 
-  it("Provides a form to show the tags section.", async done => {
+  it("Provides a form to show the tags section.", async () => {
     const wrapper = mountWithAppContext(
       <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />
     );
@@ -116,8 +116,6 @@ describe("Metadata detail view page", () => {
         </strong>
       )
     ).toEqual(true);
-
-    done();
   });
 
   it("Provides a form to show the managed attribute section.", async () => {

@@ -1,14 +1,16 @@
 import { KitsuResource } from "kitsu";
 import { Agent } from "./Agent";
-import { MetaManagedAttribute } from "./MetaManagedAttribute";
+import { ManagedAttributeMap } from "./ManagedAttributeMap";
 
 export interface MetadataAttributes {
   type: "metadata";
   bucket: string;
-  uuid: string;
   fileIdentifier: string;
   fileExtension: string;
-  dcType: DcType;
+  dcType: "Image" | "Moving Image" | "Sound" | "Text";
+  xmpRightsWebStatement?: string;
+  ac_rights?: string;
+
   // optional fields
   dcFormat?: string;
   acDigitizationDate?: string;
@@ -19,16 +21,12 @@ export interface MetadataAttributes {
   acHashFunction?: string;
   acHashValue?: string;
 }
-export enum DcType {
-  IMAGE = "Image",
-  MOVING_IMAGE = "Moving Image",
-  SOUND = "Sound",
-  TEXT = "Text"
-}
 
 export interface MetadataRelationships {
-  acMetadataCreator?: Agent;
-  managedAttribute?: MetaManagedAttribute;
+  acMetadataCreator?: Agent | null;
+  managedAttributeMap?: ManagedAttributeMap | null;
 }
 
-export type Metadata = KitsuResource & MetadataAttributes;
+export type Metadata = KitsuResource &
+  MetadataAttributes &
+  MetadataRelationships;

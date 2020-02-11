@@ -1,4 +1,4 @@
-import { Field, FieldProps } from "formik";
+import { FastField, FieldProps } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { noop } from "lodash";
 import {
@@ -17,19 +17,16 @@ export interface ResourceSelectFieldProps<TData extends KitsuResource>
 
 /** Formik-connected Dropdown select input for selecting a resource from the API. */
 export function ResourceSelectField<TData extends KitsuResource>(
-  topLevelProps: ResourceSelectFieldProps<TData>
+  resourceSelectFieldProps: ResourceSelectFieldProps<TData>
 ) {
   const {
-    className,
     name,
-    label,
     onChange = noop,
-    tooltipMsg,
-    hideLabel
-  } = topLevelProps;
+    ...resourceSelectProps
+  } = resourceSelectFieldProps;
 
   return (
-    <Field name={name}>
+    <FastField name={name}>
       {({
         field: { value },
         form: { setFieldValue, setFieldTouched }
@@ -41,21 +38,15 @@ export function ResourceSelectField<TData extends KitsuResource>(
         }
 
         return (
-          <FieldWrapper
-            className={className}
-            name={name}
-            label={label}
-            tooltipMsg={tooltipMsg}
-            hideLabel={hideLabel}
-          >
+          <FieldWrapper {...resourceSelectFieldProps}>
             <ResourceSelect
-              {...topLevelProps}
+              {...resourceSelectProps}
               onChange={onChangeInternal}
               value={value}
             />
           </FieldWrapper>
         );
       }}
-    </Field>
+    </FastField>
   );
 }

@@ -1,0 +1,32 @@
+{
+"standard": "WCAG2AAA",
+  "level": "error",
+  "defaults": {
+    "timeout": 15000,
+    "threshold": 2
+  },
+  "ignore": [
+    "     WCAG2AA.Principle1.Guideline1_4.1_4_3.G18.Fail"
+  ],
+  "urls": [
+      "http://localhost:8000/pcr-primer/list",
+      "http://localhost:8000/pcr-primer/edit",
+      "http://localhost:8000/pcr-primer/view",
+      "http://localhost:8000/pcr-profile/list",
+      "http://localhost:8000/pcr-profile/edit",
+      "http://localhost:8000/pcr-profile/view",
+      "http://localhost:8000/product/list",
+      "http://localhost:8000/product/edit",
+      "http://localhost:8000/product/view",
+      "http://localhost:8000/protocol/list",
+      "http://localhost:8000/protocol/edit",
+      "http://localhost:8000/protocol/view",    
+      "http://localhost:8000/region/list",
+      "http://localhost:8000/region/edit",
+      "http://localhost:8000/region/view",
+      "http://localhost:8000/workflow/list",
+      "http://localhost:8000/workflow/edit",
+      "http://localhost:8000/workflow/view"        
+]
+ 
+}

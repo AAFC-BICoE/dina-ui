@@ -1,7 +1,8 @@
 import { FieldView, LoadingSpinner, Query } from "common-ui";
 import { Formik } from "formik";
 import { noop } from "lodash";
-import withRouter, { WithRouterProps } from "next/dist/client/with-router";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { withRouter } from "next/router";
 import {
   BackToListButton,
   ButtonBar,

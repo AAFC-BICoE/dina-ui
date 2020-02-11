@@ -1,12 +1,7 @@
 import { FieldsParam, FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import React, { useRef, useState } from "react";
 import { useIntl } from "react-intl";
-import ReactTable, {
-  Column,
-  PageSizeChangeFunction,
-  SortedChangeFunction,
-  SortingRule
-} from "react-table";
+import ReactTable, { Column, SortingRule, TableProps } from "react-table";
 import titleCase from "title-case";
 import {
   JsonApiQuerySpec,
@@ -14,6 +9,7 @@ import {
   MetaWithTotal,
   useQuery
 } from "..";
+import { QueryState } from "../api-client/useQuery";
 import { CommonMessage } from "../intl/common-ui-intl";
 
 /** Object types accepted as a column definition. */
@@ -21,6 +17,9 @@ export type ColumnDefinition<TData> = string | Column<TData>;
 
 /** QueryTable component's props. */
 export interface QueryTableProps<TData extends KitsuResource> {
+  /** Dependencies: When the values in this array are changed, re-fetch the data. */
+  deps?: any[];
+
   /** JSONAPI resource path. */
   path: string;
 
@@ -45,14 +44,16 @@ export interface QueryTableProps<TData extends KitsuResource> {
   /** Overrides the inner loading state if set to true. */
   loading?: boolean;
 
-  /** Called when a new page size is requested. */
-  onPageSizeChange?: PageSizeChangeFunction;
-
-  /** Called when a new sort is specified. */
-  onSortedChange?: SortedChangeFunction;
-
   /** Query success callback. */
   onSuccess?: (response: KitsuResponse<TData[], MetaWithTotal>) => void;
+
+  /**
+   * Override internal react-table props.
+   * Pass in either the props or a function that provides the props.
+   */
+  reactTableProps?:
+    | Partial<TableProps>
+    | ((queryState: QueryState<TData[], MetaWithTotal>) => Partial<TableProps>);
 }
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -83,14 +84,14 @@ export function QueryTable<TData extends KitsuResource>({
   columns,
   defaultPageSize = DEFAULT_PAGE_SIZE,
   defaultSort = [],
+  deps,
   fields,
   filter,
   include,
   loading: loadingProp,
-  onPageSizeChange,
-  onSortedChange,
   onSuccess,
-  path
+  path,
+  reactTableProps
 }: QueryTableProps<TData>) {
   const { formatMessage, messages } = useIntl();
 
@@ -166,18 +167,23 @@ export function QueryTable<TData extends KitsuResource>({
     }
   });
 
-  const { error, loading: queryIsLoading, response } = useQuery<
-    TData[],
-    MetaWithTotal
-  >(query, {
+  const queryState = useQuery<TData[], MetaWithTotal>(query, {
+    deps,
     onSuccess
   });
+
+  const { error, loading: queryIsLoading, response } = queryState;
 
   const totalCount = response?.meta?.totalResourceCount;
 
   const numberOfPages = totalCount
     ? Math.ceil(totalCount / page.limit)
     : undefined;
+
+  const resolvedReactTableProps =
+    typeof reactTableProps === "function"
+      ? reactTableProps(queryState)
+      : reactTableProps;
 
   return (
     <div className="query-table-wrapper" ref={divWrapperRef}>
@@ -195,6 +201,14 @@ export function QueryTable<TData extends KitsuResource>({
         <CommonMessage id="tableTotalCount" values={{ totalCount }} />
       </span>
       <ReactTable
+        FilterComponent={({ filter: headerFilter, onChange }) => (
+          <input
+            className="w-100"
+            placeholder="Search..."
+            value={headerFilter ? headerFilter.value : ""}
+            onChange={event => onChange(event.target.value)}
+          />
+        )}
         className="-striped"
         columns={mappedColumns}
         data={response && response.data}
@@ -202,12 +216,12 @@ export function QueryTable<TData extends KitsuResource>({
         defaultSorted={sortingRules}
         loading={loadingProp || queryIsLoading}
         manual={true}
+        minRows={1}
         onFetchData={onFetchData}
-        onPageSizeChange={onPageSizeChange}
-        onSortedChange={onSortedChange}
         pageSizeOptions={[25, 50, 100, 200, 500]}
         pages={numberOfPages}
         showPaginationTop={true}
+        {...resolvedReactTableProps}
       />
     </div>
   );

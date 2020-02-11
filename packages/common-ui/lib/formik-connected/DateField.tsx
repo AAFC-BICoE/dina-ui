@@ -1,4 +1,4 @@
-import { Field, FieldProps } from "formik";
+import { FastField, FieldProps } from "formik";
 import DatePicker from "react-datepicker";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
@@ -12,7 +12,7 @@ export function DateField(props: LabelWrapperParams & DateFieldProps) {
 
   return (
     <FieldWrapper {...props}>
-      <Field name={name}>
+      <FastField name={name}>
         {({
           field: { value },
           form: { setFieldValue, setFieldTouched }
@@ -27,25 +27,27 @@ export function DateField(props: LabelWrapperParams & DateFieldProps) {
           }
 
           return (
-            <DatePicker
-              className="form-control"
-              isClearable={true}
-              onChange={onChange}
-              selected={
-                value
-                  ? showTime
-                    ? new Date(`${value}`)
-                    : new Date(`${value}T12:00:00Z`)
-                  : null
-              }
-              showYearDropdown={true}
-              todayButton="Today"
-              showTimeSelect={showTime}
-              dateFormat={showTime ? "Pp" : "yyyy-MM-dd"}
-            />
+            <div>
+              <DatePicker
+                className="form-control"
+                dateFormat={showTime ? "Pp" : "yyyy-MM-dd"}
+                isClearable={true}
+                onChange={onChange}
+                selected={
+                  value
+                    ? showTime
+                      ? new Date(`${value}`)
+                      : new Date(`${value}T12:00:00Z`)
+                    : null
+                }
+                showTimeSelect={showTime}
+                showYearDropdown={true}
+                todayButton="Today"
+              />
+            </div>
           );
         }}
-      </Field>
+      </FastField>
     </FieldWrapper>
   );
 }

@@ -1,19 +1,20 @@
 import {
   ColumnDefinition,
+  ErrorViewer,
   filterBy,
-  LoadingSpinner,
+  FilterForm,
+  FormikButton,
   QueryTable,
   ResourceSelectField,
+  rsql,
   useGroupedCheckBoxes
 } from "common-ui";
-import { connect, Formik } from "formik";
+import { Formik } from "formik";
 import { FilterParam } from "kitsu";
 import { noop } from "lodash";
 import { useState } from "react";
-import { FilterForm } from "../..";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { Group, StepResource } from "../../../types/seqdb-api";
-import { rsql } from "../../filter-builder/rsql";
 import { StepRendererProps } from "../StepRenderer";
 import { useSelectionControls } from "./useSelectionControls";
 
@@ -24,8 +25,7 @@ export function SampleSelection(props: StepRendererProps) {
 
   const {
     deleteAllCheckedStepResources,
-    loading,
-    randomNumber,
+    lastSave,
     deleteStepResources,
     selectAllCheckedSamples,
     selectSamples
@@ -61,12 +61,12 @@ export function SampleSelection(props: StepRendererProps) {
     "name",
     "version",
     {
-      Cell: connect(({ formik, original: sample }) => (
+      Cell: ({ original: sample }) => (
         <div className="row" key={sample.id}>
-          <button
+          <FormikButton
             className="btn btn-primary btn-sm col-6 single-select-button"
-            onClick={() => {
-              selectSamples([sample]);
+            onClick={async (_, formik) => {
+              await selectSamples([sample]);
               formik.setFieldValue(
                 `sampleIdsToSelect[${sample.id}]`,
                 undefined
@@ -74,12 +74,12 @@ export function SampleSelection(props: StepRendererProps) {
             }}
           >
             <SeqdbMessage id="selectButtonText" />
-          </button>
+          </FormikButton>
           <div className="col-6">
             <SampleSelectCheckBox resource={sample} />
           </div>
         </div>
-      )),
+      ),
       Header: SampleSelectCheckBoxHeader,
       sortable: false
     }
@@ -99,12 +99,12 @@ export function SampleSelection(props: StepRendererProps) {
       accessor: "sample.version"
     },
     {
-      Cell: connect(({ formik, original: sr }) => (
+      Cell: ({ original: sr }) => (
         <div className="row" key={sr.id}>
-          <button
+          <FormikButton
             className="btn btn-dark btn-sm col-6 single-deselect-button"
-            onClick={() => {
-              deleteStepResources([sr]);
+            onClick={async (_, formik) => {
+              await deleteStepResources([sr]);
               formik.setFieldValue(
                 `stepResourceIdsToDelete[${sr.id}]`,
                 undefined
@@ -112,12 +112,12 @@ export function SampleSelection(props: StepRendererProps) {
             }}
           >
             <SeqdbMessage id="deselectButtonText" />
-          </button>
+          </FormikButton>
           <div className="col-6">
             <SampleDeselectCheckBox resource={sr} />
           </div>
         </div>
-      )),
+      ),
       Header: SampleDeselectCheckBoxHeader,
       sortable: false
     }
@@ -169,73 +169,66 @@ export function SampleSelection(props: StepRendererProps) {
           </div>
         )}
       </FilterForm>
-      <div className="row form-group">
-        <Formik
-          initialValues={{ sampleIdsToSelect: {}, stepResourcesToDelete: {} }}
-          onSubmit={noop}
-        >
-          {formikProps => (
-            <>
-              <div className="col-5 available-samples">
-                <strong>
-                  <SeqdbMessage id="availableSamplesTitle" />
-                </strong>
-                <QueryTable
-                  columns={SELECTABLE_SAMPLE_COLUMNS}
-                  defaultPageSize={100}
-                  filter={filter}
-                  include="group"
-                  onSuccess={response => setAvailableSamples(response.data)}
-                  path="sample"
-                />
+      <Formik
+        initialValues={{ sampleIdsToSelect: {}, stepResourcesToDelete: {} }}
+        onSubmit={noop}
+      >
+        <div className="form-group">
+          <ErrorViewer />
+          <div className="row">
+            <div className="col-5 available-samples">
+              <strong>
+                <SeqdbMessage id="availableSamplesTitle" />
+              </strong>
+              <QueryTable
+                columns={SELECTABLE_SAMPLE_COLUMNS}
+                defaultPageSize={100}
+                filter={filter}
+                include="group"
+                onSuccess={response => setAvailableSamples(response.data)}
+                path="sample"
+              />
+            </div>
+            <div className="col-2" style={{ marginTop: "100px" }}>
+              <div className="row">
+                <div className="col-6">
+                  <FormikButton
+                    className="btn btn-primary select-all-checked-button"
+                    onClick={selectAllCheckedSamples}
+                  >
+                    <SeqdbMessage id="selectAllCheckedSamplesButtonText" />
+                  </FormikButton>
+                </div>
+                <div className="col-6">
+                  <FormikButton
+                    className="btn btn-dark deselect-all-checked-button"
+                    onClick={deleteAllCheckedStepResources}
+                  >
+                    <SeqdbMessage id="deselectAllCheckedSamplesButtonText" />
+                  </FormikButton>
+                </div>
               </div>
-              <div className="col-2" style={{ marginTop: "100px" }}>
-                {loading ? (
-                  <LoadingSpinner loading={loading} />
-                ) : (
-                  <div className="row">
-                    <div className="col-6">
-                      <button
-                        className="btn btn-primary select-all-checked-button"
-                        onClick={() => selectAllCheckedSamples(formikProps)}
-                      >
-                        <SeqdbMessage id="selectAllCheckedSamplesButtonText" />
-                      </button>
-                    </div>
-                    <div className="col-6">
-                      <button
-                        className="btn btn-dark deselect-all-checked-button"
-                        onClick={() =>
-                          deleteAllCheckedStepResources(formikProps)
-                        }
-                      >
-                        <SeqdbMessage id="deselectAllCheckedSamplesButtonText" />
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="col-5 selected-samples">
-                <strong>
-                  <SeqdbMessage id="selectedSamplesTitle" />
-                </strong>
-                <QueryTable<StepResource>
-                  columns={SELECTED_SAMPLE_COLUMNS}
-                  defaultPageSize={100}
-                  filter={{
-                    "chain.chainId": chain.id,
-                    "chainStepTemplate.chainStepTemplateId": step.id,
-                    rsql: `sample.name!=${randomNumber}`
-                  }}
-                  include="sample,sample.group"
-                  onSuccess={res => setStepResources(res.data)}
-                  path="stepResource"
-                />
-              </div>
-            </>
-          )}
-        </Formik>
-      </div>
+            </div>
+            <div className="col-5 selected-samples">
+              <strong>
+                <SeqdbMessage id="selectedSamplesTitle" />
+              </strong>
+              <QueryTable<StepResource>
+                columns={SELECTED_SAMPLE_COLUMNS}
+                defaultPageSize={100}
+                deps={[lastSave]}
+                filter={{
+                  "chain.chainId": chain.id,
+                  "chainStepTemplate.chainStepTemplateId": step.id
+                }}
+                include="sample,sample.group"
+                onSuccess={res => setStepResources(res.data)}
+                path="stepResource"
+              />
+            </div>
+          </div>
+        </div>
+      </Formik>
     </>
   );
 }

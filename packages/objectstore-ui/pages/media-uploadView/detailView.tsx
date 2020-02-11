@@ -1,8 +1,8 @@
 import { ApiClientContext, LoadingSpinner, Query } from "common-ui";
 import { GetParams } from "kitsu";
 import { omitBy } from "lodash";
-import withRouter, { WithRouterProps } from "next/dist/client/with-router";
-import Link from "next/link";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { withRouter } from "next/router";
 import { useCallback, useContext } from "react";
 import { useAsyncRun, useAsyncTask } from "react-hooks-async";
 import { FileDownLoadResponseAttributes } from "types/objectstore-api/resources/FileDownLoadResponse";
@@ -20,7 +20,7 @@ import ViewTagsForm from "../../page-fragments/viewTags";
 interface DownloadFileResponse {
   error?: string;
   loading?: boolean;
-  imgResponse: FileDownLoadResponseAttributes;
+  imgResponse: FileDownLoadResponseAttributes | null;
 }
 function useImageQuery(id: string): DownloadFileResponse {
   const { apiClient } = useContext(ApiClientContext);
