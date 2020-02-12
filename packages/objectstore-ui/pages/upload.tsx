@@ -97,7 +97,7 @@ export default function UploadPage() {
 
       // Upload the file:
       const response = await apiClient.axios.post(
-        `/v1/file/${BUCKET_NAME}`,
+        `/file/${BUCKET_NAME}`,
         formData
       );
       uploadResponses.push(response.data);
