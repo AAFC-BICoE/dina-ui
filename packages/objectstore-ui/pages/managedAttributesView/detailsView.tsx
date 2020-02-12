@@ -13,6 +13,7 @@ import { Field, FieldProps, Form, Formik, FormikActions } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext, useState } from "react";
+import { isNullOrUndefined } from "util";
 import { Head, Nav } from "../../components";
 import { ObjectStoreMessage } from "../../intl/objectstore-intl";
 import { ManagedAttribute } from "../../types/objectstore-api/resources/ManagedAttribute";
@@ -48,7 +49,7 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
         {id ? (
           <div>
             <h1>
-              <ObjectStoreMessage id="managedAttributesEditTitle" />
+              <ObjectStoreMessage id="managedAttributeEditTitle" />
             </h1>
             <Query<ManagedAttribute>
               query={{
@@ -83,7 +84,7 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
 }
 
 function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
-  const { doOperations } = useContext(ApiClientContext);
+  const { save, doOperations } = useContext(ApiClientContext);
   const [type, setType] = useState(
     profile ? profile.managedAttributeType : undefined
   );
@@ -93,58 +94,32 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
     submittedValues,
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
-    const managedAttributeValues = {
-      acceptedValues: submittedValues.acceptedValues
-        ? submittedValues.acceptedValues
-        : null,
-      managedAttributeType: submittedValues.managedAttributeType,
-      name: submittedValues.name
-    };
-
     try {
-      if (profile) {
-        const response = await doOperations([
-          {
-            op: "PATCH",
-            path: `managed-attribute/${profile.id}`,
-            value: {
-              attributes: {
-                acceptedValues: managedAttributeValues.acceptedValues,
-                managedAttributeType:
-                  managedAttributeValues.managedAttributeType,
-                name: managedAttributeValues.name
-              },
-              type: "managed-attribute"
-            }
-          }
-        ]);
-        router.push(`/managedAttributesView/listView`);
-      } else {
-        // Single hard-coded value used a filler for ID until proper
-        // UUID genereation is implemented
-        const newId = "bd628e6c-e46d-4cd7-b272-75454d522d53";
+      const response = await save([
+        {
+          resource: submittedValues,
+          type: "managed-attribute"
+        }
+      ]);
 
-        const response = await doOperations([
-          {
-            op: "POST",
-            path: "managed-attribute",
-            value: {
-              attributes: {
-                acceptedValues: managedAttributeValues.acceptedValues,
-                managedAttributeType:
-                  managedAttributeValues.managedAttributeType,
-                name: managedAttributeValues.name
-              },
-              id: newId,
-              type: "managed-attribute"
-            }
-          }
-        ]);
-        router.push(`/managedAttributesView/detailsView?id=${newId}`);
-      }
+      const newId = response[0].id;
+      router.push(`/managedAttributesView/detailsView?id=${newId}`);
+      setSubmitting(false);
     } catch (error) {
       setStatus(error.message);
       setSubmitting(false);
+    }
+  }
+
+  async function onDeleteClick() {
+    if (!isNullOrUndefined(profile)) {
+      await doOperations([
+        {
+          op: "DELETE",
+          path: `managed-attribute/${profile.id}`
+        }
+      ]);
+      router.push(`/managedAttributesView/listView`);
     }
   }
 
@@ -153,6 +128,15 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       <Form>
         <ErrorViewer />
         <SubmitButton />
+        {profile && (
+          <button
+            className="btn btn-danger"
+            type="button"
+            onClick={onDeleteClick}
+          >
+            <ObjectStoreMessage id="deleteButtonText" />
+          </button>
+        )}
         <a href="/managedAttributesView/listView">
           <button className="btn btn-primary" type="button">
             <ObjectStoreMessage id="cancelButtonText" />
