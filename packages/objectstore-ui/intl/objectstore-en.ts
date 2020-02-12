@@ -10,6 +10,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
   closePreviewButtonText: "Close Preview",
+  deleteButtonText: "Delete",
   editSelectedButtonText: "Edit Selected",
   field_acDigitizationDate: "Date Original Version Created",
   field_acTags: "Tags",

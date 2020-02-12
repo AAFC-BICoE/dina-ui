@@ -1,4 +1,5 @@
 import { ColumnDefinition, QueryTable } from "common-ui";
+import Link from "next/link";
 import { useCookies } from "react-cookie";
 import { CookieSetOptions } from "universal-cookie";
 import { Head, Nav } from "../../components";
@@ -7,14 +8,29 @@ import { ManagedAttribute } from "../../types/objectstore-api/resources/ManagedA
 
 const ATTRIBUTES_LIST_COLUMNS: Array<ColumnDefinition<ManagedAttribute>> = [
   {
+    Cell: ({ original: { id, name } }) => (
+      <Link href={`/managedAttributesView/detailsView?id=${id}`}>
+        <a>{name}</a>
+      </Link>
+    ),
     Header: "Name",
     accessor: "name"
   },
   {
+    Cell: ({ original: { id, managedAttributeType } }) => (
+      <Link href={`/managedAttributesView/detailsView?id=${id}`}>
+        <a>{managedAttributeType}</a>
+      </Link>
+    ),
     Header: "Type",
     accessor: "managedAttributeType"
   },
   {
+    Cell: ({ original: { id, acceptedValues } }) => (
+      <Link href={`/managedAttributesView/detailsView?id=${id}`}>
+        <a>{acceptedValues}</a>
+      </Link>
+    ),
     Header: "Accepted Values",
     accessor: "acceptedValues"
   }
@@ -57,12 +73,13 @@ export default function ManagedAttributesListPage() {
           path={"managed-attribute"}
           defaultPageSize={defaultPageSize}
           defaultSort={defaultSort}
-          onPageSizeChange={newSize =>
-            setCookie(TABLE_PAGE_SIZE_COOKIE, newSize, COOKIE_OPTIONS)
-          }
-          onSortedChange={newSort =>
-            setCookie(TABLE_SORT_COOKIE, newSort, COOKIE_OPTIONS)
-          }
+          reactTableProps={{
+            onPageSizeChange: newSize =>
+              setCookie(TABLE_PAGE_SIZE_COOKIE, newSize, COOKIE_OPTIONS),
+            onSortedChange: newSort =>
+              setCookie(TABLE_SORT_COOKIE, newSort, COOKIE_OPTIONS),
+            showPagination: false
+          }}
         />
       </div>
     </div>
