@@ -30,6 +30,9 @@ export interface ApiClientContextI {
 
 /** Config for creating an API client context value. */
 export interface ApiClientContextConfig {
+  /** Back-end API base URL. */
+  baseURL?: string;
+
   /**
    * Temp ID iterator.
    * This is not persisted on the back-end as the actual database ID.
@@ -57,13 +60,14 @@ export const ApiClientContext = React.createContext<ApiClientContextI>(
  * once to initialize the context.
  */
 export function createContextValue({
+  baseURL = "/api",
   getTempIdGenerator = () => {
     let idIterator = -100;
     return () => String(idIterator--);
   }
 }: ApiClientContextConfig = {}): ApiClientContextI {
   const apiClient = new Kitsu({
-    baseURL: "/api",
+    baseURL,
     headers: { "Crnk-Compact": "true" },
     pluralize: false,
     resourceCase: "none"

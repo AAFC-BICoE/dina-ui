@@ -53,3 +53,7 @@ include::intl.adoc[]
 :leveloffset: 2
 
 include::WCAG_compliance_test_tools_setup.adoc[]
+
+:leveloffset: 1
+
+include::WCAG_automation.adoc[]
