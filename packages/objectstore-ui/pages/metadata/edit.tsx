@@ -51,7 +51,14 @@ export default function EditMetadatasPage() {
     },
     {
       data: "metadata.dcType",
-      source: ["Image", "Moving Image", "Sound", "Text"],
+      source: [
+        "Image",
+        "Moving Image",
+        "Sound",
+        "Text",
+        "Dataset",
+        "Undetermined"
+      ],
       title: formatMessage("metadataObjectTypeLabel"),
       type: "dropdown"
     },

@@ -7,7 +7,13 @@ export interface MetadataAttributes {
   bucket: string;
   fileIdentifier: string;
   fileExtension: string;
-  dcType: "Image" | "Moving Image" | "Sound" | "Text";
+  dcType:
+    | "Image"
+    | "Moving Image"
+    | "Sound"
+    | "Text"
+    | "Dataset"
+    | "Undetermined";
   xmpRightsWebStatement?: string;
   ac_rights?: string;
 
