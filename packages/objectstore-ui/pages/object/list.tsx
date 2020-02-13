@@ -74,6 +74,10 @@ export default function MetadataListPage() {
     "xmpRightsWebStatement",
     "dcRights",
     {
+      Header: formatMessage("metadataAgentLabel"),
+      accessor: "acMetadataCreator.displayName"
+    },
+    {
       Cell: ({ original: { acTags } }) => acTags?.join(", "),
       accessor: "acTags"
     },

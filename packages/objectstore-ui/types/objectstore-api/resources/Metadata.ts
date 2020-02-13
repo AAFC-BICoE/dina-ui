@@ -17,6 +17,7 @@ export interface MetadataAttributes {
   xmpMetadataDate?: string;
   acTags?: string[];
   originalFilename?: string;
+  publiclyReleasable?: boolean;
 
   acHashFunction?: string;
   acHashValue?: string;

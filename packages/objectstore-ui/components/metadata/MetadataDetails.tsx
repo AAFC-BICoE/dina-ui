@@ -12,6 +12,30 @@ export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
 }
 
+const FIELD_GROUP_ATTRIBUTESS = [
+  {
+    fields: ["xmpMetadataDate", "acMetadataCreator.displayName"],
+    title: "Upload Metadata"
+  },
+  {
+    fields: [
+      "originalFilename",
+      "acDigitizationDate",
+      "fileIdentifier",
+      "fileExtension",
+      "dcType",
+      "dcFormat",
+      "acHashFunction",
+      "acHashValue"
+    ],
+    title: "Media"
+  },
+  {
+    fields: ["dcRights", "xmpRightsWebStatement", "publiclyReleasable"],
+    title: "Rights"
+  }
+];
+
 /**
  * Shows the attribute details of a Metadata. Does not include the image or thumbnail.
  * Tha ManagedAttributeMap must b included with the passed Metadata.
@@ -19,9 +43,10 @@ export interface MetadataDetailsProps {
 export function MetadataDetails({ metadata }: MetadataDetailsProps) {
   const { formatMessage, messages } = useObjectStoreIntl();
 
-  const builtInAttributeValues = toPairs(metadata)
-    .map(([name, value]) => ({ name, value }))
-    .filter(p => !isObject(p.value));
+  const fieldGroups = FIELD_GROUP_ATTRIBUTESS.map(({ fields, title }) => ({
+    data: fields.map(name => ({ name, value: metadata[name] })),
+    title
+  }));
 
   const managedAttributeValues = metadata.managedAttributeMap
     ? toPairs(metadata.managedAttributeMap.values).map(ma => ma[1])
@@ -29,35 +54,36 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
 
   return (
     <div>
-      <div className="form-group">
-        <h4>
-          <ObjectStoreMessage id="metadataBuiltInAttributesLabel" />
-        </h4>
-        <ReactTable
-          className="-striped"
-          columns={[
-            {
-              Cell: ({ original: { name } }) => {
-                const messageKey = `field_${name}`;
-                const value = messages[messageKey]
-                  ? formatMessage(messageKey as any)
-                  : titleCase(name);
+      {fieldGroups.map(fieldGroup => (
+        <div className="form-group">
+          <h4>{fieldGroup.title}</h4>
+          <ReactTable
+            className="-striped"
+            columns={[
+              {
+                Cell: ({ original: { name } }) => {
+                  const messageKey = `field_${name}`;
+                  const value = messages[messageKey]
+                    ? formatMessage(messageKey as any)
+                    : titleCase(name);
 
-                return <strong>{value}</strong>;
+                  return <strong>{value}</strong>;
+                },
+                Header: <ObjectStoreMessage id="attributeLabel" />,
+                accessor: "name"
               },
-              Header: <ObjectStoreMessage id="attributeLabel" />,
-              accessor: "name"
-            },
-            {
-              Header: <ObjectStoreMessage id="managedAttributeValueLabel" />,
-              accessor: "value"
-            }
-          ]}
-          data={builtInAttributeValues}
-          pageSize={builtInAttributeValues.length || 1}
-          showPagination={false}
-        />
-      </div>
+              {
+                Cell: ({ original: { value } }) => String(value ?? ""),
+                Header: <ObjectStoreMessage id="managedAttributeValueLabel" />,
+                accessor: "value"
+              }
+            ]}
+            data={fieldGroup.data}
+            pageSize={fieldGroup.data.length || 1}
+            showPagination={false}
+          />
+        </div>
+      ))}
       <div className="form-group">
         <h4>
           <ObjectStoreMessage id="metadataManagedAttributesLabel" />
