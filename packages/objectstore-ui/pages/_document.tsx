@@ -105,8 +105,8 @@ class DinaDocument extends Document {
             <![endif]-->
               
             <script src="https://wet-boew.github.io/themes-dist/GCWeb/js/theme.min.js"></script>
-            <script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/cdts/compiled/soyutils.js"></script>
-            <script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/cdts/compiled/wet-en.js"></script>
+            <script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/soyutils.js"></script>
+		        <script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/wet-en.js"></script>
 
             <noscript>
               <!-- Write closure fall-back static file -->
@@ -135,7 +135,7 @@ class DinaDocument extends Document {
                       "environment" : "staging",
                       "version" : 1
                     }],
-                    "isApplication":true                    
+                    "isApplication":true
                   }));                  
 
                 var defPreFooter = document.getElementById("def-preFooter");
