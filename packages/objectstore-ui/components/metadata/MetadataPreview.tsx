@@ -20,7 +20,8 @@ const METADATA_PREVIEW_STYLE = `
  */
 export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
   const { loading, response } = useQuery<Metadata>({
-    path: `metadata/${metadataId}?include=managedAttributeMap`
+    include: "acMetadataCreator,managedAttributeMap",
+    path: `metadata/${metadataId}`
   });
 
   if (loading) {

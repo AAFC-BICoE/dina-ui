@@ -20,7 +20,8 @@ export default function MetadataViewPage() {
   const { id } = router.query;
 
   const { loading, response } = useQuery<Metadata>({
-    path: `metadata/${id}?include=managedAttributeMap`
+    include: "acMetadataCreator,managedAttributeMap",
+    path: `metadata/${id}`
   });
 
   if (loading) {
@@ -47,7 +48,7 @@ export default function MetadataViewPage() {
             </div>
             <div className="col-md-8">
               <div className="container">
-                <div>
+                <div className="form-group">
                   <Link href={`/metadata/edit?ids=${id}`}>
                     <a className="btn btn-primary">
                       <ObjectStoreMessage id="editButtonText" />

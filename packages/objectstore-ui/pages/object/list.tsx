@@ -53,7 +53,13 @@ export default function MetadataListPage() {
     ? [8, 4]
     : [12, 0];
 
-  const METADATA_FILTER_ATTRIBUTES = ["originalFilename"];
+  const METADATA_FILTER_ATTRIBUTES = [
+    "originalFilename",
+    "dcFormat",
+    "xmpRightsWebStatement",
+    "dcRights",
+    "acMetadataCreator.displayName"
+  ];
 
   const METADATA_TABLE_COLUMNS: Array<ColumnDefinition<Metadata>> = [
     {
@@ -73,6 +79,7 @@ export default function MetadataListPage() {
     },
     "xmpRightsWebStatement",
     "dcRights",
+    "acMetadataCreator.displayName",
     {
       Cell: ({ original: { acTags } }) => acTags?.join(", "),
       accessor: "acTags"

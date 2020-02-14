@@ -15,14 +15,19 @@ export interface MetadataAttributes {
     | "Dataset"
     | "Undetermined";
   xmpRightsWebStatement?: string;
-  ac_rights?: string;
 
   // optional fields
+  acRights?: string;
+  acCaption?: string;
   dcFormat?: string;
+  createdDate?: string;
+  deletedDate?: string;
   acDigitizationDate?: string;
   xmpMetadataDate?: string;
   acTags?: string[];
   originalFilename?: string;
+  notPubliclyReleasableReason?: string;
+  publiclyReleasable?: boolean;
 
   acHashFunction?: string;
   acHashValue?: string;
