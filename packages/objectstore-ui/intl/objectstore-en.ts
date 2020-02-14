@@ -10,6 +10,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   attributeLabel: "Attribute",
   closePreviewButtonText: "Close Preview",
   editSelectedButtonText: "Edit Selected",
+  field_acCaption: "Caption",
   field_acDigitizationDate: "Date Original Version Created",
   field_acHashFunction: "Hash Function",
   field_acHashValue: "Hash",

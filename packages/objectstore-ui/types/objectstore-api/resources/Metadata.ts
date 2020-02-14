@@ -9,14 +9,18 @@ export interface MetadataAttributes {
   fileExtension: string;
   dcType: "Image" | "Moving Image" | "Sound" | "Text";
   xmpRightsWebStatement?: string;
-  ac_rights?: string;
 
   // optional fields
+  acRights?: string;
+  acCaption?: string;
   dcFormat?: string;
+  createdDate?: string;
+  deletedDate?: string;
   acDigitizationDate?: string;
   xmpMetadataDate?: string;
   acTags?: string[];
   originalFilename?: string;
+  notPubliclyReleasableReason?: string;
   publiclyReleasable?: boolean;
 
   acHashFunction?: string;

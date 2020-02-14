@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { isObject, toPairs } from "lodash";
+import { toPairs } from "lodash";
 import ReactTable from "react-table";
 import titleCase from "title-case";
 import {
@@ -12,35 +12,45 @@ export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
 }
 
-const FIELD_GROUP_ATTRIBUTESS = [
-  {
-    fields: ["xmpMetadataDate", "acMetadataCreator.displayName"],
-    title: "Upload Metadata"
-  },
-  {
-    fields: [
-      "originalFilename",
-      "acDigitizationDate",
-      "fileIdentifier",
-      "fileExtension",
-      "dcType",
-      "dcFormat",
-      "acHashFunction",
-      "acHashValue"
-    ],
-    title: "Media"
-  },
-  {
-    fields: ["dcRights", "xmpRightsWebStatement", "publiclyReleasable"],
-    title: "Rights"
-  }
-];
-
 /**
  * Shows the attribute details of a Metadata. Does not include the image or thumbnail.
  * Tha ManagedAttributeMap must b included with the passed Metadata.
  */
 export function MetadataDetails({ metadata }: MetadataDetailsProps) {
+  const FIELD_GROUP_ATTRIBUTESS = [
+    {
+      fields: [
+        "xmpMetadataDate",
+        "acMetadataCreator.displayName",
+        "createdDate"
+      ],
+      title: "Upload Metadata"
+    },
+    {
+      fields: [
+        "originalFilename",
+        "acDigitizationDate",
+        "fileIdentifier",
+        "fileExtension",
+        "dcType",
+        "dcFormat",
+        "acHashFunction",
+        "acHashValue",
+        "acCaption"
+      ],
+      title: "Media"
+    },
+    {
+      fields: [
+        "dcRights",
+        "xmpRightsWebStatement",
+        "publiclyReleasable",
+        ...(metadata.publiclyReleasable ? [] : ["notPubliclyReleasableReason"])
+      ],
+      title: "Rights"
+    }
+  ];
+
   const { formatMessage, messages } = useObjectStoreIntl();
 
   const fieldGroups = FIELD_GROUP_ATTRIBUTESS.map(({ fields, title }) => ({
