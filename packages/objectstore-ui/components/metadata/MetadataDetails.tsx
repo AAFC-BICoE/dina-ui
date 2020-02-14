@@ -20,9 +20,9 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
   const FIELD_GROUP_ATTRIBUTESS = [
     {
       fields: [
+        "createdDate",
         "xmpMetadataDate",
-        "acMetadataCreator.displayName",
-        "createdDate"
+        "acMetadataCreator.displayName"
       ],
       title: "Upload Metadata"
     },
