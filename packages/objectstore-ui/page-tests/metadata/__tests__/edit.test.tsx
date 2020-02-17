@@ -1,6 +1,7 @@
 import { PersistedResource } from "kitsu";
 import EditMetadatasPage, {
-  BulkMetadataEditRow
+  BulkMetadataEditRow,
+  managedAttributeColumns
 } from "../../../pages/metadata/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { ManagedAttributeMap, Metadata } from "../../../types/objectstore-api";
@@ -114,6 +115,50 @@ describe("Metadata bulk edit page", () => {
         metadata: expect.objectContaining({
           id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b"
         })
+      }
+    ]);
+  });
+
+  it("Renders the managed attribute columns into the editable table.", () => {
+    const columns = managedAttributeColumns([
+      {
+        acceptedValues: ["Holotype", "Paratype", "Syntype"],
+        id: "83748696-62b3-4db6-99cc-e4f546e7ecd7",
+        managedAttributeType: "STRING",
+        name: "SpecimenID",
+        type: "managed-attribute"
+      },
+      {
+        id: "83748696-62b3-4db6-99cc-e4f546e7ecd7",
+        managedAttributeType: "STRING",
+        name: "Type Status",
+        type: "managed-attribute"
+      },
+      {
+        id: "83748696-62b3-4db6-99cc-e4f546e7ecd7",
+        managedAttributeType: "STRING",
+        name: "Scientific Name",
+        type: "managed-attribute"
+      }
+    ]);
+
+    expect(columns).toEqual([
+      {
+        data:
+          "metadata.managedAttributeMap.values.83748696-62b3-4db6-99cc-e4f546e7ecd7.value",
+        source: ["Holotype", "Paratype", "Syntype"],
+        title: "SpecimenID",
+        type: "dropdown"
+      },
+      {
+        data:
+          "metadata.managedAttributeMap.values.83748696-62b3-4db6-99cc-e4f546e7ecd7.value",
+        title: "Type Status"
+      },
+      {
+        data:
+          "metadata.managedAttributeMap.values.83748696-62b3-4db6-99cc-e4f546e7ecd7.value",
+        title: "Scientific Name"
       }
     ]);
   });
