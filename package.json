@@ -21,6 +21,5 @@
     "hooks": {
       "pre-commit": "yarn workspaces run lint-staged"
     }
-  },
-  "version": "0.0.0"
+  }
 }
