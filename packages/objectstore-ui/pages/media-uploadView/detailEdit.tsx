@@ -18,7 +18,7 @@ import { NextRouter } from "next/router";
 import React, { useContext, useState } from "react";
 import { Agent } from "types/objectstore-api/resources/Agent";
 import { isArray, isUndefined } from "util";
-import { AttributeBuilder, Head, Nav } from "../../components";
+import { AttributeBuilder, Head } from "../../components";
 import { MetaManagedAttribute } from "../../types/objectstore-api/resources/MetaManagedAttribute";
 import { generateManagedAttributeValue } from "../../utils/metaUtils";
 

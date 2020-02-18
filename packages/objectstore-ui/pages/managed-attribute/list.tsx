@@ -1,7 +1,7 @@
 import { ColumnDefinition, QueryTable } from "common-ui";
 import { useCookies } from "react-cookie";
 import { CookieSetOptions } from "universal-cookie";
-import { Head, Nav } from "../../components";
+import { Head } from "../../components";
 import { ObjectStoreMessage } from "../../intl/objectstore-intl";
 import { ManagedAttribute } from "../../types/objectstore-api/resources/ManagedAttribute";
 

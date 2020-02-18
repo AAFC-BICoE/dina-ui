@@ -10,7 +10,7 @@ import { useRouter } from "next/router";
 import { useContext, useMemo } from "react";
 import { useDropzone } from "react-dropzone";
 import { Metadata } from "types/objectstore-api/resources/Metadata";
-import { Head, Nav } from "../components";
+import { Head } from "../components";
 import {
   ObjectStoreMessage,
   useObjectStoreIntl

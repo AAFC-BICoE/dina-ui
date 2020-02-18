@@ -11,7 +11,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useCookies } from "react-cookie";
-import { Head, Nav, StoredObjectGallery } from "../../components";
+import { Head, StoredObjectGallery } from "../../components";
 import { MetadataPreview } from "../../components/metadata/MetadataPreview";
 import {
   ObjectStoreMessage,
@@ -95,7 +95,6 @@ export default function MetadataListPage() {
   return (
     <div>
       <Head title={formatMessage("objectListTitle")} />
-      <Nav />
       <div className="container-fluid">
         <div className="list-inline">
           <div className="list-inline-item">

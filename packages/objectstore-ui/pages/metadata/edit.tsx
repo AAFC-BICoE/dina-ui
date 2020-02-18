@@ -14,7 +14,7 @@ import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import { Head, Nav } from "../../components";
+import { Head } from "../../components";
 import {
   ObjectStoreMessage,
   useObjectStoreIntl
@@ -164,7 +164,6 @@ export default function EditMetadatasPage() {
   return (
     <div className="container-fluid">
       <Head title={formatMessage("metadataBulkEditTitle")} />
-      <Nav />
       <h2>
         <ObjectStoreMessage id="metadataBulkEditTitle" />
       </h2>

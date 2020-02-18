@@ -1,7 +1,7 @@
 import { LoadingSpinner, useQuery } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Head, Nav } from "../../components";
+import { Head } from "../../components";
 import { FileView } from "../../components/file-view/FileView";
 import { MetadataDetails } from "../../components/metadata/MetadataDetails";
 import { ObjectStoreMessage } from "../../intl/objectstore-intl";
@@ -36,7 +36,6 @@ export default function MetadataViewPage() {
     return (
       <div>
         <Head title={metadata.originalFilename} />
-        <Nav />
         <style>{OBJECT_DETAILS_PAGE_CSS}</style>
         <div className="container-fluid">
           <div className="row">
