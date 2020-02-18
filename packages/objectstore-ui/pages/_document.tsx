@@ -149,8 +149,39 @@ class DinaDocument extends Document {
 				          "contactLink": "./contact-en.html"
                 });  
 
-            </script>                 
-                                      
+                function getLocaleCookie(key){
+                    var allcookies = document.cookie;
+                    var cookieArr=allcookies.split(";");
+                    var hasLocale = false;
+                    var isEnLocale = false;
+                    cookieArr.map((cookie)=>{
+                      name = cookie.split('=')[0];
+                      value = cookie.split('=')[1];
+                      if(name.indexOf("locale")>=0){
+                        hasLocale=true
+                        isEnLocale = (key==value)
+                      }
+                    })
+                    if(!hasLocale)
+                      isEnLocale = true;
+                    return isEnLocale;
+                };
+
+               $(document).on("click", ".btn.btn-link",function () {                  
+                  let btnText = $( ".btn.btn-link" ).text();
+                  if(btnText.indexOf("English")>=0){
+                    document.cookie = 'locale=en;{ path: "/" }';                    
+                  }
+                  else
+                    document.cookie = 'locale=fr;{ path: "/" }';
+                  location.reload(false); //loads from browser's cache 
+                });                                
+
+                var lan = document.getElementById("wb-lng");
+                var isEnLocale = getLocaleCookie("en");
+                lan.innerHTML = '<div class="float-right"><button class="btn btn-link" ></button></div>';                
+                isEnLocale? $("#wb-lng button.btn.btn-link").html("Français") : $("#wb-lng button.btn.btn-link").html("English");               
+            </script>                                                       
         `}
         </WetFoot>
       </Html>

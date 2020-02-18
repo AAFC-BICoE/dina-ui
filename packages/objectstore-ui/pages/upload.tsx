@@ -125,7 +125,6 @@ export default function UploadPage() {
   return (
     <div>
       <Head title={formatMessage("uploadPageTitle")} />
-      <Nav />
       <div className="container">
         <div id="dndRoot" style={{ cursor: "pointer" }}>
           <div {...getRootProps({ style })} className="root">
