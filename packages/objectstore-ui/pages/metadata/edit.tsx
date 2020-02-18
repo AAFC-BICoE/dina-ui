@@ -186,10 +186,9 @@ export default function EditMetadatasPage() {
           {controlsForm => {
             const columns = [
               ...DEFAULT_COLUMNS,
-              ...controlsForm.values.editableManagedAttributes.map(attr => ({
-                data: `metadata.managedAttributeMap.values.${attr.id}.value`,
-                title: attr.name
-              }))
+              ...managedAttributeColumns(
+                controlsForm.values.editableManagedAttributes
+              )
             ];
 
             return (
@@ -214,4 +213,19 @@ export default function EditMetadatasPage() {
       </div>
     </div>
   );
+}
+
+export function managedAttributeColumns(
+  editableManagedAttributes: ManagedAttribute[]
+) {
+  return editableManagedAttributes.map(attr => ({
+    data: `metadata.managedAttributeMap.values.${attr.id}.value`,
+    title: attr.name,
+    ...(attr.acceptedValues?.length
+      ? {
+          source: attr.acceptedValues,
+          type: "dropdown"
+        }
+      : {})
+  }));
 }
