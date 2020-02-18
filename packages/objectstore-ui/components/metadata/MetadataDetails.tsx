@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { toPairs } from "lodash";
+import { get, toPairs } from "lodash";
 import ReactTable from "react-table";
 import titleCase from "title-case";
 import {
@@ -54,7 +54,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
   const { formatMessage, messages } = useObjectStoreIntl();
 
   const fieldGroups = FIELD_GROUP_ATTRIBUTESS.map(({ fields, title }) => ({
-    data: fields.map(name => ({ name, value: metadata[name] })),
+    data: fields.map(name => ({ name, value: get(metadata, name) })),
     title
   }));
 
