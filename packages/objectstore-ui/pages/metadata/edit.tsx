@@ -3,6 +3,7 @@ import {
   BulkDataEditor,
   decodeResourceCell,
   encodeResourceCell,
+  filterBy,
   LoadingSpinner,
   ResourceSelectField,
   RowChange,
@@ -195,7 +196,7 @@ export default function EditMetadatasPage() {
               <Form>
                 <ResourceSelectField<ManagedAttribute>
                   className="col-2"
-                  filter={val => ({ name: val })}
+                  filter={filterBy(["name"])}
                   name="editableManagedAttributes"
                   isMulti={true}
                   model="managed-attribute"
