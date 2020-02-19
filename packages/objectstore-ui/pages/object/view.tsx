@@ -20,7 +20,7 @@ export default function MetadataViewPage() {
   const { id } = router.query;
 
   const { loading, response } = useQuery<Metadata>({
-    include: "acMetadataCreator,managedAttributeMap",
+    include: "acMetadataCreator,dcCreator,managedAttributeMap",
     path: `metadata/${id}`
   });
 

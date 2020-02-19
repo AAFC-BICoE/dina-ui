@@ -1,4 +1,5 @@
 import { PersistedResource } from "kitsu";
+import Select from "react-select/base";
 import EditMetadatasPage, {
   BulkMetadataEditRow,
   managedAttributeColumns
@@ -62,8 +63,16 @@ jest.mock("next/dynamic", () => () => {
   };
 });
 
-const mockBulkGet = jest.fn(async () => {
-  return TEST_METADATAS;
+const mockBulkGet = jest.fn(async paths => {
+  if ((paths[0] as string).startsWith("/metadata/")) {
+    return TEST_METADATAS;
+  }
+  if ((paths[0] as string).startsWith("/managed-attribute/")) {
+    return paths.map(() => ({
+      id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
+      name: "existing-attribute"
+    }));
+  }
 });
 
 const mockGet = jest.fn(async path => {
@@ -98,6 +107,7 @@ describe("Metadata bulk edit page", () => {
       {
         acMetadataCreator: "",
         acTags: "tag1",
+        dcCreator: "",
         metadata: expect.objectContaining({
           id: "6c524135-3c3e-41c1-a057-45afb4e3e7be"
         })
@@ -105,6 +115,7 @@ describe("Metadata bulk edit page", () => {
       {
         acMetadataCreator: "",
         acTags: "tag1, tag2",
+        dcCreator: "",
         metadata: expect.objectContaining({
           id: "3849de16-fee2-4bb1-990d-a4f5de19b48d"
         })
@@ -112,6 +123,7 @@ describe("Metadata bulk edit page", () => {
       {
         acMetadataCreator: "",
         acTags: "",
+        dcCreator: "",
         metadata: expect.objectContaining({
           id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b"
         })
@@ -159,6 +171,29 @@ describe("Metadata bulk edit page", () => {
         data:
           "metadata.managedAttributeMap.values.83748696-62b3-4db6-99cc-e4f546e7ecd7.value",
         title: "Scientific Name"
+      }
+    ]);
+  });
+
+  it("Initializes the editable managed attributes based on what attributes are set on the metadatas.", async () => {
+    const wrapper = mountWithAppContext(<EditMetadatasPage />, { apiContext });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper
+        .find(".editable-managed-attributes-select")
+        .find(Select)
+        .prop("value")
+    ).toEqual([
+      {
+        label: "existing-attribute",
+        resource: {
+          id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
+          name: "existing-attribute"
+        },
+        value: "a360a695-bbff-4d58-9a07-b6d6c134b208"
       }
     ]);
   });
