@@ -32,6 +32,7 @@ import {
 export interface BulkMetadataEditRow {
   acTags: string;
   acMetadataCreator: string;
+  dcCreator: string;
   metadata: PersistedResource<Metadata>;
 }
 
@@ -88,8 +89,19 @@ export default function EditMetadatasPage() {
         model: "agent"
       },
       {
+        data: "dcCreator",
+        title: formatMessage("field_dcCreator.displayName")
+      }
+    ),
+    resourceSelectCell<Agent>(
+      {
+        filter: input => ({ rsql: `displayName==*${input}*` }),
+        label: agent => agent.displayName,
+        model: "agent"
+      },
+      {
         data: "acMetadataCreator",
-        title: formatMessage("metadataAgentLabel")
+        title: formatMessage("field_acMetadataCreator.displayName")
       }
     )
   ];
@@ -127,7 +139,8 @@ export default function EditMetadatasPage() {
   async function loadData() {
     const metadatas = await bulkGet<Metadata>(
       ids.map(
-        id => `/metadata/${id}?include=acMetadataCreator,managedAttributeMap`
+        id =>
+          `/metadata/${id}?include=acMetadataCreator,dcCreator,managedAttributeMap`
       )
     );
 
@@ -138,6 +151,9 @@ export default function EditMetadatasPage() {
         label: metadata.acMetadataCreator?.displayName
       }),
       acTags: metadata.acTags?.join(", ") ?? "",
+      dcCreator: encodeResourceCell(metadata.dcCreator, {
+        label: metadata.dcCreator?.displayName
+      }),
       metadata
     }));
 
@@ -147,7 +163,7 @@ export default function EditMetadatasPage() {
   async function onSubmit(changes: Array<RowChange<BulkMetadataEditRow>>) {
     const editedMetadatas = changes.map<SaveArgs<Metadata>>(row => {
       const {
-        changes: { acMetadataCreator, acTags, metadata },
+        changes: { acMetadataCreator, acTags, dcCreator, metadata },
         original: {
           metadata: { id, type }
         }
@@ -165,6 +181,10 @@ export default function EditMetadatasPage() {
         metadataEdit.acMetadataCreator = decodeResourceCell(
           acMetadataCreator
         ) as Agent;
+      }
+
+      if (dcCreator !== undefined) {
+        metadataEdit.dcCreator = decodeResourceCell(dcCreator) as Agent;
       }
 
       if (acTags !== undefined) {

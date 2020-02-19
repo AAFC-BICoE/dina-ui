@@ -199,7 +199,7 @@ function EditMetadataForm({
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">
             <strong>
-              <ObjectStoreMessage id="metadataAgentLabel" />
+              <ObjectStoreMessage id="field_acMetadataCreator.displayName" />
             </strong>
           </label>
           <div className="col-sm-6">

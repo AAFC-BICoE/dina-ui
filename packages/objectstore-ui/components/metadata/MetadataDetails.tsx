@@ -42,6 +42,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
           "acDigitizationDate",
           "fileIdentifier",
           "fileExtension",
+          "dcCreator.displayName",
           "dcType",
           "dcFormat",
           "acHashFunction",

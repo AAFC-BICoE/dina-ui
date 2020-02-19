@@ -107,6 +107,7 @@ describe("Metadata bulk edit page", () => {
       {
         acMetadataCreator: "",
         acTags: "tag1",
+        dcCreator: "",
         metadata: expect.objectContaining({
           id: "6c524135-3c3e-41c1-a057-45afb4e3e7be"
         })
@@ -114,6 +115,7 @@ describe("Metadata bulk edit page", () => {
       {
         acMetadataCreator: "",
         acTags: "tag1, tag2",
+        dcCreator: "",
         metadata: expect.objectContaining({
           id: "3849de16-fee2-4bb1-990d-a4f5de19b48d"
         })
@@ -121,6 +123,7 @@ describe("Metadata bulk edit page", () => {
       {
         acMetadataCreator: "",
         acTags: "",
+        dcCreator: "",
         metadata: expect.objectContaining({
           id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b"
         })
