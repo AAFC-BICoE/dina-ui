@@ -18,7 +18,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   field_acTags: "Tags",
   field_dcFormat: "Media Format",
   field_dcRights: "Rights Statement",
-  field_dcType: "Object Type",
+  field_dcType: "Stored Object Type",
   field_managedAttributeType: "Type",
   field_originalFilename: "Original Filename",
   field_xmpMetadataDate: "Date Metadata Applied",

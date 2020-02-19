@@ -10,11 +10,11 @@ import {
   SaveArgs,
   useResourceSelectCells
 } from "common-ui";
-import { Form, Formik } from "formik";
+import { Form, Formik, FormikContext } from "formik";
 import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
 import { useRouter } from "next/router";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Head, Nav } from "../../components";
 import {
   ObjectStoreMessage,
@@ -24,6 +24,7 @@ import {
   Agent,
   ManagedAttribute,
   ManagedAttributeMap,
+  ManagedAttributeValue,
   Metadata
 } from "../../types/objectstore-api";
 
@@ -43,6 +44,10 @@ export default function EditMetadatasPage() {
   const { bulkGet, save } = useContext(ApiClientContext);
   const { formatMessage } = useObjectStoreIntl();
   const resourceSelectCell = useResourceSelectCells();
+  const [
+    initialEditableManagedAttributes,
+    setInitialEditableManagedAttributes
+  ] = useState<ManagedAttribute[]>([]);
 
   const DEFAULT_COLUMNS = [
     {
@@ -60,8 +65,12 @@ export default function EditMetadatasPage() {
         "Dataset",
         "Undetermined"
       ],
-      title: formatMessage("metadataObjectTypeLabel"),
+      title: formatMessage("field_dcType"),
       type: "dropdown"
+    },
+    {
+      data: "metadata.acCaption",
+      title: formatMessage("field_acCaption")
     },
     {
       data: "acTags",
@@ -92,12 +101,37 @@ export default function EditMetadatasPage() {
     return <LoadingSpinner loading={true} />;
   }
 
+  /**
+   * Initializes the editable managed attributes based on what attributes are set on the metadatas.
+   */
+  async function initEditableManagedAttributes(metadatas: Metadata[]) {
+    // Loop through the metadatas and find which managed attributes are set:
+    const managedAttributeIdMap: Record<string, true> = {};
+    for (const metadata of metadatas) {
+      const keys = Object.keys(metadata.managedAttributeMap?.values ?? {});
+      for (const key of keys) {
+        managedAttributeIdMap[key] = true;
+      }
+    }
+    const managedAttributeIds = Object.keys(managedAttributeIdMap);
+
+    // Fetch the managed attributes from the back-end:
+    const newInitialEditableManagedAttributes = await bulkGet<ManagedAttribute>(
+      managedAttributeIds.map(id => `/managed-attribute/${id}`)
+    );
+
+    // Set the attributes in component state; These are used to re-initialize the Formik controls:
+    setInitialEditableManagedAttributes(newInitialEditableManagedAttributes);
+  }
+
   async function loadData() {
     const metadatas = await bulkGet<Metadata>(
       ids.map(
         id => `/metadata/${id}?include=acMetadataCreator,managedAttributeMap`
       )
     );
+
+    await initEditableManagedAttributes(metadatas);
 
     const newTableData = metadatas.map<BulkMetadataEditRow>(metadata => ({
       acMetadataCreator: encodeResourceCell(metadata.acMetadataCreator, {
@@ -178,8 +212,9 @@ export default function EditMetadatasPage() {
       </h2>
       <div className="form-group">
         <Formik<FormControls>
+          enableReinitialize={true}
           initialValues={{
-            editableManagedAttributes: []
+            editableManagedAttributes: initialEditableManagedAttributes
           }}
           onSubmit={noop}
         >
@@ -194,7 +229,7 @@ export default function EditMetadatasPage() {
             return (
               <Form>
                 <ResourceSelectField<ManagedAttribute>
-                  className="col-2"
+                  className="col-2 editable-managed-attributes-select"
                   filter={filterBy(["name"])}
                   name="editableManagedAttributes"
                   isMulti={true}
