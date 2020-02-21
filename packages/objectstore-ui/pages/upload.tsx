@@ -97,7 +97,7 @@ export default function UploadPage() {
 
       // Upload the file:
       const response = await apiClient.axios.post(
-        `/v1/file/${BUCKET_NAME}`,
+        `/file/${BUCKET_NAME}`,
         formData
       );
       uploadResponses.push(response.data);
@@ -127,6 +127,11 @@ export default function UploadPage() {
       <Head title={formatMessage("uploadPageTitle")} />
       <Nav />
       <div className="container">
+        {/* TODO: Remove this after the demo */}
+        <div className="alert alert-warning">
+          Only unclassified data should be uploaded. Any uploaded data will be
+          deleted after the demonstration.
+        </div>
         <div id="dndRoot" style={{ cursor: "pointer" }}>
           <div {...getRootProps({ style })} className="root">
             <input {...getInputProps()} />

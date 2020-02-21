@@ -28,7 +28,7 @@ export function encodeResourceCell<T extends KitsuResource>(
  */
 export function decodeResourceCell(
   cellValue: string
-): Required<KitsuResource> | null {
+): Required<KitsuResource> | { id: null } {
   // Get the {type}/{id} identifier from the end of the string if it exists.
   const identifier = ENCODED_RESOURCE_MATCHER.exec(cellValue)?.[0].substr(1);
 
@@ -37,5 +37,5 @@ export function decodeResourceCell(
     return { id, type };
   }
 
-  return null;
+  return { id: null };
 }

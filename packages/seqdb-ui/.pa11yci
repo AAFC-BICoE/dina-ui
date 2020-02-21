@@ -1,13 +1,12 @@
 {
-"standard": "WCAG2AAA",
-  "level": "error",
+  "level": "error",  
   "defaults": {
+    "standard": "WCAG2A",
     "timeout": 15000,
-    "threshold": 2
-  },
-  "ignore": [
+    "threshold": 2,
+    "ignore": [
     "     WCAG2AA.Principle1.Guideline1_4.1_4_3.G18.Fail"
-  ],
+  ]
   "urls": [
       "http://localhost:8000/pcr-primer/list",
       "http://localhost:8000/pcr-primer/edit",

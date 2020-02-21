@@ -45,7 +45,7 @@ export function ViewMetadataFormPage(data) {
         <div className="row">
           <label className="col-md-3">
             <strong>
-              <ObjectStoreMessage id="metadataAgentLabel" />
+              <ObjectStoreMessage id="field_acMetadataCreator.displayName" />
             </strong>
           </label>
           <div className="col">
