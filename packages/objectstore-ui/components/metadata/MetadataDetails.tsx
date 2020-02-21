@@ -1,3 +1,4 @@
+import { useCollapser } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { get, toPairs } from "lodash";
 import ReactTable from "react-table";
@@ -17,6 +18,8 @@ export interface MetadataDetailsProps {
  * Tha ManagedAttributeMap must b included with the passed Metadata.
  */
 export function MetadataDetails({ metadata }: MetadataDetailsProps) {
+  const { formatMessage } = useObjectStoreIntl();
+
   const managedAttributeValues = metadata.managedAttributeMap
     ? toPairs(metadata.managedAttributeMap.values).map(ma => ma[1])
     : [];
@@ -30,7 +33,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
           "xmpMetadataDate",
           "acMetadataCreator.displayName"
         ]}
-        title="Upload Metadata"
+        title={formatMessage("metadataUploadDetailsLabel")}
       />
       <MetadataManagedAttributes
         managedAttributeValues={managedAttributeValues}
@@ -40,16 +43,13 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         fields={[
           "originalFilename",
           "acDigitizationDate",
-          "fileIdentifier",
           "fileExtension",
           "dcCreator.displayName",
           "dcType",
           "dcFormat",
-          "acHashFunction",
-          "acHashValue",
           "acCaption"
         ]}
-        title="Media"
+        title={formatMessage("metadataMediaDetailsLabel")}
       />
       <MetadataAttributeGroup
         metadata={metadata}
@@ -61,7 +61,12 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
             ? []
             : ["notPubliclyReleasableReason"])
         ]}
-        title="Rights"
+        title={formatMessage("metadataRightsDetailsLabel")}
+      />
+      <MetadataAttributeGroup
+        metadata={metadata}
+        fields={["fileIdentifier", "acHashFunction", "acHashValue"]}
+        title={formatMessage("metadataFileStorageDetailsLabel")}
       />
       <MetadataTags tags={metadata.acTags} />
     </div>
@@ -81,36 +86,43 @@ function MetadataAttributeGroup({
 }: MetadataAttributeGroupProps) {
   const { formatMessage, messages } = useObjectStoreIntl();
 
+  const { Collapser, collapsed } = useCollapser(`metadata-details-${title}`);
+
   const data = fields.map(name => ({ name, value: get(metadata, name) }));
 
   return (
     <div className="form-group">
-      <h4>{title}</h4>
-      <ReactTable
-        className="-striped"
-        columns={[
-          {
-            Cell: ({ original: { name } }) => {
-              const messageKey = `field_${name}`;
-              const value = messages[messageKey]
-                ? formatMessage(messageKey as any)
-                : titleCase(name);
+      <h4>
+        {title}
+        <Collapser />
+      </h4>
+      {!collapsed && (
+        <ReactTable
+          className="-striped"
+          columns={[
+            {
+              Cell: ({ original: { name } }) => {
+                const messageKey = `field_${name}`;
+                const value = messages[messageKey]
+                  ? formatMessage(messageKey as any)
+                  : titleCase(name);
 
-              return <strong>{value}</strong>;
+                return <strong>{value}</strong>;
+              },
+              Header: <ObjectStoreMessage id="attributeLabel" />,
+              accessor: "name"
             },
-            Header: <ObjectStoreMessage id="attributeLabel" />,
-            accessor: "name"
-          },
-          {
-            Cell: ({ original: { value } }) => String(value ?? ""),
-            Header: <ObjectStoreMessage id="managedAttributeValueLabel" />,
-            accessor: "value"
-          }
-        ]}
-        data={data}
-        pageSize={data.length || 1}
-        showPagination={false}
-      />
+            {
+              Cell: ({ original: { value } }) => String(value ?? ""),
+              Header: <ObjectStoreMessage id="managedAttributeValueLabel" />,
+              accessor: "value"
+            }
+          ]}
+          data={data}
+          pageSize={data.length || 1}
+          showPagination={false}
+        />
+      )}
     </div>
   );
 }
@@ -122,28 +134,35 @@ interface MetadataManagedAttributesProps {
 function MetadataManagedAttributes({
   managedAttributeValues
 }: MetadataManagedAttributesProps) {
+  const { Collapser, collapsed } = useCollapser(
+    "metadata-details-managed-attributes"
+  );
+
   return (
     <div className="form-group">
       <h4>
         <ObjectStoreMessage id="metadataManagedAttributesLabel" />
+        <Collapser />
       </h4>
-      <ReactTable
-        className="-striped"
-        columns={[
-          {
-            Cell: ({ original: { name } }) => <strong>{name}</strong>,
-            Header: <ObjectStoreMessage id="attributeLabel" />,
-            accessor: "name"
-          },
-          {
-            Header: <ObjectStoreMessage id="managedAttributeValueLabel" />,
-            accessor: "value"
-          }
-        ]}
-        data={managedAttributeValues}
-        pageSize={managedAttributeValues.length || 1}
-        showPagination={false}
-      />
+      {!collapsed && (
+        <ReactTable
+          className="-striped"
+          columns={[
+            {
+              Cell: ({ original: { name } }) => <strong>{name}</strong>,
+              Header: <ObjectStoreMessage id="attributeLabel" />,
+              accessor: "name"
+            },
+            {
+              Header: <ObjectStoreMessage id="managedAttributeValueLabel" />,
+              accessor: "value"
+            }
+          ]}
+          data={managedAttributeValues}
+          pageSize={managedAttributeValues.length || 1}
+          showPagination={false}
+        />
+      )}
     </div>
   );
 }

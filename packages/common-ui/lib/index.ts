@@ -6,6 +6,7 @@ export * from "./api-client/useQuery";
 export * from "./bulk-data-editor/BulkDataEditor";
 export * from "./bulk-data-editor/encode-resource-cell";
 export * from "./bulk-data-editor/resource-select-cell";
+export * from "./collapser/useCollapser";
 export * from "./filter-builder/FilterBuilder";
 export * from "./filter-builder/FilterBuilderField";
 export * from "./filter-builder/FilterGroup";
