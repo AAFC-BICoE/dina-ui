@@ -1,3 +1,4 @@
+import { useCollapser } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { get, toPairs } from "lodash";
 import { useCookies } from "react-cookie";
@@ -18,6 +19,8 @@ export interface MetadataDetailsProps {
  * Tha ManagedAttributeMap must b included with the passed Metadata.
  */
 export function MetadataDetails({ metadata }: MetadataDetailsProps) {
+  const { formatMessage } = useObjectStoreIntl();
+
   const managedAttributeValues = metadata.managedAttributeMap
     ? toPairs(metadata.managedAttributeMap.values).map(ma => ma[1])
     : [];
@@ -31,7 +34,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
           "xmpMetadataDate",
           "acMetadataCreator.displayName"
         ]}
-        title="Upload Metadata"
+        title={formatMessage("metadataUploadDetailsLabel")}
       />
       <MetadataManagedAttributes
         managedAttributeValues={managedAttributeValues}
@@ -41,16 +44,13 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         fields={[
           "originalFilename",
           "acDigitizationDate",
-          "fileIdentifier",
           "fileExtension",
           "dcCreator.displayName",
           "dcType",
           "dcFormat",
-          "acHashFunction",
-          "acHashValue",
           "acCaption"
         ]}
-        title="Media"
+        title={formatMessage("metadataMediaDetailsLabel")}
       />
       <MetadataAttributeGroup
         metadata={metadata}
@@ -62,7 +62,12 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
             ? []
             : ["notPubliclyReleasableReason"])
         ]}
-        title="Rights"
+        title={formatMessage("metadataRightsDetailsLabel")}
+      />
+      <MetadataAttributeGroup
+        metadata={metadata}
+        fields={["fileIdentifier", "acHashFunction", "acHashValue"]}
+        title={formatMessage("metadataFileStorageDetailsLabel")}
       />
       <MetadataTags tags={metadata.acTags} />
     </div>
