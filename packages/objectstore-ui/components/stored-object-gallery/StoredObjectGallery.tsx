@@ -1,7 +1,10 @@
 import { CheckBoxFieldProps } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
-import { ObjectStoreMessage } from "../../intl/objectstore-intl";
+import {
+  ObjectStoreMessage,
+  useObjectStoreIntl
+} from "../../intl/objectstore-intl";
 import { Metadata } from "../../types/objectstore-api";
 import { FileView } from "../file-view/FileView";
 
@@ -36,6 +39,8 @@ export function StoredObjectGallery({
   onSelectPreviewMetadataId,
   previewMetadataId
 }: StoredObjectGalleryProps) {
+  const { formatMessage } = useObjectStoreIntl();
+
   return (
     <div className="stored-object-gallery">
       <style>{GALLERY_STYLE}</style>
@@ -55,6 +60,7 @@ export function StoredObjectGallery({
                 <FileView
                   filePath={`/api/v1/file/${bucket}/${fileIdentifier}.thumbnail`}
                   fileType="jpg"
+                  imgAlt={formatMessage("thumbnailNotAvailableText")}
                 />
                 <div style={{ margin: "auto auto 1rem auto" }}>
                   <Link href={`/object/view?id=${id}`}>
