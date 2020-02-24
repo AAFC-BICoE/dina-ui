@@ -128,6 +128,11 @@ export default function UploadPage() {
       <Head title={formatMessage("uploadPageTitle")} />
       <Nav />
       <div className="container">
+        {/* TODO: Remove this after the demo */}
+        <div className="alert alert-warning">
+          For testing purpose only. Only unclassified data should be uploaded.
+          Any uploaded data can be deleted at any given moment.
+        </div>
         <div id="dndRoot" style={{ cursor: "pointer" }}>
           <div {...getRootProps({ style })} className="root">
             <input {...getInputProps()} />
