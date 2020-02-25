@@ -11,7 +11,7 @@ module.exports = {
     "\\.css$": "identity-obj-proxy"
   },
   setupFiles: ["<rootDir>/jest.setup.js"],
-  testPathIgnorePatterns: ["/node_modules/", "/*.css/"],
+  testPathIgnorePatterns: ["/node_modules/"],
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|js?|tsx?|ts?)$",
   transform: {
     "^.+\\.tsx?$": "babel-jest"
