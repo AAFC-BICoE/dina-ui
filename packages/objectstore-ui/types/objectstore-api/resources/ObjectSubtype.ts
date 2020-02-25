@@ -2,6 +2,7 @@ import { KitsuResource } from "kitsu";
 
 export interface ObjectSubtypeAttributes {
   type: string;
+  uuid: string;
   dcType:
     | "Image"
     | "Moving Image"

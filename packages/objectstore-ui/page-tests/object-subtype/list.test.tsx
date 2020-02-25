@@ -9,13 +9,15 @@ const TEST_OBJECTSUBTYPES: Array<PersistedResource<ObjectSubtype>> = [
     acSubtype: "Drawing",
     dcType: "Image",
     id: "6c524135-3c3e-41c1-a057-45afb4e3e7be",
-    type: "object-subtype"
+    type: "object-subtype",
+    uuid: "6c524135-3c3e-41c1-a057-45afb4e3e7be"
   },
   {
     acSubtype: "MusicMasterPiece",
     dcType: "Sound",
     id: "6c524135-3c3e-41c1-a057-45afb4e3e7bd",
-    type: "object-subtype"
+    type: "object-subtype",
+    uuid: "6c524135-3c3e-41c1-a057-45afb4e3e7bd"
   }
 ];
 

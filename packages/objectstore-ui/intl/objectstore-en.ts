@@ -6,9 +6,11 @@ import { COMMON_UI_MESSAGES_ENGLISH } from "common-ui";
 export const OBJECTSTORE_MESSAGES_ENGLISH = {
   ...COMMON_UI_MESSAGES_ENGLISH,
   addManagedAttributeButtonText: "Add New Managed Attribute",
+  addObjectSubtypeTitle: "Add New Object Subtype",
   appTitle: "Object Store",
   attributeLabel: "Attribute",
   closePreviewButtonText: "Close Preview",
+  editObjectSubtypeTitle: "Edit Object Subtype",
   editSelectedButtonText: "Edit Selected",
   field_acCaption: "Caption",
   field_acDigitizationDate: "Date Original Version Created",
