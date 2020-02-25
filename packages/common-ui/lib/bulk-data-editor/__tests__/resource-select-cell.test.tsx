@@ -2,7 +2,12 @@ import { KitsuResource } from "kitsu";
 import lodash from "lodash";
 import { useEffect } from "react";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
-import { useResourceSelectCells } from "../resource-select-cell";
+import {
+  useResourceSelectCells,
+  getUserFriendlyAutoCompleteRenderer,
+  makeDropdownOptionsUserFriendly
+} from "../resource-select-cell";
+import { renderToStaticMarkup } from "react-dom/server";
 
 interface Todo extends KitsuResource {
   name: string;
@@ -95,5 +100,51 @@ describe("resource-select-cell", () => {
     }
 
     mountWithAppContext(<TestComponent />, { apiContext: mockApiContext });
+  });
+
+  it("Provides a user-friendly autocomplete renderer to remove the {type}/{UUID} identifier.", () => {
+    // The table cell to render into:
+    const td = document.createElement("td");
+
+    const mockOriginalAutocompleteRenderer = jest.fn((_, TD: HTMLElement) => {
+      // The original handsontable renderer should render a string like this:
+      TD.innerHTML = `<div class="htAutocompleteArrow">▼</div>Mat Poff (agent/0c900d69-c04c-491f-850a-fa72c089ff6d)`;
+    });
+
+    const userFriendlyAutoCompleteRenderer = getUserFriendlyAutoCompleteRenderer(
+      mockOriginalAutocompleteRenderer
+    );
+
+    // Apply the custom renderer:
+    userFriendlyAutoCompleteRenderer(null, td);
+
+    expect(td.innerHTML).toEqual(
+      `<div class="htAutocompleteArrow">▼</div>Mat Poff`
+    );
+  });
+
+  it("Provides a user-friendly autocomplete dropdown renderer to remove the {type}/{UUID} identifier.", () => {
+    const parentNode = document.createElement("div");
+
+    // The original handsontable renderer should render a cell like this:
+    parentNode.innerHTML = renderToStaticMarkup(
+      <div>
+        <table className="htCore">
+          <tr>
+            <td className="listbox">
+              <strong />
+              Mat Poff (agent/69f5d6e2-5294-11ea-8d77-2e728ce88125)
+            </td>
+          </tr>
+        </table>
+      </div>
+    );
+
+    makeDropdownOptionsUserFriendly(parentNode);
+
+    // The {type}/{UUID} identifier should be gone:
+    expect(
+      parentNode.querySelector("table.htCore .listbox")?.innerHTML
+    ).toEqual(`<strong></strong>Mat Poff`);
   });
 });
