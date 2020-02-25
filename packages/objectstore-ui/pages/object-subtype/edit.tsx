@@ -75,15 +75,14 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
   const initialValues = objectSubtype || { type: "object-subtype" };
 
   const onSubmit = safeSubmit(async submittedValues => {
-    const response = await save([
+    await save([
       {
         resource: submittedValues,
         type: "object-subtype"
       }
     ]);
 
-    const newId = response[0].id;
-    await router.push(`/object-subtype/view?id=${newId}`);
+    await router.push(`/object-subtype/list`);
   });
 
   return (
@@ -92,7 +91,11 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />
-          <CancelButton entityId={id as string} entityLink="object-subtype" />
+          <CancelButton
+            entityId={id as string}
+            entityLink="object-subtype"
+            byPassView={true}
+          />
         </ButtonBar>
         <div>
           <div className="row">

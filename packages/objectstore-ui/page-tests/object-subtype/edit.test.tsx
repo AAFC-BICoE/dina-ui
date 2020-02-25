@@ -60,7 +60,40 @@ describe("Object subtype edit page", () => {
     );
 
     expect(wrapper.find(".acSubtype-field input")).toHaveLength(1);
+
     // Edit the subtype name.
+
+    wrapper.find(".acSubtype-field input").simulate("change", {
+      target: {
+        name: "acSubtype",
+        value: "libre office word"
+      }
+    });
+
+    // Submit the form.
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+
+    expect(mockPatch).lastCalledWith(
+      "operations",
+      [
+        {
+          op: "POST",
+          path: "object-subtype",
+          value: {
+            attributes: {
+              acSubtype: "libre office word"
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "object-subtype"
+          }
+        }
+      ],
+      expect.anything()
+    );
+
+    // The user should be redirected to the new object subtype's details page.
+    expect(mockPush).lastCalledWith("/object-subtype/list");
   });
 
   it("Provides a form to edit a object subtype.", async done => {
@@ -86,7 +119,7 @@ describe("Object subtype edit page", () => {
     // The page should load initially with a loading spinner.
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
 
-    // Wait for the profile form to load.
+    // Wait for the form to load.
     await Promise.resolve();
     wrapper.update();
 
@@ -124,8 +157,42 @@ describe("Object subtype edit page", () => {
         expect.anything()
       );
 
-      // The user should be redirected to the existing object subtype's details page.
-      expect(mockPush).lastCalledWith("/object-subtype/view?id=1");
+      // The user should be redirected to object subtype's list page.
+      expect(mockPush).lastCalledWith("/object-subtype/list");
+      done();
+    });
+  });
+
+  it("Renders an error after form submit if one is returned from the back-end.", async done => {
+    // The patch request will return an error.
+    mockPatch.mockImplementationOnce(() => ({
+      data: [
+        {
+          errors: [
+            {
+              detail: "DcType and subtype combination should be unique",
+              status: "422",
+              title: "Constraint violation"
+            }
+          ],
+          status: 422
+        }
+      ] as OperationsResponse
+    }));
+
+    const wrapper = mountWithAppContext(
+      <ObjectSubtypeEditPage router={{ query: {}, push: mockPush } as any} />
+    );
+
+    // Submit the form.
+    wrapper.find("form").simulate("submit");
+
+    setImmediate(() => {
+      wrapper.update();
+      expect(wrapper.find(".alert.alert-danger").text()).toEqual(
+        "Constraint violation: DcType and subtype combination should be unique"
+      );
+      expect(mockPush).toBeCalledTimes(0);
       done();
     });
   });

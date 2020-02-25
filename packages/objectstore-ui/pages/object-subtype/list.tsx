@@ -15,7 +15,7 @@ import {
 const OBJECTSUBTYPE_TABLE_COLUMNS: Array<ColumnDefinition<ObjectSubtype>> = [
   {
     Cell: ({ original: { id, dcType } }) => (
-      <Link href={`/object-subtype/view?id=${id}`}>
+      <Link href={`/object-subtype/edit?id=${id}`}>
         <a>{dcType}</a>
       </Link>
     ),

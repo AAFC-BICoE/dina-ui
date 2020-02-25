@@ -53,7 +53,7 @@ describe("Object subtype list page", () => {
       wrapper
         .find(QueryTable)
         .find(
-          'Link[href$="/object-subtype/view?id=6c524135-3c3e-41c1-a057-45afb4e3e7be"]'
+          'Link[href$="/object-subtype/edit?id=6c524135-3c3e-41c1-a057-45afb4e3e7be"]'
         )
         .exists()
     ).toEqual(true);
