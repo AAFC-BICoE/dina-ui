@@ -6,8 +6,12 @@ module.exports = {
     "jest.config.js",
     "jest.setup.js"
   ],
+  moduleNameMapper: {
+    // Mocks CSS imports to prevent throwing an error during tests.
+    "\\.css$": "identity-obj-proxy"
+  },
   setupFiles: ["<rootDir>/jest.setup.js"],
-  testPathIgnorePatterns: ["/node_modules/"],
+  testPathIgnorePatterns: ["/node_modules/", "/*.css/"],
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|js?|tsx?|ts?)$",
   transform: {
     "^.+\\.tsx?$": "babel-jest"
