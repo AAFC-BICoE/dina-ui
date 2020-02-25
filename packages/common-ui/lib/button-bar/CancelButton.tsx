@@ -8,16 +8,25 @@ interface CancelButtonProps {
 
   /** The link type for where to redirect the user. Gets appended with "/" + entityLink + "/edit/". */
   entityLink: string;
+
+  /** Boolean to use to by pass the view page if there is none */
+  byPassView?: boolean;
 }
 
 /**
  * Cancel Button which is commonly used in the button bar.
  */
-export function CancelButton({ entityId, entityLink }: CancelButtonProps) {
+export function CancelButton({
+  entityId,
+  entityLink,
+  byPassView
+}: CancelButtonProps) {
   // When editing an existing entity, the link points to the entity details page.
   // When editing a new entity, the link points to the list page.
   const href = entityId
-    ? `/${entityLink}/view?id=${entityId}`
+    ? byPassView
+      ? `/${entityLink}/list`
+      : `/${entityLink}/view?id=${entityId}`
     : `/${entityLink}/list`;
 
   return (
