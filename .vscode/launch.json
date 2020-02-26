@@ -1,46 +1,6 @@
 {
   "version": "0.2.0",
   "configurations": [
-    // Object Store launch configs:
-    {
-      "type": "java",
-      "name": "os-api",
-      "request": "launch",
-      "mainClass": "ca.gc.aafc.objectstore.api.ObjectStoreApiLauncher",
-      "projectName": "object-store.api",
-      "preLaunchTask": "docker deps",
-      "args": [
-        "--spring.datasource.url=jdbc:postgresql://$(docker-machine ip)/dina?currentSchema=object_store",
-        "--spring.datasource.username=postgres",
-        "--spring.datasource.password=p",
-        // Don't fail if the DB isn't immediately ready:
-        "--spring.datasource.continue-on-error=true",
-        "--spring.servlet.multipart.max-file-size=2GB",
-        "--spring.servlet.multipart.max-request-size=2GB",
-        "--minio.host=$(docker-machine ip)",
-        "--minio.port=9000",
-        "--minio.accessKey=minio",
-        "--minio.secretKey=minio123"
-      ]
-    },
-    {
-      "type": "chrome",
-      "request": "launch",
-      "name": "os-ui-chrome",
-      "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}/repos/dina-ui/packages/objectstore-ui"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "os-ui",
-      "runtimeExecutable": "${workspaceFolder}/repos/dina-ui/packages/objectstore-ui/node_modules/.bin/next",
-      "env": { "NODE_OPTIONS": "--inspect" },
-      "port": 9229,
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}/repos/dina-ui/packages/objectstore-ui",
-      "skipFiles": ["**/node_modules/**/*.js", "<node_internals>/**/*.js"]
-    },
     // Seqdb launch configs:
     {
       "type": "java",
