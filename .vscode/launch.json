@@ -1,41 +1,4 @@
 {
   "version": "0.2.0",
-  "configurations": [
-    // Seqdb launch configs:
-    {
-      "type": "java",
-      "name": "seqdb-api",
-      "request": "launch",
-      "mainClass": "ca.gc.aafc.seqdb.api.SeqdbApiLauncher",
-      "projectName": "seqdb.api",
-      "preLaunchTask": "docker deps",
-      "args": [
-        "--spring.datasource.url=jdbc:postgresql://$(docker-machine ip)/dina?currentSchema=seqdb",
-        "--spring.datasource.username=postgres",
-        "--spring.datasource.password=p",
-        // Don't fail if the DB isn't immediately ready:
-        "--spring.datasource.continue-on-error=true",
-        "--spring.liquibase.enabled=false",
-        "--spring.jpa.show-sql=true",
-        "--import-sample-accounts=true"
-      ]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "seqdb-ui",
-      "runtimeExecutable": "${workspaceFolder}/repos/dina-ui/packages/seqdb-ui/node_modules/.bin/next",
-      "env": { "NODE_OPTIONS": "--inspect" },
-      "port": 9229,
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}/repos/dina-ui/packages/seqdb-ui",
-      "skipFiles": ["**/node_modules/**/*.js", "<node_internals>/**/*.js"]
-    }
-  ],
-  "compounds": [
-    {
-      "name": "seqdb-all",
-      "configurations": ["seqdb-api", "seqdb-ui"]
-    }
-  ]
+  "configurations": []
 }
