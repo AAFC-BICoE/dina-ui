@@ -52,7 +52,11 @@ services:
     image: node:12.16.1
     volumes:
       - "../repos/dina-ui:/dina-ui"
-    command: yarn --cwd=/dina-ui/packages/objectstore-ui next
+    command: >
+      bash -c "
+      yarn --cwd=/dina-ui/packages/objectstore-ui ;
+      yarn --cwd=/dina-ui/packages/objectstore-ui next
+      "
   ui-gateway:
     image: abiosoft/caddy:1.0.3-no-stats
     volumes:

@@ -40,9 +40,11 @@ services:
     image: node:12.16.1
     volumes:
       - "../repos/dina-ui:/dina-ui"
-    ports:
-      - "3000:3000"
-    command: yarn --cwd=/dina-ui/packages/seqdb-ui next
+    command: >
+      bash -c "
+      yarn --cwd=/dina-ui/packages/seqdb-ui ;
+      yarn --cwd=/dina-ui/packages/seqdb-ui next
+      "
   ui-gateway:
     image: abiosoft/caddy:1.0.3-no-stats
     volumes:
