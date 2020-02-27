@@ -1,6 +1,6 @@
 version: "3.6"
 services:
-  os-database:
+  database:
     image: postgres:9.6
     environment:
       POSTGRES_DB: objectstore
@@ -16,44 +16,49 @@ services:
     ports:
       - "9000:9000"
     command: server /data
-  object-store-api-dev:
+  api-dev:
     image: maven:3.6.3-jdk-8
     volumes:
       - "../repos/objectstore-api:/app"
       # Use the host maven repository:
       - "$HOME/.m2:/root/.m2"
     ports:
-      - "8080:8080"
+      - "8080:8080" # app port
+      - "5005:5005" # debug port
     # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
     command: >
       bash -c "
       mvn
       -f /app/pom.xml
-      -Dspring.datasource.url=jdbc:postgresql://os-database/objectstore?currentSchema=objectstore
-      -Dspring.datasource.username=postgres
-      -Dspring.datasource.password=p
-      -Dspring.liquibase.user=postgres
-      -Dspring.liquibase.password=p
-      -Dspring.datasource.continue-on-error="true"
-      -Dspring.servlet.multipart.max-file-size=2GB
-      -Dspring.servlet.multipart.max-request-size=2GB
-      -Dminio.host=minio
-      -Dminio.port=9000
-      -Dminio.accessKey=minio
-      -Dminio.secretKey=minio123
+      -Dspring-boot-maven-plugin.fork=true
+      -Dspring-boot.run.jvmArguments=\"
+        -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
+        -Dspring.datasource.url=jdbc:postgresql://database/objectstore?currentSchema=objectstore
+        -Dspring.datasource.username=postgres
+        -Dspring.datasource.password=p
+        -Dspring.datasource.continue-on-error=true
+        -Dspring.liquibase.user=postgres
+        -Dspring.liquibase.password=p
+        -Dspring.servlet.multipart.max-file-size=2GB
+        -Dspring.servlet.multipart.max-request-size=2GB
+        -Dminio.host=minio
+        -Dminio.port=9000
+        -Dminio.accessKey=minio
+        -Dminio.secretKey=minio123
+      \"
       spring-boot:run
       "
-  object-store-ui-dev:
+  ui-dev:
     image: node:12.16.1
     volumes:
       - "../repos/dina-ui:/dina-ui"
     command: yarn --cwd=/dina-ui/packages/objectstore-ui next
-  object-store-gateway:
+  ui-gateway:
     image: abiosoft/caddy:1.0.3-no-stats
     volumes:
       - "./ui.Caddyfile:/etc/Caddyfile"
     environment:
-      UI_ADDRESS: object-store-ui-dev:3000
-      API_ADDRESS: object-store-api-dev:8080
+      UI_ADDRESS: ui-dev:3000
+      API_ADDRESS: api-dev:8080
     ports:
       - "2015:2015"

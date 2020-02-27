@@ -1,6 +1,6 @@
 version: "3.6"
 services:
-  seqdb-database:
+  database:
     image: postgres:9.6
     environment:
       POSTGRES_DB: seqdb
@@ -8,43 +8,47 @@ services:
       POSTGRES_PASSWORD: p
     volumes:
       - ./seqdb-initdb.sql:/docker-entrypoint-initdb.d/1-seqdb-initdb.sql
-  seqdb-api-dev:
+  api-dev:
     image: maven:3.6.3-jdk-8
     volumes:
       - "../repos/seqdb-api:/app"
       # Use the host maven repository:
       - "$HOME/.m2:/root/.m2"
     ports:
-      - "8080:8080"
+      - "8080:8080" # app port
+      - "5005:5005" # debug port
     # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
     command: >
       bash -c "
       mvn
       -f /app/pom.xml
-      -Dspring.datasource.url=jdbc:postgresql://seqdb-database/seqdb?currentSchema=seqdb
-      -Dspring.datasource.username=postgres
-      -Dspring.datasource.password=p
-      -Dspring.liquibase.user=postgres
-      -Dspring.liquibase.password=p
-      -Dspring.datasource.continue-on-error="true"
-      -Dspring.servlet.multipart.max-file-size=2GB
-      -Dspring.servlet.multipart.max-request-size=2GB
-      -Dimport-sample-accounts=true
+      -Dspring-boot-maven-plugin.fork=true
+      -Dspring-boot.run.jvmArguments=\"
+        -Dspring.datasource.url=jdbc:postgresql://database/seqdb?currentSchema=seqdb
+        -Dspring.datasource.username=postgres
+        -Dspring.datasource.password=p
+        -Dspring.liquibase.user=postgres
+        -Dspring.liquibase.password=p
+        -Dspring.datasource.continue-on-error=true
+        -Dspring.servlet.multipart.max-file-size=2GB
+        -Dspring.servlet.multipart.max-request-size=2GB
+        -Dimport-sample-accounts=true
+      \"
       spring-boot:run
       "
-  seqdb-ui-dev:
+  ui-dev:
     image: node:12.16.1
     volumes:
       - "../repos/dina-ui:/dina-ui"
     ports:
       - "3000:3000"
     command: yarn --cwd=/dina-ui/packages/seqdb-ui next
-  seqdb-gateway:
+  ui-gateway:
     image: abiosoft/caddy:1.0.3-no-stats
     volumes:
       - "./ui.Caddyfile:/etc/Caddyfile"
     environment:
-      UI_ADDRESS: seqdb-ui-dev:3000
-      API_ADDRESS: seqdb-api-dev:8080
+      UI_ADDRESS: ui-dev:3000
+      API_ADDRESS: api-dev:8080
     ports:
       - "2015:2015"
