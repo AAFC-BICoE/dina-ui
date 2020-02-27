@@ -95,6 +95,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
     try {
+      submittedValues.acceptedValues = [...submittedValues.acceptedValues[0]];
       const response = await save([
         {
           resource: submittedValues,
@@ -188,16 +189,6 @@ function AcceptedValueBuilder({
   initialValues
 }: AcceptedValueProps) {
   const [values, setValues] = useState(initialValues ? initialValues : []);
-  const [input, setInput] = useState();
-
-  async function onAndClick() {
-    if (!values.includes(input) && input !== "") {
-      const valueArray = [...values];
-      valueArray.splice(valueArray.length, 0, input);
-      setValues(valueArray);
-      setInput("");
-    }
-  }
 
   return (
     <FieldWrapper
@@ -210,9 +201,16 @@ function AcceptedValueBuilder({
       <div>
         <Field name={name}>
           {({ form: { setFieldValue, setFieldTouched } }: FieldProps) => {
-            function onAndClickInternal() {
-              onAndClick();
-              setFieldValue(name, [...values, input]);
+            function onAndClick() {
+              values.push("");
+              setFieldValue(name, [...values]);
+              setFieldTouched(name);
+            }
+            function onChange(input, index) {
+              const newValues = [...values];
+              newValues.splice(index, 1, input);
+              setValues(newValues);
+              setFieldValue(name, [newValues]);
               setFieldTouched(name);
             }
             function onRemoveClick(index) {
@@ -234,19 +232,12 @@ function AcceptedValueBuilder({
             // we will get React's warning about switching from an uncontrolled to controlled input.
             return (
               <div>
-                <input
-                  className="list-inline-item"
-                  name="addValue"
-                  type="text"
-                  value={input}
-                  onChange={e => setInput(e.target.value)}
-                />
                 <button
                   className="list-inline-item btn btn-primary"
-                  onClick={onAndClickInternal}
+                  onClick={onAndClick}
                   type="button"
                 >
-                  +
+                  Add New Accepted Value
                 </button>
                 {values &&
                   values.map((value, index) => {
@@ -257,7 +248,7 @@ function AcceptedValueBuilder({
                           type="text"
                           name={`acceptedValue_${index}`}
                           value={value}
-                          readOnly={true}
+                          onChange={e => onChange(e.target.value, index)}
                         />
                         <button
                           className="list-inline-item btn btn-dark"

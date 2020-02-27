@@ -16,24 +16,8 @@ const ATTRIBUTES_LIST_COLUMNS: Array<ColumnDefinition<ManagedAttribute>> = [
     Header: "Name",
     accessor: "name"
   },
-  {
-    Cell: ({ original: { id, managedAttributeType } }) => (
-      <Link href={`/managedAttributesView/detailsView?id=${id}`}>
-        <a>{managedAttributeType}</a>
-      </Link>
-    ),
-    Header: "Type",
-    accessor: "managedAttributeType"
-  },
-  {
-    Cell: ({ original: { id, acceptedValues } }) => (
-      <Link href={`/managedAttributesView/detailsView?id=${id}`}>
-        <a>{acceptedValues}</a>
-      </Link>
-    ),
-    Header: "Accepted Values",
-    accessor: "acceptedValues"
-  }
+  "managedAttributeType",
+  "acceptedValues"
 ];
 
 const TABLE_PAGE_SIZE_COOKIE = "tablePageSize";
