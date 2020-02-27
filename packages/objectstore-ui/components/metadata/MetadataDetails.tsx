@@ -8,6 +8,7 @@ import {
   useObjectStoreIntl
 } from "../../intl/objectstore-intl";
 import { ManagedAttributeValue, Metadata } from "../../types/objectstore-api";
+import { readableDate } from "../../utils/dates";
 
 export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
@@ -29,8 +30,8 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
-          "createdDate",
-          "xmpMetadataDate",
+          { name: "createdDate", type: "date" },
+          { name: "xmpMetadataDate", type: "date" },
           "acMetadataCreator.displayName"
         ]}
         title={formatMessage("metadataUploadDetailsLabel")}
@@ -42,7 +43,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         metadata={metadata}
         fields={[
           "originalFilename",
-          "acDigitizationDate",
+          { name: "acDigitizationDate", type: "date" },
           "fileExtension",
           "dcCreator.displayName",
           "dcType",
@@ -73,9 +74,14 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
   );
 }
 
+interface MetadataFieldSpec {
+  name: string;
+  type: "string" | "date";
+}
+
 interface MetadataAttributeGroupProps {
   metadata: Metadata;
-  fields: string[];
+  fields: Array<MetadataFieldSpec | string>;
   title: string;
 }
 
@@ -88,7 +94,16 @@ function MetadataAttributeGroup({
 
   const { Collapser, collapsed } = useCollapser(`metadata-details-${title}`);
 
-  const data = fields.map(name => ({ name, value: get(metadata, name) }));
+  const data = fields.map(field => {
+    const { name, type } =
+      typeof field === "string" ? { name: field, type: "string" } : field;
+
+    const rawValue = get(metadata, name);
+
+    const value = type === "date" ? readableDate(rawValue) : rawValue;
+
+    return { name, value };
+  });
 
   return (
     <div className="form-group">

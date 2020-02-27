@@ -18,6 +18,7 @@ import {
   useObjectStoreIntl
 } from "../../intl/objectstore-intl";
 import { Metadata } from "../../types/objectstore-api";
+import { readableDate } from "../../utils/dates";
 
 type MetadataListLayoutType = "TABLE" | "GALLERY";
 
@@ -74,7 +75,7 @@ export default function MetadataListPage() {
     "acDigitizationDate",
     {
       Cell: ({ original: { xmpMetadataDate } }) =>
-        xmpMetadataDate ? new Date(xmpMetadataDate).toLocaleString() : "",
+        readableDate(xmpMetadataDate),
       accessor: "xmpMetadataDate"
     },
     "xmpRightsWebStatement",
