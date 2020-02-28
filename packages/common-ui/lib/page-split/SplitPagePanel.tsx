@@ -23,7 +23,7 @@ export function SplitPagePanel(props: HTMLAttributes<HTMLDivElement>) {
     if (wrapper) {
       const height =
         window.innerHeight - wrapper.getBoundingClientRect().top - 1;
-      wrapper.style.height = `${height}px`;
+      wrapper.style.height = `${height - 210}px`;
     }
   }, []);
 
