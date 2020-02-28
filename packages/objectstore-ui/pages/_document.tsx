@@ -1,8 +1,9 @@
 import Document, { Head, Html, Main, NextScript } from "next/document";
 import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 
 /* tslint:disable:max-classes-per-file */
-class WetFoot extends React.Component {
+class WetFooter extends React.Component {
   public render() {
     let dangerousInnerHTML;
 
@@ -18,35 +19,42 @@ class WetFoot extends React.Component {
   }
 }
 
-class WetHead extends React.Component {
+class WetHeader extends React.Component {
   public render() {
-    let dangerousInnerHTML;
-
-    if (this.props && this.props.children) {
-      if (typeof this.props.children !== "string") {
-        dangerousInnerHTML = "";
-      } else {
-        dangerousInnerHTML = this.props.children;
-      }
-    }
-
-    return <head dangerouslySetInnerHTML={{ __html: dangerousInnerHTML }} />;
+    let headerNode;
+    headerNode = document.createElement("header");
+    headerNode.innerHTML = renderToStaticMarkup(
+      <>
+        <link
+          href="https://wet-boew.github.io/themes-dist/GCWeb/assets/favicon.ico"
+          rel="icon"
+          type="image/x-icon"
+        />
+        <link
+          rel="stylesheet"
+          href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+          integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://wet-boew.github.io/themes-dist/GCWeb/css/theme.min.css"
+        />
+      </>
+    );
+    return headerNode;
   }
 }
 
 class WetHtml extends React.Component {
   public render() {
-    let dangerousInnerHTML;
+    let htmlNode;
+    htmlNode = document.createElement("html");
+    htmlNode.innerHTML = renderToStaticMarkup(
+      <html className="no-js" lang="en" dir="ltr" />
+    );
 
-    if (this.props && this.props.children) {
-      if (typeof this.props.children !== "string") {
-        dangerousInnerHTML = "";
-      } else {
-        dangerousInnerHTML = this.props.children;
-      }
-    }
-
-    return <html dangerouslySetInnerHTML={{ __html: dangerousInnerHTML }} />;
+    return htmlNode;
   }
 }
 class DinaDocument extends Document {
@@ -58,51 +66,20 @@ class DinaDocument extends Document {
   public render() {
     return (
       <Html>
-        <WetHtml>
-          {`
-            <!--[if lt IE 9]><html class="no-js lt-ie9" lang="en" dir="ltr"><![endif]--><!--[if gt IE 8]><!-->
-              <html class="no-js" lang="en" dir="ltr">
-            <!--<![endif]-->                
-         `}
-        </WetHtml>
-        <WetHead>
-          {`
-            <!--[if gte IE 9 | !IE ]><!-->
-              <link href="https://wet-boew.github.io/themes-dist/GCWeb/assets/favicon.ico" rel="icon" type="image/x-icon">
-              <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-              <link rel="stylesheet" href="https://wet-boew.github.io/themes-dist/GCWeb/css/theme.min.css">
-            <!--<![endif]-->
-            <!--[if lt IE 9]>
-              <link href="https://wet-boew.github.io/themes-dist/GCWeb/assets/favicon.ico" rel="shortcut icon" />                              
-              <link rel="stylesheet" href="https://wet-boew.github.io/themes-dist/GCWeb/css/ie8-theme.min.css" />
-              <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.js"></script>
-              <script src="https://wet-boew.github.io/themes-dist/wet-boew/js/ie8-wet-boew.min.js"></script>
-            <![endif]-->
-            <!--[if lte IE 9]>		
-            <![endif]--></link>
-          `}
-        </WetHead>
+        {process.browser && <WetHtml />}
+        {process.browser && <WetHeader />}
         <Head />
         <body>
           <div id="def-top" />
-          <div className="container">
-            <div className="row">
-              <Main />
-              <div id="def-preFooter" />
-            </div>
-          </div>
+          <Main />
+          <div id="def-preFooter" />
           <div id="def-footer" />
           <NextScript />
         </body>
-        <WetFoot>
+        <WetFooter>
           {`
-            <!--[if gte IE 9 | !IE ]><!-->
-              <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"></script>
-               <script src="https://wet-boew.github.io/themes-dist/GCWeb/wet-boew/js/wet-boew.min.js"></script>
-            <!--<![endif]-->
-            <!--[if lt IE 9]>
-	            <script src="https://wet-boew.github.io/themes-dist/GCWeb/wet-boew/js/ie8-wet-boew2.min.js"></script>
-            <![endif]-->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"></script>
+            <script src="https://wet-boew.github.io/themes-dist/GCWeb/wet-boew/js/wet-boew.min.js"></script>
               
             <script src="https://wet-boew.github.io/themes-dist/GCWeb/js/theme.min.js"></script>
             <script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/soyutils.js"></script>
@@ -170,20 +147,20 @@ class DinaDocument extends Document {
                $(document).on("click", ".btn.btn-link",function () {                  
                   let btnText = $( ".btn.btn-link" ).text();
                   if(btnText.indexOf("English")>=0){
-                    document.cookie = 'locale=en;{ path: "/" }';                    
+                    document.cookie = 'locale=en; path=/';                    
                   }
                   else
-                    document.cookie = 'locale=fr;{ path: "/" }';
+                    document.cookie = 'locale=fr; path=/';
                   location.reload(false); //loads from browser's cache 
                 });                                
 
                 var lan = document.getElementById("wb-lng");
                 var isEnLocale = getLocaleCookie("en");
                 lan.innerHTML = '<div class="float-right"><button class="btn btn-link" ></button></div>';                
-                isEnLocale? $("#wb-lng button.btn.btn-link").html("Français") : $("#wb-lng button.btn.btn-link").html("English");               
+                $("#wb-lng button.btn.btn-link").html(isEnLocale? "Français":"English" )
             </script>                                                       
         `}
-        </WetFoot>
+        </WetFooter>
       </Html>
     );
   }
