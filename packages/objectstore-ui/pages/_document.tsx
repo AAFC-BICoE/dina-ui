@@ -14,7 +14,6 @@ class WetFooter extends React.Component {
         dangerousInnerHTML = this.props.children;
       }
     }
-
     return <footer dangerouslySetInnerHTML={{ __html: dangerousInnerHTML }} />;
   }
 }
@@ -79,18 +78,8 @@ class DinaDocument extends Document {
         <WetFooter>
           {`
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"></script>
-            <script src="https://wet-boew.github.io/themes-dist/GCWeb/wet-boew/js/wet-boew.min.js"></script>
-              
-            <script src="https://wet-boew.github.io/themes-dist/GCWeb/js/theme.min.js"></script>
             <script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/soyutils.js"></script>
-		        <script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/wet-en.js"></script>
-
-            <noscript>
-              <!-- Write closure fall-back static file -->
-              <!-- /ROOT/etc/designs/canada/cdts/gcweb/v4_0_28/cdts/static/refTop.html -->
-              <!--#include virtual="/app/cls/WET/gcweb/v4_0_28/cdts/static/refTop.html" -->
-            </noscript>
-
+            <script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/wet-en.js"></script>          
             <script>
                 var defTop = document.getElementById("def-top");                
                 defTop.outerHTML = wet.builder.appTop({ 
@@ -99,12 +88,12 @@ class DinaDocument extends Document {
                   "lngLinks":
                       [{
                         "lang": "fr",
-                        "href": "#fr",
                         "text": "Français" }],
                   "appName":
                     [{
                         "text": "AAFC BICOE - DINA Object Store",
-                        "href": "#" }] 
+                        "href": "/" 
+                      }] 
                 });
 
                 document.write(wet.builder.refTop({
