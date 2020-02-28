@@ -1,4 +1,5 @@
 import {
+  ButtonBar,
   ColumnDefinition,
   CreateButton,
   QueryTable,
@@ -6,7 +7,7 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import { ObjectSubtype } from "types/objectstore-api/resources/ObjectSubtype";
-import { ButtonBar, Head } from "../../components";
+import { Head } from "../../components";
 import {
   ObjectStoreMessage,
   useObjectStoreIntl

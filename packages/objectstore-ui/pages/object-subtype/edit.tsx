@@ -1,12 +1,10 @@
 import {
   ApiClientContext,
+  ButtonBar,
   CancelButton,
   ErrorViewer,
-  filterBy,
-  LabelView,
   LoadingSpinner,
   Query,
-  ResourceSelectField,
   safeSubmit,
   SelectField,
   SubmitButton,
@@ -16,9 +14,8 @@ import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
-import Group from "react-select/src/components/Group";
 import { ObjectSubtype } from "types/objectstore-api/resources/ObjectSubtype";
-import { ButtonBar, Head, Nav } from "../../components";
+import { Head, Nav } from "../../components";
 import {
   ObjectStoreMessage,
   useObjectStoreIntl
