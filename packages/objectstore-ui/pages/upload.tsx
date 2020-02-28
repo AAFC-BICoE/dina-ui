@@ -98,7 +98,8 @@ export default function UploadPage() {
       // Upload the file:
       const response = await apiClient.axios.post(
         `/file/${BUCKET_NAME}`,
-        formData
+        formData,
+        { transformResponse: fileUploadErrorHandler }
       );
       uploadResponses.push(response.data);
     }
@@ -129,8 +130,8 @@ export default function UploadPage() {
       <div className="container">
         {/* TODO: Remove this after the demo */}
         <div className="alert alert-warning">
-          Only unclassified data should be uploaded. Any uploaded data will be
-          deleted after the demonstration.
+          For testing purpose only. Only unclassified data should be uploaded.
+          Any uploaded data can be deleted at any given moment.
         </div>
         <div id="dndRoot" style={{ cursor: "pointer" }}>
           <div {...getRootProps({ style })} className="root">
@@ -162,4 +163,17 @@ export default function UploadPage() {
       </div>
     </div>
   );
+}
+
+/** Errors are handled differently here because they come from Spring Boot instead of Crnk. */
+export function fileUploadErrorHandler(data: string) {
+  // Custom spring boot error handling to get the correct error message:
+  const parsed = JSON.parse(data);
+  const errorDetail = parsed?.errors?.[0]?.detail;
+  if (errorDetail) {
+    throw new Error(errorDetail);
+  }
+
+  // If no error, proceed as usual:
+  return parsed;
 }

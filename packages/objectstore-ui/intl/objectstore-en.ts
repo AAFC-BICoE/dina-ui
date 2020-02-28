@@ -14,7 +14,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   field_acDigitizationDate: "Date Original Version Created",
   field_acHashFunction: "Hash Function",
   field_acHashValue: "Hash",
-  "field_acMetadataCreator.displayName": "Agent (Uploaded By)",
+  "field_acMetadataCreator.displayName": "Upload By",
   field_acTags: "Tags",
   "field_dcCreator.displayName": "Document Creator",
   field_dcFormat: "Media Format",
@@ -54,6 +54,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   noFileToDisplay: "No file to display",
   objectListTitle: "Stored Objects",
   objectStoreDetailsTitle: "Object Store Details",
+  thumbnailNotAvailableText: "No thumbnail available",
   uploadButtonText: "Upload",
   uploadFormInstructions:
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",

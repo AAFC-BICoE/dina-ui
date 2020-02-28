@@ -157,14 +157,10 @@ export function QueryTable<TData extends KitsuResource>({
         ? formatMessage({ id: messageKey as any })
         : titleCase(fieldName));
 
-    if (typeof column === "string") {
-      return {
-        Header,
-        accessor: column
-      };
-    } else {
-      return { ...column, Header };
-    }
+    return {
+      Header,
+      ...(typeof column === "string" ? { accessor: column } : { ...column })
+    };
   });
 
   const queryState = useQuery<TData[], MetaWithTotal>(query, {
@@ -208,6 +204,16 @@ export function QueryTable<TData extends KitsuResource>({
             value={headerFilter ? headerFilter.value : ""}
             onChange={event => onChange(event.target.value)}
           />
+        )}
+        TdComponent={({ className, style, children }) => (
+          <div
+            className={`${className} rt-td`}
+            style={style}
+            // Hovering over the cell should show the value next to the cursor:
+            title={typeof children === "string" ? children : undefined}
+          >
+            {children}
+          </div>
         )}
         className="-striped"
         columns={mappedColumns}

@@ -1,7 +1,10 @@
 import { CheckBoxFieldProps } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
-import { ObjectStoreMessage } from "../../intl/objectstore-intl";
+import {
+  ObjectStoreMessage,
+  useObjectStoreIntl
+} from "../../intl/objectstore-intl";
 import { Metadata } from "../../types/objectstore-api";
 import { FileView } from "../file-view/FileView";
 
@@ -20,7 +23,8 @@ interface StoredObjectGalleryProps {
 }
 
 const GALLERY_STYLE = `
-  .stored-object-gallery file-viewer-wrapper, .stored-object-gallery img {
+  .stored-object-gallery .file-viewer-wrapper, .stored-object-gallery img {
+    overflow-x: hidden !important;
     height: 7rem;
   }
 `;
@@ -36,6 +40,8 @@ export function StoredObjectGallery({
   onSelectPreviewMetadataId,
   previewMetadataId
 }: StoredObjectGalleryProps) {
+  const { formatMessage } = useObjectStoreIntl();
+
   return (
     <div className="stored-object-gallery">
       <style>{GALLERY_STYLE}</style>
@@ -43,7 +49,7 @@ export function StoredObjectGallery({
         {metadatas.map(metadata => {
           const { bucket, fileIdentifier, id, originalFilename } = metadata;
           return (
-            <li className="m-1 list-inline-item" key={id}>
+            <li className="m-1 list-inline-item align-top" key={id}>
               <div
                 className="card card-body"
                 style={{
@@ -55,12 +61,22 @@ export function StoredObjectGallery({
                 <FileView
                   filePath={`/api/v1/file/${bucket}/${fileIdentifier}.thumbnail`}
                   fileType="jpg"
+                  imgAlt={formatMessage("thumbnailNotAvailableText")}
                 />
-                <div style={{ margin: "auto auto 1rem auto" }}>
-                  <Link href={`/object/view?id=${id}`}>
-                    <a>{originalFilename}</a>
-                  </Link>
-                </div>
+                <Link href={`/object/view?id=${id}`}>
+                  <a
+                    style={{
+                      margin: "1rem auto 1rem auto",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      width: "100%"
+                    }}
+                    title={originalFilename}
+                  >
+                    {originalFilename}
+                  </a>
+                </Link>
                 <div className="row">
                   <div className="col-9">
                     <button
