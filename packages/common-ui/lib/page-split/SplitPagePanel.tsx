@@ -1,15 +1,5 @@
 import { HTMLAttributes, useCallback, useEffect, useRef } from "react";
 
-const SPLIT_PAGE_CSS = `
-  html, body {
-    margin: 0;
-    height: 100%;
-  }
-  #__next {
-    height: 100%;
-  }
-`;
-
 /**
  * Component that lets you split a page into independently scrollable sections.
  */
@@ -23,7 +13,7 @@ export function SplitPagePanel(props: HTMLAttributes<HTMLDivElement>) {
     if (wrapper) {
       const height =
         window.innerHeight - wrapper.getBoundingClientRect().top - 1;
-      wrapper.style.height = `${height - 210}px`;
+      wrapper.style.height = `${height - 100}px`;
     }
   }, []);
 
@@ -45,7 +35,6 @@ export function SplitPagePanel(props: HTMLAttributes<HTMLDivElement>) {
       ref={ref}
       style={{ overflowY: "scroll" }}
     >
-      <style>{SPLIT_PAGE_CSS}</style>
       {props.children}
     </div>
   );
