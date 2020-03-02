@@ -53,6 +53,7 @@ services:
     image: node:12.16.1
     volumes:
       - "../repos/dina-ui:/dina-ui"
+    stop_signal: SIGINT
     command: >
       bash -c "
       yarn --cwd=/dina-ui/packages/objectstore-ui ;
