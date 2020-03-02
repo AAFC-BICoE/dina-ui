@@ -9,8 +9,9 @@ import { Form, Formik, FormikContext } from "formik";
 import { noop, toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { Fragment, useEffect, useLayoutEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import ReactDOM from "react-dom";
 import { Head, StoredObjectGallery } from "../../components";
 import { MetadataPreview } from "../../components/metadata/MetadataPreview";
 import {
@@ -32,6 +33,10 @@ interface MetadataListFormValues {
 }
 
 export default function MetadataListPage() {
+  const TempPlaceHolder = () => {
+    return <></>;
+  };
+
   const { formatMessage } = useObjectStoreIntl();
 
   const {
@@ -91,6 +96,13 @@ export default function MetadataListPage() {
       sortable: false
     }
   ];
+
+  useLayoutEffect(() => {
+    const defFooter = document.getElementsByTagName("footer")?.item(0);
+    if (defFooter) {
+      ReactDOM.render(<TempPlaceHolder />, defFooter);
+    }
+  });
 
   return (
     <div>

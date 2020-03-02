@@ -1,20 +1,88 @@
+import parse from "html-react-parser";
 import Document, { Head, Html, Main, NextScript } from "next/document";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 /* tslint:disable:max-classes-per-file */
 class WetFooter extends React.Component {
-  public render() {
-    let dangerousInnerHTML;
+  public htmlToReact() {
+    const html = `
+            <script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/soyutils.js"></script>
+            <script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/wet-en.js"></script>          
+            <script>
+                let defTop = document.getElementById("def-top");                
+                defTop.outerHTML = wet.builder.appTop({ 
+                  "siteMenu": true,  
+                  "search": false,                                    
+                  "lngLinks":
+                      [{
+                        "lang": "fr",
+                        "text": "Français" }],
+                  "appName":
+                    [{
+                        "text": "AAFC BICOE - DINA Object Store",
+                        "href": "/" 
+                      }] 
+                });
+                document.write(wet.builder.refTop({
+                    "webAnalytics" : [{
+                      "environment" : "staging",
+                      "version" : 1
+                    }],
+                    "isApplication":true
+                  }));                  
 
-    if (this.props && this.props.children) {
-      if (typeof this.props.children !== "string") {
-        dangerousInnerHTML = "";
-      } else {
-        dangerousInnerHTML = this.props.children;
-      }
-    }
-    return <footer dangerouslySetInnerHTML={{ __html: dangerousInnerHTML }} />;
+                let defPreFooter = document.getElementById("def-preFooter");
+                defPreFooter.outerHTML = wet.builder.preFooter({
+                  "showShare": false,
+                  "showFeedback": false
+                });    
+                let defFooter = document.getElementById("def-footer");
+                defFooter.outerHTML = wet.builder.appFooter({
+				          "contactLink": "./contact-en.html"
+                });  
+                let isEnLocale = false;                
+                  function getLocaleCookie(key){
+                     let allcookies = document.cookie;
+                     let cookieArr=allcookies.split(";");
+                     let hasLocale = false;
+                     let isEnLocale = false;
+                     cookieArr.map((cookie)=>{
+                       name = cookie.split('=')[0];
+                       value = cookie.split('=')[1];
+                       if(name.indexOf("locale")>=0){
+                         hasLocale=true
+                         isEnLocale = (key==value)
+                      }
+                    })
+                    if(!hasLocale)
+                      isEnLocale = true;
+                    return isEnLocale;
+                };
+
+                  document.body.addEventListener('click', (event) => {
+                  if (!event.target.matches('.btn.btn-link')) return;
+                  let length = document.getElementsByClassName("btn btn-link").length
+                  if(length<=0) return;
+                  let btnText = document.getElementsByClassName("btn btn-link")[0].innerText;
+                  if(btnText.indexOf("English")>=0){
+                    document.cookie = 'locale=en; path=/';                    
+                  }
+                  else
+                    document.cookie = 'locale=fr; path=/';
+                  location.reload(false); //loads from browser's cache 
+                });                                 
+                let lan = document.getElementById("wb-lng");
+                isEnLocale = getLocaleCookie("en");
+                lan.innerHTML = '<div class="float-right"><button class="btn btn-link" ></button></div>';                
+                document.querySelector("#wb-lng button.btn.btn-link").innerHTML = isEnLocale? "Français":"English";
+            </script>      
+          `;
+    return parse(html);
+  }
+
+  public render() {
+    return this.htmlToReact();
   }
 }
 
@@ -57,11 +125,6 @@ class WetHtml extends React.Component {
   }
 }
 class DinaDocument extends Document {
-  public static async getInitialProps(ctx) {
-    const initialProps = await Document.getInitialProps(ctx);
-    return { ...initialProps };
-  }
-
   public render() {
     return (
       <Html>
@@ -74,82 +137,8 @@ class DinaDocument extends Document {
           <div id="def-preFooter" />
           <div id="def-footer" />
           <NextScript />
+          <WetFooter />
         </body>
-        <WetFooter>
-          {`
-            <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"></script>
-            <script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/soyutils.js"></script>
-            <script src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/rn/cdts/compiled/wet-en.js"></script>          
-            <script>
-                var defTop = document.getElementById("def-top");                
-                defTop.outerHTML = wet.builder.appTop({ 
-                  "siteMenu": true,  
-                  "search": false,                                    
-                  "lngLinks":
-                      [{
-                        "lang": "fr",
-                        "text": "Français" }],
-                  "appName":
-                    [{
-                        "text": "AAFC BICOE - DINA Object Store",
-                        "href": "/" 
-                      }] 
-                });
-
-                document.write(wet.builder.refTop({
-                    "webAnalytics" : [{
-                      "environment" : "staging",
-                      "version" : 1
-                    }],
-                    "isApplication":true
-                  }));                  
-
-                var defPreFooter = document.getElementById("def-preFooter");
-                defPreFooter.outerHTML = wet.builder.preFooter({
-                  "showShare": false,
-                  "showFeedback": false
-                });    
-                
-                var defFooter = document.getElementById("def-footer");
-                defFooter.outerHTML = wet.builder.appFooter({
-				          "contactLink": "./contact-en.html"
-                });  
-
-                function getLocaleCookie(key){
-                    var allcookies = document.cookie;
-                    var cookieArr=allcookies.split(";");
-                    var hasLocale = false;
-                    var isEnLocale = false;
-                    cookieArr.map((cookie)=>{
-                      name = cookie.split('=')[0];
-                      value = cookie.split('=')[1];
-                      if(name.indexOf("locale")>=0){
-                        hasLocale=true
-                        isEnLocale = (key==value)
-                      }
-                    })
-                    if(!hasLocale)
-                      isEnLocale = true;
-                    return isEnLocale;
-                };
-
-               $(document).on("click", ".btn.btn-link",function () {                  
-                  let btnText = $( ".btn.btn-link" ).text();
-                  if(btnText.indexOf("English")>=0){
-                    document.cookie = 'locale=en; path=/';                    
-                  }
-                  else
-                    document.cookie = 'locale=fr; path=/';
-                  location.reload(false); //loads from browser's cache 
-                });                                
-
-                var lan = document.getElementById("wb-lng");
-                var isEnLocale = getLocaleCookie("en");
-                lan.innerHTML = '<div class="float-right"><button class="btn btn-link" ></button></div>';                
-                $("#wb-lng button.btn.btn-link").html(isEnLocale? "Français":"English" )
-            </script>                                                       
-        `}
-        </WetFooter>
       </Html>
     );
   }
