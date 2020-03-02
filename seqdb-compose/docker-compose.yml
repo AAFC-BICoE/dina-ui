@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: p
     volumes:
       - ./seqdb-initdb.sql:/docker-entrypoint-initdb.d/1-seqdb-initdb.sql
-  api-dev:
+  api:
     image: maven:3.6.3-jdk-8
     volumes:
       - "../repos/seqdb-api:/app"
@@ -24,6 +24,7 @@ services:
       -f /app/pom.xml
       -Dspring-boot-maven-plugin.fork=true
       -Dspring-boot.run.jvmArguments=\"
+        -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
         -Dspring.datasource.url=jdbc:postgresql://database/seqdb?currentSchema=seqdb
         -Dspring.datasource.username=postgres
         -Dspring.datasource.password=p
@@ -36,7 +37,8 @@ services:
       \"
       spring-boot:run
       "
-  ui-dev:
+  # Server that hot-reloads the UI source code:
+  ui-dev-server:
     image: node:12.16.1
     volumes:
       - "../repos/dina-ui:/dina-ui"
@@ -45,12 +47,13 @@ services:
       yarn --cwd=/dina-ui/packages/seqdb-ui ;
       yarn --cwd=/dina-ui/packages/seqdb-ui next
       "
-  ui-gateway:
+  # Front-end gateway that proxies URLs to the correct service:
+  ui:
     image: abiosoft/caddy:1.0.3-no-stats
     volumes:
       - "./ui.Caddyfile:/etc/Caddyfile"
     environment:
-      UI_ADDRESS: ui-dev:3000
-      API_ADDRESS: api-dev:8080
+      UI_DEV_SERVER_ADDRESS: ui-dev-server:3000
+      API_ADDRESS: api:8080
     ports:
       - "2015:2015"

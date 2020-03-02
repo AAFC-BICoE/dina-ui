@@ -16,7 +16,7 @@ services:
     ports:
       - "9000:9000"
     command: server /data
-  api-dev:
+  api:
     image: maven:3.6.3-jdk-8
     volumes:
       - "../repos/objectstore-api:/app"
@@ -48,7 +48,8 @@ services:
       \"
       spring-boot:run
       "
-  ui-dev:
+  # Server that hot-reloads the UI source code:
+  ui-dev-server:
     image: node:12.16.1
     volumes:
       - "../repos/dina-ui:/dina-ui"
@@ -57,12 +58,13 @@ services:
       yarn --cwd=/dina-ui/packages/objectstore-ui ;
       yarn --cwd=/dina-ui/packages/objectstore-ui next
       "
-  ui-gateway:
+  # Front-end gateway that proxies URLs to the correct service:
+  ui:
     image: abiosoft/caddy:1.0.3-no-stats
     volumes:
       - "./ui.Caddyfile:/etc/Caddyfile"
     environment:
-      UI_ADDRESS: ui-dev:3000
-      API_ADDRESS: api-dev:8080
+      UI_DEV_SERVER_ADDRESS: ui-dev-server:3000
+      API_ADDRESS: api:8080
     ports:
       - "2015:2015"
