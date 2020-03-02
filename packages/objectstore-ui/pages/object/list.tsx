@@ -102,6 +102,11 @@ export default function MetadataListPage() {
     if (defFooter) {
       ReactDOM.render(<TempPlaceHolder />, defFooter);
     }
+
+    const details = document.getElementsByClassName("pagedetails")?.item(0);
+    if (details) {
+      details.setAttribute("style", "padding-top:0;padding-bottom:0");
+    }
   });
 
   return (
