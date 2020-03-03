@@ -11,6 +11,7 @@ import {
 } from "common-ui";
 import { Field, FieldProps, Form, Formik, FormikActions } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
+import Link from "next/link";
 import { NextRouter, withRouter } from "next/router";
 import { useContext, useState } from "react";
 import { isNullOrUndefined } from "util";
@@ -45,7 +46,7 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title="Managed Attribute Details" />
       <Nav />
-      <div>
+      <div className="container-fluid">
         {id ? (
           <div>
             <h1>
@@ -146,11 +147,11 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
             <ObjectStoreMessage id="deleteButtonText" />
           </button>
         )}
-        <a href="/managedAttributesView/listView">
-          <button className="btn btn-primary" type="button">
+        <Link href="/managedAttributesView/listView">
+          <a className="btn btn-primary">
             <ObjectStoreMessage id="cancelButtonText" />
-          </button>
-        </a>
+          </a>
+        </Link>
         <div style={{ width: "300px" }}>
           <h4>
             <ObjectStoreMessage id="field_managedAttributeName" />
