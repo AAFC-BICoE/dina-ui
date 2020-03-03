@@ -18,13 +18,13 @@ import { Head, Nav } from "../../components";
 import { ObjectStoreMessage } from "../../intl/objectstore-intl";
 import { ManagedAttribute } from "../../types/objectstore-api/resources/ManagedAttribute";
 
+interface AcceptedValueProps extends LabelWrapperParams {
+  initialValues?: string[];
+}
+
 interface ManagedAttributeFormProps {
   profile?: ManagedAttribute;
   router: NextRouter;
-}
-
-interface AcceptedValueProps extends LabelWrapperParams {
-  initialValues?: string[];
 }
 
 const ATTRIBUTE_TYPE_OPTIONS = [
@@ -94,17 +94,25 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
     submittedValues,
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
+    const isTypeInteger = submittedValues.managedAttributeType === "INTEGER";
+    const managedAttributeValues = {
+      acceptedValues:
+        submittedValues.acceptedValues && !isTypeInteger
+          ? submittedValues.acceptedValues
+          : null,
+      id: submittedValues.id ? submittedValues.id : null,
+      managedAttributeType: submittedValues.managedAttributeType,
+      name: submittedValues.name,
+      type: submittedValues.type
+    };
     try {
-      submittedValues.acceptedValues = [...submittedValues.acceptedValues[0]];
       const response = await save([
         {
-          resource: submittedValues,
+          resource: managedAttributeValues,
           type: "managed-attribute"
         }
       ]);
-
-      const newId = response[0].id;
-      router.push(`/managedAttributesView/detailsView?id=${newId}`);
+      router.push(`/managedAttributesView/listView`);
       setSubmitting(false);
     } catch (error) {
       setStatus(error.message);
@@ -143,13 +151,13 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
             <ObjectStoreMessage id="cancelButtonText" />
           </button>
         </a>
-        <div>
+        <div style={{ width: "300px" }}>
           <h4>
             <ObjectStoreMessage id="field_managedAttributeName" />
           </h4>
           <TextField name="name" hideLabel={true} />
         </div>
-        <div>
+        <div style={{ width: "300px" }}>
           <h4>
             <ObjectStoreMessage id="field_managedAttributeType" />
           </h4>
@@ -210,7 +218,7 @@ function AcceptedValueBuilder({
               const newValues = [...values];
               newValues.splice(index, 1, input);
               setValues(newValues);
-              setFieldValue(name, [newValues]);
+              setFieldValue(name, newValues);
               setFieldTouched(name);
             }
             function onRemoveClick(index) {
@@ -222,7 +230,7 @@ function AcceptedValueBuilder({
                 const newValues = [...values];
                 newValues.splice(index, 1);
                 setValues(newValues);
-                setFieldValue(name, [newValues]);
+                setFieldValue(name, newValues);
                 setFieldTouched(name);
               }
             }

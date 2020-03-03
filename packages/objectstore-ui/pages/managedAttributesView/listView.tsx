@@ -17,7 +17,12 @@ const ATTRIBUTES_LIST_COLUMNS: Array<ColumnDefinition<ManagedAttribute>> = [
     accessor: "name"
   },
   "managedAttributeType",
-  "acceptedValues"
+  {
+    Cell: ({ original: { acceptedValues } }) => (
+      <div>{acceptedValues?.join(", ")}</div>
+    ),
+    accessor: "acceptedValues"
+  }
 ];
 
 const TABLE_PAGE_SIZE_COOKIE = "tablePageSize";
