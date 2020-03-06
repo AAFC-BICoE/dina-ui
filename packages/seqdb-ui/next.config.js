@@ -3,8 +3,6 @@ const withTM = require("next-transpile-modules");
 
 module.exports = withCss(
   withTM({
-    // Required for static pages to be served from nginx
-    exportTrailingSlash: true,
     transpileModules: ["common-ui"],
     webpack: config => {
       // Fixes npm packages that depend on `fs` module

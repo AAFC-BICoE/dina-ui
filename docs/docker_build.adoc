@@ -32,3 +32,7 @@ Build the Docker image:
 ----
 docker build -t myrepo/seqdb-ui:mytag .
 ----
+
+Docker environment variables required to run:
+
+* API_ADDRESS: The back-end API URL and port. e.g. objectstore-api:8080
