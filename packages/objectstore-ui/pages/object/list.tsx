@@ -73,11 +73,7 @@ export default function MetadataListPage() {
     "originalFilename",
     "dcFormat",
     "acDigitizationDate",
-    {
-      Cell: ({ original: { xmpMetadataDate } }) =>
-        xmpMetadataDate ? new Date(xmpMetadataDate).toLocaleString() : "",
-      accessor: "xmpMetadataDate"
-    },
+    "xmpMetadataDate",
     "acMetadataCreator.displayName",
     {
       Cell: ({ original: { acTags } }) => acTags?.join(", "),

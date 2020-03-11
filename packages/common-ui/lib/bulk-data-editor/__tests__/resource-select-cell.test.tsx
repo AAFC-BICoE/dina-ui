@@ -1,13 +1,13 @@
 import { KitsuResource } from "kitsu";
 import lodash from "lodash";
 import { useEffect } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import {
-  useResourceSelectCells,
   getUserFriendlyAutoCompleteRenderer,
-  makeDropdownOptionsUserFriendly
+  makeDropdownOptionsUserFriendly,
+  useResourceSelectCells
 } from "../resource-select-cell";
-import { renderToStaticMarkup } from "react-dom/server";
 
 interface Todo extends KitsuResource {
   name: string;
