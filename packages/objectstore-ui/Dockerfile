@@ -1,3 +1,4 @@
-FROM nginxinc/nginx-unprivileged:1.16-alpine
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
-COPY ./out /usr/share/nginx/html
+FROM abiosoft/caddy:1.0.3-no-stats
+COPY ./prod.Caddyfile /etc/Caddyfile
+COPY ./out /www/html
+EXPOSE 8080

@@ -58,7 +58,8 @@ export default function MetadataListPage() {
     "dcFormat",
     "xmpRightsWebStatement",
     "dcRights",
-    "acMetadataCreator.displayName"
+    "acMetadataCreator.displayName",
+    "dcCreator.displayName"
   ];
 
   const METADATA_TABLE_COLUMNS: Array<ColumnDefinition<Metadata>> = [
@@ -73,8 +74,6 @@ export default function MetadataListPage() {
     "dcFormat",
     "acDigitizationDate",
     "xmpMetadataDate",
-    "xmpRightsWebStatement",
-    "dcRights",
     "acMetadataCreator.displayName",
     {
       Cell: ({ original: { acTags } }) => acTags?.join(", "),

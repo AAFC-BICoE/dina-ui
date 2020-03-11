@@ -1,3 +1,4 @@
+import { HotTableProps } from "@handsontable/react";
 import { FormikActions } from "formik";
 import { GridSettings } from "handsontable";
 import { cloneDeep, isEmpty, zipWith } from "lodash";
@@ -9,6 +10,7 @@ import { OnFormikSubmit } from "../formik-connected/safeSubmit";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { difference, RecursivePartial } from "./difference";
+import { getUserFriendlyAutoCompleteRenderer } from "./resource-select-cell";
 
 export interface RowChange<TRow> {
   original: TRow;
@@ -89,7 +91,20 @@ const DynamicHotTable = dynamic(
     // Handsontable must only be loaded in the browser, because it depends on the global
     // navigator object to be available.
     const { HotTable } = await import("@handsontable/react");
-    return HotTable;
+    const { renderers } = await import("handsontable");
+
+    const readableAutocompleteRenderer = getUserFriendlyAutoCompleteRenderer(
+      renderers.AutocompleteRenderer
+    );
+
+    return (props: HotTableProps) => {
+      // Hide the {type}/{UUID} identifier from the dropdown cell values:
+      (props.columns as GridSettings[])
+        .filter(col => col.type === "dropdown")
+        .forEach(col => (col.renderer = readableAutocompleteRenderer));
+
+      return <HotTable {...props} />;
+    };
   },
   { ssr: false }
 );

@@ -1,9 +1,10 @@
 import dynamic from "next/dynamic";
-import { ComponentType } from "react";
+import { ComponentType, SyntheticEvent } from "react";
 
 interface FileViewProps {
   filePath: string;
   fileType: string;
+  imgAlt?: string;
 }
 
 // The FileViewer component can't be server-side rendered:
@@ -23,14 +24,14 @@ const IMG_TAG_SUPPORTED_FORMATS = [
   "svg"
 ];
 
-export function FileView({ filePath, fileType }: FileViewProps) {
+export function FileView({ filePath, fileType, imgAlt }: FileViewProps) {
   const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
 
   return (
     <div className="file-viewer-wrapper">
       {isImage ? (
         <img
-          alt=""
+          alt={imgAlt}
           src={filePath}
           style={{
             display: "block",
