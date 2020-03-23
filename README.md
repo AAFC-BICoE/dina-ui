@@ -7,8 +7,9 @@
 git clone https://github.com/PoffM/dina-dev.git
 ```
 
-2. Then open the repo in VS Code (on native Linux OS or on a VM through VS Code Remote). Run this script to clone the dina repos:
+2. Run this script to clone the dina repos:
 ```
+cd ./dina-dev
 sh init-repo.sh
 ```
 
