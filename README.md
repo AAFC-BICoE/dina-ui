@@ -42,6 +42,13 @@ cd seqdb-compose
 
 The UI should be available on port 2015.
 
+## Attaching VS Code debugger to a running Java app:
+
+For breakpoints and inspection:
+
+1. Open the VS Code Run menu (Ctrl + Shift + D).
+2. Run "Attach Java".
+
 ## VS Code Error: command 'java.execute.workspaceCommand' not found
 
 If you get this error using VS Code Remote, you may need to uninstall VS Code's Lombok extension from the host VS Code.
