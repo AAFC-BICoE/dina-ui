@@ -212,6 +212,8 @@ describe("QueryTable component", () => {
 
     // Wait for the second query to load.
     await new Promise(setImmediate);
+    wrapper.update();
+
     const page2Rows = wrapper.find(".rt-tr-group");
 
     // The second page should start with todo #25.
@@ -263,6 +265,7 @@ describe("QueryTable component", () => {
 
     // Wait for the "Previous" request to finish.
     await new Promise(setImmediate);
+    wrapper.update();
 
     const rows = wrapper.find(".rt-tr-group");
 
