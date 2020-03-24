@@ -6,11 +6,13 @@ import { COMMON_UI_MESSAGES_ENGLISH } from "common-ui";
 export const OBJECTSTORE_MESSAGES_ENGLISH = {
   ...COMMON_UI_MESSAGES_ENGLISH,
   addManagedAttributeButtonText: "Add New Managed Attribute",
+  addObjectSubtypeTitle: "Add New Object Subtype",
   appTitle: "Object Store",
   attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
   closePreviewButtonText: "Close Preview",
   deleteButtonText: "Delete",
+  editObjectSubtypeTitle: "Edit Object Subtype",
   editSelectedButtonText: "Edit Selected",
   field_acCaption: "Caption",
   field_acDigitizationDate: "Date Original Version Created",
@@ -59,6 +61,8 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   noFileToDisplay: "No file to display",
   objectListTitle: "Stored Objects",
   objectStoreDetailsTitle: "Object Store Details",
+  objectSubtypeListTitle: "Object Subtypes",
+  objectSubtypeTitle: "Object Subtype",
   thumbnailNotAvailableText: "No thumbnail available",
   uploadButtonText: "Upload",
   uploadFormInstructions:
