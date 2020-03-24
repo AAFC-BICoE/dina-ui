@@ -61,6 +61,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   noFileToDisplay: "No file to display",
   objectListTitle: "Stored Objects",
   objectStoreDetailsTitle: "Object Store Details",
+  objectSubtypeListTitle: "Object Subtypes",
   objectSubtypeTitle: "Object Subtype",
   thumbnailNotAvailableText: "No thumbnail available",
   uploadButtonText: "Upload",

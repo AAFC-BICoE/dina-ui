@@ -48,7 +48,7 @@ describe("Object subtype list page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.containsMatchingElement(<a>Image</a>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<a>Drawing</a>)).toEqual(true);
     expect(
       wrapper
         .find(QueryTable)

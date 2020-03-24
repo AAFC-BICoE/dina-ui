@@ -7,7 +7,7 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import { ObjectSubtype } from "types/objectstore-api/resources/ObjectSubtype";
-import { Head } from "../../components";
+import { Head, Nav } from "../../components";
 import {
   ObjectStoreMessage,
   useObjectStoreIntl
@@ -15,17 +15,17 @@ import {
 
 const OBJECTSUBTYPE_TABLE_COLUMNS: Array<ColumnDefinition<ObjectSubtype>> = [
   {
-    Cell: ({ original: { id, dcType } }) => (
+    Cell: ({ original: { id, acSubtype } }) => (
       <Link href={`/object-subtype/edit?id=${id}`}>
-        <a>{dcType}</a>
+        <a>{acSubtype}</a>
       </Link>
     ),
-    Header: "DcType",
-    accessor: "dcType"
-  },
-  {
     Header: "AcSubtype",
     accessor: "acSubtype"
+  },
+  {
+    Header: "DcType",
+    accessor: "dcType"
   }
 ];
 
@@ -39,15 +39,18 @@ export default function ObjectSubtypeListPage() {
 
   return (
     <>
-      <Head title={formatMessage("objectSubtypeTitle")} />
+      <Head title={formatMessage("objectSubtypeListTitle")} />
+      <Nav />
       <ButtonBar>
         <CreateButton entityLink="object-subtype" />
       </ButtonBar>
       <div className="container-fluid">
         <h1>
-          <ObjectStoreMessage id="objectSubtypeTitle" />
+          <ObjectStoreMessage id="objectSubtypeListTitle" />
         </h1>
-        <QueryTable {...queryTableProps} />
+        <div style={{ maxWidth: "50rem" }}>
+          <QueryTable {...queryTableProps} />
+        </div>
       </div>
     </>
   );
