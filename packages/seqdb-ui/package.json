@@ -26,7 +26,6 @@
     "next": "^9.1.5",
     "next-transpile-modules": "^2.3.1",
     "react": "^16.10.2",
-    "react-cookie": "^4.0.1",
     "react-datepicker": "^2.9.6",
     "react-dnd-cjs": "^9.4.0",
     "react-dnd-html5-backend-cjs": "^9.4.0",
