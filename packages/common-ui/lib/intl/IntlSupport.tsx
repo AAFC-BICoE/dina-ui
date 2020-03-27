@@ -1,6 +1,6 @@
+import { useLocalStorage } from "@rehooks/local-storage";
 import { PrimitiveType } from "intl-messageformat";
 import { createContext, useContext, useEffect, useMemo } from "react";
-import { useCookies } from "react-cookie";
 import {
   FormattedMessage as ReactFormattedMessage,
   IntlProvider as ReactIntlProvider,
@@ -40,17 +40,13 @@ export function getIntlSupport<TMessages extends MessageDictionary>({
   translations = {}
 }: IntlSupportParams<TMessages>) {
   function IntlProvider({ children }: IntlProviderProps) {
-    const [{ locale = "en" }, setCookie] = useCookies(["locale"]);
+    const [storedLocale, setLocale] = useLocalStorage("locale");
+    const locale = storedLocale ?? "en";
 
     useEffect(() => {
-      // When the locale cookie changes, update the html lang attribute:
+      // When the locale changes, update the html lang attribute:
       document.querySelector("html")?.setAttribute("lang", locale);
     }, [locale]);
-
-    function setLocale(newLocale: string) {
-      // Set this cookie domain-wide:
-      setCookie("locale", newLocale, { path: "/" });
-    }
 
     const messages = useMemo(
       () =>

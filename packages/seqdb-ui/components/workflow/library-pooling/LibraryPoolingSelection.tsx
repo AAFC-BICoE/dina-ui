@@ -1,3 +1,4 @@
+import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ColumnDefinition,
   ErrorViewer,
@@ -9,7 +10,6 @@ import { Formik } from "formik";
 import { FilterParam } from "kitsu";
 import { debounce, Dictionary, noop } from "lodash";
 import { useState } from "react";
-import { useCookies } from "react-cookie";
 import { FilteredChangeFunction } from "react-table";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
@@ -29,7 +29,7 @@ export interface LibraryPoolingSelectionFormValues {
   libraryPrepBatchIdsToSelect: Dictionary<boolean>;
 }
 
-const HIDE_USED_ITEMS_COOKIE = "pooling-search-hide-used";
+const HIDE_USED_ITEMS_KEY = "pooling-search-hide-used";
 
 export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
   const {
@@ -60,8 +60,10 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     setAvailableItems: setLibraryPoolContents
   } = useGroupedCheckBoxes({ fieldName: "libraryPoolContentIdsToDelete" });
 
-  const [cookies, setCookie] = useCookies([HIDE_USED_ITEMS_COOKIE]);
-  const hideUsedItems = cookies[HIDE_USED_ITEMS_COOKIE] !== "false";
+  const [storedHideUsedItems, setHideUsedItems] = useLocalStorage(
+    HIDE_USED_ITEMS_KEY
+  );
+  const hideUsedItems = storedHideUsedItems !== "false";
 
   const [nameFilter, setNameFilter] = useState<string>("");
 
@@ -232,9 +234,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                 style={{ width: "20px", height: "20px" }}
                 type="checkbox"
                 checked={hideUsedItems}
-                onChange={e =>
-                  setCookie(HIDE_USED_ITEMS_COOKIE, e.target.checked)
-                }
+                onChange={e => setHideUsedItems(String(e.target.checked))}
               />
             </div>
             <Tabs>

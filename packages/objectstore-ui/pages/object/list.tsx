@@ -1,3 +1,4 @@
+import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ColumnDefinition,
   FormikButton,
@@ -10,7 +11,6 @@ import { noop, toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { useCookies } from "react-cookie";
 import { Head, Nav, StoredObjectGallery } from "../../components";
 import { MetadataPreview } from "../../components/metadata/MetadataPreview";
 import {
@@ -21,7 +21,7 @@ import { Metadata } from "../../types/objectstore-api";
 
 type MetadataListLayoutType = "TABLE" | "GALLERY";
 
-const METADATA_LIST_LAYOUT_COOKIE = "metadata-list-layout";
+const LIST_LAYOUT_STORAGE_KEY = "metadata-list-layout";
 
 const HIGHLIGHT_COLOR = "rgb(222, 252, 222)";
 
@@ -42,9 +42,9 @@ export default function MetadataListPage() {
     fieldName: "selectedMetadatas"
   });
 
-  const [cookies, setCookie] = useCookies([METADATA_LIST_LAYOUT_COOKIE]);
-  const listLayoutType: MetadataListLayoutType =
-    cookies[METADATA_LIST_LAYOUT_COOKIE] || "TABLE";
+  const [listLayoutType, setListLayoutType] = useLocalStorage<
+    MetadataListLayoutType
+  >(LIST_LAYOUT_STORAGE_KEY);
 
   const [previewMetadataId, setPreviewMetadataId] = useState<string | null>(
     null
@@ -107,10 +107,8 @@ export default function MetadataListPage() {
           </div>
           <div className="list-inline-item">
             <ListLayoutSelector
-              onChange={newValue =>
-                setCookie(METADATA_LIST_LAYOUT_COOKIE, newValue)
-              }
-              value={listLayoutType}
+              onChange={newValue => setListLayoutType(newValue)}
+              value={listLayoutType ?? undefined}
             />
           </div>
           <div className="list-inline-item float-right">
@@ -236,7 +234,7 @@ function MetadataListWrapper({ children }) {
   );
 }
 
-function ListLayoutSelector({ value, onChange }) {
+function ListLayoutSelector({ value = "TABLE", onChange }) {
   const items = [
     {
       layoutType: "TABLE",

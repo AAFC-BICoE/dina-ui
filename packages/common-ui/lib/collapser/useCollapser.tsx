@@ -1,18 +1,20 @@
-import { useCookies } from "react-cookie";
+import { useLocalStorage } from "@rehooks/local-storage";
+
+type CollapserState = "COLLAPSED" | "OPEN";
 
 /**
- * Collapse button to hide a UI. Uses a cookie per collapser to store the collaped state.
+ * Collapse button to hide a UI. Store the collaped state in localstorage.
  */
 export function useCollapser(id: string) {
-  const COOKIE = `collapser-${id}-collapsed`;
-  const [cookies, setCookie] = useCookies([COOKIE]);
-  const collapsed = (cookies[COOKIE] ?? "true") === "true";
+  const STORAGE_KEY = `collapser-${id}-collapsed`;
+  const [state, setState] = useLocalStorage<CollapserState>(STORAGE_KEY);
+  const collapsed = state !== "OPEN";
 
   function Collapser() {
     return (
       <button
         className="collapser-button m-2 btn btn-secondary"
-        onClick={() => setCookie(COOKIE, String(!collapsed))}
+        onClick={() => setState(collapsed ? "OPEN" : "COLLAPSED")}
         type="button"
       >
         <i

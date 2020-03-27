@@ -1,6 +1,6 @@
+import { useLocalStorage } from "@rehooks/local-storage";
 import { FilterParam, KitsuResource } from "kitsu";
-import { useCookies } from "react-cookie";
-import { CookieSetOptions } from "universal-cookie";
+import { SortingRule } from "react-table";
 import { QueryTable, QueryTableProps } from "..";
 import { rsql } from "../filter-builder/rsql";
 import { FilterForm } from "./FilterForm";
@@ -12,15 +12,9 @@ interface ListPageLayoutProps<TData extends KitsuResource> {
   WrapTable?: React.FunctionComponent;
 }
 
-const TABLE_PAGE_SIZE_COOKIE = "tablePageSize";
-const TABLE_SORT_COOKIE = "tableSort";
-
-/** The cookie should not expire. */
-const COOKIE_OPTIONS: CookieSetOptions = { expires: new Date("3000-01-01") };
-
 /**
  * Generic layout component for list pages. Renders a QueryTable with a filter builder.
- * The filter form state is hydrated from a cookie, and is saved in a cookie on form submit.
+ * The filter form state is hydrated from localstorage, and is saved in localstorage on form submit.
  */
 export function ListPageLayout<TData extends KitsuResource>({
   filterAttributes,
@@ -28,19 +22,22 @@ export function ListPageLayout<TData extends KitsuResource>({
   queryTableProps,
   WrapTable = ({ children }) => <>{children}</>
 }: ListPageLayoutProps<TData>) {
-  // Use a cookie hook to get the cookies, and re-render when the watched cookies are changed.
-  const [cookies, setCookie] = useCookies([
-    id,
-    TABLE_PAGE_SIZE_COOKIE,
-    TABLE_SORT_COOKIE
-  ]);
+  const tablePageSizeKey = `${id}_tablePageSize`;
+  const tableSortKey = `${id}_tableSort`;
+  const filterformKey = `${id}_filterForm`;
 
-  const filterForm = cookies[id] || {};
+  // Use a localStorage hook to get the filter form state,
+  // and re-render when the watched localStorage key is changed.
+  const [filterForm] = useLocalStorage<any>(filterformKey, {});
 
   // Default sort and page-size from the QueryTable. These are only used on the initial
-  // QueryTable render, and are saved as cookies when the table's sort or page-size is changed.
-  const defaultSort = cookies[TABLE_SORT_COOKIE];
-  const defaultPageSize = cookies[TABLE_PAGE_SIZE_COOKIE];
+  // QueryTable render, and are saved in localStorage when the table's sort or page-size is changed.
+  const [defaultSort, setDefaultSort] = useLocalStorage<SortingRule[]>(
+    tableSortKey
+  );
+  const [defaultPageSize, setDefaultPageSize] = useLocalStorage<number>(
+    tablePageSizeKey
+  );
 
   // Build the JSONAPI filter param to be sent to the back-end.
   const filterParam: FilterParam = {
@@ -52,14 +49,12 @@ export function ListPageLayout<TData extends KitsuResource>({
       <FilterForm filterAttributes={filterAttributes} id={id} />
       <WrapTable>
         <QueryTable<TData>
-          defaultPageSize={defaultPageSize}
-          defaultSort={defaultSort}
+          defaultPageSize={defaultPageSize ?? undefined}
+          defaultSort={defaultSort ?? undefined}
           filter={filterParam}
           reactTableProps={{
-            onPageSizeChange: newSize =>
-              setCookie(TABLE_PAGE_SIZE_COOKIE, newSize, COOKIE_OPTIONS),
-            onSortedChange: newSort =>
-              setCookie(TABLE_SORT_COOKIE, newSort, COOKIE_OPTIONS)
+            onPageSizeChange: newSize => setDefaultPageSize(newSize),
+            onSortedChange: newSort => setDefaultSort(newSort)
           }}
           {...queryTableProps}
         />
