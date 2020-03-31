@@ -2,7 +2,7 @@
 
 This application is developed using these technologies:
 
-- https://www.npmjs.com/[NPM]: Node.js package manager
+- https://yarnpkg.com/[Yarn]: Node.js package manager
 
 - https://www.typescriptlang.org/[TypeScript]: Superset of JavaScript with static types.
 
