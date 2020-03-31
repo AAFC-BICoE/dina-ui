@@ -1,5 +1,5 @@
 import "bootswatch/dist/spacelab/bootstrap.min.css";
-import { ApiClientContext, createContextValue } from "common-ui";
+import { ApiClientContext, createContextValue, ModalProvider } from "common-ui";
 import "handsontable/dist/handsontable.full.min.css";
 import App from "next/app";
 import React from "react";
@@ -32,10 +32,16 @@ export default class ObjectStoreUiApp extends App {
   public render() {
     const { Component, pageProps } = this.props;
 
+    const appElement = process.browser
+      ? document.querySelector<HTMLElement>("#__next")
+      : null;
+
     return (
       <ApiClientContext.Provider value={this.contextValue}>
         <ObjectStoreIntlProvider>
-          <Component {...pageProps} />
+          <ModalProvider appElement={appElement}>
+            <Component {...pageProps} />
+          </ModalProvider>
         </ObjectStoreIntlProvider>
       </ApiClientContext.Provider>
     );

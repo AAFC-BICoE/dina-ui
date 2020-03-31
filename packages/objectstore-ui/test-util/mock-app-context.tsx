@@ -1,7 +1,8 @@
 import {
   ApiClientContext,
   ApiClientContextI,
-  createContextValue
+  createContextValue,
+  ModalProvider
 } from "common-ui";
 import { mount } from "enzyme";
 import { ObjectStoreIntlProvider } from "../intl/objectstore-intl";
@@ -28,7 +29,11 @@ export function MockAppContextProvider({
         })
       }
     >
-      <ObjectStoreIntlProvider>{children}</ObjectStoreIntlProvider>
+      <ObjectStoreIntlProvider>
+        <ModalProvider appElement={document.querySelector("body")}>
+          {children}
+        </ModalProvider>
+      </ObjectStoreIntlProvider>
     </ApiClientContext.Provider>
   );
 }
