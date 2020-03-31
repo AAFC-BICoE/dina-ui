@@ -43,5 +43,6 @@ export * from "./button-bar/BackToListButton";
 export * from "./button-bar/ButtonBar";
 export * from "./button-bar/CancelButton";
 export * from "./button-bar/CreateButton";
+export * from "./button-bar/DeleteButton";
 export * from "./button-bar/EditButton";
 export * from "./button-bar/ButtonBar";

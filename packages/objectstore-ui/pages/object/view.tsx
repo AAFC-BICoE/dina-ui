@@ -1,4 +1,10 @@
-import { LoadingSpinner, useQuery } from "common-ui";
+import {
+  BackToListButton,
+  ButtonBar,
+  DeleteButton,
+  LoadingSpinner,
+  useQuery
+} from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Head, Nav } from "../../components";
@@ -17,7 +23,7 @@ const OBJECT_DETAILS_PAGE_CSS = `
 export default function MetadataViewPage() {
   const router = useRouter();
 
-  const { id } = router.query;
+  const id = router.query.id as string;
 
   const { loading, response } = useQuery<Metadata>({
     include: "acMetadataCreator,dcCreator,managedAttributeMap",
@@ -38,6 +44,19 @@ export default function MetadataViewPage() {
       <div>
         <Head title={metadata.originalFilename} />
         <Nav />
+        <ButtonBar>
+          <Link href={`/metadata/edit?ids=${id}`}>
+            <a className="btn btn-primary">
+              <ObjectStoreMessage id="editButtonText" />
+            </a>
+          </Link>
+          <DeleteButton
+            id={id}
+            postDeleteRedirect="/object/list"
+            type="metadata"
+          />
+          <BackToListButton entityLink="object" />
+        </ButtonBar>
         <style>{OBJECT_DETAILS_PAGE_CSS}</style>
         <div className="container-fluid">
           <div className="row">

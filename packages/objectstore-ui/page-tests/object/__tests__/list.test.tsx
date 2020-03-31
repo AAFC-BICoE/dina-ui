@@ -221,6 +221,14 @@ describe("Metadata List Page", () => {
 
     buttonWrapper.update();
 
+    // Shows how many will be deleted:
+    expect(
+      buttonWrapper
+        .find(AreYouSureModal)
+        .find(".modal-header")
+        .text()
+    ).toEqual("Delete Selected (2)");
+
     // Click 'yes' on the "Are you sure" modal:
     buttonWrapper
       .find(AreYouSureModal)
@@ -241,5 +249,6 @@ describe("Metadata List Page", () => {
         path: "metadata/11111111-1111-1111-1111-111111111111"
       }
     ]);
+    expect(mockReload).toHaveBeenCalledTimes(1);
   });
 });

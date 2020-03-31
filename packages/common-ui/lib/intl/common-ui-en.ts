@@ -11,6 +11,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   cancelButtonText: "Cancel",
   closeButtonText: "Close",
   createButtonText: "Create New",
+  deleteButtonText: "Delete",
   editButtonText: "Edit",
   filterBlankField: "Blank Field",
   filterExactMatch: "Exact Match",
