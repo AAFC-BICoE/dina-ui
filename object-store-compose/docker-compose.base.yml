@@ -1,0 +1,21 @@
+# Common base Compose file for dev and test environments:
+version: "3.7"
+services:
+  database:
+    image: postgres:9.6
+    environment:
+      POSTGRES_DB: objectstore
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: p
+    volumes:
+      - ./initdb.sql:/docker-entrypoint-initdb.d/1-initdb.sql
+    ports:
+      - "5432:5432"
+  minio:
+    image: minio/minio
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    ports:
+      - "9000:9000"
+    command: server /data

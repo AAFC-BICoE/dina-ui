@@ -3,4 +3,4 @@
 export UID=$(id -u)
 export GID=$(id -g)
 
-docker-compose -p dina-object-store-dev -f ./docker-compose.dev.yml $@
+docker-compose -p dina-object-store-dev -f ./docker-compose.base.yml -f ./docker-compose.dev.yml $@

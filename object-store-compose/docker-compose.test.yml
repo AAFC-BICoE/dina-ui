@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+  mvn-test:
+    image: maven:3.6.3-jdk-8
+    # Run as Docker host user so generated files don't belong to root:
+    user: $UID:$GID
+    volumes:
+      - "../repos/objectstore-api:/app"
+      # Share host users:
+      - "/etc/group:/etc/group:ro"
+      - "/etc/passwd:/etc/passwd:ro"
+      - "/etc/shadow:/etc/shadow:ro"
+      # Use the host maven repository:
+      - "~/.m2:/var/maven/.m2"
+    ports:
+      - "8080:8080" # app port
+      - "5005:5005" # debug port
+    # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
+    command: >
+      bash -c "
+      mvn
+      -f /app/pom.xml
+      -Duser.home=/var/maven
+      -Dspring.datasource.url=jdbc:postgresql://database/objectstore?currentSchema=objectstore
+      -Dspring.datasource.username=postgres
+      -Dspring.datasource.password=p
+      -Dspring.datasource.continue-on-error=true
+      -Dspring.liquibase.user=postgres
+      -Dspring.liquibase.password=p
+      -Dspring.servlet.multipart.max-file-size=2GB
+      -Dspring.servlet.multipart.max-request-size=2GB
+      -Dminio.host=minio
+      -Dminio.port=9000
+      -Dminio.accessKey=minio
+      -Dminio.secretKey=minio123
+      install
+      "
