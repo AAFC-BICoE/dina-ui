@@ -1,15 +1,16 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { FilterParam, KitsuResource } from "kitsu";
+import { Fragment, ReactNode, useEffect } from "react";
 import { SortingRule } from "react-table";
 import { QueryTable, QueryTableProps } from "..";
 import { rsql } from "../filter-builder/rsql";
 import { FilterForm } from "./FilterForm";
 
 interface ListPageLayoutProps<TData extends KitsuResource> {
-  filterAttributes: string[];
+  filterAttributes?: string[];
   id: string;
   queryTableProps: QueryTableProps<TData>;
-  WrapTable?: React.FunctionComponent;
+  WrapTable?: React.ComponentType;
 }
 
 /**
@@ -20,7 +21,7 @@ export function ListPageLayout<TData extends KitsuResource>({
   filterAttributes,
   id,
   queryTableProps,
-  WrapTable = ({ children }) => <>{children}</>
+  WrapTable = Fragment
 }: ListPageLayoutProps<TData>) {
   const tablePageSizeKey = `${id}_tablePageSize`;
   const tableSortKey = `${id}_tableSort`;
@@ -46,7 +47,9 @@ export function ListPageLayout<TData extends KitsuResource>({
 
   return (
     <div>
-      <FilterForm filterAttributes={filterAttributes} id={id} />
+      {filterAttributes && (
+        <FilterForm filterAttributes={filterAttributes} id={id} />
+      )}
       <WrapTable>
         <QueryTable<TData>
           defaultPageSize={defaultPageSize ?? undefined}

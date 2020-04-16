@@ -54,6 +54,11 @@ export default function MetadataViewPage() {
                       <ObjectStoreMessage id="editButtonText" />
                     </a>
                   </Link>
+                  <Link href={`/metadata/revisions?id=${id}`}>
+                    <a className="btn btn-info">
+                      <ObjectStoreMessage id="revisionsButtonText" />
+                    </a>
+                  </Link>
                 </div>
                 <MetadataDetails metadata={metadata} />
               </div>

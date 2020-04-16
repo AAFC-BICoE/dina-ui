@@ -59,11 +59,6 @@ export interface QueryTableProps<TData extends KitsuResource> {
 const DEFAULT_PAGE_SIZE = 25;
 
 const queryTableStyle = `
-  /* Wraps long text instead of shortening it. */
-  .rt-td {
-    white-space: unset !important;
-  }
-
   /*
    * Hides the page-jump input's spin button, which on this component would not
    * otherwise trigger a page jump.
@@ -205,16 +200,7 @@ export function QueryTable<TData extends KitsuResource>({
             onChange={event => onChange(event.target.value)}
           />
         )}
-        TdComponent={({ className, style, children }) => (
-          <div
-            className={`${className} rt-td`}
-            style={style}
-            // Hovering over the cell should show the value next to the cursor:
-            title={typeof children === "string" ? children : undefined}
-          >
-            {children}
-          </div>
-        )}
+        TdComponent={DefaultTd}
         className="-striped"
         columns={mappedColumns}
         data={response && response.data}
@@ -229,6 +215,21 @@ export function QueryTable<TData extends KitsuResource>({
         showPaginationTop={true}
         {...resolvedReactTableProps}
       />
+    </div>
+  );
+}
+
+export function DefaultTd({ className, style, children, onClick }) {
+  return (
+    <div
+      className={`${className} rt-td`}
+      onClick={onClick}
+      // Wraps long text instead of shortening it.
+      style={{ ...style, whiteSpace: "unset" }}
+      // Hovering over the cell should show the value next to the cursor:
+      title={typeof children === "string" ? children : undefined}
+    >
+      {children}
     </div>
   );
 }

@@ -27,11 +27,8 @@ describe("MetadataPreview component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(
-      wrapper
-        .find(".metadata-edit-link")
-        .find(Link)
-        .prop("href")
-    ).toEqual("/metadata/edit?ids=232eda40-dc97-4255-91c4-f30485e2c707");
+    expect(wrapper.find("a.metadata-edit-link").prop("href")).toEqual(
+      "/metadata/edit?ids=232eda40-dc97-4255-91c4-f30485e2c707"
+    );
   });
 });

@@ -1,13 +1,18 @@
-import { useCollapser } from "common-ui";
+import { useCollapser, useQuery } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { get, toPairs } from "lodash";
+import { ReactNode } from "react";
 import ReactTable from "react-table";
 import titleCase from "title-case";
 import {
   ObjectStoreMessage,
   useObjectStoreIntl
 } from "../../intl/objectstore-intl";
-import { ManagedAttributeValue, Metadata } from "../../types/objectstore-api";
+import {
+  ManagedAttribute,
+  ManagedAttributeMap,
+  Metadata
+} from "../../types/objectstore-api";
 
 export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
@@ -20,10 +25,6 @@ export interface MetadataDetailsProps {
 export function MetadataDetails({ metadata }: MetadataDetailsProps) {
   const { formatMessage } = useObjectStoreIntl();
 
-  const managedAttributeValues = metadata.managedAttributeMap
-    ? toPairs(metadata.managedAttributeMap.values).map(ma => ma[1])
-    : [];
-
   return (
     <div>
       <MetadataAttributeGroup
@@ -35,9 +36,14 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         ]}
         title={formatMessage("metadataUploadDetailsLabel")}
       />
-      <MetadataManagedAttributes
-        managedAttributeValues={managedAttributeValues}
-      />
+      <CollapsableSection
+        collapserId="managed-attributes"
+        title={formatMessage("metadataManagedAttributesLabel")}
+      >
+        <MetadataManagedAttributes
+          managedAttributeMap={metadata.managedAttributeMap}
+        />
+      </CollapsableSection>
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
@@ -86,84 +92,70 @@ function MetadataAttributeGroup({
 }: MetadataAttributeGroupProps) {
   const { formatMessage, messages } = useObjectStoreIntl();
 
-  const { Collapser, collapsed } = useCollapser(`metadata-details-${title}`);
-
   const data = fields.map(name => ({ name, value: get(metadata, name) }));
 
   return (
-    <div className="form-group">
-      <h4>
-        {title}
-        <Collapser />
-      </h4>
-      {!collapsed && (
-        <ReactTable
-          className="-striped"
-          columns={[
-            {
-              Cell: ({ original: { name } }) => {
-                const messageKey = `field_${name}`;
-                const value = messages[messageKey]
-                  ? formatMessage(messageKey as any)
-                  : titleCase(name);
+    <CollapsableSection collapserId={title} title={title}>
+      <ReactTable
+        className="-striped"
+        columns={[
+          {
+            Cell: ({ original: { name } }) => {
+              const messageKey = `field_${name}`;
+              const value = messages[messageKey]
+                ? formatMessage(messageKey as any)
+                : titleCase(name);
 
-                return <strong>{value}</strong>;
-              },
-              Header: <ObjectStoreMessage id="attributeLabel" />,
-              accessor: "name"
+              return <strong>{value}</strong>;
             },
-            {
-              Cell: ({ original: { value } }) => String(value ?? ""),
-              Header: <ObjectStoreMessage id="managedAttributeValueLabel" />,
-              accessor: "value"
-            }
-          ]}
-          data={data}
-          pageSize={data.length || 1}
-          showPagination={false}
-        />
-      )}
-    </div>
+            Header: <ObjectStoreMessage id="attributeLabel" />,
+            accessor: "name"
+          },
+          {
+            Cell: ({ original: { value } }) => String(value ?? ""),
+            Header: <ObjectStoreMessage id="managedAttributeValueLabel" />,
+            accessor: "value"
+          }
+        ]}
+        data={data}
+        pageSize={data.length || 1}
+        showPagination={false}
+      />
+    </CollapsableSection>
   );
 }
 
 interface MetadataManagedAttributesProps {
-  managedAttributeValues: ManagedAttributeValue[];
+  managedAttributeMap?: ManagedAttributeMap | null;
 }
 
-function MetadataManagedAttributes({
-  managedAttributeValues
+export function MetadataManagedAttributes({
+  managedAttributeMap
 }: MetadataManagedAttributesProps) {
-  const { Collapser, collapsed } = useCollapser(
-    "metadata-details-managed-attributes"
-  );
+  const managedAttributeValues = managedAttributeMap
+    ? toPairs(managedAttributeMap.values).map(([id, mav]) => ({ id, ...mav }))
+    : [];
 
   return (
-    <div className="form-group">
-      <h4>
-        <ObjectStoreMessage id="metadataManagedAttributesLabel" />
-        <Collapser />
-      </h4>
-      {!collapsed && (
-        <ReactTable
-          className="-striped"
-          columns={[
-            {
-              Cell: ({ original: { name } }) => <strong>{name}</strong>,
-              Header: <ObjectStoreMessage id="attributeLabel" />,
-              accessor: "name"
-            },
-            {
-              Header: <ObjectStoreMessage id="managedAttributeValueLabel" />,
-              accessor: "value"
-            }
-          ]}
-          data={managedAttributeValues}
-          pageSize={managedAttributeValues.length || 1}
-          showPagination={false}
-        />
-      )}
-    </div>
+    <ReactTable
+      className="-striped"
+      columns={[
+        {
+          Cell: ({ original: { id, name } }) => (
+            <strong>{name ?? <ManagedAttributeName id={id} />}</strong>
+          ),
+          Header: <ObjectStoreMessage id="attributeLabel" />,
+          accessor: "name"
+        },
+        {
+          Header: <ObjectStoreMessage id="managedAttributeValueLabel" />,
+          accessor: "value"
+        }
+      ]}
+      data={managedAttributeValues}
+      pageSize={managedAttributeValues.length || 1}
+      showPagination={false}
+    />
   );
 }
 
@@ -196,4 +188,45 @@ function MetadataTags({ tags }: MetadataTagsProps) {
       </div>
     </div>
   );
+}
+
+interface CollapsableSectionProps {
+  children: ReactNode;
+  collapserId: string;
+  title: ReactNode;
+}
+
+/** Wrapper for the collapsible sections of the details UI. */
+function CollapsableSection({
+  children,
+  collapserId,
+  title
+}: CollapsableSectionProps) {
+  const { Collapser, collapsed } = useCollapser(
+    `metadata-details-${collapserId}`
+  );
+
+  return (
+    <div className="form-group">
+      <h4>
+        {title}
+        <Collapser />
+      </h4>
+      {!collapsed && children}
+    </div>
+  );
+}
+
+/** Render the name of a ManagedAttribute. */
+export function ManagedAttributeName({ id }) {
+  const { response } = useQuery<ManagedAttribute>({
+    path: `managed-attribute/${id}`
+  });
+
+  if (response) {
+    const ma = response.data;
+    return <>{ma.name}</>;
+  }
+
+  return null;
 }

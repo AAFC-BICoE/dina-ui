@@ -10,6 +10,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   appTitle: "Object Store",
   attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
+  changedProperties: "Changes",
   closePreviewButtonText: "Close Preview",
   deleteButtonText: "Delete",
   editObjectSubtypeTitle: "Edit Object Subtype",
@@ -55,6 +56,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   metadataMediaDetailsLabel: "Media",
   metadataObjectTypeLabel: "Stored Object Type",
   metadataPageLink: "Details Page",
+  metadataRevisionsListTitle: "Revisions for {name}",
   metadataRightsDetailsLabel: "Rights",
   metadataTagsLabel: "Tags",
   metadataUploadDetailsLabel: "Upload Details",
@@ -63,10 +65,12 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   objectStoreDetailsTitle: "Object Store Details",
   objectSubtypeListTitle: "Object Subtypes",
   objectSubtypeTitle: "Object Subtype",
+  revisionsButtonText: "Revisions",
   thumbnailNotAvailableText: "No thumbnail available",
   uploadButtonText: "Upload",
   uploadFormInstructions:
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
   uploadPageTitle: "Upload Files",
+  valueLabel: "Value",
   viewPreviewButtonText: "Preview"
 };
