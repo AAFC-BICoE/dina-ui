@@ -1,5 +1,9 @@
 import "bootswatch/dist/spacelab/bootstrap.min.css";
-import { ApiClientContext, createContextValue } from "common-ui";
+import {
+  AuthenticatedApiClientProvider,
+  createContextValue,
+  KeycloakAccountProvider
+} from "common-ui";
 import "handsontable/dist/handsontable.full.min.css";
 import App from "next/app";
 import React from "react";
@@ -24,20 +28,22 @@ function uuidv4(): string {
  * See: https://github.com/zeit/next.js/#custom-app
  */
 export default class ObjectStoreUiApp extends App {
-  private contextValue = createContextValue({
-    baseURL: "/api/v1",
-    getTempIdGenerator: () => uuidv4
-  });
-
   public render() {
     const { Component, pageProps } = this.props;
 
     return (
-      <ApiClientContext.Provider value={this.contextValue}>
-        <ObjectStoreIntlProvider>
-          <Component {...pageProps} />
-        </ObjectStoreIntlProvider>
-      </ApiClientContext.Provider>
+      <KeycloakAccountProvider>
+        <AuthenticatedApiClientProvider
+          apiClientContextConfig={{
+            baseURL: "/api/v1",
+            getTempIdGenerator: () => uuidv4
+          }}
+        >
+          <ObjectStoreIntlProvider>
+            <Component {...pageProps} />
+          </ObjectStoreIntlProvider>
+        </AuthenticatedApiClientProvider>
+      </KeycloakAccountProvider>
     );
   }
 }
