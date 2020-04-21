@@ -1,16 +1,16 @@
 import { KitsuResource } from "kitsu";
 import { Metadata } from "./Metadata";
 
-interface ManagedAttributeMapAttributes {
+export interface ManagedAttributeMapAttributes {
   values: { [managedAttributeId: string]: ManagedAttributeValue };
 }
 
-interface ManagedAttributeValue {
+export interface ManagedAttributeValue {
   name?: string;
   value: string;
 }
 
-interface ManagedAttributeMapRelationships {
+export interface ManagedAttributeMapRelationships {
   metadata?: Metadata;
 }
 

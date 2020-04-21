@@ -1,10 +1,14 @@
+// SSR polyfills:
+CustomEvent = require("custom-event");
+const LocalStorage = require("node-localstorage").LocalStorage;
+localStorage = new LocalStorage("./scratch");
+
+// Next.js plugins:
 const withCss = require("@zeit/next-css");
 const withTM = require("next-transpile-modules");
 
 module.exports = withCss(
   withTM({
-    // Required for static pages to be served from nginx
-    exportTrailingSlash: true,
     transpileModules: ["common-ui"],
     devIndicators: {
       autoPrerender: false

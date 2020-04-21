@@ -191,18 +191,21 @@ function EditMetadataForm({
           </div>
         </div>
         <div className="form-group row">
-          <h6 className="col-sm-2">
-            <ObjectStoreMessage id="metadataAgentLabel" />
-          </h6>
-
-          <ResourceSelectField<Agent>
-            className="col-sm-6"
-            name="acMetadataCreator"
-            filter={filterBy(["displayName"])}
-            model="agent"
-            optionLabel={agent => agent.displayName}
-            hideLabel={true}
-          />
+          <label className="col-sm-2 col-form-label">
+            <strong>
+              <ObjectStoreMessage id="field_acMetadataCreator.displayName" />
+            </strong>
+          </label>
+          <div className="col-sm-6">
+            <ResourceSelectField<Agent>
+              className="col-sm-6"
+              name="acMetadataCreator"
+              filter={filterBy(["displayName"])}
+              model="agent"
+              optionLabel={agent => agent.displayName}
+              hideLabel={true}
+            />
+          </div>
         </div>
         <div className="form-group row">
           <h6 className="col-sm-2">

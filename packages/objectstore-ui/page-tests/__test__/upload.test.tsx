@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render } from "@testing-library/react";
-import UploadPage from "../../pages/upload";
+import UploadPage, { fileUploadErrorHandler } from "../../pages/upload";
 import { MockAppContextProvider } from "../../test-util/mock-app-context";
 
 const mockPush = jest.fn();
@@ -96,6 +96,14 @@ describe("Upload page", () => {
     );
     await flushPromises(ui, container);
 
+    expect(mockPost).lastCalledWith(
+      "/file/mybucket",
+      // Form data with the file would go here:
+      expect.anything(),
+      // Passes in the custom error handler:
+      { transformResponse: fileUploadErrorHandler }
+    );
+
     expect(mockSave).lastCalledWith([
       {
         resource: {
@@ -134,6 +142,16 @@ describe("Upload page", () => {
         ].join()
       }
     });
+  });
+
+  it("Throws file upload errors with a readable message.", done => {
+    const exampleErrorResponse = `{"errors": [{ "detail": "Error from Spring" }]}`;
+    try {
+      fileUploadErrorHandler(exampleErrorResponse);
+    } catch (error) {
+      expect(error.message).toEqual("Error from Spring");
+      done();
+    }
   });
 });
 

@@ -54,7 +54,7 @@ describe("ListPageLayout component", () => {
     );
   });
 
-  it("Stores the table's sort and page-size in cookies.", async () => {
+  it("Stores the table's sort and page-size in localstorage.", async () => {
     const wrapper = mountWithAppContext(
       <ListPageLayout
         id="test-layout"

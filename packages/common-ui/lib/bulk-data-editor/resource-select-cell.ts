@@ -40,6 +40,9 @@ export function useResourceSelectCells() {
       );
 
       process(encodedResources);
+
+      // Hide the {type}/{UUID} identifier from the dropdown options:
+      makeDropdownOptionsUserFriendly(document);
     }
 
     const debouncedOptionLoader = debounce(loadOptions, 250);
@@ -48,8 +51,39 @@ export function useResourceSelectCells() {
       source: debouncedOptionLoader as any,
       type: "dropdown",
       validator: (value, callback) =>
-        callback(ENCODED_RESOURCE_MATCHER.test(value)),
+        callback(value === "" || ENCODED_RESOURCE_MATCHER.test(value)),
       ...gridSettings
     };
   };
+}
+
+/** Renders the auto-complete dropdowns without the UUIDs to make them more readable. */
+export function getUserFriendlyAutoCompleteRenderer(originalRenderer) {
+  return function readableAutoCompleteRenderer(_, TD: HTMLElement, ...args) {
+    // This custom renderer overrides the original autocomplete renderer:
+    originalRenderer(_, TD, ...args);
+
+    // Remove the {type}/{UUID} identifier from the table cell:
+    TD.innerHTML = withoutIdentifier(TD.innerHTML);
+
+    return TD;
+  };
+}
+
+export function makeDropdownOptionsUserFriendly(element: ParentNode) {
+  const listboxes = element.querySelectorAll("table.htCore .listbox");
+
+  listboxes.forEach(listbox => {
+    listbox.innerHTML = withoutIdentifier(listbox.innerHTML);
+  });
+}
+
+/** Returns the table cell text without the {type}/{UUID} identifier. */
+function withoutIdentifier(tdHtml: string): string {
+  if (ENCODED_RESOURCE_MATCHER.test(tdHtml)) {
+    let newHtml = tdHtml.replace(ENCODED_RESOURCE_MATCHER, "");
+    newHtml = newHtml.substring(0, newHtml.length - 2);
+    return newHtml;
+  }
+  return tdHtml;
 }

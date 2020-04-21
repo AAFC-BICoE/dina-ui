@@ -52,20 +52,20 @@ describe("encode-resource-cell", () => {
     });
   });
 
-  it("returns null if the end of the string is not an identifier.", () => {
+  it("returns { id: null } if the end of the string is not an identifier.", () => {
     // Add a space after the identifier:
     const encoded = "Mat (agent/6cae3e9b-62e8-44ef-8219-60ab2e2f6898) ";
 
     const decoded = decodeResourceCell(encoded);
 
-    expect(decoded).toEqual(null);
+    expect(decoded).toEqual({ id: null });
   });
 
-  it("returns null if the string is formatted wrong.", () => {
+  it("returns { id: null } if the string is formatted wrong.", () => {
     const encoded = "sfsfgsdgsdgsdgd";
 
     const decoded = decodeResourceCell(encoded);
 
-    expect(decoded).toEqual(null);
+    expect(decoded).toEqual({ id: null });
   });
 });

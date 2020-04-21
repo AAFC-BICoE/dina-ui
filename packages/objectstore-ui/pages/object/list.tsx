@@ -1,3 +1,4 @@
+import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ColumnDefinition,
   FormikButton,
@@ -9,10 +10,9 @@ import { Form, Formik, FormikContext } from "formik";
 import { noop, toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Fragment, useEffect, useLayoutEffect, useState } from "react";
-import { useCookies } from "react-cookie";
+import { useLayoutEffect, useState } from "react";
 import ReactDOM from "react-dom";
-import { Head, StoredObjectGallery } from "../../components";
+import { Head, Nav, StoredObjectGallery } from "../../components";
 import { MetadataPreview } from "../../components/metadata/MetadataPreview";
 import {
   ObjectStoreMessage,
@@ -22,7 +22,7 @@ import { Metadata } from "../../types/objectstore-api";
 
 type MetadataListLayoutType = "TABLE" | "GALLERY";
 
-const METADATA_LIST_LAYOUT_COOKIE = "metadata-list-layout";
+const LIST_LAYOUT_STORAGE_KEY = "metadata-list-layout";
 
 const HIGHLIGHT_COLOR = "rgb(222, 252, 222)";
 
@@ -47,9 +47,9 @@ export default function MetadataListPage() {
     fieldName: "selectedMetadatas"
   });
 
-  const [cookies, setCookie] = useCookies([METADATA_LIST_LAYOUT_COOKIE]);
-  const listLayoutType: MetadataListLayoutType =
-    cookies[METADATA_LIST_LAYOUT_COOKIE] || "TABLE";
+  const [listLayoutType, setListLayoutType] = useLocalStorage<
+    MetadataListLayoutType
+  >(LIST_LAYOUT_STORAGE_KEY);
 
   const [previewMetadataId, setPreviewMetadataId] = useState<string | null>(
     null
@@ -58,7 +58,14 @@ export default function MetadataListPage() {
     ? [8, 4]
     : [12, 0];
 
-  const METADATA_FILTER_ATTRIBUTES = ["originalFilename"];
+  const METADATA_FILTER_ATTRIBUTES = [
+    "originalFilename",
+    "dcFormat",
+    "xmpRightsWebStatement",
+    "dcRights",
+    "acMetadataCreator.displayName",
+    "dcCreator.displayName"
+  ];
 
   const METADATA_TABLE_COLUMNS: Array<ColumnDefinition<Metadata>> = [
     {
@@ -71,13 +78,8 @@ export default function MetadataListPage() {
     "originalFilename",
     "dcFormat",
     "acDigitizationDate",
-    {
-      Cell: ({ original: { xmpMetadataDate } }) =>
-        xmpMetadataDate ? new Date(xmpMetadataDate).toLocaleString() : "",
-      accessor: "xmpMetadataDate"
-    },
-    "xmpRightsWebStatement",
-    "dcRights",
+    "xmpMetadataDate",
+    "acMetadataCreator.displayName",
     {
       Cell: ({ original: { acTags } }) => acTags?.join(", "),
       accessor: "acTags"
@@ -121,10 +123,8 @@ export default function MetadataListPage() {
           </div>
           <div className="list-inline-item">
             <ListLayoutSelector
-              onChange={newValue =>
-                setCookie(METADATA_LIST_LAYOUT_COOKIE, newValue)
-              }
-              value={listLayoutType}
+              onChange={newValue => setListLayoutType(newValue)}
+              value={listLayoutType ?? undefined}
             />
           </div>
           <div className="list-inline-item float-right">
@@ -250,7 +250,7 @@ function MetadataListWrapper({ children }) {
   );
 }
 
-function ListLayoutSelector({ value, onChange }) {
+function ListLayoutSelector({ value = "TABLE", onChange }) {
   const items = [
     {
       layoutType: "TABLE",

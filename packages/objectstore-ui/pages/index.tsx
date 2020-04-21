@@ -26,6 +26,20 @@ const Home: React.FunctionComponent = () => (
             </a>
           </Link>
         </li>
+        <li>
+          <Link href="/managedAttributesView/listView">
+            <a>
+              <ObjectStoreMessage id="managedAttributeListTitle" />
+            </a>
+          </Link>
+        </li>
+        <li>
+          <Link href="/object-subtype/list">
+            <a>
+              <ObjectStoreMessage id="objectSubtypeListTitle" />
+            </a>
+          </Link>
+        </li>
       </ul>
     </div>
   </div>
