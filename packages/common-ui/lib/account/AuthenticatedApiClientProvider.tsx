@@ -25,9 +25,12 @@ export function AuthenticatedApiClientProvider({
     }
   }, [authenticated, initialized]);
 
-  const apiContext = createContextValue({
-    ...apiClientContextConfig,
-    headers: { Authorization: `Bearer ${token}` }
+  const apiContext = createContextValue(apiClientContextConfig);
+
+  // Include the bearer token with every API request:
+  apiContext.apiClient.axios.interceptors.request.use(config => {
+    config.headers.Authorization = `Bearer ${token}`;
+    return config;
   });
 
   return (
