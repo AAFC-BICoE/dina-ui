@@ -1,4 +1,10 @@
+# Additional launch configuration for local dev instances.
 version: "3.7"
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: ${SUBNET}
 services:
   api:
     image: maven:3.6.3-jdk-8
@@ -13,8 +19,10 @@ services:
       # Use the host maven repository:
       - "~/.m2:/var/maven/.m2"
     ports:
-      - "8080:8080" # app port
       - "5005:5005" # debug port
+    extra_hosts:
+      # Resolve the Keycloak domain to Keycloak's static IP:
+      - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
     # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
     command: >
       bash -c "
@@ -24,7 +32,7 @@ services:
       -Dspring-boot-maven-plugin.fork=true
       -Dspring-boot.run.jvmArguments=\"
         -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
-        -Dspring.datasource.url=jdbc:postgresql://database/objectstore?currentSchema=objectstore
+        -Dspring.datasource.url=jdbc:postgresql://database/objectstore?currentSchema=object_store
         -Dspring.datasource.username=postgres
         -Dspring.datasource.password=p
         -Dspring.datasource.continue-on-error=true
@@ -36,6 +44,8 @@ services:
         -Dminio.port=9000
         -Dminio.accessKey=minio
         -Dminio.secretKey=minio123
+        -Dkeycloak.enabled=true
+        -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
       \"
       spring-boot:run
       "
@@ -60,11 +70,26 @@ services:
       "
   # Front-end gateway that proxies URLs to the correct service:
   ui:
-    image: abiosoft/caddy:1.0.3-no-stats
+    image: caddy/caddy:2.0.0-rc.3
     volumes:
-      - "./ui.Caddyfile:/etc/Caddyfile"
+      - "./ui.dev.Caddyfile:/etc/caddy/Caddyfile"
     environment:
       UI_DEV_SERVER_ADDRESS: ui-dev-server:3000
-      API_ADDRESS: api:8080
-    ports:
-      - "2015:2015"
+      OBJECTSTORE_API_ADDRESS: api:8080
+      KEYCLOAK_CLIENTID: objectstore
+      KEYCLOAK_REALM: dina
+      KEYCLOAK_PUBLIC_URL: http://${KEYCLOAK_DOMAIN}/auth
+    labels:
+      - "traefik.http.routers.ui.rule=Host(`${OBJECTSTOREUI_DOMAIN}`)"
+  # Reverse proxy exposing Keycloak with a fixed IP on port 80.
+  # Running the Keycloak container directly on port 80 gives a permissions error,
+  # because it doesn't run as root.
+  keycloak-gateway:
+    image: caddy/caddy:2.0.0-rc.3
+    labels:
+      - "traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_DOMAIN}`)"
+    command: caddy reverse-proxy --from :80 --to keycloak:8080
+    networks:
+      default:
+        # Here we set the IP for Keycloak
+        ipv4_address: ${KEYCLOAK_IP}

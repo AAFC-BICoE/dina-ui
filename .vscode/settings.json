@@ -5,5 +5,19 @@
     "**/.settings": true,
     "**/.factorypath": true
   },
-  "java.configuration.updateBuildConfiguration": "automatic"
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "remote.SSH.defaultForwardedPorts": [
+    {
+      "localPort": 2015,
+      "remotePort": 2015
+    },
+    {
+      "localPort": 8080,
+      "remotePort": 8080
+    },
+    {
+      "localPort": 80,
+      "remotePort": 80
+    }
+  ]
 }

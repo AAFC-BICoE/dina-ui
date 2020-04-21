@@ -19,3 +19,26 @@ services:
     ports:
       - "9000:9000"
     command: server /data
+  keycloak:
+    image: jboss/keycloak:9.0.3
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      KEYCLOAK_IMPORT: /keycloak-realm.json
+      DB_VENDOR: POSTGRES
+      DB_ADDR: database
+      DB_DATABASE: objectstore
+      DB_USER: postgres
+      DB_PASSWORD: p
+      DB_SCHEMA: keycloak
+    volumes:
+      - "./keycloak-realm.dev.json:/keycloak-realm.json"
+  traefik:
+    image: traefik:v2.2.0
+    command: --providers.docker=true
+    ports:
+      - "80:80" # Traefik-connected services
+      - "8080:8080" # Traefik web UI
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock

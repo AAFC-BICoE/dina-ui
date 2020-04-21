@@ -1,4 +1,0 @@
-http://:2015
-
-proxy / {$UI_DEV_SERVER_ADDRESS}
-proxy /api {$API_ADDRESS}
