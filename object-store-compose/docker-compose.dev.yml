@@ -81,14 +81,12 @@ services:
       KEYCLOAK_PUBLIC_URL: http://${KEYCLOAK_DOMAIN}/auth
     labels:
       - "traefik.http.routers.ui.rule=Host(`${OBJECTSTOREUI_DOMAIN}`)"
-  # Reverse proxy exposing Keycloak with a fixed IP on port 80.
-  # Running the Keycloak container directly on port 80 gives a permissions error,
-  # because it doesn't run as root.
-  keycloak-gateway:
-    image: caddy/caddy:2.0.0-rc.3
+  keycloak:
+    user: root
+    command: ["-Djboss.http.port=80"]
+    expose: [80]
     labels:
       - "traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_DOMAIN}`)"
-    command: caddy reverse-proxy --from :80 --to keycloak:8080
     networks:
       default:
         # Here we set the IP for Keycloak
