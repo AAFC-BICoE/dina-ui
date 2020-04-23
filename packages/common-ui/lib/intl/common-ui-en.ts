@@ -16,6 +16,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   filterPartialMatch: "Partial Match",
   filterSubmitButtonText: "Filter List",
   loadingText: "Loading...",
+  loggedInAsUser: "Logged in as: {name}",
+  logoutBtn: "Logout",
   resetButtonText: "Reset",
   submitBtnText: "Save",
   tableTotalCount: "Total matched records: {totalCount}"

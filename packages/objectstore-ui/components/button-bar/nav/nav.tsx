@@ -29,6 +29,7 @@ export function Nav() {
   );
 }
 
+/** Shows the logged-in user and the logout button. */
 function NavbarUserControl() {
   const { authenticated, initialized, logout, username } = useAccount();
 
@@ -37,14 +38,19 @@ function NavbarUserControl() {
       {initialized && authenticated ? (
         <>
           {username && (
-            <span className="mr-2 my-auto">Logged in as: {username}</span>
+            <span className="mr-2 my-auto">
+              <ObjectStoreMessage
+                id="loggedInAsUser"
+                values={{ name: username }}
+              />
+            </span>
           )}
           <button
             type="button"
             className="btn btn-dark logout-button"
             onClick={() => logout()}
           >
-            Logout
+            <ObjectStoreMessage id="logoutBtn" />
           </button>
         </>
       ) : null}
