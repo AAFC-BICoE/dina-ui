@@ -1,10 +1,5 @@
 # Additional launch configuration for local dev instances.
 version: "3.7"
-networks:
-  default:
-    ipam:
-      config:
-        - subnet: ${SUBNET}
 services:
   api:
     image: maven:3.6.3-jdk-8
@@ -20,9 +15,6 @@ services:
       - "~/.m2:/var/maven/.m2"
     ports:
       - "5005:5005" # debug port
-    extra_hosts:
-      # Resolve the Keycloak domain to Keycloak's static IP:
-      - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
     # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
     command: >
       bash -c "
@@ -49,7 +41,7 @@ services:
       \"
       spring-boot:run
       "
-  # Dev app that hot-reloads the UI source code:
+  # Nextjs's dev-mode server that hot-reloads the UI source code:
   ui-dev-server:
     image: node:12.16.1
     volumes:
@@ -66,28 +58,12 @@ services:
     command: >
       bash -c "
       yarn --cwd=/dina-ui/packages/objectstore-ui ;
-      yarn --cwd=/dina-ui/packages/objectstore-ui next
+      yarn --cwd=/dina-ui/packages/objectstore-ui dev
       "
   # Front-end gateway that proxies URLs to the correct service:
   ui:
     image: caddy/caddy:2.0.0-rc.3
     volumes:
-      - "./ui.dev.Caddyfile:/etc/caddy/Caddyfile"
+      - "../repos/dina-ui/packages/objectstore-ui/dev.Caddyfile:/etc/caddy/Caddyfile"
     environment:
       UI_DEV_SERVER_ADDRESS: ui-dev-server:3000
-      OBJECTSTORE_API_ADDRESS: api:8080
-      KEYCLOAK_CLIENTID: objectstore
-      KEYCLOAK_REALM: dina
-      KEYCLOAK_PUBLIC_URL: http://${KEYCLOAK_DOMAIN}/auth
-    labels:
-      - "traefik.http.routers.ui.rule=Host(`${OBJECTSTOREUI_DOMAIN}`)"
-  keycloak:
-    user: root
-    command: ["-Djboss.http.port=80"]
-    expose: [80]
-    labels:
-      - "traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_DOMAIN}`)"
-    networks:
-      default:
-        # Here we set the IP for Keycloak
-        ipv4_address: ${KEYCLOAK_IP}
