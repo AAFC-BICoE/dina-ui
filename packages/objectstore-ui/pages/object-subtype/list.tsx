@@ -40,15 +40,14 @@ export default function ObjectSubtypeListPage() {
   return (
     <>
       <Head title={formatMessage("objectSubtypeListTitle")} />
-      <Nav />
-      <ButtonBar>
-        <CreateButton entityLink="object-subtype" />
-      </ButtonBar>
       <div className="container-fluid">
+        <div style={{ marginTop: "10px" }}>
+          <CreateButton entityLink="object-subtype" />
+        </div>
         <h1>
           <ObjectStoreMessage id="objectSubtypeListTitle" />
         </h1>
-        <div style={{ maxWidth: "50rem" }}>
+        <div>
           <QueryTable {...queryTableProps} />
         </div>
       </div>

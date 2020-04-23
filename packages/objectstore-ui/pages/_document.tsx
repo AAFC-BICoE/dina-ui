@@ -41,41 +41,28 @@ class WetFooter extends React.Component {
                 defFooter.outerHTML = wet.builder.appFooter({
 				          "contactLink": "./contact-en.html"
                 });  
-                let isEnLocale = false;                
-                  function getLocaleCookie(key){
-                     let allcookies = document.cookie;
-                     let cookieArr=allcookies.split(";");
-                     let hasLocale = false;
-                     let isEnLocale = false;
-                     cookieArr.map((cookie)=>{
-                       name = cookie.split('=')[0];
-                       value = cookie.split('=')[1];
-                       if(name.indexOf("locale")>=0){
-                         hasLocale=true
-                         isEnLocale = (key==value)
-                      }
-                    })
-                    if(!hasLocale)
-                      isEnLocale = true;
-                    return isEnLocale;
-                };
 
-                  document.body.addEventListener('click', (event) => {
+                document.body.addEventListener('click', (event) => {
                   if (!event.target.matches('.btn.btn-link')) return;
                   let length = document.getElementsByClassName("btn btn-link").length
                   if(length<=0) return;
                   let btnText = document.getElementsByClassName("btn btn-link")[0].innerText;
                   if(btnText.indexOf("English")>=0){
-                    document.cookie = 'locale=en; path=/';                    
+                    window.localStorage.setItem('locale','en');
+                    document.querySelector("#wb-lng button.btn.btn-link").innerHTML = "Français";                                  
                   }
-                  else
-                    document.cookie = 'locale=fr; path=/';
+                  else{
+                    window.localStorage.setItem('locale','fr');
+                    document.querySelector("#wb-lng button.btn.btn-link").innerHTML = "English";                
+                  }                
                   location.reload(false); //loads from browser's cache 
-                });                                 
-                let lan = document.getElementById("wb-lng");
-                isEnLocale = getLocaleCookie("en");
-                lan.innerHTML = '<div class="float-right"><button class="btn btn-link" ></button></div>';                
-                document.querySelector("#wb-lng button.btn.btn-link").innerHTML = isEnLocale? "Français":"English";
+              });
+              let currentLan = window.localStorage.getItem('locale');
+              let lan = document.getElementById("wb-lng");
+              let isEnLocale = currentLan === "en";
+              lan.innerHTML = '<div class="float-right"><button class="btn btn-link" ></button></div>';                
+              document.querySelector("#wb-lng button.btn.btn-link").innerHTML = isEnLocale? "Français":"English";
+
             </script>      
           `;
     return parse(html);

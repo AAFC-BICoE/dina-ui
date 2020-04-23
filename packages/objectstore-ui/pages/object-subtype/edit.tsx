@@ -33,7 +33,6 @@ export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
   return (
     <div>
       <Head title={formatMessage("editObjectSubtypeTitle")} />
-      <Nav />
       <div className="container-fluid">
         {id ? (
           <div>
@@ -87,14 +86,17 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form>
         <ErrorViewer />
-        <ButtonBar>
+        <div
+          style={{ marginLeft: "5px", marginBottom: "40px", marginTop: "20px" }}
+        >
           <SubmitButton />
           <CancelButton
             entityId={id as string}
             entityLink="object-subtype"
             byPassView={true}
           />
-        </ButtonBar>
+        </div>
+
         <div>
           <div className="row">
             <SelectField

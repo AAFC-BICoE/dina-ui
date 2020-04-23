@@ -33,10 +33,6 @@ interface MetadataListFormValues {
 }
 
 export default function MetadataListPage() {
-  const TempPlaceHolder = () => {
-    return <></>;
-  };
-
   const { formatMessage } = useObjectStoreIntl();
 
   const {
@@ -100,11 +96,6 @@ export default function MetadataListPage() {
   ];
 
   useLayoutEffect(() => {
-    const defFooter = document.getElementsByTagName("footer")?.item(0);
-    if (defFooter) {
-      ReactDOM.render(<TempPlaceHolder />, defFooter);
-    }
-
     const details = document.getElementsByClassName("pagedetails")?.item(0);
     if (details) {
       details.setAttribute("style", "padding-top:0;padding-bottom:0");
