@@ -1,9 +1,7 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import {
   ApiClientContext,
-  ApiClientContextConfig,
-  ApiClientContextI,
-  createContextValue
+  ApiClientContextI
 } from "../api-client/ApiClientContext";
 import { useAccount } from "./AccountProvider";
 
@@ -45,7 +43,7 @@ export function AuthenticatedApiClientProvider({
 
   return (
     <ApiClientContext.Provider value={apiContext}>
-      {authenticated ? children : null}
+      {authenticated && initialized ? children : null}
     </ApiClientContext.Provider>
   );
 }

@@ -30,28 +30,24 @@ export function Nav() {
 }
 
 function NavbarUserControl() {
-  const { authenticated, initialized, login, logout, username } = useAccount();
+  const { authenticated, initialized, logout, username } = useAccount();
 
   return (
     <div className="d-flex">
-      {!initialized ? null : authenticated ? (
+      {initialized && authenticated ? (
         <>
           {username && (
             <span className="mr-2 my-auto">Logged in as: {username}</span>
           )}
           <button
             type="button"
-            className="btn btn-dark"
+            className="btn btn-dark logout-button"
             onClick={() => logout()}
           >
             Logout
           </button>
         </>
-      ) : (
-        <button type="button" className="btn btn-dark" onClick={() => login()}>
-          Login
-        </button>
-      )}
+      ) : null}
     </div>
   );
 }
