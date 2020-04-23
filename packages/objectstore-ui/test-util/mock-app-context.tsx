@@ -1,13 +1,17 @@
 import {
-  ApiClientContext,
+  AccountContextI,
+  AccountProvider,
   ApiClientContextI,
+  AuthenticatedApiClientProvider,
   createContextValue
 } from "common-ui";
 import { mount } from "enzyme";
+import { merge, noop } from "lodash";
 import { ObjectStoreIntlProvider } from "../intl/objectstore-intl";
 
 interface MockAppContextProviderProps {
-  apiContext?: ApiClientContextI;
+  apiContext?: Partial<ApiClientContextI>;
+  accountContext?: Partial<AccountContextI>;
   children?: React.ReactNode;
 }
 
@@ -16,20 +20,20 @@ interface MockAppContextProviderProps {
  * the application.
  */
 export function MockAppContextProvider({
+  accountContext,
   apiContext,
   children
 }: MockAppContextProviderProps) {
   return (
-    <ApiClientContext.Provider
-      value={
-        apiContext ||
-        createContextValue({
-          getTempIdGenerator: () => () => "00000000-0000-0000-0000-000000000000"
-        })
-      }
+    <AccountProvider
+      value={merge({}, DEFAULT_MOCK_ACCOUNT_CONTEXT, accountContext)}
     >
-      <ObjectStoreIntlProvider>{children}</ObjectStoreIntlProvider>
-    </ApiClientContext.Provider>
+      <AuthenticatedApiClientProvider
+        apiContext={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContext)}
+      >
+        <ObjectStoreIntlProvider>{children}</ObjectStoreIntlProvider>
+      </AuthenticatedApiClientProvider>
+    </AccountProvider>
   );
 }
 
@@ -46,3 +50,16 @@ export function mountWithAppContext(
     </MockAppContextProvider>
   );
 }
+
+const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = {
+  authenticated: true,
+  initialized: true,
+  login: noop,
+  logout: noop,
+  token: "test-token",
+  username: "test-user"
+};
+
+const DEFAULT_API_CONTEXT_VALUE = createContextValue({
+  getTempIdGenerator: () => () => "00000000-0000-0000-0000-000000000000"
+});

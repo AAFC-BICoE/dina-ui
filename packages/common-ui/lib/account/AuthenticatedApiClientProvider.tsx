@@ -2,18 +2,19 @@ import { ReactNode, useEffect } from "react";
 import {
   ApiClientContext,
   ApiClientContextConfig,
+  ApiClientContextI,
   createContextValue
 } from "../api-client/ApiClientContext";
 import { useAccount } from "./AccountProvider";
 
 interface AuthenticatedApiClientProviderProps {
-  apiClientContextConfig: ApiClientContextConfig;
+  apiContext: ApiClientContextI;
   children: ReactNode;
 }
 
 export function AuthenticatedApiClientProvider({
-  children,
-  apiClientContextConfig
+  apiContext,
+  children
 }: AuthenticatedApiClientProviderProps) {
   const { authenticated, initialized, login, token } = useAccount();
 
@@ -25,10 +26,10 @@ export function AuthenticatedApiClientProvider({
     }
   }, [authenticated, initialized]);
 
-  const apiContext = createContextValue(apiClientContextConfig);
-
-  // Include the bearer token with every API request:
-  apiContext.apiClient.axios.interceptors.request.use(config => {
+  // Include the bearer token with every API request.
+  // 'Interceptors' is nullable here to support the old tests written before authentication was added,
+  // but in the running app it should always be available.
+  apiContext.apiClient.axios.interceptors?.request.use(config => {
     config.headers.Authorization = `Bearer ${token}`;
     return config;
   });

@@ -28,17 +28,17 @@ function uuidv4(): string {
  * See: https://github.com/zeit/next.js/#custom-app
  */
 export default class ObjectStoreUiApp extends App {
+  private contextValue = createContextValue({
+    baseURL: "/api/v1",
+    getTempIdGenerator: () => uuidv4
+  });
+
   public render() {
     const { Component, pageProps } = this.props;
 
     return (
       <KeycloakAccountProvider>
-        <AuthenticatedApiClientProvider
-          apiClientContextConfig={{
-            baseURL: "/api/v1",
-            getTempIdGenerator: () => uuidv4
-          }}
-        >
+        <AuthenticatedApiClientProvider apiContext={this.contextValue}>
           <ObjectStoreIntlProvider>
             <Component {...pageProps} />
           </ObjectStoreIntlProvider>

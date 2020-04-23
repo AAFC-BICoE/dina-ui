@@ -5,7 +5,7 @@ import {
 } from "@react-keycloak/nextjs";
 import { createContext, ReactNode, useContext } from "react";
 
-interface AccountContextI {
+export interface AccountContextI {
   authenticated?: boolean;
   login: () => void;
   logout: () => void;
