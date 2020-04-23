@@ -25,7 +25,12 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
       keycloakConfig={"/keycloak.json" as any}
       // Server-side rendering config omitted because we aren't using server-side rendering.
       persistor={Persistors.Cookies({})}
-      initConfig={{}}
+      initConfig={{
+        onLoad: "check-sso",
+        silentCheckSsoRedirectUri: process.browser
+          ? `${window.location.origin}/static/silent-check-sso.xhtml`
+          : undefined
+      }}
     >
       <KeycloakAccountProviderInternal>
         {children}

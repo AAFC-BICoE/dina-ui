@@ -1,6 +1,6 @@
-import { intlContext, LanguageSelector } from "common-ui";
+import { LanguageSelector, useAccount } from "common-ui";
 import Link from "next/link";
-import React, { useContext } from "react";
+import React from "react";
 import { ObjectStoreMessage } from "../../../intl/objectstore-intl";
 import "./nav.css";
 
@@ -16,10 +16,42 @@ export function Nav() {
             <ObjectStoreMessage id="appTitle" />
           </a>
         </Link>
-        <div className="nav navbar-nav float-right">
-          <LanguageSelector />
-        </div>
+        <ul className="navbar-nav ml-auto">
+          <li className="nav-item mx-2">
+            <LanguageSelector />
+          </li>
+          <li className="nav-item mx-2">
+            <NavbarUserControl />
+          </li>
+        </ul>
       </div>
     </nav>
+  );
+}
+
+function NavbarUserControl() {
+  const { authenticated, initialized, login, logout, username } = useAccount();
+
+  return (
+    <div className="d-flex">
+      {!initialized ? null : authenticated ? (
+        <>
+          {username && (
+            <span className="mr-2 my-auto">Logged in as: {username}</span>
+          )}
+          <button
+            type="button"
+            className="btn btn-dark"
+            onClick={() => logout()}
+          >
+            Logout
+          </button>
+        </>
+      ) : (
+        <button type="button" className="btn btn-dark" onClick={() => login()}>
+          Login
+        </button>
+      )}
+    </div>
   );
 }
