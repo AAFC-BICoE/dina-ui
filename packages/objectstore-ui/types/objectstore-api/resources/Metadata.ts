@@ -18,6 +18,7 @@ export interface MetadataAttributes {
 
   // optional fields
   acRights?: string;
+  acSubType?: string;
   acCaption?: string;
   dcFormat?: string;
   createdDate?: string;

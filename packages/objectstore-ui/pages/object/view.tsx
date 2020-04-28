@@ -31,7 +31,12 @@ export default function MetadataViewPage() {
   if (response) {
     const metadata = response.data;
 
-    const filePath = `/api/v1/file/${metadata.bucket}/${metadata.fileIdentifier}`;
+    const fileId =
+      metadata.acSubType === "THUMBNAIL"
+        ? `${metadata.fileIdentifier}.thumbnail`
+        : metadata.fileIdentifier;
+
+    const filePath = `/api/v1/file/${metadata.bucket}/${fileId}`;
     const fileType = metadata.fileExtension.replace(/\./, "").toLowerCase();
 
     return (
