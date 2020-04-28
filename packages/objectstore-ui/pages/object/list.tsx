@@ -123,6 +123,8 @@ export default function MetadataListPage() {
           <div className={`table-section col-${tableSectionWidth}`}>
             <SplitPagePanel>
               <ListPageLayout<Metadata>
+                // Filter out the derived objects e.g. thumbnails:
+                additionalFilters={{ rsql: "acSubTypeId==null" }}
                 filterAttributes={METADATA_FILTER_ATTRIBUTES}
                 id="metadata-list"
                 queryTableProps={{
