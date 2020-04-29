@@ -11,3 +11,8 @@ export interface AuditSnapshotAttributes {
 }
 
 export type AuditSnapshot = KitsuResource & AuditSnapshotAttributes;
+
+export interface AuditToEntityReference {
+  typeName: string;
+  cdoId: string;
+}

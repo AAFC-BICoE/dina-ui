@@ -2,10 +2,12 @@ import {
   ColumnDefinition,
   DefaultTd,
   ListPageLayout,
-  LoadingSpinner,
-  useQuery
+  useQuery,
+  withResponse
 } from "common-ui";
+import { KitsuResource } from "kitsu";
 import { pick, toPairs } from "lodash";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { ComponentType } from "react";
 import { useIntl } from "react-intl";
@@ -17,7 +19,11 @@ import {
   ObjectStoreMessage,
   useObjectStoreIntl
 } from "../../intl/objectstore-intl";
-import { AuditSnapshot, Metadata } from "../../types/objectstore-api";
+import {
+  AuditSnapshot,
+  AuditToEntityReference,
+  Metadata
+} from "../../types/objectstore-api";
 
 const REVISION_TABLE_COLUMNS: Array<ColumnDefinition<Metadata>> = [
   "version",
@@ -40,15 +46,11 @@ export default function RevisionListPage() {
   const router = useRouter();
   const { id } = router.query;
 
-  const { loading, response } = useQuery<Metadata>({
+  const metadataQuery = useQuery<Metadata>({
     path: `metadata/${id}`
   });
 
-  if (loading || !id) {
-    return <LoadingSpinner loading={true} />;
-  }
-
-  if (response) {
+  return withResponse(metadataQuery, response => {
     const metadata = response.data;
 
     const pageTitle = formatMessage("metadataRevisionsListTitle", {
@@ -87,9 +89,7 @@ export default function RevisionListPage() {
         </div>
       </>
     );
-  }
-
-  return null;
+  });
 }
 
 interface KeyValueTableProps {
@@ -166,6 +166,19 @@ const ChangedPropertiesPopout: SubComponentFunction = ({ original }) => {
       <KeyValueTable
         data={changed}
         customValueCells={{
+          // Link to the original metadata:
+          acDerivedFrom: ({ original: { value } }) => {
+            return (
+              <ReferenceLink<Metadata>
+                instanceId={value}
+                link={({ id, originalFilename }) => (
+                  <Link href={`/object/view?id=${id}`}>
+                    <a>{originalFilename}</a>
+                  </Link>
+                )}
+              />
+            );
+          },
           managedAttributeMap: CustomManagedAttributeChangeCell
         }}
       />
@@ -175,4 +188,21 @@ const ChangedPropertiesPopout: SubComponentFunction = ({ original }) => {
 
 function CustomManagedAttributeChangeCell({ original }) {
   return <MetadataManagedAttributes managedAttributeMap={original.value} />;
+}
+
+interface ReferenceLinkProps<TResource extends KitsuResource> {
+  instanceId: AuditToEntityReference;
+  link: (dto: TResource) => JSX.Element;
+}
+
+/** A link from a revision to a referenced resource. */
+function ReferenceLink<TResource extends KitsuResource>({
+  link,
+  instanceId: { cdoId, typeName }
+}: ReferenceLinkProps<TResource>) {
+  const q = useQuery<TResource>({
+    path: `${typeName}/${cdoId}`
+  });
+
+  return withResponse(q, res => link(res.data as TResource));
 }

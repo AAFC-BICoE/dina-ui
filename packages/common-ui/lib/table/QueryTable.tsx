@@ -1,4 +1,5 @@
 import { FieldsParam, FilterParam, KitsuResource, KitsuResponse } from "kitsu";
+import { isPlainObject } from "lodash";
 import React, { useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import ReactTable, { Column, SortingRule, TableProps } from "react-table";
@@ -220,6 +221,12 @@ export function QueryTable<TData extends KitsuResource>({
 }
 
 export function DefaultTd({ className, style, children, onClick }) {
+  // If children is not a renderable child, stringify it to make it renderable:
+  const content =
+    isPlainObject(children) && !children.props
+      ? JSON.stringify(children)
+      : children;
+
   return (
     <div
       className={`${className} rt-td`}
@@ -229,7 +236,7 @@ export function DefaultTd({ className, style, children, onClick }) {
       // Hovering over the cell should show the value next to the cursor:
       title={typeof children === "string" ? children : undefined}
     >
-      {children}
+      {content}
     </div>
   );
 }

@@ -1,8 +1,9 @@
 import { DocWithErrors } from "jsonapi-typescript";
 import { GetParams, KitsuResponse, KitsuResponseData } from "kitsu";
 import { isUndefined, omitBy } from "lodash";
-import { useCallback, useContext, useRef } from "react";
+import { ReactNode, useCallback, useContext, useRef } from "react";
 import { useAsyncRun, useAsyncTask } from "react-hooks-async";
+import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { ApiClientContext } from "./ApiClientContext";
 
 /** Attributes that compose a JsonApi query. */
@@ -71,4 +72,24 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
     loading: !!task.pending,
     response: previousResponseRef.current
   };
+}
+
+/** Only render if there is a response, otherwise show generic loading and error states. */
+export function withResponse<
+  TData extends KitsuResponseData,
+  TMeta = undefined
+>(
+  { loading, error, response }: QueryState<TData, TMeta>,
+  responseRenderer: (response: KitsuResponse<TData, TMeta>) => JSX.Element
+): JSX.Element | null {
+  if (loading) {
+    return <LoadingSpinner loading={true} />;
+  }
+  if (error) {
+    return <div className="alert alert-danger">{status}</div>;
+  }
+  if (response) {
+    return responseRenderer(response);
+  }
+  return null;
 }
