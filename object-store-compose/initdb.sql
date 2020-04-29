@@ -1,1 +1,1 @@
-CREATE SCHEMA objectstore;
+CREATE SCHEMA object_store;
