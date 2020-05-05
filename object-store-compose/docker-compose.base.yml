@@ -59,7 +59,7 @@ services:
   api:
     image: objectstore-api:tag
     environment:
-      spring.datasource.url=jdbc:postgresql://database/objectstore?currentSchema: object_store
+      spring.datasource.url: jdbc:postgresql://database/objectstore?currentSchema=object_store
       spring.datasource.username: postgres
       spring.datasource.password: p
       spring.datasource.continue-on-error: "true"

@@ -1,13 +1,5 @@
-version: "3.6"
+version: "3.7"
 services:
-  database:
-    image: postgres:9.6
-    environment:
-      POSTGRES_DB: seqdb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: p
-    volumes:
-      - ./initdb.sql:/docker-entrypoint-initdb.d/1-initdb.sql
   api:
     image: maven:3.6.3-jdk-8
     volumes:
@@ -61,5 +53,3 @@ services:
     environment:
       UI_DEV_SERVER_ADDRESS: ui-dev-server:3000
       API_ADDRESS: api:8080
-    ports:
-      - "2015:2015"
