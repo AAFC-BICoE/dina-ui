@@ -21,7 +21,7 @@ services:
       mvn
       -f /app/pom.xml
       -Duser.home=/var/maven
-      -Dspring.datasource.url=jdbc:postgresql://database/objectstore?currentSchema=objectstore
+      -Dspring.datasource.url=jdbc:postgresql://database/objectstore?currentSchema=object_store
       -Dspring.datasource.username=postgres
       -Dspring.datasource.password=p
       -Dspring.datasource.continue-on-error=true
