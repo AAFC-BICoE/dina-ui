@@ -13,7 +13,7 @@ COPY ./ ./
 # objectstore-ui step:
 RUN yarn --cwd=/dina-ui/packages/objectstore-ui build
 
-FROM abiosoft/caddy:1.0.3-no-stats
-COPY --from=builder /dina-ui/packages/objectstore-ui/prod.Caddyfile /etc/Caddyfile
+FROM caddy/caddy:2.0.0-rc.3
+COPY --from=builder /dina-ui/packages/objectstore-ui/prod.Caddyfile /etc/caddy/Caddyfile
 COPY --from=builder /dina-ui/packages/objectstore-ui/out /www/html
 EXPOSE 80

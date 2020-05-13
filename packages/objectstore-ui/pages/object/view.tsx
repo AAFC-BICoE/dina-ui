@@ -42,9 +42,11 @@ export default function MetadataViewPage() {
         <div className="container-fluid">
           <div className="row">
             <div className="col-md-4">
-              <a href={filePath}>
-                <FileView filePath={filePath} fileType={fileType} />
-              </a>
+              <FileView
+                clickToDownload={true}
+                filePath={filePath}
+                fileType={fileType}
+              />
             </div>
             <div className="col-md-8">
               <div className="container">

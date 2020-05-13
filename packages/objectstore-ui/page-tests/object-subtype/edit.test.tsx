@@ -6,6 +6,9 @@ import { mountWithAppContext } from "../../test-util/mock-app-context";
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
+/** Mock next.js' router "push" function for navigating pages. */
+const mockPush = jest.fn();
+
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
   // The get request will return the existing object subtype.
@@ -15,23 +18,11 @@ const mockGet = jest.fn(async model => {
   }
 });
 
-/** Mock axios for operations requests. */
+// Mock API requests:
 const mockPatch = jest.fn();
-
-/** Mock next.js' router "push" function for navigating pages. */
-const mockPush = jest.fn();
-
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-      public axios = {
-        patch: mockPatch
-      };
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+};
 
 describe("Object subtype edit page", () => {
   beforeEach(() => {
@@ -56,7 +47,8 @@ describe("Object subtype edit page", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <ObjectSubtypeEditPage router={{ query: {}, push: mockPush } as any} />
+      <ObjectSubtypeEditPage router={{ query: {}, push: mockPush } as any} />,
+      { apiContext }
     );
 
     expect(wrapper.find(".acSubtype-field input")).toHaveLength(1);
@@ -113,7 +105,8 @@ describe("Object subtype edit page", () => {
     const wrapper = mountWithAppContext(
       <ObjectSubtypeEditPage
         router={{ query: { id: 1 }, push: mockPush } as any}
-      />
+      />,
+      { apiContext }
     );
 
     // The page should load initially with a loading spinner.
@@ -181,7 +174,8 @@ describe("Object subtype edit page", () => {
     }));
 
     const wrapper = mountWithAppContext(
-      <ObjectSubtypeEditPage router={{ query: {}, push: mockPush } as any} />
+      <ObjectSubtypeEditPage router={{ query: {}, push: mockPush } as any} />,
+      { apiContext }
     );
 
     // Submit the form.
