@@ -86,18 +86,9 @@ const mockMetaGet = jest.fn(async model => {
   }
 });
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockMetaGet;
-      public axios = {
-        patch: mockPatch,
-        post: mockPost
-      };
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockMetaGet, axios: { patch: mockPatch, post: mockPost } }
+};
 
 describe("Detail edit page", () => {
   beforeEach(() => {
@@ -125,7 +116,8 @@ describe("Detail edit page", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <DetailEditPage router={{ query: { id: 100 }, push: mockPush } as any} />
+      <DetailEditPage router={{ query: { id: 100 }, push: mockPush } as any} />,
+      { apiContext }
     );
 
     await Promise.resolve();

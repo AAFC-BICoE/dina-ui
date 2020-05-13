@@ -44,9 +44,11 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
             </a>
           </Link>
         </div>
-        <a href={filePath}>
-          <FileView filePath={filePath} fileType={fileType} />
-        </a>
+        <FileView
+          clickToDownload={true}
+          filePath={filePath}
+          fileType={fileType}
+        />
         <MetadataDetails metadata={metadata} />
       </div>
     );

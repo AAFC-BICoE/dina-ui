@@ -1,0 +1,7 @@
+node_modules
+**/node_modules
+packages/*/__tests__
+packages/*/out
+packages/*/coverage
+packages/*/build
+packages/*/.next

@@ -39,6 +39,8 @@ export interface ApiClientContextConfig {
    * The generated ID should be in the back-end's expected format (e.g. number or UUID).
    */
   getTempIdGenerator?: () => () => string;
+
+  headers?: Record<string, string>;
 }
 
 /** save function args. */
@@ -64,11 +66,12 @@ export function createContextValue({
   getTempIdGenerator = () => {
     let idIterator = -100;
     return () => String(idIterator--);
-  }
+  },
+  headers = {}
 }: ApiClientContextConfig = {}): ApiClientContextI {
   const apiClient = new Kitsu({
     baseURL,
-    headers: { "Crnk-Compact": "true" },
+    headers: { "Crnk-Compact": "true", ...headers },
     pluralize: false,
     resourceCase: "none"
   });
