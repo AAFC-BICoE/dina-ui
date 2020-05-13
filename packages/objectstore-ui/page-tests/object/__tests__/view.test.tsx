@@ -64,7 +64,7 @@ describe("Single Stored Object details page", () => {
         .find("img")
         .prop("src")
     ).toEqual(
-      "/api/v1/file/testbucket/cf99c285-0353-4fed-a15d-ac963e0514f3.thumbnail"
+      "/api/v1/file/testbucket/cf99c285-0353-4fed-a15d-ac963e0514f3.thumbnail?access_token=test-token"
     );
   });
 });
