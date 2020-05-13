@@ -1,0 +1,34 @@
+version: "3.7"
+services:
+  database:
+    image: postgres:9.6
+    environment:
+      POSTGRES_DB: seqdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: p
+    volumes:
+      - ./initdb.sql:/docker-entrypoint-initdb.d/1-initdb.sql
+  api:
+    image: seqdb-api:tag
+    environment:
+      spring.datasource.url: jdbc:postgresql://database/seqdb?currentSchema=seqdb
+      spring.datasource.username: postgres
+      spring.datasource.password: p
+      spring.datasource.continue-on-error: "true"
+      spring.liquibase.user: postgres
+      spring.liquibase.password: p
+  ui:
+    image: seqdb-ui:tag
+    environment:
+      API_ADDRESS: api:8080
+    labels:
+      - "traefik.http.routers.ui.rule=Host(`${SEQDBUI_DOMAIN}`)"
+  traefik:
+    image: traefik:v2.2.0
+    command: --providers.docker=true
+    ports:
+      - "80:80" # Traefik-connected services
+      - "8080:8080" # Traefik web UI
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
