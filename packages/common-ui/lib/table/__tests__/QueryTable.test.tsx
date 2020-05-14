@@ -47,14 +47,7 @@ const mockGet = jest.fn(async (_, { page }) => {
   return getMockTodos(page);
 });
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-    }
-);
+const apiContext: any = { apiClient: { get: mockGet } };
 
 describe("QueryTable component", () => {
   const { objectContaining, anything } = expect;
@@ -66,7 +59,10 @@ describe("QueryTable component", () => {
 
   it("Renders loading state initially.", () => {
     const wrapper = mountWithAppContext(
-      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
+      {
+        apiContext
+      }
     );
 
     expect(
@@ -80,7 +76,8 @@ describe("QueryTable component", () => {
 
   it("Renders the data from the mocked backend.", async () => {
     const wrapper = mountWithAppContext(
-      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
+      { apiContext }
     );
 
     // Continue the test after the data fetch is done.
@@ -118,7 +115,8 @@ describe("QueryTable component", () => {
       <QueryTable<Todo>
         path="todo"
         columns={["id", "name", "description", "relatedEntity.name"]}
-      />
+      />,
+      { apiContext }
     );
 
     // Expect the headers in title case.
@@ -142,7 +140,8 @@ describe("QueryTable component", () => {
 
   it("Renders the total number of pages when no custom pageSize is specified.", async () => {
     const wrapper = mountWithAppContext(
-      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
+      { apiContext }
     );
 
     // Wait until the data is loaded into the table.
@@ -163,7 +162,8 @@ describe("QueryTable component", () => {
         path="todo"
         defaultPageSize={40}
         columns={["id", "name", "description"]}
-      />
+      />,
+      { apiContext }
     );
 
     // Wait until the data is loaded into the table.
@@ -184,7 +184,8 @@ describe("QueryTable component", () => {
         path="todo"
         defaultPageSize={25}
         columns={["id", "name", "description"]}
-      />
+      />,
+      { apiContext }
     );
 
     // Wait for page 1 to load.
@@ -239,7 +240,8 @@ describe("QueryTable component", () => {
         path="todo"
         defaultPageSize={25}
         columns={["id", "name", "description"]}
-      />
+      />,
+      { apiContext }
     );
 
     // Wait for page 1 to load.
@@ -292,7 +294,8 @@ describe("QueryTable component", () => {
         path="todo"
         columns={["id", "name", "description"]}
         defaultSort={[{ id: "description", desc: false }]}
-      />
+      />,
+      { apiContext }
     );
 
     // Wait for the initial request to finish.
@@ -307,7 +310,8 @@ describe("QueryTable component", () => {
 
   it("Fetches sorted data when the header is clicked.", async () => {
     const wrapper = mountWithAppContext(
-      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
+      { apiContext }
     );
 
     // Wait for the initial request to finish.
@@ -344,7 +348,8 @@ describe("QueryTable component", () => {
 
   it("Fetches multi-sorted data when a second header is shift-clicked.", async () => {
     const wrapper = mountWithAppContext(
-      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
+      { apiContext }
     );
 
     // Wait for the initial request to finish.
@@ -382,7 +387,8 @@ describe("QueryTable component", () => {
         path="todo"
         defaultPageSize={5}
         columns={["id", "name", "description"]}
-      />
+      />,
+      { apiContext }
     );
 
     // Wait for the initial request to finish.
@@ -432,7 +438,9 @@ describe("QueryTable component", () => {
       path: "todo"
     };
 
-    const wrapper = mountWithAppContext(<QueryTable<Todo> {...firstProps} />);
+    const wrapper = mountWithAppContext(<QueryTable<Todo> {...firstProps} />, {
+      apiContext
+    });
 
     // Wait for the first request to finish.
     await new Promise(setImmediate);
@@ -463,7 +471,8 @@ describe("QueryTable component", () => {
         path="todo"
         columns={["id", "name", "description"]}
         include="relatedResource"
-      />
+      />,
+      { apiContext }
     );
 
     // Wait for the first request to finish.
@@ -498,7 +507,8 @@ describe("QueryTable component", () => {
 
     // Create the table with headers
     const wrapper = mountWithAppContext(
-      <QueryTable<Todo> path="todo" columns={columns} />
+      <QueryTable<Todo> path="todo" columns={columns} />,
+      { apiContext }
     );
 
     // Wait for the request to finish.
@@ -536,7 +546,8 @@ describe("QueryTable component", () => {
         defaultPageSize={10}
         path="todo"
         columns={["id", "name", "description"]}
-      />
+      />,
+      { apiContext }
     );
 
     // Wait until the data is loaded into the table.
@@ -562,7 +573,8 @@ describe("QueryTable component", () => {
 
   it("Has the paginator at the top and bottom of the table.", () => {
     const wrapper = mountWithAppContext(
-      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
+      { apiContext }
     );
 
     expect(wrapper.find(".pagination-top").exists()).toEqual(true);
@@ -579,7 +591,8 @@ describe("QueryTable component", () => {
         reactTableProps={{
           onPageSizeChange: mockOnPageSizeChange
         }}
-      />
+      />,
+      { apiContext }
     );
 
     // It should just pass the prop to ReactTable.
@@ -598,7 +611,8 @@ describe("QueryTable component", () => {
         reactTableProps={{
           onSortedChange: mockOnSortedChange
         }}
-      />
+      />,
+      { apiContext }
     );
 
     // It should just pass the prop to ReactTable.
@@ -609,7 +623,8 @@ describe("QueryTable component", () => {
 
   it("Shows the total records count.", async () => {
     const wrapper = mountWithAppContext(
-      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
+      { apiContext }
     );
 
     // Wait for the initial request to finish and the total to render.
@@ -627,7 +642,8 @@ describe("QueryTable component", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
+      { apiContext }
     );
 
     // Wait for the initial request to finish and the result to render.
@@ -650,7 +666,8 @@ describe("QueryTable component", () => {
         loading={true}
         path="todo"
         columns={["id", "name", "description"]}
-      />
+      />,
+      { apiContext }
     );
 
     // Wait for the initial request to finish and render.
@@ -670,7 +687,8 @@ describe("QueryTable component", () => {
         reactTableProps={{
           onFilteredChange: mockOnFilteredChange
         }}
-      />
+      />,
+      { apiContext }
     );
 
     const headerInput = wrapper.find(".rt-th input");
@@ -701,7 +719,8 @@ describe("QueryTable component", () => {
         messages={{ field_testField: "My Field Label" }}
       >
         <QueryTable<Todo> loading={true} path="todo" columns={["testField"]} />
-      </IntlProvider>
+      </IntlProvider>,
+      { apiContext }
     );
 
     expect(
@@ -726,7 +745,8 @@ describe("QueryTable component", () => {
             );
           }
         })}
-      />
+      />,
+      { apiContext }
     );
 
     // Wait for the initial request to finish and the result to render.

@@ -29,14 +29,7 @@ const mockGet = jest.fn(async (_, { filter }) => {
   return MOCK_GROUPS;
 });
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-    }
-);
+const apiContext: any = { apiClient: { get: mockGet } };
 
 // Mock out the debounce function to avoid waiting during tests.
 jest.spyOn(lodash, "debounce").mockImplementation((fn: any) => fn);
@@ -54,7 +47,8 @@ describe("ResourceSelectField component", () => {
           filter={groupName => ({ groupName })}
           optionLabel={group => group.groupName}
         />
-      </Formik>
+      </Formik>,
+      { apiContext }
     );
 
     const { value } = wrapper.find(Select).props();
@@ -81,7 +75,8 @@ describe("ResourceSelectField component", () => {
             <div id="value-display">{group && group.groupName}</div>
           </div>
         )}
-      </Formik>
+      </Formik>,
+      { apiContext }
     );
 
     // Wait for the options to load.
@@ -128,7 +123,8 @@ describe("ResourceSelectField component", () => {
           optionLabel={group => group.groupName}
           onChange={mockOnChange}
         />
-      </Formik>
+      </Formik>,
+      { apiContext }
     );
 
     // Change the value.
