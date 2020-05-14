@@ -47,16 +47,16 @@ services:
       default:
         # Here we set the IP for Keycloak
         ipv4_address: ${KEYCLOAK_IP}
-  ui:
+  objectstore-ui:
     image: objectstore-ui:tag
     environment:
-      OBJECTSTORE_API_ADDRESS: api:8080
+      OBJECTSTORE_API_ADDRESS: objectstore-api:8080
       KEYCLOAK_CLIENTID: objectstore
       KEYCLOAK_REALM: dina
       KEYCLOAK_PUBLIC_URL: http://${KEYCLOAK_DOMAIN}/auth
     labels:
-      - "traefik.http.routers.ui.rule=Host(`${OBJECTSTOREUI_DOMAIN}`)"
-  api:
+      - "traefik.http.routers.objectstore-ui.rule=Host(`${OBJECTSTOREUI_DOMAIN}`)"
+  objectstore-api:
     image: objectstore-api:tag
     environment:
       spring.datasource.url: jdbc:postgresql://database/objectstore?currentSchema=object_store
@@ -76,6 +76,20 @@ services:
     extra_hosts:
       # Resolve the Keycloak domain to Keycloak's static IP:
       - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
+  agent-api:
+    image: agent-api:tag
+    extra_hosts:
+      # Resolve the Keycloak domain to Keycloak's static IP:
+      - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
+  agent-ui:
+    image: agent-ui:tag
+    environment:
+      AGENT_API_ADDRESS: agent-api:8080
+      KEYCLOAK_CLIENTID: objectstore
+      KEYCLOAK_REALM: dina
+      KEYCLOAK_PUBLIC_URL: http://${KEYCLOAK_DOMAIN}/auth
+    labels:
+      - "traefik.http.routers.agent-ui.rule=Host(`${AGENTUI_DOMAIN}`)"
   traefik:
     image: traefik:v2.2.0
     command: --providers.docker=true
