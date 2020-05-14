@@ -10,7 +10,7 @@ import { Form, Formik, FormikContext } from "formik";
 import { noop, toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { Component, useMemo, useState } from "react";
 import { Head, Nav, StoredObjectGallery } from "../../components";
 import { MetadataPreview } from "../../components/metadata/MetadataPreview";
 import {
@@ -94,6 +94,19 @@ export default function MetadataListPage() {
     }
   ];
 
+  // Workaround to make sure react-table doesn't unmount TBodyComponent unmounted
+  // when MetadataListPage is re-rendered:
+  const TBodyGallery = useMemo(
+    () =>
+      class ReusedTBodyComponent extends Component {
+        public static innerComponent;
+        public render() {
+          return ReusedTBodyComponent.innerComponent;
+        }
+      },
+    []
+  );
+
   return (
     <div>
       <Head title={formatMessage("objectListTitle")} />
@@ -123,6 +136,8 @@ export default function MetadataListPage() {
           <div className={`table-section col-${tableSectionWidth}`}>
             <SplitPagePanel>
               <ListPageLayout<Metadata>
+                // Filter out the derived objects e.g. thumbnails:
+                additionalFilters={{ rsql: "acSubTypeId==null" }}
                 filterAttributes={METADATA_FILTER_ATTRIBUTES}
                 id="metadata-list"
                 queryTableProps={{
@@ -130,32 +145,34 @@ export default function MetadataListPage() {
                   include: "acMetadataCreator",
                   onSuccess: res => setAvailableMetadatas(res.data),
                   path: "metadata",
-                  reactTableProps: ({ response }) => ({
-                    TbodyComponent:
-                      listLayoutType === "GALLERY"
-                        ? () => (
-                            <StoredObjectGallery
-                              CheckBoxField={CheckBoxField}
-                              metadatas={response?.data ?? []}
-                              previewMetadataId={previewMetadataId}
-                              onSelectPreviewMetadataId={setPreviewMetadataId}
-                            />
-                          )
-                        : undefined,
-                    getTrProps: (_, rowInfo) => {
-                      if (rowInfo) {
-                        const metadata: Metadata = rowInfo.original;
-                        return {
-                          style: {
-                            background:
-                              metadata.id === previewMetadataId &&
-                              HIGHLIGHT_COLOR
-                          }
-                        };
+                  reactTableProps: ({ response }) => {
+                    TBodyGallery.innerComponent = (
+                      <StoredObjectGallery
+                        CheckBoxField={CheckBoxField}
+                        metadatas={response?.data ?? []}
+                        previewMetadataId={previewMetadataId}
+                        onSelectPreviewMetadataId={setPreviewMetadataId}
+                      />
+                    );
+
+                    return {
+                      TbodyComponent:
+                        listLayoutType === "GALLERY" ? TBodyGallery : undefined,
+                      getTrProps: (_, rowInfo) => {
+                        if (rowInfo) {
+                          const metadata: Metadata = rowInfo.original;
+                          return {
+                            style: {
+                              background:
+                                metadata.id === previewMetadataId &&
+                                HIGHLIGHT_COLOR
+                            }
+                          };
+                        }
+                        return {};
                       }
-                      return {};
-                    }
-                  })
+                    };
+                  }
                 }}
                 WrapTable={MetadataListWrapper}
               />

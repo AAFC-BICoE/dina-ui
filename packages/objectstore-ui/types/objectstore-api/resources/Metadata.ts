@@ -18,6 +18,7 @@ export interface MetadataAttributes {
 
   // optional fields
   acRights?: string;
+  acSubType?: string;
   acCaption?: string;
   dcFormat?: string;
   createdDate?: string;
@@ -37,6 +38,7 @@ export interface MetadataRelationships {
   acMetadataCreator?: Agent | null;
   dcCreator?: Agent | null;
   managedAttributeMap?: ManagedAttributeMap | null;
+  acDerivedFrom?: Metadata | null;
 }
 
 export type Metadata = KitsuResource &

@@ -1,4 +1,5 @@
 import { PersistedResource } from "kitsu";
+import { FileView } from "../../../components/file-view/FileView";
 import MetadataViewPage from "../../../pages/object/view";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Metadata } from "../../../types/objectstore-api";
@@ -27,7 +28,7 @@ const TEST_METADATA: PersistedResource<Metadata> = {
   type: "metadata"
 };
 
-const mockGet = jest.fn(async () => ({ data: TEST_METADATA }));
+const mockGet = jest.fn();
 const apiContext: any = { apiClient: { get: mockGet } };
 
 // Pretend the metadata id was passed in the URL:
@@ -36,10 +37,34 @@ jest.mock("next/router", () => ({
 }));
 
 describe("Single Stored Object details page", () => {
+  beforeEach(() => {
+    mockGet.mockReset();
+    mockGet.mockImplementation(async () => ({ data: TEST_METADATA }));
+  });
+
   it("Renders the page.", async () => {
     const wrapper = mountWithAppContext(<MetadataViewPage />, { apiContext });
 
     await new Promise(setImmediate);
     wrapper.update();
+  });
+
+  it("Renders the thumbnail if the metadata is a thumbnail type.", async () => {
+    const THUMBNAIL_METADATA = { ...TEST_METADATA, acSubType: "THUMBNAIL" };
+    mockGet.mockImplementation(async () => ({ data: THUMBNAIL_METADATA }));
+
+    const wrapper = mountWithAppContext(<MetadataViewPage />, { apiContext });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper
+        .find(FileView)
+        .find("img")
+        .prop("src")
+    ).toEqual(
+      "/api/v1/file/testbucket/cf99c285-0353-4fed-a15d-ac963e0514f3.thumbnail?access_token=test-token"
+    );
   });
 });
