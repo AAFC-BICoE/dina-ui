@@ -1,6 +1,5 @@
 export * from "./account/AccountProvider";
 export * from "./account/AuthenticatedApiClientProvider";
-export * from "./account/NavbarUserControl";
 export * from "./api-client/ApiClientContext";
 export * from "./api-client/operations-types";
 export * from "./api-client/Query";

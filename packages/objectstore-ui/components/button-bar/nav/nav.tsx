@@ -1,4 +1,4 @@
-import { LanguageSelector, NavbarUserControl } from "common-ui";
+import { LanguageSelector, useAccount } from "common-ui";
 import Link from "next/link";
 import React from "react";
 import { ObjectStoreMessage } from "../../../intl/objectstore-intl";
@@ -26,5 +26,34 @@ export function Nav() {
         </ul>
       </div>
     </nav>
+  );
+}
+
+/** Shows the logged-in user and the logout button. */
+function NavbarUserControl() {
+  const { authenticated, initialized, logout, username } = useAccount();
+
+  return (
+    <div className="d-flex">
+      {initialized && authenticated ? (
+        <>
+          {username && (
+            <span className="mr-2 my-auto">
+              <ObjectStoreMessage
+                id="loggedInAsUser"
+                values={{ name: username }}
+              />
+            </span>
+          )}
+          <button
+            type="button"
+            className="btn btn-dark logout-button"
+            onClick={() => logout()}
+          >
+            <ObjectStoreMessage id="logoutBtn" />
+          </button>
+        </>
+      ) : null}
+    </div>
   );
 }
