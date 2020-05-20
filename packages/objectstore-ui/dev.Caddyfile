@@ -11,4 +11,9 @@ respond /keycloak.json "{ \"resource\": \"{$KEYCLOAK_CLIENTID}\", \"realm\": \"{
 # Proxy to the back-end API:
 reverse_proxy /api/* {$OBJECTSTORE_API_ADDRESS}
 
+route /agent-api/* {
+	uri replace /agent-api/ /api/
+	reverse_proxy {$AGENT_API_ADDRESS}
+}
+
 reverse_proxy /* {$UI_DEV_SERVER_ADDRESS}

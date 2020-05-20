@@ -1,6 +1,6 @@
 import Kitsu, { KitsuResource, PersistedResource } from "kitsu";
 import { deserialise } from "kitsu-core";
-import React from "react";
+import React, { useContext } from "react";
 import { serialize } from "../util/serialize";
 import {
   FailedOperation,
