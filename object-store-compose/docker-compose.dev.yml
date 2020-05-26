@@ -71,6 +71,7 @@ services:
         -Dspring.liquibase.user=postgres
         -Dspring.liquibase.password=p
         -Dkeycloak.enabled=true
+        -Dkeycloak.resource=objectstore
         -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
       \"
       spring-boot:run
@@ -101,27 +102,3 @@ services:
       - "../repos/dina-ui/packages/objectstore-ui/dev.Caddyfile:/etc/caddy/Caddyfile"
     environment:
       UI_DEV_SERVER_ADDRESS: objectstore-ui-dev-server:3000
-  agent-ui-dev-server:
-    image: node:12.16.1
-    volumes:
-      - "../repos/dina-ui:/dina-ui"
-      # Share host home directory for yarn cache:
-      - /home/${USER}:/home/${USER}
-      # Share host users:
-      - /etc/group:/etc/group:ro
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/shadow:/etc/shadow:ro
-    # Run as Docker host user so generated files don't belong to root:
-    user: $UID:$GID
-    stop_signal: SIGKILL
-    command: >
-      bash -c "
-      yarn --cwd=/dina-ui/packages/agent-ui ;
-      yarn --cwd=/dina-ui/packages/agent-ui dev
-      "
-  agent-ui:
-    image: caddy/caddy:2.0.0-rc.3
-    volumes:
-      - "../repos/dina-ui/packages/agent-ui/dev.Caddyfile:/etc/caddy/Caddyfile"
-    environment:
-      UI_DEV_SERVER_ADDRESS: agent-ui-dev-server:3000
