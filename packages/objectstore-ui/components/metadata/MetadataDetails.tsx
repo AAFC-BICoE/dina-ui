@@ -183,7 +183,7 @@ function MetadataTags({ tags }: MetadataTagsProps) {
               <span
                 key={i}
                 style={{
-                  background: "yellow",
+                  background: "#AEB404",
                   borderRadius: "25px",
                   margin: "0.5rem",
                   padding: "0.5rem"
