@@ -28,7 +28,6 @@ services:
     command: --providers.docker=true
     ports:
       - "80:80" # Traefik-connected services
-      - "8080:8080" # Traefik web UI
     volumes:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock

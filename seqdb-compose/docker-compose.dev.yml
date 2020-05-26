@@ -47,9 +47,9 @@ services:
       "
   # Front-end gateway that proxies URLs to the correct service:
   ui:
-    image: abiosoft/caddy:1.0.3-no-stats
+    image: caddy/caddy:2.0.0-rc.3
     volumes:
-      - "./ui.Caddyfile:/etc/Caddyfile"
+      - "../repos/dina-ui/packages/seqdb-ui/dev.Caddyfile:/etc/caddy/Caddyfile"
     environment:
       UI_DEV_SERVER_ADDRESS: ui-dev-server:3000
       API_ADDRESS: api:8080

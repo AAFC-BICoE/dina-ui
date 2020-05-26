@@ -1,9 +1,0 @@
-http://:80
-
-# Proxy to the front-end:
-reverse_proxy / {$UI_DEV_SERVER_ADDRESS}
-reverse_proxy /favicon.ico {$UI_DEV_SERVER_ADDRESS}
-reverse_proxy /_next/* {$UI_DEV_SERVER_ADDRESS}
-
-proxy / {$UI_DEV_SERVER_ADDRESS}
-reverse_proxy /api/* {$API_ADDRESS}
