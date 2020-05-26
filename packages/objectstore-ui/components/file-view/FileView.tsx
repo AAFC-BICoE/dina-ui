@@ -1,7 +1,9 @@
+import { useAccount } from "common-ui";
 import dynamic from "next/dynamic";
-import { ComponentType, SyntheticEvent } from "react";
+import { ComponentType } from "react";
 
-interface FileViewProps {
+export interface FileViewProps {
+  clickToDownload?: boolean;
   filePath: string;
   fileType: string;
   imgAlt?: string;
@@ -24,15 +26,29 @@ const IMG_TAG_SUPPORTED_FORMATS = [
   "svg"
 ];
 
-export function FileView({ filePath, fileType, imgAlt }: FileViewProps) {
+export function FileView({
+  clickToDownload,
+  filePath,
+  fileType,
+  imgAlt
+}: FileViewProps) {
+  const { token } = useAccount();
+
+  // Add the auth token to the requested file path:
+  const authenticatedFilePath = `${filePath}?access_token=${token}`;
+
   const isImage = IMG_TAG_SUPPORTED_FORMATS.includes(fileType.toLowerCase());
 
-  return (
+  if (!token) {
+    return null;
+  }
+
+  const fileView = (
     <div className="file-viewer-wrapper">
       {isImage ? (
         <img
           alt={imgAlt}
-          src={filePath}
+          src={authenticatedFilePath}
           style={{
             display: "block",
             marginLeft: "auto",
@@ -41,15 +57,26 @@ export function FileView({ filePath, fileType, imgAlt }: FileViewProps) {
         />
       ) : (
         <FileViewer
-          filePath={filePath}
+          filePath={authenticatedFilePath}
           fileType={fileType}
           unsupportedComponent={() => (
             <div>
-              <a href={filePath}>{filePath}</a>
+              <a href={authenticatedFilePath}>{filePath}</a>
             </div>
           )}
         />
       )}
     </div>
+  );
+
+  return clickToDownload ? (
+    <a
+      href={authenticatedFilePath}
+      style={{ color: "inherit", textDecoration: "none" }}
+    >
+      {fileView}
+    </a>
+  ) : (
+    fileView
   );
 }

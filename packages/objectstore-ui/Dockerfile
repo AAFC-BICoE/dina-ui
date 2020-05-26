@@ -1,4 +1,4 @@
-FROM abiosoft/caddy:1.0.3-no-stats
-COPY ./prod.Caddyfile /etc/Caddyfile
+FROM caddy/caddy:2.0.0-rc.3
+COPY ./prod.Caddyfile /etc/caddy/Caddyfile
 COPY ./out /www/html
-EXPOSE 8080
+EXPOSE 80

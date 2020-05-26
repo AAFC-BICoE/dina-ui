@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "build": "run-s next:build next:export",
-    "dev": "run-p next proxy",
+    "dev": "next",
     "docs": "cd scripts/ && ts-node ./build-docs.ts",
     "lint": "tslint --project tsconfig.json",
     "lint:fix": "tslint --project tsconfig.json --fix",

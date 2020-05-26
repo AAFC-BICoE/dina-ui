@@ -11,11 +11,13 @@
   "dependencies": {
     "@handsontable/react": "^3.1.2",
     "@molgenis/rsql": "0.1.2",
+    "@react-keycloak/nextjs": "^2.0.0-beta.6",
     "@rehooks/local-storage": "^2.3.0",
     "custom-event": "^1.0.1",
     "dataloader": "^1.4.0",
     "formik": "^1.5.8",
     "handsontable": "6.2.2",
+    "keycloak-js": "^9.0.3",
     "kitsu": "7.0.4",
     "kitsu-core": "7.0.4",
     "next": "^9.1.5",

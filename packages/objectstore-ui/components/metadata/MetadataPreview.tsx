@@ -37,19 +37,23 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
     return (
       <div className="metadata-preview">
         <style>{METADATA_PREVIEW_STYLE}</style>
-        <Link href={`/metadata/edit?ids=${metadataId}`}>
-          <a className="btn btn-primary metadata-edit-link">
-            <ObjectStoreMessage id="editButtonText" />
-          </a>
-        </Link>
+        <div className="metadata-edit-link">
+          <Link href={`/metadata/edit?ids=${metadataId}`}>
+            <a className="btn btn-primary">
+              <ObjectStoreMessage id="editButtonText" />
+            </a>
+          </Link>
+        </div>
         <Link href={`/metadata/revisions?id=${metadataId}`}>
           <a className="btn btn-info metadata-revisions-link">
             <ObjectStoreMessage id="revisionsButtonText" />
           </a>
         </Link>
-        <a href={filePath}>
-          <FileView filePath={filePath} fileType={fileType} />
-        </a>
+        <FileView
+          clickToDownload={true}
+          filePath={filePath}
+          fileType={fileType}
+        />
         <MetadataDetails metadata={metadata} />
       </div>
     );
