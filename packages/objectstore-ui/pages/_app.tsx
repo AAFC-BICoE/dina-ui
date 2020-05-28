@@ -1,5 +1,10 @@
 import "bootswatch/dist/spacelab/bootstrap.min.css";
-import { ApiClientContext, createContextValue, ModalProvider } from "common-ui";
+import {
+  AuthenticatedApiClientProvider,
+  createContextValue,
+  KeycloakAccountProvider,
+  ModalProvider
+} from "common-ui";
 import "handsontable/dist/handsontable.full.min.css";
 import App from "next/app";
 import React from "react";
@@ -37,13 +42,15 @@ export default class ObjectStoreUiApp extends App {
       : null;
 
     return (
-      <ApiClientContext.Provider value={this.contextValue}>
-        <ObjectStoreIntlProvider>
-          <ModalProvider appElement={appElement}>
-            <Component {...pageProps} />
-          </ModalProvider>
-        </ObjectStoreIntlProvider>
-      </ApiClientContext.Provider>
+      <KeycloakAccountProvider>
+        <AuthenticatedApiClientProvider apiContext={this.contextValue}>
+          <ObjectStoreIntlProvider>
+            <ModalProvider appElement={appElement}>
+              <Component {...pageProps} />
+            </ModalProvider>
+          </ObjectStoreIntlProvider>
+        </AuthenticatedApiClientProvider>
+      </KeycloakAccountProvider>
     );
   }
 }

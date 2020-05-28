@@ -67,17 +67,10 @@ const mockMetaGet = jest.fn(async model => {
   }
 });
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockMetaGet;
-      public axios = {
-        get: mockGet
-      };
-    }
-);
+// Mock API requests:
+const apiContext: any = {
+  apiClient: { get: mockMetaGet, axios: { get: mockGet } }
+};
 
 describe("Metadata detail view page", () => {
   beforeEach(() => {
@@ -97,7 +90,8 @@ describe("Metadata detail view page", () => {
 
   it("Provides a form to show the tags section.", async () => {
     const wrapper = mountWithAppContext(
-      <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />
+      <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />,
+      { apiContext }
     );
 
     // Wait for the page to load.
@@ -120,7 +114,8 @@ describe("Metadata detail view page", () => {
 
   it("Provides a form to show the managed attribute section.", async () => {
     const wrapper = mountWithAppContext(
-      <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />
+      <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />,
+      { apiContext }
     );
     // Wait for the page to load.
     wrapper.update();
@@ -137,7 +132,8 @@ describe("Metadata detail view page", () => {
 
   it("Provides a form to show the metadata section.", async done => {
     const wrapper = mountWithAppContext(
-      <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />
+      <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />,
+      { apiContext }
     );
 
     // Wait for the page to load.
@@ -153,7 +149,8 @@ describe("Metadata detail view page", () => {
   });
   it("Provides a form to show the image.", async done => {
     const wrapper = mountWithAppContext(
-      <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />
+      <ObjectStoreDetailsPage router={{ query: { id: "100" } } as any} />,
+      { apiContext }
     );
 
     // Wait for the page to load.

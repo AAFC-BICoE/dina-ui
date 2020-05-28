@@ -4,24 +4,14 @@ import { EditMetadataFormPage } from "../editMetadata";
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
-/** Mock axios for operations requests. */
-const mockPost = jest.fn();
-
-const mockGet = jest.fn();
-
 const flushPromises = () => new Promise(setImmediate);
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-      public axios = {
-        post: mockPost
-      };
-    }
-);
+// Mock API requests:
+const mockPost = jest.fn();
+const mockGet = jest.fn();
+const apiContext: any = {
+  apiClient: { get: mockGet, axios: { post: mockPost } }
+};
 
 describe("Metadata edit page", () => {
   beforeEach(() => {
@@ -70,7 +60,7 @@ describe("Metadata edit page", () => {
         fileIdentifier="fileId"
       />
     );
-    const wrapper = mountWithAppContext(ui);
+    const wrapper = mountWithAppContext(ui, { apiContext });
 
     const addButton = wrapper.find("button.list-inline-item.btn.btn-primary");
 
@@ -127,7 +117,7 @@ describe("Metadata edit page", () => {
         fileIdentifier="fileId"
       />
     );
-    const wrapper = mountWithAppContext(ui);
+    const wrapper = mountWithAppContext(ui, { apiContext });
 
     wrapper.find(".assignedValue_un1-field input").simulate("change", {
       target: { name: "assignedValue_un1", value: "anything2" }
@@ -177,7 +167,8 @@ describe("Metadata edit page", () => {
       <EditMetadataFormPage
         originalFileName="fileName"
         fileIdentifier="fileId"
-      />
+      />,
+      { apiContext }
     );
     wrapper.find(".originalFilename-field input").simulate("change", {
       target: { name: "originalFilename", value: "newfile" }

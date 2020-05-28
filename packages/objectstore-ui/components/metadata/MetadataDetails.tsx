@@ -1,6 +1,8 @@
 import { useCollapser } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { get, toPairs } from "lodash";
+import Link from "next/link";
+import { ComponentType, ReactNode } from "react";
 import ReactTable from "react-table";
 import titleCase from "title-case";
 import {
@@ -31,7 +33,16 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         fields={[
           "createdDate",
           "xmpMetadataDate",
-          "acMetadataCreator.displayName"
+          "acMetadataCreator.displayName",
+          {
+            name: "acDerivedFrom",
+            value: metadata.acDerivedFrom ? (
+              <Link href={`/object/view?id=${metadata.acDerivedFrom.id}`}>
+                <a>{metadata.acDerivedFrom.originalFilename}</a>
+              </Link>
+            ) : null
+          },
+          "acSubType"
         ]}
         title={formatMessage("metadataUploadDetailsLabel")}
       />
@@ -75,7 +86,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
 
 interface MetadataAttributeGroupProps {
   metadata: Metadata;
-  fields: string[];
+  fields: Array<string | { name: string; value: ReactNode }>;
   title: string;
 }
 
@@ -88,7 +99,12 @@ function MetadataAttributeGroup({
 
   const { Collapser, collapsed } = useCollapser(`metadata-details-${title}`);
 
-  const data = fields.map(name => ({ name, value: get(metadata, name) }));
+  const data = fields.map(field => {
+    if (typeof field === "string") {
+      return { name: field, value: get(metadata, field) };
+    }
+    return field;
+  });
 
   return (
     <div className="form-group">
@@ -113,7 +129,9 @@ function MetadataAttributeGroup({
               accessor: "name"
             },
             {
-              Cell: ({ original: { value } }) => String(value ?? ""),
+              // The cell can render either JSX or a primitive (string/number etc.).
+              Cell: ({ original: { value } }) =>
+                value?.props ? <>{value}</> : String(value ?? ""),
               Header: <ObjectStoreMessage id="managedAttributeValueLabel" />,
               accessor: "value"
             }

@@ -18,6 +18,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   filterPartialMatch: "Partial Match",
   filterSubmitButtonText: "Filter List",
   loadingText: "Loading...",
+  loggedInAsUser: "Logged in as: {name}",
+  logoutBtn: "Logout",
   no: "No",
   resetButtonText: "Reset",
   submitBtnText: "Save",

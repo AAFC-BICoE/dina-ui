@@ -82,4 +82,27 @@ describe("ListPageLayout component", () => {
     expect(wrapper.find(QueryTable).prop("defaultSort")).toEqual(testSort);
     expect(wrapper.find(QueryTable).prop("defaultPageSize")).toEqual(5);
   });
+
+  it("Allows a passed additionalFilters prop.", async () => {
+    const wrapper = mountWithAppContext(
+      <ListPageLayout
+        id="test-layout"
+        additionalFilters={{
+          attr1: "a",
+          rsql: "attr2==b"
+        }}
+        filterAttributes={["name"]}
+        queryTableProps={{
+          columns: ["name", "type"],
+          path: "pcrPrimer"
+        }}
+      />,
+      { apiContext: mockApiCtx }
+    );
+
+    expect(wrapper.find(QueryTable).prop("filter")).toEqual({
+      attr1: "a",
+      rsql: "attr2==b"
+    });
+  });
 });
