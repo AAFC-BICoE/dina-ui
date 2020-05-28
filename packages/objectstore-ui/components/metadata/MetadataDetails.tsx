@@ -109,8 +109,8 @@ function MetadataAttributeGroup({
   return (
     <div className="form-group">
       <h4>
-        {title}
         <Collapser />
+        {title}
       </h4>
       {!collapsed && (
         <ReactTable
@@ -159,8 +159,8 @@ function MetadataManagedAttributes({
   return (
     <div className="form-group">
       <h4>
-        <ObjectStoreMessage id="metadataManagedAttributesLabel" />
         <Collapser />
+        <ObjectStoreMessage id="metadataManagedAttributesLabel" />
       </h4>
       {!collapsed && (
         <ReactTable
