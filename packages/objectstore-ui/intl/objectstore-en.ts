@@ -12,6 +12,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   cancelButtonText: "Cancel",
   closePreviewButtonText: "Close Preview",
   deleteButtonText: "Delete",
+  deleteSelectedButtonText: "Delete Selected",
   editObjectSubtypeTitle: "Edit Object Subtype",
   editSelectedButtonText: "Edit Selected",
   field_acCaption: "Caption",

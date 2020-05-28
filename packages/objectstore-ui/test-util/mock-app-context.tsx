@@ -3,7 +3,8 @@ import {
   AccountProvider,
   ApiClientContextI,
   AuthenticatedApiClientProvider,
-  createContextValue
+  createContextValue,
+  ModalProvider
 } from "common-ui";
 import { mount } from "enzyme";
 import { merge, noop } from "lodash";
@@ -31,7 +32,11 @@ export function MockAppContextProvider({
       <AuthenticatedApiClientProvider
         apiContext={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContext)}
       >
-        <ObjectStoreIntlProvider>{children}</ObjectStoreIntlProvider>
+        <ObjectStoreIntlProvider>
+          <ModalProvider appElement={document.querySelector("body")}>
+            {children}
+          </ModalProvider>
+        </ObjectStoreIntlProvider>
       </AuthenticatedApiClientProvider>
     </AccountProvider>
   );
