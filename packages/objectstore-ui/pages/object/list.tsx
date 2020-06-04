@@ -58,7 +58,6 @@ export default function MetadataListPage() {
     "dcFormat",
     "xmpRightsWebStatement",
     "dcRights",
-    "acMetadataCreator.displayName",
     "dcCreator.displayName"
   ];
 
@@ -74,7 +73,6 @@ export default function MetadataListPage() {
     "dcFormat",
     "acDigitizationDate",
     "xmpMetadataDate",
-    "acMetadataCreator.displayName",
     {
       Cell: ({ original: { acTags } }) => acTags?.join(", "),
       accessor: "acTags"
@@ -127,7 +125,6 @@ export default function MetadataListPage() {
                 id="metadata-list"
                 queryTableProps={{
                   columns: METADATA_TABLE_COLUMNS,
-                  include: "acMetadataCreator",
                   onSuccess: res => setAvailableMetadatas(res.data),
                   path: "metadata",
                   reactTableProps: ({ response }) => ({

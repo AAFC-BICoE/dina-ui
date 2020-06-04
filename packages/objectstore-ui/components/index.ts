@@ -4,4 +4,3 @@ export * from "./attribute-builder/AttributeBuilder";
 export * from "./attribute-builder/AttributeGroup";
 export * from "./attribute-builder/AttributeRow";
 export * from "./stored-object-gallery/StoredObjectGallery";
-export * from "./with-agent-api/withAgentApi";

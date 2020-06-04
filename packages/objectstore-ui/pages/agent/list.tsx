@@ -1,5 +1,5 @@
 import { ListPageLayout } from "common-ui";
-import { Head, Nav, withAgentApi } from "../../components";
+import { Head, Nav } from "../../components";
 import {
   ObjectStoreMessage,
   useObjectStoreIntl
@@ -8,7 +8,7 @@ import {
 const AGENT_FILTER_ATTRIBUTES = ["displayName", "email"];
 const AGENT_TABLE_COLUMNS = ["displayName", "email"];
 
-export default withAgentApi(function AgentListPage() {
+export default function AgentListPage() {
   const { formatMessage } = useObjectStoreIntl();
 
   return (
@@ -25,10 +25,10 @@ export default withAgentApi(function AgentListPage() {
           id="agent-list"
           queryTableProps={{
             columns: AGENT_TABLE_COLUMNS,
-            path: "agent"
+            path: "agent-api/agent"
           }}
         />
       </div>
     </div>
   );
-});
+}

@@ -29,7 +29,7 @@ function uuidv4(): string {
  */
 export default class ObjectStoreUiApp extends App {
   private contextValue = createContextValue({
-    baseURL: "/api/v1",
+    baseURL: "/api",
     getTempIdGenerator: () => uuidv4
   });
 
