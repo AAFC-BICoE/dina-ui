@@ -6,6 +6,7 @@ import { rsql } from "../filter-builder/rsql";
 import { FilterForm } from "./FilterForm";
 
 interface ListPageLayoutProps<TData extends KitsuResource> {
+  additionalFilters?: FilterParam;
   filterAttributes: string[];
   id: string;
   queryTableProps: QueryTableProps<TData>;
@@ -17,6 +18,7 @@ interface ListPageLayoutProps<TData extends KitsuResource> {
  * The filter form state is hydrated from localstorage, and is saved in localstorage on form submit.
  */
 export function ListPageLayout<TData extends KitsuResource>({
+  additionalFilters,
   filterAttributes,
   id,
   queryTableProps,
@@ -39,9 +41,18 @@ export function ListPageLayout<TData extends KitsuResource>({
     tablePageSizeKey
   );
 
+  const filterBuilderRsql = rsql(filterForm.filterBuilderModel);
+
+  // Combine the inner rsql with the passed additionalFilters?.rsql filter if they are set:
+  const combinedRsql = [
+    ...(filterBuilderRsql ? [filterBuilderRsql] : []),
+    ...(additionalFilters?.rsql ? [additionalFilters?.rsql] : [])
+  ].join(" and ");
+
   // Build the JSONAPI filter param to be sent to the back-end.
   const filterParam: FilterParam = {
-    rsql: rsql(filterForm.filterBuilderModel)
+    ...additionalFilters,
+    rsql: combinedRsql
   };
 
   return (
