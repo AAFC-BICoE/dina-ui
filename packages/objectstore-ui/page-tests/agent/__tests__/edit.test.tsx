@@ -1,7 +1,7 @@
 import { OperationsResponse } from "common-ui";
-import { Agent } from "../../../objectstore-ui/types/objectstore-api/resources/Agent";
-import { AgentEditPage } from "../../pages/agent/edit";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { AgentEditPage } from "../../../pages/agent/edit";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { Agent } from "../../../types/objectstore-api/resources/Agent";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);

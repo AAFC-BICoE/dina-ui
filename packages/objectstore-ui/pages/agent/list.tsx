@@ -10,7 +10,7 @@ const AGENT_FILTER_ATTRIBUTES = ["displayName", "email"];
 const AGENT_TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, displayName } }) => (
-      <Link href={`/agent/edit?id=${id}`}>
+      <Link href={`/agent/view?id=${id}`}>
         <a>{displayName}</a>
       </Link>
     ),

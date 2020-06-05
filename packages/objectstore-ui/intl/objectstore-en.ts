@@ -9,6 +9,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   addManagedAttributeButtonText: "Add New Managed Attribute",
   addObjectSubtypeTitle: "Add New Object Subtype",
   agentListTitle: "Agents",
+  agentViewTitle: "View Agent",
   appTitle: "Object Store",
   attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
