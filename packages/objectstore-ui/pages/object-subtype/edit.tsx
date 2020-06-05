@@ -2,6 +2,7 @@ import {
   ApiClientContext,
   ButtonBar,
   CancelButton,
+  DeleteButton,
   ErrorViewer,
   LoadingSpinner,
   Query,
@@ -89,6 +90,11 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />
+          <DeleteButton
+            id={id as string}
+            postDeleteRedirect="/object-subtype/list"
+            type="object-subtype"
+          />
           <CancelButton
             entityId={id as string}
             entityLink="object-subtype"

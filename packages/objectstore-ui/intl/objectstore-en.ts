@@ -15,6 +15,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   cancelButtonText: "Cancel",
   closePreviewButtonText: "Close Preview",
   deleteButtonText: "Delete",
+  deleteSelectedButtonText: "Delete Selected",
   editAgentTitle: "Edit Agent",
   editObjectSubtypeTitle: "Edit Object Subtype",
   editSelectedButtonText: "Edit Selected",

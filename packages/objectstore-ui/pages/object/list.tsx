@@ -1,16 +1,19 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
+  ApiClientContext,
+  AreYouSureModal,
   ColumnDefinition,
   FormikButton,
   ListPageLayout,
   SplitPagePanel,
-  useGroupedCheckBoxes
+  useGroupedCheckBoxes,
+  useModal
 } from "common-ui";
 import { Form, Formik, FormikContext } from "formik";
 import { noop, toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Component, useMemo, useState } from "react";
+import { Component, useContext, useMemo, useState } from "react";
 import { Head, Nav, StoredObjectGallery } from "../../components";
 import { MetadataPreview } from "../../components/metadata/MetadataPreview";
 import {
@@ -26,7 +29,7 @@ const LIST_LAYOUT_STORAGE_KEY = "metadata-list-layout";
 const HIGHLIGHT_COLOR = "rgb(222, 252, 222)";
 
 /** Values of the Formik form that wraps the metadata list */
-interface MetadataListFormValues {
+export interface MetadataListFormValues {
   /** Tracks which metadata IDs are selected. */
   selectedMetadatas: Record<string, boolean>;
 }
@@ -94,7 +97,7 @@ export default function MetadataListPage() {
     }
   ];
 
-  // Workaround to make sure react-table doesn't unmount TBodyComponent unmounted
+  // Workaround to make sure react-table doesn't unmount TBodyComponent
   // when MetadataListPage is re-rendered:
   const TBodyGallery = useMemo(
     () =>
@@ -207,6 +210,17 @@ export default function MetadataListPage() {
   );
 }
 
+/** Common button props for the bulk edit/delete buttons */
+function bulkButtonProps(ctx: FormikContext<MetadataListFormValues>) {
+  return {
+    // Disable the button if none are selected:
+    disabled: !Object.values(ctx.values.selectedMetadatas).reduce(
+      (a, b) => a || b,
+      false
+    )
+  };
+}
+
 /**
  * Adds additional controls around the metadata table.
  */
@@ -221,15 +235,10 @@ function MetadataListWrapper({ children }) {
       <Form>
         <div style={{ height: "1rem" }}>
           <div className="float-right">
+            <BulkDeleteButton />
             <FormikButton
-              buttonProps={(ctx: FormikContext<MetadataListFormValues>) => ({
-                // Disable the button if none are selected:
-                disabled: !Object.values(ctx.values.selectedMetadatas).reduce(
-                  (a, b) => a || b,
-                  false
-                )
-              })}
-              className="btn btn-primary metadata-bulk-edit-button"
+              buttonProps={bulkButtonProps}
+              className="btn btn-primary ml-2 metadata-bulk-edit-button"
               onClick={async (values: MetadataListFormValues) => {
                 const metadataIds = toPairs(values.selectedMetadatas)
                   .filter(pair => pair[1])
@@ -278,5 +287,47 @@ function ListLayoutSelector({ value = "TABLE", onChange }) {
         </div>
       ))}
     </div>
+  );
+}
+
+export function BulkDeleteButton() {
+  const router = useRouter();
+  const { openModal } = useModal();
+  const { doOperations } = useContext(ApiClientContext);
+
+  return (
+    <FormikButton
+      buttonProps={bulkButtonProps}
+      className="btn btn-danger metadata-bulk-delete-button"
+      onClick={(values: MetadataListFormValues) => {
+        const metadataIds = toPairs(values.selectedMetadatas)
+          .filter(pair => pair[1])
+          .map(pair => pair[0]);
+
+        openModal(
+          <AreYouSureModal
+            actionMessage={
+              <span>
+                <ObjectStoreMessage id="deleteSelectedButtonText" /> (
+                {metadataIds.length})
+              </span>
+            }
+            onYesButtonClicked={async () => {
+              await doOperations(
+                metadataIds.map(id => ({
+                  op: "DELETE",
+                  path: `metadata/${id}`
+                }))
+              );
+
+              // Refresh the page:
+              await router.reload();
+            }}
+          />
+        );
+      }}
+    >
+      <ObjectStoreMessage id="deleteSelectedButtonText" />
+    </FormikButton>
   );
 }

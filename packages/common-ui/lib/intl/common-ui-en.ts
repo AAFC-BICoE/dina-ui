@@ -6,10 +6,12 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   IS: "IS",
   ISNOT: "IS NOT",
   OR: "OR",
+  areYouSure: "Are you sure?",
   backToListButtonText: "Back to List",
   cancelButtonText: "Cancel",
   closeButtonText: "Close",
   createButtonText: "Create New",
+  deleteButtonText: "Delete",
   editButtonText: "Edit",
   filterBlankField: "Blank Field",
   filterExactMatch: "Exact Match",
@@ -18,7 +20,9 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   loadingText: "Loading...",
   loggedInAsUser: "Logged in as: {name}",
   logoutBtn: "Logout",
+  no: "No",
   resetButtonText: "Reset",
   submitBtnText: "Save",
-  tableTotalCount: "Total matched records: {totalCount}"
+  tableTotalCount: "Total matched records: {totalCount}",
+  yes: "Yes"
 };

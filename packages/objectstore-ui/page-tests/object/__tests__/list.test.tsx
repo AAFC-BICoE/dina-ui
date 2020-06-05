@@ -1,7 +1,12 @@
-import { QueryTable } from "common-ui";
+import { AreYouSureModal, QueryTable } from "common-ui";
+import { Formik } from "formik";
 import { PersistedResource } from "kitsu";
+import { noop } from "lodash";
 import { StoredObjectGallery } from "../../../components";
-import MetadataListPage from "../../../pages/object/list";
+import MetadataListPage, {
+  BulkDeleteButton,
+  MetadataListFormValues
+} from "../../../pages/object/list";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Metadata } from "../../../types/objectstore-api";
 
@@ -35,12 +40,18 @@ const TEST_METADATAS: Array<PersistedResource<Metadata>> = [
 ];
 
 const mockGet = jest.fn();
-const apiContext: any = { apiClient: { get: mockGet } };
+const mockDoOperations = jest.fn();
+
+const apiContext: any = {
+  apiClient: { get: mockGet },
+  doOperations: mockDoOperations
+};
 
 const mockPush = jest.fn();
+const mockReload = jest.fn();
 
 jest.mock("next/router", () => ({
-  useRouter: () => ({ push: mockPush })
+  useRouter: () => ({ push: mockPush, reload: mockReload })
 }));
 
 describe("Metadata List Page", () => {
@@ -181,5 +192,63 @@ describe("Metadata List Page", () => {
     expect(
       wrapper.find("button.metadata-bulk-edit-button").prop("disabled")
     ).toEqual(true);
+  });
+
+  it("Lets you bulk-delete metadata.", async () => {
+    const pageWrapper = mountWithAppContext(<MetadataListPage />, {
+      apiContext
+    });
+    expect(pageWrapper.find(BulkDeleteButton).exists());
+
+    // Pretend two metadatas are already selected:
+    const buttonWrapper = mountWithAppContext(
+      <Formik<MetadataListFormValues>
+        initialValues={{
+          selectedMetadatas: {
+            "00000000-0000-0000-0000-000000000000": true,
+            "11111111-1111-1111-1111-111111111111": true
+          }
+        }}
+        onSubmit={noop}
+      >
+        <BulkDeleteButton />
+      </Formik>,
+      { apiContext }
+    );
+
+    // Click the bulk-delete button:
+    buttonWrapper.find("button").simulate("click");
+
+    buttonWrapper.update();
+
+    // Shows how many will be deleted:
+    expect(
+      buttonWrapper
+        .find(AreYouSureModal)
+        .find(".modal-header")
+        .text()
+    ).toEqual("Delete Selected (2)");
+
+    // Click 'yes' on the "Are you sure" modal:
+    buttonWrapper
+      .find(AreYouSureModal)
+      .find("form")
+      .simulate("submit");
+
+    await new Promise(setImmediate);
+    buttonWrapper.update();
+
+    expect(mockDoOperations).toHaveBeenCalledTimes(1);
+    expect(mockDoOperations).lastCalledWith([
+      {
+        op: "DELETE",
+        path: "metadata/00000000-0000-0000-0000-000000000000"
+      },
+      {
+        op: "DELETE",
+        path: "metadata/11111111-1111-1111-1111-111111111111"
+      }
+    ]);
+    expect(mockReload).toHaveBeenCalledTimes(1);
   });
 });
