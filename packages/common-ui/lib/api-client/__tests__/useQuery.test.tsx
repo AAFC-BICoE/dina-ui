@@ -1,12 +1,17 @@
 import { mount } from "enzyme";
 import { KitsuResource, KitsuResponse } from "kitsu";
-import { ApiClientContext, createContextValue } from "../ApiClientContext";
+import { ApiClientContext } from "../ApiClientContext";
+import { ClientSideJoinSpec } from "../client-side-join";
 import { useQuery } from "../useQuery";
 
 /** Example of an API resource interface definition for a todo-list entry. */
 interface Todo extends KitsuResource {
   type: "todo";
   name: string;
+
+  // Fields for client-side joining to another back-end API:
+  creatorId?: string;
+  creator?: any;
 }
 
 /**
@@ -17,22 +22,22 @@ const MOCK_TODO_RESPONSE: KitsuResponse<Todo> = {
   meta: undefined
 };
 
+const MOCK_TODO_RESPONSE_WITH_CREATOR_ID: KitsuResponse<Todo[]> = {
+  data: [{ id: "25", type: "todo", name: "todo 25", creatorId: "100" }],
+  meta: undefined
+};
+
 const mockGet = jest.fn();
+const mockBulkGet = jest.fn();
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-    }
-);
-
-const contextValue = createContextValue();
+const apiContext: any = {
+  apiClient: { get: mockGet },
+  bulkGet: mockBulkGet
+};
 
 function MockContextProvider({ children }) {
   return (
-    <ApiClientContext.Provider value={contextValue}>
+    <ApiClientContext.Provider value={apiContext}>
       {children}
     </ApiClientContext.Provider>
   );
@@ -40,9 +45,17 @@ function MockContextProvider({ children }) {
 
 describe("useQuery hook", () => {
   const mockOnSuccess = jest.fn();
+  let queryState;
 
-  function TestComponent({ deps = [] as any[] }) {
-    useQuery({ path: "todo/1" }, { deps, onSuccess: mockOnSuccess });
+  function TestComponent({
+    deps = [] as any[],
+    joinSpecs = [] as ClientSideJoinSpec[]
+  }) {
+    queryState = useQuery(
+      { path: "todo/1" },
+      { deps, onSuccess: mockOnSuccess, joinSpecs }
+    );
+
     return null;
   }
 
@@ -104,5 +117,52 @@ describe("useQuery hook", () => {
     // The request should only have been sent once.
     expect(mockOnSuccess).toHaveBeenCalledTimes(1);
     expect(mockOnSuccess).lastCalledWith(MOCK_TODO_RESPONSE);
+  });
+
+  it("Lets you do client-side data joins across multiple back-end APIs", async () => {
+    mockGet.mockImplementation(async () => MOCK_TODO_RESPONSE_WITH_CREATOR_ID);
+    mockBulkGet.mockImplementation(async () => [
+      { id: "100", name: "Mat", type: "person" }
+    ]);
+
+    // Render with a joinSpec to a "people-api".
+    mount(
+      <MockContextProvider>
+        <TestComponent
+          joinSpecs={[
+            {
+              apiBaseUrl: "/people-api",
+              idField: "creatorId",
+              joinField: "creator",
+              path: todo => `person/${todo.creatorId}`
+            }
+          ]}
+        />
+      </MockContextProvider>
+    );
+
+    // Await response:
+    await new Promise(setImmediate);
+
+    expect(mockBulkGet).toHaveBeenCalledTimes(1);
+    expect(mockBulkGet).lastCalledWith(["person/100"], {
+      apiBaseUrl: "/people-api"
+    });
+
+    // The "creator" field from the additional "people" API should have been joined
+    // to data from the main "todo" API:
+    expect(queryState.response.data).toEqual([
+      {
+        creator: {
+          id: "100",
+          name: "Mat",
+          type: "person"
+        },
+        creatorId: "100",
+        id: "25",
+        name: "todo 25",
+        type: "todo"
+      }
+    ]);
   });
 });

@@ -40,10 +40,14 @@ export class ClientSideJoiner {
     );
 
     for (const resource of resourcesToJoin) {
+      // Call "load" without awaiting so the DataLoader can batch together the
+      // required IDs.
       this.joinLoader.load(this.joinSpec.path(resource));
     }
 
     for (const resource of resourcesToJoin) {
+      // The first call to "await" in this loop dispatches the batched API request
+      // for all the required joined resources:
       resource[this.joinSpec.joinField] = await this.joinLoader.load(
         this.joinSpec.path(resource)
       );
