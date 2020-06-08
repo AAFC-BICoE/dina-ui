@@ -1,7 +1,8 @@
 import Kitsu, { KitsuResource, PersistedResource } from "kitsu";
 import { deserialise } from "kitsu-core";
-import React, { useContext } from "react";
+import React from "react";
 import { serialize } from "../util/serialize";
+import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
 import {
   FailedOperation,
   Operation,
@@ -9,13 +10,25 @@ import {
   SuccessfulOperation
 } from "./operations-types";
 
+interface BulkGetOptions {
+  apiBaseUrl?: string;
+  joinSpecs?: ClientSideJoinSpec[];
+}
+
+interface DoOperationsOptions {
+  apiBaseUrl?: string;
+}
+
 /** Api context interface. */
 export interface ApiClientContextI {
   /** Client to talk to the back-end API. */
   apiClient: Kitsu;
 
   /** Function to perform requests against a jsonpatch-compliant JSONAPI server. */
-  doOperations: (operations: Operation[]) => Promise<SuccessfulOperation[]>;
+  doOperations: (
+    operations: Operation[],
+    options?: DoOperationsOptions
+  ) => Promise<SuccessfulOperation[]>;
 
   /** Creates or updates one or multiple resources. */
   save: (
@@ -24,7 +37,8 @@ export interface ApiClientContextI {
 
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
   bulkGet: <T extends KitsuResource>(
-    paths: string[]
+    paths: string[],
+    options?: BulkGetOptions
   ) => Promise<Array<PersistedResource<T>>>;
 }
 
@@ -80,19 +94,24 @@ export function createContextValue({
    * Performs a write operation against a jsonpatch-compliant JSONAPI server.
    */
   async function doOperations(
-    operations: Operation[]
+    operations: Operation[],
+    { apiBaseUrl = "" }: DoOperationsOptions = {}
   ): Promise<SuccessfulOperation[]> {
     // Unwrap the configured axios instance from the Kitsu instance.
     const { axios } = apiClient;
 
     // Do the operations request.
-    const axiosResponse = await axios.patch("operations", operations, {
-      headers: {
-        Accept: "application/json-patch+json",
-        "Content-Type": "application/json-patch+json",
-        "Crnk-Compact": "true"
+    const axiosResponse = await axios.patch(
+      `${apiBaseUrl}/operations`,
+      operations,
+      {
+        headers: {
+          Accept: "application/json-patch+json",
+          "Content-Type": "application/json-patch+json",
+          "Crnk-Compact": "true"
+        }
       }
-    });
+    );
 
     // Check for errors. At least one error means that the entire request's transaction was
     // cancelled.
@@ -146,17 +165,24 @@ export function createContextValue({
   }
 
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
-  async function bulkGet<T extends KitsuResource>(paths: string[]) {
+  async function bulkGet<T extends KitsuResource>(
+    paths: string[],
+    { apiBaseUrl = "", joinSpecs = [] }: BulkGetOptions = {}
+  ) {
     const getOperations = paths.map<Operation>(path => ({
       op: "GET",
       path
     }));
 
-    const responses = await doOperations(getOperations);
+    const responses = await doOperations(getOperations, { apiBaseUrl });
 
     const resources: Array<PersistedResource<T>> = (
       await Promise.all(responses.map(deserialise))
     ).map(res => res.data);
+
+    for (const joinSpec of joinSpecs) {
+      await new ClientSideJoiner(bulkGet, resources, joinSpec).join();
+    }
 
     return resources;
   }

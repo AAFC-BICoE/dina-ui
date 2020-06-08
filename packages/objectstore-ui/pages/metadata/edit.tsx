@@ -10,7 +10,7 @@ import {
   SaveArgs,
   useResourceSelectCells
 } from "common-ui";
-import { Form, Formik, FormikContext } from "formik";
+import { Form, Formik } from "formik";
 import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
 import { useRouter } from "next/router";
@@ -24,7 +24,6 @@ import {
   Agent,
   ManagedAttribute,
   ManagedAttributeMap,
-  ManagedAttributeValue,
   Metadata
 } from "../../types/objectstore-api";
 
@@ -86,7 +85,8 @@ export default function EditMetadatasPage() {
       {
         filter: input => ({ rsql: `displayName==*${input}*` }),
         label: agent => agent.displayName,
-        model: "agent"
+        model: "agent-api/agent",
+        type: "agent"
       },
       {
         data: "dcCreator",
@@ -97,7 +97,8 @@ export default function EditMetadatasPage() {
       {
         filter: input => ({ rsql: `displayName==*${input}*` }),
         label: agent => agent.displayName,
-        model: "agent"
+        model: "agent-api/agent",
+        type: "agent"
       },
       {
         data: "acMetadataCreator",
@@ -138,24 +139,43 @@ export default function EditMetadatasPage() {
 
   async function loadData() {
     const metadatas = await bulkGet<Metadata>(
-      ids.map(
-        id =>
-          `/metadata/${id}?include=acMetadataCreator,dcCreator,managedAttributeMap`
-      )
+      ids.map(id => `/metadata/${id}?include=managedAttributeMap`),
+      {
+        joinSpecs: [
+          // Join to agents api:
+          {
+            apiBaseUrl: "/agent-api",
+            idField: "acMetadataCreator",
+            joinField: "acMetadataCreator",
+            path: metadata => `agent/${metadata.acMetadataCreator}`
+          },
+          {
+            apiBaseUrl: "/agent-api",
+            idField: "dcCreator",
+            joinField: "dcCreator",
+            path: metadata => `agent/${metadata.dcCreator}`
+          }
+        ]
+      }
     );
 
     await initEditableManagedAttributes(metadatas);
 
-    const newTableData = metadatas.map<BulkMetadataEditRow>(metadata => ({
-      acMetadataCreator: encodeResourceCell(metadata.acMetadataCreator, {
-        label: metadata.acMetadataCreator?.displayName
-      }),
-      acTags: metadata.acTags?.join(", ") ?? "",
-      dcCreator: encodeResourceCell(metadata.dcCreator, {
-        label: metadata.dcCreator?.displayName
-      }),
-      metadata
-    }));
+    const newTableData = metadatas.map<BulkMetadataEditRow>(metadata => {
+      const acMetadataCreator = metadata.acMetadataCreator as Agent;
+      const dcCreator = metadata.dcCreator as Agent;
+
+      return {
+        acMetadataCreator: encodeResourceCell(acMetadataCreator, {
+          label: acMetadataCreator?.displayName
+        }),
+        acTags: metadata.acTags?.join(", ") ?? "",
+        dcCreator: encodeResourceCell(dcCreator, {
+          label: dcCreator?.displayName
+        }),
+        metadata
+      };
+    });
 
     return newTableData;
   }
@@ -180,11 +200,11 @@ export default function EditMetadatasPage() {
       if (acMetadataCreator !== undefined) {
         metadataEdit.acMetadataCreator = decodeResourceCell(
           acMetadataCreator
-        ) as Agent;
+        ).id;
       }
 
       if (dcCreator !== undefined) {
-        metadataEdit.dcCreator = decodeResourceCell(dcCreator) as Agent;
+        metadataEdit.dcCreator = decodeResourceCell(dcCreator).id;
       }
 
       if (acTags !== undefined) {

@@ -59,7 +59,7 @@ export function StoredObjectGallery({
                 }}
               >
                 <FileView
-                  filePath={`/api/v1/file/${bucket}/${fileIdentifier}.thumbnail`}
+                  filePath={`/api/file/${bucket}/${fileIdentifier}.thumbnail`}
                   fileType="jpg"
                   imgAlt={formatMessage("thumbnailNotAvailableText")}
                 />

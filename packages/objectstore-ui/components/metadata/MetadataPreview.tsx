@@ -19,10 +19,28 @@ const METADATA_PREVIEW_STYLE = `
  * Metadata preview component to be used on the side panel of the Metadata list page.
  */
 export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
-  const { loading, response } = useQuery<Metadata>({
-    include: "acMetadataCreator,dcCreator,managedAttributeMap",
-    path: `metadata/${metadataId}`
-  });
+  const { loading, response } = useQuery<Metadata>(
+    {
+      include: "managedAttributeMap",
+      path: `metadata/${metadataId}`
+    },
+    {
+      joinSpecs: [
+        {
+          apiBaseUrl: "/agent-api",
+          idField: "acMetadataCreator",
+          joinField: "acMetadataCreator",
+          path: metadata => `agent/${metadata.acMetadataCreator}`
+        },
+        {
+          apiBaseUrl: "/agent-api",
+          idField: "dcCreator",
+          joinField: "dcCreator",
+          path: metadata => `agent/${metadata.dcCreator}`
+        }
+      ]
+    }
+  );
 
   if (loading) {
     return <LoadingSpinner loading={true} />;
@@ -31,7 +49,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
   if (response) {
     const metadata = response.data;
 
-    const filePath = `/api/v1/file/${metadata.bucket}/${metadata.fileIdentifier}`;
+    const filePath = `/api/file/${metadata.bucket}/${metadata.fileIdentifier}`;
     const fileType = metadata.fileExtension.replace(/\./, "").toLowerCase();
 
     return (

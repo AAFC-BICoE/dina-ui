@@ -34,8 +34,8 @@ export interface MetadataAttributes {
 }
 
 export interface MetadataRelationships {
-  acMetadataCreator?: Agent | null;
-  dcCreator?: Agent | null;
+  acMetadataCreator?: Agent | string | null;
+  dcCreator?: Agent | string | null;
   managedAttributeMap?: ManagedAttributeMap | null;
 }
 
