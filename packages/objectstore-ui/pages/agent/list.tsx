@@ -23,7 +23,7 @@ const AGENT_TABLE_COLUMNS = [
   }
 ];
 
-export default withAgentApi(function AgentListPage() {
+export default function AgentListPage() {
   const { formatMessage } = useObjectStoreIntl();
 
   return (
@@ -48,4 +48,4 @@ export default withAgentApi(function AgentListPage() {
       </div>
     </div>
   );
-});
+};

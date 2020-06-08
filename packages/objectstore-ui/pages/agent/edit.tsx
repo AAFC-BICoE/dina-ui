@@ -14,7 +14,7 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { Agent } from "types/objectstore-api/resources/Agent";
-import { Head, Nav, withAgentApi } from "../../components";
+import { Head, Nav } from "../../components";
 import {
   ObjectStoreMessage,
   useObjectStoreIntl
@@ -104,4 +104,4 @@ function AgentForm({ agent, router }: AgentFormProps) {
   );
 }
 
-export default withAgentApi(withRouter(AgentEditPage));
+export default withRouter(AgentEditPage);

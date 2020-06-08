@@ -11,7 +11,7 @@ import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Agent } from "types/objectstore-api/resources/Agent";
-import { Head, Nav, withAgentApi } from "../../components";
+import { Head, Nav } from "../../components";
 import {
   ObjectStoreMessage,
   useObjectStoreIntl
@@ -63,4 +63,4 @@ export function AgentDetailsPage({ router }: WithRouterProps) {
   );
 }
 
-export default withAgentApi(withRouter(AgentDetailsPage));
+export default withRouter(AgentDetailsPage);
