@@ -5,15 +5,18 @@ import { COMMON_UI_MESSAGES_ENGLISH } from "common-ui";
  */
 export const OBJECTSTORE_MESSAGES_ENGLISH = {
   ...COMMON_UI_MESSAGES_ENGLISH,
+  addAgentTitle: "Add Agent",
   addManagedAttributeButtonText: "Add New Managed Attribute",
   addObjectSubtypeTitle: "Add New Object Subtype",
   agentListTitle: "Agents",
+  agentViewTitle: "View Agent",
   appTitle: "Object Store",
   attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
   closePreviewButtonText: "Close Preview",
   deleteButtonText: "Delete",
   deleteSelectedButtonText: "Delete Selected",
+  editAgentTitle: "Edit Agent",
   editObjectSubtypeTitle: "Edit Object Subtype",
   editSelectedButtonText: "Edit Selected",
   field_acCaption: "Caption",

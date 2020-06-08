@@ -32,7 +32,8 @@ export interface ApiClientContextI {
 
   /** Creates or updates one or multiple resources. */
   save: (
-    saveArgs: SaveArgs[]
+    saveArgs: SaveArgs[],
+    options?: DoOperationsOptions
   ) => Promise<Array<PersistedResource<KitsuResource>>>;
 
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
@@ -130,7 +131,8 @@ export function createContextValue({
    * Creates or updates one or multiple resources.
    */
   async function save(
-    saveArgs: SaveArgs[]
+    saveArgs: SaveArgs[],
+    options?: DoOperationsOptions
   ): Promise<Array<PersistedResource<KitsuResource>>> {
     // Serialize the resources to JSONAPI format.
     const serializePromises = saveArgs.map(saveArg => serialize(saveArg));
@@ -152,7 +154,7 @@ export function createContextValue({
     }));
 
     // Do the operations request.
-    const responses = await doOperations(operations);
+    const responses = await doOperations(operations, options);
 
     // Deserialize the responses to Kitsu format.
     const deserializePromises = responses.map(response =>
