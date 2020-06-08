@@ -2,7 +2,8 @@ import "bootswatch/dist/spacelab/bootstrap.min.css";
 import {
   AuthenticatedApiClientProvider,
   createContextValue,
-  KeycloakAccountProvider
+  KeycloakAccountProvider,
+  ModalProvider
 } from "common-ui";
 import "handsontable/dist/handsontable.full.min.css";
 import App from "next/app";
@@ -36,11 +37,17 @@ export default class ObjectStoreUiApp extends App {
   public render() {
     const { Component, pageProps } = this.props;
 
+    const appElement = process.browser
+      ? document.querySelector<HTMLElement>("#__next")
+      : null;
+
     return (
       <KeycloakAccountProvider>
         <AuthenticatedApiClientProvider apiContext={this.contextValue}>
           <ObjectStoreIntlProvider>
-            <Component {...pageProps} />
+            <ModalProvider appElement={appElement}>
+              <Component {...pageProps} />
+            </ModalProvider>
           </ObjectStoreIntlProvider>
         </AuthenticatedApiClientProvider>
       </KeycloakAccountProvider>

@@ -8,7 +8,7 @@ type CollapserState = "COLLAPSED" | "OPEN";
 export function useCollapser(id: string) {
   const STORAGE_KEY = `collapser-${id}-collapsed`;
   const [state, setState] = useLocalStorage<CollapserState>(STORAGE_KEY);
-  const collapsed = state !== "OPEN";
+  const collapsed = state === "COLLAPSED";
 
   function Collapser() {
     return (

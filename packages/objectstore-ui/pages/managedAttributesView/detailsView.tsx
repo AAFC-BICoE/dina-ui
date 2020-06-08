@@ -1,5 +1,7 @@
 import {
   ApiClientContext,
+  AreYouSureModal,
+  DeleteButton,
   ErrorViewer,
   FieldWrapper,
   LabelWrapperParams,
@@ -7,7 +9,8 @@ import {
   Query,
   SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useModal
 } from "common-ui";
 import { Field, FieldProps, Form, Formik, FormikActions } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -89,6 +92,8 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
   const [type, setType] = useState(
     profile ? profile.managedAttributeType : undefined
   );
+  const { openModal } = useModal();
+
   const initialValues = profile || { type: "managed-attribute" };
 
   async function onSubmit(
@@ -121,32 +126,16 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
     }
   }
 
-  async function onDeleteClick() {
-    if (!isNullOrUndefined(profile)) {
-      await doOperations([
-        {
-          op: "DELETE",
-          path: `managed-attribute/${profile.id}`
-        }
-      ]);
-      router.push(`/managedAttributesView/listView`);
-    }
-  }
-
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form>
         <ErrorViewer />
         <SubmitButton />
-        {profile && (
-          <button
-            className="btn btn-danger"
-            type="button"
-            onClick={onDeleteClick}
-          >
-            <ObjectStoreMessage id="deleteButtonText" />
-          </button>
-        )}
+        <DeleteButton
+          id={profile?.id}
+          postDeleteRedirect="/managedAttributesView/listView"
+          type="managed-attribute"
+        />
         <Link href="/managedAttributesView/listView">
           <a className="btn btn-primary">
             <ObjectStoreMessage id="cancelButtonText" />

@@ -21,7 +21,7 @@ const METADATA_PREVIEW_STYLE = `
 export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
   const { loading, response } = useQuery<Metadata>(
     {
-      include: "managedAttributeMap",
+      include: "acDerivedFrom,managedAttributeMap",
       path: `metadata/${metadataId}`
     },
     {

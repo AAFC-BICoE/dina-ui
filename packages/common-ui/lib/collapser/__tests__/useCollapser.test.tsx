@@ -17,22 +17,22 @@ function TestComponent() {
 }
 
 describe("Collapser", () => {
-  it("Renders initially as collapsed.", () => {
+  it("Renders initially as open.", () => {
     const wrapper = mount(<TestComponent />);
-    expect(wrapper.find(".collapsible-content").exists()).toEqual(false);
+    expect(wrapper.find(".collapsible-content").exists()).toEqual(true);
   });
 
   it("Provides a button to change collapsed state.", () => {
     const wrapper = mount(<TestComponent />);
 
-    // Un-collapse the content:
-    wrapper.find("button.collapser-button").simulate("click");
-    wrapper.update();
-    expect(wrapper.find(".collapsible-content").exists()).toEqual(true);
-
     // Collapse the content:
     wrapper.find("button.collapser-button").simulate("click");
     wrapper.update();
     expect(wrapper.find(".collapsible-content").exists()).toEqual(false);
+
+    // Un-collapse the content:
+    wrapper.find("button.collapser-button").simulate("click");
+    wrapper.update();
+    expect(wrapper.find(".collapsible-content").exists()).toEqual(true);
   });
 });
