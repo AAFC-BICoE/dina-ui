@@ -9,9 +9,6 @@
   ]
   },  
   "urls": [
-      "http://localhost:8000/media-uploadView/uploadFile",
-      "http://localhost:8000/media-uploadView/detailView",
-      "http://localhost:8000/media-uploadView/detailEdit",
       "http://localhost:8000/managed-attribute/list",    
       "http://localhost:8000/object/list",    
       "http://localhost:8000/object/view",    
