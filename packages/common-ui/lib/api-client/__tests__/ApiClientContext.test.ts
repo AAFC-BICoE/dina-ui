@@ -151,7 +151,7 @@ describe("API client context", () => {
     expect(mockPatch).toHaveBeenCalledTimes(1);
     const [patchCall] = mockPatch.mock.calls;
     expect(patchCall).toEqual([
-      "operations",
+      "/operations",
       TODO_INSERT_OPERATION,
       AXIOS_JSONPATCH_REQUEST_CONFIG
     ]);
@@ -224,7 +224,7 @@ Constraint violation: description size must be between 1 and 10`;
 
     // Expect correct patch args.
     expect(mockPatch).lastCalledWith(
-      "operations",
+      "/operations",
       [
         {
           op: "POST",
@@ -316,7 +316,7 @@ Constraint violation: description size must be between 1 and 10`;
     ]);
 
     expect(mockPatch).lastCalledWith(
-      "operations",
+      "/operations",
       [
         {
           op: "PATCH",
@@ -380,7 +380,7 @@ Constraint violation: description size must be between 1 and 10`;
 
     // Bulk-requests by ID:
     expect(mockPatch).lastCalledWith(
-      "operations",
+      "/operations",
       [
         { op: "GET", path: "pcrPrimer/123" },
         { op: "GET", path: "pcrPrimer/124" }

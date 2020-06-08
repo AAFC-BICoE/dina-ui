@@ -95,7 +95,7 @@ describe("Metadata detail view page", () => {
     );
 
     // Wait for the page to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
@@ -119,15 +119,15 @@ describe("Metadata detail view page", () => {
     );
     // Wait for the page to load.
     wrapper.update();
-    await Promise.resolve().then(() => {
-      expect(mockMetaGet).toHaveBeenCalledTimes(2);
-      expect(mockMetaGet).toHaveBeenLastCalledWith(
-        "metadata-managed-attribute/20",
-        {
-          include: "managedAttribute"
-        }
-      );
-    });
+    await new Promise(setImmediate);
+
+    expect(mockMetaGet).toHaveBeenCalledTimes(3);
+    expect(mockMetaGet).toHaveBeenLastCalledWith(
+      "metadata-managed-attribute/20",
+      {
+        include: "managedAttribute"
+      }
+    );
   });
 
   it("Provides a form to show the metadata section.", async done => {
@@ -137,7 +137,7 @@ describe("Metadata detail view page", () => {
     );
 
     // Wait for the page to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
@@ -154,7 +154,7 @@ describe("Metadata detail view page", () => {
     );
 
     // Wait for the page to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);

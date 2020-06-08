@@ -5,10 +5,19 @@ import EditMetadatasPage, {
   managedAttributeColumns
 } from "../../../pages/metadata/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { ManagedAttributeMap, Metadata } from "../../../types/objectstore-api";
+import {
+  Agent,
+  ManagedAttributeMap,
+  Metadata
+} from "../../../types/objectstore-api";
 
 const TEST_METADATAS: Array<PersistedResource<Metadata>> = [
   {
+    acMetadataCreator: {
+      displayName: "Mat Poff",
+      id: "6e80e42a-bcf6-4062-9db3-946e0f26458f",
+      type: "agent"
+    } as Agent,
     acTags: ["tag1"],
     bucket: "testbucket",
     dcType: "Image",
@@ -105,7 +114,8 @@ describe("Metadata bulk edit page", () => {
     // The 3 metadatas should have been loaded into the table.
     expect(wrapper.find("MockHotTable").prop("data")).toEqual([
       {
-        acMetadataCreator: "",
+        acMetadataCreator:
+          "Mat Poff (agent/6e80e42a-bcf6-4062-9db3-946e0f26458f)",
         acTags: "tag1",
         dcCreator: "",
         metadata: expect.objectContaining({
@@ -233,10 +243,7 @@ describe("Metadata bulk edit page", () => {
     expect(mockSave).lastCalledWith([
       {
         resource: {
-          acMetadataCreator: {
-            id: "63eead51-142f-4a67-a596-68fd35a36ed8",
-            type: "agent"
-          },
+          acMetadataCreator: "63eead51-142f-4a67-a596-68fd35a36ed8",
           acTags: ["newTag1", "newTag2"],
           id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
           type: "metadata"

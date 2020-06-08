@@ -67,7 +67,7 @@ describe("Object subtype edit page", () => {
     await new Promise(setImmediate);
 
     expect(mockPatch).lastCalledWith(
-      "operations",
+      "/operations",
       [
         {
           op: "POST",
@@ -113,7 +113,7 @@ describe("Object subtype edit page", () => {
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
 
     // Wait for the form to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     // Check that the existing existing subtype value is in the field.
@@ -133,7 +133,7 @@ describe("Object subtype edit page", () => {
       // "patch" should have been called with a jsonpatch request containing the existing values
       // and the modified one.
       expect(mockPatch).lastCalledWith(
-        "operations",
+        "/operations",
         [
           {
             op: "PATCH",

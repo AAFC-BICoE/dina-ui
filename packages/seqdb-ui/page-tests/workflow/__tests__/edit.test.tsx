@@ -97,7 +97,7 @@ describe("Workflow edit page.", () => {
     const today = new Date().toISOString().split("T")[0];
 
     expect(mockPatch).lastCalledWith(
-      "operations",
+      "/operations",
       [
         {
           op: "POST",
