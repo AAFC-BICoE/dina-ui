@@ -33,13 +33,13 @@ export default function MetadataViewPage() {
     {
       joinSpecs: [
         {
-          apiBaseUrl: "/agent-api",
+          apiBaseUrl: "/v1",
           idField: "acMetadataCreator",
           joinField: "acMetadataCreator",
           path: metadata => `agent/${metadata.acMetadataCreator}`
         },
         {
-          apiBaseUrl: "/agent-api",
+          apiBaseUrl: "/v1",
           idField: "dcCreator",
           joinField: "dcCreator",
           path: metadata => `agent/${metadata.dcCreator}`

@@ -39,7 +39,7 @@ export function AgentEditPage({ router }: WithRouterProps) {
             <h1>
               <ObjectStoreMessage id="editAgentTitle" />
             </h1>
-            <Query<Agent> query={{ path: `agent-api/agent/${id}` }}>
+            <Query<Agent> query={{ path: `v1/agent/${id}` }}>
               {({ loading, response }) => (
                 <div>
                   <LoadingSpinner loading={loading} />
@@ -77,7 +77,7 @@ function AgentForm({ agent, router }: AgentFormProps) {
         }
       ],
       {
-        apiBaseUrl: "/agent-api"
+        apiBaseUrl: "/v1"
       }
     );
 
