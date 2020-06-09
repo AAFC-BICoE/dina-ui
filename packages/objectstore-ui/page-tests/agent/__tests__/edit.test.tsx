@@ -12,7 +12,7 @@ const mockPush = jest.fn();
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
   // The get request will return the existing agent.
-  if (model === "agent-api/agent/1") {
+  if (model === "v1/agent/1") {
     // The request returns the test agent.
     return { data: TEST_AGENT };
   }
@@ -67,7 +67,7 @@ describe("agent edit page", () => {
     await new Promise(setImmediate);
 
     expect(mockPatch).lastCalledWith(
-      "/agent-api/operations",
+      "/v1/operations",
       [
         {
           op: "POST",
@@ -131,7 +131,7 @@ describe("agent edit page", () => {
       // "patch" should have been called with a jsonpatch request containing the existing values
       // and the modified one.
       expect(mockPatch).lastCalledWith(
-        "/agent-api/operations",
+        "/v1/operations",
         [
           {
             op: "PATCH",
