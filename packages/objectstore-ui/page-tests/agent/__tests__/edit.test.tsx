@@ -67,7 +67,6 @@ describe("agent edit page", () => {
     await new Promise(setImmediate);
 
     expect(mockPatch).lastCalledWith(
-      "/operations",
       "/agent-api/operations",
       [
         {
