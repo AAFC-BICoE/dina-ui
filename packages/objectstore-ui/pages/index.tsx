@@ -41,6 +41,13 @@ const Home: React.FunctionComponent = () => (
             </a>
           </Link>
         </li>
+        <li>
+          <Link href="/agent/list">
+            <a>
+              <ObjectStoreMessage id="agentListTitle" />
+            </a>
+          </Link>
+        </li>
       </ul>
     </div>
   </div>

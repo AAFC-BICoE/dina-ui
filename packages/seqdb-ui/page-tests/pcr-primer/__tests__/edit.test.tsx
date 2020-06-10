@@ -67,7 +67,7 @@ describe("PcrPrimer edit page", () => {
 
     setImmediate(() => {
       expect(mockPatch).lastCalledWith(
-        "operations",
+        "/operations",
         [
           {
             op: "POST",
@@ -151,7 +151,7 @@ describe("PcrPrimer edit page", () => {
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
 
     // Wait for the primer form to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     // // Check that the existing primer's seq value is in the field.
@@ -171,7 +171,7 @@ describe("PcrPrimer edit page", () => {
       // "patch" should have been called with a jsonpatch request containing the existing values
       // and the modified one.
       expect(mockPatch).lastCalledWith(
-        "operations",
+        "/operations",
         [
           {
             op: "PATCH",

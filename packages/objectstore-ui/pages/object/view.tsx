@@ -25,10 +25,28 @@ export default function MetadataViewPage() {
 
   const id = router.query.id as string;
 
-  const { loading, response } = useQuery<Metadata>({
-    include: "acDerivedFrom,acMetadataCreator,dcCreator,managedAttributeMap",
-    path: `metadata/${id}`
-  });
+  const { loading, response } = useQuery<Metadata>(
+    {
+      include: "acDerivedFrom,managedAttributeMap",
+      path: `metadata/${id}`
+    },
+    {
+      joinSpecs: [
+        {
+          apiBaseUrl: "/agent-api",
+          idField: "acMetadataCreator",
+          joinField: "acMetadataCreator",
+          path: metadata => `agent/${metadata.acMetadataCreator}`
+        },
+        {
+          apiBaseUrl: "/agent-api",
+          idField: "dcCreator",
+          joinField: "dcCreator",
+          path: metadata => `agent/${metadata.dcCreator}`
+        }
+      ]
+    }
+  );
 
   if (loading) {
     return <LoadingSpinner loading={true} />;
@@ -42,7 +60,7 @@ export default function MetadataViewPage() {
         ? `${metadata.fileIdentifier}.thumbnail`
         : metadata.fileIdentifier;
 
-    const filePath = `/api/v1/file/${metadata.bucket}/${fileId}`;
+    const filePath = `/api/file/${metadata.bucket}/${fileId}`;
     const fileType = metadata.fileExtension.replace(/\./, "").toLowerCase();
 
     return (

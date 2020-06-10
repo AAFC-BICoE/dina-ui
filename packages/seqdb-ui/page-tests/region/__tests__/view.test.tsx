@@ -44,7 +44,7 @@ describe("Region details page", () => {
     );
 
     // Wait for the page to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);

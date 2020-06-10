@@ -127,7 +127,7 @@ describe("Sample Selection UI", () => {
     wrapper.update();
 
     expect(mockPatch).lastCalledWith(
-      "operations",
+      "/operations",
       [
         {
           op: "POST",
@@ -186,7 +186,7 @@ describe("Sample Selection UI", () => {
     wrapper.update();
 
     expect(mockPatch).lastCalledWith(
-      "operations",
+      "/operations",
       [
         {
           op: "POST",
@@ -257,7 +257,7 @@ describe("Sample Selection UI", () => {
     wrapper.update();
 
     expect(mockPatch).lastCalledWith(
-      "operations",
+      "/operations",
       [
         {
           op: "DELETE",
@@ -298,7 +298,7 @@ describe("Sample Selection UI", () => {
     wrapper.update();
 
     expect(mockPatch).lastCalledWith(
-      "operations",
+      "/operations",
       [
         {
           op: "DELETE",

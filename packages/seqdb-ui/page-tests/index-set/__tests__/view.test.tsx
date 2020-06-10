@@ -70,14 +70,14 @@ describe("Index Set View Page", () => {
     expect(wrapper.find(LoadingSpinner).exists()).toEqual(true);
 
     // Wait for the page to load:
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     // The index set name is displayed:
     expect(wrapper.find("p[children='test index set']").exists()).toEqual(true);
 
     // Wait for the NGS indexes table to load:
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
     // The table shows the ngs indexes:
     expect(

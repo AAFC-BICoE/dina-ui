@@ -67,7 +67,7 @@ describe("Protocol edit page", () => {
 
     setImmediate(() => {
       expect(mockPatch).lastCalledWith(
-        "operations",
+        "/operations",
         [
           {
             op: "POST",
@@ -123,7 +123,7 @@ describe("Protocol edit page", () => {
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
 
     // Wait for the product form to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     // // Check that the existing protocol's name value is in the field.
@@ -146,7 +146,7 @@ describe("Protocol edit page", () => {
       // "patch" should have been called with a jsonpatch request containing the existing values
       // and the modified one.
       expect(mockPatch).lastCalledWith(
-        "operations",
+        "/operations",
         [
           {
             op: "PATCH",

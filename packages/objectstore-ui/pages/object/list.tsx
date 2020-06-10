@@ -60,9 +60,7 @@ export default function MetadataListPage() {
     "originalFilename",
     "dcFormat",
     "xmpRightsWebStatement",
-    "dcRights",
-    "acMetadataCreator.displayName",
-    "dcCreator.displayName"
+    "dcRights"
   ];
 
   const METADATA_TABLE_COLUMNS: Array<ColumnDefinition<Metadata>> = [
@@ -145,7 +143,21 @@ export default function MetadataListPage() {
                 id="metadata-list"
                 queryTableProps={{
                   columns: METADATA_TABLE_COLUMNS,
-                  include: "acMetadataCreator",
+                  // Include the Agents from the Agent API in the Metadatas:
+                  joinSpecs: [
+                    {
+                      apiBaseUrl: "/agent-api",
+                      idField: "acMetadataCreator",
+                      joinField: "acMetadataCreator",
+                      path: metadata => `agent/${metadata.acMetadataCreator}`
+                    },
+                    {
+                      apiBaseUrl: "/agent-api",
+                      idField: "dcCreator",
+                      joinField: "dcCreator",
+                      path: metadata => `agent/${metadata.dcCreator}`
+                    }
+                  ],
                   onSuccess: res => setAvailableMetadatas(res.data),
                   path: "metadata",
                   reactTableProps: ({ response }) => {

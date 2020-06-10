@@ -260,7 +260,7 @@ describe("Query component", () => {
     );
 
     // Continue the test after the first request finishes.
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     expect(mockChild).lastCalledWith(
       objectContaining({ response: MOCK_TODOS_RESPONSE })
@@ -271,6 +271,9 @@ describe("Query component", () => {
       children: pagedQuery({ offset: 3, limit: 3 }, mockChild)
     });
 
+    // Wait for the second request to start:
+    await Promise.resolve();
+
     expect(mockGet).toHaveBeenCalledTimes(2);
 
     // The first response is still rendered when waiting for the second fetch.
@@ -279,7 +282,7 @@ describe("Query component", () => {
     );
 
     // Continue the test after the second request finishes.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     expect(mockChild).lastCalledWith(
       objectContaining({ response: MOCK_TODOS_RESPONSE_PAGE_2 })
     );
@@ -300,7 +303,7 @@ describe("Query component", () => {
     expect(mockChild).lastCalledWith(objectContaining({ loading: true }));
 
     // Continue the test after the first query finishes.
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     // The component renders a third time when the first query finishes.
     expect(mockChild).toHaveBeenCalledTimes(3);
@@ -315,7 +318,7 @@ describe("Query component", () => {
     expect(mockChild).lastCalledWith(objectContaining({ loading: true }));
 
     // Continue the test after the second query finishes.
-    await Promise.resolve();
+    await new Promise(setImmediate);
 
     // Renders with loading as false after the second query finishes.
     expect(mockChild).lastCalledWith(objectContaining({ loading: false }));

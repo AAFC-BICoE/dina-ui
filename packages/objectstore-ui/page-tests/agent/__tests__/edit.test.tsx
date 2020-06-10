@@ -1,7 +1,7 @@
 import { OperationsResponse } from "common-ui";
-import { ObjectSubtype } from "../../../objectstore-ui/types/objectstore-api/resources/ObjectSubtype";
-import { ObjectSubtypeEditPage } from "../../pages/object-subtype/edit";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { AgentEditPage } from "../../../pages/agent/edit";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { Agent } from "../../../types/objectstore-api/resources/Agent";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -11,10 +11,10 @@ const mockPush = jest.fn();
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
-  // The get request will return the existing object subtype.
-  if (model === "object-subtype/1") {
-    // The request returns the test subtype.
-    return { data: TEST_OBJECT_SUBTYPE };
+  // The get request will return the existing agent.
+  if (model === "agent-api/agent/1") {
+    // The request returns the test agent.
+    return { data: TEST_AGENT };
   }
 });
 
@@ -24,22 +24,22 @@ const apiContext: any = {
   apiClient: { get: mockGet, axios: { patch: mockPatch } }
 };
 
-describe("Object subtype edit page", () => {
+describe("agent edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("Provides a form to add a subtype.", async () => {
+  it("Provides a form to add a agent.", async () => {
     mockPatch.mockReturnValueOnce({
       data: [
         {
           data: {
             attributes: {
-              acSubtype: "txt",
-              dcType: "TEXT"
+              displayName: "test agemt",
+              email: "testagent@a.b"
             },
             id: "1",
-            type: "object-subtype"
+            type: "agent"
           },
           status: 201
         }
@@ -47,18 +47,18 @@ describe("Object subtype edit page", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <ObjectSubtypeEditPage router={{ query: {}, push: mockPush } as any} />,
+      <AgentEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
 
-    expect(wrapper.find(".acSubtype-field input")).toHaveLength(1);
+    expect(wrapper.find(".displayName-field input")).toHaveLength(1);
 
-    // Edit the subtype name.
+    // Edit the displayName.
 
-    wrapper.find(".acSubtype-field input").simulate("change", {
+    wrapper.find(".displayName-field input").simulate("change", {
       target: {
-        name: "acSubtype",
-        value: "libre office word"
+        name: "agent",
+        value: "test agent updated"
       }
     });
 
@@ -67,35 +67,35 @@ describe("Object subtype edit page", () => {
     await new Promise(setImmediate);
 
     expect(mockPatch).lastCalledWith(
-      "/operations",
+      "/agent-api/operations",
       [
         {
           op: "POST",
-          path: "object-subtype",
+          path: "agent",
           value: {
             attributes: {
-              acSubtype: "libre office word"
+              displayName: "test agent updated"
             },
             id: "00000000-0000-0000-0000-000000000000",
-            type: "object-subtype"
+            type: "agent"
           }
         }
       ],
       expect.anything()
     );
 
-    // The user should be redirected to the new object subtype's details page.
-    expect(mockPush).lastCalledWith("/object-subtype/list");
+    // The user should be redirected to the new agent's details page.
+    expect(mockPush).lastCalledWith("/agent/list");
   });
 
-  it("Provides a form to edit a object subtype.", async done => {
+  it("Provides a form to edit an agent.", async done => {
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
       data: [
         {
           data: {
             id: "1",
-            type: "object-subtype"
+            type: "agent"
           },
           status: 201
         }
@@ -103,9 +103,7 @@ describe("Object subtype edit page", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <ObjectSubtypeEditPage
-        router={{ query: { id: 1 }, push: mockPush } as any}
-      />,
+      <AgentEditPage router={{ query: { id: 1 }, push: mockPush } as any} />,
       { apiContext }
     );
 
@@ -116,14 +114,14 @@ describe("Object subtype edit page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Check that the existing existing subtype value is in the field.
-    expect(wrapper.find(".acSubtype-field input").prop("value")).toEqual(
-      "word file"
+    // Check that the existing displayName value is in the field.
+    expect(wrapper.find(".displayName-field input").prop("value")).toEqual(
+      "agent a"
     );
 
-    // Modify the acSubtype value.
-    wrapper.find(".acSubtype-field input").simulate("change", {
-      target: { name: "acSubtype", value: "new subtype value" }
+    // Modify the displayName value.
+    wrapper.find(".displayName-field input").simulate("change", {
+      target: { name: "displayName", value: "new test agent" }
     });
 
     // Submit the form.
@@ -133,25 +131,25 @@ describe("Object subtype edit page", () => {
       // "patch" should have been called with a jsonpatch request containing the existing values
       // and the modified one.
       expect(mockPatch).lastCalledWith(
-        "/operations",
+        "/agent-api/operations",
         [
           {
             op: "PATCH",
-            path: "object-subtype/1",
+            path: "agent/1",
             value: {
               attributes: expect.objectContaining({
-                acSubtype: "new subtype value"
+                displayName: "new test agent"
               }),
               id: "1",
-              type: "object-subtype"
+              type: "agent"
             }
           }
         ],
         expect.anything()
       );
 
-      // The user should be redirected to object subtype's list page.
-      expect(mockPush).lastCalledWith("/object-subtype/list");
+      // The user should be redirected to agent's list page.
+      expect(mockPush).lastCalledWith("/agent/list");
       done();
     });
   });
@@ -163,7 +161,7 @@ describe("Object subtype edit page", () => {
         {
           errors: [
             {
-              detail: "DcType and subtype combination should be unique",
+              detail: "displayName and email combination should be unique",
               status: "422",
               title: "Constraint violation"
             }
@@ -174,7 +172,7 @@ describe("Object subtype edit page", () => {
     }));
 
     const wrapper = mountWithAppContext(
-      <ObjectSubtypeEditPage router={{ query: {}, push: mockPush } as any} />,
+      <AgentEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
 
@@ -184,7 +182,7 @@ describe("Object subtype edit page", () => {
     setImmediate(() => {
       wrapper.update();
       expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-        "Constraint violation: DcType and subtype combination should be unique"
+        "Constraint violation: displayName and email combination should be unique"
       );
       expect(mockPush).toBeCalledTimes(0);
       done();
@@ -192,11 +190,11 @@ describe("Object subtype edit page", () => {
   });
 });
 
-/** Test object subtype with all fields defined. */
-const TEST_OBJECT_SUBTYPE: ObjectSubtype = {
-  acSubtype: "word file",
-  dcType: "Text",
+/** Test agent with all fields defined. */
+const TEST_AGENT: Agent = {
+  displayName: "agent a",
+  email: "testagent@a.b",
   id: "1",
-  type: "object-subtype",
+  type: "agent",
   uuid: "323423-23423-234"
 };
