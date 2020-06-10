@@ -42,7 +42,7 @@ export default function AgentListPage() {
           id="agent-list"
           queryTableProps={{
             columns: AGENT_TABLE_COLUMNS,
-            path: "/agent"
+            path: "agent-api/agent"
           }}
         />
       </div>

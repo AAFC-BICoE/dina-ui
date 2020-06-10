@@ -85,7 +85,7 @@ export default function EditMetadatasPage() {
       {
         filter: input => ({ rsql: `displayName==*${input}*` }),
         label: agent => agent.displayName,
-        model: "v1/agent",
+        model: "agent-api/agent",
         type: "agent"
       },
       {
@@ -97,7 +97,7 @@ export default function EditMetadatasPage() {
       {
         filter: input => ({ rsql: `displayName==*${input}*` }),
         label: agent => agent.displayName,
-        model: "v1/agent",
+        model: "agent-api/agent",
         type: "agent"
       },
       {
@@ -144,13 +144,13 @@ export default function EditMetadatasPage() {
         joinSpecs: [
           // Join to agents api:
           {
-            apiBaseUrl: "/v1",
+            apiBaseUrl: "/agent-api",
             idField: "acMetadataCreator",
             joinField: "acMetadataCreator",
             path: metadata => `agent/${metadata.acMetadataCreator}`
           },
           {
-            apiBaseUrl: "/v1",
+            apiBaseUrl: "/agent-api",
             idField: "dcCreator",
             joinField: "dcCreator",
             path: metadata => `agent/${metadata.dcCreator}`

@@ -27,13 +27,13 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
     {
       joinSpecs: [
         {
-          apiBaseUrl: "/v1",
+          apiBaseUrl: "/agent-api",
           idField: "acMetadataCreator",
           joinField: "acMetadataCreator",
           path: metadata => `agent/${metadata.acMetadataCreator}`
         },
         {
-          apiBaseUrl: "/v1",
+          apiBaseUrl: "/agent-api",
           idField: "dcCreator",
           joinField: "dcCreator",
           path: metadata => `agent/${metadata.dcCreator}`
