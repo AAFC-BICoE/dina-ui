@@ -69,11 +69,17 @@ function AgentForm({ agent, router }: AgentFormProps) {
   const initialValues = agent || { type: "agent" };
 
   const onSubmit = safeSubmit(async submittedValues => {
-    await save([
+    await save(
+      [
+        {
+          resource: submittedValues,
+          type: "agent"
+        }
+      ],
       {
         apiBaseUrl: "/agent-api"
       }
-    ]);
+    );
 
     await router.push(`/agent/list`);
   });
