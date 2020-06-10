@@ -33,7 +33,7 @@ export function AgentDetailsPage({ router }: WithRouterProps) {
           byPassView={true}
         />
       </ButtonBar>
-      <Query<Agent> query={{ path: `v1/agent/${id}` }}>
+      <Query<Agent> query={{ path: `/agent/${id}` }}>
         {({ loading, response }) => {
           const agent = response && {
             ...response.data

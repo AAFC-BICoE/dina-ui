@@ -39,7 +39,7 @@ export function AgentEditPage({ router }: WithRouterProps) {
             <h1>
               <ObjectStoreMessage id="editAgentTitle" />
             </h1>
-            <Query<Agent> query={{ path: `v1/agent/${id}` }}>
+            <Query<Agent> query={{ path: `/agent/${id}` }}>
               {({ loading, response }) => (
                 <div>
                   <LoadingSpinner loading={loading} />
@@ -69,17 +69,12 @@ function AgentForm({ agent, router }: AgentFormProps) {
   const initialValues = agent || { type: "agent" };
 
   const onSubmit = safeSubmit(async submittedValues => {
-    await save(
-      [
-        {
-          resource: submittedValues,
-          type: "agent"
-        }
-      ],
+    await save([
       {
-        apiBaseUrl: "/v1"
+        resource: submittedValues,
+        type: "agent"
       }
-    );
+    ]);
 
     await router.push(`/agent/list`);
   });

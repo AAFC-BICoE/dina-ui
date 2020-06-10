@@ -13,7 +13,23 @@ respond /keycloak.json "{ \"resource\": \"{$KEYCLOAK_CLIENTID}\", \"realm\": \"{
 
 # Proxy to the additional Agent API:
 reverse_proxy /api/v1/agent {$AGENT_API_ADDRESS}
+reverse_proxy /api/v1/agent* {$AGENT_API_ADDRESS}
 reverse_proxy /api/v1/agent/* {$AGENT_API_ADDRESS}
 
-# Proxy to the main back-end API:
-# reverse_proxy /api/v1/* {$OBJECTSTORE_API_ADDRESS}
+#@objectstore path_regexp \/api\/v1\/(?!agent)
+
+#reverse_proxy  @objectstore {$OBJECTSTORE_API_ADDRESS}
+
+reverse_proxy  /api/v1/managed-attribute {$OBJECTSTORE_API_ADDRESS}
+reverse_proxy  /api/v1/managed-attribute/*  {$OBJECTSTORE_API_ADDRESS}
+reverse_proxy  /api/v1/managed-attribute*  {$OBJECTSTORE_API_ADDRESS}
+reverse_proxy  /api/v1/metadata  {$OBJECTSTORE_API_ADDRESS}
+reverse_proxy /api/v1/metadata/* {$OBJECTSTORE_API_ADDRESS}
+reverse_proxy /api/v1/metadata* {$OBJECTSTORE_API_ADDRESS}
+reverse_proxy  /api/v1/object-subtype   {$OBJECTSTORE_API_ADDRESS}
+reverse_proxy  /api/v1/object-subtype*   {$OBJECTSTORE_API_ADDRESS}
+reverse_proxy /api/v1/object-subtype/*  {$OBJECTSTORE_API_ADDRESS}
+reverse_proxy /api/v1/operations {$OBJECTSTORE_API_ADDRESS}
+reverse_proxy /api/v1/file     {$OBJECTSTORE_API_ADDRESS}
+reverse_proxy /api/v1/file*     {$OBJECTSTORE_API_ADDRESS}
+reverse_proxy /api/v1/file/*   {$OBJECTSTORE_API_ADDRESS}
