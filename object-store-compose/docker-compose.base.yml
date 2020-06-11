@@ -79,6 +79,13 @@ services:
       - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
   agent-api:
     image: agent-api:tag
+    environment:
+      spring.datasource.url: jdbc:postgresql://database/objectstore?currentSchema=object_store
+      spring.datasource.username: postgres
+      spring.datasource.password: p
+      spring.datasource.continue-on-error: "true"
+      spring.liquibase.user: postgres
+      spring.liquibase.password: p
     extra_hosts:
       # Resolve the Keycloak domain to Keycloak's static IP:
       - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
