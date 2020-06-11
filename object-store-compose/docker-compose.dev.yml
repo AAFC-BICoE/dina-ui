@@ -1,7 +1,7 @@
 # Additional launch configuration for local dev instances.
 version: "3.7"
 services:
-  api:
+  objectstore-api:
     image: maven:3.6.3-jdk-8
     # Run as Docker host user so generated files don't belong to root:
     user: $UID:$GID
@@ -41,8 +41,43 @@ services:
       \"
       spring-boot:run
       "
+  agent-api:
+    image: maven:3.6.3-jdk-8
+    # Run as Docker host user so generated files don't belong to root:
+    user: $UID:$GID
+    volumes:
+      - "../repos/agent-api:/app"
+      # Share host users:
+      - "/etc/group:/etc/group:ro"
+      - "/etc/passwd:/etc/passwd:ro"
+      - "/etc/shadow:/etc/shadow:ro"
+      # Use the host maven repository:
+      - "~/.m2:/var/maven/.m2"
+    ports:
+      - "5006:5005" # debug port
+    # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
+    command: >
+      bash -c "
+      mvn
+      -f /app/pom.xml
+      -Duser.home=/var/maven
+      -Dspring-boot-maven-plugin.fork=true
+      -Dspring-boot.run.jvmArguments=\"
+        -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
+        -Dspring.datasource.url=jdbc:postgresql://database/objectstore?currentSchema=agent
+        -Dspring.datasource.username=postgres
+        -Dspring.datasource.password=p
+        -Dspring.datasource.continue-on-error=true
+        -Dspring.liquibase.user=postgres
+        -Dspring.liquibase.password=p
+        -Dkeycloak.enabled=true
+        -Dkeycloak.resource=objectstore
+        -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
+      \"
+      spring-boot:run
+      "
   # Nextjs's dev-mode server that hot-reloads the UI source code:
-  ui-dev-server:
+  objectstore-ui-dev-server:
     image: node:12.16.1
     volumes:
       - "../repos/dina-ui:/dina-ui"
@@ -61,9 +96,9 @@ services:
       yarn --cwd=/dina-ui/packages/objectstore-ui dev
       "
   # Front-end gateway that proxies URLs to the correct service:
-  ui:
+  objectstore-ui:
     image: caddy/caddy:2.0.0-rc.3
     volumes:
       - "../repos/dina-ui/packages/objectstore-ui/dev.Caddyfile:/etc/caddy/Caddyfile"
     environment:
-      UI_DEV_SERVER_ADDRESS: ui-dev-server:3000
+      UI_DEV_SERVER_ADDRESS: objectstore-ui-dev-server:3000
