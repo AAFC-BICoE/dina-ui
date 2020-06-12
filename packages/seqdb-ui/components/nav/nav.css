@@ -1,0 +1,11 @@
+body {
+  /* Set color to ensure the contrast ratio 4.5:1 for WCAG compliance,
+  Success Criterion 1.4.3 Contrast (Minimum),Level (AA), https://www.w3.org/TR/WCAG21/ */
+  background-color: #ffffff;
+  color: #666666;
+}
+/* Set color to ensure the contrast ratio 4.5:1 for WCAG compliance,
+   Success Criterion 1.4.3 Contrast (Minimum),Level (AA), https://www.w3.org/TR/WCAG21/ */
+a {
+  color: #1064b4;
+}

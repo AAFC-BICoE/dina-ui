@@ -1,0 +1,93 @@
+# Pa11y
+
+* Install Pa11y
+
+----
+git clone https://github.com/pa11y/pa11y.git
+cd pa11y
+----
+
+* Run Pa11y for multiple pages
+
+copy below example multiple.js file to pa11y dir
+
+----
+// An example of running Pa11y on multiple URLS
+'use strict';
+
+const pa11y = require('.');
+
+runExample();
+
+// Async function required for us to use await
+async function runExample() {
+        try {
+
+                // Put together some options to use in each test
+                const options = {
+                        log: {
+                                debug: console.log,
+                                error: console.error,
+                                info: console.log
+                        }
+                };
+
+                // Run tests against multiple URLs
+                const results = await Promise.all([
+                        pa11y('http://localhost:8000/product/list', options),
+                        pa11y('http://localhost:8000/product/edit?id=1', options),
+                        pa11y('http://localhost:8000/product/view?id=1', options)
+
+                ]);
+
+        } catch (error) {
+
+                // Output an error if it occurred
+                console.error(error.message);
+
+        }
+}
+
+----
+
+run below
+
+----
+node multiple.js > WCAGreports.txt
+----
+
+WCAGreports.txt will be generated for all the elements on all pages that have WCAG compliant issues.
+
+Part of the example output report will be like below
+
+----
+ {
+      code: 'WCAG2AA.Principle4.Guideline4_1.4_1_2.H91.InputText.Name',
+      context: '<input class="form-control" type="text" value="">',
+      message: 'This textinput element does not have a name available to an accessibility API. Valid names are: label element, title undefined, aria-label undefined, aria-labelledby undefined.',
+      type: 'error',
+      typeCode: 1,
+      selector: '#__next > div > div > div > div > form > div:nth-child(2) > div:nth-child(3) > div:nth-child(2) > div > input'
+    },
+    {
+      code: 'WCAG2AA.Principle1.Guideline1_3.1_3_1.F68',
+      context: '<input class="form-control" type="text" value="">',
+      message: 'This form field should be labelled in some way. Use the label element (either with a "for" attribute or wrapped around the form field), or "title", "aria-label" or "aria-labelledby" attributes as appropriate.',
+      type: 'error',
+      typeCode: 1,
+      selector: '#__next > div > div > div > div > form > div:nth-child(2) > div:nth-child(3) > div:nth-child(2) > div > input'
+    },
+
+----
+
+# Chrome Inspector
+
+To have a visual feedback of which html element has violated the WCAG rule,use Chrome Inspector
+
+* Download the Chrome stable version
+* Launch a page, e.g, http://localhost:8000/product/list
+* Press F12 to lauch the chome devTools
+* Go to audit tab, check the "accessibility" checkbox and press "run audit" button
+* A report is shown for the page regarding the WCAG validation and the elements that have WCAG compliance issue.
+* Click on the element, you can visually see the issue on premise.
+* After fix specific issue, rerun the audit report to verify the issue is gone

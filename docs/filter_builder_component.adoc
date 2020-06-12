@@ -1,0 +1,50 @@
+= FilterBuilderField component
+
+The FilterBuilderField component provides a Formik input for creating complex filter queries.
+The FilterGroupModel value this input provides can be converted to an RSQL string to inluded in
+the API request.
+
+Example usage for filtering PcrPrimers in a list page:
+[source,tsx]
+----
+import { Form, Formik } from "formik";
+import { FilterParam } from "kitsu";
+import { useState } from "react";
+import { FilterBuilderField } from "../components/filter-builder/FilterBuilderField";
+import { rsql } from "../components/filter-builder/rsql";
+import Head from "../components/head";
+import Nav from "../components/nav";
+import { QueryTable } from "../components/table/QueryTable";
+
+export default function ExamplePage() {
+  const [filter, setFilter] = useState<FilterParam>();
+
+  function onSubmit({ filter }) {
+    setFilter({ rsql: rsql(filter) });
+  }
+
+  return (
+    <div>
+      <Head />
+      <Nav />
+      <div className="container-fluid">
+        <Formik initialValues={{}} onSubmit={onSubmit}>
+          <Form>
+            <FilterBuilderField
+              filterAttributes={["name", "group.groupName"]}
+              name="filter"
+            />
+            <button type="submit">search</button>
+          </Form>
+        </Formik>
+        <QueryTable
+          columns={["name", "type", "group.groupName"]}
+          filter={filter}
+          include="group"
+          path="pcrPrimer"
+        />
+      </div>
+    </div>
+  );
+}
+----
