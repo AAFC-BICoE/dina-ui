@@ -57,7 +57,7 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
             </h1>
             <Query<ManagedAttribute>
               query={{
-                path: `managed-attribute/${id}`
+                path: `objectstore-api/managed-attribute/${id}`
               }}
             >
               {({ loading, response }) => (
@@ -88,11 +88,10 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
 }
 
 function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
-  const { save, doOperations } = useContext(ApiClientContext);
+  const { save } = useContext(ApiClientContext);
   const [type, setType] = useState(
     profile ? profile.managedAttributeType : undefined
   );
-  const { openModal } = useModal();
 
   const initialValues = profile || { type: "managed-attribute" };
 
@@ -112,12 +111,15 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       type: submittedValues.type
     };
     try {
-      const response = await save([
-        {
-          resource: managedAttributeValues,
-          type: "managed-attribute"
-        }
-      ]);
+      await save(
+        [
+          {
+            resource: managedAttributeValues,
+            type: "managed-attribute"
+          }
+        ],
+        { apiBaseUrl: "/objectstore-api" }
+      );
       router.push(`/managedAttributesView/listView`);
       setSubmitting(false);
     } catch (error) {
@@ -133,6 +135,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
         <SubmitButton />
         <DeleteButton
           id={profile?.id}
+          options={{ apiBaseUrl: "/objectstore-api" }}
           postDeleteRedirect="/managedAttributesView/listView"
           type="managed-attribute"
         />

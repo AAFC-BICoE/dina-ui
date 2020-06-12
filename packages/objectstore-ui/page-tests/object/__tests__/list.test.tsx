@@ -58,7 +58,7 @@ describe("Metadata List Page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGet.mockImplementation(async path => {
-      if (path === "metadata") {
+      if (path === "objectstore-api/metadata") {
         return { data: TEST_METADATAS };
       }
     });
@@ -239,16 +239,21 @@ describe("Metadata List Page", () => {
     buttonWrapper.update();
 
     expect(mockDoOperations).toHaveBeenCalledTimes(1);
-    expect(mockDoOperations).lastCalledWith([
+    expect(mockDoOperations).lastCalledWith(
+      [
+        {
+          op: "DELETE",
+          path: "metadata/00000000-0000-0000-0000-000000000000"
+        },
+        {
+          op: "DELETE",
+          path: "metadata/11111111-1111-1111-1111-111111111111"
+        }
+      ],
       {
-        op: "DELETE",
-        path: "metadata/00000000-0000-0000-0000-000000000000"
-      },
-      {
-        op: "DELETE",
-        path: "metadata/11111111-1111-1111-1111-111111111111"
+        apiBaseUrl: "/objectstore-api"
       }
-    ]);
+    );
     expect(mockReload).toHaveBeenCalledTimes(1);
   });
 });

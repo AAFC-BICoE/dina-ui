@@ -41,7 +41,9 @@ export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
             <h1>
               <ObjectStoreMessage id="editObjectSubtypeTitle" />
             </h1>
-            <Query<ObjectSubtype> query={{ path: `object-subtype/${id}` }}>
+            <Query<ObjectSubtype>
+              query={{ path: `objectstore-api/object-subtype/${id}` }}
+            >
               {({ loading, response }) => (
                 <div>
                   <LoadingSpinner loading={loading} />
@@ -74,12 +76,15 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
   const initialValues = objectSubtype || { type: "object-subtype" };
 
   const onSubmit = safeSubmit(async submittedValues => {
-    await save([
-      {
-        resource: submittedValues,
-        type: "object-subtype"
-      }
-    ]);
+    await save(
+      [
+        {
+          resource: submittedValues,
+          type: "object-subtype"
+        }
+      ],
+      { apiBaseUrl: "/objectstore-api" }
+    );
 
     await router.push(`/object-subtype/list`);
   });
@@ -92,6 +97,7 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
           <SubmitButton />
           <DeleteButton
             id={id as string}
+            options={{ apiBaseUrl: "/objectstore-api" }}
             postDeleteRedirect="/object-subtype/list"
             type="object-subtype"
           />

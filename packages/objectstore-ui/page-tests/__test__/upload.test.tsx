@@ -97,39 +97,42 @@ describe("Upload page", () => {
     await flushPromises(ui, container);
 
     expect(mockPost).lastCalledWith(
-      "/file/mybucket",
+      "/objectstore-api/file/mybucket",
       // Form data with the file would go here:
       expect.anything(),
       // Passes in the custom error handler:
       { transformResponse: fileUploadErrorHandler }
     );
 
-    expect(mockSave).lastCalledWith([
-      {
-        resource: {
-          bucket: "mybucket",
-          fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
+    expect(mockSave).lastCalledWith(
+      [
+        {
+          resource: {
+            bucket: "mybucket",
+            fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
+            type: "metadata"
+          },
           type: "metadata"
         },
-        type: "metadata"
-      },
-      {
-        resource: {
-          bucket: "mybucket",
-          fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
+        {
+          resource: {
+            bucket: "mybucket",
+            fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
+            type: "metadata"
+          },
           type: "metadata"
         },
-        type: "metadata"
-      },
-      {
-        resource: {
-          bucket: "mybucket",
-          fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
+        {
+          resource: {
+            bucket: "mybucket",
+            fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
+            type: "metadata"
+          },
           type: "metadata"
-        },
-        type: "metadata"
-      }
-    ]);
+        }
+      ],
+      { apiBaseUrl: "/objectstore-api" }
+    );
 
     // You should get redirected to the bulk edit page with the new metadata IDs.
     expect(mockPush).lastCalledWith({

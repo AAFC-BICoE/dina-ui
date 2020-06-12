@@ -31,7 +31,7 @@ const OBJECTSUBTYPE_TABLE_COLUMNS: Array<ColumnDefinition<ObjectSubtype>> = [
 
 const queryTableProps: QueryTableProps<ObjectSubtype> = {
   columns: OBJECTSUBTYPE_TABLE_COLUMNS,
-  path: "object-subtype"
+  path: "objectstore-api/object-subtype"
 };
 
 export default function ObjectSubtypeListPage() {

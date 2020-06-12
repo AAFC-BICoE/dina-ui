@@ -97,7 +97,7 @@ export default function UploadPage() {
 
       // Upload the file:
       const response = await apiClient.axios.post(
-        `/file/${BUCKET_NAME}`,
+        `/objectstore-api/file/${BUCKET_NAME}`,
         formData,
         { transformResponse: fileUploadErrorHandler }
       );
@@ -113,7 +113,9 @@ export default function UploadPage() {
       type: "metadata"
     }));
 
-    const saveResults = await save(saveOperations);
+    const saveResults = await save(saveOperations, {
+      apiBaseUrl: "/objectstore-api"
+    });
 
     const ids = saveResults.map(res => res.id).join(",");
 

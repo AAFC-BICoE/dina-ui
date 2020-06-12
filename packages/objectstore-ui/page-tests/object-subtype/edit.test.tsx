@@ -12,7 +12,7 @@ const mockPush = jest.fn();
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
   // The get request will return the existing object subtype.
-  if (model === "object-subtype/1") {
+  if (model === "objectstore-api/object-subtype/1") {
     // The request returns the test subtype.
     return { data: TEST_OBJECT_SUBTYPE };
   }
@@ -67,7 +67,7 @@ describe("Object subtype edit page", () => {
     await new Promise(setImmediate);
 
     expect(mockPatch).lastCalledWith(
-      "/operations",
+      "/objectstore-api/operations",
       [
         {
           op: "POST",
@@ -133,7 +133,7 @@ describe("Object subtype edit page", () => {
       // "patch" should have been called with a jsonpatch request containing the existing values
       // and the modified one.
       expect(mockPatch).lastCalledWith(
-        "/operations",
+        "/objectstore-api/operations",
         [
           {
             op: "PATCH",

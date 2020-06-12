@@ -240,31 +240,34 @@ describe("Metadata bulk edit page", () => {
     // Only 1 row should have been updated, using 2 operations for the row:
     // - The Metadata is updated with new acMetadataCreator and new tags.
     // - The metadata's managed-attribute-map is udpated with a new attribute value.
-    expect(mockSave).lastCalledWith([
-      {
-        resource: {
-          acMetadataCreator: "63eead51-142f-4a67-a596-68fd35a36ed8",
-          acTags: ["newTag1", "newTag2"],
-          id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
-          type: "metadata"
-        },
-        type: "metadata"
-      },
-      {
-        resource: {
-          metadata: {
+    expect(mockSave).lastCalledWith(
+      [
+        {
+          resource: {
+            acMetadataCreator: "63eead51-142f-4a67-a596-68fd35a36ed8",
+            acTags: ["newTag1", "newTag2"],
             id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
             type: "metadata"
           },
-          type: "managed-attribute-map",
-          values: {
-            "4ed1dc15-c931-414a-ab13-cc766fd6fae2": {
-              value: "new attr value"
-            }
-          }
+          type: "metadata"
         },
-        type: "managed-attribute-map"
-      }
-    ]);
+        {
+          resource: {
+            metadata: {
+              id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
+              type: "metadata"
+            },
+            type: "managed-attribute-map",
+            values: {
+              "4ed1dc15-c931-414a-ab13-cc766fd6fae2": {
+                value: "new attr value"
+              }
+            }
+          },
+          type: "managed-attribute-map"
+        }
+      ],
+      { apiBaseUrl: "/objectstore-api" }
+    );
   });
 });

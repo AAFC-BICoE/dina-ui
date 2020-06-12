@@ -159,7 +159,7 @@ export default function MetadataListPage() {
                     }
                   ],
                   onSuccess: res => setAvailableMetadatas(res.data),
-                  path: "metadata",
+                  path: "objectstore-api/metadata",
                   reactTableProps: ({ response }) => {
                     TBodyGallery.innerComponent = (
                       <StoredObjectGallery
@@ -329,7 +329,10 @@ export function BulkDeleteButton() {
                 metadataIds.map(id => ({
                   op: "DELETE",
                   path: `metadata/${id}`
-                }))
+                })),
+                {
+                  apiBaseUrl: "/objectstore-api"
+                }
               );
 
               // Refresh the page:

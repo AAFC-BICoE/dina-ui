@@ -130,7 +130,8 @@ export default function EditMetadatasPage() {
 
     // Fetch the managed attributes from the back-end:
     const newInitialEditableManagedAttributes = await bulkGet<ManagedAttribute>(
-      managedAttributeIds.map(id => `/managed-attribute/${id}`)
+      managedAttributeIds.map(id => `/managed-attribute/${id}`),
+      { apiBaseUrl: "/objectstore-api" }
     );
 
     // Set the attributes in component state; These are used to re-initialize the Formik controls:
@@ -141,6 +142,7 @@ export default function EditMetadatasPage() {
     const metadatas = await bulkGet<Metadata>(
       ids.map(id => `/metadata/${id}?include=managedAttributeMap`),
       {
+        apiBaseUrl: "/objectstore-api",
         joinSpecs: [
           // Join to agents api:
           {
@@ -238,7 +240,9 @@ export default function EditMetadatasPage() {
 
     editedManagedAttributeMaps.forEach(saveArg => delete saveArg.resource.id);
 
-    await save([...editedMetadatas, ...editedManagedAttributeMaps]);
+    await save([...editedMetadatas, ...editedManagedAttributeMaps], {
+      apiBaseUrl: "/objectstore-api"
+    });
 
     await router.push("/object/list");
   }
@@ -273,7 +277,7 @@ export default function EditMetadatasPage() {
                   filter={filterBy(["name"])}
                   name="editableManagedAttributes"
                   isMulti={true}
-                  model="managed-attribute"
+                  model="objectstore-api/managed-attribute"
                   optionLabel={attr => attr.name}
                 />
                 <BulkDataEditor

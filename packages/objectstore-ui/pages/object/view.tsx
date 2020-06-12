@@ -28,7 +28,7 @@ export default function MetadataViewPage() {
   const { loading, response } = useQuery<Metadata>(
     {
       include: "acDerivedFrom,managedAttributeMap",
-      path: `metadata/${id}`
+      path: `objectstore-api/metadata/${id}`
     },
     {
       joinSpecs: [

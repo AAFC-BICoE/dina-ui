@@ -83,7 +83,7 @@ function GalleryItem({
     filter: {
       "acDerivedFrom.id": id
     },
-    path: "metadata"
+    path: "objectstore-api/metadata"
   });
 
   const thumbnail = thumbnailResponse?.data?.[0];

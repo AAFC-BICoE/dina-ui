@@ -34,7 +34,7 @@ describe("Object subtype list page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGet.mockImplementation(async path => {
-      if (path === "object-subtype") {
+      if (path === "objectstore-api/object-subtype") {
         return { data: TEST_OBJECTSUBTYPES };
       }
     });

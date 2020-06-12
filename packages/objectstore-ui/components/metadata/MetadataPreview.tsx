@@ -22,7 +22,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
   const { loading, response } = useQuery<Metadata>(
     {
       include: "acDerivedFrom,managedAttributeMap",
-      path: `metadata/${metadataId}`
+      path: `objectstore-api/metadata/${metadataId}`
     },
     {
       joinSpecs: [

@@ -44,7 +44,7 @@ export default function ManagedAttributesListPage() {
           id="managed-attribute-list"
           queryTableProps={{
             columns: ATTRIBUTES_LIST_COLUMNS,
-            path: "managed-attribute"
+            path: "objectstore-api/managed-attribute"
           }}
         />
       </div>

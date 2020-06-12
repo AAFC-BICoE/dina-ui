@@ -15,7 +15,7 @@ export function GenerateManagedAttributesView({
     <Query<MetaManagedAttribute>
       query={{
         include: "managedAttribute",
-        path: "metadata-managed-attribute/" + ma.id
+        path: "objectstore-api/metadata-managed-attribute/" + ma.id
       }}
     >
       {({ response }) => (
