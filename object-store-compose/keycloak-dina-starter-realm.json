@@ -33,6 +33,35 @@
       }
     ]
   },
+  "groups": [
+    {
+      "id": "bdb5572b-2352-4926-90e5-4594d21e6df0",
+      "name": "aafc",
+      "path": "/aafc",
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {},
+      "subGroups": []
+    },
+    {
+      "id": "2b4549e9-9a95-489f-8e30-74c2d877d8a8",
+      "name": "cnc",
+      "path": "/cnc",
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {},
+      "subGroups": []
+    },
+    {
+      "id": "b2366903-df67-4f68-b00f-ce41ddc64861",
+      "name": "dao",
+      "path": "/dao",
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {},
+      "subGroups": []
+    }
+  ],
   "defaultRoles": ["user"],
   "clientScopes": [
     {
@@ -295,6 +324,20 @@
             "claim.name": "family_name",
             "jsonType.label": "String"
           }
+        },
+        {
+          "id": "8fd7ff2b-705c-4540-8ed6-19ab609e772b",
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "full.path": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "groups",
+            "userinfo.token.claim": "true"
+          }
         }
       ]
     },
@@ -433,16 +476,17 @@
       "realmRoles": ["admin", "user"],
       "credentials": [{ "type": "password", "value": "admin" }],
       "attributes": {
-        "agentId": "abcd"
+        "agentId": "fdb72d9d-4ea1-4edf-baf2-6feafb90fd12"
       }
     },
     {
       "username": "user",
       "enabled": true,
       "realmRoles": ["user"],
+      "groups": ["aafc", "cnc"],
       "credentials": [{ "type": "password", "value": "user" }],
       "attributes": {
-        "agentId": "efgh"
+        "agentId": "9c403c4b-c849-43c4-bbc1-8bd10b1997e1"
       }
     }
   ]
