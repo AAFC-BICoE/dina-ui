@@ -155,13 +155,6 @@ export default function UploadPage() {
               onSubmit={safeSubmit(onSubmit)}
             >
               <Form>
-                <div className="row">
-                  <SelectField
-                    className="col-md-3"
-                    name="group"
-                    options={groupSelectOptions}
-                  />
-                </div>
                 <div id="dndRoot" style={{ cursor: "pointer" }}>
                   <div {...getRootProps({ style })} className="root">
                     <input {...getInputProps()} />
