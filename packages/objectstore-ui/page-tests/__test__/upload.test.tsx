@@ -1,4 +1,6 @@
 import { cleanup, fireEvent, render } from "@testing-library/react";
+import { AccountContextI } from "common-ui";
+import { noop } from "lodash";
 import UploadPage, { fileUploadErrorHandler } from "../../pages/upload";
 import { MockAppContextProvider } from "../../test-util/mock-app-context";
 
@@ -9,6 +11,16 @@ jest.mock("next/router", () => ({
     push: mockPush
   })
 }));
+
+const MOCK_ACCOUNT_CONTEXT: AccountContextI = {
+  authenticated: true,
+  groups: ["/group-with-slash", "group-without-slash"],
+  initialized: true,
+  login: noop,
+  logout: noop,
+  token: "test-token",
+  username: "test-user"
+};
 
 describe("Upload page", () => {
   let files;
@@ -21,7 +33,7 @@ describe("Upload page", () => {
 
   it("renders the root and input nodes with the necessary props", () => {
     const { container } = render(
-      <MockAppContextProvider>
+      <MockAppContextProvider accountContext={MOCK_ACCOUNT_CONTEXT}>
         <UploadPage />
       </MockAppContextProvider>
     );
@@ -33,7 +45,7 @@ describe("Upload page", () => {
   it("When dropped the files, page shows file names", async () => {
     const event = createDtWithFiles(files);
     const ui = (
-      <MockAppContextProvider>
+      <MockAppContextProvider accountContext={MOCK_ACCOUNT_CONTEXT}>
         <UploadPage />
       </MockAppContextProvider>
     );
@@ -78,7 +90,10 @@ describe("Upload page", () => {
     ]);
 
     const ui = (
-      <MockAppContextProvider apiContext={mockCtx as any}>
+      <MockAppContextProvider
+        accountContext={MOCK_ACCOUNT_CONTEXT}
+        apiContext={mockCtx as any}
+      >
         <UploadPage />
       </MockAppContextProvider>
     );
@@ -96,8 +111,9 @@ describe("Upload page", () => {
     );
     await flushPromises(ui, container);
 
+    // The prefixed slash should be removed:
     expect(mockPost).lastCalledWith(
-      "/file/mybucket",
+      "/file/group-with-slash",
       // Form data with the file would go here:
       expect.anything(),
       // Passes in the custom error handler:
@@ -107,7 +123,7 @@ describe("Upload page", () => {
     expect(mockSave).lastCalledWith([
       {
         resource: {
-          bucket: "mybucket",
+          bucket: "group-with-slash",
           fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
           type: "metadata"
         },
@@ -115,7 +131,7 @@ describe("Upload page", () => {
       },
       {
         resource: {
-          bucket: "mybucket",
+          bucket: "group-with-slash",
           fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
           type: "metadata"
         },
@@ -123,7 +139,7 @@ describe("Upload page", () => {
       },
       {
         resource: {
-          bucket: "mybucket",
+          bucket: "group-with-slash",
           fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
           type: "metadata"
         },
@@ -152,6 +168,19 @@ describe("Upload page", () => {
       expect(error.message).toEqual("Error from Spring");
       done();
     }
+  });
+
+  it("Only renders if the user belongs a group", () => {
+    const ui = (
+      <MockAppContextProvider
+        accountContext={{ ...MOCK_ACCOUNT_CONTEXT, groups: [] }}
+      >
+        <UploadPage />
+      </MockAppContextProvider>
+    );
+    const { container } = render(ui);
+
+    expect(container.querySelector(".no-group-alert")).toBeTruthy();
   });
 });
 
