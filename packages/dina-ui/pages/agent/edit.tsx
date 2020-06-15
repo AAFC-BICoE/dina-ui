@@ -15,10 +15,7 @@ import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { Agent } from "types/objectstore-api/resources/Agent";
 import { Head, Nav } from "../../components";
-import {
-  ObjectStoreMessage,
-  useObjectStoreIntl
-} from "../../intl/objectstore-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 interface AgentFormProps {
   agent?: Agent;
@@ -27,7 +24,7 @@ interface AgentFormProps {
 
 export function AgentEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
-  const { formatMessage } = useObjectStoreIntl();
+  const { formatMessage } = useDinaIntl();
 
   return (
     <div>
@@ -37,7 +34,7 @@ export function AgentEditPage({ router }: WithRouterProps) {
         {id ? (
           <div>
             <h1>
-              <ObjectStoreMessage id="editAgentTitle" />
+              <DinaMessage id="editAgentTitle" />
             </h1>
             <Query<Agent> query={{ path: `agent-api/agent/${id}` }}>
               {({ loading, response }) => (
@@ -53,7 +50,7 @@ export function AgentEditPage({ router }: WithRouterProps) {
         ) : (
           <div>
             <h1>
-              <ObjectStoreMessage id="addAgentTitle" />
+              <DinaMessage id="addAgentTitle" />
             </h1>
             <AgentForm router={router} />
           </div>

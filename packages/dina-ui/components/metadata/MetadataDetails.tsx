@@ -2,13 +2,10 @@ import { useCollapser } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { get, toPairs } from "lodash";
 import Link from "next/link";
-import { ComponentType, ReactNode } from "react";
+import { ReactNode } from "react";
 import ReactTable from "react-table";
 import titleCase from "title-case";
-import {
-  ObjectStoreMessage,
-  useObjectStoreIntl
-} from "../../intl/objectstore-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { ManagedAttributeValue, Metadata } from "../../types/objectstore-api";
 
 export interface MetadataDetailsProps {
@@ -20,7 +17,7 @@ export interface MetadataDetailsProps {
  * Tha ManagedAttributeMap must b included with the passed Metadata.
  */
 export function MetadataDetails({ metadata }: MetadataDetailsProps) {
-  const { formatMessage } = useObjectStoreIntl();
+  const { formatMessage } = useDinaIntl();
 
   const managedAttributeValues = metadata.managedAttributeMap
     ? toPairs(metadata.managedAttributeMap.values).map(ma => ma[1])
@@ -37,7 +34,9 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
           {
             name: "acDerivedFrom",
             value: metadata.acDerivedFrom ? (
-              <Link href={`/object/view?id=${metadata.acDerivedFrom.id}`}>
+              <Link
+                href={`/object-store/object/view?id=${metadata.acDerivedFrom.id}`}
+              >
                 <a>{metadata.acDerivedFrom.originalFilename}</a>
               </Link>
             ) : null
@@ -95,7 +94,7 @@ function MetadataAttributeGroup({
   fields,
   title
 }: MetadataAttributeGroupProps) {
-  const { formatMessage, messages } = useObjectStoreIntl();
+  const { formatMessage, messages } = useDinaIntl();
 
   const { Collapser, collapsed } = useCollapser(`metadata-details-${title}`);
 
@@ -125,14 +124,14 @@ function MetadataAttributeGroup({
 
                 return <strong>{value}</strong>;
               },
-              Header: <ObjectStoreMessage id="attributeLabel" />,
+              Header: <DinaMessage id="attributeLabel" />,
               accessor: "name"
             },
             {
               // The cell can render either JSX or a primitive (string/number etc.).
               Cell: ({ original: { value } }) =>
                 value?.props ? <>{value}</> : String(value ?? ""),
-              Header: <ObjectStoreMessage id="managedAttributeValueLabel" />,
+              Header: <DinaMessage id="managedAttributeValueLabel" />,
               accessor: "value"
             }
           ]}
@@ -160,7 +159,7 @@ function MetadataManagedAttributes({
     <div className="form-group">
       <h4>
         <Collapser />
-        <ObjectStoreMessage id="metadataManagedAttributesLabel" />
+        <DinaMessage id="metadataManagedAttributesLabel" />
       </h4>
       {!collapsed && (
         <ReactTable
@@ -168,11 +167,11 @@ function MetadataManagedAttributes({
           columns={[
             {
               Cell: ({ original: { name } }) => <strong>{name}</strong>,
-              Header: <ObjectStoreMessage id="attributeLabel" />,
+              Header: <DinaMessage id="attributeLabel" />,
               accessor: "name"
             },
             {
-              Header: <ObjectStoreMessage id="managedAttributeValueLabel" />,
+              Header: <DinaMessage id="managedAttributeValueLabel" />,
               accessor: "value"
             }
           ]}
@@ -193,7 +192,7 @@ function MetadataTags({ tags }: MetadataTagsProps) {
   return (
     <div className="form-group">
       <h4>
-        <ObjectStoreMessage id="metadataTagsLabel" />
+        <DinaMessage id="metadataTagsLabel" />
       </h4>
       <div className="metadata-tags">
         {tags?.length

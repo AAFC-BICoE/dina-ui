@@ -1,7 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { Head, Nav } from "../components";
-import { ObjectStoreMessage } from "../intl/objectstore-intl";
+import { DinaMessage } from "../intl/dina-ui-intl";
 
 const Home: React.FunctionComponent = () => (
   <div>
@@ -9,42 +9,47 @@ const Home: React.FunctionComponent = () => (
     <Nav />
 
     <div className="container">
-      <h1>
-        <ObjectStoreMessage id="appTitle" />
-      </h1>
+      <h2>
+        <DinaMessage id="objectStoreTitle" />
+      </h2>
       <ul>
         <li>
-          <Link href="/upload">
+          <Link href="/object-store/upload">
             <a>
-              <ObjectStoreMessage id="uploadPageTitle" />
+              <DinaMessage id="uploadPageTitle" />
             </a>
           </Link>
         </li>
         <li>
-          <Link href="/object/list">
+          <Link href="/object-store/object/list">
             <a>
-              <ObjectStoreMessage id="objectListTitle" />
+              <DinaMessage id="objectListTitle" />
             </a>
           </Link>
         </li>
         <li>
-          <Link href="/managedAttributesView/listView">
+          <Link href="/object-store/managedAttributesView/listView">
             <a>
-              <ObjectStoreMessage id="managedAttributeListTitle" />
+              <DinaMessage id="managedAttributeListTitle" />
             </a>
           </Link>
         </li>
         <li>
-          <Link href="/object-subtype/list">
+          <Link href="/object-store/object-subtype/list">
             <a>
-              <ObjectStoreMessage id="objectSubtypeListTitle" />
+              <DinaMessage id="objectSubtypeListTitle" />
             </a>
           </Link>
         </li>
+      </ul>
+      <h2>
+        <DinaMessage id="agentsSectionTitle" />
+      </h2>
+      <ul>
         <li>
           <Link href="/agent/list">
             <a>
-              <ObjectStoreMessage id="agentListTitle" />
+              <DinaMessage id="agentListTitle" />
             </a>
           </Link>
         </li>

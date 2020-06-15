@@ -32,6 +32,8 @@ describe("MetadataPreview component", () => {
         .find(".metadata-edit-link")
         .find(Link)
         .prop("href")
-    ).toEqual("/metadata/edit?ids=232eda40-dc97-4255-91c4-f30485e2c707");
+    ).toEqual(
+      "/object-store/metadata/edit?ids=232eda40-dc97-4255-91c4-f30485e2c707"
+    );
   });
 });

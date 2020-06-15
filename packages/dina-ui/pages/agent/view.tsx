@@ -12,14 +12,11 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Agent } from "types/objectstore-api/resources/Agent";
 import { Head, Nav } from "../../components";
-import {
-  ObjectStoreMessage,
-  useObjectStoreIntl
-} from "../../intl/objectstore-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export function AgentDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
-  const { formatMessage } = useObjectStoreIntl();
+  const { formatMessage } = useDinaIntl();
 
   return (
     <div>
@@ -42,7 +39,7 @@ export function AgentDetailsPage({ router }: WithRouterProps) {
           return (
             <div className="container-fluid">
               <h1>
-                <ObjectStoreMessage id="agentViewTitle" />
+                <DinaMessage id="agentViewTitle" />
               </h1>
               <LoadingSpinner loading={loading} />
               {agent && (

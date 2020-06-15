@@ -3,14 +3,15 @@ import { COMMON_UI_MESSAGES_ENGLISH } from "common-ui";
 /**
  * English Object Store messages. A message must be set here in English before other languages.
  */
-export const OBJECTSTORE_MESSAGES_ENGLISH = {
+export const DINAUI_MESSAGES_ENGLISH = {
   ...COMMON_UI_MESSAGES_ENGLISH,
   addAgentTitle: "Add Agent",
   addManagedAttributeButtonText: "Add New Managed Attribute",
   addObjectSubtypeTitle: "Add New Object Subtype",
   agentListTitle: "Agents",
   agentViewTitle: "View Agent",
-  appTitle: "Object Store",
+  agentsSectionTitle: "Agents",
+  appTitle: "DINA",
   attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
   closePreviewButtonText: "Close Preview",
@@ -68,6 +69,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   noFileToDisplay: "No file to display",
   objectListTitle: "Stored Objects",
   objectStoreDetailsTitle: "Object Store Details",
+  objectStoreTitle: "Object Store",
   objectSubtypeListTitle: "Object Subtypes",
   objectSubtypeTitle: "Object Subtype",
   thumbnailNotAvailableText: "No thumbnail available",

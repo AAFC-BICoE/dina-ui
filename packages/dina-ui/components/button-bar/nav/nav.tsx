@@ -1,7 +1,7 @@
 import { LanguageSelector, useAccount } from "common-ui";
 import Link from "next/link";
 import React from "react";
-import { ObjectStoreMessage } from "../../../intl/objectstore-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import "./nav.css";
 
 export function Nav() {
@@ -13,7 +13,7 @@ export function Nav() {
             className="navbar-brand"
             style={{ color: "#1465b7", fontWeight: "bold" }}
           >
-            <ObjectStoreMessage id="appTitle" />
+            <DinaMessage id="appTitle" />
           </a>
         </Link>
         <ul className="navbar-nav ml-auto">
@@ -39,10 +39,7 @@ function NavbarUserControl() {
         <>
           {username && (
             <span className="mr-2 my-auto">
-              <ObjectStoreMessage
-                id="loggedInAsUser"
-                values={{ name: username }}
-              />
+              <DinaMessage id="loggedInAsUser" values={{ name: username }} />
             </span>
           )}
           <button
@@ -50,7 +47,7 @@ function NavbarUserControl() {
             className="btn btn-dark logout-button"
             onClick={() => logout()}
           >
-            <ObjectStoreMessage id="logoutBtn" />
+            <DinaMessage id="logoutBtn" />
           </button>
         </>
       ) : null}

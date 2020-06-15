@@ -1,6 +1,6 @@
 import { LoadingSpinner, useQuery } from "common-ui";
 import Link from "next/link";
-import { ObjectStoreMessage } from "../../intl/objectstore-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Metadata } from "../../types/objectstore-api";
 import { FileView } from "../file-view/FileView";
 import { MetadataDetails } from "./MetadataDetails";
@@ -49,16 +49,16 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
   if (response) {
     const metadata = response.data;
 
-    const filePath = `/api/file/${metadata.bucket}/${metadata.fileIdentifier}`;
+    const filePath = `/api/objectstore-api/file/${metadata.bucket}/${metadata.fileIdentifier}`;
     const fileType = metadata.fileExtension.replace(/\./, "").toLowerCase();
 
     return (
       <div className="metadata-preview">
         <style>{METADATA_PREVIEW_STYLE}</style>
         <div className="metadata-edit-link">
-          <Link href={`/metadata/edit?ids=${metadataId}`}>
+          <Link href={`/object-store/metadata/edit?ids=${metadataId}`}>
             <a className="btn btn-primary">
-              <ObjectStoreMessage id="editButtonText" />
+              <DinaMessage id="editButtonText" />
             </a>
           </Link>
         </div>

@@ -2,7 +2,7 @@ import { FieldView } from "common-ui";
 import { Formik } from "formik";
 import { noop } from "lodash";
 import { Metadata } from "types/objectstore-api/resources/Metadata";
-import { ObjectStoreMessage } from "../intl/objectstore-intl";
+import { DinaMessage } from "../intl/dina-ui-intl";
 
 export function ViewMetadataFormPage(data) {
   return (
@@ -11,7 +11,7 @@ export function ViewMetadataFormPage(data) {
         <div className="row">
           <label className="col-md-3">
             <strong>
-              <ObjectStoreMessage id="metadataFilenameLabel" />
+              <DinaMessage id="metadataFilenameLabel" />
             </strong>
           </label>
           <div className="col">
@@ -25,7 +25,7 @@ export function ViewMetadataFormPage(data) {
         <div className="row">
           <label className="col-md-3">
             <strong>
-              <ObjectStoreMessage id="metadataObjectTypeLabel" />
+              <DinaMessage id="metadataObjectTypeLabel" />
             </strong>
           </label>
           <div className="col">
@@ -35,7 +35,7 @@ export function ViewMetadataFormPage(data) {
         <div className="row">
           <label className="col-md-3">
             <strong>
-              <ObjectStoreMessage id="metadataDcFormatLabel" />
+              <DinaMessage id="metadataDcFormatLabel" />
             </strong>
           </label>
           <div className="col">
@@ -45,7 +45,7 @@ export function ViewMetadataFormPage(data) {
         <div className="row">
           <label className="col-md-3">
             <strong>
-              <ObjectStoreMessage id="field_acMetadataCreator.displayName" />
+              <DinaMessage id="field_acMetadataCreator.displayName" />
             </strong>
           </label>
           <div className="col">
@@ -58,7 +58,7 @@ export function ViewMetadataFormPage(data) {
         </div>
         <div className="row">
           <label className="col-md-3">
-            <ObjectStoreMessage id="metadataFileIdentifierLabel" />
+            <DinaMessage id="metadataFileIdentifierLabel" />
           </label>
           <div className="col">
             <FieldView
@@ -70,7 +70,7 @@ export function ViewMetadataFormPage(data) {
         </div>
         <div className="row">
           <label className="col-md-3">
-            <ObjectStoreMessage id="metadataBucketNameLabel" />
+            <DinaMessage id="metadataBucketNameLabel" />
           </label>
           <div className="col">
             <FieldView className="col-md-9" name="bucket" hideLabel={true} />
@@ -79,7 +79,7 @@ export function ViewMetadataFormPage(data) {
         <div className="row">
           <label className="col-md-3">
             <strong>
-              <ObjectStoreMessage id="metadataFileExtensionLabel" />
+              <DinaMessage id="metadataFileExtensionLabel" />
             </strong>
           </label>
           <div className="col">
@@ -93,7 +93,7 @@ export function ViewMetadataFormPage(data) {
         <div className="row">
           <label className="col-md-3">
             <strong>
-              <ObjectStoreMessage id="metadataHashFunctionLabel" />
+              <DinaMessage id="metadataHashFunctionLabel" />
             </strong>
           </label>
           <div className="col">
@@ -107,7 +107,7 @@ export function ViewMetadataFormPage(data) {
         <div className="row">
           <label className="col-md-3">
             <strong>
-              <ObjectStoreMessage id="metadataHashValueLabel" />
+              <DinaMessage id="metadataHashValueLabel" />
             </strong>
           </label>
           <div className="col">
@@ -121,7 +121,7 @@ export function ViewMetadataFormPage(data) {
         <div className="row">
           <label className="col-md-3">
             <strong>
-              <ObjectStoreMessage id="metadataFirstDigitalVersionCreatedDateLabel" />
+              <DinaMessage id="metadataFirstDigitalVersionCreatedDateLabel" />
             </strong>
           </label>
           <div className="col">
@@ -135,7 +135,7 @@ export function ViewMetadataFormPage(data) {
         <div className="row">
           <label className="col-md-3">
             <strong>
-              <ObjectStoreMessage id="metadataLastMetadataModificationTimeLabel" />
+              <DinaMessage id="metadataLastMetadataModificationTimeLabel" />
             </strong>
           </label>
           <div className="col">

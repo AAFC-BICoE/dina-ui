@@ -15,17 +15,14 @@ import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
-import { Head, Nav } from "../../components";
-import {
-  ObjectStoreMessage,
-  useObjectStoreIntl
-} from "../../intl/objectstore-intl";
+import { Head, Nav } from "../../../components";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   Agent,
   ManagedAttribute,
   ManagedAttributeMap,
   Metadata
-} from "../../types/objectstore-api";
+} from "../../../types/objectstore-api";
 
 /** Editable row data */
 export interface BulkMetadataEditRow {
@@ -42,7 +39,7 @@ interface FormControls {
 export default function EditMetadatasPage() {
   const router = useRouter();
   const { bulkGet, save } = useContext(ApiClientContext);
-  const { formatMessage } = useObjectStoreIntl();
+  const { formatMessage } = useDinaIntl();
   const resourceSelectCell = useResourceSelectCells();
   const [
     initialEditableManagedAttributes,
@@ -244,7 +241,7 @@ export default function EditMetadatasPage() {
       apiBaseUrl: "/objectstore-api"
     });
 
-    await router.push("/object/list");
+    await router.push("/object-store/object/list");
   }
 
   return (
@@ -252,7 +249,7 @@ export default function EditMetadatasPage() {
       <Head title={formatMessage("metadataBulkEditTitle")} />
       <Nav />
       <h2>
-        <ObjectStoreMessage id="metadataBulkEditTitle" />
+        <DinaMessage id="metadataBulkEditTitle" />
       </h2>
       <div className="form-group">
         <Formik<FormControls>

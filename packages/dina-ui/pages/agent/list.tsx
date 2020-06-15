@@ -1,10 +1,7 @@
 import { ButtonBar, CreateButton, ListPageLayout } from "common-ui";
 import Link from "next/link";
 import { Head, Nav } from "../../components";
-import {
-  ObjectStoreMessage,
-  useObjectStoreIntl
-} from "../../intl/objectstore-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 const AGENT_FILTER_ATTRIBUTES = ["displayName", "email"];
 const AGENT_TABLE_COLUMNS = [
@@ -24,7 +21,7 @@ const AGENT_TABLE_COLUMNS = [
 ];
 
 export default function AgentListPage() {
-  const { formatMessage } = useObjectStoreIntl();
+  const { formatMessage } = useDinaIntl();
 
   return (
     <div>
@@ -35,7 +32,7 @@ export default function AgentListPage() {
       </ButtonBar>
       <div className="container-fluid">
         <h1>
-          <ObjectStoreMessage id="agentListTitle" />
+          <DinaMessage id="agentListTitle" />
         </h1>
         <ListPageLayout
           filterAttributes={AGENT_FILTER_ATTRIBUTES}

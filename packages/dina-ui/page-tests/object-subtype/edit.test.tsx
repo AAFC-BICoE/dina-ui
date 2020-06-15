@@ -1,5 +1,5 @@
 import { OperationsResponse } from "common-ui";
-import { ObjectSubtypeEditPage } from "../../pages/object-subtype/edit";
+import { ObjectSubtypeEditPage } from "../../pages/object-store/object-subtype/edit";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { ObjectSubtype } from "../../types/objectstore-api/resources/ObjectSubtype";
 
@@ -85,7 +85,7 @@ describe("Object subtype edit page", () => {
     );
 
     // The user should be redirected to the new object subtype's details page.
-    expect(mockPush).lastCalledWith("/object-subtype/list");
+    expect(mockPush).lastCalledWith("/object-store/object-subtype/list");
   });
 
   it("Provides a form to edit a object subtype.", async done => {
@@ -151,7 +151,7 @@ describe("Object subtype edit page", () => {
       );
 
       // The user should be redirected to object subtype's list page.
-      expect(mockPush).lastCalledWith("/object-subtype/list");
+      expect(mockPush).lastCalledWith("/object-store/object-subtype/list");
       done();
     });
   });

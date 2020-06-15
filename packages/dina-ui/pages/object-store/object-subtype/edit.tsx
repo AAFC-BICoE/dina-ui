@@ -16,11 +16,8 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ObjectSubtype } from "types/objectstore-api/resources/ObjectSubtype";
-import { Head, Nav } from "../../components";
-import {
-  ObjectStoreMessage,
-  useObjectStoreIntl
-} from "../../intl/objectstore-intl";
+import { Head, Nav } from "../../../components";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 interface ObjectSubtypeFormProps {
   objectSubtype?: ObjectSubtype;
@@ -29,7 +26,7 @@ interface ObjectSubtypeFormProps {
 
 export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
-  const { formatMessage } = useObjectStoreIntl();
+  const { formatMessage } = useDinaIntl();
 
   return (
     <div>
@@ -39,7 +36,7 @@ export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
         {id ? (
           <div>
             <h1>
-              <ObjectStoreMessage id="editObjectSubtypeTitle" />
+              <DinaMessage id="editObjectSubtypeTitle" />
             </h1>
             <Query<ObjectSubtype>
               query={{ path: `objectstore-api/object-subtype/${id}` }}
@@ -60,7 +57,7 @@ export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
         ) : (
           <div>
             <h1>
-              <ObjectStoreMessage id="addObjectSubtypeTitle" />
+              <DinaMessage id="addObjectSubtypeTitle" />
             </h1>
             <ObjectSubtypeForm router={router} />
           </div>
@@ -86,7 +83,7 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
       { apiBaseUrl: "/objectstore-api" }
     );
 
-    await router.push(`/object-subtype/list`);
+    await router.push(`/object-store/object-subtype/list`);
   });
 
   return (
@@ -98,12 +95,12 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
           <DeleteButton
             id={id as string}
             options={{ apiBaseUrl: "/objectstore-api" }}
-            postDeleteRedirect="/object-subtype/list"
+            postDeleteRedirect="/object-store/object-subtype/list"
             type="object-subtype"
           />
           <CancelButton
             entityId={id as string}
-            entityLink="object-subtype"
+            entityLink="/object-store/object-subtype"
             byPassView={true}
           />
         </ButtonBar>

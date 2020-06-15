@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { FileView } from "../../../components/file-view/FileView";
-import MetadataViewPage from "../../../pages/object/view";
+import MetadataViewPage from "../../../pages/object-store/object/view";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Metadata } from "../../../types/objectstore-api";
 
@@ -64,7 +64,7 @@ describe("Single Stored Object details page", () => {
         .find("img")
         .prop("src")
     ).toEqual(
-      "/api/file/testbucket/cf99c285-0353-4fed-a15d-ac963e0514f3.thumbnail?access_token=test-token"
+      "/api/objectstore-api/file/testbucket/cf99c285-0353-4fed-a15d-ac963e0514f3.thumbnail?access_token=test-token"
     );
   });
 });

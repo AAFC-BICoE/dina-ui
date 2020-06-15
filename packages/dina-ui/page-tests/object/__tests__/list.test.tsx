@@ -6,7 +6,7 @@ import { StoredObjectGallery } from "../../../components";
 import MetadataListPage, {
   BulkDeleteButton,
   MetadataListFormValues
-} from "../../../pages/object/list";
+} from "../../../pages/object-store/object/list";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Metadata } from "../../../types/objectstore-api";
 

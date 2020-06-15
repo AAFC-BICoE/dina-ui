@@ -8,7 +8,7 @@ import {
 } from "common-ui";
 import { mount } from "enzyme";
 import { merge, noop } from "lodash";
-import { ObjectStoreIntlProvider } from "../intl/objectstore-intl";
+import { DinaIntlProvider } from "../intl/dina-ui-intl";
 
 interface MockAppContextProviderProps {
   apiContext?: Partial<ApiClientContextI>;
@@ -32,11 +32,11 @@ export function MockAppContextProvider({
       <AuthenticatedApiClientProvider
         apiContext={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContext)}
       >
-        <ObjectStoreIntlProvider>
+        <DinaIntlProvider>
           <ModalProvider appElement={document.querySelector("body")}>
             {children}
           </ModalProvider>
-        </ObjectStoreIntlProvider>
+        </DinaIntlProvider>
       </AuthenticatedApiClientProvider>
     </AccountProvider>
   );

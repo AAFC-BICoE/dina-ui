@@ -7,11 +7,11 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Head, Nav } from "../../components";
-import { FileView } from "../../components/file-view/FileView";
-import { MetadataDetails } from "../../components/metadata/MetadataDetails";
-import { ObjectStoreMessage } from "../../intl/objectstore-intl";
-import { Metadata } from "../../types/objectstore-api";
+import { Head, Nav } from "../../../components";
+import { FileView } from "../../../components/file-view/FileView";
+import { MetadataDetails } from "../../../components/metadata/MetadataDetails";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { Metadata } from "../../../types/objectstore-api";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -60,7 +60,7 @@ export default function MetadataViewPage() {
         ? `${metadata.fileIdentifier}.thumbnail`
         : metadata.fileIdentifier;
 
-    const filePath = `/api/file/${metadata.bucket}/${fileId}`;
+    const filePath = `/api/objectstore-api/file/${metadata.bucket}/${fileId}`;
     const fileType = metadata.fileExtension.replace(/\./, "").toLowerCase();
 
     return (
@@ -68,17 +68,18 @@ export default function MetadataViewPage() {
         <Head title={metadata.originalFilename} />
         <Nav />
         <ButtonBar>
-          <Link href={`/metadata/edit?ids=${id}`}>
+          <Link href={`/object-store/metadata/edit?ids=${id}`}>
             <a className="btn btn-primary">
-              <ObjectStoreMessage id="editButtonText" />
+              <DinaMessage id="editButtonText" />
             </a>
           </Link>
           <DeleteButton
             id={id}
-            postDeleteRedirect="/object/list"
+            options={{ apiBaseUrl: "/objectstore-api" }}
+            postDeleteRedirect="/object-store/object/list"
             type="metadata"
           />
-          <BackToListButton entityLink="object" />
+          <BackToListButton entityLink="/object-store/object" />
         </ButtonBar>
         <style>{OBJECT_DETAILS_PAGE_CSS}</style>
         <div className="container-fluid">
@@ -93,9 +94,9 @@ export default function MetadataViewPage() {
             <div className="col-md-8">
               <div className="container">
                 <div className="form-group">
-                  <Link href={`/metadata/edit?ids=${id}`}>
+                  <Link href={`/object-store/metadata/edit?ids=${id}`}>
                     <a className="btn btn-primary">
-                      <ObjectStoreMessage id="editButtonText" />
+                      <DinaMessage id="editButtonText" />
                     </a>
                   </Link>
                 </div>

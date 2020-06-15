@@ -1,10 +1,7 @@
 import { CheckBoxFieldProps, useQuery } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
-import {
-  ObjectStoreMessage,
-  useObjectStoreIntl
-} from "../../intl/objectstore-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Metadata } from "../../types/objectstore-api";
 import { FileView } from "../file-view/FileView";
 
@@ -78,7 +75,7 @@ function GalleryItem({
 }: GalleryItemProps) {
   const { id, originalFilename } = metadata;
 
-  const { formatMessage } = useObjectStoreIntl();
+  const { formatMessage } = useDinaIntl();
   const { response: thumbnailResponse } = useQuery<Metadata[]>({
     filter: {
       "acDerivedFrom.id": id
@@ -103,7 +100,7 @@ function GalleryItem({
           imgAlt={formatMessage("thumbnailNotAvailableText")}
         />
       )}
-      <Link href={`/object/view?id=${id}`}>
+      <Link href={`/object-store/object/view?id=${id}`}>
         <a
           style={{
             margin: "1rem auto 1rem auto",
@@ -124,7 +121,7 @@ function GalleryItem({
             onClick={() => onSelectPreviewMetadataId(id)}
             type="button"
           >
-            <ObjectStoreMessage id="viewPreviewButtonText" />
+            <DinaMessage id="viewPreviewButtonText" />
           </button>
         </div>
         <div className="col-3">

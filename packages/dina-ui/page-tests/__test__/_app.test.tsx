@@ -1,8 +1,5 @@
-import { ApiClientContext } from "common-ui";
-import { mount, shallow } from "enzyme";
-import Kitsu from "kitsu";
-import { FunctionComponent } from "react";
-import ObjectStoreUiApp from "../../pages/_app";
+import { shallow } from "enzyme";
+import DinaUiApp from "../../pages/_app";
 
 const mockPush = jest.fn();
 
@@ -11,7 +8,7 @@ const mockRouter = {
   push: mockPush
 };
 
-describe("ObjectStoreUI App", () => {
+describe("DinaUI App", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -22,7 +19,7 @@ describe("ObjectStoreUI App", () => {
     }
 
     shallow(
-      <ObjectStoreUiApp
+      <DinaUiApp
         router={mockRouter as any}
         pageProps={{ exampleProp: "exampleValue" }}
         Component={TestComponent}

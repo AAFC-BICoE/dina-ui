@@ -1,6 +1,6 @@
 import { QueryTable } from "common-ui";
 import { PersistedResource } from "kitsu";
-import ObjectSubtypeListPage from "../../pages/object-subtype/list";
+import ObjectSubtypeListPage from "../../pages/object-store/object-subtype/list";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { ObjectSubtype } from "../../types/objectstore-api/resources/ObjectSubtype";
 

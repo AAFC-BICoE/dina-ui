@@ -14,13 +14,10 @@ import { noop, toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Component, useContext, useMemo, useState } from "react";
-import { Head, Nav, StoredObjectGallery } from "../../components";
-import { MetadataPreview } from "../../components/metadata/MetadataPreview";
-import {
-  ObjectStoreMessage,
-  useObjectStoreIntl
-} from "../../intl/objectstore-intl";
-import { Metadata } from "../../types/objectstore-api";
+import { Head, Nav, StoredObjectGallery } from "../../../components";
+import { MetadataPreview } from "../../../components/metadata/MetadataPreview";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { Metadata } from "../../../types/objectstore-api";
 
 type MetadataListLayoutType = "TABLE" | "GALLERY";
 
@@ -35,7 +32,7 @@ export interface MetadataListFormValues {
 }
 
 export default function MetadataListPage() {
-  const { formatMessage } = useObjectStoreIntl();
+  const { formatMessage } = useDinaIntl();
 
   const {
     CheckBoxField,
@@ -87,7 +84,7 @@ export default function MetadataListPage() {
           onClick={() => setPreviewMetadataId(original.id)}
           type="button"
         >
-          <ObjectStoreMessage id="viewPreviewButtonText" />
+          <DinaMessage id="viewPreviewButtonText" />
         </button>
       ),
       Header: "",
@@ -116,7 +113,7 @@ export default function MetadataListPage() {
         <div className="list-inline">
           <div className="list-inline-item">
             <h1>
-              <ObjectStoreMessage id="objectListTitle" />
+              <DinaMessage id="objectListTitle" />
             </h1>
           </div>
           <div className="list-inline-item">
@@ -126,9 +123,9 @@ export default function MetadataListPage() {
             />
           </div>
           <div className="list-inline-item float-right">
-            <Link href="/upload">
+            <Link href="/object-store/upload">
               <a>
-                <ObjectStoreMessage id="uploadPageTitle" />
+                <DinaMessage id="uploadPageTitle" />
               </a>
             </Link>
           </div>
@@ -198,9 +195,11 @@ export default function MetadataListPage() {
               {previewMetadataId && (
                 <>
                   <div style={{ height: "2.5rem" }}>
-                    <Link href={`/object/view?id=${previewMetadataId}`}>
+                    <Link
+                      href={`/object-store/object/view?id=${previewMetadataId}`}
+                    >
                       <a>
-                        <ObjectStoreMessage id="metadataDetailsPageLink" />
+                        <DinaMessage id="metadataDetailsPageLink" />
                       </a>
                     </Link>
                     <button
@@ -208,7 +207,7 @@ export default function MetadataListPage() {
                       type="button"
                       onClick={() => setPreviewMetadataId(null)}
                     >
-                      <ObjectStoreMessage id="closePreviewButtonText" />
+                      <DinaMessage id="closePreviewButtonText" />
                     </button>
                   </div>
                   <MetadataPreview metadataId={previewMetadataId} />
@@ -262,7 +261,7 @@ function MetadataListWrapper({ children }) {
                 });
               }}
             >
-              <ObjectStoreMessage id="editSelectedButtonText" />
+              <DinaMessage id="editSelectedButtonText" />
             </FormikButton>
           </div>
         </div>
@@ -276,11 +275,11 @@ function ListLayoutSelector({ value = "TABLE", onChange }) {
   const items = [
     {
       layoutType: "TABLE",
-      message: <ObjectStoreMessage id="metadataListTableLayout" />
+      message: <DinaMessage id="metadataListTableLayout" />
     },
     {
       layoutType: "GALLERY",
-      message: <ObjectStoreMessage id="metadataListGalleryLayout" />
+      message: <DinaMessage id="metadataListGalleryLayout" />
     }
   ];
 
@@ -320,7 +319,7 @@ export function BulkDeleteButton() {
           <AreYouSureModal
             actionMessage={
               <span>
-                <ObjectStoreMessage id="deleteSelectedButtonText" /> (
+                <DinaMessage id="deleteSelectedButtonText" /> (
                 {metadataIds.length})
               </span>
             }
@@ -342,7 +341,7 @@ export function BulkDeleteButton() {
         );
       }}
     >
-      <ObjectStoreMessage id="deleteSelectedButtonText" />
+      <DinaMessage id="deleteSelectedButtonText" />
     </FormikButton>
   );
 }

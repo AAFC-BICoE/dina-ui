@@ -1,13 +1,13 @@
 import { ColumnDefinition, ListPageLayout } from "common-ui";
 import Link from "next/link";
-import { Head, Nav } from "../../components";
-import { ObjectStoreMessage } from "../../intl/objectstore-intl";
-import { ManagedAttribute } from "../../types/objectstore-api/resources/ManagedAttribute";
+import { Head, Nav } from "../../../components";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { ManagedAttribute } from "../../../types/objectstore-api/resources/ManagedAttribute";
 
 const ATTRIBUTES_LIST_COLUMNS: Array<ColumnDefinition<ManagedAttribute>> = [
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/managedAttributesView/detailsView?id=${id}`}>
+      <Link href={`/object-store/managedAttributesView/detailsView?id=${id}`}>
         <a>{name}</a>
       </Link>
     ),
@@ -32,11 +32,11 @@ export default function ManagedAttributesListPage() {
       <Nav />
       <div className="container-fluid">
         <h1>
-          <ObjectStoreMessage id="managedAttributeListTitle" />
+          <DinaMessage id="managedAttributeListTitle" />
         </h1>
-        <Link href="/managedAttributesView/detailsView">
+        <Link href="/object-store/managedAttributesView/detailsView">
           <a className="btn btn-primary">
-            <ObjectStoreMessage id="addManagedAttributeButtonText" />
+            <DinaMessage id="addManagedAttributeButtonText" />
           </a>
         </Link>
         <ListPageLayout

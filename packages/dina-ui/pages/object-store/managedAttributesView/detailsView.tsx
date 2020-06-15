@@ -1,6 +1,5 @@
 import {
   ApiClientContext,
-  AreYouSureModal,
   DeleteButton,
   ErrorViewer,
   FieldWrapper,
@@ -9,18 +8,16 @@ import {
   Query,
   SelectField,
   SubmitButton,
-  TextField,
-  useModal
+  TextField
 } from "common-ui";
 import { Field, FieldProps, Form, Formik, FormikActions } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { NextRouter, withRouter } from "next/router";
 import { useContext, useState } from "react";
-import { isNullOrUndefined } from "util";
-import { Head, Nav } from "../../components";
-import { ObjectStoreMessage } from "../../intl/objectstore-intl";
-import { ManagedAttribute } from "../../types/objectstore-api/resources/ManagedAttribute";
+import { Head, Nav } from "../../../components";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { ManagedAttribute } from "../../../types/objectstore-api/resources/ManagedAttribute";
 
 interface AcceptedValueProps extends LabelWrapperParams {
   initialValues?: string[];
@@ -53,7 +50,7 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
         {id ? (
           <div>
             <h1>
-              <ObjectStoreMessage id="managedAttributeEditTitle" />
+              <DinaMessage id="managedAttributeEditTitle" />
             </h1>
             <Query<ManagedAttribute>
               query={{
@@ -76,7 +73,7 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
         ) : (
           <div>
             <h1>
-              <ObjectStoreMessage id="addManagedAttributeButtonText" />
+              <DinaMessage id="addManagedAttributeButtonText" />
             </h1>
             <br />
             <ManagedAttributeForm router={router} />
@@ -120,7 +117,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
         ],
         { apiBaseUrl: "/objectstore-api" }
       );
-      router.push(`/managedAttributesView/listView`);
+      router.push(`/object-store/managedAttributesView/listView`);
       setSubmitting(false);
     } catch (error) {
       setStatus(error.message);
@@ -136,23 +133,23 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
         <DeleteButton
           id={profile?.id}
           options={{ apiBaseUrl: "/objectstore-api" }}
-          postDeleteRedirect="/managedAttributesView/listView"
+          postDeleteRedirect="/object-store/managedAttributesView/listView"
           type="managed-attribute"
         />
-        <Link href="/managedAttributesView/listView">
+        <Link href="/object-store/managedAttributesView/listView">
           <a className="btn btn-primary">
-            <ObjectStoreMessage id="cancelButtonText" />
+            <DinaMessage id="cancelButtonText" />
           </a>
         </Link>
         <div style={{ width: "300px" }}>
           <h4>
-            <ObjectStoreMessage id="field_managedAttributeName" />
+            <DinaMessage id="field_managedAttributeName" />
           </h4>
           <TextField name="name" hideLabel={true} />
         </div>
         <div style={{ width: "300px" }}>
           <h4>
-            <ObjectStoreMessage id="field_managedAttributeType" />
+            <DinaMessage id="field_managedAttributeType" />
           </h4>
           <SelectField
             name="managedAttributeType"
@@ -164,7 +161,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
         {type === "STRING" && (
           <div>
             <h4>
-              <ObjectStoreMessage id="field_managedAttributeAcceptedValue" />
+              <DinaMessage id="field_managedAttributeAcceptedValue" />
             </h4>
             <AcceptedValueBuilder
               name="acceptedValues"

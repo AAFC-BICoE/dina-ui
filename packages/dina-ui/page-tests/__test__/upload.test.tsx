@@ -1,5 +1,7 @@
 import { cleanup, fireEvent, render } from "@testing-library/react";
-import UploadPage, { fileUploadErrorHandler } from "../../pages/upload";
+import UploadPage, {
+  fileUploadErrorHandler
+} from "../../pages/object-store/upload";
 import { MockAppContextProvider } from "../../test-util/mock-app-context";
 
 const mockPush = jest.fn();
@@ -136,7 +138,7 @@ describe("Upload page", () => {
 
     // You should get redirected to the bulk edit page with the new metadata IDs.
     expect(mockPush).lastCalledWith({
-      pathname: "/metadata/edit",
+      pathname: "/object-store/metadata/edit",
       query: {
         ids: [
           "11111111-1111-1111-1111-111111111111",

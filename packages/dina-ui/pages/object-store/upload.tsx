@@ -10,11 +10,8 @@ import { useRouter } from "next/router";
 import { useContext, useMemo } from "react";
 import { useDropzone } from "react-dropzone";
 import { Metadata } from "types/objectstore-api/resources/Metadata";
-import { Head, Nav } from "../components";
-import {
-  ObjectStoreMessage,
-  useObjectStoreIntl
-} from "../intl/objectstore-intl";
+import { Head, Nav } from "../../components";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface FileUploadResponse {
   fileIdentifier: string;
@@ -61,7 +58,7 @@ const BUCKET_NAME = "mybucket";
 
 export default function UploadPage() {
   const router = useRouter();
-  const { formatMessage } = useObjectStoreIntl();
+  const { formatMessage } = useDinaIntl();
   const { apiClient, save } = useContext(ApiClientContext);
 
   const {
@@ -120,7 +117,7 @@ export default function UploadPage() {
     const ids = saveResults.map(res => res.id).join(",");
 
     await router.push({
-      pathname: "/metadata/edit",
+      pathname: "/object-store/metadata/edit",
       query: { ids }
     });
   }
@@ -140,7 +137,7 @@ export default function UploadPage() {
             <input {...getInputProps()} />
             <div style={{ margin: "auto" }}>
               <div>
-                <ObjectStoreMessage id="uploadFormInstructions" />
+                <DinaMessage id="uploadFormInstructions" />
               </div>
             </div>
           </div>
@@ -156,7 +153,7 @@ export default function UploadPage() {
               <Form>
                 <ErrorViewer />
                 <SubmitButton>
-                  <ObjectStoreMessage id="uploadButtonText" />
+                  <DinaMessage id="uploadButtonText" />
                 </SubmitButton>
               </Form>
             </Formik>

@@ -3,7 +3,7 @@ import Select from "react-select/base";
 import EditMetadatasPage, {
   BulkMetadataEditRow,
   managedAttributeColumns
-} from "../../../pages/metadata/edit";
+} from "../../../pages/object-store/metadata/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import {
   Agent,

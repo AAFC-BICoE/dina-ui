@@ -11,7 +11,7 @@ import React from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-table/react-table.css";
 import "react-tabs/style/react-tabs.css";
-import { ObjectStoreIntlProvider } from "../intl/objectstore-intl";
+import { DinaIntlProvider } from "../intl/dina-ui-intl";
 
 /** Get Random UUID */
 function uuidv4(): string {
@@ -28,7 +28,7 @@ function uuidv4(): string {
  *
  * See: https://github.com/zeit/next.js/#custom-app
  */
-export default class ObjectStoreUiApp extends App {
+export default class DinaUiApp extends App {
   private contextValue = createContextValue({
     baseURL: "/api",
     getTempIdGenerator: () => uuidv4
@@ -44,11 +44,11 @@ export default class ObjectStoreUiApp extends App {
     return (
       <KeycloakAccountProvider>
         <AuthenticatedApiClientProvider apiContext={this.contextValue}>
-          <ObjectStoreIntlProvider>
+          <DinaIntlProvider>
             <ModalProvider appElement={appElement}>
               <Component {...pageProps} />
             </ModalProvider>
-          </ObjectStoreIntlProvider>
+          </DinaIntlProvider>
         </AuthenticatedApiClientProvider>
       </KeycloakAccountProvider>
     );
