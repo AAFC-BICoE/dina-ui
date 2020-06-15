@@ -1,7 +1,7 @@
 import { OperationsResponse } from "common-ui";
-import { ObjectSubtype } from "../../../objectstore-ui/types/objectstore-api/resources/ObjectSubtype";
 import { ObjectSubtypeEditPage } from "../../pages/object-subtype/edit";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { ObjectSubtype } from "../../types/objectstore-api/resources/ObjectSubtype";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);

@@ -4,16 +4,16 @@ FROM node:12.16.3 as builder
 WORKDIR /dina-ui
 COPY ./package.json ./
 COPY ./packages/common-ui/package.json ./packages/common-ui/package.json
-COPY ./packages/objectstore-ui/package.json ./packages/objectstore-ui/package.json
+COPY ./packages/dina-ui/package.json ./packages/dina-ui/package.json
 COPY ./packages/seqdb-ui/package.json ./packages/seqdb-ui/package.json
 COPY ./yarn.lock ./
 RUN yarn
 COPY ./ ./
 
-# objectstore-ui step:
-RUN yarn --cwd=/dina-ui/packages/objectstore-ui build
+# dina-ui step:
+RUN yarn --cwd=/dina-ui/packages/dina-ui build
 
 FROM caddy/caddy:2.0.0-rc.3
-COPY --from=builder /dina-ui/packages/objectstore-ui/prod.Caddyfile /etc/caddy/Caddyfile
-COPY --from=builder /dina-ui/packages/objectstore-ui/out /www/html
+COPY --from=builder /dina-ui/packages/dina-ui/prod.Caddyfile /etc/caddy/Caddyfile
+COPY --from=builder /dina-ui/packages/dina-ui/out /www/html
 EXPOSE 80
