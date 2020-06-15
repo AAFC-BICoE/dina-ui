@@ -80,7 +80,7 @@ services:
   agent-api:
     image: agent-api:tag
     environment:
-      spring.datasource.url: jdbc:postgresql://database/objectstore?currentSchema=object_store
+      spring.datasource.url: jdbc:postgresql://database/objectstore?currentSchema=agent
       spring.datasource.username: postgres
       spring.datasource.password: p
       spring.datasource.continue-on-error: "true"
