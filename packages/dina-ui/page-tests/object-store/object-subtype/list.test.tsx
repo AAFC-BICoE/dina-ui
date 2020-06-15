@@ -1,8 +1,8 @@
 import { QueryTable } from "common-ui";
 import { PersistedResource } from "kitsu";
-import ObjectSubtypeListPage from "../../pages/object-store/object-subtype/list";
-import { mountWithAppContext } from "../../test-util/mock-app-context";
-import { ObjectSubtype } from "../../types/objectstore-api/resources/ObjectSubtype";
+import ObjectSubtypeListPage from "../../../pages/object-store/object-subtype/list";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 
 const TEST_OBJECTSUBTYPES: Array<PersistedResource<ObjectSubtype>> = [
   {

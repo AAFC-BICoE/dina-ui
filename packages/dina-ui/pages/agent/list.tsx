@@ -28,7 +28,7 @@ export default function AgentListPage() {
       <Head title={formatMessage("agentListTitle")} />
       <Nav />
       <ButtonBar>
-        <CreateButton entityLink="agent" />
+        <CreateButton entityLink="/agent" />
       </ButtonBar>
       <div className="container-fluid">
         <h1>

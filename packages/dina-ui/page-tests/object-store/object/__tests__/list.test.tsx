@@ -2,13 +2,13 @@ import { AreYouSureModal, QueryTable } from "common-ui";
 import { Formik } from "formik";
 import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
-import { StoredObjectGallery } from "../../../components";
+import { StoredObjectGallery } from "../../../../components";
 import MetadataListPage, {
   BulkDeleteButton,
   MetadataListFormValues
-} from "../../../pages/object-store/object/list";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { Metadata } from "../../../types/objectstore-api";
+} from "../../../../pages/object-store/object/list";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { Metadata } from "../../../../types/objectstore-api";
 
 const TEST_METADATAS: Array<PersistedResource<Metadata>> = [
   {

@@ -1,8 +1,8 @@
 import { PersistedResource } from "kitsu";
-import { FileView } from "../../../components/file-view/FileView";
-import MetadataViewPage from "../../../pages/object-store/object/view";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { Metadata } from "../../../types/objectstore-api";
+import { FileView } from "../../../../components/file-view/FileView";
+import MetadataViewPage from "../../../../pages/object-store/object/view";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { Metadata } from "../../../../types/objectstore-api";
 
 const TEST_METADATA: PersistedResource<Metadata> = {
   acTags: ["tag1", "tag2"],

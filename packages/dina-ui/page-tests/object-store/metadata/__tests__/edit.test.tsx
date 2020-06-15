@@ -3,13 +3,13 @@ import Select from "react-select/base";
 import EditMetadatasPage, {
   BulkMetadataEditRow,
   managedAttributeColumns
-} from "../../../pages/object-store/metadata/edit";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+} from "../../../../pages/object-store/metadata/edit";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   Agent,
   ManagedAttributeMap,
   Metadata
-} from "../../../types/objectstore-api";
+} from "../../../../types/objectstore-api";
 
 const TEST_METADATAS: Array<PersistedResource<Metadata>> = [
   {

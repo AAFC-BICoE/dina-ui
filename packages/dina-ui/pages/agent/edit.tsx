@@ -89,7 +89,7 @@ function AgentForm({ agent, router }: AgentFormProps) {
           <SubmitButton />
           <CancelButton
             entityId={id as string}
-            entityLink="agent"
+            entityLink="/agent"
             byPassView={true}
           />
         </ButtonBar>
