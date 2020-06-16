@@ -5,6 +5,7 @@ import { Styles } from "react-select/src/styles";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface SelectFieldProps extends LabelWrapperParams {
+  disabled?: boolean;
   onChange?: (value?: string) => void;
   options: any[];
   styles?: Partial<Styles>;
@@ -12,7 +13,13 @@ export interface SelectFieldProps extends LabelWrapperParams {
 
 /** Formik-connected select input. */
 export function SelectField(props: SelectFieldProps) {
-  const { onChange = noop, options, styles, ...labelWrapperProps } = props;
+  const {
+    disabled,
+    onChange = noop,
+    options,
+    styles,
+    ...labelWrapperProps
+  } = props;
   const { name } = labelWrapperProps;
 
   return (
@@ -30,6 +37,7 @@ export function SelectField(props: SelectFieldProps) {
         return (
           <FieldWrapper {...labelWrapperProps}>
             <Select
+              isDisabled={disabled}
               options={options}
               onChange={onChangeInternal}
               styles={styles}

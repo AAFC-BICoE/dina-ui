@@ -27,7 +27,7 @@ export function MockAppContextProvider({
 }: MockAppContextProviderProps) {
   return (
     <AccountProvider
-      value={merge({}, DEFAULT_MOCK_ACCOUNT_CONTEXT, accountContext)}
+      value={{ ...DEFAULT_MOCK_ACCOUNT_CONTEXT, ...accountContext }}
     >
       <AuthenticatedApiClientProvider
         apiContext={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContext)}
@@ -58,6 +58,7 @@ export function mountWithAppContext(
 
 const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = {
   authenticated: true,
+  groups: ["/aafc", "cnc"],
   initialized: true,
   login: noop,
   logout: noop,

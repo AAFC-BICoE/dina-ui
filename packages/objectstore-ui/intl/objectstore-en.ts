@@ -37,6 +37,7 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   field_originalFilename: "Original Filename",
   field_xmpMetadataDate: "Date Metadata Applied",
   field_xmpRightsWebStatement: "Reuse Rights Statement",
+  groupMustBeSelected: "Group must be selected",
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
   managedAttributeValueLabel: "Value",
@@ -75,5 +76,6 @@ export const OBJECTSTORE_MESSAGES_ENGLISH = {
   uploadFormInstructions:
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
   uploadPageTitle: "Upload Files",
+  userMustBelongToGroup: "User must belong to a Group",
   viewPreviewButtonText: "Preview"
 };
