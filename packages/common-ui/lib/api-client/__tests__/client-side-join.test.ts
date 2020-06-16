@@ -65,7 +65,7 @@ describe("ClientSideJoiner", () => {
         "agent/a08211f2-aee4-443f-a224-a7768cd9d588",
         "agent/6328f159-78d9-401e-8273-74e90ea58d81"
       ],
-      { apiBaseUrl: "/agent-api" }
+      { apiBaseUrl: "/agent-api", returnNullForMissingResource: true }
     );
 
     // The first 3 records are joined to Agents.
