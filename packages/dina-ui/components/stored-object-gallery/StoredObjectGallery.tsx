@@ -95,7 +95,7 @@ function GalleryItem({
     >
       {thumbnail && (
         <FileView
-          filePath={`/api/file/${thumbnail.bucket}/${thumbnail.fileIdentifier}.thumbnail`}
+          filePath={`/api/objectstore-api/file/${thumbnail.bucket}/${thumbnail.fileIdentifier}.thumbnail`}
           fileType="jpg"
           imgAlt={formatMessage("thumbnailNotAvailableText")}
         />

@@ -3,7 +3,9 @@ import {
   ErrorViewer,
   safeSubmit,
   SaveArgs,
-  SubmitButton
+  SelectField,
+  SubmitButton,
+  useAccount
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
@@ -54,12 +56,11 @@ const rejectStyle = {
   borderColor: "#ff1744"
 };
 
-const BUCKET_NAME = "mybucket";
-
 export default function UploadPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
   const { apiClient, save } = useContext(ApiClientContext);
+  const { groups, initialized: accountInitialized } = useAccount();
 
   const {
     getRootProps,
@@ -82,9 +83,13 @@ export default function UploadPage() {
     [isDragActive, isDragReject]
   );
 
-  async function onSubmit() {
+  async function onSubmit({ group }) {
     // Upload each file in a separate request, then create the metadatas in a transaction.
     // TODO: Do all of this in a single transaction.
+
+    if (!group) {
+      throw new Error(formatMessage("groupMustBeSelected"));
+    }
 
     const uploadResponses: FileUploadResponse[] = [];
     for (const file of acceptedFiles) {
@@ -94,7 +99,7 @@ export default function UploadPage() {
 
       // Upload the file:
       const response = await apiClient.axios.post(
-        `/objectstore-api/file/${BUCKET_NAME}`,
+        `/objectstore-api/file/${group}`,
         formData,
         { transformResponse: fileUploadErrorHandler }
       );
@@ -103,7 +108,7 @@ export default function UploadPage() {
 
     const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(res => ({
       resource: {
-        bucket: BUCKET_NAME,
+        bucket: group,
         fileIdentifier: res.fileIdentifier,
         type: "metadata"
       } as Metadata,
@@ -122,43 +127,72 @@ export default function UploadPage() {
     });
   }
 
+  const groupSelectOptions = (groups ?? []).map(group => {
+    // Remove keycloak's prefixed slash from the start of the group name:
+    const unprefixedGroup = group.replace(/\/(.*)/, "$1");
+    return {
+      label: unprefixedGroup,
+      value: unprefixedGroup
+    };
+  });
+
   return (
     <div>
       <Head title={formatMessage("uploadPageTitle")} />
       <Nav />
       <div className="container">
-        {/* TODO: Remove this after the demo */}
-        <div className="alert alert-warning">
-          For testing purpose only. Only unclassified data should be uploaded.
-          Any uploaded data can be deleted at any given moment.
-        </div>
-        <div id="dndRoot" style={{ cursor: "pointer" }}>
-          <div {...getRootProps({ style })} className="root">
-            <input {...getInputProps()} />
-            <div style={{ margin: "auto" }}>
-              <div>
-                <DinaMessage id="uploadFormInstructions" />
-              </div>
-            </div>
+        {!accountInitialized || !groups?.length ? (
+          <div className="alert alert-warning no-group-alert">
+            <DinaMessage id="userMustBelongToGroup" />
           </div>
-          <ul className="list-group">
-            {acceptedFiles.map(file => (
-              <li className="list-group-item" key={file.name}>
-                {file.name} - {file.size} bytes
-              </li>
-            ))}
-          </ul>
-          {acceptedFiles.length ? (
-            <Formik initialValues={{}} onSubmit={safeSubmit(onSubmit)}>
+        ) : (
+          <div>
+            <div className="alert alert-warning">
+              For testing purpose only. Only unclassified data should be
+              uploaded. Any uploaded data can be deleted at any given moment.
+            </div>
+            <Formik
+              initialValues={{ group: groupSelectOptions[0].value }}
+              onSubmit={safeSubmit(onSubmit)}
+            >
               <Form>
-                <ErrorViewer />
-                <SubmitButton>
-                  <DinaMessage id="uploadButtonText" />
-                </SubmitButton>
+                <div className="row">
+                  <SelectField
+                    className="col-md-3"
+                    disabled={true}
+                    name="group"
+                    options={groupSelectOptions}
+                  />
+                </div>
+                <div id="dndRoot" style={{ cursor: "pointer" }}>
+                  <div {...getRootProps({ style })} className="root">
+                    <input {...getInputProps()} />
+                    <div style={{ margin: "auto" }}>
+                      <div>
+                        <DinaMessage id="uploadFormInstructions" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <ul className="list-group">
+                  {acceptedFiles.map(file => (
+                    <li className="list-group-item" key={file.name}>
+                      {file.name} - {file.size} bytes
+                    </li>
+                  ))}
+                </ul>
+                {acceptedFiles.length ? (
+                  <div>
+                    <ErrorViewer />
+                    <SubmitButton>
+                      <DinaMessage id="uploadButtonText" />
+                    </SubmitButton>
+                  </div>
+                ) : null}
               </Form>
             </Formik>
-          ) : null}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
