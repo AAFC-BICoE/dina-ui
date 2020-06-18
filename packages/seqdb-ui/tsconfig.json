@@ -16,7 +16,6 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "paths": {
-      // Use our own Kitsu type definitions instead of the incomplete provided types.
       "kitsu": ["../common-ui/types/kitsu"]
     },
     "allowJs": true,

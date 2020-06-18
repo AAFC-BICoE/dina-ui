@@ -16,7 +16,6 @@
     "preserveConstEnums": true,
     "sourceMap": true,
     "paths": {
-      // Use our own Kitsu type definitions instead of the incomplete provided types.
       "kitsu": ["types/kitsu"]
     }
   }
