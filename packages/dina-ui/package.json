@@ -29,7 +29,7 @@
     "kitsu": "7.0.4",
     "kitsu-core": "7.0.4",
     "lodash": "^4.17.11",
-    "next": "^9.3.3",
+    "next": "^9.4.3",
     "next-transpile-modules": "^2.3.1",
     "react": "^16.10.2",
     "react-datepicker": "^2.9.6",
