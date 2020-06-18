@@ -101,7 +101,15 @@ export default function EditMetadatasPage() {
         data: "acMetadataCreator",
         title: formatMessage("field_acMetadataCreator.displayName")
       }
-    )
+    ),
+    {
+      data: "metadata.dcRights",
+      title: formatMessage("field_dcRights")
+    },
+    {
+      data: "metadata.xmpRightsWebStatement",
+      title: formatMessage("field_xmpRightsWebStatement")
+    }
   ];
 
   const idsQuery = String(router.query.ids);
