@@ -35,12 +35,15 @@ describe("DeleteButton", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(mockDoOperations).lastCalledWith([
-      {
-        op: "DELETE",
-        path: "metadata/100"
-      }
-    ]);
+    expect(mockDoOperations).lastCalledWith(
+      [
+        {
+          op: "DELETE",
+          path: "metadata/100"
+        }
+      ],
+      undefined
+    );
     expect(mockPush).lastCalledWith("/metadata/list");
   });
 

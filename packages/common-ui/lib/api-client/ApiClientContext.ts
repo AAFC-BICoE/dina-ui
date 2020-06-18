@@ -10,12 +10,12 @@ import {
   SuccessfulOperation
 } from "./operations-types";
 
-interface BulkGetOptions {
+export interface BulkGetOptions {
   apiBaseUrl?: string;
   joinSpecs?: ClientSideJoinSpec[];
 }
 
-interface DoOperationsOptions {
+export interface DoOperationsOptions {
   apiBaseUrl?: string;
 }
 

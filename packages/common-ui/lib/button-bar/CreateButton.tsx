@@ -12,7 +12,7 @@ interface CreateButtonProps {
  */
 export function CreateButton({ entityLink }: CreateButtonProps) {
   return (
-    <Link href={`/${entityLink}/edit`}>
+    <Link href={`${entityLink}/edit`}>
       <a className="btn btn-primary">
         <CommonMessage id="createButtonText" />
       </a>

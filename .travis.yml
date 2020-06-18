@@ -20,13 +20,14 @@ script:
   - yarn test:coverage;
   # Make sure the apps can be built:
   - yarn workspace seqdb-ui build
-  - yarn workspace objectstore-ui build
+  - yarn workspace dina-ui build
 after_script:
   # Format common-ui coverage
   - ./cc-test-reporter format-coverage -t lcov -o coverage/codeclimate.common-ui.json packages/common-ui/coverage/lcov.info
   # Format seqdb-ui coverage
   - ./cc-test-reporter format-coverage -t lcov -o coverage/codeclimate.seqdb-ui.json packages/seqdb-ui/coverage/lcov.info
-  - ./cc-test-reporter format-coverage -t lcov -o coverage/codeclimate.objectstore-ui.json packages/objectstore-ui/coverage/lcov.info
+  # Format dina-ui coverage
+  - ./cc-test-reporter format-coverage -t lcov -o coverage/codeclimate.dina-ui.json packages/dina-ui/coverage/lcov.info
   # Sum coverage parts into coverage/codeclimate.json
   - ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -p 3
   # Upload coverage/codeclimate.json
