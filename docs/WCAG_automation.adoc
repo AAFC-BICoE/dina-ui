@@ -5,9 +5,9 @@ pa11y-ci-reporter-html to generate report of configured level of severity with g
 
 == Follow below steps in sequence
 
-=== Go to packages/objectstore-ui for object store UI ( packages/seqdb-ui for seqdb UI )
+=== Go to packages/dina-ui for object store UI ( packages/seqdb-ui for seqdb UI )
 
-`cd packages/objectstore-ui`
+`cd packages/dina-ui`
 
 === Check compliance for all configured pages and output json format results  
 

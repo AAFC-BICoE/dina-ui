@@ -1,7 +1,9 @@
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import { ApiClientContext } from "../api-client/ApiClientContext";
-import { FormikButton } from "../formik-connected/FormikButton";
+import {
+  ApiClientContext,
+  DoOperationsOptions
+} from "../api-client/ApiClientContext";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { AreYouSureModal } from "../modal/AreYouSureModal";
 import { useModal } from "../modal/modal";
@@ -15,10 +17,13 @@ interface DeleteButtonProps {
 
   /** URL to redirect to after deleting. */
   postDeleteRedirect: string;
+
+  options?: DoOperationsOptions;
 }
 
 export function DeleteButton({
   id,
+  options,
   postDeleteRedirect,
   type
 }: DeleteButtonProps) {
@@ -27,12 +32,15 @@ export function DeleteButton({
   const router = useRouter();
 
   async function doDelete() {
-    await doOperations([
-      {
-        op: "DELETE",
-        path: `${type}/${id}`
-      }
-    ]);
+    await doOperations(
+      [
+        {
+          op: "DELETE",
+          path: `${type}/${id}`
+        }
+      ],
+      options
+    );
 
     await router.push(postDeleteRedirect);
   }
