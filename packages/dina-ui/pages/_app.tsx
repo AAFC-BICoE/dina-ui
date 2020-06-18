@@ -5,12 +5,14 @@ import {
   KeycloakAccountProvider,
   ModalProvider
 } from "common-ui";
+import "common-ui/lib/button-bar/buttonbar.css";
 import "handsontable/dist/handsontable.full.min.css";
 import App from "next/app";
 import React from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-table/react-table.css";
 import "react-tabs/style/react-tabs.css";
+import "../components/button-bar/nav/nav.css";
 import { DinaIntlProvider } from "../intl/dina-ui-intl";
 
 /** Get Random UUID */
