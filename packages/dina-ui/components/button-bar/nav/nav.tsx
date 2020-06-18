@@ -2,7 +2,6 @@ import { LanguageSelector, useAccount } from "common-ui";
 import Link from "next/link";
 import React from "react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import "./nav.css";
 
 export function Nav() {
   return (

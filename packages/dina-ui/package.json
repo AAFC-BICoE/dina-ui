@@ -19,7 +19,6 @@
   "dependencies": {
     "@molgenis/rsql": "0.1.2",
     "@testing-library/react": "^9.3.0",
-    "@zeit/next-css": "^1.0.1",
     "axios": "^0.18.1",
     "blob": "0.0.5",
     "bootswatch": "^4.2.1",

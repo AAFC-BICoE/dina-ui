@@ -1,5 +1,4 @@
 import React from "react";
-import "./buttonbar.css";
 
 interface ButtonBarProps {
   children: React.ReactNode;
