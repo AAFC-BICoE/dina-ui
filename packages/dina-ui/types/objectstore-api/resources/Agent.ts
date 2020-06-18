@@ -5,6 +5,8 @@ export interface AgentAttributes {
   displayName: string;
   email: string;
   uuid: string;
+  createdBy?: string;
+  createdOn?: string;
 }
 
 export type Agent = KitsuResource & AgentAttributes;
