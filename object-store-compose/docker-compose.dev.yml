@@ -77,7 +77,7 @@ services:
       spring-boot:run
       "
   # Nextjs's dev-mode server that hot-reloads the UI source code:
-  objectstore-ui-dev-server:
+  dina-ui-dev-server:
     image: node:12.16.1
     volumes:
       - "../repos/dina-ui:/dina-ui"
@@ -92,13 +92,13 @@ services:
     stop_signal: SIGKILL
     command: >
       bash -c "
-      yarn --cwd=/dina-ui/packages/objectstore-ui ;
-      yarn --cwd=/dina-ui/packages/objectstore-ui dev
+      yarn --cwd=/dina-ui/packages/dina-ui ;
+      yarn --cwd=/dina-ui/packages/dina-ui dev
       "
   # Front-end gateway that proxies URLs to the correct service:
-  objectstore-ui:
+  dina-ui:
     image: caddy/caddy:2.0.0-rc.3
     volumes:
-      - "../repos/dina-ui/packages/objectstore-ui/dev.Caddyfile:/etc/caddy/Caddyfile"
+      - "../repos/dina-ui/packages/dina-ui/dev.Caddyfile:/etc/caddy/Caddyfile"
     environment:
-      UI_DEV_SERVER_ADDRESS: objectstore-ui-dev-server:3000
+      UI_DEV_SERVER_ADDRESS: dina-ui-dev-server:3000
