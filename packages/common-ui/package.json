@@ -33,6 +33,7 @@
     "title-case": "^2.1.1"
   },
   "devDependencies": {
+    "@babel/runtime-corejs2": "^7.10.2",
     "@types/enzyme": "^3.10.3",
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.12",
