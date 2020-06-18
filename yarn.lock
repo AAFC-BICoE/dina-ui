@@ -3349,7 +3349,7 @@ commander@~2.11.0:
     keycloak-js "^9.0.3"
     kitsu "7.0.4"
     kitsu-core "7.0.4"
-    next "^9.3.2"
+    next "^9.3.3"
     node-localstorage "^2.1.5"
     react-datepicker "^2.9.6"
     react-hooks-async "^3.9.0"
@@ -7339,7 +7339,7 @@ next-transpile-modules@^2.3.1:
   resolved "https://registry.yarnpkg.com/next-transpile-modules/-/next-transpile-modules-2.3.1.tgz#8977c070912fbc3e927c662431fc4e91ae335b43"
   integrity sha512-euNOBAk/CXZA6binwL47+QpcxAmK1pzH2zjF7XnRN55f2iuN/ecpUw5p3x4bikFu0yDPtSLS92nv9fcgcCo0vg==
 
-next@^9.3.2:
+next@^9.3.3:
   version "9.4.4"
   resolved "https://registry.yarnpkg.com/next/-/next-9.4.4.tgz#02ad9fea7f7016b6b42fc83b67835e4a0dd0c99a"
   integrity sha512-ZT8bU2SAv5jkFQ+y8py+Rl5RJRJ6DnZDS+VUnB1cIscmtmUhDi7LYED7pYm4MCKkYhPbEEM1Lbpo7fnoZJGWNQ==
