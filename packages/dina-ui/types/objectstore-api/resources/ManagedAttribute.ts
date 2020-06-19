@@ -5,6 +5,10 @@ export interface ManagedAttributeAttributes {
   name: string;
   managedAttributeType: string;
   acceptedValues?: string[];
+  createdDate?: string;
+  /*descEn?: string;
+  descFr?: string;*/
+  description?: Map<string, string>;
 }
 export enum ManagedAttributeType {
   "INTEGER",

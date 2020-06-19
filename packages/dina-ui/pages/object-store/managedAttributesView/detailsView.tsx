@@ -1,5 +1,6 @@
 import {
   ApiClientContext,
+  DateField,
   DeleteButton,
   ErrorViewer,
   FieldWrapper,
@@ -97,16 +98,22 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
     const isTypeInteger = submittedValues.managedAttributeType === "INTEGER";
+    const desc = new Map();
+    desc.set("en", submittedValues.descEn);
+    desc.set("fr", submittedValues.descFn);
     const managedAttributeValues = {
       acceptedValues:
         submittedValues.acceptedValues && !isTypeInteger
           ? submittedValues.acceptedValues
           : null,
+      createdDate: submittedValues.createdDate,
+      description: desc,
       id: submittedValues.id ? submittedValues.id : null,
       managedAttributeType: submittedValues.managedAttributeType,
       name: submittedValues.name,
       type: submittedValues.type
     };
+
     try {
       await save(
         [
@@ -157,6 +164,24 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
             onChange={selectValue => setType(selectValue)}
             hideLabel={true}
           />
+        </div>
+        <div style={{ width: "300px" }}>
+          <h4>
+            <DinaMessage id="field_managedAttributeDescEn" />
+          </h4>
+          <TextField name="descEn" hideLabel={true} />
+        </div>
+        <div style={{ width: "300px" }}>
+          <h4>
+            <DinaMessage id="field_managedAttributeDescFr" />
+          </h4>
+          <TextField name="descFr" hideLabel={true} />
+        </div>
+        <div style={{ width: "300px" }}>
+          <h4>
+            <DinaMessage id="field_managedAttributeCreateDate" />
+          </h4>
+          <DateField showTime={true} name="createdDate" hideLabel={true} />
         </div>
         {type === "STRING" && (
           <div>

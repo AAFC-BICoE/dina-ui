@@ -16,7 +16,12 @@ const ATTRIBUTES_LIST_COLUMNS: Array<ColumnDefinition<ManagedAttribute>> = [
   },
   "managedAttributeType",
   "createdDate",
-  "description",
+  {
+    Cell: ({ original: { description } }) => <div>{description.en} </div>,
+
+    accessor: "description"
+  },
+
   {
     Cell: ({ original: { acceptedValues } }) => (
       <div>{acceptedValues?.join(", ")}</div>
