@@ -47,7 +47,7 @@ services:
       "
   # Front-end gateway that proxies URLs to the correct service:
   ui:
-    image: caddy/caddy:2.0.0-rc.3
+    image: caddy/caddy:2.0.0-alpine
     volumes:
       - "../repos/dina-ui/packages/seqdb-ui/dev.Caddyfile:/etc/caddy/Caddyfile"
     environment:

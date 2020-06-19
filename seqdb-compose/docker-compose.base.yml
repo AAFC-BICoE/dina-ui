@@ -23,6 +23,7 @@ services:
       API_ADDRESS: api:8080
     labels:
       - "traefik.http.routers.ui.rule=Host(`${SEQDBUI_DOMAIN}`)"
+      - "traefik.http.services.ui.loadbalancer.server.port=8080"
   traefik:
     image: traefik:v2.2.0
     command: --providers.docker=true

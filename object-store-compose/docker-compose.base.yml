@@ -57,6 +57,7 @@ services:
       KEYCLOAK_PUBLIC_URL: http://${KEYCLOAK_DOMAIN}/auth
     labels:
       - "traefik.http.routers.dina-ui.rule=Host(`${DINAUI_DOMAIN}`)"
+      - "traefik.http.services.dina-ui.loadbalancer.server.port=8080"
   objectstore-api:
     image: objectstore-api:tag
     environment:
