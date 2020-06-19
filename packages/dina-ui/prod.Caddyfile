@@ -1,6 +1,6 @@
 # Configures Caddy (reverse proxy) to serve the app as static files and proxy
 # API urls to the API service.
-http://:80
+http://:8080
 
 # Serve the production app as static HTML files:
 root * /www/html
