@@ -14,17 +14,15 @@ const ATTRIBUTES_LIST_COLUMNS: Array<ColumnDefinition<ManagedAttribute>> = [
     Header: "Name",
     accessor: "name"
   },
-  "managedAttributeType",
   "createdDate",
   {
     Cell: ({ original: { description } }) => (
-      // tslint:disable-next-line: no-string-literal
-      <div>{JSON.stringify(description.en)} </div>
+      <div>en : { description.en}, fr : { description.fr}</div>
     ),
 
     accessor: "description"
   },
-
+  "managedAttributeType",
   {
     Cell: ({ original: { acceptedValues } }) => (
       <div>{acceptedValues?.join(", ")}</div>

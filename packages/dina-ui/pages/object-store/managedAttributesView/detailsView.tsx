@@ -99,9 +99,12 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
     const isTypeInteger = submittedValues.managedAttributeType === "INTEGER";
-    const desc = new Map<string, string>();
-    desc.set("en", submittedValues.descEn);
-    desc.set("fr", submittedValues.descFn);
+    //const desc = new Map<string, string>();
+    const desc = {
+      en: submittedValues.descEn,
+      fr: submittedValues.descFr
+    };
+
     const managedAttributeValues = {
       acceptedValues:
         submittedValues.acceptedValues && !isTypeInteger
@@ -156,15 +159,10 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
         </div>
         <div style={{ width: "300px" }}>
           <h4>
-            <DinaMessage id="field_managedAttributeType" />
+            <DinaMessage id="field_managedAttributeCreateDate" />
           </h4>
-          <SelectField
-            name="managedAttributeType"
-            options={ATTRIBUTE_TYPE_OPTIONS}
-            onChange={selectValue => setType(selectValue)}
-            hideLabel={true}
-          />
-        </div>
+          <DateField showTime={true} name="createdDate" hideLabel={true} />
+        </div>        
         <div style={{ width: "300px" }}>
           <h4>
             <DinaMessage id="field_managedAttributeDescEn" />
@@ -195,10 +193,15 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
         </div>
         <div style={{ width: "300px" }}>
           <h4>
-            <DinaMessage id="field_managedAttributeCreateDate" />
+            <DinaMessage id="field_managedAttributeType" />
           </h4>
-          <DateField showTime={true} name="createdDate" hideLabel={true} />
-        </div>
+          <SelectField
+            name="managedAttributeType"
+            options={ATTRIBUTE_TYPE_OPTIONS}
+            onChange={selectValue => setType(selectValue)}
+            hideLabel={true}
+          />
+        </div>        
         {type === "STRING" && (
           <div>
             <h4>
