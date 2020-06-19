@@ -1,3 +1,4 @@
+// tslint:disable: no-string-literal
 import {
   ApiClientContext,
   DateField,
@@ -98,7 +99,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
     const isTypeInteger = submittedValues.managedAttributeType === "INTEGER";
-    const desc = new Map();
+    const desc = new Map<string, string>();
     desc.set("en", submittedValues.descEn);
     desc.set("fr", submittedValues.descFn);
     const managedAttributeValues = {
@@ -113,7 +114,6 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       name: submittedValues.name,
       type: submittedValues.type
     };
-
     try {
       await save(
         [
@@ -169,13 +169,29 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           <h4>
             <DinaMessage id="field_managedAttributeDescEn" />
           </h4>
-          <TextField name="descEn" hideLabel={true} />
+          <TextField
+            name="descEn"
+            initialValue={
+              initialValues.hasOwnProperty("description")
+                ? initialValues["description"]["en"]
+                : null
+            }
+            hideLabel={true}
+          />
         </div>
         <div style={{ width: "300px" }}>
           <h4>
             <DinaMessage id="field_managedAttributeDescFr" />
           </h4>
-          <TextField name="descFr" hideLabel={true} />
+          <TextField
+            name="descFr"
+            initialValue={
+              initialValues.hasOwnProperty("description")
+                ? initialValues["description"]["fr"]
+                : null
+            }
+            hideLabel={true}
+          />
         </div>
         <div style={{ width: "300px" }}>
           <h4>

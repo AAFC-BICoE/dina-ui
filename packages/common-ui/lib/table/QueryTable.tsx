@@ -176,6 +176,9 @@ export function QueryTable<TData extends KitsuResource>({
 
   const { error, loading: queryIsLoading, response } = queryState;
 
+  // tslint:disable-next-line: no-console
+  console.log("list managed attr response is " + JSON.stringify(response));
+
   const totalCount = response?.meta?.totalResourceCount;
 
   const numberOfPages = totalCount

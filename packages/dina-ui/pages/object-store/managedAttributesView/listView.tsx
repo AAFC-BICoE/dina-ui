@@ -17,7 +17,10 @@ const ATTRIBUTES_LIST_COLUMNS: Array<ColumnDefinition<ManagedAttribute>> = [
   "managedAttributeType",
   "createdDate",
   {
-    Cell: ({ original: { description } }) => <div>{description.en} </div>,
+    Cell: ({ original: { description } }) => (
+      // tslint:disable-next-line: no-string-literal
+      <div>{JSON.stringify(description.en)} </div>
+    ),
 
     accessor: "description"
   },
