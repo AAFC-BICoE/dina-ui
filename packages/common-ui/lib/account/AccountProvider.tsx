@@ -8,6 +8,7 @@ import { createContext, ReactNode, useContext } from "react";
 export interface AccountContextI {
   authenticated?: boolean;
   groups?: string[];
+  users?: any;
   login: () => void;
   logout: () => void;
   initialized: boolean;
@@ -59,7 +60,8 @@ function KeycloakAccountProviderInternal({
     { login, logout, authenticated, token, tokenParsed },
     initialized
   ] = useKeycloak();
-  const { preferred_username: username, groups } = (tokenParsed as any) ?? {};
+  const { preferred_username: username, groups, users } =
+    (tokenParsed as any) ?? {};
 
   return (
     <AccountProvider
@@ -70,7 +72,8 @@ function KeycloakAccountProviderInternal({
         login,
         logout,
         token,
-        username
+        username,
+        users
       }}
     >
       {children}
