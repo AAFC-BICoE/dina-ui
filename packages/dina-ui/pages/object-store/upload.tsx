@@ -60,12 +60,7 @@ export default function UploadPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
   const { apiClient, save } = useContext(ApiClientContext);
-  const {
-    groups,
-    users,
-    username,
-    initialized: accountInitialized
-  } = useAccount();
+  const { agentId, groups, initialized: accountInitialized } = useAccount();
 
   const {
     getRootProps,
@@ -110,12 +105,6 @@ export default function UploadPage() {
       );
       uploadResponses.push(response.data);
     }
-    let agentId = null;
-    users.forEach(user => {
-      if (user.username === username) {
-        agentId = user.agentId;
-      }
-    });
     const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(res => ({
       resource: {
         acMetadataCreator: agentId,
