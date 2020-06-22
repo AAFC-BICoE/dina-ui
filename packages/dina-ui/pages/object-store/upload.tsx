@@ -105,11 +105,14 @@ export default function UploadPage() {
       );
       uploadResponses.push(response.data);
     }
-
+    // tslint:disable-next-line: no-console
+    console.log("before call get ");
     const responses = await apiClient.axios.get(
       `/agent-api/agent?fields[agent]=id`
     );
     const existingAgents = responses.data.data;
+    // tslint:disable-next-line: no-console
+    console.log("existingAgents are " + JSON.stringify(existingAgents));
     let agentIdExisiting = false;
     existingAgents.map(agent => {
       if (agent.id === agentId) {

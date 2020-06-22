@@ -76,9 +76,23 @@ describe("Upload page", () => {
       }))
     );
 
+    const mockGet = jest.fn(() => {
+      return {
+        data: {
+          data: [
+            {
+              id: "e279a1ae-a8ba-49c3-b983-34fe3f80e58f",
+              type: "agent"
+            }
+          ]
+        }
+      };
+    });
+
     const mockCtx = {
       apiClient: {
         axios: {
+          get: mockGet,
           post: mockPost
         }
       },
@@ -126,6 +140,7 @@ describe("Upload page", () => {
       [
         {
           resource: {
+            acMetadataCreator: null,
             bucket: "group-with-slash",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"
@@ -134,6 +149,7 @@ describe("Upload page", () => {
         },
         {
           resource: {
+            acMetadataCreator: null,
             bucket: "group-with-slash",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"
@@ -142,6 +158,7 @@ describe("Upload page", () => {
         },
         {
           resource: {
+            acMetadataCreator: null,
             bucket: "group-with-slash",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"
