@@ -2,6 +2,7 @@ import {
   ApiClientContext,
   ButtonBar,
   CancelButton,
+  DeleteButton,
   ErrorViewer,
   LoadingSpinner,
   Query,
@@ -87,6 +88,12 @@ function AgentForm({ agent, router }: AgentFormProps) {
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />
+          <DeleteButton
+            id={id as string}
+            options={{ apiBaseUrl: "/agent-api" }}
+            postDeleteRedirect="/agent/list"
+            type="agent"
+          />
           <CancelButton
             entityId={id as string}
             entityLink="/agent"
