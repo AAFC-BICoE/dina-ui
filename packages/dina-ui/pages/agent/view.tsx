@@ -26,7 +26,7 @@ export function AgentDetailsPage({ router }: WithRouterProps) {
         <EditButton entityId={id as string} entityLink="agent" />
         <CancelButton
           entityId={id as string}
-          entityLink="agent"
+          entityLink="/agent"
           byPassView={true}
         />
       </ButtonBar>
@@ -46,8 +46,10 @@ export function AgentDetailsPage({ router }: WithRouterProps) {
                 <Formik<Agent> initialValues={agent} onSubmit={noop}>
                   <div>
                     <div className="row">
-                      <FieldView className="col-md-4" name="displayName" />
-                      <FieldView className="col-md-4" name="email" />
+                      <FieldView className="col-md-3" name="displayName" />
+                      <FieldView className="col-md-3" name="email" />
+                      <FieldView className="col-md-3" name="createdBy" />
+                      <FieldView className="col-md-3" name="createdOn" />
                     </div>
                   </div>
                 </Formik>
