@@ -47,7 +47,7 @@ function MyComponent() {
 == Defining messages
 
 The actual text for these messages needs to be defined in a messages file, like seqdb-en.ts. Each UI app
-( seqdb-ui, objectstore-ui, etc. ) should have its own messages files. common-ui has its own messages files
+( seqdb-ui, dina-ui, etc. ) should have its own messages files. common-ui has its own messages files
 for shared messages used by multiple apps.
 
 seqdb-en.ts:
