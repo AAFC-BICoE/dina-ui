@@ -20,6 +20,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editAgentTitle: "Edit Agent",
   editObjectSubtypeTitle: "Edit Object Subtype",
   editSelectedButtonText: "Edit Selected",
+  feedbackButtonText: "Feedback",
   field_acCaption: "Caption",
   field_acDerivedFrom: "Derived From",
   field_acDigitizationDate: "Date Original Version Created",

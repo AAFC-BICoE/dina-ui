@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
-const AGENT_FILTER_ATTRIBUTES = ["displayName", "email"];
+const AGENT_FILTER_ATTRIBUTES = ["displayName", "email", "createdBy"];
 const AGENT_TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, displayName } }) => (
@@ -11,13 +11,11 @@ const AGENT_TABLE_COLUMNS = [
         <a>{displayName}</a>
       </Link>
     ),
-    Header: "Display Name",
     accessor: "displayName"
   },
-  {
-    Header: "Email",
-    accessor: "email"
-  }
+  "email",
+  "createdBy",
+  "createdOn"
 ];
 
 export default function AgentListPage() {
