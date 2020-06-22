@@ -22,6 +22,14 @@ export function Nav() {
           <li className="nav-item mx-2">
             <NavbarUserControl />
           </li>
+          <li className="nav-item mx-2 my-auto">
+            <a
+              className="btn btn-info"
+              href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
+            >
+              <DinaMessage id="feedbackButtonText" />
+            </a>
+          </li>
         </ul>
       </div>
     </nav>
