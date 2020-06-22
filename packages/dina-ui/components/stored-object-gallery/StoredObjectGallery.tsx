@@ -93,12 +93,16 @@ function GalleryItem({
         maxWidth: "15rem"
       }}
     >
-      {thumbnail && (
+      {thumbnail ? (
         <FileView
           filePath={`/api/objectstore-api/file/${thumbnail.bucket}/${thumbnail.fileIdentifier}.thumbnail`}
           fileType="jpg"
           imgAlt={formatMessage("thumbnailNotAvailableText")}
         />
+      ) : (
+        <div style={{ height: "7rem" }}>
+          <DinaMessage id="thumbnailNotAvailableText" />
+        </div>
       )}
       <Link href={`/object-store/object/view?id=${id}`}>
         <a
