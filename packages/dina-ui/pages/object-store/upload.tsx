@@ -106,7 +106,9 @@ export default function UploadPage() {
       uploadResponses.push(response.data);
     }
 
-    const responses = await apiClient.axios.get(`/agent-api/agent`);
+    const responses = await apiClient.axios.get(
+      `/agent-api/agent?fields[agent]=id`
+    );
     const existingAgents = responses.data.data;
     let agentIdExisiting = false;
     existingAgents.map(agent => {
