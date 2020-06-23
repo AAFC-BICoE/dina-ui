@@ -10,7 +10,7 @@ import {
   SuccessfulOperation
 } from "./operations-types";
 
-interface BulkGetOptions {
+export interface BulkGetOptions {
   apiBaseUrl?: string;
   joinSpecs?: ClientSideJoinSpec[];
 
@@ -18,7 +18,7 @@ interface BulkGetOptions {
   returnNullForMissingResource?: boolean;
 }
 
-interface DoOperationsOptions {
+export interface DoOperationsOptions {
   apiBaseUrl?: string;
 
   /** Return null for missing resource instead of throwing an Error. */
