@@ -6,10 +6,9 @@ import {
 import { createContext, ReactNode, useContext } from "react";
 
 export interface AccountContextI {
-  agentId?: any;
+  agentId?: string;
   authenticated?: boolean;
   groups?: string[];
-  users?: any;
   login: () => void;
   logout: () => void;
   initialized: boolean;

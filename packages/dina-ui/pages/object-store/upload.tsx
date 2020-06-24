@@ -105,20 +105,10 @@ export default function UploadPage() {
       );
       uploadResponses.push(response.data);
     }
-    const responses = await apiClient.axios.get(
-      `/agent-api/agent?fields[agent]=id`
-    );
-    const existingAgents = responses.data.data;
-    let agentIdExisiting = false;
-    existingAgents.map(agent => {
-      if (agent.id === agentId) {
-        agentIdExisiting = true;
-      }
-    });
 
     const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(res => ({
       resource: {
-        acMetadataCreator: agentIdExisiting ? agentId : null,
+        acMetadataCreator: agentId,
         bucket: group,
         fileIdentifier: res.fileIdentifier,
         type: "metadata"
