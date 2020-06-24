@@ -43,7 +43,7 @@ const Home: React.FunctionComponent = () => (
         </li>
       </ul>
       <h2>
-        <DinaMessage id="personsSectionTitle" />
+        <DinaMessage id="agentsSectionTitle" />
       </h2>
       <ul>
         <li>

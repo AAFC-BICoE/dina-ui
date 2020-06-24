@@ -8,6 +8,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addManagedAttributeButtonText: "Add New Managed Attribute",
   addObjectSubtypeTitle: "Add New Object Subtype",
   addPersonTitle: "Add Person",
+  agentsSectionTitle: "Agents",
   appTitle: "DINA",
   attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
@@ -73,7 +74,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   objectSubtypeTitle: "Object Subtype",
   personListTitle: "Persons",
   personViewTitle: "View Person",
-  personsSectionTitle: "Persons",
   thumbnailNotAvailableText: "No thumbnail available",
   uploadButtonText: "Upload",
   uploadFormInstructions:

@@ -146,13 +146,13 @@ export default function MetadataListPage() {
                       apiBaseUrl: "/agent-api",
                       idField: "acMetadataCreator",
                       joinField: "acMetadataCreator",
-                      path: metadata => `agent/${metadata.acMetadataCreator}`
+                      path: metadata => `person/${metadata.acMetadataCreator}`
                     },
                     {
                       apiBaseUrl: "/agent-api",
                       idField: "dcCreator",
                       joinField: "dcCreator",
-                      path: metadata => `agent/${metadata.dcCreator}`
+                      path: metadata => `person/${metadata.dcCreator}`
                     }
                   ],
                   onSuccess: res => setAvailableMetadatas(res.data),
