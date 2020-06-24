@@ -43,13 +43,13 @@ const Home: React.FunctionComponent = () => (
         </li>
       </ul>
       <h2>
-        <DinaMessage id="agentsSectionTitle" />
+        <DinaMessage id="personsSectionTitle" />
       </h2>
       <ul>
         <li>
-          <Link href="/agent/list">
+          <Link href="/person/list">
             <a>
-              <DinaMessage id="agentListTitle" />
+              <DinaMessage id="personListTitle" />
             </a>
           </Link>
         </li>
