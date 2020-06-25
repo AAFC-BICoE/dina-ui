@@ -32,6 +32,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dcRights: "Rights Statement",
   field_dcType: "Stored Object Type",
   field_managedAttributeAcceptedValue: "Accepted Value",
+  field_managedAttributeCreateDate: "Create Date",
+  field_managedAttributeDescEn: "English Description",
+  field_managedAttributeDescFr: "French Description",
+  field_managedAttributeMandatoryFieldsError:
+    "Both name and type are mandatory fields",
   field_managedAttributeName: "Attribute Name",
   field_managedAttributeType: "Type",
   field_originalFilename: "Original Filename",

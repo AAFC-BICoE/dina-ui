@@ -1,5 +1,7 @@
+// tslint:disable: no-string-literal
 import {
   ApiClientContext,
+  DateField,
   DeleteButton,
   ErrorViewer,
   FieldWrapper,
@@ -16,7 +18,7 @@ import Link from "next/link";
 import { NextRouter, withRouter } from "next/router";
 import { useContext, useState } from "react";
 import { Head, Nav } from "../../../components";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../types/objectstore-api/resources/ManagedAttribute";
 
 interface AcceptedValueProps extends LabelWrapperParams {
@@ -89,19 +91,33 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
   const [type, setType] = useState(
     profile ? profile.managedAttributeType : undefined
   );
-
+  const id = profile?.id;
   const initialValues = profile || { type: "managed-attribute" };
+  const { formatMessage } = useDinaIntl();
 
   async function onSubmit(
     submittedValues,
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
     const isTypeInteger = submittedValues.managedAttributeType === "INTEGER";
+    const desc = {
+      en: submittedValues.descEn,
+      fr: submittedValues.descFr
+    };
+    if (
+      submittedValues.name === undefined ||
+      submittedValues.managedAttributeType === undefined
+    ) {
+      setStatus(formatMessage("field_managedAttributeMandatoryFieldsError"));
+      setSubmitting(false);
+      return;
+    }
     const managedAttributeValues = {
       acceptedValues:
         submittedValues.acceptedValues && !isTypeInteger
           ? submittedValues.acceptedValues
           : null,
+      description: desc,
       id: submittedValues.id ? submittedValues.id : null,
       managedAttributeType: submittedValues.managedAttributeType,
       name: submittedValues.name,
@@ -131,7 +147,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
         <ErrorViewer />
         <SubmitButton />
         <DeleteButton
-          id={profile?.id}
+          id={id}
           options={{ apiBaseUrl: "/objectstore-api" }}
           postDeleteRedirect="/object-store/managedAttributesView/listView"
           type="managed-attribute"
@@ -146,6 +162,47 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
             <DinaMessage id="field_managedAttributeName" />
           </h4>
           <TextField name="name" hideLabel={true} />
+        </div>
+        {id && (
+          <div style={{ width: "300px" }}>
+            <h4>
+              <DinaMessage id="field_managedAttributeCreateDate" />
+            </h4>
+            <DateField
+              showTime={true}
+              name="createdDate"
+              disabled={true}
+              hideLabel={true}
+            />
+          </div>
+        )}
+        <div style={{ width: "300px" }}>
+          <h4>
+            <DinaMessage id="field_managedAttributeDescEn" />
+          </h4>
+          <TextField
+            name="descEn"
+            initialValue={
+              initialValues.hasOwnProperty("description")
+                ? initialValues["description"]["en"]
+                : null
+            }
+            hideLabel={true}
+          />
+        </div>
+        <div style={{ width: "300px" }}>
+          <h4>
+            <DinaMessage id="field_managedAttributeDescFr" />
+          </h4>
+          <TextField
+            name="descFr"
+            initialValue={
+              initialValues.hasOwnProperty("description")
+                ? initialValues["description"]["fr"]
+                : null
+            }
+            hideLabel={true}
+          />
         </div>
         <div style={{ width: "300px" }}>
           <h4>
