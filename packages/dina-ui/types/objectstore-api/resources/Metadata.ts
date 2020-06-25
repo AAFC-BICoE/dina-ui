@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
-import { Agent } from "./Agent";
 import { ManagedAttributeMap } from "./ManagedAttributeMap";
+import { Person } from "./Person";
 
 export interface MetadataAttributes {
   type: "metadata";
@@ -35,8 +35,8 @@ export interface MetadataAttributes {
 }
 
 export interface MetadataRelationships {
-  acMetadataCreator?: Agent | string | null;
-  dcCreator?: Agent | string | null;
+  acMetadataCreator?: Person | string | null;
+  dcCreator?: Person | string | null;
   managedAttributeMap?: ManagedAttributeMap | null;
   acDerivedFrom?: Metadata | null;
 }

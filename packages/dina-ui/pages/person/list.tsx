@@ -7,7 +7,7 @@ const AGENT_FILTER_ATTRIBUTES = ["displayName", "email", "createdBy"];
 const AGENT_TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, displayName } }) => (
-      <Link href={`/agent/view?id=${id}`}>
+      <Link href={`/person/view?id=${id}`}>
         <a>{displayName}</a>
       </Link>
     ),
@@ -23,21 +23,21 @@ export default function AgentListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("agentListTitle")} />
+      <Head title={formatMessage("personListTitle")} />
       <Nav />
       <ButtonBar>
-        <CreateButton entityLink="/agent" />
+        <CreateButton entityLink="/person" />
       </ButtonBar>
       <div className="container-fluid">
         <h1>
-          <DinaMessage id="agentListTitle" />
+          <DinaMessage id="personListTitle" />
         </h1>
         <ListPageLayout
           filterAttributes={AGENT_FILTER_ATTRIBUTES}
-          id="agent-list"
+          id="person-list"
           queryTableProps={{
             columns: AGENT_TABLE_COLUMNS,
-            path: "agent-api/agent"
+            path: "agent-api/person"
           }}
         />
       </div>

@@ -1,13 +1,13 @@
-import { AgentDetailsPage } from "../../../pages/agent/view";
+import { PersonDetailsPage } from "../../../pages/person/view";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { Agent } from "../../../types/objectstore-api/resources/Agent";
+import { Person } from "../../../types/objectstore-api/resources/Person";
 
-/** Test agent with all fields defined. */
-const TEST_AGENT: Agent = {
-  displayName: "agent a",
-  email: "testagent@a.b",
+/** Test person with all fields defined. */
+const TEST_AGENT: Person = {
+  displayName: "person a",
+  email: "testperson@a.b",
   id: "1",
-  type: "agent",
+  type: "person",
   uuid: "323423-23423-234"
 };
 
@@ -24,19 +24,19 @@ const apiContext: any = {
   apiClient: { get: mockGet }
 };
 
-describe("Agent details page", () => {
+describe("Person details page", () => {
   it("Renders initially with a loading spinner.", () => {
     const wrapper = mountWithAppContext(
-      <AgentDetailsPage router={{ query: { id: "100" } } as any} />,
+      <PersonDetailsPage router={{ query: { id: "100" } } as any} />,
       { apiContext }
     );
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
   });
 
-  it("Render the Agent details", async () => {
+  it("Render the Person details", async () => {
     const wrapper = mountWithAppContext(
-      <AgentDetailsPage router={{ query: { id: "100" } } as any} />,
+      <PersonDetailsPage router={{ query: { id: "100" } } as any} />,
       { apiContext }
     );
 
@@ -46,16 +46,18 @@ describe("Agent details page", () => {
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
-    // The agent's name should be rendered in a FieldView.
+    // The person's name should be rendered in a FieldView.
     expect(
       wrapper.containsMatchingElement(<strong>Display Name</strong>)
     ).toEqual(true);
-    expect(wrapper.containsMatchingElement(<p>agent a</p>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<p>person a</p>)).toEqual(true);
 
-    // The agent's email should be rendered in a FieldView.
+    // The person's email should be rendered in a FieldView.
     expect(wrapper.containsMatchingElement(<strong>Email</strong>)).toEqual(
       true
     );
-    expect(wrapper.containsMatchingElement(<p>testagent@a.b</p>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<p>testperson@a.b</p>)).toEqual(
+      true
+    );
   });
 });

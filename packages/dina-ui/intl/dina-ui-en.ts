@@ -5,11 +5,9 @@ import { COMMON_UI_MESSAGES_ENGLISH } from "common-ui";
  */
 export const DINAUI_MESSAGES_ENGLISH = {
   ...COMMON_UI_MESSAGES_ENGLISH,
-  addAgentTitle: "Add Agent",
   addManagedAttributeButtonText: "Add New Managed Attribute",
   addObjectSubtypeTitle: "Add New Object Subtype",
-  agentListTitle: "Agents",
-  agentViewTitle: "View Agent",
+  addPersonTitle: "Add Person",
   agentsSectionTitle: "Agents",
   appTitle: "DINA",
   attributeLabel: "Attribute",
@@ -17,8 +15,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   closePreviewButtonText: "Close Preview",
   deleteButtonText: "Delete",
   deleteSelectedButtonText: "Delete Selected",
-  editAgentTitle: "Edit Agent",
   editObjectSubtypeTitle: "Edit Object Subtype",
+  editPersonTitle: "Edit Person",
   editSelectedButtonText: "Edit Selected",
   feedbackButtonText: "Feedback",
   field_acCaption: "Caption",
@@ -74,6 +72,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   objectStoreTitle: "Object Store",
   objectSubtypeListTitle: "Object Subtypes",
   objectSubtypeTitle: "Object Subtype",
+  personListTitle: "Persons",
+  personViewTitle: "View Person",
   thumbnailNotAvailableText: "No thumbnail available",
   uploadButtonText: "Upload",
   uploadFormInstructions:

@@ -18,10 +18,10 @@ import { useContext, useState } from "react";
 import { Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
-  Agent,
   ManagedAttribute,
   ManagedAttributeMap,
-  Metadata
+  Metadata,
+  Person
 } from "../../../types/objectstore-api";
 
 /** Editable row data */
@@ -78,24 +78,24 @@ export default function EditMetadatasPage() {
     //   data: "metadata.acDigitizationDate",
     //   title: formatMessage("metadataFirstDigitalVersionCreatedDateLabel")
     // },
-    resourceSelectCell<Agent>(
+    resourceSelectCell<Person>(
       {
         filter: input => ({ rsql: `displayName==*${input}*` }),
-        label: agent => agent.displayName,
-        model: "agent-api/agent",
-        type: "agent"
+        label: person => person.displayName,
+        model: "agent-api/person",
+        type: "person"
       },
       {
         data: "dcCreator",
         title: formatMessage("field_dcCreator.displayName")
       }
     ),
-    resourceSelectCell<Agent>(
+    resourceSelectCell<Person>(
       {
         filter: input => ({ rsql: `displayName==*${input}*` }),
-        label: agent => agent.displayName,
-        model: "agent-api/agent",
-        type: "agent"
+        label: person => person.displayName,
+        model: "agent-api/person",
+        type: "person"
       },
       {
         data: "acMetadataCreator",
@@ -149,18 +149,18 @@ export default function EditMetadatasPage() {
       {
         apiBaseUrl: "/objectstore-api",
         joinSpecs: [
-          // Join to agents api:
+          // Join to persons api:
           {
             apiBaseUrl: "/agent-api",
             idField: "acMetadataCreator",
             joinField: "acMetadataCreator",
-            path: metadata => `agent/${metadata.acMetadataCreator}`
+            path: metadata => `person/${metadata.acMetadataCreator}`
           },
           {
             apiBaseUrl: "/agent-api",
             idField: "dcCreator",
             joinField: "dcCreator",
-            path: metadata => `agent/${metadata.dcCreator}`
+            path: metadata => `person/${metadata.dcCreator}`
           }
         ]
       }
@@ -169,8 +169,8 @@ export default function EditMetadatasPage() {
     await initEditableManagedAttributes(metadatas);
 
     const newTableData = metadatas.map<BulkMetadataEditRow>(metadata => {
-      const acMetadataCreator = metadata.acMetadataCreator as Agent;
-      const dcCreator = metadata.dcCreator as Agent;
+      const acMetadataCreator = metadata.acMetadataCreator as Person;
+      const dcCreator = metadata.dcCreator as Person;
 
       return {
         acMetadataCreator: encodeResourceCell(acMetadataCreator, {
