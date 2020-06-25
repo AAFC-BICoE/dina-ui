@@ -21,7 +21,8 @@ export class ClientSideJoiner {
     PersistedResource<any>
   > = new DataLoader<string, PersistedResource<any>>(async paths => {
     const joinedResources = await this.bulkGet(paths, {
-      apiBaseUrl: this.joinSpec.apiBaseUrl
+      apiBaseUrl: this.joinSpec.apiBaseUrl,
+      returnNullForMissingResource: true
     });
     return joinedResources;
   });

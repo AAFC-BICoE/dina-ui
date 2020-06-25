@@ -1,7 +1,11 @@
 import { AxiosRequestConfig } from "axios";
 import Kitsu from "kitsu";
 import { createContextValue } from "../ApiClientContext";
-import { Operation, OperationsResponse } from "../operations-types";
+import {
+  FailedOperation,
+  Operation,
+  OperationsResponse
+} from "../operations-types";
 
 interface TestPcrPrimer {
   name: string;
@@ -392,6 +396,38 @@ Constraint violation: description size must be between 1 and 10`;
     expect(response).toEqual([
       { id: "123", name: "primer 123", type: "pcrPrimer" },
       { id: "124", name: "primer 124", type: "pcrPrimer" }
+    ]);
+  });
+
+  it("bulkGet can return null entries instead of throwing errors on 404 responses.", async () => {
+    mockPatch.mockImplementationOnce(() => ({
+      data: [
+        {
+          data: {
+            attributes: { name: "primer 123" },
+            id: "123",
+            type: "pcrPrimer"
+          },
+          status: 201
+        },
+        {
+          errors: [],
+          status: 404
+        }
+      ]
+    }));
+
+    const response = await bulkGet(["primer/123", "primer/000"], {
+      returnNullForMissingResource: true
+    });
+
+    expect(response).toEqual([
+      {
+        id: "123",
+        name: "primer 123",
+        type: "pcrPrimer"
+      },
+      null
     ]);
   });
 });

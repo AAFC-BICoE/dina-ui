@@ -13,10 +13,16 @@ import {
 export interface BulkGetOptions {
   apiBaseUrl?: string;
   joinSpecs?: ClientSideJoinSpec[];
+
+  /** Return null for missing resource instead of throwing an Error. */
+  returnNullForMissingResource?: boolean;
 }
 
 export interface DoOperationsOptions {
   apiBaseUrl?: string;
+
+  /** Return null for missing resource instead of throwing an Error. */
+  returnNullForMissingResource?: boolean;
 }
 
 /** Api context interface. */
@@ -96,7 +102,7 @@ export function createContextValue({
    */
   async function doOperations(
     operations: Operation[],
-    { apiBaseUrl = "" }: DoOperationsOptions = {}
+    { apiBaseUrl = "", returnNullForMissingResource }: DoOperationsOptions = {}
   ): Promise<SuccessfulOperation[]> {
     // Unwrap the configured axios instance from the Kitsu instance.
     const { axios } = apiClient;
@@ -114,9 +120,24 @@ export function createContextValue({
       }
     );
 
+    const responses: OperationsResponse = axiosResponse.data;
+
+    // Optionally return null instead of throwing an error for missing resources:
+    if (returnNullForMissingResource) {
+      for (const i in responses) {
+        // 404 Not Found or 410 Gone
+        if ([404, 410].includes(responses[i].status)) {
+          responses[i] = {
+            data: null as any,
+            status: 404
+          };
+        }
+      }
+    }
+
     // Check for errors. At least one error means that the entire request's transaction was
     // cancelled.
-    const errorMessage = getErrorMessage(axiosResponse.data);
+    const errorMessage = getErrorMessage(responses);
 
     // If there is an error message, throw it.
     if (errorMessage) {
@@ -124,7 +145,7 @@ export function createContextValue({
     }
 
     // Return the successful jsonpatch response.
-    return axiosResponse.data;
+    return responses as SuccessfulOperation[];
   }
 
   /**
@@ -169,14 +190,21 @@ export function createContextValue({
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
   async function bulkGet<T extends KitsuResource>(
     paths: string[],
-    { apiBaseUrl = "", joinSpecs = [] }: BulkGetOptions = {}
+    {
+      apiBaseUrl = "",
+      joinSpecs = [],
+      returnNullForMissingResource
+    }: BulkGetOptions = {}
   ) {
     const getOperations = paths.map<Operation>(path => ({
       op: "GET",
       path
     }));
 
-    const responses = await doOperations(getOperations, { apiBaseUrl });
+    const responses = await doOperations(getOperations, {
+      apiBaseUrl,
+      returnNullForMissingResource
+    });
 
     const resources: Array<PersistedResource<T>> = (
       await Promise.all(responses.map(deserialise))
