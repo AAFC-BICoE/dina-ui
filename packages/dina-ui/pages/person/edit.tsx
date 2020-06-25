@@ -14,35 +14,35 @@ import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
-import { Agent } from "types/objectstore-api/resources/Agent";
+import { Person } from "types/objectstore-api/resources/Person";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
-interface AgentFormProps {
-  agent?: Agent;
+interface PersonFormProps {
+  person?: Person;
   router: NextRouter;
 }
 
-export function AgentEditPage({ router }: WithRouterProps) {
+export function PersonEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useDinaIntl();
 
   return (
     <div>
-      <Head title={formatMessage("editAgentTitle")} />
+      <Head title={formatMessage("editPersonTitle")} />
       <Nav />
       <div className="container-fluid">
         {id ? (
           <div>
             <h1>
-              <DinaMessage id="editAgentTitle" />
+              <DinaMessage id="editPersonTitle" />
             </h1>
-            <Query<Agent> query={{ path: `agent-api/agent/${id}` }}>
+            <Query<Person> query={{ path: `agent-api/person/${id}` }}>
               {({ loading, response }) => (
                 <div>
                   <LoadingSpinner loading={loading} />
                   {response && (
-                    <AgentForm agent={response.data} router={router} />
+                    <PersonForm person={response.data} router={router} />
                   )}
                 </div>
               )}
@@ -51,9 +51,9 @@ export function AgentEditPage({ router }: WithRouterProps) {
         ) : (
           <div>
             <h1>
-              <DinaMessage id="addAgentTitle" />
+              <DinaMessage id="addPersonTitle" />
             </h1>
-            <AgentForm router={router} />
+            <PersonForm router={router} />
           </div>
         )}
       </div>
@@ -61,17 +61,17 @@ export function AgentEditPage({ router }: WithRouterProps) {
   );
 }
 
-function AgentForm({ agent, router }: AgentFormProps) {
+function PersonForm({ person, router }: PersonFormProps) {
   const { save } = useContext(ApiClientContext);
   const { id } = router.query;
-  const initialValues = agent || { type: "agent" };
+  const initialValues = person || { type: "person" };
 
   const onSubmit = safeSubmit(async submittedValues => {
     await save(
       [
         {
           resource: submittedValues,
-          type: "agent"
+          type: "person"
         }
       ],
       {
@@ -79,7 +79,7 @@ function AgentForm({ agent, router }: AgentFormProps) {
       }
     );
 
-    await router.push(`/agent/list`);
+    await router.push(`/person/list`);
   });
 
   return (
@@ -91,12 +91,12 @@ function AgentForm({ agent, router }: AgentFormProps) {
           <DeleteButton
             id={id as string}
             options={{ apiBaseUrl: "/agent-api" }}
-            postDeleteRedirect="/agent/list"
-            type="agent"
+            postDeleteRedirect="/person/list"
+            type="person"
           />
           <CancelButton
             entityId={id as string}
-            entityLink="/agent"
+            entityLink="/person"
             byPassView={true}
           />
         </ButtonBar>
@@ -113,4 +113,4 @@ function AgentForm({ agent, router }: AgentFormProps) {
   );
 }
 
-export default withRouter(AgentEditPage);
+export default withRouter(PersonEditPage);

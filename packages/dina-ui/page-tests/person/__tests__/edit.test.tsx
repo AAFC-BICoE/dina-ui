@@ -1,7 +1,7 @@
 import { OperationsResponse } from "common-ui";
-import { AgentEditPage } from "../../../pages/agent/edit";
+import { PersonEditPage } from "../../../pages/person/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { Agent } from "../../../types/objectstore-api/resources/Agent";
+import { Person } from "../../../types/objectstore-api/resources/Person";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -11,9 +11,9 @@ const mockPush = jest.fn();
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
-  // The get request will return the existing agent.
-  if (model === "agent-api/agent/1") {
-    // The request returns the test agent.
+  // The get request will return the existing person.
+  if (model === "agent-api/person/1") {
+    // The request returns the test person.
     return { data: TEST_AGENT };
   }
 });
@@ -24,22 +24,22 @@ const apiContext: any = {
   apiClient: { get: mockGet, axios: { patch: mockPatch } }
 };
 
-describe("agent edit page", () => {
+describe("person edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("Provides a form to add a agent.", async () => {
+  it("Provides a form to add a person.", async () => {
     mockPatch.mockReturnValueOnce({
       data: [
         {
           data: {
             attributes: {
               displayName: "test agemt",
-              email: "testagent@a.b"
+              email: "testperson@a.b"
             },
             id: "1",
-            type: "agent"
+            type: "person"
           },
           status: 201
         }
@@ -47,7 +47,7 @@ describe("agent edit page", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <AgentEditPage router={{ query: {}, push: mockPush } as any} />,
+      <PersonEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
 
@@ -57,8 +57,8 @@ describe("agent edit page", () => {
 
     wrapper.find(".displayName-field input").simulate("change", {
       target: {
-        name: "agent",
-        value: "test agent updated"
+        name: "person",
+        value: "test person updated"
       }
     });
 
@@ -71,31 +71,31 @@ describe("agent edit page", () => {
       [
         {
           op: "POST",
-          path: "agent",
+          path: "person",
           value: {
             attributes: {
-              displayName: "test agent updated"
+              displayName: "test person updated"
             },
             id: "00000000-0000-0000-0000-000000000000",
-            type: "agent"
+            type: "person"
           }
         }
       ],
       expect.anything()
     );
 
-    // The user should be redirected to the new agent's details page.
-    expect(mockPush).lastCalledWith("/agent/list");
+    // The user should be redirected to the new person's details page.
+    expect(mockPush).lastCalledWith("/person/list");
   });
 
-  it("Provides a form to edit an agent.", async done => {
+  it("Provides a form to edit an person.", async done => {
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
       data: [
         {
           data: {
             id: "1",
-            type: "agent"
+            type: "person"
           },
           status: 201
         }
@@ -103,7 +103,7 @@ describe("agent edit page", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <AgentEditPage router={{ query: { id: 1 }, push: mockPush } as any} />,
+      <PersonEditPage router={{ query: { id: 1 }, push: mockPush } as any} />,
       { apiContext }
     );
 
@@ -116,12 +116,12 @@ describe("agent edit page", () => {
 
     // Check that the existing displayName value is in the field.
     expect(wrapper.find(".displayName-field input").prop("value")).toEqual(
-      "agent a"
+      "person a"
     );
 
     // Modify the displayName value.
     wrapper.find(".displayName-field input").simulate("change", {
-      target: { name: "displayName", value: "new test agent" }
+      target: { name: "displayName", value: "new test person" }
     });
 
     // Submit the form.
@@ -135,21 +135,21 @@ describe("agent edit page", () => {
         [
           {
             op: "PATCH",
-            path: "agent/1",
+            path: "person/1",
             value: {
               attributes: expect.objectContaining({
-                displayName: "new test agent"
+                displayName: "new test person"
               }),
               id: "1",
-              type: "agent"
+              type: "person"
             }
           }
         ],
         expect.anything()
       );
 
-      // The user should be redirected to agent's list page.
-      expect(mockPush).lastCalledWith("/agent/list");
+      // The user should be redirected to person's list page.
+      expect(mockPush).lastCalledWith("/person/list");
       done();
     });
   });
@@ -172,7 +172,7 @@ describe("agent edit page", () => {
     }));
 
     const wrapper = mountWithAppContext(
-      <AgentEditPage router={{ query: {}, push: mockPush } as any} />,
+      <PersonEditPage router={{ query: {}, push: mockPush } as any} />,
       { apiContext }
     );
 
@@ -190,11 +190,11 @@ describe("agent edit page", () => {
   });
 });
 
-/** Test agent with all fields defined. */
-const TEST_AGENT: Agent = {
-  displayName: "agent a",
-  email: "testagent@a.b",
+/** Test person with all fields defined. */
+const TEST_AGENT: Person = {
+  displayName: "person a",
+  email: "testperson@a.b",
   id: "1",
-  type: "agent",
+  type: "person",
   uuid: "323423-23423-234"
 };
