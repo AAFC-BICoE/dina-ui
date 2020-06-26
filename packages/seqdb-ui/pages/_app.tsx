@@ -7,7 +7,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import "react-table/react-table.css";
 import "react-tabs/style/react-tabs.css";
 import "../components/button-bar/buttonbar.css";
-import "../components/nav/app-top.css";
 import "../components/nav/nav.css";
 import { SeqdbIntlProvider } from "../intl/seqdb-intl";
 
