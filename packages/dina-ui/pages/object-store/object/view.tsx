@@ -7,7 +7,7 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { Footer, Head, Nav } from "../../../components";
 import { FileView } from "../../../components/file-view/FileView";
 import { MetadataDetails } from "../../../components/metadata/MetadataDetails";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
@@ -105,6 +105,7 @@ export default function MetadataViewPage() {
             </div>
           </div>
         </div>
+        <Footer />
       </div>
     );
   }

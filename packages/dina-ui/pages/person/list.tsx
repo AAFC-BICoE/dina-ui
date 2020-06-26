@@ -1,6 +1,6 @@
 import { ButtonBar, CreateButton, ListPageLayout } from "common-ui";
 import Link from "next/link";
-import { Head, Nav } from "../../components";
+import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 const AGENT_FILTER_ATTRIBUTES = ["displayName", "email", "createdBy"];
@@ -41,6 +41,7 @@ export default function AgentListPage() {
           }}
         />
       </div>
+      <Footer />
     </div>
   );
 }

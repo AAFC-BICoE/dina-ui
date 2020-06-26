@@ -16,7 +16,7 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ObjectSubtype } from "types/objectstore-api/resources/ObjectSubtype";
-import { Head, Nav } from "../../../components";
+import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 interface ObjectSubtypeFormProps {
@@ -63,6 +63,7 @@ export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

@@ -88,7 +88,7 @@ function NavbarUserControl() {
 
 export function Footer() {
   return (
-    <footer id="wb-info">
+    <footer id="wb-info" className="my-3" style={{ zIndex: 0 }}>
       <div className="brand">
         <div className="container">
           <div className="row">
