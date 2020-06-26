@@ -21,7 +21,7 @@
     "@testing-library/react": "^9.3.0",
     "axios": "^0.18.1",
     "blob": "0.0.5",
-    "bootswatch": "^4.2.1",
+    "bootstrap": "^4.5.0",
     "common-ui": "link:../common-ui",
     "core-js": "^3.2.1",
     "formik": "^1.5.8",
