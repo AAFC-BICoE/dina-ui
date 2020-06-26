@@ -93,7 +93,6 @@ export function Footer() {
         <div className="container">
           <div className="row">
             <nav className="col-md-10 ftr-urlt-lnk">
-              <h2 className="wb-inv">About this Web application</h2>
               <ul>
                 <li>
                   <a href="https://www.canada.ca/en/contact.html">
@@ -112,11 +111,6 @@ export function Footer() {
                 </li>
               </ul>
             </nav>
-            <div className="col-6 visible-sm visible-xs tofpg">
-              <a href="#wb-cont">
-                Top of Page <span className="glyphicon glyphicon-chevron-up" />
-              </a>
-            </div>
             <div className="col-6 col-md-3 col-lg-2 text-right">
               <img
                 src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/assets/wmms-blk.svg"
