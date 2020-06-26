@@ -25,13 +25,13 @@ export default function AgentListPage() {
     <div>
       <Head title={formatMessage("personListTitle")} />
       <Nav />
-      <ButtonBar>
-        <CreateButton entityLink="/person" />
-      </ButtonBar>
       <div className="container-fluid">
         <h1>
           <DinaMessage id="personListTitle" />
         </h1>
+        <ButtonBar>
+          <CreateButton entityLink="/person" />
+        </ButtonBar>
         <ListPageLayout
           filterAttributes={AGENT_FILTER_ATTRIBUTES}
           id="person-list"

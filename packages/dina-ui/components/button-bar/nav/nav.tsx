@@ -5,7 +5,7 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 export function Nav() {
   return (
-    <header>
+    <header className="py-3">
       <div id="wb-bnr" className="container">
         <div className="row d-flex">
           <div
@@ -23,7 +23,7 @@ export function Nav() {
             </span>
             <meta property="areaServed" typeof="Country" content="Canada" />
           </div>
-          <section id="wb-lng" className="text-right ml-auto">
+          <section id="wb-lng" className="text-right ml-auto col-7 col-md-8">
             <ul className="list-inline ">
               <li className="list-inline-item mx-2">
                 <LanguageSelector />
@@ -83,5 +83,49 @@ function NavbarUserControl() {
         </>
       ) : null}
     </div>
+  );
+}
+
+export function Footer() {
+  return (
+    <footer id="wb-info">
+      <div className="brand">
+        <div className="container">
+          <div className="row">
+            <nav className="col-md-10 ftr-urlt-lnk">
+              <h2 className="wb-inv">About this Web application</h2>
+              <ul>
+                <li>
+                  <a href="https://www.canada.ca/en/contact.html">
+                    Contact information
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.canada.ca/en/transparency/terms.html">
+                    Terms and conditions
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.canada.ca/en/transparency/privacy.html">
+                    Privacy
+                  </a>
+                </li>
+              </ul>
+            </nav>
+            <div className="col-6 visible-sm visible-xs tofpg">
+              <a href="#wb-cont">
+                Top of Page <span className="glyphicon glyphicon-chevron-up" />
+              </a>
+            </div>
+            <div className="col-6 col-md-3 col-lg-2 text-right">
+              <img
+                src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/assets/wmms-blk.svg"
+                alt="Symbol of the Government of Canada"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React from "react";
-import { Head, Nav } from "../components";
+import { Footer, Head, Nav } from "../components";
 import { DinaMessage } from "../intl/dina-ui-intl";
 
 const Home: React.FunctionComponent = () => (
@@ -55,6 +55,8 @@ const Home: React.FunctionComponent = () => (
         </li>
       </ul>
     </div>
+
+    <Footer />
   </div>
 );
 
