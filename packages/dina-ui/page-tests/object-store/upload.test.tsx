@@ -15,6 +15,7 @@ jest.mock("next/router", () => ({
 }));
 
 const MOCK_ACCOUNT_CONTEXT: AccountContextI = {
+  agentId: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
   authenticated: true,
   groups: ["/group-with-slash", "group-without-slash"],
   initialized: true,
@@ -126,6 +127,7 @@ describe("Upload page", () => {
       [
         {
           resource: {
+            acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
             bucket: "group-with-slash",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"
@@ -134,6 +136,7 @@ describe("Upload page", () => {
         },
         {
           resource: {
+            acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
             bucket: "group-with-slash",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"
@@ -142,6 +145,7 @@ describe("Upload page", () => {
         },
         {
           resource: {
+            acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
             bucket: "group-with-slash",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"

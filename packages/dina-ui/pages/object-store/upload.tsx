@@ -60,7 +60,7 @@ export default function UploadPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
   const { apiClient, save } = useContext(ApiClientContext);
-  const { groups, initialized: accountInitialized } = useAccount();
+  const { agentId, groups, initialized: accountInitialized } = useAccount();
 
   const {
     getRootProps,
@@ -108,6 +108,7 @@ export default function UploadPage() {
 
     const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(res => ({
       resource: {
+        acMetadataCreator: agentId,
         bucket: group,
         fileIdentifier: res.fileIdentifier,
         type: "metadata"

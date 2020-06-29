@@ -6,6 +6,7 @@ import {
 import { createContext, ReactNode, useContext } from "react";
 
 export interface AccountContextI {
+  agentId?: string;
   authenticated?: boolean;
   groups?: string[];
   login: () => void;
@@ -59,11 +60,13 @@ function KeycloakAccountProviderInternal({
     { login, logout, authenticated, token, tokenParsed },
     initialized
   ] = useKeycloak();
-  const { preferred_username: username, groups } = (tokenParsed as any) ?? {};
+  const { preferred_username: username, groups, "agent-identifier": agentId } =
+    (tokenParsed as any) ?? {};
 
   return (
     <AccountProvider
       value={{
+        agentId,
         authenticated,
         groups,
         initialized,
