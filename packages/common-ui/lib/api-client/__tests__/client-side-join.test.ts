@@ -7,7 +7,7 @@ describe("ClientSideJoiner", () => {
     jest.clearAllMocks();
   });
 
-  it("Joins Metadatas to Agents", async () => {
+  it("Joins Metadatas to Persons", async () => {
     const metadatas = [
       {
         acMetadataCreator: "a08211f2-aee4-443f-a224-a7768cd9d588",
@@ -40,32 +40,32 @@ describe("ClientSideJoiner", () => {
       apiBaseUrl: "/agent-api",
       idField: "acMetadataCreator",
       joinField: "acMetadataCreator",
-      path: metadata => `agent/${metadata.acMetadataCreator}`
+      path: metadata => `person/${metadata.acMetadataCreator}`
     });
 
     mockBulkGet.mockReturnValueOnce([
       {
-        displayName: "Agent1",
+        displayName: "Person1",
         id: "a08211f2-aee4-443f-a224-a7768cd9d588",
-        type: "agent"
+        type: "person"
       },
       {
-        displayName: "Agent2",
+        displayName: "Person2",
         id: "6328f159-78d9-401e-8273-74e90ea58d81",
-        type: "agent"
+        type: "person"
       }
     ]);
 
     await clientSideJoiner.join();
 
-    // Bulk get is called once, with unique agent ids.
-    // There were 2 unique agent IDs in the
+    // Bulk get is called once, with unique person ids.
+    // There were 2 unique person IDs in the
     expect(mockBulkGet).lastCalledWith(
       [
-        "agent/a08211f2-aee4-443f-a224-a7768cd9d588",
-        "agent/6328f159-78d9-401e-8273-74e90ea58d81"
+        "person/a08211f2-aee4-443f-a224-a7768cd9d588",
+        "person/6328f159-78d9-401e-8273-74e90ea58d81"
       ],
-      { apiBaseUrl: "/agent-api" }
+      { apiBaseUrl: "/agent-api", returnNullForMissingResource: true }
     );
 
     // The first 3 records are joined to Agents.
@@ -73,9 +73,9 @@ describe("ClientSideJoiner", () => {
     expect(metadatas).toEqual([
       {
         acMetadataCreator: {
-          displayName: "Agent1",
+          displayName: "Person1",
           id: "a08211f2-aee4-443f-a224-a7768cd9d588",
-          type: "agent"
+          type: "person"
         },
         exampleField: "example-value",
         id: "ac4baae6-045e-4015-aeb6-1f6fd4766a1c",
@@ -83,9 +83,9 @@ describe("ClientSideJoiner", () => {
       },
       {
         acMetadataCreator: {
-          displayName: "Agent1",
+          displayName: "Person1",
           id: "a08211f2-aee4-443f-a224-a7768cd9d588",
-          type: "agent"
+          type: "person"
         },
         exampleField: "example-value",
         id: "15c30e4d-7788-49d0-848d-447479c9f89e",
@@ -93,9 +93,9 @@ describe("ClientSideJoiner", () => {
       },
       {
         acMetadataCreator: {
-          displayName: "Agent2",
+          displayName: "Person2",
           id: "6328f159-78d9-401e-8273-74e90ea58d81",
-          type: "agent"
+          type: "person"
         },
         exampleField: "example-value",
         id: "1b35311f-225f-4102-9067-6e201caacd13",

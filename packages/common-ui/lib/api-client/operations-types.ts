@@ -2,7 +2,7 @@ import { DocWithData, DocWithErrors, ResourceObject } from "jsonapi-typescript";
 
 /** A sucessful jsonpath operation. */
 export interface SuccessfulOperation extends DocWithData {
-  status: 201;
+  status: number;
 }
 
 /** A failed jsonpatch operation */

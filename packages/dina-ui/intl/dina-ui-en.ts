@@ -5,11 +5,9 @@ import { COMMON_UI_MESSAGES_ENGLISH } from "common-ui";
  */
 export const DINAUI_MESSAGES_ENGLISH = {
   ...COMMON_UI_MESSAGES_ENGLISH,
-  addAgentTitle: "Add Agent",
   addManagedAttributeButtonText: "Add New Managed Attribute",
   addObjectSubtypeTitle: "Add New Object Subtype",
-  agentListTitle: "Agents",
-  agentViewTitle: "View Agent",
+  addPersonTitle: "Add Person",
   agentsSectionTitle: "Agents",
   appTitle: "DINA",
   attributeLabel: "Attribute",
@@ -17,8 +15,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   closePreviewButtonText: "Close Preview",
   deleteButtonText: "Delete",
   deleteSelectedButtonText: "Delete Selected",
-  editAgentTitle: "Edit Agent",
   editObjectSubtypeTitle: "Edit Object Subtype",
+  editPersonTitle: "Edit Person",
   editSelectedButtonText: "Edit Selected",
   feedbackButtonText: "Feedback",
   field_acCaption: "Caption",
@@ -34,6 +32,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dcRights: "Rights Statement",
   field_dcType: "Stored Object Type",
   field_managedAttributeAcceptedValue: "Accepted Value",
+  field_managedAttributeCreateDate: "Create Date",
+  field_managedAttributeDescEn: "English Description",
+  field_managedAttributeDescFr: "French Description",
+  field_managedAttributeMandatoryFieldsError:
+    "Both name and type are mandatory fields",
   field_managedAttributeName: "Attribute Name",
   field_managedAttributeType: "Type",
   field_originalFilename: "Original Filename",
@@ -74,6 +77,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   objectStoreTitle: "Object Store",
   objectSubtypeListTitle: "Object Subtypes",
   objectSubtypeTitle: "Object Subtype",
+  personListTitle: "Persons",
+  personViewTitle: "View Person",
   thumbnailNotAvailableText: "No thumbnail available",
   uploadButtonText: "Upload",
   uploadFormInstructions:

@@ -146,7 +146,8 @@ describe("useQuery hook", () => {
 
     expect(mockBulkGet).toHaveBeenCalledTimes(1);
     expect(mockBulkGet).lastCalledWith(["person/100"], {
-      apiBaseUrl: "/people-api"
+      apiBaseUrl: "/people-api",
+      returnNullForMissingResource: true
     });
 
     // The "creator" field from the additional "people" API should have been joined

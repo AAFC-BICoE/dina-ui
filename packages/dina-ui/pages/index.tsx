@@ -47,9 +47,9 @@ const Home: React.FunctionComponent = () => (
       </h2>
       <ul>
         <li>
-          <Link href="/agent/list">
+          <Link href="/person/list">
             <a>
-              <DinaMessage id="agentListTitle" />
+              <DinaMessage id="personListTitle" />
             </a>
           </Link>
         </li>
