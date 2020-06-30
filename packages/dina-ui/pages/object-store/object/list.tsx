@@ -5,7 +5,9 @@ import {
   ColumnDefinition,
   FormikButton,
   ListPageLayout,
+  SelectField,
   SplitPagePanel,
+  useAccount,
   useGroupedCheckBoxes,
   useModal
 } from "common-ui";
@@ -33,6 +35,7 @@ export interface MetadataListFormValues {
 
 export default function MetadataListPage() {
   const { formatMessage } = useDinaIntl();
+  const { groups } = useAccount();
 
   const {
     CheckBoxField,
@@ -92,6 +95,18 @@ export default function MetadataListPage() {
     }
   ];
 
+  const groupSelectOptions = [
+    { label: "<any>", value: undefined },
+    ...(groups ?? []).map(group => {
+      // Remove keycloak's prefixed slash from the start of the group name:
+      const unprefixedGroup = group.replace(/\/(.*)/, "$1");
+      return {
+        label: unprefixedGroup,
+        value: unprefixedGroup
+      };
+    })
+  ];
+
   // Workaround to make sure react-table doesn't unmount TBodyComponent
   // when MetadataListPage is re-rendered:
   const TBodyGallery = useMemo(
@@ -135,8 +150,22 @@ export default function MetadataListPage() {
             <SplitPagePanel>
               <ListPageLayout<Metadata>
                 // Filter out the derived objects e.g. thumbnails:
-                additionalFilters={{ rsql: "acSubTypeId==null" }}
+                additionalFilters={filterForm => ({
+                  ...(filterForm.group && { bucket: filterForm.group }),
+                  rsql: "acSubTypeId==null"
+                })}
                 filterAttributes={METADATA_FILTER_ATTRIBUTES}
+                filterFormchildren={({ submitForm }) => (
+                  <div className="form-group">
+                    <div style={{ width: "300px" }}>
+                      <SelectField
+                        onChange={() => setImmediate(submitForm)}
+                        name="group"
+                        options={groupSelectOptions}
+                      />
+                    </div>
+                  </div>
+                )}
                 id="metadata-list"
                 queryTableProps={{
                   columns: METADATA_TABLE_COLUMNS,
