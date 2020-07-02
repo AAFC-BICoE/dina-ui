@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "@molgenis/rsql": "0.1.2",
-    "@zeit/next-css": "^1.0.1",
     "bootswatch": "^4.2.1",
     "common-ui": "link:../common-ui",
     "core-js": "^3.2.1",
@@ -25,7 +24,7 @@
     "kitsu": "7.0.4",
     "kitsu-core": "7.0.4",
     "lodash": "^4.17.11",
-    "next": "^9.1.5",
+    "next": "^9.4.3",
     "next-transpile-modules": "^2.3.1",
     "react": "^16.10.2",
     "react-datepicker": "^2.9.6",

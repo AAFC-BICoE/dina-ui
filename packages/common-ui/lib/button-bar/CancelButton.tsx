@@ -25,9 +25,9 @@ export function CancelButton({
   // When editing a new entity, the link points to the list page.
   const href = entityId
     ? byPassView
-      ? `/${entityLink}/list`
-      : `/${entityLink}/view?id=${entityId}`
-    : `/${entityLink}/list`;
+      ? `${entityLink}/list`
+      : `${entityLink}/view?id=${entityId}`
+    : `${entityLink}/list`;
 
   return (
     <Link href={href}>

@@ -1,4 +1,5 @@
 import { useLocalStorage } from "@rehooks/local-storage";
+import { FormikProps } from "formik";
 import { FilterParam, KitsuResource } from "kitsu";
 import { SortingRule } from "react-table";
 import { QueryTable, QueryTableProps } from "..";
@@ -6,8 +7,9 @@ import { rsql } from "../filter-builder/rsql";
 import { FilterForm } from "./FilterForm";
 
 interface ListPageLayoutProps<TData extends KitsuResource> {
-  additionalFilters?: FilterParam;
+  additionalFilters?: FilterParam | ((filterForm: any) => FilterParam);
   filterAttributes: string[];
+  filterFormchildren?: (formik: FormikProps<any>) => React.ReactElement;
   id: string;
   queryTableProps: QueryTableProps<TData>;
   WrapTable?: React.FunctionComponent;
@@ -18,8 +20,9 @@ interface ListPageLayoutProps<TData extends KitsuResource> {
  * The filter form state is hydrated from localstorage, and is saved in localstorage on form submit.
  */
 export function ListPageLayout<TData extends KitsuResource>({
-  additionalFilters,
+  additionalFilters: additionalFiltersProp,
   filterAttributes,
+  filterFormchildren,
   id,
   queryTableProps,
   WrapTable = ({ children }) => <>{children}</>
@@ -43,6 +46,11 @@ export function ListPageLayout<TData extends KitsuResource>({
 
   const filterBuilderRsql = rsql(filterForm.filterBuilderModel);
 
+  const additionalFilters =
+    typeof additionalFiltersProp === "function"
+      ? additionalFiltersProp(filterForm)
+      : additionalFiltersProp;
+
   // Combine the inner rsql with the passed additionalFilters?.rsql filter if they are set:
   const combinedRsql = [
     ...(filterBuilderRsql ? [filterBuilderRsql] : []),
@@ -57,7 +65,9 @@ export function ListPageLayout<TData extends KitsuResource>({
 
   return (
     <div>
-      <FilterForm filterAttributes={filterAttributes} id={id} />
+      <FilterForm filterAttributes={filterAttributes} id={id}>
+        {filterFormchildren}
+      </FilterForm>
       <WrapTable>
         <QueryTable<TData>
           defaultPageSize={defaultPageSize ?? undefined}
