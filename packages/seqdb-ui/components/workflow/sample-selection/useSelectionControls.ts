@@ -56,7 +56,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
   }
 
   async function deleteStepResources(
-    stepResources: Array<PersistedResource<StepResource>>
+    stepResources: PersistedResource<StepResource>[]
   ) {
     const operations = stepResources.map(sr => ({
       op: "DELETE" as OperationVerb,
@@ -85,7 +85,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
     const stepResources = ids.map(id => ({
       id,
       type: "stepResource"
-    })) as Array<PersistedResource<StepResource>>;
+    })) as PersistedResource<StepResource>[];
 
     await deleteStepResources(stepResources);
 

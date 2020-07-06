@@ -33,7 +33,7 @@ function TestComponent() {
 
   return (
     <Formik initialValues={{ checkedIds: {} }} onSubmit={mockOnSubmit}>
-      <Form>
+      <Form translate={undefined}>
         {TEST_SAMPLES.map(s => (
           <CheckBoxField key={String(s.id)} resource={s} />
         ))}
@@ -58,10 +58,9 @@ describe("Grouped check boxes hook", () => {
   it("Sets the checked ID in the formik state.", async () => {
     const wrapper = mountWithAppContext(<TestComponent />);
     // Check the third checkbox.
-    wrapper
-      .find("input[type='checkbox']")
-      .at(2)
-      .prop<any>("onClick")({ target: { checked: true } } as any);
+    wrapper.find("input[type='checkbox']").at(2).prop<any>("onClick")({
+      target: { checked: true }
+    } as any);
 
     wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
@@ -76,18 +75,14 @@ describe("Grouped check boxes hook", () => {
     const wrapper = mountWithAppContext(<TestComponent />);
 
     // Check the second checkbox.
-    wrapper
-      .find("input[type='checkbox']")
-      .at(1)
-      .prop<any>("onClick")({ target: { checked: true } } as any);
+    wrapper.find("input[type='checkbox']").at(1).prop<any>("onClick")({
+      target: { checked: true }
+    } as any);
 
     wrapper.update();
 
     // Shift+click the fourth checkbox.
-    wrapper
-      .find("input[type='checkbox']")
-      .at(3)
-      .prop<any>("onClick")({
+    wrapper.find("input[type='checkbox']").at(3).prop<any>("onClick")({
       shiftKey: true,
       target: { checked: true }
     } as any);
@@ -115,17 +110,13 @@ describe("Grouped check boxes hook", () => {
     const wrapper = mountWithAppContext(<TestComponent />);
 
     // Click the fourth checkbox.
-    wrapper
-      .find("input[type='checkbox']")
-      .at(3)
-      .prop<any>("onClick")({ target: { checked: true } } as any);
+    wrapper.find("input[type='checkbox']").at(3).prop<any>("onClick")({
+      target: { checked: true }
+    } as any);
     wrapper.update();
 
     // Shift+click the second checkbox.
-    wrapper
-      .find("input[type='checkbox']")
-      .at(1)
-      .prop<any>("onClick")({
+    wrapper.find("input[type='checkbox']").at(1).prop<any>("onClick")({
       shiftKey: true,
       target: { checked: true }
     } as any);

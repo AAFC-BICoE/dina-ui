@@ -4,7 +4,7 @@ import { Head, Nav } from "../../../components";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../types/objectstore-api/resources/ManagedAttribute";
 
-const ATTRIBUTES_LIST_COLUMNS: Array<ColumnDefinition<ManagedAttribute>> = [
+const ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] = [
   {
     Cell: ({ original: { id, name } }) => (
       <Link href={`/object-store/managedAttributesView/detailsView?id=${id}`}>

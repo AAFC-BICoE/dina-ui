@@ -21,7 +21,7 @@ export default function ExamplePage() {
     <div className="card card-body" style={{ width: "500px" }}>
       <Formik initialValues={{ myGroup: null }} onSubmit={null}>
         {({ values: { myGroup } }) => (
-          <Form>
+          <Form translate={undefined}>
             <h2>Selected group: {myGroup ? myGroup.groupName : "None"}</h2>
             <ResourceSelectField<Group>
               name="myGroup"

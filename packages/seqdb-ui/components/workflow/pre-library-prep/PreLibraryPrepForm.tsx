@@ -44,7 +44,10 @@ export function PreLibraryPrepForm({ onSubmit }: PreLibraryPrepFormProps) {
         }
 
         return (
-          <Form className="card card-body pre-library-prep-form">
+          <Form
+            className="card card-body pre-library-prep-form"
+            translate={undefined}
+          >
             <div className="row">
               <SelectField
                 className="col-6"

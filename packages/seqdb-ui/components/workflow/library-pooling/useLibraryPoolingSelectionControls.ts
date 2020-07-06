@@ -20,7 +20,7 @@ export function useLibraryPoolingSelectionControls({
   const [lastSave, setLastSave] = useState<number>();
 
   async function selectPooledItems(
-    pooledItems: Array<LibraryPrepBatch | LibraryPool>
+    pooledItems: (LibraryPrepBatch | LibraryPool)[]
   ) {
     const newLibraryPoolContents = pooledItems.map<LibraryPoolContent>(
       item => ({

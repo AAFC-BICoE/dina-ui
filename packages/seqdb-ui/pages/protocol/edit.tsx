@@ -92,7 +92,7 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
 
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      <Form>
+      <Form translate={undefined}>
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />

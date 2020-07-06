@@ -4,7 +4,7 @@ import ObjectSubtypeListPage from "../../../pages/object-store/object-subtype/li
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 
-const TEST_OBJECTSUBTYPES: Array<PersistedResource<ObjectSubtype>> = [
+const TEST_OBJECTSUBTYPES: PersistedResource<ObjectSubtype>[] = [
   {
     acSubtype: "Drawing",
     dcType: "Image",

@@ -80,11 +80,6 @@ describe("Index Set View Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
     // The table shows the ngs indexes:
-    expect(
-      wrapper
-        .find(".rt-tbody .rt-td")
-        .first()
-        .text()
-    ).toEqual("index 1");
+    expect(wrapper.find(".rt-tbody .rt-td").first().text()).toEqual("index 1");
   });
 });

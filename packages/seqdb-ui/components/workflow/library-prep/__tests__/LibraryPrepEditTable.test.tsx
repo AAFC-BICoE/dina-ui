@@ -99,12 +99,9 @@ describe("LibraryPrepEditTable component", () => {
 
     expect(wrapper.find(".rt-tbody .rt-tr").length).toEqual(3);
 
-    expect(
-      (wrapper
-        .find("input")
-        .first()
-        .instance() as any).value
-    ).toEqual("123");
+    expect((wrapper.find("input").first().instance() as any).value).toEqual(
+      "123"
+    );
   });
 
   it("Lets you add and edit library prep values.", async () => {
@@ -114,10 +111,7 @@ describe("LibraryPrepEditTable component", () => {
     wrapper.update();
 
     // Change the first inputNg value.
-    wrapper
-      .find(NumberFormat)
-      .first()
-      .prop<any>("onValueChange")({
+    wrapper.find(NumberFormat).first().prop<any>("onValueChange")({
       floatValue: 999.999
     });
 
@@ -190,24 +184,16 @@ describe("LibraryPrepEditTable component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(
-      wrapper
-        .find(ResourceSelect)
-        .first()
-        .prop("value")
-    ).toEqual({
+    expect(wrapper.find(ResourceSelect).first().prop("value")).toEqual({
       id: "1",
       name: "i5 index 1",
       type: "ngsIndex"
     });
 
     // The well coordinate column text should be formatted as F05.
-    expect(
-      wrapper
-        .find(".rt-tbody .rt-tr .rt-td")
-        .first()
-        .text()
-    ).toEqual("F05");
+    expect(wrapper.find(".rt-tbody .rt-tr .rt-td").first().text()).toEqual(
+      "F05"
+    );
 
     wrapper
       .find(".rt-tbody .rt-tr")

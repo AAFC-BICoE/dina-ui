@@ -7,7 +7,7 @@ describe("SubmitButton component", () => {
     const wrapper = mountWithAppContext(
       /* tslint:disable:no-empty */
       <Formik initialValues={{}} onSubmit={() => {}}>
-        <Form>
+        <Form translate={undefined}>
           <SubmitButton />
         </Form>
       </Formik>
@@ -21,7 +21,7 @@ describe("SubmitButton component", () => {
     const wrapper = mountWithAppContext(
       /* tslint:disable:no-empty */
       <Formik initialValues={{}} onSubmit={() => {}}>
-        <Form>
+        <Form translate={undefined}>
           <SubmitButton />
         </Form>
       </Formik>

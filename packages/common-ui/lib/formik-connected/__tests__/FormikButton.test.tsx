@@ -11,7 +11,7 @@ function getWrapper() {
       initialValues={{ testProperty: "testValue" }}
       onSubmit={mockOnSubmit}
     >
-      <Form>
+      <Form translate={undefined}>
         <FormikButton onClick={mockOnClick}>Test Button</FormikButton>
       </Form>
     </Formik>

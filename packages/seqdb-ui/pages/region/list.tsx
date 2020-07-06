@@ -4,7 +4,7 @@ import { ButtonBar, CreateButton, Head, Nav } from "../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { Region } from "../../types/seqdb-api/resources/Region";
 
-const REGION_TABLE_COLUMNS: Array<ColumnDefinition<Region>> = [
+const REGION_TABLE_COLUMNS: ColumnDefinition<Region>[] = [
   {
     Cell: ({ original: { id, name } }) => (
       <Link href={`/region/view?id=${id}`}>

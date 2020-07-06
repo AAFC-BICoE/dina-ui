@@ -11,7 +11,7 @@ import {
   useGroupedCheckBoxes,
   useModal
 } from "common-ui";
-import { Form, Formik, FormikContext } from "formik";
+import { Form, Formik, FormikContextType } from "formik";
 import { noop, toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -63,7 +63,7 @@ export default function MetadataListPage() {
     "dcRights"
   ];
 
-  const METADATA_TABLE_COLUMNS: Array<ColumnDefinition<Metadata>> = [
+  const METADATA_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
     {
       Cell: ({ original: metadata }) => (
         <CheckBoxField key={metadata.id} resource={metadata} />
@@ -251,7 +251,7 @@ export default function MetadataListPage() {
 }
 
 /** Common button props for the bulk edit/delete buttons */
-function bulkButtonProps(ctx: FormikContext<MetadataListFormValues>) {
+function bulkButtonProps(ctx: FormikContextType<MetadataListFormValues>) {
   return {
     // Disable the button if none are selected:
     disabled: !Object.values(ctx.values.selectedMetadatas).reduce(
@@ -272,7 +272,7 @@ function MetadataListWrapper({ children }) {
       initialValues={{ selectedMetadatas: {} }}
       onSubmit={noop}
     >
-      <Form>
+      <Form translate={undefined}>
         <div style={{ height: "1rem" }}>
           <div className="float-right">
             <BulkDeleteButton />

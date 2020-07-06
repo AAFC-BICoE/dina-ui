@@ -156,7 +156,7 @@ export default function UploadPage() {
               initialValues={{ group: groupSelectOptions[0].value }}
               onSubmit={safeSubmit(onSubmit)}
             >
-              <Form>
+              <Form translate={undefined}>
                 <div className="row">
                   <SelectField
                     className="col-md-3"

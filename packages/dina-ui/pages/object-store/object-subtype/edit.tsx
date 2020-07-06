@@ -88,7 +88,7 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
 
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      <Form>
+      <Form translate={undefined}>
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />

@@ -87,7 +87,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
 
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      <Form>
+      <Form translate={undefined}>
         <ButtonBar>
           <SubmitButton />
           <CancelButton entityId={id as string} entityLink="pcr-primer" />

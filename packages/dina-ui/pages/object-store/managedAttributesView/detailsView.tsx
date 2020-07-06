@@ -12,7 +12,7 @@ import {
   SubmitButton,
   TextField
 } from "common-ui";
-import { Field, FieldProps, Form, Formik, FormikActions } from "formik";
+import { Field, FieldProps, Form, Formik, FormikContextType } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { NextRouter, withRouter } from "next/router";
@@ -97,7 +97,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
 
   async function onSubmit(
     submittedValues,
-    { setStatus, setSubmitting }: FormikActions<any>
+    { setStatus, setSubmitting }: FormikContextType<any>
   ) {
     const isTypeInteger = submittedValues.managedAttributeType === "INTEGER";
     const desc = {
@@ -143,7 +143,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
 
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      <Form>
+      <Form translate={undefined}>
         <ErrorViewer />
         <SubmitButton />
         <DeleteButton
