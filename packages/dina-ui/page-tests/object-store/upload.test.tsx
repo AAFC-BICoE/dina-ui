@@ -17,7 +17,7 @@ jest.mock("next/router", () => ({
 const MOCK_ACCOUNT_CONTEXT: AccountContextI = {
   agentId: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
   authenticated: true,
-  groups: ["/group-with-slash", "group-without-slash"],
+  groupNames: ["example-group"],
   initialized: true,
   login: noop,
   logout: noop,
@@ -114,9 +114,9 @@ describe("Upload page", () => {
     );
     await flushPromises(ui, container);
 
-    // The prefixed slash should be removed:
+    // The group name should be in the URL:
     expect(mockPost).lastCalledWith(
-      "/objectstore-api/file/group-with-slash",
+      "/objectstore-api/file/example-group",
       // Form data with the file would go here:
       expect.anything(),
       // Passes in the custom error handler:
@@ -128,7 +128,7 @@ describe("Upload page", () => {
         {
           resource: {
             acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
-            bucket: "group-with-slash",
+            bucket: "example-group",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"
           },
@@ -137,7 +137,7 @@ describe("Upload page", () => {
         {
           resource: {
             acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
-            bucket: "group-with-slash",
+            bucket: "example-group",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"
           },
@@ -146,7 +146,7 @@ describe("Upload page", () => {
         {
           resource: {
             acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
-            bucket: "group-with-slash",
+            bucket: "example-group",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"
           },
@@ -182,7 +182,7 @@ describe("Upload page", () => {
   it("Only renders if the user belongs a group", () => {
     const ui = (
       <MockAppContextProvider
-        accountContext={{ ...MOCK_ACCOUNT_CONTEXT, groups: [] }}
+        accountContext={{ ...MOCK_ACCOUNT_CONTEXT, groupNames: [] }}
       >
         <UploadPage />
       </MockAppContextProvider>
