@@ -283,7 +283,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                   className="btn btn-primary select-all-checked-button"
                   onClick={selectAllCheckedItems}
                 >
-                  Select all checked pooling items -->
+                  Select all checked pooling items {"-->"}
                 </FormikButton>
               </div>
               <div className="col-6">

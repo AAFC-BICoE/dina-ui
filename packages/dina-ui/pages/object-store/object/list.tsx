@@ -77,7 +77,7 @@ export default function MetadataListPage() {
     "xmpMetadataDate",
     "acMetadataCreator.displayName",
     {
-      Cell: ({ original: { acTags } }) => acTags?.join(", "),
+      Cell: ({ original: { acTags } }) => <>{acTags?.join(", ")}</>,
       accessor: "acTags"
     },
     {

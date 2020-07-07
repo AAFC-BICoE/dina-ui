@@ -1,5 +1,5 @@
 import { ApiClientContext, OperationVerb } from "common-ui";
-import { FormikActions } from "formik";
+import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
 import { toPairs } from "lodash";
 import { useContext, useState } from "react";
@@ -38,7 +38,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
 
   async function selectAllCheckedSamples(
     formValues,
-    formik: FormikActions<any>
+    formik: FormikContextType<any>
   ) {
     const { sampleIdsToSelect } = formValues;
     const ids = toPairs(sampleIdsToSelect)
@@ -74,7 +74,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
 
   async function deleteAllCheckedStepResources(
     formValues,
-    formik: FormikActions<any>
+    formik: FormikContextType<any>
   ) {
     const { stepResourceIdsToDelete } = formValues;
 

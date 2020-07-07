@@ -17,12 +17,11 @@ const ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] = [
   "createdDate",
   {
     Cell: ({ original: { description } }) =>
-      (description?.en || description?.fr) && (
+      description?.en || description?.fr ? (
         <div>
           en : {description?.en} | fr : {description?.fr}
         </div>
-      ),
-
+      ) : null,
     accessor: "description"
   },
   "managedAttributeType",

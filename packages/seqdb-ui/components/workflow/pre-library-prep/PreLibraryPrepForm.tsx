@@ -40,7 +40,7 @@ export function PreLibraryPrepForm({ onSubmit }: PreLibraryPrepFormProps) {
     >
       {({ resetForm }) => {
         function onTypeChange(newType?: string) {
-          resetForm({ preLibraryPrepType: newType });
+          resetForm({ values: { preLibraryPrepType: newType } });
         }
 
         return (
