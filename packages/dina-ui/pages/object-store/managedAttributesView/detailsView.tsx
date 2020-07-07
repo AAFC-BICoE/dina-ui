@@ -163,7 +163,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           </h4>
           <TextField name="name" hideLabel={true} />
         </div>
-        {id && (
+        {id && initialValues.hasOwnProperty("createdDate") && (
           <div style={{ width: "300px" }}>
             <h4>
               <DinaMessage id="field_managedAttributeCreateDate" />
@@ -183,7 +183,8 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           <TextField
             name="descEn"
             initialValue={
-              initialValues.hasOwnProperty("description")
+              initialValues.hasOwnProperty("description") &&
+              initialValues["description"]["en"]
                 ? initialValues["description"]["en"]
                 : null
             }
@@ -197,7 +198,8 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           <TextField
             name="descFr"
             initialValue={
-              initialValues.hasOwnProperty("description")
+              initialValues.hasOwnProperty("description") &&
+              initialValues["description"]["fr"]
                 ? initialValues["description"]["fr"]
                 : null
             }
