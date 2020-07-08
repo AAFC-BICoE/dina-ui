@@ -1,11 +1,10 @@
-import { AxiosRequestConfig } from "axios";
+import { AxiosError, AxiosRequestConfig } from "axios";
 import Kitsu from "kitsu";
-import { createContextValue } from "../ApiClientContext";
 import {
-  FailedOperation,
-  Operation,
-  OperationsResponse
-} from "../operations-types";
+  createContextValue,
+  makeAxiosErrorMoreReadable
+} from "../ApiClientContext";
+import { Operation, OperationsResponse } from "../operations-types";
 
 interface TestPcrPrimer {
   name: string;
@@ -429,5 +428,21 @@ Constraint violation: description size must be between 1 and 10`;
       },
       null
     ]);
+  });
+
+  it("Provides a function to improve the info shown from Axios errors.", () => {
+    const axiosError = {
+      isAxiosError: true,
+      config: {
+        url: "/test-url"
+      },
+      response: {
+        statusText: "Test Error"
+      }
+    };
+
+    expect(() => makeAxiosErrorMoreReadable(axiosError as AxiosError)).toThrow(
+      new Error("/test-url: Test Error")
+    );
   });
 });

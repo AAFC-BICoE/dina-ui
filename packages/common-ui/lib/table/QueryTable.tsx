@@ -190,18 +190,19 @@ export function QueryTable<TData extends KitsuResource>({
   return (
     <div className="query-table-wrapper" ref={divWrapperRef}>
       <style>{queryTableStyle}</style>
+      <span>
+        <CommonMessage id="tableTotalCount" values={{ totalCount }} />
+      </span>
       {error && (
         <div
           className="alert alert-danger"
           style={{ position: "absolute", zIndex: 1 }}
         >
-          <p>Error:</p>
-          <p>{error?.errors?.map(e => e.detail).join("\n")}</p>
+          <span>
+            {error.errors?.map(e => e.detail).join("\n") ?? String(error)}
+          </span>
         </div>
       )}
-      <span>
-        <CommonMessage id="tableTotalCount" values={{ totalCount }} />
-      </span>
       <ReactTable
         FilterComponent={({ filter: headerFilter, onChange }) => (
           <input
