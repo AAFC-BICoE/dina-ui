@@ -30,6 +30,14 @@
       {
         "id": "90bc503d-ab0c-40a5-a0de-eedba9d09fc8",
         "name": "admin"
+      },
+      {
+        "id": "62f69b76-740e-42f2-ba99-8adf42d8edd4",
+        "name": "collection-manager"
+      },
+      {
+        "id": "bf8685f9-8a74-40f2-a4bc-746f239e230c",
+        "name": "staff"
       }
     ]
   },
@@ -50,7 +58,30 @@
       "attributes": {},
       "realmRoles": [],
       "clientRoles": {},
-      "subGroups": []
+      "subGroups": [
+        {
+          "id": "a802bf67-9bd6-4df3-a64a-d970ec6aa14a",
+          "name": "staff",
+          "path": "/cnc/staff",
+          "attributes": {},
+          "realmRoles": [
+            "staff"
+          ],
+          "clientRoles": {},
+          "subGroups": []
+        },
+        {
+          "id": "0b10b8c4-897d-4668-a3cc-446003418fa4",
+          "name": "collection-manager",
+          "path": "/cnc/collection-manager",
+          "attributes": {},
+          "realmRoles": [
+            "collection-manager"
+          ],
+          "clientRoles": {},
+          "subGroups": []
+        }
+      ]
     },
     {
       "id": "b2366903-df67-4f68-b00f-ce41ddc64861",
@@ -59,7 +90,31 @@
       "attributes": {},
       "realmRoles": [],
       "clientRoles": {},
-      "subGroups": []
+      "subGroups": [
+        {
+          "id": "e0233df3-90bc-4bd4-91d5-3233bd0a3ee7",
+          "name": "collection-manager",
+          "path": "/dao/collection-manager",
+          "attributes": {},
+          "realmRoles": [
+            "collection-manager"
+          ],
+          "clientRoles": {},
+          "subGroups": []
+        },
+        {
+          "id": "94d74312-2fda-4998-9788-2a074bd8cd1a",
+          "name": "staff",
+          "path": "/dao/staff",
+          "attributes": {},
+          "realmRoles": [
+            "staff"
+          ],
+          "clientRoles": {},
+          "subGroups": []
+        }
+      ]
+
     }
   ],
   "defaultRoles": ["user"],
@@ -487,6 +542,26 @@
       "credentials": [{ "type": "password", "value": "user" }],
       "attributes": {
         "agentId": "9c403c4b-c849-43c4-bbc1-8bd10b1997e1"
+      }
+    },
+    {
+      "username": "cnc-cm",
+      "enabled": true,
+      "realmRoles": ["user"],
+      "groups": ["cnc/collection-manager"],
+      "credentials": [{ "type": "password", "value": "cnc-cm" }],
+      "attributes": {
+        "agentId": "ba05d46b-6c75-4c92-82d6-e72237d9982f"
+      }
+    },
+    {
+      "username": "cnc-staff",
+      "enabled": true,
+      "realmRoles": ["user"],
+      "groups": ["cnc/staff"],
+      "credentials": [{ "type": "password", "value": "cnc-staff" }],
+      "attributes": {
+        "agentId": "34e1de96-cc79-4ce1-8cf6-d0be70ec7bed"
       }
     }
   ]
