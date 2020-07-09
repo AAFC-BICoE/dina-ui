@@ -76,7 +76,7 @@ export function LibraryPrepBatchForm({
 
   return (
     <Formik initialValues={libraryPrepBatch || {}} onSubmit={onSubmit}>
-      <Form>
+      <Form translate={undefined}>
         <ErrorViewer />
         <div className="row">
           <TextField

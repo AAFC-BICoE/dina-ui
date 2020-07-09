@@ -1,4 +1,4 @@
-import { HTMLAttributes, useCallback, useEffect, useRef } from "react";
+import { ReactNode, useCallback, useEffect, useRef } from "react";
 
 const SPLIT_PAGE_CSS = `
   html, body {
@@ -13,7 +13,7 @@ const SPLIT_PAGE_CSS = `
 /**
  * Component that lets you split a page into independently scrollable sections.
  */
-export function SplitPagePanel(props: HTMLAttributes<HTMLDivElement>) {
+export function SplitPagePanel({ children }: { children?: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
 
   // Memoized function that resizes the wrapper div on window resize:
@@ -39,14 +39,9 @@ export function SplitPagePanel(props: HTMLAttributes<HTMLDivElement>) {
   });
 
   return (
-    <div
-      className="split-page-panel"
-      {...props}
-      ref={ref}
-      style={{ overflowY: "scroll" }}
-    >
+    <div className="split-page-panel" ref={ref} style={{ overflowY: "scroll" }}>
       <style>{SPLIT_PAGE_CSS}</style>
-      {props.children}
+      {children}
     </div>
   );
 }

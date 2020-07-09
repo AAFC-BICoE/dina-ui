@@ -117,14 +117,12 @@ describe("Library Prep Batch form", () => {
     );
 
     // Change the product and protocol
-    wrapper
-      .find(".product-field")
-      .find(ResourceSelect)
-      .prop<any>("onChange")({ id: "100" });
-    wrapper
-      .find(".protocol-field")
-      .find(ResourceSelect)
-      .prop<any>("onChange")({ id: "200" });
+    wrapper.find(".product-field").find(ResourceSelect).prop<any>("onChange")({
+      id: "100"
+    });
+    wrapper.find(".protocol-field").find(ResourceSelect).prop<any>("onChange")({
+      id: "200"
+    });
 
     wrapper.find(".notes-field input").simulate("change", {
       target: { name: "seq", value: "new notes" }

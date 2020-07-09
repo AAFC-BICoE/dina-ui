@@ -3,7 +3,7 @@ import { AttributeRowModel } from "./AttributeRow";
 export interface AttributeGroupModel {
   id: number;
   type: "ATTRIBUTE_GROUP";
-  children: Array<AttributeRowModel | AttributeGroupModel>;
+  children: (AttributeRowModel | AttributeGroupModel)[];
 }
 
 export interface AttributeGroupProps {

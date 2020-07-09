@@ -10,7 +10,7 @@ describe("TextField component", () => {
         initialValues={{ testObject: { testField: "initial value" } }}
         onSubmit={noop}
       >
-        <Form>
+        <Form translate={undefined}>
           <TextField name="testObject.testField" />
         </Form>
       </Formik>
@@ -33,7 +33,7 @@ describe("TextField component", () => {
             testObject: { testField }
           }
         }) => (
-          <Form>
+          <Form translate={undefined}>
             <TextField name="testObject.testField" />
             <div id="value-display">{testField}</div>
           </Form>

@@ -8,7 +8,7 @@ const mockOnSubmit = jest.fn();
 function getWrapper({ initialValues }) {
   return mountWithAppContext(
     <Formik initialValues={initialValues} onSubmit={mockOnSubmit}>
-      <Form>
+      <Form translate={undefined}>
         <NumberField name="testField" />
       </Form>
     </Formik>
@@ -63,10 +63,9 @@ describe("NumberField component", () => {
     expect(wrapper.find("input").prop("value")).toEqual("123.23");
 
     // Change the value to undefined.
-    (wrapper.find(Formik).instance() as any).setFieldValue(
-      "testField",
-      undefined
-    );
+    wrapper.find(NumberFormat).prop("onValueChange")?.({
+      floatValue: undefined
+    } as any);
     wrapper.update();
 
     // The input should become blank.

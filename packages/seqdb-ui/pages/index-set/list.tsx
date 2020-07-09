@@ -9,7 +9,7 @@ const INDEX_SET_FILTER_ATTRIBUTES = [
   "reverseadapter"
 ];
 
-const INDEX_SET_TABLE_COLUMNS: Array<ColumnDefinition<IndexSet>> = [
+const INDEX_SET_TABLE_COLUMNS: ColumnDefinition<IndexSet>[] = [
   {
     Cell: ({ original: { id, name } }) => (
       <Link href={`/index-set/view?id=${id}`}>

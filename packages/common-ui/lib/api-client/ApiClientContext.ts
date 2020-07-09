@@ -40,13 +40,13 @@ export interface ApiClientContextI {
   save: (
     saveArgs: SaveArgs[],
     options?: DoOperationsOptions
-  ) => Promise<Array<PersistedResource<KitsuResource>>>;
+  ) => Promise<PersistedResource<KitsuResource>[]>;
 
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
   bulkGet: <T extends KitsuResource>(
-    paths: string[],
+    paths: readonly string[],
     options?: BulkGetOptions
-  ) => Promise<Array<PersistedResource<T>>>;
+  ) => Promise<PersistedResource<T>[]>;
 }
 
 /** Config for creating an API client context value. */
@@ -154,7 +154,7 @@ export function createContextValue({
   async function save(
     saveArgs: SaveArgs[],
     options?: DoOperationsOptions
-  ): Promise<Array<PersistedResource<KitsuResource>>> {
+  ): Promise<PersistedResource<KitsuResource>[]> {
     // Serialize the resources to JSONAPI format.
     const serializePromises = saveArgs.map(saveArg => serialize(saveArg));
     const serialized = await Promise.all(serializePromises);
@@ -206,7 +206,7 @@ export function createContextValue({
       returnNullForMissingResource
     });
 
-    const resources: Array<PersistedResource<T>> = (
+    const resources: PersistedResource<T>[] = (
       await Promise.all(responses.map(deserialise))
     ).map(res => res.data);
 

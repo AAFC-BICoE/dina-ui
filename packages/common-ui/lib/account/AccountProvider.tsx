@@ -3,12 +3,13 @@ import {
   SSRKeycloakProvider,
   useKeycloak
 } from "@react-keycloak/nextjs";
+import { uniq } from "lodash";
 import { createContext, ReactNode, useContext } from "react";
 
 export interface AccountContextI {
   agentId?: string;
   authenticated?: boolean;
-  groups?: string[];
+  groupNames?: string[];
   login: () => void;
   logout: () => void;
   initialized: boolean;
@@ -60,15 +61,23 @@ function KeycloakAccountProviderInternal({
     { login, logout, authenticated, token, tokenParsed },
     initialized
   ] = useKeycloak();
-  const { preferred_username: username, groups, "agent-identifier": agentId } =
-    (tokenParsed as any) ?? {};
+
+  const {
+    preferred_username: username,
+    groups: keycloakGroups,
+    "agent-identifier": agentId
+  } = (tokenParsed as any) ?? {};
+
+  const groupNames =
+    keycloakGroups &&
+    keycloakGroupNamesToBareGroupNames(keycloakGroups as string[]);
 
   return (
     <AccountProvider
       value={{
         agentId,
         authenticated,
-        groups,
+        groupNames,
         initialized,
         login,
         logout,
@@ -78,5 +87,20 @@ function KeycloakAccountProviderInternal({
     >
       {children}
     </AccountProvider>
+  );
+}
+
+/**
+ * Convert from Keycloak's format ( ["/cnc", "/cnc/staff"] to just the group name ["cnc"] )
+ */
+export function keycloakGroupNamesToBareGroupNames(keycloakGroups: string[]) {
+  return uniq(
+    keycloakGroups
+      // Add leading slash if absent:
+      .map(groupName =>
+        groupName.startsWith("/") ? groupName : `/${groupName}`
+      )
+      // Get only the group name immediately after the first slash:
+      .map(groupName => groupName.split("/")[1])
   );
 }

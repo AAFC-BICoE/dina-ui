@@ -10,7 +10,7 @@ import MetadataListPage, {
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Metadata } from "../../../../types/objectstore-api";
 
-const TEST_METADATAS: Array<PersistedResource<Metadata>> = [
+const TEST_METADATAS: PersistedResource<Metadata>[] = [
   {
     acTags: ["tag1"],
     bucket: "testbucket",
@@ -70,12 +70,7 @@ describe("Metadata List Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(
-      wrapper
-        .find(QueryTable)
-        .find(".rt-td")
-        .exists()
-    ).toEqual(true);
+    expect(wrapper.find(QueryTable).find(".rt-td").exists()).toEqual(true);
   });
 
   it("Provides a toggle to see the gallery view.", async () => {
@@ -89,12 +84,9 @@ describe("Metadata List Page", () => {
         .find("input")
         .prop("checked")
     ).toEqual(true);
-    expect(
-      wrapper
-        .find(".table-section")
-        .find(QueryTable)
-        .exists()
-    ).toEqual(true);
+    expect(wrapper.find(".table-section").find(QueryTable).exists()).toEqual(
+      true
+    );
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -146,10 +138,7 @@ describe("Metadata List Page", () => {
     wrapper.update();
 
     // Click the preview button:
-    wrapper
-      .find("button.preview-button")
-      .first()
-      .simulate("click");
+    wrapper.find("button.preview-button").first().simulate("click");
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -223,17 +212,11 @@ describe("Metadata List Page", () => {
 
     // Shows how many will be deleted:
     expect(
-      buttonWrapper
-        .find(AreYouSureModal)
-        .find(".modal-header")
-        .text()
+      buttonWrapper.find(AreYouSureModal).find(".modal-header").text()
     ).toEqual("Delete Selected (2)");
 
     // Click 'yes' on the "Are you sure" modal:
-    buttonWrapper
-      .find(AreYouSureModal)
-      .find("form")
-      .simulate("submit");
+    buttonWrapper.find(AreYouSureModal).find("form").simulate("submit");
 
     await new Promise(setImmediate);
     buttonWrapper.update();

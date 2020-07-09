@@ -3,12 +3,12 @@ env:
     - CC_TEST_REPORTER_ID=1adf2f4c3169570205e0702dc0166037e02880f128a2bfd74d2f6102f89f699f
 language: node_js
 node_js:
-  - "12"
+  - "14"
 cache:
   yarn: true
 before_install:
   # Setup yarn
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.22.0
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.22.4
   - export PATH=$HOME/.yarn/bin:$PATH
 before_script:
   # Setup the test coverage reporter.

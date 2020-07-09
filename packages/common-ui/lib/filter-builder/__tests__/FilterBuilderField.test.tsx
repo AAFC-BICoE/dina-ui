@@ -14,7 +14,7 @@ describe("FilterBuilderField component", () => {
         messages={{ "field_group.groupName": "Group Name" }}
       >
         <Formik initialValues={{ filter: null }} onSubmit={mockSubmit}>
-          <Form>
+          <Form translate={undefined}>
             <FilterBuilderField
               filterAttributes={["name", "group.groupName"]}
               name="filter"
@@ -29,12 +29,7 @@ describe("FilterBuilderField component", () => {
   it("Exposes the passed filter attributes as filter options.", () => {
     const wrapper = mountForm();
 
-    expect(
-      wrapper
-        .find(Select)
-        .first()
-        .props().options
-    ).toEqual([
+    expect(wrapper.find(Select).first().props().options).toEqual([
       { label: "Name", value: "name" },
       { label: "Group Name", value: "group.groupName" }
     ]);
@@ -42,10 +37,19 @@ describe("FilterBuilderField component", () => {
 
   it("Passes the filter model up to Formik.", async () => {
     const wrapper = mountForm();
-    await Promise.resolve();
+    await new Promise(setImmediate);
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
     // Formik should have the initial value.
-    expect(wrapper.find(Formik).state().values.filter.type).toEqual(
-      "FILTER_GROUP"
+    expect(mockSubmit).lastCalledWith(
+      expect.objectContaining({
+        filter: expect.objectContaining({ type: "FILTER_GROUP" })
+      }),
+      expect.anything()
     );
 
     // Change an input value.
@@ -53,9 +57,23 @@ describe("FilterBuilderField component", () => {
       .find(".filter-value")
       .simulate("change", { target: { value: "test value" } });
 
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
     // Formik should have the updated value.
-    expect(
-      wrapper.find(Formik).state().values.filter.children[0].value
-    ).toEqual("test value");
+    expect(mockSubmit).lastCalledWith(
+      expect.objectContaining({
+        filter: expect.objectContaining({
+          children: [
+            expect.objectContaining({
+              value: "test value"
+            })
+          ]
+        })
+      }),
+      expect.anything()
+    );
   });
 });

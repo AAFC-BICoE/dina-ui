@@ -19,7 +19,7 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   /** Function called when an option is selected. */
   onChange?: (
-    value: PersistedResource<TData> | Array<PersistedResource<TData>>
+    value: PersistedResource<TData> | PersistedResource<TData>[]
   ) => void;
 
   /** The model type to select resources from. */
@@ -122,7 +122,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   // Set the component's value externally when used as a controlled input.
   let selectValue;
   if (isMulti) {
-    selectValue = ((value || []) as Array<PersistedResource<TData>>).map(
+    selectValue = ((value || []) as PersistedResource<TData>[]).map(
       resource => ({
         label: optionLabel(resource),
         resource,

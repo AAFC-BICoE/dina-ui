@@ -27,7 +27,7 @@ export function AreYouSureModal({
 
   return (
     <Formik initialValues={{}} onSubmit={safeSubmit(onYesClickInternal)}>
-      <Form>
+      <Form translate={undefined}>
         <div className="modal-content">
           <div className="modal-header">
             <h2>{actionMessage}</h2>
