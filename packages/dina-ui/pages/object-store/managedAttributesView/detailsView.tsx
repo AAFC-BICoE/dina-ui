@@ -99,11 +99,6 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
     submittedValues,
     { setStatus, setSubmitting }: FormikActions<any>
   ) {
-    const isTypeInteger = submittedValues.managedAttributeType === "INTEGER";
-    const desc = {
-      en: submittedValues.description.en,
-      fr: submittedValues.description.fr
-    };
     if (
       submittedValues.name === undefined ||
       submittedValues.managedAttributeType === undefined
@@ -113,15 +108,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       return;
     }
     const managedAttributeValues = {
-      acceptedValues:
-        submittedValues.acceptedValues && !isTypeInteger
-          ? submittedValues.acceptedValues
-          : null,
-      description: desc,
-      id: submittedValues.id ? submittedValues.id : null,
-      managedAttributeType: submittedValues.managedAttributeType,
-      name: submittedValues.name,
-      type: submittedValues.type
+      ...submittedValues
     };
     try {
       await save(
