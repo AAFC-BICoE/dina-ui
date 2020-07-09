@@ -101,8 +101,8 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
   ) {
     const isTypeInteger = submittedValues.managedAttributeType === "INTEGER";
     const desc = {
-      en: submittedValues.descEn,
-      fr: submittedValues.descFr
+      en: submittedValues.description.en,
+      fr: submittedValues.description.fr
     };
     if (
       submittedValues.name === undefined ||
@@ -180,31 +180,13 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           <h4>
             <DinaMessage id="field_managedAttributeDescEn" />
           </h4>
-          <TextField
-            name="descEn"
-            initialValue={
-              initialValues.hasOwnProperty("description") &&
-              initialValues["description"]["en"]
-                ? initialValues["description"]["en"]
-                : null
-            }
-            hideLabel={true}
-          />
+          <TextField name="description.en" hideLabel={true} />
         </div>
         <div style={{ width: "300px" }}>
           <h4>
             <DinaMessage id="field_managedAttributeDescFr" />
           </h4>
-          <TextField
-            name="descFr"
-            initialValue={
-              initialValues.hasOwnProperty("description") &&
-              initialValues["description"]["fr"]
-                ? initialValues["description"]["fr"]
-                : null
-            }
-            hideLabel={true}
-          />
+          <TextField name="description.fr" hideLabel={true} />
         </div>
         <div style={{ width: "300px" }}>
           <h4>
