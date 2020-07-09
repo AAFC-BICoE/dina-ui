@@ -35,7 +35,7 @@ export interface MetadataListFormValues {
 
 export default function MetadataListPage() {
   const { formatMessage } = useDinaIntl();
-  const { groups } = useAccount();
+  const { groupNames } = useAccount();
 
   const {
     CheckBoxField,
@@ -97,14 +97,10 @@ export default function MetadataListPage() {
 
   const groupSelectOptions = [
     { label: "<any>", value: undefined },
-    ...(groups ?? []).map(group => {
-      // Remove keycloak's prefixed slash from the start of the group name:
-      const unprefixedGroup = group.replace(/\/(.*)/, "$1");
-      return {
-        label: unprefixedGroup,
-        value: unprefixedGroup
-      };
-    })
+    ...(groupNames ?? []).map(group => ({
+      label: group,
+      value: group
+    }))
   ];
 
   // Workaround to make sure react-table doesn't unmount TBodyComponent
