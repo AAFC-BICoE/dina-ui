@@ -107,14 +107,11 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       setSubmitting(false);
       return;
     }
-    const managedAttributeValues = {
-      ...submittedValues
-    };
     try {
       await save(
         [
           {
-            resource: managedAttributeValues,
+            resource: submittedValues,
             type: "managed-attribute"
           }
         ],
