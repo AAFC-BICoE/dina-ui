@@ -1,5 +1,5 @@
 import { HotTableProps } from "@handsontable/react";
-import { FormikActions } from "formik";
+import { FormikContextType } from "formik";
 import { GridSettings } from "handsontable";
 import { cloneDeep, isEmpty, zipWith } from "lodash";
 import dynamic from "next/dynamic";
@@ -21,9 +21,9 @@ export interface BulkDataEditorProps<TRow> {
   columns: GridSettings[];
   loadData: () => Promise<TRow[]>;
   onSubmit: (
-    changes: Array<RowChange<TRow>>,
+    changes: RowChange<TRow>[],
     formikValues: any,
-    formikActions: FormikActions<any>
+    formikActions: FormikContextType<any>
   ) => Promise<void>;
 }
 

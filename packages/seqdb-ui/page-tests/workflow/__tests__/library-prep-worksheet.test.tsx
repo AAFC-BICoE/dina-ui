@@ -153,12 +153,9 @@ describe("Library Prep Worksheet page", () => {
 
     // Check the row headers:
     expect(
-      wrapper.find("table.library-prep-grid tr").map(rowNode =>
-        rowNode
-          .find("td")
-          .first()
-          .text()
-      )
+      wrapper
+        .find("table.library-prep-grid tr")
+        .map(rowNode => rowNode.find("td").first().text())
     ).toEqual(["", "A", "B", "C", "D", "E", "F", "G", "H"]);
 
     // Make sure the indexes sho up in the grid:

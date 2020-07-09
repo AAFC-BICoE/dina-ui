@@ -40,7 +40,7 @@ export interface QueryTableProps<TData extends KitsuResource> {
   defaultPageSize?: number;
 
   /** The columns to show in the table. */
-  columns: Array<ColumnDefinition<TData>>;
+  columns: ColumnDefinition<TData>[];
 
   /** Client-side joins across multiple back-end APIs. */
   joinSpecs?: ClientSideJoinSpec[];

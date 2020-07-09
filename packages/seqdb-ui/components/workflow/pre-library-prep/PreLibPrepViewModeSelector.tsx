@@ -18,7 +18,7 @@ export function PreLibPrepViewModeSelector({
 }: ViewModeSelectorProps) {
   const { formatMessage } = useSeqdbIntl();
 
-  const modes: Array<{ label: string; mode: PreLibPrepViewMode }> = [
+  const modes: { label: string; mode: PreLibPrepViewMode }[] = [
     { label: formatMessage("plpEditModeLabel"), mode: "EDIT" },
     { label: formatMessage("plpShearingModeLabel"), mode: "SHEARING_DETAILS" },
     { label: formatMessage("plpSizeModeLabel"), mode: "SIZE_SELECTION_DETAILS" }

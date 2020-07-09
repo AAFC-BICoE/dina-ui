@@ -85,7 +85,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
 
 interface MetadataAttributeGroupProps {
   metadata: Metadata;
-  fields: Array<string | { name: string; value: ReactNode }>;
+  fields: (string | { name: string; value: ReactNode })[];
   title: string;
 }
 

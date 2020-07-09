@@ -49,7 +49,7 @@ export function FilterForm({
   return (
     <Formik initialValues={filterForm} onSubmit={onFilterFormSubmitInternal}>
       {formikProps => (
-        <Form className="form-group">
+        <Form className="form-group" translate={undefined}>
           <div className="form-group">
             <strong>Filter records:</strong>
             <FilterBuilderField

@@ -22,7 +22,7 @@ function getWrapper() {
     <LibraryPrepStep
       chain={{ id: "5", type: "chain" } as PersistedResource<Chain>}
       step={step as PersistedResource<ChainStepTemplate>}
-      chainStepTemplates={steps as Array<PersistedResource<ChainStepTemplate>>}
+      chainStepTemplates={steps as PersistedResource<ChainStepTemplate>[]}
     />,
     { apiContext: mockCtx as any }
   );

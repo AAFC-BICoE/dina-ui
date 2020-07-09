@@ -51,7 +51,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
     setRsqlFilter(rsql(values.filterBuilderModel));
   }
 
-  const BRIEF_PLP_DETAILS_COLUMNS: Array<ColumnDefinition<StepResource>> = [
+  const BRIEF_PLP_DETAILS_COLUMNS: ColumnDefinition<StepResource>[] = [
     {
       Cell: ({ original }) => {
         if (plpSrLoading || !original.sample) {
@@ -102,7 +102,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
     }
   ];
 
-  const SAMPLE_STEP_RESOURCE_COLUMNS: Array<ColumnDefinition<StepResource>> = [
+  const SAMPLE_STEP_RESOURCE_COLUMNS: ColumnDefinition<StepResource>[] = [
     {
       Header: formatMessage("field_group.groupName"),
       accessor: "sample.group.groupName"

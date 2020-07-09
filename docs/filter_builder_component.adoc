@@ -29,7 +29,7 @@ export default function ExamplePage() {
       <Nav />
       <div className="container-fluid">
         <Formik initialValues={{}} onSubmit={onSubmit}>
-          <Form>
+          <Form translate={undefined}>
             <FilterBuilderField
               filterAttributes={["name", "group.groupName"]}
               name="filter"

@@ -10,7 +10,7 @@ import { ObjectSubtype } from "types/objectstore-api/resources/ObjectSubtype";
 import { Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
-const OBJECTSUBTYPE_TABLE_COLUMNS: Array<ColumnDefinition<ObjectSubtype>> = [
+const OBJECTSUBTYPE_TABLE_COLUMNS: ColumnDefinition<ObjectSubtype>[] = [
   {
     Cell: ({ original: { id, acSubtype } }) => (
       <Link href={`/object-store/object-subtype/edit?id=${id}`}>

@@ -6,7 +6,13 @@
     "tslint-plugin-prettier"
   ],
   "rules": {
-    "prettier": true,
+    "prettier": [
+      true,
+      {
+        "arrowParens": "avoid",
+        "trailingComma": "none"
+      }
+    ],
     "interface-name": false,
     "jsx-no-lambda": false
   }

@@ -8,7 +8,7 @@ function getWrapper(customOnSubmit: OnFormikSubmit) {
 
   return mount(
     <Formik initialValues={{ testProperty: "testValue" }} onSubmit={onSubmit}>
-      <Form>
+      <Form translate={undefined}>
         <ErrorViewer />
       </Form>
     </Formik>

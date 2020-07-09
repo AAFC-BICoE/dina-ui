@@ -8,7 +8,7 @@ export interface FilterGroupModel {
   id: number;
   type: "FILTER_GROUP";
   operator: FilterGroupOperator;
-  children: Array<FilterRowModel | FilterGroupModel>;
+  children: (FilterRowModel | FilterGroupModel)[];
 }
 
 export interface FilterGroupProps {
