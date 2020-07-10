@@ -21,9 +21,9 @@ const TEST_SAMPLES = [
   { id: "3", type: "sample", name: "test sample 3" },
   { id: "4", type: "sample", name: "test sample 4" },
   { id: "5", type: "sample", name: "test sample 5" }
-] as Array<PersistedResource<Sample>>;
+] as PersistedResource<Sample>[];
 
-const TEST_SAMPLE_STEP_RESOURCES: Array<PersistedResource<StepResource>> = [
+const TEST_SAMPLE_STEP_RESOURCES: PersistedResource<StepResource>[] = [
   {
     id: "1",
     sample: TEST_SAMPLES[0],

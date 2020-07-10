@@ -1,4 +1,4 @@
-import { Formik } from "formik";
+import { Form, Formik } from "formik";
 import { noop } from "lodash";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { BulkDataEditor } from "../BulkDataEditor";
@@ -37,15 +37,17 @@ describe("BulkDataEditor component", () => {
 
     const wrapper = mountWithAppContext(
       <Formik initialValues={{ testFormikAttr: "test value" }} onSubmit={noop}>
-        <BulkDataEditor
-          columns={[
-            { data: "a", title: "A" },
-            { data: "b", title: "B" },
-            { data: "c", title: "C" }
-          ]}
-          loadData={loadData}
-          onSubmit={mockOnSubmit}
-        />
+        <Form translate={undefined}>
+          <BulkDataEditor
+            columns={[
+              { data: "a", title: "A" },
+              { data: "b", title: "B" },
+              { data: "c", title: "C" }
+            ]}
+            loadData={loadData}
+            onSubmit={mockOnSubmit}
+          />
+        </Form>
       </Formik>
     );
 

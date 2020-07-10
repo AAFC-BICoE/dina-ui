@@ -69,10 +69,7 @@ describe("FilterRow component", () => {
     const wrapper = mountFilterRow();
 
     expect(
-      wrapper
-        .find(".filter-attribute")
-        .find(Select)
-        .props().options
+      wrapper.find(".filter-attribute").find(Select).props().options
     ).toEqual([
       { label: "Name", value: "name" },
       { label: "Description", value: "description" },
@@ -97,10 +94,7 @@ describe("FilterRow component", () => {
     const wrapper = mountFilterRow();
 
     expect(
-      wrapper
-        .find(".filter-predicate")
-        .find(Select)
-        .props().options
+      wrapper.find(".filter-predicate").find(Select).props().options
     ).toEqual([
       { label: expect.anything(), value: "IS" },
       { label: expect.anything(), value: "IS NOT" }
@@ -235,10 +229,7 @@ describe("FilterRow component", () => {
     });
 
     expect(
-      wrapper
-        .find(".filter-attribute")
-        .find(Select)
-        .prop("value")
+      wrapper.find(".filter-attribute").find(Select).prop("value")
     ).toEqual({
       label: "Specimen Number",
       value: TEST_SPECIMEN_NUMBER_FILTER
@@ -258,10 +249,7 @@ describe("FilterRow component", () => {
     });
 
     expect(
-      wrapper
-        .find(".filter-attribute")
-        .find(Select)
-        .prop("value")
+      wrapper.find(".filter-attribute").find(Select).prop("value")
     ).toEqual({
       label: "Specimen Replicate Version",
       value: TEST_REPLICATE_VERSION_FILTER
@@ -286,10 +274,7 @@ describe("FilterRow component", () => {
 
     // The field label should be "Group Name" instead of teh auto-generated "Group Group Name":
     expect(
-      wrapper
-        .find(".filter-attribute")
-        .find(Select)
-        .prop("value")
+      wrapper.find(".filter-attribute").find(Select).prop("value")
     ).toEqual({
       label: "Group Name",
       value: TEST_INTL_FIELD_NAME

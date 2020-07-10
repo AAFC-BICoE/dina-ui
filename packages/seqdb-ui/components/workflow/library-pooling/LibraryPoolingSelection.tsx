@@ -81,9 +81,9 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     }`
   };
 
-  const LIBRARY_PREP_BATCH_TABLE_COLUMNS: Array<ColumnDefinition<
+  const LIBRARY_PREP_BATCH_TABLE_COLUMNS: ColumnDefinition<
     LibraryPrepBatch
-  >> = [
+  >[] = [
     {
       Header: "Name",
       accessor: "name",
@@ -119,7 +119,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     }
   ];
 
-  const LIBRARY_POOL_TABLE_COLUMNS: Array<ColumnDefinition<LibraryPool>> = [
+  const LIBRARY_POOL_TABLE_COLUMNS: ColumnDefinition<LibraryPool>[] = [
     {
       Header: "Name",
       accessor: "name",
@@ -155,9 +155,9 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     }
   ];
 
-  const LIBRARY_POOL_CONTENTS_TABLE_COLUMNS: Array<ColumnDefinition<
+  const LIBRARY_POOL_CONTENTS_TABLE_COLUMNS: ColumnDefinition<
     LibraryPoolContent
-  >> = [
+  >[] = [
     {
       Cell: ({ original }) => {
         const lpc: LibraryPoolContent = original;
@@ -283,7 +283,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                   className="btn btn-primary select-all-checked-button"
                   onClick={selectAllCheckedItems}
                 >
-                  Select all checked pooling items -->
+                  Select all checked pooling items {"-->"}
                 </FormikButton>
               </div>
               <div className="col-6">

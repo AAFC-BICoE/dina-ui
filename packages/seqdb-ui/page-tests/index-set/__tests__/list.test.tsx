@@ -47,11 +47,8 @@ describe("Index set list page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(
-      wrapper
-        .find(".rt-tbody .rt-td")
-        .first()
-        .text()
-    ).toEqual("index set 1");
+    expect(wrapper.find(".rt-tbody .rt-td").first().text()).toEqual(
+      "index set 1"
+    );
   });
 });

@@ -4,7 +4,7 @@ import { ButtonBar, CreateButton, Head, Nav } from "../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 
-const PCRPROFILE_TABLE_COLUMNS: Array<ColumnDefinition<PcrProfile>> = [
+const PCRPROFILE_TABLE_COLUMNS: ColumnDefinition<PcrProfile>[] = [
   {
     accessor: "group.groupName"
   },

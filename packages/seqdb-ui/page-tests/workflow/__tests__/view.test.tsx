@@ -106,12 +106,9 @@ describe("Workflow view page", () => {
       "NGS Workflow: test workflow"
     );
 
-    expect(
-      wrapper
-        .find("h1")
-        .at(0)
-        .text()
-    ).toEqual("NGS Workflow: test workflow");
+    expect(wrapper.find("h1").at(0).text()).toEqual(
+      "NGS Workflow: test workflow"
+    );
 
     // Renders the step tabs:
     expect(wrapper.contains("Step 1: step number 1")).toEqual(true);

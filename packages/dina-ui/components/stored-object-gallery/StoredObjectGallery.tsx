@@ -10,7 +10,7 @@ interface StoredObjectGalleryProps {
   CheckBoxField: React.ComponentType<CheckBoxFieldProps<Metadata>>;
 
   /** The displayed Metadatas. */
-  metadatas: Array<PersistedResource<Metadata>>;
+  metadatas: PersistedResource<Metadata>[];
 
   /** Called when a Metadata is selected for preview. */
   onSelectPreviewMetadataId: (id: string) => void;

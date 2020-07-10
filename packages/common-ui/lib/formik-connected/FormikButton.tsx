@@ -1,4 +1,4 @@
-import { connect, FormikContext } from "formik";
+import { connect, FormikContextType } from "formik";
 import { LoadingSpinner, OnFormikSubmit, safeSubmit } from "..";
 
 interface FormikButtonProps {
@@ -7,7 +7,9 @@ interface FormikButtonProps {
   onClick: OnFormikSubmit;
 
   /** Override internal button props using the formik context. */
-  buttonProps?: (ctx: FormikContext<any>) => React.HTMLProps<HTMLButtonElement>;
+  buttonProps?: (
+    ctx: FormikContextType<any>
+  ) => React.HTMLProps<HTMLButtonElement>;
 }
 
 /**

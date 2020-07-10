@@ -8,10 +8,10 @@ COPY ./packages/dina-ui/package.json ./packages/dina-ui/package.json
 COPY ./packages/seqdb-ui/package.json ./packages/seqdb-ui/package.json
 COPY ./yarn.lock ./
 RUN yarn
-COPY ./ ./
+COPY ./packages/ ./packages/
 
 # dina-ui step:
-RUN yarn --cwd=/dina-ui/packages/dina-ui build
+RUN yarn --cwd=./packages/dina-ui build
 
 FROM caddy/caddy:2.0.0-alpine
 COPY --from=builder /dina-ui/packages/dina-ui/prod.Caddyfile /etc/caddy/Caddyfile

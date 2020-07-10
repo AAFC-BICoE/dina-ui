@@ -1,5 +1,5 @@
 import { ApiClientContext, OperationVerb } from "common-ui";
-import { FormikActions } from "formik";
+import { FormikContextType } from "formik";
 import { toPairs } from "lodash";
 import { useContext, useState } from "react";
 import {
@@ -20,7 +20,7 @@ export function useLibraryPoolingSelectionControls({
   const [lastSave, setLastSave] = useState<number>();
 
   async function selectPooledItems(
-    pooledItems: Array<LibraryPrepBatch | LibraryPool>
+    pooledItems: (LibraryPrepBatch | LibraryPool)[]
   ) {
     const newLibraryPoolContents = pooledItems.map<LibraryPoolContent>(
       item => ({
@@ -43,7 +43,7 @@ export function useLibraryPoolingSelectionControls({
 
   async function selectAllCheckedItems(
     formValues: LibraryPoolingSelectionFormValues,
-    formik: FormikActions<any>
+    formik: FormikContextType<any>
   ) {
     const { libraryPoolIdsToSelect, libraryPrepBatchIdsToSelect } = formValues;
 
@@ -95,7 +95,7 @@ export function useLibraryPoolingSelectionControls({
 
   async function deleteAllCheckedItems(
     formValues: LibraryPoolingSelectionFormValues,
-    formik: FormikActions<any>
+    formik: FormikContextType<any>
   ) {
     const { libraryPoolContentIdsToDelete } = formValues;
 

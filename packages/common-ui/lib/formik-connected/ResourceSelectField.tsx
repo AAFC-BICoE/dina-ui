@@ -11,7 +11,7 @@ export interface ResourceSelectFieldProps<TData extends KitsuResource>
   extends Omit<ResourceSelectProps<TData>, "value">,
     LabelWrapperParams {
   onChange?: (
-    value?: PersistedResource<TData> | Array<PersistedResource<TData>>
+    value?: PersistedResource<TData> | PersistedResource<TData>[]
   ) => void;
 }
 

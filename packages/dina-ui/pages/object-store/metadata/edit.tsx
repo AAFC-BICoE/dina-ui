@@ -187,7 +187,7 @@ export default function EditMetadatasPage() {
     return newTableData;
   }
 
-  async function onSubmit(changes: Array<RowChange<BulkMetadataEditRow>>) {
+  async function onSubmit(changes: RowChange<BulkMetadataEditRow>[]) {
     const editedMetadatas = changes.map<SaveArgs<Metadata>>(row => {
       const {
         changes: { acMetadataCreator, acTags, dcCreator, metadata },
@@ -276,7 +276,7 @@ export default function EditMetadatasPage() {
             ];
 
             return (
-              <Form>
+              <Form translate={undefined}>
                 <ResourceSelectField<ManagedAttribute>
                   className="col-2 editable-managed-attributes-select"
                   filter={filterBy(["name"])}

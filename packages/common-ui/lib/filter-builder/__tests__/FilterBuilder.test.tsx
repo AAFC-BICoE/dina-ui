@@ -108,11 +108,7 @@ describe("FilterBuilder component", () => {
 
     wrapper.find(".filter-row-buttons button.and").simulate("click");
 
-    wrapper
-      .find(FilterRow)
-      .at(1)
-      .find("button.or")
-      .simulate("click");
+    wrapper.find(FilterRow).at(1).find("button.or").simulate("click");
 
     expect(wrapper.find(FilterBuilder).state().model).toEqual({
       children: [
@@ -174,10 +170,7 @@ describe("FilterBuilder component", () => {
       .simulate("change", { target: { value: "second filter value" } });
 
     // Click the first filter row's button again.
-    wrapper
-      .find("button.and")
-      .first()
-      .simulate("click");
+    wrapper.find("button.and").first().simulate("click");
 
     // The blank filter row should be inserted between the two existing filter rows.
     expect(
@@ -212,10 +205,7 @@ describe("FilterBuilder component", () => {
       .simulate("change", { target: { value: "second filter value" } });
 
     // Click the first row's "-" button.
-    wrapper
-      .find("button[children='-']")
-      .first()
-      .simulate("click");
+    wrapper.find("button[children='-']").first().simulate("click");
 
     // The second filter row should be the only one left.
     expect(wrapper.find(FilterRow).length).toEqual(1);
@@ -235,18 +225,10 @@ describe("FilterBuilder component", () => {
     const wrapper = mountFilterBuilder();
 
     // Click the initial FilterRow's AND button.
-    wrapper
-      .find(FilterRow)
-      .at(0)
-      .find("button.and")
-      .simulate("click");
+    wrapper.find(FilterRow).at(0).find("button.and").simulate("click");
 
     // Click the second FilterRow's OR button.
-    wrapper
-      .find(FilterRow)
-      .at(1)
-      .find("button.or")
-      .simulate("click");
+    wrapper.find(FilterRow).at(1).find("button.or").simulate("click");
 
     // Click the third FilterRow's "-" button.
     wrapper

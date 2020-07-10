@@ -36,7 +36,7 @@ function getWrapper(propsOverride = {}) {
       onSubmit={noop}
     >
       {({ values: { testField } }) => (
-        <Form>
+        <Form translate={undefined}>
           <SelectField
             name="testField"
             options={PRIMER_TYPE_OPTIONS}
