@@ -7,7 +7,7 @@ import {
   TextField
 } from "common-ui";
 import { Form, Formik } from "formik";
-import { Product, Protocol } from "types/seqdb-api";
+import { Product, Protocol } from "../../../types/seqdb-api";
 import { useSeqdbIntl } from "../../../intl/seqdb-intl";
 
 interface PreLibraryPrepFormProps {
