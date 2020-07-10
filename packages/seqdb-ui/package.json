@@ -4,8 +4,6 @@
   "scripts": {
     "build": "run-s next:build next:export",
     "dev": "run-p next proxy",
-    "lint": "tslint --project tsconfig.json",
-    "lint:fix": "tslint --project tsconfig.json --fix",
     "next": "next",
     "next:build": "node --require ./next.config.js ./node_modules/.bin/next build",
     "next:export": "node --require ./next.config.js ./node_modules/.bin/next export",
@@ -51,15 +49,8 @@
     "enzyme-to-json": "^3.3.5",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^26.1.0",
-    "lint-staged": "^10.2.11",
     "npm-run-all": "^4.1.5",
-    "prettier": "^2.0.5",
-    "react-test-renderer": "^16.8.6",
-    "tslint": "^6.1.2",
-    "tslint-config-prettier": "^1.18.0",
-    "tslint-plugin-prettier": "^2.3.0",
-    "tslint-react": "^5.0.0",
-    "typescript": "^3.9.6"
+    "react-test-renderer": "^16.8.6"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

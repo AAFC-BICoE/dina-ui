@@ -8,18 +8,35 @@
   },
   "scripts": {
     "docs": "asciidoctor -a copycss -a toc=left --safe-mode unsafe --destination-dir ./generated-docs ./docs/index.adoc",
-    "lint": "yarn workspaces run lint",
-    "lint:fix": "yarn workspaces run lint:fix",
+    "lint": "tslint --project tsconfig.json",
+    "lint:fix": "tslint --project tsconfig.json --fix",
     "test": "yarn workspaces run test",
     "test:coverage": "yarn workspaces run test:coverage"
   },
   "devDependencies": {
     "asciidoctor": "^2.0.3",
-    "husky": "^3.0.9"
+    "husky": "^3.0.9",
+    "lint-staged": "^10.2.11",
+    "prettier": "^2.0.5",
+    "tslint": "^6.1.2",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.3.0",
+    "tslint-react": "^5.0.0",
+    "typescript": "^3.9.6"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn workspaces run lint-staged"
+      "pre-commit": "yarn lint-staged"
     }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "tslint --project tsconfig.json --fix",
+      "git add"
+    ],
+    "*.{js,jsx,css,json,md}": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }
