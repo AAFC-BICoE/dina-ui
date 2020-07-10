@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "main": "lib/index.ts",
   "scripts": {
+    "lint": "tslint --project tsconfig.json",
+    "lint:fix": "tslint --project tsconfig.json --fix",
     "test": "tsc && jest",
     "test:coverage": "tsc && jest --coverage"
   },

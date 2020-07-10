@@ -8,8 +8,8 @@
   },
   "scripts": {
     "docs": "asciidoctor -a copycss -a toc=left --safe-mode unsafe --destination-dir ./generated-docs ./docs/index.adoc",
-    "lint": "tslint --project tsconfig.json",
-    "lint:fix": "tslint --project tsconfig.json --fix",
+    "lint": "yarn workspaces run lint",
+    "lint:fix": "yarn workspaces run lint:fix",
     "test": "yarn workspaces run test",
     "test:coverage": "yarn workspaces run test:coverage"
   },
