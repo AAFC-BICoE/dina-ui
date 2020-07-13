@@ -1,7 +1,7 @@
 // tslint:disable: no-string-literal
 import {
   ApiClientContext,
-  DateField,
+  ButtonBar,
   DeleteButton,
   ErrorViewer,
   FieldWrapper,
@@ -129,18 +129,21 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form translate={undefined}>
         <ErrorViewer />
-        <SubmitButton />
-        <DeleteButton
-          id={id}
-          options={{ apiBaseUrl: "/objectstore-api" }}
-          postDeleteRedirect="/object-store/managedAttributesView/listView"
-          type="managed-attribute"
-        />
-        <Link href="/object-store/managedAttributesView/listView">
-          <a className="btn btn-primary">
-            <DinaMessage id="cancelButtonText" />
-          </a>
-        </Link>
+        <ButtonBar>
+          <SubmitButton />
+          <Link href="/object-store/managedAttributesView/listView">
+            <a className="btn btn-dark">
+              <DinaMessage id="cancelButtonText" />
+            </a>
+          </Link>
+          <DeleteButton
+            className="ml-5"
+            id={id}
+            options={{ apiBaseUrl: "/objectstore-api" }}
+            postDeleteRedirect="/object-store/managedAttributesView/listView"
+            type="managed-attribute"
+          />
+        </ButtonBar>
         <div style={{ width: "300px" }}>
           <h4>
             <DinaMessage id="field_managedAttributeName" />

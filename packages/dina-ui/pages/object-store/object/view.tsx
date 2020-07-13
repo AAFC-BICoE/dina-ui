@@ -73,13 +73,14 @@ export default function MetadataViewPage() {
               <DinaMessage id="editButtonText" />
             </a>
           </Link>
+          <BackToListButton entityLink="/object-store/object" />
           <DeleteButton
+            className="ml-5"
             id={id}
             options={{ apiBaseUrl: "/objectstore-api" }}
             postDeleteRedirect="/object-store/object/list"
             type="metadata"
           />
-          <BackToListButton entityLink="/object-store/object" />
         </ButtonBar>
         <style>{OBJECT_DETAILS_PAGE_CSS}</style>
         <div className="container-fluid">

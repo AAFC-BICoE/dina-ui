@@ -88,16 +88,17 @@ function PersonForm({ person, router }: PersonFormProps) {
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />
-          <DeleteButton
-            id={id as string}
-            options={{ apiBaseUrl: "/agent-api" }}
-            postDeleteRedirect="/person/list"
-            type="person"
-          />
           <CancelButton
             entityId={id as string}
             entityLink="/person"
             byPassView={true}
+          />
+          <DeleteButton
+            className="ml-5"
+            id={id as string}
+            options={{ apiBaseUrl: "/agent-api" }}
+            postDeleteRedirect="/person/list"
+            type="person"
           />
         </ButtonBar>
         <div>
