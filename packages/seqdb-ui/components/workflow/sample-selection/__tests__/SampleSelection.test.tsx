@@ -19,9 +19,9 @@ const TEST_SAMPLES = [
   { id: "3", type: "sample", name: "test sample 3" },
   { id: "4", type: "sample", name: "test sample 4" },
   { id: "5", type: "sample", name: "test sample 5" }
-] as Array<PersistedResource<Sample>>;
+] as PersistedResource<Sample>[];
 
-const TEST_STEP_RESOURCES: Array<PersistedResource<StepResource>> = [
+const TEST_STEP_RESOURCES: PersistedResource<StepResource>[] = [
   { id: "1", sample: TEST_SAMPLES[0] } as PersistedResource<StepResource>,
   { id: "2", sample: TEST_SAMPLES[1] } as PersistedResource<StepResource>,
   { id: "3", sample: TEST_SAMPLES[2] } as PersistedResource<StepResource>,
@@ -118,10 +118,7 @@ describe("Sample Selection UI", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    wrapper
-      .find(".single-select-button")
-      .at(0)
-      .simulate("click");
+    wrapper.find(".single-select-button").at(0).simulate("click");
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -248,10 +245,7 @@ describe("Sample Selection UI", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    wrapper
-      .find(".single-deselect-button")
-      .at(0)
-      .simulate("click");
+    wrapper.find(".single-deselect-button").at(0).simulate("click");
 
     await new Promise(setImmediate);
     wrapper.update();

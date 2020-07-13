@@ -1,4 +1,4 @@
-http://:80
+http://:8080
 
 # Proxy to the front-end:
 reverse_proxy / {$UI_DEV_SERVER_ADDRESS}

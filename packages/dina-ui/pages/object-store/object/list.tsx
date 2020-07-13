@@ -5,11 +5,13 @@ import {
   ColumnDefinition,
   FormikButton,
   ListPageLayout,
+  SelectField,
   SplitPagePanel,
+  useAccount,
   useGroupedCheckBoxes,
   useModal
 } from "common-ui";
-import { Form, Formik, FormikContext } from "formik";
+import { Form, Formik, FormikContextType } from "formik";
 import { noop, toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -33,6 +35,7 @@ export interface MetadataListFormValues {
 
 export default function MetadataListPage() {
   const { formatMessage } = useDinaIntl();
+  const { groupNames } = useAccount();
 
   const {
     CheckBoxField,
@@ -60,7 +63,7 @@ export default function MetadataListPage() {
     "dcRights"
   ];
 
-  const METADATA_TABLE_COLUMNS: Array<ColumnDefinition<Metadata>> = [
+  const METADATA_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
     {
       Cell: ({ original: metadata }) => (
         <CheckBoxField key={metadata.id} resource={metadata} />
@@ -74,7 +77,7 @@ export default function MetadataListPage() {
     "xmpMetadataDate",
     "acMetadataCreator.displayName",
     {
-      Cell: ({ original: { acTags } }) => acTags?.join(", "),
+      Cell: ({ original: { acTags } }) => <>{acTags?.join(", ")}</>,
       accessor: "acTags"
     },
     {
@@ -90,6 +93,14 @@ export default function MetadataListPage() {
       Header: "",
       sortable: false
     }
+  ];
+
+  const groupSelectOptions = [
+    { label: "<any>", value: undefined },
+    ...(groupNames ?? []).map(group => ({
+      label: group,
+      value: group
+    }))
   ];
 
   // Workaround to make sure react-table doesn't unmount TBodyComponent
@@ -135,8 +146,22 @@ export default function MetadataListPage() {
             <SplitPagePanel>
               <ListPageLayout<Metadata>
                 // Filter out the derived objects e.g. thumbnails:
-                additionalFilters={{ rsql: "acSubTypeId==null" }}
+                additionalFilters={filterForm => ({
+                  ...(filterForm.group && { bucket: filterForm.group }),
+                  rsql: "acSubTypeId==null"
+                })}
                 filterAttributes={METADATA_FILTER_ATTRIBUTES}
+                filterFormchildren={({ submitForm }) => (
+                  <div className="form-group">
+                    <div style={{ width: "300px" }}>
+                      <SelectField
+                        onChange={() => setImmediate(submitForm)}
+                        name="group"
+                        options={groupSelectOptions}
+                      />
+                    </div>
+                  </div>
+                )}
                 id="metadata-list"
                 queryTableProps={{
                   columns: METADATA_TABLE_COLUMNS,
@@ -222,7 +247,7 @@ export default function MetadataListPage() {
 }
 
 /** Common button props for the bulk edit/delete buttons */
-function bulkButtonProps(ctx: FormikContext<MetadataListFormValues>) {
+function bulkButtonProps(ctx: FormikContextType<MetadataListFormValues>) {
   return {
     // Disable the button if none are selected:
     disabled: !Object.values(ctx.values.selectedMetadatas).reduce(
@@ -243,7 +268,7 @@ function MetadataListWrapper({ children }) {
       initialValues={{ selectedMetadatas: {} }}
       onSubmit={noop}
     >
-      <Form>
+      <Form translate={undefined}>
         <div style={{ height: "1rem" }}>
           <div className="float-right">
             <BulkDeleteButton />

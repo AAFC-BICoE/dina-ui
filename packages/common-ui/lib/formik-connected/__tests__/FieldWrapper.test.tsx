@@ -2,6 +2,7 @@ import { mount } from "enzyme";
 import { IntlProvider } from "react-intl";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { FieldWrapper } from "../FieldWrapper";
+import titleCase from "title-case";
 
 describe("FieldWrapper component.", () => {
   it("Adds a generated title-case label to the wrapped component.", () => {

@@ -42,7 +42,7 @@ export default function ExampleFormPage() {
   return (
     <div className="card card-body" style={{ width: "1000px" }}>
       <Formik initialValues={{}} onSubmit={onSubmit}>
-        <Form>
+        <Form translate={undefined}>
           <ErrorViewer />
           <TextField name="name" />
           <TextField name="description" />

@@ -50,10 +50,10 @@ export class FilterRow extends React.Component<FilterRowProps> {
       showRemoveButton
     } = this.props;
 
-    const searchTypes: Array<{
+    const searchTypes: {
       label: React.ReactNode;
       value: FilterRowSearchType;
-    }> = [
+    }[] = [
       {
         label: <CommonMessage id="filterPartialMatch" />,
         value: "PARTIAL_MATCH"

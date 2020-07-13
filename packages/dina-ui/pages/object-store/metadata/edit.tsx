@@ -187,7 +187,7 @@ export default function EditMetadatasPage() {
     return newTableData;
   }
 
-  async function onSubmit(changes: Array<RowChange<BulkMetadataEditRow>>) {
+  async function onSubmit(changes: RowChange<BulkMetadataEditRow>[]) {
     const editedMetadatas = changes.map<SaveArgs<Metadata>>(row => {
       const {
         changes: { acMetadataCreator, acTags, dcCreator, metadata },
@@ -253,49 +253,47 @@ export default function EditMetadatasPage() {
   }
 
   return (
-    <div>
-      <div className="container-fluid">
-        <Head title={formatMessage("metadataBulkEditTitle")} />
-        <Nav />
-        <h2>
-          <DinaMessage id="metadataBulkEditTitle" />
-        </h2>
-        <div className="form-group">
-          <Formik<FormControls>
-            enableReinitialize={true}
-            initialValues={{
-              editableManagedAttributes: initialEditableManagedAttributes
-            }}
-            onSubmit={noop}
-          >
-            {controlsForm => {
-              const columns = [
-                ...DEFAULT_COLUMNS,
-                ...managedAttributeColumns(
-                  controlsForm.values.editableManagedAttributes
-                )
-              ];
+    <div className="container-fluid">
+      <Head title={formatMessage("metadataBulkEditTitle")} />
+      <Nav />
+      <h2>
+        <DinaMessage id="metadataBulkEditTitle" />
+      </h2>
+      <div className="form-group">
+        <Formik<FormControls>
+          enableReinitialize={true}
+          initialValues={{
+            editableManagedAttributes: initialEditableManagedAttributes
+          }}
+          onSubmit={noop}
+        >
+          {controlsForm => {
+            const columns = [
+              ...DEFAULT_COLUMNS,
+              ...managedAttributeColumns(
+                controlsForm.values.editableManagedAttributes
+              )
+            ];
 
-              return (
-                <Form>
-                  <ResourceSelectField<ManagedAttribute>
-                    className="col-2 editable-managed-attributes-select"
-                    filter={filterBy(["name"])}
-                    name="editableManagedAttributes"
-                    isMulti={true}
-                    model="objectstore-api/managed-attribute"
-                    optionLabel={attr => attr.name}
-                  />
-                  <BulkDataEditor
-                    columns={columns}
-                    loadData={loadData}
-                    onSubmit={onSubmit}
-                  />
-                </Form>
-              );
-            }}
-          </Formik>
-        </div>
+            return (
+              <Form translate={undefined}>
+                <ResourceSelectField<ManagedAttribute>
+                  className="col-2 editable-managed-attributes-select"
+                  filter={filterBy(["name"])}
+                  name="editableManagedAttributes"
+                  isMulti={true}
+                  model="objectstore-api/managed-attribute"
+                  optionLabel={attr => attr.name}
+                />
+                <BulkDataEditor
+                  columns={columns}
+                  loadData={loadData}
+                  onSubmit={onSubmit}
+                />
+              </Form>
+            );
+          }}
+        </Formik>
       </div>
       <Footer />
     </div>

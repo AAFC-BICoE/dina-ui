@@ -276,7 +276,7 @@ function LibraryPrepGrid({ libraryPrepBatch, preps }: LibraryPrepTableProps) {
         <tr>
           <td />
           {columnNumbers.map(num => (
-            <td>{num}</td>
+            <td key={num}>{num}</td>
           ))}
         </tr>
         {rowLetters.map(rowLetter => (

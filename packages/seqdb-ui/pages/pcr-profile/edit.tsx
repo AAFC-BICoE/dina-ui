@@ -86,7 +86,7 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
 
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      <Form>
+      <Form translate={undefined}>
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />
