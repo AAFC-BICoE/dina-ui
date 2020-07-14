@@ -14,7 +14,7 @@ import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
-import { Person } from "types/objectstore-api/resources/Person";
+import { Person } from "../../types/objectstore-api/resources/Person";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
