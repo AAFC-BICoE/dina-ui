@@ -1,0 +1,14 @@
+http://:8080
+
+# Proxy to the front-end:
+reverse_proxy / {$UI_DEV_SERVER_ADDRESS}
+reverse_proxy /favicon.ico {$UI_DEV_SERVER_ADDRESS}
+reverse_proxy /_next/* {$UI_DEV_SERVER_ADDRESS}
+reverse_proxy /* {$UI_DEV_SERVER_ADDRESS}
+
+# Proxy to the back-end SeqDB API:
+route /api/* {
+  # For demo purposes, automatically authenticate against the REST API as Admin:Admin
+  request_header Authorization "Basic QWRtaW46QWRtaW4="
+	reverse_proxy {$API_ADDRESS}
+}

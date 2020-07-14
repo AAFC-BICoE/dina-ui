@@ -4,11 +4,12 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface DateFieldProps {
   showTime?: boolean;
+  disabled?: boolean;
 }
 
 /** Formik-connected date input. */
 export function DateField(props: LabelWrapperParams & DateFieldProps) {
-  const { name, showTime } = props;
+  const { name, showTime, disabled } = props;
 
   return (
     <FieldWrapper {...props}>
@@ -43,6 +44,7 @@ export function DateField(props: LabelWrapperParams & DateFieldProps) {
                 showTimeSelect={showTime}
                 showYearDropdown={true}
                 todayButton="Today"
+                disabled={disabled}
               />
             </div>
           );

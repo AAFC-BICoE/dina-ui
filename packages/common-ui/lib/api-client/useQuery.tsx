@@ -1,10 +1,11 @@
 import { DocWithErrors } from "jsonapi-typescript";
 import { GetParams, KitsuResponse, KitsuResponseData } from "kitsu";
-import { isUndefined, omitBy } from "lodash";
-import { ReactNode, useCallback, useContext, useRef } from "react";
+import { isArray, isUndefined, omitBy } from "lodash";
+import { useCallback, useContext, useRef } from "react";
 import { useAsyncRun, useAsyncTask } from "react-hooks-async";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { ApiClientContext } from "./ApiClientContext";
+import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
 
 /** Attributes that compose a JsonApi query. */
 export interface JsonApiQuerySpec extends GetParams {
@@ -25,6 +26,9 @@ export interface QueryOptions<TData extends KitsuResponseData, TMeta> {
 
   /** onSuccess callback. */
   onSuccess?: (response: KitsuResponse<TData, TMeta>) => void;
+
+  /** Client-side joins across multiple back-end APIs. */
+  joinSpecs?: ClientSideJoinSpec[];
 }
 
 /**
@@ -33,16 +37,16 @@ export interface QueryOptions<TData extends KitsuResponseData, TMeta> {
  */
 export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   querySpec: JsonApiQuerySpec,
-  options: QueryOptions<TData, TMeta> = {}
+  { deps, joinSpecs, onSuccess }: QueryOptions<TData, TMeta> = {}
 ): QueryState<TData, TMeta> {
-  const { apiClient } = useContext(ApiClientContext);
+  const { apiClient, bulkGet } = useContext(ApiClientContext);
 
   const previousResponseRef = useRef<KitsuResponse<TData, TMeta> | undefined>(
     undefined
   );
 
   // Memoize the callback. Only re-create it when the query spec changes.
-  const fetchData = useCallback(() => {
+  const fetchData = useCallback(async () => {
     // Omit undefined values from the GET params, which would otherwise cause an invalid request.
     // e.g. /api/region?fields=undefined
     const { path, fields, filter, sort, include, page } = querySpec;
@@ -52,11 +56,23 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
     );
 
     const request = apiClient.get<TData, TMeta>(path, getParams);
-    if (options.onSuccess) {
-      request.then(options.onSuccess);
+    if (onSuccess) {
+      request.then(onSuccess);
     }
-    return request;
-  }, [JSON.stringify(querySpec), ...(options.deps ? options.deps : [])]);
+
+    const response = await request;
+
+    if (joinSpecs) {
+      const { data } = response;
+      const resources = isArray(data) ? data : [data];
+
+      for (const joinSpec of joinSpecs) {
+        await new ClientSideJoiner(bulkGet, resources, joinSpec).join();
+      }
+    }
+
+    return response;
+  }, [JSON.stringify(querySpec), ...(deps ?? [])]);
 
   // fetchData function should re-run when the query spec changes.
   const task = useAsyncTask(fetchData);
@@ -74,7 +90,7 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   };
 }
 
-/** Only render if there is a response, otherwise show generic loading and error states. */
+/** Only render if there is a response, otherwise show generic 'loading' or 'error' indicators. */
 export function withResponse<
   TData extends KitsuResponseData,
   TMeta = undefined
@@ -86,7 +102,11 @@ export function withResponse<
     return <LoadingSpinner loading={true} />;
   }
   if (error) {
-    return <div className="alert alert-danger">{status}</div>;
+    return (
+      <div className="alert alert-danger">
+        {error?.errors?.map(e => e.detail).join("\n")}
+      </div>
+    );
   }
   if (response) {
     return responseRenderer(response);

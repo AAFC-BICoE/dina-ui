@@ -77,13 +77,12 @@ describe("Workflow edit page.", () => {
       type: "chainTemplate"
     });
 
-    (wrapper
-      .find(".group-field")
-      .find(ResourceSelect)
-      .prop("onChange") as any)({
-      id: "200",
-      type: "group"
-    });
+    (wrapper.find(".group-field").find(ResourceSelect).prop("onChange") as any)(
+      {
+        id: "200",
+        type: "group"
+      }
+    );
 
     wrapper.find(".name-field input").simulate("change", {
       target: { name: "name", value: "New Workflow" }
@@ -97,7 +96,7 @@ describe("Workflow edit page.", () => {
     const today = new Date().toISOString().split("T")[0];
 
     expect(mockPatch).lastCalledWith(
-      "operations",
+      "/operations",
       [
         {
           op: "POST",

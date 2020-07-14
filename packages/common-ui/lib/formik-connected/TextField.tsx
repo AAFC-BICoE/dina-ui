@@ -34,7 +34,7 @@ export function TextField(props: TextFieldProps) {
               className="form-control"
               onChange={onChange}
               type="text"
-              value={initialValue || value || ""}
+              value={value || ""}
               readOnly={readOnly}
             />
           );

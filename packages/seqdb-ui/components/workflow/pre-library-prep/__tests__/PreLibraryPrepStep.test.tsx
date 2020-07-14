@@ -21,9 +21,9 @@ const TEST_SAMPLES = [
   { id: "3", type: "sample", name: "test sample 3" },
   { id: "4", type: "sample", name: "test sample 4" },
   { id: "5", type: "sample", name: "test sample 5" }
-] as Array<PersistedResource<Sample>>;
+] as PersistedResource<Sample>[];
 
-const TEST_SAMPLE_STEP_RESOURCES: Array<PersistedResource<StepResource>> = [
+const TEST_SAMPLE_STEP_RESOURCES: PersistedResource<StepResource>[] = [
   {
     id: "1",
     sample: TEST_SAMPLES[0],
@@ -297,7 +297,7 @@ describe("PreLibraryPrepStep UI", () => {
 
     // There should have been 3 preps created.
     expect(prepCall).toEqual([
-      "operations",
+      "/operations",
       [
         {
           op: "POST",
@@ -383,7 +383,7 @@ describe("PreLibraryPrepStep UI", () => {
 
     // There should have been 3 step resources created.
     expect(stepResourceCall).toEqual([
-      "operations",
+      "/operations",
       [
         {
           op: "POST",
@@ -615,7 +615,7 @@ describe("PreLibraryPrepStep UI", () => {
 
     // There should have been two PATCH operations and one POST operation.
     expect(prepCall).toEqual([
-      "operations",
+      "/operations",
       [
         // The existing ones:
         {
@@ -661,7 +661,7 @@ describe("PreLibraryPrepStep UI", () => {
 
     // Only one stepResource should have been created: for the new preLibraryPrep
     expect(stepResourceCall).toEqual([
-      "operations",
+      "/operations",
       [
         {
           op: "POST",
@@ -720,8 +720,8 @@ describe("PreLibraryPrepStep UI", () => {
 
     // There should have been two empty operations calls.
     expect(mockPatch.mock.calls).toEqual([
-      ["operations", [], expect.anything()],
-      ["operations", [], expect.anything()]
+      ["/operations", [], expect.anything()],
+      ["/operations", [], expect.anything()]
     ]);
   });
 
@@ -739,7 +739,7 @@ describe("PreLibraryPrepStep UI", () => {
 
     // There should have been one empty operations call.
     expect(mockPatch.mock.calls).toEqual([
-      ["operations", [], expect.anything()]
+      ["/operations", [], expect.anything()]
     ]);
   });
 
@@ -757,7 +757,7 @@ describe("PreLibraryPrepStep UI", () => {
 
     // There should have been one empty operations call.
     expect(mockPatch.mock.calls).toEqual([
-      ["operations", [], expect.anything()]
+      ["/operations", [], expect.anything()]
     ]);
   });
 
@@ -904,7 +904,7 @@ describe("PreLibraryPrepStep UI", () => {
 
     expect(mockPatch).toHaveBeenCalledTimes(1);
     expect(mockPatch).lastCalledWith(
-      "operations",
+      "/operations",
       [
         { op: "DELETE", path: "stepResource/100" },
         { op: "DELETE", path: "preLibraryPrep/200" }

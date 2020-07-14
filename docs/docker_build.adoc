@@ -4,16 +4,17 @@ From the top-level directory, run the docker build:
 
 [source,bash]
 ----
-docker build -f objectstore-ui.Dockerfile -t objectstore-ui:tag.
-docker build -f seqdb-ui.Dockerfile -t seqdb-ui:tag.
+docker build -f Dockerfile -t dina-ui:tag .
+docker build -f seqdb-ui.Dockerfile -t seqdb-ui:tag .
 ----
 
 
 Docker environment variables required to run:
 
-objectstore-ui:
+dina-ui:
 
 * OBJECTSTORE_API_ADDRESS: The back-end API URL and port. e.g. objectstore-api:8080
+* AGENT_API_ADDRESS: The back-end API URL and port. e.g. agent-api:8080
 
 seqdb-ui:
 

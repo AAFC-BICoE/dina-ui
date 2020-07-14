@@ -62,7 +62,7 @@ export function LibraryPoolDetailsForm({
 
   return (
     <Formik initialValues={libraryPool || {}} onSubmit={onSubmit}>
-      <Form>
+      <Form translate={undefined}>
         <h2>Library Pool</h2>
         <ErrorViewer />
         <div className="row">

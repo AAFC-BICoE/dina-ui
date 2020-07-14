@@ -98,28 +98,13 @@ describe("IndexGrid component", () => {
     wrapper.update();
 
     expect(
-      wrapper
-        .find(".rt-tbody .rt-tr")
-        .at(1)
-        .find(".rt-td")
-        .at(2)
-        .text()
+      wrapper.find(".rt-tbody .rt-tr").at(1).find(".rt-td").at(2).text()
     ).toEqual("SAMP1");
     expect(
-      wrapper
-        .find(".rt-tbody .rt-tr")
-        .at(1)
-        .find(".rt-td")
-        .at(3)
-        .text()
+      wrapper.find(".rt-tbody .rt-tr").at(1).find(".rt-td").at(3).text()
     ).toEqual("SAMP2" + "i5: test index 1" + "i7: test index 2");
     expect(
-      wrapper
-        .find(".rt-tbody .rt-tr")
-        .at(2)
-        .find(".rt-td")
-        .at(3)
-        .text()
+      wrapper.find(".rt-tbody .rt-tr").at(2).find(".rt-td").at(3).text()
     ).toEqual("SAMP4");
   });
 

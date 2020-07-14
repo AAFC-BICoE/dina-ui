@@ -1,6 +1,9 @@
 import { Form, Formik } from "formik";
 import { noop } from "lodash";
-import ReactDatePicker from "react-datepicker";
+import {
+  default as DatePicker,
+  default as ReactDatePicker
+} from "react-datepicker";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DateField } from "../DateField";
 
@@ -13,7 +16,7 @@ describe("DateField component", () => {
         }}
         onSubmit={noop}
       >
-        <Form>
+        <Form translate={undefined}>
           <DateField name="testField" />
         </Form>
       </Formik>
@@ -39,7 +42,11 @@ describe("DateField component", () => {
     const { onChange } = wrapper.find(ReactDatePicker).props();
 
     onChange(new Date("2019-05-25T12:00:00Z"), undefined);
-    expect(wrapper.find(Formik).state().values.testField).toEqual("2019-05-25");
+    wrapper.update();
+
+    expect(wrapper.find(DatePicker).prop("selected")).toEqual(
+      new Date("2019-05-25T12:00:00.000Z")
+    );
   });
 
   it("Can set the date field to null.", () => {
@@ -47,6 +54,8 @@ describe("DateField component", () => {
     const { onChange } = wrapper.find(ReactDatePicker).props();
 
     onChange(null, undefined);
-    expect(wrapper.find(Formik).state().values.testField).toEqual(null);
+    wrapper.update();
+
+    expect(wrapper.find(DatePicker).prop("selected")).toEqual(null);
   });
 });

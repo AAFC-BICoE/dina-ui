@@ -2,7 +2,6 @@ import { intlContext, LanguageSelector } from "common-ui";
 import Link from "next/link";
 import React, { useContext } from "react";
 import { SeqdbMessage } from "../../intl/seqdb-intl";
-import "./nav.css";
 
 export function Nav() {
   return (

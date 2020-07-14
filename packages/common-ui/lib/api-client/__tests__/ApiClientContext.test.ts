@@ -1,7 +1,11 @@
 import { AxiosRequestConfig } from "axios";
 import Kitsu from "kitsu";
 import { createContextValue } from "../ApiClientContext";
-import { Operation, OperationsResponse } from "../operations-types";
+import {
+  FailedOperation,
+  Operation,
+  OperationsResponse
+} from "../operations-types";
 
 interface TestPcrPrimer {
   name: string;
@@ -151,7 +155,7 @@ describe("API client context", () => {
     expect(mockPatch).toHaveBeenCalledTimes(1);
     const [patchCall] = mockPatch.mock.calls;
     expect(patchCall).toEqual([
-      "operations",
+      "/operations",
       TODO_INSERT_OPERATION,
       AXIOS_JSONPATCH_REQUEST_CONFIG
     ]);
@@ -224,7 +228,7 @@ Constraint violation: description size must be between 1 and 10`;
 
     // Expect correct patch args.
     expect(mockPatch).lastCalledWith(
-      "operations",
+      "/operations",
       [
         {
           op: "POST",
@@ -316,7 +320,7 @@ Constraint violation: description size must be between 1 and 10`;
     ]);
 
     expect(mockPatch).lastCalledWith(
-      "operations",
+      "/operations",
       [
         {
           op: "PATCH",
@@ -380,7 +384,7 @@ Constraint violation: description size must be between 1 and 10`;
 
     // Bulk-requests by ID:
     expect(mockPatch).lastCalledWith(
-      "operations",
+      "/operations",
       [
         { op: "GET", path: "pcrPrimer/123" },
         { op: "GET", path: "pcrPrimer/124" }
@@ -392,6 +396,38 @@ Constraint violation: description size must be between 1 and 10`;
     expect(response).toEqual([
       { id: "123", name: "primer 123", type: "pcrPrimer" },
       { id: "124", name: "primer 124", type: "pcrPrimer" }
+    ]);
+  });
+
+  it("bulkGet can return null entries instead of throwing errors on 404 responses.", async () => {
+    mockPatch.mockImplementationOnce(() => ({
+      data: [
+        {
+          data: {
+            attributes: { name: "primer 123" },
+            id: "123",
+            type: "pcrPrimer"
+          },
+          status: 201
+        },
+        {
+          errors: [],
+          status: 404
+        }
+      ]
+    }));
+
+    const response = await bulkGet(["primer/123", "primer/000"], {
+      returnNullForMissingResource: true
+    });
+
+    expect(response).toEqual([
+      {
+        id: "123",
+        name: "primer 123",
+        type: "pcrPrimer"
+      },
+      null
     ]);
   });
 });

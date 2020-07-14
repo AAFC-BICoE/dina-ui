@@ -5,6 +5,7 @@ import {
   createContextValue
 } from "../api-client/ApiClientContext";
 import { CommonUIIntlProvider } from "../intl/common-ui-intl";
+import { ModalProvider } from "../modal/modal";
 
 interface MockAppContextProviderProps {
   apiContext?: ApiClientContextI;
@@ -21,7 +22,11 @@ export function MockAppContextProvider({
 }: MockAppContextProviderProps) {
   return (
     <ApiClientContext.Provider value={apiContext || createContextValue()}>
-      <CommonUIIntlProvider>{children}</CommonUIIntlProvider>
+      <CommonUIIntlProvider>
+        <ModalProvider appElement={document.querySelector("body")}>
+          {children}
+        </ModalProvider>
+      </CommonUIIntlProvider>
     </ApiClientContext.Provider>
   );
 }

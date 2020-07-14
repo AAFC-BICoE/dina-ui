@@ -5,6 +5,7 @@ import { useIntl } from "react-intl";
 import ReactTable, { Column, SortingRule, TableProps } from "react-table";
 import titleCase from "title-case";
 import {
+  ClientSideJoinSpec,
   JsonApiQuerySpec,
   LimitOffsetPageSpec,
   MetaWithTotal,
@@ -40,7 +41,10 @@ export interface QueryTableProps<TData extends KitsuResource> {
   defaultPageSize?: number;
 
   /** The columns to show in the table. */
-  columns: Array<ColumnDefinition<TData>>;
+  columns: ColumnDefinition<TData>[];
+
+  /** Client-side joins across multiple back-end APIs. */
+  joinSpecs?: ClientSideJoinSpec[];
 
   /** Overrides the inner loading state if set to true. */
   loading?: boolean;
@@ -84,6 +88,7 @@ export function QueryTable<TData extends KitsuResource>({
   fields,
   filter,
   include,
+  joinSpecs,
   loading: loadingProp,
   onSuccess,
   path,
@@ -161,6 +166,7 @@ export function QueryTable<TData extends KitsuResource>({
 
   const queryState = useQuery<TData[], MetaWithTotal>(query, {
     deps,
+    joinSpecs,
     onSuccess
   });
 
@@ -186,7 +192,7 @@ export function QueryTable<TData extends KitsuResource>({
           style={{ position: "absolute", zIndex: 1 }}
         >
           <p>Error:</p>
-          <p>{error.errors.map(e => e.detail).join("\n")}</p>
+          <p>{error?.errors?.map(e => e.detail).join("\n")}</p>
         </div>
       )}
       <span>
@@ -204,7 +210,7 @@ export function QueryTable<TData extends KitsuResource>({
         TdComponent={DefaultTd}
         className="-striped"
         columns={mappedColumns}
-        data={response && response.data}
+        data={response?.data}
         defaultPageSize={page.limit}
         defaultSorted={sortingRules}
         loading={loadingProp || queryIsLoading}

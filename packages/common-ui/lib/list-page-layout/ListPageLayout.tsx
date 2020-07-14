@@ -1,4 +1,5 @@
 import { useLocalStorage } from "@rehooks/local-storage";
+import { FormikProps } from "formik";
 import { FilterParam, KitsuResource } from "kitsu";
 import { Fragment, ReactNode, useEffect } from "react";
 import { SortingRule } from "react-table";
@@ -7,7 +8,9 @@ import { rsql } from "../filter-builder/rsql";
 import { FilterForm } from "./FilterForm";
 
 interface ListPageLayoutProps<TData extends KitsuResource> {
+  additionalFilters?: FilterParam | ((filterForm: any) => FilterParam);
   filterAttributes?: string[];
+  filterFormchildren?: (formik: FormikProps<any>) => React.ReactElement;
   id: string;
   queryTableProps: QueryTableProps<TData>;
   WrapTable?: React.ComponentType;
@@ -18,7 +21,9 @@ interface ListPageLayoutProps<TData extends KitsuResource> {
  * The filter form state is hydrated from localstorage, and is saved in localstorage on form submit.
  */
 export function ListPageLayout<TData extends KitsuResource>({
+  additionalFilters: additionalFiltersProp,
   filterAttributes,
+  filterFormchildren,
   id,
   queryTableProps,
   WrapTable = Fragment
@@ -40,15 +45,31 @@ export function ListPageLayout<TData extends KitsuResource>({
     tablePageSizeKey
   );
 
+  const filterBuilderRsql = rsql(filterForm.filterBuilderModel);
+
+  const additionalFilters =
+    typeof additionalFiltersProp === "function"
+      ? additionalFiltersProp(filterForm)
+      : additionalFiltersProp;
+
+  // Combine the inner rsql with the passed additionalFilters?.rsql filter if they are set:
+  const combinedRsql = [
+    ...(filterBuilderRsql ? [filterBuilderRsql] : []),
+    ...(additionalFilters?.rsql ? [additionalFilters?.rsql] : [])
+  ].join(" and ");
+
   // Build the JSONAPI filter param to be sent to the back-end.
   const filterParam: FilterParam = {
-    rsql: rsql(filterForm.filterBuilderModel)
+    ...additionalFilters,
+    rsql: combinedRsql
   };
 
   return (
     <div>
       {filterAttributes && (
-        <FilterForm filterAttributes={filterAttributes} id={id} />
+        <FilterForm filterAttributes={filterAttributes} id={id}>
+          {filterFormchildren}
+        </FilterForm>
       )}
       <WrapTable>
         <QueryTable<TData>

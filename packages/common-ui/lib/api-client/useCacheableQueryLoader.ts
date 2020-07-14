@@ -16,7 +16,7 @@ interface QueryKey {
 export function useCacheableQueryLoader() {
   const { apiClient } = useContext(ApiClientContext);
 
-  const queryLoader = new DataLoader<QueryKey, KitsuResponse<any>>(
+  const queryLoader = new DataLoader<QueryKey, KitsuResponse<any>, string>(
     keys => {
       const promises = keys.map(({ path, params }) =>
         apiClient.get(path, params)
