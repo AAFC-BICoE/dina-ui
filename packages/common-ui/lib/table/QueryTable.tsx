@@ -68,6 +68,11 @@ const queryTableStyle = `
     white-space: unset !important;
   }
 
+  /* Align the header titles to the left to match the cell text alignment. */ 
+  .ReactTable .rt-thead .rt-tr {
+    text-align: left;
+  }
+
   /*
    * Hides the page-jump input's spin button, which on this component would not
    * otherwise trigger a page jump.
