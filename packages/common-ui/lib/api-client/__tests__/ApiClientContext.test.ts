@@ -445,4 +445,21 @@ Constraint violation: description size must be between 1 and 10`;
       new Error("/test-url: Test Error")
     );
   });
+
+  it("Shows a special case error message for 502 bad gateway errors.", () => {
+    const axiosError = {
+      isAxiosError: true,
+      config: {
+        url: "/agent-api/operations"
+      },
+      response: {
+        status: 502,
+        statusText: "Bad Gateway"
+      }
+    };
+
+    expect(() => makeAxiosErrorMoreReadable(axiosError as AxiosError)).toThrow(
+      new Error("Service unavailable:\n/agent-api/operations: Bad Gateway")
+    );
+  });
 });

@@ -196,11 +196,9 @@ export function QueryTable<TData extends KitsuResource>({
       {error && (
         <div
           className="alert alert-danger"
-          style={{ position: "absolute", zIndex: 1 }}
+          style={{ position: "absolute", zIndex: 1, whiteSpace: "pre-line" }}
         >
-          <span>
-            {error.errors?.map(e => e.detail).join("\n") ?? String(error)}
-          </span>
+          {error.errors?.map(e => e.detail).join("\n") ?? String(error)}
         </div>
       )}
       <ReactTable

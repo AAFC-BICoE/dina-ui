@@ -260,7 +260,14 @@ function getErrorMessage(
 /** Show more details in the Axios errors. */
 export function makeAxiosErrorMoreReadable(error: AxiosError) {
   if (error.isAxiosError) {
-    throw new Error(`${error.config.url}: ${error.response?.statusText}`);
+    let errorMessage = `${error.config.url}: ${error.response?.statusText}`;
+
+    // Special case: Make 502 "bad gateway" messages more user-friendly:
+    if (error.response?.status === 502) {
+      errorMessage = `Service unavailable:\n${errorMessage}`;
+    }
+
+    throw new Error(errorMessage);
   }
   throw error;
 }
