@@ -609,11 +609,13 @@ describe("QueryTable component", () => {
     wrapper.update();
 
     expect(
-      wrapper.find(".alert.alert-danger").matchesElement(
-        <div className="alert alert-danger">
-          <span>error message 1{"\n"}error message 2</span>
-        </div>
-      )
+      wrapper
+        .find(".alert.alert-danger")
+        .matchesElement(
+          <div className="alert alert-danger">
+            error message 1{"\n"}error message 2
+          </div>
+        )
     ).toEqual(true);
   });
 
