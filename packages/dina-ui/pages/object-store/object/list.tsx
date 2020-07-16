@@ -20,7 +20,6 @@ import { Head, Nav, StoredObjectGallery } from "../../../components";
 import { MetadataPreview } from "../../../components/metadata/MetadataPreview";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
-import { O_NOFOLLOW } from "constants";
 
 type MetadataListLayoutType = "TABLE" | "GALLERY";
 
