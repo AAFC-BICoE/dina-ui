@@ -71,11 +71,14 @@ export function BulkDataEditor<TRow>({
   return (
     <>
       <ErrorViewer />
-      <DynamicHotTable
-        columns={columns}
-        data={workingTableData as any}
-        manualColumnResize={true}
-      />
+      <div className="form-group">
+        <DynamicHotTable
+          columns={columns}
+          data={workingTableData as any}
+          manualColumnResize={true}
+          maxRows={workingTableData.length}
+        />
+      </div>
       <FormikButton
         className="btn btn-primary bulk-editor-submit-button"
         onClick={onSubmitInternal}
