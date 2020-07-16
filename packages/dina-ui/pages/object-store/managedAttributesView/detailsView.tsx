@@ -17,7 +17,7 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { NextRouter, withRouter } from "next/router";
 import { useContext, useState } from "react";
-import { Head, Nav } from "../../../components";
+import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../types/objectstore-api/resources/ManagedAttribute";
 
@@ -82,6 +82,7 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

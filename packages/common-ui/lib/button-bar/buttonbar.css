@@ -1,10 +1,7 @@
 /* Button bar container styling */
 .button-bar {
-  position: fixed;
   width: 100%;
   height: 60px;
-  top: 58px;
-  left: 0;
   background: #f3f3f3;
   border-bottom: 1px solid #d3d7cf;
   z-index: 100;

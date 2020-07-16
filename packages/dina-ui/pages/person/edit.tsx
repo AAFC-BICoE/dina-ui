@@ -14,9 +14,9 @@ import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
-import { Person } from "../../types/objectstore-api/resources/Person";
-import { Head, Nav } from "../../components";
+import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { Person } from "../../types/objectstore-api/resources/Person";
 
 interface PersonFormProps {
   person?: Person;
@@ -57,6 +57,7 @@ export function PersonEditPage({ router }: WithRouterProps) {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import "bootswatch/dist/spacelab/bootstrap.min.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import {
   AuthenticatedApiClientProvider,
   createContextValue,
@@ -11,7 +11,10 @@ import App from "next/app";
 import React from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-table/react-table.css";
+import "react-tabs/style/react-tabs.css";
+import "../components/button-bar/nav/app-top.css";
 import "../components/button-bar/nav/nav.css";
+import "../components/button-bar/nav/wet-beow-bootstrap-4.css";
 import { DinaIntlProvider } from "../intl/dina-ui-intl";
 
 /** Get Random UUID */
