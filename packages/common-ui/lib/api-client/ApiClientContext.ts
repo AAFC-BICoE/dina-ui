@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import Kitsu, { KitsuResource, PersistedResource } from "kitsu";
 import { deserialise } from "kitsu-core";
 import React from "react";
@@ -96,6 +97,11 @@ export function createContextValue({
     pluralize: false,
     resourceCase: "none"
   });
+
+  apiClient.axios?.interceptors?.response.use(
+    successResponse => successResponse,
+    makeAxiosErrorMoreReadable
+  );
 
   /**
    * Performs a write operation against a jsonpatch-compliant JSONAPI server.
@@ -249,4 +255,19 @@ function getErrorMessage(
 
   // Return the error message if there is one, or null otherwise.
   return message || null;
+}
+
+/** Show more details in the Axios errors. */
+export function makeAxiosErrorMoreReadable(error: AxiosError) {
+  if (error.isAxiosError) {
+    let errorMessage = `${error.config.url}: ${error.response?.statusText}`;
+
+    // Special case: Make 502 "bad gateway" messages more user-friendly:
+    if (error.response?.status === 502) {
+      errorMessage = `Service unavailable:\n${errorMessage}`;
+    }
+
+    throw new Error(errorMessage);
+  }
+  throw error;
 }

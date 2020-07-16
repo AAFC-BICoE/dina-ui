@@ -1,7 +1,7 @@
 import { isEqual, pull } from "lodash";
 import React from "react";
-import { ManagedAttribute } from "types/objectstore-api/resources/ManagedAttribute";
-import { MetaManagedAttribute } from "types/objectstore-api/resources/MetaManagedAttribute";
+import { ManagedAttribute } from "../../types/objectstore-api/resources/ManagedAttribute";
+import { MetaManagedAttribute } from "../../types/objectstore-api/resources/MetaManagedAttribute";
 import { AttributeGroup, AttributeGroupModel } from "./AttributeGroup";
 import { AttributeRow, AttributeRowModel } from "./AttributeRow";
 

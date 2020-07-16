@@ -11,9 +11,9 @@ import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 import { useContext, useMemo } from "react";
 import { useDropzone } from "react-dropzone";
-import { Metadata } from "types/objectstore-api/resources/Metadata";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { Metadata } from "../../types/objectstore-api/resources/Metadata";
 
 export interface FileUploadResponse {
   fileIdentifier: string;
