@@ -2,7 +2,7 @@ import { ApiClientContext, Operation, safeSubmit, useQuery } from "common-ui";
 import { FormikProps } from "formik";
 import { toPairs } from "lodash";
 import { useContext, useState } from "react";
-import { PreLibraryPrep } from "types/seqdb-api/resources/workflow/PreLibraryPrep";
+import { PreLibraryPrep } from "../../../types/seqdb-api/resources/workflow/PreLibraryPrep";
 import {
   Chain,
   ChainStepTemplate,

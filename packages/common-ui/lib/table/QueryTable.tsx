@@ -68,6 +68,11 @@ const queryTableStyle = `
     white-space: unset !important;
   }
 
+  /* Align the header titles to the left to match the cell text alignment. */ 
+  .ReactTable .rt-thead .rt-tr {
+    text-align: left;
+  }
+
   /*
    * Hides the page-jump input's spin button, which on this component would not
    * otherwise trigger a page jump.
@@ -190,18 +195,17 @@ export function QueryTable<TData extends KitsuResource>({
   return (
     <div className="query-table-wrapper" ref={divWrapperRef}>
       <style>{queryTableStyle}</style>
-      {error && (
-        <div
-          className="alert alert-danger"
-          style={{ position: "absolute", zIndex: 1 }}
-        >
-          <p>Error:</p>
-          <p>{error?.errors?.map(e => e.detail).join("\n")}</p>
-        </div>
-      )}
       <span>
         <CommonMessage id="tableTotalCount" values={{ totalCount }} />
       </span>
+      {error && (
+        <div
+          className="alert alert-danger"
+          style={{ position: "absolute", zIndex: 1, whiteSpace: "pre-line" }}
+        >
+          {error.errors?.map(e => e.detail).join("\n") ?? String(error)}
+        </div>
+      )}
       <ReactTable
         FilterComponent={({ filter: headerFilter, onChange }) => (
           <input

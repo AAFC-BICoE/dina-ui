@@ -1,8 +1,8 @@
-import { LoadingSpinner, Query, ButtonBar, CancelButton } from "common-ui";
+import { ButtonBar, CancelButton, LoadingSpinner, Query } from "common-ui";
 import { useRouter } from "next/router";
-import { Person } from "types/objectstore-api/resources/Person";
 import { Head, Nav, PersonForm } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { Person } from "../../types/objectstore-api/resources/Person";
 
 export default function PersonEditPage() {
   const router = useRouter();

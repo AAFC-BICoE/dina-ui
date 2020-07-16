@@ -6,7 +6,7 @@ import {
   QueryTableProps
 } from "common-ui";
 import Link from "next/link";
-import { ObjectSubtype } from "types/objectstore-api/resources/ObjectSubtype";
+import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 import { Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
