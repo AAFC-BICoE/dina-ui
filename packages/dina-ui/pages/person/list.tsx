@@ -15,7 +15,12 @@ const AGENT_TABLE_COLUMNS = [
   },
   "email",
   "createdBy",
-  "createdOn"
+  {
+    Cell: ({ original: { createdOn } }) => (
+      <>{createdOn ? new Date(createdOn).toString() : createdOn}</>
+    ),
+    accessor: "createdOn"
+  }
 ];
 
 export default function AgentListPage() {
