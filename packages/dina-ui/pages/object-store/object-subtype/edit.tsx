@@ -93,16 +93,17 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />
-          <DeleteButton
-            id={id as string}
-            options={{ apiBaseUrl: "/objectstore-api" }}
-            postDeleteRedirect="/object-store/object-subtype/list"
-            type="object-subtype"
-          />
           <CancelButton
             entityId={id as string}
             entityLink="/object-store/object-subtype"
             byPassView={true}
+          />
+          <DeleteButton
+            className="ml-5"
+            id={id as string}
+            options={{ apiBaseUrl: "/objectstore-api" }}
+            postDeleteRedirect="/object-store/object-subtype/list"
+            type="object-subtype"
           />
         </ButtonBar>
         <div>
