@@ -100,7 +100,7 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
       .length;
 
     return (
-      <div className="grouped-checkbox-header">
+      <div className="grouped-checkbox-header text-center">
         Select <CheckAllCheckBox />
         <img
           src="/static/images/iconInformation.gif"

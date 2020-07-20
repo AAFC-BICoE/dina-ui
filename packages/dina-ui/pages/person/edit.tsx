@@ -14,9 +14,9 @@ import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
-import { Person } from "types/objectstore-api/resources/Person";
-import { Head, Nav } from "../../components";
+import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { Person } from "../../types/objectstore-api/resources/Person";
 
 interface PersonFormProps {
   person?: Person;
@@ -57,6 +57,7 @@ export function PersonEditPage({ router }: WithRouterProps) {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }
@@ -88,16 +89,17 @@ function PersonForm({ person, router }: PersonFormProps) {
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />
-          <DeleteButton
-            id={id as string}
-            options={{ apiBaseUrl: "/agent-api" }}
-            postDeleteRedirect="/person/list"
-            type="person"
-          />
           <CancelButton
             entityId={id as string}
             entityLink="/person"
             byPassView={true}
+          />
+          <DeleteButton
+            className="ml-5"
+            id={id as string}
+            options={{ apiBaseUrl: "/agent-api" }}
+            postDeleteRedirect="/person/list"
+            type="person"
           />
         </ButtonBar>
         <div>

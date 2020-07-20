@@ -1,6 +1,6 @@
 import { ColumnDefinition, ListPageLayout } from "common-ui";
 import Link from "next/link";
-import { Head, Nav } from "../../../components";
+import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../types/objectstore-api/resources/ManagedAttribute";
 
@@ -58,6 +58,7 @@ export default function ManagedAttributesListPage() {
           }}
         />
       </div>
+      <Footer />
     </div>
   );
 }

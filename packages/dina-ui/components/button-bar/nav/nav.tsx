@@ -5,34 +5,58 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 export function Nav() {
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-      <div className="container-fluid p-0">
-        <Link href="/">
-          <a
-            className="navbar-brand"
-            style={{ color: "#1465b7", fontWeight: "bold" }}
+    <header className="py-3">
+      <div id="wb-bnr" className="container">
+        <div className="row d-flex">
+          <div
+            className="brand col-5 col-md-4"
+            property="publisher"
+            typeof="GovernmentOrganization"
           >
-            <DinaMessage id="appTitle" />
-          </a>
-        </Link>
-        <ul className="navbar-nav ml-auto">
-          <li className="nav-item mx-2">
-            <LanguageSelector />
-          </li>
-          <li className="nav-item mx-2">
-            <NavbarUserControl />
-          </li>
-          <li className="nav-item mx-2 my-auto">
-            <a
-              className="btn btn-info"
-              href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
-            >
-              <DinaMessage id="feedbackButtonText" />
-            </a>
-          </li>
-        </ul>
+            <img
+              src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/assets/sig-blk-en.svg"
+              alt=""
+              property="logo"
+            />
+            <span className="wb-inv" property="name">
+              <DinaMessage id="governmentOfCanada" />
+            </span>
+            <meta property="areaServed" typeof="Country" content="Canada" />
+          </div>
+          <section id="wb-lng" className="text-right ml-auto col-7 col-md-8">
+            <ul className="list-inline ">
+              <li className="list-inline-item mx-2">
+                <LanguageSelector />
+              </li>
+              <li className="list-inline-item mx-2">
+                <NavbarUserControl />
+              </li>
+              <li className="list-inline-item mx-2 my-auto">
+                <a
+                  className="btn btn-info"
+                  href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
+                >
+                  <DinaMessage id="feedbackButtonText" />
+                </a>
+              </li>
+            </ul>
+          </section>
+        </div>
       </div>
-    </nav>
+      <div className="app-bar">
+        <div className="container">
+          <div className="row">
+            <section className="col-12">
+              <Link href="/">
+                <a className="app-name">
+                  <DinaMessage id="appTitle" />
+                </a>
+              </Link>
+            </section>
+          </div>
+        </div>
+      </div>
+    </header>
   );
 }
 
@@ -59,5 +83,43 @@ function NavbarUserControl() {
         </>
       ) : null}
     </div>
+  );
+}
+
+export function Footer() {
+  return (
+    <footer id="wb-info" className="my-3" style={{ zIndex: 0 }}>
+      <div className="brand">
+        <div className="container">
+          <div className="row">
+            <nav className="col-md-10 ftr-urlt-lnk">
+              <ul>
+                <li>
+                  <a href="https://www.canada.ca/en/contact.html">
+                    Contact information
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.canada.ca/en/transparency/terms.html">
+                    Terms and conditions
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.canada.ca/en/transparency/privacy.html">
+                    Privacy
+                  </a>
+                </li>
+              </ul>
+            </nav>
+            <div className="col-6 col-md-3 col-lg-2 text-right">
+              <img
+                src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/assets/wmms-blk.svg"
+                alt="Symbol of the Government of Canada"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 }

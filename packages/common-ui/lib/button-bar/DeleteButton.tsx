@@ -9,6 +9,9 @@ import { AreYouSureModal } from "../modal/AreYouSureModal";
 import { useModal } from "../modal/modal";
 
 interface DeleteButtonProps {
+  /** Additional button classes. */
+  className?: string;
+
   /** The resource ID. */
   id?: string;
 
@@ -22,6 +25,7 @@ interface DeleteButtonProps {
 }
 
 export function DeleteButton({
+  className,
   id,
   options,
   postDeleteRedirect,
@@ -51,7 +55,7 @@ export function DeleteButton({
 
   return (
     <button
-      className="btn btn-danger delete-button"
+      className={`btn btn-danger delete-button ${className}`}
       onClick={() =>
         openModal(
           <AreYouSureModal

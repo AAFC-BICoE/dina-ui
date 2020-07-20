@@ -8,7 +8,6 @@ module.exports = {
     "jest.config.js",
     "jest.setup.js",
     "next.config.js",
-    "polyfills.js",
   ],
   moduleNameMapper: {
     // Mocks CSS imports to prevent throwing an error during tests.

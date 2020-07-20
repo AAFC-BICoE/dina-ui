@@ -1,6 +1,6 @@
 import { ApiClientContext, LoadingSpinner } from "common-ui";
 import { mount } from "enzyme";
-import { LibraryPrep, StepResource } from "types/seqdb-api";
+import { LibraryPrep, StepResource } from "../../../types/seqdb-api";
 import LibraryPrepWorksheetPage from "../../../pages/workflow/library-prep-worksheet";
 
 const mockUseRouter = jest.fn();
