@@ -2,7 +2,7 @@ import { ApiClientContext, Operation, safeSubmit, useQuery } from "common-ui";
 import { FormikProps } from "formik";
 import { toPairs } from "lodash";
 import { useContext, useState } from "react";
-import { PreLibraryPrep } from "types/seqdb-api/resources/workflow/PreLibraryPrep";
+import { PreLibraryPrep } from "../../../types/seqdb-api/resources/workflow/PreLibraryPrep";
 import {
   Chain,
   ChainStepTemplate,
@@ -17,7 +17,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
   const [visibleSamples, setVisibleSamples] = useState<StepResource[]>([]);
 
   // Keep track of the last save operation, so the data is re-fetched immediately after saving.
-  const [lastSave, setLastSave] = useState();
+  const [lastSave, setLastSave] = useState<number>();
 
   const visibleSampleIds = visibleSamples.length
     ? visibleSamples.map(sr => (sr.sample as Sample).id).join(",")

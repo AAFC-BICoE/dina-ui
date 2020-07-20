@@ -12,7 +12,7 @@ import {
   SubmitButton,
   TextField
 } from "common-ui";
-import { Field, FieldProps, Form, Formik, FormikActions } from "formik";
+import { Field, FieldProps, Form, Formik, FormikContextType } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { NextRouter, withRouter } from "next/router";
@@ -98,13 +98,8 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
 
   async function onSubmit(
     submittedValues,
-    { setStatus, setSubmitting }: FormikActions<any>
+    { setStatus, setSubmitting }: FormikContextType<any>
   ) {
-    const isTypeInteger = submittedValues.managedAttributeType === "INTEGER";
-    const desc = {
-      en: submittedValues.descEn,
-      fr: submittedValues.descFr
-    };
     if (
       submittedValues.name === undefined ||
       submittedValues.managedAttributeType === undefined
@@ -113,22 +108,11 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       setSubmitting(false);
       return;
     }
-    const managedAttributeValues = {
-      acceptedValues:
-        submittedValues.acceptedValues && !isTypeInteger
-          ? submittedValues.acceptedValues
-          : null,
-      description: desc,
-      id: submittedValues.id ? submittedValues.id : null,
-      managedAttributeType: submittedValues.managedAttributeType,
-      name: submittedValues.name,
-      type: submittedValues.type
-    };
     try {
       await save(
         [
           {
-            resource: managedAttributeValues,
+            resource: submittedValues,
             type: "managed-attribute"
           }
         ],
@@ -144,7 +128,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
 
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      <Form>
+      <Form translate={undefined}>
         <ErrorViewer />
         <SubmitButton />
         <DeleteButton
@@ -164,46 +148,17 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           </h4>
           <TextField name="name" hideLabel={true} />
         </div>
-        {id && (
-          <div style={{ width: "300px" }}>
-            <h4>
-              <DinaMessage id="field_managedAttributeCreateDate" />
-            </h4>
-            <DateField
-              showTime={true}
-              name="createdDate"
-              disabled={true}
-              hideLabel={true}
-            />
-          </div>
-        )}
         <div style={{ width: "300px" }}>
           <h4>
             <DinaMessage id="field_managedAttributeDescEn" />
           </h4>
-          <TextField
-            name="descEn"
-            initialValue={
-              initialValues.hasOwnProperty("description")
-                ? initialValues["description"]["en"]
-                : null
-            }
-            hideLabel={true}
-          />
+          <TextField name="description.en" hideLabel={true} />
         </div>
         <div style={{ width: "300px" }}>
           <h4>
             <DinaMessage id="field_managedAttributeDescFr" />
           </h4>
-          <TextField
-            name="descFr"
-            initialValue={
-              initialValues.hasOwnProperty("description")
-                ? initialValues["description"]["fr"]
-                : null
-            }
-            hideLabel={true}
-          />
+          <TextField name="description.fr" hideLabel={true} />
         </div>
         <div style={{ width: "300px" }}>
           <h4>

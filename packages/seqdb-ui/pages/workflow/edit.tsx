@@ -88,7 +88,7 @@ function ChainForm({ chain, router }: ChainFormProps) {
     <div>
       <div className="container-fluid">
         <Formik initialValues={initialValues} onSubmit={onSubmit}>
-          <Form>
+          <Form translate={undefined}>
             <ErrorViewer />
             <div className="row">
               <ResourceSelectField<any>

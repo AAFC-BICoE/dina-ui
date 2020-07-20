@@ -147,7 +147,7 @@ export function LibraryPrepEditTable({
     setLastPrepTableSave(Date.now());
   });
 
-  const COLUMNS: Array<Column<StepResource>> =
+  const COLUMNS: Column<StepResource>[] =
     editMode === "DETAILS"
       ? [
           {
@@ -239,7 +239,7 @@ export function LibraryPrepEditTable({
       initialValues={formikValues}
       onSubmit={onSubmit}
     >
-      <Form>
+      <Form translate={undefined}>
         <ErrorViewer />
         <div className="row">
           <div className="col-12">

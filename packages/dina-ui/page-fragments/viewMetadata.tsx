@@ -1,7 +1,7 @@
 import { FieldView } from "common-ui";
 import { Formik } from "formik";
 import { noop } from "lodash";
-import { Metadata } from "types/objectstore-api/resources/Metadata";
+import { Metadata } from "../types/objectstore-api/resources/Metadata";
 import { DinaMessage } from "../intl/dina-ui-intl";
 
 export function ViewMetadataFormPage(data) {

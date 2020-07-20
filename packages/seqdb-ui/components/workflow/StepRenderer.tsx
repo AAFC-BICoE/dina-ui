@@ -6,7 +6,7 @@ import { PreLibraryPrepStep } from "./pre-library-prep/PreLibraryPrepStep";
 import { SampleSelection } from "./sample-selection/SampleSelection";
 
 export interface StepRendererProps {
-  chainStepTemplates: Array<PersistedResource<ChainStepTemplate>>;
+  chainStepTemplates: PersistedResource<ChainStepTemplate>[];
   chain: PersistedResource<Chain>;
   step: PersistedResource<ChainStepTemplate>;
 }

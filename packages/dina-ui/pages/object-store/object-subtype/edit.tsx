@@ -15,9 +15,9 @@ import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
-import { ObjectSubtype } from "types/objectstore-api/resources/ObjectSubtype";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 
 interface ObjectSubtypeFormProps {
   objectSubtype?: ObjectSubtype;
@@ -89,7 +89,7 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
 
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      <Form>
+      <Form translate={undefined}>
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />

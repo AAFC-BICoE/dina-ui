@@ -11,7 +11,7 @@ import {
   Person
 } from "../../../../types/objectstore-api";
 
-const TEST_METADATAS: Array<PersistedResource<Metadata>> = [
+const TEST_METADATAS: PersistedResource<Metadata>[] = [
   {
     acMetadataCreator: {
       displayName: "Mat Poff",

@@ -7,7 +7,7 @@ import {
   TextField
 } from "common-ui";
 import { Form, Formik } from "formik";
-import { Product, Protocol } from "types/seqdb-api";
+import { Product, Protocol } from "../../../types/seqdb-api";
 import { useSeqdbIntl } from "../../../intl/seqdb-intl";
 
 interface PreLibraryPrepFormProps {
@@ -40,11 +40,14 @@ export function PreLibraryPrepForm({ onSubmit }: PreLibraryPrepFormProps) {
     >
       {({ resetForm }) => {
         function onTypeChange(newType?: string) {
-          resetForm({ preLibraryPrepType: newType });
+          resetForm({ values: { preLibraryPrepType: newType } });
         }
 
         return (
-          <Form className="card card-body pre-library-prep-form">
+          <Form
+            className="card card-body pre-library-prep-form"
+            translate={undefined}
+          >
             <div className="row">
               <SelectField
                 className="col-6"

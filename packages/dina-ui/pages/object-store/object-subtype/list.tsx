@@ -6,11 +6,11 @@ import {
   QueryTableProps
 } from "common-ui";
 import Link from "next/link";
-import { ObjectSubtype } from "types/objectstore-api/resources/ObjectSubtype";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 
-const OBJECTSUBTYPE_TABLE_COLUMNS: Array<ColumnDefinition<ObjectSubtype>> = [
+const OBJECTSUBTYPE_TABLE_COLUMNS: ColumnDefinition<ObjectSubtype>[] = [
   {
     Cell: ({ original: { id, acSubtype } }) => (
       <Link href={`/object-store/object-subtype/edit?id=${id}`}>

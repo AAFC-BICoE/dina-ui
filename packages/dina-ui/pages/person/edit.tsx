@@ -14,9 +14,9 @@ import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
-import { Person } from "types/objectstore-api/resources/Person";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { Person } from "../../types/objectstore-api/resources/Person";
 
 interface PersonFormProps {
   person?: Person;
@@ -85,7 +85,7 @@ function PersonForm({ person, router }: PersonFormProps) {
 
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      <Form>
+      <Form translate={undefined}>
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />

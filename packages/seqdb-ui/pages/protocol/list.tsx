@@ -4,7 +4,7 @@ import { ButtonBar, CreateButton, Head, Nav } from "../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { Protocol } from "../../types/seqdb-api/resources/Protocol";
 
-const PROTOCOL_TABLE_COLUMNS: Array<ColumnDefinition<Protocol>> = [
+const PROTOCOL_TABLE_COLUMNS: ColumnDefinition<Protocol>[] = [
   {
     Cell: ({ original: { id, name } }) => (
       <Link href={`/protocol/view?id=${id}`}>

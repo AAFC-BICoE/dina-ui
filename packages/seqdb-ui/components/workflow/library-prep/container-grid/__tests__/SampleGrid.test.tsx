@@ -129,12 +129,9 @@ describe("SampleGrid component", () => {
 
     // There should be 8 rows
     expect(
-      wrapper.find(".rt-tbody .rt-tr").map(node =>
-        node
-          .find(".rt-td")
-          .first()
-          .text()
-      )
+      wrapper
+        .find(".rt-tbody .rt-tr")
+        .map(node => node.find(".rt-td").first().text())
     ).toEqual(["A", "B", "C", "D", "E", "F", "G", "H"]);
   });
 
@@ -161,21 +158,11 @@ describe("SampleGrid component", () => {
 
     // Expect the sample in 1A:
     expect(
-      rows
-        .first()
-        .find(".rt-td")
-        .at(1)
-        .find(".sample-box-text")
-        .text()
+      rows.first().find(".rt-td").at(1).find(".sample-box-text").text()
     ).toEqual("SAMP200");
     // Expect the sample in 2B:
     expect(
-      rows
-        .at(1)
-        .find(".rt-td")
-        .at(2)
-        .find(".sample-box-text")
-        .text()
+      rows.at(1).find(".rt-td").at(2).find(".sample-box-text").text()
     ).toEqual("SAMP400");
   });
 
@@ -268,17 +255,13 @@ describe("SampleGrid component", () => {
     wrapper.update();
 
     // Select the first sample:
-    wrapper
-      .find(".available-sample-list li")
-      .first()
-      .prop<any>("onClick")({});
+    wrapper.find(".available-sample-list li").first().prop<any>("onClick")({});
     wrapper.update();
 
     // Shift-click the third sample:
-    wrapper
-      .find(".available-sample-list li")
-      .at(2)
-      .prop<any>("onClick")({ shiftKey: true });
+    wrapper.find(".available-sample-list li").at(2).prop<any>("onClick")({
+      shiftKey: true
+    });
     wrapper.update();
 
     // Move the selected samples:
@@ -364,17 +347,13 @@ describe("SampleGrid component", () => {
     wrapper.update();
 
     // Select the first sample:
-    wrapper
-      .find(".available-sample-list li")
-      .first()
-      .prop<any>("onClick")({});
+    wrapper.find(".available-sample-list li").first().prop<any>("onClick")({});
     wrapper.update();
 
     // Shift-click the third sample:
-    wrapper
-      .find(".available-sample-list li")
-      .at(2)
-      .prop<any>("onClick")({ shiftKey: true });
+    wrapper.find(".available-sample-list li").at(2).prop<any>("onClick")({
+      shiftKey: true
+    });
     wrapper.update();
 
     // Move the selected samples:
@@ -509,17 +488,13 @@ describe("SampleGrid component", () => {
     wrapper.update();
 
     // Select the first sample:
-    wrapper
-      .find(".available-sample-list li")
-      .first()
-      .prop<any>("onClick")({});
+    wrapper.find(".available-sample-list li").first().prop<any>("onClick")({});
     wrapper.update();
 
     // Shift-click the third sample:
-    wrapper
-      .find(".available-sample-list li")
-      .at(2)
-      .prop<any>("onClick")({ shiftKey: true });
+    wrapper.find(".available-sample-list li").at(2).prop<any>("onClick")({
+      shiftKey: true
+    });
     wrapper.update();
 
     // Move the 3 selected samples, starting at the last cell:

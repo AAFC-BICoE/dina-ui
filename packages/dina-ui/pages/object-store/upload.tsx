@@ -11,9 +11,9 @@ import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 import { useContext, useMemo } from "react";
 import { useDropzone } from "react-dropzone";
-import { Metadata } from "types/objectstore-api/resources/Metadata";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { Metadata } from "../../types/objectstore-api/resources/Metadata";
 
 export interface FileUploadResponse {
   fileIdentifier: string;
@@ -60,7 +60,7 @@ export default function UploadPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
   const { apiClient, save } = useContext(ApiClientContext);
-  const { groups, initialized: accountInitialized } = useAccount();
+  const { agentId, groupNames, initialized: accountInitialized } = useAccount();
 
   const {
     getRootProps,
@@ -108,6 +108,7 @@ export default function UploadPage() {
 
     const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(res => ({
       resource: {
+        acMetadataCreator: agentId,
         bucket: group,
         fileIdentifier: res.fileIdentifier,
         type: "metadata"
@@ -127,21 +128,17 @@ export default function UploadPage() {
     });
   }
 
-  const groupSelectOptions = (groups ?? []).map(group => {
-    // Remove keycloak's prefixed slash from the start of the group name:
-    const unprefixedGroup = group.replace(/\/(.*)/, "$1");
-    return {
-      label: unprefixedGroup,
-      value: unprefixedGroup
-    };
-  });
+  const groupSelectOptions = (groupNames ?? []).map(group => ({
+    label: group,
+    value: group
+  }));
 
   return (
     <div>
       <Head title={formatMessage("uploadPageTitle")} />
       <Nav />
       <div className="container">
-        {!accountInitialized || !groups?.length ? (
+        {!accountInitialized || !groupNames?.length ? (
           <div className="alert alert-warning no-group-alert">
             <DinaMessage id="userMustBelongToGroup" />
           </div>
@@ -155,7 +152,7 @@ export default function UploadPage() {
               initialValues={{ group: groupSelectOptions[0].value }}
               onSubmit={safeSubmit(onSubmit)}
             >
-              <Form>
+              <Form translate={undefined}>
                 <div className="row">
                   <SelectField
                     className="col-md-3"

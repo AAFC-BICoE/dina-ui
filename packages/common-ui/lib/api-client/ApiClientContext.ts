@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import Kitsu, { KitsuResource, PersistedResource } from "kitsu";
 import { deserialise } from "kitsu-core";
 import React from "react";
@@ -40,13 +41,13 @@ export interface ApiClientContextI {
   save: (
     saveArgs: SaveArgs[],
     options?: DoOperationsOptions
-  ) => Promise<Array<PersistedResource<KitsuResource>>>;
+  ) => Promise<PersistedResource<KitsuResource>[]>;
 
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
   bulkGet: <T extends KitsuResource>(
-    paths: string[],
+    paths: readonly string[],
     options?: BulkGetOptions
-  ) => Promise<Array<PersistedResource<T>>>;
+  ) => Promise<PersistedResource<T>[]>;
 }
 
 /** Config for creating an API client context value. */
@@ -96,6 +97,11 @@ export function createContextValue({
     pluralize: false,
     resourceCase: "none"
   });
+
+  apiClient.axios?.interceptors?.response.use(
+    successResponse => successResponse,
+    makeAxiosErrorMoreReadable
+  );
 
   /**
    * Performs a write operation against a jsonpatch-compliant JSONAPI server.
@@ -154,7 +160,7 @@ export function createContextValue({
   async function save(
     saveArgs: SaveArgs[],
     options?: DoOperationsOptions
-  ): Promise<Array<PersistedResource<KitsuResource>>> {
+  ): Promise<PersistedResource<KitsuResource>[]> {
     // Serialize the resources to JSONAPI format.
     const serializePromises = saveArgs.map(saveArg => serialize(saveArg));
     const serialized = await Promise.all(serializePromises);
@@ -206,7 +212,7 @@ export function createContextValue({
       returnNullForMissingResource
     });
 
-    const resources: Array<PersistedResource<T>> = (
+    const resources: PersistedResource<T>[] = (
       await Promise.all(responses.map(deserialise))
     ).map(res => res.data);
 
@@ -249,4 +255,19 @@ function getErrorMessage(
 
   // Return the error message if there is one, or null otherwise.
   return message || null;
+}
+
+/** Show more details in the Axios errors. */
+export function makeAxiosErrorMoreReadable(error: AxiosError) {
+  if (error.isAxiosError) {
+    let errorMessage = `${error.config.url}: ${error.response?.statusText}`;
+
+    // Special case: Make 502 "bad gateway" messages more user-friendly:
+    if (error.response?.status === 502) {
+      errorMessage = `Service unavailable:\n${errorMessage}`;
+    }
+
+    throw new Error(errorMessage);
+  }
+  throw error;
 }

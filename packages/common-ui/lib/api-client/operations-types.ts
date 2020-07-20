@@ -29,7 +29,7 @@ export interface Operation {
  *
  * See: https://github.com/json-api/json-api/blob/9c7a03dbc37f80f6ca81b16d444c960e96dd7a57/extensions/jsonpatch/index.md#-responses
  */
-export type OperationsResponse = Array<SuccessfulOperation | FailedOperation>;
+export type OperationsResponse = (SuccessfulOperation | FailedOperation)[];
 
 export interface MetaWithTotal {
   totalResourceCount: number;

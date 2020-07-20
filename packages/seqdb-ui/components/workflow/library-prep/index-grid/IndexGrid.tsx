@@ -139,7 +139,7 @@ export function IndexGrid(props: IndexGridProps) {
         initialValues={{ indexI5s: {}, indexI7s: {} }}
         onSubmit={onSubmit}
       >
-        <Form>
+        <Form translate={undefined}>
           <style>{`
             .rt-td {
               padding: 0 !important;

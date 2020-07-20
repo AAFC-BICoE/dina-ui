@@ -1,4 +1,3 @@
-import { ApiClientContext } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
@@ -192,7 +191,8 @@ describe("LibraryPoolingStep component", () => {
     // The library pool content table should render.
     expect(
       wrapper
-        .find(".library-pool-content-table .rt-td[children='test pool 1']")
+        .find(".library-pool-content-table .rt-td")
+        .findWhere(node => node.text().includes("test pool 1"))
         .exists()
     ).toEqual(true);
   });

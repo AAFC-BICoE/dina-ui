@@ -1,6 +1,6 @@
 import { ApiClientContext, LoadingSpinner } from "common-ui";
 import { mount } from "enzyme";
-import { LibraryPrep, StepResource } from "types/seqdb-api";
+import { LibraryPrep, StepResource } from "../../../types/seqdb-api";
 import LibraryPrepWorksheetPage from "../../../pages/workflow/library-prep-worksheet";
 
 const mockUseRouter = jest.fn();
@@ -153,12 +153,9 @@ describe("Library Prep Worksheet page", () => {
 
     // Check the row headers:
     expect(
-      wrapper.find("table.library-prep-grid tr").map(rowNode =>
-        rowNode
-          .find("td")
-          .first()
-          .text()
-      )
+      wrapper
+        .find("table.library-prep-grid tr")
+        .map(rowNode => rowNode.find("td").first().text())
     ).toEqual(["", "A", "B", "C", "D", "E", "F", "G", "H"]);
 
     // Make sure the indexes sho up in the grid:
