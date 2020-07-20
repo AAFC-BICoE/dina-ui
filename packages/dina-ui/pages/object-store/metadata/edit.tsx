@@ -15,7 +15,7 @@ import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
-import { Head, Nav, AddPersonButton } from "../../../components";
+import { AddPersonButton, Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   ManagedAttribute,
@@ -298,6 +298,7 @@ export default function EditMetadatasPage() {
           }}
         </Formik>
       </div>
+      <Footer />
     </div>
   );
 }

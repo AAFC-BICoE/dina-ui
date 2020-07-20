@@ -1,6 +1,6 @@
 import { ButtonBar, CancelButton, LoadingSpinner, Query } from "common-ui";
 import { useRouter } from "next/router";
-import { Head, Nav, PersonForm } from "../../components";
+import { Footer, Head, Nav, PersonForm } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api/resources/Person";
 
@@ -56,6 +56,7 @@ export default function PersonEditPage() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

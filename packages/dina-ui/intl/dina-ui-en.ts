@@ -43,6 +43,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_originalFilename: "Original Filename",
   field_xmpMetadataDate: "Date Metadata Applied",
   field_xmpRightsWebStatement: "Reuse Rights Statement",
+  governmentOfCanada: "Government of Canada",
   groupMustBeSelected: "Group must be selected",
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
