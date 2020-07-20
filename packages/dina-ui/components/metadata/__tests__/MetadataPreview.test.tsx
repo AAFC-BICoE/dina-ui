@@ -1,5 +1,4 @@
 import { PersistedResource } from "kitsu";
-import Link from "next/link";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Metadata } from "../../../types/objectstore-api";
 import { MetadataPreview } from "../MetadataPreview";
@@ -27,9 +26,8 @@ describe("MetadataPreview component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(
-      wrapper.find(".metadata-edit-link a").find(Link).prop("href")
-    ).toEqual(
+    // There should be a link to single-edit a Metadata:
+    expect(wrapper.find("a.metadata-edit-link").prop("href")).toEqual(
       "/object-store/metadata/edit?ids=232eda40-dc97-4255-91c4-f30485e2c707"
     );
   });
