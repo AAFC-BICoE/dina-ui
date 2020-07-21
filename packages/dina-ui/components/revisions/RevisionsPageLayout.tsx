@@ -3,7 +3,7 @@ import { pick } from "lodash";
 import { ComponentType } from "react";
 import { CellInfo } from "react-table";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { AuditSnapshot, Metadata } from "../../types/objectstore-api";
+import { Metadata, AuditSnapshot } from "../../types/objectstore-api";
 import { KeyValueTable } from "./KeyValueTable";
 
 const REVISION_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [

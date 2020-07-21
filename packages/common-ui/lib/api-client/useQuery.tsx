@@ -104,7 +104,7 @@ export function withResponse<
   if (error) {
     return (
       <div className="alert alert-danger">
-        {error?.errors?.map(e => e.detail).join("\n")}
+        {error?.errors?.map(e => e.detail).join("\n") ?? String(error)}
       </div>
     );
   }

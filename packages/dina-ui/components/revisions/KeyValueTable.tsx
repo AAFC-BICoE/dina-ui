@@ -39,6 +39,7 @@ export function KeyValueTable({ customValueCells, data }: KeyValueTableProps) {
             return <strong>{fieldLabel}</strong>;
           },
           Header: <DinaMessage id="attributeLabel" />,
+          className: "key-cell",
           accessor: "field",
           width: 200
         },
@@ -52,7 +53,8 @@ export function KeyValueTable({ customValueCells, data }: KeyValueTableProps) {
             return props.value;
           },
           Header: <DinaMessage id="valueLabel" />,
-          accessor: "value"
+          accessor: "value",
+          className: "value-cell"
         }
       ]}
       data={entries}

@@ -5,12 +5,12 @@ import { Head, Nav, Footer } from "../../../components";
 import { MetadataManagedAttributes } from "../../../components/metadata/MetadataDetails";
 import { ReferenceLink } from "../../../components/revisions/ReferenceLink";
 import { RevisionsPageLayout } from "../../../components/revisions/RevisionsPageLayout";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { useDinaIntl, DinaMessage } from "../../../intl/dina-ui-intl";
 import { Metadata, Person } from "../../../types/objectstore-api";
 import { ComponentType } from "enzyme";
 import { CellInfo } from "react-table";
 
-export default function RevisionListPage() {
+export default function MetadataRevisionListPage() {
   const { formatMessage } = useDinaIntl();
 
   const router = useRouter();
@@ -33,6 +33,13 @@ export default function RevisionListPage() {
         <Nav />
         <div className="container-fluid">
           <h1>{pageTitle}</h1>
+          <div className="form-group">
+            <Link href={`/object-store/object/view?id=${metadata.id}`}>
+              <a>
+                <DinaMessage id="metadataDetailsPageLink" />
+              </a>
+            </Link>
+          </div>
           <RevisionsPageLayout
             auditSnapshotPath="objectstore-api/audit-snapshot"
             instanceId={`metadata/${metadataId}`}
