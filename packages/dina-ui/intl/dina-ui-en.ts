@@ -83,6 +83,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   personListTitle: "Persons",
   personViewTitle: "View Person",
   revisionsButtonText: "Revisions",
+  revisionsByUserPageTitle: "Revisions by user",
+  searchButton: "Search",
   thumbnailNotAvailableText: "No thumbnail available",
   uploadButtonText: "Upload",
   uploadFormInstructions:

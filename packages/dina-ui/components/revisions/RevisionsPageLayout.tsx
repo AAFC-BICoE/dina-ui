@@ -1,38 +1,64 @@
 import { ColumnDefinition, ListPageLayout } from "common-ui";
 import { pick } from "lodash";
-import { ComponentType } from "react";
-import { CellInfo } from "react-table";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { Metadata, AuditSnapshot } from "../../types/objectstore-api";
+import { AuditSnapshot, Metadata } from "../../types/objectstore-api";
 import { KeyValueTable } from "./KeyValueTable";
-
-const REVISION_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
-  "version",
-  "commitDateTime",
-  "snapshotType",
-  {
-    Cell: ({ original: { changedProperties } }) => (
-      <div style={{ whiteSpace: "normal" }}>
-        {changedProperties?.join(", ")}
-      </div>
-    ),
-    accessor: "changedProperties"
-  },
-  "author"
-];
+import { RevisionRowConfigsByType } from "./revision-row-config";
 
 interface RevisionsPageLayoutProps {
   /** Audit snapshot path, including the base API path. */
   auditSnapshotPath: string;
-  instanceId: string;
-  customValueCells?: Record<string, ComponentType<CellInfo>>;
+
+  /** Filter by revision author. */
+  author?: string;
+
+  /** Filter by resource. */
+  instanceId?: string;
+
+  /** Custom revision table row renderering per type: */
+  revisionRowConfigsByType?: RevisionRowConfigsByType;
 }
 
 export function RevisionsPageLayout({
   auditSnapshotPath,
-  customValueCells,
+  revisionRowConfigsByType,
+  author,
   instanceId
 }: RevisionsPageLayoutProps) {
+  const REVISION_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
+    ...// Only show resourceName column when not searching by instanceId:
+    (instanceId
+      ? []
+      : [
+          {
+            Cell: ({ original }) => {
+              const snapshot: AuditSnapshot = original;
+              const [type] = snapshot.instanceId.split("/");
+              const ResourceName = revisionRowConfigsByType?.[type]?.name;
+              if (ResourceName) {
+                return <ResourceName {...snapshot.state} />;
+              } else {
+                return snapshot.instanceId;
+              }
+            },
+            accessor: "resourceName",
+            className: "resource-name-cell"
+          }
+        ]),
+    "version",
+    "commitDateTime",
+    "snapshotType",
+    {
+      Cell: ({ original: { changedProperties } }) => (
+        <div style={{ whiteSpace: "normal" }}>
+          {changedProperties?.join(", ")}
+        </div>
+      ),
+      accessor: "changedProperties"
+    },
+    "author"
+  ];
+
   return (
     <>
       <style>{`
@@ -44,7 +70,11 @@ export function RevisionsPageLayout({
         id="metadata-revision-list"
         queryTableProps={{
           columns: REVISION_TABLE_COLUMNS,
-          filter: { instanceId },
+          filter: {
+            // Include these filters if specified in props:
+            ...(author && { author }),
+            ...(instanceId && { instanceId })
+          },
           path: auditSnapshotPath,
           reactTableProps: {
             ExpanderComponent: ExpanderWithLabel,
@@ -53,6 +83,8 @@ export function RevisionsPageLayout({
               const snapshot: AuditSnapshot = original;
               const changed = pick(snapshot.state, snapshot.changedProperties);
 
+              const [type] = snapshot.instanceId.split("/");
+
               return (
                 <div className="p-4" style={{ maxWidth: "50rem" }}>
                   <h4>
@@ -60,7 +92,9 @@ export function RevisionsPageLayout({
                   </h4>
                   <KeyValueTable
                     data={changed}
-                    customValueCells={customValueCells}
+                    customValueCells={
+                      revisionRowConfigsByType?.[type]?.customValueCells
+                    }
                   />
                 </div>
               );
