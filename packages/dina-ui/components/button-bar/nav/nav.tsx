@@ -45,18 +45,85 @@ export function Nav() {
       </div>
       <div className="app-bar">
         <div className="container">
-          <div className="row">
-            <section className="col-12">
+          <ul className="list-inline d-flex m-0">
+            <style>
+              {`
+                .dropdown:hover .dropdown-menu {
+                    display: block;
+                }
+                .dropdown a.nav-link {
+                  color: rgb(232, 230, 227);
+                }
+              `}
+            </style>
+            <li className="list-inline-item mr-4">
               <Link href="/">
-                <a className="app-name">
+                <a className="app-name px-0">
                   <DinaMessage id="appTitle" />
                 </a>
               </Link>
-            </section>
-          </div>
+            </li>
+            <li className="list-inline-item my-auto">
+              <NavObjectStoreDropdown />
+            </li>
+            <li className="list-inline-item my-auto">
+              <NavAgentsDropdown />
+            </li>
+          </ul>
         </div>
       </div>
     </header>
+  );
+}
+
+/** Object Store links. */
+function NavObjectStoreDropdown() {
+  return (
+    <div className="dropdown">
+      <a className="nav-link dropdown-toggle" href="#">
+        <DinaMessage id="objectStoreTitle" />
+      </a>
+      <div className="dropdown-menu m-0">
+        <Link href="/object-store/upload">
+          <a className="dropdown-item">
+            <DinaMessage id="uploadPageTitle" />
+          </a>
+        </Link>
+        <Link href="/object-store/object/list">
+          <a className="dropdown-item">
+            <DinaMessage id="objectListTitle" />
+          </a>
+        </Link>
+        <Link href="/object-store/managedAttributesView/listView">
+          <a className="dropdown-item">
+            <DinaMessage id="managedAttributeListTitle" />
+          </a>
+        </Link>
+        <Link href="/object-store/object-subtype/list">
+          <a className="dropdown-item">
+            <DinaMessage id="objectSubtypeListTitle" />
+          </a>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+/** Agents links. */
+function NavAgentsDropdown() {
+  return (
+    <div className="dropdown">
+      <a className="nav-link dropdown-toggle" href="#">
+        <DinaMessage id="agentsSectionTitle" />
+      </a>
+      <div className="dropdown-menu m-0">
+        <Link href="/person/list">
+          <a className="dropdown-item">
+            <DinaMessage id="personListTitle" />
+          </a>
+        </Link>
+      </div>
+    </div>
   );
 }
 
