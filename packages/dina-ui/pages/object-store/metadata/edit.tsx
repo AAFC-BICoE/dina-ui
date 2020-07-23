@@ -15,7 +15,7 @@ import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
-import { Footer, Head, Nav } from "../../../components";
+import { AddPersonButton, Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   ManagedAttribute,
@@ -285,6 +285,9 @@ export default function EditMetadatasPage() {
                   model="objectstore-api/managed-attribute"
                   optionLabel={attr => attr.name}
                 />
+                <div className="form-group">
+                  <AddPersonButton />
+                </div>
                 <BulkDataEditor
                   columns={columns}
                   loadData={loadData}
