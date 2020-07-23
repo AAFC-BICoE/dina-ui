@@ -1,13 +1,23 @@
 import { OperationsResponse } from "common-ui";
-import { PersonEditPage } from "../../../pages/person/edit";
+import PersonEditPage from "../../../pages/person/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Person } from "../../../types/objectstore-api/resources/Person";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
+jest.mock("next/router", () => ({
+  useRouter: () => ({
+    push: mockPush,
+    query: mockQuery
+  })
+}));
+
 /** Mock next.js' router "push" function for navigating pages. */
 const mockPush = jest.fn();
+
+/** The mock URL query string params. */
+let mockQuery: any = {};
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
@@ -27,6 +37,7 @@ const apiContext: any = {
 describe("person edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockQuery = {};
   });
 
   it("Provides a form to add a person.", async () => {
@@ -46,10 +57,9 @@ describe("person edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext(
-      <PersonEditPage router={{ query: {}, push: mockPush } as any} />,
-      { apiContext }
-    );
+    mockQuery = {};
+
+    const wrapper = mountWithAppContext(<PersonEditPage />, { apiContext });
 
     expect(wrapper.find(".displayName-field input")).toHaveLength(1);
 
@@ -102,10 +112,9 @@ describe("person edit page", () => {
       ] as OperationsResponse
     });
 
-    const wrapper = mountWithAppContext(
-      <PersonEditPage router={{ query: { id: 1 }, push: mockPush } as any} />,
-      { apiContext }
-    );
+    mockQuery = { id: 1 };
+
+    const wrapper = mountWithAppContext(<PersonEditPage />, { apiContext });
 
     // The page should load initially with a loading spinner.
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
@@ -171,10 +180,9 @@ describe("person edit page", () => {
       ] as OperationsResponse
     }));
 
-    const wrapper = mountWithAppContext(
-      <PersonEditPage router={{ query: {}, push: mockPush } as any} />,
-      { apiContext }
-    );
+    mockQuery = {};
+
+    const wrapper = mountWithAppContext(<PersonEditPage />, { apiContext });
 
     // Submit the form.
     wrapper.find("form").simulate("submit");

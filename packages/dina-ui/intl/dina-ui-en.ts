@@ -8,6 +8,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addManagedAttributeButtonText: "Add New Managed Attribute",
   addObjectSubtypeTitle: "Add New Object Subtype",
   addPersonTitle: "Add Person",
+  addPersonButtonText: "Missing Person? Add without leaving the page.",
   agentsSectionTitle: "Agents",
   appTitle: "DINA",
   attributeLabel: "Attribute",
