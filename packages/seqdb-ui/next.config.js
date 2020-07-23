@@ -8,4 +8,9 @@ const withTM = require("next-transpile-modules");
 
 module.exports = withTM({
   transpileModules: ["common-ui"],
+  webpack: (config) => {
+    // Enable setImmediate polyfill:
+    config.node.setImmediate = true;
+    return config;
+  },
 });
