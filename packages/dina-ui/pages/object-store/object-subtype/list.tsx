@@ -6,9 +6,9 @@ import {
   QueryTableProps
 } from "common-ui";
 import Link from "next/link";
-import { ObjectSubtype } from "types/objectstore-api/resources/ObjectSubtype";
-import { Head, Nav } from "../../../components";
+import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
 
 const OBJECTSUBTYPE_TABLE_COLUMNS: ColumnDefinition<ObjectSubtype>[] = [
   {
@@ -38,17 +38,18 @@ export default function ObjectSubtypeListPage() {
     <>
       <Head title={formatMessage("objectSubtypeListTitle")} />
       <Nav />
-      <ButtonBar>
-        <CreateButton entityLink="/object-store/object-subtype" />
-      </ButtonBar>
       <div className="container-fluid">
         <h1>
           <DinaMessage id="objectSubtypeListTitle" />
         </h1>
+        <ButtonBar>
+          <CreateButton entityLink="/object-store/object-subtype" />
+        </ButtonBar>
         <div style={{ maxWidth: "50rem" }}>
           <QueryTable {...queryTableProps} />
         </div>
       </div>
+      <Footer />
     </>
   );
 }

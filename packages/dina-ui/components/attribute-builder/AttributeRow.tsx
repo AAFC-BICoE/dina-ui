@@ -1,7 +1,7 @@
 import { filterBy } from "common-ui";
 import { ResourceSelectField, TextField } from "common-ui";
 import React from "react";
-import { ManagedAttribute } from "types/objectstore-api/resources/ManagedAttribute";
+import { ManagedAttribute } from "../../types/objectstore-api/resources/ManagedAttribute";
 import { ControlledAttribute } from "./AttributeBuilder";
 
 export interface AttributeRowModel {

@@ -1,5 +1,5 @@
 import { HotTableProps } from "@handsontable/react";
-import { FormikContextType } from "formik";
+import { FormikContextType, useFormikContext } from "formik";
 import { GridSettings } from "handsontable";
 import { cloneDeep, isEmpty, zipWith } from "lodash";
 import dynamic from "next/dynamic";
@@ -11,6 +11,7 @@ import { CommonMessage } from "../intl/common-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { difference, RecursivePartial } from "./difference";
 import { getUserFriendlyAutoCompleteRenderer } from "./resource-select-cell";
+import { safeSubmit } from "../formik-connected/safeSubmit";
 
 export interface RowChange<TRow> {
   original: TRow;
@@ -34,18 +35,31 @@ export function BulkDataEditor<TRow>({
 }: BulkDataEditorProps<TRow>) {
   type TableData = TRow[];
 
+  const formik = useFormikContext();
+
   const [initialTableData, setInitialTableData] = useState<TableData>();
   const [workingTableData, setWorkingTableData] = useState<TableData>();
 
+  // Loads the initial data and shows an error message on fail:
+  const loadDataInternal = safeSubmit(async () => {
+    const loadedData = await loadData();
+    setInitialTableData(loadedData);
+    setWorkingTableData(cloneDeep(loadedData));
+  });
+
   // Load the data once after mount:
   useEffect(() => {
-    (async () => {
-      const loadedData = await loadData();
-      setInitialTableData(loadedData);
-      setWorkingTableData(cloneDeep(loadedData));
-    })();
+    loadDataInternal({}, formik);
   }, []);
 
+  // Show initial data loading errors here:
+  const loadingFailed =
+    (!workingTableData || !initialTableData) && formik.status;
+  if (loadingFailed) {
+    return <ErrorViewer />;
+  }
+
+  // Show loading state here:
   if (!workingTableData || !initialTableData) {
     return <LoadingSpinner loading={true} />;
   }
@@ -71,11 +85,14 @@ export function BulkDataEditor<TRow>({
   return (
     <>
       <ErrorViewer />
-      <DynamicHotTable
-        columns={columns}
-        data={workingTableData as any}
-        manualColumnResize={true}
-      />
+      <div className="form-group">
+        <DynamicHotTable
+          columns={columns}
+          data={workingTableData as any}
+          manualColumnResize={true}
+          maxRows={workingTableData.length}
+        />
+      </div>
       <FormikButton
         className="btn btn-primary bulk-editor-submit-button"
         onClick={onSubmitInternal}

@@ -10,9 +10,9 @@ import { Formik } from "formik";
 import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
-import { Person } from "types/objectstore-api/resources/Person";
-import { Head, Nav } from "../../components";
+import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { Person } from "../../types/objectstore-api/resources/Person";
 
 export function PersonDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -58,6 +58,7 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
           );
         }}
       </Query>
+      <Footer />
     </div>
   );
 }

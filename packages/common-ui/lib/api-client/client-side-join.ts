@@ -1,6 +1,6 @@
 import DataLoader from "dataloader";
 import { PersistedResource } from "kitsu";
-import { get } from "lodash";
+import { get, zipWith } from "lodash";
 import { ApiClientContextI } from "./ApiClientContext";
 
 export interface ClientSideJoinSpec {
@@ -36,22 +36,24 @@ export class ClientSideJoiner {
   /** Fetches the joined data and joins it to the  */
   public async join() {
     // Only join on the resources that have the idField set:
-    const resourcesToJoin = this.resources.filter(resource =>
+    const baseResources = this.resources.filter(resource =>
       get(resource, this.joinSpec.idField)
     );
 
-    for (const resource of resourcesToJoin) {
-      // Call "load" without awaiting so the DataLoader can batch together the
-      // required IDs.
-      this.joinLoader.load(this.joinSpec.path(resource));
-    }
+    const paths = baseResources.map(resource => this.joinSpec.path(resource));
 
-    for (const resource of resourcesToJoin) {
-      // The first call to "await" in this loop dispatches the batched API request
-      // for all the required joined resources:
-      resource[this.joinSpec.joinField] = await this.joinLoader.load(
-        this.joinSpec.path(resource)
-      );
-    }
+    // Load the joined resources from the back-end:
+    const joinedResources = await this.joinLoader.loadMany(paths);
+
+    // Join the resources:
+    zipWith(baseResources, joinedResources, (baseResource, joinedResource) => {
+      // DataLoader#loadMany doesn't throw errors; throw here if there are any:
+      if (joinedResource instanceof Error) {
+        throw joinedResource;
+      }
+
+      // Otherwise attach the joined resource:
+      baseResource[this.joinSpec.joinField] = joinedResource;
+    });
   }
 }
