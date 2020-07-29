@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   mvn-test:
-    image: maven:3.6.3-jdk-8
+    image: maven:3.6.3-jdk-11
     # Run as Docker host user so generated files don't belong to root:
     user: $UID:$GID
     volumes:
