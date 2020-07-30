@@ -73,8 +73,26 @@ export default function MetadataListPage() {
     },
     "originalFilename",
     "dcFormat",
-    "acDigitizationDate",
-    "xmpMetadataDate",
+    {
+      Cell: ({ original: { acDigitizationDate } }) => (
+        <>
+          {acDigitizationDate
+            ? new Date(acDigitizationDate).toString()
+            : acDigitizationDate}
+        </>
+      ),
+      accessor: "acDigitizationDate"
+    },
+    {
+      Cell: ({ original: { xmpMetadataDate } }) => (
+        <>
+          {xmpMetadataDate
+            ? new Date(xmpMetadataDate).toString()
+            : xmpMetadataDate}
+        </>
+      ),
+      accessor: "xmpMetadataDate"
+    },
     "acMetadataCreator.displayName",
     {
       Cell: ({ original: { acTags } }) => <>{acTags?.join(", ")}</>,
