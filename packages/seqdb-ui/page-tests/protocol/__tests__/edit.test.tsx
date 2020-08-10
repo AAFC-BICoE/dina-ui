@@ -158,9 +158,6 @@ describe("Protocol edit page", () => {
               }),
               id: "10",
               relationships: {
-                group: {
-                  data: expect.objectContaining({ id: "8", type: "group" })
-                },
                 kit: {
                   data: expect.objectContaining({ id: "10", type: "product" })
                 }
@@ -223,20 +220,8 @@ const TEST_PROTOCOL: Required<Protocol> = {
   description: "protocol desc",
   equipment: "equip",
   forwardPrimerConcentration: "fPrimer",
-  group: {
-    description: "protocol group desc",
-    groupName: "Public",
-    id: "8",
-    type: "group"
-  },
   id: "10",
   kit: {
-    group: {
-      description: "product group desc",
-      groupName: "ganx",
-      id: "8",
-      type: "group"
-    },
     id: "10",
     lastModified: "2019-03-27T04:00:00.000+0000",
     name: "Rapid Alkaline DNA Extraction",

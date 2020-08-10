@@ -16,7 +16,6 @@ import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ButtonBar, CancelButton, Head, Nav } from "../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
-import { Group } from "../../types/seqdb-api/resources/Group";
 import { Product } from "../../types/seqdb-api/resources/Product";
 import {
   Protocol,
@@ -42,9 +41,7 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
             <h1>
               <SeqdbMessage id="editProtocolTitle" />
             </h1>
-            <Query<Protocol>
-              query={{ include: "group,kit", path: `protocol/${id}` }}
-            >
+            <Query<Protocol> query={{ include: "kit", path: `protocol/${id}` }}>
               {({ loading, response }) => (
                 <div>
                   <LoadingSpinner loading={loading} />
@@ -99,15 +96,6 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
           <CancelButton entityId={id as string} entityLink="protocol" />
         </ButtonBar>
         <div>
-          <div className="row">
-            <ResourceSelectField<Group>
-              className="col-md-2"
-              name="group"
-              filter={filterBy(["groupName"])}
-              model="group"
-              optionLabel={group => group.groupName}
-            />
-          </div>
           <div className="row">
             <SelectField
               className="col-md-2"

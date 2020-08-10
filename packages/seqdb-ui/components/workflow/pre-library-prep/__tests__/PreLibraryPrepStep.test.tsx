@@ -124,7 +124,7 @@ describe("PreLibraryPrepStep UI", () => {
     /** Mock Kitsu "get" method. */
     mockGet.mockImplementation(async (model, params) => {
       if (model === "stepResource") {
-        if (params.include === "sample,sample.group") {
+        if (params.include === "sample") {
           return { data: TEST_SAMPLE_STEP_RESOURCES };
         } else if (params.include.includes("sample,preLibraryPrep")) {
           return { data: [] };
@@ -162,7 +162,7 @@ describe("PreLibraryPrepStep UI", () => {
           "chainStepTemplate.chainStepTemplateId": "1",
           rsql: ""
         },
-        include: "sample,sample.group",
+        include: "sample",
         page: {
           limit: 100,
           offset: 0
@@ -764,10 +764,7 @@ describe("PreLibraryPrepStep UI", () => {
   it("Shows the Shearing and Size Selection status in the table.", async () => {
     mockGet.mockImplementation(async (path, params) => {
       // The request for the sample stepResources.
-      if (
-        path === "stepResource" &&
-        params.include.includes("sample,sample.group")
-      ) {
+      if (path === "stepResource" && params.include === "sample") {
         // Return stepResources with samples.
         return {
           data: [
@@ -841,10 +838,7 @@ describe("PreLibraryPrepStep UI", () => {
   it("Lets you delete selected shearing or size selection stepResources.", async () => {
     mockGet.mockImplementation(async (path, params) => {
       // Mock sample table response.
-      if (
-        path === "stepResource" &&
-        params.include.includes("sample,sample.group")
-      ) {
+      if (path === "stepResource" && params.include === "sample") {
         return {
           data: [
             { id: "5", type: "stepResource", sample: { id: "11" } },
@@ -916,10 +910,7 @@ describe("PreLibraryPrepStep UI", () => {
   it("Shows different view modes for the shearing and size selectino details", async () => {
     mockGet.mockImplementation(async (path, params) => {
       // The request for the sample stepResources.
-      if (
-        path === "stepResource" &&
-        params.include.includes("sample,sample.group")
-      ) {
+      if (path === "stepResource" && params.include === "sample") {
         return {
           data: [{ id: "5", type: "stepResource", sample: { id: "10" } }]
         };

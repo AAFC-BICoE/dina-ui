@@ -13,28 +13,19 @@ const PROTOCOL_TABLE_COLUMNS: ColumnDefinition<Protocol>[] = [
     ),
     accessor: "name"
   },
-  {
-    accessor: "group.groupName"
-  },
   "type",
   "version",
   "description",
   "equipment",
-  {
-    Header: "Kit Group Name",
-    accessor: "kit.group.groupname"
-  },
   "kit.name"
 ];
 
 const PROTOCOL_FILTER_ATTRIBUTES = [
   "name",
-  "group.groupName",
   "type",
   "version",
   "description",
   "equipment",
-  "kit.group.groupName",
   "kit.name"
 ];
 
@@ -57,7 +48,7 @@ export default function ProtocolListPage() {
           filterAttributes={PROTOCOL_FILTER_ATTRIBUTES}
           queryTableProps={{
             columns: PROTOCOL_TABLE_COLUMNS,
-            include: "group,kit",
+            include: "kit",
             path: "protocol"
           }}
         />

@@ -185,11 +185,6 @@ describe("Product edit page", () => {
               name: "Rapid Alkaline DNA Extraction"
             }),
             id: "10",
-            relationships: {
-              group: {
-                data: expect.objectContaining({ id: "8", type: "group" })
-              }
-            },
             type: "product"
           }
         }
@@ -205,12 +200,6 @@ describe("Product edit page", () => {
 /** Test Product with all fields defined. */
 const TEST_PRODUCT: Required<Product> = {
   description: "desc",
-  group: {
-    description: "group desc",
-    groupName: "Public",
-    id: "8",
-    type: "group"
-  },
   id: "10",
   lastModified: "2019-03-27T04:00:00.000+0000",
   name: "Rapid Alkaline DNA Extraction",

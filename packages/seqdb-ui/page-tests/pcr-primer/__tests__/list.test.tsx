@@ -8,7 +8,6 @@ jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 const TEST_PRIMERS: PcrPrimer[] = [
   {
-    group: { id: "1", groupName: "Test Group", type: "group" },
     id: "4",
     lotNumber: 1,
     name: "Test Primer 1",
@@ -16,7 +15,6 @@ const TEST_PRIMERS: PcrPrimer[] = [
     type: "PRIMER"
   },
   {
-    group: { id: "1", groupName: "Test Group", type: "group" },
     id: "5",
     lotNumber: 1,
     name: "Test Primer 2",

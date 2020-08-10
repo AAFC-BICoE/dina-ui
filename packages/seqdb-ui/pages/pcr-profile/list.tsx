@@ -6,9 +6,6 @@ import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 
 const PCRPROFILE_TABLE_COLUMNS: ColumnDefinition<PcrProfile>[] = [
   {
-    accessor: "group.groupName"
-  },
-  {
     Cell: ({ original: { region } }) =>
       region ? (
         <Link href={`/region/view?id=${region.id}`}>
@@ -50,7 +47,7 @@ export default function PcrProfileListPage() {
           id="pcr-profile-list"
           queryTableProps={{
             columns: PCRPROFILE_TABLE_COLUMNS,
-            include: "group,region",
+            include: "region",
             path: "thermocyclerprofile"
           }}
         />

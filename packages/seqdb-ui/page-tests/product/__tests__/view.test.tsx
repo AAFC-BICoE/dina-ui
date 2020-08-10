@@ -6,7 +6,6 @@ import { Product } from "../../../types/seqdb-api/resources/Product";
 jest.mock("next/link", () => () => <div />);
 
 const TEST_PRODUCT: Product = {
-  group: { id: "1", groupName: "Test Group", type: "group" },
   id: "4",
   name: "Test Product 1",
   type: "product"

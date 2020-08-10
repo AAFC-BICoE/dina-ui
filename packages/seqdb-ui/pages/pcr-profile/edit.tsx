@@ -15,7 +15,6 @@ import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ButtonBar, CancelButton, Head, Nav } from "../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
-import { Group } from "../../types/seqdb-api/resources/Group";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 import { Region } from "../../types/seqdb-api/resources/Region";
 
@@ -40,7 +39,7 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
             </h1>
             <Query<PcrProfile>
               query={{
-                include: "group,region",
+                include: "region",
                 path: `thermocyclerprofile/${id}`
               }}
             >
@@ -93,15 +92,6 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
           <CancelButton entityId={id as string} entityLink="pcr-profile" />
         </ButtonBar>
         <div>
-          <div className="row">
-            <ResourceSelectField<Group>
-              className="col-md-2"
-              name="group"
-              filter={filterBy(["groupName"])}
-              model="group"
-              optionLabel={group => group.groupName}
-            />
-          </div>
           <div className="row">
             <ResourceSelectField<Region>
               className="col-md-2"

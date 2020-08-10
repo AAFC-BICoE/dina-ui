@@ -1,5 +1,4 @@
 import { KitsuResource } from "kitsu";
-import { Group } from "./Group";
 import { Product } from "./Product";
 
 export interface ProtocolAttributes {
@@ -19,7 +18,6 @@ export interface ProtocolAttributes {
 }
 
 export interface ProtocolRelationships {
-  group: Group;
   kit?: Product;
 }
 

@@ -9,7 +9,6 @@ import {
 jest.mock("next/link", () => () => <div />);
 
 const TEST_PROTOCOL: Protocol = {
-  group: { id: "1", groupName: "Test Group", type: "group" },
   id: "4",
   kit: { name: "test kit", type: "product" },
   name: "Test Protocol",

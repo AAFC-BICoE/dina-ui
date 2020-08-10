@@ -1,5 +1,4 @@
 import { KitsuResource } from "kitsu";
-import { Group } from "./Group";
 
 export interface ContainerTypeAttributes {
   baseType: string;
@@ -10,10 +9,4 @@ export interface ContainerTypeAttributes {
   numberOfWells: number;
 }
 
-export interface ContainerTypeRelationships {
-  group?: Group;
-}
-
-export type ContainerType = KitsuResource &
-  ContainerTypeAttributes &
-  ContainerTypeRelationships;
+export type ContainerType = KitsuResource & ContainerTypeAttributes;

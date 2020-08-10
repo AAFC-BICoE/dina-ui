@@ -16,7 +16,6 @@ import { useContext } from "react";
 import { Head, Nav } from "../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
 import { Chain } from "../../types/seqdb-api";
-import { Group } from "../../types/seqdb-api/resources/Group";
 
 interface ChainFormProps {
   chain?: any;
@@ -38,7 +37,7 @@ export function ChainEditPage({ router }: WithRouterProps) {
               <SeqdbMessage id="editWorkflowTitle" />
             </h1>
             <Query<Chain>
-              query={{ include: "chainTemplate,group", path: `workflow/${id}` }}
+              query={{ include: "chainTemplate", path: `workflow/${id}` }}
             >
               {({ loading, response }) => (
                 <div>
@@ -98,15 +97,6 @@ function ChainForm({ chain, router }: ChainFormProps) {
                 filter={filterBy(["name"])}
                 model="chainTemplate"
                 optionLabel={template => template.name}
-              />
-            </div>
-            <div className="row">
-              <ResourceSelectField<Group>
-                className="col-md-2"
-                name="group"
-                filter={filterBy(["groupName"])}
-                model="group"
-                optionLabel={group => group.groupName}
               />
             </div>
             <div className="row">

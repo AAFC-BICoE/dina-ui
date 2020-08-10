@@ -180,9 +180,6 @@ describe("PcrProfile edit page", () => {
               }),
               id: "1",
               relationships: {
-                group: {
-                  data: expect.objectContaining({ id: "8", type: "group" })
-                },
                 region: {
                   data: expect.objectContaining({ id: "2", type: "region" })
                 }
@@ -205,12 +202,6 @@ describe("PcrProfile edit page", () => {
 const TEST_PROFILE: Required<PcrProfile> = {
   application: "PCR of ITS regions",
   cycles: "cycles",
-  group: {
-    description: null,
-    groupName: "Public",
-    id: "8",
-    type: "group"
-  },
   id: "1",
   lastModified: "2013-03-19T04:00:00.000+0000",
   name: "PROF1",

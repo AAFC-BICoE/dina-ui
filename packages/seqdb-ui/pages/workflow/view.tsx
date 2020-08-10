@@ -24,7 +24,7 @@ export default function WorkflowViewPage() {
   const { formatMessage } = useSeqdbIntl();
 
   const { loading, response } = useQuery<Chain>({
-    include: "group,chainTemplate",
+    include: "chainTemplate",
     path: `chain/${id}`
   });
 
@@ -113,7 +113,6 @@ function WorkflowSteps({ chain }: { chain: PersistedResource<Chain> }) {
           <Formik initialValues={chain} onSubmit={noop}>
             <div className="col-md-3">
               <FieldView label="Template" name="chainTemplate.name" />
-              <FieldView label="Group" name="group.groupName" />
               <FieldView name="name" />
               <FieldView name="dateCreated" />
             </div>

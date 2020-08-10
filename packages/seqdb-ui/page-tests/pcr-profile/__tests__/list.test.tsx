@@ -7,13 +7,11 @@ jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 const TEST_PROFILES: PcrProfile[] = [
   {
-    group: { id: "1", groupName: "Test Group", type: "group" },
     id: "4",
     name: "Test Profile 1",
     type: "PRORILE"
   },
   {
-    group: { id: "1", groupName: "Test Group", type: "group" },
     id: "5",
     name: "Test Profile 2",
     type: "PROFILE"

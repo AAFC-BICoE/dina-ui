@@ -13,11 +13,6 @@ const TEST_PROTOCALS: Protocol[] = [
   {
     description: "desc1 ",
     equipment: "equip1",
-    group: {
-      groupName: "Test Group",
-      id: "1",
-      type: "group"
-    },
     id: "4",
     name: "Test Protocol 1",
     notes: "notes1",
@@ -29,11 +24,6 @@ const TEST_PROTOCALS: Protocol[] = [
   {
     description: "desc2 ",
     equipment: "equip2",
-    group: {
-      groupName: "Test Group",
-      id: "2",
-      type: "group"
-    },
     id: "5",
     name: "Test Protocol 2",
     notes: "notes2",

@@ -1,5 +1,4 @@
 import { KitsuResource } from "kitsu";
-import { Group } from "../Group";
 import { ChainTemplate } from "./ChainTemplate";
 
 export interface ChainAttributes {
@@ -9,7 +8,6 @@ export interface ChainAttributes {
 
 export interface ChainRelationships {
   chainTemplate: ChainTemplate;
-  group?: Group;
 }
 
 export type Chain = KitsuResource & ChainAttributes & ChainRelationships;

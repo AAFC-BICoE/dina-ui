@@ -184,9 +184,6 @@ describe("PcrPrimer edit page", () => {
               }),
               id: "1",
               relationships: {
-                group: {
-                  data: expect.objectContaining({ id: "8", type: "group" })
-                },
                 region: {
                   data: expect.objectContaining({ id: "2", type: "region" })
                 }
@@ -212,12 +209,6 @@ const TEST_PRIMER: Required<PcrPrimer> = {
   designDate: null,
   designedBy: "Bob Jones",
   direction: "R",
-  group: {
-    description: null,
-    groupName: "Public",
-    id: "8",
-    type: "group"
-  },
   id: "1",
   lastModified: "2013-03-19T04:00:00.000+0000",
   lotNumber: 1,

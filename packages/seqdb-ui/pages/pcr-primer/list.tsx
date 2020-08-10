@@ -13,7 +13,6 @@ const PCRPRIMER_TABLE_COLUMNS: ColumnDefinition<PcrPrimer>[] = [
     ),
     accessor: "name"
   },
-  "group.groupName",
   {
     Cell: ({ original: { region } }) =>
       region ? (
@@ -41,8 +40,7 @@ const PCR_PRIMER_FILTER_ATTRIBUTES = [
   "tmCalculated",
   "reference",
   "supplier",
-  "region.name",
-  "group.groupName"
+  "region.name"
 ];
 
 export default function PcrPrimerListPage() {
@@ -64,7 +62,7 @@ export default function PcrPrimerListPage() {
           id="primer-list"
           queryTableProps={{
             columns: PCRPRIMER_TABLE_COLUMNS,
-            include: "group,region",
+            include: "region",
             path: "pcrPrimer"
           }}
         />

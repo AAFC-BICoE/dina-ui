@@ -6,7 +6,6 @@ import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
 jest.mock("next/link", () => () => <div />);
 
 const TEST_PROFILE: PcrProfile = {
-  group: { id: "1", groupName: "Test Group", type: "group" },
   id: "5",
   name: "Test Profile",
   type: "thermocyclerprofile"

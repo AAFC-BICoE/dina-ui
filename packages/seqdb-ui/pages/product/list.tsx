@@ -14,9 +14,6 @@ const PRODUCT_TABLE_COLUMNS: ColumnDefinition<Product>[] = [
     accessor: "name"
   },
   {
-    accessor: "group.groupName"
-  },
-  {
     Header: "UPC",
     accessor: "upc"
   },
@@ -24,13 +21,7 @@ const PRODUCT_TABLE_COLUMNS: ColumnDefinition<Product>[] = [
   "description"
 ];
 
-const PRODUCT_FILTER_ATTRIBUTES = [
-  "name",
-  "group.groupName",
-  "upc",
-  "type",
-  "description"
-];
+const PRODUCT_FILTER_ATTRIBUTES = ["name", "upc", "type", "description"];
 
 export default function ProductListPage() {
   const { formatMessage } = useSeqdbIntl();
@@ -51,7 +42,6 @@ export default function ProductListPage() {
           id="product-list"
           queryTableProps={{
             columns: PRODUCT_TABLE_COLUMNS,
-            include: "group",
             path: "product"
           }}
         />

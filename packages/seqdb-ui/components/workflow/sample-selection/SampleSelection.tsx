@@ -1,11 +1,9 @@
 import {
   ColumnDefinition,
   ErrorViewer,
-  filterBy,
   FilterForm,
   FormikButton,
   QueryTable,
-  ResourceSelectField,
   rsql,
   useGroupedCheckBoxes
 } from "common-ui";
@@ -14,7 +12,7 @@ import { FilterParam } from "kitsu";
 import { noop } from "lodash";
 import { useState } from "react";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { Group, StepResource } from "../../../types/seqdb-api";
+import { StepResource } from "../../../types/seqdb-api";
 import { StepRendererProps } from "../StepRenderer";
 import { useSelectionControls } from "./useSelectionControls";
 
@@ -47,17 +45,9 @@ export function SampleSelection(props: StepRendererProps) {
     fieldName: "stepResourceIdsToDelete"
   });
 
-  const SAMPLE_FILTER_ATTRIBUTES = [
-    "name",
-    {
-      allowRange: true,
-      label: "Specimen Number List/Range",
-      name: "specimenReplicate.specimen.number"
-    }
-  ];
+  const SAMPLE_FILTER_ATTRIBUTES = ["name"];
 
   const SELECTABLE_SAMPLE_COLUMNS: ColumnDefinition<any>[] = [
-    "group.groupName",
     "name",
     "version",
     {
@@ -86,10 +76,6 @@ export function SampleSelection(props: StepRendererProps) {
   ];
 
   const SELECTED_SAMPLE_COLUMNS: ColumnDefinition<any>[] = [
-    {
-      Header: "Group Name",
-      accessor: "sample.group.groupName"
-    },
     {
       Header: "Name",
       accessor: "sample.name"
@@ -131,11 +117,6 @@ export function SampleSelection(props: StepRendererProps) {
       rsqlFilters.push(filterBuilderRsql);
     }
 
-    if (values.groups && values.groups.length) {
-      const groupIds = values.groups.map(g => g.id).join(",");
-      rsqlFilters.push(`group.groupId=in=(${groupIds})`);
-    }
-
     const filterParam: FilterParam = {
       rsql: rsqlFilters.join(" and ")
     };
@@ -152,23 +133,7 @@ export function SampleSelection(props: StepRendererProps) {
         filterAttributes={SAMPLE_FILTER_ATTRIBUTES}
         id="sample-selection"
         onFilterFormSubmit={onFilterSubmit}
-      >
-        {({ submitForm }) => (
-          <div className="form-group">
-            <div style={{ width: "300px" }}>
-              <ResourceSelectField<Group>
-                filter={filterBy(["groupName"])}
-                isMulti={true}
-                label="Filter by group"
-                name="groups"
-                model="group"
-                onChange={() => setImmediate(submitForm)}
-                optionLabel={group => group.groupName}
-              />
-            </div>
-          </div>
-        )}
-      </FilterForm>
+      />
       <Formik
         initialValues={{ sampleIdsToSelect: {}, stepResourcesToDelete: {} }}
         onSubmit={noop}
@@ -184,7 +149,6 @@ export function SampleSelection(props: StepRendererProps) {
                 columns={SELECTABLE_SAMPLE_COLUMNS}
                 defaultPageSize={100}
                 filter={filter}
-                include="group"
                 onSuccess={response => setAvailableSamples(response.data)}
                 path="sample"
               />
@@ -221,7 +185,7 @@ export function SampleSelection(props: StepRendererProps) {
                   "chain.chainId": chain.id,
                   "chainStepTemplate.chainStepTemplateId": step.id
                 }}
-                include="sample,sample.group"
+                include="sample"
                 onSuccess={res => setStepResources(res.data)}
                 path="stepResource"
               />

@@ -1,5 +1,4 @@
 import { KitsuResource } from "kitsu";
-import { Group } from "./Group";
 import { Region } from "./Region";
 
 export interface PcrPrimerAttributes {
@@ -40,7 +39,6 @@ export interface PcrPrimerAttributes {
 
 export interface PcrPrimerRelationships {
   region?: Region;
-  group?: Group;
 }
 
 export type PcrPrimer = KitsuResource &

@@ -1,7 +1,7 @@
 import { OperationsResponse, ResourceSelect } from "common-ui";
 import { ChainEditPage } from "../../../pages/workflow/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { Chain, ChainTemplate, Group } from "../../../types/seqdb-api";
+import { Chain, ChainTemplate } from "../../../types/seqdb-api";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -37,7 +37,6 @@ jest.mock(
 const TEST_WORKFLOW: Chain = {
   chainTemplate: { id: "1", type: "chainTemplate" } as ChainTemplate,
   dateCreated: "2019-08-16",
-  group: { id: "100", type: "group" } as Group,
   id: "5",
   name: "Mat's chain",
   type: "chain"
@@ -77,13 +76,6 @@ describe("Workflow edit page.", () => {
       type: "chainTemplate"
     });
 
-    (wrapper.find(".group-field").find(ResourceSelect).prop("onChange") as any)(
-      {
-        id: "200",
-        type: "group"
-      }
-    );
-
     wrapper.find(".name-field input").simulate("change", {
       target: { name: "name", value: "New Workflow" }
     });
@@ -108,8 +100,7 @@ describe("Workflow edit page.", () => {
             },
             id: "-100",
             relationships: {
-              chainTemplate: { data: { id: "1", type: "chainTemplate" } },
-              group: { data: { id: "200", type: "group" } }
+              chainTemplate: { data: { id: "1", type: "chainTemplate" } }
             },
             type: "chain"
           }

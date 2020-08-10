@@ -25,7 +25,7 @@ export function ProductDetailsPage({ router }: WithRouterProps) {
         <EditButton entityId={id as string} entityLink="product" />
         <BackToListButton entityLink="product" />
       </ButtonBar>
-      <Query<Product> query={{ include: "group", path: `product/${id}` }}>
+      <Query<Product> query={{ path: `product/${id}` }}>
         {({ loading, response }) => (
           <div className="container-fluid">
             <h1>
@@ -35,13 +35,6 @@ export function ProductDetailsPage({ router }: WithRouterProps) {
             {response && (
               <Formik<Product> initialValues={response.data} onSubmit={noop}>
                 <div>
-                  <div className="row">
-                    <FieldView
-                      className="col-md-2"
-                      name="group.groupName"
-                      label="Group Name"
-                    />
-                  </div>
                   <div className="row">
                     <FieldView className="col-md-2" name="name" />
                     <FieldView

@@ -1,6 +1,6 @@
 import WorkflowListPage from "../../../pages/workflow/list";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { Chain, ChainTemplate, Group } from "../../../types/seqdb-api";
+import { Chain, ChainTemplate } from "../../../types/seqdb-api";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -9,7 +9,6 @@ const TEST_CHAINS: Chain[] = [
   {
     chainTemplate: { name: "Mat's chain template" } as ChainTemplate,
     dateCreated: "2019-08-16",
-    group: { groupName: "poffm" } as Group,
     id: "1",
     name: "Mat's chain 1",
     type: "chain"
@@ -17,7 +16,6 @@ const TEST_CHAINS: Chain[] = [
   {
     chainTemplate: { name: "Mat's chain template" } as ChainTemplate,
     dateCreated: "2019-08-17",
-    group: { groupName: "poffm" } as Group,
     id: "2",
     name: "Mat's chain 2",
     type: "chain"
@@ -50,7 +48,6 @@ describe("Workflow list page.", () => {
     expect(wrapper.containsMatchingElement(<a>Mat's chain 1</a>)).toEqual(true);
     expect(wrapper.containsMatchingElement(<a>Mat's chain 2</a>)).toEqual(true);
 
-    expect(wrapper.containsMatchingElement(<div>poffm</div>)).toEqual(true);
     expect(
       wrapper.containsMatchingElement(<div>Mat's chain template</div>)
     ).toEqual(true);

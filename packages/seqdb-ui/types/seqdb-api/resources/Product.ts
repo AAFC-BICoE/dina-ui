@@ -1,5 +1,4 @@
 import { KitsuResource } from "kitsu";
-import { Group } from "./Group";
 
 export interface ProductAttributes {
   name: string;
@@ -10,8 +9,4 @@ export interface ProductAttributes {
   lastModified?: string;
 }
 
-export interface ProductRelationships {
-  group?: Group;
-}
-
-export type Product = KitsuResource & ProductAttributes & ProductRelationships;
+export type Product = KitsuResource & ProductAttributes;

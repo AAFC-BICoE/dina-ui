@@ -18,7 +18,6 @@ import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ButtonBar, CancelButton, Head, Nav } from "../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
-import { Group } from "../../types/seqdb-api/resources/Group";
 import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
 import { Region } from "../../types/seqdb-api/resources/Region";
 
@@ -42,7 +41,7 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
               <SeqdbMessage id="editPcrPrimerTitle" />
             </h1>
             <Query<PcrPrimer>
-              query={{ include: "group,region", path: `pcrPrimer/${id}` }}
+              query={{ include: "region", path: `pcrPrimer/${id}` }}
             >
               {({ loading, response }) => (
                 <div>
@@ -94,15 +93,6 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
         </ButtonBar>
         <ErrorViewer />
         <div>
-          <div className="row">
-            <ResourceSelectField<Group>
-              className="col-md-2"
-              name="group"
-              filter={filterBy(["groupName"])}
-              model="group"
-              optionLabel={group => group.groupName}
-            />
-          </div>
           <div className="row">
             <SelectField
               className="col-md-2"
