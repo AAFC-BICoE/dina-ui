@@ -3,8 +3,8 @@ import { AccountContextI } from "common-ui";
 import { noop } from "lodash";
 import UploadPage, {
   fileUploadErrorHandler
-} from "../../pages/object-store/upload";
-import { MockAppContextProvider } from "../../test-util/mock-app-context";
+} from "../../../pages/object-store/upload";
+import { MockAppContextProvider } from "../../../test-util/mock-app-context";
 
 const mockPush = jest.fn();
 

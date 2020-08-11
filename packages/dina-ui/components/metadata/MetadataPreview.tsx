@@ -57,11 +57,16 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
         <style>{METADATA_PREVIEW_STYLE}</style>
         <div className="metadata-edit-link">
           <Link href={`/object-store/metadata/edit?ids=${metadataId}`}>
-            <a className="btn btn-primary">
+            <a className="btn btn-primary metadata-edit-link">
               <DinaMessage id="editButtonText" />
             </a>
           </Link>
         </div>
+        <Link href={`/object-store/metadata/revisions?id=${metadataId}`}>
+          <a className="btn btn-info metadata-revisions-link">
+            <DinaMessage id="revisionsButtonText" />
+          </a>
+        </Link>
         <FileView
           clickToDownload={true}
           filePath={filePath}
