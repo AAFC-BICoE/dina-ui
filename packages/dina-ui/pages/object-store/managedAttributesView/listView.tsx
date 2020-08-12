@@ -14,14 +14,18 @@ const ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] = [
     Header: "Name",
     accessor: "name"
   },
-  "createdDate",
+  "createdBy",
   {
     Cell: ({ original: { description } }) =>
-      description?.en || description?.fr ? (
-        <div>
+      description?.en && description?.fr ? (
+        <>
           en : {description?.en} | fr : {description?.fr}
-        </div>
-      ) : null,
+        </>
+      ) : description?.en ? (
+        description.en
+      ) : (
+        description.fr
+      ),
     accessor: "description"
   },
   "managedAttributeType",
