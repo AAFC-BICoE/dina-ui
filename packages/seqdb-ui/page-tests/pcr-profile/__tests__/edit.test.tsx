@@ -7,9 +7,9 @@ import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async model => {
+const mockGet = jest.fn(async path => {
   // The get request will return the existing profile.
-  if (model === "thermocyclerprofile/100") {
+  if (path === "seqdb-api/thermocyclerprofile/100") {
     // The request for the profile returns the test profile.
     return { data: TEST_PROFILE };
   } else {
@@ -24,17 +24,9 @@ const mockPatch = jest.fn();
 /** Mock next.js' router "push" function for navigating pages. */
 const mockPush = jest.fn();
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-      public axios = {
-        patch: mockPatch
-      };
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+};
 
 describe("PcrProfile edit page", () => {
   beforeEach(() => {
@@ -55,7 +47,8 @@ describe("PcrProfile edit page", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <PcrProfileEditPage router={{ query: {}, push: mockPush } as any} />
+      <PcrProfileEditPage router={{ query: {}, push: mockPush } as any} />,
+      { apiContext }
     );
 
     // Edit the profile name.
@@ -68,7 +61,7 @@ describe("PcrProfile edit page", () => {
 
     setImmediate(() => {
       expect(mockPatch).lastCalledWith(
-        "/operations",
+        "/seqdb-api/operations",
         [
           {
             op: "POST",
@@ -109,7 +102,8 @@ describe("PcrProfile edit page", () => {
     }));
 
     const wrapper = mountWithAppContext(
-      <PcrProfileEditPage router={{ query: {}, push: mockPush } as any} />
+      <PcrProfileEditPage router={{ query: {}, push: mockPush } as any} />,
+      { apiContext }
     );
 
     // Submit the form.
@@ -142,7 +136,8 @@ describe("PcrProfile edit page", () => {
     const wrapper = mountWithAppContext(
       <PcrProfileEditPage
         router={{ query: { id: 100 }, push: mockPush } as any}
-      />
+      />,
+      { apiContext }
     );
 
     // The page should load initially with a loading spinner.
@@ -168,7 +163,7 @@ describe("PcrProfile edit page", () => {
       // "patch" should have been called with a jsonpatch request containing the existing values
       // and the modified one.
       expect(mockPatch).lastCalledWith(
-        "/operations",
+        "/seqdb-api/operations",
         [
           {
             op: "PATCH",

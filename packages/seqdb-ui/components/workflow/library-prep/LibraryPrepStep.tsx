@@ -33,7 +33,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
       },
       include:
         "libraryPrepBatch,libraryPrepBatch.product,libraryPrepBatch.protocol,libraryPrepBatch.containerType,libraryPrepBatch.thermocyclerProfile,libraryPrepBatch.indexSet",
-      path: "stepResource"
+      path: "seqdb-api/stepResource"
     },
     {
       deps: [lastSave]

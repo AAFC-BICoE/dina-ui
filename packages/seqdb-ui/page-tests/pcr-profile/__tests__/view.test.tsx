@@ -18,19 +18,15 @@ const mockGet = jest.fn(async () => {
   };
 });
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-    }
-);
+const apiContext: any = { apiClient: { get: mockGet } };
 
 describe("PcrProfile details page", () => {
   it("Renders initially with a loading spinner.", () => {
     const wrapper = mountWithAppContext(
-      <PcrProfileDetailsPage router={{ query: { id: "100" } } as any} />
+      <PcrProfileDetailsPage router={{ query: { id: "100" } } as any} />,
+      {
+        apiContext
+      }
     );
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
@@ -38,7 +34,10 @@ describe("PcrProfile details page", () => {
 
   it("Renders the PCR profile details", async () => {
     const wrapper = mountWithAppContext(
-      <PcrProfileDetailsPage router={{ query: { id: "100" } } as any} />
+      <PcrProfileDetailsPage router={{ query: { id: "100" } } as any} />,
+      {
+        apiContext
+      }
     );
 
     // Wait for the page to load.

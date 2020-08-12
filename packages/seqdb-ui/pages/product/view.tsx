@@ -25,7 +25,7 @@ export function ProductDetailsPage({ router }: WithRouterProps) {
         <EditButton entityId={id as string} entityLink="product" />
         <BackToListButton entityLink="product" />
       </ButtonBar>
-      <Query<Product> query={{ path: `product/${id}` }}>
+      <Query<Product> query={{ path: `seqdb-api/product/${id}` }}>
         {({ loading, response }) => (
           <div className="container-fluid">
             <h1>

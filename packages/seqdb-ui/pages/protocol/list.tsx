@@ -49,7 +49,7 @@ export default function ProtocolListPage() {
           queryTableProps={{
             columns: PROTOCOL_TABLE_COLUMNS,
             include: "kit",
-            path: "protocol"
+            path: "seqdb-api/protocol"
           }}
         />
       </div>

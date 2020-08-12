@@ -41,7 +41,9 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
             <h1>
               <SeqdbMessage id="editProtocolTitle" />
             </h1>
-            <Query<Protocol> query={{ include: "kit", path: `protocol/${id}` }}>
+            <Query<Protocol>
+              query={{ include: "kit", path: `seqdb-api/protocol/${id}` }}
+            >
               {({ loading, response }) => (
                 <div>
                   <LoadingSpinner loading={loading} />
@@ -76,12 +78,15 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
       submittedValues.kit.type = "product";
     }
 
-    const response = await save([
-      {
-        resource: submittedValues,
-        type: "protocol"
-      }
-    ]);
+    const response = await save(
+      [
+        {
+          resource: submittedValues,
+          type: "protocol"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
 
     const newId = response[0].id;
     await router.push(`/protocol/view?id=${newId}`);

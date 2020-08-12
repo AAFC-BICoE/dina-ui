@@ -37,7 +37,10 @@ export function ChainEditPage({ router }: WithRouterProps) {
               <SeqdbMessage id="editWorkflowTitle" />
             </h1>
             <Query<Chain>
-              query={{ include: "chainTemplate", path: `workflow/${id}` }}
+              query={{
+                include: "chainTemplate",
+                path: `seqdb-api/chain/${id}`
+              }}
             >
               {({ loading, response }) => (
                 <div>
@@ -72,12 +75,15 @@ function ChainForm({ chain, router }: ChainFormProps) {
     const dateCreated = new Date().toISOString().split("T")[0];
     submittedValues.dateCreated = dateCreated;
 
-    const response = await save([
-      {
-        resource: submittedValues,
-        type: "chain"
-      }
-    ]);
+    const response = await save(
+      [
+        {
+          resource: submittedValues,
+          type: "chain"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
 
     const newId = response[0].id;
     await router.push(`/workflow/view?id=${newId}`);

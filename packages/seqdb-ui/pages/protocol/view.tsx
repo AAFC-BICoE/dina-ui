@@ -28,7 +28,9 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
         <EditButton entityId={id as string} entityLink="protocol" />
         <BackToListButton entityLink="protocol" />
       </ButtonBar>
-      <Query<Protocol> query={{ include: "kit", path: `protocol/${id}` }}>
+      <Query<Protocol>
+        query={{ include: "kit", path: `seqdb-api/protocol/${id}` }}
+      >
         {({ loading, response }) => {
           const protocol = response && {
             ...response.data,

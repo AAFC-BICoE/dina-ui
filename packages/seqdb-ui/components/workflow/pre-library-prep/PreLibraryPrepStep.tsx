@@ -197,7 +197,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                         res.data.map(sr => sr.sample as Sample)
                       );
                     }}
-                    path="stepResource"
+                    path="seqdb-api/stepResource"
                   />
                 </div>
                 {viewMode === "EDIT" && (

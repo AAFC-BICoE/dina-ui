@@ -1,5 +1,9 @@
 import "bootswatch/dist/spacelab/bootstrap.min.css";
-import { ApiClientContext, createContextValue } from "common-ui";
+import {
+  AuthenticatedApiClientProvider,
+  createContextValue,
+  KeycloakAccountProvider
+} from "common-ui";
 import "common-ui/lib/button-bar/buttonbar.css";
 import App from "next/app";
 import React from "react";
@@ -16,17 +20,21 @@ import { SeqdbIntlProvider } from "../intl/seqdb-intl";
  * See: https://github.com/zeit/next.js/#custom-app
  */
 export default class SeqdbUiApp extends App {
-  private contextValue = createContextValue();
+  private contextValue = createContextValue({
+    baseURL: "/api"
+  });
 
   public render() {
     const { Component, pageProps } = this.props;
 
     return (
-      <ApiClientContext.Provider value={this.contextValue}>
-        <SeqdbIntlProvider>
-          <Component {...pageProps} />
-        </SeqdbIntlProvider>
-      </ApiClientContext.Provider>
+      <KeycloakAccountProvider>
+        <AuthenticatedApiClientProvider apiContext={this.contextValue}>
+          <SeqdbIntlProvider>
+            <Component {...pageProps} />
+          </SeqdbIntlProvider>
+        </AuthenticatedApiClientProvider>
+      </KeycloakAccountProvider>
     );
   }
 }

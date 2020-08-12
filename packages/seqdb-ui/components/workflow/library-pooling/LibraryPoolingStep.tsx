@@ -20,7 +20,7 @@ export function LibraryPoolingStep(props: StepRendererProps) {
         "chainStepTemplate.chainStepTemplateId": step.id as string
       },
       include: "libraryPool",
-      path: "stepResource"
+      path: "seqdb-api/stepResource"
     },
     {
       deps: [lastSave]

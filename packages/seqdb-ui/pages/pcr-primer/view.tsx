@@ -27,7 +27,7 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
       </ButtonBar>
 
       <Query<PcrPrimer>
-        query={{ include: "group,region", path: `pcrPrimer/${id}` }}
+        query={{ include: "group,region", path: `seqdb-api/pcrPrimer/${id}` }}
       >
         {({ loading, response }) => (
           <div className="container-fluid">

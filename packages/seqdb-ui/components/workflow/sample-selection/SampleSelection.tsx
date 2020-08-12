@@ -150,7 +150,7 @@ export function SampleSelection(props: StepRendererProps) {
                 defaultPageSize={100}
                 filter={filter}
                 onSuccess={response => setAvailableSamples(response.data)}
-                path="sample"
+                path="seqdb-api/sample"
               />
             </div>
             <div className="col-2" style={{ marginTop: "100px" }}>
@@ -187,7 +187,7 @@ export function SampleSelection(props: StepRendererProps) {
                 }}
                 include="sample"
                 onSuccess={res => setStepResources(res.data)}
-                path="stepResource"
+                path="seqdb-api/stepResource"
               />
             </div>
           </div>

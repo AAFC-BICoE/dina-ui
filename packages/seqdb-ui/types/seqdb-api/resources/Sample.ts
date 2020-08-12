@@ -20,8 +20,6 @@ export interface SampleAttributes {
   lysisBufferVolume?: number;
   proteinaseKVolume?: number;
   qubitDNAConcentration?: number;
-  ratio260_280?: number;
-  ratio260_230?: number;
   quantificationMethod?: string;
   growthMedia?: string;
   dnaNotes?: string;

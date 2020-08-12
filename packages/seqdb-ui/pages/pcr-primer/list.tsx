@@ -63,7 +63,7 @@ export default function PcrPrimerListPage() {
           queryTableProps={{
             columns: PCRPRIMER_TABLE_COLUMNS,
             include: "region",
-            path: "pcrPrimer"
+            path: "seqdb-api/pcrPrimer"
           }}
         />
       </div>

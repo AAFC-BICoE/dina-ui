@@ -25,7 +25,7 @@ export default function WorkflowViewPage() {
 
   const { loading, response } = useQuery<Chain>({
     include: "chainTemplate",
-    path: `chain/${id}`
+    path: `seqdb-api/chain/${id}`
   });
 
   return (
@@ -59,7 +59,7 @@ function WorkflowSteps({ chain }: { chain: PersistedResource<Chain> }) {
   const { loading, response } = useQuery<ChainStepTemplate[]>({
     filter: { "chainTemplate.id": chain.chainTemplate.id as string },
     include: "stepTemplate",
-    path: "chainStepTemplate"
+    path: "seqdb-api/chainStepTemplate"
   });
 
   const router = useRouter();

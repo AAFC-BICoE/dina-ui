@@ -26,7 +26,10 @@ export function PcrProfileDetailsPage({ router }: WithRouterProps) {
         <BackToListButton entityLink="pcr-profile" />
       </ButtonBar>
       <Query<PcrProfile>
-        query={{ include: "region", path: `thermocyclerprofile/${id}` }}
+        query={{
+          include: "region",
+          path: `seqdb-api/thermocyclerprofile/${id}`
+        }}
       >
         {({ loading, response }) => (
           <div className="container-fluid">

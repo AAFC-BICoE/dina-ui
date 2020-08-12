@@ -35,7 +35,8 @@ export function useLibraryPoolingSelectionControls({
       newLibraryPoolContents.map(lpc => ({
         resource: lpc,
         type: "libraryPoolContent"
-      }))
+      })),
+      { apiBaseUrl: "/seqdb-api" }
     );
 
     setLastSave(Date.now());
@@ -88,7 +89,7 @@ export function useLibraryPoolingSelectionControls({
       }
     }));
 
-    await doOperations(operations);
+    await doOperations(operations, { apiBaseUrl: "/seqdb-api" });
 
     setLastSave(Date.now());
   }

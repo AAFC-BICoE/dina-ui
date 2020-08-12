@@ -30,7 +30,8 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
     }));
 
     await save(
-      newStepResources.map(sr => ({ resource: sr, type: "stepResource" }))
+      newStepResources.map(sr => ({ resource: sr, type: "stepResource" })),
+      { apiBaseUrl: "/seqdb-api" }
     );
 
     setLastSave(Date.now());
@@ -67,7 +68,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
       }
     }));
 
-    await doOperations(operations);
+    await doOperations(operations, { apiBaseUrl: "/seqdb-api" });
 
     setLastSave(Date.now());
   }

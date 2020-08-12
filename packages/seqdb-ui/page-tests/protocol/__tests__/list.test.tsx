@@ -41,18 +41,13 @@ const mockGet = jest.fn(async () => {
   };
 });
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockGet }
+};
 
 describe("Protocol list page", () => {
   it("Renders the list page.", async () => {
-    const wrapper = mountWithAppContext(<ProtocolListPage />);
+    const wrapper = mountWithAppContext(<ProtocolListPage />, { apiContext });
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -67,7 +62,7 @@ describe("Protocol list page", () => {
   });
 
   it("Allows a filterable search.", async () => {
-    const wrapper = mountWithAppContext(<ProtocolListPage />);
+    const wrapper = mountWithAppContext(<ProtocolListPage />, { apiContext });
 
     // Wait for the default search to finish.
     await new Promise(setImmediate);

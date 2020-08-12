@@ -7,8 +7,8 @@ import { Chain, ChainTemplate } from "../../../types/seqdb-api";
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async model => {
-  if (model === "chain/5") {
+const mockGet = jest.fn(async path => {
+  if (path === "seqdb-api/chain/5") {
     // The request for the primer returns the test region.
     return { data: TEST_WORKFLOW };
   } else {
@@ -22,17 +22,9 @@ const mockPatch = jest.fn();
 /** Mock next.js' router "push" function for navigating pages. */
 const mockPush = jest.fn();
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-      public axios = {
-        patch: mockPatch
-      };
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockGet, patch: mockPatch }
+};
 
 const TEST_WORKFLOW: Chain = {
   chainTemplate: { id: "1", type: "chainTemplate" } as ChainTemplate,
@@ -61,7 +53,8 @@ describe("Workflow edit page.", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <ChainEditPage router={{ query: {}, push: mockPush } as any} />
+      <ChainEditPage router={{ query: {}, push: mockPush } as any} />,
+      { apiContext }
     );
 
     await new Promise(setImmediate);
@@ -88,7 +81,7 @@ describe("Workflow edit page.", () => {
     const today = new Date().toISOString().split("T")[0];
 
     expect(mockPatch).lastCalledWith(
-      "/operations",
+      "/seqdb-api/operations",
       [
         {
           op: "POST",

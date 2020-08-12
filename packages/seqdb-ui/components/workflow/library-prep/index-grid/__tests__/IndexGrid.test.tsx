@@ -76,7 +76,7 @@ describe("IndexGrid component", () => {
     jest.resetAllMocks();
 
     mockGet.mockImplementation(async path => {
-      if (path === "libraryPrepBatch/10/libraryPreps") {
+      if (path === "seqdb-api/libraryPrepBatch/10/libraryPreps") {
         return { data: MOCK_LIBRARY_PREPS };
       }
 
@@ -158,44 +158,47 @@ describe("IndexGrid component", () => {
     // 3B should be omitted from this operation because it is not in column 2 or row C.
     // 2C should be updated with i7 of ngs index 100 and i5 of ngs index 200.
     // 3C should be updated with i5 of ngs index 200.
-    expect(mockSave).lastCalledWith([
-      {
-        resource: {
-          id: "1",
-          indexI7: {
-            id: "100",
-            type: "ngsIndex"
+    expect(mockSave).lastCalledWith(
+      [
+        {
+          resource: {
+            id: "1",
+            indexI7: {
+              id: "100",
+              type: "ngsIndex"
+            },
+            type: "libraryPrep"
           },
           type: "libraryPrep"
         },
-        type: "libraryPrep"
-      },
-      {
-        resource: {
-          id: "3",
-          indexI5: {
-            id: "200",
-            type: "ngsIndex"
-          },
-          indexI7: {
-            id: "100",
-            type: "ngsIndex"
-          },
-          type: "libraryPrep"
-        },
-        type: "libraryPrep"
-      },
-      {
-        resource: {
-          id: "4",
-          indexI5: {
-            id: "200",
-            type: "ngsIndex"
+        {
+          resource: {
+            id: "3",
+            indexI5: {
+              id: "200",
+              type: "ngsIndex"
+            },
+            indexI7: {
+              id: "100",
+              type: "ngsIndex"
+            },
+            type: "libraryPrep"
           },
           type: "libraryPrep"
         },
-        type: "libraryPrep"
-      }
-    ]);
+        {
+          resource: {
+            id: "4",
+            indexI5: {
+              id: "200",
+              type: "ngsIndex"
+            },
+            type: "libraryPrep"
+          },
+          type: "libraryPrep"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
   });
 });

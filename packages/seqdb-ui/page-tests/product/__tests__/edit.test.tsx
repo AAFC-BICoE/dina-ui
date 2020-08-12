@@ -15,25 +15,17 @@ const mockPatch = jest.fn();
 /** Mock next.js' router "push" function for navigating pages. */
 const mockPush = jest.fn();
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-      public axios = {
-        patch: mockPatch
-      };
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockGet, patch: mockPatch }
+};
 
 describe("Product edit page", () => {
   beforeEach(() => {
     jest.resetAllMocks();
 
     // The get request will return the existing product.
-    mockGet.mockImplementation(async model => {
-      if (model === "product/10") {
+    mockGet.mockImplementation(async path => {
+      if (path === "seqdb-api/product/10") {
         // The request for the product returns the test product.
         return { data: TEST_PRODUCT };
       } else {
@@ -57,7 +49,8 @@ describe("Product edit page", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <ProductEditPage router={{ query: {}, push: mockPush } as any} />
+      <ProductEditPage router={{ query: {}, push: mockPush } as any} />,
+      { apiContext }
     );
 
     // Edit the product name.
@@ -70,7 +63,7 @@ describe("Product edit page", () => {
 
     await new Promise(setImmediate);
     expect(mockPatch).lastCalledWith(
-      "/operations",
+      "/seqdb-api/operations",
       [
         {
           op: "POST",
@@ -110,7 +103,8 @@ describe("Product edit page", () => {
     }));
 
     const wrapper = mountWithAppContext(
-      <ProductEditPage router={{ query: {}, push: mockPush } as any} />
+      <ProductEditPage router={{ query: {}, push: mockPush } as any} />,
+      { apiContext }
     );
 
     // Edit the product name.
@@ -144,7 +138,8 @@ describe("Product edit page", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <ProductEditPage router={{ query: { id: 10 }, push: mockPush } as any} />
+      <ProductEditPage router={{ query: { id: 10 }, push: mockPush } as any} />,
+      { apiContext }
     );
 
     // The page should load initially with a loading spinner.
@@ -169,12 +164,12 @@ describe("Product edit page", () => {
 
     // Submit the form.
     wrapper.find("form").simulate("submit");
-
     await new Promise(setImmediate);
+
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
     expect(mockPatch).lastCalledWith(
-      "/operations",
+      "/seqdb-api/operations",
       [
         {
           op: "PATCH",

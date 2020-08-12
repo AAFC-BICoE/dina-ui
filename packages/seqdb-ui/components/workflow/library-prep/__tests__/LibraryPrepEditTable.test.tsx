@@ -71,13 +71,13 @@ describe("LibraryPrepEditTable component", () => {
 
     mockGet.mockImplementation(async path => {
       // Mock the samples with libraryPreps:
-      if (path === "libraryPrepBatch/5/libraryPreps") {
+      if (path === "seqdb-api/libraryPrepBatch/5/libraryPreps") {
         return {
           data: MOCK_LIBRARY_PREPS
         };
       }
       // Mock the samples without well coords:
-      if (path === "stepResource") {
+      if (path === "seqdb-api/stepResource") {
         return {
           data: MOCK_SAMPLE_STEPRESOURCES
         };
@@ -134,48 +134,51 @@ describe("LibraryPrepEditTable component", () => {
     wrapper.update();
 
     // Only the two edited library preps should be submitted:
-    expect(mockSave).lastCalledWith([
-      {
-        resource: {
-          id: "3",
-          indexI5: {
-            id: "1",
-            name: "i5 index 1",
-            type: "ngsIndex"
+    expect(mockSave).lastCalledWith(
+      [
+        {
+          resource: {
+            id: "3",
+            indexI5: {
+              id: "1",
+              name: "i5 index 1",
+              type: "ngsIndex"
+            },
+            inputNg: 999.999,
+            libraryPrepBatch: expect.objectContaining({
+              id: "5",
+              type: "libraryPrepBatch"
+            }),
+            sample: {
+              id: "6",
+              name: "SAMP600",
+              type: "sample"
+            },
+            size: "big",
+            type: "libraryPrep",
+            wellColumn: 5,
+            wellRow: "F"
           },
-          inputNg: 999.999,
-          libraryPrepBatch: expect.objectContaining({
-            id: "5",
-            type: "libraryPrepBatch"
-          }),
-          sample: {
-            id: "6",
-            name: "SAMP600",
-            type: "sample"
+          type: "libraryPrep"
+        },
+        {
+          resource: {
+            libraryPrepBatch: expect.objectContaining({
+              id: "5",
+              type: "libraryPrepBatch"
+            }),
+            quality: "very good",
+            sample: {
+              id: "8",
+              name: "SAMP800",
+              type: "sample"
+            }
           },
-          size: "big",
-          type: "libraryPrep",
-          wellColumn: 5,
-          wellRow: "F"
-        },
-        type: "libraryPrep"
-      },
-      {
-        resource: {
-          libraryPrepBatch: expect.objectContaining({
-            id: "5",
-            type: "libraryPrepBatch"
-          }),
-          quality: "very good",
-          sample: {
-            id: "8",
-            name: "SAMP800",
-            type: "sample"
-          }
-        },
-        type: "libraryPrep"
-      }
-    ]);
+          type: "libraryPrep"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
   });
 
   it("Has an 'INDEX' mode that lets you edit ngs indexes.", async () => {
@@ -212,27 +215,30 @@ describe("LibraryPrepEditTable component", () => {
     wrapper.update();
 
     // Only the edited library preps should be submitted:
-    expect(mockSave).lastCalledWith([
-      {
-        resource: {
-          indexI5: {
-            id: "50",
-            name: "i5 index 50",
-            type: "ngsIndex"
+    expect(mockSave).lastCalledWith(
+      [
+        {
+          resource: {
+            indexI5: {
+              id: "50",
+              name: "i5 index 50",
+              type: "ngsIndex"
+            },
+            libraryPrepBatch: expect.objectContaining({
+              id: "5",
+              type: "libraryPrepBatch"
+            }),
+            sample: {
+              id: "8",
+              name: "SAMP800",
+              type: "sample"
+            }
           },
-          libraryPrepBatch: expect.objectContaining({
-            id: "5",
-            type: "libraryPrepBatch"
-          }),
-          sample: {
-            id: "8",
-            name: "SAMP800",
-            type: "sample"
-          }
-        },
-        type: "libraryPrep"
-      }
-    ]);
+          type: "libraryPrep"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
   });
 
   it("Should show a warning box if the index set or container type are null.", async () => {

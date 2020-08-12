@@ -34,7 +34,7 @@ export function RegionEditPage({ router }: WithRouterProps) {
             <h1>
               <SeqdbMessage id="editRegionTitle" />
             </h1>
-            <Query<Region> query={{ path: `region/${id}` }}>
+            <Query<Region> query={{ path: `seqdb-api/region/${id}` }}>
               {({ loading, response }) => (
                 <div>
                   <LoadingSpinner loading={loading} />
@@ -64,12 +64,15 @@ function RegionForm({ region, router }: RegionFormProps) {
   const initialValues = region || {};
 
   const onSubmit = safeSubmit(async submittedValues => {
-    const response = await save([
-      {
-        resource: submittedValues,
-        type: "region"
-      }
-    ]);
+    const response = await save(
+      [
+        {
+          resource: submittedValues,
+          type: "region"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
 
     const newId = response[0].id;
     await router.push(`/region/view?id=${newId}`);

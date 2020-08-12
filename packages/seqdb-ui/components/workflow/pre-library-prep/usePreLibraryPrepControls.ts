@@ -38,7 +38,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       include:
         "sample,preLibraryPrep,preLibraryPrep.protocol,preLibraryPrep.product",
       page: { limit: 1000 }, // Maximum page limit. There should only be 1 or 2 prelibrarypreps per sample.
-      path: "stepResource"
+      path: "seqdb-api/stepResource"
     },
     {
       deps: [lastSave],
@@ -122,7 +122,9 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       }
     });
 
-    const savedPlps = (await save(plps)) as PreLibraryPrep[];
+    const savedPlps = (await save(plps, {
+      apiBaseUrl: "/seqdb-api"
+    })) as PreLibraryPrep[];
 
     const newStepResources = checkedSampleIds
       .map((sampleId, i) => ({
@@ -152,7 +154,8 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       newStepResources.map(resource => ({
         resource,
         type: "stepResource"
-      }))
+      })),
+      { apiBaseUrl: "/seqdb-api" }
     );
     setLastSave(Date.now());
 
@@ -204,7 +207,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
 
       const operations = [...srOperations, ...plpOperations];
 
-      await doOperations(operations);
+      await doOperations(operations, { apiBaseUrl: "/seqdb-api" });
       setLastSave(Date.now());
       formikProps.setFieldValue("checkedIds", {});
     } catch (err) {

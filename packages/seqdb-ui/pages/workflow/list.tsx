@@ -38,7 +38,7 @@ export default function WorkflowListPage() {
           queryTableProps={{
             columns: WORKFLOW_TABLE_COLUMNS,
             include: "chainTemplate",
-            path: "chain"
+            path: "seqdb-api/chain"
           }}
         />
       </div>

@@ -35,7 +35,7 @@ export default function IndexSetListPage() {
           id="index-set-list"
           queryTableProps={{
             columns: INDEX_SET_TABLE_COLUMNS,
-            path: "indexSet"
+            path: "seqdb-api/indexSet"
           }}
         />
       </div>

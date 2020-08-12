@@ -46,12 +46,15 @@ export function LibraryPrepBatchForm({
       submittedValues.protocol.type = "protocol";
     }
 
-    const [newLibraryPrepBatch] = await save([
-      {
-        resource: submittedValues,
-        type: "libraryPrepBatch"
-      }
-    ]);
+    const [newLibraryPrepBatch] = await save(
+      [
+        {
+          resource: submittedValues,
+          type: "libraryPrepBatch"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
 
     // Only add a new stepResource if the LibraryPrepBatch is new.
     if (!submittedValues.id) {
@@ -63,12 +66,15 @@ export function LibraryPrepBatchForm({
         value: "LIBRARY_PREP_BATCH"
       };
 
-      await save([
-        {
-          resource: newStepResource,
-          type: "stepResource"
-        }
-      ]);
+      await save(
+        [
+          {
+            resource: newStepResource,
+            type: "stepResource"
+          }
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      );
     }
 
     onSuccess();

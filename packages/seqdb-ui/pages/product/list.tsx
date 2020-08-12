@@ -42,7 +42,7 @@ export default function ProductListPage() {
           id="product-list"
           queryTableProps={{
             columns: PRODUCT_TABLE_COLUMNS,
-            path: "product"
+            path: "seqdb-api/product"
           }}
         />
       </div>

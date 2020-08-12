@@ -7,8 +7,8 @@ import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async model => {
-  if (model === "pcrPrimer/100") {
+const mockGet = jest.fn(async path => {
+  if (path === "seqdb-api/pcrPrimer/100") {
     // The request for the primer returns the test primer.
     return { data: TEST_PRIMER };
   } else {
@@ -23,24 +23,16 @@ const mockPatch = jest.fn();
 /** Mock next.js' router "push" function for navigating pages. */
 const mockPush = jest.fn();
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-      public axios = {
-        patch: mockPatch
-      };
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockGet, patch: mockPatch }
+};
 
 describe("PcrPrimer edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("Provides a form to add a PcrPrimer.", done => {
+  it("Provides a form to add a PcrPrimer.", async () => {
     mockPatch.mockReturnValueOnce({
       data: [
         {
@@ -54,7 +46,8 @@ describe("PcrPrimer edit page", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} />
+      <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} />,
+      { apiContext }
     );
 
     // Edit the primer name.
@@ -65,35 +58,36 @@ describe("PcrPrimer edit page", () => {
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      expect(mockPatch).lastCalledWith(
-        "/operations",
-        [
-          {
-            op: "POST",
-            path: "pcrPrimer",
-            value: {
-              attributes: {
-                lotNumber: 1,
-                name: "New PcrPrimer",
-                seq: "",
-                type: "PRIMER"
-              },
-              id: "-100",
-              type: "pcrPrimer"
-            }
-          }
-        ],
-        expect.anything()
-      );
+    // Wait for the primer form to load.
+    await new Promise(setImmediate);
+    wrapper.update();
 
-      // The user should be redirected to the new primer's details page.
-      expect(mockPush).lastCalledWith("/pcr-primer/view?id=1");
-      done();
-    });
+    expect(mockPatch).lastCalledWith(
+      "/seqdb-api/operations",
+      [
+        {
+          op: "POST",
+          path: "pcrPrimer",
+          value: {
+            attributes: {
+              lotNumber: 1,
+              name: "New PcrPrimer",
+              seq: "",
+              type: "PRIMER"
+            },
+            id: "-100",
+            type: "pcrPrimer"
+          }
+        }
+      ],
+      expect.anything()
+    );
+
+    // The user should be redirected to the new primer's details page.
+    expect(mockPush).lastCalledWith("/pcr-primer/view?id=1");
   });
 
-  it("Renders an error after form submit if one is returned from the back-end.", done => {
+  it("Renders an error after form submit if one is returned from the back-end.", async () => {
     // The patch request will return an error.
     mockPatch.mockImplementationOnce(() => ({
       data: [
@@ -111,23 +105,25 @@ describe("PcrPrimer edit page", () => {
     }));
 
     const wrapper = mountWithAppContext(
-      <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} />
+      <PcrPrimerEditPage router={{ query: {}, push: mockPush } as any} />,
+      { apiContext }
     );
 
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-        "Constraint violation: name size must be between 1 and 10"
-      );
-      expect(mockPush).toBeCalledTimes(0);
-      done();
-    });
+    // Wait for the primer form to load.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.update();
+    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
+      "Constraint violation: name size must be between 1 and 10"
+    );
+    expect(mockPush).toBeCalledTimes(0);
   });
 
-  it("Provides a form to edit a PcrPrimer.", async done => {
+  it("Provides a form to edit a PcrPrimer.", async () => {
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
       data: [
@@ -144,7 +140,8 @@ describe("PcrPrimer edit page", () => {
     const wrapper = mountWithAppContext(
       <PcrPrimerEditPage
         router={{ query: { id: 100 }, push: mockPush } as any}
-      />
+      />,
+      { apiContext }
     );
 
     // The page should load initially with a loading spinner.
@@ -167,38 +164,39 @@ describe("PcrPrimer edit page", () => {
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      // "patch" should have been called with a jsonpatch request containing the existing values
-      // and the modified one.
-      expect(mockPatch).lastCalledWith(
-        "/operations",
-        [
-          {
-            op: "PATCH",
-            path: "pcrPrimer/1",
-            value: {
-              attributes: expect.objectContaining({
-                application: null,
-                name: "ITS1",
-                seq: "new seq value"
-              }),
-              id: "1",
-              relationships: {
-                region: {
-                  data: expect.objectContaining({ id: "2", type: "region" })
-                }
-              },
-              type: "pcrPrimer"
-            }
-          }
-        ],
-        expect.anything()
-      );
+    // Wait for the primer form to load.
+    await new Promise(setImmediate);
+    wrapper.update();
 
-      // The user should be redirected to the existing primer's details page.
-      expect(mockPush).lastCalledWith("/pcr-primer/view?id=1");
-      done();
-    });
+    // "patch" should have been called with a jsonpatch request containing the existing values
+    // and the modified one.
+    expect(mockPatch).lastCalledWith(
+      "/seqdb-api/operations",
+      [
+        {
+          op: "PATCH",
+          path: "pcrPrimer/1",
+          value: {
+            attributes: expect.objectContaining({
+              application: null,
+              name: "ITS1",
+              seq: "new seq value"
+            }),
+            id: "1",
+            relationships: {
+              region: {
+                data: expect.objectContaining({ id: "2", type: "region" })
+              }
+            },
+            type: "pcrPrimer"
+          }
+        }
+      ],
+      expect.anything()
+    );
+
+    // The user should be redirected to the existing primer's details page.
+    expect(mockPush).lastCalledWith("/pcr-primer/view?id=1");
   });
 });
 

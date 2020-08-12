@@ -248,7 +248,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                   deps={[lastSave]}
                   filter={batchFilter}
                   onSuccess={res => setAvailableBatchs(res.data)}
-                  path="libraryPrepBatch"
+                  path="seqdb-api/libraryPrepBatch"
                   reactTableProps={{
                     defaultFiltered: [{ id: "name", value: nameFilter }],
                     getTrProps: () => ({
@@ -264,7 +264,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
                   deps={[lastSave]}
                   filter={poolFilter}
                   onSuccess={res => setAvailablePools(res.data)}
-                  path="libraryPool"
+                  path="seqdb-api/libraryPool"
                   reactTableProps={{
                     defaultFiltered: [{ id: "name", value: nameFilter }],
                     getTrProps: () => ({
@@ -303,7 +303,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
               deps={[lastSave]}
               include="pooledLibraryPrepBatch,pooledLibraryPool"
               onSuccess={res => setLibraryPoolContents(res.data)}
-              path={`libraryPool/${libraryPool.id}/contents`}
+              path={`seqdb-api/libraryPool/${libraryPool.id}/contents`}
               reactTableProps={{
                 getTrProps: (_, rowInfo) => {
                   if (rowInfo) {

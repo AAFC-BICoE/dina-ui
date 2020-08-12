@@ -7,8 +7,8 @@ import { Region } from "../../../types/seqdb-api/resources/Region";
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async model => {
-  if (model === "region/100") {
+const mockGet = jest.fn(async path => {
+  if (path === "seqdb-api/region/100") {
     // The request for the primer returns the test region.
     return { data: TEST_REGION };
   } else {
@@ -23,17 +23,9 @@ const mockPatch = jest.fn();
 /** Mock next.js' router "push" function for navigating pages. */
 const mockPush = jest.fn();
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-      public axios = {
-        patch: mockPatch
-      };
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockGet, patch: mockPatch }
+};
 
 describe("Region edit page", () => {
   beforeEach(() => {
@@ -54,7 +46,8 @@ describe("Region edit page", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <RegionEditPage router={{ query: {}, push: mockPush } as any} />
+      <RegionEditPage router={{ query: {}, push: mockPush } as any} />,
+      { apiContext }
     );
 
     // Edit the region name.
@@ -68,7 +61,7 @@ describe("Region edit page", () => {
     await new Promise(setImmediate);
 
     expect(mockPatch).lastCalledWith(
-      "/operations",
+      "/seqdb-api/operations",
       [
         {
           op: "POST",
@@ -107,7 +100,8 @@ describe("Region edit page", () => {
     }));
 
     const wrapper = mountWithAppContext(
-      <RegionEditPage router={{ query: {}, push: mockPush } as any} />
+      <RegionEditPage router={{ query: {}, push: mockPush } as any} />,
+      { apiContext }
     );
 
     // Add a name.
@@ -142,7 +136,8 @@ describe("Region edit page", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <RegionEditPage router={{ query: { id: 100 }, push: mockPush } as any} />
+      <RegionEditPage router={{ query: { id: 100 }, push: mockPush } as any} />,
+      { apiContext }
     );
 
     // The page should load initially with a loading spinner.
@@ -168,7 +163,7 @@ describe("Region edit page", () => {
     // "patch" should have been called with a jsonpatch request containing the existing values
     // and the modified one.
     expect(mockPatch).lastCalledWith(
-      "/operations",
+      "/seqdb-api/operations",
       [
         {
           op: "PATCH",

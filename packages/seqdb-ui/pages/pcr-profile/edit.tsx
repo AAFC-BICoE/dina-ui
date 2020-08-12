@@ -40,7 +40,7 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
             <Query<PcrProfile>
               query={{
                 include: "region",
-                path: `thermocyclerprofile/${id}`
+                path: `seqdb-api/thermocyclerprofile/${id}`
               }}
             >
               {({ loading, response }) => (
@@ -72,12 +72,15 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
   const initialValues = profile || { type: "thermocyclerprofile" };
 
   const onSubmit = safeSubmit(async submittedValues => {
-    const response = await save([
-      {
-        resource: submittedValues,
-        type: "thermocyclerprofile"
-      }
-    ]);
+    const response = await save(
+      [
+        {
+          resource: submittedValues,
+          type: "thermocyclerprofile"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
 
     const newId = response[0].id;
     await router.push(`/pcr-profile/view?id=${newId}`);

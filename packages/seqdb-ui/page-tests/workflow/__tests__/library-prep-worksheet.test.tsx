@@ -27,7 +27,7 @@ describe("Library Prep Worksheet page", () => {
   beforeEach(() => {
     jest.resetAllMocks();
     mockGet.mockImplementation(async path => {
-      if (path === "stepResource/5") {
+      if (path === "seqdb-api/stepResource/5") {
         return {
           data: {
             chain: {
@@ -54,7 +54,7 @@ describe("Library Prep Worksheet page", () => {
           } as StepResource
         };
       }
-      if (path === "libraryPrepBatch/200/libraryPreps") {
+      if (path === "seqdb-api/libraryPrepBatch/200/libraryPreps") {
         return {
           data: [
             {

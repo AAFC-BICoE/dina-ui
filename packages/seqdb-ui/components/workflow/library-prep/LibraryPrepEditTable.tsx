@@ -68,7 +68,7 @@ export function LibraryPrepEditTable({
       },
       include: "sample,indexI5,indexI7",
       page: { limit: 1000 },
-      path: `libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`
+      path: `seqdb-api/libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`
     },
     {
       // Run this query whenever there is a new set of sample StepResources.
@@ -102,7 +102,7 @@ export function LibraryPrepEditTable({
       },
       include: "sample",
       page: { limit: 1000 },
-      path: "stepResource"
+      path: "seqdb-api/stepResource"
     },
     {
       deps: [lastPrepTableSave],
@@ -142,7 +142,7 @@ export function LibraryPrepEditTable({
       type: "libraryPrep"
     }));
 
-    await save(saveArgs);
+    await save(saveArgs, { apiBaseUrl: "/seqdb-api" });
 
     setLastPrepTableSave(Date.now());
   });

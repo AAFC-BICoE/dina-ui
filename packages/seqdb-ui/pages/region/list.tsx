@@ -38,7 +38,7 @@ export default function RegionListPage() {
           id="region-list"
           queryTableProps={{
             columns: REGION_TABLE_COLUMNS,
-            path: "region"
+            path: "seqdb-api/region"
           }}
         />
       </div>

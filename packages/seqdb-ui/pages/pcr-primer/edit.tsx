@@ -41,7 +41,7 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
               <SeqdbMessage id="editPcrPrimerTitle" />
             </h1>
             <Query<PcrPrimer>
-              query={{ include: "region", path: `pcrPrimer/${id}` }}
+              query={{ include: "region", path: `seqdb-api/pcrPrimer/${id}` }}
             >
               {({ loading, response }) => (
                 <div>
@@ -73,12 +73,15 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
   const initialValues = primer || { lotNumber: 1, seq: "", type: "PRIMER" };
 
   const onSubmit = safeSubmit(async submittedValues => {
-    const response = await save([
-      {
-        resource: submittedValues,
-        type: "pcrPrimer"
-      }
-    ]);
+    const response = await save(
+      [
+        {
+          resource: submittedValues,
+          type: "pcrPrimer"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
 
     const newId = response[0].id;
     await router.push(`/pcr-primer/view?id=${newId}`);

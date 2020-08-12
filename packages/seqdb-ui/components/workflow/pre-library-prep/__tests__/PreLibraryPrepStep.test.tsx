@@ -95,17 +95,9 @@ const TEST_CHAIN_STEP_TEMPLATES = [
 const mockGet = jest.fn();
 const mockPatch = jest.fn();
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-      public axios = {
-        patch: mockPatch
-      };
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+};
 
 function getWrapper() {
   return mountWithAppContext(
@@ -113,7 +105,8 @@ function getWrapper() {
       chain={TEST_CHAIN}
       chainStepTemplates={TEST_CHAIN_STEP_TEMPLATES}
       step={TEST_PRE_LIBRARY_PREP_CHAIN_STEP_TEMPLATE}
-    />
+    />,
+    { apiContext }
   );
 }
 
@@ -122,8 +115,8 @@ describe("PreLibraryPrepStep UI", () => {
     jest.clearAllMocks();
 
     /** Mock Kitsu "get" method. */
-    mockGet.mockImplementation(async (model, params) => {
-      if (model === "stepResource") {
+    mockGet.mockImplementation(async (path, params) => {
+      if (path === "seqdb-api/stepResource") {
         if (params.include === "sample") {
           return { data: TEST_SAMPLE_STEP_RESOURCES };
         } else if (params.include.includes("sample,preLibraryPrep")) {
@@ -154,7 +147,7 @@ describe("PreLibraryPrepStep UI", () => {
     ] = mockGet.mock.calls;
 
     expect(sampleStepResourceCall).toEqual([
-      "stepResource",
+      "seqdb-api/stepResource",
       {
         // It should be filtered to the previous step's stepResources.
         filter: {
@@ -170,7 +163,7 @@ describe("PreLibraryPrepStep UI", () => {
       }
     ]);
     expect(preLibraryPrepStepResourceCall).toEqual([
-      "stepResource",
+      "seqdb-api/stepResource",
       {
         fields: {
           product: "name",
@@ -297,7 +290,7 @@ describe("PreLibraryPrepStep UI", () => {
 
     // There should have been 3 preps created.
     expect(prepCall).toEqual([
-      "/operations",
+      "/seqdb-api/operations",
       [
         {
           op: "POST",
@@ -383,7 +376,7 @@ describe("PreLibraryPrepStep UI", () => {
 
     // There should have been 3 step resources created.
     expect(stepResourceCall).toEqual([
-      "/operations",
+      "/seqdb-api/operations",
       [
         {
           op: "POST",
@@ -534,7 +527,7 @@ describe("PreLibraryPrepStep UI", () => {
 
     mockGet.mockImplementation((path, params) => {
       if (
-        path === "stepResource" &&
+        path === "seqdb-api/stepResource" &&
         params.include.includes("sample,preLibraryPrep")
       ) {
         expect(params.filter.rsql).toEqual("sample.sampleId=in=(3,4,5)");
@@ -615,7 +608,7 @@ describe("PreLibraryPrepStep UI", () => {
 
     // There should have been two PATCH operations and one POST operation.
     expect(prepCall).toEqual([
-      "/operations",
+      "/seqdb-api/operations",
       [
         // The existing ones:
         {
@@ -661,7 +654,7 @@ describe("PreLibraryPrepStep UI", () => {
 
     // Only one stepResource should have been created: for the new preLibraryPrep
     expect(stepResourceCall).toEqual([
-      "/operations",
+      "/seqdb-api/operations",
       [
         {
           op: "POST",
@@ -720,8 +713,8 @@ describe("PreLibraryPrepStep UI", () => {
 
     // There should have been two empty operations calls.
     expect(mockPatch.mock.calls).toEqual([
-      ["/operations", [], expect.anything()],
-      ["/operations", [], expect.anything()]
+      ["/seqdb-api/operations", [], expect.anything()],
+      ["/seqdb-api/operations", [], expect.anything()]
     ]);
   });
 
@@ -739,7 +732,7 @@ describe("PreLibraryPrepStep UI", () => {
 
     // There should have been one empty operations call.
     expect(mockPatch.mock.calls).toEqual([
-      ["/operations", [], expect.anything()]
+      ["/seqdb-api/operations", [], expect.anything()]
     ]);
   });
 
@@ -757,14 +750,14 @@ describe("PreLibraryPrepStep UI", () => {
 
     // There should have been one empty operations call.
     expect(mockPatch.mock.calls).toEqual([
-      ["/operations", [], expect.anything()]
+      ["/seqdb-api/operations", [], expect.anything()]
     ]);
   });
 
   it("Shows the Shearing and Size Selection status in the table.", async () => {
     mockGet.mockImplementation(async (path, params) => {
       // The request for the sample stepResources.
-      if (path === "stepResource" && params.include === "sample") {
+      if (path === "seqdb-api/stepResource" && params.include === "sample") {
         // Return stepResources with samples.
         return {
           data: [
@@ -784,7 +777,7 @@ describe("PreLibraryPrepStep UI", () => {
 
       // The request for the preLibraryPrep stepResources.
       if (
-        path === "stepResource" &&
+        path === "seqdb-api/stepResource" &&
         params.include.includes("sample,preLibraryPrep")
       ) {
         // Return stepResources with preLibraryPreps and samples.
@@ -838,7 +831,7 @@ describe("PreLibraryPrepStep UI", () => {
   it("Lets you delete selected shearing or size selection stepResources.", async () => {
     mockGet.mockImplementation(async (path, params) => {
       // Mock sample table response.
-      if (path === "stepResource" && params.include === "sample") {
+      if (path === "seqdb-api/stepResource" && params.include === "sample") {
         return {
           data: [
             { id: "5", type: "stepResource", sample: { id: "11" } },
@@ -851,7 +844,7 @@ describe("PreLibraryPrepStep UI", () => {
 
       // Mock stepResource call from inside the deleteStepResources function.
       if (
-        path === "stepResource" &&
+        path === "seqdb-api/stepResource" &&
         params.include.includes("sample,preLibraryPrep")
       ) {
         return {
@@ -898,7 +891,7 @@ describe("PreLibraryPrepStep UI", () => {
 
     expect(mockPatch).toHaveBeenCalledTimes(1);
     expect(mockPatch).lastCalledWith(
-      "/operations",
+      "/seqdb-api/operations",
       [
         { op: "DELETE", path: "stepResource/100" },
         { op: "DELETE", path: "preLibraryPrep/200" }
@@ -910,7 +903,7 @@ describe("PreLibraryPrepStep UI", () => {
   it("Shows different view modes for the shearing and size selectino details", async () => {
     mockGet.mockImplementation(async (path, params) => {
       // The request for the sample stepResources.
-      if (path === "stepResource" && params.include === "sample") {
+      if (path === "seqdb-api/stepResource" && params.include === "sample") {
         return {
           data: [{ id: "5", type: "stepResource", sample: { id: "10" } }]
         };
@@ -919,7 +912,7 @@ describe("PreLibraryPrepStep UI", () => {
       // The request for the preLibraryPrep stepResources; There should be a prelibraryprep with
       // an inputAmount for the sample.
       if (
-        path === "stepResource" &&
+        path === "seqdb-api/stepResource" &&
         params.include.includes("sample,preLibraryPrep")
       ) {
         return {

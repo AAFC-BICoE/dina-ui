@@ -1,11 +1,9 @@
 import {
   ApiClientContext,
   ErrorViewer,
-  filterBy,
   LabelView,
   LoadingSpinner,
   Query,
-  ResourceSelectField,
   safeSubmit,
   SubmitButton,
   TextField
@@ -37,7 +35,7 @@ export function ProductEditPage({ router }: WithRouterProps) {
             <h1>
               <SeqdbMessage id="editProductTitle" />
             </h1>
-            <Query<Product> query={{ path: `product/${id}` }}>
+            <Query<Product> query={{ path: `seqdb-api/product/${id}` }}>
               {({ loading, response }) => (
                 <div>
                   <LoadingSpinner loading={loading} />
@@ -68,12 +66,15 @@ function ProductForm({ product, router }: ProductFormProps) {
   const initialValues = product || {};
 
   const onSubmit = safeSubmit(async submittedValues => {
-    const response = await save([
-      {
-        resource: submittedValues,
-        type: "product"
-      }
-    ]);
+    const response = await save(
+      [
+        {
+          resource: submittedValues,
+          type: "product"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
 
     const newId = response[0].id;
     await router.push(`/product/view?id=${newId}`);

@@ -29,18 +29,13 @@ const mockGet = jest.fn(async () => {
   };
 });
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockGet }
+};
 
 describe("Workflow list page.", () => {
   it("Lists workflows.", async () => {
-    const wrapper = mountWithAppContext(<WorkflowListPage />);
+    const wrapper = mountWithAppContext(<WorkflowListPage />, { apiContext });
 
     await new Promise(setImmediate);
     wrapper.update();

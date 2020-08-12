@@ -65,7 +65,8 @@ describe("Library Prep Batch form", () => {
             },
             type: "libraryPrepBatch"
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ],
       [
         [
@@ -88,7 +89,8 @@ describe("Library Prep Batch form", () => {
             },
             type: "stepResource"
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ]
     ]);
 
@@ -153,7 +155,8 @@ describe("Library Prep Batch form", () => {
             },
             type: "libraryPrepBatch"
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ]
     ]);
 
