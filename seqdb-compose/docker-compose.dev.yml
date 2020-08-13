@@ -37,7 +37,7 @@ services:
     image: node:12.16.1
     volumes:
       - "../repos/dina-ui:/dina-ui"
-    stop_signal: SIGINT
+    stop_signal: SIGKILL
     command: >
       bash -c "
       yarn --cwd=/dina-ui/packages/seqdb-ui ;
@@ -49,5 +49,4 @@ services:
     volumes:
       - "../repos/dina-ui/packages/seqdb-ui/dev.Caddyfile:/etc/caddy/Caddyfile"
     environment:
-      UI_DEV_SERVER_ADDRESS: ui-dev-server:3000
-      SEQDB_API_ADDRESS: api:8080
+      UI_DEV_SERVER_ADDRESS: seqdb-ui-dev-server:3000
