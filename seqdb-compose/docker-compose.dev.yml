@@ -21,7 +21,7 @@ services:
       -Duser.home=/var/maven
       -Dspring-boot-maven-plugin.fork=true
       -Dspring-boot.run.jvmArguments=\"
-        -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
+        -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
         -Dspring.datasource.url=jdbc:postgresql://database/seqdb?currentSchema=seqdb
         -Dspring.datasource.username=postgres
         -Dspring.datasource.password=p
