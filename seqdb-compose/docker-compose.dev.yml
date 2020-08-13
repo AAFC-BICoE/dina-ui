@@ -1,7 +1,7 @@
 version: "3.7"
 services:
-  api:
-    image: maven:3.6.3-jdk-8
+  seqdb-api:
+    image: maven:3.6.3-jdk-11
     volumes:
       - "../repos/seqdb-api:/app"
       # Share host users:
@@ -27,15 +27,13 @@ services:
         -Dspring.datasource.password=p
         -Dspring.liquibase.user=postgres
         -Dspring.liquibase.password=p
-        -Dspring.datasource.continue-on-error=true
         -Dspring.servlet.multipart.max-file-size=2GB
         -Dspring.servlet.multipart.max-request-size=2GB
-        -Dimport-sample-accounts=true
       \"
       spring-boot:run
       "
   # Server that hot-reloads the UI source code:
-  ui-dev-server:
+  seqdb-ui-dev-server:
     image: node:12.16.1
     volumes:
       - "../repos/dina-ui:/dina-ui"
@@ -46,10 +44,10 @@ services:
       yarn --cwd=/dina-ui/packages/seqdb-ui next
       "
   # Front-end gateway that proxies URLs to the correct service:
-  ui:
+  seqdb-ui:
     image: caddy/caddy:2.0.0-alpine
     volumes:
       - "../repos/dina-ui/packages/seqdb-ui/dev.Caddyfile:/etc/caddy/Caddyfile"
     environment:
       UI_DEV_SERVER_ADDRESS: ui-dev-server:3000
-      API_ADDRESS: api:8080
+      SEQDB_API_ADDRESS: api:8080

@@ -1,1 +1,2 @@
 CREATE SCHEMA seqdb;
+CREATE SCHEMA keycloak;

@@ -1,4 +1,9 @@
 version: "3.7"
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: ${SUBNET}
 services:
   database:
     image: postgres:9.6
@@ -8,7 +13,30 @@ services:
       POSTGRES_PASSWORD: p
     volumes:
       - ./initdb.sql:/docker-entrypoint-initdb.d/1-initdb.sql
-  api:
+  keycloak:
+    image: jboss/keycloak:9.0.3
+    user: root
+    command: ["-Djboss.http.port=80"]
+    expose: [80]
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      KEYCLOAK_IMPORT: /keycloak-realm.json
+      DB_VENDOR: POSTGRES
+      DB_ADDR: database
+      DB_DATABASE: seqdb
+      DB_USER: postgres
+      DB_PASSWORD: p
+      DB_SCHEMA: keycloak
+    volumes:
+      - "../keycloak-dina-starter-realm.json:/keycloak-realm.json"
+    labels:
+      - "traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_DOMAIN}`)"
+    networks:
+      default:
+        # Here we set the IP for Keycloak
+        ipv4_address: ${KEYCLOAK_IP}
+  seqdb-api:
     image: seqdb-api:tag
     environment:
       spring.datasource.url: jdbc:postgresql://database/seqdb?currentSchema=seqdb
@@ -17,10 +45,13 @@ services:
       spring.datasource.continue-on-error: "true"
       spring.liquibase.user: postgres
       spring.liquibase.password: p
-  ui:
+  seqdb-ui:
     image: seqdb-ui:tag
     environment:
-      API_ADDRESS: api:8080
+      SEQDB_API_ADDRESS: api:8080
+      KEYCLOAK_CLIENTID: seqdb
+      KEYCLOAK_REALM: dina
+      KEYCLOAK_PUBLIC_URL: http://${KEYCLOAK_DOMAIN}/auth
     labels:
       - "traefik.http.routers.ui.rule=Host(`${SEQDBUI_DOMAIN}`)"
       - "traefik.http.services.ui.loadbalancer.server.port=8080"

@@ -40,7 +40,7 @@ services:
       DB_PASSWORD: p
       DB_SCHEMA: keycloak
     volumes:
-      - "./keycloak-dina-starter-realm.json:/keycloak-realm.json"
+      - "../keycloak-dina-starter-realm.json:/keycloak-realm.json"
     labels:
       - "traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_DOMAIN}`)"
     networks:

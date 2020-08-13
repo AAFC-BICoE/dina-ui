@@ -19,6 +19,22 @@
         "email"
       ],
       "webOrigins": ["*"]
+    },
+    {
+      "id": "47c3fb06-86d7-4fe4-8afb-0ef55714c43e",
+      "clientId": "seqdb",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": ["*"],
+      "defaultClientScopes": [
+        "web-origins",
+        "dina-agent",
+        "role_list",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "webOrigins": ["*"]
     }
   ],
   "roles": {
