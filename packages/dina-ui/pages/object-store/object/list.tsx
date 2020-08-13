@@ -60,7 +60,16 @@ export default function MetadataListPage() {
     "originalFilename",
     "dcFormat",
     "xmpRightsWebStatement",
-    "dcRights"
+    "dcRights",
+    {
+      name: "acDigitizationDate",
+      type: "date"
+    },
+    {
+      name: "acMetadataCreator",
+      type: "dropdown",
+      options: [{ label: "1", value: "2" }]
+    }
   ];
 
   const METADATA_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [

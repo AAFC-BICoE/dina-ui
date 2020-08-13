@@ -1,5 +1,5 @@
 import { isEqual } from "lodash";
-import React from "react";
+import React, { useState } from "react";
 import Select from "react-select";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { FilterAttribute } from "./FilterBuilder";
@@ -7,6 +7,7 @@ import {
   FilterBuilderContext,
   FilterBuilderContextI
 } from "./FilterBuilderContext";
+import DatePicker from "react-datepicker";
 
 export type FilterRowPredicate = "IS" | "IS NOT";
 export type FilterRowSearchType =
@@ -37,6 +38,19 @@ export interface FilterAttributeOption {
   value: FilterAttribute;
 }
 
+function FilterDatePicker() {
+  const [startDate, setDate] = useState(new Date());
+  const handleDateChange = e => setDate(e);
+
+  return (
+    <DatePicker
+      className="d-inline-block form-control"
+      selected={startDate}
+      onChange={handleDateChange}
+    />
+  );
+}
+
 export class FilterRow extends React.Component<FilterRowProps> {
   public static contextType = FilterBuilderContext;
   public context!: FilterBuilderContextI;
@@ -50,6 +64,22 @@ export class FilterRow extends React.Component<FilterRowProps> {
       showRemoveButton
     } = this.props;
 
+    let filterPropertyType;
+    let filterDropdownList;
+
+    if (
+      typeof model.attribute !== "string" &&
+      model.attribute.type === "date"
+    ) {
+      filterPropertyType = "date";
+    } else if (
+      typeof model.attribute !== "string" &&
+      model.attribute.type === "dropdown"
+    ) {
+      filterPropertyType = "dropdown";
+      filterDropdownList = model.attribute.options;
+    }
+
     const searchTypes: {
       label: React.ReactNode;
       value: FilterRowSearchType;
@@ -58,8 +88,14 @@ export class FilterRow extends React.Component<FilterRowProps> {
         label: <CommonMessage id="filterPartialMatch" />,
         value: "PARTIAL_MATCH"
       },
-      { label: <CommonMessage id="filterExactMatch" />, value: "EXACT_MATCH" },
-      { label: <CommonMessage id="filterBlankField" />, value: "BLANK_FIELD" }
+      {
+        label: <CommonMessage id="filterExactMatch" />,
+        value: "EXACT_MATCH"
+      },
+      {
+        label: <CommonMessage id="filterBlankField" />,
+        value: "BLANK_FIELD"
+      }
     ];
 
     const selectedAttribute = this.context.attributeOptions.find(option =>
@@ -89,15 +125,36 @@ export class FilterRow extends React.Component<FilterRowProps> {
             value={{ label: model.predicate, value: model.predicate }}
           />
         </div>
-        <input
-          className="filter-value list-inline-item form-control w-auto d-inline-block"
-          style={{
-            visibility:
-              model.searchType === "BLANK_FIELD" ? "hidden" : undefined
-          }}
-          value={model.value}
-          onChange={this.onValueChanged}
-        />
+
+        {filterPropertyType === "date" && (
+          <div className="list-inline-item" style={{ width: 180 }}>
+            <FilterDatePicker />
+          </div>
+        )}
+        {filterPropertyType === "dropdown" && (
+          <div className="list-inline-item" style={{ width: 150 }}>
+            <Select
+              className="dropdown-type"
+              instanceId={`dropdownType_${model.id}`}
+              options={filterDropdownList}
+              value={filterDropdownList.find(
+                option => option.value === filterDropdownList.value
+              )}
+            />
+          </div>
+        )}
+
+        {typeof this.props.model.attribute === "string" && (
+          <input
+            className="filter-value list-inline-item form-control w-auto d-inline-block"
+            style={{
+              visibility:
+                model.searchType === "BLANK_FIELD" ? "hidden" : undefined
+            }}
+            value={model.value}
+            onChange={this.onValueChanged}
+          />
+        )}
         <div className="list-inline-item" style={{ width: 180 }}>
           <Select
             className="filter-search-type"

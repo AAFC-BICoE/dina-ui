@@ -7,6 +7,7 @@ import {
   FilterGroupOperator
 } from "./FilterGroup";
 import { FilterRow, FilterRowModel } from "./FilterRow";
+import { OptionsType, OptionTypeBase } from "react-select";
 
 export type FilterAttribute =
   | string
@@ -14,6 +15,8 @@ export type FilterAttribute =
       name: string;
       label?: string;
       allowRange?: boolean;
+      type?: string;
+      options?: OptionsType<OptionTypeBase>[];
     };
 
 export interface FilterBuilderProps {
