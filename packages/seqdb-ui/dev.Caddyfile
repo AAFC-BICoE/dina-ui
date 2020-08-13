@@ -12,6 +12,6 @@ respond /keycloak.json "{ \"resource\": \"{$KEYCLOAK_CLIENTID}\", \"realm\": \"{
 # Proxy to the back-end SeqDB API:
 route /api/seqdb-api/* {
   # For demo purposes, automatically authenticate against the REST API as Admin:Admin
-  uri replace /api/seqdb-api /api/v1
+  uri replace /api/seqdb-api /api
 	reverse_proxy {$SEQDB_API_ADDRESS}
 }

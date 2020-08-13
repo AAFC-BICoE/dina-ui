@@ -64,14 +64,14 @@ export function PreLibraryPrepForm({ onSubmit }: PreLibraryPrepFormProps) {
                 className="col-6"
                 filter={filterBy(["name"])}
                 name="protocol"
-                model="protocol"
+                model="seqdb-api/protocol"
                 optionLabel={protocol => protocol.name}
               />
               <ResourceSelectField<Product>
                 className="col-6"
                 filter={filterBy(["name"])}
                 label="Kit"
-                model="product"
+                model="seqdb-api/product"
                 name="product"
                 optionLabel={kit => kit.name}
               />

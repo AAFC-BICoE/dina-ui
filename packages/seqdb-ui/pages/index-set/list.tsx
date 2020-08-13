@@ -2,6 +2,7 @@ import { ColumnDefinition, ListPageLayout } from "common-ui";
 import Link from "next/link";
 import { Head, Nav } from "../../components";
 import { IndexSet } from "../../types/seqdb-api";
+import { useSeqdbIntl, SeqdbMessage } from "../../intl/seqdb-intl";
 
 const INDEX_SET_FILTER_ATTRIBUTES = [
   "name",
@@ -24,12 +25,16 @@ const INDEX_SET_TABLE_COLUMNS: ColumnDefinition<IndexSet>[] = [
 ];
 
 export default function IndexSetListPage() {
+  const { formatMessage } = useSeqdbIntl();
+
   return (
     <>
-      <Head title="Index Sets" />
+      <Head title={formatMessage("indexSetListTitle")} />
       <Nav />
       <div className="container-fluid">
-        <h1>Index Sets</h1>
+        <h1>
+          <SeqdbMessage id="indexSetListTitle" />
+        </h1>
         <ListPageLayout
           filterAttributes={INDEX_SET_FILTER_ATTRIBUTES}
           id="index-set-list"

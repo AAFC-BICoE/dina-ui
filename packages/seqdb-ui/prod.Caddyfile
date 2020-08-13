@@ -13,6 +13,6 @@ respond /keycloak.json "{ \"resource\": \"{$KEYCLOAK_CLIENTID}\", \"realm\": \"{
 
 # Proxy to the main back-end API:
 route /api/seqdb-api/* {
-	uri replace /api/seqdb-api /api/v1
+	uri replace /api/seqdb-api /api
 	reverse_proxy {$SEQDB_API_ADDRESS}
 }

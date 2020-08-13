@@ -110,7 +110,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
               name="region"
               filter={filterBy(["name"])}
               label="Target Gene Region"
-              model="region"
+              model="seqdb-api/region"
               optionLabel={region => region.name}
             />
             <TextField className="col-md-2" name="name" />

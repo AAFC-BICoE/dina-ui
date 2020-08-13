@@ -101,7 +101,7 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
               name="region"
               filter={filterBy(["name"])}
               label="Select Gene Region"
-              model="region"
+              model="seqdb-api/region"
               optionLabel={region => region.name}
             />
             <TextField

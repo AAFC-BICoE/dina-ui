@@ -223,7 +223,7 @@ export function LibraryPrepEditTable({
                   key={original.id}
                   name={`sampleSrs[${index}].libraryPrep.${fieldName}`}
                   optionLabel={ngsIndex => ngsIndex.name}
-                  model={`indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
+                  model={`seqdb-api/indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
                   styles={{ menu: () => ({ zIndex: 5 }) }}
                 />
               ),

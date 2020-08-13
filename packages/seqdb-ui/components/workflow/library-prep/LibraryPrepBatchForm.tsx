@@ -97,35 +97,35 @@ export function LibraryPrepBatchForm({
             className="col-md-2"
             name="product"
             filter={filterBy(["name"])}
-            model="product"
+            model="seqdb-api/product"
             optionLabel={product => product.name}
           />
           <ResourceSelectField<Protocol>
             className="col-md-2"
             name="protocol"
             filter={filterBy(["name"])}
-            model="protocol"
+            model="seqdb-api/protocol"
             optionLabel={protocol => protocol.name}
           />
           <ResourceSelectField<ContainerType>
             className="col-md-2"
             name="containerType"
             filter={filterBy(["name"])}
-            model="containerType"
+            model="seqdb-api/containerType"
             optionLabel={ct => ct.name}
           />
           <ResourceSelectField<PcrProfile>
             className="col-md-2"
             name="thermocyclerProfile"
             filter={filterBy(["name"])}
-            model="thermocyclerprofile"
+            model="seqdb-api/thermocyclerprofile"
             optionLabel={profile => profile.name}
           />
           <ResourceSelectField<IndexSet>
             className="col-md-2"
             name="indexSet"
             filter={filterBy(["name"])}
-            model="indexSet"
+            model="seqdb-api/indexSet"
             optionLabel={set => set.name}
           />
         </div>

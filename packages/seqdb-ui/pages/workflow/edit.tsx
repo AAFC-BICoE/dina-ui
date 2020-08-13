@@ -15,7 +15,7 @@ import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { Head, Nav } from "../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
-import { Chain } from "../../types/seqdb-api";
+import { Chain, ChainTemplate } from "../../types/seqdb-api";
 
 interface ChainFormProps {
   chain?: any;
@@ -96,12 +96,12 @@ function ChainForm({ chain, router }: ChainFormProps) {
           <Form translate={undefined}>
             <ErrorViewer />
             <div className="row">
-              <ResourceSelectField<any>
+              <ResourceSelectField<ChainTemplate>
                 className="col-md-2"
                 label="Workflow Template"
                 name="chainTemplate"
                 filter={filterBy(["name"])}
-                model="chainTemplate"
+                model="seqdb-api/chainTemplate"
                 optionLabel={template => template.name}
               />
             </div>

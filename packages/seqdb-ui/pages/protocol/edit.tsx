@@ -125,7 +125,7 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
               className="col-md-4"
               name="kit"
               filter={filterBy(["name"])}
-              model="product"
+              model="seqdb-api/product"
               optionLabel={product => product.name}
             />
           </div>
