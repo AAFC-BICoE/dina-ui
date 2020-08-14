@@ -57,9 +57,9 @@ const TEST_CHAIN_STEP_TEMPLATES = [TEST_CHAIN_STEP_TEMPLATE];
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
-  if (model === "sample") {
+  if (model === "seqdb-api/sample") {
     return { data: TEST_SAMPLES };
-  } else if (model === "stepResource") {
+  } else if (model === "seqdb-api/stepResource") {
     return { data: TEST_STEP_RESOURCES };
   } else {
     return { data: [] };
