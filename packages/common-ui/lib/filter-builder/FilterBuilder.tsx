@@ -16,7 +16,7 @@ export type FilterAttribute =
       label?: string;
       allowRange?: boolean;
       type?: string;
-      options?: OptionsType<OptionTypeBase>[];
+      options?: any;
     };
 
 export interface FilterBuilderProps {

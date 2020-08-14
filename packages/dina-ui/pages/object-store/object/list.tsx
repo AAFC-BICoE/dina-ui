@@ -9,7 +9,8 @@ import {
   SplitPagePanel,
   useAccount,
   useGroupedCheckBoxes,
-  useModal
+  useModal,
+  useQuery
 } from "common-ui";
 import { Form, Formik, FormikContextType } from "formik";
 import { noop, toPairs } from "lodash";
@@ -19,7 +20,7 @@ import { Component, useContext, useMemo, useState } from "react";
 import { Head, Nav, StoredObjectGallery } from "../../../components";
 import { MetadataPreview } from "../../../components/metadata/MetadataPreview";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Metadata } from "../../../types/objectstore-api";
+import { Metadata, Person } from "../../../types/objectstore-api";
 
 type MetadataListLayoutType = "TABLE" | "GALLERY";
 
@@ -36,6 +37,9 @@ export interface MetadataListFormValues {
 export default function MetadataListPage() {
   const { formatMessage } = useDinaIntl();
   const { groupNames } = useAccount();
+  const queryState = useQuery<Person[]>({
+    path: "agent-api/person"
+  });
 
   const {
     CheckBoxField,
@@ -56,6 +60,13 @@ export default function MetadataListPage() {
     ? [8, 4]
     : [12, 0];
 
+  const creatorOptions = [
+    ...(queryState?.response?.data ?? []).map(d => ({
+      label: d.displayName,
+      value: d.id
+    }))
+  ];
+
   const METADATA_FILTER_ATTRIBUTES = [
     "originalFilename",
     "dcFormat",
@@ -68,7 +79,7 @@ export default function MetadataListPage() {
     {
       name: "acMetadataCreator",
       type: "dropdown",
-      options: [{ label: "1", value: "2" }]
+      options: creatorOptions
     }
   ];
 

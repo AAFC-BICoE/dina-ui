@@ -38,19 +38,6 @@ export interface FilterAttributeOption {
   value: FilterAttribute;
 }
 
-function FilterDatePicker() {
-  const [startDate, setDate] = useState(new Date());
-  const handleDateChange = e => setDate(e);
-
-  return (
-    <DatePicker
-      className="d-inline-block form-control"
-      selected={startDate}
-      onChange={handleDateChange}
-    />
-  );
-}
-
 export class FilterRow extends React.Component<FilterRowProps> {
   public static contextType = FilterBuilderContext;
   public context!: FilterBuilderContextI;
@@ -128,7 +115,15 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
         {filterPropertyType === "date" && (
           <div className="list-inline-item" style={{ width: 180 }}>
-            <FilterDatePicker />
+            <DatePicker
+              className="d-inline-block form-control"
+              selected={
+                isNaN(Date.parse(model.value))
+                  ? new Date()
+                  : new Date(model.value)
+              }
+              onChange={this.onDateValueChanged}
+            />
           </div>
         )}
         {filterPropertyType === "dropdown" && (
@@ -137,6 +132,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
               className="dropdown-type"
               instanceId={`dropdownType_${model.id}`}
               options={filterDropdownList}
+              onChange={this.onSelectValueChanged}
               value={filterDropdownList.find(
                 option => option.value === filterDropdownList.value
               )}
@@ -221,6 +217,18 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
   private onValueChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.props.model.value = e.target.value;
+    this.props.onChange();
+    this.forceUpdate();
+  };
+
+  private onSelectValueChanged = e => {
+    this.props.model.value = e.value;
+    this.props.onChange();
+    this.forceUpdate();
+  };
+
+  private onDateValueChanged = e => {
+    this.props.model.value = e;
     this.props.onChange();
     this.forceUpdate();
   };
