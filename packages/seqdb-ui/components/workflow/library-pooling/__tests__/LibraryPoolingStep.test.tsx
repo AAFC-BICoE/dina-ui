@@ -238,7 +238,7 @@ describe("LibraryPoolingStep component", () => {
                 name: "test pool",
                 type: "libraryPool"
               },
-              pooledLibraryPool: null,
+              pooledLibraryPool: { id: null },
               pooledLibraryPrepBatch: {
                 id: "1",
                 type: "libraryPrepBatch"
@@ -254,7 +254,7 @@ describe("LibraryPoolingStep component", () => {
                 name: "test pool",
                 type: "libraryPool"
               },
-              pooledLibraryPool: null,
+              pooledLibraryPool: { id: null },
               pooledLibraryPrepBatch: {
                 id: "2",
                 type: "libraryPrepBatch"
@@ -270,7 +270,7 @@ describe("LibraryPoolingStep component", () => {
                 name: "test pool",
                 type: "libraryPool"
               },
-              pooledLibraryPool: null,
+              pooledLibraryPool: { id: null },
               pooledLibraryPrepBatch: {
                 id: "3",
                 type: "libraryPrepBatch"
@@ -438,7 +438,7 @@ describe("LibraryPoolingStep component", () => {
                 name: "test pool",
                 type: "libraryPool"
               },
-              pooledLibraryPool: null,
+              pooledLibraryPool: { id: null },
               pooledLibraryPrepBatch: {
                 id: "1",
                 name: "test batch 1",
@@ -493,7 +493,7 @@ describe("LibraryPoolingStep component", () => {
                 name: "test pool 1",
                 type: "libraryPool"
               },
-              pooledLibraryPrepBatch: null,
+              pooledLibraryPrepBatch: { id: null },
               type: "libraryPoolContent"
             },
             type: "libraryPoolContent"

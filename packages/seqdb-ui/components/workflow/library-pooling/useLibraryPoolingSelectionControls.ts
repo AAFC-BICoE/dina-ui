@@ -25,8 +25,10 @@ export function useLibraryPoolingSelectionControls({
     const newLibraryPoolContents = pooledItems.map<LibraryPoolContent>(
       item => ({
         libraryPool,
-        pooledLibraryPool: item.type === "libraryPool" ? item : null,
-        pooledLibraryPrepBatch: item.type === "libraryPrepBatch" ? item : null,
+        pooledLibraryPool:
+          item.type === "libraryPool" ? item : ({ id: null } as any),
+        pooledLibraryPrepBatch:
+          item.type === "libraryPrepBatch" ? item : ({ id: null } as any),
         type: "libraryPoolContent"
       })
     );
