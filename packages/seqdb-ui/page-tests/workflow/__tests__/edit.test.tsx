@@ -23,7 +23,7 @@ const mockPatch = jest.fn();
 const mockPush = jest.fn();
 
 const apiContext: any = {
-  apiClient: { get: mockGet, patch: mockPatch }
+  apiClient: { get: mockGet, axios: { patch: mockPatch } }
 };
 
 const TEST_WORKFLOW: Chain = {

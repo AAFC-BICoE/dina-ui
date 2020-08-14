@@ -88,7 +88,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
     // These should be edited instead of creating new ones.
     const existingStepResources = checkedSampleIds.length
       ? (
-          await apiClient.get<StepResource[]>("stepResource", {
+          await apiClient.get<StepResource[]>("seqdb-api/stepResource", {
             filter: {
               "chain.chainId": chain.id,
               "chainStepTemplate.chainStepTemplateId": step.id,
@@ -138,7 +138,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
           type: "preLibraryPrep"
         } as PreLibraryPrep,
         sample: { id: sampleId, type: "sample" },
-        type: "INPUT",
+        type: "stepResource",
         value: savedPlps[i].preLibraryPrepType
       }))
       // Don't create a new step resource if there is already one for this sample.
@@ -178,7 +178,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       // These should be edited instead of creating new ones.
       const stepResourcesToDelete = checkedSampleIds.length
         ? (
-            await apiClient.get<StepResource[]>("stepResource", {
+            await apiClient.get<StepResource[]>("seqdb-api/stepResource", {
               filter: {
                 "chain.chainId": chain.id,
                 "chainStepTemplate.chainStepTemplateId": step.id,

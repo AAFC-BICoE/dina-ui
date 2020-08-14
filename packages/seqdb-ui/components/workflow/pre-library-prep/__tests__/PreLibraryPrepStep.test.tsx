@@ -383,7 +383,6 @@ describe("PreLibraryPrepStep UI", () => {
           path: "stepResource",
           value: {
             attributes: {
-              type: "INPUT",
               value: "SHEARING"
             },
             id: "-100",
@@ -421,7 +420,6 @@ describe("PreLibraryPrepStep UI", () => {
           path: "stepResource",
           value: {
             attributes: {
-              type: "INPUT",
               value: "SHEARING"
             },
             id: "-101",
@@ -459,7 +457,6 @@ describe("PreLibraryPrepStep UI", () => {
           path: "stepResource",
           value: {
             attributes: {
-              type: "INPUT",
               value: "SHEARING"
             },
             id: "-102",
@@ -661,7 +658,6 @@ describe("PreLibraryPrepStep UI", () => {
           path: "stepResource",
           value: {
             attributes: {
-              type: "INPUT",
               value: "SHEARING"
             },
             id: "-100",
