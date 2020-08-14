@@ -1,5 +1,8 @@
 version: "3.7"
 services:
+  database:
+    volumes:
+      - "$HOME/seqdb-api-pgdata:/var/lib/postgresql/data"
   seqdb-api:
     image: maven:3.6.3-jdk-11
     volumes:
@@ -27,8 +30,8 @@ services:
         -Dspring.datasource.password=p
         -Dspring.liquibase.user=postgres
         -Dspring.liquibase.password=p
-        -Dspring.servlet.multipart.max-file-size=2GB
-        -Dspring.servlet.multipart.max-request-size=2GB
+        -Dkeycloak.enabled=true
+        -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
       \"
       spring-boot:run
       "

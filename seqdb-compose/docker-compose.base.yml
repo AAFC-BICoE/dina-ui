@@ -45,6 +45,9 @@ services:
       spring.datasource.continue-on-error: "true"
       spring.liquibase.user: postgres
       spring.liquibase.password: p
+    extra_hosts:
+      # Resolve the Keycloak domain to Keycloak's static IP:
+      - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
   seqdb-ui:
     image: seqdb-ui:tag
     environment:
