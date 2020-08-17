@@ -5,6 +5,8 @@ services:
       - "$HOME/seqdb-api-pgdata:/var/lib/postgresql/data"
   seqdb-api:
     image: maven:3.6.3-jdk-11
+    # Run as Docker host user so generated files don't belong to root:
+    user: $UID:$GID
     volumes:
       - "../repos/seqdb-api:/app"
       # Share host users:
@@ -40,6 +42,8 @@ services:
     image: node:12.16.1
     volumes:
       - "../repos/dina-ui:/dina-ui"
+    # Run as Docker host user so generated files don't belong to root:
+    user: $UID:$GID
     stop_signal: SIGKILL
     command: >
       bash -c "
