@@ -1,8 +1,5 @@
 version: "3.7"
 services:
-  database:
-    volumes:
-      - "$HOME/seqdb-api-pgdata:/var/lib/postgresql/data"
   seqdb-api:
     image: maven:3.6.3-jdk-11
     # Run as Docker host user so generated files don't belong to root:
