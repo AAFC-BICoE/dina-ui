@@ -97,8 +97,8 @@ export function LibraryPrepEditTable({
         sample: "name"
       },
       filter: {
-        "chain.chainId": chain.id as string,
-        "chainStepTemplate.chainStepTemplateId": sampleSelectionStep.id as string
+        "chain.uuid": chain.id as string,
+        "chainStepTemplate.uuid": sampleSelectionStep.id as string
       },
       include: "sample",
       page: { limit: 1000 },

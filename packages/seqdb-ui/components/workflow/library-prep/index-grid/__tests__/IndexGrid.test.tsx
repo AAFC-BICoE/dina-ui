@@ -21,7 +21,6 @@ const TEST_LIBRARY_PREP_BATCH: LibraryPrepBatch = {
     name: "container type",
     numberOfColumns: 12,
     numberOfRows: 8,
-    numberOfWells: 96,
     type: "containerType"
   },
   id: "10",

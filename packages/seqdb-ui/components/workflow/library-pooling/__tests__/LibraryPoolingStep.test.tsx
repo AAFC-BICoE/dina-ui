@@ -578,8 +578,7 @@ describe("LibraryPoolingStep component", () => {
     // The name filter should be passed in:
     expect(mockGet).lastCalledWith("seqdb-api/libraryPool", {
       filter: {
-        rsql:
-          "libraryPoolId!=100 and name=='*test search name*' and dateUsed==null"
+        rsql: "uuid!=100 and name=='*test search name*' and dateUsed==null"
       },
       page: { limit: 25, offset: 0 }
     });
@@ -616,7 +615,7 @@ describe("LibraryPoolingStep component", () => {
 
     expect(mockGet).lastCalledWith("seqdb-api/libraryPool", {
       filter: {
-        rsql: "libraryPoolId!=100 and name=='**' "
+        rsql: "uuid!=100 and name=='**' "
       },
       page: { limit: 25, offset: 0 }
     });

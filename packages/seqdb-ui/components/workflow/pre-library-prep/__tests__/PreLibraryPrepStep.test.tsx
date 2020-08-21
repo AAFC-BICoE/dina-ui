@@ -151,8 +151,8 @@ describe("PreLibraryPrepStep UI", () => {
       {
         // It should be filtered to the previous step's stepResources.
         filter: {
-          "chain.chainId": "1",
-          "chainStepTemplate.chainStepTemplateId": "1",
+          "chain.uuid": "1",
+          "chainStepTemplate.uuid": "1",
           rsql: ""
         },
         include: "sample",
@@ -171,9 +171,9 @@ describe("PreLibraryPrepStep UI", () => {
           sample: "name,version"
         },
         filter: {
-          "chain.chainId": "1",
-          "chainStepTemplate.chainStepTemplateId": "2",
-          rsql: "sample.sampleId=in=(1,2,3,4,5)"
+          "chain.uuid": "1",
+          "chainStepTemplate.uuid": "2",
+          rsql: "sample.uuid=in=(1,2,3,4,5)"
         },
         include:
           "sample,preLibraryPrep,preLibraryPrep.protocol,preLibraryPrep.product",
@@ -527,7 +527,7 @@ describe("PreLibraryPrepStep UI", () => {
         path === "seqdb-api/stepResource" &&
         params.include.includes("sample,preLibraryPrep")
       ) {
-        expect(params.filter.rsql).toEqual("sample.sampleId=in=(3,4,5)");
+        expect(params.filter.rsql).toEqual("sample.uuid=in=(3,4,5)");
         // The first 2 samples should already have preLibraryPreps.
         return {
           data: [

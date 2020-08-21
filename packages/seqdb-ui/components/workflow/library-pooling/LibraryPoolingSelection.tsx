@@ -76,7 +76,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     rsql: `name=='*${nameFilter}*' ${hideUsedItems ? "and dateUsed==null" : ""}`
   };
   const poolFilter = {
-    rsql: `libraryPoolId!=${libraryPool.id} and name=='*${nameFilter}*' ${
+    rsql: `uuid!=${libraryPool.id} and name=='*${nameFilter}*' ${
       hideUsedItems ? "and dateUsed==null" : ""
     }`
   };

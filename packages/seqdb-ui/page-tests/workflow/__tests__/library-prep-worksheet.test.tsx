@@ -43,7 +43,6 @@ describe("Library Prep Worksheet page", () => {
                 name: "container type",
                 numberOfColumns: 12,
                 numberOfRows: 8,
-                numberOfWells: 96,
                 type: "containerType"
               },
               id: "200",

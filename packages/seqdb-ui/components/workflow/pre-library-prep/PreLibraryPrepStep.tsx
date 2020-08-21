@@ -185,8 +185,8 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                     columns={SAMPLE_STEP_RESOURCE_COLUMNS}
                     defaultPageSize={100}
                     filter={{
-                      "chain.chainId": chain.id,
-                      "chainStepTemplate.chainStepTemplateId": previousStep.id,
+                      "chain.uuid": chain.id,
+                      "chainStepTemplate.uuid": previousStep.id,
                       rsql: rsqlFilter
                     }}
                     include="sample"

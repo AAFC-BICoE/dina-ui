@@ -31,9 +31,9 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
         sample: "name,version"
       },
       filter: {
-        "chain.chainId": chain.id,
-        "chainStepTemplate.chainStepTemplateId": step.id,
-        rsql: `sample.sampleId=in=(${visibleSampleIds})`
+        "chain.uuid": chain.id,
+        "chainStepTemplate.uuid": step.id,
+        rsql: `sample.uuid=in=(${visibleSampleIds})`
       },
       include:
         "sample,preLibraryPrep,preLibraryPrep.protocol,preLibraryPrep.product",
@@ -90,10 +90,10 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       ? (
           await apiClient.get<StepResource[]>("seqdb-api/stepResource", {
             filter: {
-              "chain.chainId": chain.id,
-              "chainStepTemplate.chainStepTemplateId": step.id,
+              "chain.uuid": chain.id,
+              "chainStepTemplate.uuid": step.id,
               "preLibraryPrep.preLibraryPrepType": plpValues.preLibraryPrepType,
-              rsql: `sample.sampleId=in=(${checkedSampleIds})`
+              rsql: `sample.uuid=in=(${checkedSampleIds})`
             },
             include: "sample,preLibraryPrep",
             page: { limit: 1000 } // Max page limit
@@ -183,7 +183,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
                 "chain.chainId": chain.id,
                 "chainStepTemplate.chainStepTemplateId": step.id,
                 "preLibraryPrep.preLibraryPrepType": plpType,
-                rsql: `sample.sampleId=in=(${checkedSampleIds})`
+                rsql: `sample.uuid=in=(${checkedSampleIds})`
               },
               include: "sample,preLibraryPrep",
               page: { limit: 1000 } // Max page limit

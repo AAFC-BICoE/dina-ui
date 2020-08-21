@@ -28,8 +28,8 @@ export function LibraryPrepStep(props: StepRendererProps) {
         thermocyclerprofile: "name"
       },
       filter: {
-        "chain.chainId": chain.id as string,
-        "chainStepTemplate.chainStepTemplateId": step.id as string
+        "chain.uuid": chain.id as string,
+        "chainStepTemplate.uuid": step.id as string
       },
       include:
         "libraryPrepBatch,libraryPrepBatch.product,libraryPrepBatch.protocol,libraryPrepBatch.containerType,libraryPrepBatch.thermocyclerProfile,libraryPrepBatch.indexSet",

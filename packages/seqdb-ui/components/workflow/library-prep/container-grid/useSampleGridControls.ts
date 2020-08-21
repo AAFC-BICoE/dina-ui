@@ -91,9 +91,9 @@ export function useSampleGridControls({
             sample: "name"
           },
           filter: {
-            "chain.chainId": chain.id as string,
-            "chainStepTemplate.chainStepTemplateId": sampleSelectionStep.id as string,
-            rsql: `sample.sampleId=out=(${sampleIdsWithCoords || "0"})`
+            "chain.uuid": chain.id as string,
+            "chainStepTemplate.uuid": sampleSelectionStep.id as string,
+            rsql: `sample.uuid=out=(${sampleIdsWithCoords || "0"})`
           },
           include: "sample",
           page: { limit: 1000 }

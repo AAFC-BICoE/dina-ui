@@ -57,7 +57,7 @@ export default function WorkflowViewPage() {
 
 function WorkflowSteps({ chain }: { chain: PersistedResource<Chain> }) {
   const { loading, response } = useQuery<ChainStepTemplate[]>({
-    filter: { "chainTemplate.id": chain.chainTemplate.id as string },
+    filter: { "chainTemplate.uuid": chain.chainTemplate.id as string },
     include: "stepTemplate",
     path: "seqdb-api/chainStepTemplate"
   });

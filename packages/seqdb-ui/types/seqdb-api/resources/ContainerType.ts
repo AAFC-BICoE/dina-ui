@@ -6,7 +6,6 @@ export interface ContainerTypeAttributes {
   name: string;
   numberOfColumns: number;
   numberOfRows: number;
-  numberOfWells: number;
 }
 
 export type ContainerType = KitsuResource & ContainerTypeAttributes;

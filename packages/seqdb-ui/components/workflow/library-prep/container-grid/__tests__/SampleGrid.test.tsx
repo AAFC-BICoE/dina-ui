@@ -32,7 +32,6 @@ function getWrapper(propsOverride?: Partial<ContainerGridProps>) {
           name: "96 well box",
           numberOfColumns: 12,
           numberOfRows: 8,
-          numberOfWells: 96,
           type: "containerType"
         },
         id: "5",

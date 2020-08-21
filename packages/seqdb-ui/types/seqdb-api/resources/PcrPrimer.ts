@@ -14,17 +14,6 @@ export interface PcrPrimerAttributes {
   tmCalculated?: string | null;
   tmPe?: number | null;
   position?: string | null;
-  storage?: string | null;
-  restrictionSite?: string | null;
-  used4sequencing?: boolean | null;
-  used4qrtpcr?: boolean | null;
-  used4nestedPcr?: boolean | null;
-  used4genotyping?: boolean | null;
-  used4cloning?: boolean | null;
-  used4stdPcr?: boolean | null;
-  referenceSeqDir?: string | null;
-  referenceSeqFile?: string | null;
-  urllink?: string | null;
   note?: string | null;
   lastModified?: string | null;
   application?: string | null;

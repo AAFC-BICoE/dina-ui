@@ -14,6 +14,16 @@ import "../components/button-bar/buttonbar.css";
 import "../components/nav/nav.css";
 import { SeqdbIntlProvider } from "../intl/seqdb-intl";
 
+/** Get Random UUID */
+function uuidv4(): string {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, char => {
+    const randomNumber = Math.floor(Math.random() * 16);
+    // tslint:disable-next-line: no-bitwise
+    const v = char === "x" ? randomNumber : (randomNumber & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 /**
  * App component that wraps every page component.
  *
@@ -21,7 +31,8 @@ import { SeqdbIntlProvider } from "../intl/seqdb-intl";
  */
 export default class SeqdbUiApp extends App {
   private contextValue = createContextValue({
-    baseURL: "/api"
+    baseURL: "/api",
+    getTempIdGenerator: () => uuidv4
   });
 
   public render() {

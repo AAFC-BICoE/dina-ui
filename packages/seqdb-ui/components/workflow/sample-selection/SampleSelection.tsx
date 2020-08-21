@@ -182,8 +182,8 @@ export function SampleSelection(props: StepRendererProps) {
                 defaultPageSize={100}
                 deps={[lastSave]}
                 filter={{
-                  "chain.chainId": chain.id,
-                  "chainStepTemplate.chainStepTemplateId": step.id
+                  "chain.uuid": chain.id,
+                  "chainStepTemplate.uuid": step.id
                 }}
                 include="sample"
                 onSuccess={res => setStepResources(res.data)}
