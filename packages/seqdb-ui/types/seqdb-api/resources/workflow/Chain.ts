@@ -3,7 +3,7 @@ import { ChainTemplate } from "./ChainTemplate";
 
 export interface ChainAttributes {
   name: string;
-  dateCreated: string;
+  createdOn?: string;
 }
 
 export interface ChainRelationships {

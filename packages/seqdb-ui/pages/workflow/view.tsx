@@ -114,7 +114,6 @@ function WorkflowSteps({ chain }: { chain: PersistedResource<Chain> }) {
             <div className="col-md-3">
               <FieldView label="Template" name="chainTemplate.name" />
               <FieldView name="name" />
-              <FieldView name="dateCreated" />
             </div>
           </Formik>
         </TabPanel>

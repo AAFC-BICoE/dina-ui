@@ -215,8 +215,6 @@ const TEST_PRIMER: Required<PcrPrimer> = {
   position: null,
   purification: "none",
   reference: null,
-  referenceSeqDir: null,
-  referenceSeqFile: null,
   region: {
     description: "ITS Region Amplification",
     id: "2",
@@ -224,21 +222,12 @@ const TEST_PRIMER: Required<PcrPrimer> = {
     symbol: "ITS",
     type: "region"
   },
-  restrictionSite: "600",
   seq: "ACTACGATCAGCATCGATG",
   stockConcentration: "10",
-  storage: null,
   supplier: null,
   targetSpecies: null,
   tmCalculated: "55",
   tmPe: null,
   type: "PRIMER",
-  urllink: null,
-  used4cloning: true,
-  used4genotyping: false,
-  used4nestedPcr: false,
-  used4qrtpcr: false,
-  used4sequencing: true,
-  used4stdPcr: true,
   version: null
 };

@@ -28,7 +28,7 @@ const apiContext: any = {
 
 const TEST_WORKFLOW: Chain = {
   chainTemplate: { id: "1", type: "chainTemplate" } as ChainTemplate,
-  dateCreated: "2019-08-16",
+  createdOn: "2019-08-16",
   id: "5",
   name: "Mat's chain",
   type: "chain"
@@ -88,7 +88,6 @@ describe("Workflow edit page.", () => {
           path: "chain",
           value: {
             attributes: {
-              dateCreated: today,
               name: "New Workflow"
             },
             id: "-100",

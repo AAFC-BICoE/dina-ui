@@ -71,10 +71,6 @@ function ChainForm({ chain, router }: ChainFormProps) {
   const initialValues = chain || {};
 
   const onSubmit = safeSubmit(async submittedValues => {
-    // Current date as yyyy-mm-dd string.
-    const dateCreated = new Date().toISOString().split("T")[0];
-    submittedValues.dateCreated = dateCreated;
-
     const response = await save(
       [
         {

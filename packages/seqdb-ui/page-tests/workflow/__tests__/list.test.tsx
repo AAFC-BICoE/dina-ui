@@ -8,14 +8,14 @@ jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 const TEST_CHAINS: Chain[] = [
   {
     chainTemplate: { name: "Mat's chain template" } as ChainTemplate,
-    dateCreated: "2019-08-16",
+    createdOn: "2019-08-16",
     id: "1",
     name: "Mat's chain 1",
     type: "chain"
   },
   {
     chainTemplate: { name: "Mat's chain template" } as ChainTemplate,
-    dateCreated: "2019-08-17",
+    createdOn: "2019-08-17",
     id: "2",
     name: "Mat's chain 2",
     type: "chain"

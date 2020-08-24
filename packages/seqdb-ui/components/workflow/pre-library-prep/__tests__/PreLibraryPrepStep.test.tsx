@@ -59,7 +59,7 @@ const TEST_CHAIN_TEMPLATE: PersistedResource<ChainTemplate> = {
 
 const TEST_CHAIN: PersistedResource<Chain> = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
-  dateCreated: "2019-01-01",
+  createdOn: "2019-01-01",
   id: "1",
   name: "Mat's chain",
   type: "chain"

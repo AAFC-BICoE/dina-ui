@@ -44,7 +44,7 @@ describe("Workflow view page", () => {
               name: "test workflow template",
               type: "chainTemplate"
             },
-            dateCreated: "2019-11-20",
+            createdOn: "2019-11-20",
             id: "123",
             name: "test workflow",
             type: "chain"
