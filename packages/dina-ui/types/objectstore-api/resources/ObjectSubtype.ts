@@ -5,6 +5,7 @@ export interface ObjectSubtypeAttributes {
   uuid: string;
   dcType: string;
   acSubtype: string;
+  appManaged?: boolean;
 }
 
 export type ObjectSubtype = KitsuResource & ObjectSubtypeAttributes;

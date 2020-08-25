@@ -5,7 +5,8 @@ export interface ManagedAttributeAttributes {
   name: string;
   managedAttributeType: string;
   acceptedValues?: string[];
-  createdDate?: string;
+  createdBy?: string;
+  createdOn?: string;
   description?: Map<string, string>;
 }
 export enum ManagedAttributeType {
