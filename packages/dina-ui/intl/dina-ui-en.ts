@@ -13,6 +13,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   appTitle: "DINA",
   attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
+  changedProperties: "Changes",
   closePreviewButtonText: "Close Preview",
   deleteButtonText: "Delete",
   deleteSelectedButtonText: "Delete Selected",
@@ -33,7 +34,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dcRights: "Rights Statement",
   field_dcType: "Stored Object Type",
   field_managedAttributeAcceptedValue: "Accepted Value",
-  field_managedAttributeCreateDate: "Create Date",
+  field_managedAttributeCreatedOn: "Created On",
+  field_managedAttributeCreatedBy: "Created By",
   field_managedAttributeDescEn: "English Description",
   field_managedAttributeDescFr: "French Description",
   field_managedAttributeMandatoryFieldsError:
@@ -70,6 +72,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metadataMediaDetailsLabel: "Media",
   metadataObjectTypeLabel: "Stored Object Type",
   metadataPageLink: "Details Page",
+  metadataRevisionsListTitle: "Revisions for {name}",
   metadataRightsDetailsLabel: "Rights",
   metadataTagsLabel: "Tags",
   metadataUploadDetailsLabel: "Upload Details",
@@ -81,11 +84,15 @@ export const DINAUI_MESSAGES_ENGLISH = {
   objectSubtypeTitle: "Object Subtype",
   personListTitle: "Persons",
   personViewTitle: "View Person",
+  revisionsButtonText: "Revisions",
+  revisionsByUserPageTitle: "Revisions by user",
+  searchButton: "Search",
   thumbnailNotAvailableText: "No thumbnail available",
   uploadButtonText: "Upload",
   uploadFormInstructions:
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
   uploadPageTitle: "Upload Files",
   userMustBelongToGroup: "User must belong to a Group",
+  valueLabel: "Value",
   viewPreviewButtonText: "Preview"
 };

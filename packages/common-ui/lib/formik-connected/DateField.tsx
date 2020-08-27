@@ -32,7 +32,7 @@ export function DateField(props: LabelWrapperParams & DateFieldProps) {
               <DatePicker
                 className="form-control"
                 dateFormat={showTime ? "Pp" : "yyyy-MM-dd"}
-                isClearable={true}
+                isClearable={!disabled}
                 onChange={onChange}
                 selected={
                   value

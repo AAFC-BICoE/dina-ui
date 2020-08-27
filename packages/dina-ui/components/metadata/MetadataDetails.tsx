@@ -1,4 +1,4 @@
-import { useCollapser } from "common-ui";
+import { useCollapser, useQuery } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { get, toPairs } from "lodash";
 import Link from "next/link";
@@ -6,7 +6,11 @@ import { ReactNode } from "react";
 import ReactTable from "react-table";
 import titleCase from "title-case";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { ManagedAttributeValue, Metadata } from "../../types/objectstore-api";
+import {
+  ManagedAttribute,
+  ManagedAttributeMap,
+  Metadata
+} from "../../types/objectstore-api";
 
 export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
@@ -18,10 +22,6 @@ export interface MetadataDetailsProps {
  */
 export function MetadataDetails({ metadata }: MetadataDetailsProps) {
   const { formatMessage } = useDinaIntl();
-
-  const managedAttributeValues = metadata.managedAttributeMap
-    ? toPairs(metadata.managedAttributeMap.values).map(ma => ma[1])
-    : [];
 
   return (
     <div>
@@ -45,9 +45,14 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         ]}
         title={formatMessage("metadataUploadDetailsLabel")}
       />
-      <MetadataManagedAttributes
-        managedAttributeValues={managedAttributeValues}
-      />
+      <CollapsableSection
+        collapserId="managed-attributes"
+        title={formatMessage("metadataManagedAttributesLabel")}
+      >
+        <MetadataManagedAttributes
+          managedAttributeMap={metadata.managedAttributeMap}
+        />
+      </CollapsableSection>
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
@@ -96,8 +101,6 @@ function MetadataAttributeGroup({
 }: MetadataAttributeGroupProps) {
   const { formatMessage, messages } = useDinaIntl();
 
-  const { Collapser, collapsed } = useCollapser(`metadata-details-${title}`);
-
   const data = fields.map(field => {
     if (typeof field === "string") {
       return { name: field, value: get(metadata, field) };
@@ -106,81 +109,69 @@ function MetadataAttributeGroup({
   });
 
   return (
-    <div className="form-group">
-      <h4>
-        <Collapser />
-        {title}
-      </h4>
-      {!collapsed && (
-        <ReactTable
-          className="-striped"
-          columns={[
-            {
-              Cell: ({ original: { name } }) => {
-                const messageKey = `field_${name}`;
-                const value = messages[messageKey]
-                  ? formatMessage(messageKey as any)
-                  : titleCase(name);
+    <CollapsableSection collapserId={title} title={title}>
+      <ReactTable
+        className="-striped"
+        columns={[
+          {
+            Cell: ({ original: { name } }) => {
+              const messageKey = `field_${name}`;
+              const value = messages[messageKey]
+                ? formatMessage(messageKey as any)
+                : titleCase(name);
 
-                return <strong>{value}</strong>;
-              },
-              Header: <DinaMessage id="attributeLabel" />,
-              accessor: "name"
+              return <strong>{value}</strong>;
             },
-            {
-              // The cell can render either JSX or a primitive (string/number etc.).
-              Cell: ({ original: { value } }) =>
-                value?.props ? <>{value}</> : String(value ?? ""),
-              Header: <DinaMessage id="managedAttributeValueLabel" />,
-              accessor: "value"
-            }
-          ]}
-          data={data}
-          pageSize={data.length || 1}
-          showPagination={false}
-        />
-      )}
-    </div>
+            Header: <DinaMessage id="attributeLabel" />,
+            accessor: "name"
+          },
+          {
+            // The cell can render either JSX or a primitive (string/number etc.).
+            Cell: ({ original: { value } }) =>
+              value?.props ? <>{value}</> : String(value ?? ""),
+            Header: <DinaMessage id="managedAttributeValueLabel" />,
+            accessor: "value"
+          }
+        ]}
+        data={data}
+        pageSize={data.length || 1}
+        showPagination={false}
+      />
+    </CollapsableSection>
   );
 }
 
 interface MetadataManagedAttributesProps {
-  managedAttributeValues: ManagedAttributeValue[];
+  managedAttributeMap?: ManagedAttributeMap | null;
 }
 
-function MetadataManagedAttributes({
-  managedAttributeValues
+export function MetadataManagedAttributes({
+  managedAttributeMap
 }: MetadataManagedAttributesProps) {
-  const { Collapser, collapsed } = useCollapser(
-    "metadata-details-managed-attributes"
-  );
+  const managedAttributeValues = managedAttributeMap
+    ? toPairs(managedAttributeMap.values).map(([id, mav]) => ({ id, ...mav }))
+    : [];
 
   return (
-    <div className="form-group">
-      <h4>
-        <Collapser />
-        <DinaMessage id="metadataManagedAttributesLabel" />
-      </h4>
-      {!collapsed && (
-        <ReactTable
-          className="-striped"
-          columns={[
-            {
-              Cell: ({ original: { name } }) => <strong>{name}</strong>,
-              Header: <DinaMessage id="attributeLabel" />,
-              accessor: "name"
-            },
-            {
-              Header: <DinaMessage id="managedAttributeValueLabel" />,
-              accessor: "value"
-            }
-          ]}
-          data={managedAttributeValues}
-          pageSize={managedAttributeValues.length || 1}
-          showPagination={false}
-        />
-      )}
-    </div>
+    <ReactTable
+      className="-striped"
+      columns={[
+        {
+          Cell: ({ original: { id, name } }) => (
+            <strong>{name ?? <ManagedAttributeName id={id} />}</strong>
+          ),
+          Header: <DinaMessage id="attributeLabel" />,
+          accessor: "name"
+        },
+        {
+          Header: <DinaMessage id="managedAttributeValueLabel" />,
+          accessor: "value"
+        }
+      ]}
+      data={managedAttributeValues}
+      pageSize={managedAttributeValues.length || 1}
+      showPagination={false}
+    />
   );
 }
 
@@ -213,4 +204,45 @@ function MetadataTags({ tags }: MetadataTagsProps) {
       </div>
     </div>
   );
+}
+
+interface CollapsableSectionProps {
+  children: ReactNode;
+  collapserId: string;
+  title: ReactNode;
+}
+
+/** Wrapper for the collapsible sections of the details UI. */
+function CollapsableSection({
+  children,
+  collapserId,
+  title
+}: CollapsableSectionProps) {
+  const { Collapser, collapsed } = useCollapser(
+    `metadata-details-${collapserId}`
+  );
+
+  return (
+    <div className="form-group">
+      <h4>
+        {title}
+        <Collapser />
+      </h4>
+      {!collapsed && children}
+    </div>
+  );
+}
+
+/** Render the name of a ManagedAttribute. */
+export function ManagedAttributeName({ id }) {
+  const { response } = useQuery<ManagedAttribute>({
+    path: `objectstore-api/managed-attribute/${id}`
+  });
+
+  if (response) {
+    const ma = response.data;
+    return <>{ma.name}</>;
+  }
+
+  return null;
 }
