@@ -13,7 +13,9 @@ export type FilterRowPredicate = "IS" | "IS NOT";
 export type FilterRowSearchType =
   | "PARTIAL_MATCH"
   | "EXACT_MATCH"
-  | "BLANK_FIELD";
+  | "BLANK_FIELD"
+  | "GREATER_THAN"
+  | "LESS_THAN";
 
 export interface FilterRowModel {
   id: number;
@@ -51,7 +53,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
       showRemoveButton
     } = this.props;
 
-    let filterPropertyType;
+    let filterPropertyType = "string";
     let filterDropdownList;
 
     if (
@@ -67,23 +69,49 @@ export class FilterRow extends React.Component<FilterRowProps> {
       filterDropdownList = model.attribute.options;
     }
 
-    const searchTypes: {
+    let searchTypes: {
       label: React.ReactNode;
       value: FilterRowSearchType;
-    }[] = [
-      {
-        label: <CommonMessage id="filterPartialMatch" />,
-        value: "PARTIAL_MATCH"
-      },
-      {
-        label: <CommonMessage id="filterExactMatch" />,
-        value: "EXACT_MATCH"
-      },
-      {
-        label: <CommonMessage id="filterBlankField" />,
-        value: "BLANK_FIELD"
-      }
-    ];
+    }[] = [];
+
+    if (filterPropertyType === "date") {
+      searchTypes = [
+        {
+          label: <CommonMessage id="filterGreaterThan" />,
+          value: "GREATER_THAN"
+        },
+        {
+          label: <CommonMessage id="filterExactMatch" />,
+          value: "EXACT_MATCH"
+        },
+        {
+          label: <CommonMessage id="filterLessThan" />,
+          value: "LESS_THAN"
+        }
+      ];
+    } else if (filterPropertyType === "dropdown") {
+      searchTypes = [
+        {
+          label: <CommonMessage id="filterExactMatch" />,
+          value: "EXACT_MATCH"
+        }
+      ];
+    } else if (filterPropertyType === "string") {
+      searchTypes = [
+        {
+          label: <CommonMessage id="filterPartialMatch" />,
+          value: "PARTIAL_MATCH"
+        },
+        {
+          label: <CommonMessage id="filterExactMatch" />,
+          value: "EXACT_MATCH"
+        },
+        {
+          label: <CommonMessage id="filterBlankField" />,
+          value: "BLANK_FIELD"
+        }
+      ];
+    }
 
     const selectedAttribute = this.context.attributeOptions.find(option =>
       isEqual(option.value, model.attribute)
@@ -193,6 +221,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
   private onPropertyChanged = (value: FilterAttributeOption) => {
     this.props.model.attribute = value.value;
+    this.props.model.value = "";
     this.props.onChange();
     this.forceUpdate();
   };

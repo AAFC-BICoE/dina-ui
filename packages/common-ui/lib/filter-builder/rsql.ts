@@ -112,7 +112,10 @@ function toPredicate(filterRow: FilterRowModel) {
   }
 
   // Surround the search value with asterisks if this is a partial match.
-  const searchValue = searchType === "PARTIAL_MATCH" ? `*${value}*` : value;
+  let searchValue = value;
+  if (searchType === "PARTIAL_MATCH") searchValue = `*${value}*`;
+  else if (searchType === "GREATER_THAN") searchValue = `>${value}`;
+  else if (searchType === "LESS_THAN") searchValue = `<${value}`;
 
   return {
     arguments: searchValue,
