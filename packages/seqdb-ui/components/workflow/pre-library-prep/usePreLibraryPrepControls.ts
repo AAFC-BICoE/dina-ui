@@ -21,7 +21,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
 
   const visibleSampleIds = visibleSamples.length
     ? visibleSamples.map(sr => (sr.sample as Sample).id).join(",")
-    : 0;
+    : "00000000-0000-0000-0000-000000000000";
 
   const { loading: plpSrLoading } = useQuery<StepResource[]>(
     {
