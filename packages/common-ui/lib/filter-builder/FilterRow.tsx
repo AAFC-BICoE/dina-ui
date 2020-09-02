@@ -8,6 +8,7 @@ import {
   FilterBuilderContextI
 } from "./FilterBuilderContext";
 import DatePicker from "react-datepicker";
+import moment from "moment";
 
 export type FilterRowPredicate = "IS" | "IS NOT";
 export type FilterRowSearchType =
@@ -225,7 +226,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
       typeof this.props.model.attribute !== "string" &&
       this.props.model.attribute.type === "date"
     ) {
-      this.props.model.value = new Date().toDateString();
+      this.props.model.value = moment().format();
       this.props.model.searchType = "GREATER_THAN";
     } else if (typeof this.props.model.attribute === "string") {
       this.props.model.value = "";
@@ -272,7 +273,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
   };
 
   private onDateValueChanged = e => {
-    this.props.model.value = e;
+    this.props.model.value = moment(e).format();
     this.props.onChange();
     this.forceUpdate();
   };
