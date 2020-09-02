@@ -61,7 +61,6 @@ export default function MetadataListPage() {
     : [12, 0];
 
   const creatorOptions = [
-    { label: "<any>", value: undefined },
     ...(queryState?.response?.data ?? []).map(d => ({
       label: d.displayName,
       value: d.id

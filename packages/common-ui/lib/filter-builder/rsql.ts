@@ -113,13 +113,21 @@ function toPredicate(filterRow: FilterRowModel) {
 
   // Surround the search value with asterisks if this is a partial match.
   let searchValue = value;
-  if (searchType === "PARTIAL_MATCH") searchValue = `*${value}*`;
-  else if (searchType === "GREATER_THAN") searchValue = `>${value}`;
-  else if (searchType === "LESS_THAN") searchValue = `<${value}`;
+  let compare;
+  if (searchType === "PARTIAL_MATCH") {
+    searchValue = `*${value}*`;
+    compare = predicate === "IS NOT" ? "!=" : "==";
+  } else if (searchType === "GREATER_THAN") {
+    compare = predicate === "IS NOT" ? "=lt=" : "=gt=";
+  } else if (searchType === "LESS_THAN") {
+    compare = predicate === "IS NOT" ? "=gt=" : "=lt=";
+  } else if (searchType === "EXACT_MATCH") {
+    compare = predicate === "IS NOT" ? "!=" : "==";
+  }
 
   return {
     arguments: searchValue,
-    comparison: predicate === "IS NOT" ? "!=" : "==",
+    comparison: compare,
     selector
   };
 }

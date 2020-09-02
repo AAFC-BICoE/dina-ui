@@ -221,7 +221,22 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
   private onPropertyChanged = (value: FilterAttributeOption) => {
     this.props.model.attribute = value.value;
-    this.props.model.value = "";
+    if (
+      typeof this.props.model.attribute !== "string" &&
+      this.props.model.attribute.type === "date"
+    ) {
+      this.props.model.value = new Date().toDateString();
+      this.props.model.searchType = "GREATER_THAN";
+    } else if (typeof this.props.model.attribute === "string") {
+      this.props.model.value = "";
+      this.props.model.searchType = "PARTIAL_MATCH";
+    } else if (
+      typeof this.props.model.attribute !== "string" &&
+      this.props.model.attribute.type === "dropdown"
+    ) {
+      this.props.model.searchType = "EXACT_MATCH";
+    }
+
     this.props.onChange();
     this.forceUpdate();
   };
