@@ -33,6 +33,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dcFormat: "Media Format",
   field_dcRights: "Rights Statement",
   field_dcType: "Stored Object Type",
+  field_license: "License",
   field_managedAttributeAcceptedValue: "Accepted Value",
   field_managedAttributeCreatedOn: "Created On",
   field_managedAttributeCreatedBy: "Created By",
