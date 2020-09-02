@@ -325,6 +325,7 @@ describe("Metadata bulk edit page", () => {
       [
         {
           resource: {
+            dcRights: "",
             id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
             type: "metadata",
             xmpRightsUsageTerms: "",

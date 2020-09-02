@@ -252,8 +252,9 @@ export default function EditMetadatasPage() {
             : null;
           // The Metadata's xmpRightsWebStatement field stores the license's url.
           metadataEdit.xmpRightsWebStatement = selectedLicense?.url ?? "";
-          // No need to store this ; The url should be enough.
+          // No need to store these ; The url should be enough.
           metadataEdit.xmpRightsUsageTerms = "";
+          metadataEdit.dcRights = "";
         }
 
         return {

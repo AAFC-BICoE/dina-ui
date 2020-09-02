@@ -20,7 +20,7 @@ export interface MetadataAttributes {
   xmpRightsUsageTerms?: string;
 
   // optional fields
-  acRights?: string;
+  dcRights?: string;
   acSubType?: string;
   acCaption?: string;
   dcFormat?: string;
