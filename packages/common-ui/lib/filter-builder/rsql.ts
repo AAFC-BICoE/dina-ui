@@ -111,20 +111,23 @@ function toPredicate(filterRow: FilterRowModel) {
     };
   }
 
-  // Surround the search value with asterisks if this is a partial match.
+  // Surround the search value with asterisks if this is a partial match for string property type search
   let searchValue = value;
   let compare;
-  if (searchType === "PARTIAL_MATCH") {
-    searchValue = `*${value}*`;
-    compare = predicate === "IS NOT" ? "!=" : "==";
-  } else if (searchType === "GREATER_THAN") {
-    compare = predicate === "IS NOT" ? "=lt=" : "=gt=";
-  } else if (searchType === "LESS_THAN") {
-    compare = predicate === "IS NOT" ? "=gt=" : "=lt=";
-  } else if (searchType === "EXACT_MATCH") {
-    compare = predicate === "IS NOT" ? "!=" : "==";
+  if (typeof attribute === "string" || attribute.type === "dropdown") {
+    if (searchType === "PARTIAL_MATCH") {
+      searchValue = `*${value}*`;
+      compare = predicate === "IS NOT" ? "!=" : "==";
+    } else if (searchType === "EXACT_MATCH") {
+      compare = predicate === "IS NOT" ? "!=" : "==";
+    }
   }
-
+  // override compare if this is date type, which only has greater and less than
+  if (predicate === "GREATER_THAN") {
+    compare = "=gt=";
+  } else if (predicate === "LESS_THAN") {
+    compare = "=lt=";
+  }
   return {
     arguments: searchValue,
     comparison: compare,

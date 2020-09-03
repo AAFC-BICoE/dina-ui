@@ -10,13 +10,11 @@ import {
 import DatePicker from "react-datepicker";
 import moment from "moment";
 
-export type FilterRowPredicate = "IS" | "IS NOT";
+export type FilterRowPredicate = "IS" | "IS NOT" | "GREATER_THAN" | "LESS_THAN";
 export type FilterRowSearchType =
   | "PARTIAL_MATCH"
   | "EXACT_MATCH"
-  | "BLANK_FIELD"
-  | "GREATER_THAN"
-  | "LESS_THAN";
+  | "BLANK_FIELD";
 
 export interface FilterRowModel {
   id: number;
@@ -56,6 +54,19 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
     let filterPropertyType = "string";
     let filterDropdownList;
+    let predicateTypes: {
+      label: React.ReactNode;
+      value: FilterRowPredicate;
+    }[] = [
+      {
+        label: <CommonMessage id="IS" />,
+        value: "IS"
+      },
+      {
+        label: <CommonMessage id="ISNOT" />,
+        value: "IS NOT"
+      }
+    ];
 
     if (
       typeof model.attribute !== "string" &&
@@ -69,21 +80,29 @@ export class FilterRow extends React.Component<FilterRowProps> {
       filterPropertyType = "dropdown";
       filterDropdownList = model.attribute.options;
     }
-
     let searchTypes: {
       label: React.ReactNode;
       value: FilterRowSearchType;
-    }[] = [];
+    }[] = [
+      {
+        label: <CommonMessage id="filterPartialMatch" />,
+        value: "PARTIAL_MATCH"
+      },
+      {
+        label: <CommonMessage id="filterExactMatch" />,
+        value: "EXACT_MATCH"
+      },
+      {
+        label: <CommonMessage id="filterBlankField" />,
+        value: "BLANK_FIELD"
+      }
+    ];
 
     if (filterPropertyType === "date") {
-      searchTypes = [
+      predicateTypes = [
         {
           label: <CommonMessage id="filterGreaterThan" />,
           value: "GREATER_THAN"
-        },
-        {
-          label: <CommonMessage id="filterExactMatch" />,
-          value: "EXACT_MATCH"
         },
         {
           label: <CommonMessage id="filterLessThan" />,
@@ -97,23 +116,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
           value: "EXACT_MATCH"
         }
       ];
-    } else if (filterPropertyType === "string") {
-      searchTypes = [
-        {
-          label: <CommonMessage id="filterPartialMatch" />,
-          value: "PARTIAL_MATCH"
-        },
-        {
-          label: <CommonMessage id="filterExactMatch" />,
-          value: "EXACT_MATCH"
-        },
-        {
-          label: <CommonMessage id="filterBlankField" />,
-          value: "BLANK_FIELD"
-        }
-      ];
     }
-
     const selectedAttribute = this.context.attributeOptions.find(option =>
       isEqual(option.value, model.attribute)
     );
@@ -129,14 +132,11 @@ export class FilterRow extends React.Component<FilterRowProps> {
             value={selectedAttribute}
           />
         </div>
-        <div className="list-inline-item" style={{ width: 120 }}>
+        <div className="list-inline-item" style={{ width: 180 }}>
           <Select
             className="filter-predicate"
             instanceId={`predicate_${model.id}`}
-            options={[
-              { label: <CommonMessage id="IS" />, value: "IS" },
-              { label: <CommonMessage id="ISNOT" />, value: "IS NOT" }
-            ]}
+            options={predicateTypes}
             onChange={this.onPredicateChanged}
             value={{ label: model.predicate, value: model.predicate }}
           />
@@ -180,17 +180,19 @@ export class FilterRow extends React.Component<FilterRowProps> {
             onChange={this.onValueChanged}
           />
         )}
-        <div className="list-inline-item" style={{ width: 180 }}>
-          <Select
-            className="filter-search-type"
-            instanceId={`searchType_${model.id}`}
-            options={searchTypes}
-            onChange={this.onSearchTypeChanged}
-            value={searchTypes.find(
-              option => option.value === model.searchType
-            )}
-          />
-        </div>
+        {filterPropertyType !== "date" && (
+          <div className="list-inline-item" style={{ width: 180 }}>
+            <Select
+              className="filter-search-type"
+              instanceId={`searchType_${model.id}`}
+              options={searchTypes}
+              onChange={this.onSearchTypeChanged}
+              value={searchTypes.find(
+                option => option.value === model.searchType
+              )}
+            />
+          </div>
+        )}
         <div className="filter-row-buttons list-inline-item">
           <button
             className="list-inline-item btn btn-primary and"
@@ -227,15 +229,17 @@ export class FilterRow extends React.Component<FilterRowProps> {
       this.props.model.attribute.type === "date"
     ) {
       this.props.model.value = moment().format();
-      this.props.model.searchType = "GREATER_THAN";
+      this.props.model.predicate = "GREATER_THAN";
     } else if (typeof this.props.model.attribute === "string") {
       this.props.model.value = "";
       this.props.model.searchType = "PARTIAL_MATCH";
+      this.props.model.predicate = "IS";
     } else if (
       typeof this.props.model.attribute !== "string" &&
       this.props.model.attribute.type === "dropdown"
     ) {
       this.props.model.searchType = "EXACT_MATCH";
+      this.props.model.predicate = "IS";
     }
 
     this.props.onChange();
