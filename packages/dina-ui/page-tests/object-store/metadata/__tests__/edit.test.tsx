@@ -297,7 +297,6 @@ describe("Metadata bulk edit page", () => {
     const wrapper = mountWithAppContext(<EditMetadatasPage />, { apiContext });
 
     await new Promise(setImmediate);
-    await new Promise(setImmediate);
     wrapper.update();
 
     // Get the table data to directly edit it for the test to simulate how the Handsontable would
