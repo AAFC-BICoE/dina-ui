@@ -104,6 +104,11 @@ function NavObjectStoreDropdown() {
             <DinaMessage id="objectSubtypeListTitle" />
           </a>
         </Link>
+        <Link href="/object-store/revisions-by-user">
+          <a className="dropdown-item">
+            <DinaMessage id="revisionsByUserPageTitle" />
+          </a>
+        </Link>
       </div>
     </div>
   );

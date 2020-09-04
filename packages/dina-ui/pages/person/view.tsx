@@ -36,6 +36,11 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
             ...response.data
           };
 
+          if (person && person.createdOn) {
+            const inUserTimeZone = new Date(person.createdOn).toString();
+            person.createdOn = inUserTimeZone;
+          }
+
           return (
             <div className="container-fluid">
               <h1>

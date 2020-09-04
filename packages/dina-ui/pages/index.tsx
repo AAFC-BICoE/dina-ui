@@ -41,6 +41,13 @@ const Home: React.FunctionComponent = () => (
             </a>
           </Link>
         </li>
+        <li>
+          <Link href="/object-store/revisions-by-user">
+            <a>
+              <DinaMessage id="revisionsByUserPageTitle" />
+            </a>
+          </Link>
+        </li>
       </ul>
       <h2>
         <DinaMessage id="agentsSectionTitle" />

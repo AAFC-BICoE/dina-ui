@@ -11,7 +11,7 @@ import {
   SubmitButton,
   TextField
 } from "common-ui";
-import { Form, Formik } from "formik";
+import { Form, Formik, connect } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
@@ -98,13 +98,7 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
             entityLink="/object-store/object-subtype"
             byPassView={true}
           />
-          <DeleteButton
-            className="ml-5"
-            id={id as string}
-            options={{ apiBaseUrl: "/objectstore-api" }}
-            postDeleteRedirect="/object-store/object-subtype/list"
-            type="object-subtype"
-          />
+          <CustomDeleteButton />
         </ButtonBar>
         <div>
           <div className="row">
@@ -122,6 +116,20 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
     </Formik>
   );
 }
+
+const CustomDeleteButton = connect<{}, ObjectSubtype>(
+  ({ formik: { values: subType } }) => (
+    <DeleteButton
+      className="ml-5"
+      // Disable the delete button if the subType is app-managed:
+      disabled={subType.appManaged}
+      id={subType.id}
+      options={{ apiBaseUrl: "/objectstore-api" }}
+      postDeleteRedirect="/object-store/object-subtype/list"
+      type="object-subtype"
+    />
+  )
+);
 
 const DC_TYPE_OPTIONS = [
   {
