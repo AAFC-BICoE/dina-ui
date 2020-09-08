@@ -1,4 +1,4 @@
-import { ButtonBar, CreateButton, ListPageLayout } from "common-ui";
+import { ButtonBar, CreateButton, ListPageLayout, dateCell } from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -15,12 +15,7 @@ const AGENT_TABLE_COLUMNS = [
   },
   "email",
   "createdBy",
-  {
-    Cell: ({ original: { createdOn } }) => (
-      <>{createdOn ? new Date(createdOn).toString() : createdOn}</>
-    ),
-    accessor: "createdOn"
-  }
+  dateCell("createdOn")
 ];
 
 export default function AgentListPage() {

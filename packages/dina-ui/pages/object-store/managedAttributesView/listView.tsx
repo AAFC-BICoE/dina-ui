@@ -1,8 +1,14 @@
-import { ColumnDefinition, ListPageLayout } from "common-ui";
+import {
+  ColumnDefinition,
+  ListPageLayout,
+  ButtonBar,
+  CreateButton
+} from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../types/objectstore-api/resources/ManagedAttribute";
+import { CommonMessage } from "common-ui/lib/intl/common-ui-intl";
 
 const ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] = [
   {
@@ -48,11 +54,13 @@ export default function ManagedAttributesListPage() {
         <h1>
           <DinaMessage id="managedAttributeListTitle" />
         </h1>
-        <Link href="/object-store/managedAttributesView/detailsView">
-          <a className="btn btn-primary">
-            <DinaMessage id="addManagedAttributeButtonText" />
-          </a>
-        </Link>
+        <ButtonBar>
+          <Link href="/object-store/managedAttributesView/detailsView">
+            <a className="btn btn-primary">
+              <CommonMessage id="createButtonText" />
+            </a>
+          </Link>
+        </ButtonBar>
         <ListPageLayout
           filterAttributes={ATTRIBUTES_FILTER_ATTRIBUTES}
           id="managed-attribute-list"

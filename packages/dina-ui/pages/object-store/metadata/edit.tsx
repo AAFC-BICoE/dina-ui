@@ -8,7 +8,10 @@ import {
   ResourceSelectField,
   RowChange,
   SaveArgs,
-  useResourceSelectCells
+  useResourceSelectCells,
+  Tooltip,
+  ButtonBar,
+  CancelButton
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { PersistedResource } from "kitsu";
@@ -295,6 +298,9 @@ export default function EditMetadatasPage() {
     <div className="container-fluid">
       <Head title={formatMessage("metadataBulkEditTitle")} />
       <Nav />
+      <ButtonBar>
+        <CancelButton entityLink="/object-store/object" />
+      </ButtonBar>
       <h2>
         <DinaMessage id="metadataBulkEditTitle" />
       </h2>
@@ -326,6 +332,7 @@ export default function EditMetadatasPage() {
                 />
                 <div className="form-group">
                   <AddPersonButton />
+                  <Tooltip id="addPersonPopupTooltip" />
                 </div>
                 <BulkDataEditor
                   columns={columns}
