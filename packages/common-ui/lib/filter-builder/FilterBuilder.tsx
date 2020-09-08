@@ -7,7 +7,7 @@ import {
   FilterGroupOperator
 } from "./FilterGroup";
 import { FilterRow, FilterRowModel } from "./FilterRow";
-import { OptionsType, OptionTypeBase } from "react-select";
+import { PersistedResource, FilterParam } from "kitsu";
 
 export type FilterAttribute =
   | string
@@ -16,7 +16,10 @@ export type FilterAttribute =
       label?: string;
       allowRange?: boolean;
       type?: string;
-      options?: any;
+      resourceType?: any;
+      filterBy?: (inputValue: string) => FilterParam;
+      optionLabel?: any;
+      value?: PersistedResource | PersistedResource[];
     };
 
 export interface FilterBuilderProps {

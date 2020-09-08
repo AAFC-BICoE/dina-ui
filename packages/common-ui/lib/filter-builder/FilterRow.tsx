@@ -9,6 +9,7 @@ import {
 } from "./FilterBuilderContext";
 import DatePicker from "react-datepicker";
 import moment from "moment";
+import { ResourceSelectField } from "../formik-connected/ResourceSelectField";
 
 export type FilterRowPredicate = "IS" | "IS NOT" | "GREATER_THAN" | "LESS_THAN";
 export type FilterRowSearchType =
@@ -53,7 +54,10 @@ export class FilterRow extends React.Component<FilterRowProps> {
     } = this.props;
 
     let filterPropertyType = "string";
-    let filterDropdownList;
+    let resourceType;
+    let filterBy;
+    let optionLabel;
+    let value;
     let predicateTypes: {
       label: React.ReactNode;
       value: FilterRowPredicate;
@@ -78,7 +82,10 @@ export class FilterRow extends React.Component<FilterRowProps> {
       model.attribute.type === "dropdown"
     ) {
       filterPropertyType = "dropdown";
-      filterDropdownList = model.attribute.options;
+      resourceType = model.attribute.resourceType;
+      filterBy = model.attribute.filterBy;
+      optionLabel = model.attribute.optionLabel;
+      value = model.attribute.value;
     }
     let searchTypes: {
       label: React.ReactNode;
@@ -157,14 +164,13 @@ export class FilterRow extends React.Component<FilterRowProps> {
         )}
         {filterPropertyType === "dropdown" && (
           <div className="list-inline-item" style={{ width: 150 }}>
-            <Select
-              className="dropdown-type"
-              instanceId={`dropdownType_${model.id}`}
-              options={filterDropdownList}
+            <ResourceSelectField
               onChange={this.onSelectValueChanged}
-              value={filterDropdownList.find(
-                option => option.value === filterDropdownList.value
-              )}
+              filter={filterBy}
+              model={`agent-api/${resourceType}`}
+              optionLabel={optionLabel}
+              name={resourceType}
+              hideLabel={true}
             />
           </div>
         )}
@@ -271,7 +277,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
   };
 
   private onSelectValueChanged = e => {
-    this.props.model.value = e.value;
+    this.props.model.value = e.id;
     this.props.onChange();
     this.forceUpdate();
   };

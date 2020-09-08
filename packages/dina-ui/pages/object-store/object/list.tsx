@@ -10,7 +10,8 @@ import {
   useAccount,
   useGroupedCheckBoxes,
   useModal,
-  useQuery
+  useQuery,
+  filterBy
 } from "common-ui";
 import { Form, Formik, FormikContextType } from "formik";
 import { noop, toPairs } from "lodash";
@@ -59,14 +60,6 @@ export default function MetadataListPage() {
   const [tableSectionWidth, previewSectionWidth] = previewMetadataId
     ? [8, 4]
     : [12, 0];
-
-  const creatorOptions = [
-    ...(queryState?.response?.data ?? []).map(d => ({
-      label: d.displayName,
-      value: d.id
-    }))
-  ];
-
   const METADATA_FILTER_ATTRIBUTES = [
     "originalFilename",
     "dcFormat",
@@ -79,7 +72,10 @@ export default function MetadataListPage() {
     {
       name: "acMetadataCreator",
       type: "dropdown",
-      options: creatorOptions
+      resourceType: "person",
+      filterBy: filterBy(["displayName"]),
+      optionLabel: person => person.displayName,
+      value: queryState?.response?.data ?? []
     }
   ];
 
@@ -398,7 +394,7 @@ export function BulkDeleteButton() {
               );
 
               // Refresh the page:
-              await router.reload();
+              router.reload();
             }}
           />
         );
