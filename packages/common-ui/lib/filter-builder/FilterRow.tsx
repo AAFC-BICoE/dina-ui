@@ -129,7 +129,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
     );
 
     return (
-      <div className="list-inline">
+      <div className="list-inline row">
         <div className="list-inline-item" style={{ width: 320 }}>
           <Select<FilterAttributeOption>
             className="filter-attribute"
@@ -163,7 +163,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
           </div>
         )}
         {filterPropertyType === "dropdown" && (
-          <div className="list-inline-item" style={{ width: 150 }}>
+          <div style={{ width: 150, marginRight: 10 }}>
             <ResourceSelectField
               onChange={this.onSelectValueChanged}
               filter={filterBy}
