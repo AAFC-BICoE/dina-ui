@@ -13,7 +13,7 @@ import { ENCODED_RESOURCE_MATCHER } from "./encode-resource-cell";
 
 interface ResourceSelectCellProps<T extends KitsuResource> {
   model: string;
-  filter: (inputValue: string) => FilterParam;
+  filter?: (inputValue: string) => FilterParam;
   label: (resource: PersistedResource<T>) => string;
   type?: string;
 }
@@ -22,7 +22,12 @@ export function useResourceSelectCells() {
   const { apiClient } = useContext(ApiClientContext);
 
   return function resourceSelectCell<T extends KitsuResource>(
-    { filter, label, model, type = model }: ResourceSelectCellProps<T>,
+    {
+      filter = () => ({}),
+      label,
+      model,
+      type = model
+    }: ResourceSelectCellProps<T>,
     gridSettings?: GridSettings
   ): HotColumnProps {
     async function loadOptions(query: string, process) {
