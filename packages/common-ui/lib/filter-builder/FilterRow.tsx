@@ -57,7 +57,6 @@ export class FilterRow extends React.Component<FilterRowProps> {
     let resourceType;
     let filterBy;
     let optionLabel;
-    let value;
     let predicateTypes: {
       label: React.ReactNode;
       value: FilterRowPredicate;
@@ -85,7 +84,6 @@ export class FilterRow extends React.Component<FilterRowProps> {
       resourceType = model.attribute.resourceType;
       filterBy = model.attribute.filterBy;
       optionLabel = model.attribute.optionLabel;
-      value = model.attribute.value;
     }
     let searchTypes: {
       label: React.ReactNode;
@@ -241,7 +239,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
       this.props.model.predicate = "IS";
     } else if (
       typeof this.props.model.attribute !== "string" &&
-      this.props.model.attribute.type === "dropdown"
+      this.props.model.attribute.type === "resource-dropdown"
     ) {
       this.props.model.searchType = "EXACT_MATCH";
       this.props.model.predicate = "IS";
