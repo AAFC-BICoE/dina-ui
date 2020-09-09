@@ -29,6 +29,7 @@ import {
   License
 } from "../../../types/objectstore-api";
 import { HotColumnProps } from "@handsontable/react";
+import { useLocalStorage } from "@rehooks/local-storage";
 
 /** Editable row data */
 export interface BulkMetadataEditRow {
@@ -40,7 +41,7 @@ export interface BulkMetadataEditRow {
 }
 
 interface FormControls {
-  editableBuiltInAttributes: HotColumnProps[];
+  editableBuiltInAttributes: string[];
   editableManagedAttributes: ManagedAttribute[];
 }
 
@@ -56,7 +57,7 @@ export default function EditMetadatasPage() {
 
   const { locale } = useDinaIntl();
 
-  const DEFAULT_COLUMNS: HotColumnProps[] = [
+  const BUILT_IN_ATTRIBUTES_COLUMNS: HotColumnProps[] = [
     {
       data: "metadata.originalFilename",
       readOnly: true,
@@ -119,6 +120,11 @@ export default function EditMetadatasPage() {
       }
     )
   ];
+
+  const [
+    editableBuiltInAttributes,
+    setEditableBuiltInAttributes
+  ] = useLocalStorage<string[]>("metadata_editableBuiltInAttributes");
 
   const idsQuery = String(router.query.ids);
   const ids = idsQuery.split(",");
@@ -310,14 +316,18 @@ export default function EditMetadatasPage() {
         <Formik<FormControls>
           enableReinitialize={true}
           initialValues={{
-            editableBuiltInAttributes: DEFAULT_COLUMNS,
+            editableBuiltInAttributes:
+              editableBuiltInAttributes ??
+              BUILT_IN_ATTRIBUTES_COLUMNS.map(col => col.data),
             editableManagedAttributes: initialEditableManagedAttributes
           }}
           onSubmit={noop}
         >
           {controlsForm => {
             const columns = [
-              ...controlsForm.values.editableBuiltInAttributes,
+              ...BUILT_IN_ATTRIBUTES_COLUMNS.filter(col =>
+                controlsForm.values.editableBuiltInAttributes.includes(col.data)
+              ),
               ...managedAttributeColumns(
                 controlsForm.values.editableManagedAttributes
               )
@@ -328,11 +338,12 @@ export default function EditMetadatasPage() {
                 <div className="row">
                   <SelectField
                     className="col-6 editable-builtin-attributes-select"
+                    onChange={setEditableBuiltInAttributes}
                     name="editableBuiltInAttributes"
                     isMulti={true}
-                    options={DEFAULT_COLUMNS.map(col => ({
+                    options={BUILT_IN_ATTRIBUTES_COLUMNS.map(col => ({
                       label: col.title ?? "",
-                      value: col
+                      value: col.data
                     }))}
                   />
                   <ResourceSelectField<ManagedAttribute>

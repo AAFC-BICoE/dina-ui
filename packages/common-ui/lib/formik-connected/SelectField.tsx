@@ -15,7 +15,7 @@ export interface SelectFieldProps extends LabelWrapperParams {
   /** Whether this is a multi-select dropdown. */
   isMulti?: boolean;
 
-  onChange?: (value?: string) => void;
+  onChange?: ((value?: string) => void) | ((value?: string[]) => void);
   options: SelectOption[];
   styles?: Partial<Styles>;
 }
