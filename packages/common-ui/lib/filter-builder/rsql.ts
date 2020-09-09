@@ -67,7 +67,11 @@ function toPredicate(filterRow: FilterRowModel) {
   }
 
   // Allow list/range filters.
-  if (typeof attribute !== "string" && attribute.allowRange) {
+  if (
+    typeof attribute !== "string" &&
+    typeof value === "string" &&
+    attribute.allowRange
+  ) {
     const commaSplit = value.split(",");
 
     const singleNumbers = commaSplit.filter(e => !e.includes("-"));
@@ -114,12 +118,13 @@ function toPredicate(filterRow: FilterRowModel) {
   // Surround the search value with asterisks if this is a partial match for string property type search
   let searchValue = value;
   let compare;
-  if (typeof attribute === "string" || attribute.type === "dropdown") {
+  if (typeof attribute === "string" || attribute.type === "resource-dropdown") {
     if (searchType === "PARTIAL_MATCH") {
       searchValue = `*${value}*`;
       compare = predicate === "IS NOT" ? "!=" : "==";
     } else if (searchType === "EXACT_MATCH") {
       compare = predicate === "IS NOT" ? "!=" : "==";
+      searchValue = `${typeof value !== "string" ? value.id : value}`;
     }
   }
   // override compare if this is date type, which only has greater and less than

@@ -10,6 +10,7 @@ import {
 import DatePicker from "react-datepicker";
 import moment from "moment";
 import { ResourceSelect } from "../resource-select/ResourceSelect";
+import { KitsuResource } from "kitsu";
 
 export type FilterRowPredicate = "IS" | "IS NOT" | "GREATER_THAN" | "LESS_THAN";
 export type FilterRowSearchType =
@@ -23,7 +24,7 @@ export interface FilterRowModel {
   attribute: FilterAttribute;
   predicate: FilterRowPredicate;
   searchType: FilterRowSearchType;
-  value: string;
+  value: string | KitsuResource;
 }
 
 export interface FilterRowProps {
@@ -152,9 +153,11 @@ export class FilterRow extends React.Component<FilterRowProps> {
             <DatePicker
               className="d-inline-block form-control"
               selected={
-                isNaN(Date.parse(model.value))
-                  ? new Date()
-                  : new Date(model.value)
+                typeof model.value === "string"
+                  ? isNaN(Date.parse(model.value))
+                    ? new Date()
+                    : new Date(model.value)
+                  : null
               }
               onChange={this.onDateValueChanged}
             />
@@ -167,7 +170,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
               filter={filterBy}
               model={`agent-api/${resourceType}`}
               optionLabel={optionLabel}
-              value={{ id: model.value, type: resourceType }}
+              value={typeof model.value !== "string" ? model.value : undefined}
             />
           </div>
         )}
@@ -179,7 +182,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
               visibility:
                 model.searchType === "BLANK_FIELD" ? "hidden" : undefined
             }}
-            value={model.value}
+            value={typeof model.value === "string" ? model.value : undefined}
             onChange={this.onValueChanged}
           />
         )}
@@ -274,7 +277,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
   };
 
   private onSelectValueChanged = e => {
-    this.props.model.value = e.id;
+    this.props.model.value = e;
     this.props.onChange();
     this.forceUpdate();
   };
