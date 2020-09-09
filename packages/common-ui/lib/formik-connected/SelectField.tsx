@@ -1,13 +1,22 @@
 import { FastField, FieldProps } from "formik";
-import { noop } from "lodash";
+import { isArray } from "lodash";
 import Select from "react-select";
 import { Styles } from "react-select/src/styles";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
+export interface SelectOption {
+  label: string;
+  value: any;
+}
+
 export interface SelectFieldProps extends LabelWrapperParams {
   disabled?: boolean;
+
+  /** Whether this is a multi-select dropdown. */
+  isMulti?: boolean;
+
   onChange?: (value?: string) => void;
-  options: any[];
+  options: SelectOption[];
   styles?: Partial<Styles>;
 }
 
@@ -15,7 +24,8 @@ export interface SelectFieldProps extends LabelWrapperParams {
 export function SelectField(props: SelectFieldProps) {
   const {
     disabled,
-    onChange = noop,
+    isMulti,
+    onChange,
     options,
     styles,
     ...labelWrapperProps
@@ -28,20 +38,38 @@ export function SelectField(props: SelectFieldProps) {
         field: { value },
         form: { setFieldValue, setFieldTouched }
       }: FieldProps) => {
-        function onChangeInternal({ value: newValue }) {
+        function onChangeInternal(
+          change: SelectOption[] | SelectOption | null
+        ) {
+          // Set default empty array value if the new value is null:
+          if (isMulti && change === null) {
+            change = [];
+          }
+
+          const newValue = isArray(change)
+            ? change.map(option => option.value)
+            : change?.value ?? null;
           setFieldValue(name, newValue);
           setFieldTouched(name);
-          onChange(newValue);
+          onChange?.(newValue);
         }
 
         return (
           <FieldWrapper {...labelWrapperProps}>
             <Select
               isDisabled={disabled}
+              isMulti={isMulti}
               options={options}
               onChange={onChangeInternal}
-              styles={styles}
-              value={options.find(option => option.value === value)}
+              styles={{
+                menu: () => ({ zIndex: 1000 }),
+                ...styles
+              }}
+              value={
+                isMulti
+                  ? options?.filter(option => value?.includes(option.value))
+                  : options.find(option => option.value === value)
+              }
             />
           </FieldWrapper>
         );

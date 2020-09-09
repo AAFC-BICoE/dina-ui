@@ -11,7 +11,8 @@ import {
   useResourceSelectCells,
   Tooltip,
   ButtonBar,
-  CancelButton
+  CancelButton,
+  SelectField
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { PersistedResource } from "kitsu";
@@ -27,7 +28,7 @@ import {
   Person,
   License
 } from "../../../types/objectstore-api";
-import { debug } from "console";
+import { HotColumnProps } from "@handsontable/react";
 
 /** Editable row data */
 export interface BulkMetadataEditRow {
@@ -39,6 +40,7 @@ export interface BulkMetadataEditRow {
 }
 
 interface FormControls {
+  editableBuiltInAttributes: HotColumnProps[];
   editableManagedAttributes: ManagedAttribute[];
 }
 
@@ -54,7 +56,7 @@ export default function EditMetadatasPage() {
 
   const { locale } = useDinaIntl();
 
-  const DEFAULT_COLUMNS = [
+  const DEFAULT_COLUMNS: HotColumnProps[] = [
     {
       data: "metadata.originalFilename",
       readOnly: true,
@@ -308,13 +310,14 @@ export default function EditMetadatasPage() {
         <Formik<FormControls>
           enableReinitialize={true}
           initialValues={{
+            editableBuiltInAttributes: DEFAULT_COLUMNS,
             editableManagedAttributes: initialEditableManagedAttributes
           }}
           onSubmit={noop}
         >
           {controlsForm => {
             const columns = [
-              ...DEFAULT_COLUMNS,
+              ...controlsForm.values.editableBuiltInAttributes,
               ...managedAttributeColumns(
                 controlsForm.values.editableManagedAttributes
               )
@@ -322,14 +325,25 @@ export default function EditMetadatasPage() {
 
             return (
               <Form translate={undefined}>
-                <ResourceSelectField<ManagedAttribute>
-                  className="col-2 editable-managed-attributes-select"
-                  filter={filterBy(["name"])}
-                  name="editableManagedAttributes"
-                  isMulti={true}
-                  model="objectstore-api/managed-attribute"
-                  optionLabel={attr => attr.name}
-                />
+                <div className="row">
+                  <SelectField
+                    className="col-6 editable-builtin-attributes-select"
+                    name="editableBuiltInAttributes"
+                    isMulti={true}
+                    options={DEFAULT_COLUMNS.map(col => ({
+                      label: col.title ?? "",
+                      value: col
+                    }))}
+                  />
+                  <ResourceSelectField<ManagedAttribute>
+                    className="col-2 editable-managed-attributes-select"
+                    filter={filterBy(["name"])}
+                    name="editableManagedAttributes"
+                    isMulti={true}
+                    model="objectstore-api/managed-attribute"
+                    optionLabel={attr => attr.name}
+                  />
+                </div>
                 <div className="form-group">
                   <AddPersonButton />
                   <Tooltip id="addPersonPopupTooltip" />
