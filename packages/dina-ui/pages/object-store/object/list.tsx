@@ -70,7 +70,7 @@ export default function MetadataListPage() {
       name: "acMetadataCreator",
       type: "resource-dropdown",
       resourceType: "person",
-      filterBy: filterBy(["displayName"]),
+      filter: filterBy(["displayName"]),
       optionLabel: person => person.displayName
     }
   ];

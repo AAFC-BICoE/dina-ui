@@ -56,7 +56,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
     let filterPropertyType = "string";
     let resourceType;
-    let filterBy;
+    let filter;
     let optionLabel;
     let predicateTypes: {
       label: React.ReactNode;
@@ -83,7 +83,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
     ) {
       filterPropertyType = "dropdown";
       resourceType = model.attribute.resourceType;
-      filterBy = model.attribute.filterBy;
+      filter = model.attribute.filter;
       optionLabel = model.attribute.optionLabel;
     }
     let searchTypes: {
@@ -167,7 +167,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
           <div style={{ width: 150, marginRight: 10 }}>
             <ResourceSelect
               onChange={this.onSelectValueChanged}
-              filter={filterBy}
+              filter={filter}
               model={`agent-api/${resourceType}`}
               optionLabel={optionLabel}
               value={typeof model.value !== "string" ? model.value : undefined}

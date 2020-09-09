@@ -17,7 +17,7 @@ export type FilterAttribute =
       allowRange?: boolean;
       type?: string;
       resourceType?: any;
-      filterBy?: (inputValue: string) => FilterParam;
+      filter?: (inputValue: string) => FilterParam;
       optionLabel?: (resource: PersistedResource) => string;
     };
 
