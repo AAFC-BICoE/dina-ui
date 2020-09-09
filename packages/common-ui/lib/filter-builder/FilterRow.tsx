@@ -9,7 +9,7 @@ import {
 } from "./FilterBuilderContext";
 import DatePicker from "react-datepicker";
 import moment from "moment";
-import { ResourceSelectField } from "../formik-connected/ResourceSelectField";
+import { ResourceSelect } from "../resource-select/ResourceSelect";
 
 export type FilterRowPredicate = "IS" | "IS NOT" | "GREATER_THAN" | "LESS_THAN";
 export type FilterRowSearchType =
@@ -79,7 +79,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
       filterPropertyType = "date";
     } else if (
       typeof model.attribute !== "string" &&
-      model.attribute.type === "dropdown"
+      model.attribute.type === "resource-dropdown"
     ) {
       filterPropertyType = "dropdown";
       resourceType = model.attribute.resourceType;
@@ -164,13 +164,12 @@ export class FilterRow extends React.Component<FilterRowProps> {
         )}
         {filterPropertyType === "dropdown" && (
           <div style={{ width: 150, marginRight: 10 }}>
-            <ResourceSelectField
+            <ResourceSelect
               onChange={this.onSelectValueChanged}
               filter={filterBy}
               model={`agent-api/${resourceType}`}
               optionLabel={optionLabel}
-              name={resourceType}
-              hideLabel={true}
+              value={{ id: model.value, type: resourceType }}
             />
           </div>
         )}

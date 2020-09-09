@@ -18,7 +18,7 @@ export type FilterAttribute =
       type?: string;
       resourceType?: any;
       filterBy?: (inputValue: string) => FilterParam;
-      optionLabel?: any;
+      optionLabel?: (resource: PersistedResource) => string;
       value?: PersistedResource | PersistedResource[];
     };
 

@@ -38,9 +38,6 @@ export interface MetadataListFormValues {
 export default function MetadataListPage() {
   const { formatMessage } = useDinaIntl();
   const { groupNames } = useAccount();
-  const queryState = useQuery<Person[]>({
-    path: "agent-api/person"
-  });
 
   const {
     CheckBoxField,
@@ -71,11 +68,10 @@ export default function MetadataListPage() {
     },
     {
       name: "acMetadataCreator",
-      type: "dropdown",
+      type: "resource-dropdown",
       resourceType: "person",
       filterBy: filterBy(["displayName"]),
-      optionLabel: person => person.displayName,
-      value: queryState?.response?.data ?? []
+      optionLabel: person => person.displayName
     }
   ];
 
