@@ -1,5 +1,5 @@
-import { isEqual } from "lodash";
-import React, { useState } from "react";
+import { isEqual, noop } from "lodash";
+import React from "react";
 import Select from "react-select";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { FilterAttribute } from "./FilterBuilder";
@@ -58,6 +58,10 @@ export class FilterRow extends React.Component<FilterRowProps> {
     let resourceType;
     let filter;
     let optionLabel;
+    const selectedAttribute = this.context.attributeOptions.find(option =>
+      isEqual(option.value, model.attribute)
+    );
+
     let predicateTypes: {
       label: React.ReactNode;
       value: FilterRowPredicate;
@@ -83,8 +87,14 @@ export class FilterRow extends React.Component<FilterRowProps> {
     ) {
       filterPropertyType = "dropdown";
       resourceType = model.attribute.resourceType;
-      filter = model.attribute.filter;
-      optionLabel = model.attribute.optionLabel;
+      filter =
+        selectedAttribute && typeof selectedAttribute.value !== "string"
+          ? selectedAttribute.value.filter
+          : noop;
+      optionLabel =
+        selectedAttribute && typeof selectedAttribute.value !== "string"
+          ? selectedAttribute.value.optionLabel
+          : noop;
     }
     let searchTypes: {
       label: React.ReactNode;
@@ -123,10 +133,6 @@ export class FilterRow extends React.Component<FilterRowProps> {
         }
       ];
     }
-    const selectedAttribute = this.context.attributeOptions.find(option =>
-      isEqual(option.value, model.attribute)
-    );
-
     return (
       <div className="list-inline row">
         <div className="list-inline-item" style={{ width: 320 }}>
