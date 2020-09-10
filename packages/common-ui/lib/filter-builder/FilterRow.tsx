@@ -164,7 +164,10 @@ export class FilterRow extends React.Component<FilterRowProps> {
           </div>
         )}
         {filterPropertyType === "dropdown" && (
-          <div style={{ width: 150, marginRight: 10 }}>
+          <div
+            className="form-control"
+            style={{ width: 150, marginRight: 10, border: 0, marginTop: -5 }}
+          >
             <ResourceSelect
               onChange={this.onSelectValueChanged}
               filter={filter}
