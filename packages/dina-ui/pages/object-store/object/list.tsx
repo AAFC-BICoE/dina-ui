@@ -64,11 +64,11 @@ export default function MetadataListPage() {
     "dcRights",
     {
       name: "acDigitizationDate",
-      type: "date"
+      type: "DATE"
     },
     {
       name: "acMetadataCreator",
-      type: "resource-dropdown",
+      type: "DROPDOWN",
       resourceType: "person",
       filter: filterBy(["displayName"]),
       optionLabel: person => person.displayName

@@ -27,6 +27,8 @@ export interface FilterRowModel {
   value: string | KitsuResource;
 }
 
+export type FilterAttributeTypes = "DATE" | "DROPDOWN";
+
 export interface FilterRowProps {
   model: FilterRowModel;
   showRemoveButton: boolean;
@@ -58,9 +60,23 @@ export class FilterRow extends React.Component<FilterRowProps> {
     let resourceType;
     let filter;
     let optionLabel;
-    const selectedAttribute = this.context.attributeOptions.find(option =>
-      isEqual(option.value, model.attribute)
-    );
+    const selectedAttribute = this.context.attributeOptions.find(option => {
+      if (
+        typeof option.value === "string" &&
+        typeof model.attribute === "string"
+      )
+        return isEqual(option.value, model.attribute);
+      else if (
+        typeof option.value !== "string" &&
+        typeof model.attribute !== "string"
+      )
+        return (
+          isEqual(option.value.name, model.attribute.name) &&
+          isEqual(option.value.type, model.attribute.type) &&
+          isEqual(option.value.resourceType, model.attribute.resourceType)
+        );
+      return false;
+    });
 
     let predicateTypes: {
       label: React.ReactNode;
@@ -78,14 +94,14 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
     if (
       typeof model.attribute !== "string" &&
-      model.attribute.type === "date"
+      model.attribute.type === "DATE"
     ) {
-      filterPropertyType = "date";
+      filterPropertyType = "DATE";
     } else if (
       typeof model.attribute !== "string" &&
-      model.attribute.type === "resource-dropdown"
+      model.attribute.type === "DROPDOWN"
     ) {
-      filterPropertyType = "dropdown";
+      filterPropertyType = "DROPDOWN";
       resourceType = model.attribute.resourceType;
       filter =
         selectedAttribute && typeof selectedAttribute.value !== "string"
@@ -114,7 +130,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
       }
     ];
 
-    if (filterPropertyType === "date") {
+    if (filterPropertyType === "DATE") {
       predicateTypes = [
         {
           label: <CommonMessage id="filterGreaterThan" />,
@@ -125,7 +141,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
           value: "LESS_THAN"
         }
       ];
-    } else if (filterPropertyType === "dropdown") {
+    } else if (filterPropertyType === "DROPDOWN") {
       searchTypes = [
         {
           label: <CommonMessage id="filterExactMatch" />,
@@ -154,7 +170,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
           />
         </div>
 
-        {filterPropertyType === "date" && (
+        {filterPropertyType === "DATE" && (
           <div className="list-inline-item" style={{ width: 180 }}>
             <DatePicker
               className="d-inline-block form-control"
@@ -169,7 +185,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
             />
           </div>
         )}
-        {filterPropertyType === "dropdown" && (
+        {filterPropertyType === "DROPDOWN" && (
           <div
             className="form-control"
             style={{ width: 150, marginRight: 10, border: 0, marginTop: -5 }}
@@ -195,7 +211,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
             onChange={this.onValueChanged}
           />
         )}
-        {filterPropertyType !== "date" && (
+        {filterPropertyType !== "DATE" && (
           <div className="list-inline-item" style={{ width: 180 }}>
             <Select
               className="filter-search-type"
@@ -241,7 +257,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
     this.props.model.attribute = value.value;
     if (
       typeof this.props.model.attribute !== "string" &&
-      this.props.model.attribute.type === "date"
+      this.props.model.attribute.type === "DATE"
     ) {
       this.props.model.value = moment().format();
       this.props.model.predicate = "GREATER_THAN";
@@ -251,7 +267,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
       this.props.model.predicate = "IS";
     } else if (
       typeof this.props.model.attribute !== "string" &&
-      this.props.model.attribute.type === "resource-dropdown"
+      this.props.model.attribute.type === "DROPDOWN"
     ) {
       this.props.model.searchType = "EXACT_MATCH";
       this.props.model.predicate = "IS";

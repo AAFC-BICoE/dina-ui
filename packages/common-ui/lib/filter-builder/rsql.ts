@@ -118,7 +118,7 @@ function toPredicate(filterRow: FilterRowModel) {
   // Surround the search value with asterisks if this is a partial match for string property type search
   let searchValue = value;
   let compare;
-  if (typeof attribute === "string" || attribute.type === "resource-dropdown") {
+  if (typeof attribute === "string" || attribute.type === "DROPDOWN") {
     if (searchType === "PARTIAL_MATCH") {
       searchValue = `*${value}*`;
       compare = predicate === "IS NOT" ? "!=" : "==";
