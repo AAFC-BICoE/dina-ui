@@ -14,10 +14,13 @@ export interface MetadataAttributes {
     | "Text"
     | "Dataset"
     | "Undetermined";
+
+  /** Refers to the License/LicenseDTO's 'url' field. */
   xmpRightsWebStatement?: string;
+  xmpRightsUsageTerms?: string;
 
   // optional fields
-  acRights?: string;
+  dcRights?: string;
   acSubType?: string;
   acCaption?: string;
   dcFormat?: string;

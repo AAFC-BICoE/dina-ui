@@ -8,7 +8,8 @@ import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   ManagedAttributeMap,
   Metadata,
-  Person
+  Person,
+  License
 } from "../../../../types/objectstore-api";
 
 const TEST_METADATAS: PersistedResource<Metadata>[] = [
@@ -45,13 +46,28 @@ const TEST_METADATAS: PersistedResource<Metadata>[] = [
     },
     type: "metadata"
   },
+  // Only the third test Metadata has a license:
   {
     bucket: "testbucket",
     dcType: "Image",
     fileExtension: ".png",
     fileIdentifier: "54bc37d7-17c4-4f70-8b33-2def722c6e97",
+    xmpRightsWebStatement:
+      "https://open.canada.ca/en/open-government-licence-canada",
     id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
     type: "metadata"
+  }
+];
+
+const TEST_LICENSES: PersistedResource<License>[] = [
+  {
+    id: "open-government-license-canada",
+    type: "license",
+    url: "https://open.canada.ca/en/open-government-licence-canada",
+    titles: {
+      en: "Open Government Licence - Canada",
+      fr: "Licence du gouvernement ouvert – Canada"
+    }
   }
 ];
 
@@ -87,6 +103,8 @@ const mockBulkGet = jest.fn(async paths => {
 const mockGet = jest.fn(async path => {
   if (path === "metadata") {
     return { data: TEST_METADATAS };
+  } else if (path === "objectstore-api/license") {
+    return { data: TEST_LICENSES };
   } else {
     return { data: [] };
   }
@@ -118,6 +136,7 @@ describe("Metadata bulk edit page", () => {
           "Mat Poff (person/6e80e42a-bcf6-4062-9db3-946e0f26458f)",
         acTags: "tag1",
         dcCreator: "",
+        license: "",
         metadata: expect.objectContaining({
           id: "6c524135-3c3e-41c1-a057-45afb4e3e7be"
         })
@@ -126,6 +145,7 @@ describe("Metadata bulk edit page", () => {
         acMetadataCreator: "",
         acTags: "tag1, tag2",
         dcCreator: "",
+        license: "",
         metadata: expect.objectContaining({
           id: "3849de16-fee2-4bb1-990d-a4f5de19b48d"
         })
@@ -134,6 +154,8 @@ describe("Metadata bulk edit page", () => {
         acMetadataCreator: "",
         acTags: "",
         dcCreator: "",
+        license:
+          "Open Government Licence - Canada (license/open-government-license-canada)",
         metadata: expect.objectContaining({
           id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b"
         })
@@ -263,6 +285,59 @@ describe("Metadata bulk edit page", () => {
                 value: "new attr value"
               }
             }
+          },
+          type: "managed-attribute-map"
+        }
+      ],
+      { apiBaseUrl: "/objectstore-api" }
+    );
+  });
+
+  it("Lets you edit the Metadata's license.", async () => {
+    const wrapper = mountWithAppContext(<EditMetadatasPage />, { apiContext });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Get the table data to directly edit it for the test to simulate how the Handsontable would
+    // edit the data.
+    const tableData = wrapper
+      .find("MockHotTable")
+      .prop<BulkMetadataEditRow[]>("data");
+
+    // The existing license on test Metadata#3 should be encoded properly into the table row:
+    expect(tableData[2].license).toEqual(
+      "Open Government Licence - Canada (license/open-government-license-canada)"
+    );
+
+    // Change the license:
+    tableData[2].license =
+      "universal-public-domain-dedication-1 (license/CC0 1.0 Universal (CC0 1.0) Public Domain Dedication)";
+
+    // Submit the spreadsheet:
+    wrapper.find("button.bulk-editor-submit-button").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave).lastCalledWith(
+      [
+        {
+          resource: {
+            id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+            type: "metadata",
+            xmpRightsUsageTerms: "",
+            xmpRightsWebStatement: ""
+          },
+          type: "metadata"
+        },
+        {
+          resource: {
+            metadata: {
+              id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+              type: "metadata"
+            },
+            type: "managed-attribute-map"
           },
           type: "managed-attribute-map"
         }

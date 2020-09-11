@@ -10,8 +10,8 @@ import {
   useAccount,
   useGroupedCheckBoxes,
   useModal,
-  useQuery,
-  filterBy
+  filterBy,
+  dateCell
 } from "common-ui";
 import { Form, Formik, FormikContextType } from "formik";
 import { noop, toPairs } from "lodash";
@@ -85,26 +85,8 @@ export default function MetadataListPage() {
     },
     "originalFilename",
     "dcFormat",
-    {
-      Cell: ({ original: { acDigitizationDate } }) => (
-        <>
-          {acDigitizationDate
-            ? new Date(acDigitizationDate).toString()
-            : acDigitizationDate}
-        </>
-      ),
-      accessor: "acDigitizationDate"
-    },
-    {
-      Cell: ({ original: { xmpMetadataDate } }) => (
-        <>
-          {xmpMetadataDate
-            ? new Date(xmpMetadataDate).toString()
-            : xmpMetadataDate}
-        </>
-      ),
-      accessor: "xmpMetadataDate"
-    },
+    dateCell("acDigitizationDate"),
+    dateCell("xmpMetadataDate"),
     "acMetadataCreator.displayName",
     {
       Cell: ({ original: { acTags } }) => <>{acTags?.join(", ")}</>,
@@ -112,13 +94,15 @@ export default function MetadataListPage() {
     },
     {
       Cell: ({ original }) => (
-        <button
-          className="btn btn-info w-100 h-100 preview-button"
-          onClick={() => setPreviewMetadataId(original.id)}
-          type="button"
-        >
-          <DinaMessage id="viewPreviewButtonText" />
-        </button>
+        <div className="d-flex h-100">
+          <button
+            className="btn btn-info m-auto preview-button"
+            onClick={() => setPreviewMetadataId(original.id)}
+            type="button"
+          >
+            <DinaMessage id="viewPreviewButtonText" />
+          </button>
+        </div>
       ),
       Header: "",
       sortable: false
