@@ -2,5 +2,3 @@
 /generated-docs
 /packages/*/pa11y-result.json
 /packages/*/pa11y-html-report
-packages/common-ui/package-lock.json
-package-lock.json

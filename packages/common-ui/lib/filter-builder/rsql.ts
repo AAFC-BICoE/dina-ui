@@ -116,15 +116,14 @@ function toPredicate(filterRow: FilterRowModel) {
   }
 
   // Surround the search value with asterisks if this is a partial match for string property type search
-  let searchValue = value;
+  let searchValue: string = typeof value === "string" ? value : value.id ?? "";
   let compare;
   if (typeof attribute === "string" || attribute.type === "DROPDOWN") {
     if (searchType === "PARTIAL_MATCH") {
-      searchValue = `*${value}*`;
+      searchValue = `*${searchValue}*`;
       compare = predicate === "IS NOT" ? "!=" : "==";
     } else if (searchType === "EXACT_MATCH") {
       compare = predicate === "IS NOT" ? "!=" : "==";
-      searchValue = `${typeof value !== "string" ? value.id : value}`;
     }
   }
   // override compare if this is date type, which only has greater and less than
