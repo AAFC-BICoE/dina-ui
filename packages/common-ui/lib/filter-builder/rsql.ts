@@ -67,7 +67,11 @@ function toPredicate(filterRow: FilterRowModel) {
   }
 
   // Allow list/range filters.
-  if (typeof attribute !== "string" && attribute.allowRange) {
+  if (
+    typeof attribute !== "string" &&
+    typeof value === "string" &&
+    attribute.allowRange
+  ) {
     const commaSplit = value.split(",");
 
     const singleNumbers = commaSplit.filter(e => !e.includes("-"));
@@ -111,12 +115,26 @@ function toPredicate(filterRow: FilterRowModel) {
     };
   }
 
-  // Surround the search value with asterisks if this is a partial match.
-  const searchValue = searchType === "PARTIAL_MATCH" ? `*${value}*` : value;
-
+  // Surround the search value with asterisks if this is a partial match for string property type search
+  let searchValue: string = typeof value === "string" ? value : value.id ?? "";
+  let compare;
+  if (typeof attribute === "string" || attribute.type === "DROPDOWN") {
+    if (searchType === "PARTIAL_MATCH") {
+      searchValue = `*${searchValue}*`;
+      compare = predicate === "IS NOT" ? "!=" : "==";
+    } else if (searchType === "EXACT_MATCH") {
+      compare = predicate === "IS NOT" ? "!=" : "==";
+    }
+  }
+  // override compare if this is date type, which only has greater and less than
+  if (predicate === "GREATER_THAN") {
+    compare = "=gt=";
+  } else if (predicate === "LESS_THAN") {
+    compare = "=lt=";
+  }
   return {
     arguments: searchValue,
-    comparison: predicate === "IS NOT" ? "!=" : "==",
+    comparison: compare,
     selector
   };
 }

@@ -10,6 +10,8 @@ import {
   useAccount,
   useGroupedCheckBoxes,
   useModal,
+  filterBy,
+  FilterAttribute,
   dateCell
 } from "common-ui";
 import { Form, Formik, FormikContextType } from "formik";
@@ -20,7 +22,7 @@ import { Component, useContext, useMemo, useState } from "react";
 import { Head, Nav, StoredObjectGallery } from "../../../components";
 import { MetadataPreview } from "../../../components/metadata/MetadataPreview";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Metadata } from "../../../types/objectstore-api";
+import { Metadata, Person } from "../../../types/objectstore-api";
 
 type MetadataListLayoutType = "TABLE" | "GALLERY";
 
@@ -56,12 +58,22 @@ export default function MetadataListPage() {
   const [tableSectionWidth, previewSectionWidth] = previewMetadataId
     ? [8, 4]
     : [12, 0];
-
-  const METADATA_FILTER_ATTRIBUTES = [
+  const METADATA_FILTER_ATTRIBUTES: FilterAttribute[] = [
     "originalFilename",
     "dcFormat",
     "xmpRightsWebStatement",
-    "dcRights"
+    "dcRights",
+    {
+      name: "acDigitizationDate",
+      type: "DATE"
+    },
+    {
+      name: "acMetadataCreator",
+      type: "DROPDOWN",
+      resourcePath: "agent-api/person",
+      filter: filterBy(["displayName"]),
+      optionLabel: person => (person as Person).displayName
+    }
   ];
 
   const METADATA_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [

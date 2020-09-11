@@ -198,9 +198,9 @@ describe("FilterRow component", () => {
     const wrapper = mountFilterRow();
 
     // The input is visible be default
-    expect(wrapper.find("input.filter-value").prop("style")).toEqual({
-      visibility: undefined
-    });
+    expect(
+      wrapper.find("input.filter-value").prop("style")?.visibility
+    ).toEqual(undefined);
 
     // Change the search type to "BLANK_FIELD".
     wrapper
@@ -211,9 +211,9 @@ describe("FilterRow component", () => {
     wrapper.update();
 
     // The input should now be hidden.
-    expect(wrapper.find("input.filter-value").prop("style")).toEqual({
-      visibility: "hidden"
-    });
+    expect(
+      wrapper.find("input.filter-value").prop("style")?.visibility
+    ).toEqual("hidden");
   });
 
   it("Can show a custom filter attribute label.", () => {
