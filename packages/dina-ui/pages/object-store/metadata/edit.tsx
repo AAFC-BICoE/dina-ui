@@ -8,7 +8,10 @@ import {
   ResourceSelectField,
   RowChange,
   SaveArgs,
-  useResourceSelectCells
+  useResourceSelectCells,
+  Tooltip,
+  ButtonBar,
+  CancelButton
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { PersistedResource } from "kitsu";
@@ -21,14 +24,17 @@ import {
   ManagedAttribute,
   ManagedAttributeMap,
   Metadata,
-  Person
+  Person,
+  License
 } from "../../../types/objectstore-api";
+import { debug } from "console";
 
 /** Editable row data */
 export interface BulkMetadataEditRow {
   acTags: string;
   acMetadataCreator: string;
   dcCreator: string;
+  license: string;
   metadata: PersistedResource<Metadata>;
 }
 
@@ -38,13 +44,15 @@ interface FormControls {
 
 export default function EditMetadatasPage() {
   const router = useRouter();
-  const { bulkGet, save } = useContext(ApiClientContext);
+  const { apiClient, bulkGet, save } = useContext(ApiClientContext);
   const { formatMessage } = useDinaIntl();
   const resourceSelectCell = useResourceSelectCells();
   const [
     initialEditableManagedAttributes,
     setInitialEditableManagedAttributes
   ] = useState<ManagedAttribute[]>([]);
+
+  const { locale } = useDinaIntl();
 
   const DEFAULT_COLUMNS = [
     {
@@ -73,11 +81,6 @@ export default function EditMetadatasPage() {
       data: "acTags",
       title: formatMessage("metadataBulkEditTagsLabel")
     },
-    // TODO handle datetime cells:
-    // {
-    //   data: "metadata.acDigitizationDate",
-    //   title: formatMessage("metadataFirstDigitalVersionCreatedDateLabel")
-    // },
     resourceSelectCell<Person>(
       {
         filter: input => ({ rsql: `displayName==*${input}*` }),
@@ -102,14 +105,17 @@ export default function EditMetadatasPage() {
         title: formatMessage("field_acMetadataCreator.displayName")
       }
     ),
-    {
-      data: "metadata.dcRights",
-      title: formatMessage("field_dcRights")
-    },
-    {
-      data: "metadata.xmpRightsWebStatement",
-      title: formatMessage("field_xmpRightsWebStatement")
-    }
+    resourceSelectCell<License>(
+      {
+        label: license => license.titles[locale] ?? license.url,
+        model: "objectstore-api/license",
+        type: "license"
+      },
+      {
+        data: "license",
+        title: formatMessage("field_license")
+      }
+    )
   ];
 
   const idsQuery = String(router.query.ids);
@@ -168,61 +174,97 @@ export default function EditMetadatasPage() {
 
     await initEditableManagedAttributes(metadatas);
 
-    const newTableData = metadatas.map<BulkMetadataEditRow>(metadata => {
-      const acMetadataCreator = metadata.acMetadataCreator as Person;
-      const dcCreator = metadata.dcCreator as Person;
+    const newTableData = await Promise.all(
+      metadatas.map<Promise<BulkMetadataEditRow>>(async metadata => {
+        const acMetadataCreator = metadata.acMetadataCreator as Person;
+        const dcCreator = metadata.dcCreator as Person;
 
-      return {
-        acMetadataCreator: encodeResourceCell(acMetadataCreator, {
-          label: acMetadataCreator?.displayName
-        }),
-        acTags: metadata.acTags?.join(", ") ?? "",
-        dcCreator: encodeResourceCell(dcCreator, {
-          label: dcCreator?.displayName
-        }),
-        metadata
-      };
-    });
+        // Get the License resource based on the Metadata's xmpRightsWebStatement field:
+        let license: License | undefined;
+        if (metadata.xmpRightsWebStatement) {
+          const url = metadata.xmpRightsWebStatement;
+          license = (
+            await apiClient.get<License[]>("objectstore-api/license", {
+              filter: { url }
+            })
+          ).data[0];
+        }
+
+        return {
+          acMetadataCreator: encodeResourceCell(acMetadataCreator, {
+            label: acMetadataCreator?.displayName
+          }),
+          acTags: metadata.acTags?.join(", ") ?? "",
+          dcCreator: encodeResourceCell(dcCreator, {
+            label: dcCreator?.displayName
+          }),
+          license: encodeResourceCell(license, {
+            label: license?.titles[locale] ?? license?.url ?? ""
+          }),
+          metadata
+        };
+      })
+    );
 
     return newTableData;
   }
 
   async function onSubmit(changes: RowChange<BulkMetadataEditRow>[]) {
-    const editedMetadatas = changes.map<SaveArgs<Metadata>>(row => {
-      const {
-        changes: { acMetadataCreator, acTags, dcCreator, metadata },
-        original: {
-          metadata: { id, type }
+    // Loop through the changes per row to get the data to POST to the bulk operations API:
+    const editedMetadatas = await Promise.all(
+      changes.map<Promise<SaveArgs<Metadata>>>(async row => {
+        const {
+          changes: { acMetadataCreator, acTags, dcCreator, license, metadata },
+          original: {
+            metadata: { id, type }
+          }
+        } = row;
+
+        const metadataEdit = {
+          id,
+          type,
+          ...metadata
+        } as Metadata;
+
+        delete metadataEdit.managedAttributeMap;
+
+        if (acMetadataCreator !== undefined) {
+          metadataEdit.acMetadataCreator = decodeResourceCell(
+            acMetadataCreator
+          ).id;
         }
-      } = row;
 
-      const metadataEdit = {
-        id,
-        type,
-        ...metadata
-      } as Metadata;
+        if (dcCreator !== undefined) {
+          metadataEdit.dcCreator = decodeResourceCell(dcCreator).id;
+        }
 
-      delete metadataEdit.managedAttributeMap;
+        if (acTags !== undefined) {
+          metadataEdit.acTags = acTags.split(",").map(t => t.trim());
+        }
 
-      if (acMetadataCreator !== undefined) {
-        metadataEdit.acMetadataCreator = decodeResourceCell(
-          acMetadataCreator
-        ).id;
-      }
+        if (license !== undefined) {
+          const selectedLicense = license
+            ? (
+                await apiClient.get<License>(
+                  `objectstore-api/license/${
+                    decodeResourceCell(license).id as string
+                  }`,
+                  {}
+                )
+              ).data
+            : null;
+          // The Metadata's xmpRightsWebStatement field stores the license's url.
+          metadataEdit.xmpRightsWebStatement = selectedLicense?.url ?? "";
+          // No need to store this ; The url should be enough.
+          metadataEdit.xmpRightsUsageTerms = "";
+        }
 
-      if (dcCreator !== undefined) {
-        metadataEdit.dcCreator = decodeResourceCell(dcCreator).id;
-      }
-
-      if (acTags !== undefined) {
-        metadataEdit.acTags = acTags.split(",").map(t => t.trim());
-      }
-
-      return {
-        resource: metadataEdit,
-        type: "metadata"
-      };
-    });
+        return {
+          resource: metadataEdit,
+          type: "metadata"
+        };
+      })
+    );
 
     const editedManagedAttributeMaps = changes.map<
       SaveArgs<ManagedAttributeMap>
@@ -256,6 +298,9 @@ export default function EditMetadatasPage() {
     <div className="container-fluid">
       <Head title={formatMessage("metadataBulkEditTitle")} />
       <Nav />
+      <ButtonBar>
+        <CancelButton entityLink="/object-store/object" />
+      </ButtonBar>
       <h2>
         <DinaMessage id="metadataBulkEditTitle" />
       </h2>
@@ -287,6 +332,7 @@ export default function EditMetadatasPage() {
                 />
                 <div className="form-group">
                   <AddPersonButton />
+                  <Tooltip id="addPersonPopupTooltip" />
                 </div>
                 <BulkDataEditor
                   columns={columns}
