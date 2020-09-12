@@ -11,7 +11,8 @@ import {
   useResourceSelectCells,
   Tooltip,
   ButtonBar,
-  CancelButton
+  CancelButton,
+  SelectField
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { PersistedResource } from "kitsu";
@@ -27,7 +28,8 @@ import {
   Person,
   License
 } from "../../../types/objectstore-api";
-import { debug } from "console";
+import { HotColumnProps } from "@handsontable/react";
+import { useLocalStorage } from "@rehooks/local-storage";
 
 /** Editable row data */
 export interface BulkMetadataEditRow {
@@ -39,6 +41,7 @@ export interface BulkMetadataEditRow {
 }
 
 interface FormControls {
+  editableBuiltInAttributes: string[];
   editableManagedAttributes: ManagedAttribute[];
 }
 
@@ -54,7 +57,7 @@ export default function EditMetadatasPage() {
 
   const { locale } = useDinaIntl();
 
-  const DEFAULT_COLUMNS = [
+  const BUILT_IN_ATTRIBUTES_COLUMNS: HotColumnProps[] = [
     {
       data: "metadata.originalFilename",
       readOnly: true,
@@ -117,6 +120,11 @@ export default function EditMetadatasPage() {
       }
     )
   ];
+
+  const [
+    editableBuiltInAttributes,
+    setEditableBuiltInAttributes
+  ] = useLocalStorage<string[]>("metadata_editableBuiltInAttributes");
 
   const idsQuery = String(router.query.ids);
   const ids = idsQuery.split(",");
@@ -308,13 +316,18 @@ export default function EditMetadatasPage() {
         <Formik<FormControls>
           enableReinitialize={true}
           initialValues={{
+            editableBuiltInAttributes:
+              editableBuiltInAttributes ??
+              BUILT_IN_ATTRIBUTES_COLUMNS.map(col => col.data),
             editableManagedAttributes: initialEditableManagedAttributes
           }}
           onSubmit={noop}
         >
           {controlsForm => {
             const columns = [
-              ...DEFAULT_COLUMNS,
+              ...BUILT_IN_ATTRIBUTES_COLUMNS.filter(col =>
+                controlsForm.values.editableBuiltInAttributes.includes(col.data)
+              ),
               ...managedAttributeColumns(
                 controlsForm.values.editableManagedAttributes
               )
@@ -322,14 +335,26 @@ export default function EditMetadatasPage() {
 
             return (
               <Form translate={undefined}>
-                <ResourceSelectField<ManagedAttribute>
-                  className="col-2 editable-managed-attributes-select"
-                  filter={filterBy(["name"])}
-                  name="editableManagedAttributes"
-                  isMulti={true}
-                  model="objectstore-api/managed-attribute"
-                  optionLabel={attr => attr.name}
-                />
+                <div className="row">
+                  <SelectField
+                    className="col-6 editable-builtin-attributes-select"
+                    onChange={setEditableBuiltInAttributes}
+                    name="editableBuiltInAttributes"
+                    isMulti={true}
+                    options={BUILT_IN_ATTRIBUTES_COLUMNS.map(col => ({
+                      label: col.title ?? "",
+                      value: col.data
+                    }))}
+                  />
+                  <ResourceSelectField<ManagedAttribute>
+                    className="col-2 editable-managed-attributes-select"
+                    filter={filterBy(["name"])}
+                    name="editableManagedAttributes"
+                    isMulti={true}
+                    model="objectstore-api/managed-attribute"
+                    optionLabel={attr => attr.name}
+                  />
+                </div>
                 <div className="form-group">
                   <AddPersonButton />
                   <Tooltip id="addPersonPopupTooltip" />
