@@ -148,10 +148,6 @@ export function ResourceSelect<TData extends KitsuResource>({
       loadOptions={debouncedOptionLoader}
       onChange={onChangeInternal}
       placeholder="Type here to search."
-      styles={{
-        menu: () => ({ zIndex: 1000 }),
-        ...styles
-      }}
       value={selectValue}
     />
   );
