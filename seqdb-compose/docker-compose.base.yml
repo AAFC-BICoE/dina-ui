@@ -6,7 +6,7 @@ networks:
         - subnet: ${SUBNET}
 services:
   database:
-    image: postgres:9.6
+    image: postgres:12.4
     environment:
       POSTGRES_DB: seqdb
       POSTGRES_USER: postgres
