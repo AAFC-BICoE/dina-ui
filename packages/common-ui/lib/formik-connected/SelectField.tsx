@@ -61,10 +61,7 @@ export function SelectField(props: SelectFieldProps) {
               isMulti={isMulti}
               options={options}
               onChange={onChangeInternal}
-              styles={{
-                menu: () => ({ zIndex: 1000 }),
-                ...styles
-              }}
+              styles={styles}
               value={
                 isMulti
                   ? options?.filter(option => value?.includes(option.value))
