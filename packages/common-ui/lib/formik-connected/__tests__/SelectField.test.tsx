@@ -87,7 +87,21 @@ describe("SelectField component", () => {
     // Change the value.
     wrapper.find(Select).prop("onChange")({ value: "newTestValue" }, null);
 
-    // The mock functino should have been called with the new value.
+    // The mock function should have been called with the new value.
     expect(mockOnChange).lastCalledWith("newTestValue");
+  });
+
+  it("Allows multi-select.", async () => {
+    const mockOnChange = jest.fn();
+    const wrapper = getWrapper({ onChange: mockOnChange });
+
+    // Change the value to the first two options:
+    wrapper.find(Select).prop("onChange")(
+      [PRIMER_TYPE_OPTIONS[0], PRIMER_TYPE_OPTIONS[1]],
+      null
+    );
+
+    // The mock function should have been called with the new value.
+    expect(mockOnChange).lastCalledWith(["PRIMER", "MID"]);
   });
 });

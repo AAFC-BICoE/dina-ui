@@ -7,14 +7,25 @@ import {
   FilterGroupOperator
 } from "./FilterGroup";
 import { FilterRow, FilterRowModel } from "./FilterRow";
+import { PersistedResource, FilterParam } from "kitsu";
 
-export type FilterAttribute =
-  | string
-  | {
-      name: string;
-      label?: string;
-      allowRange?: boolean;
-    };
+export type FilterAttribute = string | FilterAttributeConfig;
+
+export interface FilterAttributeConfig {
+  name: string;
+  label?: string;
+  allowRange?: boolean;
+
+  /** Only needed for date or dropdown filters. */
+  type?: FilterAttributeType;
+
+  // Only needed for dropdown filters:
+  resourcePath?: string;
+  filter?: (inputValue: string) => FilterParam;
+  optionLabel?: (resource: PersistedResource) => string;
+}
+
+export type FilterAttributeType = "DATE" | "DROPDOWN" | "STRING";
 
 export interface FilterBuilderProps {
   filterAttributes: FilterAttribute[];

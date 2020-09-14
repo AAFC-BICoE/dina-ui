@@ -3,13 +3,13 @@ import { FormikProps } from "formik";
 import { FilterParam, KitsuResource } from "kitsu";
 import { Fragment, ReactNode, useEffect } from "react";
 import { SortingRule } from "react-table";
-import { QueryTable, QueryTableProps } from "..";
+import { QueryTable, QueryTableProps, FilterAttribute } from "..";
 import { rsql } from "../filter-builder/rsql";
 import { FilterForm } from "./FilterForm";
 
 interface ListPageLayoutProps<TData extends KitsuResource> {
   additionalFilters?: FilterParam | ((filterForm: any) => FilterParam);
-  filterAttributes?: string[];
+  filterAttributes?: FilterAttribute[];
   filterFormchildren?: (formik: FormikProps<any>) => React.ReactElement;
   id: string;
   queryTableProps: QueryTableProps<TData>;
