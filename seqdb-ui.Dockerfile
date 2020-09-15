@@ -10,6 +10,7 @@ COPY ./packages/seqdb-ui/package.json ./packages/seqdb-ui/package.json
 COPY ./yarn.lock ./
 RUN yarn
 COPY ./packages/ ./packages/
+COPY ./.git/ ./.git/
 
 # seqdb-ui step:
 RUN yarn --cwd=./packages/seqdb-ui build
