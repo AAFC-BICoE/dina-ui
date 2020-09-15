@@ -26,5 +26,6 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   resetButtonText: "Reset",
   submitBtnText: "Save",
   tableTotalCount: "Total matched records: {totalCount}",
+  uiAppVersion: "UI Application Version: {version}",
   yes: "Yes"
 };

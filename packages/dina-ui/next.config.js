@@ -7,6 +7,7 @@ localStorage = new LocalStorage("./scratch");
 const withTM = require("next-transpile-modules");
 
 module.exports = withTM({
+  env: { UI_APP_VERSION: process.env.UI_APP_VERSION },
   transpileModules: ["common-ui"],
   webpack: (config) => {
     // Enable setImmediate polyfill:
