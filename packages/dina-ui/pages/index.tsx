@@ -1,3 +1,5 @@
+import "react-app-polyfill/ie11";
+import "react-app-polyfill/stable";
 import Link from "next/link";
 import React from "react";
 import { Footer, Head, Nav } from "../components";
