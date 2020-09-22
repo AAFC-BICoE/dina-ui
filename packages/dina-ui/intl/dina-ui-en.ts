@@ -5,6 +5,7 @@ import { COMMON_UI_MESSAGES_ENGLISH } from "common-ui";
  */
 export const DINAUI_MESSAGES_ENGLISH = {
   ...COMMON_UI_MESSAGES_ENGLISH,
+  addFilesButton: "Add Files",
   addManagedAttributeButtonText: "Add New Managed Attribute",
   addObjectSubtypeTitle: "Add New Object Subtype",
   addPersonTitle: "Add Person",
