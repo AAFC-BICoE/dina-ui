@@ -92,6 +92,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   revisionsByUserPageTitle: "Revisions by user",
   searchButton: "Search",
   thumbnailNotAvailableText: "No thumbnail available",
+  unsupportedBrowserMessage: "IE is not supported. Please download Chrome/Opera/Firefox",
   uploadButtonText: "Upload",
   uploadFormInstructions:
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",

@@ -1,5 +1,15 @@
 http://:8080
 
+rewrite / {
+  if {>User-Agent} is Mozilla/5.0 (Windows NT 10.0; Win64; x64; Trident/7.0; rv:11.0) like Gecko
+  to /{$UI_DEV_SERVER_ADDRESS}/unsupported-browser.html
+}
+
+rewrite /* {
+  if {>User-Agent} is Mozilla/5.0 (Windows NT 10.0; Win64; x64; Trident/7.0; rv:11.0) like Gecko
+  to /{$UI_DEV_SERVER_ADDRESS}/unsupported-browser.html
+}
+
 # Proxy to the front-end:
 reverse_proxy / {$UI_DEV_SERVER_ADDRESS}
 reverse_proxy /favicon.ico {$UI_DEV_SERVER_ADDRESS}
@@ -20,3 +30,4 @@ route /api/agent-api/* {
 	uri replace /api/agent-api /api/v1
 	reverse_proxy {$AGENT_API_ADDRESS}
 }
+ 

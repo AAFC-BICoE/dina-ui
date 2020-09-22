@@ -4,16 +4,11 @@ import Link from "next/link";
 import React from "react";
 import { Footer, Head, Nav } from "../components";
 import { DinaMessage } from "../intl/dina-ui-intl";
-import { isIE } from "react-device-detect";
 
 const Home: React.FunctionComponent = () =>
-  isIE ? (
-    <div> IE is not supported. Download Chrome/Opera/Firefox </div>
-  ) : (
     <div>
       <Head title="Home" />
       <Nav />
-
       <div className="container">
         <h2>
           <DinaMessage id="objectStoreTitle" />
@@ -71,6 +66,5 @@ const Home: React.FunctionComponent = () =>
 
       <Footer />
     </div>
-  );
 
 export default Home;
