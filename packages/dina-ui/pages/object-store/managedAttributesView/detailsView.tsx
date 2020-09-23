@@ -10,7 +10,8 @@ import {
   Query,
   SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  DateField
 } from "common-ui";
 import { Field, FieldProps, Form, Formik, FormikContextType } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -151,13 +152,13 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           </h4>
           <TextField name="name" hideLabel={true} />
         </div>
-        <div style={{ width: "300px" }}>
+        <div style={{ width: "70%" }}>
           <h4>
             <DinaMessage id="field_managedAttributeDescEn" />
           </h4>
           <TextField name="description.en" hideLabel={true} />
         </div>
-        <div style={{ width: "300px" }}>
+        <div style={{ width: "70%" }}>
           <h4>
             <DinaMessage id="field_managedAttributeDescFr" />
           </h4>
@@ -184,6 +185,27 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
               initialValues={profile ? profile.acceptedValues : undefined}
               hideLabel={true}
             />
+          </div>
+        )}
+        {id && (
+          <div style={{ width: "300px" }}>
+            <h4>
+              <DinaMessage id="field_managedAttributeCreatedOn" />
+            </h4>
+            <DateField
+              showTime={true}
+              name="createdOn"
+              disabled={true}
+              hideLabel={true}
+            />
+          </div>
+        )}
+        {id && (
+          <div style={{ width: "300px" }}>
+            <h4>
+              <DinaMessage id="field_managedAttributeCreatedBy" />
+            </h4>
+            <TextField name="createdBy" hideLabel={true} readOnly={true} />
           </div>
         )}
       </Form>

@@ -73,6 +73,11 @@ export default function MetadataViewPage() {
               <DinaMessage id="editButtonText" />
             </a>
           </Link>
+          <Link href={`/object-store/metadata/revisions?id=${id}`}>
+            <a className="btn btn-info">
+              <DinaMessage id="revisionsButtonText" />
+            </a>
+          </Link>
           <BackToListButton entityLink="/object-store/object" />
           <DeleteButton
             className="ml-5"

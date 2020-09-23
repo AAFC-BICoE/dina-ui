@@ -12,6 +12,8 @@ interface DeleteButtonProps {
   /** Additional button classes. */
   className?: string;
 
+  disabled?: boolean;
+
   /** The resource ID. */
   id?: string;
 
@@ -26,6 +28,7 @@ interface DeleteButtonProps {
 
 export function DeleteButton({
   className,
+  disabled,
   id,
   options,
   postDeleteRedirect,
@@ -56,6 +59,7 @@ export function DeleteButton({
   return (
     <button
       className={`btn btn-danger delete-button ${className}`}
+      disabled={disabled}
       onClick={() =>
         openModal(
           <AreYouSureModal

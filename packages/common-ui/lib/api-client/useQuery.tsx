@@ -3,6 +3,7 @@ import { GetParams, KitsuResponse, KitsuResponseData } from "kitsu";
 import { isArray, isUndefined, omitBy } from "lodash";
 import { useCallback, useContext, useRef } from "react";
 import { useAsyncRun, useAsyncTask } from "react-hooks-async";
+import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { ApiClientContext } from "./ApiClientContext";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
 
@@ -87,4 +88,28 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
     loading: !!task.pending,
     response: previousResponseRef.current
   };
+}
+
+/** Only render if there is a response, otherwise show generic 'loading' or 'error' indicators. */
+export function withResponse<
+  TData extends KitsuResponseData,
+  TMeta = undefined
+>(
+  { loading, error, response }: QueryState<TData, TMeta>,
+  responseRenderer: (response: KitsuResponse<TData, TMeta>) => JSX.Element
+): JSX.Element | null {
+  if (loading) {
+    return <LoadingSpinner loading={true} />;
+  }
+  if (error) {
+    return (
+      <div className="alert alert-danger">
+        {error?.errors?.map(e => e.detail).join("\n") ?? String(error)}
+      </div>
+    );
+  }
+  if (response) {
+    return responseRenderer(response);
+  }
+  return null;
 }
