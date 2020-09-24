@@ -30,6 +30,9 @@ export default function IndexSetViewPage() {
           <div className="container-fluid">
             <h1>Index Set Details</h1>
             <div className="row">
+              <FieldView className="col-md-2" name="group" />
+            </div>
+            <div className="row">
               <FieldView className="col-md-2" name="name" />
             </div>
             <div className="row">

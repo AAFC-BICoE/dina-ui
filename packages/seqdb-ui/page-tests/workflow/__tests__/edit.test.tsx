@@ -78,8 +78,6 @@ describe("Workflow edit page.", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const today = new Date().toISOString().split("T")[0];
-
     expect(mockPatch).lastCalledWith(
       "/seqdb-api/operations",
       [

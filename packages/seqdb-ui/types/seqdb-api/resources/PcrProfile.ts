@@ -4,6 +4,7 @@ import { Region } from "./Region";
 export interface PcrProfileAttributes {
   name: string;
   // Optional fields
+  group?: string;
   cycles?: string | null;
   lastModified?: string | null;
   application?: string | null;

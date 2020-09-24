@@ -41,6 +41,9 @@ export function PcrProfileDetailsPage({ router }: WithRouterProps) {
               <Formik<PcrProfile> initialValues={response.data} onSubmit={noop}>
                 <div>
                   <div className="row">
+                    <FieldView className="col-md-2" name="group" />
+                  </div>
+                  <div className="row">
                     <FieldView
                       className="col-md-2"
                       label="Target Gene Region"

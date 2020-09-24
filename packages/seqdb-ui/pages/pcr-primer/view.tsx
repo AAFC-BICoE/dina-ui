@@ -39,6 +39,9 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
               <Formik<PcrPrimer> initialValues={response.data} onSubmit={noop}>
                 <div>
                   <div className="row">
+                    <FieldView className="col-md-2" name="group" />
+                  </div>
+                  <div className="row">
                     <FieldView className="col-md-2" name="type" />
                   </div>
                   <div className="row">

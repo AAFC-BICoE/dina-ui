@@ -6,8 +6,10 @@ import {
   Query,
   ResourceSelectField,
   safeSubmit,
+  SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -68,8 +70,14 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
 
 function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
   const { save } = useContext(ApiClientContext);
+  const groupSelectOptions = useGroupSelectOptions();
+
   const { id } = router.query;
-  const initialValues = profile || { type: "thermocyclerprofile" };
+
+  const initialValues = profile || {
+    group: groupSelectOptions[0].value,
+    type: "thermocyclerprofile"
+  };
 
   const onSubmit = safeSubmit(async submittedValues => {
     const response = await save(
@@ -95,6 +103,14 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
           <CancelButton entityId={id as string} entityLink="pcr-profile" />
         </ButtonBar>
         <div>
+          <div className="row">
+            <SelectField
+              className="col-md-2"
+              disabled={true}
+              name="group"
+              options={groupSelectOptions}
+            />
+          </div>
           <div className="row">
             <ResourceSelectField<Region>
               className="col-md-2"

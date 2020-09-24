@@ -8,7 +8,8 @@ import {
   safeSubmit,
   SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -69,8 +70,10 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
 
 function ProtocolForm({ protocol, router }: ProtocolFormProps) {
   const { save } = useContext(ApiClientContext);
+  const groupSelectOptions = useGroupSelectOptions();
+
   const { id } = router.query;
-  const initialValues = protocol || {};
+  const initialValues = protocol || { group: groupSelectOptions[0].value };
 
   const onSubmit = safeSubmit(async submittedValues => {
     // Override the product type with "product" when kit is available
@@ -101,6 +104,14 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
           <CancelButton entityId={id as string} entityLink="protocol" />
         </ButtonBar>
         <div>
+          <div className="row">
+            <SelectField
+              className="col-md-2"
+              disabled={true}
+              name="group"
+              options={groupSelectOptions}
+            />
+          </div>
           <div className="row">
             <SelectField
               className="col-md-2"

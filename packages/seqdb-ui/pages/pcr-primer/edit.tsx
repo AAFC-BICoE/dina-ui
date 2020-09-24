@@ -10,7 +10,8 @@ import {
   safeSubmit,
   SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -69,8 +70,14 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
 function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
   const { save } = useContext(ApiClientContext);
   const { id } = router.query;
+  const groupSelectOptions = useGroupSelectOptions();
 
-  const initialValues = primer || { lotNumber: 1, seq: "", type: "PRIMER" };
+  const initialValues = primer || {
+    group: groupSelectOptions[0].value,
+    lotNumber: 1,
+    seq: "",
+    type: "PRIMER"
+  };
 
   const onSubmit = safeSubmit(async submittedValues => {
     const response = await save(
@@ -96,6 +103,14 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
         </ButtonBar>
         <ErrorViewer />
         <div>
+          <div className="row">
+            <SelectField
+              className="col-md-2"
+              disabled={true}
+              name="group"
+              options={groupSelectOptions}
+            />
+          </div>
           <div className="row">
             <SelectField
               className="col-md-2"

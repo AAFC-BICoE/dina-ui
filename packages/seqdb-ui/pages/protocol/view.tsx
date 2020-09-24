@@ -47,6 +47,9 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
                 <Formik<Protocol> initialValues={protocol} onSubmit={noop}>
                   <div>
                     <div className="row">
+                      <FieldView className="col-md-2" name="group" />
+                    </div>
+                    <div className="row">
                       <FieldView className="col-md-2" name="type" />
                       <FieldView className="col-md-2" name="name" />
                       <FieldView className="col-md-2" name="version" />

@@ -112,8 +112,8 @@ function WorkflowSteps({ chain }: { chain: PersistedResource<Chain> }) {
         <TabPanel>
           <Formik initialValues={chain} onSubmit={noop}>
             <div className="col-md-3">
-              <FieldView label="Template" name="chainTemplate.name" />
               <FieldView name="group" />
+              <FieldView label="Template" name="chainTemplate.name" />
               <FieldView name="name" />
             </div>
           </Formik>

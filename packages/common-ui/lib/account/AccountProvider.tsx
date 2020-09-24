@@ -51,6 +51,18 @@ export function useAccount(): AccountContextI {
   return ctx;
 }
 
+/** Group dropdown menu select options. */
+export function useGroupSelectOptions() {
+  const { groupNames } = useAccount();
+
+  const groupSelectOptions = (groupNames ?? []).map(group => ({
+    label: group,
+    value: group
+  }));
+
+  return groupSelectOptions;
+}
+
 /** Converts the Keycloak context to the generic AccountContextI. */
 function KeycloakAccountProviderInternal({
   children

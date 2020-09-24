@@ -9,7 +9,8 @@ import {
   SelectField,
   SubmitButton,
   TextField,
-  useAccount
+  useAccount,
+  useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -69,12 +70,7 @@ export function ChainEditPage({ router }: WithRouterProps) {
 
 function ChainForm({ chain, router }: ChainFormProps) {
   const { save } = useContext(ApiClientContext);
-  const { groupNames } = useAccount();
-
-  const groupSelectOptions = (groupNames ?? []).map(group => ({
-    label: group,
-    value: group
-  }));
+  const groupSelectOptions = useGroupSelectOptions();
 
   const initialValues = chain || { group: groupSelectOptions[0].value };
 
@@ -100,6 +96,14 @@ function ChainForm({ chain, router }: ChainFormProps) {
           <Form translate={undefined}>
             <ErrorViewer />
             <div className="row">
+              <SelectField
+                className="col-md-3"
+                disabled={true}
+                name="group"
+                options={groupSelectOptions}
+              />
+            </div>
+            <div className="row">
               <ResourceSelectField<ChainTemplate>
                 className="col-md-2"
                 label="Workflow Template"
@@ -107,14 +111,6 @@ function ChainForm({ chain, router }: ChainFormProps) {
                 filter={filterBy(["name"])}
                 model="seqdb-api/chainTemplate"
                 optionLabel={template => template.name}
-              />
-            </div>
-            <div className="row">
-              <SelectField
-                className="col-md-3"
-                disabled={true}
-                name="group"
-                options={groupSelectOptions}
               />
             </div>
             <div className="row">

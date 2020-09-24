@@ -4,6 +4,7 @@ import { Product } from "./Product";
 export interface ProtocolAttributes {
   type: string;
   name: string;
+  group?: string;
   version?: string;
   description?: string;
   steps?: string;

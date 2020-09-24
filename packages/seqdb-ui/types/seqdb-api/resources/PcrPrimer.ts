@@ -8,6 +8,7 @@ export interface PcrPrimerAttributes {
   lotNumber: number;
 
   // Optional fields
+  group?: string;
   version?: number | null;
   designDate?: string | null;
   direction?: string | null;

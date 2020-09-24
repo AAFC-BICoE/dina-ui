@@ -5,8 +5,10 @@ import {
   LoadingSpinner,
   Query,
   safeSubmit,
+  SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -62,8 +64,10 @@ export function ProductEditPage({ router }: WithRouterProps) {
 function ProductForm({ product, router }: ProductFormProps) {
   const { save } = useContext(ApiClientContext);
   const { formatMessage } = useSeqdbIntl();
+  const groupSelectOptions = useGroupSelectOptions();
+
   const { id } = router.query;
-  const initialValues = product || {};
+  const initialValues = product || { group: groupSelectOptions[0].value };
 
   const onSubmit = safeSubmit(async submittedValues => {
     const response = await save(
@@ -89,6 +93,14 @@ function ProductForm({ product, router }: ProductFormProps) {
           <CancelButton entityId={id as string} entityLink="product" />
         </ButtonBar>
         <div>
+          <div className="row">
+            <SelectField
+              className="col-md-2"
+              disabled={true}
+              name="group"
+              options={groupSelectOptions}
+            />
+          </div>
           <div className="row">
             <LabelView
               className="col-md-2"

@@ -68,6 +68,7 @@ describe("Region edit page", () => {
           path: "region",
           value: {
             attributes: {
+              group: "/aafc",
               name: "New Region"
             },
             id: "-100",
@@ -171,6 +172,7 @@ describe("Region edit page", () => {
           value: {
             attributes: expect.objectContaining({
               description: "desc",
+              group: "/aafc",
               name: "Test Region",
               symbol: "new symbol"
             }),
@@ -190,6 +192,7 @@ describe("Region edit page", () => {
 /** Test Primer with all fields defined. */
 const TEST_REGION: Required<Region> = {
   description: "desc",
+  group: "/aafc",
   id: "1",
   name: "Test Region",
   symbol: "symbol",

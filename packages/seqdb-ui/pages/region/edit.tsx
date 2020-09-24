@@ -4,8 +4,10 @@ import {
   LoadingSpinner,
   Query,
   safeSubmit,
+  SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -60,8 +62,10 @@ export function RegionEditPage({ router }: WithRouterProps) {
 
 function RegionForm({ region, router }: RegionFormProps) {
   const { save } = useContext(ApiClientContext);
+  const groupSelectOptions = useGroupSelectOptions();
+
   const { id } = router.query;
-  const initialValues = region || {};
+  const initialValues = region || { group: groupSelectOptions[0].value };
 
   const onSubmit = safeSubmit(async submittedValues => {
     const response = await save(
@@ -87,6 +91,14 @@ function RegionForm({ region, router }: RegionFormProps) {
           <CancelButton entityId={id as string} entityLink="region" />
         </ButtonBar>
         <div>
+          <div className="row">
+            <SelectField
+              className="col-md-2"
+              disabled={true}
+              name="group"
+              options={groupSelectOptions}
+            />
+          </div>
           <div className="row">
             <TextField className="col-md-2" name="name" />
             <TextField className="col-md-2" name="symbol" />

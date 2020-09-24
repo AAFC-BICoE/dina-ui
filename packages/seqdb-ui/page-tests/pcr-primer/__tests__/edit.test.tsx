@@ -70,6 +70,7 @@ describe("PcrPrimer edit page", () => {
           path: "pcrPrimer",
           value: {
             attributes: {
+              group: "/aafc",
               lotNumber: 1,
               name: "New PcrPrimer",
               seq: "",
@@ -179,6 +180,7 @@ describe("PcrPrimer edit page", () => {
           value: {
             attributes: expect.objectContaining({
               application: null,
+              group: "/aafc",
               name: "ITS1",
               seq: "new seq value"
             }),
@@ -207,6 +209,7 @@ const TEST_PRIMER: Required<PcrPrimer> = {
   designDate: null,
   designedBy: "Bob Jones",
   direction: "R",
+  group: "/aafc",
   id: "1",
   lastModified: "2013-03-19T04:00:00.000+0000",
   lotNumber: 1,

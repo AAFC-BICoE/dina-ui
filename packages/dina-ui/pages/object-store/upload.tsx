@@ -5,7 +5,8 @@ import {
   SaveArgs,
   SelectField,
   SubmitButton,
-  useAccount
+  useAccount,
+  useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
@@ -60,7 +61,8 @@ export default function UploadPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
   const { apiClient, save } = useContext(ApiClientContext);
-  const { agentId, groupNames, initialized: accountInitialized } = useAccount();
+  const { agentId, initialized: accountInitialized } = useAccount();
+  const groupSelectOptions = useGroupSelectOptions();
 
   const {
     getRootProps,
@@ -128,17 +130,12 @@ export default function UploadPage() {
     });
   }
 
-  const groupSelectOptions = (groupNames ?? []).map(group => ({
-    label: group,
-    value: group
-  }));
-
   return (
     <div>
       <Head title={formatMessage("uploadPageTitle")} />
       <Nav />
       <div className="container">
-        {!accountInitialized || !groupNames?.length ? (
+        {!accountInitialized || !groupSelectOptions?.length ? (
           <div className="alert alert-warning no-group-alert">
             <DinaMessage id="userMustBelongToGroup" />
           </div>

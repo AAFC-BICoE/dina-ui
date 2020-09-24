@@ -5,6 +5,7 @@ export interface SampleAttributes {
   version: string;
 
   // Optional Fields
+  group?: string;
   sampleType?: string;
   notes?: string;
   dateDiscarded?: string;
