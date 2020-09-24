@@ -6,8 +6,10 @@ import {
   Query,
   ResourceSelectField,
   safeSubmit,
+  SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useAccount
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -67,8 +69,14 @@ export function ChainEditPage({ router }: WithRouterProps) {
 
 function ChainForm({ chain, router }: ChainFormProps) {
   const { save } = useContext(ApiClientContext);
+  const { groupNames } = useAccount();
 
-  const initialValues = chain || {};
+  const groupSelectOptions = (groupNames ?? []).map(group => ({
+    label: group,
+    value: group
+  }));
+
+  const initialValues = chain || { group: groupSelectOptions[0].value };
 
   const onSubmit = safeSubmit(async submittedValues => {
     const response = await save(
@@ -99,6 +107,14 @@ function ChainForm({ chain, router }: ChainFormProps) {
                 filter={filterBy(["name"])}
                 model="seqdb-api/chainTemplate"
                 optionLabel={template => template.name}
+              />
+            </div>
+            <div className="row">
+              <SelectField
+                className="col-md-3"
+                disabled={true}
+                name="group"
+                options={groupSelectOptions}
               />
             </div>
             <div className="row">
