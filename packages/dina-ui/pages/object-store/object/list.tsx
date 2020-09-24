@@ -88,7 +88,7 @@ export default function MetadataListPage() {
     "dcFormat",
     dateCell("acDigitizationDate"),
     dateCell("xmpMetadataDate"),
-    "acMetadataCreator.displayName",
+    { accessor: "acMetadataCreator.displayName", sortable: false },
     {
       Cell: ({ original: { acTags } }) => <>{acTags?.join(", ")}</>,
       accessor: "acTags"

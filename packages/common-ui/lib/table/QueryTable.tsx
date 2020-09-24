@@ -13,6 +13,7 @@ import {
 } from "..";
 import { QueryState } from "../api-client/useQuery";
 import { CommonMessage } from "../intl/common-ui-intl";
+import { Tooltip } from "../tooltip/Tooltip";
 
 /** Object types accepted as a column definition. */
 export type ColumnDefinition<TData> = string | Column<TData>;
@@ -198,6 +199,16 @@ export function QueryTable<TData extends KitsuResource>({
       <style>{queryTableStyle}</style>
       <span>
         <CommonMessage id="tableTotalCount" values={{ totalCount }} />
+      </span>
+      <span className="mx-3">
+        <Tooltip
+          id="queryTableMultiSortExplanation"
+          visibleElement={
+            <a href="#">
+              <CommonMessage id="queryTableMultiSortTooltipTitle" />
+            </a>
+          }
+        />
       </span>
       {error && (
         <div
