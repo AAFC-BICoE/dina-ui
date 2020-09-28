@@ -22,7 +22,6 @@ route /api/agent-api/* {
 }
  
 @ie {
-	#header User-Agent Mozilla/5.0 (Windows NT 10.0; Win64; x64; Trident/7.0; rv:11.0) like Gecko*
-	header User-Agent *Edg/85.0.564.63*
+	header User-Agent Mozilla/5.0 (Windows NT 10.0; Win64; x64; Trident/7.0; rv:11.0) like Gecko*	
 }
-rewrite @ie {$UI_DEV_SERVER_ADDRESS}/unsupported-browser.html
+rewrite @ie /static/unsupported-browser.html
