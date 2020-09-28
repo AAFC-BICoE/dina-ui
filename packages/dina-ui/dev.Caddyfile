@@ -1,11 +1,5 @@
 http://:8080
 
-@ie {
-	header User-Agent Mozilla/5.0 (Windows NT 10.0; Win64; x64; Trident/7.0; rv:11.0) like Gecko*
-}
-
-rewrite @ie /{$UI_DEV_SERVER_ADDRESS}/unsupported-browser.html
-
 # Proxy to the front-end:
 reverse_proxy / {$UI_DEV_SERVER_ADDRESS}
 reverse_proxy /favicon.ico {$UI_DEV_SERVER_ADDRESS}
@@ -27,3 +21,8 @@ route /api/agent-api/* {
 	reverse_proxy {$AGENT_API_ADDRESS}
 }
  
+@ie {
+	#header User-Agent Mozilla/5.0 (Windows NT 10.0; Win64; x64; Trident/7.0; rv:11.0) like Gecko*
+	header User-Agent *Edg/85.0.564.63*
+}
+rewrite @ie {$UI_DEV_SERVER_ADDRESS}/unsupported-browser.html
