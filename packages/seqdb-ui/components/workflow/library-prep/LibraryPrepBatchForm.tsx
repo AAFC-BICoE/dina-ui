@@ -131,7 +131,7 @@ export function LibraryPrepBatchForm({
         </div>
         <div className="row">
           <TextField className="col-md-6" name="cleanUpNotes" />
-          <TextField className="col-md-6" name="notes" />
+          <TextField className="col-md-6" name="notes" multiLines={true} />
         </div>
         <SubmitButton />
       </Form>
