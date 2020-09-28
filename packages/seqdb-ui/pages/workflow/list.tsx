@@ -12,6 +12,7 @@ const WORKFLOW_TABLE_COLUMNS: ColumnDefinition<any>[] = [
     ),
     accessor: "name"
   },
+  "group",
   "createdOn",
   "chainTemplate.name"
 ];

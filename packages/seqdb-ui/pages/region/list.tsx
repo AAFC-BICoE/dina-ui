@@ -13,6 +13,7 @@ const REGION_TABLE_COLUMNS: ColumnDefinition<Region>[] = [
     ),
     accessor: "name"
   },
+  "group",
   "description",
   "symbol"
 ];

@@ -20,6 +20,7 @@ const INDEX_SET_TABLE_COLUMNS: ColumnDefinition<IndexSet>[] = [
     Header: "Name",
     accessor: "name"
   },
+  "group",
   "forwardAdapter",
   "reverseAdapter"
 ];

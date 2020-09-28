@@ -13,6 +13,7 @@ const PROTOCOL_TABLE_COLUMNS: ColumnDefinition<Protocol>[] = [
     ),
     accessor: "name"
   },
+  "group",
   "type",
   "version",
   "description",

@@ -13,6 +13,7 @@ const PCRPRIMER_TABLE_COLUMNS: ColumnDefinition<PcrPrimer>[] = [
     ),
     accessor: "name"
   },
+  "group",
   {
     Cell: ({ original: { region } }) =>
       region ? (

@@ -14,6 +14,7 @@ const PCRPROFILE_TABLE_COLUMNS: ColumnDefinition<PcrProfile>[] = [
       ) : null,
     accessor: "region.name"
   },
+  "group",
   {
     Cell: ({ original: { id, name } }) => (
       <Link href={`/pcr-profile/view?id=${id}`}>

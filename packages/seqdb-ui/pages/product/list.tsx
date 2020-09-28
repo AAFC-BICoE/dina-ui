@@ -13,6 +13,7 @@ const PRODUCT_TABLE_COLUMNS: ColumnDefinition<Product>[] = [
     ),
     accessor: "name"
   },
+  "group",
   {
     Header: "UPC",
     accessor: "upc"
