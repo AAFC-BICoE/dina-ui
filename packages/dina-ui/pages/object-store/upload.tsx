@@ -1,17 +1,21 @@
 import {
   ApiClientContext,
   ErrorViewer,
-  safeSubmit,
   SaveArgs,
   SelectField,
-  SubmitButton,
   useAccount
 } from "common-ui";
 import { Form, Formik } from "formik";
+import { noop } from "lodash";
 import { useRouter } from "next/router";
-import { useContext, useMemo } from "react";
-import { useDropzone } from "react-dropzone";
-import { Footer, Head, Nav } from "../../components";
+import { useContext } from "react";
+import {
+  FileUploader,
+  Footer,
+  Head,
+  IFileWithMeta,
+  Nav
+} from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Metadata } from "../../types/objectstore-api/resources/Metadata";
 
@@ -28,33 +32,10 @@ export interface FileUploadResponse {
   sizeInBytes: number;
 }
 
-const baseStyle = {
-  alignItems: "center",
-  backgroundColor: "#fafafa",
-  borderColor: "#eeeeee",
-  borderRadius: 2,
-  borderStyle: "dashed",
-  borderWidth: 2,
-  color: "#bdbdbd",
-  display: "flex",
-  flex: 1,
-  flexDirectionProperty: "column",
-  outline: "none",
-  padding: "20px",
-  transition: "border .24s ease-in-out"
-};
-
-const activeStyle = {
-  borderColor: "#2196f3"
-};
-
-const acceptStyle = {
-  borderColor: "#00e676"
-};
-
-const rejectStyle = {
-  borderColor: "#ff1744"
-};
+export interface OnSubmitValues {
+  acceptedFiles: IFileWithMeta[];
+  group: string;
+}
 
 export default function UploadPage() {
   const router = useRouter();
@@ -62,28 +43,9 @@ export default function UploadPage() {
   const { apiClient, save } = useContext(ApiClientContext);
   const { agentId, groupNames, initialized: accountInitialized } = useAccount();
 
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-    isDragReject,
-    acceptedFiles
-  } = useDropzone({
-    accept: "image/*,audio/*,video/*,.pdf,.doc,.docx,.png"
-  });
+  const acceptedFileTypes = "image/*,audio/*,video/*,.pdf,.doc,.docx,.png";
 
-  const style = useMemo(
-    () => ({
-      ...baseStyle,
-      ...(isDragActive ? activeStyle : {}),
-      ...(isDragAccept ? acceptStyle : {}),
-      ...(isDragReject ? rejectStyle : {})
-    }),
-    [isDragActive, isDragReject]
-  );
-
-  async function onSubmit({ group }) {
+  async function onSubmit({ acceptedFiles, group }: OnSubmitValues) {
     // Upload each file in a separate request, then create the metadatas in a transaction.
     // TODO: Do all of this in a single transaction.
 
@@ -92,7 +54,7 @@ export default function UploadPage() {
     }
 
     const uploadResponses: FileUploadResponse[] = [];
-    for (const file of acceptedFiles) {
+    for (const { file } of acceptedFiles) {
       // Wrap the file in a FormData:
       const formData = new FormData();
       formData.append("file", file);
@@ -150,9 +112,10 @@ export default function UploadPage() {
             </div>
             <Formik
               initialValues={{ group: groupSelectOptions[0].value }}
-              onSubmit={safeSubmit(onSubmit)}
+              onSubmit={noop}
             >
               <Form translate={undefined}>
+                <ErrorViewer />
                 <div className="row">
                   <SelectField
                     className="col-md-3"
@@ -161,31 +124,12 @@ export default function UploadPage() {
                     options={groupSelectOptions}
                   />
                 </div>
-                <div id="dndRoot" style={{ cursor: "pointer" }}>
-                  <div {...getRootProps({ style })} className="root">
-                    <input {...getInputProps()} />
-                    <div style={{ margin: "auto" }}>
-                      <div>
-                        <DinaMessage id="uploadFormInstructions" />
-                      </div>
-                    </div>
-                  </div>
+                <div>
+                  <FileUploader
+                    acceptedFileTypes={acceptedFileTypes}
+                    onSubmit={onSubmit}
+                  />
                 </div>
-                <ul className="list-group">
-                  {acceptedFiles.map(file => (
-                    <li className="list-group-item" key={file.name}>
-                      {file.name} - {file.size} bytes
-                    </li>
-                  ))}
-                </ul>
-                {acceptedFiles.length ? (
-                  <div>
-                    <ErrorViewer />
-                    <SubmitButton>
-                      <DinaMessage id="uploadButtonText" />
-                    </SubmitButton>
-                  </div>
-                ) : null}
               </Form>
             </Formik>
           </div>

@@ -1,8 +1,8 @@
 import { FormikContextType } from "formik";
 
-export type OnFormikSubmit = (
-  submittedValues: any,
-  formik: FormikContextType<any>
+export type OnFormikSubmit<TValues = any> = (
+  submittedValues: TValues,
+  formik: FormikContextType<TValues>
 ) => void | Promise<void>;
 
 /**

@@ -10,6 +10,7 @@ import "handsontable/dist/handsontable.full.min.css";
 import App from "next/app";
 import React from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import "react-dropzone-uploader/dist/styles.css";
 import "react-table/react-table.css";
 import "react-tabs/style/react-tabs.css";
 import "../components/button-bar/nav/app-top.css";
