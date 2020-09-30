@@ -60,7 +60,6 @@ export default function MetadataListPage() {
     : [12, 0];
   const METADATA_FILTER_ATTRIBUTES: FilterAttribute[] = [
     "originalFilename",
-    "dcFormat",
     "xmpRightsWebStatement",
     "dcRights",
     {
