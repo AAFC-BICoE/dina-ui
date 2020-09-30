@@ -21,7 +21,7 @@ route /api/agent-api/* {
 	reverse_proxy {$AGENT_API_ADDRESS}
 }
  
-@ie {
-	header User-Agent Mozilla/5.0 (Windows NT 10.0; Win64; x64; Trident/7.0; rv:11.0) like Gecko*	
+@internetexplorer  {
+	header_regexp User-Agent .*(MSIE|Trident).*
 }
-rewrite @ie /static/unsupported-browser.html
+rewrite @internetexplorer  /static/unsupported-browser.html
