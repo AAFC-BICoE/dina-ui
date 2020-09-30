@@ -68,6 +68,10 @@ export default function MetadataListPage() {
       type: "DATE"
     },
     {
+      name: "xmpMetadataDate",
+      type: "DATE"
+    },
+    {
       name: "acMetadataCreator",
       type: "DROPDOWN",
       resourcePath: "agent-api/person",
