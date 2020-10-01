@@ -20,9 +20,17 @@ export type FileUploaderOnSubmitArgs<TValues> = TValues & {
 
 export interface IFileWithMeta {
   file: File;
+  meta: IMeta;
   cancel: () => void;
   restart: () => void;
   remove: () => void;
+}
+
+export interface IMeta {
+  type: string; // MIME type, example: `image/*`
+  name: string;
+  size: number; // bytes
+  lastModifiedDate: string; // ISO string
 }
 
 /**
