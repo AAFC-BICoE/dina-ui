@@ -60,6 +60,7 @@ export default function MetadataListPage() {
     : [12, 0];
   const METADATA_FILTER_ATTRIBUTES: FilterAttribute[] = [
     "originalFilename",
+    "dcFormat",
     "xmpRightsWebStatement",
     "dcRights",
     {
@@ -84,7 +85,6 @@ export default function MetadataListPage() {
       sortable: false
     },
     "originalFilename",
-    "dcFormat",
     dateCell("acDigitizationDate"),
     dateCell("xmpMetadataDate"),
     { accessor: "acMetadataCreator.displayName", sortable: false },
