@@ -34,11 +34,13 @@
     "pa11y-ci": "^2.3.0",
     "prettier": "^2.0.5",
     "react-test-renderer": "^16.8.6",
+    "ts-node": "^9.0.0",
     "tslint": "^6.1.2",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.3.0",
     "tslint-react": "^5.0.0",
-    "typescript": "^3.9.6"
+    "typescript": "^3.9.6",
+    "xlsx": "^0.16.7"
   },
   "husky": {
     "hooks": {

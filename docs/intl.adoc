@@ -55,7 +55,6 @@ seqdb-en.ts:
 [source,tsx]
 ----
 export const SEQDB_MESSAGES_ENGLISH = {
-  ...COMMON_UI_MESSAGES_ENGLISH,
   ...
   greeting: "Hello!"
   ...
@@ -72,7 +71,6 @@ Example from seqdb-fr.ts:
 [source,tsx]
 ----
 export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
-  ...COMMON_UI_MESSAGES_FR,
   ...
   greeting: "Bonjour!", // If the key exists in the english messages file, Typescript allows it.
   otherKey: "C'est un autre message." // If "otherKey" isn't a key in the English messages, this should show an error in your IDE.
@@ -92,7 +90,6 @@ Example:
 [source,tsx]
 ----
 export const SEQDB_MESSAGES_ENGLISH = {
-  ...COMMON_UI_MESSAGES_ENGLISH,
   ...
   field_name: "Name",
   "field_group.groupName": "Group Name",
@@ -103,7 +100,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
 [source,tsx]
 ----
 export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
-  ...COMMON_UI_MESSAGES_FR,
   ...
   field_name: "Nom",
   "field_group.groupName": "Nom de Groupe"
