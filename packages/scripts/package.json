@@ -1,0 +1,19 @@
+{
+  "name": "dina-scripts",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "export-intl-csv": "ts-node ./intl-support/export-intl-csv.script.ts",
+    "import-intl-csv": "ts-node ./intl-support/import-intl-csv.script.ts"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "tslint --project tsconfig.json --fix",
+      "git add"
+    ],
+    "*.{js,jsx,css,json,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  }
+}
