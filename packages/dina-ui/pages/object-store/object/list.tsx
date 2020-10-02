@@ -85,7 +85,6 @@ export default function MetadataListPage() {
       sortable: false
     },
     "originalFilename",
-    "dcFormat",
     dateCell("acDigitizationDate"),
     dateCell("xmpMetadataDate"),
     { accessor: "acMetadataCreator.displayName", sortable: false },
