@@ -106,3 +106,22 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   ...
 }
 ----
+
+== Export messages as CSV
+
+Run the following command to export the messages in CSV format:
+
+[source,bash]
+----
+cd ./packages/scripts
+yarn --silent export-intl-csv > messages.csv
+----
+
+== Import CSV files to update Typescript message files
+
+Run the following command after editing your CSV file:
+
+----
+cd ./packages/scripts
+yarn import-intl-csv messages.csv
+----

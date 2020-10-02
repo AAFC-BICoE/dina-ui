@@ -39,35 +39,35 @@ export const MESSAGE_GROUPS: MessageDictionary = {
     english: {
       file: join(
         __dirname,
-        "../../packages/common-ui/lib/intl/common-ui-en.ts"
+        "../../../packages/common-ui/lib/intl/common-ui-en.ts"
       ),
       messages: COMMON_UI_MESSAGES_ENGLISH
     },
     french: {
       file: join(
         __dirname,
-        "../../packages/common-ui/lib/intl/common-ui-fr.ts"
+        "../../../packages/common-ui/lib/intl/common-ui-fr.ts"
       ),
       messages: COMMON_UI_MESSAGES_FR
     }
   },
   dina: {
     english: {
-      file: join(__dirname, "../../packages/dina-ui/intl/dina-ui-en.ts"),
+      file: join(__dirname, "../../../packages/dina-ui/intl/dina-ui-en.ts"),
       messages: DINAUI_MESSAGES_ENGLISH
     },
     french: {
-      file: join(__dirname, "../../packages/dina-ui/intl/dina-ui-fr.ts"),
+      file: join(__dirname, "../../../packages/dina-ui/intl/dina-ui-fr.ts"),
       messages: DINAUI_MESSAGES_FRENCH
     }
   },
   seqdb: {
     english: {
-      file: join(__dirname, "../../packages/seqdb-ui/intl/seqdb-en.ts"),
+      file: join(__dirname, "../../../packages/seqdb-ui/intl/seqdb-en.ts"),
       messages: SEQDB_MESSAGES_ENGLISH
     },
     french: {
-      file: join(__dirname, "../../packages/seqdb-ui/intl/seqdb-fr.ts"),
+      file: join(__dirname, "../../../packages/seqdb-ui/intl/seqdb-fr.ts"),
       messages: SEQDB_MESSAGES_FRENCH
     }
   }
