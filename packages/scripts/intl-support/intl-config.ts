@@ -1,10 +1,16 @@
 import { join } from "path";
-import { COMMON_UI_MESSAGES_ENGLISH } from "../../common-ui/lib/intl/common-ui-en";
-import { COMMON_UI_MESSAGES_FR } from "../../common-ui/lib/intl/common-ui-fr";
-import { DINAUI_MESSAGES_ENGLISH } from "../../dina-ui/intl/dina-ui-en";
-import { DINAUI_MESSAGES_FRENCH } from "../../dina-ui/intl/dina-ui-fr";
-import { SEQDB_MESSAGES_ENGLISH } from "../../seqdb-ui/intl/seqdb-en";
-import { SEQDB_MESSAGES_FRENCH } from "../../seqdb-ui/intl/seqdb-fr";
+
+// tslint:disable: no-var-requires
+const {
+  COMMON_UI_MESSAGES_ENGLISH
+} = require("../../common-ui/lib/intl/common-ui-en");
+const {
+  COMMON_UI_MESSAGES_FR
+} = require("../../common-ui/lib/intl/common-ui-fr");
+const { DINAUI_MESSAGES_ENGLISH } = require("../../dina-ui/intl/dina-ui-en");
+const { DINAUI_MESSAGES_FRENCH } = require("../../dina-ui/intl/dina-ui-fr");
+const { SEQDB_MESSAGES_ENGLISH } = require("../../seqdb-ui/intl/seqdb-en");
+const { SEQDB_MESSAGES_FRENCH } = require("../../seqdb-ui/intl/seqdb-fr");
 
 // Type definitions and message file locations for exporting/importing app messages using CSV spreadsheets:
 
