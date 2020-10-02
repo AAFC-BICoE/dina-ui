@@ -19,45 +19,48 @@ export function importCsvMessages({
 }: ImportCsvMessagesParams) {
   const csvRows = sheetUtils.sheet_to_json<CsvRow>(csvSheet);
 
+  // Loop through the different Apps (common/seqdb/dina):
   for (const app of Object.keys(messageGroups)) {
     const appConfig = messageGroups[app];
+
+    // Loop through languages (en/fr):
     for (const lang of LANGUAGES) {
-      const messageGroup = appConfig[lang];
-
-      const { file } = messageGroup;
-
-      const srcCode = readFile(file);
-      const srcCodeLines = srcCode.split("\n");
-      const ast = tsquery.ast(srcCode);
+      // Get the filename + messages for this app and language:
+      const { file, messages } = appConfig[lang];
 
       const appRows = csvRows.filter(row => row.app === app);
 
+      const newMessages = { ...messages };
+
+      // Loop through the CSV rows to construct the new messages object:
       for (const row of appRows) {
-        const { key } = row;
+        const newMessage = row[lang];
 
-        const [node] = tsquery(ast, `PropertyAssignment[name.name="${key}"]`);
-
-        if (node && ts.isPropertyAssignment(node)) {
-          const { initializer } = node;
-
-          // Get the line + column position of the text to be replaced in the messages file:
-          const {
-            line: lineNumber,
-            character: start
-          } = ast.getLineAndCharacterOfPosition(initializer.getStart());
-          const { length } = initializer.getText();
-
-          // Replace the message in the .ts file with the one from the CSV:
-          const newLineText = srcCodeLines[lineNumber].replace(
-            RegExp(`(.{${start}}).{${length}}(.*)`),
-            `$1"${row[lang]}"$2`
-          );
-          srcCodeLines[lineNumber] = newLineText;
+        if (newMessage) {
+          const { key } = row;
+          newMessages[key] = newMessage;
         }
       }
 
-      const newSrcFileText = srcCodeLines.join("\n");
-      writeFile(file, newSrcFileText);
+      // Parse the Typescript message file:
+      const srcCode = readFile(file);
+      const ast = tsquery.ast(srcCode);
+
+      // Assume the first ObjectLiteralExpression ("{}") in the file is the message object:
+      const [node] = tsquery(ast, `ObjectLiteralExpression`);
+
+      // Use a string replacement in the source messages file to swap in the new messages object:
+      if (node && ts.isObjectLiteralExpression(node)) {
+        const start = node.getStart();
+        const length = node.end - start;
+        const newSrcFileText = srcCode.replace(
+          // Matches the ObjectLiteralExpression based on start/end positions:
+          RegExp(`([\\s\\S]{${start}})[\\s\\S]{${length}}([\\s\\S]*)`),
+          // Pretty prints Json in its place:
+          `$1${JSON.stringify(newMessages, null, 2)}$2`
+        );
+        writeFile(file, newSrcFileText);
+      }
     }
   }
 }
