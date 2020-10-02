@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@babel/runtime-corejs2": "^7.10.4",
+    "@phenomnomnominal/tsquery": "^4.1.1",
     "@types/enzyme": "^3.10.5",
     "@types/enzyme-to-json": "^1.5.2",
     "@types/jest": "^26.0.3",
