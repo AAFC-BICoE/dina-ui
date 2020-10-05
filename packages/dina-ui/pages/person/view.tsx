@@ -51,10 +51,14 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
                 <Formik<Person> initialValues={person} onSubmit={noop}>
                   <div>
                     <div className="row">
-                      <FieldView className="col-md-3" name="displayName" />
-                      <FieldView className="col-md-3" name="email" />
-                      <FieldView className="col-md-3" name="createdBy" />
-                      <FieldView className="col-md-3" name="createdOn" />
+                      <FieldView className="col-md-2" name="displayName" />
+                      <FieldView className="col-md-2" name="email" />
+                      <FieldView
+                        className="col-md-2"
+                        name="organization.name"
+                      />
+                      <FieldView className="col-md-2" name="createdBy" />
+                      <FieldView className="col-md-2" name="createdOn" />
                     </div>
                   </div>
                 </Formik>
