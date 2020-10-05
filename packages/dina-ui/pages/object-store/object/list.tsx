@@ -85,11 +85,12 @@ export default function MetadataListPage() {
       sortable: false
     },
     {
-      Cell: ({ original: { id, originalFilename } }) => (
-        <Link href={`/object-store/object/view?id=${id}`}>
-          {originalFilename}
-        </Link>
-      ),
+      Cell: ({ original: { id, originalFilename } }) =>
+        originalFilename ? (
+          <Link href={`/object-store/object/view?id=${id}`}>
+            {originalFilename}
+          </Link>
+        ) : null,
       accessor: "originalFilename"
     },
     "dcFormat",
