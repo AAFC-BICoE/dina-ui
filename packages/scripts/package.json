@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "export-intl-csv": "ts-node ./intl-support/export-intl-csv.script.ts",
-    "import-intl-csv": "ts-node ./intl-support/import-intl-csv.script.ts",
+    "import-intl-csv": "ts-node ./intl-support/import-intl-csv.script.ts $CSVFILE && prettier --write ../**/intl/**/*.ts",
     "lint": "tslint --project tsconfig.json",
     "lint:fix": "tslint --project tsconfig.json --fix",
     "test": "tsc && jest",

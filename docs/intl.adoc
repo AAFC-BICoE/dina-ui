@@ -123,5 +123,5 @@ Run the following command after editing your CSV file:
 
 ----
 cd ./packages/scripts
-yarn import-intl-csv messages.csv
+CSVFILE=messages.csv yarn import-intl-csv
 ----
