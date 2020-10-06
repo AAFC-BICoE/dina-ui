@@ -1,4 +1,6 @@
 import { transformToRSQL } from "@molgenis/rsql";
+import moment from "moment";
+import { FilterAttributeConfig } from "./FilterBuilder";
 import { FilterGroupModel } from "./FilterGroup";
 import { FilterRowModel } from "./FilterRow";
 
@@ -42,6 +44,11 @@ function toGroup(filterGroup: FilterGroupModel) {
 function toPredicate(filterRow: FilterRowModel) {
   const { attribute, predicate, searchType, value } = filterRow;
 
+  const attributeConfig: FilterAttributeConfig =
+    typeof attribute === "string"
+      ? { name: attribute, type: "STRING" }
+      : attribute;
+
   const selector = typeof attribute === "string" ? attribute : attribute.name;
 
   if (searchType === "BLANK_FIELD") {
@@ -67,11 +74,7 @@ function toPredicate(filterRow: FilterRowModel) {
   }
 
   // Allow list/range filters.
-  if (
-    typeof attribute !== "string" &&
-    typeof value === "string" &&
-    attribute.allowRange
-  ) {
+  if (typeof value === "string" && attributeConfig.allowRange) {
     const commaSplit = value.split(",");
 
     const singleNumbers = commaSplit.filter(e => !e.includes("-"));
@@ -118,7 +121,10 @@ function toPredicate(filterRow: FilterRowModel) {
   // Surround the search value with asterisks if this is a partial match for string property type search
   let searchValue: string = typeof value === "string" ? value : value.id ?? "";
   let compare;
-  if (typeof attribute === "string" || attribute.type === "DROPDOWN") {
+  if (
+    attributeConfig.type === "DROPDOWN" ||
+    attributeConfig.type === "STRING"
+  ) {
     if (searchType === "PARTIAL_MATCH") {
       searchValue = `*${searchValue}*`;
       compare = predicate === "IS NOT" ? "!=" : "==";
@@ -127,10 +133,22 @@ function toPredicate(filterRow: FilterRowModel) {
     }
   }
   // override compare if this is date type, which only has greater and less than
-  if (predicate === "GREATER_THAN_OR_EQUAL") {
+  if (predicate === "GREATER_THAN") {
     compare = "=ge=";
+    if (attributeConfig.type === "DATE") {
+      // GreaterThan searches should match from the beginning of the chosen day:
+      const beginningOfDay = new Date(searchValue);
+      beginningOfDay.setHours(0, 0, 0, 0);
+      searchValue = moment(beginningOfDay).format();
+    }
   } else if (predicate === "LESS_THAN") {
-    compare = "=lt=";
+    compare = "=le=";
+    if (attributeConfig.type === "DATE") {
+      // LessThan searches should match from the end of the chosen day:
+      const endOfDay = new Date(searchValue);
+      endOfDay.setHours(23, 59, 59, 999);
+      searchValue = moment(endOfDay).format();
+    }
   }
   return {
     arguments: searchValue,

@@ -15,7 +15,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   editButtonText: "Edit",
   filterBlankField: "Blank Field",
   filterExactMatch: "Exact Match",
-  filterGreaterThanOrEqual: "Greater Than or Equal",
+  filterGreaterThan: "Greater Than",
   filterLessThan: "Less Than",
   filterPartialMatch: "Partial Match",
   filterSubmitButtonText: "Filter List",
