@@ -25,6 +25,10 @@ export function FieldView(props: FieldViewProps) {
               <Link href={link}>
                 <a>{value}</a>
               </Link>
+            ) : Array.isArray(value) ? (
+              value
+                .map(val => (val.name ? val.name : JSON.stringify(val)))
+                .join()
             ) : (
               value
             )}

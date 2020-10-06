@@ -58,7 +58,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
           <div className="row">
             <ResourceSelectField<Organization>
               className="col-md-2"
-              name="organization"
+              name="organizations"
               filter={filterBy(["name"])}
               model="agent-api/organization"
               optionLabel={organization => organization.name}

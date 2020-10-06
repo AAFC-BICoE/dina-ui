@@ -11,7 +11,7 @@ export interface PersonAttributes {
 }
 
 export interface PersonRelationships {
-  organization?: Organization;
+  organizations?: Organization[];
 }
 
 export type Person = KitsuResource & PersonAttributes & PersonRelationships;

@@ -53,10 +53,7 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
                     <div className="row">
                       <FieldView className="col-md-2" name="displayName" />
                       <FieldView className="col-md-2" name="email" />
-                      <FieldView
-                        className="col-md-2"
-                        name="organization.name"
-                      />
+                      <FieldView className="col-md-2" name="organizations" />
                       <FieldView className="col-md-2" name="createdBy" />
                       <FieldView className="col-md-2" name="createdOn" />
                     </div>
