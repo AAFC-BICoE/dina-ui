@@ -156,7 +156,7 @@ describe("rsql conversion", () => {
     };
 
     const rsqlFilter = rsql(model);
-    expect(rsqlFilter).toEqual("number=in=(10,90),number=gt=30;number=lt=50");
+    expect(rsqlFilter).toEqual("number=in=(10,90),number=ge=30;number=le=50");
   });
 
   it("Allows a NOT list and range filter.", () => {
@@ -233,7 +233,7 @@ describe("rsql conversion", () => {
     };
 
     const rsqlFilter = rsql(model);
-    expect(rsqlFilter).toEqual("number=gt=100;number=lt=200");
+    expect(rsqlFilter).toEqual("number=ge=100;number=le=200");
   });
 
   it("Allows a range filter written backwards.", () => {
@@ -258,6 +258,118 @@ describe("rsql conversion", () => {
     };
 
     const rsqlFilter = rsql(model);
-    expect(rsqlFilter).toEqual("number=gt=100;number=lt=200");
+    expect(rsqlFilter).toEqual("number=ge=100;number=le=200");
+  });
+
+  it("Allows date IS filter.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: {
+            name: "myDateField",
+            label: "My Date Field",
+            type: "DATE"
+          },
+          id: 1,
+          predicate: "IS",
+          searchType: "PARTIAL_MATCH",
+          type: "FILTER_ROW",
+          value:
+            "Tue Oct 06 2020 20:14:30 GMT+0000 (Coordinated Universal Time)"
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const rsqlFilter = rsql(model);
+    expect(rsqlFilter).toEqual(
+      // Greater than or equal to {beginning of day} AND less than or equal to {end of day}:
+      "myDateField=ge=2020-10-06T00:00:00+00:00;myDateField=le=2020-10-06T23:59:59+00:00"
+    );
+  });
+
+  it("Allows date IS NOT filter.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: {
+            name: "myDateField",
+            label: "My Date Field",
+            type: "DATE"
+          },
+          id: 1,
+          predicate: "IS NOT",
+          searchType: "PARTIAL_MATCH",
+          type: "FILTER_ROW",
+          value:
+            "Tue Oct 06 2020 20:14:30 GMT+0000 (Coordinated Universal Time)"
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const rsqlFilter = rsql(model);
+    expect(rsqlFilter).toEqual(
+      // Less than {beginning of day} OR greater than {end of day}:
+      "myDateField=lt=2020-10-06T00:00:00+00:00,myDateField=gt=2020-10-06T23:59:59+00:00"
+    );
+  });
+
+  it("Allows date FROM filter.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: {
+            name: "myDateField",
+            label: "My Date Field",
+            type: "DATE"
+          },
+          id: 1,
+          predicate: "FROM",
+          searchType: "PARTIAL_MATCH",
+          type: "FILTER_ROW",
+          value:
+            "Tue Oct 06 2020 20:14:30 GMT+0000 (Coordinated Universal Time)"
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const rsqlFilter = rsql(model);
+    // Greater than or equal to {beginning of day}:
+    expect(rsqlFilter).toEqual("myDateField=ge=2020-10-06T00:00:00+00:00");
+  });
+
+  it("Allows date UNTIL filter.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: {
+            name: "myDateField",
+            label: "My Date Field",
+            type: "DATE"
+          },
+          id: 1,
+          predicate: "UNTIL",
+          searchType: "PARTIAL_MATCH",
+          type: "FILTER_ROW",
+          value:
+            "Tue Oct 06 2020 20:14:30 GMT+0000 (Coordinated Universal Time)"
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const rsqlFilter = rsql(model);
+    // Less than or equal to {end of day}:
+    expect(rsqlFilter).toEqual("myDateField=le=2020-10-06T23:59:59+00:00");
   });
 });
