@@ -61,6 +61,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
               name="organizations"
               filter={filterBy(["name"])}
               model="agent-api/organization"
+              isMulti={true}
               optionLabel={organization => organization.name}
             />
           </div>

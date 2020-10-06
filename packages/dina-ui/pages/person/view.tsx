@@ -30,7 +30,9 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
           byPassView={true}
         />
       </ButtonBar>
-      <Query<Person> query={{ path: `agent-api/person/${id}` }}>
+      <Query<Person>
+        query={{ path: `agent-api/person/${id}?include=organizations` }}
+      >
         {({ loading, response }) => {
           const person = response && {
             ...response.data
