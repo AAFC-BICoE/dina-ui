@@ -127,8 +127,8 @@ function toPredicate(filterRow: FilterRowModel) {
     }
   }
   // override compare if this is date type, which only has greater and less than
-  if (predicate === "GREATER_THAN") {
-    compare = "=gt=";
+  if (predicate === "GREATER_THAN_OR_EQUAL") {
+    compare = "=ge=";
   } else if (predicate === "LESS_THAN") {
     compare = "=lt=";
   }

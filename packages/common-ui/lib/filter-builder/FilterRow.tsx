@@ -11,7 +11,11 @@ import moment from "moment";
 import { ResourceSelect } from "../resource-select/ResourceSelect";
 import { KitsuResource } from "kitsu";
 
-export type FilterRowPredicate = "IS" | "IS NOT" | "GREATER_THAN" | "LESS_THAN";
+export type FilterRowPredicate =
+  | "IS"
+  | "IS NOT"
+  | "GREATER_THAN_OR_EQUAL"
+  | "LESS_THAN";
 export type FilterRowSearchType =
   | "PARTIAL_MATCH"
   | "EXACT_MATCH"
@@ -93,13 +97,15 @@ export class FilterRow extends React.Component<FilterRowProps> {
             value={selectedAttributeOption}
           />
         </div>
-        <div className="list-inline-item" style={{ width: 180 }}>
+        <div className="list-inline-item" style={{ width: 230 }}>
           <Select
             className="filter-predicate"
             instanceId={`predicate_${model.id}`}
             options={predicateTypes}
             onChange={this.onPredicateChanged}
-            value={{ label: model.predicate, value: model.predicate }}
+            value={predicateTypes.find(
+              option => option.value === model.predicate
+            )}
           />
         </div>
 
@@ -192,7 +198,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
     if (attribute.type === "DATE") {
       this.props.model.value = moment().format();
-      this.props.model.predicate = "GREATER_THAN";
+      this.props.model.predicate = "GREATER_THAN_OR_EQUAL";
     } else if (attribute.type === "STRING") {
       this.props.model.value = "";
       this.props.model.searchType = "PARTIAL_MATCH";
@@ -282,8 +288,8 @@ const BOOLEAN_PREDICATE_OPTIONS: DropdownOption<FilterRowPredicate>[] = [
 /** Predicate dropdown options for filtering on date attributes. */
 const DATE_PREDICATE_OPTIONS: DropdownOption<FilterRowPredicate>[] = [
   {
-    label: <CommonMessage id="filterGreaterThan" />,
-    value: "GREATER_THAN"
+    label: <CommonMessage id="filterGreaterThanOrEqual" />,
+    value: "GREATER_THAN_OR_EQUAL"
   },
   {
     label: <CommonMessage id="filterLessThan" />,
