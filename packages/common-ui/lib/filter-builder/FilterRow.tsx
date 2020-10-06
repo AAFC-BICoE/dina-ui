@@ -1,18 +1,17 @@
+import { KitsuResource } from "kitsu";
+import moment from "moment";
 import React from "react";
+import DatePicker from "react-datepicker";
 import Select from "react-select";
 import { CommonMessage } from "../intl/common-ui-intl";
+import { ResourceSelect } from "../resource-select/ResourceSelect";
 import { FilterAttribute, FilterAttributeConfig } from "./FilterBuilder";
 import {
   FilterBuilderContext,
   FilterBuilderContextI
 } from "./FilterBuilderContext";
-import DatePicker from "react-datepicker";
-import moment from "moment";
-import { ResourceSelect } from "../resource-select/ResourceSelect";
-import { KitsuResource } from "kitsu";
-import { isPlainObject } from "lodash";
 
-export type FilterRowPredicate = "IS" | "IS NOT" | "GREATER_THAN" | "LESS_THAN";
+export type FilterRowPredicate = "IS" | "IS NOT" | "FROM" | "UNTIL";
 
 export type FilterRowSearchType =
   | "PARTIAL_MATCH"
@@ -196,7 +195,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
     if (attribute.type === "DATE") {
       this.props.model.value = moment().format();
-      this.props.model.predicate = "GREATER_THAN";
+      this.props.model.predicate = "FROM";
     } else if (attribute.type === "STRING") {
       this.props.model.value = "";
       this.props.model.searchType = "PARTIAL_MATCH";
@@ -286,12 +285,20 @@ const BOOLEAN_PREDICATE_OPTIONS: DropdownOption<FilterRowPredicate>[] = [
 /** Predicate dropdown options for filtering on date attributes. */
 const DATE_PREDICATE_OPTIONS: DropdownOption<FilterRowPredicate>[] = [
   {
-    label: <CommonMessage id="filterGreaterThan" />,
-    value: "GREATER_THAN"
+    label: <CommonMessage id="IS" />,
+    value: "IS"
   },
   {
-    label: <CommonMessage id="filterLessThan" />,
-    value: "LESS_THAN"
+    label: <CommonMessage id="ISNOT" />,
+    value: "IS NOT"
+  },
+  {
+    label: <CommonMessage id="filterFrom" />,
+    value: "FROM"
+  },
+  {
+    label: <CommonMessage id="filterUntil" />,
+    value: "UNTIL"
   }
 ];
 

@@ -4,6 +4,17 @@ import { FilterAttributeConfig } from "./FilterBuilder";
 import { FilterGroupModel } from "./FilterGroup";
 import { FilterRowModel } from "./FilterRow";
 
+interface RsqlOperand {
+  arguments: string | string[];
+  comparison: string;
+  selector: string;
+}
+
+interface RsqlOperandGroup {
+  operands: (RsqlOperand | RsqlOperandGroup)[];
+  operator: string;
+}
+
 /** Converts a FilterGroupModel to an RSQL expression. */
 export function rsql(filter: FilterGroupModel | null): string {
   if (!filter) {
@@ -13,7 +24,7 @@ export function rsql(filter: FilterGroupModel | null): string {
 }
 
 /** Converts a FilterGroupModel to an RSQL expression. */
-function toGroup(filterGroup: FilterGroupModel) {
+function toGroup(filterGroup: FilterGroupModel): RsqlOperandGroup {
   const { children, operator } = filterGroup;
 
   return {
@@ -41,7 +52,9 @@ function toGroup(filterGroup: FilterGroupModel) {
 }
 
 /** Converts a FilterRowModel to an RSQL expression. */
-function toPredicate(filterRow: FilterRowModel) {
+function toPredicate(
+  filterRow: FilterRowModel
+): RsqlOperandGroup | RsqlOperand {
   const { attribute, predicate, searchType, value } = filterRow;
 
   const attributeConfig: FilterAttributeConfig =
@@ -95,21 +108,9 @@ function toPredicate(filterRow: FilterRowModel) {
         .split("-")
         .sort((a, b) => Number(a) - Number(b));
 
-      return {
-        operands: [
-          {
-            arguments: low,
-            comparison: predicate === "IS NOT" ? "=lt=" : "=gt=",
-            selector
-          },
-          {
-            arguments: high,
-            comparison: predicate === "IS NOT" ? "=gt=" : "=lt=",
-            selector
-          }
-        ],
-        operator: predicate === "IS NOT" ? "OR" : "AND"
-      };
+      const positive = predicate === "IS";
+
+      return betweenOperand({ low, high, positive, selector });
     });
 
     return {
@@ -132,27 +133,69 @@ function toPredicate(filterRow: FilterRowModel) {
       compare = predicate === "IS NOT" ? "!=" : "==";
     }
   }
-  // override compare if this is date type, which only has greater and less than
-  if (predicate === "GREATER_THAN") {
-    compare = "=ge=";
-    if (attributeConfig.type === "DATE") {
+
+  // Handle date searches:
+  if (attributeConfig.type === "DATE") {
+    const beginningOfDay = new Date(searchValue);
+    beginningOfDay.setHours(0, 0, 0, 0);
+    const beginningOfDayString = moment(beginningOfDay).format();
+
+    const endOfDay = new Date(searchValue);
+    endOfDay.setHours(23, 59, 59, 999);
+    const endOfDayString = moment(endOfDay).format();
+
+    if (predicate === "FROM") {
+      compare = "=ge=";
       // GreaterThan searches should match from the beginning of the chosen day:
-      const beginningOfDay = new Date(searchValue);
-      beginningOfDay.setHours(0, 0, 0, 0);
-      searchValue = moment(beginningOfDay).format();
-    }
-  } else if (predicate === "LESS_THAN") {
-    compare = "=le=";
-    if (attributeConfig.type === "DATE") {
+      searchValue = beginningOfDayString;
+    } else if (predicate === "UNTIL") {
+      compare = "=le=";
       // LessThan searches should match from the end of the chosen day:
-      const endOfDay = new Date(searchValue);
-      endOfDay.setHours(23, 59, 59, 999);
-      searchValue = moment(endOfDay).format();
+      searchValue = endOfDayString;
+    } else if (predicate === "IS" || predicate === "IS NOT") {
+      return betweenOperand({
+        low: beginningOfDayString,
+        high: endOfDayString,
+        positive: predicate === "IS",
+        selector
+      });
     }
   }
+
   return {
     arguments: searchValue,
     comparison: compare,
     selector
+  };
+}
+
+interface BetweenOperandParams {
+  selector: string;
+  low: string | string[];
+  high: string | string[];
+  positive: boolean;
+}
+
+/** Creates a "between"-type operand given low and high values. */
+function betweenOperand({
+  low,
+  high,
+  positive,
+  selector
+}: BetweenOperandParams): RsqlOperandGroup {
+  return {
+    operands: [
+      {
+        arguments: low,
+        comparison: positive ? "=ge=" : "=lt=",
+        selector
+      },
+      {
+        arguments: high,
+        comparison: positive ? "=le=" : "=gt=",
+        selector
+      }
+    ],
+    operator: positive ? "AND" : "OR"
   };
 }
