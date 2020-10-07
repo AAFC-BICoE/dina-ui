@@ -25,12 +25,14 @@ export function FieldView(props: FieldViewProps) {
               <Link href={link}>
                 <a>{value}</a>
               </Link>
-            ) : Array.isArray(value) ? (
-              value
+            ) : Array.isArray(value.data) ? (
+              value.data
                 .map(val => (val.name ? val.name : JSON.stringify(val)))
                 .join()
-            ) : (
+            ) : typeof value === "string" ? (
               value
+            ) : (
+              value.toString()
             )}
           </p>
         </FieldWrapper>

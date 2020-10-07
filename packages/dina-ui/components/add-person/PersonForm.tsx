@@ -29,6 +29,17 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   const id = person?.id;
 
   const onSubmit = safeSubmit(async submittedValues => {
+    const submitCopy = { ...submittedValues };
+    submittedValues.relationships = {};
+    submittedValues.relationships.organizations = {};
+    submittedValues.relationships.organizations.data = [];
+    submitCopy.organizations.map(org =>
+      submittedValues.relationships.organizations.data.push({
+        id: org.id,
+        type: "organization"
+      })
+    );
+    delete submittedValues.organizations;
     await save(
       [
         {
