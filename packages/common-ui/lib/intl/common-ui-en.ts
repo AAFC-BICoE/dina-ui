@@ -13,6 +13,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   createButtonText: "Create New",
   deleteButtonText: "Delete",
   editButtonText: "Edit",
+  filterBetween: "BETWEEN",
   filterBlankField: "Blank Field",
   filterExactMatch: "Exact Match",
   filterFrom: "FROM",

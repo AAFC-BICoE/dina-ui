@@ -372,4 +372,71 @@ describe("rsql conversion", () => {
     // Less than or equal to {end of day}:
     expect(rsqlFilter).toEqual("myDateField=le=2020-10-06T23:59:59+00:00");
   });
+
+  it("Allows date BETWEEN filter.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: {
+            name: "myDateField",
+            label: "My Date Field",
+            type: "DATE"
+          },
+          id: 1,
+          predicate: "BETWEEN",
+          searchType: "PARTIAL_MATCH",
+          type: "FILTER_ROW",
+          value: {
+            low:
+              "Tue Oct 06 2020 20:14:30 GMT+0000 (Coordinated Universal Time)",
+            high:
+              "Tue Oct 12 2020 21:05:30 GMT+0000 (Coordinated Universal Time)"
+          }
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const rsqlFilter = rsql(model);
+    // From the beginning date to the end date:
+    expect(rsqlFilter).toEqual(
+      "myDateField=ge=2020-10-06T00:00:00+00:00;myDateField=le=2020-10-12T23:59:59+00:00"
+    );
+  });
+
+  it("Allows date BETWEEN filter with a backwards range.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: {
+            name: "myDateField",
+            label: "My Date Field",
+            type: "DATE"
+          },
+          id: 1,
+          predicate: "BETWEEN",
+          searchType: "PARTIAL_MATCH",
+          type: "FILTER_ROW",
+          value: {
+            // The high and low values are backwards:
+            low:
+              "Tue Oct 12 2020 21:05:30 GMT+0000 (Coordinated Universal Time)",
+            high:
+              "Tue Oct 06 2020 20:14:30 GMT+0000 (Coordinated Universal Time)"
+          }
+        }
+      ],
+      id: 6,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const rsqlFilter = rsql(model);
+    // From the beginning date to the end date:
+    expect(rsqlFilter).toEqual(
+      "myDateField=ge=2020-10-06T00:00:00+00:00;myDateField=le=2020-10-12T23:59:59+00:00"
+    );
+  });
 });
