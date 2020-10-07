@@ -11,17 +11,19 @@ export interface FilterRowDatePickerProps {
   isRange: boolean;
   value: string | DateRange;
   onDateValueChanged: (date: string | DateRange | null) => void;
+  defaultDate?: () => Date;
 }
 
 /** Single-date and date-range picker for the FilterRow. */
 export function FilterRowDatePicker({
+  defaultDate = () => new Date(),
   isRange,
   onDateValueChanged,
   value
 }: FilterRowDatePickerProps) {
   // Set a default value when the user switches between single-date and range inputs:
   useEffect(() => {
-    const today = new Date().toString();
+    const today = defaultDate().toString();
     // Init default DateRange:
     if (isRange && !isPlainObject(value)) {
       onDateValueChanged({ low: today, high: today });
@@ -63,7 +65,7 @@ export function FilterRowDatePicker({
     const selected =
       typeof value === "string"
         ? isNaN(Date.parse(value))
-          ? new Date()
+          ? defaultDate()
           : new Date(value)
         : null;
 
