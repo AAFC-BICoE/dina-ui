@@ -68,9 +68,8 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
           <div style={{ maxWidth: "20rem" }}>
             <TextField name="email" />
           </div>
-          <div className="row">
+          <div style={{ maxWidth: "20rem" }}>
             <ResourceSelectField<Organization>
-              className="col-md-2"
               name="organizations"
               filter={filterBy(["name"])}
               model="agent-api/organization"
