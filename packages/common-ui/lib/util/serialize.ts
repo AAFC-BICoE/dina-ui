@@ -40,6 +40,7 @@ export async function serialize<TData extends KitsuResource>({
   // The "links" and "relationships" attributes are not supported by kitsu-core's serializer, so
   // we remove themhere.
   delete (resourceCopy as any).links;
+  const origRelationship = (resourceCopy as any).relationships;
   delete (resourceCopy as any).relationships;
 
   const nestedObjects = getNestedObjects(resourceCopy);
@@ -66,6 +67,8 @@ export async function serialize<TData extends KitsuResource>({
   }
 
   data.attributes = { ...data.attributes, ...nestedObjects };
+  if (origRelationship && Object.keys(origRelationship).length !== 0)
+    data.relationships = { ...origRelationship };
 
   return data;
 }

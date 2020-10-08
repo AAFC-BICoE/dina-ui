@@ -2,15 +2,18 @@ import {
   ApiClientContext,
   DeleteButton,
   ErrorViewer,
+  filterBy,
   safeSubmit,
   SubmitButton,
   TextField,
   useModal
 } from "common-ui";
 import { Form, Formik } from "formik";
+import { Organization } from "packages/dina-ui/types/objectstore-api/resources/Organization";
 import { useContext } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
+import { ResourceSelectField } from "common-ui/lib";
 
 interface PersonFormProps {
   person?: Person;
@@ -26,6 +29,19 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   const id = person?.id;
 
   const onSubmit = safeSubmit(async submittedValues => {
+    const submitCopy = { ...submittedValues };
+    if (submitCopy.organizations) {
+      submittedValues.relationships = {};
+      submittedValues.relationships.organizations = {};
+      submittedValues.relationships.organizations.data = [];
+      submitCopy.organizations.map(org =>
+        submittedValues.relationships.organizations.data.push({
+          id: org.id,
+          type: "organization"
+        })
+      );
+      delete submittedValues.organizations;
+    }
     await save(
       [
         {
@@ -51,6 +67,15 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
           </div>
           <div style={{ maxWidth: "20rem" }}>
             <TextField name="email" />
+          </div>
+          <div style={{ maxWidth: "20rem" }}>
+            <ResourceSelectField<Organization>
+              name="organizations"
+              filter={filterBy(["name"])}
+              model="agent-api/organization"
+              isMulti={true}
+              optionLabel={organization => organization.name}
+            />
           </div>
           <div className="form-group">
             <SubmitButton />
