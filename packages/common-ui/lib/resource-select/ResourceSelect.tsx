@@ -125,7 +125,8 @@ export function ResourceSelect<TData extends KitsuResource>({
     const isArr = Array.isArray(value);
     selectValue = ((isArr
       ? value
-      : (value ? value.data : []) || []) as PersistedResource<TData>[]).map(
+      : // tslint:disable-next-line: no-string-literal
+        (value ? value["data"] : []) || []) as PersistedResource<TData>[]).map(
       resource => ({
         label: optionLabel(resource),
         resource,
