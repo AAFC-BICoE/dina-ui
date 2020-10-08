@@ -1,4 +1,5 @@
 import { OperationsResponse } from "common-ui";
+import { Organization } from "packages/dina-ui/types/objectstore-api/resources/Organization";
 import PersonEditPage from "../../../pages/person/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Person } from "../../../types/objectstore-api/resources/Person";
@@ -22,9 +23,11 @@ let mockQuery: any = {};
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
   // The get request will return the existing person.
-  if (model === "agent-api/person/1") {
+  if (model === "agent-api/person/1?include=organizations") {
     // The request returns the test person.
     return { data: TEST_AGENT };
+  } else if (model === "agent-api/organization") {
+    return { data: TEST_ORGANIZATIONS };
   }
 });
 
@@ -39,7 +42,6 @@ describe("person edit page", () => {
     jest.clearAllMocks();
     mockQuery = {};
   });
-
   it("Provides a form to add a person.", async () => {
     mockPatch.mockReturnValueOnce({
       data: [
@@ -206,3 +208,18 @@ const TEST_AGENT: Person = {
   type: "person",
   uuid: "323423-23423-234"
 };
+
+const TEST_ORGANIZATIONS: Organization[] = [
+  {
+    name: "Org1",
+    uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
+    id: "1",
+    type: "organization"
+  },
+  {
+    name: "Org2",
+    uuid: "1756a90f-5cf8-410e-b3d4-bfe19e8db484",
+    id: "2",
+    type: "organization"
+  }
+];
