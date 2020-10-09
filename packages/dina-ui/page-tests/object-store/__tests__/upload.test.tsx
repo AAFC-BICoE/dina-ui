@@ -1,10 +1,10 @@
-import { cleanup, fireEvent, render } from "@testing-library/react";
-import { AccountContextI } from "common-ui";
+import { AccountContextI, OnFormikSubmit } from "common-ui";
 import { noop } from "lodash";
+import { FileUploader, IFileWithMeta, IMeta } from "../../../components";
 import UploadPage, {
   fileUploadErrorHandler
 } from "../../../pages/object-store/upload";
-import { MockAppContextProvider } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 
 const mockPush = jest.fn();
 
@@ -26,37 +26,18 @@ const MOCK_ACCOUNT_CONTEXT: AccountContextI = {
 };
 
 describe("Upload page", () => {
-  let files;
   beforeEach(() => {
     jest.clearAllMocks();
-    files = [createFile("file1.pdf", 1111, "application/pdf")];
   });
 
-  afterEach(cleanup);
+  it("renders FileUploader with the necessary props", () => {
+    const wrapper = mountWithAppContext(<UploadPage />, {
+      accountContext: MOCK_ACCOUNT_CONTEXT
+    });
 
-  it("renders the root and input nodes with the necessary props", () => {
-    const { container } = render(
-      <MockAppContextProvider accountContext={MOCK_ACCOUNT_CONTEXT}>
-        <UploadPage />
-      </MockAppContextProvider>
+    expect(wrapper.find(FileUploader).prop("acceptedFileTypes")).toEqual(
+      "image/*,audio/*,video/*,.pdf,.doc,.docx,.png"
     );
-    const rootDiv = container.querySelector("div#dndRoot");
-    expect(rootDiv).toHaveProperty("style.border-color");
-    expect(rootDiv?.querySelector("div.root>input")).toHaveProperty("multiple");
-  });
-
-  it("When dropped the files, page shows file names", async () => {
-    const event = createDtWithFiles(files);
-    const ui = (
-      <MockAppContextProvider accountContext={MOCK_ACCOUNT_CONTEXT}>
-        <UploadPage />
-      </MockAppContextProvider>
-    );
-    const { container } = render(ui);
-    const dropzone = container.querySelector(".root");
-    dispatchEvt(dropzone, "drop", event);
-    await flushPromises(ui, container);
-    expect(container.querySelector("a[href$='file1.pdf']")).toBeDefined();
   });
 
   it("Uploads files when you click the Upload button", async () => {
@@ -77,7 +58,7 @@ describe("Upload page", () => {
       }))
     );
 
-    const mockCtx = {
+    const mockApiCtx = {
       apiClient: {
         axios: {
           post: mockPost
@@ -86,33 +67,37 @@ describe("Upload page", () => {
       save: mockSave
     };
 
-    const event = createDtWithFiles([
-      createFile("file1.pdf", 1111, "application/pdf"),
-      createFile("file2.pdf", 1111, "application/pdf"),
-      createFile("file3.pdf", 1111, "application/pdf")
-    ]);
+    const wrapper = mountWithAppContext(<UploadPage />, {
+      accountContext: MOCK_ACCOUNT_CONTEXT,
+      apiContext: mockApiCtx as any
+    });
 
-    const ui = (
-      <MockAppContextProvider
-        accountContext={MOCK_ACCOUNT_CONTEXT}
-        apiContext={mockCtx as any}
-      >
-        <UploadPage />
-      </MockAppContextProvider>
-    );
-    const { container } = render(ui);
-    const dropzone = container.querySelector(".root");
-    dispatchEvt(dropzone, "drop", event);
-    await flushPromises(ui, container);
+    // Pretend the FileUploader is uploading these files:
+    const mockAcceptedFiles: Partial<IFileWithMeta>[] = [
+      {
+        file: { name: "file1.pdf", type: "application/pdf" } as File,
+        meta: { lastModifiedDate: "2019-08-28T20:37:21.502Z" } as IMeta
+      },
+      {
+        file: { name: "file2.pdf", type: "application/pdf" } as File,
+        meta: { lastModifiedDate: "2019-08-29T20:37:21.502Z" } as IMeta
+      },
+      {
+        file: { name: "file3.pdf", type: "application/pdf" } as File,
+        meta: { lastModifiedDate: "2019-08-30T20:37:21.502Z" } as IMeta
+      }
+    ];
 
-    fireEvent(
-      container.querySelector("button[type='submit']") as any,
-      new MouseEvent("click", {
-        bubbles: true,
-        cancelable: true
-      })
+    // Call the onSubmit funciton with uploaded files:
+    wrapper.find(FileUploader).prop<OnFormikSubmit>("onSubmit")(
+      {
+        acceptedFiles: mockAcceptedFiles,
+        group: "example-group"
+      },
+      null as any
     );
-    await flushPromises(ui, container);
+
+    await new Promise(setImmediate);
 
     // The group name should be in the URL:
     expect(mockPost).lastCalledWith(
@@ -127,6 +112,7 @@ describe("Upload page", () => {
       [
         {
           resource: {
+            acDigitizationDate: "2019-08-28T20:37:21+00:00",
             acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
             bucket: "example-group",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
@@ -136,6 +122,7 @@ describe("Upload page", () => {
         },
         {
           resource: {
+            acDigitizationDate: "2019-08-29T20:37:21+00:00",
             acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
             bucket: "example-group",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
@@ -145,6 +132,7 @@ describe("Upload page", () => {
         },
         {
           resource: {
+            acDigitizationDate: "2019-08-30T20:37:21+00:00",
             acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
             bucket: "example-group",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
@@ -180,56 +168,10 @@ describe("Upload page", () => {
   });
 
   it("Only renders if the user belongs a group", () => {
-    const ui = (
-      <MockAppContextProvider
-        accountContext={{ ...MOCK_ACCOUNT_CONTEXT, groupNames: [] }}
-      >
-        <UploadPage />
-      </MockAppContextProvider>
-    );
-    const { container } = render(ui);
+    const wrapper = mountWithAppContext(<UploadPage />, {
+      accountContext: { ...MOCK_ACCOUNT_CONTEXT, groupNames: [] }
+    });
 
-    expect(container.querySelector(".no-group-alert")).toBeTruthy();
+    expect(wrapper.find(".no-group-alert")).toBeTruthy();
   });
 });
-
-function createFile(name, size, type) {
-  const file = new File([], name, { type });
-  Object.defineProperty(file, "size", {
-    get() {
-      return size;
-    }
-  });
-  return file;
-}
-
-function createDtWithFiles(files: File[] = []) {
-  return {
-    dataTransfer: {
-      files,
-      items: files.map(file => ({
-        getAsFile: () => file,
-        kind: "file",
-        type: file.type
-      })),
-      types: ["Files"]
-    }
-  };
-}
-
-function dispatchEvt(node, type, data) {
-  const event = new Event(type, { bubbles: true });
-  Object.assign(event, data);
-
-  event.preventDefault();
-  node.dispatchEvent(event);
-}
-
-function flushPromises(ui, container) {
-  return new Promise(resolve =>
-    global.setImmediate(() => {
-      render(ui, { container });
-      resolve(container);
-    })
-  );
-}

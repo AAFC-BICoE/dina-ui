@@ -1,6 +1,7 @@
 import { KitsuResource } from "kitsu";
+import { Organization } from "./Organization";
 
-export interface AgentAttributes {
+export interface PersonAttributes {
   type: "person";
   displayName: string;
   email: string;
@@ -9,4 +10,8 @@ export interface AgentAttributes {
   createdOn?: string;
 }
 
-export type Person = KitsuResource & AgentAttributes;
+export interface PersonRelationships {
+  organizations?: Organization[];
+}
+
+export type Person = KitsuResource & PersonAttributes & PersonRelationships;

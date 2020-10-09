@@ -68,6 +68,10 @@ export default function MetadataListPage() {
       type: "DATE"
     },
     {
+      name: "xmpMetadataDate",
+      type: "DATE"
+    },
+    {
       name: "acMetadataCreator",
       type: "DROPDOWN",
       resourcePath: "agent-api/person",
@@ -85,10 +89,9 @@ export default function MetadataListPage() {
       sortable: false
     },
     "originalFilename",
-    "dcFormat",
     dateCell("acDigitizationDate"),
     dateCell("xmpMetadataDate"),
-    "acMetadataCreator.displayName",
+    { accessor: "acMetadataCreator.displayName", sortable: false },
     {
       Cell: ({ original: { acTags } }) => <>{acTags?.join(", ")}</>,
       accessor: "acTags"
