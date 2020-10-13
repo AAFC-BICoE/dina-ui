@@ -29,7 +29,13 @@ export function FieldView(props: FieldViewProps) {
               </Link>
             ) : Array.isArray(value) ? (
               value
-                .map(val => (val.name ? val.name : JSON.stringify(val)))
+                .map(val =>
+                  val.name
+                    ? val.name
+                    : typeof val === "string"
+                    ? val
+                    : JSON.stringify(val)
+                )
                 .join()
             ) : typeof value === "string" ? (
               value
