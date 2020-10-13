@@ -1,10 +1,7 @@
-import { COMMON_UI_MESSAGES_ENGLISH } from "common-ui";
-
 /**
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
-  ...COMMON_UI_MESSAGES_ENGLISH,
   addFilesButton: "Add Files",
   addManagedAttributeButtonText: "Add New Managed Attribute",
   addObjectSubtypeTitle: "Add New Object Subtype",
