@@ -125,9 +125,11 @@ describe("organization edit page", () => {
     wrapper.update();
 
     // Check that the existing aliases value is in the field.
-    expect(wrapper.find(".aliases-field input").prop("value")).toEqual(
-      "DEW,ACE"
-    );
+
+    expect(wrapper.find(".aliases-field input").prop("value")).toEqual([
+      "DEW",
+      "ACE"
+    ]);
 
     // Modify the aliases value.
     wrapper.find(".aliases-field input").simulate("change", {
@@ -148,7 +150,7 @@ describe("organization edit page", () => {
             path: "organization/1",
             value: {
               attributes: expect.objectContaining({
-                aliases: "DEW"
+                aliases: ["DEW"]
               }),
               id: "1",
               type: "organization"
@@ -171,7 +173,7 @@ describe("organization edit page", () => {
         {
           errors: [
             {
-              detail: "displayName and email combination should be unique",
+              detail: "Name should not be blank",
               status: "422",
               title: "Constraint violation"
             }
@@ -193,7 +195,7 @@ describe("organization edit page", () => {
     setImmediate(() => {
       wrapper.update();
       expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-        "Constraint violation: name should be unique"
+        "Constraint violation: Name should not be blank"
       );
       expect(mockPush).toBeCalledTimes(0);
       done();

@@ -11,8 +11,7 @@ import {
   TextField
 } from "common-ui";
 import { Form, Formik } from "formik";
-import { WithRouterProps } from "next/dist/client/with-router";
-import { NextRouter, withRouter } from "next/router";
+import { useRouter, NextRouter } from "next/router";
 import { useContext } from "react";
 import { Organization } from "../../types/objectstore-api/resources/Organization";
 import { Head, Nav } from "../../components";
@@ -23,8 +22,11 @@ interface OrganizationFormProps {
   router: NextRouter;
 }
 
-export function OrganizationEditPage({ router }: WithRouterProps) {
-  const { id } = router.query;
+export default function OrganizationEditPage() {
+  const router = useRouter();
+  const {
+    query: { id }
+  } = router;
   const { formatMessage } = useDinaIntl();
 
   return (
@@ -127,5 +129,3 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
     </Formik>
   );
 }
-
-export default withRouter(OrganizationEditPage);
