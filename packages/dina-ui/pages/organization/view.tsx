@@ -56,7 +56,38 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
                 >
                   <div>
                     <div className="row">
-                      <FieldView className="col-md-2" name="name" />
+                      {organization.names.length === 2 ? (
+                        <>
+                          <FieldView
+                            className="col-md-2"
+                            name="names[0].name"
+                            label={
+                              organization.names[0].languageCode === "EN"
+                                ? formatMessage("organizationEnglishNameLabel")
+                                : formatMessage("organizationFrenchNameLabel")
+                            }
+                          />
+                          <FieldView
+                            className="col-md-2"
+                            name="names[1].name"
+                            label={
+                              organization.names[1].languageCode === "EN"
+                                ? formatMessage("organizationEnglishNameLabel")
+                                : formatMessage("organizationFrenchNameLabel")
+                            }
+                          />
+                        </>
+                      ) : (
+                        <FieldView
+                          className="col-md-2"
+                          name="names[0].name"
+                          label={
+                            organization.names[0].languageCode === "EN"
+                              ? formatMessage("organizationEnglishNameLabel")
+                              : formatMessage("organizationFrenchNameLabel")
+                          }
+                        />
+                      )}
                       <FieldView className="col-md-3" name="aliases" />
                       <FieldView className="col-md-2" name="createdBy" />
                       <FieldView className="col-md-2" name="createdOn" />

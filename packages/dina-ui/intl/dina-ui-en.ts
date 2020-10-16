@@ -87,6 +87,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   objectStoreTitle: "Object Store",
   objectSubtypeListTitle: "Object Subtypes",
   objectSubtypeTitle: "Object Subtype",
+  organizationEnglishNameLabel: "English Name",
+  organizationFrenchNameLabel: "French Name",
   organizationListTitle: "Organizations",
   organizationViewTitle: "View Organization",
   personListTitle: "Persons",

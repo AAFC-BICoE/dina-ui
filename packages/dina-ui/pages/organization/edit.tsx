@@ -13,7 +13,10 @@ import {
 import { Form, Formik } from "formik";
 import { useRouter, NextRouter } from "next/router";
 import { useContext } from "react";
-import { Organization } from "../../types/objectstore-api/resources/Organization";
+import {
+  MultiligualName,
+  Organization
+} from "../../types/objectstore-api/resources/Organization";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
@@ -79,6 +82,16 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
     if (aliases !== undefined) {
       submittedValues.aliases = aliases.split(",").map(a => a.trim());
     }
+    if (submittedValues.name !== undefined) {
+      const multiligualName: MultiligualName = {
+        languageCode:
+          submittedValues.names[0].languageCode === "FR" ? "EN" : "FR",
+        name: submittedValues.name
+      };
+      submittedValues.names.push(multiligualName);
+      delete submittedValues.name;
+    }
+
     await save(
       [
         {
@@ -114,9 +127,66 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
           />
         </ButtonBar>
         <div>
-          <div className="row">
-            <TextField className="col-md-4" name="name" />
-          </div>
+          {organization?.names.length === 2 ? (
+            <>
+              <div className="row">
+                <TextField
+                  className="col-md-4"
+                  name="names[0].name"
+                  label={
+                    organization.names[0].languageCode === "EN"
+                      ? formatMessage("organizationEnglishNameLabel")
+                      : formatMessage("organizationFrenchNameLabel")
+                  }
+                />
+              </div>
+              <div className="row">
+                <TextField
+                  className="col-md-4"
+                  name="names[1].name"
+                  label={
+                    organization.names[0].languageCode === "EN"
+                      ? formatMessage("organizationEnglishNameLabel")
+                      : formatMessage("organizationFrenchNameLabel")
+                  }
+                />
+              </div>
+            </>
+          ) : organization?.names[0].languageCode === "FR" ? (
+            <>
+              <div className="row">
+                <TextField
+                  className="col-md-4"
+                  name="names[0].name"
+                  label={formatMessage("organizationFrenchNameLabel")}
+                />
+              </div>
+              <div className="row">
+                <TextField
+                  className="col-md-4"
+                  name="name"
+                  label={formatMessage("organizationEnglishNameLabel")}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="row">
+                <TextField
+                  className="col-md-4"
+                  name="names[0].name"
+                  label={formatMessage("organizationEnglishNameLabel")}
+                />
+              </div>
+              <div className="row">
+                <TextField
+                  className="col-md-4"
+                  name="name"
+                  label={formatMessage("organizationFrenchNameLabel")}
+                />
+              </div>
+            </>
+          )}
           <div className="row">
             <TextField
               className="col-md-4"

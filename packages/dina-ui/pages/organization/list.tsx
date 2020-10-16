@@ -12,9 +12,17 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 const ORGANIZATION_FILTER_ATTRIBUTES = ["name", "aliases", "createdBy"];
 const ORGANIZATION_TABLE_COLUMNS = [
   {
-    Cell: ({ original: { id, name } }) => (
+    Cell: ({ original: { id, names } }) => (
       <Link href={`/organization/view?id=${id}`}>
-        <a>{name}</a>
+        {names.length === 2 ? (
+          <a>
+            {names[0].languageCode === "EN"
+              ? names[0].name + "|" + names[1].name
+              : names[1].name + "|" + names[0].name}
+          </a>
+        ) : (
+          <a>names[0].name</a>
+        )}
       </Link>
     ),
     accessor: "name"
