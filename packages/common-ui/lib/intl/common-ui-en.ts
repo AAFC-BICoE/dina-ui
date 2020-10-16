@@ -26,5 +26,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   resetButtonText: "Reset",
   submitBtnText: "Save",
   tableTotalCount: "Total matched records: {totalCount}",
+  queryTableMultiSortExplanation:
+    "To sort by multiple columns: Click one column header to sort by that column, then press shift while you click an additional header.",
+  queryTableMultiSortTooltipTitle: "Multi-column sorting",
   yes: "Yes"
 };
