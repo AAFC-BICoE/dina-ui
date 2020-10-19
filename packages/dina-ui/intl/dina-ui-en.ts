@@ -96,5 +96,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   uploadPageTitle: "Upload Files",
   userMustBelongToGroup: "User must belong to a Group",
   valueLabel: "Value",
-  viewPreviewButtonText: "Preview"
+  viewPreviewButtonText: "Preview",
+  addOrganizationTitle: "Add New Organization",
+  editOrganizationTitle: "Edit Organization",
+  editOrganizationAliasesLabel: "Aliases (comma seperated)",
+  organizationListTitle: "Organizations",
+  organizationViewTitle: "View Organization"
 };
