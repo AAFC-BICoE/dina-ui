@@ -3,6 +3,7 @@ import { KitsuResource } from "kitsu";
 import { noop, toPairs } from "lodash";
 import { useRef, useState } from "react";
 import ReactTooltip from "react-tooltip";
+import { CommonMessage } from "../intl/common-ui-intl";
 
 export interface CheckBoxFieldProps<TData extends KitsuResource> {
   resource: TData;
@@ -11,9 +12,6 @@ export interface CheckBoxFieldProps<TData extends KitsuResource> {
 export interface GroupedCheckBoxesParams {
   fieldName: string;
 }
-
-const CHECK_ALL_TOOLTIP_MESSAGE =
-  "Check this header box to check all visible items in this page.";
 
 export function useGroupedCheckBoxes<TData extends KitsuResource>({
   fieldName
@@ -101,16 +99,20 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
 
     return (
       <div className="grouped-checkbox-header text-center">
-        Select <CheckAllCheckBox />
+        <CommonMessage id="select" /> <CheckAllCheckBox />
         <img
           src="/static/images/iconInformation.gif"
           data-tip={true}
-          data-for={CHECK_ALL_TOOLTIP_MESSAGE}
+          data-for="checkAllTooltipMessage"
         />
-        <ReactTooltip id={CHECK_ALL_TOOLTIP_MESSAGE}>
-          <span>{CHECK_ALL_TOOLTIP_MESSAGE}</span>
+        <ReactTooltip id="checkAllTooltipMessage">
+          <span>
+            <CommonMessage id="checkAllTooltipMessage" />
+          </span>
         </ReactTooltip>
-        <div>({totalChecked} selected)</div>
+        <div>
+          ({totalChecked} <CommonMessage id="selected" />)
+        </div>
       </div>
     );
   });
