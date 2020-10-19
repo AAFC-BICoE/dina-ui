@@ -211,13 +211,31 @@ const TEST_AGENT: Person = {
 
 const TEST_ORGANIZATIONS: Organization[] = [
   {
-    name: "Org1",
+    names: [
+      {
+        languageCode: "EN",
+        name: "org1"
+      },
+      {
+        languageCode: "FR",
+        name: "org1 Fr"
+      }
+    ],
     uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
     id: "1",
     type: "organization"
   },
   {
-    name: "Org2",
+    names: [
+      {
+        languageCode: "EN",
+        name: "org A"
+      },
+      {
+        languageCode: "FR",
+        name: "orgA Fr"
+      }
+    ],
     uuid: "1756a90f-5cf8-410e-b3d4-bfe19e8db484",
     id: "2",
     type: "organization"
