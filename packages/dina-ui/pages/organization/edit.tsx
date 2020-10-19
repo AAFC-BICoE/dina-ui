@@ -107,6 +107,8 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
     await router.push(`/organization/list`);
   });
 
+  const orgName1 = organization?.names[0];
+  const orgName2 = organization?.names[1];
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form translate={undefined}>
@@ -131,10 +133,10 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
             <>
               <div className="row">
                 <TextField
-                  className="col-md-4"
+                  className="col-md-4 name1"
                   name="names[0].name"
                   label={
-                    organization.names[0].languageCode === "EN"
+                    orgName1?.languageCode === "EN"
                       ? formatMessage("organizationEnglishNameLabel")
                       : formatMessage("organizationFrenchNameLabel")
                   }
@@ -142,28 +144,28 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
               </div>
               <div className="row">
                 <TextField
-                  className="col-md-4"
+                  className="col-md-4 name2"
                   name="names[1].name"
                   label={
-                    organization.names[0].languageCode === "EN"
+                    orgName2?.languageCode === "EN"
                       ? formatMessage("organizationEnglishNameLabel")
                       : formatMessage("organizationFrenchNameLabel")
                   }
                 />
               </div>
             </>
-          ) : organization?.names[0].languageCode === "FR" ? (
+          ) : orgName1?.languageCode === "FR" ? (
             <>
               <div className="row">
                 <TextField
-                  className="col-md-4"
+                  className="col-md-4 name1"
                   name="names[0].name"
                   label={formatMessage("organizationFrenchNameLabel")}
                 />
               </div>
               <div className="row">
                 <TextField
-                  className="col-md-4"
+                  className="col-md-4 name2"
                   name="name"
                   label={formatMessage("organizationEnglishNameLabel")}
                 />
@@ -173,14 +175,14 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
             <>
               <div className="row">
                 <TextField
-                  className="col-md-4"
+                  className="col-md-4 name1"
                   name="names[0].name"
                   label={formatMessage("organizationEnglishNameLabel")}
                 />
               </div>
               <div className="row">
                 <TextField
-                  className="col-md-4"
+                  className="col-md-4 name2"
                   name="name"
                   label={formatMessage("organizationFrenchNameLabel")}
                 />

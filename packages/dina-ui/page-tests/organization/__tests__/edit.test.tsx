@@ -43,7 +43,16 @@ describe("organization edit page", () => {
         {
           data: {
             attributes: {
-              name: "test org",
+              names: [
+                {
+                  languageCode: "EN",
+                  name: "test org"
+                },
+                {
+                  languageCode: "FR",
+                  name: "test org FR"
+                }
+              ],
               aliases: "ACE"
             },
             id: "1",
@@ -60,14 +69,15 @@ describe("organization edit page", () => {
       apiContext
     });
 
-    expect(wrapper.find(".name-field input")).toHaveLength(1);
+    expect(wrapper.find(".name1 input")).toHaveLength(1);
+    expect(wrapper.find(".name2 input")).toHaveLength(1);
 
     // Edit the name.
 
-    wrapper.find(".name-field input").simulate("change", {
+    wrapper.find(".name1 input").simulate("change", {
       target: {
-        name: "name",
-        value: "test organization updated"
+        name: "names[0].name",
+        value: "test org new"
       }
     });
 
@@ -83,7 +93,11 @@ describe("organization edit page", () => {
           path: "organization",
           value: {
             attributes: {
-              name: "test organization updated"
+              names: [
+                {
+                  name: "test org new"
+                }
+              ]
             },
             id: "00000000-0000-0000-0000-000000000000",
             type: "organization"
@@ -206,7 +220,12 @@ describe("organization edit page", () => {
 /** Test organization with all fields defined. */
 
 const TEST_ORGANIZATION: Organization = {
-  name: "Org1",
+  names: [
+    {
+      languageCode: "EN",
+      name: "Org1"
+    }
+  ],
   uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
   id: "1",
   type: "organization",

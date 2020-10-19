@@ -43,6 +43,9 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
             organization.createdOn = inUserTimeZone;
           }
 
+          const orgName1 = organization?.names[0];
+          const orgName2 = organization?.names[1];
+
           return (
             <div className="container-fluid">
               <h1>
@@ -62,7 +65,7 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
                             className="col-md-2"
                             name="names[0].name"
                             label={
-                              organization.names[0].languageCode === "EN"
+                              orgName1?.languageCode === "EN"
                                 ? formatMessage("organizationEnglishNameLabel")
                                 : formatMessage("organizationFrenchNameLabel")
                             }
@@ -71,7 +74,7 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
                             className="col-md-2"
                             name="names[1].name"
                             label={
-                              organization.names[1].languageCode === "EN"
+                              orgName2?.languageCode === "EN"
                                 ? formatMessage("organizationEnglishNameLabel")
                                 : formatMessage("organizationFrenchNameLabel")
                             }
@@ -82,7 +85,7 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
                           className="col-md-2"
                           name="names[0].name"
                           label={
-                            organization.names[0].languageCode === "EN"
+                            orgName1?.languageCode === "EN"
                               ? formatMessage("organizationEnglishNameLabel")
                               : formatMessage("organizationFrenchNameLabel")
                           }

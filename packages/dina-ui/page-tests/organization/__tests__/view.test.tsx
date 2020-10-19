@@ -4,7 +4,12 @@ import { Organization } from "../../../types/objectstore-api/resources/Organizat
 
 /** Test organization with all fields defined. */
 const TEST_ORGANIZATION: Organization = {
-  name: "organization a",
+  names: [
+    {
+      languageCode: "EN",
+      name: "organization a"
+    }
+  ],
   aliases: ["org1", "org2"],
   id: "1",
   type: "organization",
@@ -47,9 +52,9 @@ describe("Organization details page", () => {
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
     // The organization's name should be rendered in a FieldView.
-    expect(wrapper.containsMatchingElement(<strong>Name</strong>)).toEqual(
-      true
-    );
+    expect(
+      wrapper.containsMatchingElement(<strong>English Name</strong>)
+    ).toEqual(true);
     expect(wrapper.containsMatchingElement(<p>organization a</p>)).toEqual(
       true
     );
