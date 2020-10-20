@@ -1,9 +1,7 @@
 import { OperationsResponse } from "common-ui";
-import { Organization } from "packages/dina-ui/types/objectstore-api/resources/Organization";
-import PersonEditPage from "../../../pages/person/edit";
+import OrganizationEditPage from "../../../pages/organization/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { Person } from "../../../types/objectstore-api/resources/Person";
-
+import { Organization } from "../../../types/objectstore-api/resources/Organization";
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
@@ -22,12 +20,9 @@ let mockQuery: any = {};
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
-  // The get request will return the existing person.
-  if (model === "agent-api/person/1?include=organizations") {
-    // The request returns the test person.
-    return { data: TEST_AGENT };
-  } else if (model === "agent-api/organization") {
-    return { data: TEST_ORGANIZATIONS };
+  // The get request will return the existing organization.
+  if (model === "agent-api/organization/1") {
+    return { data: TEST_ORGANIZATION };
   }
 });
 
@@ -37,22 +32,31 @@ const apiContext: any = {
   apiClient: { get: mockGet, axios: { patch: mockPatch } }
 };
 
-describe("person edit page", () => {
+describe("organization edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockQuery = {};
   });
-  it("Provides a form to add a person.", async () => {
+  it("Provides a form to add an organization.", async () => {
     mockPatch.mockReturnValueOnce({
       data: [
         {
           data: {
             attributes: {
-              displayName: "test agemt",
-              email: "testperson@a.b"
+              names: [
+                {
+                  languageCode: "EN",
+                  name: "test org"
+                },
+                {
+                  languageCode: "FR",
+                  name: "test org FR"
+                }
+              ],
+              aliases: "ACE"
             },
             id: "1",
-            type: "person"
+            type: "organization"
           },
           status: 201
         }
@@ -61,16 +65,19 @@ describe("person edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext(<PersonEditPage />, { apiContext });
+    const wrapper = mountWithAppContext(<OrganizationEditPage />, {
+      apiContext
+    });
 
-    expect(wrapper.find(".displayName-field input")).toHaveLength(1);
+    expect(wrapper.find(".nameEN input")).toHaveLength(1);
+    expect(wrapper.find(".nameFR input")).toHaveLength(1);
 
-    // Edit the displayName.
+    // Edit the name.
 
-    wrapper.find(".displayName-field input").simulate("change", {
+    wrapper.find(".nameEN input").simulate("change", {
       target: {
-        name: "person",
-        value: "test person updated"
+        name: "name.EN",
+        value: "test org new"
       }
     });
 
@@ -83,32 +90,34 @@ describe("person edit page", () => {
       [
         {
           op: "POST",
-          path: "person",
+          path: "organization",
           value: {
             attributes: {
-              displayName: "test person updated"
+              names: [
+                {
+                  languageCode: "EN",
+                  name: "test org new"
+                }
+              ]
             },
             id: "00000000-0000-0000-0000-000000000000",
-            type: "person"
+            type: "organization"
           }
         }
       ],
       expect.anything()
     );
 
-    // The user should be redirected to the new person's details page.
-    expect(mockPush).lastCalledWith("/person/list");
+    // The user should be redirected to the new organization's details page.
+    expect(mockPush).lastCalledWith("/organization/list");
   });
 
-  it("Provides a form to edit an person.", async done => {
+  it("Provides a form to edit an organization.", async done => {
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
       data: [
         {
-          data: {
-            id: "1",
-            type: "person"
-          },
+          data: TEST_ORGANIZATION,
           status: 201
         }
       ] as OperationsResponse
@@ -116,7 +125,9 @@ describe("person edit page", () => {
 
     mockQuery = { id: 1 };
 
-    const wrapper = mountWithAppContext(<PersonEditPage />, { apiContext });
+    const wrapper = mountWithAppContext(<OrganizationEditPage />, {
+      apiContext
+    });
 
     // The page should load initially with a loading spinner.
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
@@ -125,14 +136,16 @@ describe("person edit page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Check that the existing displayName value is in the field.
-    expect(wrapper.find(".displayName-field input").prop("value")).toEqual(
-      "person a"
-    );
+    // Check that the existing aliases value is in the field.
 
-    // Modify the displayName value.
-    wrapper.find(".displayName-field input").simulate("change", {
-      target: { name: "displayName", value: "new test person" }
+    expect(wrapper.find(".aliases-field input").prop("value")).toEqual([
+      "DEW",
+      "ACE"
+    ]);
+
+    // Modify the aliases value.
+    wrapper.find(".aliases-field input").simulate("change", {
+      target: { name: "aliases", value: "DEW" }
     });
 
     // Submit the form.
@@ -146,21 +159,21 @@ describe("person edit page", () => {
         [
           {
             op: "PATCH",
-            path: "person/1",
+            path: "organization/1",
             value: {
               attributes: expect.objectContaining({
-                displayName: "new test person"
+                aliases: ["DEW"]
               }),
               id: "1",
-              type: "person"
+              type: "organization"
             }
           }
         ],
         expect.anything()
       );
 
-      // The user should be redirected to person's list page.
-      expect(mockPush).lastCalledWith("/person/list");
+      // The user should be redirected to organization's list page.
+      expect(mockPush).lastCalledWith("/organization/list");
       done();
     });
   });
@@ -172,7 +185,7 @@ describe("person edit page", () => {
         {
           errors: [
             {
-              detail: "displayName and email combination should be unique",
+              detail: "Name should not be blank",
               status: "422",
               title: "Constraint violation"
             }
@@ -184,7 +197,9 @@ describe("person edit page", () => {
 
     mockQuery = {};
 
-    const wrapper = mountWithAppContext(<PersonEditPage />, { apiContext });
+    const wrapper = mountWithAppContext(<OrganizationEditPage />, {
+      apiContext
+    });
 
     // Submit the form.
     wrapper.find("form").simulate("submit");
@@ -192,7 +207,7 @@ describe("person edit page", () => {
     setImmediate(() => {
       wrapper.update();
       expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-        "Constraint violation: displayName and email combination should be unique"
+        "Constraint violation: Name should not be blank"
       );
       expect(mockPush).toBeCalledTimes(0);
       done();
@@ -200,44 +215,17 @@ describe("person edit page", () => {
   });
 });
 
-/** Test person with all fields defined. */
-const TEST_AGENT: Person = {
-  displayName: "person a",
-  email: "testperson@a.b",
-  id: "1",
-  type: "person",
-  uuid: "323423-23423-234"
-};
+/** Test organization with all fields defined. */
 
-const TEST_ORGANIZATIONS: Organization[] = [
-  {
-    names: [
-      {
-        languageCode: "EN",
-        name: "org1"
-      },
-      {
-        languageCode: "FR",
-        name: "org1 Fr"
-      }
-    ],
-    uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
-    id: "1",
-    type: "organization"
-  },
-  {
-    names: [
-      {
-        languageCode: "EN",
-        name: "org A"
-      },
-      {
-        languageCode: "FR",
-        name: "orgA Fr"
-      }
-    ],
-    uuid: "1756a90f-5cf8-410e-b3d4-bfe19e8db484",
-    id: "2",
-    type: "organization"
-  }
-];
+const TEST_ORGANIZATION: Organization = {
+  names: [
+    {
+      languageCode: "EN",
+      name: "Org1"
+    }
+  ],
+  uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
+  id: "1",
+  type: "organization",
+  aliases: ["DEW", "ACE"]
+};

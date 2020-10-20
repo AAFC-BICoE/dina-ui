@@ -127,6 +127,11 @@ function NavAgentsDropdown() {
             <DinaMessage id="personListTitle" />
           </a>
         </Link>
+        <Link href="/organization/list">
+          <a className="dropdown-item">
+            <DinaMessage id="organizationListTitle" />
+          </a>
+        </Link>
       </div>
     </div>
   );

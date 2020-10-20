@@ -41,6 +41,7 @@ export * from "./page-split/SplitPagePanel";
 export * from "./resource-select/ResourceSelect";
 export * from "./table/QueryTable";
 export * from "./table/date-cell";
+export * from "./table/stringArray-cell";
 export * from "./tooltip/Tooltip";
 export * from "./util/rsql";
 export * from "./util/serialize";
