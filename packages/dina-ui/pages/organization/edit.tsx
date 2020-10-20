@@ -86,13 +86,14 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
     organization.name[organization.names[1]?.languageCode] =
       organization.names[1]?.name;
   }
-
   const onSubmit = safeSubmit(async submittedValues => {
     const aliases = submittedValues.aliases;
-    if (aliases !== undefined) {
+    if (Array.isArray(aliases)) {
       submittedValues.aliases = aliases.map(a => a.trim());
+    } else if (aliases !== undefined) {
+      submittedValues.aliases = [];
+      submittedValues.aliases[0] = aliases.trim();
     }
-
     submittedValues.names = [];
     if (submittedValues.name !== undefined) {
       const multiligualName: MultiligualName[] = [];
@@ -110,7 +111,7 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
       } else if (submittedValues.name.EN) {
         multiligualName[0] = {
           languageCode: "EN",
-          name: submittedValues.name.FR
+          name: submittedValues.name.EN
         };
       } else if (submittedValues.name.FR) {
         multiligualName[0] = {
@@ -164,14 +165,14 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
         <div>
           <div className="row">
             <TextField
-              className="col-md-4"
+              className="col-md-4 nameEN"
               name="name.EN"
               label={formatMessage("organizationEnglishNameLabel")}
             />
           </div>
           <div className="row">
             <TextField
-              className="col-md-4"
+              className="col-md-4 nameFR"
               name="name.FR"
               label={formatMessage("organizationFrenchNameLabel")}
             />

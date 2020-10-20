@@ -69,14 +69,14 @@ describe("organization edit page", () => {
       apiContext
     });
 
-    expect(wrapper.find(".name1 input")).toHaveLength(1);
-    expect(wrapper.find(".name2 input")).toHaveLength(1);
+    expect(wrapper.find(".nameEN input")).toHaveLength(1);
+    expect(wrapper.find(".nameFR input")).toHaveLength(1);
 
     // Edit the name.
 
-    wrapper.find(".name1 input").simulate("change", {
+    wrapper.find(".nameEN input").simulate("change", {
       target: {
-        name: "names[0].name",
+        name: "name.EN",
         value: "test org new"
       }
     });
@@ -95,6 +95,7 @@ describe("organization edit page", () => {
             attributes: {
               names: [
                 {
+                  languageCode: "EN",
                   name: "test org new"
                 }
               ]
@@ -116,10 +117,7 @@ describe("organization edit page", () => {
     mockPatch.mockReturnValueOnce({
       data: [
         {
-          data: {
-            id: "1",
-            type: "organization"
-          },
+          data: TEST_ORGANIZATION,
           status: 201
         }
       ] as OperationsResponse
