@@ -32,6 +32,8 @@ export function FieldView(props: FieldViewProps) {
                 .map(val =>
                   val.name
                     ? val.name
+                    : val.names
+                    ? val.names[0].name
                     : typeof val === "string"
                     ? val
                     : JSON.stringify(val)
