@@ -2,7 +2,7 @@ import { KitsuResource } from "kitsu";
 
 export interface OrganizationAttributes {
   type: "organization";
-  name?: string;
+  name?: Map<string, string>;
   names: MultiligualName[];
   aliases?: string[];
   uuid: string;

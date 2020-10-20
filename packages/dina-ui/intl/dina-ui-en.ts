@@ -48,6 +48,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeName: "Attribute Name",
   field_managedAttributeType: "Type",
   field_originalFilename: "Original Filename",
+  field_organizationMandatoryFieldsError:
+    "At least one orgnization name is required",
   field_xmpMetadataDate: "Date Metadata Applied",
   field_xmpRightsWebStatement: "Reuse Rights Statement",
   governmentOfCanada: "Government of Canada",

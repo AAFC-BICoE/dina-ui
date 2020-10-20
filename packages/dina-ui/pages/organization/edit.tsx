@@ -25,6 +25,8 @@ interface OrganizationFormProps {
   router: NextRouter;
 }
 
+export type languageCode = "EN" | "FR";
+
 export default function OrganizationEditPage() {
   const router = useRouter();
   const {
@@ -77,18 +79,51 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
   const initialValues = organization || { type: "organization" };
   const { formatMessage } = useDinaIntl();
 
+  if (organization) {
+    organization.name = new Map();
+    organization.name[organization.names[0].languageCode] =
+      organization.names[0].name;
+    organization.name[organization.names[1]?.languageCode] =
+      organization.names[1]?.name;
+  }
+
   const onSubmit = safeSubmit(async submittedValues => {
     const aliases = submittedValues.aliases;
     if (aliases !== undefined) {
-      submittedValues.aliases = aliases.split(",").map(a => a.trim());
+      submittedValues.aliases = aliases.map(a => a.trim());
     }
+
+    submittedValues.names = [];
     if (submittedValues.name !== undefined) {
-      const multiligualName: MultiligualName = {
-        languageCode:
-          submittedValues.names[0].languageCode === "FR" ? "EN" : "FR",
-        name: submittedValues.name
-      };
-      submittedValues.names.push(multiligualName);
+      const multiligualName: MultiligualName[] = [];
+
+      if (submittedValues.name.EN && submittedValues.name.FR) {
+        multiligualName[0] = {
+          languageCode: "EN",
+          name: submittedValues.name.EN
+        };
+
+        multiligualName[1] = {
+          languageCode: "FR",
+          name: submittedValues.name.FR
+        };
+      } else if (submittedValues.name.EN) {
+        multiligualName[0] = {
+          languageCode: "EN",
+          name: submittedValues.name.FR
+        };
+      } else if (submittedValues.name.FR) {
+        multiligualName[0] = {
+          languageCode: "FR",
+          name: submittedValues.name.FR
+        };
+      } else {
+        throw new Error(
+          formatMessage("field_organizationMandatoryFieldsError")
+        );
+      }
+
+      submittedValues.names = multiligualName;
       delete submittedValues.name;
     }
 
@@ -107,8 +142,6 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
     await router.push(`/organization/list`);
   });
 
-  const orgName1 = organization?.names[0];
-  const orgName2 = organization?.names[1];
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form translate={undefined}>
@@ -129,66 +162,20 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
           />
         </ButtonBar>
         <div>
-          {organization?.names.length === 2 ? (
-            <>
-              <div className="row">
-                <TextField
-                  className="col-md-4 name1"
-                  name="names[0].name"
-                  label={
-                    orgName1?.languageCode === "EN"
-                      ? formatMessage("organizationEnglishNameLabel")
-                      : formatMessage("organizationFrenchNameLabel")
-                  }
-                />
-              </div>
-              <div className="row">
-                <TextField
-                  className="col-md-4 name2"
-                  name="names[1].name"
-                  label={
-                    orgName2?.languageCode === "EN"
-                      ? formatMessage("organizationEnglishNameLabel")
-                      : formatMessage("organizationFrenchNameLabel")
-                  }
-                />
-              </div>
-            </>
-          ) : orgName1?.languageCode === "FR" ? (
-            <>
-              <div className="row">
-                <TextField
-                  className="col-md-4 name1"
-                  name="names[0].name"
-                  label={formatMessage("organizationFrenchNameLabel")}
-                />
-              </div>
-              <div className="row">
-                <TextField
-                  className="col-md-4 name2"
-                  name="name"
-                  label={formatMessage("organizationEnglishNameLabel")}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="row">
-                <TextField
-                  className="col-md-4 name1"
-                  name="names[0].name"
-                  label={formatMessage("organizationEnglishNameLabel")}
-                />
-              </div>
-              <div className="row">
-                <TextField
-                  className="col-md-4 name2"
-                  name="name"
-                  label={formatMessage("organizationFrenchNameLabel")}
-                />
-              </div>
-            </>
-          )}
+          <div className="row">
+            <TextField
+              className="col-md-4"
+              name="name.EN"
+              label={formatMessage("organizationEnglishNameLabel")}
+            />
+          </div>
+          <div className="row">
+            <TextField
+              className="col-md-4"
+              name="name.FR"
+              label={formatMessage("organizationFrenchNameLabel")}
+            />
+          </div>
           <div className="row">
             <TextField
               className="col-md-4"

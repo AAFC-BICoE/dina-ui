@@ -17,11 +17,11 @@ const ORGANIZATION_TABLE_COLUMNS = [
         {names.length === 2 ? (
           <a>
             {names[0].languageCode === "EN"
-              ? names[0].name + "|" + names[1].name
-              : names[1].name + "|" + names[0].name}
+              ? "EN: " + names[0].name + " | FR: " + names[1].name
+              : "EN: " + names[1].name + " | FR: " + names[0].name}
           </a>
         ) : (
-          <a>names[0].name</a>
+          <a>{`${names[0].languageCode}: ${names[0].name}`}</a>
         )}
       </Link>
     ),

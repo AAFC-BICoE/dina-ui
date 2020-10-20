@@ -30,9 +30,7 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
           byPassView={true}
         />
       </ButtonBar>
-      <Query<Organization>
-        query={{ path: `agent-api/organization/${id}?include=organizations` }}
-      >
+      <Query<Organization> query={{ path: `agent-api/organization/${id}` }}>
         {({ loading, response }) => {
           const organization = response && {
             ...response.data
@@ -43,9 +41,13 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
             organization.createdOn = inUserTimeZone;
           }
 
-          const orgName1 = organization?.names[0];
-          const orgName2 = organization?.names[1];
-
+          if (organization) {
+            organization.name = new Map();
+            organization.name[organization.names[0].languageCode] =
+              organization.names[0].name;
+            organization.name[organization.names[1]?.languageCode] =
+              organization.names[1]?.name;
+          }
           return (
             <div className="container-fluid">
               <h1>
@@ -59,38 +61,16 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
                 >
                   <div>
                     <div className="row">
-                      {organization.names.length === 2 ? (
-                        <>
-                          <FieldView
-                            className="col-md-2"
-                            name="names[0].name"
-                            label={
-                              orgName1?.languageCode === "EN"
-                                ? formatMessage("organizationEnglishNameLabel")
-                                : formatMessage("organizationFrenchNameLabel")
-                            }
-                          />
-                          <FieldView
-                            className="col-md-2"
-                            name="names[1].name"
-                            label={
-                              orgName2?.languageCode === "EN"
-                                ? formatMessage("organizationEnglishNameLabel")
-                                : formatMessage("organizationFrenchNameLabel")
-                            }
-                          />
-                        </>
-                      ) : (
-                        <FieldView
-                          className="col-md-2"
-                          name="names[0].name"
-                          label={
-                            orgName1?.languageCode === "EN"
-                              ? formatMessage("organizationEnglishNameLabel")
-                              : formatMessage("organizationFrenchNameLabel")
-                          }
-                        />
-                      )}
+                      <FieldView
+                        className="col-md-2"
+                        name="name.EN"
+                        label={formatMessage("organizationEnglishNameLabel")}
+                      />
+                      <FieldView
+                        className="col-md-2"
+                        name="name.FR"
+                        label={formatMessage("organizationFrenchNameLabel")}
+                      />
                       <FieldView className="col-md-3" name="aliases" />
                       <FieldView className="col-md-2" name="createdBy" />
                       <FieldView className="col-md-2" name="createdOn" />
