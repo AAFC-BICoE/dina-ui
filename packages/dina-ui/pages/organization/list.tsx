@@ -9,7 +9,7 @@ import Link from "next/link";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
-const ORGANIZATION_FILTER_ATTRIBUTES = ["name", "aliases", "createdBy"];
+const ORGANIZATION_FILTER_ATTRIBUTES = ["createdBy"];
 const ORGANIZATION_TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, names } }) => (
@@ -25,7 +25,8 @@ const ORGANIZATION_TABLE_COLUMNS = [
         )}
       </Link>
     ),
-    accessor: "name"
+    accessor: "name",
+    sortable: false
   },
   stringArrayCell("aliases"),
   "createdBy",
