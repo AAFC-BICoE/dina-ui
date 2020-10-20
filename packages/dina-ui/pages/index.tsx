@@ -7,7 +7,6 @@ const Home: React.FunctionComponent = () => (
   <div>
     <Head title="Home" />
     <Nav />
-
     <div className="container">
       <h2>
         <DinaMessage id="objectStoreTitle" />
@@ -60,11 +59,16 @@ const Home: React.FunctionComponent = () => (
             </a>
           </Link>
         </li>
+        <li>
+          <Link href="/organization/list">
+            <a>
+              <DinaMessage id="organizationListTitle" />
+            </a>
+          </Link>
+        </li>
       </ul>
     </div>
-
     <Footer />
   </div>
 );
-
 export default Home;

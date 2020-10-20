@@ -88,7 +88,15 @@ export default function MetadataListPage() {
       Header: CheckBoxHeader,
       sortable: false
     },
-    "originalFilename",
+    {
+      Cell: ({ original: { id, originalFilename } }) =>
+        originalFilename ? (
+          <Link href={`/object-store/object/view?id=${id}`}>
+            {originalFilename}
+          </Link>
+        ) : null,
+      accessor: "originalFilename"
+    },
     dateCell("acDigitizationDate"),
     dateCell("xmpMetadataDate"),
     { accessor: "acMetadataCreator.displayName", sortable: false },

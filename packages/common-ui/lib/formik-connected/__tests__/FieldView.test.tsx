@@ -43,4 +43,19 @@ describe("FieldView component", () => {
 
     expect(wrapper.find("a").prop("href")).toEqual("/linked-page");
   });
+
+  it("Renders field value as comma seperated string when it is string array object", () => {
+    const wrapper = mountWithAppContext(
+      <Formik
+        initialValues={{
+          testObject: { aliases: ["alias1", "alias2"] }
+        }}
+        onSubmit={noop}
+      >
+        <FieldView name="testObject.aliases" />
+      </Formik>
+    );
+
+    expect(wrapper.find("p").text()).toEqual("alias1,alias2");
+  });
 });

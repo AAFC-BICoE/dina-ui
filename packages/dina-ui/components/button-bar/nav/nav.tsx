@@ -127,6 +127,11 @@ function NavAgentsDropdown() {
             <DinaMessage id="personListTitle" />
           </a>
         </Link>
+        <Link href="/organization/list">
+          <a className="dropdown-item">
+            <DinaMessage id="organizationListTitle" />
+          </a>
+        </Link>
       </div>
     </div>
   );
@@ -168,17 +173,17 @@ export function Footer() {
               <ul>
                 <li>
                   <a href="https://www.canada.ca/en/contact.html">
-                    Contact information
+                    <DinaMessage id="footerContactInfo" />
                   </a>
                 </li>
                 <li>
                   <a href="https://www.canada.ca/en/transparency/terms.html">
-                    Terms and conditions
+                    <DinaMessage id="footerTermsAndConditions" />
                   </a>
                 </li>
                 <li>
                   <a href="https://www.canada.ca/en/transparency/privacy.html">
-                    Privacy
+                    <DinaMessage id="footerPrivacy" />
                   </a>
                 </li>
               </ul>

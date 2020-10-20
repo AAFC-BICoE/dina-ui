@@ -71,10 +71,10 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
           <div style={{ maxWidth: "20rem" }}>
             <ResourceSelectField<Organization>
               name="organizations"
-              filter={filterBy(["name"])}
+              filter={filterBy(["names[0].name"])}
               model="agent-api/organization"
               isMulti={true}
-              optionLabel={organization => organization.name}
+              optionLabel={organization => organization.names?.[0].name}
             />
           </div>
           <div className="form-group">
