@@ -173,17 +173,17 @@ export function Footer() {
               <ul>
                 <li>
                   <a href="https://www.canada.ca/en/contact.html">
-                    Contact information
+                    <DinaMessage id="footerContactInfo" />
                   </a>
                 </li>
                 <li>
                   <a href="https://www.canada.ca/en/transparency/terms.html">
-                    Terms and conditions
+                    <DinaMessage id="footerTermsAndConditions" />
                   </a>
                 </li>
                 <li>
                   <a href="https://www.canada.ca/en/transparency/privacy.html">
-                    Privacy
+                    <DinaMessage id="footerPrivacy" />
                   </a>
                 </li>
               </ul>

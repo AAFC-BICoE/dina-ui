@@ -17,13 +17,9 @@ const OBJECTSUBTYPE_TABLE_COLUMNS: ColumnDefinition<ObjectSubtype>[] = [
         <a>{acSubtype}</a>
       </Link>
     ),
-    Header: "AcSubtype",
     accessor: "acSubtype"
   },
-  {
-    Header: "DcType",
-    accessor: "dcType"
-  }
+  "dcType"
 ];
 
 const queryTableProps: QueryTableProps<ObjectSubtype> = {

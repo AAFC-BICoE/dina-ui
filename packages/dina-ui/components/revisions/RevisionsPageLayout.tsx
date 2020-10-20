@@ -114,7 +114,9 @@ function ExpanderWithLabel({ isExpanded }) {
   return (
     <>
       <span>
-        <strong>Show changes</strong>
+        <strong>
+          <DinaMessage id="showChanges" />
+        </strong>
       </span>
       <span className={`rt-expander ${isExpanded ? "-open" : false}`}>•</span>
     </>
