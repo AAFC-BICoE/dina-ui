@@ -1,5 +1,11 @@
 http://:8080
 
+# Serve the unsupported-browser.html page when requesting from IE
+@internetexplorer  {
+	header_regexp User-Agent .*(MSIE|Trident).*
+}
+rewrite @internetexplorer  /static/unsupported-browser.html
+
 # Proxy to the front-end:
 reverse_proxy / {$UI_DEV_SERVER_ADDRESS}
 reverse_proxy /favicon.ico {$UI_DEV_SERVER_ADDRESS}
@@ -20,3 +26,7 @@ route /api/agent-api/* {
 	uri replace /api/agent-api /api/v1
 	reverse_proxy {$AGENT_API_ADDRESS}
 }
+ 
+
+
+
