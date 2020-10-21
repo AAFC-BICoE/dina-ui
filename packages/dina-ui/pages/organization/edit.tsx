@@ -73,6 +73,19 @@ export default function OrganizationEditPage() {
   );
 }
 
+export const trimAliases = (aliases, isArray) => {
+  let trimmedAliases;
+  isArray
+    ? (trimmedAliases = aliases
+        .filter(a => a.trim().length > 0)
+        .map(a => a.trim()))
+    : (trimmedAliases = aliases
+        .split(",")
+        .filter(a => a.trim().length > 0)
+        .map(a => a.trim()));
+  return trimmedAliases;
+};
+
 function OrganizationForm({ organization, router }: OrganizationFormProps) {
   const { save } = useContext(ApiClientContext);
   const { id } = router.query;
@@ -86,19 +99,6 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
     organization.name[organization.names[1]?.languageCode] =
       organization.names[1]?.name;
   }
-
-  const trimAliases = (aliases, isArray) => {
-    let trimmedAliases;
-    isArray
-      ? (trimmedAliases = aliases
-          .filter(a => a.trim().length > 0)
-          .map(a => a.trim()))
-      : (trimmedAliases = aliases
-          .split(",")
-          .filter(a => a.trim().length > 0)
-          .map(a => a.trim()));
-    return trimmedAliases;
-  };
 
   const onSubmit = safeSubmit(async submittedValues => {
     const aliases = submittedValues.aliases;
