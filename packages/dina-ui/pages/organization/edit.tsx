@@ -86,13 +86,28 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
     organization.name[organization.names[1]?.languageCode] =
       organization.names[1]?.name;
   }
+
+  const trimAliases = (aliases, isArray) => {
+    let trimmedAliases;
+    isArray
+      ? (trimmedAliases = aliases
+          .filter(a => a.trim().length > 0)
+          .map(a => a.trim()))
+      : (trimmedAliases = aliases
+          .split(",")
+          .filter(a => a.trim().length > 0)
+          .map(a => a.trim()));
+    return trimmedAliases;
+  };
+
   const onSubmit = safeSubmit(async submittedValues => {
     const aliases = submittedValues.aliases;
     if (Array.isArray(aliases)) {
-      submittedValues.aliases = aliases.map(a => a.trim());
-    } else if (aliases !== undefined) {
-      submittedValues.aliases = [];
-      submittedValues.aliases[0] = aliases.trim();
+      aliases.length === 1
+        ? (submittedValues.aliases = trimAliases(aliases[0], false))
+        : (submittedValues.aliases = trimAliases(aliases, true));
+    } else if (aliases !== null && aliases !== undefined) {
+      submittedValues.aliases = trimAliases(aliases, false);
     }
     submittedValues.names = [];
     if (submittedValues.name !== undefined) {
