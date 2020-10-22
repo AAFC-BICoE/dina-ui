@@ -1,5 +1,7 @@
 import { OperationsResponse } from "common-ui";
-import OrganizationEditPage from "../../../pages/organization/edit";
+import OrganizationEditPage, {
+  trimAliases
+} from "../../../pages/organization/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Organization } from "../../../types/objectstore-api/resources/Organization";
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -213,6 +215,19 @@ describe("organization edit page", () => {
       done();
     });
   });
+});
+
+it("Verify trim aliases.", () => {
+  const expectedTrimmedArr = ["a", "b", "v", "p", "kl"];
+  const aliasesAsString = "a,b  ,v,  p,  , kl";
+  const aliasesAsArrayOfOne = ["a,b  ,v,  p,  , kl"];
+  const aliasesAsArrayOfMany = ["a", "b", "v", "  p", "  ", "kl"];
+
+  expect(trimAliases(aliasesAsString, false)).toEqual(expectedTrimmedArr);
+  expect(trimAliases(aliasesAsArrayOfOne[0], false)).toEqual(
+    expectedTrimmedArr
+  );
+  expect(trimAliases(aliasesAsArrayOfMany, true)).toEqual(expectedTrimmedArr);
 });
 
 /** Test organization with all fields defined. */
