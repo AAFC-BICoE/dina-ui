@@ -2,6 +2,7 @@ import {
   ButtonBar,
   ColumnDefinition,
   CreateButton,
+  dateCell,
   QueryTable,
   QueryTableProps
 } from "common-ui";
@@ -19,7 +20,9 @@ const OBJECTSUBTYPE_TABLE_COLUMNS: ColumnDefinition<ObjectSubtype>[] = [
     ),
     accessor: "acSubtype"
   },
-  "dcType"
+  "dcType",
+  "createdBy",
+  dateCell("createdOn")
 ];
 
 const queryTableProps: QueryTableProps<ObjectSubtype> = {
