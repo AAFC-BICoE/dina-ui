@@ -88,6 +88,7 @@ const MOCK_ACCOUNT_CONTEXT: AccountContextI = {
   initialized: true,
   login: noop,
   logout: noop,
+  roles: ["user"],
   token: "test-token",
   username: "test-user"
 };

@@ -117,7 +117,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   uploadFormInstructions:
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
   uploadPageTitle: "Upload Files",
+  userListTitle: "Users",
   userMustBelongToGroup: "User must belong to a Group",
+  usersSectionTitle: "Users",
   valueLabel: "Value",
   viewPreviewButtonText: "Preview"
 };

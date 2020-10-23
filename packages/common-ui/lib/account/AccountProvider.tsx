@@ -14,6 +14,7 @@ export interface AccountContextI {
   logout: () => void;
   initialized: boolean;
   token?: string;
+  roles: string[];
   username?: string;
 }
 
@@ -58,7 +59,7 @@ function KeycloakAccountProviderInternal({
   children: ReactNode;
 }) {
   const [
-    { login, logout, authenticated, token, tokenParsed },
+    { login, logout, authenticated, token, realmAccess, tokenParsed },
     initialized
   ] = useKeycloak();
 
@@ -81,6 +82,7 @@ function KeycloakAccountProviderInternal({
         initialized,
         login,
         logout,
+        roles: realmAccess?.roles ?? [],
         token,
         username
       }}

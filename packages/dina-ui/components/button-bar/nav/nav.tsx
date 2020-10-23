@@ -4,6 +4,12 @@ import React from "react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 export function Nav() {
+  const { roles } = useAccount();
+
+  // Only show the Users UI to collection-managers and admins:
+  const showUsersLinks =
+    roles.includes("collection-manager") || roles.includes("admin");
+
   return (
     <header className="py-3">
       <div id="wb-bnr" className="container">
@@ -69,6 +75,11 @@ export function Nav() {
             <li className="list-inline-item my-auto">
               <NavAgentsDropdown />
             </li>
+            {showUsersLinks && (
+              <li className="list-inline-item my-auto">
+                <NavUsersDropdown />
+              </li>
+            )}
           </ul>
         </div>
       </div>
@@ -130,6 +141,24 @@ function NavAgentsDropdown() {
         <Link href="/organization/list">
           <a className="dropdown-item">
             <DinaMessage id="organizationListTitle" />
+          </a>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+/** Users links. */
+function NavUsersDropdown() {
+  return (
+    <div className="dropdown">
+      <a className="nav-link dropdown-toggle" href="#">
+        <DinaMessage id="usersSectionTitle" />
+      </a>
+      <div className="dropdown-menu m-0">
+        <Link href="/user/list">
+          <a className="dropdown-item">
+            <DinaMessage id="userListTitle" />
           </a>
         </Link>
       </div>
