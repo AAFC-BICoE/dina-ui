@@ -52,6 +52,7 @@ services:
     environment:
       AGENT_API_ADDRESS: agent-api:8080
       OBJECTSTORE_API_ADDRESS: objectstore-api:8080
+      USER_API_ADDRESS: user-api:8080
       KEYCLOAK_CLIENTID: objectstore
       KEYCLOAK_REALM: dina
       KEYCLOAK_PUBLIC_URL: http://${KEYCLOAK_DOMAIN}/auth
@@ -87,6 +88,24 @@ services:
       spring.datasource.continue-on-error: "true"
       spring.liquibase.user: postgres
       spring.liquibase.password: p
+      keycloak.enabled: "true"
+      keycloak.auth-server-url: http://${KEYCLOAK_DOMAIN}/auth
+    extra_hosts:
+      # Resolve the Keycloak domain to Keycloak's static IP:
+      - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
+  user-api:
+    build: ../repos/dina-user-api
+    environment:
+      spring.datasource.url: jdbc:postgresql://database/objectstore?currentSchema=userapi
+      spring.datasource.username: postgres
+      spring.datasource.password: p
+      spring.datasource.continue-on-error: "true"
+      spring.liquibase.user: postgres
+      spring.liquibase.password: p
+      spring.liquibase-schema: userapi
+      keycloak.enabled: "true"
+      keycloak.secret: 03eff0eb-a81b-4213-bad7-49457778d4eb
+      keycloak.auth-server-url: http://${KEYCLOAK_DOMAIN}/auth
     extra_hosts:
       # Resolve the Keycloak domain to Keycloak's static IP:
       - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
