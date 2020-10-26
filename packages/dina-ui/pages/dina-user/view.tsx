@@ -24,7 +24,7 @@ export default function DinaUserDetailsPage() {
       <ButtonBar>
         <CancelButton entityLink="/user" navigateTo={`/`} />
       </ButtonBar>
-      <Query<DinaUser> query={{ path: `dinauser-api/user/${subject}` }}>
+      <Query<DinaUser> query={{ path: `user-api/user/${subject}` }}>
         {({ loading, response }) => {
           const dinaUser = response && {
             ...response.data

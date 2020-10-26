@@ -28,9 +28,9 @@ route /api/agent-api/* {
 }
  
 # Proxy to the back-end DinaUser API:
-route /api/dinauser-api/* {
-	uri replace /api/dinauser-api /api/v1
-	reverse_proxy {$DINAUSER_API_ADDRESS}
+route /api/user-api/* {
+	uri replace /api/user-api /api/v1
+	reverse_proxy {$USER_API_ADDRESS}
 } 
 
 
