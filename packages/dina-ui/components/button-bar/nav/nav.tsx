@@ -69,6 +69,9 @@ export function Nav() {
             <li className="list-inline-item my-auto">
               <NavAgentsDropdown />
             </li>
+            <li className="list-inline-item my-auto">
+              <NavDinaUserDropdown />
+            </li>
           </ul>
         </div>
       </div>
@@ -159,6 +162,24 @@ function NavbarUserControl() {
           </button>
         </>
       ) : null}
+    </div>
+  );
+}
+
+/** Dina User links. */
+function NavDinaUserDropdown() {
+  return (
+    <div className="dropdown">
+      <a className="nav-link dropdown-toggle" href="#">
+        <DinaMessage id="dinaUserSectionTitle" />
+      </a>
+      <div className="dropdown-menu m-0">
+        <Link href="/dina-user/view">
+          <a className="dropdown-item">
+            <DinaMessage id="whoAmITitle" />
+          </a>
+        </Link>
+      </div>
     </div>
   );
 }

@@ -15,6 +15,7 @@ export interface AccountContextI {
   initialized: boolean;
   token?: string;
   username?: string;
+  subject?: string;
 }
 
 const AccountContext = createContext<AccountContextI | null>(null);
@@ -58,7 +59,7 @@ function KeycloakAccountProviderInternal({
   children: ReactNode;
 }) {
   const [
-    { login, logout, authenticated, token, tokenParsed },
+    { login, logout, authenticated, token, tokenParsed, subject },
     initialized
   ] = useKeycloak();
 
@@ -82,7 +83,8 @@ function KeycloakAccountProviderInternal({
         login,
         logout,
         token,
-        username
+        username,
+        subject
       }}
     >
       {children}
