@@ -3,17 +3,17 @@ import {
   CancelButton,
   FieldView,
   LoadingSpinner,
-  Query
+  Query,
+  useAccount
 } from "common-ui";
 import { Formik } from "formik";
 import { noop } from "lodash";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { DinaUser } from "../../types/objectstore-api/resources/DinaUser";
-import { useKeycloak } from "@react-keycloak/nextjs";
 
-export function DinaUserDetailsPage() {
-  const [{ subject }] = useKeycloak();
+export default function DinaUserDetailsPage() {
+  const { subject } = useAccount();
 
   const { formatMessage } = useDinaIntl();
 
@@ -41,6 +41,7 @@ export function DinaUserDetailsPage() {
                   <div>
                     <div className="row">
                       <FieldView className="col-md-2" name="username" />
+                      <FieldView className="col-md-2" name="groups" />
                       <FieldView className="col-md-2" name="roles" />
                       <FieldView className="col-md-2" name="firstName" />
                       <FieldView className="col-md-2" name="lastName" />
@@ -57,5 +58,3 @@ export function DinaUserDetailsPage() {
     </div>
   );
 }
-
-export default DinaUserDetailsPage;
