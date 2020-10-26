@@ -1,14 +1,12 @@
 import {
   ButtonBar,
   CancelButton,
-  EditButton,
   FieldView,
   LoadingSpinner,
   Query
 } from "common-ui";
 import { Formik } from "formik";
 import { noop } from "lodash";
-import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { DinaUser } from "../../types/objectstore-api/resources/DinaUser";
@@ -21,10 +19,10 @@ export function DinaUserDetailsPage() {
 
   return (
     <div>
-      <Head title={formatMessage("dinaUserViewTitle")} />
+      <Head title={formatMessage("whoAmITitle")} />
       <Nav />
       <ButtonBar>
-        <CancelButton entityId={subject as string} entityLink="/user" />
+        <CancelButton entityLink="/user" navigateTo={`/`} />
       </ButtonBar>
       <Query<DinaUser> query={{ path: `dinauser-api/user/${subject}` }}>
         {({ loading, response }) => {
@@ -35,7 +33,7 @@ export function DinaUserDetailsPage() {
           return (
             <div className="container-fluid">
               <h1>
-                <DinaMessage id="dinaUserViewTitle" />
+                <DinaMessage id="whoAmITitle" />
               </h1>
               <LoadingSpinner loading={loading} />
               {dinaUser && (

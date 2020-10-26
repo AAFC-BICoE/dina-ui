@@ -17,7 +17,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   closePreviewButtonText: "Close Preview",
   deleteButtonText: "Delete",
   deleteSelectedButtonText: "Delete Selected",
-  dinaUserViewTitle: "View Dina User",
+  dinaUserSectionTitle: "Dina User",
   editObjectSubtypeTitle: "Edit Object Subtype",
   editOrganizationTitle: "Edit Organization",
   editOrganizationAliasesLabel: "Aliases (comma seperated)",
@@ -120,5 +120,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   uploadPageTitle: "Upload Files",
   userMustBelongToGroup: "User must belong to a Group",
   valueLabel: "Value",
-  viewPreviewButtonText: "Preview"
+  viewPreviewButtonText: "Preview",
+  whoAmITitle: " Who Am I"
 };
