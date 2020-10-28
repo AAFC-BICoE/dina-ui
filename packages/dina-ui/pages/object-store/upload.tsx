@@ -72,7 +72,10 @@ export default function UploadPage() {
     const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(
       (res, idx) => ({
         resource: {
-          acMetadataCreator: agentId,
+          acMetadataCreator: {
+            id: agentId,
+            type: "person"
+          },
           acDigitizationDate: moment(
             acceptedFiles[idx].meta.lastModifiedDate
           ).format(),

@@ -237,13 +237,17 @@ export default function EditMetadatasPage() {
         delete metadataEdit.managedAttributeMap;
 
         if (acMetadataCreator !== undefined) {
-          metadataEdit.acMetadataCreator = decodeResourceCell(
-            acMetadataCreator
-          ).id;
+          metadataEdit.acMetadataCreator = {
+            id: decodeResourceCell(acMetadataCreator).id as any,
+            type: "person"
+          };
         }
 
         if (dcCreator !== undefined) {
-          metadataEdit.dcCreator = decodeResourceCell(dcCreator).id;
+          metadataEdit.dcCreator = {
+            id: decodeResourceCell(dcCreator).id as any,
+            type: "person"
+          };
         }
 
         if (acTags !== undefined) {
