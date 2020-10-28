@@ -12,6 +12,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   closeButtonText: "Close",
   createButtonText: "Create New",
   deleteButtonText: "Delete",
+  editableTable: "Editable Table",
   editButtonText: "Edit",
   filterBlankField: "Blank Field",
   filterExactMatch: "Exact Match",

@@ -34,9 +34,12 @@ interface LibraryPrepBulkEditRow {
   indexI7?: string;
   sample: Sample;
   libraryPrep: LibraryPrep;
+
+  /** Read-only wellCoordinates column: */
+  wellCoordinates?: string;
 }
 
-interface LibraryPrepBulkEditorProps {
+export interface LibraryPrepBulkEditorProps {
   chain: Chain;
   editMode: LibraryPrepEditMode;
   libraryPrepBatch: LibraryPrepBatch;
@@ -80,21 +83,30 @@ export function LibraryPrepBulkEditor({
         ]
       : []),
     ...(editMode === "INDEX"
-      ? (["indexI5", "indexI7"] as ("indexI5" | "indexI7")[]).map(indexField =>
-          resourceSelectCell<NgsIndex>(
-            {
-              filter: filterBy(["name"]),
-              label: ngsIndex => ngsIndex.name,
-              model: `seqdb-api/indexSet/${libraryPrepBatch.indexSet?.id}/ngsIndexes`,
-              type: "ngsIndex"
-            },
-            {
-              data: `${indexField}`,
-              title: formatMessage(indexField),
-              width: 300
-            }
+      ? [
+          {
+            data: "wellCoordinates",
+            title: formatMessage("wellCoordinates"),
+            readOnly: true,
+            width: 150
+          },
+          ...(["indexI5", "indexI7"] as ("indexI5" | "indexI7")[]).map(
+            indexField =>
+              resourceSelectCell<NgsIndex>(
+                {
+                  filter: filterBy(["name"]),
+                  label: ngsIndex => ngsIndex.name,
+                  model: `seqdb-api/indexSet/${libraryPrepBatch.indexSet?.id}/ngsIndexes`,
+                  type: "ngsIndex"
+                },
+                {
+                  data: `${indexField}`,
+                  title: formatMessage(indexField),
+                  width: 300
+                }
+              )
           )
-        )
+        ]
       : [])
   ];
 
@@ -130,6 +142,13 @@ export function LibraryPrepBulkEditor({
       const libraryPrep =
         libraryPreps.find(prep => prep.sample.id === sample.id) ??
         ({} as LibraryPrep);
+
+      const { wellColumn, wellRow } = libraryPrep;
+      const wellCoordinates =
+        wellColumn === null || !wellRow
+          ? undefined
+          : `${wellRow}${String(wellColumn).padStart(2, "0")}`;
+
       return {
         libraryPrep,
         indexI5: encodeResourceCell(libraryPrep.indexI5, {
@@ -138,7 +157,8 @@ export function LibraryPrepBulkEditor({
         indexI7: encodeResourceCell(libraryPrep.indexI7, {
           label: libraryPrep.indexI7?.name
         }),
-        sample
+        sample,
+        wellCoordinates
       };
     });
 
@@ -159,10 +179,10 @@ export function LibraryPrepBulkEditor({
 
       // Set the indexes if they were changed:
       const { indexI5, indexI7 } = change.changes;
-      if (indexI5) {
+      if (indexI5 !== undefined) {
         libraryPrepEdit.indexI5 = decodeResourceCell(indexI5) as NgsIndex;
       }
-      if (indexI7) {
+      if (indexI7 !== undefined) {
         libraryPrepEdit.indexI7 = decodeResourceCell(indexI7) as NgsIndex;
       }
 
@@ -188,6 +208,9 @@ export function LibraryPrepBulkEditor({
   return (
     <Formik initialValues={{}} onSubmit={noop}>
       <Form translate={undefined}>
+        <strong>
+          <SeqdbMessage id="editableTable" />:
+        </strong>
         <BulkDataEditor<LibraryPrepBulkEditRow>
           columns={COLUMNS}
           loadData={loadData}

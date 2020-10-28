@@ -64,6 +64,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   shearingLabel: "Shearing",
   sizeSelectedStatus: "Size Selection Added",
   sizeSelectionLabel: "Size Selection",
+  wellCoordinates: "Well Coordinates",
   workflowDetailsTab: "Details",
   workflowListTitle: "NGS Workflows",
   workflowStepTab: "Step {number}: {name}",
