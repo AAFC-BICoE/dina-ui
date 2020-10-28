@@ -159,7 +159,10 @@ export default function EditMetadatasPage() {
 
   async function loadData() {
     const metadatas = await bulkGet<Metadata>(
-      ids.map(id => `/metadata/${id}?include=managedAttributeMap`),
+      ids.map(
+        id =>
+          `/metadata/${id}?include=managedAttributeMap,acMetadataCreator,dcCreator`
+      ),
       {
         apiBaseUrl: "/objectstore-api",
         joinSpecs: [
@@ -168,13 +171,13 @@ export default function EditMetadatasPage() {
             apiBaseUrl: "/agent-api",
             idField: "acMetadataCreator",
             joinField: "acMetadataCreator",
-            path: metadata => `person/${metadata.acMetadataCreator}`
+            path: metadata => `person/${metadata.acMetadataCreator.id}`
           },
           {
             apiBaseUrl: "/agent-api",
             idField: "dcCreator",
             joinField: "dcCreator",
-            path: metadata => `person/${metadata.dcCreator}`
+            path: metadata => `person/${metadata.dcCreator.id}`
           }
         ]
       }

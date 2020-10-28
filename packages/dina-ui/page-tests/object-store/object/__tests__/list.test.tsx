@@ -19,6 +19,10 @@ const TEST_METADATAS: PersistedResource<Metadata>[] = [
     fileIdentifier: "9a85b858-f8f0-4a97-99a8-07b2cb759766",
     id: "6c524135-3c3e-41c1-a057-45afb4e3e7be",
     originalFilename: "file1.png",
+    acMetadataCreator: {
+      id: "cf6ecbbd-ed1f-46ac-9369-b65706d39ac4",
+      type: "person"
+    },
     type: "metadata"
   },
   {
@@ -29,6 +33,10 @@ const TEST_METADATAS: PersistedResource<Metadata>[] = [
     fileIdentifier: "72b4b907-c486-49a8-ab58-d01541d83eff",
     id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
     originalFilename: "file2.png",
+    acMetadataCreator: {
+      id: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
+      type: "person"
+    },
     type: "metadata"
   },
   {
@@ -37,6 +45,10 @@ const TEST_METADATAS: PersistedResource<Metadata>[] = [
     fileExtension: ".png",
     fileIdentifier: "54bc37d7-17c4-4f70-8b33-2def722c6e97",
     id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+    acMetadataCreator: {
+      id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+      type: "person"
+    },
     type: "metadata"
   }
 ];
@@ -60,7 +72,9 @@ describe("Metadata List Page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGet.mockImplementation(async path => {
-      if (path === "objectstore-api/metadata") {
+      if (
+        path === "objectstore-api/metadata?include=acMetadataCreator,dcCreator"
+      ) {
         return { data: TEST_METADATAS };
       }
     });
