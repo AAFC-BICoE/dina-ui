@@ -4,8 +4,10 @@ import {
   BulkDataEditor,
   decodeResourceCell,
   encodeResourceCell,
+  filterBy,
   RowChange,
-  SaveArgs
+  SaveArgs,
+  useResourceSelectCells
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { noop, pick } from "lodash";
@@ -38,6 +40,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
 
   const { apiClient, save } = useContext(ApiClientContext);
   const { formatMessage } = useSeqdbIntl();
+  const resourceSelectCell = useResourceSelectCells();
 
   const [plpEditMode, setPlpEditMode] = useState<PreLibraryPrepEditMode>(
     "SHEARING"
@@ -68,11 +71,39 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
     },
     {
       data: "plpStepResource.preLibraryPrep.quality",
-      title: formatMessage("field_quality")
+      title: formatMessage("field_quality"),
+      width: 150
     },
+    resourceSelectCell<Protocol>(
+      {
+        filter: filterBy(["name"]),
+        label: protocol => protocol.name,
+        model: `seqdb-api/protocol`,
+        type: "protocol"
+      },
+      {
+        data: "protocol",
+        title: formatMessage("field_protocol"),
+        width: 150
+      }
+    ),
+    resourceSelectCell<Product>(
+      {
+        filter: filterBy(["name"]),
+        label: product => product.name,
+        model: `seqdb-api/product`,
+        type: "product"
+      },
+      {
+        data: "product",
+        title: formatMessage("field_product"),
+        width: 150
+      }
+    ),
     {
       data: "plpStepResource.preLibraryPrep.notes",
-      title: formatMessage("field_notes")
+      title: formatMessage("field_notes"),
+      width: 300
     }
   ];
 
@@ -183,8 +214,8 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
           id: step.id,
           type: step.type
         } as ChainStepTemplate,
-        preLibraryPrep,
-        sample: row.original.sampleStepResource.sample,
+        preLibraryPrep: pick(preLibraryPrep, "id", "type"),
+        sample: pick(row.original.sampleStepResource.sample, "id", "type"),
         type: "stepResource",
         value: preLibraryPrep.preLibraryPrepType
       } as StepResource;

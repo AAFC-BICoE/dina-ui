@@ -30,6 +30,8 @@ export const SEQDB_MESSAGES_ENGLISH = {
   field_inputAmount: "Input Amount",
   field_name: "Name",
   field_notes: "Notes",
+  field_product: "Product",
+  field_protocol: "Protocol",
   field_quality: "Quality",
   "field_sample.name": "Sample Name",
   field_targetDpSize: "Target Dp Size",
