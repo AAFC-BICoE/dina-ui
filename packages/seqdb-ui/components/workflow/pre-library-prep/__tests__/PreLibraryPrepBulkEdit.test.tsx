@@ -1,6 +1,4 @@
-import { ResourceSelect } from "common-ui";
 import { PersistedResource } from "kitsu";
-import NumberFormat from "react-number-format";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   Chain,
