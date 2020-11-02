@@ -33,7 +33,9 @@ export default function PersonEditPage() {
             <h1>
               <DinaMessage id="editPersonTitle" />
             </h1>
-            <Query<Person> query={{ path: `agent-api/person/${id}` }}>
+            <Query<Person>
+              query={{ path: `agent-api/person/${id}?include=organizations` }}
+            >
               {({ loading, response }) => (
                 <div>
                   <LoadingSpinner loading={loading} />

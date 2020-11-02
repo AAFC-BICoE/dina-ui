@@ -74,7 +74,10 @@ export default function UploadPage() {
     const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(
       (res, idx) => ({
         resource: {
-          acMetadataCreator: agentId,
+          acMetadataCreator: {
+            id: agentId,
+            type: "person"
+          },
           acDigitizationDate: moment(
             acceptedFiles[idx].meta.lastModifiedDate
           ).format(),
@@ -110,8 +113,7 @@ export default function UploadPage() {
         ) : (
           <div>
             <div className="alert alert-warning">
-              For testing purpose only. Only unclassified data should be
-              uploaded. Any uploaded data can be deleted at any given moment.
+              <DinaMessage id="forTestingPurposesOnlyMessage" />
             </div>
             <Formik
               initialValues={{ group: groupSelectOptions[0].value }}

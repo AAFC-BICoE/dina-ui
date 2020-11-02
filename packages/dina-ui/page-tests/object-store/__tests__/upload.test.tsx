@@ -113,7 +113,10 @@ describe("Upload page", () => {
         {
           resource: {
             acDigitizationDate: "2019-08-28T20:37:21+00:00",
-            acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+            acMetadataCreator: {
+              id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+              type: "person"
+            },
             bucket: "example-group",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"
@@ -123,7 +126,10 @@ describe("Upload page", () => {
         {
           resource: {
             acDigitizationDate: "2019-08-29T20:37:21+00:00",
-            acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+            acMetadataCreator: {
+              id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+              type: "person"
+            },
             bucket: "example-group",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"
@@ -133,7 +139,10 @@ describe("Upload page", () => {
         {
           resource: {
             acDigitizationDate: "2019-08-30T20:37:21+00:00",
-            acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+            acMetadataCreator: {
+              id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+              type: "person"
+            },
             bucket: "example-group",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"
