@@ -38,8 +38,8 @@ export interface MetadataAttributes {
 }
 
 export interface MetadataRelationships {
-  acMetadataCreator?: Person | string | null;
-  dcCreator?: Person | string | null;
+  acMetadataCreator?: Person | KitsuResource | null;
+  dcCreator?: Person | KitsuResource | null;
   managedAttributeMap?: ManagedAttributeMap | null;
   acDerivedFrom?: Metadata | null;
 }

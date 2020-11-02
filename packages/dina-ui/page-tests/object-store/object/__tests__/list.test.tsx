@@ -60,7 +60,9 @@ describe("Metadata List Page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGet.mockImplementation(async path => {
-      if (path === "objectstore-api/metadata") {
+      if (
+        path === "objectstore-api/metadata?include=acMetadataCreator,dcCreator"
+      ) {
         return { data: TEST_METADATAS };
       }
     });

@@ -21,7 +21,7 @@ const METADATA_PREVIEW_STYLE = `
 export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
   const { loading, response } = useQuery<Metadata>(
     {
-      include: "acDerivedFrom,managedAttributeMap",
+      include: "acDerivedFrom,managedAttributeMap,acMetadataCreator,dcCreator",
       path: `objectstore-api/metadata/${metadataId}`
     },
     {
@@ -30,13 +30,13 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
           apiBaseUrl: "/agent-api",
           idField: "acMetadataCreator",
           joinField: "acMetadataCreator",
-          path: metadata => `person/${metadata.acMetadataCreator}`
+          path: metadata => `person/${metadata.acMetadataCreator.id}`
         },
         {
           apiBaseUrl: "/agent-api",
           idField: "dcCreator",
           joinField: "dcCreator",
-          path: metadata => `person/${metadata.dcCreator}`
+          path: metadata => `person/${metadata.dcCreator.id}`
         }
       ]
     }
