@@ -140,32 +140,6 @@ function NavAgentsDropdown() {
   );
 }
 
-/** Shows the logged-in user and the logout button. */
-function NavbarUserControl() {
-  const { authenticated, initialized, logout, username } = useAccount();
-
-  return (
-    <div className="d-flex">
-      {initialized && authenticated ? (
-        <>
-          {username && (
-            <span className="mr-2 my-auto">
-              <DinaMessage id="loggedInAsUser" values={{ name: username }} />
-            </span>
-          )}
-          <button
-            type="button"
-            className="btn btn-dark logout-button"
-            onClick={() => logout()}
-          >
-            <DinaMessage id="logoutBtn" />
-          </button>
-        </>
-      ) : null}
-    </div>
-  );
-}
-
 /** Dina User links. */
 function NavDinaUserDropdown() {
   return (

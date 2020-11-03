@@ -23,6 +23,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   editProtocolTitle: "Edit Protocol",
   editRegionTitle: "Edit Region",
   editWorkflowTitle: "Edit NGS Workflow",
+  "field_group.groupName": "Group Name",
   field_name: "Name",
   indexSetListTitle: "Index Sets",
   notShearedStatus: "Not Sheared",
