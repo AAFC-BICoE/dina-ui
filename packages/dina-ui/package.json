@@ -19,7 +19,7 @@
     "bootstrap": "^4.5.0",
     "common-ui": "link:../common-ui",
     "moment": "^2.27.0",
-    "next-transpile-modules": "^2.3.1",
+    "next-transpile-modules": "^4.1.0",
     "react-dropzone-uploader": "^2.11.0",
     "react-file-viewer": "^1.2.1"
   },

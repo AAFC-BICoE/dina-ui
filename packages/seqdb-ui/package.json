@@ -17,7 +17,7 @@
   "dependencies": {
     "bootswatch": "^4.2.1",
     "common-ui": "link:../common-ui",
-    "next-transpile-modules": "^2.3.1",
+    "next-transpile-modules": "^4.1.0",
     "react-dnd-cjs": "^9.4.0",
     "react-dnd-html5-backend-cjs": "^9.4.0",
     "react-tabs": "^3.0.0"
