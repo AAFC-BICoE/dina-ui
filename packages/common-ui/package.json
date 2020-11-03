@@ -22,7 +22,7 @@
     "kitsu": "7.0.4",
     "kitsu-core": "7.0.4",
     "lodash": "^4.17.19",
-    "next": "^9.4.4",
+    "next": "^10.0.0",
     "node-localstorage": "^2.1.6",
     "react": "^16.13.1",
     "react-datepicker": "^3.0.0",
