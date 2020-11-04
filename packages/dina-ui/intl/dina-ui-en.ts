@@ -32,6 +32,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_acHashFunction: "Hash Function",
   field_acHashValue: "Hash",
   "field_acMetadataCreator.displayName": "Upload By",
+  field_acMetadataCreator: "Ac Metadata Creator",
   field_acSubType: "Object SubType",
   field_acTags: "Tags",
   "field_dcCreator.displayName": "Document Creator",
