@@ -7,13 +7,11 @@ jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 const TEST_PROFILES: PcrProfile[] = [
   {
-    group: { id: "1", groupName: "Test Group", type: "group" },
     id: "4",
     name: "Test Profile 1",
     type: "PRORILE"
   },
   {
-    group: { id: "1", groupName: "Test Group", type: "group" },
     id: "5",
     name: "Test Profile 2",
     type: "PROFILE"
@@ -27,18 +25,13 @@ const mockGet = jest.fn(async () => {
   };
 });
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockGet }
+};
 
 describe("PcrProfile list page", () => {
   it("Renders the list page.", async () => {
-    const wrapper = mountWithAppContext(<PcrProfileListPage />);
+    const wrapper = mountWithAppContext(<PcrProfileListPage />, { apiContext });
 
     await new Promise(setImmediate);
     wrapper.update();

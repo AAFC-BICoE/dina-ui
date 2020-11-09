@@ -16,11 +16,11 @@ export function LibraryPoolingStep(props: StepRendererProps) {
   const { loading, response } = useQuery<StepResource[]>(
     {
       filter: {
-        "chain.chainId": chain.id as string,
-        "chainStepTemplate.chainStepTemplateId": step.id as string
+        "chain.uuid": chain.id as string,
+        "chainStepTemplate.uuid": step.id as string
       },
       include: "libraryPool",
-      path: "stepResource"
+      path: "seqdb-api/stepResource"
     },
     {
       deps: [lastSave]

@@ -25,8 +25,10 @@ export function useLibraryPoolingSelectionControls({
     const newLibraryPoolContents = pooledItems.map<LibraryPoolContent>(
       item => ({
         libraryPool,
-        pooledLibraryPool: item.type === "libraryPool" ? item : null,
-        pooledLibraryPrepBatch: item.type === "libraryPrepBatch" ? item : null,
+        pooledLibraryPool:
+          item.type === "libraryPool" ? item : ({ id: null } as any),
+        pooledLibraryPrepBatch:
+          item.type === "libraryPrepBatch" ? item : ({ id: null } as any),
         type: "libraryPoolContent"
       })
     );
@@ -35,7 +37,8 @@ export function useLibraryPoolingSelectionControls({
       newLibraryPoolContents.map(lpc => ({
         resource: lpc,
         type: "libraryPoolContent"
-      }))
+      })),
+      { apiBaseUrl: "/seqdb-api" }
     );
 
     setLastSave(Date.now());
@@ -88,7 +91,7 @@ export function useLibraryPoolingSelectionControls({
       }
     }));
 
-    await doOperations(operations);
+    await doOperations(operations, { apiBaseUrl: "/seqdb-api" });
 
     setLastSave(Date.now());
   }

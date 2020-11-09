@@ -1,6 +1,7 @@
 import { AxiosError, AxiosRequestConfig } from "axios";
 import Kitsu from "kitsu";
 import {
+  CustomDinaKitsu,
   createContextValue,
   makeAxiosErrorMoreReadable
 } from "../ApiClientContext";
@@ -461,5 +462,75 @@ Constraint violation: description size must be between 1 and 10`;
     expect(() => makeAxiosErrorMoreReadable(axiosError as AxiosError)).toThrow(
       new Error("Service unavailable:\n/agent-api/operations: Bad Gateway")
     );
+  });
+
+  it("Sends a get request without omitting the end of a logn URL more than 2 slashes.", async () => {
+    const kitsu = new CustomDinaKitsu({
+      baseURL: "/base-url",
+      headers: { myHeader: "my-value" }
+    });
+
+    const mockAxiosGet = jest.fn(async () => ({
+      data: {
+        data: [
+          {
+            type: "articles",
+            id: "200",
+            attributes: {
+              title: "JSON:API paints my bikeshed!"
+            },
+            relationships: {
+              author: {
+                data: { id: "42", type: "people" }
+              }
+            }
+          }
+        ],
+        included: [
+          {
+            type: "people",
+            id: "42",
+            attributes: {
+              name: "John"
+            }
+          }
+        ]
+      }
+    }));
+
+    // Mock axios GET method to make sure called correctly:
+    const mockAxios = { get: mockAxiosGet };
+    kitsu.axios = mockAxios as any;
+
+    const response = await kitsu.get("my-api/topic/100/articles/200", {
+      include: "author"
+    });
+
+    expect(mockAxiosGet).lastCalledWith("my-api/topic/100/articles/200", {
+      headers: {
+        Accept: "application/vnd.api+json",
+        "Content-Type": "application/vnd.api+json",
+        myHeader: "my-value"
+      },
+      params: {
+        include: "author"
+      },
+      paramsSerializer: expect.anything()
+    });
+
+    expect(response).toEqual({
+      data: [
+        {
+          author: {
+            id: "42",
+            name: "John",
+            type: "people"
+          },
+          id: "200",
+          title: "JSON:API paints my bikeshed!",
+          type: "articles"
+        }
+      ]
+    });
   });
 });

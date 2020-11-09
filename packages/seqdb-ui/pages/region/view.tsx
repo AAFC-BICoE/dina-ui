@@ -25,7 +25,7 @@ export function RegionDetailsPage({ router }: WithRouterProps) {
         <EditButton entityId={id as string} entityLink="region" />
         <BackToListButton entityLink="region" />
       </ButtonBar>
-      <Query<Region> query={{ path: `region/${id}` }}>
+      <Query<Region> query={{ path: `seqdb-api/region/${id}` }}>
         {({ loading, response }) => (
           <div className="container-fluid">
             <h1>
@@ -35,6 +35,9 @@ export function RegionDetailsPage({ router }: WithRouterProps) {
             {response && (
               <Formik<Region> initialValues={response.data} onSubmit={noop}>
                 <div>
+                  <div className="row">
+                    <FieldView className="col-md-2" name="group" />
+                  </div>
                   <div className="row">
                     <FieldView className="col-md-2" name="name" />
                     <FieldView className="col-md-2" name="description" />

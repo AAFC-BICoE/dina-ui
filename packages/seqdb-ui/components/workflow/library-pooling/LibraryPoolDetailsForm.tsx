@@ -32,12 +32,15 @@ export function LibraryPoolDetailsForm({
 
   const onSubmit = safeSubmit(async submittedValues => {
     // Save the library pool:
-    const [savedLibraryPool] = await save([
-      {
-        resource: submittedValues,
-        type: "libraryPool"
-      }
-    ]);
+    const [savedLibraryPool] = await save(
+      [
+        {
+          resource: submittedValues,
+          type: "libraryPool"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
 
     // Only add a new stepResource if the LibraryPool is new.
     if (!submittedValues.id) {
@@ -49,12 +52,15 @@ export function LibraryPoolDetailsForm({
         value: "LIBRARY_POOL"
       };
 
-      await save([
-        {
-          resource: newStepResource,
-          type: "stepResource"
-        }
-      ]);
+      await save(
+        [
+          {
+            resource: newStepResource,
+            type: "stepResource"
+          }
+        ],
+        { apiBaseUrl: "/seqdb-api" }
+      );
     }
 
     onSuccess();

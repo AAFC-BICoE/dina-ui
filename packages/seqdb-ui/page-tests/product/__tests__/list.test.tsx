@@ -8,13 +8,11 @@ jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 const TEST_PRODUCTS: Product[] = [
   {
-    group: { id: "1", groupName: "Test Group", type: "group" },
     id: "4",
     name: "Test Product 1",
     type: "PRODUCT"
   },
   {
-    group: { id: "2", groupName: "Test Group", type: "group" },
     id: "5",
     name: "Test Product 2",
     type: "PRODUCT"
@@ -28,18 +26,13 @@ const mockGet = jest.fn(async () => {
   };
 });
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockGet }
+};
 
 describe("Product list page", () => {
   it("Renders the list page.", async () => {
-    const wrapper = mountWithAppContext(<ProductListPage />);
+    const wrapper = mountWithAppContext(<ProductListPage />, { apiContext });
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -54,7 +47,7 @@ describe("Product list page", () => {
   });
 
   it("Allows a filterable search.", async () => {
-    const wrapper = mountWithAppContext(<ProductListPage />);
+    const wrapper = mountWithAppContext(<ProductListPage />, { apiContext });
 
     // Wait for the default search to finish.
     await new Promise(setImmediate);
@@ -71,7 +64,7 @@ describe("Product list page", () => {
     await new Promise(setImmediate);
     wrapper.update();
     expect(mockGet).lastCalledWith(
-      "product",
+      "seqdb-api/product",
       expect.objectContaining({ filter: { rsql: "name==*omni*" } })
     );
     expect(wrapper.find(QueryTable).prop("filter")).toEqual({

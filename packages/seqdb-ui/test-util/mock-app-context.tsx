@@ -1,13 +1,18 @@
 import {
-  ApiClientContext,
+  AccountContextI,
+  AccountProvider,
   ApiClientContextI,
-  createContextValue
+  AuthenticatedApiClientProvider,
+  createContextValue,
+  ModalProvider
 } from "common-ui";
 import { mount } from "enzyme";
+import { merge, noop } from "lodash";
 import { SeqdbIntlProvider } from "../intl/seqdb-intl";
 
 interface MockAppContextProviderProps {
   apiContext?: ApiClientContextI;
+  accountContext?: Partial<AccountContextI>;
   children?: React.ReactNode;
 }
 
@@ -16,13 +21,24 @@ interface MockAppContextProviderProps {
  * the application.
  */
 export function MockAppContextProvider({
+  accountContext,
   apiContext,
   children
 }: MockAppContextProviderProps) {
   return (
-    <ApiClientContext.Provider value={apiContext || createContextValue()}>
-      <SeqdbIntlProvider>{children}</SeqdbIntlProvider>
-    </ApiClientContext.Provider>
+    <AccountProvider
+      value={{ ...DEFAULT_MOCK_ACCOUNT_CONTEXT, ...accountContext }}
+    >
+      <AuthenticatedApiClientProvider
+        apiContext={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContext)}
+      >
+        <SeqdbIntlProvider>
+          <ModalProvider appElement={document.querySelector("body")}>
+            {children}
+          </ModalProvider>
+        </SeqdbIntlProvider>
+      </AuthenticatedApiClientProvider>
+    </AccountProvider>
   );
 }
 
@@ -39,3 +55,15 @@ export function mountWithAppContext(
     </MockAppContextProvider>
   );
 }
+
+const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = {
+  authenticated: true,
+  groupNames: ["/aafc", "cnc"],
+  initialized: true,
+  login: noop,
+  logout: noop,
+  token: "test-token",
+  username: "test-user"
+};
+
+const DEFAULT_API_CONTEXT_VALUE = createContextValue();

@@ -6,8 +6,11 @@ import {
   Query,
   ResourceSelectField,
   safeSubmit,
+  SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useAccount,
+  useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -15,8 +18,7 @@ import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { Head, Nav } from "../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
-import { Chain } from "../../types/seqdb-api";
-import { Group } from "../../types/seqdb-api/resources/Group";
+import { Chain, ChainTemplate } from "../../types/seqdb-api";
 
 interface ChainFormProps {
   chain?: any;
@@ -38,7 +40,10 @@ export function ChainEditPage({ router }: WithRouterProps) {
               <SeqdbMessage id="editWorkflowTitle" />
             </h1>
             <Query<Chain>
-              query={{ include: "chainTemplate,group", path: `workflow/${id}` }}
+              query={{
+                include: "chainTemplate",
+                path: `seqdb-api/chain/${id}`
+              }}
             >
               {({ loading, response }) => (
                 <div>
@@ -65,20 +70,20 @@ export function ChainEditPage({ router }: WithRouterProps) {
 
 function ChainForm({ chain, router }: ChainFormProps) {
   const { save } = useContext(ApiClientContext);
+  const groupSelectOptions = useGroupSelectOptions();
 
-  const initialValues = chain || {};
+  const initialValues = chain || { group: groupSelectOptions[0].value };
 
   const onSubmit = safeSubmit(async submittedValues => {
-    // Current date as yyyy-mm-dd string.
-    const dateCreated = new Date().toISOString().split("T")[0];
-    submittedValues.dateCreated = dateCreated;
-
-    const response = await save([
-      {
-        resource: submittedValues,
-        type: "chain"
-      }
-    ]);
+    const response = await save(
+      [
+        {
+          resource: submittedValues,
+          type: "chain"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
 
     const newId = response[0].id;
     await router.push(`/workflow/view?id=${newId}`);
@@ -91,22 +96,21 @@ function ChainForm({ chain, router }: ChainFormProps) {
           <Form translate={undefined}>
             <ErrorViewer />
             <div className="row">
-              <ResourceSelectField<any>
+              <SelectField
+                className="col-md-3"
+                disabled={true}
+                name="group"
+                options={groupSelectOptions}
+              />
+            </div>
+            <div className="row">
+              <ResourceSelectField<ChainTemplate>
                 className="col-md-2"
                 label="Workflow Template"
                 name="chainTemplate"
                 filter={filterBy(["name"])}
-                model="chainTemplate"
+                model="seqdb-api/chainTemplate"
                 optionLabel={template => template.name}
-              />
-            </div>
-            <div className="row">
-              <ResourceSelectField<Group>
-                className="col-md-2"
-                name="group"
-                filter={filterBy(["groupName"])}
-                model="group"
-                optionLabel={group => group.groupName}
               />
             </div>
             <div className="row">
