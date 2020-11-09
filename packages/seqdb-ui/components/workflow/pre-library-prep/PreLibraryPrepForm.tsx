@@ -75,7 +75,7 @@ export function PreLibraryPrepForm({ onSubmit }: PreLibraryPrepFormProps) {
                 name="product"
                 optionLabel={kit => kit.name}
               />
-              <TextField className="col-12" name="notes" />
+              <TextField className="col-12" name="notes" multiLines={true} />
             </div>
             <div>
               <SubmitButton />
