@@ -1,6 +1,6 @@
 import { AccountContextI, OnFormikSubmit } from "common-ui";
 import { noop } from "lodash";
-import { FileUploader, IFileWithMeta } from "../../../components";
+import { FileUploader, IFileWithMeta, IMeta } from "../../../components";
 import UploadPage, {
   fileUploadErrorHandler
 } from "../../../pages/object-store/upload";
@@ -74,9 +74,18 @@ describe("Upload page", () => {
 
     // Pretend the FileUploader is uploading these files:
     const mockAcceptedFiles: Partial<IFileWithMeta>[] = [
-      { file: { name: "file1.pdf", type: "application/pdf" } as File },
-      { file: { name: "file2.pdf", type: "application/pdf" } as File },
-      { file: { name: "file3.pdf", type: "application/pdf" } as File }
+      {
+        file: { name: "file1.pdf", type: "application/pdf" } as File,
+        meta: { lastModifiedDate: "2019-08-28T20:37:21.502Z" } as IMeta
+      },
+      {
+        file: { name: "file2.pdf", type: "application/pdf" } as File,
+        meta: { lastModifiedDate: "2019-08-29T20:37:21.502Z" } as IMeta
+      },
+      {
+        file: { name: "file3.pdf", type: "application/pdf" } as File,
+        meta: { lastModifiedDate: "2019-08-30T20:37:21.502Z" } as IMeta
+      }
     ];
 
     // Call the onSubmit funciton with uploaded files:
@@ -103,7 +112,11 @@ describe("Upload page", () => {
       [
         {
           resource: {
-            acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+            acDigitizationDate: "2019-08-28T20:37:21+00:00",
+            acMetadataCreator: {
+              id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+              type: "person"
+            },
             bucket: "example-group",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"
@@ -112,7 +125,11 @@ describe("Upload page", () => {
         },
         {
           resource: {
-            acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+            acDigitizationDate: "2019-08-29T20:37:21+00:00",
+            acMetadataCreator: {
+              id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+              type: "person"
+            },
             bucket: "example-group",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"
@@ -121,7 +138,11 @@ describe("Upload page", () => {
         },
         {
           resource: {
-            acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+            acDigitizationDate: "2019-08-30T20:37:21+00:00",
+            acMetadataCreator: {
+              id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+              type: "person"
+            },
             bucket: "example-group",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"

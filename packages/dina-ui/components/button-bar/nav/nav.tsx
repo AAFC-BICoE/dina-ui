@@ -69,6 +69,9 @@ export function Nav() {
             <li className="list-inline-item my-auto">
               <NavAgentsDropdown />
             </li>
+            <li className="list-inline-item my-auto">
+              <NavDinaUserDropdown />
+            </li>
           </ul>
         </div>
       </div>
@@ -127,6 +130,11 @@ function NavAgentsDropdown() {
             <DinaMessage id="personListTitle" />
           </a>
         </Link>
+        <Link href="/organization/list">
+          <a className="dropdown-item">
+            <DinaMessage id="organizationListTitle" />
+          </a>
+        </Link>
       </div>
     </div>
   );
@@ -158,6 +166,24 @@ function NavbarUserControl() {
   );
 }
 
+/** Dina User links. */
+function NavDinaUserDropdown() {
+  return (
+    <div className="dropdown">
+      <a className="nav-link dropdown-toggle" href="#">
+        <DinaMessage id="dinaUserSectionTitle" />
+      </a>
+      <div className="dropdown-menu m-0">
+        <Link href="/dina-user/view">
+          <a className="dropdown-item">
+            <DinaMessage id="whoAmITitle" />
+          </a>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 export function Footer() {
   return (
     <footer id="wb-info" className="my-3" style={{ zIndex: 0 }}>
@@ -168,17 +194,17 @@ export function Footer() {
               <ul>
                 <li>
                   <a href="https://www.canada.ca/en/contact.html">
-                    Contact information
+                    <DinaMessage id="footerContactInfo" />
                   </a>
                 </li>
                 <li>
                   <a href="https://www.canada.ca/en/transparency/terms.html">
-                    Terms and conditions
+                    <DinaMessage id="footerTermsAndConditions" />
                   </a>
                 </li>
                 <li>
                   <a href="https://www.canada.ca/en/transparency/privacy.html">
-                    Privacy
+                    <DinaMessage id="footerPrivacy" />
                   </a>
                 </li>
               </ul>

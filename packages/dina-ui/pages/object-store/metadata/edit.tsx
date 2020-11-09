@@ -159,7 +159,10 @@ export default function EditMetadatasPage() {
 
   async function loadData() {
     const metadatas = await bulkGet<Metadata>(
-      ids.map(id => `/metadata/${id}?include=managedAttributeMap`),
+      ids.map(
+        id =>
+          `/metadata/${id}?include=managedAttributeMap,acMetadataCreator,dcCreator`
+      ),
       {
         apiBaseUrl: "/objectstore-api",
         joinSpecs: [
@@ -168,13 +171,13 @@ export default function EditMetadatasPage() {
             apiBaseUrl: "/agent-api",
             idField: "acMetadataCreator",
             joinField: "acMetadataCreator",
-            path: metadata => `person/${metadata.acMetadataCreator}`
+            path: metadata => `person/${metadata.acMetadataCreator.id}`
           },
           {
             apiBaseUrl: "/agent-api",
             idField: "dcCreator",
             joinField: "dcCreator",
-            path: metadata => `person/${metadata.dcCreator}`
+            path: metadata => `person/${metadata.dcCreator.id}`
           }
         ]
       }
@@ -237,13 +240,17 @@ export default function EditMetadatasPage() {
         delete metadataEdit.managedAttributeMap;
 
         if (acMetadataCreator !== undefined) {
-          metadataEdit.acMetadataCreator = decodeResourceCell(
-            acMetadataCreator
-          ).id;
+          metadataEdit.acMetadataCreator = {
+            id: decodeResourceCell(acMetadataCreator).id as any,
+            type: "person"
+          };
         }
 
         if (dcCreator !== undefined) {
-          metadataEdit.dcCreator = decodeResourceCell(dcCreator).id;
+          metadataEdit.dcCreator = {
+            id: decodeResourceCell(dcCreator).id as any,
+            type: "person"
+          };
         }
 
         if (acTags !== undefined) {

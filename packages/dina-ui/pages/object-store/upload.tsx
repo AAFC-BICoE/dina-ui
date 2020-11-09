@@ -7,6 +7,7 @@ import {
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { noop } from "lodash";
+import moment from "moment";
 import { useRouter } from "next/router";
 import { useContext } from "react";
 import {
@@ -68,15 +69,23 @@ export default function UploadPage() {
       uploadResponses.push(response.data);
     }
 
-    const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(res => ({
-      resource: {
-        acMetadataCreator: agentId,
-        bucket: group,
-        fileIdentifier: res.fileIdentifier,
+    const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(
+      (res, idx) => ({
+        resource: {
+          acMetadataCreator: {
+            id: agentId,
+            type: "person"
+          },
+          acDigitizationDate: moment(
+            acceptedFiles[idx].meta.lastModifiedDate
+          ).format(),
+          bucket: group,
+          fileIdentifier: res.fileIdentifier,
+          type: "metadata"
+        } as Metadata,
         type: "metadata"
-      } as Metadata,
-      type: "metadata"
-    }));
+      })
+    );
 
     const saveResults = await save(saveOperations, {
       apiBaseUrl: "/objectstore-api"
@@ -107,8 +116,7 @@ export default function UploadPage() {
         ) : (
           <div>
             <div className="alert alert-warning">
-              For testing purpose only. Only unclassified data should be
-              uploaded. Any uploaded data can be deleted at any given moment.
+              <DinaMessage id="forTestingPurposesOnlyMessage" />
             </div>
             <Formik
               initialValues={{ group: groupSelectOptions[0].value }}

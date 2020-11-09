@@ -2,6 +2,7 @@ import {
   ApiClientContext,
   ButtonBar,
   CancelButton,
+  DateField,
   DeleteButton,
   ErrorViewer,
   LoadingSpinner,
@@ -110,6 +111,15 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
           </div>
           <div className="row">
             <TextField className="col-md-4" name="acSubtype" />
+          </div>
+          <div className="row">
+            <DateField
+              className="col-md-4"
+              showTime={true}
+              name="createdOn"
+              disabled={true}
+            />
+            <TextField className="col-md-4" readOnly={true} name="createdBy" />
           </div>
         </div>
       </Form>

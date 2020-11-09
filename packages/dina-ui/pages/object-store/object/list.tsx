@@ -68,6 +68,10 @@ export default function MetadataListPage() {
       type: "DATE"
     },
     {
+      name: "xmpMetadataDate",
+      type: "DATE"
+    },
+    {
       name: "acMetadataCreator",
       type: "DROPDOWN",
       resourcePath: "agent-api/person",
@@ -84,8 +88,15 @@ export default function MetadataListPage() {
       Header: CheckBoxHeader,
       sortable: false
     },
-    "originalFilename",
-    "dcFormat",
+    {
+      Cell: ({ original: { id, originalFilename } }) =>
+        originalFilename ? (
+          <Link href={`/object-store/object/view?id=${id}`}>
+            {originalFilename}
+          </Link>
+        ) : null,
+      accessor: "originalFilename"
+    },
     dateCell("acDigitizationDate"),
     dateCell("xmpMetadataDate"),
     { accessor: "acMetadataCreator.displayName", sortable: false },
@@ -186,17 +197,19 @@ export default function MetadataListPage() {
                       apiBaseUrl: "/agent-api",
                       idField: "acMetadataCreator",
                       joinField: "acMetadataCreator",
-                      path: metadata => `person/${metadata.acMetadataCreator}`
+                      path: metadata =>
+                        `person/${metadata.acMetadataCreator.id}`
                     },
                     {
                       apiBaseUrl: "/agent-api",
                       idField: "dcCreator",
                       joinField: "dcCreator",
-                      path: metadata => `person/${metadata.dcCreator}`
+                      path: metadata => `person/${metadata.dcCreator.id}`
                     }
                   ],
                   onSuccess: res => setAvailableMetadatas(res.data),
-                  path: "objectstore-api/metadata",
+                  path:
+                    "objectstore-api/metadata?include=acMetadataCreator,dcCreator",
                   reactTableProps: ({ response }) => {
                     TBodyGallery.innerComponent = (
                       <StoredObjectGallery
