@@ -101,5 +101,26 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   uploadPageTitle: "Télécharger les fichiers",
   userMustBelongToGroup: "L'utilisateur doit appartenir à un groupe",
   valueLabel: "Valeur",
-  viewPreviewButtonText: "Prévisualiser"
+  viewPreviewButtonText: "Prévisualiser",
+  dinaUserSectionTitle: "Utilisateur Dina ",
+  field_acceptedValues: "Valeurs acceptées",
+  field_acSubtype: "Sous-catégorie Ac ",
+  field_acMetadataCreator: "Créateur de métadonnées ",
+  field_createdBy: "Créé par",
+  field_createdDate: "Date de création",
+  field_createdOn: "Créé le",
+  field_description: "Description",
+  field_displayName: "Visualiser le nom",
+  field_email: "Courriel",
+  field_organizationMandatoryFieldsError:
+    "Le nom dau moins une organisation est requis",
+  field_type: "Catégorie",
+  footerContactInfo: "Coordonnées du contact ",
+  footerTermsAndConditions: "Modalités ",
+  footerPrivacy: "Protection de la vie privée",
+  forTestingPurposesOnlyMessage:
+    "Aux fins danalyse seulement. Seules des données non classifiées peuvent être téléversées. Toute donnée téléversée peut être supprimée, en tout temps. ",
+  organizationEnglishNameLabel: "Nom anglais ",
+  organizationFrenchNameLabel: "Nom français ",
+  whoAmITitle: "Qui suis-je?"
 };

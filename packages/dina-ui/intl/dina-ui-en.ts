@@ -122,5 +122,5 @@ export const DINAUI_MESSAGES_ENGLISH = {
   userMustBelongToGroup: "User must belong to a Group",
   valueLabel: "Value",
   viewPreviewButtonText: "Preview",
-  whoAmITitle: " Who Am I"
+  whoAmITitle: "Who Am I"
 };
