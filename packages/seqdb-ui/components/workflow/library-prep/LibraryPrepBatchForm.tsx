@@ -133,10 +133,14 @@ export function LibraryPrepBatchForm({
           <NumberField className="col-md-2" name="totalLibraryYieldNm" />
         </div>
         <div className="row">
-          <TextField className="col-md-6" name="yieldNotes" />
+          <TextField className="col-md-6" name="yieldNotes" multiLines={true} />
         </div>
         <div className="row">
-          <TextField className="col-md-6" name="cleanUpNotes" />
+          <TextField
+            className="col-md-6"
+            name="cleanUpNotes"
+            multiLines={true}
+          />
           <TextField className="col-md-6" name="notes" multiLines={true} />
         </div>
         <SubmitButton />
