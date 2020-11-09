@@ -113,13 +113,13 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_displayName: "Visualiser le nom",
   field_email: "Courriel",
   field_organizationMandatoryFieldsError:
-    "Le nom dau moins une organisation est requis",
+    "Le nom d'au moins une organisation est requis",
   field_type: "Catégorie",
   footerContactInfo: "Coordonnées du contact ",
   footerTermsAndConditions: "Modalités ",
   footerPrivacy: "Protection de la vie privée",
   forTestingPurposesOnlyMessage:
-    "Aux fins danalyse seulement. Seules des données non classifiées peuvent être téléversées. Toute donnée téléversée peut être supprimée, en tout temps. ",
+    "Aux fins d'analyse seulement. Seules des données non classifiées peuvent être téléversées. Toute donnée téléversée peut être supprimée, en tout temps. ",
   organizationEnglishNameLabel: "Nom anglais ",
   organizationFrenchNameLabel: "Nom français ",
   whoAmITitle: "Qui suis-je?"
