@@ -26,24 +26,21 @@ export function TextField(props: TextFieldProps) {
             setFieldValue(name, event.target.value);
             setFieldTouched(name);
           }
+
+          const inputProps = {
+            className: "form-control",
+            onChange,
+            value: value || "",
+            readOnly
+          };
+
           // The default Field component's inner text input needs to be replaced with our own
           // controlled input that we manually pass the "onChange" and "value" props. Otherwise
           // we will get React's warning about switching from an uncontrolled to controlled input.
           return multiLines ? (
-            <textarea
-              className="form-control"
-              onChange={onChange}
-              value={value || ""}
-              readOnly={readOnly}
-            />
+            <textarea {...inputProps} />
           ) : (
-            <input
-              className="form-control"
-              onChange={onChange}
-              value={value || ""}
-              readOnly={readOnly}
-              type="text"
-            />
+            <input {...inputProps} type="text" />
           );
         }}
       </FastField>
