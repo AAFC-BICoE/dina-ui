@@ -112,10 +112,6 @@ export default function EditMetadatasPage() {
       data: "metadata.dcRights",
       title: formatMessage("field_dcRights")
     },
-    {
-      data: "metadata.xmpRightsWebStatement",
-      title: formatMessage("field_xmpRightsWebStatement")
-    },
     resourceSelectCell<License>(
       {
         label: license => license.titles[locale] ?? license.url,
