@@ -63,7 +63,7 @@ export function useSampleGridControls({
       },
       include: "sample",
       page: { limit: 1000 },
-      path: `libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`
+      path: `seqdb-api/libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`
     },
     {
       deps: [lastSave],
@@ -85,15 +85,17 @@ export function useSampleGridControls({
 
         const { data: selectionStepSrsNoCoords } = await apiClient.get<
           SampleStepResource[]
-        >("stepResource", {
+        >("seqdb-api/stepResource", {
           // Get all the sample stepResources from the sample selection step that have no coords.
           fields: {
             sample: "name"
           },
           filter: {
-            "chain.chainId": chain.id as string,
-            "chainStepTemplate.chainStepTemplateId": sampleSelectionStep.id as string,
-            rsql: `sample.sampleId=out=(${sampleIdsWithCoords || "0"})`
+            "chain.uuid": chain.id as string,
+            "chainStepTemplate.uuid": sampleSelectionStep.id as string,
+            rsql: `sample.uuid=out=(${
+              sampleIdsWithCoords || "00000000-0000-0000-0000-000000000000"
+            })`
           },
           include: "sample",
           page: { limit: 1000 }
@@ -277,7 +279,7 @@ export function useSampleGridControls({
         type: "libraryPrep"
       }));
 
-      await save(saveArgs);
+      await save(saveArgs, { apiBaseUrl: "/seqdb-api" });
 
       setLastSave(Date.now());
     } catch (err) {

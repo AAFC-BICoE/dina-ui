@@ -13,11 +13,6 @@ const TEST_PROTOCALS: Protocol[] = [
   {
     description: "desc1 ",
     equipment: "equip1",
-    group: {
-      groupName: "Test Group",
-      id: "1",
-      type: "group"
-    },
     id: "4",
     name: "Test Protocol 1",
     notes: "notes1",
@@ -29,11 +24,6 @@ const TEST_PROTOCALS: Protocol[] = [
   {
     description: "desc2 ",
     equipment: "equip2",
-    group: {
-      groupName: "Test Group",
-      id: "2",
-      type: "group"
-    },
     id: "5",
     name: "Test Protocol 2",
     notes: "notes2",
@@ -51,18 +41,13 @@ const mockGet = jest.fn(async () => {
   };
 });
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockGet }
+};
 
 describe("Protocol list page", () => {
   it("Renders the list page.", async () => {
-    const wrapper = mountWithAppContext(<ProtocolListPage />);
+    const wrapper = mountWithAppContext(<ProtocolListPage />, { apiContext });
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -77,7 +62,7 @@ describe("Protocol list page", () => {
   });
 
   it("Allows a filterable search.", async () => {
-    const wrapper = mountWithAppContext(<ProtocolListPage />);
+    const wrapper = mountWithAppContext(<ProtocolListPage />, { apiContext });
 
     // Wait for the default search to finish.
     await new Promise(setImmediate);
@@ -94,7 +79,7 @@ describe("Protocol list page", () => {
     await new Promise(setImmediate);
     wrapper.update();
     expect(mockGet).lastCalledWith(
-      "protocol",
+      "seqdb-api/protocol",
       expect.objectContaining({ filter: { rsql: "name=='*Funnel trap*'" } })
     );
     expect(wrapper.find(QueryTable).prop("filter")).toEqual({

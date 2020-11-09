@@ -1,10 +1,10 @@
 import { KitsuResource } from "kitsu";
-import { Group } from "./Group";
 import { Product } from "./Product";
 
 export interface ProtocolAttributes {
   type: string;
   name: string;
+  group?: string;
   version?: string;
   description?: string;
   steps?: string;
@@ -19,7 +19,6 @@ export interface ProtocolAttributes {
 }
 
 export interface ProtocolRelationships {
-  group: Group;
   kit?: Product;
 }
 

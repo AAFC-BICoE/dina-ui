@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
-import Kitsu, { KitsuResource, PersistedResource } from "kitsu";
-import { deserialise } from "kitsu-core";
+import Kitsu, { KitsuResource, PersistedResource, GetParams } from "kitsu";
+import { deserialise, query, error as kitsuError } from "kitsu-core";
 import React from "react";
 import { serialize } from "../util/serialize";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
@@ -91,7 +91,7 @@ export function createContextValue({
   },
   headers = {}
 }: ApiClientContextConfig = {}): ApiClientContextI {
-  const apiClient = new Kitsu({
+  const apiClient = new CustomDinaKitsu({
     baseURL,
     headers: { "Crnk-Compact": "true", ...headers },
     pluralize: false,
@@ -270,4 +270,25 @@ export function makeAxiosErrorMoreReadable(error: AxiosError) {
     throw new Error(errorMessage);
   }
   throw error;
+}
+
+export class CustomDinaKitsu extends Kitsu {
+  /**
+   * The default Kitsu 'get' method omits the last part of URLs with multiple slashes.
+   * e.g. "seqdb-api/indexSet/1/ngsindexes" becomes "seqdb-api/indexSet/1".
+   * Override the 'get' method so it works with our long URLs:
+   */
+  async get(path: string, params: GetParams = {}) {
+    try {
+      const { data } = await this.axios.get(path, {
+        headers: this.headers,
+        params,
+        paramsSerializer: p => query(p)
+      });
+
+      return deserialise(data);
+    } catch (E) {
+      throw kitsuError(E);
+    }
+  }
 }

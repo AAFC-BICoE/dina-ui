@@ -32,7 +32,6 @@ function getWrapper(propsOverride?: Partial<ContainerGridProps>) {
           name: "96 well box",
           numberOfColumns: 12,
           numberOfRows: 8,
-          numberOfWells: 96,
           type: "containerType"
         },
         id: "5",
@@ -83,13 +82,13 @@ describe("SampleGrid component", () => {
 
     mockGet.mockImplementation(async path => {
       // Mock the samples with libraryPreps:
-      if (path === "libraryPrepBatch/5/libraryPreps") {
+      if (path === "seqdb-api/libraryPrepBatch/5/libraryPreps") {
         return {
           data: MOCK_LIBRARY_PREPS
         };
       }
       // Mock the samples without well coords:
-      if (path === "stepResource") {
+      if (path === "seqdb-api/stepResource") {
         return {
           data: MOCK_STEPRESOURCES_NO_WELL_COORDS
         };
@@ -212,18 +211,21 @@ describe("SampleGrid component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(mockSave).lastCalledWith([
-      {
-        resource: {
-          id: "3",
-          sample: expect.objectContaining({ id: "6", type: "sample" }),
-          type: "libraryPrep",
-          wellColumn: 3,
-          wellRow: "F"
-        },
-        type: "libraryPrep"
-      }
-    ]);
+    expect(mockSave).lastCalledWith(
+      [
+        {
+          resource: {
+            id: "3",
+            sample: expect.objectContaining({ id: "6", type: "sample" }),
+            type: "libraryPrep",
+            wellColumn: 3,
+            wellRow: "F"
+          },
+          type: "libraryPrep"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
   });
 
   it("Lets you drag a sample from the grid to the list.", async () => {
@@ -287,53 +289,56 @@ describe("SampleGrid component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(mockSave).lastCalledWith([
-      {
-        resource: {
-          id: "3",
-          sample: expect.objectContaining({
-            id: "6",
-            type: "sample"
-          }),
-          type: "libraryPrep",
-          wellColumn: 3,
-          wellRow: "G"
+    expect(mockSave).lastCalledWith(
+      [
+        {
+          resource: {
+            id: "3",
+            sample: expect.objectContaining({
+              id: "6",
+              type: "sample"
+            }),
+            type: "libraryPrep",
+            wellColumn: 3,
+            wellRow: "G"
+          },
+          type: "libraryPrep"
         },
-        type: "libraryPrep"
-      },
-      {
-        resource: {
-          libraryPrepBatch: expect.objectContaining({
-            id: "5",
-            type: "libraryPrepBatch"
-          }),
-          sample: expect.objectContaining({
-            id: "8",
-            type: "sample"
-          }),
-          type: "libraryPrep",
-          wellColumn: 3,
-          wellRow: "H"
+        {
+          resource: {
+            libraryPrepBatch: expect.objectContaining({
+              id: "5",
+              type: "libraryPrepBatch"
+            }),
+            sample: expect.objectContaining({
+              id: "8",
+              type: "sample"
+            }),
+            type: "libraryPrep",
+            wellColumn: 3,
+            wellRow: "H"
+          },
+          type: "libraryPrep"
         },
-        type: "libraryPrep"
-      },
-      {
-        resource: {
-          libraryPrepBatch: expect.objectContaining({
-            id: "5",
-            type: "libraryPrepBatch"
-          }),
-          sample: expect.objectContaining({
-            id: "10",
-            type: "sample"
-          }),
-          type: "libraryPrep",
-          wellColumn: 4,
-          wellRow: "A"
-        },
-        type: "libraryPrep"
-      }
-    ]);
+        {
+          resource: {
+            libraryPrepBatch: expect.objectContaining({
+              id: "5",
+              type: "libraryPrepBatch"
+            }),
+            sample: expect.objectContaining({
+              id: "10",
+              type: "sample"
+            }),
+            type: "libraryPrep",
+            wellColumn: 4,
+            wellRow: "A"
+          },
+          type: "libraryPrep"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
   });
 
   it("Lets you fill multiple samples by Row.", async () => {
@@ -369,44 +374,47 @@ describe("SampleGrid component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(mockSave).lastCalledWith([
-      {
-        resource: {
-          id: "3",
-          sample: expect.objectContaining({ id: "6", type: "sample" }),
-          type: "libraryPrep",
-          wellColumn: 11,
-          wellRow: "G"
+    expect(mockSave).lastCalledWith(
+      [
+        {
+          resource: {
+            id: "3",
+            sample: expect.objectContaining({ id: "6", type: "sample" }),
+            type: "libraryPrep",
+            wellColumn: 11,
+            wellRow: "G"
+          },
+          type: "libraryPrep"
         },
-        type: "libraryPrep"
-      },
-      {
-        resource: {
-          libraryPrepBatch: expect.objectContaining({
-            id: "5",
-            type: "libraryPrepBatch"
-          }),
-          sample: expect.objectContaining({ id: "8", type: "sample" }),
-          type: "libraryPrep",
-          wellColumn: 12,
-          wellRow: "G"
+        {
+          resource: {
+            libraryPrepBatch: expect.objectContaining({
+              id: "5",
+              type: "libraryPrepBatch"
+            }),
+            sample: expect.objectContaining({ id: "8", type: "sample" }),
+            type: "libraryPrep",
+            wellColumn: 12,
+            wellRow: "G"
+          },
+          type: "libraryPrep"
         },
-        type: "libraryPrep"
-      },
-      {
-        resource: {
-          libraryPrepBatch: expect.objectContaining({
-            id: "5",
-            type: "libraryPrepBatch"
-          }),
-          sample: expect.objectContaining({ id: "10", type: "sample" }),
-          type: "libraryPrep",
-          wellColumn: 1,
-          wellRow: "H"
-        },
-        type: "libraryPrep"
-      }
-    ]);
+        {
+          resource: {
+            libraryPrepBatch: expect.objectContaining({
+              id: "5",
+              type: "libraryPrepBatch"
+            }),
+            sample: expect.objectContaining({ id: "10", type: "sample" }),
+            type: "libraryPrep",
+            wellColumn: 1,
+            wellRow: "H"
+          },
+          type: "libraryPrep"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
   });
 
   it("Provides a 'Clear Grid' button to clear the grid", async () => {
@@ -518,48 +526,51 @@ describe("SampleGrid component", () => {
     wrapper.update();
 
     // SAMP600 should be submitted in well H12. The other two samples should have null well coordinates.
-    expect(mockSave).lastCalledWith([
-      {
-        resource: expect.objectContaining({
-          id: "3",
-          sample: {
-            id: "6",
-            name: "SAMP600",
-            type: "sample"
-          },
-          type: "libraryPrep",
-          wellColumn: 12,
-          wellRow: "H"
-        }),
-        type: "libraryPrep"
-      },
-      {
-        resource: expect.objectContaining({
-          sample: {
-            id: "8",
-            name: "SAMP800",
-            type: "sample"
-          },
-          type: "libraryPrep",
-          wellColumn: null,
-          wellRow: null
-        }),
-        type: "libraryPrep"
-      },
-      {
-        resource: expect.objectContaining({
-          sample: {
-            id: "10",
-            name: "ZSAMP1000",
-            type: "sample"
-          },
-          type: "libraryPrep",
-          wellColumn: null,
-          wellRow: null
-        }),
-        type: "libraryPrep"
-      }
-    ]);
+    expect(mockSave).lastCalledWith(
+      [
+        {
+          resource: expect.objectContaining({
+            id: "3",
+            sample: {
+              id: "6",
+              name: "SAMP600",
+              type: "sample"
+            },
+            type: "libraryPrep",
+            wellColumn: 12,
+            wellRow: "H"
+          }),
+          type: "libraryPrep"
+        },
+        {
+          resource: expect.objectContaining({
+            sample: {
+              id: "8",
+              name: "SAMP800",
+              type: "sample"
+            },
+            type: "libraryPrep",
+            wellColumn: null,
+            wellRow: null
+          }),
+          type: "libraryPrep"
+        },
+        {
+          resource: expect.objectContaining({
+            sample: {
+              id: "10",
+              name: "ZSAMP1000",
+              type: "sample"
+            },
+            type: "libraryPrep",
+            wellColumn: null,
+            wellRow: null
+          }),
+          type: "libraryPrep"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
   });
 
   it("Shows a warning box if the Container Type is absent.", async () => {

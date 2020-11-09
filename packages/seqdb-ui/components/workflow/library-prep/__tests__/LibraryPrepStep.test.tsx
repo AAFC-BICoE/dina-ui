@@ -30,7 +30,7 @@ function getWrapper() {
 
 function mockExistingBatch() {
   mockGet.mockImplementation(async path => {
-    if (path === "stepResource") {
+    if (path === "seqdb-api/stepResource") {
       return {
         data: [
           {
@@ -51,7 +51,7 @@ function mockExistingBatch() {
 
 function mockNoExistingBatch() {
   mockGet.mockImplementation(async path => {
-    if (path === "stepResource") {
+    if (path === "seqdb-api/stepResource") {
       return { data: [] };
     }
 
@@ -108,7 +108,8 @@ describe("LibraryPrepStepDetails component", () => {
             },
             type: "libraryPrepBatch"
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ],
       [
         [
@@ -131,7 +132,8 @@ describe("LibraryPrepStepDetails component", () => {
             },
             type: "stepResource"
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ]
     ]);
 

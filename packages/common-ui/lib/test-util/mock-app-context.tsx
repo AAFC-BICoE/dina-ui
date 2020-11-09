@@ -1,6 +1,8 @@
 import { mount } from "enzyme";
+import { merge, noop } from "lodash";
+import { AccountContextI, AccountProvider } from "../account/AccountProvider";
+import { AuthenticatedApiClientProvider } from "../account/AuthenticatedApiClientProvider";
 import {
-  ApiClientContext,
   ApiClientContextI,
   createContextValue
 } from "../api-client/ApiClientContext";
@@ -9,6 +11,7 @@ import { ModalProvider } from "../modal/modal";
 
 interface MockAppContextProviderProps {
   apiContext?: ApiClientContextI;
+  accountContext?: Partial<AccountContextI>;
   children?: React.ReactNode;
 }
 
@@ -17,17 +20,24 @@ interface MockAppContextProviderProps {
  * the application.
  */
 export function MockAppContextProvider({
+  accountContext,
   apiContext,
   children
 }: MockAppContextProviderProps) {
   return (
-    <ApiClientContext.Provider value={apiContext || createContextValue()}>
-      <CommonUIIntlProvider>
-        <ModalProvider appElement={document.querySelector("body")}>
-          {children}
-        </ModalProvider>
-      </CommonUIIntlProvider>
-    </ApiClientContext.Provider>
+    <AccountProvider
+      value={{ ...DEFAULT_MOCK_ACCOUNT_CONTEXT, ...accountContext }}
+    >
+      <AuthenticatedApiClientProvider
+        apiContext={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContext)}
+      >
+        <CommonUIIntlProvider>
+          <ModalProvider appElement={document.querySelector("body")}>
+            {children}
+          </ModalProvider>
+        </CommonUIIntlProvider>
+      </AuthenticatedApiClientProvider>
+    </AccountProvider>
   );
 }
 
@@ -44,3 +54,17 @@ export function mountWithAppContext(
     </MockAppContextProvider>
   );
 }
+
+const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = {
+  authenticated: true,
+  groupNames: ["/aafc", "cnc"],
+  initialized: true,
+  login: noop,
+  logout: noop,
+  token: "test-token",
+  username: "test-user"
+};
+
+const DEFAULT_API_CONTEXT_VALUE = createContextValue({
+  getTempIdGenerator: () => () => "00000000-0000-0000-0000-000000000000"
+});

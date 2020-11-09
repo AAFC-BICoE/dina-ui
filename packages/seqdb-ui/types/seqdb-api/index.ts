@@ -1,7 +1,4 @@
-export * from "./resources/Container";
 export * from "./resources/ContainerType";
-export * from "./resources/Group";
-export * from "./resources/Location";
 export * from "./resources/PcrPrimer";
 export * from "./resources/PcrProfile";
 export * from "./resources/Product";

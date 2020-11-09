@@ -6,8 +6,10 @@ import {
   Query,
   ResourceSelectField,
   safeSubmit,
+  SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -15,7 +17,6 @@ import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ButtonBar, CancelButton, Head, Nav } from "../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
-import { Group } from "../../types/seqdb-api/resources/Group";
 import { PcrProfile } from "../../types/seqdb-api/resources/PcrProfile";
 import { Region } from "../../types/seqdb-api/resources/Region";
 
@@ -40,8 +41,8 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
             </h1>
             <Query<PcrProfile>
               query={{
-                include: "group,region",
-                path: `thermocyclerprofile/${id}`
+                include: "region",
+                path: `seqdb-api/thermocyclerprofile/${id}`
               }}
             >
               {({ loading, response }) => (
@@ -69,16 +70,25 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
 
 function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
   const { save } = useContext(ApiClientContext);
+  const groupSelectOptions = useGroupSelectOptions();
+
   const { id } = router.query;
-  const initialValues = profile || { type: "thermocyclerprofile" };
+
+  const initialValues = profile || {
+    group: groupSelectOptions[0].value,
+    type: "thermocyclerprofile"
+  };
 
   const onSubmit = safeSubmit(async submittedValues => {
-    const response = await save([
-      {
-        resource: submittedValues,
-        type: "thermocyclerprofile"
-      }
-    ]);
+    const response = await save(
+      [
+        {
+          resource: submittedValues,
+          type: "thermocyclerprofile"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
 
     const newId = response[0].id;
     await router.push(`/pcr-profile/view?id=${newId}`);
@@ -94,12 +104,11 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
         </ButtonBar>
         <div>
           <div className="row">
-            <ResourceSelectField<Group>
+            <SelectField
               className="col-md-2"
+              disabled={true}
               name="group"
-              filter={filterBy(["groupName"])}
-              model="group"
-              optionLabel={group => group.groupName}
+              options={groupSelectOptions}
             />
           </div>
           <div className="row">
@@ -108,7 +117,7 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
               name="region"
               filter={filterBy(["name"])}
               label="Select Gene Region"
-              model="region"
+              model="seqdb-api/region"
               optionLabel={region => region.name}
             />
             <TextField

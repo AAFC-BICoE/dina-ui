@@ -36,7 +36,7 @@ describe("Workflow view page", () => {
     }));
 
     mockGet.mockImplementation(async path => {
-      if (path === "chain/123") {
+      if (path === "seqdb-api/chain/123") {
         return {
           data: {
             chainTemplate: {
@@ -44,14 +44,14 @@ describe("Workflow view page", () => {
               name: "test workflow template",
               type: "chainTemplate"
             },
-            dateCreated: "2019-11-20",
+            createdOn: "2019-11-20",
             id: "123",
             name: "test workflow",
             type: "chain"
           } as Chain
         };
       }
-      if (path === "chainStepTemplate") {
+      if (path === "seqdb-api/chainStepTemplate") {
         return {
           data: [
             {

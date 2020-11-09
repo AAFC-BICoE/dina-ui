@@ -8,7 +8,7 @@ jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
-  if (model === "protocol/10") {
+  if (model === "seqdb-api/protocol/10") {
     // The request for the protocol returns the test protocol.
     return { data: TEST_PROTOCOL };
   } else {
@@ -23,17 +23,9 @@ const mockPatch = jest.fn();
 /** Mock next.js' router "push" function for navigating pages. */
 const mockPush = jest.fn();
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-      public axios = {
-        patch: mockPatch
-      };
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+};
 
 describe("Protocol edit page", () => {
   beforeEach(() => {
@@ -54,7 +46,8 @@ describe("Protocol edit page", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <ProtocolEditPage router={{ query: {}, push: mockPush } as any} />
+      <ProtocolEditPage router={{ query: {}, push: mockPush } as any} />,
+      { apiContext }
     );
 
     // Edit the protocol name, adding mandatory field values
@@ -67,13 +60,14 @@ describe("Protocol edit page", () => {
 
     setImmediate(() => {
       expect(mockPatch).lastCalledWith(
-        "/operations",
+        "/seqdb-api/operations",
         [
           {
             op: "POST",
             path: "protocol",
             value: {
               attributes: {
+                group: "/aafc",
                 name: "New Protocol"
               },
               id: "-100",
@@ -93,7 +87,7 @@ describe("Protocol edit page", () => {
   it("Provides a form to edit a Protocol.", async done => {
     // The get request will return the existing protocol.
     mockGet.mockImplementation(async model => {
-      if (model === "protocol/10") {
+      if (model === "seqdb-api/protocol/10") {
         // The request for the protocol returns the test protocol.
         return { data: TEST_PROTOCOL };
       } else {
@@ -116,7 +110,10 @@ describe("Protocol edit page", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <ProtocolEditPage router={{ query: { id: 10 }, push: mockPush } as any} />
+      <ProtocolEditPage
+        router={{ query: { id: 10 }, push: mockPush } as any}
+      />,
+      { apiContext }
     );
 
     // The page should load initially with a loading spinner.
@@ -146,7 +143,7 @@ describe("Protocol edit page", () => {
       // "patch" should have been called with a jsonpatch request containing the existing values
       // and the modified one.
       expect(mockPatch).lastCalledWith(
-        "/operations",
+        "/seqdb-api/operations",
         [
           {
             op: "PATCH",
@@ -154,13 +151,11 @@ describe("Protocol edit page", () => {
             value: {
               attributes: expect.objectContaining({
                 description: "new desc for protocol 10",
+                group: "/aafc",
                 name: "PCR Standardized for Sequencing (10ul), +BSA"
               }),
               id: "10",
               relationships: {
-                group: {
-                  data: expect.objectContaining({ id: "8", type: "group" })
-                },
                 kit: {
                   data: expect.objectContaining({ id: "10", type: "product" })
                 }
@@ -196,7 +191,8 @@ describe("Protocol edit page", () => {
     }));
 
     const wrapper = mountWithAppContext(
-      <ProtocolEditPage router={{ query: {}, push: mockPush } as any} />
+      <ProtocolEditPage router={{ query: {}, push: mockPush } as any} />,
+      { apiContext }
     );
 
     // Edit the protocol name.
@@ -223,20 +219,9 @@ const TEST_PROTOCOL: Required<Protocol> = {
   description: "protocol desc",
   equipment: "equip",
   forwardPrimerConcentration: "fPrimer",
-  group: {
-    description: "protocol group desc",
-    groupName: "Public",
-    id: "8",
-    type: "group"
-  },
+  group: "/aafc",
   id: "10",
   kit: {
-    group: {
-      description: "product group desc",
-      groupName: "ganx",
-      id: "8",
-      type: "group"
-    },
     id: "10",
     lastModified: "2019-03-27T04:00:00.000+0000",
     name: "Rapid Alkaline DNA Extraction",

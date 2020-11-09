@@ -1,14 +1,14 @@
 import {
   ApiClientContext,
   ErrorViewer,
-  filterBy,
   LabelView,
   LoadingSpinner,
   Query,
-  ResourceSelectField,
   safeSubmit,
+  SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -16,7 +16,6 @@ import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ButtonBar, CancelButton, Head, Nav } from "../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
-import { Group } from "../../types/seqdb-api/resources/Group";
 import { Product } from "../../types/seqdb-api/resources/Product";
 
 interface ProductFormProps {
@@ -38,7 +37,7 @@ export function ProductEditPage({ router }: WithRouterProps) {
             <h1>
               <SeqdbMessage id="editProductTitle" />
             </h1>
-            <Query<Product> query={{ include: "group", path: `product/${id}` }}>
+            <Query<Product> query={{ path: `seqdb-api/product/${id}` }}>
               {({ loading, response }) => (
                 <div>
                   <LoadingSpinner loading={loading} />
@@ -65,16 +64,21 @@ export function ProductEditPage({ router }: WithRouterProps) {
 function ProductForm({ product, router }: ProductFormProps) {
   const { save } = useContext(ApiClientContext);
   const { formatMessage } = useSeqdbIntl();
+  const groupSelectOptions = useGroupSelectOptions();
+
   const { id } = router.query;
-  const initialValues = product || {};
+  const initialValues = product || { group: groupSelectOptions[0].value };
 
   const onSubmit = safeSubmit(async submittedValues => {
-    const response = await save([
-      {
-        resource: submittedValues,
-        type: "product"
-      }
-    ]);
+    const response = await save(
+      [
+        {
+          resource: submittedValues,
+          type: "product"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
 
     const newId = response[0].id;
     await router.push(`/product/view?id=${newId}`);
@@ -90,12 +94,11 @@ function ProductForm({ product, router }: ProductFormProps) {
         </ButtonBar>
         <div>
           <div className="row">
-            <ResourceSelectField<Group>
+            <SelectField
               className="col-md-2"
+              disabled={true}
               name="group"
-              filter={filterBy(["groupName"])}
-              model="group"
-              optionLabel={group => group.groupName}
+              options={groupSelectOptions}
             />
           </div>
           <div className="row">

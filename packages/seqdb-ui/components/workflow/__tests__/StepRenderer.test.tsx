@@ -19,7 +19,7 @@ const TEST_CHAIN_TEMPLATE = {
 
 const TEST_CHAIN = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
-  dateCreated: "2019-01-01",
+  createdOn: "2019-01-01",
   id: "1",
   name: "Mat's pooling chain",
   type: "chain"

@@ -33,7 +33,7 @@ export class NewRegionButton extends React.Component {
     await doOperations([
       {
         op: "POST",
-        path: "region",
+        path: "seqdb-api/region",
         value: {
           attributes: {
             name: `new-region-${Math.random()}`,
