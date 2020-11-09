@@ -38,7 +38,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
   field_snapshotType: "Type dimage instantanée ",
   field_version: "Version",
   filterRecordsTitle: "Filtrer les dossiers ",
-  group: "Groupe",
+  field_group: "Groupe",
   name: "Nom",
   next: "Suivant",
   of: "de",

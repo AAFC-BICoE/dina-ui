@@ -28,7 +28,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   filterRecordsTitle: "Filter records",
   filterPartialMatch: "Partial Match",
   filterSubmitButtonText: "Filter List",
-  group: "Group",
+  field_group: "Group",
   loadingText: "Loading...",
   loggedInAsUser: "Logged in as: {name}",
   logoutBtn: "Logout",
