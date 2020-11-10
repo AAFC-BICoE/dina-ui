@@ -31,6 +31,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_acDigitizationDate: "Date Original Version Created",
   field_acHashFunction: "Hash Function",
   field_acHashValue: "Hash",
+  field_acMetadataCreator: "Created By",
   "field_acMetadataCreator.displayName": "Created By",
   field_acSubType: "Object SubType",
   field_acTags: "Tags",

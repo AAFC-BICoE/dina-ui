@@ -28,6 +28,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_acDigitizationDate: "Date de création de la version originale",
   field_acHashFunction: "Fonction de hachage",
   field_acHashValue: "Hachage",
+  field_acMetadataCreator: "Téléchargé par",
   "field_acMetadataCreator.displayName": "Téléchargé par",
   field_acSubType: "Sous-type d'objet",
   field_acTags: "Balises",
