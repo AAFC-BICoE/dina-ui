@@ -1,4 +1,4 @@
-import { LanguageSelector, useAccount } from "common-ui";
+import { LanguageSelector, NavbarUserControl } from "common-ui";
 import Link from "next/link";
 import React from "react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
@@ -24,7 +24,7 @@ export function Nav() {
             <meta property="areaServed" typeof="Country" content="Canada" />
           </div>
           <section id="wb-lng" className="text-right ml-auto col-7 col-md-8">
-            <ul className="list-inline ">
+            <ul className="list-inline">
               <li className="list-inline-item mx-2">
                 <LanguageSelector />
               </li>
@@ -68,6 +68,9 @@ export function Nav() {
             </li>
             <li className="list-inline-item my-auto">
               <NavAgentsDropdown />
+            </li>
+            <li className="list-inline-item my-auto">
+              <NavDinaUserDropdown />
             </li>
           </ul>
         </div>
@@ -137,28 +140,20 @@ function NavAgentsDropdown() {
   );
 }
 
-/** Shows the logged-in user and the logout button. */
-function NavbarUserControl() {
-  const { authenticated, initialized, logout, username } = useAccount();
-
+/** Dina User links. */
+function NavDinaUserDropdown() {
   return (
-    <div className="d-flex">
-      {initialized && authenticated ? (
-        <>
-          {username && (
-            <span className="mr-2 my-auto">
-              <DinaMessage id="loggedInAsUser" values={{ name: username }} />
-            </span>
-          )}
-          <button
-            type="button"
-            className="btn btn-dark logout-button"
-            onClick={() => logout()}
-          >
-            <DinaMessage id="logoutBtn" />
-          </button>
-        </>
-      ) : null}
+    <div className="dropdown">
+      <a className="nav-link dropdown-toggle" href="#">
+        <DinaMessage id="dinaUserSectionTitle" />
+      </a>
+      <div className="dropdown-menu m-0">
+        <Link href="/dina-user/view">
+          <a className="dropdown-item">
+            <DinaMessage id="whoAmITitle" />
+          </a>
+        </Link>
+      </div>
     </div>
   );
 }

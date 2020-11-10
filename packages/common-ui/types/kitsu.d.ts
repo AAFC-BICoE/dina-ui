@@ -9,6 +9,8 @@ declare module "kitsu" {
   export default class Kitsu {
     public axios: AxiosInstance;
 
+    public headers: any;
+
     constructor(params: KitsuConstructorParams);
 
     public delete(...args: any[]): Promise<any>;

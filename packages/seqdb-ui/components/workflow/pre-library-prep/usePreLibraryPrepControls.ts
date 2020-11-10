@@ -21,7 +21,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
 
   const visibleSampleIds = visibleSamples.length
     ? visibleSamples.map(sr => (sr.sample as Sample).id).join(",")
-    : 0;
+    : "00000000-0000-0000-0000-000000000000";
 
   const { loading: plpSrLoading } = useQuery<StepResource[]>(
     {
@@ -31,14 +31,14 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
         sample: "name,version"
       },
       filter: {
-        "chain.chainId": chain.id,
-        "chainStepTemplate.chainStepTemplateId": step.id,
-        rsql: `sample.sampleId=in=(${visibleSampleIds})`
+        "chain.uuid": chain.id,
+        "chainStepTemplate.uuid": step.id,
+        rsql: `sample.uuid=in=(${visibleSampleIds})`
       },
       include:
         "sample,preLibraryPrep,preLibraryPrep.protocol,preLibraryPrep.product",
       page: { limit: 1000 }, // Maximum page limit. There should only be 1 or 2 prelibrarypreps per sample.
-      path: "stepResource"
+      path: "seqdb-api/stepResource"
     },
     {
       deps: [lastSave],
@@ -88,12 +88,12 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
     // These should be edited instead of creating new ones.
     const existingStepResources = checkedSampleIds.length
       ? (
-          await apiClient.get<StepResource[]>("stepResource", {
+          await apiClient.get<StepResource[]>("seqdb-api/stepResource", {
             filter: {
-              "chain.chainId": chain.id,
-              "chainStepTemplate.chainStepTemplateId": step.id,
+              "chain.uuid": chain.id,
+              "chainStepTemplate.uuid": step.id,
               "preLibraryPrep.preLibraryPrepType": plpValues.preLibraryPrepType,
-              rsql: `sample.sampleId=in=(${checkedSampleIds})`
+              rsql: `sample.uuid=in=(${checkedSampleIds})`
             },
             include: "sample,preLibraryPrep",
             page: { limit: 1000 } // Max page limit
@@ -122,7 +122,9 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       }
     });
 
-    const savedPlps = (await save(plps)) as PreLibraryPrep[];
+    const savedPlps = (await save(plps, {
+      apiBaseUrl: "/seqdb-api"
+    })) as PreLibraryPrep[];
 
     const newStepResources = checkedSampleIds
       .map((sampleId, i) => ({
@@ -136,7 +138,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
           type: "preLibraryPrep"
         } as PreLibraryPrep,
         sample: { id: sampleId, type: "sample" },
-        type: "INPUT",
+        type: "stepResource",
         value: savedPlps[i].preLibraryPrepType
       }))
       // Don't create a new step resource if there is already one for this sample.
@@ -152,7 +154,8 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       newStepResources.map(resource => ({
         resource,
         type: "stepResource"
-      }))
+      })),
+      { apiBaseUrl: "/seqdb-api" }
     );
     setLastSave(Date.now());
 
@@ -175,12 +178,12 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
       // These should be edited instead of creating new ones.
       const stepResourcesToDelete = checkedSampleIds.length
         ? (
-            await apiClient.get<StepResource[]>("stepResource", {
+            await apiClient.get<StepResource[]>("seqdb-api/stepResource", {
               filter: {
                 "chain.chainId": chain.id,
                 "chainStepTemplate.chainStepTemplateId": step.id,
                 "preLibraryPrep.preLibraryPrepType": plpType,
-                rsql: `sample.sampleId=in=(${checkedSampleIds})`
+                rsql: `sample.uuid=in=(${checkedSampleIds})`
               },
               include: "sample,preLibraryPrep",
               page: { limit: 1000 } // Max page limit
@@ -204,7 +207,7 @@ export function usePreLibraryPrepControls({ chain, step }: StepRendererProps) {
 
       const operations = [...srOperations, ...plpOperations];
 
-      await doOperations(operations);
+      await doOperations(operations, { apiBaseUrl: "/seqdb-api" });
       setLastSave(Date.now());
       formikProps.setFieldValue("checkedIds", {});
     } catch (err) {

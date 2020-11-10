@@ -1,6 +1,7 @@
 import { AxiosError, AxiosRequestConfig } from "axios";
 import Kitsu from "kitsu";
 import {
+  CustomDinaKitsu,
   createContextValue,
   makeAxiosErrorMoreReadable
 } from "../ApiClientContext";
@@ -87,6 +88,20 @@ const TODO_OPERATION_1_VALID_2_INVALID: Operation[] = [
   }
 ];
 
+const TODO_OPERATION_DENY_ACCESS: Operation[] = [
+  {
+    op: "POST",
+    path: "todo",
+    value: {
+      attributes: {
+        name: "this will fail with an 'access denied' error."
+      },
+      id: "1",
+      type: "todo"
+    }
+  }
+];
+
 const MOCK_AXIOS_RESPONSE_1_VALID_2_INVALID = {
   data: [
     {
@@ -127,6 +142,22 @@ const MOCK_AXIOS_RESPONSE_1_VALID_2_INVALID = {
   ] as OperationsResponse
 };
 
+const MOCK_AXIOS_RESPONSE_ACCESS_DENIED = {
+  data: [
+    {
+      errors: [
+        {
+          status: "403",
+          code: "Access is denied",
+          title: "Access is denied",
+          meta: { type: "AccessDeniedException" }
+        }
+      ],
+      status: 403
+    }
+  ] as OperationsResponse
+};
+
 /** Mock of Axios' patch function. */
 const mockPatch = jest.fn((_, data) => {
   if (data === TODO_INSERT_OPERATION) {
@@ -134,6 +165,9 @@ const mockPatch = jest.fn((_, data) => {
   }
   if (data === TODO_OPERATION_1_VALID_2_INVALID) {
     return MOCK_AXIOS_RESPONSE_1_VALID_2_INVALID;
+  }
+  if (data === TODO_OPERATION_DENY_ACCESS) {
+    return MOCK_AXIOS_RESPONSE_ACCESS_DENIED;
   }
 });
 
@@ -171,6 +205,19 @@ Constraint violation: description size must be between 1 and 10`;
 
     try {
       await doOperations(TODO_OPERATION_1_VALID_2_INVALID);
+    } catch (error) {
+      actualError = error;
+    }
+    expect(actualError.message).toEqual(expectedErrorMessage);
+  });
+
+  it("Omits the detail field from the error message if the detail is undefined.", async () => {
+    const expectedErrorMessage = "Access is denied";
+
+    let actualError: Error = new Error();
+
+    try {
+      await doOperations(TODO_OPERATION_DENY_ACCESS);
     } catch (error) {
       actualError = error;
     }
@@ -461,5 +508,75 @@ Constraint violation: description size must be between 1 and 10`;
     expect(() => makeAxiosErrorMoreReadable(axiosError as AxiosError)).toThrow(
       new Error("Service unavailable:\n/agent-api/operations: Bad Gateway")
     );
+  });
+
+  it("Sends a get request without omitting the end of a logn URL more than 2 slashes.", async () => {
+    const kitsu = new CustomDinaKitsu({
+      baseURL: "/base-url",
+      headers: { myHeader: "my-value" }
+    });
+
+    const mockAxiosGet = jest.fn(async () => ({
+      data: {
+        data: [
+          {
+            type: "articles",
+            id: "200",
+            attributes: {
+              title: "JSON:API paints my bikeshed!"
+            },
+            relationships: {
+              author: {
+                data: { id: "42", type: "people" }
+              }
+            }
+          }
+        ],
+        included: [
+          {
+            type: "people",
+            id: "42",
+            attributes: {
+              name: "John"
+            }
+          }
+        ]
+      }
+    }));
+
+    // Mock axios GET method to make sure called correctly:
+    const mockAxios = { get: mockAxiosGet };
+    kitsu.axios = mockAxios as any;
+
+    const response = await kitsu.get("my-api/topic/100/articles/200", {
+      include: "author"
+    });
+
+    expect(mockAxiosGet).lastCalledWith("my-api/topic/100/articles/200", {
+      headers: {
+        Accept: "application/vnd.api+json",
+        "Content-Type": "application/vnd.api+json",
+        myHeader: "my-value"
+      },
+      params: {
+        include: "author"
+      },
+      paramsSerializer: expect.anything()
+    });
+
+    expect(response).toEqual({
+      data: [
+        {
+          author: {
+            id: "42",
+            name: "John",
+            type: "people"
+          },
+          id: "200",
+          title: "JSON:API paints my bikeshed!",
+          type: "articles"
+        }
+      ]
+    });
   });
 });

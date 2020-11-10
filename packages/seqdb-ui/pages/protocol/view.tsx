@@ -28,7 +28,9 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
         <EditButton entityId={id as string} entityLink="protocol" />
         <BackToListButton entityLink="protocol" />
       </ButtonBar>
-      <Query<Protocol> query={{ include: "group,kit", path: `protocol/${id}` }}>
+      <Query<Protocol>
+        query={{ include: "kit", path: `seqdb-api/protocol/${id}` }}
+      >
         {({ loading, response }) => {
           const protocol = response && {
             ...response.data,
@@ -45,11 +47,7 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
                 <Formik<Protocol> initialValues={protocol} onSubmit={noop}>
                   <div>
                     <div className="row">
-                      <FieldView
-                        className="col-md-2"
-                        name="group.groupName"
-                        label="Group Name"
-                      />
+                      <FieldView className="col-md-2" name="group" />
                     </div>
                     <div className="row">
                       <FieldView className="col-md-2" name="type" />

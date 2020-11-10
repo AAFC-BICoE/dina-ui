@@ -26,7 +26,10 @@ export function PcrProfileDetailsPage({ router }: WithRouterProps) {
         <BackToListButton entityLink="pcr-profile" />
       </ButtonBar>
       <Query<PcrProfile>
-        query={{ include: "group,region", path: `thermocyclerprofile/${id}` }}
+        query={{
+          include: "region",
+          path: `seqdb-api/thermocyclerprofile/${id}`
+        }}
       >
         {({ loading, response }) => (
           <div className="container-fluid">
@@ -38,11 +41,7 @@ export function PcrProfileDetailsPage({ router }: WithRouterProps) {
               <Formik<PcrProfile> initialValues={response.data} onSubmit={noop}>
                 <div>
                   <div className="row">
-                    <FieldView
-                      className="col-md-2"
-                      name="group.groupName"
-                      label="Group Name"
-                    />
+                    <FieldView className="col-md-2" name="group" />
                   </div>
                   <div className="row">
                     <FieldView

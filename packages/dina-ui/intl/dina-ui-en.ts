@@ -17,6 +17,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   closePreviewButtonText: "Close Preview",
   deleteButtonText: "Delete",
   deleteSelectedButtonText: "Delete Selected",
+  dinaUserSectionTitle: "Dina User",
   editObjectSubtypeTitle: "Edit Object Subtype",
   editOrganizationTitle: "Edit Organization",
   editOrganizationAliasesLabel: "Aliases (comma seperated)",
@@ -30,10 +31,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_acDigitizationDate: "Date Original Version Created",
   field_acHashFunction: "Hash Function",
   field_acHashValue: "Hash",
-  "field_acMetadataCreator.displayName": "Upload By",
+  field_acMetadataCreator: "Metadata Created By",
+  "field_acMetadataCreator.displayName": "Metadata Created By",
   field_acSubType: "Object SubType",
   field_acTags: "Tags",
-  "field_dcCreator.displayName": "Document Creator",
+  "field_dcCreator.displayName": "Digitized By",
   field_createdBy: "Created By",
   field_createdDate: "Created Date",
   field_createdOn: "Created On",
@@ -59,7 +61,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
   field_type: "Type",
-  field_xmpMetadataDate: "Date Metadata Applied",
+  field_xmpMetadataDate: "Last Updated On",
   field_xmpRightsWebStatement: "Reuse Rights Statement",
   footerContactInfo: "Contact information",
   footerTermsAndConditions: "Terms and conditions",
@@ -119,5 +121,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   uploadPageTitle: "Upload Files",
   userMustBelongToGroup: "User must belong to a Group",
   valueLabel: "Value",
-  viewPreviewButtonText: "Preview"
+  viewPreviewButtonText: "Preview",
+  whoAmITitle: "Who Am I"
 };

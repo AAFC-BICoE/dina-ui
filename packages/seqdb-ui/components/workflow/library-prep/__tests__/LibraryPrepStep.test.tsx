@@ -30,7 +30,7 @@ function getWrapper() {
 
 function mockExistingBatch() {
   mockGet.mockImplementation(async path => {
-    if (path === "stepResource") {
+    if (path === "seqdb-api/stepResource") {
       return {
         data: [
           {
@@ -51,7 +51,7 @@ function mockExistingBatch() {
 
 function mockNoExistingBatch() {
   mockGet.mockImplementation(async path => {
-    if (path === "stepResource") {
+    if (path === "seqdb-api/stepResource") {
       return { data: [] };
     }
 
@@ -79,7 +79,7 @@ describe("LibraryPrepStepDetails component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    wrapper.find(".notes-field input").simulate("change", {
+    wrapper.find(".notes-field textarea").simulate("change", {
       target: { name: "seq", value: "new notes" }
     });
 
@@ -108,7 +108,8 @@ describe("LibraryPrepStepDetails component", () => {
             },
             type: "libraryPrepBatch"
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ],
       [
         [
@@ -131,7 +132,8 @@ describe("LibraryPrepStepDetails component", () => {
             },
             type: "stepResource"
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ]
     ]);
 
@@ -155,7 +157,7 @@ describe("LibraryPrepStepDetails component", () => {
     wrapper.find("button[children='Edit Batch Details']").simulate("click");
     wrapper.update();
 
-    expect(wrapper.find(".notes-field input").prop("value")).toEqual(
+    expect(wrapper.find(".notes-field textarea").prop("value")).toEqual(
       "new notes"
     );
   });

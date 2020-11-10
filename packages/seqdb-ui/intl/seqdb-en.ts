@@ -25,6 +25,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   editWorkflowTitle: "Edit NGS Workflow",
   "field_group.groupName": "Group Name",
   field_name: "Name",
+  indexSetListTitle: "Index Sets",
   notShearedStatus: "Not Sheared",
   notSizeSelectedStatus: "No Size Selection",
   pcrPrimerListTitle: "PCR Primers",
