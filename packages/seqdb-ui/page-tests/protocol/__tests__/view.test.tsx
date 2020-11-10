@@ -9,7 +9,6 @@ import {
 jest.mock("next/link", () => () => <div />);
 
 const TEST_PROTOCOL: Protocol = {
-  group: { id: "1", groupName: "Test Group", type: "group" },
   id: "4",
   kit: { name: "test kit", type: "product" },
   name: "Test Protocol",
@@ -23,19 +22,15 @@ const mockGet = jest.fn(async () => {
   };
 });
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-    }
-);
+const apiContext: any = { apiClient: { get: mockGet } };
 
 describe("Protocol details page", () => {
   it("Renders initially with a loading spinner.", () => {
     const wrapper = mountWithAppContext(
-      <ProtocolDetailsPage router={{ query: { id: "100" } } as any} />
+      <ProtocolDetailsPage router={{ query: { id: "100" } } as any} />,
+      {
+        apiContext
+      }
     );
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
@@ -43,7 +38,10 @@ describe("Protocol details page", () => {
 
   it("Render the Protocol details", async () => {
     const wrapper = mountWithAppContext(
-      <ProtocolDetailsPage router={{ query: { id: "100" } } as any} />
+      <ProtocolDetailsPage router={{ query: { id: "100" } } as any} />,
+      {
+        apiContext
+      }
     );
 
     // Wait for the page to load.

@@ -1,4 +1,6 @@
 import { FastField, FieldProps } from "formik";
+import { isDate } from "lodash";
+import moment from "moment";
 import Link from "next/link";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
@@ -25,9 +27,23 @@ export function FieldView(props: FieldViewProps) {
               <Link href={link}>
                 <a>{value}</a>
               </Link>
-            ) : (
+            ) : Array.isArray(value) ? (
               value
-            )}
+                .map(val =>
+                  val.name
+                    ? val.name
+                    : val.names
+                    ? val.names[0].name
+                    : typeof val === "string"
+                    ? val
+                    : JSON.stringify(val)
+                )
+                .join()
+            ) : typeof value === "string" ? (
+              value
+            ) : isDate(value) ? (
+              moment(value).format()
+            ) : null}
           </p>
         </FieldWrapper>
       )}

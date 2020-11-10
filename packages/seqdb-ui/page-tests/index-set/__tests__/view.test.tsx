@@ -41,10 +41,10 @@ const TEST_NGS_INDEXES: NgsIndex[] = [
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async path => {
-  if (path === "indexSet/100") {
+  if (path === "seqdb-api/indexSet/100") {
     return { data: TEST_INDEX_SET };
   }
-  if (path === "indexSet/100/ngsIndexes") {
+  if (path === "seqdb-api/indexSet/100/ngsIndexes") {
     return { data: TEST_NGS_INDEXES };
   }
   return { data: [] };

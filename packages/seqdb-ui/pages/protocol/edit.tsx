@@ -8,7 +8,8 @@ import {
   safeSubmit,
   SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -16,7 +17,6 @@ import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ButtonBar, CancelButton, Head, Nav } from "../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
-import { Group } from "../../types/seqdb-api/resources/Group";
 import { Product } from "../../types/seqdb-api/resources/Product";
 import {
   Protocol,
@@ -43,7 +43,7 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
               <SeqdbMessage id="editProtocolTitle" />
             </h1>
             <Query<Protocol>
-              query={{ include: "group,kit", path: `protocol/${id}` }}
+              query={{ include: "kit", path: `seqdb-api/protocol/${id}` }}
             >
               {({ loading, response }) => (
                 <div>
@@ -70,8 +70,10 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
 
 function ProtocolForm({ protocol, router }: ProtocolFormProps) {
   const { save } = useContext(ApiClientContext);
+  const groupSelectOptions = useGroupSelectOptions();
+
   const { id } = router.query;
-  const initialValues = protocol || {};
+  const initialValues = protocol || { group: groupSelectOptions[0].value };
 
   const onSubmit = safeSubmit(async submittedValues => {
     // Override the product type with "product" when kit is available
@@ -79,12 +81,15 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
       submittedValues.kit.type = "product";
     }
 
-    const response = await save([
-      {
-        resource: submittedValues,
-        type: "protocol"
-      }
-    ]);
+    const response = await save(
+      [
+        {
+          resource: submittedValues,
+          type: "protocol"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
 
     const newId = response[0].id;
     await router.push(`/protocol/view?id=${newId}`);
@@ -100,12 +105,11 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
         </ButtonBar>
         <div>
           <div className="row">
-            <ResourceSelectField<Group>
+            <SelectField
               className="col-md-2"
+              disabled={true}
               name="group"
-              filter={filterBy(["groupName"])}
-              model="group"
-              optionLabel={group => group.groupName}
+              options={groupSelectOptions}
             />
           </div>
           <div className="row">
@@ -123,7 +127,7 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
             <TextField className="col-md-8" name="steps" />
           </div>
           <div className="row">
-            <TextField className="col-md-8" name="notes" />
+            <TextField className="col-md-8" name="notes" multiLines={true} />
           </div>
           <div className="row">
             <TextField className="col-md-2" name="reference" />
@@ -132,7 +136,7 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
               className="col-md-4"
               name="kit"
               filter={filterBy(["name"])}
-              model="product"
+              model="seqdb-api/product"
               optionLabel={product => product.name}
             />
           </div>

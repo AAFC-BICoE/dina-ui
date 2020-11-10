@@ -20,19 +20,15 @@ const mockGet = jest.fn(async () => {
   };
 });
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-    }
-);
+const apiContext: any = { apiClient: { get: mockGet } };
 
 describe("Region details page", () => {
   it("Renders initially with a loading spinner.", () => {
     const wrapper = mountWithAppContext(
-      <RegionDetailsPage router={{ query: { id: "100" } } as any} />
+      <RegionDetailsPage router={{ query: { id: "100" } } as any} />,
+      {
+        apiContext
+      }
     );
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
@@ -40,7 +36,10 @@ describe("Region details page", () => {
 
   it("Render the gene region details", async () => {
     const wrapper = mountWithAppContext(
-      <RegionDetailsPage router={{ query: { id: "100" } } as any} />
+      <RegionDetailsPage router={{ query: { id: "100" } } as any} />,
+      {
+        apiContext
+      }
     );
 
     // Wait for the page to load.

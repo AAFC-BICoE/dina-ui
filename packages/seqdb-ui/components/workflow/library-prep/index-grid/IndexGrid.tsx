@@ -72,7 +72,7 @@ export function IndexGrid(props: IndexGridProps) {
                 filter={filterBy(["name"])}
                 name={`indexI5s[${rowLetter}]`}
                 optionLabel={primer => primer.name}
-                model={`indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
+                model={`seqdb-api/indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
                 styles={{ menu: () => ({ zIndex: 5 }) }}
               />
             </div>
@@ -122,7 +122,7 @@ export function IndexGrid(props: IndexGridProps) {
                 filter={filterBy(["name"])}
                 name={`indexI7s[${columnLabel}]`}
                 optionLabel={primer => primer.name}
-                model={`indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
+                model={`seqdb-api/indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
                 styles={{ menu: () => ({ zIndex: 5 }) }}
               />
             </>

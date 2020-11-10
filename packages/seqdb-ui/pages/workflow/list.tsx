@@ -12,16 +12,12 @@ const WORKFLOW_TABLE_COLUMNS: ColumnDefinition<any>[] = [
     ),
     accessor: "name"
   },
-  "dateCreated",
-  "chainTemplate.name",
-  "group.groupName"
+  "group",
+  "createdOn",
+  "chainTemplate.name"
 ];
 
-const WORKFLOW_FILTER_ATTRIBUTES = [
-  "name",
-  "chainTemplate.name",
-  "group.groupName"
-];
+const WORKFLOW_FILTER_ATTRIBUTES = ["name", "chainTemplate.name"];
 
 export default function WorkflowListPage() {
   const { formatMessage } = useSeqdbIntl();
@@ -42,8 +38,8 @@ export default function WorkflowListPage() {
           id="workflow-list"
           queryTableProps={{
             columns: WORKFLOW_TABLE_COLUMNS,
-            include: "chainTemplate,group",
-            path: "chain"
+            include: "chainTemplate",
+            path: "seqdb-api/chain"
           }}
         />
       </div>

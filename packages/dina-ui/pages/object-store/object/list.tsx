@@ -12,7 +12,8 @@ import {
   useModal,
   filterBy,
   FilterAttribute,
-  dateCell
+  dateCell,
+  useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik, FormikContextType } from "formik";
 import { noop, toPairs } from "lodash";
@@ -88,7 +89,15 @@ export default function MetadataListPage() {
       Header: CheckBoxHeader,
       sortable: false
     },
-    "originalFilename",
+    {
+      Cell: ({ original: { id, originalFilename } }) =>
+        originalFilename ? (
+          <Link href={`/object-store/object/view?id=${id}`}>
+            {originalFilename}
+          </Link>
+        ) : null,
+      accessor: "originalFilename"
+    },
     dateCell("acDigitizationDate"),
     dateCell("xmpMetadataDate"),
     { accessor: "acMetadataCreator.displayName", sortable: false },
@@ -115,10 +124,7 @@ export default function MetadataListPage() {
 
   const groupSelectOptions = [
     { label: "<any>", value: undefined },
-    ...(groupNames ?? []).map(group => ({
-      label: group,
-      value: group
-    }))
+    ...useGroupSelectOptions()
   ];
 
   // Workaround to make sure react-table doesn't unmount TBodyComponent
@@ -189,17 +195,19 @@ export default function MetadataListPage() {
                       apiBaseUrl: "/agent-api",
                       idField: "acMetadataCreator",
                       joinField: "acMetadataCreator",
-                      path: metadata => `person/${metadata.acMetadataCreator}`
+                      path: metadata =>
+                        `person/${metadata.acMetadataCreator.id}`
                     },
                     {
                       apiBaseUrl: "/agent-api",
                       idField: "dcCreator",
                       joinField: "dcCreator",
-                      path: metadata => `person/${metadata.dcCreator}`
+                      path: metadata => `person/${metadata.dcCreator.id}`
                     }
                   ],
                   onSuccess: res => setAvailableMetadatas(res.data),
-                  path: "objectstore-api/metadata",
+                  path:
+                    "objectstore-api/metadata?include=acMetadataCreator,dcCreator",
                   reactTableProps: ({ response }) => {
                     TBodyGallery.innerComponent = (
                       <StoredObjectGallery

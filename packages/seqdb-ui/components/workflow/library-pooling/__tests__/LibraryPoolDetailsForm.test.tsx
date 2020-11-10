@@ -70,7 +70,8 @@ describe("LibraryPoolDetailsForm component", () => {
             },
             type: "libraryPool"
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ],
       [
         [
@@ -93,7 +94,8 @@ describe("LibraryPoolDetailsForm component", () => {
             },
             type: "stepResource"
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ]
     ]);
 
@@ -144,7 +146,8 @@ describe("LibraryPoolDetailsForm component", () => {
             },
             type: "libraryPool"
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ]
     ]);
     expect(mockOnSuccess).toHaveBeenCalledTimes(1);

@@ -266,7 +266,10 @@ describe("Metadata bulk edit page", () => {
       [
         {
           resource: {
-            acMetadataCreator: "63eead51-142f-4a67-a596-68fd35a36ed8",
+            acMetadataCreator: {
+              id: "63eead51-142f-4a67-a596-68fd35a36ed8",
+              type: "person"
+            },
             acTags: ["newTag1", "newTag2"],
             id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
             type: "metadata"

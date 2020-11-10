@@ -65,7 +65,8 @@ describe("Library Prep Batch form", () => {
             },
             type: "libraryPrepBatch"
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ],
       [
         [
@@ -88,7 +89,8 @@ describe("Library Prep Batch form", () => {
             },
             type: "stepResource"
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ]
     ]);
 
@@ -112,7 +114,7 @@ describe("Library Prep Batch form", () => {
       }
     });
 
-    expect(wrapper.find(".notes-field input").prop("value")).toEqual(
+    expect(wrapper.find(".notes-field textarea").prop("value")).toEqual(
       "test notes"
     );
 
@@ -124,7 +126,7 @@ describe("Library Prep Batch form", () => {
       id: "200"
     });
 
-    wrapper.find(".notes-field input").simulate("change", {
+    wrapper.find(".notes-field textarea").simulate("change", {
       target: { name: "seq", value: "new notes" }
     });
 
@@ -153,7 +155,8 @@ describe("Library Prep Batch form", () => {
             },
             type: "libraryPrepBatch"
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ]
     ]);
 

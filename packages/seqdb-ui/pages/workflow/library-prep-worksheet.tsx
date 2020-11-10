@@ -21,7 +21,7 @@ export default function LibraryPrepWorksheetPage() {
       "libraryPrepBatch.containerType",
       "chain"
     ].join(","),
-    path: `stepResource/${stepResourceId}`
+    path: `seqdb-api/stepResource/${stepResourceId}`
   });
 
   const batch = srResponse && srResponse.data.libraryPrepBatch;
@@ -35,7 +35,7 @@ export default function LibraryPrepWorksheetPage() {
     },
     include: "indexI5,indexI7,sample",
     page: { limit: 1000 },
-    path: `libraryPrepBatch/${batch ? batch.id : 0}/libraryPreps`,
+    path: `seqdb-api/libraryPrepBatch/${batch ? batch.id : 0}/libraryPreps`,
     sort: "wellRow,wellColumn"
   });
 

@@ -11,6 +11,9 @@ interface CancelButtonProps {
 
   /** Boolean to use to by pass the view page if there is none */
   byPassView?: boolean;
+
+  /** The link for where to redirect the user  */
+  navigateTo?: string;
 }
 
 /**
@@ -19,11 +22,15 @@ interface CancelButtonProps {
 export function CancelButton({
   entityId,
   entityLink,
-  byPassView
+  byPassView,
+  navigateTo
 }: CancelButtonProps) {
   // When editing an existing entity, the link points to the entity details page.
   // When editing a new entity, the link points to the list page.
-  const href = entityId
+  // When placed in view page, will accept url to navigate to
+  const href = navigateTo
+    ? navigateTo
+    : entityId
     ? byPassView
       ? `${entityLink}/list`
       : `${entityLink}/view?id=${entityId}`

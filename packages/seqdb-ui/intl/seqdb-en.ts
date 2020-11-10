@@ -4,7 +4,6 @@ import { COMMON_UI_MESSAGES_ENGLISH } from "common-ui";
  * English SeqDB messages. A message must be set here in English before other languages.
  */
 export const SEQDB_MESSAGES_ENGLISH = {
-  ...COMMON_UI_MESSAGES_ENGLISH,
   addPcrPrimerTitle: "Add PCR Primer",
   addPcrProfileTitle: "Add Thermocycler Profile",
   addProductTitle: "Add Product",
@@ -26,6 +25,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   editWorkflowTitle: "Edit NGS Workflow",
   "field_group.groupName": "Group Name",
   field_name: "Name",
+  indexSetListTitle: "Index Sets",
   notShearedStatus: "Not Sheared",
   notSizeSelectedStatus: "No Size Selection",
   pcrPrimerListTitle: "PCR Primers",

@@ -122,7 +122,11 @@ export function ResourceSelect<TData extends KitsuResource>({
   // Set the component's value externally when used as a controlled input.
   let selectValue;
   if (isMulti) {
-    selectValue = ((value || []) as PersistedResource<TData>[]).map(
+    const isArr = Array.isArray(value);
+    selectValue = ((isArr
+      ? value
+      : // tslint:disable-next-line: no-string-literal
+        (value ? value["data"] : []) || []) as PersistedResource<TData>[]).map(
       resource => ({
         label: optionLabel(resource),
         resource,

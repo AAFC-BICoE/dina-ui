@@ -15,6 +15,7 @@ export interface AccountContextI {
   initialized: boolean;
   token?: string;
   username?: string;
+  subject?: string;
 }
 
 const AccountContext = createContext<AccountContextI | null>(null);
@@ -51,6 +52,18 @@ export function useAccount(): AccountContextI {
   return ctx;
 }
 
+/** Group dropdown menu select options. */
+export function useGroupSelectOptions() {
+  const { groupNames } = useAccount();
+
+  const groupSelectOptions = (groupNames ?? []).map(group => ({
+    label: group,
+    value: group
+  }));
+
+  return groupSelectOptions;
+}
+
 /** Converts the Keycloak context to the generic AccountContextI. */
 function KeycloakAccountProviderInternal({
   children
@@ -58,7 +71,7 @@ function KeycloakAccountProviderInternal({
   children: ReactNode;
 }) {
   const [
-    { login, logout, authenticated, token, tokenParsed },
+    { login, logout, authenticated, token, tokenParsed, subject },
     initialized
   ] = useKeycloak();
 
@@ -82,7 +95,8 @@ function KeycloakAccountProviderInternal({
         login,
         logout,
         token,
-        username
+        username,
+        subject
       }}
     >
       {children}

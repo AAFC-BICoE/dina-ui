@@ -240,7 +240,13 @@ export function QueryTable<TData extends KitsuResource>({
         pageSizeOptions={[25, 50, 100, 200, 500]}
         pages={numberOfPages}
         showPaginationTop={true}
+        noDataText={<CommonMessage id="noRowsFound" />}
+        ofText={<CommonMessage id="of" />}
+        rowsText={formatMessage({ id: "rows" })}
+        previousText={<CommonMessage id="previous" />}
+        nextText={<CommonMessage id="next" />}
         {...resolvedReactTableProps}
+        pageText={<CommonMessage id="page" />}
       />
     </div>
   );

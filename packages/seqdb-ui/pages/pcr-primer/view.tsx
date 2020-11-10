@@ -27,7 +27,7 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
       </ButtonBar>
 
       <Query<PcrPrimer>
-        query={{ include: "group,region", path: `pcrPrimer/${id}` }}
+        query={{ include: "region", path: `seqdb-api/pcrPrimer/${id}` }}
       >
         {({ loading, response }) => (
           <div className="container-fluid">
@@ -39,11 +39,7 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
               <Formik<PcrPrimer> initialValues={response.data} onSubmit={noop}>
                 <div>
                   <div className="row">
-                    <FieldView
-                      className="col-md-2"
-                      name="group.groupName"
-                      label="Group Name"
-                    />
+                    <FieldView className="col-md-2" name="group" />
                   </div>
                   <div className="row">
                     <FieldView className="col-md-2" name="type" />

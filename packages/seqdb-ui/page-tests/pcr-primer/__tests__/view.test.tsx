@@ -6,7 +6,6 @@ import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 jest.mock("next/link", () => () => <div />);
 
 const TEST_PRIMER: PcrPrimer = {
-  group: { id: "1", groupName: "Test Group", type: "group" },
   id: "5",
   lotNumber: 1,
   name: "Test Primer",

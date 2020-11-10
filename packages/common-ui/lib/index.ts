@@ -1,5 +1,6 @@
 export * from "./account/AccountProvider";
 export * from "./account/AuthenticatedApiClientProvider";
+export * from "./account/NavBarUserControl";
 export * from "./api-client/ApiClientContext";
 export * from "./api-client/client-side-join";
 export * from "./api-client/operations-types";
@@ -41,6 +42,7 @@ export * from "./page-split/SplitPagePanel";
 export * from "./resource-select/ResourceSelect";
 export * from "./table/QueryTable";
 export * from "./table/date-cell";
+export * from "./table/stringArray-cell";
 export * from "./tooltip/Tooltip";
 export * from "./util/rsql";
 export * from "./util/serialize";
