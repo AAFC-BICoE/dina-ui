@@ -124,7 +124,6 @@ export default function UploadPage() {
                 <div className="row">
                   <SelectField
                     className="col-md-3"
-                    disabled={true}
                     name="group"
                     options={groupSelectOptions}
                   />
