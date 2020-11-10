@@ -10,7 +10,8 @@ import {
   safeSubmit,
   SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -18,7 +19,6 @@ import { NextRouter, withRouter } from "next/router";
 import { useContext } from "react";
 import { ButtonBar, CancelButton, Head, Nav } from "../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../intl/seqdb-intl";
-import { Group } from "../../types/seqdb-api/resources/Group";
 import { PcrPrimer } from "../../types/seqdb-api/resources/PcrPrimer";
 import { Region } from "../../types/seqdb-api/resources/Region";
 
@@ -42,7 +42,7 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
               <SeqdbMessage id="editPcrPrimerTitle" />
             </h1>
             <Query<PcrPrimer>
-              query={{ include: "group,region", path: `pcrPrimer/${id}` }}
+              query={{ include: "region", path: `seqdb-api/pcrPrimer/${id}` }}
             >
               {({ loading, response }) => (
                 <div>
@@ -70,16 +70,25 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
 function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
   const { save } = useContext(ApiClientContext);
   const { id } = router.query;
+  const groupSelectOptions = useGroupSelectOptions();
 
-  const initialValues = primer || { lotNumber: 1, seq: "", type: "PRIMER" };
+  const initialValues = primer || {
+    group: groupSelectOptions[0].value,
+    lotNumber: 1,
+    seq: "",
+    type: "PRIMER"
+  };
 
   const onSubmit = safeSubmit(async submittedValues => {
-    const response = await save([
-      {
-        resource: submittedValues,
-        type: "pcrPrimer"
-      }
-    ]);
+    const response = await save(
+      [
+        {
+          resource: submittedValues,
+          type: "pcrPrimer"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
 
     const newId = response[0].id;
     await router.push(`/pcr-primer/view?id=${newId}`);
@@ -95,12 +104,11 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
         <ErrorViewer />
         <div>
           <div className="row">
-            <ResourceSelectField<Group>
+            <SelectField
               className="col-md-2"
+              disabled={true}
               name="group"
-              filter={filterBy(["groupName"])}
-              model="group"
-              optionLabel={group => group.groupName}
+              options={groupSelectOptions}
             />
           </div>
           <div className="row">
@@ -117,7 +125,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
               name="region"
               filter={filterBy(["name"])}
               label="Target Gene Region"
-              model="region"
+              model="seqdb-api/region"
               optionLabel={region => region.name}
             />
             <TextField className="col-md-2" name="name" />

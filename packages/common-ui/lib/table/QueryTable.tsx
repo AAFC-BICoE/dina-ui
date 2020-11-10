@@ -246,6 +246,7 @@ export function QueryTable<TData extends KitsuResource>({
         previousText={<CommonMessage id="previous" />}
         nextText={<CommonMessage id="next" />}
         {...resolvedReactTableProps}
+        pageText={<CommonMessage id="page" />}
       />
     </div>
   );

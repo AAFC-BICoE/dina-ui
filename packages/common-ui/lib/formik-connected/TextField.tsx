@@ -4,6 +4,7 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 export interface TextFieldProps extends LabelWrapperParams {
   readOnly?: boolean;
   initialValue?: string;
+  multiLines?: boolean;
 }
 
 /**
@@ -11,7 +12,7 @@ export interface TextFieldProps extends LabelWrapperParams {
  * a wrapper that adds a label.
  */
 export function TextField(props: TextFieldProps) {
-  const { initialValue, readOnly, ...labelWrapperProps } = props;
+  const { initialValue, readOnly, multiLines, ...labelWrapperProps } = props;
   const { name } = labelWrapperProps;
 
   return (
@@ -26,17 +27,20 @@ export function TextField(props: TextFieldProps) {
             setFieldTouched(name);
           }
 
+          const inputProps = {
+            className: "form-control",
+            onChange,
+            value: value || "",
+            readOnly
+          };
+
           // The default Field component's inner text input needs to be replaced with our own
           // controlled input that we manually pass the "onChange" and "value" props. Otherwise
           // we will get React's warning about switching from an uncontrolled to controlled input.
-          return (
-            <input
-              className="form-control"
-              onChange={onChange}
-              type="text"
-              value={value || ""}
-              readOnly={readOnly}
-            />
+          return multiLines ? (
+            <textarea {...inputProps} />
+          ) : (
+            <input {...inputProps} type="text" />
           );
         }}
       </FastField>

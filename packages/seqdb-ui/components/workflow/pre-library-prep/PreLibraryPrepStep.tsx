@@ -103,10 +103,6 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
   ];
 
   const SAMPLE_STEP_RESOURCE_COLUMNS: ColumnDefinition<StepResource>[] = [
-    {
-      Header: formatMessage("field_group.groupName"),
-      accessor: "sample.group.groupName"
-    },
     "sample.name",
     "sample.version",
     ...(viewMode === "EDIT"
@@ -189,11 +185,11 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                     columns={SAMPLE_STEP_RESOURCE_COLUMNS}
                     defaultPageSize={100}
                     filter={{
-                      "chain.chainId": chain.id,
-                      "chainStepTemplate.chainStepTemplateId": previousStep.id,
+                      "chain.uuid": chain.id,
+                      "chainStepTemplate.uuid": previousStep.id,
                       rsql: rsqlFilter
                     }}
-                    include="sample,sample.group"
+                    include="sample"
                     loading={plpSrLoading || formikProps.isSubmitting}
                     onSuccess={res => {
                       setVisibleSamples(res.data);
@@ -201,7 +197,7 @@ export function PreLibraryPrepStep(props: StepRendererProps) {
                         res.data.map(sr => sr.sample as Sample)
                       );
                     }}
-                    path="stepResource"
+                    path="seqdb-api/stepResource"
                   />
                 </div>
                 {viewMode === "EDIT" && (

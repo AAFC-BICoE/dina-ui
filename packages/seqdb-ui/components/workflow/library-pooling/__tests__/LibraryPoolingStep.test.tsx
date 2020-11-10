@@ -20,7 +20,7 @@ const TEST_CHAIN_TEMPLATE = {
 
 const TEST_CHAIN = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
-  dateCreated: "2019-01-01",
+  createdOn: "2019-01-01",
   id: "1",
   name: "Mat's pooling chain",
   type: "chain"
@@ -135,14 +135,14 @@ describe("LibraryPoolingStep component", () => {
     jest.resetAllMocks();
 
     /** Mock Kitsu "get" method. */
-    mockGet.mockImplementation(async model => {
-      if (model === "libraryPrepBatch") {
+    mockGet.mockImplementation(async path => {
+      if (path === "seqdb-api/libraryPrepBatch") {
         return { data: TEST_LIBRARY_PREP_BATCHS };
-      } else if (model === "libraryPool") {
+      } else if (path === "seqdb-api/libraryPool") {
         return { data: TEST_LIBRARY_POOLS };
-      } else if (model === "stepResource") {
+      } else if (path === "seqdb-api/stepResource") {
         return { data: [TEST_LIBRARY_POOL_STEPRESOURCE] };
-      } else if (model === "libraryPool/100/contents") {
+      } else if (path === "seqdb-api/libraryPool/100/contents") {
         return { data: TEST_LIBRARY_POOL_CONTENTS };
       } else {
         return { data: [] };
@@ -238,7 +238,7 @@ describe("LibraryPoolingStep component", () => {
                 name: "test pool",
                 type: "libraryPool"
               },
-              pooledLibraryPool: null,
+              pooledLibraryPool: { id: null },
               pooledLibraryPrepBatch: {
                 id: "1",
                 type: "libraryPrepBatch"
@@ -254,7 +254,7 @@ describe("LibraryPoolingStep component", () => {
                 name: "test pool",
                 type: "libraryPool"
               },
-              pooledLibraryPool: null,
+              pooledLibraryPool: { id: null },
               pooledLibraryPrepBatch: {
                 id: "2",
                 type: "libraryPrepBatch"
@@ -270,7 +270,7 @@ describe("LibraryPoolingStep component", () => {
                 name: "test pool",
                 type: "libraryPool"
               },
-              pooledLibraryPool: null,
+              pooledLibraryPool: { id: null },
               pooledLibraryPrepBatch: {
                 id: "3",
                 type: "libraryPrepBatch"
@@ -279,7 +279,8 @@ describe("LibraryPoolingStep component", () => {
             },
             type: "libraryPoolContent"
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ]
     ]);
   });
@@ -338,7 +339,8 @@ describe("LibraryPoolingStep component", () => {
               type: "libraryPoolContent"
             }
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ]
     ]);
   });
@@ -346,11 +348,11 @@ describe("LibraryPoolingStep component", () => {
   it("Renders the library pool details form when there is no existing library pool for this workflow", async () => {
     // Don't return the library pool step resource:
     mockGet.mockImplementation(async model => {
-      if (model === "libraryPrepBatch") {
+      if (model === "seqdb-api/libraryPrepBatch") {
         return { data: TEST_LIBRARY_PREP_BATCHS };
-      } else if (model === "libraryPool") {
+      } else if (model === "seqdb-api/libraryPool") {
         return { data: TEST_LIBRARY_POOLS };
-      } else if (model === "stepResource") {
+      } else if (model === "seqdb-api/stepResource") {
         return { data: [] };
       } else {
         return { data: [] };
@@ -373,13 +375,13 @@ describe("LibraryPoolingStep component", () => {
 
     // Return a library pool step resource:
     mockGet.mockImplementation(async model => {
-      if (model === "libraryPrepBatch") {
+      if (model === "seqdb-api/libraryPrepBatch") {
         return { data: TEST_LIBRARY_PREP_BATCHS };
-      } else if (model === "libraryPool") {
+      } else if (model === "seqdb-api/libraryPool") {
         return { data: TEST_LIBRARY_POOLS };
-      } else if (model === "stepResource") {
+      } else if (model === "seqdb-api/stepResource") {
         return { data: [TEST_LIBRARY_POOL_STEPRESOURCE] };
-      } else if (model === "libraryPool/100/contents") {
+      } else if (model === "seqdb-api/libraryPool/100/contents") {
         return { data: TEST_LIBRARY_POOL_CONTENTS };
       } else {
         return { data: [] };
@@ -436,7 +438,7 @@ describe("LibraryPoolingStep component", () => {
                 name: "test pool",
                 type: "libraryPool"
               },
-              pooledLibraryPool: null,
+              pooledLibraryPool: { id: null },
               pooledLibraryPrepBatch: {
                 id: "1",
                 name: "test batch 1",
@@ -446,7 +448,8 @@ describe("LibraryPoolingStep component", () => {
             },
             type: "libraryPoolContent"
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ]
     ]);
   });
@@ -490,12 +493,13 @@ describe("LibraryPoolingStep component", () => {
                 name: "test pool 1",
                 type: "libraryPool"
               },
-              pooledLibraryPrepBatch: null,
+              pooledLibraryPrepBatch: { id: null },
               type: "libraryPoolContent"
             },
             type: "libraryPoolContent"
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ]
     ]);
   });
@@ -526,7 +530,8 @@ describe("LibraryPoolingStep component", () => {
               type: "libraryPoolContent"
             }
           }
-        ]
+        ],
+        { apiBaseUrl: "/seqdb-api" }
       ]
     ]);
   });
@@ -556,7 +561,7 @@ describe("LibraryPoolingStep component", () => {
     wrapper.update();
 
     // The name filter should be passed in:
-    expect(mockGet).lastCalledWith("libraryPrepBatch", {
+    expect(mockGet).lastCalledWith("seqdb-api/libraryPrepBatch", {
       filter: { rsql: "name=='*test search name*' and dateUsed==null" },
       page: { limit: 25, offset: 0 }
     });
@@ -571,10 +576,9 @@ describe("LibraryPoolingStep component", () => {
     wrapper.update();
 
     // The name filter should be passed in:
-    expect(mockGet).lastCalledWith("libraryPool", {
+    expect(mockGet).lastCalledWith("seqdb-api/libraryPool", {
       filter: {
-        rsql:
-          "libraryPoolId!=100 and name=='*test search name*' and dateUsed==null"
+        rsql: "uuid!=100 and name=='*test search name*' and dateUsed==null"
       },
       page: { limit: 25, offset: 0 }
     });
@@ -595,7 +599,7 @@ describe("LibraryPoolingStep component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(mockGet).lastCalledWith("libraryPrepBatch", {
+    expect(mockGet).lastCalledWith("seqdb-api/libraryPrepBatch", {
       filter: { rsql: "name=='**' " },
       page: { limit: 25, offset: 0 }
     });
@@ -609,9 +613,9 @@ describe("LibraryPoolingStep component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(mockGet).lastCalledWith("libraryPool", {
+    expect(mockGet).lastCalledWith("seqdb-api/libraryPool", {
       filter: {
-        rsql: "libraryPoolId!=100 and name=='**' "
+        rsql: "uuid!=100 and name=='**' "
       },
       page: { limit: 25, offset: 0 }
     });

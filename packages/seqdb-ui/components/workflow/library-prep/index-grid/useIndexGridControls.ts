@@ -20,7 +20,7 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
       },
       include: "sample,indexI5,indexI7",
       page: { limit: 1000 },
-      path: `libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`
+      path: `seqdb-api/libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`
     },
     {
       deps: [lastSave]
@@ -64,7 +64,7 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
       type: "libraryPrep"
     }));
 
-    await save(saveOps);
+    await save(saveOps, { apiBaseUrl: "/seqdb-api" });
 
     setLastSave(Date.now());
   });

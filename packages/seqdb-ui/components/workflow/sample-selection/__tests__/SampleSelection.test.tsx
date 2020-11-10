@@ -37,7 +37,7 @@ const TEST_CHAIN_TEMPLATE: PersistedResource<ChainTemplate> = {
 
 const TEST_CHAIN: PersistedResource<Chain> = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
-  dateCreated: "2019-01-01",
+  createdOn: "2019-01-01",
   id: "1",
   name: "Mat's chain",
   type: "chain"
@@ -57,9 +57,9 @@ const TEST_CHAIN_STEP_TEMPLATES = [TEST_CHAIN_STEP_TEMPLATE];
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
-  if (model === "sample") {
+  if (model === "seqdb-api/sample") {
     return { data: TEST_SAMPLES };
-  } else if (model === "stepResource") {
+  } else if (model === "seqdb-api/stepResource") {
     return { data: TEST_STEP_RESOURCES };
   } else {
     return { data: [] };
@@ -68,18 +68,9 @@ const mockGet = jest.fn(async model => {
 
 /** Mock axios for operations requests. */
 const mockPatch = jest.fn(async () => ({ data: [] }));
-
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-      public axios = {
-        patch: mockPatch
-      };
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+};
 
 function getWrapper() {
   return mountWithAppContext(
@@ -87,7 +78,8 @@ function getWrapper() {
       chain={TEST_CHAIN}
       chainStepTemplates={TEST_CHAIN_STEP_TEMPLATES}
       step={TEST_CHAIN_STEP_TEMPLATE}
-    />
+    />,
+    { apiContext }
   );
 }
 
@@ -124,7 +116,7 @@ describe("Sample Selection UI", () => {
     wrapper.update();
 
     expect(mockPatch).lastCalledWith(
-      "/operations",
+      "/seqdb-api/operations",
       [
         {
           op: "POST",
@@ -183,7 +175,7 @@ describe("Sample Selection UI", () => {
     wrapper.update();
 
     expect(mockPatch).lastCalledWith(
-      "/operations",
+      "/seqdb-api/operations",
       [
         {
           op: "POST",
@@ -251,7 +243,7 @@ describe("Sample Selection UI", () => {
     wrapper.update();
 
     expect(mockPatch).lastCalledWith(
-      "/operations",
+      "/seqdb-api/operations",
       [
         {
           op: "DELETE",
@@ -292,7 +284,7 @@ describe("Sample Selection UI", () => {
     wrapper.update();
 
     expect(mockPatch).lastCalledWith(
-      "/operations",
+      "/seqdb-api/operations",
       [
         {
           op: "DELETE",

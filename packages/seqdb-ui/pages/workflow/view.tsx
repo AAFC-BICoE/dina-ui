@@ -24,8 +24,8 @@ export default function WorkflowViewPage() {
   const { formatMessage } = useSeqdbIntl();
 
   const { loading, response } = useQuery<Chain>({
-    include: "group,chainTemplate",
-    path: `chain/${id}`
+    include: "chainTemplate",
+    path: `seqdb-api/chain/${id}`
   });
 
   return (
@@ -57,9 +57,9 @@ export default function WorkflowViewPage() {
 
 function WorkflowSteps({ chain }: { chain: PersistedResource<Chain> }) {
   const { loading, response } = useQuery<ChainStepTemplate[]>({
-    filter: { "chainTemplate.id": chain.chainTemplate.id as string },
+    filter: { "chainTemplate.uuid": chain.chainTemplate.id as string },
     include: "stepTemplate",
-    path: "chainStepTemplate"
+    path: "seqdb-api/chainStepTemplate"
   });
 
   const router = useRouter();
@@ -112,10 +112,9 @@ function WorkflowSteps({ chain }: { chain: PersistedResource<Chain> }) {
         <TabPanel>
           <Formik initialValues={chain} onSubmit={noop}>
             <div className="col-md-3">
+              <FieldView name="group" />
               <FieldView label="Template" name="chainTemplate.name" />
-              <FieldView label="Group" name="group.groupName" />
               <FieldView name="name" />
-              <FieldView name="dateCreated" />
             </div>
           </Formik>
         </TabPanel>

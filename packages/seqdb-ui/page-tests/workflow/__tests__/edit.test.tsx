@@ -1,14 +1,14 @@
 import { OperationsResponse, ResourceSelect } from "common-ui";
 import { ChainEditPage } from "../../../pages/workflow/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { Chain, ChainTemplate, Group } from "../../../types/seqdb-api";
+import { Chain, ChainTemplate } from "../../../types/seqdb-api";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async model => {
-  if (model === "chain/5") {
+const mockGet = jest.fn(async path => {
+  if (path === "seqdb-api/chain/5") {
     // The request for the primer returns the test region.
     return { data: TEST_WORKFLOW };
   } else {
@@ -22,22 +22,13 @@ const mockPatch = jest.fn();
 /** Mock next.js' router "push" function for navigating pages. */
 const mockPush = jest.fn();
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-      public axios = {
-        patch: mockPatch
-      };
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+};
 
 const TEST_WORKFLOW: Chain = {
   chainTemplate: { id: "1", type: "chainTemplate" } as ChainTemplate,
-  dateCreated: "2019-08-16",
-  group: { id: "100", type: "group" } as Group,
+  createdOn: "2019-08-16",
   id: "5",
   name: "Mat's chain",
   type: "chain"
@@ -62,7 +53,8 @@ describe("Workflow edit page.", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <ChainEditPage router={{ query: {}, push: mockPush } as any} />
+      <ChainEditPage router={{ query: {}, push: mockPush } as any} />,
+      { apiContext }
     );
 
     await new Promise(setImmediate);
@@ -77,13 +69,6 @@ describe("Workflow edit page.", () => {
       type: "chainTemplate"
     });
 
-    (wrapper.find(".group-field").find(ResourceSelect).prop("onChange") as any)(
-      {
-        id: "200",
-        type: "group"
-      }
-    );
-
     wrapper.find(".name-field input").simulate("change", {
       target: { name: "name", value: "New Workflow" }
     });
@@ -93,23 +78,20 @@ describe("Workflow edit page.", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const today = new Date().toISOString().split("T")[0];
-
     expect(mockPatch).lastCalledWith(
-      "/operations",
+      "/seqdb-api/operations",
       [
         {
           op: "POST",
           path: "chain",
           value: {
             attributes: {
-              dateCreated: today,
+              group: "/aafc",
               name: "New Workflow"
             },
             id: "-100",
             relationships: {
-              chainTemplate: { data: { id: "1", type: "chainTemplate" } },
-              group: { data: { id: "200", type: "group" } }
+              chainTemplate: { data: { id: "1", type: "chainTemplate" } }
             },
             type: "chain"
           }

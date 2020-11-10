@@ -30,18 +30,13 @@ const mockGet = jest.fn(async () => {
   };
 });
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-    }
-);
+const apiContext: any = {
+  apiClient: { get: mockGet }
+};
 
 describe("Region list page", () => {
   it("Renders the list page.", async () => {
-    const wrapper = mountWithAppContext(<RegionListPage />);
+    const wrapper = mountWithAppContext(<RegionListPage />, { apiContext });
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -52,7 +47,7 @@ describe("Region list page", () => {
   });
 
   it("Allows a filterable search.", async () => {
-    const wrapper = mountWithAppContext(<RegionListPage />);
+    const wrapper = mountWithAppContext(<RegionListPage />, { apiContext });
 
     // Wait for the default search to finish.
     await new Promise(setImmediate);
@@ -70,7 +65,7 @@ describe("Region list page", () => {
     wrapper.update();
 
     expect(mockGet).lastCalledWith(
-      "region",
+      "seqdb-api/region",
       expect.objectContaining({ filter: { rsql: "name==*omni*" } })
     );
     expect(wrapper.find(QueryTable).prop("filter")).toEqual({

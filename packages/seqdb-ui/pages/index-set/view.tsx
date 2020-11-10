@@ -10,7 +10,9 @@ export default function IndexSetViewPage() {
     query: { id }
   } = useRouter();
 
-  const { loading, response } = useQuery<IndexSet>({ path: `indexSet/${id}` });
+  const { loading, response } = useQuery<IndexSet>({
+    path: `seqdb-api/indexSet/${id}`
+  });
 
   if (loading) {
     return <LoadingSpinner loading={loading} />;
@@ -28,6 +30,9 @@ export default function IndexSetViewPage() {
           <div className="container-fluid">
             <h1>Index Set Details</h1>
             <div className="row">
+              <FieldView className="col-md-2" name="group" />
+            </div>
+            <div className="row">
               <FieldView className="col-md-2" name="name" />
             </div>
             <div className="row">
@@ -37,7 +42,7 @@ export default function IndexSetViewPage() {
             <strong>NGS indexes:</strong>
             <QueryTable
               columns={["name", "lotNumber", "direction"]}
-              path={`indexSet/${id}/ngsIndexes`}
+              path={`seqdb-api/indexSet/${id}/ngsIndexes`}
             />
           </div>
         </Formik>

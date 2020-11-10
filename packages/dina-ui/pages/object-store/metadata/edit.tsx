@@ -108,6 +108,10 @@ export default function EditMetadatasPage() {
         title: formatMessage("field_acMetadataCreator.displayName")
       }
     ),
+    {
+      data: "metadata.dcRights",
+      title: formatMessage("field_dcRights")
+    },
     resourceSelectCell<License>(
       {
         label: license => license.titles[locale] ?? license.url,

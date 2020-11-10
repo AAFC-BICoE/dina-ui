@@ -1,10 +1,10 @@
 import { KitsuResource } from "kitsu";
-import { Group } from "./Group";
 import { Region } from "./Region";
 
 export interface PcrProfileAttributes {
   name: string;
   // Optional fields
+  group?: string;
   cycles?: string | null;
   lastModified?: string | null;
   application?: string | null;
@@ -27,7 +27,6 @@ export interface PcrProfileAttributes {
 
 export interface PcrProfileRelationships {
   region?: Region;
-  group?: Group;
 }
 
 export type PcrProfile = KitsuResource &
