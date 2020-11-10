@@ -1,6 +1,21 @@
 import { transformToRSQL } from "@molgenis/rsql";
+import { KitsuResource } from "kitsu";
+import moment from "moment";
+import { FilterAttributeConfig } from "./FilterBuilder";
 import { FilterGroupModel } from "./FilterGroup";
 import { FilterRowModel } from "./FilterRow";
+import { DateRange } from "./FilterRowDatePicker";
+
+interface RsqlOperand {
+  arguments: string | string[];
+  comparison: string;
+  selector: string;
+}
+
+interface RsqlOperandGroup {
+  operands: (RsqlOperand | RsqlOperandGroup)[];
+  operator: string;
+}
 
 /** Converts a FilterGroupModel to an RSQL expression. */
 export function rsql(filter: FilterGroupModel | null): string {
@@ -11,7 +26,7 @@ export function rsql(filter: FilterGroupModel | null): string {
 }
 
 /** Converts a FilterGroupModel to an RSQL expression. */
-function toGroup(filterGroup: FilterGroupModel) {
+function toGroup(filterGroup: FilterGroupModel): RsqlOperandGroup {
   const { children, operator } = filterGroup;
 
   return {
@@ -39,8 +54,15 @@ function toGroup(filterGroup: FilterGroupModel) {
 }
 
 /** Converts a FilterRowModel to an RSQL expression. */
-function toPredicate(filterRow: FilterRowModel) {
+function toPredicate(
+  filterRow: FilterRowModel
+): RsqlOperandGroup | RsqlOperand {
   const { attribute, predicate, searchType, value } = filterRow;
+
+  const attributeConfig: FilterAttributeConfig =
+    typeof attribute === "string"
+      ? { name: attribute, type: "STRING" }
+      : attribute;
 
   const selector = typeof attribute === "string" ? attribute : attribute.name;
 
@@ -67,11 +89,7 @@ function toPredicate(filterRow: FilterRowModel) {
   }
 
   // Allow list/range filters.
-  if (
-    typeof attribute !== "string" &&
-    typeof value === "string" &&
-    attribute.allowRange
-  ) {
+  if (typeof value === "string" && attributeConfig.allowRange) {
     const commaSplit = value.split(",");
 
     const singleNumbers = commaSplit.filter(e => !e.includes("-"));
@@ -92,21 +110,9 @@ function toPredicate(filterRow: FilterRowModel) {
         .split("-")
         .sort((a, b) => Number(a) - Number(b));
 
-      return {
-        operands: [
-          {
-            arguments: low,
-            comparison: predicate === "IS NOT" ? "=lt=" : "=gt=",
-            selector
-          },
-          {
-            arguments: high,
-            comparison: predicate === "IS NOT" ? "=gt=" : "=lt=",
-            selector
-          }
-        ],
-        operator: predicate === "IS NOT" ? "OR" : "AND"
-      };
+      const positive = predicate === "IS";
+
+      return betweenOperand({ low, high, positive, selector });
     });
 
     return {
@@ -115,10 +121,57 @@ function toPredicate(filterRow: FilterRowModel) {
     };
   }
 
-  // Surround the search value with asterisks if this is a partial match for string property type search
-  let searchValue: string = typeof value === "string" ? value : value.id ?? "";
+  let searchValue;
   let compare;
-  if (typeof attribute === "string" || attribute.type === "DROPDOWN") {
+
+  // Handle date searches:
+  if (attributeConfig.type === "DATE") {
+    const dates =
+      predicate === "BETWEEN"
+        ? [(value as DateRange).low, (value as DateRange).high]
+        : [value as string, value as string];
+    // Sort the dates in case the user gives them in the wrong order:
+    const [low, high] = dates.sort((a, b) => Date.parse(a) - Date.parse(b));
+
+    const beginningOfRange = new Date(low);
+    beginningOfRange.setHours(0, 0, 0, 0); // Beginning of the day.
+    const beginningOfRangeString = moment(beginningOfRange).format();
+
+    const endOfRange = new Date(high);
+    endOfRange.setHours(23, 59, 59, 999); // End of the day.
+    const endOfRangeString = moment(endOfRange).format();
+
+    if (predicate === "FROM") {
+      compare = "=ge=";
+      // GreaterThan searches should match from the beginning of the chosen day:
+      searchValue = beginningOfRangeString;
+    } else if (predicate === "UNTIL") {
+      compare = "=le=";
+      // LessThan searches should match from the end of the chosen day:
+      searchValue = endOfRangeString;
+    } else if (
+      predicate === "IS" ||
+      predicate === "IS NOT" ||
+      predicate === "BETWEEN"
+    ) {
+      return betweenOperand({
+        low: beginningOfRangeString,
+        high: endOfRangeString,
+        positive: predicate !== "IS NOT",
+        selector
+      });
+    }
+  }
+
+  if (
+    attributeConfig.type === "DROPDOWN" ||
+    attributeConfig.type === "STRING"
+  ) {
+    searchValue =
+      attributeConfig.type === "DROPDOWN"
+        ? (value as KitsuResource).id
+        : (value as string);
+
     if (searchType === "PARTIAL_MATCH") {
       searchValue = `*${searchValue}*`;
       compare = predicate === "IS NOT" ? "!=" : "==";
@@ -126,15 +179,41 @@ function toPredicate(filterRow: FilterRowModel) {
       compare = predicate === "IS NOT" ? "!=" : "==";
     }
   }
-  // override compare if this is date type, which only has greater and less than
-  if (predicate === "GREATER_THAN") {
-    compare = "=gt=";
-  } else if (predicate === "LESS_THAN") {
-    compare = "=lt=";
-  }
+
   return {
     arguments: searchValue,
     comparison: compare,
     selector
+  };
+}
+
+interface BetweenOperandParams {
+  selector: string;
+  low: string | string[];
+  high: string | string[];
+  positive: boolean;
+}
+
+/** Creates a "between"-type operand given low and high values. */
+function betweenOperand({
+  low,
+  high,
+  positive,
+  selector
+}: BetweenOperandParams): RsqlOperandGroup {
+  return {
+    operands: [
+      {
+        arguments: low,
+        comparison: positive ? "=ge=" : "=lt=",
+        selector
+      },
+      {
+        arguments: high,
+        comparison: positive ? "=le=" : "=gt=",
+        selector
+      }
+    ],
+    operator: positive ? "AND" : "OR"
   };
 }
