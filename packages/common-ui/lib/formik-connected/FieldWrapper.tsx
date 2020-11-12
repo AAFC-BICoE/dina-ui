@@ -1,6 +1,5 @@
-import { useIntl } from "react-intl";
 import ReactTooltip from "react-tooltip";
-import titleCase from "title-case";
+import { FieldHeader } from "../field-header/FieldHeader";
 
 export interface LabelWrapperParams {
   /** The CSS classes of the div wrapper. */
@@ -38,14 +37,7 @@ export function FieldWrapper({
   tooltipMsg,
   children
 }: FieldWrapperProps) {
-  const { formatMessage, messages } = useIntl();
-
-  const messageKey = `field_${name}`;
-  const fieldLabel =
-    label ??
-    (messages[messageKey]
-      ? formatMessage({ id: messageKey })
-      : titleCase(name));
+  const fieldLabel = label ?? <FieldHeader name={name} />;
 
   return (
     <div className={className}>

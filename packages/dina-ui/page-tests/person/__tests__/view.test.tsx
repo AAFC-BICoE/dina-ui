@@ -47,15 +47,11 @@ describe("Person details page", () => {
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
     // The person's name should be rendered in a FieldView.
-    expect(
-      wrapper.containsMatchingElement(<strong>Display Name</strong>)
-    ).toEqual(true);
+    expect(wrapper.find(".displayName-field-header").exists()).toEqual(true);
     expect(wrapper.containsMatchingElement(<p>person a</p>)).toEqual(true);
 
     // The person's email should be rendered in a FieldView.
-    expect(wrapper.containsMatchingElement(<strong>Email</strong>)).toEqual(
-      true
-    );
+    expect(wrapper.find(".email-field-header").exists()).toEqual(true);
     expect(wrapper.containsMatchingElement(<p>testperson@a.b</p>)).toEqual(
       true
     );
