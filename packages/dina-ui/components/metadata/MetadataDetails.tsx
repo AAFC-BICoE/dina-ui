@@ -28,6 +28,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
+          "group",
           "createdDate",
           "xmpMetadataDate",
           "acMetadataCreator.displayName",
