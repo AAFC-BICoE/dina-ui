@@ -69,7 +69,7 @@ export function Nav() {
             <li className="list-inline-item my-auto">
               <NavAgentsDropdown />
             </li>
-            <li className="list-inline-item my-auto">
+            <li className="list-inline-item my-auto d-none">
               <NavDinaUserDropdown />
             </li>
           </ul>
