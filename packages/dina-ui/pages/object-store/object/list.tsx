@@ -174,6 +174,12 @@ export default function MetadataListPage() {
                   ...(filterForm.group && { bucket: filterForm.group }),
                   rsql: "acSubTypeId==null"
                 })}
+                defaultSort={[
+                  {
+                    desc: true,
+                    id: "xmpMetadataDate"
+                  }
+                ]}
                 filterAttributes={METADATA_FILTER_ATTRIBUTES}
                 filterFormchildren={({ submitForm }) => (
                   <div className="form-group">
