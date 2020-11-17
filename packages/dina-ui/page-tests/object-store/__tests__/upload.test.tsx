@@ -112,7 +112,6 @@ describe("Upload page", () => {
       [
         {
           resource: {
-            acDigitizationDate: "2019-08-28T20:37:21+00:00",
             acMetadataCreator: {
               id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
               type: "person"
@@ -125,7 +124,6 @@ describe("Upload page", () => {
         },
         {
           resource: {
-            acDigitizationDate: "2019-08-29T20:37:21+00:00",
             acMetadataCreator: {
               id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
               type: "person"
@@ -138,7 +136,6 @@ describe("Upload page", () => {
         },
         {
           resource: {
-            acDigitizationDate: "2019-08-30T20:37:21+00:00",
             acMetadataCreator: {
               id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
               type: "person"
