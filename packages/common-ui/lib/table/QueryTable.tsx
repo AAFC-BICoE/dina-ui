@@ -53,6 +53,10 @@ export interface QueryTableProps<TData extends KitsuResource> {
   /** Query success callback. */
   onSuccess?: (response: KitsuResponse<TData[], MetaWithTotal>) => void;
 
+  onPageSizeChange?: (newSize: number) => void;
+
+  onSortedChange?: (newSort: SortingRule[]) => void;
+
   /**
    * Override internal react-table props.
    * Pass in either the props or a function that provides the props.
@@ -102,6 +106,8 @@ export function QueryTable<TData extends KitsuResource>({
   joinSpecs,
   loading: loadingProp,
   onSuccess,
+  onPageSizeChange,
+  onSortedChange,
   path,
   reactTableProps
 }: QueryTableProps<TData>) {
@@ -242,6 +248,8 @@ export function QueryTable<TData extends KitsuResource>({
         showPaginationTop={true}
         noDataText={<CommonMessage id="noRowsFound" />}
         ofText={<CommonMessage id="of" />}
+        onPageSizeChange={onPageSizeChange}
+        onSortedChange={onSortedChange}
         rowsText={formatMessage({ id: "rows" })}
         previousText={<CommonMessage id="previous" />}
         nextText={<CommonMessage id="next" />}
