@@ -1,4 +1,3 @@
-import ReactTooltip from "react-tooltip";
 import { FieldHeader } from "../field-header/FieldHeader";
 
 export interface LabelWrapperParams {
@@ -13,9 +12,6 @@ export interface LabelWrapperParams {
 
   /** The label for the field. */
   label?: string;
-
-  /** Tootip Msg provided for the field, move to here to cover text field with tooltip case */
-  tooltipMsg?: string;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -34,7 +30,6 @@ export function FieldWrapper({
   hideLabel = false,
   name,
   label,
-  tooltipMsg,
   children
 }: FieldWrapperProps) {
   const fieldLabel = label ?? <FieldHeader name={name} />;
@@ -46,16 +41,6 @@ export function FieldWrapper({
           <label>
             <div>
               <strong>{fieldLabel}</strong>
-              {tooltipMsg && (
-                <img
-                  src="/static/images/iconInformation.gif"
-                  data-tip={true}
-                  data-for={tooltipMsg}
-                />
-              )}
-              <ReactTooltip id={tooltipMsg}>
-                <span>{tooltipMsg}</span>
-              </ReactTooltip>
             </div>
           </label>
         )}

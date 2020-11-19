@@ -1,6 +1,6 @@
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
-import ReactTooltip from "react-tooltip";
+import RcTooltip from "rc-tooltip";
 
 export interface TooltipProps {
   /** The ID of the message to show in the tooltip. */
@@ -14,19 +14,20 @@ export interface TooltipProps {
 }
 
 export function Tooltip({ id, visibleElement }: TooltipProps) {
-  // Random ID needed by react-tooltip:
-  const [reactTooltipId] = useState(Math.random().toString());
-
   return (
     <span className="m-2">
-      <span data-tip={true} data-for={reactTooltipId}>
-        {visibleElement ?? <img src="/static/images/iconInformation.gif" />}
-      </span>
-      <ReactTooltip id={reactTooltipId}>
-        <div style={{ maxWidth: "15rem" }}>
-          <FormattedMessage id={id} />
-        </div>
-      </ReactTooltip>
+      <RcTooltip
+        overlay={
+          <div style={{ maxWidth: "15rem" }}>
+            <FormattedMessage id={id} />
+          </div>
+        }
+        placement="top"
+      >
+        <span>
+          {visibleElement ?? <img src="/static/images/iconInformation.gif" />}
+        </span>
+      </RcTooltip>
     </span>
   );
 }
