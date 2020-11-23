@@ -32,6 +32,7 @@ export interface FileUploadResponse {
   evaluatedMediaType: string;
   evaluatedFileExtension: string;
   sizeInBytes: number;
+  dateTimeDigitized?: string;
 }
 
 export interface OnSubmitValues {
@@ -73,6 +74,9 @@ export default function UploadPage() {
 
     const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(res => ({
       resource: {
+        acDigitizationDate: res.dateTimeDigitized
+          ? moment(res.dateTimeDigitized).format()
+          : null,
         acMetadataCreator: {
           id: agentId,
           type: "person"
