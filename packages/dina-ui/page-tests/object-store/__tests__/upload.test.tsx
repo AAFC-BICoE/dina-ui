@@ -57,7 +57,6 @@ describe("Upload page", () => {
         id: "11111111-1111-1111-1111-111111111111"
       }))
     );
-
     const mockApiCtx = {
       apiClient: {
         axios: {
@@ -107,7 +106,9 @@ describe("Upload page", () => {
       // Passes in the custom error handler:
       { transformResponse: fileUploadErrorHandler }
     );
-
+    // call the save button to save the metadata for the uploaded files
+    wrapper.find("form.saveMultiMeta").simulate("submit");
+    await new Promise(setImmediate);
     expect(mockSave).lastCalledWith(
       [
         {

@@ -58,6 +58,8 @@ export default function UploadPage() {
   const acceptedFileTypes = "image/*,audio/*,video/*,.pdf,.doc,.docx,.png";
 
   async function onSubmit({ acceptedFiles, group }: OnSubmitValues) {
+    uploadResps.length = 0;
+    accptFiles.length = 0;
     // Upload each file in a separate request, then create the metadatas in a transaction.
     // TODO: Do all of this in a single transaction.
 
@@ -151,15 +153,15 @@ export default function UploadPage() {
             </Formik>
           </div>
         ) : (
-          <>
-            {ViewExif(uploadResps)}
-            <Formik initialValues={{}} onSubmit={onSubmitMeta}>
-              <Form>
-                <SubmitButton />
-              </Form>
-            </Formik>
-          </>
+          <>{ViewExif(uploadResps)}</>
         )}
+        <Formik initialValues={{}} onSubmit={onSubmitMeta}>
+          <Form className="saveMultiMeta">
+            <SubmitButton>
+              <DinaMessage id="submitBtnText" />
+            </SubmitButton>
+          </Form>
+        </Formik>
       </div>
       <Footer />
     </div>
