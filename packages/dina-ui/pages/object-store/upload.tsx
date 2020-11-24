@@ -68,7 +68,6 @@ export default function UploadPage() {
     }
     grp = group;
     accptFiles = acceptedFiles;
-    let hasExif = false;
     for (const { file } of acceptedFiles) {
       // Wrap the file in a FormData:
       const formData = new FormData();
@@ -81,9 +80,8 @@ export default function UploadPage() {
         { transformResponse: fileUploadErrorHandler }
       );
       uploadResps.push(response.data);
-      if (response.data.exif) hasExif = true;
     }
-    setShowExif(hasExif);
+    setShowExif(true);
   }
 
   async function onSubmitMeta() {
@@ -153,15 +151,17 @@ export default function UploadPage() {
             </Formik>
           </div>
         ) : (
-          <>{ViewExif(uploadResps)}</>
+          <>
+            {ViewExif(uploadResps)}
+            <Formik initialValues={{}} onSubmit={onSubmitMeta}>
+              <Form className="saveMultiMeta">
+                <SubmitButton>
+                  <DinaMessage id="submitBtnText" />
+                </SubmitButton>
+              </Form>
+            </Formik>
+          </>
         )}
-        <Formik initialValues={{}} onSubmit={onSubmitMeta}>
-          <Form className="saveMultiMeta">
-            <SubmitButton>
-              <DinaMessage id="submitBtnText" />
-            </SubmitButton>
-          </Form>
-        </Formik>
       </div>
       <Footer />
     </div>

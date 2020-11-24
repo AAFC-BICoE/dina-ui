@@ -106,6 +106,8 @@ describe("Upload page", () => {
       // Passes in the custom error handler:
       { transformResponse: fileUploadErrorHandler }
     );
+
+    wrapper.update();
     // call the save button to save the metadata for the uploaded files
     wrapper.find("form.saveMultiMeta").simulate("submit");
     await new Promise(setImmediate);
