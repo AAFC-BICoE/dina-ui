@@ -32,6 +32,7 @@ export interface FileUploadResponse {
   evaluatedMediaType: string;
   evaluatedFileExtension: string;
   sizeInBytes: number;
+  dateTimeDigitized?: string;
 }
 
 export interface OnSubmitValues {
@@ -71,23 +72,21 @@ export default function UploadPage() {
       uploadResponses.push(response.data);
     }
 
-    const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(
-      (res, idx) => ({
-        resource: {
-          acMetadataCreator: {
-            id: agentId,
-            type: "person"
-          },
-          acDigitizationDate: moment(
-            acceptedFiles[idx].meta.lastModifiedDate
-          ).format(),
-          bucket: group,
-          fileIdentifier: res.fileIdentifier,
-          type: "metadata"
-        } as Metadata,
+    const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(res => ({
+      resource: {
+        acDigitizationDate: res.dateTimeDigitized
+          ? moment(res.dateTimeDigitized).format()
+          : null,
+        acMetadataCreator: {
+          id: agentId,
+          type: "person"
+        },
+        bucket: group,
+        fileIdentifier: res.fileIdentifier,
         type: "metadata"
-      })
-    );
+      } as Metadata,
+      type: "metadata"
+    }));
 
     const saveResults = await save(saveOperations, {
       apiBaseUrl: "/objectstore-api"
