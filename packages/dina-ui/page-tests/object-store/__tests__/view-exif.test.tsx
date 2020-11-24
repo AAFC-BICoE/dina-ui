@@ -1,5 +1,5 @@
 import { AccountContextI, FieldWrapper } from "common-ui";
-import { ViewExif } from "../../../pages/object-store/view-exif";
+import ViewExif from "../../../pages/object-store/view-exif";
 import { noop } from "lodash";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 

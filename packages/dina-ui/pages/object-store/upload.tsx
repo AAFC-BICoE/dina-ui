@@ -21,7 +21,7 @@ import {
 } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Metadata } from "../../types/objectstore-api/resources/Metadata";
-import { ViewExif } from "./view-exif";
+import ViewExif from "./view-exif";
 
 export interface FileUploadResponse {
   fileIdentifier: string;
