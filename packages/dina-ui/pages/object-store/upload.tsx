@@ -21,21 +21,9 @@ import {
 } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Metadata } from "../../types/objectstore-api/resources/Metadata";
-import ViewExif from "./view-exif";
-
-export interface FileUploadResponse {
-  fileIdentifier: string;
-  metaFileEntryVersion: string;
-  originalFilename: string;
-  sha1Hex: string;
-  receivedMediaType: string;
-  detectedMediaType: string;
-  detectedFileExtension: string;
-  evaluatedMediaType: string;
-  evaluatedFileExtension: string;
-  sizeInBytes: number;
-  exif: Map<string, string>;
-}
+import ViewExif, {
+  FileUploadResponse
+} from "../../components/exif-view/view-exif";
 
 export interface OnSubmitValues {
   acceptedFiles: IFileWithMeta[];

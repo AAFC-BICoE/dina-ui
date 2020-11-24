@@ -1,9 +1,22 @@
-import { FileUploadResponse } from "./upload";
 import { useCollapser } from "common-ui";
 import ReactTable from "react-table";
 import { ReactNode } from "react";
 
 interface ExifProps {
+  exif: Map<string, string>;
+}
+
+export interface FileUploadResponse {
+  fileIdentifier: string;
+  metaFileEntryVersion: string;
+  originalFilename: string;
+  sha1Hex: string;
+  receivedMediaType: string;
+  detectedMediaType: string;
+  detectedFileExtension: string;
+  evaluatedMediaType: string;
+  evaluatedFileExtension: string;
+  sizeInBytes: number;
   exif: Map<string, string>;
 }
 
@@ -22,6 +35,8 @@ function DisplayExif({ exif }: ExifProps) {
       className="-striped"
       columns={getColumns()}
       showPagination={false}
+      data={[exif]}
+      defaultPageSize={1}
     />
   );
 }
