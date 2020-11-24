@@ -30,11 +30,11 @@ export interface OnSubmitValues {
   group: string;
 }
 
-export default function UploadPage() {
-  const uploadResps: FileUploadResponse[] = [];
-  let accptFiles: IFileWithMeta[] = [];
-  let grp: string;
+const uploadResps: FileUploadResponse[] = [];
+let accptFiles: IFileWithMeta[] = [];
+let grp: string;
 
+export default function UploadPage() {
   const [showExif, setShowExif] = useState(false);
 
   const router = useRouter();
