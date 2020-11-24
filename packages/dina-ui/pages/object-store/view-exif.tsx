@@ -51,18 +51,16 @@ function CollapsableSection({
   );
 }
 
-export function ViewExif(uploadResponses: FileUploadResponse[]) {
-  return uploadResponses.map(resp => {
-    return (
-      resp.exif && (
-        <CollapsableSection
-          collapserId={resp.fileIdentifier}
-          title={resp.originalFilename}
-          key={resp.fileIdentifier}
-        >
-          <DisplayExif exif={resp.exif} />
-        </CollapsableSection>
-      )
-    );
-  });
+export function ViewExif(resp: FileUploadResponse) {
+  return (
+    resp.exif && (
+      <CollapsableSection
+        collapserId={resp.fileIdentifier}
+        title={resp.originalFilename}
+        key={resp.fileIdentifier}
+      >
+        <DisplayExif exif={resp.exif} />
+      </CollapsableSection>
+    )
+  );
 }

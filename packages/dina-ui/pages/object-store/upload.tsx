@@ -152,7 +152,7 @@ export default function UploadPage() {
           </div>
         ) : (
           <>
-            {ViewExif(uploadResps)}
+            {uploadResps.map(resp => ViewExif(resp))}
             <Formik initialValues={{}} onSubmit={onSubmitMeta}>
               <Form className="saveMultiMeta">
                 <SubmitButton>
