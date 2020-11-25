@@ -73,15 +73,15 @@ export default function UploadPage() {
   }
 
   async function onSubmitMeta() {
-    const saveOperations = uploadResps.map<SaveArgs<Metadata>>((res, idx) => ({
+    const saveOperations = uploadResps.map<SaveArgs<Metadata>>(res => ({
       resource: {
+        acDigitizationDate: res.dateTimeDigitized
+          ? moment(res.dateTimeDigitized).format()
+          : null,
         acMetadataCreator: {
           id: agentId,
           type: "person"
         },
-        acDigitizationDate: moment(
-          accptFiles[idx].meta.lastModifiedDate
-        ).format(),
         bucket: grp,
         fileIdentifier: res.fileIdentifier,
         type: "metadata"

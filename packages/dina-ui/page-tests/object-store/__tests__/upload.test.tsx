@@ -44,6 +44,7 @@ describe("Upload page", () => {
     const mockPost = jest.fn(() => {
       return {
         data: {
+          dateTimeDigitized: "2003-12-14T12:01:44",
           fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
           fileType: "image",
           size: "500",
@@ -128,7 +129,7 @@ describe("Upload page", () => {
       [
         {
           resource: {
-            acDigitizationDate: "2019-08-28T20:37:21+00:00",
+            acDigitizationDate: "2003-12-14T12:01:44+00:00",
             acMetadataCreator: {
               id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
               type: "person"
@@ -141,7 +142,7 @@ describe("Upload page", () => {
         },
         {
           resource: {
-            acDigitizationDate: "2019-08-29T20:37:21+00:00",
+            acDigitizationDate: "2003-12-14T12:01:44+00:00",
             acMetadataCreator: {
               id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
               type: "person"
@@ -154,7 +155,7 @@ describe("Upload page", () => {
         },
         {
           resource: {
-            acDigitizationDate: "2019-08-30T20:37:21+00:00",
+            acDigitizationDate: "2003-12-14T12:01:44+00:00",
             acMetadataCreator: {
               id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
               type: "person"

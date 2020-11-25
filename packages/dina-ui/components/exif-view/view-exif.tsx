@@ -18,6 +18,7 @@ export interface FileUploadResponse {
   evaluatedFileExtension: string;
   sizeInBytes: number;
   exif: Map<string, string>;
+  dateTimeDigitized?: string;
 }
 
 function DisplayExif({ exif }: ExifProps) {
