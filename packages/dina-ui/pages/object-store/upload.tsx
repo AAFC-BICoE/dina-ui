@@ -30,12 +30,12 @@ export interface OnSubmitValues {
   group: string;
 }
 
-const uploadResps: FileUploadResponse[] = [];
-let accptFiles: IFileWithMeta[] = [];
-let grp: string;
-
 export default function UploadPage() {
-  const [showExif, setShowExif] = useState(false);
+  const [previousState, setPreviousState] = useState({
+    uploadResps: [],
+    grp: "",
+    showExif: false
+  });
 
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
@@ -46,16 +46,14 @@ export default function UploadPage() {
   const acceptedFileTypes = "image/*,audio/*,video/*,.pdf,.doc,.docx,.png";
 
   async function onSubmit({ acceptedFiles, group }: OnSubmitValues) {
-    uploadResps.length = 0;
-    accptFiles.length = 0;
     // Upload each file in a separate request, then create the metadatas in a transaction.
     // TODO: Do all of this in a single transaction.
 
     if (!group) {
       throw new Error(formatMessage("groupMustBeSelected"));
     }
-    grp = group;
-    accptFiles = acceptedFiles;
+
+    const uploadRespsT: FileUploadResponse[] = [];
     for (const { file } of acceptedFiles) {
       // Wrap the file in a FormData:
       const formData = new FormData();
@@ -67,27 +65,33 @@ export default function UploadPage() {
         formData,
         { transformResponse: fileUploadErrorHandler }
       );
-      uploadResps.push(response.data);
+      uploadRespsT.push(response.data);
     }
-    setShowExif(true);
+    setPreviousState({
+      uploadResps: uploadRespsT as any,
+      grp: group,
+      showExif: true
+    });
   }
 
   async function onSubmitMeta() {
-    const saveOperations = uploadResps.map<SaveArgs<Metadata>>(res => ({
-      resource: {
-        acDigitizationDate: res.dateTimeDigitized
-          ? moment(res.dateTimeDigitized).format()
-          : null,
-        acMetadataCreator: {
-          id: agentId,
-          type: "person"
-        },
-        bucket: grp,
-        fileIdentifier: res.fileIdentifier,
+    const saveOperations = previousState.uploadResps.map<SaveArgs<Metadata>>(
+      res => ({
+        resource: {
+          acDigitizationDate: (res as FileUploadResponse).dateTimeDigitized
+            ? moment((res as FileUploadResponse).dateTimeDigitized).format()
+            : null,
+          acMetadataCreator: {
+            id: agentId,
+            type: "person"
+          },
+          bucket: previousState.grp,
+          fileIdentifier: (res as FileUploadResponse).fileIdentifier,
+          type: "metadata"
+        } as Metadata,
         type: "metadata"
-      } as Metadata,
-      type: "metadata"
-    }));
+      })
+    );
 
     const saveResults = await save(saveOperations, {
       apiBaseUrl: "/objectstore-api"
@@ -110,7 +114,7 @@ export default function UploadPage() {
           <div className="alert alert-warning no-group-alert">
             <DinaMessage id="userMustBelongToGroup" />
           </div>
-        ) : !showExif ? (
+        ) : !previousState.showExif ? (
           <div>
             <div className="alert alert-warning">
               <DinaMessage id="forTestingPurposesOnlyMessage" />
@@ -140,7 +144,7 @@ export default function UploadPage() {
           </div>
         ) : (
           <>
-            {uploadResps.map(resp => ViewExif(resp))}
+            {previousState.uploadResps.map(resp => ViewExif(resp))}
             <Formik initialValues={{}} onSubmit={onSubmitMeta}>
               <Form className="saveMultiMeta">
                 <SubmitButton>
