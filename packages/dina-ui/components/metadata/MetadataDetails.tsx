@@ -28,6 +28,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
+          "group",
           {
             name: "createdDate",
             value: <DateView date={metadata.createdDate} />
