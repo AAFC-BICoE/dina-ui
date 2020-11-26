@@ -3,7 +3,6 @@ import { isPlainObject } from "lodash";
 import React, { useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import ReactTable, { Column, SortingRule, TableProps } from "react-table";
-import titleCase from "title-case";
 import {
   ClientSideJoinSpec,
   JsonApiQuerySpec,
@@ -12,6 +11,7 @@ import {
   useQuery
 } from "..";
 import { QueryState } from "../api-client/useQuery";
+import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
 
@@ -167,13 +167,7 @@ export function QueryTable<TData extends KitsuResource>({
             fieldName: String(column.accessor)
           };
 
-    const messageKey = `field_${fieldName}`;
-
-    const Header =
-      customHeader ??
-      (messages[messageKey]
-        ? formatMessage({ id: messageKey as any })
-        : titleCase(fieldName));
+    const Header = customHeader ?? <FieldHeader name={fieldName} />;
 
     return {
       Header,

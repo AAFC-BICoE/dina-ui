@@ -29,10 +29,14 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_acSubtype: "Ac Subtype",
   field_acDerivedFrom: "Derived From",
   field_acDigitizationDate: "Date Original Version Created",
+  field_acDigitizationDate_tooltip:
+    "Date and time of when the digital object described by the metadata was created. For an image it represents when the image was taken.",
   field_acHashFunction: "Hash Function",
   field_acHashValue: "Hash",
   field_acMetadataCreator: "Metadata Created By",
   "field_acMetadataCreator.displayName": "Metadata Created By",
+  "field_acMetadataCreator.displayName_tooltip":
+    "Agent who created the metadata record.",
   field_acSubType: "Object SubType",
   field_acTags: "Tags",
   "field_dcCreator.displayName": "Digitized By",
@@ -60,8 +64,13 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_originalFilename: "Original Filename",
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
+  field_publiclyReleasable: "Publicly releasable",
+  field_publiclyReleasable_tooltip:
+    "Indicates if the object could be released publicly on a web page or open data portals.",
   field_type: "Type",
   field_xmpMetadataDate: "Last Updated On",
+  field_xmpMetadataDate_tooltip:
+    "Date and time of when the record was last updated.",
   field_xmpRightsWebStatement: "Reuse Rights Statement",
   footerContactInfo: "Contact information",
   footerTermsAndConditions: "Terms and conditions",
