@@ -20,8 +20,11 @@
     "common-ui": "link:../common-ui",
     "moment": "^2.27.0",
     "next-transpile-modules": "^4.1.0",
+    "react-dnd-cjs": "^9.4.0",
+    "react-dnd-html5-backend-cjs": "^9.4.0",
     "react-dropzone-uploader": "^2.11.0",
-    "react-file-viewer": "^1.2.1"
+    "react-file-viewer": "^1.2.1",
+    "react-tabs": "^3.0.0"
   },
   "devDependencies": {
     "@testing-library/react": "^10.4.4"

@@ -8,8 +8,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
-import { FileView } from "../../../components/file-view/FileView";
-import { MetadataDetails } from "../../../components/metadata/MetadataDetails";
+import { FileView, MetadataDetails } from "../../../components/object-store";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 

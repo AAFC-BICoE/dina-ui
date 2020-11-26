@@ -2,6 +2,7 @@ import { LanguageSelector, NavbarUserControl } from "common-ui";
 import Link from "next/link";
 import React from "react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { SeqdbMessage } from "../../../intl/seqdb-intl";
 
 export function Nav() {
   return (
@@ -152,6 +153,54 @@ function NavDinaUserDropdown() {
         <Link href="/dina-user/view">
           <a className="dropdown-item">
             <DinaMessage id="whoAmITitle" />
+          </a>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+/** Seqdb UI links. */
+function NavSeqDBDropdown() {
+  return (
+    <div className="dropdown">
+      <a className="nav-link dropdown-toggle" href="#">
+        <SeqdbMessage id="appTitle" />
+      </a>
+      <div className="dropdown-menu m-0">
+        <Link href="/workflow/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="workflowListTitle" />
+          </a>
+        </Link>
+        <Link href="/index-set/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="indexSetListTitle" />
+          </a>
+        </Link>
+        <Link href="/pcr-primer/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="pcrPrimerListTitle" />
+          </a>
+        </Link>
+        <Link href="/pcr-profile/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="pcrProfileListTitle" />
+          </a>
+        </Link>
+        <Link href="/product/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="productListTitle" />
+          </a>
+        </Link>
+        <Link href="/protocol/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="protocolListTitle" />
+          </a>
+        </Link>
+        <Link href="/region/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="regionListTitle" />
           </a>
         </Link>
       </div>
