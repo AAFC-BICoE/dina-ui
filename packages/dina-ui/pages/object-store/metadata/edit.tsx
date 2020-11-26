@@ -34,7 +34,6 @@ import { useLocalStorage } from "@rehooks/local-storage";
 /** Editable row data */
 export interface BulkMetadataEditRow {
   acTags: string;
-  acMetadataCreator: string;
   dcCreator: string;
   license: string;
   metadata: PersistedResource<Metadata>;
@@ -96,18 +95,6 @@ export default function EditMetadatasPage() {
         title: formatMessage("field_dcCreator.displayName")
       }
     ),
-    resourceSelectCell<Person>(
-      {
-        filter: input => ({ rsql: `displayName==*${input}*` }),
-        label: person => person.displayName,
-        model: "agent-api/person",
-        type: "person"
-      },
-      {
-        data: "acMetadataCreator",
-        title: formatMessage("field_acMetadataCreator.displayName")
-      }
-    ),
     {
       data: "metadata.dcRights",
       title: formatMessage("field_dcRights")
@@ -163,20 +150,11 @@ export default function EditMetadatasPage() {
 
   async function loadData() {
     const metadatas = await bulkGet<Metadata>(
-      ids.map(
-        id =>
-          `/metadata/${id}?include=managedAttributeMap,acMetadataCreator,dcCreator`
-      ),
+      ids.map(id => `/metadata/${id}?include=managedAttributeMap,dcCreator`),
       {
         apiBaseUrl: "/objectstore-api",
         joinSpecs: [
           // Join to persons api:
-          {
-            apiBaseUrl: "/agent-api",
-            idField: "acMetadataCreator",
-            joinField: "acMetadataCreator",
-            path: metadata => `person/${metadata.acMetadataCreator.id}`
-          },
           {
             apiBaseUrl: "/agent-api",
             idField: "dcCreator",
@@ -191,7 +169,6 @@ export default function EditMetadatasPage() {
 
     const newTableData = await Promise.all(
       metadatas.map<Promise<BulkMetadataEditRow>>(async metadata => {
-        const acMetadataCreator = metadata.acMetadataCreator as Person;
         const dcCreator = metadata.dcCreator as Person;
 
         // Get the License resource based on the Metadata's xmpRightsWebStatement field:
@@ -206,9 +183,6 @@ export default function EditMetadatasPage() {
         }
 
         return {
-          acMetadataCreator: encodeResourceCell(acMetadataCreator, {
-            label: acMetadataCreator?.displayName
-          }),
           acTags: metadata.acTags?.join(", ") ?? "",
           dcCreator: encodeResourceCell(dcCreator, {
             label: dcCreator?.displayName
@@ -229,7 +203,7 @@ export default function EditMetadatasPage() {
     const editedMetadatas = await Promise.all(
       changes.map<Promise<SaveArgs<Metadata>>>(async row => {
         const {
-          changes: { acMetadataCreator, acTags, dcCreator, license, metadata },
+          changes: { acTags, dcCreator, license, metadata },
           original: {
             metadata: { id, type }
           }
@@ -242,13 +216,6 @@ export default function EditMetadatasPage() {
         } as Metadata;
 
         delete metadataEdit.managedAttributeMap;
-
-        if (acMetadataCreator !== undefined) {
-          metadataEdit.acMetadataCreator = {
-            id: decodeResourceCell(acMetadataCreator).id as any,
-            type: "person"
-          };
-        }
 
         if (dcCreator !== undefined) {
           metadataEdit.dcCreator = {
