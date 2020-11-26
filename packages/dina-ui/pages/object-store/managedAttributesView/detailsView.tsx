@@ -220,7 +220,6 @@ function AcceptedValueBuilder({
   className,
   name,
   label,
-  tooltipMsg,
   hideLabel,
   initialValues
 }: AcceptedValueProps) {
@@ -231,7 +230,6 @@ function AcceptedValueBuilder({
       className={className}
       name={name}
       label={label}
-      tooltipMsg={tooltipMsg}
       hideLabel={hideLabel}
     >
       <div>

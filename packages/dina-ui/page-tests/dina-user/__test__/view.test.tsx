@@ -47,27 +47,19 @@ describe("Dina user who am i page", () => {
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
     // The dina username should be rendered in a FieldView.
-    expect(wrapper.containsMatchingElement(<strong>Username</strong>)).toEqual(
-      true
-    );
+    expect(wrapper.find(".username-field-header").exists()).toEqual(true);
     expect(wrapper.containsMatchingElement(<p>cnc-cm</p>)).toEqual(true);
 
     // The dina user's email should be rendered in a FieldView.
-    expect(
-      wrapper.containsMatchingElement(<strong>Email Address</strong>)
-    ).toEqual(true);
+    expect(wrapper.find(".emailAddress-field-header").exists()).toEqual(true);
     expect(wrapper.containsMatchingElement(<p>a.b@c.d</p>)).toEqual(true);
 
     // The dina user's groups should be rendered in a FieldView.
-    expect(wrapper.containsMatchingElement(<strong>Groups</strong>)).toEqual(
-      true
-    );
+    expect(wrapper.find(".groups-field-header").exists()).toEqual(true);
     expect(wrapper.containsMatchingElement(<p>dao,cnc</p>)).toEqual(true);
 
     // The dina user's roles should be rendered in a FieldView.
-    expect(wrapper.containsMatchingElement(<strong>Roles</strong>)).toEqual(
-      true
-    );
+    expect(wrapper.find(".roles-field-header").exists()).toEqual(true);
     expect(
       wrapper.containsMatchingElement(<p>/dao/staff,/cnd/collection-manager</p>)
     ).toEqual(true);

@@ -1,9 +1,7 @@
-import { DefaultTd } from "common-ui";
+import { DefaultTd, FieldHeader } from "common-ui";
 import { toPairs } from "lodash";
 import { ComponentType } from "react";
-import { useIntl } from "react-intl";
 import ReactTable, { CellInfo } from "react-table";
-import titleCase from "title-case";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export interface KeyValueTableProps {
@@ -16,8 +14,6 @@ export interface KeyValueTableProps {
 
 /** Table that shows an object's keys in the left column and values in the right column. */
 export function KeyValueTable({ customValueCells, data }: KeyValueTableProps) {
-  const { formatMessage, messages } = useIntl();
-
   const pairs = toPairs(data);
   const entries = pairs.map(([field, value]) => ({
     field,
@@ -30,14 +26,11 @@ export function KeyValueTable({ customValueCells, data }: KeyValueTableProps) {
       columns={[
         // Render the intl name of the field, or by default a title-case field:
         {
-          Cell: ({ original: { field } }) => {
-            const messageKey = `field_${field}`;
-            const fieldLabel = messages[messageKey]
-              ? formatMessage({ id: messageKey as any })
-              : titleCase(field);
-
-            return <strong>{fieldLabel}</strong>;
-          },
+          Cell: ({ original: { field } }) => (
+            <strong>
+              <FieldHeader name={field} />
+            </strong>
+          ),
           Header: <DinaMessage id="attributeLabel" />,
           className: "key-cell",
           accessor: "field",

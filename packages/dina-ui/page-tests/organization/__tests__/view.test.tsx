@@ -60,9 +60,7 @@ describe("Organization details page", () => {
     );
 
     // The organization's email should be rendered in a FieldView.
-    expect(wrapper.containsMatchingElement(<strong>Aliases</strong>)).toEqual(
-      true
-    );
+    expect(wrapper.find(".aliases-field-header").exists()).toEqual(true);
     expect(wrapper.containsMatchingElement(<p>org1,org2</p>)).toEqual(true);
   });
 });

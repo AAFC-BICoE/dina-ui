@@ -201,9 +201,10 @@ describe("SampleGrid component", () => {
       .at(3);
     expect(gridCell.find(".sample-box-text").text()).toEqual("SAMP600");
     // The background color should be yellow:
-    expect(gridCell.find("li").prop<any>("style").backgroundColor).toEqual(
-      "#fff3cd"
-    );
+    expect(
+      gridCell.find("li div.move-status-indicator").prop<any>("style")
+        .backgroundColor
+    ).toEqual("#fff3cd");
 
     // Submit the grid changes:
     wrapper.find(".grid-submit").simulate("click");

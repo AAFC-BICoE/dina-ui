@@ -112,30 +112,14 @@ describe("QueryTable component", () => {
   it("Renders the headers defined in the columns prop.", () => {
     // Create the table with headers
     const wrapper = mountWithAppContext(
-      <QueryTable<Todo>
-        path="todo"
-        columns={["id", "name", "description", "relatedEntity.name"]}
-      />,
+      <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
 
-    // Expect the headers in title case.
-    expect(
-      wrapper.find(".rt-resizable-header-content[children='Id']").exists()
-    ).toEqual(true);
-    expect(
-      wrapper.find(".rt-resizable-header-content[children='Name']").exists()
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(".rt-resizable-header-content[children='Description']")
-        .exists()
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(".rt-resizable-header-content[children='Related Entity Name']")
-        .exists()
-    ).toEqual(true);
+    // Expect the field headers:.
+    expect(wrapper.find(".id-field-header").exists()).toEqual(true);
+    expect(wrapper.find(".name-field-header").exists()).toEqual(true);
+    expect(wrapper.find(".description-field-header").exists()).toEqual(true);
   });
 
   it("Renders the total number of pages when no custom pageSize is specified.", async () => {
@@ -308,9 +292,7 @@ describe("QueryTable component", () => {
       objectContaining({ sort: anything() })
     );
 
-    const nameHeader = wrapper.find(
-      ".rt-resizable-header-content[children='Name']"
-    );
+    const nameHeader = wrapper.find(".name-field-header");
 
     // Click the "name" header.
     nameHeader.simulate("click");
@@ -341,14 +323,12 @@ describe("QueryTable component", () => {
     await new Promise(setImmediate);
 
     // Click the "name" header.
-    wrapper
-      .find(".rt-resizable-header-content[children='Name']")
-      .simulate("click");
+    wrapper.find(".name-field-header").simulate("click");
     await new Promise(setImmediate);
 
     // Shift-click the "description" header.
     wrapper
-      .find(".rt-resizable-header-content[children='Description']")
+      .find(".description-field-header")
       .simulate("click", { shiftKey: true });
     await new Promise(setImmediate);
 
@@ -699,11 +679,9 @@ describe("QueryTable component", () => {
       { apiContext }
     );
 
-    expect(
-      wrapper
-        .find(".rt-resizable-header-content[children='My Field Label']")
-        .exists()
-    ).toEqual(true);
+    expect(wrapper.find(".testField-field-header").text()).toEqual(
+      "My Field Label"
+    );
   });
 
   it("Provides a 'reactTableProps' prop that passes in the query state.", async () => {

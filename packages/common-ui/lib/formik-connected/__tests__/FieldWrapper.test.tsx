@@ -25,22 +25,6 @@ describe("FieldWrapper component.", () => {
     expect(wrapper.find(".col-6").exists()).toEqual(true);
   });
 
-  it("Accepts a tooltip msg which is applied to a surrounding div.", () => {
-    const wrapper = mountWithAppContext(
-      <FieldWrapper
-        tooltipMsg="Wrapper to a formick connected field"
-        name="fieldName"
-      >
-        <div />
-      </FieldWrapper>
-    );
-    expect(
-      wrapper.containsMatchingElement(
-        <img src="/static/images/iconInformation.gif" />
-      )
-    ).toBeTruthy();
-  });
-
   it("Displays the intl message (if there is one) in the label.", () => {
     const wrapper = mount(
       <IntlProvider
