@@ -3,6 +3,7 @@ import {
   ErrorViewer,
   SaveArgs,
   SelectField,
+  SubmitButton,
   useAccount,
   useGroupSelectOptions
 } from "common-ui";
@@ -10,7 +11,7 @@ import { Form, Formik } from "formik";
 import { noop } from "lodash";
 import moment from "moment";
 import { useRouter } from "next/router";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import {
   FileUploader,
   Footer,
@@ -20,19 +21,9 @@ import {
 } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Metadata } from "../../types/objectstore-api/resources/Metadata";
-
-export interface FileUploadResponse {
-  fileIdentifier: string;
-  metaFileEntryVersion: string;
-  originalFilename: string;
-  sha1Hex: string;
-  receivedMediaType: string;
-  detectedMediaType: string;
-  detectedFileExtension: string;
-  evaluatedMediaType: string;
-  evaluatedFileExtension: string;
-  sizeInBytes: number;
-}
+import ViewExif, {
+  FileUploadResponse
+} from "../../components/exif-view/view-exif";
 
 export interface OnSubmitValues {
   acceptedFiles: IFileWithMeta[];
@@ -40,6 +31,12 @@ export interface OnSubmitValues {
 }
 
 export default function UploadPage() {
+  const [previousState, setPreviousState] = useState({
+    uploadResps: [],
+    grp: "",
+    showExif: false
+  });
+
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
   const { apiClient, save } = useContext(ApiClientContext);
@@ -56,7 +53,7 @@ export default function UploadPage() {
       throw new Error(formatMessage("groupMustBeSelected"));
     }
 
-    const uploadResponses: FileUploadResponse[] = [];
+    const uploadRespsT: FileUploadResponse[] = [];
     for (const { file } of acceptedFiles) {
       // Wrap the file in a FormData:
       const formData = new FormData();
@@ -68,21 +65,28 @@ export default function UploadPage() {
         formData,
         { transformResponse: fileUploadErrorHandler }
       );
-      uploadResponses.push(response.data);
+      uploadRespsT.push(response.data);
     }
+    setPreviousState({
+      uploadResps: uploadRespsT as any,
+      grp: group,
+      showExif: true
+    });
+  }
 
-    const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(
-      (res, idx) => ({
+  async function onSubmitMeta() {
+    const saveOperations = previousState.uploadResps.map<SaveArgs<Metadata>>(
+      res => ({
         resource: {
+          acDigitizationDate: (res as FileUploadResponse).dateTimeDigitized
+            ? moment((res as FileUploadResponse).dateTimeDigitized).format()
+            : null,
           acMetadataCreator: {
             id: agentId,
             type: "person"
           },
-          acDigitizationDate: moment(
-            acceptedFiles[idx].meta.lastModifiedDate
-          ).format(),
-          bucket: group,
-          fileIdentifier: res.fileIdentifier,
+          bucket: previousState.grp,
+          fileIdentifier: (res as FileUploadResponse).fileIdentifier,
           type: "metadata"
         } as Metadata,
         type: "metadata"
@@ -110,7 +114,7 @@ export default function UploadPage() {
           <div className="alert alert-warning no-group-alert">
             <DinaMessage id="userMustBelongToGroup" />
           </div>
-        ) : (
+        ) : !previousState.showExif ? (
           <div>
             <div className="alert alert-warning">
               <DinaMessage id="forTestingPurposesOnlyMessage" />
@@ -137,6 +141,17 @@ export default function UploadPage() {
               </Form>
             </Formik>
           </div>
+        ) : (
+          <>
+            {previousState.uploadResps.map(resp => ViewExif(resp))}
+            <Formik initialValues={{}} onSubmit={onSubmitMeta}>
+              <Form className="saveMultiMeta">
+                <SubmitButton>
+                  <DinaMessage id="submitBtnText" />
+                </SubmitButton>
+              </Form>
+            </Formik>
+          </>
         )}
       </div>
       <Footer />

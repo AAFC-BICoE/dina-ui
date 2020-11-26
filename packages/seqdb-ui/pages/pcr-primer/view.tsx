@@ -1,4 +1,4 @@
-import { FieldView, LoadingSpinner, Query } from "common-ui";
+import { DateField, FieldView, LoadingSpinner, Query } from "common-ui";
 import { Formik } from "formik";
 import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -58,7 +58,11 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
                   <div className="row">
                     <FieldView className="col-md-2" name="direction" />
                     <FieldView className="col-md-2" name="tmCalculated" />
-                    <FieldView className="col-md-2" name="dateOrdered" />
+                    <DateField
+                      className="col-md-2"
+                      disabled={true}
+                      name="dateOrdered"
+                    />
                   </div>
                   <div className="row">
                     <FieldView

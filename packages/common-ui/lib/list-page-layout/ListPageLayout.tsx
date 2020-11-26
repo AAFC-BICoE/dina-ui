@@ -9,6 +9,7 @@ import { FilterForm } from "./FilterForm";
 
 interface ListPageLayoutProps<TData extends KitsuResource> {
   additionalFilters?: FilterParam | ((filterForm: any) => FilterParam);
+  defaultSort?: SortingRule[];
   filterAttributes?: FilterAttribute[];
   filterFormchildren?: (formik: FormikProps<any>) => React.ReactElement;
   id: string;
@@ -22,6 +23,7 @@ interface ListPageLayoutProps<TData extends KitsuResource> {
  */
 export function ListPageLayout<TData extends KitsuResource>({
   additionalFilters: additionalFiltersProp,
+  defaultSort: defaultSortProp,
   filterAttributes,
   filterFormchildren,
   id,
@@ -38,9 +40,11 @@ export function ListPageLayout<TData extends KitsuResource>({
 
   // Default sort and page-size from the QueryTable. These are only used on the initial
   // QueryTable render, and are saved in localStorage when the table's sort or page-size is changed.
-  const [defaultSort, setDefaultSort] = useLocalStorage<SortingRule[]>(
-    tableSortKey
-  );
+  const [storedDefaultSort, setStoredDefaultSort] = useLocalStorage<
+    SortingRule[]
+  >(tableSortKey);
+  const defaultSort = storedDefaultSort ?? defaultSortProp;
+
   const [defaultPageSize, setDefaultPageSize] = useLocalStorage<number>(
     tablePageSizeKey
   );
@@ -76,10 +80,8 @@ export function ListPageLayout<TData extends KitsuResource>({
           defaultPageSize={defaultPageSize ?? undefined}
           defaultSort={defaultSort ?? undefined}
           filter={filterParam}
-          reactTableProps={{
-            onPageSizeChange: newSize => setDefaultPageSize(newSize),
-            onSortedChange: newSort => setDefaultSort(newSort)
-          }}
+          onPageSizeChange={newSize => setDefaultPageSize(newSize)}
+          onSortedChange={newSort => setStoredDefaultSort(newSort)}
           {...queryTableProps}
         />
       </WrapTable>
