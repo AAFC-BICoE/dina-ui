@@ -8,7 +8,7 @@ import { SampleGrid } from "./container-grid/SampleGrid";
 import { IndexGrid } from "./index-grid/IndexGrid";
 import { LibraryPrepBatchDetails } from "./LibraryPrepBatchDetails";
 import { LibraryPrepBatchForm } from "./LibraryPrepBatchForm";
-import { LibraryPrepEditTable } from "./LibraryPrepEditTable";
+import { LibraryPrepBulkEditor } from "./LibraryPrepBulkEditor";
 
 export function LibraryPrepStep(props: StepRendererProps) {
   const { chain, chainStepTemplates, step } = props;
@@ -106,7 +106,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
               <Tab>Substep 3: Index Assignment</Tab>
             </TabList>
             <TabPanel>
-              <LibraryPrepEditTable
+              <LibraryPrepBulkEditor
                 chain={chain}
                 editMode="DETAILS"
                 libraryPrepBatch={libraryPrepBatch}
@@ -130,7 +130,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
                   <IndexGrid libraryPrepBatch={libraryPrepBatch} />
                 </TabPanel>
                 <TabPanel>
-                  <LibraryPrepEditTable
+                  <LibraryPrepBulkEditor
                     chain={chain}
                     editMode="INDEX"
                     libraryPrepBatch={libraryPrepBatch}
