@@ -1,4 +1,4 @@
-import { ColumnDefinition, ListPageLayout } from "common-ui";
+import { ColumnDefinition, dateCell, ListPageLayout } from "common-ui";
 import { pick } from "lodash";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AuditSnapshot, Metadata } from "../../types/objectstore-api";
@@ -46,7 +46,7 @@ export function RevisionsPageLayout({
           }
         ]),
     "version",
-    "commitDateTime",
+    dateCell("commitDateTime"),
     "snapshotType",
     {
       Cell: ({ original: { changedProperties } }) => (
@@ -114,7 +114,9 @@ function ExpanderWithLabel({ isExpanded }) {
   return (
     <>
       <span>
-        <strong>Show changes</strong>
+        <strong>
+          <DinaMessage id="showChanges" />
+        </strong>
       </span>
       <span className={`rt-expander ${isExpanded ? "-open" : false}`}>•</span>
     </>

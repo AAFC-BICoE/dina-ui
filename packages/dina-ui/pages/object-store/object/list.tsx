@@ -89,7 +89,15 @@ export default function MetadataListPage() {
       Header: CheckBoxHeader,
       sortable: false
     },
-    "originalFilename",
+    {
+      Cell: ({ original: { id, originalFilename } }) =>
+        originalFilename ? (
+          <Link href={`/object-store/object/view?id=${id}`}>
+            {originalFilename}
+          </Link>
+        ) : null,
+      accessor: "originalFilename"
+    },
     dateCell("acDigitizationDate"),
     dateCell("xmpMetadataDate"),
     { accessor: "acMetadataCreator.displayName", sortable: false },
@@ -166,6 +174,12 @@ export default function MetadataListPage() {
                   ...(filterForm.group && { bucket: filterForm.group }),
                   rsql: "acSubTypeId==null"
                 })}
+                defaultSort={[
+                  {
+                    desc: true,
+                    id: "xmpMetadataDate"
+                  }
+                ]}
                 filterAttributes={METADATA_FILTER_ATTRIBUTES}
                 filterFormchildren={({ submitForm }) => (
                   <div className="form-group">
@@ -187,17 +201,19 @@ export default function MetadataListPage() {
                       apiBaseUrl: "/agent-api",
                       idField: "acMetadataCreator",
                       joinField: "acMetadataCreator",
-                      path: metadata => `person/${metadata.acMetadataCreator}`
+                      path: metadata =>
+                        `person/${metadata.acMetadataCreator.id}`
                     },
                     {
                       apiBaseUrl: "/agent-api",
                       idField: "dcCreator",
                       joinField: "dcCreator",
-                      path: metadata => `person/${metadata.dcCreator}`
+                      path: metadata => `person/${metadata.dcCreator.id}`
                     }
                   ],
                   onSuccess: res => setAvailableMetadatas(res.data),
-                  path: "objectstore-api/metadata",
+                  path:
+                    "objectstore-api/metadata?include=acMetadataCreator,dcCreator",
                   reactTableProps: ({ response }) => {
                     TBodyGallery.innerComponent = (
                       <StoredObjectGallery

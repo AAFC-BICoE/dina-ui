@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@babel/runtime-corejs2": "^7.10.4",
+    "@phenomnomnominal/tsquery": "^4.1.1",
     "@types/enzyme": "^3.10.5",
     "@types/enzyme-to-json": "^1.5.2",
     "@types/jest": "^26.0.3",
@@ -34,11 +35,14 @@
     "pa11y-ci": "^2.3.0",
     "prettier": "^2.0.5",
     "react-test-renderer": "^16.8.6",
+    "ts-jest": "^26.4.1",
+    "ts-node": "^9.0.0",
     "tslint": "^6.1.2",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.3.0",
     "tslint-react": "^5.0.0",
-    "typescript": "^3.9.6"
+    "typescript": "^3.9.6",
+    "xlsx": "^0.16.7"
   },
   "husky": {
     "hooks": {

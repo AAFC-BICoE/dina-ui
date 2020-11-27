@@ -76,7 +76,7 @@ export function LibraryPoolDetailsForm({
           <DateField className="col-md-2" name="dateUsed" />
         </div>
         <div className="row">
-          <TextField className="col-md-6" name="notes" />
+          <TextField className="col-md-6" name="notes" multiLines={true} />
         </div>
         <SubmitButton />
       </Form>

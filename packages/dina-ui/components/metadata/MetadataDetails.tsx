@@ -1,4 +1,4 @@
-import { useCollapser, useQuery } from "common-ui";
+import { DateView, useCollapser, useQuery } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { get, toPairs } from "lodash";
 import Link from "next/link";
@@ -28,8 +28,15 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
-          "createdDate",
-          "xmpMetadataDate",
+          "group",
+          {
+            name: "createdDate",
+            value: <DateView date={metadata.createdDate} />
+          },
+          {
+            name: "xmpMetadataDate",
+            value: <DateView date={metadata.xmpMetadataDate} />
+          },
           "acMetadataCreator.displayName",
           {
             name: "acDerivedFrom",
@@ -57,7 +64,10 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         metadata={metadata}
         fields={[
           "originalFilename",
-          "acDigitizationDate",
+          {
+            name: "acDigitizationDate",
+            value: <DateView date={metadata.acDigitizationDate} />
+          },
           "fileExtension",
           "dcCreator.displayName",
           "dcType",

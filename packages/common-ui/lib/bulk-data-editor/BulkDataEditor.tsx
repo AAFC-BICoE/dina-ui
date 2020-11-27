@@ -91,6 +91,12 @@ export function BulkDataEditor<TRow>({
 
   return (
     <>
+      <style>{`
+        /* Prevent the handsontable header from covering the Dropdown menu options: */
+        .ht_clone_top {
+          z-index: 0 !important;
+        }  
+      `}</style>
       <ErrorViewer />
       <div className="form-group">
         <DynamicHotTable

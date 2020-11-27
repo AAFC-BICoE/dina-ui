@@ -31,6 +31,7 @@ export function DateField(props: LabelWrapperParams & DateFieldProps) {
             <div>
               <DatePicker
                 className="form-control"
+                wrapperClassName="w-100"
                 dateFormat={showTime ? "Pp" : "yyyy-MM-dd"}
                 isClearable={!disabled}
                 onChange={onChange}

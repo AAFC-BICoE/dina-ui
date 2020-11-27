@@ -4,7 +4,6 @@ import { COMMON_UI_MESSAGES_ENGLISH } from "common-ui";
  * English SeqDB messages. A message must be set here in English before other languages.
  */
 export const SEQDB_MESSAGES_ENGLISH = {
-  ...COMMON_UI_MESSAGES_ENGLISH,
   addPcrPrimerTitle: "Add PCR Primer",
   addPcrProfileTitle: "Add Thermocycler Profile",
   addProductTitle: "Add Product",
@@ -28,6 +27,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   field_averageFragmentSize: "Average Fragment Size",
   field_concentration: "Concentration",
   field_inputAmount: "Input Amount",
+  "field_group.groupName": "Group Name",
   field_name: "Name",
   field_notes: "Notes",
   field_product: "Product",
