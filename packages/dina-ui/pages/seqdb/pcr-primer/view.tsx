@@ -24,8 +24,8 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("pcrPrimerViewTitle")} />
       <Nav />
       <ButtonBar>
-        <EditButton entityId={id as string} entityLink="pcr-primer" />
-        <BackToListButton entityLink="pcr-primer" />
+        <EditButton entityId={id as string} entityLink="seqdb/pcr-primer" />
+        <BackToListButton entityLink="/seqdb/pcr-primer" />
       </ButtonBar>
 
       <Query<PcrPrimer>

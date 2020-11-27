@@ -43,7 +43,7 @@ export default function ProtocolListPage() {
       <Head title={formatMessage("protocolListTitle")} />
       <Nav />
       <ButtonBar>
-        <CreateButton entityLink="protocol" />
+        <CreateButton entityLink="/seqdb/protocol" />
       </ButtonBar>
       <div className="container-fluid">
         <h1>

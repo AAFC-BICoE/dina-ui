@@ -33,7 +33,7 @@ export default function RegionListPage() {
       <Head title={formatMessage("regionListTitle")} />
       <Nav />
       <ButtonBar>
-        <CreateButton entityLink="region" />
+        <CreateButton entityLink="/seqdb/region" />
       </ButtonBar>
       <div className="container-fluid">
         <h1>

@@ -32,7 +32,7 @@ export default function WorkflowListPage() {
       <Head title={formatMessage("workflowListTitle")} />
       <Nav />
       <ButtonBar>
-        <CreateButton entityLink="workflow" />
+        <CreateButton entityLink="/seqdb/workflow" />
       </ButtonBar>
       <div className="container-fluid">
         <h1>

@@ -37,8 +37,8 @@ export default function WorkflowViewPage() {
       />
       <Nav />
       <ButtonBar>
-        <EditButton entityId={id as string} entityLink="workflow" />
-        <BackToListButton entityLink="workflow" />
+        <EditButton entityId={id as string} entityLink="seqdb/workflow" />
+        <BackToListButton entityLink="/seqdb/workflow" />
       </ButtonBar>
       <div className="container-fluid">
         <Link href="/workflow/list">

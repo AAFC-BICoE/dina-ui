@@ -57,7 +57,7 @@ export default function PcrPrimerListPage() {
       <Head title={formatMessage("pcrPrimerListTitle")} />
       <Nav />
       <ButtonBar>
-        <CreateButton entityLink="pcr-primer" />
+        <CreateButton entityLink="/seqdb/pcr-primer" />
       </ButtonBar>
       <div className="container-fluid">
         <h1>

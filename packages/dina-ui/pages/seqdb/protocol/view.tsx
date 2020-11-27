@@ -26,8 +26,8 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("protocolViewTitle")} />
       <Nav />
       <ButtonBar>
-        <EditButton entityId={id as string} entityLink="protocol" />
-        <BackToListButton entityLink="protocol" />
+        <EditButton entityId={id as string} entityLink="seqdb/protocol" />
+        <BackToListButton entityLink="/seqdb/protocol" />
       </ButtonBar>
       <Query<Protocol>
         query={{ include: "kit", path: `seqdb-api/protocol/${id}` }}

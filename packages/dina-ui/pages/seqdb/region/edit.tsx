@@ -90,7 +90,7 @@ function RegionForm({ region, router }: RegionFormProps) {
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />
-          <CancelButton entityId={id as string} entityLink="region" />
+          <CancelButton entityId={id as string} entityLink="/seqdb/region" />
         </ButtonBar>
         <div>
           <div className="row">

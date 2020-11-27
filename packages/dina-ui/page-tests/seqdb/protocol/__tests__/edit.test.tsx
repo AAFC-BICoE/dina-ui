@@ -70,7 +70,7 @@ describe("Protocol edit page", () => {
                 group: "/aafc",
                 name: "New Protocol"
               },
-              id: "-100",
+              id: "00000000-0000-0000-0000-000000000000",
               type: "protocol"
             }
           }

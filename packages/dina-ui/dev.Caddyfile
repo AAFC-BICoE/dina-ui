@@ -33,5 +33,8 @@ route /api/user-api/* {
 	reverse_proxy {$USER_API_ADDRESS}
 } 
 
-
-
+# Proxy to the back-end Seqdb API:
+route /api/seqdb-api/* {
+	uri replace /api/seqdb-api /api
+	reverse_proxy {$SEQDB_API_ADDRESS}
+} 

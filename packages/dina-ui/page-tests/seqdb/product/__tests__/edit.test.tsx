@@ -74,7 +74,7 @@ describe("Product edit page", () => {
               name: "New Product",
               type: undefined
             },
-            id: "-100",
+            id: "00000000-0000-0000-0000-000000000000",
             type: "product"
           }
         }

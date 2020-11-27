@@ -31,7 +31,7 @@ export default function IndexSetViewPage() {
         <Head title="Index Set" />
         <Nav />
         <ButtonBar>
-          <BackToListButton entityLink="index-set" />
+          <BackToListButton entityLink="/seqdb/index-set" />
         </ButtonBar>
         <Formik initialValues={response.data} onSubmit={noop}>
           <div className="container-fluid">

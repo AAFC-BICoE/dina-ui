@@ -23,8 +23,8 @@ export function ProductDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("productViewTitle")} />
       <Nav />
       <ButtonBar>
-        <EditButton entityId={id as string} entityLink="product" />
-        <BackToListButton entityLink="product" />
+        <EditButton entityId={id as string} entityLink="seqdb/product" />
+        <BackToListButton entityLink="/seqdb/product" />
       </ButtonBar>
       <Query<Product> query={{ path: `seqdb-api/product/${id}` }}>
         {({ loading, response }) => (

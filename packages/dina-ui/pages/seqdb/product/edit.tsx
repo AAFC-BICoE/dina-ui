@@ -92,7 +92,7 @@ function ProductForm({ product, router }: ProductFormProps) {
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />
-          <CancelButton entityId={id as string} entityLink="product" />
+          <CancelButton entityId={id as string} entityLink="/seqdb/product" />
         </ButtonBar>
         <div>
           <div className="row">

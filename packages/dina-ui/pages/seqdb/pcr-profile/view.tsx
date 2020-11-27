@@ -23,8 +23,8 @@ export function PcrProfileDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("pcrProfileViewTitle")} />
       <Nav />
       <ButtonBar>
-        <EditButton entityId={id as string} entityLink="pcr-profile" />
-        <BackToListButton entityLink="pcr-profile" />
+        <EditButton entityId={id as string} entityLink="seqdb/pcr-profile" />
+        <BackToListButton entityLink="/seqdb/pcr-profile" />
       </ButtonBar>
       <Query<PcrProfile>
         query={{

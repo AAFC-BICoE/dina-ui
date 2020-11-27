@@ -89,7 +89,7 @@ describe("Workflow edit page.", () => {
               group: "/aafc",
               name: "New Workflow"
             },
-            id: "-100",
+            id: "00000000-0000-0000-0000-000000000000",
             relationships: {
               chainTemplate: { data: { id: "1", type: "chainTemplate" } }
             },

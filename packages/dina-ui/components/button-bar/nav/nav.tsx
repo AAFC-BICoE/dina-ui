@@ -74,6 +74,9 @@ export function Nav() {
             <li className="list-inline-item my-auto d-none">
               <NavDinaUserDropdown />
             </li>
+            <li className="list-inline-item my-auto">
+              <NavSeqDBDropdown />
+            </li>
           </ul>
         </div>
       </div>
@@ -165,40 +168,40 @@ function NavSeqDBDropdown() {
   return (
     <div className="dropdown">
       <a className="nav-link dropdown-toggle" href="#">
-        <SeqdbMessage id="appTitle" />
+        <SeqdbMessage id="seqdbTitle" />
       </a>
       <div className="dropdown-menu m-0">
-        <Link href="/workflow/list">
+        <Link href="/seqdb/workflow/list">
           <a className="dropdown-item">
             <SeqdbMessage id="workflowListTitle" />
           </a>
         </Link>
-        <Link href="/index-set/list">
+        <Link href="/seqdb/index-set/list">
           <a className="dropdown-item">
             <SeqdbMessage id="indexSetListTitle" />
           </a>
         </Link>
-        <Link href="/pcr-primer/list">
+        <Link href="/seqdb/pcr-primer/list">
           <a className="dropdown-item">
             <SeqdbMessage id="pcrPrimerListTitle" />
           </a>
         </Link>
-        <Link href="/pcr-profile/list">
+        <Link href="/seqdb/pcr-profile/list">
           <a className="dropdown-item">
             <SeqdbMessage id="pcrProfileListTitle" />
           </a>
         </Link>
-        <Link href="/product/list">
+        <Link href="/seqdb/product/list">
           <a className="dropdown-item">
             <SeqdbMessage id="productListTitle" />
           </a>
         </Link>
-        <Link href="/protocol/list">
+        <Link href="/seqdb/protocol/list">
           <a className="dropdown-item">
             <SeqdbMessage id="protocolListTitle" />
           </a>
         </Link>
-        <Link href="/region/list">
+        <Link href="/seqdb/region/list">
           <a className="dropdown-item">
             <SeqdbMessage id="regionListTitle" />
           </a>

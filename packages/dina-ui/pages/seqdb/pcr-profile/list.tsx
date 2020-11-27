@@ -42,7 +42,7 @@ export default function PcrProfileListPage() {
       <Head title={formatMessage("pcrProfileListTitle")} />
       <Nav />
       <ButtonBar>
-        <CreateButton entityLink="pcr-profile" />
+        <CreateButton entityLink="/seqdb/pcr-profile" />
       </ButtonBar>
       <div className="container-fluid">
         <h1>

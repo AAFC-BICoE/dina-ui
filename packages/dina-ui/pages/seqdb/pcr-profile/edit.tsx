@@ -102,7 +102,10 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />
-          <CancelButton entityId={id as string} entityLink="pcr-profile" />
+          <CancelButton
+            entityId={id as string}
+            entityLink="/seqdb/pcr-profile"
+          />
         </ButtonBar>
         <div>
           <div className="row">

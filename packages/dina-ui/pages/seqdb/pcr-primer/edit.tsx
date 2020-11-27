@@ -101,7 +101,10 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
       <Form translate={undefined}>
         <ButtonBar>
           <SubmitButton />
-          <CancelButton entityId={id as string} entityLink="pcr-primer" />
+          <CancelButton
+            entityId={id as string}
+            entityLink="/seqdb/pcr-primer"
+          />
         </ButtonBar>
         <ErrorViewer />
         <div>

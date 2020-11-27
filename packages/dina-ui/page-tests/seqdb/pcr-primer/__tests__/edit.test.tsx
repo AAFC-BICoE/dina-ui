@@ -76,7 +76,7 @@ describe("PcrPrimer edit page", () => {
               seq: "",
               type: "PRIMER"
             },
-            id: "-100",
+            id: "00000000-0000-0000-0000-000000000000",
             type: "pcrPrimer"
           }
         }

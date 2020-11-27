@@ -37,7 +37,7 @@ export default function ProductListPage() {
       <Head title={formatMessage("productListTitle")} />
       <Nav />
       <ButtonBar>
-        <CreateButton entityLink="product" />
+        <CreateButton entityLink="/seqdb/product" />
       </ButtonBar>
       <div className="container-fluid">
         <h1>

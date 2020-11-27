@@ -103,7 +103,7 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
         <ErrorViewer />
         <ButtonBar>
           <SubmitButton />
-          <CancelButton entityId={id as string} entityLink="protocol" />
+          <CancelButton entityId={id as string} entityLink="/seqdb/protocol" />
         </ButtonBar>
         <div>
           <div className="row">

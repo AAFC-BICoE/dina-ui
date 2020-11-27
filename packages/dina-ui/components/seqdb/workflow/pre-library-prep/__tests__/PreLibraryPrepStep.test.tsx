@@ -300,7 +300,7 @@ describe("PreLibraryPrepStep UI", () => {
               inputAmount: 1234,
               preLibraryPrepType: "SHEARING"
             },
-            id: "-100",
+            id: "00000000-0000-0000-0000-000000000000",
             relationships: {
               product: {
                 data: {
@@ -326,7 +326,7 @@ describe("PreLibraryPrepStep UI", () => {
               inputAmount: 1234,
               preLibraryPrepType: "SHEARING"
             },
-            id: "-101",
+            id: "00000000-0000-0000-0000-000000000000",
             relationships: {
               product: {
                 data: {
@@ -352,7 +352,7 @@ describe("PreLibraryPrepStep UI", () => {
               inputAmount: 1234,
               preLibraryPrepType: "SHEARING"
             },
-            id: "-102",
+            id: "00000000-0000-0000-0000-000000000000",
             relationships: {
               product: {
                 data: {
@@ -616,7 +616,7 @@ describe("PreLibraryPrepStep UI", () => {
               inputAmount: 4321,
               preLibraryPrepType: "SHEARING"
             },
-            id: "1",
+            id: "00000000-0000-0000-0000-000000000000",
             type: "preLibraryPrep"
           }
         },
@@ -628,7 +628,7 @@ describe("PreLibraryPrepStep UI", () => {
               inputAmount: 4321,
               preLibraryPrepType: "SHEARING"
             },
-            id: "2",
+            id: "00000000-0000-0000-0000-000000000000",
             type: "preLibraryPrep"
           }
         },
@@ -641,7 +641,7 @@ describe("PreLibraryPrepStep UI", () => {
               inputAmount: 4321,
               preLibraryPrepType: "SHEARING"
             },
-            id: "-100",
+            id: "00000000-0000-0000-0000-000000000000",
             type: "preLibraryPrep"
           }
         }

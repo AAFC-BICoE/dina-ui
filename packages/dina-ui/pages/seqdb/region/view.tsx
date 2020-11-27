@@ -23,8 +23,8 @@ export function RegionDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("regionViewTitle")} />
       <Nav />
       <ButtonBar>
-        <EditButton entityId={id as string} entityLink="region" />
-        <BackToListButton entityLink="region" />
+        <EditButton entityId={id as string} entityLink="seqdb/region" />
+        <BackToListButton entityLink="/seqdb/region" />
       </ButtonBar>
       <Query<Region> query={{ path: `seqdb-api/region/${id}` }}>
         {({ loading, response }) => (

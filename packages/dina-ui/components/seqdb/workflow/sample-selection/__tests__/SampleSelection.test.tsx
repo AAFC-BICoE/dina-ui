@@ -123,7 +123,7 @@ describe("Sample Selection UI", () => {
           path: "stepResource",
           value: {
             attributes: { value: "SAMPLE" },
-            id: "-100",
+            id: "00000000-0000-0000-0000-000000000000",
             relationships: {
               chain: { data: { id: "1", type: "chain" } },
               chainStepTemplate: {
@@ -182,7 +182,7 @@ describe("Sample Selection UI", () => {
           path: "stepResource",
           value: {
             attributes: { value: "SAMPLE" },
-            id: "-100",
+            id: "00000000-0000-0000-0000-000000000000",
             relationships: {
               chain: { data: { id: "1", type: "chain" } },
               chainStepTemplate: {
@@ -198,7 +198,7 @@ describe("Sample Selection UI", () => {
           path: "stepResource",
           value: {
             attributes: { value: "SAMPLE" },
-            id: "-101",
+            id: "00000000-0000-0000-0000-000000000000",
             relationships: {
               chain: { data: { id: "1", type: "chain" } },
               chainStepTemplate: {
@@ -214,7 +214,7 @@ describe("Sample Selection UI", () => {
           path: "stepResource",
           value: {
             attributes: { value: "SAMPLE" },
-            id: "-102",
+            id: "00000000-0000-0000-0000-000000000000",
             relationships: {
               chain: { data: { id: "1", type: "chain" } },
               chainStepTemplate: {

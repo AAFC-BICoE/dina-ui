@@ -71,7 +71,7 @@ describe("PcrProfile edit page", () => {
                 group: "/aafc",
                 name: "New PcrProfile"
               },
-              id: "-100",
+              id: "00000000-0000-0000-0000-000000000000",
               type: "thermocyclerprofile"
             }
           }

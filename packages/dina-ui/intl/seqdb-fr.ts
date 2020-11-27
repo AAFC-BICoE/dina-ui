@@ -4,7 +4,6 @@ import { SEQDB_MESSAGES_ENGLISH } from "./seqdb-en";
  * French translation of SeqDB English messages
  */
 export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
-  appTitle: "Sequence Database (fr)",
   field_name: "Nom",
   addPcrPrimerTitle: "Ajouter une amorce PCR",
   addPcrProfileTitle: "Ajouter un profil de thermocycleur",
@@ -56,6 +55,7 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
     "Sélectionner tous les échantillons cochés -->",
   selectButtonText: "Sélectionner",
   selectedSamplesTitle: "Échantillons sélectionnés",
+  seqdbTitle: "Sequence Database (fr)",
   shearedStatus: "Cisaillé",
   shearingLabel: "Cisaillement",
   sizeSelectedStatus: "Sélection de taille ajoutée",
