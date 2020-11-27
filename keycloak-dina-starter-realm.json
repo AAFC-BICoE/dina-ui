@@ -6,7 +6,7 @@
   "clients": [
     {
       "id": "fe3ef8c1-e615-4528-960b-e86b3102c7c0",
-      "clientId": "objectstore",
+      "clientId": "dina",
       "enabled": true,
       "publicClient": true,
       "redirectUris": ["*"],

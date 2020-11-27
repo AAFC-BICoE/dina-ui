@@ -2,11 +2,32 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Attach java",
+      "name": "Attach to Object Store API",
       "request": "attach",
       "type": "java",
       "hostName": "localhost",
       "port": 5005
+    },
+    {
+      "name": "Attach to Agent API",
+      "request": "attach",
+      "type": "java",
+      "hostName": "localhost",
+      "port": 5006
+    },
+    {
+      "name": "Attach to User API",
+      "request": "attach",
+      "type": "java",
+      "hostName": "localhost",
+      "port": 5007
+    },
+    {
+      "name": "Attach to Seqdb API",
+      "request": "attach",
+      "type": "java",
+      "hostName": "localhost",
+      "port": 5007
     }
   ]
 }
