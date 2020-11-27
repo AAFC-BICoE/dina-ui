@@ -5,6 +5,7 @@ import {
   KeycloakAccountProvider
 } from "common-ui";
 import "common-ui/lib/button-bar/buttonbar.css";
+import "handsontable/dist/handsontable.full.min.css";
 import App from "next/app";
 import "rc-tooltip/assets/bootstrap.css";
 import React from "react";

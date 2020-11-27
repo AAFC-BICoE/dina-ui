@@ -2,7 +2,7 @@ import { PersistedResource } from "kitsu";
 import { Chain, ChainStepTemplate } from "../../types/seqdb-api";
 import { LibraryPoolingStep } from "./library-pooling/LibraryPoolingStep";
 import { LibraryPrepStep } from "./library-prep/LibraryPrepStep";
-import { PreLibraryPrepStep } from "./pre-library-prep/PreLibraryPrepStep";
+import { PreLibraryPrepBulkEdit } from "./pre-library-prep/PreLibraryPrepBulkEdit";
 import { SampleSelection } from "./sample-selection/SampleSelection";
 
 export interface StepRendererProps {
@@ -19,7 +19,7 @@ export function StepRenderer(props: StepRendererProps) {
       return <LibraryPrepStep {...props} />;
     case "SIZE_SELECTION":
     case "SHEARING":
-      return <PreLibraryPrepStep {...props} />;
+      return <PreLibraryPrepBulkEdit {...props} />;
     case "LIBRARY_POOL":
       return <LibraryPoolingStep {...props} />;
     default:
