@@ -249,7 +249,12 @@ function getErrorMessage(
   // Convert the JsonApiErrors to an aggregated error string.
   const message = jsonApiErrors
     .map(errors =>
-      errors.map(({ title, detail }) => `${title}: ${detail}`).join("\n")
+      errors
+        .map(({ title, detail }) =>
+          // The error message is the title + detail, but remove one if the other is missing
+          [title, detail].filter(s => s?.trim()).join(": ")
+        )
+        .join("\n")
     )
     .join("\n");
 

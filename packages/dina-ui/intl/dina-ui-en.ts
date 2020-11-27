@@ -1,13 +1,11 @@
-import { COMMON_UI_MESSAGES_ENGLISH } from "common-ui";
-
 /**
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
-  ...COMMON_UI_MESSAGES_ENGLISH,
   addFilesButton: "Add Files",
   addManagedAttributeButtonText: "Add New Managed Attribute",
   addObjectSubtypeTitle: "Add New Object Subtype",
+  addOrganizationTitle: "Add New Organization",
   addPersonTitle: "Add Person",
   addPersonButtonText: "Add Person",
   addPersonPopupTooltip: "Add Person without leaving the page",
@@ -19,24 +17,40 @@ export const DINAUI_MESSAGES_ENGLISH = {
   closePreviewButtonText: "Close Preview",
   deleteButtonText: "Delete",
   deleteSelectedButtonText: "Delete Selected",
+  dinaUserSectionTitle: "Dina User",
   editObjectSubtypeTitle: "Edit Object Subtype",
+  editOrganizationTitle: "Edit Organization",
+  editOrganizationAliasesLabel: "Aliases (comma seperated)",
   editPersonTitle: "Edit Person",
   editSelectedButtonText: "Edit Selected",
   feedbackButtonText: "Feedback",
+  field_acceptedValues: "Accepted Values",
   field_acCaption: "Caption",
+  field_acSubtype: "Ac Subtype",
   field_acDerivedFrom: "Derived From",
   field_acDigitizationDate: "Date Original Version Created",
+  field_acDigitizationDate_tooltip:
+    "Date and time of when the digital object described by the metadata was created. For an image it represents when the image was taken.",
   field_acHashFunction: "Hash Function",
   field_acHashValue: "Hash",
-  "field_acMetadataCreator.displayName": "Upload By",
+  field_acMetadataCreator: "Metadata Created By",
+  "field_acMetadataCreator.displayName": "Metadata Created By",
+  "field_acMetadataCreator.displayName_tooltip":
+    "Agent who created the metadata record.",
   field_acSubType: "Object SubType",
   field_acTags: "Tags",
-  "field_dcCreator.displayName": "Document Creator",
+  "field_dcCreator.displayName": "Digitized By",
+  field_createdBy: "Created By",
+  field_createdDate: "Created Date",
+  field_createdOn: "Created On",
   field_dcFormat: "Media Format",
   field_dcRights: "Rights Statement",
   field_dcType: "Stored Object Type",
+  field_description: "Description",
+  field_displayName: "Display Name",
   field_editableBuiltInAttributes: "Built In Attributes",
   field_editableManagedAttributes: "Managed Attributes",
+  field_email: "Email",
   field_license: "License",
   field_managedAttributeAcceptedValue: "Accepted Value",
   field_managedAttributeCreatedOn: "Created On",
@@ -48,8 +62,21 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeName: "Attribute Name",
   field_managedAttributeType: "Type",
   field_originalFilename: "Original Filename",
-  field_xmpMetadataDate: "Date Metadata Applied",
+  field_organizationMandatoryFieldsError:
+    "At least one orgnization name is required",
+  field_publiclyReleasable: "Publicly releasable",
+  field_publiclyReleasable_tooltip:
+    "Indicates if the object could be released publicly on a web page or open data portals.",
+  field_type: "Type",
+  field_xmpMetadataDate: "Last Updated On",
+  field_xmpMetadataDate_tooltip:
+    "Date and time of when the record was last updated.",
   field_xmpRightsWebStatement: "Reuse Rights Statement",
+  footerContactInfo: "Contact information",
+  footerTermsAndConditions: "Terms and conditions",
+  footerPrivacy: "Privacy",
+  forTestingPurposesOnlyMessage:
+    "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
   governmentOfCanada: "Government of Canada",
   groupMustBeSelected: "Group must be selected",
   managedAttributeEditTitle: "Edit Managed Attribute",
@@ -87,6 +114,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   objectStoreTitle: "Object Store",
   objectSubtypeListTitle: "Object Subtypes",
   objectSubtypeTitle: "Object Subtype",
+  organizationEnglishNameLabel: "English Name",
+  organizationFrenchNameLabel: "French Name",
+  organizationListTitle: "Organizations",
+  organizationViewTitle: "View Organization",
   personListTitle: "Persons",
   personViewTitle: "View Person",
   revisionsButtonText: "Revisions",
@@ -99,5 +130,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   uploadPageTitle: "Upload Files",
   userMustBelongToGroup: "User must belong to a Group",
   valueLabel: "Value",
-  viewPreviewButtonText: "Preview"
+  viewPreviewButtonText: "Preview",
+  whoAmITitle: "Who Am I"
 };

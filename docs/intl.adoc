@@ -55,7 +55,6 @@ seqdb-en.ts:
 [source,tsx]
 ----
 export const SEQDB_MESSAGES_ENGLISH = {
-  ...COMMON_UI_MESSAGES_ENGLISH,
   ...
   greeting: "Hello!"
   ...
@@ -72,7 +71,6 @@ Example from seqdb-fr.ts:
 [source,tsx]
 ----
 export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
-  ...COMMON_UI_MESSAGES_FR,
   ...
   greeting: "Bonjour!", // If the key exists in the english messages file, Typescript allows it.
   otherKey: "C'est un autre message." // If "otherKey" isn't a key in the English messages, this should show an error in your IDE.
@@ -92,7 +90,6 @@ Example:
 [source,tsx]
 ----
 export const SEQDB_MESSAGES_ENGLISH = {
-  ...COMMON_UI_MESSAGES_ENGLISH,
   ...
   field_name: "Name",
   "field_group.groupName": "Group Name",
@@ -103,10 +100,47 @@ export const SEQDB_MESSAGES_ENGLISH = {
 [source,tsx]
 ----
 export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
-  ...COMMON_UI_MESSAGES_FR,
   ...
   field_name: "Nom",
   "field_group.groupName": "Nom de Groupe"
   ...
 }
+----
+
+=== Field tooltip messages
+
+You can add an additional tooltip message to go inside the Field Label after the field name.
+After adding the field label message, add a tooltip message by adding "_tooltip" to the end of
+the field label's message.
+
+Example:
+
+[source,tsx]
+----
+export const DINAUI_MESSAGES_ENGLISH = {
+  ...
+  field_publiclyReleasable: "Publicly releasable",
+  field_publiclyReleasable_tooltip:
+    "Indicates if the object could be released publicly on a web page or open data portals.",
+  ...
+}
+----
+
+== Export messages as CSV
+
+Run the following command to export the messages in CSV format:
+
+[source,bash]
+----
+cd ./packages/scripts
+yarn --silent export-intl-csv > messages.csv
+----
+
+== Import CSV files to update Typescript message files
+
+Run the following command after editing your CSV file:
+
+----
+cd ./packages/scripts
+CSVFILE=messages.csv yarn import-intl-csv
 ----

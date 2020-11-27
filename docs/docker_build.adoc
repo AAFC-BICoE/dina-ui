@@ -18,4 +18,4 @@ dina-ui:
 
 seqdb-ui:
 
-* API_ADDRESS: The back-end API URL and port. e.g. seqdb-api:8080
+* SEQDB_API_ADDRESS: The back-end API URL and port. e.g. seqdb-api:8080

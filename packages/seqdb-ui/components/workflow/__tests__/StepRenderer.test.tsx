@@ -7,7 +7,7 @@ import {
 } from "../../../types/seqdb-api";
 import { LibraryPoolingStep } from "../library-pooling/LibraryPoolingStep";
 import { LibraryPrepStep } from "../library-prep/LibraryPrepStep";
-import { PreLibraryPrepStep } from "../pre-library-prep/PreLibraryPrepStep";
+import { PreLibraryPrepBulkEdit } from "../pre-library-prep/PreLibraryPrepBulkEdit";
 import { SampleSelection } from "../sample-selection/SampleSelection";
 import { StepRenderer, StepRendererProps } from "../StepRenderer";
 
@@ -67,7 +67,7 @@ describe("StepRenderer component", () => {
     const ssWrapper = getWrapper({
       step: SIZE_SELECTION_STEP
     });
-    expect(ssWrapper.find(PreLibraryPrepStep).exists()).toEqual(true);
+    expect(ssWrapper.find(PreLibraryPrepBulkEdit).exists()).toEqual(true);
 
     const lpWrapper = getWrapper({
       step: LIBRARY_POOL_STEP

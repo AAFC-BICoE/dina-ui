@@ -51,7 +51,9 @@ export function FilterForm({
       {formikProps => (
         <Form className="form-group" translate={undefined}>
           <div className="form-group">
-            <strong>Filter records:</strong>
+            <strong>
+              <CommonMessage id="filterRecordsTitle" />
+            </strong>
             <FilterBuilderField
               filterAttributes={filterAttributes}
               name="filterBuilderModel"

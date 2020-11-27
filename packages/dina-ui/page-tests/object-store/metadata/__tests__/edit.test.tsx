@@ -14,7 +14,7 @@ import {
 
 const TEST_METADATAS: PersistedResource<Metadata>[] = [
   {
-    acMetadataCreator: {
+    dcCreator: {
       displayName: "Mat Poff",
       id: "6e80e42a-bcf6-4062-9db3-946e0f26458f",
       type: "person"
@@ -132,28 +132,24 @@ describe("Metadata bulk edit page", () => {
     // The 3 metadatas should have been loaded into the table.
     expect(wrapper.find("MockHotTable").prop("data")).toEqual([
       {
-        acMetadataCreator:
-          "Mat Poff (person/6e80e42a-bcf6-4062-9db3-946e0f26458f)",
+        dcCreator: "Mat Poff (person/6e80e42a-bcf6-4062-9db3-946e0f26458f)",
         acTags: "tag1",
-        dcCreator: "",
         license: "",
         metadata: expect.objectContaining({
           id: "6c524135-3c3e-41c1-a057-45afb4e3e7be"
         })
       },
       {
-        acMetadataCreator: "",
-        acTags: "tag1, tag2",
         dcCreator: "",
+        acTags: "tag1, tag2",
         license: "",
         metadata: expect.objectContaining({
           id: "3849de16-fee2-4bb1-990d-a4f5de19b48d"
         })
       },
       {
-        acMetadataCreator: "",
-        acTags: "",
         dcCreator: "",
+        acTags: "",
         license:
           "Open Government Licence - Canada (license/open-government-license-canada)",
         metadata: expect.objectContaining({
@@ -243,7 +239,7 @@ describe("Metadata bulk edit page", () => {
       .prop<BulkMetadataEditRow[]>("data");
 
     // Update the metadata creator field:
-    tableData[1].acMetadataCreator =
+    tableData[1].dcCreator =
       "Mat (person/63eead51-142f-4a67-a596-68fd35a36ed8)";
 
     // Update the tags:
@@ -260,13 +256,16 @@ describe("Metadata bulk edit page", () => {
     wrapper.update();
 
     // Only 1 row should have been updated, using 2 operations for the row:
-    // - The Metadata is updated with new acMetadataCreator and new tags.
+    // - The Metadata is updated with new dcCreator and new tags.
     // - The metadata's managed-attribute-map is udpated with a new attribute value.
     expect(mockSave).lastCalledWith(
       [
         {
           resource: {
-            acMetadataCreator: "63eead51-142f-4a67-a596-68fd35a36ed8",
+            dcCreator: {
+              id: "63eead51-142f-4a67-a596-68fd35a36ed8",
+              type: "person"
+            },
             acTags: ["newTag1", "newTag2"],
             id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
             type: "metadata"

@@ -27,7 +27,7 @@ export default function MetadataViewPage() {
 
   const { loading, response } = useQuery<Metadata>(
     {
-      include: "acDerivedFrom,managedAttributeMap",
+      include: "acDerivedFrom,managedAttributeMap,acMetadataCreator,dcCreator",
       path: `objectstore-api/metadata/${id}`
     },
     {
@@ -36,13 +36,13 @@ export default function MetadataViewPage() {
           apiBaseUrl: "/agent-api",
           idField: "acMetadataCreator",
           joinField: "acMetadataCreator",
-          path: metadata => `person/${metadata.acMetadataCreator}`
+          path: metadata => `person/${metadata.acMetadataCreator.id}`
         },
         {
           apiBaseUrl: "/agent-api",
           idField: "dcCreator",
           joinField: "dcCreator",
-          path: metadata => `person/${metadata.dcCreator}`
+          path: metadata => `person/${metadata.dcCreator.id}`
         }
       ]
     }

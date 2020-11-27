@@ -1,10 +1,9 @@
-import { useCollapser, useQuery } from "common-ui";
+import { DateView, FieldHeader, useCollapser, useQuery } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { get, toPairs } from "lodash";
 import Link from "next/link";
 import { ReactNode } from "react";
 import ReactTable from "react-table";
-import titleCase from "title-case";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   ManagedAttribute,
@@ -28,8 +27,15 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
-          "createdDate",
-          "xmpMetadataDate",
+          "group",
+          {
+            name: "createdDate",
+            value: <DateView date={metadata.createdDate} />
+          },
+          {
+            name: "xmpMetadataDate",
+            value: <DateView date={metadata.xmpMetadataDate} />
+          },
           "acMetadataCreator.displayName",
           {
             name: "acDerivedFrom",
@@ -57,7 +63,10 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         metadata={metadata}
         fields={[
           "originalFilename",
-          "acDigitizationDate",
+          {
+            name: "acDigitizationDate",
+            value: <DateView date={metadata.acDigitizationDate} />
+          },
           "fileExtension",
           "dcCreator.displayName",
           "dcType",
@@ -99,8 +108,6 @@ function MetadataAttributeGroup({
   fields,
   title
 }: MetadataAttributeGroupProps) {
-  const { formatMessage, messages } = useDinaIntl();
-
   const data = fields.map(field => {
     if (typeof field === "string") {
       return { name: field, value: get(metadata, field) };
@@ -114,14 +121,11 @@ function MetadataAttributeGroup({
         className="-striped"
         columns={[
           {
-            Cell: ({ original: { name } }) => {
-              const messageKey = `field_${name}`;
-              const value = messages[messageKey]
-                ? formatMessage(messageKey as any)
-                : titleCase(name);
-
-              return <strong>{value}</strong>;
-            },
+            Cell: ({ original: { name } }) => (
+              <strong>
+                <FieldHeader name={name} />
+              </strong>
+            ),
             Header: <DinaMessage id="attributeLabel" />,
             accessor: "name"
           },

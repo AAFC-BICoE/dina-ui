@@ -3,7 +3,6 @@ import { isPlainObject } from "lodash";
 import React, { useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import ReactTable, { Column, SortingRule, TableProps } from "react-table";
-import titleCase from "title-case";
 import {
   ClientSideJoinSpec,
   JsonApiQuerySpec,
@@ -12,6 +11,7 @@ import {
   useQuery
 } from "..";
 import { QueryState } from "../api-client/useQuery";
+import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
 
@@ -52,6 +52,10 @@ export interface QueryTableProps<TData extends KitsuResource> {
 
   /** Query success callback. */
   onSuccess?: (response: KitsuResponse<TData[], MetaWithTotal>) => void;
+
+  onPageSizeChange?: (newSize: number) => void;
+
+  onSortedChange?: (newSort: SortingRule[]) => void;
 
   /**
    * Override internal react-table props.
@@ -102,6 +106,8 @@ export function QueryTable<TData extends KitsuResource>({
   joinSpecs,
   loading: loadingProp,
   onSuccess,
+  onPageSizeChange,
+  onSortedChange,
   path,
   reactTableProps
 }: QueryTableProps<TData>) {
@@ -161,13 +167,7 @@ export function QueryTable<TData extends KitsuResource>({
             fieldName: String(column.accessor)
           };
 
-    const messageKey = `field_${fieldName}`;
-
-    const Header =
-      customHeader ??
-      (messages[messageKey]
-        ? formatMessage({ id: messageKey as any })
-        : titleCase(fieldName));
+    const Header = customHeader ?? <FieldHeader name={fieldName} />;
 
     return {
       Header,
@@ -240,7 +240,15 @@ export function QueryTable<TData extends KitsuResource>({
         pageSizeOptions={[25, 50, 100, 200, 500]}
         pages={numberOfPages}
         showPaginationTop={true}
+        noDataText={<CommonMessage id="noRowsFound" />}
+        ofText={<CommonMessage id="of" />}
+        onPageSizeChange={onPageSizeChange}
+        onSortedChange={onSortedChange}
+        rowsText={formatMessage({ id: "rows" })}
+        previousText={<CommonMessage id="previous" />}
+        nextText={<CommonMessage id="next" />}
         {...resolvedReactTableProps}
+        pageText={<CommonMessage id="page" />}
       />
     </div>
   );

@@ -1,7 +1,7 @@
 import { noop } from "lodash";
 import { useDrag } from "react-dnd-cjs";
-import ReactTooltip from "react-tooltip";
 import { Sample } from "../../../../types/seqdb-api";
+import RcTooltip from "rc-tooltip";
 
 interface DraggableSampleBoxProps {
   onClick?: (e: any) => void;
@@ -21,25 +21,25 @@ export function DraggableSampleBox({
   });
 
   return (
-    <li
-      className="list-group-item"
-      data-tip={true}
-      data-for={sample.id}
-      onClick={onClick}
-      ref={drag}
-      style={{
-        backgroundColor: selected
-          ? "rgb(222, 252, 222)"
-          : wasMoved
-          ? "#fff3cd"
-          : undefined,
-        cursor: "move"
-      }}
-    >
-      <ReactTooltip id={sample.id}>
-        <span>{sample.name}</span>
-      </ReactTooltip>
-      <span className="sample-box-text">{sample.name}</span>
+    <li className="list-group-item p-0" onClick={onClick} ref={drag}>
+      <RcTooltip
+        placement="top"
+        overlay={<div style={{ maxWidth: "15rem" }}>{sample.name}</div>}
+      >
+        <div
+          className="move-status-indicator list-group-item"
+          style={{
+            backgroundColor: selected
+              ? "rgb(222, 252, 222)"
+              : wasMoved
+              ? "#fff3cd"
+              : undefined,
+            cursor: "move"
+          }}
+        >
+          <span className="sample-box-text">{sample.name}</span>
+        </div>
+      </RcTooltip>
     </li>
   );
 }

@@ -44,9 +44,11 @@ describe("Upload page", () => {
     const mockPost = jest.fn(() => {
       return {
         data: {
+          dateTimeDigitized: "2003-12-14T12:01:44",
           fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
           fileType: "image",
-          size: "500"
+          size: "500",
+          exif: { "date original created": "2000, Jan 8" }
         }
       };
     });
@@ -57,7 +59,6 @@ describe("Upload page", () => {
         id: "11111111-1111-1111-1111-111111111111"
       }))
     );
-
     const mockApiCtx = {
       apiClient: {
         axios: {
@@ -108,12 +109,31 @@ describe("Upload page", () => {
       { transformResponse: fileUploadErrorHandler }
     );
 
+    wrapper.update();
+
+    expect(
+      wrapper
+        .find(
+          ".rt-th.rt-resizable-header.-cursor-pointer .rt-resizable-header-content"
+        )
+        .contains("date original created")
+    ).toBe(true);
+    expect(wrapper.find(".rt-tr.-odd .rt-td").contains("2000, Jan 8")).toBe(
+      true
+    );
+
+    // call the save button to save the metadata for the uploaded files
+    wrapper.find("form.saveMultiMeta").simulate("submit");
+    await new Promise(setImmediate);
     expect(mockSave).lastCalledWith(
       [
         {
           resource: {
-            acDigitizationDate: "2019-08-28T20:37:21+00:00",
-            acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+            acDigitizationDate: "2003-12-14T12:01:44+00:00",
+            acMetadataCreator: {
+              id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+              type: "person"
+            },
             bucket: "example-group",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"
@@ -122,8 +142,11 @@ describe("Upload page", () => {
         },
         {
           resource: {
-            acDigitizationDate: "2019-08-29T20:37:21+00:00",
-            acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+            acDigitizationDate: "2003-12-14T12:01:44+00:00",
+            acMetadataCreator: {
+              id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+              type: "person"
+            },
             bucket: "example-group",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"
@@ -132,8 +155,11 @@ describe("Upload page", () => {
         },
         {
           resource: {
-            acDigitizationDate: "2019-08-30T20:37:21+00:00",
-            acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+            acDigitizationDate: "2003-12-14T12:01:44+00:00",
+            acMetadataCreator: {
+              id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+              type: "person"
+            },
             bucket: "example-group",
             fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
             type: "metadata"

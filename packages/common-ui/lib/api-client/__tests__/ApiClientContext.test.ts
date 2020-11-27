@@ -88,6 +88,20 @@ const TODO_OPERATION_1_VALID_2_INVALID: Operation[] = [
   }
 ];
 
+const TODO_OPERATION_DENY_ACCESS: Operation[] = [
+  {
+    op: "POST",
+    path: "todo",
+    value: {
+      attributes: {
+        name: "this will fail with an 'access denied' error."
+      },
+      id: "1",
+      type: "todo"
+    }
+  }
+];
+
 const MOCK_AXIOS_RESPONSE_1_VALID_2_INVALID = {
   data: [
     {
@@ -128,6 +142,22 @@ const MOCK_AXIOS_RESPONSE_1_VALID_2_INVALID = {
   ] as OperationsResponse
 };
 
+const MOCK_AXIOS_RESPONSE_ACCESS_DENIED = {
+  data: [
+    {
+      errors: [
+        {
+          status: "403",
+          code: "Access is denied",
+          title: "Access is denied",
+          meta: { type: "AccessDeniedException" }
+        }
+      ],
+      status: 403
+    }
+  ] as OperationsResponse
+};
+
 /** Mock of Axios' patch function. */
 const mockPatch = jest.fn((_, data) => {
   if (data === TODO_INSERT_OPERATION) {
@@ -135,6 +165,9 @@ const mockPatch = jest.fn((_, data) => {
   }
   if (data === TODO_OPERATION_1_VALID_2_INVALID) {
     return MOCK_AXIOS_RESPONSE_1_VALID_2_INVALID;
+  }
+  if (data === TODO_OPERATION_DENY_ACCESS) {
+    return MOCK_AXIOS_RESPONSE_ACCESS_DENIED;
   }
 });
 
@@ -172,6 +205,19 @@ Constraint violation: description size must be between 1 and 10`;
 
     try {
       await doOperations(TODO_OPERATION_1_VALID_2_INVALID);
+    } catch (error) {
+      actualError = error;
+    }
+    expect(actualError.message).toEqual(expectedErrorMessage);
+  });
+
+  it("Omits the detail field from the error message if the detail is undefined.", async () => {
+    const expectedErrorMessage = "Access is denied";
+
+    let actualError: Error = new Error();
+
+    try {
+      await doOperations(TODO_OPERATION_DENY_ACCESS);
     } catch (error) {
       actualError = error;
     }

@@ -79,7 +79,7 @@ describe("LibraryPrepStepDetails component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    wrapper.find(".notes-field input").simulate("change", {
+    wrapper.find(".notes-field textarea").simulate("change", {
       target: { name: "seq", value: "new notes" }
     });
 
@@ -157,7 +157,7 @@ describe("LibraryPrepStepDetails component", () => {
     wrapper.find("button[children='Edit Batch Details']").simulate("click");
     wrapper.update();
 
-    expect(wrapper.find(".notes-field input").prop("value")).toEqual(
+    expect(wrapper.find(".notes-field textarea").prop("value")).toEqual(
       "new notes"
     );
   });
