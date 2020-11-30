@@ -94,7 +94,7 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
     );
 
     const newId = response[0].id;
-    await router.push(`/protocol/view?id=${newId}`);
+    await router.push(`/seqdb/protocol/view?id=${newId}`);
   });
 
   return (

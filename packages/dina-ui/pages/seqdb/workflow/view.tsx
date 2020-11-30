@@ -41,7 +41,7 @@ export default function WorkflowViewPage() {
         <BackToListButton entityLink="/seqdb/workflow" />
       </ButtonBar>
       <div className="container-fluid">
-        <Link href="/workflow/list">
+        <Link href="/seqdb/workflow/list">
           <a>NGS Workflow list</a>
         </Link>
         <h1>

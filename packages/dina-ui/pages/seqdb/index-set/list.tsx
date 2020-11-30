@@ -13,7 +13,7 @@ const INDEX_SET_FILTER_ATTRIBUTES = [
 const INDEX_SET_TABLE_COLUMNS: ColumnDefinition<IndexSet>[] = [
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/index-set/view?id=${id}`}>
+      <Link href={`/seqdb/index-set/view?id=${id}`}>
         <a>{name}</a>
       </Link>
     ),

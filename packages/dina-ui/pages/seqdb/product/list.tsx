@@ -12,7 +12,7 @@ import { Product } from "../../../types/seqdb-api/resources/Product";
 const PRODUCT_TABLE_COLUMNS: ColumnDefinition<Product>[] = [
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/product/view?id=${id}`}>
+      <Link href={`/seqdb/product/view?id=${id}`}>
         <a>{name}</a>
       </Link>
     ),

@@ -11,7 +11,7 @@ import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 const WORKFLOW_TABLE_COLUMNS: ColumnDefinition<any>[] = [
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/workflow/view?id=${id}`}>
+      <Link href={`/seqdb/workflow/view?id=${id}`}>
         <a>{name}</a>
       </Link>
     ),

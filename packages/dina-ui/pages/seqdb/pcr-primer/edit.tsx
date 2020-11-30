@@ -93,7 +93,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
     );
 
     const newId = response[0].id;
-    await router.push(`/pcr-primer/view?id=${newId}`);
+    await router.push(`/seqdb/pcr-primer/view?id=${newId}`);
   });
 
   return (

@@ -12,7 +12,7 @@ import { Region } from "../../../types/seqdb-api/resources/Region";
 const REGION_TABLE_COLUMNS: ColumnDefinition<Region>[] = [
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/region/view?id=${id}`}>
+      <Link href={`/seqdb/region/view?id=${id}`}>
         <a>{name}</a>
       </Link>
     ),

@@ -13,7 +13,7 @@ const PCRPROFILE_TABLE_COLUMNS: ColumnDefinition<PcrProfile>[] = [
   {
     Cell: ({ original: { region } }) =>
       region ? (
-        <Link href={`/region/view?id=${region.id}`}>
+        <Link href={`/seqdb/region/view?id=${region.id}`}>
           <a>{region.name}</a>
         </Link>
       ) : null,
@@ -22,7 +22,7 @@ const PCRPROFILE_TABLE_COLUMNS: ColumnDefinition<PcrProfile>[] = [
   "group",
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/pcr-profile/view?id=${id}`}>
+      <Link href={`/seqdb/pcr-profile/view?id=${id}`}>
         <a>{name}</a>
       </Link>
     ),

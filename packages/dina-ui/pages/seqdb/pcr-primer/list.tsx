@@ -12,7 +12,7 @@ import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 const PCRPRIMER_TABLE_COLUMNS: ColumnDefinition<PcrPrimer>[] = [
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/pcr-primer/view?id=${id}`}>
+      <Link href={`/seqdb/pcr-primer/view?id=${id}`}>
         <a>{name}</a>
       </Link>
     ),
@@ -22,7 +22,7 @@ const PCRPRIMER_TABLE_COLUMNS: ColumnDefinition<PcrPrimer>[] = [
   {
     Cell: ({ original: { region } }) =>
       region ? (
-        <Link href={`/region/view?id=${region.id}`}>
+        <Link href={`/seqdb/region/view?id=${region.id}`}>
           <a>{region.name}</a>
         </Link>
       ) : null,

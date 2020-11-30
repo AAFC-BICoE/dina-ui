@@ -93,7 +93,7 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
     );
 
     const newId = response[0].id;
-    await router.push(`/pcr-profile/view?id=${newId}`);
+    await router.push(`/seqdb/pcr-profile/view?id=${newId}`);
   });
 
   return (

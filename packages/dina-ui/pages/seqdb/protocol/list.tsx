@@ -12,7 +12,7 @@ import { Protocol } from "../../../types/seqdb-api/resources/Protocol";
 const PROTOCOL_TABLE_COLUMNS: ColumnDefinition<Protocol>[] = [
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/protocol/view?id=${id}`}>
+      <Link href={`/seqdb/protocol/view?id=${id}`}>
         <a>{name}</a>
       </Link>
     ),

@@ -83,7 +83,7 @@ function ProductForm({ product, router }: ProductFormProps) {
     );
 
     const newId = response[0].id;
-    await router.push(`/product/view?id=${newId}`);
+    await router.push(`/seqdb/product/view?id=${newId}`);
   });
 
   return (
