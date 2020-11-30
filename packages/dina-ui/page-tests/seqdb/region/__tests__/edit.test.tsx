@@ -80,7 +80,7 @@ describe("Region edit page", () => {
     );
 
     // The user should be redirected to the new region's details page.
-    expect(mockPush).lastCalledWith("/region/view?id=1");
+    expect(mockPush).lastCalledWith("/seqdb/region/view?id=1");
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
@@ -185,7 +185,7 @@ describe("Region edit page", () => {
     );
 
     // The user should be redirected to the existing region's details page.
-    expect(mockPush).lastCalledWith("/region/view?id=1");
+    expect(mockPush).lastCalledWith("/seqdb/region/view?id=1");
   });
 });
 

@@ -80,7 +80,7 @@ describe("PcrProfile edit page", () => {
       );
 
       // The user should be redirected to the new profile's details page.
-      expect(mockPush).lastCalledWith("/pcr-profile/view?id=1");
+      expect(mockPush).lastCalledWith("/seqdb/pcr-profile/view?id=1");
       done();
     });
   });
@@ -189,7 +189,7 @@ describe("PcrProfile edit page", () => {
       );
 
       // The user should be redirected to the existing profile's details page.
-      expect(mockPush).lastCalledWith("/pcr-profile/view?id=1");
+      expect(mockPush).lastCalledWith("/seqdb/pcr-profile/view?id=1");
       done();
     });
   });

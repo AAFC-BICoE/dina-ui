@@ -1,30 +1,26 @@
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { SeqdbMessage, useSeqdbIntl } from "../../../../intl/seqdb-intl";
 
-export type PreLibPrepViewMode =
-  | "EDIT"
-  | "SHEARING_DETAILS"
-  | "SIZE_SELECTION_DETAILS";
+export type PreLibraryPrepEditMode = "SHEARING" | "SIZE_SELECTION";
 
 interface ViewModeSelectorProps {
-  viewMode: PreLibPrepViewMode;
-  onChange: (newMode: PreLibPrepViewMode) => void;
+  editMode: PreLibraryPrepEditMode;
+  onChange: (newMode: PreLibraryPrepEditMode) => void;
 }
 
 /** View mode selector for the Pre Lib Prep page. */
-export function PreLibPrepViewModeSelector({
+export function PreLibPrepEditModeSelector({
   onChange,
-  viewMode
+  editMode
 }: ViewModeSelectorProps) {
   const { formatMessage } = useSeqdbIntl();
 
-  const modes: { label: string; mode: PreLibPrepViewMode }[] = [
-    { label: formatMessage("plpEditModeLabel"), mode: "EDIT" },
-    { label: formatMessage("plpShearingModeLabel"), mode: "SHEARING_DETAILS" },
-    { label: formatMessage("plpSizeModeLabel"), mode: "SIZE_SELECTION_DETAILS" }
+  const modes: { label: string; mode: PreLibraryPrepEditMode }[] = [
+    { label: formatMessage("plpShearingModeLabel"), mode: "SHEARING" },
+    { label: formatMessage("plpSizeModeLabel"), mode: "SIZE_SELECTION" }
   ];
 
-  const selectedIndex = modes.findIndex(({ mode }) => viewMode === mode);
+  const selectedIndex = modes.findIndex(({ mode }) => editMode === mode);
 
   function onSelect(tabIndex: number) {
     const selectedMode = modes[tabIndex];

@@ -83,7 +83,7 @@ describe("Product edit page", () => {
     );
 
     // The user should be redirected to the new product's details page.
-    expect(mockPush).lastCalledWith("/product/view?id=1");
+    expect(mockPush).lastCalledWith("/seqdb/product/view?id=1");
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
@@ -189,7 +189,7 @@ describe("Product edit page", () => {
     );
 
     // The user should be redirected to the existing product's details page.
-    expect(mockPush).lastCalledWith("/product/view?id=10");
+    expect(mockPush).lastCalledWith("/seqdb/product/view?id=10");
   });
 });
 

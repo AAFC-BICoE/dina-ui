@@ -85,7 +85,7 @@ describe("PcrPrimer edit page", () => {
     );
 
     // The user should be redirected to the new primer's details page.
-    expect(mockPush).lastCalledWith("/pcr-primer/view?id=1");
+    expect(mockPush).lastCalledWith("/seqdb/pcr-primer/view?id=1");
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
@@ -198,7 +198,7 @@ describe("PcrPrimer edit page", () => {
     );
 
     // The user should be redirected to the existing primer's details page.
-    expect(mockPush).lastCalledWith("/pcr-primer/view?id=1");
+    expect(mockPush).lastCalledWith("/seqdb/pcr-primer/view?id=1");
   });
 });
 

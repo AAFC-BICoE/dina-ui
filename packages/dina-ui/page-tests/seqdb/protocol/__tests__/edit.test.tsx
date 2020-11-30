@@ -79,7 +79,7 @@ describe("Protocol edit page", () => {
       );
 
       // The user should be redirected to the new protocol's details page.
-      expect(mockPush).lastCalledWith("/protocol/view?id=1");
+      expect(mockPush).lastCalledWith("/seqdb/protocol/view?id=1");
       done();
     });
   });
@@ -168,7 +168,7 @@ describe("Protocol edit page", () => {
       );
 
       // The user should be redirected to the existing protocol's details page.
-      expect(mockPush).lastCalledWith("/protocol/view?id=10");
+      expect(mockPush).lastCalledWith("/seqdb/protocol/view?id=10");
       done();
     });
   });

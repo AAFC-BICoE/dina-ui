@@ -100,6 +100,6 @@ describe("Workflow edit page.", () => {
       expect.anything()
     );
 
-    expect(mockPush).lastCalledWith("/workflow/view?id=100");
+    expect(mockPush).lastCalledWith("/seqdb/workflow/view?id=100");
   });
 });

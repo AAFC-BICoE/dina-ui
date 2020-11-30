@@ -1,11 +1,9 @@
-import { ResourceSelect } from "common-ui";
-import NumberFormat from "react-number-format";
 import { mountWithAppContext } from "../../../../../test-util/mock-app-context";
 import { Chain, ChainStepTemplate } from "../../../../../types/seqdb-api";
 import {
-  LibraryPrepEditTable,
-  LibraryPrepEditTableProps
-} from "../LibraryPrepEditTable";
+  LibraryPrepBulkEditor,
+  LibraryPrepBulkEditorProps
+} from "../LibraryPrepBulkEditor";
 
 const mockGet = jest.fn();
 const mockSave = jest.fn();
@@ -17,9 +15,16 @@ const mockCtx = {
   save: mockSave
 };
 
-function getWrapper(propsOverride?: Partial<LibraryPrepEditTableProps>) {
+// Mock out the HandsOnTable which should only be rendered in the browser.
+jest.mock("next/dynamic", () => () => {
+  return function MockHotTable() {
+    return <div>Mock Handsontable</div>;
+  };
+});
+
+function getWrapper(propsOverride?: Partial<LibraryPrepBulkEditorProps>) {
   return mountWithAppContext(
-    <LibraryPrepEditTable
+    <LibraryPrepBulkEditor
       libraryPrepBatch={{
         containerType: {
           baseType: "base type",
@@ -64,7 +69,7 @@ const MOCK_SAMPLE_STEPRESOURCES = [
   { sample: { id: "8", name: "SAMP800", type: "sample" } }
 ];
 
-describe("LibraryPrepEditTable component", () => {
+describe("LibraryPrepBulkEditor component", () => {
   beforeEach(() => {
     jest.resetAllMocks();
 
@@ -96,11 +101,8 @@ describe("LibraryPrepEditTable component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".rt-tbody .rt-tr").length).toEqual(3);
-
-    expect((wrapper.find("input").first().instance() as any).value).toEqual(
-      "123"
-    );
+    const tableData = wrapper.find("MockHotTable").prop<any[]>("data");
+    expect(tableData[0].libraryPrep.inputNg).toEqual(123);
   });
 
   it("Lets you add and edit library prep values.", async () => {
@@ -109,25 +111,16 @@ describe("LibraryPrepEditTable component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    const tableData = wrapper.find("MockHotTable").prop<any[]>("data");
+
     // Change the first inputNg value.
-    wrapper.find(NumberFormat).first().prop<any>("onValueChange")({
-      floatValue: 999.999
-    });
+    tableData[0].libraryPrep.inputNg = 999.999;
 
     // Change the third Quality value.
-    wrapper
-      .find(".rt-tbody .rt-tr")
-      .at(2)
-      .find("input")
-      .at(1)
-      .simulate("change", {
-        target: {
-          name: "sampleSrs[2].libraryPrep.quality-field",
-          value: "very good"
-        }
-      });
+    tableData[2].libraryPrep.quality = "very good";
 
-    wrapper.find("form").simulate("submit");
+    // Submit the bulk editor:
+    wrapper.find("button.bulk-editor-submit-button").simulate("click");
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -135,46 +128,12 @@ describe("LibraryPrepEditTable component", () => {
     // Only the two edited library preps should be submitted:
     expect(mockSave).lastCalledWith(
       [
-        {
-          resource: {
-            id: "3",
-            indexI5: {
-              id: "1",
-              name: "i5 index 1",
-              type: "ngsIndex"
-            },
-            inputNg: 999.999,
-            libraryPrepBatch: expect.objectContaining({
-              id: "5",
-              type: "libraryPrepBatch"
-            }),
-            sample: {
-              id: "6",
-              name: "SAMP600",
-              type: "sample"
-            },
-            size: "big",
-            type: "libraryPrep",
-            wellColumn: 5,
-            wellRow: "F"
-          },
-          type: "libraryPrep"
-        },
-        {
-          resource: {
-            libraryPrepBatch: expect.objectContaining({
-              id: "5",
-              type: "libraryPrepBatch"
-            }),
-            quality: "very good",
-            sample: {
-              id: "8",
-              name: "SAMP800",
-              type: "sample"
-            }
-          },
-          type: "libraryPrep"
-        }
+        expect.objectContaining({
+          resource: expect.objectContaining({ inputNg: 999.999 })
+        }),
+        expect.objectContaining({
+          resource: expect.objectContaining({ quality: "very good" })
+        })
       ],
       { apiBaseUrl: "/seqdb-api" }
     );
@@ -186,29 +145,15 @@ describe("LibraryPrepEditTable component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(ResourceSelect).first().prop("value")).toEqual({
-      id: "1",
-      name: "i5 index 1",
-      type: "ngsIndex"
-    });
+    const tableData = wrapper.find("MockHotTable").prop<any[]>("data");
 
     // The well coordinate column text should be formatted as F05.
-    expect(wrapper.find(".rt-tbody .rt-tr .rt-td").first().text()).toEqual(
-      "F05"
-    );
+    expect(tableData[0].wellCoordinates).toEqual("F05");
 
-    wrapper
-      .find(".rt-tbody .rt-tr")
-      .at(2)
-      .find(ResourceSelect)
-      .first()
-      .prop<any>("onChange")({
-      id: "50",
-      name: "i5 index 50",
-      type: "ngsIndex"
-    });
+    tableData[0].indexI5 = "i5 index 50 (ngsIndex/50)";
 
-    wrapper.find("form").simulate("submit");
+    // Submit the bulk editor:
+    wrapper.find("button.bulk-editor-submit-button").simulate("click");
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -216,25 +161,14 @@ describe("LibraryPrepEditTable component", () => {
     // Only the edited library preps should be submitted:
     expect(mockSave).lastCalledWith(
       [
-        {
-          resource: {
+        expect.objectContaining({
+          resource: expect.objectContaining({
             indexI5: {
               id: "50",
-              name: "i5 index 50",
               type: "ngsIndex"
-            },
-            libraryPrepBatch: expect.objectContaining({
-              id: "5",
-              type: "libraryPrepBatch"
-            }),
-            sample: {
-              id: "8",
-              name: "SAMP800",
-              type: "sample"
             }
-          },
-          type: "libraryPrep"
-        }
+          })
+        })
       ],
       { apiBaseUrl: "/seqdb-api" }
     );
@@ -242,6 +176,7 @@ describe("LibraryPrepEditTable component", () => {
 
   it("Should show a warning box if the index set or container type are null.", async () => {
     const wrapper = getWrapper({
+      editMode: "INDEX",
       libraryPrepBatch: {
         id: "5",
         name: "test library prep batch",
@@ -252,8 +187,6 @@ describe("LibraryPrepEditTable component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".alert.alert-warning").text()).toEqual(
-      "Index set and container type must be set to edit library preps."
-    );
+    expect(wrapper.find(".alert.alert-warning").exists()).toBeTruthy();
   });
 });
