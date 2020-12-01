@@ -1,6 +1,10 @@
 import { AccountContextI, OnFormikSubmit } from "common-ui";
 import { noop } from "lodash";
-import { FileUploader, IFileWithMeta, IMeta } from "../../../components";
+import {
+  FileUploader,
+  IFileWithMeta,
+  IMeta
+} from "../../../components/object-store";
 import UploadPage, {
   fileUploadErrorHandler
 } from "../../../pages/object-store/upload";

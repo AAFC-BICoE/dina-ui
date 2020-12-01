@@ -12,18 +12,15 @@ import { noop } from "lodash";
 import moment from "moment";
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
+import { Footer, Head, Nav } from "../../components";
 import {
   FileUploader,
-  Footer,
-  Head,
+  FileUploadResponse,
   IFileWithMeta,
-  Nav
-} from "../../components";
+  ViewExif
+} from "../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Metadata } from "../../types/objectstore-api/resources/Metadata";
-import ViewExif, {
-  FileUploadResponse
-} from "../../components/exif-view/view-exif";
 
 export interface OnSubmitValues {
   acceptedFiles: IFileWithMeta[];

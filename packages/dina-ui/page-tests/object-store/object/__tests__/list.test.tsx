@@ -2,7 +2,7 @@ import { AreYouSureModal, QueryTable } from "common-ui";
 import { Formik } from "formik";
 import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
-import { StoredObjectGallery } from "../../../../components";
+import { StoredObjectGallery } from "../../../../components/object-store";
 import MetadataListPage, {
   BulkDeleteButton,
   MetadataListFormValues

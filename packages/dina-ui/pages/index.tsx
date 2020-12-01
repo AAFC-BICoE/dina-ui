@@ -2,6 +2,7 @@ import Link from "next/link";
 import React from "react";
 import { Footer, Head, Nav } from "../components";
 import { DinaMessage } from "../intl/dina-ui-intl";
+import { SeqdbMessage } from "../intl/seqdb-intl";
 
 const Home: React.FunctionComponent = () => (
   <div>
@@ -81,6 +82,60 @@ const Home: React.FunctionComponent = () => (
           </li>
         </ul>
       </div>
+      <h2>
+        <SeqdbMessage id="seqdbTitle" />
+      </h2>
+      <ul>
+        <li>
+          <Link href="/seqdb/workflow/list">
+            <a>
+              <SeqdbMessage id="workflowListTitle" />
+            </a>
+          </Link>
+        </li>
+        <li>
+          <Link href="/seqdb/index-set/list">
+            <a>
+              <SeqdbMessage id="indexSetListTitle" />
+            </a>
+          </Link>
+        </li>
+        <li>
+          <Link href="/seqdb/pcr-primer/list">
+            <a>
+              <SeqdbMessage id="pcrPrimerListTitle" />
+            </a>
+          </Link>
+        </li>
+        <li>
+          <Link href="/seqdb/pcr-profile/list">
+            <a>
+              <SeqdbMessage id="pcrProfileListTitle" />
+            </a>
+          </Link>
+        </li>
+        <li>
+          <Link href="/seqdb/product/list">
+            <a>
+              <SeqdbMessage id="productListTitle" />
+            </a>
+          </Link>
+        </li>
+        <li>
+          <Link href="/seqdb/protocol/list">
+            <a>
+              <SeqdbMessage id="protocolListTitle" />
+            </a>
+          </Link>
+        </li>
+        <li>
+          <Link href="/seqdb/region/list">
+            <a>
+              <SeqdbMessage id="regionListTitle" />
+            </a>
+          </Link>
+        </li>
+      </ul>
     </div>
     <Footer />
   </div>

@@ -3,25 +3,28 @@ import {
   ApiClientContext,
   AreYouSureModal,
   ColumnDefinition,
+  dateCell,
+  FilterAttribute,
+  filterBy,
   FormikButton,
   ListPageLayout,
   SelectField,
   SplitPagePanel,
   useAccount,
   useGroupedCheckBoxes,
-  useModal,
-  filterBy,
-  FilterAttribute,
-  dateCell,
-  useGroupSelectOptions
+  useGroupSelectOptions,
+  useModal
 } from "common-ui";
 import { Form, Formik, FormikContextType } from "formik";
 import { noop, toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Component, useContext, useMemo, useState } from "react";
-import { Head, Nav, StoredObjectGallery } from "../../../components";
-import { MetadataPreview } from "../../../components/metadata/MetadataPreview";
+import { Head, Nav } from "../../../components";
+import {
+  MetadataPreview,
+  StoredObjectGallery
+} from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata, Person } from "../../../types/objectstore-api";
 
