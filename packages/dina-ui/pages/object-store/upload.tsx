@@ -107,6 +107,9 @@ export default function UploadPage() {
       <Head title={formatMessage("uploadPageTitle")} />
       <Nav />
       <main className="container">
+        <h1>
+          <DinaMessage id="uploadPageTitle" />
+        </h1>
         {!accountInitialized || !groupSelectOptions?.length ? (
           <div className="alert alert-warning no-group-alert">
             <DinaMessage id="userMustBelongToGroup" />

@@ -288,9 +288,9 @@ export default function EditMetadatasPage() {
         <CancelButton entityLink="/object-store/object" />
       </ButtonBar>
       <main className="container-fluid">
-        <h2>
+        <h1>
           <DinaMessage id="metadataBulkEditTitle" />
-        </h2>
+        </h1>
         <div className="form-group">
           <Formik<FormControls>
             enableReinitialize={true}
