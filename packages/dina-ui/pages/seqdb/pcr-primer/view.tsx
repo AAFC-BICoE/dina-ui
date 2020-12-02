@@ -32,7 +32,7 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
         query={{ include: "region", path: `seqdb-api/pcrPrimer/${id}` }}
       >
         {({ loading, response }) => (
-          <div className="container-fluid">
+          <main className="container-fluid">
             <h1>
               <SeqdbMessage id="pcrPrimerViewTitle" />
             </h1>
@@ -90,7 +90,7 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
                 </div>
               </Formik>
             )}
-          </div>
+          </main>
         )}
       </Query>
     </div>

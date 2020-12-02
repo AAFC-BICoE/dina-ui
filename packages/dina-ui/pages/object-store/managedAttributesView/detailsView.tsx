@@ -49,7 +49,7 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title="Managed Attribute Details" />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         {id ? (
           <div>
             <h1>
@@ -82,7 +82,7 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
             <ManagedAttributeForm router={router} />
           </div>
         )}
-      </div>
+      </main>
       <Footer />
     </div>
   );
@@ -147,32 +147,19 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           />
         </ButtonBar>
         <div style={{ width: "300px" }}>
-          <h4>
-            <DinaMessage id="field_managedAttributeName" />
-          </h4>
-          <TextField name="name" hideLabel={true} />
+          <TextField name="name" />
         </div>
         <div style={{ width: "70%" }}>
-          <h4>
-            <DinaMessage id="field_managedAttributeDescEn" />
-          </h4>
-          <TextField name="description.en" hideLabel={true} />
+          <TextField name="description.en" multiLines={true} />
         </div>
         <div style={{ width: "70%" }}>
-          <h4>
-            <DinaMessage id="field_managedAttributeDescFr" />
-          </h4>
-          <TextField name="description.fr" hideLabel={true} />
+          <TextField name="description.fr" multiLines={true} />
         </div>
         <div style={{ width: "300px" }}>
-          <h4>
-            <DinaMessage id="field_managedAttributeType" />
-          </h4>
           <SelectField
             name="managedAttributeType"
             options={ATTRIBUTE_TYPE_OPTIONS}
             onChange={selectValue => setType(selectValue)}
-            hideLabel={true}
           />
         </div>
         {type === "STRING" && (

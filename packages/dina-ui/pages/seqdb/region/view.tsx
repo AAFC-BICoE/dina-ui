@@ -28,7 +28,7 @@ export function RegionDetailsPage({ router }: WithRouterProps) {
       </ButtonBar>
       <Query<Region> query={{ path: `seqdb-api/region/${id}` }}>
         {({ loading, response }) => (
-          <div className="container-fluid">
+          <main className="container-fluid">
             <h1>
               <SeqdbMessage id="regionViewTitle" />
             </h1>
@@ -47,7 +47,7 @@ export function RegionDetailsPage({ router }: WithRouterProps) {
                 </div>
               </Formik>
             )}
-          </div>
+          </main>
         )}
       </Query>
     </div>

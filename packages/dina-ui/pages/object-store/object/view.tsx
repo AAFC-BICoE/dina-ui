@@ -87,7 +87,7 @@ export default function MetadataViewPage() {
           />
         </ButtonBar>
         <style>{OBJECT_DETAILS_PAGE_CSS}</style>
-        <div className="container-fluid">
+        <main className="container-fluid">
           <div className="row">
             <div className="col-md-4">
               <FileView
@@ -109,7 +109,7 @@ export default function MetadataViewPage() {
               </div>
             </div>
           </div>
-        </div>
+        </main>
         <Footer />
       </div>
     );

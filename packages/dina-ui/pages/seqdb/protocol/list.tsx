@@ -45,7 +45,7 @@ export default function ProtocolListPage() {
       <ButtonBar>
         <CreateButton entityLink="/seqdb/protocol" />
       </ButtonBar>
-      <div className="container-fluid">
+      <main className="container-fluid">
         <h1>
           <SeqdbMessage id="protocolListTitle" />
         </h1>
@@ -58,7 +58,7 @@ export default function ProtocolListPage() {
             path: "seqdb-api/protocol"
           }}
         />
-      </div>
+      </main>
     </>
   );
 }

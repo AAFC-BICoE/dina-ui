@@ -106,7 +106,7 @@ export default function UploadPage() {
     <div>
       <Head title={formatMessage("uploadPageTitle")} />
       <Nav />
-      <div className="container">
+      <main className="container">
         {!accountInitialized || !groupSelectOptions?.length ? (
           <div className="alert alert-warning no-group-alert">
             <DinaMessage id="userMustBelongToGroup" />
@@ -150,7 +150,7 @@ export default function UploadPage() {
             </Formik>
           </>
         )}
-      </div>
+      </main>
       <Footer />
     </div>
   );

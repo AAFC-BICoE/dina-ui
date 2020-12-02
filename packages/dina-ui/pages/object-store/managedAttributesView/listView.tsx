@@ -50,7 +50,7 @@ export default function ManagedAttributesListPage() {
     <div>
       <Head title="Managed Attributes" />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         <h1>
           <DinaMessage id="managedAttributeListTitle" />
         </h1>
@@ -69,7 +69,7 @@ export default function ManagedAttributesListPage() {
             path: "objectstore-api/managed-attribute"
           }}
         />
-      </div>
+      </main>
       <Footer />
     </div>
   );

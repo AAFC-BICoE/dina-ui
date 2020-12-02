@@ -281,72 +281,76 @@ export default function EditMetadatasPage() {
   }
 
   return (
-    <div className="container-fluid">
+    <div>
       <Head title={formatMessage("metadataBulkEditTitle")} />
       <Nav />
       <ButtonBar>
         <CancelButton entityLink="/object-store/object" />
       </ButtonBar>
-      <h2>
-        <DinaMessage id="metadataBulkEditTitle" />
-      </h2>
-      <div className="form-group">
-        <Formik<FormControls>
-          enableReinitialize={true}
-          initialValues={{
-            editableBuiltInAttributes:
-              editableBuiltInAttributes ??
-              BUILT_IN_ATTRIBUTES_COLUMNS.map(col => col.data),
-            editableManagedAttributes: initialEditableManagedAttributes
-          }}
-          onSubmit={noop}
-        >
-          {controlsForm => {
-            const columns = [
-              ...BUILT_IN_ATTRIBUTES_COLUMNS.filter(col =>
-                controlsForm.values.editableBuiltInAttributes.includes(col.data)
-              ),
-              ...managedAttributeColumns(
-                controlsForm.values.editableManagedAttributes
-              )
-            ];
+      <main className="container-fluid">
+        <h2>
+          <DinaMessage id="metadataBulkEditTitle" />
+        </h2>
+        <div className="form-group">
+          <Formik<FormControls>
+            enableReinitialize={true}
+            initialValues={{
+              editableBuiltInAttributes:
+                editableBuiltInAttributes ??
+                BUILT_IN_ATTRIBUTES_COLUMNS.map(col => col.data),
+              editableManagedAttributes: initialEditableManagedAttributes
+            }}
+            onSubmit={noop}
+          >
+            {controlsForm => {
+              const columns = [
+                ...BUILT_IN_ATTRIBUTES_COLUMNS.filter(col =>
+                  controlsForm.values.editableBuiltInAttributes.includes(
+                    col.data
+                  )
+                ),
+                ...managedAttributeColumns(
+                  controlsForm.values.editableManagedAttributes
+                )
+              ];
 
-            return (
-              <Form translate={undefined}>
-                <div className="row">
-                  <SelectField
-                    className="col-6 editable-builtin-attributes-select"
-                    onChange={setEditableBuiltInAttributes}
-                    name="editableBuiltInAttributes"
-                    isMulti={true}
-                    options={BUILT_IN_ATTRIBUTES_COLUMNS.map(col => ({
-                      label: col.title ?? "",
-                      value: col.data
-                    }))}
+              return (
+                <Form translate={undefined}>
+                  <div className="row">
+                    <SelectField
+                      className="col-6 editable-builtin-attributes-select"
+                      onChange={setEditableBuiltInAttributes}
+                      name="editableBuiltInAttributes"
+                      isMulti={true}
+                      options={BUILT_IN_ATTRIBUTES_COLUMNS.map(col => ({
+                        label: col.title ?? "",
+                        value: col.data
+                      }))}
+                    />
+                    <ResourceSelectField<ManagedAttribute>
+                      className="col-2 editable-managed-attributes-select"
+                      filter={filterBy(["name"])}
+                      name="editableManagedAttributes"
+                      isMulti={true}
+                      model="objectstore-api/managed-attribute"
+                      optionLabel={attr => attr.name}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <AddPersonButton />
+                    <Tooltip id="addPersonPopupTooltip" />
+                  </div>
+                  <BulkDataEditor
+                    columns={columns}
+                    loadData={loadData}
+                    onSubmit={onSubmit}
                   />
-                  <ResourceSelectField<ManagedAttribute>
-                    className="col-2 editable-managed-attributes-select"
-                    filter={filterBy(["name"])}
-                    name="editableManagedAttributes"
-                    isMulti={true}
-                    model="objectstore-api/managed-attribute"
-                    optionLabel={attr => attr.name}
-                  />
-                </div>
-                <div className="form-group">
-                  <AddPersonButton />
-                  <Tooltip id="addPersonPopupTooltip" />
-                </div>
-                <BulkDataEditor
-                  columns={columns}
-                  loadData={loadData}
-                  onSubmit={onSubmit}
-                />
-              </Form>
-            );
-          }}
-        </Formik>
-      </div>
+                </Form>
+              );
+            }}
+          </Formik>
+        </div>
+      </main>
       <Footer />
     </div>
   );

@@ -18,7 +18,7 @@ export default function RevisionsByUserPage() {
     <>
       <Head title={pageTitle} />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         <h1>{pageTitle}</h1>
         <AuthorFilterForm />
         {
@@ -31,7 +31,7 @@ export default function RevisionsByUserPage() {
             />
           )
         }
-      </div>
+      </main>
       <Footer />
     </>
   );

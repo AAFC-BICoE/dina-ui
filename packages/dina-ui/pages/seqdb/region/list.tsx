@@ -35,7 +35,7 @@ export default function RegionListPage() {
       <ButtonBar>
         <CreateButton entityLink="/seqdb/region" />
       </ButtonBar>
-      <div className="container-fluid">
+      <main className="container-fluid">
         <h1>
           <SeqdbMessage id="regionListTitle" />
         </h1>
@@ -47,7 +47,7 @@ export default function RegionListPage() {
             path: "seqdb-api/region"
           }}
         />
-      </div>
+      </main>
     </>
   );
 }

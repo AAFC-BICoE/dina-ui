@@ -32,7 +32,7 @@ export default function IndexSetListPage() {
     <>
       <Head title={formatMessage("indexSetListTitle")} />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         <h1>
           <SeqdbMessage id="indexSetListTitle" />
         </h1>
@@ -44,7 +44,7 @@ export default function IndexSetListPage() {
             path: "seqdb-api/indexSet"
           }}
         />
-      </div>
+      </main>
     </>
   );
 }

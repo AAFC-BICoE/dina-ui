@@ -59,7 +59,7 @@ export default function PcrPrimerListPage() {
       <ButtonBar>
         <CreateButton entityLink="/seqdb/pcr-primer" />
       </ButtonBar>
-      <div className="container-fluid">
+      <main className="container-fluid">
         <h1>
           <SeqdbMessage id="pcrPrimerListTitle" />
         </h1>
@@ -72,7 +72,7 @@ export default function PcrPrimerListPage() {
             path: "seqdb-api/pcrPrimer"
           }}
         />
-      </div>
+      </main>
     </>
   );
 }
