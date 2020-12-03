@@ -1,7 +1,7 @@
 import { DateView } from "common-ui";
 import Link from "next/link";
 import { Metadata, Person } from "../../../types/objectstore-api";
-import { MetadataManagedAttributes } from "../../metadata/MetadataDetails";
+import { MetadataManagedAttributes } from "../../object-store";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
 

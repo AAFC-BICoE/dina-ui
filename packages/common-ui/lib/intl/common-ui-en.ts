@@ -14,6 +14,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   closeButtonText: "Close",
   createButtonText: "Create New",
   deleteButtonText: "Delete",
+  editableTable: "Editable Table",
   editButtonText: "Edit",
   field_author: "Author",
   field_changedProperties: "Changed Properties",

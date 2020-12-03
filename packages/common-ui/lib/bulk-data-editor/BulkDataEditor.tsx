@@ -40,17 +40,22 @@ export function BulkDataEditor<TRow>({
   const [initialTableData, setInitialTableData] = useState<TableData>();
   const [workingTableData, setWorkingTableData] = useState<TableData>();
 
+  const [loading, setLoading] = useState(true);
+  const [lastSave, setLastSave] = useState(Date.now());
+
   // Loads the initial data and shows an error message on fail:
   const loadDataInternal = safeSubmit(async () => {
+    setLoading(true);
     const loadedData = await loadData();
     setInitialTableData(loadedData);
     setWorkingTableData(cloneDeep(loadedData));
+    setLoading(false);
   });
 
-  // Load the data once after mount:
+  // Load the data once after mount, and after every save:
   useEffect(() => {
     loadDataInternal({}, formik);
-  }, []);
+  }, [lastSave]);
 
   // Show initial data loading errors here:
   const loadingFailed =
@@ -60,7 +65,7 @@ export function BulkDataEditor<TRow>({
   }
 
   // Show loading state here:
-  if (!workingTableData || !initialTableData) {
+  if (loading || !workingTableData || !initialTableData) {
     return <LoadingSpinner loading={true} />;
   }
 
@@ -80,6 +85,8 @@ export function BulkDataEditor<TRow>({
     const editedDiffs = diffs.filter(diff => !isEmpty(diff.changes));
 
     await onSubmit(editedDiffs, formikValues, formikActions);
+
+    setLastSave(Date.now());
   };
 
   return (

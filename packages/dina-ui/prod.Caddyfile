@@ -29,3 +29,15 @@ route /api/agent-api/* {
 	uri replace /api/agent-api /api/v1
 	reverse_proxy {$AGENT_API_ADDRESS}
 }
+
+# Proxy to the back-end DinaUser API:
+route /api/user-api/* {
+	uri replace /api/user-api /api/v1
+	reverse_proxy {$USER_API_ADDRESS}
+} 
+
+# Proxy to the back-end Seqdb API:
+route /api/seqdb-api/* {
+	uri replace /api/seqdb-api /api
+	reverse_proxy {$SEQDB_API_ADDRESS}
+}
