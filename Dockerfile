@@ -6,7 +6,6 @@ COPY ./package.json ./
 COPY ./tsconfig.common.json ./
 COPY ./packages/common-ui/package.json ./packages/common-ui/package.json
 COPY ./packages/dina-ui/package.json ./packages/dina-ui/package.json
-COPY ./packages/seqdb-ui/package.json ./packages/seqdb-ui/package.json
 COPY ./yarn.lock ./
 RUN yarn
 COPY ./packages/ ./packages/
