@@ -30,6 +30,7 @@ export function LanguageSelector() {
               className="btn btn-link px-0"
               disabled={locale === key}
               onClick={onClick}
+              lang={key}
             >
               {LANGUAGE_LABELS[key]}
             </button>
