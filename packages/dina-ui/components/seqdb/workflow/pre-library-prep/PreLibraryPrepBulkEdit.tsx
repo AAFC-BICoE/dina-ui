@@ -134,7 +134,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
         filter: {
           "chain.uuid": chain.id,
           "chainStepTemplate.uuid": step.id,
-          rsql: `sample.uuid=in=(${sampleIds})`
+          rsql: sampleIds.length ? `sample.uuid=in=(${sampleIds})` : ""
         },
         include:
           "sample,preLibraryPrep,preLibraryPrep.protocol,preLibraryPrep.product",
