@@ -2,6 +2,7 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
+  addCollectingEventTitle: "Add Collecting Event",
   addFilesButton: "Add Files",
   addManagedAttributeButtonText: "Add New Managed Attribute",
   addObjectSubtypeTitle: "Add New Object Subtype",
@@ -9,15 +10,19 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addPersonTitle: "Add Person",
   addPersonButtonText: "Add Person",
   addPersonPopupTooltip: "Add Person without leaving the page",
+  addRemoveBulkEditRowInfo:
+    "Right-click on a row to allow deleting. Click on the numbered row header and then drag to re-order the records.",
   agentsSectionTitle: "Agents",
   appTitle: "DINA",
   attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
   changedProperties: "Changes",
   closePreviewButtonText: "Close Preview",
+  collectingEventListTitle: "Collecting Events",
   deleteButtonText: "Delete",
   deleteSelectedButtonText: "Delete Selected",
   dinaUserSectionTitle: "Dina User",
+  editCollectingEventTitle: "Edit Collecting Event",
   editObjectSubtypeTitle: "Edit Object Subtype",
   editOrganizationTitle: "Edit Organization",
   editOrganizationAliasesLabel: "Aliases (comma seperated)",
@@ -64,9 +69,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_originalFilename: "Original Filename",
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
+  field_person: "Person",
   field_publiclyReleasable: "Publicly releasable",
   field_publiclyReleasable_tooltip:
     "Indicates if the object could be released publicly on a web page or open data portals.",
+  field_role: "Role",
   field_type: "Type",
   field_xmpMetadataDate: "Last Updated On",
   field_xmpMetadataDate_tooltip:
@@ -118,6 +125,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organizationFrenchNameLabel: "French Name",
   organizationListTitle: "Organizations",
   organizationViewTitle: "View Organization",
+  person: "Person",
   personListTitle: "Persons",
   personViewTitle: "View Person",
   revisionsButtonText: "Revisions",

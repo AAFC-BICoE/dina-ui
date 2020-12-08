@@ -38,3 +38,9 @@ route /api/seqdb-api/* {
 	uri replace /api/seqdb-api /api
 	reverse_proxy {$SEQDB_API_ADDRESS}
 } 
+
+# Proxy to the back-end Collections API:
+route /api/collections-api/* {
+	uri replace /api/collections-api /v1
+	reverse_proxy {$COLLECTIONS_API_ADDRESS}
+}

@@ -3,15 +3,15 @@ import { FormikContextType, useFormikContext } from "formik";
 import { GridSettings } from "handsontable";
 import { cloneDeep, isEmpty, zipWith } from "lodash";
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ErrorViewer } from "../formik-connected/ErrorViewer";
 import { FormikButton } from "../formik-connected/FormikButton";
-import { OnFormikSubmit } from "../formik-connected/safeSubmit";
+import { OnFormikSubmit, safeSubmit } from "../formik-connected/safeSubmit";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
+import { Tooltip } from "../tooltip/Tooltip";
 import { difference, RecursivePartial } from "./difference";
 import { getUserFriendlyAutoCompleteRenderer } from "./resource-select-cell";
-import { safeSubmit } from "../formik-connected/safeSubmit";
 
 export interface RowChange<TRow> {
   original: TRow;
@@ -26,12 +26,21 @@ export interface BulkDataEditorProps<TRow> {
     formikValues: any,
     formikActions: FormikContextType<any>
   ) => Promise<void>;
+
+  showRowHeaders?: boolean;
+  allowDragging?: boolean;
+  showContextMenu?: boolean;
+  allowInsertRow?: boolean;
 }
 
 export function BulkDataEditor<TRow>({
   columns,
   loadData,
-  onSubmit
+  onSubmit,
+  showRowHeaders,
+  allowDragging,
+  showContextMenu,
+  allowInsertRow
 }: BulkDataEditorProps<TRow>) {
   type TableData = TRow[];
 
@@ -103,7 +112,10 @@ export function BulkDataEditor<TRow>({
           columns={columns}
           data={workingTableData as any}
           manualColumnResize={true}
-          maxRows={workingTableData.length}
+          rowHeaders={showRowHeaders}
+          manualRowMove={allowDragging}
+          contextMenu={showContextMenu}
+          allowInsertRow={allowInsertRow ?? false}
         />
       </div>
       <FormikButton
@@ -128,12 +140,33 @@ const DynamicHotTable = dynamic(
     );
 
     return (props: HotTableProps) => {
+      const hotTableRef = useRef<any>(null);
       // Hide the {type}/{UUID} identifier from the dropdown cell values:
       (props.columns as GridSettings[])
         .filter(col => col.type === "dropdown")
         .forEach(col => (col.renderer = readableAutocompleteRenderer));
 
-      return <HotTable {...props} />;
+      function addRow() {
+        hotTableRef.current.hotInstance.alter("insert_row");
+      }
+
+      return (
+        <div>
+          {props.allowInsertRow && (
+            <div>
+              <button
+                className="btn btn-primary"
+                onClick={addRow}
+                type="button"
+              >
+                Add Row
+              </button>
+              <Tooltip id="addRemoveBulkEditRowInfo" />
+            </div>
+          )}
+          <HotTable {...props} ref={hotTableRef} />
+        </div>
+      );
     };
   },
   { ssr: false }
