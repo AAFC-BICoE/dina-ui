@@ -68,7 +68,7 @@ export default function LibraryPrepWorksheetPage() {
             }
           }
         `}</style>
-        <div className="container-fluid">
+        <main className="container-fluid">
           <div className="form-group">
             <h2 className="d-inline">Library Prep Worksheet</h2>
             <button
@@ -177,7 +177,7 @@ export default function LibraryPrepWorksheetPage() {
               )}
             </div>
           </div>
-        </div>
+        </main>
       </div>
     );
   }

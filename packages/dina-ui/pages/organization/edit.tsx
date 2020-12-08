@@ -38,7 +38,7 @@ export default function OrganizationEditPage() {
     <div>
       <Head title={formatMessage("editOrganizationTitle")} />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         {id ? (
           <div>
             <h1>
@@ -68,7 +68,7 @@ export default function OrganizationEditPage() {
             <OrganizationForm router={router} />
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }

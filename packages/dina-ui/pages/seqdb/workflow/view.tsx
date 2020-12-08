@@ -40,7 +40,7 @@ export default function WorkflowViewPage() {
         <EditButton entityId={id as string} entityLink="seqdb/workflow" />
         <BackToListButton entityLink="/seqdb/workflow" />
       </ButtonBar>
-      <div className="container-fluid">
+      <main className="container-fluid">
         <Link href="/seqdb/workflow/list">
           <a>NGS Workflow list</a>
         </Link>
@@ -50,7 +50,7 @@ export default function WorkflowViewPage() {
         </h1>
         <LoadingSpinner loading={loading} />
         {response && <WorkflowSteps chain={response.data} />}
-      </div>
+      </main>
     </>
   );
 }

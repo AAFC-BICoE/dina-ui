@@ -37,14 +37,14 @@ export function FieldWrapper({
   return (
     <div className={className}>
       <div className={`form-group ${name}-field`}>
-        {!hideLabel && (
-          <label>
+        <label className="w-100">
+          {!hideLabel && (
             <div>
               <strong>{fieldLabel}</strong>
             </div>
-          </label>
-        )}
-        {children}
+          )}
+          {children}
+        </label>
       </div>
     </div>
   );

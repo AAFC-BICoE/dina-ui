@@ -44,7 +44,7 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
           }
 
           return (
-            <div className="container-fluid">
+            <main className="container-fluid">
               <h1>
                 <DinaMessage id="personViewTitle" />
               </h1>
@@ -62,7 +62,7 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
                   </div>
                 </Formik>
               )}
-            </div>
+            </main>
           );
         }}
       </Query>

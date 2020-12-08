@@ -147,7 +147,7 @@ export default function MetadataListPage() {
     <div>
       <Head title={formatMessage("objectListTitle")} />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         <div className="list-inline">
           <div className="list-inline-item">
             <h1>
@@ -276,7 +276,7 @@ export default function MetadataListPage() {
             </SplitPagePanel>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

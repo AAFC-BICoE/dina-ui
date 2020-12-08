@@ -47,6 +47,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dcRights: "Rights Statement",
   field_dcType: "Stored Object Type",
   field_description: "Description",
+  "field_description.en": "English Description",
+  "field_description.fr": "French Description",
   field_displayName: "Display Name",
   field_editableBuiltInAttributes: "Built In Attributes",
   field_editableManagedAttributes: "Managed Attributes",
@@ -55,12 +57,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeAcceptedValue: "Accepted Value",
   field_managedAttributeCreatedOn: "Created On",
   field_managedAttributeCreatedBy: "Created By",
-  field_managedAttributeDescEn: "English Description",
-  field_managedAttributeDescFr: "French Description",
   field_managedAttributeMandatoryFieldsError:
     "Both name and type are mandatory fields",
   field_managedAttributeName: "Attribute Name",
-  field_managedAttributeType: "Type",
   field_originalFilename: "Original Filename",
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",

@@ -39,7 +39,7 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
           };
 
           return (
-            <div className="container-fluid">
+            <main className="container-fluid">
               <h1>
                 <SeqdbMessage id="protocolViewTitle" />
               </h1>
@@ -73,7 +73,7 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
                   </div>
                 </Formik>
               )}
-            </div>
+            </main>
           );
         }}
       </Query>

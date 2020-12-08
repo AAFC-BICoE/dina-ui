@@ -28,7 +28,7 @@ export default function MetadataRevisionListPage() {
       <>
         <Head title={pageTitle} />
         <Nav />
-        <div className="container-fluid">
+        <main className="container-fluid">
           <h1>{pageTitle}</h1>
           <div className="form-group">
             <Link href={`/object-store/object/view?id=${metadata.id}`}>
@@ -42,7 +42,7 @@ export default function MetadataRevisionListPage() {
             instanceId={`metadata/${metadataId}`}
             revisionRowConfigsByType={OBJECT_STORE_REVISION_ROW_CONFIG}
           />
-        </div>
+        </main>
         <Footer />
       </>
     );

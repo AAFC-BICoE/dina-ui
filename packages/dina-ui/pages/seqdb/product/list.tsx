@@ -39,7 +39,7 @@ export default function ProductListPage() {
       <ButtonBar>
         <CreateButton entityLink="/seqdb/product" />
       </ButtonBar>
-      <div className="container-fluid">
+      <main className="container-fluid">
         <h1>
           <SeqdbMessage id="productListTitle" />
         </h1>
@@ -51,7 +51,7 @@ export default function ProductListPage() {
             path: "seqdb-api/product"
           }}
         />
-      </div>
+      </main>
     </>
   );
 }

@@ -38,7 +38,7 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage("editProtocolTitle")} />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         {id ? (
           <div>
             <h1>
@@ -65,7 +65,7 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
             <ProtocolForm router={router} />
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }

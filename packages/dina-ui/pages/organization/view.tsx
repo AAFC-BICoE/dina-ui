@@ -49,7 +49,7 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
               organization.names[1]?.name;
           }
           return (
-            <div className="container-fluid">
+            <main className="container-fluid">
               <h1>
                 <DinaMessage id="organizationViewTitle" />
               </h1>
@@ -78,7 +78,7 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
                   </div>
                 </Formik>
               )}
-            </div>
+            </main>
           );
         }}
       </Query>
