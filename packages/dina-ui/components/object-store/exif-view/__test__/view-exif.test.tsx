@@ -1,7 +1,7 @@
 import { AccountContextI } from "common-ui";
 import { noop } from "lodash";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { ViewExif } from "../view-exif";
+import { ExifView } from "../ExifView";
 
 const mockFileUploadResponses = {
   fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
@@ -35,7 +35,7 @@ describe("View Exif page", () => {
   });
 
   it("renders exif props when received file upload response", () => {
-    const elm = ViewExif(mockFileUploadResponses);
+    const elm = ExifView < mockFileUploadResponses;
     const wrapper = mountWithAppContext(elm, {
       accountContext: { ...MOCK_ACCOUNT_CONTEXT, groupNames: [] }
     });
