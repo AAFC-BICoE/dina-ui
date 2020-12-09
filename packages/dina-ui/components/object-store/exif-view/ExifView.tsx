@@ -1,24 +1,11 @@
-import { useCollapser } from "common-ui";
+import { LoadingSpinner, useCollapser, useQuery } from "common-ui";
 import ReactTable from "react-table";
 import { ReactNode } from "react";
+import { ObjectUpload } from "packages/dina-ui/types/objectstore-api/resources/ObjectUpload";
+import { PersistedResource } from "kitsu";
 
 interface ExifProps {
   exif: Map<string, string>;
-}
-
-export interface FileUploadResponse {
-  fileIdentifier: string;
-  metaFileEntryVersion: string;
-  originalFilename: string;
-  sha1Hex: string;
-  receivedMediaType: string;
-  detectedMediaType: string;
-  detectedFileExtension: string;
-  evaluatedMediaType: string;
-  evaluatedFileExtension: string;
-  sizeInBytes: number;
-  exif: Map<string, string>;
-  dateTimeDigitized?: string;
 }
 
 function DisplayExif({ exif }: ExifProps) {
@@ -67,14 +54,19 @@ function CollapsableSection({
   );
 }
 
-export function ViewExif(resp: FileUploadResponse) {
+interface ObjectUploadProps {
+  objectUpload: ObjectUpload;
+}
+
+export function ExifView({ objectUpload }: ObjectUploadProps) {
+  if (!objectUpload) return null;
   return (
     <CollapsableSection
-      collapserId={resp.fileIdentifier}
-      title={resp.originalFilename}
-      key={resp.fileIdentifier}
+      collapserId={objectUpload.fileIdentifier}
+      title={objectUpload.originalFilename}
+      key={objectUpload.fileIdentifier}
     >
-      {resp.exif && <DisplayExif exif={resp.exif} />}
+      {objectUpload.exif && <DisplayExif exif={objectUpload.exif} />}
     </CollapsableSection>
   );
 }
