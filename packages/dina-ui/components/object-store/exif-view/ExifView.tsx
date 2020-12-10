@@ -7,7 +7,7 @@ import {
 import ReactTable from "react-table";
 import { ReactNode } from "react";
 import { ObjectUpload } from "packages/dina-ui/types/objectstore-api/resources/ObjectUpload";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 
 interface ExifProps {
   exif: Map<string, string>;
@@ -70,15 +70,18 @@ function CollapsableSection({
   );
 }
 export function ExifView({ objectUpload }: ObjectUploadProps) {
-  if (!objectUpload) return null;
-  const { formatMessage } = useDinaIntl();
-  return (
-    <CollapsableSection
-      collapserId={objectUpload.fileIdentifier}
-      title={formatMessage("exifProperties")}
-      key={objectUpload.fileIdentifier}
-    >
-      {objectUpload.exif && <DisplayExif exif={objectUpload.exif} />}
-    </CollapsableSection>
-  );
+  if (objectUpload && objectUpload.exif) 
+  {    
+    const { formatMessage } = useDinaIntl();
+    return (
+      <CollapsableSection
+        collapserId={objectUpload.fileIdentifier}
+        title={formatMessage("exifProperties")}
+        key={objectUpload.fileIdentifier}
+      >
+      <DisplayExif exif={objectUpload.exif} />
+      </CollapsableSection>
+    );
+  }
+  return null;
 }
