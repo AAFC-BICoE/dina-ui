@@ -1,30 +1,46 @@
-import { LoadingSpinner, useCollapser, useQuery } from "common-ui";
+import {
+  ColumnDefinition,
+  LoadingSpinner,
+  useCollapser,
+  useQuery
+} from "common-ui";
 import ReactTable from "react-table";
 import { ReactNode } from "react";
 import { ObjectUpload } from "packages/dina-ui/types/objectstore-api/resources/ObjectUpload";
-import { PersistedResource } from "kitsu";
+import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 
 interface ExifProps {
   exif: Map<string, string>;
 }
 
-function DisplayExif({ exif }: ExifProps) {
-  function getColumns() {
-    return Object.keys(exif).map(key => {
-      return {
-        Header: key,
-        accessor: key
-      };
-    });
-  }
+interface ObjectUploadProps {
+  objectUpload: ObjectUpload;
+}
 
+function DisplayExif({ exif }: ExifProps) {
+  const { formatMessage } = useDinaIntl();
+  const ExifMaps = Object.keys(exif).map(key => {
+    return {
+      propKey: key,
+      propValue: exif[key]
+    };
+  });
+  const METADATA_TABLE_COLUMNS = [
+    {
+      Header: formatMessage("exifAttribute"),
+      accessor: "propKey"
+    },
+    {
+      Header: formatMessage("exifValue"),
+      accessor: "propValue"
+    }
+  ];
   return (
     <ReactTable
       className="-striped"
-      columns={getColumns()}
+      columns={METADATA_TABLE_COLUMNS}
       showPagination={false}
-      data={[exif]}
-      defaultPageSize={1}
+      data={ExifMaps}
     />
   );
 }
@@ -53,17 +69,13 @@ function CollapsableSection({
     </div>
   );
 }
-
-interface ObjectUploadProps {
-  objectUpload: ObjectUpload;
-}
-
 export function ExifView({ objectUpload }: ObjectUploadProps) {
   if (!objectUpload) return null;
+  const { formatMessage } = useDinaIntl();
   return (
     <CollapsableSection
       collapserId={objectUpload.fileIdentifier}
-      title={objectUpload.originalFilename}
+      title={formatMessage("exifProperties")}
       key={objectUpload.fileIdentifier}
     >
       {objectUpload.exif && <DisplayExif exif={objectUpload.exif} />}

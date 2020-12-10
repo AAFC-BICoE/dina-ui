@@ -36,16 +36,16 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
   const { apiClient } = useContext(ApiClientContext);
 
   const getObjetUpload = async (
-    metadata: KitsuResponse<Metadata, ObjectUpload>
+    mydata: KitsuResponse<Metadata, ObjectUpload>
   ) => {
     const objectUploadResp = await apiClient.get<ObjectUpload>(
       "objectstore-api/object-upload",
       {
-        include: "exif,originalFilename,fileIdentifier",
-        filter: { fileIdentifier: `${metadata.data.fileIdentifier}` }
+        filter: { fileIdentifier: `${mydata.data.fileIdentifier}` }
       }
     );
-    metadata.meta = objectUploadResp?.data[0];
+
+    mydata.meta = objectUploadResp?.data[0];
   };
 
   const { loading, response } = useQuery<Metadata, ObjectUpload>(
