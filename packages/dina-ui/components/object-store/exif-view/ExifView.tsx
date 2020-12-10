@@ -70,8 +70,7 @@ function CollapsableSection({
   );
 }
 export function ExifView({ objectUpload }: ObjectUploadProps) {
-  if (objectUpload && objectUpload.exif) 
-  {    
+  if (objectUpload && objectUpload.exif) {
     const { formatMessage } = useDinaIntl();
     return (
       <CollapsableSection
@@ -79,7 +78,7 @@ export function ExifView({ objectUpload }: ObjectUploadProps) {
         title={formatMessage("exifProperties")}
         key={objectUpload.fileIdentifier}
       >
-      <DisplayExif exif={objectUpload.exif} />
+        <DisplayExif exif={objectUpload.exif} />
       </CollapsableSection>
     );
   }

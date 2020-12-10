@@ -4,7 +4,7 @@ import { ObjectUpload } from "packages/dina-ui/types/objectstore-api/resources/O
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { ExifView } from "../ExifView";
 
-const exifData =  new Map().set("date original created", "2000, Jan 8");
+const exifData = new Map().set("date original created", "2000, Jan 8");
 
 /** Test ObjectUpload */
 const TEST_OBJECTUPLOAD: ObjectUpload = {
@@ -39,15 +39,13 @@ describe("View Exif page", () => {
   });
 
   it("renders exif props when received file upload response", () => {
-    const elm = <ExifView objectUpload={TEST_OBJECTUPLOAD}/>;
+    const elm = <ExifView objectUpload={TEST_OBJECTUPLOAD} />;
     const wrapper = mountWithAppContext(elm, {
       accountContext: { ...MOCK_ACCOUNT_CONTEXT, groupNames: [] }
     });
     expect(wrapper.find("div.rt-td").contains("date original created")).toBe(
       true
     );
-    expect(wrapper.find("div.rt-td").contains("2000, Jan 8")).toBe(
-      true
-    );    
+    expect(wrapper.find("div.rt-td").contains("2000, Jan 8")).toBe(true);
   });
 });
