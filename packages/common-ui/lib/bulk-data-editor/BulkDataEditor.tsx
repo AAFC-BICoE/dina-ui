@@ -6,12 +6,11 @@ import dynamic from "next/dynamic";
 import { Component, useEffect, useState } from "react";
 import { ErrorViewer } from "../formik-connected/ErrorViewer";
 import { FormikButton } from "../formik-connected/FormikButton";
-import { OnFormikSubmit } from "../formik-connected/safeSubmit";
+import { OnFormikSubmit, safeSubmit } from "../formik-connected/safeSubmit";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { difference, RecursivePartial } from "./difference";
 import { getUserFriendlyAutoCompleteRenderer } from "./resource-select-cell";
-import { safeSubmit } from "../formik-connected/safeSubmit";
 import { useBulkEditorFrontEndValidation } from "./useBulkEditorFrontEndValidation";
 
 export interface RowChange<TRow> {
@@ -144,9 +143,15 @@ const DynamicHotTable = dynamic(
     );
 
     return class extends Component<HotTableProps> {
-      // Re-rendering the table is expensive, so only do it if the data changes:
-      public shouldComponentUpdate(nextProps) {
-        return !isEqual(this.props.data, nextProps.data);
+      // Re-rendering the table is expensive, so only do it if the data or columns change:
+      public shouldComponentUpdate(nextProps: HotTableProps) {
+        return (
+          !isEqual(this.props.data, nextProps.data) ||
+          !isEqual(
+            (this.props.columns as GridSettings[]).map(({ data }) => data),
+            (nextProps.columns as GridSettings[]).map(({ data }) => data)
+          )
+        );
       }
 
       public render() {
