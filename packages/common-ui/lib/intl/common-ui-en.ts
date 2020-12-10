@@ -53,5 +53,6 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   showChanges: "Show Changes",
   submitBtnText: "Save",
   tableTotalCount: "Total matched records: {totalCount}",
+  uiAppVersion: "UI Application Version: {version}",
   yes: "Yes"
 };
