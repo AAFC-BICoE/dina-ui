@@ -13,5 +13,6 @@ jobs:
           node-version: '14'
       - name: yarn test and build
         run: |
+          yarn install
           yarn test:coverage;
           yarn workspace dina-ui build
