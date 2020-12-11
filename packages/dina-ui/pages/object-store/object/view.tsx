@@ -1,16 +1,24 @@
 import {
+  ApiClientContext,
   BackToListButton,
   ButtonBar,
   DeleteButton,
   LoadingSpinner,
   useQuery
 } from "common-ui";
+import { KitsuResponse } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { ObjectUpload } from "packages/dina-ui/types/objectstore-api/resources/ObjectUpload";
 import { Footer, Head, Nav } from "../../../components";
-import { FileView, MetadataDetails } from "../../../components/object-store";
+import {
+  ExifView,
+  FileView,
+  MetadataDetails
+} from "../../../components/object-store";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
+import { useContext, useState } from "react";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -20,11 +28,26 @@ const OBJECT_DETAILS_PAGE_CSS = `
 `;
 
 export default function MetadataViewPage() {
+  const { apiClient } = useContext(ApiClientContext);
+  const [objectUpload, setObjectUpload] = useState<ObjectUpload>();
   const router = useRouter();
 
   const id = router.query.id as string;
 
-  const { loading, response } = useQuery<Metadata>(
+  const getObjetUpload = async (
+    mydata: KitsuResponse<Metadata, ObjectUpload>
+  ) => {
+    const objectUploadResp = await apiClient.get<ObjectUpload>(
+      "objectstore-api/object-upload",
+      {
+        filter: { fileIdentifier: `${mydata?.data.fileIdentifier}` }
+      }
+    );
+
+    setObjectUpload(objectUploadResp?.data[0]);
+  };
+
+  const { loading, response } = useQuery<Metadata, ObjectUpload>(
     {
       include: "acDerivedFrom,managedAttributeMap,acMetadataCreator,dcCreator",
       path: `objectstore-api/metadata/${id}`
@@ -43,7 +66,8 @@ export default function MetadataViewPage() {
           joinField: "dcCreator",
           path: metadata => `person/${metadata.dcCreator.id}`
         }
-      ]
+      ],
+      onSuccess: getObjetUpload
     }
   );
 
@@ -106,6 +130,7 @@ export default function MetadataViewPage() {
                   </Link>
                 </div>
                 <MetadataDetails metadata={metadata} />
+                <ExifView objectUpload={objectUpload as ObjectUpload} />
               </div>
             </div>
           </div>
