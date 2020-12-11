@@ -5,7 +5,7 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import { FileView } from "../file-view/FileView";
 import { MetadataDetails } from "./MetadataDetails";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { ExifView } from "../exif-view/ExifView";
 import { KitsuResponse } from "kitsu";
 
@@ -24,6 +24,7 @@ const METADATA_PREVIEW_STYLE = `
  */
 export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
   const { apiClient } = useContext(ApiClientContext);
+  const [objectUpload, setObjectUpload] = useState<ObjectUpload>();
 
   const getObjetUpload = async (
     mydata: KitsuResponse<Metadata, ObjectUpload>
@@ -35,7 +36,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
       }
     );
 
-    if (mydata) mydata.meta = objectUploadResp?.data[0];
+    setObjectUpload(objectUploadResp?.data[0]);
   };
 
   const { loading, response } = useQuery<Metadata, ObjectUpload>(
@@ -72,8 +73,6 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
     const filePath = `/api/objectstore-api/file/${metadata.bucket}/${metadata.fileIdentifier}`;
     const fileType = metadata.fileExtension.replace(/\./, "").toLowerCase();
 
-    const objectUpload = response.meta;
-
     return (
       <div className="metadata-preview">
         <style>{METADATA_PREVIEW_STYLE}</style>
@@ -95,7 +94,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
           fileType={fileType}
         />
         <MetadataDetails metadata={metadata} />
-        <ExifView objectUpload={objectUpload} />
+        <ExifView objectUpload={objectUpload as ObjectUpload} />
       </div>
     );
   }

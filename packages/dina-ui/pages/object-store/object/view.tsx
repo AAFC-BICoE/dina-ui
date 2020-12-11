@@ -18,7 +18,7 @@ import {
 } from "../../../components/object-store";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -29,6 +29,7 @@ const OBJECT_DETAILS_PAGE_CSS = `
 
 export default function MetadataViewPage() {
   const { apiClient } = useContext(ApiClientContext);
+  const [objectUpload, setObjectUpload] = useState<ObjectUpload>();
   const router = useRouter();
 
   const id = router.query.id as string;
@@ -39,11 +40,11 @@ export default function MetadataViewPage() {
     const objectUploadResp = await apiClient.get<ObjectUpload>(
       "objectstore-api/object-upload",
       {
-        filter: { fileIdentifier: `${mydata.data.fileIdentifier}` }
+        filter: { fileIdentifier: `${mydata?.data.fileIdentifier}` }
       }
     );
 
-    mydata.meta = objectUploadResp?.data[0];
+    setObjectUpload(objectUploadResp?.data[0]);
   };
 
   const { loading, response } = useQuery<Metadata, ObjectUpload>(
@@ -84,8 +85,6 @@ export default function MetadataViewPage() {
 
     const filePath = `/api/objectstore-api/file/${metadata.bucket}/${fileId}`;
     const fileType = metadata.fileExtension.replace(/\./, "").toLowerCase();
-
-    const objectUpload = response.meta;
 
     return (
       <div>
@@ -131,7 +130,7 @@ export default function MetadataViewPage() {
                   </Link>
                 </div>
                 <MetadataDetails metadata={metadata} />
-                <ExifView objectUpload={objectUpload} />
+                <ExifView objectUpload={objectUpload as ObjectUpload} />
               </div>
             </div>
           </div>
