@@ -17,12 +17,9 @@ jobs:
           yarn test:coverage;
           yarn workspace dina-ui build
 
-      - name: Install jq
-        run: sudo apt install jq
-
       - name: Extract Version
         run: |
-          jq -r ".version" package.json > version.txt
+          jq -r ".version" packages/dina-ui/package.json > version.txt
 
       - name: Store artifacts
         uses: actions/upload-artifact@v2
