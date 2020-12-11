@@ -1,0 +1,9 @@
+= Versioning
+
+Dina UI's version is stored in the dina-ui package's package.json
+(Not the repo's top-level package.json). You can update this version when releasing a
+new version of the application by running this command at the repo's top level:
+
+----
+yarn --cwd ./packages/dina-ui version
+----
