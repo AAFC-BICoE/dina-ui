@@ -33,7 +33,7 @@ export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage("editObjectSubtypeTitle")} />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         {id ? (
           <div>
             <h1>
@@ -63,7 +63,7 @@ export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
             <ObjectSubtypeForm router={router} />
           </div>
         )}
-      </div>
+      </main>
       <Footer />
     </div>
   );

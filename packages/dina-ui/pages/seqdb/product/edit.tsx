@@ -33,7 +33,7 @@ export function ProductEditPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage("editProductTitle")} />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         {id ? (
           <div>
             <h1>
@@ -58,7 +58,7 @@ export function ProductEditPage({ router }: WithRouterProps) {
             <ProductForm router={router} />
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }

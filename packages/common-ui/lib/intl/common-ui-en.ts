@@ -8,6 +8,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   OR: "OR",
   areYouSure: "Are you sure?",
   backToListButtonText: "Back to List",
+  bulkEditorValidationError: "Invalid value on row {row}: {value}",
   cancelButtonText: "Cancel",
   checkAllTooltipMessage:
     "Check this header box to check all visible items in this page.",
@@ -53,5 +54,6 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   showChanges: "Show Changes",
   submitBtnText: "Save",
   tableTotalCount: "Total matched records: {totalCount}",
+  uiAppVersion: "UI Application Version: {version}",
   yes: "Yes"
 };

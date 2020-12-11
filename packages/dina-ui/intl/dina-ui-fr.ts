@@ -42,6 +42,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_dcRights: "Déclaration sur les droits",
   field_dcType: "Type d'objet stocké",
   field_description: "Description",
+  "field_description.en": "Description anglaise",
+  "field_description.fr": "Description française",
   field_displayName: "Visualiser le nom",
   field_editableBuiltInAttributes: "Attributs intégrés",
   field_editableManagedAttributes: "Attributs gérés",
@@ -50,12 +52,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_managedAttributeAcceptedValue: "Valeur acceptée",
   field_managedAttributeCreatedBy: "Créé par",
   field_managedAttributeCreatedOn: "Créé le",
-  field_managedAttributeDescEn: "Description anglaise",
-  field_managedAttributeDescFr: "Description française",
   field_managedAttributeMandatoryFieldsError:
     "Le nom et le type sont des champs obligatoires",
   field_managedAttributeName: "Nom de l'attribut",
-  field_managedAttributeType: "Type",
   field_organizationMandatoryFieldsError:
     "Le nom d'au moins une organisation est requis",
   field_originalFilename: "Nom du fichier original",

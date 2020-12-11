@@ -37,7 +37,7 @@ export default function ObjectSubtypeListPage() {
     <>
       <Head title={formatMessage("objectSubtypeListTitle")} />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         <h1>
           <DinaMessage id="objectSubtypeListTitle" />
         </h1>
@@ -47,7 +47,7 @@ export default function ObjectSubtypeListPage() {
         <div style={{ maxWidth: "50rem" }}>
           <QueryTable {...queryTableProps} />
         </div>
-      </div>
+      </main>
       <Footer />
     </>
   );

@@ -33,7 +33,7 @@ export function PcrProfileDetailsPage({ router }: WithRouterProps) {
         }}
       >
         {({ loading, response }) => (
-          <div className="container-fluid">
+          <main className="container-fluid">
             <h1>
               <SeqdbMessage id="pcrProfileViewTitle" />
             </h1>
@@ -88,7 +88,7 @@ export function PcrProfileDetailsPage({ router }: WithRouterProps) {
                 </div>
               </Formik>
             )}
-          </div>
+          </main>
         )}
       </Query>
     </div>

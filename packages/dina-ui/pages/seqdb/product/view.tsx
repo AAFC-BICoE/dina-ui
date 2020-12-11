@@ -28,7 +28,7 @@ export function ProductDetailsPage({ router }: WithRouterProps) {
       </ButtonBar>
       <Query<Product> query={{ path: `seqdb-api/product/${id}` }}>
         {({ loading, response }) => (
-          <div className="container-fluid">
+          <main className="container-fluid">
             <h1>
               <SeqdbMessage id="productViewTitle" />
             </h1>
@@ -54,7 +54,7 @@ export function ProductDetailsPage({ router }: WithRouterProps) {
                 </div>
               </Formik>
             )}
-          </div>
+          </main>
         )}
       </Query>
     </div>

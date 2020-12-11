@@ -44,7 +44,7 @@ export default function PcrProfileListPage() {
       <ButtonBar>
         <CreateButton entityLink="/seqdb/pcr-profile" />
       </ButtonBar>
-      <div className="container-fluid">
+      <main className="container-fluid">
         <h1>
           <SeqdbMessage id="pcrProfileListTitle" />
         </h1>
@@ -57,7 +57,7 @@ export default function PcrProfileListPage() {
             path: "seqdb-api/thermocyclerprofile"
           }}
         />
-      </div>
+      </main>
     </>
   );
 }

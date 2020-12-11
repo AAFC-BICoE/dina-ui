@@ -34,7 +34,7 @@ export default function IndexSetViewPage() {
           <BackToListButton entityLink="/seqdb/index-set" />
         </ButtonBar>
         <Formik initialValues={response.data} onSubmit={noop}>
-          <div className="container-fluid">
+          <main className="container-fluid">
             <h1>Index Set Details</h1>
             <div className="row">
               <FieldView className="col-md-2" name="group" />
@@ -51,7 +51,7 @@ export default function IndexSetViewPage() {
               columns={["name", "lotNumber", "direction"]}
               path={`seqdb-api/indexSet/${id}/ngsIndexes`}
             />
-          </div>
+          </main>
         </Formik>
       </>
     );

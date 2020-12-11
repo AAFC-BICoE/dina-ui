@@ -31,7 +31,7 @@ export default function DinaUserDetailsPage() {
           };
 
           return (
-            <div className="container-fluid">
+            <main className="container-fluid">
               <h1>
                 <DinaMessage id="whoAmITitle" />
               </h1>
@@ -50,7 +50,7 @@ export default function DinaUserDetailsPage() {
                   </div>
                 </Formik>
               )}
-            </div>
+            </main>
           );
         }}
       </Query>

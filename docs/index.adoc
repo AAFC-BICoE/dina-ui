@@ -12,6 +12,8 @@ include::dev_tools.adoc[]
 
 include::getting_started.adoc[]
 
+include::versioning.adoc[]
+
 include::yarn_package_scripts.adoc[]
 
 include::docker_build.adoc[]

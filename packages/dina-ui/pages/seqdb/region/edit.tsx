@@ -32,7 +32,7 @@ export function RegionEditPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage("editRegionTitle")} />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         {id ? (
           <div>
             <h1>
@@ -57,7 +57,7 @@ export function RegionEditPage({ router }: WithRouterProps) {
             <RegionForm router={router} />
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }

@@ -34,7 +34,7 @@ export default function WorkflowListPage() {
       <ButtonBar>
         <CreateButton entityLink="/seqdb/workflow" />
       </ButtonBar>
-      <div className="container-fluid">
+      <main className="container-fluid">
         <h1>
           <SeqdbMessage id="workflowListTitle" />
         </h1>
@@ -47,7 +47,7 @@ export default function WorkflowListPage() {
             path: "seqdb-api/chain"
           }}
         />
-      </div>
+      </main>
     </>
   );
 }

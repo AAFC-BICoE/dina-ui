@@ -40,7 +40,7 @@ export default function OrganizationListPage() {
     <div>
       <Head title={formatMessage("organizationListTitle")} />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         <h1>
           <DinaMessage id="organizationListTitle" />
         </h1>
@@ -55,7 +55,7 @@ export default function OrganizationListPage() {
             path: "agent-api/organization"
           }}
         />
-      </div>
+      </main>
       <Footer />
     </div>
   );

@@ -217,7 +217,14 @@ export function Footer() {
       <div className="brand">
         <div className="container">
           <div className="row">
-            <nav className="col-md-10 ftr-urlt-lnk">
+            <nav className="col-md-10 ftr-urlt-lnk py-3">
+              <style>
+                {`
+                  .ftr-urlt-lnk li {
+                    float: initial !important;
+                  }
+                `}
+              </style>
               <ul>
                 <li>
                   <a href="https://www.canada.ca/en/contact.html">
@@ -235,6 +242,14 @@ export function Footer() {
                   </a>
                 </li>
               </ul>
+              <div>
+                {process.env.UI_APP_VERSION && (
+                  <DinaMessage
+                    id="uiAppVersion"
+                    values={{ version: process.env.UI_APP_VERSION }}
+                  />
+                )}
+              </div>
             </nav>
             <div className="col-6 col-md-3 col-lg-2 text-right">
               <img

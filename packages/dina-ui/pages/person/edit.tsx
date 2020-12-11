@@ -27,7 +27,7 @@ export default function PersonEditPage() {
           byPassView={true}
         />
       </ButtonBar>
-      <div className="container-fluid">
+      <main className="container-fluid">
         {id ? (
           <div>
             <h1>
@@ -57,7 +57,7 @@ export default function PersonEditPage() {
             <PersonForm onSubmitSuccess={onSubmitSuccess} />
           </div>
         )}
-      </div>
+      </main>
       <Footer />
     </div>
   );

@@ -91,7 +91,11 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
     return (
       <div className="list-inline row">
-        <div className="list-inline-item" style={{ width: 320 }}>
+        <div
+          aria-label="Filter Attribute"
+          className="list-inline-item"
+          style={{ width: 320 }}
+        >
           <Select<FilterAttributeOption>
             className="filter-attribute"
             instanceId={`attribute_${model.id}`}
@@ -100,7 +104,11 @@ export class FilterRow extends React.Component<FilterRowProps> {
             value={selectedAttributeOption}
           />
         </div>
-        <div className="list-inline-item" style={{ width: "12rem" }}>
+        <div
+          aria-label="Filter Predicate"
+          className="list-inline-item"
+          style={{ width: "12rem" }}
+        >
           <Select
             className="filter-predicate"
             instanceId={`predicate_${model.id}`}
@@ -111,44 +119,45 @@ export class FilterRow extends React.Component<FilterRowProps> {
             )}
           />
         </div>
-
-        {attribute.type === "DATE" && (
-          <FilterRowDatePicker
-            isRange={model.predicate === "BETWEEN"}
-            value={model.value as string | DateRange}
-            onDateValueChanged={this.onDateValueChanged}
-          />
-        )}
-        {attribute.type === "DROPDOWN" && (
-          <div className="list-inline-item" style={{ width: "16rem" }}>
-            <ResourceSelect
-              onChange={this.onSelectValueChanged}
-              filter={attribute.filter ?? (() => ({}))}
-              model={attribute.resourcePath ?? ""}
-              optionLabel={attribute.optionLabel ?? (() => "---")}
-              value={
-                typeof model.value !== "string"
-                  ? (model.value as KitsuResource)
-                  : undefined
-              }
+        <div aria-label="Filter Value" className="list-inline-item">
+          {attribute.type === "DATE" && (
+            <FilterRowDatePicker
+              isRange={model.predicate === "BETWEEN"}
+              value={model.value as string | DateRange}
+              onDateValueChanged={this.onDateValueChanged}
             />
-          </div>
-        )}
+          )}
+          {attribute.type === "DROPDOWN" && (
+            <div style={{ width: "16rem" }}>
+              <ResourceSelect
+                onChange={this.onSelectValueChanged}
+                filter={attribute.filter ?? (() => ({}))}
+                model={attribute.resourcePath ?? ""}
+                optionLabel={attribute.optionLabel ?? (() => "---")}
+                value={
+                  typeof model.value !== "string"
+                    ? (model.value as KitsuResource)
+                    : undefined
+                }
+              />
+            </div>
+          )}
 
-        {attribute.type === "STRING" && (
-          <input
-            className="filter-value list-inline-item form-control d-inline-block"
-            style={{
-              width: "16rem",
-              visibility:
-                model.searchType === "BLANK_FIELD" ? "hidden" : undefined
-            }}
-            value={typeof model.value === "string" ? model.value : undefined}
-            onChange={this.onValueChanged}
-          />
-        )}
+          {attribute.type === "STRING" && (
+            <input
+              className="filter-value form-control d-inline-block"
+              style={{
+                width: "16rem",
+                visibility:
+                  model.searchType === "BLANK_FIELD" ? "hidden" : undefined
+              }}
+              value={typeof model.value === "string" ? model.value : undefined}
+              onChange={this.onValueChanged}
+            />
+          )}
+        </div>
         {attribute.type !== "DATE" && (
-          <div className="list-inline-item" style={{ width: "12rem" }}>
+          <div aria-label="Filter Search Type" style={{ width: "12rem" }}>
             <Select
               className="filter-search-type"
               instanceId={`searchType_${model.id}`}
