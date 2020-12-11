@@ -16,3 +16,12 @@ jobs:
           yarn install
           yarn test:coverage;
           yarn workspace dina-ui build
+
+      - name: Store artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifacts
+          path: |
+            packages/dina-ui/prod.Caddyfile
+            packages/dina-ui/out
+            Dockerfile
