@@ -17,6 +17,13 @@ jobs:
           yarn test:coverage;
           yarn workspace dina-ui build
 
+      - name: Install jq
+        run: apt install jq
+
+      - name: Extract Version
+        run: |
+          jq -r ".version" package.json > version.txt
+
       - name: Store artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -25,3 +32,4 @@ jobs:
             packages/dina-ui/prod.Caddyfile
             packages/dina-ui/out
             Dockerfile
+            version.txt
