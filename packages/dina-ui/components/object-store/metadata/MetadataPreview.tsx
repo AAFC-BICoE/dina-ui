@@ -31,11 +31,11 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
     const objectUploadResp = await apiClient.get<ObjectUpload>(
       "objectstore-api/object-upload",
       {
-        filter: { fileIdentifier: `${mydata.data.fileIdentifier}` }
+        filter: { fileIdentifier: `${mydata?.data.fileIdentifier}` }
       }
     );
 
-    mydata.meta = objectUploadResp?.data[0];
+    if (mydata) mydata.meta = objectUploadResp?.data[0];
   };
 
   const { loading, response } = useQuery<Metadata, ObjectUpload>(

@@ -43,9 +43,12 @@ describe("View Exif page", () => {
     const wrapper = mountWithAppContext(elm, {
       accountContext: { ...MOCK_ACCOUNT_CONTEXT, groupNames: [] }
     });
-    expect(wrapper.find("div.rt-td").contains("date original created")).toBe(
+
+    expect(
+      wrapper.find("div.key-cell.rt-td").contains("Date Original Created")
+    ).toBe(true);
+    expect(wrapper.find("div.value-cell.rt-td").contains("2000, Jan 8")).toBe(
       true
     );
-    expect(wrapper.find("div.rt-td").contains("2000, Jan 8")).toBe(true);
   });
 });
