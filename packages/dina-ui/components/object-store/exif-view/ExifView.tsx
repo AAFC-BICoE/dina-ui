@@ -1,48 +1,11 @@
-import {
-  ColumnDefinition,
-  LoadingSpinner,
-  useCollapser,
-  useQuery
-} from "common-ui";
-import ReactTable from "react-table";
+import { useCollapser } from "common-ui";
 import { ReactNode } from "react";
 import { ObjectUpload } from "packages/dina-ui/types/objectstore-api/resources/ObjectUpload";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-
-interface ExifProps {
-  exif: Map<string, string>;
-}
+import { KeyValueTable } from "../../revisions/KeyValueTable";
 
 interface ObjectUploadProps {
   objectUpload: ObjectUpload;
-}
-
-function DisplayExif({ exif }: ExifProps) {
-  const { formatMessage } = useDinaIntl();
-  const ExifMaps = Object.keys(exif).map(key => {
-    return {
-      propKey: key,
-      propValue: exif[key]
-    };
-  });
-  const METADATA_TABLE_COLUMNS = [
-    {
-      Header: formatMessage("exifAttribute"),
-      accessor: "propKey"
-    },
-    {
-      Header: formatMessage("exifValue"),
-      accessor: "propValue"
-    }
-  ];
-  return (
-    <ReactTable
-      className="-striped"
-      columns={METADATA_TABLE_COLUMNS}
-      showPagination={false}
-      data={ExifMaps}
-    />
-  );
 }
 
 interface CollapsableSectionProps {
@@ -70,7 +33,11 @@ function CollapsableSection({
   );
 }
 export function ExifView({ objectUpload }: ObjectUploadProps) {
-  if (objectUpload && objectUpload.exif) {
+  if (
+    objectUpload &&
+    objectUpload.exif &&
+    Object.keys(objectUpload.exif).length > 0
+  ) {
     const { formatMessage } = useDinaIntl();
     return (
       <CollapsableSection
@@ -78,7 +45,7 @@ export function ExifView({ objectUpload }: ObjectUploadProps) {
         title={formatMessage("exifProperties")}
         key={objectUpload.fileIdentifier}
       >
-        <DisplayExif exif={objectUpload.exif} />
+        <KeyValueTable data={objectUpload.exif} />
       </CollapsableSection>
     );
   }
