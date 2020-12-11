@@ -23,8 +23,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editOrganizationAliasesLabel: "Aliases (comma seperated)",
   editPersonTitle: "Edit Person",
   editSelectedButtonText: "Edit Selected",
-  exifAttribute: "Attribute",
-  exifValue: "Value",
   exifProperties: "Exif Properties",
   feedbackButtonText: "Feedback",
   field_acceptedValues: "Accepted Values",
