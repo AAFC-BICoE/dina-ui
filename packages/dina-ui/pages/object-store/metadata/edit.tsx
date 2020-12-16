@@ -63,6 +63,10 @@ export default function EditMetadatasPage() {
       title: formatMessage("field_originalFilename")
     },
     {
+      data: "acDigitizationDate",
+      title: formatMessage("field_acDigitizationDate")
+    },
+    {
       data: "metadata.dcType",
       source: [
         "Image",
