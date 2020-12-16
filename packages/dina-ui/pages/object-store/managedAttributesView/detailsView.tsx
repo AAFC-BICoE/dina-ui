@@ -96,15 +96,15 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
   const ATTRIBUTE_TYPE_OPTIONS = [
     {
       label: formatMessage("field_managedAttributeType_integer_label"),
-      value: "INTEGER"
+      value: ManagedAttributeType.INTEGER
     },
     {
       label: formatMessage("field_managedAttributeType_text_label"),
-      value: "STRING"
+      value: ManagedAttributeType.STRING
     },
     {
       label: formatMessage("field_managedAttributeType_picklist_label"),
-      value: "PICKLIST"
+      value: ManagedAttributeType.PICKLIST
     }
   ];
 
