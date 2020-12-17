@@ -64,7 +64,7 @@ export function FileUploader<TValues = any>({
       }}
       inputContent={formatMessage("uploadFormInstructions")}
       inputWithFilesContent={formatMessage("addFilesButton")}
-      submitButtonContent={formatMessage("submitBtnText")}
+      submitButtonContent={formatMessage("uploadButtonText")}
     />
   );
 }

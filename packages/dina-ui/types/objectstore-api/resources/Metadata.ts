@@ -6,8 +6,8 @@ export interface MetadataAttributes {
   type: "metadata";
   bucket: string;
   fileIdentifier: string;
-  fileExtension: string;
-  dcType:
+  fileExtension?: string;
+  dcType?:
     | "Image"
     | "Moving Image"
     | "Sound"
@@ -26,7 +26,7 @@ export interface MetadataAttributes {
   dcFormat?: string;
   createdDate?: string;
   deletedDate?: string;
-  acDigitizationDate?: string;
+  acDigitizationDate?: string | null;
   xmpMetadataDate?: string;
   acTags?: string[];
   originalFilename?: string;

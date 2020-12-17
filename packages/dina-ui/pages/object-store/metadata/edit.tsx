@@ -1,6 +1,10 @@
+import { HotColumnProps } from "@handsontable/react";
+import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ApiClientContext,
   BulkDataEditor,
+  ButtonBar,
+  CancelButton,
   decodeResourceCell,
   encodeResourceCell,
   filterBy,
@@ -8,35 +12,33 @@ import {
   ResourceSelectField,
   RowChange,
   SaveArgs,
-  useResourceSelectCells,
+  SelectField,
   Tooltip,
-  ButtonBar,
-  CancelButton,
-  SelectField
+  useAccount,
+  useResourceSelectCells
 } from "common-ui";
 import { Form, Formik } from "formik";
-import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
+import moment from "moment";
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
 import { AddPersonButton, Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
+  License,
   ManagedAttribute,
   ManagedAttributeMap,
   Metadata,
-  Person,
-  License
+  Person
 } from "../../../types/objectstore-api";
-import { HotColumnProps } from "@handsontable/react";
-import { useLocalStorage } from "@rehooks/local-storage";
+import { ObjectUpload } from "../../../types/objectstore-api/resources/ObjectUpload";
 
 /** Editable row data */
 export interface BulkMetadataEditRow {
   acTags: string;
   dcCreator: string;
   license: string;
-  metadata: PersistedResource<Metadata>;
+  metadata: Metadata;
 }
 
 interface FormControls {
@@ -47,6 +49,7 @@ interface FormControls {
 export default function EditMetadatasPage() {
   const router = useRouter();
   const { apiClient, bulkGet, save } = useContext(ApiClientContext);
+  const { agentId, initialized: accountInitialized } = useAccount();
   const { formatMessage } = useDinaIntl();
   const resourceSelectCell = useResourceSelectCells();
   const [
@@ -56,24 +59,14 @@ export default function EditMetadatasPage() {
 
   const { locale } = useDinaIntl();
 
+  const metadataIds = router.query.metadataIds?.toString().split(",");
+  const objectUploadIds = router.query.objectUploadIds?.toString().split(",");
+
   const BUILT_IN_ATTRIBUTES_COLUMNS: HotColumnProps[] = [
     {
       data: "metadata.originalFilename",
       readOnly: true,
       title: formatMessage("field_originalFilename")
-    },
-    {
-      data: "metadata.dcType",
-      source: [
-        "Image",
-        "Moving Image",
-        "Sound",
-        "Text",
-        "Dataset",
-        "Undetermined"
-      ],
-      title: formatMessage("field_dcType"),
-      type: "dropdown"
     },
     {
       data: "metadata.acCaption",
@@ -83,33 +76,52 @@ export default function EditMetadatasPage() {
       data: "acTags",
       title: formatMessage("metadataBulkEditTagsLabel")
     },
-    resourceSelectCell<Person>(
-      {
-        filter: input => ({ rsql: `displayName==*${input}*` }),
-        label: person => person.displayName,
-        model: "agent-api/person",
-        type: "person"
-      },
-      {
-        data: "dcCreator",
-        title: formatMessage("field_dcCreator.displayName")
-      }
-    ),
-    {
-      data: "metadata.dcRights",
-      title: formatMessage("field_dcRights")
-    },
-    resourceSelectCell<License>(
-      {
-        label: license => license.titles[locale] ?? license.url,
-        model: "objectstore-api/license",
-        type: "license"
-      },
-      {
-        data: "license",
-        title: formatMessage("field_license")
-      }
-    )
+    // Only show these columns when editing existing Metadatas.
+    // New Metadata entry doesn't have access to this server-generated value yet.
+    ...(metadataIds
+      ? [
+          {
+            data: "metadata.dcType",
+            source: [
+              "Image",
+              "Moving Image",
+              "Sound",
+              "Text",
+              "Dataset",
+              "Undetermined"
+            ],
+            title: formatMessage("field_dcType"),
+            type: "dropdown"
+          },
+          resourceSelectCell<Person>(
+            {
+              filter: input => ({ rsql: `displayName==*${input}*` }),
+              label: person => person.displayName,
+              model: "agent-api/person",
+              type: "person"
+            },
+            {
+              data: "dcCreator",
+              title: formatMessage("field_dcCreator.displayName")
+            }
+          ),
+          {
+            data: "metadata.dcRights",
+            title: formatMessage("field_dcRights")
+          },
+          resourceSelectCell<License>(
+            {
+              label: license => license.titles[locale] ?? license.url,
+              model: "objectstore-api/license",
+              type: "license"
+            },
+            {
+              data: "license",
+              title: formatMessage("field_license")
+            }
+          )
+        ]
+      : [])
   ];
 
   const [
@@ -117,10 +129,7 @@ export default function EditMetadatasPage() {
     setEditableBuiltInAttributes
   ] = useLocalStorage<string[]>("metadata_editableBuiltInAttributes");
 
-  const idsQuery = String(router.query.ids);
-  const ids = idsQuery.split(",");
-
-  if (!idsQuery) {
+  if ((!metadataIds && !objectUploadIds) || !accountInitialized) {
     return <LoadingSpinner loading={true} />;
   }
 
@@ -149,23 +158,59 @@ export default function EditMetadatasPage() {
   }
 
   async function loadData() {
-    const metadatas = await bulkGet<Metadata>(
-      ids.map(id => `/metadata/${id}?include=managedAttributeMap,dcCreator`),
-      {
-        apiBaseUrl: "/objectstore-api",
-        joinSpecs: [
-          // Join to persons api:
-          {
-            apiBaseUrl: "/agent-api",
-            idField: "dcCreator",
-            joinField: "dcCreator",
-            path: metadata => `person/${metadata.dcCreator.id}`
-          }
-        ]
-      }
-    );
+    const metadatas: Metadata[] = [];
 
-    await initEditableManagedAttributes(metadatas);
+    // When editing existing Metadatas:
+    if (metadataIds) {
+      const existingMetadatas = await bulkGet<Metadata>(
+        metadataIds.map(
+          id => `/metadata/${id}?include=managedAttributeMap,dcCreator`
+        ),
+        {
+          apiBaseUrl: "/objectstore-api",
+          joinSpecs: [
+            // Join to persons api:
+            {
+              apiBaseUrl: "/agent-api",
+              idField: "dcCreator",
+              joinField: "dcCreator",
+              path: metadata => `person/${metadata.dcCreator.id}`
+            }
+          ]
+        }
+      );
+
+      metadatas.push(...existingMetadatas);
+
+      await initEditableManagedAttributes(metadatas);
+      // When adding new Metadatas based on existing ObjectUploads:
+    } else if (objectUploadIds) {
+      const objectUploads = await bulkGet<ObjectUpload>(
+        objectUploadIds.map(id => `/object-upload/${id}`),
+        {
+          apiBaseUrl: "/objectstore-api"
+        }
+      );
+
+      const newMetadatas = objectUploads.map<Metadata>(objectUpload => ({
+        acDigitizationDate: objectUpload.dateTimeDigitized
+          ? moment(objectUpload.dateTimeDigitized).format()
+          : null,
+        acMetadataCreator: {
+          id: agentId,
+          type: "person"
+        },
+        bucket: router.query.group as string,
+        fileIdentifier: objectUpload.fileIdentifier,
+        originalFilename: objectUpload.originalFilename,
+        type: "metadata"
+      }));
+
+      metadatas.push(...newMetadatas);
+    } else {
+      // Shouldn't happen:
+      return [];
+    }
 
     const newTableData = await Promise.all(
       metadatas.map<Promise<BulkMetadataEditRow>>(async metadata => {

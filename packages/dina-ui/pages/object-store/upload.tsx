@@ -1,22 +1,18 @@
 import {
   ApiClientContext,
   ErrorViewer,
-  SaveArgs,
   SelectField,
-  SubmitButton,
   useAccount,
   useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { noop } from "lodash";
-import moment from "moment";
 import { useRouter } from "next/router";
-import { ObjectUpload } from "../../types/objectstore-api/resources/ObjectUpload";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { Footer, Head, Nav } from "../../components";
 import { FileUploader, IFileWithMeta } from "../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { Metadata } from "../../types/objectstore-api/resources/Metadata";
+import { ObjectUpload } from "../../types/objectstore-api/resources/ObjectUpload";
 
 export interface OnSubmitValues {
   acceptedFiles: IFileWithMeta[];
@@ -26,16 +22,13 @@ export interface OnSubmitValues {
 export default function UploadPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
-  const { apiClient, save } = useContext(ApiClientContext);
+  const { apiClient } = useContext(ApiClientContext);
   const { agentId, initialized: accountInitialized } = useAccount();
   const groupSelectOptions = useGroupSelectOptions();
 
   const acceptedFileTypes = "image/*,audio/*,video/*,.pdf,.doc,.docx,.png";
 
   async function onSubmit({ acceptedFiles, group }: OnSubmitValues) {
-    // Upload each file in a separate request, then create the metadatas in a transaction.
-    // TODO: Do all of this in a single transaction.
-
     if (!group) {
       throw new Error(formatMessage("groupMustBeSelected"));
     }
@@ -54,31 +47,14 @@ export default function UploadPage() {
       );
       uploadRespsT.push(response.data);
     }
-    const saveOperations = uploadRespsT.map<SaveArgs<Metadata>>(res => ({
-      resource: {
-        acDigitizationDate: (res as ObjectUpload).dateTimeDigitized
-          ? moment((res as ObjectUpload).dateTimeDigitized).format()
-          : null,
-        acMetadataCreator: {
-          id: agentId,
-          type: "person"
-        },
-        bucket: group,
-        fileIdentifier: (res as ObjectUpload).fileIdentifier,
-        type: "metadata"
-      } as Metadata,
-      type: "metadata"
-    }));
 
-    const saveResults = await save(saveOperations, {
-      apiBaseUrl: "/objectstore-api"
-    });
-
-    const ids = saveResults.map(res => res.id).join(",");
+    const objectUploadIds = uploadRespsT
+      .map(({ fileIdentifier }) => fileIdentifier)
+      .join(",");
 
     await router.push({
       pathname: "/object-store/metadata/edit",
-      query: { ids }
+      query: { agentId, group, objectUploadIds }
     });
   }
 
