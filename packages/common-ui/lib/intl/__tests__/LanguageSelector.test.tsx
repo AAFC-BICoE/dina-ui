@@ -14,7 +14,7 @@ describe("LanguageSelector component", () => {
   it("Renders the language selector.", () => {
     const wrapper = mountWithAppContext(<LanguageSelector />);
 
-    expect(wrapper.find("button[children='English']").exists()).toEqual(true);
+    expect(wrapper.find("button[children='English']").exists()).toEqual(false);
     expect(wrapper.find("button[children='Français']").exists()).toEqual(true);
   });
 
@@ -22,24 +22,15 @@ describe("LanguageSelector component", () => {
     const wrapper = mountWithAppContext(<LanguageSelector />);
 
     // Initially the locale should be set to "en":
-    expect(wrapper.find("button[children='English']").prop("disabled")).toEqual(
-      true
-    );
-    expect(
-      wrapper.find("button[children='Français']").prop("disabled")
-    ).toEqual(false);
+    expect(wrapper.find("button[children='Français']").exists()).toEqual(true);
 
     wrapper.find("button[children='Français']").simulate("click");
 
     wrapper.update();
 
     // The locale should have been changed to "fr":
-    expect(wrapper.find("button[children='English']").prop("disabled")).toEqual(
-      false
-    );
-    expect(
-      wrapper.find("button[children='Français']").prop("disabled")
-    ).toEqual(true);
+    expect(wrapper.find("button[children='Français']").exists()).toEqual(false);
+    expect(wrapper.find("button[children='English']").exists()).toEqual(true);
   });
 
   it("Doesn't render server-side.", () => {
