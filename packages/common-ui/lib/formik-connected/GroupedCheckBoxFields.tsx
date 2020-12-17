@@ -101,7 +101,7 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
       <div className="grouped-checkbox-header text-center">
         <CommonMessage id="select" /> <CheckAllCheckBox />
         <Tooltip id="checkAllTooltipMessage" />
-        <div>
+        <div aria-describedby="checkAllTooltipMessage">
           ({totalChecked} <CommonMessage id="selected" />)
         </div>
       </div>
