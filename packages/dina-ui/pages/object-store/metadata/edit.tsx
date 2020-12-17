@@ -261,7 +261,7 @@ export default function EditMetadatasPage() {
           id,
           type,
           // When adding new Metadatas, add the required fields from the ObjectUpload:
-          ...(objectUploadIds ? row.original.metadata : {}),
+          ...(!id ? row.original.metadata : {}),
           ...metadata
         } as Metadata;
 
@@ -330,7 +330,24 @@ export default function EditMetadatasPage() {
       });
     } else if (objectUploadIds) {
       // When adding new Metadatas based on existing ObjectUploads:
-      await save(editedMetadatas, {
+      // Create the Metadatas:
+      const createdMetadatas = await save(editedMetadatas, {
+        apiBaseUrl: "/objectstore-api"
+      });
+
+      createdMetadatas.forEach((createdMetadata, index) => {
+        // Set the original row's Metadata ID so if the Managed Attribute Map fails, you don't create duplicate Metadats:
+        changes[index].original.metadata.id = createdMetadata.id;
+
+        // Link the managed attribute value with the newly created Metadata ID:
+        editedManagedAttributeMaps[index].resource.metadata = {
+          id: createdMetadata.id,
+          type: "metadata"
+        } as Metadata;
+      });
+
+      // Create the Managed Attribute Values:
+      await save(editedManagedAttributeMaps, {
         apiBaseUrl: "/objectstore-api"
       });
     }
