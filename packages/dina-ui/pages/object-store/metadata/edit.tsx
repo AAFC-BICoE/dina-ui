@@ -183,6 +183,7 @@ export default function EditMetadatasPage() {
       metadatas.push(...existingMetadatas);
 
       await initEditableManagedAttributes(metadatas);
+
       // When adding new Metadatas based on existing ObjectUploads:
     } else if (objectUploadIds) {
       const objectUploads = await bulkGet<ObjectUpload>(
@@ -201,7 +202,7 @@ export default function EditMetadatasPage() {
           type: "person"
         },
         bucket: router.query.group as string,
-        fileIdentifier: objectUpload.fileIdentifier,
+        fileIdentifier: objectUpload.id,
         originalFilename: objectUpload.originalFilename,
         type: "metadata"
       }));
@@ -209,7 +210,9 @@ export default function EditMetadatasPage() {
       metadatas.push(...newMetadatas);
     } else {
       // Shouldn't happen:
-      return [];
+      throw new Error(
+        "No Metadata IDs or ObjectUpload IDs were provided to load."
+      );
     }
 
     const newTableData = await Promise.all(
@@ -257,6 +260,8 @@ export default function EditMetadatasPage() {
         const metadataEdit = {
           id,
           type,
+          // When adding new Metadatas, add the required fields from the ObjectUpload:
+          ...(objectUploadIds ? row.original.metadata : {}),
           ...metadata
         } as Metadata;
 
@@ -318,9 +323,17 @@ export default function EditMetadatasPage() {
 
     editedManagedAttributeMaps.forEach(saveArg => delete saveArg.resource.id);
 
-    await save([...editedMetadatas, ...editedManagedAttributeMaps], {
-      apiBaseUrl: "/objectstore-api"
-    });
+    if (metadataIds) {
+      // When editing existing Metadatas:
+      await save([...editedMetadatas, ...editedManagedAttributeMaps], {
+        apiBaseUrl: "/objectstore-api"
+      });
+    } else if (objectUploadIds) {
+      // When adding new Metadatas based on existing ObjectUploads:
+      await save(editedMetadatas, {
+        apiBaseUrl: "/objectstore-api"
+      });
+    }
 
     await router.push("/object-store/object/list");
   }
@@ -389,6 +402,7 @@ export default function EditMetadatasPage() {
                     columns={columns}
                     loadData={loadData}
                     onSubmit={onSubmit}
+                    submitUnchangedRows={objectUploadIds ? true : false}
                   />
                 </Form>
               );

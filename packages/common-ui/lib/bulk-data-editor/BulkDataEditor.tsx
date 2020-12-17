@@ -26,12 +26,19 @@ export interface BulkDataEditorProps<TRow> {
     formikValues: any,
     formikActions: FormikContextType<any>
   ) => Promise<void>;
+
+  /**
+   * Submit unchanged rows, e.g. when inserting new data instead of editing existing data.
+   * Default false.
+   */
+  submitUnchangedRows?: boolean;
 }
 
 export function BulkDataEditor<TRow>({
   columns,
   loadData,
-  onSubmit
+  onSubmit,
+  submitUnchangedRows = false
 }: BulkDataEditorProps<TRow>) {
   type TableData = TRow[];
 
@@ -90,7 +97,9 @@ export function BulkDataEditor<TRow>({
       })
     );
 
-    const editedDiffs = diffs.filter(diff => !isEmpty(diff.changes));
+    const editedDiffs = submitUnchangedRows
+      ? diffs
+      : diffs.filter(diff => !isEmpty(diff.changes));
 
     await onSubmit(editedDiffs, formikValues, formikActions);
 
