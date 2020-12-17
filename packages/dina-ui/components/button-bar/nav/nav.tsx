@@ -27,9 +27,6 @@ export function Nav() {
           <section id="wb-lng" className="text-right ml-auto col-7 col-md-8">
             <ul className="list-inline">
               <li className="list-inline-item mx-2">
-                <LanguageSelector />
-              </li>
-              <li className="list-inline-item mx-2">
                 <NavbarUserControl />
               </li>
               <li className="list-inline-item mx-2 my-auto">
@@ -40,6 +37,9 @@ export function Nav() {
                 >
                   <DinaMessage id="feedbackButtonText" />
                 </a>
+              </li>
+              <li className="list-inline-item mx-2">
+                <LanguageSelector />
               </li>
             </ul>
           </section>
