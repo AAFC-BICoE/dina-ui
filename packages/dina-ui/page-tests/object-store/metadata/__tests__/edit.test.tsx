@@ -75,7 +75,7 @@ const TEST_LICENSES: PersistedResource<License>[] = [
 jest.mock("next/router", () => ({
   useRouter: () => ({
     query: {
-      id:
+      metadataIds:
         "6c524135-3c3e-41c1-a057-45afb4e3e7be,3849de16-fee2-4bb1-990d-a4f5de19b48d,31ee7848-b5c1-46e1-bbca-68006d9eda3b"
     }
   })
