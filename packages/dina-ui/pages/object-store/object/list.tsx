@@ -113,6 +113,7 @@ export default function MetadataListPage() {
         <div className="d-flex h-100">
           <button
             className="btn btn-info m-auto preview-button"
+            style={{ backgroundColor: "#117C8D" }}
             onClick={() => setPreviewMetadataId(original.id)}
             type="button"
           >
