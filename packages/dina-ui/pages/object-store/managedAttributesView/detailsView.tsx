@@ -123,6 +123,11 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       submittedValues.managedAttributeType === ManagedAttributeType.PICKLIST
     ) {
       submittedValues.managedAttributeType = ManagedAttributeType.STRING;
+    } else if (
+      submittedValues.managedAttributeType === ManagedAttributeType.INTEGER ||
+      submittedValues.managedAttributeType === ManagedAttributeType.STRING
+    ) {
+      submittedValues.acceptedValues = [];
     }
 
     try {
