@@ -97,7 +97,7 @@ export default function MetadataViewPage() {
             </a>
           </Link>
           <Link href={`/object-store/metadata/revisions?id=${id}`}>
-            <a className="btn btn-info">
+            <a className="btn btn-info btn-info-wcag-enhanced">
               <DinaMessage id="revisionsButtonText" />
             </a>
           </Link>

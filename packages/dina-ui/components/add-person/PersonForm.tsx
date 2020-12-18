@@ -102,7 +102,7 @@ export function AddPersonButton() {
 
   return (
     <button
-      className="btn btn-info delete-button open-person-modal"
+      className="btn btn-info delete-button open-person-modal btn-info-wcag-enhanced"
       onClick={() =>
         openModal(
           <div className="modal-content">

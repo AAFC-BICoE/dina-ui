@@ -368,3 +368,13 @@ a.btn,
     padding-bottom: 15px;
   }
 }
+
+.btn-info-wcag-enhanced {
+  background-color: #117c8d;
+  border-color: #117c8d;
+}
+
+.btn-info-wcag-enhanced:hover {
+  background-color: #18666d;
+  border-color: #18666d;
+}
