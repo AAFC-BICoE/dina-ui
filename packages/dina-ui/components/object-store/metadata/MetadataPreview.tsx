@@ -84,7 +84,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
           </Link>
         </div>
         <Link href={`/object-store/metadata/revisions?id=${metadataId}`}>
-          <a className="btn btn-info metadata-revisions-link btn-info-wcag-enhanced">
+          <a className="btn btn-info metadata-revisions-link">
             <DinaMessage id="revisionsButtonText" />
           </a>
         </Link>

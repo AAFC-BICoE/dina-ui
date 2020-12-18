@@ -121,7 +121,7 @@ function GalleryItem({
       <div className="row">
         <div className="col-9">
           <button
-            className="btn btn-info w-100 preview-button btn-info-wcag-enhanced"
+            className="btn btn-info w-100 preview-button"
             onClick={() => onSelectPreviewMetadataId(id)}
             type="button"
           >

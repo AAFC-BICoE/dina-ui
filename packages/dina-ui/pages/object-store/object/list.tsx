@@ -112,7 +112,7 @@ export default function MetadataListPage() {
       Cell: ({ original }) => (
         <div className="d-flex h-100">
           <button
-            className="btn btn-info m-auto preview-button btn-info-wcag-enhanced"
+            className="btn btn-info m-auto preview-button"
             onClick={() => setPreviewMetadataId(original.id)}
             type="button"
           >

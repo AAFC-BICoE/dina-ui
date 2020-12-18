@@ -31,7 +31,7 @@ export function Nav() {
               </li>
               <li className="list-inline-item mx-2 my-auto">
                 <a
-                  className="btn btn-info btn-info-wcag-enhanced"
+                  className="btn btn-info"
                   href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
                   target="_blank"
                 >
