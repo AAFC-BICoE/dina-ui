@@ -4,7 +4,7 @@ export interface ManagedAttributeAttributes {
   type: string;
   name: string;
   managedAttributeType: string;
-  acceptedValues?: string[];
+  acceptedValues?: string[] | null;
   createdBy?: string;
   createdOn?: string;
   description?: Map<string, string>;

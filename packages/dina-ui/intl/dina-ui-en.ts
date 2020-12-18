@@ -55,7 +55,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_editableManagedAttributes: "Managed Attributes",
   field_email: "Email",
   field_license: "License",
-  field_managedAttributeAcceptedValue: "Accepted Value",
+  field_acceptedValuesAsLines: "Accepted Values (One value per line)",
+  field_acceptedValuesAsLines_tooltip:
+    "Write one accepted value per line. Press enter while typing in the field to add a new line.",
   field_managedAttributeCreatedOn: "Created On",
   field_managedAttributeCreatedBy: "Created By",
   field_managedAttributeMandatoryFieldsError:
