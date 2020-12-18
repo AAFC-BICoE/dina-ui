@@ -28,6 +28,7 @@ export function LanguageSelector() {
             <div key={locale} className="d-inline">
               <button
                 className="btn btn-link px-0"
+                style={{ color: "#006FE6" }}
                 onClick={onClick}
                 lang={locale}
               >

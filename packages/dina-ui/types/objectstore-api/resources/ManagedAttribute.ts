@@ -9,9 +9,7 @@ export interface ManagedAttributeAttributes {
   createdOn?: string;
   description?: Map<string, string>;
 }
-export enum ManagedAttributeType {
-  "INTEGER",
-  "STRING"
-}
+
+export type ManagedAttributeType = "INTEGER" | "STRING";
 
 export type ManagedAttribute = KitsuResource & ManagedAttributeAttributes;

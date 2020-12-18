@@ -30,17 +30,6 @@ interface ManagedAttributeFormProps {
   router: NextRouter;
 }
 
-const ATTRIBUTE_TYPE_OPTIONS = [
-  {
-    label: "Integer",
-    value: "INTEGER"
-  },
-  {
-    label: "String",
-    value: "STRING"
-  }
-];
-
 export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
 
@@ -89,33 +78,51 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
 
 function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
   const { save } = useContext(ApiClientContext);
-  const [type, setType] = useState(
-    profile ? profile.managedAttributeType : undefined
-  );
+  const { formatMessage } = useDinaIntl();
+
   const id = profile?.id;
 
   const initialValues: Partial<ManagedAttributeFormFields> = profile || {
     type: "managed-attribute"
   };
+
+  const acceptedValueLen = profile?.acceptedValues?.length;
+
+  const [type, setType] = useState(
+    profile
+      ? acceptedValueLen
+        ? "PICKLIST"
+        : profile.managedAttributeType
+      : undefined
+  );
+
+  if (type === "PICKLIST") {
+    initialValues.managedAttributeType = "PICKLIST";
+  }
+
   // Convert acceptedValues to easily editable string format:
   initialValues.acceptedValuesAsLines =
     initialValues.acceptedValues?.concat("")?.join("\n") ?? "";
 
-  const { formatMessage } = useDinaIntl();
+  const ATTRIBUTE_TYPE_OPTIONS = [
+    {
+      label: formatMessage("field_managedAttributeType_integer_label"),
+      value: "INTEGER"
+    },
+    {
+      label: formatMessage("field_managedAttributeType_text_label"),
+      value: "STRING"
+    },
+    {
+      label: formatMessage("field_managedAttributeType_picklist_label"),
+      value: "PICKLIST"
+    }
+  ];
 
   async function onSubmit({
     acceptedValuesAsLines,
     ...managedAttribute
   }: ManagedAttributeFormFields) {
-    if (
-      managedAttribute.name === undefined ||
-      managedAttribute.managedAttributeType === undefined
-    ) {
-      throw new Error(
-        formatMessage("field_managedAttributeMandatoryFieldsError")
-      );
-    }
-
     // Convert user-suplied string to string array:
     managedAttribute.acceptedValues = (acceptedValuesAsLines || "")
       // Split by line breaks:
@@ -128,6 +135,21 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       managedAttribute.acceptedValues = null;
     }
 
+    if (!managedAttribute.name || !managedAttribute.managedAttributeType) {
+      throw new Error(
+        formatMessage("field_managedAttributeMandatoryFieldsError")
+      );
+    }
+
+    if (managedAttribute.managedAttributeType === "PICKLIST") {
+      managedAttribute.managedAttributeType = "STRING";
+    } else if (
+      managedAttribute.managedAttributeType === "INTEGER" ||
+      managedAttribute.managedAttributeType === "STRING"
+    ) {
+      managedAttribute.acceptedValues = null;
+    }
+
     await save(
       [
         {
@@ -137,7 +159,8 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       ],
       { apiBaseUrl: "/objectstore-api" }
     );
-    router.push(`/object-store/managedAttributesView/listView`);
+
+    await router.push(`/object-store/managedAttributesView/listView`);
   }
 
   return (
@@ -172,10 +195,10 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           <SelectField
             name="managedAttributeType"
             options={ATTRIBUTE_TYPE_OPTIONS}
-            onChange={selectValue => setType(selectValue)}
+            onChange={newType => setType(newType)}
           />
         </div>
-        {type === "STRING" && (
+        {type === "PICKLIST" && (
           <div style={{ width: "300px" }}>
             <TextField name="acceptedValuesAsLines" multiLines={true} />
           </div>
