@@ -23,7 +23,7 @@ export default function UploadPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useContext(ApiClientContext);
-  const { agentId, initialized: accountInitialized } = useAccount();
+  const { initialized: accountInitialized } = useAccount();
   const groupSelectOptions = useGroupSelectOptions();
 
   const acceptedFileTypes = "image/*,audio/*,video/*,.pdf,.doc,.docx,.png";
@@ -54,7 +54,7 @@ export default function UploadPage() {
 
     await router.push({
       pathname: "/object-store/metadata/edit",
-      query: { agentId, group, objectUploadIds }
+      query: { group, objectUploadIds }
     });
   }
 
