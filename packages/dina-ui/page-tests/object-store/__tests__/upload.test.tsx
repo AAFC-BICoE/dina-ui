@@ -116,7 +116,6 @@ describe("Upload page", () => {
     expect(mockPush).lastCalledWith({
       pathname: "/object-store/metadata/edit",
       query: {
-        agentId: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
         group: "example-group",
         objectUploadIds: [
           "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",

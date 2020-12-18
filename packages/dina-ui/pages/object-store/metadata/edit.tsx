@@ -197,10 +197,12 @@ export default function EditMetadatasPage() {
         acDigitizationDate: objectUpload.dateTimeDigitized
           ? moment(objectUpload.dateTimeDigitized).format()
           : null,
-        acMetadataCreator: {
-          id: agentId,
-          type: "person"
-        },
+        acMetadataCreator: agentId
+          ? {
+              id: agentId,
+              type: "person"
+            }
+          : null,
         bucket: router.query.group as string,
         fileIdentifier: objectUpload.id,
         originalFilename: objectUpload.originalFilename,
