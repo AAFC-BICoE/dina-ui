@@ -63,7 +63,7 @@ export default function EditMetadatasPage() {
       title: formatMessage("field_originalFilename")
     },
     {
-      data: "acDigitizationDate",
+      data: "metadata.acDigitizationDate",
       readOnly: true,
       title: formatMessage("field_acDigitizationDate")
     },
