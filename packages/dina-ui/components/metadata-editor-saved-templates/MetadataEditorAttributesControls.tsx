@@ -1,3 +1,4 @@
+import { HotColumnProps } from "@handsontable/react";
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
   filterBy,
@@ -11,7 +12,6 @@ import {
 import { Form, Formik, useFormikContext } from "formik";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../types/objectstore-api";
-import { HotColumnProps } from "@handsontable/react";
 
 /** A named set of attributes used for editing Metadatas. */
 export interface AttributesTemplate {
@@ -30,14 +30,15 @@ export interface MetadataEditorControls {
 /** MetadataEditorAttributesControls component props. */
 export interface MetadataEditorAttributesControlsProps {
   builtInAttributes: HotColumnProps[];
-  initialValues: MetadataEditorControls;
 }
+
+export const ATTRIBUTE_TEMPLATES_STORAGE_KEY = "metadata_attributesTemplates";
 
 /** Provides functions to save/load Metadata Bulk Editor templates to/from the browser's Local Storage. */
 function useMetadataEditorSavedTemplates() {
   const [storedAttributesTemplates, setAttributesTemplates] = useLocalStorage<
     AttributesTemplate[]
-  >("metadata_attributesTemplates");
+  >(ATTRIBUTE_TEMPLATES_STORAGE_KEY);
   const attributesTemplates = storedAttributesTemplates ?? [];
 
   const { closeModal, openModal } = useModal();
@@ -103,8 +104,7 @@ function useMetadataEditorSavedTemplates() {
 
 /** Provides Formik inputs for selecting and saving Attributes Templates. */
 export function MetadataEditorAttributesControls({
-  builtInAttributes,
-  initialValues
+  builtInAttributes
 }: MetadataEditorAttributesControlsProps) {
   const {
     attributesTemplates,
@@ -126,7 +126,7 @@ export function MetadataEditorAttributesControls({
   function resetAttributesLayout() {
     formikCtx.setValues({
       ...formikCtx.values,
-      ...initialValues
+      ...formikCtx.initialValues
     });
   }
 
@@ -165,7 +165,7 @@ export function MetadataEditorAttributesControls({
         <div className="col-2">
           {formikCtx.values.attributesTemplate && (
             <FormikButton
-              className="btn btn-danger mt-4"
+              className="template-delete-button btn btn-danger mt-4"
               onClick={deleteSelectedTemplate}
             >
               <DinaMessage id="deleteThisAttributesTemplate" />
@@ -193,13 +193,13 @@ export function MetadataEditorAttributesControls({
         />
         <div className="col-3 pt-3">
           <FormikButton
-            className="btn btn-primary m-2"
+            className="template-save-button btn btn-primary m-2"
             onClick={saveAttributeTemplate}
           >
             <DinaMessage id="metadataAttributesTemplateSave" />
           </FormikButton>
           <FormikButton
-            className="btn btn-dark m-2"
+            className="template-reset-button btn btn-dark m-2"
             onClick={resetAttributesLayout}
           >
             <DinaMessage id="resetMetadataEditorAttributesButtonText" />

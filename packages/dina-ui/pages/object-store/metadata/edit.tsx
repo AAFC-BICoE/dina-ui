@@ -317,7 +317,6 @@ export default function EditMetadatasPage() {
                 <Form translate={undefined}>
                   <MetadataEditorAttributesControls
                     builtInAttributes={BUILT_IN_ATTRIBUTES_COLUMNS}
-                    initialValues={initialFormControls}
                   />
                   <div className="form-group">
                     <AddPersonButton />
