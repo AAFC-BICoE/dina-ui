@@ -79,10 +79,10 @@ function CollectingEventForm({
   const { id } = router.query;
   const initialValues = collectingEvent || { type: "collecting-event" };
   const { formatMessage } = useDinaIntl();
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState({ checked: false });
 
-  function setEndDateVisible(event) {
-    setVisible(event);
+  function setEndDateVisible(checked) {
+    setVisible({ checked });
   }
 
   const onSubmit = safeSubmit(async submittedValues => {
@@ -123,24 +123,26 @@ function CollectingEventForm({
           <div className="row">
             <DateField
               className="col-md-4"
+              showTime={true}
               name="startEventDateTime"
               label={formatMessage("startEventDateTimeLabel")}
             />
           </div>
           <div className="row">
-            <label
-              className="col-md-4"
-              onChange={undefined}
-              onClick={undefined}
-            >
+            <label style={{ marginLeft: 15 }}>
               <span>{formatMessage("enableDateRangeLabel")}</span>
-              <Switch onChange={e => setEndDateVisible(e)} checked={visible} />
+              <Switch
+                onChange={e => setEndDateVisible(e)}
+                checked={visible.checked}
+                className="react-switch"
+              />
             </label>
           </div>
-          {visible && (
+          {visible.checked && (
             <div className="row">
               <DateField
                 className="col-md-4"
+                showTime={true}
                 name="endEventDateTime"
                 label={formatMessage("endEventDateTimeLabel")}
               />

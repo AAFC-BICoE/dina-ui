@@ -63,11 +63,13 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                         name="startEventDateTime"
                         label={formatMessage("startEventDateTimeLabel")}
                       />
-                      <FieldView
-                        className="col-md-2"
-                        name="endEventDateTime"
-                        label={formatMessage("endEventDateTimeLabel")}
-                      />
+                      {collectingEvent.endEventDateTime && (
+                        <FieldView
+                          className="col-md-2"
+                          name="endEventDateTime"
+                          label={formatMessage("endEventDateTimeLabel")}
+                        />
+                      )}
                       <FieldView
                         className="col-md-3"
                         name="verbatimEventDateTime"

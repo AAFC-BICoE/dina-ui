@@ -368,3 +368,9 @@ a.btn,
     padding-bottom: 15px;
   }
 }
+
+/* Custom style to adjust react switch */
+.react-switch {
+  vertical-align: middle;
+  margin-left: 4px;
+}
