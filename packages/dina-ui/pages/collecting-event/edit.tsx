@@ -43,7 +43,7 @@ export default function CollectingEventEditPage() {
               <DinaMessage id="editCollectingEventTitle" />
             </h1>
             <Query<CollectingEvent>
-              query={{ path: `agent-api/collecting-event/${id}` }}
+              query={{ path: `collection-api/collecting-event/${id}` }}
             >
               {({ loading, response }) => (
                 <div>

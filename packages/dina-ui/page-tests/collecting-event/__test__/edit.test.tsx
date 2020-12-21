@@ -37,16 +37,15 @@ describe("collecting-event edit page", () => {
     jest.clearAllMocks();
     mockQuery = {};
   });
-  it("Provides a form to add an collecting-event.", async () => {
+  it("Provides a form to add a collecting-event.", async () => {
     mockPatch.mockReturnValueOnce({
       data: [
         {
           data: {
             attributes: {
-              startEventDateTime: "2019_01_01_10_20_10",
-              endEventDateTime: "2019_01_06_5_6_9",
-              verbatimEventDateTime:
-                "From 2019,1,1,10,10,10 to 2019,01,06,5,6,9"
+              startEventDateTime: "12/21/2019, 4:00 PM",
+              endEventDateTime: "12/22/2019, 4:00 PM",
+              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm"
             },
             id: "1",
             type: "collecting-event"
@@ -63,15 +62,27 @@ describe("collecting-event edit page", () => {
     });
 
     expect(wrapper.find(".startEventDateTime-field")).toHaveLength(1);
-    expect(wrapper.find(".endEventDateTime-field")).toHaveLength(1);
+    // initially renders without end event datetime
+    expect(wrapper.find(".endEventDateTime-field")).toHaveLength(0);
     expect(wrapper.find(".verbatimEventDateTime-field")).toHaveLength(1);
 
-    // Edit the name.
-
-    wrapper.find('[name="endEventDateTime"]').simulate("change", {
+    // simulate turn on the date range switch
+    wrapper.find(".react-switch input").simulate("change", {
       target: {
-        name: "endEventDateTime",
-        value: "2019_01_06_6_6_9"
+        type: "checkbox",
+        checked: true
+      }
+    });
+    await new Promise(setImmediate);
+
+    // renders end event datetime
+    expect(wrapper.find(".endEventDateTime-field")).toHaveLength(1);
+
+    // Edit the verbatime datetime
+    wrapper.find(".verbatimEventDateTime-field input").simulate("change", {
+      target: {
+        name: "verbatimEventDateTime",
+        value: "From 2019,12,21 4pm to 2019,12,22 5pm"
       }
     });
 
@@ -87,7 +98,7 @@ describe("collecting-event edit page", () => {
           path: "collecting-event",
           value: {
             attributes: {
-              endEventDateTime: "2019_01_06_6_6_9"
+              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
             },
             id: "00000000-0000-0000-0000-000000000000",
             type: "collecting-event"
@@ -101,7 +112,7 @@ describe("collecting-event edit page", () => {
     expect(mockPush).lastCalledWith("/collecting-event/list");
   });
 
-  it("Provides a form to edit an collecting-event.", async done => {
+  it("Provides a form to edit a collecting-event.", async done => {
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
       data: [
@@ -126,13 +137,16 @@ describe("collecting-event edit page", () => {
     wrapper.update();
 
     // Check that the existing value is in the field.
-    expect(wrapper.find('[name="startEventDateTime"]').prop("value")).toEqual([
-      "2019_01_01_10_20_10"
-    ]);
+    expect(
+      wrapper.find(".verbatimEventDateTime-field input").prop("value")
+    ).toEqual("From 2019,12,21 4pm to 2019,12,22 4pm");
 
     // Modify the value.
-    wrapper.find('[name="startEventDateTime"]').simulate("change", {
-      target: { name: "startEventDateTime", value: "2019_01_01_10_20_30" }
+    wrapper.find(".verbatimEventDateTime-field input").simulate("change", {
+      target: {
+        name: "verbatimEventDateTime",
+        value: "From 2019,12,21 4pm to 2019,12,22 6pm"
+      }
     });
 
     // Submit the form.
@@ -149,7 +163,7 @@ describe("collecting-event edit page", () => {
             path: "collecting-event/1",
             value: {
               attributes: expect.objectContaining({
-                startEventDateTime: "2019_01_01_10_20_30"
+                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 6pm"
               }),
               id: "1",
               type: "collecting-event"
@@ -208,7 +222,7 @@ const TEST_COLLECTING_EVENT: CollectingEvent = {
   uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
   id: "1",
   type: "collecting-event",
-  startEventDateTime: "2019_01_01_10_20_10",
-  endEventDateTime: "2019_01_06_5_6_9",
-  verbatimEventDateTime: "From 2019,1,1,10,10,10 to 2019,01,06,5,6,9"
+  startEventDateTime: "12/21/2019, 4:00 PM",
+  endEventDateTime: "12/22/2019, 4:00 PM",
+  verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm"
 };
