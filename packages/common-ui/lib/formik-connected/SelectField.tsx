@@ -4,24 +4,24 @@ import Select from "react-select";
 import { Styles } from "react-select/src/styles";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
-export interface SelectOption {
+export interface SelectOption<T> {
   label: string;
-  value: any;
+  value: T;
 }
 
-export interface SelectFieldProps extends LabelWrapperParams {
+export interface SelectFieldProps<T = string> extends LabelWrapperParams {
   disabled?: boolean;
 
   /** Whether this is a multi-select dropdown. */
   isMulti?: boolean;
 
-  onChange?: ((value?: string) => void) | ((value?: string[]) => void);
-  options: SelectOption[];
+  onChange?: (value?: T | T[] | null) => void;
+  options: SelectOption<T>[];
   styles?: Partial<Styles>;
 }
 
 /** Formik-connected select input. */
-export function SelectField(props: SelectFieldProps) {
+export function SelectField<T = string>(props: SelectFieldProps<T>) {
   const {
     disabled,
     isMulti,
@@ -39,7 +39,7 @@ export function SelectField(props: SelectFieldProps) {
         form: { setFieldValue, setFieldTouched }
       }: FieldProps) => {
         function onChangeInternal(
-          change: SelectOption[] | SelectOption | null
+          change: SelectOption<T>[] | SelectOption<T> | null
         ) {
           // Set default empty array value if the new value is null:
           if (isMulti && change === null) {

@@ -1,35 +1,42 @@
+import { HotColumnProps } from "@handsontable/react";
 import {
   ApiClientContext,
   BulkDataEditor,
+  ButtonBar,
+  CancelButton,
   decodeResourceCell,
   encodeResourceCell,
   filterBy,
+  FormikButton,
   LoadingSpinner,
   ResourceSelectField,
   RowChange,
   SaveArgs,
-  useResourceSelectCells,
+  SelectField,
   Tooltip,
-  ButtonBar,
-  CancelButton,
-  SelectField
+  useResourceSelectCells
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
-import { AddPersonButton, Footer, Head, Nav } from "../../../components";
+import {
+  AddPersonButton,
+  AttributesTemplate,
+  Footer,
+  Head,
+  Nav,
+  useMetadataEditorSavedTemplates
+} from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
+  License,
   ManagedAttribute,
   ManagedAttributeMap,
   Metadata,
-  Person,
-  License
+  Person
 } from "../../../types/objectstore-api";
-import { HotColumnProps } from "@handsontable/react";
-import { useLocalStorage } from "@rehooks/local-storage";
 
 /** Editable row data */
 export interface BulkMetadataEditRow {
@@ -39,7 +46,8 @@ export interface BulkMetadataEditRow {
   metadata: PersistedResource<Metadata>;
 }
 
-interface FormControls {
+export interface FormControls {
+  attributesTemplate: AttributesTemplate | null;
   editableBuiltInAttributes: string[];
   editableManagedAttributes: ManagedAttribute[];
 }
@@ -53,6 +61,11 @@ export default function EditMetadatasPage() {
     initialEditableManagedAttributes,
     setInitialEditableManagedAttributes
   ] = useState<ManagedAttribute[]>([]);
+
+  const {
+    attributesTemplates,
+    openAttributesTemplateForm
+  } = useMetadataEditorSavedTemplates();
 
   const { locale } = useDinaIntl();
 
@@ -117,11 +130,6 @@ export default function EditMetadatasPage() {
     )
   ];
 
-  const [
-    editableBuiltInAttributes,
-    setEditableBuiltInAttributes
-  ] = useLocalStorage<string[]>("metadata_editableBuiltInAttributes");
-
   const idsQuery = String(router.query.ids);
   const ids = idsQuery.split(",");
 
@@ -132,7 +140,7 @@ export default function EditMetadatasPage() {
   /**
    * Initializes the editable managed attributes based on what attributes are set on the metadatas.
    */
-  async function initEditableManagedAttributes(metadatas: Metadata[]) {
+  async function getManagedAttributesInUse(metadatas: Metadata[]) {
     // Loop through the metadatas and find which managed attributes are set:
     const managedAttributeIdMap: Record<string, true> = {};
     for (const metadata of metadatas) {
@@ -149,8 +157,7 @@ export default function EditMetadatasPage() {
       { apiBaseUrl: "/objectstore-api" }
     );
 
-    // Set the attributes in component state; These are used to re-initialize the Formik controls:
-    setInitialEditableManagedAttributes(newInitialEditableManagedAttributes);
+    return newInitialEditableManagedAttributes;
   }
 
   async function loadData() {
@@ -170,7 +177,8 @@ export default function EditMetadatasPage() {
       }
     );
 
-    await initEditableManagedAttributes(metadatas);
+    const managedAttributesInUse = await getManagedAttributesInUse(metadatas);
+    setInitialEditableManagedAttributes(managedAttributesInUse);
 
     const newTableData = await Promise.all(
       metadatas.map<Promise<BulkMetadataEditRow>>(async metadata => {
@@ -285,6 +293,12 @@ export default function EditMetadatasPage() {
     await router.push("/object-store/object/list");
   }
 
+  const initialFormControls: FormControls = {
+    attributesTemplate: null,
+    editableBuiltInAttributes: BUILT_IN_ATTRIBUTES_COLUMNS.map(col => col.data),
+    editableManagedAttributes: initialEditableManagedAttributes
+  };
+
   return (
     <div>
       <Head title={formatMessage("metadataBulkEditTitle")} />
@@ -299,12 +313,7 @@ export default function EditMetadatasPage() {
         <div className="form-group">
           <Formik<FormControls>
             enableReinitialize={true}
-            initialValues={{
-              editableBuiltInAttributes:
-                editableBuiltInAttributes ??
-                BUILT_IN_ATTRIBUTES_COLUMNS.map(col => col.data),
-              editableManagedAttributes: initialEditableManagedAttributes
-            }}
+            initialValues={initialFormControls}
             onSubmit={noop}
           >
             {controlsForm => {
@@ -324,7 +333,6 @@ export default function EditMetadatasPage() {
                   <div className="row">
                     <SelectField
                       className="col-6 editable-builtin-attributes-select"
-                      onChange={setEditableBuiltInAttributes}
                       name="editableBuiltInAttributes"
                       isMulti={true}
                       options={BUILT_IN_ATTRIBUTES_COLUMNS.map(col => ({
@@ -340,6 +348,38 @@ export default function EditMetadatasPage() {
                       model="objectstore-api/managed-attribute"
                       optionLabel={attr => attr.name}
                     />
+                    <div className="col-2">
+                      <SelectField<AttributesTemplate>
+                        name="attributesTemplate"
+                        // When the template is changed
+                        onChange={(template: AttributesTemplate) => {
+                          controlsForm.setFieldValue(
+                            "editableBuiltInAttributes",
+                            template.editableBuiltInAttributes
+                          );
+                          controlsForm.setFieldValue(
+                            "editableManagedAttributes",
+                            template.editableManagedAttributes
+                          );
+                        }}
+                        options={attributesTemplates.map(template => ({
+                          label: template.name,
+                          value: template
+                        }))}
+                      />
+                      <FormikButton
+                        className="btn btn-primary"
+                        onClick={formikCtx =>
+                          openAttributesTemplateForm(formikCtx, newTemplate => {
+                            const fieldName: keyof FormControls =
+                              "attributesTemplate";
+                            controlsForm.setFieldValue(fieldName, newTemplate);
+                          })
+                        }
+                      >
+                        <DinaMessage id="metadataAttributesTemplateSave" />
+                      </FormikButton>
+                    </div>
                   </div>
                   <div className="form-group">
                     <AddPersonButton />

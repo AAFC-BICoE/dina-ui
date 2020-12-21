@@ -180,7 +180,9 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           <SelectField
             name="managedAttributeType"
             options={ATTRIBUTE_TYPE_OPTIONS}
-            onChange={selectValue => setType(selectValue)}
+            onChange={(selectValue: ManagedAttributeType) =>
+              setType(selectValue)
+            }
           />
         </div>
         {type === ManagedAttributeType.PICKLIST && (

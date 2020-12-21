@@ -2,6 +2,7 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
+  addAttributesTemplateTitle: "New Attributes Template",
   addFilesButton: "Add Files",
   addManagedAttributeButtonText: "Add New Managed Attribute",
   addObjectSubtypeTitle: "Add New Object Subtype",
@@ -41,6 +42,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_acSubType: "Object SubType",
   field_acTags: "Tags",
   "field_dcCreator.displayName": "Digitized By",
+  field_attributesTemplate: "",
   field_createdBy: "Created By",
   field_createdDate: "Created Date",
   field_createdOn: "Created On",
@@ -85,6 +87,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
   managedAttributeValueLabel: "Value",
+  metadataAttributesTemplateSave: "Save This Attributes Template",
   metadataBucketNameLabel: "Bucket Name",
   metadataBuiltInAttributesLabel: "Built-in Attributes",
   metadataBulkEditTagsLabel: "Tags (Comma-separated)",
