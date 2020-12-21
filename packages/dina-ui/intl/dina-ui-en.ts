@@ -2,6 +2,7 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
+  addCollectingEventTitle: "Add Collecting Event",
   addFilesButton: "Add Files",
   addManagedAttributeButtonText: "Add New Managed Attribute",
   addObjectSubtypeTitle: "Add New Object Subtype",
@@ -15,14 +16,19 @@ export const DINAUI_MESSAGES_ENGLISH = {
   cancelButtonText: "Cancel",
   changedProperties: "Changes",
   closePreviewButtonText: "Close Preview",
+  collectingEventListTitle: "Collecting Event",
+  collectingEventViewTitle: "View Collecting Event",
   deleteButtonText: "Delete",
   deleteSelectedButtonText: "Delete Selected",
   dinaUserSectionTitle: "Dina User",
+  editCollectingEventTitle: "Edit Collecting Event",
   editObjectSubtypeTitle: "Edit Object Subtype",
   editOrganizationTitle: "Edit Organization",
   editOrganizationAliasesLabel: "Aliases (comma seperated)",
   editPersonTitle: "Edit Person",
   editSelectedButtonText: "Edit Selected",
+  enableDateRangeLabel: "Enable Date Range",
+  endEventDateTimeLabel: "End Event DateTime",
   exifProperties: "Exif Properties",
   feedbackButtonText: "Feedback",
   field_acceptedValues: "Accepted Values",
@@ -123,6 +129,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   revisionsButtonText: "Revisions",
   revisionsByUserPageTitle: "Revisions by user",
   searchButton: "Search",
+  startEventDateTimeLabel: "Start Event DateTime",
   thumbnailNotAvailableText: "No thumbnail available",
   uploadButtonText: "Upload",
   uploadFormInstructions:
@@ -130,6 +137,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   uploadPageTitle: "Upload Files",
   userMustBelongToGroup: "User must belong to a Group",
   valueLabel: "Value",
+  verbatimEventDateTimeLabel: "Verbatim Event DateTime",
   viewPreviewButtonText: "Preview",
   whoAmITitle: "Who Am I"
 };
