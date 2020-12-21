@@ -34,7 +34,7 @@ export interface MetadataEditorAttributesControlsProps {
 }
 
 /** Provides functions to save/load Metadata Bulk Editor templates to/from the browser's Local Storage. */
-export function useMetadataEditorSavedTemplates() {
+function useMetadataEditorSavedTemplates() {
   const [storedAttributesTemplates, setAttributesTemplates] = useLocalStorage<
     AttributesTemplate[]
   >("metadata_attributesTemplates");
@@ -73,7 +73,7 @@ export function useMetadataEditorSavedTemplates() {
               </h2>
             </div>
             <div className="modal-body">
-              <TextField name="name" />
+              <TextField name="name" inputProps={{ autoFocus: true }} />
             </div>
             <div className="modal-footer">
               <SubmitButton />
@@ -87,8 +87,16 @@ export function useMetadataEditorSavedTemplates() {
     );
   }
 
+  function deleteTemplate(templateToRemove: AttributesTemplate) {
+    const newTemplates = attributesTemplates.filter(
+      template => template !== templateToRemove
+    );
+    setAttributesTemplates(newTemplates);
+  }
+
   return {
     attributesTemplates,
+    deleteTemplate,
     openAttributesTemplateForm
   };
 }
@@ -100,6 +108,7 @@ export function MetadataEditorAttributesControls({
 }: MetadataEditorAttributesControlsProps) {
   const {
     attributesTemplates,
+    deleteTemplate,
     openAttributesTemplateForm
   } = useMetadataEditorSavedTemplates();
 
@@ -130,11 +139,18 @@ export function MetadataEditorAttributesControls({
     });
   }
 
+  function deleteSelectedTemplate() {
+    if (formikCtx.values.attributesTemplate) {
+      deleteTemplate(formikCtx.values.attributesTemplate);
+      resetAttributesLayout();
+    }
+  }
+
   return (
     <div>
       <div className="row">
         <div className="col-2">
-          <SelectField<AttributesTemplate>
+          <SelectField<AttributesTemplate | null>
             name="attributesTemplate"
             // When the template is changed
             onChange={(template: AttributesTemplate) =>
@@ -145,6 +161,16 @@ export function MetadataEditorAttributesControls({
               value: template
             }))}
           />
+        </div>
+        <div className="col-2">
+          {formikCtx.values.attributesTemplate && (
+            <FormikButton
+              className="btn btn-danger mt-4"
+              onClick={deleteSelectedTemplate}
+            >
+              <DinaMessage id="deleteThisAttributesTemplate" />
+            </FormikButton>
+          )}
         </div>
       </div>
       <div className="row">

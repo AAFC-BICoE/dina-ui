@@ -63,9 +63,9 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
               onChange={onChangeInternal}
               styles={styles}
               value={
-                isMulti
+                (isMulti
                   ? options?.filter(option => value?.includes(option.value))
-                  : options.find(option => option.value === value)
+                  : options.find(option => option.value === value)) ?? null
               }
             />
           </FieldWrapper>

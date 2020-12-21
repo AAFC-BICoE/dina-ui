@@ -17,6 +17,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   changedProperties: "Changes",
   closePreviewButtonText: "Close Preview",
   deleteButtonText: "Delete",
+  deleteThisAttributesTemplate: "Delete This Template",
   deleteSelectedButtonText: "Delete Selected",
   dinaUserSectionTitle: "Dina User",
   editObjectSubtypeTitle: "Edit Object Subtype",

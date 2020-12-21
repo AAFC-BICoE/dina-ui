@@ -1,10 +1,13 @@
 import { FastField, FieldProps } from "formik";
+import { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface TextFieldProps extends LabelWrapperParams {
   readOnly?: boolean;
   initialValue?: string;
   multiLines?: boolean;
+
+  inputProps?: InputHTMLAttributes<any> | TextareaHTMLAttributes<any>;
 }
 
 /**
@@ -12,7 +15,13 @@ export interface TextFieldProps extends LabelWrapperParams {
  * a wrapper that adds a label.
  */
 export function TextField(props: TextFieldProps) {
-  const { initialValue, readOnly, multiLines, ...labelWrapperProps } = props;
+  const {
+    initialValue,
+    readOnly,
+    multiLines,
+    inputProps: inputPropsExternal,
+    ...labelWrapperProps
+  } = props;
   const { name } = labelWrapperProps;
 
   return (
@@ -27,7 +36,8 @@ export function TextField(props: TextFieldProps) {
             setFieldTouched(name);
           }
 
-          const inputProps = {
+          const inputPropsInternal = {
+            ...inputPropsExternal,
             className: "form-control",
             onChange,
             value: value || "",
@@ -38,9 +48,9 @@ export function TextField(props: TextFieldProps) {
           // controlled input that we manually pass the "onChange" and "value" props. Otherwise
           // we will get React's warning about switching from an uncontrolled to controlled input.
           return multiLines ? (
-            <textarea {...inputProps} />
+            <textarea {...inputPropsInternal} />
           ) : (
-            <input {...inputProps} type="text" />
+            <input {...inputPropsInternal} type="text" />
           );
         }}
       </FastField>
