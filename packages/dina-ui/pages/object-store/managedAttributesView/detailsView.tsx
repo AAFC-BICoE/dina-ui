@@ -20,7 +20,10 @@ import { NextRouter, withRouter } from "next/router";
 import { useContext, useState } from "react";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ManagedAttribute } from "../../../types/objectstore-api/resources/ManagedAttribute";
+import {
+  ManagedAttribute,
+  ManagedAttributeType
+} from "../../../types/objectstore-api/resources/ManagedAttribute";
 
 interface AcceptedValueProps extends LabelWrapperParams {
   initialValues?: string[];
@@ -30,17 +33,6 @@ interface ManagedAttributeFormProps {
   profile?: ManagedAttribute;
   router: NextRouter;
 }
-
-const ATTRIBUTE_TYPE_OPTIONS = [
-  {
-    label: "Integer",
-    value: "INTEGER"
-  },
-  {
-    label: "String",
-    value: "STRING"
-  }
-];
 
 export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -90,12 +82,31 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
 
 function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
   const { save } = useContext(ApiClientContext);
+  const acceptedValueLen = profile?.acceptedValues?.length;
+  if (acceptedValueLen && profile)
+    profile.managedAttributeType = ManagedAttributeType.PICKLIST;
+
   const [type, setType] = useState(
     profile ? profile.managedAttributeType : undefined
   );
   const id = profile?.id;
   const initialValues = profile || { type: "managed-attribute" };
   const { formatMessage } = useDinaIntl();
+
+  const ATTRIBUTE_TYPE_OPTIONS = [
+    {
+      label: formatMessage("field_managedAttributeType_integer_label"),
+      value: ManagedAttributeType.INTEGER
+    },
+    {
+      label: formatMessage("field_managedAttributeType_text_label"),
+      value: ManagedAttributeType.STRING
+    },
+    {
+      label: formatMessage("field_managedAttributeType_picklist_label"),
+      value: ManagedAttributeType.PICKLIST
+    }
+  ];
 
   async function onSubmit(
     submittedValues,
@@ -108,7 +119,17 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       setStatus(formatMessage("field_managedAttributeMandatoryFieldsError"));
       setSubmitting(false);
       return;
+    } else if (
+      submittedValues.managedAttributeType === ManagedAttributeType.PICKLIST
+    ) {
+      submittedValues.managedAttributeType = ManagedAttributeType.STRING;
+    } else if (
+      submittedValues.managedAttributeType === ManagedAttributeType.INTEGER ||
+      submittedValues.managedAttributeType === ManagedAttributeType.STRING
+    ) {
+      submittedValues.acceptedValues = [];
     }
+
     try {
       await save(
         [
@@ -162,7 +183,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
             onChange={selectValue => setType(selectValue)}
           />
         </div>
-        {type === "STRING" && (
+        {type === ManagedAttributeType.PICKLIST && (
           <div>
             <h4>
               <DinaMessage id="field_managedAttributeAcceptedValue" />

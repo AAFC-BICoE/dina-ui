@@ -61,6 +61,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeMandatoryFieldsError:
     "Both name and type are mandatory fields",
   field_managedAttributeName: "Attribute Name",
+  field_managedAttributeType_integer_label: "Numerical",
+  field_managedAttributeType_picklist_label: "Pick List",
+  field_managedAttributeType_text_label: "Text",
   field_originalFilename: "Original Filename",
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",

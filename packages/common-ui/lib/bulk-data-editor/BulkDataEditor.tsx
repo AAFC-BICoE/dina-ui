@@ -12,6 +12,7 @@ import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { difference, RecursivePartial } from "./difference";
 import { getUserFriendlyAutoCompleteRenderer } from "./resource-select-cell";
 import { useBulkEditorFrontEndValidation } from "./useBulkEditorFrontEndValidation";
+import { useHeaderWidthFix } from "./useHeaderWidthFix";
 
 export interface RowChange<TRow> {
   original: TRow;
@@ -57,6 +58,8 @@ export function BulkDataEditor<TRow>({
     afterValidate,
     validationAlertJsx
   } = useBulkEditorFrontEndValidation();
+
+  const { tableWrapperRef } = useHeaderWidthFix({ columns });
 
   // Loads the initial data and shows an error message on fail:
   const loadDataInternal = safeSubmit(async () => {
@@ -107,12 +110,12 @@ export function BulkDataEditor<TRow>({
   };
 
   return (
-    <>
+    <div ref={tableWrapperRef}>
       <style>{`
         /* Prevent the handsontable header from covering the Dropdown menu options: */
-        .ht_clone_top {
+        .ht_clone_top, .ht_clone_left, .ht_clone_top_left_corner {
           z-index: 0 !important;
-        }  
+        }
       `}</style>
       <ErrorViewer />
       {validationAlertJsx}
@@ -133,7 +136,7 @@ export function BulkDataEditor<TRow>({
       >
         <CommonMessage id="submitBtnText" />
       </FormikButton>
-    </>
+    </div>
   );
 }
 
