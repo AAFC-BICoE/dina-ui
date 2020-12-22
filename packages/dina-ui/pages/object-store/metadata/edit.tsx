@@ -335,6 +335,11 @@ export default function EditMetadatasPage() {
       await save([...editedMetadatas, ...editedManagedAttributeMaps], {
         apiBaseUrl: "/objectstore-api"
       });
+
+      if (metadataIds.length === 1) {
+        await router.push(`/object-store/object/view?id=${metadataIds[0]}`);
+        return;
+      }
     } else if (objectUploadIds) {
       // When adding new Metadatas based on existing ObjectUploads:
       // Create the Metadatas:
@@ -357,11 +362,16 @@ export default function EditMetadatasPage() {
       await save(editedManagedAttributeMaps, {
         apiBaseUrl: "/objectstore-api"
       });
+
+      if (createdMetadatas.length === 1) {
+        await router.push(
+          `/object-store/object/view?id=${createdMetadatas[0].id}`
+        );
+        return;
+      }
     }
 
-    if (ids.length === 1)
-      await router.push(`/object-store/object/view?id=${ids[0]}`);
-    else await router.push("/object-store/object/list");
+    await router.push("/object-store/object/list");
   }
 
   return (
@@ -370,10 +380,10 @@ export default function EditMetadatasPage() {
       <Nav />
       <ButtonBar>
         <>
-          {ids.length === 1 ? (
+          {metadataIds?.length === 1 ? (
             <CancelButton
               entityLink="/object-store/object"
-              entityId={ids[0]}
+              entityId={metadataIds[0]}
               byPassView={false}
             />
           ) : (
