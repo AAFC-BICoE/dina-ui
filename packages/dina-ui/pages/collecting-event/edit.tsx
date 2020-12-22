@@ -119,14 +119,14 @@ function CollectingEventForm({
           <div className="row">
             <DateField
               className="col-md-3"
-              showTime={true}
+              showTime={false}
               name="startEventDateTime"
               label={formatMessage("startEventDateTimeLabel")}
             />
             {checked && (
               <DateField
                 className="col-md-3"
-                showTime={true}
+                showTime={false}
                 name="endEventDateTime"
                 label={formatMessage("endEventDateTimeLabel")}
               />
