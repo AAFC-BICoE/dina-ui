@@ -1,5 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { ManagedAttributeMap } from "./ManagedAttributeMap";
+import { DcType } from "./ObjectUpload";
 import { Person } from "./Person";
 
 export interface MetadataAttributes {
@@ -7,13 +8,6 @@ export interface MetadataAttributes {
   bucket: string;
   fileIdentifier: string;
   fileExtension?: string;
-  dcType?:
-    | "Image"
-    | "Moving Image"
-    | "Sound"
-    | "Text"
-    | "Dataset"
-    | "Undetermined";
 
   /** Refers to the License/LicenseDTO's 'url' field. */
   xmpRightsWebStatement?: string;
@@ -22,6 +16,7 @@ export interface MetadataAttributes {
   // optional fields
   dcRights?: string;
   acSubType?: string;
+  dcType?: DcType;
   acCaption?: string;
   dcFormat?: string;
   createdDate?: string;

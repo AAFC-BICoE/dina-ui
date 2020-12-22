@@ -74,6 +74,19 @@ export default function EditMetadatasPage() {
       title: formatMessage("field_acDigitizationDate")
     },
     {
+      data: "metadata.dcType",
+      source: [
+        "Image",
+        "Moving Image",
+        "Sound",
+        "Text",
+        "Dataset",
+        "Undetermined"
+      ],
+      title: formatMessage("field_dcType"),
+      type: "dropdown"
+    },
+    {
       data: "metadata.acCaption",
       title: formatMessage("field_acCaption")
     },
@@ -85,19 +98,6 @@ export default function EditMetadatasPage() {
     // New Metadata entry doesn't have access to this server-generated value yet.
     ...(metadataIds
       ? [
-          {
-            data: "metadata.dcType",
-            source: [
-              "Image",
-              "Moving Image",
-              "Sound",
-              "Text",
-              "Dataset",
-              "Undetermined"
-            ],
-            title: formatMessage("field_dcType"),
-            type: "dropdown"
-          },
           resourceSelectCell<Person>(
             {
               filter: input => ({ rsql: `displayName==*${input}*` }),
@@ -209,6 +209,7 @@ export default function EditMetadatasPage() {
             }
           : null,
         bucket: router.query.group as string,
+        dcType: objectUpload.dcType,
         fileIdentifier: objectUpload.id,
         originalFilename: objectUpload.originalFilename,
         type: "metadata"
