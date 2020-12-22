@@ -79,11 +79,7 @@ function CollectingEventForm({
   const { id } = router.query;
   const initialValues = collectingEvent || { type: "collecting-event" };
   const { formatMessage } = useDinaIntl();
-  const [visible, setVisible] = useState({ checked: false });
-
-  function setEndDateVisible(checked) {
-    setVisible({ checked });
-  }
+  const [checked, setChecked] = useState(false);
 
   const onSubmit = safeSubmit(async submittedValues => {
     await save(
@@ -122,38 +118,34 @@ function CollectingEventForm({
         <div>
           <div className="row">
             <DateField
-              className="col-md-4"
+              className="col-md-3"
               showTime={true}
               name="startEventDateTime"
               label={formatMessage("startEventDateTimeLabel")}
+            />
+            {checked && (
+              <DateField
+                className="col-md-3"
+                showTime={true}
+                name="endEventDateTime"
+                label={formatMessage("endEventDateTimeLabel")}
+              />
+            )}
+            <TextField
+              className="col-md-3"
+              name="verbatimEventDateTime"
+              label={formatMessage("verbatimEventDateTimeLabel")}
             />
           </div>
           <div className="row">
             <label style={{ marginLeft: 15 }}>
               <span>{formatMessage("enableDateRangeLabel")}</span>
               <Switch
-                onChange={e => setEndDateVisible(e)}
-                checked={visible.checked}
+                onChange={e => setChecked(e)}
+                checked={checked}
                 className="react-switch"
               />
             </label>
-          </div>
-          {visible.checked && (
-            <div className="row">
-              <DateField
-                className="col-md-4"
-                showTime={true}
-                name="endEventDateTime"
-                label={formatMessage("endEventDateTimeLabel")}
-              />
-            </div>
-          )}
-          <div className="row">
-            <TextField
-              className="col-md-6"
-              name="verbatimEventDateTime"
-              label={formatMessage("verbatimEventDateTimeLabel")}
-            />
           </div>
         </div>
       </Form>

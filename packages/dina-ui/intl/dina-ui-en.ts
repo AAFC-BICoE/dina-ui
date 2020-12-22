@@ -16,6 +16,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   cancelButtonText: "Cancel",
   changedProperties: "Changes",
   closePreviewButtonText: "Close Preview",
+  collectionSectionTitle: "Collections",
   collectingEventListTitle: "Collecting Event",
   collectingEventViewTitle: "View Collecting Event",
   deleteButtonText: "Delete",
