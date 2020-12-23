@@ -12,6 +12,7 @@ export interface MetadataAttributes {
   /** Refers to the License/LicenseDTO's 'url' field. */
   xmpRightsWebStatement?: string;
   xmpRightsUsageTerms?: string;
+  xmpRightsOwner?: string;
 
   // optional fields
   dcRights?: string;

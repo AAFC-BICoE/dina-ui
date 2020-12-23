@@ -25,6 +25,7 @@ import { useContext, useState } from "react";
 import { AddPersonButton, Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
+  DefaultValue,
   License,
   ManagedAttribute,
   ManagedAttributeMap,
@@ -94,39 +95,33 @@ export default function EditMetadatasPage() {
       data: "acTags",
       title: formatMessage("metadataBulkEditTagsLabel")
     },
-    // Only show these columns when editing existing Metadatas.
-    // New Metadata entry doesn't have access to this server-generated value yet.
-    ...(metadataIds
-      ? [
-          resourceSelectCell<Person>(
-            {
-              filter: input => ({ rsql: `displayName==*${input}*` }),
-              label: person => person.displayName,
-              model: "agent-api/person",
-              type: "person"
-            },
-            {
-              data: "dcCreator",
-              title: formatMessage("field_dcCreator.displayName")
-            }
-          ),
-          {
-            data: "metadata.dcRights",
-            title: formatMessage("field_dcRights")
-          },
-          resourceSelectCell<License>(
-            {
-              label: license => license.titles[locale] ?? license.url,
-              model: "objectstore-api/license",
-              type: "license"
-            },
-            {
-              data: "license",
-              title: formatMessage("field_license")
-            }
-          )
-        ]
-      : [])
+    resourceSelectCell<Person>(
+      {
+        filter: input => ({ rsql: `displayName==*${input}*` }),
+        label: person => person.displayName,
+        model: "agent-api/person",
+        type: "person"
+      },
+      {
+        data: "dcCreator",
+        title: formatMessage("field_dcCreator.displayName")
+      }
+    ),
+    {
+      data: "metadata.dcRights",
+      title: formatMessage("field_dcRights")
+    },
+    resourceSelectCell<License>(
+      {
+        label: license => license.titles[locale] ?? license.url,
+        model: "objectstore-api/license",
+        type: "license"
+      },
+      {
+        data: "license",
+        title: formatMessage("field_license")
+      }
+    )
   ];
 
   const [
@@ -198,7 +193,26 @@ export default function EditMetadatasPage() {
         }
       );
 
+      // Set default values for the new Metadatas:
+      const defaultValueAttributes: (keyof Metadata)[] = [
+        "xmpRightsWebStatement",
+        "dcRights",
+        "xmpRightsOwner",
+        "xmpRightsUsageTerms"
+      ];
+      const metadataDefaults: Partial<Metadata> = {};
+      for (const attribute of defaultValueAttributes) {
+        const {
+          data: [{ value }]
+        } = await apiClient.get<DefaultValue[]>(
+          "objectstore-api/default-values",
+          { filter: { type: "metadata", attribute } }
+        );
+        metadataDefaults[attribute] = value as any;
+      }
+
       const newMetadatas = objectUploads.map<Metadata>(objectUpload => ({
+        ...metadataDefaults,
         acDigitizationDate: objectUpload.dateTimeDigitized
           ? moment(objectUpload.dateTimeDigitized).format()
           : null,

@@ -104,11 +104,21 @@ const mockBulkGet = jest.fn(async paths => {
   }
 });
 
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn(async (path, params) => {
   if (path === "metadata") {
     return { data: TEST_METADATAS };
   } else if (path === "objectstore-api/license") {
     return { data: TEST_LICENSES };
+  } else if (path === "objectstore-api/default-values") {
+    return {
+      data: [
+        {
+          type: params?.filter?.type,
+          attribute: params?.filter?.attribute,
+          value: "default-value"
+        }
+      ]
+    };
   } else {
     return { data: [] };
   }
@@ -392,11 +402,14 @@ describe("Metadata bulk edit page", () => {
       .find("MockHotTable")
       .prop<BulkMetadataEditRow[]>("data");
 
+    // Expect the initial data:
     expect(tableData).toEqual([
       {
         acTags: "",
         dcCreator: "",
-        license: "",
+        // Default license is loaded:
+        license:
+          "Open Government Licence - Canada (license/open-government-license-canada)",
         metadata: {
           acDigitizationDate: "2020-12-17T23:37:45+00:00",
           acMetadataCreator: {
@@ -404,8 +417,13 @@ describe("Metadata bulk edit page", () => {
             type: "person"
           },
           bucket: "example-group",
+          dcRights: "default-value",
           fileIdentifier: "b4c8d6a6-0332-4f2a-a7b9-68b7898b6486",
           originalFilename: "test-file.png",
+          // Default rights fields are loaded from the API endpoint:
+          xmpRightsOwner: "default-value",
+          xmpRightsUsageTerms: "default-value",
+          xmpRightsWebStatement: "default-value",
           type: "metadata"
         }
       }
@@ -430,9 +448,13 @@ describe("Metadata bulk edit page", () => {
                 id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
                 type: "person"
               },
+              dcRights: "default-value",
               bucket: "example-group",
               fileIdentifier: "b4c8d6a6-0332-4f2a-a7b9-68b7898b6486",
               originalFilename: "test-file.png",
+              xmpRightsOwner: "default-value",
+              xmpRightsUsageTerms: "default-value",
+              xmpRightsWebStatement: "default-value",
               type: "metadata"
             },
             type: "metadata"
