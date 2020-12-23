@@ -201,7 +201,9 @@ export default function EditMetadatasPage() {
         {}
       );
       const metadataDefaults: Partial<Metadata> = {};
-      for (const defaultValue of defaultValues) {
+      for (const defaultValue of defaultValues.filter(
+        ({ type }) => type === "metadata"
+      )) {
         metadataDefaults[
           defaultValue.attribute as keyof Metadata
         ] = defaultValue.value as any;
