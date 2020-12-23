@@ -1,4 +1,5 @@
 import { KitsuResource } from "kitsu";
+import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
 
 export interface ManagedAttributeAttributes {
   type: string;
@@ -14,5 +15,23 @@ export enum ManagedAttributeType {
   STRING = "STRING",
   PICKLIST = "PICKLIST"
 }
+
+export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
+  labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH;
+  value: ManagedAttributeType;
+}[] = [
+  {
+    labelKey: "field_managedAttributeType_integer_label",
+    value: ManagedAttributeType.INTEGER
+  },
+  {
+    labelKey: "field_managedAttributeType_text_label",
+    value: ManagedAttributeType.STRING
+  },
+  {
+    labelKey: "field_managedAttributeType_picklist_label",
+    value: ManagedAttributeType.PICKLIST
+  }
+];
 
 export type ManagedAttribute = KitsuResource & ManagedAttributeAttributes;
