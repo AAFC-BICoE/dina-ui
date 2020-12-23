@@ -104,20 +104,37 @@ const mockBulkGet = jest.fn(async paths => {
   }
 });
 
-const mockGet = jest.fn(async (path, params) => {
+const mockGet = jest.fn(async path => {
   if (path === "metadata") {
     return { data: TEST_METADATAS };
   } else if (path === "objectstore-api/license") {
     return { data: TEST_LICENSES };
-  } else if (path === "objectstore-api/default-values") {
+  } else if (path === "objectstore-api/config/default-values") {
     return {
-      data: [
-        {
-          type: params?.filter?.type,
-          attribute: params?.filter?.attribute,
-          value: "default-value"
-        }
-      ]
+      data: {
+        values: [
+          {
+            type: "metadata",
+            attribute: "xmpRightsWebStatement",
+            value: "default-value"
+          },
+          {
+            type: "metadata",
+            attribute: "dcRights",
+            value: "default-value"
+          },
+          {
+            type: "metadata",
+            attribute: "xmpRightsOwner",
+            value: "default-value"
+          },
+          {
+            type: "metadata",
+            attribute: "xmpRightsUsageTerms",
+            value: "default-value"
+          }
+        ]
+      }
     };
   } else {
     return { data: [] };

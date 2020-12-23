@@ -194,21 +194,17 @@ export default function EditMetadatasPage() {
       );
 
       // Set default values for the new Metadatas:
-      const defaultValueAttributes: (keyof Metadata)[] = [
-        "xmpRightsWebStatement",
-        "dcRights",
-        "xmpRightsOwner",
-        "xmpRightsUsageTerms"
-      ];
+      const {
+        data: { values: defaultValues }
+      } = await apiClient.get<{ values: DefaultValue[] }>(
+        "objectstore-api/config/default-values",
+        {}
+      );
       const metadataDefaults: Partial<Metadata> = {};
-      for (const attribute of defaultValueAttributes) {
-        const {
-          data: [{ value }]
-        } = await apiClient.get<DefaultValue[]>(
-          "objectstore-api/default-values",
-          { filter: { type: "metadata", attribute } }
-        );
-        metadataDefaults[attribute] = value as any;
+      for (const defaultValue of defaultValues) {
+        metadataDefaults[
+          defaultValue.attribute as keyof Metadata
+        ] = defaultValue.value as any;
       }
 
       const newMetadatas = objectUploads.map<Metadata>(objectUpload => ({
