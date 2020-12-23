@@ -20,7 +20,11 @@ export function DateField(props: LabelWrapperParams & DateFieldProps) {
         }: FieldProps) => {
           function onChange(date: Date) {
             if (showTime) {
-              setFieldValue(name, date && date.toISOString());
+              setFieldValue(
+                name,
+                date &&
+                  date.toISOString().slice(0, date.toISOString().length - 2)
+              );
             } else {
               setFieldValue(name, date && date.toISOString().slice(0, 10));
             }

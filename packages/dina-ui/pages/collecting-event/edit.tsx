@@ -82,6 +82,7 @@ function CollectingEventForm({
   const [checked, setChecked] = useState(false);
 
   const onSubmit = safeSubmit(async submittedValues => {
+    if (!checked) delete submittedValues.endEventDateTime;
     await save(
       [
         {
@@ -119,14 +120,14 @@ function CollectingEventForm({
           <div className="row">
             <DateField
               className="col-md-3"
-              showTime={false}
+              showTime={true}
               name="startEventDateTime"
               label={formatMessage("startEventDateTimeLabel")}
             />
             {checked && (
               <DateField
                 className="col-md-3"
-                showTime={false}
+                showTime={true}
                 name="endEventDateTime"
                 label={formatMessage("endEventDateTimeLabel")}
               />
