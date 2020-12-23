@@ -204,7 +204,7 @@ export function QueryTable<TData extends KitsuResource>({
         <Tooltip
           id="queryTableMultiSortExplanation"
           visibleElement={
-            <a href="#">
+            <a href="#" aria-describedby="queryTableMultiSortExplanation">
               <CommonMessage id="queryTableMultiSortTooltipTitle" />
             </a>
           }

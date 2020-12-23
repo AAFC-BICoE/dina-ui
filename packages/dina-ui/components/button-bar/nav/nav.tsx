@@ -27,19 +27,20 @@ export function Nav() {
           <section id="wb-lng" className="text-right ml-auto col-7 col-md-8">
             <ul className="list-inline">
               <li className="list-inline-item mx-2">
-                <LanguageSelector />
-              </li>
-              <li className="list-inline-item mx-2">
                 <NavbarUserControl />
               </li>
               <li className="list-inline-item mx-2 my-auto">
                 <a
                   className="btn btn-info"
+                  style={{ backgroundColor: "#117C8D" }}
                   href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
                   target="_blank"
                 >
                   <DinaMessage id="feedbackButtonText" />
                 </a>
+              </li>
+              <li className="list-inline-item mx-2">
+                <LanguageSelector />
               </li>
             </ul>
           </section>

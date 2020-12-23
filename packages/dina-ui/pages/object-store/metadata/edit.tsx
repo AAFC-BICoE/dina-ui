@@ -63,6 +63,11 @@ export default function EditMetadatasPage() {
       title: formatMessage("field_originalFilename")
     },
     {
+      data: "metadata.acDigitizationDate",
+      readOnly: true,
+      title: formatMessage("field_acDigitizationDate")
+    },
+    {
       data: "metadata.dcType",
       source: [
         "Image",
@@ -277,7 +282,9 @@ export default function EditMetadatasPage() {
       apiBaseUrl: "/objectstore-api"
     });
 
-    await router.push("/object-store/object/list");
+    if (ids.length === 1)
+      await router.push(`/object-store/object/view?id=${ids[0]}`);
+    else await router.push("/object-store/object/list");
   }
 
   return (
@@ -285,7 +292,17 @@ export default function EditMetadatasPage() {
       <Head title={formatMessage("metadataBulkEditTitle")} />
       <Nav />
       <ButtonBar>
-        <CancelButton entityLink="/object-store/object" />
+        <>
+          {ids.length === 1 ? (
+            <CancelButton
+              entityLink="/object-store/object"
+              entityId={ids[0]}
+              byPassView={false}
+            />
+          ) : (
+            <CancelButton entityLink="/object-store/object" />
+          )}
+        </>
       </ButtonBar>
       <main className="container-fluid">
         <h1>

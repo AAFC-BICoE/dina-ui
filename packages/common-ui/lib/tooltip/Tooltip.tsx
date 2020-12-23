@@ -17,6 +17,7 @@ export function Tooltip({ id, visibleElement }: TooltipProps) {
   return (
     <span className="m-2">
       <RcTooltip
+        id={id}
         overlay={
           <div style={{ maxWidth: "15rem" }}>
             <FormattedMessage id={id} />
@@ -25,7 +26,13 @@ export function Tooltip({ id, visibleElement }: TooltipProps) {
         placement="top"
       >
         <span>
-          {visibleElement ?? <img src="/static/images/iconInformation.gif" />}
+          {visibleElement ?? (
+            <img
+              src="/static/images/iconInformation.gif"
+              alt=""
+              aria-describedby={id}
+            />
+          )}
         </span>
       </RcTooltip>
     </span>
