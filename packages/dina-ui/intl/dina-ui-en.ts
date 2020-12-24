@@ -75,6 +75,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_xmpMetadataDate_tooltip:
     "Date and time of when the record was last updated.",
   field_xmpRightsWebStatement: "Reuse Rights Statement",
+  fileTooBig: "File too big",
   footerContactInfo: "Contact information",
   footerTermsAndConditions: "Terms and conditions",
   footerPrivacy: "Privacy",

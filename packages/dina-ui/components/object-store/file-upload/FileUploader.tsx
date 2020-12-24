@@ -125,8 +125,9 @@ export function FileUploader<TValues = any>({
  */
 function CustomPreviewComponent(props) {
   const ref = useRef<HTMLDivElement>(null);
+  const { formatMessage } = useDinaIntl();
 
-  // Fix the layout for
+  // Add improvements to the per-file preview component:
   useLayoutEffect(() => {
     const img = ref.current?.querySelector("img.dzu-previewImage");
     if (img) {
@@ -137,6 +138,16 @@ function CustomPreviewComponent(props) {
         newFilenameNode.className = "dzu-previewFileName mx-3";
         newFilenameNode.innerText = props.fileWithMeta.file.name;
         img?.after(newFilenameNode);
+      }
+    }
+
+    const childSpans = ref.current?.querySelectorAll("span");
+    if (childSpans) {
+      for (const span of childSpans) {
+        // Replace the library's hard-coded file size error with our intl version:
+        if (span.innerText === "File too big") {
+          span.innerText = formatMessage("fileTooBig");
+        }
       }
     }
   });
