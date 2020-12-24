@@ -33,8 +33,8 @@ describe("FileUploader component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(FileUploader).childAt(0).prop("maxSizeBytes")).toEqual(
-      EXPECTED_MAX_FILE_SIZE_IN_BYTES
-    );
+    expect(
+      wrapper.findWhere(node => node.prop("maxSizeBytes")).prop("maxSizeBytes")
+    ).toEqual(EXPECTED_MAX_FILE_SIZE_IN_BYTES);
   });
 });

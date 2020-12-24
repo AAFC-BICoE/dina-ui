@@ -13,7 +13,7 @@ import Dropzone, {
   Preview,
   SubmitButton
 } from "react-dropzone-uploader/dist/react-dropzone-uploader";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 /** FileUploader component props. */
 export interface FileUploaderProps<TValues = any> {
@@ -84,37 +84,45 @@ export function FileUploader<TValues = any>({
       parseBytesString(humanReadableBytesString) || undefined;
 
     return (
-      <Dropzone
-        accept={acceptedFileTypes}
-        maxSizeBytes={maxSizeBytes}
-        onSubmit={acceptedFiles =>
-          safeSubmit(onSubmit)({ ...formik.values, acceptedFiles }, formik)
-        }
-        PreviewComponent={CustomPreviewComponent}
-        SubmitButtonComponent={(props: IDropzoneSubmitButtonProps) => {
-          const filesWithMeta = props.files;
-          const hasAnInvalidFileSize =
-            maxSizeBytes &&
-            filesWithMeta.filter(file => file.file.size > maxSizeBytes).length
-              ? true
-              : false;
+      <div>
+        {maxSizeBytes && (
+          <DinaMessage
+            id="uploadFilesMaxSize"
+            values={{ maxSize: humanReadableBytesString }}
+          />
+        )}
+        <Dropzone
+          accept={acceptedFileTypes}
+          maxSizeBytes={maxSizeBytes}
+          onSubmit={acceptedFiles =>
+            safeSubmit(onSubmit)({ ...formik.values, acceptedFiles }, formik)
+          }
+          PreviewComponent={CustomPreviewComponent}
+          SubmitButtonComponent={(props: IDropzoneSubmitButtonProps) => {
+            const filesWithMeta = props.files;
+            const hasAnInvalidFileSize =
+              maxSizeBytes &&
+              filesWithMeta.filter(file => file.file.size > maxSizeBytes).length
+                ? true
+                : false;
 
-          const submitDisabled = props.disabled || hasAnInvalidFileSize;
+            const submitDisabled = props.disabled || hasAnInvalidFileSize;
 
-          return formik.isSubmitting ? (
-            <LoadingSpinner loading={true} />
-          ) : (
-            <SubmitButton {...props} disabled={submitDisabled} />
-          );
-        }}
-        styles={{
-          dropzone: { overflow: "initial" },
-          inputLabel: { padding: "1.25rem" }
-        }}
-        inputContent={formatMessage("uploadFormInstructions")}
-        inputWithFilesContent={formatMessage("addFilesButton")}
-        submitButtonContent={formatMessage("submitBtnText")}
-      />
+            return formik.isSubmitting ? (
+              <LoadingSpinner loading={true} />
+            ) : (
+              <SubmitButton {...props} disabled={submitDisabled} />
+            );
+          }}
+          styles={{
+            dropzone: { overflow: "initial" },
+            inputLabel: { padding: "1.25rem" }
+          }}
+          inputContent={formatMessage("uploadFormInstructions")}
+          inputWithFilesContent={formatMessage("addFilesButton")}
+          submitButtonContent={formatMessage("submitBtnText")}
+        />
+      </div>
     );
   });
 }
