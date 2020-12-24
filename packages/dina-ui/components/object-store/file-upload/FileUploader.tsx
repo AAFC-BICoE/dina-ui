@@ -1,5 +1,13 @@
-import { LoadingSpinner, OnFormikSubmit, safeSubmit } from "common-ui";
+import { parse as parseBytesString } from "bytes";
+import {
+  LoadingSpinner,
+  OnFormikSubmit,
+  safeSubmit,
+  useQuery,
+  withResponse
+} from "common-ui";
 import { useFormikContext } from "formik";
+import { KitsuResource } from "kitsu";
 import { useLayoutEffect, useRef } from "react";
 import Dropzone, {
   Preview,
@@ -11,6 +19,20 @@ import { useDinaIntl } from "../../../intl/dina-ui-intl";
 export interface FileUploaderProps<TValues = any> {
   acceptedFileTypes: string;
   onSubmit: OnFormikSubmit<FileUploaderOnSubmitArgs<TValues>>;
+}
+
+interface IDropzoneCommonProps {
+  files: IFileWithMeta[];
+}
+
+interface IDropzoneSubmitButtonProps extends IDropzoneCommonProps {
+  className?: string;
+  buttonClassName?: string;
+  style?: React.CSSProperties;
+  buttonStyle?: React.CSSProperties;
+  disabled: boolean;
+  content?: React.ReactNode;
+  onSubmit: (files: IFileWithMeta[]) => void;
 }
 
 /** The args passed into the onSubmit prop. */
@@ -33,6 +55,11 @@ export interface IMeta {
   lastModifiedDate: string; // ISO string
 }
 
+export interface FileUploadApiConfig extends KitsuResource {
+  "max-file-size": string;
+  "max-request-size": string;
+}
+
 /**
  * File Uploader component.
  * Use this component's onSubmit prop instead of the parent Formik's onSubmit prop.
@@ -44,29 +71,52 @@ export function FileUploader<TValues = any>({
   const { formatMessage } = useDinaIntl();
   const formik = useFormikContext<TValues>();
 
-  return (
-    <Dropzone
-      accept={acceptedFileTypes}
-      onSubmit={acceptedFiles =>
-        safeSubmit(onSubmit)({ ...formik.values, acceptedFiles }, formik)
-      }
-      PreviewComponent={CustomPreviewComponent}
-      SubmitButtonComponent={props =>
-        formik.isSubmitting ? (
-          <LoadingSpinner loading={true} />
-        ) : (
-          <SubmitButton {...props} />
-        )
-      }
-      styles={{
-        dropzone: { overflow: "initial" },
-        inputLabel: { padding: "1.25rem" }
-      }}
-      inputContent={formatMessage("uploadFormInstructions")}
-      inputWithFilesContent={formatMessage("addFilesButton")}
-      submitButtonContent={formatMessage("submitBtnText")}
-    />
-  );
+  // Get the file upload config from the API:
+  const fileUploadConfigQuery = useQuery<FileUploadApiConfig>({
+    path: "objectstore-api/config/file-upload"
+  });
+
+  return withResponse(fileUploadConfigQuery, ({ data: fileUploadConfig }) => {
+    // The API uses a human-readable bytes string e.g. "2GB".
+    // Parse it to the equivalent bytes number e.g. 2147483648 for the Dropzone component.
+    const humanReadableBytesString = fileUploadConfig["max-file-size"];
+    const maxSizeBytes =
+      parseBytesString(humanReadableBytesString) || undefined;
+
+    return (
+      <Dropzone
+        accept={acceptedFileTypes}
+        maxSizeBytes={maxSizeBytes}
+        onSubmit={acceptedFiles =>
+          safeSubmit(onSubmit)({ ...formik.values, acceptedFiles }, formik)
+        }
+        PreviewComponent={CustomPreviewComponent}
+        SubmitButtonComponent={(props: IDropzoneSubmitButtonProps) => {
+          const filesWithMeta = props.files;
+          const hasAnInvalidFileSize =
+            maxSizeBytes &&
+            filesWithMeta.filter(file => file.file.size > maxSizeBytes).length
+              ? true
+              : false;
+
+          const submitDisabled = props.disabled || hasAnInvalidFileSize;
+
+          return formik.isSubmitting ? (
+            <LoadingSpinner loading={true} />
+          ) : (
+            <SubmitButton {...props} disabled={submitDisabled} />
+          );
+        }}
+        styles={{
+          dropzone: { overflow: "initial" },
+          inputLabel: { padding: "1.25rem" }
+        }}
+        inputContent={formatMessage("uploadFormInstructions")}
+        inputWithFilesContent={formatMessage("addFilesButton")}
+        submitButtonContent={formatMessage("submitBtnText")}
+      />
+    );
+  });
 }
 
 /**
