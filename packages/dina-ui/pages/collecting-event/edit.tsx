@@ -9,7 +9,8 @@ import {
   Query,
   safeSubmit,
   SubmitButton,
-  TextField
+  TextField,
+  SelectField
 } from "common-ui";
 import { Form, Formik } from "formik";
 import { useRouter, NextRouter } from "next/router";
@@ -31,7 +32,6 @@ export default function CollectingEventEditPage() {
     query: { id }
   } = router;
   const { formatMessage } = useDinaIntl();
-
   return (
     <div>
       <Head title={formatMessage("editCollectingEventTitle")} />
@@ -76,10 +76,29 @@ function CollectingEventForm({
   router
 }: CollectingEventFormProps) {
   const { save } = useContext(ApiClientContext);
+  const [displayType, setDisplayType] = useState();
   const { id } = router.query;
   const initialValues = collectingEvent || { type: "collecting-event" };
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
+  const DISPLAY_TYPE_OPTIONS = [
+    {
+      label: formatMessage("year"),
+      value: "Y"
+    },
+    {
+      label: formatMessage("yearMonth"),
+      value: "Y-M"
+    },
+    {
+      label: formatMessage("yearMonthDay"),
+      value: "Y-M-D"
+    },
+    {
+      label: formatMessage("yearMonthDayTime"),
+      value: "Y-M-D-T"
+    }
+  ];
 
   const onSubmit = safeSubmit(async submittedValues => {
     if (!checked) delete submittedValues.endEventDateTime;
@@ -118,11 +137,17 @@ function CollectingEventForm({
         </ButtonBar>
         <div>
           <div className="row">
+            <SelectField
+              name="eventDateDisplayType"
+              options={DISPLAY_TYPE_OPTIONS}
+              onChange={selectValue => setDisplayType(selectValue)}
+            />
             <DateField
               className="col-md-3"
-              showTime={true}
+              showTime={false}
               name="startEventDateTime"
               label={formatMessage("startEventDateTimeLabel")}
+              displayType={displayType}
             />
             {checked && (
               <DateField

@@ -140,5 +140,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   valueLabel: "Value",
   verbatimEventDateTimeLabel: "Verbatim Event DateTime",
   viewPreviewButtonText: "Preview",
-  whoAmITitle: "Who Am I"
+  whoAmITitle: "Who Am I",
+  year: "Year",
+  yearMonth: "Year-Month",
+  yearMonthDay: "Year-Month-Day",
+  yearMonthDayTime: "Year-Month-Day-Time"
 };
