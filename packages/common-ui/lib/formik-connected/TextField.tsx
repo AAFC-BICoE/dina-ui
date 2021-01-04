@@ -38,7 +38,7 @@ export function TextField(props: TextFieldProps) {
           // controlled input that we manually pass the "onChange" and "value" props. Otherwise
           // we will get React's warning about switching from an uncontrolled to controlled input.
           return multiLines ? (
-            <textarea {...inputProps} />
+            <textarea rows={4} {...inputProps} />
           ) : (
             <input {...inputProps} type="text" />
           );
