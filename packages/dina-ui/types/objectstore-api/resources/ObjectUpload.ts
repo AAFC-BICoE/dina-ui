@@ -1,6 +1,15 @@
 import { KitsuResource } from "kitsu";
 
+export type DcType =
+  | "Image"
+  | "Moving Image"
+  | "Sound"
+  | "Text"
+  | "Dataset"
+  | "Undetermined";
+
 export interface ObjectUploadAttributes {
+  dcType?: DcType;
   fileIdentifier: string;
   metaFileEntryVersion: string;
   originalFilename: string;
