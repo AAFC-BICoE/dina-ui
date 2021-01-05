@@ -317,7 +317,7 @@ function MetadataListWrapper({ children }) {
 
                 await router.push({
                   pathname: "/object-store/metadata/edit",
-                  query: { ids: metadataIds.join(",") }
+                  query: { metadataIds: metadataIds.join(",") }
                 });
               }}
             >

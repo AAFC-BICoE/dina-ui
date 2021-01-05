@@ -2,18 +2,17 @@
 import {
   ApiClientContext,
   ButtonBar,
+  DateField,
   DeleteButton,
   ErrorViewer,
-  FieldWrapper,
-  LabelWrapperParams,
   LoadingSpinner,
   Query,
+  safeSubmit,
   SelectField,
   SubmitButton,
-  TextField,
-  DateField
+  TextField
 } from "common-ui";
-import { Field, FieldProps, Form, Formik, FormikContextType } from "formik";
+import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { NextRouter, withRouter } from "next/router";
@@ -26,8 +25,8 @@ import {
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../../types/objectstore-api/resources/ManagedAttribute";
 
-interface AcceptedValueProps extends LabelWrapperParams {
-  initialValues?: string[];
+interface ManagedAttributeFormFields extends ManagedAttribute {
+  acceptedValuesAsLines?: string;
 }
 
 interface ManagedAttributeFormProps {
@@ -83,63 +82,82 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
 
 function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
   const { save } = useContext(ApiClientContext);
+  const { formatMessage } = useDinaIntl();
+
+  const id = profile?.id;
+
+  const initialValues: Partial<ManagedAttributeFormFields> = profile || {
+    type: "managed-attribute"
+  };
+
   const acceptedValueLen = profile?.acceptedValues?.length;
-  if (acceptedValueLen && profile)
-    profile.managedAttributeType = ManagedAttributeType.PICKLIST;
 
   const [type, setType] = useState(
-    profile ? profile.managedAttributeType : undefined
+    profile
+      ? acceptedValueLen
+        ? "PICKLIST"
+        : profile.managedAttributeType
+      : undefined
   );
-  const id = profile?.id;
-  const initialValues = profile || { type: "managed-attribute" };
-  const { formatMessage } = useDinaIntl();
+
+  if (type === "PICKLIST") {
+    initialValues.managedAttributeType = "PICKLIST";
+  }
+
+  // Convert acceptedValues to easily editable string format:
+  initialValues.acceptedValuesAsLines =
+    initialValues.acceptedValues?.concat("")?.join("\n") ?? "";
 
   const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
     ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
   );
 
-  async function onSubmit(
-    submittedValues,
-    { setStatus, setSubmitting }: FormikContextType<any>
-  ) {
-    if (
-      submittedValues.name === undefined ||
-      submittedValues.managedAttributeType === undefined
-    ) {
-      setStatus(formatMessage("field_managedAttributeMandatoryFieldsError"));
-      setSubmitting(false);
-      return;
-    } else if (
-      submittedValues.managedAttributeType === ManagedAttributeType.PICKLIST
-    ) {
-      submittedValues.managedAttributeType = ManagedAttributeType.STRING;
-    } else if (
-      submittedValues.managedAttributeType === ManagedAttributeType.INTEGER ||
-      submittedValues.managedAttributeType === ManagedAttributeType.STRING
-    ) {
-      submittedValues.acceptedValues = [];
+  async function onSubmit({
+    acceptedValuesAsLines,
+    ...managedAttribute
+  }: ManagedAttributeFormFields) {
+    // Convert user-suplied string to string array:
+    managedAttribute.acceptedValues = (acceptedValuesAsLines || "")
+      // Split by line breaks:
+      .match(/[^\r\n]+/g)
+      // Remove empty lines:
+      ?.filter(line => line.trim());
+
+    // Treat empty array or undefined as null:
+    if (!managedAttribute.acceptedValues?.length) {
+      managedAttribute.acceptedValues = null;
     }
 
-    try {
-      await save(
-        [
-          {
-            resource: submittedValues,
-            type: "managed-attribute"
-          }
-        ],
-        { apiBaseUrl: "/objectstore-api" }
+    if (!managedAttribute.name || !managedAttribute.managedAttributeType) {
+      throw new Error(
+        formatMessage("field_managedAttributeMandatoryFieldsError")
       );
-      router.push(`/object-store/managedAttributesView/listView`);
-      setSubmitting(false);
-    } catch (error) {
-      setStatus(error.message);
-      setSubmitting(false);
     }
+
+    if (managedAttribute.managedAttributeType === "PICKLIST") {
+      managedAttribute.managedAttributeType = "STRING";
+    } else if (
+      managedAttribute.managedAttributeType === "INTEGER" ||
+      managedAttribute.managedAttributeType === "STRING"
+    ) {
+      managedAttribute.acceptedValues = null;
+    }
+
+    await save(
+      [
+        {
+          resource: managedAttribute,
+          type: "managed-attribute"
+        }
+      ],
+      { apiBaseUrl: "/objectstore-api" }
+    );
+
+    await router.push(`/object-store/managedAttributesView/listView`);
   }
 
   return (
-    <Formik initialValues={initialValues} onSubmit={onSubmit}>
+    <Formik initialValues={initialValues} onSubmit={safeSubmit(onSubmit)}>
       <Form translate={undefined}>
         <ErrorViewer />
         <ButtonBar>
@@ -170,19 +188,12 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           <SelectField
             name="managedAttributeType"
             options={ATTRIBUTE_TYPE_OPTIONS}
-            onChange={selectValue => setType(selectValue)}
+            onChange={newType => setType(newType)}
           />
         </div>
-        {type === ManagedAttributeType.PICKLIST && (
-          <div>
-            <h4>
-              <DinaMessage id="field_managedAttributeAcceptedValue" />
-            </h4>
-            <AcceptedValueBuilder
-              name="acceptedValues"
-              initialValues={profile ? profile.acceptedValues : undefined}
-              hideLabel={true}
-            />
+        {type === "PICKLIST" && (
+          <div style={{ width: "300px" }}>
+            <TextField name="acceptedValuesAsLines" multiLines={true} />
           </div>
         )}
         {id && (
@@ -208,96 +219,6 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
         )}
       </Form>
     </Formik>
-  );
-}
-
-/**
- * Renders a mutable list of user inputs
- */
-function AcceptedValueBuilder({
-  className,
-  name,
-  label,
-  hideLabel,
-  initialValues
-}: AcceptedValueProps) {
-  const [values, setValues] = useState(initialValues ? initialValues : []);
-
-  return (
-    <FieldWrapper
-      className={className}
-      name={name}
-      label={label}
-      hideLabel={hideLabel}
-    >
-      <div>
-        <Field name={name}>
-          {({ form: { setFieldValue, setFieldTouched } }: FieldProps) => {
-            function onAndClick() {
-              values.push("");
-              setFieldValue(name, [...values]);
-              setFieldTouched(name);
-            }
-            function onChange(input, index) {
-              const newValues = [...values];
-              newValues.splice(index, 1, input);
-              setValues(newValues);
-              setFieldValue(name, newValues);
-              setFieldTouched(name);
-            }
-            function onRemoveClick(index) {
-              if (values.length === 1) {
-                setValues([]);
-                setFieldValue(name, undefined);
-                setFieldTouched(name);
-              } else {
-                const newValues = [...values];
-                newValues.splice(index, 1);
-                setValues(newValues);
-                setFieldValue(name, newValues);
-                setFieldTouched(name);
-              }
-            }
-
-            // The Accepted Values text input needs to be replaced with our own
-            // controlled input that we manually pass the "onChange" and "value" props. Otherwise
-            // we will get React's warning about switching from an uncontrolled to controlled input.
-            return (
-              <div>
-                <button
-                  className="list-inline-item btn btn-primary"
-                  onClick={onAndClick}
-                  type="button"
-                >
-                  Add New Accepted Value
-                </button>
-                {values &&
-                  values.map((value, index) => {
-                    return (
-                      <div key={index}>
-                        <input
-                          className="list-inline-item"
-                          type="text"
-                          name={`acceptedValue_${index}`}
-                          value={value}
-                          onChange={e => onChange(e.target.value, index)}
-                        />
-                        <button
-                          className="list-inline-item btn btn-dark"
-                          onClick={() => onRemoveClick(index)}
-                          type="button"
-                        >
-                          -
-                        </button>
-                      </div>
-                    );
-                  })}
-              </div>
-            );
-          }}
-        </Field>
-      </div>
-    </FieldWrapper>
   );
 }
 

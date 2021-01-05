@@ -5,16 +5,13 @@ export interface ManagedAttributeAttributes {
   type: string;
   name: string;
   managedAttributeType: string;
-  acceptedValues?: string[];
+  acceptedValues?: string[] | null;
   createdBy?: string;
   createdOn?: string;
   description?: Map<string, string>;
 }
-export enum ManagedAttributeType {
-  INTEGER = "INTEGER",
-  STRING = "STRING",
-  PICKLIST = "PICKLIST"
-}
+
+export type ManagedAttributeType = "INTEGER" | "STRING";
 
 export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
   labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH;

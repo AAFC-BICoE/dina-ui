@@ -57,7 +57,7 @@ const ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] = [
   },
   {
     Cell: ({ original: { acceptedValues } }) => (
-      <div>{acceptedValues?.join(", ")}</div>
+      <div>{acceptedValues?.map(val => `"${val}"`)?.join(", ")}</div>
     ),
     accessor: "acceptedValues"
   }
