@@ -1,4 +1,5 @@
 import { HotColumnProps } from "@handsontable/react";
+import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ApiClientContext,
   BulkDataEditor,
@@ -10,11 +11,12 @@ import {
   RowChange,
   SaveArgs,
   Tooltip,
+  useAccount,
   useResourceSelectCells
 } from "common-ui";
 import { Form, Formik } from "formik";
-import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
+import moment from "moment";
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
 import {
@@ -27,24 +29,27 @@ import {
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
+  DefaultValue,
   License,
   ManagedAttribute,
   ManagedAttributeMap,
   Metadata,
   Person
 } from "../../../types/objectstore-api";
+import { ObjectUpload } from "../../../types/objectstore-api/resources/ObjectUpload";
 
 /** Editable row data */
 export interface BulkMetadataEditRow {
   acTags: string;
   dcCreator: string;
   license: string;
-  metadata: PersistedResource<Metadata>;
+  metadata: Metadata;
 }
 
 export default function EditMetadatasPage() {
   const router = useRouter();
   const { apiClient, bulkGet, save } = useContext(ApiClientContext);
+  const { agentId, initialized: accountInitialized } = useAccount();
   const { formatMessage } = useDinaIntl();
   const resourceSelectCell = useResourceSelectCells();
   const [
@@ -53,6 +58,9 @@ export default function EditMetadatasPage() {
   ] = useState<ManagedAttribute[]>([]);
 
   const { locale } = useDinaIntl();
+
+  const metadataIds = router.query.metadataIds?.toString().split(",");
+  const objectUploadIds = router.query.objectUploadIds?.toString().split(",");
 
   const BUILT_IN_ATTRIBUTES_COLUMNS: HotColumnProps[] = [
     {
@@ -115,10 +123,12 @@ export default function EditMetadatasPage() {
     )
   ];
 
-  const idsQuery = String(router.query.ids);
-  const ids = idsQuery.split(",");
+  const [
+    editableBuiltInAttributes,
+    setEditableBuiltInAttributes
+  ] = useLocalStorage<string[]>("metadata_editableBuiltInAttributes");
 
-  if (!idsQuery) {
+  if ((!metadataIds && !objectUploadIds) || !accountInitialized) {
     return <LoadingSpinner loading={true} />;
   }
 
@@ -146,21 +156,80 @@ export default function EditMetadatasPage() {
   }
 
   async function loadData() {
-    const metadatas = await bulkGet<Metadata>(
-      ids.map(id => `/metadata/${id}?include=managedAttributeMap,dcCreator`),
-      {
-        apiBaseUrl: "/objectstore-api",
-        joinSpecs: [
-          // Join to persons api:
-          {
-            apiBaseUrl: "/agent-api",
-            idField: "dcCreator",
-            joinField: "dcCreator",
-            path: metadata => `person/${metadata.dcCreator.id}`
-          }
-        ]
+    const metadatas: Metadata[] = [];
+
+    // When editing existing Metadatas:
+    if (metadataIds) {
+      const existingMetadatas = await bulkGet<Metadata>(
+        metadataIds.map(
+          id => `/metadata/${id}?include=managedAttributeMap,dcCreator`
+        ),
+        {
+          apiBaseUrl: "/objectstore-api",
+          joinSpecs: [
+            // Join to persons api:
+            {
+              apiBaseUrl: "/agent-api",
+              idField: "dcCreator",
+              joinField: "dcCreator",
+              path: metadata => `person/${metadata.dcCreator.id}`
+            }
+          ]
+        }
+      );
+
+      metadatas.push(...existingMetadatas);
+
+      // When adding new Metadatas based on existing ObjectUploads:
+    } else if (objectUploadIds) {
+      const objectUploads = await bulkGet<ObjectUpload>(
+        objectUploadIds.map(id => `/object-upload/${id}`),
+        {
+          apiBaseUrl: "/objectstore-api"
+        }
+      );
+
+      // Set default values for the new Metadatas:
+      const {
+        data: { values: defaultValues }
+      } = await apiClient.get<{ values: DefaultValue[] }>(
+        "objectstore-api/config/default-values",
+        {}
+      );
+      const metadataDefaults: Partial<Metadata> = {};
+      for (const defaultValue of defaultValues.filter(
+        ({ type }) => type === "metadata"
+      )) {
+        metadataDefaults[
+          defaultValue.attribute as keyof Metadata
+        ] = defaultValue.value as any;
       }
-    );
+
+      const newMetadatas = objectUploads.map<Metadata>(objectUpload => ({
+        ...metadataDefaults,
+        acDigitizationDate: objectUpload.dateTimeDigitized
+          ? moment(objectUpload.dateTimeDigitized).format()
+          : null,
+        acMetadataCreator: agentId
+          ? {
+              id: agentId,
+              type: "person"
+            }
+          : null,
+        bucket: router.query.group as string,
+        dcType: objectUpload.dcType,
+        fileIdentifier: objectUpload.id,
+        originalFilename: objectUpload.originalFilename,
+        type: "metadata"
+      }));
+
+      metadatas.push(...newMetadatas);
+    } else {
+      // Shouldn't happen:
+      throw new Error(
+        "No Metadata IDs or ObjectUpload IDs were provided to load."
+      );
+    }
 
     const managedAttributesInUse = await getManagedAttributesInUse(metadatas);
     setInitialEditableManagedAttributes(managedAttributesInUse);
@@ -210,6 +279,8 @@ export default function EditMetadatasPage() {
         const metadataEdit = {
           id,
           type,
+          // When adding new Metadatas, add the required fields from the ObjectUpload:
+          ...(!id ? row.original.metadata : {}),
           ...metadata
         } as Metadata;
 
@@ -271,9 +342,46 @@ export default function EditMetadatasPage() {
 
     editedManagedAttributeMaps.forEach(saveArg => delete saveArg.resource.id);
 
-    await save([...editedMetadatas, ...editedManagedAttributeMaps], {
-      apiBaseUrl: "/objectstore-api"
-    });
+    if (metadataIds) {
+      // When editing existing Metadatas:
+      await save([...editedMetadatas, ...editedManagedAttributeMaps], {
+        apiBaseUrl: "/objectstore-api"
+      });
+
+      if (metadataIds.length === 1) {
+        await router.push(`/object-store/object/view?id=${metadataIds[0]}`);
+        return;
+      }
+    } else if (objectUploadIds) {
+      // When adding new Metadatas based on existing ObjectUploads:
+      // Create the Metadatas:
+      const createdMetadatas = await save(editedMetadatas, {
+        apiBaseUrl: "/objectstore-api"
+      });
+
+      createdMetadatas.forEach((createdMetadata, index) => {
+        // Set the original row's Metadata ID so if the Managed Attribute Map fails, you don't create duplicate Metadats:
+        changes[index].original.metadata.id = createdMetadata.id;
+
+        // Link the managed attribute value with the newly created Metadata ID:
+        editedManagedAttributeMaps[index].resource.metadata = {
+          id: createdMetadata.id,
+          type: "metadata"
+        } as Metadata;
+      });
+
+      // Create the Managed Attribute Values:
+      await save(editedManagedAttributeMaps, {
+        apiBaseUrl: "/objectstore-api"
+      });
+
+      if (createdMetadatas.length === 1) {
+        await router.push(
+          `/object-store/object/view?id=${createdMetadatas[0].id}`
+        );
+        return;
+      }
+    }
 
     await router.push("/object-store/object/list");
   }
@@ -289,7 +397,17 @@ export default function EditMetadatasPage() {
       <Head title={formatMessage("metadataBulkEditTitle")} />
       <Nav />
       <ButtonBar>
-        <CancelButton entityLink="/object-store/object" />
+        <>
+          {metadataIds?.length === 1 ? (
+            <CancelButton
+              entityLink="/object-store/object"
+              entityId={metadataIds[0]}
+              byPassView={false}
+            />
+          ) : (
+            <CancelButton entityLink="/object-store/object" />
+          )}
+        </>
       </ButtonBar>
       <main className="container-fluid">
         <h1>
@@ -326,6 +444,7 @@ export default function EditMetadatasPage() {
                     columns={columns}
                     loadData={loadData}
                     onSubmit={onSubmit}
+                    submitUnchangedRows={objectUploadIds ? true : false}
                   />
                 </Form>
               );

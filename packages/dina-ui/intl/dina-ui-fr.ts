@@ -24,6 +24,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   editSelectedButtonText: "Modifier les éléments sélectionnés",
   feedbackButtonText: "Commentaires",
   field_acCaption: "Légende",
+  field_acceptedValuesAsLines: "Valeur acceptée",
   field_acDerivedFrom: "Tiré de",
   field_acDigitizationDate: "Date de création de la version originale",
   field_acHashFunction: "Fonction de hachage",
@@ -49,7 +50,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_editableManagedAttributes: "Attributs gérés",
   field_email: "Courriel",
   field_license: "Licence",
-  field_managedAttributeAcceptedValue: "Valeur acceptée",
   field_managedAttributeCreatedBy: "Créé par",
   field_managedAttributeCreatedOn: "Créé le",
   field_managedAttributeMandatoryFieldsError:

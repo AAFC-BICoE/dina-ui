@@ -32,6 +32,11 @@ export async function serialize<TData extends KitsuResource>({
   // Create a copy of the resource so the original is not affected.
   const resourceCopy = { ...resource };
 
+  // Get rid of undefined IDs, which can cause errors:
+  if (typeof resourceCopy.id === "undefined") {
+    delete resourceCopy.id;
+  }
+
   // kitsu's serializer doesn't handle relationships that have been set to null.
   // Handle them manually here, where { id: null } counts as a null relationship.
   const nullRelationships = getNullRelationships(resourceCopy);

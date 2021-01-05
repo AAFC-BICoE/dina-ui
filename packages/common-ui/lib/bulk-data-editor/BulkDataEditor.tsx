@@ -12,6 +12,7 @@ import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { difference, RecursivePartial } from "./difference";
 import { getUserFriendlyAutoCompleteRenderer } from "./resource-select-cell";
 import { useBulkEditorFrontEndValidation } from "./useBulkEditorFrontEndValidation";
+import { useHeaderWidthFix } from "./useHeaderWidthFix";
 
 export interface RowChange<TRow> {
   original: TRow;
@@ -26,12 +27,19 @@ export interface BulkDataEditorProps<TRow> {
     formikValues: any,
     formikActions: FormikContextType<any>
   ) => Promise<void>;
+
+  /**
+   * Submit unchanged rows, e.g. when inserting new data instead of editing existing data.
+   * Default false.
+   */
+  submitUnchangedRows?: boolean;
 }
 
 export function BulkDataEditor<TRow>({
   columns,
   loadData,
-  onSubmit
+  onSubmit,
+  submitUnchangedRows = false
 }: BulkDataEditorProps<TRow>) {
   type TableData = TRow[];
 
@@ -50,6 +58,8 @@ export function BulkDataEditor<TRow>({
     afterValidate,
     validationAlertJsx
   } = useBulkEditorFrontEndValidation();
+
+  const { tableWrapperRef } = useHeaderWidthFix({ columns });
 
   // Loads the initial data and shows an error message on fail:
   const loadDataInternal = safeSubmit(async () => {
@@ -90,7 +100,9 @@ export function BulkDataEditor<TRow>({
       })
     );
 
-    const editedDiffs = diffs.filter(diff => !isEmpty(diff.changes));
+    const editedDiffs = submitUnchangedRows
+      ? diffs
+      : diffs.filter(diff => !isEmpty(diff.changes));
 
     await onSubmit(editedDiffs, formikValues, formikActions);
 
@@ -98,12 +110,12 @@ export function BulkDataEditor<TRow>({
   };
 
   return (
-    <>
+    <div ref={tableWrapperRef}>
       <style>{`
         /* Prevent the handsontable header from covering the Dropdown menu options: */
-        .ht_clone_top {
+        .ht_clone_top, .ht_clone_left, .ht_clone_top_left_corner {
           z-index: 0 !important;
-        }  
+        }
       `}</style>
       <ErrorViewer />
       {validationAlertJsx}
@@ -124,7 +136,7 @@ export function BulkDataEditor<TRow>({
       >
         <CommonMessage id="submitBtnText" />
       </FormikButton>
-    </>
+    </div>
   );
 }
 
