@@ -84,14 +84,17 @@ export default function MetadataViewPage() {
         : metadata.fileIdentifier;
 
     const filePath = `/api/objectstore-api/file/${metadata.bucket}/${fileId}`;
-    const fileType = metadata.fileExtension.replace(/\./, "").toLowerCase();
+    // fileExtension should always be available when getting the Metadata from the back-end:
+    const fileType = (metadata.fileExtension as string)
+      .replace(/\./, "")
+      .toLowerCase();
 
     return (
       <div>
         <Head title={metadata.originalFilename} />
         <Nav />
         <ButtonBar>
-          <Link href={`/object-store/metadata/edit?ids=${id}`}>
+          <Link href={`/object-store/metadata/edit?metadataIds=${id}`}>
             <a className="btn btn-primary">
               <DinaMessage id="editButtonText" />
             </a>
@@ -123,7 +126,7 @@ export default function MetadataViewPage() {
             <div className="col-md-8">
               <div className="container">
                 <div className="form-group">
-                  <Link href={`/object-store/metadata/edit?ids=${id}`}>
+                  <Link href={`/object-store/metadata/edit?metadataIds=${id}`}>
                     <a className="btn btn-primary">
                       <DinaMessage id="editButtonText" />
                     </a>
