@@ -6,13 +6,12 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 const COLLECTING_EVENT_FILTER_ATTRIBUTES = ["createdBy"];
 const COLLECTING_EVENT_TABLE_COLUMNS = [
   {
-    Cell: ({ original: { id } }) => (
-      <Link href={`/collecting-event/view?id=${id}`} />
+    Cell: ({ original: { id, createdBy } }) => (
+      <Link href={`/collecting-event/view?id=${id}`}>{createdBy}</Link>
     ),
-    accessor: "id",
+    accessor: "createdBy",
     sortable: false
   },
-  "createdBy",
   dateCell("startEventDateTime"),
   dateCell("endEventDateTime"),
   "verbatimEventDateTime",

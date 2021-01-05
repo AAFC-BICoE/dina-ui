@@ -31,7 +31,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
         />
       </ButtonBar>
       <Query<CollectingEvent>
-        query={{ path: `agent-api/collecting-event/${id}` }}
+        query={{ path: `collection-api/collecting-event/${id}` }}
       >
         {({ loading, response }) => {
           const collectingEvent = response && {
