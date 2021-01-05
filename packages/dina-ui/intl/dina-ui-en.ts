@@ -77,6 +77,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_xmpMetadataDate_tooltip:
     "Date and time of when the record was last updated.",
   field_xmpRightsWebStatement: "Reuse Rights Statement",
+  fileTooBig: "File too big",
   footerContactInfo: "Contact information",
   footerTermsAndConditions: "Terms and conditions",
   footerPrivacy: "Privacy",
@@ -132,6 +133,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   uploadButtonText: "Upload",
   uploadFormInstructions:
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
+  uploadFilesMaxSize: "The maximum file size is {maxSize}.",
   uploadPageTitle: "Upload Files",
   userMustBelongToGroup: "User must belong to a Group",
   valueLabel: "Value",
