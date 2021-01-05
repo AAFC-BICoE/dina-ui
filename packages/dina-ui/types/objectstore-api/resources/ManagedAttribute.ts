@@ -11,7 +11,7 @@ export interface ManagedAttributeAttributes {
   description?: Map<string, string>;
 }
 
-export type ManagedAttributeType = "INTEGER" | "STRING";
+export type ManagedAttributeType = "INTEGER" | "STRING" | "PICKLIST";
 
 export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
   labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH;
@@ -19,15 +19,15 @@ export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
 }[] = [
   {
     labelKey: "field_managedAttributeType_integer_label",
-    value: ManagedAttributeType.INTEGER
+    value: "INTEGER"
   },
   {
     labelKey: "field_managedAttributeType_text_label",
-    value: ManagedAttributeType.STRING
+    value: "STRING"
   },
   {
     labelKey: "field_managedAttributeType_picklist_label",
-    value: ManagedAttributeType.PICKLIST
+    value: "PICKLIST"
   }
 ];
 
