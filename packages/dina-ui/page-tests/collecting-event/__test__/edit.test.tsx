@@ -202,6 +202,10 @@ describe("collecting-event edit page", () => {
       apiContext
     });
 
+    // Need to emulate by setting the value to test back end error is actually rendered
+    wrapper.find(".startEventDateTime input").simulate("change", {
+      target: { name: "startEventDateTime", value: "2020" }
+    });
     // Submit the form.
     wrapper.find("form").simulate("submit");
 

@@ -158,7 +158,7 @@ function CollectingEventForm({
         <div>
           <div className="row">
             <TextField
-              className="col-md-3"
+              className="col-md-3 startEventDateTime"
               name="startEventDateTime"
               label={formatMessage("startEventDateTimeLabel")}
               placeholder={"YYYY_MM_DD_HH_MM_SS_MMM"}
