@@ -15,6 +15,7 @@ import {
 import { Form, Formik } from "formik";
 import { useRouter, NextRouter } from "next/router";
 import { useContext } from "react";
+import { useEffect } from "react";
 import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -76,29 +77,10 @@ function CollectingEventForm({
   router
 }: CollectingEventFormProps) {
   const { save } = useContext(ApiClientContext);
-  const [displayType, setDisplayType] = useState();
   const { id } = router.query;
   const initialValues = collectingEvent || { type: "collecting-event" };
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
-  const DISPLAY_TYPE_OPTIONS = [
-    {
-      label: formatMessage("year"),
-      value: "Y"
-    },
-    {
-      label: formatMessage("yearMonth"),
-      value: "Y-M"
-    },
-    {
-      label: formatMessage("yearMonthDay"),
-      value: "Y-M-D"
-    },
-    {
-      label: formatMessage("yearMonthDayTime"),
-      value: "Y-M-D-T"
-    }
-  ];
 
   const onSubmit = safeSubmit(async submittedValues => {
     if (!checked) delete submittedValues.endEventDateTime;
@@ -137,24 +119,18 @@ function CollectingEventForm({
         </ButtonBar>
         <div>
           <div className="row">
-            <SelectField
-              name="eventDateDisplayType"
-              options={DISPLAY_TYPE_OPTIONS}
-              onChange={selectValue => setDisplayType(selectValue)}
-            />
-            <DateField
+            <TextField
               className="col-md-3"
-              showTime={false}
               name="startEventDateTime"
               label={formatMessage("startEventDateTimeLabel")}
-              displayType={displayType}
+              placeholder={"YYYY-MM-DD"}
             />
             {checked && (
-              <DateField
+              <TextField
                 className="col-md-3"
-                showTime={true}
                 name="endEventDateTime"
                 label={formatMessage("endEventDateTimeLabel")}
+                placeholder={"YYYY-MM-DD"}
               />
             )}
             <TextField
