@@ -48,6 +48,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_acSubType: "Object SubType",
   field_acTags: "Tags",
   "field_dcCreator.displayName": "Digitized By",
+  field_collectingEvent_endDateTimeError:
+    "End event datetime format must be a subset of : YYYY-MM-DD-HH-MM-SS-MMM, inclusive",
+  field_collectingEvent_startDateTimeError:
+    "Start event datetime format must be a subset of: YYYY-MM-DD-HH-MM-SS-MMM, inclusive",
   field_createdBy: "Created By",
   field_createdDate: "Created Date",
   field_createdOn: "Created On",

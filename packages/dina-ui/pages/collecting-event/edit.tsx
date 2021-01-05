@@ -12,7 +12,7 @@ import {
   TextField,
   SelectField
 } from "common-ui";
-import { Form, Formik } from "formik";
+import { Form, Formik, FormikContextType } from "formik";
 import { useRouter, NextRouter } from "next/router";
 import { useContext } from "react";
 import { useEffect } from "react";
@@ -82,21 +82,59 @@ function CollectingEventForm({
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
 
-  const onSubmit = safeSubmit(async submittedValues => {
-    if (!checked) delete submittedValues.endEventDateTime;
-    await save(
-      [
-        {
-          resource: submittedValues,
-          type: "collecting-event"
-        }
-      ],
-      {
-        apiBaseUrl: "/collection-api"
+  const onSubmit = safeSubmit(
+    async (
+      submittedValues,
+      { setStatus, setSubmitting }: FormikContextType<any>
+    ) => {
+      if (!checked) delete submittedValues.endEventDateTime;
+      if (submittedValues.startEventDateTime === undefined) {
+        setStatus(formatMessage("field_collectingEvent_startDateTimeError"));
+        setSubmitting(false);
+        return;
       }
-    );
-    await router.push(`/collecting-event/list`);
-  });
+      const matcher = /([^\d]+)/g;
+      const startDateTime = submittedValues.startEventDateTime.replace(
+        matcher,
+        ""
+      );
+      const datePrecision = [4, 6, 8, 12, 14, 17];
+      if (
+        datePrecision.filter(precision => precision === startDateTime.length)
+          .length !== 1
+      ) {
+        setStatus(formatMessage("field_collectingEvent_startDateTimeError"));
+        setSubmitting(false);
+        return;
+      }
+      if (checked) {
+        const endDateTime = submittedValues.endEventDateTime.replace(
+          matcher,
+          ""
+        );
+        if (
+          datePrecision.filter(precision => precision === endDateTime.length)
+            .length !== 1
+        ) {
+          setStatus(formatMessage("field_collectingEvent_endDateTimeError"));
+          setSubmitting(false);
+          return;
+        }
+      }
+      await save(
+        [
+          {
+            resource: submittedValues,
+            type: "collecting-event"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      );
+      await router.push(`/collecting-event/list`);
+    }
+  );
 
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
@@ -123,14 +161,14 @@ function CollectingEventForm({
               className="col-md-3"
               name="startEventDateTime"
               label={formatMessage("startEventDateTimeLabel")}
-              placeholder={"YYYY-MM-DD"}
+              placeholder={"YYYY_MM_DD_HH_MM_SS_MMM"}
             />
             {checked && (
               <TextField
                 className="col-md-3"
                 name="endEventDateTime"
                 label={formatMessage("endEventDateTimeLabel")}
-                placeholder={"YYYY-MM-DD"}
+                placeholder={"YYYY_MM_DD_HH_MM_SS_MMM"}
               />
             )}
             <TextField
