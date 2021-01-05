@@ -71,13 +71,16 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
     const metadata = response.data;
 
     const filePath = `/api/objectstore-api/file/${metadata.bucket}/${metadata.fileIdentifier}`;
-    const fileType = metadata.fileExtension.replace(/\./, "").toLowerCase();
+    // fileExtension should always be available when getting the Metadata from the back-end:
+    const fileType = (metadata.fileExtension as string)
+      .replace(/\./, "")
+      .toLowerCase();
 
     return (
       <div className="metadata-preview">
         <style>{METADATA_PREVIEW_STYLE}</style>
         <div className="metadata-edit-link">
-          <Link href={`/object-store/metadata/edit?ids=${metadataId}`}>
+          <Link href={`/object-store/metadata/edit?metadataIds=${metadataId}`}>
             <a className="btn btn-primary metadata-edit-link">
               <DinaMessage id="editButtonText" />
             </a>

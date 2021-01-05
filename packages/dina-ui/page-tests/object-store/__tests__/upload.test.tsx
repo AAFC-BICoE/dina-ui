@@ -112,60 +112,16 @@ describe("Upload page", () => {
       { transformResponse: fileUploadErrorHandler }
     );
 
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            acDigitizationDate: "2003-12-14T12:01:44+00:00",
-            acMetadataCreator: {
-              id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
-              type: "person"
-            },
-            bucket: "example-group",
-            fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
-            type: "metadata"
-          },
-          type: "metadata"
-        },
-        {
-          resource: {
-            acDigitizationDate: "2003-12-14T12:01:44+00:00",
-            acMetadataCreator: {
-              id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
-              type: "person"
-            },
-            bucket: "example-group",
-            fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
-            type: "metadata"
-          },
-          type: "metadata"
-        },
-        {
-          resource: {
-            acDigitizationDate: "2003-12-14T12:01:44+00:00",
-            acMetadataCreator: {
-              id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
-              type: "person"
-            },
-            bucket: "example-group",
-            fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
-            type: "metadata"
-          },
-          type: "metadata"
-        }
-      ],
-      { apiBaseUrl: "/objectstore-api" }
-    );
-
     // You should get redirected to the bulk edit page with the new metadata IDs.
     expect(mockPush).lastCalledWith({
       pathname: "/object-store/metadata/edit",
       query: {
-        ids: [
-          "11111111-1111-1111-1111-111111111111",
-          "11111111-1111-1111-1111-111111111111",
-          "11111111-1111-1111-1111-111111111111"
-        ].join()
+        group: "example-group",
+        objectUploadIds: [
+          "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
+          "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
+          "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73"
+        ].join(",")
       }
     });
   });

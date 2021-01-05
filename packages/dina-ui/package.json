@@ -1,6 +1,6 @@
 {
   "name": "dina-ui",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "scripts": {
     "build": "run-s next:build next:export",
     "dev": "next",
@@ -17,6 +17,7 @@
   "dependencies": {
     "blob": "0.1.0",
     "bootstrap": "^4.5.0",
+    "bytes": "^3.1.0",
     "common-ui": "link:../common-ui",
     "moment": "^2.27.0",
     "next-transpile-modules": "^4.1.0",
@@ -28,7 +29,8 @@
     "react-tabs": "^3.0.0"
   },
   "devDependencies": {
-    "@testing-library/react": "^10.4.4"
+    "@testing-library/react": "^10.4.4",
+    "@types/bytes": "^3.1.0"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
