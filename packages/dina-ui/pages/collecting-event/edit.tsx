@@ -107,7 +107,7 @@ function CollectingEventForm({
         setSubmitting(false);
         return;
       }
-      if (checked) {
+      if (checked && submittedValues.endEventDateTime) {
         const endDateTime = submittedValues.endEventDateTime.replace(
           matcher,
           ""
@@ -161,14 +161,14 @@ function CollectingEventForm({
               className="col-md-3 startEventDateTime"
               name="startEventDateTime"
               label={formatMessage("startEventDateTimeLabel")}
-              placeholder={"YYYY_MM_DD_HH_MM_SS_MMM"}
+              placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
             {checked && (
               <TextField
                 className="col-md-3"
                 name="endEventDateTime"
                 label={formatMessage("endEventDateTimeLabel")}
-                placeholder={"YYYY_MM_DD_HH_MM_SS_MMM"}
+                placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
               />
             )}
             <TextField

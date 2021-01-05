@@ -43,8 +43,8 @@ describe("collecting-event edit page", () => {
         {
           data: {
             attributes: {
-              startEventDateTime: "12/21/2019, 4:00 PM",
-              endEventDateTime: "12/22/2019, 4:00 PM",
+              startEventDateTime: "12/21/2019T16:00",
+              endEventDateTime: "12/22/2019T16:00",
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm"
             },
             id: "1",
@@ -78,6 +78,13 @@ describe("collecting-event edit page", () => {
     // renders end event datetime
     expect(wrapper.find(".endEventDateTime-field")).toHaveLength(1);
 
+    wrapper.find(".startEventDateTime-field input").simulate("change", {
+      target: {
+        name: "startEventDateTime",
+        value: "12/21/2019T16:00"
+      }
+    });
+
     // Edit the verbatime datetime
     wrapper.find(".verbatimEventDateTime-field input").simulate("change", {
       target: {
@@ -98,6 +105,7 @@ describe("collecting-event edit page", () => {
           path: "collecting-event",
           value: {
             attributes: {
+              startEventDateTime: "12/21/2019T16:00",
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
             },
             id: "00000000-0000-0000-0000-000000000000",
@@ -135,6 +143,13 @@ describe("collecting-event edit page", () => {
     // Wait for the form to load.
     await new Promise(setImmediate);
     wrapper.update();
+
+    wrapper.find(".startEventDateTime-field input").simulate("change", {
+      target: {
+        name: "startEventDateTime",
+        value: "12/21/2019T16:00"
+      }
+    });
 
     // Check that the existing value is in the field.
     expect(
