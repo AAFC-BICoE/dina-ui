@@ -1,5 +1,4 @@
 import { HotColumnProps } from "@handsontable/react";
-import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ApiClientContext,
   BulkDataEditor,
@@ -122,11 +121,6 @@ export default function EditMetadatasPage() {
       }
     )
   ];
-
-  const [
-    editableBuiltInAttributes,
-    setEditableBuiltInAttributes
-  ] = useLocalStorage<string[]>("metadata_editableBuiltInAttributes");
 
   if ((!metadataIds && !objectUploadIds) || !accountInitialized) {
     return <LoadingSpinner loading={true} />;
