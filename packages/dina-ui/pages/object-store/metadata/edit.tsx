@@ -1,5 +1,4 @@
 import { HotColumnProps } from "@handsontable/react";
-import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ApiClientContext,
   BulkDataEditor,
@@ -7,12 +6,9 @@ import {
   CancelButton,
   decodeResourceCell,
   encodeResourceCell,
-  filterBy,
   LoadingSpinner,
-  ResourceSelectField,
   RowChange,
   SaveArgs,
-  SelectField,
   Tooltip,
   useAccount,
   useResourceSelectCells
@@ -22,7 +18,14 @@ import { noop } from "lodash";
 import moment from "moment";
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
-import { AddPersonButton, Footer, Head, Nav } from "../../../components";
+import {
+  AddPersonButton,
+  Footer,
+  Head,
+  MetadataEditorAttributesControls,
+  MetadataEditorControls,
+  Nav
+} from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   DefaultValue,
@@ -40,11 +43,6 @@ export interface BulkMetadataEditRow {
   dcCreator: string;
   license: string;
   metadata: Metadata;
-}
-
-interface FormControls {
-  editableBuiltInAttributes: string[];
-  editableManagedAttributes: ManagedAttribute[];
 }
 
 export default function EditMetadatasPage() {
@@ -124,11 +122,6 @@ export default function EditMetadatasPage() {
     )
   ];
 
-  const [
-    editableBuiltInAttributes,
-    setEditableBuiltInAttributes
-  ] = useLocalStorage<string[]>("metadata_editableBuiltInAttributes");
-
   if ((!metadataIds && !objectUploadIds) || !accountInitialized) {
     return <LoadingSpinner loading={true} />;
   }
@@ -136,7 +129,7 @@ export default function EditMetadatasPage() {
   /**
    * Initializes the editable managed attributes based on what attributes are set on the metadatas.
    */
-  async function initEditableManagedAttributes(metadatas: Metadata[]) {
+  async function getManagedAttributesInUse(metadatas: Metadata[]) {
     // Loop through the metadatas and find which managed attributes are set:
     const managedAttributeIdMap: Record<string, true> = {};
     for (const metadata of metadatas) {
@@ -153,8 +146,7 @@ export default function EditMetadatasPage() {
       { apiBaseUrl: "/objectstore-api" }
     );
 
-    // Set the attributes in component state; These are used to re-initialize the Formik controls:
-    setInitialEditableManagedAttributes(newInitialEditableManagedAttributes);
+    return newInitialEditableManagedAttributes;
   }
 
   async function loadData() {
@@ -181,8 +173,6 @@ export default function EditMetadatasPage() {
       );
 
       metadatas.push(...existingMetadatas);
-
-      await initEditableManagedAttributes(metadatas);
 
       // When adding new Metadatas based on existing ObjectUploads:
     } else if (objectUploadIds) {
@@ -234,6 +224,9 @@ export default function EditMetadatasPage() {
         "No Metadata IDs or ObjectUpload IDs were provided to load."
       );
     }
+
+    const managedAttributesInUse = await getManagedAttributesInUse(metadatas);
+    setInitialEditableManagedAttributes(managedAttributesInUse);
 
     const newTableData = await Promise.all(
       metadatas.map<Promise<BulkMetadataEditRow>>(async metadata => {
@@ -387,6 +380,12 @@ export default function EditMetadatasPage() {
     await router.push("/object-store/object/list");
   }
 
+  const initialFormControls: MetadataEditorControls = {
+    attributesTemplate: null,
+    editableBuiltInAttributes: BUILT_IN_ATTRIBUTES_COLUMNS.map(col => col.data),
+    editableManagedAttributes: initialEditableManagedAttributes
+  };
+
   return (
     <div>
       <Head title={formatMessage("metadataBulkEditTitle")} />
@@ -409,14 +408,9 @@ export default function EditMetadatasPage() {
           <DinaMessage id="metadataBulkEditTitle" />
         </h1>
         <div className="form-group">
-          <Formik<FormControls>
+          <Formik<MetadataEditorControls>
             enableReinitialize={true}
-            initialValues={{
-              editableBuiltInAttributes:
-                editableBuiltInAttributes ??
-                BUILT_IN_ATTRIBUTES_COLUMNS.map(col => col.data),
-              editableManagedAttributes: initialEditableManagedAttributes
-            }}
+            initialValues={initialFormControls}
             onSubmit={noop}
           >
             {controlsForm => {
@@ -433,26 +427,9 @@ export default function EditMetadatasPage() {
 
               return (
                 <Form translate={undefined}>
-                  <div className="row">
-                    <SelectField
-                      className="col-6 editable-builtin-attributes-select"
-                      onChange={setEditableBuiltInAttributes}
-                      name="editableBuiltInAttributes"
-                      isMulti={true}
-                      options={BUILT_IN_ATTRIBUTES_COLUMNS.map(col => ({
-                        label: col.title ?? "",
-                        value: col.data
-                      }))}
-                    />
-                    <ResourceSelectField<ManagedAttribute>
-                      className="col-2 editable-managed-attributes-select"
-                      filter={filterBy(["name"])}
-                      name="editableManagedAttributes"
-                      isMulti={true}
-                      model="objectstore-api/managed-attribute"
-                      optionLabel={attr => attr.name}
-                    />
-                  </div>
+                  <MetadataEditorAttributesControls
+                    builtInAttributes={BUILT_IN_ATTRIBUTES_COLUMNS}
+                  />
                   <div className="form-group">
                     <AddPersonButton />
                     <Tooltip id="addPersonPopupTooltip" />

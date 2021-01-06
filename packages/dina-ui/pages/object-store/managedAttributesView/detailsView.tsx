@@ -21,6 +21,7 @@ import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   ManagedAttribute,
+  ManagedAttributeType,
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../../types/objectstore-api/resources/ManagedAttribute";
 
@@ -187,7 +188,9 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           <SelectField
             name="managedAttributeType"
             options={ATTRIBUTE_TYPE_OPTIONS}
-            onChange={newType => setType(newType)}
+            onChange={(selectValue: ManagedAttributeType) =>
+              setType(selectValue)
+            }
           />
         </div>
         {type === "PICKLIST" && (

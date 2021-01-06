@@ -86,6 +86,9 @@ jest.mock("next/dynamic", () => () => {
 });
 
 const mockBulkGet = jest.fn(async paths => {
+  if (paths.length === 0) {
+    return [];
+  }
   if ((paths[0] as string).startsWith("/metadata/")) {
     return TEST_METADATAS;
   }

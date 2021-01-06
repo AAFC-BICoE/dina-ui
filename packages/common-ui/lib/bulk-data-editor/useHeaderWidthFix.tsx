@@ -1,5 +1,5 @@
 import { GridSettings } from "handsontable";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 interface HeaderWidthFixParams {
   columns: GridSettings[];
@@ -12,8 +12,8 @@ interface HeaderWidthFixParams {
 export function useHeaderWidthFix({ columns }: HeaderWidthFixParams) {
   const tableWrapperRef = useRef<HTMLDivElement>(null);
 
-  // Whenever the columns change, run some code to manually set the width of the header row:
-  useEffect(() => {
+  /** Manually sets the width of the header row to the correct value. */
+  const fixWidth = useCallback(() => {
     setImmediate(() => {
       const wrapper = tableWrapperRef.current;
 
@@ -31,7 +31,18 @@ export function useHeaderWidthFix({ columns }: HeaderWidthFixParams) {
         }
       }
     });
-  }, [columns.map(col => col.data).join()]);
+  }, []);
+
+  // Whenever the columns change, run some code to manually set the width of the header row:
+  useEffect(fixWidth, [columns.map(col => col.data).join()]);
+
+  // Sometimes the Handsontable resizes itself wrong when clicking on a cell. Run the code again on every mouse click:
+  useEffect(() => {
+    document.addEventListener("click", fixWidth);
+    return () => {
+      document.removeEventListener("click", fixWidth);
+    };
+  }, []);
 
   return { tableWrapperRef };
 }
