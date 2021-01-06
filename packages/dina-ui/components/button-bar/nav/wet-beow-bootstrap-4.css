@@ -369,11 +369,16 @@ a.btn,
   }
 }
 
+/* Custom style to adjust react switch */
+.react-switch {
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
 .btn-info {
   background-color: #117c8d;
   border-color: #117c8d;
 }
-
 .btn-info:hover {
   background-color: #18666d;
   border-color: #18666d;

@@ -1,10 +1,12 @@
 import { FastField, FieldProps } from "formik";
+import Placeholder from "react-select/src/components/Placeholder";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface TextFieldProps extends LabelWrapperParams {
   readOnly?: boolean;
   initialValue?: string;
   multiLines?: boolean;
+  placeholder?: string;
 }
 
 /**
@@ -12,7 +14,13 @@ export interface TextFieldProps extends LabelWrapperParams {
  * a wrapper that adds a label.
  */
 export function TextField(props: TextFieldProps) {
-  const { initialValue, readOnly, multiLines, ...labelWrapperProps } = props;
+  const {
+    initialValue,
+    readOnly,
+    multiLines,
+    placeholder,
+    ...labelWrapperProps
+  } = props;
   const { name } = labelWrapperProps;
 
   return (
@@ -40,7 +48,7 @@ export function TextField(props: TextFieldProps) {
           return multiLines ? (
             <textarea rows={4} {...inputProps} />
           ) : (
-            <input {...inputProps} type="text" />
+            <input {...inputProps} type="text" placeholder={placeholder} />
           );
         }}
       </FastField>
