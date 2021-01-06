@@ -1,52 +1,54 @@
+import { HotColumnProps } from "@handsontable/react";
 import {
   ApiClientContext,
   BulkDataEditor,
-  decodeResourceCell,
-  encodeResourceCell,
-  filterBy,
-  LoadingSpinner,
-  ResourceSelectField,
-  RowChange,
-  SaveArgs,
-  useResourceSelectCells,
-  Tooltip,
   ButtonBar,
   CancelButton,
-  SelectField
+  decodeResourceCell,
+  encodeResourceCell,
+  LoadingSpinner,
+  RowChange,
+  SaveArgs,
+  Tooltip,
+  useAccount,
+  useResourceSelectCells
 } from "common-ui";
 import { Form, Formik } from "formik";
-import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
+import moment from "moment";
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
-import { AddPersonButton, Footer, Head, Nav } from "../../../components";
+import {
+  AddPersonButton,
+  Footer,
+  Head,
+  MetadataEditorAttributesControls,
+  MetadataEditorControls,
+  Nav
+} from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
+  DefaultValue,
+  License,
   ManagedAttribute,
   ManagedAttributeMap,
   Metadata,
-  Person,
-  License
+  Person
 } from "../../../types/objectstore-api";
-import { HotColumnProps } from "@handsontable/react";
-import { useLocalStorage } from "@rehooks/local-storage";
+import { ObjectUpload } from "../../../types/objectstore-api/resources/ObjectUpload";
 
 /** Editable row data */
 export interface BulkMetadataEditRow {
   acTags: string;
   dcCreator: string;
   license: string;
-  metadata: PersistedResource<Metadata>;
-}
-
-interface FormControls {
-  editableBuiltInAttributes: string[];
-  editableManagedAttributes: ManagedAttribute[];
+  metadata: Metadata;
 }
 
 export default function EditMetadatasPage() {
   const router = useRouter();
   const { apiClient, bulkGet, save } = useContext(ApiClientContext);
+  const { agentId, initialized: accountInitialized } = useAccount();
   const { formatMessage } = useDinaIntl();
   const resourceSelectCell = useResourceSelectCells();
   const [
@@ -55,6 +57,9 @@ export default function EditMetadatasPage() {
   ] = useState<ManagedAttribute[]>([]);
 
   const { locale } = useDinaIntl();
+
+  const metadataIds = router.query.metadataIds?.toString().split(",");
+  const objectUploadIds = router.query.objectUploadIds?.toString().split(",");
 
   const BUILT_IN_ATTRIBUTES_COLUMNS: HotColumnProps[] = [
     {
@@ -117,22 +122,14 @@ export default function EditMetadatasPage() {
     )
   ];
 
-  const [
-    editableBuiltInAttributes,
-    setEditableBuiltInAttributes
-  ] = useLocalStorage<string[]>("metadata_editableBuiltInAttributes");
-
-  const idsQuery = String(router.query.ids);
-  const ids = idsQuery.split(",");
-
-  if (!idsQuery) {
+  if ((!metadataIds && !objectUploadIds) || !accountInitialized) {
     return <LoadingSpinner loading={true} />;
   }
 
   /**
    * Initializes the editable managed attributes based on what attributes are set on the metadatas.
    */
-  async function initEditableManagedAttributes(metadatas: Metadata[]) {
+  async function getManagedAttributesInUse(metadatas: Metadata[]) {
     // Loop through the metadatas and find which managed attributes are set:
     const managedAttributeIdMap: Record<string, true> = {};
     for (const metadata of metadatas) {
@@ -149,28 +146,87 @@ export default function EditMetadatasPage() {
       { apiBaseUrl: "/objectstore-api" }
     );
 
-    // Set the attributes in component state; These are used to re-initialize the Formik controls:
-    setInitialEditableManagedAttributes(newInitialEditableManagedAttributes);
+    return newInitialEditableManagedAttributes;
   }
 
   async function loadData() {
-    const metadatas = await bulkGet<Metadata>(
-      ids.map(id => `/metadata/${id}?include=managedAttributeMap,dcCreator`),
-      {
-        apiBaseUrl: "/objectstore-api",
-        joinSpecs: [
-          // Join to persons api:
-          {
-            apiBaseUrl: "/agent-api",
-            idField: "dcCreator",
-            joinField: "dcCreator",
-            path: metadata => `person/${metadata.dcCreator.id}`
-          }
-        ]
-      }
-    );
+    const metadatas: Metadata[] = [];
 
-    await initEditableManagedAttributes(metadatas);
+    // When editing existing Metadatas:
+    if (metadataIds) {
+      const existingMetadatas = await bulkGet<Metadata>(
+        metadataIds.map(
+          id => `/metadata/${id}?include=managedAttributeMap,dcCreator`
+        ),
+        {
+          apiBaseUrl: "/objectstore-api",
+          joinSpecs: [
+            // Join to persons api:
+            {
+              apiBaseUrl: "/agent-api",
+              idField: "dcCreator",
+              joinField: "dcCreator",
+              path: metadata => `person/${metadata.dcCreator.id}`
+            }
+          ]
+        }
+      );
+
+      metadatas.push(...existingMetadatas);
+
+      // When adding new Metadatas based on existing ObjectUploads:
+    } else if (objectUploadIds) {
+      const objectUploads = await bulkGet<ObjectUpload>(
+        objectUploadIds.map(id => `/object-upload/${id}`),
+        {
+          apiBaseUrl: "/objectstore-api"
+        }
+      );
+
+      // Set default values for the new Metadatas:
+      const {
+        data: { values: defaultValues }
+      } = await apiClient.get<{ values: DefaultValue[] }>(
+        "objectstore-api/config/default-values",
+        {}
+      );
+      const metadataDefaults: Partial<Metadata> = {};
+      for (const defaultValue of defaultValues.filter(
+        ({ type }) => type === "metadata"
+      )) {
+        metadataDefaults[
+          defaultValue.attribute as keyof Metadata
+        ] = defaultValue.value as any;
+      }
+
+      const newMetadatas = objectUploads.map<Metadata>(objectUpload => ({
+        ...metadataDefaults,
+        acDigitizationDate: objectUpload.dateTimeDigitized
+          ? moment(objectUpload.dateTimeDigitized).format()
+          : null,
+        acMetadataCreator: agentId
+          ? {
+              id: agentId,
+              type: "person"
+            }
+          : null,
+        bucket: router.query.group as string,
+        dcType: objectUpload.dcType,
+        fileIdentifier: objectUpload.id,
+        originalFilename: objectUpload.originalFilename,
+        type: "metadata"
+      }));
+
+      metadatas.push(...newMetadatas);
+    } else {
+      // Shouldn't happen:
+      throw new Error(
+        "No Metadata IDs or ObjectUpload IDs were provided to load."
+      );
+    }
+
+    const managedAttributesInUse = await getManagedAttributesInUse(metadatas);
+    setInitialEditableManagedAttributes(managedAttributesInUse);
 
     const newTableData = await Promise.all(
       metadatas.map<Promise<BulkMetadataEditRow>>(async metadata => {
@@ -217,6 +273,8 @@ export default function EditMetadatasPage() {
         const metadataEdit = {
           id,
           type,
+          // When adding new Metadatas, add the required fields from the ObjectUpload:
+          ...(!id ? row.original.metadata : {}),
           ...metadata
         } as Metadata;
 
@@ -278,14 +336,55 @@ export default function EditMetadatasPage() {
 
     editedManagedAttributeMaps.forEach(saveArg => delete saveArg.resource.id);
 
-    await save([...editedMetadatas, ...editedManagedAttributeMaps], {
-      apiBaseUrl: "/objectstore-api"
-    });
+    if (metadataIds) {
+      // When editing existing Metadatas:
+      await save([...editedMetadatas, ...editedManagedAttributeMaps], {
+        apiBaseUrl: "/objectstore-api"
+      });
 
-    if (ids.length === 1)
-      await router.push(`/object-store/object/view?id=${ids[0]}`);
-    else await router.push("/object-store/object/list");
+      if (metadataIds.length === 1) {
+        await router.push(`/object-store/object/view?id=${metadataIds[0]}`);
+        return;
+      }
+    } else if (objectUploadIds) {
+      // When adding new Metadatas based on existing ObjectUploads:
+      // Create the Metadatas:
+      const createdMetadatas = await save(editedMetadatas, {
+        apiBaseUrl: "/objectstore-api"
+      });
+
+      createdMetadatas.forEach((createdMetadata, index) => {
+        // Set the original row's Metadata ID so if the Managed Attribute Map fails, you don't create duplicate Metadats:
+        changes[index].original.metadata.id = createdMetadata.id;
+
+        // Link the managed attribute value with the newly created Metadata ID:
+        editedManagedAttributeMaps[index].resource.metadata = {
+          id: createdMetadata.id,
+          type: "metadata"
+        } as Metadata;
+      });
+
+      // Create the Managed Attribute Values:
+      await save(editedManagedAttributeMaps, {
+        apiBaseUrl: "/objectstore-api"
+      });
+
+      if (createdMetadatas.length === 1) {
+        await router.push(
+          `/object-store/object/view?id=${createdMetadatas[0].id}`
+        );
+        return;
+      }
+    }
+
+    await router.push("/object-store/object/list");
   }
+
+  const initialFormControls: MetadataEditorControls = {
+    attributesTemplate: null,
+    editableBuiltInAttributes: BUILT_IN_ATTRIBUTES_COLUMNS.map(col => col.data),
+    editableManagedAttributes: initialEditableManagedAttributes
+  };
 
   return (
     <div>
@@ -293,10 +392,10 @@ export default function EditMetadatasPage() {
       <Nav />
       <ButtonBar>
         <>
-          {ids.length === 1 ? (
+          {metadataIds?.length === 1 ? (
             <CancelButton
               entityLink="/object-store/object"
-              entityId={ids[0]}
+              entityId={metadataIds[0]}
               byPassView={false}
             />
           ) : (
@@ -309,14 +408,9 @@ export default function EditMetadatasPage() {
           <DinaMessage id="metadataBulkEditTitle" />
         </h1>
         <div className="form-group">
-          <Formik<FormControls>
+          <Formik<MetadataEditorControls>
             enableReinitialize={true}
-            initialValues={{
-              editableBuiltInAttributes:
-                editableBuiltInAttributes ??
-                BUILT_IN_ATTRIBUTES_COLUMNS.map(col => col.data),
-              editableManagedAttributes: initialEditableManagedAttributes
-            }}
+            initialValues={initialFormControls}
             onSubmit={noop}
           >
             {controlsForm => {
@@ -333,26 +427,9 @@ export default function EditMetadatasPage() {
 
               return (
                 <Form translate={undefined}>
-                  <div className="row">
-                    <SelectField
-                      className="col-6 editable-builtin-attributes-select"
-                      onChange={setEditableBuiltInAttributes}
-                      name="editableBuiltInAttributes"
-                      isMulti={true}
-                      options={BUILT_IN_ATTRIBUTES_COLUMNS.map(col => ({
-                        label: col.title ?? "",
-                        value: col.data
-                      }))}
-                    />
-                    <ResourceSelectField<ManagedAttribute>
-                      className="col-2 editable-managed-attributes-select"
-                      filter={filterBy(["name"])}
-                      name="editableManagedAttributes"
-                      isMulti={true}
-                      model="objectstore-api/managed-attribute"
-                      optionLabel={attr => attr.name}
-                    />
-                  </div>
+                  <MetadataEditorAttributesControls
+                    builtInAttributes={BUILT_IN_ATTRIBUTES_COLUMNS}
+                  />
                   <div className="form-group">
                     <AddPersonButton />
                     <Tooltip id="addPersonPopupTooltip" />
@@ -361,6 +438,7 @@ export default function EditMetadatasPage() {
                     columns={columns}
                     loadData={loadData}
                     onSubmit={onSubmit}
+                    submitUnchangedRows={objectUploadIds ? true : false}
                   />
                 </Form>
               );

@@ -78,6 +78,9 @@ export function Nav() {
             <li className="list-inline-item my-auto">
               <NavSeqDBDropdown />
             </li>
+            <li className="list-inline-item my-auto d-none">
+              <NavCollectingEventDropdown />
+            </li>
           </ul>
         </div>
       </div>
@@ -205,6 +208,24 @@ function NavSeqDBDropdown() {
         <Link href="/seqdb/region/list">
           <a className="dropdown-item">
             <SeqdbMessage id="regionListTitle" />
+          </a>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+/** Collecting event links. */
+function NavCollectingEventDropdown() {
+  return (
+    <div className="dropdown">
+      <a className="nav-link dropdown-toggle" href="#">
+        <DinaMessage id="collectionSectionTitle" />
+      </a>
+      <div className="dropdown-menu m-0">
+        <Link href="/collecting-event/list">
+          <a className="dropdown-item">
+            <DinaMessage id="collectingEventListTitle" />
           </a>
         </Link>
       </div>

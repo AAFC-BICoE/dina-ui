@@ -2,6 +2,8 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
+  addAttributesTemplateTitle: "New Attributes Template",
+  addCollectingEventTitle: "Add Collecting Event",
   addFilesButton: "Add Files",
   addManagedAttributeButtonText: "Add New Managed Attribute",
   addObjectSubtypeTitle: "Add New Object Subtype",
@@ -15,17 +17,27 @@ export const DINAUI_MESSAGES_ENGLISH = {
   cancelButtonText: "Cancel",
   changedProperties: "Changes",
   closePreviewButtonText: "Close Preview",
+  collectionSectionTitle: "Collections",
+  collectingEventListTitle: "Collecting Event",
+  collectingEventViewTitle: "View Collecting Event",
   deleteButtonText: "Delete",
+  deleteThisAttributesTemplate: "Delete This Template",
   deleteSelectedButtonText: "Delete Selected",
   dinaUserSectionTitle: "Dina User",
+  editCollectingEventTitle: "Edit Collecting Event",
   editObjectSubtypeTitle: "Edit Object Subtype",
   editOrganizationTitle: "Edit Organization",
   editOrganizationAliasesLabel: "Aliases (comma seperated)",
   editPersonTitle: "Edit Person",
   editSelectedButtonText: "Edit Selected",
+  enableDateRangeLabel: "Enable Date Range",
+  endEventDateTimeLabel: "End Event DateTime",
   exifProperties: "Exif Properties",
   feedbackButtonText: "Feedback",
   field_acceptedValues: "Accepted Values",
+  field_acceptedValuesAsLines: "Accepted Values (One value per line)",
+  field_acceptedValuesAsLines_tooltip:
+    "Write one accepted value per line. Press enter while typing in the field to add a new line.",
   field_acCaption: "Caption",
   field_acSubtype: "Ac Subtype",
   field_acDerivedFrom: "Derived From",
@@ -41,6 +53,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_acSubType: "Object SubType",
   field_acTags: "Tags",
   "field_dcCreator.displayName": "Digitized By",
+  field_attributesTemplate: "Set Attributes Template",
+  field_collectingEvent_endDateTimeError:
+    "End event datetime format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
+  field_collectingEvent_startDateTimeError:
+    "Start event datetime format must be a subset of: YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
   field_createdBy: "Created By",
   field_createdDate: "Created Date",
   field_createdOn: "Created On",
@@ -55,7 +72,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_editableManagedAttributes: "Managed Attributes",
   field_email: "Email",
   field_license: "License",
-  field_managedAttributeAcceptedValue: "Accepted Value",
   field_managedAttributeCreatedOn: "Created On",
   field_managedAttributeCreatedBy: "Created By",
   field_managedAttributeMandatoryFieldsError:
@@ -75,6 +91,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_xmpMetadataDate_tooltip:
     "Date and time of when the record was last updated.",
   field_xmpRightsWebStatement: "Reuse Rights Statement",
+  fileTooBig: "File too big",
   footerContactInfo: "Contact information",
   footerTermsAndConditions: "Terms and conditions",
   footerPrivacy: "Privacy",
@@ -85,6 +102,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
   managedAttributeValueLabel: "Value",
+  metadataAttributesTemplateSave: "Save This Attributes Template",
   metadataBucketNameLabel: "Bucket Name",
   metadataBuiltInAttributesLabel: "Built-in Attributes",
   metadataBulkEditTagsLabel: "Tags (Comma-separated)",
@@ -123,16 +141,24 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organizationViewTitle: "View Organization",
   personListTitle: "Persons",
   personViewTitle: "View Person",
+  resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",
   revisionsButtonText: "Revisions",
   revisionsByUserPageTitle: "Revisions by user",
   searchButton: "Search",
+  startEventDateTimeLabel: "Start Event DateTime",
   thumbnailNotAvailableText: "No thumbnail available",
   uploadButtonText: "Upload",
   uploadFormInstructions:
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
+  uploadFilesMaxSize: "The maximum file size is {maxSize}.",
   uploadPageTitle: "Upload Files",
   userMustBelongToGroup: "User must belong to a Group",
   valueLabel: "Value",
+  verbatimEventDateTimeLabel: "Verbatim Event DateTime",
   viewPreviewButtonText: "Preview",
-  whoAmITitle: "Who Am I"
+  whoAmITitle: "Who Am I",
+  year: "Year",
+  yearMonth: "Year-Month",
+  yearMonthDay: "Year-Month-Day",
+  yearMonthDayTime: "Year-Month-Day-Time"
 };

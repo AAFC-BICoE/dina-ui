@@ -71,14 +71,11 @@ const TEST_LICENSES: PersistedResource<License>[] = [
   }
 ];
 
+const mockUseRouter = jest.fn();
+
 // Pretend the metadata ids were passed in the URL:
 jest.mock("next/router", () => ({
-  useRouter: () => ({
-    query: {
-      id:
-        "6c524135-3c3e-41c1-a057-45afb4e3e7be,3849de16-fee2-4bb1-990d-a4f5de19b48d,31ee7848-b5c1-46e1-bbca-68006d9eda3b"
-    }
-  })
+  useRouter: () => mockUseRouter()
 }));
 
 // Mock out the HandsOnTable which should only be rendered in the browser.
@@ -89,6 +86,9 @@ jest.mock("next/dynamic", () => () => {
 });
 
 const mockBulkGet = jest.fn(async paths => {
+  if (paths.length === 0) {
+    return [];
+  }
   if ((paths[0] as string).startsWith("/metadata/")) {
     return TEST_METADATAS;
   }
@@ -98,6 +98,13 @@ const mockBulkGet = jest.fn(async paths => {
       name: "existing-attribute"
     }));
   }
+  if ((paths[0] as string).startsWith("/object-upload/")) {
+    return paths.map(() => ({
+      id: "b4c8d6a6-0332-4f2a-a7b9-68b7898b6486",
+      dateTimeDigitized: "2020-12-17T23:37:45.932Z",
+      originalFilename: "test-file.png"
+    }));
+  }
 });
 
 const mockGet = jest.fn(async path => {
@@ -105,12 +112,39 @@ const mockGet = jest.fn(async path => {
     return { data: TEST_METADATAS };
   } else if (path === "objectstore-api/license") {
     return { data: TEST_LICENSES };
+  } else if (path === "objectstore-api/config/default-values") {
+    return {
+      data: {
+        values: [
+          {
+            type: "metadata",
+            attribute: "xmpRightsWebStatement",
+            value: "default-value"
+          },
+          {
+            type: "metadata",
+            attribute: "dcRights",
+            value: "default-value"
+          },
+          {
+            type: "metadata",
+            attribute: "xmpRightsOwner",
+            value: "default-value"
+          },
+          {
+            type: "metadata",
+            attribute: "xmpRightsUsageTerms",
+            value: "default-value"
+          }
+        ]
+      }
+    };
   } else {
     return { data: [] };
   }
 });
 
-const mockSave = jest.fn(args => args.map(({ resource }) => resource));
+const mockSave = jest.fn();
 
 const apiContext: any = {
   apiClient: { get: mockGet },
@@ -121,9 +155,16 @@ const apiContext: any = {
 describe("Metadata bulk edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockSave.mockImplementation(args => args.map(({ resource }) => resource));
+    mockUseRouter.mockReturnValue({
+      query: {
+        metadataIds:
+          "6c524135-3c3e-41c1-a057-45afb4e3e7be,3849de16-fee2-4bb1-990d-a4f5de19b48d,31ee7848-b5c1-46e1-bbca-68006d9eda3b"
+      }
+    });
   });
 
-  it("Renders the bulk edit page.", async () => {
+  it("Renders the bulk edit page (edit existing data mode).", async () => {
     const wrapper = mountWithAppContext(<EditMetadatasPage />, { apiContext });
 
     await new Promise(setImmediate);
@@ -159,7 +200,7 @@ describe("Metadata bulk edit page", () => {
     ]);
   });
 
-  it("Renders the managed attribute columns into the editable table.", () => {
+  it("Renders the managed attribute columns into the editable table (edit existing data mode).", () => {
     const columns = managedAttributeColumns([
       {
         acceptedValues: ["Holotype", "Paratype", "Syntype"],
@@ -203,7 +244,7 @@ describe("Metadata bulk edit page", () => {
     ]);
   });
 
-  it("Initializes the editable managed attributes based on what attributes are set on the metadatas.", async () => {
+  it("Initializes the editable managed attributes based on what attributes are set on the metadatas (edit existing data mode).", async () => {
     const wrapper = mountWithAppContext(<EditMetadatasPage />, { apiContext });
 
     await new Promise(setImmediate);
@@ -226,7 +267,7 @@ describe("Metadata bulk edit page", () => {
     ]);
   });
 
-  it("Submits the changed values.", async () => {
+  it("Submits the changed values (edit existing data mode).", async () => {
     const wrapper = mountWithAppContext(<EditMetadatasPage />, { apiContext });
 
     await new Promise(setImmediate);
@@ -292,7 +333,7 @@ describe("Metadata bulk edit page", () => {
     );
   });
 
-  it("Lets you edit the Metadata's license.", async () => {
+  it("Lets you edit the Metadata's license (edit existing data mode).", async () => {
     const wrapper = mountWithAppContext(<EditMetadatasPage />, { apiContext });
 
     await new Promise(setImmediate);
@@ -343,5 +384,124 @@ describe("Metadata bulk edit page", () => {
       ],
       { apiBaseUrl: "/objectstore-api" }
     );
+  });
+
+  it("Loads initial Metadata fields and lets you submit new Metadatas (edit new data mode)", async () => {
+    mockUseRouter.mockReturnValue({
+      query: {
+        objectUploadIds: "b4c8d6a6-0332-4f2a-a7b9-68b7898b6486",
+        group: "example-group"
+      }
+    });
+
+    mockSave.mockImplementation(args =>
+      args.map(({ resource }) => {
+        const resourceCopy = { ...resource };
+        // When submitting a new resource, give it a new ID:
+        if (!resourceCopy.id) {
+          resourceCopy.id = "00000000-0000-0000-0000-000000000000";
+        }
+        return resourceCopy;
+      })
+    );
+
+    const wrapper = mountWithAppContext(<EditMetadatasPage />, {
+      apiContext,
+      accountContext: {
+        // acMetadataCreator should be set as the logged-in user's agentId:
+        agentId: "6ee06232-e801-4cd5-8fc5-127aa14c3ace"
+      }
+    });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Get the table data to directly edit it for the test to simulate how the Handsontable would
+    // edit the data.
+    const tableData = wrapper
+      .find("MockHotTable")
+      .prop<BulkMetadataEditRow[]>("data");
+
+    // Expect the initial data:
+    expect(tableData).toEqual([
+      {
+        acTags: "",
+        dcCreator: "",
+        // Default license is loaded:
+        license:
+          "Open Government Licence - Canada (license/open-government-license-canada)",
+        metadata: {
+          acDigitizationDate: "2020-12-17T23:37:45+00:00",
+          acMetadataCreator: {
+            id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+            type: "person"
+          },
+          bucket: "example-group",
+          dcRights: "default-value",
+          fileIdentifier: "b4c8d6a6-0332-4f2a-a7b9-68b7898b6486",
+          originalFilename: "test-file.png",
+          // Default rights fields are loaded from the API endpoint:
+          xmpRightsOwner: "default-value",
+          xmpRightsUsageTerms: "default-value",
+          xmpRightsWebStatement: "default-value",
+          type: "metadata"
+        }
+      }
+    ]);
+
+    tableData[0].metadata.acCaption = "test-caption";
+
+    // Submit the spreadsheet:
+    wrapper.find("button.bulk-editor-submit-button").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              acCaption: "test-caption",
+              acDigitizationDate: "2020-12-17T23:37:45+00:00",
+              acMetadataCreator: {
+                id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
+                type: "person"
+              },
+              dcRights: "default-value",
+              bucket: "example-group",
+              fileIdentifier: "b4c8d6a6-0332-4f2a-a7b9-68b7898b6486",
+              originalFilename: "test-file.png",
+              xmpRightsOwner: "default-value",
+              xmpRightsUsageTerms: "default-value",
+              xmpRightsWebStatement: "default-value",
+              type: "metadata"
+            },
+            type: "metadata"
+          }
+        ],
+        {
+          apiBaseUrl: "/objectstore-api"
+        }
+      ],
+      [
+        [
+          {
+            resource: {
+              metadata: {
+                // The new Metadata's ID should be included here:
+                id: "00000000-0000-0000-0000-000000000000",
+                type: "metadata"
+              },
+              type: "managed-attribute-map"
+            },
+            type: "managed-attribute-map"
+          }
+        ],
+        {
+          apiBaseUrl: "/objectstore-api"
+        }
+      ]
+    ]);
   });
 });
