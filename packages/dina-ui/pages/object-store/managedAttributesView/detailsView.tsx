@@ -21,7 +21,8 @@ import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   ManagedAttribute,
-  ManagedAttributeType
+  ManagedAttributeType,
+  MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../../types/objectstore-api/resources/ManagedAttribute";
 
 interface ManagedAttributeFormFields extends ManagedAttribute {
@@ -107,20 +108,9 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
   initialValues.acceptedValuesAsLines =
     initialValues.acceptedValues?.concat("")?.join("\n") ?? "";
 
-  const ATTRIBUTE_TYPE_OPTIONS = [
-    {
-      label: formatMessage("field_managedAttributeType_integer_label"),
-      value: "INTEGER"
-    },
-    {
-      label: formatMessage("field_managedAttributeType_text_label"),
-      value: "STRING"
-    },
-    {
-      label: formatMessage("field_managedAttributeType_picklist_label"),
-      value: "PICKLIST"
-    }
-  ];
+  const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
+    ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
+  );
 
   async function onSubmit({
     acceptedValuesAsLines,

@@ -6,8 +6,8 @@ export interface TextFieldProps extends LabelWrapperParams {
   readOnly?: boolean;
   initialValue?: string;
   multiLines?: boolean;
-
   inputProps?: InputHTMLAttributes<any> | TextareaHTMLAttributes<any>;
+  placeholder?: string;
 }
 
 /**
@@ -20,6 +20,7 @@ export function TextField(props: TextFieldProps) {
     readOnly,
     multiLines,
     inputProps: inputPropsExternal,
+    placeholder,
     ...labelWrapperProps
   } = props;
   const { name } = labelWrapperProps;
@@ -50,7 +51,11 @@ export function TextField(props: TextFieldProps) {
           return multiLines ? (
             <textarea rows={4} {...inputPropsInternal} />
           ) : (
-            <input {...inputPropsInternal} type="text" />
+            <input
+              {...inputPropsInternal}
+              type="text"
+              placeholder={placeholder}
+            />
           );
         }}
       </FastField>
