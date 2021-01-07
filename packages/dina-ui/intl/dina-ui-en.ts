@@ -23,6 +23,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   deleteSelectedButtonText: "Delete Selected",
   dinaUserSectionTitle: "Dina User",
   editCollectingEventTitle: "Edit Collecting Event",
+  editMetadataTitle: "Edit Metadata",
   editObjectSubtypeTitle: "Edit Object Subtype",
   editOrganizationTitle: "Edit Organization",
   editOrganizationAliasesLabel: "Aliases (comma seperated)",

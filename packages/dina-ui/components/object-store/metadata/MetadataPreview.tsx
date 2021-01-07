@@ -80,7 +80,9 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
       <div className="metadata-preview">
         <style>{METADATA_PREVIEW_STYLE}</style>
         <div className="metadata-edit-link">
-          <Link href={`/object-store/metadata/edit?metadataIds=${metadataId}`}>
+          <Link
+            href={`/object-store/metadata/single-record-edit?id=${metadataId}`}
+          >
             <a className="btn btn-primary metadata-edit-link">
               <DinaMessage id="editButtonText" />
             </a>

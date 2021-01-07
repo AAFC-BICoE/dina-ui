@@ -94,7 +94,7 @@ export default function MetadataViewPage() {
         <Head title={metadata.originalFilename} />
         <Nav />
         <ButtonBar>
-          <Link href={`/object-store/metadata/edit?metadataIds=${id}`}>
+          <Link href={`/object-store/metadata/single-record-edit?id=${id}`}>
             <a className="btn btn-primary">
               <DinaMessage id="editButtonText" />
             </a>
@@ -126,7 +126,9 @@ export default function MetadataViewPage() {
             <div className="col-md-8">
               <div className="container">
                 <div className="form-group">
-                  <Link href={`/object-store/metadata/edit?metadataIds=${id}`}>
+                  <Link
+                    href={`/object-store/metadata/single-record-edit?id=${id}`}
+                  >
                     <a className="btn btn-primary">
                       <DinaMessage id="editButtonText" />
                     </a>

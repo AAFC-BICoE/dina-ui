@@ -7,6 +7,7 @@ export interface FileViewProps {
   filePath: string;
   fileType: string;
   imgAlt?: string;
+  imgHeight?: string;
 }
 
 // The FileViewer component can't be server-side rendered:
@@ -30,7 +31,8 @@ export function FileView({
   clickToDownload,
   filePath,
   fileType,
-  imgAlt
+  imgAlt,
+  imgHeight
 }: FileViewProps) {
   const { token } = useAccount();
 
@@ -43,40 +45,38 @@ export function FileView({
     return null;
   }
 
-  const fileView = (
-    <div className="file-viewer-wrapper">
-      {isImage ? (
-        <img
-          alt={imgAlt}
-          src={authenticatedFilePath}
-          style={{
-            display: "block",
-            marginLeft: "auto",
-            marginRight: "auto"
-          }}
-        />
-      ) : (
-        <FileViewer
-          filePath={authenticatedFilePath}
-          fileType={fileType}
-          unsupportedComponent={() => (
-            <div>
-              <a href={authenticatedFilePath}>{filePath}</a>
-            </div>
-          )}
-        />
-      )}
+  return (
+    <div className="file-viewer-wrapper" style={{ textAlign: "center" }}>
+      <a
+        href={authenticatedFilePath}
+        style={{
+          color: "inherit",
+          textDecoration: "none",
+          pointerEvents: clickToDownload ? undefined : "none",
+          display: "block",
+          marginLeft: "auto",
+          marginRight: "auto",
+          width: "fit-content"
+        }}
+      >
+        {isImage ? (
+          <img
+            alt={imgAlt}
+            src={authenticatedFilePath}
+            style={{ height: imgHeight }}
+          />
+        ) : (
+          <FileViewer
+            filePath={authenticatedFilePath}
+            fileType={fileType}
+            unsupportedComponent={() => (
+              <div>
+                <a href={authenticatedFilePath}>{filePath}</a>
+              </div>
+            )}
+          />
+        )}
+      </a>
     </div>
-  );
-
-  return clickToDownload ? (
-    <a
-      href={authenticatedFilePath}
-      style={{ color: "inherit", textDecoration: "none" }}
-    >
-      {fileView}
-    </a>
-  ) : (
-    fileView
   );
 }
