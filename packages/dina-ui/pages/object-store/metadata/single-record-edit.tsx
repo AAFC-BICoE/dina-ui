@@ -19,7 +19,12 @@ import { NextRouter, useRouter } from "next/router";
 import { Head, Nav } from "../../../components";
 import { FileView } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { License, Metadata, Person } from "../../../types/objectstore-api";
+import {
+  License,
+  ManagedAttribute,
+  Metadata,
+  Person
+} from "../../../types/objectstore-api";
 
 interface SingleMetadataFormProps {
   /** Existing Metadata is required, no new ones are added with this form. */
@@ -178,50 +183,73 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
               imgHeight="15rem"
             />
           </div>
-          <div className="row">
-            <TextField
-              className="col-md-3 col-sm-4"
-              name="originalFilename"
-              readOnly={true}
-            />
-            <DateField
-              className="col-md-3 col-sm-4"
-              name="acDigitizationDate"
-              disabled={true}
-            />
+          <div className="form-group">
+            <h2>
+              <DinaMessage id="metadataMediaDetailsLabel" />
+            </h2>
+            <div className="row">
+              <TextField
+                className="col-md-3 col-sm-4"
+                name="originalFilename"
+                readOnly={true}
+              />
+              <DateField
+                className="col-md-3 col-sm-4"
+                name="acDigitizationDate"
+                disabled={true}
+              />
+            </div>
+            <div className="row">
+              <SelectField
+                className="col-md-3 col-sm-4"
+                name="dcType"
+                options={DCTYPE_OPTIONS}
+              />
+              <TextField className="col-md-3 col-sm-4" name="acCaption" />
+              <TextField
+                className="col-md-3 col-sm-4"
+                name="acTags"
+                multiLines={true}
+                label={formatMessage("metadataBulkEditTagsLabel")}
+              />
+            </div>
+            <div className="row">
+              <ResourceSelectField<Person>
+                className="col-md-3 col-sm-4"
+                name="dcCreator"
+                filter={filterBy(["displayName"])}
+                model="agent-api/person"
+                optionLabel={person => person.displayName}
+                label={formatMessage("field_dcCreator.displayName")}
+              />
+            </div>
           </div>
-          <div className="row">
-            <SelectField
-              className="col-md-3 col-sm-4"
-              name="dcType"
-              options={DCTYPE_OPTIONS}
-            />
-            <TextField className="col-md-3 col-sm-4" name="acCaption" />
-            <TextField
-              className="col-md-3 col-sm-4"
-              name="acTags"
-              multiLines={true}
-              label={formatMessage("metadataBulkEditTagsLabel")}
-            />
+          <div className="form-group">
+            <h2>
+              <DinaMessage id="metadataRightsDetailsLabel" />
+            </h2>
+            <div className="row">
+              <TextField className="col-md-3 col-sm-4" name="dcRights" />
+              <ResourceSelectField<License>
+                className="col-md-3 col-sm-4"
+                name="license"
+                filter={() => ({})}
+                model="objectstore-api/license"
+                optionLabel={license => license.titles[locale] ?? license.url}
+              />
+            </div>
           </div>
-          <div className="row">
-            <ResourceSelectField<Person>
-              className="col-md-3 col-sm-4"
-              name="dcCreator"
-              filter={filterBy(["displayName"])}
-              model="agent-api/person"
-              optionLabel={person => person.displayName}
-            />
-          </div>
-          <div className="row">
-            <TextField className="col-md-3 col-sm-4" name="dcRights" />
-            <ResourceSelectField<License>
-              className="col-md-3 col-sm-4"
-              name="license"
-              filter={() => ({})}
-              model="objectstore-api/license"
-              optionLabel={license => license.titles[locale] ?? license.url}
-            />
+          <div className="form-group">
+            <h2>
+              <DinaMessage id="metadataManagedAttributesLabel" />
+            </h2>
+            {/* <ResourceSelectField<ManagedAttribute>
+                className="col-md-3 col-sm-4"
+                name="license"
+                filter={() => ({})}
+                model="objectstore-api/license"
+                optionLabel={license => license.titles[locale] ?? license.url}
+              /> */}
           </div>
         </div>
       </Form>
