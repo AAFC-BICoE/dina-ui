@@ -136,18 +136,20 @@ const Home: React.FunctionComponent = () => (
           </Link>
         </li>
       </ul>
-      <h2>
-        <DinaMessage id="collectionSectionTitle" />
-      </h2>
-      <ul>
-        <li>
-          <Link href="/collecting-event/list">
-            <a>
-              <DinaMessage id="collectingEventListTitle" />
-            </a>
-          </Link>
-        </li>
-      </ul>
+      <div className="d-none">
+        <h2>
+          <DinaMessage id="collectionSectionTitle" />
+        </h2>
+        <ul>
+          <li>
+            <Link href="/collecting-event/list">
+              <a>
+                <DinaMessage id="collectingEventListTitle" />
+              </a>
+            </Link>
+          </li>
+        </ul>
+      </div>
     </div>
     <Footer />
   </div>

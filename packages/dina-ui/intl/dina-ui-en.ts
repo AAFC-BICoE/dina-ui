@@ -2,6 +2,7 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
+  addAttributesTemplateTitle: "New Attributes Template",
   addCollectingEventTitle: "Add Collecting Event",
   addFilesButton: "Add Files",
   addManagedAttributeButtonText: "Add New Managed Attribute",
@@ -20,6 +21,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingEventListTitle: "Collecting Event",
   collectingEventViewTitle: "View Collecting Event",
   deleteButtonText: "Delete",
+  deleteThisAttributesTemplate: "Delete This Template",
   deleteSelectedButtonText: "Delete Selected",
   dinaUserSectionTitle: "Dina User",
   editCollectingEventTitle: "Edit Collecting Event",
@@ -52,6 +54,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_acSubType: "Object SubType",
   field_acTags: "Tags",
   "field_dcCreator.displayName": "Digitized By",
+  field_attributesTemplate: "Set Attributes Template",
   field_collectingEvent_endDateTimeError:
     "End event datetime format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
   field_collectingEvent_startDateTimeError:
@@ -100,6 +103,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
   managedAttributeValueLabel: "Value",
+  metadataAttributesTemplateSave: "Save This Attributes Template",
   metadataBucketNameLabel: "Bucket Name",
   metadataBuiltInAttributesLabel: "Built-in Attributes",
   metadataBulkEditTagsLabel: "Tags (Comma-separated)",
@@ -138,6 +142,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organizationViewTitle: "View Organization",
   personListTitle: "Persons",
   personViewTitle: "View Person",
+  resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",
   revisionsButtonText: "Revisions",
   revisionsByUserPageTitle: "Revisions by user",
   searchButton: "Search",
