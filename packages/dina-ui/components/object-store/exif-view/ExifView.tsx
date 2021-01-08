@@ -1,8 +1,7 @@
-import { useCollapser } from "common-ui";
+import { KeyValueTable, useCollapser } from "common-ui";
 import { ReactNode } from "react";
 import { ObjectUpload } from "packages/dina-ui/types/objectstore-api/resources/ObjectUpload";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { KeyValueTable } from "../../revisions/KeyValueTable";
 
 interface ObjectUploadProps {
   objectUpload: ObjectUpload;

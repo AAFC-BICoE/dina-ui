@@ -1,5 +1,5 @@
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { KeyValueTable } from "../KeyValueTable";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
 
 describe("KeyValueTable component", () => {
   it("Renders the object's keys and values", () => {

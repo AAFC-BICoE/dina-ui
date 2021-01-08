@@ -4,8 +4,13 @@ import {
   DateField,
   DeleteButton,
   ErrorViewer,
+  FieldWrapper,
   filterBy,
+  KeyValueTable,
+  KeyValueTableProps,
+  NumberField,
   Query,
+  ResourceSelect,
   ResourceSelectField,
   safeSubmit,
   SelectField,
@@ -14,8 +19,9 @@ import {
   useApiClient,
   withResponse
 } from "common-ui";
-import { Form, Formik } from "formik";
+import { Form, Formik, useFormikContext } from "formik";
 import { NextRouter, useRouter } from "next/router";
+import { useEffect, useMemo, useState } from "react";
 import { Head, Nav } from "../../../components";
 import { FileView } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -25,6 +31,8 @@ import {
   Metadata,
   Person
 } from "../../../types/objectstore-api";
+import { getManagedAttributesInUse } from "./edit";
+import { toPairs } from "lodash";
 
 interface SingleMetadataFormProps {
   /** Existing Metadata is required, no new ones are added with this form. */
@@ -54,7 +62,7 @@ export default function MetadataEditPage() {
             <Query<Metadata>
               query={{
                 path: `objectstore-api/metadata/${id}`,
-                include: "dcCreator"
+                include: "managedAttributeMap,dcCreator"
               }}
               options={{
                 joinSpecs: [
@@ -95,6 +103,7 @@ export default function MetadataEditPage() {
 
 function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
   const { formatMessage, locale } = useDinaIntl();
+  const { apiClient, save } = useApiClient();
   const { id } = router.query;
 
   // Convert acTags array to a comma-separated string:
@@ -103,19 +112,14 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
     acTags: metadata.acTags?.join(", ") ?? ""
   };
 
-  const { apiClient, save } = useApiClient();
-
-  const DCTYPE_OPTIONS = [
-    { label: "Image", value: "IMAGE" },
-    { label: "Moving Image", value: "MOVING_IMAGE" },
-    { label: "Sound", value: "SOUND" },
-    { label: "Text", value: "TEXT" },
-    { label: "Dataset", value: "DATASET" },
-    { label: "Undetermined", value: "UNDETERMINED" }
-  ];
-
   const onSubmit = safeSubmit(async submittedValues => {
-    const { acTags, license, ...metadataValues } = submittedValues;
+    const {
+      acTags,
+      license,
+      managedAttributeMap,
+      ...metadataValues
+    } = submittedValues;
+    delete managedAttributeMap.id;
 
     if (license) {
       const selectedLicense = license?.id
@@ -142,6 +146,10 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
         {
           resource: metadataEdit,
           type: "metadata"
+        },
+        {
+          resource: { ...managedAttributeMap, metadata },
+          type: "managed-attribute-map"
         }
       ],
       { apiBaseUrl: "/objectstore-api" }
@@ -239,20 +247,107 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
               />
             </div>
           </div>
-          <div className="form-group">
-            <h2>
-              <DinaMessage id="metadataManagedAttributesLabel" />
-            </h2>
-            {/* <ResourceSelectField<ManagedAttribute>
-                className="col-md-3 col-sm-4"
-                name="license"
-                filter={() => ({})}
-                model="objectstore-api/license"
-                optionLabel={license => license.titles[locale] ?? license.url}
-              /> */}
-          </div>
+          <ManagedAttributesEditor />
         </div>
       </Form>
     </Formik>
   );
 }
+
+function ManagedAttributesEditor() {
+  const { values: metadata } = useFormikContext<Metadata>();
+  const { bulkGet } = useApiClient();
+  const { formatMessage } = useDinaIntl();
+
+  const [editableManagedAttributes, setEditableManagedAttributes] = useState<
+    ManagedAttribute[]
+  >([]);
+
+  useEffect(() => {
+    (async () => {
+      const initialAttributes = await getManagedAttributesInUse(
+        [metadata],
+        bulkGet
+      );
+      setEditableManagedAttributes(initialAttributes);
+    })();
+  }, []);
+
+  return (
+    <div className="form-group">
+      <h2>
+        <DinaMessage id="metadataManagedAttributesLabel" />
+      </h2>
+      <div className="row">
+        <div className="col-md-3 col-sm-4">
+          <FieldWrapper
+            name="editableManagedAttributes"
+            label={formatMessage("field_editableManagedAttributes")}
+          >
+            <ResourceSelect<ManagedAttribute>
+              filter={filterBy(["name"])}
+              model="objectstore-api/managed-attribute"
+              optionLabel={attribute => attribute.name}
+              isMulti={true}
+              onChange={ma =>
+                setEditableManagedAttributes(ma as ManagedAttribute[])
+              }
+              value={editableManagedAttributes}
+            />
+          </FieldWrapper>
+        </div>
+        <div className="col-md-3 col-sm-4">
+          <div className="alert alert-warning">
+            <DinaMessage id="editableManagedAttributesRemoveInfo" />
+          </div>
+        </div>
+      </div>
+      <div className="row" style={{ minHeight: "25rem" }}>
+        {editableManagedAttributes.map(attribute => {
+          const props = {
+            className: "col-md-3 col-sm-4",
+            key: attribute.id,
+            label: attribute.name,
+            name: `managedAttributeMap.values.${attribute.id}.value`
+          };
+
+          if (attribute.managedAttributeType === "STRING") {
+            if (attribute.acceptedValues) {
+              return (
+                <SelectField
+                  {...props}
+                  options={[
+                    { label: `<${formatMessage("none")}>`, value: "" },
+                    ...attribute.acceptedValues.map(value => ({
+                      label: value,
+                      value
+                    }))
+                  ]}
+                />
+              );
+            }
+            return (
+              <TextField
+                {...props}
+                inputProps={{ type: "search" }} // Adds the 'X' clear button in the text input.
+              />
+            );
+          } else if (attribute.managedAttributeType === "INTEGER") {
+            return <NumberField {...props} />;
+          } else {
+            return null;
+          }
+        })}
+      </div>
+    </div>
+  );
+}
+
+const DCTYPE_OPTIONS = [
+  { label: "Image", value: "IMAGE" },
+  { label: "Moving Image", value: "MOVING_IMAGE" },
+  { label: "Sound", value: "SOUND" },
+  { label: "Text", value: "TEXT" },
+  { label: "Dataset", value: "DATASET" },
+  { label: "Undetermined", value: "UNDETERMINED" }
+];
