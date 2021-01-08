@@ -4,11 +4,12 @@ import {
   CancelButton,
   DeleteButton,
   ErrorViewer,
+  filterBy,
   LoadingSpinner,
   Query,
   safeSubmit,
   SubmitButton,
-  TextField,
+  TextField
 } from "common-ui";
 import { Form, Formik, FormikContextType } from "formik";
 import { useRouter, NextRouter } from "next/router";
@@ -16,6 +17,8 @@ import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorG
 import { useContext } from "react";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
+import { ResourceSelectField } from "common-ui/lib";
 
 interface CollectorGroupFormProps {
   collectorGroup?: CollectorGroup;
@@ -33,12 +36,12 @@ export default function CollectorGroupEditPage() {
       <Head title={formatMessage("editCollectorGroupTitle")} />
       <Nav />
       <main className="container-fluid">
-         <div>
-           <h1>
-             <DinaMessage id="addCollectorGroupTitle" />
-           </h1>
-           <CollectorGroupForm router={router} />
-         </div>
+        <div>
+          <h1>
+            <DinaMessage id="addCollectorGroupTitle" />
+          </h1>
+          <CollectorGroupForm router={router} />
+        </div>
       </main>
     </div>
   );
@@ -58,7 +61,15 @@ function CollectorGroupForm({
       submittedValues,
       { setStatus, setSubmitting }: FormikContextType<any>
     ) => {
-
+      if (!submittedValues.agentIdentifiers) {
+        setStatus(formatMessage("field_collectorGroup_agentsError"));
+        setSubmitting(false);
+        return;
+      } else {
+        const agentIDs: string[] = [];
+        submittedValues.agentIdentifiers.map(agent => agentIDs.push(agent.id));
+        submittedValues.agentIdentifiers = agentIDs;
+      }
       await save(
         [
           {
@@ -73,7 +84,7 @@ function CollectorGroupForm({
       await router.push(`/collector-group/list`);
     }
   );
-  
+
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       <Form translate={undefined}>
@@ -96,17 +107,19 @@ function CollectorGroupForm({
         <div>
           <div className="row">
             <TextField
-              className="col-md-3 startEventDateTime"
-              name="startEventDateTime"
-              label={formatMessage("startEventDateTimeLabel")}
-              placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
+              className="col-md-3 collectorGroupName"
+              name="name"
+              label={formatMessage("collectorGroupNameLabel")}
             />
-            <TextField
-              className="col-md-3"
-              name="verbatimEventDateTime"
-              label={formatMessage("verbatimEventDateTimeLabel")}
+            <ResourceSelectField<Person>
+              name="agentIdentifiers"
+              filter={filterBy(["displayName"])}
+              model="agent-api/person"
+              isMulti={true}
+              optionLabel={agent => agent.displayName}
+              label={formatMessage("collectorGroupAgentsLabel")}
             />
-          </div> 
+          </div>
         </div>
       </Form>
     </Formik>
