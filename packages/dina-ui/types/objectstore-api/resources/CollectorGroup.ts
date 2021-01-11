@@ -7,7 +7,7 @@ export interface CollectorGroupAttributes {
   createdBy?: string;
   createdOn?: string;
   agentIdentifiers: string[];
-  agents: Person[];
+  agents?: Person[];
 }
 
 export type CollectorGroup = KitsuResource & CollectorGroupAttributes;

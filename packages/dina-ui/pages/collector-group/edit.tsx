@@ -33,7 +33,7 @@ export default function CollectorGroupEditPage() {
   const { formatMessage } = useDinaIntl();
   return (
     <div>
-      <Head title={formatMessage("editCollectorGroupTitle")} />
+      <Head title={formatMessage("addCollectorGroupTitle")} />
       <Nav />
       <main className="container-fluid">
         <div>
