@@ -13,13 +13,33 @@ import { withRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
+import { KitsuResponse } from "kitsu";
 
 export function CollectorGroupDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useDinaIntl();
-  const { apiClient, bulkGet, save } = useContext(ApiClientContext);
+  const { bulkGet } = useContext(ApiClientContext);
+  const [collectorGroup, setCollectorGroup] = useState<CollectorGroup>();
+
+  const getAgents = (response: KitsuResponse<CollectorGroup, undefined>) => {
+    if (response?.data?.agentIdentifiers) {
+      const fetchAgents = async () => {
+        return await bulkGet<Person>(
+          response.data.agentIdentifiers.map(
+            agentId => `/person/${agentId}`
+          ) as any,
+          { apiBaseUrl: "/agent-api" }
+        );
+      };
+      const agents = fetchAgents();
+      agents.then(async () => {
+        response.data.agents = await agents;
+        setCollectorGroup(response.data);
+      });
+    }
+  };
 
   return (
     <div>
@@ -34,44 +54,9 @@ export function CollectorGroupDetailsPage({ router }: WithRouterProps) {
       </ButtonBar>
       <Query<CollectorGroup>
         query={{ path: `collection-api/collector-group/${id}` }}
+        onSuccess={getAgents}
       >
-        {({ loading, response }) => {
-          const collectorGroup = response && {
-            ...response.data
-          };
-          let agentsLoading = true;
-          const renderView = () => {
-            return (
-              <main className="container-fluid">
-                <h1>
-                  <DinaMessage id="collectorGroupViewTitle" />
-                </h1>
-                <LoadingSpinner loading={loading || agentsLoading} />
-                {collectorGroup && (
-                  <Formik<CollectorGroup>
-                    initialValues={collectorGroup}
-                    onSubmit={noop}
-                  >
-                    <div>
-                      <div className="row">
-                        <FieldView
-                          className="col-md-2"
-                          name="name"
-                          label={formatMessage("collectorGroupNameLabel")}
-                        />
-                        <FieldView
-                          className="col-md-3"
-                          name="agents"
-                          label={formatMessage("collectorGroupAgentsLabel")}
-                        />
-                      </div>
-                    </div>
-                  </Formik>
-                )}
-              </main>
-            );
-          };
-
+        {({ loading }) => {
           if (collectorGroup && collectorGroup.createdOn) {
             const inUserTimeZone = new Date(
               collectorGroup.createdOn
@@ -79,24 +64,35 @@ export function CollectorGroupDetailsPage({ router }: WithRouterProps) {
             collectorGroup.createdOn = inUserTimeZone;
           }
 
-          if (collectorGroup && collectorGroup.agentIdentifiers) {
-            const fetchAgents = async () => {
-              const a = await bulkGet<Person>(
-                collectorGroup.agentIdentifiers.map(
-                  agentId => `/person/${agentId}`
-                ),
-                { apiBaseUrl: "/agent-api" }
-              );
-              return a;
-            };
-            const agents = fetchAgents();
-            agents.then(async () => {
-              collectorGroup.agents = await agents;
-              renderView();
-              agentsLoading = false;
-            });
-          }
-          return renderView();
+          return (
+            <main className="container-fluid">
+              <h1>
+                <DinaMessage id="collectorGroupViewTitle" />
+              </h1>
+              <LoadingSpinner loading={loading} />
+              {collectorGroup && (
+                <Formik<CollectorGroup>
+                  initialValues={collectorGroup}
+                  onSubmit={noop}
+                >
+                  <div>
+                    <div className="row">
+                      <FieldView
+                        className="col-md-2"
+                        name="name"
+                        label={formatMessage("collectorGroupNameLabel")}
+                      />
+                      <FieldView
+                        className="col-md-3"
+                        name="agents"
+                        label={formatMessage("collectorGroupAgentsLabel")}
+                      />
+                    </div>
+                  </div>
+                </Formik>
+              )}
+            </main>
+          );
         }}
       </Query>
       <Footer />
