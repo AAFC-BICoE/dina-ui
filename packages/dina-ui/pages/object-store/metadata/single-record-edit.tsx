@@ -6,8 +6,6 @@ import {
   ErrorViewer,
   FieldWrapper,
   filterBy,
-  KeyValueTable,
-  KeyValueTableProps,
   NumberField,
   Query,
   ResourceSelect,
@@ -21,7 +19,7 @@ import {
 } from "common-ui";
 import { Form, Formik, useFormikContext } from "formik";
 import { NextRouter, useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Head, Nav } from "../../../components";
 import { FileView } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -32,7 +30,6 @@ import {
   Person
 } from "../../../types/objectstore-api";
 import { getManagedAttributesInUse } from "./edit";
-import { toPairs } from "lodash";
 
 interface SingleMetadataFormProps {
   /** Existing Metadata is required, no new ones are added with this form. */
@@ -274,7 +271,7 @@ function ManagedAttributesEditor() {
   }, []);
 
   return (
-    <div className="form-group">
+    <div className="form-group managed-attributes-editor">
       <h2>
         <DinaMessage id="metadataManagedAttributesLabel" />
       </h2>
