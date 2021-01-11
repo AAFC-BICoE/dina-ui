@@ -6,6 +6,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
   ISNOT: "N'EST PAS",
   OR: "OU",
   areYouSure: "Êtes-vous certain?",
+  attributeLabel: "Attribut",
   backToListButtonText: "Retour à la liste",
   cancelButtonText: "Annuler",
   closeButtonText: "Fermer",
@@ -48,5 +49,6 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
   rows: "rangées",
   select: "Sélectionner ",
   selected: "sélectionné ",
-  showChanges: "Visualiser les modifications "
+  showChanges: "Visualiser les modifications",
+  valueLabel: "Valeur"
 };

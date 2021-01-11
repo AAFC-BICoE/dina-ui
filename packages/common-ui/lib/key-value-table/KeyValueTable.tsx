@@ -2,7 +2,7 @@ import { DefaultTd, FieldHeader } from "common-ui";
 import { toPairs } from "lodash";
 import { ComponentType } from "react";
 import ReactTable, { CellInfo } from "react-table";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { CommonMessage } from "../intl/common-ui-intl";
 
 export interface KeyValueTableProps {
   /** The object whose keys and values are to be shown. */
@@ -31,7 +31,7 @@ export function KeyValueTable({ customValueCells, data }: KeyValueTableProps) {
               <FieldHeader name={field} />
             </strong>
           ),
-          Header: <DinaMessage id="attributeLabel" />,
+          Header: <CommonMessage id="attributeLabel" />,
           className: "key-cell",
           accessor: "field",
           width: 200
@@ -45,7 +45,7 @@ export function KeyValueTable({ customValueCells, data }: KeyValueTableProps) {
             }
             return props.value;
           },
-          Header: <DinaMessage id="valueLabel" />,
+          Header: <CommonMessage id="valueLabel" />,
           accessor: "value",
           className: "value-cell"
         }

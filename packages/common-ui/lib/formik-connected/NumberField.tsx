@@ -25,7 +25,13 @@ export function NumberField(props: LabelWrapperParams) {
             <NumberFormat
               className="form-control"
               onValueChange={onValueChange}
-              value={typeof value === "number" ? value : ""}
+              value={
+                typeof value === "number"
+                  ? value
+                  : typeof value === "string"
+                  ? Number(value)
+                  : ""
+              }
             />
           );
         }}
