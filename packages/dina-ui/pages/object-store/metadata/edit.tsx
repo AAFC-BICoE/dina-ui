@@ -260,6 +260,8 @@ export default function EditMetadatasPage() {
   }
 
   async function onSubmit(changes: RowChange<BulkMetadataEditRow>[]) {
+    let postSaveRedirect = router.query.postSaveRedirect?.toString();
+
     // Loop through the changes per row to get the data to POST to the bulk operations API:
     const editedMetadatas = await Promise.all(
       changes.map<Promise<SaveArgs<Metadata>>>(async row => {
@@ -343,8 +345,7 @@ export default function EditMetadatasPage() {
       });
 
       if (metadataIds.length === 1) {
-        await router.push(`/object-store/object/view?id=${metadataIds[0]}`);
-        return;
+        postSaveRedirect = `/object-store/object/view?id=${metadataIds[0]}`;
       }
     } else if (objectUploadIds) {
       // When adding new Metadatas based on existing ObjectUploads:
@@ -370,14 +371,15 @@ export default function EditMetadatasPage() {
       });
 
       if (createdMetadatas.length === 1) {
-        await router.push(
-          `/object-store/object/view?id=${createdMetadatas[0].id}`
-        );
-        return;
+        postSaveRedirect = `/object-store/object/view?id=${createdMetadatas[0].id}`;
       }
     }
 
-    await router.push("/object-store/object/list");
+    // Set default redirect:
+    postSaveRedirect = postSaveRedirect ?? "/object-store/object/list";
+
+    // Do redirect:
+    await router.push(postSaveRedirect);
   }
 
   const initialFormControls: MetadataEditorControls = {

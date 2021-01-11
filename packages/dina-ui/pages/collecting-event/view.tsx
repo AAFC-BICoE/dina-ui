@@ -11,6 +11,7 @@ import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
+import { AttachmentList } from "../../components/object-store/attachment-list/AttachmentList";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
 
@@ -22,14 +23,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage("collectingEventViewTitle")} />
       <Nav />
-      <ButtonBar>
-        <EditButton entityId={id as string} entityLink="collecting-event" />
-        <CancelButton
-          entityId={id as string}
-          entityLink="/collecting-event"
-          byPassView={true}
-        />
-      </ButtonBar>
+
       <Query<CollectingEvent>
         query={{ path: `collection-api/collecting-event/${id}` }}
       >
@@ -57,24 +51,47 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                   onSubmit={noop}
                 >
                   <div>
-                    <div className="row">
-                      <FieldView
-                        className="col-md-2"
-                        name="startEventDateTime"
-                        label={formatMessage("startEventDateTimeLabel")}
-                      />
-                      {collectingEvent.endEventDateTime && (
+                    <div className="form-group">
+                      <ButtonBar>
+                        <EditButton
+                          entityId={id as string}
+                          entityLink="collecting-event"
+                        />
+                        <CancelButton
+                          entityId={id as string}
+                          entityLink="/collecting-event"
+                          byPassView={true}
+                        />
+                      </ButtonBar>
+                      <div className="row">
                         <FieldView
                           className="col-md-2"
-                          name="endEventDateTime"
-                          label={formatMessage("endEventDateTimeLabel")}
+                          name="startEventDateTime"
+                          label={formatMessage("startEventDateTimeLabel")}
                         />
-                      )}
-                      <FieldView
-                        className="col-md-3"
-                        name="verbatimEventDateTime"
-                        label={formatMessage("verbatimEventDateTimeLabel")}
-                      />
+                        {collectingEvent.endEventDateTime && (
+                          <FieldView
+                            className="col-md-2"
+                            name="endEventDateTime"
+                            label={formatMessage("endEventDateTimeLabel")}
+                          />
+                        )}
+                        <FieldView
+                          className="col-md-3"
+                          name="verbatimEventDateTime"
+                          label={formatMessage("verbatimEventDateTimeLabel")}
+                        />
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <div className="row">
+                        <div className="col-md-6">
+                          <AttachmentList
+                            attachmentPath={`collection-api/collecting-event/${id}/attachment`}
+                            postSaveRedirect={`/collecting-event/view?id=${id}`}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </Formik>

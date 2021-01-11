@@ -2,25 +2,21 @@ import {
   ApiClientContext,
   ButtonBar,
   CancelButton,
-  DateField,
   DeleteButton,
   ErrorViewer,
   LoadingSpinner,
   Query,
   safeSubmit,
   SubmitButton,
-  TextField,
-  SelectField
+  TextField
 } from "common-ui";
 import { Form, Formik, FormikContextType } from "formik";
-import { useRouter, NextRouter } from "next/router";
-import { useContext } from "react";
-import { useEffect } from "react";
-import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
+import { NextRouter, useRouter } from "next/router";
+import { useContext, useState } from "react";
+import Switch from "react-switch";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { useState } from "react";
-import Switch from "react-switch";
+import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
 
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;

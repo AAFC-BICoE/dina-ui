@@ -13,6 +13,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addPersonPopupTooltip: "Add Person without leaving the page",
   agentsSectionTitle: "Agents",
   appTitle: "DINA",
+  attachments: "Attachments",
   attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
   changedProperties: "Changes",

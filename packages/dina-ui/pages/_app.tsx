@@ -17,6 +17,7 @@ import "react-tabs/style/react-tabs.css";
 import "../components/button-bar/nav/app-top.css";
 import "../components/button-bar/nav/nav.css";
 import "../components/button-bar/nav/wet-beow-bootstrap-4.css";
+import { FileUploadProviderImpl } from "../components/object-store/file-upload/FileUploadProvider";
 import { DinaIntlProvider } from "../intl/dina-ui-intl";
 
 /** Get Random UUID */
@@ -50,11 +51,13 @@ export default class DinaUiApp extends App {
     return (
       <KeycloakAccountProvider>
         <AuthenticatedApiClientProvider apiContext={this.contextValue}>
-          <DinaIntlProvider>
-            <ModalProvider appElement={appElement}>
-              <Component {...pageProps} />
-            </ModalProvider>
-          </DinaIntlProvider>
+          <FileUploadProviderImpl>
+            <DinaIntlProvider>
+              <ModalProvider appElement={appElement}>
+                <Component {...pageProps} />
+              </ModalProvider>
+            </DinaIntlProvider>
+          </FileUploadProviderImpl>
         </AuthenticatedApiClientProvider>
       </KeycloakAccountProvider>
     );
