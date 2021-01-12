@@ -4,6 +4,7 @@
 export const DINAUI_MESSAGES_ENGLISH = {
   addAttributesTemplateTitle: "New Attributes Template",
   addCollectingEventTitle: "Add Collecting Event",
+  addCollectorGroupTitle: "Add Collector Group",
   addFilesButton: "Add Files",
   addManagedAttributeButtonText: "Add New Managed Attribute",
   addObjectSubtypeTitle: "Add New Object Subtype",
@@ -19,6 +20,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectionSectionTitle: "Collections",
   collectingEventListTitle: "Collecting Event",
   collectingEventViewTitle: "View Collecting Event",
+  collectorGroupAgentsLabel: "Collector Group Agents",
+  collectorGroupListTitle: "Collector Group",
+  collectorGroupNameLabel: "Collector Group Name",
+  collectorGroupViewTitle: "View Collector Group",
   deleteButtonText: "Delete",
   deleteThisAttributesTemplate: "Delete This Template",
   deleteSelectedButtonText: "Delete Selected",
@@ -60,6 +65,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "End event datetime format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
   field_collectingEvent_startDateTimeError:
     "Start event datetime format must be a subset of: YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
+  field_collectorGroup_agentsError:
+    "At lease one agent should be specified for the group",
   field_createdBy: "Created By",
   field_createdDate: "Created Date",
   field_createdOn: "Created On",
