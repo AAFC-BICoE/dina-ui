@@ -30,7 +30,7 @@ services:
         -Dspring.datasource.continue-on-error=true
         -Dspring.liquibase.user=postgres
         -Dspring.liquibase.password=p
-        -Dspring.servlet.multipart.max-file-size=2MB
+        -Dspring.servlet.multipart.max-file-size=2GB
         -Dspring.servlet.multipart.max-request-size=2GB
         -Dminio.host=minio
         -Dminio.port=9000
