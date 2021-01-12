@@ -24,6 +24,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   deleteButtonText: "Delete",
   deleteThisAttributesTemplate: "Delete This Template",
   deleteSelectedButtonText: "Delete Selected",
+  detachSelectedButtonText: "Detach Selected",
   dinaUserSectionTitle: "Dina User",
   editCollectingEventTitle: "Edit Collecting Event",
   editObjectSubtypeTitle: "Edit Object Subtype",

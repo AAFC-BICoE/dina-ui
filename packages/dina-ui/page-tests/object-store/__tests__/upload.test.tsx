@@ -5,9 +5,8 @@ import {
   IFileWithMeta,
   IMeta
 } from "../../../components/object-store";
-import UploadPage, {
-  fileUploadErrorHandler
-} from "../../../pages/object-store/upload";
+import { fileUploadErrorHandler } from "../../../components/object-store/file-upload/FileUploadProvider";
+import UploadPage from "../../../pages/object-store/upload";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 
 const mockPush = jest.fn();

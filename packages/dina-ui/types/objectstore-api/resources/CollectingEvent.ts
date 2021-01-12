@@ -2,6 +2,7 @@ import { KitsuResource } from "kitsu";
 
 export interface CollectingEventAttributes {
   uuid: string;
+  attachment?: string[];
   startEventDateTime: string;
   endEventDateTime: string;
   verbatimEventDateTime: string;
