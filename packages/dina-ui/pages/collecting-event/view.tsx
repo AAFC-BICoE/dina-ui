@@ -60,6 +60,13 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                     <div className="row">
                       <FieldView
                         className="col-md-2"
+                        name="group"
+                        label={formatMessage("field_group")}
+                      />
+                    </div>
+                    <div className="row">
+                      <FieldView
+                        className="col-md-2"
                         name="startEventDateTime"
                         label={formatMessage("startEventDateTimeLabel")}
                       />
