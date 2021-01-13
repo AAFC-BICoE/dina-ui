@@ -12,7 +12,7 @@ import {
 } from "./ExistingAttachmentsTable";
 
 export interface AttachmentListProps
-  extends ExistingAttachmentsTableProps,
+  extends Omit<ExistingAttachmentsTableProps, "onMetadatasEdited">,
     AttachmentUploaderProps {}
 
 export function AttachmentList({
@@ -22,19 +22,23 @@ export function AttachmentList({
 }: AttachmentListProps) {
   const [lastSave, setLastSave] = useState(Date.now());
 
-  const { response: attachmentsRes } = useQuery<[]>({ path: attachmentPath });
+  const { response: attachmentsRes } = useQuery<[]>(
+    { path: attachmentPath },
+    { deps: [lastSave] }
+  );
   const totalAttachments = attachmentsRes?.data?.length;
 
   async function afterMetadatasSavedInternal(metadataIds: string[]) {
     await afterMetadatasSavedProp(metadataIds);
-
-    // After saving new Metadatas, reset to initial component state:
-    setLastSave(Date.now());
+    resetComponent();
   }
   async function onDetachMetadataIdsInternal(metadataIds: string[]) {
     await onDetachMetadataIdsProp(metadataIds);
+    resetComponent();
+  }
 
-    // After saving new Metadatas, reset to initial component state:
+  // After updating Attachments, reset to initial component state:
+  async function resetComponent() {
     setLastSave(Date.now());
   }
 
@@ -57,6 +61,7 @@ export function AttachmentList({
           <ExistingAttachmentsTable
             attachmentPath={attachmentPath}
             onDetachMetadataIds={onDetachMetadataIdsInternal}
+            onMetadatasEdited={resetComponent}
           />
         </TabPanel>
         <TabPanel>

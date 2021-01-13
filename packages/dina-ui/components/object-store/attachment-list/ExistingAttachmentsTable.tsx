@@ -9,12 +9,13 @@ import {
 import { Form, Formik, FormikContextType } from "formik";
 import { noop, toPairs } from "lodash";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
 
 export interface ExistingAttachmentsTableProps {
   attachmentPath: string;
   onDetachMetadataIds: (metadataIds: string[]) => Promise<void>;
+  onMetadatasEdited: () => Promise<void>;
 }
 export interface AttachmentsTableFormValues {
   /** Tracks which metadata IDs are selected. */
@@ -24,9 +25,9 @@ export interface AttachmentsTableFormValues {
 /** Table showing existing attachment */
 export function ExistingAttachmentsTable({
   attachmentPath,
-  onDetachMetadataIds
+  onDetachMetadataIds,
+  onMetadatasEdited
 }: ExistingAttachmentsTableProps) {
-  const router = useRouter();
   const {
     CheckBoxField,
     CheckBoxHeader,
@@ -34,6 +35,8 @@ export function ExistingAttachmentsTable({
   } = useGroupedCheckBoxes({
     fieldName: "selectedMetadatas"
   });
+
+  const { openMetadataEditorModal } = useBulkMetadataEditModal();
 
   const ATTACHMENT_TABLE_COLUMNS: ColumnDefinition<any>[] = [
     {
@@ -91,9 +94,9 @@ export function ExistingAttachmentsTable({
       .filter(pair => pair[1])
       .map(pair => pair[0]);
 
-    await router.push({
-      pathname: "/object-store/metadata/edit",
-      query: { metadataIds: metadataIds.join(",") }
+    openMetadataEditorModal({
+      afterMetadatasSaved: onMetadatasEdited,
+      metadataIds
     });
   }
 

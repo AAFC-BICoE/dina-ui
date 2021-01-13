@@ -37,7 +37,7 @@ export interface BulkMetadataEditorProps {
   metadataIds?: string[];
   /** IDs of ObjectUplaods to create new Metadatas for. */
   objectUploadIds?: string[];
-  group: string;
+  group?: string;
   afterMetadatasSaved: (metadataIds: string[]) => Promise<void>;
 }
 
@@ -180,7 +180,7 @@ export function BulkMetadataEditor({
       metadatas.push(...existingMetadatas);
 
       // When adding new Metadatas based on existing ObjectUploads:
-    } else if (objectUploadIds) {
+    } else if (objectUploadIds && group) {
       const objectUploads = await bulkGet<ObjectUpload>(
         objectUploadIds.map(id => `/object-upload/${id}`),
         {
@@ -226,7 +226,7 @@ export function BulkMetadataEditor({
     } else {
       // Shouldn't happen:
       throw new Error(
-        "No Metadata IDs or ObjectUpload IDs were provided to load."
+        "No Metadata IDs or ObjectUpload IDs (+ Group) were provided to load."
       );
     }
 

@@ -94,12 +94,12 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                     <AttachmentList
                       attachmentPath={`collection-api/collecting-event/${id}/attachment`}
                       onDetachMetadataIds={metadataIds =>
-                        detachMetadataIds(metadataIds, collectingEvent)
+                        detachMetadataIds(metadataIds, String(id))
                       }
                       afterMetadatasSaved={metadataIds =>
                         attachMetadatasToCollectingEvent(
                           metadataIds,
-                          collectingEvent
+                          String(id)
                         )
                       }
                     />
@@ -116,18 +116,22 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
 }
 
 export function useAttachMetadatasToCollectingEvent() {
-  const { doOperations } = useContext(ApiClientContext);
+  const { apiClient, doOperations } = useContext(ApiClientContext);
 
   async function attachMetadatasToCollectingEvent(
     metadataIds: string[],
-    collectingEvent: PersistedResource<CollectingEvent>
+    collectingEventId: string
   ) {
-    if (!collectingEvent?.attachment) {
-      // Shouldn't happen because the attachment list should be present.
-      return;
+    const { data: collectingEvent } = await apiClient.get<CollectingEvent>(
+      `collection-api/collecting-event/${collectingEventId}`,
+      { include: "attachment" }
+    );
+    if (!collectingEvent.attachment) {
+      throw Error("Attachments undefined.");
     }
+
     const newAttachmentList = [
-      ...(collectingEvent.attachment ?? []),
+      ...collectingEvent.attachment,
       ...metadataIds.map(id => ({ id, type: "metadata" }))
     ];
 
@@ -136,11 +140,14 @@ export function useAttachMetadatasToCollectingEvent() {
 
   async function detachMetadataIds(
     metadataIdsToDetach: string[],
-    collectingEvent: PersistedResource<CollectingEvent>
+    collectingEventId: string
   ) {
-    if (!collectingEvent?.attachment) {
-      // Shouldn't happen because the attachment list should be present.
-      return;
+    const { data: collectingEvent } = await apiClient.get<CollectingEvent>(
+      `collection-api/collecting-event/${collectingEventId}`,
+      { include: "attachment" }
+    );
+    if (!collectingEvent.attachment) {
+      throw Error("Attachments undefined.");
     }
 
     const newAttachmentList = collectingEvent.attachment.filter(
