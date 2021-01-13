@@ -10,7 +10,8 @@ import {
   safeSubmit,
   SubmitButton,
   TextField,
-  SelectField
+  SelectField,
+  useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik, FormikContextType } from "formik";
 import { useRouter, NextRouter } from "next/router";
@@ -82,13 +83,18 @@ function CollectingEventForm({
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
 
+  const groupSelectOptions = [
+    { label: "<any>", value: undefined },
+    ...useGroupSelectOptions()
+  ];
+
   const onSubmit = safeSubmit(
     async (
       submittedValues,
       { setStatus, setSubmitting }: FormikContextType<any>
     ) => {
       if (!checked) delete submittedValues.endEventDateTime;
-      if (submittedValues.startEventDateTime === undefined) {
+      if (!submittedValues.startEventDateTime) {
         setStatus(formatMessage("field_collectingEvent_startDateTimeError"));
         setSubmitting(false);
         return;
@@ -99,10 +105,7 @@ function CollectingEventForm({
         ""
       );
       const datePrecision = [4, 6, 8, 12, 14, 17];
-      if (
-        datePrecision.filter(precision => precision === startDateTime.length)
-          .length !== 1
-      ) {
+      if (!datePrecision.includes(startDateTime.length)) {
         setStatus(formatMessage("field_collectingEvent_startDateTimeError"));
         setSubmitting(false);
         return;
@@ -112,10 +115,7 @@ function CollectingEventForm({
           matcher,
           ""
         );
-        if (
-          datePrecision.filter(precision => precision === endDateTime.length)
-            .length !== 1
-        ) {
+        if (!datePrecision.includes(endDateTime.length)) {
           setStatus(formatMessage("field_collectingEvent_endDateTimeError"));
           setSubmitting(false);
           return;
@@ -156,6 +156,11 @@ function CollectingEventForm({
           />
         </ButtonBar>
         <div>
+          <div className="form-group">
+            <div style={{ width: "300px" }}>
+              <SelectField name="group" options={groupSelectOptions} />
+            </div>
+          </div>
           <div className="row">
             <TextField
               className="col-md-3 startEventDateTime"
