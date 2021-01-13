@@ -2,7 +2,6 @@ import {
   ApiClientContext,
   ButtonBar,
   CancelButton,
-  DateField,
   DeleteButton,
   ErrorViewer,
   LoadingSpinner,
@@ -10,17 +9,20 @@ import {
   safeSubmit,
   SubmitButton,
   TextField,
-  SelectField
+  ResourceSelectField,
+  filterBy
 } from "common-ui";
 import { Form, Formik, FormikContextType } from "formik";
 import { useRouter, NextRouter } from "next/router";
 import { useContext } from "react";
-import { useEffect } from "react";
 import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
+import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useState } from "react";
 import Switch from "react-switch";
+import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
+import { KitsuResponse } from "kitsu";
 
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
@@ -33,6 +35,25 @@ export default function CollectingEventEditPage() {
     query: { id }
   } = router;
   const { formatMessage } = useDinaIntl();
+  const { bulkGet } = useContext(ApiClientContext);
+  const [collectingEvent, setCollectingEvent] = useState<CollectingEvent>();
+  const getAgents = (response: KitsuResponse<CollectingEvent, undefined>) => {
+    if (response?.data?.collectors) {
+      const paths = response?.data?.collectors.map(
+        collector => `/person/${collector.id}`
+      );
+      const fetchAgents = async () => {
+        return await bulkGet<Person>(paths as any, {
+          apiBaseUrl: "/agent-api"
+        });
+      };
+      const agents = fetchAgents();
+      agents.then(async () => {
+        response.data.collectors = await agents;
+        setCollectingEvent(response.data);
+      });
+    }
+  };
   return (
     <div>
       <Head title={formatMessage("editCollectingEventTitle")} />
@@ -44,7 +65,10 @@ export default function CollectingEventEditPage() {
               <DinaMessage id="editCollectingEventTitle" />
             </h1>
             <Query<CollectingEvent>
-              query={{ path: `collection-api/collecting-event/${id}` }}
+              query={{
+                path: `collection-api/collecting-event/${id}?include=collectors`
+              }}
+              onSuccess={getAgents}
             >
               {({ loading, response }) => (
                 <div>
@@ -76,11 +100,16 @@ function CollectingEventForm({
   collectingEvent,
   router
 }: CollectingEventFormProps) {
-  const { save } = useContext(ApiClientContext);
+  const { save, bulkGet } = useContext(ApiClientContext);
   const { id } = router.query;
   const initialValues = collectingEvent || { type: "collecting-event" };
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
+  const [agentIds, setAgentIds] = useState([] as any);
+
+  const populateAgentList = event => {
+    const collectorGroupId = event;
+  };
 
   const onSubmit = safeSubmit(
     async (
@@ -121,6 +150,26 @@ function CollectingEventForm({
           return;
         }
       }
+
+      if (submittedValues.collectorGroupUuid?.id) {
+        submittedValues.collectorGroupUuid =
+          submittedValues.collectorGroupUuid?.id;
+      }
+      // handle converting to relationship manually due to crnk bug
+      const submitCopy = { ...submittedValues };
+      if (submitCopy.collectors) {
+        submittedValues.relationships = {};
+        submittedValues.relationships.collectors = {};
+        submittedValues.relationships.collectors.data = [];
+        submitCopy.collectors.map(collector =>
+          submittedValues.relationships.collectors.data.push({
+            id: collector.id,
+            type: "agent"
+          })
+        );
+        delete submittedValues.collectors;
+      }
+
       await save(
         [
           {
@@ -186,6 +235,22 @@ function CollectingEventForm({
                 className="react-switch"
               />
             </label>
+          </div>
+          <div className="row">
+            <ResourceSelectField<CollectorGroup>
+              name="collectorGroup"
+              filter={filterBy(["name"])}
+              model="collection-api/collector-group"
+              optionLabel={group => group.name}
+              onChange={event => populateAgentList(event)}
+            />
+            <ResourceSelectField<Person>
+              name="collectors"
+              filter={filterBy(["displayName"])}
+              model="agent-api/person"
+              optionLabel={person => person.displayName}
+              isMulti={true}
+            />
           </div>
         </div>
       </Form>
