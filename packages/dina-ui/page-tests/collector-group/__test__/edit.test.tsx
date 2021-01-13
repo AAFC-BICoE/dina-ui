@@ -26,7 +26,7 @@ const mockGet = jest.fn(async model => {
   if (model === "collection-api/collector-group/1") {
     return { data: TEST_COLLECTOR_GROUP };
   } else if (model === "agent-api/person") {
-    return { data: TEST_AGENT };
+    return { data: [TEST_AGENT] };
   }
 });
 
@@ -80,10 +80,18 @@ describe("collector-group edit page", () => {
           op: "POST",
           path: "collector-group",
           value: {
-            attributes: {
-              agentIdentifiers: ["1"]
-            },
+            attributes: {},
             id: "00000000-0000-0000-0000-000000000000",
+            relationships: {
+              agentIdentifiers: {
+                data: [
+                  {
+                    id: "1",
+                    type: "agent"
+                  }
+                ]
+              }
+            },
             type: "collector-group"
           }
         }
@@ -136,8 +144,8 @@ describe("collector-group edit page", () => {
 const TEST_COLLECTOR_GROUP: CollectorGroup = {
   uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
   agentIdentifiers: [
-    "a8fb14f7-cda9-4313-9cc7-f313db653cad",
-    "eb61092e-fb28-41c8-99e6-d78743296520"
+    { id: "a8fb14f7-cda9-4313-9cc7-f313db653cad", type: "agent" },
+    { id: "eb61092e-fb28-41c8-99e6-d78743296520", type: "agent" }
   ],
   id: "1",
   name: "test collector group",

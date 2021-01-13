@@ -24,21 +24,21 @@ export function CollectorGroupDetailsPage({ router }: WithRouterProps) {
   const [collectorGroup, setCollectorGroup] = useState<CollectorGroup>();
 
   const getAgents = (response: KitsuResponse<CollectorGroup, undefined>) => {
-    if (response?.data?.agentIdentifiers) {
-      const fetchAgents = async () => {
+    const fetchAgents = async () => {
+      if (response?.data?.agentIdentifiers) {
         return await bulkGet<Person>(
-          response.data.agentIdentifiers.map(
-            agentId => `/person/${agentId}`
+          response?.data?.agentIdentifiers.map(
+            agent => `/person/${agent.id}`
           ) as any,
           { apiBaseUrl: "/agent-api" }
         );
-      };
-      const agents = fetchAgents();
-      agents.then(async () => {
-        response.data.agents = await agents;
-        setCollectorGroup(response.data);
-      });
-    }
+      }
+    };
+    const agents = fetchAgents();
+    agents.then(async () => {
+      response.data.agents = await agents;
+      setCollectorGroup(response.data);
+    });
   };
 
   return (
@@ -53,7 +53,9 @@ export function CollectorGroupDetailsPage({ router }: WithRouterProps) {
         />
       </ButtonBar>
       <Query<CollectorGroup>
-        query={{ path: `collection-api/collector-group/${id}` }}
+        query={{
+          path: `collection-api/collector-group/${id}?include=agentIdentifiers`
+        }}
         onSuccess={getAgents}
       >
         {({ loading }) => {
