@@ -53,7 +53,7 @@ export default function CollectingEventEditPage() {
     const agents = fetchAgents();
     agents.then(async () => {
       response.data.collectors = await agents;
-      setCollectingEvent(response.data);
+      setCollectingEvent(response.data as CollectingEvent);
     });
   };
   return (
@@ -104,9 +104,12 @@ function CollectingEventForm({
 }: CollectingEventFormProps) {
   const { save, apiClient } = useContext(ApiClientContext);
   const { id } = router.query;
+  const initialValues2 = { type: "collecting-event", collectors: [] };
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
-  const [initialValues, setInitialValues] = useState(collectingEvent);
+  const [initialValues, setInitialValues] = useState(
+    collectingEvent ?? initialValues2
+  );
 
   const populateAgentList = async event => {
     if (!event || !event.id) return;
@@ -120,10 +123,10 @@ function CollectingEventForm({
     );
     // get all agents
     const agentsResp = await apiClient.get<Person[]>(`agent-api/person`, {});
-    if (initialValues)
-      initialValues.collectors = agentsResp.data.filter(agent =>
-        collectorids?.includes(agent.id)
-      );
+
+    initialValues.collectors = agentsResp.data.filter(agent =>
+      collectorids?.includes(agent.id)
+    );
     setInitialValues(initialValues);
   };
 
@@ -200,7 +203,11 @@ function CollectingEventForm({
   );
 
   return (
-    <Formik initialValues={initialValues} onSubmit={onSubmit}>
+    <Formik
+      initialValues={initialValues}
+      onSubmit={onSubmit}
+      enableReinitialize={true}
+    >
       <Form translate={undefined}>
         <ErrorViewer />
         <ButtonBar>

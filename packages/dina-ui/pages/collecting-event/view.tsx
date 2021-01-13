@@ -25,23 +25,23 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const [collectingEvent, setCollectingEvent] = useState<CollectingEvent>();
 
   const getAgents = (response: KitsuResponse<CollectingEvent, undefined>) => {
-    if (response?.data?.collectors) {
-      const fetchAgents = async () => {
-        if (response?.data?.collectors) {
-          return await bulkGet<Person>(
-            response?.data?.collectors.map(
-              collector => `/person/${collector.id}`
-            ) as any,
-            { apiBaseUrl: "/agent-api" }
-          );
-        }
-      };
-      const agents = fetchAgents();
-      agents.then(async () => {
+    const fetchAgents = async () => {
+      if (response?.data?.collectors) {
+        return await bulkGet<Person>(
+          response?.data?.collectors.map(
+            collector => `/person/${collector.id}`
+          ) as any,
+          { apiBaseUrl: "/agent-api" }
+        );
+      }
+    };
+    const agents = fetchAgents();
+    agents
+      .then(async () => {
         response.data.collectors = await agents;
         setCollectingEvent(response.data);
-      });
-    }
+      })
+      .finally(() => setCollectingEvent(response.data));
   };
 
   return (
