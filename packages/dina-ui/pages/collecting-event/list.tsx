@@ -1,4 +1,11 @@
-import { ButtonBar, CreateButton, ListPageLayout, dateCell } from "common-ui";
+import {
+  ButtonBar,
+  CreateButton,
+  ListPageLayout,
+  dateCell,
+  useGroupSelectOptions,
+  SelectField
+} from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -21,6 +28,11 @@ const COLLECTING_EVENT_TABLE_COLUMNS = [
 export default function CollectingEventListPage() {
   const { formatMessage } = useDinaIntl();
 
+  const groupSelectOptions = [
+    { label: "<any>", value: undefined },
+    ...useGroupSelectOptions()
+  ];
+
   return (
     <div>
       <Head title={formatMessage("collectingEventListTitle")} />
@@ -39,6 +51,17 @@ export default function CollectingEventListPage() {
             columns: COLLECTING_EVENT_TABLE_COLUMNS,
             path: "collection-api/collecting-event"
           }}
+          filterFormchildren={({ submitForm }) => (
+            <div className="form-group">
+              <div style={{ width: "300px" }}>
+                <SelectField
+                  onChange={() => setImmediate(submitForm)}
+                  name="group"
+                  options={groupSelectOptions}
+                />
+              </div>
+            </div>
+          )}
         />
       </main>
       <Footer />
