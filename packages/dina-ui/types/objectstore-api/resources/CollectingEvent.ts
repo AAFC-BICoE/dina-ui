@@ -10,6 +10,7 @@ export interface CollectingEventAttributes {
   createdOn?: string;
   collectorGroupUuid?: string;
   collectorGroup?: CollectorGroup[];
+  group: string;
 }
 
 export interface CollectingEventRelationships {

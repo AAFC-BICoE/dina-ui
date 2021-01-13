@@ -40,21 +40,21 @@ export default function CollectingEventEditPage() {
   const { bulkGet } = useContext(ApiClientContext);
   const [collectingEvent, setCollectingEvent] = useState<CollectingEvent>();
   const getAgents = (response: KitsuResponse<CollectingEvent, undefined>) => {
-    if (response?.data?.collectors) {
-      const paths = response?.data?.collectors.map(
-        collector => `/person/${collector.id}`
-      );
-      const fetchAgents = async () => {
-        return await bulkGet<Person>(paths as any, {
-          apiBaseUrl: "/agent-api"
-        });
-      };
-      const agents = fetchAgents();
-      agents.then(async () => {
-        response.data.collectors = await agents;
-        setCollectingEvent(response.data);
-      });
-    }
+    const fetchAgents = async () => {
+      if (response?.data?.collectors) {
+        return await bulkGet<Person>(
+          response?.data?.collectors.map(
+            collector => `/person/${collector.id}`
+          ) as any,
+          { apiBaseUrl: "/agent-api" }
+        );
+      }
+    };
+    const agents = fetchAgents();
+    agents.then(async () => {
+      response.data.collectors = await agents;
+      setCollectingEvent(response.data);
+    });
   };
   return (
     <div>
@@ -72,12 +72,12 @@ export default function CollectingEventEditPage() {
               }}
               onSuccess={getAgents}
             >
-              {({ loading, response }) => (
+              {({ loading }) => (
                 <div>
                   <LoadingSpinner loading={loading} />
-                  {response && (
+                  {collectingEvent && (
                     <CollectingEventForm
-                      collectingEvent={response.data}
+                      collectingEvent={collectingEvent}
                       router={router}
                     />
                   )}
@@ -102,12 +102,11 @@ function CollectingEventForm({
   collectingEvent,
   router
 }: CollectingEventFormProps) {
-  const { save, bulkGet } = useContext(ApiClientContext);
+  const { save } = useContext(ApiClientContext);
   const { id } = router.query;
   const initialValues = collectingEvent || { type: "collecting-event" };
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
-  const [agentIds, setAgentIds] = useState([] as any);
 
   const populateAgentList = event => {
     const collectorGroupId = event;
@@ -248,11 +247,13 @@ function CollectingEventForm({
               model="collection-api/collector-group"
               optionLabel={group => group.name}
               onChange={event => populateAgentList(event)}
+              className="col-md-3"
             />
             <ResourceSelectField<Person>
               name="collectors"
               filter={filterBy(["displayName"])}
               model="agent-api/person"
+              className="col-md-3"
               optionLabel={person => person.displayName}
               isMulti={true}
             />
