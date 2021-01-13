@@ -102,14 +102,29 @@ function CollectingEventForm({
   collectingEvent,
   router
 }: CollectingEventFormProps) {
-  const { save } = useContext(ApiClientContext);
+  const { save, apiClient } = useContext(ApiClientContext);
   const { id } = router.query;
-  const initialValues = collectingEvent || { type: "collecting-event" };
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
+  const [initialValues, setInitialValues] = useState(collectingEvent);
 
-  const populateAgentList = event => {
-    const collectorGroupId = event;
+  const populateAgentList = async event => {
+    if (!event || !event.id) return;
+    // get collectors belong to the collector group this collecting even related to
+    const collectorsResp = await apiClient.get<CollectorGroup>(
+      `collection-api/collector-group/${event.id}?include=agentIdentifiers`,
+      {}
+    );
+    const collectorids = collectorsResp?.data?.agentIdentifiers?.map(
+      agentRel => agentRel.id
+    );
+    // get all agents
+    const agentsResp = await apiClient.get<Person[]>(`agent-api/person`, {});
+    if (initialValues)
+      initialValues.collectors = agentsResp.data.filter(agent =>
+        collectorids?.includes(agent.id)
+      );
+    setInitialValues(initialValues);
   };
 
   const groupSelectOptions = [
