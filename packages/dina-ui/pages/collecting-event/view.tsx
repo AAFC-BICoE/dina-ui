@@ -126,6 +126,7 @@ export function useAttachMetadatasToCollectingEvent() {
       `collection-api/collecting-event/${collectingEventId}`,
       { include: "attachment" }
     );
+    // Shouldn't happen:
     if (!collectingEvent.attachment) {
       throw Error("Attachments undefined.");
     }
@@ -146,6 +147,7 @@ export function useAttachMetadatasToCollectingEvent() {
       `collection-api/collecting-event/${collectingEventId}`,
       { include: "attachment" }
     );
+    // Shouldn't happen:
     if (!collectingEvent.attachment) {
       throw Error("Attachments undefined.");
     }

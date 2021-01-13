@@ -127,7 +127,7 @@ export function ExistingAttachmentsTable({
             </FormikButton>
             <FormikButton
               buttonProps={bulkButtonProps}
-              className="btn btn-primary ml-2 metadata-bulk-edit-button"
+              className="btn btn-primary ml-2 metadata-detach-button"
               onClick={detachSelectedMetadatas}
             >
               <DinaMessage id="detachSelectedButtonText" />
