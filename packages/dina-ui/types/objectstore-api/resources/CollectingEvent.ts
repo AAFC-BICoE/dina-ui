@@ -1,8 +1,9 @@
+import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 
 export interface CollectingEventAttributes {
   uuid: string;
-  attachment?: string[];
+  attachment?: ResourceIdentifierObject[];
   startEventDateTime: string;
   endEventDateTime: string;
   verbatimEventDateTime: string;

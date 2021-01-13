@@ -8,7 +8,8 @@ import {
   withResponse
 } from "common-ui";
 import { Formik } from "formik";
-import { KitsuResource } from "kitsu";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
+import { PersistedResource } from "kitsu";
 import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
@@ -115,11 +116,11 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
 }
 
 export function useAttachMetadatasToCollectingEvent() {
-  const { save } = useContext(ApiClientContext);
+  const { doOperations } = useContext(ApiClientContext);
 
   async function attachMetadatasToCollectingEvent(
     metadataIds: string[],
-    collectingEvent: CollectingEvent
+    collectingEvent: PersistedResource<CollectingEvent>
   ) {
     if (!collectingEvent?.attachment) {
       // Shouldn't happen because the attachment list should be present.
@@ -127,29 +128,15 @@ export function useAttachMetadatasToCollectingEvent() {
     }
     const newAttachmentList = [
       ...(collectingEvent.attachment ?? []),
-      ...metadataIds
+      ...metadataIds.map(id => ({ id, type: "metadata" }))
     ];
 
-    const collectingEventUpdate: KitsuResource & Partial<CollectingEvent> = {
-      id: collectingEvent.id,
-      type: "collecting-event",
-      attachment: newAttachmentList
-    };
-
-    await save(
-      [
-        {
-          resource: collectingEventUpdate,
-          type: "collecting-event"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
+    await updateCollectingEvent(collectingEvent.id, newAttachmentList);
   }
 
   async function detachMetadataIds(
-    metadataIds: string[],
-    collectingEvent: CollectingEvent
+    metadataIdsToDetach: string[],
+    collectingEvent: PersistedResource<CollectingEvent>
   ) {
     if (!collectingEvent?.attachment) {
       // Shouldn't happen because the attachment list should be present.
@@ -157,20 +144,28 @@ export function useAttachMetadatasToCollectingEvent() {
     }
 
     const newAttachmentList = collectingEvent.attachment.filter(
-      existingId => !metadataIds.includes(existingId)
+      existingAttachment => !metadataIdsToDetach.includes(existingAttachment.id)
     );
 
-    const collectingEventUpdate: KitsuResource & Partial<CollectingEvent> = {
-      id: collectingEvent.id,
-      type: "collecting-event",
-      attachment: newAttachmentList
-    };
+    await updateCollectingEvent(collectingEvent.id, newAttachmentList);
+  }
 
-    await save(
+  async function updateCollectingEvent(
+    id: string,
+    newAttachmentsList: ResourceIdentifierObject[]
+  ) {
+    await doOperations(
       [
         {
-          resource: collectingEventUpdate,
-          type: "collecting-event"
+          op: "PATCH",
+          path: `collecting-event/${id}`,
+          value: {
+            id,
+            type: "collecting-event",
+            relationships: {
+              attachment: { data: newAttachmentsList }
+            }
+          }
         }
       ],
       { apiBaseUrl: "/collection-api" }
