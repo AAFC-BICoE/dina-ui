@@ -6,7 +6,9 @@ import { CollectorGroup } from "../../../types/objectstore-api/resources/Collect
 /** Test collector-group with all fields defined. */
 const TEST_COLLECTOR_GROUP: CollectorGroup = {
   uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
-  agentIdentifiers: ["a8fb14f7-cda9-4313-9cc7-f313db653cad"],
+  agentIdentifiers: [
+    { id: "a8fb14f7-cda9-4313-9cc7-f313db653cad", type: "agent" }
+  ],
   id: "1",
   name: "test collector group",
   type: "collector-group"
@@ -28,7 +30,7 @@ const mockPatch = jest.fn(async () => ({
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
   // The get request will return the existing collector-group.
-  if (model === "collection-api/collector-group/100") {
+  if (model === "collection-api/collector-group/100?include=agentIdentifiers") {
     return { data: TEST_COLLECTOR_GROUP };
   }
 });

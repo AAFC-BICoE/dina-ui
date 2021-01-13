@@ -6,8 +6,12 @@ export interface CollectorGroupAttributes {
   name: string;
   createdBy?: string;
   createdOn?: string;
-  agentIdentifiers: string[];
   agents?: Person[];
 }
 
-export type CollectorGroup = KitsuResource & CollectorGroupAttributes;
+export interface CollectorGroupRelationships {
+  agentIdentifiers?: KitsuResource[];
+}
+export type CollectorGroup = KitsuResource &
+  CollectorGroupAttributes &
+  CollectorGroupRelationships;

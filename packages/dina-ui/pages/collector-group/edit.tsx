@@ -66,10 +66,19 @@ function CollectorGroupForm({
         setSubmitting(false);
         return;
       } else {
-        const agentIDs: string[] = [];
-        submittedValues.agentIdentifiers.map(agent => agentIDs.push(agent.id));
-        submittedValues.agentIdentifiers = agentIDs;
+        // handle converting to relationship manually due to crnk bug
+        submittedValues.relationships = {};
+        submittedValues.relationships.agentIdentifiers = {};
+        submittedValues.relationships.agentIdentifiers.data = [];
+        submittedValues.agentIdentifiers.map(agent =>
+          submittedValues.relationships.agentIdentifiers.data.push({
+            id: agent.id,
+            type: "agent"
+          })
+        );
+        delete submittedValues.agentIdentifiers;
       }
+
       await save(
         [
           {
