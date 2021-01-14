@@ -1,6 +1,6 @@
 import DataLoader from "dataloader";
 import { PersistedResource } from "kitsu";
-import { get, zipWith } from "lodash";
+import { get, set, zipWith } from "lodash";
 import { ApiClientContextI } from "./ApiClientContext";
 
 export interface ClientSideJoinSpec {
@@ -53,7 +53,7 @@ export class ClientSideJoiner {
       }
 
       // Otherwise attach the joined resource:
-      baseResource[this.joinSpec.joinField] = joinedResource;
+      set(baseResource, this.joinSpec.joinField, joinedResource);
     });
   }
 }

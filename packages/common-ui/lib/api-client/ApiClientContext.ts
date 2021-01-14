@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import Kitsu, { KitsuResource, PersistedResource, GetParams } from "kitsu";
 import { deserialise, query, error as kitsuError } from "kitsu-core";
-import React from "react";
+import React, { useContext } from "react";
 import { serialize } from "../util/serialize";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
 import {
@@ -78,6 +78,15 @@ export const ApiClientContext = React.createContext<ApiClientContextI>(
   // Default value is undefined. This won't matter as long as the hook is called inside the context provider.
   undefined as any
 );
+
+/** Hook to get the Api Client Context */
+export function useApiClient() {
+  const ctx = useContext(ApiClientContext);
+  if (!ctx) {
+    throw new Error("No ApiClientContex available.");
+  }
+  return ctx;
+}
 
 /**
  * Creates the value of the API client context. The app should only need to call this function

@@ -1,6 +1,6 @@
 import { ResourceSelect, SelectField } from "common-ui";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { ManagedAttribute } from "../../../types/objectstore-api";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { ManagedAttribute } from "../../../../types/objectstore-api";
 import {
   ATTRIBUTE_TEMPLATES_STORAGE_KEY,
   MetadataEditorAttributesControls,

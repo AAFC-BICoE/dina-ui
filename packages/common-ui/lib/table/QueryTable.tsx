@@ -50,6 +50,9 @@ export interface QueryTableProps<TData extends KitsuResource> {
   /** Overrides the inner loading state if set to true. */
   loading?: boolean;
 
+  /** Omits the paging section of the query string for endpoints that don't support paging. */
+  omitPaging?: boolean;
+
   /** Query success callback. */
   onSuccess?: (response: KitsuResponse<TData[], MetaWithTotal>) => void;
 
@@ -105,6 +108,7 @@ export function QueryTable<TData extends KitsuResource>({
   include,
   joinSpecs,
   loading: loadingProp,
+  omitPaging,
   onSuccess,
   onPageSizeChange,
   onSortedChange,
@@ -152,7 +156,14 @@ export function QueryTable<TData extends KitsuResource>({
     sortingRules.map(({ desc, id }) => `${desc ? "-" : ""}${id}`).join() ||
     undefined;
 
-  const query: JsonApiQuerySpec = { path, fields, filter, include, page, sort };
+  const query: JsonApiQuerySpec = {
+    path,
+    fields,
+    filter,
+    include,
+    ...(!omitPaging && { page }),
+    sort
+  };
 
   const mappedColumns = columns.map<Column>(column => {
     // The "columns" prop can be a string or a react-table Column type.
@@ -197,19 +208,23 @@ export function QueryTable<TData extends KitsuResource>({
   return (
     <div className="query-table-wrapper" ref={divWrapperRef}>
       <style>{queryTableStyle}</style>
-      <span>
-        <CommonMessage id="tableTotalCount" values={{ totalCount }} />
-      </span>
-      <span className="mx-3">
-        <Tooltip
-          id="queryTableMultiSortExplanation"
-          visibleElement={
-            <a href="#" aria-describedby="queryTableMultiSortExplanation">
-              <CommonMessage id="queryTableMultiSortTooltipTitle" />
-            </a>
-          }
-        />
-      </span>
+      {!omitPaging && (
+        <span>
+          <CommonMessage id="tableTotalCount" values={{ totalCount }} />
+        </span>
+      )}
+      {resolvedReactTableProps?.sortable !== false && (
+        <span className="mx-3">
+          <Tooltip
+            id="queryTableMultiSortExplanation"
+            visibleElement={
+              <a href="#" aria-describedby="queryTableMultiSortExplanation">
+                <CommonMessage id="queryTableMultiSortTooltipTitle" />
+              </a>
+            }
+          />
+        </span>
+      )}
       {error && (
         <div
           className="alert alert-danger"
@@ -247,6 +262,7 @@ export function QueryTable<TData extends KitsuResource>({
         rowsText={formatMessage({ id: "rows" })}
         previousText={<CommonMessage id="previous" />}
         nextText={<CommonMessage id="next" />}
+        showPagination={!omitPaging}
         {...resolvedReactTableProps}
         pageText={<CommonMessage id="page" />}
       />

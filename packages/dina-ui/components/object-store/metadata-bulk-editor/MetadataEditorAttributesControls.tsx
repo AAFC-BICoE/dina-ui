@@ -10,8 +10,8 @@ import {
   useModal
 } from "common-ui";
 import { Form, Formik, useFormikContext } from "formik";
-import { DinaMessage } from "../../intl/dina-ui-intl";
-import { ManagedAttribute } from "../../types/objectstore-api";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { ManagedAttribute } from "../../../types/objectstore-api";
 
 /** A named set of attributes used for editing Metadatas. */
 export interface AttributesTemplate {

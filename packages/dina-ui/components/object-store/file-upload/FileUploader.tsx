@@ -36,7 +36,7 @@ interface IDropzoneSubmitButtonProps extends IDropzoneCommonProps {
 }
 
 /** The args passed into the onSubmit prop. */
-export type FileUploaderOnSubmitArgs<TValues> = TValues & {
+export type FileUploaderOnSubmitArgs<TValues = {}> = TValues & {
   acceptedFiles: IFileWithMeta[];
 };
 

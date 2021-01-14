@@ -28,7 +28,7 @@ describe("MetadataPreview component", () => {
 
     // There should be a link to single-edit a Metadata:
     expect(wrapper.find("a.metadata-edit-link").prop("href")).toEqual(
-      "/object-store/metadata/edit?metadataIds=232eda40-dc97-4255-91c4-f30485e2c707"
+      "/object-store/metadata/single-record-edit?id=232eda40-dc97-4255-91c4-f30485e2c707"
     );
   });
 });

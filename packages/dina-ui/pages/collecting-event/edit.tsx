@@ -2,25 +2,23 @@ import {
   ApiClientContext,
   ButtonBar,
   CancelButton,
-  DateField,
   DeleteButton,
   ErrorViewer,
   LoadingSpinner,
   Query,
   safeSubmit,
+  SelectField,
   SubmitButton,
   TextField,
-  SelectField
+  useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik, FormikContextType } from "formik";
-import { useRouter, NextRouter } from "next/router";
-import { useContext } from "react";
-import { useEffect } from "react";
-import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
+import { NextRouter, useRouter } from "next/router";
+import { useContext, useState } from "react";
+import Switch from "react-switch";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { useState } from "react";
-import Switch from "react-switch";
+import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
 
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
@@ -82,13 +80,18 @@ function CollectingEventForm({
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
 
+  const groupSelectOptions = [
+    { label: "<any>", value: undefined },
+    ...useGroupSelectOptions()
+  ];
+
   const onSubmit = safeSubmit(
     async (
       submittedValues,
       { setStatus, setSubmitting }: FormikContextType<any>
     ) => {
       if (!checked) delete submittedValues.endEventDateTime;
-      if (submittedValues.startEventDateTime === undefined) {
+      if (!submittedValues.startEventDateTime) {
         setStatus(formatMessage("field_collectingEvent_startDateTimeError"));
         setSubmitting(false);
         return;
@@ -99,10 +102,7 @@ function CollectingEventForm({
         ""
       );
       const datePrecision = [4, 6, 8, 12, 14, 17];
-      if (
-        datePrecision.filter(precision => precision === startDateTime.length)
-          .length !== 1
-      ) {
+      if (!datePrecision.includes(startDateTime.length)) {
         setStatus(formatMessage("field_collectingEvent_startDateTimeError"));
         setSubmitting(false);
         return;
@@ -112,10 +112,7 @@ function CollectingEventForm({
           matcher,
           ""
         );
-        if (
-          datePrecision.filter(precision => precision === endDateTime.length)
-            .length !== 1
-        ) {
+        if (!datePrecision.includes(endDateTime.length)) {
           setStatus(formatMessage("field_collectingEvent_endDateTimeError"));
           setSubmitting(false);
           return;
@@ -156,6 +153,11 @@ function CollectingEventForm({
           />
         </ButtonBar>
         <div>
+          <div className="form-group">
+            <div style={{ width: "300px" }}>
+              <SelectField name="group" options={groupSelectOptions} />
+            </div>
+          </div>
           <div className="row">
             <TextField
               className="col-md-3 startEventDateTime"

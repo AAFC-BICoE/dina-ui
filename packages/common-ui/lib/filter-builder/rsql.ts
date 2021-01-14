@@ -169,7 +169,7 @@ function toPredicate(
   ) {
     searchValue =
       attributeConfig.type === "DROPDOWN"
-        ? (value as KitsuResource).id
+        ? String((value as KitsuResource).id)
         : (value as string);
 
     if (searchType === "PARTIAL_MATCH") {
