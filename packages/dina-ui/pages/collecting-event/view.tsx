@@ -50,7 +50,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const collectingEventQuery = useQuery<CollectingEvent>(
     {
       path: `collection-api/collecting-event/${id}`,
-      include: "attachment, collectors"
+      include: "attachement,collectors"
     },
     {
       onSuccess: getAgents
@@ -86,55 +86,57 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
               <DinaMessage id="collectingEventViewTitle" />
             </h1>
             <div>
-              <Formik<CollectingEvent>
-                initialValues={collectingEvent}
-                onSubmit={noop}
-              >
-                <div>
-                  <div className="form-group">
-                    <ButtonBar>
-                      <EditButton
-                        entityId={id as string}
-                        entityLink="collecting-event"
-                      />
-                      <CancelButton
-                        entityId={id as string}
-                        entityLink="/collecting-event"
-                        byPassView={true}
-                      />
-                    </ButtonBar>
-                    <div className="row">
-                      <FieldView
-                        className="col-md-2"
-                        name="group"
-                        label={formatMessage("field_group")}
-                      />
-                    </div>
-                    <div className="row">
-                      <FieldView
-                        className="col-md-2"
-                        name="startEventDateTime"
-                        label={formatMessage("startEventDateTimeLabel")}
-                      />
-                      {collectingEvent.endEventDateTime && (
+              {collectingEvent && (
+                <Formik<CollectingEvent>
+                  initialValues={collectingEvent}
+                  onSubmit={noop}
+                >
+                  <div>
+                    <div className="form-group">
+                      <ButtonBar>
+                        <EditButton
+                          entityId={id as string}
+                          entityLink="collecting-event"
+                        />
+                        <CancelButton
+                          entityId={id as string}
+                          entityLink="/collecting-event"
+                          byPassView={true}
+                        />
+                      </ButtonBar>
+                      <div className="row">
                         <FieldView
                           className="col-md-2"
-                          name="endEventDateTime"
-                          label={formatMessage("endEventDateTimeLabel")}
+                          name="group"
+                          label={formatMessage("field_group")}
                         />
-                      )}
-                      <FieldView
-                        className="col-md-3"
-                        name="verbatimEventDateTime"
-                        label={formatMessage("verbatimEventDateTimeLabel")}
-                      />
-                    </div>
-                    <div className="row">
-                      <FieldView className="col-md-2" name="collectors" />
+                      </div>
+                      <div className="row">
+                        <FieldView
+                          className="col-md-2"
+                          name="startEventDateTime"
+                          label={formatMessage("startEventDateTimeLabel")}
+                        />
+                        {collectingEvent.endEventDateTime && (
+                          <FieldView
+                            className="col-md-2"
+                            name="endEventDateTime"
+                            label={formatMessage("endEventDateTimeLabel")}
+                          />
+                        )}
+                        <FieldView
+                          className="col-md-3"
+                          name="verbatimEventDateTime"
+                          label={formatMessage("verbatimEventDateTimeLabel")}
+                        />
+                      </div>
+                      <div className="row">
+                        <FieldView className="col-md-2" name="collectors" />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Formik>
+                </Formik>
+              )}
               <div className="form-group">
                 <div className="row">
                   <div className="col-md-6">
