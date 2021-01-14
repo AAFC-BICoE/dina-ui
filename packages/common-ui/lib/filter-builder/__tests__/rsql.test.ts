@@ -1,3 +1,4 @@
+import { KitsuResource } from "kitsu";
 import { FilterGroupModel } from "../FilterGroup";
 import { rsql } from "../rsql";
 
@@ -438,5 +439,31 @@ describe("rsql conversion", () => {
     expect(rsqlFilter).toEqual(
       "myDateField=ge=2020-10-06T00:00:00+00:00;myDateField=le=2020-10-12T23:59:59+00:00"
     );
+  });
+
+  it("Converts a dropdown-type filter with a null ID value.", () => {
+    const model: FilterGroupModel = {
+      children: [
+        {
+          attribute: {
+            name: "acMetadataCreator",
+            type: "DROPDOWN",
+            resourcePath: "agent-api/person"
+          },
+          id: 3,
+          predicate: "IS",
+          searchType: "EXACT_MATCH",
+          type: "FILTER_ROW",
+          // Null ID:
+          value: { id: null } as any
+        }
+      ],
+      id: 4,
+      operator: "AND",
+      type: "FILTER_GROUP"
+    };
+
+    const rsqlFilter = rsql(model);
+    expect(rsqlFilter).toEqual("acMetadataCreator==null");
   });
 });

@@ -36,7 +36,7 @@ export function ListPageLayout<TData extends KitsuResource>({
 
   // Use a localStorage hook to get the filter form state,
   // and re-render when the watched localStorage key is changed.
-  const [filterForm] = useLocalStorage<any>(filterformKey, {});
+  const [filterForm, setFilterForm] = useLocalStorage<any>(filterformKey, {});
 
   // Default sort and page-size from the QueryTable. These are only used on the initial
   // QueryTable render, and are saved in localStorage when the table's sort or page-size is changed.
@@ -49,7 +49,15 @@ export function ListPageLayout<TData extends KitsuResource>({
     tablePageSizeKey
   );
 
-  const filterBuilderRsql = rsql(filterForm.filterBuilderModel);
+  let filterBuilderRsql = "";
+  try {
+    filterBuilderRsql = rsql(filterForm.filterBuilderModel);
+  } catch (error) {
+    // If there is an error, ignore the filter form rsql instead of crashing the page.
+    // tslint:disable-next-line
+    console.error(error);
+    setImmediate(() => setFilterForm({}));
+  }
 
   const additionalFilters =
     typeof additionalFiltersProp === "function"
