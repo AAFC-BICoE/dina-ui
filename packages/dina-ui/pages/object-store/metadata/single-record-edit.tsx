@@ -21,7 +21,10 @@ import { Form, Formik, useFormikContext } from "formik";
 import { NextRouter, useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Head, Nav } from "../../../components";
-import { FileView } from "../../../components/object-store";
+import {
+  FileView,
+  getManagedAttributesInUse
+} from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   License,
@@ -29,7 +32,6 @@ import {
   Metadata,
   Person
 } from "../../../types/objectstore-api";
-import { getManagedAttributesInUse } from "./edit";
 
 interface SingleMetadataFormProps {
   /** Existing Metadata is required, no new ones are added with this form. */

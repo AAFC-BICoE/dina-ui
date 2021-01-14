@@ -14,6 +14,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addPersonPopupTooltip: "Add Person without leaving the page",
   agentsSectionTitle: "Agents",
   appTitle: "DINA",
+  attachments: "Attachments",
+  attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
   changedProperties: "Changes",
   closePreviewButtonText: "Close Preview",
@@ -27,6 +29,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   deleteButtonText: "Delete",
   deleteThisAttributesTemplate: "Delete This Template",
   deleteSelectedButtonText: "Delete Selected",
+  detachSelectedButtonText: "Detach Selected",
   dinaUserSectionTitle: "Dina User",
   editableManagedAttributesRemoveInfo:
     "Note: Removing an attribute from the 'Visible Managed Attributes' list doesn't delete the value. To delete the value, clear the input below.",

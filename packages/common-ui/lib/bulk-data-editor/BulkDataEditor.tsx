@@ -119,7 +119,11 @@ export function BulkDataEditor<TRow>({
       `}</style>
       <ErrorViewer />
       {validationAlertJsx}
-      <div className="form-group">
+      {/** Setting the width/height and overflow:hidden here is detected by Handsontable and enables horizontal scrolling: */}
+      <div
+        className="form-group"
+        style={{ width: "100%", height: "100%", overflowX: "hidden" }}
+      >
         <DynamicHotTable
           afterValidate={afterValidate}
           columns={columns}
@@ -127,6 +131,11 @@ export function BulkDataEditor<TRow>({
           manualColumnResize={true}
           maxRows={workingTableData.length}
           rowHeaders={true}
+          // Disables handsontable's feature to hide off-screen rows/columns for performance.
+          // This fixes the scrolling inside a modal, but maybe change this later to improve performance
+          // for 100s or more rows.
+          viewportColumnRenderingOffset={1000}
+          viewportRowRenderingOffset={1000}
         />
       </div>
       <FormikButton
