@@ -50,7 +50,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const collectingEventQuery = useQuery<CollectingEvent>(
     {
       path: `collection-api/collecting-event/${id}`,
-      include: "attachement,collectors"
+      include: "attachment,collectors"
     },
     {
       onSuccess: getAgents
