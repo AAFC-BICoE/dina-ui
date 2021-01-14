@@ -52,8 +52,8 @@ export function TextField(props: TextFieldProps) {
             <textarea rows={4} {...inputPropsInternal} />
           ) : (
             <input
-              {...inputPropsInternal}
               type="text"
+              {...inputPropsInternal}
               placeholder={placeholder}
             />
           );

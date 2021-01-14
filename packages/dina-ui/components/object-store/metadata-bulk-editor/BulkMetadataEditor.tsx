@@ -1,6 +1,7 @@
 import { HotColumnProps } from "@handsontable/react";
 import {
   ApiClientContext,
+  ApiClientContextI,
   BulkDataEditor,
   decodeResourceCell,
   encodeResourceCell,
@@ -131,29 +132,6 @@ export function BulkMetadataEditor({
     return <LoadingSpinner loading={true} />;
   }
 
-  /**
-   * Initializes the editable managed attributes based on what attributes are set on the metadatas.
-   */
-  async function getManagedAttributesInUse(metadatas: Metadata[]) {
-    // Loop through the metadatas and find which managed attributes are set:
-    const managedAttributeIdMap: Record<string, true> = {};
-    for (const metadata of metadatas) {
-      const keys = Object.keys(metadata.managedAttributeMap?.values ?? {});
-      for (const key of keys) {
-        managedAttributeIdMap[key] = true;
-      }
-    }
-    const managedAttributeIds = Object.keys(managedAttributeIdMap);
-
-    // Fetch the managed attributes from the back-end:
-    const newInitialEditableManagedAttributes = await bulkGet<ManagedAttribute>(
-      managedAttributeIds.map(id => `/managed-attribute/${id}`),
-      { apiBaseUrl: "/objectstore-api" }
-    );
-
-    return newInitialEditableManagedAttributes;
-  }
-
   async function loadData() {
     const metadatas: Metadata[] = [];
 
@@ -230,7 +208,10 @@ export function BulkMetadataEditor({
       );
     }
 
-    const managedAttributesInUse = await getManagedAttributesInUse(metadatas);
+    const managedAttributesInUse = await getManagedAttributesInUse(
+      metadatas,
+      bulkGet
+    );
     setInitialEditableManagedAttributes(managedAttributesInUse);
 
     const newTableData = await Promise.all(
@@ -424,6 +405,32 @@ export function BulkMetadataEditor({
       </div>
     </div>
   );
+}
+
+/**
+ * Initializes the editable managed attributes based on what attributes are set on the metadatas.
+ */
+export async function getManagedAttributesInUse(
+  metadatas: Metadata[],
+  bulkGet: ApiClientContextI["bulkGet"]
+) {
+  // Loop through the metadatas and find which managed attributes are set:
+  const managedAttributeIdMap: Record<string, true> = {};
+  for (const metadata of metadatas) {
+    const keys = Object.keys(metadata.managedAttributeMap?.values ?? {});
+    for (const key of keys) {
+      managedAttributeIdMap[key] = true;
+    }
+  }
+  const managedAttributeIds = Object.keys(managedAttributeIdMap);
+
+  // Fetch the managed attributes from the back-end:
+  const newInitialEditableManagedAttributes = await bulkGet<ManagedAttribute>(
+    managedAttributeIds.map(id => `/managed-attribute/${id}`),
+    { apiBaseUrl: "/objectstore-api" }
+  );
+
+  return newInitialEditableManagedAttributes;
 }
 
 export function managedAttributeColumns(

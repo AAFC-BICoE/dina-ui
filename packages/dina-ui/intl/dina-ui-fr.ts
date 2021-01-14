@@ -10,7 +10,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addPersonTitle: "Ajouter une personne",
   agentsSectionTitle: "Agents",
   appTitle: "DINA",
-  attributeLabel: "Attribut",
   cancelButtonText: "Annuler",
   changedProperties: "Modifications",
   closePreviewButtonText: "Fermer la prévisualisation",
@@ -119,7 +118,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Glisser-déposer les fichiers ici ou cliquer pour ouvrir la fenêtre de dialogue. Seuls les fichiers graphiques, audio, vidéo, .pdf, .doc et .docx sont acceptés.",
   uploadPageTitle: "Télécharger les fichiers",
   userMustBelongToGroup: "L'utilisateur doit appartenir à un groupe",
-  valueLabel: "Valeur",
   viewPreviewButtonText: "Prévisualiser",
   whoAmITitle: "Qui suis-je?"
 };

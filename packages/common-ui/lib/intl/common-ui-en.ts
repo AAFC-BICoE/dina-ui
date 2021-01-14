@@ -8,6 +8,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   OR: "OR",
   addNew: "Add New",
   areYouSure: "Are you sure?",
+  attributeLabel: "Attribute",
   backToListButtonText: "Back to List",
   bulkEditorValidationError: "Invalid value on row {row}: {value}",
   cancelButtonText: "Cancel",
@@ -42,6 +43,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   name: "Name",
   next: "Next",
   no: "No",
+  none: "None",
   noRowsFound: "No Rows Found",
   of: "of",
   page: "Page",
@@ -57,5 +59,6 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   submitBtnText: "Save",
   tableTotalCount: "Total matched records: {totalCount}",
   uiAppVersion: "UI Application Version: {version}",
+  valueLabel: "Value",
   yes: "Yes"
 };

@@ -119,10 +119,10 @@ export function BulkDataEditor<TRow>({
       `}</style>
       <ErrorViewer />
       {validationAlertJsx}
-      {/** Setting the width and overflow:hidden here is detected by Handsontable and enables horizontal scrolling: */}
+      {/** Setting the width/height and overflow:hidden here is detected by Handsontable and enables horizontal scrolling: */}
       <div
         className="form-group"
-        style={{ width: "100%", overflowX: "hidden" }}
+        style={{ width: "100%", height: "100%", overflowX: "hidden" }}
       >
         <DynamicHotTable
           afterValidate={afterValidate}
