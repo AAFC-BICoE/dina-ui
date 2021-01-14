@@ -27,6 +27,7 @@ const mockSave = jest.fn(ops =>
 
 const apiContext = {
   apiClient: {
+    get: async () => ({ data: [] }),
     axios: {
       post: mockPost
     }
