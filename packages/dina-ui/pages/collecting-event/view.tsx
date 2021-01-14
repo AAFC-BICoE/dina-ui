@@ -133,13 +133,8 @@ export function useAttachMetadatasToCollectingEvent() {
       `collection-api/collecting-event/${collectingEventId}`,
       { include: "attachment" }
     );
-    // Shouldn't happen:
-    if (!collectingEvent.attachment) {
-      throw Error("Attachments undefined.");
-    }
-
     const newAttachmentList = [
-      ...collectingEvent.attachment,
+      ...(collectingEvent.attachment ?? []),
       ...metadataIds.map(id => ({ id, type: "metadata" }))
     ];
 
@@ -154,12 +149,7 @@ export function useAttachMetadatasToCollectingEvent() {
       `collection-api/collecting-event/${collectingEventId}`,
       { include: "attachment" }
     );
-    // Shouldn't happen:
-    if (!collectingEvent.attachment) {
-      throw Error("Attachments undefined.");
-    }
-
-    const newAttachmentList = collectingEvent.attachment.filter(
+    const newAttachmentList = (collectingEvent.attachment ?? []).filter(
       existingAttachment => !metadataIdsToDetach.includes(existingAttachment.id)
     );
 
