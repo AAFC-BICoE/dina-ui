@@ -104,11 +104,12 @@ function CollectingEventForm({
 }: CollectingEventFormProps) {
   const { save, apiClient } = useContext(ApiClientContext);
   const { id } = router.query;
-  const initialValues2 = { type: "collecting-event", collectors: [] };
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
+  const [key, setKey] = useState(0);
+  const [useCollectorGroup, setUseCollectoGroup] = useState(false);
   const [initialValues, setInitialValues] = useState(
-    collectingEvent ?? initialValues2
+    collectingEvent ?? { type: "collecting-event", collectors: [] }
   );
 
   const populateAgentList = async event => {
@@ -127,7 +128,8 @@ function CollectingEventForm({
     initialValues.collectors = agentsResp.data.filter(agent =>
       collectorids?.includes(agent.id)
     );
-    setInitialValues(initialValues);
+    // set a random number as a key to enable formik reinitialise after initial value changes
+    setKey(Math.random());
   };
 
   const groupSelectOptions = [
@@ -169,10 +171,6 @@ function CollectingEventForm({
         }
       }
 
-      if (submittedValues.collectorGroupUuid?.id) {
-        submittedValues.collectorGroupUuid =
-          submittedValues.collectorGroupUuid?.id;
-      }
       // handle converting to relationship manually due to crnk bug
       const submitCopy = { ...submittedValues };
       if (submitCopy.collectors) {
@@ -187,6 +185,7 @@ function CollectingEventForm({
         );
         delete submittedValues.collectors;
       }
+
       await save(
         [
           {
@@ -207,6 +206,7 @@ function CollectingEventForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
       enableReinitialize={true}
+      key={key}
     >
       <Form translate={undefined}>
         <ErrorViewer />
@@ -232,6 +232,14 @@ function CollectingEventForm({
             </div>
           </div>
           <div className="row">
+            <label style={{ marginLeft: 15, marginTop: 25 }}>
+              <span>{formatMessage("enableDateRangeLabel")}</span>
+              <Switch
+                onChange={e => setChecked(e)}
+                checked={checked}
+                className="react-switch"
+              />
+            </label>
             <TextField
               className="col-md-3 startEventDateTime"
               name="startEventDateTime"
@@ -253,24 +261,14 @@ function CollectingEventForm({
             />
           </div>
           <div className="row">
-            <label style={{ marginLeft: 15 }}>
-              <span>{formatMessage("enableDateRangeLabel")}</span>
+            <label style={{ marginLeft: 15, marginTop: 25 }}>
+              <span>{formatMessage("useCollectorGroupLabel")}</span>
               <Switch
-                onChange={e => setChecked(e)}
-                checked={checked}
+                onChange={e => setUseCollectoGroup(e)}
+                checked={useCollectorGroup}
                 className="react-switch"
               />
             </label>
-          </div>
-          <div className="row">
-            <ResourceSelectField<CollectorGroup>
-              name="collectorGroup"
-              filter={filterBy(["name"])}
-              model="collection-api/collector-group"
-              optionLabel={group => group.name}
-              onChange={event => populateAgentList(event)}
-              className="col-md-3"
-            />
             <ResourceSelectField<Person>
               name="collectors"
               filter={filterBy(["displayName"])}
@@ -279,6 +277,17 @@ function CollectingEventForm({
               optionLabel={person => person.displayName}
               isMulti={true}
             />
+            {useCollectorGroup && (
+              <ResourceSelectField<CollectorGroup>
+                name="collectorGroup"
+                filter={filterBy(["name"])}
+                model="collection-api/collector-group"
+                optionLabel={group => group.name}
+                onChange={event => populateAgentList(event)}
+                className="col-md-3"
+                label={formatMessage("selectCollectorGroupLabel")}
+              />
+            )}
           </div>
         </div>
       </Form>

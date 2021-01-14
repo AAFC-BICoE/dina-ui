@@ -78,7 +78,7 @@ export function Nav() {
             <li className="list-inline-item my-auto">
               <NavSeqDBDropdown />
             </li>
-            <li className="list-inline-item my-auto d-none">
+            <li className="list-inline-item my-auto">
               <NavCollectingEventDropdown />
             </li>
           </ul>

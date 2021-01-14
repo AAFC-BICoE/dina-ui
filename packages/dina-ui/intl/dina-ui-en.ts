@@ -154,6 +154,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   revisionsButtonText: "Revisions",
   revisionsByUserPageTitle: "Revisions by user",
   searchButton: "Search",
+  selectCollectorGroupLabel:
+    "Select a collector group to pre-poplulate 'Collectors' field",
   startEventDateTimeLabel: "Start Event DateTime",
   thumbnailNotAvailableText: "No thumbnail available",
   uploadButtonText: "Upload",
@@ -161,6 +163,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
   uploadFilesMaxSize: "The maximum file size is {maxSize}.",
   uploadPageTitle: "Upload Files",
+  useCollectorGroupLabel: "Use Collector Group",
   userMustBelongToGroup: "User must belong to a Group",
   verbatimEventDateTimeLabel: "Verbatim Event DateTime",
   viewPreviewButtonText: "Preview",
