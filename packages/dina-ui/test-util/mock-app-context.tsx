@@ -8,6 +8,7 @@ import {
 } from "common-ui";
 import { mount } from "enzyme";
 import { merge, noop } from "lodash";
+import { FileUploadProviderImpl } from "../components/object-store/file-upload/FileUploadProvider";
 import { DinaIntlProvider } from "../intl/dina-ui-intl";
 
 interface MockAppContextProviderProps {
@@ -32,11 +33,13 @@ export function MockAppContextProvider({
       <AuthenticatedApiClientProvider
         apiContext={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContext)}
       >
-        <DinaIntlProvider>
-          <ModalProvider appElement={document.querySelector("body")}>
-            {children}
-          </ModalProvider>
-        </DinaIntlProvider>
+        <FileUploadProviderImpl>
+          <DinaIntlProvider>
+            <ModalProvider appElement={document.querySelector("body")}>
+              {children}
+            </ModalProvider>
+          </DinaIntlProvider>
+        </FileUploadProviderImpl>
       </AuthenticatedApiClientProvider>
     </AccountProvider>
   );

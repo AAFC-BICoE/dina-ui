@@ -1,4 +1,7 @@
-import { CollectingEventDetailsPage } from "../../../pages/collecting-event/view";
+import {
+  CollectingEventDetailsPage,
+  useAttachMetadatasToCollectingEvent
+} from "../../../pages/collecting-event/view";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { CollectingEvent } from "../../../types/objectstore-api/resources/CollectingEvent";
 
@@ -62,5 +65,145 @@ describe("CollectingEvent details page", () => {
         <p>From 2019, 1,1,10,10,10 to 2019, 1.6, 10,10,10</p>
       )
     ).toEqual(true);
+  });
+
+  /** Test component for testing the useAttachMetadatasToCollectingEvent hook. */
+  function TestAttachControlsComponent() {
+    const {
+      attachMetadatasToCollectingEvent,
+      detachMetadataIds
+    } = useAttachMetadatasToCollectingEvent();
+    return (
+      <div>
+        <button
+          className="attach"
+          onClick={() =>
+            attachMetadatasToCollectingEvent(
+              [
+                "11111111-1111-1111-1111-111111111111",
+                "22222222-2222-2222-2222-222222222222"
+              ],
+              "00000000-0000-0000-0000-000000000000"
+            )
+          }
+        />
+        <button
+          className="detach"
+          onClick={() =>
+            detachMetadataIds(
+              [
+                "11111111-1111-1111-1111-111111111111",
+                "22222222-2222-2222-2222-222222222222"
+              ],
+              "00000000-0000-0000-0000-000000000000"
+            )
+          }
+        />
+      </div>
+    );
+  }
+
+  it("Attaches Metadatas to a CollectingEvent.", async () => {
+    const mockDoOperations = jest.fn();
+    const mockGet1CollectingEvent = jest.fn(async () => ({
+      data: {
+        id: "00000000-0000-0000-0000-000000000000",
+        attachment: [
+          { id: "99999999-9999-9999-9999-999999999999", type: "metadata" }
+        ]
+      }
+    }));
+    const wrapper = mountWithAppContext(<TestAttachControlsComponent />, {
+      apiContext: {
+        apiClient: { get: mockGet1CollectingEvent } as any,
+        doOperations: mockDoOperations
+      }
+    });
+
+    wrapper.find("button.attach").simulate("click");
+
+    await new Promise(setImmediate);
+
+    expect(mockDoOperations).lastCalledWith(
+      [
+        {
+          op: "PATCH",
+          path: "collecting-event/00000000-0000-0000-0000-000000000000",
+          value: {
+            id: "00000000-0000-0000-0000-000000000000",
+            relationships: {
+              attachment: {
+                // The 1 existing attachment + 2 new ones:
+                data: [
+                  {
+                    id: "99999999-9999-9999-9999-999999999999",
+                    type: "metadata"
+                  },
+                  {
+                    id: "11111111-1111-1111-1111-111111111111",
+                    type: "metadata"
+                  },
+                  {
+                    id: "22222222-2222-2222-2222-222222222222",
+                    type: "metadata"
+                  }
+                ]
+              }
+            },
+            type: "collecting-event"
+          }
+        }
+      ],
+      { apiBaseUrl: "/collection-api" }
+    );
+  });
+
+  it("Detaches Metadatas from a CollectingEvent.", async () => {
+    const mockDoOperations = jest.fn();
+    const mockGet1CollectingEvent = jest.fn(async () => ({
+      data: {
+        id: "00000000-0000-0000-0000-000000000000",
+        attachment: [
+          { id: "11111111-1111-1111-1111-111111111111", type: "metadata" },
+          { id: "22222222-2222-2222-2222-222222222222", type: "metadata" },
+          { id: "33333333-3333-3333-3333-333333333333", type: "metadata" }
+        ]
+      }
+    }));
+    const wrapper = mountWithAppContext(<TestAttachControlsComponent />, {
+      apiContext: {
+        apiClient: { get: mockGet1CollectingEvent } as any,
+        doOperations: mockDoOperations
+      }
+    });
+
+    wrapper.find("button.detach").simulate("click");
+
+    await new Promise(setImmediate);
+
+    expect(mockDoOperations).lastCalledWith(
+      [
+        {
+          op: "PATCH",
+          path: "collecting-event/00000000-0000-0000-0000-000000000000",
+          value: {
+            id: "00000000-0000-0000-0000-000000000000",
+            relationships: {
+              attachment: {
+                data: [
+                  // Only the 1 attachment that wasn't removed remains:
+                  {
+                    id: "33333333-3333-3333-3333-333333333333",
+                    type: "metadata"
+                  }
+                ]
+              }
+            },
+            type: "collecting-event"
+          }
+        }
+      ],
+      { apiBaseUrl: "/collection-api" }
+    );
   });
 });

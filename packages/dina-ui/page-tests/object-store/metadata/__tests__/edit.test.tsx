@@ -1,15 +1,16 @@
 import { PersistedResource } from "kitsu";
 import Select from "react-select/base";
-import EditMetadatasPage, {
+import {
   BulkMetadataEditRow,
   managedAttributeColumns
-} from "../../../../pages/object-store/metadata/edit";
+} from "../../../../components/object-store";
+import EditMetadatasPage from "../../../../pages/object-store/metadata/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
+  License,
   ManagedAttributeMap,
   Metadata,
-  Person,
-  License
+  Person
 } from "../../../../types/objectstore-api";
 
 const TEST_METADATAS: PersistedResource<Metadata>[] = [

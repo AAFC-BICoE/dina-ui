@@ -39,8 +39,10 @@ export function useHeaderWidthFix({ columns }: HeaderWidthFixParams) {
   // Sometimes the Handsontable resizes itself wrong when clicking on a cell. Run the code again on every mouse click:
   useEffect(() => {
     document.addEventListener("click", fixWidth);
+    document.addEventListener("resize", fixWidth);
     return () => {
       document.removeEventListener("click", fixWidth);
+      document.removeEventListener("resize", fixWidth);
     };
   }, []);
 

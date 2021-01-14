@@ -7,23 +7,23 @@ import {
   LoadingSpinner,
   Query,
   safeSubmit,
+  SelectField,
   SubmitButton,
   TextField,
   ResourceSelectField,
   filterBy,
-  SelectField,
   useGroupSelectOptions
 } from "common-ui";
 import { Form, Formik, FormikContextType } from "formik";
 import { useRouter, NextRouter } from "next/router";
 import { useContext } from "react";
-import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
 import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useState } from "react";
 import Switch from "react-switch";
 import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
+import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
 import { KitsuResponse } from "kitsu";
 
 interface CollectingEventFormProps {
