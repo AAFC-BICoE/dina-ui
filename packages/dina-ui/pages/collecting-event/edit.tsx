@@ -179,7 +179,7 @@ function CollectingEventForm({
 
       // handle converting to relationship manually due to crnk bug
       const submitCopy = { ...submittedValues };
-      if (submitCopy.collectors) {
+      if (submitCopy.collectors && submitCopy.collectors.length > 0) {
         submittedValues.relationships = {};
         submittedValues.relationships.collectors = {};
         submittedValues.relationships.collectors.data = [];
@@ -189,11 +189,12 @@ function CollectingEventForm({
             type: "agent"
           })
         );
-        delete submittedValues.collectors;
       }
+      delete submittedValues.collectors;
 
-      submittedValues.collectorGroupUuid =
-        submittedValues.collectorGroups?.id ?? null;
+      if (submittedValues.collectorGroups?.id)
+        submittedValues.collectorGroupUuid = submittedValues.collectorGroups.id;
+
       delete submittedValues.collectorGroups;
 
       await save(
@@ -247,7 +248,7 @@ function CollectingEventForm({
               <Switch
                 onChange={e => setChecked(e)}
                 checked={checked}
-                className="react-switch"
+                className="react-switch dateRange"
               />
             </label>
             <TextField
