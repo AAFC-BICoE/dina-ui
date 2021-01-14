@@ -9,7 +9,7 @@ export interface CollectingEventAttributes {
   createdBy?: string;
   createdOn?: string;
   collectorGroupUuid?: string;
-  collectorGroup?: CollectorGroup[];
+  collectorGroups?: CollectorGroup[];
   group: string;
 }
 

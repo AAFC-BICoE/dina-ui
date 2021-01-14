@@ -107,19 +107,23 @@ function CollectingEventForm({
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
   const [key, setKey] = useState(0);
-  const [useCollectorGroup, setUseCollectoGroup] = useState(false);
+  const [useCollectorGroup, setUseCollectorGroup] = useState(false);
   const [initialValues, setInitialValues] = useState(
-    collectingEvent ?? { type: "collecting-event", collectors: [] }
+    collectingEvent ?? {
+      type: "collecting-event",
+      collectors: [],
+      collectorGroups: []
+    }
   );
 
   const populateAgentList = async event => {
     if (!event || !event.id) return;
     // get collectors belong to the collector group this collecting even related to
-    const collectorsResp = await apiClient.get<CollectorGroup>(
+    const collectorGroup = await apiClient.get<CollectorGroup>(
       `collection-api/collector-group/${event.id}?include=agentIdentifiers`,
       {}
     );
-    const collectorids = collectorsResp?.data?.agentIdentifiers?.map(
+    const collectorids = collectorGroup?.data?.agentIdentifiers?.map(
       agentRel => agentRel.id
     );
     // get all agents
@@ -128,6 +132,8 @@ function CollectingEventForm({
     initialValues.collectors = agentsResp.data.filter(agent =>
       collectorids?.includes(agent.id)
     );
+    initialValues.collectorGroups = [collectorGroup.data as CollectorGroup];
+
     // set a random number as a key to enable formik reinitialise after initial value changes
     setKey(Math.random());
   };
@@ -185,6 +191,10 @@ function CollectingEventForm({
         );
         delete submittedValues.collectors;
       }
+
+      submittedValues.collectorGroupUuid =
+        submittedValues.collectorGroups?.id ?? null;
+      delete submittedValues.collectorGroups;
 
       await save(
         [
@@ -264,7 +274,7 @@ function CollectingEventForm({
             <label style={{ marginLeft: 15, marginTop: 25 }}>
               <span>{formatMessage("useCollectorGroupLabel")}</span>
               <Switch
-                onChange={e => setUseCollectoGroup(e)}
+                onChange={e => setUseCollectorGroup(e)}
                 checked={useCollectorGroup}
                 className="react-switch"
               />
@@ -279,7 +289,7 @@ function CollectingEventForm({
             />
             {useCollectorGroup && (
               <ResourceSelectField<CollectorGroup>
-                name="collectorGroup"
+                name="collectorGroups"
                 filter={filterBy(["name"])}
                 model="collection-api/collector-group"
                 optionLabel={group => group.name}
