@@ -14,6 +14,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import "react-dropzone-uploader/dist/styles.css";
 import "react-table/react-table.css";
 import "react-tabs/style/react-tabs.css";
+import { ErrorBoundaryPage } from "../components";
 import "../components/button-bar/nav/app-top.css";
 import "../components/button-bar/nav/nav.css";
 import "../components/button-bar/nav/wet-beow-bootstrap-4.css";
@@ -53,9 +54,11 @@ export default class DinaUiApp extends App {
         <AuthenticatedApiClientProvider apiContext={this.contextValue}>
           <FileUploadProviderImpl>
             <DinaIntlProvider>
-              <ModalProvider appElement={appElement}>
-                <Component {...pageProps} />
-              </ModalProvider>
+              <ErrorBoundaryPage>
+                <ModalProvider appElement={appElement}>
+                  <Component {...pageProps} />
+                </ModalProvider>
+              </ErrorBoundaryPage>
             </DinaIntlProvider>
           </FileUploadProviderImpl>
         </AuthenticatedApiClientProvider>

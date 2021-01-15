@@ -204,6 +204,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
                 className="col-md-3 col-sm-4"
                 name="acDigitizationDate"
                 disabled={true}
+                showTime={true}
               />
             </div>
             <div className="row">
