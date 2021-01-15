@@ -21,6 +21,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   editButtonText: "Edit",
   errorPageTitle: "Error",
   existing: "Existing",
+  false: "False",
   field_author: "Author",
   field_changedProperties: "Changed Properties",
   field_commitDateTime: "Commit Date and Time",
@@ -60,6 +61,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   somethingWentWrong: "Something went wrong",
   submitBtnText: "Save",
   tableTotalCount: "Total matched records: {totalCount}",
+  true: "True",
   uiAppVersion: "UI Application Version: {version}",
   valueLabel: "Value",
   yes: "Yes"
