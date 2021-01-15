@@ -93,17 +93,6 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                 >
                   <div>
                     <div className="form-group">
-                      <ButtonBar>
-                        <EditButton
-                          entityId={id as string}
-                          entityLink="collecting-event"
-                        />
-                        <CancelButton
-                          entityId={id as string}
-                          entityLink="/collecting-event"
-                          byPassView={true}
-                        />
-                      </ButtonBar>
                       <div className="row">
                         <FieldView
                           className="col-md-2"

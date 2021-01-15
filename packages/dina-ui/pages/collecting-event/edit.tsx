@@ -14,9 +14,9 @@ import {
   filterBy,
   useGroupSelectOptions
 } from "common-ui";
-import { Form, Formik, FormikContextType } from "formik";
+import { Form, Formik, useFormikContext, FormikContextType } from "formik";
 import { useRouter, NextRouter } from "next/router";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -98,27 +98,16 @@ export default function CollectingEventEditPage() {
   );
 }
 
-function CollectingEventForm({
-  collectingEvent,
-  router
-}: CollectingEventFormProps) {
-  const { save, apiClient } = useContext(ApiClientContext);
-  const { id } = router.query;
+function CollectingEventFormInternal() {
+  const { apiClient } = useContext(ApiClientContext);
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
-  const [key, setKey] = useState(0);
   const [useCollectorGroup, setUseCollectorGroup] = useState(false);
-  const [initialValues, setInitialValues] = useState(
-    collectingEvent ?? {
-      type: "collecting-event",
-      collectors: [],
-      collectorGroups: []
-    }
-  );
+  const formikCtx = useFormikContext<CollectingEvent>();
 
   const populateAgentList = async event => {
     if (!event || !event.id) return;
-    // get collectors belong to the collector group this collecting even related to
+    // get collectors belong to the collector group this collecting event related to
     const collectorGroup = await apiClient.get<CollectorGroup>(
       `collection-api/collector-group/${event.id}?include=agentIdentifiers`,
       {}
@@ -128,14 +117,14 @@ function CollectingEventForm({
     );
     // get all agents
     const agentsResp = await apiClient.get<Person[]>(`agent-api/person`, {});
-
-    initialValues.collectors = agentsResp.data.filter(agent =>
-      collectorids?.includes(agent.id)
-    );
-    initialValues.collectorGroups = [collectorGroup.data as CollectorGroup];
-
-    // set a random number as a key to enable formik reinitialise after initial value changes
-    setKey(Math.random());
+    formikCtx.setValues({
+      ...formikCtx.initialValues,
+      ...formikCtx.values,
+      collectors: agentsResp.data.filter(agent =>
+        collectorids?.includes(agent.id)
+      ),
+      collectorGroups: [collectorGroup.data as CollectorGroup]
+    });
   };
 
   const groupSelectOptions = [
@@ -143,12 +132,94 @@ function CollectingEventForm({
     ...useGroupSelectOptions()
   ];
 
+  return (
+    <div>
+      <div className="form-group">
+        <div style={{ width: "300px" }}>
+          <SelectField name="group" options={groupSelectOptions} />
+        </div>
+      </div>
+      <div className="row">
+        <label style={{ marginLeft: 15, marginTop: 25 }}>
+          <span>{formatMessage("enableDateRangeLabel")}</span>
+          <Switch
+            onChange={e => setChecked(e)}
+            checked={checked}
+            className="react-switch dateRange"
+          />
+        </label>
+        <TextField
+          className="col-md-3 startEventDateTime"
+          name="startEventDateTime"
+          label={formatMessage("startEventDateTimeLabel")}
+          placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
+        />
+        {checked && (
+          <TextField
+            className="col-md-3"
+            name="endEventDateTime"
+            label={formatMessage("endEventDateTimeLabel")}
+            placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
+          />
+        )}
+        <TextField
+          className="col-md-3"
+          name="verbatimEventDateTime"
+          label={formatMessage("verbatimEventDateTimeLabel")}
+        />
+      </div>
+      <div className="row">
+        <label style={{ marginLeft: 15, marginTop: 25 }}>
+          <span>{formatMessage("useCollectorGroupLabel")}</span>
+          <Switch
+            onChange={e => setUseCollectorGroup(e)}
+            checked={useCollectorGroup}
+            className="react-switch"
+          />
+        </label>
+        <ResourceSelectField<Person>
+          name="collectors"
+          filter={filterBy(["displayName"])}
+          model="agent-api/person"
+          className="col-md-3"
+          optionLabel={person => person.displayName}
+          isMulti={true}
+        />
+        {useCollectorGroup && (
+          <ResourceSelectField<CollectorGroup>
+            name="collectorGroups"
+            filter={filterBy(["name"])}
+            model="collection-api/collector-group"
+            optionLabel={group => group.name}
+            onChange={event => populateAgentList(event)}
+            className="col-md-3"
+            label={formatMessage("selectCollectorGroupLabel")}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CollectingEventForm({
+  collectingEvent,
+  router
+}: CollectingEventFormProps) {
+  const { save } = useContext(ApiClientContext);
+  const { id } = router.query;
+  const { formatMessage } = useDinaIntl();
+  const [initialValues, setInitialValues] = useState(
+    collectingEvent ?? {
+      type: "collecting-event",
+      collectors: [],
+      collectorGroups: []
+    }
+  );
   const onSubmit = safeSubmit(
     async (
       submittedValues,
       { setStatus, setSubmitting }: FormikContextType<any>
     ) => {
-      if (!checked) delete submittedValues.endEventDateTime;
       if (!submittedValues.startEventDateTime) {
         setStatus(formatMessage("field_collectingEvent_startDateTimeError"));
         setSubmitting(false);
@@ -165,7 +236,7 @@ function CollectingEventForm({
         setSubmitting(false);
         return;
       }
-      if (checked && submittedValues.endEventDateTime) {
+      if (submittedValues.endEventDateTime) {
         const endDateTime = submittedValues.endEventDateTime.replace(
           matcher,
           ""
@@ -192,11 +263,10 @@ function CollectingEventForm({
       }
       delete submittedValues.collectors;
 
-      if (submittedValues.collectorGroups?.id)
-        submittedValues.collectorGroupUuid = submittedValues.collectorGroups.id;
-
+      if (submittedValues.collectorGroups?.[0].id)
+        submittedValues.collectorGroupUuid =
+          submittedValues.collectorGroups[0].id;
       delete submittedValues.collectorGroups;
-
       await save(
         [
           {
@@ -217,7 +287,6 @@ function CollectingEventForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
       enableReinitialize={true}
-      key={key}
     >
       <Form translate={undefined}>
         <ErrorViewer />
@@ -236,71 +305,7 @@ function CollectingEventForm({
             type="collecting-event"
           />
         </ButtonBar>
-        <div>
-          <div className="form-group">
-            <div style={{ width: "300px" }}>
-              <SelectField name="group" options={groupSelectOptions} />
-            </div>
-          </div>
-          <div className="row">
-            <label style={{ marginLeft: 15, marginTop: 25 }}>
-              <span>{formatMessage("enableDateRangeLabel")}</span>
-              <Switch
-                onChange={e => setChecked(e)}
-                checked={checked}
-                className="react-switch dateRange"
-              />
-            </label>
-            <TextField
-              className="col-md-3 startEventDateTime"
-              name="startEventDateTime"
-              label={formatMessage("startEventDateTimeLabel")}
-              placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
-            />
-            {checked && (
-              <TextField
-                className="col-md-3"
-                name="endEventDateTime"
-                label={formatMessage("endEventDateTimeLabel")}
-                placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
-              />
-            )}
-            <TextField
-              className="col-md-3"
-              name="verbatimEventDateTime"
-              label={formatMessage("verbatimEventDateTimeLabel")}
-            />
-          </div>
-          <div className="row">
-            <label style={{ marginLeft: 15, marginTop: 25 }}>
-              <span>{formatMessage("useCollectorGroupLabel")}</span>
-              <Switch
-                onChange={e => setUseCollectorGroup(e)}
-                checked={useCollectorGroup}
-                className="react-switch"
-              />
-            </label>
-            <ResourceSelectField<Person>
-              name="collectors"
-              filter={filterBy(["displayName"])}
-              model="agent-api/person"
-              className="col-md-3"
-              optionLabel={person => person.displayName}
-              isMulti={true}
-            />
-            {useCollectorGroup && (
-              <ResourceSelectField<CollectorGroup>
-                name="collectorGroups"
-                filter={filterBy(["name"])}
-                model="collection-api/collector-group"
-                optionLabel={group => group.name}
-                onChange={event => populateAgentList(event)}
-                className="col-md-3"
-                label={formatMessage("selectCollectorGroupLabel")}
-              />
-            )}
-          </div>
-        </div>
+        <CollectingEventFormInternal />
       </Form>
     </Formik>
   );
