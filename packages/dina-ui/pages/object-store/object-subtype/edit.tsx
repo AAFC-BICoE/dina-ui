@@ -1,21 +1,19 @@
 import {
-  ApiClientContext,
   ButtonBar,
   CancelButton,
   DateField,
   DeleteButton,
-  ErrorViewer,
+  DinaForm,
+  DinaFormOnSubmit,
   LoadingSpinner,
   Query,
-  safeSubmit,
   SelectField,
   SubmitButton,
   TextField
 } from "common-ui";
-import { Form, Formik, connect } from "formik";
+import { connect } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
-import { useContext } from "react";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ObjectSubtype } from "../../../types/objectstore-api/resources/ObjectSubtype";
@@ -70,11 +68,13 @@ export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
 }
 
 function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
-  const { save } = useContext(ApiClientContext);
   const { id } = router.query;
   const initialValues = objectSubtype || { type: "object-subtype" };
 
-  const onSubmit = safeSubmit(async submittedValues => {
+  const onSubmit: DinaFormOnSubmit = async ({
+    submittedValues,
+    api: { save }
+  }) => {
     await save(
       [
         {
@@ -86,44 +86,41 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
     );
 
     await router.push(`/object-store/object-subtype/list`);
-  });
+  };
 
   return (
-    <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      <Form translate={undefined}>
-        <ErrorViewer />
-        <ButtonBar>
-          <SubmitButton />
-          <CancelButton
-            entityId={id as string}
-            entityLink="/object-store/object-subtype"
-            byPassView={true}
+    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+      <ButtonBar>
+        <SubmitButton />
+        <CancelButton
+          entityId={id as string}
+          entityLink="/object-store/object-subtype"
+          byPassView={true}
+        />
+        <CustomDeleteButton />
+      </ButtonBar>
+      <div>
+        <div className="row">
+          <SelectField
+            options={DC_TYPE_OPTIONS}
+            name="dcType"
+            className="col-sm-4"
           />
-          <CustomDeleteButton />
-        </ButtonBar>
-        <div>
-          <div className="row">
-            <SelectField
-              options={DC_TYPE_OPTIONS}
-              name="dcType"
-              className="col-sm-4"
-            />
-          </div>
-          <div className="row">
-            <TextField className="col-md-4" name="acSubtype" />
-          </div>
-          <div className="row">
-            <DateField
-              className="col-md-4"
-              showTime={true}
-              name="createdOn"
-              disabled={true}
-            />
-            <TextField className="col-md-4" readOnly={true} name="createdBy" />
-          </div>
         </div>
-      </Form>
-    </Formik>
+        <div className="row">
+          <TextField className="col-md-4" name="acSubtype" />
+        </div>
+        <div className="row">
+          <DateField
+            className="col-md-4"
+            showTime={true}
+            name="createdOn"
+            disabled={true}
+          />
+          <TextField className="col-md-4" readOnly={true} name="createdBy" />
+        </div>
+      </div>
+    </DinaForm>
   );
 }
 

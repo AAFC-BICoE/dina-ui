@@ -3,21 +3,21 @@ import {
   CancelButton,
   DateField,
   DeleteButton,
-  ErrorViewer,
+  DinaForm,
+  DinaFormOnSubmit,
   FieldWrapper,
   filterBy,
   NumberField,
   Query,
   ResourceSelect,
   ResourceSelectField,
-  safeSubmit,
   SelectField,
   SubmitButton,
   TextField,
   useApiClient,
   withResponse
 } from "common-ui";
-import { Form, Formik, useFormikContext } from "formik";
+import { useFormikContext } from "formik";
 import { NextRouter, useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Head, Nav } from "../../../components";
@@ -102,7 +102,6 @@ export default function MetadataEditPage() {
 
 function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
   const { formatMessage, locale } = useDinaIntl();
-  const { apiClient, save } = useApiClient();
   const { id } = router.query;
 
   // Convert acTags array to a comma-separated string:
@@ -111,7 +110,10 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
     acTags: metadata.acTags?.join(", ") ?? ""
   };
 
-  const onSubmit = safeSubmit(async submittedValues => {
+  const onSubmit: DinaFormOnSubmit = async ({
+    submittedValues,
+    api: { apiClient, save }
+  }) => {
     const {
       acTags,
       license,
@@ -155,7 +157,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
     );
 
     await router.push(`/object-store/object/view?id=${id}`);
-  });
+  };
 
   const filePath = `/api/objectstore-api/file/${metadata.bucket}/${metadata.fileIdentifier}`;
   // fileExtension should always be available when getting the Metadata from the back-end:
@@ -164,92 +166,89 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
     .toLowerCase();
 
   return (
-    <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      <Form translate={undefined}>
-        <ErrorViewer />
-        <ButtonBar>
-          <SubmitButton />
-          <CancelButton
-            entityId={id as string}
-            entityLink="/object-store/object"
+    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+      <ButtonBar>
+        <SubmitButton />
+        <CancelButton
+          entityId={id as string}
+          entityLink="/object-store/object"
+        />
+        <DeleteButton
+          className="ml-5"
+          id={id as string}
+          options={{ apiBaseUrl: "/objectstore-api" }}
+          postDeleteRedirect="/object/list"
+          type="metadata"
+        />
+      </ButtonBar>
+      <div>
+        <div className="form-group">
+          <FileView
+            clickToDownload={true}
+            filePath={filePath}
+            fileType={fileType}
+            imgHeight="15rem"
           />
-          <DeleteButton
-            className="ml-5"
-            id={id as string}
-            options={{ apiBaseUrl: "/objectstore-api" }}
-            postDeleteRedirect="/object/list"
-            type="metadata"
-          />
-        </ButtonBar>
-        <div>
-          <div className="form-group">
-            <FileView
-              clickToDownload={true}
-              filePath={filePath}
-              fileType={fileType}
-              imgHeight="15rem"
+        </div>
+        <div className="form-group">
+          <h2>
+            <DinaMessage id="metadataMediaDetailsLabel" />
+          </h2>
+          <div className="row">
+            <TextField
+              className="col-md-3 col-sm-4"
+              name="originalFilename"
+              readOnly={true}
+            />
+            <DateField
+              className="col-md-3 col-sm-4"
+              name="acDigitizationDate"
+              disabled={true}
             />
           </div>
-          <div className="form-group">
-            <h2>
-              <DinaMessage id="metadataMediaDetailsLabel" />
-            </h2>
-            <div className="row">
-              <TextField
-                className="col-md-3 col-sm-4"
-                name="originalFilename"
-                readOnly={true}
-              />
-              <DateField
-                className="col-md-3 col-sm-4"
-                name="acDigitizationDate"
-                disabled={true}
-              />
-            </div>
-            <div className="row">
-              <SelectField
-                className="col-md-3 col-sm-4"
-                name="dcType"
-                options={DCTYPE_OPTIONS}
-              />
-              <TextField className="col-md-3 col-sm-4" name="acCaption" />
-              <TextField
-                className="col-md-3 col-sm-4"
-                name="acTags"
-                multiLines={true}
-                label={formatMessage("metadataBulkEditTagsLabel")}
-              />
-            </div>
-            <div className="row">
-              <ResourceSelectField<Person>
-                className="col-md-3 col-sm-4"
-                name="dcCreator"
-                filter={filterBy(["displayName"])}
-                model="agent-api/person"
-                optionLabel={person => person.displayName}
-                label={formatMessage("field_dcCreator.displayName")}
-              />
-            </div>
+          <div className="row">
+            <SelectField
+              className="col-md-3 col-sm-4"
+              name="dcType"
+              options={DCTYPE_OPTIONS}
+            />
+            <TextField className="col-md-3 col-sm-4" name="acCaption" />
+            <TextField
+              className="col-md-3 col-sm-4"
+              name="acTags"
+              multiLines={true}
+              label={formatMessage("metadataBulkEditTagsLabel")}
+            />
           </div>
-          <div className="form-group">
-            <h2>
-              <DinaMessage id="metadataRightsDetailsLabel" />
-            </h2>
-            <div className="row">
-              <TextField className="col-md-3 col-sm-4" name="dcRights" />
-              <ResourceSelectField<License>
-                className="col-md-3 col-sm-4"
-                name="license"
-                filter={() => ({})}
-                model="objectstore-api/license"
-                optionLabel={license => license.titles[locale] ?? license.url}
-              />
-            </div>
+          <div className="row">
+            <ResourceSelectField<Person>
+              className="col-md-3 col-sm-4"
+              name="dcCreator"
+              filter={filterBy(["displayName"])}
+              model="agent-api/person"
+              optionLabel={person => person.displayName}
+              label={formatMessage("field_dcCreator.displayName")}
+            />
           </div>
-          <ManagedAttributesEditor />
         </div>
-      </Form>
-    </Formik>
+        <div className="form-group">
+          <h2>
+            <DinaMessage id="metadataRightsDetailsLabel" />
+          </h2>
+          <div className="row">
+            <TextField className="col-md-3 col-sm-4" name="dcRights" />
+            <ResourceSelectField<License>
+              className="col-md-3 col-sm-4"
+              name="license"
+              filter={() => ({})}
+              model="objectstore-api/license"
+              optionLabel={license => license.titles[locale] ?? license.url}
+            />
+          </div>
+        </div>
+        <ManagedAttributesEditor />
+      </div>
+    </DinaForm>
   );
 }
 
