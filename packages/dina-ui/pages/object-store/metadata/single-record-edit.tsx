@@ -203,7 +203,6 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
               <DateField
                 className="col-md-3 col-sm-4"
                 name="acDigitizationDate"
-                disabled={true}
                 showTime={true}
               />
             </div>
