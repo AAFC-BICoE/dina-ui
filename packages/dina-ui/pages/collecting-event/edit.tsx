@@ -117,14 +117,10 @@ function CollectingEventFormInternal() {
     );
     // get all agents
     const agentsResp = await apiClient.get<Person[]>(`agent-api/person`, {});
-    formikCtx.setValues({
-      ...formikCtx.initialValues,
-      ...formikCtx.values,
-      collectors: agentsResp.data.filter(agent =>
-        collectorids?.includes(agent.id)
-      ),
-      collectorGroups: [collectorGroup.data as CollectorGroup]
-    });
+    const collectors = agentsResp.data.filter(agent =>
+      collectorids?.includes(agent.id)
+    ) as any;
+    formikCtx.setFieldValue("collectors", collectors);
   };
 
   const groupSelectOptions = [
@@ -208,13 +204,11 @@ function CollectingEventForm({
   const { save } = useContext(ApiClientContext);
   const { id } = router.query;
   const { formatMessage } = useDinaIntl();
-  const [initialValues, setInitialValues] = useState(
-    collectingEvent ?? {
-      type: "collecting-event",
-      collectors: [],
-      collectorGroups: []
-    }
-  );
+  const initialValues = collectingEvent ?? {
+    type: "collecting-event",
+    collectors: [],
+    collectorGroups: []
+  };
   const onSubmit = safeSubmit(
     async (
       submittedValues,
@@ -247,7 +241,6 @@ function CollectingEventForm({
           return;
         }
       }
-
       // handle converting to relationship manually due to crnk bug
       const submitCopy = { ...submittedValues };
       if (submitCopy.collectors && submitCopy.collectors.length > 0) {
@@ -263,9 +256,8 @@ function CollectingEventForm({
       }
       delete submittedValues.collectors;
 
-      if (submittedValues.collectorGroups?.[0].id)
-        submittedValues.collectorGroupUuid =
-          submittedValues.collectorGroups[0].id;
+      if (submittedValues.collectorGroups?.id)
+        submittedValues.collectorGroupUuid = submittedValues.collectorGroups.id;
       delete submittedValues.collectorGroups;
       await save(
         [
