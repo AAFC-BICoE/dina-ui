@@ -9,9 +9,11 @@ import {
   withResponse
 } from "common-ui";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
+import { KitsuResponse } from "kitsu";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
-import { useContext } from "react";
+import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
+import { useContext, useState } from "react";
 import { Footer, Head, Nav } from "../../components";
 import { AttachmentList } from "../../components/object-store/attachment-list/AttachmentList";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -20,11 +22,38 @@ import { CollectingEvent } from "../../types/objectstore-api/resources/Collectin
 export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useDinaIntl();
+  const { bulkGet } = useContext(ApiClientContext);
+  const [collectingEvent, setCollectingEvent] = useState<CollectingEvent>();
 
-  const collectingEventQuery = useQuery<CollectingEvent>({
-    path: `collection-api/collecting-event/${id}`,
-    include: "attachment"
-  });
+  const getAgents = (response: KitsuResponse<CollectingEvent, undefined>) => {
+    const fetchAgents = async () => {
+      if (response?.data?.collectors) {
+        return await bulkGet<Person>(
+          response?.data?.collectors.map(
+            collector => `/person/${collector.id}`
+          ) as any,
+          { apiBaseUrl: "/agent-api" }
+        );
+      }
+    };
+    const agents = fetchAgents();
+    agents
+      .then(async () => {
+        response.data.collectors = await agents;
+        setCollectingEvent(response.data);
+      })
+      .finally(() => setCollectingEvent(response.data));
+  };
+
+  const collectingEventQuery = useQuery<CollectingEvent>(
+    {
+      path: `collection-api/collecting-event/${id}`,
+      include: "attachment,collectors"
+    },
+    {
+      onSuccess: getAgents
+    }
+  );
 
   const {
     attachMetadatasToCollectingEvent,
@@ -35,10 +64,18 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage("collectingEventViewTitle")} />
       <Nav />
-      {withResponse(collectingEventQuery, ({ data: collectingEvent }) => {
-        if (collectingEvent.createdOn) {
-          const inUserTimeZone = new Date(collectingEvent.createdOn).toString();
-          collectingEvent.createdOn = inUserTimeZone;
+      <ButtonBar>
+        <EditButton entityId={id as string} entityLink="collecting-event" />
+        <CancelButton
+          entityId={id as string}
+          entityLink="/collecting-event"
+          byPassView={true}
+        />
+      </ButtonBar>
+      {withResponse(collectingEventQuery, ({ data: colEvent }) => {
+        if (colEvent.createdOn) {
+          const inUserTimeZone = new Date(colEvent.createdOn).toString();
+          if (collectingEvent) collectingEvent.createdOn = inUserTimeZone;
         }
 
         return (
@@ -47,49 +84,43 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
               <DinaMessage id="collectingEventViewTitle" />
             </h1>
             <div>
-              <DinaForm<CollectingEvent> initialValues={collectingEvent}>
-                <div>
-                  <div className="form-group">
-                    <ButtonBar>
-                      <EditButton
-                        entityId={id as string}
-                        entityLink="collecting-event"
-                      />
-                      <CancelButton
-                        entityId={id as string}
-                        entityLink="/collecting-event"
-                        byPassView={true}
-                      />
-                    </ButtonBar>
-                    <div className="row">
-                      <FieldView
-                        className="col-md-2"
-                        name="group"
-                        label={formatMessage("field_group")}
-                      />
-                    </div>
-                    <div className="row">
-                      <FieldView
-                        className="col-md-2"
-                        name="startEventDateTime"
-                        label={formatMessage("startEventDateTimeLabel")}
-                      />
-                      {collectingEvent.endEventDateTime && (
+              {collectingEvent && (
+                <DinaForm<CollectingEvent> initialValues={collectingEvent}>
+                  <div>
+                    <div className="form-group">
+                      <div className="row">
                         <FieldView
                           className="col-md-2"
-                          name="endEventDateTime"
-                          label={formatMessage("endEventDateTimeLabel")}
+                          name="group"
+                          label={formatMessage("field_group")}
                         />
-                      )}
-                      <FieldView
-                        className="col-md-3"
-                        name="verbatimEventDateTime"
-                        label={formatMessage("verbatimEventDateTimeLabel")}
-                      />
+                      </div>
+                      <div className="row">
+                        <FieldView
+                          className="col-md-2"
+                          name="startEventDateTime"
+                          label={formatMessage("startEventDateTimeLabel")}
+                        />
+                        {collectingEvent.endEventDateTime && (
+                          <FieldView
+                            className="col-md-2"
+                            name="endEventDateTime"
+                            label={formatMessage("endEventDateTimeLabel")}
+                          />
+                        )}
+                        <FieldView
+                          className="col-md-3"
+                          name="verbatimEventDateTime"
+                          label={formatMessage("verbatimEventDateTimeLabel")}
+                        />
+                      </div>
+                      <div className="row">
+                        <FieldView className="col-md-2" name="collectors" />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </DinaForm>
+                </DinaForm>
+              )}
               <div className="form-group">
                 <div className="row">
                   <div className="col-md-6">

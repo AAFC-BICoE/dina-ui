@@ -1,5 +1,6 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
+import { CollectorGroup } from "./CollectorGroup";
 
 export interface CollectingEventAttributes {
   uuid: string;
@@ -9,6 +10,15 @@ export interface CollectingEventAttributes {
   verbatimEventDateTime: string;
   createdBy?: string;
   createdOn?: string;
+  collectorGroupUuid?: string;
+  collectorGroups?: CollectorGroup[];
+  group: string;
 }
 
-export type CollectingEvent = KitsuResource & CollectingEventAttributes;
+export interface CollectingEventRelationships {
+  collectors?: KitsuResource[];
+}
+
+export type CollectingEvent = KitsuResource &
+  CollectingEventAttributes &
+  CollectingEventRelationships;

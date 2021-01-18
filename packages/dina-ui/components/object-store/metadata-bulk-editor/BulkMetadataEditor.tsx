@@ -124,7 +124,17 @@ export function BulkMetadataEditor({
         data: "license",
         title: formatMessage("field_license")
       }
-    )
+    ),
+    {
+      data: "metadata.publiclyReleasable",
+      source: ["true", "false"],
+      title: formatMessage("field_publiclyReleasable"),
+      type: "dropdown"
+    },
+    {
+      data: "metadata.notPubliclyReleasableReason",
+      title: formatMessage("field_notPubliclyReleasableReason")
+    }
   ];
 
   if ((!metadataIds && !objectUploadIds) || !accountInitialized) {
@@ -357,7 +367,10 @@ export function BulkMetadataEditor({
 
   const initialFormControls: MetadataEditorControls = {
     attributesTemplate: null,
-    editableBuiltInAttributes: BUILT_IN_ATTRIBUTES_COLUMNS.map(col => col.data),
+    editableBuiltInAttributes: BUILT_IN_ATTRIBUTES_COLUMNS.filter(
+      // Omit notPubliclyReleasableReason from the default shown attributes:
+      col => col.data !== "metadata.notPubliclyReleasableReason"
+    ).map(col => col.data),
     editableManagedAttributes: initialEditableManagedAttributes
   };
 

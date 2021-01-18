@@ -1,10 +1,10 @@
 import {
+  ApiClientContext,
   ButtonBar,
   CancelButton,
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
-  ErrorViewer,
   filterBy,
   SubmitButton,
   TextField
@@ -12,6 +12,7 @@ import {
 import { ResourceSelectField } from "common-ui/lib";
 import { NextRouter, useRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
+import { useContext } from "react";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
@@ -47,19 +48,14 @@ function CollectorGroupForm({
   collectorGroup,
   router
 }: CollectorGroupFormProps) {
+  const { save } = useContext(ApiClientContext);
   const { id } = router.query;
   const initialValues = collectorGroup || { type: "collector-group" };
   const { formatMessage } = useDinaIntl();
 
-  const onSubmit: DinaFormOnSubmit = async ({
-    submittedValues,
-    formik: { setStatus, setSubmitting },
-    api: { save }
-  }) => {
+  const onSubmit: DinaFormOnSubmit = async ({ submittedValues }) => {
     if (!submittedValues.agentIdentifiers) {
-      setStatus(formatMessage("field_collectorGroup_agentsError"));
-      setSubmitting(false);
-      return;
+      throw new Error(formatMessage("field_collectorGroup_agentsError"));
     } else {
       // handle converting to relationship manually due to crnk bug
       submittedValues.relationships = {};
@@ -117,6 +113,7 @@ function CollectorGroupForm({
             filter={filterBy(["displayName"])}
             model="agent-api/person"
             isMulti={true}
+            className="col-md-3"
             optionLabel={agent => agent.displayName}
             label={formatMessage("collectorGroupAgentsLabel")}
           />

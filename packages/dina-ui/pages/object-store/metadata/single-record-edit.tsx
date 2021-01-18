@@ -104,6 +104,11 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
   const { formatMessage, locale } = useDinaIntl();
   const { id } = router.query;
 
+  const PUBLICLY_RELEASABLE_OPTIONS = [
+    { label: formatMessage("true"), value: true },
+    { label: formatMessage("false"), value: false }
+  ];
+
   // Convert acTags array to a comma-separated string:
   const initialValues = {
     ...metadata,
@@ -203,7 +208,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
             <DateField
               className="col-md-3 col-sm-4"
               name="acDigitizationDate"
-              disabled={true}
+              showTime={true}
             />
           </div>
           <div className="row">
@@ -244,11 +249,31 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
               model="objectstore-api/license"
               optionLabel={license => license.titles[locale] ?? license.url}
             />
+            <SelectField
+              className="col-md-3 col-sm-4"
+              name="publiclyReleasable"
+              options={PUBLICLY_RELEASABLE_OPTIONS}
+            />
+            <NotPubliclyReleasableReasonField />
           </div>
         </div>
         <ManagedAttributesEditor />
       </div>
     </DinaForm>
+  );
+}
+
+function NotPubliclyReleasableReasonField() {
+  const {
+    values: { publiclyReleasable }
+  } = useFormikContext<Metadata>();
+
+  return publiclyReleasable ? null : (
+    <TextField
+      className="col-md-3 col-sm-4"
+      name="notPubliclyReleasableReason"
+      multiLines={true}
+    />
   );
 }
 

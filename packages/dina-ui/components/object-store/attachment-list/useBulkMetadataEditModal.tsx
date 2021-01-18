@@ -29,7 +29,9 @@ export function useBulkMetadataEditModal() {
         <style>{`
           .modal-dialog {
             max-width: calc(100vw - 3rem) !important;
-            height: calc(100vh - 3rem) !important;
+          }
+          .modal-content {
+            max-height: calc(100vh - 3rem) !important;
             overflow-y: scroll !important;
           }
           .ht_master .wtHolder {

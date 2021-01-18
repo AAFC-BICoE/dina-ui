@@ -28,6 +28,7 @@
     "react": "^16.13.1",
     "react-datepicker": "^3.0.0",
     "react-dom": "^16.13.1",
+    "react-error-boundary": "^3.1.0",
     "react-hooks-async": "^3.10.1",
     "react-intl": "^5.0.2",
     "react-modal": "^3.11.2",
