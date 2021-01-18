@@ -27,7 +27,14 @@
       "request": "attach",
       "type": "java",
       "hostName": "localhost",
-      "port": 5007
-    }
+      "port": 5008
+    },
+    {
+      "name": "Attach to Collection API",
+      "request": "attach",
+      "type": "java",
+      "hostName": "localhost",
+      "port": 5009
+    },
   ]
 }
