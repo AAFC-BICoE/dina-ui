@@ -46,10 +46,10 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
   });
 
   const childrenInternal:
-    | ((props: FormikProps<Values>) => React.ReactNode)
+    | ((formikProps: FormikProps<Values>) => React.ReactNode)
     | React.ReactNode =
     typeof childrenProp === "function" ? (
-      props => <FormWrapper>{childrenProp(props)}</FormWrapper>
+      formikProps => <FormWrapper>{childrenProp(formikProps)}</FormWrapper>
     ) : (
       <FormWrapper>{childrenProp}</FormWrapper>
     );
@@ -61,7 +61,7 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
   );
 }
 
-/** Wraps the inner  */
+/** Wraps the inner content with the Form + ErrorViewer components. */
 function FormWrapper({ children }: PropsWithChildren<{}>) {
   return (
     <Form>
