@@ -99,7 +99,7 @@ export default function CollectingEventEditPage() {
 }
 
 function CollectingEventFormInternal() {
-  const { apiClient } = useContext(ApiClientContext);
+  const { apiClient, bulkGet } = useContext(ApiClientContext);
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
   const [useCollectorGroup, setUseCollectorGroup] = useState(false);
@@ -115,12 +115,14 @@ function CollectingEventFormInternal() {
     const collectorids = collectorGroup?.data?.agentIdentifiers?.map(
       agentRel => agentRel.id
     );
-    // get all agents
-    const agentsResp = await apiClient.get<Person[]>(`agent-api/person`, {});
-    const collectors = agentsResp.data.filter(agent =>
-      collectorids?.includes(agent.id)
-    ) as any;
-    formikCtx.setFieldValue("collectors", collectors);
+    if (collectorids) {
+      // Get the agents from the selected group:
+      const collectors = (await bulkGet(
+        collectorids.map(collId => `person/${collId}`),
+        { apiBaseUrl: "/agent-api" }
+      )) as Person[];
+      formikCtx.setFieldValue("collectors", collectors);
+    }
   };
 
   const groupSelectOptions = [
