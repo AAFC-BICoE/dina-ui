@@ -1,4 +1,5 @@
 import { OperationsResponse } from "common-ui";
+import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
 import CollectingEventEditPage from "../../../pages/collecting-event/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { CollectingEvent } from "../../../types/objectstore-api/resources/CollectingEvent";
@@ -21,15 +22,28 @@ let mockQuery: any = {};
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
   // The get request will return the existing collecting-event.
-  if (model === "collection-api/collecting-event/1") {
+  if (model === "collection-api/collecting-event/1?include=collectors") {
     return { data: TEST_COLLECTING_EVENT };
+  } else if (model === "agent-api/person") {
+    return { data: [TEST_AGENT] };
   }
 });
 
 // Mock API requests:
 const mockPatch = jest.fn();
+
+const mockBulkGet = jest.fn(async paths => {
+  if (!paths.length) {
+    return [];
+  }
+  if ((paths[0] as string).startsWith("/agent-api/")) {
+    return TEST_AGENT;
+  }
+});
+
 const apiContext: any = {
-  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+  apiClient: { get: mockGet, axios: { patch: mockPatch } },
+  bulkGet: mockBulkGet
 };
 
 describe("collecting-event edit page", () => {
@@ -67,7 +81,7 @@ describe("collecting-event edit page", () => {
     expect(wrapper.find(".verbatimEventDateTime-field")).toHaveLength(1);
 
     // simulate turn on the date range switch
-    wrapper.find(".react-switch input").simulate("change", {
+    wrapper.find(".react-switch.dateRange input").simulate("change", {
       target: {
         type: "checkbox",
         checked: true
@@ -144,13 +158,6 @@ describe("collecting-event edit page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    wrapper.find(".startEventDateTime-field input").simulate("change", {
-      target: {
-        name: "startEventDateTime",
-        value: "12/21/2019T16:00"
-      }
-    });
-
     // Check that the existing value is in the field.
     expect(
       wrapper.find(".verbatimEventDateTime-field input").prop("value")
@@ -221,6 +228,11 @@ describe("collecting-event edit page", () => {
     wrapper.find(".startEventDateTime input").simulate("change", {
       target: { name: "startEventDateTime", value: "2020" }
     });
+
+    wrapper.find(".group-field Select").prop<any>("onChange")([
+      { label: "group", value: "test group" }
+    ]);
+
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
@@ -241,7 +253,20 @@ const TEST_COLLECTING_EVENT: CollectingEvent = {
   uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
   id: "1",
   type: "collecting-event",
-  startEventDateTime: "12/21/2019, 4:00 PM",
-  endEventDateTime: "12/22/2019, 4:00 PM",
-  verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm"
+  startEventDateTime: "12/21/2019T16:00",
+  endEventDateTime: "12/21/2019T17:00",
+  verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm",
+  group: "test group",
+  collectors: [
+    { id: "a8fb14f7-cda9-4313-9cc7-f313db653cad", type: "agent" },
+    { id: "eb61092e-fb28-41c8-99e6-d78743296520", type: "agent" }
+  ]
+};
+
+const TEST_AGENT: Person = {
+  displayName: "person a",
+  email: "testperson@a.b",
+  id: "1",
+  type: "person",
+  uuid: "323423-23423-234"
 };

@@ -125,6 +125,7 @@ function CollectorGroupForm({
               filter={filterBy(["displayName"])}
               model="agent-api/person"
               isMulti={true}
+              className="col-md-3"
               optionLabel={agent => agent.displayName}
               label={formatMessage("collectorGroupAgentsLabel")}
             />

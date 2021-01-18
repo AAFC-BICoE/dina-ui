@@ -56,8 +56,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Date and time of when the digital object described by the metadata was created. For an image it represents when the image was taken.",
   field_acHashFunction: "Hash Function",
   field_acHashValue: "Hash",
-  field_acMetadataCreator: "Metadata Created By",
-  "field_acMetadataCreator.displayName": "Metadata Created By",
+  field_acMetadataCreator: "Uploaded By",
+  "field_acMetadataCreator.displayName": "Uploaded By",
   "field_acMetadataCreator.displayName_tooltip":
     "Agent who created the metadata record.",
   field_acSubType: "Object SubType",
@@ -92,6 +92,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeType_integer_label: "Numerical",
   field_managedAttributeType_picklist_label: "Pick List",
   field_managedAttributeType_text_label: "Text",
+  field_notPubliclyReleasableReason: "Not Publicly Releasable Reason",
   field_originalFilename: "Original Filename",
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
@@ -157,6 +158,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   revisionsButtonText: "Revisions",
   revisionsByUserPageTitle: "Revisions by user",
   searchButton: "Search",
+  selectCollectorGroupLabel:
+    "Select a collector group to pre-poplulate 'Collectors' field",
   startEventDateTimeLabel: "Start Event DateTime",
   thumbnailNotAvailableText: "No thumbnail available",
   uploadButtonText: "Upload",
@@ -164,6 +167,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
   uploadFilesMaxSize: "The maximum file size is {maxSize}.",
   uploadPageTitle: "Upload Files",
+  useCollectorGroupLabel: "Use Collector Group",
   userMustBelongToGroup: "User must belong to a Group",
   verbatimEventDateTimeLabel: "Verbatim Event DateTime",
   viewPreviewButtonText: "Preview",

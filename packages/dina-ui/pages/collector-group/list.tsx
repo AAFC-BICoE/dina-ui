@@ -6,8 +6,8 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 const COLLECTOR_GROUP_FILTER_ATTRIBUTES = ["createdBy"];
 const COLLECTOR_GROUP_TABLE_COLUMNS = [
   {
-    Cell: ({ original: { id, createdBy } }) => (
-      <Link href={`/collector-group/view?id=${id}`}>{createdBy}</Link>
+    Cell: ({ original: { id, name } }) => (
+      <Link href={`/collector-group/view?id=${id}`}>{name}</Link>
     ),
     accessor: "name",
     sortable: false
