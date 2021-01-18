@@ -158,17 +158,6 @@ describe("collecting-event edit page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    wrapper.find(".group-field Select").prop<any>("onChange")([
-      { label: "group", value: "test group" }
-    ]);
-
-    wrapper.find(".startEventDateTime-field input").simulate("change", {
-      target: {
-        name: "startEventDateTime",
-        value: "12/21/2019T16:00"
-      }
-    });
-
     // Check that the existing value is in the field.
     expect(
       wrapper.find(".verbatimEventDateTime-field input").prop("value")
@@ -264,8 +253,8 @@ const TEST_COLLECTING_EVENT: CollectingEvent = {
   uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
   id: "1",
   type: "collecting-event",
-  startEventDateTime: "12/21/2019, 4:00 PM",
-  endEventDateTime: "12/22/2019, 4:00 PM",
+  startEventDateTime: "12/21/2019T16:00",
+  endEventDateTime: "12/21/2019T17:00",
   verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm",
   group: "test group",
   collectors: [

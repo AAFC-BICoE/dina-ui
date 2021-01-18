@@ -105,7 +105,7 @@ function CollectingEventFormInternal() {
   const [useCollectorGroup, setUseCollectorGroup] = useState(false);
   const formikCtx = useFormikContext<CollectingEvent>();
 
-  const populateAgentList = async event => {
+  const populateCollectorList = async event => {
     if (!event || !event.id) return;
     // get collectors belong to the collector group this collecting event related to
     const collectorGroup = await apiClient.get<CollectorGroup>(
@@ -187,7 +187,7 @@ function CollectingEventFormInternal() {
             filter={filterBy(["name"])}
             model="collection-api/collector-group"
             optionLabel={group => group.name}
-            onChange={event => populateAgentList(event)}
+            onChange={event => populateCollectorList(event)}
             className="col-md-3"
             label={formatMessage("selectCollectorGroupLabel")}
           />
