@@ -112,17 +112,21 @@ export function BulkDataEditor<TRow>({
   return (
     <div ref={tableWrapperRef}>
       <style>{`
-        /* Prevent the handsontable header from covering the Dropdown menu options: */
+        /* Prevent the handsontable header from covering the react-select menu options: */
         .ht_clone_top, .ht_clone_left, .ht_clone_top_left_corner {
           z-index: 0 !important;
+        }
+        /* Prevent the dropdowns from being from being hidden at the bottom of the table: https://github.com/handsontable/handsontable/issues/5032 */
+        .handsontableEditor.autocompleteEditor, .handsontableEditor.autocompleteEditor .ht_master .wtHolder {
+          min-height: 138px;
         }
       `}</style>
       <ErrorViewer />
       {validationAlertJsx}
-      {/** Setting the width/height and overflow:hidden here is detected by Handsontable and enables horizontal scrolling: */}
       <div
         className="form-group"
-        style={{ width: "100%", height: "100%", overflowX: "hidden" }}
+        //Setting the width/height and overflowX:hidden here is detected by Handsontable and enables horizontal scrolling:
+        style={{ height: "100%", width: "100%", overflowX: "hidden" }}
       >
         <DynamicHotTable
           afterValidate={afterValidate}
@@ -137,6 +141,8 @@ export function BulkDataEditor<TRow>({
           viewportColumnRenderingOffset={1000}
           viewportRowRenderingOffset={1000}
         />
+        {/** Spacer div to make room for Handsontable's dropdown menus: */}
+        <div style={{ height: "140px" }} />
       </div>
       <FormikButton
         className="btn btn-primary bulk-editor-submit-button"

@@ -56,8 +56,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Date and time of when the digital object described by the metadata was created. For an image it represents when the image was taken.",
   field_acHashFunction: "Hash Function",
   field_acHashValue: "Hash",
-  field_acMetadataCreator: "Metadata Created By",
-  "field_acMetadataCreator.displayName": "Metadata Created By",
+  field_acMetadataCreator: "Uploaded By",
+  "field_acMetadataCreator.displayName": "Uploaded By",
   "field_acMetadataCreator.displayName_tooltip":
     "Agent who created the metadata record.",
   field_acSubType: "Object SubType",
