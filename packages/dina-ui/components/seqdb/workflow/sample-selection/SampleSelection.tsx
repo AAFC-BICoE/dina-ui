@@ -136,7 +136,6 @@ export function SampleSelection(props: StepRendererProps) {
       <div className="form-group">
         <DinaForm
           initialValues={{ sampleIdsToSelect: {}, stepResourcesToDelete: {} }}
-          onSubmit={noop}
         >
           <div className="row">
             <div className="col-5 available-samples">
