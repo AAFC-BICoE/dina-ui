@@ -1,4 +1,6 @@
-import { ResourceSelect, SelectField } from "common-ui";
+import { writeStorage } from "@rehooks/local-storage";
+import { DinaForm, ResourceSelect } from "common-ui";
+import Select from "react-select";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { ManagedAttribute } from "../../../../types/objectstore-api";
 import {
@@ -6,10 +8,6 @@ import {
   MetadataEditorAttributesControls,
   MetadataEditorControls
 } from "../MetadataEditorAttributesControls";
-import { noop } from "lodash";
-import { Form, Formik } from "formik";
-import Select from "react-select";
-import { writeStorage } from "@rehooks/local-storage";
 const mockCtx = {
   apiClient: {
     async get() {
@@ -46,13 +44,11 @@ const initialFormControls: MetadataEditorControls = {
 describe("MetadataEditorAttributesControls component", () => {
   function getWrapper() {
     return mountWithAppContext(
-      <Formik initialValues={initialFormControls} onSubmit={noop}>
-        <Form translate={undefined}>
-          <MetadataEditorAttributesControls
-            builtInAttributes={TEST_BUILT_IN_COLUMNS}
-          />
-        </Form>
-      </Formik>,
+      <DinaForm initialValues={initialFormControls}>
+        <MetadataEditorAttributesControls
+          builtInAttributes={TEST_BUILT_IN_COLUMNS}
+        />
+      </DinaForm>,
       { apiContext: mockCtx as any }
     );
   }

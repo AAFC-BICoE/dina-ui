@@ -1,14 +1,13 @@
 import {
   BackToListButton,
   ButtonBar,
+  DinaForm,
   EditButton,
   FieldView,
   LoadingSpinner,
   useQuery
 } from "common-ui";
-import { Formik } from "formik";
 import { PersistedResource } from "kitsu";
-import { noop } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -110,13 +109,13 @@ function WorkflowSteps({ chain }: { chain: PersistedResource<Chain> }) {
           </div>
         </div>
         <TabPanel>
-          <Formik initialValues={chain} onSubmit={noop}>
+          <DinaForm initialValues={chain}>
             <div className="col-md-3">
               <FieldView name="group" />
               <FieldView label="Template" name="chainTemplate.name" />
               <FieldView name="name" />
             </div>
-          </Formik>
+          </DinaForm>
         </TabPanel>
         {steps.map(step => (
           <TabPanel key={step.id as string}>

@@ -4,6 +4,7 @@ import lodash, { noop } from "lodash";
 import Select from "react-select/base";
 import { ResourceSelectField } from "../../";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { DinaForm } from "../DinaForm";
 
 interface TestGroup extends KitsuResource {
   groupName: string;
@@ -63,8 +64,12 @@ describe("ResourceSelectField component", () => {
   });
 
   it("Changes the Formik field's value.", async () => {
+    interface TestForm {
+      group: { groupName?: string } | null;
+    }
+
     const wrapper = mountWithAppContext(
-      <Formik initialValues={{ group: null }} onSubmit={noop}>
+      <DinaForm<TestForm> initialValues={{ group: null }}>
         {({ values: { group } }) => (
           <div>
             <ResourceSelectField<TestGroup>
@@ -77,7 +82,7 @@ describe("ResourceSelectField component", () => {
             <div id="value-display">{group && group.groupName}</div>
           </div>
         )}
-      </Formik>,
+      </DinaForm>,
       { apiContext }
     );
 

@@ -3,6 +3,7 @@ import {
   ApiClientContext,
   BulkDataEditor,
   decodeResourceCell,
+  DinaForm,
   encodeResourceCell,
   filterBy,
   RowChange,
@@ -235,19 +236,17 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
         onChange={setPlpEditMode}
         editMode={plpEditMode}
       />
-      <Formik initialValues={{}} onSubmit={noop}>
-        <Form translate={undefined}>
-          <strong>
-            <SeqdbMessage id="editableTable" />:
-          </strong>
-          <BulkDataEditor<PreLibraryPrepBulkEditRow>
-            key={plpEditMode}
-            columns={COLUMNS}
-            loadData={loadData}
-            onSubmit={onSubmit}
-          />
-        </Form>
-      </Formik>
+      <DinaForm initialValues={{}}>
+        <strong>
+          <SeqdbMessage id="editableTable" />:
+        </strong>
+        <BulkDataEditor<PreLibraryPrepBulkEditRow>
+          key={plpEditMode}
+          columns={COLUMNS}
+          loadData={loadData}
+          onSubmit={onSubmit}
+        />
+      </DinaForm>
     </>
   );
 }

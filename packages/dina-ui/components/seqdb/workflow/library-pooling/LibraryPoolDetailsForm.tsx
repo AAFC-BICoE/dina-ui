@@ -1,13 +1,11 @@
 import {
-  ApiClientContext,
   DateField,
+  DinaForm,
+  DinaFormOnSubmit,
   ErrorViewer,
-  safeSubmit,
   SubmitButton,
   TextField
 } from "common-ui";
-import { Form, Formik } from "formik";
-import { useContext } from "react";
 import {
   Chain,
   ChainStepTemplate,
@@ -28,9 +26,10 @@ export function LibraryPoolDetailsForm({
   onSuccess,
   step
 }: LibraryPoolDetailsFormProps) {
-  const { save } = useContext(ApiClientContext);
-
-  const onSubmit = safeSubmit(async submittedValues => {
+  const onSubmit: DinaFormOnSubmit = async ({
+    api: { save },
+    submittedValues
+  }) => {
     // Save the library pool:
     const [savedLibraryPool] = await save(
       [
@@ -64,22 +63,20 @@ export function LibraryPoolDetailsForm({
     }
 
     onSuccess();
-  });
+  };
 
   return (
-    <Formik initialValues={libraryPool || {}} onSubmit={onSubmit}>
-      <Form translate={undefined}>
-        <h2>Library Pool</h2>
-        <ErrorViewer />
-        <div className="row">
-          <TextField className="col-md-2" name="name" />
-          <DateField className="col-md-2" name="dateUsed" />
-        </div>
-        <div className="row">
-          <TextField className="col-md-6" name="notes" multiLines={true} />
-        </div>
-        <SubmitButton />
-      </Form>
-    </Formik>
+    <DinaForm initialValues={libraryPool || {}} onSubmit={onSubmit}>
+      <h2>Library Pool</h2>
+      <ErrorViewer />
+      <div className="row">
+        <TextField className="col-md-2" name="name" />
+        <DateField className="col-md-2" name="dateUsed" />
+      </div>
+      <div className="row">
+        <TextField className="col-md-6" name="notes" multiLines={true} />
+      </div>
+      <SubmitButton />
+    </DinaForm>
   );
 }

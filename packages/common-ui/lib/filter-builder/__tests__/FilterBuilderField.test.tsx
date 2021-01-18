@@ -1,6 +1,6 @@
-import { Form, Formik } from "formik";
 import { IntlProvider } from "react-intl";
 import Select from "react-select";
+import { DinaForm } from "../../formik-connected/DinaForm";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { FilterBuilderField } from "../FilterBuilderField";
 
@@ -13,15 +13,16 @@ describe("FilterBuilderField component", () => {
         locale="en"
         messages={{ "field_group.groupName": "Group Name" }}
       >
-        <Formik initialValues={{ filter: null }} onSubmit={mockSubmit}>
-          <Form translate={undefined}>
-            <FilterBuilderField
-              filterAttributes={["name", "group.groupName"]}
-              name="filter"
-            />
-            <button type="submit">search</button>
-          </Form>
-        </Formik>
+        <DinaForm
+          initialValues={{ filter: null }}
+          onSubmit={async ({ submittedValues }) => mockSubmit(submittedValues)}
+        >
+          <FilterBuilderField
+            filterAttributes={["name", "group.groupName"]}
+            name="filter"
+          />
+          <button type="submit">search</button>
+        </DinaForm>
       </IntlProvider>
     );
   }
@@ -48,8 +49,7 @@ describe("FilterBuilderField component", () => {
     expect(mockSubmit).lastCalledWith(
       expect.objectContaining({
         filter: expect.objectContaining({ type: "FILTER_GROUP" })
-      }),
-      expect.anything()
+      })
     );
 
     // Change an input value.
@@ -72,8 +72,7 @@ describe("FilterBuilderField component", () => {
             })
           ]
         })
-      }),
-      expect.anything()
+      })
     );
   });
 });
