@@ -4,6 +4,7 @@ import {
   ApiClientContextI,
   BulkDataEditor,
   decodeResourceCell,
+  DinaForm,
   encodeResourceCell,
   LoadingSpinner,
   RowChange,
@@ -12,8 +13,6 @@ import {
   useAccount,
   useResourceSelectCells
 } from "common-ui";
-import { Form, Formik } from "formik";
-import { noop } from "lodash";
 import moment from "moment";
 import { useContext, useState } from "react";
 import { AddPersonButton } from "../../../components";
@@ -368,10 +367,9 @@ export function BulkMetadataEditor({
         <DinaMessage id="metadataBulkEditTitle" />
       </h1>
       <div className="form-group">
-        <Formik<MetadataEditorControls>
+        <DinaForm<MetadataEditorControls>
           enableReinitialize={true}
           initialValues={initialFormControls}
-          onSubmit={noop}
         >
           {controlsForm => {
             const columns = [
@@ -384,7 +382,7 @@ export function BulkMetadataEditor({
             ];
 
             return (
-              <Form translate={undefined}>
+              <div>
                 <MetadataEditorAttributesControls
                   builtInAttributes={BUILT_IN_ATTRIBUTES_COLUMNS}
                 />
@@ -398,10 +396,10 @@ export function BulkMetadataEditor({
                   onSubmit={onSubmit}
                   submitUnchangedRows={objectUploadIds ? true : false}
                 />
-              </Form>
+              </div>
             );
           }}
-        </Formik>
+        </DinaForm>
       </div>
     </div>
   );

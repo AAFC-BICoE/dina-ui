@@ -1,13 +1,12 @@
 import {
   ButtonBar,
   CancelButton,
+  DinaForm,
   EditButton,
   FieldView,
   LoadingSpinner,
   Query
 } from "common-ui";
-import { Formik } from "formik";
-import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
@@ -50,17 +49,15 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
               </h1>
               <LoadingSpinner loading={loading} />
               {person && (
-                <Formik<Person> initialValues={person} onSubmit={noop}>
-                  <div>
-                    <div className="row">
-                      <FieldView className="col-md-2" name="displayName" />
-                      <FieldView className="col-md-2" name="email" />
-                      <FieldView className="col-md-2" name="organizations" />
-                      <FieldView className="col-md-2" name="createdBy" />
-                      <FieldView className="col-md-2" name="createdOn" />
-                    </div>
+                <DinaForm<Person> initialValues={person}>
+                  <div className="row">
+                    <FieldView className="col-md-2" name="displayName" />
+                    <FieldView className="col-md-2" name="email" />
+                    <FieldView className="col-md-2" name="organizations" />
+                    <FieldView className="col-md-2" name="createdBy" />
+                    <FieldView className="col-md-2" name="createdOn" />
                   </div>
-                </Formik>
+                </DinaForm>
               )}
             </main>
           );

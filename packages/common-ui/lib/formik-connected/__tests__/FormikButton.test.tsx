@@ -1,20 +1,18 @@
-import { mount } from "enzyme";
-import { Form, Formik } from "formik";
 import { FormikButton, LoadingSpinner } from "../..";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { DinaForm } from "../DinaForm";
 
 const mockOnClick = jest.fn();
 const mockOnSubmit = jest.fn();
 
 function getWrapper() {
-  return mount(
-    <Formik
+  return mountWithAppContext(
+    <DinaForm
       initialValues={{ testProperty: "testValue" }}
-      onSubmit={mockOnSubmit}
+      onSubmit={async ({ submittedValues }) => mockOnSubmit(submittedValues)}
     >
-      <Form translate={undefined}>
-        <FormikButton onClick={mockOnClick}>Test Button</FormikButton>
-      </Form>
-    </Formik>
+      <FormikButton onClick={mockOnClick}>Test Button</FormikButton>
+    </DinaForm>
   );
 }
 

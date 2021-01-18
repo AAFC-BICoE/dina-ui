@@ -1,6 +1,5 @@
-import { Formik } from "formik";
 import { KitsuResource } from "kitsu";
-import lodash, { noop } from "lodash";
+import lodash from "lodash";
 import Select from "react-select/base";
 import { ResourceSelectField } from "../../";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
@@ -40,9 +39,8 @@ jest.spyOn(lodash, "debounce").mockImplementation((fn: any) => fn);
 describe("ResourceSelectField component", () => {
   it("Displays the Formik field's value.", () => {
     const wrapper = mountWithAppContext(
-      <Formik
+      <DinaForm
         initialValues={{ group: { id: "3", groupName: "Mat's Group" } }}
-        onSubmit={noop}
       >
         <ResourceSelectField<TestGroup>
           name="group"
@@ -50,7 +48,7 @@ describe("ResourceSelectField component", () => {
           filter={groupName => ({ groupName })}
           optionLabel={group => group.groupName}
         />
-      </Formik>,
+      </DinaForm>,
       { apiContext }
     );
 
@@ -119,10 +117,7 @@ describe("ResourceSelectField component", () => {
     const mockOnChange = jest.fn();
 
     const wrapper = mountWithAppContext(
-      <Formik
-        initialValues={{ group: { id: 3, groupName: "Mat's Group" } }}
-        onSubmit={noop}
-      >
+      <DinaForm initialValues={{ group: { id: 3, groupName: "Mat's Group" } }}>
         <ResourceSelectField<TestGroup>
           name="group"
           model="group"
@@ -130,7 +125,7 @@ describe("ResourceSelectField component", () => {
           optionLabel={group => group.groupName}
           onChange={mockOnChange}
         />
-      </Formik>,
+      </DinaForm>,
       { apiContext }
     );
 

@@ -83,7 +83,7 @@ export const ApiClientContext = React.createContext<ApiClientContextI>(
 export function useApiClient() {
   const ctx = useContext(ApiClientContext);
   if (!ctx) {
-    throw new Error("No ApiClientContex available.");
+    throw new Error("No ApiClientContext available.");
   }
   return ctx;
 }

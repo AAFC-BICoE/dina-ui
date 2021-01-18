@@ -1,4 +1,3 @@
-import { Form, Formik } from "formik";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { SubmitButton } from "../SubmitButton";

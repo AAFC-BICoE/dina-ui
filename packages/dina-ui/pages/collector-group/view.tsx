@@ -2,20 +2,19 @@ import {
   ApiClientContext,
   ButtonBar,
   CancelButton,
+  DinaForm,
   FieldView,
   LoadingSpinner,
   Query
 } from "common-ui";
-import { Formik } from "formik";
-import { noop } from "lodash";
+import { KitsuResponse } from "kitsu";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
+import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
+import { useContext, useState } from "react";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
-import { useContext, useState } from "react";
-import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
-import { KitsuResponse } from "kitsu";
 
 export function CollectorGroupDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -73,10 +72,7 @@ export function CollectorGroupDetailsPage({ router }: WithRouterProps) {
               </h1>
               <LoadingSpinner loading={loading} />
               {collectorGroup && (
-                <Formik<CollectorGroup>
-                  initialValues={collectorGroup}
-                  onSubmit={noop}
-                >
+                <DinaForm<CollectorGroup> initialValues={collectorGroup}>
                   <div>
                     <div className="row">
                       <FieldView
@@ -91,7 +87,7 @@ export function CollectorGroupDetailsPage({ router }: WithRouterProps) {
                       />
                     </div>
                   </div>
-                </Formik>
+                </DinaForm>
               )}
             </main>
           );

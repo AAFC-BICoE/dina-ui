@@ -1,12 +1,11 @@
 import {
-  ErrorViewer,
+  DinaForm,
   filterBy,
   LoadingSpinner,
   ResourceSelectField,
   SubmitButton,
   useCacheableQueryLoader
 } from "common-ui";
-import { Form, Formik } from "formik";
 import ReactTable, { Column } from "react-table";
 import {
   LibraryPrep,
@@ -135,30 +134,27 @@ export function IndexGrid(props: IndexGridProps) {
     const tableData = new Array(containerType.numberOfRows).fill({});
 
     return (
-      <Formik
+      <DinaForm
         initialValues={{ indexI5s: {}, indexI7s: {} }}
         onSubmit={onSubmit}
       >
-        <Form translate={undefined}>
-          <style>{`
+        <style>{`
             .rt-td {
               padding: 0 !important;
             }
           `}</style>
-          <ErrorViewer />
-          <div style={{ height: "50px" }}>
-            <div className="float-right">
-              <SubmitButton />
-            </div>
+        <div style={{ height: "50px" }}>
+          <div className="float-right">
+            <SubmitButton />
           </div>
-          <ReactTable
-            columns={columns}
-            data={tableData}
-            minRows={0}
-            showPagination={false}
-          />
-        </Form>
-      </Formik>
+        </div>
+        <ReactTable
+          columns={columns}
+          data={tableData}
+          minRows={0}
+          showPagination={false}
+        />
+      </DinaForm>
     );
   }
 

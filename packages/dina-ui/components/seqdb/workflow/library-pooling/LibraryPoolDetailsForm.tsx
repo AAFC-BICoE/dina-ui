@@ -2,7 +2,6 @@ import {
   DateField,
   DinaForm,
   DinaFormOnSubmit,
-  ErrorViewer,
   SubmitButton,
   TextField
 } from "common-ui";
@@ -66,17 +65,18 @@ export function LibraryPoolDetailsForm({
   };
 
   return (
-    <DinaForm initialValues={libraryPool || {}} onSubmit={onSubmit}>
+    <div>
       <h2>Library Pool</h2>
-      <ErrorViewer />
-      <div className="row">
-        <TextField className="col-md-2" name="name" />
-        <DateField className="col-md-2" name="dateUsed" />
-      </div>
-      <div className="row">
-        <TextField className="col-md-6" name="notes" multiLines={true} />
-      </div>
-      <SubmitButton />
-    </DinaForm>
+      <DinaForm initialValues={libraryPool || {}} onSubmit={onSubmit}>
+        <div className="row">
+          <TextField className="col-md-2" name="name" />
+          <DateField className="col-md-2" name="dateUsed" />
+        </div>
+        <div className="row">
+          <TextField className="col-md-6" name="notes" multiLines={true} />
+        </div>
+        <SubmitButton />
+      </DinaForm>
+    </div>
   );
 }

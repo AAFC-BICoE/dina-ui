@@ -10,8 +10,7 @@ import {
   SaveArgs,
   useResourceSelectCells
 } from "common-ui";
-import { Form, Formik } from "formik";
-import { noop, pick } from "lodash";
+import { pick } from "lodash";
 import { useContext, useState } from "react";
 import { SeqdbMessage, useSeqdbIntl } from "../../../../intl/seqdb-intl";
 import {

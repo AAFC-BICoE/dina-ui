@@ -2,15 +2,13 @@ import {
   ApiClientContext,
   ButtonBar,
   CancelButton,
+  DinaForm,
   EditButton,
   FieldView,
   useQuery,
   withResponse
 } from "common-ui";
-import { Formik } from "formik";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
-import { PersistedResource } from "kitsu";
-import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { useContext } from "react";
@@ -49,10 +47,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
               <DinaMessage id="collectingEventViewTitle" />
             </h1>
             <div>
-              <Formik<CollectingEvent>
-                initialValues={collectingEvent}
-                onSubmit={noop}
-              >
+              <DinaForm<CollectingEvent> initialValues={collectingEvent}>
                 <div>
                   <div className="form-group">
                     <ButtonBar>
@@ -94,7 +89,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                     </div>
                   </div>
                 </div>
-              </Formik>
+              </DinaForm>
               <div className="form-group">
                 <div className="row">
                   <div className="col-md-6">

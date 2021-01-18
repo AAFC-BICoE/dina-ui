@@ -1,13 +1,12 @@
 import {
   ColumnDefinition,
-  ErrorViewer,
+  DinaForm,
   FilterForm,
   FormikButton,
   QueryTable,
   rsql,
   useGroupedCheckBoxes
 } from "common-ui";
-import { Formik } from "formik";
 import { FilterParam } from "kitsu";
 import { noop } from "lodash";
 import { useState } from "react";
@@ -134,12 +133,11 @@ export function SampleSelection(props: StepRendererProps) {
         id="sample-selection"
         onFilterFormSubmit={onFilterSubmit}
       />
-      <Formik
-        initialValues={{ sampleIdsToSelect: {}, stepResourcesToDelete: {} }}
-        onSubmit={noop}
-      >
-        <div className="form-group">
-          <ErrorViewer />
+      <div className="form-group">
+        <DinaForm
+          initialValues={{ sampleIdsToSelect: {}, stepResourcesToDelete: {} }}
+          onSubmit={noop}
+        >
           <div className="row">
             <div className="col-5 available-samples">
               <strong>
@@ -191,8 +189,8 @@ export function SampleSelection(props: StepRendererProps) {
               />
             </div>
           </div>
-        </div>
-      </Formik>
+        </DinaForm>
+      </div>
     </>
   );
 }
