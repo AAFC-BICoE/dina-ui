@@ -55,12 +55,11 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
       isUndefined
     );
 
-    const request = apiClient.get<TData, TMeta>(path, getParams);
-    if (onSuccess) {
-      request.then(onSuccess);
-    }
+    const response = await apiClient.get<TData, TMeta>(path, getParams);
 
-    const response = await request;
+    if (onSuccess) {
+      await onSuccess(response);
+    }
 
     if (joinSpecs) {
       const { data } = response;
