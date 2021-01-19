@@ -1,13 +1,12 @@
 import {
   BackToListButton,
   ButtonBar,
+  DinaForm,
   FieldView,
   LoadingSpinner,
   QueryTable,
   useQuery
 } from "common-ui";
-import { Formik } from "formik";
-import { noop } from "lodash";
 import { useRouter } from "next/router";
 import { Head, Nav } from "../../../components";
 import { IndexSet } from "../../../types/seqdb-api";
@@ -33,7 +32,7 @@ export default function IndexSetViewPage() {
         <ButtonBar>
           <BackToListButton entityLink="/seqdb/index-set" />
         </ButtonBar>
-        <Formik initialValues={response.data} onSubmit={noop}>
+        <DinaForm initialValues={response.data}>
           <main className="container-fluid">
             <h1>Index Set Details</h1>
             <div className="row">
@@ -52,7 +51,7 @@ export default function IndexSetViewPage() {
               path={`seqdb-api/indexSet/${id}/ngsIndexes`}
             />
           </main>
-        </Formik>
+        </DinaForm>
       </>
     );
   }

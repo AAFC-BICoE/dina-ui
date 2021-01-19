@@ -1,13 +1,12 @@
 import {
   BackToListButton,
   ButtonBar,
+  DinaForm,
   EditButton,
   FieldView,
   LoadingSpinner,
   Query
 } from "common-ui";
-import { Formik } from "formik";
-import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Head, Nav } from "../../../components";
@@ -34,18 +33,16 @@ export function RegionDetailsPage({ router }: WithRouterProps) {
             </h1>
             <LoadingSpinner loading={loading} />
             {response && (
-              <Formik<Region> initialValues={response.data} onSubmit={noop}>
-                <div>
-                  <div className="row">
-                    <FieldView className="col-md-2" name="group" />
-                  </div>
-                  <div className="row">
-                    <FieldView className="col-md-2" name="name" />
-                    <FieldView className="col-md-2" name="description" />
-                    <FieldView className="col-md-2" name="symbol" />
-                  </div>
+              <DinaForm<Region> initialValues={response.data}>
+                <div className="row">
+                  <FieldView className="col-md-2" name="group" />
                 </div>
-              </Formik>
+                <div className="row">
+                  <FieldView className="col-md-2" name="name" />
+                  <FieldView className="col-md-2" name="description" />
+                  <FieldView className="col-md-2" name="symbol" />
+                </div>
+              </DinaForm>
             )}
           </main>
         )}

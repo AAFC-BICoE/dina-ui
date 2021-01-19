@@ -1,25 +1,21 @@
-import { Form, Formik } from "formik";
-import { noop } from "lodash";
 import {
   default as DatePicker,
   default as ReactDatePicker
 } from "react-datepicker";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DateField } from "../DateField";
+import { DinaForm } from "../DinaForm";
 
 describe("DateField component", () => {
   function getWrapper(testDate: string | null = "2019-02-02") {
     return mountWithAppContext(
-      <Formik
+      <DinaForm
         initialValues={{
           testField: testDate
         }}
-        onSubmit={noop}
       >
-        <Form translate={undefined}>
-          <DateField name="testField" />
-        </Form>
-      </Formik>
+        <DateField name="testField" />
+      </DinaForm>
     );
   }
 

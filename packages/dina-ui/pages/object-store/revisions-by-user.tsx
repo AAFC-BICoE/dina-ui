@@ -1,10 +1,9 @@
+import { DinaForm, DinaFormOnSubmit, SubmitButton, TextField } from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
-import { RevisionsPageLayout } from "../../components/revisions/RevisionsPageLayout";
-import { useDinaIntl, DinaMessage } from "../../intl/dina-ui-intl";
 import { OBJECT_STORE_REVISION_ROW_CONFIG } from "../../components/revisions/revision-row-configs/objectstore-revision-row-configs";
-import { Form, Formik } from "formik";
-import { TextField, SubmitButton, safeSubmit } from "common-ui";
+import { RevisionsPageLayout } from "../../components/revisions/RevisionsPageLayout";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export default function RevisionsByUserPage() {
   const { query } = useRouter();
@@ -41,27 +40,27 @@ export function AuthorFilterForm() {
   const { pathname, push, query } = useRouter();
 
   /** Update the query string with the searched author. */
-  async function onSubmit({ author }) {
+  const onSubmit: DinaFormOnSubmit = async ({
+    submittedValues: { author }
+  }) => {
     await push({ pathname, query: { author } });
-  }
+  };
 
   return (
-    <Formik
+    <DinaForm
       initialValues={{ author: query.author?.toString() ?? "" }}
-      onSubmit={safeSubmit(onSubmit)}
+      onSubmit={onSubmit}
     >
-      <Form>
-        <ul className="list-inline">
-          <li className="list-inline-item">
-            <TextField name="author" />
-          </li>
-          <li className="list-inline-item">
-            <SubmitButton>
-              <DinaMessage id="searchButton" />
-            </SubmitButton>
-          </li>
-        </ul>
-      </Form>
-    </Formik>
+      <ul className="list-inline">
+        <li className="list-inline-item">
+          <TextField name="author" />
+        </li>
+        <li className="list-inline-item">
+          <SubmitButton>
+            <DinaMessage id="searchButton" />
+          </SubmitButton>
+        </li>
+      </ul>
+    </DinaForm>
   );
 }

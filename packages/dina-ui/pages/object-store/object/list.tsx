@@ -4,6 +4,7 @@ import {
   AreYouSureModal,
   ColumnDefinition,
   dateCell,
+  DinaForm,
   FilterAttribute,
   filterBy,
   FormikButton,
@@ -15,8 +16,8 @@ import {
   useGroupSelectOptions,
   useModal
 } from "common-ui";
-import { Form, Formik, FormikContextType } from "formik";
-import { noop, toPairs } from "lodash";
+import { FormikContextType } from "formik";
+import { toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Component, useContext, useMemo, useState } from "react";
@@ -299,35 +300,30 @@ function MetadataListWrapper({ children }) {
   const router = useRouter();
 
   return (
-    <Formik<MetadataListFormValues>
-      initialValues={{ selectedMetadatas: {} }}
-      onSubmit={noop}
-    >
-      <Form translate={undefined}>
-        <div style={{ height: "1rem" }}>
-          <div className="float-right">
-            <BulkDeleteButton />
-            <FormikButton
-              buttonProps={bulkButtonProps}
-              className="btn btn-primary ml-2 metadata-bulk-edit-button"
-              onClick={async (values: MetadataListFormValues) => {
-                const metadataIds = toPairs(values.selectedMetadatas)
-                  .filter(pair => pair[1])
-                  .map(pair => pair[0]);
+    <DinaForm<MetadataListFormValues> initialValues={{ selectedMetadatas: {} }}>
+      <div style={{ height: "1rem" }}>
+        <div className="float-right">
+          <BulkDeleteButton />
+          <FormikButton
+            buttonProps={bulkButtonProps}
+            className="btn btn-primary ml-2 metadata-bulk-edit-button"
+            onClick={async (values: MetadataListFormValues) => {
+              const metadataIds = toPairs(values.selectedMetadatas)
+                .filter(pair => pair[1])
+                .map(pair => pair[0]);
 
-                await router.push({
-                  pathname: "/object-store/metadata/edit",
-                  query: { metadataIds: metadataIds.join(",") }
-                });
-              }}
-            >
-              <DinaMessage id="editSelectedButtonText" />
-            </FormikButton>
-          </div>
+              await router.push({
+                pathname: "/object-store/metadata/edit",
+                query: { metadataIds: metadataIds.join(",") }
+              });
+            }}
+          >
+            <DinaMessage id="editSelectedButtonText" />
+          </FormikButton>
         </div>
-        {children}
-      </Form>
-    </Formik>
+      </div>
+      {children}
+    </DinaForm>
   );
 }
 

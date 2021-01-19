@@ -3,28 +3,27 @@ import {
   ButtonBar,
   CancelButton,
   DeleteButton,
-  ErrorViewer,
+  DinaForm,
+  DinaFormOnSubmit,
+  filterBy,
   LoadingSpinner,
   Query,
-  safeSubmit,
+  ResourceSelectField,
   SelectField,
   SubmitButton,
   TextField,
-  ResourceSelectField,
-  filterBy,
   useGroupSelectOptions
 } from "common-ui";
-import { Form, Formik, useFormikContext, FormikContextType } from "formik";
-import { useRouter, NextRouter } from "next/router";
-import { useContext, useEffect } from "react";
-import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
+import { useFormikContext } from "formik";
+import { KitsuResponse } from "kitsu";
+import { NextRouter, useRouter } from "next/router";
+import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
+import { useContext, useState } from "react";
+import Switch from "react-switch";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { useState } from "react";
-import Switch from "react-switch";
-import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
 import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
-import { KitsuResponse } from "kitsu";
+import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
 
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
@@ -203,7 +202,6 @@ function CollectingEventForm({
   collectingEvent,
   router
 }: CollectingEventFormProps) {
-  const { save } = useContext(ApiClientContext);
   const { id } = router.query;
   const { formatMessage } = useDinaIntl();
   const initialValues = collectingEvent ?? {
@@ -211,96 +209,82 @@ function CollectingEventForm({
     collectors: [],
     collectorGroups: []
   };
-  const onSubmit = safeSubmit(
-    async (
-      submittedValues,
-      { setStatus, setSubmitting }: FormikContextType<any>
-    ) => {
-      if (!submittedValues.startEventDateTime) {
-        setStatus(formatMessage("field_collectingEvent_startDateTimeError"));
-        setSubmitting(false);
-        return;
-      }
-      const matcher = /([^\d]+)/g;
-      const startDateTime = submittedValues.startEventDateTime.replace(
-        matcher,
-        ""
-      );
-      const datePrecision = [4, 6, 8, 12, 14, 17];
-      if (!datePrecision.includes(startDateTime.length)) {
-        setStatus(formatMessage("field_collectingEvent_startDateTimeError"));
-        setSubmitting(false);
-        return;
-      }
-      if (submittedValues.endEventDateTime) {
-        const endDateTime = submittedValues.endEventDateTime.replace(
-          matcher,
-          ""
-        );
-        if (!datePrecision.includes(endDateTime.length)) {
-          setStatus(formatMessage("field_collectingEvent_endDateTimeError"));
-          setSubmitting(false);
-          return;
-        }
-      }
-      // handle converting to relationship manually due to crnk bug
-      const submitCopy = { ...submittedValues };
-      if (submitCopy.collectors && submitCopy.collectors.length > 0) {
-        submittedValues.relationships = {};
-        submittedValues.relationships.collectors = {};
-        submittedValues.relationships.collectors.data = [];
-        submitCopy.collectors.map(collector =>
-          submittedValues.relationships.collectors.data.push({
-            id: collector.id,
-            type: "agent"
-          })
-        );
-      }
-      delete submittedValues.collectors;
-
-      if (submittedValues.collectorGroups?.id)
-        submittedValues.collectorGroupUuid = submittedValues.collectorGroups.id;
-      delete submittedValues.collectorGroups;
-      await save(
-        [
-          {
-            resource: submittedValues,
-            type: "collecting-event"
-          }
-        ],
-        {
-          apiBaseUrl: "/collection-api"
-        }
-      );
-      await router.push(`/collecting-event/list`);
+  const onSubmit: DinaFormOnSubmit = async ({
+    submittedValues,
+    api: { save }
+  }) => {
+    if (!submittedValues.startEventDateTime) {
+      throw new Error(formatMessage("field_collectingEvent_startDateTimeError"));
     }
-  );
+    const matcher = /([^\d]+)/g;
+    const startDateTime = submittedValues.startEventDateTime.replace(
+      matcher,
+      ""
+    );
+    const datePrecision = [4, 6, 8, 12, 14, 17];
+    if (!datePrecision.includes(startDateTime.length)) {
+      throw new Error(formatMessage("field_collectingEvent_startDateTimeError"));
+    }
+    if (submittedValues.endEventDateTime) {
+      const endDateTime = submittedValues.endEventDateTime.replace(matcher, "");
+      if (!datePrecision.includes(endDateTime.length)) {
+        throw new Error(formatMessage("field_collectingEvent_endDateTimeError"));
+      }
+    }
+    // handle converting to relationship manually due to crnk bug
+    const submitCopy = { ...submittedValues };
+    if (submitCopy.collectors && submitCopy.collectors.length > 0) {
+      submittedValues.relationships = {};
+      submittedValues.relationships.collectors = {};
+      submittedValues.relationships.collectors.data = [];
+      submitCopy.collectors.map(collector =>
+        submittedValues.relationships.collectors.data.push({
+          id: collector.id,
+          type: "agent"
+        })
+      );
+    }
+    delete submittedValues.collectors;
+
+    if (submittedValues.collectorGroups?.id)
+      submittedValues.collectorGroupUuid = submittedValues.collectorGroups.id;
+    delete submittedValues.collectorGroups;
+    await save(
+      [
+        {
+          resource: submittedValues,
+          type: "collecting-event"
+        }
+      ],
+      {
+        apiBaseUrl: "/collection-api"
+      }
+    );
+    await router.push(`/collecting-event/list`);
+  };
 
   return (
-    <Formik
+    <DinaForm
       initialValues={initialValues}
       onSubmit={onSubmit}
       enableReinitialize={true}
     >
-      <Form translate={undefined}>
-        <ErrorViewer />
-        <ButtonBar>
-          <SubmitButton />
-          <CancelButton
-            entityId={id as string}
-            entityLink="/collecting-event"
-            byPassView={true}
-          />
-          <DeleteButton
-            className="ml-5"
-            id={id as string}
-            options={{ apiBaseUrl: "/collection-api" }}
-            postDeleteRedirect="/collecting-event/list"
-            type="collecting-event"
-          />
-        </ButtonBar>
-        <CollectingEventFormInternal />
-      </Form>
-    </Formik>
+      <ButtonBar>
+        <SubmitButton />
+        <CancelButton
+          entityId={id as string}
+          entityLink="/collecting-event"
+          byPassView={true}
+        />
+        <DeleteButton
+          className="ml-5"
+          id={id as string}
+          options={{ apiBaseUrl: "/collection-api" }}
+          postDeleteRedirect="/collecting-event/list"
+          type="collecting-event"
+        />
+      </ButtonBar>
+      <CollectingEventFormInternal />
+    </DinaForm>
   );
 }

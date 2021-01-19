@@ -1,11 +1,9 @@
 import {
-  ErrorViewer,
+  DinaForm,
   SelectField,
   useAccount,
   useGroupSelectOptions
 } from "common-ui";
-import { Form, Formik } from "formik";
-import { noop } from "lodash";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
 import {
@@ -65,27 +63,21 @@ export default function UploadPage() {
             <div className="alert alert-warning">
               <DinaMessage id="forTestingPurposesOnlyMessage" />
             </div>
-            <Formik
-              initialValues={{ group: groupSelectOptions[0].value }}
-              onSubmit={noop}
-            >
-              <Form translate={undefined}>
-                <ErrorViewer />
-                <div className="row">
-                  <SelectField
-                    className="col-md-3"
-                    name="group"
-                    options={groupSelectOptions}
-                  />
-                </div>
-                <div>
-                  <FileUploader
-                    acceptedFileTypes={acceptedFileTypes}
-                    onSubmit={onSubmit}
-                  />
-                </div>
-              </Form>
-            </Formik>
+            <DinaForm initialValues={{ group: groupSelectOptions[0].value }}>
+              <div className="row">
+                <SelectField
+                  className="col-md-3"
+                  name="group"
+                  options={groupSelectOptions}
+                />
+              </div>
+              <div>
+                <FileUploader
+                  acceptedFileTypes={acceptedFileTypes}
+                  onSubmit={onSubmit}
+                />
+              </div>
+            </DinaForm>
           </div>
         )}
       </main>

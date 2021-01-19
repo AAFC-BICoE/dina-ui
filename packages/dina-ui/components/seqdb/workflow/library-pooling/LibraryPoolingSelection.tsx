@@ -1,14 +1,13 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ColumnDefinition,
-  ErrorViewer,
+  DinaForm,
   FormikButton,
   QueryTable,
   useGroupedCheckBoxes
 } from "common-ui";
-import { Formik } from "formik";
 import { FilterParam } from "kitsu";
-import { debounce, Dictionary, noop } from "lodash";
+import { debounce, Dictionary } from "lodash";
 import { useState } from "react";
 import { FilteredChangeFunction } from "react-table";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -215,16 +214,14 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
   ];
 
   return (
-    <Formik<LibraryPoolingSelectionFormValues>
+    <DinaForm<LibraryPoolingSelectionFormValues>
       initialValues={{
         libraryPoolContentIdsToDelete: {},
         libraryPoolIdsToSelect: {},
         libraryPrepBatchIdsToSelect: {}
       }}
-      onSubmit={noop}
     >
       <>
-        <ErrorViewer />
         <div className="row">
           <div className="col-5 library-pool-content-selection-table">
             <div className="float-right">
@@ -323,6 +320,6 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
           </div>
         </div>
       </>
-    </Formik>
+    </DinaForm>
   );
 }

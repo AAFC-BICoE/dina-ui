@@ -4,7 +4,6 @@ import { GridSettings } from "handsontable";
 import { cloneDeep, isEmpty, isEqual, zipWith } from "lodash";
 import dynamic from "next/dynamic";
 import { Component, useEffect, useState } from "react";
-import { ErrorViewer } from "../formik-connected/ErrorViewer";
 import { FormikButton } from "../formik-connected/FormikButton";
 import { OnFormikSubmit, safeSubmit } from "../formik-connected/safeSubmit";
 import { CommonMessage } from "../intl/common-ui-intl";
@@ -79,7 +78,7 @@ export function BulkDataEditor<TRow>({
   const loadingFailed =
     (!workingTableData || !initialTableData) && formik.status;
   if (loadingFailed) {
-    return <ErrorViewer />;
+    return <div />;
   }
 
   // Show loading state here:
@@ -121,7 +120,6 @@ export function BulkDataEditor<TRow>({
           min-height: 138px;
         }
       `}</style>
-      <ErrorViewer />
       {validationAlertJsx}
       <div
         className="form-group"

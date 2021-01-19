@@ -1,13 +1,12 @@
 import {
   BackToListButton,
   ButtonBar,
+  DinaForm,
   EditButton,
   FieldView,
   LoadingSpinner,
   Query
 } from "common-ui";
-import { Formik } from "formik";
-import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Head, Nav } from "../../../components";
@@ -45,7 +44,7 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
               </h1>
               <LoadingSpinner loading={loading} />
               {protocol && (
-                <Formik<Protocol> initialValues={protocol} onSubmit={noop}>
+                <DinaForm<Protocol> initialValues={protocol}>
                   <div>
                     <div className="row">
                       <FieldView className="col-md-2" name="group" />
@@ -71,7 +70,7 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
                       <FieldView className="col-md-2" name="lastModified" />
                     </div>
                   </div>
-                </Formik>
+                </DinaForm>
               )}
             </main>
           );

@@ -1,19 +1,16 @@
 import {
-  ApiClientContext,
   DeleteButton,
-  ErrorViewer,
+  DinaForm,
+  DinaFormOnSubmit,
   filterBy,
-  safeSubmit,
   SubmitButton,
   TextField,
   useModal
 } from "common-ui";
-import { Form, Formik } from "formik";
+import { ResourceSelectField } from "common-ui/lib";
 import { Organization } from "packages/dina-ui/types/objectstore-api/resources/Organization";
-import { useContext } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
-import { ResourceSelectField } from "common-ui/lib";
 
 interface PersonFormProps {
   person?: Person;
@@ -22,13 +19,14 @@ interface PersonFormProps {
 
 /** Form to add or edit a Person. */
 export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
-  const { save } = useContext(ApiClientContext);
-
   const initialValues = person || { type: "person" };
 
   const id = person?.id;
 
-  const onSubmit = safeSubmit(async submittedValues => {
+  const onSubmit: DinaFormOnSubmit = async ({
+    api: { save },
+    submittedValues
+  }) => {
     const submitCopy = { ...submittedValues };
     if (submitCopy.organizations) {
       submittedValues.relationships = {};
@@ -55,40 +53,35 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
     );
 
     await onSubmitSuccess();
-  });
+  };
 
   return (
-    <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      <Form translate={undefined}>
-        <ErrorViewer />
-        <div>
-          <div style={{ maxWidth: "20rem" }}>
-            <TextField name="displayName" />
-          </div>
-          <div style={{ maxWidth: "20rem" }}>
-            <TextField name="email" />
-          </div>
-          <div style={{ maxWidth: "20rem" }}>
-            <ResourceSelectField<Organization>
-              name="organizations"
-              filter={filterBy(["names[0].name"])}
-              model="agent-api/organization"
-              isMulti={true}
-              optionLabel={organization => organization.names?.[0].name}
-            />
-          </div>
-          <div className="form-group">
-            <SubmitButton />
-            <DeleteButton
-              id={id}
-              options={{ apiBaseUrl: "/agent-api" }}
-              postDeleteRedirect="/person/list"
-              type="person"
-            />
-          </div>
-        </div>
-      </Form>
-    </Formik>
+    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+      <div style={{ maxWidth: "20rem" }}>
+        <TextField name="displayName" />
+      </div>
+      <div style={{ maxWidth: "20rem" }}>
+        <TextField name="email" />
+      </div>
+      <div style={{ maxWidth: "20rem" }}>
+        <ResourceSelectField<Organization>
+          name="organizations"
+          filter={filterBy(["names[0].name"])}
+          model="agent-api/organization"
+          isMulti={true}
+          optionLabel={organization => organization.names?.[0].name}
+        />
+      </div>
+      <div className="form-group">
+        <SubmitButton />
+        <DeleteButton
+          id={id}
+          options={{ apiBaseUrl: "/agent-api" }}
+          postDeleteRedirect="/person/list"
+          type="person"
+        />
+      </div>
+    </DinaForm>
   );
 }
 

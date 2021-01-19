@@ -1,6 +1,8 @@
 import { HotColumnProps } from "@handsontable/react";
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
+  DinaForm,
+  DinaFormOnSubmit,
   filterBy,
   FormikButton,
   ResourceSelectField,
@@ -9,7 +11,7 @@ import {
   TextField,
   useModal
 } from "common-ui";
-import { Form, Formik, useFormikContext } from "formik";
+import { useFormikContext } from "formik";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../types/objectstore-api";
 
@@ -51,7 +53,9 @@ function useMetadataEditorSavedTemplates() {
     }: Omit<AttributesTemplate, "name">,
     onSuccess: (newTemplate: AttributesTemplate) => void
   ) {
-    function onTemplateSubmit({ name }) {
+    const onTemplateSubmit: DinaFormOnSubmit = ({
+      submittedValues: { name }
+    }) => {
       const newTemplate: AttributesTemplate = {
         name: name || `New Template ${new Date().toLocaleString()}`,
         editableBuiltInAttributes,
@@ -62,28 +66,26 @@ function useMetadataEditorSavedTemplates() {
       onSuccess(newTemplate);
 
       closeModal();
-    }
+    };
 
     openModal(
       <div className="modal-content">
-        <Formik initialValues={{ name: "" }} onSubmit={onTemplateSubmit}>
-          <Form translate={undefined}>
-            <div className="modal-header">
-              <h2>
-                <DinaMessage id="addAttributesTemplateTitle" />
-              </h2>
-            </div>
-            <div className="modal-body">
-              <TextField name="name" inputProps={{ autoFocus: true }} />
-            </div>
-            <div className="modal-footer">
-              <SubmitButton />
-              <button className="btn btn-dark" onClick={closeModal}>
-                <DinaMessage id="cancelButtonText" />
-              </button>
-            </div>
-          </Form>
-        </Formik>
+        <div className="modal-header">
+          <h2>
+            <DinaMessage id="addAttributesTemplateTitle" />
+          </h2>
+        </div>
+        <DinaForm initialValues={{ name: "" }} onSubmit={onTemplateSubmit}>
+          <div className="modal-body">
+            <TextField name="name" inputProps={{ autoFocus: true }} />
+          </div>
+          <div className="modal-footer">
+            <SubmitButton />
+            <button className="btn btn-dark" onClick={closeModal}>
+              <DinaMessage id="cancelButtonText" />
+            </button>
+          </div>
+        </DinaForm>
       </div>
     );
   }

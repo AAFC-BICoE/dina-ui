@@ -1,6 +1,4 @@
-import { ErrorViewer, SelectField, useGroupSelectOptions } from "common-ui";
-import { Form, Formik } from "formik";
-import { noop } from "lodash";
+import { DinaForm, SelectField, useGroupSelectOptions } from "common-ui";
 import { FileUploader, FileUploaderOnSubmitArgs } from "..";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useFileUpload } from "../file-upload/FileUploadProvider";
@@ -46,23 +44,20 @@ export function AttachmentUploader({
   }
 
   return (
-    <Formik<AttachmentUploadForm> initialValues={{}} onSubmit={noop}>
-      <Form>
-        <ErrorViewer />
-        <div className="row">
-          <SelectField
-            className="col-md-3"
-            name="group"
-            options={groupSelectOptions}
-          />
-        </div>
-        <div>
-          <FileUploader
-            onSubmit={onUploaderSubmit}
-            acceptedFileTypes={acceptedFileTypes}
-          />
-        </div>
-      </Form>
-    </Formik>
+    <DinaForm<AttachmentUploadForm> initialValues={{}}>
+      <div className="row">
+        <SelectField
+          className="col-md-3"
+          name="group"
+          options={groupSelectOptions}
+        />
+      </div>
+      <div>
+        <FileUploader
+          onSubmit={onUploaderSubmit}
+          acceptedFileTypes={acceptedFileTypes}
+        />
+      </div>
+    </DinaForm>
   );
 }

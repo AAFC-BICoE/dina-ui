@@ -2,24 +2,22 @@ import {
   ApiClientContext,
   ButtonBar,
   CancelButton,
+  DinaForm,
   EditButton,
   FieldView,
   useQuery,
   withResponse
 } from "common-ui";
-import { Formik } from "formik";
-import { KitsuResponse } from "kitsu";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
-import { PersistedResource } from "kitsu";
-import { noop } from "lodash";
+import { KitsuResponse } from "kitsu";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
+import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
+import { useContext, useState } from "react";
 import { Footer, Head, Nav } from "../../components";
 import { AttachmentList } from "../../components/object-store/attachment-list/AttachmentList";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
-import { useContext, useState } from "react";
-import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
 
 export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -87,10 +85,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
             </h1>
             <div>
               {collectingEvent && (
-                <Formik<CollectingEvent>
-                  initialValues={collectingEvent}
-                  onSubmit={noop}
-                >
+                <DinaForm<CollectingEvent> initialValues={collectingEvent}>
                   <div>
                     <div className="form-group">
                       <div className="row">
@@ -124,7 +119,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                       </div>
                     </div>
                   </div>
-                </Formik>
+                </DinaForm>
               )}
               <div className="form-group">
                 <div className="row">

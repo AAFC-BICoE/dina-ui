@@ -1,13 +1,14 @@
 import {
   ColumnDefinition,
   dateCell,
+  DinaForm,
   FieldHeader,
   FormikButton,
   QueryTable,
   useGroupedCheckBoxes
 } from "common-ui";
-import { Form, Formik, FormikContextType } from "formik";
-import { noop, toPairs } from "lodash";
+import { FormikContextType } from "formik";
+import { toPairs } from "lodash";
 import Link from "next/link";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
@@ -111,54 +112,51 @@ export function ExistingAttachmentsTable({
   }
 
   return (
-    <Formik<AttachmentsTableFormValues>
+    <DinaForm<AttachmentsTableFormValues>
       initialValues={{ selectedMetadatas: {} }}
-      onSubmit={noop}
     >
-      <Form>
-        <div className="list-inline" style={{ minHeight: "3rem" }}>
-          <div className="list-inline-item float-right">
-            <FormikButton
-              buttonProps={bulkButtonProps}
-              className="btn btn-primary ml-2 metadata-bulk-edit-button"
-              onClick={editSelectedMetadatas}
-            >
-              <DinaMessage id="editSelectedButtonText" />
-            </FormikButton>
-            <FormikButton
-              buttonProps={bulkButtonProps}
-              className="btn btn-primary ml-2 metadata-detach-button"
-              onClick={detachSelectedMetadatas}
-            >
-              <DinaMessage id="detachSelectedButtonText" />
-            </FormikButton>
-          </div>
+      <div className="list-inline" style={{ minHeight: "3rem" }}>
+        <div className="list-inline-item float-right">
+          <FormikButton
+            buttonProps={bulkButtonProps}
+            className="btn btn-primary ml-2 metadata-bulk-edit-button"
+            onClick={editSelectedMetadatas}
+          >
+            <DinaMessage id="editSelectedButtonText" />
+          </FormikButton>
+          <FormikButton
+            buttonProps={bulkButtonProps}
+            className="btn btn-primary ml-2 metadata-detach-button"
+            onClick={detachSelectedMetadatas}
+          >
+            <DinaMessage id="detachSelectedButtonText" />
+          </FormikButton>
         </div>
-        <QueryTable
-          columns={ATTACHMENT_TABLE_COLUMNS}
-          joinSpecs={[
-            {
-              apiBaseUrl: "/objectstore-api",
-              idField: "id",
-              joinField: "metadata",
-              path: metadataRef =>
-                `metadata/${metadataRef.id}?include=acMetadataCreator`
-            },
-            {
-              apiBaseUrl: "/agent-api",
-              idField: "metadata.acMetadataCreator.id",
-              joinField: "metadata.acMetadataCreator",
-              path: metadataRef =>
-                `person/${metadataRef.metadata?.acMetadataCreator?.id}`
-            }
-          ]}
-          omitPaging={true}
-          path={attachmentPath}
-          reactTableProps={{ sortable: false }}
-          defaultPageSize={10000}
-          onSuccess={res => setAvailableMetadatas(res.data)}
-        />
-      </Form>
-    </Formik>
+      </div>
+      <QueryTable
+        columns={ATTACHMENT_TABLE_COLUMNS}
+        joinSpecs={[
+          {
+            apiBaseUrl: "/objectstore-api",
+            idField: "id",
+            joinField: "metadata",
+            path: metadataRef =>
+              `metadata/${metadataRef.id}?include=acMetadataCreator`
+          },
+          {
+            apiBaseUrl: "/agent-api",
+            idField: "metadata.acMetadataCreator.id",
+            joinField: "metadata.acMetadataCreator",
+            path: metadataRef =>
+              `person/${metadataRef.metadata?.acMetadataCreator?.id}`
+          }
+        ]}
+        omitPaging={true}
+        path={attachmentPath}
+        reactTableProps={{ sortable: false }}
+        defaultPageSize={10000}
+        onSuccess={res => setAvailableMetadatas(res.data)}
+      />
+    </DinaForm>
   );
 }

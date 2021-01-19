@@ -1,24 +1,21 @@
 import {
-  ApiClientContext,
   ButtonBar,
   CancelButton,
   DeleteButton,
-  ErrorViewer,
+  DinaForm,
+  DinaFormOnSubmit,
   LoadingSpinner,
   Query,
-  safeSubmit,
   SubmitButton,
   TextField
 } from "common-ui";
-import { Form, Formik } from "formik";
-import { useRouter, NextRouter } from "next/router";
-import { useContext } from "react";
+import { NextRouter, useRouter } from "next/router";
+import { Head, Nav } from "../../components";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   MultiligualName,
   Organization
 } from "../../types/objectstore-api/resources/Organization";
-import { Head, Nav } from "../../components";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 interface OrganizationFormProps {
   organization?: Organization;
@@ -87,7 +84,6 @@ export const trimAliases = (aliases, isArray) => {
 };
 
 function OrganizationForm({ organization, router }: OrganizationFormProps) {
-  const { save } = useContext(ApiClientContext);
   const { id } = router.query;
   const initialValues = organization || { type: "organization" };
   const { formatMessage } = useDinaIntl();
@@ -100,7 +96,10 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
       organization.names[1]?.name;
   }
 
-  const onSubmit = safeSubmit(async submittedValues => {
+  const onSubmit: DinaFormOnSubmit = async ({
+    api: { save },
+    submittedValues
+  }) => {
     const aliases = submittedValues.aliases;
     if (Array.isArray(aliases)) {
       aliases.length === 1
@@ -156,51 +155,48 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
     );
 
     await router.push(`/organization/list`);
-  });
+  };
 
   return (
-    <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      <Form translate={undefined}>
-        <ErrorViewer />
-        <ButtonBar>
-          <SubmitButton />
-          <CancelButton
-            entityId={id as string}
-            entityLink="/organization"
-            byPassView={true}
+    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+      <ButtonBar>
+        <SubmitButton />
+        <CancelButton
+          entityId={id as string}
+          entityLink="/organization"
+          byPassView={true}
+        />
+        <DeleteButton
+          className="ml-5"
+          id={id as string}
+          options={{ apiBaseUrl: "/agent-api" }}
+          postDeleteRedirect="/organization/list"
+          type="organization"
+        />
+      </ButtonBar>
+      <div>
+        <div className="row">
+          <TextField
+            className="col-md-4 nameEN"
+            name="name.EN"
+            label={formatMessage("organizationEnglishNameLabel")}
           />
-          <DeleteButton
-            className="ml-5"
-            id={id as string}
-            options={{ apiBaseUrl: "/agent-api" }}
-            postDeleteRedirect="/organization/list"
-            type="organization"
-          />
-        </ButtonBar>
-        <div>
-          <div className="row">
-            <TextField
-              className="col-md-4 nameEN"
-              name="name.EN"
-              label={formatMessage("organizationEnglishNameLabel")}
-            />
-          </div>
-          <div className="row">
-            <TextField
-              className="col-md-4 nameFR"
-              name="name.FR"
-              label={formatMessage("organizationFrenchNameLabel")}
-            />
-          </div>
-          <div className="row">
-            <TextField
-              className="col-md-4"
-              name="aliases"
-              label={formatMessage("editOrganizationAliasesLabel")}
-            />
-          </div>
         </div>
-      </Form>
-    </Formik>
+        <div className="row">
+          <TextField
+            className="col-md-4 nameFR"
+            name="name.FR"
+            label={formatMessage("organizationFrenchNameLabel")}
+          />
+        </div>
+        <div className="row">
+          <TextField
+            className="col-md-4"
+            name="aliases"
+            label={formatMessage("editOrganizationAliasesLabel")}
+          />
+        </div>
+      </div>
+    </DinaForm>
   );
 }

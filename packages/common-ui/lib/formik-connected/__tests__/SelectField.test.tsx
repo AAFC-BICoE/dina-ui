@@ -1,7 +1,6 @@
-import { Form, Formik } from "formik";
-import { noop } from "lodash";
 import Select from "react-select";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { DinaForm } from "../DinaForm";
 import { SelectField } from "../SelectField";
 
 const PRIMER_TYPE_OPTIONS = [
@@ -29,23 +28,22 @@ const PRIMER_TYPE_OPTIONS = [
 
 function getWrapper(propsOverride = {}) {
   return mountWithAppContext(
-    <Formik
+    <DinaForm
       initialValues={{
         testField: "ITRU_PRIMER"
       }}
-      onSubmit={noop}
     >
       {({ values: { testField } }) => (
-        <Form translate={undefined}>
+        <>
           <SelectField
             name="testField"
             options={PRIMER_TYPE_OPTIONS}
             {...propsOverride}
           />
           <div id="value-display">{testField}</div>
-        </Form>
+        </>
       )}
-    </Formik>
+    </DinaForm>
   );
 }
 

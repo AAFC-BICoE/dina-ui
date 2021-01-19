@@ -1,20 +1,17 @@
 import {
-  ApiClientContext,
-  ErrorViewer,
+  DinaForm,
+  DinaFormOnSubmit,
   filterBy,
   LoadingSpinner,
   Query,
   ResourceSelectField,
-  safeSubmit,
   SelectField,
   SubmitButton,
   TextField,
   useGroupSelectOptions
 } from "common-ui";
-import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
-import { useContext } from "react";
 import { Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Chain, ChainTemplate } from "../../../types/seqdb-api";
@@ -68,12 +65,14 @@ export function ChainEditPage({ router }: WithRouterProps) {
 }
 
 function ChainForm({ chain, router }: ChainFormProps) {
-  const { save } = useContext(ApiClientContext);
   const groupSelectOptions = useGroupSelectOptions();
 
   const initialValues = chain || { group: groupSelectOptions[0].value };
 
-  const onSubmit = safeSubmit(async submittedValues => {
+  const onSubmit: DinaFormOnSubmit = async ({
+    api: { save },
+    submittedValues
+  }) => {
     const response = await save(
       [
         {
@@ -86,38 +85,35 @@ function ChainForm({ chain, router }: ChainFormProps) {
 
     const newId = response[0].id;
     await router.push(`/seqdb/workflow/view?id=${newId}`);
-  });
+  };
 
   return (
     <div>
       <div className="container-fluid">
-        <Formik initialValues={initialValues} onSubmit={onSubmit}>
-          <Form translate={undefined}>
-            <ErrorViewer />
-            <div className="row">
-              <SelectField
-                className="col-md-3"
-                disabled={true}
-                name="group"
-                options={groupSelectOptions}
-              />
-            </div>
-            <div className="row">
-              <ResourceSelectField<ChainTemplate>
-                className="col-md-2"
-                label="Workflow Template"
-                name="chainTemplate"
-                filter={filterBy(["name"])}
-                model="seqdb-api/chainTemplate"
-                optionLabel={template => template.name}
-              />
-            </div>
-            <div className="row">
-              <TextField className="col-md-2" name="name" />
-            </div>
-            <SubmitButton />
-          </Form>
-        </Formik>
+        <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+          <div className="row">
+            <SelectField
+              className="col-md-3"
+              disabled={true}
+              name="group"
+              options={groupSelectOptions}
+            />
+          </div>
+          <div className="row">
+            <ResourceSelectField<ChainTemplate>
+              className="col-md-2"
+              label="Workflow Template"
+              name="chainTemplate"
+              filter={filterBy(["name"])}
+              model="seqdb-api/chainTemplate"
+              optionLabel={template => template.name}
+            />
+          </div>
+          <div className="row">
+            <TextField className="col-md-2" name="name" />
+          </div>
+          <SubmitButton />
+        </DinaForm>
       </div>
     </div>
   );
