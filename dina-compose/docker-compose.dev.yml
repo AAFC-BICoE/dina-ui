@@ -142,9 +142,9 @@ services:
         -Dspring.liquibase.password=p
         -Dspring.liquibase.liquibase-schema=userapi
         -Dkeycloak.enabled=true
-        -Dkeycloak.resource=dina
+        -Dkeycloak.resource=user-svc
         -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
-        -Dkeycloak.secret=03eff0eb-a81b-4213-bad7-49457778d4eb
+        -Dkeycloak.credentials.secret=120c0b7a-5ed2-4295-9a31-29c2fcbc714f
       \"
       spring-boot:run
       "
@@ -204,7 +204,7 @@ services:
       "
   # Front-end gateway that proxies URLs to the correct service:
   dina-ui:
-    image: caddy/caddy:2.0.0-alpine
+    image: caddy/caddy:2.3.0-alpine
     volumes:
       - "../repos/dina-ui/packages/dina-ui/dev.Caddyfile:/etc/caddy/Caddyfile"
     environment:

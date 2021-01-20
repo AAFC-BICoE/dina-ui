@@ -132,7 +132,7 @@ services:
       spring.liquibase.password: p
       spring.liquibase-schema: userapi
       keycloak.enabled: "true"
-      keycloak.secret: 03eff0eb-a81b-4213-bad7-49457778d4eb
+      keycloak.secret: 120c0b7a-5ed2-4295-9a31-29c2fcbc714f
       keycloak.auth-server-url: http://${KEYCLOAK_DOMAIN}/auth
     extra_hosts:
       # Resolve the Keycloak domain to Keycloak's static IP:
