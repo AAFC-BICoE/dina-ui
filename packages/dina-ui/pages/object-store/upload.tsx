@@ -1,11 +1,6 @@
-import {
-  DinaForm,
-  SelectField,
-  useAccount,
-  useGroupSelectOptions
-} from "common-ui";
+import { DinaForm, useAccount } from "common-ui";
 import { useRouter } from "next/router";
-import { Footer, Head, Nav } from "../../components";
+import { Footer, GroupSelectField, Head, Nav } from "../../components";
 import {
   FileUploader,
   FileUploaderOnSubmitArgs
@@ -20,8 +15,7 @@ export interface OnSubmitValues {
 export default function UploadPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
-  const { initialized: accountInitialized } = useAccount();
-  const groupSelectOptions = useGroupSelectOptions();
+  const { initialized: accountInitialized, groupNames } = useAccount();
   const { uploadFiles } = useFileUpload();
 
   const acceptedFileTypes = "image/*,audio/*,video/*,.pdf,.doc,.docx,.png";
@@ -54,7 +48,7 @@ export default function UploadPage() {
         <h1>
           <DinaMessage id="uploadPageTitle" />
         </h1>
-        {!accountInitialized || !groupSelectOptions?.length ? (
+        {!accountInitialized || !groupNames?.length ? (
           <div className="alert alert-warning no-group-alert">
             <DinaMessage id="userMustBelongToGroup" />
           </div>
@@ -63,13 +57,9 @@ export default function UploadPage() {
             <div className="alert alert-warning">
               <DinaMessage id="forTestingPurposesOnlyMessage" />
             </div>
-            <DinaForm initialValues={{ group: groupSelectOptions[0].value }}>
+            <DinaForm initialValues={{ group: groupNames[0] }}>
               <div className="row">
-                <SelectField
-                  className="col-md-3"
-                  name="group"
-                  options={groupSelectOptions}
-                />
+                <GroupSelectField className="col-md-3" name="group" />
               </div>
               <div>
                 <FileUploader
