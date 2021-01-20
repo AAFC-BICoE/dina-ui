@@ -22,8 +22,8 @@ import { useContext, useState } from "react";
 import Switch from "react-switch";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
-import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
+import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
+import { CollectorGroup } from "../../types/collection-api/resources/CollectorGroup";
 
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
@@ -214,7 +214,9 @@ function CollectingEventForm({
     api: { save }
   }) => {
     if (!submittedValues.startEventDateTime) {
-      throw new Error(formatMessage("field_collectingEvent_startDateTimeError"));
+      throw new Error(
+        formatMessage("field_collectingEvent_startDateTimeError")
+      );
     }
     const matcher = /([^\d]+)/g;
     const startDateTime = submittedValues.startEventDateTime.replace(
@@ -223,12 +225,16 @@ function CollectingEventForm({
     );
     const datePrecision = [4, 6, 8, 12, 14, 17];
     if (!datePrecision.includes(startDateTime.length)) {
-      throw new Error(formatMessage("field_collectingEvent_startDateTimeError"));
+      throw new Error(
+        formatMessage("field_collectingEvent_startDateTimeError")
+      );
     }
     if (submittedValues.endEventDateTime) {
       const endDateTime = submittedValues.endEventDateTime.replace(matcher, "");
       if (!datePrecision.includes(endDateTime.length)) {
-        throw new Error(formatMessage("field_collectingEvent_endDateTimeError"));
+        throw new Error(
+          formatMessage("field_collectingEvent_endDateTimeError")
+        );
       }
     }
     // handle converting to relationship manually due to crnk bug

@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { Person } from "./Person";
+import { Person } from "../../objectstore-api/resources/Person";
 
 export interface CollectorGroupAttributes {
   uuid: string;

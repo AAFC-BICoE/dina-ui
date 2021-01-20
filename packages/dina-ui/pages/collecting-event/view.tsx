@@ -17,7 +17,7 @@ import { useContext, useState } from "react";
 import { Footer, Head, Nav } from "../../components";
 import { AttachmentList } from "../../components/object-store/attachment-list/AttachmentList";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
+import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
 
 export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
