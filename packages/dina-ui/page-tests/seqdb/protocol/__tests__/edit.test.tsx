@@ -67,7 +67,7 @@ describe("Protocol edit page", () => {
             path: "protocol",
             value: {
               attributes: {
-                group: "/aafc",
+                group: "aafc",
                 name: "New Protocol"
               },
               id: "00000000-0000-0000-0000-000000000000",
@@ -151,7 +151,7 @@ describe("Protocol edit page", () => {
             value: {
               attributes: expect.objectContaining({
                 description: "new desc for protocol 10",
-                group: "/aafc",
+                group: "aafc",
                 name: "PCR Standardized for Sequencing (10ul), +BSA"
               }),
               id: "10",
@@ -219,7 +219,7 @@ const TEST_PROTOCOL: Required<Protocol> = {
   description: "protocol desc",
   equipment: "equip",
   forwardPrimerConcentration: "fPrimer",
-  group: "/aafc",
+  group: "aafc",
   id: "10",
   kit: {
     id: "10",

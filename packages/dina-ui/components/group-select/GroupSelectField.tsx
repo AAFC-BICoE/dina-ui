@@ -12,7 +12,6 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
   const { locale } = useDinaIntl();
   const { groupNames: myGroupNames } = useAccount();
 
-  // Fetch all groups becuase there is no
   const { response } = useQuery<Group[]>({
     path: "user-api/group",
     page: { limit: 1000 },
