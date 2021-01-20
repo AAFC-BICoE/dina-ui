@@ -12,11 +12,11 @@ import {
   SelectField,
   SubmitButton,
   TextField,
-  useGroupSelectOptions
+  useAccount
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 import { Region } from "../../../types/seqdb-api/resources/Region";
@@ -68,10 +68,10 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
 
 function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
   const { id } = router.query;
-  const groupSelectOptions = useGroupSelectOptions();
+  const { groupNames } = useAccount();
 
   const initialValues = primer || {
-    group: groupSelectOptions[0].value,
+    group: groupNames?.[0],
     lotNumber: 1,
     seq: "",
     type: "PRIMER"
@@ -103,12 +103,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
       </ButtonBar>
       <div>
         <div className="row">
-          <SelectField
-            className="col-md-2"
-            disabled={true}
-            name="group"
-            options={groupSelectOptions}
-          />
+          <GroupSelectField className="col-md-2" name="group" />
         </div>
         <div className="row">
           <SelectField

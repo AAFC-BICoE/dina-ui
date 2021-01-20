@@ -2,9 +2,13 @@ import { SelectField, SelectFieldProps, useAccount, useQuery } from "common-ui";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
 
-interface GroupSelectFieldProps extends Omit<SelectFieldProps, "options"> {}
+interface GroupSelectFieldProps extends Omit<SelectFieldProps, "options"> {
+  showAnyOption?: boolean;
+}
 
-export function GroupSelectField(props: GroupSelectFieldProps) {
+export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
+  const { showAnyOption, ...selectFieldProps } = groupSelectFieldProps;
+
   const { locale } = useDinaIntl();
   const { groupNames: myGroupNames } = useAccount();
 
@@ -15,7 +19,10 @@ export function GroupSelectField(props: GroupSelectFieldProps) {
     filter: JSON.stringify({ name: myGroupNames })
   });
 
-  const groupSelectOptions =
+  const groupSelectOptions: {
+    label: string;
+    value: string | undefined | null;
+  }[] =
     response?.data?.map(group => ({
       label: group.labels[locale] ?? group.name,
       value: group.name
@@ -24,11 +31,15 @@ export function GroupSelectField(props: GroupSelectFieldProps) {
     myGroupNames?.map(name => ({ label: name, value: name })) ??
     [];
 
+  if (showAnyOption) {
+    groupSelectOptions.unshift({ label: "<any>", value: undefined });
+  }
+
   return (
     <SelectField
       // Re-initizlize the component if the labels change:
       key={groupSelectOptions.map(option => option.label).join()}
-      {...props}
+      {...selectFieldProps}
       options={groupSelectOptions}
     />
   );

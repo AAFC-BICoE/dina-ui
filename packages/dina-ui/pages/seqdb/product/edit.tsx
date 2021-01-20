@@ -6,14 +6,13 @@ import {
   LabelView,
   LoadingSpinner,
   Query,
-  SelectField,
   SubmitButton,
   TextField,
-  useGroupSelectOptions
+  useAccount
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Product } from "../../../types/seqdb-api/resources/Product";
 
@@ -62,10 +61,10 @@ export function ProductEditPage({ router }: WithRouterProps) {
 
 function ProductForm({ product, router }: ProductFormProps) {
   const { formatMessage } = useSeqdbIntl();
-  const groupSelectOptions = useGroupSelectOptions();
+  const { groupNames } = useAccount();
 
   const { id } = router.query;
-  const initialValues = product || { group: groupSelectOptions[0].value };
+  const initialValues = product || { group: groupNames?.[0] };
 
   const onSubmit: DinaFormOnSubmit = async ({
     api: { save },
@@ -93,12 +92,7 @@ function ProductForm({ product, router }: ProductFormProps) {
       </ButtonBar>
       <div>
         <div className="row">
-          <SelectField
-            className="col-md-2"
-            disabled={true}
-            name="group"
-            options={groupSelectOptions}
-          />
+          <GroupSelectField className="col-md-2" name="group" />
         </div>
         <div className="row">
           <LabelView
