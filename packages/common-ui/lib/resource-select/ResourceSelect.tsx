@@ -48,6 +48,8 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
     path: string,
     params: GetParams
   ) => Promise<KitsuResponse<TData[], any>>;
+
+  defaultValue?: any;
 }
 
 /** An option the user can select to set the relationship to null. */
@@ -64,7 +66,8 @@ export function ResourceSelect<TData extends KitsuResource>({
   sort,
   customDataFetch,
   styles,
-  value
+  value,
+  defaultValue
 }: ResourceSelectProps<TData>) {
   const { apiClient } = useContext(ApiClientContext);
 
@@ -154,6 +157,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       placeholder="Type here to search."
       styles={styles}
       value={selectValue}
+      defaultValue={defaultValue}
     />
   );
 }
