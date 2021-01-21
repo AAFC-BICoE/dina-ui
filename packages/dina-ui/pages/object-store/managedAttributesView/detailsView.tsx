@@ -1,22 +1,20 @@
 // tslint:disable: no-string-literal
 import {
-  ApiClientContext,
   ButtonBar,
   DateField,
   DeleteButton,
-  ErrorViewer,
+  DinaForm,
+  DinaFormOnSubmit,
   LoadingSpinner,
   Query,
-  safeSubmit,
   SelectField,
   SubmitButton,
   TextField
 } from "common-ui";
-import { Form, Formik } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { NextRouter, withRouter } from "next/router";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
@@ -81,7 +79,6 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
 }
 
 function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
-  const { save } = useContext(ApiClientContext);
   const { formatMessage } = useDinaIntl();
 
   const id = profile?.id;
@@ -112,10 +109,10 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
     ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
   );
 
-  async function onSubmit({
-    acceptedValuesAsLines,
-    ...managedAttribute
-  }: ManagedAttributeFormFields) {
+  const onSubmit: DinaFormOnSubmit<ManagedAttributeFormFields> = async ({
+    api: { save },
+    submittedValues: { acceptedValuesAsLines, ...managedAttribute }
+  }) => {
     // Convert user-suplied string to string array:
     managedAttribute.acceptedValues = (acceptedValuesAsLines || "")
       // Split by line breaks:
@@ -154,73 +151,68 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
     );
 
     await router.push(`/object-store/managedAttributesView/listView`);
-  }
+  };
 
   return (
-    <Formik initialValues={initialValues} onSubmit={safeSubmit(onSubmit)}>
-      <Form translate={undefined}>
-        <ErrorViewer />
-        <ButtonBar>
-          <SubmitButton />
-          <Link href="/object-store/managedAttributesView/listView">
-            <a className="btn btn-dark">
-              <DinaMessage id="cancelButtonText" />
-            </a>
-          </Link>
-          <DeleteButton
-            className="ml-5"
-            id={id}
-            options={{ apiBaseUrl: "/objectstore-api" }}
-            postDeleteRedirect="/object-store/managedAttributesView/listView"
-            type="managed-attribute"
-          />
-        </ButtonBar>
+    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+      <ButtonBar>
+        <SubmitButton />
+        <Link href="/object-store/managedAttributesView/listView">
+          <a className="btn btn-dark">
+            <DinaMessage id="cancelButtonText" />
+          </a>
+        </Link>
+        <DeleteButton
+          className="ml-5"
+          id={id}
+          options={{ apiBaseUrl: "/objectstore-api" }}
+          postDeleteRedirect="/object-store/managedAttributesView/listView"
+          type="managed-attribute"
+        />
+      </ButtonBar>
+      <div style={{ width: "300px" }}>
+        <TextField name="name" />
+      </div>
+      <div style={{ width: "70%" }}>
+        <TextField name="description.en" multiLines={true} />
+      </div>
+      <div style={{ width: "70%" }}>
+        <TextField name="description.fr" multiLines={true} />
+      </div>
+      <div style={{ width: "300px" }}>
+        <SelectField
+          name="managedAttributeType"
+          options={ATTRIBUTE_TYPE_OPTIONS}
+          onChange={(selectValue: ManagedAttributeType) => setType(selectValue)}
+        />
+      </div>
+      {type === "PICKLIST" && (
         <div style={{ width: "300px" }}>
-          <TextField name="name" />
+          <TextField name="acceptedValuesAsLines" multiLines={true} />
         </div>
-        <div style={{ width: "70%" }}>
-          <TextField name="description.en" multiLines={true} />
-        </div>
-        <div style={{ width: "70%" }}>
-          <TextField name="description.fr" multiLines={true} />
-        </div>
+      )}
+      {id && (
         <div style={{ width: "300px" }}>
-          <SelectField
-            name="managedAttributeType"
-            options={ATTRIBUTE_TYPE_OPTIONS}
-            onChange={(selectValue: ManagedAttributeType) =>
-              setType(selectValue)
-            }
+          <h4>
+            <DinaMessage id="field_managedAttributeCreatedOn" />
+          </h4>
+          <DateField
+            showTime={true}
+            name="createdOn"
+            disabled={true}
+            hideLabel={true}
           />
         </div>
-        {type === "PICKLIST" && (
-          <div style={{ width: "300px" }}>
-            <TextField name="acceptedValuesAsLines" multiLines={true} />
-          </div>
-        )}
-        {id && (
-          <div style={{ width: "300px" }}>
-            <h4>
-              <DinaMessage id="field_managedAttributeCreatedOn" />
-            </h4>
-            <DateField
-              showTime={true}
-              name="createdOn"
-              disabled={true}
-              hideLabel={true}
-            />
-          </div>
-        )}
-        {id && (
-          <div style={{ width: "300px" }}>
-            <h4>
-              <DinaMessage id="field_managedAttributeCreatedBy" />
-            </h4>
-            <TextField name="createdBy" hideLabel={true} readOnly={true} />
-          </div>
-        )}
-      </Form>
-    </Formik>
+      )}
+      {id && (
+        <div style={{ width: "300px" }}>
+          <h4>
+            <DinaMessage id="field_managedAttributeCreatedBy" />
+          </h4>
+          <TextField name="createdBy" hideLabel={true} readOnly={true} />
+        </div>
+      )}
+    </DinaForm>
   );
 }
 

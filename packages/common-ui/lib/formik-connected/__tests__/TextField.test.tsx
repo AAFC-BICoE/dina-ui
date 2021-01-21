@@ -1,19 +1,13 @@
-import { Form, Formik } from "formik";
-import { noop } from "lodash";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { DinaForm } from "../DinaForm";
 import { TextField } from "../TextField";
 
 describe("TextField component", () => {
   it("Displays the field's label and value.", () => {
     const wrapper = mountWithAppContext(
-      <Formik
-        initialValues={{ testObject: { testField: "initial value" } }}
-        onSubmit={noop}
-      >
-        <Form translate={undefined}>
-          <TextField name="testObject.testField" />
-        </Form>
-      </Formik>
+      <DinaForm initialValues={{ testObject: { testField: "initial value" } }}>
+        <TextField name="testObject.testField" />
+      </DinaForm>
     );
 
     expect(wrapper.find("label").text()).toEqual("Test Object Test Field");
@@ -24,21 +18,18 @@ describe("TextField component", () => {
 
   it("Changes the field's value.", () => {
     const wrapper = mountWithAppContext(
-      <Formik
-        initialValues={{ testObject: { testField: "initial value" } }}
-        onSubmit={noop}
-      >
+      <DinaForm initialValues={{ testObject: { testField: "initial value" } }}>
         {({
           values: {
             testObject: { testField }
           }
         }) => (
-          <Form translate={undefined}>
+          <>
             <TextField name="testObject.testField" />
             <div id="value-display">{testField}</div>
-          </Form>
+          </>
         )}
-      </Formik>
+      </DinaForm>
     );
 
     wrapper.find("input").simulate("change", {

@@ -1,7 +1,5 @@
-import { AreYouSureModal, QueryTable } from "common-ui";
-import { Formik } from "formik";
+import { AreYouSureModal, DinaForm, QueryTable } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { noop } from "lodash";
 import { ObjectUpload } from "packages/dina-ui/types/objectstore-api/resources/ObjectUpload";
 import { StoredObjectGallery } from "../../../../components/object-store";
 import MetadataListPage, {
@@ -215,17 +213,16 @@ describe("Metadata List Page", () => {
 
     // Pretend two metadatas are already selected:
     const buttonWrapper = mountWithAppContext(
-      <Formik<MetadataListFormValues>
+      <DinaForm<MetadataListFormValues>
         initialValues={{
           selectedMetadatas: {
             "00000000-0000-0000-0000-000000000000": true,
             "11111111-1111-1111-1111-111111111111": true
           }
         }}
-        onSubmit={noop}
       >
         <BulkDeleteButton />
-      </Formik>,
+      </DinaForm>,
       { apiContext }
     );
 

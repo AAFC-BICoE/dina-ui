@@ -2,13 +2,12 @@ import {
   BackToListButton,
   ButtonBar,
   DateField,
+  DinaForm,
   EditButton,
   FieldView,
   LoadingSpinner,
   Query
 } from "common-ui";
-import { Formik } from "formik";
-import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Head, Nav } from "../../../components";
@@ -38,7 +37,7 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
             </h1>
             <LoadingSpinner loading={loading} />
             {response && (
-              <Formik<PcrPrimer> initialValues={response.data} onSubmit={noop}>
+              <DinaForm<PcrPrimer> initialValues={response.data}>
                 <div>
                   <div className="row">
                     <FieldView className="col-md-2" name="group" />
@@ -88,7 +87,7 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
                     <FieldView className="col-md-6" name="note" />
                   </div>
                 </div>
-              </Formik>
+              </DinaForm>
             )}
           </main>
         )}

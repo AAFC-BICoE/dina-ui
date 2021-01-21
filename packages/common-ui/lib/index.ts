@@ -18,6 +18,7 @@ export * from "./filter-builder/FilterBuilderField";
 export * from "./filter-builder/FilterGroup";
 export * from "./filter-builder/rsql";
 export * from "./formik-connected/DateField";
+export * from "./formik-connected/DinaForm";
 export * from "./formik-connected/ErrorViewer";
 export * from "./formik-connected/FieldView";
 export * from "./formik-connected/FieldWrapper";

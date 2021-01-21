@@ -1,4 +1,4 @@
-import { Form, Formik } from "formik";
+import { DinaForm } from "common-ui";
 import { noop } from "lodash";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { FileUploader } from "../FileUploader";
@@ -22,11 +22,9 @@ const mockCtx = {
 describe("FileUploader component", () => {
   it("Converts the API's max file size from a gigabytes string to bytes.", async () => {
     const wrapper = mountWithAppContext(
-      <Formik initialValues={{}} onSubmit={noop}>
-        <Form>
-          <FileUploader acceptedFileTypes="image/*" onSubmit={noop} />
-        </Form>
-      </Formik>,
+      <DinaForm initialValues={{}}>
+        <FileUploader acceptedFileTypes="image/*" onSubmit={noop} />
+      </DinaForm>,
       { apiContext: mockCtx }
     );
 

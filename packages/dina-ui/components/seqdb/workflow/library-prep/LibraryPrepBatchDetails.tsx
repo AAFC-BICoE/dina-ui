@@ -1,6 +1,4 @@
-import { FieldView } from "common-ui";
-import { Formik } from "formik";
-import { noop } from "lodash";
+import { DinaForm, FieldView } from "common-ui";
 import { LibraryPrepBatch } from "../../../../types/seqdb-api";
 
 interface LibraryPrepBatchDetailsProps {
@@ -11,7 +9,7 @@ export function LibraryPrepBatchDetails({
   libraryPrepBatch
 }: LibraryPrepBatchDetailsProps) {
   return (
-    <Formik<LibraryPrepBatch> initialValues={libraryPrepBatch} onSubmit={noop}>
+    <DinaForm<LibraryPrepBatch> initialValues={libraryPrepBatch}>
       {({ values: batch }) => (
         <>
           <div className="row">
@@ -49,6 +47,6 @@ export function LibraryPrepBatchDetails({
           </div>
         </>
       )}
-    </Formik>
+    </DinaForm>
   );
 }

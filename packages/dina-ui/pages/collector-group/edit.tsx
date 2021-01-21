@@ -3,22 +3,19 @@ import {
   ButtonBar,
   CancelButton,
   DeleteButton,
-  ErrorViewer,
+  DinaForm,
+  DinaFormOnSubmit,
   filterBy,
-  LoadingSpinner,
-  Query,
-  safeSubmit,
   SubmitButton,
   TextField
 } from "common-ui";
-import { Form, Formik, FormikContextType } from "formik";
-import { useRouter, NextRouter } from "next/router";
-import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
+import { ResourceSelectField } from "common-ui/lib";
+import { NextRouter, useRouter } from "next/router";
+import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
 import { useContext } from "react";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
-import { ResourceSelectField } from "common-ui/lib";
+import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
 
 interface CollectorGroupFormProps {
   collectorGroup?: CollectorGroup;
@@ -56,82 +53,72 @@ function CollectorGroupForm({
   const initialValues = collectorGroup || { type: "collector-group" };
   const { formatMessage } = useDinaIntl();
 
-  const onSubmit = safeSubmit(
-    async (
-      submittedValues,
-      { setStatus, setSubmitting }: FormikContextType<any>
-    ) => {
-      if (!submittedValues.agentIdentifiers) {
-        setStatus(formatMessage("field_collectorGroup_agentsError"));
-        setSubmitting(false);
-        return;
-      } else {
-        // handle converting to relationship manually due to crnk bug
-        submittedValues.relationships = {};
-        submittedValues.relationships.agentIdentifiers = {};
-        submittedValues.relationships.agentIdentifiers.data = [];
-        submittedValues.agentIdentifiers.map(agent =>
-          submittedValues.relationships.agentIdentifiers.data.push({
-            id: agent.id,
-            type: "agent"
-          })
-        );
-        delete submittedValues.agentIdentifiers;
-      }
-
-      await save(
-        [
-          {
-            resource: submittedValues,
-            type: "collector-group"
-          }
-        ],
-        {
-          apiBaseUrl: "/collection-api"
-        }
+  const onSubmit: DinaFormOnSubmit = async ({ submittedValues }) => {
+    if (!submittedValues.agentIdentifiers) {
+      throw new Error(formatMessage("field_collectorGroup_agentsError"));
+    } else {
+      // handle converting to relationship manually due to crnk bug
+      submittedValues.relationships = {};
+      submittedValues.relationships.agentIdentifiers = {};
+      submittedValues.relationships.agentIdentifiers.data = [];
+      submittedValues.agentIdentifiers.map(agent =>
+        submittedValues.relationships.agentIdentifiers.data.push({
+          id: agent.id,
+          type: "agent"
+        })
       );
-      await router.push(`/collector-group/list`);
+      delete submittedValues.agentIdentifiers;
     }
-  );
+
+    await save(
+      [
+        {
+          resource: submittedValues,
+          type: "collector-group"
+        }
+      ],
+      {
+        apiBaseUrl: "/collection-api"
+      }
+    );
+    await router.push(`/collector-group/list`);
+  };
 
   return (
-    <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      <Form translate={undefined}>
-        <ErrorViewer />
-        <ButtonBar>
-          <SubmitButton />
-          <CancelButton
-            entityId={id as string}
-            entityLink="/collector-group"
-            byPassView={true}
+    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+      <ButtonBar>
+        <SubmitButton />
+        <CancelButton
+          entityId={id as string}
+          entityLink="/collector-group"
+          byPassView={true}
+        />
+        <DeleteButton
+          className="ml-5"
+          id={id as string}
+          options={{ apiBaseUrl: "/collection-api" }}
+          postDeleteRedirect="/collector-group/list"
+          type="collector-group"
+        />
+      </ButtonBar>
+      <div>
+        <div className="row">
+          <TextField
+            className="col-md-3 collectorGroupName"
+            name="name"
+            label={formatMessage("collectorGroupNameLabel")}
           />
-          <DeleteButton
-            className="ml-5"
-            id={id as string}
-            options={{ apiBaseUrl: "/collection-api" }}
-            postDeleteRedirect="/collector-group/list"
-            type="collector-group"
+          <ResourceSelectField<Person>
+            name="agentIdentifiers"
+            filter={filterBy(["displayName"])}
+            model="agent-api/person"
+            isMulti={true}
+            className="col-md-3"
+            optionLabel={agent => agent.displayName}
+            label={formatMessage("collectorGroupAgentsLabel")}
           />
-        </ButtonBar>
-        <div>
-          <div className="row">
-            <TextField
-              className="col-md-3 collectorGroupName"
-              name="name"
-              label={formatMessage("collectorGroupNameLabel")}
-            />
-            <ResourceSelectField<Person>
-              name="agentIdentifiers"
-              filter={filterBy(["displayName"])}
-              model="agent-api/person"
-              isMulti={true}
-              className="col-md-3"
-              optionLabel={agent => agent.displayName}
-              label={formatMessage("collectorGroupAgentsLabel")}
-            />
-          </div>
         </div>
-      </Form>
-    </Formik>
+      </div>
+    </DinaForm>
   );
 }

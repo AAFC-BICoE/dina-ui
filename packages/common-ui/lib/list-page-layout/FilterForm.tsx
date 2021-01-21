@@ -1,9 +1,10 @@
 import { useLocalStorage } from "@rehooks/local-storage";
-import { Form, Formik, FormikProps } from "formik";
+import { FormikProps } from "formik";
 import { cloneDeep, noop } from "lodash";
 import { useEffect } from "react";
 import { FilterAttribute } from "../filter-builder/FilterBuilder";
 import { FilterBuilderField } from "../filter-builder/FilterBuilderField";
+import { DinaForm, DinaFormOnSubmit } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
 import { CommonMessage } from "../intl/common-ui-intl";
 
@@ -28,12 +29,15 @@ export function FilterForm({
     {}
   );
 
-  function onFilterFormSubmitInternal(values, { setSubmitting }) {
+  const onFilterFormSubmitInternal: DinaFormOnSubmit = ({
+    submittedValues,
+    formik: { setSubmitting }
+  }) => {
     // On submit, put the filter form's values into local storage.
-    setFilterForm(cloneDeep(values));
+    setFilterForm(cloneDeep(submittedValues));
     setSubmitting(false);
-    onFilterFormSubmit(values);
-  }
+    onFilterFormSubmit(submittedValues);
+  };
 
   function resetFilterForm({ setValues }: FormikProps<any>) {
     removeFilterForm();
@@ -47,9 +51,9 @@ export function FilterForm({
   }, []);
 
   return (
-    <Formik initialValues={filterForm} onSubmit={onFilterFormSubmitInternal}>
+    <DinaForm initialValues={filterForm} onSubmit={onFilterFormSubmitInternal}>
       {formikProps => (
-        <Form className="form-group" translate={undefined}>
+        <div className="form-group" translate={undefined}>
           <div className="form-group">
             <strong>
               <CommonMessage id="filterRecordsTitle" />
@@ -74,8 +78,8 @@ export function FilterForm({
               <CommonMessage id="resetButtonText" />
             </button>
           </div>
-        </Form>
+        </div>
       )}
-    </Formik>
+    </DinaForm>
   );
 }

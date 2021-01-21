@@ -1,6 +1,4 @@
-import { FieldView } from "common-ui";
-import { Formik } from "formik";
-import { noop } from "lodash";
+import { DinaForm, FieldView } from "common-ui";
 import { LibraryPool } from "../../../../types/seqdb-api";
 
 interface LibraryPoolDetailsProps {
@@ -9,7 +7,7 @@ interface LibraryPoolDetailsProps {
 
 export function LibraryPoolDetails({ libraryPool }: LibraryPoolDetailsProps) {
   return (
-    <Formik<LibraryPool> initialValues={libraryPool} onSubmit={noop}>
+    <DinaForm<LibraryPool> initialValues={libraryPool}>
       <>
         <div className="row">
           <FieldView className="col-md-2" name="name" />
@@ -19,6 +17,6 @@ export function LibraryPoolDetails({ libraryPool }: LibraryPoolDetailsProps) {
           <FieldView className="col-md-6" name="notes" />
         </div>
       </>
-    </Formik>
+    </DinaForm>
   );
 }

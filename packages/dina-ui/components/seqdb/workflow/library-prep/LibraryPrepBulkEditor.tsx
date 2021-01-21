@@ -3,14 +3,13 @@ import {
   ApiClientContext,
   BulkDataEditor,
   decodeResourceCell,
+  DinaForm,
   encodeResourceCell,
   filterBy,
   RowChange,
   SaveArgs,
   useResourceSelectCells
 } from "common-ui";
-import { Form, Formik } from "formik";
-import { noop } from "lodash";
 import { useContext } from "react";
 import { SeqdbMessage, useSeqdbIntl } from "../../../../intl/seqdb-intl";
 import {
@@ -206,17 +205,15 @@ export function LibraryPrepBulkEditor({
   }
 
   return (
-    <Formik initialValues={{}} onSubmit={noop}>
-      <Form translate={undefined}>
-        <strong>
-          <SeqdbMessage id="editableTable" />:
-        </strong>
-        <BulkDataEditor<LibraryPrepBulkEditRow>
-          columns={COLUMNS}
-          loadData={loadData}
-          onSubmit={onSubmit}
-        />
-      </Form>
-    </Formik>
+    <DinaForm initialValues={{}}>
+      <strong>
+        <SeqdbMessage id="editableTable" />:
+      </strong>
+      <BulkDataEditor<LibraryPrepBulkEditRow>
+        columns={COLUMNS}
+        loadData={loadData}
+        onSubmit={onSubmit}
+      />
+    </DinaForm>
   );
 }
