@@ -11,6 +11,7 @@ import {
   FileUploaderOnSubmitArgs
 } from "../../components/object-store";
 import { useFileUpload } from "../../components/object-store/file-upload/FileUploadProvider";
+import { UserGroups } from "../../components/user-group/useUserGroup";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface OnSubmitValues {
@@ -20,8 +21,6 @@ export interface OnSubmitValues {
 export default function UploadPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
-  const { initialized: accountInitialized } = useAccount();
-  const groupSelectOptions = useGroupSelectOptions();
   const { uploadFiles } = useFileUpload();
 
   const acceptedFileTypes = "image/*,audio/*,video/*,.pdf,.doc,.docx,.png";
@@ -54,31 +53,23 @@ export default function UploadPage() {
         <h1>
           <DinaMessage id="uploadPageTitle" />
         </h1>
-        {!accountInitialized || !groupSelectOptions?.length ? (
-          <div className="alert alert-warning no-group-alert">
-            <DinaMessage id="userMustBelongToGroup" />
+        (
+        <div>
+          <div className="alert alert-warning">
+            <DinaMessage id="forTestingPurposesOnlyMessage" />
           </div>
-        ) : (
-          <div>
-            <div className="alert alert-warning">
-              <DinaMessage id="forTestingPurposesOnlyMessage" />
+          <DinaForm initialValues={{}}>
+            <div className="row">
+              <UserGroups classes="col-md-3" />
             </div>
-            <DinaForm initialValues={{ group: groupSelectOptions[0].value }}>
-              <div className="row">
-                <SelectField
-                  className="col-md-3"
-                  name="group"
-                  options={groupSelectOptions}
-                />
-              </div>
-              <div>
-                <FileUploader
-                  acceptedFileTypes={acceptedFileTypes}
-                  onSubmit={onSubmit}
-                />
-              </div>
-            </DinaForm>
-          </div>
+            <div>
+              <FileUploader
+                acceptedFileTypes={acceptedFileTypes}
+                onSubmit={onSubmit}
+              />
+            </div>
+          </DinaForm>
+        </div>
         )}
       </main>
       <Footer />
