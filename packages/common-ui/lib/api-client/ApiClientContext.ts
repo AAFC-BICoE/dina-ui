@@ -122,7 +122,7 @@ export function createContextValue({
         // Invalidate the cache after one second.
         // All this does is batch requests if a set of react components all try to make the same request at once.
         // e.g. a page with a lot of the same dropdown select component, or a
-        defaultCache: new LRUCache({ max: 50, maxAge: ONE_SECOND })
+        defaultCache: new LRUCache({ max: 100, maxAge: ONE_SECOND })
       }
     );
   }
