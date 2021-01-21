@@ -5,7 +5,7 @@ import {
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { Head, Nav } from "../../../components";
+import { groupCell, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
 
@@ -19,7 +19,7 @@ const PCRPROFILE_TABLE_COLUMNS: ColumnDefinition<PcrProfile>[] = [
       ) : null,
     accessor: "region.name"
   },
-  "group",
+  groupCell("group"),
   {
     Cell: ({ original: { id, name } }) => (
       <Link href={`/seqdb/pcr-profile/view?id=${id}`}>

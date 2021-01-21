@@ -5,7 +5,7 @@ import {
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { Head, Nav } from "../../../components";
+import { groupCell, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Region } from "../../../types/seqdb-api/resources/Region";
 
@@ -18,7 +18,7 @@ const REGION_TABLE_COLUMNS: ColumnDefinition<Region>[] = [
     ),
     accessor: "name"
   },
-  "group",
+  groupCell("group"),
   "description",
   "symbol"
 ];

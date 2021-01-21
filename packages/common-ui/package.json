@@ -13,6 +13,7 @@
     "@molgenis/rsql": "0.1.2",
     "@react-keycloak/nextjs": "^2.0.0-beta.6",
     "@rehooks/local-storage": "^2.4.0",
+    "axios-cache-adapter": "^2.5.0",
     "core-js": "^3.6.5",
     "custom-event": "^1.0.1",
     "dataloader": "^2.0.0",

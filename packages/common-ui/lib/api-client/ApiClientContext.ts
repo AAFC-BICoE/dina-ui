@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
-import Kitsu, { KitsuResource, PersistedResource, GetParams } from "kitsu";
-import { deserialise, query, error as kitsuError } from "kitsu-core";
+import { setupCache as setupAxiosCache } from "axios-cache-adapter";
+import Kitsu, { GetParams, KitsuResource, PersistedResource } from "kitsu";
+import { deserialise, error as kitsuError, query } from "kitsu-core";
 import React, { useContext } from "react";
 import { serialize } from "../util/serialize";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
@@ -111,6 +112,14 @@ export function createContextValue({
     successResponse => successResponse,
     makeAxiosErrorMoreReadable
   );
+
+  if (apiClient.axios?.defaults?.adapter) {
+    const ONE_SECOND = 1000;
+    const axiosCache = setupAxiosCache({
+      maxAge: ONE_SECOND
+    });
+    apiClient.axios.defaults.adapter = axiosCache.adapter;
+  }
 
   /**
    * Performs a write operation against a jsonpatch-compliant JSONAPI server.

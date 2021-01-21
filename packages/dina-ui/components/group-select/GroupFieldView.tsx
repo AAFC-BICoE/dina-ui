@@ -10,7 +10,16 @@ export function GroupFieldView(props: GroupFieldViewProps) {
     <FastField name={props.name}>
       {({ field: { value: groupName } }: FieldProps) => (
         <FieldWrapper {...props}>
-          <GroupLabel groupName={groupName} />
+          <p
+            className="group-label"
+            style={{
+              borderBottom: "1px solid black",
+              borderRight: "1px solid black",
+              minHeight: "25px"
+            }}
+          >
+            <GroupLabel groupName={groupName} />
+          </p>
         </FieldWrapper>
       )}
     </FastField>
@@ -19,22 +28,29 @@ export function GroupFieldView(props: GroupFieldViewProps) {
 
 /** Renders the group label (if available) or the group name. */
 export function GroupLabel({ groupName }) {
+  const label = useGroupLabel(groupName);
+  return <>{label}</>;
+}
+
+/** Renders the Group label in the QueryTable. */
+export function groupCell(accessor: string) {
+  return {
+    Cell: ({ original }) => {
+      const groupName = original[accessor];
+      const label = useGroupLabel(groupName);
+      return <div className="group-label-cell">{label}</div>;
+    },
+    accessor
+  };
+}
+
+/** Returns the group label from the back-end. Returns the raw name for loading and error states. */
+function useGroupLabel(groupName: string) {
   const { locale } = useDinaIntl();
   const { response } = useQuery<Group[]>({
     path: "user-api/group",
-    page: { limit: 1000 },
     filter: { name: groupName }
   });
 
-  return (
-    <p
-      style={{
-        borderBottom: "1px solid black",
-        borderRight: "1px solid black",
-        minHeight: "25px"
-      }}
-    >
-      {response?.data?.[0]?.labels?.[locale] ?? groupName}
-    </p>
-  );
+  return response?.data?.[0]?.labels?.[locale] ?? groupName;
 }

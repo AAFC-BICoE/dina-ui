@@ -10,6 +10,7 @@ import {
   ManagedAttributeMap,
   Metadata
 } from "../../../types/objectstore-api";
+import { GroupLabel } from "../../group-select/GroupFieldView";
 
 export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
@@ -27,7 +28,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
-          "group",
+          { name: "group", value: <GroupLabel groupName={metadata.group} /> },
           {
             name: "createdDate",
             value: <DateView date={metadata.createdDate} />

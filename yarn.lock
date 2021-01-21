@@ -2599,6 +2599,14 @@ axe-core@^3.5.1:
   resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-3.5.5.tgz#84315073b53fa3c0c51676c588d59da09a192227"
   integrity sha512-5P0QZ6J5xGikH780pghEdbEKijCTrruK9KxtPZCFWUpef0f6GipO+xEZ5GKCb020mmqgbiNO6TcA55CriL784Q==
 
+axios-cache-adapter@^2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/axios-cache-adapter/-/axios-cache-adapter-2.5.0.tgz#e68be61e8c1cd7f31e4e7cfcbfd0435404ae67ef"
+  integrity sha512-YcMPdMoqmSLoZx7A5YD/PdYGuX6/Y9M2tHBhaIXvXrPeGgNnbW7nb3+uArWlT53WGHLfclnu2voMmS7jGXVg6A==
+  dependencies:
+    cache-control-esm "1.0.0"
+    lodash "^4.17.11"
+
 axios@^0.19.0:
   version "0.19.2"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.19.2.tgz#3ea36c5d8818d0d5f8a8a97a6d36b86cdc00cb27"
@@ -3078,6 +3086,11 @@ cache-base@^1.0.1:
     union-value "^1.0.0"
     unset-value "^1.0.0"
 
+cache-control-esm@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/cache-control-esm/-/cache-control-esm-1.0.0.tgz#417647ecf1837a5e74155f55d5a4ae32a84e2581"
+  integrity sha512-Fa3UV4+eIk4EOih8FTV6EEsVKO0W5XWtNs6FC3InTfVz+EjurjPfDXY5wZDo/lxjDxg5RjNcurLyxEJBcEUx9g==
+
 caller-callsite@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/caller-callsite/-/caller-callsite-2.0.0.tgz#847e0fce0a223750a9a027c54b33731ad3154134"
@@ -3506,6 +3519,7 @@ commander@~2.17.1:
     "@molgenis/rsql" "0.1.2"
     "@react-keycloak/nextjs" "^2.0.0-beta.6"
     "@rehooks/local-storage" "^2.4.0"
+    axios-cache-adapter "^2.5.0"
     core-js "^3.6.5"
     custom-event "^1.0.1"
     dataloader "^2.0.0"
@@ -3521,6 +3535,7 @@ commander@~2.17.1:
     react "^16.13.1"
     react-datepicker "^3.0.0"
     react-dom "^16.13.1"
+    react-error-boundary "^3.1.0"
     react-hooks-async "^3.10.1"
     react-intl "^5.0.2"
     react-modal "^3.11.2"

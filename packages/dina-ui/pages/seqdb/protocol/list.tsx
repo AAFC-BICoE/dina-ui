@@ -5,7 +5,7 @@ import {
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { Head, Nav } from "../../../components";
+import { groupCell, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Protocol } from "../../../types/seqdb-api/resources/Protocol";
 
@@ -18,7 +18,7 @@ const PROTOCOL_TABLE_COLUMNS: ColumnDefinition<Protocol>[] = [
     ),
     accessor: "name"
   },
-  "group",
+  groupCell("group"),
   "type",
   "version",
   "description",
