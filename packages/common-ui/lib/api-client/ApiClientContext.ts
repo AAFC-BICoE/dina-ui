@@ -1,7 +1,8 @@
 import { AxiosError } from "axios";
-import { setupCache as setupAxiosCache } from "axios-cache-adapter";
+import { cacheAdapterEnhancer } from "axios-extensions";
 import Kitsu, { GetParams, KitsuResource, PersistedResource } from "kitsu";
 import { deserialise, error as kitsuError, query } from "kitsu-core";
+import LRUCache from "lru-cache";
 import React, { useContext } from "react";
 import { serialize } from "../util/serialize";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
@@ -115,10 +116,15 @@ export function createContextValue({
 
   if (apiClient.axios?.defaults?.adapter) {
     const ONE_SECOND = 1000;
-    const axiosCache = setupAxiosCache({
-      maxAge: ONE_SECOND
-    });
-    apiClient.axios.defaults.adapter = axiosCache.adapter;
+    apiClient.axios.defaults.adapter = cacheAdapterEnhancer(
+      apiClient.axios.defaults.adapter,
+      {
+        // Invalidate the cache after one second.
+        // All this does is batch requests if a set of react components all try to make the same request at once.
+        // e.g. a page with a lot of the same dropdown select component, or a
+        defaultCache: new LRUCache({ max: 100, maxAge: ONE_SECOND })
+      }
+    );
   }
 
   /**

@@ -37,8 +37,7 @@ export function groupCell(accessor: string) {
   return {
     Cell: ({ original }) => {
       const groupName = original[accessor];
-      const label = useGroupLabel(groupName);
-      return <div className="group-label-cell">{label}</div>;
+      return <GroupLabel groupName={groupName} />;
     },
     accessor
   };
