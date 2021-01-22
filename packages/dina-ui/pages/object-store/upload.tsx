@@ -1,9 +1,4 @@
-import {
-  DinaForm,
-  SelectField,
-  useAccount,
-  useGroupSelectOptions
-} from "common-ui";
+import { DinaForm, useAccount } from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
 import {
@@ -11,7 +6,7 @@ import {
   FileUploaderOnSubmitArgs
 } from "../../components/object-store";
 import { useFileUpload } from "../../components/object-store/file-upload/FileUploadProvider";
-import { UserGroups } from "../../components/user-group/useUserGroup";
+import { GroupSelectField } from "../../components/group-select/GroupSelectField";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface OnSubmitValues {
@@ -21,6 +16,7 @@ export interface OnSubmitValues {
 export default function UploadPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
+  const { initialized: accountInitialized, groupNames } = useAccount();
   const { uploadFiles } = useFileUpload();
 
   const acceptedFileTypes = "image/*,audio/*,video/*,.pdf,.doc,.docx,.png";
@@ -53,14 +49,14 @@ export default function UploadPage() {
         <h1>
           <DinaMessage id="uploadPageTitle" />
         </h1>
-        (
-        <div>
-          <div className="alert alert-warning">
-            <DinaMessage id="forTestingPurposesOnlyMessage" />
+        {!accountInitialized || !groupNames?.length ? (
+          <div className="alert alert-warning no-group-alert">
+            <DinaMessage id="userMustBelongToGroup" />
           </div>
-          <DinaForm initialValues={{}}>
+        ) : (
+          <DinaForm initialValues={{ group: groupNames[0] }}>
             <div className="row">
-              <UserGroups classes="col-md-3" />
+              <GroupSelectField className="col-md-3" name="group" />
             </div>
             <div>
               <FileUploader
@@ -69,7 +65,6 @@ export default function UploadPage() {
               />
             </div>
           </DinaForm>
-        </div>
         )}
       </main>
       <Footer />

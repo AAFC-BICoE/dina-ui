@@ -64,15 +64,11 @@ export function ResourceSelect<TData extends KitsuResource>({
   onChange = () => undefined,
   optionLabel,
   sort,
-  customDataFetch,
   styles,
   value,
   defaultValue
 }: ResourceSelectProps<TData>) {
   const { apiClient } = useContext(ApiClientContext);
-
-  const dataFetch =
-    customDataFetch || ((...args) => apiClient.get<TData[]>(...args));
 
   async function loadOptions(
     inputValue: string,
@@ -88,7 +84,7 @@ export function ResourceSelect<TData extends KitsuResource>({
     );
 
     // Send the API request.
-    const { data } = await dataFetch(model, getParams);
+    const { data } = await apiClient.get<TData[]>(model, getParams);
 
     // Build the list of options from the returned resources.
     const resourceOptions = data.map(resource => ({

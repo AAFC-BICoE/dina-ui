@@ -11,7 +11,7 @@ import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { Head, Nav } from "../../../components";
+import { GroupFieldView, Head, Nav } from "../../../components";
 import { StepRenderer } from "../../../components/seqdb/workflow/StepRenderer";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Chain, ChainStepTemplate } from "../../../types/seqdb-api";
@@ -111,7 +111,7 @@ function WorkflowSteps({ chain }: { chain: PersistedResource<Chain> }) {
         <TabPanel>
           <DinaForm initialValues={chain}>
             <div className="col-md-3">
-              <FieldView name="group" />
+              <GroupFieldView name="group" />
               <FieldView label="Template" name="chainTemplate.name" />
               <FieldView name="name" />
             </div>
