@@ -59,7 +59,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
   return (
     <SelectField
       // Re-initizlize the component if the labels change:
-      key={groupSelectOptions.map(option => option.label).join() + defaultValue}
+      key={groupSelectOptions.map(option => option.label).join()}
       {...selectFieldProps}
       options={groupSelectOptions}
       defaultValue={showDefaultValue ? defaultValue : undefined}

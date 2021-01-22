@@ -46,6 +46,7 @@ export default function CollectingEventListPage() {
                   onChange={() => setImmediate(submitForm)}
                   name="group"
                   showAnyOption={true}
+                  showAllGroups={true}
                 />
               </div>
             </div>
