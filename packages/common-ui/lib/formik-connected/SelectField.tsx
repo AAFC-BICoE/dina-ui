@@ -18,6 +18,7 @@ export interface SelectFieldProps<T = string> extends LabelWrapperParams {
   onChange?: (value?: T | T[] | null) => void;
   options: SelectOption<T>[];
   styles?: Partial<Styles>;
+  defaultValue?: any;
 }
 
 /** Formik-connected select input. */
@@ -28,6 +29,7 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
     onChange,
     options,
     styles,
+    defaultValue,
     ...labelWrapperProps
   } = props;
   const { name } = labelWrapperProps;
@@ -53,7 +55,6 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
           setFieldTouched(name);
           onChange?.(newValue);
         }
-
         return (
           <FieldWrapper {...labelWrapperProps}>
             <Select
@@ -67,6 +68,7 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
                   ? options?.filter(option => value?.includes(option.value))
                   : options.find(option => option.value === value)) ?? null
               }
+              defaultValue={defaultValue}
             />
           </FieldWrapper>
         );

@@ -185,6 +185,8 @@ export default function MetadataListPage() {
                         onChange={() => setImmediate(submitForm)}
                         name="group"
                         showAnyOption={true}
+                        showAllGroups={true}
+                        showDefaultValue={true}
                       />
                     </div>
                   </div>
