@@ -33,9 +33,6 @@ export default function CollectingEventListPage() {
           <CreateButton entityLink="/collecting-event" />
         </ButtonBar>
         <ListPageLayout
-          additionalFilters={filterForm => ({
-            ...(filterForm.group && { group: filterForm.group })
-          })}
           filterAttributes={COLLECTING_EVENT_FILTER_ATTRIBUTES}
           id="collecting-event-list"
           queryTableProps={{
@@ -49,8 +46,6 @@ export default function CollectingEventListPage() {
                   onChange={() => setImmediate(submitForm)}
                   name="group"
                   showAnyOption={true}
-                  showAllGroups={true}
-                  showDefaultValue={true}
                 />
               </div>
             </div>
