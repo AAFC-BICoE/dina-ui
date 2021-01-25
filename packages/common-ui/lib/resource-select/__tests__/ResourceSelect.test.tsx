@@ -1,4 +1,3 @@
-import { mount } from "enzyme";
 import { KitsuResource } from "kitsu";
 import lodash from "lodash";
 import Select from "react-select/base";
@@ -8,6 +7,7 @@ import {
   ResourceSelect,
   ResourceSelectProps
 } from "../..";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 
 /** Example */
 interface Todo extends KitsuResource {
@@ -48,7 +48,7 @@ describe("ResourceSelect component", () => {
   };
 
   function mountWithContext(element: JSX.Element) {
-    return mount(
+    return mountWithAppContext(
       <ApiClientContext.Provider value={createContextValue()}>
         {element}
       </ApiClientContext.Provider>
