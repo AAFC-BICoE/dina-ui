@@ -1,5 +1,4 @@
-import { Form, Formik } from "formik";
-import { noop } from "lodash";
+import { DinaForm } from "../../formik-connected/DinaForm";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { BulkDataEditor } from "../BulkDataEditor";
 
@@ -36,19 +35,17 @@ describe("BulkDataEditor component", () => {
     }
 
     const wrapper = mountWithAppContext(
-      <Formik initialValues={{ testFormikAttr: "test value" }} onSubmit={noop}>
-        <Form translate={undefined}>
-          <BulkDataEditor
-            columns={[
-              { data: "a", title: "A" },
-              { data: "b", title: "B" },
-              { data: "c", title: "C" }
-            ]}
-            loadData={loadData}
-            onSubmit={mockOnSubmit}
-          />
-        </Form>
-      </Formik>
+      <DinaForm initialValues={{ testFormikAttr: "test value" }}>
+        <BulkDataEditor
+          columns={[
+            { data: "a", title: "A" },
+            { data: "b", title: "B" },
+            { data: "c", title: "C" }
+          ]}
+          loadData={loadData}
+          onSubmit={mockOnSubmit}
+        />
+      </DinaForm>
     );
 
     // Await initial data load

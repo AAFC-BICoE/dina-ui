@@ -1,21 +1,26 @@
-import { Form, Formik } from "formik";
 import NumberFormat from "react-number-format";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { DinaForm } from "../DinaForm";
 import { NumberField } from "../NumberField";
 
 const mockOnSubmit = jest.fn();
 
 function getWrapper({ initialValues }) {
   return mountWithAppContext(
-    <Formik initialValues={initialValues} onSubmit={mockOnSubmit}>
-      <Form translate={undefined}>
-        <NumberField name="testField" />
-      </Form>
-    </Formik>
+    <DinaForm
+      initialValues={initialValues}
+      onSubmit={async ({ submittedValues }) => mockOnSubmit(submittedValues)}
+    >
+      <NumberField name="testField" />
+    </DinaForm>
   );
 }
 
 describe("NumberField component", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("Displays the field's label and value.", async () => {
     const wrapper = getWrapper({ initialValues: { testField: 123.23 } });
 
@@ -36,10 +41,7 @@ describe("NumberField component", () => {
     await new Promise(setImmediate);
 
     // Expect the correct value to have been submitted.
-    expect(mockOnSubmit).lastCalledWith(
-      { testField: 456.78 },
-      expect.anything()
-    );
+    expect(mockOnSubmit).lastCalledWith({ testField: 456.78 });
   });
 
   it("Sets the field value as null if the input is blank.", async () => {
@@ -55,7 +57,7 @@ describe("NumberField component", () => {
     await new Promise(setImmediate);
 
     // Expect the correct value to have been submitted.
-    expect(mockOnSubmit).lastCalledWith({ testField: null }, expect.anything());
+    expect(mockOnSubmit).lastCalledWith({ testField: null });
   });
 
   it("Shows a blank input when the formik value becomes undefined.", async () => {

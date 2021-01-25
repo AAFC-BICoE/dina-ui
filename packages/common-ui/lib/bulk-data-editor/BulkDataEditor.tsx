@@ -1,17 +1,17 @@
 import { HotTableProps } from "@handsontable/react";
 import { FormikContextType, useFormikContext } from "formik";
 import { GridSettings } from "handsontable";
-import { cloneDeep, isEmpty, zipWith } from "lodash";
+import { cloneDeep, isEmpty, isEqual, zipWith } from "lodash";
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
-import { ErrorViewer } from "../formik-connected/ErrorViewer";
+import { Component, useEffect, useState } from "react";
 import { FormikButton } from "../formik-connected/FormikButton";
-import { OnFormikSubmit } from "../formik-connected/safeSubmit";
+import { OnFormikSubmit, safeSubmit } from "../formik-connected/safeSubmit";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { difference, RecursivePartial } from "./difference";
 import { getUserFriendlyAutoCompleteRenderer } from "./resource-select-cell";
-import { safeSubmit } from "../formik-connected/safeSubmit";
+import { useBulkEditorFrontEndValidation } from "./useBulkEditorFrontEndValidation";
+import { useHeaderWidthFix } from "./useHeaderWidthFix";
 
 export interface RowChange<TRow> {
   original: TRow;
@@ -26,12 +26,19 @@ export interface BulkDataEditorProps<TRow> {
     formikValues: any,
     formikActions: FormikContextType<any>
   ) => Promise<void>;
+
+  /**
+   * Submit unchanged rows, e.g. when inserting new data instead of editing existing data.
+   * Default false.
+   */
+  submitUnchangedRows?: boolean;
 }
 
 export function BulkDataEditor<TRow>({
   columns,
   loadData,
-  onSubmit
+  onSubmit,
+  submitUnchangedRows = false
 }: BulkDataEditorProps<TRow>) {
   type TableData = TRow[];
 
@@ -40,27 +47,42 @@ export function BulkDataEditor<TRow>({
   const [initialTableData, setInitialTableData] = useState<TableData>();
   const [workingTableData, setWorkingTableData] = useState<TableData>();
 
+  const [loading, setLoading] = useState(true);
+  const [lastSave, setLastSave] = useState(Date.now());
+
+  // Client-side validation errors caught by the handsontable's built-in error catching.
+  // These should prevent submission of the table:
+  const {
+    hasValidationErrors,
+    afterValidate,
+    validationAlertJsx
+  } = useBulkEditorFrontEndValidation();
+
+  const { tableWrapperRef } = useHeaderWidthFix({ columns });
+
   // Loads the initial data and shows an error message on fail:
   const loadDataInternal = safeSubmit(async () => {
+    setLoading(true);
     const loadedData = await loadData();
     setInitialTableData(loadedData);
     setWorkingTableData(cloneDeep(loadedData));
+    setLoading(false);
   });
 
-  // Load the data once after mount:
+  // Load the data once after mount, and after every save:
   useEffect(() => {
     loadDataInternal({}, formik);
-  }, []);
+  }, [lastSave]);
 
   // Show initial data loading errors here:
   const loadingFailed =
     (!workingTableData || !initialTableData) && formik.status;
   if (loadingFailed) {
-    return <ErrorViewer />;
+    return <div />;
   }
 
   // Show loading state here:
-  if (!workingTableData || !initialTableData) {
+  if (loading || !workingTableData || !initialTableData) {
     return <LoadingSpinner loading={true} />;
   }
 
@@ -77,32 +99,63 @@ export function BulkDataEditor<TRow>({
       })
     );
 
-    const editedDiffs = diffs.filter(diff => !isEmpty(diff.changes));
+    const editedDiffs = submitUnchangedRows
+      ? diffs
+      : diffs.filter(diff => !isEmpty(diff.changes));
 
     await onSubmit(editedDiffs, formikValues, formikActions);
+
+    setLastSave(Date.now());
   };
 
   return (
-    <>
-      <ErrorViewer />
-      <div className="form-group">
+    <div ref={tableWrapperRef}>
+      <style>{`
+        /* Prevent the handsontable header from covering the react-select menu options: */
+        .ht_clone_top, .ht_clone_left, .ht_clone_top_left_corner {
+          z-index: 0 !important;
+        }
+        /* Prevent the dropdowns from being from being hidden at the bottom of the table: https://github.com/handsontable/handsontable/issues/5032 */
+        .handsontableEditor.autocompleteEditor, .handsontableEditor.autocompleteEditor .ht_master .wtHolder {
+          min-height: 138px;
+        }
+      `}</style>
+      {validationAlertJsx}
+      <div
+        className="form-group"
+        // Setting the width/height and overflowX:hidden here is detected by Handsontable and enables horizontal scrolling:
+        style={{ height: "100%", width: "100%", overflowX: "hidden" }}
+      >
         <DynamicHotTable
+          afterValidate={afterValidate}
           columns={columns}
           data={workingTableData as any}
           manualColumnResize={true}
           maxRows={workingTableData.length}
+          rowHeaders={true}
+          // Disables handsontable's feature to hide off-screen rows/columns for performance.
+          // This fixes the scrolling inside a modal, but maybe change this later to improve performance
+          // for 100s or more rows.
+          viewportColumnRenderingOffset={1000}
+          viewportRowRenderingOffset={1000}
         />
+        {/** Spacer div to make room for Handsontable's dropdown menus: */}
+        <div style={{ height: "140px" }} />
       </div>
       <FormikButton
         className="btn btn-primary bulk-editor-submit-button"
         onClick={onSubmitInternal}
+        buttonProps={() => ({ disabled: hasValidationErrors })}
       >
         <CommonMessage id="submitBtnText" />
       </FormikButton>
-    </>
+    </div>
   );
 }
 
+/**
+ * A wrapper around Handsontable that avoids server-side rendering Handsontable, which would cause errors.
+ */
 const DynamicHotTable = dynamic(
   async () => {
     // Handsontable must only be loaded in the browser, because it depends on the global
@@ -114,13 +167,25 @@ const DynamicHotTable = dynamic(
       renderers.AutocompleteRenderer
     );
 
-    return (props: HotTableProps) => {
-      // Hide the {type}/{UUID} identifier from the dropdown cell values:
-      (props.columns as GridSettings[])
-        .filter(col => col.type === "dropdown")
-        .forEach(col => (col.renderer = readableAutocompleteRenderer));
+    return class extends Component<HotTableProps> {
+      // Re-rendering the table is expensive, so only do it if the data or columns change:
+      public shouldComponentUpdate(nextProps: HotTableProps) {
+        return (
+          !isEqual(this.props.data, nextProps.data) ||
+          !isEqual(
+            (this.props.columns as GridSettings[]).map(({ data }) => data),
+            (nextProps.columns as GridSettings[]).map(({ data }) => data)
+          )
+        );
+      }
 
-      return <HotTable {...props} />;
+      public render() {
+        (this.props.columns as GridSettings[])
+          .filter(col => col.type === "dropdown")
+          .forEach(col => (col.renderer = readableAutocompleteRenderer));
+
+        return <HotTable {...this.props} />;
+      }
     };
   },
   { ssr: false }

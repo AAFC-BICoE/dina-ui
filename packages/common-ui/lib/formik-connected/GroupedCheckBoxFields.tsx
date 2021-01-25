@@ -2,8 +2,8 @@ import { connect, Field } from "formik";
 import { KitsuResource } from "kitsu";
 import { noop, toPairs } from "lodash";
 import { useRef, useState } from "react";
-import ReactTooltip from "react-tooltip";
 import { CommonMessage } from "../intl/common-ui-intl";
+import { Tooltip } from "../tooltip/Tooltip";
 
 export interface CheckBoxFieldProps<TData extends KitsuResource> {
   resource: TData;
@@ -100,17 +100,8 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
     return (
       <div className="grouped-checkbox-header text-center">
         <CommonMessage id="select" /> <CheckAllCheckBox />
-        <img
-          src="/static/images/iconInformation.gif"
-          data-tip={true}
-          data-for="checkAllTooltipMessage"
-        />
-        <ReactTooltip id="checkAllTooltipMessage">
-          <span>
-            <CommonMessage id="checkAllTooltipMessage" />
-          </span>
-        </ReactTooltip>
-        <div>
+        <Tooltip id="checkAllTooltipMessage" />
+        <div aria-describedby="checkAllTooltipMessage">
           ({totalChecked} <CommonMessage id="selected" />)
         </div>
       </div>

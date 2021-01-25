@@ -17,10 +17,6 @@ body {
   font-size: 16px;
   line-height: 1.4375;
 }
-main {
-  font-size: 20px;
-  line-height: 1.65em;
-}
 a {
   color: #284162;
   text-decoration: underline;
@@ -371,4 +367,19 @@ a.btn,
   .footer-spacing {
     padding-bottom: 15px;
   }
+}
+
+/* Custom style to adjust react switch */
+.react-switch {
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.btn-info {
+  background-color: #117c8d;
+  border-color: #117c8d;
+}
+.btn-info:hover {
+  background-color: #18666d;
+  border-color: #18666d;
 }

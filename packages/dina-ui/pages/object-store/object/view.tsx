@@ -1,17 +1,24 @@
 import {
+  ApiClientContext,
   BackToListButton,
   ButtonBar,
   DeleteButton,
   LoadingSpinner,
   useQuery
 } from "common-ui";
+import { KitsuResponse } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { ObjectUpload } from "packages/dina-ui/types/objectstore-api/resources/ObjectUpload";
 import { Footer, Head, Nav } from "../../../components";
-import { FileView } from "../../../components/file-view/FileView";
-import { MetadataDetails } from "../../../components/metadata/MetadataDetails";
+import {
+  ExifView,
+  FileView,
+  MetadataDetails
+} from "../../../components/object-store";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
+import { useContext, useState } from "react";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -21,13 +28,28 @@ const OBJECT_DETAILS_PAGE_CSS = `
 `;
 
 export default function MetadataViewPage() {
+  const { apiClient } = useContext(ApiClientContext);
+  const [objectUpload, setObjectUpload] = useState<ObjectUpload>();
   const router = useRouter();
 
   const id = router.query.id as string;
 
-  const { loading, response } = useQuery<Metadata>(
+  const getObjetUpload = async (
+    mydata: KitsuResponse<Metadata, ObjectUpload>
+  ) => {
+    const objectUploadResp = await apiClient.get<ObjectUpload>(
+      "objectstore-api/object-upload",
+      {
+        filter: { fileIdentifier: `${mydata?.data.fileIdentifier}` }
+      }
+    );
+
+    setObjectUpload(objectUploadResp?.data[0]);
+  };
+
+  const { loading, response } = useQuery<Metadata, ObjectUpload>(
     {
-      include: "acDerivedFrom,managedAttributeMap",
+      include: "acDerivedFrom,managedAttributeMap,acMetadataCreator,dcCreator",
       path: `objectstore-api/metadata/${id}`
     },
     {
@@ -36,15 +58,16 @@ export default function MetadataViewPage() {
           apiBaseUrl: "/agent-api",
           idField: "acMetadataCreator",
           joinField: "acMetadataCreator",
-          path: metadata => `person/${metadata.acMetadataCreator}`
+          path: metadata => `person/${metadata.acMetadataCreator.id}`
         },
         {
           apiBaseUrl: "/agent-api",
           idField: "dcCreator",
           joinField: "dcCreator",
-          path: metadata => `person/${metadata.dcCreator}`
+          path: metadata => `person/${metadata.dcCreator.id}`
         }
-      ]
+      ],
+      onSuccess: getObjetUpload
     }
   );
 
@@ -61,14 +84,17 @@ export default function MetadataViewPage() {
         : metadata.fileIdentifier;
 
     const filePath = `/api/objectstore-api/file/${metadata.bucket}/${fileId}`;
-    const fileType = metadata.fileExtension.replace(/\./, "").toLowerCase();
+    // fileExtension should always be available when getting the Metadata from the back-end:
+    const fileType = (metadata.fileExtension as string)
+      .replace(/\./, "")
+      .toLowerCase();
 
     return (
       <div>
         <Head title={metadata.originalFilename} />
         <Nav />
         <ButtonBar>
-          <Link href={`/object-store/metadata/edit?ids=${id}`}>
+          <Link href={`/object-store/metadata/single-record-edit?id=${id}`}>
             <a className="btn btn-primary">
               <DinaMessage id="editButtonText" />
             </a>
@@ -88,7 +114,7 @@ export default function MetadataViewPage() {
           />
         </ButtonBar>
         <style>{OBJECT_DETAILS_PAGE_CSS}</style>
-        <div className="container-fluid">
+        <main className="container-fluid">
           <div className="row">
             <div className="col-md-4">
               <FileView
@@ -100,17 +126,20 @@ export default function MetadataViewPage() {
             <div className="col-md-8">
               <div className="container">
                 <div className="form-group">
-                  <Link href={`/object-store/metadata/edit?ids=${id}`}>
+                  <Link
+                    href={`/object-store/metadata/single-record-edit?id=${id}`}
+                  >
                     <a className="btn btn-primary">
                       <DinaMessage id="editButtonText" />
                     </a>
                   </Link>
                 </div>
                 <MetadataDetails metadata={metadata} />
+                <ExifView objectUpload={objectUpload as ObjectUpload} />
               </div>
             </div>
           </div>
-        </div>
+        </main>
         <Footer />
       </div>
     );

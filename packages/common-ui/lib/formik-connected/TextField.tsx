@@ -1,9 +1,13 @@
 import { FastField, FieldProps } from "formik";
+import { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface TextFieldProps extends LabelWrapperParams {
   readOnly?: boolean;
   initialValue?: string;
+  multiLines?: boolean;
+  inputProps?: InputHTMLAttributes<any> | TextareaHTMLAttributes<any>;
+  placeholder?: string;
 }
 
 /**
@@ -11,7 +15,14 @@ export interface TextFieldProps extends LabelWrapperParams {
  * a wrapper that adds a label.
  */
 export function TextField(props: TextFieldProps) {
-  const { initialValue, readOnly, ...labelWrapperProps } = props;
+  const {
+    initialValue,
+    readOnly,
+    multiLines,
+    inputProps: inputPropsExternal,
+    placeholder,
+    ...labelWrapperProps
+  } = props;
   const { name } = labelWrapperProps;
 
   return (
@@ -26,16 +37,24 @@ export function TextField(props: TextFieldProps) {
             setFieldTouched(name);
           }
 
+          const inputPropsInternal = {
+            ...inputPropsExternal,
+            className: "form-control",
+            onChange,
+            value: value || "",
+            readOnly
+          };
+
           // The default Field component's inner text input needs to be replaced with our own
           // controlled input that we manually pass the "onChange" and "value" props. Otherwise
           // we will get React's warning about switching from an uncontrolled to controlled input.
-          return (
+          return multiLines ? (
+            <textarea rows={4} {...inputPropsInternal} />
+          ) : (
             <input
-              className="form-control"
-              onChange={onChange}
               type="text"
-              value={value || ""}
-              readOnly={readOnly}
+              {...inputPropsInternal}
+              placeholder={placeholder}
             />
           );
         }}

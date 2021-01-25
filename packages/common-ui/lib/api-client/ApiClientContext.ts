@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
-import Kitsu, { KitsuResource, PersistedResource } from "kitsu";
-import { deserialise } from "kitsu-core";
-import React from "react";
+import Kitsu, { KitsuResource, PersistedResource, GetParams } from "kitsu";
+import { deserialise, query, error as kitsuError } from "kitsu-core";
+import React, { useContext } from "react";
 import { serialize } from "../util/serialize";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
 import {
@@ -79,6 +79,15 @@ export const ApiClientContext = React.createContext<ApiClientContextI>(
   undefined as any
 );
 
+/** Hook to get the Api Client Context */
+export function useApiClient() {
+  const ctx = useContext(ApiClientContext);
+  if (!ctx) {
+    throw new Error("No ApiClientContext available.");
+  }
+  return ctx;
+}
+
 /**
  * Creates the value of the API client context. The app should only need to call this function
  * once to initialize the context.
@@ -91,7 +100,7 @@ export function createContextValue({
   },
   headers = {}
 }: ApiClientContextConfig = {}): ApiClientContextI {
-  const apiClient = new Kitsu({
+  const apiClient = new CustomDinaKitsu({
     baseURL,
     headers: { "Crnk-Compact": "true", ...headers },
     pluralize: false,
@@ -249,7 +258,12 @@ function getErrorMessage(
   // Convert the JsonApiErrors to an aggregated error string.
   const message = jsonApiErrors
     .map(errors =>
-      errors.map(({ title, detail }) => `${title}: ${detail}`).join("\n")
+      errors
+        .map(({ title, detail }) =>
+          // The error message is the title + detail, but remove one if the other is missing
+          [title, detail].filter(s => s?.trim()).join(": ")
+        )
+        .join("\n")
     )
     .join("\n");
 
@@ -270,4 +284,25 @@ export function makeAxiosErrorMoreReadable(error: AxiosError) {
     throw new Error(errorMessage);
   }
   throw error;
+}
+
+export class CustomDinaKitsu extends Kitsu {
+  /**
+   * The default Kitsu 'get' method omits the last part of URLs with multiple slashes.
+   * e.g. "seqdb-api/indexSet/1/ngsindexes" becomes "seqdb-api/indexSet/1".
+   * Override the 'get' method so it works with our long URLs:
+   */
+  async get(path: string, params: GetParams = {}) {
+    try {
+      const { data } = await this.axios.get(path, {
+        headers: this.headers,
+        params,
+        paramsSerializer: p => query(p)
+      });
+
+      return deserialise(data);
+    } catch (E) {
+      throw kitsuError(E);
+    }
+  }
 }

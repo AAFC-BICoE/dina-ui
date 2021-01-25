@@ -1,32 +1,28 @@
 import { KitsuResource } from "kitsu";
 import { ManagedAttributeMap } from "./ManagedAttributeMap";
+import { DcType } from "./ObjectUpload";
 import { Person } from "./Person";
 
 export interface MetadataAttributes {
   type: "metadata";
   bucket: string;
   fileIdentifier: string;
-  fileExtension: string;
-  dcType:
-    | "Image"
-    | "Moving Image"
-    | "Sound"
-    | "Text"
-    | "Dataset"
-    | "Undetermined";
+  fileExtension?: string;
 
   /** Refers to the License/LicenseDTO's 'url' field. */
   xmpRightsWebStatement?: string;
   xmpRightsUsageTerms?: string;
+  xmpRightsOwner?: string;
 
   // optional fields
   dcRights?: string;
   acSubType?: string;
+  dcType?: DcType;
   acCaption?: string;
   dcFormat?: string;
   createdDate?: string;
   deletedDate?: string;
-  acDigitizationDate?: string;
+  acDigitizationDate?: string | null;
   xmpMetadataDate?: string;
   acTags?: string[];
   originalFilename?: string;
@@ -38,8 +34,8 @@ export interface MetadataAttributes {
 }
 
 export interface MetadataRelationships {
-  acMetadataCreator?: Person | string | null;
-  dcCreator?: Person | string | null;
+  acMetadataCreator?: Person | KitsuResource | null;
+  dcCreator?: Person | KitsuResource | null;
   managedAttributeMap?: ManagedAttributeMap | null;
   acDerivedFrom?: Metadata | null;
 }

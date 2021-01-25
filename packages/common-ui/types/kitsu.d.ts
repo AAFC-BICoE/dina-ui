@@ -9,6 +9,8 @@ declare module "kitsu" {
   export default class Kitsu {
     public axios: AxiosInstance;
 
+    public headers: any;
+
     constructor(params: KitsuConstructorParams);
 
     public delete(...args: any[]): Promise<any>;
@@ -70,8 +72,8 @@ declare module "kitsu" {
     TData extends KitsuResponseData,
     TMeta = undefined
   > {
-    data: TData extends Array<infer R>
-      ? Array<PersistedResource<R>>
+    data: TData extends (infer R)[]
+      ? PersistedResource<R>[]
       : PersistedResource<TData>;
     meta: TMeta;
   }

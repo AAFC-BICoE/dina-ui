@@ -1,6 +1,7 @@
+import { DateView } from "common-ui";
 import Link from "next/link";
 import { Metadata, Person } from "../../../types/objectstore-api";
-import { MetadataManagedAttributes } from "../../metadata/MetadataDetails";
+import { MetadataManagedAttributes } from "../../object-store";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
 
@@ -11,6 +12,10 @@ export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
     </Link>
   ),
   customValueCells: {
+    // Date Fields:
+    createdDate: ({ original: { value } }) => <DateView date={value} />,
+    xmpMetadataDate: ({ original: { value } }) => <DateView date={value} />,
+    acDigitizationDate: ({ original: { value } }) => <DateView date={value} />,
     // Link to the original metadata:
     acDerivedFrom: ({ original: { value: instanceId } }) => {
       return (
@@ -26,24 +31,24 @@ export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
       );
     },
     // Link to the Metadata creator:
-    acMetadataCreator: ({ original: { value: cdoId } }) => {
+    acMetadataCreator: ({ original: { value: relation } }) => {
       return (
-        cdoId && (
+        relation && (
           <ReferenceLink<Person>
             baseApiPath="agent-api"
-            instanceId={{ typeName: "person", cdoId }}
+            instanceId={{ typeName: "person", cdoId: relation.id }}
             link={({ displayName }) => <span>{displayName}</span>}
           />
         )
       );
     },
     // Link to the doc creator:
-    dcCreator: ({ original: { value: cdoId } }) => {
+    dcCreator: ({ original: { value: relation } }) => {
       return (
-        cdoId && (
+        relation && (
           <ReferenceLink<Person>
             baseApiPath="agent-api"
-            instanceId={{ typeName: "person", cdoId }}
+            instanceId={{ typeName: "person", cdoId: relation.id }}
             link={({ displayName }) => <span>{displayName}</span>}
           />
         )

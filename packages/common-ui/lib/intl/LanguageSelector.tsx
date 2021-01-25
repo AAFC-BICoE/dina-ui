@@ -1,4 +1,4 @@
-import { Fragment, useContext } from "react";
+import { useContext } from "react";
 import { intlContext } from "./IntlSupport";
 
 const LANGUAGE_LABELS = {
@@ -17,28 +17,26 @@ export function LanguageSelector() {
 
   return (
     <div>
-      {Object.keys(LANGUAGE_LABELS).map((key, i, arr) => {
-        const divider = i < arr.length - 1 && " | ";
+      {Object.keys(LANGUAGE_LABELS)
+        .filter(key => key !== locale)
+        .map(key => {
+          function onClick() {
+            setLocale(key);
+          }
 
-        function onClick() {
-          setLocale(key);
-        }
-
-        return (
-          <div key={key} className="d-inline">
-            <button
-              className="btn btn-link px-0"
-              disabled={locale === key}
-              onClick={onClick}
-            >
-              {LANGUAGE_LABELS[key]}
-            </button>
-            <div className="d-inline" style={{ paddingTop: "0.375rem" }}>
-              {divider}
+          return (
+            <div key={locale} className="d-inline">
+              <button
+                className="btn btn-link px-0"
+                style={{ color: "#006FE6" }}
+                onClick={onClick}
+                lang={locale}
+              >
+                {LANGUAGE_LABELS[key]}
+              </button>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
     </div>
   );
 }

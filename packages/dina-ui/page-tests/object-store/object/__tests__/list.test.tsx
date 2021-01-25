@@ -1,8 +1,7 @@
-import { AreYouSureModal, QueryTable } from "common-ui";
-import { Formik } from "formik";
+import { AreYouSureModal, DinaForm, QueryTable } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { noop } from "lodash";
-import { StoredObjectGallery } from "../../../../components";
+import { ObjectUpload } from "packages/dina-ui/types/objectstore-api/resources/ObjectUpload";
+import { StoredObjectGallery } from "../../../../components/object-store";
 import MetadataListPage, {
   BulkDeleteButton,
   MetadataListFormValues
@@ -41,6 +40,23 @@ const TEST_METADATAS: PersistedResource<Metadata>[] = [
   }
 ];
 
+const exifData = new Map().set("date original created", "2000, Jan 8");
+const TEST_OBJECTUPLOAD: PersistedResource<ObjectUpload> = {
+  id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+  fileIdentifier: "54bc37d7-17c4-4f70-8b33-2def722c6e97",
+  sizeInBytes: 500,
+  originalFilename: "test.png",
+  metaFileEntryVersion: "1",
+  sha1Hex: "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+  receivedMediaType: "image/png",
+  detectedMediaType: "image/png",
+  detectedFileExtension: "png",
+  evaluatedMediaType: "image/png",
+  evaluatedFileExtension: "png",
+  exif: Object.fromEntries(exifData),
+  type: "object-upload"
+};
+
 const mockGet = jest.fn();
 const mockDoOperations = jest.fn();
 
@@ -60,8 +76,12 @@ describe("Metadata List Page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGet.mockImplementation(async path => {
-      if (path === "objectstore-api/metadata") {
+      if (
+        path === "objectstore-api/metadata?include=acMetadataCreator,dcCreator"
+      ) {
         return { data: TEST_METADATAS };
+      } else if (path === "objectstore-api/object-upload") {
+        return { data: TEST_OBJECTUPLOAD };
       }
     });
   });
@@ -124,7 +144,7 @@ describe("Metadata List Page", () => {
     expect(mockPush).lastCalledWith({
       pathname: "/object-store/metadata/edit",
       query: {
-        ids:
+        metadataIds:
           "6c524135-3c3e-41c1-a057-45afb4e3e7be,3849de16-fee2-4bb1-990d-a4f5de19b48d,31ee7848-b5c1-46e1-bbca-68006d9eda3b"
       }
     });
@@ -193,17 +213,16 @@ describe("Metadata List Page", () => {
 
     // Pretend two metadatas are already selected:
     const buttonWrapper = mountWithAppContext(
-      <Formik<MetadataListFormValues>
+      <DinaForm<MetadataListFormValues>
         initialValues={{
           selectedMetadatas: {
             "00000000-0000-0000-0000-000000000000": true,
             "11111111-1111-1111-1111-111111111111": true
           }
         }}
-        onSubmit={noop}
       >
         <BulkDeleteButton />
-      </Formik>,
+      </DinaForm>,
       { apiContext }
     );
 

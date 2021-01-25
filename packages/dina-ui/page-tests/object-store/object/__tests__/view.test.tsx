@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { FileView } from "../../../../components/file-view/FileView";
+import { FileView } from "../../../../components/object-store";
 import MetadataViewPage from "../../../../pages/object-store/object/view";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Metadata } from "../../../../types/objectstore-api";

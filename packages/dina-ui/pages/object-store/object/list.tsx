@@ -3,24 +3,29 @@ import {
   ApiClientContext,
   AreYouSureModal,
   ColumnDefinition,
+  dateCell,
+  DinaForm,
+  FilterAttribute,
+  filterBy,
   FormikButton,
   ListPageLayout,
   SelectField,
   SplitPagePanel,
   useAccount,
   useGroupedCheckBoxes,
-  useModal,
-  filterBy,
-  FilterAttribute,
-  dateCell
+  useGroupSelectOptions,
+  useModal
 } from "common-ui";
-import { Form, Formik, FormikContextType } from "formik";
-import { noop, toPairs } from "lodash";
+import { FormikContextType } from "formik";
+import { toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Component, useContext, useMemo, useState } from "react";
-import { Head, Nav, StoredObjectGallery } from "../../../components";
-import { MetadataPreview } from "../../../components/metadata/MetadataPreview";
+import { Head, Nav } from "../../../components";
+import {
+  MetadataPreview,
+  StoredObjectGallery
+} from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata, Person } from "../../../types/objectstore-api";
 
@@ -123,10 +128,7 @@ export default function MetadataListPage() {
 
   const groupSelectOptions = [
     { label: "<any>", value: undefined },
-    ...(groupNames ?? []).map(group => ({
-      label: group,
-      value: group
-    }))
+    ...useGroupSelectOptions()
   ];
 
   // Workaround to make sure react-table doesn't unmount TBodyComponent
@@ -146,7 +148,7 @@ export default function MetadataListPage() {
     <div>
       <Head title={formatMessage("objectListTitle")} />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         <div className="list-inline">
           <div className="list-inline-item">
             <h1>
@@ -176,6 +178,12 @@ export default function MetadataListPage() {
                   ...(filterForm.group && { bucket: filterForm.group }),
                   rsql: "acSubTypeId==null"
                 })}
+                defaultSort={[
+                  {
+                    desc: true,
+                    id: "xmpMetadataDate"
+                  }
+                ]}
                 filterAttributes={METADATA_FILTER_ATTRIBUTES}
                 filterFormchildren={({ submitForm }) => (
                   <div className="form-group">
@@ -197,17 +205,19 @@ export default function MetadataListPage() {
                       apiBaseUrl: "/agent-api",
                       idField: "acMetadataCreator",
                       joinField: "acMetadataCreator",
-                      path: metadata => `person/${metadata.acMetadataCreator}`
+                      path: metadata =>
+                        `person/${metadata.acMetadataCreator.id}`
                     },
                     {
                       apiBaseUrl: "/agent-api",
                       idField: "dcCreator",
                       joinField: "dcCreator",
-                      path: metadata => `person/${metadata.dcCreator}`
+                      path: metadata => `person/${metadata.dcCreator.id}`
                     }
                   ],
                   onSuccess: res => setAvailableMetadatas(res.data),
-                  path: "objectstore-api/metadata",
+                  path:
+                    "objectstore-api/metadata?include=acMetadataCreator,dcCreator",
                   reactTableProps: ({ response }) => {
                     TBodyGallery.innerComponent = (
                       <StoredObjectGallery
@@ -267,7 +277,7 @@ export default function MetadataListPage() {
             </SplitPagePanel>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
@@ -290,35 +300,30 @@ function MetadataListWrapper({ children }) {
   const router = useRouter();
 
   return (
-    <Formik<MetadataListFormValues>
-      initialValues={{ selectedMetadatas: {} }}
-      onSubmit={noop}
-    >
-      <Form translate={undefined}>
-        <div style={{ height: "1rem" }}>
-          <div className="float-right">
-            <BulkDeleteButton />
-            <FormikButton
-              buttonProps={bulkButtonProps}
-              className="btn btn-primary ml-2 metadata-bulk-edit-button"
-              onClick={async (values: MetadataListFormValues) => {
-                const metadataIds = toPairs(values.selectedMetadatas)
-                  .filter(pair => pair[1])
-                  .map(pair => pair[0]);
+    <DinaForm<MetadataListFormValues> initialValues={{ selectedMetadatas: {} }}>
+      <div style={{ height: "1rem" }}>
+        <div className="float-right">
+          <BulkDeleteButton />
+          <FormikButton
+            buttonProps={bulkButtonProps}
+            className="btn btn-primary ml-2 metadata-bulk-edit-button"
+            onClick={async (values: MetadataListFormValues) => {
+              const metadataIds = toPairs(values.selectedMetadatas)
+                .filter(pair => pair[1])
+                .map(pair => pair[0]);
 
-                await router.push({
-                  pathname: "/object-store/metadata/edit",
-                  query: { ids: metadataIds.join(",") }
-                });
-              }}
-            >
-              <DinaMessage id="editSelectedButtonText" />
-            </FormikButton>
-          </div>
+              await router.push({
+                pathname: "/object-store/metadata/edit",
+                query: { metadataIds: metadataIds.join(",") }
+              });
+            }}
+          >
+            <DinaMessage id="editSelectedButtonText" />
+          </FormikButton>
         </div>
-        {children}
-      </Form>
-    </Formik>
+      </div>
+      {children}
+    </DinaForm>
   );
 }
 

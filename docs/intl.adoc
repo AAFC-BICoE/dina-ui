@@ -107,6 +107,25 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
 }
 ----
 
+=== Field tooltip messages
+
+You can add an additional tooltip message to go inside the Field Label after the field name.
+After adding the field label message, add a tooltip message by adding "_tooltip" to the end of
+the field label's message.
+
+Example:
+
+[source,tsx]
+----
+export const DINAUI_MESSAGES_ENGLISH = {
+  ...
+  field_publiclyReleasable: "Publicly releasable",
+  field_publiclyReleasable_tooltip:
+    "Indicates if the object could be released publicly on a web page or open data portals.",
+  ...
+}
+----
+
 == Export messages as CSV
 
 Run the following command to export the messages in CSV format:

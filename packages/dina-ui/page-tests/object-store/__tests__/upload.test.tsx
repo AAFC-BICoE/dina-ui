@@ -1,9 +1,12 @@
 import { AccountContextI, OnFormikSubmit } from "common-ui";
 import { noop } from "lodash";
-import { FileUploader, IFileWithMeta, IMeta } from "../../../components";
-import UploadPage, {
-  fileUploadErrorHandler
-} from "../../../pages/object-store/upload";
+import {
+  FileUploader,
+  IFileWithMeta,
+  IMeta
+} from "../../../components/object-store";
+import { fileUploadErrorHandler } from "../../../components/object-store/file-upload/FileUploadProvider";
+import UploadPage from "../../../pages/object-store/upload";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 
 const mockPush = jest.fn();
@@ -44,6 +47,7 @@ describe("Upload page", () => {
     const mockPost = jest.fn(() => {
       return {
         data: {
+          dateTimeDigitized: "2003-12-14T12:01:44",
           fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
           fileType: "image",
           size: "500"
@@ -57,7 +61,6 @@ describe("Upload page", () => {
         id: "11111111-1111-1111-1111-111111111111"
       }))
     );
-
     const mockApiCtx = {
       apiClient: {
         axios: {
@@ -108,51 +111,16 @@ describe("Upload page", () => {
       { transformResponse: fileUploadErrorHandler }
     );
 
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: {
-            acDigitizationDate: "2019-08-28T20:37:21+00:00",
-            acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
-            bucket: "example-group",
-            fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
-            type: "metadata"
-          },
-          type: "metadata"
-        },
-        {
-          resource: {
-            acDigitizationDate: "2019-08-29T20:37:21+00:00",
-            acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
-            bucket: "example-group",
-            fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
-            type: "metadata"
-          },
-          type: "metadata"
-        },
-        {
-          resource: {
-            acDigitizationDate: "2019-08-30T20:37:21+00:00",
-            acMetadataCreator: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
-            bucket: "example-group",
-            fileIdentifier: "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
-            type: "metadata"
-          },
-          type: "metadata"
-        }
-      ],
-      { apiBaseUrl: "/objectstore-api" }
-    );
-
     // You should get redirected to the bulk edit page with the new metadata IDs.
     expect(mockPush).lastCalledWith({
       pathname: "/object-store/metadata/edit",
       query: {
-        ids: [
-          "11111111-1111-1111-1111-111111111111",
-          "11111111-1111-1111-1111-111111111111",
-          "11111111-1111-1111-1111-111111111111"
-        ].join()
+        group: "example-group",
+        objectUploadIds: [
+          "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
+          "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
+          "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73"
+        ].join(",")
       }
     });
   });

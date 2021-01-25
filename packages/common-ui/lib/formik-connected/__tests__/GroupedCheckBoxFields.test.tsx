@@ -1,7 +1,7 @@
-import { Form, Formik } from "formik";
 import { KitsuResource } from "kitsu";
 import { useEffect } from "react";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { DinaForm } from "../DinaForm";
 import { useGroupedCheckBoxes } from "../GroupedCheckBoxFields";
 
 interface TestResource extends KitsuResource {
@@ -32,14 +32,15 @@ function TestComponent() {
   }, []);
 
   return (
-    <Formik initialValues={{ checkedIds: {} }} onSubmit={mockOnSubmit}>
-      <Form translate={undefined}>
-        {TEST_SAMPLES.map(s => (
-          <CheckBoxField key={String(s.id)} resource={s} />
-        ))}
-        <CheckBoxHeader />
-      </Form>
-    </Formik>
+    <DinaForm
+      initialValues={{ checkedIds: {} }}
+      onSubmit={async ({ submittedValues }) => mockOnSubmit(submittedValues)}
+    >
+      {TEST_SAMPLES.map(s => (
+        <CheckBoxField key={String(s.id)} resource={s} />
+      ))}
+      <CheckBoxHeader />
+    </DinaForm>
   );
 }
 
@@ -65,10 +66,7 @@ describe("Grouped check boxes hook", () => {
     wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
 
-    expect(mockOnSubmit).lastCalledWith(
-      { checkedIds: { "3": true } },
-      expect.anything()
-    );
+    expect(mockOnSubmit).lastCalledWith({ checkedIds: { "3": true } });
   });
 
   it("Lets you shift+click to toggle multiple check boxes at a time.", async () => {
@@ -100,10 +98,9 @@ describe("Grouped check boxes hook", () => {
     wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
 
-    expect(mockOnSubmit).lastCalledWith(
-      { checkedIds: { "2": true, "3": true, "4": true } },
-      expect.anything()
-    );
+    expect(mockOnSubmit).lastCalledWith({
+      checkedIds: { "2": true, "3": true, "4": true }
+    });
   });
 
   it("Multi-toggles checkboxes even when they are in reverse order.", async () => {
@@ -133,10 +130,9 @@ describe("Grouped check boxes hook", () => {
     wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
 
-    expect(mockOnSubmit).lastCalledWith(
-      { checkedIds: { "2": true, "3": true, "4": true } },
-      expect.anything()
-    );
+    expect(mockOnSubmit).lastCalledWith({
+      checkedIds: { "2": true, "3": true, "4": true }
+    });
   });
 
   it("Provides a checkbox to check all boxes.", async () => {
@@ -157,10 +153,9 @@ describe("Grouped check boxes hook", () => {
     wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
 
-    expect(mockOnSubmit).lastCalledWith(
-      { checkedIds: { "1": true, "2": true, "3": true, "4": true, "5": true } },
-      expect.anything()
-    );
+    expect(mockOnSubmit).lastCalledWith({
+      checkedIds: { "1": true, "2": true, "3": true, "4": true, "5": true }
+    });
 
     // Uncheck the check-all box.
     wrapper.find("input.check-all-checkbox").prop<any>("onClick")({
@@ -174,6 +169,6 @@ describe("Grouped check boxes hook", () => {
     wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
 
-    expect(mockOnSubmit).lastCalledWith({ checkedIds: {} }, expect.anything());
+    expect(mockOnSubmit).lastCalledWith({ checkedIds: {} });
   });
 });

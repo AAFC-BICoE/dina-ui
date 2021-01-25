@@ -1,112 +1,60 @@
 import {
-  ApiClientContext,
-  ErrorViewer,
-  SaveArgs,
+  DinaForm,
   SelectField,
-  useAccount
+  useAccount,
+  useGroupSelectOptions
 } from "common-ui";
-import { Form, Formik } from "formik";
-import { noop } from "lodash";
-import moment from "moment";
 import { useRouter } from "next/router";
-import { useContext } from "react";
+import { Footer, Head, Nav } from "../../components";
 import {
   FileUploader,
-  Footer,
-  Head,
-  IFileWithMeta,
-  Nav
-} from "../../components";
+  FileUploaderOnSubmitArgs
+} from "../../components/object-store";
+import { useFileUpload } from "../../components/object-store/file-upload/FileUploadProvider";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { Metadata } from "../../types/objectstore-api/resources/Metadata";
-
-export interface FileUploadResponse {
-  fileIdentifier: string;
-  metaFileEntryVersion: string;
-  originalFilename: string;
-  sha1Hex: string;
-  receivedMediaType: string;
-  detectedMediaType: string;
-  detectedFileExtension: string;
-  evaluatedMediaType: string;
-  evaluatedFileExtension: string;
-  sizeInBytes: number;
-}
 
 export interface OnSubmitValues {
-  acceptedFiles: IFileWithMeta[];
   group: string;
 }
 
 export default function UploadPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
-  const { apiClient, save } = useContext(ApiClientContext);
-  const { agentId, groupNames, initialized: accountInitialized } = useAccount();
+  const { initialized: accountInitialized } = useAccount();
+  const groupSelectOptions = useGroupSelectOptions();
+  const { uploadFiles } = useFileUpload();
 
   const acceptedFileTypes = "image/*,audio/*,video/*,.pdf,.doc,.docx,.png";
 
-  async function onSubmit({ acceptedFiles, group }: OnSubmitValues) {
-    // Upload each file in a separate request, then create the metadatas in a transaction.
-    // TODO: Do all of this in a single transaction.
-
+  async function onSubmit({
+    acceptedFiles,
+    group
+  }: FileUploaderOnSubmitArgs<OnSubmitValues>) {
     if (!group) {
       throw new Error(formatMessage("groupMustBeSelected"));
     }
 
-    const uploadResponses: FileUploadResponse[] = [];
-    for (const { file } of acceptedFiles) {
-      // Wrap the file in a FormData:
-      const formData = new FormData();
-      formData.append("file", file);
+    const uploadRespsT = await uploadFiles({ files: acceptedFiles, group });
 
-      // Upload the file:
-      const response = await apiClient.axios.post(
-        `/objectstore-api/file/${group}`,
-        formData,
-        { transformResponse: fileUploadErrorHandler }
-      );
-      uploadResponses.push(response.data);
-    }
-
-    const saveOperations = uploadResponses.map<SaveArgs<Metadata>>(
-      (res, idx) => ({
-        resource: {
-          acMetadataCreator: agentId,
-          acDigitizationDate: moment(
-            acceptedFiles[idx].meta.lastModifiedDate
-          ).format(),
-          bucket: group,
-          fileIdentifier: res.fileIdentifier,
-          type: "metadata"
-        } as Metadata,
-        type: "metadata"
-      })
-    );
-
-    const saveResults = await save(saveOperations, {
-      apiBaseUrl: "/objectstore-api"
-    });
-
-    const ids = saveResults.map(res => res.id).join(",");
+    const objectUploadIds = uploadRespsT
+      .map(({ fileIdentifier }) => fileIdentifier)
+      .join(",");
 
     await router.push({
       pathname: "/object-store/metadata/edit",
-      query: { ids }
+      query: { group, objectUploadIds }
     });
   }
-
-  const groupSelectOptions = (groupNames ?? []).map(group => ({
-    label: group,
-    value: group
-  }));
 
   return (
     <div>
       <Head title={formatMessage("uploadPageTitle")} />
       <Nav />
-      <div className="container">
-        {!accountInitialized || !groupNames?.length ? (
+      <main className="container">
+        <h1>
+          <DinaMessage id="uploadPageTitle" />
+        </h1>
+        {!accountInitialized || !groupSelectOptions?.length ? (
           <div className="alert alert-warning no-group-alert">
             <DinaMessage id="userMustBelongToGroup" />
           </div>
@@ -115,45 +63,25 @@ export default function UploadPage() {
             <div className="alert alert-warning">
               <DinaMessage id="forTestingPurposesOnlyMessage" />
             </div>
-            <Formik
-              initialValues={{ group: groupSelectOptions[0].value }}
-              onSubmit={noop}
-            >
-              <Form translate={undefined}>
-                <ErrorViewer />
-                <div className="row">
-                  <SelectField
-                    className="col-md-3"
-                    disabled={true}
-                    name="group"
-                    options={groupSelectOptions}
-                  />
-                </div>
-                <div>
-                  <FileUploader
-                    acceptedFileTypes={acceptedFileTypes}
-                    onSubmit={onSubmit}
-                  />
-                </div>
-              </Form>
-            </Formik>
+            <DinaForm initialValues={{ group: groupSelectOptions[0].value }}>
+              <div className="row">
+                <SelectField
+                  className="col-md-3"
+                  name="group"
+                  options={groupSelectOptions}
+                />
+              </div>
+              <div>
+                <FileUploader
+                  acceptedFileTypes={acceptedFileTypes}
+                  onSubmit={onSubmit}
+                />
+              </div>
+            </DinaForm>
           </div>
         )}
-      </div>
+      </main>
       <Footer />
     </div>
   );
-}
-
-/** Errors are handled differently here because they come from Spring Boot instead of Crnk. */
-export function fileUploadErrorHandler(data: string) {
-  // Custom spring boot error handling to get the correct error message:
-  const parsed = JSON.parse(data);
-  const errorDetail = parsed?.errors?.[0]?.detail;
-  if (errorDetail) {
-    throw new Error(errorDetail);
-  }
-
-  // If no error, proceed as usual:
-  return parsed;
 }

@@ -5,8 +5,7 @@ This is a searchable dropdown select component for selecting a back-end resource
 Example usage for selecting a Group from a list:
 [source,tsx]
 ----
-import { Form, Formik } from "formik";
-import { ResourceSelectField } from "../components";
+import { DinaForm, ResourceSelectField } from "common-ui";
 import { Group } from "../types/seqdb-api/resources/Group";
 
 /**
@@ -19,9 +18,9 @@ import { Group } from "../types/seqdb-api/resources/Group";
 export default function ExamplePage() {
   return (
     <div className="card card-body" style={{ width: "500px" }}>
-      <Formik initialValues={{ myGroup: null }} onSubmit={null}>
+      <DinaForm initialValues={{ myGroup: null }}>
         {({ values: { myGroup } }) => (
-          <Form translate={undefined}>
+          <div>
             <h2>Selected group: {myGroup ? myGroup.groupName : "None"}</h2>
             <ResourceSelectField<Group>
               name="myGroup"
@@ -29,9 +28,9 @@ export default function ExamplePage() {
               model="group"
               optionLabel={group => group.groupName}
             />
-          </Form>
+          </div>
         )}
-      </Formik>
+      </div>
     </div>
   );
 }

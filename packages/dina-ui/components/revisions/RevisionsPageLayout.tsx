@@ -1,8 +1,12 @@
-import { ColumnDefinition, ListPageLayout } from "common-ui";
+import {
+  ColumnDefinition,
+  dateCell,
+  KeyValueTable,
+  ListPageLayout
+} from "common-ui";
 import { pick } from "lodash";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AuditSnapshot, Metadata } from "../../types/objectstore-api";
-import { KeyValueTable } from "./KeyValueTable";
 import { RevisionRowConfigsByType } from "./revision-row-config";
 
 interface RevisionsPageLayoutProps {
@@ -46,7 +50,7 @@ export function RevisionsPageLayout({
           }
         ]),
     "version",
-    "commitDateTime",
+    dateCell("commitDateTime"),
     "snapshotType",
     {
       Cell: ({ original: { changedProperties } }) => (

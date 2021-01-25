@@ -1,7 +1,8 @@
-import { LanguageSelector, useAccount } from "common-ui";
+import { LanguageSelector, NavbarUserControl, useAccount } from "common-ui";
 import Link from "next/link";
 import React from "react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { SeqdbMessage } from "../../../intl/seqdb-intl";
 
 export function Nav() {
   const { roles } = useAccount();
@@ -30,20 +31,22 @@ export function Nav() {
             <meta property="areaServed" typeof="Country" content="Canada" />
           </div>
           <section id="wb-lng" className="text-right ml-auto col-7 col-md-8">
-            <ul className="list-inline ">
-              <li className="list-inline-item mx-2">
-                <LanguageSelector />
-              </li>
+            <ul className="list-inline">
               <li className="list-inline-item mx-2">
                 <NavbarUserControl />
               </li>
               <li className="list-inline-item mx-2 my-auto">
                 <a
                   className="btn btn-info"
+                  style={{ backgroundColor: "#117C8D" }}
                   href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
+                  target="_blank"
                 >
                   <DinaMessage id="feedbackButtonText" />
                 </a>
+              </li>
+              <li className="list-inline-item mx-2">
+                <LanguageSelector />
               </li>
             </ul>
           </section>
@@ -75,11 +78,15 @@ export function Nav() {
             <li className="list-inline-item my-auto">
               <NavAgentsDropdown />
             </li>
-            {showUsersLinks && (
-              <li className="list-inline-item my-auto">
-                <NavUsersDropdown />
-              </li>
-            )}
+            <li className="list-inline-item my-auto d-none">
+              <NavDinaUserDropdown />
+            </li>
+            <li className="list-inline-item my-auto">
+              <NavSeqDBDropdown />
+            </li>
+            <li className="list-inline-item my-auto">
+              <NavCollectionDropdown />
+            </li>
           </ul>
         </div>
       </div>
@@ -148,12 +155,12 @@ function NavAgentsDropdown() {
   );
 }
 
-/** Users links. */
-function NavUsersDropdown() {
+/** Dina User links. */
+function NavDinaUserDropdown() {
   return (
     <div className="dropdown">
       <a className="nav-link dropdown-toggle" href="#">
-        <DinaMessage id="usersSectionTitle" />
+        <DinaMessage id="dinaUserSectionTitle" />
       </a>
       <div className="dropdown-menu m-0">
         <Link href="/user/list">
@@ -161,33 +168,83 @@ function NavUsersDropdown() {
             <DinaMessage id="userListTitle" />
           </a>
         </Link>
+        <Link href="/dina-user/view">
+          <a className="dropdown-item">
+            <DinaMessage id="whoAmITitle" />
+          </a>
+        </Link>
       </div>
     </div>
   );
 }
 
-/** Shows the logged-in user and the logout button. */
-function NavbarUserControl() {
-  const { authenticated, initialized, logout, username } = useAccount();
-
+/** Seqdb UI links. */
+function NavSeqDBDropdown() {
   return (
-    <div className="d-flex">
-      {initialized && authenticated ? (
-        <>
-          {username && (
-            <span className="mr-2 my-auto">
-              <DinaMessage id="loggedInAsUser" values={{ name: username }} />
-            </span>
-          )}
-          <button
-            type="button"
-            className="btn btn-dark logout-button"
-            onClick={() => logout()}
-          >
-            <DinaMessage id="logoutBtn" />
-          </button>
-        </>
-      ) : null}
+    <div className="dropdown">
+      <a className="nav-link dropdown-toggle" href="#">
+        <SeqdbMessage id="seqdbTitle" />
+      </a>
+      <div className="dropdown-menu m-0">
+        <Link href="/seqdb/workflow/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="workflowListTitle" />
+          </a>
+        </Link>
+        <Link href="/seqdb/index-set/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="indexSetListTitle" />
+          </a>
+        </Link>
+        <Link href="/seqdb/pcr-primer/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="pcrPrimerListTitle" />
+          </a>
+        </Link>
+        <Link href="/seqdb/pcr-profile/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="pcrProfileListTitle" />
+          </a>
+        </Link>
+        <Link href="/seqdb/product/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="productListTitle" />
+          </a>
+        </Link>
+        <Link href="/seqdb/protocol/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="protocolListTitle" />
+          </a>
+        </Link>
+        <Link href="/seqdb/region/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="regionListTitle" />
+          </a>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+/** Collecting event links. */
+function NavCollectionDropdown() {
+  return (
+    <div className="dropdown">
+      <a className="nav-link dropdown-toggle" href="#">
+        <DinaMessage id="collectionSectionTitle" />
+      </a>
+      <div className="dropdown-menu m-0">
+        <Link href="/collecting-event/list">
+          <a className="dropdown-item">
+            <DinaMessage id="collectingEventListTitle" />
+          </a>
+        </Link>
+        <Link href="/collector-group/list">
+          <a className="dropdown-item">
+            <DinaMessage id="collectorGroupListTitle" />
+          </a>
+        </Link>
+      </div>
     </div>
   );
 }
@@ -198,7 +255,14 @@ export function Footer() {
       <div className="brand">
         <div className="container">
           <div className="row">
-            <nav className="col-md-10 ftr-urlt-lnk">
+            <nav className="col-md-10 ftr-urlt-lnk py-3">
+              <style>
+                {`
+                  .ftr-urlt-lnk li {
+                    float: initial !important;
+                  }
+                `}
+              </style>
               <ul>
                 <li>
                   <a href="https://www.canada.ca/en/contact.html">
@@ -216,6 +280,14 @@ export function Footer() {
                   </a>
                 </li>
               </ul>
+              <div>
+                {process.env.UI_APP_VERSION && (
+                  <DinaMessage
+                    id="uiAppVersion"
+                    values={{ version: process.env.UI_APP_VERSION }}
+                  />
+                )}
+              </div>
             </nav>
             <div className="col-6 col-md-3 col-lg-2 text-right">
               <img

@@ -6,6 +6,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
   ISNOT: "N'EST PAS",
   OR: "OU",
   areYouSure: "Êtes-vous certain?",
+  attributeLabel: "Attribut",
   backToListButtonText: "Retour à la liste",
   cancelButtonText: "Annuler",
   closeButtonText: "Fermer",
@@ -28,5 +29,26 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
   queryTableMultiSortExplanation:
     "Pour trier la liste en fonction de plusieurs colonnes : Cliquez sur un en-tête de colonne pour trier par cette colonne, puis appuyez sur la touche Maj pendant que vous cliquez sur un autre en-tête.",
   queryTableMultiSortTooltipTitle: "Trier en fonction de plusieurs colonnes ",
-  yes: "Oui"
+  yes: "Oui",
+  checkAllTooltipMessage:
+    "Cochez cette case pour cocher tous les articles visibles dans cette page. ",
+  field_author: "Auteur",
+  field_changedProperties: "Propriétés modifiées ",
+  field_commitDateTime: "Date et heure de l'engagement ",
+  field_resourceName: "Nom de la ressource",
+  field_snapshotType: "Type d'image instantanée ",
+  field_version: "Version",
+  filterRecordsTitle: "Filtrer les dossiers ",
+  field_group: "Groupe",
+  name: "Nom",
+  next: "Suivant",
+  of: "de",
+  noRowsFound: "Aucune donnée n'a été trouvée",
+  page: "Page",
+  previous: "Précédente",
+  rows: "rangées",
+  select: "Sélectionner ",
+  selected: "sélectionné ",
+  showChanges: "Visualiser les modifications",
+  valueLabel: "Valeur"
 };

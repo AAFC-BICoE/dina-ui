@@ -25,7 +25,7 @@ export default function AgentListPage() {
     <div>
       <Head title={formatMessage("personListTitle")} />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         <h1>
           <DinaMessage id="personListTitle" />
         </h1>
@@ -40,7 +40,7 @@ export default function AgentListPage() {
             path: "agent-api/person"
           }}
         />
-      </div>
+      </main>
       <Footer />
     </div>
   );

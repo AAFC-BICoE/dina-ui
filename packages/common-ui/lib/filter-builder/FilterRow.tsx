@@ -1,17 +1,24 @@
+import { KitsuResource } from "kitsu";
+import moment from "moment";
 import React from "react";
 import Select from "react-select";
 import { CommonMessage } from "../intl/common-ui-intl";
+import { ResourceSelect } from "../resource-select/ResourceSelect";
+import {
+  BOOLEAN_PREDICATE_OPTIONS,
+  DATE_PREDICATE_OPTIONS,
+  SEARCH_TYPES_EXACT_ONLY,
+  STRING_SEARCH_TYPES
+} from "./dropdown-options";
 import { FilterAttribute, FilterAttributeConfig } from "./FilterBuilder";
 import {
   FilterBuilderContext,
   FilterBuilderContextI
 } from "./FilterBuilderContext";
-import DatePicker from "react-datepicker";
-import moment from "moment";
-import { ResourceSelect } from "../resource-select/ResourceSelect";
-import { KitsuResource } from "kitsu";
+import { DateRange, FilterRowDatePicker } from "./FilterRowDatePicker";
 
-export type FilterRowPredicate = "IS" | "IS NOT" | "GREATER_THAN" | "LESS_THAN";
+export type FilterRowPredicate = "IS" | "IS NOT" | "FROM" | "UNTIL" | "BETWEEN";
+
 export type FilterRowSearchType =
   | "PARTIAL_MATCH"
   | "EXACT_MATCH"
@@ -23,7 +30,7 @@ export interface FilterRowModel {
   attribute: FilterAttribute;
   predicate: FilterRowPredicate;
   searchType: FilterRowSearchType;
-  value: string | KitsuResource;
+  value: string | KitsuResource | DateRange;
 }
 
 export interface FilterRowProps {
@@ -40,7 +47,7 @@ export interface FilterAttributeOption {
   value: FilterAttribute;
 }
 
-type DropdownOption<TValue> = {
+export type FilterDropdownOption<TValue> = {
   label: React.ReactNode;
   value: TValue;
 };
@@ -84,7 +91,11 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
     return (
       <div className="list-inline row">
-        <div className="list-inline-item" style={{ width: 320 }}>
+        <div
+          aria-label="Filter Attribute"
+          className="list-inline-item"
+          style={{ width: 320 }}
+        >
           <Select<FilterAttributeOption>
             className="filter-attribute"
             instanceId={`attribute_${model.id}`}
@@ -93,58 +104,60 @@ export class FilterRow extends React.Component<FilterRowProps> {
             value={selectedAttributeOption}
           />
         </div>
-        <div className="list-inline-item" style={{ width: 180 }}>
+        <div
+          aria-label="Filter Predicate"
+          className="list-inline-item"
+          style={{ width: "12rem" }}
+        >
           <Select
             className="filter-predicate"
             instanceId={`predicate_${model.id}`}
             options={predicateTypes}
             onChange={this.onPredicateChanged}
-            value={{ label: model.predicate, value: model.predicate }}
+            value={predicateTypes.find(
+              option => option.value === model.predicate
+            )}
           />
         </div>
-
-        {attribute.type === "DATE" && (
-          <div className="list-inline-item" style={{ width: "15rem" }}>
-            <DatePicker
-              className="d-inline-block form-control"
-              wrapperClassName="w-100"
-              selected={
-                typeof model.value === "string"
-                  ? isNaN(Date.parse(model.value))
-                    ? new Date()
-                    : new Date(model.value)
-                  : null
-              }
-              onChange={this.onDateValueChanged}
+        <div aria-label="Filter Value" className="list-inline-item">
+          {attribute.type === "DATE" && (
+            <FilterRowDatePicker
+              isRange={model.predicate === "BETWEEN"}
+              value={model.value as string | DateRange}
+              onDateValueChanged={this.onDateValueChanged}
             />
-          </div>
-        )}
-        {attribute.type === "DROPDOWN" && (
-          <div className="list-inline-item" style={{ width: "15rem" }}>
-            <ResourceSelect
-              onChange={this.onSelectValueChanged}
-              filter={attribute.filter ?? (() => ({}))}
-              model={attribute.resourcePath ?? ""}
-              optionLabel={attribute.optionLabel ?? (() => "---")}
-              value={typeof model.value !== "string" ? model.value : undefined}
-            />
-          </div>
-        )}
+          )}
+          {attribute.type === "DROPDOWN" && (
+            <div style={{ width: "16rem" }}>
+              <ResourceSelect
+                onChange={this.onSelectValueChanged}
+                filter={attribute.filter ?? (() => ({}))}
+                model={attribute.resourcePath ?? ""}
+                optionLabel={attribute.optionLabel ?? (() => "---")}
+                value={
+                  typeof model.value !== "string"
+                    ? (model.value as KitsuResource)
+                    : undefined
+                }
+              />
+            </div>
+          )}
 
-        {attribute.type === "STRING" && (
-          <input
-            className="filter-value list-inline-item form-control d-inline-block"
-            style={{
-              width: "15rem",
-              visibility:
-                model.searchType === "BLANK_FIELD" ? "hidden" : undefined
-            }}
-            value={typeof model.value === "string" ? model.value : undefined}
-            onChange={this.onValueChanged}
-          />
-        )}
+          {attribute.type === "STRING" && (
+            <input
+              className="filter-value form-control d-inline-block"
+              style={{
+                width: "16rem",
+                visibility:
+                  model.searchType === "BLANK_FIELD" ? "hidden" : undefined
+              }}
+              value={typeof model.value === "string" ? model.value : undefined}
+              onChange={this.onValueChanged}
+            />
+          )}
+        </div>
         {attribute.type !== "DATE" && (
-          <div className="list-inline-item" style={{ width: 180 }}>
+          <div aria-label="Filter Search Type" style={{ width: "12rem" }}>
             <Select
               className="filter-search-type"
               instanceId={`searchType_${model.id}`}
@@ -192,7 +205,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
     if (attribute.type === "DATE") {
       this.props.model.value = moment().format();
-      this.props.model.predicate = "GREATER_THAN";
+      this.props.model.predicate = "FROM";
     } else if (attribute.type === "STRING") {
       this.props.model.value = "";
       this.props.model.searchType = "PARTIAL_MATCH";
@@ -236,8 +249,8 @@ export class FilterRow extends React.Component<FilterRowProps> {
     this.forceUpdate();
   };
 
-  private onDateValueChanged = e => {
-    this.props.model.value = moment(e).format();
+  private onDateValueChanged = (date: string | DateRange) => {
+    this.props.model.value = date;
     this.props.onChange();
     this.forceUpdate();
   };
@@ -266,51 +279,3 @@ export class FilterRow extends React.Component<FilterRowProps> {
       : selectedAttribute.value;
   }
 }
-
-/** Predicate dropdown options for filtering on date attributes. */
-const BOOLEAN_PREDICATE_OPTIONS: DropdownOption<FilterRowPredicate>[] = [
-  {
-    label: <CommonMessage id="IS" />,
-    value: "IS"
-  },
-  {
-    label: <CommonMessage id="ISNOT" />,
-    value: "IS NOT"
-  }
-];
-
-/** Predicate dropdown options for filtering on date attributes. */
-const DATE_PREDICATE_OPTIONS: DropdownOption<FilterRowPredicate>[] = [
-  {
-    label: <CommonMessage id="filterGreaterThan" />,
-    value: "GREATER_THAN"
-  },
-  {
-    label: <CommonMessage id="filterLessThan" />,
-    value: "LESS_THAN"
-  }
-];
-
-/** Search types for String searches */
-const STRING_SEARCH_TYPES: DropdownOption<FilterRowSearchType>[] = [
-  {
-    label: <CommonMessage id="filterPartialMatch" />,
-    value: "PARTIAL_MATCH"
-  },
-  {
-    label: <CommonMessage id="filterExactMatch" />,
-    value: "EXACT_MATCH"
-  },
-  {
-    label: <CommonMessage id="filterBlankField" />,
-    value: "BLANK_FIELD"
-  }
-];
-
-/** Search types for attributes that only support exact matching. */
-const SEARCH_TYPES_EXACT_ONLY: DropdownOption<FilterRowSearchType>[] = [
-  {
-    label: <CommonMessage id="filterExactMatch" />,
-    value: "EXACT_MATCH"
-  }
-];

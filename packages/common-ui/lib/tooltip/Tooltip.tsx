@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
-import ReactTooltip from "react-tooltip";
+import RcTooltip from "rc-tooltip";
 
 export interface TooltipProps {
   /** The ID of the message to show in the tooltip. */
@@ -16,14 +16,25 @@ export interface TooltipProps {
 export function Tooltip({ id, visibleElement }: TooltipProps) {
   return (
     <span className="m-2">
-      <span data-tip={true} data-for={id}>
-        {visibleElement ?? <img src="/static/images/iconInformation.gif" />}
-      </span>
-      <ReactTooltip id={id}>
-        <div style={{ maxWidth: "15rem" }}>
-          <FormattedMessage id={id} />
-        </div>
-      </ReactTooltip>
+      <RcTooltip
+        id={id}
+        overlay={
+          <div style={{ maxWidth: "15rem" }}>
+            <FormattedMessage id={id} />
+          </div>
+        }
+        placement="top"
+      >
+        <span>
+          {visibleElement ?? (
+            <img
+              src="/static/images/iconInformation.gif"
+              alt=""
+              aria-describedby={id}
+            />
+          )}
+        </span>
+      </RcTooltip>
     </span>
   );
 }

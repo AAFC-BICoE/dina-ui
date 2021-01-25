@@ -7,7 +7,6 @@ the API request.
 Example usage for filtering PcrPrimers in a list page:
 [source,tsx]
 ----
-import { Form, Formik } from "formik";
 import { FilterParam } from "kitsu";
 import { useState } from "react";
 import { FilterBuilderField } from "../components/filter-builder/FilterBuilderField";
@@ -15,11 +14,12 @@ import { rsql } from "../components/filter-builder/rsql";
 import Head from "../components/head";
 import Nav from "../components/nav";
 import { QueryTable } from "../components/table/QueryTable";
+import { DinaForm, DinaFormOnSubmit } from "../components/formik-connected/DinaForm";
 
 export default function ExamplePage() {
   const [filter, setFilter] = useState<FilterParam>();
 
-  function onSubmit({ filter }) {
+  const onSubmit: DinaFormOnSubmit = ({ submittedvalues:  { filter } }) => {
     setFilter({ rsql: rsql(filter) });
   }
 
@@ -28,15 +28,13 @@ export default function ExamplePage() {
       <Head />
       <Nav />
       <div className="container-fluid">
-        <Formik initialValues={{}} onSubmit={onSubmit}>
-          <Form translate={undefined}>
-            <FilterBuilderField
-              filterAttributes={["name", "group.groupName"]}
-              name="filter"
-            />
-            <button type="submit">search</button>
-          </Form>
-        </Formik>
+        <DinaForm initialValues={{}} onSubmit={onSubmit}>
+          <FilterBuilderField
+            filterAttributes={["name", "group.groupName"]}
+            name="filter"
+          />
+          <button type="submit">search</button>
+        </DinaForm>
         <QueryTable
           columns={["name", "type", "group.groupName"]}
           filter={filter}

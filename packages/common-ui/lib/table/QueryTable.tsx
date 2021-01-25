@@ -3,7 +3,6 @@ import { isPlainObject } from "lodash";
 import React, { useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import ReactTable, { Column, SortingRule, TableProps } from "react-table";
-import titleCase from "title-case";
 import {
   ClientSideJoinSpec,
   JsonApiQuerySpec,
@@ -12,6 +11,7 @@ import {
   useQuery
 } from "..";
 import { QueryState } from "../api-client/useQuery";
+import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
 
@@ -50,8 +50,15 @@ export interface QueryTableProps<TData extends KitsuResource> {
   /** Overrides the inner loading state if set to true. */
   loading?: boolean;
 
+  /** Omits the paging section of the query string for endpoints that don't support paging. */
+  omitPaging?: boolean;
+
   /** Query success callback. */
   onSuccess?: (response: KitsuResponse<TData[], MetaWithTotal>) => void;
+
+  onPageSizeChange?: (newSize: number) => void;
+
+  onSortedChange?: (newSort: SortingRule[]) => void;
 
   /**
    * Override internal react-table props.
@@ -101,7 +108,10 @@ export function QueryTable<TData extends KitsuResource>({
   include,
   joinSpecs,
   loading: loadingProp,
+  omitPaging,
   onSuccess,
+  onPageSizeChange,
+  onSortedChange,
   path,
   reactTableProps
 }: QueryTableProps<TData>) {
@@ -146,7 +156,14 @@ export function QueryTable<TData extends KitsuResource>({
     sortingRules.map(({ desc, id }) => `${desc ? "-" : ""}${id}`).join() ||
     undefined;
 
-  const query: JsonApiQuerySpec = { path, fields, filter, include, page, sort };
+  const query: JsonApiQuerySpec = {
+    path,
+    fields,
+    filter,
+    include,
+    ...(!omitPaging && { page }),
+    sort
+  };
 
   const mappedColumns = columns.map<Column>(column => {
     // The "columns" prop can be a string or a react-table Column type.
@@ -161,13 +178,7 @@ export function QueryTable<TData extends KitsuResource>({
             fieldName: String(column.accessor)
           };
 
-    const messageKey = `field_${fieldName}`;
-
-    const Header =
-      customHeader ??
-      (messages[messageKey]
-        ? formatMessage({ id: messageKey as any })
-        : titleCase(fieldName));
+    const Header = customHeader ?? <FieldHeader name={fieldName} />;
 
     return {
       Header,
@@ -197,19 +208,23 @@ export function QueryTable<TData extends KitsuResource>({
   return (
     <div className="query-table-wrapper" ref={divWrapperRef}>
       <style>{queryTableStyle}</style>
-      <span>
-        <CommonMessage id="tableTotalCount" values={{ totalCount }} />
-      </span>
-      <span className="mx-3">
-        <Tooltip
-          id="queryTableMultiSortExplanation"
-          visibleElement={
-            <a href="#">
-              <CommonMessage id="queryTableMultiSortTooltipTitle" />
-            </a>
-          }
-        />
-      </span>
+      {!omitPaging && (
+        <span>
+          <CommonMessage id="tableTotalCount" values={{ totalCount }} />
+        </span>
+      )}
+      {resolvedReactTableProps?.sortable !== false && (
+        <span className="mx-3">
+          <Tooltip
+            id="queryTableMultiSortExplanation"
+            visibleElement={
+              <a href="#" aria-describedby="queryTableMultiSortExplanation">
+                <CommonMessage id="queryTableMultiSortTooltipTitle" />
+              </a>
+            }
+          />
+        </span>
+      )}
       {error && (
         <div
           className="alert alert-danger"
@@ -242,10 +257,14 @@ export function QueryTable<TData extends KitsuResource>({
         showPaginationTop={true}
         noDataText={<CommonMessage id="noRowsFound" />}
         ofText={<CommonMessage id="of" />}
+        onPageSizeChange={onPageSizeChange}
+        onSortedChange={onSortedChange}
         rowsText={formatMessage({ id: "rows" })}
         previousText={<CommonMessage id="previous" />}
         nextText={<CommonMessage id="next" />}
+        showPagination={!omitPaging}
         {...resolvedReactTableProps}
+        pageText={<CommonMessage id="page" />}
       />
     </div>
   );

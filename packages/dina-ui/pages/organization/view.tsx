@@ -1,13 +1,12 @@
 import {
   ButtonBar,
   CancelButton,
+  DinaForm,
   EditButton,
   FieldView,
   LoadingSpinner,
   Query
 } from "common-ui";
-import { Formik } from "formik";
-import { noop } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
@@ -49,36 +48,31 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
               organization.names[1]?.name;
           }
           return (
-            <div className="container-fluid">
+            <main className="container-fluid">
               <h1>
                 <DinaMessage id="organizationViewTitle" />
               </h1>
               <LoadingSpinner loading={loading} />
               {organization && (
-                <Formik<Organization>
-                  initialValues={organization}
-                  onSubmit={noop}
-                >
-                  <div>
-                    <div className="row">
-                      <FieldView
-                        className="col-md-2"
-                        name="name.EN"
-                        label={formatMessage("organizationEnglishNameLabel")}
-                      />
-                      <FieldView
-                        className="col-md-2"
-                        name="name.FR"
-                        label={formatMessage("organizationFrenchNameLabel")}
-                      />
-                      <FieldView className="col-md-3" name="aliases" />
-                      <FieldView className="col-md-2" name="createdBy" />
-                      <FieldView className="col-md-2" name="createdOn" />
-                    </div>
+                <DinaForm<Organization> initialValues={organization}>
+                  <div className="row">
+                    <FieldView
+                      className="col-md-2"
+                      name="name.EN"
+                      label={formatMessage("organizationEnglishNameLabel")}
+                    />
+                    <FieldView
+                      className="col-md-2"
+                      name="name.FR"
+                      label={formatMessage("organizationFrenchNameLabel")}
+                    />
+                    <FieldView className="col-md-3" name="aliases" />
+                    <FieldView className="col-md-2" name="createdBy" />
+                    <FieldView className="col-md-2" name="createdOn" />
                   </div>
-                </Formik>
+                </DinaForm>
               )}
-            </div>
+            </main>
           );
         }}
       </Query>
