@@ -1,6 +1,7 @@
 import { DinaUser } from "../../../types/objectstore-api/resources/DinaUser";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import DinaUserDetailsPage from "../../../pages/dina-user/view";
+import { Person } from "../../../types/objectstore-api";
 
 /** Test dina user with all fields defined. */
 const TEST_DINAUSER: DinaUser = {
@@ -18,12 +19,34 @@ const mockGet = jest.fn(async () => {
   return { data: TEST_DINAUSER };
 });
 
+const mockBulkGet = jest.fn(async paths => {
+  return (paths || []).map(path => {
+    if (path.startsWith("/agent-api/")) {
+      return TEST_AGENT;
+    }
+  });
+});
+
+const TEST_AGENT: Person = {
+  displayName: "person a",
+  email: "testperson@a.b",
+  id: "1",
+  type: "person",
+  uuid: "323423-23423-234"
+};
+
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);
 
+// Pretend we are at the page for index set id#100
+jest.mock("next/router", () => ({
+  useRouter: () => ({ query: { id: "1" } })
+}));
+
 // Mock API requests:
 const apiContext: any = {
-  apiClient: { get: mockGet }
+  apiClient: { get: mockGet },
+  bulkGet: mockBulkGet
 };
 
 describe("Dina user who am i page", () => {
