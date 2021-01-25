@@ -78,9 +78,11 @@ export function Nav() {
             <li className="list-inline-item my-auto">
               <NavAgentsDropdown />
             </li>
-            <li className="list-inline-item my-auto d-none">
-              <NavDinaUserDropdown />
-            </li>
+            {showUsersLinks && (
+              <li className="list-inline-item my-auto">
+                <NavDinaUserDropdown />
+              </li>
+            )}
             <li className="list-inline-item my-auto">
               <NavSeqDBDropdown />
             </li>
@@ -157,18 +159,20 @@ function NavAgentsDropdown() {
 
 /** Dina User links. */
 function NavDinaUserDropdown() {
+  const { subject } = useAccount();
+
   return (
     <div className="dropdown">
       <a className="nav-link dropdown-toggle" href="#">
         <DinaMessage id="dinaUserSectionTitle" />
       </a>
       <div className="dropdown-menu m-0">
-        <Link href="/user/list">
+        <Link href="/dina-user/list">
           <a className="dropdown-item">
             <DinaMessage id="userListTitle" />
           </a>
         </Link>
-        <Link href="/dina-user/view">
+        <Link href={`/dina-user/view?id=${subject}`}>
           <a className="dropdown-item">
             <DinaMessage id="whoAmITitle" />
           </a>

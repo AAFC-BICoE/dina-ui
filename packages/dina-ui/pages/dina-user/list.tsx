@@ -1,18 +1,25 @@
-import {
-  ButtonBar,
-  CreateButton,
-  dateCell,
-  ListPageLayout,
-  stringArrayCell
-} from "common-ui";
+import { dateCell, ListPageLayout, stringArrayCell } from "common-ui";
+import Link from "next/link";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 const USER_TABLE_COLUMNS = [
-  "username",
+  {
+    Cell: ({ original: { id, username } }) => (
+      <Link href={`/dina-user/view?id=${id}`}>{username}</Link>
+    ),
+    accessor: "username"
+  },
   "firstName",
   "lastName",
-  "emailAddress",
+  {
+    Cell: ({ original: { agent } }) =>
+      agent?.id ? (
+        <Link href={`/person/view?id=${agent.id}`}>{agent.displayName}</Link>
+      ) : null,
+    accessor: "agent.displayName",
+    sortable: false
+  },
   { ...stringArrayCell("groups"), sortable: false },
   { ...stringArrayCell("roles"), sortable: false },
   dateCell("createdOn")
@@ -33,7 +40,15 @@ export default function AgentListPage() {
           id="user-list"
           queryTableProps={{
             columns: USER_TABLE_COLUMNS,
-            path: "user-api/user"
+            path: "user-api/user",
+            joinSpecs: [
+              {
+                apiBaseUrl: "/agent-api",
+                idField: "agentId",
+                joinField: "agent",
+                path: user => `person/${user.agentId}`
+              }
+            ]
           }}
         />
       </div>
