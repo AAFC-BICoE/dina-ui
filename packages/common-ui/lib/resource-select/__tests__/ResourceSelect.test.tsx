@@ -28,14 +28,11 @@ const mockGet = jest.fn(async (_, {}) => {
   return MOCK_TODOS;
 });
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-    }
-);
+const apiContext = {
+  apiClient: {
+    get: mockGet
+  }
+} as any;
 
 // Mock out the debounce function to avoid waiting during tests.
 jest.spyOn(lodash, "debounce").mockImplementation(fn => fn as any);
@@ -48,11 +45,7 @@ describe("ResourceSelect component", () => {
   };
 
   function mountWithContext(element: JSX.Element) {
-    return mountWithAppContext(
-      <ApiClientContext.Provider value={createContextValue()}>
-        {element}
-      </ApiClientContext.Provider>
-    );
+    return mountWithAppContext(element, { apiContext });
   }
 
   beforeEach(() => {
