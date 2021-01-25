@@ -50,6 +50,7 @@ export default function CollectingEventListPage() {
                   name="group"
                   showAnyOption={true}
                   showAllGroups={true}
+                  showDefaultValue={true}
                 />
               </div>
             </div>
