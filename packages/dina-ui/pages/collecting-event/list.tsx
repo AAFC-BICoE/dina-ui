@@ -12,8 +12,8 @@ const COLLECTING_EVENT_TABLE_COLUMNS = [
     accessor: "createdBy",
     sortable: false
   },
-  dateCell("startEventDateTime"),
-  dateCell("endEventDateTime"),
+  "startEventDateTime",
+  "endEventDateTime",
   "verbatimEventDateTime",
   dateCell("createdOn")
 ];
