@@ -59,7 +59,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_originalFilename: "Nom du fichier original",
   field_type: "Catégorie",
   field_xmpMetadataDate: "Date d'application des métadonnées",
-  field_xmpRightsWebStatement: "Déclaration sur les droits de réutilisation",
+  field_xmpRightsWebStatement: "Licence",
   footerContactInfo: "Coordonnées du contact ",
   footerPrivacy: "Protection de la vie privée",
   footerTermsAndConditions: "Modalités ",
