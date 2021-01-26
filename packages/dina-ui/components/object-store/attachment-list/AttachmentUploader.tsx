@@ -1,6 +1,7 @@
-import { DinaForm, SelectField, useGroupSelectOptions } from "common-ui";
+import { DinaForm } from "common-ui";
 import { FileUploader, FileUploaderOnSubmitArgs } from "..";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { GroupSelectField } from "../../group-select/GroupSelectField";
 import { useFileUpload } from "../file-upload/FileUploadProvider";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
 
@@ -17,7 +18,6 @@ export function AttachmentUploader({
 }: AttachmentUploaderProps) {
   const { formatMessage } = useDinaIntl();
   const { uploadFiles } = useFileUpload();
-  const groupSelectOptions = useGroupSelectOptions();
   const { openMetadataEditorModal } = useBulkMetadataEditModal();
 
   const acceptedFileTypes = "image/*,audio/*,video/*,.pdf,.doc,.docx,.png";
@@ -46,11 +46,7 @@ export function AttachmentUploader({
   return (
     <DinaForm<AttachmentUploadForm> initialValues={{}}>
       <div className="row">
-        <SelectField
-          className="col-md-3"
-          name="group"
-          options={groupSelectOptions}
-        />
+        <GroupSelectField className="col-md-3" name="group" />
       </div>
       <div>
         <FileUploader

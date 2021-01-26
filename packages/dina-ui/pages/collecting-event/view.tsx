@@ -14,7 +14,7 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
 import { useContext, useState } from "react";
-import { Footer, Head, Nav } from "../../components";
+import { Footer, GroupFieldView, Head, Nav } from "../../components";
 import { AttachmentList } from "../../components/object-store/attachment-list/AttachmentList";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
@@ -89,7 +89,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                   <div>
                     <div className="form-group">
                       <div className="row">
-                        <FieldView
+                        <GroupFieldView
                           className="col-md-2"
                           name="group"
                           label={formatMessage("field_group")}

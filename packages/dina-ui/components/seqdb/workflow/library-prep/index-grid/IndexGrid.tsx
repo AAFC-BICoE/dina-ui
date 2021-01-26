@@ -3,8 +3,7 @@ import {
   filterBy,
   LoadingSpinner,
   ResourceSelectField,
-  SubmitButton,
-  useCacheableQueryLoader
+  SubmitButton
 } from "common-ui";
 import ReactTable, { Column } from "react-table";
 import {
@@ -22,7 +21,6 @@ export function IndexGrid(props: IndexGridProps) {
   const { libraryPrepBatch } = props;
 
   const { containerType, indexSet } = libraryPrepBatch;
-  const resourceSelectLoader = useCacheableQueryLoader();
 
   const {
     libraryPrepsLoading,
@@ -66,7 +64,6 @@ export function IndexGrid(props: IndexGridProps) {
             <div style={{ padding: "7px 5px" }}>
               <span>{String.fromCharCode(index + 65)}</span>
               <ResourceSelectField<NgsIndex>
-                customDataFetch={resourceSelectLoader}
                 hideLabel={true}
                 filter={filterBy(["name"])}
                 name={`indexI5s[${rowLetter}]`}
@@ -116,7 +113,6 @@ export function IndexGrid(props: IndexGridProps) {
             <>
               {columnLabel}
               <ResourceSelectField<NgsIndex>
-                customDataFetch={resourceSelectLoader}
                 hideLabel={true}
                 filter={filterBy(["name"])}
                 name={`indexI7s[${columnLabel}]`}
