@@ -10,11 +10,11 @@ import {
   SelectField,
   SubmitButton,
   TextField,
-  useGroupSelectOptions
+  useAccount
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Product } from "../../../types/seqdb-api/resources/Product";
 import {
@@ -68,10 +68,10 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
 }
 
 function ProtocolForm({ protocol, router }: ProtocolFormProps) {
-  const groupSelectOptions = useGroupSelectOptions();
+  const { groupNames } = useAccount();
 
   const { id } = router.query;
-  const initialValues = protocol || { group: groupSelectOptions[0].value };
+  const initialValues = protocol || { group: groupNames?.[0] };
 
   const onSubmit: DinaFormOnSubmit = async ({
     api: { save },
@@ -104,12 +104,7 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
       </ButtonBar>
       <div>
         <div className="row">
-          <SelectField
-            className="col-md-2"
-            disabled={true}
-            name="group"
-            options={groupSelectOptions}
-          />
+          <GroupSelectField className="col-md-2" name="group" />
         </div>
         <div className="row">
           <SelectField

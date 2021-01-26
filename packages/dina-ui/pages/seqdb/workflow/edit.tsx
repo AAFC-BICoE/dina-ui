@@ -5,14 +5,13 @@ import {
   LoadingSpinner,
   Query,
   ResourceSelectField,
-  SelectField,
   SubmitButton,
   TextField,
-  useGroupSelectOptions
+  useAccount
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Chain, ChainTemplate } from "../../../types/seqdb-api";
 
@@ -65,9 +64,9 @@ export function ChainEditPage({ router }: WithRouterProps) {
 }
 
 function ChainForm({ chain, router }: ChainFormProps) {
-  const groupSelectOptions = useGroupSelectOptions();
+  const { groupNames } = useAccount();
 
-  const initialValues = chain || { group: groupSelectOptions[0].value };
+  const initialValues = chain || { group: groupNames?.[0] };
 
   const onSubmit: DinaFormOnSubmit = async ({
     api: { save },
@@ -92,12 +91,7 @@ function ChainForm({ chain, router }: ChainFormProps) {
       <div className="container-fluid">
         <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
           <div className="row">
-            <SelectField
-              className="col-md-3"
-              disabled={true}
-              name="group"
-              options={groupSelectOptions}
-            />
+            <GroupSelectField className="col-md-3" name="group" />
           </div>
           <div className="row">
             <ResourceSelectField<ChainTemplate>

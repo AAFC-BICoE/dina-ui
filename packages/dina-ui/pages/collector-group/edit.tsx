@@ -11,11 +11,11 @@ import {
 } from "common-ui";
 import { ResourceSelectField } from "common-ui/lib";
 import { NextRouter, useRouter } from "next/router";
+import { CollectorGroup } from "../../types/collection-api/resources/CollectorGroup";
 import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
 import { useContext } from "react";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
 
 interface CollectorGroupFormProps {
   collectorGroup?: CollectorGroup;

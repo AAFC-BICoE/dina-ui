@@ -1,9 +1,9 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { FormikProps } from "formik";
 import { FilterParam, KitsuResource } from "kitsu";
-import { Fragment, ReactNode, useEffect } from "react";
+import { Fragment } from "react";
 import { SortingRule } from "react-table";
-import { QueryTable, QueryTableProps, FilterAttribute } from "..";
+import { FilterAttribute, QueryTable, QueryTableProps } from "..";
 import { rsql } from "../filter-builder/rsql";
 import { FilterForm } from "./FilterForm";
 
@@ -59,10 +59,9 @@ export function ListPageLayout<TData extends KitsuResource>({
     setImmediate(() => setFilterForm({}));
   }
 
-  const additionalFilters =
-    typeof additionalFiltersProp === "function"
-      ? additionalFiltersProp(filterForm)
-      : additionalFiltersProp;
+  const additionalFilters = (typeof additionalFiltersProp === "function"
+    ? additionalFiltersProp(filterForm)
+    : additionalFiltersProp) as Record<string, string>;
 
   // Combine the inner rsql with the passed additionalFilters?.rsql filter if they are set:
   const combinedRsql = [

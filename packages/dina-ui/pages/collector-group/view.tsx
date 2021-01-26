@@ -10,11 +10,11 @@ import {
 import { KitsuResponse } from "kitsu";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
+import { CollectorGroup } from "packages/dina-ui/types/collection-api/resources/CollectorGroup";
 import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
 import { useContext, useState } from "react";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
 
 export function CollectorGroupDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
