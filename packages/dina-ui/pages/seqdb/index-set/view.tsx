@@ -8,7 +8,7 @@ import {
   useQuery
 } from "common-ui";
 import { useRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { GroupFieldView, Head, Nav } from "../../../components";
 import { IndexSet } from "../../../types/seqdb-api";
 
 export default function IndexSetViewPage() {
@@ -36,7 +36,7 @@ export default function IndexSetViewPage() {
           <main className="container-fluid">
             <h1>Index Set Details</h1>
             <div className="row">
-              <FieldView className="col-md-2" name="group" />
+              <GroupFieldView className="col-md-2" name="group" />
             </div>
             <div className="row">
               <FieldView className="col-md-2" name="name" />

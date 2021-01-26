@@ -63,17 +63,15 @@ declare module "kitsu" {
   }
 
   /** Parameter for filtering listed data. */
-  export interface FilterParam {
-    [key: string]: string;
-  }
+  export type FilterParam = string | Record<string, string>;
 
   /** The response from a Kitsu GET request. */
   export interface KitsuResponse<
     TData extends KitsuResponseData,
     TMeta = undefined
   > {
-    data: TData extends Array<infer R>
-      ? Array<PersistedResource<R>>
+    data: TData extends ?(infer R)[]
+      ? PersistedResource<R>[]
       : PersistedResource<TData>;
     meta: TMeta;
   }

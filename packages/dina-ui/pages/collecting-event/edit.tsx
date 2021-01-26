@@ -11,8 +11,7 @@ import {
   ResourceSelectField,
   SelectField,
   SubmitButton,
-  TextField,
-  useGroupSelectOptions
+  TextField
 } from "common-ui";
 import { useFormikContext } from "formik";
 import { KitsuResponse } from "kitsu";
@@ -20,10 +19,10 @@ import { NextRouter, useRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
 import { useContext, useState } from "react";
 import Switch from "react-switch";
-import { Head, Nav } from "../../components";
+import { GroupSelectField, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
-import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
+import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
+import { CollectorGroup } from "../../types/collection-api/resources/CollectorGroup";
 
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
@@ -100,16 +99,12 @@ export default function CollectingEventEditPage() {
 function CollectingEventFormInternal() {
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
-  const groupSelectOptions = [
-    { label: "<any>", value: undefined },
-    ...useGroupSelectOptions()
-  ];
 
   return (
     <div>
       <div className="form-group">
         <div style={{ width: "300px" }}>
-          <SelectField name="group" options={groupSelectOptions} />
+          <GroupSelectField name="group" showAnyOption={true} />
         </div>
       </div>
       <div className="row">

@@ -68,7 +68,7 @@ describe("PcrProfile edit page", () => {
             path: "thermocyclerprofile",
             value: {
               attributes: {
-                group: "/aafc",
+                group: "aafc",
                 name: "New PcrProfile"
               },
               id: "00000000-0000-0000-0000-000000000000",
@@ -172,7 +172,7 @@ describe("PcrProfile edit page", () => {
             value: {
               attributes: expect.objectContaining({
                 application: "new app value",
-                group: "/aafc",
+                group: "aafc",
                 name: "PROF1"
               }),
               id: "1",
@@ -199,7 +199,7 @@ describe("PcrProfile edit page", () => {
 const TEST_PROFILE: Required<PcrProfile> = {
   application: "PCR of ITS regions",
   cycles: "cycles",
-  group: "/aafc",
+  group: "aafc",
   id: "1",
   lastModified: "2013-03-19T04:00:00.000+0000",
   name: "PROF1",

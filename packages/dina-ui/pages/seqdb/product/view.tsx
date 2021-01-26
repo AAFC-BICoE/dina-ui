@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { GroupFieldView, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Product } from "../../../types/seqdb-api/resources/Product";
 
@@ -36,7 +36,7 @@ export function ProductDetailsPage({ router }: WithRouterProps) {
               <DinaForm<Product> initialValues={response.data}>
                 <div>
                   <div className="row">
-                    <FieldView className="col-md-2" name="group" />
+                    <GroupFieldView className="col-md-2" name="group" />
                   </div>
                   <div className="row">
                     <FieldView className="col-md-2" name="name" />
