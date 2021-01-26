@@ -37,7 +37,8 @@
     "react-number-format": "^4.4.1",
     "react-select": "^3.1.0",
     "react-table": "^6.11.5",
-    "title-case": "2.1.1"
+    "title-case": "2.1.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.119",

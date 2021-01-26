@@ -1,12 +1,7 @@
 import { KitsuResource } from "kitsu";
 import lodash from "lodash";
 import Select from "react-select/base";
-import {
-  ApiClientContext,
-  createContextValue,
-  ResourceSelect,
-  ResourceSelectProps
-} from "../..";
+import { ResourceSelect, ResourceSelectProps } from "../..";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 
 /** Example */
