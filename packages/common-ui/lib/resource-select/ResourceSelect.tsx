@@ -6,6 +6,7 @@ import {
 } from "kitsu";
 import { debounce, isUndefined, omitBy } from "lodash";
 import React, { useContext } from "react";
+import { useIntl } from "react-intl";
 import AsyncSelect from "react-select/async";
 import { Styles } from "react-select/src/styles";
 import { OptionsType } from "react-select/src/types";
@@ -59,6 +60,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   value
 }: ResourceSelectProps<TData>) {
   const { apiClient } = useContext(ApiClientContext);
+  const { formatMessage } = useIntl();
 
   async function loadOptions(
     inputValue: string,
@@ -140,7 +142,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       isMulti={isMulti}
       loadOptions={debouncedOptionLoader}
       onChange={onChangeInternal}
-      placeholder="Type here to search."
+      placeholder={formatMessage({ id: "typeHereToSearch" })}
       styles={styles}
       value={selectValue}
     />
