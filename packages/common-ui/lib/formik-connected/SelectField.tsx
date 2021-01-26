@@ -18,6 +18,7 @@ export interface SelectFieldProps<T = string> extends LabelWrapperParams {
   onChange?: (value?: T | T[] | null) => void;
   options: SelectOption<T>[];
   styles?: Partial<Styles>;
+  defaultValue?: any;
 }
 
 /** Formik-connected select input. */
@@ -28,6 +29,7 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
     onChange,
     options,
     styles,
+    defaultValue,
     ...labelWrapperProps
   } = props;
   const { name } = labelWrapperProps;
@@ -36,8 +38,22 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
     <FastField name={name}>
       {({
         field: { value },
-        form: { setFieldValue, setFieldTouched }
+        form: { setFieldValue, setFieldTouched, initialValues, touched }
       }: FieldProps) => {
+        // handle when there is no localstorage, storage has null value , first time visit the form
+        // will set the defaultvalue
+        if (
+          !value &&
+          defaultValue &&
+          (!initialValues ||
+            !touched ||
+            ((!initialValues[name] || initialValues[name] === null) &&
+              !touched[name]))
+        ) {
+          setFieldValue(name, defaultValue.value);
+          setFieldTouched(name);
+          onChange?.(defaultValue.value);
+        }
         function onChangeInternal(
           change: SelectOption<T>[] | SelectOption<T> | null
         ) {
@@ -53,7 +69,6 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
           setFieldTouched(name);
           onChange?.(newValue);
         }
-
         return (
           <FieldWrapper {...labelWrapperProps}>
             <Select

@@ -21,8 +21,8 @@ import { useContext, useState } from "react";
 import Switch from "react-switch";
 import { GroupSelectField, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
-import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
+import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
+import { CollectorGroup } from "../../types/collection-api/resources/CollectorGroup";
 
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;

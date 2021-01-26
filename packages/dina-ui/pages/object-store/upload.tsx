@@ -1,11 +1,12 @@
 import { DinaForm, useAccount } from "common-ui";
 import { useRouter } from "next/router";
-import { Footer, GroupSelectField, Head, Nav } from "../../components";
+import { Footer, Head, Nav } from "../../components";
 import {
   FileUploader,
   FileUploaderOnSubmitArgs
 } from "../../components/object-store";
 import { useFileUpload } from "../../components/object-store/file-upload/FileUploadProvider";
+import { GroupSelectField } from "../../components/group-select/GroupSelectField";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface OnSubmitValues {
@@ -53,22 +54,17 @@ export default function UploadPage() {
             <DinaMessage id="userMustBelongToGroup" />
           </div>
         ) : (
-          <div>
-            <div className="alert alert-warning">
-              <DinaMessage id="forTestingPurposesOnlyMessage" />
+          <DinaForm initialValues={{ group: groupNames[0] }}>
+            <div className="row">
+              <GroupSelectField className="col-md-3" name="group" />
             </div>
-            <DinaForm initialValues={{ group: groupNames[0] }}>
-              <div className="row">
-                <GroupSelectField className="col-md-3" name="group" />
-              </div>
-              <div>
-                <FileUploader
-                  acceptedFileTypes={acceptedFileTypes}
-                  onSubmit={onSubmit}
-                />
-              </div>
-            </DinaForm>
-          </div>
+            <div>
+              <FileUploader
+                acceptedFileTypes={acceptedFileTypes}
+                onSubmit={onSubmit}
+              />
+            </div>
+          </DinaForm>
         )}
       </main>
       <Footer />

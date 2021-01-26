@@ -70,8 +70,8 @@ declare module "kitsu" {
     TData extends KitsuResponseData,
     TMeta = undefined
   > {
-    data: TData extends Array<infer R>
-      ? Array<PersistedResource<R>>
+    data: TData extends ?(infer R)[]
+      ? PersistedResource<R>[]
       : PersistedResource<TData>;
     meta: TMeta;
   }
