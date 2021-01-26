@@ -2,7 +2,6 @@ import {
   FilterParam,
   GetParams,
   KitsuResource,
-  KitsuResponse,
   PersistedResource
 } from "kitsu";
 import { debounce, isUndefined, omitBy } from "lodash";
@@ -42,14 +41,6 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   /** react-select styles prop. */
   styles?: Partial<Styles>;
-
-  /** Optional query loader function for custom API request behavior (Useful for caching). */
-  customDataFetch?: (
-    path: string,
-    params: GetParams
-  ) => Promise<KitsuResponse<TData[], any>>;
-
-  defaultValue?: any;
 }
 
 /** An option the user can select to set the relationship to null. */
@@ -65,8 +56,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   optionLabel,
   sort,
   styles,
-  value,
-  defaultValue
+  value
 }: ResourceSelectProps<TData>) {
   const { apiClient } = useContext(ApiClientContext);
 
@@ -153,7 +143,6 @@ export function ResourceSelect<TData extends KitsuResource>({
       placeholder="Type here to search."
       styles={styles}
       value={selectValue}
-      defaultValue={defaultValue}
     />
   );
 }

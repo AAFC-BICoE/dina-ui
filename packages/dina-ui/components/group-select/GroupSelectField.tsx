@@ -7,10 +7,14 @@ import {
 } from "common-ui";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
-import { useState } from "react";
 
 interface GroupSelectFieldProps extends Omit<SelectFieldProps, "options"> {
   showAnyOption?: boolean;
+
+  /**
+   * Show all groups, even those the user doesn't belong to.
+   * The default (false) is to only show the groups the user belongs to.
+   */
   showAllGroups?: boolean;
   showDefaultValue?: boolean;
 }
@@ -25,7 +29,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
 
   const { locale } = useDinaIntl();
   const { groupNames: myGroupNames } = useAccount();
-  let defaultValue;
+  let defaultValue: SelectOption<string> | undefined;
 
   const { response } = useQuery<Group[]>({
     path: "user-api/group",
@@ -33,10 +37,12 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
     filter: !showAllGroups ? JSON.stringify({ name: myGroupNames }) : undefined
   });
 
-  const groupOptions = response?.data?.map(group => ({
-    label: group.labels[locale] ?? group.name,
-    value: group.name
-  }));
+  const groupOptions: SelectOption<string>[] | undefined = response?.data?.map(
+    group => ({
+      label: group.labels[locale] ?? group.name,
+      value: group.name
+    })
+  );
 
   const groupSelectOptions: {
     label: string;
