@@ -76,9 +76,12 @@ export function DinaUserForm({ dinaUser, router }: DinaUserFormProps) {
     // Only the agentId is editable:
     const updatedUser = {
       id: submittedValues.id,
-      type: submittedValues.type,
-      agentId: submittedValues.agent?.id
-    };
+      type: submittedValues.type
+    } as DinaUser;
+
+    if (submittedValues.agent?.id !== undefined) {
+      updatedUser.agentId = submittedValues.agent.id;
+    }
 
     await save(
       [
