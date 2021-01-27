@@ -24,6 +24,7 @@ import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
 import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
+import Cleave from "cleave.js/react";
 
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
@@ -129,6 +130,10 @@ function CollectingEventFormInternal() {
     ...useGroupSelectOptions()
   ];
 
+  const onKeyDown = e => {
+    // console.log("e.value " + e.target.value);
+  };
+
   return (
     <div>
       <div className="form-group">
@@ -147,10 +152,22 @@ function CollectingEventFormInternal() {
         </label>
         <TextField
           className="col-md-3 startEventDateTime"
-          name="startEventDateTime"
+          name="startEventDateTime1"
           label={formatMessage("startEventDateTimeLabel")}
           placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
         />
+
+        <Cleave
+          element=".startEventDateTime"
+          options={{
+            numericOnly: true,
+            blocks: [4, 2, 2, 2, 2, 2, 3],
+            delimiters: ["-", "-", "T", ":", ":", ":"],
+            delimiterLazyShow: true
+          }}
+          onChange={e => onKeyDown(e)}
+        />
+
         {checked && (
           <TextField
             className="col-md-3"
@@ -214,7 +231,9 @@ function CollectingEventForm({
     api: { save }
   }) => {
     if (!submittedValues.startEventDateTime) {
-      throw new Error(formatMessage("field_collectingEvent_startDateTimeError"));
+      throw new Error(
+        formatMessage("field_collectingEvent_startDateTimeError")
+      );
     }
     const matcher = /([^\d]+)/g;
     const startDateTime = submittedValues.startEventDateTime.replace(
@@ -223,12 +242,16 @@ function CollectingEventForm({
     );
     const datePrecision = [4, 6, 8, 12, 14, 17];
     if (!datePrecision.includes(startDateTime.length)) {
-      throw new Error(formatMessage("field_collectingEvent_startDateTimeError"));
+      throw new Error(
+        formatMessage("field_collectingEvent_startDateTimeError")
+      );
     }
     if (submittedValues.endEventDateTime) {
       const endDateTime = submittedValues.endEventDateTime.replace(matcher, "");
       if (!datePrecision.includes(endDateTime.length)) {
-        throw new Error(formatMessage("field_collectingEvent_endDateTimeError"));
+        throw new Error(
+          formatMessage("field_collectingEvent_endDateTimeError")
+        );
       }
     }
     // handle converting to relationship manually due to crnk bug
