@@ -1,9 +1,4 @@
-import {
-  DinaForm,
-  SelectField,
-  useAccount,
-  useGroupSelectOptions
-} from "common-ui";
+import { DinaForm, useAccount } from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
 import {
@@ -11,6 +6,7 @@ import {
   FileUploaderOnSubmitArgs
 } from "../../components/object-store";
 import { useFileUpload } from "../../components/object-store/file-upload/FileUploadProvider";
+import { GroupSelectField } from "../../components/group-select/GroupSelectField";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface OnSubmitValues {
@@ -20,8 +16,7 @@ export interface OnSubmitValues {
 export default function UploadPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
-  const { initialized: accountInitialized } = useAccount();
-  const groupSelectOptions = useGroupSelectOptions();
+  const { initialized: accountInitialized, groupNames } = useAccount();
   const { uploadFiles } = useFileUpload();
 
   const acceptedFileTypes = "image/*,audio/*,video/*,.pdf,.doc,.docx,.png";
@@ -54,31 +49,22 @@ export default function UploadPage() {
         <h1>
           <DinaMessage id="uploadPageTitle" />
         </h1>
-        {!accountInitialized || !groupSelectOptions?.length ? (
+        {!accountInitialized || !groupNames?.length ? (
           <div className="alert alert-warning no-group-alert">
             <DinaMessage id="userMustBelongToGroup" />
           </div>
         ) : (
-          <div>
-            <div className="alert alert-warning">
-              <DinaMessage id="forTestingPurposesOnlyMessage" />
+          <DinaForm initialValues={{ group: groupNames[0] }}>
+            <div className="row">
+              <GroupSelectField className="col-md-3" name="group" />
             </div>
-            <DinaForm initialValues={{ group: groupSelectOptions[0].value }}>
-              <div className="row">
-                <SelectField
-                  className="col-md-3"
-                  name="group"
-                  options={groupSelectOptions}
-                />
-              </div>
-              <div>
-                <FileUploader
-                  acceptedFileTypes={acceptedFileTypes}
-                  onSubmit={onSubmit}
-                />
-              </div>
-            </DinaForm>
-          </div>
+            <div>
+              <FileUploader
+                acceptedFileTypes={acceptedFileTypes}
+                onSubmit={onSubmit}
+              />
+            </div>
+          </DinaForm>
         )}
       </main>
       <Footer />

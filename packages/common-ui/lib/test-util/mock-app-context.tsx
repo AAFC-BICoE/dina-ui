@@ -57,7 +57,7 @@ export function mountWithAppContext(
 
 const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = {
   authenticated: true,
-  groupNames: ["/aafc", "cnc"],
+  groupNames: ["aafc", "cnc"],
   initialized: true,
   login: noop,
   logout: noop,

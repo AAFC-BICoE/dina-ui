@@ -11,8 +11,7 @@ import {
   ResourceSelectField,
   SelectField,
   SubmitButton,
-  TextField,
-  useGroupSelectOptions
+  TextField
 } from "common-ui";
 import { useFormikContext } from "formik";
 import { KitsuResponse } from "kitsu";
@@ -20,10 +19,10 @@ import { NextRouter, useRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
 import { useContext, useState } from "react";
 import Switch from "react-switch";
-import { Head, Nav } from "../../components";
+import { GroupSelectField, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { CollectingEvent } from "../../types/objectstore-api/resources/CollectingEvent";
-import { CollectorGroup } from "../../types/objectstore-api/resources/CollectorGroup";
+import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
+import { CollectorGroup } from "../../types/collection-api/resources/CollectorGroup";
 
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
@@ -98,53 +97,17 @@ export default function CollectingEventEditPage() {
 }
 
 function CollectingEventFormInternal() {
-  const { apiClient, bulkGet } = useContext(ApiClientContext);
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
-  const [useCollectorGroup, setUseCollectorGroup] = useState(false);
-  const formikCtx = useFormikContext<CollectingEvent>();
-
-  const populateCollectorList = async event => {
-    if (!event || !event.id) return;
-    // get collectors belong to the collector group this collecting event related to
-    const collectorGroup = await apiClient.get<CollectorGroup>(
-      `collection-api/collector-group/${event.id}?include=agentIdentifiers`,
-      {}
-    );
-    const collectorids = collectorGroup?.data?.agentIdentifiers?.map(
-      agentRel => agentRel.id
-    );
-    if (collectorids) {
-      // Get the agents from the selected group:
-      const collectors = (await bulkGet(
-        collectorids.map(collId => `person/${collId}`),
-        { apiBaseUrl: "/agent-api" }
-      )) as Person[];
-      formikCtx.setFieldValue("collectors", collectors);
-    }
-  };
-
-  const groupSelectOptions = [
-    { label: "<any>", value: undefined },
-    ...useGroupSelectOptions()
-  ];
 
   return (
     <div>
       <div className="form-group">
         <div style={{ width: "300px" }}>
-          <SelectField name="group" options={groupSelectOptions} />
+          <GroupSelectField name="group" showAnyOption={true} />
         </div>
       </div>
       <div className="row">
-        <label style={{ marginLeft: 15, marginTop: 25 }}>
-          <span>{formatMessage("enableDateRangeLabel")}</span>
-          <Switch
-            onChange={e => setChecked(e)}
-            checked={checked}
-            className="react-switch dateRange"
-          />
-        </label>
         <TextField
           className="col-md-3 startEventDateTime"
           name="startEventDateTime"
@@ -166,14 +129,16 @@ function CollectingEventFormInternal() {
         />
       </div>
       <div className="row">
-        <label style={{ marginLeft: 15, marginTop: 25 }}>
-          <span>{formatMessage("useCollectorGroupLabel")}</span>
+        <label style={{ marginLeft: 15, marginTop: -15 }}>
+          <span>{formatMessage("enableDateRangeLabel")}</span>
           <Switch
-            onChange={e => setUseCollectorGroup(e)}
-            checked={useCollectorGroup}
-            className="react-switch"
+            onChange={e => setChecked(e)}
+            checked={checked}
+            className="react-switch dateRange"
           />
         </label>
+      </div>
+      <div className="row">
         <ResourceSelectField<Person>
           name="collectors"
           filter={filterBy(["displayName"])}
@@ -182,17 +147,6 @@ function CollectingEventFormInternal() {
           optionLabel={person => person.displayName}
           isMulti={true}
         />
-        {useCollectorGroup && (
-          <ResourceSelectField<CollectorGroup>
-            name="collectorGroups"
-            filter={filterBy(["name"])}
-            model="collection-api/collector-group"
-            optionLabel={group => group.name}
-            onChange={event => populateCollectorList(event)}
-            className="col-md-3"
-            label={formatMessage("selectCollectorGroupLabel")}
-          />
-        )}
       </div>
     </div>
   );

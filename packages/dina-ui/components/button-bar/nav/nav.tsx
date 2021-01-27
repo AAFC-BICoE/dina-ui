@@ -243,11 +243,13 @@ function NavCollectionDropdown() {
             <DinaMessage id="collectingEventListTitle" />
           </a>
         </Link>
-        <Link href="/collector-group/list">
-          <a className="dropdown-item">
-            <DinaMessage id="collectorGroupListTitle" />
-          </a>
-        </Link>
+        <div className="d-none">
+          <Link href="/collector-group/list">
+            <a className="dropdown-item">
+              <DinaMessage id="collectorGroupListTitle" />
+            </a>
+          </Link>
+        </div>
       </div>
     </div>
   );

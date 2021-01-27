@@ -5,7 +5,7 @@ import {
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { Head, Nav } from "../../../components";
+import { groupCell, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrPrimer } from "../../../types/seqdb-api/resources/PcrPrimer";
 
@@ -18,7 +18,7 @@ const PCRPRIMER_TABLE_COLUMNS: ColumnDefinition<PcrPrimer>[] = [
     ),
     accessor: "name"
   },
-  "group",
+  groupCell("group"),
   {
     Cell: ({ original: { region } }) =>
       region ? (

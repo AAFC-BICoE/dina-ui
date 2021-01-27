@@ -8,6 +8,7 @@ import {
 } from "kitsu";
 import { debounce } from "lodash";
 import { useContext } from "react";
+import { useIntl } from "react-intl";
 import { ApiClientContext, encodeResourceCell } from "..";
 import { ENCODED_RESOURCE_MATCHER } from "./encode-resource-cell";
 
@@ -20,6 +21,7 @@ interface ResourceSelectCellProps<T extends KitsuResource> {
 
 export function useResourceSelectCells() {
   const { apiClient } = useContext(ApiClientContext);
+  const { formatMessage } = useIntl();
 
   return function resourceSelectCell<T extends KitsuResource>(
     {
@@ -53,6 +55,7 @@ export function useResourceSelectCells() {
     const debouncedOptionLoader = debounce(loadOptions, 250);
 
     return {
+      placeholder: formatMessage({ id: "typeHereToSearch" }),
       source: debouncedOptionLoader as any,
       type: "dropdown",
       validator: (value, callback) =>
