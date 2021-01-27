@@ -1,5 +1,6 @@
 import {
   ApiClientContext,
+  AutoSuggestTextField,
   ButtonBar,
   CancelButton,
   DeleteButton,
@@ -9,11 +10,9 @@ import {
   LoadingSpinner,
   Query,
   ResourceSelectField,
-  SelectField,
   SubmitButton,
   TextField
 } from "common-ui";
-import { useFormikContext } from "formik";
 import { KitsuResponse } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
@@ -22,7 +21,7 @@ import Switch from "react-switch";
 import { GroupSelectField, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
-import { CollectorGroup } from "../../types/collection-api/resources/CollectorGroup";
+import { useFormikContext } from "formik";
 
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
@@ -139,6 +138,18 @@ function CollectingEventFormInternal() {
         </label>
       </div>
       <div className="row">
+        <AutoSuggestTextField<CollectingEvent>
+          className="col-md-3"
+          name="verbatimCollectors"
+          query={(searchValue, ctx) => ({
+            path: "collection-api/collecting-event",
+            filter: {
+              ...(ctx.values.group && { group: ctx.values.group }),
+              rsql: `verbatimCollectors==*${searchValue}*`
+            }
+          })}
+          suggestion={collEvent => collEvent.verbatimCollectors ?? ""}
+        />
         <ResourceSelectField<Person>
           name="collectors"
           filter={filterBy(["displayName"])}
