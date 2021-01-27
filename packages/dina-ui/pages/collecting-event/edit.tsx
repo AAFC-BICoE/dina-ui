@@ -12,6 +12,7 @@ import {
   SelectField,
   SubmitButton,
   TextField,
+  FormattedTextField,
   useGroupSelectOptions
 } from "common-ui";
 import { useFormikContext } from "formik";
@@ -130,10 +131,6 @@ function CollectingEventFormInternal() {
     ...useGroupSelectOptions()
   ];
 
-  const onKeyDown = e => {
-    // console.log("e.value " + e.target.value);
-  };
-
   return (
     <div>
       <div className="form-group">
@@ -150,26 +147,15 @@ function CollectingEventFormInternal() {
             className="react-switch dateRange"
           />
         </label>
-        <TextField
+        <FormattedTextField
+          name="startEventDateTime"
           className="col-md-3 startEventDateTime"
-          name="startEventDateTime1"
           label={formatMessage("startEventDateTimeLabel")}
           placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
         />
 
-        <Cleave
-          element=".startEventDateTime"
-          options={{
-            numericOnly: true,
-            blocks: [4, 2, 2, 2, 2, 2, 3],
-            delimiters: ["-", "-", "T", ":", ":", ":"],
-            delimiterLazyShow: true
-          }}
-          onChange={e => onKeyDown(e)}
-        />
-
         {checked && (
-          <TextField
+          <FormattedTextField
             className="col-md-3"
             name="endEventDateTime"
             label={formatMessage("endEventDateTimeLabel")}
