@@ -132,7 +132,7 @@ describe("collecting-event edit page", () => {
     );
 
     // The user should be redirected to the new collecting-event's details page.
-    expect(mockPush).lastCalledWith("/collecting-event/list");
+    expect(mockPush).lastCalledWith("/collecting-event/view?id=1");
   });
 
   it("Provides a form to edit a collecting-event.", async done => {
@@ -197,7 +197,7 @@ describe("collecting-event edit page", () => {
       );
 
       // The user should be redirected to collecting-event's list page.
-      expect(mockPush).lastCalledWith("/collecting-event/list");
+      expect(mockPush).lastCalledWith("/collecting-event/view?id=1");
       done();
     });
   });

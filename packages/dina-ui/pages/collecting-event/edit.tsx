@@ -1,16 +1,17 @@
 import {
   ApiClientContext,
+  AutoSuggestTextField,
   ButtonBar,
   CancelButton,
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
   filterBy,
+  FormattedTextField,
   LoadingSpinner,
   Query,
   ResourceSelectField,
   SubmitButton,
-  FormattedTextField,
   TextField
 } from "common-ui";
 import { KitsuResponse } from "kitsu";
@@ -137,6 +138,18 @@ function CollectingEventFormInternal() {
         </label>
       </div>
       <div className="row">
+        <AutoSuggestTextField<CollectingEvent>
+          className="col-md-3"
+          name="dwcRecordedBy"
+          query={(searchValue, ctx) => ({
+            path: "collection-api/collecting-event",
+            filter: {
+              ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+              rsql: `dwcRecordedBy==*${searchValue}*`
+            }
+          })}
+          suggestion={collEvent => collEvent.dwcRecordedBy ?? ""}
+        />
         <ResourceSelectField<Person>
           name="collectors"
           filter={filterBy(["displayName"])}
@@ -208,7 +221,7 @@ function CollectingEventForm({
     if (submittedValues.collectorGroups?.id)
       submittedValues.collectorGroupUuid = submittedValues.collectorGroups.id;
     delete submittedValues.collectorGroups;
-    await save(
+    const [saved] = await save(
       [
         {
           resource: submittedValues,
@@ -219,7 +232,7 @@ function CollectingEventForm({
         apiBaseUrl: "/collection-api"
       }
     );
-    await router.push(`/collecting-event/list`);
+    await router.push(`/collecting-event/view?id=${saved.id}`);
   };
 
   return (
