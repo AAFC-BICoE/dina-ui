@@ -210,7 +210,8 @@ function CollectingEventForm({
   const initialValues = collectingEvent ?? {
     type: "collecting-event",
     collectors: [],
-    collectorGroups: []
+    collectorGroups: [],
+    startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM"
   };
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
