@@ -1,7 +1,7 @@
 import { HotColumnProps } from "@handsontable/react";
 import {
   ApiClientContext,
-  ApiClientContextI,
+  ApiClientI,
   BulkDataEditor,
   decodeResourceCell,
   DinaForm,
@@ -423,7 +423,7 @@ export function BulkMetadataEditor({
  */
 export async function getManagedAttributesInUse(
   metadatas: Metadata[],
-  bulkGet: ApiClientContextI["bulkGet"]
+  bulkGet: ApiClientI["bulkGet"]
 ) {
   // Loop through the metadatas and find which managed attributes are set:
   const managedAttributeIdMap: Record<string, true> = {};

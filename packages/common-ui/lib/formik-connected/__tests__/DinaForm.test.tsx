@@ -23,12 +23,12 @@ describe("DinaForm component.", () => {
       account: expect.objectContaining({
         username: "test-user"
       }),
-      api: {
+      api: expect.objectContaining({
         apiClient: expect.anything(),
         bulkGet: expect.anything(),
         doOperations: expect.anything(),
         save: expect.anything()
-      },
+      }),
       formik: expect.anything(),
       submittedValues: {
         testAttr: "test-value"

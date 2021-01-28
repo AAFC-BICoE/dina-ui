@@ -1,19 +1,12 @@
-import { ReactNode, useEffect, useRef } from "react";
-import {
-  ApiClientContext,
-  ApiClientContextI
-} from "../api-client/ApiClientContext";
+import { PropsWithChildren, useEffect, useRef } from "react";
+import { useApiClient } from "../api-client/ApiClientContext";
 import { useAccount } from "./AccountProvider";
 
-interface AuthenticatedApiClientProviderProps {
-  apiContext: ApiClientContextI;
-  children: ReactNode;
-}
-
+/** Applies authentication headers from the AccountProvider to the ApiClient from the ApiClientProvider. */
 export function AuthenticatedApiClientProvider({
-  apiContext,
   children
-}: AuthenticatedApiClientProviderProps) {
+}: PropsWithChildren<{}>) {
+  const apiContext = useApiClient();
   const { authenticated, initialized, login, token } = useAccount();
   const authTokenRef = useRef<string>();
 
@@ -41,9 +34,5 @@ export function AuthenticatedApiClientProvider({
     authTokenRef.current = token;
   }, [token]);
 
-  return (
-    <ApiClientContext.Provider value={apiContext}>
-      {authenticated && initialized ? children : null}
-    </ApiClientContext.Provider>
-  );
+  return <>{authenticated && initialized ? children : null}</>;
 }

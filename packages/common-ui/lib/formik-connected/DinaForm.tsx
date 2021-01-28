@@ -8,10 +8,7 @@ import {
 } from "formik";
 import { PropsWithChildren } from "react";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
-import {
-  ApiClientContextI,
-  useApiClient
-} from "../api-client/ApiClientContext";
+import { ApiClientI, useApiClient } from "../api-client/ApiClientContext";
 import { ErrorViewer } from "./ErrorViewer";
 import { safeSubmit } from "./safeSubmit";
 
@@ -27,7 +24,7 @@ export type DinaFormOnSubmit<TValues = any> = (
 export interface DinaFormSubmitParams<TValues> {
   submittedValues: TValues;
   formik: FormikContextType<TValues>;
-  api: ApiClientContextI;
+  api: ApiClientI;
   account: AccountContextI;
 }
 
