@@ -7,7 +7,7 @@ export interface CollectingEventAttributes {
   attachment?: ResourceIdentifierObject[];
   startEventDateTime: string;
   endEventDateTime: string;
-  verbatimCollectors?: string;
+  dwcRecordedBy?: string;
   verbatimEventDateTime: string;
   createdBy?: string;
   createdOn?: string;

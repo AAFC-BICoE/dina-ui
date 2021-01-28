@@ -115,10 +115,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                         />
                       </div>
                       <div className="row">
-                        <FieldView
-                          className="col-md-2"
-                          name="verbatimCollectors"
-                        />
+                        <FieldView className="col-md-2" name="dwcRecordedBy" />
                         <FieldView className="col-md-2" name="collectors" />
                       </div>
                     </div>

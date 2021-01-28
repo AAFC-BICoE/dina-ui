@@ -140,15 +140,15 @@ function CollectingEventFormInternal() {
       <div className="row">
         <AutoSuggestTextField<CollectingEvent>
           className="col-md-3"
-          name="verbatimCollectors"
+          name="dwcRecordedBy"
           query={(searchValue, ctx) => ({
             path: "collection-api/collecting-event",
             filter: {
               ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-              rsql: `verbatimCollectors==*${searchValue}*`
+              rsql: `dwcRecordedBy==*${searchValue}*`
             }
           })}
-          suggestion={collEvent => collEvent.verbatimCollectors ?? ""}
+          suggestion={collEvent => collEvent.dwcRecordedBy ?? ""}
         />
         <ResourceSelectField<Person>
           name="collectors"
