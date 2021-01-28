@@ -7,14 +7,13 @@ import {
   LoadingSpinner,
   Query,
   ResourceSelectField,
-  SelectField,
   SubmitButton,
   TextField,
-  useGroupSelectOptions
+  useAccount
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
 import { Region } from "../../../types/seqdb-api/resources/Region";
@@ -68,12 +67,11 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
 }
 
 function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
-  const groupSelectOptions = useGroupSelectOptions();
-
+  const { groupNames } = useAccount();
   const { id } = router.query;
 
   const initialValues = profile || {
-    group: groupSelectOptions[0].value,
+    group: groupNames?.[0],
     type: "thermocyclerprofile"
   };
 
@@ -103,12 +101,7 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
       </ButtonBar>
       <div>
         <div className="row">
-          <SelectField
-            className="col-md-2"
-            disabled={true}
-            name="group"
-            options={groupSelectOptions}
-          />
+          <GroupSelectField className="col-md-2" name="group" />
         </div>
         <div className="row">
           <ResourceSelectField<Region>

@@ -2,11 +2,11 @@ import {
   FilterParam,
   GetParams,
   KitsuResource,
-  KitsuResponse,
   PersistedResource
 } from "kitsu";
 import { debounce, isUndefined, omitBy } from "lodash";
 import React, { useContext } from "react";
+import { useIntl } from "react-intl";
 import AsyncSelect from "react-select/async";
 import { Styles } from "react-select/src/styles";
 import { OptionsType } from "react-select/src/types";
@@ -42,12 +42,6 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   /** react-select styles prop. */
   styles?: Partial<Styles>;
-
-  /** Optional query loader function for custom API request behavior (Useful for caching). */
-  customDataFetch?: (
-    path: string,
-    params: GetParams
-  ) => Promise<KitsuResponse<TData[], any>>;
 }
 
 /** An option the user can select to set the relationship to null. */
@@ -62,14 +56,11 @@ export function ResourceSelect<TData extends KitsuResource>({
   onChange = () => undefined,
   optionLabel,
   sort,
-  customDataFetch,
   styles,
   value
 }: ResourceSelectProps<TData>) {
   const { apiClient } = useContext(ApiClientContext);
-
-  const dataFetch =
-    customDataFetch || ((...args) => apiClient.get<TData[]>(...args));
+  const { formatMessage } = useIntl();
 
   async function loadOptions(
     inputValue: string,
@@ -85,7 +76,7 @@ export function ResourceSelect<TData extends KitsuResource>({
     );
 
     // Send the API request.
-    const { data } = await dataFetch(model, getParams);
+    const { data } = await apiClient.get<TData[]>(model, getParams);
 
     // Build the list of options from the returned resources.
     const resourceOptions = data.map(resource => ({
@@ -151,7 +142,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       isMulti={isMulti}
       loadOptions={debouncedOptionLoader}
       onChange={onChangeInternal}
-      placeholder="Type here to search."
+      placeholder={formatMessage({ id: "typeHereToSearch" })}
       styles={styles}
       value={selectValue}
     />

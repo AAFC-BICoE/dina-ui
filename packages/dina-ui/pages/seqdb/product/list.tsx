@@ -5,7 +5,7 @@ import {
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { Head, Nav } from "../../../components";
+import { groupCell, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Product } from "../../../types/seqdb-api/resources/Product";
 
@@ -18,7 +18,7 @@ const PRODUCT_TABLE_COLUMNS: ColumnDefinition<Product>[] = [
     ),
     accessor: "name"
   },
-  "group",
+  groupCell("group"),
   {
     Header: "UPC",
     accessor: "upc"

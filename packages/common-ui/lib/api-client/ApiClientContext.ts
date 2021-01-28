@@ -1,6 +1,8 @@
 import { AxiosError } from "axios";
-import Kitsu, { KitsuResource, PersistedResource, GetParams } from "kitsu";
-import { deserialise, query, error as kitsuError } from "kitsu-core";
+import { cacheAdapterEnhancer } from "axios-extensions";
+import Kitsu, { GetParams, KitsuResource, PersistedResource } from "kitsu";
+import { deserialise, error as kitsuError, query } from "kitsu-core";
+import LRUCache from "lru-cache";
 import React, { useContext } from "react";
 import { serialize } from "../util/serialize";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
@@ -111,6 +113,19 @@ export function createContextValue({
     successResponse => successResponse,
     makeAxiosErrorMoreReadable
   );
+
+  if (apiClient.axios?.defaults?.adapter) {
+    const ONE_SECOND = 1000;
+    apiClient.axios.defaults.adapter = cacheAdapterEnhancer(
+      apiClient.axios.defaults.adapter,
+      {
+        // Invalidate the cache after one second.
+        // All this does is batch requests if a set of react components all try to make the same request at once.
+        // e.g. a page with a lot of the same dropdown select component, or a set of group label components fetching the label for the same group.
+        defaultCache: new LRUCache({ max: 100, maxAge: ONE_SECOND })
+      }
+    );
+  }
 
   /**
    * Performs a write operation against a jsonpatch-compliant JSONAPI server.

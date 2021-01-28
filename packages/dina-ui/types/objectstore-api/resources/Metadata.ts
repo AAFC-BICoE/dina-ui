@@ -15,6 +15,7 @@ export interface MetadataAttributes {
   xmpRightsOwner?: string;
 
   // optional fields
+  group?: string;
   dcRights?: string;
   acSubType?: string;
   dcType?: DcType;

@@ -70,7 +70,7 @@ describe("Product edit page", () => {
           path: "product",
           value: {
             attributes: {
-              group: "/aafc",
+              group: "aafc",
               name: "New Product",
               type: undefined
             },
@@ -196,7 +196,7 @@ describe("Product edit page", () => {
 /** Test Product with all fields defined. */
 const TEST_PRODUCT: Required<Product> = {
   description: "desc",
-  group: "/aafc",
+  group: "aafc",
   id: "10",
   lastModified: "2019-03-27T04:00:00.000+0000",
   name: "Rapid Alkaline DNA Extraction",

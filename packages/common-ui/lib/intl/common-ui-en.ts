@@ -62,6 +62,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   submitBtnText: "Save",
   tableTotalCount: "Total matched records: {totalCount}",
   true: "True",
+  typeHereToSearch: "Type here to search.",
   uiAppVersion: "UI Application Version: {version}",
   valueLabel: "Value",
   yes: "Yes"

@@ -86,7 +86,7 @@ describe("Workflow edit page.", () => {
           path: "chain",
           value: {
             attributes: {
-              group: "/aafc",
+              group: "aafc",
               name: "New Workflow"
             },
             id: "00000000-0000-0000-0000-000000000000",

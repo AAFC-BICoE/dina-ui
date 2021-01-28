@@ -9,11 +9,9 @@ import {
   filterBy,
   FormikButton,
   ListPageLayout,
-  SelectField,
   SplitPagePanel,
   useAccount,
   useGroupedCheckBoxes,
-  useGroupSelectOptions,
   useModal
 } from "common-ui";
 import { FormikContextType } from "formik";
@@ -21,7 +19,7 @@ import { toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Component, useContext, useMemo, useState } from "react";
-import { Head, Nav } from "../../../components";
+import { GroupSelectField, Head, Nav } from "../../../components";
 import {
   MetadataPreview,
   StoredObjectGallery
@@ -126,11 +124,6 @@ export default function MetadataListPage() {
     }
   ];
 
-  const groupSelectOptions = [
-    { label: "<any>", value: undefined },
-    ...useGroupSelectOptions()
-  ];
-
   // Workaround to make sure react-table doesn't unmount TBodyComponent
   // when MetadataListPage is re-rendered:
   const TBodyGallery = useMemo(
@@ -188,10 +181,12 @@ export default function MetadataListPage() {
                 filterFormchildren={({ submitForm }) => (
                   <div className="form-group">
                     <div style={{ width: "300px" }}>
-                      <SelectField
+                      <GroupSelectField
                         onChange={() => setImmediate(submitForm)}
                         name="group"
-                        options={groupSelectOptions}
+                        showAnyOption={true}
+                        showAllGroups={true}
+                        showDefaultValue={true}
                       />
                     </div>
                   </div>
