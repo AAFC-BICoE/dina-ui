@@ -106,21 +106,12 @@ function CollectingEventFormInternal() {
         </div>
       </div>
       <div className="row">
-        <label style={{ marginLeft: 15, marginTop: 25 }}>
-          <span>{formatMessage("enableDateRangeLabel")}</span>
-          <Switch
-            onChange={e => setChecked(e)}
-            checked={checked}
-            className="react-switch dateRange"
-          />
-        </label>
         <FormattedTextField
           name="startEventDateTime"
           className="col-md-3 startEventDateTime"
           label={formatMessage("startEventDateTimeLabel")}
           placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
         />
-
         {checked && (
           <FormattedTextField
             className="col-md-3"
