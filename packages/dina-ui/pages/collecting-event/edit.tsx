@@ -7,6 +7,7 @@ import {
   DinaForm,
   DinaFormOnSubmit,
   filterBy,
+  FormattedTextField,
   LoadingSpinner,
   Query,
   ResourceSelectField,
@@ -21,7 +22,6 @@ import Switch from "react-switch";
 import { GroupSelectField, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
-import { useFormikContext } from "formik";
 
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
@@ -107,14 +107,14 @@ function CollectingEventFormInternal() {
         </div>
       </div>
       <div className="row">
-        <TextField
-          className="col-md-3 startEventDateTime"
+        <FormattedTextField
           name="startEventDateTime"
+          className="col-md-3 startEventDateTime"
           label={formatMessage("startEventDateTimeLabel")}
           placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
         />
         {checked && (
-          <TextField
+          <FormattedTextField
             className="col-md-3"
             name="endEventDateTime"
             label={formatMessage("endEventDateTimeLabel")}
@@ -172,7 +172,8 @@ function CollectingEventForm({
   const initialValues = collectingEvent ?? {
     type: "collecting-event",
     collectors: [],
-    collectorGroups: []
+    collectorGroups: [],
+    startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM"
   };
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
