@@ -144,7 +144,7 @@ function CollectingEventFormInternal() {
           query={(searchValue, ctx) => ({
             path: "collection-api/collecting-event",
             filter: {
-              ...(ctx.values.group && { group: ctx.values.group }),
+              ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
               rsql: `verbatimCollectors==*${searchValue}*`
             }
           })}
@@ -220,7 +220,7 @@ function CollectingEventForm({
     if (submittedValues.collectorGroups?.id)
       submittedValues.collectorGroupUuid = submittedValues.collectorGroups.id;
     delete submittedValues.collectorGroups;
-    await save(
+    const [saved] = await save(
       [
         {
           resource: submittedValues,
@@ -231,7 +231,7 @@ function CollectingEventForm({
         apiBaseUrl: "/collection-api"
       }
     );
-    await router.push(`/collecting-event/list`);
+    await router.push(`/collecting-event/view?id=${saved.id}`);
   };
 
   return (
