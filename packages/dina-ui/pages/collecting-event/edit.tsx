@@ -12,7 +12,8 @@ import {
   Query,
   ResourceSelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useAccount
 } from "common-ui";
 import { KitsuResponse } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
@@ -26,6 +27,10 @@ import { CollectingEvent } from "../../types/collection-api/resources/Collecting
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
   router: NextRouter;
+}
+
+interface CollectingEventFormInternalProps {
+  group: string | undefined;
 }
 
 export default function CollectingEventEditPage() {
@@ -95,15 +100,28 @@ export default function CollectingEventEditPage() {
   );
 }
 
-function CollectingEventFormInternal() {
+function CollectingEventFormInternal({
+  group
+}: CollectingEventFormInternalProps) {
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
+  const { groupNames: myGroupNames } = useAccount();
+  let eventGroupWithinUserGroups = false;
+  if (myGroupNames?.includes(group as any)) eventGroupWithinUserGroups = true;
 
   return (
     <div>
       <div className="form-group">
         <div style={{ width: "300px" }}>
-          <GroupSelectField name="group" showAnyOption={true} />
+          {eventGroupWithinUserGroups ? (
+            <GroupSelectField name="group" showAnyOption={true} />
+          ) : (
+            <GroupSelectField
+              name="group"
+              disabled={true}
+              showAllGroups={true}
+            />
+          )}
         </div>
       </div>
       <div className="row">
@@ -256,7 +274,7 @@ function CollectingEventForm({
           type="collecting-event"
         />
       </ButtonBar>
-      <CollectingEventFormInternal />
+      <CollectingEventFormInternal group={collectingEvent?.group} />
     </DinaForm>
   );
 }
