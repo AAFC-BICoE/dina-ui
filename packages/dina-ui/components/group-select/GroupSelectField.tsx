@@ -16,7 +16,15 @@ interface GroupSelectFieldProps extends Omit<SelectFieldProps, "options"> {
    * The default (false) is to only show the groups the user belongs to.
    */
   showAllGroups?: boolean;
+  /**
+   * Show group set previously, applys to list/search group dropdown
+   */
   showDefaultValue?: boolean;
+
+  /**
+   * The group name of current record
+   */
+  groupName?: string;
 }
 
 export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
@@ -24,6 +32,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
     showAnyOption,
     showAllGroups,
     showDefaultValue,
+    groupName,
     ...selectFieldProps
   } = groupSelectFieldProps;
 
@@ -31,10 +40,16 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
   const { groupNames: myGroupNames } = useAccount();
   let defaultValue: SelectOption<string> | undefined;
 
+  const shouldDisable =
+    !myGroupNames?.includes(groupName as any) && groupName !== undefined;
+
   const { response } = useQuery<Group[]>({
     path: "user-api/group",
     page: { limit: 1000 },
-    filter: !showAllGroups ? JSON.stringify({ name: myGroupNames }) : undefined
+    filter:
+      shouldDisable || showAllGroups
+        ? undefined
+        : JSON.stringify({ name: myGroupNames })
   });
 
   const groupOptions: SelectOption<string>[] | undefined = response?.data?.map(
@@ -69,6 +84,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
       {...selectFieldProps}
       options={groupSelectOptions}
       defaultValue={showDefaultValue ? defaultValue : undefined}
+      disabled={shouldDisable}
     />
   );
 }

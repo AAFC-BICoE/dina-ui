@@ -105,23 +105,16 @@ function CollectingEventFormInternal({
 }: CollectingEventFormInternalProps) {
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
-  const { groupNames: myGroupNames } = useAccount();
-  let eventGroupWithinUserGroups = false;
-  if (myGroupNames?.includes(group as any)) eventGroupWithinUserGroups = true;
 
   return (
     <div>
       <div className="form-group">
         <div style={{ width: "300px" }}>
-          {eventGroupWithinUserGroups ? (
-            <GroupSelectField name="group" showAnyOption={true} />
-          ) : (
-            <GroupSelectField
-              name="group"
-              disabled={true}
-              showAllGroups={true}
-            />
-          )}
+          <GroupSelectField
+            name="group"
+            showAnyOption={true}
+            groupName={group}
+          />
         </div>
       </div>
       <div className="row">
