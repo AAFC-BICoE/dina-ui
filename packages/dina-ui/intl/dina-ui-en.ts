@@ -83,6 +83,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_editableBuiltInAttributes: "Visible Built In Attributes",
   field_editableManagedAttributes: "Visible Managed Attributes",
   field_email: "Email",
+  field_familyNames_tooltip: "Family name(s) including compound family names",
+  field_givenNames_tooltip: "First and all middle names",
   field_license: "License",
   field_managedAttributeCreatedOn: "Created On",
   field_managedAttributeCreatedBy: "Created By",
