@@ -1,5 +1,5 @@
 import { OperationsResponse } from "common-ui";
-import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
+import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import CollectingEventEditPage from "../../../pages/collecting-event/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";

@@ -2,7 +2,7 @@ import { OperationsResponse, ResourceSelect } from "common-ui";
 import CollectorGroupEditPage from "../../../pages/collector-group/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { CollectorGroup } from "../../../types/collection-api/resources/CollectorGroup";
-import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
+import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
