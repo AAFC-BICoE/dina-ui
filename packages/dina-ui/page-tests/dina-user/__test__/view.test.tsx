@@ -1,4 +1,4 @@
-import { DinaUser } from "../../../types/objectstore-api/resources/DinaUser";
+import { DinaUser } from "../../../types/user-api/resources/DinaUser";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import DinaUserDetailsPage from "../../../pages/dina-user/view";
 

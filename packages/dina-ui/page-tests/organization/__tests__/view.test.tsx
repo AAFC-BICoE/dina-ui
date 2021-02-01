@@ -1,6 +1,6 @@
 import { OrganizationDetailsPage } from "../../../pages/organization/view";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { Organization } from "../../../types/objectstore-api/resources/Organization";
+import { Organization } from "../../../types/agent-api/resources/Organization";
 
 /** Test organization with all fields defined. */
 const TEST_ORGANIZATION: Organization = {

@@ -1,7 +1,7 @@
 import { KitsuResource } from "kitsu";
 import { ManagedAttributeMap } from "./ManagedAttributeMap";
 import { DcType } from "./ObjectUpload";
-import { Person } from "./Person";
+import { Person } from "../../agent-api/resources/Person";
 
 export interface MetadataAttributes {
   type: "metadata";

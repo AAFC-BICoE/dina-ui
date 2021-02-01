@@ -16,7 +16,7 @@ import {
 } from "common-ui";
 import { KitsuResponse } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
-import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
+import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import { useContext, useState } from "react";
 import Switch from "react-switch";
 import { GroupSelectField, Head, Nav } from "../../components";

@@ -15,7 +15,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   MultiligualName,
   Organization
-} from "../../types/objectstore-api/resources/Organization";
+} from "../../types/agent-api/resources/Organization";
 
 interface OrganizationFormProps {
   organization?: Organization;

@@ -1,6 +1,6 @@
 import { PersonDetailsPage } from "../../../pages/person/view";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { Person } from "../../../types/objectstore-api/resources/Person";
+import { Person } from "../../../types/agent-api/resources/Person";
 
 /** Test person with all fields defined. */
 const TEST_AGENT: Person = {
