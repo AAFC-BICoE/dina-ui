@@ -80,7 +80,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "field_description.en": "English Description",
   "field_description.fr": "French Description",
   field_displayName: "Display Name",
-  field_dwcVerbatimSRS_label: "Dwc Verbatim SRS",
+  field_dwcVerbatimSRS: "Dwc Verbatim SRS",
   field_editableBuiltInAttributes: "Visible Built In Attributes",
   field_editableManagedAttributes: "Visible Managed Attributes",
   field_email: "Email",

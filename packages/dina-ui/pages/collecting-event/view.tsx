@@ -141,11 +141,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                           className="col-md-2"
                           name="dwcVerbatimCoordinateSystem"
                         />
-                        <FieldView
-                          className="col-md-2"
-                          name="dwcVerbatimSRS"
-                          label={formatMessage("field_dwcVerbatimSRS_label")}
-                        />
+                        <FieldView className="col-md-2" name="dwcVerbatimSRS" />
                         <FieldView
                           className="col-md-2"
                           name="dwcVerbatimElevation"

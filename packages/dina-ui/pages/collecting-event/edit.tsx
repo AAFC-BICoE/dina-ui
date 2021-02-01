@@ -167,11 +167,7 @@ function CollectingEventFormInternal() {
       </div>
       <div className="row">
         <TextField className="col-md-3" name="dwcVerbatimCoordinateSystem" />
-        <TextField
-          className="col-md-3"
-          name="dwcVerbatimSRS"
-          label={formatMessage("field_dwcVerbatimSRS_label")}
-        />
+        <TextField className="col-md-3" name="dwcVerbatimSRS" />
         <TextField className="col-md-3" name="dwcVerbatimElevation" />
         <TextField className="col-md-3" name="dwcVerbatimDepth" />
       </div>
