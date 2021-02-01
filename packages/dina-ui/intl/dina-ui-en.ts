@@ -74,7 +74,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_createdDate: "Created Date",
   field_createdOn: "Created On",
   field_dcFormat: "Media Format",
-  field_dcRights: "Rights Statement",
+  field_dcRights: "Copyright",
   field_dcType: "Stored Object Type",
   field_description: "Description",
   "field_description.en": "English Description",

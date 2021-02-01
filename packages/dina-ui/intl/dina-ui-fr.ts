@@ -39,7 +39,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_createdOn: "Créé le",
   "field_dcCreator.displayName": "Créateur du document",
   field_dcFormat: "Format du média",
-  field_dcRights: "Déclaration sur les droits",
+  field_dcRights: "Droit d'auteur",
   field_dcType: "Type d'objet stocké",
   field_description: "Description",
   "field_description.en": "Description anglaise",
