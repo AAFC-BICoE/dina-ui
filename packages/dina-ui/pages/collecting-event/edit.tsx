@@ -12,8 +12,7 @@ import {
   Query,
   ResourceSelectField,
   SubmitButton,
-  TextField,
-  useAccount
+  TextField
 } from "common-ui";
 import { KitsuResponse } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
@@ -27,10 +26,6 @@ import { CollectingEvent } from "../../types/collection-api/resources/Collecting
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
   router: NextRouter;
-}
-
-interface CollectingEventFormInternalProps {
-  group: string | undefined;
 }
 
 export default function CollectingEventEditPage() {
@@ -100,9 +95,7 @@ export default function CollectingEventEditPage() {
   );
 }
 
-function CollectingEventFormInternal({
-  group
-}: CollectingEventFormInternalProps) {
+function CollectingEventFormInternal() {
   const { formatMessage } = useDinaIntl();
   const [checked, setChecked] = useState(false);
 
@@ -110,11 +103,7 @@ function CollectingEventFormInternal({
     <div>
       <div className="form-group">
         <div style={{ width: "300px" }}>
-          <GroupSelectField
-            name="group"
-            showAnyOption={true}
-            groupName={group}
-          />
+          <GroupSelectField name="group" showAnyOption={true} />
         </div>
       </div>
       <div className="row">
@@ -267,7 +256,7 @@ function CollectingEventForm({
           type="collecting-event"
         />
       </ButtonBar>
-      <CollectingEventFormInternal group={collectingEvent?.group} />
+      <CollectingEventFormInternal />
     </DinaForm>
   );
 }

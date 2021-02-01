@@ -104,11 +104,7 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
       </ButtonBar>
       <div>
         <div className="row">
-          <GroupSelectField
-            className="col-md-2"
-            name="group"
-            groupName={initialValues.group}
-          />
+          <GroupSelectField className="col-md-2" name="group" />
         </div>
         <div className="row">
           <SelectField

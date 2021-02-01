@@ -5,6 +5,7 @@ import {
   useAccount,
   useQuery
 } from "common-ui";
+import { useFormikContext } from "formik";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
 
@@ -20,11 +21,6 @@ interface GroupSelectFieldProps extends Omit<SelectFieldProps, "options"> {
    * Show group set previously, applys to list/search group dropdown
    */
   showDefaultValue?: boolean;
-
-  /**
-   * The group name of current record
-   */
-  groupName?: string;
 }
 
 export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
@@ -32,16 +28,20 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
     showAnyOption,
     showAllGroups,
     showDefaultValue,
-    groupName,
     ...selectFieldProps
   } = groupSelectFieldProps;
 
   const { locale } = useDinaIntl();
   const { groupNames: myGroupNames } = useAccount();
+  const { initialValues } = useFormikContext<any>();
+
   let defaultValue: SelectOption<string> | undefined;
 
+  const initialGroupName = initialValues[selectFieldProps.name];
+
   const shouldDisable =
-    !myGroupNames?.includes(groupName as any) && groupName !== undefined;
+    !myGroupNames?.includes(initialGroupName as any) &&
+    initialGroupName !== undefined;
 
   const { response } = useQuery<Group[]>({
     path: "user-api/group",
@@ -50,7 +50,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
     filter: showAllGroups
       ? undefined
       : shouldDisable
-      ? JSON.stringify({ name: [groupName] })
+      ? JSON.stringify({ name: [initialGroupName] })
       : JSON.stringify({ name: myGroupNames })
   });
 
