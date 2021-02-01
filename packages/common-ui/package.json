@@ -28,6 +28,7 @@
     "node-localstorage": "^2.1.6",
     "rc-tooltip": "^5.0.1",
     "react": "^17.0.1",
+    "react-autosuggest": "^10.1.0",
     "react-datepicker": "^3.0.0",
     "react-dom": "^17.0.1",
     "react-error-boundary": "^3.1.0",
@@ -37,11 +38,13 @@
     "react-number-format": "^4.4.1",
     "react-select": "^3.1.0",
     "react-table": "^6.11.5",
-    "title-case": "2.1.1"
+    "title-case": "2.1.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.119",
     "@types/react": "^16.9.41",
+    "@types/react-autosuggest": "^10.0.1",
     "@types/react-datepicker": "^3.0.2",
     "@types/react-dom": "^16.9.8",
     "@types/react-modal": "^3.10.6",

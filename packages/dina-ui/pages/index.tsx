@@ -147,7 +147,7 @@ const Home: React.FunctionComponent = () => (
             </a>
           </Link>
         </li>
-        <li>
+        <li className="d-none">
           <Link href="/collector-group/list">
             <a>
               <DinaMessage id="collectorGroupListTitle" />

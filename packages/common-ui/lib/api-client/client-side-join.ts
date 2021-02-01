@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import { PersistedResource } from "kitsu";
 import { get, set, zipWith } from "lodash";
-import { ApiClientContextI } from "./ApiClientContext";
+import { ApiClientI } from "./ApiClientContext";
 
 export interface ClientSideJoinSpec {
   apiBaseUrl?: string;
@@ -28,7 +28,7 @@ export class ClientSideJoiner {
   });
 
   constructor(
-    private bulkGet: ApiClientContextI["bulkGet"],
+    private bulkGet: ApiClientI["bulkGet"],
     private resources: any[],
     private joinSpec: ClientSideJoinSpec
   ) {}

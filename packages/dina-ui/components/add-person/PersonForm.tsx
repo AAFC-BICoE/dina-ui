@@ -8,7 +8,7 @@ import {
   useModal
 } from "common-ui";
 import { ResourceSelectField } from "common-ui/lib";
-import { Organization } from "packages/dina-ui/types/objectstore-api/resources/Organization";
+import { Organization } from "packages/dina-ui/types/agent-api/resources/Organization";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 
@@ -59,6 +59,12 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <div style={{ maxWidth: "20rem" }}>
         <TextField name="displayName" />
+      </div>
+      <div style={{ maxWidth: "20rem" }}>
+        <TextField name="givenNames" />
+      </div>
+      <div style={{ maxWidth: "20rem" }}>
+        <TextField name="familyNames" />
       </div>
       <div style={{ maxWidth: "20rem" }}>
         <TextField name="email" />

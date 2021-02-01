@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { DinaUser } from "../../types/objectstore-api/resources/DinaUser";
+import { DinaUser } from "../../types/user-api/resources/DinaUser";
 
 export default function DinaUserDetailsPage() {
   const { subject } = useAccount();

@@ -41,7 +41,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editPersonTitle: "Edit Person",
   editSelectedButtonText: "Edit Selected",
   enableDateRangeLabel: "Enable Date Range",
-  endEventDateTimeLabel: "End Event DateTime",
+  endEventDateTimeLabel: "End Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   exifProperties: "Exif Properties",
   feedbackButtonText: "Feedback",
   field_acceptedValues: "Accepted Values",
@@ -83,6 +83,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_editableBuiltInAttributes: "Visible Built In Attributes",
   field_editableManagedAttributes: "Visible Managed Attributes",
   field_email: "Email",
+  field_familyNames_tooltip: "Family name(s) including compound family names",
+  field_givenNames_tooltip: "First and all middle names",
   field_license: "License",
   field_managedAttributeCreatedOn: "Created On",
   field_managedAttributeCreatedBy: "Created By",
@@ -160,7 +162,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   searchButton: "Search",
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",
-  startEventDateTimeLabel: "Start Event DateTime",
+  startEventDateTimeLabel: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   thumbnailNotAvailableText: "No thumbnail available",
   uploadButtonText: "Upload",
   uploadFormInstructions:

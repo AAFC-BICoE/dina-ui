@@ -2,7 +2,7 @@ import { mount } from "enzyme";
 import { DocWithErrors } from "jsonapi-typescript";
 import { KitsuResource, KitsuResponse } from "kitsu";
 import { last } from "lodash";
-import { ApiClientContext, createContextValue } from "../ApiClientContext";
+import { ApiClientContext, ApiClientImpl } from "../ApiClientContext";
 import { Query } from "../Query";
 
 /** Example of an API resource interface definition for a todo-list entry. */
@@ -78,7 +78,7 @@ const mockGet = jest.fn((path, { fields, page }) => {
   }
 });
 
-const contextValue = createContextValue();
+const contextValue = new ApiClientImpl();
 
 /**
  * Helper method to create a paged query element with the required context.

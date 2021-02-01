@@ -1,5 +1,5 @@
 import { OperationsResponse } from "common-ui";
-import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
+import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import CollectingEventEditPage from "../../../pages/collecting-event/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
@@ -92,10 +92,11 @@ describe("collecting-event edit page", () => {
     // renders end event datetime
     expect(wrapper.find(".endEventDateTime-field")).toHaveLength(1);
 
+    // Edit the start event datetime
     wrapper.find(".startEventDateTime-field input").simulate("change", {
       target: {
         name: "startEventDateTime",
-        value: "12/21/2019T16:00"
+        value: "201912211600"
       }
     });
 
@@ -119,7 +120,7 @@ describe("collecting-event edit page", () => {
           path: "collecting-event",
           value: {
             attributes: {
-              startEventDateTime: "12/21/2019T16:00",
+              startEventDateTime: "2019-12-21T16:00",
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
             },
             id: "00000000-0000-0000-0000-000000000000",
@@ -131,7 +132,7 @@ describe("collecting-event edit page", () => {
     );
 
     // The user should be redirected to the new collecting-event's details page.
-    expect(mockPush).lastCalledWith("/collecting-event/list");
+    expect(mockPush).lastCalledWith("/collecting-event/view?id=1");
   });
 
   it("Provides a form to edit a collecting-event.", async done => {
@@ -196,7 +197,7 @@ describe("collecting-event edit page", () => {
       );
 
       // The user should be redirected to collecting-event's list page.
-      expect(mockPush).lastCalledWith("/collecting-event/list");
+      expect(mockPush).lastCalledWith("/collecting-event/view?id=1");
       done();
     });
   });

@@ -1,29 +1,27 @@
 import { FastField, FieldProps } from "formik";
 import { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
+import Cleave from "cleave.js/react";
 
-export interface TextFieldProps extends LabelWrapperParams {
+export interface FormattedTextFieldProps extends LabelWrapperParams {
   readOnly?: boolean;
   initialValue?: string;
   multiLines?: boolean;
-  inputProps?: InputHTMLAttributes<any> | TextareaHTMLAttributes<any>;
+  inputProps?: InputHTMLAttributes<any>;
   placeholder?: string;
-
-  CustomInput?: React.ComponentType<InputHTMLAttributes<any>>;
 }
 
 /**
  * Provides a text input for a Formik field. This component wraps Formik's "Field" component with
  * a wrapper that adds a label.
  */
-export function TextField(props: TextFieldProps) {
+export function FormattedTextField(props: FormattedTextFieldProps) {
   const {
     initialValue,
     readOnly,
     multiLines,
     inputProps: inputPropsExternal,
     placeholder,
-    CustomInput,
     ...labelWrapperProps
   } = props;
   const { name } = labelWrapperProps;
@@ -42,22 +40,25 @@ export function TextField(props: TextFieldProps) {
 
           const inputPropsInternal = {
             ...inputPropsExternal,
-            placeholder,
             className: "form-control",
             onChange,
-            value: value || "",
+            value: value ?? "",
             readOnly
           };
-
           // The default Field component's inner text input needs to be replaced with our own
           // controlled input that we manually pass the "onChange" and "value" props. Otherwise
           // we will get React's warning about switching from an uncontrolled to controlled input.
-          return CustomInput ? (
-            <CustomInput {...inputPropsInternal} />
-          ) : multiLines ? (
-            <textarea rows={4} {...inputPropsInternal} />
-          ) : (
-            <input type="text" {...inputPropsInternal} />
+          return (
+            <Cleave
+              {...inputPropsInternal}
+              placeholder={placeholder}
+              options={{
+                numericOnly: true,
+                blocks: [4, 2, 2, 2, 2, 2, 3],
+                delimiters: ["-", "-", "T", ":", ":", "."],
+                delimiterLazyShow: true
+              }}
+            />
           );
         }}
       </FastField>

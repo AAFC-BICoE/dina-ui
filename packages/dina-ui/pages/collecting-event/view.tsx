@@ -12,7 +12,7 @@ import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResponse } from "kitsu";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
-import { Person } from "packages/dina-ui/types/objectstore-api/resources/Person";
+import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import { useContext, useState } from "react";
 import { Footer, GroupFieldView, Head, Nav } from "../../components";
 import { AttachmentList } from "../../components/object-store/attachment-list/AttachmentList";
@@ -115,6 +115,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                         />
                       </div>
                       <div className="row">
+                        <FieldView className="col-md-2" name="dwcRecordedBy" />
                         <FieldView className="col-md-2" name="collectors" />
                       </div>
                     </div>

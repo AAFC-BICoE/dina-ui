@@ -1,9 +1,9 @@
 import {
   AccountContextI,
   AccountProvider,
-  ApiClientContextI,
-  AuthenticatedApiClientProvider,
-  createContextValue,
+  ApiClientI,
+  ApiClientImpl,
+  ApiClientProvider,
   ModalProvider
 } from "common-ui";
 import { mount } from "enzyme";
@@ -12,7 +12,7 @@ import { FileUploadProviderImpl } from "../components/object-store/file-upload/F
 import { DinaIntlProvider } from "../intl/dina-ui-intl";
 
 interface MockAppContextProviderProps {
-  apiContext?: Partial<ApiClientContextI>;
+  apiContext?: Partial<ApiClientI>;
   accountContext?: Partial<AccountContextI>;
   children?: React.ReactNode;
 }
@@ -30,8 +30,8 @@ export function MockAppContextProvider({
     <AccountProvider
       value={{ ...DEFAULT_MOCK_ACCOUNT_CONTEXT, ...accountContext }}
     >
-      <AuthenticatedApiClientProvider
-        apiContext={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContext)}
+      <ApiClientProvider
+        value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContext)}
       >
         <FileUploadProviderImpl>
           <DinaIntlProvider>
@@ -40,7 +40,7 @@ export function MockAppContextProvider({
             </ModalProvider>
           </DinaIntlProvider>
         </FileUploadProviderImpl>
-      </AuthenticatedApiClientProvider>
+      </ApiClientProvider>
     </AccountProvider>
   );
 }
@@ -69,6 +69,6 @@ const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = {
   username: "test-user"
 };
 
-const DEFAULT_API_CONTEXT_VALUE = createContextValue({
-  getTempIdGenerator: () => () => "00000000-0000-0000-0000-000000000000"
+const DEFAULT_API_CONTEXT_VALUE = new ApiClientImpl({
+  newId: () => "00000000-0000-0000-0000-000000000000"
 });

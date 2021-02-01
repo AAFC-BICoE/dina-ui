@@ -11,7 +11,7 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { Person } from "../../types/objectstore-api/resources/Person";
+import { Person } from "../../types/agent-api/resources/Person";
 
 export function PersonDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -52,6 +52,8 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
                 <DinaForm<Person> initialValues={person}>
                   <div className="row">
                     <FieldView className="col-md-2" name="displayName" />
+                    <FieldView className="col-md-2" name="givenNames" />
+                    <FieldView className="col-md-2" name="familyNames" />
                     <FieldView className="col-md-2" name="email" />
                     <FieldView className="col-md-2" name="organizations" />
                     <FieldView className="col-md-2" name="createdBy" />

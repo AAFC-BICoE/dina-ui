@@ -1,8 +1,8 @@
 import { AxiosError, AxiosRequestConfig } from "axios";
 import Kitsu from "kitsu";
 import {
+  ApiClientImpl,
   CustomDinaKitsu,
-  createContextValue,
   makeAxiosErrorMoreReadable
 } from "../ApiClientContext";
 import { Operation, OperationsResponse } from "../operations-types";
@@ -171,7 +171,9 @@ const mockPatch = jest.fn((_, data) => {
   }
 });
 
-const { apiClient, bulkGet, doOperations, save } = createContextValue();
+const { apiClient, bulkGet, doOperations, save } = new ApiClientImpl({
+  newId: () => "00000000-0000-0000-0000-000000000000"
+});
 
 // Add the mocked "patch" method to the Axios instance:
 apiClient.axios = { patch: mockPatch } as any;
@@ -281,7 +283,7 @@ Constraint violation: description size must be between 1 and 10`;
           path: "pcrPrimer",
           value: {
             attributes: { lotNumber: 1, name: "testPrimer1" },
-            id: "-100",
+            id: "00000000-0000-0000-0000-000000000000",
             type: "pcrPrimer"
           }
         },
@@ -290,7 +292,7 @@ Constraint violation: description size must be between 1 and 10`;
           path: "pcrPrimer",
           value: {
             attributes: { lotNumber: 1, name: "testPrimer2" },
-            id: "-101",
+            id: "00000000-0000-0000-0000-000000000000",
             type: "pcrPrimer"
           }
         }

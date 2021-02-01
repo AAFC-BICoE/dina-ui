@@ -3,7 +3,8 @@ import { cacheAdapterEnhancer } from "axios-extensions";
 import Kitsu, { GetParams, KitsuResource, PersistedResource } from "kitsu";
 import { deserialise, error as kitsuError, query } from "kitsu-core";
 import LRUCache from "lru-cache";
-import React, { useContext } from "react";
+import React, { PropsWithChildren, useContext, useMemo } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { serialize } from "../util/serialize";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
 import {
@@ -28,8 +29,8 @@ export interface DoOperationsOptions {
   returnNullForMissingResource?: boolean;
 }
 
-/** Api context interface. */
-export interface ApiClientContextI {
+/** Api client interface. */
+export interface ApiClientI {
   /** Client to talk to the back-end API. */
   apiClient: Kitsu;
 
@@ -52,19 +53,12 @@ export interface ApiClientContextI {
   ) => Promise<PersistedResource<T>[]>;
 }
 
-/** Config for creating an API client context value. */
-export interface ApiClientContextConfig {
+/** Config for creating an API client. */
+export interface ApiClientConfig {
   /** Back-end API base URL. */
   baseURL?: string;
-
-  /**
-   * Temp ID iterator.
-   * This is not persisted on the back-end as the actual database ID.
-   * The generated ID should be in the back-end's expected format (e.g. number or UUID).
-   */
-  getTempIdGenerator?: () => () => string;
-
-  headers?: Record<string, string>;
+  /** New Id generator. */
+  newId?: () => string;
 }
 
 /** save function args. */
@@ -74,12 +68,22 @@ export interface SaveArgs<T extends KitsuResource = KitsuResource> {
 }
 
 /**
- * React context that passes down a single API client to subscribed components.
+ * React Context that passes down the API client to Components.
  */
-export const ApiClientContext = React.createContext<ApiClientContextI>(
+export const ApiClientContext = React.createContext<ApiClientI>(
   // Default value is undefined. This won't matter as long as the hook is called inside the context provider.
   undefined as any
 );
+
+export const ApiClientProvider = ApiClientContext.Provider;
+
+export function ApiClientImplProvider({
+  children,
+  ...cfg
+}: PropsWithChildren<ApiClientConfig> = {}) {
+  const apiContext = useMemo(() => new ApiClientImpl(cfg), []);
+  return <ApiClientProvider value={apiContext}>{children}</ApiClientProvider>;
+}
 
 /** Hook to get the Api Client Context */
 export function useApiClient() {
@@ -90,52 +94,50 @@ export function useApiClient() {
   return ctx;
 }
 
-/**
- * Creates the value of the API client context. The app should only need to call this function
- * once to initialize the context.
- */
-export function createContextValue({
-  baseURL = "/api",
-  getTempIdGenerator = () => {
-    let idIterator = -100;
-    return () => String(idIterator--);
-  },
-  headers = {}
-}: ApiClientContextConfig = {}): ApiClientContextI {
-  const apiClient = new CustomDinaKitsu({
-    baseURL,
-    headers: { "Crnk-Compact": "true", ...headers },
-    pluralize: false,
-    resourceCase: "none"
-  });
+export class ApiClientImpl implements ApiClientI {
+  public apiClient: Kitsu;
 
-  apiClient.axios?.interceptors?.response.use(
-    successResponse => successResponse,
-    makeAxiosErrorMoreReadable
-  );
+  constructor(private cfg: ApiClientConfig = {}) {
+    this.apiClient = new CustomDinaKitsu({
+      baseURL: cfg.baseURL ?? "/api",
+      headers: { "Crnk-Compact": "true" },
+      pluralize: false,
+      resourceCase: "none"
+    });
 
-  if (apiClient.axios?.defaults?.adapter) {
-    const ONE_SECOND = 1000;
-    apiClient.axios.defaults.adapter = cacheAdapterEnhancer(
-      apiClient.axios.defaults.adapter,
-      {
-        // Invalidate the cache after one second.
-        // All this does is batch requests if a set of react components all try to make the same request at once.
-        // e.g. a page with a lot of the same dropdown select component, or a set of group label components fetching the label for the same group.
-        defaultCache: new LRUCache({ max: 100, maxAge: ONE_SECOND })
-      }
+    this.apiClient.axios?.interceptors?.response.use(
+      successResponse => successResponse,
+      makeAxiosErrorMoreReadable
     );
+
+    if (this.apiClient.axios?.defaults?.adapter) {
+      const ONE_SECOND = 1000;
+      this.apiClient.axios.defaults.adapter = cacheAdapterEnhancer(
+        this.apiClient.axios.defaults.adapter,
+        {
+          // Invalidate the cache after one second.
+          // All this does is batch requests if a set of react components all try to make the same request at once.
+          // e.g. a page with a lot of the same dropdown select component, or a set of group label components fetching the label for the same group.
+          defaultCache: new LRUCache({ max: 100, maxAge: ONE_SECOND })
+        }
+      );
+    }
+
+    // Bind the methods so context consumers can use object destructuring.
+    this.doOperations = this.doOperations.bind(this);
+    this.save = this.save.bind(this);
+    this.bulkGet = this.bulkGet.bind(this);
   }
 
   /**
    * Performs a write operation against a jsonpatch-compliant JSONAPI server.
    */
-  async function doOperations(
+  public async doOperations(
     operations: Operation[],
     { apiBaseUrl = "", returnNullForMissingResource }: DoOperationsOptions = {}
   ): Promise<SuccessfulOperation[]> {
     // Unwrap the configured axios instance from the Kitsu instance.
-    const { axios } = apiClient;
+    const { axios } = this.apiClient;
 
     // Do the operations request.
     const axiosResponse = await axios.patch(
@@ -181,16 +183,13 @@ export function createContextValue({
   /**
    * Creates or updates one or multiple resources.
    */
-  async function save(
+  public async save(
     saveArgs: SaveArgs[],
     options?: DoOperationsOptions
   ): Promise<PersistedResource<KitsuResource>[]> {
     // Serialize the resources to JSONAPI format.
     const serializePromises = saveArgs.map(saveArg => serialize(saveArg));
     const serialized = await Promise.all(serializePromises);
-
-    // Temp ID iterator. This is not persisted on the back-end as the actual database ID.
-    const generateId = getTempIdGenerator();
 
     // Create the jsonpatch oeprations objects.
     const operations = serialized.map<Operation>(jsonapiResource => ({
@@ -200,12 +199,12 @@ export function createContextValue({
         : jsonapiResource.type,
       value: {
         ...jsonapiResource,
-        id: String(jsonapiResource.id || generateId())
+        id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
       }
     }));
 
     // Do the operations request.
-    const responses = await doOperations(operations, options);
+    const responses = await this.doOperations(operations, options);
 
     // Deserialize the responses to Kitsu format.
     const deserializePromises = responses.map(response =>
@@ -218,7 +217,7 @@ export function createContextValue({
   }
 
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
-  async function bulkGet<T extends KitsuResource>(
+  public async bulkGet<T extends KitsuResource>(
     paths: string[],
     {
       apiBaseUrl = "",
@@ -231,7 +230,7 @@ export function createContextValue({
       path
     }));
 
-    const responses = await doOperations(getOperations, {
+    const responses = await this.doOperations(getOperations, {
       apiBaseUrl,
       returnNullForMissingResource
     });
@@ -241,18 +240,11 @@ export function createContextValue({
     ).map(res => res.data);
 
     for (const joinSpec of joinSpecs) {
-      await new ClientSideJoiner(bulkGet, resources, joinSpec).join();
+      await new ClientSideJoiner(this.bulkGet, resources, joinSpec).join();
     }
 
     return resources;
   }
-
-  return {
-    apiClient,
-    bulkGet,
-    doOperations,
-    save
-  };
 }
 
 /** Gets the error message as a string from the JSONAPI jsonpatch/operations response. */
