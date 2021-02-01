@@ -6,9 +6,19 @@ export interface CollectingEventAttributes {
   uuid: string;
   attachment?: ResourceIdentifierObject[];
   startEventDateTime: string;
-  endEventDateTime: string;
+  endEventDateTime?: string;
   dwcRecordedBy?: string;
-  verbatimEventDateTime: string;
+  verbatimEventDateTime?: string;
+
+  dwcVerbatimLocality?: string;
+  dwcVerbatimLatitude?: string;
+  dwcVerbatimLongitude?: string;
+  dwcVerbatimCoordinates?: string;
+  dwcVerbatimCoordinateSystem?: string;
+  dwcVerbatimSRS?: string;
+  dwcVerbatimElevation?: string;
+  dwcVerbatimDepth?: string;
+
   createdBy?: string;
   createdOn?: string;
   collectorGroupUuid?: string;

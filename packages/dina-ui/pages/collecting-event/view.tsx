@@ -118,6 +118,43 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                         <FieldView className="col-md-2" name="dwcRecordedBy" />
                         <FieldView className="col-md-2" name="collectors" />
                       </div>
+                      <div className="row">
+                        <FieldView
+                          className="col-md-2"
+                          name="dwcVerbatimLocality"
+                        />
+                        <FieldView
+                          className="col-md-2"
+                          name="dwcVerbatimLatitude"
+                        />
+                        <FieldView
+                          className="col-md-2"
+                          name="dwcVerbatimLongitude"
+                        />
+                        <FieldView
+                          className="col-md-2"
+                          name="dwcVerbatimCoordinates"
+                        />
+                      </div>
+                      <div className="row">
+                        <FieldView
+                          className="col-md-2"
+                          name="dwcVerbatimCoordinateSystem"
+                        />
+                        <FieldView
+                          className="col-md-2"
+                          name="dwcVerbatimSRS"
+                          label={formatMessage("field_dwcVerbatimSRS_label")}
+                        />
+                        <FieldView
+                          className="col-md-2"
+                          name="dwcVerbatimElevation"
+                        />
+                        <FieldView
+                          className="col-md-2"
+                          name="dwcVerbatimDepth"
+                        />
+                      </div>
                     </div>
                   </div>
                 </DinaForm>

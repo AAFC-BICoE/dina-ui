@@ -159,6 +159,22 @@ function CollectingEventFormInternal() {
           isMulti={true}
         />
       </div>
+      <div className="row">
+        <TextField className="col-md-3" name="dwcVerbatimLocality" />
+        <TextField className="col-md-3" name="dwcVerbatimLatitude" />
+        <TextField className="col-md-3" name="dwcVerbatimLongitude" />
+        <TextField className="col-md-3" name="dwcVerbatimCoordinates" />
+      </div>
+      <div className="row">
+        <TextField className="col-md-3" name="dwcVerbatimCoordinateSystem" />
+        <TextField
+          className="col-md-3"
+          name="dwcVerbatimSRS"
+          label={formatMessage("field_dwcVerbatimSRS_label")}
+        />
+        <TextField className="col-md-3" name="dwcVerbatimElevation" />
+        <TextField className="col-md-3" name="dwcVerbatimDepth" />
+      </div>
     </div>
   );
 }
