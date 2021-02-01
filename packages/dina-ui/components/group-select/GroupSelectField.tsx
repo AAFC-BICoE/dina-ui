@@ -46,10 +46,12 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
   const { response } = useQuery<Group[]>({
     path: "user-api/group",
     page: { limit: 1000 },
-    filter:
-      shouldDisable || showAllGroups
-        ? undefined
-        : JSON.stringify({ name: myGroupNames })
+    // Get the group from backend when groupName is not within current user's group
+    filter: showAllGroups
+      ? undefined
+      : shouldDisable
+      ? JSON.stringify({ name: [groupName] })
+      : JSON.stringify({ name: myGroupNames })
   });
 
   const groupOptions: SelectOption<string>[] | undefined = response?.data?.map(

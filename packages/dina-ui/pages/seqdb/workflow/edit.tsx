@@ -91,7 +91,11 @@ function ChainForm({ chain, router }: ChainFormProps) {
       <div className="container-fluid">
         <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
           <div className="row">
-            <GroupSelectField className="col-md-3" name="group" />
+            <GroupSelectField
+              className="col-md-3"
+              name="group"
+              groupName={initialValues.group}
+            />
           </div>
           <div className="row">
             <ResourceSelectField<ChainTemplate>
