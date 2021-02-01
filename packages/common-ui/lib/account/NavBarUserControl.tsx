@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { useAccount } from "./AccountProvider";
 
@@ -11,7 +12,14 @@ export function NavbarUserControl() {
         <>
           {username && (
             <span className="mr-2 my-auto">
-              <CommonMessage id="loggedInAsUser" values={{ name: username }} />
+              <Link href="/dina-user/view">
+                <a>
+                  <CommonMessage
+                    id="loggedInAsUser"
+                    values={{ name: username }}
+                  />
+                </a>
+              </Link>
             </span>
           )}
           <button

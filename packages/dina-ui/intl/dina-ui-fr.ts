@@ -108,7 +108,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   organizationListTitle: "Organisations",
   organizationViewTitle: "Afficher l'organisation",
   personListTitle: "Personnes",
-  personViewTitle: "Afficher la personne",
+  personViewTitle: "Personne",
   revisionsButtonText: "Révisions",
   revisionsByUserPageTitle: "Révisions par l'utilisateur",
   searchButton: "Recherche",

@@ -156,7 +156,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organizationListTitle: "Organizations",
   organizationViewTitle: "View Organization",
   personListTitle: "Persons",
-  personViewTitle: "View Person",
+  personViewTitle: "Person",
   resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",
   revisionsButtonText: "Revisions",
   revisionsByUserPageTitle: "Revisions by user",
