@@ -4,8 +4,8 @@ import { Organization } from "./Organization";
 export interface PersonAttributes {
   type: "person";
   displayName: string;
-  givenNames: string;
-  familyNames: string;
+  givenNames?: string;
+  familyNames?: string;
   email: string;
   uuid: string;
   createdBy?: string;
