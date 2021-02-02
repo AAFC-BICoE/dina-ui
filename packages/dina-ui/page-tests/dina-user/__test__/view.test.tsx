@@ -1,6 +1,7 @@
 import { DinaUser } from "../../../types/user-api/resources/DinaUser";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import DinaUserDetailsPage from "../../../pages/dina-user/view";
+import { Person } from "../../../types/objectstore-api";
 
 /** Test dina user with all fields defined. */
 const TEST_DINAUSER: DinaUser = {
@@ -13,9 +14,24 @@ const TEST_DINAUSER: DinaUser = {
   type: "user"
 };
 
+const TEST_AGENT: Person = {
+  displayName: "person a",
+  email: "testperson@a.b",
+  id: "1",
+  type: "person",
+  uuid: "323423-23423-234"
+};
+
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async () => {
   return { data: TEST_DINAUSER };
+});
+
+const mockBulkGet = jest.fn(async paths => {
+  if ((paths[0] as string).startsWith("person/")) {
+    return [TEST_AGENT];
+  }
+  return [];
 });
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -23,7 +39,8 @@ jest.mock("next/link", () => () => <div />);
 
 // Mock API requests:
 const apiContext: any = {
-  apiClient: { get: mockGet }
+  apiClient: { get: mockGet },
+  bulkGet: mockBulkGet
 };
 
 describe("Dina user who am i page", () => {
