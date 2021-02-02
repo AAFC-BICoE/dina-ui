@@ -432,6 +432,7 @@ describe("Metadata bulk edit page", () => {
         license:
           "Open Government Licence - Canada (license/open-government-license-canada)",
         metadata: {
+          acCaption: "test-file.png",
           acDigitizationDate: "2020-12-17T23:37:45+00:00",
           acMetadataCreator: {
             id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",

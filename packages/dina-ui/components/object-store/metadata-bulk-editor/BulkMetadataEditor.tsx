@@ -193,6 +193,7 @@ export function BulkMetadataEditor({
 
       const newMetadatas = objectUploads.map<Metadata>(objectUpload => ({
         ...metadataDefaults,
+        acCaption: objectUpload.originalFilename,
         acDigitizationDate: objectUpload.dateTimeDigitized
           ? moment(objectUpload.dateTimeDigitized).format()
           : null,
