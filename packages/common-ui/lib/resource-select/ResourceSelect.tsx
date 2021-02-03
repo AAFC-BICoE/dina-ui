@@ -152,7 +152,10 @@ export function ResourceSelect<TData extends KitsuResource>({
       loadOptions={debouncedOptionLoader}
       onChange={onChangeInternal}
       placeholder={formatMessage({ id: "typeHereToSearch" })}
-      styles={{ multiValueLabel: () => ({ cursor: "move" }), ...styles }}
+      styles={{
+        multiValueLabel: base => ({ ...base, cursor: "move" }),
+        ...styles
+      }}
       value={selectValue}
       // react-sortable-hoc config:
       axis="xy"
