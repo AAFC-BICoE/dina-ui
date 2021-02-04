@@ -20,7 +20,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
   filterPartialMatch: "Correspondance partielle",
   filterSubmitButtonText: "Filtrer la liste",
   loadingText: "Chargement en cours...",
-  loggedInAsUser: "Connecté en tant que : {name}",
+  loggedInAsUser: "Connecté en tant que:",
   logoutBtn: "Fermer la session",
   no: "Non",
   resetButtonText: "Réinitialiser",

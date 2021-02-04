@@ -12,13 +12,9 @@ export function NavbarUserControl() {
         <>
           {username && (
             <span className="mr-2 my-auto">
+              <CommonMessage id="loggedInAsUser" />{" "}
               <Link href="/dina-user/view">
-                <a>
-                  <CommonMessage
-                    id="loggedInAsUser"
-                    values={{ name: username }}
-                  />
-                </a>
+                <a>{username}</a>
               </Link>
             </span>
           )}
