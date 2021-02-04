@@ -9,6 +9,9 @@ export type DcType =
   | "Undetermined";
 
 export interface ObjectUploadAttributes {
+  bucket?: string;
+  createdBy?: string;
+  createdOn?: string;
   dcType?: DcType;
   fileIdentifier: string;
   metaFileEntryVersion: string;

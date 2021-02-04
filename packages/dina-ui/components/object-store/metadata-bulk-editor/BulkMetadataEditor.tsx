@@ -57,8 +57,6 @@ export function BulkMetadataEditor({
 }: BulkMetadataEditorProps) {
   const { apiClient, bulkGet, save } = useContext(ApiClientContext);
   const { agentId, initialized: accountInitialized } = useAccount();
-  const { formatMessage } = useDinaIntl();
-  const resourceSelectCell = useResourceSelectCells();
   const [
     initialEditableManagedAttributes,
     setInitialEditableManagedAttributes
@@ -66,76 +64,7 @@ export function BulkMetadataEditor({
 
   const { locale } = useDinaIntl();
 
-  const BUILT_IN_ATTRIBUTES_COLUMNS: HotColumnProps[] = [
-    {
-      data: "metadata.originalFilename",
-      readOnly: true,
-      title: formatMessage("field_originalFilename")
-    },
-    {
-      data: "metadata.acDigitizationDate",
-      readOnly: true,
-      title: formatMessage("field_acDigitizationDate")
-    },
-    {
-      data: "metadata.dcType",
-      source: [
-        "Image",
-        "Moving Image",
-        "Sound",
-        "Text",
-        "Dataset",
-        "Undetermined"
-      ],
-      title: formatMessage("field_dcType"),
-      type: "dropdown"
-    },
-    {
-      data: "metadata.acCaption",
-      title: formatMessage("field_acCaption")
-    },
-    {
-      data: "acTags",
-      title: formatMessage("metadataBulkEditTagsLabel")
-    },
-    resourceSelectCell<Person>(
-      {
-        filter: input => ({ rsql: `displayName==*${input}*` }),
-        label: person => person.displayName,
-        model: "agent-api/person",
-        type: "person"
-      },
-      {
-        data: "dcCreator",
-        title: formatMessage("field_dcCreator.displayName")
-      }
-    ),
-    {
-      data: "metadata.dcRights",
-      title: formatMessage("field_dcRights")
-    },
-    resourceSelectCell<License>(
-      {
-        label: license => license.titles[locale] ?? license.url,
-        model: "objectstore-api/license",
-        type: "license"
-      },
-      {
-        data: "license",
-        title: formatMessage("field_license")
-      }
-    ),
-    {
-      data: "metadata.publiclyReleasable",
-      source: ["true", "false"],
-      title: formatMessage("field_publiclyReleasable"),
-      type: "dropdown"
-    },
-    {
-      data: "metadata.notPubliclyReleasableReason",
-      title: formatMessage("field_notPubliclyReleasableReason")
-    }
-  ];
+  const BUILT_IN_ATTRIBUTES_COLUMNS = useMetadataBuiltInAttributeColumns();
 
   if ((!metadataIds && !objectUploadIds) || !accountInitialized) {
     return <LoadingSpinner loading={true} />;
@@ -416,6 +345,83 @@ export function BulkMetadataEditor({
       </div>
     </div>
   );
+}
+
+/** Gets the Metadata bulit in attrbute columns for the bulk editor. (Not including ManagedAttributes) */
+export function useMetadataBuiltInAttributeColumns(): HotColumnProps[] {
+  const { formatMessage, locale } = useDinaIntl();
+  const resourceSelectCell = useResourceSelectCells();
+
+  return [
+    {
+      data: "metadata.originalFilename",
+      readOnly: true,
+      title: formatMessage("field_originalFilename")
+    },
+    {
+      data: "metadata.acDigitizationDate",
+      readOnly: true,
+      title: formatMessage("field_acDigitizationDate")
+    },
+    {
+      data: "metadata.dcType",
+      source: [
+        "Image",
+        "Moving Image",
+        "Sound",
+        "Text",
+        "Dataset",
+        "Undetermined"
+      ],
+      title: formatMessage("field_dcType"),
+      type: "dropdown"
+    },
+    {
+      data: "metadata.acCaption",
+      title: formatMessage("field_acCaption")
+    },
+    {
+      data: "acTags",
+      title: formatMessage("metadataBulkEditTagsLabel")
+    },
+    resourceSelectCell<Person>(
+      {
+        filter: input => ({ rsql: `displayName==*${input}*` }),
+        label: person => person.displayName,
+        model: "agent-api/person",
+        type: "person"
+      },
+      {
+        data: "dcCreator",
+        title: formatMessage("field_dcCreator.displayName")
+      }
+    ),
+    {
+      data: "metadata.dcRights",
+      title: formatMessage("field_dcRights")
+    },
+    resourceSelectCell<License>(
+      {
+        label: license => license.titles[locale] ?? license.url,
+        model: "objectstore-api/license",
+        type: "license"
+      },
+      {
+        data: "license",
+        title: formatMessage("field_license")
+      }
+    ),
+    {
+      data: "metadata.publiclyReleasable",
+      source: ["true", "false"],
+      title: formatMessage("field_publiclyReleasable"),
+      type: "dropdown"
+    },
+    {
+      data: "metadata.notPubliclyReleasableReason",
+      title: formatMessage("field_notPubliclyReleasableReason")
+    }
+  ];
 }
 
 /**

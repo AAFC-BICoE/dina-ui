@@ -1,12 +1,13 @@
-import { DinaForm, useAccount } from "common-ui";
+import { DinaForm, FormikButton, useAccount } from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
+import { GroupSelectField } from "../../components/group-select/GroupSelectField";
 import {
   FileUploader,
   FileUploaderOnSubmitArgs
 } from "../../components/object-store";
 import { useFileUpload } from "../../components/object-store/file-upload/FileUploadProvider";
-import { GroupSelectField } from "../../components/group-select/GroupSelectField";
+import { useDefaultValueRuleEditorModal } from "../../components/object-store/metadata-bulk-editor/custom-default-values/useDefaultValueRuleBuilderModal";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface OnSubmitValues {
@@ -18,6 +19,7 @@ export default function UploadPage() {
   const { formatMessage } = useDinaIntl();
   const { initialized: accountInitialized, groupNames } = useAccount();
   const { uploadFiles } = useFileUpload();
+  const { openDefaultValuesModal } = useDefaultValueRuleEditorModal();
 
   const acceptedFileTypes = "image/*,audio/*,video/*,.pdf,.doc,.docx,.png";
 
@@ -57,6 +59,14 @@ export default function UploadPage() {
           <DinaForm initialValues={{ group: groupNames[0] }}>
             <div className="row">
               <GroupSelectField className="col-md-3" name="group" />
+              <div className="col-md-3">
+                <FormikButton
+                  className="btn btn-primary"
+                  onClick={openDefaultValuesModal}
+                >
+                  Configure default values
+                </FormikButton>
+              </div>
             </div>
             <div>
               <FileUploader
