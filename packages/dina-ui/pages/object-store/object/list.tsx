@@ -166,9 +166,10 @@ export default function MetadataListPage() {
           <div className={`table-section col-${tableSectionWidth}`}>
             <SplitPagePanel>
               <ListPageLayout<Metadata>
-                // Filter out the derived objects e.g. thumbnails:
                 additionalFilters={filterForm => ({
+                  // Apply group filter:
                   ...(filterForm.group && { bucket: filterForm.group }),
+                  // Filter out the derived objects e.g. thumbnails:
                   rsql: "acSubTypeId==null"
                 })}
                 defaultSort={[
@@ -186,7 +187,6 @@ export default function MetadataListPage() {
                         name="group"
                         showAnyOption={true}
                         showAllGroups={true}
-                        showDefaultValue={true}
                       />
                     </div>
                   </div>

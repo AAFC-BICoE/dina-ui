@@ -33,6 +33,10 @@ export default function CollectingEventListPage() {
           <CreateButton entityLink="/collecting-event" />
         </ButtonBar>
         <ListPageLayout
+          additionalFilters={filterForm => ({
+            // Apply group filter:
+            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
+          })}
           filterAttributes={COLLECTING_EVENT_FILTER_ATTRIBUTES}
           id="collecting-event-list"
           queryTableProps={{
