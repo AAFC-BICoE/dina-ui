@@ -69,18 +69,6 @@ const Home: React.FunctionComponent = () => (
         </li>
       </ul>
       <h2>
-        <DinaMessage id="dinaUserSectionTitle" />
-      </h2>
-      <ul>
-        <li>
-          <Link href="/dina-user/view">
-            <a>
-              <DinaMessage id="whoAmITitle" />
-            </a>
-          </Link>
-        </li>
-      </ul>
-      <h2>
         <SeqdbMessage id="seqdbTitle" />
       </h2>
       <ul>
