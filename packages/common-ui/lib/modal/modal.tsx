@@ -44,7 +44,6 @@ export function ModalProvider({ appElement, children }: ModalProviderProps) {
   return (
     <ModalContext.Provider value={{ closeModal, openModal }}>
       {children}
-      <style>{`.modal-content { margin: auto }`}</style>
       <ReactModal
         appElement={appElement ?? undefined}
         isOpen={!!modals.length}
@@ -52,6 +51,7 @@ export function ModalProvider({ appElement, children }: ModalProviderProps) {
         // Make sure the modal is in front of the Bootstrap nav bar:
         style={{ overlay: { zIndex: 1040 } }}
       >
+        {modals.length && <style>{`.modal-content { margin: auto }`}</style>}
         {modals.map((modal, index) => (
           <div
             className="dina-modal-wrapper"
