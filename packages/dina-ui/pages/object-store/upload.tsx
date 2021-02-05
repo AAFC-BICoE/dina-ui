@@ -61,7 +61,7 @@ export default function UploadPage() {
               <GroupSelectField className="col-md-3" name="group" />
               <div className="col-md-3">
                 <FormikButton
-                  className="btn btn-primary"
+                  className="btn btn-primary mt-4"
                   onClick={openDefaultValuesModal}
                 >
                   Configure default values

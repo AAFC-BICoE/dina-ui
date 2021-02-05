@@ -7,14 +7,16 @@ import {
   SubmitButton,
   TextField
 } from "common-ui";
-import { FieldArray, useFormikContext } from "formik";
+import { FieldArray } from "formik";
+import { useEffect, useState } from "react";
+import Select from "react-select";
 import titleCase from "title-case";
-import { v4 as uuidv4 } from "uuid";
 import { useDinaIntl } from "../../../../intl/dina-ui-intl";
 import { useMetadataBuiltInAttributeColumns } from "../BulkMetadataEditor";
 
 interface DefaultValuesConfig {
-  uuid: string;
+  createdOn: string;
+  name: string;
   defaultValueRules: DefaultValueRule[];
 }
 
@@ -54,23 +56,22 @@ export function DefaultValueRuleEditor({
     []
   );
 
-  const configToEdit = storedDefaultValuesConfigs[0] ?? {
-    uuid: uuidv4(),
-    defaultValueRules: []
-  };
+  const [ruleConfigIndex, setRuleConfigIndex] = useState(0);
+
+  const selectedConfig: DefaultValuesConfig | undefined =
+    storedDefaultValuesConfigs[ruleConfigIndex];
 
   const saveDefaultValueRules: DinaFormOnSubmit<DefaultValuesConfig> = ({
     submittedValues
   }) => {
-    const index = storedDefaultValuesConfigs.findIndex(
-      cfg => cfg.uuid === submittedValues.uuid
-    );
     const newDefaultValuesConfigs = [...storedDefaultValuesConfigs];
 
-    if (index === -1) {
-      newDefaultValuesConfigs.push(submittedValues);
+    const existingRuleConfig = newDefaultValuesConfigs[ruleConfigIndex];
+
+    if (existingRuleConfig) {
+      newDefaultValuesConfigs[ruleConfigIndex] = submittedValues;
     } else {
-      newDefaultValuesConfigs[index] = submittedValues;
+      newDefaultValuesConfigs.push(submittedValues);
     }
 
     saveDefaultValuesConfigs(newDefaultValuesConfigs);
@@ -79,52 +80,144 @@ export function DefaultValueRuleEditor({
   };
 
   return (
-    <DinaForm<DefaultValuesConfig>
-      initialValues={configToEdit}
-      onSubmit={saveDefaultValueRules}
-    >
-      {({ values }) => (
-        <div>
-          <ul className="list-group">
-            <FieldArray name="defaultValueRules">
-              {arrayHelpers =>
-                values.defaultValueRules.length ? (
-                  values.defaultValueRules.map((_, index) => (
-                    <li className="list-group-item" key={index}>
-                      <DefaultValueRuleEditorRow
-                        index={index}
-                        onAddClick={() =>
-                          arrayHelpers.insert(index + 1, blankRule())
-                        }
-                        onRemoveClick={() => arrayHelpers.remove(index)}
-                        targetFields={builtInMetadataAttributes}
-                      />
-                    </li>
-                  ))
-                ) : (
-                  <button
-                    style={{ width: "10rem" }}
-                    className="btn btn-primary"
-                    type="button"
-                    onClick={() => arrayHelpers.push(blankRule())}
-                  >
-                    Add rule
-                  </button>
-                )
-              }
-            </FieldArray>
-          </ul>
-          {/** Spacer div to make room for react-select's dropdown menus: */}
-          <div style={{ height: "15rem" }} />
-          <SubmitButton />
-        </div>
+    <div>
+      <div className="form-group">
+        <DefaultValueConfigSelector
+          ruleConfigIndex={ruleConfigIndex}
+          onChangeConfigIndex={setRuleConfigIndex}
+        />
+      </div>
+      <hr />
+      {selectedConfig && (
+        <DinaForm<DefaultValuesConfig>
+          enableReinitialize={true}
+          initialValues={selectedConfig}
+          onSubmit={saveDefaultValueRules}
+        >
+          {({ values }) => (
+            <div>
+              <TextField className="col-md-3" name="name" />
+              <ul className="list-group">
+                <FieldArray name="defaultValueRules">
+                  {arrayHelpers =>
+                    values.defaultValueRules.length ? (
+                      values.defaultValueRules.map((rule, index) => (
+                        <li className="list-group-item" key={index}>
+                          <DefaultValueRuleEditorRow
+                            index={index}
+                            rule={rule}
+                            onAddClick={() =>
+                              arrayHelpers.insert(index + 1, blankRule())
+                            }
+                            onRemoveClick={() => arrayHelpers.remove(index)}
+                            targetFields={builtInMetadataAttributes}
+                          />
+                        </li>
+                      ))
+                    ) : (
+                      <button
+                        style={{ width: "10rem" }}
+                        className="btn btn-primary"
+                        type="button"
+                        onClick={() => arrayHelpers.push(blankRule())}
+                      >
+                        Add rule
+                      </button>
+                    )
+                  }
+                </FieldArray>
+              </ul>
+              {/** Spacer div to make room for react-select's dropdown menus: */}
+              <div style={{ height: "15rem" }} />
+              <SubmitButton />
+            </div>
+          )}
+        </DinaForm>
       )}
-    </DinaForm>
+    </div>
+  );
+}
+
+interface DefaultValueConfigSelectorProps {
+  ruleConfigIndex: number;
+  onChangeConfigIndex: (index: number) => void;
+}
+
+function DefaultValueConfigSelector({
+  ruleConfigIndex,
+  onChangeConfigIndex
+}: DefaultValueConfigSelectorProps) {
+  const [
+    storedDefaultValuesConfigs,
+    saveDefaultValuesConfigs
+  ] = useLocalStorage<DefaultValuesConfig[]>(
+    "metadata_defaultValuesConfigs",
+    []
+  );
+
+  function addNewConfig() {
+    const newConfigs = [
+      ...storedDefaultValuesConfigs,
+      {
+        name: "",
+        createdOn: new Date().toLocaleString(),
+        defaultValueRules: []
+      }
+    ];
+    saveDefaultValuesConfigs(newConfigs);
+    onChangeConfigIndex(newConfigs.length - 1);
+  }
+
+  function deleteThisConfig() {
+    const newConfigs = storedDefaultValuesConfigs.filter(
+      (_, index) => index !== ruleConfigIndex
+    );
+    saveDefaultValuesConfigs(newConfigs);
+    onChangeConfigIndex(0);
+  }
+
+  const ruleConfigSelectOptions = storedDefaultValuesConfigs.map(
+    (cfg, index) => ({
+      label: cfg.name || `Rule Set ${cfg.createdOn}`,
+      value: index
+    })
+  );
+
+  return (
+    <div className="row">
+      <div className="col-md-4">
+        <Select<{ label: string; value: number }>
+          instanceId="config-select"
+          options={ruleConfigSelectOptions}
+          onChange={(option: any) => onChangeConfigIndex(option.value)}
+          value={ruleConfigSelectOptions[ruleConfigIndex] ?? null}
+        />
+      </div>
+      <div className="col-md-2">
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={addNewConfig}
+        >
+          Add Rule Set
+        </button>
+      </div>
+      <div className="col-md-2">
+        <button
+          type="button"
+          className="btn btn-danger"
+          onClick={deleteThisConfig}
+        >
+          Delete this Rule Set
+        </button>
+      </div>
+    </div>
   );
 }
 
 interface DefaultValueRuleEditorRowProps {
   index: number;
+  rule: DefaultValueRule;
   targetFields: HotColumnProps[];
   onAddClick: () => void;
   onRemoveClick: () => void;
@@ -132,11 +225,11 @@ interface DefaultValueRuleEditorRowProps {
 
 function DefaultValueRuleEditorRow({
   index,
+  rule,
   targetFields,
   onAddClick,
   onRemoveClick
 }: DefaultValueRuleEditorRowProps) {
-  const { values } = useFormikContext<DefaultValuesConfig>();
   const { formatMessage } = useDinaIntl();
 
   const targetFieldOptions = targetFields.map(({ title, data }) => ({
@@ -153,8 +246,6 @@ function DefaultValueRuleEditorRow({
     label: formatMessage(`field_${field}` as any).trim() || titleCase(field),
     value: field
   }));
-
-  const rule = values.defaultValueRules[index];
 
   const fieldPrefix = `defaultValueRules.${index}`;
 
