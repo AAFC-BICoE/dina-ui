@@ -8,9 +8,11 @@ import { debounce, isUndefined, omitBy } from "lodash";
 import React, { useContext } from "react";
 import { useIntl } from "react-intl";
 import AsyncSelect from "react-select/async";
+import { components as reactSelectComponents } from "react-select";
 import { Styles } from "react-select/src/styles";
 import { OptionsType } from "react-select/src/types";
 import { ApiClientContext } from "../..";
+import { SortableContainer, SortableElement } from "react-sortable-hoc";
 
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData extends KitsuResource> {
@@ -110,6 +112,12 @@ export function ResourceSelect<TData extends KitsuResource>({
     loadOptions(inputValue, callback);
   }, 250);
 
+  const onSortEnd = ({ oldIndex, newIndex }) => {
+    onChange(
+      arrayMove((value ?? []) as PersistedResource<any>[], oldIndex, newIndex)
+    );
+  };
+
   // Set the component's value externally when used as a controlled input.
   let selectValue;
   if (isMulti) {
@@ -137,14 +145,34 @@ export function ResourceSelect<TData extends KitsuResource>({
   }
 
   return (
-    <AsyncSelect
+    <SortableSelect
+      // react-select AsyncSelect props:
       defaultOptions={true}
       isMulti={isMulti}
       loadOptions={debouncedOptionLoader}
       onChange={onChangeInternal}
       placeholder={formatMessage({ id: "typeHereToSearch" })}
-      styles={styles}
+      styles={{
+        multiValueLabel: base => ({ ...base, cursor: "move" }),
+        ...styles
+      }}
       value={selectValue}
+      // react-sortable-hoc config:
+      axis="xy"
+      onSortEnd={onSortEnd}
+      components={{
+        MultiValue: SortableMultiValue
+      }}
+      distance={4}
     />
   );
 }
+
+// Drag/drop re-ordering support copied from https://github.com/JedWatson/react-select/pull/3645/files
+function arrayMove(array: any[], from: number, to: number) {
+  array = array.slice();
+  array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
+  return array;
+}
+const SortableMultiValue = SortableElement(reactSelectComponents.MultiValue);
+const SortableSelect = SortableContainer(AsyncSelect);
