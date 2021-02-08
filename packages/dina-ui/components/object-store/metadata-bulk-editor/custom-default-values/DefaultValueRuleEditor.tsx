@@ -1,9 +1,11 @@
-import { useLocalStorage } from "@rehooks/local-storage";
 import { DinaForm, DinaFormOnSubmit, SubmitButton, TextField } from "common-ui";
 import { FieldArray } from "formik";
 import { useState } from "react";
-import Select from "react-select";
 import { useMetadataBuiltInAttributeColumns } from "../BulkMetadataEditor";
+import {
+  DefaultValueConfigManager,
+  useStoredDefaultValuesConfigs
+} from "./DefaultValueConfigManager";
 import { DefaultValueRuleEditorRow } from "./DefaultValueRuleEditorRow";
 import { DefaultValueRule, DefaultValuesConfig } from "./model-types";
 
@@ -18,28 +20,25 @@ export function DefaultValueRuleEditor({
     column => !column.readOnly && column.type !== "dropdown"
   );
 
-  const [
+  const {
     storedDefaultValuesConfigs,
     saveDefaultValuesConfigs
-  ] = useLocalStorage<DefaultValuesConfig[]>(
-    "metadata_defaultValuesConfigs",
-    []
-  );
+  } = useStoredDefaultValuesConfigs();
 
-  const [ruleConfigIndex, setRuleConfigIndex] = useState(0);
+  const [ruleConfigIndex, setRuleConfigIndex] = useState<number | null>(0);
 
   const selectedConfig: DefaultValuesConfig | undefined =
-    storedDefaultValuesConfigs[ruleConfigIndex];
+    storedDefaultValuesConfigs[ruleConfigIndex ?? -1] ?? undefined;
 
   const saveDefaultValueRules: DinaFormOnSubmit<DefaultValuesConfig> = ({
     submittedValues
   }) => {
     const newDefaultValuesConfigs = [...storedDefaultValuesConfigs];
 
-    const existingRuleConfig = newDefaultValuesConfigs[ruleConfigIndex];
-
-    if (existingRuleConfig) {
-      newDefaultValuesConfigs[ruleConfigIndex] = submittedValues;
+    if (selectedConfig) {
+      newDefaultValuesConfigs[
+        newDefaultValuesConfigs.indexOf(selectedConfig)
+      ] = submittedValues;
     } else {
       newDefaultValuesConfigs.push(submittedValues);
     }
@@ -52,7 +51,7 @@ export function DefaultValueRuleEditor({
   return (
     <div>
       <div className="form-group">
-        <DefaultValueConfigSelector
+        <DefaultValueConfigManager
           ruleConfigIndex={ruleConfigIndex}
           onChangeConfigIndex={setRuleConfigIndex}
         />
@@ -104,83 +103,6 @@ export function DefaultValueRuleEditor({
           )}
         </DinaForm>
       )}
-    </div>
-  );
-}
-
-interface DefaultValueConfigSelectorProps {
-  ruleConfigIndex: number;
-  onChangeConfigIndex: (index: number) => void;
-}
-
-function DefaultValueConfigSelector({
-  ruleConfigIndex,
-  onChangeConfigIndex
-}: DefaultValueConfigSelectorProps) {
-  const [
-    storedDefaultValuesConfigs,
-    saveDefaultValuesConfigs
-  ] = useLocalStorage<DefaultValuesConfig[]>(
-    "metadata_defaultValuesConfigs",
-    []
-  );
-
-  function addNewConfig() {
-    const newConfigs = [
-      ...storedDefaultValuesConfigs,
-      {
-        name: "",
-        createdOn: new Date().toLocaleString(),
-        defaultValueRules: []
-      }
-    ];
-    saveDefaultValuesConfigs(newConfigs);
-    onChangeConfigIndex(newConfigs.length - 1);
-  }
-
-  function deleteThisConfig() {
-    const newConfigs = storedDefaultValuesConfigs.filter(
-      (_, index) => index !== ruleConfigIndex
-    );
-    saveDefaultValuesConfigs(newConfigs);
-    onChangeConfigIndex(0);
-  }
-
-  const ruleConfigSelectOptions = storedDefaultValuesConfigs.map(
-    (cfg, index) => ({
-      label: cfg.name || `Rule Set ${cfg.createdOn}`,
-      value: index
-    })
-  );
-
-  return (
-    <div className="row">
-      <div className="col-md-4">
-        <Select<{ label: string; value: number }>
-          instanceId="config-select"
-          options={ruleConfigSelectOptions}
-          onChange={(option: any) => onChangeConfigIndex(option.value)}
-          value={ruleConfigSelectOptions[ruleConfigIndex] ?? null}
-        />
-      </div>
-      <div className="col-md-2">
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={addNewConfig}
-        >
-          Add Rule Set
-        </button>
-      </div>
-      <div className="col-md-2">
-        <button
-          type="button"
-          className="btn btn-danger"
-          onClick={deleteThisConfig}
-        >
-          Delete this Rule Set
-        </button>
-      </div>
     </div>
   );
 }

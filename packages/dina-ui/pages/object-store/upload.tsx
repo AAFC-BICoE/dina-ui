@@ -7,11 +7,13 @@ import {
   FileUploaderOnSubmitArgs
 } from "../../components/object-store";
 import { useFileUpload } from "../../components/object-store/file-upload/FileUploadProvider";
+import { DefaultValuesConfigSelectField } from "../../components/object-store/metadata-bulk-editor/custom-default-values/DefaultValueConfigManager";
 import { useDefaultValueRuleEditorModal } from "../../components/object-store/metadata-bulk-editor/custom-default-values/useDefaultValueRuleBuilderModal";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface OnSubmitValues {
   group: string;
+  defaultValuesConfig: number | null;
 }
 
 export default function UploadPage() {
@@ -25,7 +27,8 @@ export default function UploadPage() {
 
   async function onSubmit({
     acceptedFiles,
-    group
+    group,
+    defaultValuesConfig
   }: FileUploaderOnSubmitArgs<OnSubmitValues>) {
     if (!group) {
       throw new Error(formatMessage("groupMustBeSelected"));
@@ -39,7 +42,11 @@ export default function UploadPage() {
 
     await router.push({
       pathname: "/object-store/metadata/edit",
-      query: { group, objectUploadIds }
+      query: {
+        group,
+        objectUploadIds,
+        ...(defaultValuesConfig !== null ? { defaultValuesConfig } : {})
+      }
     });
   }
 
@@ -56,9 +63,19 @@ export default function UploadPage() {
             <DinaMessage id="userMustBelongToGroup" />
           </div>
         ) : (
-          <DinaForm initialValues={{ group: groupNames[0] }}>
+          <DinaForm<OnSubmitValues>
+            initialValues={{
+              group: groupNames[0],
+              defaultValuesConfig: null
+            }}
+          >
             <div className="row">
               <GroupSelectField className="col-md-3" name="group" />
+              <DefaultValuesConfigSelectField
+                allowBlank={true}
+                name="defaultValuesConfig"
+                className="col-md-3"
+              />
               <div className="col-md-3">
                 <FormikButton
                   className="btn btn-primary mt-4"
