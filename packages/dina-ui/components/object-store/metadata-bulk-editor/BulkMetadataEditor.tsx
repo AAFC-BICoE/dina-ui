@@ -203,13 +203,14 @@ export function BulkMetadataEditor({
 
   /** Apply custom default values to new Metadatas: */
   async function applyCustomDefaultValues(rows: BulkMetadataEditRow[]) {
-    // Don't apply default values to existing Metadatas:
-    if (!objectUploadIds) {
-      return;
-    }
-
     const selectedDefaultValuesConfig =
       storedDefaultValuesConfigs[defaultValuesConfig ?? -1];
+
+    // Don't apply default values to existing Metadatas.
+    // Don't apply default values when no Default Values Config is seleceted.
+    if (!objectUploadIds || !selectedDefaultValuesConfig) {
+      return;
+    }
 
     // Loop through spreadsheet rows:
     for (const row of rows) {

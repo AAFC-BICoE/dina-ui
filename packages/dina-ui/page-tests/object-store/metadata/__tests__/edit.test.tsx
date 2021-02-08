@@ -447,6 +447,12 @@ describe("Metadata bulk edit page", () => {
           xmpRightsUsageTerms: "default-value",
           xmpRightsWebStatement: "default-value",
           type: "metadata"
+        },
+        // The ObjectUpload is included in the initial table data to provide values for Default Values Configs:
+        objectUpload: {
+          dateTimeDigitized: "2020-12-17T23:37:45.932Z",
+          id: "b4c8d6a6-0332-4f2a-a7b9-68b7898b6486",
+          originalFilename: "test-file.png"
         }
       }
     ]);
