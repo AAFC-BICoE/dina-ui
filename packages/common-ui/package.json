@@ -37,6 +37,7 @@
     "react-modal": "^3.11.2",
     "react-number-format": "^4.4.1",
     "react-select": "^3.1.0",
+    "react-sortable-hoc": "^1.11.0",
     "react-table": "^6.11.5",
     "title-case": "2.1.1",
     "uuid": "^8.3.2"

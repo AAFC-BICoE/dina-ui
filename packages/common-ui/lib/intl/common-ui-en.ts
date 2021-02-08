@@ -40,7 +40,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   filterSubmitButtonText: "Filter List",
   filterUntil: "UNTIL",
   loadingText: "Loading...",
-  loggedInAsUser: "Logged in as: {name}",
+  loggedInAsUser: "Logged in as:",
   logoutBtn: "Logout",
   name: "Name",
   next: "Next",

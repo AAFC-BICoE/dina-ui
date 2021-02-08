@@ -73,7 +73,7 @@ function GalleryItem({
   metadata,
   onSelectPreviewMetadataId
 }: GalleryItemProps) {
-  const { id, originalFilename } = metadata;
+  const { id, acCaption } = metadata;
 
   const { formatMessage } = useDinaIntl();
   const { response: thumbnailResponse } = useQuery<Metadata[]>({
@@ -113,9 +113,9 @@ function GalleryItem({
             whiteSpace: "nowrap",
             width: "100%"
           }}
-          title={originalFilename}
+          title={acCaption}
         >
-          {originalFilename}
+          {acCaption}
         </a>
       </Link>
       <div className="row">

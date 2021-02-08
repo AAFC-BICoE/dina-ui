@@ -103,7 +103,7 @@ function CollectingEventFormInternal() {
     <div>
       <div className="form-group">
         <div style={{ width: "300px" }}>
-          <GroupSelectField name="group" showAnyOption={true} />
+          <GroupSelectField name="group" />
         </div>
       </div>
       <div className="row">
