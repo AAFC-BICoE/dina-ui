@@ -1,41 +1,11 @@
-import { HotColumnProps } from "@handsontable/react";
 import { useLocalStorage } from "@rehooks/local-storage";
-import {
-  DinaForm,
-  DinaFormOnSubmit,
-  SelectField,
-  SubmitButton,
-  TextField
-} from "common-ui";
+import { DinaForm, DinaFormOnSubmit, SubmitButton, TextField } from "common-ui";
 import { FieldArray } from "formik";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Select from "react-select";
-import titleCase from "title-case";
-import { useDinaIntl } from "../../../../intl/dina-ui-intl";
 import { useMetadataBuiltInAttributeColumns } from "../BulkMetadataEditor";
-
-interface DefaultValuesConfig {
-  createdOn: string;
-  name: string;
-  defaultValueRules: DefaultValueRule[];
-}
-
-interface DefaultValueRule {
-  targetField: string;
-  source: DefaultValueRuleSource;
-}
-
-type DefaultValueRuleSource = ObjectUploadFieldSource | TextLiteralSource;
-
-interface ObjectUploadFieldSource {
-  type: "objectUploadField";
-  field: string;
-}
-
-interface TextLiteralSource {
-  type: "text";
-  text: string;
-}
+import { DefaultValueRuleEditorRow } from "./DefaultValueRuleEditorRow";
+import { DefaultValueRule, DefaultValuesConfig } from "./model-types";
 
 export interface DefaultValueRuleEditorProps {
   onSave?: () => void;
@@ -215,94 +185,6 @@ function DefaultValueConfigSelector({
   );
 }
 
-interface DefaultValueRuleEditorRowProps {
-  index: number;
-  rule: DefaultValueRule;
-  targetFields: HotColumnProps[];
-  onAddClick: () => void;
-  onRemoveClick: () => void;
-}
-
-function DefaultValueRuleEditorRow({
-  index,
-  rule,
-  targetFields,
-  onAddClick,
-  onRemoveClick
-}: DefaultValueRuleEditorRowProps) {
-  const { formatMessage } = useDinaIntl();
-
-  const targetFieldOptions = targetFields.map(({ title, data }) => ({
-    label: String(title),
-    value: data
-  }));
-
-  const sourceTypeOptions = ["text", "objectUploadField"].map(sourceType => ({
-    label: formatMessage(sourceType as any).trim() || titleCase(sourceType),
-    value: sourceType
-  }));
-
-  const objectUploadFieldOptions = OBJECT_UPLOAD_FIELDS.map(field => ({
-    label: formatMessage(`field_${field}` as any).trim() || titleCase(field),
-    value: field
-  }));
-
-  const fieldPrefix = `defaultValueRules.${index}`;
-
-  return (
-    <div className="list-inline">
-      <div className="list-inline-item">Set</div>
-      <div className="list-inline-item" style={{ width: "16rem" }}>
-        <SelectField
-          name={`${fieldPrefix}.targetField`}
-          options={targetFieldOptions}
-          label={formatMessage("targetField")}
-        />
-      </div>
-      <div className="list-inline-item">To</div>
-      <div className="list-inline-item" style={{ width: "16rem" }}>
-        <SelectField
-          name={`${fieldPrefix}.source.type`}
-          options={sourceTypeOptions}
-          label={formatMessage("valueSourceType")}
-        />
-      </div>
-      <div className="list-inline-item">:</div>
-      {rule.source.type === "text" && (
-        <div className="list-inline-item" style={{ width: "16rem" }}>
-          <TextField
-            name={`${fieldPrefix}.source.text`}
-            label={formatMessage("sourceText")}
-          />
-        </div>
-      )}
-      {rule.source.type === "objectUploadField" && (
-        <div className="list-inline-item" style={{ width: "16rem" }}>
-          <SelectField
-            name={`${fieldPrefix}.source.field`}
-            options={objectUploadFieldOptions}
-            label={formatMessage("sourceField")}
-          />
-        </div>
-      )}
-      <div className="list-inline-item">
-        <button className="btn btn-primary" type="button" onClick={onAddClick}>
-          +
-        </button>
-      </div>
-      <div className="list-inline-item">
-        <button
-          className="btn btn-primary"
-          type="button"
-          onClick={onRemoveClick}
-        >
-          -
-        </button>
-      </div>
-    </div>
-  );
-}
-
 function blankRule(): DefaultValueRule {
   return {
     targetField: "",
@@ -312,20 +194,3 @@ function blankRule(): DefaultValueRule {
     }
   };
 }
-
-const OBJECT_UPLOAD_FIELDS = [
-  "bucket",
-  "createdBy",
-  "createdOn",
-  "dateTimeDigitized",
-  "dcType",
-  "detectedFileExtension",
-  "detectedMediaType",
-  "evaluatedFileExtension",
-  "evaluatedMediaType",
-  "originalFilename",
-  "receivedMediaType",
-  "sha1Hex",
-  "sizeInBytes",
-  "thumbnailIdentifier"
-];
