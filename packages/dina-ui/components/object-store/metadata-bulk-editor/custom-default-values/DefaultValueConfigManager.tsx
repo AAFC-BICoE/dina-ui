@@ -2,6 +2,7 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { FieldWrapper, LabelWrapperParams } from "common-ui";
 import { FastField, FieldProps } from "formik";
 import Select from "react-select";
+import { DinaMessage } from "../../../../intl/dina-ui-intl";
 import { DefaultValuesConfig } from "./model-types";
 
 export interface DefaultValueConfigSelectProps {
@@ -46,30 +47,35 @@ export function DefaultValueConfigManager({
   }
 
   return (
-    <div className="row">
-      <div className="col-md-4">
+    <div className="list-inline">
+      <div className="list-inline-item">
+        <strong>
+          <DinaMessage id="defaultValuesConfig" />:
+        </strong>
+      </div>
+      <div className="list-inline-item" style={{ width: "24rem" }}>
         <DefaultValuesConfigSelect
           allowBlank={allowBlank}
           onChangeConfigIndex={onChangeConfigIndex}
           ruleConfigIndex={ruleConfigIndex}
         />
       </div>
-      <div className="col-md-2">
+      <div className="list-inline-item">
         <button
           type="button"
           className="btn btn-primary form-control add-button"
           onClick={addNewConfig}
         >
-          Add Rule Set
+          <DinaMessage id="addRuleSet" />
         </button>
       </div>
-      <div className="col-md-2">
+      <div className="list-inline-item">
         <button
           type="button"
           className="btn btn-danger form-control delete-button"
           onClick={deleteThisConfig}
         >
-          Delete Config
+          <DinaMessage id="deleteConfig" />
         </button>
       </div>
     </div>

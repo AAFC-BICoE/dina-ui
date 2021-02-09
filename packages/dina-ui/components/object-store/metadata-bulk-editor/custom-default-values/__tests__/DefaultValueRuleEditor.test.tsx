@@ -17,7 +17,7 @@ const TEST_CONFIGS: DefaultValuesConfig[] = [
 
 describe("DefaultValueRuleEditor component", () => {
   beforeEach(() => {
-    // Reset "local storage":
+    // Reset local storage:
     deleteFromStorage(STORAGE_KEY);
     writeStorage(STORAGE_KEY, TEST_CONFIGS);
   });

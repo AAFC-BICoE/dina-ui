@@ -1,6 +1,7 @@
 import { DinaForm, DinaFormOnSubmit, SubmitButton, TextField } from "common-ui";
 import { FieldArray } from "formik";
 import { useState } from "react";
+import { DinaMessage } from "../../../../intl/dina-ui-intl";
 import { useMetadataBuiltInAttributeColumns } from "../BulkMetadataEditor";
 import {
   DefaultValueConfigManager,
@@ -10,10 +11,12 @@ import { DefaultValueRuleEditorRow } from "./DefaultValueRuleEditorRow";
 import { DefaultValueRule, DefaultValuesConfig } from "./model-types";
 
 export interface DefaultValueRuleEditorProps {
-  onSave?: () => void;
+  initialIndex?: number | null;
+  onSave?: (index: number | null) => void;
 }
 
 export function DefaultValueRuleEditor({
+  initialIndex = 0,
   onSave
 }: DefaultValueRuleEditorProps) {
   const builtInMetadataAttributes = useMetadataBuiltInAttributeColumns().filter(
@@ -25,7 +28,9 @@ export function DefaultValueRuleEditor({
     saveDefaultValuesConfigs
   } = useStoredDefaultValuesConfigs();
 
-  const [ruleConfigIndex, setRuleConfigIndex] = useState<number | null>(0);
+  const [ruleConfigIndex, setRuleConfigIndex] = useState<number | null>(
+    initialIndex
+  );
 
   const selectedConfig: DefaultValuesConfig | undefined =
     storedDefaultValuesConfigs[ruleConfigIndex ?? -1] ?? undefined;
@@ -45,7 +50,7 @@ export function DefaultValueRuleEditor({
 
     saveDefaultValuesConfigs(newDefaultValuesConfigs);
 
-    onSave?.();
+    onSave?.(ruleConfigIndex);
   };
 
   return (
@@ -90,7 +95,7 @@ export function DefaultValueRuleEditor({
                         type="button"
                         onClick={() => arrayHelpers.push(blankRule())}
                       >
-                        Add rule
+                        <DinaMessage id="addRule" />
                       </button>
                     )
                   }

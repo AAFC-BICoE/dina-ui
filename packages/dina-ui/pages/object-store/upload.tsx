@@ -74,14 +74,20 @@ export default function UploadPage() {
               <DefaultValuesConfigSelectField
                 allowBlank={true}
                 name="defaultValuesConfig"
-                className="col-md-3"
+                className="offset-md-3 col-md-3"
               />
               <div className="col-md-3">
                 <FormikButton
                   className="btn btn-primary mt-4"
-                  onClick={openDefaultValuesModal}
+                  onClick={({ defaultValuesConfig }, { setFieldValue }) =>
+                    openDefaultValuesModal({
+                      index: defaultValuesConfig,
+                      onSave: index =>
+                        setFieldValue("defaultValuesConfig", index)
+                    })
+                  }
                 >
-                  Configure default values
+                  <DinaMessage id="configureDefaultValues" />
                 </FormikButton>
               </div>
             </div>

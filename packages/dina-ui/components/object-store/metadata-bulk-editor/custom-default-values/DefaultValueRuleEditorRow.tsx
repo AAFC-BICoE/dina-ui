@@ -2,7 +2,7 @@ import { HotColumnProps } from "@handsontable/react";
 import { SelectField, TextField } from "common-ui";
 import { useFormikContext } from "formik";
 import titleCase from "title-case";
-import { useDinaIntl } from "../../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import { DefaultValueRule, DefaultValuesConfig } from "./model-types";
 
 export interface DefaultValueRuleEditorRowProps {
@@ -47,7 +47,9 @@ export function DefaultValueRuleEditorRow({
 
   return (
     <div className="list-inline">
-      <div className="list-inline-item">Set</div>
+      <div className="list-inline-item">
+        <DinaMessage id="set" />
+      </div>
       <div
         className="list-inline-item target-field-field"
         style={{ width: "16rem" }}
@@ -58,7 +60,9 @@ export function DefaultValueRuleEditorRow({
           label={formatMessage("targetField")}
         />
       </div>
-      <div className="list-inline-item">To</div>
+      <div className="list-inline-item">
+        <DinaMessage id="to" />
+      </div>
       <div
         className="list-inline-item source-type-field"
         style={{ width: "16rem" }}

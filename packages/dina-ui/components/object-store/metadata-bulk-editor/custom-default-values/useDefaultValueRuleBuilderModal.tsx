@@ -2,10 +2,18 @@ import { useModal } from "common-ui";
 import { DinaMessage } from "../../../../intl/dina-ui-intl";
 import { DefaultValueRuleEditor } from "./DefaultValueRuleEditor";
 
+interface DefaultValueRuleEditorModalParams {
+  index: number | null;
+  onSave: (index: number | null) => void;
+}
+
 export function useDefaultValueRuleEditorModal() {
   const { closeModal, openModal } = useModal();
 
-  function openDefaultValuesModal() {
+  function openDefaultValuesModal({
+    index,
+    onSave
+  }: DefaultValueRuleEditorModalParams) {
     openModal(
       <div className="modal-content">
         <style>{`
@@ -18,10 +26,18 @@ export function useDefaultValueRuleEditorModal() {
           }
         `}</style>
         <div className="modal-header">
-          <h2>Default value rules</h2>
+          <h2>
+            <DinaMessage id="defaultValuesConfigs" />
+          </h2>
         </div>
         <div className="modal-body">
-          <DefaultValueRuleEditor onSave={closeModal} />
+          <DefaultValueRuleEditor
+            initialIndex={index}
+            onSave={newIndex => {
+              closeModal();
+              onSave(newIndex);
+            }}
+          />
         </div>
         <div className="modal-footer">
           <button className="btn btn-dark" onClick={closeModal}>

@@ -1,9 +1,11 @@
+import { deleteFromStorage, writeStorage } from "@rehooks/local-storage";
 import { PersistedResource } from "kitsu";
 import Select from "react-select/base";
 import {
   BulkMetadataEditRow,
   managedAttributeColumns
 } from "../../../../components/object-store";
+import { DefaultValuesConfig } from "../../../../components/object-store/metadata-bulk-editor/custom-default-values/model-types";
 import EditMetadatasPage from "../../../../pages/object-store/metadata/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
@@ -153,6 +155,25 @@ const apiContext: any = {
   save: mockSave
 };
 
+const STORAGE_KEY = "metadata_defaultValuesConfigs";
+
+const TEST_CONFIGS: DefaultValuesConfig[] = [
+  {
+    name: "initial-name",
+    createdOn: "test-date",
+    defaultValueRules: [
+      {
+        source: { type: "text", text: "test-caption-text" },
+        targetField: "acCaption"
+      },
+      {
+        source: { type: "objectUploadField", field: "originalFilename" },
+        targetField: "acTags"
+      }
+    ]
+  }
+];
+
 describe("Metadata bulk edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -163,6 +184,10 @@ describe("Metadata bulk edit page", () => {
           "6c524135-3c3e-41c1-a057-45afb4e3e7be,3849de16-fee2-4bb1-990d-a4f5de19b48d,31ee7848-b5c1-46e1-bbca-68006d9eda3b"
       }
     });
+
+    // Reset "local storage":
+    deleteFromStorage(STORAGE_KEY);
+    writeStorage(STORAGE_KEY, TEST_CONFIGS);
   });
 
   it("Renders the bulk edit page (edit existing data mode).", async () => {
@@ -510,6 +535,36 @@ describe("Metadata bulk edit page", () => {
           apiBaseUrl: "/objectstore-api"
         }
       ]
+    ]);
+  });
+
+  it("Lets you set custom values from a pre-made config", async () => {
+    mockUseRouter.mockReturnValue({
+      query: {
+        objectUploadIds: "b4c8d6a6-0332-4f2a-a7b9-68b7898b6486",
+        group: "example-group",
+        // The index of the Config to use:
+        defaultValuesConfig: "0"
+      }
+    });
+
+    const wrapper = mountWithAppContext(<EditMetadatasPage />, { apiContext });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Get the table data to directly edit it for the test to simulate how the Handsontable would
+    // edit the data.
+    const tableData = wrapper
+      .find("MockHotTable")
+      .prop<BulkMetadataEditRow[]>("data");
+
+    expect(tableData).toEqual([
+      // Custom default values should be set here:
+      expect.objectContaining({
+        acCaption: "test-caption-text",
+        acTags: "test-file.png"
+      })
     ]);
   });
 });
