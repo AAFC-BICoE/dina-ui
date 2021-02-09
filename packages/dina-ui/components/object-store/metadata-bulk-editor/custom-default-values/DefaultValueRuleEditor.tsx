@@ -86,7 +86,7 @@ export function DefaultValueRuleEditor({
                     ) : (
                       <button
                         style={{ width: "10rem" }}
-                        className="btn btn-primary"
+                        className="btn btn-primary add-rule-button"
                         type="button"
                         onClick={() => arrayHelpers.push(blankRule())}
                       >

@@ -1,8 +1,9 @@
 import { HotColumnProps } from "@handsontable/react";
 import { SelectField, TextField } from "common-ui";
+import { useFormikContext } from "formik";
 import titleCase from "title-case";
 import { useDinaIntl } from "../../../../intl/dina-ui-intl";
-import { DefaultValueRule } from "./model-types";
+import { DefaultValueRule, DefaultValuesConfig } from "./model-types";
 
 export interface DefaultValueRuleEditorRowProps {
   index: number;
@@ -19,6 +20,7 @@ export function DefaultValueRuleEditorRow({
   onAddClick,
   onRemoveClick
 }: DefaultValueRuleEditorRowProps) {
+  const { setFieldValue } = useFormikContext<DefaultValuesConfig>();
   const { formatMessage } = useDinaIntl();
 
   const targetFieldOptions = targetFields.map(({ title, data }) => ({
@@ -38,10 +40,18 @@ export function DefaultValueRuleEditorRow({
 
   const fieldPrefix = `defaultValueRules.${index}`;
 
+  /** Gets rid of fields from the previous Field Source object. */
+  function clearSourceField(type: string) {
+    setFieldValue(`${fieldPrefix}.source`, { type });
+  }
+
   return (
     <div className="list-inline">
       <div className="list-inline-item">Set</div>
-      <div className="list-inline-item" style={{ width: "16rem" }}>
+      <div
+        className="list-inline-item target-field-field"
+        style={{ width: "16rem" }}
+      >
         <SelectField
           name={`${fieldPrefix}.targetField`}
           options={targetFieldOptions}
@@ -49,16 +59,23 @@ export function DefaultValueRuleEditorRow({
         />
       </div>
       <div className="list-inline-item">To</div>
-      <div className="list-inline-item" style={{ width: "16rem" }}>
+      <div
+        className="list-inline-item source-type-field"
+        style={{ width: "16rem" }}
+      >
         <SelectField
           name={`${fieldPrefix}.source.type`}
           options={sourceTypeOptions}
           label={formatMessage("valueSourceType")}
+          onChange={clearSourceField}
         />
       </div>
       <div className="list-inline-item">:</div>
       {rule.source.type === "text" && (
-        <div className="list-inline-item" style={{ width: "16rem" }}>
+        <div
+          className="list-inline-item source-text-field"
+          style={{ width: "16rem" }}
+        >
           <TextField
             name={`${fieldPrefix}.source.text`}
             label={formatMessage("sourceText")}
@@ -66,7 +83,10 @@ export function DefaultValueRuleEditorRow({
         </div>
       )}
       {rule.source.type === "objectUploadField" && (
-        <div className="list-inline-item" style={{ width: "16rem" }}>
+        <div
+          className="list-inline-item source-field-field"
+          style={{ width: "16rem" }}
+        >
           <SelectField
             name={`${fieldPrefix}.source.field`}
             options={objectUploadFieldOptions}
@@ -75,7 +95,11 @@ export function DefaultValueRuleEditorRow({
         </div>
       )}
       <div className="list-inline-item">
-        <button className="btn btn-primary" type="button" onClick={onAddClick}>
+        <button
+          className="btn btn-primary add-rule-button"
+          type="button"
+          onClick={onAddClick}
+        >
           +
         </button>
       </div>

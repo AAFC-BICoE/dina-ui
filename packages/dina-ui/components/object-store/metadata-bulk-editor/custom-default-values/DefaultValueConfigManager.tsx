@@ -1,6 +1,5 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { FieldWrapper, LabelWrapperParams } from "common-ui";
-import { RecursivePartial } from "common-ui/lib/bulk-data-editor/difference";
 import { FastField, FieldProps } from "formik";
 import Select from "react-select";
 import { DefaultValuesConfig } from "./model-types";
@@ -9,12 +8,16 @@ export interface DefaultValueConfigSelectProps {
   allowBlank?: boolean;
   ruleConfigIndex: number | null;
   onChangeConfigIndex: (index: number | null) => void;
+  /** Mock this out in tests so it gives a predictable value. */
+  dateSupplier?: () => string;
 }
 
 /** Lists, adds, edits, and removes Default Value Configs. */
 export function DefaultValueConfigManager({
+  allowBlank,
   ruleConfigIndex,
-  onChangeConfigIndex
+  onChangeConfigIndex,
+  dateSupplier = () => new Date().toLocaleString()
 }: DefaultValueConfigSelectProps) {
   const {
     storedDefaultValuesConfigs,
@@ -26,7 +29,7 @@ export function DefaultValueConfigManager({
       ...storedDefaultValuesConfigs,
       {
         name: "",
-        createdOn: new Date().toLocaleString(),
+        createdOn: dateSupplier(),
         defaultValueRules: []
       }
     ];
@@ -46,6 +49,7 @@ export function DefaultValueConfigManager({
     <div className="row">
       <div className="col-md-4">
         <DefaultValuesConfigSelect
+          allowBlank={allowBlank}
           onChangeConfigIndex={onChangeConfigIndex}
           ruleConfigIndex={ruleConfigIndex}
         />
@@ -53,7 +57,7 @@ export function DefaultValueConfigManager({
       <div className="col-md-2">
         <button
           type="button"
-          className="btn btn-primary form-control"
+          className="btn btn-primary form-control add-button"
           onClick={addNewConfig}
         >
           Add Rule Set
@@ -62,7 +66,7 @@ export function DefaultValueConfigManager({
       <div className="col-md-2">
         <button
           type="button"
-          className="btn btn-danger form-control"
+          className="btn btn-danger form-control delete-button"
           onClick={deleteThisConfig}
         >
           Delete Config
