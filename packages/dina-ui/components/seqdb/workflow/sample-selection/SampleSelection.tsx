@@ -147,7 +147,7 @@ export function SampleSelection(props: StepRendererProps) {
                 defaultPageSize={100}
                 filter={filter}
                 onSuccess={response => setAvailableSamples(response.data)}
-                path="seqdb-api/sample"
+                path="seqdb-api/molecuarSample"
               />
             </div>
             <div className="col-2" style={{ marginTop: "100px" }}>
@@ -182,7 +182,7 @@ export function SampleSelection(props: StepRendererProps) {
                   "chain.uuid": chain.id,
                   "chainStepTemplate.uuid": step.id
                 }}
-                include="sample"
+                include="molecularSample"
                 onSuccess={res => setStepResources(res.data)}
                 path="seqdb-api/stepResource"
               />

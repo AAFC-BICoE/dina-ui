@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { Sample } from "../Sample";
+import { MolecularSample } from "../MolecularSample";
 import { LibraryPrepBatch } from "./LibraryPrepBatch";
 import { NgsIndex } from "./NgsIndex";
 
@@ -13,7 +13,7 @@ interface LibraryPrepAttributes {
 
 interface LibraryPrepRelationships {
   libraryPrepBatch: LibraryPrepBatch;
-  sample: Sample;
+  sample: MolecularSample;
   indexI5?: NgsIndex | null;
   indexI7?: NgsIndex | null;
 }
