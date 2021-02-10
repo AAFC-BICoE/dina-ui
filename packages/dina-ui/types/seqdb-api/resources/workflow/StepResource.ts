@@ -26,7 +26,7 @@ export interface StepResourceRelationships {
   libraryPool?: LibraryPool;
   preLibraryPrep?: PreLibraryPrep;
   primer?: PcrPrimer;
-  sample?: MolecularSample;
+  molecularSample?: MolecularSample;
 }
 
 export type StepResource = KitsuResource &

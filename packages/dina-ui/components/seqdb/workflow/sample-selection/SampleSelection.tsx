@@ -50,14 +50,14 @@ export function SampleSelection(props: StepRendererProps) {
     "name",
     "version",
     {
-      Cell: ({ original: sample }) => (
-        <div className="row" key={sample.id}>
+      Cell: ({ original: molecularSample }) => (
+        <div className="row" key={molecularSample.id}>
           <FormikButton
             className="btn btn-primary btn-sm col-6 single-select-button"
             onClick={async (_, formik) => {
-              await selectSamples([sample]);
+              await selectSamples([molecularSample]);
               formik.setFieldValue(
-                `sampleIdsToSelect[${sample.id}]`,
+                `sampleIdsToSelect[${molecularSample.id}]`,
                 undefined
               );
             }}
@@ -65,7 +65,7 @@ export function SampleSelection(props: StepRendererProps) {
             <SeqdbMessage id="selectButtonText" />
           </FormikButton>
           <div className="col-6">
-            <SampleSelectCheckBox resource={sample} />
+            <SampleSelectCheckBox resource={molecularSample} />
           </div>
         </div>
       ),
@@ -77,11 +77,11 @@ export function SampleSelection(props: StepRendererProps) {
   const SELECTED_SAMPLE_COLUMNS: ColumnDefinition<any>[] = [
     {
       Header: "Name",
-      accessor: "sample.name"
+      accessor: "molecularSample.name"
     },
     {
       Header: "Version",
-      accessor: "sample.version"
+      accessor: "molecularSample.version"
     },
     {
       Cell: ({ original: sr }) => (
@@ -147,7 +147,7 @@ export function SampleSelection(props: StepRendererProps) {
                 defaultPageSize={100}
                 filter={filter}
                 onSuccess={response => setAvailableSamples(response.data)}
-                path="seqdb-api/molecuarSample"
+                path="seqdb-api/molecularSample"
               />
             </div>
             <div className="col-2" style={{ marginTop: "100px" }}>

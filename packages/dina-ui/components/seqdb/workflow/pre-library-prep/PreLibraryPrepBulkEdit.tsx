@@ -50,7 +50,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
 
   const COLUMNS: HotColumnProps[] = [
     {
-      data: "sampleStepResource.sample.name",
+      data: "sampleStepResource.molecularSample.name",
       title: formatMessage("field_name")
     },
     {
@@ -115,12 +115,12 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
         "chain.uuid": chain.id,
         "chainStepTemplate.uuid": previousStep.id
       },
-      include: "sample",
+      include: "molecularSample",
       page: { limit: 1000 }
     });
 
     const sampleIds = selectedSampleStepResources
-      .map(sr => sr.sample?.id)
+      .map(sr => sr.molecularSample?.id)
       .filter(id => id) as string[];
 
     const { data: plpStepResources } = await apiClient.get<StepResource[]>(
@@ -129,16 +129,16 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
         fields: {
           product: "name",
           protocol: "name",
-          sample: "name,version"
+          molecularSample: "name,version"
         },
         filter: {
           "chain.uuid": chain.id,
           "chainStepTemplate.uuid": step.id,
-          rsql: sampleIds.length ? `sample.uuid=in=(${sampleIds})` : ""
+          rsql: sampleIds.length ? `molecularSample.uuid=in=(${sampleIds})` : ""
         },
         include:
-          "sample,preLibraryPrep,preLibraryPrep.protocol,preLibraryPrep.product",
-        page: { limit: 1000 } // Maximum page limit. There should only be 1 or 2 prelibrarypreps per sample.
+          "molecularSample,preLibraryPrep,preLibraryPrep.protocol,preLibraryPrep.product",
+        page: { limit: 1000 } // Maximum page limit. There should only be 1 or 2 prelibrarypreps per molecularSample.
       }
     );
 
@@ -146,8 +146,9 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
       sampleSr => {
         const plpStepResource = plpStepResources.find(
           plpSr =>
-            plpSr.sample &&
-            plpSr.sample.id === (sampleSr.sample as Sample).id &&
+            plpSr.molecularSample &&
+            plpSr.molecularSample.id ===
+              (sampleSr.molecularSample as Sample).id &&
             plpSr.value === plpEditMode
         );
 
@@ -215,7 +216,11 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
           type: step.type
         } as ChainStepTemplate,
         preLibraryPrep: pick(preLibraryPrep, "id", "type"),
-        sample: pick(row.original.sampleStepResource.sample, "id", "type"),
+        molecularSample: pick(
+          row.original.sampleStepResource.molecularSample,
+          "id",
+          "type"
+        ),
         type: "stepResource",
         value: preLibraryPrep.preLibraryPrepType
       } as StepResource;

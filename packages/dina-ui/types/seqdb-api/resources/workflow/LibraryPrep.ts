@@ -13,7 +13,7 @@ interface LibraryPrepAttributes {
 
 interface LibraryPrepRelationships {
   libraryPrepBatch: LibraryPrepBatch;
-  sample: MolecularSample;
+  molecularSample: MolecularSample;
   indexI5?: NgsIndex | null;
   indexI7?: NgsIndex | null;
 }

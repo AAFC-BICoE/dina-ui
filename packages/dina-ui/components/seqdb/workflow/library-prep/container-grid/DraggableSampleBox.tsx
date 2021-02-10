@@ -1,11 +1,11 @@
 import { noop } from "lodash";
 import { useDrag } from "react-dnd-cjs";
-import { Sample } from "../../../../../types/seqdb-api";
+import { MolecularSample } from "../../../../../types/seqdb-api";
 import RcTooltip from "rc-tooltip";
 
 interface DraggableSampleBoxProps {
   onClick?: (e: any) => void;
-  sample: Sample;
+  sample: MolecularSample;
   selected: boolean;
   wasMoved: boolean;
 }
@@ -17,7 +17,7 @@ export function DraggableSampleBox({
   wasMoved
 }: DraggableSampleBoxProps) {
   const [, drag] = useDrag({
-    item: { sample, type: "sample" }
+    item: { sample, type: "molecularSample" }
   });
 
   return (
