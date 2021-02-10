@@ -19,7 +19,7 @@ import {
   PreLibraryPrep,
   Product,
   Protocol,
-  Sample,
+  MolecularSample,
   StepResource
 } from "../../../../types/seqdb-api";
 import { StepRendererProps } from "../StepRenderer";
@@ -148,7 +148,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
           plpSr =>
             plpSr.molecularSample &&
             plpSr.molecularSample.id ===
-              (sampleSr.molecularSample as Sample).id &&
+              (sampleSr.molecularSample as MolecularSample).id &&
             plpSr.value === plpEditMode
         );
 

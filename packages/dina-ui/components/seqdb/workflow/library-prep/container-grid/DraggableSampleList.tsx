@@ -28,17 +28,15 @@ export function DraggableSampleList({
       ref={dropRef}
       style={{ minHeight: "400px", maxHeight: "400px", overflowY: "scroll" }}
     >
-      {availableSamples &&
-        availableSamples.length > 0 &&
-        availableSamples.map(sample => (
-          <DraggableSampleBox
-            key={String(sample?.id)}
-            wasMoved={movedSamples.includes(sample)}
-            sample={sample}
-            onClick={e => onClick(sample, e)}
-            selected={selectedSamples.includes(sample)}
-          />
-        ))}
+      {availableSamples.map(sample => (
+        <DraggableSampleBox
+          key={String(sample?.id)}
+          wasMoved={movedSamples.includes(sample)}
+          sample={sample}
+          onClick={e => onClick(sample, e)}
+          selected={selectedSamples.includes(sample)}
+        />
+      ))}
     </ul>
   );
 }
