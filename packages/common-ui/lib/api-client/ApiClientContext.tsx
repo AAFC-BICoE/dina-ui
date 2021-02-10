@@ -288,6 +288,15 @@ export function makeAxiosErrorMoreReadable(error: AxiosError) {
       errorMessage = `Service unavailable:\n${errorMessage}`;
     }
 
+    // Handle errors coming from Spring Boot:
+    if (error.response?.data?.errors) {
+      const jsonApiErrorResponse = {
+        status: error.response.status,
+        errors: error.response.data.errors
+      };
+      errorMessage += "\n" + getErrorMessage([jsonApiErrorResponse]);
+    }
+
     throw new Error(errorMessage);
   }
   throw error;
