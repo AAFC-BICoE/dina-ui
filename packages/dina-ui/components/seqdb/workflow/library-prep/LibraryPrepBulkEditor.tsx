@@ -17,21 +17,21 @@ import {
   ChainStepTemplate,
   LibraryPrep,
   LibraryPrepBatch,
+  MolecularSample,
   NgsIndex,
-  Sample,
   StepResource
 } from "../../../../types/seqdb-api";
 
 type LibraryPrepEditMode = "DETAILS" | "INDEX";
 
 interface SampleStepResource extends StepResource {
-  sample: Sample;
+  molecularSample: MolecularSample;
 }
 
 interface LibraryPrepBulkEditRow {
   indexI5?: string;
   indexI7?: string;
-  sample: Sample;
+  molecularSample: MolecularSample;
   libraryPrep: LibraryPrep;
 
   /** Read-only wellCoordinates column: */
@@ -57,7 +57,7 @@ export function LibraryPrepBulkEditor({
 
   const COLUMNS: HotColumnProps[] = [
     {
-      data: "sample.name",
+      data: "molecularSample.name",
       title: formatMessage("field_sample.name"),
       width: 300,
       readOnly: true
@@ -116,13 +116,13 @@ export function LibraryPrepBulkEditor({
       "seqdb-api/stepResource",
       {
         fields: {
-          sample: "name"
+          molecularSample: "name"
         },
         filter: {
           "chain.uuid": chain.id as string,
           "chainStepTemplate.uuid": sampleSelectionStep.id as string
         },
-        include: "sample",
+        include: "molecularSample",
         page: { limit: 1000 }
       }
     );
@@ -131,35 +131,38 @@ export function LibraryPrepBulkEditor({
     const { data: libraryPreps } = await apiClient.get<LibraryPrep[]>(
       `seqdb-api/libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`,
       {
-        include: "sample,indexI5,indexI7",
+        include: "molecularSample,indexI5,indexI7",
         page: { limit: 1000 }
       }
     );
 
-    const rows = sampleSrs.map<LibraryPrepBulkEditRow>(({ sample }) => {
-      // Join the LibraryPreps to the StepResources:
-      const libraryPrep =
-        libraryPreps.find(prep => prep.sample.id === sample.id) ??
-        ({} as LibraryPrep);
+    const rows = sampleSrs.map<LibraryPrepBulkEditRow>(
+      ({ molecularSample }) => {
+        // Join the LibraryPreps to the StepResources:
+        const libraryPrep =
+          libraryPreps.find(
+            prep => prep.molecularSample.id === molecularSample.id
+          ) ?? ({} as LibraryPrep);
 
-      const { wellColumn, wellRow } = libraryPrep;
-      const wellCoordinates =
-        wellColumn === null || !wellRow
-          ? undefined
-          : `${wellRow}${String(wellColumn).padStart(2, "0")}`;
+        const { wellColumn, wellRow } = libraryPrep;
+        const wellCoordinates =
+          wellColumn === null || !wellRow
+            ? undefined
+            : `${wellRow}${String(wellColumn).padStart(2, "0")}`;
 
-      return {
-        libraryPrep,
-        indexI5: encodeResourceCell(libraryPrep.indexI5, {
-          label: libraryPrep.indexI5?.name
-        }),
-        indexI7: encodeResourceCell(libraryPrep.indexI7, {
-          label: libraryPrep.indexI7?.name
-        }),
-        sample,
-        wellCoordinates
-      };
-    });
+        return {
+          libraryPrep,
+          indexI5: encodeResourceCell(libraryPrep.indexI5, {
+            label: libraryPrep.indexI5?.name
+          }),
+          indexI7: encodeResourceCell(libraryPrep.indexI7, {
+            label: libraryPrep.indexI7?.name
+          }),
+          molecularSample,
+          wellCoordinates
+        };
+      }
+    );
 
     return rows;
   }
@@ -172,7 +175,7 @@ export function LibraryPrepBulkEditor({
         type: "libraryPrep",
         ...(id ? { id } : {}),
         libraryPrepBatch,
-        sample: change.original.sample,
+        molecularSample: change.original.molecularSample,
         ...change.changes.libraryPrep
       } as LibraryPrep;
 

@@ -4,7 +4,7 @@ export * from "./resources/PcrProfile";
 export * from "./resources/Product";
 export * from "./resources/Protocol";
 export * from "./resources/Region";
-export * from "./resources/Sample";
+export * from "./resources/MolecularSample";
 export * from "./resources/workflow/Chain";
 export * from "./resources/workflow/ChainStepTemplate";
 export * from "./resources/workflow/ChainTemplate";

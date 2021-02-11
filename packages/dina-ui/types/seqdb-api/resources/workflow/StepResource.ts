@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { PcrPrimer } from "../PcrPrimer";
-import { Sample } from "../Sample";
+import { MolecularSample } from "../MolecularSample";
 import { Chain } from "./Chain";
 import { ChainStepTemplate } from "./ChainStepTemplate";
 import { LibraryPool } from "./LibraryPool";
@@ -26,7 +26,7 @@ export interface StepResourceRelationships {
   libraryPool?: LibraryPool;
   preLibraryPrep?: PreLibraryPrep;
   primer?: PcrPrimer;
-  sample?: Sample;
+  molecularSample?: MolecularSample;
 }
 
 export type StepResource = KitsuResource &

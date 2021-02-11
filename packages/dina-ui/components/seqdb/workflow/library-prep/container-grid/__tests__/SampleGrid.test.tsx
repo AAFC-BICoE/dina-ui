@@ -2,7 +2,7 @@ import { mountWithAppContext } from "../../../../../../test-util/mock-app-contex
 import {
   Chain,
   ChainStepTemplate,
-  Sample,
+  MolecularSample,
   StepResource
 } from "../../../../../../types/seqdb-api";
 import { ContainerGrid } from "../ContainerGrid";
@@ -49,29 +49,29 @@ function getWrapper(propsOverride?: Partial<ContainerGridProps>) {
 const MOCK_LIBRARY_PREPS = [
   {
     id: "1",
-    sample: { id: "2", name: "SAMP200", type: "sample" },
+    molecularSample: { id: "2", name: "SAMP200", type: "molecularSample" },
     type: "libraryPrep",
     wellColumn: 1,
     wellRow: "A"
   },
   {
     id: "2",
-    sample: { id: "4", name: "SAMP400", type: "sample" },
+    molecularSample: { id: "4", name: "SAMP400", type: "molecularSample" },
     type: "libraryPrep",
     wellColumn: 2,
     wellRow: "B"
   },
   {
     id: "3",
-    sample: { id: "6", name: "SAMP600", type: "sample" },
+    molecularSample: { id: "6", name: "SAMP600", type: "molecularSample" },
     type: "libraryPrep"
   }
 ];
 
 const MOCK_STEPRESOURCES_NO_WELL_COORDS = [
-  { sample: { id: "6", name: "SAMP600", type: "sample" } },
-  { sample: { id: "10", name: "ZSAMP1000", type: "sample" } },
-  { sample: { id: "8", name: "SAMP800", type: "sample" } }
+  { molecularSample: { id: "6", name: "SAMP600", type: "molecularSample" } },
+  { molecularSample: { id: "10", name: "ZSAMP1000", type: "molecularSample" } },
+  { molecularSample: { id: "8", name: "SAMP800", type: "molecularSample" } }
 ] as StepResource[];
 
 describe("SampleGrid component", () => {
@@ -186,7 +186,7 @@ describe("SampleGrid component", () => {
     wrapper.update();
 
     wrapper.find(ContainerGrid).prop("onDrop")(
-      MOCK_STEPRESOURCES_NO_WELL_COORDS[0].sample as Sample,
+      MOCK_STEPRESOURCES_NO_WELL_COORDS[0].molecularSample as MolecularSample,
       "F_3"
     );
 
@@ -215,7 +215,10 @@ describe("SampleGrid component", () => {
         {
           resource: {
             id: "3",
-            sample: expect.objectContaining({ id: "6", type: "sample" }),
+            molecularSample: expect.objectContaining({
+              id: "6",
+              type: "molecularSample"
+            }),
             type: "libraryPrep",
             wellColumn: 3,
             wellRow: "F"
@@ -235,7 +238,7 @@ describe("SampleGrid component", () => {
 
     // Move SAMP200 to the list:
     wrapper.find(DraggableSampleList).prop("onDrop")(
-      MOCK_LIBRARY_PREPS[0].sample as Sample
+      MOCK_LIBRARY_PREPS[0].molecularSample as MolecularSample
     );
 
     wrapper.update();
@@ -267,7 +270,7 @@ describe("SampleGrid component", () => {
 
     // Move the selected samples:
     wrapper.find(ContainerGrid).prop("onDrop")(
-      MOCK_STEPRESOURCES_NO_WELL_COORDS[0].sample as Sample,
+      MOCK_STEPRESOURCES_NO_WELL_COORDS[0].molecularSample as MolecularSample,
       "G_3"
     );
     wrapper.update();
@@ -293,9 +296,9 @@ describe("SampleGrid component", () => {
         {
           resource: {
             id: "3",
-            sample: expect.objectContaining({
+            molecularSample: expect.objectContaining({
               id: "6",
-              type: "sample"
+              type: "molecularSample"
             }),
             type: "libraryPrep",
             wellColumn: 3,
@@ -309,9 +312,9 @@ describe("SampleGrid component", () => {
               id: "5",
               type: "libraryPrepBatch"
             }),
-            sample: expect.objectContaining({
+            molecularSample: expect.objectContaining({
               id: "8",
-              type: "sample"
+              type: "molecularSample"
             }),
             type: "libraryPrep",
             wellColumn: 3,
@@ -325,9 +328,9 @@ describe("SampleGrid component", () => {
               id: "5",
               type: "libraryPrepBatch"
             }),
-            sample: expect.objectContaining({
+            molecularSample: expect.objectContaining({
               id: "10",
-              type: "sample"
+              type: "molecularSample"
             }),
             type: "libraryPrep",
             wellColumn: 4,
@@ -362,7 +365,7 @@ describe("SampleGrid component", () => {
 
     // Move the selected samples:
     wrapper.find(ContainerGrid).prop("onDrop")(
-      MOCK_STEPRESOURCES_NO_WELL_COORDS[0].sample as Sample,
+      MOCK_STEPRESOURCES_NO_WELL_COORDS[0].molecularSample as MolecularSample,
       "G_11"
     );
     wrapper.update();
@@ -378,7 +381,10 @@ describe("SampleGrid component", () => {
         {
           resource: {
             id: "3",
-            sample: expect.objectContaining({ id: "6", type: "sample" }),
+            molecularSample: expect.objectContaining({
+              id: "6",
+              type: "molecularSample"
+            }),
             type: "libraryPrep",
             wellColumn: 11,
             wellRow: "G"
@@ -391,7 +397,10 @@ describe("SampleGrid component", () => {
               id: "5",
               type: "libraryPrepBatch"
             }),
-            sample: expect.objectContaining({ id: "8", type: "sample" }),
+            molecularSample: expect.objectContaining({
+              id: "8",
+              type: "molecularSample"
+            }),
             type: "libraryPrep",
             wellColumn: 12,
             wellRow: "G"
@@ -404,7 +413,10 @@ describe("SampleGrid component", () => {
               id: "5",
               type: "libraryPrepBatch"
             }),
-            sample: expect.objectContaining({ id: "10", type: "sample" }),
+            molecularSample: expect.objectContaining({
+              id: "10",
+              type: "molecularSample"
+            }),
             type: "libraryPrep",
             wellColumn: 1,
             wellRow: "H"
@@ -466,7 +478,7 @@ describe("SampleGrid component", () => {
     wrapper.update();
 
     wrapper.find(ContainerGrid).prop("onDrop")(
-      MOCK_STEPRESOURCES_NO_WELL_COORDS[2].sample as Sample,
+      MOCK_STEPRESOURCES_NO_WELL_COORDS[2].molecularSample as MolecularSample,
       "A_1"
     );
     wrapper.update();
@@ -506,7 +518,7 @@ describe("SampleGrid component", () => {
 
     // Move the 3 selected samples, starting at the last cell:
     wrapper.find(ContainerGrid).prop("onDrop")(
-      MOCK_STEPRESOURCES_NO_WELL_COORDS[0].sample as Sample,
+      MOCK_STEPRESOURCES_NO_WELL_COORDS[0].molecularSample as MolecularSample,
       "H_12"
     );
     wrapper.update();
@@ -530,10 +542,10 @@ describe("SampleGrid component", () => {
         {
           resource: expect.objectContaining({
             id: "3",
-            sample: {
+            molecularSample: {
               id: "6",
               name: "SAMP600",
-              type: "sample"
+              type: "molecularSample"
             },
             type: "libraryPrep",
             wellColumn: 12,
@@ -543,10 +555,10 @@ describe("SampleGrid component", () => {
         },
         {
           resource: expect.objectContaining({
-            sample: {
+            molecularSample: {
               id: "8",
               name: "SAMP800",
-              type: "sample"
+              type: "molecularSample"
             },
             type: "libraryPrep",
             wellColumn: null,
@@ -556,10 +568,10 @@ describe("SampleGrid component", () => {
         },
         {
           resource: expect.objectContaining({
-            sample: {
+            molecularSample: {
               id: "10",
               name: "ZSAMP1000",
-              type: "sample"
+              type: "molecularSample"
             },
             type: "libraryPrep",
             wellColumn: null,

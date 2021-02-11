@@ -1,12 +1,12 @@
 import { useDrop } from "react-dnd-cjs";
-import { Sample } from "../../../../../types/seqdb-api";
+import { MolecularSample } from "../../../../../types/seqdb-api";
 import { DraggableSampleBox } from "./DraggableSampleBox";
 
 interface DraggableSampleListProps {
-  availableSamples: Sample[];
-  movedSamples: Sample[];
-  onDrop: (item: Sample) => void;
-  selectedSamples: Sample[];
+  availableSamples: MolecularSample[];
+  movedSamples: MolecularSample[];
+  onDrop: (item: MolecularSample) => void;
+  selectedSamples: MolecularSample[];
   onClick: (sample, e) => void;
 }
 
@@ -18,7 +18,7 @@ export function DraggableSampleList({
   onDrop
 }: DraggableSampleListProps) {
   const [, dropRef] = useDrop({
-    accept: "sample",
+    accept: "molecularSample",
     drop: item => onDrop((item as any).sample)
   });
 
@@ -30,7 +30,7 @@ export function DraggableSampleList({
     >
       {availableSamples.map(sample => (
         <DraggableSampleBox
-          key={String(sample.id)}
+          key={String(sample?.id)}
           wasMoved={movedSamples.includes(sample)}
           sample={sample}
           onClick={e => onClick(sample, e)}

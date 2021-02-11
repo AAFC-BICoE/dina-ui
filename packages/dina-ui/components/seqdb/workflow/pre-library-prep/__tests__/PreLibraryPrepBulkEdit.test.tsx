@@ -4,7 +4,7 @@ import {
   Chain,
   ChainStepTemplate,
   ChainTemplate,
-  Sample,
+  MolecularSample,
   StepResource,
   StepTemplate
 } from "../../../../../types/seqdb-api";
@@ -21,37 +21,37 @@ jest.mock("next/dynamic", () => () => {
 });
 
 const TEST_SAMPLES = [
-  { id: "1", type: "sample", name: "test sample 1" },
-  { id: "2", type: "sample", name: "test sample 2" },
-  { id: "3", type: "sample", name: "test sample 3" },
-  { id: "4", type: "sample", name: "test sample 4" },
-  { id: "5", type: "sample", name: "test sample 5" }
-] as PersistedResource<Sample>[];
+  { id: "1", type: "molecularSample", name: "test sample 1" },
+  { id: "2", type: "molecularSample", name: "test sample 2" },
+  { id: "3", type: "molecularSample", name: "test sample 3" },
+  { id: "4", type: "molecularSample", name: "test sample 4" },
+  { id: "5", type: "molecularSample", name: "test sample 5" }
+] as PersistedResource<MolecularSample>[];
 
 const TEST_SAMPLE_STEP_RESOURCES: PersistedResource<StepResource>[] = [
   {
     id: "1",
-    sample: TEST_SAMPLES[0],
+    molecularSample: TEST_SAMPLES[0],
     type: "stepResource"
   } as PersistedResource<StepResource>,
   {
     id: "2",
-    sample: TEST_SAMPLES[1],
+    molecularSample: TEST_SAMPLES[1],
     type: "stepResource"
   } as PersistedResource<StepResource>,
   {
     id: "3",
-    sample: TEST_SAMPLES[2],
+    molecularSample: TEST_SAMPLES[2],
     type: "stepResource"
   } as PersistedResource<StepResource>,
   {
     id: "4",
-    sample: TEST_SAMPLES[3],
+    molecularSample: TEST_SAMPLES[3],
     type: "stepResource"
   } as PersistedResource<StepResource>,
   {
     id: "5",
-    sample: TEST_SAMPLES[4],
+    molecularSample: TEST_SAMPLES[4],
     type: "stepResource"
   } as PersistedResource<StepResource>
 ];
@@ -122,9 +122,9 @@ describe("PreLibraryPrepStep UI", () => {
     /** Mock Kitsu "get" method. */
     mockGet.mockImplementation(async (path, params) => {
       if (path === "seqdb-api/stepResource") {
-        if (params.include === "sample") {
+        if (params.include === "molecularSample") {
           return { data: TEST_SAMPLE_STEP_RESOURCES };
-        } else if (params.include.includes("sample,preLibraryPrep")) {
+        } else if (params.include.includes("molecularSample,preLibraryPrep")) {
           return { data: [] };
         }
       } else {
@@ -145,7 +145,7 @@ describe("PreLibraryPrepStep UI", () => {
 
     const tableData = wrapper.find("MockHotTable").prop<any[]>("data");
 
-    expect(tableData[0].sampleStepResource.sample.name).toEqual(
+    expect(tableData[0].sampleStepResource.molecularSample.name).toEqual(
       "test sample 1"
     );
   });
@@ -267,10 +267,10 @@ describe("PreLibraryPrepStep UI", () => {
                   type: "preLibraryPrep"
                 }
               },
-              sample: {
+              molecularSample: {
                 data: {
                   id: "2",
-                  type: "sample"
+                  type: "molecularSample"
                 }
               }
             },
@@ -304,9 +304,14 @@ describe("PreLibraryPrepStep UI", () => {
   it("Shows different view modes for the shearing and size selection details", async () => {
     mockGet.mockImplementation(async (path, params) => {
       // The request for the sample stepResources.
-      if (path === "seqdb-api/stepResource" && params.include === "sample") {
+      if (
+        path === "seqdb-api/stepResource" &&
+        params.include === "molecularSample"
+      ) {
         return {
-          data: [{ id: "5", type: "stepResource", sample: { id: "10" } }]
+          data: [
+            { id: "5", type: "stepResource", molecularSample: { id: "10" } }
+          ]
         };
       }
 
@@ -314,7 +319,7 @@ describe("PreLibraryPrepStep UI", () => {
       // an inputAmount for the sample.
       if (
         path === "seqdb-api/stepResource" &&
-        params.include.includes("sample,preLibraryPrep")
+        params.include.includes("molecularSample,preLibraryPrep")
       ) {
         return {
           data: [
@@ -325,7 +330,7 @@ describe("PreLibraryPrepStep UI", () => {
                 inputAmount: 999,
                 type: "preLibraryPrep"
               },
-              sample: { id: "10", type: "sample" },
+              molecularSample: { id: "10", type: "molecularSample" },
               type: "stepResource",
               value: "SIZE_SELECTION"
             }
