@@ -158,6 +158,7 @@ function CollectingEventFormInternal() {
           optionLabel={person => person.displayName}
           isMulti={true}
         />
+        <TextField className="col-md-3" name="dwcRecordNumber" />
       </div>
       <div className="row">
         <TextField className="col-md-3" name="dwcVerbatimLocality" />

@@ -90,6 +90,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcVerbatimLocality: "Verbatim Locality",
   field_dwcVerbatimSRS: "Verbatim SRS",
   field_dwcRecordedBy: "Verbatim Collectors",
+  field_dwcRecordNumber: "Collector's Number",
   field_editableBuiltInAttributes: "Visible Built In Attributes",
   field_editableManagedAttributes: "Visible Managed Attributes",
   field_email: "Email",
