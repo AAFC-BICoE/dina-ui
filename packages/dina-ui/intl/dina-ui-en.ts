@@ -14,6 +14,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addPersonPopupTooltip: "Add Person without leaving the page",
   agentsSectionTitle: "Agents",
   appTitle: "DINA",
+  attachSelected: "Attach Selected",
   associatedAgent: "Associated Agent",
   attachments: "Attachments",
   attachExistingObjects: "Attach Existing Objects",

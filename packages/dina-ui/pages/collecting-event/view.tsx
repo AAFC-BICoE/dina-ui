@@ -10,6 +10,7 @@ import {
 } from "common-ui";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResponse } from "kitsu";
+import { uniqBy } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
@@ -156,22 +157,15 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                 </DinaForm>
               )}
               <div className="form-group">
-                <div className="row">
-                  <div className="col-md-6">
-                    <AttachmentSection
-                      attachmentPath={`collection-api/collecting-event/${id}/attachment`}
-                      onDetachMetadataIds={metadataIds =>
-                        detachMetadataIds(metadataIds, String(id))
-                      }
-                      afterMetadatasSaved={metadataIds =>
-                        attachMetadatasToCollectingEvent(
-                          metadataIds,
-                          String(id)
-                        )
-                      }
-                    />
-                  </div>
-                </div>
+                <AttachmentSection
+                  attachmentPath={`collection-api/collecting-event/${id}/attachment`}
+                  onDetachMetadataIds={metadataIds =>
+                    detachMetadataIds(metadataIds, String(id))
+                  }
+                  afterMetadatasSaved={metadataIds =>
+                    attachMetadatasToCollectingEvent(metadataIds, String(id))
+                  }
+                />
               </div>
             </div>
           </main>
@@ -193,10 +187,13 @@ export function useAttachMetadatasToCollectingEvent() {
       `collection-api/collecting-event/${collectingEventId}`,
       { include: "attachment" }
     );
-    const newAttachmentList = [
-      ...(collectingEvent.attachment ?? []),
-      ...metadataIds.map(id => ({ id, type: "metadata" }))
-    ];
+    const newAttachmentList = uniqBy(
+      [
+        ...(collectingEvent.attachment ?? []),
+        ...metadataIds.map(id => ({ id, type: "metadata" }))
+      ],
+      attachment => attachment.id
+    );
 
     await updateCollectingEvent(collectingEvent.id, newAttachmentList);
   }

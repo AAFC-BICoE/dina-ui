@@ -10,6 +10,7 @@ import {
   ExistingAttachmentsTable,
   ExistingAttachmentsTableProps
 } from "./ExistingAttachmentsTable";
+import { ExistingObjectsAttacher } from "./ExistingObjectsAttacher";
 
 export interface AttachmentListProps
   extends Omit<ExistingAttachmentsTableProps, "onMetadatasEdited">,
@@ -73,7 +74,11 @@ export function AttachmentSection({
             afterMetadatasSaved={afterMetadatasSavedInternal}
           />
         </TabPanel>
-        <TabPanel />
+        <TabPanel>
+          <ExistingObjectsAttacher
+            onMetadataIdsSubmitted={afterMetadatasSavedInternal}
+          />
+        </TabPanel>
       </Tabs>
     </div>
   );

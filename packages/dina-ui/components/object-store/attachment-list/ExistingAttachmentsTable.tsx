@@ -58,16 +58,12 @@ export function ExistingAttachmentsTable({
       Header: <FieldHeader name="originalFilename" />
     },
     {
-      ...dateCell("metadata.acDigitizationDate"),
-      Header: <FieldHeader name="acDigitizationDate" />
+      accessor: "metadata.acCaption",
+      Header: <FieldHeader name="acCaption" />
     },
     {
       ...dateCell("metadata.xmpMetadataDate"),
       Header: <FieldHeader name="xmpMetadataDate" />
-    },
-    {
-      accessor: "metadata.acMetadataCreator.displayName",
-      Header: <FieldHeader name="acMetadataCreator.displayName" />
     },
     {
       Cell: ({ original: { metadata } }) => <>{metadata?.acTags?.join(", ")}</>,

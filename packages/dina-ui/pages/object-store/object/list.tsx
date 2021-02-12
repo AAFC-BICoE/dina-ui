@@ -39,6 +39,28 @@ export interface MetadataListFormValues {
   selectedMetadatas: Record<string, boolean>;
 }
 
+export const METADATA_FILTER_ATTRIBUTES: FilterAttribute[] = [
+  "originalFilename",
+  "dcFormat",
+  "xmpRightsWebStatement",
+  "dcRights",
+  {
+    name: "acDigitizationDate",
+    type: "DATE"
+  },
+  {
+    name: "xmpMetadataDate",
+    type: "DATE"
+  },
+  {
+    name: "acMetadataCreator",
+    type: "DROPDOWN",
+    resourcePath: "agent-api/person",
+    filter: filterBy(["displayName"]),
+    optionLabel: person => (person as Person).displayName
+  }
+];
+
 export default function MetadataListPage() {
   const { formatMessage } = useDinaIntl();
   const { groupNames } = useAccount();
@@ -61,27 +83,6 @@ export default function MetadataListPage() {
   const [tableSectionWidth, previewSectionWidth] = previewMetadataId
     ? [8, 4]
     : [12, 0];
-  const METADATA_FILTER_ATTRIBUTES: FilterAttribute[] = [
-    "originalFilename",
-    "dcFormat",
-    "xmpRightsWebStatement",
-    "dcRights",
-    {
-      name: "acDigitizationDate",
-      type: "DATE"
-    },
-    {
-      name: "xmpMetadataDate",
-      type: "DATE"
-    },
-    {
-      name: "acMetadataCreator",
-      type: "DROPDOWN",
-      resourcePath: "agent-api/person",
-      filter: filterBy(["displayName"]),
-      optionLabel: person => (person as Person).displayName
-    }
-  ];
 
   const METADATA_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
     {
@@ -242,7 +243,9 @@ export default function MetadataListPage() {
                     };
                   }
                 }}
-                WrapTable={MetadataListWrapper}
+                wrapTable={children => (
+                  <MetadataListWrapper>{children}</MetadataListWrapper>
+                )}
               />
             </SplitPagePanel>
           </div>
