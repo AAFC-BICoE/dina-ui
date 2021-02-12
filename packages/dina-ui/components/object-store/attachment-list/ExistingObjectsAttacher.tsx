@@ -106,18 +106,20 @@ export function ExistingObjectsAttacher({
 
 function MetadataListWrapper({ children, onSubmit }) {
   return (
-    <DinaForm<ExistingObjectsAttacherForm>
-      initialValues={{ selectedMetadatas: {} }}
-      onSubmit={onSubmit}
-    >
-      <div style={{ height: "1rem" }}>
-        <div className="float-right">
-          <SubmitButton>
-            <DinaMessage id="attachSelected" />
-          </SubmitButton>
+    <div className="attach-form">
+      <DinaForm<ExistingObjectsAttacherForm>
+        initialValues={{ selectedMetadatas: {} }}
+        onSubmit={onSubmit}
+      >
+        <div style={{ height: "1rem" }}>
+          <div className="float-right">
+            <SubmitButton>
+              <DinaMessage id="attachSelected" />
+            </SubmitButton>
+          </div>
         </div>
-      </div>
-      {children}
-    </DinaForm>
+        {children}
+      </DinaForm>
+    </div>
   );
 }
