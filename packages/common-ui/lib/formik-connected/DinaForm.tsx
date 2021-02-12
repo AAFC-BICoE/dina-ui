@@ -6,7 +6,7 @@ import {
   FormikProps,
   FormikValues
 } from "formik";
-import { PropsWithChildren } from "react";
+import { BaseSyntheticEvent, KeyboardEvent, PropsWithChildren } from "react";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
 import { ApiClientI, useApiClient } from "../api-client/ApiClientContext";
 import { ErrorViewer } from "./ErrorViewer";
@@ -58,10 +58,18 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
   );
 }
 
+function disableEnterKeyFormSubmit(
+  event: KeyboardEvent<HTMLFormElement> & BaseSyntheticEvent
+) {
+  if (event.target.tagName !== "TEXTAREA" && event.which === 13 /* Enter */) {
+    event.preventDefault();
+  }
+}
+
 /** Wraps the inner content with the Form + ErrorViewer components. */
 function FormWrapper({ children }: PropsWithChildren<{}>) {
   return (
-    <Form>
+    <Form onKeyDown={disableEnterKeyFormSubmit}>
       <ErrorViewer />
       {children}
     </Form>
