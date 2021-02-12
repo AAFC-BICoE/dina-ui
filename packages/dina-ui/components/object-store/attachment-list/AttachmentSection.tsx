@@ -15,7 +15,8 @@ export interface AttachmentListProps
   extends Omit<ExistingAttachmentsTableProps, "onMetadatasEdited">,
     AttachmentUploaderProps {}
 
-export function AttachmentList({
+/** UI section for reading and modifying file attachments. */
+export function AttachmentSection({
   attachmentPath,
   onDetachMetadataIds: onDetachMetadataIdsProp,
   afterMetadatasSaved: afterMetadatasSavedProp
@@ -51,10 +52,13 @@ export function AttachmentList({
       <Tabs>
         <TabList>
           <Tab>
-            <DinaMessage id="existing" />
+            <DinaMessage id="existingAttachments" />
           </Tab>
           <Tab>
-            <DinaMessage id="addNew" />
+            <DinaMessage id="uploadNewAttachments" />
+          </Tab>
+          <Tab>
+            <DinaMessage id="attachExistingObjects" />
           </Tab>
         </TabList>
         <TabPanel>
@@ -69,6 +73,7 @@ export function AttachmentList({
             afterMetadatasSaved={afterMetadatasSavedInternal}
           />
         </TabPanel>
+        <TabPanel />
       </Tabs>
     </div>
   );

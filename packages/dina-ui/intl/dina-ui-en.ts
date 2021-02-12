@@ -16,6 +16,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   appTitle: "DINA",
   associatedAgent: "Associated Agent",
   attachments: "Attachments",
+  attachExistingObjects: "Attach Existing Objects",
   attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
   changedProperties: "Changes",
@@ -44,6 +45,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   enableDateRangeLabel: "Enable Date Range",
   endEventDateTimeLabel: "End Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   exifProperties: "Exif Properties",
+  existingAttachments: "Existing Attachments",
   feedbackButtonText: "Feedback",
   field_acceptedValues: "Accepted Values",
   field_acceptedValuesAsLines: "Accepted Values (One value per line)",
@@ -178,6 +180,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   uploadFormInstructions:
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
   uploadFilesMaxSize: "The maximum file size is {maxSize}.",
+  uploadNewAttachments: "Upload New Attachments",
   uploadPageTitle: "Upload Files",
   useCollectorGroupLabel: "Use Collector Group",
   userMustBelongToGroup: "User must belong to a Group",
