@@ -4,7 +4,7 @@ import {
   KitsuResource,
   PersistedResource
 } from "kitsu";
-import { debounce, isUndefined, omitBy } from "lodash";
+import { debounce, isArray, isUndefined, omitBy } from "lodash";
 import React, { useContext } from "react";
 import { useIntl } from "react-intl";
 import AsyncSelect from "react-select/async";
@@ -44,6 +44,17 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   /** react-select styles prop. */
   styles?: Partial<Styles>;
+
+  /** Special dropdown options which call a callback method instead of select a value. */
+  callbackOptions?: CallbackOption[];
+}
+
+export interface CallbackOption {
+  /** Intl message key for the option label. */
+  label: JSX.Element;
+
+  /** Function called when the option is selected. */
+  onSelect: () => void;
 }
 
 /** An option the user can select to set the relationship to null. */
@@ -59,7 +70,8 @@ export function ResourceSelect<TData extends KitsuResource>({
   optionLabel,
   sort,
   styles,
-  value
+  value,
+  callbackOptions
 }: ResourceSelectProps<TData>) {
   const { apiClient } = useContext(ApiClientContext);
   const { formatMessage } = useIntl();
@@ -88,16 +100,31 @@ export function ResourceSelect<TData extends KitsuResource>({
     }));
 
     // Only show the null option when in single-resource mode and when there is no search input value.
-    const options =
-      !isMulti && !inputValue
-        ? [NULL_OPTION, ...resourceOptions]
-        : resourceOptions;
+    const options = [
+      ...(!isMulti && !inputValue ? [NULL_OPTION] : []),
+      ...resourceOptions,
+      ...(callbackOptions
+        ? callbackOptions.map(option => ({
+            ...option,
+            label: <strong>{option.label}</strong>
+          }))
+        : [])
+    ];
 
     callback(options);
   }
 
   function onChangeInternal(selectedOption) {
-    if (selectedOption?.resource) {
+    const callbackOption: CallbackOption = isArray(selectedOption)
+      ? selectedOption.find(option => option?.onSelect)
+      : selectedOption?.onSelect
+      ? selectedOption
+      : undefined;
+
+    if (callbackOption) {
+      // For callback options, don't set any value:
+      callbackOption.onSelect();
+    } else if (selectedOption?.resource) {
       // Handle single select:
       onChange(selectedOption.resource);
     } else {

@@ -93,37 +93,45 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
 
 /** Button that opens a PersonForm in a modal. */
 export function AddPersonButton() {
+  const { openAddPersonModal } = useAddPersonModal();
+
+  return (
+    <button
+      className="btn btn-info delete-button open-person-modal"
+      onClick={openAddPersonModal}
+      type="button"
+    >
+      <DinaMessage id="addPersonButtonText" />
+    </button>
+  );
+}
+
+export function useAddPersonModal() {
   const { closeModal, openModal } = useModal();
 
   async function onSubmitSuccess() {
     closeModal();
   }
 
-  return (
-    <button
-      className="btn btn-info delete-button open-person-modal"
-      onClick={() =>
-        openModal(
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2>
-                <DinaMessage id="addPersonTitle" />
-              </h2>
-            </div>
-            <div className="modal-body">
-              <PersonForm onSubmitSuccess={onSubmitSuccess} />
-            </div>
-            <div className="modal-footer">
-              <button className="btn btn-dark" onClick={closeModal}>
-                <DinaMessage id="cancelButtonText" />
-              </button>
-            </div>
-          </div>
-        )
-      }
-      type="button"
-    >
-      <DinaMessage id="addPersonButtonText" />
-    </button>
-  );
+  function openAddPersonModal() {
+    openModal(
+      <div className="modal-content">
+        <div className="modal-header">
+          <h2>
+            <DinaMessage id="addPersonTitle" />
+          </h2>
+        </div>
+        <div className="modal-body">
+          <PersonForm onSubmitSuccess={onSubmitSuccess} />
+        </div>
+        <div className="modal-footer">
+          <button className="btn btn-dark" onClick={closeModal}>
+            <DinaMessage id="cancelButtonText" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return { openAddPersonModal };
 }
