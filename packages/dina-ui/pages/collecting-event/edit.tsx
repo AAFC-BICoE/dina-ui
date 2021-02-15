@@ -12,7 +12,8 @@ import {
   Query,
   ResourceSelectField,
   SubmitButton,
-  TextField
+  TextField,
+  KeyboardEventHandlerWrapper
 } from "common-ui";
 import { KitsuResponse } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
@@ -27,7 +28,17 @@ interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
   router: NextRouter;
 }
+/* handle shortcut keys to aid user input on degree, minute and second */
 
+const keyEventHandler = (key, e) => {
+  key === "alt+1"
+    ? (e.target.value = "°")
+    : key === "alt+2"
+    ? (e.target.value = "'")
+    : key === "alt+3"
+    ? (e.target.value = "''")
+    : (e.target.value = e.target.value);
+};
 export default function CollectingEventEditPage() {
   const router = useRouter();
   const {
@@ -161,7 +172,12 @@ function CollectingEventFormInternal() {
       </div>
       <div className="row">
         <TextField className="col-md-3" name="dwcVerbatimLocality" />
-        <TextField className="col-md-3" name="dwcVerbatimLatitude" />
+        <KeyboardEventHandlerWrapper
+          handleKeys={["alt+1", "alt+2", "alt+3"]}
+          onKeyEvent={keyEventHandler}
+        >
+          <TextField className="col-md-3" name="dwcVerbatimLatitude" />
+        </KeyboardEventHandlerWrapper>
         <TextField className="col-md-3" name="dwcVerbatimLongitude" />
         <TextField className="col-md-3" name="dwcVerbatimCoordinates" />
       </div>
