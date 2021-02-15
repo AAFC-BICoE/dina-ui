@@ -7,6 +7,7 @@ import {
   SubmitButton,
   useGroupedCheckBoxes
 } from "common-ui";
+import { FormikContextType } from "formik";
 import { toPairs } from "lodash";
 import Link from "next/link";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
@@ -113,7 +114,17 @@ function MetadataListWrapper({ children, onSubmit }) {
       >
         <div style={{ height: "1rem" }}>
           <div className="float-right">
-            <SubmitButton>
+            <SubmitButton
+              buttonProps={(
+                ctx: FormikContextType<ExistingObjectsAttacherForm>
+              ) => ({
+                // Disable the button if none are selected:
+                disabled: !Object.values(ctx.values.selectedMetadatas).reduce(
+                  (a, b) => a || b,
+                  false
+                )
+              })}
+            >
               <DinaMessage id="attachSelected" />
             </SubmitButton>
           </div>
