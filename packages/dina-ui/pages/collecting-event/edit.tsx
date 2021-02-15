@@ -166,7 +166,7 @@ function CollectingEventFormInternal() {
           callbackOptions={[
             {
               label: <DinaMessage id="addNewPerson" />,
-              onSelect: openAddPersonModal
+              getResource: openAddPersonModal
             }
           ]}
         />

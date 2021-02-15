@@ -46,15 +46,22 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   styles?: Partial<Styles>;
 
   /** Special dropdown options which call a callback method instead of select a value. */
-  callbackOptions?: CallbackOption[];
+  callbackOptions?: AsyncOption<TData>[];
 }
 
-export interface CallbackOption {
+/**
+ * Special dropdown option that can fetch an async value.
+ * e.g. setting a resource after the user created it through a modal.
+ */
+export interface AsyncOption<TData extends KitsuResource> {
   /** Option label. */
   label: JSX.Element;
 
-  /** Function called when the option is selected. */
-  onSelect: () => void;
+  /**
+   * Function called to fetch the resource when the option is selected.
+   * Returning undefined doesn't set the value.
+   */
+  getResource: () => Promise<PersistedResource<TData> | undefined>;
 }
 
 /** An option the user can select to set the relationship to null. */
@@ -66,7 +73,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   include,
   isMulti = false,
   model,
-  onChange = () => undefined,
+  onChange: onChangeProp = () => undefined,
   optionLabel,
   sort,
   styles,
@@ -114,23 +121,36 @@ export function ResourceSelect<TData extends KitsuResource>({
     callback(options);
   }
 
-  function onChangeInternal(selectedOption) {
-    const callbackOption: CallbackOption = isArray(selectedOption)
-      ? selectedOption.find(option => option?.onSelect)
-      : selectedOption?.onSelect
-      ? selectedOption
-      : undefined;
-
-    if (callbackOption) {
-      // For callback options, don't set any value:
-      callbackOption.onSelect();
+  async function onChangeSingle(selectedOption) {
+    if (selectedOption?.getResource) {
+      const resource = await (selectedOption as AsyncOption<
+        TData
+      >).getResource();
+      if (resource) {
+        onChangeProp(resource);
+      }
     } else if (selectedOption?.resource) {
-      // Handle single select:
-      onChange(selectedOption.resource);
+      onChangeProp(selectedOption.resource);
+    }
+  }
+
+  async function onChangeMulti(selectedOptions: any[] | null) {
+    const callbackOption: AsyncOption<TData> = selectedOptions?.find(
+      option => option?.getResource
+    );
+
+    if (callbackOption && selectedOptions) {
+      // For callback options, don't set any value:
+      const asyncResource = await callbackOption.getResource();
+      if (asyncResource) {
+        const newResources = selectedOptions.map(option =>
+          option === callbackOption ? asyncResource : option.resource
+        );
+        onChangeProp(newResources);
+      }
     } else {
-      // Handle multi select:
-      const resources = selectedOption?.map(o => o.resource) || [];
-      onChange(resources);
+      const resources = selectedOptions?.map(o => o.resource) || [];
+      onChangeProp(resources);
     }
   }
 
@@ -140,7 +160,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   }, 250);
 
   const onSortEnd = ({ oldIndex, newIndex }) => {
-    onChange(
+    onChangeProp(
       arrayMove((value ?? []) as PersistedResource<any>[], oldIndex, newIndex)
     );
   };
@@ -177,7 +197,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       defaultOptions={true}
       isMulti={isMulti}
       loadOptions={debouncedOptionLoader}
-      onChange={onChangeInternal}
+      onChange={isMulti ? onChangeMulti : onChangeSingle}
       placeholder={formatMessage({ id: "typeHereToSearch" })}
       styles={{
         multiValueLabel: base => ({ ...base, cursor: "move" }),
