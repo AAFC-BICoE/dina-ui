@@ -7,6 +7,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addCollectorGroupTitle: "Add Collector Group",
   addFilesButton: "Add Files",
   addManagedAttributeButtonText: "Add New Managed Attribute",
+  addNewPerson: "Add New Person",
   addObjectSubtypeTitle: "Add New Object Subtype",
   addOrganizationTitle: "Add New Organization",
   addPersonTitle: "Add Person",

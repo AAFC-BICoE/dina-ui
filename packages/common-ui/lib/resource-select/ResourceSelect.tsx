@@ -50,7 +50,7 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 }
 
 export interface CallbackOption {
-  /** Intl message key for the option label. */
+  /** Option label. */
   label: JSX.Element;
 
   /** Function called when the option is selected. */

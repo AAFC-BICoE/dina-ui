@@ -165,7 +165,7 @@ function CollectingEventFormInternal() {
           isMulti={true}
           callbackOptions={[
             {
-              label: <DinaMessage id="addPersonTitle" />,
+              label: <DinaMessage id="addNewPerson" />,
               onSelect: openAddPersonModal
             }
           ]}

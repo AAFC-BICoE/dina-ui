@@ -1,8 +1,9 @@
 import { KitsuResource } from "kitsu";
-import lodash from "lodash";
+import lodash, { last } from "lodash";
 import Select from "react-select/base";
 import { ResourceSelect, ResourceSelectProps } from "../..";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { CallbackOption } from "../ResourceSelect";
 
 /** Example */
 interface Todo extends KitsuResource {
@@ -353,5 +354,66 @@ describe("ResourceSelect component", () => {
 
     // Only the todos should be options.
     expect((options as any[]).map(o => o.resource)).toEqual(MOCK_TODOS.data);
+  });
+
+  it("Allows a callback options prop to show special options that call a function (single dropdown mode).", async () => {
+    const mockOnSelect = jest.fn();
+
+    const TEST_CALLBACK_OPTION: CallbackOption = {
+      label: <>My Callback Option</>,
+      onSelect: mockOnSelect
+    };
+
+    const wrapper = mountWithContext(
+      <ResourceSelect<Todo>
+        {...DEFAULT_SELECT_PROPS}
+        callbackOptions={[TEST_CALLBACK_OPTION]}
+      />
+    );
+
+    // Wait for the options to load.
+    await Promise.resolve();
+    wrapper.update();
+
+    const options = wrapper.find(Select).prop("options");
+
+    // There should be 5 options including the <none> option and the custom callback option:
+    expect(options.length).toEqual(5);
+
+    // Select the callback option, which should call the callback:
+    wrapper.find(Select).prop("onChange")(last(options));
+
+    expect(mockOnSelect).toHaveBeenCalledTimes(1);
+  });
+
+  it("Allows a callback options prop to show special options that call a function (multi dropdown mode).", async () => {
+    const mockOnSelect = jest.fn();
+
+    const TEST_CALLBACK_OPTION: CallbackOption = {
+      label: <>My Callback Option</>,
+      onSelect: mockOnSelect
+    };
+
+    const wrapper = mountWithContext(
+      <ResourceSelect<Todo>
+        {...DEFAULT_SELECT_PROPS}
+        callbackOptions={[TEST_CALLBACK_OPTION]}
+        isMulti={true}
+      />
+    );
+
+    // Wait for the options to load.
+    await Promise.resolve();
+    wrapper.update();
+
+    const options = wrapper.find(Select).prop("options");
+
+    // There should be 4 options including the custom callback option:
+    expect(options.length).toEqual(4);
+
+    // Select the callback option, which should call the callback:
+    wrapper.find(Select).prop("onChange")([options[0], last(options)]);
+
+    expect(mockOnSelect).toHaveBeenCalledTimes(1);
   });
 });
