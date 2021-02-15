@@ -45,8 +45,8 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   /** react-select styles prop. */
   styles?: Partial<Styles>;
 
-  /** Special dropdown options which call a callback method instead of select a value. */
-  callbackOptions?: AsyncOption<TData>[];
+  /** Special dropdown options that can fetch an async value e.g. by creating a resource in a modal. */
+  asyncOptions?: AsyncOption<TData>[];
 }
 
 /**
@@ -78,7 +78,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   sort,
   styles,
   value,
-  callbackOptions
+  asyncOptions
 }: ResourceSelectProps<TData>) {
   const { apiClient } = useContext(ApiClientContext);
   const { formatMessage } = useIntl();
@@ -110,8 +110,8 @@ export function ResourceSelect<TData extends KitsuResource>({
     const options = [
       ...(!isMulti && !inputValue ? [NULL_OPTION] : []),
       ...resourceOptions,
-      ...(callbackOptions
-        ? callbackOptions.map(option => ({
+      ...(asyncOptions
+        ? asyncOptions.map(option => ({
             ...option,
             label: <strong>{option.label}</strong>
           }))
@@ -135,16 +135,16 @@ export function ResourceSelect<TData extends KitsuResource>({
   }
 
   async function onChangeMulti(selectedOptions: any[] | null) {
-    const callbackOption: AsyncOption<TData> = selectedOptions?.find(
+    const asyncOption: AsyncOption<TData> = selectedOptions?.find(
       option => option?.getResource
     );
 
-    if (callbackOption && selectedOptions) {
+    if (asyncOption && selectedOptions) {
       // For callback options, don't set any value:
-      const asyncResource = await callbackOption.getResource();
+      const asyncResource = await asyncOption.getResource();
       if (asyncResource) {
         const newResources = selectedOptions.map(option =>
-          option === callbackOption ? asyncResource : option.resource
+          option === asyncOption ? asyncResource : option.resource
         );
         onChangeProp(newResources);
       }

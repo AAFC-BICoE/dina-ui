@@ -163,7 +163,7 @@ function CollectingEventFormInternal() {
           className="col-md-3"
           optionLabel={person => person.displayName}
           isMulti={true}
-          callbackOptions={[
+          asyncOptions={[
             {
               label: <DinaMessage id="addNewPerson" />,
               getResource: openAddPersonModal

@@ -369,7 +369,7 @@ describe("ResourceSelect component", () => {
     const wrapper = mountWithContext(
       <ResourceSelect<Todo>
         {...DEFAULT_SELECT_PROPS}
-        callbackOptions={[TEST_CALLBACK_OPTION]}
+        asyncOptions={[TEST_CALLBACK_OPTION]}
         onChange={mockOnChange}
       />
     );
@@ -406,7 +406,7 @@ describe("ResourceSelect component", () => {
     const wrapper = mountWithContext(
       <ResourceSelect<Todo>
         {...DEFAULT_SELECT_PROPS}
-        callbackOptions={[TEST_CALLBACK_OPTION]}
+        asyncOptions={[TEST_CALLBACK_OPTION]}
         isMulti={true}
         onChange={mockOnChange}
       />
