@@ -2,20 +2,8 @@ import dynamic from "next/dynamic";
 import React from "react";
 import { ComponentType } from "react";
 import { FastField, FieldProps } from "formik";
-import { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
-import {
-  FieldWrapper,
-  LabelWrapperParams
-} from "../formik-connected/FieldWrapper";
-
-export interface TextFieldProps extends LabelWrapperParams {
-  readOnly?: boolean;
-  initialValue?: string;
-  multiLines?: boolean;
-  inputProps?: InputHTMLAttributes<any> | TextareaHTMLAttributes<any>;
-  placeholder?: string;
-  CustomInput?: React.ComponentType<InputHTMLAttributes<any>>;
-}
+import { FieldWrapper } from "../formik-connected/FieldWrapper";
+import { TextFieldProps } from "../formik-connected/TextField";
 
 const KeyboardEventHandler: ComponentType<any> = dynamic(
   () => {
@@ -78,6 +66,7 @@ export function KeyboardEventHandlerWrappedTextField(props: TextFieldProps) {
               <KeyboardEventHandler
                 handleKeys={["alt+1", "alt+2", "alt+3"]}
                 onKeyEvent={keyEventHandler}
+                isExclusive={true}
               >
                 <input type="text" {...inputPropsInternal} />
               </KeyboardEventHandler>
