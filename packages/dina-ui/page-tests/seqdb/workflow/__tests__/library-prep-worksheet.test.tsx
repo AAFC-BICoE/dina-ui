@@ -60,7 +60,11 @@ describe("Library Prep Worksheet page", () => {
               id: "1",
               indexI5: { id: "1", type: "ngsIndex", name: "index 1" },
               indexI7: { id: "4", type: "ngsIndex", name: "index 4" },
-              sample: { id: "1", type: "sample", name: "SAMP1" },
+              molecularSample: {
+                id: "1",
+                type: "molecularSample",
+                name: "SAMP1"
+              },
               type: "libraryPrep",
               wellColumn: 1,
               wellRow: "A"
@@ -69,7 +73,11 @@ describe("Library Prep Worksheet page", () => {
               id: "2",
               indexI5: { id: "2", type: "ngsIndex", name: "index 2" },
               indexI7: { id: "5", type: "ngsIndex", name: "index 5" },
-              sample: { id: "1", type: "sample", name: "SAMP2" },
+              molecularSample: {
+                id: "1",
+                type: "molecularSample",
+                name: "SAMP2"
+              },
               type: "libraryPrep",
               wellColumn: 2,
               wellRow: "A"
@@ -78,7 +86,11 @@ describe("Library Prep Worksheet page", () => {
               id: "3",
               indexI5: { id: "3", type: "ngsIndex", name: "index 3" },
               indexI7: { id: "6", type: "ngsIndex", name: "index 6" },
-              sample: { id: "1", type: "sample", name: "SAMP3" },
+              molecularSample: {
+                id: "1",
+                type: "molecularSample",
+                name: "SAMP3"
+              },
               type: "libraryPrep",
               wellColumn: 2,
               wellRow: "A"

@@ -32,15 +32,22 @@ export function AreYouSureModal({
         <p>
           <CommonMessage id="areYouSure" />
         </p>
-      </div>
-      <div className="modal-footer">
         <DinaForm initialValues={{}} onSubmit={onYesClickInternal}>
-          <SubmitButton className="btn btn-primary yes-button">
-            <CommonMessage id="yes" />
-          </SubmitButton>
-          <FormikButton className="btn btn-dark no-button" onClick={closeModal}>
-            <CommonMessage id="no" />
-          </FormikButton>
+          <div className="list-inline">
+            <div className="list-inline-item" style={{ width: "8rem" }}>
+              <SubmitButton className="btn btn-primary form-control yes-button">
+                <CommonMessage id="yes" />
+              </SubmitButton>
+            </div>
+            <div className="list-inline-item" style={{ width: "8rem" }}>
+              <FormikButton
+                className="btn btn-dark form-control no-button"
+                onClick={closeModal}
+              >
+                <CommonMessage id="no" />
+              </FormikButton>
+            </div>
+          </div>
         </DinaForm>
       </div>
     </div>

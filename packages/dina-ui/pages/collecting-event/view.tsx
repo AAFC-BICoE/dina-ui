@@ -10,12 +10,13 @@ import {
 } from "common-ui";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResponse } from "kitsu";
+import { uniqBy } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import { useContext, useState } from "react";
 import { Footer, GroupFieldView, Head, Nav } from "../../components";
-import { AttachmentList } from "../../components/object-store/attachment-list/AttachmentList";
+import { AttachmentSection } from "../../components/object-store/attachment-list/AttachmentSection";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
 
@@ -117,6 +118,10 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                       <div className="row">
                         <FieldView className="col-md-2" name="dwcRecordedBy" />
                         <FieldView className="col-md-2" name="collectors" />
+                        <FieldView
+                          className="col-md-2"
+                          name="dwcRecordNumber"
+                        />
                       </div>
                       <div className="row">
                         <FieldView
@@ -156,22 +161,15 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                 </DinaForm>
               )}
               <div className="form-group">
-                <div className="row">
-                  <div className="col-md-6">
-                    <AttachmentList
-                      attachmentPath={`collection-api/collecting-event/${id}/attachment`}
-                      onDetachMetadataIds={metadataIds =>
-                        detachMetadataIds(metadataIds, String(id))
-                      }
-                      afterMetadatasSaved={metadataIds =>
-                        attachMetadatasToCollectingEvent(
-                          metadataIds,
-                          String(id)
-                        )
-                      }
-                    />
-                  </div>
-                </div>
+                <AttachmentSection
+                  attachmentPath={`collection-api/collecting-event/${id}/attachment`}
+                  onDetachMetadataIds={metadataIds =>
+                    detachMetadataIds(metadataIds, String(id))
+                  }
+                  afterMetadatasSaved={metadataIds =>
+                    attachMetadatasToCollectingEvent(metadataIds, String(id))
+                  }
+                />
               </div>
             </div>
           </main>
@@ -193,10 +191,13 @@ export function useAttachMetadatasToCollectingEvent() {
       `collection-api/collecting-event/${collectingEventId}`,
       { include: "attachment" }
     );
-    const newAttachmentList = [
-      ...(collectingEvent.attachment ?? []),
-      ...metadataIds.map(id => ({ id, type: "metadata" }))
-    ];
+    const newAttachmentList = uniqBy(
+      [
+        ...(collectingEvent.attachment ?? []),
+        ...metadataIds.map(id => ({ id, type: "metadata" }))
+      ],
+      attachment => attachment.id
+    );
 
     await updateCollectingEvent(collectingEvent.id, newAttachmentList);
   }

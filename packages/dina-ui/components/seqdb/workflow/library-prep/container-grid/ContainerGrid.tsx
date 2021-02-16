@@ -1,23 +1,23 @@
 import { useDrop } from "react-dnd-cjs";
 import ReactTable, { Column } from "react-table";
-import { ContainerType, Sample } from "../../../../../types/seqdb-api";
+import { ContainerType, MolecularSample } from "../../../../../types/seqdb-api";
 import { DraggableSampleBox } from "./DraggableSampleBox";
 
 interface ContainerGridProps {
   containerType: ContainerType;
   cellGrid: CellGrid;
-  movedSamples: Sample[];
-  onDrop: (sample: Sample, coords: string) => void;
+  movedSamples: MolecularSample[];
+  onDrop: (sample: MolecularSample, coords: string) => void;
 }
 
 interface GridCellProps {
-  onDrop: (item: { sample: Sample }) => void;
-  movedSamples: Sample[];
-  sample: Sample;
+  onDrop: (item: { sample: MolecularSample }) => void;
+  movedSamples: MolecularSample[];
+  sample: MolecularSample;
 }
 
 export interface CellGrid {
-  [key: string]: Sample;
+  [key: string]: MolecularSample;
 }
 
 export function ContainerGrid({

@@ -512,6 +512,38 @@ Constraint violation: description size must be between 1 and 10`;
     );
   });
 
+  it("Shows error messages coming from Spring Boot (In addition to Crnk's format).", () => {
+    const axiosError = {
+      isAxiosError: true,
+      config: {
+        url: "/agent-api/operations"
+      },
+      response: {
+        status: 422,
+        statusText: "Unprocessable Entity",
+        data: {
+          errors: [
+            {
+              status: "422",
+              title: "Data integrity violation",
+              detail:
+                "could not execute statement; SQL [n/a]; constraint [fk_metadata_managed_attribute_to_managed_attribute_id]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement"
+            }
+          ]
+        }
+      }
+    };
+
+    expect(() => makeAxiosErrorMoreReadable(axiosError as AxiosError)).toThrow(
+      new Error(
+        [
+          "/agent-api/operations: Unprocessable Entity",
+          "Data integrity violation: could not execute statement; SQL [n/a]; constraint [fk_metadata_managed_attribute_to_managed_attribute_id]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement"
+        ].join("\n")
+      )
+    );
+  });
+
   it("Sends a get request without omitting the end of a logn URL more than 2 slashes.", async () => {
     const kitsu = new CustomDinaKitsu({
       baseURL: "/base-url",

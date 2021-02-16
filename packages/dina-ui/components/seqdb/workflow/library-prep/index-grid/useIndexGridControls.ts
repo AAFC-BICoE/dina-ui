@@ -14,9 +14,9 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
     {
       fields: {
         ngsIndex: "name",
-        sample: "name"
+        molecularSample: "name"
       },
-      include: "sample,indexI5,indexI7",
+      include: "molecularSample,indexI5,indexI7",
       page: { limit: 1000 },
       path: `seqdb-api/libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`
     },

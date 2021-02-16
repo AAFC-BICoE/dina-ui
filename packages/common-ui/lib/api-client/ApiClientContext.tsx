@@ -41,10 +41,10 @@ export interface ApiClientI {
   ) => Promise<SuccessfulOperation[]>;
 
   /** Creates or updates one or multiple resources. */
-  save: (
+  save: <TData extends KitsuResource = KitsuResource>(
     saveArgs: SaveArgs[],
     options?: DoOperationsOptions
-  ) => Promise<PersistedResource<KitsuResource>[]>;
+  ) => Promise<PersistedResource<TData>[]>;
 
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
   bulkGet: <T extends KitsuResource>(
@@ -183,10 +183,10 @@ export class ApiClientImpl implements ApiClientI {
   /**
    * Creates or updates one or multiple resources.
    */
-  public async save(
+  public async save<TData extends KitsuResource = KitsuResource>(
     saveArgs: SaveArgs[],
     options?: DoOperationsOptions
-  ): Promise<PersistedResource<KitsuResource>[]> {
+  ): Promise<PersistedResource<TData>[]> {
     // Serialize the resources to JSONAPI format.
     const serializePromises = saveArgs.map(saveArg => serialize(saveArg));
     const serialized = await Promise.all(serializePromises);
@@ -286,6 +286,15 @@ export function makeAxiosErrorMoreReadable(error: AxiosError) {
     // Special case: Make 502 "bad gateway" messages more user-friendly:
     if (error.response?.status === 502) {
       errorMessage = `Service unavailable:\n${errorMessage}`;
+    }
+
+    // Handle errors coming from Spring Boot:
+    if (error.response?.data?.errors) {
+      const jsonApiErrorResponse = {
+        status: error.response.status,
+        errors: error.response.data.errors
+      };
+      errorMessage += "\n" + getErrorMessage([jsonApiErrorResponse]);
     }
 
     throw new Error(errorMessage);

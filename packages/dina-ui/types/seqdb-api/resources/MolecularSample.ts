@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 
-export interface SampleAttributes {
+export interface MolecularSampleAttributes {
   name: string;
   version: string;
 
@@ -13,4 +13,4 @@ export interface SampleAttributes {
   lastModified?: string;
 }
 
-export type Sample = KitsuResource & SampleAttributes;
+export type MolecularSample = KitsuResource & MolecularSampleAttributes;

@@ -28,7 +28,7 @@ export function useBulkMetadataEditModal() {
       <div className="modal-content">
         <style>{`
           .modal-dialog {
-            max-width: calc(100vw - 3rem) !important;
+            max-width: calc(100vw - 3rem);
           }
           .modal-content {
             max-height: calc(100vh - 3rem) !important;

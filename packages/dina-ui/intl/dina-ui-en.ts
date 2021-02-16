@@ -7,6 +7,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addCollectorGroupTitle: "Add Collector Group",
   addFilesButton: "Add Files",
   addManagedAttributeButtonText: "Add New Managed Attribute",
+  addNewPerson: "Add New Person",
   addObjectSubtypeTitle: "Add New Object Subtype",
   addOrganizationTitle: "Add New Organization",
   addPersonTitle: "Add Person",
@@ -14,8 +15,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addPersonPopupTooltip: "Add Person without leaving the page",
   agentsSectionTitle: "Agents",
   appTitle: "DINA",
+  attachSelected: "Attach Selected",
   associatedAgent: "Associated Agent",
   attachments: "Attachments",
+  attachExistingObjects: "Attach Existing Objects",
   attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
   changedProperties: "Changes",
@@ -44,6 +47,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   enableDateRangeLabel: "Enable Date Range",
   endEventDateTimeLabel: "End Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   exifProperties: "Exif Properties",
+  existingAttachments: "Existing Attachments",
   feedbackButtonText: "Feedback",
   field_acceptedValues: "Accepted Values",
   field_acceptedValuesAsLines: "Accepted Values (One value per line)",
@@ -81,8 +85,30 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "field_description.en": "English Description",
   "field_description.fr": "French Description",
   field_displayName: "Display Name",
-  field_dwcVerbatimSRS: "Dwc Verbatim SRS",
+  field_dwcVerbatimCoordinates: "Verbatim Coordinates",
+  field_dwcVerbatimCoordinates_tooltip:
+    "The verbatim original spatial coordinates of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Examples: 41 05 54S 121 05 34W, 17T 630000 4833400",
+  field_dwcVerbatimCoordinateSystem: "Verbatim Coordinate System",
+  field_dwcVerbatimCoordinateSystem_tooltip:
+    "The coordinate format for the verbatimLatitude and verbatimLongitude or the verbatimCoordinates of the Location. Examples: decimal degrees, degrees decimal minutes, degrees minutes seconds, UTM",
+  field_dwcVerbatimDepth: "Verbatim Depth",
+  field_dwcVerbatimDepth_tooltip:
+    "The original description of the depth below the local surface. Example: 100-200 m",
+  field_dwcVerbatimElevation: "Verbatim Elevation",
+  field_dwcVerbatimElevation_tooltip:
+    "The original description of the elevation (altitude, above sea level) of the Location. Example: 100-200 m",
+  field_dwcVerbatimLatitude: "Verbatim Latitude",
+  field_dwcVerbatimLatitude_tooltip:
+    "The verbatim original latitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Example: 41 05 54.03S",
+  field_dwcVerbatimLongitude: "Verbatim Longitude",
+  field_dwcVerbatimLongitude_tooltip:
+    "The verbatim original longitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Example: 121d 10' 34\" W",
+  field_dwcVerbatimLocality: "Verbatim Locality",
+  field_dwcVerbatimSRS: "Verbatim SRS",
+  field_dwcVerbatimSRS_tooltip:
+    "The ellipsoid, geodetic datum, or spatial reference system (SRS) upon which coordinates given in verbatimLatitude and verbatimLongitude, or verbatimCoordinates are based. Recommended best practice is to use the EPSG code of the SRS, if known. Examples: EPSG:4326, WGS84, NAD27",
   field_dwcRecordedBy: "Verbatim Collectors",
+  field_dwcRecordNumber: "Collector's Number",
   field_editableBuiltInAttributes: "Visible Built In Attributes",
   field_editableManagedAttributes: "Visible Managed Attributes",
   field_email: "Email",
@@ -171,6 +197,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   uploadFormInstructions:
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
   uploadFilesMaxSize: "The maximum file size is {maxSize}.",
+  uploadNewAttachments: "Upload New Attachments",
   uploadPageTitle: "Upload Files",
   useCollectorGroupLabel: "Use Collector Group",
   userMustBelongToGroup: "User must belong to a Group",
