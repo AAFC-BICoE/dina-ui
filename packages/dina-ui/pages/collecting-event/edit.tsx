@@ -28,17 +28,6 @@ interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
   router: NextRouter;
 }
-/* handle shortcut keys to aid user input on degree, minute and second */
-
-const keyEventHandler = (key, e) => {
-  key === "alt+1"
-    ? (e.target.value += "°")
-    : key === "alt+2"
-    ? (e.target.value += "'")
-    : key === "alt+3"
-    ? (e.target.value += "''")
-    : (e.target.value = e.target.value);
-};
 export default function CollectingEventEditPage() {
   const router = useRouter();
   const {
@@ -173,8 +162,6 @@ function CollectingEventFormInternal() {
       <div className="row">
         <TextField className="col-md-3" name="dwcVerbatimLocality" />
         <KeyboardEventHandlerWrappedTextField
-          handleKeys={["alt+1", "alt+2", "alt+3"]}
-          onKeyEvent={keyEventHandler}
           name="dwcVerbatimLatitude"
           className="col-md-3"
         />

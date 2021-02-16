@@ -1,7 +1,21 @@
 import dynamic from "next/dynamic";
 import React from "react";
-import { ComponentType, createContext, ReactNode } from "react";
-import { TextField, TextFieldProps } from "../formik-connected/TextField";
+import { ComponentType } from "react";
+import { FastField, FieldProps } from "formik";
+import { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
+import {
+  FieldWrapper,
+  LabelWrapperParams
+} from "../formik-connected/FieldWrapper";
+
+export interface TextFieldProps extends LabelWrapperParams {
+  readOnly?: boolean;
+  initialValue?: string;
+  multiLines?: boolean;
+  inputProps?: InputHTMLAttributes<any> | TextareaHTMLAttributes<any>;
+  placeholder?: string;
+  CustomInput?: React.ComponentType<InputHTMLAttributes<any>>;
+}
 
 const KeyboardEventHandler: ComponentType<any> = dynamic(
   () => {
@@ -10,44 +24,67 @@ const KeyboardEventHandler: ComponentType<any> = dynamic(
   { ssr: false }
 );
 
-interface KeyboardEventHandlerWrapperContextI {
-  handleKeys: string[];
-  onKeyEvent: (key, e) => void;
-}
+/**
+ * This component detects shortcut key alt+1,alt+2,alt+3 for aiding vabatime
+ * data entry of degree, minute and second
+ */
 
-const KeyboardEventHandlerWrapperContext = createContext<
-  KeyboardEventHandlerWrapperContextI
->(null as any);
+export function KeyboardEventHandlerWrappedTextField(props: TextFieldProps) {
+  const {
+    initialValue,
+    readOnly,
+    multiLines,
+    inputProps: inputPropsExternal,
+    placeholder,
+    CustomInput,
+    ...labelWrapperProps
+  } = props;
+  const { name } = labelWrapperProps;
 
-export type KeyboardEventHandlerWrappedTextFieldProps = TextFieldProps &
-  KeyboardEventHandlerWrapperContextI;
-
-export function KeyboardEventHandlerWrappedTextField({
-  handleKeys,
-  onKeyEvent,
-  ...textFieldProps
-}: KeyboardEventHandlerWrappedTextFieldProps) {
   return (
-    <KeyboardEventHandlerWrapperContext.Provider
-      value={{ handleKeys, onKeyEvent }}
-    >
-      <KeyboardEventHandlerWrapperInternal
-        handleKeys={handleKeys}
-        onKeyEvent={onKeyEvent}
-        {...textFieldProps}
-      />
-    </KeyboardEventHandlerWrapperContext.Provider>
-  );
-}
+    <FieldWrapper {...labelWrapperProps}>
+      <FastField name={name}>
+        {({
+          field: { value },
+          form: { setFieldValue, setFieldTouched }
+        }: FieldProps) => {
+          const keyEventHandler = (key, e) => {
+            key === "alt+1"
+              ? (e.target.value += "°")
+              : key === "alt+2"
+              ? (e.target.value += "'")
+              : key === "alt+3"
+              ? (e.target.value += "''")
+              : (e.target.value = e.target.value);
+            onChange(e);
+          };
 
-function KeyboardEventHandlerWrapperInternal({
-  handleKeys,
-  onKeyEvent,
-  name
-}: KeyboardEventHandlerWrappedTextFieldProps) {
-  return (
-    <KeyboardEventHandler handleKeys={handleKeys} onKeyEvent={onKeyEvent}>
-      <TextField name={name} />
-    </KeyboardEventHandler>
+          function onChange(event) {
+            setFieldValue(name, event.target.value);
+            setFieldTouched(name);
+          }
+
+          const inputPropsInternal = {
+            ...inputPropsExternal,
+            placeholder,
+            className: "form-control",
+            onChange,
+            value: value || "",
+            readOnly
+          };
+
+          return (
+            <>
+              <KeyboardEventHandler
+                handleKeys={["alt+1", "alt+2", "alt+3"]}
+                onKeyEvent={keyEventHandler}
+              >
+                <input type="text" {...inputPropsInternal} />
+              </KeyboardEventHandler>
+            </>
+          );
+        }}
+      </FastField>
+    </FieldWrapper>
   );
 }
