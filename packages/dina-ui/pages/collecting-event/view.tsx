@@ -96,7 +96,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                           label={formatMessage("field_group")}
                         />
                       </div>
-                      <div className="row">
+                      <div className="row" style={{ position: "relative" }}>
                         <FieldView
                           className="col-md-2"
                           name="startEventDateTime"
@@ -109,6 +109,8 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                             label={formatMessage("endEventDateTimeLabel")}
                           />
                         )}
+                        {/* Stick this field to the bottom of the row div to align with the other fields in this row: */}
+                        <style>{`.verbatimEventDateTime-field { position: absolute; bottom: 0; width: 100%; }`}</style>
                         <FieldView
                           className="col-md-3"
                           name="verbatimEventDateTime"

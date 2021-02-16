@@ -40,7 +40,7 @@ export function FieldView(props: FieldViewProps) {
                     ? val
                     : JSON.stringify(val)
                 )
-                .join()
+                .join(", ")
             ) : typeof value === "string" ? (
               value
             ) : isDate(value) ? (
