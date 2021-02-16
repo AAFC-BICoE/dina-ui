@@ -8,13 +8,14 @@ import {
   useModal
 } from "common-ui";
 import { ResourceSelectField } from "common-ui/lib";
+import { PersistedResource } from "kitsu";
 import { Organization } from "packages/dina-ui/types/agent-api/resources/Organization";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 
 interface PersonFormProps {
   person?: Person;
-  onSubmitSuccess: () => Promise<void>;
+  onSubmitSuccess: (person: PersistedResource<Person>) => void | Promise<void>;
 }
 
 /** Form to add or edit a Person. */
@@ -40,7 +41,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       );
       delete submittedValues.organizations;
     }
-    await save(
+    const [newPerson] = await save<Person>(
       [
         {
           resource: submittedValues,
@@ -52,7 +53,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       }
     );
 
-    await onSubmitSuccess();
+    await onSubmitSuccess(newPerson);
   };
 
   return (
@@ -93,37 +94,48 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
 
 /** Button that opens a PersonForm in a modal. */
 export function AddPersonButton() {
-  const { closeModal, openModal } = useModal();
-
-  async function onSubmitSuccess() {
-    closeModal();
-  }
+  const { openAddPersonModal } = useAddPersonModal();
 
   return (
     <button
       className="btn btn-info delete-button open-person-modal"
-      onClick={() =>
-        openModal(
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2>
-                <DinaMessage id="addPersonTitle" />
-              </h2>
-            </div>
-            <div className="modal-body">
-              <PersonForm onSubmitSuccess={onSubmitSuccess} />
-            </div>
-            <div className="modal-footer">
-              <button className="btn btn-dark" onClick={closeModal}>
-                <DinaMessage id="cancelButtonText" />
-              </button>
-            </div>
-          </div>
-        )
-      }
+      onClick={openAddPersonModal}
       type="button"
     >
       <DinaMessage id="addPersonButtonText" />
     </button>
   );
+}
+
+export function useAddPersonModal() {
+  const { closeModal, openModal } = useModal();
+
+  function openAddPersonModal() {
+    return new Promise<PersistedResource<Person> | undefined>(resolve => {
+      function finishModal(newPerson?: PersistedResource<Person>) {
+        closeModal();
+        resolve(newPerson);
+      }
+
+      openModal(
+        <div className="modal-content">
+          <div className="modal-header">
+            <h2>
+              <DinaMessage id="addPersonTitle" />
+            </h2>
+          </div>
+          <div className="modal-body">
+            <PersonForm onSubmitSuccess={finishModal} />
+          </div>
+          <div className="modal-footer">
+            <button className="btn btn-dark" onClick={() => finishModal()}>
+              <DinaMessage id="cancelButtonText" />
+            </button>
+          </div>
+        </div>
+      );
+    });
+  }
+
+  return { openAddPersonModal };
 }

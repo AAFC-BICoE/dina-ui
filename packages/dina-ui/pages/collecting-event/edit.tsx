@@ -19,7 +19,12 @@ import { NextRouter, useRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import { useContext, useState } from "react";
 import Switch from "react-switch";
-import { GroupSelectField, Head, Nav } from "../../components";
+import {
+  GroupSelectField,
+  Head,
+  Nav,
+  useAddPersonModal
+} from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
 
@@ -97,6 +102,7 @@ export default function CollectingEventEditPage() {
 
 function CollectingEventFormInternal() {
   const { formatMessage } = useDinaIntl();
+  const { openAddPersonModal } = useAddPersonModal();
   const [checked, setChecked] = useState(false);
 
   return (
@@ -157,6 +163,12 @@ function CollectingEventFormInternal() {
           className="col-md-3"
           optionLabel={person => person.displayName}
           isMulti={true}
+          asyncOptions={[
+            {
+              label: <DinaMessage id="addNewPerson" />,
+              getResource: openAddPersonModal
+            }
+          ]}
         />
         <TextField className="col-md-3" name="dwcRecordNumber" />
       </div>
