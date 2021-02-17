@@ -1,7 +1,6 @@
-import dynamic from "next/dynamic";
-import React from "react";
-import { ComponentType } from "react";
 import { FastField, FieldProps } from "formik";
+import dynamic from "next/dynamic";
+import React, { ComponentType } from "react";
 import { FieldWrapper } from "../formik-connected/FieldWrapper";
 import { TextFieldProps } from "../formik-connected/TextField";
 
@@ -64,7 +63,6 @@ export function KeyboardEventHandlerWrappedTextField(props: TextFieldProps) {
               <KeyboardEventHandler
                 handleKeys={["alt+1", "alt+2", "alt+3"]}
                 onKeyEvent={keyEventHandler}
-                isExclusive={true}
               >
                 {<input type="text" {...inputPropsInternal} />}
               </KeyboardEventHandler>
