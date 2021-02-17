@@ -88,6 +88,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcVerbatimLatitude: "Verbatim Latitude",
   field_dwcVerbatimLongitude: "Verbatim Longitude",
   field_dwcVerbatimLocality: "Verbatim Locality",
+  field_dwcVerbatimLatitude_tooltip:
+    "Use shortcut alt+1 for °, alt+2 for ' and alt+3 for ''",
+  field_dwcVerbatimLongitude_tooltip:
+    "Use shortcut alt+1 for °, alt+2 for ' and alt+3 for ''",
+  field_dwcVerbatimLocality_tooltip:
+    "Use shortcut alt+1 for °, alt+2 for ' and alt+3 for ''",
   field_dwcVerbatimSRS: "Verbatim SRS",
   field_dwcRecordedBy: "Verbatim Collectors",
   field_editableBuiltInAttributes: "Visible Built In Attributes",

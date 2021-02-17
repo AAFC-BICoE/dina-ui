@@ -160,12 +160,18 @@ function CollectingEventFormInternal() {
         />
       </div>
       <div className="row">
-        <TextField className="col-md-3" name="dwcVerbatimLocality" />
+        <KeyboardEventHandlerWrappedTextField
+          className="col-md-3"
+          name="dwcVerbatimLocality"
+        />
         <KeyboardEventHandlerWrappedTextField
           name="dwcVerbatimLatitude"
           className="col-md-3"
         />
-        <TextField className="col-md-3" name="dwcVerbatimLongitude" />
+        <KeyboardEventHandlerWrappedTextField
+          className="col-md-3"
+          name="dwcVerbatimLongitude"
+        />
         <TextField className="col-md-3" name="dwcVerbatimCoordinates" />
       </div>
       <div className="row">
