@@ -12,7 +12,8 @@ import {
   Query,
   ResourceSelectField,
   SubmitButton,
-  TextField
+  TextField,
+  KeyboardEventHandlerWrappedTextField
 } from "common-ui";
 import { KitsuResponse } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
@@ -32,7 +33,6 @@ interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
   router: NextRouter;
 }
-
 export default function CollectingEventEditPage() {
   const router = useRouter();
   const {
@@ -173,9 +173,18 @@ function CollectingEventFormInternal() {
         <TextField className="col-md-3" name="dwcRecordNumber" />
       </div>
       <div className="row">
-        <TextField className="col-md-3" name="dwcVerbatimLocality" />
-        <TextField className="col-md-3" name="dwcVerbatimLatitude" />
-        <TextField className="col-md-3" name="dwcVerbatimLongitude" />
+        <KeyboardEventHandlerWrappedTextField
+          className="col-md-3"
+          name="dwcVerbatimLocality"
+        />
+        <KeyboardEventHandlerWrappedTextField
+          name="dwcVerbatimLatitude"
+          className="col-md-3"
+        />
+        <KeyboardEventHandlerWrappedTextField
+          className="col-md-3"
+          name="dwcVerbatimLongitude"
+        />
         <TextField className="col-md-3" name="dwcVerbatimCoordinates" />
       </div>
       <div className="row">
