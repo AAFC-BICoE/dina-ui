@@ -3,6 +3,14 @@ import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import CollectingEventEditPage from "../../../pages/collecting-event/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
+
+// Mock out the dynamic component, which should only be rendered in the browser
+jest.mock("next/dynamic", () => () => {
+  return function MockDynamicComponent() {
+    return <div>Mock dynamic component</div>;
+  };
+});
+
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 

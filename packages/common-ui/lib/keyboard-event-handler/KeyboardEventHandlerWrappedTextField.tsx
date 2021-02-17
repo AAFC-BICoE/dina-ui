@@ -5,7 +5,7 @@ import { FastField, FieldProps } from "formik";
 import { FieldWrapper } from "../formik-connected/FieldWrapper";
 import { TextFieldProps } from "../formik-connected/TextField";
 
-const KeyboardEventHandler: ComponentType<any> = dynamic(
+export const KeyboardEventHandler: ComponentType<any> = dynamic(
   () => {
     return import("react-keyboard-event-handler");
   },
@@ -28,7 +28,6 @@ export function KeyboardEventHandlerWrappedTextField(props: TextFieldProps) {
     ...labelWrapperProps
   } = props;
   const { name } = labelWrapperProps;
-
   return (
     <FieldWrapper {...labelWrapperProps}>
       <FastField name={name}>
@@ -60,7 +59,6 @@ export function KeyboardEventHandlerWrappedTextField(props: TextFieldProps) {
             value: value || "",
             readOnly
           };
-
           return (
             <>
               <KeyboardEventHandler
@@ -68,7 +66,7 @@ export function KeyboardEventHandlerWrappedTextField(props: TextFieldProps) {
                 onKeyEvent={keyEventHandler}
                 isExclusive={true}
               >
-                <input type="text" {...inputPropsInternal} />
+                {<input type="text" {...inputPropsInternal} />}
               </KeyboardEventHandler>
             </>
           );
