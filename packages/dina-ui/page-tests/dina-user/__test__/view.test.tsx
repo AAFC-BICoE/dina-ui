@@ -69,12 +69,14 @@ describe("Dina user who am i page", () => {
 
     // The dina user's groups should be rendered in a FieldView.
     expect(wrapper.find(".groups-field-header").exists()).toEqual(true);
-    expect(wrapper.containsMatchingElement(<p>dao,cnc</p>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<p>dao, cnc</p>)).toEqual(true);
 
     // The dina user's roles should be rendered in a FieldView.
     expect(wrapper.find(".roles-field-header").exists()).toEqual(true);
     expect(
-      wrapper.containsMatchingElement(<p>/dao/staff,/cnd/collection-manager</p>)
+      wrapper.containsMatchingElement(
+        <p>/dao/staff, /cnd/collection-manager</p>
+      )
     ).toEqual(true);
   });
 });
