@@ -26,6 +26,7 @@ import {
   Person
 } from "../../../types/objectstore-api";
 import { ObjectUpload } from "../../../types/objectstore-api/resources/ObjectUpload";
+import { getManagedAttributesInUse } from "../managed-attributes/getManagedAttributesInUse";
 import {
   MetadataEditorAttributesControls,
   MetadataEditorControls
@@ -219,7 +220,7 @@ export function BulkMetadataEditor({
     }
 
     const managedAttributesInUse = await getManagedAttributesInUse(
-      metadatas,
+      metadatas.map(it => it.managedAttributeMap),
       bulkGet
     );
     setInitialEditableManagedAttributes(managedAttributesInUse);
@@ -417,32 +418,6 @@ export function BulkMetadataEditor({
       </div>
     </div>
   );
-}
-
-/**
- * Initializes the editable managed attributes based on what attributes are set on the metadatas.
- */
-export async function getManagedAttributesInUse(
-  metadatas: Metadata[],
-  bulkGet: ApiClientI["bulkGet"]
-) {
-  // Loop through the metadatas and find which managed attributes are set:
-  const managedAttributeIdMap: Record<string, true> = {};
-  for (const metadata of metadatas) {
-    const keys = Object.keys(metadata.managedAttributeMap?.values ?? {});
-    for (const key of keys) {
-      managedAttributeIdMap[key] = true;
-    }
-  }
-  const managedAttributeIds = Object.keys(managedAttributeIdMap);
-
-  // Fetch the managed attributes from the back-end:
-  const newInitialEditableManagedAttributes = await bulkGet<ManagedAttribute>(
-    managedAttributeIds.map(id => `/managed-attribute/${id}`),
-    { apiBaseUrl: "/objectstore-api" }
-  );
-
-  return newInitialEditableManagedAttributes;
 }
 
 export function managedAttributeColumns(

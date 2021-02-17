@@ -5,11 +5,8 @@ import {
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
-  FieldWrapper,
   filterBy,
-  NumberField,
   Query,
-  ResourceSelect,
   ResourceSelectField,
   SelectField,
   SubmitButton,
@@ -19,19 +16,11 @@ import {
 } from "common-ui";
 import { useFormikContext } from "formik";
 import { NextRouter, useRouter } from "next/router";
-import { useEffect, useState } from "react";
 import { Head, Nav } from "../../../components";
-import {
-  FileView,
-  getManagedAttributesInUse
-} from "../../../components/object-store";
+import { FileView } from "../../../components/object-store";
+import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import {
-  License,
-  ManagedAttribute,
-  Metadata,
-  Person
-} from "../../../types/objectstore-api";
+import { License, Metadata, Person } from "../../../types/objectstore-api";
 
 interface SingleMetadataFormProps {
   /** Existing Metadata is required, no new ones are added with this form. */
@@ -257,7 +246,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
             <NotPubliclyReleasableReasonField />
           </div>
         </div>
-        <ManagedAttributesEditor />
+        <ManagedAttributesEditor mapPath="managedAttributeMap" />
       </div>
     </DinaForm>
   );
@@ -274,95 +263,6 @@ function NotPubliclyReleasableReasonField() {
       name="notPubliclyReleasableReason"
       multiLines={true}
     />
-  );
-}
-
-function ManagedAttributesEditor() {
-  const { values: metadata } = useFormikContext<Metadata>();
-  const { bulkGet } = useApiClient();
-  const { formatMessage } = useDinaIntl();
-
-  const [editableManagedAttributes, setEditableManagedAttributes] = useState<
-    ManagedAttribute[]
-  >([]);
-
-  useEffect(() => {
-    (async () => {
-      const initialAttributes = await getManagedAttributesInUse(
-        [metadata],
-        bulkGet
-      );
-      setEditableManagedAttributes(initialAttributes);
-    })();
-  }, []);
-
-  return (
-    <div className="form-group managed-attributes-editor">
-      <h2>
-        <DinaMessage id="metadataManagedAttributesLabel" />
-      </h2>
-      <div className="row">
-        <div className="col-md-3 col-sm-4">
-          <FieldWrapper
-            name="editableManagedAttributes"
-            label={formatMessage("field_editableManagedAttributes")}
-          >
-            <ResourceSelect<ManagedAttribute>
-              filter={filterBy(["name"])}
-              model="objectstore-api/managed-attribute"
-              optionLabel={attribute => attribute.name}
-              isMulti={true}
-              onChange={ma =>
-                setEditableManagedAttributes(ma as ManagedAttribute[])
-              }
-              value={editableManagedAttributes}
-            />
-          </FieldWrapper>
-        </div>
-        <div className="col-md-3 col-sm-4">
-          <div className="alert alert-warning">
-            <DinaMessage id="editableManagedAttributesRemoveInfo" />
-          </div>
-        </div>
-      </div>
-      <div className="row" style={{ minHeight: "25rem" }}>
-        {editableManagedAttributes.map(attribute => {
-          const props = {
-            className: "col-md-3 col-sm-4",
-            key: attribute.id,
-            label: attribute.name,
-            name: `managedAttributeMap.values.${attribute.id}.value`
-          };
-
-          if (attribute.managedAttributeType === "STRING") {
-            if (attribute.acceptedValues) {
-              return (
-                <SelectField
-                  {...props}
-                  options={[
-                    { label: `<${formatMessage("none")}>`, value: "" },
-                    ...attribute.acceptedValues.map(value => ({
-                      label: value,
-                      value
-                    }))
-                  ]}
-                />
-              );
-            }
-            return (
-              <TextField
-                {...props}
-                inputProps={{ type: "search" }} // Adds the 'X' clear button in the text input.
-              />
-            );
-          } else if (attribute.managedAttributeType === "INTEGER") {
-            return <NumberField {...props} />;
-          } else {
-            return null;
-          }
-        })}
-      </div>
-    </div>
   );
 }
 
