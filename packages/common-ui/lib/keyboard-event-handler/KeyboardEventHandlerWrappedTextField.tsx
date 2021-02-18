@@ -40,7 +40,7 @@ export function KeyboardEventHandlerWrappedTextField(props: TextFieldProps) {
               : key === "alt+2"
               ? (e.target.value += "'")
               : key === "alt+3"
-              ? (e.target.value += "''")
+              ? (e.target.value += '"')
               : (e.target.value = e.target.value);
             onChange(e);
           };
