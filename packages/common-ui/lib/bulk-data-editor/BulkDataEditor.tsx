@@ -26,6 +26,7 @@ export interface BulkDataEditorProps<TRow> {
     formikValues: any,
     formikActions: FormikContextType<any>
   ) => Promise<void>;
+  applyCustomDefaultValues?: (rows: TRow[]) => Promise<void>;
 
   /**
    * Submit unchanged rows, e.g. when inserting new data instead of editing existing data.
@@ -38,6 +39,7 @@ export function BulkDataEditor<TRow>({
   columns,
   loadData,
   onSubmit,
+  applyCustomDefaultValues,
   submitUnchangedRows = false
 }: BulkDataEditorProps<TRow>) {
   type TableData = TRow[];
@@ -63,9 +65,16 @@ export function BulkDataEditor<TRow>({
   // Loads the initial data and shows an error message on fail:
   const loadDataInternal = safeSubmit(async () => {
     setLoading(true);
+
+    // Load the initial data to be used later to check which fields are edited:
     const loadedData = await loadData();
     setInitialTableData(loadedData);
-    setWorkingTableData(cloneDeep(loadedData));
+
+    // Create a copy of the initial data to receive edits:
+    const newWorkingData = cloneDeep(loadedData);
+    await applyCustomDefaultValues?.(newWorkingData);
+    setWorkingTableData(newWorkingData);
+
     setLoading(false);
   });
 
@@ -123,7 +132,7 @@ export function BulkDataEditor<TRow>({
       {validationAlertJsx}
       <div
         className="form-group"
-        //Setting the width/height and overflowX:hidden here is detected by Handsontable and enables horizontal scrolling:
+        // Setting the width/height and overflowX:hidden here is detected by Handsontable and enables horizontal scrolling:
         style={{ height: "100%", width: "100%", overflowX: "hidden" }}
       >
         <DynamicHotTable

@@ -45,6 +45,6 @@ describe("FieldView component", () => {
       </DinaForm>
     );
 
-    expect(wrapper.find("p").text()).toEqual("alias1,alias2");
+    expect(wrapper.find("p").text()).toEqual("alias1, alias2");
   });
 });
