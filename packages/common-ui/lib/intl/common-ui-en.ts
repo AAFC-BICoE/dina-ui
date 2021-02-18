@@ -59,11 +59,16 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   selected: "selected",
   showChanges: "Show Changes",
   somethingWentWrong: "Something went wrong",
+  sourceField: "Source Field",
+  sourceText: "Source Text",
   submitBtnText: "Save",
   tableTotalCount: "Total matched records: {totalCount}",
+  targetField: "Target Field",
+  text: "Text",
   true: "True",
   typeHereToSearch: "Type here to search.",
   uiAppVersion: "UI Application Version: {version}",
   valueLabel: "Value",
+  valueSourceType: "Value Source Type",
   yes: "Yes"
 };

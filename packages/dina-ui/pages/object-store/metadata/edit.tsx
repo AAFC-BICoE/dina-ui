@@ -46,6 +46,11 @@ export default function EditMetadatasPage() {
           metadataIds={metadataIds}
           objectUploadIds={objectUploadIds}
           group={router.query.group as string}
+          defaultValuesConfig={
+            typeof router.query.defaultValuesConfig === "string"
+              ? Number(router.query.defaultValuesConfig)
+              : undefined
+          }
           afterMetadatasSaved={afterMetadatasSaved}
         />
       </main>

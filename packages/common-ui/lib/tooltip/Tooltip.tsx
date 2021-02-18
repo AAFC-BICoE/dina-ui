@@ -1,6 +1,6 @@
+import RcTooltip from "rc-tooltip";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
-import RcTooltip from "rc-tooltip";
 
 export interface TooltipProps {
   /** The ID of the message to show in the tooltip. */
@@ -19,7 +19,7 @@ export function Tooltip({ id, visibleElement }: TooltipProps) {
       <RcTooltip
         id={id}
         overlay={
-          <div style={{ maxWidth: "15rem" }}>
+          <div style={{ maxWidth: "15rem", whiteSpace: "pre-wrap" }}>
             <FormattedMessage id={id} />
           </div>
         }

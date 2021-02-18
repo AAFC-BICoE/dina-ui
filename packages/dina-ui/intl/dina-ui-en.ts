@@ -13,6 +13,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addPersonTitle: "Add Person",
   addPersonButtonText: "Add Person",
   addPersonPopupTooltip: "Add Person without leaving the page",
+  addRule: "Add Rule",
+  addRuleSet: "Add Rule Set",
   agentsSectionTitle: "Agents",
   appTitle: "DINA",
   attachSelected: "Attach Selected",
@@ -30,7 +32,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectorGroupListTitle: "Collector Group",
   collectorGroupNameLabel: "Collector Group Name",
   collectorGroupViewTitle: "View Collector Group",
+  configureDefaultValues: "Configure default values",
+  defaultValuesConfig: "Default Values Config",
+  defaultValuesConfigs: "Default Values Configs",
   deleteButtonText: "Delete",
+  deleteConfig: "Delete Config",
   deleteThisAttributesTemplate: "Delete This Template",
   deleteSelectedButtonText: "Delete Selected",
   detachSelectedButtonText: "Detach Selected",
@@ -99,11 +105,15 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "The original description of the elevation (altitude, above sea level) of the Location. Example: 100-200 m",
   field_dwcVerbatimLatitude: "Verbatim Latitude",
   field_dwcVerbatimLatitude_tooltip:
-    "The verbatim original latitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Example: 41 05 54.03S",
+    "The verbatim original latitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Example: 41 05 54.03S \
+    \nUse shortcut alt+1 for °, alt+2 for ' and alt+3 for '' ",
   field_dwcVerbatimLongitude: "Verbatim Longitude",
   field_dwcVerbatimLongitude_tooltip:
-    "The verbatim original longitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Example: 121d 10' 34\" W",
+    "The verbatim original longitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Example: 121d 10' 34\" W \
+    \nUse shortcut alt+1 for °, alt+2 for ' and alt+3 for ''",
   field_dwcVerbatimLocality: "Verbatim Locality",
+  field_dwcVerbatimLocality_tooltip:
+    "Use shortcut alt+1 for °, alt+2 for ' and alt+3 for ''",
   field_dwcVerbatimSRS: "Verbatim SRS",
   field_dwcVerbatimSRS_tooltip:
     "The ellipsoid, geodetic datum, or spatial reference system (SRS) upon which coordinates given in verbatimLatitude and verbatimLongitude, or verbatimCoordinates are based. Recommended best practice is to use the EPSG code of the SRS, if known. Examples: EPSG:4326, WGS84, NAD27",
@@ -191,8 +201,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   searchButton: "Search",
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",
+  set: "Set",
   startEventDateTimeLabel: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   thumbnailNotAvailableText: "No thumbnail available",
+  to: "To",
   uploadButtonText: "Upload",
   uploadFormInstructions:
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
