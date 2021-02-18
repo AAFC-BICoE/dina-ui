@@ -99,15 +99,13 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "The original description of the elevation (altitude, above sea level) of the Location. Example: 100-200 m",
   field_dwcVerbatimLatitude: "Verbatim Latitude",
   field_dwcVerbatimLatitude_tooltip:
-    "The verbatim original latitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Example: 41 05 54.03S",
+    "The verbatim original latitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Example: 41 05 54.03S \
+    \nUse shortcut alt+1 for °, alt+2 for ' and alt+3 for '' ",
   field_dwcVerbatimLongitude: "Verbatim Longitude",
   field_dwcVerbatimLongitude_tooltip:
-    "The verbatim original longitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Example: 121d 10' 34\" W",
+    "The verbatim original longitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Example: 121d 10' 34\" W \
+    \nUse shortcut alt+1 for °, alt+2 for ' and alt+3 for ''",
   field_dwcVerbatimLocality: "Verbatim Locality",
-  field_dwcVerbatimLatitude_tooltip:
-    "Use shortcut alt+1 for °, alt+2 for ' and alt+3 for ''",
-  field_dwcVerbatimLongitude_tooltip:
-    "Use shortcut alt+1 for °, alt+2 for ' and alt+3 for ''",
   field_dwcVerbatimLocality_tooltip:
     "Use shortcut alt+1 for °, alt+2 for ' and alt+3 for ''",
   field_dwcVerbatimSRS: "Verbatim SRS",
