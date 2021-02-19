@@ -2,6 +2,7 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
+  addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
   addCollectingEventTitle: "Add Collecting Event",
   addCollectorGroupTitle: "Add Collector Group",
