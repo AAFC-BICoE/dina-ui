@@ -32,6 +32,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectorGroupListTitle: "Collector Group",
   collectorGroupNameLabel: "Collector Group Name",
   collectorGroupViewTitle: "View Collector Group",
+  deleted: "Deleted",
+  deletedMetadata_tooltip: "Deleted Metadata ID: {id}",
   configureDefaultValues: "Configure default values",
   defaultValuesConfig: "Default Values Config",
   defaultValuesConfigs: "Default Values Configs",
