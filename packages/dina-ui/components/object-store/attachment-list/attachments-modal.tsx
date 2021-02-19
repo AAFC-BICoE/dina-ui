@@ -1,14 +1,14 @@
 import { FieldHeader, useApiClient, useModal } from "common-ui";
 import { uniqBy } from "lodash";
 import { useState } from "react";
+import ReactTable from "react-table";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import { AttachmentSection } from "./AttachmentSection";
-import ReactTable from "react-table";
 
 export function useAttachmentsModal() {
   const { closeModal, openModal } = useModal();
-  const [attachedMetadatas, setAttachedMetadatas] = useState<Metadata[]>([]);
+  const [selectedMetadatas, setSelectedMetadatas] = useState<Metadata[]>([]);
   const { bulkGet } = useApiClient();
 
   async function addAttachedMetadatas(metadataIds: string[]) {
@@ -18,16 +18,16 @@ export function useAttachmentsModal() {
     );
 
     // Add the selected Metadatas to the array, making sure there are no duplicates:
-    setAttachedMetadatas(current =>
+    setSelectedMetadatas(current =>
       uniqBy([...current, ...metadatas], metadata => metadata.id)
     );
 
     closeModal();
   }
 
-  function removeMetadata(id: string) {
+  async function removeMetadata(id: string) {
     // Remove the selected Metadata from the array:
-    setAttachedMetadatas(current =>
+    setSelectedMetadatas(current =>
       current.filter(metadata => metadata.id !== id)
     );
   }
@@ -61,8 +61,8 @@ export function useAttachmentsModal() {
 
   const attachedMetadatasUI = (
     <div>
-      <h2>Attachments ({attachedMetadatas.length})</h2>
-      {attachedMetadatas.length ? (
+      <h2>Attachments ({selectedMetadatas.length})</h2>
+      {selectedMetadatas.length ? (
         <ReactTable
           columns={[
             ...[
@@ -82,8 +82,8 @@ export function useAttachmentsModal() {
               )
             }
           ]}
-          data={attachedMetadatas}
-          minRows={attachedMetadatas.length}
+          data={selectedMetadatas}
+          minRows={selectedMetadatas.length}
           showPagination={false}
         />
       ) : null}
@@ -97,5 +97,10 @@ export function useAttachmentsModal() {
     </div>
   );
 
-  return { attachedMetadatas, attachedMetadatasUI };
+  return {
+    addAttachedMetadatas,
+    attachedMetadatasUI,
+    removeMetadata,
+    selectedMetadatas
+  };
 }

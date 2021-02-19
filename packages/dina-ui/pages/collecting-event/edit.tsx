@@ -109,7 +109,7 @@ function CollectingEventForm({
   const { id } = router.query;
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
-  const { attachedMetadatas, attachedMetadatasUI } = useAttachmentsModal();
+  const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal();
   const [checked, setChecked] = useState(false);
 
   const initialValues = collectingEvent ?? {
@@ -122,6 +122,9 @@ function CollectingEventForm({
     submittedValues,
     api: { save }
   }) => {
+    // Init relationships object for one-to-many relations:
+    submittedValues.relationships = {};
+
     if (!submittedValues.startEventDateTime) {
       throw new Error(
         formatMessage("field_collectingEvent_startDateTimeError")
@@ -149,7 +152,6 @@ function CollectingEventForm({
     // handle converting to relationship manually due to crnk bug
     const submitCopy = { ...submittedValues };
     if (submitCopy.collectors && submitCopy.collectors.length > 0) {
-      submittedValues.relationships = {};
       submittedValues.relationships.collectors = {};
       submittedValues.relationships.collectors.data = [];
       submitCopy.collectors.map(collector =>
@@ -164,6 +166,14 @@ function CollectingEventForm({
     if (submittedValues.collectorGroups?.id)
       submittedValues.collectorGroupUuid = submittedValues.collectorGroups.id;
     delete submittedValues.collectorGroups;
+
+    // Add attachments if they were selected:
+    if (selectedMetadatas.length) {
+      submittedValues.relationships.attachment = {
+        data: selectedMetadatas.map(it => ({ id: it.id, type: it.type }))
+      };
+    }
+
     const [saved] = await save(
       [
         {
@@ -286,7 +296,7 @@ function CollectingEventForm({
           <TextField className="col-md-3" name="dwcVerbatimElevation" />
           <TextField className="col-md-3" name="dwcVerbatimDepth" />
         </div>
-        {!id && <div className="form-group">{attachedMetadatasView}</div>}
+        {!id && <div className="form-group">{attachedMetadatasUI}</div>}
       </div>
     </DinaForm>
   );
