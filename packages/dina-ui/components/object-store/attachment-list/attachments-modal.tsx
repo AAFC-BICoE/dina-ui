@@ -59,7 +59,7 @@ export function useAttachmentsModal() {
     );
   }
 
-  const attachedMetadatasView = (
+  const attachedMetadatasUI = (
     <div>
       <h2>Attachments ({attachedMetadatas.length})</h2>
       {attachedMetadatas.length ? (
