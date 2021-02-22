@@ -58,26 +58,38 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
-      <div style={{ maxWidth: "20rem" }}>
-        <TextField name="displayName" />
+      <div className="list-inline">
+        <div style={{ width: "20rem" }} className="list-inline-item">
+          <TextField name="displayName" />
+        </div>
       </div>
-      <div style={{ maxWidth: "20rem" }}>
-        <TextField name="givenNames" />
+      <div className="list-inline">
+        <div style={{ width: "20rem" }} className="list-inline-item">
+          <TextField name="givenNames" />
+        </div>
+        <div style={{ width: "20rem" }} className="list-inline-item">
+          <TextField name="familyNames" />
+        </div>
+        <div style={{ width: "20rem" }} className="list-inline-item">
+          <TextField name="title" />
+        </div>
+        <div style={{ width: "20rem" }} className="list-inline-item">
+          <TextField name="appellation" />
+        </div>
       </div>
-      <div style={{ maxWidth: "20rem" }}>
-        <TextField name="familyNames" />
-      </div>
-      <div style={{ maxWidth: "20rem" }}>
-        <TextField name="email" />
-      </div>
-      <div style={{ maxWidth: "20rem" }}>
-        <ResourceSelectField<Organization>
-          name="organizations"
-          filter={filterBy(["names[0].name"])}
-          model="agent-api/organization"
-          isMulti={true}
-          optionLabel={organization => organization.names?.[0].name}
-        />
+      <div className="list-inline">
+        <div style={{ width: "20rem" }} className="list-inline-item">
+          <TextField name="email" />
+        </div>
+        <div style={{ width: "20rem" }} className="list-inline-item">
+          <ResourceSelectField<Organization>
+            name="organizations"
+            filter={filterBy(["names[0].name"])}
+            model="agent-api/organization"
+            isMulti={true}
+            optionLabel={organization => organization.names?.[0].name}
+          />
+        </div>
       </div>
       <div className="form-group">
         <SubmitButton />
@@ -119,6 +131,7 @@ export function useAddPersonModal() {
 
       openModal(
         <div className="modal-content">
+          <style>{`.modal-dialog { max-width: 100rem; }`}</style>
           <div className="modal-header">
             <h2>
               <DinaMessage id="addPersonTitle" />

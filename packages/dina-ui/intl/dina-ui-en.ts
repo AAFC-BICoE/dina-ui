@@ -76,6 +76,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_acSubType: "Object SubType",
   field_acTags: "Tags",
   "field_dcCreator.displayName": "Digitized By",
+  field_appellation: "Appellation",
+  field_appellation_tooltip: "e.g. Mr., Mrs., Ms.",
   field_attributesTemplate: "Set Attributes Template",
   field_collectingEvent_endDateTimeError:
     "End event datetime format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
@@ -142,6 +144,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_publiclyReleasable: "Publicly releasable",
   field_publiclyReleasable_tooltip:
     "Indicates if the object could be released publicly on a web page or open data portals.",
+  field_title: "Title",
+  field_title_tooltip: "e.g. Dr., Prof.",
   field_type: "Type",
   field_xmpMetadataDate: "Last Updated On",
   field_xmpMetadataDate_tooltip:
