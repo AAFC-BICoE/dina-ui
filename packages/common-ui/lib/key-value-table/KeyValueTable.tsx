@@ -1,7 +1,7 @@
 import { DefaultTd, FieldHeader } from "common-ui";
 import { toPairs } from "lodash";
 import { ComponentType } from "react";
-import ReactTable, { CellInfo } from "react-table";
+import ReactTable, { CellInfo, TableCellRenderer } from "react-table";
 import { CommonMessage } from "../intl/common-ui-intl";
 
 export interface KeyValueTableProps {
@@ -10,10 +10,25 @@ export interface KeyValueTableProps {
 
   /** The value cell Component for a specific field can be overriden for displaying complex object types. */
   customValueCells?: Record<string, ComponentType<CellInfo>>;
+
+  attributeHeader?: JSX.Element;
+  valueHeader?: JSX.Element;
+
+  attributeCell?: TableCellRenderer;
 }
 
 /** Table that shows an object's keys in the left column and values in the right column. */
-export function KeyValueTable({ customValueCells, data }: KeyValueTableProps) {
+export function KeyValueTable({
+  customValueCells,
+  data,
+  attributeHeader = <CommonMessage id="attributeLabel" />,
+  attributeCell = ({ original: { field } }) => (
+    <strong>
+      <FieldHeader name={field} />
+    </strong>
+  ),
+  valueHeader = <CommonMessage id="valueLabel" />
+}: KeyValueTableProps) {
   const pairs = toPairs(data);
   const entries = pairs.map(([field, value]) => ({
     field,
@@ -26,12 +41,8 @@ export function KeyValueTable({ customValueCells, data }: KeyValueTableProps) {
       columns={[
         // Render the intl name of the field, or by default a title-case field:
         {
-          Cell: ({ original: { field } }) => (
-            <strong>
-              <FieldHeader name={field} />
-            </strong>
-          ),
-          Header: <CommonMessage id="attributeLabel" />,
+          Cell: attributeCell,
+          Header: attributeHeader,
           className: "key-cell",
           accessor: "field",
           width: 200
@@ -45,7 +56,7 @@ export function KeyValueTable({ customValueCells, data }: KeyValueTableProps) {
             }
             return props.value;
           },
-          Header: <CommonMessage id="valueLabel" />,
+          Header: valueHeader,
           accessor: "value",
           className: "value-cell"
         }

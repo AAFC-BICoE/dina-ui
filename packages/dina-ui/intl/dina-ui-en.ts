@@ -154,6 +154,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   forTestingPurposesOnlyMessage:
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
   governmentOfCanada: "Government of Canada",
+  group: "Group",
   groupMustBeSelected: "Group must be selected",
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
@@ -200,6 +201,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",
   revisionsButtonText: "Revisions",
   revisionsByUserPageTitle: "Revisions by user",
+  roles: "Roles",
+  rolesPerGroup: "Roles Per Group",
   searchButton: "Search",
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",
