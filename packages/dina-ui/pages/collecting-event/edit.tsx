@@ -170,7 +170,7 @@ function CollectingEventFormInternal() {
             }
           ]}
         />
-        <TextField className="col-md-3" name="dwcRecordNumber" />
+        <TextField className="col-md-3" name="dwcRecordNumbers" />
       </div>
       <div className="row">
         <KeyboardEventHandlerWrappedTextField
@@ -203,12 +203,18 @@ function CollectingEventForm({
 }: CollectingEventFormProps) {
   const { id } = router.query;
   const { formatMessage } = useDinaIntl();
-  const initialValues = collectingEvent ?? {
-    type: "collecting-event",
-    collectors: [],
-    collectorGroups: [],
-    startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM"
-  };
+
+  const initialValues = collectingEvent
+    ? {
+        ...collectingEvent,
+        dwcRecordNumbers: collectingEvent.dwcRecordNumbers?.join(", ") ?? ""
+      }
+    : {
+        type: "collecting-event",
+        collectors: [],
+        collectorGroups: [],
+        startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM"
+      };
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
     api: { save }
@@ -258,7 +264,12 @@ function CollectingEventForm({
     const [saved] = await save(
       [
         {
-          resource: submittedValues,
+          resource: {
+            ...submittedValues,
+            dwcRecordNumbers: submittedValues.dwcRecordNumbers
+              .split(",")
+              .map(num => num.trim())
+          },
           type: "collecting-event"
         }
       ],
