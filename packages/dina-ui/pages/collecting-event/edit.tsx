@@ -261,10 +261,13 @@ function CollectingEventForm({
     if (submittedValues.collectorGroups?.id)
       submittedValues.collectorGroupUuid = submittedValues.collectorGroups.id;
     delete submittedValues.collectorGroups;
-    if (submittedValues.dwcRecordNumbers)
-      submittedValues.dwcRecordNumbers = submittedValues.dwcRecordNumbers
-        ?.split(",")
+    const { dwcRecordNumbers } = submittedValues;
+    if (dwcRecordNumbers && dwcRecordNumbers.length > 0) {
+      submittedValues.dwcRecordNumbers = dwcRecordNumbers
+        .split(",")
         .map(num => num.trim());
+    } else submittedValues.dwcRecordNumbers = null;
+
     const [saved] = await save(
       [
         {
