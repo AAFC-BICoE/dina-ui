@@ -11,7 +11,8 @@ const TEST_DINAUSER: DinaUser = {
   roles: ["/dao/staff", "/cnd/collection-manager"],
   agentId: "e3a18289-4a9d-4ad6-ad06-3c7f1837406e",
   id: "1",
-  type: "user"
+  type: "user",
+  rolesPerGroup: { cnc: ["collection-manager"] }
 };
 
 const TEST_AGENT: Person = {
