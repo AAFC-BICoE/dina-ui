@@ -18,6 +18,7 @@ import { ErrorBoundaryPage } from "../components";
 import "../components/button-bar/nav/app-top.css";
 import "../components/button-bar/nav/nav.css";
 import "../components/button-bar/nav/wet-beow-bootstrap-4.css";
+import "common-ui/lib/table/react-table-style.css";
 import { FileUploadProviderImpl } from "../components/object-store/file-upload/FileUploadProvider";
 import { DinaIntlProvider } from "../intl/dina-ui-intl";
 
