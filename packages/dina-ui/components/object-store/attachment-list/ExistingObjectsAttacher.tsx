@@ -114,7 +114,7 @@ function MetadataListWrapper({ children, onAttachButtonClick }) {
         <div style={{ height: "1rem" }}>
           <div className="float-right">
             <FormikButton
-              className="btn btn-primary"
+              className="btn btn-primary existing-objects-attach-button"
               onClick={onAttachButtonClick}
               buttonProps={(
                 ctx: FormikContextType<ExistingObjectsAttacherForm>
