@@ -16,7 +16,7 @@ import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
 
 export interface ExistingAttachmentsTableProps {
   attachmentPath: string;
-  onDetachMetadataIds: (metadataIds: string[]) => Promise<void>;
+  onDetachMetadataIds?: (metadataIds: string[]) => Promise<void>;
   onMetadatasEdited: () => Promise<void>;
 }
 export interface AttachmentsTableFormValues {
@@ -117,7 +117,7 @@ export function ExistingAttachmentsTable({
       .filter(pair => pair[1])
       .map(pair => pair[0]);
 
-    await onDetachMetadataIds(metadataIds);
+    await onDetachMetadataIds?.(metadataIds);
   }
 
   return (
