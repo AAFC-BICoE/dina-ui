@@ -15,6 +15,7 @@ import { safeSubmit } from "./safeSubmit";
 export interface DinaFormProps<TValues>
   extends Omit<FormikConfig<TValues>, "onSubmit"> {
   onSubmit?: DinaFormOnSubmit<TValues>;
+  values?: TValues;
 }
 
 export type DinaFormOnSubmit<TValues = any> = (

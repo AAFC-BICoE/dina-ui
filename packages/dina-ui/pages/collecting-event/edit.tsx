@@ -28,6 +28,10 @@ import {
 } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
+import PanelGroup from "react-panelgroup";
+import { FieldArray } from "formik";
+import { useFormikContext } from "formik";
+import { GeoReferenceAssertionRow } from "./GeoReferenceAssertionRow";
 
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
@@ -104,6 +108,19 @@ function CollectingEventFormInternal() {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [checked, setChecked] = useState(false);
+  const { values } = useFormikContext<CollectingEvent>();
+
+  const blankAssertion = index => {
+    const key1 = index + "decimalLatitude";
+    const key2 = index + "decimalLongitude";
+    const key3 = index + "coordinateUncertaintyInMeters";
+    const assertion = {
+      [key1]: "",
+      [key2]: "",
+      [key3]: ""
+    };
+    return assertion;
+  };
 
   return (
     <div>
@@ -188,10 +205,49 @@ function CollectingEventFormInternal() {
         <TextField className="col-md-3" name="dwcVerbatimCoordinates" />
       </div>
       <div className="row">
-        <TextField className="col-md-3" name="dwcVerbatimCoordinateSystem" />
-        <TextField className="col-md-3" name="dwcVerbatimSRS" />
-        <TextField className="col-md-3" name="dwcVerbatimElevation" />
-        <TextField className="col-md-3" name="dwcVerbatimDepth" />
+        <div className="col-md-6">
+          <TextField className="col-md-3" name="dwcVerbatimCoordinateSystem" />
+          <TextField className="col-md-3" name="dwcVerbatimSRS" />
+          <TextField className="col-md-3" name="dwcVerbatimElevation" />
+          <TextField className="col-md-3" name="dwcVerbatimDepth" />
+        </div>
+
+        <div className="col-md-6">
+          <PanelGroup direction="row">
+            <div> Panel Header </div>
+            <div>
+              <ul className="list-group">
+                <FieldArray name="geoReferenceAssertions">
+                  {arrayHelpers =>
+                    values.geoReferenceAssertions?.length ? (
+                      values.geoReferenceAssertions.map((assertion, index) => (
+                        <li className="list-group-item" key={index}>
+                          <GeoReferenceAssertionRow
+                            index={index}
+                            assertion={assertion}
+                            onAddClick={() =>
+                              arrayHelpers.insert(index + 1, blankAssertion)
+                            }
+                            onRemoveClick={() => arrayHelpers.remove(index)}
+                          />
+                        </li>
+                      ))
+                    ) : (
+                      <button
+                        style={{ width: "10rem" }}
+                        className="btn btn-primary add-assertion-button"
+                        type="button"
+                        onClick={() => arrayHelpers.push(blankAssertion)}
+                      >
+                        <DinaMessage id="addAssertion" />
+                      </button>
+                    )
+                  }
+                </FieldArray>
+              </ul>
+            </div>
+          </PanelGroup>
+        </div>
       </div>
     </div>
   );
@@ -255,6 +311,23 @@ function CollectingEventForm({
     if (submittedValues.collectorGroups?.id)
       submittedValues.collectorGroupUuid = submittedValues.collectorGroups.id;
     delete submittedValues.collectorGroups;
+
+    if (
+      submitCopy.geoReferenceAssertions &&
+      submitCopy.geoReferenceAssertions.length > 0
+    ) {
+      if (!submittedValues.relationships) submittedValues.relationships = {};
+      submittedValues.relationships.geoReferenceAssertions = {};
+      submittedValues.relationships.geoReferenceAssertions.data = [];
+      submitCopy.geoReferenceAssertions.map(assertion =>
+        submittedValues.relationships.geoReferenceAssertions.data.push({
+          id: assertion.id,
+          type: "georeference-assertion"
+        })
+      );
+    }
+    delete submittedValues.geoReferenceAssertions;
+
     const [saved] = await save(
       [
         {
@@ -274,6 +347,7 @@ function CollectingEventForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
       enableReinitialize={true}
+      values={collectingEvent ?? null}
     >
       <ButtonBar>
         <SubmitButton />
