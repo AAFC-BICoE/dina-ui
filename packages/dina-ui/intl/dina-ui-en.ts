@@ -3,6 +3,7 @@
  */
 export const DINAUI_MESSAGES_ENGLISH = {
   addAssertion: " Add Assertion",
+  addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
   addCollectingEventTitle: "Add Collecting Event",
   addCollectorGroupTitle: "Add Collector Group",
@@ -50,7 +51,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editMetadataTitle: "Edit Metadata",
   editObjectSubtypeTitle: "Edit Object Subtype",
   editOrganizationTitle: "Edit Organization",
-  editOrganizationAliasesLabel: "Aliases (comma seperated)",
+  editOrganizationAliasesLabel: "Aliases (Comma-separated)",
   editPersonTitle: "Edit Person",
   editSelectedButtonText: "Edit Selected",
   enableDateRangeLabel: "Enable Date Range",
@@ -109,19 +110,19 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcVerbatimLatitude: "Verbatim Latitude",
   field_dwcVerbatimLatitude_tooltip:
     "The verbatim original latitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Example: 41 05 54.03S \
-    \nUse shortcut alt+1 for °, alt+2 for ' and alt+3 for '' ",
+    \nUse shortcut alt+1 for °, alt+2 for ′ and alt+3 for ″",
   field_dwcVerbatimLongitude: "Verbatim Longitude",
   field_dwcVerbatimLongitude_tooltip:
-    "The verbatim original longitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Example: 121d 10' 34\" W \
-    \nUse shortcut alt+1 for °, alt+2 for ' and alt+3 for ''",
+    "The verbatim original longitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Example: 121d 10′ 34″ W \
+    \nUse shortcut alt+1 for °, alt+2 for ′ and alt+3 for ″",
   field_dwcVerbatimLocality: "Verbatim Locality",
   field_dwcVerbatimLocality_tooltip:
-    "Use shortcut alt+1 for °, alt+2 for ' and alt+3 for ''",
+    "Use shortcut alt+1 for °, alt+2 for ′ and alt+3 for ″",
   field_dwcVerbatimSRS: "Verbatim SRS",
   field_dwcVerbatimSRS_tooltip:
     "The ellipsoid, geodetic datum, or spatial reference system (SRS) upon which coordinates given in verbatimLatitude and verbatimLongitude, or verbatimCoordinates are based. Recommended best practice is to use the EPSG code of the SRS, if known. Examples: EPSG:4326, WGS84, NAD27",
   field_dwcRecordedBy: "Verbatim Collectors",
-  field_dwcRecordNumber: "Collector's Number",
+  field_dwcRecordNumbers: "Collector's Numbers (Comma-separated)",
   field_editableBuiltInAttributes: "Visible Built In Attributes",
   field_editableManagedAttributes: "Visible Managed Attributes",
   field_email: "Email",

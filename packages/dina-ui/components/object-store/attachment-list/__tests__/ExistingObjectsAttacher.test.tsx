@@ -66,7 +66,7 @@ describe("ExistingObjectsAttacher component", () => {
       target: { checked: true }
     });
 
-    wrapper.find(".attach-form form").simulate("submit");
+    wrapper.find("button.existing-objects-attach-button").simulate("click");
 
     // Await form submit:
     await new Promise(setImmediate);

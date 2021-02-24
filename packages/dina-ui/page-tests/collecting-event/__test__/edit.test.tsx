@@ -116,6 +116,14 @@ describe("collecting-event edit page", () => {
       }
     });
 
+    // Edit the dwcRecordNumbers
+    wrapper.find(".dwcRecordNumbers-field input").simulate("change", {
+      target: {
+        name: "dwcRecordNumbers",
+        value: "12,23"
+      }
+    });
+
     // Submit the form.
     wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
@@ -129,7 +137,8 @@ describe("collecting-event edit page", () => {
           value: {
             attributes: {
               startEventDateTime: "2019-12-21T16:00",
-              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
+              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
+              dwcRecordNumbers: ["12", "23"]
             },
             id: "00000000-0000-0000-0000-000000000000",
             type: "collecting-event"
@@ -269,7 +278,8 @@ const TEST_COLLECTING_EVENT: CollectingEvent = {
   collectors: [
     { id: "a8fb14f7-cda9-4313-9cc7-f313db653cad", type: "agent" },
     { id: "eb61092e-fb28-41c8-99e6-d78743296520", type: "agent" }
-  ]
+  ],
+  dwcRecordNumbers: ["12", "13", "14"]
 };
 
 const TEST_AGENT: Person = {
