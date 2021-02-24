@@ -22,7 +22,7 @@ export function GeoReferenceAssertionRow({
       <TextField
         name={`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`}
       />
-      <div className="list-inline-item">
+      <div className="list-inline-item d-none">
         <button
           className="btn btn-primary add-assertion-button"
           type="button"
@@ -31,7 +31,7 @@ export function GeoReferenceAssertionRow({
           +
         </button>
       </div>
-      <div className="list-inline-item">
+      <div className="list-inline-item d-none">
         <button
           className="btn btn-primary"
           type="button"

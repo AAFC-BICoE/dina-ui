@@ -155,6 +155,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   forTestingPurposesOnlyMessage:
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
   geoReferencing: "Geo-Referencing",
+  geoReferenceAssertionError:
+    "DecimalLatituded, DecimalLongitude and CoordinateUncertaintyInMeters can only be numbers",
   governmentOfCanada: "Government of Canada",
   group: "Group",
   groupMustBeSelected: "Group must be selected",

@@ -21,6 +21,7 @@ import { NextRouter, useRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import { useContext, useState, Dispatch } from "react";
 import Switch from "react-switch";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
   GroupSelectField,
   Head,
@@ -222,72 +223,76 @@ function CollectingEventFormInternal({
         <TextField className="col-md-3" name="dwcVerbatimCoordinates" />
       </div>
       <div className="row">
-        <div className="col-md-5">
+        <div className="col-md-6">
           <div className="row">
             <TextField
-              className="col-md-3"
+              className="col-md-4"
               name="dwcVerbatimCoordinateSystem"
             />
-            <TextField className="col-md-3" name="dwcVerbatimSRS" />
+            <TextField className="col-md-4" name="dwcVerbatimSRS" />
           </div>
           <div className="row">
-            <TextField className="col-md-3" name="dwcVerbatimElevation" />
-            <TextField className="col-md-3" name="dwcVerbatimDepth" />
+            <TextField className="col-md-4" name="dwcVerbatimElevation" />
+            <TextField className="col-md-4" name="dwcVerbatimDepth" />
           </div>
         </div>
 
-        <div className="col-md-5">
-          <PanelGroup direction="row">
-            <div style={{ border: 1 }}>
-              <DinaMessage id="geoReferencing" />
-            </div>
-            <div>
-              <ul className="list-group">
-                <FieldArray name="geoReferenceAssertions">
-                  {arrayHelpers =>
-                    values.geoReferenceAssertions?.length ? (
-                      values.geoReferenceAssertions.map((assertion, index) => (
-                        <li className="list-group-item" key={index}>
-                          <GeoReferenceAssertionRow
-                            index={index}
-                            assertion={assertion}
-                            onAddClick={() =>
-                              arrayHelpers.insert(index + 1, blankAssertion)
-                            }
-                            onRemoveClick={() => arrayHelpers.remove(index)}
-                          />
-                        </li>
-                      ))
-                    ) : (
-                      <button
-                        style={{ width: "10rem" }}
-                        className="btn btn-primary add-assertion-button"
-                        type="button"
-                        onClick={() => arrayHelpers.push(blankAssertion)}
-                      >
-                        <DinaMessage id="addAssertion" />
-                      </button>
-                    )
-                  }
-                </FieldArray>
-                {/** Spacer div to make room */}
-                <div style={{ height: "15rem" }} />
-                <button
-                  style={{ width: "20rem" }}
-                  className="btn btn-primary add-assertion-button"
-                  type="button"
-                  onClick={() =>
-                    saveGeoReferenceAssertion(
-                      values.geoReferenceAssertions?.[0] as any
-                    )
-                  }
-                >
-                  <DinaMessage id="saveGeoReferenceAssertion" />
-                </button>
-                <CustomDeleteButton />
-              </ul>
-            </div>
-          </PanelGroup>
+        <div className="col-md-4">
+          <Tabs>
+            <TabList>
+              <Tab>
+                <DinaMessage id="geoReferencing" />
+              </Tab>
+            </TabList>
+            <TabPanel>
+              <div>
+                <ul>
+                  <FieldArray name="geoReferenceAssertions">
+                    {arrayHelpers =>
+                      values.geoReferenceAssertions?.length ? (
+                        values.geoReferenceAssertions.map(
+                          (assertion, index) => (
+                            <li className="list-group-item" key={index}>
+                              <GeoReferenceAssertionRow
+                                index={index}
+                                assertion={assertion}
+                                onAddClick={() =>
+                                  arrayHelpers.insert(index + 1, blankAssertion)
+                                }
+                                onRemoveClick={() => arrayHelpers.remove(index)}
+                              />
+                            </li>
+                          )
+                        )
+                      ) : (
+                        <button
+                          style={{ width: "10rem" }}
+                          className="btn btn-primary add-assertion-button"
+                          type="button"
+                          onClick={() => arrayHelpers.push(blankAssertion)}
+                        >
+                          <DinaMessage id="addAssertion" />
+                        </button>
+                      )
+                    }
+                  </FieldArray>
+                  <div style={{ height: "5rem" }} />
+                  <button
+                    style={{ width: "20rem" }}
+                    className="btn btn-primary add-assertion-button"
+                    type="button"
+                    onClick={() =>
+                      saveGeoReferenceAssertion(
+                        values.geoReferenceAssertions?.[0] as any
+                      )
+                    }
+                  >
+                    <DinaMessage id="saveGeoReferenceAssertion" />
+                  </button>
+                </ul>
+              </div>
+            </TabPanel>
+          </Tabs>
         </div>
       </div>
     </div>
@@ -312,7 +317,21 @@ function CollectingEventForm({
     initialValues.geoReferenceAssertions?.[0]?.id ?? (undefined as any)
   );
 
+  const isValueNumber = value => {
+    const matcher = /([^\d\\.]+)/g;
+    const nonDigitsAndDots = value?.toString().replace(matcher, "");
+    return !nonDigitsAndDots || nonDigitsAndDots.length <= 0;
+  };
+
   const saveGeoReferenceAssertion = async assertion => {
+    if (
+      !isValueNumber(assertion.dwcDecimalLatitude) ||
+      !isValueNumber(assertion.dwcDecimalLongitude) ||
+      !isValueNumber(assertion.dwcCoordinateUncertaintyInMeters)
+    ) {
+      throw new Error(formatMessage("geoReferenceAssertionError"));
+    }
+
     const [saved] = await save(
       [
         {
@@ -427,14 +446,14 @@ function CollectingEventForm({
   );
 }
 
-const DeleteAssertionButton = (id, setAssertionId: Dispatch<any>) => {
+const DeleteAssertionButton = ({ id, setAssertionId }) => {
   const { doOperations } = useContext(ApiClientContext);
   async function doDelete() {
     await doOperations(
       [
         {
           op: "DELETE",
-          path: `georeference-assertion/${id.id}`
+          path: `georeference-assertion/${id}`
         }
       ],
       { apiBaseUrl: "/collection-api" }
@@ -442,7 +461,7 @@ const DeleteAssertionButton = (id, setAssertionId: Dispatch<any>) => {
     setAssertionId(null);
   }
 
-  if (!id.id) {
+  if (!id) {
     return null;
   }
 
