@@ -14,7 +14,8 @@ import {
   ResourceSelectField,
   SubmitButton,
   useApiClient,
-  TextField
+  TextField,
+  FormikButton
 } from "common-ui";
 import { KitsuResponse } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
@@ -279,7 +280,7 @@ function CollectingEventFormInternal({
                     }
                   </FieldArray>
                   <div style={{ height: "5rem" }} />
-                  <button
+                  <FormikButton
                     style={{ width: "20rem" }}
                     className="btn btn-primary add-assertion-button"
                     type="button"
@@ -290,7 +291,7 @@ function CollectingEventFormInternal({
                     }
                   >
                     <DinaMessage id="saveGeoReferenceAssertion" />
-                  </button>
+                  </FormikButton>
                 </ul>
               </div>
             </TabPanel>
@@ -329,7 +330,7 @@ function CollectingEventForm({
   );
 
   const isValueNumber = value => {
-    const matcher = /([^\d\\.]+)/g;
+    const matcher = /([\d\\.]+)/g;
     const nonDigitsAndDots = value?.toString().replace(matcher, "");
     return !nonDigitsAndDots || nonDigitsAndDots.length <= 0;
   };
