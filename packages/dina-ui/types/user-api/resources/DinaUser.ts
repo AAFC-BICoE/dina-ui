@@ -9,6 +9,7 @@ export interface DinaUserAttributes {
   agentId: string;
   firstName?: string;
   lastName?: string;
+  rolesPerGroup: Record<string, string[] | undefined>;
 }
 
 export type DinaUser = KitsuResource & DinaUserAttributes;

@@ -2,6 +2,7 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
+  addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
   addCollectingEventTitle: "Add Collecting Event",
   addCollectorGroupTitle: "Add Collector Group",
@@ -32,6 +33,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectorGroupListTitle: "Collector Group",
   collectorGroupNameLabel: "Collector Group Name",
   collectorGroupViewTitle: "View Collector Group",
+  deleted: "Deleted",
+  deletedMetadata_tooltip: "Deleted Metadata ID: {id}",
   configureDefaultValues: "Configure default values",
   defaultValuesConfig: "Default Values Config",
   defaultValuesConfigs: "Default Values Configs",
@@ -47,7 +50,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editMetadataTitle: "Edit Metadata",
   editObjectSubtypeTitle: "Edit Object Subtype",
   editOrganizationTitle: "Edit Organization",
-  editOrganizationAliasesLabel: "Aliases (comma seperated)",
+  editOrganizationAliasesLabel: "Aliases (Comma-separated)",
   editPersonTitle: "Edit Person",
   editSelectedButtonText: "Edit Selected",
   enableDateRangeLabel: "Enable Date Range",
@@ -106,19 +109,19 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcVerbatimLatitude: "Verbatim Latitude",
   field_dwcVerbatimLatitude_tooltip:
     "The verbatim original latitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Example: 41 05 54.03S \
-    \nUse shortcut alt+1 for °, alt+2 for ' and alt+3 for '' ",
+    \nUse shortcut alt+1 for °, alt+2 for ′ and alt+3 for ″",
   field_dwcVerbatimLongitude: "Verbatim Longitude",
   field_dwcVerbatimLongitude_tooltip:
-    "The verbatim original longitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Example: 121d 10' 34\" W \
-    \nUse shortcut alt+1 for °, alt+2 for ' and alt+3 for ''",
+    "The verbatim original longitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Example: 121d 10′ 34″ W \
+    \nUse shortcut alt+1 for °, alt+2 for ′ and alt+3 for ″",
   field_dwcVerbatimLocality: "Verbatim Locality",
   field_dwcVerbatimLocality_tooltip:
-    "Use shortcut alt+1 for °, alt+2 for ' and alt+3 for ''",
+    "Use shortcut alt+1 for °, alt+2 for ′ and alt+3 for ″",
   field_dwcVerbatimSRS: "Verbatim SRS",
   field_dwcVerbatimSRS_tooltip:
     "The ellipsoid, geodetic datum, or spatial reference system (SRS) upon which coordinates given in verbatimLatitude and verbatimLongitude, or verbatimCoordinates are based. Recommended best practice is to use the EPSG code of the SRS, if known. Examples: EPSG:4326, WGS84, NAD27",
   field_dwcRecordedBy: "Verbatim Collectors",
-  field_dwcRecordNumber: "Collector's Number",
+  field_dwcRecordNumbers: "Collector's Numbers (Comma-separated)",
   field_editableBuiltInAttributes: "Visible Built In Attributes",
   field_editableManagedAttributes: "Visible Managed Attributes",
   field_email: "Email",
@@ -152,6 +155,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   forTestingPurposesOnlyMessage:
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
   governmentOfCanada: "Government of Canada",
+  group: "Group",
   groupMustBeSelected: "Group must be selected",
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
@@ -198,6 +202,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",
   revisionsButtonText: "Revisions",
   revisionsByUserPageTitle: "Revisions by user",
+  roles: "Roles",
+  rolesPerGroup: "Roles Per Group",
   searchButton: "Search",
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",

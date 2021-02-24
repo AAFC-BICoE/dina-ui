@@ -5,17 +5,18 @@ import {
   FieldHeader,
   FormikButton,
   QueryTable,
+  Tooltip,
   useGroupedCheckBoxes
 } from "common-ui";
 import { FormikContextType } from "formik";
 import { toPairs } from "lodash";
 import Link from "next/link";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
 
 export interface ExistingAttachmentsTableProps {
   attachmentPath: string;
-  onDetachMetadataIds: (metadataIds: string[]) => Promise<void>;
+  onDetachMetadataIds?: (metadataIds: string[]) => Promise<void>;
   onMetadatasEdited: () => Promise<void>;
 }
 export interface AttachmentsTableFormValues {
@@ -36,6 +37,7 @@ export function ExistingAttachmentsTable({
   } = useGroupedCheckBoxes({
     fieldName: "selectedMetadatas"
   });
+  const { formatMessage } = useDinaIntl();
 
   const { openMetadataEditorModal } = useBulkMetadataEditModal();
 
@@ -48,12 +50,23 @@ export function ExistingAttachmentsTable({
       sortable: false
     },
     {
-      Cell: ({ original: { id, metadata } }) =>
-        metadata?.originalFilename ? (
+      Cell: ({ original: { id, metadata } }) => {
+        // When this Metadata has been deleted, show a "deleted" message in this cell:
+        if (!metadata) {
+          return (
+            <div>
+              {`<${formatMessage("deleted")}>`}
+              <Tooltip id="deletedMetadata_tooltip" intlValues={{ id }} />
+            </div>
+          );
+        }
+
+        return metadata?.originalFilename ? (
           <Link href={`/object-store/object/view?id=${id}`}>
             {metadata?.originalFilename}
           </Link>
-        ) : null,
+        ) : null;
+      },
       accessor: "metadata.originalFilename",
       Header: <FieldHeader name="originalFilename" />
     },
@@ -104,7 +117,7 @@ export function ExistingAttachmentsTable({
       .filter(pair => pair[1])
       .map(pair => pair[0]);
 
-    await onDetachMetadataIds(metadataIds);
+    await onDetachMetadataIds?.(metadataIds);
   }
 
   return (

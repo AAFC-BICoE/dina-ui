@@ -53,6 +53,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   queryTableMultiSortExplanation:
     "To sort by multiple columns: Click one column header to sort by that column, then press shift while you click an additional header.",
   queryTableMultiSortTooltipTitle: "Multi-column sorting",
+  remove: "Remove",
   resetButtonText: "Reset",
   rows: "rows",
   select: "Select",
