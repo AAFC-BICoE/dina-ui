@@ -2,9 +2,9 @@ import {
   ColumnDefinition,
   dateCell,
   DinaForm,
-  DinaFormOnSubmit,
+  FormikButton,
   ListPageLayout,
-  SubmitButton,
+  OnFormikSubmit,
   useGroupedCheckBoxes
 } from "common-ui";
 import { FormikContextType } from "formik";
@@ -35,8 +35,8 @@ export function ExistingObjectsAttacher({
     fieldName: "selectedMetadatas"
   });
 
-  const onSubmit: DinaFormOnSubmit<ExistingObjectsAttacherForm> = async ({
-    submittedValues: { selectedMetadatas }
+  const submitMetadataIds: OnFormikSubmit<ExistingObjectsAttacherForm> = async ({
+    selectedMetadatas
   }) => {
     const metadataIds = toPairs(selectedMetadatas)
       .filter(pair => pair[1])
@@ -97,7 +97,7 @@ export function ExistingObjectsAttacher({
         onSuccess: res => setAvailableMetadatas(res.data)
       }}
       wrapTable={children => (
-        <MetadataListWrapper onSubmit={onSubmit}>
+        <MetadataListWrapper onAttachButtonClick={submitMetadataIds}>
           {children}
         </MetadataListWrapper>
       )}
@@ -105,16 +105,17 @@ export function ExistingObjectsAttacher({
   );
 }
 
-function MetadataListWrapper({ children, onSubmit }) {
+function MetadataListWrapper({ children, onAttachButtonClick }) {
   return (
     <div className="attach-form">
       <DinaForm<ExistingObjectsAttacherForm>
         initialValues={{ selectedMetadatas: {} }}
-        onSubmit={onSubmit}
       >
         <div style={{ height: "1rem" }}>
           <div className="float-right">
-            <SubmitButton
+            <FormikButton
+              className="btn btn-primary existing-objects-attach-button"
+              onClick={onAttachButtonClick}
               buttonProps={(
                 ctx: FormikContextType<ExistingObjectsAttacherForm>
               ) => ({
@@ -126,7 +127,7 @@ function MetadataListWrapper({ children, onSubmit }) {
               })}
             >
               <DinaMessage id="attachSelected" />
-            </SubmitButton>
+            </FormikButton>
           </div>
         </div>
         {children}
