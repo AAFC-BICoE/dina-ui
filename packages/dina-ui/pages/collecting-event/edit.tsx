@@ -281,9 +281,7 @@ function CollectingEventFormInternal({
                   </FieldArray>
                   <div style={{ height: "5rem" }} />
                   <FormikButton
-                    style={{ width: "20rem" }}
                     className="btn btn-primary add-assertion-button"
-                    type="button"
                     onClick={() =>
                       saveGeoReferenceAssertion(
                         values.geoReferenceAssertions?.[0] as any
@@ -468,95 +466,7 @@ function CollectingEventForm({
         id={assertionId}
         setAssertionId={setAssertionId}
       />
-      <div>
-        <div className="form-group">
-          <div style={{ width: "300px" }}>
-            <GroupSelectField name="group" />
-          </div>
-        </div>
-        <div className="row">
-          <FormattedTextField
-            name="startEventDateTime"
-            className="col-md-3 startEventDateTime"
-            label={formatMessage("startEventDateTimeLabel")}
-            placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
-          />
-          {checked && (
-            <FormattedTextField
-              className="col-md-3"
-              name="endEventDateTime"
-              label={formatMessage("endEventDateTimeLabel")}
-              placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
-            />
-          )}
-          <TextField
-            className="col-md-3"
-            name="verbatimEventDateTime"
-            label={formatMessage("verbatimEventDateTimeLabel")}
-          />
-        </div>
-        <div className="row">
-          <label style={{ marginLeft: 15, marginTop: -15 }}>
-            <span>{formatMessage("enableDateRangeLabel")}</span>
-            <Switch
-              onChange={e => setChecked(e)}
-              checked={checked}
-              className="react-switch dateRange"
-            />
-          </label>
-        </div>
-        <div className="row">
-          <AutoSuggestTextField<CollectingEvent>
-            className="col-md-3"
-            name="dwcRecordedBy"
-            query={(searchValue, ctx) => ({
-              path: "collection-api/collecting-event",
-              filter: {
-                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                rsql: `dwcRecordedBy==*${searchValue}*`
-              }
-            })}
-            suggestion={collEvent => collEvent.dwcRecordedBy ?? ""}
-          />
-          <ResourceSelectField<Person>
-            name="collectors"
-            filter={filterBy(["displayName"])}
-            model="agent-api/person"
-            className="col-md-3"
-            optionLabel={person => person.displayName}
-            isMulti={true}
-            asyncOptions={[
-              {
-                label: <DinaMessage id="addNewPerson" />,
-                getResource: openAddPersonModal
-              }
-            ]}
-          />
-          <TextField className="col-md-3" name="dwcRecordNumbers" />
-        </div>
-        <div className="row">
-          <KeyboardEventHandlerWrappedTextField
-            className="col-md-3"
-            name="dwcVerbatimLocality"
-          />
-          <KeyboardEventHandlerWrappedTextField
-            name="dwcVerbatimLatitude"
-            className="col-md-3"
-          />
-          <KeyboardEventHandlerWrappedTextField
-            className="col-md-3"
-            name="dwcVerbatimLongitude"
-          />
-          <TextField className="col-md-3" name="dwcVerbatimCoordinates" />
-        </div>
-        <div className="row">
-          <TextField className="col-md-3" name="dwcVerbatimCoordinateSystem" />
-          <TextField className="col-md-3" name="dwcVerbatimSRS" />
-          <TextField className="col-md-3" name="dwcVerbatimElevation" />
-          <TextField className="col-md-3" name="dwcVerbatimDepth" />
-        </div>
-        {!id && <div className="form-group">{attachedMetadatasUI}</div>}
-      </div>
+      {!id && <div className="form-group">{attachedMetadatasUI}</div>}
     </DinaForm>
   );
 }
