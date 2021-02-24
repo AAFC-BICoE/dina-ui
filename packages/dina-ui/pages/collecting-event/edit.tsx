@@ -112,12 +112,18 @@ function CollectingEventForm({
   const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal();
   const [checked, setChecked] = useState(false);
 
-  const initialValues = collectingEvent ?? {
-    type: "collecting-event",
-    collectors: [],
-    collectorGroups: [],
-    startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM"
-  };
+  const initialValues = collectingEvent
+    ? {
+        ...collectingEvent,
+        dwcRecordNumbers: collectingEvent.dwcRecordNumbers?.join(", ") ?? ""
+      }
+    : {
+        type: "collecting-event",
+        collectors: [],
+        collectorGroups: [],
+        startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM"
+      };
+
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
     api: { save }
@@ -166,6 +172,13 @@ function CollectingEventForm({
     if (submittedValues.collectorGroups?.id)
       submittedValues.collectorGroupUuid = submittedValues.collectorGroups.id;
     delete submittedValues.collectorGroups;
+
+    const { dwcRecordNumbers } = submittedValues;
+    if (dwcRecordNumbers && dwcRecordNumbers.length > 0) {
+      submittedValues.dwcRecordNumbers = dwcRecordNumbers
+        .split(",")
+        .map(num => num.trim());
+    } else submittedValues.dwcRecordNumbers = null;
 
     // Add attachments if they were selected:
     if (selectedMetadatas.length) {
@@ -273,7 +286,7 @@ function CollectingEventForm({
               }
             ]}
           />
-          <TextField className="col-md-3" name="dwcRecordNumber" />
+          <TextField className="col-md-3" name="dwcRecordNumbers" />
         </div>
         <div className="row">
           <KeyboardEventHandlerWrappedTextField
