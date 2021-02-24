@@ -1,4 +1,5 @@
 import { TextField } from "common-ui";
+import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { GeoReferenceAssertion } from "packages/dina-ui/types/collection-api/resources/GeoReferenceAssertion";
 
 export interface GeoReferenceAssertionRowProps {
@@ -13,14 +14,20 @@ export function GeoReferenceAssertionRow({
   onAddClick,
   onRemoveClick
 }: GeoReferenceAssertionRowProps) {
+  const { formatMessage } = useDinaIntl();
   return (
     <div className="list-inline">
-      <TextField name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`} />
+      <TextField
+        name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
+        label={formatMessage("decimalLatitudedLabel")}
+      />
       <TextField
         name={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
+        label={formatMessage("decimalLongitudeLabel")}
       />
       <TextField
         name={`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`}
+        label={formatMessage("coordinateUncertaintyInMetersLabel")}
       />
       <div className="list-inline-item d-none">
         <button
