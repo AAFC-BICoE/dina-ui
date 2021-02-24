@@ -49,7 +49,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const collectingEventQuery = useQuery<CollectingEvent>(
     {
       path: `collection-api/collecting-event/${id}`,
-      include: "attachment,collectors"
+      include: "attachment,collectors,geoReferenceAssertions"
     },
     {
       onSuccess: getAgents

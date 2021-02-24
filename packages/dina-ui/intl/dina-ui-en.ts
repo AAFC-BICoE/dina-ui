@@ -154,6 +154,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   footerPrivacy: "Privacy",
   forTestingPurposesOnlyMessage:
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
+  geoReferencing: "Geo-Referencing",
   governmentOfCanada: "Government of Canada",
   group: "Group",
   groupMustBeSelected: "Group must be selected",
@@ -204,6 +205,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   revisionsByUserPageTitle: "Revisions by user",
   roles: "Roles",
   rolesPerGroup: "Roles Per Group",
+  saveGeoReferenceAssertion: "Save GeoReference Assertion",
   searchButton: "Search",
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",

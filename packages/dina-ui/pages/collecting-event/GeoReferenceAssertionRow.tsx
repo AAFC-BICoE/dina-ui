@@ -1,7 +1,5 @@
-import { DinaForm, TextField } from "common-ui";
-import { useFormikContext } from "formik";
+import { TextField } from "common-ui";
 import { GeoReferenceAssertion } from "packages/dina-ui/types/collection-api/resources/GeoReferenceAssertion";
-import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
@@ -17,10 +15,12 @@ export function GeoReferenceAssertionRow({
 }: GeoReferenceAssertionRowProps) {
   return (
     <div className="list-inline">
-      <TextField name={`geoReferenceAssertions[${index}].decimalLatitude`} />
-      <TextField name={`geoReferenceAssertions[${index}].decimalLongitude`} />
+      <TextField name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`} />
       <TextField
-        name={`geoReferenceAssertions[${index}].coordinateUncertaintyInMeters`}
+        name={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
+      />
+      <TextField
+        name={`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`}
       />
       <div className="list-inline-item">
         <button

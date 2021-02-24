@@ -13,12 +13,13 @@ import {
   ResourceSelectField,
   SubmitButton,
   TextField,
-  KeyboardEventHandlerWrappedTextField
+  KeyboardEventHandlerWrappedTextField,
+  useApiClient
 } from "common-ui";
 import { KitsuResponse } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import Switch from "react-switch";
 import {
   GroupSelectField,
@@ -74,7 +75,7 @@ export default function CollectingEventEditPage() {
             </h1>
             <Query<CollectingEvent>
               query={{
-                path: `collection-api/collecting-event/${id}?include=collectors`
+                path: `collection-api/collecting-event/${id}?include=collectors,geoReferenceAssertions`
               }}
               onSuccess={getAgents}
             >
@@ -104,16 +105,24 @@ export default function CollectingEventEditPage() {
   );
 }
 
-function CollectingEventFormInternal() {
+interface CollectingEventFormInternalProps {
+  saveGeoReferenceAssertion: ({}) => void;
+}
+
+function CollectingEventFormInternal({
+  saveGeoReferenceAssertion
+}: CollectingEventFormInternalProps) {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [checked, setChecked] = useState(false);
   const { values } = useFormikContext<CollectingEvent>();
+  const { save } = useApiClient();
+  const geoReferenceAssertionId = useRef<string>();
 
   const blankAssertion = index => {
-    const key1 = index + "decimalLatitude";
-    const key2 = index + "decimalLongitude";
-    const key3 = index + "coordinateUncertaintyInMeters";
+    const key1 = index + "dwcDecimalLatitude";
+    const key2 = index + "dwcDecimalLongitude";
+    const key3 = index + "dwcCoordinateUncertaintyInMeters";
     const assertion = {
       [key1]: "",
       [key2]: "",
@@ -205,16 +214,26 @@ function CollectingEventFormInternal() {
         <TextField className="col-md-3" name="dwcVerbatimCoordinates" />
       </div>
       <div className="row">
-        <div className="col-md-6">
-          <TextField className="col-md-3" name="dwcVerbatimCoordinateSystem" />
-          <TextField className="col-md-3" name="dwcVerbatimSRS" />
-          <TextField className="col-md-3" name="dwcVerbatimElevation" />
-          <TextField className="col-md-3" name="dwcVerbatimDepth" />
+        <div className="col-md-5">
+          <div className="row">
+            <TextField
+              className="col-md-3"
+              name="dwcVerbatimCoordinateSystem"
+            />
+            <TextField className="col-md-3" name="dwcVerbatimSRS" />
+          </div>
+          <div className="row">
+            <TextField className="col-md-3" name="dwcVerbatimElevation" />
+            <TextField className="col-md-3" name="dwcVerbatimDepth" />
+          </div>
         </div>
 
-        <div className="col-md-6">
+        <div className="col-md-5">
           <PanelGroup direction="row">
-            <div> Panel Header </div>
+            <div>
+              {" "}
+              <DinaMessage id="geoReferencing" />{" "}
+            </div>
             <div>
               <ul className="list-group">
                 <FieldArray name="geoReferenceAssertions">
@@ -244,6 +263,20 @@ function CollectingEventFormInternal() {
                     )
                   }
                 </FieldArray>
+                {/** Spacer div to make room */}
+                <div style={{ height: "15rem" }} />
+                <button
+                  style={{ width: "20rem" }}
+                  className="btn btn-primary add-assertion-button"
+                  type="button"
+                  onClick={() =>
+                    saveGeoReferenceAssertion(
+                      values.geoReferenceAssertions?.[0] as any
+                    )
+                  }
+                >
+                  <DinaMessage id="saveGeoReferenceAssertion" />
+                </button>
               </ul>
             </div>
           </PanelGroup>
@@ -265,10 +298,25 @@ function CollectingEventForm({
     collectorGroups: [],
     startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM"
   };
-  const onSubmit: DinaFormOnSubmit = async ({
-    submittedValues,
-    api: { save }
-  }) => {
+  const { save } = useApiClient();
+  const geoReferenceAssertionId = useRef<string>();
+
+  const saveGeoReferenceAssertion = async assertion => {
+    const [saved] = await save(
+      [
+        {
+          resource: { ...assertion, type: "georeference-assertion" },
+          type: "georeference-assertion"
+        }
+      ],
+      {
+        apiBaseUrl: "/collection-api"
+      }
+    );
+    geoReferenceAssertionId.current = saved.id;
+  };
+
+  const onSubmit: DinaFormOnSubmit = async ({ submittedValues }) => {
     if (!submittedValues.startEventDateTime) {
       throw new Error(
         formatMessage("field_collectingEvent_startDateTimeError")
@@ -312,19 +360,14 @@ function CollectingEventForm({
       submittedValues.collectorGroupUuid = submittedValues.collectorGroups.id;
     delete submittedValues.collectorGroups;
 
-    if (
-      submitCopy.geoReferenceAssertions &&
-      submitCopy.geoReferenceAssertions.length > 0
-    ) {
+    if (geoReferenceAssertionId.current) {
       if (!submittedValues.relationships) submittedValues.relationships = {};
       submittedValues.relationships.geoReferenceAssertions = {};
       submittedValues.relationships.geoReferenceAssertions.data = [];
-      submitCopy.geoReferenceAssertions.map(assertion =>
-        submittedValues.relationships.geoReferenceAssertions.data.push({
-          id: assertion.id,
-          type: "georeference-assertion"
-        })
-      );
+      submittedValues.relationships.geoReferenceAssertions.data.push({
+        id: geoReferenceAssertionId.current,
+        type: "georeference-assertion"
+      });
     }
     delete submittedValues.geoReferenceAssertions;
 
@@ -364,7 +407,9 @@ function CollectingEventForm({
           type="collecting-event"
         />
       </ButtonBar>
-      <CollectingEventFormInternal />
+      <CollectingEventFormInternal
+        saveGeoReferenceAssertion={saveGeoReferenceAssertion}
+      />
     </DinaForm>
   );
 }
