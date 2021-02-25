@@ -32,7 +32,6 @@ import {
 import { useAttachmentsModal } from "../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
-import PanelGroup from "react-panelgroup";
 import { FieldArray } from "formik";
 import { useFormikContext } from "formik";
 import { GeoReferenceAssertionRow } from "./GeoReferenceAssertionRow";
