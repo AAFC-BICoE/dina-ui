@@ -291,8 +291,6 @@ function CollectingEventFormInternal({
                   >
                     <DinaMessage id="saveGeoReferenceAssertion" />
                   </FormikButton>
-
-                  <CustomDeleteButton />
                 </ul>
               </div>
             </TabPanel>
