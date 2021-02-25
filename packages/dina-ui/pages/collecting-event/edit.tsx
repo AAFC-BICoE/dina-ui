@@ -34,7 +34,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
 import { FieldArray } from "formik";
 import { useFormikContext } from "formik";
-import { GeoReferenceAssertionRow } from "./GeoReferenceAssertionRow";
+import { GeoReferenceAssertionRow } from "../../components/collection/GeoReferenceAssertionRow";
 import { CommonMessage } from "../../../common-ui/lib/intl/common-ui-intl";
 import { GeoReferenceAssertion } from "packages/dina-ui/types/collection-api/resources/GeoReferenceAssertion";
 import { connect } from "formik";

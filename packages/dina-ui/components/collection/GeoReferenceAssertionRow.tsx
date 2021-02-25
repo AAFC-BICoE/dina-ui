@@ -1,6 +1,6 @@
-import { TextField } from "../../../common-ui";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { GeoReferenceAssertion } from "../../../dina-ui/types/collection-api/resources/GeoReferenceAssertion";
+import { TextField } from "common-ui";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { GeoReferenceAssertion } from "../../types/collection-api/resources/GeoReferenceAssertion";
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
