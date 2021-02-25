@@ -9,8 +9,7 @@ import {
   ResourceSelectField,
   SelectField,
   SubmitButton,
-  TextField,
-  useAccount
+  TextField
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
@@ -68,10 +67,8 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
 }
 
 function ProtocolForm({ protocol, router }: ProtocolFormProps) {
-  const { groupNames } = useAccount();
-
   const { id } = router.query;
-  const initialValues = protocol || { group: groupNames?.[0] };
+  const initialValues = protocol || {};
 
   const onSubmit: DinaFormOnSubmit = async ({
     api: { save },
@@ -104,7 +101,11 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
       </ButtonBar>
       <div>
         <div className="row">
-          <GroupSelectField className="col-md-2" name="group" />
+          <GroupSelectField
+            className="col-md-2"
+            name="group"
+            enableStoredDefaultGroup={true}
+          />
         </div>
         <div className="row">
           <SelectField
