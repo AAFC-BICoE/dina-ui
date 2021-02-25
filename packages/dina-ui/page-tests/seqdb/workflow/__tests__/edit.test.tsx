@@ -1,4 +1,6 @@
+import { writeStorage } from "@rehooks/local-storage";
 import { OperationsResponse, ResourceSelect } from "common-ui";
+import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { ChainEditPage } from "../../../../pages/seqdb/workflow/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Chain, ChainTemplate } from "../../../../types/seqdb-api";
@@ -36,6 +38,8 @@ const TEST_WORKFLOW: Chain = {
 
 describe("Workflow edit page.", () => {
   beforeEach(() => {
+    // Set the deault group selection:
+    writeStorage(DEFAULT_GROUP_STORAGE_KEY, "aafc");
     jest.clearAllMocks();
   });
 

@@ -8,6 +8,7 @@ import Select from "react-select";
 describe("GroupSelectField component", () => {
   // Clear the local storage:
   beforeEach(() => deleteFromStorage(DEFAULT_GROUP_STORAGE_KEY));
+  afterEach(() => deleteFromStorage(DEFAULT_GROUP_STORAGE_KEY));
 
   it("Renders the default group list without accessing the user API.", async () => {
     const wrapper = mountWithAppContext(
