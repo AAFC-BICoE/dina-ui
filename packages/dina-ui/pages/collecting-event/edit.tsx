@@ -129,9 +129,15 @@ function CollectingEventFormInternal({
   const [checked, setChecked] = useState(false);
   const { values } = useFormikContext<CollectingEvent>();
 
-  const CustomDeleteButton = connect<{}, GeoReferenceAssertion>(({}) => (
-    <DeleteAssertionButton id={id} setAssertionId={setAssertionId} />
-  ));
+  const CustomDeleteButton = connect<{}, GeoReferenceAssertion>(
+    ({ formik: { resetForm } }) => (
+      <DeleteAssertionButton
+        id={id}
+        resetForm={resetForm}
+        setAssertionId={setAssertionId}
+      />
+    )
+  );
 
   const blankAssertion = index => {
     const key1 = index + "dwcDecimalLatitude";
@@ -291,6 +297,7 @@ function CollectingEventFormInternal({
                   >
                     <DinaMessage id="saveGeoReferenceAssertion" />
                   </FormikButton>
+                  <CustomDeleteButton />
                 </ul>
               </div>
             </TabPanel>
@@ -469,7 +476,7 @@ function CollectingEventForm({
   );
 }
 
-const DeleteAssertionButton = ({ id, setAssertionId }) => {
+const DeleteAssertionButton = ({ id, resetForm, setAssertionId }) => {
   const { doOperations } = useContext(ApiClientContext);
   async function doDelete() {
     await doOperations(
@@ -482,6 +489,7 @@ const DeleteAssertionButton = ({ id, setAssertionId }) => {
       { apiBaseUrl: "/collection-api" }
     );
     setAssertionId(null);
+    resetForm();
   }
 
   if (!id) {
@@ -493,6 +501,7 @@ const DeleteAssertionButton = ({ id, setAssertionId }) => {
       className={`btn btn-danger delete-button`}
       onClick={doDelete}
       type="button"
+      style={{ marginLeft: 10 }}
     >
       <CommonMessage id="deleteButtonText" />
     </button>
