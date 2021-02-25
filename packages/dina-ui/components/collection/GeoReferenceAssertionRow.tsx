@@ -1,18 +1,20 @@
-import { TextField } from "common-ui";
+import { TextField, FieldView } from "common-ui";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { GeoReferenceAssertion } from "../../types/collection-api/resources/GeoReferenceAssertion";
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
-  assertion: GeoReferenceAssertion;
-  onAddClick: () => void;
-  onRemoveClick: () => void;
+  assertion?: GeoReferenceAssertion;
+  onAddClick?: () => void;
+  onRemoveClick?: () => void;
+  viewOnly?: boolean;
 }
 
 export function GeoReferenceAssertionRow({
   index,
   onAddClick,
-  onRemoveClick
+  onRemoveClick,
+  viewOnly
 }: GeoReferenceAssertionRowProps) {
   const { formatMessage } = useDinaIntl();
   return (
@@ -20,14 +22,17 @@ export function GeoReferenceAssertionRow({
       <TextField
         name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
         label={formatMessage("decimalLatitudedLabel")}
+        readOnly={viewOnly}
       />
       <TextField
         name={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
         label={formatMessage("decimalLongitudeLabel")}
+        readOnly={viewOnly}
       />
       <TextField
         name={`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`}
         label={formatMessage("coordinateUncertaintyInMetersLabel")}
+        readOnly={viewOnly}
       />
       <div className="list-inline-item d-none">
         <button

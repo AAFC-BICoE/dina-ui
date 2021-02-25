@@ -340,6 +340,7 @@ function CollectingEventForm({
   };
 
   const saveGeoReferenceAssertion = async assertion => {
+    if (!assertion) return;
     if (
       !isValueNumber(assertion.dwcDecimalLatitude) ||
       !isValueNumber(assertion.dwcDecimalLongitude) ||
@@ -347,7 +348,6 @@ function CollectingEventForm({
     ) {
       throw new Error(formatMessage("geoReferenceAssertionError"));
     }
-
     const [saved] = await save(
       [
         {
@@ -361,6 +361,7 @@ function CollectingEventForm({
     );
     setAssertionId(saved.id);
   };
+
   const onSubmit: DinaFormOnSubmit = async ({ submittedValues }) => {
     // Init relationships object for one-to-many relations:
     submittedValues.relationships = {};
