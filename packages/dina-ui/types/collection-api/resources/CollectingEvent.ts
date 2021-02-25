@@ -1,6 +1,7 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 import { CollectorGroup } from "./CollectorGroup";
+import { GeoReferenceAssertion } from "./GeoReferenceAssertion";
 
 export interface CollectingEventAttributes {
   uuid: string;
@@ -29,6 +30,7 @@ export interface CollectingEventAttributes {
 
 export interface CollectingEventRelationships {
   collectors?: KitsuResource[];
+  geoReferenceAssertions?: GeoReferenceAssertion[];
 }
 
 export type CollectingEvent = KitsuResource &

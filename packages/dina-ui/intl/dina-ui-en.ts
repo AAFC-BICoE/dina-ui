@@ -2,6 +2,7 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
+  addAssertion: " Add Assertion",
   addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
   addCollectingEventTitle: "Add Collecting Event",
@@ -33,6 +34,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectorGroupListTitle: "Collector Group",
   collectorGroupNameLabel: "Collector Group Name",
   collectorGroupViewTitle: "View Collector Group",
+  coordinateUncertaintyInMetersLabel: "Coordinate Uncertainty In Meters",
+  decimalLatitudedLabel: "Decimal Latitude",
+  decimalLongitudeLabel: "Decimal Longitude",
   deleted: "Deleted",
   deletedMetadata_tooltip: "Deleted Metadata ID: {id}",
   configureDefaultValues: "Configure default values",
@@ -154,6 +158,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   footerPrivacy: "Privacy",
   forTestingPurposesOnlyMessage:
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
+  geoReferencing: "Geo-Referencing",
+  geoReferenceAssertionError:
+    "DecimalLatituded, DecimalLongitude and CoordinateUncertaintyInMeters can only be numbers",
   governmentOfCanada: "Government of Canada",
   group: "Group",
   groupMustBeSelected: "Group must be selected",
@@ -204,6 +211,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   revisionsByUserPageTitle: "Revisions by user",
   roles: "Roles",
   rolesPerGroup: "Roles Per Group",
+  saveGeoReferenceAssertion: "Save GeoReference Assertion",
   searchButton: "Search",
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",

@@ -30,7 +30,10 @@ let mockQuery: any = {};
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
   // The get request will return the existing collecting-event.
-  if (model === "collection-api/collecting-event/1?include=collectors") {
+  if (
+    model ===
+    "collection-api/collecting-event/1?include=collectors,geoReferenceAssertions"
+  ) {
     return { data: TEST_COLLECTING_EVENT };
   } else if (model === "agent-api/person") {
     return { data: [TEST_AGENT] };
@@ -279,7 +282,13 @@ const TEST_COLLECTING_EVENT: CollectingEvent = {
     { id: "a8fb14f7-cda9-4313-9cc7-f313db653cad", type: "agent" },
     { id: "eb61092e-fb28-41c8-99e6-d78743296520", type: "agent" }
   ],
-  dwcRecordNumbers: ["12", "13", "14"]
+  dwcRecordNumbers: ["12", "13", "14"],
+  geoReferenceAssertions: [
+    {
+      uuid: "a8fb14f7-cda9-4313-9cc7-f313db653cad",
+      type: "georeference-assertion"
+    }
+  ]
 };
 
 const TEST_AGENT: Person = {
