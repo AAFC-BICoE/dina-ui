@@ -86,6 +86,7 @@ describe("person edit page", () => {
           path: "person",
           value: {
             attributes: {
+              aliases: [],
               displayName: "test person updated"
             },
             id: "00000000-0000-0000-0000-000000000000",
