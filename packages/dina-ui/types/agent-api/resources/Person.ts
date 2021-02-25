@@ -6,6 +6,7 @@ export interface PersonAttributes {
   displayName: string;
   givenNames?: string;
   familyNames?: string;
+  aliases?: string[];
   email: string;
   uuid: string;
   createdBy?: string;
