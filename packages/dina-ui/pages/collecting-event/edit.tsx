@@ -65,8 +65,10 @@ export default function CollectingEventEditPage() {
     };
     const agents = fetchAgents();
     agents.then(async () => {
-      response.data.collectors = await agents;
-      setCollectingEvent(response.data as CollectingEvent);
+      if (response && response.data) {
+        response.data.collectors = await agents;
+        setCollectingEvent(response.data as CollectingEvent);
+      }
     });
   };
   return (
@@ -207,7 +209,7 @@ function CollectingEventFormInternal({
             }
           ]}
         />
-        <TextField className="col-md-3" name="dwcRecordNumber" />
+        <TextField className="col-md-3" name="dwcRecordNumbers" />
       </div>
       <div className="row">
         <KeyboardEventHandlerWrappedTextField
@@ -289,6 +291,8 @@ function CollectingEventFormInternal({
                   >
                     <DinaMessage id="saveGeoReferenceAssertion" />
                   </FormikButton>
+
+                  <CustomDeleteButton />
                 </ul>
               </div>
             </TabPanel>
@@ -305,9 +309,7 @@ function CollectingEventForm({
 }: CollectingEventFormProps) {
   const { id } = router.query;
   const { formatMessage } = useDinaIntl();
-  const { openAddPersonModal } = useAddPersonModal();
   const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal();
-  const [checked, setChecked] = useState(false);
   const initialValues = collectingEvent
     ? {
         ...collectingEvent,
@@ -317,8 +319,7 @@ function CollectingEventForm({
         type: "collecting-event",
         collectors: [],
         collectorGroups: [],
-        startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
-        geoReferenceAssertions: []
+        startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM"
       };
 
   const { save } = useApiClient();
@@ -443,7 +444,6 @@ function CollectingEventForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
       enableReinitialize={true}
-      values={collectingEvent ?? null}
     >
       <ButtonBar>
         <SubmitButton />
