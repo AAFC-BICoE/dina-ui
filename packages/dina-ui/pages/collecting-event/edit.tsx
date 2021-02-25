@@ -319,7 +319,8 @@ function CollectingEventForm({
         type: "collecting-event",
         collectors: [],
         collectorGroups: [],
-        startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM"
+        startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
+        geoReferenceAssertions: []
       };
 
   const { save } = useApiClient();
