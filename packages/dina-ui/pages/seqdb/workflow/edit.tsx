@@ -64,9 +64,7 @@ export function ChainEditPage({ router }: WithRouterProps) {
 }
 
 function ChainForm({ chain, router }: ChainFormProps) {
-  const { groupNames } = useAccount();
-
-  const initialValues = chain || { group: groupNames?.[0] };
+  const initialValues = chain || {};
 
   const onSubmit: DinaFormOnSubmit = async ({
     api: { save },
@@ -91,7 +89,11 @@ function ChainForm({ chain, router }: ChainFormProps) {
       <div className="container-fluid">
         <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
           <div className="row">
-            <GroupSelectField className="col-md-3" name="group" />
+            <GroupSelectField
+              className="col-md-3"
+              name="group"
+              enableStoredDefaultGroup={true}
+            />
           </div>
           <div className="row">
             <ResourceSelectField<ChainTemplate>

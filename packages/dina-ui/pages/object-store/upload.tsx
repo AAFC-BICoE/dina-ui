@@ -12,7 +12,7 @@ import { useDefaultValueRuleEditorModal } from "../../components/object-store/me
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface OnSubmitValues {
-  group: string;
+  group?: string;
   defaultValuesConfig: number | null;
 }
 
@@ -64,13 +64,14 @@ export default function UploadPage() {
           </div>
         ) : (
           <DinaForm<OnSubmitValues>
-            initialValues={{
-              group: groupNames[0],
-              defaultValuesConfig: null
-            }}
+            initialValues={{ defaultValuesConfig: null }}
           >
             <div className="row">
-              <GroupSelectField className="col-md-3" name="group" />
+              <GroupSelectField
+                className="col-md-3"
+                name="group"
+                enableStoredDefaultGroup={true}
+              />
               <DefaultValuesConfigSelectField
                 allowBlank={true}
                 name="defaultValuesConfig"

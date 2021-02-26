@@ -2,6 +2,8 @@ import { OperationsResponse } from "common-ui";
 import { ProtocolEditPage } from "../../../../pages/seqdb/protocol/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Protocol } from "../../../../types/seqdb-api/resources/Protocol";
+import { writeStorage } from "@rehooks/local-storage";
+import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -29,6 +31,9 @@ const apiContext: any = {
 
 describe("Protocol edit page", () => {
   beforeEach(() => {
+    // Set the deault group selection:
+    writeStorage(DEFAULT_GROUP_STORAGE_KEY, "aafc");
+
     jest.clearAllMocks();
   });
 

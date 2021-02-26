@@ -155,7 +155,7 @@ function CollectingEventFormInternal({
     <div>
       <div className="form-group">
         <div style={{ width: "300px" }}>
-          <GroupSelectField name="group" />
+          <GroupSelectField name="group" enableStoredDefaultGroup={true} />
         </div>
       </div>
       <div className="row">

@@ -6,9 +6,10 @@ import {
   useQuery
 } from "common-ui";
 import { useFormikContext } from "formik";
-import { uniq } from "lodash";
+import { get, uniq } from "lodash";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
+import { useStoredDefaultGroup } from "./useStoredDefaultGroup";
 
 interface GroupSelectFieldProps extends Omit<SelectFieldProps, "options"> {
   showAnyOption?: boolean;
@@ -18,12 +19,19 @@ interface GroupSelectFieldProps extends Omit<SelectFieldProps, "options"> {
    * The default (false) is to only show the groups the user belongs to.
    */
   showAllGroups?: boolean;
+
+  /**
+   * Sets a default group from local storage if no initial value is set (e.g. from existing value in a group field).
+   * This should be used in forms to add new data, not in search forms like list pages.
+   */
+  enableStoredDefaultGroup?: boolean;
 }
 
 export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
   const {
     showAnyOption,
     showAllGroups,
+    enableStoredDefaultGroup = false,
     ...selectFieldProps
   } = groupSelectFieldProps;
 
@@ -31,7 +39,12 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
   const { groupNames: myGroupNames } = useAccount();
   const { initialValues } = useFormikContext<any>();
 
-  const initialGroupName = initialValues[selectFieldProps.name];
+  const { setStoredDefaultGroupIfEnabled } = useStoredDefaultGroup({
+    enable: enableStoredDefaultGroup,
+    groupFieldName: selectFieldProps.name
+  });
+
+  const initialGroupName = get(initialValues, selectFieldProps.name);
 
   const selectableGroupNames = uniq([
     // If the value is already set, include it in the dropdown regardless of user permissions.
@@ -74,6 +87,10 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
       // Re-initialize the component if the labels change:
       key={groupSelectOptions.map(option => option.label).join()}
       {...selectFieldProps}
+      onChange={(newValue: string | null | undefined) => {
+        setStoredDefaultGroupIfEnabled(newValue);
+        selectFieldProps.onChange?.(newValue);
+      }}
       options={groupSelectOptions}
     />
   );

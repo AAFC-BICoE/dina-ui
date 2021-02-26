@@ -46,7 +46,11 @@ export function AttachmentUploader({
   return (
     <DinaForm<AttachmentUploadForm> initialValues={{}}>
       <div className="row">
-        <GroupSelectField className="col-md-3" name="group" />
+        <GroupSelectField
+          className="col-md-3"
+          name="group"
+          enableStoredDefaultGroup={true}
+        />
       </div>
       <div>
         <FileUploader
