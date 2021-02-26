@@ -129,9 +129,16 @@ function CollectingEventFormInternal({
   const [checked, setChecked] = useState(false);
   const { values } = useFormikContext<CollectingEvent>();
 
-  const CustomDeleteButton = connect<{}, GeoReferenceAssertion>(({}) => (
-    <DeleteAssertionButton id={id} setAssertionId={setAssertionId} />
-  ));
+  const CustomDeleteButton = connect<{}, GeoReferenceAssertion>(
+    ({ formik: { setFieldValue, setFieldTouched } }) => (
+      <DeleteAssertionButton
+        id={id}
+        setAssertionId={setAssertionId}
+        setFieldValue={setFieldValue}
+        setFieldTouched={setFieldTouched}
+      />
+    )
+  );
 
   const blankAssertion = index => {
     const key1 = index + "dwcDecimalLatitude";
@@ -254,7 +261,7 @@ function CollectingEventFormInternal({
                   <FieldArray name="geoReferenceAssertions">
                     {arrayHelpers =>
                       values.geoReferenceAssertions?.length ? (
-                        values.geoReferenceAssertions.map(
+                        values.geoReferenceAssertions?.map(
                           (assertion, index) => (
                             <li className="list-group-item" key={index}>
                               <GeoReferenceAssertionRow
@@ -291,6 +298,7 @@ function CollectingEventFormInternal({
                   >
                     <DinaMessage id="saveGeoReferenceAssertion" />
                   </FormikButton>
+                  {id && <CustomDeleteButton />}
                 </ul>
               </div>
             </TabPanel>
@@ -326,21 +334,8 @@ function CollectingEventForm({
     initialValues.geoReferenceAssertions?.[0]?.id ?? (undefined as any)
   );
 
-  const isValueNumber = value => {
-    const matcher = /([\d\\.]+)/g;
-    const nonDigitsAndDots = value?.toString().replace(matcher, "");
-    return !nonDigitsAndDots || nonDigitsAndDots.length <= 0;
-  };
-
   const saveGeoReferenceAssertion = async assertion => {
-    if (
-      !isValueNumber(assertion.dwcDecimalLatitude) ||
-      !isValueNumber(assertion.dwcDecimalLongitude) ||
-      !isValueNumber(assertion.dwcCoordinateUncertaintyInMeters)
-    ) {
-      throw new Error(formatMessage("geoReferenceAssertionError"));
-    }
-
+    if (!assertion) return;
     const [saved] = await save(
       [
         {
@@ -354,6 +349,7 @@ function CollectingEventForm({
     );
     setAssertionId(saved.id);
   };
+
   const onSubmit: DinaFormOnSubmit = async ({ submittedValues }) => {
     // Init relationships object for one-to-many relations:
     submittedValues.relationships = {};
@@ -469,7 +465,12 @@ function CollectingEventForm({
   );
 }
 
-const DeleteAssertionButton = ({ id, setAssertionId }) => {
+const DeleteAssertionButton = ({
+  id,
+  setFieldValue,
+  setFieldTouched,
+  setAssertionId
+}) => {
   const { doOperations } = useContext(ApiClientContext);
   async function doDelete() {
     await doOperations(
@@ -481,9 +482,10 @@ const DeleteAssertionButton = ({ id, setAssertionId }) => {
       ],
       { apiBaseUrl: "/collection-api" }
     );
+    setFieldValue("geoReferenceAssertions", []);
+    setFieldTouched("geoReferenceAssertions", true);
     setAssertionId(null);
   }
-
   if (!id) {
     return null;
   }
@@ -493,6 +495,7 @@ const DeleteAssertionButton = ({ id, setAssertionId }) => {
       className={`btn btn-danger delete-button`}
       onClick={doDelete}
       type="button"
+      style={{ marginLeft: 10 }}
     >
       <CommonMessage id="deleteButtonText" />
     </button>
