@@ -19,6 +19,9 @@ import { Footer, GroupFieldView, Head, Nav } from "../../components";
 import { AttachmentSection } from "../../components/object-store/attachment-list/AttachmentSection";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { FieldArray } from "formik";
+import { GeoReferenceAssertionRow } from "../../components/collection/GeoReferenceAssertionRow";
 
 export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -49,7 +52,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const collectingEventQuery = useQuery<CollectingEvent>(
     {
       path: `collection-api/collecting-event/${id}`,
-      include: "attachment,collectors"
+      include: "attachment,collectors,geoReferenceAssertions"
     },
     {
       onSuccess: getAgents
@@ -122,7 +125,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                         <FieldView className="col-md-2" name="collectors" />
                         <FieldView
                           className="col-md-2"
-                          name="dwcRecordNumber"
+                          name="dwcRecordNumbers"
                         />
                       </div>
                       <div className="row">
@@ -143,21 +146,85 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                           name="dwcVerbatimCoordinates"
                         />
                       </div>
-                      <div className="row">
-                        <FieldView
-                          className="col-md-2"
-                          name="dwcVerbatimCoordinateSystem"
-                        />
-                        <FieldView className="col-md-2" name="dwcVerbatimSRS" />
-                        <FieldView
-                          className="col-md-2"
-                          name="dwcVerbatimElevation"
-                        />
-                        <FieldView
-                          className="col-md-2"
-                          name="dwcVerbatimDepth"
-                        />
-                      </div>
+                      {collectingEvent?.geoReferenceAssertions?.length ? (
+                        <div className="row">
+                          <div className="col-md-6">
+                            <div className="row">
+                              <FieldView
+                                className="col-md-4"
+                                name="dwcVerbatimCoordinateSystem"
+                              />
+                              <FieldView
+                                className="col-md-4"
+                                name="dwcVerbatimSRS"
+                              />
+                            </div>
+
+                            <div className="row">
+                              <FieldView
+                                className="col-md-4"
+                                name="dwcVerbatimElevation"
+                              />
+                              <FieldView
+                                className="col-md-4"
+                                name="dwcVerbatimDepth"
+                              />
+                            </div>
+                          </div>
+                          <div className="col-md-5">
+                            <Tabs>
+                              <TabList>
+                                <Tab>
+                                  <DinaMessage id="geoReferencing" />
+                                </Tab>
+                              </TabList>
+                              <TabPanel>
+                                <div>
+                                  <ul>
+                                    <FieldArray name="geoReferenceAssertions">
+                                      {() =>
+                                        collectingEvent?.geoReferenceAssertions?.map(
+                                          (assertion, index) => (
+                                            <li
+                                              className="list-group-item"
+                                              key={index}
+                                            >
+                                              <GeoReferenceAssertionRow
+                                                index={index}
+                                                assertion={assertion}
+                                                viewOnly={true}
+                                              />
+                                            </li>
+                                          )
+                                        )
+                                      }
+                                    </FieldArray>
+                                  </ul>
+                                </div>
+                              </TabPanel>
+                            </Tabs>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="row">
+                          <FieldView
+                            className="col-md-2"
+                            name="dwcVerbatimCoordinateSystem"
+                          />
+                          <FieldView
+                            className="col-md-2"
+                            name="dwcVerbatimSRS"
+                          />
+                          <FieldView
+                            className="col-md-2"
+                            name="dwcVerbatimElevation"
+                          />
+                          <FieldView
+                            className="col-md-2"
+                            name="dwcVerbatimDepth"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </DinaForm>

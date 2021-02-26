@@ -76,7 +76,11 @@ export function useAttachmentsModal() {
             })),
             {
               Cell: ({ original: { id } }) => (
-                <button onClick={() => removeMetadata(id)} type="button">
+                <button
+                  className="btn btn-dark"
+                  onClick={() => removeMetadata(id)}
+                  type="button"
+                >
                   <DinaMessage id="remove" />
                 </button>
               )

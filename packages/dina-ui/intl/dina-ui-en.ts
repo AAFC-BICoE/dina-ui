@@ -2,6 +2,7 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
+  addAssertion: " Add Assertion",
   addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
   addCollectingEventTitle: "Add Collecting Event",
@@ -33,6 +34,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectorGroupListTitle: "Collector Group",
   collectorGroupNameLabel: "Collector Group Name",
   collectorGroupViewTitle: "View Collector Group",
+  coordinateUncertaintyInMetersLabel: "Coordinate Uncertainty In Meters",
+  decimalLatitudedLabel: "Decimal Latitude",
+  decimalLongitudeLabel: "Decimal Longitude",
   deleted: "Deleted",
   deletedMetadata_tooltip: "Deleted Metadata ID: {id}",
   configureDefaultValues: "Configure default values",
@@ -50,7 +54,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editMetadataTitle: "Edit Metadata",
   editObjectSubtypeTitle: "Edit Object Subtype",
   editOrganizationTitle: "Edit Organization",
-  editOrganizationAliasesLabel: "Aliases (comma seperated)",
+  editOrganizationAliasesLabel: "Aliases (Comma-separated)",
   editPersonTitle: "Edit Person",
   editSelectedButtonText: "Edit Selected",
   enableDateRangeLabel: "Enable Date Range",
@@ -121,7 +125,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcVerbatimSRS_tooltip:
     "The ellipsoid, geodetic datum, or spatial reference system (SRS) upon which coordinates given in verbatimLatitude and verbatimLongitude, or verbatimCoordinates are based. Recommended best practice is to use the EPSG code of the SRS, if known. Examples: EPSG:4326, WGS84, NAD27",
   field_dwcRecordedBy: "Verbatim Collectors",
-  field_dwcRecordNumber: "Collector's Number",
+  field_dwcRecordNumbers: "Collector's Numbers (Comma-separated)",
   field_editableBuiltInAttributes: "Visible Built In Attributes",
   field_editableManagedAttributes: "Visible Managed Attributes",
   field_email: "Email",
@@ -154,6 +158,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   footerPrivacy: "Privacy",
   forTestingPurposesOnlyMessage:
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
+  geoReferencing: "Geo-Referencing",
   governmentOfCanada: "Government of Canada",
   group: "Group",
   groupMustBeSelected: "Group must be selected",
@@ -204,6 +209,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   revisionsByUserPageTitle: "Revisions by user",
   roles: "Roles",
   rolesPerGroup: "Roles Per Group",
+  saveGeoReferenceAssertion: "Save GeoReference Assertion",
   searchButton: "Search",
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",
