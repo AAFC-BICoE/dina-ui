@@ -334,21 +334,8 @@ function CollectingEventForm({
     initialValues.geoReferenceAssertions?.[0]?.id ?? (undefined as any)
   );
 
-  const isValueNumber = value => {
-    const matcher = /([\d\\.]+)/g;
-    const nonDigitsAndDots = value?.toString().replace(matcher, "");
-    return !nonDigitsAndDots || nonDigitsAndDots.length <= 0;
-  };
-
   const saveGeoReferenceAssertion = async assertion => {
     if (!assertion) return;
-    if (
-      !isValueNumber(assertion.dwcDecimalLatitude) ||
-      !isValueNumber(assertion.dwcDecimalLongitude) ||
-      !isValueNumber(assertion.dwcCoordinateUncertaintyInMeters)
-    ) {
-      throw new Error(formatMessage("geoReferenceAssertionError"));
-    }
     const [saved] = await save(
       [
         {

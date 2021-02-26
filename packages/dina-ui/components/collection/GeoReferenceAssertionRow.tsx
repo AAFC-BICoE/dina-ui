@@ -1,4 +1,4 @@
-import { TextField, FieldView } from "common-ui";
+import { NumberField } from "common-ui";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { GeoReferenceAssertion } from "../../types/collection-api/resources/GeoReferenceAssertion";
 
@@ -19,19 +19,19 @@ export function GeoReferenceAssertionRow({
   const { formatMessage } = useDinaIntl();
   return (
     <div className="list-inline">
-      <TextField
+      <NumberField
         name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
         label={formatMessage("decimalLatitudedLabel")}
         readOnly={viewOnly}
         className={"dwcDecimalLatitude"}
       />
-      <TextField
+      <NumberField
         name={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
         label={formatMessage("decimalLongitudeLabel")}
         readOnly={viewOnly}
         className={"dwcDecimalLongitude"}
       />
-      <TextField
+      <NumberField
         name={`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`}
         label={formatMessage("coordinateUncertaintyInMetersLabel")}
         readOnly={viewOnly}
