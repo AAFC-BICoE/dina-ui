@@ -146,44 +146,43 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                           name="dwcVerbatimCoordinates"
                         />
                       </div>
-                      <div className="row">
-                        <div className="col-md-6">
-                          <div className="row">
-                            <FieldView
-                              className="col-md-4"
-                              name="dwcVerbatimCoordinateSystem"
-                            />
-                            <FieldView
-                              className="col-md-4"
-                              name="dwcVerbatimSRS"
-                            />
-                          </div>
+                      {collectingEvent?.geoReferenceAssertions?.length ? (
+                        <div className="row">
+                          <div className="col-md-6">
+                            <div className="row">
+                              <FieldView
+                                className="col-md-4"
+                                name="dwcVerbatimCoordinateSystem"
+                              />
+                              <FieldView
+                                className="col-md-4"
+                                name="dwcVerbatimSRS"
+                              />
+                            </div>
 
-                          <div className="row">
-                            <FieldView
-                              className="col-md-4"
-                              name="dwcVerbatimElevation"
-                            />
-                            <FieldView
-                              className="col-md-4"
-                              name="dwcVerbatimDepth"
-                            />
+                            <div className="row">
+                              <FieldView
+                                className="col-md-4"
+                                name="dwcVerbatimElevation"
+                              />
+                              <FieldView
+                                className="col-md-4"
+                                name="dwcVerbatimDepth"
+                              />
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-md-5">
-                          <Tabs>
-                            <TabList>
-                              <Tab>
-                                <DinaMessage id="geoReferencing" />
-                              </Tab>
-                            </TabList>
-                            <TabPanel>
-                              <div>
-                                <ul>
-                                  <FieldArray name="geoReferenceAssertions">
-                                    {() =>
-                                      collectingEvent?.geoReferenceAssertions
-                                        ?.length ? (
+                          <div className="col-md-5">
+                            <Tabs>
+                              <TabList>
+                                <Tab>
+                                  <DinaMessage id="geoReferencing" />
+                                </Tab>
+                              </TabList>
+                              <TabPanel>
+                                <div>
+                                  <ul>
+                                    <FieldArray name="geoReferenceAssertions">
+                                      {() =>
                                         collectingEvent?.geoReferenceAssertions?.map(
                                           (assertion, index) => (
                                             <li
@@ -198,17 +197,34 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                                             </li>
                                           )
                                         )
-                                      ) : (
-                                        <></>
-                                      )
-                                    }
-                                  </FieldArray>
-                                </ul>
-                              </div>
-                            </TabPanel>
-                          </Tabs>
+                                      }
+                                    </FieldArray>
+                                  </ul>
+                                </div>
+                              </TabPanel>
+                            </Tabs>
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="row">
+                          <FieldView
+                            className="col-md-2"
+                            name="dwcVerbatimCoordinateSystem"
+                          />
+                          <FieldView
+                            className="col-md-2"
+                            name="dwcVerbatimSRS"
+                          />
+                          <FieldView
+                            className="col-md-2"
+                            name="dwcVerbatimElevation"
+                          />
+                          <FieldView
+                            className="col-md-2"
+                            name="dwcVerbatimDepth"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </DinaForm>

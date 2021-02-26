@@ -130,11 +130,12 @@ function CollectingEventFormInternal({
   const { values } = useFormikContext<CollectingEvent>();
 
   const CustomDeleteButton = connect<{}, GeoReferenceAssertion>(
-    ({ formik: { resetForm } }) => (
+    ({ formik: { setFieldValue, setFieldTouched } }) => (
       <DeleteAssertionButton
         id={id}
-        resetForm={resetForm}
         setAssertionId={setAssertionId}
+        setFieldValue={setFieldValue}
+        setFieldTouched={setFieldTouched}
       />
     )
   );
@@ -260,7 +261,7 @@ function CollectingEventFormInternal({
                   <FieldArray name="geoReferenceAssertions">
                     {arrayHelpers =>
                       values.geoReferenceAssertions?.length ? (
-                        values.geoReferenceAssertions.map(
+                        values.geoReferenceAssertions?.map(
                           (assertion, index) => (
                             <li className="list-group-item" key={index}>
                               <GeoReferenceAssertionRow
@@ -297,7 +298,7 @@ function CollectingEventFormInternal({
                   >
                     <DinaMessage id="saveGeoReferenceAssertion" />
                   </FormikButton>
-                  <CustomDeleteButton />
+                  {id && <CustomDeleteButton />}
                 </ul>
               </div>
             </TabPanel>
@@ -477,7 +478,12 @@ function CollectingEventForm({
   );
 }
 
-const DeleteAssertionButton = ({ id, resetForm, setAssertionId }) => {
+const DeleteAssertionButton = ({
+  id,
+  setFieldValue,
+  setFieldTouched,
+  setAssertionId
+}) => {
   const { doOperations } = useContext(ApiClientContext);
   async function doDelete() {
     await doOperations(
@@ -489,10 +495,10 @@ const DeleteAssertionButton = ({ id, resetForm, setAssertionId }) => {
       ],
       { apiBaseUrl: "/collection-api" }
     );
+    setFieldValue("geoReferenceAssertions", []);
+    setFieldTouched("geoReferenceAssertions", true);
     setAssertionId(null);
-    resetForm();
   }
-
   if (!id) {
     return null;
   }
