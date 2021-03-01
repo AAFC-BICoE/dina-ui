@@ -125,7 +125,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcVerbatimSRS_tooltip:
     "The ellipsoid, geodetic datum, or spatial reference system (SRS) upon which coordinates given in verbatimLatitude and verbatimLongitude, or verbatimCoordinates are based. Recommended best practice is to use the EPSG code of the SRS, if known. Examples: EPSG:4326, WGS84, NAD27",
   field_dwcRecordedBy: "Verbatim Collectors",
-  field_dwcRecordNumbers: "Collector's Numbers (Comma-separated)",
+  field_dwcRecordNumber: "Collector's Number",
+  field_dwcOtherRecordNumbers: "Collection Numbers",
   field_editableBuiltInAttributes: "Visible Built In Attributes",
   field_editableManagedAttributes: "Visible Managed Attributes",
   field_email: "Email",

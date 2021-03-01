@@ -119,11 +119,11 @@ describe("collecting-event edit page", () => {
       }
     });
 
-    // Edit the dwcRecordNumbers
-    wrapper.find(".dwcRecordNumbers-field input").simulate("change", {
+    // Edit the dwcOtherRecordNumbers
+    wrapper.find(".dwcOtherRecordNumbers-field textarea").simulate("change", {
       target: {
-        name: "dwcRecordNumbers",
-        value: "12,23"
+        name: "dwcOtherRecordNumbers",
+        value: "12\n23"
       }
     });
 
@@ -141,7 +141,7 @@ describe("collecting-event edit page", () => {
             attributes: {
               startEventDateTime: "2019-12-21T16:00",
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
-              dwcRecordNumbers: ["12", "23"]
+              dwcOtherRecordNumbers: ["12", "23"]
             },
             id: "00000000-0000-0000-0000-000000000000",
             type: "collecting-event"
@@ -282,7 +282,7 @@ const TEST_COLLECTING_EVENT: CollectingEvent = {
     { id: "a8fb14f7-cda9-4313-9cc7-f313db653cad", type: "agent" },
     { id: "eb61092e-fb28-41c8-99e6-d78743296520", type: "agent" }
   ],
-  dwcRecordNumbers: ["12", "13", "14"],
+  dwcOtherRecordNumbers: ["12", "13", "14"],
   geoReferenceAssertions: [
     {
       uuid: "a8fb14f7-cda9-4313-9cc7-f313db653cad",

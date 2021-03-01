@@ -216,7 +216,12 @@ function CollectingEventFormInternal({
             }
           ]}
         />
-        <TextField className="col-md-3" name="dwcRecordNumbers" />
+        <TextField className="col-md-3" name="dwcRecordNumber" />
+        <TextField
+          className="col-md-3"
+          name="dwcOtherRecordNumbers"
+          multiLines={true}
+        />
       </div>
       <div className="row">
         <KeyboardEventHandlerWrappedTextField
@@ -319,14 +324,16 @@ function CollectingEventForm({
   const initialValues = collectingEvent
     ? {
         ...collectingEvent,
-        dwcRecordNumbers: collectingEvent.dwcRecordNumbers?.join(", ") ?? ""
+        dwcOtherRecordNumbers:
+          collectingEvent.dwcOtherRecordNumbers?.concat("").join("\n") ?? ""
       }
     : {
         type: "collecting-event",
         collectors: [],
         collectorGroups: [],
         startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
-        geoReferenceAssertions: []
+        geoReferenceAssertions: [],
+        dwcOtherRecordNumbers: []
       };
 
   const { save } = useApiClient();
@@ -406,12 +413,19 @@ function CollectingEventForm({
       });
     }
     delete submittedValues.geoReferenceAssertions;
-    const { dwcRecordNumbers } = submittedValues;
-    if (dwcRecordNumbers && dwcRecordNumbers.length > 0) {
-      submittedValues.dwcRecordNumbers = dwcRecordNumbers
-        .split(",")
-        .map(num => num.trim());
-    } else submittedValues.dwcRecordNumbers = null;
+    // Convert user-suplied string to string array:
+    submittedValues.dwcOtherRecordNumbers = (
+      submittedValues.dwcOtherRecordNumbers?.toString() || ""
+    )
+      // Split by line breaks:
+      .match(/[^\r\n]+/g)
+      // Remove empty lines:
+      ?.filter(line => line.trim());
+
+    // Treat empty array or undefined as null:
+    if (!submittedValues.dwcOtherRecordNumbers?.length) {
+      submittedValues.dwcOtherRecordNumbers = null;
+    }
 
     // Add attachments if they were selected:
     if (selectedMetadatas.length) {
@@ -460,7 +474,6 @@ function CollectingEventForm({
         id={assertionId}
         setAssertionId={setAssertionId}
       />
-      {!id && <div className="form-group">{attachedMetadatasUI}</div>}
     </DinaForm>
   );
 }
