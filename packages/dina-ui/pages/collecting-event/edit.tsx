@@ -386,16 +386,13 @@ function CollectingEventForm({
       }
     }
     // handle converting to relationship manually due to crnk bug
-    const submitCopy = { ...submittedValues };
-    if (submitCopy.collectors && submitCopy.collectors.length > 0) {
-      submittedValues.relationships.collectors = {};
-      submittedValues.relationships.collectors.data = [];
-      submitCopy.collectors.map(collector =>
-        submittedValues.relationships.collectors.data.push({
+    if (submittedValues.collectors?.length > 0) {
+      submittedValues.relationships.collectors = {
+        data: submittedValues.collectors.map(collector => ({
           id: collector.id,
           type: "agent"
-        })
-      );
+        }))
+      };
     }
     delete submittedValues.collectors;
 
@@ -404,13 +401,14 @@ function CollectingEventForm({
     delete submittedValues.collectorGroups;
 
     if (assertionId) {
-      if (!submittedValues.relationships) submittedValues.relationships = {};
-      submittedValues.relationships.geoReferenceAssertions = {};
-      submittedValues.relationships.geoReferenceAssertions.data = [];
-      submittedValues.relationships.geoReferenceAssertions.data.push({
-        id: assertionId,
-        type: "georeference-assertion"
-      });
+      submittedValues.relationships.geoReferenceAssertions = {
+        data: [
+          {
+            id: assertionId,
+            type: "georeference-assertion"
+          }
+        ]
+      };
     }
     delete submittedValues.geoReferenceAssertions;
     // Convert user-suplied string to string array:
