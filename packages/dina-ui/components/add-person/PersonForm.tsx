@@ -15,12 +15,20 @@ import { Person } from "../../types/objectstore-api";
 
 interface PersonFormProps {
   person?: Person;
-  onSubmitSuccess: (person: PersistedResource<Person>) => void | Promise<void>;
+  onSubmitSuccess?: (person: PersistedResource<Person>) => void | Promise<void>;
+}
+
+interface PersonFormValues extends Partial<Person> {
+  aliasesAsLines?: string;
 }
 
 /** Form to add or edit a Person. */
 export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
-  const initialValues = person || { type: "person" };
+  const initialValues: PersonFormValues = person || { type: "person" };
+
+  // Convert acceptedValues to easily editable string format:
+  initialValues.aliasesAsLines =
+    initialValues.aliases?.concat("")?.join("\n") ?? "";
 
   const id = person?.id;
 
@@ -62,7 +70,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       }
     );
 
-    await onSubmitSuccess(savedPerson);
+    await onSubmitSuccess?.(savedPerson);
   };
 
   return (
@@ -91,14 +99,18 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
           optionLabel={organization => organization.names?.[0].name}
         />
       </div>
-      <div className="form-group">
-        <SubmitButton />
-        <DeleteButton
-          id={id}
-          options={{ apiBaseUrl: "/agent-api" }}
-          postDeleteRedirect="/person/list"
-          type="person"
-        />
+      <div className="form-group list-inline">
+        <div className="list-inline-item">
+          <SubmitButton />
+        </div>
+        <div className="list-inline-item">
+          <DeleteButton
+            id={id}
+            options={{ apiBaseUrl: "/agent-api" }}
+            postDeleteRedirect="/person/list"
+            type="person"
+          />
+        </div>
       </div>
     </DinaForm>
   );
