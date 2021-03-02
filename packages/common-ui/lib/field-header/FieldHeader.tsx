@@ -4,6 +4,7 @@ import { Tooltip } from "../tooltip/Tooltip";
 
 export interface FieldNameProps {
   name: string;
+  customeName?: string;
 }
 
 /**
@@ -11,10 +12,12 @@ export interface FieldNameProps {
  * The tooltip is found from the intl messages file using the key "field_{fieldName}_tooltip".
  * e.g. field_acMetadataCreator.displayName_tooltip
  */
-export function FieldHeader({ name: fieldName }: FieldNameProps) {
+export function FieldHeader({ name: fieldName, customeName }: FieldNameProps) {
   const { formatMessage, messages } = useIntl();
 
-  const messageKey = `field_${fieldName}`;
+  const messageKey = customeName
+    ? `field_${customeName}`
+    : `field_${fieldName}`;
 
   const tooltipKey = `${messageKey}_tooltip`;
   const tooltip = messages[tooltipKey] ? <Tooltip id={tooltipKey} /> : null;

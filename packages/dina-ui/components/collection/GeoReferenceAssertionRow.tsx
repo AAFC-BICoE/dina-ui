@@ -52,17 +52,17 @@ export function GeoReferenceAssertionRow({
             <FieldView
               name={`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`}
               className={"dwcGeoreferenceProtocol"}
-              label={formatMessage("georeferenceProtocolLabel")}
+              customName={"dwcGeoreferenceProtocol"}
             />
             <FieldView
               name={`geoReferenceAssertions[${index}].dwcGeoreferenceSources`}
               className={"dwcGeoreferenceSources"}
-              label={formatMessage("georeferenceSourcesLabel")}
+              customName={"dwcGeoreferenceSources"}
             />
             <FieldView
               name={`geoReferenceAssertions[${index}].dwcGeoreferenceRemarks`}
               className={"dwcGeoreferenceRemarks"}
-              label={formatMessage("georeferenceRemarksLabel")}
+              customName={"dwcGeoreferenceRemarks"}
             />
           </div>
         </div>
@@ -103,17 +103,17 @@ export function GeoReferenceAssertionRow({
             <TextField
               name={`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`}
               className={"dwcGeoreferenceProtocol"}
-              label={formatMessage("georeferenceProtocolLabel")}
+              customName={"dwcGeoreferenceProtocol"}
             />
             <TextField
               name={`geoReferenceAssertions[${index}].dwcGeoreferenceSources`}
               className={"dwcGeoreferenceSources"}
-              label={formatMessage("georeferenceSourcesLabel")}
+              customName={"dwcGeoreferenceSources"}
             />
             <TextField
               name={`geoReferenceAssertions[${index}].dwcGeoreferenceRemarks`}
               className={"dwcGeoreferenceRemarks"}
-              label={formatMessage("georeferenceRemarksLabel")}
+              customName={"dwcGeoreferenceRemarks"}
             />
           </div>
         </div>

@@ -113,6 +113,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers.",
   field_dwcRecordedBy: "Verbatim Collectors",
   field_dwcRecordNumber: "Collector's Number",
+  field_dwcGeoreferenceProtocol: "Georeference Protocol",
+  field_dwcGeoreferenceRemarks: "Georeference Remarks",
+  field_dwcGeoreferenceSources: "Georeference Sources",
   field_dwcVerbatimCoordinates: "Verbatim Coordinates",
   field_dwcVerbatimCoordinates_tooltip:
     "The verbatim original spatial coordinates of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Examples: 41 05 54S 121 05 34W, 17T 630000 4833400",
@@ -172,9 +175,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   forTestingPurposesOnlyMessage:
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
   georeferencedDateLabel: "Georeferenced Date",
-  georeferenceProtocolLabel: "Georeference Protocol",
-  georeferenceRemarksLabel: "Georeference Remarks",
-  georeferenceSourcesLabel: "Georeference Sources",
   geoReferencing: "Geo-Referencing",
   governmentOfCanada: "Government of Canada",
   group: "Group",
