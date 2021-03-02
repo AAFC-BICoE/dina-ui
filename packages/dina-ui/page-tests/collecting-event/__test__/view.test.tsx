@@ -13,7 +13,15 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
   id: "1",
   type: "collecting-event",
   uuid: "323423-23423-234",
-  group: "test group"
+  group: "test group",
+  dwcOtherRecordNumbers: ["12", "13", "14"],
+  geoReferenceAssertions: [
+    {
+      uuid: "a8fb14f7-cda9-4313-9cc7-f313db653cad",
+      type: "georeference-assertion",
+      dwcDecimalLongitude: 12.5
+    }
+  ]
 };
 
 /** Mock Kitsu "get" method. */
@@ -65,6 +73,10 @@ describe("CollectingEvent details page", () => {
         <p>From 2019, 1,1,10,10,10 to 2019, 1.6, 10,10,10</p>
       )
     ).toEqual(true);
+
+    expect(wrapper.containsMatchingElement(<p>12, 13, 14</p>)).toEqual(true);
+
+    expect(wrapper.containsMatchingElement(<p>12.5</p>)).toEqual(true);
   });
 
   /** Test component for testing the useAttachMetadatasToCollectingEvent hook. */

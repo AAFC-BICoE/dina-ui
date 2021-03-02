@@ -52,10 +52,19 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
                 <DinaForm<Person> initialValues={person}>
                   <div className="row">
                     <FieldView className="col-md-2" name="displayName" />
+                  </div>
+                  <div className="row">
                     <FieldView className="col-md-2" name="givenNames" />
                     <FieldView className="col-md-2" name="familyNames" />
+                  </div>
+                  <div className="row">
+                    <FieldView className="col-md-2" name="aliases" />
+                  </div>
+                  <div className="row">
                     <FieldView className="col-md-2" name="email" />
                     <FieldView className="col-md-2" name="organizations" />
+                  </div>
+                  <div className="row">
                     <FieldView className="col-md-2" name="createdBy" />
                     <FieldView className="col-md-2" name="createdOn" />
                   </div>

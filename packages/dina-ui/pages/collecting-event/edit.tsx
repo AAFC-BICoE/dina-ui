@@ -129,9 +129,16 @@ function CollectingEventFormInternal({
   const [checked, setChecked] = useState(false);
   const { values } = useFormikContext<CollectingEvent>();
 
-  const CustomDeleteButton = connect<{}, GeoReferenceAssertion>(({}) => (
-    <DeleteAssertionButton id={id} setAssertionId={setAssertionId} />
-  ));
+  const CustomDeleteButton = connect<{}, GeoReferenceAssertion>(
+    ({ formik: { setFieldValue, setFieldTouched } }) => (
+      <DeleteAssertionButton
+        id={id}
+        setAssertionId={setAssertionId}
+        setFieldValue={setFieldValue}
+        setFieldTouched={setFieldTouched}
+      />
+    )
+  );
 
   const blankAssertion = index => {
     const key1 = index + "dwcDecimalLatitude";
@@ -148,7 +155,7 @@ function CollectingEventFormInternal({
     <div>
       <div className="form-group">
         <div style={{ width: "300px" }}>
-          <GroupSelectField name="group" />
+          <GroupSelectField name="group" enableStoredDefaultGroup={true} />
         </div>
       </div>
       <div className="row">
@@ -209,7 +216,12 @@ function CollectingEventFormInternal({
             }
           ]}
         />
-        <TextField className="col-md-3" name="dwcRecordNumbers" />
+        <TextField className="col-md-3" name="dwcRecordNumber" />
+        <TextField
+          className="col-md-3"
+          name="dwcOtherRecordNumbers"
+          multiLines={true}
+        />
       </div>
       <div className="row">
         <KeyboardEventHandlerWrappedTextField
@@ -230,18 +242,18 @@ function CollectingEventFormInternal({
         <div className="col-md-6">
           <div className="row">
             <TextField
-              className="col-md-4"
+              className="col-md-6"
               name="dwcVerbatimCoordinateSystem"
             />
-            <TextField className="col-md-4" name="dwcVerbatimSRS" />
+            <TextField className="col-md-6" name="dwcVerbatimSRS" />
           </div>
           <div className="row">
-            <TextField className="col-md-4" name="dwcVerbatimElevation" />
-            <TextField className="col-md-4" name="dwcVerbatimDepth" />
+            <TextField className="col-md-6" name="dwcVerbatimElevation" />
+            <TextField className="col-md-6" name="dwcVerbatimDepth" />
           </div>
         </div>
 
-        <div className="col-md-4">
+        <div className="col-md-6">
           <Tabs>
             <TabList>
               <Tab>
@@ -254,7 +266,7 @@ function CollectingEventFormInternal({
                   <FieldArray name="geoReferenceAssertions">
                     {arrayHelpers =>
                       values.geoReferenceAssertions?.length ? (
-                        values.geoReferenceAssertions.map(
+                        values.geoReferenceAssertions?.map(
                           (assertion, index) => (
                             <li className="list-group-item" key={index}>
                               <GeoReferenceAssertionRow
@@ -291,6 +303,7 @@ function CollectingEventFormInternal({
                   >
                     <DinaMessage id="saveGeoReferenceAssertion" />
                   </FormikButton>
+                  {id && <CustomDeleteButton />}
                 </ul>
               </div>
             </TabPanel>
@@ -311,14 +324,16 @@ function CollectingEventForm({
   const initialValues = collectingEvent
     ? {
         ...collectingEvent,
-        dwcRecordNumbers: collectingEvent.dwcRecordNumbers?.join(", ") ?? ""
+        dwcOtherRecordNumbers:
+          collectingEvent.dwcOtherRecordNumbers?.concat("").join("\n") ?? ""
       }
     : {
         type: "collecting-event",
         collectors: [],
         collectorGroups: [],
         startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
-        geoReferenceAssertions: []
+        geoReferenceAssertions: [],
+        dwcOtherRecordNumbers: []
       };
 
   const { save } = useApiClient();
@@ -326,21 +341,8 @@ function CollectingEventForm({
     initialValues.geoReferenceAssertions?.[0]?.id ?? (undefined as any)
   );
 
-  const isValueNumber = value => {
-    const matcher = /([\d\\.]+)/g;
-    const nonDigitsAndDots = value?.toString().replace(matcher, "");
-    return !nonDigitsAndDots || nonDigitsAndDots.length <= 0;
-  };
-
   const saveGeoReferenceAssertion = async assertion => {
-    if (
-      !isValueNumber(assertion.dwcDecimalLatitude) ||
-      !isValueNumber(assertion.dwcDecimalLongitude) ||
-      !isValueNumber(assertion.dwcCoordinateUncertaintyInMeters)
-    ) {
-      throw new Error(formatMessage("geoReferenceAssertionError"));
-    }
-
+    if (!assertion) return;
     const [saved] = await save(
       [
         {
@@ -354,6 +356,7 @@ function CollectingEventForm({
     );
     setAssertionId(saved.id);
   };
+
   const onSubmit: DinaFormOnSubmit = async ({ submittedValues }) => {
     // Init relationships object for one-to-many relations:
     submittedValues.relationships = {};
@@ -383,16 +386,13 @@ function CollectingEventForm({
       }
     }
     // handle converting to relationship manually due to crnk bug
-    const submitCopy = { ...submittedValues };
-    if (submitCopy.collectors && submitCopy.collectors.length > 0) {
-      submittedValues.relationships.collectors = {};
-      submittedValues.relationships.collectors.data = [];
-      submitCopy.collectors.map(collector =>
-        submittedValues.relationships.collectors.data.push({
+    if (submittedValues.collectors?.length > 0) {
+      submittedValues.relationships.collectors = {
+        data: submittedValues.collectors.map(collector => ({
           id: collector.id,
           type: "agent"
-        })
-      );
+        }))
+      };
     }
     delete submittedValues.collectors;
 
@@ -401,21 +401,29 @@ function CollectingEventForm({
     delete submittedValues.collectorGroups;
 
     if (assertionId) {
-      if (!submittedValues.relationships) submittedValues.relationships = {};
-      submittedValues.relationships.geoReferenceAssertions = {};
-      submittedValues.relationships.geoReferenceAssertions.data = [];
-      submittedValues.relationships.geoReferenceAssertions.data.push({
-        id: assertionId,
-        type: "georeference-assertion"
-      });
+      submittedValues.relationships.geoReferenceAssertions = {
+        data: [
+          {
+            id: assertionId,
+            type: "georeference-assertion"
+          }
+        ]
+      };
     }
     delete submittedValues.geoReferenceAssertions;
-    const { dwcRecordNumbers } = submittedValues;
-    if (dwcRecordNumbers && dwcRecordNumbers.length > 0) {
-      submittedValues.dwcRecordNumbers = dwcRecordNumbers
-        .split(",")
-        .map(num => num.trim());
-    } else submittedValues.dwcRecordNumbers = null;
+    // Convert user-suplied string to string array:
+    submittedValues.dwcOtherRecordNumbers = (
+      submittedValues.dwcOtherRecordNumbers?.toString() || ""
+    )
+      // Split by line breaks:
+      .match(/[^\r\n]+/g)
+      // Remove empty lines:
+      ?.filter(line => line.trim());
+
+    // Treat empty array or undefined as null:
+    if (!submittedValues.dwcOtherRecordNumbers?.length) {
+      submittedValues.dwcOtherRecordNumbers = null;
+    }
 
     // Add attachments if they were selected:
     if (selectedMetadatas.length) {
@@ -464,12 +472,16 @@ function CollectingEventForm({
         id={assertionId}
         setAssertionId={setAssertionId}
       />
-      {!id && <div className="form-group">{attachedMetadatasUI}</div>}
     </DinaForm>
   );
 }
 
-const DeleteAssertionButton = ({ id, setAssertionId }) => {
+const DeleteAssertionButton = ({
+  id,
+  setFieldValue,
+  setFieldTouched,
+  setAssertionId
+}) => {
   const { doOperations } = useContext(ApiClientContext);
   async function doDelete() {
     await doOperations(
@@ -481,9 +493,10 @@ const DeleteAssertionButton = ({ id, setAssertionId }) => {
       ],
       { apiBaseUrl: "/collection-api" }
     );
+    setFieldValue("geoReferenceAssertions", []);
+    setFieldTouched("geoReferenceAssertions", true);
     setAssertionId(null);
   }
-
   if (!id) {
     return null;
   }
@@ -493,6 +506,7 @@ const DeleteAssertionButton = ({ id, setAssertionId }) => {
       className={`btn btn-danger delete-button`}
       onClick={doDelete}
       type="button"
+      style={{ marginLeft: 10 }}
     >
       <CommonMessage id="deleteButtonText" />
     </button>

@@ -34,9 +34,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectorGroupListTitle: "Collector Group",
   collectorGroupNameLabel: "Collector Group Name",
   collectorGroupViewTitle: "View Collector Group",
-  coordinateUncertaintyInMetersLabel: "Coordinate Uncertainty In Meters",
-  decimalLatitudedLabel: "Decimal Latitude",
-  decimalLongitudeLabel: "Decimal Longitude",
+  coordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",
+  decimalLatitude: "Decimal Latitude",
+  decimalLongitude: "Decimal Longitude",
   deleted: "Deleted",
   deletedMetadata_tooltip: "Deleted Metadata ID: {id}",
   configureDefaultValues: "Configure default values",
@@ -80,6 +80,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Agent who created the metadata record.",
   field_acSubType: "Object SubType",
   field_acTags: "Tags",
+  field_aliases: "Aliases",
+  field_aliasesAsLines: "Aliases (One value per line)",
+  field_aliasesAsLines_tooltip:
+    "Write one accepted value per line. Press enter while typing in the field to add a new line.",
   "field_dcCreator.displayName": "Digitized By",
   field_attributesTemplate: "Set Attributes Template",
   field_collectingEvent_endDateTimeError:
@@ -98,6 +102,20 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "field_description.en": "English Description",
   "field_description.fr": "French Description",
   field_displayName: "Display Name",
+  field_dwcGeoreferenceProtocol_tooltip:
+    "A description or reference to the methods used to determine the spatial footprint, coordinates, and uncertainties.",
+  field_dwcGeoreferenceSources_tooltip:
+    "A list of maps, gazetteers, or other resources used to georeference the Location, described specifically enough to allow anyone in the future to use the same resources.",
+  field_dwcGeoreferenceRemarks_tooltip:
+    "Notes or comments about the spatial description determination, explaining assumptions made in addition or opposition to the those formalized in the method referred to in georeferenceProtocol.",
+  field_dwcOtherRecordNumbers: "Collection Numbers",
+  field_dwcOtherRecordNumbers_tooltip:
+    "Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers.",
+  field_dwcRecordedBy: "Verbatim Collectors",
+  field_dwcRecordNumber: "Collector's Number",
+  field_dwcGeoreferenceProtocol: "Georeference Protocol",
+  field_dwcGeoreferenceRemarks: "Georeference Remarks",
+  field_dwcGeoreferenceSources: "Georeference Sources",
   field_dwcVerbatimCoordinates: "Verbatim Coordinates",
   field_dwcVerbatimCoordinates_tooltip:
     "The verbatim original spatial coordinates of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Examples: 41 05 54S 121 05 34W, 17T 630000 4833400",
@@ -124,8 +142,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcVerbatimSRS: "Verbatim SRS",
   field_dwcVerbatimSRS_tooltip:
     "The ellipsoid, geodetic datum, or spatial reference system (SRS) upon which coordinates given in verbatimLatitude and verbatimLongitude, or verbatimCoordinates are based. Recommended best practice is to use the EPSG code of the SRS, if known. Examples: EPSG:4326, WGS84, NAD27",
-  field_dwcRecordedBy: "Verbatim Collectors",
-  field_dwcRecordNumbers: "Collector's Numbers (Comma-separated)",
   field_editableBuiltInAttributes: "Visible Built In Attributes",
   field_editableManagedAttributes: "Visible Managed Attributes",
   field_email: "Email",
@@ -158,12 +174,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   footerPrivacy: "Privacy",
   forTestingPurposesOnlyMessage:
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
+  georeferencedDateLabel: "Georeferenced Date",
   geoReferencing: "Geo-Referencing",
-  geoReferenceAssertionError:
-    "DecimalLatituded, DecimalLongitude and CoordinateUncertaintyInMeters can only be numbers",
   governmentOfCanada: "Government of Canada",
   group: "Group",
   groupMustBeSelected: "Group must be selected",
+  literalGeoreferencedByLabel: "Georeferenced By",
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
   managedAttributeValueLabel: "Value",

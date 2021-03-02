@@ -8,8 +8,7 @@ import {
   Query,
   ResourceSelectField,
   SubmitButton,
-  TextField,
-  useAccount
+  TextField
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
@@ -67,11 +66,9 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
 }
 
 function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
-  const { groupNames } = useAccount();
   const { id } = router.query;
 
   const initialValues = profile || {
-    group: groupNames?.[0],
     type: "thermocyclerprofile"
   };
 
@@ -101,7 +98,11 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
       </ButtonBar>
       <div>
         <div className="row">
-          <GroupSelectField className="col-md-2" name="group" />
+          <GroupSelectField
+            className="col-md-2"
+            name="group"
+            enableStoredDefaultGroup={true}
+          />
         </div>
         <div className="row">
           <ResourceSelectField<Region>
