@@ -118,6 +118,24 @@ export function GeoReferenceAssertionRow({
           </div>
         </div>
       )}
+      <div className="list-inline-item d-none">
+        <button
+          className="btn btn-primary add-assertion-button"
+          type="button"
+          onClick={onAddClick}
+        >
+          +
+        </button>
+      </div>
+      <div className="list-inline-item d-none">
+        <button
+          className="btn btn-primary"
+          type="button"
+          onClick={onRemoveClick}
+        >
+          -
+        </button>
+      </div>{" "}
     </>
   );
 }
