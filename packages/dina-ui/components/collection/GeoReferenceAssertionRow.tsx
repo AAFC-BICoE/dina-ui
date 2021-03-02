@@ -52,17 +52,17 @@ export function GeoReferenceAssertionRow({
             <FieldView
               name={`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`}
               className={"dwcGeoreferenceProtocol"}
-              customName={"dwcGeoreferenceProtocol"}
+              tooltipKey={"field_dwcGeoreferenceProtocol_tooltip"}
             />
             <FieldView
               name={`geoReferenceAssertions[${index}].dwcGeoreferenceSources`}
               className={"dwcGeoreferenceSources"}
-              customName={"dwcGeoreferenceSources"}
+              tooltipKey={"field_dwcGeoreferenceSources_tooltip"}
             />
             <FieldView
               name={`geoReferenceAssertions[${index}].dwcGeoreferenceRemarks`}
               className={"dwcGeoreferenceRemarks"}
-              customName={"dwcGeoreferenceRemarks"}
+              tooltipKey={"field_dwcGeoreferenceRemarks_tooltip"}
             />
           </div>
         </div>
@@ -103,17 +103,17 @@ export function GeoReferenceAssertionRow({
             <TextField
               name={`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`}
               className={"dwcGeoreferenceProtocol"}
-              customName={"dwcGeoreferenceProtocol"}
+              tooltipKey={"field_dwcGeoreferenceProtocol_tooltip"}
             />
             <TextField
               name={`geoReferenceAssertions[${index}].dwcGeoreferenceSources`}
               className={"dwcGeoreferenceSources"}
-              customName={"dwcGeoreferenceSources"}
+              tooltipKey={"field_dwcGeoreferenceSources_tooltip"}
             />
             <TextField
               name={`geoReferenceAssertions[${index}].dwcGeoreferenceRemarks`}
               className={"dwcGeoreferenceRemarks"}
-              customName={"dwcGeoreferenceRemarks"}
+              tooltipKey={"field_dwcGeoreferenceRemarks_tooltip"}
             />
           </div>
         </div>
