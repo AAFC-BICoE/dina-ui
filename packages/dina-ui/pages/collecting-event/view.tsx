@@ -155,27 +155,27 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                           <div className="col-md-6">
                             <div className="row">
                               <FieldView
-                                className="col-md-4"
+                                className="col-md-5"
                                 name="dwcVerbatimCoordinateSystem"
                               />
                               <FieldView
-                                className="col-md-4"
+                                className="col-md-5"
                                 name="dwcVerbatimSRS"
                               />
                             </div>
 
                             <div className="row">
                               <FieldView
-                                className="col-md-4"
+                                className="col-md-5"
                                 name="dwcVerbatimElevation"
                               />
                               <FieldView
-                                className="col-md-4"
+                                className="col-md-5"
                                 name="dwcVerbatimDepth"
                               />
                             </div>
                           </div>
-                          <div className="col-md-5">
+                          <div className="col-md-4">
                             <Tabs>
                               <TabList>
                                 <Tab>
