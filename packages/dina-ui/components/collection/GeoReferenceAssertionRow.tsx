@@ -21,7 +21,7 @@ export function GeoReferenceAssertionRow({
     <>
       {viewOnly ? (
         <div className="row">
-          <div className="col-md-5">
+          <div className="col-md-6">
             <FieldView
               name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
               label={formatMessage("decimalLatitude")}
@@ -43,7 +43,7 @@ export function GeoReferenceAssertionRow({
               label={formatMessage("georeferencedDateLabel")}
             />
           </div>
-          <div className="col-md-5">
+          <div className="col-md-6">
             <FieldView
               name={`geoReferenceAssertions[${index}].literalGeoreferencedBy`}
               className={"literalGeoreferencedBy"}
@@ -68,7 +68,7 @@ export function GeoReferenceAssertionRow({
         </div>
       ) : (
         <div className="row">
-          <div className="col-md-5">
+          <div className="col-md-6">
             <NumberField
               name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
               label={formatMessage("decimalLatitude")}
@@ -94,7 +94,7 @@ export function GeoReferenceAssertionRow({
             />
           </div>
 
-          <div className="col-md-5">
+          <div className="col-md-6">
             <TextField
               name={`geoReferenceAssertions[${index}].literalGeoreferencedBy`}
               className={"literalGeoreferencedBy"}
