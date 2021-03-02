@@ -125,7 +125,11 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                         <FieldView className="col-md-2" name="collectors" />
                         <FieldView
                           className="col-md-2"
-                          name="dwcRecordNumbers"
+                          name="dwcRecordNumber"
+                        />
+                        <FieldView
+                          className="col-md-2"
+                          name="dwcOtherRecordNumbers"
                         />
                       </div>
                       <div className="row">

@@ -19,7 +19,8 @@ export interface CollectingEventAttributes {
   dwcVerbatimSRS?: string;
   dwcVerbatimElevation?: string;
   dwcVerbatimDepth?: string;
-  dwcRecordNumbers?: string[];
+  dwcOtherRecordNumbers?: string[];
+  dwcRecordNumber?: string;
 
   createdBy?: string;
   createdOn?: string;

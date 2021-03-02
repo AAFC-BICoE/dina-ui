@@ -216,7 +216,12 @@ function CollectingEventFormInternal({
             }
           ]}
         />
-        <TextField className="col-md-3" name="dwcRecordNumbers" />
+        <TextField className="col-md-3" name="dwcRecordNumber" />
+        <TextField
+          className="col-md-3"
+          name="dwcOtherRecordNumbers"
+          multiLines={true}
+        />
       </div>
       <div className="row">
         <KeyboardEventHandlerWrappedTextField
@@ -319,14 +324,16 @@ function CollectingEventForm({
   const initialValues = collectingEvent
     ? {
         ...collectingEvent,
-        dwcRecordNumbers: collectingEvent.dwcRecordNumbers?.join(", ") ?? ""
+        dwcOtherRecordNumbers:
+          collectingEvent.dwcOtherRecordNumbers?.concat("").join("\n") ?? ""
       }
     : {
         type: "collecting-event",
         collectors: [],
         collectorGroups: [],
         startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
-        geoReferenceAssertions: []
+        geoReferenceAssertions: [],
+        dwcOtherRecordNumbers: []
       };
 
   const { save } = useApiClient();
@@ -379,16 +386,13 @@ function CollectingEventForm({
       }
     }
     // handle converting to relationship manually due to crnk bug
-    const submitCopy = { ...submittedValues };
-    if (submitCopy.collectors && submitCopy.collectors.length > 0) {
-      submittedValues.relationships.collectors = {};
-      submittedValues.relationships.collectors.data = [];
-      submitCopy.collectors.map(collector =>
-        submittedValues.relationships.collectors.data.push({
+    if (submittedValues.collectors?.length > 0) {
+      submittedValues.relationships.collectors = {
+        data: submittedValues.collectors.map(collector => ({
           id: collector.id,
           type: "agent"
-        })
-      );
+        }))
+      };
     }
     delete submittedValues.collectors;
 
@@ -397,21 +401,29 @@ function CollectingEventForm({
     delete submittedValues.collectorGroups;
 
     if (assertionId) {
-      if (!submittedValues.relationships) submittedValues.relationships = {};
-      submittedValues.relationships.geoReferenceAssertions = {};
-      submittedValues.relationships.geoReferenceAssertions.data = [];
-      submittedValues.relationships.geoReferenceAssertions.data.push({
-        id: assertionId,
-        type: "georeference-assertion"
-      });
+      submittedValues.relationships.geoReferenceAssertions = {
+        data: [
+          {
+            id: assertionId,
+            type: "georeference-assertion"
+          }
+        ]
+      };
     }
     delete submittedValues.geoReferenceAssertions;
-    const { dwcRecordNumbers } = submittedValues;
-    if (dwcRecordNumbers && dwcRecordNumbers.length > 0) {
-      submittedValues.dwcRecordNumbers = dwcRecordNumbers
-        .split(",")
-        .map(num => num.trim());
-    } else submittedValues.dwcRecordNumbers = null;
+    // Convert user-suplied string to string array:
+    submittedValues.dwcOtherRecordNumbers = (
+      submittedValues.dwcOtherRecordNumbers?.toString() || ""
+    )
+      // Split by line breaks:
+      .match(/[^\r\n]+/g)
+      // Remove empty lines:
+      ?.filter(line => line.trim());
+
+    // Treat empty array or undefined as null:
+    if (!submittedValues.dwcOtherRecordNumbers?.length) {
+      submittedValues.dwcOtherRecordNumbers = null;
+    }
 
     // Add attachments if they were selected:
     if (selectedMetadatas.length) {
@@ -460,7 +472,6 @@ function CollectingEventForm({
         id={assertionId}
         setAssertionId={setAssertionId}
       />
-      {!id && <div className="form-group">{attachedMetadatasUI}</div>}
     </DinaForm>
   );
 }
