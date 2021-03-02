@@ -1,6 +1,8 @@
 import { NumberField } from "common-ui";
-import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { connect } from "formik";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { GeoReferenceAssertion } from "../../types/collection-api/resources/GeoReferenceAssertion";
+import { get } from "lodash";
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
@@ -18,7 +20,10 @@ export function GeoReferenceAssertionRow({
 }: GeoReferenceAssertionRowProps) {
   const { formatMessage } = useDinaIntl();
   return (
-    <div className="list-inline">
+    <div>
+      {viewOnly && (
+        <ViewInMapButton assertionPath={`geoReferenceAssertions.${index}`} />
+      )}
       <NumberField
         name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
         label={formatMessage("decimalLatitudedLabel")}
@@ -62,3 +67,26 @@ export function GeoReferenceAssertionRow({
     </div>
   );
 }
+
+export const ViewInMapButton = connect<{ assertionPath: string }>(
+  ({ assertionPath, formik: { values } }) => {
+    const { dwcDecimalLatitude: lat, dwcDecimalLongitude: lon } = get(
+      values,
+      assertionPath
+    );
+
+    const showButton = typeof lat === "number" && typeof lon === "number";
+
+    return showButton ? (
+      <div className="form-group">
+        <a
+          href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}`}
+          target="_blank"
+          className="btn btn-info"
+        >
+          <DinaMessage id="viewOnMap" />
+        </a>
+      </div>
+    ) : null;
+  }
+);

@@ -233,6 +233,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   useCollectorGroupLabel: "Use Collector Group",
   userMustBelongToGroup: "User must belong to a Group",
   verbatimEventDateTimeLabel: "Verbatim Event DateTime",
+  viewOnMap: "View on Map",
   viewPreviewButtonText: "Preview",
   whoAmITitle: "Who Am I",
   year: "Year",
