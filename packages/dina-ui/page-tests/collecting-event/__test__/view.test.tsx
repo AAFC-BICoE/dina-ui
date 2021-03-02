@@ -14,7 +14,7 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
   type: "collecting-event",
   uuid: "323423-23423-234",
   group: "test group",
-  dwcRecordNumbers: ["12", "13", "14"],
+  dwcOtherRecordNumbers: ["12", "13", "14"],
   geoReferenceAssertions: [
     {
       uuid: "a8fb14f7-cda9-4313-9cc7-f313db653cad",
