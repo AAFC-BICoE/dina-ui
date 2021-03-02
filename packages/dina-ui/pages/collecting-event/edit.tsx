@@ -248,7 +248,7 @@ function CollectingEventFormInternal({
           </div>
         </div>
 
-        <div className="col-md-4">
+        <div className="col-md-6">
           <Tabs>
             <TabList>
               <Tab>

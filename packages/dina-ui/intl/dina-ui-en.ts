@@ -34,9 +34,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectorGroupListTitle: "Collector Group",
   collectorGroupNameLabel: "Collector Group Name",
   collectorGroupViewTitle: "View Collector Group",
-  coordinateUncertaintyInMetersLabel: "Coordinate Uncertainty In Meters",
-  decimalLatitudedLabel: "Decimal Latitude",
-  decimalLongitudeLabel: "Decimal Longitude",
+  coordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",
+  decimalLatitude: "Decimal Latitude",
+  decimalLongitude: "Decimal Longitude",
   deleted: "Deleted",
   deletedMetadata_tooltip: "Deleted Metadata ID: {id}",
   configureDefaultValues: "Configure default values",
@@ -102,6 +102,16 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "field_description.en": "English Description",
   "field_description.fr": "French Description",
   field_displayName: "Display Name",
+  georeferencedDateLabel: "Georeferenced Date",
+  georeferenceProtocolLabel: "Georeference Protocol",
+  field_dwcGeoreferenceProtocol_tooltip:
+    "A description or reference to the methods used to determine the spatial footprint, coordinates, and uncertainties.",
+  georeferenceSourcesLabel: "Georeference Sources",
+  field_dwcGeoreferenceSources_tooltip:
+    "A list of maps, gazetteers, or other resources used to georeference the Location, described specifically enough to allow anyone in the future to use the same resources.",
+  georeferenceRemarksLabel: "Georeference Remarks",
+  field_dwcGeoreferenceRemarks_tooltip:
+    "Notes or comments about the spatial description determination, explaining assumptions made in addition or opposition to the those formalized in the method referred to in georeferenceProtocol.",
   field_dwcVerbatimCoordinates: "Verbatim Coordinates",
   field_dwcVerbatimCoordinates_tooltip:
     "The verbatim original spatial coordinates of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Examples: 41 05 54S 121 05 34W, 17T 630000 4833400",
@@ -166,6 +176,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   governmentOfCanada: "Government of Canada",
   group: "Group",
   groupMustBeSelected: "Group must be selected",
+  literalGeoreferencedByLabel: "Georeferenced By",
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
   managedAttributeValueLabel: "Value",
