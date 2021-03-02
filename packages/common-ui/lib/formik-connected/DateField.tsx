@@ -5,11 +5,12 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 export interface DateFieldProps {
   showTime?: boolean;
   disabled?: boolean;
+  withZone?: boolean;
 }
 
 /** Formik-connected date input. */
 export function DateField(props: LabelWrapperParams & DateFieldProps) {
-  const { name, showTime, disabled } = props;
+  const { name, showTime, disabled, withZone } = props;
 
   return (
     <FieldWrapper {...props}>
@@ -22,7 +23,10 @@ export function DateField(props: LabelWrapperParams & DateFieldProps) {
             if (showTime) {
               setFieldValue(name, date && date.toISOString());
             } else {
-              setFieldValue(name, date && date.toISOString().slice(0, 10));
+              if (withZone) {
+                setFieldValue(name, date && date.toISOString());
+              } else
+                setFieldValue(name, date && date.toISOString().slice(0, 10));
             }
             setFieldTouched(name);
           }
@@ -38,6 +42,8 @@ export function DateField(props: LabelWrapperParams & DateFieldProps) {
                 selected={
                   value
                     ? showTime
+                      ? new Date(`${value}`)
+                      : withZone
                       ? new Date(`${value}`)
                       : new Date(`${value}T12:00:00Z`)
                     : null

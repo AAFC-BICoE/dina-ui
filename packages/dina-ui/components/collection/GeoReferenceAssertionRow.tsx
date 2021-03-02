@@ -1,4 +1,4 @@
-import { NumberField, FieldView, TextField } from "common-ui";
+import { DateField, NumberField, FieldView, TextField } from "common-ui";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { GeoReferenceAssertion } from "../../types/collection-api/resources/GeoReferenceAssertion";
 
@@ -52,10 +52,11 @@ export function GeoReferenceAssertionRow({
             label={formatMessage("georeferencedDateLabel")}
           />
         ) : (
-          <TextField
+          <DateField
             name={`geoReferenceAssertions[${index}].dwcGeoreferencedDate`}
             className={"dwcGeoreferencedDate"}
             label={formatMessage("georeferencedDateLabel")}
+            withZone={true}
           />
         )}
       </div>
@@ -108,7 +109,7 @@ export function GeoReferenceAssertionRow({
       )}
 
       {!viewOnly && (
-        <>
+        <div className="d-none">
           <div className="list-inline-item">
             <button
               className="btn btn-primary add-assertion-button"
@@ -127,7 +128,7 @@ export function GeoReferenceAssertionRow({
               -
             </button>
           </div>{" "}
-        </>
+        </div>
       )}
     </div>
   );
