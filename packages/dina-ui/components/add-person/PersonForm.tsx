@@ -15,36 +15,53 @@ import { Person } from "../../types/objectstore-api";
 
 interface PersonFormProps {
   person?: Person;
-  onSubmitSuccess: (person: PersistedResource<Person>) => void | Promise<void>;
+  onSubmitSuccess?: (person: PersistedResource<Person>) => void | Promise<void>;
+}
+
+interface PersonFormValues extends Partial<Person> {
+  aliasesAsLines?: string;
 }
 
 /** Form to add or edit a Person. */
 export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
-  const initialValues = person || { type: "person" };
+  const initialValues: PersonFormValues = person || { type: "person" };
+
+  // Convert acceptedValues to easily editable string format:
+  initialValues.aliasesAsLines =
+    initialValues.aliases?.concat("")?.join("\n") ?? "";
 
   const id = person?.id;
 
   const onSubmit: DinaFormOnSubmit = async ({
     api: { save },
-    submittedValues
+    submittedValues: { aliasesAsLines, ...submittedPerson }
   }) => {
-    const submitCopy = { ...submittedValues };
+    const submitCopy = { ...submittedPerson };
     if (submitCopy.organizations) {
-      submittedValues.relationships = {};
-      submittedValues.relationships.organizations = {};
-      submittedValues.relationships.organizations.data = [];
+      submittedPerson.relationships = {};
+      submittedPerson.relationships.organizations = {};
+      submittedPerson.relationships.organizations.data = [];
       submitCopy.organizations.map(org =>
-        submittedValues.relationships.organizations.data.push({
+        submittedPerson.relationships.organizations.data.push({
           id: org.id,
           type: "organization"
         })
       );
-      delete submittedValues.organizations;
+      delete submittedPerson.organizations;
     }
-    const [newPerson] = await save<Person>(
+
+    // Convert user-suplied string to string array:
+    submittedPerson.aliases =
+      (aliasesAsLines || "")
+        // Split by line breaks:
+        .match(/[^\r\n]+/g)
+        // Remove empty lines:
+        ?.filter(line => line.trim()) ?? [];
+
+    const [savedPerson] = await save<Person>(
       [
         {
-          resource: submittedValues,
+          resource: submittedPerson,
           type: "person"
         }
       ],
@@ -53,24 +70,27 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       }
     );
 
-    await onSubmitSuccess(newPerson);
+    await onSubmitSuccess?.(savedPerson);
   };
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
-      <div style={{ maxWidth: "20rem" }}>
+      <div style={{ width: "30rem" }}>
         <TextField name="displayName" />
       </div>
-      <div style={{ maxWidth: "20rem" }}>
+      <div style={{ width: "30rem" }}>
         <TextField name="givenNames" />
       </div>
-      <div style={{ maxWidth: "20rem" }}>
+      <div style={{ width: "30rem" }}>
         <TextField name="familyNames" />
       </div>
-      <div style={{ maxWidth: "20rem" }}>
+      <div style={{ width: "30rem" }}>
+        <TextField name="aliasesAsLines" multiLines={true} />
+      </div>
+      <div style={{ width: "30rem" }}>
         <TextField name="email" />
       </div>
-      <div style={{ maxWidth: "20rem" }}>
+      <div style={{ width: "30rem" }}>
         <ResourceSelectField<Organization>
           name="organizations"
           filter={filterBy(["names[0].name"])}
@@ -79,14 +99,18 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
           optionLabel={organization => organization.names?.[0].name}
         />
       </div>
-      <div className="form-group">
-        <SubmitButton />
-        <DeleteButton
-          id={id}
-          options={{ apiBaseUrl: "/agent-api" }}
-          postDeleteRedirect="/person/list"
-          type="person"
-        />
+      <div className="form-group list-inline">
+        <div className="list-inline-item">
+          <SubmitButton />
+        </div>
+        <div className="list-inline-item">
+          <DeleteButton
+            id={id}
+            options={{ apiBaseUrl: "/agent-api" }}
+            postDeleteRedirect="/person/list"
+            type="person"
+          />
+        </div>
       </div>
     </DinaForm>
   );
@@ -119,6 +143,7 @@ export function useAddPersonModal() {
 
       openModal(
         <div className="modal-content">
+          <style>{`.modal-dialog { max-width: 100rem; }`}</style>
           <div className="modal-header">
             <h2>
               <DinaMessage id="addPersonTitle" />

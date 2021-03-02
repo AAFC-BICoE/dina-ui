@@ -14,6 +14,12 @@ const AGENT_TABLE_COLUMNS = [
     accessor: "displayName"
   },
   "email",
+  "givenNames",
+  "familyNames",
+  {
+    Cell: ({ original: { aliases } }) => <>{aliases?.join(", ")}</>,
+    accessor: "aliases"
+  },
   "createdBy",
   dateCell("createdOn")
 ];

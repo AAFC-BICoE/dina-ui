@@ -80,6 +80,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Agent who created the metadata record.",
   field_acSubType: "Object SubType",
   field_acTags: "Tags",
+  field_aliases: "Aliases",
+  field_aliasesAsLines: "Aliases (One value per line)",
+  field_aliasesAsLines_tooltip:
+    "Write one accepted value per line. Press enter while typing in the field to add a new line.",
   "field_dcCreator.displayName": "Digitized By",
   field_attributesTemplate: "Set Attributes Template",
   field_collectingEvent_endDateTimeError:
