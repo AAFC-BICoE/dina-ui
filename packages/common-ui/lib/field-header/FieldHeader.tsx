@@ -4,7 +4,7 @@ import { Tooltip } from "../tooltip/Tooltip";
 
 export interface FieldNameProps {
   name: string;
-  tooltipKey?: string;
+  customName?: string;
 }
 
 /**
@@ -14,17 +14,23 @@ export interface FieldNameProps {
  */
 export function FieldHeader({
   name: fieldName,
-  tooltipKey: tooltipKeyProp
+  customName: customFieldName
 }: FieldNameProps) {
   const { formatMessage, messages } = useIntl();
 
-  const messageKey = `field_${fieldName}`;
-
-  const tooltipKey = tooltipKeyProp ?? `${messageKey}_tooltip`;
+  const messageKey = customFieldName
+    ? `field_${customFieldName}`
+    : `field_${fieldName}`;
+  const tooltipKey = `${messageKey}_tooltip`;
   const tooltip = messages[tooltipKey] ? <Tooltip id={tooltipKey} /> : null;
-
   return (
-    <div className={`${fieldName}-field-header`}>
+    <div
+      className={
+        customFieldName
+          ? `${customFieldName}-field-header`
+          : `${fieldName}-field-header`
+      }
+    >
       {messages[messageKey]
         ? formatMessage({ id: messageKey as any })
         : titleCase(fieldName)}
