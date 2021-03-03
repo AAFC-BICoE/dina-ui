@@ -157,8 +157,13 @@ function CollectingEventFormInternal({
       { apiBaseUrl: "/collection-api" }
     );
 
-    ids?.forEach(id => {
-      values.geoReferenceAssertions?.splice(id, 1);
+    assertionIds?.forEach(id => {
+      values.geoReferenceAssertions?.splice(
+        values.geoReferenceAssertions?.findIndex(
+          assertion => assertion.id === id
+        ),
+        1
+      );
     });
     setFieldValue("geoReferenceAssertions", values.geoReferenceAssertions);
     setFieldTouched("geoReferenceAssertions", true);
