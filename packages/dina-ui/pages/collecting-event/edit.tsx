@@ -17,7 +17,7 @@ import {
   TextField,
   FormikButton
 } from "common-ui";
-import { KitsuResponse } from "kitsu";
+import { KitsuResponse, PersistedResource } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import { useContext, useState, Dispatch } from "react";
@@ -38,11 +38,13 @@ import { GeoReferenceAssertionRow } from "../../components/collection/GeoReferen
 import { CommonMessage } from "../../../common-ui/lib/intl/common-ui-intl";
 import { GeoReferenceAssertion } from "packages/dina-ui/types/collection-api/resources/GeoReferenceAssertion";
 import { connect } from "formik";
+import { Metadata } from "../../types/objectstore-api";
 
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
   router: NextRouter;
 }
+
 export default function CollectingEventEditPage() {
   const router = useRouter();
   const {
@@ -52,25 +54,31 @@ export default function CollectingEventEditPage() {
   const { bulkGet } = useContext(ApiClientContext);
   const [collectingEvent, setCollectingEvent] = useState<CollectingEvent>();
 
-  const getAgents = (response: KitsuResponse<CollectingEvent, undefined>) => {
-    const fetchAgents = async () => {
-      if (response?.data?.collectors) {
-        return await bulkGet<Person>(
-          response?.data?.collectors.map(
-            collector => `/person/${collector.id}`
-          ) as any,
-          { apiBaseUrl: "/agent-api" }
-        );
-      }
-    };
-    const agents = fetchAgents();
-    agents.then(async () => {
-      if (response && response.data) {
-        response.data.collectors = await agents;
-        setCollectingEvent(response.data as CollectingEvent);
-      }
-    });
-  };
+  /** Do client-side multi-API joins on one-to-many fields. */
+  async function initOneToManyRelations(
+    response: KitsuResponse<CollectingEvent>
+  ) {
+    if (response?.data?.collectors) {
+      const agents = await bulkGet<Person>(
+        response.data.collectors.map(collector => `/person/${collector.id}`),
+        { apiBaseUrl: "/agent-api", returnNullForMissingResource: true }
+      );
+      // Omit null (deleted) records:
+      response.data.collectors = agents.filter(it => it);
+    }
+
+    if (response?.data?.attachment) {
+      const metadatas = await bulkGet<Metadata>(
+        response.data.attachment.map(collector => `/metadata/${collector.id}`),
+        { apiBaseUrl: "/objectstore-api", returnNullForMissingResource: true }
+      );
+      // Omit null (deleted) records:
+      response.data.attachment = metadatas.filter(it => it);
+    }
+
+    setCollectingEvent(response.data);
+  }
+
   return (
     <div>
       <Head title={formatMessage("editCollectingEventTitle")} />
@@ -83,9 +91,9 @@ export default function CollectingEventEditPage() {
             </h1>
             <Query<CollectingEvent>
               query={{
-                path: `collection-api/collecting-event/${id}?include=collectors,geoReferenceAssertions`
+                path: `collection-api/collecting-event/${id}?include=collectors,geoReferenceAssertions,attachment`
               }}
-              onSuccess={getAgents}
+              onSuccess={initOneToManyRelations}
             >
               {({ loading }) => (
                 <div>
@@ -320,7 +328,14 @@ function CollectingEventForm({
 }: CollectingEventFormProps) {
   const { id } = router.query;
   const { formatMessage } = useDinaIntl();
-  const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal();
+
+  // The selected Metadatas to be attached to this Collecting Event:
+  const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal({
+    initialMetadatas: collectingEvent?.attachment as PersistedResource<
+      Metadata
+    >[]
+  });
+
   const initialValues = collectingEvent
     ? {
         ...collectingEvent,
@@ -431,6 +446,8 @@ function CollectingEventForm({
         data: selectedMetadatas.map(it => ({ id: it.id, type: it.type }))
       };
     }
+    // Delete the 'attachment' attribute because it should stay in the relationships field:
+    delete submittedValues.attachment;
 
     const [saved] = await save(
       [
@@ -472,6 +489,7 @@ function CollectingEventForm({
         id={assertionId}
         setAssertionId={setAssertionId}
       />
+      <div className="form-group">{attachedMetadatasUI}</div>
     </DinaForm>
   );
 }

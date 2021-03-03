@@ -32,7 +32,7 @@ const mockGet = jest.fn(async model => {
   // The get request will return the existing collecting-event.
   if (
     model ===
-    "collection-api/collecting-event/1?include=collectors,geoReferenceAssertions"
+    "collection-api/collecting-event/1?include=collectors,geoReferenceAssertions,attachment"
   ) {
     return { data: TEST_COLLECTING_EVENT };
   } else if (model === "agent-api/person") {
@@ -47,8 +47,18 @@ const mockBulkGet = jest.fn(async paths => {
   if (!paths.length) {
     return [];
   }
-  if ((paths[0] as string).startsWith("/agent-api/")) {
-    return TEST_AGENT;
+  if ((paths[0] as string).startsWith("/person/")) {
+    return paths.map(path => ({
+      id: path.replace("/person/", ""),
+      type: "agent"
+    }));
+  }
+  if ((paths[0] as string).startsWith("/metadata/")) {
+    return paths.map(path => ({
+      id: path.replace("/metadata/", ""),
+      type: "metadata",
+      originalFilename: "test-file"
+    }));
   }
 });
 
@@ -208,6 +218,20 @@ describe("collecting-event edit page", () => {
               attributes: expect.objectContaining({
                 verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 6pm"
               }),
+              relationships: {
+                attachment: {
+                  data: [
+                    { id: "88888", type: "metadata" },
+                    { id: "99999", type: "metadata" }
+                  ]
+                },
+                collectors: {
+                  data: [
+                    { id: "111", type: "agent" },
+                    { id: "222", type: "agent" }
+                  ]
+                }
+              },
               id: "1",
               type: "collecting-event"
             }
@@ -279,8 +303,8 @@ const TEST_COLLECTING_EVENT: CollectingEvent = {
   verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm",
   group: "test group",
   collectors: [
-    { id: "a8fb14f7-cda9-4313-9cc7-f313db653cad", type: "agent" },
-    { id: "eb61092e-fb28-41c8-99e6-d78743296520", type: "agent" }
+    { id: "111", type: "agent" },
+    { id: "222", type: "agent" }
   ],
   dwcOtherRecordNumbers: ["12", "13", "14"],
   geoReferenceAssertions: [
@@ -288,6 +312,10 @@ const TEST_COLLECTING_EVENT: CollectingEvent = {
       uuid: "a8fb14f7-cda9-4313-9cc7-f313db653cad",
       type: "georeference-assertion"
     }
+  ],
+  attachment: [
+    { id: "88888", type: "metadata" },
+    { id: "99999", type: "metadata" }
   ]
 };
 
