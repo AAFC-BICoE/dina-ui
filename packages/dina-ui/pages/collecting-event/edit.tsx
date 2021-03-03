@@ -364,9 +364,7 @@ function CollectingEventForm({
         type: "collecting-event",
         collectors: [],
         collectorGroups: [],
-        startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
-        geoReferenceAssertions: [],
-        dwcOtherRecordNumbers: []
+        startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM"
       };
 
   const { save } = useApiClient();
@@ -432,12 +430,16 @@ function CollectingEventForm({
     delete submittedValues.collectorGroups;
 
     if (assertionIds) {
-      submittedValues.relationships.geoReferenceAssertions = {
-        data: assertionIds.map(assertionId => ({
-          id: assertionId,
-          type: "georeference-assertion"
-        }))
-      };
+      assertionIds.splice(
+        assertionIds.findIndex(Id => Id === null || Id === undefined)?.[0]
+      );
+      if (assertionIds.length > 0)
+        submittedValues.relationships.geoReferenceAssertions = {
+          data: assertionIds.map(assertionId => ({
+            id: assertionId,
+            type: "georeference-assertion"
+          }))
+        };
     }
     delete submittedValues.geoReferenceAssertions;
     // Convert user-suplied string to string array:
