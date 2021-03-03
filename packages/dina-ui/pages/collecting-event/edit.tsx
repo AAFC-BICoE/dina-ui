@@ -242,18 +242,18 @@ function CollectingEventFormInternal({
         <div className="col-md-6">
           <div className="row">
             <TextField
-              className="col-md-4"
+              className="col-md-6"
               name="dwcVerbatimCoordinateSystem"
             />
-            <TextField className="col-md-4" name="dwcVerbatimSRS" />
+            <TextField className="col-md-6" name="dwcVerbatimSRS" />
           </div>
           <div className="row">
-            <TextField className="col-md-4" name="dwcVerbatimElevation" />
-            <TextField className="col-md-4" name="dwcVerbatimDepth" />
+            <TextField className="col-md-6" name="dwcVerbatimElevation" />
+            <TextField className="col-md-6" name="dwcVerbatimDepth" />
           </div>
         </div>
 
-        <div className="col-md-4">
+        <div className="col-md-6">
           <Tabs>
             <TabList>
               <Tab>

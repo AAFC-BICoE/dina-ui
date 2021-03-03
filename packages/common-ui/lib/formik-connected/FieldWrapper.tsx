@@ -12,6 +12,9 @@ export interface LabelWrapperParams {
 
   /** The label for the field. */
   label?: string;
+
+  /** Override the default tooltip key. */
+  tooltipKey?: string;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -30,9 +33,12 @@ export function FieldWrapper({
   hideLabel = false,
   name,
   label,
-  children
+  children,
+  tooltipKey
 }: FieldWrapperProps) {
-  const fieldLabel = label ?? <FieldHeader name={name} />;
+  const fieldLabel = label ?? (
+    <FieldHeader name={name} tooltipKey={tooltipKey} />
+  );
 
   return (
     <div className={className}>

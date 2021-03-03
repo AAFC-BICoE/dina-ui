@@ -76,9 +76,7 @@ describe("CollectingEvent details page", () => {
 
     expect(wrapper.containsMatchingElement(<p>12, 13, 14</p>)).toEqual(true);
 
-    expect(wrapper.find(".dwcDecimalLongitude input").prop("value")).toEqual(
-      "12.5"
-    );
+    expect(wrapper.containsMatchingElement(<p>12.5</p>)).toEqual(true);
   });
 
   /** Test component for testing the useAttachMetadatasToCollectingEvent hook. */

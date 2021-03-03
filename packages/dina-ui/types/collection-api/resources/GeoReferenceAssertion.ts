@@ -7,6 +7,11 @@ export interface GeoReferenceAssertionAttributes {
   dwcDecimalLatitude?: number;
   dwcDecimalLongitude?: number;
   dwcCoordinateUncertaintyInMeters?: number;
+  dwcGeoreferencedDate?: string;
+  literalGeoreferencedBy?: string;
+  dwcGeoreferenceProtocol?: string;
+  dwcGeoreferenceSources?: string;
+  dwcGeoreferenceRemarks?: string;
 }
 
 export type GeoReferenceAssertion = KitsuResource &
