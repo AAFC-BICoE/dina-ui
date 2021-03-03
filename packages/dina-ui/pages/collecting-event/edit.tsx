@@ -127,18 +127,45 @@ function CollectingEventFormInternal({
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [checked, setChecked] = useState(false);
-  const { values } = useFormikContext<CollectingEvent>();
+  const { doOperations } = useContext(ApiClientContext);
+  const { setFieldValue, setFieldTouched, values } = useFormikContext<
+    CollectingEvent
+  >();
 
-  const CustomDeleteButton = connect<{}, GeoReferenceAssertion>(
-    ({ formik: { setFieldValue, setFieldTouched } }) => (
-      <DeleteAssertionButton
-        ids={ids}
-        setAssertionIds={setAssertionIds}
-        setFieldValue={setFieldValue}
-        setFieldTouched={setFieldTouched}
-      />
-    )
-  );
+  const CustomDeleteAllButton = () => {
+    if (!ids) {
+      return null;
+    }
+    return (
+      <button
+        className={`btn btn-danger delete-all-button`}
+        onClick={() => deleteById(ids)}
+        type="button"
+        style={{ marginLeft: 10 }}
+      >
+        <CommonMessage id="deleteAllButtonText" />
+      </button>
+    );
+  };
+
+  const deleteById = async assertionIds => {
+    await doOperations(
+      assertionIds?.map(id => ({
+        op: "DELETE",
+        path: `georeference-assertion/${id}`
+      })),
+      { apiBaseUrl: "/collection-api" }
+    );
+
+    ids?.forEach(id => {
+      values.geoReferenceAssertions?.splice(id, 1);
+    });
+    setFieldValue("geoReferenceAssertions", values.geoReferenceAssertions);
+    setFieldTouched("geoReferenceAssertions", true);
+    setAssertionIds(
+      values.geoReferenceAssertions?.map(assertion => assertion.id)
+    );
+  };
 
   const blankAssertion = index => {
     const key1 = index + "dwcDecimalLatitude";
@@ -270,6 +297,7 @@ function CollectingEventFormInternal({
                           (assertion, index) => (
                             <li className="list-group-item" key={index}>
                               <GeoReferenceAssertionRow
+                                onDeleteClick={() => deleteById([assertion.id])}
                                 index={index}
                                 assertion={assertion}
                                 onAddClick={() =>
@@ -303,7 +331,7 @@ function CollectingEventFormInternal({
                   >
                     <DinaMessage id="saveGeoReferenceAssertion" />
                   </FormikButton>
-                  {ids && <CustomDeleteButton />}
+                  {ids?.length > 0 && <CustomDeleteAllButton />}
                 </ul>
               </div>
             </TabPanel>
@@ -496,12 +524,12 @@ const DeleteAssertionButton = ({
   }
   return (
     <button
-      className={`btn btn-danger delete-button`}
+      className={`btn btn-danger delete-all-button`}
       onClick={doDelete}
       type="button"
       style={{ marginLeft: 10 }}
     >
-      <CommonMessage id="deleteButtonText" />
+      <CommonMessage id="deleteAllButtonText" />
     </button>
   );
 };
