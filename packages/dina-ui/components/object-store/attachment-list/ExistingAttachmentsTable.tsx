@@ -17,7 +17,7 @@ import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
 export interface ExistingAttachmentsTableProps {
   attachmentPath: string;
   onDetachMetadataIds?: (metadataIds: string[]) => Promise<void>;
-  onMetadatasEdited: () => Promise<void>;
+  onMetadatasEdited?: () => void | Promise<void>;
 }
 export interface AttachmentsTableFormValues {
   /** Tracks which metadata IDs are selected. */
@@ -133,13 +133,15 @@ export function ExistingAttachmentsTable({
           >
             <DinaMessage id="editSelectedButtonText" />
           </FormikButton>
-          <FormikButton
-            buttonProps={bulkButtonProps}
-            className="btn btn-primary ml-2 metadata-detach-button"
-            onClick={detachSelectedMetadatas}
-          >
-            <DinaMessage id="detachSelectedButtonText" />
-          </FormikButton>
+          {onDetachMetadataIds && (
+            <FormikButton
+              buttonProps={bulkButtonProps}
+              className="btn btn-primary ml-2 metadata-detach-button"
+              onClick={detachSelectedMetadatas}
+            >
+              <DinaMessage id="detachSelectedButtonText" />
+            </FormikButton>
+          )}
         </div>
       </div>
       <QueryTable

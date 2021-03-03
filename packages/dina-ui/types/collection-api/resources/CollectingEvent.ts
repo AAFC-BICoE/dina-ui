@@ -5,7 +5,7 @@ import { GeoReferenceAssertion } from "./GeoReferenceAssertion";
 
 export interface CollectingEventAttributes {
   uuid: string;
-  attachment?: KitsuResource[];
+  attachment?: ResourceIdentifierObject[];
   startEventDateTime: string;
   endEventDateTime?: string;
   dwcRecordedBy?: string;

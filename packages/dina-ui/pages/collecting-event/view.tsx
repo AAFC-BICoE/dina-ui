@@ -22,6 +22,7 @@ import { CollectingEvent } from "../../types/collection-api/resources/Collecting
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { FieldArray } from "formik";
 import { GeoReferenceAssertionRow } from "../../components/collection/GeoReferenceAssertionRow";
+import { AttachmentReadOnlySection } from "../../components/object-store/attachment-list/AttachmentReadOnlySection";
 
 export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -58,11 +59,6 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
       onSuccess: getAgents
     }
   );
-
-  const {
-    attachMetadatasToCollectingEvent,
-    detachMetadataIds
-  } = useAttachMetadatasToCollectingEvent();
 
   return (
     <div>
@@ -234,14 +230,8 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                 </DinaForm>
               )}
               <div className="form-group">
-                <AttachmentSection
+                <AttachmentReadOnlySection
                   attachmentPath={`collection-api/collecting-event/${id}/attachment`}
-                  onDetachMetadataIds={metadataIds =>
-                    detachMetadataIds(metadataIds, String(id))
-                  }
-                  afterMetadatasSaved={metadataIds =>
-                    attachMetadatasToCollectingEvent(metadataIds, String(id))
-                  }
                 />
               </div>
             </div>
@@ -251,68 +241,6 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
       <Footer />
     </div>
   );
-}
-
-export function useAttachMetadatasToCollectingEvent() {
-  const { apiClient, doOperations } = useContext(ApiClientContext);
-
-  async function attachMetadatasToCollectingEvent(
-    metadataIds: string[],
-    collectingEventId: string
-  ) {
-    const { data: collectingEvent } = await apiClient.get<CollectingEvent>(
-      `collection-api/collecting-event/${collectingEventId}`,
-      { include: "attachment" }
-    );
-    const newAttachmentList = uniqBy(
-      [
-        ...(collectingEvent.attachment ?? []),
-        ...metadataIds.map(id => ({ id, type: "metadata" }))
-      ],
-      attachment => attachment.id
-    );
-
-    await updateCollectingEvent(collectingEvent.id, newAttachmentList);
-  }
-
-  async function detachMetadataIds(
-    metadataIdsToDetach: string[],
-    collectingEventId: string
-  ) {
-    const { data: collectingEvent } = await apiClient.get<CollectingEvent>(
-      `collection-api/collecting-event/${collectingEventId}`,
-      { include: "attachment" }
-    );
-    const newAttachmentList = (collectingEvent.attachment ?? []).filter(
-      existingAttachment => !metadataIdsToDetach.includes(existingAttachment.id)
-    );
-
-    await updateCollectingEvent(collectingEvent.id, newAttachmentList);
-  }
-
-  async function updateCollectingEvent(
-    id: string,
-    newAttachmentsList: ResourceIdentifierObject[]
-  ) {
-    await doOperations(
-      [
-        {
-          op: "PATCH",
-          path: `collecting-event/${id}`,
-          value: {
-            id,
-            type: "collecting-event",
-            relationships: {
-              attachment: { data: newAttachmentsList }
-            }
-          }
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
-  }
-
-  return { attachMetadatasToCollectingEvent, detachMetadataIds };
 }
 
 export default withRouter(CollectingEventDetailsPage);
