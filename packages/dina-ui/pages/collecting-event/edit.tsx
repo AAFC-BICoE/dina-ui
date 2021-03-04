@@ -430,9 +430,11 @@ function CollectingEventForm({
     delete submittedValues.collectorGroups;
 
     if (assertionIds) {
-      assertionIds.splice(
-        assertionIds.findIndex(Id => Id === null || Id === undefined)?.[0]
+      const nullEleIndex = assertionIds.findIndex(
+        Id => Id === null || Id === undefined
       );
+      if (nullEleIndex !== -1) assertionIds.splice(nullEleIndex);
+
       if (assertionIds.length > 0)
         submittedValues.relationships.geoReferenceAssertions = {
           data: assertionIds.map(assertionId => ({
@@ -506,37 +508,3 @@ function CollectingEventForm({
     </DinaForm>
   );
 }
-
-const DeleteAssertionButton = ({
-  ids,
-  setFieldValue,
-  setFieldTouched,
-  setAssertionIds
-}) => {
-  const { doOperations } = useContext(ApiClientContext);
-  async function doDelete() {
-    await doOperations(
-      ids.map(id => ({
-        op: "DELETE",
-        path: `georeference-assertion/${id}`
-      })),
-      { apiBaseUrl: "/collection-api" }
-    );
-    setFieldValue("geoReferenceAssertions", []);
-    setFieldTouched("geoReferenceAssertions", true);
-    setAssertionIds([]);
-  }
-  if (!ids) {
-    return null;
-  }
-  return (
-    <button
-      className={`btn btn-danger delete-all-button`}
-      onClick={doDelete}
-      type="button"
-      style={{ marginLeft: 10 }}
-    >
-      <CommonMessage id="deleteAllButtonText" />
-    </button>
-  );
-};
