@@ -7,6 +7,8 @@ import {
 } from "common-ui";
 import { GeoReferenceAssertion } from "../../types/collection-api/resources/GeoReferenceAssertion";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { connect } from "formik";
+import { get } from "lodash";
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
@@ -27,52 +29,55 @@ export function GeoReferenceAssertionRow({
 }: GeoReferenceAssertionRowProps) {
   const { formatMessage } = useDinaIntl();
   return (
-    <>
+    <div>
       {viewOnly ? (
-        <div className="row">
-          <div className="col-md-6">
-            <FieldView
-              name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
-              label={formatMessage("decimalLatitude")}
-              className={"dwcDecimalLatitude"}
-            />
-            <FieldView
-              name={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
-              label={formatMessage("decimalLongitude")}
-              className={"dwcDecimalLongitude"}
-            />
-            <FieldView
-              name={`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`}
-              label={formatMessage("coordinateUncertaintyInMeters")}
-              className={"dwcCoordinateUncertaintyInMeters"}
-            />
-            <FieldView
-              name={`geoReferenceAssertions[${index}].dwcGeoreferencedDate`}
-              className={"dwcGeoreferencedDate"}
-              label={formatMessage("georeferencedDateLabel")}
-            />
-          </div>
-          <div className="col-md-6">
-            <FieldView
-              name={`geoReferenceAssertions[${index}].literalGeoreferencedBy`}
-              className={"literalGeoreferencedBy"}
-              label={formatMessage("literalGeoreferencedByLabel")}
-            />
-            <FieldView
-              name={`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`}
-              className={"dwcGeoreferenceProtocol"}
-              customName={"dwcGeoreferenceProtocol"}
-            />
-            <FieldView
-              name={`geoReferenceAssertions[${index}].dwcGeoreferenceSources`}
-              className={"dwcGeoreferenceSources"}
-              customName={"dwcGeoreferenceSources"}
-            />
-            <FieldView
-              name={`geoReferenceAssertions[${index}].dwcGeoreferenceRemarks`}
-              className={"dwcGeoreferenceRemarks"}
-              customName={"dwcGeoreferenceRemarks"}
-            />
+        <div>
+          <ViewInMapButton assertionPath={`geoReferenceAssertions.${index}`} />
+          <div className="row">
+            <div className="col-md-6">
+              <FieldView
+                name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
+                label={formatMessage("decimalLatitude")}
+                className={"dwcDecimalLatitude"}
+              />
+              <FieldView
+                name={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
+                label={formatMessage("decimalLongitude")}
+                className={"dwcDecimalLongitude"}
+              />
+              <FieldView
+                name={`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`}
+                label={formatMessage("coordinateUncertaintyInMeters")}
+                className={"dwcCoordinateUncertaintyInMeters"}
+              />
+              <FieldView
+                name={`geoReferenceAssertions[${index}].dwcGeoreferencedDate`}
+                className={"dwcGeoreferencedDate"}
+                label={formatMessage("georeferencedDateLabel")}
+              />
+            </div>
+            <div className="col-md-6">
+              <FieldView
+                name={`geoReferenceAssertions[${index}].literalGeoreferencedBy`}
+                className={"literalGeoreferencedBy"}
+                label={formatMessage("literalGeoreferencedByLabel")}
+              />
+              <FieldView
+                name={`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`}
+                className={"dwcGeoreferenceProtocol"}
+                customName={"dwcGeoreferenceProtocol"}
+              />
+              <FieldView
+                name={`geoReferenceAssertions[${index}].dwcGeoreferenceSources`}
+                className={"dwcGeoreferenceSources"}
+                customName={"dwcGeoreferenceSources"}
+              />
+              <FieldView
+                name={`geoReferenceAssertions[${index}].dwcGeoreferenceRemarks`}
+                className={"dwcGeoreferenceRemarks"}
+                customName={"dwcGeoreferenceRemarks"}
+              />
+            </div>
           </div>
         </div>
       ) : (
@@ -156,6 +161,29 @@ export function GeoReferenceAssertionRow({
           )}
         </div>
       )}
-    </>
+    </div>
   );
 }
+
+export const ViewInMapButton = connect<{ assertionPath: string }>(
+  ({ assertionPath, formik: { values } }) => {
+    const { dwcDecimalLatitude: lat, dwcDecimalLongitude: lon } = get(
+      values,
+      assertionPath
+    );
+
+    const showButton = typeof lat === "number" && typeof lon === "number";
+
+    return showButton ? (
+      <div className="form-group">
+        <a
+          href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}`}
+          target="_blank"
+          className="btn btn-info"
+        >
+          <DinaMessage id="viewOnMap" />
+        </a>
+      </div>
+    ) : null;
+  }
+);
