@@ -1,4 +1,5 @@
 import { FieldHeader, useApiClient, useModal } from "common-ui";
+import { PersistedResource } from "kitsu";
 import { uniqBy } from "lodash";
 import { useState } from "react";
 import ReactTable from "react-table";
@@ -6,9 +7,18 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import { AttachmentSection } from "./AttachmentSection";
 
-export function useAttachmentsModal() {
+export interface AttachmentsModalParams {
+  /** Pre-existing metadata attachments. */
+  initialMetadatas?: PersistedResource<Metadata>[];
+}
+
+export function useAttachmentsModal({
+  initialMetadatas = []
+}: AttachmentsModalParams) {
   const { closeModal, openModal } = useModal();
-  const [selectedMetadatas, setSelectedMetadatas] = useState<Metadata[]>([]);
+  const [selectedMetadatas, setSelectedMetadatas] = useState<Metadata[]>(
+    initialMetadatas
+  );
   const { bulkGet } = useApiClient();
 
   async function addAttachedMetadatas(metadataIds: string[]) {

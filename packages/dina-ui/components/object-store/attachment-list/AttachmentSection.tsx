@@ -11,6 +11,7 @@ import {
   ExistingAttachmentsTableProps
 } from "./ExistingAttachmentsTable";
 import { ExistingObjectsAttacher } from "./ExistingObjectsAttacher";
+import { TotalAttachmentsIndicator } from "./TotalAttachmentsIndicator";
 
 export interface AttachmentListProps
   extends Omit<
@@ -94,22 +95,4 @@ export function AttachmentSection({
       </Tabs>
     </div>
   );
-}
-
-interface TotalAttachmentsIndicatorProps {
-  attachmentPath: string;
-  lastSave: number;
-}
-
-function TotalAttachmentsIndicator({
-  attachmentPath,
-  lastSave
-}: TotalAttachmentsIndicatorProps) {
-  const { response: attachmentsRes } = useQuery<[]>(
-    { path: attachmentPath },
-    { deps: [lastSave] }
-  );
-  const totalAttachments = attachmentsRes?.data?.length;
-
-  return totalAttachments ? <span>({totalAttachments})</span> : null;
 }

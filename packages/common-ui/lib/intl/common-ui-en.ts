@@ -16,6 +16,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
     "Check this header box to check all visible items in this page.",
   closeButtonText: "Close",
   createButtonText: "Create New",
+  deleteAllButtonText: "Delete All",
   deleteButtonText: "Delete",
   editableTable: "Editable Table",
   editButtonText: "Edit",
