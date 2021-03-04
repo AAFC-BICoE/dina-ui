@@ -123,30 +123,62 @@ export default function CollectingEventEditPage() {
 
 interface CollectingEventFormInternalProps {
   saveGeoReferenceAssertion: ({}) => void;
-  id: string;
-  setAssertionId: Dispatch<any>;
+  ids: string[];
+  setAssertionIds: Dispatch<any>;
 }
 
 function CollectingEventFormInternal({
   saveGeoReferenceAssertion,
-  id,
-  setAssertionId
+  ids: ids,
+  setAssertionIds: setAssertionIds
 }: CollectingEventFormInternalProps) {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [checked, setChecked] = useState(false);
-  const { values } = useFormikContext<CollectingEvent>();
+  const { doOperations } = useContext(ApiClientContext);
+  const { setFieldValue, setFieldTouched, values } = useFormikContext<
+    CollectingEvent
+  >();
 
-  const CustomDeleteButton = connect<{}, GeoReferenceAssertion>(
-    ({ formik: { setFieldValue, setFieldTouched } }) => (
-      <DeleteAssertionButton
-        id={id}
-        setAssertionId={setAssertionId}
-        setFieldValue={setFieldValue}
-        setFieldTouched={setFieldTouched}
-      />
-    )
-  );
+  const CustomDeleteAllButton = () => {
+    if (!ids) {
+      return null;
+    }
+    return (
+      <button
+        className={`btn btn-danger delete-all-button`}
+        onClick={() => deleteById(ids)}
+        type="button"
+        style={{ marginLeft: 10 }}
+      >
+        <CommonMessage id="deleteAllButtonText" />
+      </button>
+    );
+  };
+
+  const deleteById = async assertionIds => {
+    await doOperations(
+      assertionIds?.map(id => ({
+        op: "DELETE",
+        path: `georeference-assertion/${id}`
+      })),
+      { apiBaseUrl: "/collection-api" }
+    );
+
+    assertionIds?.forEach(id => {
+      values.geoReferenceAssertions?.splice(
+        values.geoReferenceAssertions?.findIndex(
+          assertion => assertion.id === id
+        ),
+        1
+      );
+    });
+    setFieldValue("geoReferenceAssertions", values.geoReferenceAssertions);
+    setFieldTouched("geoReferenceAssertions", true);
+    setAssertionIds(
+      values.geoReferenceAssertions?.map(assertion => assertion.id)
+    );
+  };
 
   const blankAssertion = index => {
     const key1 = index + "dwcDecimalLatitude";
@@ -278,6 +310,7 @@ function CollectingEventFormInternal({
                           (assertion, index) => (
                             <li className="list-group-item" key={index}>
                               <GeoReferenceAssertionRow
+                                onDeleteClick={() => deleteById([assertion.id])}
                                 index={index}
                                 assertion={assertion}
                                 onAddClick={() =>
@@ -305,13 +338,13 @@ function CollectingEventFormInternal({
                     className="btn btn-primary add-assertion-button"
                     onClick={() =>
                       saveGeoReferenceAssertion(
-                        values.geoReferenceAssertions?.[0] as any
+                        values.geoReferenceAssertions ?? {}
                       )
                     }
                   >
                     <DinaMessage id="saveGeoReferenceAssertion" />
                   </FormikButton>
-                  {id && <CustomDeleteButton />}
+                  {ids?.length > 0 && <CustomDeleteAllButton />}
                 </ul>
               </div>
             </TabPanel>
@@ -346,30 +379,26 @@ function CollectingEventForm({
         type: "collecting-event",
         collectors: [],
         collectorGroups: [],
-        startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
-        geoReferenceAssertions: [],
-        dwcOtherRecordNumbers: []
+        startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM"
       };
 
   const { save } = useApiClient();
-  const [assertionId, setAssertionId] = useState(
-    initialValues.geoReferenceAssertions?.[0]?.id ?? (undefined as any)
+  const [assertionIds, setAssertionIds] = useState(
+    collectingEvent?.geoReferenceAssertions?.map(assert => assert.id)
   );
 
-  const saveGeoReferenceAssertion = async assertion => {
-    if (!assertion) return;
-    const [saved] = await save(
-      [
-        {
-          resource: { ...assertion, type: "georeference-assertion" },
-          type: "georeference-assertion"
-        }
-      ],
+  const saveGeoReferenceAssertion = async assertions => {
+    if (!assertions) return;
+    const savedAssertions = await save(
+      assertions.map(assertion => ({
+        resource: { ...assertion, type: "georeference-assertion" },
+        type: "georeference-assertion"
+      })),
       {
         apiBaseUrl: "/collection-api"
       }
     );
-    setAssertionId(saved.id);
+    setAssertionIds(savedAssertions.map(assert => assert.id));
   };
 
   const onSubmit: DinaFormOnSubmit = async ({ submittedValues }) => {
@@ -415,15 +444,19 @@ function CollectingEventForm({
       submittedValues.collectorGroupUuid = submittedValues.collectorGroups.id;
     delete submittedValues.collectorGroups;
 
-    if (assertionId) {
-      submittedValues.relationships.geoReferenceAssertions = {
-        data: [
-          {
+    if (assertionIds) {
+      const nullEleIndex = assertionIds.findIndex(
+        Id => Id === null || Id === undefined
+      );
+      if (nullEleIndex !== -1) assertionIds.splice(nullEleIndex);
+
+      if (assertionIds.length > 0)
+        submittedValues.relationships.geoReferenceAssertions = {
+          data: assertionIds.map(assertionId => ({
             id: assertionId,
             type: "georeference-assertion"
-          }
-        ]
-      };
+          }))
+        };
     }
     delete submittedValues.geoReferenceAssertions;
     // Convert user-suplied string to string array:
@@ -486,47 +519,10 @@ function CollectingEventForm({
       </ButtonBar>
       <CollectingEventFormInternal
         saveGeoReferenceAssertion={saveGeoReferenceAssertion}
-        id={assertionId}
-        setAssertionId={setAssertionId}
+        ids={assertionIds as any}
+        setAssertionIds={setAssertionIds}
       />
       <div className="form-group">{attachedMetadatasUI}</div>
     </DinaForm>
   );
 }
-
-const DeleteAssertionButton = ({
-  id,
-  setFieldValue,
-  setFieldTouched,
-  setAssertionId
-}) => {
-  const { doOperations } = useContext(ApiClientContext);
-  async function doDelete() {
-    await doOperations(
-      [
-        {
-          op: "DELETE",
-          path: `georeference-assertion/${id}`
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
-    setFieldValue("geoReferenceAssertions", []);
-    setFieldTouched("geoReferenceAssertions", true);
-    setAssertionId(null);
-  }
-  if (!id) {
-    return null;
-  }
-
-  return (
-    <button
-      className={`btn btn-danger delete-button`}
-      onClick={doDelete}
-      type="button"
-      style={{ marginLeft: 10 }}
-    >
-      <CommonMessage id="deleteButtonText" />
-    </button>
-  );
-};
