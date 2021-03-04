@@ -1,6 +1,11 @@
+import { PersistedResource } from "kitsu";
 import { last } from "lodash";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { useAttachmentsModal } from "../attachments-modal";
+import { Metadata } from "../../../../types/objectstore-api";
+import {
+  AttachmentsModalParams,
+  useAttachmentsModal
+} from "../attachments-modal";
 
 const hookRender = jest.fn();
 
@@ -10,8 +15,8 @@ function lastHookReturn() {
   >;
 }
 
-function TestComponent() {
-  const hookReturn = useAttachmentsModal();
+function TestComponent({ initialMetadatas }: AttachmentsModalParams) {
+  const hookReturn = useAttachmentsModal({ initialMetadatas });
   hookRender(hookReturn);
   return null;
 }
@@ -83,5 +88,31 @@ describe("Attachments modal", () => {
       { id: "1", type: "metadata" },
       { id: "9", type: "metadata" }
     ]);
+  });
+
+  it("Can be initialized with existing Metadatas.", async () => {
+    const TEST_METADATAS: PersistedResource<Metadata>[] = [
+      {
+        id: "1",
+        type: "metadata",
+        originalFilename: "test-file-1",
+        bucket: "bucket",
+        fileIdentifier: "111"
+      },
+      {
+        id: "2",
+        type: "metadata",
+        originalFilename: "test-file-2",
+        bucket: "bucket",
+        fileIdentifier: "222"
+      }
+    ];
+
+    mountWithAppContext(<TestComponent initialMetadatas={TEST_METADATAS} />, {
+      apiContext
+    });
+
+    // Initially empty:
+    expect(lastHookReturn().selectedMetadatas).toEqual(TEST_METADATAS);
   });
 });
