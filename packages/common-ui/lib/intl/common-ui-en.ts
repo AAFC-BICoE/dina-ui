@@ -40,6 +40,9 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   filterRecordsTitle: "Filter records",
   filterSubmitButtonText: "Filter List",
   filterUntil: "UNTIL",
+  geoSuggest: "Geo-Suggest",
+  geoSuggestTooltip:
+    "This button shows some suggested geo-locations based on what you've typed into the field.",
   loadingText: "Loading...",
   loggedInAsUser: "Logged in as:",
   logoutBtn: "Logout",

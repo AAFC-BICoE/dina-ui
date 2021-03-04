@@ -15,7 +15,8 @@ import {
   SubmitButton,
   useApiClient,
   TextField,
-  FormikButton
+  FormikButton,
+  GeoSuggestTextField
 } from "common-ui";
 import { KitsuResponse, PersistedResource } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
@@ -264,10 +265,7 @@ function CollectingEventFormInternal({
         />
       </div>
       <div className="row">
-        <KeyboardEventHandlerWrappedTextField
-          className="col-md-3"
-          name="dwcVerbatimLocality"
-        />
+        <GeoSuggestTextField className="col-md-3" name="dwcVerbatimLocality" />
         <KeyboardEventHandlerWrappedTextField
           name="dwcVerbatimLatitude"
           className="col-md-3"
