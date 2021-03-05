@@ -7,28 +7,20 @@ import {
 import { FormikContextType, useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { debounce, uniq } from "lodash";
-import {
-  createContext,
-  InputHTMLAttributes,
-  useCallback,
-  useContext,
-  useState
-} from "react";
+import { InputHTMLAttributes, useCallback, useState } from "react";
 import AutoSuggest, { InputProps } from "react-autosuggest";
 
 export type AutoSuggestTextFieldProps<
   T extends KitsuResource
-> = TextFieldProps & AutoSuggestContextI<T>;
+> = TextFieldProps & AutoSuggestConfig<T>;
 
-interface AutoSuggestContextI<T extends KitsuResource> {
+interface AutoSuggestConfig<T extends KitsuResource> {
   query: (
     searchValue: string,
     formikCtx: FormikContextType<any>
   ) => JsonApiQuerySpec;
   suggestion: (resource: PersistedResource<T>) => string;
 }
-
-const AutoSuggestContext = createContext<AutoSuggestContextI<any>>(null as any);
 
 /**
  * Suggests typeahead values based on a back-end query.
@@ -40,20 +32,25 @@ export function AutoSuggestTextField<T extends KitsuResource>({
   ...textFieldProps
 }: AutoSuggestTextFieldProps<T>) {
   return (
-    <AutoSuggestContext.Provider value={{ query, suggestion }}>
-      <TextField
-        {...textFieldProps}
-        CustomInput={AutoSuggestTextFieldInternal}
-      />
-    </AutoSuggestContext.Provider>
+    <TextField
+      {...textFieldProps}
+      customInput={inputProps => (
+        <AutoSuggestTextFieldInternal
+          query={query}
+          suggestion={suggestion}
+          {...inputProps}
+        />
+      )}
+    />
   );
 }
 
-function AutoSuggestTextFieldInternal<T extends KitsuResource>(
-  inputProps: InputHTMLAttributes<any>
-) {
+function AutoSuggestTextFieldInternal<T extends KitsuResource>({
+  query,
+  suggestion,
+  ...inputProps
+}: InputHTMLAttributes<any> & AutoSuggestConfig<T>) {
   const formikCtx = useFormikContext<any>();
-  const { query, suggestion } = useContext(AutoSuggestContext);
 
   const [searchValue, setSearchValue] = useState("");
   const debouncedSetSearchValue = useCallback(

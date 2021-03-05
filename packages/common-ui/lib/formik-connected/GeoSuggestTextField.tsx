@@ -1,20 +1,15 @@
 import { LoadingSpinner, TextField, TextFieldProps } from "common-ui";
 import { noop } from "lodash";
-import {
-  createContext,
-  FormEvent,
-  InputHTMLAttributes,
-  useContext,
-  useState
-} from "react";
+import { FormEvent, InputHTMLAttributes, useState } from "react";
 import AutoSuggest, { InputProps } from "react-autosuggest";
 import useSWR from "swr";
 import { CommonMessage } from "../intl/common-ui-intl";
+import { KeyboardEventHandlerWrapper } from "../keyboard-event-handler/KeyboardEventHandlerWrappedTextField";
 import { Tooltip } from "../tooltip/Tooltip";
 
-export type GeoSuggestTextFieldProps = TextFieldProps & GeoSuggestContextI;
+export type GeoSuggestTextFieldProps = TextFieldProps & GeoSuggestProps;
 
-export interface GeoSuggestContextI {
+export interface GeoSuggestProps {
   /** Fetches json from a url. */
   fetchJson?: (url: string) => Promise<any>;
 }
@@ -25,8 +20,6 @@ export interface NominatumApiSearchResult {
   type: string;
 }
 
-const GeoSuggestContext = createContext<GeoSuggestContextI>(null as any);
-
 /**
  * Suggests typeahead values based on a back-end query.
  * The suggestion values are taken from each returned API resource.
@@ -36,20 +29,25 @@ export function GeoSuggestTextField({
   ...textFieldProps
 }: GeoSuggestTextFieldProps) {
   return (
-    <GeoSuggestContext.Provider value={{ fetchJson }}>
-      <TextField
-        {...textFieldProps}
-        CustomInput={GeoSuggestTextFieldInternal}
-      />
-    </GeoSuggestContext.Provider>
+    <TextField
+      {...textFieldProps}
+      customInput={inputProps => (
+        <GeoSuggestTextFieldInternal
+          fetchJson={fetchJson}
+          {...(inputProps as any)}
+        />
+      )}
+    />
   );
 }
 
-function GeoSuggestTextFieldInternal(inputProps: InputHTMLAttributes<any>) {
-  const {
-    fetchJson = url => window.fetch(url).then(res => res.json())
-  } = useContext(GeoSuggestContext);
+type GeoSuggestTextFieldInternalProps = InputHTMLAttributes<any> &
+  GeoSuggestProps;
 
+function GeoSuggestTextFieldInternal({
+  fetchJson = url => window.fetch(url).then(res => res.json()),
+  ...inputProps
+}: GeoSuggestTextFieldInternalProps) {
   const [geoSearchValue, setGeoSearchValue] = useState("");
 
   /** Whether the Geo Api is on hold. Just to make sure we don't send more requests than we are allowed to. */
@@ -114,29 +112,32 @@ function GeoSuggestTextFieldInternal(inputProps: InputHTMLAttributes<any>) {
   return (
     <div>
       <style>{`.autosuggest-highlighted { background-color: #ddd; }`}</style>
-      <AutoSuggest
-        suggestions={suggestions}
-        getSuggestionValue={s => s}
-        onSuggestionsClearRequested={() => setGeoSearchValue("")}
-        onSuggestionsFetchRequested={noop}
-        onSuggestionSelected={(_, data) =>
-          inputProps.onChange?.({ target: { value: data.suggestion } } as any)
-        }
-        renderSuggestion={text => <div>{text}</div>}
-        renderInputComponent={props => (
-          <textarea rows={3} {...(props as any)} />
-        )}
-        inputProps={{
-          ...(inputProps as InputProps<any>),
-          onChange: onChangeInternal
-        }}
-        theme={{
-          suggestionsList: "list-group",
-          suggestion: "list-group-item",
-          suggestionHighlighted: "autosuggest-highlighted"
-        }}
-      />
+      <KeyboardEventHandlerWrapper onChange={inputProps.onChange}>
+        <AutoSuggest
+          suggestions={suggestions}
+          getSuggestionValue={s => s}
+          onSuggestionsClearRequested={() => setGeoSearchValue("")}
+          onSuggestionsFetchRequested={noop}
+          onSuggestionSelected={(_, data) =>
+            inputProps.onChange?.({ target: { value: data.suggestion } } as any)
+          }
+          renderSuggestion={text => <div>{text}</div>}
+          renderInputComponent={props => (
+            <textarea rows={3} {...(props as any)} />
+          )}
+          inputProps={{
+            ...(inputProps as InputProps<any>),
+            onChange: onChangeInternal
+          }}
+          theme={{
+            suggestionsList: "list-group",
+            suggestion: "list-group-item",
+            suggestionHighlighted: "autosuggest-highlighted"
+          }}
+        />
+      </KeyboardEventHandlerWrapper>
       {!suggestions.length && (
+        // Only show the geo-suggest button when the previous suggestion box is closed.
         <div className="form-group">
           <div className="float-right">
             {suggestionsAreLoading ? (
