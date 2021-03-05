@@ -68,7 +68,13 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>(
 
   return (
     <>
-      <style>{`.autosuggest-highlighted { background-color: #ddd; }`}</style>
+      <style>{`
+        .container-open   {      
+          position: absolute;
+          z-index: 2;
+          margin: 0 0 0 -15px; }, 
+        .container  {display:none;}, 
+        .autosuggest-highlighted { background-color: #ddd; }`}</style>
       <AutoSuggest
         suggestions={suggestions}
         getSuggestionValue={s => s}
@@ -87,7 +93,9 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>(
         theme={{
           suggestionsList: "list-group",
           suggestion: "list-group-item",
-          suggestionHighlighted: "autosuggest-highlighted"
+          suggestionHighlighted: "autosuggest-highlighted",
+          suggestionsContainerOpen: "container-open",
+          suggestionsContainer: "container"
         }}
       />
     </>
