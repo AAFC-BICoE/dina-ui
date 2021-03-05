@@ -66,6 +66,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
           entityId={id as string}
           entityLink="/collecting-event"
           byPassView={true}
+          customLabel={true}
         />
       </ButtonBar>
       {withResponse(collectingEventQuery, ({ data: colEvent }) => {

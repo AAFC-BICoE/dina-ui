@@ -14,6 +14,8 @@ interface CancelButtonProps {
 
   /** The link for where to redirect the user  */
   navigateTo?: string;
+
+  customLabel?: boolean;
 }
 
 /**
@@ -23,7 +25,8 @@ export function CancelButton({
   entityId,
   entityLink,
   byPassView,
-  navigateTo
+  navigateTo,
+  customLabel
 }: CancelButtonProps) {
   // When editing an existing entity, the link points to the entity details page.
   // When editing a new entity, the link points to the list page.
@@ -39,7 +42,11 @@ export function CancelButton({
   return (
     <Link href={href}>
       <a className="btn btn-outline-secondary">
-        <CommonMessage id="cancelButtonText" />
+        {customLabel ? (
+          <CommonMessage id="backLabel" />
+        ) : (
+          <CommonMessage id="cancelButtonText" />
+        )}
       </a>
     </Link>
   );
