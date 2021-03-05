@@ -125,12 +125,15 @@ interface CollectingEventFormInternalProps {
   saveGeoReferenceAssertion: ({}) => void;
   ids: string[];
   setAssertionIds: Dispatch<any>;
+  managedAssertions: GeoReferenceAssertion[];
+  setManagedAssertions: Dispatch<any>;
 }
 
 function CollectingEventFormInternal({
-  saveGeoReferenceAssertion,
   ids: ids,
-  setAssertionIds: setAssertionIds
+  setAssertionIds: setAssertionIds,
+  managedAssertions,
+  setManagedAssertions
 }: CollectingEventFormInternalProps) {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
@@ -180,17 +183,19 @@ function CollectingEventFormInternal({
     );
   };
 
-  const blankAssertion = index => {
-    const key1 = index + "dwcDecimalLatitude";
-    const key2 = index + "dwcDecimalLongitude";
-    const key3 = index + "dwcCoordinateUncertaintyInMeters";
+  const blankAssertion = () => {
+    const key1 = "dwcDecimalLatitude";
+    const key2 = "dwcDecimalLongitude";
+    const key3 = "dwcCoordinateUncertaintyInMeters";
     const assertion = {
       [key1]: "",
       [key2]: "",
-      [key3]: ""
+      [key3]: "",
+      type: "georeference-assertion"
     };
     return assertion;
   };
+
   return (
     <div>
       <div className="form-group">
@@ -296,58 +301,54 @@ function CollectingEventFormInternal({
         <div className="col-md-6">
           <Tabs>
             <TabList>
-              <Tab>
-                <DinaMessage id="geoReferencing" />
-              </Tab>
+              {managedAssertions?.length > 0 ? (
+                managedAssertions?.map((assert, idx) => (
+                  <Tab key={idx}> {assert.id ?? idx} </Tab>
+                ))
+              ) : (
+                <Tab>main assertion</Tab>
+              )}
             </TabList>
-            <TabPanel>
-              <div>
-                <ul>
-                  <FieldArray name="geoReferenceAssertions">
-                    {arrayHelpers =>
-                      values.geoReferenceAssertions?.length ? (
-                        values.geoReferenceAssertions?.map(
-                          (assertion, index) => (
-                            <li className="list-group-item" key={index}>
-                              <GeoReferenceAssertionRow
-                                onDeleteClick={() => deleteById([assertion.id])}
-                                index={index}
-                                assertion={assertion}
-                                onAddClick={() =>
-                                  arrayHelpers.insert(index + 1, blankAssertion)
-                                }
-                                onRemoveClick={() => arrayHelpers.remove(index)}
-                              />
-                            </li>
-                          )
+            {managedAssertions?.length > 0 ? (
+              managedAssertions.map((assertion, idx) => (
+                <TabPanel key={idx}>
+                  <GeoReferenceAssertionRow
+                    onDeleteClick={() => deleteById([assertion.id])}
+                    index={idx}
+                    assertion={assertion}
+                  />
+                  {index === 0 && (
+                    <button
+                      style={{ width: "10rem" }}
+                      className="btn btn-primary add-assertion-button"
+                      type="button"
+                      onClick={() =>
+                        setManagedAssertions(
+                          managedAssertions?.concat([blankAssertion() as any])
                         )
-                      ) : (
-                        <button
-                          style={{ width: "10rem" }}
-                          className="btn btn-primary add-assertion-button"
-                          type="button"
-                          onClick={() => arrayHelpers.push(blankAssertion)}
-                        >
-                          <DinaMessage id="addAssertion" />
-                        </button>
-                      )
-                    }
-                  </FieldArray>
-                  <div style={{ height: "5rem" }} />
-                  <FormikButton
-                    className="btn btn-primary add-assertion-button"
-                    onClick={() =>
-                      saveGeoReferenceAssertion(
-                        values.geoReferenceAssertions ?? {}
-                      )
-                    }
-                  >
-                    <DinaMessage id="saveGeoReferenceAssertion" />
-                  </FormikButton>
-                  {ids?.length > 0 && <CustomDeleteAllButton />}
-                </ul>
-              </div>
-            </TabPanel>
+                      }
+                    >
+                      <DinaMessage id="addAssertion" />
+                    </button>
+                  )}
+                </TabPanel>
+              ))
+            ) : (
+              <TabPanel>
+                <button
+                  style={{ width: "10rem" }}
+                  className="btn btn-primary add-assertion-button"
+                  type="button"
+                  onClick={() =>
+                    setManagedAssertions(
+                      managedAssertions?.concat([blankAssertion() as any])
+                    )
+                  }
+                >
+                  <DinaMessage id="addAssertion" />
+                </button>
+              </TabPanel>
+            )}
           </Tabs>
         </div>
       </div>
@@ -369,6 +370,9 @@ function CollectingEventForm({
     >[]
   });
 
+  const [managedAssertions, setManagedAssertions] = useState<[]>(
+    collectingEvent?.geoReferenceAssertions ?? ([] as any)
+  );
   const initialValues = collectingEvent
     ? {
         ...collectingEvent,
@@ -521,6 +525,8 @@ function CollectingEventForm({
         saveGeoReferenceAssertion={saveGeoReferenceAssertion}
         ids={assertionIds as any}
         setAssertionIds={setAssertionIds}
+        managedAssertions={managedAssertions}
+        setManagedAssertions={setManagedAssertions}
       />
       <div className="form-group">{attachedMetadatasUI}</div>
     </DinaForm>
