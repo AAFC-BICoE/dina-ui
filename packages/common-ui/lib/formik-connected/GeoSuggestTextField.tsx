@@ -145,7 +145,7 @@ function GeoSuggestTextFieldInternal({
             ) : (
               <button
                 type="button"
-                className="btn btn-info"
+                className="btn btn-info geo-suggest-button"
                 disabled={geoButtonDisabled}
                 onClick={doGeoSearch}
               >
