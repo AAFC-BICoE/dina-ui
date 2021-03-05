@@ -126,6 +126,6 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
     CheckBoxField,
     CheckBoxHeader,
     setAvailableItems,
-    CheckBoxHeaderDetached: DetachedTotalSelected
+    DetachedTotalSelected
   };
 }

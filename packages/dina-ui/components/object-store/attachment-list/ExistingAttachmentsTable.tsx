@@ -37,7 +37,7 @@ export function ExistingAttachmentsTable({
     CheckBoxField,
     CheckBoxHeader,
     setAvailableItems: setAvailableMetadatas,
-    CheckBoxHeaderDetached
+    DetachedTotalSelected
   } = useGroupedCheckBoxes({
     fieldName: "selectedMetadatas",
     detachTotalSelected
@@ -131,7 +131,7 @@ export function ExistingAttachmentsTable({
     >
       <div className="list-inline" style={{ minHeight: "3rem" }}>
         <div className="float-left">
-          {detachTotalSelected && <CheckBoxHeaderDetached />}
+          {detachTotalSelected && <DetachedTotalSelected />}
         </div>
         <div className="float-right">
           <FormikButton
