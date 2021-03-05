@@ -11,10 +11,12 @@ export interface CheckBoxFieldProps<TData extends KitsuResource> {
 
 export interface GroupedCheckBoxesParams {
   fieldName: string;
+  detachTotalSelected?: boolean;
 }
 
 export function useGroupedCheckBoxes<TData extends KitsuResource>({
-  fieldName
+  fieldName,
+  detachTotalSelected
 }: GroupedCheckBoxesParams) {
   const [availableItems, setAvailableItems] = useState<TData[]>([]);
   const lastCheckedItemRef = useRef<TData>();
@@ -96,17 +98,34 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
   const CheckBoxHeader = connect(({ formik: { values } }) => {
     const totalChecked = toPairs(values[fieldName]).filter(pair => pair[1])
       .length;
-
     return (
       <div className="grouped-checkbox-header text-center">
-        <CommonMessage id="select" /> <CheckAllCheckBox />
-        <Tooltip id="checkAllTooltipMessage" />
-        <div aria-describedby="checkAllTooltipMessage">
-          ({totalChecked} <CommonMessage id="selected" />)
-        </div>
+        <CheckAllCheckBox />
+        {!detachTotalSelected && (
+          <div aria-describedby="checkAllTooltipMessage">
+            ({totalChecked} <CommonMessage id="selected" />)
+          </div>
+        )}
       </div>
     );
   });
 
-  return { CheckAllCheckBox, CheckBoxField, CheckBoxHeader, setAvailableItems };
+  const DetachedTotalSelected = connect(({ formik: { values } }) => {
+    const totalChecked = toPairs(values[fieldName]).filter(pair => pair[1])
+      .length;
+    return (
+      <div>
+        {totalChecked} <CommonMessage id="selected" />
+        <Tooltip id="checkAllTooltipMessage" />
+      </div>
+    );
+  });
+
+  return {
+    CheckAllCheckBox,
+    CheckBoxField,
+    CheckBoxHeader,
+    setAvailableItems,
+    CheckBoxHeaderDetached: DetachedTotalSelected
+  };
 }

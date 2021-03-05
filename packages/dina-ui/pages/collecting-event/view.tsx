@@ -8,18 +8,14 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
-import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResponse } from "kitsu";
-import { uniqBy } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import { useContext, useState } from "react";
 import { Footer, GroupFieldView, Head, Nav } from "../../components";
-import { AttachmentSection } from "../../components/object-store/attachment-list/AttachmentSection";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { FieldArray } from "formik";
 import { GeoReferenceAssertionRow } from "../../components/collection/GeoReferenceAssertionRow";
 import { AttachmentReadOnlySection } from "../../components/object-store/attachment-list/AttachmentReadOnlySection";
@@ -207,6 +203,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
               <div className="form-group">
                 <AttachmentReadOnlySection
                   attachmentPath={`collection-api/collecting-event/${id}/attachment`}
+                  detachTotalSelected={true}
                 />
               </div>
             </div>

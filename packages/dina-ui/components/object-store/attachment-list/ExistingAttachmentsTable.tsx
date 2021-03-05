@@ -13,11 +13,13 @@ import { toPairs } from "lodash";
 import Link from "next/link";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
+import { CommonMessage } from "../../../../common-ui/lib/intl/common-ui-intl";
 
 export interface ExistingAttachmentsTableProps {
   attachmentPath: string;
   onDetachMetadataIds?: (metadataIds: string[]) => Promise<void>;
   onMetadatasEdited?: () => void | Promise<void>;
+  detachTotalSelected?: boolean;
 }
 export interface AttachmentsTableFormValues {
   /** Tracks which metadata IDs are selected. */
@@ -28,14 +30,17 @@ export interface AttachmentsTableFormValues {
 export function ExistingAttachmentsTable({
   attachmentPath,
   onDetachMetadataIds,
-  onMetadatasEdited
+  onMetadatasEdited,
+  detachTotalSelected
 }: ExistingAttachmentsTableProps) {
   const {
     CheckBoxField,
     CheckBoxHeader,
-    setAvailableItems: setAvailableMetadatas
+    setAvailableItems: setAvailableMetadatas,
+    CheckBoxHeaderDetached
   } = useGroupedCheckBoxes({
-    fieldName: "selectedMetadatas"
+    fieldName: "selectedMetadatas",
+    detachTotalSelected
   });
   const { formatMessage } = useDinaIntl();
 
@@ -125,7 +130,10 @@ export function ExistingAttachmentsTable({
       initialValues={{ selectedMetadatas: {} }}
     >
       <div className="list-inline" style={{ minHeight: "3rem" }}>
-        <div className="list-inline-item float-right">
+        <div className="float-left">
+          {detachTotalSelected && <CheckBoxHeaderDetached />}
+        </div>
+        <div className="float-right">
           <FormikButton
             buttonProps={bulkButtonProps}
             className="btn btn-primary ml-2 metadata-bulk-edit-button"
