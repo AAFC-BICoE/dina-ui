@@ -176,6 +176,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
   georeferencedDateLabel: "Georeferenced Date",
   geoReferencing: "Geo-Referencing",
+  geoReferencingLegend: "Georeferencing",
   governmentOfCanada: "Government of Canada",
   group: "Group",
   groupMustBeSelected: "Group must be selected",

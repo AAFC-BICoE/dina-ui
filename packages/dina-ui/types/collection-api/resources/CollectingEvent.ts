@@ -27,6 +27,7 @@ export interface CollectingEventAttributes {
   collectorGroupUuid?: string;
   collectorGroups?: CollectorGroup[];
   group: string;
+  managedAssertions?: GeoReferenceAssertion[];
 }
 
 export interface CollectingEventRelationships {

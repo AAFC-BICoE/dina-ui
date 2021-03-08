@@ -191,7 +191,6 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                                             >
                                               <GeoReferenceAssertionRow
                                                 index={index}
-                                                assertion={assertion}
                                                 viewOnly={true}
                                               />
                                             </li>

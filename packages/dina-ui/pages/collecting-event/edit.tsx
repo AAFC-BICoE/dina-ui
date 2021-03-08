@@ -20,7 +20,7 @@ import {
 import { KitsuResponse, PersistedResource } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
-import { useContext, useState } from "react";
+import { useContext, useState, Dispatch } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
@@ -119,9 +119,13 @@ export default function CollectingEventEditPage() {
 
 interface CollectingEventFormInternalProps {
   saveGeoReferenceAssertion: ({}) => void;
+  deletedId: string;
+  setDeletedId: Dispatch<any>;
 }
 
-function CollectingEventFormInternal({}: CollectingEventFormInternalProps) {
+function CollectingEventFormInternal({
+  setDeletedId
+}: CollectingEventFormInternalProps) {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [checked, setChecked] = useState(false);
@@ -130,25 +134,29 @@ function CollectingEventFormInternal({}: CollectingEventFormInternalProps) {
     CollectingEvent
   >();
 
-  const deleteById = async assertionIds => {
+  const deleteById = async id => {
     await doOperations(
-      assertionIds?.map(id => ({
-        op: "DELETE",
-        path: `georeference-assertion/${id}`
-      })),
+      [
+        {
+          op: "DELETE",
+          path: `georeference-assertion/${id}`
+        }
+      ],
       { apiBaseUrl: "/collection-api" }
     );
 
-    assertionIds?.forEach(id => {
-      values.geoReferenceAssertions?.splice(
-        values.geoReferenceAssertions?.findIndex(
-          assertion => assertion.id === id
-        ),
-        1
-      );
-    });
+    setDeletedId(id);
+    values.geoReferenceAssertions?.splice(
+      values.geoReferenceAssertions?.findIndex(
+        assertion => assertion.id === id
+      ),
+      1
+    );
     setFieldValue("geoReferenceAssertions", values.geoReferenceAssertions);
     setFieldTouched("geoReferenceAssertions", true);
+
+    setFieldValue("managedAssertions", values.geoReferenceAssertions);
+    setFieldTouched("managedAssertions", true);
   };
 
   return (
@@ -254,73 +262,118 @@ function CollectingEventFormInternal({}: CollectingEventFormInternalProps) {
         </div>
 
         <div className="col-md-6">
-          <Tabs>
-            <TabList>
-              {values &&
-              values.geoReferenceAssertions &&
-              values.geoReferenceAssertions.length > 0 ? (
-                values.geoReferenceAssertions?.map((assert, idx) => (
-                  <Tab key={idx}> {assert.id ?? idx} </Tab>
-                ))
-              ) : (
-                <Tab>main assertion</Tab>
-              )}
-            </TabList>
+          <fieldset className="border p-2">
+            <legend className="w-auto">
+              <DinaMessage id="geoReferencingLegend" />
+            </legend>
             {values &&
             values.geoReferenceAssertions &&
-            values.geoReferenceAssertions?.length > 0 ? (
-              values.geoReferenceAssertions.map((assertion, idx) => (
-                <TabPanel key={idx}>
-                  <GeoReferenceAssertionRow index={idx} />
-                  {idx === 0 && (
-                    <div className="row">
-                      <button
-                        style={{ width: "10rem" }}
-                        className="btn btn-primary add-assertion-button"
-                        type="button"
-                        onClick={() => {
-                          setFieldTouched("geoReferenceAssertions", true);
-                          setFieldValue(
-                            "geoReferenceAssertions",
-                            values.geoReferenceAssertions?.concat([{} as any])
-                          );
-                        }}
+            values.geoReferenceAssertions.length <= 1 ? (
+              <>
+                <GeoReferenceAssertionRow index={0} />
+                <div className="row">
+                  <button
+                    style={{ width: "10rem" }}
+                    className="btn btn-primary add-assertion-button"
+                    type="button"
+                    onClick={() => {
+                      setFieldTouched("geoReferenceAssertions", true);
+                      setFieldValue(
+                        "geoReferenceAssertions",
+                        values.geoReferenceAssertions?.length === 0
+                          ? values.geoReferenceAssertions.concat([
+                              {} as any,
+                              {} as any
+                            ])
+                          : values.geoReferenceAssertions?.concat([{} as any])
+                      );
+                    }}
+                  >
+                    <DinaMessage id="addAssertion" />
+                  </button>
+
+                  {values.geoReferenceAssertions?.[0]?.id && (
+                    <div className="col-md-1">
+                      <FormikButton
+                        className="btn btn-danger delete-button"
+                        onClick={() =>
+                          deleteById([values.geoReferenceAssertions?.[0]?.id])
+                        }
                       >
-                        <DinaMessage id="addAssertion" />
-                      </button>
-                      {assertion.id && (
-                        <div className="col-md-1">
-                          <FormikButton
-                            className="btn btn-danger delete-button"
-                            onClick={() => deleteById([assertion.id])}
-                          >
-                            <DinaMessage id="deleteButtonText" />
-                          </FormikButton>
-                        </div>
-                      )}
+                        <DinaMessage id="deleteButtonText" />
+                      </FormikButton>
                     </div>
                   )}
-                </TabPanel>
-              ))
+                </div>
+              </>
             ) : (
-              <TabPanel>
-                <button
-                  style={{ width: "10rem" }}
-                  className="btn btn-primary add-assertion-button"
-                  type="button"
-                  onClick={() => {
-                    setFieldTouched("geoReferenceAssertions", true);
-                    setFieldValue(
-                      "geoReferenceAssertions",
-                      values.geoReferenceAssertions?.concat([{} as any])
-                    );
-                  }}
-                >
-                  <DinaMessage id="addAssertion" />
-                </button>
-              </TabPanel>
+              <Tabs>
+                <TabList>
+                  {values &&
+                    values.geoReferenceAssertions &&
+                    values.geoReferenceAssertions?.map((assert, idx) => (
+                      <Tab key={idx}> {idx + 1} </Tab>
+                    ))}
+                </TabList>
+                {values &&
+                values.geoReferenceAssertions &&
+                values.geoReferenceAssertions?.length > 0 ? (
+                  values.geoReferenceAssertions.map((assertion, idx) => (
+                    <TabPanel key={idx}>
+                      <GeoReferenceAssertionRow index={idx} />
+                      {idx === 0 && (
+                        <div className="row">
+                          <button
+                            style={{ width: "10rem" }}
+                            className="btn btn-primary add-assertion-button"
+                            type="button"
+                            onClick={() => {
+                              setFieldTouched("geoReferenceAssertions", true);
+                              setFieldValue(
+                                "geoReferenceAssertions",
+                                values.geoReferenceAssertions?.concat([
+                                  {} as any
+                                ])
+                              );
+                            }}
+                          >
+                            <DinaMessage id="addAssertion" />
+                          </button>
+                          {assertion.id && (
+                            <div className="col-md-1">
+                              <FormikButton
+                                className="btn btn-danger delete-button"
+                                onClick={() => deleteById([assertion.id])}
+                              >
+                                <DinaMessage id="deleteButtonText" />
+                              </FormikButton>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </TabPanel>
+                  ))
+                ) : (
+                  <TabPanel>
+                    <button
+                      style={{ width: "10rem" }}
+                      className="btn btn-primary add-assertion-button"
+                      type="button"
+                      onClick={() => {
+                        setFieldTouched("geoReferenceAssertions", true);
+                        setFieldValue(
+                          "geoReferenceAssertions",
+                          values.geoReferenceAssertions?.concat([{} as any])
+                        );
+                      }}
+                    >
+                      <DinaMessage id="addAssertion" />
+                    </button>
+                  </TabPanel>
+                )}
+              </Tabs>
             )}
-          </Tabs>
+          </fieldset>
         </div>
       </div>
     </div>
@@ -345,25 +398,30 @@ function CollectingEventForm({
         ...collectingEvent,
         dwcOtherRecordNumbers:
           collectingEvent.dwcOtherRecordNumbers?.concat("").join("\n") ?? "",
-        geoReferenceAssertions: collectingEvent.geoReferenceAssertions ?? []
+        geoReferenceAssertions: collectingEvent.geoReferenceAssertions ?? [],
+        managedAssertions: collectingEvent.geoReferenceAssertions ?? []
       }
     : {
         type: "collecting-event",
         collectors: [],
         collectorGroups: [],
         startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
-        geoReferenceAssertions: []
+        geoReferenceAssertions: [],
+        managedAssertions: []
       };
 
   const { save } = useApiClient();
+  const [deletedId, setDeletedId] = useState();
 
   const saveGeoReferenceAssertion = async assertions => {
     if (!assertions) return;
     const savedAssertions = await save(
-      assertions.map(assertion => ({
-        resource: { ...assertion, type: "georeference-assertion" },
-        type: "georeference-assertion"
-      })),
+      assertions
+        .filter(assertion => Object.keys(assertion).length > 0)
+        .map(assertion => ({
+          resource: { ...assertion, type: "georeference-assertion" },
+          type: "georeference-assertion"
+        })),
       {
         apiBaseUrl: "/collection-api"
       }
@@ -414,21 +472,28 @@ function CollectingEventForm({
       submittedValues.collectorGroupUuid = submittedValues.collectorGroups.id;
     delete submittedValues.collectorGroups;
 
+    // When there is deleted assertion, replace the link to assertion with
+    // the updated assertions
+    if (deletedId)
+      submittedValues.geoReferenceAssertions =
+        submittedValues.managedAssertions;
+
     // save georefernce assertions if any
     if (submittedValues.geoReferenceAssertions) {
       const savedAssertions = await saveGeoReferenceAssertion(
         submittedValues.geoReferenceAssertions
       );
-      if (savedAssertions)
+      if (savedAssertions && savedAssertions.length > 0)
         submittedValues.relationships.geoReferenceAssertions = {
           data: savedAssertions.map(assertion => ({
             id: assertion.id,
             type: assertion.type
           }))
         };
-
-      delete submittedValues.geoReferenceAssertions;
     }
+
+    delete submittedValues.geoReferenceAssertions;
+    delete submittedValues.managedAssertions;
 
     // Convert user-suplied string to string array:
     submittedValues.dwcOtherRecordNumbers = (
@@ -490,6 +555,8 @@ function CollectingEventForm({
       </ButtonBar>
       <CollectingEventFormInternal
         saveGeoReferenceAssertion={saveGeoReferenceAssertion}
+        deletedId={deletedId as any}
+        setDeletedId={setDeletedId}
       />
       <div className="form-group">{attachedMetadatasUI}</div>
     </DinaForm>
