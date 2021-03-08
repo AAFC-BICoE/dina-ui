@@ -17,16 +17,22 @@ jest.mock("next/dynamic", () => () => {
 const mockFetchJson = jest.fn(async () => {
   const results: NominatumApiSearchResult[] = [
     {
+      osm_id: 1,
+      osm_type: "type1",
       category: "boundary",
       type: "administrative",
       display_name: "result 1"
     },
     {
+      osm_id: 2,
+      osm_type: "type2",
       category: "boundary",
       type: "administrative",
       display_name: "result 2"
     },
     {
+      osm_id: 3,
+      osm_type: "type3",
       category: "place",
       type: "type",
       display_name: "result 3"
