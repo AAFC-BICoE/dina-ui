@@ -184,6 +184,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                                     <FieldArray name="geoReferenceAssertions">
                                       {() =>
                                         collectingEvent?.geoReferenceAssertions?.map(
+                                          /* tslint:disable:no-unused-variable */
                                           (assertion, index) => (
                                             <li
                                               className="list-group-item"

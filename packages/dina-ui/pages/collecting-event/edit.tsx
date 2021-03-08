@@ -311,6 +311,7 @@ function CollectingEventFormInternal({
                 <TabList>
                   {values &&
                     values.geoReferenceAssertions &&
+                    /* tslint:disable:no-unused-variable */
                     values.geoReferenceAssertions?.map((assert, idx) => (
                       <Tab key={idx}> {idx + 1} </Tab>
                     ))}
