@@ -62,6 +62,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   rows: "rows",
   select: "Select",
   selected: "selected",
+  selectLocation: "Select Location",
   showChanges: "Show Changes",
   somethingWentWrong: "Something went wrong",
   sourceField: "Source Field",

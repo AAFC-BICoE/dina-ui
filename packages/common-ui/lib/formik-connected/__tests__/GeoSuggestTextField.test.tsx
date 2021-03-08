@@ -51,10 +51,9 @@ describe("GeoSuggestTextField component", () => {
       </DinaForm>
     );
 
-    wrapper
-      .find(Autosuggest)
-      .prop<any>("inputProps")
-      .onChange({ target: { value: "ottawa" } } as any);
+    wrapper.find("textarea").prop<any>("onChange")({
+      target: { value: "ottawa" }
+    } as any);
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -65,16 +64,14 @@ describe("GeoSuggestTextField component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(Autosuggest).prop("suggestions")).toEqual([
-      "result 1",
-      "result 2"
-    ]);
+    // Suggestions are shown in a list of buttons:
+    expect(
+      wrapper.find(".suggestion-list button").map(node => node.text())
+    ).toEqual(["result 1", "result 2"]);
 
-    // The button should be hidden when there are suggestions:
-    expect(wrapper.find("button.geo-suggest-button").exists()).toEqual(false);
-
+    // The correct API url shouls have been used:
     expect(mockFetchJson).lastCalledWith(
-      "https://nominatim.openstreetmap.org/search.php?q=ottawa&format=jsonv2"
+      "https://nominatim.openstreetmap.org/search.php?q=ottawa&addressdetails=1&format=jsonv2"
     );
   });
 });
