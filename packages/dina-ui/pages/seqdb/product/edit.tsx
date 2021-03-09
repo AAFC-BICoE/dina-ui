@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  CancelButton,
+  BackButton,
   DinaForm,
   DinaFormOnSubmit,
   LabelView,
@@ -86,7 +86,7 @@ function ProductForm({ product, router }: ProductFormProps) {
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <CancelButton entityId={id as string} entityLink="/seqdb/product" />
+        <BackButton entityId={id as string} entityLink="/seqdb/product" />
       </ButtonBar>
       <div>
         <div className="row">

@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  CancelButton,
+  BackButton,
   DinaForm,
   FieldView,
   KeyValueTable,
@@ -35,7 +35,7 @@ export default function DinaUserDetailsPage() {
       <Head title={formatMessage("whoAmITitle")} />
       <Nav />
       <ButtonBar>
-        <CancelButton entityLink="/user" navigateTo={`/`} />
+        <BackButton entityLink="/user" navigateTo={`/`} />
       </ButtonBar>
       {withResponse(userQuery, ({ data: dinaUser }) => (
         <main className="container-fluid">

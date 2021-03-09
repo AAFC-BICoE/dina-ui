@@ -88,7 +88,7 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
       <input
         className="check-all-checkbox"
         onClick={onCheckAllCheckBoxClick}
-        style={{ height: "20px", width: "20px" }}
+        style={{ height: "20px", width: "20px", marginLeft: "5px" }}
         type="checkbox"
       />
     );
@@ -100,12 +100,20 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
       .length;
     return (
       <div className="grouped-checkbox-header text-center">
-        <CheckAllCheckBox />
-        {!detachTotalSelected && (
-          <div aria-describedby="checkAllTooltipMessage">
-            ({totalChecked} <CommonMessage id="selected" />)
+      
+        {detachTotalSelected ? <div aria-describedby="checkAllTooltipMessage">
+          <CommonMessage id="select" /> <CheckAllCheckBox />
+          <Tooltip id="checkAllTooltipMessage" />
+        </div> :
+          (<div aria-describedby="checkAllTooltipMessage">
+            <CommonMessage id="select" /><CheckAllCheckBox />
+            <Tooltip id="checkAllTooltipMessage" />
+            <div>
+              ({totalChecked} <CommonMessage id="selected" />)
+            </div>
           </div>
-        )}
+          )
+        }
       </div>
     );
   });
@@ -116,7 +124,6 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
     return (
       <div>
         {totalChecked} <CommonMessage id="selected" />
-        <Tooltip id="checkAllTooltipMessage" />
       </div>
     );
   });

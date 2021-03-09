@@ -2,7 +2,7 @@ import {
   ApiClientContext,
   AutoSuggestTextField,
   ButtonBar,
-  CancelButton,
+  BackButton,
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
@@ -504,7 +504,7 @@ function CollectingEventForm({
     >
       <ButtonBar>
         <SubmitButton />
-        <CancelButton
+        <BackButton
           entityId={id as string}
           entityLink="/collecting-event"
           byPassView={true}

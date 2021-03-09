@@ -1,7 +1,7 @@
 import {
   ApiClientContext,
   ButtonBar,
-  CancelButton,
+  BackButton,
   DinaForm,
   EditButton,
   FieldView,
@@ -62,11 +62,10 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
       <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="collecting-event" />
-        <CancelButton
+        <BackButton
           entityId={id as string}
           entityLink="/collecting-event"
           byPassView={true}
-          customLabel={true}
         />
       </ButtonBar>
       {withResponse(collectingEventQuery, ({ data: colEvent }) => {
