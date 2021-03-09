@@ -145,18 +145,19 @@ function CollectingEventFormInternal({
       { apiBaseUrl: "/collection-api" }
     );
 
-    setDeletedId(id);
-    values.geoReferenceAssertions?.splice(
-      values.geoReferenceAssertions?.findIndex(
-        assertion => assertion.id === id
-      ),
-      1
-    );
-    setFieldValue("geoReferenceAssertions", values.geoReferenceAssertions);
-    setFieldTouched("geoReferenceAssertions", true);
-
-    setFieldValue("managedAssertions", values.geoReferenceAssertions);
-    setFieldTouched("managedAssertions", true);
+    const index= values.geoReferenceAssertions?.findIndex(
+      assertion => assertion.id === id
+    )
+    
+    if(index && index !=-1 ){
+      values.geoReferenceAssertions?.splice(index,1);
+      setFieldValue("geoReferenceAssertions", values.geoReferenceAssertions);
+      setFieldTouched("geoReferenceAssertions", true);
+ 
+      setFieldValue("managedAssertions", values.geoReferenceAssertions);
+      setFieldTouched("managedAssertions", true);
+      setDeletedId(id);
+    }    
   };
 
   return (
@@ -271,9 +272,9 @@ function CollectingEventFormInternal({
             values.geoReferenceAssertions.length <= 1 ? (
               <>
                 <GeoReferenceAssertionRow index={0} />
-                <div className="row">
+                <div>
                   <button
-                    style={{ width: "10rem" }}
+                    style={{ width: "20rem" }}
                     className="btn btn-primary add-assertion-button"
                     type="button"
                     onClick={() => {
@@ -293,16 +294,15 @@ function CollectingEventFormInternal({
                   </button>
 
                   {values.geoReferenceAssertions?.[0]?.id && (
-                    <div className="col-md-1">
                       <FormikButton
                         className="btn btn-danger delete-button"
                         onClick={() =>
-                          deleteById([values.geoReferenceAssertions?.[0]?.id])
+                          deleteById(values.geoReferenceAssertions?.[0]?.id)
                         }
+                        buttonProps={() => ({ style :{marginLeft: 10} })}
                       >
-                        <DinaMessage id="deleteButtonText" />
+                        <DinaMessage id="deleteAssertionLabel" />
                       </FormikButton>
-                    </div>
                   )}
                 </div>
               </>
@@ -322,9 +322,9 @@ function CollectingEventFormInternal({
                     <TabPanel key={idx}>
                       <GeoReferenceAssertionRow index={idx} />
                       {idx === 0 && (
-                        <div className="row">
+                        <div>
                           <button
-                            style={{ width: "10rem" }}
+                            style={{ width: "20rem" }}
                             className="btn btn-primary add-assertion-button"
                             type="button"
                             onClick={() => {
@@ -340,14 +340,13 @@ function CollectingEventFormInternal({
                             <DinaMessage id="addAssertion" />
                           </button>
                           {assertion.id && (
-                            <div className="col-md-1">
                               <FormikButton
                                 className="btn btn-danger delete-button"
-                                onClick={() => deleteById([assertion.id])}
+                                onClick={() => deleteById(assertion.id)}
+                                buttonProps={() => ({ style :{marginLeft: 10} })}
                               >
-                                <DinaMessage id="deleteButtonText" />
+                                <DinaMessage id="deleteAssertionLabel" />
                               </FormikButton>
-                            </div>
                           )}
                         </div>
                       )}

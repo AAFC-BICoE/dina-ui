@@ -2,7 +2,7 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
-  addAssertion: " Add Assertion",
+  addAssertion: " Add another GeoReference",
   addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
   addCollectingEventTitle: "Add Collecting Event",
@@ -37,6 +37,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   coordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",
   decimalLatitude: "Decimal Latitude",
   decimalLongitude: "Decimal Longitude",
+  deleteAssertionLabel: " Delete this GeoReference",
   deleted: "Deleted",
   deletedMetadata_tooltip: "Deleted Metadata ID: {id}",
   configureDefaultValues: "Configure default values",

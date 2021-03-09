@@ -67,7 +67,7 @@ export function GeoReferenceAssertionRow({
         </div>
       ) : (
         <div className="row">
-          <div className="col-md-4">
+          <div className="col-md-6">
             <NumberField
               name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
               label={formatMessage("decimalLatitude")}
@@ -93,7 +93,7 @@ export function GeoReferenceAssertionRow({
             />
           </div>
 
-          <div className="col-md-5">
+          <div className="col-md-6">
             <TextField
               name={`geoReferenceAssertions[${index}].literalGeoreferencedBy`}
               className={"literalGeoreferencedBy"}
