@@ -171,7 +171,8 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                               <DinaMessage id="geoReferencingLegend" />
                             </legend>
                             {collectingEvent?.geoReferenceAssertions
-                              ?.length && (
+                              ?.length && collectingEvent?.geoReferenceAssertions
+                              ?.length > 0  && (
                               <ul>
                                 <FieldArray name="geoReferenceAssertions">
                                   {() =>
