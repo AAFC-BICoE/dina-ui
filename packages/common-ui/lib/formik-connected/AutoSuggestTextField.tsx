@@ -69,41 +69,43 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>(
   return (
     <>
       <style>{`
-        .container-open {      
+        .autosuggest .container-open {      
             position: absolute;
             z-index: 2; 
             margin: 0 0 0 -15px; 
          },
-        .container {
+        .autosuggest .container {
            display:none;
         }
-        .autosuggest-highlighted { 
+        .autosuggest .autosuggest-highlighted { 
           background-color: #ddd; 
         }
         `}</style>
-      <AutoSuggest
-        suggestions={suggestions}
-        getSuggestionValue={s => s}
-        onSuggestionsFetchRequested={({ value }) =>
-          debouncedSetSearchValue(value)
-        }
-        onSuggestionSelected={(_, data) =>
-          inputProps.onChange?.({ target: { value: data.suggestion } } as any)
-        }
-        onSuggestionsClearRequested={() => {
-          debouncedSetSearchValue.cancel();
-          debouncedSetSearchValue("");
-        }}
-        renderSuggestion={text => <div>{text}</div>}
-        inputProps={inputProps as InputProps<any>}
-        theme={{
-          suggestionsList: "list-group",
-          suggestion: "list-group-item",
-          suggestionHighlighted: "autosuggest-highlighted",
-          suggestionsContainerOpen: "container-open",
-          suggestionsContainer: "container"
-        }}
-      />
+      <div className="autosuggest">
+        <AutoSuggest
+          suggestions={suggestions}
+          getSuggestionValue={s => s}
+          onSuggestionsFetchRequested={({ value }) =>
+            debouncedSetSearchValue(value)
+          }
+          onSuggestionSelected={(_, data) =>
+            inputProps.onChange?.({ target: { value: data.suggestion } } as any)
+          }
+          onSuggestionsClearRequested={() => {
+            debouncedSetSearchValue.cancel();
+            debouncedSetSearchValue("");
+          }}
+          renderSuggestion={text => <div>{text}</div>}
+          inputProps={inputProps as InputProps<any>}
+          theme={{
+            suggestionsList: "list-group",
+            suggestion: "list-group-item",
+            suggestionHighlighted: "autosuggest-highlighted",
+            suggestionsContainerOpen: "container-open",
+            suggestionsContainer: "container"
+          }}
+        />
+      </div>
     </>
   );
 }
