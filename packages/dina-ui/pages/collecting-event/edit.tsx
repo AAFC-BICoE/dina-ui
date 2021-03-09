@@ -317,8 +317,7 @@ function CollectingEventFormInternal({
                     ))}
                 </TabList>
                 {values &&
-                values.geoReferenceAssertions &&
-                values.geoReferenceAssertions?.length > 0 ? (
+                  values.geoReferenceAssertions &&
                   values.geoReferenceAssertions.map((assertion, idx) => (
                     <TabPanel key={idx}>
                       <GeoReferenceAssertionRow index={idx} />
@@ -353,25 +352,7 @@ function CollectingEventFormInternal({
                         </div>
                       )}
                     </TabPanel>
-                  ))
-                ) : (
-                  <TabPanel>
-                    <button
-                      style={{ width: "10rem" }}
-                      className="btn btn-primary add-assertion-button"
-                      type="button"
-                      onClick={() => {
-                        setFieldTouched("geoReferenceAssertions", true);
-                        setFieldValue(
-                          "geoReferenceAssertions",
-                          values.geoReferenceAssertions?.concat([{} as any])
-                        );
-                      }}
-                    >
-                      <DinaMessage id="addAssertion" />
-                    </button>
-                  </TabPanel>
-                )}
+                  ))}
               </Tabs>
             )}
           </fieldset>
@@ -419,14 +400,17 @@ function CollectingEventForm({
     const savedAssertions = await save(
       assertions
         .filter(assertion => Object.keys(assertion).length > 0)
-        .map(assertion => ({
-          resource: { ...assertion, type: "georeference-assertion" },
-          type: "georeference-assertion"
-        })),
+        .map(assertion => {
+          return {
+            resource: { ...assertion, type: "georeference-assertion" },
+            type: "georeference-assertion"
+          };
+        }),
       {
         apiBaseUrl: "/collection-api"
       }
     );
+
     return savedAssertions;
   };
 
@@ -480,10 +464,14 @@ function CollectingEventForm({
         submittedValues.managedAssertions;
 
     // save georefernce assertions if any
-    if (submittedValues.geoReferenceAssertions) {
+    if (
+      submittedValues.geoReferenceAssertions &&
+      submittedValues.geoReferenceAssertions.length > 0
+    ) {
       const savedAssertions = await saveGeoReferenceAssertion(
         submittedValues.geoReferenceAssertions
       );
+
       if (savedAssertions && savedAssertions.length > 0)
         submittedValues.relationships.geoReferenceAssertions = {
           data: savedAssertions.map(assertion => ({
@@ -518,7 +506,6 @@ function CollectingEventForm({
     }
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
-
     const [saved] = await save(
       [
         {

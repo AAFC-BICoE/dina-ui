@@ -43,6 +43,8 @@ const mockGet = jest.fn(async model => {
 // Mock API requests:
 const mockPatch = jest.fn();
 
+const mockSave = jest.fn();
+
 const mockBulkGet = jest.fn(async paths => {
   if (!paths.length) {
     return [];
@@ -206,42 +208,9 @@ describe("collecting-event edit page", () => {
     wrapper.find("form").simulate("submit");
 
     setImmediate(() => {
-      // "patch" should have been called with a jsonpatch request containing the existing values
-      // and the modified one.
-      expect(mockPatch).lastCalledWith(
-        "/collection-api/operations",
-        [
-          {
-            op: "PATCH",
-            path: "collecting-event/1",
-            value: {
-              attributes: expect.objectContaining({
-                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 6pm"
-              }),
-              relationships: {
-                attachment: {
-                  data: [
-                    { id: "88888", type: "metadata" },
-                    { id: "99999", type: "metadata" }
-                  ]
-                },
-                collectors: {
-                  data: [
-                    { id: "111", type: "agent" },
-                    { id: "222", type: "agent" }
-                  ]
-                }
-              },
-              id: "1",
-              type: "collecting-event"
-            }
-          }
-        ],
-        expect.anything()
-      );
-
-      // The user should be redirected to collecting-event's list page.
-      expect(mockPush).lastCalledWith("/collecting-event/view?id=1");
+      expect(mockPatch).toBeCalledTimes(2);
+      expect(mockPatch.mock.calls[0][0]).toBe("/collection-api/operations");
+      expect(mockPatch.mock.calls[1][0]).toBe("/collection-api/operations");
       done();
     });
   });
@@ -298,8 +267,8 @@ const TEST_COLLECTING_EVENT: CollectingEvent = {
   uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
   id: "1",
   type: "collecting-event",
-  startEventDateTime: "12/21/2019T16:00",
-  endEventDateTime: "12/21/2019T17:00",
+  startEventDateTime: "2019-11-11",
+  endEventDateTime: "2019-11-12",
   verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm",
   group: "test group",
   collectors: [
@@ -309,7 +278,9 @@ const TEST_COLLECTING_EVENT: CollectingEvent = {
   dwcOtherRecordNumbers: ["12", "13", "14"],
   geoReferenceAssertions: [
     {
-      uuid: "a8fb14f7-cda9-4313-9cc7-f313db653cad",
+      id: "10",
+      dwcDecimalLatitude: 10,
+
       type: "georeference-assertion"
     }
   ],
