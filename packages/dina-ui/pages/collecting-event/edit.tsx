@@ -150,11 +150,11 @@ function CollectingEventFormInternal({
     const index= values.geoReferenceAssertions?.findIndex(
       assertion => assertion.id === id
     )
-    if(index && index !=-1 ){
+
+    if(index !== undefined && index != -1 ){
       values.geoReferenceAssertions?.splice(index,1);
       setFieldValue("geoReferenceAssertions", values.geoReferenceAssertions);
       setFieldTouched("geoReferenceAssertions", true);
- 
       setFieldValue("managedAssertions", values.geoReferenceAssertions);
       setFieldTouched("managedAssertions", true);
       setDeletedId(id);
