@@ -89,7 +89,6 @@ export function GeoReferenceAssertionRow({
               name={`geoReferenceAssertions[${index}].dwcGeoreferencedDate`}
               className={"dwcGeoreferencedDate"}
               label={formatMessage("georeferencedDateLabel")}
-              withZone={true}
             />
           </div>
 
