@@ -1,7 +1,7 @@
 import {
   ApiClientContext,
   ButtonBar,
-  CancelButton,
+  BackButton,
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
@@ -88,7 +88,7 @@ function CollectorGroupForm({
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <CancelButton
+        <BackButton
           entityId={id as string}
           entityLink="/collector-group"
           byPassView={true}
