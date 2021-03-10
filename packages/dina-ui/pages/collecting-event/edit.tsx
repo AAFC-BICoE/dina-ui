@@ -150,7 +150,6 @@ function CollectingEventFormInternal({
     const index= values.geoReferenceAssertions?.findIndex(
       assertion => assertion.id === id
     )
-    
     if(index && index !=-1 ){
       values.geoReferenceAssertions?.splice(index,1);
       setFieldValue("geoReferenceAssertions", values.geoReferenceAssertions);
@@ -310,7 +309,7 @@ function CollectingEventFormInternal({
                 </div>
               </>
             ) : (
-              <Tabs selectedIndex={activeTabIdx===0? 0: (activeTabIdx)}
+              <Tabs selectedIndex={activeTabIdx}
               onSelect={index => setActiveTabIdx(index)} >
                 <TabList>
                   {values &&
