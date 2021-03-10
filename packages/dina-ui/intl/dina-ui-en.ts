@@ -116,6 +116,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers.",
   field_dwcRecordedBy: "Verbatim Collectors",
   field_dwcRecordNumber: "Collector's Number",
+  field_dwcGeodeticDatum: "Geodetic Datum",
+  field_dwcGeodeticDatum_tooltip:
+    "The geodetic datum upon which the geographic coordinates given in decimalLatitude and decimalLongitude is based. Recommended best practice is to use the EPSG code. Examples: EPSG:4326 (EPSG code for WGS84)",
   field_dwcGeoreferenceProtocol: "Georeference Protocol",
   field_dwcGeoreferenceRemarks: "Georeference Remarks",
   field_dwcGeoreferenceSources: "Georeference Sources",
