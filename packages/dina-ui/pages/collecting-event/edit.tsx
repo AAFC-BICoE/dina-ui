@@ -134,6 +134,8 @@ function CollectingEventFormInternal({
     CollectingEvent
   >();
 
+  const [activeTabIdx, setActiveTabIdx ] = useState(0);
+
   const deleteById = async id => {
     await doOperations(
       [
@@ -288,6 +290,7 @@ function CollectingEventFormInternal({
                             ])
                           : values.geoReferenceAssertions?.concat([{} as any])
                       );
+                      setActiveTabIdx(values.geoReferenceAssertions?.length as number)
                     }}
                   >
                     <DinaMessage id="addAssertion" />
@@ -307,12 +310,13 @@ function CollectingEventFormInternal({
                 </div>
               </>
             ) : (
-              <Tabs>
+              <Tabs selectedIndex={activeTabIdx===0? 0: (activeTabIdx)}
+              onSelect={index => setActiveTabIdx(index)} >
                 <TabList>
                   {values &&
                     values.geoReferenceAssertions &&
                     values.geoReferenceAssertions?.map((assert, idx) => (
-                      <Tab key={assert.id}> {idx + 1} </Tab>
+                      <Tab key={assert.id} id={idx}> {idx + 1} </Tab>
                     ))}
                 </TabList>
                 {values &&
@@ -334,6 +338,7 @@ function CollectingEventFormInternal({
                                   {} as any
                                 ])
                               );
+                              setActiveTabIdx(values.geoReferenceAssertions?.length as number)
                             }}
                           >
                             <DinaMessage id="addAssertion" />
@@ -543,6 +548,7 @@ function CollectingEventForm({
         saveGeoReferenceAssertion={saveGeoReferenceAssertion}
         deletedId={deletedId as any}
         setDeletedId={setDeletedId}
+        key={Math.random()}
       />
       <div className="form-group">{attachedMetadatasUI}</div>
     </DinaForm>
