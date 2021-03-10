@@ -2,7 +2,7 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
-  addAssertion: " Add Assertion",
+  addAssertion: " Add another GeoReference",
   addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
   addCollectingEventTitle: "Add Collecting Event",
@@ -28,6 +28,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   changedProperties: "Changes",
   closePreviewButtonText: "Close Preview",
   collectionSectionTitle: "Collections",
+  collectingAgentsLegend: "Collecting Agents",
+  collectingDateLegend: "Collecting Date",
   collectingEventListTitle: "Collecting Event",
   collectingEventViewTitle: "View Collecting Event",
   collectorGroupAgentsLabel: "Collector Group Agents",
@@ -37,6 +39,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   coordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",
   decimalLatitude: "Decimal Latitude",
   decimalLongitude: "Decimal Longitude",
+  deleteAssertionLabel: " Delete this GeoReference",
   deleted: "Deleted",
   deletedMetadata_tooltip: "Deleted Metadata ID: {id}",
   configureDefaultValues: "Configure default values",
@@ -175,7 +178,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   forTestingPurposesOnlyMessage:
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
   georeferencedDateLabel: "Georeferenced Date",
+  geographyLegend: "Geography (Places)",
   geoReferencing: "Geo-Referencing",
+  geoReferencingLegend: "Georeferencing",
   governmentOfCanada: "Government of Canada",
   group: "Group",
   groupMustBeSelected: "Group must be selected",
@@ -244,6 +249,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   useCollectorGroupLabel: "Use Collector Group",
   userMustBelongToGroup: "User must belong to a Group",
   verbatimEventDateTimeLabel: "Verbatim Event DateTime",
+  verbatimCoordinatesLegend: "Verbatim Coordinates",
   viewOnMap: "View on Map",
   viewPreviewButtonText: "Preview",
   whoAmITitle: "Who Am I",

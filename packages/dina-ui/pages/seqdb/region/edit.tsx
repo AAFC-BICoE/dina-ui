@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  CancelButton,
+  BackButton,
   DinaForm,
   DinaFormOnSubmit,
   LoadingSpinner,
@@ -83,7 +83,7 @@ function RegionForm({ region, router }: RegionFormProps) {
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <CancelButton entityId={id as string} entityLink="/seqdb/region" />
+        <BackButton entityId={id as string} entityLink="/seqdb/region" />
       </ButtonBar>
       <div>
         <div className="row">

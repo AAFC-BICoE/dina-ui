@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  CancelButton,
+  BackButton,
   DinaForm,
   DinaFormOnSubmit,
   filterBy,
@@ -97,7 +97,7 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <CancelButton entityId={id as string} entityLink="/seqdb/protocol" />
+        <BackButton entityId={id as string} entityLink="/seqdb/protocol" />
       </ButtonBar>
       <div>
         <div className="row">

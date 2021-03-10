@@ -5,10 +5,12 @@ import { useState } from "react";
 
 export interface AttachmentReadOnlySection {
   attachmentPath: string;
+  detachTotalSelected?: boolean;
 }
 
 export function AttachmentReadOnlySection({
-  attachmentPath
+  attachmentPath,
+  detachTotalSelected
 }: AttachmentReadOnlySection) {
   // JSX key to reload the child components after editing Metadatas.
   const [lastSave, setLastSave] = useState<number>();
@@ -22,6 +24,7 @@ export function AttachmentReadOnlySection({
       <ExistingAttachmentsTable
         attachmentPath={attachmentPath}
         onMetadatasEdited={() => setLastSave(Date.now())}
+        detachTotalSelected={detachTotalSelected}
       />
     </div>
   );

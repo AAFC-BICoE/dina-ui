@@ -1,31 +1,16 @@
-import {
-  FormikButton,
-  DateField,
-  NumberField,
-  FieldView,
-  TextField
-} from "common-ui";
-import { GeoReferenceAssertion } from "../../types/collection-api/resources/GeoReferenceAssertion";
+import { DateField, NumberField, FieldView, TextField } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { connect } from "formik";
 import { get } from "lodash";
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
-  assertion?: GeoReferenceAssertion;
-  onAddClick?: () => void;
-  onRemoveClick?: () => void;
   viewOnly?: boolean;
-  onDeleteClick?: (ids: string[], setAssertionIds: any) => void;
 }
 
 export function GeoReferenceAssertionRow({
   index,
-  onAddClick,
-  onRemoveClick,
-  viewOnly,
-  assertion,
-  onDeleteClick
+  viewOnly
 }: GeoReferenceAssertionRowProps) {
   const { formatMessage } = useDinaIntl();
   return (
@@ -82,7 +67,7 @@ export function GeoReferenceAssertionRow({
         </div>
       ) : (
         <div className="row">
-          <div className="col-md-4">
+          <div className="col-md-6">
             <NumberField
               name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
               label={formatMessage("decimalLatitude")}
@@ -108,7 +93,7 @@ export function GeoReferenceAssertionRow({
             />
           </div>
 
-          <div className="col-md-5">
+          <div className="col-md-6">
             <TextField
               name={`geoReferenceAssertions[${index}].literalGeoreferencedBy`}
               className={"literalGeoreferencedBy"}
@@ -130,35 +115,6 @@ export function GeoReferenceAssertionRow({
               customName={"dwcGeoreferenceRemarks"}
             />
           </div>
-          <div className="col-md-1">
-            <button
-              className="btn btn-primary add-assertion-button"
-              type="button"
-              onClick={onAddClick}
-            >
-              +
-            </button>
-          </div>
-          {assertion?.id ? (
-            <div className="col-md-1">
-              <FormikButton
-                className="btn btn-danger delete-button"
-                onClick={onDeleteClick as any}
-              >
-                <DinaMessage id="deleteButtonText" />
-              </FormikButton>
-            </div>
-          ) : (
-            <div className="col-md-1">
-              <button
-                className="btn btn-primary"
-                type="button"
-                onClick={onRemoveClick}
-              >
-                -
-              </button>
-            </div>
-          )}
         </div>
       )}
     </div>

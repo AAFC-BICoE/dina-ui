@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  CancelButton,
+  BackButton,
   DinaForm,
   DinaFormOnSubmit,
   filterBy,
@@ -94,7 +94,7 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <CancelButton entityId={id as string} entityLink="/seqdb/pcr-profile" />
+        <BackButton entityId={id as string} entityLink="/seqdb/pcr-profile" />
       </ButtonBar>
       <div>
         <div className="row">
