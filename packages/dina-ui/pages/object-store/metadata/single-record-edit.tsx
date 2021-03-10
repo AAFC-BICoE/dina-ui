@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  CancelButton,
+  BackButton,
   DateField,
   DeleteButton,
   DinaForm,
@@ -174,7 +174,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <CancelButton
+        <BackButton
           entityId={id as string}
           entityLink="/object-store/object"
         />

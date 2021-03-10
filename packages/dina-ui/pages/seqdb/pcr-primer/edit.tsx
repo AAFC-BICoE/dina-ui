@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  CancelButton,
+  BackButton,
   DateField,
   DinaForm,
   DinaFormOnSubmit,
@@ -96,7 +96,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <CancelButton entityId={id as string} entityLink="/seqdb/pcr-primer" />
+        <BackButton entityId={id as string} entityLink="/seqdb/pcr-primer" />
       </ButtonBar>
       <div>
         <div className="row">

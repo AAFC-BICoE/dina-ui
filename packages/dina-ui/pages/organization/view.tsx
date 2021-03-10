@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  CancelButton,
+  BackButton,
   DinaForm,
   EditButton,
   FieldView,
@@ -23,7 +23,7 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
       <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="organization" />
-        <CancelButton
+        <BackButton
           entityId={id as string}
           entityLink="/organization"
           byPassView={true}

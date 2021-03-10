@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  CancelButton,
+  BackButton,
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
@@ -161,7 +161,7 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <CancelButton
+        <BackButton
           entityId={id as string}
           entityLink="/organization"
           byPassView={true}
