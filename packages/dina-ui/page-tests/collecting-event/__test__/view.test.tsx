@@ -14,7 +14,7 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
   dwcOtherRecordNumbers: ["12", "13", "14"],
   geoReferenceAssertions: [
     {
-      uuid: "a8fb14f7-cda9-4313-9cc7-f313db653cad",
+      id: "1",
       type: "georeference-assertion",
       dwcDecimalLongitude: 12.5
     }

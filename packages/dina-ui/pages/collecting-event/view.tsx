@@ -180,11 +180,10 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                                       (assertion, index) => (
                                         <li
                                           className="list-group-item"
-                                          key={index}
+                                          key={assertion.id}
                                         >
                                           <GeoReferenceAssertionRow
                                             index={index}
-                                            assertion={assertion}
                                             viewOnly={true}
                                           />
                                         </li>
