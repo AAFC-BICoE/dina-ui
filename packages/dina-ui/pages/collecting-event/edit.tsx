@@ -316,7 +316,7 @@ function CollectingEventFormInternal({
                   {values &&
                     values.geoReferenceAssertions &&
                     values.geoReferenceAssertions?.map((assert, idx) => (
-                      <Tab key={assert.id} id={idx}> {idx + 1} </Tab>
+                      <Tab key={assert.id}> {idx + 1} </Tab>
                     ))}
                 </TabList>
                 {values &&
