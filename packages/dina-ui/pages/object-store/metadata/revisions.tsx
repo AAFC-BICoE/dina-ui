@@ -20,7 +20,7 @@ export default function MetadataRevisionListPage() {
   return withResponse(metadataQuery, response => {
     const metadata = response.data;
 
-    const pageTitle = formatMessage("metadataRevisionsListTitle", {
+    const pageTitle = formatMessage("revisionsListTitle", {
       name: metadata.originalFilename
     });
 
@@ -33,7 +33,7 @@ export default function MetadataRevisionListPage() {
           <div className="form-group">
             <Link href={`/object-store/object/view?id=${metadata.id}`}>
               <a>
-                <DinaMessage id="metadataDetailsPageLink" />
+                <DinaMessage id="detailsPageLink" />
               </a>
             </Link>
           </div>

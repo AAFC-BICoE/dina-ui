@@ -19,6 +19,7 @@ import { CollectingEvent } from "../../types/collection-api/resources/Collecting
 import { FieldArray } from "formik";
 import { GeoReferenceAssertionRow } from "../../components/collection/GeoReferenceAssertionRow";
 import { AttachmentReadOnlySection } from "../../components/object-store/attachment-list/AttachmentReadOnlySection";
+import Link from "next/link";
 
 export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -62,6 +63,11 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
       <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="collecting-event" />
+        <Link href={`/collecting-event/revisions?id=${id}`}>
+            <a className="btn btn-info">
+              <DinaMessage id="revisionsButtonText" />
+            </a>
+          </Link>
         <BackButton
           entityId={id as string}
           entityLink="/collecting-event"
