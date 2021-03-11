@@ -1,26 +1,28 @@
 import {
   ApiClientContext,
   AutoSuggestTextField,
-  ButtonBar,
   BackButton,
+  ButtonBar,
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
   filterBy,
   FormattedTextField,
+  FormikButton,
   KeyboardEventHandlerWrappedTextField,
   LoadingSpinner,
   Query,
   ResourceSelectField,
   SubmitButton,
-  useApiClient,
   TextField,
-  FormikButton
+  useApiClient
 } from "common-ui";
+import { useFormikContext } from "formik";
 import { KitsuResponse, PersistedResource } from "kitsu";
+import { orderBy } from "lodash";
 import { NextRouter, useRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
-import { useContext, useState, Dispatch } from "react";
+import { Dispatch, useContext, useState } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
@@ -29,11 +31,10 @@ import {
   Nav,
   useAddPersonModal
 } from "../../components";
+import { GeoReferenceAssertionRow } from "../../components/collection/GeoReferenceAssertionRow";
 import { useAttachmentsModal } from "../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
-import { useFormikContext } from "formik";
-import { GeoReferenceAssertionRow } from "../../components/collection/GeoReferenceAssertionRow";
 import { Metadata } from "../../types/objectstore-api";
 
 interface CollectingEventFormProps {
@@ -70,6 +71,14 @@ export default function CollectingEventEditPage() {
       );
       // Omit null (deleted) records:
       response.data.attachment = metadatas.filter(it => it);
+    }
+
+    // Order GeoReferenceAssertions by "createdOn" ascending:
+    if (response?.data) {
+      response.data.geoReferenceAssertions = orderBy(
+        response.data.geoReferenceAssertions,
+        "createdOn"
+      );
     }
 
     setCollectingEvent(response.data);
@@ -134,7 +143,7 @@ function CollectingEventFormInternal({
     CollectingEvent
   >();
 
-  const [activeTabIdx, setActiveTabIdx ] = useState(0);
+  const [activeTabIdx, setActiveTabIdx] = useState(0);
 
   const deleteById = async id => {
     await doOperations(
@@ -147,18 +156,18 @@ function CollectingEventFormInternal({
       { apiBaseUrl: "/collection-api" }
     );
 
-    const index= values.geoReferenceAssertions?.findIndex(
+    const index = values.geoReferenceAssertions?.findIndex(
       assertion => assertion.id === id
-    )
+    );
 
-    if(index !== undefined && index != -1 ){
-      values.geoReferenceAssertions?.splice(index,1);
+    if (index !== undefined && index !== -1) {
+      values.geoReferenceAssertions?.splice(index, 1);
       setFieldValue("geoReferenceAssertions", values.geoReferenceAssertions);
       setFieldTouched("geoReferenceAssertions", true);
       setFieldValue("managedAssertions", values.geoReferenceAssertions);
       setFieldTouched("managedAssertions", true);
       setDeletedId(id);
-    }    
+    }
   };
 
   return (
@@ -289,28 +298,32 @@ function CollectingEventFormInternal({
                             ])
                           : values.geoReferenceAssertions?.concat([{} as any])
                       );
-                      setActiveTabIdx(values.geoReferenceAssertions?.length as number)
+                      setActiveTabIdx(
+                        values.geoReferenceAssertions?.length as number
+                      );
                     }}
                   >
                     <DinaMessage id="addAssertion" />
                   </button>
 
                   {values.geoReferenceAssertions?.[0]?.id && (
-                      <FormikButton
-                        className="btn btn-danger delete-button"
-                        onClick={() =>
-                          deleteById(values.geoReferenceAssertions?.[0]?.id)
-                        }
-                        buttonProps={() => ({ style :{marginLeft: 10} })}
-                      >
-                        <DinaMessage id="deleteAssertionLabel" />
-                      </FormikButton>
+                    <FormikButton
+                      className="btn btn-danger delete-button"
+                      onClick={() =>
+                        deleteById(values.geoReferenceAssertions?.[0]?.id)
+                      }
+                      buttonProps={() => ({ style: { marginLeft: 10 } })}
+                    >
+                      <DinaMessage id="deleteAssertionLabel" />
+                    </FormikButton>
                   )}
                 </div>
               </>
             ) : (
-              <Tabs selectedIndex={activeTabIdx}
-              onSelect={index => setActiveTabIdx(index)} >
+              <Tabs
+                selectedIndex={activeTabIdx}
+                onSelect={index => setActiveTabIdx(index)}
+              >
                 <TabList>
                   {values &&
                     values.geoReferenceAssertions &&
@@ -337,19 +350,23 @@ function CollectingEventFormInternal({
                                   {} as any
                                 ])
                               );
-                              setActiveTabIdx(values.geoReferenceAssertions?.length as number)
+                              setActiveTabIdx(
+                                values.geoReferenceAssertions?.length as number
+                              );
                             }}
                           >
                             <DinaMessage id="addAssertion" />
                           </button>
                           {assertion.id && (
-                              <FormikButton
-                                className="btn btn-danger delete-button"
-                                onClick={() => deleteById(assertion.id)}
-                                buttonProps={() => ({ style :{marginLeft: 10} })}
-                              >
-                                <DinaMessage id="deleteAssertionLabel" />
-                              </FormikButton>
+                            <FormikButton
+                              className="btn btn-danger delete-button"
+                              onClick={() => deleteById(assertion.id)}
+                              buttonProps={() => ({
+                                style: { marginLeft: 10 }
+                              })}
+                            >
+                              <DinaMessage id="deleteAssertionLabel" />
+                            </FormikButton>
                           )}
                         </div>
                       )}
