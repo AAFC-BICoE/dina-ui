@@ -40,6 +40,11 @@ export function GeoReferenceAssertionRow({
                 className={"dwcGeoreferencedDate"}
                 label={formatMessage("georeferencedDateLabel")}
               />
+              <FieldView
+                name={`geoReferenceAssertions[${index}].dwcGeodeticDatum`}
+                className={"dwcGeodeticDatum"}
+                customName={"dwcGeodeticDatum"}
+              />
             </div>
             <div className="col-md-6">
               <FieldView
@@ -89,7 +94,11 @@ export function GeoReferenceAssertionRow({
               name={`geoReferenceAssertions[${index}].dwcGeoreferencedDate`}
               className={"dwcGeoreferencedDate"}
               label={formatMessage("georeferencedDateLabel")}
-              withZone={true}
+            />
+            <TextField
+              name={`geoReferenceAssertions[${index}].dwcGeodeticDatum`}
+              className={"dwcGeodeticDatum"}
+              customName="dwcGeodeticDatum"
             />
           </div>
 
