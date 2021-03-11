@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  CancelButton,
+  BackButton,
   DateField,
   DeleteButton,
   DinaForm,
@@ -92,7 +92,7 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <CancelButton
+        <BackButton
           entityId={id as string}
           entityLink="/object-store/object-subtype"
           byPassView={true}

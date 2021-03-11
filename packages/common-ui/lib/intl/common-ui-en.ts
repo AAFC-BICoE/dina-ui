@@ -9,6 +9,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   addNew: "Add New",
   areYouSure: "Are you sure?",
   attributeLabel: "Attribute",
+  backLabel: "Back",
   backToListButtonText: "Back to List",
   bulkEditorValidationError: "Invalid value on row {row}: {value}",
   cancelButtonText: "Cancel",

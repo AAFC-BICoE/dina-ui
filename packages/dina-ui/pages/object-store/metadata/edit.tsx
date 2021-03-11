@@ -1,4 +1,4 @@
-import { ButtonBar, CancelButton, LoadingSpinner, useAccount } from "common-ui";
+import { ButtonBar, BackButton, LoadingSpinner, useAccount } from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
 import { BulkMetadataEditor } from "../../../components/object-store";
@@ -31,13 +31,13 @@ export default function EditMetadatasPage() {
       <ButtonBar>
         <>
           {metadataIds?.length === 1 ? (
-            <CancelButton
+            <BackButton
               entityLink="/object-store/object"
               entityId={metadataIds[0]}
               byPassView={false}
             />
           ) : (
-            <CancelButton entityLink="/object-store/object" />
+            <BackButton entityLink="/object-store/object" />
           )}
         </>
       </ButtonBar>

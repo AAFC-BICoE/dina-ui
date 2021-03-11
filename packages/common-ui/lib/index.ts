@@ -35,6 +35,7 @@ export * from "./formik-connected/TextField";
 export * from "./formik-connected/safeSubmit";
 export * from "./intl/common-ui-en";
 export * from "./intl/common-ui-fr";
+export * from "./intl/common-ui-intl";
 export * from "./intl/IntlSupport";
 export * from "./intl/LanguageSelector";
 export * from "./key-value-table/KeyValueTable";

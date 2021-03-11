@@ -1,7 +1,7 @@
 import {
   ApiClientContext,
   ButtonBar,
-  CancelButton,
+  BackButton,
   DinaForm,
   FieldView,
   LoadingSpinner,
@@ -45,7 +45,7 @@ export function CollectorGroupDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("collectorGroupViewTitle")} />
       <Nav />
       <ButtonBar>
-        <CancelButton
+        <BackButton
           entityId={id as string}
           entityLink="/collector-group"
           byPassView={true}

@@ -13,7 +13,7 @@ export interface LabelWrapperParams {
   /** The label for the field. */
   label?: string;
 
-  /** Override the default name. */
+  /** Override the default "name" prop used to get labels and tooltips from the intl messages. */
   customName?: string;
 }
 
