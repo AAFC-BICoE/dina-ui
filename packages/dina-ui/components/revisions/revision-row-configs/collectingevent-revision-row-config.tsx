@@ -24,7 +24,7 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
         <ReferenceLink<Person>
           baseApiPath="agent-api"
           instanceId={{ typeName: "person", cdoId: rel.id }}
-          link={({ displayName }) => <span>{displayName}</span>}
+          link={({ displayName }) => <><span>{displayName}</span> <br/></>}
         />
       ));
     },
