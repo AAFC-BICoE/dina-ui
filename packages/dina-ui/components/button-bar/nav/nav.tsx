@@ -214,6 +214,11 @@ function NavCollectionDropdown() {
             </a>
           </Link>
         </div>
+        <Link href="/collection/revisions-by-user/">
+          <a className="dropdown-item">
+            <DinaMessage id="revisionsByUserPageTitle" />
+          </a>
+        </Link>       
       </div>
     </div>
   );
