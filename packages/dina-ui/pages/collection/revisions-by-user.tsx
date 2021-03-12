@@ -1,5 +1,5 @@
 import { COLLECTION_REVISION_ROW_CONFIG } from "packages/dina-ui/components/revisions/revision-row-configs/collection-revision-row-configs";
-import  RevisionsByUserPage  from "../../components/revision-by-user/RevisionByUserPage";
+import  RevisionsByUserPage  from "../../components/revision-by-user/CommonRevisionsByUserPage";
 
 export default function CollectionRevisionByUserPage (){
   return (

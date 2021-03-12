@@ -1,7 +1,7 @@
 import { DinaForm, DinaFormOnSubmit, SubmitButton, TextField } from "common-ui";
 import { useRouter } from "next/router";
-import { Footer, Head, Nav } from "../../components";
-import { RevisionsPageLayout } from "../../components/revisions/RevisionsPageLayout";
+import { Footer, Head, Nav } from "..";
+import { RevisionsPageLayout } from "../revisions/RevisionsPageLayout";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { RevisionRowConfigsByType } from "../revisions/revision-row-config";
 
