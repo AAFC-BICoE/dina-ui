@@ -246,7 +246,8 @@ function CollectingEventFormInternal({
       <div className="row">
         <div className="col-md-3">
           <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLocality" />
-          <GeoSuggestSearchBox />
+          {/* Re-show this button once other location fields (city/country etc.) are implemented: */}
+          {/* <GeoSuggestSearchBox /> */}
         </div>
         <KeyboardEventHandlerWrappedTextField
           name="dwcVerbatimLatitude"
