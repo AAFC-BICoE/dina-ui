@@ -1,13 +1,13 @@
 import { ButtonBar, CreateButton, ListPageLayout, dateCell } from "common-ui";
 import Link from "next/link";
-import { Footer, Head, Nav } from "../../components";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { Footer, Head, Nav } from "../../../components";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 const COLLECTOR_GROUP_FILTER_ATTRIBUTES = ["createdBy"];
 const COLLECTOR_GROUP_TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/collector-group/view?id=${id}`}>{name}</Link>
+      <Link href={`/collection/collector-group/view?id=${id}`}>{name}</Link>
     ),
     accessor: "name",
     sortable: false
@@ -35,7 +35,7 @@ export default function collectorGroupListPage() {
           id="collector-group-list"
           queryTableProps={{
             columns: COLLECTOR_GROUP_TABLE_COLUMNS,
-            path: "collection-api/collector-group"
+            path: "collection-api/collection/collector-group"
           }}
         />
       </main>

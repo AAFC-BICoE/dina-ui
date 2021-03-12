@@ -1,7 +1,7 @@
 import { OperationsResponse, ResourceSelect } from "common-ui";
-import CollectorGroupEditPage from "../../../pages/collector-group/edit";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { CollectorGroup } from "../../../types/collection-api/resources/CollectorGroup";
+import CollectorGroupEditPage from "../../../../pages/collection/collector-group/edit";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { CollectorGroup } from "../../../../types/collection-api/resources/CollectorGroup";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -100,7 +100,7 @@ describe("collector-group edit page", () => {
     );
 
     // The user should be redirected to the new collector-group's details page.
-    expect(mockPush).lastCalledWith("/collector-group/list");
+    expect(mockPush).lastCalledWith("/collection/collector-group/list");
   });
 
   it("Renders an error after form submit without specifying madatory field.", async done => {

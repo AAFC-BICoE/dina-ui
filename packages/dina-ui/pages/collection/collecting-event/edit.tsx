@@ -28,13 +28,13 @@ import {
   Head,
   Nav,
   useAddPersonModal
-} from "../../components";
-import { useAttachmentsModal } from "../../components/object-store";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
+} from "../../../components";
+import { useAttachmentsModal } from "../../../components/object-store";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 import { useFormikContext } from "formik";
-import { GeoReferenceAssertionRow } from "../../components/collection/GeoReferenceAssertionRow";
-import { Metadata } from "../../types/objectstore-api";
+import { GeoReferenceAssertionRow } from "../../../components/collection/GeoReferenceAssertionRow";
+import { Metadata } from "../../../types/objectstore-api";
 
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
@@ -519,7 +519,7 @@ function CollectingEventForm({
         apiBaseUrl: "/collection-api"
       }
     );
-    await router.push(`/collecting-event/view?id=${saved.id}`);
+    await router.push(`/collection/collecting-event/view?id=${saved.id}`);
   };
 
   return (
@@ -532,14 +532,14 @@ function CollectingEventForm({
         <SubmitButton />
         <BackButton
           entityId={id as string}
-          entityLink="/collecting-event"
+          entityLink="/collection/collecting-event"
           byPassView={true}
         />
         <DeleteButton
           className="ml-5"
           id={id as string}
           options={{ apiBaseUrl: "/collection-api" }}
-          postDeleteRedirect="/collecting-event/list"
+          postDeleteRedirect="/collection/collecting-event/list"
           type="collecting-event"
         />
       </ButtonBar>

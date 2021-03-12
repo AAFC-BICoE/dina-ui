@@ -3,9 +3,9 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { COLLECTION_REVISION_ROW_CONFIG } from "packages/dina-ui/components/revisions/revision-row-configs/collection-revision-row-configs";
 import { CollectingEvent } from "packages/dina-ui/types/collection-api/resources/CollectingEvent";
-import { Footer, Head, Nav } from "../../components";
-import { RevisionsPageLayout } from "../../components/revisions/RevisionsPageLayout";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { Footer, Head, Nav } from "../../../components";
+import { RevisionsPageLayout } from "../../../components/revisions/RevisionsPageLayout";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export default function CollectingEventRevisionListPage() {
   const { formatMessage } = useDinaIntl();
@@ -31,7 +31,7 @@ export default function CollectingEventRevisionListPage() {
         <main className="container-fluid">
           <h1>{pageTitle}</h1>
           <div className="form-group">
-            <Link href={`/collecting-event/view?id=${collectingEvent.id}`}>
+            <Link href={`/collection/collecting-event/view?id=${collectingEvent.id}`}>
               <a>
                 <DinaMessage id="detailsPageLink" />
               </a>

@@ -1,8 +1,8 @@
 import { OperationsResponse } from "common-ui";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
-import CollectingEventEditPage from "../../../pages/collecting-event/edit";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
+import CollectingEventEditPage from "../../../../pages/collection/collecting-event/edit";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -164,7 +164,7 @@ describe("collecting-event edit page", () => {
     );
 
     // The user should be redirected to the new collecting-event's details page.
-    expect(mockPush).lastCalledWith("/collecting-event/view?id=1");
+    expect(mockPush).lastCalledWith("/collection/collecting-event/view?id=1");
   });
 
   it("Provides a form to edit a collecting-event.", async done => {
