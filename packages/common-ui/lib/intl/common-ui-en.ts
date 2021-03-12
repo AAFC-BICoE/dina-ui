@@ -9,6 +9,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   addNew: "Add New",
   areYouSure: "Are you sure?",
   attributeLabel: "Attribute",
+  autoFillGeoSuggestLabel:
+    "Auto-fill Location Fields (This search box's value is not persisted)",
   backLabel: "Back",
   backToListButtonText: "Back to List",
   bulkEditorValidationError: "Invalid value on row {row}: {value}",

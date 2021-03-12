@@ -1,4 +1,5 @@
 import { TextField, TextFieldProps } from "common-ui";
+import { FormikContextType, useFormikContext } from "formik";
 import { InputHTMLAttributes, useState } from "react";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { KeyboardEventHandlerWrapper } from "../keyboard-event-handler/KeyboardEventHandlerWrappedTextField";
@@ -11,6 +12,13 @@ export type GeoSuggestTextFieldProps = TextFieldProps & GeoSuggestProps;
 export interface GeoSuggestProps {
   /** Fetches json from a url. */
   fetchJson?: (url: string) => Promise<any>;
+
+  onSelectSearchResult?: (
+    result: NominatumApiSearchResult,
+    formik: FormikContextType<any>
+  ) => void;
+
+  inputProps?: Omit<InputHTMLAttributes<any>, "onChange" | "value">;
 }
 
 export interface NominatumApiSearchResult {
@@ -35,37 +43,17 @@ export interface NominatumApiSearchResult {
   };
 }
 
-/**
- * Suggests typeahead values based on a back-end query.
- * The suggestion values are taken from each returned API resource.
- */
-export function GeoSuggestTextField({
-  fetchJson,
-  ...textFieldProps
-}: GeoSuggestTextFieldProps) {
-  return (
-    <TextField
-      {...textFieldProps}
-      customInput={inputProps => (
-        <GeoSuggestTextFieldInternal
-          fetchJson={fetchJson}
-          {...(inputProps as any)}
-        />
-      )}
-    />
-  );
-}
-
-type GeoSuggestTextFieldInternalProps = InputHTMLAttributes<any> &
-  GeoSuggestProps;
-
-function GeoSuggestTextFieldInternal({
+export function GeoSuggestSearchBox({
   fetchJson = url => window.fetch(url).then(res => res.json()),
-  ...inputProps
-}: GeoSuggestTextFieldInternalProps) {
+  onSelectSearchResult,
+  inputProps
+}: GeoSuggestProps) {
   const { closeModal, openModal } = useModal();
+  const formikContext = useFormikContext<any>();
+
   /** Whether the Geo Api is on hold. Just to make sure we don't send more requests than we are allowed to. */
   const [geoApiRequestsOnHold, setGeoApiRequestsOnHold] = useState(false);
+  const [inputValue, setInputValue] = useState("");
 
   async function nominatimSearch(
     searchValue: string
@@ -89,12 +77,17 @@ function GeoSuggestTextFieldInternal({
     }
   }
 
-  async function openGeoSuggestModal() {
-    const geoSearchResults = await nominatimSearch(String(inputProps.value));
+  const suggestButtonIsDisabled = geoApiRequestsOnHold || !inputValue;
 
+  async function openGeoSuggestModal() {
     // Set a 1-second API request throttle:
+    if (suggestButtonIsDisabled) {
+      return;
+    }
     setGeoApiRequestsOnHold(true);
     setTimeout(() => setGeoApiRequestsOnHold(false), 1000);
+
+    const geoSearchResults = await nominatimSearch(String(inputValue));
 
     // Filter results down to administrative boundaries:
     const administrativeBoundaries = geoSearchResults.filter(
@@ -103,9 +96,9 @@ function GeoSuggestTextFieldInternal({
     );
 
     function selectGeoResult(result: NominatumApiSearchResult) {
-      // TODO add callback here to change other fields
-      // console.log({ selection: result });
       closeModal();
+      setInputValue("");
+      onSelectSearchResult?.(result, formikContext);
     }
 
     openModal(
@@ -119,8 +112,8 @@ function GeoSuggestTextFieldInternal({
           <div className="list-group suggestion-list">
             {administrativeBoundaries.map(boundary => (
               <button
-                key={boundary.osm_id}
                 type="button"
+                key={boundary.osm_id}
                 className="list-group-item btn btn-light text-left"
                 onClick={() => selectGeoResult(boundary)}
               >
@@ -138,26 +131,43 @@ function GeoSuggestTextFieldInternal({
     );
   }
 
-  const suggestButtonDisabled = geoApiRequestsOnHold || !inputProps.value;
-
   return (
-    <div>
+    <div className="form-group geo-suggest-search-box">
       <style>{`.autosuggest-highlighted { background-color: #ddd; }`}</style>
-      <KeyboardEventHandlerWrapper onChange={inputProps.onChange}>
-        <textarea rows={3} {...inputProps} />
+      <KeyboardEventHandlerWrapper>
+        <label className="w-100">
+          <div>
+            <strong>
+              <CommonMessage id="autoFillGeoSuggestLabel" />
+            </strong>
+          </div>
+          <div className="input-group">
+            <input
+              className="form-control"
+              onChange={e => setInputValue(e.target.value)}
+              // Pressing enter should open the modal, not submit the form:
+              onKeyDown={e => {
+                if (e.keyCode === 13) {
+                  e.preventDefault();
+                  openGeoSuggestModal();
+                }
+              }}
+              value={inputValue}
+              {...inputProps}
+            />
+            <div className="input-group-append">
+              <FormikButton
+                className="btn btn-info geo-suggest-button"
+                buttonProps={() => ({ disabled: suggestButtonIsDisabled })}
+                onClick={openGeoSuggestModal}
+              >
+                <CommonMessage id="geoSuggest" />
+              </FormikButton>
+              <Tooltip id="geoSuggestTooltip" />
+            </div>
+          </div>
+        </label>
       </KeyboardEventHandlerWrapper>
-      <div className="form-group">
-        <div className="float-right">
-          <FormikButton
-            className="btn btn-info geo-suggest-button"
-            buttonProps={() => ({ disabled: suggestButtonDisabled })}
-            onClick={openGeoSuggestModal}
-          >
-            <CommonMessage id="geoSuggest" />
-          </FormikButton>
-          <Tooltip id="geoSuggestTooltip" />
-        </div>
-      </div>
     </div>
   );
 }

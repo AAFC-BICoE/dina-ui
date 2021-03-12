@@ -2,9 +2,9 @@ import Autosuggest from "react-autosuggest";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import {
-  GeoSuggestTextField,
+  GeoSuggestSearchBox,
   NominatumApiSearchResult
-} from "../GeoSuggestTextField";
+} from "../GeoSuggestSearchBox";
 
 // Mock out the KeyboardEventHandler which should only be rendered in the browser.
 jest.mock("next/dynamic", () => () => {
@@ -47,11 +47,11 @@ describe("GeoSuggestTextField component", () => {
   it("Fetches the suggestions from the Nominatim API.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
-        <GeoSuggestTextField name="geoField" fetchJson={mockFetchJson} />
+        <GeoSuggestSearchBox fetchJson={mockFetchJson} />
       </DinaForm>
     );
 
-    wrapper.find("textarea").prop<any>("onChange")({
+    wrapper.find("input").prop<any>("onChange")({
       target: { value: "ottawa" }
     } as any);
 
@@ -63,6 +63,11 @@ describe("GeoSuggestTextField component", () => {
 
     await new Promise(setImmediate);
     wrapper.update();
+
+    // THe button should be disabled after searching due to API request throttling:
+    expect(wrapper.find("button.geo-suggest-button").prop("disabled")).toEqual(
+      true
+    );
 
     // Suggestions are shown in a list of buttons:
     expect(

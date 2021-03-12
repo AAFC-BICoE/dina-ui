@@ -9,7 +9,7 @@ import {
   filterBy,
   FormattedTextField,
   FormikButton,
-  GeoSuggestTextField,
+  GeoSuggestSearchBox,
   KeyboardEventHandlerWrappedTextField,
   LoadingSpinner,
   Query,
@@ -244,7 +244,10 @@ function CollectingEventFormInternal({
         />
       </div>
       <div className="row">
-        <GeoSuggestTextField className="col-md-3" name="dwcVerbatimLocality" />
+        <div className="col-md-3">
+          <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLocality" />
+          <GeoSuggestSearchBox />
+        </div>
         <KeyboardEventHandlerWrappedTextField
           name="dwcVerbatimLatitude"
           className="col-md-3"
@@ -562,7 +565,6 @@ function CollectingEventForm({
         saveGeoReferenceAssertion={saveGeoReferenceAssertion}
         deletedId={deletedId as any}
         setDeletedId={setDeletedId}
-        key={Math.random()}
       />
       <div className="form-group">{attachedMetadatasUI}</div>
     </DinaForm>
