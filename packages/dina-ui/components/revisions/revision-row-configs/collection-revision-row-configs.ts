@@ -3,5 +3,5 @@ import { COLLECTING_EVENT_REVISION_ROW_CONFIG } from "./collectingevent-revision
 
 /** Custom revision row behavior for Object Store Resources. */
 export const COLLECTION_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
-  collectingEvent: COLLECTING_EVENT_REVISION_ROW_CONFIG
+  "collecting-event": COLLECTING_EVENT_REVISION_ROW_CONFIG
 };

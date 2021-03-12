@@ -20,10 +20,10 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
     // Link to the collector:
     collectors: ({ original: { value: relation } }) => {
       return (
-        relation && (
+        relation?.map (rel=>
         <ReferenceLink<Person>
           baseApiPath="agent-api"
-          instanceId={{ typeName: "person", cdoId: relation.id }}
+          instanceId={{ typeName: "person", cdoId: rel.id }}
           link={({ displayName }) => <span>{displayName}</span>}
         />
       ));
@@ -31,11 +31,11 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
     // Link to the georeference assertion:
     geoReferenceAssertions: ({ original: { value: relation } }) => {
       return (
-        relation && (
+        relation.map ( rel=>
           <ReferenceLink<GeoReferenceAssertion>
-            baseApiPath="georeference-assertion"
-            instanceId={{ typeName: "georeference-assertion", cdoId: relation.id }}
-            link={({ literalGeoreferencedBy }) => <span>{literalGeoreferencedBy}</span>}
+            baseApiPath="collection-api"
+            instanceId={{ typeName: "georeference-assertion", cdoId: rel.cdoId }}
+            link={({ id }) => <span>{id}</span>}
           />
         )
       );
