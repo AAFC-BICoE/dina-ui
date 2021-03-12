@@ -1,4 +1,5 @@
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { OBJECT_STORE_REVISION_ROW_CONFIG } from "../../revisions/revision-row-configs/objectstore-revision-row-configs";
 import RevisionsByUserPage, {
   AuthorFilterForm
 } from "../CommonRevisionsByUserPage";
@@ -40,7 +41,9 @@ describe("MetadataRevisionListPage", () => {
   it("Renders the page.", async () => {
     mockUseRouter.mockReturnValue({ query: { author: "MatPoff" } });
 
-    const wrapper = mountWithAppContext(<RevisionsByUserPage snapshotPath="testPath" revisionRowConfigsByType={{}}/>, {
+    const wrapper = mountWithAppContext(<RevisionsByUserPage 
+      snapshotPath="objectstore-api/audit-snapshot" 
+      revisionRowConfigsByType={OBJECT_STORE_REVISION_ROW_CONFIG} />, {
       apiContext: { apiClient: { get: mockGet } as any }
     });
 
