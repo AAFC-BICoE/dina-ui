@@ -42,7 +42,7 @@ export interface ApiClientI {
 
   /** Creates or updates one or multiple resources. */
   save: <TData extends KitsuResource = KitsuResource>(
-    saveArgs: SaveArgs[],
+    args: (SaveArgs | DeleteArgs)[],
     options?: DoOperationsOptions
   ) => Promise<PersistedResource<TData>[]>;
 
@@ -65,6 +65,10 @@ export interface ApiClientConfig {
 export interface SaveArgs<T extends KitsuResource = KitsuResource> {
   resource: T;
   type: string;
+}
+
+export interface DeleteArgs {
+  delete: PersistedResource<any>;
 }
 
 /**
@@ -184,15 +188,18 @@ export class ApiClientImpl implements ApiClientI {
    * Creates or updates one or multiple resources.
    */
   public async save<TData extends KitsuResource = KitsuResource>(
-    saveArgs: SaveArgs[],
+    args: (SaveArgs | DeleteArgs)[],
     options?: DoOperationsOptions
   ): Promise<PersistedResource<TData>[]> {
+    const deleteArgs = args.filter(arg => arg.delete) as DeleteArgs[];
+    const saveArgs = args.filter(arg => !arg.delete) as SaveArgs[];
+
     // Serialize the resources to JSONAPI format.
     const serializePromises = saveArgs.map(saveArg => serialize(saveArg));
     const serialized = await Promise.all(serializePromises);
 
-    // Create the jsonpatch oeprations objects.
-    const operations = serialized.map<Operation>(jsonapiResource => ({
+    // Create the jsonpatch operations objects.
+    const saveOperations = serialized.map<Operation>(jsonapiResource => ({
       op: jsonapiResource.id ? "PATCH" : "POST",
       path: jsonapiResource.id
         ? `${jsonapiResource.type}/${jsonapiResource.id}`
@@ -202,6 +209,13 @@ export class ApiClientImpl implements ApiClientI {
         id: String(jsonapiResource.id || this.cfg.newId?.() || uuidv4())
       }
     }));
+
+    const deleteOperations = deleteArgs.map<Operation>(deleteArg => ({
+      op: "DELETE",
+      path: `${deleteArg.delete.type}/${deleteArg.delete.id}`
+    }));
+
+    const operations = [...saveOperations, ...deleteOperations];
 
     // Do the operations request.
     const responses = await this.doOperations(operations, options);

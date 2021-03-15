@@ -13,6 +13,7 @@ import {
   LoadingSpinner,
   Query,
   ResourceSelectField,
+  SaveArgs,
   SubmitButton,
   TextField,
   useApiClient
@@ -341,27 +342,39 @@ function CollectingEventForm({
   const { save } = useApiClient();
 
   async function saveGeoReferenceAssertion(
-    assertions: GeoReferenceAssertion[],
+    assertionsToSave: GeoReferenceAssertion[],
     linkedCollectingEvent: PersistedResource<CollectingEvent>
   ) {
-    const savedAssertions = await save(
-      assertions
-        .filter(assertion => Object.keys(assertion).length > 0)
-        .map(assertion => {
-          return {
-            resource: {
-              ...assertion,
-              type: "georeference-assertion",
-              collectingEvent: {
-                type: linkedCollectingEvent.type,
-                id: linkedCollectingEvent.id
-              }
-            },
-            type: "georeference-assertion"
-          };
-        }),
-      { apiBaseUrl: "/collection-api" }
+    const existingAssertions = initialValues.geoReferenceAssertions as PersistedResource<
+      GeoReferenceAssertion
+    >[];
+
+    const assertionIdsToSave = assertionsToSave.map(it => it.id);
+    const assertionsToDelete = existingAssertions.filter(
+      existingAssertion => !assertionIdsToSave.includes(existingAssertion.id)
     );
+
+    const saveArgs: SaveArgs[] = assertionsToSave
+      .filter(assertion => Object.keys(assertion).length > 0)
+      .map(assertion => {
+        return {
+          resource: {
+            ...assertion,
+            type: "georeference-assertion",
+            collectingEvent: {
+              type: linkedCollectingEvent.type,
+              id: linkedCollectingEvent.id
+            }
+          },
+          type: "georeference-assertion"
+        };
+      });
+
+    const deleteArgs = assertionsToDelete.map(assertion => ({
+      delete: assertion
+    }));
+
+    await save([...saveArgs, ...deleteArgs], { apiBaseUrl: "/collection-api" });
   }
 
   const onSubmit: DinaFormOnSubmit = async ({ submittedValues }) => {
@@ -445,11 +458,11 @@ function CollectingEventForm({
       }
     );
 
-    // save georefernce assertions
-    // await saveGeoReferenceAssertion(
-    //   geoReferenceAssertionsToSave,
-    //   savedCollectingEvent
-    // );
+    // save georeference assertions:
+    await saveGeoReferenceAssertion(
+      geoReferenceAssertionsToSave,
+      savedCollectingEvent
+    );
 
     await router.push(`/collecting-event/view?id=${savedCollectingEvent.id}`);
   };
