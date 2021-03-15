@@ -191,8 +191,8 @@ export class ApiClientImpl implements ApiClientI {
     args: (SaveArgs | DeleteArgs)[],
     options?: DoOperationsOptions
   ): Promise<PersistedResource<TData>[]> {
-    const deleteArgs = args.filter(arg => arg.delete) as DeleteArgs[];
-    const saveArgs = args.filter(arg => !arg.delete) as SaveArgs[];
+    const deleteArgs = args.filter(arg => (arg as any).delete) as DeleteArgs[];
+    const saveArgs = args.filter(arg => !(arg as any).delete) as SaveArgs[];
 
     // Serialize the resources to JSONAPI format.
     const serializePromises = saveArgs.map(saveArg => serialize(saveArg));
