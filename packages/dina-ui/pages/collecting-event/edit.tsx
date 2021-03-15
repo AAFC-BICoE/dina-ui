@@ -266,7 +266,9 @@ function CollectingEventFormInternal() {
                       <TabList>
                         {assertions.length
                           ? assertions.map((assertion, index) => (
-                              <Tab key={assertion.id}> {index + 1} </Tab>
+                              <Tab key={assertion.id}>
+                                <span className="m-3">{index + 1}</span>
+                              </Tab>
                             ))
                           : null}
                       </TabList>
@@ -374,7 +376,8 @@ function CollectingEventForm({
       delete: assertion
     }));
 
-    await save([...saveArgs, ...deleteArgs], { apiBaseUrl: "/collection-api" });
+    await save(saveArgs, { apiBaseUrl: "/collection-api" });
+    await save(deleteArgs, { apiBaseUrl: "/collection-api" });
   }
 
   const onSubmit: DinaFormOnSubmit = async ({ submittedValues }) => {
