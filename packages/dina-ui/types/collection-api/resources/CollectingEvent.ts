@@ -22,6 +22,11 @@ export interface CollectingEventAttributes {
   dwcOtherRecordNumbers?: string[];
   dwcRecordNumber?: string;
 
+  dwcCountry?: string;
+  dwcCountryCode?: string;
+  dwcStateProvince?: string;
+  dwcMunicipality?: string;
+
   createdBy?: string;
   createdOn?: string;
   collectorGroupUuid?: string;
