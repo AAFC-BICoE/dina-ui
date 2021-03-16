@@ -12,16 +12,19 @@ import {
   GeoSuggestSearchBox,
   KeyboardEventHandlerWrappedTextField,
   LoadingSpinner,
+  NominatumApiSearchResult,
   Query,
   ResourceSelectField,
   SubmitButton,
   TextField,
-  useApiClient
+  useApiClient,
+  useModal
 } from "common-ui";
 import { useFormikContext } from "formik";
 import { KitsuResponse, PersistedResource } from "kitsu";
 import { orderBy } from "lodash";
 import { NextRouter, useRouter } from "next/router";
+import { GeographySearchDialog } from "packages/dina-ui/components/collection/GeographySearchDialog";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import { Dispatch, useContext, useState } from "react";
 import Switch from "react-switch";
@@ -145,6 +148,7 @@ function CollectingEventFormInternal({
   >();
 
   const [activeTabIdx, setActiveTabIdx] = useState(0);
+  const { closeModal, openModal } = useModal();
 
   const deleteById = async id => {
     await doOperations(
@@ -170,6 +174,42 @@ function CollectingEventFormInternal({
       setDeletedId(id);
     }
   };
+
+  async function nominatimSearch(
+    searchValue: string
+  ): Promise<NominatumApiSearchResult[]> {
+    if (!searchValue?.trim()) {
+      return [];
+    }
+
+    const url = new URL("https://nominatim.openstreetmap.org/search.php");
+    url.search = new URLSearchParams({
+      q: searchValue,
+      addressdetails: "1",
+      format: "jsonv2"
+    }).toString();
+
+    const fetchJson = url => window.fetch(url).then(res => res.json());
+
+    try {
+      const results = await fetchJson(url.toString());
+      return results as NominatumApiSearchResult[];
+    } catch (error) {
+      return [];
+    }
+  };
+  
+  const searchByValueOnAdminBoundaries = async (searchValue :string)=> {
+    const geoSearchResults = nominatimSearch(String(searchValue));
+
+    // Filter results down to administrative boundaries:
+    const administrativeBoundaries = (await geoSearchResults).filter(
+      result =>
+        result.category === "boundary" && result.type === "administrative"
+    );
+    setAdministrativeBoundaries(administrativeBoundaries);     
+    //setInputValue(inputValue);    
+}  
 
   return (
     <div>
@@ -408,15 +448,33 @@ function CollectingEventFormInternal({
                 <legend className="w-auto">
                   <DinaMessage id="toponymyLegend" />
                 </legend>
+                <button
+                  type="button"
+                  className="btn btn-light text-left"
+                  onClick={() =>{ 
+                    searchByValueOnAdminBoundaries(values.placeName  as any);
+                    openModal(<GeographySearchDialog searchByValue={values.placeName as any}
+                   closeModal={closeModal}  />)}}>
+                  <DinaMessage id="openGeographySearchButtonLabel" />
+                </button>
+                <div>
+                  <TextField name="placeName" />
+                  <TextField name="dwcMunicipality" />
+                  <TextField name="dwcStateProvince" />
+                  <TextField name="dwcCountry" />
+                </div>
               </fieldset>
-            </div>  
+            </div>
           </div>
         </fieldset>
         </div>
       </div>
     </div>
   );
+
+  
 }
+
 
 function CollectingEventForm({
   collectingEvent,

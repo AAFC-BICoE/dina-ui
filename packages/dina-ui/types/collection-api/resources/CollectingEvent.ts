@@ -33,6 +33,8 @@ export interface CollectingEventAttributes {
   collectorGroups?: CollectorGroup[];
   group: string;
   managedAssertions?: GeoReferenceAssertion[];
+
+  placeName?: string
 }
 
 export interface CollectingEventRelationships {
