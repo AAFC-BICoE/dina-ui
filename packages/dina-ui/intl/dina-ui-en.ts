@@ -32,6 +32,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingDateLegend: "Collecting Date",
   collectingEventListTitle: "Collecting Event",
   collectingEventViewTitle: "View Collecting Event",
+  collectingLocationLegend: "Collecing Location",
   collectorGroupAgentsLabel: "Collector Group Agents",
   collectorGroupListTitle: "Collector Group",
   collectorGroupNameLabel: "Collector Group Name",
@@ -105,6 +106,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "field_description.en": "English Description",
   "field_description.fr": "French Description",
   field_displayName: "Display Name",
+  field_dwcCountry: "Country",
+  field_dwcCountryCode: "Country Code",
   field_dwcGeoreferenceProtocol_tooltip:
     "A description or reference to the methods used to determine the spatial footprint, coordinates, and uncertainties.",
   field_dwcGeoreferenceSources_tooltip:
@@ -122,6 +125,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcGeoreferenceProtocol: "Georeference Protocol",
   field_dwcGeoreferenceRemarks: "Georeference Remarks",
   field_dwcGeoreferenceSources: "Georeference Sources",
+  field_dwcMunicipality: "Municipality",
+  field_dwcStateProvince: "State/Province",
   field_dwcVerbatimCoordinates: "Verbatim Coordinates",
   field_dwcVerbatimCoordinates_tooltip:
     "The verbatim original spatial coordinates of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem. Examples: 41 05 54S 121 05 34W, 17T 630000 4833400",
@@ -243,6 +248,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   startEventDateTimeLabel: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   thumbnailNotAvailableText: "No thumbnail available",
   to: "To",
+  toponymyLegend: "Toponymy",
   uploadButtonText: "Upload",
   uploadFormInstructions:
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
