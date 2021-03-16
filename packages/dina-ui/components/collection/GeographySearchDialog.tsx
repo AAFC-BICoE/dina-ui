@@ -75,7 +75,7 @@ export function GeographySearchDialog({searchByValue, closeModal}: GeoGraphySear
           </h2>
         </div>
         <div className="modal-body">
-         <div className="row">
+          <div className="row">
             <div className="col-md-9">
               <input
                 className="form-control"
@@ -88,19 +88,9 @@ export function GeographySearchDialog({searchByValue, closeModal}: GeoGraphySear
                 <DinaMessage id="searchButton" />
               </button>
             </div>
-            </div>
+          </div>
             {administrativeBoundaries?.map((boundary)=>{
             <div className="row">
-              <div className="row">
-                <div className="col-md-2">
-                  <button
-                    type="button"
-                    className="list-group-item btn btn-light text-left"
-                  >
-                    {"Hello"}
-                  </button>
-                </div>
-              </div>
               <div className="col-md-2">
                 <button
                   type="button"

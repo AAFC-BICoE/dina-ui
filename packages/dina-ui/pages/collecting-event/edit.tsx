@@ -174,43 +174,7 @@ function CollectingEventFormInternal({
       setDeletedId(id);
     }
   };
-
-  async function nominatimSearch(
-    searchValue: string
-  ): Promise<NominatumApiSearchResult[]> {
-    if (!searchValue?.trim()) {
-      return [];
-    }
-
-    const url = new URL("https://nominatim.openstreetmap.org/search.php");
-    url.search = new URLSearchParams({
-      q: searchValue,
-      addressdetails: "1",
-      format: "jsonv2"
-    }).toString();
-
-    const fetchJson = url => window.fetch(url).then(res => res.json());
-
-    try {
-      const results = await fetchJson(url.toString());
-      return results as NominatumApiSearchResult[];
-    } catch (error) {
-      return [];
-    }
-  };
   
-  const searchByValueOnAdminBoundaries = async (searchValue :string)=> {
-    const geoSearchResults = nominatimSearch(String(searchValue));
-
-    // Filter results down to administrative boundaries:
-    const administrativeBoundaries = (await geoSearchResults).filter(
-      result =>
-        result.category === "boundary" && result.type === "administrative"
-    );
-    setAdministrativeBoundaries(administrativeBoundaries);     
-    //setInputValue(inputValue);    
-}  
-
   return (
     <div>
       <div className="form-group">
@@ -452,7 +416,6 @@ function CollectingEventFormInternal({
                   type="button"
                   className="btn btn-light text-left"
                   onClick={() =>{ 
-                    searchByValueOnAdminBoundaries(values.placeName  as any);
                     openModal(<GeographySearchDialog searchByValue={values.placeName as any}
                    closeModal={closeModal}  />)}}>
                   <DinaMessage id="openGeographySearchButtonLabel" />
