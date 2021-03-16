@@ -278,7 +278,7 @@ function CollectingEventFormInternal() {
                               <GeoReferenceAssertionRow index={index} />
                               <div className="list-inline">
                                 <FormikButton
-                                  className="list-inline-item btn btn-primary"
+                                  className="list-inline-item btn btn-primary add-assertion-button"
                                   onClick={addGeoReference}
                                 >
                                   <DinaMessage id="addAssertion" />
@@ -296,7 +296,7 @@ function CollectingEventFormInternal() {
                     </Tabs>
                     {!assertions.length ? (
                       <FormikButton
-                        className="btn btn-primary"
+                        className="btn btn-primary add-assertion-button"
                         onClick={addGeoReference}
                       >
                         <DinaMessage id="addAssertion" />
@@ -376,8 +376,14 @@ function CollectingEventForm({
       delete: assertion
     }));
 
-    await save(saveArgs, { apiBaseUrl: "/collection-api" });
-    await save(deleteArgs, { apiBaseUrl: "/collection-api" });
+    if (saveArgs.length) {
+      await save(saveArgs, { apiBaseUrl: "/collection-api" });
+    }
+    // Call the saves and deleted separately for now.
+    // TODO find out why an operations request with 1 save + 1 delete causes the delete to be ignored.
+    if (deleteArgs.length) {
+      await save(deleteArgs, { apiBaseUrl: "/collection-api" });
+    }
   }
 
   const onSubmit: DinaFormOnSubmit = async ({ submittedValues }) => {

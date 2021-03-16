@@ -3,6 +3,7 @@ import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import CollectingEventEditPage from "../../../pages/collecting-event/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
+import NumberFormat from "react-number-format";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -42,8 +43,6 @@ const mockGet = jest.fn(async model => {
 
 // Mock API requests:
 const mockPatch = jest.fn();
-
-const mockSave = jest.fn();
 
 const mockBulkGet = jest.fn(async paths => {
   if (!paths.length) {
@@ -165,6 +164,99 @@ describe("collecting-event edit page", () => {
 
     // The user should be redirected to the new collecting-event's details page.
     expect(mockPush).lastCalledWith("/collecting-event/view?id=1");
+  });
+
+  it("Lets you add georeference assertions on a new Collecting Event.", async () => {
+    // Return the collecting event so it can then be attached to the new georeference assertion:
+    mockPatch.mockReturnValueOnce({
+      data: [
+        {
+          data: {
+            attributes: {
+              startEventDateTime: "12/21/2019T16:00"
+            },
+            id: "1",
+            type: "collecting-event"
+          },
+          status: 201
+        }
+      ] as OperationsResponse
+    });
+
+    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
+      apiContext
+    });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Edit the start event datetime
+    wrapper.find(".startEventDateTime-field input").simulate("change", {
+      target: {
+        name: "startEventDateTime",
+        value: "201912211600"
+      }
+    });
+
+    wrapper.find("button.add-assertion-button").simulate("click");
+
+    wrapper
+      .find(".dwcDecimalLatitude")
+      .find(NumberFormat)
+      .prop<any>("onValueChange")({ floatValue: 45.394728 });
+    wrapper
+      .find(".dwcDecimalLongitude")
+      .find(NumberFormat)
+      .prop<any>("onValueChange")({ floatValue: -75.701452 });
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+
+    // Saves the collecting event and the georeference assertion in separate requests:
+    // (The collecting event id is required to save the georeference assertion)
+    expect(mockPatch.mock.calls).toEqual([
+      [
+        "/collection-api/operations",
+        [
+          {
+            op: "POST",
+            path: "collecting-event",
+            value: {
+              attributes: expect.objectContaining({
+                startEventDateTime: "2019-12-21T16:00"
+              }),
+              id: "00000000-0000-0000-0000-000000000000",
+              type: "collecting-event"
+            }
+          }
+        ],
+        expect.anything()
+      ],
+      [
+        "/collection-api/operations",
+        [
+          {
+            op: "POST",
+            path: "georeference-assertion",
+            value: {
+              attributes: {
+                dwcDecimalLatitude: 45.394728,
+                dwcDecimalLongitude: -75.701452
+              },
+              id: "00000000-0000-0000-0000-000000000000",
+              relationships: {
+                collectingEvent: {
+                  data: { id: "1", type: "collecting-event" }
+                }
+              },
+              type: "georeference-assertion"
+            }
+          }
+        ],
+        expect.anything()
+      ]
+    ]);
   });
 
   it("Provides a form to edit a collecting-event.", async done => {
