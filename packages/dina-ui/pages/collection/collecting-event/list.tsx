@@ -1,13 +1,13 @@
 import { ButtonBar, CreateButton, dateCell, ListPageLayout } from "common-ui";
 import Link from "next/link";
-import { Footer, GroupSelectField, Head, Nav } from "../../components";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { Footer, GroupSelectField, Head, Nav } from "../../../components";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 const COLLECTING_EVENT_FILTER_ATTRIBUTES = ["createdBy"];
 const COLLECTING_EVENT_TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, createdBy } }) => (
-      <Link href={`/collecting-event/view?id=${id}`}>{createdBy}</Link>
+      <Link href={`/collection/collecting-event/view?id=${id}`}>{createdBy}</Link>
     ),
     accessor: "createdBy",
     sortable: false
@@ -30,7 +30,7 @@ export default function CollectingEventListPage() {
           <DinaMessage id="collectingEventListTitle" />
         </h1>
         <ButtonBar>
-          <CreateButton entityLink="/collecting-event" />
+          <CreateButton entityLink="/collection/collecting-event" />
         </ButtonBar>
         <ListPageLayout
           additionalFilters={filterForm => ({

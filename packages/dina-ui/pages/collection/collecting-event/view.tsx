@@ -15,11 +15,12 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import { useContext, useState } from "react";
-import { Footer, GroupFieldView, Head, Nav } from "../../components";
-import { GeoReferenceAssertionRow } from "../../components/collection/GeoReferenceAssertionRow";
-import { AttachmentReadOnlySection } from "../../components/object-store/attachment-list/AttachmentReadOnlySection";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
+import { Footer, GroupFieldView, Head, Nav } from "../../../components";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
+import { GeoReferenceAssertionRow } from "../../../components/collection/GeoReferenceAssertionRow";
+import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
+import Link from "next/link";
 
 export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -63,10 +64,15 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("collectingEventViewTitle")} />
       <Nav />
       <ButtonBar>
-        <EditButton entityId={id as string} entityLink="collecting-event" />
+        <EditButton entityId={id as string} entityLink="collection/collecting-event" />
+        <Link href={`/collection/collecting-event/revisions?id=${id}`}>
+            <a className="btn btn-info">
+              <DinaMessage id="revisionsButtonText" />
+            </a>
+          </Link>
         <BackButton
           entityId={id as string}
-          entityLink="/collecting-event"
+          entityLink="/collection/collecting-event"
           byPassView={true}
         />
       </ButtonBar>

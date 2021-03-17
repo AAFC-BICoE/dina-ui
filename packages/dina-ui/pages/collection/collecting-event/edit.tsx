@@ -24,8 +24,8 @@ import { useFormikContext } from "formik";
 import { KitsuResponse, PersistedResource } from "kitsu";
 import { orderBy } from "lodash";
 import { NextRouter, useRouter } from "next/router";
-import { GeographySearchDialog } from "../../components/collection/GeographySearchDialog";
-import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
+import { GeographySearchDialog, GeoReferenceAssertionRow} from "../../../components";
+import { Person } from "../../../types/agent-api/resources/Person";
 import { Dispatch, useContext, useState } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -33,13 +33,13 @@ import {
   GroupSelectField,
   Head,
   Nav,
-  useAddPersonModal
-} from "../../components";
-import { GeoReferenceAssertionRow } from "../../components/collection/GeoReferenceAssertionRow";
-import { useAttachmentsModal } from "../../components/object-store";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
-import { Metadata } from "../../types/objectstore-api";
+  useAddPersonModal  
+} from "../../../components";
+
+import { useAttachmentsModal } from "../../../components/object-store";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
+import { Metadata } from "../../../types/objectstore-api";
 
 interface CollectingEventFormProps {
   collectingEvent?: CollectingEvent;
@@ -604,7 +604,7 @@ function CollectingEventForm({
         apiBaseUrl: "/collection-api"
       }
     );
-    await router.push(`/collecting-event/view?id=${saved.id}`);
+    await router.push(`/collection/collecting-event/view?id=${saved.id}`);
   };
 
   return (
@@ -617,14 +617,14 @@ function CollectingEventForm({
         <SubmitButton />
         <BackButton
           entityId={id as string}
-          entityLink="/collecting-event"
+          entityLink="/collection/collecting-event"
           byPassView={true}
         />
         <DeleteButton
           className="ml-5"
           id={id as string}
           options={{ apiBaseUrl: "/collection-api" }}
-          postDeleteRedirect="/collecting-event/list"
+          postDeleteRedirect="/collection/collecting-event/list"
           type="collecting-event"
         />
       </ButtonBar>
