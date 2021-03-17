@@ -150,6 +150,18 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                             <legend className="w-auto">
                               <DinaMessage id="geographyLegend" />
                             </legend>
+                            <FieldView
+                              className="col-md-12"
+                              name="dwcCountry"
+                            />
+                            <FieldView
+                              className="col-md-12"
+                              name="dwcStateProvince"
+                            />
+                            <FieldView
+                              className="col-md-12"
+                              name="dwcMunicipality"
+                            />                            
                           </fieldset>
                         </div>
                         <div className="col-md-6">
