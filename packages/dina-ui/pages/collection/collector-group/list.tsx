@@ -28,14 +28,14 @@ export default function collectorGroupListPage() {
           <DinaMessage id="collectorGroupListTitle" />
         </h1>
         <ButtonBar>
-          <CreateButton entityLink="/collector-group" />
+          <CreateButton entityLink="/collection/collector-group" />
         </ButtonBar>
         <ListPageLayout
           filterAttributes={COLLECTOR_GROUP_FILTER_ATTRIBUTES}
           id="collector-group-list"
           queryTableProps={{
             columns: COLLECTOR_GROUP_TABLE_COLUMNS,
-            path: "collection-api/collection/collector-group"
+            path: "collection-api/collector-group"
           }}
         />
       </main>

@@ -8,15 +8,13 @@ import { RevisionRowConfig } from "../revision-row-config";
 
 export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingEvent> = {
   name: ({ id  }) => (
-    <Link href={`/collecting-event/view?id=${id}`}>
+    <Link href={`/collection/collecting-event/view?id=${id}`}>
       <a>{id}</a>
     </Link>
   ),
   customValueCells: {
     // Date Fields:
     createdOn: ({ original: { value } }) => <DateView date={value} />,
-    startEventDateTime: ({ original: { value } }) => <DateView date={value} />,
-    endEventDateTime: ({ original: { value } }) => <DateView date={value} />,
     // Link to the collector:
     collectors: ({ original: { value: relation } }) => {
       return (
