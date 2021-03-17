@@ -27,7 +27,6 @@ export interface NominatumApiSearchResult {
   display_name: string;
   category: string;
   type: string;
-  place_id: number;
   address?: {
     city?: string;
     city_district?: string;
