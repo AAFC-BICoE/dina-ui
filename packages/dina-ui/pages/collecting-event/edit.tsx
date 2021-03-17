@@ -24,7 +24,7 @@ import { useFormikContext } from "formik";
 import { KitsuResponse, PersistedResource } from "kitsu";
 import { orderBy } from "lodash";
 import { NextRouter, useRouter } from "next/router";
-import { GeographySearchDialog } from "packages/dina-ui/components/collection/GeographySearchDialog";
+import { GeographySearchDialog } from "../../components/collection/GeographySearchDialog";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import { Dispatch, useContext, useState } from "react";
 import Switch from "react-switch";
