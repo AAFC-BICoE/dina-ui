@@ -40,6 +40,7 @@ export interface NominatumApiSearchResult {
     public_building?: string;
     state?: string;
     suburb?: string;
+    county?: string;
   };
 }
 
