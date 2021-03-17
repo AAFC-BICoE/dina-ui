@@ -214,6 +214,11 @@ function NavCollectionDropdown() {
             </a>
           </Link>
         </div>
+        <Link href="/collection/managed-attribute/list">
+          <a className="dropdown-item">
+            <DinaMessage id="managedAttributeListTitle" />
+          </a>
+        </Link>
         <Link href="/collection/revisions-by-user/">
           <a className="dropdown-item">
             <DinaMessage id="revisionsByUserPageTitle" />
