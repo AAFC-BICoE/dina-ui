@@ -5,18 +5,21 @@ import {
   FieldHeader,
   FormikButton,
   QueryTable,
+  Tooltip,
   useGroupedCheckBoxes
 } from "common-ui";
 import { FormikContextType } from "formik";
 import { toPairs } from "lodash";
 import Link from "next/link";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
+import { CommonMessage } from "../../../../common-ui/lib/intl/common-ui-intl";
 
 export interface ExistingAttachmentsTableProps {
   attachmentPath: string;
-  onDetachMetadataIds: (metadataIds: string[]) => Promise<void>;
-  onMetadatasEdited: () => Promise<void>;
+  onDetachMetadataIds?: (metadataIds: string[]) => Promise<void>;
+  onMetadatasEdited?: () => void | Promise<void>;
+  detachTotalSelected?: boolean;
 }
 export interface AttachmentsTableFormValues {
   /** Tracks which metadata IDs are selected. */
@@ -27,15 +30,19 @@ export interface AttachmentsTableFormValues {
 export function ExistingAttachmentsTable({
   attachmentPath,
   onDetachMetadataIds,
-  onMetadatasEdited
+  onMetadatasEdited,
+  detachTotalSelected
 }: ExistingAttachmentsTableProps) {
   const {
     CheckBoxField,
     CheckBoxHeader,
-    setAvailableItems: setAvailableMetadatas
+    setAvailableItems: setAvailableMetadatas,
+    DetachedTotalSelected
   } = useGroupedCheckBoxes({
-    fieldName: "selectedMetadatas"
+    fieldName: "selectedMetadatas",
+    detachTotalSelected
   });
+  const { formatMessage } = useDinaIntl();
 
   const { openMetadataEditorModal } = useBulkMetadataEditModal();
 
@@ -48,12 +55,23 @@ export function ExistingAttachmentsTable({
       sortable: false
     },
     {
-      Cell: ({ original: { id, metadata } }) =>
-        metadata?.originalFilename ? (
+      Cell: ({ original: { id, metadata } }) => {
+        // When this Metadata has been deleted, show a "deleted" message in this cell:
+        if (!metadata) {
+          return (
+            <div>
+              {`<${formatMessage("deleted")}>`}
+              <Tooltip id="deletedMetadata_tooltip" intlValues={{ id }} />
+            </div>
+          );
+        }
+
+        return metadata?.originalFilename ? (
           <Link href={`/object-store/object/view?id=${id}`}>
             {metadata?.originalFilename}
           </Link>
-        ) : null,
+        ) : null;
+      },
       accessor: "metadata.originalFilename",
       Header: <FieldHeader name="originalFilename" />
     },
@@ -104,7 +122,7 @@ export function ExistingAttachmentsTable({
       .filter(pair => pair[1])
       .map(pair => pair[0]);
 
-    await onDetachMetadataIds(metadataIds);
+    await onDetachMetadataIds?.(metadataIds);
   }
 
   return (
@@ -112,7 +130,10 @@ export function ExistingAttachmentsTable({
       initialValues={{ selectedMetadatas: {} }}
     >
       <div className="list-inline" style={{ minHeight: "3rem" }}>
-        <div className="list-inline-item float-right">
+        <div className="float-left">
+          {detachTotalSelected && <DetachedTotalSelected />}
+        </div>
+        <div className="float-right">
           <FormikButton
             buttonProps={bulkButtonProps}
             className="btn btn-primary ml-2 metadata-bulk-edit-button"
@@ -120,13 +141,15 @@ export function ExistingAttachmentsTable({
           >
             <DinaMessage id="editSelectedButtonText" />
           </FormikButton>
-          <FormikButton
-            buttonProps={bulkButtonProps}
-            className="btn btn-primary ml-2 metadata-detach-button"
-            onClick={detachSelectedMetadatas}
-          >
-            <DinaMessage id="detachSelectedButtonText" />
-          </FormikButton>
+          {onDetachMetadataIds && (
+            <FormikButton
+              buttonProps={bulkButtonProps}
+              className="btn btn-primary ml-2 metadata-detach-button"
+              onClick={detachSelectedMetadatas}
+            >
+              <DinaMessage id="detachSelectedButtonText" />
+            </FormikButton>
+          )}
         </div>
       </div>
       <QueryTable

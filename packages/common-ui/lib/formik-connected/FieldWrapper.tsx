@@ -12,6 +12,9 @@ export interface LabelWrapperParams {
 
   /** The label for the field. */
   label?: string;
+
+  /** Override the default "name" prop used to get labels and tooltips from the intl messages. */
+  customName?: string;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -30,9 +33,12 @@ export function FieldWrapper({
   hideLabel = false,
   name,
   label,
-  children
+  children,
+  customName
 }: FieldWrapperProps) {
-  const fieldLabel = label ?? <FieldHeader name={name} />;
+  const fieldLabel = label ?? (
+    <FieldHeader name={name} customName={customName} />
+  );
 
   return (
     <div className={className}>

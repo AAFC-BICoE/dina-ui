@@ -1,7 +1,7 @@
 import {
   ApiClientContext,
   ButtonBar,
-  CancelButton,
+  BackButton,
   DinaForm,
   FieldView,
   LoadingSpinner,
@@ -13,8 +13,8 @@ import { withRouter } from "next/router";
 import { CollectorGroup } from "packages/dina-ui/types/collection-api/resources/CollectorGroup";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import { useContext, useState } from "react";
-import { Footer, Head, Nav } from "../../components";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { Footer, Head, Nav } from "../../../components";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export function CollectorGroupDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -45,9 +45,9 @@ export function CollectorGroupDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("collectorGroupViewTitle")} />
       <Nav />
       <ButtonBar>
-        <CancelButton
+        <BackButton
           entityId={id as string}
-          entityLink="/collector-group"
+          entityLink="/collection/collector-group"
           byPassView={true}
         />
       </ButtonBar>

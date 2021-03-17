@@ -3,7 +3,7 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { BulkMetadataEditor } from "../metadata-bulk-editor/BulkMetadataEditor";
 
 export interface BulkMetadataEditModalParams {
-  afterMetadatasSaved?: (metadataIds: string[]) => Promise<void>;
+  afterMetadatasSaved?: (metadataIds: string[]) => void | Promise<void>;
   objectUploadIds?: string[];
   metadataIds?: string[];
   group?: string;

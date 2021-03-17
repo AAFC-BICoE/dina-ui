@@ -11,10 +11,12 @@ export interface CheckBoxFieldProps<TData extends KitsuResource> {
 
 export interface GroupedCheckBoxesParams {
   fieldName: string;
+  detachTotalSelected?: boolean;
 }
 
 export function useGroupedCheckBoxes<TData extends KitsuResource>({
-  fieldName
+  fieldName,
+  detachTotalSelected
 }: GroupedCheckBoxesParams) {
   const [availableItems, setAvailableItems] = useState<TData[]>([]);
   const lastCheckedItemRef = useRef<TData>();
@@ -86,7 +88,7 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
       <input
         className="check-all-checkbox"
         onClick={onCheckAllCheckBoxClick}
-        style={{ height: "20px", width: "20px" }}
+        style={{ height: "20px", width: "20px", marginLeft: "5px" }}
         type="checkbox"
       />
     );
@@ -96,17 +98,36 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
   const CheckBoxHeader = connect(({ formik: { values } }) => {
     const totalChecked = toPairs(values[fieldName]).filter(pair => pair[1])
       .length;
-
     return (
       <div className="grouped-checkbox-header text-center">
-        <CommonMessage id="select" /> <CheckAllCheckBox />
-        <Tooltip id="checkAllTooltipMessage" />
         <div aria-describedby="checkAllTooltipMessage">
-          ({totalChecked} <CommonMessage id="selected" />)
+          <CommonMessage id="select" /> <CheckAllCheckBox />
+          <Tooltip id="checkAllTooltipMessage" />
+          {!detachTotalSelected && (
+            <div>
+              ({totalChecked} <CommonMessage id="selected" />)
+            </div>
+          )}
         </div>
       </div>
     );
   });
 
-  return { CheckAllCheckBox, CheckBoxField, CheckBoxHeader, setAvailableItems };
+  const DetachedTotalSelected = connect(({ formik: { values } }) => {
+    const totalChecked = toPairs(values[fieldName]).filter(pair => pair[1])
+      .length;
+    return (
+      <div>
+        {totalChecked} <CommonMessage id="selected" />
+      </div>
+    );
+  });
+
+  return {
+    CheckAllCheckBox,
+    CheckBoxField,
+    CheckBoxHeader,
+    setAvailableItems,
+    DetachedTotalSelected
+  };
 }

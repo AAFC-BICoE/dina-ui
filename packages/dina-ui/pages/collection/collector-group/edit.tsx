@@ -1,7 +1,7 @@
 import {
   ApiClientContext,
   ButtonBar,
-  CancelButton,
+  BackButton,
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
@@ -11,11 +11,11 @@ import {
 } from "common-ui";
 import { ResourceSelectField } from "common-ui/lib";
 import { NextRouter, useRouter } from "next/router";
-import { CollectorGroup } from "../../types/collection-api/resources/CollectorGroup";
+import { CollectorGroup } from "../../../types/collection-api/resources/CollectorGroup";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import { useContext } from "react";
-import { Head, Nav } from "../../components";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { Head, Nav } from "../../../components";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 interface CollectorGroupFormProps {
   collectorGroup?: CollectorGroup;
@@ -81,23 +81,23 @@ function CollectorGroupForm({
         apiBaseUrl: "/collection-api"
       }
     );
-    await router.push(`/collector-group/list`);
+    await router.push(`/collection/collector-group/list`);
   };
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <CancelButton
+        <BackButton
           entityId={id as string}
-          entityLink="/collector-group"
+          entityLink="/collection/collector-group"
           byPassView={true}
         />
         <DeleteButton
           className="ml-5"
           id={id as string}
           options={{ apiBaseUrl: "/collection-api" }}
-          postDeleteRedirect="/collector-group/list"
+          postDeleteRedirect="/collection/collector-group/list"
           type="collector-group"
         />
       </ButtonBar>

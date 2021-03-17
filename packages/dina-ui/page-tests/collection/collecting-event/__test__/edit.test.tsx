@@ -1,8 +1,16 @@
 import { OperationsResponse } from "common-ui";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
-import CollectingEventEditPage from "../../../pages/collecting-event/edit";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
+import CollectingEventEditPage from "../../../../pages/collection/collecting-event/edit";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
+
+// Mock out the dynamic component, which should only be rendered in the browser
+jest.mock("next/dynamic", () => () => {
+  return function MockDynamicComponent() {
+    return <div>Mock dynamic component</div>;
+  };
+});
+
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
@@ -22,7 +30,10 @@ let mockQuery: any = {};
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
   // The get request will return the existing collecting-event.
-  if (model === "collection-api/collecting-event/1?include=collectors") {
+  if (
+    model ===
+    "collection-api/collecting-event/1?include=collectors,geoReferenceAssertions,attachment"
+  ) {
     return { data: TEST_COLLECTING_EVENT };
   } else if (model === "agent-api/person") {
     return { data: [TEST_AGENT] };
@@ -32,12 +43,24 @@ const mockGet = jest.fn(async model => {
 // Mock API requests:
 const mockPatch = jest.fn();
 
+const mockSave = jest.fn();
+
 const mockBulkGet = jest.fn(async paths => {
   if (!paths.length) {
     return [];
   }
-  if ((paths[0] as string).startsWith("/agent-api/")) {
-    return TEST_AGENT;
+  if ((paths[0] as string).startsWith("/person/")) {
+    return paths.map(path => ({
+      id: path.replace("/person/", ""),
+      type: "agent"
+    }));
+  }
+  if ((paths[0] as string).startsWith("/metadata/")) {
+    return paths.map(path => ({
+      id: path.replace("/metadata/", ""),
+      type: "metadata",
+      originalFilename: "test-file"
+    }));
   }
 });
 
@@ -108,6 +131,14 @@ describe("collecting-event edit page", () => {
       }
     });
 
+    // Edit the dwcOtherRecordNumbers
+    wrapper.find(".dwcOtherRecordNumbers-field textarea").simulate("change", {
+      target: {
+        name: "dwcOtherRecordNumbers",
+        value: "12\n23"
+      }
+    });
+
     // Submit the form.
     wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
@@ -121,7 +152,8 @@ describe("collecting-event edit page", () => {
           value: {
             attributes: {
               startEventDateTime: "2019-12-21T16:00",
-              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
+              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
+              dwcOtherRecordNumbers: ["12", "23"]
             },
             id: "00000000-0000-0000-0000-000000000000",
             type: "collecting-event"
@@ -132,7 +164,7 @@ describe("collecting-event edit page", () => {
     );
 
     // The user should be redirected to the new collecting-event's details page.
-    expect(mockPush).lastCalledWith("/collecting-event/view?id=1");
+    expect(mockPush).lastCalledWith("/collection/collecting-event/view?id=1");
   });
 
   it("Provides a form to edit a collecting-event.", async done => {
@@ -176,28 +208,9 @@ describe("collecting-event edit page", () => {
     wrapper.find("form").simulate("submit");
 
     setImmediate(() => {
-      // "patch" should have been called with a jsonpatch request containing the existing values
-      // and the modified one.
-      expect(mockPatch).lastCalledWith(
-        "/collection-api/operations",
-        [
-          {
-            op: "PATCH",
-            path: "collecting-event/1",
-            value: {
-              attributes: expect.objectContaining({
-                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 6pm"
-              }),
-              id: "1",
-              type: "collecting-event"
-            }
-          }
-        ],
-        expect.anything()
-      );
-
-      // The user should be redirected to collecting-event's list page.
-      expect(mockPush).lastCalledWith("/collecting-event/view?id=1");
+      expect(mockPatch).toBeCalledTimes(2);
+      expect(mockPatch.mock.calls[0][0]).toBe("/collection-api/operations");
+      expect(mockPatch.mock.calls[1][0]).toBe("/collection-api/operations");
       done();
     });
   });
@@ -254,13 +267,26 @@ const TEST_COLLECTING_EVENT: CollectingEvent = {
   uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
   id: "1",
   type: "collecting-event",
-  startEventDateTime: "12/21/2019T16:00",
-  endEventDateTime: "12/21/2019T17:00",
+  startEventDateTime: "2019-11-11",
+  endEventDateTime: "2019-11-12",
   verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm",
   group: "test group",
   collectors: [
-    { id: "a8fb14f7-cda9-4313-9cc7-f313db653cad", type: "agent" },
-    { id: "eb61092e-fb28-41c8-99e6-d78743296520", type: "agent" }
+    { id: "111", type: "agent" },
+    { id: "222", type: "agent" }
+  ],
+  dwcOtherRecordNumbers: ["12", "13", "14"],
+  geoReferenceAssertions: [
+    {
+      id: "10",
+      dwcDecimalLatitude: 10,
+
+      type: "georeference-assertion"
+    }
+  ],
+  attachment: [
+    { id: "88888", type: "metadata" },
+    { id: "99999", type: "metadata" }
   ]
 };
 

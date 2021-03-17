@@ -1,7 +1,6 @@
 import { HotColumnProps } from "@handsontable/react";
 import {
   ApiClientContext,
-  ApiClientI,
   BulkDataEditor,
   decodeResourceCell,
   DinaForm,
@@ -13,6 +12,8 @@ import {
   useAccount,
   useResourceSelectCells
 } from "common-ui";
+import { PersistedResource } from "kitsu";
+import { get, set } from "lodash";
 import moment from "moment";
 import { useContext, useState } from "react";
 import { AddPersonButton } from "../../../components";
@@ -27,6 +28,7 @@ import {
 } from "../../../types/objectstore-api";
 import { ObjectUpload } from "../../../types/objectstore-api/resources/ObjectUpload";
 import { getManagedAttributesInUse } from "../managed-attributes/getManagedAttributesInUse";
+import { useStoredDefaultValuesConfigs } from "./custom-default-values/DefaultValueConfigManager";
 import {
   MetadataEditorAttributesControls,
   MetadataEditorControls
@@ -39,6 +41,7 @@ export interface BulkMetadataEditorProps {
   /** IDs of ObjectUplaods to create new Metadatas for. */
   objectUploadIds?: string[];
   group?: string;
+  defaultValuesConfig?: number;
   afterMetadatasSaved: (metadataIds: string[]) => Promise<void>;
 }
 
@@ -48,18 +51,20 @@ export interface BulkMetadataEditRow {
   dcCreator: string;
   license: string;
   metadata: Metadata;
+
+  /** Included in the row data for new Metadata records. */
+  objectUpload?: PersistedResource<ObjectUpload>;
 }
 
 export function BulkMetadataEditor({
   metadataIds,
   objectUploadIds,
   group,
+  defaultValuesConfig,
   afterMetadatasSaved
 }: BulkMetadataEditorProps) {
   const { apiClient, bulkGet, save } = useContext(ApiClientContext);
   const { agentId, initialized: accountInitialized } = useAccount();
-  const { formatMessage } = useDinaIntl();
-  const resourceSelectCell = useResourceSelectCells();
   const [
     initialEditableManagedAttributes,
     setInitialEditableManagedAttributes
@@ -67,76 +72,9 @@ export function BulkMetadataEditor({
 
   const { locale } = useDinaIntl();
 
-  const BUILT_IN_ATTRIBUTES_COLUMNS: HotColumnProps[] = [
-    {
-      data: "metadata.originalFilename",
-      readOnly: true,
-      title: formatMessage("field_originalFilename")
-    },
-    {
-      data: "metadata.acDigitizationDate",
-      readOnly: true,
-      title: formatMessage("field_acDigitizationDate")
-    },
-    {
-      data: "metadata.dcType",
-      source: [
-        "Image",
-        "Moving Image",
-        "Sound",
-        "Text",
-        "Dataset",
-        "Undetermined"
-      ],
-      title: formatMessage("field_dcType"),
-      type: "dropdown"
-    },
-    {
-      data: "metadata.acCaption",
-      title: formatMessage("field_acCaption")
-    },
-    {
-      data: "acTags",
-      title: formatMessage("metadataBulkEditTagsLabel")
-    },
-    resourceSelectCell<Person>(
-      {
-        filter: input => ({ rsql: `displayName==*${input}*` }),
-        label: person => person.displayName,
-        model: "agent-api/person",
-        type: "person"
-      },
-      {
-        data: "dcCreator",
-        title: formatMessage("field_dcCreator.displayName")
-      }
-    ),
-    {
-      data: "metadata.dcRights",
-      title: formatMessage("field_dcRights")
-    },
-    resourceSelectCell<License>(
-      {
-        label: license => license.titles[locale] ?? license.url,
-        model: "objectstore-api/license",
-        type: "license"
-      },
-      {
-        data: "license",
-        title: formatMessage("field_license")
-      }
-    ),
-    {
-      data: "metadata.publiclyReleasable",
-      source: ["true", "false"],
-      title: formatMessage("field_publiclyReleasable"),
-      type: "dropdown"
-    },
-    {
-      data: "metadata.notPubliclyReleasableReason",
-      title: formatMessage("field_notPubliclyReleasableReason")
-    }
-  ];
+  const { storedDefaultValuesConfigs } = useStoredDefaultValuesConfigs();
+
+  const BUILT_IN_ATTRIBUTES_COLUMNS = useMetadataBuiltInAttributeColumns();
 
   if ((!metadataIds && !objectUploadIds) || !accountInitialized) {
     return <LoadingSpinner loading={true} />;
@@ -144,6 +82,10 @@ export function BulkMetadataEditor({
 
   async function loadData() {
     const metadatas: Metadata[] = [];
+    // tslint:disable-next-line
+    let objectUploads:
+      | PersistedResource<ObjectUpload>[]
+      | undefined = undefined;
 
     // When editing existing Metadatas:
     if (metadataIds) {
@@ -169,7 +111,7 @@ export function BulkMetadataEditor({
 
       // When adding new Metadatas based on existing ObjectUploads:
     } else if (objectUploadIds && group) {
-      const objectUploads = await bulkGet<ObjectUpload>(
+      objectUploads = await bulkGet<ObjectUpload>(
         objectUploadIds.map(id => `/object-upload/${id}`),
         {
           apiBaseUrl: "/objectstore-api"
@@ -226,34 +168,62 @@ export function BulkMetadataEditor({
     setInitialEditableManagedAttributes(managedAttributesInUse);
 
     const newTableData = await Promise.all(
-      metadatas.map<Promise<BulkMetadataEditRow>>(async metadata => {
-        const dcCreator = metadata.dcCreator as Person;
+      metadatas.map<Promise<BulkMetadataEditRow>>(
+        async (metadata, rowIndex) => {
+          const dcCreator = metadata.dcCreator as Person;
 
-        // Get the License resource based on the Metadata's xmpRightsWebStatement field:
-        let license: License | undefined;
-        if (metadata.xmpRightsWebStatement) {
-          const url = metadata.xmpRightsWebStatement;
-          license = (
-            await apiClient.get<License[]>("objectstore-api/license", {
-              filter: { url }
-            })
-          ).data[0];
+          // Get the License resource based on the Metadata's xmpRightsWebStatement field:
+          let license: License | undefined;
+          if (metadata.xmpRightsWebStatement) {
+            const url = metadata.xmpRightsWebStatement;
+            license = (
+              await apiClient.get<License[]>("objectstore-api/license", {
+                filter: { url }
+              })
+            ).data[0];
+          }
+
+          return {
+            acTags: metadata.acTags?.join(", ") ?? "",
+            dcCreator: encodeResourceCell(dcCreator, {
+              label: dcCreator?.displayName
+            }),
+            license: encodeResourceCell(license, {
+              label: license?.titles[locale] ?? license?.url ?? ""
+            }),
+            metadata,
+            objectUpload: objectUploads?.[rowIndex]
+          };
         }
-
-        return {
-          acTags: metadata.acTags?.join(", ") ?? "",
-          dcCreator: encodeResourceCell(dcCreator, {
-            label: dcCreator?.displayName
-          }),
-          license: encodeResourceCell(license, {
-            label: license?.titles[locale] ?? license?.url ?? ""
-          }),
-          metadata
-        };
-      })
+      )
     );
 
     return newTableData;
+  }
+
+  /** Apply custom default values to new Metadatas: */
+  async function applyCustomDefaultValues(rows: BulkMetadataEditRow[]) {
+    const selectedDefaultValuesConfig =
+      storedDefaultValuesConfigs[defaultValuesConfig ?? -1];
+
+    // Don't apply default values to existing Metadatas.
+    // Don't apply default values when no Default Values Config is seleceted.
+    if (!objectUploadIds || !selectedDefaultValuesConfig) {
+      return;
+    }
+
+    // Loop through spreadsheet rows:
+    for (const row of rows) {
+      // Loop through default value rules:
+      for (const rule of selectedDefaultValuesConfig.defaultValueRules ?? []) {
+        if (rule?.source?.type === "objectUploadField") {
+          const value = get(row.objectUpload, rule.source.field);
+          set(row, rule.targetField, value);
+        } else if (rule?.source?.type === "text") {
+          set(row, rule.targetField, rule.source.text);
+        }
+      }
+    }
   }
 
   async function onSubmit(changes: RowChange<BulkMetadataEditRow>[]) {
@@ -409,6 +379,7 @@ export function BulkMetadataEditor({
                   columns={columns}
                   loadData={loadData}
                   onSubmit={onSubmit}
+                  applyCustomDefaultValues={applyCustomDefaultValues}
                   submitUnchangedRows={objectUploadIds ? true : false}
                 />
               </div>
@@ -418,6 +389,83 @@ export function BulkMetadataEditor({
       </div>
     </div>
   );
+}
+
+/** Gets the Metadata bulit in attrbute columns for the bulk editor. (Not including ManagedAttributes) */
+export function useMetadataBuiltInAttributeColumns(): HotColumnProps[] {
+  const { formatMessage, locale } = useDinaIntl();
+  const resourceSelectCell = useResourceSelectCells();
+
+  return [
+    {
+      data: "metadata.originalFilename",
+      readOnly: true,
+      title: formatMessage("field_originalFilename")
+    },
+    {
+      data: "metadata.acDigitizationDate",
+      readOnly: true,
+      title: formatMessage("field_acDigitizationDate")
+    },
+    {
+      data: "metadata.dcType",
+      source: [
+        "Image",
+        "Moving Image",
+        "Sound",
+        "Text",
+        "Dataset",
+        "Undetermined"
+      ],
+      title: formatMessage("field_dcType"),
+      type: "dropdown"
+    },
+    {
+      data: "metadata.acCaption",
+      title: formatMessage("field_acCaption")
+    },
+    {
+      data: "acTags",
+      title: formatMessage("metadataBulkEditTagsLabel")
+    },
+    resourceSelectCell<Person>(
+      {
+        filter: input => ({ rsql: `displayName==*${input}*` }),
+        label: person => person.displayName,
+        model: "agent-api/person",
+        type: "person"
+      },
+      {
+        data: "dcCreator",
+        title: formatMessage("field_dcCreator.displayName")
+      }
+    ),
+    {
+      data: "metadata.dcRights",
+      title: formatMessage("field_dcRights")
+    },
+    resourceSelectCell<License>(
+      {
+        label: license => license.titles[locale] ?? license.url,
+        model: "objectstore-api/license",
+        type: "license"
+      },
+      {
+        data: "license",
+        title: formatMessage("field_license")
+      }
+    ),
+    {
+      data: "metadata.publiclyReleasable",
+      source: ["true", "false"],
+      title: formatMessage("field_publiclyReleasable"),
+      type: "dropdown"
+    },
+    {
+      data: "metadata.notPubliclyReleasableReason",
+      title: formatMessage("field_notPubliclyReleasableReason")
+    }
+  ];
 }
 
 export function managedAttributeColumns(

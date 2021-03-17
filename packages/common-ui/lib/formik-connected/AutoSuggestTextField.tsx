@@ -7,28 +7,20 @@ import {
 import { FormikContextType, useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { debounce, uniq } from "lodash";
-import {
-  createContext,
-  InputHTMLAttributes,
-  useCallback,
-  useContext,
-  useState
-} from "react";
+import { InputHTMLAttributes, useCallback, useState } from "react";
 import AutoSuggest, { InputProps } from "react-autosuggest";
 
 export type AutoSuggestTextFieldProps<
   T extends KitsuResource
-> = TextFieldProps & AutoSuggestContextI<T>;
+> = TextFieldProps & AutoSuggestConfig<T>;
 
-interface AutoSuggestContextI<T extends KitsuResource> {
+interface AutoSuggestConfig<T extends KitsuResource> {
   query: (
     searchValue: string,
     formikCtx: FormikContextType<any>
   ) => JsonApiQuerySpec;
   suggestion: (resource: PersistedResource<T>) => string;
 }
-
-const AutoSuggestContext = createContext<AutoSuggestContextI<any>>(null as any);
 
 /**
  * Suggests typeahead values based on a back-end query.
@@ -40,20 +32,25 @@ export function AutoSuggestTextField<T extends KitsuResource>({
   ...textFieldProps
 }: AutoSuggestTextFieldProps<T>) {
   return (
-    <AutoSuggestContext.Provider value={{ query, suggestion }}>
-      <TextField
-        {...textFieldProps}
-        CustomInput={AutoSuggestTextFieldInternal}
-      />
-    </AutoSuggestContext.Provider>
+    <TextField
+      {...textFieldProps}
+      customInput={inputProps => (
+        <AutoSuggestTextFieldInternal
+          query={query}
+          suggestion={suggestion}
+          {...inputProps}
+        />
+      )}
+    />
   );
 }
 
-function AutoSuggestTextFieldInternal<T extends KitsuResource>(
-  inputProps: InputHTMLAttributes<any>
-) {
+function AutoSuggestTextFieldInternal<T extends KitsuResource>({
+  query,
+  suggestion,
+  ...inputProps
+}: InputHTMLAttributes<any> & AutoSuggestConfig<T>) {
   const formikCtx = useFormikContext<any>();
-  const { query, suggestion } = useContext(AutoSuggestContext);
 
   const [searchValue, setSearchValue] = useState("");
   const debouncedSetSearchValue = useCallback(
@@ -68,28 +65,44 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>(
 
   return (
     <>
-      <style>{`.autosuggest-highlighted { background-color: #ddd; }`}</style>
-      <AutoSuggest
-        suggestions={suggestions}
-        getSuggestionValue={s => s}
-        onSuggestionsFetchRequested={({ value }) =>
-          debouncedSetSearchValue(value)
+      <style>{`
+        .autosuggest .container-open {      
+            position: absolute;
+            z-index: 2; 
+            margin: 0 0 0 -15px; 
+         },
+        .autosuggest .container {
+           display:none;
         }
-        onSuggestionSelected={(_, data) =>
-          inputProps.onChange?.({ target: { value: data.suggestion } } as any)
+        .autosuggest .autosuggest-highlighted { 
+          background-color: #ddd; 
         }
-        onSuggestionsClearRequested={() => {
-          debouncedSetSearchValue.cancel();
-          debouncedSetSearchValue("");
-        }}
-        renderSuggestion={text => <div>{text}</div>}
-        inputProps={inputProps as InputProps<any>}
-        theme={{
-          suggestionsList: "list-group",
-          suggestion: "list-group-item",
-          suggestionHighlighted: "autosuggest-highlighted"
-        }}
-      />
+        `}</style>
+      <div className="autosuggest">
+        <AutoSuggest
+          suggestions={suggestions}
+          getSuggestionValue={s => s}
+          onSuggestionsFetchRequested={({ value }) =>
+            debouncedSetSearchValue(value)
+          }
+          onSuggestionSelected={(_, data) =>
+            inputProps.onChange?.({ target: { value: data.suggestion } } as any)
+          }
+          onSuggestionsClearRequested={() => {
+            debouncedSetSearchValue.cancel();
+            debouncedSetSearchValue("");
+          }}
+          renderSuggestion={text => <div>{text}</div>}
+          inputProps={inputProps as InputProps<any>}
+          theme={{
+            suggestionsList: "list-group",
+            suggestion: "list-group-item",
+            suggestionHighlighted: "autosuggest-highlighted",
+            suggestionsContainerOpen: "container-open",
+            suggestionsContainer: "container"
+          }}
+        />
+      </div>
     </>
   );
 }

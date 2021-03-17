@@ -258,7 +258,7 @@ export default function MetadataListPage() {
                       href={`/object-store/object/view?id=${previewMetadataId}`}
                     >
                       <a>
-                        <DinaMessage id="metadataDetailsPageLink" />
+                        <DinaMessage id="detailsPageLink" />
                       </a>
                     </Link>
                     <button

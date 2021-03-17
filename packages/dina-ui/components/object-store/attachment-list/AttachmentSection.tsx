@@ -11,10 +11,20 @@ import {
   ExistingAttachmentsTableProps
 } from "./ExistingAttachmentsTable";
 import { ExistingObjectsAttacher } from "./ExistingObjectsAttacher";
+import { TotalAttachmentsIndicator } from "./TotalAttachmentsIndicator";
 
 export interface AttachmentListProps
-  extends Omit<ExistingAttachmentsTableProps, "onMetadatasEdited">,
-    AttachmentUploaderProps {}
+  extends Omit<
+      ExistingAttachmentsTableProps,
+      "onMetadatasEdited" | "attachmentPath"
+    >,
+    AttachmentUploaderProps {
+  /**
+   * API path to the attachment list.
+   * Omitting this gets rid of the Existing Attachments UI.
+   */
+  attachmentPath?: string;
+}
 
 /** UI section for reading and modifying file attachments. */
 export function AttachmentSection({
@@ -24,18 +34,12 @@ export function AttachmentSection({
 }: AttachmentListProps) {
   const [lastSave, setLastSave] = useState(Date.now());
 
-  const { response: attachmentsRes } = useQuery<[]>(
-    { path: attachmentPath },
-    { deps: [lastSave] }
-  );
-  const totalAttachments = attachmentsRes?.data?.length;
-
   async function afterMetadatasSavedInternal(metadataIds: string[]) {
     await afterMetadatasSavedProp(metadataIds);
     resetComponent();
   }
   async function onDetachMetadataIdsInternal(metadataIds: string[]) {
-    await onDetachMetadataIdsProp(metadataIds);
+    await onDetachMetadataIdsProp?.(metadataIds);
     resetComponent();
   }
 
@@ -48,13 +52,20 @@ export function AttachmentSection({
     <div key={lastSave}>
       <h2>
         <DinaMessage id="attachments" />{" "}
-        {totalAttachments ? `(${totalAttachments})` : null}
+        {attachmentPath && (
+          <TotalAttachmentsIndicator
+            attachmentPath={attachmentPath}
+            lastSave={lastSave}
+          />
+        )}
       </h2>
       <Tabs>
         <TabList>
-          <Tab>
-            <DinaMessage id="existingAttachments" />
-          </Tab>
+          {attachmentPath && (
+            <Tab>
+              <DinaMessage id="existingAttachments" />
+            </Tab>
+          )}
           <Tab>
             <DinaMessage id="uploadNewAttachments" />
           </Tab>
@@ -62,13 +73,15 @@ export function AttachmentSection({
             <DinaMessage id="attachExistingObjects" />
           </Tab>
         </TabList>
-        <TabPanel>
-          <ExistingAttachmentsTable
-            attachmentPath={attachmentPath}
-            onDetachMetadataIds={onDetachMetadataIdsInternal}
-            onMetadatasEdited={resetComponent}
-          />
-        </TabPanel>
+        {attachmentPath && (
+          <TabPanel>
+            <ExistingAttachmentsTable
+              attachmentPath={attachmentPath}
+              onDetachMetadataIds={onDetachMetadataIdsInternal}
+              onMetadatasEdited={resetComponent}
+            />
+          </TabPanel>
+        )}
         <TabPanel>
           <AttachmentUploader
             afterMetadatasSaved={afterMetadatasSavedInternal}

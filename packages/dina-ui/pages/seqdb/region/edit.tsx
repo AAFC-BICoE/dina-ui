@@ -1,13 +1,12 @@
 import {
   ButtonBar,
-  CancelButton,
+  BackButton,
   DinaForm,
   DinaFormOnSubmit,
   LoadingSpinner,
   Query,
   SubmitButton,
-  TextField,
-  useAccount
+  TextField
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
@@ -59,10 +58,8 @@ export function RegionEditPage({ router }: WithRouterProps) {
 }
 
 function RegionForm({ region, router }: RegionFormProps) {
-  const { groupNames } = useAccount();
-
   const { id } = router.query;
-  const initialValues = region || { group: groupNames?.[0] };
+  const initialValues = region || {};
 
   const onSubmit: DinaFormOnSubmit = async ({
     api: { save },
@@ -86,11 +83,15 @@ function RegionForm({ region, router }: RegionFormProps) {
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <CancelButton entityId={id as string} entityLink="/seqdb/region" />
+        <BackButton entityId={id as string} entityLink="/seqdb/region" />
       </ButtonBar>
       <div>
         <div className="row">
-          <GroupSelectField className="col-md-2" name="group" />
+          <GroupSelectField
+            className="col-md-2"
+            name="group"
+            enableStoredDefaultGroup={true}
+          />
         </div>
         <div className="row">
           <TextField className="col-md-2" name="name" />
