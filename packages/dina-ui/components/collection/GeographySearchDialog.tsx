@@ -6,6 +6,7 @@ import { DinaMessage, useDinaIntl} from "packages/dina-ui/intl/dina-ui-intl";
 interface GeoGraphySearchDialogProps  {
     searchByValue: string;
     closeModal: ()=>void ;
+    onSelectSearchResult: (result: NominatumApiSearchResult) => void;
 }
 
 async function nominatimSearch(
@@ -33,12 +34,14 @@ async function nominatimSearch(
 };
 
 
-export function GeographySearchDialog({searchByValue, closeModal}: GeoGraphySearchDialogProps){
+export function GeographySearchDialog({searchByValue, closeModal, onSelectSearchResult}: GeoGraphySearchDialogProps){
 
     const [administrativeBoundaries, setAdministrativeBoundaries] = useState<NominatumApiSearchResult[]>();
     const [inputValue, setInputValue] = useState(searchByValue);
       /** Whether the Geo Api is on hold. Just to make sure we don't send more requests than we are allowed to. */
     const [geoApiRequestsOnHold, setGeoApiRequestsOnHold] = useState(false);
+
+    const [count, setCount] = useState(-1);
 
     const suggestButtonIsDisabled = geoApiRequestsOnHold || !inputValue;
 
@@ -65,11 +68,17 @@ export function GeographySearchDialog({searchByValue, closeModal}: GeoGraphySear
       setAdministrativeBoundaries(administrativeBoundaries);     
     }      
 
-    function selectGeoResult(result: NominatumApiSearchResult) {
+    const selectGeoResult = (result: NominatumApiSearchResult) => {
       closeModal();
       setInputValue("");
-      //onSelectSearchResult?.(result, formikContext);
-    }    
+      onSelectSearchResult?.(result);
+    }
+
+    /* Execute automatically once */
+    if(count===-1){      
+      searchByValueOnAdminBoundaries(inputValue as any);
+      setCount(count+1);
+    }
 
     return(
       <div className="modal-content">
@@ -106,7 +115,7 @@ export function GeographySearchDialog({searchByValue, closeModal}: GeoGraphySear
             </div>
           </div>
             {administrativeBoundaries?.map(boundary=>
-            <div>
+            <div key= {boundary.osm_id}>
               <div className="row">
               <div className="col-md-12">
                 {boundary.display_name}
@@ -116,7 +125,6 @@ export function GeographySearchDialog({searchByValue, closeModal}: GeoGraphySear
               <div className="col-md-4">
                 <button
                   type="button"
-                  key={boundary.osm_id}
                   className="btn btn-light text-left"
                   onClick={() => selectGeoResult(boundary)}
                 >       
@@ -124,9 +132,13 @@ export function GeographySearchDialog({searchByValue, closeModal}: GeoGraphySear
                 </button>
               </div>
               <div className="col-md-4">
-                <button className="btn btn-light text-left">
+                <a
+                  href={`https://www.openstreetmap.org/way/${boundary.osm_id}`}
+                  target="_blank"
+                  className="btn btn-info"
+                >
                   <DinaMessage id="viewDetailButtonLabel" />
-                </button>
+                </a>
               </div>
               </div>
               <hr className="text-light" style={{borderWidth: 1}}/>

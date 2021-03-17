@@ -175,6 +175,12 @@ function CollectingEventFormInternal({
     }
   };
   
+  const onSelectSearchResult = (result:NominatumApiSearchResult) =>{
+    setFieldValue("dwcCountry", result.address?.country);
+    setFieldValue("dwcMunicipality", result.address?.county??result.address?.city_district);
+    setFieldValue("dwcStateProvince", result.address?.state);
+    setFieldValue("placeName", result.display_name);
+  }
   return (
     <div>
       <div className="form-group">
@@ -416,8 +422,8 @@ function CollectingEventFormInternal({
                   type="button"
                   className="btn btn-light text-left"
                   onClick={() =>{ 
-                    openModal(<GeographySearchDialog searchByValue={values.placeName as any}
-                   closeModal={closeModal}  />)}}>
+                    openModal(<GeographySearchDialog searchByValue={values.dwcVerbatimLocality as any}
+                   closeModal={closeModal} onSelectSearchResult={onSelectSearchResult} />)}}>
                   <DinaMessage id="openGeographySearchButtonLabel" />
                 </button>
                 <div>
