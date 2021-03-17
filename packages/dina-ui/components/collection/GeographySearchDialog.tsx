@@ -134,7 +134,7 @@ export function GeographySearchDialog({searchByValue, closeModal, onSelectSearch
               </div>
               <div className="col-md-4">
                 <a
-                  href={`https://www.openstreetmap.org/way/${boundary.osm_id}`}
+                  href={`https://www.openstreetmap.org/${boundary.osm_type}/${boundary.osm_id}`}
                   target="_blank"
                   className="btn btn-info"
                 >
