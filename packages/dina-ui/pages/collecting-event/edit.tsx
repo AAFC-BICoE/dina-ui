@@ -589,6 +589,10 @@ function CollectingEventForm({
     }
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
+
+    //Delete the place name as it is only for display purpose
+    delete submittedValues.placeName;
+
     const [saved] = await save(
       [
         {

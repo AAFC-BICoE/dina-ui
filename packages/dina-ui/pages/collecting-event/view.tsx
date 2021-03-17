@@ -150,10 +150,6 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                             />
                             <FieldView
                               className="col-md-12"
-                              name="dwcCountryCode"
-                            />
-                            <FieldView
-                              className="col-md-12"
                               name="dwcStateProvince"
                             />
                             <FieldView
