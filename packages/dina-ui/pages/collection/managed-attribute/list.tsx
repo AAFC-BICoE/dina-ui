@@ -21,19 +21,6 @@ const ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] = [
   },
   "createdBy",
   {
-    Cell: ({ original: { description } }) =>
-      description?.en && description?.fr ? (
-        <>
-          en : {description?.en} | fr : {description?.fr}
-        </>
-      ) : description?.en ? (
-        description.en
-      ) : (
-        description.fr
-      ),
-    accessor: "description"
-  },
-  {
     Cell: ({ original: { acceptedValues, managedAttributeType } }) => {
       const labelKey:
         | keyof typeof DINAUI_MESSAGES_ENGLISH
@@ -67,7 +54,7 @@ export default function ManagedAttributesListPage() {
       <Nav />
       <main className="container-fluid">
         <h1>
-          <DinaMessage id="managedAttributeListTitle" />
+          <DinaMessage id="collectionManagedAttributeListTitle" />
         </h1>
         <ButtonBar>
           <Link href="/collection/managed-attribute/edit">
@@ -78,7 +65,7 @@ export default function ManagedAttributesListPage() {
         </ButtonBar>
         <ListPageLayout
           filterAttributes={ATTRIBUTES_FILTER_ATTRIBUTES}
-          id="managed-attribute-list"
+          id="collection-module-managed-attribute-list"
           queryTableProps={{
             columns: ATTRIBUTES_LIST_COLUMNS,
             path: "collection-api/managed-attribute"

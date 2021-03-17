@@ -9,7 +9,6 @@ export interface ManagedAttributeAttributes {
   acceptedValues?: string[] | null;
   createdBy?: string;
   createdOn?: string;
-  description?: Map<string, string>;
 }
 
 export type ManagedAttributeType = "INTEGER" | "STRING" | "PICKLIST";

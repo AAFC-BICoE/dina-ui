@@ -27,6 +27,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   cancelButtonText: "Cancel",
   changedProperties: "Changes",
   closePreviewButtonText: "Close Preview",
+  collectionManagedAttributeListTitle: "Collection Module Managed Attributes",
   collectionSectionTitle: "Collections",
   collectingAgentsLegend: "Collecting Agents",
   collectingDateLegend: "Collecting Date",
