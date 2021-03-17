@@ -177,7 +177,7 @@ function CollectingEventFormInternal({
   
   const onSelectSearchResult = (result:NominatumApiSearchResult) =>{
     setFieldValue("dwcCountry", result.address?.country);
-    setFieldValue("dwcMunicipality", result.address?.county??result.address?.city_district);
+    setFieldValue("dwcMunicipality", result.address?.city??result.address?.city_district??result.address?.county);
     setFieldValue("dwcStateProvince", result.address?.state);
     setFieldValue("placeName", result.display_name);
   }
