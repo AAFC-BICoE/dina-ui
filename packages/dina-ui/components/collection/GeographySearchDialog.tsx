@@ -3,10 +3,10 @@ import { useState } from "react";
 import { CommonMessage } from "../../../common-ui/lib/intl/common-ui-intl";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
-interface GeoGraphySearchDialogProps  {
-    searchByValue: string;
-    closeModal: ()=>void ;
-    onSelectSearchResult: (result: NominatumApiSearchResult) => void;
+interface GeoGraphySearchDialogProps {
+  searchByValue: string;
+  closeModal: () => void;
+  onSelectSearchResult: (result: NominatumApiSearchResult) => void;
 }
 
 async function nominatimSearch(
@@ -23,7 +23,7 @@ async function nominatimSearch(
     format: "jsonv2"
   }).toString();
 
-  const fetchJson = url => window.fetch(url).then(res => res.json());
+  const fetchJson = urlArg => window.fetch(urlArg).then(res => res.json());
 
   try {
     const results = await fetchJson(url.toString());
@@ -31,105 +31,107 @@ async function nominatimSearch(
   } catch (error) {
     return [];
   }
-};
+}
 
+export function GeographySearchDialog({
+  searchByValue,
+  closeModal,
+  onSelectSearchResult
+}: GeoGraphySearchDialogProps) {
+  const [administrativeBoundaries, setAdministrativeBoundaries] = useState<
+    NominatumApiSearchResult[]
+  >();
+  const [inputValue, setInputValue] = useState(searchByValue);
+  /** Whether the Geo Api is on hold. Just to make sure we don't send more requests than we are allowed to. */
+  const [geoApiRequestsOnHold, setGeoApiRequestsOnHold] = useState(false);
 
-export function GeographySearchDialog({searchByValue, closeModal, onSelectSearchResult}: GeoGraphySearchDialogProps){
+  const [count, setCount] = useState(-1);
 
-    const [administrativeBoundaries, setAdministrativeBoundaries] = useState<NominatumApiSearchResult[]>();
-    const [inputValue, setInputValue] = useState(searchByValue);
-      /** Whether the Geo Api is on hold. Just to make sure we don't send more requests than we are allowed to. */
-    const [geoApiRequestsOnHold, setGeoApiRequestsOnHold] = useState(false);
+  const suggestButtonIsDisabled = geoApiRequestsOnHold || !inputValue;
 
-    const [count, setCount] = useState(-1);
+  const { formatMessage } = useDinaIntl();
 
-    const suggestButtonIsDisabled = geoApiRequestsOnHold || !inputValue;
+  const pageTitle = formatMessage("searchResults", {
+    resultSize: administrativeBoundaries?.length
+  });
 
-    const { formatMessage } = useDinaIntl();
-
-    const pageTitle = formatMessage("searchResults", {
-      resultSize: administrativeBoundaries?.length
-    });
-
-    const searchByValueOnAdminBoundaries = async (searchValue :string)=> {
-      // Set a 1-second API request throttle:
-      if (suggestButtonIsDisabled) {
-        return;
-      }
-      setGeoApiRequestsOnHold(true);
-      setTimeout(() => setGeoApiRequestsOnHold(false), 1000);
-      const geoSearchResults = nominatimSearch(String(searchValue));
-    
-      // Filter results down to administrative boundaries:
-      const administrativeBoundaries = (await geoSearchResults).filter(
-        result =>
-          result.category === "boundary" && result.type === "administrative"
-      );
-      setAdministrativeBoundaries(administrativeBoundaries);     
-    }      
-
-    const selectGeoResult = (result: NominatumApiSearchResult) => {
-      closeModal();
-      setInputValue("");
-      onSelectSearchResult?.(result);
+  const searchByValueOnAdminBoundaries = async (searchValue: string) => {
+    // Set a 1-second API request throttle:
+    if (suggestButtonIsDisabled) {
+      return;
     }
+    setGeoApiRequestsOnHold(true);
+    setTimeout(() => setGeoApiRequestsOnHold(false), 1000);
+    const geoSearchResults = nominatimSearch(String(searchValue));
 
-    /* Execute automatically once */
-    if(count===-1){      
-      searchByValueOnAdminBoundaries(inputValue as any);
-      setCount(count+1);
-    }
+    // Filter results down to administrative boundaries:
+    const newAdministrativeBoundaries = (await geoSearchResults).filter(
+      result =>
+        result.category === "boundary" && result.type === "administrative"
+    );
+    setAdministrativeBoundaries(newAdministrativeBoundaries);
+  };
 
-    return(
-      <div className="modal-content">
-        <style>{`
+  const selectGeoResult = (result: NominatumApiSearchResult) => {
+    closeModal();
+    setInputValue("");
+    onSelectSearchResult?.(result);
+  };
+
+  /* Execute automatically once */
+  if (count === -1) {
+    searchByValueOnAdminBoundaries(inputValue as any);
+    setCount(count + 1);
+  }
+
+  return (
+    <div className="modal-content">
+      <style>{`
         .modal-dialog {
           max-width: calc(30vw - 3rem);          
         }
       `}</style>
 
-        <div className="modal-header">
-          <h2>
-            {pageTitle}
-          </h2>
-        </div>
-        <div className="modal-body">
-          <div className="row">
-            <div className="col-md-9">
-              <input
-                className="form-control"
-                onChange={e => setInputValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.keyCode === 13) {
-                    e.preventDefault();
-                    searchByValueOnAdminBoundaries(inputValue);
-                  }
-                }} 
-                value={inputValue}
-                />
-            </div>
-            <div className="col-md-1">
-              <button onClick={() => searchByValueOnAdminBoundaries(inputValue as any)}
-                className="btn btn-light text-left" >
-                <DinaMessage id="searchButton" />
-              </button>
-            </div>
+      <div className="modal-header">
+        <h2>{pageTitle}</h2>
+      </div>
+      <div className="modal-body">
+        <div className="row">
+          <div className="col-md-9">
+            <input
+              className="form-control"
+              onChange={e => setInputValue(e.target.value)}
+              onKeyDown={e => {
+                if (e.keyCode === 13) {
+                  e.preventDefault();
+                  searchByValueOnAdminBoundaries(inputValue);
+                }
+              }}
+              value={inputValue}
+            />
           </div>
-            {administrativeBoundaries?.map(boundary=>
-            <div key= {boundary.osm_id}>
-              <div className="row">
-              <div className="col-md-12">
-                {boundary.display_name}
-                </div>
-              </div>
-              <div className="row">
+          <div className="col-md-1">
+            <button
+              onClick={() => searchByValueOnAdminBoundaries(inputValue as any)}
+              className="btn btn-light text-left"
+            >
+              <DinaMessage id="searchButton" />
+            </button>
+          </div>
+        </div>
+        {administrativeBoundaries?.map(boundary => (
+          <div key={boundary.osm_id}>
+            <div className="row">
+              <div className="col-md-12">{boundary.display_name}</div>
+            </div>
+            <div className="row">
               <div className="col-md-4">
                 <button
                   type="button"
                   className="btn btn-light text-left"
                   onClick={() => selectGeoResult(boundary)}
-                >       
-                  <CommonMessage id="select" />         
+                >
+                  <CommonMessage id="select" />
                 </button>
               </div>
               <div className="col-md-4">
@@ -141,18 +143,16 @@ export function GeographySearchDialog({searchByValue, closeModal, onSelectSearch
                   <DinaMessage id="viewDetailButtonLabel" />
                 </a>
               </div>
-              </div>
-              <hr className="text-light" style={{borderWidth: 1}}/>
             </div>
-          )}
-
+            <hr className="text-light" style={{ borderWidth: 1 }} />
           </div>
-        <div className="modal-footer">
-          <button className="btn btn-dark" onClick={closeModal}>
-            <CommonMessage id="cancelButtonText" />
-          </button>
-        </div>       
+        ))}
       </div>
-
-    )
+      <div className="modal-footer">
+        <button className="btn btn-dark" onClick={closeModal}>
+          <CommonMessage id="cancelButtonText" />
+        </button>
+      </div>
+    </div>
+  );
 }

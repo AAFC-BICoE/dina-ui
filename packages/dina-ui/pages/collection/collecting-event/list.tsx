@@ -7,7 +7,9 @@ const COLLECTING_EVENT_FILTER_ATTRIBUTES = ["createdBy"];
 const COLLECTING_EVENT_TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, createdBy } }) => (
-      <Link href={`/collection/collecting-event/view?id=${id}`}>{createdBy}</Link>
+      <Link href={`/collection/collecting-event/view?id=${id}`}>
+        {createdBy}
+      </Link>
     ),
     accessor: "createdBy",
     sortable: false

@@ -7,10 +7,13 @@ import { RevisionRowConfigsByType } from "../revisions/revision-row-config";
 
 export type RevisionsByUserPageProps = {
   snapshotPath: string;
-  revisionRowConfigsByType:  RevisionRowConfigsByType;
-}
+  revisionRowConfigsByType: RevisionRowConfigsByType;
+};
 
-export default function RevisionsByUserPage( {snapshotPath, revisionRowConfigsByType}: RevisionsByUserPageProps) {
+export default function RevisionsByUserPage({
+  snapshotPath,
+  revisionRowConfigsByType
+}: RevisionsByUserPageProps) {
   const { query } = useRouter();
   const { formatMessage } = useDinaIntl();
 

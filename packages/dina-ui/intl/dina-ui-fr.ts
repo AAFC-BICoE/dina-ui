@@ -75,7 +75,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   metadataBuiltInAttributesLabel: "Attributs intégrés",
   metadataBulkEditTagsLabel: "Balises (séparées par une virgule)",
   metadataBulkEditTitle: "Modifier les métadonnées",
-  metadataDcFormatLabel: "Format de l'élément dc",  
+  metadataDcFormatLabel: "Format de l'élément dc",
   metadataFileExtensionLabel: "Extension du fichier",
   metadataFileIdentifierLabel: "Identificateur du fichier",
   metadataFileStorageDetailsLabel: "Stockage du fichier",

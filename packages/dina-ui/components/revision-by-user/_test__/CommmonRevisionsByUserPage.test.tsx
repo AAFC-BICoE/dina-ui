@@ -41,11 +41,15 @@ describe("MetadataRevisionListPage", () => {
   it("Renders the page.", async () => {
     mockUseRouter.mockReturnValue({ query: { author: "MatPoff" } });
 
-    const wrapper = mountWithAppContext(<RevisionsByUserPage 
-      snapshotPath="objectstore-api/audit-snapshot" 
-      revisionRowConfigsByType={OBJECT_STORE_REVISION_ROW_CONFIG} />, {
-      apiContext: { apiClient: { get: mockGet } as any }
-    });
+    const wrapper = mountWithAppContext(
+      <RevisionsByUserPage
+        snapshotPath="objectstore-api/audit-snapshot"
+        revisionRowConfigsByType={OBJECT_STORE_REVISION_ROW_CONFIG}
+      />,
+      {
+        apiContext: { apiClient: { get: mockGet } as any }
+      }
+    );
 
     // Await revisions query:
     await new Promise(setImmediate);

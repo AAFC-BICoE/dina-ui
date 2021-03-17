@@ -24,7 +24,10 @@ import { useFormikContext } from "formik";
 import { KitsuResponse, PersistedResource } from "kitsu";
 import { orderBy } from "lodash";
 import { NextRouter, useRouter } from "next/router";
-import { GeographySearchDialog, GeoReferenceAssertionRow} from "../../../components";
+import {
+  GeographySearchDialog,
+  GeoReferenceAssertionRow
+} from "../../../components";
 import { Person } from "../../../types/agent-api/resources/Person";
 import { Dispatch, useContext, useState } from "react";
 import Switch from "react-switch";
@@ -33,7 +36,7 @@ import {
   GroupSelectField,
   Head,
   Nav,
-  useAddPersonModal  
+  useAddPersonModal
 } from "../../../components";
 
 import { useAttachmentsModal } from "../../../components/object-store";
@@ -174,13 +177,18 @@ function CollectingEventFormInternal({
       setDeletedId(id);
     }
   };
-  
-  const onSelectSearchResult = (result:NominatumApiSearchResult) =>{
+
+  const onSelectSearchResult = (result: NominatumApiSearchResult) => {
     setFieldValue("dwcCountry", result.address?.country);
-    setFieldValue("dwcMunicipality", result.address?.city??result.address?.city_district??result.address?.county);
+    setFieldValue(
+      "dwcMunicipality",
+      result.address?.city ??
+        result.address?.city_district ??
+        result.address?.county
+    );
     setFieldValue("dwcStateProvince", result.address?.state);
     setFieldValue("placeName", result.display_name);
-  }
+  };
   return (
     <div>
       <div className="form-group">
@@ -220,9 +228,9 @@ function CollectingEventFormInternal({
                 checked={checked}
                 className="react-switch dateRange"
               />
-            </label>            
+            </label>
           </fieldset>
-        </div>      
+        </div>
         <div className="col-md-6">
           <fieldset className="border p-2">
             <legend className="w-auto">
@@ -261,21 +269,21 @@ function CollectingEventFormInternal({
               multiLines={true}
             />
           </fieldset>
-        </div>              
+        </div>
       </div>
 
       <div className="row">
-      <div className="col-md-12">
-        <fieldset className="border p-2">
-          <legend className="w-auto">
-            <DinaMessage id="collectingLocationLegend" />
-          </legend>
-          <div className="row">
-            <div className="col-md-12">
-            <fieldset className="border p-2">
-              <legend className="w-auto">
-                <DinaMessage id="verbatimCoordinatesLegend" />
-              </legend>
+        <div className="col-md-12">
+          <fieldset className="border p-2">
+            <legend className="w-auto">
+              <DinaMessage id="collectingLocationLegend" />
+            </legend>
+            <div className="row">
+              <div className="col-md-12">
+                <fieldset className="border p-2">
+                  <legend className="w-auto">
+                    <DinaMessage id="verbatimCoordinatesLegend" />
+                  </legend>
                   <div className="col-md-12">
                     <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLocality" />
                     {/* Re-show this button once other location fields (city/country etc.) are implemented: */}
@@ -291,7 +299,10 @@ function CollectingEventFormInternal({
                         className="col-md-12"
                         name="dwcVerbatimLongitude"
                       />
-                      <TextField className="col-md-12" name="dwcVerbatimCoordinates" />
+                      <TextField
+                        className="col-md-12"
+                        name="dwcVerbatimCoordinates"
+                      />
                     </div>
                     <div className="col-md-6">
                       <TextField
@@ -300,23 +311,29 @@ function CollectingEventFormInternal({
                       />
                       <TextField className="col-md-12" name="dwcVerbatimSRS" />
 
-                      <TextField className="col-md-12" name="dwcVerbatimElevation" />
-                      <TextField className="col-md-12" name="dwcVerbatimDepth" />
+                      <TextField
+                        className="col-md-12"
+                        name="dwcVerbatimElevation"
+                      />
+                      <TextField
+                        className="col-md-12"
+                        name="dwcVerbatimDepth"
+                      />
                     </div>
                   </div>
-            </fieldset>
-            </div>            
-          </div>
-          <div className="row">
-            <div className="col-md-6">
-              <fieldset className="border p-2">
-                <legend className="w-auto">
-                  <DinaMessage id="geoReferencingLegend" />
-                </legend>
+                </fieldset>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-6">
+                <fieldset className="border p-2">
+                  <legend className="w-auto">
+                    <DinaMessage id="geoReferencingLegend" />
+                  </legend>
 
                   {values &&
-                    values.geoReferenceAssertions &&
-                    values.geoReferenceAssertions.length <= 1 ? (
+                  values.geoReferenceAssertions &&
+                  values.geoReferenceAssertions.length <= 1 ? (
                     <>
                       <GeoReferenceAssertionRow index={0} />
                       <div>
@@ -330,10 +347,12 @@ function CollectingEventFormInternal({
                               "geoReferenceAssertions",
                               values.geoReferenceAssertions?.length === 0
                                 ? values.geoReferenceAssertions.concat([
-                                  {} as any,
-                                  {} as any
-                                ])
-                                : values.geoReferenceAssertions?.concat([{} as any])
+                                    {} as any,
+                                    {} as any
+                                  ])
+                                : values.geoReferenceAssertions?.concat([
+                                    {} as any
+                                  ])
                             );
                             setActiveTabIdx(
                               values.geoReferenceAssertions?.length as number
@@ -380,7 +399,10 @@ function CollectingEventFormInternal({
                                   className="btn btn-primary add-assertion-button"
                                   type="button"
                                   onClick={() => {
-                                    setFieldTouched("geoReferenceAssertions", true);
+                                    setFieldTouched(
+                                      "geoReferenceAssertions",
+                                      true
+                                    );
                                     setFieldValue(
                                       "geoReferenceAssertions",
                                       values.geoReferenceAssertions?.concat([
@@ -388,7 +410,8 @@ function CollectingEventFormInternal({
                                       ])
                                     );
                                     setActiveTabIdx(
-                                      values.geoReferenceAssertions?.length as number
+                                      values.geoReferenceAssertions
+                                        ?.length as number
                                     );
                                   }}
                                 >
@@ -411,39 +434,43 @@ function CollectingEventFormInternal({
                         ))}
                     </Tabs>
                   )}
-              </fieldset>
+                </fieldset>
+              </div>
+              <div className="col-md-6">
+                <fieldset className="border p-2">
+                  <legend className="w-auto">
+                    <DinaMessage id="toponymyLegend" />
+                  </legend>
+                  <button
+                    type="button"
+                    className="btn btn-light text-left"
+                    onClick={() => {
+                      openModal(
+                        <GeographySearchDialog
+                          searchByValue={values.dwcVerbatimLocality as any}
+                          closeModal={closeModal}
+                          onSelectSearchResult={onSelectSearchResult}
+                        />
+                      );
+                    }}
+                  >
+                    <DinaMessage id="openGeographySearchButtonLabel" />
+                  </button>
+                  <div>
+                    <TextField name="placeName" />
+                    <TextField name="dwcMunicipality" />
+                    <TextField name="dwcStateProvince" />
+                    <TextField name="dwcCountry" />
+                  </div>
+                </fieldset>
+              </div>
             </div>
-            <div className="col-md-6">
-              <fieldset className="border p-2">
-                <legend className="w-auto">
-                  <DinaMessage id="toponymyLegend" />
-                </legend>
-                <button
-                  type="button"
-                  className="btn btn-light text-left"
-                  onClick={() =>{ 
-                    openModal(<GeographySearchDialog searchByValue={values.dwcVerbatimLocality as any}
-                   closeModal={closeModal} onSelectSearchResult={onSelectSearchResult} />)}}>
-                  <DinaMessage id="openGeographySearchButtonLabel" />
-                </button>
-                <div>
-                  <TextField name="placeName" />
-                  <TextField name="dwcMunicipality" />
-                  <TextField name="dwcStateProvince" />
-                  <TextField name="dwcCountry" />
-                </div>
-              </fieldset>
-            </div>
-          </div>
-        </fieldset>
+          </fieldset>
         </div>
       </div>
     </div>
   );
-
-  
 }
-
 
 function CollectingEventForm({
   collectingEvent,
@@ -590,7 +617,7 @@ function CollectingEventForm({
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
 
-    //Delete the place name as it is only for display purpose
+    // Delete the place name as it is only for display purpose
     delete submittedValues.placeName;
 
     const [saved] = await save(

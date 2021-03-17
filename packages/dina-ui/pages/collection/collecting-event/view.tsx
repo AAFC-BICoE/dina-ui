@@ -64,12 +64,15 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("collectingEventViewTitle")} />
       <Nav />
       <ButtonBar>
-        <EditButton entityId={id as string} entityLink="collection/collecting-event" />
+        <EditButton
+          entityId={id as string}
+          entityLink="collection/collecting-event"
+        />
         <Link href={`/collection/collecting-event/revisions?id=${id}`}>
-            <a className="btn btn-info">
-              <DinaMessage id="revisionsButtonText" />
-            </a>
-          </Link>
+          <a className="btn btn-info">
+            <DinaMessage id="revisionsButtonText" />
+          </a>
+        </Link>
         <BackButton
           entityId={id as string}
           entityLink="/collection/collecting-event"
@@ -161,7 +164,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                             <FieldView
                               className="col-md-12"
                               name="dwcMunicipality"
-                            />                            
+                            />
                           </fieldset>
                         </div>
                         <div className="col-md-6">

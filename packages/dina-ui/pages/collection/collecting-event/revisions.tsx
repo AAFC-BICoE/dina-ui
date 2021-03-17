@@ -21,7 +21,7 @@ export default function CollectingEventRevisionListPage() {
     const collectingEvent = response.data;
 
     const pageTitle = formatMessage("revisionsListTitle", {
-      name: collectingEvent.dwcRecordedBy??collectingEventId?.toString()
+      name: collectingEvent.dwcRecordedBy ?? collectingEventId?.toString()
     });
 
     return (
@@ -31,7 +31,9 @@ export default function CollectingEventRevisionListPage() {
         <main className="container-fluid">
           <h1>{pageTitle}</h1>
           <div className="form-group">
-            <Link href={`/collection/collecting-event/view?id=${collectingEvent.id}`}>
+            <Link
+              href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
+            >
               <a>
                 <DinaMessage id="detailsPageLink" />
               </a>

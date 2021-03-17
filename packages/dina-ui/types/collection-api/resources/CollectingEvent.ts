@@ -34,7 +34,7 @@ export interface CollectingEventAttributes {
   group: string;
   managedAssertions?: GeoReferenceAssertion[];
 
-  placeName?: string
+  placeName?: string;
 }
 
 export interface CollectingEventRelationships {

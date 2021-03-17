@@ -218,7 +218,7 @@ function NavCollectionDropdown() {
           <a className="dropdown-item">
             <DinaMessage id="revisionsByUserPageTitle" />
           </a>
-        </Link>       
+        </Link>
       </div>
     </div>
   );
