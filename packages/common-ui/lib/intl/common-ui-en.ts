@@ -9,6 +9,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   addNew: "Add New",
   areYouSure: "Are you sure?",
   attributeLabel: "Attribute",
+  autoFillGeoSuggestLabel:
+    "Auto-fill Location Fields (This search box's value is not persisted)",
   backLabel: "Back",
   backToListButtonText: "Back to List",
   bulkEditorValidationError: "Invalid value on row {row}: {value}",
@@ -41,6 +43,9 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   filterRecordsTitle: "Filter records",
   filterSubmitButtonText: "Filter List",
   filterUntil: "UNTIL",
+  geoSuggest: "Geo-Suggest",
+  geoSuggestTooltip:
+    "This button shows some suggested geo-locations based on what you've typed into the field.",
   loadingText: "Loading...",
   loggedInAsUser: "Logged in as:",
   logoutBtn: "Logout",
@@ -60,6 +65,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   rows: "rows",
   select: "Select",
   selected: "selected",
+  selectLocation: "Select Location",
   showChanges: "Show Changes",
   somethingWentWrong: "Something went wrong",
   sourceField: "Source Field",

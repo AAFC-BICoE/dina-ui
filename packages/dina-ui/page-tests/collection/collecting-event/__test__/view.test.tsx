@@ -1,6 +1,6 @@
-import { CollectingEventDetailsPage } from "../../../pages/collecting-event/view";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
+import { CollectingEventDetailsPage } from "../../../../pages/collection/collecting-event/view";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
 
 /** Test organization with all fields defined. */
 const TEST_COLLECTION_EVENT: CollectingEvent = {
