@@ -9,7 +9,7 @@ export interface TextFieldProps extends LabelWrapperParams {
   inputProps?: InputHTMLAttributes<any> | TextareaHTMLAttributes<any>;
   placeholder?: string;
 
-  CustomInput?: React.ComponentType<InputHTMLAttributes<any>>;
+  customInput?: (inputProps: InputHTMLAttributes<any>) => JSX.Element;
 }
 
 /**
@@ -23,7 +23,7 @@ export function TextField(props: TextFieldProps) {
     multiLines,
     inputProps: inputPropsExternal,
     placeholder,
-    CustomInput,
+    customInput,
     ...labelWrapperProps
   } = props;
   const { name } = labelWrapperProps;
@@ -52,12 +52,13 @@ export function TextField(props: TextFieldProps) {
           // The default Field component's inner text input needs to be replaced with our own
           // controlled input that we manually pass the "onChange" and "value" props. Otherwise
           // we will get React's warning about switching from an uncontrolled to controlled input.
-          return CustomInput ? (
-            <CustomInput {...inputPropsInternal} />
-          ) : multiLines ? (
-            <textarea rows={4} {...inputPropsInternal} />
-          ) : (
-            <input type="text" {...inputPropsInternal} />
+          return (
+            customInput?.(inputPropsInternal) ??
+            (multiLines ? (
+              <textarea rows={4} {...inputPropsInternal} />
+            ) : (
+              <input type="text" {...inputPropsInternal} />
+            ))
           );
         }}
       </FastField>

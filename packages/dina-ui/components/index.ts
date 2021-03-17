@@ -3,4 +3,7 @@ export * from "./button-bar/nav/nav";
 export * from "./error/ErrorBoundaryPage";
 export * from "./group-select/GroupFieldView";
 export * from "./group-select/GroupSelectField";
+export * from "./revision-by-user/CommonRevisionsByUserPage";
+export * from "./collection/GeoReferenceAssertionRow";
+export * from "./collection/GeographySearchDialog";
 export * from "./head";

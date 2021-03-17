@@ -9,7 +9,7 @@ export interface DateFieldProps {
 
 /** Formik-connected date input. */
 export function DateField(props: LabelWrapperParams & DateFieldProps) {
-  const { name, showTime, disabled  } = props;
+  const { name, showTime, disabled } = props;
 
   return (
     <FieldWrapper {...props}>
@@ -22,7 +22,7 @@ export function DateField(props: LabelWrapperParams & DateFieldProps) {
             if (showTime) {
               setFieldValue(name, date && date.toISOString());
             } else {
-                setFieldValue(name, date && date.toISOString().slice(0, 10));
+              setFieldValue(name, date && date.toISOString().slice(0, 10));
             }
             setFieldTouched(name);
           }
