@@ -1,7 +1,7 @@
-import { NominatumApiSearchResult } from "packages/common-ui/lib";
+import { NominatumApiSearchResult } from "../../../common-ui/lib";
 import { useState } from "react";
-import { CommonMessage } from "packages/common-ui/lib/intl/common-ui-intl";
-import { DinaMessage, useDinaIntl} from "packages/dina-ui/intl/dina-ui-intl";
+import { CommonMessage } from "../../../common-ui/lib/intl/common-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 interface GeoGraphySearchDialogProps  {
     searchByValue: string;
