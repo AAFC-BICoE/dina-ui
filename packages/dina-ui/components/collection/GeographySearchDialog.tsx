@@ -63,7 +63,6 @@ export function GeographySearchDialog({searchByValue, closeModal}: GeoGraphySear
           result.category === "boundary" && result.type === "administrative"
       );
       setAdministrativeBoundaries(administrativeBoundaries);     
-      //setInputValue(inputValue);    
     }      
 
     function selectGeoResult(result: NominatumApiSearchResult) {
@@ -74,6 +73,11 @@ export function GeographySearchDialog({searchByValue, closeModal}: GeoGraphySear
 
     return(
       <div className="modal-content">
+        <style>{`
+        .modal-dialog {
+          max-width: calc(30vw - 3rem);          
+        }
+      `}</style>
 
         <div className="modal-header">
           <h2>
@@ -85,8 +89,14 @@ export function GeographySearchDialog({searchByValue, closeModal}: GeoGraphySear
             <div className="col-md-9">
               <input
                 className="form-control"
-                onChange={e => setInputValue(e.target.value as any)}
-                value={inputValue} />
+                onChange={e => setInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.keyCode === 13) {
+                    e.preventDefault();
+                  }
+                }} 
+                value={inputValue}
+                />
             </div>
             <div className="col-md-1">
               <button onClick={() => searchByValueOnAdminBoundaries(inputValue as any)}
@@ -95,25 +105,33 @@ export function GeographySearchDialog({searchByValue, closeModal}: GeoGraphySear
               </button>
             </div>
           </div>
-            {administrativeBoundaries?.map((boundary)=>{
-            <div className="row">
-              <div className="col-md-2">
+            {administrativeBoundaries?.map(boundary=>
+            <div>
+              <div className="row">
+              <div className="col-md-12">
+                {boundary.display_name}
+                </div>
+              </div>
+              <div className="row">
+              <div className="col-md-4">
                 <button
                   type="button"
                   key={boundary.osm_id}
-                  className="list-group-item btn btn-light text-left"
+                  className="btn btn-light text-left"
                   onClick={() => selectGeoResult(boundary)}
-                >
-                  {boundary.display_name}
+                >       
+                  <CommonMessage id="select" />         
                 </button>
               </div>
-              <div className="col-md-2">
-                <button className="list-group-item btn btn-light text-left">
+              <div className="col-md-4">
+                <button className="btn btn-light text-left">
                   <DinaMessage id="viewDetailButtonLabel" />
                 </button>
               </div>
+              </div>
+              <hr className="text-light" style={{borderWidth: 1}}/>
             </div>
-          })}
+          )}
 
           </div>
         <div className="modal-footer">
