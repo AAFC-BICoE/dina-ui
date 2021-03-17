@@ -1,7 +1,7 @@
 import { NominatumApiSearchResult } from "packages/common-ui/lib";
 import { useState } from "react";
 import { CommonMessage } from "packages/common-ui/lib/intl/common-ui-intl";
-import { DinaMessage} from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl} from "packages/dina-ui/intl/dina-ui-intl";
 
 interface GeoGraphySearchDialogProps  {
     searchByValue: string;
@@ -42,7 +42,13 @@ export function GeographySearchDialog({searchByValue, closeModal}: GeoGraphySear
 
     const suggestButtonIsDisabled = geoApiRequestsOnHold || !inputValue;
 
-    const searchByValueOnAdminBoundaries = async (searchValue :string, setAdministrativeBoundaries)=> {
+    const { formatMessage } = useDinaIntl();
+
+    const pageTitle = formatMessage("searchResults", {
+      resultSize: administrativeBoundaries?.length
+    });
+
+    const searchByValueOnAdminBoundaries = async (searchValue :string)=> {
       // Set a 1-second API request throttle:
       if (suggestButtonIsDisabled) {
         return;
@@ -71,7 +77,7 @@ export function GeographySearchDialog({searchByValue, closeModal}: GeoGraphySear
 
         <div className="modal-header">
           <h2>
-            <DinaMessage id="searchResults" />
+            {pageTitle}
           </h2>
         </div>
         <div className="modal-body">
@@ -83,7 +89,7 @@ export function GeographySearchDialog({searchByValue, closeModal}: GeoGraphySear
                 value={inputValue} />
             </div>
             <div className="col-md-1">
-              <button onClick={() => searchByValueOnAdminBoundaries(inputValue as any, setAdministrativeBoundaries)}
+              <button onClick={() => searchByValueOnAdminBoundaries(inputValue as any)}
                 className="btn btn-light text-left" >
                 <DinaMessage id="searchButton" />
               </button>
