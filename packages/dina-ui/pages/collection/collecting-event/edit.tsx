@@ -383,10 +383,10 @@ function CollectingEventFormInternal() {
                     <DinaMessage id="openGeographySearchButtonLabel" />
                   </button>
                   <div>
-                    <TextField name="placeName" />
-                    <TextField name="dwcMunicipality" />
-                    <TextField name="dwcStateProvince" />
-                    <TextField name="dwcCountry" />
+                    <TextField name="placeName" readOnly={true}/>
+                    <TextField name="dwcMunicipality" readOnly={true}/>
+                    <TextField name="dwcStateProvince" readOnly={true}/>
+                    <TextField name="dwcCountry" readOnly={true}/>
                   </div>
                 </fieldset>
               </div>
