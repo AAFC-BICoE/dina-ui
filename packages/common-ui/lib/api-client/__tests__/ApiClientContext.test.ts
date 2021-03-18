@@ -5,7 +5,11 @@ import {
   CustomDinaKitsu,
   makeAxiosErrorMoreReadable
 } from "../ApiClientContext";
-import { Operation, OperationsResponse } from "../operations-types";
+import {
+  Operation,
+  OperationsResponse,
+  SuccessfulOperation
+} from "../operations-types";
 
 interface TestPcrPrimer {
   name: string;
@@ -401,6 +405,23 @@ Constraint violation: description size must be between 1 and 10`;
       },
       { id: "124", lotNumber: 1, name: "testPrimer2 edited", type: "pcrPrimer" }
     ]);
+  });
+
+  it("Provides a save function that can delete resources.", async () => {
+    mockPatch.mockImplementationOnce(() => ({
+      data: [{ status: 204 } as SuccessfulOperation]
+    }));
+
+    const response = await save([
+      { delete: { id: "1234", type: "test-type" } }
+    ]);
+
+    expect(response).toEqual([undefined]);
+    expect(mockPatch).lastCalledWith(
+      "/operations",
+      [{ op: "DELETE", path: "test-type/1234" }],
+      expect.anything()
+    );
   });
 
   it("Provides a bulk-get-by-ID function.", async () => {

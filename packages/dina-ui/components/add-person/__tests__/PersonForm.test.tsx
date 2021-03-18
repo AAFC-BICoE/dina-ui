@@ -4,6 +4,12 @@ import { Person } from "../../../types/objectstore-api";
 
 const mockSave = jest.fn();
 
+/** Mock Kitsu "get" method. */
+const mockGet = jest.fn(async () => {
+  // Return empty array for the dropdowns:
+  return { data: [] };
+});
+
 const TEST_PERSON_WITH_ALIASES: Person = {
   type: "person",
   displayName: "test-person",
@@ -15,7 +21,7 @@ const TEST_PERSON_WITH_ALIASES: Person = {
 describe("PersonForm", () => {
   it("AddPersonButton opens the PersonForm modal", async () => {
     const wrapper = mountWithAppContext(<AddPersonButton />, {
-      apiContext: { save: mockSave }
+      apiContext: { apiClient: { get: mockGet } as any, save: mockSave }
     });
 
     // Open modal:
@@ -69,7 +75,7 @@ describe("PersonForm", () => {
   it("Submits the aliases as any array.", async () => {
     const wrapper = mountWithAppContext(
       <PersonForm person={TEST_PERSON_WITH_ALIASES} />,
-      { apiContext: { save: mockSave } }
+      { apiContext: { apiClient: { get: mockGet } as any, save: mockSave } }
     );
 
     wrapper.find(".aliasesAsLines-field textarea").prop<any>("onChange")({
