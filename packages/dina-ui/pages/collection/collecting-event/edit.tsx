@@ -36,6 +36,7 @@ import {
   useAddPersonModal
 } from "../../../components";
 import { useAttachmentsModal } from "../../../components/object-store";
+import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Person } from "../../../types/agent-api/resources/Person";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
@@ -383,14 +384,25 @@ function CollectingEventFormInternal() {
                     <DinaMessage id="openGeographySearchButtonLabel" />
                   </button>
                   <div>
-                    <TextField name="placeName" readOnly={true}/>
-                    <TextField name="dwcMunicipality" readOnly={true}/>
-                    <TextField name="dwcStateProvince" readOnly={true}/>
-                    <TextField name="dwcCountry" readOnly={true}/>
+                    <TextField name="placeName" readOnly={true} />
+                    <TextField name="dwcMunicipality" readOnly={true} />
+                    <TextField name="dwcStateProvince" readOnly={true} />
+                    <TextField name="dwcCountry" readOnly={true} />
                   </div>
                 </fieldset>
               </div>
             </div>
+          </fieldset>
+          <fieldset className="border p-2">
+            <legend className="w-auto">
+              <DinaMessage id="managedAttributeListTitle" />
+            </legend>
+            <ManagedAttributesEditor
+              valuesPath="managedAttributeValues"
+              valueFieldName="assignedValue"
+              managedAttributeApiPath="collection-api/managed-attribute"
+              apiBaseUrl="/collection-api"
+            />
           </fieldset>
         </div>
       </div>

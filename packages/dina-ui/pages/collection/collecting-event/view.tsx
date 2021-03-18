@@ -8,7 +8,7 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
-import { FieldArray } from "formik";
+import { FastField, FieldArray } from "formik";
 import { KitsuResponse } from "kitsu";
 import { orderBy } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -21,6 +21,7 @@ import { CollectingEvent } from "../../../types/collection-api/resources/Collect
 import { GeoReferenceAssertionRow } from "../../../components/collection/GeoReferenceAssertionRow";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import Link from "next/link";
+import { ManagedAttributesViewer } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
 
 export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -165,6 +166,21 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                               className="col-md-12"
                               name="dwcMunicipality"
                             />
+                          </fieldset>
+                          <fieldset className="border p-2">
+                            <legend className="w-auto">
+                              <DinaMessage id="managedAttributeListTitle" />
+                            </legend>
+                            <FastField name="managedAttributeValues">
+                              {({ field: { value } }) => (
+                                <ManagedAttributesViewer
+                                  values={value}
+                                  managedAttributeApiPath={maId =>
+                                    `collection-api/managed-attribute/${maId}`
+                                  }
+                                />
+                              )}
+                            </FastField>
                           </fieldset>
                         </div>
                         <div className="col-md-6">

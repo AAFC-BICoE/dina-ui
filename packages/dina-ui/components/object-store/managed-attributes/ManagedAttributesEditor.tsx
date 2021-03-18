@@ -11,23 +11,29 @@ import { useFormikContext } from "formik";
 import { get } from "lodash";
 import { useEffect, useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ManagedAttribute, Metadata } from "../../../types/objectstore-api";
+import { ManagedAttribute } from "../../../types/objectstore-api";
 import { getManagedAttributesInUse } from "./getManagedAttributesInUse";
 
 export interface ManagedAttributesEditorProps {
-  /** Formik path to the ManagedAttributeMap field. */
-  mapPath: string;
+  /** Formik path to the ManagedAttribute values field. */
+  valuesPath: string;
+  valueFieldName?: string;
+  apiBaseUrl: string;
+  managedAttributeApiPath: string;
 }
 
 /** Set of fields inside a Formik form to edit Managed Attributes. */
 export function ManagedAttributesEditor({
-  mapPath
+  valuesPath,
+  managedAttributeApiPath,
+  valueFieldName = "value",
+  apiBaseUrl
 }: ManagedAttributesEditorProps) {
-  const { values: formValues } = useFormikContext<Metadata>();
+  const { values: formValues } = useFormikContext<any>();
   const { bulkGet } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
-  const managedAttributeMap = get(formValues, mapPath);
+  const managedAttributeValues = get(formValues, valuesPath);
 
   const [editableManagedAttributes, setEditableManagedAttributes] = useState<
     ManagedAttribute[]
@@ -36,8 +42,9 @@ export function ManagedAttributesEditor({
   useEffect(() => {
     (async () => {
       const initialAttributes = await getManagedAttributesInUse(
-        [managedAttributeMap],
-        bulkGet
+        [managedAttributeValues],
+        bulkGet,
+        { apiBaseUrl }
       );
       setEditableManagedAttributes(initialAttributes);
     })();
@@ -56,7 +63,7 @@ export function ManagedAttributesEditor({
           >
             <ResourceSelect<ManagedAttribute>
               filter={filterBy(["name"])}
-              model="objectstore-api/managed-attribute"
+              model={managedAttributeApiPath}
               optionLabel={attribute => attribute.name}
               isMulti={true}
               onChange={ma =>
@@ -78,7 +85,7 @@ export function ManagedAttributesEditor({
             className: "col-md-3 col-sm-4",
             key: attribute.id,
             label: attribute.name,
-            name: `${mapPath}.values.${attribute.id}.value`
+            name: `${valuesPath}.${attribute.id}.${valueFieldName}`
           };
 
           if (attribute.managedAttributeType === "STRING") {
