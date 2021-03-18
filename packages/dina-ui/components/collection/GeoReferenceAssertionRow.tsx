@@ -3,11 +3,12 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { connect } from "formik";
 import { get } from "lodash";
 import { Person } from "../../types/agent-api/resources/Person";
+import { PersistedResource } from "kitsu";
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
   viewOnly?: boolean;
-  openAddPersonModal;
+  openAddPersonModal?: () => Promise<PersistedResource<Person> | undefined>;
 }
 
 export function GeoReferenceAssertionRow({
@@ -54,6 +55,11 @@ export function GeoReferenceAssertionRow({
                 name={`geoReferenceAssertions[${index}].literalGeoreferencedBy`}
                 className={"literalGeoreferencedBy"}
                 label={formatMessage("literalGeoreferencedByLabel")}
+              />
+              <FieldView
+                name={`geoReferenceAssertions[${index}].georeferencedBy`}
+                className={"georeferencedBy"}
+                label={formatMessage("georeferencedByLabel")}                
               />
               <FieldView
                 name={`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`}
@@ -122,7 +128,7 @@ export function GeoReferenceAssertionRow({
               asyncOptions={[
                 {
                   label: <DinaMessage id="addNewPerson" />,
-                  getResource: openAddPersonModal
+                  getResource: openAddPersonModal as any
                 }
               ]}
             />
