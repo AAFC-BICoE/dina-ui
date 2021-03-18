@@ -1,16 +1,19 @@
-import { DateField, NumberField, FieldView, TextField } from "common-ui";
+import { DateField, NumberField, FieldView, TextField, filterBy, ResourceSelectField } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { connect } from "formik";
 import { get } from "lodash";
+import { Person } from "../../types/agent-api/resources/Person";
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
   viewOnly?: boolean;
+  openAddPersonModal;
 }
 
 export function GeoReferenceAssertionRow({
   index,
-  viewOnly
+  viewOnly,
+  openAddPersonModal
 }: GeoReferenceAssertionRowProps) {
   const { formatMessage } = useDinaIntl();
   return (
@@ -108,6 +111,22 @@ export function GeoReferenceAssertionRow({
               className={"literalGeoreferencedBy"}
               label={formatMessage("literalGeoreferencedByLabel")}
             />
+
+            <ResourceSelectField<Person>
+              name={`geoReferenceAssertions[${index}].georeferencedBy`}
+              label={formatMessage("georeferencedByLabel")}
+              filter={filterBy(["displayName"])}
+              model="agent-api/person"
+              optionLabel={person => person.displayName}
+              isMulti={true}
+              asyncOptions={[
+                {
+                  label: <DinaMessage id="addNewPerson" />,
+                  getResource: openAddPersonModal
+                }
+              ]}
+            />
+
             <TextField
               name={`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`}
               className={"dwcGeoreferenceProtocol"}

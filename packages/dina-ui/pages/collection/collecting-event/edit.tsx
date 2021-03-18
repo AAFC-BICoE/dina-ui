@@ -327,7 +327,7 @@ function CollectingEventFormInternal() {
                             {assertions.length
                               ? assertions.map((assertion, index) => (
                                   <TabPanel key={assertion.id}>
-                                    <GeoReferenceAssertionRow index={index} />
+                                    <GeoReferenceAssertionRow index={index} openAddPersonModal={openAddPersonModal}/>
                                     <div className="list-inline">
                                       <FormikButton
                                         className="list-inline-item btn btn-primary add-assertion-button"
@@ -536,6 +536,17 @@ function CollectingEventForm({
     }
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
+
+    //Convert georeferenceByAgents to relationship
+    submittedValues.geoReferenceAssertions?.map( assertion => {
+      if(assertion.georeferencedBy?.length > 0 ){
+        assertion.relationships = {};
+        assertion.relationships.georeferencedBy = {
+          data: assertion.georeferencedBy.map( it => ({id: it.id, type: "agent"}))
+      };
+      delete assertion.georeferencedBy;
+    }
+  })
 
     const geoReferenceAssertionsToSave = submittedValues.geoReferenceAssertions;
     delete submittedValues.geoReferenceAssertions;
