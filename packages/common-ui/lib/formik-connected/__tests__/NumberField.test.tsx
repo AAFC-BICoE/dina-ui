@@ -19,7 +19,7 @@ function getWrapper({ initialValues }) {
 describe("NumberField component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-  })
+  });
 
   it("Displays the field's label and value.", async () => {
     const wrapper = getWrapper({ initialValues: { testField: 123.23 } });
@@ -41,9 +41,7 @@ describe("NumberField component", () => {
     await new Promise(setImmediate);
 
     // Expect the correct value to have been submitted.
-    expect(mockOnSubmit).lastCalledWith(
-      { testField: 456.78 }
-    );
+    expect(mockOnSubmit).lastCalledWith({ testField: 456.78 });
   });
 
   it("Sets the field value as null if the input is blank.", async () => {

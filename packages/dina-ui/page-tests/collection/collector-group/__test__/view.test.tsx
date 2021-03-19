@@ -1,7 +1,7 @@
 import { Person } from "packages/dina-ui/types/objectstore-api";
-import { CollectorGroupDetailsPage } from "../../../pages/collector-group/view";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { CollectorGroup } from "../../../types/collection-api/resources/CollectorGroup";
+import { CollectorGroupDetailsPage } from "../../../../pages/collection/collector-group/view";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { CollectorGroup } from "../../../../types/collection-api/resources/CollectorGroup";
 
 /** Test collector-group with all fields defined. */
 const TEST_COLLECTOR_GROUP: CollectorGroup = {

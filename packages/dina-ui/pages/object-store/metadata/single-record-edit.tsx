@@ -174,10 +174,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <BackButton
-          entityId={id as string}
-          entityLink="/object-store/object"
-        />
+        <BackButton entityId={id as string} entityLink="/object-store/object" />
         <DeleteButton
           className="ml-5"
           id={id as string}

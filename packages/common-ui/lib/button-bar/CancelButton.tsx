@@ -23,7 +23,7 @@ export function BackButton({
   entityId,
   entityLink,
   byPassView,
-  navigateTo,
+  navigateTo
 }: BackButtonProps) {
   // When editing an existing entity, the link points to the entity details page.
   // When editing a new entity, the link points to the list page.
