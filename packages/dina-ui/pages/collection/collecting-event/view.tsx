@@ -104,97 +104,65 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                       </div>
                       <div className="row">
                         <div className="col-md-6">
-                          <fieldset className="border p-2">
+                          <fieldset className="form-group border px-4 py-2">
                             <legend className="w-auto">
                               <DinaMessage id="collectingDateLegend" />
                             </legend>
                             <FieldView
-                              className="col-md-12"
                               name="startEventDateTime"
                               label={formatMessage("startEventDateTimeLabel")}
                             />
                             {collectingEvent.endEventDateTime && (
                               <FieldView
-                                className="col-md-12"
                                 name="endEventDateTime"
                                 label={formatMessage("endEventDateTimeLabel")}
                               />
                             )}
                             <FieldView
-                              className="col-md-12"
                               name="verbatimEventDateTime"
                               label={formatMessage(
                                 "verbatimEventDateTimeLabel"
                               )}
                             />
                           </fieldset>
-                          <fieldset className="border p-2">
+                          <fieldset className="form-group border px-4 py-2">
                             <legend className="w-auto">
                               <DinaMessage id="collectingAgentsLegend" />
                             </legend>
-                            <FieldView
-                              className="col-md-12"
-                              name="dwcRecordedBy"
-                            />
-                            <FieldView
-                              className="col-md-12"
-                              name="collectors"
-                            />
-                            <FieldView
-                              className="col-md-12"
-                              name="dwcRecordNumber"
-                            />
-                            <FieldView
-                              className="col-md-12"
-                              name="dwcOtherRecordNumbers"
-                            />
+                            <FieldView name="dwcRecordedBy" />
+                            <FieldView name="collectors" />
+                            <FieldView name="dwcRecordNumber" />
+                            <FieldView name="dwcOtherRecordNumbers" />
                           </fieldset>
-                          <fieldset className="border p-2">
+                          <fieldset className="form-group border px-4 py-2">
                             <legend className="w-auto">
-                              <DinaMessage id="geographyLegend" />
+                              <DinaMessage id="toponymyLegend" />
                             </legend>
-                            <FieldView
-                              className="col-md-12"
-                              name="dwcCountry"
-                            />
-                            <FieldView
-                              className="col-md-12"
-                              name="dwcStateProvince"
-                            />
-                            <FieldView
-                              className="col-md-12"
-                              name="dwcMunicipality"
-                            />
+                            <FieldView name="dwcMunicipality" />
+                            <FieldView name="dwcStateProvince" />
+                            <FieldView name="dwcCountry" />
                           </fieldset>
                         </div>
                         <div className="col-md-6">
-                          <fieldset className="border p-2">
+                          <fieldset className="form-group border px-4 py-2">
                             <legend className="w-auto">
                               <DinaMessage id="verbatimCoordinatesLegend" />
                             </legend>
-                            <FieldView
-                              className="col-md-12"
-                              name="dwcVerbatimLocality"
-                            />
-                            <FieldView
-                              className="col-md-12"
-                              name="dwcVerbatimLatitude"
-                            />
-                            <FieldView
-                              className="col-md-12"
-                              name="dwcVerbatimLongitude"
-                            />
-                            <FieldView
-                              className="col-md-12"
-                              name="dwcVerbatimCoordinates"
-                            />
+                            <FieldView name="dwcVerbatimLocality" />
+                            <FieldView name="dwcVerbatimLatitude" />
+                            <FieldView name="dwcVerbatimLongitude" />
+                            <FieldView name="dwcVerbatimCoordinates" />
+                            <FieldView name="dwcVerbatimCoordinateSystem" />
+                            <FieldView name="dwcVerbatimSRS" />
+                            <FieldView name="dwcVerbatimElevation" />
+                            <FieldView name="dwcVerbatimDepth" />
                           </fieldset>
-                          <fieldset className="border p-2">
+                          <fieldset className="form-group border px-4 py-2">
                             <legend className="w-auto">
                               <DinaMessage id="geoReferencingLegend" />
                             </legend>
                             {collectingEvent?.geoReferenceAssertions?.length ? (
-                              <ul>
+                              <ul className="list-group">
                                 <FieldArray name="geoReferenceAssertions">
                                   {() =>
                                     collectingEvent?.geoReferenceAssertions?.map(
