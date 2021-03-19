@@ -42,24 +42,39 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
     }
 
     if(response?.data?.geoReferenceAssertions){
+      //Retrieve georeferenceAssertion with georeferencedBy 
       const geoReferenceAssertions = await bulkGet<GeoReferenceAssertion>(
         response?.data?.geoReferenceAssertions.map(it => `/georeference-assertion/${it.id}?include=georeferencedBy`),
         { apiBaseUrl: "/collection-api", returnNullForMissingResource: true }
       );
+
+      //Retrieve georeferencedBy associated agents
+      let agentBulkGetArgs  : string[];
+      agentBulkGetArgs = [];
       geoReferenceAssertions.forEach(async (assert) =>{
         if(assert.georeferencedBy){
-          const referfenceBy = assert.georeferencedBy;
-          const agents = await bulkGet<Person>(
-            referfenceBy.map(it => `/person/${it.id}`),
-            { apiBaseUrl: "/agent-api", returnNullForMissingResource: true }
-          );
-          // Omit null (deleted) records:
-          assert.georeferencedBy = agents.filter(it => it);        
+          agentBulkGetArgs=agentBulkGetArgs.concat(assert.georeferencedBy.map(it => `/person/${it.id}`));
         }
-      });     
-      response.data.geoReferenceAssertions = geoReferenceAssertions; 
+      }); 
+
+      const agents =  await bulkGet<Person>(
+        agentBulkGetArgs,
+        { apiBaseUrl: "/agent-api", returnNullForMissingResource: true }
+      );
+
+      geoReferenceAssertions.forEach(assert => {
+        let refers = assert.georeferencedBy;
+        refers?.map( refer => {
+          const index = assert.georeferencedBy?.findIndex(assert => assert.id===refer.id) ;
+          const agent = agents.filter( agent => agent.id === refer.id)?.[0];
+          if(assert.georeferencedBy !== undefined && index != undefined){
+            assert.georeferencedBy[index]= agent;
+          }
+        })
+      })
+      response.data.geoReferenceAssertions = geoReferenceAssertions;       
     } 
-    
+
     // Order GeoReferenceAssertions by "createdOn" ascending:
     if (response?.data) {
       response.data.geoReferenceAssertions = orderBy(
