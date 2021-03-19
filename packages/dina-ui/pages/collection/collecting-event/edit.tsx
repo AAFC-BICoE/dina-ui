@@ -35,7 +35,7 @@ import {
   Nav,
   useAddPersonModal
 } from "../../../components";
-import { SetCoordinatesFromVerbatimButton } from "../../../components/collection/fetchDecimalLatLon";
+import { SetCoordinatesFromVerbatimButton } from "../../../components/collection/SetCoordinatesFromVerbatimButton";
 import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Person } from "../../../types/agent-api/resources/Person";
