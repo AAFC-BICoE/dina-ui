@@ -21,6 +21,7 @@ import { CollectingEvent } from "../../../types/collection-api/resources/Collect
 import { GeoReferenceAssertionRow } from "../../../components/collection/GeoReferenceAssertionRow";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import Link from "next/link";
+import { GeoReferenceAssertion } from "packages/dina-ui/types/collection-api/resources/GeoReferenceAssertion";
 
 export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -40,6 +41,25 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
       response.data.collectors = agents.filter(it => it);
     }
 
+    if(response?.data?.geoReferenceAssertions){
+      const geoReferenceAssertions = await bulkGet<GeoReferenceAssertion>(
+        response?.data?.geoReferenceAssertions.map(it => `/georeference-assertion/${it.id}?include=georeferencedBy`),
+        { apiBaseUrl: "/collection-api", returnNullForMissingResource: true }
+      );
+      geoReferenceAssertions.forEach(async (assert) =>{
+        if(assert.georeferencedBy){
+          const referfenceBy = assert.georeferencedBy;
+          const agents = await bulkGet<Person>(
+            referfenceBy.map(it => `/person/${it.id}`),
+            { apiBaseUrl: "/agent-api", returnNullForMissingResource: true }
+          );
+          // Omit null (deleted) records:
+          assert.georeferencedBy = agents.filter(it => it);        
+        }
+      });     
+      response.data.geoReferenceAssertions = geoReferenceAssertions; 
+    } 
+    
     // Order GeoReferenceAssertions by "createdOn" ascending:
     if (response?.data) {
       response.data.geoReferenceAssertions = orderBy(

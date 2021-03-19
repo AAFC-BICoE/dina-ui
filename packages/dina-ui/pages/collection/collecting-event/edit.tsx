@@ -544,8 +544,8 @@ function CollectingEventForm({
         assertion.relationships.georeferencedBy = {
           data: assertion.georeferencedBy.map( it => ({id: it.id, type: "agent"}))
       };
-      delete assertion.georeferencedBy;
     }
+    delete assertion.georeferencedBy;
   })
 
     const geoReferenceAssertionsToSave = submittedValues.geoReferenceAssertions;
