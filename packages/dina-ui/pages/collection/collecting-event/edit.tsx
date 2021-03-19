@@ -35,6 +35,7 @@ import {
   Nav,
   useAddPersonModal
 } from "../../../components";
+import { SetCoordinatesFromVerbatimButton } from "../../../components/collection/fetchDecimalLatLon";
 import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Person } from "../../../types/agent-api/resources/Person";
@@ -327,6 +328,14 @@ function CollectingEventFormInternal() {
                             {assertions.length
                               ? assertions.map((assertion, index) => (
                                   <TabPanel key={assertion.id}>
+                                    <div className="form-group">
+                                      <SetCoordinatesFromVerbatimButton
+                                        sourceLatField="dwcVerbatimLatitude"
+                                        sourceLonField="dwcVerbatimLongitude"
+                                        targetLatField={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
+                                        targetLonField={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
+                                      />
+                                    </div>
                                     <GeoReferenceAssertionRow index={index} />
                                     <div className="list-inline">
                                       <FormikButton
@@ -383,10 +392,10 @@ function CollectingEventFormInternal() {
                     <DinaMessage id="openGeographySearchButtonLabel" />
                   </button>
                   <div>
-                    <TextField name="placeName" readOnly={true}/>
-                    <TextField name="dwcMunicipality" readOnly={true}/>
-                    <TextField name="dwcStateProvince" readOnly={true}/>
-                    <TextField name="dwcCountry" readOnly={true}/>
+                    <TextField name="placeName" readOnly={true} />
+                    <TextField name="dwcMunicipality" readOnly={true} />
+                    <TextField name="dwcStateProvince" readOnly={true} />
+                    <TextField name="dwcCountry" readOnly={true} />
                   </div>
                 </fieldset>
               </div>

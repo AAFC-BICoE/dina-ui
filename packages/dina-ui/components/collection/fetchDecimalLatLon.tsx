@@ -1,13 +1,11 @@
+import { FormikButton } from "common-ui";
 import { FormikContextType } from "formik";
+import { get } from "lodash";
+import { DinaMessage } from "../../intl/dina-ui-intl";
+import { useState } from "react";
 
 export interface LatLongSetterProps {
   fetchJson?: (url: string) => Promise<any>;
-
-  onDecimalCoordsFetched: (latLon: {
-    lat: number;
-    lon: number;
-  }) => void | Promise<void>;
-
   verbatimCoords: { lat: string; lon: string };
 }
 
@@ -30,9 +28,11 @@ export interface CanadensysResponse {
 
 export async function fetchDecimalLatLonFromVerbatim({
   verbatimCoords,
-  onDecimalCoordsFetched,
   fetchJson = url => window.fetch(url).then(res => res.json())
-}: LatLongSetterProps) {
+}: LatLongSetterProps): Promise<{
+  lat: number;
+  lon: number;
+}> {
   const apiUrl = new URL("https://data.canadensys.net/tools/coordinates.json");
   apiUrl.search = new URLSearchParams({
     data: `${verbatimCoords.lat},${verbatimCoords.lon}`
@@ -44,11 +44,60 @@ export async function fetchDecimalLatLonFromVerbatim({
     const lonLat = response.features?.[0]?.geometry?.coordinates;
     if (lonLat) {
       const [lon, lat] = lonLat;
-      await onDecimalCoordsFetched({ lon, lat });
+      return { lon, lat };
     }
+    throw new Error("No coordinates returned from Canadensys");
   } catch (error) {
-    // Do nothing on error to avoid dependency on 3rd party API.
     /* tslint:disable-next-line */
-    console.error("Canadensys request error:", error);
+    throw new Error("Canadensys request error: " + error.message);
   }
+}
+
+export interface GetCoordinatesFromVerbatimButtonProps {
+  sourceLatField: string;
+  sourceLonField: string;
+
+  targetLatField: string;
+  targetLonField: string;
+}
+
+export function SetCoordinatesFromVerbatimButton({
+  sourceLatField,
+  sourceLonField,
+  targetLatField,
+  targetLonField
+}: GetCoordinatesFromVerbatimButtonProps) {
+  const [error, setError] = useState<string>("");
+
+  async function DoRequest(values: any, formik: FormikContextType<any>) {
+    try {
+      const { lat, lon } = await fetchDecimalLatLonFromVerbatim({
+        verbatimCoords: {
+          lat: get(values, sourceLatField),
+          lon: get(values, sourceLonField)
+        }
+      });
+
+      formik.setFieldValue(targetLatField, lat);
+      formik.setFieldValue(targetLonField, lon);
+      setError("");
+    } catch (error) {
+      setError(error.message);
+    }
+  }
+
+  return (
+    <>
+      {error && <div className="alert alert-danger">{error}</div>}
+      <FormikButton
+        onClick={DoRequest}
+        className="btn btn-info"
+        buttonProps={({ values }) => ({
+          disabled: !get(values, sourceLatField) || !get(values, sourceLonField)
+        })}
+      >
+        <DinaMessage id="latLongAutoSetterButton" />
+      </FormikButton>
+    </>
+  );
 }
