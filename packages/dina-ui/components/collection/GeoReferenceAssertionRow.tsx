@@ -77,12 +77,16 @@ export function GeoReferenceAssertionRow({
               name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
               label={formatMessage("decimalLatitude")}
               className={"dwcDecimalLatitude"}
+              // Can be null or a valid latitude number:
+              isAllowed={({ floatValue: val }) => isValidLatitudeOrBlank(val)}
             />
             <NumberField
               name={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
               label={formatMessage("decimalLongitude")}
               readOnly={viewOnly}
               className={"dwcDecimalLongitude"}
+              // Can be null or a valid longitude number:
+              isAllowed={({ floatValue: val }) => isValidLongitudeOrBlank(val)}
             />
             <NumberField
               name={`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`}
@@ -152,3 +156,11 @@ export const ViewInMapButton = connect<{ assertionPath: string }>(
     ) : null;
   }
 );
+
+export function isValidLatitudeOrBlank(val?: number) {
+  return !val || (val >= -90 && val <= 90);
+}
+
+export function isValidLongitudeOrBlank(val?: number) {
+  return !val || (val >= -180 && val <= 180);
+}
