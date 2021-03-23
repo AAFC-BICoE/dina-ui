@@ -285,14 +285,14 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.9.0":
+"@babel/runtime@^7.0.0":
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.10.4.tgz#a6724f1a6b8d2f6ea5236dbfe58c7d7ea9c5eb99"
   integrity sha512-UpTN5yUJr9b4EX2CnGNWIvER7Ab83ibv0pcvvHc4UOdrBI5jb8bj+32cCwPX6xu0mt2daFNjYhoi+X7beH0RSw==
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.1.2", "@babel/runtime@^7.10.1", "@babel/runtime@^7.10.2", "@babel/runtime@^7.10.3", "@babel/runtime@^7.11.1", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.5", "@babel/runtime@^7.4.4", "@babel/runtime@^7.5.5", "@babel/runtime@^7.7.2", "@babel/runtime@^7.8.7":
+"@babel/runtime@^7.1.2", "@babel/runtime@^7.10.1", "@babel/runtime@^7.10.2", "@babel/runtime@^7.10.3", "@babel/runtime@^7.11.1", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.5", "@babel/runtime@^7.4.4", "@babel/runtime@^7.5.5", "@babel/runtime@^7.7.2", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.0":
   version "7.13.10"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.13.10.tgz#47d42a57b6095f4468da440388fdbad8bebf0d7d"
   integrity sha512-4QPkjJq6Ns3V/RgpEahRk+AGfL0eO6RHHtTWoNNr5mO49G6B5+X6d6THgWEAvTrznU5xYpbAlVKRYcsCgh/Akw==
@@ -781,22 +781,22 @@
   dependencies:
     esquery "^1.0.1"
 
-"@react-keycloak/core@^2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@react-keycloak/core/-/core-2.1.1.tgz#b636ec2e50753f54ba2ee4cc1a3a702cb7da7ecd"
-  integrity sha512-uLGPeMDEz1Jj6EjHbFS+kvIsOIe48TaEpaD54tUjc4QxzMVQaX+4ZvecwyBcJKPGL9f9MkTlPWz/3brIBHJ2FA==
+"@react-keycloak/core@^2.2.1":
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/@react-keycloak/core/-/core-2.2.1.tgz#c09fbf8e22f6e2646781f59a1cfa2f4411911c63"
+  integrity sha512-MKoawiLMamhCrcEQ79svZZV8lw+ojkcz4LMGeCzHULlZB8sTDY3uBg7S8NxhpdPdyAjQoQ5ExKL4Il75OBIamg==
   dependencies:
     "@babel/runtime" "^7.9.0"
     prop-types "^15.7.2"
     react-fast-compare "^3.0.1"
 
 "@react-keycloak/nextjs@^2.0.0-beta.6":
-  version "2.0.0-beta.6"
-  resolved "https://registry.yarnpkg.com/@react-keycloak/nextjs/-/nextjs-2.0.0-beta.6.tgz#bd208ac449f07a17e106062d7218d70be489f053"
-  integrity sha512-DWAuwT/LhVKlVqe9lTdYwMrs+2urHCN1+K11XfriKfzAZbvde3vIMvPK3RtGD03MWF0OMq+yEhK9HZl/6CT6gQ==
+  version "2.0.0-beta.10"
+  resolved "https://registry.yarnpkg.com/@react-keycloak/nextjs/-/nextjs-2.0.0-beta.10.tgz#41f0199d29859fbc7b0ef50689e901e3165ab12b"
+  integrity sha512-zPnPBRTZ1QJgXWNIrd2zTns7rzZZjGcQNzcAnS2Jn72Bjs0czcePDuBBpz1lhDr1nDgZBCtuEnLgPstDjbmo0Q==
   dependencies:
     "@babel/runtime" "^7.9.0"
-    "@react-keycloak/core" "^2.1.1"
+    "@react-keycloak/core" "^2.2.1"
     base-64 "^0.1.0"
     detect-node "^2.0.4"
     hoist-non-react-statics "^3.3.2"
@@ -2755,9 +2755,9 @@ detect-newline@^3.0.0:
   integrity sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA==
 
 detect-node@^2.0.4:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.4.tgz#014ee8f8f669c5c58023da64b8179c083a28c46c"
-  integrity sha512-ZIzRpLJrOj7jjP2miAtgqIfmzbxa4ZOr5jJc601zklsfEx9oTzmmj2nVpIPRpNlRTIh8lc1kyViIY7BWSGNmKw==
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.5.tgz#9d270aa7eaa5af0b72c4c9d9b814e7f4ce738b79"
+  integrity sha512-qi86tE6hRcFHy8jI1m2VG+LaPUR1LhqDa5G8tVjuUXmOrpuAgqsA1pN0+ldgr3aKUH+QLI9hCY/OcRYisERejw==
 
 diff-sequences@^25.2.6:
   version "25.2.6"
