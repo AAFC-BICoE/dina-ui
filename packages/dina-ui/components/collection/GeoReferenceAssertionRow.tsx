@@ -1,4 +1,11 @@
-import { DateField, NumberField, FieldView, TextField, filterBy, ResourceSelectField } from "common-ui";
+import {
+  DateField,
+  NumberField,
+  FieldView,
+  TextField,
+  filterBy,
+  ResourceSelectField
+} from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { connect } from "formik";
 import { get } from "lodash";
@@ -59,7 +66,7 @@ export function GeoReferenceAssertionRow({
               <FieldView
                 name={`geoReferenceAssertions[${index}].georeferencedBy`}
                 className={"georeferencedBy"}
-                label={formatMessage("georeferencedByLabel")}                
+                label={formatMessage("georeferencedByLabel")}
               />
               <FieldView
                 name={`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`}

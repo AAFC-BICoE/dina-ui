@@ -18,7 +18,7 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
       id: "1",
       type: "georeference-assertion",
       dwcDecimalLongitude: 12.5,
-      georeferencedBy: [{id: "1", type: "agent"}]
+      georeferencedBy: [{ id: "1", type: "agent" }]
     }
   ]
 };
@@ -26,15 +26,12 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
   // The get request will return the existing collecting-event.
-  if (
-    model === "collection-api/collecting-event/100"
-  ) {
+  if (model === "collection-api/collecting-event/100") {
     return { data: TEST_COLLECTION_EVENT };
   } else if (model === "agent-api/person") {
     return { data: [TEST_AGENT] };
-  }   
+  }
 });
-
 
 const mockBulkGet = jest.fn(async paths => {
   if (!paths.length) {
@@ -48,14 +45,18 @@ const mockBulkGet = jest.fn(async paths => {
     }));
   }
 
-  if ((paths[0] as string).startsWith("/georeference-assertion/1?include=georeferencedBy")) {
+  if (
+    (paths[0] as string).startsWith(
+      "/georeference-assertion/1?include=georeferencedBy"
+    )
+  ) {
     return paths.map(path => ({
       id: path.replace("/georeference-assertion/", ""),
       type: "georeference-assertion",
       dwcDecimalLongitude: 12.5,
       georeferencedBy: [{ id: "1", type: "agent" }]
     }));
-  };
+  }
 });
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
