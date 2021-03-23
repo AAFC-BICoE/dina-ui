@@ -77,6 +77,46 @@ export default function CollectingEventEditPage() {
       response.data.attachment = metadatas.filter(it => it);
     }
 
+    if (response?.data?.geoReferenceAssertions) {
+      // Retrieve georeferenceAssertion with georeferencedBy
+      const geoReferenceAssertions = await bulkGet<GeoReferenceAssertion>(
+        response?.data?.geoReferenceAssertions.map(
+          it => `/georeference-assertion/${it.id}?include=georeferencedBy`
+        ),
+        { apiBaseUrl: "/collection-api", returnNullForMissingResource: true }
+      );
+
+      // Retrieve georeferencedBy associated agents
+      let agentBulkGetArgs: string[];
+      agentBulkGetArgs = [];
+      geoReferenceAssertions.forEach(async assert => {
+        if (assert.georeferencedBy) {
+          agentBulkGetArgs = agentBulkGetArgs.concat(
+            assert.georeferencedBy.map(it => `/person/${it.id}`)
+          );
+        }
+      });
+
+      const agents = await bulkGet<Person>(agentBulkGetArgs, {
+        apiBaseUrl: "/agent-api",
+        returnNullForMissingResource: true
+      });
+
+      geoReferenceAssertions.forEach(assert => {
+        const refers = assert.georeferencedBy;
+        refers?.map(refer => {
+          const index = assert.georeferencedBy?.findIndex(
+            it => it.id === refer.id
+          );
+          const agent = agents.filter(it => it.id === refer.id)?.[0];
+          if (assert.georeferencedBy !== undefined && index !== undefined) {
+            assert.georeferencedBy[index] = agent;
+          }
+        });
+      });
+      response.data.geoReferenceAssertions = geoReferenceAssertions;
+    }
+
     // Order GeoReferenceAssertions by "createdOn" ascending:
     if (response?.data) {
       response.data.geoReferenceAssertions = orderBy(
@@ -302,7 +342,10 @@ function CollectingEventFormInternal() {
                       {assertions.length
                         ? assertions.map((assertion, index) => (
                             <TabPanel key={assertion.id}>
-                              <GeoReferenceAssertionRow index={index} />
+                              <GeoReferenceAssertionRow
+                                index={index}
+                                openAddPersonModal={openAddPersonModal}
+                              />
                               <div className="list-inline">
                                 <FormikButton
                                   className="list-inline-item btn btn-primary add-assertion-button"
@@ -478,6 +521,20 @@ function CollectingEventForm({
     }
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
+
+    // Convert georeferenceByAgents to relationship
+    submittedValues.geoReferenceAssertions?.map(assertion => {
+      if (assertion.georeferencedBy) {
+        assertion.relationships = {};
+        assertion.relationships.georeferencedBy = {
+          data: assertion.georeferencedBy.map(it => ({
+            id: it.id,
+            type: "agent"
+          }))
+        };
+      }
+      delete assertion.georeferencedBy;
+    });
 
     const geoReferenceAssertionsToSave = submittedValues.geoReferenceAssertions;
     delete submittedValues.geoReferenceAssertions;

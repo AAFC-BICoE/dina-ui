@@ -21,6 +21,7 @@ import { CollectingEvent } from "../../../types/collection-api/resources/Collect
 import { GeoReferenceAssertionRow } from "../../../components/collection/GeoReferenceAssertionRow";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import Link from "next/link";
+import { GeoReferenceAssertion } from "packages/dina-ui/types/collection-api/resources/GeoReferenceAssertion";
 
 export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -38,6 +39,46 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
       );
       // Omit null (deleted) records:
       response.data.collectors = agents.filter(it => it);
+    }
+
+    if (response?.data?.geoReferenceAssertions) {
+      // Retrieve georeferenceAssertion with georeferencedBy
+      const geoReferenceAssertions = await bulkGet<GeoReferenceAssertion>(
+        response?.data?.geoReferenceAssertions.map(
+          it => `/georeference-assertion/${it.id}?include=georeferencedBy`
+        ),
+        { apiBaseUrl: "/collection-api", returnNullForMissingResource: true }
+      );
+
+      // Retrieve georeferencedBy associated agents
+      let agentBulkGetArgs: string[];
+      agentBulkGetArgs = [];
+      geoReferenceAssertions.forEach(async assert => {
+        if (assert.georeferencedBy) {
+          agentBulkGetArgs = agentBulkGetArgs.concat(
+            assert.georeferencedBy.map(it => `/person/${it.id}`)
+          );
+        }
+      });
+
+      const agents = await bulkGet<Person>(agentBulkGetArgs, {
+        apiBaseUrl: "/agent-api",
+        returnNullForMissingResource: true
+      });
+
+      geoReferenceAssertions.forEach(assert => {
+        const refers = assert.georeferencedBy;
+        refers?.map(refer => {
+          const index = assert.georeferencedBy?.findIndex(
+            it => it.id === refer.id
+          );
+          const agent = agents.filter(it => it.id === refer.id)?.[0];
+          if (assert.georeferencedBy !== undefined && index !== undefined) {
+            assert.georeferencedBy[index] = agent;
+          }
+        });
+      });
+      response.data.geoReferenceAssertions = geoReferenceAssertions;
     }
 
     // Order GeoReferenceAssertions by "createdOn" ascending:
