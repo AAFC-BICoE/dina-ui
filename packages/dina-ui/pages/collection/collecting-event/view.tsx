@@ -12,22 +12,22 @@ import { FieldArray } from "formik";
 import { KitsuResponse } from "kitsu";
 import { orderBy } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
+import Link from "next/link";
 import { withRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
-import { useContext, useState } from "react";
+import { GeoReferenceAssertion } from "packages/dina-ui/types/collection-api/resources/GeoReferenceAssertion";
+import { useContext } from "react";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { Footer, GroupFieldView, Head, Nav } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 import { GeoReferenceAssertionRow } from "../../../components/collection/GeoReferenceAssertionRow";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
-import Link from "next/link";
-import { GeoReferenceAssertion } from "packages/dina-ui/types/collection-api/resources/GeoReferenceAssertion";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 
 export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useDinaIntl();
   const { bulkGet } = useContext(ApiClientContext);
-  const [collectingEvent, setCollectingEvent] = useState<CollectingEvent>();
 
   async function initOneToManyRelations(
     response: KitsuResponse<CollectingEvent, undefined>
@@ -81,15 +81,18 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
       response.data.geoReferenceAssertions = geoReferenceAssertions;
     }
 
-    // Order GeoReferenceAssertions by "createdOn" ascending:
     if (response?.data) {
+      // Order GeoReferenceAssertions by "createdOn" ascending:
       response.data.geoReferenceAssertions = orderBy(
         response.data.geoReferenceAssertions,
         "createdOn"
       );
     }
 
-    setCollectingEvent(response.data);
+    if (response?.data?.createdOn) {
+      const inUserTimeZone = new Date(response.data.createdOn).toString();
+      response.data.createdOn = inUserTimeZone;
+    }
   }
 
   const collectingEventQuery = useQuery<CollectingEvent>(
@@ -120,126 +123,128 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
           byPassView={true}
         />
       </ButtonBar>
-      {withResponse(collectingEventQuery, ({ data: colEvent }) => {
-        if (colEvent.createdOn) {
-          const inUserTimeZone = new Date(colEvent.createdOn).toString();
-          if (collectingEvent) collectingEvent.createdOn = inUserTimeZone;
-        }
-
-        return (
-          <main className="container-fluid">
-            <h1>
-              <DinaMessage id="collectingEventViewTitle" />
-            </h1>
-            <div>
-              {collectingEvent && (
-                <DinaForm<CollectingEvent> initialValues={collectingEvent}>
-                  <div>
-                    <div className="form-group">
-                      <div className="row">
-                        <GroupFieldView
-                          className="col-md-2"
-                          name="group"
-                          label={formatMessage("field_group")}
+      {withResponse(collectingEventQuery, ({ data: colEvent }) => (
+        <main className="container-fluid">
+          <h1>
+            <DinaMessage id="collectingEventViewTitle" />
+          </h1>
+          <div>
+            <DinaForm<CollectingEvent> initialValues={colEvent}>
+              <div>
+                <div className="form-group">
+                  <div className="row">
+                    <GroupFieldView
+                      className="col-md-2"
+                      name="group"
+                      label={formatMessage("field_group")}
+                    />
+                  </div>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <fieldset className="form-group border px-4 py-2">
+                        <legend className="w-auto">
+                          <DinaMessage id="collectingDateLegend" />
+                        </legend>
+                        <FieldView
+                          name="startEventDateTime"
+                          label={formatMessage("startEventDateTimeLabel")}
                         />
-                      </div>
-                      <div className="row">
-                        <div className="col-md-6">
-                          <fieldset className="form-group border px-4 py-2">
-                            <legend className="w-auto">
-                              <DinaMessage id="collectingDateLegend" />
-                            </legend>
-                            <FieldView
-                              name="startEventDateTime"
-                              label={formatMessage("startEventDateTimeLabel")}
-                            />
-                            {collectingEvent.endEventDateTime && (
-                              <FieldView
-                                name="endEventDateTime"
-                                label={formatMessage("endEventDateTimeLabel")}
-                              />
-                            )}
-                            <FieldView
-                              name="verbatimEventDateTime"
-                              label={formatMessage(
-                                "verbatimEventDateTimeLabel"
-                              )}
-                            />
-                          </fieldset>
-                          <fieldset className="form-group border px-4 py-2">
-                            <legend className="w-auto">
-                              <DinaMessage id="collectingAgentsLegend" />
-                            </legend>
-                            <FieldView name="dwcRecordedBy" />
-                            <FieldView name="collectors" />
-                            <FieldView name="dwcRecordNumber" />
-                            <FieldView name="dwcOtherRecordNumbers" />
-                          </fieldset>
-                          <fieldset className="form-group border px-4 py-2">
-                            <legend className="w-auto">
-                              <DinaMessage id="toponymyLegend" />
-                            </legend>
-                            <FieldView name="dwcMunicipality" />
-                            <FieldView name="dwcStateProvince" />
-                            <FieldView name="dwcCountry" />
-                          </fieldset>
-                        </div>
-                        <div className="col-md-6">
-                          <fieldset className="form-group border px-4 py-2">
-                            <legend className="w-auto">
-                              <DinaMessage id="verbatimCoordinatesLegend" />
-                            </legend>
-                            <FieldView name="dwcVerbatimLocality" />
-                            <FieldView name="dwcVerbatimLatitude" />
-                            <FieldView name="dwcVerbatimLongitude" />
-                            <FieldView name="dwcVerbatimCoordinates" />
-                            <FieldView name="dwcVerbatimCoordinateSystem" />
-                            <FieldView name="dwcVerbatimSRS" />
-                            <FieldView name="dwcVerbatimElevation" />
-                            <FieldView name="dwcVerbatimDepth" />
-                          </fieldset>
-                          <fieldset className="form-group border px-4 py-2">
-                            <legend className="w-auto">
-                              <DinaMessage id="geoReferencingLegend" />
-                            </legend>
-                            {collectingEvent?.geoReferenceAssertions?.length ? (
-                              <ul className="list-group">
-                                <FieldArray name="geoReferenceAssertions">
-                                  {() =>
-                                    collectingEvent?.geoReferenceAssertions?.map(
-                                      (assertion, index) => (
-                                        <li
-                                          className="list-group-item"
-                                          key={assertion.id}
-                                        >
-                                          <GeoReferenceAssertionRow
-                                            index={index}
-                                            viewOnly={true}
-                                          />
-                                        </li>
-                                      )
-                                    )
-                                  }
-                                </FieldArray>
-                              </ul>
-                            ) : null}
-                          </fieldset>
-                        </div>
-                      </div>
+                        {colEvent.endEventDateTime && (
+                          <FieldView
+                            name="endEventDateTime"
+                            label={formatMessage("endEventDateTimeLabel")}
+                          />
+                        )}
+                        <FieldView
+                          name="verbatimEventDateTime"
+                          label={formatMessage("verbatimEventDateTimeLabel")}
+                        />
+                      </fieldset>
+                      <fieldset className="form-group border px-4 py-2">
+                        <legend className="w-auto">
+                          <DinaMessage id="collectingAgentsLegend" />
+                        </legend>
+                        <FieldView name="dwcRecordedBy" />
+                        <FieldView name="collectors" />
+                        <FieldView name="dwcRecordNumber" />
+                        <FieldView name="dwcOtherRecordNumbers" />
+                      </fieldset>
+                      <fieldset className="form-group border px-4 py-2">
+                        <legend className="w-auto">
+                          <DinaMessage id="toponymyLegend" />
+                        </legend>
+                        <FieldView name="dwcMunicipality" />
+                        <FieldView name="dwcStateProvince" />
+                        <FieldView name="dwcCountry" />
+                      </fieldset>
+                    </div>
+                    <div className="col-md-6">
+                      <fieldset className="form-group border px-4 py-2">
+                        <legend className="w-auto">
+                          <DinaMessage id="verbatimCoordinatesLegend" />
+                        </legend>
+                        <FieldView name="dwcVerbatimLocality" />
+                        <FieldView name="dwcVerbatimLatitude" />
+                        <FieldView name="dwcVerbatimLongitude" />
+                        <FieldView name="dwcVerbatimCoordinates" />
+                        <FieldView name="dwcVerbatimCoordinateSystem" />
+                        <FieldView name="dwcVerbatimSRS" />
+                        <FieldView name="dwcVerbatimElevation" />
+                        <FieldView name="dwcVerbatimDepth" />
+                      </fieldset>
+                      <fieldset className="form-group border px-4 py-2">
+                        <legend className="w-auto">
+                          <DinaMessage id="geoReferencingLegend" />
+                        </legend>
+                        <FieldArray name="geoReferenceAssertions">
+                          {({ form }) => {
+                            const assertions =
+                              (form.values as CollectingEvent)
+                                .geoReferenceAssertions ?? [];
+
+                            return (
+                              <Tabs>
+                                <TabList>
+                                  {assertions.length
+                                    ? assertions.map((assertion, index) => (
+                                        <Tab key={assertion.id}>
+                                          <span className="m-3">
+                                            {index + 1}
+                                          </span>
+                                        </Tab>
+                                      ))
+                                    : null}
+                                </TabList>
+                                {assertions.length
+                                  ? assertions.map((assertion, index) => (
+                                      <TabPanel key={assertion.id}>
+                                        <GeoReferenceAssertionRow
+                                          index={index}
+                                          viewOnly={true}
+                                        />
+                                      </TabPanel>
+                                    ))
+                                  : null}
+                              </Tabs>
+                            );
+                          }}
+                        </FieldArray>
+                      </fieldset>
                     </div>
                   </div>
-                </DinaForm>
-              )}
-              <div className="form-group">
-                <AttachmentReadOnlySection
-                  attachmentPath={`collection-api/collecting-event/${id}/attachment`}
-                  detachTotalSelected={true}
-                />
+                </div>
               </div>
+            </DinaForm>
+
+            <div className="form-group">
+              <AttachmentReadOnlySection
+                attachmentPath={`collection-api/collecting-event/${id}/attachment`}
+                detachTotalSelected={true}
+              />
             </div>
-          </main>
-        );
-      })}
+          </div>
+        </main>
+      ))}
       <Footer />
     </div>
   );
