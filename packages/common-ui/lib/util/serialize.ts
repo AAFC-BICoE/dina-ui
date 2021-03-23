@@ -73,7 +73,7 @@ export async function serialize<TData extends KitsuResource>({
 
   data.attributes = { ...data.attributes, ...nestedObjects };
   if (origRelationship && Object.keys(origRelationship).length !== 0)
-    data.relationships = { ...origRelationship };
+    data.relationships = { ...data.relationships, ...origRelationship };
 
   return data;
 }

@@ -1,16 +1,27 @@
-import { DateField, NumberField, FieldView, TextField } from "common-ui";
+import {
+  DateField,
+  NumberField,
+  FieldView,
+  TextField,
+  filterBy,
+  ResourceSelectField
+} from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { connect } from "formik";
 import { get } from "lodash";
+import { Person } from "../../types/agent-api/resources/Person";
+import { PersistedResource } from "kitsu";
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
   viewOnly?: boolean;
+  openAddPersonModal?: () => Promise<PersistedResource<Person> | undefined>;
 }
 
 export function GeoReferenceAssertionRow({
   index,
-  viewOnly
+  viewOnly,
+  openAddPersonModal
 }: GeoReferenceAssertionRowProps) {
   const { formatMessage } = useDinaIntl();
   return (
@@ -53,6 +64,11 @@ export function GeoReferenceAssertionRow({
                 label={formatMessage("literalGeoreferencedByLabel")}
               />
               <FieldView
+                name={`geoReferenceAssertions[${index}].georeferencedBy`}
+                className={"georeferencedBy"}
+                label={formatMessage("georeferencedByLabel")}
+              />
+              <FieldView
                 name={`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`}
                 className={"dwcGeoreferenceProtocol"}
                 customName={"dwcGeoreferenceProtocol"}
@@ -77,12 +93,16 @@ export function GeoReferenceAssertionRow({
               name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
               label={formatMessage("decimalLatitude")}
               className={"dwcDecimalLatitude"}
+              // Can be null or a valid latitude number:
+              isAllowed={({ floatValue: val }) => isValidLatitudeOrBlank(val)}
             />
             <NumberField
               name={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
               label={formatMessage("decimalLongitude")}
               readOnly={viewOnly}
               className={"dwcDecimalLongitude"}
+              // Can be null or a valid longitude number:
+              isAllowed={({ floatValue: val }) => isValidLongitudeOrBlank(val)}
             />
             <NumberField
               name={`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`}
@@ -108,6 +128,22 @@ export function GeoReferenceAssertionRow({
               className={"literalGeoreferencedBy"}
               label={formatMessage("literalGeoreferencedByLabel")}
             />
+
+            <ResourceSelectField<Person>
+              name={`geoReferenceAssertions[${index}].georeferencedBy`}
+              label={formatMessage("georeferencedByLabel")}
+              filter={filterBy(["displayName"])}
+              model="agent-api/person"
+              optionLabel={person => person.displayName}
+              isMulti={true}
+              asyncOptions={[
+                {
+                  label: <DinaMessage id="addNewPerson" />,
+                  getResource: openAddPersonModal as any
+                }
+              ]}
+            />
+
             <TextField
               name={`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`}
               className={"dwcGeoreferenceProtocol"}
@@ -152,3 +188,11 @@ export const ViewInMapButton = connect<{ assertionPath: string }>(
     ) : null;
   }
 );
+
+export function isValidLatitudeOrBlank(val?: number) {
+  return !val || (val >= -90 && val <= 90);
+}
+
+export function isValidLongitudeOrBlank(val?: number) {
+  return !val || (val >= -180 && val <= 180);
+}
