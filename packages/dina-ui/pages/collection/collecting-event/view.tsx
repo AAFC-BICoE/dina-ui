@@ -128,120 +128,130 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
           <h1>
             <DinaMessage id="collectingEventViewTitle" />
           </h1>
-          <div>
+          <div className="form-group">
             <DinaForm<CollectingEvent> initialValues={colEvent}>
-              <div>
-                <div className="form-group">
-                  <div className="row">
-                    <GroupFieldView
-                      className="col-md-2"
-                      name="group"
-                      label={formatMessage("field_group")}
+              <div className="row">
+                <GroupFieldView
+                  className="col-md-2"
+                  name="group"
+                  label={formatMessage("field_group")}
+                />
+              </div>
+              <div className="row">
+                <div className="col-md-6">
+                  <fieldset className="form-group border px-4 py-2">
+                    <legend className="w-auto">
+                      <DinaMessage id="collectingDateLegend" />
+                    </legend>
+                    <FieldView
+                      name="startEventDateTime"
+                      label={formatMessage("startEventDateTimeLabel")}
                     />
-                  </div>
-                  <div className="row">
-                    <div className="col-md-6">
-                      <fieldset className="form-group border px-4 py-2">
-                        <legend className="w-auto">
-                          <DinaMessage id="collectingDateLegend" />
-                        </legend>
-                        <FieldView
-                          name="startEventDateTime"
-                          label={formatMessage("startEventDateTimeLabel")}
-                        />
-                        {colEvent.endEventDateTime && (
-                          <FieldView
-                            name="endEventDateTime"
-                            label={formatMessage("endEventDateTimeLabel")}
-                          />
-                        )}
-                        <FieldView
-                          name="verbatimEventDateTime"
-                          label={formatMessage("verbatimEventDateTimeLabel")}
-                        />
-                      </fieldset>
-                      <fieldset className="form-group border px-4 py-2">
-                        <legend className="w-auto">
-                          <DinaMessage id="collectingAgentsLegend" />
-                        </legend>
-                        <FieldView name="dwcRecordedBy" />
-                        <FieldView name="collectors" />
-                        <FieldView name="dwcRecordNumber" />
-                        <FieldView name="dwcOtherRecordNumbers" />
-                      </fieldset>
-                      <fieldset className="form-group border px-4 py-2">
-                        <legend className="w-auto">
-                          <DinaMessage id="toponymyLegend" />
-                        </legend>
-                        <FieldView name="dwcMunicipality" />
-                        <FieldView name="dwcStateProvince" />
-                        <FieldView name="dwcCountry" />
-                      </fieldset>
-                    </div>
-                    <div className="col-md-6">
-                      <fieldset className="form-group border px-4 py-2">
-                        <legend className="w-auto">
-                          <DinaMessage id="verbatimCoordinatesLegend" />
-                        </legend>
-                        <FieldView name="dwcVerbatimLocality" />
-                        <FieldView name="dwcVerbatimLatitude" />
-                        <FieldView name="dwcVerbatimLongitude" />
-                        <FieldView name="dwcVerbatimCoordinates" />
-                        <FieldView name="dwcVerbatimCoordinateSystem" />
-                        <FieldView name="dwcVerbatimSRS" />
-                        <FieldView name="dwcVerbatimElevation" />
-                        <FieldView name="dwcVerbatimDepth" />
-                      </fieldset>
-                      <fieldset className="form-group border px-4 py-2">
-                        <legend className="w-auto">
-                          <DinaMessage id="geoReferencingLegend" />
-                        </legend>
-                        <FieldArray name="geoReferenceAssertions">
-                          {({ form }) => {
-                            const assertions =
-                              (form.values as CollectingEvent)
-                                .geoReferenceAssertions ?? [];
-
-                            return (
-                              <Tabs>
-                                <TabList>
-                                  {assertions.length
-                                    ? assertions.map((assertion, index) => (
-                                        <Tab key={assertion.id}>
-                                          <span className="m-3">
-                                            {index + 1}
-                                          </span>
-                                        </Tab>
-                                      ))
-                                    : null}
-                                </TabList>
-                                {assertions.length
-                                  ? assertions.map((assertion, index) => (
-                                      <TabPanel key={assertion.id}>
-                                        <GeoReferenceAssertionRow
-                                          index={index}
-                                          viewOnly={true}
-                                        />
-                                      </TabPanel>
-                                    ))
-                                  : null}
-                              </Tabs>
-                            );
-                          }}
-                        </FieldArray>
-                      </fieldset>
-                    </div>
-                  </div>
+                    {colEvent.endEventDateTime && (
+                      <FieldView
+                        name="endEventDateTime"
+                        label={formatMessage("endEventDateTimeLabel")}
+                      />
+                    )}
+                    <FieldView
+                      name="verbatimEventDateTime"
+                      label={formatMessage("verbatimEventDateTimeLabel")}
+                    />
+                  </fieldset>
+                </div>
+                <div className="col-md-6">
+                  <fieldset className="form-group border px-4 py-2">
+                    <legend className="w-auto">
+                      <DinaMessage id="collectingAgentsLegend" />
+                    </legend>
+                    <FieldView name="dwcRecordedBy" />
+                    <FieldView name="collectors" />
+                    <FieldView name="dwcRecordNumber" />
+                    <FieldView name="dwcOtherRecordNumbers" />
+                  </fieldset>
                 </div>
               </div>
-            </DinaForm>
+              <fieldset className="form-group border px-4 py-2">
+                <legend className="w-auto">
+                  <DinaMessage id="collectingLocationLegend" />
+                </legend>
+                <fieldset className="form-group border px-4 py-2">
+                  <legend className="w-auto">
+                    <DinaMessage id="verbatimCoordinatesLegend" />
+                  </legend>
+                  <FieldView name="dwcVerbatimLocality" />
+                  <div className="row">
+                    <div className="col-md-6">
+                      <FieldView name="dwcVerbatimLatitude" />
+                      <FieldView name="dwcVerbatimLongitude" />
+                    </div>
+                    <div className="col-md-6">
+                      <FieldView name="dwcVerbatimCoordinates" />
+                      <FieldView name="dwcVerbatimCoordinateSystem" />
+                      <FieldView name="dwcVerbatimSRS" />
+                      <FieldView name="dwcVerbatimElevation" />
+                      <FieldView name="dwcVerbatimDepth" />
+                    </div>
+                  </div>
+                </fieldset>
+                <div className="row">
+                  <div className="col-md-6">
+                    <fieldset className="form-group border px-4 py-2">
+                      <legend className="w-auto">
+                        <DinaMessage id="geoReferencingLegend" />
+                      </legend>
+                      <FieldArray name="geoReferenceAssertions">
+                        {({ form }) => {
+                          const assertions =
+                            (form.values as CollectingEvent)
+                              .geoReferenceAssertions ?? [];
 
-            <div className="form-group">
-              <AttachmentReadOnlySection
-                attachmentPath={`collection-api/collecting-event/${id}/attachment`}
-                detachTotalSelected={true}
-              />
-            </div>
+                          return (
+                            <Tabs>
+                              <TabList>
+                                {assertions.length
+                                  ? assertions.map((assertion, index) => (
+                                      <Tab key={assertion.id}>
+                                        <span className="m-3">{index + 1}</span>
+                                      </Tab>
+                                    ))
+                                  : null}
+                              </TabList>
+                              {assertions.length
+                                ? assertions.map((assertion, index) => (
+                                    <TabPanel key={assertion.id}>
+                                      <GeoReferenceAssertionRow
+                                        index={index}
+                                        viewOnly={true}
+                                      />
+                                    </TabPanel>
+                                  ))
+                                : null}
+                            </Tabs>
+                          );
+                        }}
+                      </FieldArray>
+                    </fieldset>
+                  </div>
+                  <div className="col-md-6">
+                    <fieldset className="form-group border px-4 py-2">
+                      <legend className="w-auto">
+                        <DinaMessage id="toponymyLegend" />
+                      </legend>
+                      <FieldView name="dwcMunicipality" />
+                      <FieldView name="dwcStateProvince" />
+                      <FieldView name="dwcCountry" />
+                    </fieldset>
+                  </div>
+                </div>
+              </fieldset>
+            </DinaForm>
+          </div>
+          <div className="form-group">
+            <AttachmentReadOnlySection
+              attachmentPath={`collection-api/collecting-event/${id}/attachment`}
+              detachTotalSelected={true}
+            />
           </div>
         </main>
       ))}

@@ -230,6 +230,8 @@ function CollectingEventFormInternal() {
               />
             </label>
           </fieldset>
+        </div>
+        <div className="col-md-6">
           <fieldset className="form-group border px-4 py-2">
             <legend className="w-auto">
               <DinaMessage id="collectingAgentsLegend" />
@@ -261,124 +263,140 @@ function CollectingEventFormInternal() {
             <TextField name="dwcRecordNumber" />
             <TextField name="dwcOtherRecordNumbers" multiLines={true} />
           </fieldset>
-          <fieldset className="form-group border px-4 py-2">
-            <legend className="w-auto">
-              <DinaMessage id="toponymyLegend" />
-            </legend>
-            <button
-              type="button"
-              className="btn btn-light text-left"
-              onClick={() => {
-                openModal(
-                  <GeographySearchDialog
-                    searchByValue={values.dwcVerbatimLocality as any}
-                    closeModal={closeModal}
-                    onSelectSearchResult={onSelectSearchResult}
-                  />
-                );
-              }}
-            >
-              <DinaMessage id="openGeographySearchButtonLabel" />
-            </button>
-            <div>
-              <TextField name="placeName" readOnly={true} />
-              <TextField name="dwcMunicipality" readOnly={true} />
-              <TextField name="dwcStateProvince" readOnly={true} />
-              <TextField name="dwcCountry" readOnly={true} />
-            </div>
-          </fieldset>
-        </div>
-        <div className="col-md-6">
-          <fieldset className="form-group border px-4 py-2">
-            <legend className="w-auto">
-              <DinaMessage id="verbatimCoordinatesLegend" />
-            </legend>
-            <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLocality" />
-            <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLatitude" />
-            <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLongitude" />
-            <TextField name="dwcVerbatimCoordinates" />
-            <TextField name="dwcVerbatimCoordinateSystem" />
-            <TextField name="dwcVerbatimSRS" />
-            <TextField name="dwcVerbatimElevation" />
-            <TextField name="dwcVerbatimDepth" />
-          </fieldset>
-          <fieldset className="form-group border px-4 py-2">
-            <legend className="w-auto">
-              <DinaMessage id="geoReferencingLegend" />
-            </legend>
-            <FieldArray name="geoReferenceAssertions">
-              {({ form, push, remove }) => {
-                const assertions =
-                  (form.values as CollectingEvent).geoReferenceAssertions ?? [];
-
-                function addGeoReference() {
-                  push({});
-                  setActiveTabIdx(assertions.length);
-                }
-
-                function removeGeoReference(index: number) {
-                  remove(index);
-                  // Stay on the current tab number, or reduce if removeing the last element:
-                  setActiveTabIdx(current =>
-                    clamp(current, 0, assertions.length - 2)
-                  );
-                }
-
-                return (
-                  <div>
-                    <Tabs
-                      selectedIndex={activeTabIdx}
-                      onSelect={setActiveTabIdx}
-                    >
-                      <TabList>
-                        {assertions.length
-                          ? assertions.map((assertion, index) => (
-                              <Tab key={assertion.id}>
-                                <span className="m-3">{index + 1}</span>
-                              </Tab>
-                            ))
-                          : null}
-                      </TabList>
-                      {assertions.length
-                        ? assertions.map((assertion, index) => (
-                            <TabPanel key={assertion.id}>
-                              <GeoReferenceAssertionRow
-                                index={index}
-                                openAddPersonModal={openAddPersonModal}
-                              />
-                              <div className="list-inline">
-                                <FormikButton
-                                  className="list-inline-item btn btn-primary add-assertion-button"
-                                  onClick={addGeoReference}
-                                >
-                                  <DinaMessage id="addAssertion" />
-                                </FormikButton>
-                                <FormikButton
-                                  className="list-inline-item btn btn-dark"
-                                  onClick={() => removeGeoReference(index)}
-                                >
-                                  <DinaMessage id="removeAssertionLabel" />
-                                </FormikButton>
-                              </div>
-                            </TabPanel>
-                          ))
-                        : null}
-                    </Tabs>
-                    {!assertions.length ? (
-                      <FormikButton
-                        className="btn btn-primary add-assertion-button"
-                        onClick={addGeoReference}
-                      >
-                        <DinaMessage id="addAssertion" />
-                      </FormikButton>
-                    ) : null}
-                  </div>
-                );
-              }}
-            </FieldArray>
-          </fieldset>
         </div>
       </div>
+      <fieldset className="form-group border px-4 py-2">
+        <legend className="w-auto">
+          <DinaMessage id="collectingLocationLegend" />
+        </legend>
+        <fieldset className="form-group border px-4 py-2">
+          <legend className="w-auto">
+            <DinaMessage id="verbatimCoordinatesLegend" />
+          </legend>
+          <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLocality" />
+          <div className="row">
+            <div className="col-md-6">
+              <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLatitude" />
+              <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLongitude" />
+            </div>
+            <div className="col-md-6">
+              <TextField name="dwcVerbatimCoordinates" />
+              <TextField name="dwcVerbatimCoordinateSystem" />
+              <TextField name="dwcVerbatimSRS" />
+              <TextField name="dwcVerbatimElevation" />
+              <TextField name="dwcVerbatimDepth" />
+            </div>
+          </div>
+        </fieldset>
+        <div className="row">
+          <div className="col-md-6">
+            <fieldset className="form-group border px-4 py-2">
+              <legend className="w-auto">
+                <DinaMessage id="geoReferencingLegend" />
+              </legend>
+              <FieldArray name="geoReferenceAssertions">
+                {({ form, push, remove }) => {
+                  const assertions =
+                    (form.values as CollectingEvent).geoReferenceAssertions ??
+                    [];
+
+                  function addGeoReference() {
+                    push({});
+                    setActiveTabIdx(assertions.length);
+                  }
+
+                  function removeGeoReference(index: number) {
+                    remove(index);
+                    // Stay on the current tab number, or reduce if removeing the last element:
+                    setActiveTabIdx(current =>
+                      clamp(current, 0, assertions.length - 2)
+                    );
+                  }
+
+                  return (
+                    <div>
+                      <Tabs
+                        selectedIndex={activeTabIdx}
+                        onSelect={setActiveTabIdx}
+                      >
+                        <TabList>
+                          {assertions.length
+                            ? assertions.map((assertion, index) => (
+                                <Tab key={assertion.id}>
+                                  <span className="m-3">{index + 1}</span>
+                                </Tab>
+                              ))
+                            : null}
+                        </TabList>
+                        {assertions.length
+                          ? assertions.map((assertion, index) => (
+                              <TabPanel key={assertion.id}>
+                                <GeoReferenceAssertionRow
+                                  index={index}
+                                  openAddPersonModal={openAddPersonModal}
+                                />
+                                <div className="list-inline">
+                                  <FormikButton
+                                    className="list-inline-item btn btn-primary add-assertion-button"
+                                    onClick={addGeoReference}
+                                  >
+                                    <DinaMessage id="addAssertion" />
+                                  </FormikButton>
+                                  <FormikButton
+                                    className="list-inline-item btn btn-dark"
+                                    onClick={() => removeGeoReference(index)}
+                                  >
+                                    <DinaMessage id="removeAssertionLabel" />
+                                  </FormikButton>
+                                </div>
+                              </TabPanel>
+                            ))
+                          : null}
+                      </Tabs>
+                      {!assertions.length ? (
+                        <FormikButton
+                          className="btn btn-primary add-assertion-button"
+                          onClick={addGeoReference}
+                        >
+                          <DinaMessage id="addAssertion" />
+                        </FormikButton>
+                      ) : null}
+                    </div>
+                  );
+                }}
+              </FieldArray>
+            </fieldset>
+          </div>
+          <div className="col-md-6">
+            <fieldset className="form-group border px-4 py-2">
+              <legend className="w-auto">
+                <DinaMessage id="toponymyLegend" />
+              </legend>
+              <button
+                type="button"
+                className="btn btn-light text-left"
+                onClick={() => {
+                  openModal(
+                    <GeographySearchDialog
+                      searchByValue={values.dwcVerbatimLocality as any}
+                      closeModal={closeModal}
+                      onSelectSearchResult={onSelectSearchResult}
+                    />
+                  );
+                }}
+              >
+                <DinaMessage id="openGeographySearchButtonLabel" />
+              </button>
+              <div>
+                <TextField name="placeName" readOnly={true} />
+                <TextField name="dwcMunicipality" readOnly={true} />
+                <TextField name="dwcStateProvince" readOnly={true} />
+                <TextField name="dwcCountry" readOnly={true} />
+              </div>
+            </fieldset>
+          </div>
+        </div>
+      </fieldset>
     </div>
   );
 }

@@ -32,7 +32,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingDateLegend: "Collecting Date",
   collectingEventListTitle: "Collecting Event",
   collectingEventViewTitle: "View Collecting Event",
-  collectingLocationLegend: "Collecing Location",
+  collectingLocationLegend: "Collecting Location",
   collectorGroupAgentsLabel: "Collector Group Agents",
   collectorGroupListTitle: "Collector Group",
   collectorGroupNameLabel: "Collector Group Name",
