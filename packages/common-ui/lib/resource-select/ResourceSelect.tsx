@@ -11,7 +11,7 @@ import AsyncSelect from "react-select/async";
 import { components as reactSelectComponents } from "react-select";
 import { Styles } from "react-select/src/styles";
 import { OptionsType } from "react-select/src/types";
-import { ApiClientContext } from "../..";
+import { ApiClientContext, SelectOption } from "../..";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 
 /** ResourceSelect component props. */
@@ -43,7 +43,7 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   sort?: string;
 
   /** react-select styles prop. */
-  styles?: Partial<Styles>;
+  styles?: Partial<Styles<SelectOption<any>, boolean>>;
 
   /** Special dropdown options that can fetch an async value e.g. by creating a resource in a modal. */
   asyncOptions?: AsyncOption<TData>[];
@@ -126,9 +126,7 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   async function onChangeSingle(selectedOption) {
     if (selectedOption?.getResource) {
-      const resource = await (selectedOption as AsyncOption<
-        TData
-      >).getResource();
+      const resource = await (selectedOption as AsyncOption<TData>).getResource();
       if (resource) {
         onChangeProp(resource);
       }

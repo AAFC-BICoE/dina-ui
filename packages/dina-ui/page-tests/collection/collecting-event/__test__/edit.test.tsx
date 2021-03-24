@@ -64,6 +64,19 @@ const mockBulkGet = jest.fn(async paths => {
       originalFilename: "test-file"
     }));
   }
+
+  if (
+    (paths[0] as string).startsWith(
+      "/georeference-assertion/10?include=georeferencedBy"
+    )
+  ) {
+    return paths.map(path => ({
+      id: path.replace("/georeference-assertion/", ""),
+      type: "georeference-assertion",
+      dwcDecimalLongitude: 10,
+      georeferencedBy: [{ id: "1", type: "agent" }]
+    }));
+  }
 });
 
 const apiContext: any = {
@@ -375,7 +388,7 @@ const TEST_COLLECTING_EVENT: CollectingEvent = {
     {
       id: "10",
       dwcDecimalLatitude: 10,
-
+      georeferencedBy: [{ id: "1", type: "agent" }],
       type: "georeference-assertion"
     }
   ],

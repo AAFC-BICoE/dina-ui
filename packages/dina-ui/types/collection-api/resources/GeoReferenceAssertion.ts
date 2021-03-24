@@ -13,5 +13,10 @@ export interface GeoReferenceAssertionAttributes {
   dwcGeoreferenceRemarks?: string;
 }
 
+export interface GeoReferenceAssertionRelationships {
+  georeferencedBy?: KitsuResource[];
+}
+
 export type GeoReferenceAssertion = KitsuResource &
-  GeoReferenceAssertionAttributes;
+  GeoReferenceAssertionAttributes &
+  GeoReferenceAssertionRelationships;
