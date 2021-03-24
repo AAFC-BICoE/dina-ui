@@ -17,7 +17,7 @@ export interface SelectFieldProps<T = string> extends LabelWrapperParams {
 
   onChange?: (value?: T | T[] | null) => void;
   options: SelectOption<T>[];
-  styles?: Partial<Styles>;
+  styles?: Partial<Styles<SelectOption<T>, boolean>>;
 }
 
 /** Formik-connected select input. */
