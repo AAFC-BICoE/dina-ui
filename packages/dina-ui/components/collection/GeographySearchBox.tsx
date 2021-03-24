@@ -99,8 +99,15 @@ export function GeographySearchBox({
         <br />
         {administrativeBoundaries?.map((boundary, index) => (
           <div key={boundary.osm_id}>
+            <style>{`
+                .searchResult {
+                  font-size:12pt; font-family:verdana,sans-serif;
+                }     
+            `}</style>
             <div className="row">
-              <div className="col-md-12">{boundary.display_name}</div>
+              <div className="col-md-12 searchResult">
+                {boundary.display_name}
+              </div>
             </div>
             <div className="row">
               <div className="col-md-4">
