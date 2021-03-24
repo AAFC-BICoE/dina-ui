@@ -194,6 +194,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   group: "Group",
   groupMustBeSelected: "Group must be selected",
   literalGeoreferencedByLabel: "Verbatim Georeferenced By",
+  LocationLabel: "Location",
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
   managedAttributeValueLabel: "Value",

@@ -45,8 +45,6 @@ export function GeographySearchBox({
   const [geoApiRequestsOnHold, setGeoApiRequestsOnHold] = useState(false);
   const suggestButtonIsDisabled = geoApiRequestsOnHold || !inputValue;
 
-  const { formatMessage } = useDinaIntl();
-
   const searchByValueOnAdminBoundaries = async (searchValue: string) => {
     // Set a 1-second API request throttle:
     if (suggestButtonIsDisabled) {
@@ -67,7 +65,14 @@ export function GeographySearchBox({
   return (
     <div>
       <div className="row">
-        <div className="col-md-9">
+        <div className="col-md-1">
+          <label>
+            <strong>
+              <DinaMessage id="LocationLabel" />
+            </strong>
+          </label>
+        </div>
+        <div className="col-md-8">
           <input
             className="form-control"
             onChange={e => setInputValue(e.target.value)}
@@ -107,6 +112,7 @@ export function GeographySearchBox({
                   <CommonMessage id="select" />
                 </button>
               </div>
+
               <div className="col-md-4">
                 <a
                   href={`https://www.openstreetmap.org/${boundary.osm_type}/${boundary.osm_id}`}

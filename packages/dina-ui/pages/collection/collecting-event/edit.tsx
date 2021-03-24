@@ -177,7 +177,11 @@ function CollectingEventFormInternal() {
   >();
 
   const [activeTabIdx, setActiveTabIdx] = useState(0);
-  const [showPlaceSearchResult, setShowPlaceSearchResult] = useState(false);
+  const [showPlaceSearchResult, setShowPlaceSearchResult] = useState(
+    values.geographicPlaceName || values.dwcCountry || values.dwcStateProvince
+      ? true
+      : false
+  );
   const [selectedSearchResult, setSelectedSearchResult] = useState<
     NominatumApiSearchResult
   >();
@@ -190,19 +194,12 @@ function CollectingEventFormInternal() {
   ) => {
     if (!result) {
       setFieldValue("dwcCountry", null);
-      setFieldValue("dwcMunicipality", null);
       setFieldValue("dwcStateProvince", null);
-      setFieldValue("placeName", null);
+      setFieldValue("geographicPlaceName", null);
     } else {
       setFieldValue("dwcCountry", result?.address?.country);
-      setFieldValue(
-        "dwcMunicipality",
-        result?.address?.city ??
-          result?.address?.city_district ??
-          result?.address?.county
-      );
       setFieldValue("dwcStateProvince", result?.address?.state);
-      setFieldValue("placeName", result?.display_name);
+      setFieldValue("geographicPlaceName", result?.display_name);
     }
     setSelectedSearchResult(result as any);
   };
@@ -404,7 +401,7 @@ function CollectingEventFormInternal() {
                 style={{
                   overflowY: "auto",
                   overflowX: "hidden",
-                  maxHeight: 550
+                  maxHeight: 520
                 }}
               >
                 <div
@@ -420,8 +417,7 @@ function CollectingEventFormInternal() {
                 <div
                   style={{ display: showPlaceSearchResult ? "inline" : "none" }}
                 >
-                  <TextField name="placeName" readOnly={true} />
-                  <TextField name="dwcMunicipality" readOnly={true} />
+                  <TextField name="geographicPlaceName" readOnly={true} />
                   <TextField name="dwcStateProvince" readOnly={true} />
                   <TextField name="dwcCountry" readOnly={true} />
                   <div className="row">
@@ -434,15 +430,18 @@ function CollectingEventFormInternal() {
                         <DinaMessage id="removeThisPlaceLabel" />
                       </button>
                     </div>
-                    <div className="col-md-4">
-                      <a
-                        href={`https://www.openstreetmap.org/${selectedSearchResult?.osm_type}/${selectedSearchResult?.osm_id}`}
-                        target="_blank"
-                        className="btn btn-info"
-                      >
-                        <DinaMessage id="viewDetailButtonLabel" />
-                      </a>
-                    </div>
+                    {administrativeBoundaries &&
+                      administrativeBoundaries?.length > 0 && (
+                        <div className="col-md-4">
+                          <a
+                            href={`https://www.openstreetmap.org/${selectedSearchResult?.osm_type}/${selectedSearchResult?.osm_id}`}
+                            target="_blank"
+                            className="btn btn-info"
+                          >
+                            <DinaMessage id="viewDetailButtonLabel" />
+                          </a>
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>
@@ -609,9 +608,6 @@ function CollectingEventForm({
 
     const geoReferenceAssertionsToSave = submittedValues.geoReferenceAssertions;
     delete submittedValues.geoReferenceAssertions;
-
-    // Delete the place name as it is only for display purpose
-    delete submittedValues.placeName;
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [
