@@ -32,7 +32,7 @@ export interface CollectingEventAttributes {
   collectorGroupUuid?: string;
   collectorGroups?: CollectorGroup[];
   group: string;
-  placeName?: string;
+  geographicPlaceName?: string;
 }
 
 export interface CollectingEventRelationships {
