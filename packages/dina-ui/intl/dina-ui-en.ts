@@ -237,6 +237,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   personViewTitle: "Person",
   removeAssertionLabel: "Remove this GeoReference",
   placeNameLabel: "Place Name",
+  removeThisPlaceLabel: " Remove this Place",
   resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",
   revisionsListTitle: "Revisions for {name}",
   revisionsButtonText: "Revisions",
