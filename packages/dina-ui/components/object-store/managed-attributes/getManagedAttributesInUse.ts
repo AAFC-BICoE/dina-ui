@@ -1,4 +1,5 @@
 import { ApiClientI } from "common-ui";
+import { flatMap, keys, uniq } from "lodash";
 import {
   ManagedAttribute,
   ManagedAttributeMap
@@ -12,24 +13,26 @@ export async function getManagedAttributesInUse(
   bulkGet: ApiClientI["bulkGet"],
   {
     apiBaseUrl = "/objectstore-api",
-    managedAttributePath = "/managed-attribute"
+    managedAttributePath = "/managed-attribute",
+    managedAttributeKeyField = "id",
+    /** Prefix before the key when doing a Managed Attribute lookup e.g. COLLECTING_EVENT */
+    keyPrefix = ""
   } = {}
 ) {
-  // Loop through the metadatas and find which managed attributes are set:
-  const managedAttributeIdMap: Record<string, true> = {};
-  for (const values of managedAttributeMaps) {
-    const keys = Object.keys(values ?? {});
-    for (const key of keys) {
-      managedAttributeIdMap[key] = true;
-    }
-  }
-  const managedAttributeIds = Object.keys(managedAttributeIdMap);
+  // Get all unique ManagedAttribute keys in the given value maps:
+  const managedAttributeKeys = uniq(flatMap(managedAttributeMaps.map(keys)));
 
   // Fetch the managed attributes from the back-end:
   const newInitialEditableManagedAttributes = await bulkGet<ManagedAttribute>(
-    managedAttributeIds.map(id => `${managedAttributePath}/${id}`),
-    { apiBaseUrl }
+    managedAttributeKeys.map(
+      key => `${managedAttributePath}/${keyPrefix ? keyPrefix + "." : ""}${key}`
+    ),
+    { apiBaseUrl, returnNullForMissingResource: true }
   );
 
-  return newInitialEditableManagedAttributes;
+  return newInitialEditableManagedAttributes.map(
+    // If the Managed Attribute is missing from the back-end then return a shallow copy with just the key field:
+    (attr, index) =>
+      attr ?? { [managedAttributeKeyField]: managedAttributeKeys[index] }
+  );
 }

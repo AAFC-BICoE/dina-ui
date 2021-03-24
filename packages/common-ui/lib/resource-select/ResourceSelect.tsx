@@ -87,7 +87,7 @@ export function ResourceSelect<TData extends KitsuResource>({
     inputValue: string,
     callback: (options: OptionsType<any>) => void
   ) {
-    const filterParam = inputValue ? filter(inputValue) : undefined;
+    const filterParam = filter(inputValue);
 
     // Omit undefined values from the GET params, which would otherwise cause an invalid request.
     // e.g. /api/region?include=undefined

@@ -158,16 +158,9 @@ function ManagedAttributeForm({
             <DinaMessage id="cancelButtonText" />
           </a>
         </Link>
-        <DeleteButton
-          className="ml-5"
-          id={id}
-          options={{ apiBaseUrl: "/collection-api" }}
-          postDeleteRedirect="/collection/managed-attribute/list"
-          type="managed-attribute"
-        />
       </ButtonBar>
       <div style={{ width: "300px" }}>
-        <TextField name="name" />
+        <TextField name="name" readOnly={id !== undefined} />
       </div>
       <div style={{ width: "300px" }}>
         <SelectField

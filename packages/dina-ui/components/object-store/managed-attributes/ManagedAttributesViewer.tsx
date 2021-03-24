@@ -14,7 +14,8 @@ export interface ManagedAttributesViewerProps {
     { name?: string; value?: string; assignedValue?: string }
   >;
 
-  managedAttributeApiPath: (id: string) => string;
+  /** Function that returns the API find-one path given the Managed Attribute key or ID. */
+  managedAttributeApiPath: (key: string) => string;
 }
 
 export function ManagedAttributesViewer({
@@ -22,7 +23,7 @@ export function ManagedAttributesViewer({
   managedAttributeApiPath
 }: ManagedAttributesViewerProps) {
   const managedAttributeValues = values
-    ? toPairs(values).map(([id, mav]) => ({ id, ...mav }))
+    ? toPairs(values).map(([key, mav]) => ({ key, ...mav }))
     : [];
 
   return (
@@ -30,18 +31,19 @@ export function ManagedAttributesViewer({
       className="-striped"
       columns={[
         {
-          Cell: ({ original: { id, name } }) => (
+          Cell: ({ original: { key, name } }) => (
             <strong>
               {name ?? (
                 <ManagedAttributeName
                   managedAttributeApiPath={managedAttributeApiPath}
-                  id={id}
+                  managedAttributeKey={key}
                 />
               )}
             </strong>
           ),
           Header: <DinaMessage id="attributeLabel" />,
-          accessor: "name"
+          accessor: row => row.name ?? row.key,
+          id: "name"
         },
         {
           Header: <DinaMessage id="managedAttributeValueLabel" />,
@@ -57,10 +59,13 @@ export function ManagedAttributesViewer({
 }
 
 /** Render the name of a ManagedAttribute. */
-export function ManagedAttributeName({ id, managedAttributeApiPath }) {
+export function ManagedAttributeName({
+  managedAttributeKey,
+  managedAttributeApiPath
+}) {
   const { response } = useQuery<KitsuResource & { name: string }>({
-    path: managedAttributeApiPath(id)
+    path: managedAttributeApiPath(managedAttributeKey)
   });
 
-  return response?.data?.name ? <>{response?.data?.name}</> : null;
+  return <>{response?.data?.name ?? managedAttributeKey}</>;
 }

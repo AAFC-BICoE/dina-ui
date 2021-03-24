@@ -402,6 +402,8 @@ function CollectingEventFormInternal() {
               valueFieldName="assignedValue"
               managedAttributeApiPath="collection-api/managed-attribute"
               apiBaseUrl="/collection-api"
+              managedAttributeComponent="COLLECTING_EVENT"
+              managedAttributeKeyField="key"
             />
           </fieldset>
         </div>

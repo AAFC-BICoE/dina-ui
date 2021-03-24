@@ -175,8 +175,8 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                               {({ field: { value } }) => (
                                 <ManagedAttributesViewer
                                   values={value}
-                                  managedAttributeApiPath={maId =>
-                                    `collection-api/managed-attribute/${maId}`
+                                  managedAttributeApiPath={key =>
+                                    `collection-api/managed-attribute/collecting_event.${key}`
                                   }
                                 />
                               )}

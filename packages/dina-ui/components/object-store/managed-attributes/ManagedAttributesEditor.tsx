@@ -20,6 +20,18 @@ export interface ManagedAttributesEditorProps {
   valueFieldName?: string;
   apiBaseUrl: string;
   managedAttributeApiPath: string;
+
+  /**
+   * The target component of the managed attribute e.g. COLLECTING_EVENT.
+   * Used for Collection API but not for Object Store API.
+   */
+  managedAttributeComponent?: string;
+
+  /**
+   * The key field on the ManagedAttribute to use as the key in the managed attribute map.
+   * e.g. "id".
+   */
+  managedAttributeKeyField?: string;
 }
 
 /** Set of fields inside a Formik form to edit Managed Attributes. */
@@ -27,7 +39,9 @@ export function ManagedAttributesEditor({
   valuesPath,
   managedAttributeApiPath,
   valueFieldName = "value",
-  apiBaseUrl
+  apiBaseUrl,
+  managedAttributeComponent,
+  managedAttributeKeyField = "id"
 }: ManagedAttributesEditorProps) {
   const { values: formValues } = useFormikContext<any>();
   const { bulkGet } = useApiClient();
@@ -44,7 +58,11 @@ export function ManagedAttributesEditor({
       const initialAttributes = await getManagedAttributesInUse(
         [managedAttributeValues],
         bulkGet,
-        { apiBaseUrl }
+        {
+          apiBaseUrl,
+          keyPrefix: managedAttributeComponent,
+          managedAttributeKeyField
+        }
       );
       setEditableManagedAttributes(initialAttributes);
     })();
@@ -62,9 +80,16 @@ export function ManagedAttributesEditor({
             label={formatMessage("field_editableManagedAttributes")}
           >
             <ResourceSelect<ManagedAttribute>
-              filter={filterBy(["name"])}
+              filter={input => ({
+                ...filterBy(["name"])(input),
+                ...(managedAttributeComponent
+                  ? { managedAttributeComponent }
+                  : {})
+              })}
               model={managedAttributeApiPath}
-              optionLabel={attribute => attribute.name}
+              optionLabel={attribute =>
+                attribute.name ?? get(attribute, managedAttributeKeyField)
+              }
               isMulti={true}
               onChange={ma =>
                 setEditableManagedAttributes(ma as ManagedAttribute[])
@@ -81,38 +106,40 @@ export function ManagedAttributesEditor({
       </div>
       <div className="row" style={{ minHeight: "25rem" }}>
         {editableManagedAttributes.map(attribute => {
+          const attributeKey = get(attribute, managedAttributeKeyField);
+
           const props = {
             className: "col-md-3 col-sm-4",
-            key: attribute.id,
-            label: attribute.name,
-            name: `${valuesPath}.${attribute.id}.${valueFieldName}`
+            key: attributeKey,
+            label: attribute.name ?? attributeKey,
+            name: `${valuesPath}.${attributeKey}.${valueFieldName}`
           };
 
-          if (attribute.managedAttributeType === "STRING") {
-            if (attribute.acceptedValues) {
-              return (
-                <SelectField
-                  {...props}
-                  options={[
-                    { label: `<${formatMessage("none")}>`, value: "" },
-                    ...attribute.acceptedValues.map(value => ({
-                      label: value,
-                      value
-                    }))
-                  ]}
-                />
-              );
-            }
+          if (
+            attribute.managedAttributeType === "STRING" &&
+            attribute.acceptedValues?.length
+          ) {
+            return (
+              <SelectField
+                {...props}
+                options={[
+                  { label: `<${formatMessage("none")}>`, value: "" },
+                  ...attribute.acceptedValues.map(value => ({
+                    label: value,
+                    value
+                  }))
+                ]}
+              />
+            );
+          } else if (attribute.managedAttributeType === "INTEGER") {
+            return <NumberField {...props} />;
+          } else {
             return (
               <TextField
                 {...props}
                 inputProps={{ type: "search" }} // Adds the 'X' clear button in the text input.
               />
             );
-          } else if (attribute.managedAttributeType === "INTEGER") {
-            return <NumberField {...props} />;
-          } else {
-            return null;
           }
         })}
       </div>
