@@ -28,12 +28,12 @@ import { useContext, useState } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
-  GeographySearchDialog,
   GeoReferenceAssertionRow,
   GroupSelectField,
   Head,
   Nav,
-  useAddPersonModal
+  useAddPersonModal,
+  GeographySearchBox
 } from "../../../components";
 import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -177,18 +177,43 @@ function CollectingEventFormInternal() {
   >();
 
   const [activeTabIdx, setActiveTabIdx] = useState(0);
-  const { openModal, closeModal } = useModal();
+  const [showPlaceSearchResult, setShowPlaceSearchResult] = useState(
+    values.geographicPlaceName || values.dwcCountry || values.dwcStateProvince
+      ? true
+      : false
+  );
+  const [selectedSearchResult, setSelectedSearchResult] = useState<
+    NominatumApiSearchResult
+  >();
+  const [administrativeBoundaries, setAdministrativeBoundaries] = useState<
+    NominatumApiSearchResult[]
+  >();
 
-  const onSelectSearchResult = (result: NominatumApiSearchResult) => {
-    setFieldValue("dwcCountry", result.address?.country);
-    setFieldValue(
-      "dwcMunicipality",
-      result.address?.city ??
-        result.address?.city_district ??
-        result.address?.county
-    );
-    setFieldValue("dwcStateProvince", result.address?.state);
-    setFieldValue("placeName", result.display_name);
+  const onSelectSearchResult = (
+    result: NominatumApiSearchResult | undefined
+  ) => {
+    if (!result) {
+      setFieldValue("dwcCountry", null);
+      setFieldValue("dwcStateProvince", null);
+      setFieldValue("geographicPlaceName", null);
+    } else {
+      setFieldValue("dwcCountry", result?.address?.country);
+      setFieldValue("dwcStateProvince", result?.address?.state);
+      setFieldValue("geographicPlaceName", result?.display_name);
+    }
+    setSelectedSearchResult(result as any);
+  };
+
+  const selectSearchResult = (result: NominatumApiSearchResult) => {
+    onSelectSearchResult(result);
+    setShowPlaceSearchResult(true);
+  };
+
+  const removeThisPlace = () => {
+    // reset the fields when user remote the place
+    onSelectSearchResult(undefined);
+    setAdministrativeBoundaries(undefined);
+    setShowPlaceSearchResult(false);
   };
 
   return (
@@ -372,26 +397,53 @@ function CollectingEventFormInternal() {
               <legend className="w-auto">
                 <DinaMessage id="toponymyLegend" />
               </legend>
-              <button
-                type="button"
-                className="btn btn-light text-left"
-                onClick={() => {
-                  openModal(
-                    <GeographySearchDialog
-                      searchByValue={values.dwcVerbatimLocality as any}
-                      closeModal={closeModal}
-                      onSelectSearchResult={onSelectSearchResult}
-                    />
-                  );
+              <div
+                style={{
+                  overflowY: "auto",
+                  overflowX: "hidden",
+                  maxHeight: 520
                 }}
               >
-                <DinaMessage id="openGeographySearchButtonLabel" />
-              </button>
-              <div>
-                <TextField name="placeName" readOnly={true} />
-                <TextField name="dwcMunicipality" readOnly={true} />
-                <TextField name="dwcStateProvince" readOnly={true} />
-                <TextField name="dwcCountry" readOnly={true} />
+                <div
+                  style={{ display: showPlaceSearchResult ? "none" : "inline" }}
+                >
+                  <GeographySearchBox
+                    selectSearchResult={selectSearchResult}
+                    administrativeBoundaries={administrativeBoundaries as any}
+                    setAdministrativeBoundaries={setAdministrativeBoundaries}
+                  />
+                </div>
+
+                <div
+                  style={{ display: showPlaceSearchResult ? "inline" : "none" }}
+                >
+                  <TextField name="geographicPlaceName" readOnly={true} />
+                  <TextField name="dwcStateProvince" readOnly={true} />
+                  <TextField name="dwcCountry" readOnly={true} />
+                  <div className="row">
+                    <div className="col-md-4">
+                      <button
+                        type="button"
+                        className="btn btn-dark"
+                        onClick={removeThisPlace}
+                      >
+                        <DinaMessage id="removeThisPlaceLabel" />
+                      </button>
+                    </div>
+                    {administrativeBoundaries &&
+                      administrativeBoundaries?.length > 0 && (
+                        <div className="col-md-4">
+                          <a
+                            href={`https://www.openstreetmap.org/${selectedSearchResult?.osm_type}/${selectedSearchResult?.osm_id}`}
+                            target="_blank"
+                            className="btn btn-info"
+                          >
+                            <DinaMessage id="viewDetailButtonLabel" />
+                          </a>
+                        </div>
+                      )}
+                  </div>
+                </div>
               </div>
             </fieldset>
           </div>
@@ -556,9 +608,6 @@ function CollectingEventForm({
 
     const geoReferenceAssertionsToSave = submittedValues.geoReferenceAssertions;
     delete submittedValues.geoReferenceAssertions;
-
-    // Delete the place name as it is only for display purpose
-    delete submittedValues.placeName;
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [

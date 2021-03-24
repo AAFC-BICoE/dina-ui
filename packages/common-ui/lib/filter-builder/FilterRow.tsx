@@ -113,7 +113,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
             className="filter-predicate"
             instanceId={`predicate_${model.id}`}
             options={predicateTypes}
-            onChange={this.onPredicateChanged}
+            onChange={this.onPredicateChanged as any}
             value={predicateTypes.find(
               option => option.value === model.predicate
             )}

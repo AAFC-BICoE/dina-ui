@@ -238,7 +238,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                       <legend className="w-auto">
                         <DinaMessage id="toponymyLegend" />
                       </legend>
-                      <FieldView name="dwcMunicipality" />
+                      <FieldView name="geographicPlaceName" />
                       <FieldView name="dwcStateProvince" />
                       <FieldView name="dwcCountry" />
                     </fieldset>
