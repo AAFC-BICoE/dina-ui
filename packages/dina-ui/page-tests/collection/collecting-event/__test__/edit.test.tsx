@@ -38,6 +38,9 @@ const mockGet = jest.fn(async model => {
     return { data: TEST_COLLECTING_EVENT };
   } else if (model === "agent-api/person") {
     return { data: [TEST_AGENT] };
+  } else {
+    // Return an empty array for the dropdown select menus:
+    return { data: [] };
   }
 });
 
@@ -259,7 +262,7 @@ describe("collecting-event edit page", () => {
     ]);
   });
 
-  it("Provides a form to edit a collecting-event.", async done => {
+  it("Provides a form to edit a collecting-event.", async () => {
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
       data: [
@@ -299,12 +302,12 @@ describe("collecting-event edit page", () => {
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      expect(mockPatch).toBeCalledTimes(2);
-      expect(mockPatch.mock.calls[0][0]).toBe("/collection-api/operations");
-      expect(mockPatch.mock.calls[1][0]).toBe("/collection-api/operations");
-      done();
-    });
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockPatch).toBeCalledTimes(2);
+    expect(mockPatch.mock.calls[0][0]).toBe("/collection-api/operations");
+    expect(mockPatch.mock.calls[1][0]).toBe("/collection-api/operations");
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async done => {
