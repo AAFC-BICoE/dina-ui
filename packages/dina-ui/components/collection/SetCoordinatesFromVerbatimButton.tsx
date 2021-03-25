@@ -48,17 +48,15 @@ export function SetCoordinatesFromVerbatimButton({
   }
 
   return (
-    <>
+    <FormikButton
+      onClick={DoRequest}
+      className="btn btn-info"
+      buttonProps={({ values }) => ({
+        disabled: !get(values, sourceLatField) || !get(values, sourceLonField)
+      })}
+    >
       {error && <div className="alert alert-danger">{error}</div>}
-      <FormikButton
-        onClick={DoRequest}
-        className="btn btn-info"
-        buttonProps={({ values }) => ({
-          disabled: !get(values, sourceLatField) || !get(values, sourceLonField)
-        })}
-      >
-        <DinaMessage id="latLongAutoSetterButton" />
-      </FormikButton>
-    </>
+      <DinaMessage id="latLongAutoSetterButton" />
+    </FormikButton>
   );
 }

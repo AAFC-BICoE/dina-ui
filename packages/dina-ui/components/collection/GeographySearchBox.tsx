@@ -1,7 +1,7 @@
 import CoordinateParser from "coordinate-parser";
 import { useState } from "react";
 import useSWR from "swr";
-import { LoadingSpinner, NominatumApiSearchResult } from "common-ui";
+import { LoadingSpinner, NominatumApiSearchResult, Tooltip } from "common-ui";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 
 interface GeographySearchBoxProps {
@@ -44,6 +44,11 @@ async function nominatimSearch(
 
   try {
     const response = await fetchJson(url.toString());
+
+    if (response.error) {
+      throw new Error(String(response.error));
+    }
+
     // Search API returns an array ; Reverse API returns a single place:
     return (coords ? [response] : response) as NominatumApiSearchResult[];
   } catch (error) {
@@ -95,37 +100,39 @@ export function GeographySearchBox({
 
   return (
     <div>
-      <div className="row">
-        <div className="col-md-1">
-          <label>
-            <strong>
-              <DinaMessage id="locationLabel" />
-            </strong>
-          </label>
-        </div>
-        <div className="col-md-8">
-          <input
-            className="form-control"
-            onChange={e => onInputChange(e.target.value)}
-            onFocus={e => e.target.select()}
-            onKeyDown={e => {
-              if (e.keyCode === 13) {
-                e.preventDefault();
-                doSearch();
-              }
-            }}
-            value={inputValue}
-          />
-        </div>
-        <div className="col-md-1">
-          <button
-            onClick={doSearch}
-            className="btn btn-primary"
-            type="button"
-            disabled={suggestButtonIsDisabled}
-          >
-            <DinaMessage id="searchButton" />
-          </button>
+      <div className="d-flex flex-row">
+        <label className="pt-2">
+          <strong>
+            <DinaMessage id="locationLabel" />
+          </strong>
+          <Tooltip id="geographySearchBoxTooltip" />
+        </label>
+        <div className="flex-grow-1">
+          <div className="input-group">
+            <input
+              className="form-control"
+              onChange={e => onInputChange(e.target.value)}
+              onFocus={e => e.target.select()}
+              onKeyDown={e => {
+                if (e.keyCode === 13) {
+                  e.preventDefault();
+                  doSearch();
+                }
+              }}
+              value={inputValue}
+            />
+            <div className="input-group-append">
+              <button
+                style={{ width: "10rem" }}
+                onClick={doSearch}
+                className="btn btn-primary geo-search-button"
+                type="button"
+                disabled={suggestButtonIsDisabled}
+              >
+                <DinaMessage id="searchButton" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       <div>

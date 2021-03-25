@@ -187,6 +187,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
   georeferencedDateLabel: "Georeferenced Date",
   geographyLegend: "Geography (Places)",
+  geographySearchBoxTooltip:
+    'Search by place name (e.g. "Ottawa" or WGS84 coordinates (e.g. "40.123, -74.123"))',
   georeferencedByLabel: "Georeferenced By",
   geoReferencing: "Geo-Referencing",
   geoReferencingLegend: "Georeferencing",
@@ -195,7 +197,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   groupMustBeSelected: "Group must be selected",
   literalGeoreferencedByLabel: "Verbatim Georeferenced By",
   locationLabel: "Location",
-  latLongAutoSetterButton: "Set Decimal Lat/Long based on Verbatim fields",
+  latLongAutoSetterButton: "Use Converted Lat/Long from Verbatim fields",
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
   managedAttributeValueLabel: "Value",

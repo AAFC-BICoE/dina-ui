@@ -417,6 +417,21 @@ function CollectingEventFormInternal() {
                 <div
                   style={{ display: showPlaceSearchResult ? "none" : "inline" }}
                 >
+                  <div className="form-group">
+                    <SetCoordinatesFromVerbatimButton
+                      sourceLatField="dwcVerbatimLatitude"
+                      sourceLonField="dwcVerbatimLongitude"
+                      onSetCoords={({ lat, lon }) => {
+                        setGeoSearchValue(`${lat}, ${lon}`);
+                        // Do the geo-search automatically:
+                        setImmediate(() =>
+                          document
+                            ?.querySelector<HTMLElement>(".geo-search-button")
+                            ?.click()
+                        );
+                      }}
+                    />
+                  </div>
                   <GeographySearchBox
                     inputValue={geoSearchValue}
                     onInputChange={setGeoSearchValue}
