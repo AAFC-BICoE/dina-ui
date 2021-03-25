@@ -39,7 +39,10 @@ import {
 import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Person } from "../../../types/agent-api/resources/Person";
-import { CollectingEvent, GeoreferenceVerificationStatus } from "../../../types/collection-api/resources/CollectingEvent";
+import {
+  CollectingEvent,
+  GeoreferenceVerificationStatus
+} from "../../../types/collection-api/resources/CollectingEvent";
 import { GeoReferenceAssertion } from "../../../types/collection-api/resources/GeoReferenceAssertion";
 import { Metadata } from "../../../types/objectstore-api";
 
@@ -173,9 +176,11 @@ function CollectingEventFormInternal() {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [checked, setChecked] = useState(false);
-  const { setFieldValue, setFieldTouched, values } = useFormikContext<
-    CollectingEvent
-  >();
+  const {
+    setFieldValue,
+    setFieldTouched,
+    values
+  } = useFormikContext<CollectingEvent>();
 
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const [showPlaceSearchResult, setShowPlaceSearchResult] = useState(
@@ -183,9 +188,10 @@ function CollectingEventFormInternal() {
       ? true
       : false
   );
-  const [selectedSearchResult, setSelectedSearchResult] = useState<
-    NominatumApiSearchResult
-  >();
+  const [
+    selectedSearchResult,
+    setSelectedSearchResult
+  ] = useState<NominatumApiSearchResult>();
   const [administrativeBoundaries, setAdministrativeBoundaries] = useState<
     NominatumApiSearchResult[]
   >();
@@ -219,17 +225,18 @@ function CollectingEventFormInternal() {
     setShowPlaceSearchResult(false);
   };
 
-  const onGeoReferencingImpossibleCheckBoxClick = ( e ) => {
-      console.log ( "e.target.value: " + e.target.value);
-      if( e.target.checked === true ) {
-        setFieldValue("dwcGeoreferenceVerificationStatus", "GEOREFERENCING_NOT_POSSIBLE");
-        setGeoreferenceDisabled(true);
-      }        
-      else{
-        setFieldValue("dwcGeoreferenceVerificationStatus", "");
-        setGeoreferenceDisabled(false);        
-      }
-  }
+  const onGeoReferencingImpossibleCheckBoxClick = e => {
+    if (e.target.checked === true) {
+      setFieldValue(
+        "dwcGeoreferenceVerificationStatus",
+        "GEOREFERENCING_NOT_POSSIBLE"
+      );
+      setGeoreferenceDisabled(true);
+    } else {
+      setFieldValue("dwcGeoreferenceVerificationStatus", "");
+      setGeoreferenceDisabled(false);
+    }
+  };
 
   return (
     <div>
@@ -330,10 +337,16 @@ function CollectingEventFormInternal() {
         </fieldset>
         <div className="row">
           <div className="col-md-1">
-            <CheckBoxField name="dwcGeoreferenceVerificationStatus" onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}/>
+            <CheckBoxField
+              name="dwcGeoreferenceVerificationStatus"
+              onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
+            />
           </div>
           <div className="col-md-5">
-            <fieldset className="form-group border px-4 py-2" disabled={georeferenceDisabled}>
+            <fieldset
+              className="form-group border px-4 py-2"
+              disabled={georeferenceDisabled}
+            >
               <legend className="w-auto">
                 <DinaMessage id="geoReferencingLegend" />
               </legend>
@@ -480,9 +493,7 @@ function CollectingEventForm({
 
   // The selected Metadatas to be attached to this Collecting Event:
   const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal({
-    initialMetadatas: collectingEvent?.attachment as PersistedResource<
-      Metadata
-    >[]
+    initialMetadatas: collectingEvent?.attachment as PersistedResource<Metadata>[]
   });
   const initialValues = collectingEvent
     ? {
@@ -505,9 +516,7 @@ function CollectingEventForm({
     assertionsToSave: GeoReferenceAssertion[],
     linkedCollectingEvent: PersistedResource<CollectingEvent>
   ) {
-    const existingAssertions = initialValues.geoReferenceAssertions as PersistedResource<
-      GeoReferenceAssertion
-    >[];
+    const existingAssertions = initialValues.geoReferenceAssertions as PersistedResource<GeoReferenceAssertion>[];
 
     const assertionIdsToSave = assertionsToSave.map(it => it.id);
     const assertionsToDelete = existingAssertions.filter(
