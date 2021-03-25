@@ -9,15 +9,18 @@ export interface SetCoordinatesFromVerbatimButtonProps {
   sourceLatField: string;
   sourceLonField: string;
 
-  targetLatField: string;
-  targetLonField: string;
+  targetLatField?: string;
+  targetLonField?: string;
+
+  onSetCoords?: (coords: { lat: number; lon: number }) => void;
 }
 
 export function SetCoordinatesFromVerbatimButton({
   sourceLatField,
   sourceLonField,
   targetLatField,
-  targetLonField
+  targetLonField,
+  onSetCoords
 }: SetCoordinatesFromVerbatimButtonProps) {
   const [error, setError] = useState<string>("");
 
@@ -27,8 +30,17 @@ export function SetCoordinatesFromVerbatimButton({
         `${get(values, sourceLatField)}, ${get(values, sourceLonField)}`
       );
 
-      formik.setFieldValue(targetLatField, coords.getLatitude());
-      formik.setFieldValue(targetLonField, coords.getLongitude());
+      const lat = coords.getLatitude();
+      const lon = coords.getLongitude();
+
+      if (targetLatField) {
+        formik.setFieldValue(targetLatField, lat);
+      }
+      if (targetLonField) {
+        formik.setFieldValue(targetLonField, lon);
+      }
+      onSetCoords?.({ lat, lon });
+
       setError("");
     } catch (error) {
       setError(error.message);

@@ -360,6 +360,9 @@ function CollectingEventFormInternal() {
                                     sourceLonField="dwcVerbatimLongitude"
                                     targetLatField={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
                                     targetLonField={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
+                                    onSetCoords={({ lat, lon }) =>
+                                      setGeoSearchValue(`${lat}, ${lon}`)
+                                    }
                                   />
                                 </div>
 
