@@ -28,7 +28,7 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   model: string;
 
   /** Function to get the option label for each resource. */
-  optionLabel: (resource: PersistedResource<TData>) => string;
+  optionLabel: (resource: PersistedResource<TData>) => string | JSX.Element;
 
   /** Function that is passed the dropdown's search input value and returns a JSONAPI filter param. */
   filter: (inputValue: string) => FilterParam;

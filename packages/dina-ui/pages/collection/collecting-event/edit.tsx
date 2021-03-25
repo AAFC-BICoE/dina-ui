@@ -172,9 +172,11 @@ function CollectingEventFormInternal() {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [checked, setChecked] = useState(false);
-  const { setFieldValue, setFieldTouched, values } = useFormikContext<
-    CollectingEvent
-  >();
+  const {
+    setFieldValue,
+    setFieldTouched,
+    values
+  } = useFormikContext<CollectingEvent>();
 
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const [showPlaceSearchResult, setShowPlaceSearchResult] = useState(
@@ -182,12 +184,15 @@ function CollectingEventFormInternal() {
       ? true
       : false
   );
-  const [selectedSearchResult, setSelectedSearchResult] = useState<
-    NominatumApiSearchResult
-  >();
+  const [
+    selectedSearchResult,
+    setSelectedSearchResult
+  ] = useState<NominatumApiSearchResult>();
   const [administrativeBoundaries, setAdministrativeBoundaries] = useState<
     NominatumApiSearchResult[]
   >();
+
+  const router = useRouter();
 
   const onSelectSearchResult = (
     result: NominatumApiSearchResult | undefined
@@ -214,6 +219,10 @@ function CollectingEventFormInternal() {
     onSelectSearchResult(undefined);
     setAdministrativeBoundaries(undefined);
     setShowPlaceSearchResult(false);
+  };
+
+  const gotoPerson = id => {
+    router.push(`/person/view?id=${id}`);
   };
 
   return (
@@ -276,7 +285,12 @@ function CollectingEventFormInternal() {
               name="collectors"
               filter={filterBy(["displayName"])}
               model="agent-api/person"
-              optionLabel={person => person.displayName}
+              optionLabel={person => (
+                <a onClick={() => gotoPerson(person.id)}>
+                  {" "}
+                  {person.displayName}{" "}
+                </a>
+              )}
               isMulti={true}
               asyncOptions={[
                 {
@@ -462,9 +476,7 @@ function CollectingEventForm({
 
   // The selected Metadatas to be attached to this Collecting Event:
   const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal({
-    initialMetadatas: collectingEvent?.attachment as PersistedResource<
-      Metadata
-    >[]
+    initialMetadatas: collectingEvent?.attachment as PersistedResource<Metadata>[]
   });
   const initialValues = collectingEvent
     ? {
@@ -487,9 +499,7 @@ function CollectingEventForm({
     assertionsToSave: GeoReferenceAssertion[],
     linkedCollectingEvent: PersistedResource<CollectingEvent>
   ) {
-    const existingAssertions = initialValues.geoReferenceAssertions as PersistedResource<
-      GeoReferenceAssertion
-    >[];
+    const existingAssertions = initialValues.geoReferenceAssertions as PersistedResource<GeoReferenceAssertion>[];
 
     const assertionIdsToSave = assertionsToSave.map(it => it.id);
     const assertionsToDelete = existingAssertions.filter(
