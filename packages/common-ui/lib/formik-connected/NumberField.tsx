@@ -1,5 +1,5 @@
 import { FastField, FieldProps } from "formik";
-import { ChangeEventHandler, useRef } from "react";
+import { ChangeEvent, ChangeEventHandler, useRef } from "react";
 import NumberFormat, { NumberFormatValues } from "react-number-format";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
@@ -58,29 +58,23 @@ export function NumberField(props: NumberFieldProps) {
 function InputWithErrorNotify(inputProps) {
   const inputRef = useRef<HTMLInputElement>();
 
-  function withErrorNotify(onChangeFn: ChangeEventHandler<HTMLInputElement>) {
-    return e => {
-      const inputValue = e.target.value;
-      onChangeFn(e);
-      const actualValue = e.target.value;
+  function onChangeWithErrorNotify(event: ChangeEvent<HTMLInputElement>) {
+    const inputValue = event.target.value;
+    inputProps.onChange?.(event);
+    const actualValue = event.target.value;
 
-      // When the user input is blocked then notify the user with a red outline around the input:
-      const input = inputRef.current;
-      if (inputValue !== actualValue && input) {
-        input.className = input.className + " is-invalid";
-        setTimeout(
-          () => (input.className = input.className.replace(" is-invalid", "")),
-          1000
-        );
-      }
-    };
+    // When the user input is blocked then notify the user with a red outline around the input:
+    const input = inputRef.current;
+    if (inputValue !== actualValue && input) {
+      input.className = input.className + " is-invalid";
+      setTimeout(
+        () => (input.className = input.className.replace(" is-invalid", "")),
+        1000
+      );
+    }
   }
 
   return (
-    <input
-      {...inputProps}
-      ref={inputRef}
-      onChange={withErrorNotify(inputProps.onChange)}
-    />
+    <input {...inputProps} ref={inputRef} onChange={onChangeWithErrorNotify} />
   );
 }
