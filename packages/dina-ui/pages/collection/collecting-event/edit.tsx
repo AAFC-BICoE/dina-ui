@@ -35,6 +35,7 @@ import {
   useAddPersonModal,
   GeographySearchBox
 } from "../../../components";
+import { SetCoordinatesFromVerbatimButton } from "../../../components/collection/SetCoordinatesFromVerbatimButton";
 import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Person } from "../../../types/agent-api/resources/Person";
@@ -172,9 +173,11 @@ function CollectingEventFormInternal() {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [checked, setChecked] = useState(false);
-  const { setFieldValue, setFieldTouched, values } = useFormikContext<
-    CollectingEvent
-  >();
+  const {
+    setFieldValue,
+    setFieldTouched,
+    values
+  } = useFormikContext<CollectingEvent>();
 
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const [showPlaceSearchResult, setShowPlaceSearchResult] = useState(
@@ -182,12 +185,10 @@ function CollectingEventFormInternal() {
       ? true
       : false
   );
-  const [selectedSearchResult, setSelectedSearchResult] = useState<
-    NominatumApiSearchResult
-  >();
-  const [administrativeBoundaries, setAdministrativeBoundaries] = useState<
-    NominatumApiSearchResult[]
-  >();
+  const [
+    selectedSearchResult,
+    setSelectedSearchResult
+  ] = useState<NominatumApiSearchResult>();
 
   const onSelectSearchResult = (
     result: NominatumApiSearchResult | undefined
@@ -212,7 +213,6 @@ function CollectingEventFormInternal() {
   const removeThisPlace = () => {
     // reset the fields when user remote the place
     onSelectSearchResult(undefined);
-    setAdministrativeBoundaries(undefined);
     setShowPlaceSearchResult(false);
   };
 
@@ -356,6 +356,15 @@ function CollectingEventFormInternal() {
                         {assertions.length
                           ? assertions.map((assertion, index) => (
                               <TabPanel key={assertion.id}>
+                                <div className="form-group">
+                                  <SetCoordinatesFromVerbatimButton
+                                    sourceLatField="dwcVerbatimLatitude"
+                                    sourceLonField="dwcVerbatimLongitude"
+                                    targetLatField={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
+                                    targetLonField={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
+                                  />
+                                </div>
+
                                 <GeoReferenceAssertionRow
                                   index={index}
                                   openAddPersonModal={openAddPersonModal}
@@ -408,9 +417,7 @@ function CollectingEventFormInternal() {
                   style={{ display: showPlaceSearchResult ? "none" : "inline" }}
                 >
                   <GeographySearchBox
-                    selectSearchResult={selectSearchResult}
-                    administrativeBoundaries={administrativeBoundaries as any}
-                    setAdministrativeBoundaries={setAdministrativeBoundaries}
+                    onSelectSearchResult={selectSearchResult}
                   />
                 </div>
 
@@ -430,18 +437,17 @@ function CollectingEventFormInternal() {
                         <DinaMessage id="removeThisPlaceLabel" />
                       </button>
                     </div>
-                    {administrativeBoundaries &&
-                      administrativeBoundaries?.length > 0 && (
-                        <div className="col-md-4">
-                          <a
-                            href={`https://www.openstreetmap.org/${selectedSearchResult?.osm_type}/${selectedSearchResult?.osm_id}`}
-                            target="_blank"
-                            className="btn btn-info"
-                          >
-                            <DinaMessage id="viewDetailButtonLabel" />
-                          </a>
-                        </div>
-                      )}
+                    {selectedSearchResult ? (
+                      <div className="col-md-4">
+                        <a
+                          href={`https://www.openstreetmap.org/${selectedSearchResult?.osm_type}/${selectedSearchResult?.osm_id}`}
+                          target="_blank"
+                          className="btn btn-info"
+                        >
+                          <DinaMessage id="viewDetailButtonLabel" />
+                        </a>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               </div>
@@ -462,9 +468,7 @@ function CollectingEventForm({
 
   // The selected Metadatas to be attached to this Collecting Event:
   const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal({
-    initialMetadatas: collectingEvent?.attachment as PersistedResource<
-      Metadata
-    >[]
+    initialMetadatas: collectingEvent?.attachment as PersistedResource<Metadata>[]
   });
   const initialValues = collectingEvent
     ? {
@@ -487,9 +491,7 @@ function CollectingEventForm({
     assertionsToSave: GeoReferenceAssertion[],
     linkedCollectingEvent: PersistedResource<CollectingEvent>
   ) {
-    const existingAssertions = initialValues.geoReferenceAssertions as PersistedResource<
-      GeoReferenceAssertion
-    >[];
+    const existingAssertions = initialValues.geoReferenceAssertions as PersistedResource<GeoReferenceAssertion>[];
 
     const assertionIdsToSave = assertionsToSave.map(it => it.id);
     const assertionsToDelete = existingAssertions.filter(
