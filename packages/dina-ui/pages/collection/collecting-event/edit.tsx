@@ -287,8 +287,7 @@ function CollectingEventFormInternal() {
               model="agent-api/person"
               optionLabel={person => (
                 <a onClick={() => gotoPerson(person.id)}>
-                  {" "}
-                  {person.displayName}{" "}
+                  {person.displayName}
                 </a>
               )}
               isMulti={true}
