@@ -1,6 +1,6 @@
 import { FastField, FieldProps } from "formik";
-import NumberFormat from "react-number-format";
-import { NumberFormatValues } from "react-number-format";
+import { ChangeEventHandler, useRef } from "react";
+import NumberFormat, { NumberFormatValues } from "react-number-format";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface NumberFieldProps extends LabelWrapperParams {
@@ -35,6 +35,7 @@ export function NumberField(props: NumberFieldProps) {
               className="form-control"
               onValueChange={onValueChange}
               readOnly={readOnly}
+              customInput={InputWithErrorNotify}
               value={
                 typeof value === "number"
                   ? value
@@ -47,5 +48,39 @@ export function NumberField(props: NumberFieldProps) {
         }}
       </FastField>
     </FieldWrapper>
+  );
+}
+
+/**
+ * Wraps the normal input onChange function to show a red outline around the input when
+ * the NumberFormat blocks invalid input.
+ */
+function InputWithErrorNotify(inputProps) {
+  const inputRef = useRef<HTMLInputElement>();
+
+  function withErrorNotify(onChangeFn: ChangeEventHandler<HTMLInputElement>) {
+    return e => {
+      const inputValue = e.target.value;
+      onChangeFn(e);
+      const actualValue = e.target.value;
+
+      // When the user input is blocked then notify the user with a red outline around the input:
+      const input = inputRef.current;
+      if (inputValue !== actualValue && input) {
+        input.className = input.className + " is-invalid";
+        setTimeout(
+          () => (input.className = input.className.replace(" is-invalid", "")),
+          1000
+        );
+      }
+    };
+  }
+
+  return (
+    <input
+      {...inputProps}
+      ref={inputRef}
+      onChange={withErrorNotify(inputProps.onChange)}
+    />
   );
 }
