@@ -176,11 +176,7 @@ function CollectingEventFormInternal() {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [checked, setChecked] = useState(false);
-  const {
-    setFieldValue,
-    setFieldTouched,
-    values
-  } = useFormikContext<CollectingEvent>();
+  const { setFieldValue, values } = useFormikContext<CollectingEvent>();
 
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const [showPlaceSearchResult, setShowPlaceSearchResult] = useState(
@@ -196,7 +192,9 @@ function CollectingEventFormInternal() {
     NominatumApiSearchResult[]
   >();
 
-  const [georeferenceDisabled, setGeoreferenceDisabled] = useState(false);
+  const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
+    values.dwcGeoreferenceVerificationStatus === "GEOREFERENCING_NOT_POSSIBLE"
+  );
 
   const onSelectSearchResult = (
     result: NominatumApiSearchResult | undefined
@@ -233,7 +231,7 @@ function CollectingEventFormInternal() {
       );
       setGeoreferenceDisabled(true);
     } else {
-      setFieldValue("dwcGeoreferenceVerificationStatus", "");
+      setFieldValue("dwcGeoreferenceVerificationStatus", null);
       setGeoreferenceDisabled(false);
     }
   };
