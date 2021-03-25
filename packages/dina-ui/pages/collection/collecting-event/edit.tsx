@@ -173,11 +173,7 @@ function CollectingEventFormInternal() {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [checked, setChecked] = useState(false);
-  const {
-    setFieldValue,
-    setFieldTouched,
-    values
-  } = useFormikContext<CollectingEvent>();
+  const { setFieldValue, values } = useFormikContext<CollectingEvent>();
 
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const [showPlaceSearchResult, setShowPlaceSearchResult] = useState(
@@ -189,6 +185,8 @@ function CollectingEventFormInternal() {
     selectedSearchResult,
     setSelectedSearchResult
   ] = useState<NominatumApiSearchResult>();
+
+  const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
   const onSelectSearchResult = (
     result: NominatumApiSearchResult | undefined
@@ -417,6 +415,8 @@ function CollectingEventFormInternal() {
                   style={{ display: showPlaceSearchResult ? "none" : "inline" }}
                 >
                   <GeographySearchBox
+                    inputValue={geoSearchValue}
+                    onInputChange={setGeoSearchValue}
                     onSelectSearchResult={selectSearchResult}
                   />
                 </div>
