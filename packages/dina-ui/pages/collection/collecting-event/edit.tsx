@@ -18,8 +18,7 @@ import {
   SaveArgs,
   SubmitButton,
   TextField,
-  useApiClient,
-  useModal
+  useApiClient
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
 import { KitsuResponse, PersistedResource } from "kitsu";
@@ -229,6 +228,7 @@ function CollectingEventFormInternal() {
         "dwcGeoreferenceVerificationStatus",
         "GEOREFERENCING_NOT_POSSIBLE"
       );
+      setFieldValue("geoReferenceAssertions", []);
       setGeoreferenceDisabled(true);
     } else {
       setFieldValue("dwcGeoreferenceVerificationStatus", null);
@@ -334,20 +334,20 @@ function CollectingEventFormInternal() {
           </div>
         </fieldset>
         <div className="row">
-          <div className="col-md-1">
-            <CheckBoxField
-              name="dwcGeoreferenceVerificationStatus"
-              onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
-            />
-          </div>
-          <div className="col-md-5">
+          <div className="col-md-6">
+            
             <fieldset
-              className="form-group border px-4 py-2"
-              disabled={georeferenceDisabled}
+              className="form-group border px-4 py-2"              
             >
               <legend className="w-auto">
                 <DinaMessage id="geoReferencingLegend" />
               </legend>
+              <div className="col-md-3">
+                <CheckBoxField
+                  name="dwcGeoreferenceVerificationStatus"
+                  onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
+                />
+              </div>
               <FieldArray name="geoReferenceAssertions">
                 {({ form, push, remove }) => {
                   const assertions =
@@ -368,7 +368,7 @@ function CollectingEventFormInternal() {
                   }
 
                   return (
-                    <div>
+                    <div style={{ display: georeferenceDisabled ? "none" : "inline" }}>
                       <Tabs
                         selectedIndex={activeTabIdx}
                         onSelect={setActiveTabIdx}
