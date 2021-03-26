@@ -48,7 +48,7 @@ export function FieldView(props: FieldViewProps) {
                     {idx <= value.length - 2 && <span>, </span>}
                   </>
                 ) : idx <= value.length - 2 ? (
-                  displayString + ","
+                  displayString + ", "
                 ) : (
                   displayString
                 );
