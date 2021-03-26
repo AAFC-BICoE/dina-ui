@@ -4,10 +4,11 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface CheckBoxProps extends LabelWrapperParams {
   onCheckBoxClick?: (e) => void;
+  disabled?: boolean;
 }
 
 export function CheckBoxField(props: CheckBoxProps) {
-  const { name, onCheckBoxClick } = props;
+  const { name, onCheckBoxClick, disabled } = props;
   return (
     <FieldWrapper {...props}>
       <FastField name={name}>
@@ -33,6 +34,7 @@ export function CheckBoxField(props: CheckBoxProps) {
               }}
               type="checkbox"
               value={value || false}
+              disabled={disabled}
             />
           );
         }}

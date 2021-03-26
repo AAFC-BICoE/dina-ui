@@ -335,10 +335,7 @@ function CollectingEventFormInternal() {
         </fieldset>
         <div className="row">
           <div className="col-md-6">
-            
-            <fieldset
-              className="form-group border px-4 py-2"              
-            >
+            <fieldset className="form-group border px-4 py-2">
               <legend className="w-auto">
                 <DinaMessage id="geoReferencingLegend" />
               </legend>
@@ -368,7 +365,11 @@ function CollectingEventFormInternal() {
                   }
 
                   return (
-                    <div style={{ display: georeferenceDisabled ? "none" : "inline" }}>
+                    <div
+                      style={{
+                        display: georeferenceDisabled ? "none" : "inline"
+                      }}
+                    >
                       <Tabs
                         selectedIndex={activeTabIdx}
                         onSelect={setActiveTabIdx}
