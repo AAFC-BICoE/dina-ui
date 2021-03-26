@@ -77,7 +77,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   true: "True",
   typeHereToSearch: "Type here to search.",
   uiAppVersion: "UI Application Version: {version}",
-  validNumberOnlyError: "You can only enter a valid number.",
+  validNumberOnlyError: "Invalid entry blocked.",
   valueLabel: "Value",
   valueSourceType: "Value Source Type",
   yes: "Yes"
