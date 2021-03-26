@@ -165,7 +165,10 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                       <DinaMessage id="collectingAgentsLegend" />
                     </legend>
                     <FieldView name="dwcRecordedBy" />
-                    <FieldView name="collectors" />
+                    <FieldView
+                      name="collectors"
+                      arrayItemLink="/person/view?id="
+                    />
                     <FieldView name="dwcRecordNumber" />
                     <FieldView name="dwcOtherRecordNumbers" />
                   </fieldset>

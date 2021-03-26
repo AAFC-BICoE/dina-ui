@@ -14,9 +14,10 @@ type ValidationErrorState = {
 export function useBulkEditorFrontEndValidation() {
   // Client-side validation errors caught by the handsontable's built-in error catching.
   // These should prevent submission of the table:
-  const [validationErrors, setValidationErrors] = useState<
-    ValidationErrorState
-  >({});
+  const [
+    validationErrors,
+    setValidationErrors
+  ] = useState<ValidationErrorState>({});
 
   const hasValidationErrors = !isEmpty(validationErrors);
 

@@ -73,9 +73,10 @@ export default function MetadataListPage() {
     fieldName: "selectedMetadatas"
   });
 
-  const [listLayoutType, setListLayoutType] = useLocalStorage<
-    MetadataListLayoutType
-  >(LIST_LAYOUT_STORAGE_KEY);
+  const [
+    listLayoutType,
+    setListLayoutType
+  ] = useLocalStorage<MetadataListLayoutType>(LIST_LAYOUT_STORAGE_KEY);
 
   const [previewMetadataId, setPreviewMetadataId] = useState<string | null>(
     null

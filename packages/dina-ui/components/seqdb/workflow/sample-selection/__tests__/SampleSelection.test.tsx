@@ -22,21 +22,26 @@ const TEST_SAMPLES = [
 ] as PersistedResource<MolecularSample>[];
 
 const TEST_STEP_RESOURCES: PersistedResource<StepResource>[] = [
-  { id: "1", molecularSample: TEST_SAMPLES[0] } as PersistedResource<
-    StepResource
-  >,
-  { id: "2", molecularSample: TEST_SAMPLES[1] } as PersistedResource<
-    StepResource
-  >,
-  { id: "3", molecularSample: TEST_SAMPLES[2] } as PersistedResource<
-    StepResource
-  >,
-  { id: "4", molecularSample: TEST_SAMPLES[3] } as PersistedResource<
-    StepResource
-  >,
-  { id: "5", molecularSample: TEST_SAMPLES[4] } as PersistedResource<
-    StepResource
-  >
+  {
+    id: "1",
+    molecularSample: TEST_SAMPLES[0]
+  } as PersistedResource<StepResource>,
+  {
+    id: "2",
+    molecularSample: TEST_SAMPLES[1]
+  } as PersistedResource<StepResource>,
+  {
+    id: "3",
+    molecularSample: TEST_SAMPLES[2]
+  } as PersistedResource<StepResource>,
+  {
+    id: "4",
+    molecularSample: TEST_SAMPLES[3]
+  } as PersistedResource<StepResource>,
+  {
+    id: "5",
+    molecularSample: TEST_SAMPLES[4]
+  } as PersistedResource<StepResource>
 ];
 
 const TEST_CHAIN_TEMPLATE: PersistedResource<ChainTemplate> = {
@@ -57,9 +62,10 @@ const TEST_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
   id: "1",
   stepNumber: 1,
-  stepTemplate: { id: "1", type: "stepTemplate" } as PersistedResource<
-    StepTemplate
-  >,
+  stepTemplate: {
+    id: "1",
+    type: "stepTemplate"
+  } as PersistedResource<StepTemplate>,
   type: "chainStepTemplate"
 };
 

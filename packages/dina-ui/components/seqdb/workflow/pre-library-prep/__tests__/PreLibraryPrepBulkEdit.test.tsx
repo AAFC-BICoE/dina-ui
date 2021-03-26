@@ -75,9 +75,10 @@ const TEST_SAMPLE_SELECTION_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemp
   chainTemplate: TEST_CHAIN_TEMPLATE,
   id: "1",
   stepNumber: 1,
-  stepTemplate: { id: "1", type: "stepTemplate" } as PersistedResource<
-    StepTemplate
-  >,
+  stepTemplate: {
+    id: "1",
+    type: "stepTemplate"
+  } as PersistedResource<StepTemplate>,
   type: "chainStepTemplate"
 };
 
@@ -86,9 +87,10 @@ const TEST_PRE_LIBRARY_PREP_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemp
   chainTemplate: TEST_CHAIN_TEMPLATE,
   id: "2",
   stepNumber: 2,
-  stepTemplate: { id: "2", type: "stepTemplate" } as PersistedResource<
-    StepTemplate
-  >,
+  stepTemplate: {
+    id: "2",
+    type: "stepTemplate"
+  } as PersistedResource<StepTemplate>,
   type: "chainStepTemplate"
 };
 
