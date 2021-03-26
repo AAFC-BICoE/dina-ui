@@ -220,11 +220,7 @@ function CollectingEventFormInternal() {
     setAdministrativeBoundaries(undefined);
     setShowPlaceSearchResult(false);
   };
-
-  const gotoPerson = id => {
-    router.push(`/person/view?id=${id}`);
-  };
-
+  
   return (
     <div>
       <div className="form-group">
@@ -285,11 +281,7 @@ function CollectingEventFormInternal() {
               name="collectors"
               filter={filterBy(["displayName"])}
               model="agent-api/person"
-              optionLabel={person => (
-                <a onClick={() => gotoPerson(person.id)}>
-                  {person.displayName}
-                </a>
-              )}
+              optionLabel={person => person.displayName}
               isMulti={true}
               asyncOptions={[
                 {

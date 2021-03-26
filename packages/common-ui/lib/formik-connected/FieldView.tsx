@@ -6,11 +6,12 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface FieldViewProps extends LabelWrapperParams {
   link?: string;
+  arrayItemLink?: string;
 }
 
 /** Renders the label and value of a field from Formik context. */
 export function FieldView(props: FieldViewProps) {
-  const { link, name } = props;
+  const { link, name, arrayItemLink } = props;
 
   return (
     <FastField name={name}>
@@ -27,27 +28,46 @@ export function FieldView(props: FieldViewProps) {
               <Link href={link}>
                 <a>{value}</a>
               </Link>
-            ) : Array.isArray(value) ? (
+            ) : Array.isArray(value) && !arrayItemLink ? (
               value
                 .map(val =>
                   val.name
                     ? val.name
                     : val.displayName
-                    ? val.displayName
-                    : val.names
-                    ? val.names[0].name
-                    : typeof val === "string"
-                    ? val
-                    : JSON.stringify(val)
+                      ? val.displayName
+                      : val.names
+                        ? val.names[0].name
+                        : typeof val === "string"
+                          ? val
+                          : JSON.stringify(val)
                 )
                 .join(", ")
-            ) : typeof value === "string" ? (
+            ) : Array.isArray(value) && arrayItemLink ? (
               value
-            ) : isDate(value) ? (
-              moment(value).format()
-            ) : isNumber(value) ? (
-              value.toString()
-            ) : null}
+                .map( (val, idx) =>
+                  <>
+                    <Link href={arrayItemLink + val.id} key={val.id}>
+                      {val.name
+                        ? val.name
+                        : val.displayName
+                          ? val.displayName
+                          : val.names
+                            ? val.names[0].name
+                            : typeof val === "string"
+                              ? val
+                              : JSON.stringify(val)}
+                    </Link>
+                    {idx <= value.length-2 && <span>, </span>}
+                  </>
+                )
+            ) :
+              typeof value === "string" ? (
+                value
+              ) : isDate(value) ? (
+                moment(value).format()
+              ) : isNumber(value) ? (
+                value.toString()
+              ) : null}
           </p>
         </FieldWrapper>
       )}
