@@ -28,46 +28,38 @@ export function FieldView(props: FieldViewProps) {
               <Link href={link}>
                 <a>{value}</a>
               </Link>
-            ) : Array.isArray(value) && !arrayItemLink ? (
-              value
-                .map(val =>
-                  val.name
-                    ? val.name
-                    : val.displayName
-                      ? val.displayName
-                      : val.names
-                        ? val.names[0].name
-                        : typeof val === "string"
-                          ? val
-                          : JSON.stringify(val)
-                )
-                .join(", ")
-            ) : Array.isArray(value) && arrayItemLink ? (
-              value
-                .map( (val, idx) =>
+            ) : Array.isArray(value) ? (
+              value.map((val, idx) => {
+                const displayString = val.name
+                  ? val.name
+                  : val.displayName
+                  ? val.displayName
+                  : val.names
+                  ? val.names[0].name
+                  : typeof val === "string"
+                  ? val
+                  : JSON.stringify(val);
+
+                return arrayItemLink ? (
                   <>
                     <Link href={arrayItemLink + val.id} key={val.id}>
-                      {val.name
-                        ? val.name
-                        : val.displayName
-                          ? val.displayName
-                          : val.names
-                            ? val.names[0].name
-                            : typeof val === "string"
-                              ? val
-                              : JSON.stringify(val)}
+                      <a>{displayString}</a>
                     </Link>
-                    {idx <= value.length-2 && <span>, </span>}
+                    {idx <= value.length - 2 && <span>, </span>}
                   </>
-                )
-            ) :
-              typeof value === "string" ? (
-                value
-              ) : isDate(value) ? (
-                moment(value).format()
-              ) : isNumber(value) ? (
-                value.toString()
-              ) : null}
+                ) : idx <= value.length - 2 ? (
+                  displayString + ","
+                ) : (
+                  displayString
+                );
+              })
+            ) : typeof value === "string" ? (
+              value
+            ) : isDate(value) ? (
+              moment(value).format()
+            ) : isNumber(value) ? (
+              value.toString()
+            ) : null}
           </p>
         </FieldWrapper>
       )}

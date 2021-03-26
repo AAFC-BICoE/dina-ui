@@ -220,7 +220,7 @@ function CollectingEventFormInternal() {
     setAdministrativeBoundaries(undefined);
     setShowPlaceSearchResult(false);
   };
-  
+
   return (
     <div>
       <div className="form-group">
