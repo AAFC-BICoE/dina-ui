@@ -1,6 +1,7 @@
 import { FastField, FieldProps } from "formik";
-import { ChangeEvent, ChangeEventHandler, useRef } from "react";
+import { ChangeEvent, useState } from "react";
 import NumberFormat, { NumberFormatValues } from "react-number-format";
+import { CommonMessage } from "../intl/common-ui-intl";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface NumberFieldProps extends LabelWrapperParams {
@@ -30,20 +31,25 @@ export function NumberField(props: NumberFieldProps) {
           }
 
           return (
-            <NumberFormat
-              isAllowed={props.isAllowed}
-              className="form-control"
-              onValueChange={onValueChange}
-              readOnly={readOnly}
-              customInput={InputWithErrorNotify}
-              value={
-                typeof value === "number"
-                  ? value
-                  : typeof value === "string"
-                  ? Number(value)
-                  : ""
-              }
-            />
+            <div>
+              <NumberFormat
+                isAllowed={props.isAllowed}
+                className="form-control"
+                onValueChange={onValueChange}
+                readOnly={readOnly}
+                customInput={InputWithErrorNotify}
+                value={
+                  typeof value === "number"
+                    ? value
+                    : typeof value === "string"
+                    ? Number(value)
+                    : ""
+                }
+              />
+              <div className="invalid-feedback">
+                <CommonMessage id="validNumberOnlyError" />
+              </div>
+            </div>
           );
         }}
       </FastField>
@@ -56,7 +62,7 @@ export function NumberField(props: NumberFieldProps) {
  * the NumberFormat blocks invalid input.
  */
 function InputWithErrorNotify(inputProps) {
-  const inputRef = useRef<HTMLInputElement>();
+  const [classNames, setClassNames] = useState("");
 
   function onChangeWithErrorNotify(event: ChangeEvent<HTMLInputElement>) {
     const inputValue = event.target.value;
@@ -64,17 +70,20 @@ function InputWithErrorNotify(inputProps) {
     const actualValue = event.target.value;
 
     // When the user input is blocked then notify the user with a red outline around the input:
-    const input = inputRef.current;
-    if (inputValue !== actualValue && input) {
-      input.className = input.className + " is-invalid";
+    if (inputValue !== actualValue) {
+      setClassNames(current => current + " is-invalid");
       setTimeout(
-        () => (input.className = input.className.replace(" is-invalid", "")),
+        () => setClassNames(current => current.replace(" is-invalid", "")),
         1000
       );
     }
   }
 
   return (
-    <input {...inputProps} ref={inputRef} onChange={onChangeWithErrorNotify} />
+    <input
+      {...inputProps}
+      className={`${inputProps.className ?? ""} ${classNames}`}
+      onChange={onChangeWithErrorNotify}
+    />
   );
 }
