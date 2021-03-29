@@ -125,6 +125,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcGeoreferenceProtocol: "Georeference Protocol",
   field_dwcGeoreferenceRemarks: "Georeference Remarks",
   field_dwcGeoreferenceSources: "Georeference Sources",
+  field_dwcGeoreferenceVerificationStatus: "Georeferencing Not Possible",
   field_dwcMunicipality: "Municipality",
   field_dwcStateProvince: "State/Province",
   field_dwcVerbatimCoordinates: "Verbatim Coordinates",

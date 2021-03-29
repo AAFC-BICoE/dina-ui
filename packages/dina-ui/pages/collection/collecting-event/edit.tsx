@@ -3,6 +3,7 @@ import {
   AutoSuggestTextField,
   BackButton,
   ButtonBar,
+  CheckBoxField,
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
@@ -17,8 +18,7 @@ import {
   SaveArgs,
   SubmitButton,
   TextField,
-  useApiClient,
-  useModal
+  useApiClient
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
 import { KitsuResponse, PersistedResource } from "kitsu";
@@ -38,7 +38,10 @@ import {
 import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Person } from "../../../types/agent-api/resources/Person";
-import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
+import {
+  CollectingEvent,
+  GeoreferenceVerificationStatus
+} from "../../../types/collection-api/resources/CollectingEvent";
 import { GeoReferenceAssertion } from "../../../types/collection-api/resources/GeoReferenceAssertion";
 import { Metadata } from "../../../types/objectstore-api";
 
@@ -172,11 +175,7 @@ function CollectingEventFormInternal() {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [checked, setChecked] = useState(false);
-  const {
-    setFieldValue,
-    setFieldTouched,
-    values
-  } = useFormikContext<CollectingEvent>();
+  const { setFieldValue, values } = useFormikContext<CollectingEvent>();
 
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const [showPlaceSearchResult, setShowPlaceSearchResult] = useState(
@@ -192,7 +191,9 @@ function CollectingEventFormInternal() {
     NominatumApiSearchResult[]
   >();
 
-  const router = useRouter();
+  const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
+    values.dwcGeoreferenceVerificationStatus === "GEOREFERENCING_NOT_POSSIBLE"
+  );
 
   const onSelectSearchResult = (
     result: NominatumApiSearchResult | undefined
@@ -219,6 +220,20 @@ function CollectingEventFormInternal() {
     onSelectSearchResult(undefined);
     setAdministrativeBoundaries(undefined);
     setShowPlaceSearchResult(false);
+  };
+
+  const onGeoReferencingImpossibleCheckBoxClick = e => {
+    if (e.target.checked === true) {
+      setFieldValue(
+        "dwcGeoreferenceVerificationStatus",
+        "GEOREFERENCING_NOT_POSSIBLE"
+      );
+      setFieldValue("geoReferenceAssertions", []);
+      setGeoreferenceDisabled(true);
+    } else {
+      setFieldValue("dwcGeoreferenceVerificationStatus", null);
+      setGeoreferenceDisabled(false);
+    }
   };
 
   return (
@@ -324,6 +339,12 @@ function CollectingEventFormInternal() {
               <legend className="w-auto">
                 <DinaMessage id="geoReferencingLegend" />
               </legend>
+              <div className="col-md-5">
+                <CheckBoxField
+                  name="dwcGeoreferenceVerificationStatus"
+                  onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
+                />
+              </div>
               <FieldArray name="geoReferenceAssertions">
                 {({ form, push, remove }) => {
                   const assertions =
@@ -344,7 +365,11 @@ function CollectingEventFormInternal() {
                   }
 
                   return (
-                    <div>
+                    <div
+                      style={{
+                        display: georeferenceDisabled ? "none" : "inline"
+                      }}
+                    >
                       <Tabs
                         selectedIndex={activeTabIdx}
                         onSelect={setActiveTabIdx}
