@@ -24,7 +24,8 @@ import { FieldArray, useFormikContext } from "formik";
 import { KitsuResponse, PersistedResource } from "kitsu";
 import { clamp, orderBy } from "lodash";
 import { NextRouter, useRouter } from "next/router";
-import { useContext, useState } from "react";
+import { geographicPlaceSourceUrl } from "packages/dina-ui/types/collection-api/GeographicPlaceNameSourceDetail";
+import { useContext, useState, Dispatch, SetStateAction } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
@@ -40,6 +41,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Person } from "../../../types/agent-api/resources/Person";
 import {
   CollectingEvent,
+  GeographicPlaceNameSource,
   GeoreferenceVerificationStatus
 } from "../../../types/collection-api/resources/CollectingEvent";
 import { GeoReferenceAssertion } from "../../../types/collection-api/resources/GeoReferenceAssertion";
@@ -171,7 +173,12 @@ export default function CollectingEventEditPage() {
   );
 }
 
-function CollectingEventFormInternal() {
+interface CollectingEventFormInternalProps {
+  selectedSearchResult: NominatumApiSearchResult,
+  setSelectedSearchResult: Dispatch<SetStateAction<any>>; 
+}
+
+function CollectingEventFormInternal( {selectedSearchResult, setSelectedSearchResult}: CollectingEventFormInternalProps) {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [checked, setChecked] = useState(false);
@@ -183,10 +190,7 @@ function CollectingEventFormInternal() {
       ? true
       : false
   );
-  const [
-    selectedSearchResult,
-    setSelectedSearchResult
-  ] = useState<NominatumApiSearchResult>();
+
   const [administrativeBoundaries, setAdministrativeBoundaries] = useState<
     NominatumApiSearchResult[]
   >();
@@ -216,7 +220,7 @@ function CollectingEventFormInternal() {
   };
 
   const removeThisPlace = () => {
-    // reset the fields when user remote the place
+    // reset the fields when user remove the place
     onSelectSearchResult(undefined);
     setAdministrativeBoundaries(undefined);
     setShowPlaceSearchResult(false);
@@ -377,35 +381,35 @@ function CollectingEventFormInternal() {
                         <TabList>
                           {assertions.length
                             ? assertions.map((assertion, index) => (
-                                <Tab key={assertion.id}>
-                                  <span className="m-3">{index + 1}</span>
-                                </Tab>
-                              ))
+                              <Tab key={assertion.id}>
+                                <span className="m-3">{index + 1}</span>
+                              </Tab>
+                            ))
                             : null}
                         </TabList>
                         {assertions.length
                           ? assertions.map((assertion, index) => (
-                              <TabPanel key={assertion.id}>
-                                <GeoReferenceAssertionRow
-                                  index={index}
-                                  openAddPersonModal={openAddPersonModal}
-                                />
-                                <div className="list-inline">
-                                  <FormikButton
-                                    className="list-inline-item btn btn-primary add-assertion-button"
-                                    onClick={addGeoReference}
-                                  >
-                                    <DinaMessage id="addAssertion" />
-                                  </FormikButton>
-                                  <FormikButton
-                                    className="list-inline-item btn btn-dark"
-                                    onClick={() => removeGeoReference(index)}
-                                  >
-                                    <DinaMessage id="removeAssertionLabel" />
-                                  </FormikButton>
-                                </div>
-                              </TabPanel>
-                            ))
+                            <TabPanel key={assertion.id}>
+                              <GeoReferenceAssertionRow
+                                index={index}
+                                openAddPersonModal={openAddPersonModal}
+                              />
+                              <div className="list-inline">
+                                <FormikButton
+                                  className="list-inline-item btn btn-primary add-assertion-button"
+                                  onClick={addGeoReference}
+                                >
+                                  <DinaMessage id="addAssertion" />
+                                </FormikButton>
+                                <FormikButton
+                                  className="list-inline-item btn btn-dark"
+                                  onClick={() => removeGeoReference(index)}
+                                >
+                                  <DinaMessage id="removeAssertionLabel" />
+                                </FormikButton>
+                              </div>
+                            </TabPanel>
+                          ))
                           : null}
                       </Tabs>
                       {!assertions.length ? (
@@ -460,18 +464,18 @@ function CollectingEventFormInternal() {
                         <DinaMessage id="removeThisPlaceLabel" />
                       </button>
                     </div>
-                    {administrativeBoundaries &&
-                      administrativeBoundaries?.length > 0 && (
-                        <div className="col-md-4">
-                          <a
-                            href={`https://www.openstreetmap.org/${selectedSearchResult?.osm_type}/${selectedSearchResult?.osm_id}`}
-                            target="_blank"
-                            className="btn btn-info"
-                          >
-                            <DinaMessage id="viewDetailButtonLabel" />
-                          </a>
-                        </div>
-                      )}
+                    {(selectedSearchResult || values.geographicPlaceNameSourceDetail) &&
+                      <div className="col-md-4">
+                        <a
+                          href={`${geographicPlaceSourceUrl}/${selectedSearchResult ? selectedSearchResult.osm_type : values.geographicPlaceNameSourceDetail?.sourceIdType}/${
+                            selectedSearchResult? selectedSearchResult.osm_id: values.geographicPlaceNameSourceDetail?.sourceID}`}
+                          target="_blank"
+                          className="btn btn-info"
+                        >
+                          <DinaMessage id="viewDetailButtonLabel" />
+                        </a>
+                      </div>
+                    }
                   </div>
                 </div>
               </div>
@@ -496,20 +500,25 @@ function CollectingEventForm({
   });
   const initialValues = collectingEvent
     ? {
-        ...collectingEvent,
-        dwcOtherRecordNumbers:
-          collectingEvent.dwcOtherRecordNumbers?.concat("").join("\n") ?? "",
-        geoReferenceAssertions: collectingEvent.geoReferenceAssertions ?? []
-      }
+      ...collectingEvent,
+      dwcOtherRecordNumbers:
+        collectingEvent.dwcOtherRecordNumbers?.concat("").join("\n") ?? "",
+      geoReferenceAssertions: collectingEvent.geoReferenceAssertions ?? []
+    }
     : {
-        type: "collecting-event",
-        collectors: [],
-        collectorGroups: [],
-        startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
-        geoReferenceAssertions: []
-      };
+      type: "collecting-event",
+      collectors: [],
+      collectorGroups: [],
+      startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
+      geoReferenceAssertions: []
+    };
 
   const { save } = useApiClient();
+
+  const [
+    selectedSearchResult,
+    setSelectedSearchResult
+  ] = useState<NominatumApiSearchResult>();
 
   async function saveGeoReferenceAssertion(
     assertionsToSave: GeoReferenceAssertion[],
@@ -635,6 +644,15 @@ function CollectingEventForm({
     const geoReferenceAssertionsToSave = submittedValues.geoReferenceAssertions;
     delete submittedValues.geoReferenceAssertions;
 
+    if(selectedSearchResult) {
+      submittedValues.geographicPlaceNameSourceDetail = {};
+      console.log("geographicPlaceSourceUrl: " + geographicPlaceSourceUrl);
+      submittedValues.geographicPlaceNameSourceDetail.sourceID = selectedSearchResult.osm_id;
+      submittedValues.geographicPlaceNameSourceDetail.sourceIdType = selectedSearchResult.osm_type;
+      submittedValues.geographicPlaceNameSourceDetail.sourceUrl = geographicPlaceSourceUrl;
+      submittedValues.geographicPlaceNameSource = GeographicPlaceNameSource.OSM;  
+    }
+
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [
         {
@@ -679,7 +697,7 @@ function CollectingEventForm({
           type="collecting-event"
         />
       </ButtonBar>
-      <CollectingEventFormInternal />
+      <CollectingEventFormInternal selectedSearchResult={selectedSearchResult as any} setSelectedSearchResult={setSelectedSearchResult} />
       <div className="form-group">{attachedMetadatasUI}</div>
     </DinaForm>
   );
