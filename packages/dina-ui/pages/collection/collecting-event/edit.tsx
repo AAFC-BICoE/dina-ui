@@ -28,20 +28,18 @@ import { useContext, useState } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
+  GeographySearchBox,
   GeoReferenceAssertionRow,
   GroupSelectField,
   Head,
   Nav,
-  useAddPersonModal,
-  GeographySearchBox
+  useAddPersonModal
 } from "../../../components";
+import { SetCoordinatesFromVerbatimButton } from "../../../components/collection/SetCoordinatesFromVerbatimButton";
 import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Person } from "../../../types/agent-api/resources/Person";
-import {
-  CollectingEvent,
-  GeoreferenceVerificationStatus
-} from "../../../types/collection-api/resources/CollectingEvent";
+import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 import { GeoReferenceAssertion } from "../../../types/collection-api/resources/GeoReferenceAssertion";
 import { Metadata } from "../../../types/objectstore-api";
 
@@ -386,6 +384,14 @@ function CollectingEventFormInternal() {
                         {assertions.length
                           ? assertions.map((assertion, index) => (
                               <TabPanel key={assertion.id}>
+                                <div className="form-group">
+                                  <SetCoordinatesFromVerbatimButton
+                                    sourceLatField="dwcVerbatimLatitude"
+                                    sourceLonField="dwcVerbatimLongitude"
+                                    targetLatField={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
+                                    targetLonField={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
+                                  />
+                                </div>
                                 <GeoReferenceAssertionRow
                                   index={index}
                                   openAddPersonModal={openAddPersonModal}
