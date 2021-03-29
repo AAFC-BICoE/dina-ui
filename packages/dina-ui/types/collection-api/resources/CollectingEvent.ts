@@ -32,8 +32,13 @@ export interface CollectingEventAttributes {
   collectorGroupUuid?: string;
   collectorGroups?: CollectorGroup[];
   group: string;
-  placeName?: string;
+  geographicPlaceName?: string;
+  dwcGeoreferenceVerificationStatus?: string;
 }
+
+export type GeoreferenceVerificationStatus =
+  | "GEOREFERENCING_NOT_POSSIBLE"
+  | undefined;
 
 export interface CollectingEventRelationships {
   collectors?: KitsuResource[];

@@ -6,9 +6,7 @@ import {
 } from "./FilterRow";
 
 /** Predicate dropdown options for filtering on date attributes. */
-export const BOOLEAN_PREDICATE_OPTIONS: FilterDropdownOption<
-  FilterRowPredicate
->[] = [
+export const BOOLEAN_PREDICATE_OPTIONS: FilterDropdownOption<FilterRowPredicate>[] = [
   {
     label: <CommonMessage id="IS" />,
     value: "IS"
@@ -20,9 +18,7 @@ export const BOOLEAN_PREDICATE_OPTIONS: FilterDropdownOption<
 ];
 
 /** Predicate dropdown options for filtering on date attributes. */
-export const DATE_PREDICATE_OPTIONS: FilterDropdownOption<
-  FilterRowPredicate
->[] = [
+export const DATE_PREDICATE_OPTIONS: FilterDropdownOption<FilterRowPredicate>[] = [
   {
     label: <CommonMessage id="IS" />,
     value: "IS"
@@ -46,9 +42,7 @@ export const DATE_PREDICATE_OPTIONS: FilterDropdownOption<
 ];
 
 /** Search types for String searches */
-export const STRING_SEARCH_TYPES: FilterDropdownOption<
-  FilterRowSearchType
->[] = [
+export const STRING_SEARCH_TYPES: FilterDropdownOption<FilterRowSearchType>[] = [
   {
     label: <CommonMessage id="filterPartialMatch" />,
     value: "PARTIAL_MATCH"
@@ -64,9 +58,7 @@ export const STRING_SEARCH_TYPES: FilterDropdownOption<
 ];
 
 /** Search types for attributes that only support exact matching. */
-export const SEARCH_TYPES_EXACT_ONLY: FilterDropdownOption<
-  FilterRowSearchType
->[] = [
+export const SEARCH_TYPES_EXACT_ONLY: FilterDropdownOption<FilterRowSearchType>[] = [
   {
     label: <CommonMessage id="filterExactMatch" />,
     value: "EXACT_MATCH"
