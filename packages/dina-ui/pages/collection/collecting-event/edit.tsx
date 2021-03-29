@@ -24,7 +24,7 @@ import { FieldArray, useFormikContext } from "formik";
 import { KitsuResponse, PersistedResource } from "kitsu";
 import { clamp, orderBy } from "lodash";
 import { NextRouter, useRouter } from "next/router";
-import { geographicPlaceSourceUrl } from "packages/dina-ui/types/collection-api/GeographicPlaceNameSourceDetail";
+import { geographicPlaceSourceUrl } from "../../..//types/collection-api/GeographicPlaceNameSourceDetail";
 import { useContext, useState, Dispatch, SetStateAction } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";

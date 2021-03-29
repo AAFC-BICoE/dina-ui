@@ -101,10 +101,10 @@ export function GeographySearchBox({
           <div key={boundary.osm_id}>
             <style>{`
                 .searchResult {
-                  font-size:12pt; font-family:verdana,sans-serif;
+                  font-size:13pt; font-family:verdana,sans-serif;
                 }     
             `}</style>
-            <div className="row">
+            <div className="row py-1">
               <div className="col-md-12 searchResult">
                 {boundary.display_name}
               </div>
