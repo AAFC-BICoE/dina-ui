@@ -206,10 +206,12 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                         <legend className="w-auto">
                           <DinaMessage id="geoReferencingLegend" />
                         </legend>
-                        <CheckBoxField
-                          disabled={georeferenceDisabled}
-                          name="dwcGeoreferenceVerificationStatus"
-                        />
+                        {georeferenceDisabled && (
+                          <CheckBoxField
+                            disabled={georeferenceDisabled}
+                            name="dwcGeoreferenceVerificationStatus"
+                          />
+                        )}
                         <FieldArray name="geoReferenceAssertions">
                           {({ form }) => {
                             const assertions =
