@@ -34,17 +34,17 @@ export interface CollectingEventAttributes {
   collectorGroups?: CollectorGroup[];
   group: string;
   geographicPlaceName?: string;
-  dwcGeoreferenceVerificationStatus?: string;
-  geographicPlaceNameSourceDetail? : GeographicPlaceNameSourceDetail;
+  dwcGeoreferenceVerificationStatus?: GeoreferenceVerificationStatus;
+  geographicPlaceNameSourceDetail?: GeographicPlaceNameSourceDetail;
   geographicPlaceNameSource?: GeographicPlaceNameSource;
 }
 
-export type GeoreferenceVerificationStatus =
-  "GEOREFERENCING_NOT_POSSIBLE"
-
+export enum GeoreferenceVerificationStatus {
+  GEOREFERENCING_NOT_POSSIBLE = "GEOREFERENCING_NOT_POSSIBLE"
+}
 
 export enum GeographicPlaceNameSource {
-    OSM = "OSM"
+  OSM = "OSM"
 }
 
 export interface CollectingEventRelationships {
