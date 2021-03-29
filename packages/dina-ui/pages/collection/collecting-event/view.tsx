@@ -24,6 +24,7 @@ import { GeoReferenceAssertionRow } from "../../../components/collection/GeoRefe
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
+import { geographicPlaceSourceUrl } from "../../..//types/collection-api/GeographicPlaceNameSourceDetail";
 
 export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -255,6 +256,17 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                         <FieldView name="geographicPlaceName" />
                         <FieldView name="dwcStateProvince" />
                         <FieldView name="dwcCountry" />
+                        {colEvent.geographicPlaceNameSourceDetail && (
+                          <div className="col-md-4">
+                            <a
+                              href={`${geographicPlaceSourceUrl}/${colEvent.geographicPlaceNameSourceDetail?.sourceIdType}/${colEvent.geographicPlaceNameSourceDetail?.sourceID}`}
+                              target="_blank"
+                              className="btn btn-info"
+                            >
+                              <DinaMessage id="viewDetailButtonLabel" />
+                            </a>
+                          </div>
+                        )}
                       </fieldset>
                     </div>
                   </div>

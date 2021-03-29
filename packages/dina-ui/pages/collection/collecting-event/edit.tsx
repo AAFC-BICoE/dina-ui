@@ -665,6 +665,8 @@ function CollectingEventForm({
         selectedSearchResult.osm_type;
       submittedValues.geographicPlaceNameSourceDetail.sourceUrl = geographicPlaceSourceUrl;
       submittedValues.geographicPlaceNameSource = GeographicPlaceNameSource.OSM;
+    } else {
+      submittedValues.geographicPlaceNameSourceDetail = null;
     }
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
