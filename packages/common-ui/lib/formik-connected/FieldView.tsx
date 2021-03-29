@@ -6,11 +6,12 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface FieldViewProps extends LabelWrapperParams {
   link?: string;
+  arrayItemLink?: string;
 }
 
 /** Renders the label and value of a field from Formik context. */
 export function FieldView(props: FieldViewProps) {
-  const { link, name } = props;
+  const { link, name, arrayItemLink } = props;
 
   return (
     <FastField name={name}>
@@ -28,19 +29,30 @@ export function FieldView(props: FieldViewProps) {
                 <a>{value}</a>
               </Link>
             ) : Array.isArray(value) ? (
-              value
-                .map(val =>
-                  val.name
-                    ? val.name
-                    : val.displayName
-                    ? val.displayName
-                    : val.names
-                    ? val.names[0].name
-                    : typeof val === "string"
-                    ? val
-                    : JSON.stringify(val)
-                )
-                .join(", ")
+              value.map((val, idx) => {
+                const displayString = val.name
+                  ? val.name
+                  : val.displayName
+                  ? val.displayName
+                  : val.names
+                  ? val.names[0].name
+                  : typeof val === "string"
+                  ? val
+                  : JSON.stringify(val);
+
+                return arrayItemLink ? (
+                  <>
+                    <Link href={arrayItemLink + val.id} key={val.id}>
+                      <a>{displayString}</a>
+                    </Link>
+                    {idx <= value.length - 2 && <span>, </span>}
+                  </>
+                ) : idx <= value.length - 2 ? (
+                  displayString + ", "
+                ) : (
+                  displayString
+                );
+              })
             ) : typeof value === "string" ? (
               value
             ) : isDate(value) ? (
