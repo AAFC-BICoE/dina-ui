@@ -65,14 +65,14 @@ export function GeographySearchBox({
   return (
     <div>
       <div className="row">
-        <div className="col-md-1">
+        <div className="col-md-1 mr-1 py-1">
           <label>
             <strong>
               <DinaMessage id="LocationLabel" />
             </strong>
           </label>
         </div>
-        <div className="col-md-8">
+        <div className="col-md-7 ml-3">
           <input
             className="form-control"
             onChange={e => setInputValue(e.target.value)}
