@@ -172,7 +172,10 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                         <DinaMessage id="collectingAgentsLegend" />
                       </legend>
                       <FieldView name="dwcRecordedBy" />
-                      <FieldView name="collectors" />
+                      <FieldView
+                        name="collectors"
+                        arrayItemLink="/person/view?id="
+                      />
                       <FieldView name="dwcRecordNumber" />
                       <FieldView name="dwcOtherRecordNumbers" />
                     </fieldset>
@@ -208,44 +211,49 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                           <DinaMessage id="geoReferencingLegend" />
                         </legend>
                         {georeferenceDisabled && (
-                          <CheckBoxField
-                            disabled={georeferenceDisabled}
-                            name="dwcGeoreferenceVerificationStatus"
-                          />
+                          <div className="col-md-5">
+                            <CheckBoxField
+                              disabled={georeferenceDisabled}
+                              name="dwcGeoreferenceVerificationStatus"
+                            />
+                          </div>
                         )}
-                        <FieldArray name="geoReferenceAssertions">
-                          {({ form }) => {
-                            const assertions =
-                              (form.values as CollectingEvent)
-                                .geoReferenceAssertions ?? [];
+                        {colEvent.geoReferenceAssertions &&
+                          colEvent.geoReferenceAssertions?.length > 0 && (
+                            <FieldArray name="geoReferenceAssertions">
+                              {({ form }) => {
+                                const assertions =
+                                  (form.values as CollectingEvent)
+                                    .geoReferenceAssertions ?? [];
 
-                            return (
-                              <Tabs>
-                                <TabList>
-                                  {assertions.length
-                                    ? assertions.map((assertion, index) => (
-                                        <Tab key={assertion.id}>
-                                          <span className="m-3">
-                                            {index + 1}
-                                          </span>
-                                        </Tab>
-                                      ))
-                                    : null}
-                                </TabList>
-                                {assertions.length
-                                  ? assertions.map((assertion, index) => (
-                                      <TabPanel key={assertion.id}>
-                                        <GeoReferenceAssertionRow
-                                          index={index}
-                                          viewOnly={true}
-                                        />
-                                      </TabPanel>
-                                    ))
-                                  : null}
-                              </Tabs>
-                            );
-                          }}
-                        </FieldArray>
+                                return (
+                                  <Tabs>
+                                    <TabList>
+                                      {assertions.length
+                                        ? assertions.map((assertion, index) => (
+                                            <Tab key={assertion.id}>
+                                              <span className="m-3">
+                                                {index + 1}
+                                              </span>
+                                            </Tab>
+                                          ))
+                                        : null}
+                                    </TabList>
+                                    {assertions.length
+                                      ? assertions.map((assertion, index) => (
+                                          <TabPanel key={assertion.id}>
+                                            <GeoReferenceAssertionRow
+                                              index={index}
+                                              viewOnly={true}
+                                            />
+                                          </TabPanel>
+                                        ))
+                                      : null}
+                                  </Tabs>
+                                );
+                              }}
+                            </FieldArray>
+                          )}
                       </fieldset>
                     </div>
                     <div className="col-md-6">

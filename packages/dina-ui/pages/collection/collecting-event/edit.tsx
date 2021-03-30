@@ -29,13 +29,14 @@ import { useContext, useState, Dispatch, SetStateAction } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
+  GeographySearchBox,
   GeoReferenceAssertionRow,
   GroupSelectField,
   Head,
   Nav,
-  useAddPersonModal,
-  GeographySearchBox
+  useAddPersonModal
 } from "../../../components";
+import { SetCoordinatesFromVerbatimButton } from "../../../components/collection/SetCoordinatesFromVerbatimButton";
 import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Person } from "../../../types/agent-api/resources/Person";
@@ -347,7 +348,7 @@ function CollectingEventFormInternal({
               <legend className="w-auto">
                 <DinaMessage id="geoReferencingLegend" />
               </legend>
-              <div className="col-md-3">
+              <div className="col-md-5">
                 <CheckBoxField
                   name="dwcGeoreferenceVerificationStatus"
                   onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
@@ -394,6 +395,14 @@ function CollectingEventFormInternal({
                         {assertions.length
                           ? assertions.map((assertion, index) => (
                               <TabPanel key={assertion.id}>
+                                <div className="form-group">
+                                  <SetCoordinatesFromVerbatimButton
+                                    sourceLatField="dwcVerbatimLatitude"
+                                    sourceLonField="dwcVerbatimLongitude"
+                                    targetLatField={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
+                                    targetLonField={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
+                                  />
+                                </div>
                                 <GeoReferenceAssertionRow
                                   index={index}
                                   openAddPersonModal={openAddPersonModal}
