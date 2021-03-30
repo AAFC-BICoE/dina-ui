@@ -1,5 +1,5 @@
 import CoordinateParser from "coordinate-parser";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import useSWR from "swr";
 import { LoadingSpinner, NominatumApiSearchResult, Tooltip } from "common-ui";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -9,6 +9,9 @@ interface GeographySearchBoxProps {
   onInputChange: (value: string) => void;
 
   onSelectSearchResult: (result: NominatumApiSearchResult) => void;
+
+  /** Extra JSX to render under the search bar. */
+  renderUnderSearchBar?: ReactNode;
 }
 
 async function nominatimSearch(
@@ -60,7 +63,8 @@ async function nominatimSearch(
 export function GeographySearchBox({
   onSelectSearchResult,
   inputValue,
-  onInputChange
+  onInputChange,
+  renderUnderSearchBar
 }: GeographySearchBoxProps) {
   /** The query passed to the nominatum API. This state is only set when the user submits the search input. */
   const [searchValue, setSearchValue] = useState<string>("");
@@ -100,7 +104,7 @@ export function GeographySearchBox({
 
   return (
     <div>
-      <div className="d-flex flex-row">
+      <div className="d-flex flex-row form-group">
         <label className="pt-2">
           <strong>
             <DinaMessage id="locationLabel" />
@@ -135,15 +139,15 @@ export function GeographySearchBox({
           </div>
         </div>
       </div>
-      <div>
-        <br />
+      {renderUnderSearchBar}
+      <div className="list-group">
         {geoSearchIsLoading ? (
           <LoadingSpinner loading={true} />
         ) : searchResults?.length === 0 ? (
           <DinaMessage id="noResultsFound" />
         ) : (
           searchResults?.map((place, index) => (
-            <div key={place.osm_id}>
+            <div className="list-group-item" key={place.osm_id}>
               <style>{`
                 .searchResult {
                   font-size:12pt; font-family:verdana,sans-serif;
@@ -175,10 +179,6 @@ export function GeographySearchBox({
                   </a>
                 </div>
               </div>
-              <br />
-              {index < searchResults?.length - 1 && (
-                <hr className="text-light" style={{ borderWidth: 3 }} />
-              )}
             </div>
           ))
         )}

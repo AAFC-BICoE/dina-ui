@@ -2,10 +2,13 @@ import { FormikButton } from "common-ui";
 import Coordinates from "coordinate-parser";
 import { FormikContextType } from "formik";
 import { get } from "lodash";
-import { useState } from "react";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { ReactNode, useState } from "react";
 
 export interface SetCoordinatesFromVerbatimButtonProps {
+  /** Button content */
+  children: ReactNode;
+  className?: string;
+
   sourceLatField: string;
   sourceLonField: string;
 
@@ -15,16 +18,19 @@ export interface SetCoordinatesFromVerbatimButtonProps {
   onSetCoords?: (coords: { lat: number; lon: number }) => void;
 }
 
+/** Provides lat/lon from verbatim fields in decimal format. */
 export function SetCoordinatesFromVerbatimButton({
   sourceLatField,
   sourceLonField,
   targetLatField,
   targetLonField,
-  onSetCoords
+  onSetCoords,
+  className = "btn btn-info",
+  children
 }: SetCoordinatesFromVerbatimButtonProps) {
   const [error, setError] = useState<string>("");
 
-  async function DoRequest(values: any, formik: FormikContextType<any>) {
+  function doConversion(values: any, formik: FormikContextType<any>) {
     try {
       const coords = new Coordinates(
         `${get(values, sourceLatField)}, ${get(values, sourceLonField)}`
@@ -49,14 +55,14 @@ export function SetCoordinatesFromVerbatimButton({
 
   return (
     <FormikButton
-      onClick={DoRequest}
-      className="btn btn-info"
+      onClick={doConversion}
+      className={className}
       buttonProps={({ values }) => ({
         disabled: !get(values, sourceLatField) || !get(values, sourceLonField)
       })}
     >
       {error && <div className="alert alert-danger">{error}</div>}
-      <DinaMessage id="latLongAutoSetterButton" />
+      {children}
     </FormikButton>
   );
 }

@@ -391,7 +391,9 @@ function CollectingEventFormInternal() {
                                     onSetCoords={({ lat, lon }) =>
                                       setGeoSearchValue(`${lat}, ${lon}`)
                                     }
-                                  />
+                                  >
+                                    <DinaMessage id="latLongAutoSetterButton" />
+                                  </SetCoordinatesFromVerbatimButton>
                                 </div>
                                 <GeoReferenceAssertionRow
                                   index={index}
@@ -444,25 +446,33 @@ function CollectingEventFormInternal() {
                 <div
                   style={{ display: showPlaceSearchResult ? "none" : "inline" }}
                 >
-                  <div className="form-group">
-                    <SetCoordinatesFromVerbatimButton
-                      sourceLatField="dwcVerbatimLatitude"
-                      sourceLonField="dwcVerbatimLongitude"
-                      onSetCoords={({ lat, lon }) => {
-                        setGeoSearchValue(`${lat}, ${lon}`);
-                        // Do the geo-search automatically:
-                        setImmediate(() =>
-                          document
-                            ?.querySelector<HTMLElement>(".geo-search-button")
-                            ?.click()
-                        );
-                      }}
-                    />
-                  </div>
                   <GeographySearchBox
                     inputValue={geoSearchValue}
                     onInputChange={setGeoSearchValue}
                     onSelectSearchResult={selectSearchResult}
+                    renderUnderSearchBar={
+                      <div className="form-group">
+                        <DinaMessage id="search" />:{" "}
+                        <SetCoordinatesFromVerbatimButton
+                          sourceLatField="dwcVerbatimLatitude"
+                          sourceLonField="dwcVerbatimLongitude"
+                          className="btn btn-link"
+                          onSetCoords={({ lat, lon }) => {
+                            setGeoSearchValue(`${lat}, ${lon}`);
+                            // Do the geo-search automatically:
+                            setImmediate(() =>
+                              document
+                                ?.querySelector<HTMLElement>(
+                                  ".geo-search-button"
+                                )
+                                ?.click()
+                            );
+                          }}
+                        >
+                          <DinaMessage id="verbatimLatLong" />
+                        </SetCoordinatesFromVerbatimButton>
+                      </div>
+                    }
                   />
                 </div>
 
