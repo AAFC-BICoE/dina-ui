@@ -94,7 +94,7 @@ function GalleryItem({
     >
       <FileView
         filePath={filePath}
-        fileType={fileType}
+        fileType="jpg"
         imgAlt={formatMessage("thumbnailNotAvailableText")}
       />
 
