@@ -3,6 +3,7 @@ import {
   AutoSuggestTextField,
   BackButton,
   ButtonBar,
+  CheckBoxField,
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
@@ -17,8 +18,7 @@ import {
   SaveArgs,
   SubmitButton,
   TextField,
-  useApiClient,
-  useModal
+  useApiClient
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
 import { KitsuResponse, PersistedResource } from "kitsu";
@@ -28,13 +28,14 @@ import { useContext, useState } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
+  GeographySearchBox,
   GeoReferenceAssertionRow,
   GroupSelectField,
   Head,
   Nav,
-  useAddPersonModal,
-  GeographySearchBox
+  useAddPersonModal
 } from "../../../components";
+import { SetCoordinatesFromVerbatimButton } from "../../../components/collection/SetCoordinatesFromVerbatimButton";
 import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Person } from "../../../types/agent-api/resources/Person";
@@ -172,9 +173,7 @@ function CollectingEventFormInternal() {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [checked, setChecked] = useState(false);
-  const { setFieldValue, setFieldTouched, values } = useFormikContext<
-    CollectingEvent
-  >();
+  const { setFieldValue, values } = useFormikContext<CollectingEvent>();
 
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const [showPlaceSearchResult, setShowPlaceSearchResult] = useState(
@@ -182,12 +181,17 @@ function CollectingEventFormInternal() {
       ? true
       : false
   );
-  const [selectedSearchResult, setSelectedSearchResult] = useState<
-    NominatumApiSearchResult
-  >();
+  const [
+    selectedSearchResult,
+    setSelectedSearchResult
+  ] = useState<NominatumApiSearchResult>();
   const [administrativeBoundaries, setAdministrativeBoundaries] = useState<
     NominatumApiSearchResult[]
   >();
+
+  const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
+    values.dwcGeoreferenceVerificationStatus === "GEOREFERENCING_NOT_POSSIBLE"
+  );
 
   const onSelectSearchResult = (
     result: NominatumApiSearchResult | undefined
@@ -214,6 +218,20 @@ function CollectingEventFormInternal() {
     onSelectSearchResult(undefined);
     setAdministrativeBoundaries(undefined);
     setShowPlaceSearchResult(false);
+  };
+
+  const onGeoReferencingImpossibleCheckBoxClick = e => {
+    if (e.target.checked === true) {
+      setFieldValue(
+        "dwcGeoreferenceVerificationStatus",
+        "GEOREFERENCING_NOT_POSSIBLE"
+      );
+      setFieldValue("geoReferenceAssertions", []);
+      setGeoreferenceDisabled(true);
+    } else {
+      setFieldValue("dwcGeoreferenceVerificationStatus", null);
+      setGeoreferenceDisabled(false);
+    }
   };
 
   return (
@@ -319,6 +337,12 @@ function CollectingEventFormInternal() {
               <legend className="w-auto">
                 <DinaMessage id="geoReferencingLegend" />
               </legend>
+              <div className="col-md-5">
+                <CheckBoxField
+                  name="dwcGeoreferenceVerificationStatus"
+                  onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
+                />
+              </div>
               <FieldArray name="geoReferenceAssertions">
                 {({ form, push, remove }) => {
                   const assertions =
@@ -339,7 +363,11 @@ function CollectingEventFormInternal() {
                   }
 
                   return (
-                    <div>
+                    <div
+                      style={{
+                        display: georeferenceDisabled ? "none" : "inline"
+                      }}
+                    >
                       <Tabs
                         selectedIndex={activeTabIdx}
                         onSelect={setActiveTabIdx}
@@ -356,6 +384,14 @@ function CollectingEventFormInternal() {
                         {assertions.length
                           ? assertions.map((assertion, index) => (
                               <TabPanel key={assertion.id}>
+                                <div className="form-group">
+                                  <SetCoordinatesFromVerbatimButton
+                                    sourceLatField="dwcVerbatimLatitude"
+                                    sourceLonField="dwcVerbatimLongitude"
+                                    targetLatField={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
+                                    targetLonField={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
+                                  />
+                                </div>
                                 <GeoReferenceAssertionRow
                                   index={index}
                                   openAddPersonModal={openAddPersonModal}
@@ -462,9 +498,7 @@ function CollectingEventForm({
 
   // The selected Metadatas to be attached to this Collecting Event:
   const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal({
-    initialMetadatas: collectingEvent?.attachment as PersistedResource<
-      Metadata
-    >[]
+    initialMetadatas: collectingEvent?.attachment as PersistedResource<Metadata>[]
   });
   const initialValues = collectingEvent
     ? {
@@ -487,9 +521,7 @@ function CollectingEventForm({
     assertionsToSave: GeoReferenceAssertion[],
     linkedCollectingEvent: PersistedResource<CollectingEvent>
   ) {
-    const existingAssertions = initialValues.geoReferenceAssertions as PersistedResource<
-      GeoReferenceAssertion
-    >[];
+    const existingAssertions = initialValues.geoReferenceAssertions as PersistedResource<GeoReferenceAssertion>[];
 
     const assertionIdsToSave = assertionsToSave.map(it => it.id);
     const assertionsToDelete = existingAssertions.filter(
