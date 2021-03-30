@@ -3,6 +3,7 @@ import {
   AutoSuggestTextField,
   BackButton,
   ButtonBar,
+  CheckBoxField,
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
@@ -17,8 +18,7 @@ import {
   SaveArgs,
   SubmitButton,
   TextField,
-  useApiClient,
-  useModal
+  useApiClient
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
 import { KitsuResponse, PersistedResource } from "kitsu";
@@ -28,12 +28,12 @@ import { useContext, useState } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
+  GeographySearchBox,
   GeoReferenceAssertionRow,
   GroupSelectField,
   Head,
   Nav,
-  useAddPersonModal,
-  GeographySearchBox
+  useAddPersonModal
 } from "../../../components";
 import { SetCoordinatesFromVerbatimButton } from "../../../components/collection/SetCoordinatesFromVerbatimButton";
 import { useAttachmentsModal } from "../../../components/object-store";
@@ -188,6 +188,10 @@ function CollectingEventFormInternal() {
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
+  const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
+    values.dwcGeoreferenceVerificationStatus === "GEOREFERENCING_NOT_POSSIBLE"
+  );
+
   const onSelectSearchResult = (
     result: NominatumApiSearchResult | undefined
   ) => {
@@ -212,6 +216,20 @@ function CollectingEventFormInternal() {
     // reset the fields when user remote the place
     onSelectSearchResult(undefined);
     setShowPlaceSearchResult(false);
+  };
+
+  const onGeoReferencingImpossibleCheckBoxClick = e => {
+    if (e.target.checked === true) {
+      setFieldValue(
+        "dwcGeoreferenceVerificationStatus",
+        "GEOREFERENCING_NOT_POSSIBLE"
+      );
+      setFieldValue("geoReferenceAssertions", []);
+      setGeoreferenceDisabled(true);
+    } else {
+      setFieldValue("dwcGeoreferenceVerificationStatus", null);
+      setGeoreferenceDisabled(false);
+    }
   };
 
   return (
@@ -317,6 +335,12 @@ function CollectingEventFormInternal() {
               <legend className="w-auto">
                 <DinaMessage id="geoReferencingLegend" />
               </legend>
+              <div className="col-md-5">
+                <CheckBoxField
+                  name="dwcGeoreferenceVerificationStatus"
+                  onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
+                />
+              </div>
               <FieldArray name="geoReferenceAssertions">
                 {({ form, push, remove }) => {
                   const assertions =
@@ -337,7 +361,11 @@ function CollectingEventFormInternal() {
                   }
 
                   return (
-                    <div>
+                    <div
+                      style={{
+                        display: georeferenceDisabled ? "none" : "inline"
+                      }}
+                    >
                       <Tabs
                         selectedIndex={activeTabIdx}
                         onSelect={setActiveTabIdx}
@@ -365,7 +393,6 @@ function CollectingEventFormInternal() {
                                     }
                                   />
                                 </div>
-
                                 <GeoReferenceAssertionRow
                                   index={index}
                                   openAddPersonModal={openAddPersonModal}
