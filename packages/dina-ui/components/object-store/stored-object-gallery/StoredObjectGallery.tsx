@@ -75,11 +75,7 @@ function GalleryItem({
 }: GalleryItemProps) {
   const { id, acCaption } = metadata;
 
-  const fileId =
-    metadata.acSubType === "THUMBNAIL"
-      ? `${metadata.fileIdentifier}.thumbnail`
-      : metadata.fileIdentifier;
-
+  const fileId = `${metadata.fileIdentifier}/thumbnail`;
   const filePath = `/api/objectstore-api/file/${metadata.bucket}/${fileId}`;
 
   const { formatMessage } = useDinaIntl();
