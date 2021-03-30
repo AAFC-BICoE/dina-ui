@@ -453,12 +453,12 @@ function CollectingEventFormInternal() {
                     renderUnderSearchBar={
                       <div className="form-group">
                         <DinaMessage id="search" />:{" "}
-                        <SetCoordinatesFromVerbatimButton
-                          sourceLatField="dwcVerbatimLatitude"
-                          sourceLonField="dwcVerbatimLongitude"
+                        <FormikButton
                           className="btn btn-link"
-                          onSetCoords={({ lat, lon }) => {
-                            setGeoSearchValue(`${lat}, ${lon}`);
+                          onClick={state => {
+                            setGeoSearchValue(
+                              `${state.dwcVerbatimLatitude}, ${state.dwcVerbatimLongitude}`
+                            );
                             // Do the geo-search automatically:
                             setImmediate(() =>
                               document
@@ -468,9 +468,14 @@ function CollectingEventFormInternal() {
                                 ?.click()
                             );
                           }}
+                          buttonProps={({ values: state }) => ({
+                            disabled:
+                              !state.dwcVerbatimLatitude ||
+                              !state.dwcVerbatimLongitude
+                          })}
                         >
                           <DinaMessage id="verbatimLatLong" />
-                        </SetCoordinatesFromVerbatimButton>
+                        </FormikButton>
                       </div>
                     }
                   />
