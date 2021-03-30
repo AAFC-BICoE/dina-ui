@@ -75,15 +75,18 @@ function GalleryItem({
 }: GalleryItemProps) {
   const { id, acCaption } = metadata;
 
-  const { formatMessage } = useDinaIntl();
-  const { response: thumbnailResponse } = useQuery<Metadata[]>({
-    filter: {
-      "acDerivedFrom.id": id
-    },
-    path: "objectstore-api/metadata"
-  });
+  const fileId =
+    metadata.acSubType === "THUMBNAIL"
+      ? `${metadata.fileIdentifier}.thumbnail`
+      : metadata.fileIdentifier;
 
-  const thumbnail = thumbnailResponse?.data?.[0];
+  const filePath = `/api/objectstore-api/file/${metadata.bucket}/${fileId}`;
+
+  const { formatMessage } = useDinaIntl();
+  // fileExtension should always be available when getting the Metadata from the back-end:
+  const fileType = (metadata.fileExtension as string)
+    .replace(/\./, "")
+    .toLowerCase();
 
   return (
     <div
@@ -93,17 +96,12 @@ function GalleryItem({
         maxWidth: "15rem"
       }}
     >
-      {thumbnail ? (
-        <FileView
-          filePath={`/api/objectstore-api/file/${thumbnail.bucket}/${thumbnail.fileIdentifier}.thumbnail`}
-          fileType="jpg"
-          imgAlt={formatMessage("thumbnailNotAvailableText")}
-        />
-      ) : (
-        <div style={{ height: "7rem" }}>
-          <DinaMessage id="thumbnailNotAvailableText" />
-        </div>
-      )}
+      <FileView
+        filePath={filePath}
+        fileType={fileType}
+        imgAlt={formatMessage("thumbnailNotAvailableText")}
+      />
+
       <Link href={`/object-store/object/view?id=${id}`}>
         <a
           style={{
