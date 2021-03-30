@@ -22,7 +22,9 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
           targetLatField="decimalLatitude"
           targetLonField="decimalLongitude"
           onSetCoords={onCoordsSetCallback}
-        />
+        >
+          Test Button
+        </SetCoordinatesFromVerbatimButton>
         <NumberField name="decimalLatitude" />
         <NumberField name="decimalLongitude" />
       </DinaForm>
