@@ -146,7 +146,7 @@ export function GeographySearchBox({
         ) : searchResults?.length === 0 ? (
           <DinaMessage id="noResultsFound" />
         ) : (
-          searchResults?.map((place, index) => (
+          searchResults?.map(place => (
             <div className="list-group-item" key={place.osm_id}>
               <style>{`
                 .searchResult {
