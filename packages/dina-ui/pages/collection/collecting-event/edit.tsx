@@ -185,9 +185,8 @@ function CollectingEventFormInternal() {
     selectedSearchResult,
     setSelectedSearchResult
   ] = useState<NominatumApiSearchResult>();
-  const [administrativeBoundaries, setAdministrativeBoundaries] = useState<
-    NominatumApiSearchResult[]
-  >();
+
+  const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
   const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
     values.dwcGeoreferenceVerificationStatus === "GEOREFERENCING_NOT_POSSIBLE"
@@ -216,7 +215,6 @@ function CollectingEventFormInternal() {
   const removeThisPlace = () => {
     // reset the fields when user remote the place
     onSelectSearchResult(undefined);
-    setAdministrativeBoundaries(undefined);
     setShowPlaceSearchResult(false);
   };
 
@@ -390,7 +388,12 @@ function CollectingEventFormInternal() {
                                     sourceLonField="dwcVerbatimLongitude"
                                     targetLatField={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
                                     targetLonField={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
-                                  />
+                                    onSetCoords={({ lat, lon }) =>
+                                      setGeoSearchValue(`${lat}, ${lon}`)
+                                    }
+                                  >
+                                    <DinaMessage id="latLongAutoSetterButton" />
+                                  </SetCoordinatesFromVerbatimButton>
                                 </div>
                                 <GeoReferenceAssertionRow
                                   index={index}
@@ -444,9 +447,37 @@ function CollectingEventFormInternal() {
                   style={{ display: showPlaceSearchResult ? "none" : "inline" }}
                 >
                   <GeographySearchBox
-                    selectSearchResult={selectSearchResult}
-                    administrativeBoundaries={administrativeBoundaries as any}
-                    setAdministrativeBoundaries={setAdministrativeBoundaries}
+                    inputValue={geoSearchValue}
+                    onInputChange={setGeoSearchValue}
+                    onSelectSearchResult={selectSearchResult}
+                    renderUnderSearchBar={
+                      <div className="form-group">
+                        <DinaMessage id="search" />:{" "}
+                        <FormikButton
+                          className="btn btn-link"
+                          onClick={state => {
+                            setGeoSearchValue(
+                              `${state.dwcVerbatimLatitude}, ${state.dwcVerbatimLongitude}`
+                            );
+                            // Do the geo-search automatically:
+                            setImmediate(() =>
+                              document
+                                ?.querySelector<HTMLElement>(
+                                  ".geo-search-button"
+                                )
+                                ?.click()
+                            );
+                          }}
+                          buttonProps={({ values: state }) => ({
+                            disabled:
+                              !state.dwcVerbatimLatitude ||
+                              !state.dwcVerbatimLongitude
+                          })}
+                        >
+                          <DinaMessage id="verbatimLatLong" />
+                        </FormikButton>
+                      </div>
+                    }
                   />
                 </div>
 
@@ -466,18 +497,17 @@ function CollectingEventFormInternal() {
                         <DinaMessage id="removeThisPlaceLabel" />
                       </button>
                     </div>
-                    {administrativeBoundaries &&
-                      administrativeBoundaries?.length > 0 && (
-                        <div className="col-md-4">
-                          <a
-                            href={`https://www.openstreetmap.org/${selectedSearchResult?.osm_type}/${selectedSearchResult?.osm_id}`}
-                            target="_blank"
-                            className="btn btn-info"
-                          >
-                            <DinaMessage id="viewDetailButtonLabel" />
-                          </a>
-                        </div>
-                      )}
+                    {selectedSearchResult ? (
+                      <div className="col-md-4">
+                        <a
+                          href={`https://www.openstreetmap.org/${selectedSearchResult?.osm_type}/${selectedSearchResult?.osm_id}`}
+                          target="_blank"
+                          className="btn btn-info"
+                        >
+                          <DinaMessage id="viewDetailButtonLabel" />
+                        </a>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               </div>
