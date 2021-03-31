@@ -335,7 +335,9 @@ function CollectingEventFormInternal() {
               <legend className="w-auto">
                 <DinaMessage id="geoReferencingLegend" />
               </legend>
-              {georeferenceDisabled && (
+              {(georeferenceDisabled ||
+                (values.geoReferenceAssertions &&
+                  values.geoReferenceAssertions.length === 0)) && (
                 <div className="col-md-5">
                   <CheckBoxField
                     name="dwcGeoreferenceVerificationStatus"
