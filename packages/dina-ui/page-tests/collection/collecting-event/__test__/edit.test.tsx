@@ -165,9 +165,7 @@ describe("collecting-event edit page", () => {
             attributes: {
               startEventDateTime: "2019-12-21T16:00",
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
-              dwcOtherRecordNumbers: ["12", "23"],
-              geographicPlaceNameSource: null,
-              geographicPlaceNameSourceDetail: null
+              dwcOtherRecordNumbers: ["12", "23"]
             },
             id: "00000000-0000-0000-0000-000000000000",
             type: "collecting-event"
