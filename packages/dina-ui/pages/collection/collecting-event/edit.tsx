@@ -335,12 +335,14 @@ function CollectingEventFormInternal() {
               <legend className="w-auto">
                 <DinaMessage id="geoReferencingLegend" />
               </legend>
-              <div className="col-md-5">
-                <CheckBoxField
-                  name="dwcGeoreferenceVerificationStatus"
-                  onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
-                />
-              </div>
+              {georeferenceDisabled && (
+                <div className="col-md-5">
+                  <CheckBoxField
+                    name="dwcGeoreferenceVerificationStatus"
+                    onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
+                  />
+                </div>
+              )}
               <FieldArray name="geoReferenceAssertions">
                 {({ form, push, remove }) => {
                   const assertions =
