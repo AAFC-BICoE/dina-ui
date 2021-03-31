@@ -177,11 +177,13 @@ export default function CollectingEventEditPage() {
 interface CollectingEventFormInternalProps {
   selectedSearchResult: NominatumApiSearchResult;
   setSelectedSearchResult: Dispatch<SetStateAction<any>>;
+  setPlaceRemoved: Dispatch<SetStateAction<any>>;
 }
 
 function CollectingEventFormInternal({
   selectedSearchResult,
-  setSelectedSearchResult
+  setSelectedSearchResult,
+  setPlaceRemoved
 }: CollectingEventFormInternalProps) {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
@@ -229,6 +231,7 @@ function CollectingEventFormInternal({
     onSelectSearchResult(undefined);
     setAdministrativeBoundaries(undefined);
     setShowPlaceSearchResult(false);
+    setPlaceRemoved(true);
   };
 
   const onGeoReferencingImpossibleCheckBoxClick = e => {
@@ -542,6 +545,8 @@ function CollectingEventForm({
     setSelectedSearchResult
   ] = useState<NominatumApiSearchResult>();
 
+  const [placeRemoved, setPlaceRemoved] = useState(false);
+
   async function saveGeoReferenceAssertion(
     assertionsToSave: GeoReferenceAssertion[],
     linkedCollectingEvent: PersistedResource<CollectingEvent>
@@ -674,7 +679,7 @@ function CollectingEventForm({
         selectedSearchResult.osm_type;
       submittedValues.geographicPlaceNameSourceDetail.sourceUrl = geographicPlaceSourceUrl;
       submittedValues.geographicPlaceNameSource = GeographicPlaceNameSource.OSM;
-    } else {
+    } else if (placeRemoved) {
       submittedValues.geographicPlaceNameSourceDetail = null;
       submittedValues.geographicPlaceNameSource = null;
     }
@@ -726,6 +731,7 @@ function CollectingEventForm({
       <CollectingEventFormInternal
         selectedSearchResult={selectedSearchResult as any}
         setSelectedSearchResult={setSelectedSearchResult}
+        setPlaceRemoved={setPlaceRemoved}
       />
       <div className="form-group">{attachedMetadatasUI}</div>
     </DinaForm>
