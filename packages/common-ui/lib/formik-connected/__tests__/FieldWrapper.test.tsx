@@ -1,4 +1,5 @@
 import { mount } from "enzyme";
+import { divide } from "lodash";
 import { IntlProvider } from "react-intl";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
@@ -56,5 +57,28 @@ describe("FieldWrapper component.", () => {
     );
 
     expect(wrapper.find("label").text()).toEqual("The Group's Name");
+  });
+
+  it("Displays the readOnly value when the form is read-only.", () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{ myField: "my value" }} readOnly={true}>
+        <FieldWrapper name="myField" />
+      </DinaForm>
+    );
+
+    expect(wrapper.find(".field-view").text()).toEqual("my value");
+  });
+
+  it("Can display a custom read-only view.", () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{ myField: "my value" }} readOnly={true}>
+        <FieldWrapper
+          name="myField"
+          readOnlyRender={value => <div className="custom-div">{value}</div>}
+        />
+      </DinaForm>
+    );
+
+    expect(wrapper.find(".custom-div").text()).toEqual("my value");
   });
 });

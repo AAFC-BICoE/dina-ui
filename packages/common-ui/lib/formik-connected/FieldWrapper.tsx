@@ -1,4 +1,5 @@
 import { FastField } from "formik";
+import { ReactNode } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { useDinaFormContext } from "./DinaForm";
 import { ReadOnlyValue } from "./FieldView";
@@ -19,11 +20,14 @@ export interface LabelWrapperParams {
   /** Override the default "name" prop used to get labels and tooltips from the intl messages. */
   customName?: string;
 
+  /** Link href to render for a single string value. */
   link?: string;
 
+  /** Link href to render on each array item. */
   arrayItemLink?: string;
 
-  readOnlyRender?: (value: any) => JSX.Element;
+  /** Custom element to render when the form is in read-only mode. */
+  readOnlyRender?: (value: any) => ReactNode;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
