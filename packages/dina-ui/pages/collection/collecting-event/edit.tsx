@@ -195,9 +195,7 @@ function CollectingEventFormInternal({
       : false
   );
 
-  const [administrativeBoundaries, setAdministrativeBoundaries] = useState<
-    NominatumApiSearchResult[]
-  >();
+  const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
   const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
     values.dwcGeoreferenceVerificationStatus ===
@@ -212,9 +210,9 @@ function CollectingEventFormInternal({
       setFieldValue("dwcStateProvince", null);
       setFieldValue("geographicPlaceName", null);
     } else {
-      setFieldValue("dwcCountry", result?.address?.country);
-      setFieldValue("dwcStateProvince", result?.address?.state);
-      setFieldValue("geographicPlaceName", result?.display_name);
+      setFieldValue("dwcCountry", result?.address?.country || null);
+      setFieldValue("dwcStateProvince", result?.address?.state || null);
+      setFieldValue("geographicPlaceName", result?.display_name || null);
     }
     setSelectedSearchResult(result as any);
   };
@@ -227,7 +225,6 @@ function CollectingEventFormInternal({
   const removeThisPlace = () => {
     // reset the fields when user remove the place
     onSelectSearchResult(undefined);
-    setAdministrativeBoundaries(undefined);
     setShowPlaceSearchResult(false);
     // reset the source fields when user remove the place
     setFieldValue("geographicPlaceNameSourceDetail", null);
@@ -351,12 +348,16 @@ function CollectingEventFormInternal({
               <legend className="w-auto">
                 <DinaMessage id="geoReferencingLegend" />
               </legend>
-              <div className="col-md-5">
-                <CheckBoxField
-                  name="dwcGeoreferenceVerificationStatus"
-                  onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
-                />
-              </div>
+              {(georeferenceDisabled ||
+                (values.geoReferenceAssertions &&
+                  values.geoReferenceAssertions.length === 0)) && (
+                <div className="col-md-5">
+                  <CheckBoxField
+                    name="dwcGeoreferenceVerificationStatus"
+                    onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
+                  />
+                </div>
+              )}
               <FieldArray name="geoReferenceAssertions">
                 {({ form, push, remove }) => {
                   const assertions =
@@ -404,7 +405,12 @@ function CollectingEventFormInternal({
                                     sourceLonField="dwcVerbatimLongitude"
                                     targetLatField={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
                                     targetLonField={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
-                                  />
+                                    onSetCoords={({ lat, lon }) =>
+                                      setGeoSearchValue(`${lat}, ${lon}`)
+                                    }
+                                  >
+                                    <DinaMessage id="latLongAutoSetterButton" />
+                                  </SetCoordinatesFromVerbatimButton>
                                 </div>
                                 <GeoReferenceAssertionRow
                                   index={index}
@@ -458,9 +464,37 @@ function CollectingEventFormInternal({
                   style={{ display: showPlaceSearchResult ? "none" : "inline" }}
                 >
                   <GeographySearchBox
-                    selectSearchResult={selectSearchResult}
-                    administrativeBoundaries={administrativeBoundaries as any}
-                    setAdministrativeBoundaries={setAdministrativeBoundaries}
+                    inputValue={geoSearchValue}
+                    onInputChange={setGeoSearchValue}
+                    onSelectSearchResult={selectSearchResult}
+                    renderUnderSearchBar={
+                      <div className="form-group">
+                        <DinaMessage id="search" />:{" "}
+                        <FormikButton
+                          className="btn btn-link"
+                          onClick={state => {
+                            setGeoSearchValue(
+                              `${state.dwcVerbatimLatitude}, ${state.dwcVerbatimLongitude}`
+                            );
+                            // Do the geo-search automatically:
+                            setImmediate(() =>
+                              document
+                                ?.querySelector<HTMLElement>(
+                                  ".geo-search-button"
+                                )
+                                ?.click()
+                            );
+                          }}
+                          buttonProps={({ values: state }) => ({
+                            disabled:
+                              !state.dwcVerbatimLatitude ||
+                              !state.dwcVerbatimLongitude
+                          })}
+                        >
+                          <DinaMessage id="verbatimLatLong" />
+                        </FormikButton>
+                      </div>
+                    }
                   />
                 </div>
 
