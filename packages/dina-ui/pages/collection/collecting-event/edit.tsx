@@ -200,9 +200,9 @@ function CollectingEventFormInternal() {
       setFieldValue("dwcStateProvince", null);
       setFieldValue("geographicPlaceName", null);
     } else {
-      setFieldValue("dwcCountry", result?.address?.country);
-      setFieldValue("dwcStateProvince", result?.address?.state);
-      setFieldValue("geographicPlaceName", result?.display_name);
+      setFieldValue("dwcCountry", result?.address?.country || null);
+      setFieldValue("dwcStateProvince", result?.address?.state || null);
+      setFieldValue("geographicPlaceName", result?.display_name || null);
     }
     setSelectedSearchResult(result as any);
   };
