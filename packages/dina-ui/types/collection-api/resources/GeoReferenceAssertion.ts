@@ -1,4 +1,5 @@
 import { KitsuResource } from "kitsu";
+import { CollectingEvent } from "./CollectingEvent";
 
 export interface GeoReferenceAssertionAttributes {
   createdBy?: string;
@@ -14,6 +15,7 @@ export interface GeoReferenceAssertionAttributes {
 }
 
 export interface GeoReferenceAssertionRelationships {
+  collectingEvent?: CollectingEvent;
   georeferencedBy?: KitsuResource[];
 }
 

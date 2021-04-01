@@ -1,5 +1,6 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
+import { GeographicPlaceNameSourceDetail } from "../GeographicPlaceNameSourceDetail";
 import { CollectorGroup } from "./CollectorGroup";
 import { GeoReferenceAssertion } from "./GeoReferenceAssertion";
 
@@ -33,12 +34,18 @@ export interface CollectingEventAttributes {
   collectorGroups?: CollectorGroup[];
   group: string;
   geographicPlaceName?: string;
-  dwcGeoreferenceVerificationStatus?: string;
+  dwcGeoreferenceVerificationStatus?: GeoreferenceVerificationStatus;
+  geographicPlaceNameSourceDetail?: GeographicPlaceNameSourceDetail;
+  geographicPlaceNameSource?: GeographicPlaceNameSource;
 }
 
-export type GeoreferenceVerificationStatus =
-  | "GEOREFERENCING_NOT_POSSIBLE"
-  | undefined;
+export enum GeoreferenceVerificationStatus {
+  GEOREFERENCING_NOT_POSSIBLE = "GEOREFERENCING_NOT_POSSIBLE"
+}
+
+export enum GeographicPlaceNameSource {
+  OSM = "OSM"
+}
 
 export interface CollectingEventRelationships {
   collectors?: KitsuResource[];
