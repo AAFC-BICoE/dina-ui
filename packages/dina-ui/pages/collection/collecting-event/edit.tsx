@@ -232,6 +232,15 @@ function CollectingEventFormInternal() {
     }
   };
 
+  /** Does a Places search using the given search string. */
+  function doGeoSearch(query: string) {
+    setGeoSearchValue(query);
+    // Do the geo-search automatically:
+    setImmediate(() =>
+      document?.querySelector<HTMLElement>(".geo-search-button")?.click()
+    );
+  }
+
   return (
     <div>
       <div className="form-group">
@@ -400,12 +409,12 @@ function CollectingEventFormInternal() {
                               index={index}
                               openAddPersonModal={openAddPersonModal}
                             />
-                            <div className="list-inline">
+                            <div className="list-inline mb-3">
                               <FormikButton
                                 className="list-inline-item btn btn-primary add-assertion-button"
                                 onClick={addGeoReference}
                               >
-                                <DinaMessage id="addAssertion" />
+                                <DinaMessage id="addAnotherAssertion" />
                               </FormikButton>
                               <FormikButton
                                 className="list-inline-item btn btn-dark"
@@ -451,23 +460,28 @@ function CollectingEventFormInternal() {
                     onInputChange={setGeoSearchValue}
                     onSelectSearchResult={selectSearchResult}
                     renderUnderSearchBar={
-                      <div className="form-group">
-                        <DinaMessage id="search" />:{" "}
+                      <div className="form-group d-flex flex-row align-items-center">
+                        <div className="pr-3">
+                          <DinaMessage id="search" />:
+                        </div>
                         <FormikButton
                           className="btn btn-link"
-                          onClick={state => {
-                            setGeoSearchValue(
+                          onClick={state =>
+                            doGeoSearch(state.dwcVerbatimLocality)
+                          }
+                          buttonProps={({ values: state }) => ({
+                            disabled: !state.dwcVerbatimLocality
+                          })}
+                        >
+                          <DinaMessage id="field_dwcVerbatimLocality" />
+                        </FormikButton>
+                        <FormikButton
+                          className="btn btn-link"
+                          onClick={state =>
+                            doGeoSearch(
                               `${state.dwcVerbatimLatitude}, ${state.dwcVerbatimLongitude}`
-                            );
-                            // Do the geo-search automatically:
-                            setImmediate(() =>
-                              document
-                                ?.querySelector<HTMLElement>(
-                                  ".geo-search-button"
-                                )
-                                ?.click()
-                            );
-                          }}
+                            )
+                          }
                           buttonProps={({ values: state }) => ({
                             disabled:
                               !state.dwcVerbatimLatitude ||
@@ -475,6 +489,25 @@ function CollectingEventFormInternal() {
                           })}
                         >
                           <DinaMessage id="verbatimLatLong" />
+                        </FormikButton>
+                        <FormikButton
+                          className="btn btn-link"
+                          onClick={state => {
+                            const assertion =
+                              state.geoReferenceAssertions?.[activeTabIdx];
+                            const lat = assertion?.dwcDecimalLatitude;
+                            const lon = assertion?.dwcDecimalLongitude;
+                            doGeoSearch(`${lat}, ${lon}`);
+                          }}
+                          buttonProps={({ values: state }) => {
+                            const assertion =
+                              state.geoReferenceAssertions?.[activeTabIdx];
+                            const lat = assertion?.dwcDecimalLatitude;
+                            const lon = assertion?.dwcDecimalLongitude;
+                            return { disabled: !lat || !lon };
+                          }}
+                        >
+                          <DinaMessage id="decimalLatLong" />
                         </FormikButton>
                       </div>
                     }

@@ -2,6 +2,7 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
+  addAnotherAssertion: "Add Another GeoReference",
   addAssertion: "Add GeoReference",
   addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
@@ -38,6 +39,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectorGroupNameLabel: "Collector Group Name",
   collectorGroupViewTitle: "View Collector Group",
   coordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",
+  decimalLatLong: "Decimal Lat/Long",
   decimalLatitude: "Decimal Latitude",
   decimalLongitude: "Decimal Longitude",
   deleted: "Deleted",

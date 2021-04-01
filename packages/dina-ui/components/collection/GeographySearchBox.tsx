@@ -140,7 +140,7 @@ export function GeographySearchBox({
         </div>
       </div>
       {renderUnderSearchBar}
-      <div className="list-group">
+      <div className="list-group mb-3">
         {geoSearchIsLoading ? (
           <LoadingSpinner loading={true} />
         ) : searchResults?.length === 0 ? (
