@@ -17,6 +17,8 @@ describe("LibraryPoolDetails component", () => {
   it("Renders the library pool details", () => {
     const wrapper = getWrapper();
 
-    expect(wrapper.find(".name-field p").text()).toEqual("test library pool");
+    expect(wrapper.find(".name-field .field-view").text()).toEqual(
+      "test library pool"
+    );
   });
 });

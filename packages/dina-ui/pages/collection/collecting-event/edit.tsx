@@ -21,7 +21,7 @@ import {
   useApiClient,
   useDinaFormContext
 } from "common-ui";
-import { Field, FastField, FieldArray, useFormikContext } from "formik";
+import { Field, FieldArray, useFormikContext } from "formik";
 import { KitsuResponse, PersistedResource } from "kitsu";
 import { clamp, orderBy } from "lodash";
 import { NextRouter, useRouter } from "next/router";
