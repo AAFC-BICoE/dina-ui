@@ -177,13 +177,11 @@ export default function CollectingEventEditPage() {
 interface CollectingEventFormInternalProps {
   selectedSearchResult: NominatumApiSearchResult;
   setSelectedSearchResult: Dispatch<SetStateAction<any>>;
-  setPlaceRemoved: Dispatch<SetStateAction<any>>;
 }
 
 function CollectingEventFormInternal({
   selectedSearchResult,
-  setSelectedSearchResult,
-  setPlaceRemoved
+  setSelectedSearchResult
 }: CollectingEventFormInternalProps) {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
@@ -231,7 +229,9 @@ function CollectingEventFormInternal({
     onSelectSearchResult(undefined);
     setAdministrativeBoundaries(undefined);
     setShowPlaceSearchResult(false);
-    setPlaceRemoved(true);
+    // reset the source fields when user remove the place
+    setFieldValue("geographicPlaceNameSourceDetail", null);
+    setFieldValue("geographicPlaceNameSource", null);
   };
 
   const onGeoReferencingImpossibleCheckBoxClick = e => {
@@ -472,13 +472,12 @@ function CollectingEventFormInternal({
                   <TextField name="dwcCountry" readOnly={true} />
                   <div className="row">
                     <div className="col-md-4">
-                      <button
-                        type="button"
+                      <FormikButton
                         className="btn btn-dark"
                         onClick={removeThisPlace}
                       >
                         <DinaMessage id="removeThisPlaceLabel" />
-                      </button>
+                      </FormikButton>
                     </div>
                     {(selectedSearchResult ||
                       values.geographicPlaceNameSourceDetail) && (
@@ -544,8 +543,6 @@ function CollectingEventForm({
     selectedSearchResult,
     setSelectedSearchResult
   ] = useState<NominatumApiSearchResult>();
-
-  const [placeRemoved, setPlaceRemoved] = useState(false);
 
   async function saveGeoReferenceAssertion(
     assertionsToSave: GeoReferenceAssertion[],
@@ -679,9 +676,6 @@ function CollectingEventForm({
         selectedSearchResult.osm_type;
       submittedValues.geographicPlaceNameSourceDetail.sourceUrl = geographicPlaceSourceUrl;
       submittedValues.geographicPlaceNameSource = GeographicPlaceNameSource.OSM;
-    } else if (placeRemoved) {
-      submittedValues.geographicPlaceNameSourceDetail = null;
-      submittedValues.geographicPlaceNameSource = null;
     }
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
@@ -731,7 +725,6 @@ function CollectingEventForm({
       <CollectingEventFormInternal
         selectedSearchResult={selectedSearchResult as any}
         setSelectedSearchResult={setSelectedSearchResult}
-        setPlaceRemoved={setPlaceRemoved}
       />
       <div className="form-group">{attachedMetadatasUI}</div>
     </DinaForm>
