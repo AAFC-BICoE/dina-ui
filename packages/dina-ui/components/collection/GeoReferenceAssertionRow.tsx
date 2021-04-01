@@ -66,7 +66,6 @@ export function GeoReferenceAssertionRow({
 
           <div className="col-md-6">
             <TextField
-              arrayItemLink="/person/view?id="
               name={`geoReferenceAssertions[${index}].literalGeoreferencedBy`}
               className={"literalGeoreferencedBy"}
               label={formatMessage("literalGeoreferencedByLabel")}
@@ -74,6 +73,7 @@ export function GeoReferenceAssertionRow({
 
             <ResourceSelectField<Person>
               name={`geoReferenceAssertions[${index}].georeferencedBy`}
+              arrayItemLink="/person/view?id="
               label={formatMessage("georeferencedByLabel")}
               filter={filterBy(["displayName"])}
               model="agent-api/person"

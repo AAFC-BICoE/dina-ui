@@ -193,6 +193,13 @@ export function CollectingEventFormLayout() {
       GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
   );
 
+  function toggleRangeEnabled(newValue: boolean) {
+    if (!newValue) {
+      setFieldValue("endEventDateTime", null);
+    }
+    setRangeEnabled(newValue);
+  }
+
   function selectSearchResult(result: NominatumApiSearchResult) {
     // Set locality fields:
     setFieldValue("dwcCountry", result?.address?.country || null);
@@ -262,27 +269,33 @@ export function CollectingEventFormLayout() {
               label={formatMessage("startEventDateTimeLabel")}
               placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
-            {rangeEnabled && (
-              <FormattedTextField
-                name="endEventDateTime"
-                label={formatMessage("endEventDateTimeLabel")}
-                placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
-              />
-            )}
+            <Field name="endEventDateTime">
+              {({ field: { value: endEventDateTime } }) => (
+                <div>
+                  {(rangeEnabled || endEventDateTime) && (
+                    <FormattedTextField
+                      name="endEventDateTime"
+                      label={formatMessage("endEventDateTimeLabel")}
+                      placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
+                    />
+                  )}
+                  {!readOnly && (
+                    <label style={{ marginLeft: 15, marginTop: -15 }}>
+                      <span>{formatMessage("enableDateRangeLabel")}</span>
+                      <Switch
+                        onChange={toggleRangeEnabled}
+                        checked={rangeEnabled || endEventDateTime}
+                        className="react-switch dateRange"
+                      />
+                    </label>
+                  )}
+                </div>
+              )}
+            </Field>
             <TextField
               name="verbatimEventDateTime"
               label={formatMessage("verbatimEventDateTimeLabel")}
             />
-            {!readOnly && (
-              <label style={{ marginLeft: 15, marginTop: -15 }}>
-                <span>{formatMessage("enableDateRangeLabel")}</span>
-                <Switch
-                  onChange={e => setRangeEnabled(e)}
-                  checked={rangeEnabled}
-                  className="react-switch dateRange"
-                />
-              </label>
-            )}
           </fieldset>
         </div>
         <div className="col-md-6">
