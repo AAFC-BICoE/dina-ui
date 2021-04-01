@@ -1,4 +1,7 @@
+import { FastField } from "formik";
 import { FieldHeader } from "../field-header/FieldHeader";
+import { useDinaFormContext } from "./DinaForm";
+import { ReadOnlyValue } from "./FieldView";
 
 export interface LabelWrapperParams {
   /** The CSS classes of the div wrapper. */
@@ -15,10 +18,16 @@ export interface LabelWrapperParams {
 
   /** Override the default "name" prop used to get labels and tooltips from the intl messages. */
   customName?: string;
+
+  link?: string;
+
+  arrayItemLink?: string;
+
+  readOnlyRender?: (value: any) => JSX.Element;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
-  children: JSX.Element;
+  children?: JSX.Element;
 }
 
 /**
@@ -34,8 +43,13 @@ export function FieldWrapper({
   name,
   label,
   children,
-  customName
+  customName,
+  arrayItemLink,
+  link,
+  readOnlyRender
 }: FieldWrapperProps) {
+  const { readOnly } = useDinaFormContext();
+
   const fieldLabel = label ?? (
     <FieldHeader name={name} customName={customName} />
   );
@@ -49,7 +63,21 @@ export function FieldWrapper({
               <strong>{fieldLabel}</strong>
             </div>
           )}
-          {children}
+          {readOnly || !children ? (
+            <FastField name={name}>
+              {({ field: { value } }) =>
+                readOnlyRender?.(value) ?? (
+                  <ReadOnlyValue
+                    arrayItemLink={arrayItemLink}
+                    link={link}
+                    value={value}
+                  />
+                )
+              }
+            </FastField>
+          ) : (
+            children
+          )}
         </label>
       </div>
     </div>
