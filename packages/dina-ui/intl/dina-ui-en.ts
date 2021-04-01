@@ -196,7 +196,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   governmentOfCanada: "Government of Canada",
   group: "Group",
   groupMustBeSelected: "Group must be selected",
-  latLongAutoSetterButton: "Use Converted Lat/Long from Verbatim fields",
+  latLongAutoSetterButton: "Convert to Decimal Lat/Long",
   locationLabel: "Location",
   literalGeoreferencedByLabel: "Georeferenced By",
   managedAttributeEditTitle: "Edit Managed Attribute",

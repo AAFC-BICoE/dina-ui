@@ -15,7 +15,7 @@ export interface SetCoordinatesFromVerbatimButtonProps {
   targetLatField?: string;
   targetLonField?: string;
 
-  onSetCoords?: (coords: { lat: number; lon: number }) => void;
+  onClick?: (coords: { lat: number; lon: number }) => void;
 }
 
 /** Provides lat/lon from verbatim fields in decimal format. */
@@ -24,7 +24,7 @@ export function SetCoordinatesFromVerbatimButton({
   sourceLonField,
   targetLatField,
   targetLonField,
-  onSetCoords,
+  onClick,
   className = "btn btn-info",
   children
 }: SetCoordinatesFromVerbatimButtonProps) {
@@ -45,7 +45,7 @@ export function SetCoordinatesFromVerbatimButton({
       if (targetLonField) {
         formik.setFieldValue(targetLonField, lon);
       }
-      onSetCoords?.({ lat, lon });
+      onClick?.({ lat, lon });
 
       setError("");
     } catch (error) {
