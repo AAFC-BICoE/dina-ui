@@ -24,7 +24,8 @@ import { FieldArray, useFormikContext } from "formik";
 import { KitsuResponse, PersistedResource } from "kitsu";
 import { clamp, orderBy } from "lodash";
 import { NextRouter, useRouter } from "next/router";
-import { useContext, useState } from "react";
+import { geographicPlaceSourceUrl } from "../../..//types/collection-api/GeographicPlaceNameSourceDetail";
+import { useContext, useState, Dispatch, SetStateAction } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
@@ -39,7 +40,11 @@ import { SetCoordinatesFromVerbatimButton } from "../../../components/collection
 import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Person } from "../../../types/agent-api/resources/Person";
-import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
+import {
+  CollectingEvent,
+  GeographicPlaceNameSource,
+  GeoreferenceVerificationStatus
+} from "../../../types/collection-api/resources/CollectingEvent";
 import { GeoReferenceAssertion } from "../../../types/collection-api/resources/GeoReferenceAssertion";
 import { Metadata } from "../../../types/objectstore-api";
 
@@ -169,7 +174,15 @@ export default function CollectingEventEditPage() {
   );
 }
 
-function CollectingEventFormInternal() {
+interface CollectingEventFormInternalProps {
+  selectedSearchResult: NominatumApiSearchResult;
+  setSelectedSearchResult: Dispatch<SetStateAction<any>>;
+}
+
+function CollectingEventFormInternal({
+  selectedSearchResult,
+  setSelectedSearchResult
+}: CollectingEventFormInternalProps) {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [checked, setChecked] = useState(false);
@@ -181,15 +194,12 @@ function CollectingEventFormInternal() {
       ? true
       : false
   );
-  const [
-    selectedSearchResult,
-    setSelectedSearchResult
-  ] = useState<NominatumApiSearchResult>();
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
   const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
-    values.dwcGeoreferenceVerificationStatus === "GEOREFERENCING_NOT_POSSIBLE"
+    values.dwcGeoreferenceVerificationStatus ===
+      GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
   );
 
   const onSelectSearchResult = (
@@ -213,16 +223,19 @@ function CollectingEventFormInternal() {
   };
 
   const removeThisPlace = () => {
-    // reset the fields when user remote the place
+    // reset the fields when user remove the place
     onSelectSearchResult(undefined);
     setShowPlaceSearchResult(false);
+    // reset the source fields when user remove the place
+    setFieldValue("geographicPlaceNameSourceDetail", null);
+    setFieldValue("geographicPlaceNameSource", null);
   };
 
   const onGeoReferencingImpossibleCheckBoxClick = e => {
     if (e.target.checked === true) {
       setFieldValue(
         "dwcGeoreferenceVerificationStatus",
-        "GEOREFERENCING_NOT_POSSIBLE"
+        GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
       );
       setFieldValue("geoReferenceAssertions", []);
       setGeoreferenceDisabled(true);
@@ -493,25 +506,34 @@ function CollectingEventFormInternal() {
                   <TextField name="dwcCountry" readOnly={true} />
                   <div className="row">
                     <div className="col-md-4">
-                      <button
-                        type="button"
+                      <FormikButton
                         className="btn btn-dark"
                         onClick={removeThisPlace}
                       >
                         <DinaMessage id="removeThisPlaceLabel" />
-                      </button>
+                      </FormikButton>
                     </div>
-                    {selectedSearchResult ? (
+                    {(selectedSearchResult ||
+                      values.geographicPlaceNameSourceDetail) && (
                       <div className="col-md-4">
                         <a
-                          href={`https://www.openstreetmap.org/${selectedSearchResult?.osm_type}/${selectedSearchResult?.osm_id}`}
+                          href={`${geographicPlaceSourceUrl}/${
+                            selectedSearchResult
+                              ? selectedSearchResult.osm_type
+                              : values.geographicPlaceNameSourceDetail
+                                  ?.sourceIdType
+                          }/${
+                            selectedSearchResult
+                              ? selectedSearchResult.osm_id
+                              : values.geographicPlaceNameSourceDetail?.sourceID
+                          }`}
                           target="_blank"
                           className="btn btn-info"
                         >
                           <DinaMessage id="viewDetailButtonLabel" />
                         </a>
                       </div>
-                    ) : null}
+                    )}
                   </div>
                 </div>
               </div>
@@ -550,6 +572,11 @@ function CollectingEventForm({
       };
 
   const { save } = useApiClient();
+
+  const [
+    selectedSearchResult,
+    setSelectedSearchResult
+  ] = useState<NominatumApiSearchResult>();
 
   async function saveGeoReferenceAssertion(
     assertionsToSave: GeoReferenceAssertion[],
@@ -675,6 +702,16 @@ function CollectingEventForm({
     const geoReferenceAssertionsToSave = submittedValues.geoReferenceAssertions;
     delete submittedValues.geoReferenceAssertions;
 
+    if (selectedSearchResult) {
+      submittedValues.geographicPlaceNameSourceDetail = {};
+      submittedValues.geographicPlaceNameSourceDetail.sourceID =
+        selectedSearchResult.osm_id;
+      submittedValues.geographicPlaceNameSourceDetail.sourceIdType =
+        selectedSearchResult.osm_type;
+      submittedValues.geographicPlaceNameSourceDetail.sourceUrl = geographicPlaceSourceUrl;
+      submittedValues.geographicPlaceNameSource = GeographicPlaceNameSource.OSM;
+    }
+
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [
         {
@@ -719,7 +756,10 @@ function CollectingEventForm({
           type="collecting-event"
         />
       </ButtonBar>
-      <CollectingEventFormInternal />
+      <CollectingEventFormInternal
+        selectedSearchResult={selectedSearchResult as any}
+        setSelectedSearchResult={setSelectedSearchResult}
+      />
       <div className="form-group">{attachedMetadatasUI}</div>
     </DinaForm>
   );

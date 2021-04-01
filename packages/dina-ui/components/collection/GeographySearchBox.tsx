@@ -150,7 +150,7 @@ export function GeographySearchBox({
             <div className="list-group-item" key={place.osm_id}>
               <style>{`
                 .searchResult {
-                  font-size:12pt; font-family:verdana,sans-serif;
+                  font-size:13pt; font-family:verdana,sans-serif;
                 }     
             `}</style>
               <div className="row">
