@@ -59,7 +59,6 @@ const mockBulkGet = jest.fn(async paths => {
   }
 });
 
-
 // Mock API requests:
 const apiContext: any = {
   apiClient: { get: mockGet },
