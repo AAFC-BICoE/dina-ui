@@ -198,9 +198,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   governmentOfCanada: "Government of Canada",
   group: "Group",
   groupMustBeSelected: "Group must be selected",
-  latitudeValidationError: "Invalid latitude: {latitude}",
-  longitudeValidationError: "Invalid longitude: {longtitude}",
-  latLongAutoSetterButton: "Convert to Decimal Lat/Long",
+  latitudeValidationError: "Invalid latitude: {latitude}, \
+  \nValid latitude range is between 0 to 90 for degree, and 0 to 60 for minute and second",
+  longitudeValidationError: "Invalid longitude: {longtitude}, \
+  \nValid longitude is between 0 to 180 for degree, and 0 to 60 for minute and second",
+  latLongAutoSetterButton: "Convert to Decimal Lat/Long",  
   locationLabel: "Location",
   literalGeoreferencedByLabel: "Georeferenced By",
   managedAttributeEditTitle: "Edit Managed Attribute",
