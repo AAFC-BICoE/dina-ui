@@ -64,7 +64,13 @@ export function FieldWrapper({
   return (
     <div className={className}>
       <div className={`form-group ${name}-field ${horizontal ? "row" : ""}`}>
-        <label className={`${labelCol ? `mt-sm-2 col-sm-${labelCol}` : ""}`}>
+        <label
+          className={[
+            `${labelCol ? `col-sm-${labelCol}` : ""}`,
+            // Adjust alignment for editable inputs:
+            horizontal && !readOnly ? "mt-sm-2" : ""
+          ].join(" ")}
+        >
           {!hideLabel && <strong>{fieldLabel}</strong>}
         </label>
         <div className={valueCol ? `col-sm-${valueCol}` : ""}>

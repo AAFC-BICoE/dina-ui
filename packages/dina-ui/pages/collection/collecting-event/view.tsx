@@ -17,10 +17,10 @@ import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import { GeoReferenceAssertion } from "packages/dina-ui/types/collection-api/resources/GeoReferenceAssertion";
 import { useContext } from "react";
 import { Footer, Head, Nav } from "../../../components";
+import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
-import { CollectingEventFormLayout } from "./edit";
 
 export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
