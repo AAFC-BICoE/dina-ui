@@ -7,7 +7,7 @@ import {
   FormikValues
 } from "formik";
 import { cloneDeep } from "lodash";
-import { PropsWithChildren } from "react";
+import { createContext, PropsWithChildren, useContext } from "react";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
 import { ApiClientI, useApiClient } from "../api-client/ApiClientContext";
 import { ErrorViewer } from "./ErrorViewer";
@@ -17,6 +17,18 @@ export interface DinaFormProps<TValues>
   extends Omit<FormikConfig<TValues>, "onSubmit"> {
   onSubmit?: DinaFormOnSubmit<TValues>;
   values?: TValues;
+  readOnly?: boolean;
+}
+
+/** Values available to form elements. */
+export interface DinaFormContextI {
+  readOnly: boolean;
+  /*
+   * Whether to layout the label and value horizontally (Default vertical).
+   * If a [number, number] is passed then those are the bootstrap grid columns for the label and value.
+   * "true" defaults to [6, 6].
+   */
+  horizontal?: boolean | [number, number];
 }
 
 export type DinaFormOnSubmit<TValues = any> = (
@@ -61,9 +73,11 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
     );
 
   return (
-    <Formik {...props} onSubmit={onSubmitInternal}>
-      {childrenInternal}
-    </Formik>
+    <DinaFormContext.Provider value={{ readOnly: props.readOnly ?? false }}>
+      <Formik {...props} onSubmit={onSubmitInternal}>
+        {childrenInternal}
+      </Formik>
+    </DinaFormContext.Provider>
   );
 }
 
@@ -74,5 +88,32 @@ function FormWrapper({ children }: PropsWithChildren<{}>) {
       <ErrorViewer />
       {children}
     </Form>
+  );
+}
+
+const DinaFormContext = createContext<DinaFormContextI | null>(null);
+
+export function useDinaFormContext() {
+  const ctx = useContext(DinaFormContext);
+  if (!ctx) {
+    throw new Error("No DinaFormContext available.");
+  }
+  return ctx;
+}
+
+/**
+ * Override context values for a section of the form.
+ * e.g. making part of the form layout horizontal or readOnly.
+ */
+export function DinaFormSection({
+  children,
+  ...ctxOverride
+}: PropsWithChildren<Partial<DinaFormContextI>>) {
+  const ctx = useDinaFormContext();
+
+  return (
+    <DinaFormContext.Provider value={{ ...ctx, ...ctxOverride }}>
+      {children}
+    </DinaFormContext.Provider>
   );
 }

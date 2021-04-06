@@ -7,10 +7,30 @@ export interface CheckBoxProps extends LabelWrapperParams {
   disabled?: boolean;
 }
 
+const checkboxProps = {
+  style: {
+    display: "block",
+    height: "20px",
+    margin: "auto",
+    width: "20px"
+  },
+  type: "checkbox"
+};
+
 export function CheckBoxField(props: CheckBoxProps) {
   const { name, onCheckBoxClick, disabled } = props;
   return (
-    <FieldWrapper {...props}>
+    <FieldWrapper
+      {...props}
+      readOnlyRender={value => (
+        <input
+          {...checkboxProps}
+          checked={value || false}
+          value={value || false}
+          disabled={true}
+        />
+      )}
+    >
       <FastField name={name}>
         {({
           field: { value },
@@ -24,15 +44,9 @@ export function CheckBoxField(props: CheckBoxProps) {
 
           return (
             <input
+              {...checkboxProps}
               checked={value || false}
               onChange={onChange}
-              style={{
-                display: "block",
-                height: "20px",
-                margin: "auto",
-                width: "20px"
-              }}
-              type="checkbox"
               value={value || false}
               disabled={disabled}
             />

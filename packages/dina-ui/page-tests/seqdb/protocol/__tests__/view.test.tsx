@@ -52,10 +52,12 @@ describe("Protocol details page", () => {
 
     // The protol's name should be rendered in a FieldView.
     expect(wrapper.find(".name-field-header").exists()).toEqual(true);
-    expect(wrapper.containsMatchingElement(<p>Test Protocol</p>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<div>Test Protocol</div>)).toEqual(
+      true
+    );
     wrapper.debug();
 
     // The protol's kit name should be rendered in a FieldView.
-    expect(wrapper.containsMatchingElement(<p>test kit</p>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<div>test kit</div>)).toEqual(true);
   });
 });

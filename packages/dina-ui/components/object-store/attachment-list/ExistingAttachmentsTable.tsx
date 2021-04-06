@@ -139,7 +139,7 @@ export function ExistingAttachmentsTable({
             className="btn btn-primary ml-2 metadata-bulk-edit-button"
             onClick={editSelectedMetadatas}
           >
-            <DinaMessage id="editSelectedButtonText" />
+            <DinaMessage id="editSelectedAttachmentMetadata" />
           </FormikButton>
           {onDetachMetadataIds && (
             <FormikButton

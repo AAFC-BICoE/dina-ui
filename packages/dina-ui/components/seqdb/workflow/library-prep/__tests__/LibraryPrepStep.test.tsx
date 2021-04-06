@@ -136,7 +136,9 @@ describe("LibraryPrepStepDetails component", () => {
       ]
     ]);
 
-    expect(wrapper.find(".notes-field p").text()).toEqual("new notes");
+    expect(wrapper.find(".notes-field .field-view").text()).toEqual(
+      "new notes"
+    );
 
     // This details state should also show the library prep sub-steps:
     expect(wrapper.contains("Substep 1: Library Prep Details Table")).toEqual(
@@ -151,7 +153,9 @@ describe("LibraryPrepStepDetails component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".notes-field p").text()).toEqual("new notes");
+    expect(wrapper.find(".notes-field .field-view").text()).toEqual(
+      "new notes"
+    );
 
     wrapper.find("button[children='Edit Batch Details']").simulate("click");
     wrapper.update();
