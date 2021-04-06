@@ -56,7 +56,7 @@ export * from "./util/rsql";
 export * from "./util/serialize";
 export * from "./button-bar/BackToListButton";
 export * from "./button-bar/ButtonBar";
-export * from "./button-bar/CancelButton";
+export * from "./button-bar/BackButton";
 export * from "./button-bar/CreateButton";
 export * from "./button-bar/DeleteButton";
 export * from "./button-bar/EditButton";

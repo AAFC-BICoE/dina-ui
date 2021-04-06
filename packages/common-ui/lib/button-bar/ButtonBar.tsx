@@ -5,5 +5,5 @@ interface ButtonBarProps {
 }
 
 export function ButtonBar({ children }: ButtonBarProps) {
-  return <div className="button-bar my-3">{children}</div>;
+  return <div className="button-bar my-3 d-flex">{children}</div>;
 }

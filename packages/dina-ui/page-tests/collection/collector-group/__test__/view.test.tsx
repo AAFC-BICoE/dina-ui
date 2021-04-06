@@ -65,9 +65,9 @@ describe("CollectorGroup details page", () => {
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
-    expect(wrapper.containsMatchingElement(<p>person a</p>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<div>person a</div>)).toEqual(true);
     expect(
-      wrapper.containsMatchingElement(<p> test collector group</p>)
+      wrapper.containsMatchingElement(<div> test collector group</div>)
     ).toEqual(true);
   });
 });
