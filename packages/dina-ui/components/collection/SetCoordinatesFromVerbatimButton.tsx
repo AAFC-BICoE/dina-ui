@@ -32,66 +32,92 @@ export function SetCoordinatesFromVerbatimButton({
   const [error, setError] = useState<string>("");
   const { formatMessage } = useDinaIntl();
 
-  function validateLatLong (latLong: string, setError: any, msgKey: string) {
-    //if there is no degree, minute or second symbles, consider as degree
+  function validateLatLong(latLong: string, setError: any, msgKey: string) {
+    // if there is no degree, minute or second symbles, consider as degree
     let degreeIdx, minuteIdx, secondIdx;
     degreeIdx = latLong.indexOf("°");
     minuteIdx = latLong.indexOf("′");
     secondIdx = latLong.indexOf("″");
 
-    //consider this as degree when non of the symbles are used
-    if(degreeIdx ===-1 && minuteIdx ===-1 && secondIdx === -1){
-      let numberFormattedLatLong = Number(latLong.slice(0).trim());
+    // consider this as degree when non of the symbles are used
+    if (degreeIdx === -1 && minuteIdx === -1 && secondIdx === -1) {
+      const numberFormattedLatLong = Number(latLong.slice(0).trim());
       if (numberFormattedLatLong > 90 || numberFormattedLatLong < 0) {
-        msgKey === "lat" ?
-        setError(formatMessage("latitudeValidationError", {
-          latitude: latLong})) :
-        setError(formatMessage("longitudeValidationError", {
-          longtitude: latLong}));   
-        return true;     
+        msgKey === "lat"
+          ? setError(
+              formatMessage("latitudeValidationError", {
+                latitude: latLong
+              })
+            )
+          : setError(
+              formatMessage("longitudeValidationError", {
+                longtitude: latLong
+              })
+            );
+        return true;
       }
-    }else if(degreeIdx !==-1) {
-      let numberFormattedDegree = Number(latLong.slice(0, degreeIdx));
+    } else if (degreeIdx !== -1) {
+      const numberFormattedDegree = Number(latLong.slice(0, degreeIdx));
       if (numberFormattedDegree > 90 || numberFormattedDegree < 0) {
-        msgKey === "lat" ?
-        setError(formatMessage("latitudeValidationError", {
-          latitude: latLong})) :
-        setError(formatMessage("longitudeValidationError", {
-          longtitude: latLong}));        
-        return true;     
+        msgKey === "lat"
+          ? setError(
+              formatMessage("latitudeValidationError", {
+                latitude: latLong
+              })
+            )
+          : setError(
+              formatMessage("longitudeValidationError", {
+                longtitude: latLong
+              })
+            );
+        return true;
       }
-    }else if(minuteIdx !==-1) {
-      let numberFormattedMin = Number(latLong.slice(degreeIdx===-1? 0:degreeIdx+1, minuteIdx));
+    } else if (minuteIdx !== -1) {
+      const numberFormattedMin = Number(
+        latLong.slice(degreeIdx === -1 ? 0 : degreeIdx + 1, minuteIdx)
+      );
       if (numberFormattedMin > 60 || numberFormattedMin < 0) {
-        msgKey === "lat" ?
-        setError(formatMessage("latitudeValidationError", {
-          latitude: latLong})) :
-        setError(formatMessage("longitudeValidationError", {
-          longtitude: latLong}));        
-        return true;     
+        msgKey === "lat"
+          ? setError(
+              formatMessage("latitudeValidationError", {
+                latitude: latLong
+              })
+            )
+          : setError(
+              formatMessage("longitudeValidationError", {
+                longtitude: latLong
+              })
+            );
+        return true;
       }
-    }else if(secondIdx !==-1) {
-      let numberFormattedSec = Number(latLong.slice(minuteIdx === -1? 0: minuteIdx+1, secondIdx));
+    } else if (secondIdx !== -1) {
+      const numberFormattedSec = Number(
+        latLong.slice(minuteIdx === -1 ? 0 : minuteIdx + 1, secondIdx)
+      );
       if (numberFormattedSec > 60 || numberFormattedSec < 0) {
-        msgKey === "lat" ?
-        setError(formatMessage("latitudeValidationError", {
-          latitude: latLong})) :
-        setError(formatMessage("longitudeValidationError", {
-          longtitude: latLong}));        
-        return true;     
+        msgKey === "lat"
+          ? setError(
+              formatMessage("latitudeValidationError", {
+                latitude: latLong
+              })
+            )
+          : setError(
+              formatMessage("longitudeValidationError", {
+                longtitude: latLong
+              })
+            );
+        return true;
       }
-    } 
+    }
   }
 
   function doConversion(values: any, formik: FormikContextType<any>) {
     try {
-      const latStr = get(values, sourceLatField).replace(/[NnSs]/,"");
+      const latStr = get(values, sourceLatField).replace(/[NnSs]/, "");
       const longStr = get(values, sourceLonField).replace(/[WwEe]/, "");
-      if(validateLatLong (latStr, setError, "lat"))
-        return;
+      if (validateLatLong(latStr, setError, "lat")) return;
 
-      if( validateLatLong (longStr ,setError, "long"))
-        return;           
+      if (validateLatLong(longStr, setError, "long")) return;
 
       const coords = new Coordinates(
         `${get(values, sourceLatField)}, ${get(values, sourceLonField)}`
