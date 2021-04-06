@@ -59,9 +59,6 @@ const mockBulkGet = jest.fn(async paths => {
   }
 });
 
-// Mock out the Link component, which normally fails when used outside of a Next app.
-jest.mock("next/link", () => () => <div />);
-
 // Mock API requests:
 const apiContext: any = {
   apiClient: { get: mockGet },
@@ -110,6 +107,8 @@ describe("CollectingEvent details page", () => {
     );
 
     expect(wrapper.containsMatchingElement(<div>12.5</div>)).toEqual(true);
+
+    expect(wrapper.containsMatchingElement(<a>person a</a>)).toEqual(true);
   });
 });
 
