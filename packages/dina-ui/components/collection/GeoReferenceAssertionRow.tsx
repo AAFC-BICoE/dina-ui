@@ -67,6 +67,7 @@ export function GeoReferenceAssertionRow({
                 name={`geoReferenceAssertions[${index}].georeferencedBy`}
                 className={"georeferencedBy"}
                 label={formatMessage("georeferencedByLabel")}
+                arrayItemLink="/person/view?id="
               />
               <FieldView
                 name={`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`}
