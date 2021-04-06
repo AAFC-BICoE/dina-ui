@@ -22,7 +22,7 @@ export function EditButton({
 }: EditButtonProps) {
   return (
     <Link href={`/${entityLink}/edit?id=${entityId}`}>
-      <a className={`btn btn-primary ${className}`}>
+      <a className={`btn btn-primary ${className}`} style={{ width: "10rem" }}>
         <CommonMessage id="editButtonText" />
       </a>
     </Link>

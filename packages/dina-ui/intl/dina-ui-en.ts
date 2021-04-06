@@ -61,6 +61,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editOrganizationAliasesLabel: "Aliases (Comma-separated)",
   editPersonTitle: "Edit Person",
   editSelectedButtonText: "Edit Selected",
+  editSelectedAttachmentMetadata: "Edit Selected Attachment Metadata",
   enableDateRangeLabel: "Enable Date Range",
   endEventDateTimeLabel: "End Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   exifProperties: "Exif Properties",
