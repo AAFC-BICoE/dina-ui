@@ -9,6 +9,7 @@ import { useFormikContext } from "formik";
 import { get, uniq } from "lodash";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
+import { GroupLabel } from "./GroupFieldView";
 import { useStoredDefaultGroup } from "./useStoredDefaultGroup";
 
 interface GroupSelectFieldProps extends Omit<SelectFieldProps, "options"> {
@@ -87,6 +88,9 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
       // Re-initialize the component if the labels change:
       key={groupSelectOptions.map(option => option.label).join()}
       {...selectFieldProps}
+      readOnlyRender={groupName =>
+        groupName ? <GroupLabel groupName={groupName} /> : null
+      }
       onChange={(newValue: string | null | undefined) => {
         setStoredDefaultGroupIfEnabled(newValue);
         selectFieldProps.onChange?.(newValue);

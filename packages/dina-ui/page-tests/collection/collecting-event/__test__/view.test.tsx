@@ -59,9 +59,6 @@ const mockBulkGet = jest.fn(async paths => {
   }
 });
 
-// Mock out the Link component, which normally fails when used outside of a Next app.
-jest.mock("next/link", () => () => <div />);
-
 // Mock API requests:
 const apiContext: any = {
   apiClient: { get: mockGet },
@@ -91,25 +88,27 @@ describe("CollectingEvent details page", () => {
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
     // The collecting-event's start, end and verbatim time should be rendered in a FieldView.
-    expect(wrapper.containsMatchingElement(<p>2019_01_01_10_10_10</p>)).toEqual(
-      true
-    );
-    expect(wrapper.containsMatchingElement(<p>2019_01_06_10_10_10</p>)).toEqual(
-      true
-    );
+    expect(
+      wrapper.containsMatchingElement(<div>2019_01_01_10_10_10</div>)
+    ).toEqual(true);
+    expect(
+      wrapper.containsMatchingElement(<div>2019_01_06_10_10_10</div>)
+    ).toEqual(true);
 
     // The collecting-event's verbatim datetime should be rendered in a FieldView.
     expect(
       wrapper.containsMatchingElement(
-        <p>From 2019, 1,1,10,10,10 to 2019, 1.6, 10,10,10</p>
+        <div>From 2019, 1,1,10,10,10 to 2019, 1.6, 10,10,10</div>
       )
     ).toEqual(true);
 
-    expect(wrapper.containsMatchingElement(<p>12, 13, 14</p>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<div>12, 13, 14</div>)).toEqual(
+      true
+    );
 
-    expect(wrapper.containsMatchingElement(<p>12.5</p>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<div>12.5</div>)).toEqual(true);
 
-    expect(wrapper.containsMatchingElement(<p>person a</p>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<a>person a</a>)).toEqual(true);
   });
 });
 

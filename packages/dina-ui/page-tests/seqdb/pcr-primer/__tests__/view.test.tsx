@@ -51,6 +51,8 @@ describe("PcrPrimer details page", () => {
 
     // The primer's name should be rendered in a FieldView.
     expect(wrapper.find(".name-field-header").exists()).toEqual(true);
-    expect(wrapper.containsMatchingElement(<p>Test Primer</p>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<div>Test Primer</div>)).toEqual(
+      true
+    );
   });
 });

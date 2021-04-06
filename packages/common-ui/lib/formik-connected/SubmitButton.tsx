@@ -17,12 +17,15 @@ interface SubmitButtonProps {
  */
 export const SubmitButton = connect<SubmitButtonProps>(
   function SubmitButtonInternal({ buttonProps, children, className, formik }) {
+    const buttonPropsObj = buttonProps?.(formik) ?? {};
+
     return formik.isSubmitting ? (
       <LoadingSpinner loading={formik.isSubmitting} />
     ) : (
       <button
-        {...buttonProps?.(formik)}
-        className={className ? className : "btn btn-primary"}
+        {...buttonPropsObj}
+        className={`btn btn-primary ${className}`}
+        style={{ ...buttonPropsObj.style, width: "10rem" }}
         type="submit"
       >
         {children || <CommonMessage id="submitBtnText" />}
