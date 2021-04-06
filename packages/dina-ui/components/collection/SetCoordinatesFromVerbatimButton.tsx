@@ -90,9 +90,12 @@ export function SetCoordinatesFromVerbatimButton({
         numberFormattedMin = Number(
           latLong.slice(degreeIdx === -1 ? 0 : degreeIdx + 1, minuteIdx)
         );
-        if (numberFormattedMin > 60 || numberFormattedMin < 0 ||
-          (msgKey === "lat" && numberFormattedDegree === 90) || 
-          (msgKey === "long" && numberFormattedDegree === 180)) {
+        if (
+          numberFormattedMin > 60 ||
+          numberFormattedMin < 0 ||
+          (msgKey === "lat" && numberFormattedDegree === 90) ||
+          (msgKey === "long" && numberFormattedDegree === 180)
+        ) {
           msgKey === "lat"
             ? setError(
                 formatMessage("latitudeValidationError", {
@@ -119,8 +122,11 @@ export function SetCoordinatesFromVerbatimButton({
             secondIdx
           )
         );
-        if (numberFormattedSec > 60 || numberFormattedSec < 0 ||
-           numberFormattedMin === 60 ) {
+        if (
+          numberFormattedSec > 60 ||
+          numberFormattedSec < 0 ||
+          numberFormattedMin === 60
+        ) {
           msgKey === "lat"
             ? setError(
                 formatMessage("latitudeValidationError", {
