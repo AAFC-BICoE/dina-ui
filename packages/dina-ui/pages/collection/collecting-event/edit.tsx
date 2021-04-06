@@ -362,7 +362,7 @@ export function CollectingEventFormLayout() {
           </div>
         </fieldset>
         <div className="row">
-          <div className="col-md-6">
+          <div className="col-lg-6">
             <fieldset className="form-group border px-4 py-2">
               <legend className="w-auto">
                 <DinaMessage id="geoReferencingLegend" />
@@ -471,7 +471,7 @@ export function CollectingEventFormLayout() {
               </FieldArray>
             </fieldset>
           </div>
-          <div className="col-md-6">
+          <div className="col-lg-6">
             <fieldset className="form-group border px-4 py-2">
               <legend className="w-auto">
                 <DinaMessage id="toponymyLegend" />

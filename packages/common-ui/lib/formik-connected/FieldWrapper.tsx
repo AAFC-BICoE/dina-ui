@@ -64,7 +64,7 @@ export function FieldWrapper({
   return (
     <div className={className}>
       <div className={`form-group ${name}-field ${horizontal ? "row" : ""}`}>
-        <label className={labelCol ? `col-sm-${labelCol}` : ""}>
+        <label className={`${labelCol ? `mt-sm-2 col-sm-${labelCol}` : ""}`}>
           {!hideLabel && <strong>{fieldLabel}</strong>}
         </label>
         <div className={valueCol ? `col-sm-${valueCol}` : ""}>
