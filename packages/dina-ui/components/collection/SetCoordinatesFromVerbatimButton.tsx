@@ -32,9 +32,11 @@ export function SetCoordinatesFromVerbatimButton({
   const [error, setError] = useState<string>("");
   const { formatMessage } = useDinaIntl();
 
-  function validateLatLong(latLong: string, setError: any, msgKey: string) {
+  function validateLatLong(latLong: string, msgKey: string) {
     // if there is no degree, minute or second symbles, consider as degree
-    let degreeIdx, minuteIdx, secondIdx;
+    let degreeIdx;
+    let minuteIdx;
+    let secondIdx;
     degreeIdx = latLong.indexOf("°");
     minuteIdx = latLong.indexOf("′");
     secondIdx = latLong.indexOf("″");
@@ -58,18 +60,25 @@ export function SetCoordinatesFromVerbatimButton({
       }
     } else if (degreeIdx !== -1) {
       const numberFormattedDegree = Number(latLong.slice(0, degreeIdx));
-      if (numberFormattedDegree > 90 || numberFormattedDegree < 0) {
-        msgKey === "lat"
-          ? setError(
-              formatMessage("latitudeValidationError", {
-                latitude: latLong
-              })
-            )
-          : setError(
-              formatMessage("longitudeValidationError", {
-                longtitude: latLong
-              })
-            );
+      if (
+        msgKey === "lat" &&
+        (numberFormattedDegree > 90 || numberFormattedDegree < 0)
+      ) {
+        setError(
+          formatMessage("latitudeValidationError", {
+            latitude: latLong
+          })
+        );
+        return true;
+      } else if (
+        msgKey === "long" &&
+        (numberFormattedDegree > 180 || numberFormattedDegree < 0)
+      ) {
+        setError(
+          formatMessage("longitudeValidationError", {
+            longtitude: latLong
+          })
+        );
         return true;
       }
     } else if (minuteIdx !== -1) {
@@ -115,9 +124,9 @@ export function SetCoordinatesFromVerbatimButton({
     try {
       const latStr = get(values, sourceLatField).replace(/[NnSs]/, "");
       const longStr = get(values, sourceLonField).replace(/[WwEe]/, "");
-      if (validateLatLong(latStr, setError, "lat")) return;
+      if (validateLatLong(latStr, "lat")) return;
 
-      if (validateLatLong(longStr, setError, "long")) return;
+      if (validateLatLong(longStr, "long")) return;
 
       const coords = new Coordinates(
         `${get(values, sourceLatField)}, ${get(values, sourceLonField)}`
