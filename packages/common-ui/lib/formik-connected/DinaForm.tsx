@@ -23,6 +23,12 @@ export interface DinaFormProps<TValues>
 /** Values available to form elements. */
 export interface DinaFormContextI {
   readOnly: boolean;
+  /*
+   * Whether to layout the label and value horizontally (Default vertical).
+   * If a [number, number] is passed then those are the bootstrap grid columns for the label and value.
+   * "true" defaults to [6, 6].
+   */
+  horizontal?: boolean | [number, number];
 }
 
 export type DinaFormOnSubmit<TValues = any> = (
@@ -93,4 +99,21 @@ export function useDinaFormContext() {
     throw new Error("No DinaFormContext available.");
   }
   return ctx;
+}
+
+/**
+ * Override context values for a section of the form.
+ * e.g. making part of the form layout horizontal or readOnly.
+ */
+export function DinaFormSection({
+  children,
+  ...ctxOverride
+}: PropsWithChildren<Partial<DinaFormContextI>>) {
+  const ctx = useDinaFormContext();
+
+  return (
+    <DinaFormContext.Provider value={{ ...ctx, ...ctxOverride }}>
+      {children}
+    </DinaFormContext.Provider>
+  );
 }

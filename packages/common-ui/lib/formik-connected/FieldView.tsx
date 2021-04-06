@@ -20,7 +20,10 @@ export function ReadOnlyValue({
   arrayItemLink
 }: ReadOnlyValueProps) {
   return (
-    <div className="field-view" style={{ minHeight: "25px" }}>
+    <div
+      className="field-view"
+      style={{ minHeight: "25px", whiteSpace: "pre-wrap" }}
+    >
       {link ? (
         <Link href={link}>
           <a>{value}</a>

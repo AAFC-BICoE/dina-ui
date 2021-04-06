@@ -52,21 +52,22 @@ export function FieldWrapper({
   link,
   readOnlyRender
 }: FieldWrapperProps) {
-  const { readOnly } = useDinaFormContext();
+  const { horizontal, readOnly } = useDinaFormContext();
 
   const fieldLabel = label ?? (
     <FieldHeader name={name} customName={customName} />
   );
 
+  const [labelCol, valueCol] =
+    typeof horizontal === "boolean" ? [6, 6] : horizontal || [];
+
   return (
     <div className={className}>
-      <div className={`form-group ${name}-field`}>
-        <label className="w-100">
-          {!hideLabel && (
-            <div>
-              <strong>{fieldLabel}</strong>
-            </div>
-          )}
+      <div className={`form-group ${name}-field ${horizontal ? "row" : ""}`}>
+        <label className={labelCol ? `col-sm-${labelCol}` : ""}>
+          {!hideLabel && <strong>{fieldLabel}</strong>}
+        </label>
+        <div className={valueCol ? `col-sm-${valueCol}` : ""}>
           {readOnly || !children ? (
             <FastField name={name}>
               {({ field: { value } }) =>
@@ -82,7 +83,7 @@ export function FieldWrapper({
           ) : (
             children
           )}
-        </label>
+        </div>
       </div>
     </div>
   );

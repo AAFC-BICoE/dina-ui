@@ -7,6 +7,7 @@ import {
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
+  DinaFormSection,
   filterBy,
   FormattedTextField,
   FormikButton,
@@ -252,11 +253,16 @@ export function CollectingEventFormLayout() {
 
   return (
     <div>
-      <div className="form-group">
-        <div style={{ width: "300px" }}>
-          <GroupSelectField name="group" enableStoredDefaultGroup={true} />
+      <DinaFormSection horizontal={[3, 9]}>
+        <div className="row">
+          <div className="col-md-6">
+            <GroupSelectField name="group" enableStoredDefaultGroup={true} />
+          </div>
+          <div className="col-md-6">
+            <TextField name="dwcOtherRecordNumbers" multiLines={true} />
+          </div>
         </div>
-      </div>
+      </DinaFormSection>
       <div className="row">
         <div className="col-md-6">
           <fieldset className="form-group border px-4 py-2">
@@ -329,7 +335,6 @@ export function CollectingEventFormLayout() {
               ]}
             />
             <TextField name="dwcRecordNumber" />
-            <TextField name="dwcOtherRecordNumbers" multiLines={true} />
           </fieldset>
         </div>
       </div>
