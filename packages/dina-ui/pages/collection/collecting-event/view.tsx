@@ -2,6 +2,7 @@ import {
   ApiClientContext,
   BackButton,
   ButtonBar,
+  DeleteButton,
   DinaForm,
   EditButton,
   useQuery,
@@ -100,26 +101,38 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
     { onSuccess: initOneToManyRelations }
   );
 
+  const buttonBar = (
+    <ButtonBar>
+      <BackButton
+        entityId={id as string}
+        entityLink="/collection/collecting-event"
+        byPassView={true}
+      />
+      <EditButton
+        className="ml-auto"
+        entityId={id as string}
+        entityLink="collection/collecting-event"
+      />
+      <Link href={`/collection/collecting-event/revisions?id=${id}`}>
+        <a className="btn btn-info">
+          <DinaMessage id="revisionsButtonText" />
+        </a>
+      </Link>
+      <DeleteButton
+        className="ml-5"
+        id={id as string}
+        options={{ apiBaseUrl: "/collection-api" }}
+        postDeleteRedirect="/collection/collecting-event/list"
+        type="collecting-event"
+      />
+    </ButtonBar>
+  );
+
   return (
     <div>
       <Head title={formatMessage("collectingEventViewTitle")} />
       <Nav />
-      <ButtonBar>
-        <EditButton
-          entityId={id as string}
-          entityLink="collection/collecting-event"
-        />
-        <Link href={`/collection/collecting-event/revisions?id=${id}`}>
-          <a className="btn btn-info">
-            <DinaMessage id="revisionsButtonText" />
-          </a>
-        </Link>
-        <BackButton
-          entityId={id as string}
-          entityLink="/collection/collecting-event"
-          byPassView={true}
-        />
-      </ButtonBar>
+      {buttonBar}
       {withResponse(collectingEventQuery, ({ data: colEvent }) => (
         <main className="container-fluid">
           <h1>
@@ -138,6 +151,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
           </div>
         </main>
       ))}
+      {buttonBar}
       <Footer />
     </div>
   );

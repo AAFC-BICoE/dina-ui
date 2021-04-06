@@ -735,29 +735,26 @@ function CollectingEventForm({
     );
   };
 
+  const buttonBar = (
+    <ButtonBar>
+      <BackButton
+        entityId={id as string}
+        entityLink="/collection/collecting-event"
+      />
+      <SubmitButton className="ml-auto" />
+    </ButtonBar>
+  );
+
   return (
     <DinaForm
       initialValues={initialValues}
       onSubmit={onSubmit}
       enableReinitialize={true}
     >
-      <ButtonBar>
-        <SubmitButton />
-        <BackButton
-          entityId={id as string}
-          entityLink="/collection/collecting-event"
-          byPassView={true}
-        />
-        <DeleteButton
-          className="ml-5"
-          id={id as string}
-          options={{ apiBaseUrl: "/collection-api" }}
-          postDeleteRedirect="/collection/collecting-event/list"
-          type="collecting-event"
-        />
-      </ButtonBar>
+      {buttonBar}
       <CollectingEventFormLayout />
       <div className="form-group">{attachedMetadatasUI}</div>
+      {buttonBar}
     </DinaForm>
   );
 }
