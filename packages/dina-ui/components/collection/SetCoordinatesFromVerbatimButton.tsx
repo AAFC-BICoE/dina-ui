@@ -58,64 +58,82 @@ export function SetCoordinatesFromVerbatimButton({
             );
         return true;
       }
-    } else if (degreeIdx !== -1) {
-      const numberFormattedDegree = Number(latLong.slice(0, degreeIdx));
-      if (
-        msgKey === "lat" &&
-        (numberFormattedDegree > 90 || numberFormattedDegree < 0)
-      ) {
-        setError(
-          formatMessage("latitudeValidationError", {
-            latitude: latLong
-          })
-        );
-        return true;
-      } else if (
-        msgKey === "long" &&
-        (numberFormattedDegree > 180 || numberFormattedDegree < 0)
-      ) {
-        setError(
-          formatMessage("longitudeValidationError", {
-            longtitude: latLong
-          })
-        );
-        return true;
+    } else {
+      let numberFormattedDegree;
+      let numberFormattedMin;
+      if (degreeIdx !== -1) {
+        numberFormattedDegree = Number(latLong.slice(0, degreeIdx));
+        if (
+          msgKey === "lat" &&
+          (numberFormattedDegree > 90 || numberFormattedDegree < 0)
+        ) {
+          setError(
+            formatMessage("latitudeValidationError", {
+              latitude: latLong
+            })
+          );
+          return true;
+        } else if (
+          msgKey === "long" &&
+          (numberFormattedDegree > 180 || numberFormattedDegree < 0)
+        ) {
+          setError(
+            formatMessage("longitudeValidationError", {
+              longtitude: latLong
+            })
+          );
+          return true;
+        }
       }
-    } else if (minuteIdx !== -1) {
-      const numberFormattedMin = Number(
-        latLong.slice(degreeIdx === -1 ? 0 : degreeIdx + 1, minuteIdx)
-      );
-      if (numberFormattedMin > 60 || numberFormattedMin < 0) {
-        msgKey === "lat"
-          ? setError(
-              formatMessage("latitudeValidationError", {
-                latitude: latLong
-              })
-            )
-          : setError(
-              formatMessage("longitudeValidationError", {
-                longtitude: latLong
-              })
-            );
-        return true;
+
+      if (minuteIdx !== -1) {
+        numberFormattedMin = Number(
+          latLong.slice(degreeIdx === -1 ? 0 : degreeIdx + 1, minuteIdx)
+        );
+        if (numberFormattedMin > 60 || numberFormattedMin < 0 ||
+          (msgKey === "lat" && numberFormattedDegree === 90) || 
+          (msgKey === "long" && numberFormattedDegree === 180)) {
+          msgKey === "lat"
+            ? setError(
+                formatMessage("latitudeValidationError", {
+                  latitude: latLong
+                })
+              )
+            : setError(
+                formatMessage("longitudeValidationError", {
+                  longtitude: latLong
+                })
+              );
+          return true;
+        }
       }
-    } else if (secondIdx !== -1) {
-      const numberFormattedSec = Number(
-        latLong.slice(minuteIdx === -1 ? 0 : minuteIdx + 1, secondIdx)
-      );
-      if (numberFormattedSec > 60 || numberFormattedSec < 0) {
-        msgKey === "lat"
-          ? setError(
-              formatMessage("latitudeValidationError", {
-                latitude: latLong
-              })
-            )
-          : setError(
-              formatMessage("longitudeValidationError", {
-                longtitude: latLong
-              })
-            );
-        return true;
+
+      if (secondIdx !== -1) {
+        const numberFormattedSec = Number(
+          latLong.slice(
+            minuteIdx === -1
+              ? degreeIdx === -1
+                ? 0
+                : degreeIdx + 1
+              : minuteIdx + 1,
+            secondIdx
+          )
+        );
+        if (numberFormattedSec > 60 || numberFormattedSec < 0 ||
+           numberFormattedMin === 60 ) {
+          msgKey === "lat"
+            ? setError(
+                formatMessage("latitudeValidationError", {
+                  latitude: latLong
+                })
+              )
+            : setError(
+                formatMessage("longitudeValidationError", {
+                  longtitude: latLong
+                })
+              );
+          return true;
+        }
       }
     }
   }
