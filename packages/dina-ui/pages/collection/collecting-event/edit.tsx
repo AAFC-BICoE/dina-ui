@@ -4,7 +4,6 @@ import {
   BackButton,
   ButtonBar,
   CheckBoxField,
-  DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
   DinaFormSection,
@@ -251,6 +250,15 @@ export function CollectingEventFormLayout() {
     }
   }
 
+  /** Does a Places search using the given search string. */
+  function doGeoSearch(query: string) {
+    setGeoSearchValue(query);
+    // Do the geo-search automatically:
+    setImmediate(() =>
+      document?.querySelector<HTMLElement>(".geo-search-button")?.click()
+    );
+  }
+
   return (
     <div>
       <DinaFormSection horizontal={[3, 9]}>
@@ -351,6 +359,19 @@ export function CollectingEventFormLayout() {
             <div className="col-md-6">
               <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLatitude" />
               <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLongitude" />
+              <div className="form-group">
+                <SetCoordinatesFromVerbatimButton
+                  sourceLatField="dwcVerbatimLatitude"
+                  sourceLonField="dwcVerbatimLongitude"
+                  targetLatField={`geoReferenceAssertions[${activeTabIdx}].dwcDecimalLatitude`}
+                  targetLonField={`geoReferenceAssertions[${activeTabIdx}].dwcDecimalLongitude`}
+                  onClick={({ lat, lon }) =>
+                    setGeoSearchValue(`${lat}, ${lon}`)
+                  }
+                >
+                  <DinaMessage id="latLongAutoSetterButton" />
+                </SetCoordinatesFromVerbatimButton>
+              </div>
             </div>
             <div className="col-md-6">
               <TextField name="dwcVerbatimCoordinates" />
@@ -407,13 +428,11 @@ export function CollectingEventFormLayout() {
                         onSelect={setActiveTabIdx}
                       >
                         <TabList>
-                          {assertions.length
-                            ? assertions.map((assertion, index) => (
-                                <Tab key={assertion.id}>
-                                  <span className="m-3">{index + 1}</span>
-                                </Tab>
-                              ))
-                            : null}
+                          {assertions.map((assertion, index) => (
+                            <Tab key={assertion.id}>
+                              <span className="m-3">{index + 1}</span>
+                            </Tab>
+                          ))}
                         </TabList>
                         {assertions.length
                           ? assertions.map((assertion, index) => (
@@ -425,7 +444,7 @@ export function CollectingEventFormLayout() {
                                       sourceLonField="dwcVerbatimLongitude"
                                       targetLatField={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
                                       targetLonField={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
-                                      onSetCoords={({ lat, lon }) =>
+                                      onClick={({ lat, lon }) =>
                                         setGeoSearchValue(`${lat}, ${lon}`)
                                       }
                                     >
@@ -438,12 +457,12 @@ export function CollectingEventFormLayout() {
                                   openAddPersonModal={openAddPersonModal}
                                 />
                                 {!readOnly && (
-                                  <div className="list-inline">
+                                  <div className="list-inline mb-3">
                                     <FormikButton
                                       className="list-inline-item btn btn-primary add-assertion-button"
                                       onClick={addGeoReference}
                                     >
-                                      <DinaMessage id="addAssertion" />
+                                      <DinaMessage id="addAnotherAssertion" />
                                     </FormikButton>
                                     <FormikButton
                                       className="list-inline-item btn btn-dark"
@@ -457,14 +476,14 @@ export function CollectingEventFormLayout() {
                             ))
                           : null}
                       </Tabs>
-                      {!assertions.length && !readOnly ? (
+                      {!assertions.length && !readOnly && (
                         <FormikButton
                           className="btn btn-primary add-assertion-button"
                           onClick={addGeoReference}
                         >
                           <DinaMessage id="addAssertion" />
                         </FormikButton>
-                      ) : null}
+                      )}
                     </div>
                   );
                 }}
@@ -520,23 +539,28 @@ export function CollectingEventFormLayout() {
                         onInputChange={setGeoSearchValue}
                         onSelectSearchResult={selectSearchResult}
                         renderUnderSearchBar={
-                          <div className="form-group">
-                            <DinaMessage id="search" />:{" "}
+                          <div className="form-group d-flex flex-row align-items-center">
+                            <div className="pr-3">
+                              <DinaMessage id="search" />:
+                            </div>
                             <FormikButton
                               className="btn btn-link"
-                              onClick={state => {
-                                setGeoSearchValue(
+                              onClick={state =>
+                                doGeoSearch(state.dwcVerbatimLocality)
+                              }
+                              buttonProps={({ values: state }) => ({
+                                disabled: !state.dwcVerbatimLocality
+                              })}
+                            >
+                              <DinaMessage id="field_dwcVerbatimLocality" />
+                            </FormikButton>
+                            <FormikButton
+                              className="btn btn-link"
+                              onClick={state =>
+                                doGeoSearch(
                                   `${state.dwcVerbatimLatitude}, ${state.dwcVerbatimLongitude}`
-                                );
-                                // Do the geo-search automatically:
-                                setImmediate(() =>
-                                  document
-                                    ?.querySelector<HTMLElement>(
-                                      ".geo-search-button"
-                                    )
-                                    ?.click()
-                                );
-                              }}
+                                )
+                              }
                               buttonProps={({ values: state }) => ({
                                 disabled:
                                   !state.dwcVerbatimLatitude ||
@@ -544,6 +568,25 @@ export function CollectingEventFormLayout() {
                               })}
                             >
                               <DinaMessage id="verbatimLatLong" />
+                            </FormikButton>
+                            <FormikButton
+                              className="btn btn-link"
+                              onClick={state => {
+                                const assertion =
+                                  state.geoReferenceAssertions?.[activeTabIdx];
+                                const lat = assertion?.dwcDecimalLatitude;
+                                const lon = assertion?.dwcDecimalLongitude;
+                                doGeoSearch(`${lat}, ${lon}`);
+                              }}
+                              buttonProps={({ values: state }) => {
+                                const assertion =
+                                  state.geoReferenceAssertions?.[activeTabIdx];
+                                const lat = assertion?.dwcDecimalLatitude;
+                                const lon = assertion?.dwcDecimalLongitude;
+                                return { disabled: !lat || !lon };
+                              }}
+                            >
+                              <DinaMessage id="decimalLatLong" />
                             </FormikButton>
                           </div>
                         }
@@ -583,7 +626,7 @@ function CollectingEventForm({
         collectors: [],
         collectorGroups: [],
         startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
-        geoReferenceAssertions: []
+        geoReferenceAssertions: [{}]
       };
 
   const { save } = useApiClient();
