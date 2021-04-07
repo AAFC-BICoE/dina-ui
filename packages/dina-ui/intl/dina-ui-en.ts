@@ -26,6 +26,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   attachExistingObjects: "Attach Existing Objects",
   attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
+  cataloguedObjectListTitle: "Catalogued Objects",
   changedProperties: "Changes",
   closePreviewButtonText: "Close Preview",
   collectionSectionTitle: "Collections",
