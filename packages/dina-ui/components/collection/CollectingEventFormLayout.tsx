@@ -278,6 +278,8 @@ export function CollectingEventFormLayout() {
                                 <GeoReferenceAssertionRow
                                   index={index}
                                   openAddPersonModal={openAddPersonModal}
+                                  setFieldValue={setFieldValue}
+                                  values={values}
                                 />
                                 {!readOnly && (
                                   <div className="list-inline mb-3">

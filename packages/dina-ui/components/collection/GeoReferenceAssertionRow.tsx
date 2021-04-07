@@ -20,31 +20,39 @@ export interface GeoReferenceAssertionRowProps {
   index: number;
   viewOnly?: boolean;
   openAddPersonModal?: () => Promise<PersistedResource<Person> | undefined>;
+  setFieldValue?: (
+    field: string,
+    value: any,
+    shouldValidate?: boolean | undefined
+  ) => void;
+  values?: CollectingEvent;
 }
 
 export function GeoReferenceAssertionRow({
   index,
   viewOnly,
-  openAddPersonModal
+  openAddPersonModal,
+  setFieldValue,
+  values
 }: GeoReferenceAssertionRowProps) {
   const { formatMessage } = useDinaIntl();
-  const { setFieldValue, values } = useFormikContext<CollectingEvent>();
   const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
     values?.geoReferenceAssertions?.[index]
       .dwcGeoreferenceVerificationStatus ===
       GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
   );
+
   function onGeoReferencingImpossibleCheckBoxClick(e) {
     // On checked, set 3 fields editable, rest readonly; unchecked, all fields editable
     const name = `geoReferenceAssertions[${index}].dwcGeoreferenceVerificationStatus`;
     if (e.target.checked === true) {
-      setFieldValue(
+      setFieldValue?.(
         name,
         GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
       );
       setGeoreferenceDisabled(true);
     } else {
-      setFieldValue(name, null);
+      setFieldValue?.(name, null);
       setGeoreferenceDisabled(false);
     }
   }
@@ -113,6 +121,7 @@ export function GeoReferenceAssertionRow({
               getResource: openAddPersonModal as any
             }
           ]}
+          isDisabled={georeferenceDisabled}
         />
         <TextField
           name={`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`}
