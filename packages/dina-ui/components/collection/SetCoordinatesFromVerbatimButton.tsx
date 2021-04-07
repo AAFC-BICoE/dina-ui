@@ -1,4 +1,4 @@
-import { FormikButton } from "common-ui";
+import { FormikButton, useDinaFormContext } from "common-ui";
 import Coordinates from "coordinate-parser";
 import { FormikContextType } from "formik";
 import { get } from "lodash";
@@ -28,6 +28,7 @@ export function SetCoordinatesFromVerbatimButton({
   className = "btn btn-info",
   children
 }: SetCoordinatesFromVerbatimButtonProps) {
+  const { readOnly } = useDinaFormContext();
   const [error, setError] = useState<string>("");
 
   function doConversion(values: any, formik: FormikContextType<any>) {
@@ -54,15 +55,18 @@ export function SetCoordinatesFromVerbatimButton({
   }
 
   return (
-    <FormikButton
-      onClick={doConversion}
-      className={className}
-      buttonProps={({ values }) => ({
-        disabled: !get(values, sourceLatField) || !get(values, sourceLonField)
-      })}
-    >
-      {error && <div className="alert alert-danger">{error}</div>}
-      {children}
-    </FormikButton>
+    // Don't render in read-only mode.
+    !readOnly && (
+      <FormikButton
+        onClick={doConversion}
+        className={className}
+        buttonProps={({ values }) => ({
+          disabled: !get(values, sourceLatField) || !get(values, sourceLonField)
+        })}
+      >
+        {error && <div className="alert alert-danger">{error}</div>}
+        {children}
+      </FormikButton>
+    )
   );
 }
