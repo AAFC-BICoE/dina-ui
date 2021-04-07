@@ -7,11 +7,11 @@ import {
   TextField,
   CheckBoxField
 } from "common-ui";
-import { connect, useFormikContext } from "formik";
+import { connect } from "formik";
 import { PersistedResource } from "kitsu";
 import { get } from "lodash";
-import { CollectingEvent } from "packages/dina-ui/types/collection-api/resources/CollectingEvent";
-import { GeoreferenceVerificationStatus } from "packages/dina-ui/types/collection-api/resources/GeoReferenceAssertion";
+import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
+import { GeoreferenceVerificationStatus } from "../../types/collection-api/resources/GeoReferenceAssertion";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
 import { useState } from "react";

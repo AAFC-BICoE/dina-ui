@@ -1,6 +1,5 @@
 import {
   AutoSuggestTextField,
-  CheckBoxField,
   DinaFormSection,
   filterBy,
   FormattedTextField,
