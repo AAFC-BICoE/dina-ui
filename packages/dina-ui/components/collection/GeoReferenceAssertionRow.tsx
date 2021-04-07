@@ -4,13 +4,17 @@ import {
   filterBy,
   NumberField,
   ResourceSelectField,
-  TextField
+  TextField,
+  CheckBoxField
 } from "common-ui";
-import { connect } from "formik";
+import { connect, useFormikContext } from "formik";
 import { PersistedResource } from "kitsu";
 import { get } from "lodash";
+import { CollectingEvent } from "packages/dina-ui/types/collection-api/resources/CollectingEvent";
+import { GeoreferenceVerificationStatus } from "packages/dina-ui/types/collection-api/resources/GeoReferenceAssertion";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
+import { useState } from "react";
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
@@ -24,23 +28,51 @@ export function GeoReferenceAssertionRow({
   openAddPersonModal
 }: GeoReferenceAssertionRowProps) {
   const { formatMessage } = useDinaIntl();
+  const { setFieldValue, values } = useFormikContext<CollectingEvent>();
+  const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
+    values?.geoReferenceAssertions?.[index]
+      .dwcGeoreferenceVerificationStatus ===
+      GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
+  );
+  function onGeoReferencingImpossibleCheckBoxClick(e) {
+    // On checked, set 3 fields editable, rest readonly; unchecked, all fields editable
+    const name = `geoReferenceAssertions[${index}].dwcGeoreferenceVerificationStatus`;
+    if (e.target.checked === true) {
+      setFieldValue(
+        name,
+        GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
+      );
+      setGeoreferenceDisabled(true);
+    } else {
+      setFieldValue(name, null);
+      setGeoreferenceDisabled(false);
+    }
+  }
+
   return (
     <div>
       <DinaFormSection horizontal={true}>
         {viewOnly && (
           <ViewInMapButton assertionPath={`geoReferenceAssertions.${index}`} />
         )}
+        <CheckBoxField
+          name={`geoReferenceAssertions[${index}].dwcGeoreferenceVerificationStatus`}
+          onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
+          disabled={viewOnly}
+          customName="dwcGeoreferenceVerificationStatus"
+        />
         <NumberField
           name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
           label={formatMessage("decimalLatitude")}
           className={"dwcDecimalLatitude"}
           // Can be null or a valid latitude number:
           isAllowed={({ floatValue: val }) => isValidLatitudeOrBlank(val)}
+          readOnly={viewOnly ?? georeferenceDisabled}
         />
         <NumberField
           name={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
           label={formatMessage("decimalLongitude")}
-          readOnly={viewOnly}
+          readOnly={viewOnly ?? georeferenceDisabled}
           className={"dwcDecimalLongitude"}
           // Can be null or a valid longitude number:
           isAllowed={({ floatValue: val }) => isValidLongitudeOrBlank(val)}
@@ -48,7 +80,7 @@ export function GeoReferenceAssertionRow({
         <NumberField
           name={`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`}
           label={formatMessage("coordinateUncertaintyInMeters")}
-          readOnly={viewOnly}
+          readOnly={georeferenceDisabled}
           className={"dwcCoordinateUncertaintyInMeters"}
         />
         <DateField
@@ -60,6 +92,7 @@ export function GeoReferenceAssertionRow({
           name={`geoReferenceAssertions[${index}].dwcGeodeticDatum`}
           className={"dwcGeodeticDatum"}
           customName="dwcGeodeticDatum"
+          readOnly={georeferenceDisabled}
         />
         <TextField
           name={`geoReferenceAssertions[${index}].literalGeoreferencedBy`}
@@ -85,11 +118,13 @@ export function GeoReferenceAssertionRow({
           name={`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`}
           className={"dwcGeoreferenceProtocol"}
           customName={"dwcGeoreferenceProtocol"}
+          readOnly={georeferenceDisabled}
         />
         <TextField
           name={`geoReferenceAssertions[${index}].dwcGeoreferenceSources`}
           className={"dwcGeoreferenceSources"}
           customName={"dwcGeoreferenceSources"}
+          readOnly={georeferenceDisabled}
         />
         <TextField
           name={`geoReferenceAssertions[${index}].dwcGeoreferenceRemarks`}

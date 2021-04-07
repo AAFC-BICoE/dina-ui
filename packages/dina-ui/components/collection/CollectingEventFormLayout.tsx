@@ -27,8 +27,7 @@ import { Person } from "../../types/agent-api/resources/Person";
 import { geographicPlaceSourceUrl } from "../../types/collection-api/GeographicPlaceNameSourceDetail";
 import {
   CollectingEvent,
-  GeographicPlaceNameSource,
-  GeoreferenceVerificationStatus
+  GeographicPlaceNameSource
 } from "../../types/collection-api/resources/CollectingEvent";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 
@@ -44,11 +43,6 @@ export function CollectingEventFormLayout() {
   const [activeTabIdx, setActiveTabIdx] = useState(0);
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
-
-  const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
-    values.dwcGeoreferenceVerificationStatus ===
-      GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
-  );
 
   function toggleRangeEnabled(newValue: boolean) {
     if (!newValue) {
@@ -91,20 +85,6 @@ export function CollectingEventFormLayout() {
     // reset the source fields when user remove the place
     setFieldValue("geographicPlaceNameSourceDetail", null);
     setFieldValue("geographicPlaceNameSource", null);
-  }
-
-  function onGeoReferencingImpossibleCheckBoxClick(e) {
-    if (e.target.checked === true) {
-      setFieldValue(
-        "dwcGeoreferenceVerificationStatus",
-        GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
-      );
-      setFieldValue("geoReferenceAssertions", []);
-      setGeoreferenceDisabled(true);
-    } else {
-      setFieldValue("dwcGeoreferenceVerificationStatus", null);
-      setGeoreferenceDisabled(false);
-    }
   }
 
   /** Does a Places search using the given search string. */
@@ -245,16 +225,6 @@ export function CollectingEventFormLayout() {
               <legend className="w-auto">
                 <DinaMessage id="geoReferencingLegend" />
               </legend>
-              {(georeferenceDisabled ||
-                (values.geoReferenceAssertions &&
-                  values.geoReferenceAssertions.length === 0)) && (
-                <div className="col-md-5">
-                  <CheckBoxField
-                    name="dwcGeoreferenceVerificationStatus"
-                    onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
-                  />
-                </div>
-              )}
               <FieldArray name="geoReferenceAssertions">
                 {({ form, push, remove }) => {
                   const assertions =
@@ -275,11 +245,7 @@ export function CollectingEventFormLayout() {
                   }
 
                   return (
-                    <div
-                      style={{
-                        display: georeferenceDisabled ? "none" : "inline"
-                      }}
-                    >
+                    <div>
                       <Tabs
                         selectedIndex={activeTabIdx}
                         onSelect={setActiveTabIdx}
