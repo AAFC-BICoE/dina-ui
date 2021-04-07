@@ -54,19 +54,17 @@ export function SetCoordinatesFromVerbatimButton({
     }
   }
 
-  return (
-    // Don't render in read-only mode.
-    !readOnly && (
-      <FormikButton
-        onClick={doConversion}
-        className={className}
-        buttonProps={({ values }) => ({
-          disabled: !get(values, sourceLatField) || !get(values, sourceLonField)
-        })}
-      >
-        {error && <div className="alert alert-danger">{error}</div>}
-        {children}
-      </FormikButton>
-    )
+  // Don't render in read-only mode.
+  return readOnly ? null : (
+    <FormikButton
+      onClick={doConversion}
+      className={className}
+      buttonProps={({ values }) => ({
+        disabled: !get(values, sourceLatField) || !get(values, sourceLonField)
+      })}
+    >
+      {error && <div className="alert alert-danger">{error}</div>}
+      {children}
+    </FormikButton>
   );
 }
