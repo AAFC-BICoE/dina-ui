@@ -41,7 +41,7 @@ export function SetCoordinatesFromVerbatimButton({
       const lat = coords.getLatitude();
       const lon = coords.getLongitude();
 
-      if (lat > 90 || lat < -91) {
+      if (lat > 90 || lat < -90) {
         setError(
           formatMessage("latitudeValidationError", {
             latitude: lat
