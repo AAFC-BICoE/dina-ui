@@ -6,6 +6,7 @@ import {
   FilterAttribute,
   ListPageLayout
 } from "common-ui";
+import Link from "next/link";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { PhysicalEntity } from "../../../types/collection-api";
@@ -20,7 +21,14 @@ const CATALOGUED_OBJECT_FILTER_ATTRIBUTES: FilterAttribute[] = [
 ];
 
 const CATALOGUED_OBJECT_TABLE_COLUMNS: ColumnDefinition<PhysicalEntity>[] = [
-  "dwcCatalogNumber",
+  {
+    Cell: ({ original: { id, dwcCatalogNumber } }) => (
+      <Link href={`/collection/catalogued-object/view?id=${id}`}>
+        {dwcCatalogNumber || id}
+      </Link>
+    ),
+    accessor: "dwcCatalogNumber"
+  },
   "createdBy",
   dateCell("createdOn")
 ];

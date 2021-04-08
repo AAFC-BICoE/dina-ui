@@ -28,6 +28,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   cancelButtonText: "Cancel",
   cataloguedObjectListTitle: "Catalogued Objects",
   changedProperties: "Changes",
+  cataloguedObjectViewTitle: "View Catalogued Object",
   closePreviewButtonText: "Close Preview",
   collectionSectionTitle: "Collections",
   collectingAgentsLegend: "Collecting Agents",
@@ -57,6 +58,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dinaUserSectionTitle: "Dina User",
   editableManagedAttributesRemoveInfo:
     "Note: Removing an attribute from the 'Visible Managed Attributes' list doesn't delete the value. To delete the value, clear the input below.",
+  editCataloguedObjectTitle: "Edit Catalogued Object",
   editCollectingEventTitle: "Edit Collecting Event",
   editMetadataTitle: "Edit Metadata",
   editObjectSubtypeTitle: "Edit Object Subtype",
@@ -245,6 +247,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organizationViewTitle: "View Organization",
   personListTitle: "Persons",
   personViewTitle: "Person",
+  preparationData: "Preparation Data",
   removeAssertionLabel: "Remove this GeoReference",
   placeNameLabel: "Place Name",
   removeThisPlaceLabel: " Remove this Place",

@@ -101,6 +101,8 @@ export function useDinaFormContext() {
   return ctx;
 }
 
+export type DinaFormSectionProps = PropsWithChildren<Partial<DinaFormContextI>>;
+
 /**
  * Override context values for a section of the form.
  * e.g. making part of the form layout horizontal or readOnly.
@@ -108,7 +110,7 @@ export function useDinaFormContext() {
 export function DinaFormSection({
   children,
   ...ctxOverride
-}: PropsWithChildren<Partial<DinaFormContextI>>) {
+}: DinaFormSectionProps) {
   const ctx = useDinaFormContext();
 
   return (
