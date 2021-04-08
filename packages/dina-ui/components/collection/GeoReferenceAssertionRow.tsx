@@ -69,11 +69,6 @@ export function GeoReferenceAssertionRow({
       );
       setFieldTouched(`geoReferenceAssertions[${index}].dwcGeodeticDatum`);
       setFieldValue?.(
-        `geoReferenceAssertions[${index}].georeferencedBy`,
-        geoReferencedBy ? [] : undefined
-      );
-      setFieldTouched(`geoReferenceAssertions[${index}].georeferencedBy`, true);
-      setFieldValue?.(
         `geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`,
         null
       );
@@ -110,10 +105,6 @@ export function GeoReferenceAssertionRow({
       setFieldValue?.(
         `geoReferenceAssertions[${index}].dwcGeodeticDatum`,
         undefined
-      );
-      setFieldTouched(
-        `geoReferenceAssertions[${index}].georeferencedBy`,
-        false
       );
       setFieldValue?.(
         `geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`,
