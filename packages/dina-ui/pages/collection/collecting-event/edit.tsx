@@ -286,17 +286,14 @@ function CollectingEventForm({
 
     // Convert georeferenceByAgents to relationship
     submittedValues.geoReferenceAssertions?.map(assertion => {
-      assertion.relationships = {};
       if (assertion.georeferencedBy) {
+        assertion.relationships = {};
         assertion.relationships.georeferencedBy = {
           data: assertion.georeferencedBy.map(it => ({
             id: it.id,
             type: "agent"
           }))
         };
-      } else {
-        // remove the relationship when switched to georeferencen impossible
-        assertion.relationships.georeferencedBy = { data: [] };
       }
       delete assertion.georeferencedBy;
     });

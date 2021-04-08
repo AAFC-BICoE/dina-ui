@@ -70,7 +70,7 @@ export function GeoReferenceAssertionRow({
       setFieldTouched(`geoReferenceAssertions[${index}].dwcGeodeticDatum`);
       setFieldValue?.(
         `geoReferenceAssertions[${index}].georeferencedBy`,
-        geoReferencedBy ? null : undefined
+        geoReferencedBy ? [] : undefined
       );
       setFieldTouched(`geoReferenceAssertions[${index}].georeferencedBy`, true);
       setFieldValue?.(
