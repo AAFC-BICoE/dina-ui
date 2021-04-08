@@ -1,4 +1,4 @@
-import { FormikButton } from "common-ui";
+import { FormikButton, useDinaFormContext } from "common-ui";
 import Coordinates from "coordinate-parser";
 import { FormikContextType } from "formik";
 import { get } from "lodash";
@@ -29,6 +29,7 @@ export function SetCoordinatesFromVerbatimButton({
   className = "btn btn-info",
   children
 }: SetCoordinatesFromVerbatimButtonProps) {
+  const { readOnly } = useDinaFormContext();
   const [error, setError] = useState<string>("");
   const { formatMessage } = useDinaIntl();
 
@@ -73,7 +74,8 @@ export function SetCoordinatesFromVerbatimButton({
     }
   }
 
-  return (
+  // Don't render in read-only mode.
+  return readOnly ? null : (
     <FormikButton
       onClick={doConversion}
       className={className}

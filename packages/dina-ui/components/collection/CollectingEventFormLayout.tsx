@@ -294,21 +294,6 @@ export function CollectingEventFormLayout() {
                         {assertions.length
                           ? assertions.map((assertion, index) => (
                               <TabPanel key={assertion.id}>
-                                <div className="form-group">
-                                  {!readOnly && (
-                                    <SetCoordinatesFromVerbatimButton
-                                      sourceLatField="dwcVerbatimLatitude"
-                                      sourceLonField="dwcVerbatimLongitude"
-                                      targetLatField={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
-                                      targetLonField={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
-                                      onClick={({ lat, lon }) =>
-                                        setGeoSearchValue(`${lat}, ${lon}`)
-                                      }
-                                    >
-                                      <DinaMessage id="latLongAutoSetterButton" />
-                                    </SetCoordinatesFromVerbatimButton>
-                                  )}
-                                </div>
                                 <GeoReferenceAssertionRow
                                   index={index}
                                   openAddPersonModal={openAddPersonModal}
@@ -390,7 +375,7 @@ export function CollectingEventFormLayout() {
                           </div>
                         </div>
                       </div>
-                    ) : (
+                    ) : !readOnly ? (
                       <GeographySearchBox
                         inputValue={geoSearchValue}
                         onInputChange={setGeoSearchValue}
@@ -448,7 +433,7 @@ export function CollectingEventFormLayout() {
                           </div>
                         }
                       />
-                    )
+                    ) : null
                   }
                 </Field>
               </div>
