@@ -11,7 +11,7 @@ const checkboxProps = {
   style: {
     display: "block",
     height: "20px",
-    margin: "auto",
+    marginLeft: "15px",
     width: "20px"
   },
   type: "checkbox"
@@ -24,7 +24,7 @@ export function CheckBoxField(props: CheckBoxProps) {
       {...props}
       readOnlyRender={value => (
         <input
-          {...checkboxProps}
+          {...checkboxProps }
           checked={value || false}
           value={value || false}
           disabled={true}

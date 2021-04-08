@@ -7,7 +7,7 @@ import {
   TextField,
   CheckBoxField
 } from "common-ui";
-import { connect } from "formik";
+import { connect, useFormikContext } from "formik";
 import { PersistedResource } from "kitsu";
 import { get } from "lodash";
 import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
@@ -20,22 +20,15 @@ export interface GeoReferenceAssertionRowProps {
   index: number;
   viewOnly?: boolean;
   openAddPersonModal?: () => Promise<PersistedResource<Person> | undefined>;
-  setFieldValue?: (
-    field: string,
-    value: any,
-    shouldValidate?: boolean | undefined
-  ) => void;
-  values?: CollectingEvent;
 }
 
 export function GeoReferenceAssertionRow({
   index,
   viewOnly,
-  openAddPersonModal,
-  setFieldValue,
-  values
+  openAddPersonModal
 }: GeoReferenceAssertionRowProps) {
   const { formatMessage } = useDinaIntl();
+  const { setFieldValue, values, setFieldTouched } = useFormikContext<CollectingEvent>();
   const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
     values?.geoReferenceAssertions?.[index]
       .dwcGeoreferenceVerificationStatus ===
@@ -45,13 +38,39 @@ export function GeoReferenceAssertionRow({
   function onGeoReferencingImpossibleCheckBoxClick(e) {
     // On checked, set 3 fields editable, rest readonly; unchecked, all fields editable
     const name = `geoReferenceAssertions[${index}].dwcGeoreferenceVerificationStatus`;
+    const geoReferencedBy = values?.geoReferenceAssertions?.[index].georeferencedBy;
     if (e.target.checked === true) {
+      setFieldValue?.(`geoReferenceAssertions[${index}].dwcDecimalLatitude`, null);
+      setFieldTouched(`geoReferenceAssertions[${index}].dwcDecimalLatitude`);
+      setFieldValue?.(`geoReferenceAssertions[${index}].dwcDecimalLongitude`, null);
+      setFieldTouched(`geoReferenceAssertions[${index}].dwcDecimalLongitude`);
+      setFieldValue?.(`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`, null);
+      setFieldTouched(`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`);
+
+      setFieldValue?.(`geoReferenceAssertions[${index}].dwcGeodeticDatum`, null);
+      setFieldTouched(`geoReferenceAssertions[${index}].dwcGeodeticDatum`);
+      setFieldValue?.(`geoReferenceAssertions[${index}].georeferencedBy`, geoReferencedBy? null:undefined);
+      setFieldTouched(`geoReferenceAssertions[${index}].georeferencedBy`, true);
+      setFieldValue?.(`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`, null);      
+      setFieldTouched(`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`);      
+
+      setFieldValue?.(`geoReferenceAssertions[${index}].dwcGeoreferenceSources`, null);            
+      setFieldTouched(`geoReferenceAssertions[${index}].dwcGeoreferenceSources`);            
       setFieldValue?.(
         name,
         GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
       );
       setGeoreferenceDisabled(true);
-    } else {
+    } else {      
+      setFieldValue?.(`geoReferenceAssertions[${index}].dwcDecimalLatitude`, undefined);
+      setFieldValue?.(`geoReferenceAssertions[${index}].dwcDecimalLongitude`, undefined);
+      setFieldValue?.(`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`, undefined);
+
+      setFieldValue?.(`geoReferenceAssertions[${index}].dwcGeodeticDatum`, undefined);
+      setFieldTouched(`geoReferenceAssertions[${index}].georeferencedBy`, false);
+      setFieldValue?.(`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`, undefined);      
+
+      setFieldValue?.(`geoReferenceAssertions[${index}].dwcGeoreferenceSources`, undefined);            
       setFieldValue?.(name, null);
       setGeoreferenceDisabled(false);
     }
@@ -75,12 +94,12 @@ export function GeoReferenceAssertionRow({
           className={"dwcDecimalLatitude"}
           // Can be null or a valid latitude number:
           isAllowed={({ floatValue: val }) => isValidLatitudeOrBlank(val)}
-          readOnly={viewOnly ?? georeferenceDisabled}
+          readOnly={georeferenceDisabled}
         />
         <NumberField
           name={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
           label={formatMessage("decimalLongitude")}
-          readOnly={viewOnly ?? georeferenceDisabled}
+          readOnly={georeferenceDisabled}
           className={"dwcDecimalLongitude"}
           // Can be null or a valid longitude number:
           isAllowed={({ floatValue: val }) => isValidLongitudeOrBlank(val)}
