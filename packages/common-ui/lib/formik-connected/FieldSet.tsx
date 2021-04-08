@@ -7,7 +7,7 @@ export interface FieldSetProps extends DinaFormSectionProps {
 
 export function FieldSet({ legend, ...formSectionProps }: FieldSetProps) {
   return (
-    <fieldset className="form-group border px-4 py-2">
+    <fieldset className="form-group border card px-4 py-2">
       <legend className="w-auto">{legend}</legend>
       <DinaFormSection {...formSectionProps} />
     </fieldset>

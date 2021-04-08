@@ -59,7 +59,7 @@ export default function CataloguedObjectEditPage() {
         ) : (
           <div>
             <h1>
-              <DinaMessage id="addCollectingEventTitle" />
+              <DinaMessage id="addCataloguedObjectTitle" />
             </h1>
             <CataloguedObjectForm onSaved={viewNewCataloguedObject} />
           </div>
