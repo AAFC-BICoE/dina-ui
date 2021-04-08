@@ -116,8 +116,14 @@ export function DinaFormSection({
 }: DinaFormSectionProps) {
   const ctx = useDinaFormContext();
 
+  const combinedPrefix = [ctx.namePrefix, ctxOverride.namePrefix]
+    .filter(it => it)
+    .join(".");
+
   return (
-    <DinaFormContext.Provider value={{ ...ctx, ...ctxOverride }}>
+    <DinaFormContext.Provider
+      value={{ ...ctx, ...ctxOverride, namePrefix: combinedPrefix }}
+    >
       {children}
     </DinaFormContext.Provider>
   );

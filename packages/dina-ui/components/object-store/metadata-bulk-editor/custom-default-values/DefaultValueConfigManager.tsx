@@ -1,6 +1,5 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { FieldWrapper, LabelWrapperParams } from "common-ui";
-import { FastField, FieldProps } from "formik";
 import Select from "react-select";
 import { DinaMessage } from "../../../../intl/dina-ui-intl";
 import { DefaultValuesConfig } from "./model-types";

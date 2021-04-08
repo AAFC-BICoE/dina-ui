@@ -1,5 +1,4 @@
 import { FieldWrapper, FieldWrapperProps, useQuery } from "common-ui";
-import { FastField, FieldProps } from "formik";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
 
