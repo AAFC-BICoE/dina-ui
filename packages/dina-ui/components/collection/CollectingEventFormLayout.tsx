@@ -2,6 +2,7 @@ import {
   AutoSuggestTextField,
   CheckBoxField,
   DinaFormSection,
+  FieldSet,
   filterBy,
   FormattedTextField,
   FormikButton,
@@ -130,10 +131,7 @@ export function CollectingEventFormLayout() {
       </DinaFormSection>
       <div className="row">
         <div className="col-md-6">
-          <fieldset className="form-group border px-4 py-2">
-            <legend className="w-auto">
-              <DinaMessage id="collectingDateLegend" />
-            </legend>
+          <FieldSet legend={<DinaMessage id="collectingDateLegend" />}>
             <FormattedTextField
               name="startEventDateTime"
               className="startEventDateTime"
@@ -167,13 +165,10 @@ export function CollectingEventFormLayout() {
               name="verbatimEventDateTime"
               label={formatMessage("verbatimEventDateTimeLabel")}
             />
-          </fieldset>
+          </FieldSet>
         </div>
         <div className="col-md-6">
-          <fieldset className="form-group border px-4 py-2">
-            <legend className="w-auto">
-              <DinaMessage id="collectingAgentsLegend" />
-            </legend>
+          <FieldSet legend={<DinaMessage id="collectingAgentsLegend" />}>
             <AutoSuggestTextField<CollectingEvent>
               name="dwcRecordedBy"
               query={(searchValue, ctx) => ({
@@ -200,17 +195,11 @@ export function CollectingEventFormLayout() {
               ]}
             />
             <TextField name="dwcRecordNumber" />
-          </fieldset>
+          </FieldSet>
         </div>
       </div>
-      <fieldset className="form-group border px-4 py-2">
-        <legend className="w-auto">
-          <DinaMessage id="collectingLocationLegend" />
-        </legend>
-        <fieldset className="form-group border px-4 py-2">
-          <legend className="w-auto">
-            <DinaMessage id="verbatimCoordinatesLegend" />
-          </legend>
+      <FieldSet legend={<DinaMessage id="collectingLocationLegend" />}>
+        <FieldSet legend={<DinaMessage id="verbatimCoordinatesLegend" />}>
           <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLocality" />
           <div className="row">
             <div className="col-md-6">
@@ -238,13 +227,10 @@ export function CollectingEventFormLayout() {
               <TextField name="dwcVerbatimDepth" />
             </div>
           </div>
-        </fieldset>
+        </FieldSet>
         <div className="row">
           <div className="col-lg-6">
-            <fieldset className="form-group border px-4 py-2">
-              <legend className="w-auto">
-                <DinaMessage id="geoReferencingLegend" />
-              </legend>
+            <FieldSet legend={<DinaMessage id="geoReferencingLegend" />}>
               {(georeferenceDisabled ||
                 (values.geoReferenceAssertions &&
                   values.geoReferenceAssertions.length === 0)) && (
@@ -345,13 +331,10 @@ export function CollectingEventFormLayout() {
                   );
                 }}
               </FieldArray>
-            </fieldset>
+            </FieldSet>
           </div>
           <div className="col-lg-6">
-            <fieldset className="form-group border px-4 py-2">
-              <legend className="w-auto">
-                <DinaMessage id="toponymyLegend" />
-              </legend>
+            <FieldSet legend={<DinaMessage id="toponymyLegend" />}>
               <div
                 style={{
                   overflowY: "auto",
@@ -452,10 +435,10 @@ export function CollectingEventFormLayout() {
                   }
                 </Field>
               </div>
-            </fieldset>
+            </FieldSet>
           </div>
         </div>
-      </fieldset>
+      </FieldSet>
     </div>
   );
 }
