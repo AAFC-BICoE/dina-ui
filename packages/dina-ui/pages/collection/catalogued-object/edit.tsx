@@ -1,6 +1,3 @@
-import { GroupSelectField, Head, Nav } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { useRouter } from "next/router";
 import {
   BackButton,
   ButtonBar,
@@ -15,6 +12,10 @@ import {
   TextField,
   useApiClient
 } from "common-ui";
+import { useRouter } from "next/router";
+import { GroupSelectField, Head, Nav } from "../../../components";
+import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { PhysicalEntity } from "../../../types/collection-api";
 
 export default function CataloguedObjectEditPage() {
@@ -139,6 +140,9 @@ export function CataloguedObjectFormLayout() {
           </FieldSet>
         </div>
       </div>
+      <FieldSet legend={<DinaMessage id="collectingEvent" />}>
+        {/* <CollectingEventFormLayout /> */}
+      </FieldSet>
     </div>
   );
 }

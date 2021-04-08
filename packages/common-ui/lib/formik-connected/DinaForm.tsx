@@ -29,6 +29,9 @@ export interface DinaFormContextI {
    * "true" defaults to [6, 6].
    */
   horizontal?: boolean | [number, number];
+
+  /** Field name prefix to add before every field name in formik. */
+  namePrefix?: string;
 }
 
 export type DinaFormOnSubmit<TValues = any> = (

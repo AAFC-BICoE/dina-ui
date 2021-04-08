@@ -1,4 +1,3 @@
-import { FastField, FieldProps } from "formik";
 import React from "react";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
@@ -18,7 +17,7 @@ const checkboxProps = {
 };
 
 export function CheckBoxField(props: CheckBoxProps) {
-  const { name, onCheckBoxClick, disabled } = props;
+  const { onCheckBoxClick, disabled } = props;
   return (
     <FieldWrapper
       {...props}
@@ -31,28 +30,22 @@ export function CheckBoxField(props: CheckBoxProps) {
         />
       )}
     >
-      <FastField name={name}>
-        {({
-          field: { value },
-          form: { setFieldValue, setFieldTouched }
-        }: FieldProps) => {
-          function onChange(event) {
-            setFieldValue(name, event.target.checked);
-            setFieldTouched(name);
-            onCheckBoxClick?.(event);
-          }
+      {({ setValue, value }) => {
+        function onChange(event) {
+          setValue(event.target.checked);
+          onCheckBoxClick?.(event);
+        }
 
-          return (
-            <input
-              {...checkboxProps}
-              checked={value || false}
-              onChange={onChange}
-              value={value || false}
-              disabled={disabled}
-            />
-          );
-        }}
-      </FastField>
+        return (
+          <input
+            {...checkboxProps}
+            checked={value || false}
+            onChange={onChange}
+            value={value || false}
+            disabled={disabled}
+          />
+        );
+      }}
     </FieldWrapper>
   );
 }

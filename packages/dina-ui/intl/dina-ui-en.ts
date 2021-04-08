@@ -31,6 +31,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   changedProperties: "Changes",
   cataloguedObjectViewTitle: "View Catalogued Object",
   closePreviewButtonText: "Close Preview",
+  collectingEvent: "Collecting Event",
   collectionSectionTitle: "Collections",
   collectingAgentsLegend: "Collecting Agents",
   collectingDateLegend: "Collecting Date",
