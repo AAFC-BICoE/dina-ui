@@ -2,6 +2,7 @@ import { FormikButton } from "common-ui";
 import Coordinates from "coordinate-parser";
 import { FormikContextType } from "formik";
 import { get } from "lodash";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { ReactNode, useState } from "react";
 
 export interface SetCoordinatesFromVerbatimButtonProps {
@@ -29,6 +30,7 @@ export function SetCoordinatesFromVerbatimButton({
   children
 }: SetCoordinatesFromVerbatimButtonProps) {
   const [error, setError] = useState<string>("");
+  const { formatMessage } = useDinaIntl();
 
   function doConversion(values: any, formik: FormikContextType<any>) {
     try {
@@ -38,6 +40,24 @@ export function SetCoordinatesFromVerbatimButton({
 
       const lat = coords.getLatitude();
       const lon = coords.getLongitude();
+
+      if (lat > 90 || lat < -90) {
+        setError(
+          formatMessage("latitudeValidationError", {
+            latitude: lat
+          })
+        );
+        return;
+      }
+
+      if (lon > 180 || lon < -180) {
+        setError(
+          formatMessage("longitudeValidationError", {
+            longtitude: lon
+          })
+        );
+        return;
+      }
 
       if (targetLatField) {
         formik.setFieldValue(targetLatField, lat);
