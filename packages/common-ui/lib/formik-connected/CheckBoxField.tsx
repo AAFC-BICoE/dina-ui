@@ -24,7 +24,7 @@ export function CheckBoxField(props: CheckBoxProps) {
       {...props}
       readOnlyRender={value => (
         <input
-          {...checkboxProps }
+          {...checkboxProps}
           checked={value || false}
           value={value || false}
           disabled={true}

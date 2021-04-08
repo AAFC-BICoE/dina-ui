@@ -28,7 +28,11 @@ export function GeoReferenceAssertionRow({
   openAddPersonModal
 }: GeoReferenceAssertionRowProps) {
   const { formatMessage } = useDinaIntl();
-  const { setFieldValue, values, setFieldTouched } = useFormikContext<CollectingEvent>();
+  const {
+    setFieldValue,
+    values,
+    setFieldTouched
+  } = useFormikContext<CollectingEvent>();
   const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
     values?.geoReferenceAssertions?.[index]
       .dwcGeoreferenceVerificationStatus ===
@@ -38,39 +42,88 @@ export function GeoReferenceAssertionRow({
   function onGeoReferencingImpossibleCheckBoxClick(e) {
     // On checked, set 3 fields editable, rest readonly; unchecked, all fields editable
     const name = `geoReferenceAssertions[${index}].dwcGeoreferenceVerificationStatus`;
-    const geoReferencedBy = values?.geoReferenceAssertions?.[index].georeferencedBy;
+    const geoReferencedBy =
+      values?.geoReferenceAssertions?.[index].georeferencedBy;
     if (e.target.checked === true) {
-      setFieldValue?.(`geoReferenceAssertions[${index}].dwcDecimalLatitude`, null);
+      setFieldValue?.(
+        `geoReferenceAssertions[${index}].dwcDecimalLatitude`,
+        null
+      );
       setFieldTouched(`geoReferenceAssertions[${index}].dwcDecimalLatitude`);
-      setFieldValue?.(`geoReferenceAssertions[${index}].dwcDecimalLongitude`, null);
+      setFieldValue?.(
+        `geoReferenceAssertions[${index}].dwcDecimalLongitude`,
+        null
+      );
       setFieldTouched(`geoReferenceAssertions[${index}].dwcDecimalLongitude`);
-      setFieldValue?.(`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`, null);
-      setFieldTouched(`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`);
+      setFieldValue?.(
+        `geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`,
+        null
+      );
+      setFieldTouched(
+        `geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`
+      );
 
-      setFieldValue?.(`geoReferenceAssertions[${index}].dwcGeodeticDatum`, null);
+      setFieldValue?.(
+        `geoReferenceAssertions[${index}].dwcGeodeticDatum`,
+        null
+      );
       setFieldTouched(`geoReferenceAssertions[${index}].dwcGeodeticDatum`);
-      setFieldValue?.(`geoReferenceAssertions[${index}].georeferencedBy`, geoReferencedBy? null:undefined);
+      setFieldValue?.(
+        `geoReferenceAssertions[${index}].georeferencedBy`,
+        geoReferencedBy ? null : undefined
+      );
       setFieldTouched(`geoReferenceAssertions[${index}].georeferencedBy`, true);
-      setFieldValue?.(`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`, null);      
-      setFieldTouched(`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`);      
+      setFieldValue?.(
+        `geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`,
+        null
+      );
+      setFieldTouched(
+        `geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`
+      );
 
-      setFieldValue?.(`geoReferenceAssertions[${index}].dwcGeoreferenceSources`, null);            
-      setFieldTouched(`geoReferenceAssertions[${index}].dwcGeoreferenceSources`);            
+      setFieldValue?.(
+        `geoReferenceAssertions[${index}].dwcGeoreferenceSources`,
+        null
+      );
+      setFieldTouched(
+        `geoReferenceAssertions[${index}].dwcGeoreferenceSources`
+      );
       setFieldValue?.(
         name,
         GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
       );
       setGeoreferenceDisabled(true);
-    } else {      
-      setFieldValue?.(`geoReferenceAssertions[${index}].dwcDecimalLatitude`, undefined);
-      setFieldValue?.(`geoReferenceAssertions[${index}].dwcDecimalLongitude`, undefined);
-      setFieldValue?.(`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`, undefined);
+    } else {
+      setFieldValue?.(
+        `geoReferenceAssertions[${index}].dwcDecimalLatitude`,
+        undefined
+      );
+      setFieldValue?.(
+        `geoReferenceAssertions[${index}].dwcDecimalLongitude`,
+        undefined
+      );
+      setFieldValue?.(
+        `geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`,
+        undefined
+      );
 
-      setFieldValue?.(`geoReferenceAssertions[${index}].dwcGeodeticDatum`, undefined);
-      setFieldTouched(`geoReferenceAssertions[${index}].georeferencedBy`, false);
-      setFieldValue?.(`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`, undefined);      
+      setFieldValue?.(
+        `geoReferenceAssertions[${index}].dwcGeodeticDatum`,
+        undefined
+      );
+      setFieldTouched(
+        `geoReferenceAssertions[${index}].georeferencedBy`,
+        false
+      );
+      setFieldValue?.(
+        `geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`,
+        undefined
+      );
 
-      setFieldValue?.(`geoReferenceAssertions[${index}].dwcGeoreferenceSources`, undefined);            
+      setFieldValue?.(
+        `geoReferenceAssertions[${index}].dwcGeoreferenceSources`,
+        undefined
+      );
       setFieldValue?.(name, null);
       setGeoreferenceDisabled(false);
     }
