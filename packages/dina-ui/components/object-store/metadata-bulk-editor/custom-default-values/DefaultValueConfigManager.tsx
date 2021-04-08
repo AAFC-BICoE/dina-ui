@@ -127,20 +127,14 @@ export function DefaultValuesConfigSelectField(
 ) {
   const { allowBlank, ...labelWrapperProps } = props;
   return (
-    <FastField name={props.name}>
-      {({ field: { value }, form: { setFieldValue } }: FieldProps) => {
-        return (
-          <FieldWrapper {...labelWrapperProps}>
-            <DefaultValuesConfigSelect
-              allowBlank={allowBlank}
-              onChangeConfigIndex={newIndex =>
-                setFieldValue(props.name, newIndex)
-              }
-              ruleConfigIndex={value}
-            />
-          </FieldWrapper>
-        );
-      }}
-    </FastField>
+    <FieldWrapper {...labelWrapperProps}>
+      {({ setValue, value }) => (
+        <DefaultValuesConfigSelect
+          allowBlank={allowBlank}
+          onChangeConfigIndex={setValue}
+          ruleConfigIndex={value}
+        />
+      )}
+    </FieldWrapper>
   );
 }
