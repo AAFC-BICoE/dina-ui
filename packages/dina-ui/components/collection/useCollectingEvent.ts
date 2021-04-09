@@ -18,6 +18,8 @@ export function useCollectingEventQuery(id?: string) {
       path: `collection-api/collecting-event/${id}?include=collectors,geoReferenceAssertions,attachment`
     },
     {
+      // Return undefined when ID is undefined:
+      disabled: !id,
       onSuccess: async ({ data }) => {
         // Do client-side multi-API joins on one-to-many fields:
 
