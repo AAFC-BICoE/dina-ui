@@ -2,7 +2,6 @@ import {
   AutoSuggestTextField,
   CheckBoxField,
   DinaFormSection,
-  FieldArray,
   FieldSet,
   filterBy,
   FormattedTextField,
@@ -13,7 +12,7 @@ import {
   TextField,
   useDinaFormContext
 } from "common-ui";
-import { Field, FormikContextType } from "formik";
+import { Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
 import { useState } from "react";
 import Switch from "react-switch";

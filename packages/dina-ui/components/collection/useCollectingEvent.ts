@@ -1,4 +1,5 @@
 import { SaveArgs, useApiClient, useQuery } from "common-ui";
+import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
 import { orderBy } from "lodash";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
@@ -170,7 +171,10 @@ export function useCollectingEventSave(
     }
   }
 
-  async function saveCollectingEvent(submittedValues) {
+  async function saveCollectingEvent(
+    submittedValues,
+    formik: FormikContextType<any>
+  ) {
     // Init relationships object for one-to-many relations:
     submittedValues.relationships = {};
 
@@ -264,6 +268,10 @@ export function useCollectingEventSave(
         apiBaseUrl: "/collection-api"
       }
     );
+
+    // Set the Collecting Event ID so if there is an error after this,
+    // then subsequent submissions use PATCH instea of POST:
+    formik.setFieldValue("id", savedCollectingEvent.id);
 
     // save georeference assertions:
     await saveGeoReferenceAssertion(

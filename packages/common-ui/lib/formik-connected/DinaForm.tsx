@@ -7,7 +7,7 @@ import {
   FormikValues
 } from "formik";
 import { cloneDeep } from "lodash";
-import { createContext, PropsWithChildren, useContext } from "react";
+import { createContext, Fragment, PropsWithChildren, useContext } from "react";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
 import { ApiClientI, useApiClient } from "../api-client/ApiClientContext";
 import { ErrorViewer } from "./ErrorViewer";
@@ -49,6 +49,8 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
   const api = useApiClient();
   const account = useAccount();
 
+  const isNestedForm = !!useContext(DinaFormContext);
+
   const { children: childrenProp, onSubmit: onSubmitProp } = props;
 
   /** Wrapped onSubmit prop with erorr handling and API/Account params. */
@@ -63,13 +65,17 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
     });
   });
 
+  const FormWrapperInternal = isNestedForm ? Fragment : FormWrapper;
+
   const childrenInternal:
     | ((formikProps: FormikProps<Values>) => React.ReactNode)
     | React.ReactNode =
     typeof childrenProp === "function" ? (
-      formikProps => <FormWrapper>{childrenProp(formikProps)}</FormWrapper>
+      formikProps => (
+        <FormWrapperInternal>{childrenProp(formikProps)}</FormWrapperInternal>
+      )
     ) : (
-      <FormWrapper>{childrenProp}</FormWrapper>
+      <FormWrapperInternal>{childrenProp}</FormWrapperInternal>
     );
 
   return (

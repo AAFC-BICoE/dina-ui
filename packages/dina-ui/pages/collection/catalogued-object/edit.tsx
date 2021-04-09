@@ -10,9 +10,13 @@ import {
   Query,
   SubmitButton,
   TextField,
-  useApiClient
+  useApiClient,
+  withResponse
 } from "common-ui";
+import { FormikProps } from "formik";
+import { cloneDeep } from "lodash";
 import { useRouter } from "next/router";
+import { useRef } from "react";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import {
@@ -20,7 +24,7 @@ import {
   useCollectingEventSave
 } from "../../../components/collection/useCollectingEvent";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { PhysicalEntity } from "../../../types/collection-api";
+import { CollectingEvent, PhysicalEntity } from "../../../types/collection-api";
 
 export default function CataloguedObjectEditPage() {
   const router = useRouter();
@@ -29,7 +33,7 @@ export default function CataloguedObjectEditPage() {
   } = router;
   const { formatMessage } = useDinaIntl();
 
-  async function viewNewCataloguedObject(savedId: string) {
+  async function moveToViewPage(savedId: string) {
     await router.push(`/collection/catalogued-object/view?id=${savedId}`);
   }
 
@@ -45,7 +49,7 @@ export default function CataloguedObjectEditPage() {
             </h1>
             <Query<PhysicalEntity>
               query={{
-                path: `collection-api/physical-entity/${id}`
+                path: `collection-api/physical-entity/${id}?include=collectingEvent`
               }}
             >
               {({ loading, response }) => (
@@ -54,7 +58,7 @@ export default function CataloguedObjectEditPage() {
                   {response?.data && (
                     <CataloguedObjectForm
                       cataloguedObject={response?.data}
-                      onSaved={viewNewCataloguedObject}
+                      onSaved={moveToViewPage}
                     />
                   )}
                 </div>
@@ -66,7 +70,7 @@ export default function CataloguedObjectEditPage() {
             <h1>
               <DinaMessage id="addCataloguedObjectTitle" />
             </h1>
-            <CataloguedObjectForm onSaved={viewNewCataloguedObject} />
+            <CataloguedObjectForm onSaved={moveToViewPage} />
           </div>
         )}
       </div>
@@ -86,34 +90,39 @@ export function CataloguedObjectForm({
 }: CataloguedObjectFormProps) {
   const { save } = useApiClient();
 
-  const colEventQuery = useCollectingEventQuery(
-    cataloguedObject?.collectingEvent?.id
-  );
+  /** Used to get the values of the nested CollectingEvent form. */
+  const colEventFormRef = useRef<FormikProps<any>>(null);
+
+  const colEventId = cataloguedObject?.collectingEvent?.id;
+  const colEventQuery = useCollectingEventQuery(colEventId);
 
   const {
     collectingEventInitialValues,
     saveCollectingEvent
   } = useCollectingEventSave(colEventQuery.response?.data);
 
-  const initialValues = {
-    ...(cataloguedObject ?? {}),
-    collectingEvent: collectingEventInitialValues
-  } as any;
-
   const onSubmit: DinaFormOnSubmit<PhysicalEntity> = async ({
-    submittedValues
+    submittedValues,
+    formik
   }) => {
-    const { collectingEvent, ...cataloguedObjectValues } = submittedValues;
-
-    const savedCollectingEvent = await saveCollectingEvent(collectingEvent);
+    const { ...cataloguedObjectValues } = submittedValues;
 
     const cataloguedObjectInput = {
-      ...cataloguedObjectValues,
-      collectingEvent: {
+      ...cataloguedObjectValues
+    };
+
+    // Save the linked CollectingEvent if included:
+    const submittedCollectingEvent = cloneDeep(colEventFormRef.current?.values);
+    if (submittedCollectingEvent) {
+      const savedCollectingEvent = await saveCollectingEvent(
+        submittedCollectingEvent,
+        formik
+      );
+      cataloguedObjectInput.collectingEvent = {
         id: savedCollectingEvent.id,
         type: savedCollectingEvent.type
-      }
-    };
+      } as CollectingEvent;
+    }
 
     const [savedPhysicalEntity] = await save<PhysicalEntity>(
       [
@@ -138,10 +147,30 @@ export function CataloguedObjectForm({
     </ButtonBar>
   );
 
-  return colEventQuery.loading ? null : (
-    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+  // Wait for the CollectingEvent (if linked) to be ready before rendering:
+  return (
+    <DinaForm initialValues={cataloguedObject ?? {}} onSubmit={onSubmit}>
       {buttonBar}
       <CataloguedObjectFormLayout />
+      <FieldSet legend={<DinaMessage id="collectingEvent" />}>
+        {colEventId ? (
+          withResponse(colEventQuery, () => (
+            <DinaForm
+              innerRef={colEventFormRef}
+              initialValues={collectingEventInitialValues}
+            >
+              <CollectingEventFormLayout />
+            </DinaForm>
+          ))
+        ) : (
+          <DinaForm
+            innerRef={colEventFormRef}
+            initialValues={collectingEventInitialValues}
+          >
+            <CollectingEventFormLayout />
+          </DinaForm>
+        )}
+      </FieldSet>
       {buttonBar}
     </DinaForm>
   );
@@ -170,9 +199,6 @@ export function CataloguedObjectFormLayout() {
           </FieldSet>
         </div>
       </div>
-      <FieldSet legend={<DinaMessage id="collectingEvent" />}>
-        <CollectingEventFormLayout />
-      </FieldSet>
     </div>
   );
 }

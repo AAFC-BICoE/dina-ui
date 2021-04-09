@@ -4,6 +4,7 @@ import {
   DeleteButton,
   DinaForm,
   EditButton,
+  FieldSet,
   useQuery,
   withResponse
 } from "common-ui";
@@ -13,6 +14,8 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Head, Nav } from "../../../components";
 import { PhysicalEntity } from "../../../types/collection-api";
 import { CataloguedObjectFormLayout } from "./edit";
+import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
+import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 
 export default function PhysicalEntityViewPage() {
   const router = useRouter();
@@ -21,8 +24,14 @@ export default function PhysicalEntityViewPage() {
   const { id } = router.query;
 
   const physicalEntityQuery = useQuery<PhysicalEntity>({
-    path: `collection-api/physical-entity/${id}`
+    path: `collection-api/physical-entity/${id}?include=collectingEvent`
   });
+
+  const colEventQuery = useCollectingEventQuery(
+    physicalEntityQuery.response?.data?.collectingEvent?.id
+  );
+
+  const collectingEvent = colEventQuery.response?.data;
 
   const buttonBar = (
     <ButtonBar>
@@ -56,14 +65,19 @@ export default function PhysicalEntityViewPage() {
           <h1>
             <DinaMessage id="cataloguedObjectViewTitle" />
           </h1>
-          <div className="form-group">
-            <DinaForm<PhysicalEntity>
-              initialValues={physicalEntity}
-              readOnly={true}
-            >
-              <CataloguedObjectFormLayout />
-            </DinaForm>
-          </div>
+          <DinaForm<PhysicalEntity>
+            initialValues={physicalEntity}
+            readOnly={true}
+          >
+            <CataloguedObjectFormLayout />
+            <FieldSet legend={<DinaMessage id="collectingEvent" />}>
+              {collectingEvent && (
+                <DinaForm initialValues={collectingEvent} readOnly={true}>
+                  <CollectingEventFormLayout />
+                </DinaForm>
+              )}
+            </FieldSet>
+          </DinaForm>
           {buttonBar}
         </main>
       ))}
