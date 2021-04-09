@@ -33,7 +33,7 @@ export function GeoReferenceAssertionRow({
 }: GeoReferenceAssertionRowProps) {
   const { formatMessage } = useDinaIntl();
   const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
-    assertion.dwcGeoreferenceVerificationStatus ===
+    assertion?.dwcGeoreferenceVerificationStatus ===
       GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
   );
 
