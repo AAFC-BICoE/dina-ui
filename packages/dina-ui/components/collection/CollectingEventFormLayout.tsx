@@ -11,7 +11,7 @@ import {
   TextField,
   useDinaFormContext
 } from "common-ui";
-import { Field, FieldArray, useFormikContext } from "formik";
+import { Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
 import { useState } from "react";
 import Switch from "react-switch";
@@ -39,71 +39,72 @@ export function CollectingEventFormLayout() {
   const [rangeEnabled, setRangeEnabled] = useState(false);
 
   const { readOnly } = useDinaFormContext();
-  const { setFieldValue, values } = useFormikContext<CollectingEvent>();
 
   const [activeTabIdx, setActiveTabIdx] = useState(0);
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
-  const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
-    values.dwcGeoreferenceVerificationStatus ===
-      GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
-  );
-
-  function toggleRangeEnabled(newValue: boolean) {
+  function toggleRangeEnabled(
+    newValue: boolean,
+    formik: FormikContextType<{}>
+  ) {
     if (!newValue) {
-      setFieldValue("endEventDateTime", null);
+      formik.setFieldValue("endEventDateTime", null);
     }
     setRangeEnabled(newValue);
   }
 
-  function selectSearchResult(result: NominatumApiSearchResult) {
+  function selectSearchResult(
+    result: NominatumApiSearchResult,
+    formik: FormikContextType<{}>
+  ) {
     // Set locality fields:
-    setFieldValue("dwcCountry", result?.address?.country || null);
-    setFieldValue("dwcStateProvince", result?.address?.state || null);
-    setFieldValue("geographicPlaceName", result?.display_name || null);
+    formik.setFieldValue("dwcCountry", result?.address?.country || null);
+    formik.setFieldValue("dwcStateProvince", result?.address?.state || null);
+    formik.setFieldValue("geographicPlaceName", result?.display_name || null);
 
     // Set geo source fields:
-    setFieldValue(
+    formik.setFieldValue(
       "geographicPlaceNameSourceDetail.sourceID",
       result.osm_id || null
     );
-    setFieldValue(
+    formik.setFieldValue(
       "geographicPlaceNameSourceDetail.sourceIdType",
       result.osm_type || null
     );
-    setFieldValue(
+    formik.setFieldValue(
       "geographicPlaceNameSourceDetail.sourceUrl",
       geographicPlaceSourceUrl
     );
-    setFieldValue(
+    formik.setFieldValue(
       "geographicPlaceNameSourceDetail.geographicPlaceNameSource",
       GeographicPlaceNameSource.OSM
     );
   }
 
-  function removeThisPlace() {
+  function removeThisPlace(formik: FormikContextType<{}>) {
     // reset the fields when user remove the place
-    setFieldValue("dwcCountry", null);
-    setFieldValue("dwcStateProvince", null);
-    setFieldValue("geographicPlaceName", null);
+    formik.setFieldValue("dwcCountry", null);
+    formik.setFieldValue("dwcStateProvince", null);
+    formik.setFieldValue("geographicPlaceName", null);
 
     // reset the source fields when user remove the place
-    setFieldValue("geographicPlaceNameSourceDetail", null);
-    setFieldValue("geographicPlaceNameSource", null);
+    formik.setFieldValue("geographicPlaceNameSourceDetail", null);
+    formik.setFieldValue("geographicPlaceNameSource", null);
   }
 
-  function onGeoReferencingImpossibleCheckBoxClick(e) {
-    if (e.target.checked === true) {
-      setFieldValue(
+  function onGeoReferencingImpossibleCheckBoxClick(
+    event,
+    formik: FormikContextType<{}>
+  ) {
+    if (event.target.checked === true) {
+      formik.setFieldValue(
         "dwcGeoreferenceVerificationStatus",
         GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
       );
-      setFieldValue("geoReferenceAssertions", []);
-      setGeoreferenceDisabled(true);
+      formik.setFieldValue("geoReferenceAssertions", []);
     } else {
-      setFieldValue("dwcGeoreferenceVerificationStatus", null);
-      setGeoreferenceDisabled(false);
+      formik.setFieldValue("dwcGeoreferenceVerificationStatus", null);
     }
   }
 
@@ -141,7 +142,7 @@ export function CollectingEventFormLayout() {
               placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
             <Field name="endEventDateTime">
-              {({ field: { value: endEventDateTime } }) => (
+              {({ field: { value: endEventDateTime }, form }) => (
                 <div>
                   {(rangeEnabled || endEventDateTime) && (
                     <FormattedTextField
@@ -154,7 +155,9 @@ export function CollectingEventFormLayout() {
                     <label style={{ marginLeft: 15, marginTop: -15 }}>
                       <span>{formatMessage("enableDateRangeLabel")}</span>
                       <Switch
-                        onChange={toggleRangeEnabled}
+                        onChange={newValue =>
+                          toggleRangeEnabled(newValue, form)
+                        }
                         checked={rangeEnabled || endEventDateTime}
                         className="react-switch dateRange"
                       />
@@ -245,21 +248,37 @@ export function CollectingEventFormLayout() {
               <legend className="w-auto">
                 <DinaMessage id="geoReferencingLegend" />
               </legend>
-              {(georeferenceDisabled ||
-                (values.geoReferenceAssertions &&
-                  values.geoReferenceAssertions.length === 0)) && (
-                <div className="col-md-5">
-                  <CheckBoxField
-                    name="dwcGeoreferenceVerificationStatus"
-                    onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
-                  />
-                </div>
-              )}
+              <Field name="dwcGeoreferenceVerificationStatus">
+                {({
+                  field: { value: verificationStatus },
+                  form: {
+                    values: { geoReferenceAssertions }
+                  }
+                }) =>
+                  (verificationStatus ===
+                    GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE ||
+                    !geoReferenceAssertions?.length) && (
+                    <div className="col-md-5">
+                      <CheckBoxField
+                        name="dwcGeoreferenceVerificationStatus"
+                        onCheckBoxClick={
+                          onGeoReferencingImpossibleCheckBoxClick
+                        }
+                      />
+                    </div>
+                  )
+                }
+              </Field>
               <FieldArray name="geoReferenceAssertions">
                 {({ form, push, remove }) => {
                   const assertions =
                     (form.values as CollectingEvent).geoReferenceAssertions ??
                     [];
+
+                  const georeferenceDisabled =
+                    (form.values as CollectingEvent)
+                      .dwcGeoreferenceVerificationStatus ===
+                    GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE;
 
                   function addGeoReference() {
                     push({});
@@ -274,12 +293,8 @@ export function CollectingEventFormLayout() {
                     );
                   }
 
-                  return (
-                    <div
-                      style={{
-                        display: georeferenceDisabled ? "none" : "inline"
-                      }}
-                    >
+                  return georeferenceDisabled ? null : (
+                    <div>
                       <Tabs
                         selectedIndex={activeTabIdx}
                         onSelect={setActiveTabIdx}
@@ -361,7 +376,7 @@ export function CollectingEventFormLayout() {
                             <div className="col-md-4">
                               <FormikButton
                                 className="btn btn-dark"
-                                onClick={removeThisPlace}
+                                onClick={(_, formik) => removeThisPlace(formik)}
                               >
                                 <DinaMessage id="removeThisPlaceLabel" />
                               </FormikButton>
