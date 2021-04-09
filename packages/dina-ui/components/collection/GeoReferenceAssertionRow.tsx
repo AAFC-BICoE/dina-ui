@@ -48,45 +48,25 @@ export function GeoReferenceAssertionRow({
         `geoReferenceAssertions[${index}].dwcDecimalLatitude`,
         null
       );
-      formik.setFieldTouched(
-        `geoReferenceAssertions[${index}].dwcDecimalLatitude`
-      );
       formik.setFieldValue?.(
         `geoReferenceAssertions[${index}].dwcDecimalLongitude`,
         null
-      );
-      formik.setFieldTouched(
-        `geoReferenceAssertions[${index}].dwcDecimalLongitude`
       );
       formik.setFieldValue?.(
         `geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`,
         null
       );
-      formik.setFieldTouched(
-        `geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`
-      );
-
       formik.setFieldValue?.(
         `geoReferenceAssertions[${index}].dwcGeodeticDatum`,
         null
-      );
-      formik.setFieldTouched(
-        `geoReferenceAssertions[${index}].dwcGeodeticDatum`
       );
       formik.setFieldValue(
         `geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`,
         null
       );
-      formik.setFieldTouched(
-        `geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`
-      );
-
       formik.setFieldValue(
         `geoReferenceAssertions[${index}].dwcGeoreferenceSources`,
         null
-      );
-      formik.setFieldTouched(
-        `geoReferenceAssertions[${index}].dwcGeoreferenceSources`
       );
       formik.setFieldValue(
         name,
@@ -106,7 +86,6 @@ export function GeoReferenceAssertionRow({
         `geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`,
         undefined
       );
-
       formik.setFieldValue(
         `geoReferenceAssertions[${index}].dwcGeodeticDatum`,
         undefined
@@ -115,7 +94,6 @@ export function GeoReferenceAssertionRow({
         `geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`,
         undefined
       );
-
       formik.setFieldValue(
         `geoReferenceAssertions[${index}].dwcGeoreferenceSources`,
         undefined
@@ -143,7 +121,6 @@ export function GeoReferenceAssertionRow({
             />
           )}
         </Field>
-
         <NumberField
           name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
           label={formatMessage("decimalLatitude")}
@@ -196,7 +173,6 @@ export function GeoReferenceAssertionRow({
               getResource: openAddPersonModal as any
             }
           ]}
-          isDisabled={georeferenceDisabled}
         />
         <TextField
           name={`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`}
