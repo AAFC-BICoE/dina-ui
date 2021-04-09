@@ -52,6 +52,8 @@ describe("PcrProfile details page", () => {
         <strong>Thermocycler Profile Name</strong>
       )
     ).toEqual(true);
-    expect(wrapper.containsMatchingElement(<p>Test Profile</p>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<div>Test Profile</div>)).toEqual(
+      true
+    );
   });
 });

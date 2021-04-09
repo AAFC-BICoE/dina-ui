@@ -54,7 +54,9 @@ export function KeyValueTable({
             if (CustomCell) {
               return <CustomCell {...props} />;
             }
-            return props.value;
+            return typeof props.value === "object"
+              ? JSON.stringify(props.value)
+              : props.value;
           },
           Header: valueHeader,
           accessor: "value",

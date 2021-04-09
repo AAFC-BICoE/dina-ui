@@ -2,6 +2,7 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
+  addAnotherAssertion: "Add Another GeoReference",
   addAssertion: "Add GeoReference",
   addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
@@ -38,6 +39,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectorGroupNameLabel: "Collector Group Name",
   collectorGroupViewTitle: "View Collector Group",
   coordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",
+  decimalLatLong: "Decimal Lat/Long",
   decimalLatitude: "Decimal Latitude",
   decimalLongitude: "Decimal Longitude",
   deleted: "Deleted",
@@ -61,6 +63,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editOrganizationAliasesLabel: "Aliases (Comma-separated)",
   editPersonTitle: "Edit Person",
   editSelectedButtonText: "Edit Selected",
+  editSelectedAttachmentMetadata: "Edit Selected Attachment Metadata",
   enableDateRangeLabel: "Enable Date Range",
   endEventDateTimeLabel: "End Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   exifProperties: "Exif Properties",
@@ -188,15 +191,23 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
   georeferencedDateLabel: "Georeferenced Date",
   geographyLegend: "Geography (Places)",
+  geographySearchBoxTooltip:
+    'Search by place name (e.g. "Ottawa" or WGS84 coordinates (e.g. "40.123, -74.123"))',
   georeferencedByLabel: "Georeferenced By (agent)",
   geoReferencing: "Geo-Referencing",
   geoReferencingLegend: "Georeferencing",
   governmentOfCanada: "Government of Canada",
   group: "Group",
   groupMustBeSelected: "Group must be selected",
-  latLongAutoSetterButton: "Set Decimal Lat/Long based on Verbatim fields",
+  latitudeValidationError:
+    "Invalid latitude: {latitude}, \
+  \nValid latitude range is between -90 to 90 for degree, and 0 to 60 for minute and second",
+  longitudeValidationError:
+    "Invalid longitude: {longtitude}, \
+  \nValid longitude is between -180 to 180 for degree, and 0 to 60 for minute and second",
+  latLongAutoSetterButton: "Convert to Decimal Lat/Long",
+  locationLabel: "Location",
   literalGeoreferencedByLabel: "Georeferenced By",
-  LocationLabel: "Location",
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
   managedAttributeValueLabel: "Value",
@@ -226,6 +237,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metadataTagsLabel: "Tags",
   metadataUploadDetailsLabel: "Upload Details",
   noFileToDisplay: "No file to display",
+  noResultsFound: "No results found.",
   objectListTitle: "Stored Objects",
   objectStoreDetailsTitle: "Object Store Details",
   objectStoreTitle: "Object Store",
@@ -256,7 +268,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   startEventDateTimeLabel: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   thumbnailNotAvailableText: "No thumbnail available",
   to: "To",
-  toponymyLegend: "Toponymy",
+  toponymyLegend: "Current Geographic Place",
   uploadButtonText: "Upload",
   uploadFormInstructions:
     "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
@@ -267,6 +279,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   userMustBelongToGroup: "User must belong to a Group",
   verbatimEventDateTimeLabel: "Verbatim Event DateTime",
   verbatimCoordinatesLegend: "Verbatim Coordinates",
+  verbatimLatLong: "Verbatim Lat/Long",
   viewDetailButtonLabel: " View Detail",
   viewOnMap: "View on Map",
   viewPreviewButtonText: "Preview",

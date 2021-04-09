@@ -5,11 +5,13 @@ import { SetCoordinatesFromVerbatimButton } from "../SetCoordinatesFromVerbatimB
 
 describe("SetCoordinatesFromVerbatimButton component", () => {
   it("Sets the lat/lon from the verbatim fields.", async () => {
+    const onClickCallback = jest.fn();
+
     const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{
-          verbatimLatitude: "45°32'25\"N",
-          verbatimLongitude: "129°40'31\"W",
+          verbatimLatitude: "45°32′25″N",
+          verbatimLongitude: "129°40′31″W",
           decimalLatitude: "",
           decimalLongitude: ""
         }}
@@ -19,7 +21,10 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
           sourceLonField="verbatimLongitude"
           targetLatField="decimalLatitude"
           targetLonField="decimalLongitude"
-        />
+          onClick={onClickCallback}
+        >
+          Test Button
+        </SetCoordinatesFromVerbatimButton>
         <NumberField name="decimalLatitude" />
         <NumberField name="decimalLongitude" />
       </DinaForm>
@@ -35,5 +40,10 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
     expect(
       wrapper.find(".decimalLongitude-field").find(NumberFormat).prop("value")
     ).toEqual(-129.67527777777778);
+
+    expect(onClickCallback).lastCalledWith({
+      lat: 45.540277777777774,
+      lon: -129.67527777777778
+    });
   });
 });
