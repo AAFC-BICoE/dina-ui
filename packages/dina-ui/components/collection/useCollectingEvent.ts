@@ -119,7 +119,6 @@ export function useCollectingEventSave(
         type: "collecting-event",
         collectors: [],
         collectorGroups: [],
-        startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
         geoReferenceAssertions: [{}]
       };
 

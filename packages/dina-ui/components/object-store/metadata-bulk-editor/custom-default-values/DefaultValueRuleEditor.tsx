@@ -1,5 +1,10 @@
-import { DinaForm, DinaFormOnSubmit, SubmitButton, TextField } from "common-ui";
-import { FieldArray } from "formik";
+import {
+  DinaForm,
+  DinaFormOnSubmit,
+  FieldArray,
+  SubmitButton,
+  TextField
+} from "common-ui";
 import { useState } from "react";
 import { DinaMessage } from "../../../../intl/dina-ui-intl";
 import { useMetadataBuiltInAttributeColumns } from "../BulkMetadataEditor";

@@ -2,6 +2,7 @@ import {
   AutoSuggestTextField,
   CheckBoxField,
   DinaFormSection,
+  FieldArray,
   FieldSet,
   filterBy,
   FormattedTextField,
@@ -12,7 +13,7 @@ import {
   TextField,
   useDinaFormContext
 } from "common-ui";
-import { Field, FieldArray, useFormikContext } from "formik";
+import { Field, useFormikContext } from "formik";
 import { clamp } from "lodash";
 import { useState } from "react";
 import Switch from "react-switch";
@@ -153,7 +154,7 @@ export function CollectingEventFormLayout() {
                       <span>{formatMessage("enableDateRangeLabel")}</span>
                       <Switch
                         onChange={toggleRangeEnabled}
-                        checked={rangeEnabled || endEventDateTime}
+                        checked={rangeEnabled || endEventDateTime || false}
                         className="react-switch dateRange"
                       />
                     </label>

@@ -15,6 +15,10 @@ import {
 import { useRouter } from "next/router";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
+import {
+  useCollectingEventQuery,
+  useCollectingEventSave
+} from "../../../components/collection/useCollectingEvent";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { PhysicalEntity } from "../../../types/collection-api";
 
@@ -75,26 +79,52 @@ export interface CataloguedObjectFormProps {
   onSaved?: (id: string) => Promise<void>;
 }
 
+/** Editable CataloguedObject Form. */
 export function CataloguedObjectForm({
   cataloguedObject,
   onSaved
 }: CataloguedObjectFormProps) {
   const { save } = useApiClient();
 
-  const initialValues: Partial<PhysicalEntity> = cataloguedObject
-    ? cataloguedObject
-    : {};
+  const colEventQuery = useCollectingEventQuery(
+    cataloguedObject?.collectingEvent?.id
+  );
 
-  const onSubmit: DinaFormOnSubmit = async ({ submittedValues }) => {
+  const {
+    collectingEventInitialValues,
+    saveCollectingEvent
+  } = useCollectingEventSave(colEventQuery.response?.data);
+
+  const initialValues = {
+    ...(cataloguedObject ?? {}),
+    collectingEvent: collectingEventInitialValues
+  } as any;
+
+  const onSubmit: DinaFormOnSubmit<PhysicalEntity> = async ({
+    submittedValues
+  }) => {
+    const { collectingEvent, ...cataloguedObjectValues } = submittedValues;
+
+    const savedCollectingEvent = await saveCollectingEvent(collectingEvent);
+
+    const cataloguedObjectInput = {
+      ...cataloguedObjectValues,
+      collectingEvent: {
+        id: savedCollectingEvent.id,
+        type: savedCollectingEvent.type
+      }
+    };
+
     const [savedPhysicalEntity] = await save<PhysicalEntity>(
       [
         {
-          resource: submittedValues,
+          resource: cataloguedObjectInput,
           type: "physical-entity"
         }
       ],
       { apiBaseUrl: "/collection-api" }
     );
+
     await onSaved?.(savedPhysicalEntity.id);
   };
 
@@ -108,7 +138,7 @@ export function CataloguedObjectForm({
     </ButtonBar>
   );
 
-  return (
+  return colEventQuery.loading ? null : (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       {buttonBar}
       <CataloguedObjectFormLayout />
@@ -140,8 +170,11 @@ export function CataloguedObjectFormLayout() {
           </FieldSet>
         </div>
       </div>
-      <FieldSet legend={<DinaMessage id="collectingEvent" />}>
-        {/* <CollectingEventFormLayout /> */}
+      <FieldSet
+        legend={<DinaMessage id="collectingEvent" />}
+        namePrefix="collectingEvent"
+      >
+        <CollectingEventFormLayout />
       </FieldSet>
     </div>
   );
