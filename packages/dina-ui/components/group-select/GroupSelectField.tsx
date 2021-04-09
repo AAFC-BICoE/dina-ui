@@ -3,7 +3,6 @@ import {
   SelectFieldProps,
   SelectOption,
   useAccount,
-  useDinaFormContext,
   useQuery
 } from "common-ui";
 import { useFormikContext } from "formik";
@@ -41,19 +40,13 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
   const { locale } = useDinaIntl();
   const { groupNames: myGroupNames } = useAccount();
   const { initialValues } = useFormikContext<any>();
-  const { namePrefix } = useDinaFormContext();
-
-  /** Prefixed field name for nested form section. */
-  const prefixedFieldName = [namePrefix, selectFieldProps.name]
-    .filter(it => it)
-    .join(".");
 
   const { setStoredDefaultGroupIfEnabled } = useStoredDefaultGroup({
     enable: enableStoredDefaultGroup,
-    groupFieldName: prefixedFieldName
+    groupFieldName: selectFieldProps.name
   });
 
-  const initialGroupName = get(initialValues, prefixedFieldName);
+  const initialGroupName = get(initialValues, selectFieldProps.name);
 
   const selectableGroupNames = uniq([
     // If the value is already set, include it in the dropdown regardless of user permissions.

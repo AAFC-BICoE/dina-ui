@@ -1,5 +1,6 @@
 import { connect, FormikContextType } from "formik";
 import { LoadingSpinner, OnFormikSubmit, safeSubmit } from "..";
+import { withFormikContext } from "./FormikConnect";
 
 interface FormikButtonProps {
   className?: string;
@@ -17,15 +18,14 @@ interface FormikButtonProps {
 /**
  * Formik-connected button for click events other than main form submissions.
  */
-export const FormikButton = connect<FormikButtonProps>(
-  ({
-    buttonProps,
-    className,
-    children,
-    formik,
-    loading: loadingProp,
-    onClick
-  }) =>
+export function FormikButton({
+  buttonProps,
+  className,
+  children,
+  loading: loadingProp,
+  onClick
+}: FormikButtonProps) {
+  return withFormikContext(formik =>
     formik.isSubmitting || loadingProp ? (
       <LoadingSpinner loading={true} />
     ) : (
@@ -38,4 +38,5 @@ export const FormikButton = connect<FormikButtonProps>(
         {children}
       </button>
     )
-);
+  );
+}

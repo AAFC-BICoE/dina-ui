@@ -29,9 +29,6 @@ export interface DinaFormContextI {
    * "true" defaults to [6, 6].
    */
   horizontal?: boolean | [number, number];
-
-  /** Field name prefix to add before every field name in formik. */
-  namePrefix?: string;
 }
 
 export type DinaFormOnSubmit<TValues = any> = (
@@ -116,14 +113,8 @@ export function DinaFormSection({
 }: DinaFormSectionProps) {
   const ctx = useDinaFormContext();
 
-  const combinedPrefix = [ctx.namePrefix, ctxOverride.namePrefix]
-    .filter(it => it)
-    .join(".");
-
   return (
-    <DinaFormContext.Provider
-      value={{ ...ctx, ...ctxOverride, namePrefix: combinedPrefix }}
-    >
+    <DinaFormContext.Provider value={{ ...ctx, ...ctxOverride }}>
       {children}
     </DinaFormContext.Provider>
   );

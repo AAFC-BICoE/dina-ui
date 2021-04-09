@@ -170,10 +170,7 @@ export function CataloguedObjectFormLayout() {
           </FieldSet>
         </div>
       </div>
-      <FieldSet
-        legend={<DinaMessage id="collectingEvent" />}
-        namePrefix="collectingEvent"
-      >
+      <FieldSet legend={<DinaMessage id="collectingEvent" />}>
         <CollectingEventFormLayout />
       </FieldSet>
     </div>

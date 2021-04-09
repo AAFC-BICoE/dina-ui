@@ -60,10 +60,7 @@ export function FieldWrapper({
   link,
   readOnlyRender
 }: FieldWrapperProps) {
-  const { horizontal, namePrefix, readOnly } = useDinaFormContext();
-
-  /** Prefixed field name for nested form section. */
-  const prefixedFieldName = [namePrefix, name].filter(it => it).join(".");
+  const { horizontal, readOnly } = useDinaFormContext();
 
   const fieldLabel = label ?? (
     <FieldHeader name={name} customName={customName} />
@@ -85,7 +82,7 @@ export function FieldWrapper({
           {!hideLabel && <strong>{fieldLabel}</strong>}
         </label>
         <div className={valueCol ? `col-sm-${valueCol}` : ""}>
-          <FastField name={prefixedFieldName}>
+          <FastField name={name}>
             {({ field: { value }, form }) => {
               if (readOnly || !children) {
                 return (
@@ -99,8 +96,8 @@ export function FieldWrapper({
                 );
               } else if (typeof children === "function") {
                 function setValue(newValue: any) {
-                  form.setFieldValue(prefixedFieldName, newValue);
-                  form.setFieldTouched(prefixedFieldName);
+                  form.setFieldValue(name, newValue);
+                  form.setFieldTouched(name);
                 }
 
                 return children?.({ value, setValue, formik: form });
