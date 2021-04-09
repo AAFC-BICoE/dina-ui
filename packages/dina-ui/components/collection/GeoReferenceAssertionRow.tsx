@@ -43,61 +43,31 @@ export function GeoReferenceAssertionRow({
   ) {
     // On checked, set 3 fields editable, rest readonly; unchecked, all fields editable
     const name = `geoReferenceAssertions[${index}].dwcGeoreferenceVerificationStatus`;
+    const dwcDecimalLatitude = `geoReferenceAssertions[${index}].dwcDecimalLatitude`;
+    const dwcDecimalLongitude = `geoReferenceAssertions[${index}].dwcDecimalLongitude`;
+    const dwcCoordinateUncertaintyInMeters = `geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`;
+    const dwcGeodeticDatum = `geoReferenceAssertions[${index}].dwcGeodeticDatum`;
+    const dwcGeoreferenceProtocol = `geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`;
+    const dwcGeoreferenceSources = `geoReferenceAssertions[${index}].dwcGeoreferenceSources`;
     if (event.target.checked === true) {
-      formik.setFieldValue?.(
-        `geoReferenceAssertions[${index}].dwcDecimalLatitude`,
-        null
-      );
-      formik.setFieldValue?.(
-        `geoReferenceAssertions[${index}].dwcDecimalLongitude`,
-        null
-      );
-      formik.setFieldValue?.(
-        `geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`,
-        null
-      );
-      formik.setFieldValue?.(
-        `geoReferenceAssertions[${index}].dwcGeodeticDatum`,
-        null
-      );
-      formik.setFieldValue(
-        `geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`,
-        null
-      );
-      formik.setFieldValue(
-        `geoReferenceAssertions[${index}].dwcGeoreferenceSources`,
-        null
-      );
+      formik.setFieldValue(dwcDecimalLatitude, null);
+      formik.setFieldValue(dwcDecimalLongitude, null);
+      formik.setFieldValue(dwcCoordinateUncertaintyInMeters, null);
+      formik.setFieldValue(dwcGeodeticDatum, null);
+      formik.setFieldValue(dwcGeoreferenceProtocol, null);
+      formik.setFieldValue(dwcGeoreferenceSources, null);
       formik.setFieldValue(
         name,
         GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
       );
       setGeoreferenceDisabled(true);
     } else {
-      formik.setFieldValue(
-        `geoReferenceAssertions[${index}].dwcDecimalLatitude`,
-        undefined
-      );
-      formik.setFieldValue(
-        `geoReferenceAssertions[${index}].dwcDecimalLongitude`,
-        undefined
-      );
-      formik.setFieldValue(
-        `geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`,
-        undefined
-      );
-      formik.setFieldValue(
-        `geoReferenceAssertions[${index}].dwcGeodeticDatum`,
-        undefined
-      );
-      formik.setFieldValue(
-        `geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`,
-        undefined
-      );
-      formik.setFieldValue(
-        `geoReferenceAssertions[${index}].dwcGeoreferenceSources`,
-        undefined
-      );
+      formik.setFieldValue(dwcDecimalLatitude, undefined);
+      formik.setFieldValue(dwcDecimalLongitude, undefined);
+      formik.setFieldValue(dwcCoordinateUncertaintyInMeters, undefined);
+      formik.setFieldValue(dwcGeodeticDatum, undefined);
+      formik.setFieldValue(dwcGeoreferenceProtocol, undefined);
+      formik.setFieldValue(dwcGeoreferenceSources, undefined);
       formik.setFieldValue(name, null);
       setGeoreferenceDisabled(false);
     }
