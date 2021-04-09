@@ -12,6 +12,11 @@ export interface GeoReferenceAssertionAttributes {
   dwcGeoreferenceProtocol?: string;
   dwcGeoreferenceSources?: string;
   dwcGeoreferenceRemarks?: string;
+  dwcGeoreferenceVerificationStatus?: GeoreferenceVerificationStatus;
+}
+
+export enum GeoreferenceVerificationStatus {
+  GEOREFERENCING_NOT_POSSIBLE = "GEOREFERENCING_NOT_POSSIBLE"
 }
 
 export interface GeoReferenceAssertionRelationships {

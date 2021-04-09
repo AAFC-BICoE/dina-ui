@@ -47,6 +47,8 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   /** Special dropdown options that can fetch an async value e.g. by creating a resource in a modal. */
   asyncOptions?: AsyncOption<TData>[];
+
+  isDisabled?: boolean;
 }
 
 /**
@@ -78,7 +80,8 @@ export function ResourceSelect<TData extends KitsuResource>({
   sort,
   styles,
   value,
-  asyncOptions
+  asyncOptions,
+  isDisabled
 }: ResourceSelectProps<TData>) {
   const { apiClient } = useContext(ApiClientContext);
   const { formatMessage } = useIntl();
@@ -209,6 +212,7 @@ export function ResourceSelect<TData extends KitsuResource>({
         MultiValue: SortableMultiValue
       }}
       distance={4}
+      isDisabled={isDisabled}
     />
   );
 }
