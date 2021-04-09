@@ -1,14 +1,21 @@
 import CoordinateParser from "coordinate-parser";
 import { ReactNode, useState } from "react";
 import useSWR from "swr";
-import { LoadingSpinner, NominatumApiSearchResult, Tooltip } from "common-ui";
+import {
+  LoadingSpinner,
+  NominatumApiSearchResult,
+  OnFormikSubmit,
+  Tooltip,
+  FormikButton
+} from "common-ui";
 import { DinaMessage } from "../../intl/dina-ui-intl";
+import { FormikContextType } from "formik";
 
 interface GeographySearchBoxProps {
   inputValue: string;
   onInputChange: (value: string) => void;
 
-  onSelectSearchResult: (result: NominatumApiSearchResult) => void;
+  onSelectSearchResult: OnFormikSubmit<NominatumApiSearchResult>;
 
   /** Extra JSX to render under the search bar. */
   renderUnderSearchBar?: ReactNode;
@@ -84,10 +91,13 @@ export function GeographySearchBox({
   const suggestButtonIsDisabled =
     geoApiRequestsOnHold || !inputValue || geoSearchIsLoading;
 
-  function selectGeoResult(result: NominatumApiSearchResult) {
+  function selectGeoResult(
+    result: NominatumApiSearchResult,
+    formik: FormikContextType<any>
+  ) {
     onInputChange("");
     setSearchValue("");
-    onSelectSearchResult?.(result);
+    onSelectSearchResult?.(result, formik);
   }
 
   function doSearch() {
@@ -160,13 +170,12 @@ export function GeographySearchBox({
               </div>
               <div className="row">
                 <div className="col-md-4">
-                  <button
-                    type="button"
+                  <FormikButton
                     className="btn btn-primary"
-                    onClick={() => selectGeoResult(place)}
+                    onClick={(_, formik) => selectGeoResult(place, formik)}
                   >
                     <DinaMessage id="select" />
-                  </button>
+                  </FormikButton>
                 </div>
 
                 <div className="col-md-4">

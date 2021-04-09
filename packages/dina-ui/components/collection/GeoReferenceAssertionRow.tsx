@@ -7,11 +7,13 @@ import {
   TextField,
   CheckBoxField
 } from "common-ui";
-import { connect, useFormikContext } from "formik";
+import { connect, FormikContextType, Field } from "formik";
 import { PersistedResource } from "kitsu";
 import { get } from "lodash";
-import { CollectingEvent } from "../../types/collection-api/resources/CollectingEvent";
-import { GeoreferenceVerificationStatus } from "../../types/collection-api/resources/GeoReferenceAssertion";
+import {
+  GeoReferenceAssertion,
+  GeoreferenceVerificationStatus
+} from "../../types/collection-api/resources/GeoReferenceAssertion";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
 import { useState } from "react";
@@ -19,103 +21,106 @@ import { useState } from "react";
 export interface GeoReferenceAssertionRowProps {
   index: number;
   viewOnly?: boolean;
+  assertion: GeoReferenceAssertion;
   openAddPersonModal?: () => Promise<PersistedResource<Person> | undefined>;
 }
 
 export function GeoReferenceAssertionRow({
   index,
   viewOnly,
+  assertion,
   openAddPersonModal
 }: GeoReferenceAssertionRowProps) {
   const { formatMessage } = useDinaIntl();
-  const {
-    setFieldValue,
-    values,
-    setFieldTouched
-  } = useFormikContext<CollectingEvent>();
   const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
-    values?.geoReferenceAssertions?.[index]
-      .dwcGeoreferenceVerificationStatus ===
+    assertion.dwcGeoreferenceVerificationStatus ===
       GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
   );
 
-  function onGeoReferencingImpossibleCheckBoxClick(e) {
+  function onGeoReferencingImpossibleCheckBoxClick(
+    event,
+    formik: FormikContextType<{}>
+  ) {
     // On checked, set 3 fields editable, rest readonly; unchecked, all fields editable
     const name = `geoReferenceAssertions[${index}].dwcGeoreferenceVerificationStatus`;
-    const geoReferencedBy =
-      values?.geoReferenceAssertions?.[index].georeferencedBy;
-    if (e.target.checked === true) {
-      setFieldValue?.(
+    if (event.target.checked === true) {
+      formik.setFieldValue?.(
         `geoReferenceAssertions[${index}].dwcDecimalLatitude`,
         null
       );
-      setFieldTouched(`geoReferenceAssertions[${index}].dwcDecimalLatitude`);
-      setFieldValue?.(
+      formik.setFieldTouched(
+        `geoReferenceAssertions[${index}].dwcDecimalLatitude`
+      );
+      formik.setFieldValue?.(
         `geoReferenceAssertions[${index}].dwcDecimalLongitude`,
         null
       );
-      setFieldTouched(`geoReferenceAssertions[${index}].dwcDecimalLongitude`);
-      setFieldValue?.(
+      formik.setFieldTouched(
+        `geoReferenceAssertions[${index}].dwcDecimalLongitude`
+      );
+      formik.setFieldValue?.(
         `geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`,
         null
       );
-      setFieldTouched(
+      formik.setFieldTouched(
         `geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`
       );
 
-      setFieldValue?.(
+      formik.setFieldValue?.(
         `geoReferenceAssertions[${index}].dwcGeodeticDatum`,
         null
       );
-      setFieldTouched(`geoReferenceAssertions[${index}].dwcGeodeticDatum`);
-      setFieldValue?.(
+      formik.setFieldTouched(
+        `geoReferenceAssertions[${index}].dwcGeodeticDatum`
+      );
+      formik.setFieldValue(
         `geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`,
         null
       );
-      setFieldTouched(
+      formik.setFieldTouched(
         `geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`
       );
 
-      setFieldValue?.(
+      formik.setFieldValue(
         `geoReferenceAssertions[${index}].dwcGeoreferenceSources`,
         null
       );
-      setFieldTouched(
+      formik.setFieldTouched(
         `geoReferenceAssertions[${index}].dwcGeoreferenceSources`
       );
-      setFieldValue?.(
+      formik.setFieldValue(
         name,
         GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
       );
       setGeoreferenceDisabled(true);
     } else {
-      setFieldValue?.(
+      formik.setFieldValue(
         `geoReferenceAssertions[${index}].dwcDecimalLatitude`,
         undefined
       );
-      setFieldValue?.(
+      formik.setFieldValue(
         `geoReferenceAssertions[${index}].dwcDecimalLongitude`,
         undefined
       );
-      setFieldValue?.(
+      formik.setFieldValue(
         `geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`,
         undefined
       );
 
-      setFieldValue?.(
+      formik.setFieldValue(
         `geoReferenceAssertions[${index}].dwcGeodeticDatum`,
         undefined
       );
-      setFieldValue?.(
+      formik.setFieldValue(
         `geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`,
         undefined
       );
 
-      setFieldValue?.(
+      formik.setFieldValue(
         `geoReferenceAssertions[${index}].dwcGeoreferenceSources`,
         undefined
       );
-      setFieldValue?.(name, null);
+      formik.setFieldValue(name, null);
       setGeoreferenceDisabled(false);
     }
   }
@@ -126,12 +131,19 @@ export function GeoReferenceAssertionRow({
         {viewOnly && (
           <ViewInMapButton assertionPath={`geoReferenceAssertions.${index}`} />
         )}
-        <CheckBoxField
+        <Field
           name={`geoReferenceAssertions[${index}].dwcGeoreferenceVerificationStatus`}
-          onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
-          disabled={viewOnly}
-          customName="dwcGeoreferenceVerificationStatus"
-        />
+        >
+          {() => (
+            <CheckBoxField
+              name={`geoReferenceAssertions[${index}].dwcGeoreferenceVerificationStatus`}
+              onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
+              disabled={viewOnly}
+              customName="dwcGeoreferenceVerificationStatus"
+            />
+          )}
+        </Field>
+
         <NumberField
           name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
           label={formatMessage("decimalLatitude")}
