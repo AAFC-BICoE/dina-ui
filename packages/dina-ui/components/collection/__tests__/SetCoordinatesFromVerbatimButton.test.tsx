@@ -10,8 +10,8 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
     const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{
-          verbatimLatitude: "45°32'25\"N",
-          verbatimLongitude: "129°40'31\"W",
+          verbatimLatitude: "45°32′25″N",
+          verbatimLongitude: "129°40′31″W",
           decimalLatitude: "",
           decimalLongitude: ""
         }}

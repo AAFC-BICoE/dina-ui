@@ -1,4 +1,4 @@
-import { FastField } from "formik";
+import { FastField, FormikProps } from "formik";
 import { ReactNode } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { useDinaFormContext } from "./DinaForm";
@@ -39,6 +39,7 @@ export interface FieldWrapperProps extends LabelWrapperParams {
 export interface FieldWrapperRenderProps {
   value: any;
   setValue: (newValue: any) => void;
+  formik: FormikProps<any>;
 }
 
 /**
@@ -85,10 +86,7 @@ export function FieldWrapper({
         </label>
         <div className={valueCol ? `col-sm-${valueCol}` : ""}>
           <FastField name={prefixedFieldName}>
-            {({
-              field: { value },
-              form: { setFieldValue, setFieldTouched }
-            }) => {
+            {({ field: { value }, form }) => {
               if (readOnly || !children) {
                 return (
                   readOnlyRender?.(value) ?? (
@@ -101,11 +99,11 @@ export function FieldWrapper({
                 );
               } else if (typeof children === "function") {
                 function setValue(newValue: any) {
-                  setFieldValue(prefixedFieldName, newValue);
-                  setFieldTouched(prefixedFieldName);
+                  form.setFieldValue(prefixedFieldName, newValue);
+                  form.setFieldTouched(prefixedFieldName);
                 }
 
-                return children?.({ value, setValue });
+                return children?.({ value, setValue, formik: form });
               }
               return children;
             }}

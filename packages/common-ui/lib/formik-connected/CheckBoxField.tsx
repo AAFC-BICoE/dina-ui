@@ -1,8 +1,9 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
+import { OnFormikSubmit } from "./safeSubmit";
 
 export interface CheckBoxProps extends LabelWrapperParams {
-  onCheckBoxClick?: (e) => void;
+  onCheckBoxClick?: OnFormikSubmit<ChangeEvent<HTMLInputElement>>;
   disabled?: boolean;
 }
 
@@ -30,10 +31,10 @@ export function CheckBoxField(props: CheckBoxProps) {
         />
       )}
     >
-      {({ setValue, value }) => {
+      {({ setValue, value, formik }) => {
         function onChange(event) {
           setValue(event.target.checked);
-          onCheckBoxClick?.(event);
+          onCheckBoxClick?.(event, formik);
         }
 
         return (

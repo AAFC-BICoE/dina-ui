@@ -135,7 +135,9 @@ export function useCollectingEventSave(
 
     const assertionIdsToSave = assertionsToSave.map(it => it.id);
     const assertionsToDelete = existingAssertions.filter(
-      existingAssertion => !assertionIdsToSave.includes(existingAssertion.id)
+      existingAssertion =>
+        existingAssertion.id &&
+        !assertionIdsToSave.includes(existingAssertion.id)
     );
 
     const saveArgs: SaveArgs[] = assertionsToSave
