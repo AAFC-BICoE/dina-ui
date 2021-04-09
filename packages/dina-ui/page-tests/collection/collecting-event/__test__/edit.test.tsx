@@ -1,5 +1,5 @@
 import { OperationsResponse } from "common-ui";
-import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
+import { Person } from "../../../../types/agent-api/resources/Person";
 import NumberFormat from "react-number-format";
 import CollectingEventEditPage from "../../../../pages/collection/collecting-event/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";

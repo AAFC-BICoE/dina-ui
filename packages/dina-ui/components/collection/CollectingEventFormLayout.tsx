@@ -12,7 +12,7 @@ import {
 } from "common-ui";
 import { Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
-import { GeoreferenceVerificationStatus } from "packages/dina-ui/types/collection-api/resources/GeoReferenceAssertion";
+import { GeoreferenceVerificationStatus } from "../../types/collection-api/resources/GeoReferenceAssertion";
 import { useState } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
