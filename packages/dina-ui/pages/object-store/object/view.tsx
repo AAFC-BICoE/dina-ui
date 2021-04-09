@@ -49,7 +49,7 @@ export default function MetadataViewPage() {
 
   const { loading, response } = useQuery<Metadata, ObjectUpload>(
     {
-      include: "acDerivedFrom,managedAttributeMap,acMetadataCreator,dcCreator",
+      include: "managedAttributeMap,acMetadataCreator,dcCreator",
       path: `objectstore-api/metadata/${id}`
     },
     {
