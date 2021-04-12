@@ -1,7 +1,6 @@
 import { KitsuResource } from "kitsu";
 
 interface CoordinateSystemAttributes {
-  id: string;
   coordinateSystem: string[];
 }
 

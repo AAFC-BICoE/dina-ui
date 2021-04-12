@@ -31,6 +31,7 @@ import {
   GeographicPlaceNameSource
 } from "../../types/collection-api/resources/CollectingEvent";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
+import { CoordinateSystem } from "../../types/collection-api/resources/CoordinateSystem";
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
 export function CollectingEventFormLayout() {
@@ -235,17 +236,13 @@ export function CollectingEventFormLayout() {
             </div>
             <div className="col-md-6">
               <TextField name="dwcVerbatimCoordinates" />
-              <AutoSuggestTextField<CollectingEvent>
+              <AutoSuggestTextField<CoordinateSystem>
                 name="dwcVerbatimCoordinateSystem"
-                query={(searchValue, ctx) => ({
-                  path: "collection-api/collecting-event",
-                  filter: {
-                    ...(ctx.values.group && { group: { EQ: ctx.values.group } })
-                  }
+                configQuery={() => ({
+                  path: "collection-api/coordinate-system"
                 })}
-                suggestion={collEvent =>
-                  collEvent.dwcVerbatimCoordinateSystem ?? ""
-                }
+                configSuggestion={src => src.coordinateSystem ?? []}
+                shouldRenderSuggestions={(value, reason) => true}
               />
               <AutoSuggestTextField<SRS>
                 name="dwcVerbatimSRS"

@@ -1,7 +1,6 @@
 import { KitsuResource } from "kitsu";
 
 interface SRSAttributes {
-  id: string;
   srs: string[];
 }
 

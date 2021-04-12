@@ -6,7 +6,7 @@ import {
 } from "common-ui";
 import { FormikContextType, useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { debounce, uniq } from "lodash";
+import { debounce, noop, uniq } from "lodash";
 import { InputHTMLAttributes, useCallback, useState } from "react";
 import AutoSuggest, {
   InputProps,
@@ -39,6 +39,8 @@ export function AutoSuggestTextField<T extends KitsuResource>({
   query,
   suggestion,
   shouldRenderSuggestions,
+  configQuery,
+  configSuggestion,
   ...textFieldProps
 }: AutoSuggestTextFieldProps<T>) {
   return (
@@ -48,6 +50,8 @@ export function AutoSuggestTextField<T extends KitsuResource>({
         <AutoSuggestTextFieldInternal
           query={query}
           suggestion={suggestion}
+          configQuery={configQuery}
+          configSuggestion={configSuggestion}
           {...inputProps}
           shouldRenderSuggestions={shouldRenderSuggestions}
         />
@@ -77,7 +81,9 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   );
 
   const suggestions = !loading
-    ? uniq((response?.data ?? []).map(configSuggestion ?? (suggestion as any)))
+    ? configSuggestion
+      ? configSuggestion(response?.data?.[0] as any)
+      : uniq((response?.data ?? []).map(suggestion ?? noop))
     : [];
 
   return (
