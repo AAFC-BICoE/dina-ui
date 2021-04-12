@@ -13,6 +13,7 @@ import {
 } from "common-ui";
 import { Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
+import { SRS } from "../../types/collection-api/resources/SRS";
 import { useState } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -235,8 +236,26 @@ export function CollectingEventFormLayout() {
             </div>
             <div className="col-md-6">
               <TextField name="dwcVerbatimCoordinates" />
-              <TextField name="dwcVerbatimCoordinateSystem" />
-              <TextField name="dwcVerbatimSRS" />
+              <AutoSuggestTextField<CollectingEvent>
+                name="dwcVerbatimCoordinateSystem"
+                query={(searchValue, ctx) => ({
+                  path: "collection-api/collecting-event",
+                  filter: {
+                    ...(ctx.values.group && { group: { EQ: ctx.values.group } })
+                  }
+                })}
+                suggestion={collEvent =>
+                  collEvent.dwcVerbatimCoordinateSystem ?? ""
+                }
+              />
+              <AutoSuggestTextField<SRS>
+                name="dwcVerbatimSRS"
+                configQuery={() => ({
+                  path: "collection-api/srs"
+                })}
+                configSuggestion={src => src.srs ?? []}
+                shouldRenderSuggestions={(value, reason) => true}
+              />
               <TextField name="dwcVerbatimElevation" />
               <TextField name="dwcVerbatimDepth" />
             </div>
