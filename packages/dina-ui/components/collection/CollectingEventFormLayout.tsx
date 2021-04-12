@@ -32,6 +32,7 @@ import {
 } from "../../types/collection-api/resources/CollectingEvent";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import { CoordinateSystem } from "../../types/collection-api/resources/CoordinateSystem";
+import AutoSuggest, { ShouldRenderReasons } from "react-autosuggest";
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
 export function CollectingEventFormLayout() {
@@ -116,6 +117,11 @@ export function CollectingEventFormLayout() {
     setImmediate(() =>
       document?.querySelector<HTMLElement>(".geo-search-button")?.click()
     );
+  }
+
+  /* Ensure config is rendered when input get focuse without needing to enter any value */
+  function shouldRenderSuggestions(value: string, reason: ShouldRenderReasons) {
+    return !value || value?.length >= 0 || reason?.length >= 0;
   }
 
   return (
@@ -242,7 +248,7 @@ export function CollectingEventFormLayout() {
                   path: "collection-api/coordinate-system"
                 })}
                 configSuggestion={src => src.coordinateSystem ?? []}
-                shouldRenderSuggestions={(value, reason) => true}
+                shouldRenderSuggestions={shouldRenderSuggestions}
               />
               <AutoSuggestTextField<SRS>
                 name="dwcVerbatimSRS"
@@ -250,7 +256,7 @@ export function CollectingEventFormLayout() {
                   path: "collection-api/srs"
                 })}
                 configSuggestion={src => src.srs ?? []}
-                shouldRenderSuggestions={(value, reason) => true}
+                shouldRenderSuggestions={shouldRenderSuggestions}
               />
               <TextField name="dwcVerbatimElevation" />
               <TextField name="dwcVerbatimDepth" />
