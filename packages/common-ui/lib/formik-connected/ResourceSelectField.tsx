@@ -13,6 +13,7 @@ export interface ResourceSelectFieldProps<TData extends KitsuResource>
   onChange?: (
     value?: PersistedResource<TData> | PersistedResource<TData>[]
   ) => void;
+  isDisabled?: boolean;
 }
 
 /** Formik-connected Dropdown select input for selecting a resource from the API. */

@@ -185,7 +185,9 @@ function CollectingEventForm({
 
     const assertionIdsToSave = assertionsToSave.map(it => it.id);
     const assertionsToDelete = existingAssertions.filter(
-      existingAssertion => !assertionIdsToSave.includes(existingAssertion.id)
+      existingAssertion =>
+        existingAssertion.id &&
+        !assertionIdsToSave.includes(existingAssertion.id)
     );
 
     const saveArgs: SaveArgs[] = assertionsToSave
@@ -218,7 +220,7 @@ function CollectingEventForm({
     }
   }
 
-  const onSubmit: DinaFormOnSubmit = async ({ submittedValues }) => {
+  const onSubmit: DinaFormOnSubmit = async ({ submittedValues, formik }) => {
     // Init relationships object for one-to-many relations:
     submittedValues.relationships = {};
 
@@ -312,6 +314,10 @@ function CollectingEventForm({
         apiBaseUrl: "/collection-api"
       }
     );
+
+    // Set the Collecting Event ID so if there is an error after this,
+    // then subsequent submissions use PATCH instea of POST:
+    formik.setFieldValue("id", savedCollectingEvent.id);
 
     // save georeference assertions:
     await saveGeoReferenceAssertion(

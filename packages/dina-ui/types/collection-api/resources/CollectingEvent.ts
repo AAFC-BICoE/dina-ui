@@ -34,13 +34,8 @@ export interface CollectingEventAttributes {
   collectorGroups?: CollectorGroup[];
   group: string;
   geographicPlaceName?: string;
-  dwcGeoreferenceVerificationStatus?: GeoreferenceVerificationStatus;
   geographicPlaceNameSourceDetail?: GeographicPlaceNameSourceDetail;
   geographicPlaceNameSource?: GeographicPlaceNameSource;
-}
-
-export enum GeoreferenceVerificationStatus {
-  GEOREFERENCING_NOT_POSSIBLE = "GEOREFERENCING_NOT_POSSIBLE"
 }
 
 export enum GeographicPlaceNameSource {

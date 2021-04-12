@@ -1,6 +1,5 @@
 import {
   AutoSuggestTextField,
-  CheckBoxField,
   DinaFormSection,
   filterBy,
   FormattedTextField,
@@ -11,8 +10,9 @@ import {
   TextField,
   useDinaFormContext
 } from "common-ui";
-import { Field, FieldArray, useFormikContext } from "formik";
+import { Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
+import { GeoreferenceVerificationStatus } from "../../types/collection-api/resources/GeoReferenceAssertion";
 import { useState } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -27,8 +27,7 @@ import { Person } from "../../types/agent-api/resources/Person";
 import { geographicPlaceSourceUrl } from "../../types/collection-api/GeographicPlaceNameSourceDetail";
 import {
   CollectingEvent,
-  GeographicPlaceNameSource,
-  GeoreferenceVerificationStatus
+  GeographicPlaceNameSource
 } from "../../types/collection-api/resources/CollectingEvent";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 
@@ -39,71 +38,72 @@ export function CollectingEventFormLayout() {
   const [rangeEnabled, setRangeEnabled] = useState(false);
 
   const { readOnly } = useDinaFormContext();
-  const { setFieldValue, values } = useFormikContext<CollectingEvent>();
 
   const [activeTabIdx, setActiveTabIdx] = useState(0);
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
-  const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
-    values.dwcGeoreferenceVerificationStatus ===
-      GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
-  );
-
-  function toggleRangeEnabled(newValue: boolean) {
+  function toggleRangeEnabled(
+    newValue: boolean,
+    formik: FormikContextType<{}>
+  ) {
     if (!newValue) {
-      setFieldValue("endEventDateTime", null);
+      formik.setFieldValue("endEventDateTime", null);
     }
     setRangeEnabled(newValue);
   }
 
-  function selectSearchResult(result: NominatumApiSearchResult) {
+  function selectSearchResult(
+    result: NominatumApiSearchResult,
+    formik: FormikContextType<{}>
+  ) {
     // Set locality fields:
-    setFieldValue("dwcCountry", result?.address?.country || null);
-    setFieldValue("dwcStateProvince", result?.address?.state || null);
-    setFieldValue("geographicPlaceName", result?.display_name || null);
+    formik.setFieldValue("dwcCountry", result?.address?.country || null);
+    formik.setFieldValue("dwcStateProvince", result?.address?.state || null);
+    formik.setFieldValue("geographicPlaceName", result?.display_name || null);
 
     // Set geo source fields:
-    setFieldValue(
+    formik.setFieldValue(
       "geographicPlaceNameSourceDetail.sourceID",
       result.osm_id || null
     );
-    setFieldValue(
+    formik.setFieldValue(
       "geographicPlaceNameSourceDetail.sourceIdType",
       result.osm_type || null
     );
-    setFieldValue(
+    formik.setFieldValue(
       "geographicPlaceNameSourceDetail.sourceUrl",
       geographicPlaceSourceUrl
     );
-    setFieldValue(
+    formik.setFieldValue(
       "geographicPlaceNameSourceDetail.geographicPlaceNameSource",
       GeographicPlaceNameSource.OSM
     );
   }
 
-  function removeThisPlace() {
+  function removeThisPlace(formik: FormikContextType<{}>) {
     // reset the fields when user remove the place
-    setFieldValue("dwcCountry", null);
-    setFieldValue("dwcStateProvince", null);
-    setFieldValue("geographicPlaceName", null);
+    formik.setFieldValue("dwcCountry", null);
+    formik.setFieldValue("dwcStateProvince", null);
+    formik.setFieldValue("geographicPlaceName", null);
 
     // reset the source fields when user remove the place
-    setFieldValue("geographicPlaceNameSourceDetail", null);
-    setFieldValue("geographicPlaceNameSource", null);
+    formik.setFieldValue("geographicPlaceNameSourceDetail", null);
+    formik.setFieldValue("geographicPlaceNameSource", null);
   }
 
-  function onGeoReferencingImpossibleCheckBoxClick(e) {
-    if (e.target.checked === true) {
-      setFieldValue(
+  function onGeoReferencingImpossibleCheckBoxClick(
+    event,
+    formik: FormikContextType<{}>
+  ) {
+    if (event.target.checked === true) {
+      formik.setFieldValue(
         "dwcGeoreferenceVerificationStatus",
         GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
       );
-      setFieldValue("geoReferenceAssertions", []);
-      setGeoreferenceDisabled(true);
+      formik.setFieldValue("geoReferenceAssertions", []);
     } else {
-      setFieldValue("dwcGeoreferenceVerificationStatus", null);
-      setGeoreferenceDisabled(false);
+      formik.setFieldValue("dwcGeoreferenceVerificationStatus", null);
     }
   }
 
@@ -141,7 +141,7 @@ export function CollectingEventFormLayout() {
               placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
             <Field name="endEventDateTime">
-              {({ field: { value: endEventDateTime } }) => (
+              {({ field: { value: endEventDateTime }, form }) => (
                 <div>
                   {(rangeEnabled || endEventDateTime) && (
                     <FormattedTextField
@@ -154,7 +154,9 @@ export function CollectingEventFormLayout() {
                     <label style={{ marginLeft: 15, marginTop: -15 }}>
                       <span>{formatMessage("enableDateRangeLabel")}</span>
                       <Switch
-                        onChange={toggleRangeEnabled}
+                        onChange={newValue =>
+                          toggleRangeEnabled(newValue, form)
+                        }
                         checked={rangeEnabled || endEventDateTime}
                         className="react-switch dateRange"
                       />
@@ -211,9 +213,9 @@ export function CollectingEventFormLayout() {
           <legend className="w-auto">
             <DinaMessage id="verbatimCoordinatesLegend" />
           </legend>
-          <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLocality" />
           <div className="row">
             <div className="col-md-6">
+              <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLocality" />
               <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLatitude" />
               <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLongitude" />
               <div className="form-group">
@@ -245,16 +247,6 @@ export function CollectingEventFormLayout() {
               <legend className="w-auto">
                 <DinaMessage id="geoReferencingLegend" />
               </legend>
-              {(georeferenceDisabled ||
-                (values.geoReferenceAssertions &&
-                  values.geoReferenceAssertions.length === 0)) && (
-                <div className="col-md-5">
-                  <CheckBoxField
-                    name="dwcGeoreferenceVerificationStatus"
-                    onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
-                  />
-                </div>
-              )}
               <FieldArray name="geoReferenceAssertions">
                 {({ form, push, remove }) => {
                   const assertions =
@@ -273,45 +265,31 @@ export function CollectingEventFormLayout() {
                       clamp(current, 0, assertions.length - 2)
                     );
                   }
-
                   return (
-                    <div
-                      style={{
-                        display: georeferenceDisabled ? "none" : "inline"
-                      }}
-                    >
+                    <div>
                       <Tabs
                         selectedIndex={activeTabIdx}
                         onSelect={setActiveTabIdx}
                       >
-                        <TabList>
-                          {assertions.map((assertion, index) => (
-                            <Tab key={assertion.id}>
-                              <span className="m-3">{index + 1}</span>
-                            </Tab>
-                          ))}
-                        </TabList>
+                        {
+                          // Only show the tabs when there is more than 1 assertion:
+                          assertions.length !== 1 && (
+                            <TabList>
+                              {assertions.map((assertion, index) => (
+                                <Tab key={assertion.id}>
+                                  <span className="m-3">{index + 1}</span>
+                                </Tab>
+                              ))}
+                            </TabList>
+                          )
+                        }
                         {assertions.length
                           ? assertions.map((assertion, index) => (
                               <TabPanel key={assertion.id}>
-                                <div className="form-group">
-                                  {!readOnly && (
-                                    <SetCoordinatesFromVerbatimButton
-                                      sourceLatField="dwcVerbatimLatitude"
-                                      sourceLonField="dwcVerbatimLongitude"
-                                      targetLatField={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
-                                      targetLonField={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
-                                      onClick={({ lat, lon }) =>
-                                        setGeoSearchValue(`${lat}, ${lon}`)
-                                      }
-                                    >
-                                      <DinaMessage id="latLongAutoSetterButton" />
-                                    </SetCoordinatesFromVerbatimButton>
-                                  )}
-                                </div>
                                 <GeoReferenceAssertionRow
                                   index={index}
                                   openAddPersonModal={openAddPersonModal}
+                                  assertion={assertion}
                                 />
                                 {!readOnly && (
                                   <div className="list-inline mb-3">
@@ -371,7 +349,7 @@ export function CollectingEventFormLayout() {
                             <div className="col-md-4">
                               <FormikButton
                                 className="btn btn-dark"
-                                onClick={removeThisPlace}
+                                onClick={(_, formik) => removeThisPlace(formik)}
                               >
                                 <DinaMessage id="removeThisPlaceLabel" />
                               </FormikButton>
@@ -390,65 +368,94 @@ export function CollectingEventFormLayout() {
                           </div>
                         </div>
                       </div>
-                    ) : (
+                    ) : !readOnly ? (
                       <GeographySearchBox
                         inputValue={geoSearchValue}
                         onInputChange={setGeoSearchValue}
                         onSelectSearchResult={selectSearchResult}
                         renderUnderSearchBar={
-                          <div className="form-group d-flex flex-row align-items-center">
-                            <div className="pr-3">
-                              <DinaMessage id="search" />:
-                            </div>
-                            <FormikButton
-                              className="btn btn-link"
-                              onClick={state =>
-                                doGeoSearch(state.dwcVerbatimLocality)
-                              }
-                              buttonProps={({ values: state }) => ({
-                                disabled: !state.dwcVerbatimLocality
-                              })}
-                            >
-                              <DinaMessage id="field_dwcVerbatimLocality" />
-                            </FormikButton>
-                            <FormikButton
-                              className="btn btn-link"
-                              onClick={state =>
-                                doGeoSearch(
-                                  `${state.dwcVerbatimLatitude}, ${state.dwcVerbatimLongitude}`
-                                )
-                              }
-                              buttonProps={({ values: state }) => ({
-                                disabled:
-                                  !state.dwcVerbatimLatitude ||
-                                  !state.dwcVerbatimLongitude
-                              })}
-                            >
-                              <DinaMessage id="verbatimLatLong" />
-                            </FormikButton>
-                            <FormikButton
-                              className="btn btn-link"
-                              onClick={state => {
-                                const assertion =
-                                  state.geoReferenceAssertions?.[activeTabIdx];
-                                const lat = assertion?.dwcDecimalLatitude;
-                                const lon = assertion?.dwcDecimalLongitude;
-                                doGeoSearch(`${lat}, ${lon}`);
-                              }}
-                              buttonProps={({ values: state }) => {
-                                const assertion =
-                                  state.geoReferenceAssertions?.[activeTabIdx];
-                                const lat = assertion?.dwcDecimalLatitude;
-                                const lon = assertion?.dwcDecimalLongitude;
-                                return { disabled: !lat || !lon };
-                              }}
-                            >
-                              <DinaMessage id="decimalLatLong" />
-                            </FormikButton>
-                          </div>
+                          <Field>
+                            {({ form: { values: formState } }) => {
+                              const colEvent: Partial<CollectingEvent> = formState;
+                              const activeAssertion =
+                                colEvent.geoReferenceAssertions?.[activeTabIdx];
+
+                              const decimalLat =
+                                activeAssertion?.dwcDecimalLatitude;
+                              const decimalLon =
+                                activeAssertion?.dwcDecimalLongitude;
+
+                              const hasVerbatimLocality = !!colEvent.dwcVerbatimLocality;
+                              const hasVerbatimCoords = !!(
+                                colEvent.dwcVerbatimLatitude &&
+                                colEvent.dwcVerbatimLongitude
+                              );
+                              const hasDecimalCoords = !!(
+                                decimalLat && decimalLon
+                              );
+
+                              const hasAnyLocation =
+                                hasVerbatimLocality ||
+                                hasVerbatimCoords ||
+                                hasDecimalCoords;
+
+                              return hasAnyLocation ? (
+                                <div className="form-group d-flex flex-row align-items-center">
+                                  <div className="pr-3">
+                                    <DinaMessage id="search" />:
+                                  </div>
+                                  <FormikButton
+                                    className={
+                                      hasVerbatimLocality
+                                        ? "btn btn-link"
+                                        : "d-none"
+                                    }
+                                    onClick={state =>
+                                      doGeoSearch(state.dwcVerbatimLocality)
+                                    }
+                                  >
+                                    <DinaMessage id="field_dwcVerbatimLocality" />
+                                  </FormikButton>
+                                  <FormikButton
+                                    className={
+                                      hasVerbatimCoords
+                                        ? "btn btn-link"
+                                        : "d-none"
+                                    }
+                                    onClick={state =>
+                                      doGeoSearch(
+                                        `${state.dwcVerbatimLatitude}, ${state.dwcVerbatimLongitude}`
+                                      )
+                                    }
+                                  >
+                                    <DinaMessage id="verbatimLatLong" />
+                                  </FormikButton>
+                                  <FormikButton
+                                    className={
+                                      hasDecimalCoords
+                                        ? "btn btn-link"
+                                        : "d-none"
+                                    }
+                                    onClick={state => {
+                                      const assertion =
+                                        state.geoReferenceAssertions?.[
+                                          activeTabIdx
+                                        ];
+                                      const lat = assertion?.dwcDecimalLatitude;
+                                      const lon =
+                                        assertion?.dwcDecimalLongitude;
+                                      doGeoSearch(`${lat}, ${lon}`);
+                                    }}
+                                  >
+                                    <DinaMessage id="decimalLatLong" />
+                                  </FormikButton>
+                                </div>
+                              ) : null;
+                            }}
+                          </Field>
                         }
                       />
-                    )
+                    ) : null
                   }
                 </Field>
               </div>
