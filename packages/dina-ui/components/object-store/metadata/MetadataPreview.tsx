@@ -41,7 +41,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
 
   const { loading, response } = useQuery<Metadata, ObjectUpload>(
     {
-      include: "acDerivedFrom,managedAttributeMap,acMetadataCreator,dcCreator",
+      include: "managedAttributeMap,acMetadataCreator,dcCreator",
       path: `objectstore-api/metadata/${metadataId}`
     },
     {
