@@ -1,6 +1,5 @@
 import {
   AutoSuggestTextField,
-  CheckBoxField,
   DinaFormSection,
   filterBy,
   FormattedTextField,
@@ -14,6 +13,7 @@ import {
 import { Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
 import { SRS } from "../../types/collection-api/resources/SRS";
+import { GeoreferenceVerificationStatus } from "../../types/collection-api/resources/GeoReferenceAssertion";
 import { useState } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -28,8 +28,7 @@ import { Person } from "../../types/agent-api/resources/Person";
 import { geographicPlaceSourceUrl } from "../../types/collection-api/GeographicPlaceNameSourceDetail";
 import {
   CollectingEvent,
-  GeographicPlaceNameSource,
-  GeoreferenceVerificationStatus
+  GeographicPlaceNameSource
 } from "../../types/collection-api/resources/CollectingEvent";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 
@@ -267,37 +266,11 @@ export function CollectingEventFormLayout() {
               <legend className="w-auto">
                 <DinaMessage id="geoReferencingLegend" />
               </legend>
-              <Field name="dwcGeoreferenceVerificationStatus">
-                {({
-                  field: { value: verificationStatus },
-                  form: {
-                    values: { geoReferenceAssertions }
-                  }
-                }) =>
-                  (verificationStatus ===
-                    GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE ||
-                    !geoReferenceAssertions?.length) && (
-                    <div className="col-md-5">
-                      <CheckBoxField
-                        name="dwcGeoreferenceVerificationStatus"
-                        onCheckBoxClick={
-                          onGeoReferencingImpossibleCheckBoxClick
-                        }
-                      />
-                    </div>
-                  )
-                }
-              </Field>
               <FieldArray name="geoReferenceAssertions">
                 {({ form, push, remove }) => {
                   const assertions =
                     (form.values as CollectingEvent).geoReferenceAssertions ??
                     [];
-
-                  const georeferenceDisabled =
-                    (form.values as CollectingEvent)
-                      .dwcGeoreferenceVerificationStatus ===
-                    GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE;
 
                   function addGeoReference() {
                     push({});
@@ -311,8 +284,7 @@ export function CollectingEventFormLayout() {
                       clamp(current, 0, assertions.length - 2)
                     );
                   }
-
-                  return georeferenceDisabled ? null : (
+                  return (
                     <div>
                       <Tabs
                         selectedIndex={activeTabIdx}
@@ -336,6 +308,7 @@ export function CollectingEventFormLayout() {
                                 <GeoReferenceAssertionRow
                                   index={index}
                                   openAddPersonModal={openAddPersonModal}
+                                  assertion={assertion}
                                 />
                                 {!readOnly && (
                                   <div className="list-inline mb-3">
