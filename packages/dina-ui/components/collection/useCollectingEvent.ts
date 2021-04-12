@@ -57,34 +57,18 @@ export function useCollectingEventQuery(id?: string) {
             }
           );
 
-          // Retrieve georeferencedBy associated agents
-          let agentBulkGetArgs: string[];
-          agentBulkGetArgs = [];
-          geoReferenceAssertions.forEach(async assert => {
-            if (assert.georeferencedBy) {
-              agentBulkGetArgs = agentBulkGetArgs.concat(
-                assert.georeferencedBy.map(it => `/person/${it.id}`)
+          // Retrieve georeferencedBy agent arrays on GeoReferenceAssertions.
+          for (const assertion of geoReferenceAssertions) {
+            if (assertion.georeferencedBy) {
+              assertion.georeferencedBy = await bulkGet<Person>(
+                assertion.georeferencedBy.map(it => `/person/${it.id}`),
+                {
+                  apiBaseUrl: "/agent-api",
+                  returnNullForMissingResource: true
+                }
               );
             }
-          });
-
-          const agents = await bulkGet<Person>(agentBulkGetArgs, {
-            apiBaseUrl: "/agent-api",
-            returnNullForMissingResource: true
-          });
-
-          geoReferenceAssertions.forEach(assert => {
-            const refers = assert.georeferencedBy;
-            refers?.map(refer => {
-              const index = assert.georeferencedBy?.findIndex(
-                it => it.id === refer.id
-              );
-              const agent = agents.filter(it => it.id === refer.id)?.[0];
-              if (assert.georeferencedBy !== undefined && index !== undefined) {
-                assert.georeferencedBy[index] = agent;
-              }
-            });
-          });
+          }
           data.geoReferenceAssertions = geoReferenceAssertions;
         }
 
