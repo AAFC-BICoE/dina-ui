@@ -1,13 +1,16 @@
 import {
   ColumnDefinition,
+  DateField,
   DinaForm,
   DinaFormSubmitParams,
+  FieldSet,
   FormikButton,
   QueryTable,
   TextField
 } from "common-ui";
 import { FormikContextType, FormikProps } from "formik";
 import { FilterParam } from "kitsu";
+import moment from "moment";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -18,7 +21,7 @@ export interface CollectingEventFilterFormValues {
   createdBy?: string;
   agent?: Person;
   location?: string;
-  dateRange?: { low?: string; high?: string };
+  date?: { min?: string; max?: string };
 }
 
 export interface CollectingEventLinkerProps {
@@ -73,7 +76,7 @@ export function CollectingEventLinker({
   const [filterParam, setFilterParam] = useState<FilterParam>();
 
   function setFilters({
-    submittedValues: { createdBy, location }
+    submittedValues: { createdBy, location, date }
   }: DinaFormSubmitParams<CollectingEventFilterFormValues>) {
     // Build the RSQL filter string:
     const rsqlFilters: string[] = [];
@@ -82,8 +85,14 @@ export function CollectingEventLinker({
     }
     if (location) {
       rsqlFilters.push(
-        `dwcVerbatimLocality==*${location}* or geographicPlaceName==*${location}*`
+        `(dwcVerbatimLocality==*${location}* or geographicPlaceName==*${location}*)`
       );
+    }
+    if (date?.min) {
+      rsqlFilters.push(`startEventDateTime=ge=${date.min}`);
+    }
+    if (date?.max) {
+      rsqlFilters.push(`startEventDateTime=le=${date.max}`);
     }
     setFilterParam({
       rsql: rsqlFilters.join(" and ")
@@ -106,32 +115,52 @@ export function CollectingEventLinker({
         <DinaForm<CollectingEventFilterFormValues>
           initialValues={{}}
           onSubmit={setFilters}
-          horizontal={[4, 8]}
           innerRef={filterFormRef}
         >
-          <div className="row">
-            {/* Filter by agent? Un-comment when the back-end can allow this. */}
-            {/* <ResourceSelectField<Person>
+          <FieldSet legend={<DinaMessage id="search" />}>
+            <div className="row">
+              {/* Filter by agent? Un-comment when the back-end can allow this. */}
+              {/* <ResourceSelectField<Person>
               className="col-md-4"
               name="agent"
               filter={filterBy(["displayName"])}
               model="agent-api/person"
               optionLabel={person => person.displayName}
             /> */}
-            <TextField
-              name="createdBy"
-              className="col-md-4"
-              inputProps={nestedFormInputProps}
-            />
-            <TextField
-              name="location"
-              className="col-md-4"
-              inputProps={nestedFormInputProps}
-            />
-            <FormikButton onClick={() => filterFormRef.current?.submitForm()}>
-              <DinaMessage id="search" />
-            </FormikButton>
-          </div>
+              <TextField
+                name="createdBy"
+                className="col-md-3"
+                inputProps={nestedFormInputProps}
+              />
+              <TextField
+                name="location"
+                className="col-md-3"
+                inputProps={nestedFormInputProps}
+              />
+              {/* Commented out due to filtering issue (https://redmine.biodiversity.agr.gc.ca/issues/22300) */}
+              {/* <DateField
+                name="date.min"
+                className="col-md-3"
+                onKeyDown={nestedFormInputProps.onKeyDown}
+              />
+              <DateField
+                name="date.max"
+                className="col-md-3"
+                onKeyDown={nestedFormInputProps.onKeyDown}
+              /> */}
+              <div className="col-md-3">
+                <FormikButton
+                  className="btn btn-primary form-group"
+                  buttonProps={() => ({
+                    style: { width: "10rem", marginTop: "2rem" }
+                  })}
+                  onClick={() => filterFormRef.current?.submitForm()}
+                >
+                  <DinaMessage id="search" />
+                </FormikButton>
+              </div>
+            </div>
+          </FieldSet>
         </DinaForm>
       </div>
       <div

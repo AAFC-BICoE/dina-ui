@@ -1,14 +1,16 @@
+import { KeyboardEvent } from "react";
 import DatePicker from "react-datepicker";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface DateFieldProps {
   showTime?: boolean;
   disabled?: boolean;
+  onKeyDown?: (event: KeyboardEvent<HTMLDivElement>) => void;
 }
 
 /** Formik-connected date input. */
 export function DateField(props: LabelWrapperParams & DateFieldProps) {
-  const { showTime, disabled } = props;
+  const { showTime, disabled, onKeyDown } = props;
 
   return (
     <FieldWrapper {...props}>
@@ -40,6 +42,7 @@ export function DateField(props: LabelWrapperParams & DateFieldProps) {
               showYearDropdown={true}
               todayButton="Today"
               disabled={disabled}
+              onKeyDown={onKeyDown}
             />
           </div>
         );

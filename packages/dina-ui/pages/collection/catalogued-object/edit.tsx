@@ -165,7 +165,7 @@ export function CataloguedObjectForm({
           <TabList>
             <Tab>
               {colEventId ? (
-                <DinaMessage id="editButtonText" />
+                <DinaMessage id="attachedCollectingEvent" />
               ) : (
                 <DinaMessage id="createNew" />
               )}

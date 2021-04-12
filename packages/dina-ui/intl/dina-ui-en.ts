@@ -22,6 +22,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   agentsSectionTitle: "Agents",
   appTitle: "DINA",
   attachSelected: "Attach Selected",
+  attachedCollectingEvent: "Attached Collecting Event",
   associatedAgent: "Associated Agent",
   attachments: "Attachments",
   attachExisting: "Attach Existing",
