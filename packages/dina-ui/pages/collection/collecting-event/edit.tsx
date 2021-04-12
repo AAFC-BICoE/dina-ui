@@ -66,8 +66,11 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     saveCollectingEvent
   } = useCollectingEventSave(collectingEvent);
 
-  const onSubmit: DinaFormOnSubmit = async ({ submittedValues }) => {
-    const savedCollectingEvent = await saveCollectingEvent(submittedValues);
+  const onSubmit: DinaFormOnSubmit = async ({ submittedValues, formik }) => {
+    const savedCollectingEvent = await saveCollectingEvent(
+      submittedValues,
+      formik
+    );
     await router.push(
       `/collection/collecting-event/view?id=${savedCollectingEvent.id}`
     );

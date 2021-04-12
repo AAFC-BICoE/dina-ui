@@ -14,15 +14,15 @@ import { ErrorViewer } from "./ErrorViewer";
 import { safeSubmit } from "./safeSubmit";
 
 export interface DinaFormProps<TValues>
-  extends Omit<FormikConfig<TValues>, "onSubmit"> {
+  extends Omit<FormikConfig<TValues>, "onSubmit">,
+    DinaFormContextI {
   onSubmit?: DinaFormOnSubmit<TValues>;
   values?: TValues;
-  readOnly?: boolean;
 }
 
 /** Values available to form elements. */
 export interface DinaFormContextI {
-  readOnly: boolean;
+  readOnly?: boolean;
   /*
    * Whether to layout the label and value horizontally (Default vertical).
    * If a [number, number] is passed then those are the bootstrap grid columns for the label and value.
@@ -79,7 +79,12 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
     );
 
   return (
-    <DinaFormContext.Provider value={{ readOnly: props.readOnly ?? false }}>
+    <DinaFormContext.Provider
+      value={{
+        readOnly: props.readOnly ?? false,
+        horizontal: props.horizontal
+      }}
+    >
       <Formik {...props} onSubmit={onSubmitInternal}>
         {childrenInternal}
       </Formik>

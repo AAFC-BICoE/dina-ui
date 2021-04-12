@@ -16,9 +16,11 @@ import {
 import { FormikProps } from "formik";
 import { cloneDeep } from "lodash";
 import { useRouter } from "next/router";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { TabList, Tabs, Tab, TabPanel } from "react-tabs";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
+import { CollectingEventLinker } from "../../../components/collection/CollectingEventLinker";
 import {
   useCollectingEventQuery,
   useCollectingEventSave
@@ -93,7 +95,9 @@ export function CataloguedObjectForm({
   /** Used to get the values of the nested CollectingEvent form. */
   const colEventFormRef = useRef<FormikProps<any>>(null);
 
-  const colEventId = cataloguedObject?.collectingEvent?.id;
+  const [colEventId, setColEventId] = useState(
+    cataloguedObject?.collectingEvent?.id
+  );
   const colEventQuery = useCollectingEventQuery(colEventId);
 
   const {
@@ -107,6 +111,7 @@ export function CataloguedObjectForm({
   }) => {
     const { ...cataloguedObjectValues } = submittedValues;
 
+    /** Input to submit to the back-end API. */
     const cataloguedObjectInput = {
       ...cataloguedObjectValues
     };
@@ -114,16 +119,19 @@ export function CataloguedObjectForm({
     // Save the linked CollectingEvent if included:
     const submittedCollectingEvent = cloneDeep(colEventFormRef.current?.values);
     if (submittedCollectingEvent) {
+      // Use the same save method as the Collecting Event page:
       const savedCollectingEvent = await saveCollectingEvent(
         submittedCollectingEvent,
         formik
       );
+      // Link the PhysicalEntity to the CollectingEvent:
       cataloguedObjectInput.collectingEvent = {
         id: savedCollectingEvent.id,
         type: savedCollectingEvent.type
       } as CollectingEvent;
     }
 
+    // Save the PhysicalEntity:
     const [savedPhysicalEntity] = await save<PhysicalEntity>(
       [
         {
@@ -153,23 +161,49 @@ export function CataloguedObjectForm({
       {buttonBar}
       <CataloguedObjectFormLayout />
       <FieldSet legend={<DinaMessage id="collectingEvent" />}>
-        {colEventId ? (
-          withResponse(colEventQuery, () => (
-            <DinaForm
-              innerRef={colEventFormRef}
-              initialValues={collectingEventInitialValues}
-            >
-              <CollectingEventFormLayout />
-            </DinaForm>
-          ))
-        ) : (
-          <DinaForm
-            innerRef={colEventFormRef}
-            initialValues={collectingEventInitialValues}
-          >
-            <CollectingEventFormLayout />
-          </DinaForm>
-        )}
+        <Tabs key={colEventId}>
+          <TabList>
+            <Tab>
+              {colEventId ? (
+                <DinaMessage id="editButtonText" />
+              ) : (
+                <DinaMessage id="createNew" />
+              )}
+            </Tab>
+            <Tab>
+              <DinaMessage id="attachExisting" />
+            </Tab>
+          </TabList>
+          <TabPanel>
+            {
+              // If there is already a linked CollectingEvent then wait for it to load first:
+              colEventId ? (
+                withResponse(colEventQuery, () => (
+                  <DinaForm
+                    innerRef={colEventFormRef}
+                    initialValues={collectingEventInitialValues}
+                  >
+                    <CollectingEventFormLayout />
+                  </DinaForm>
+                ))
+              ) : (
+                <DinaForm
+                  innerRef={colEventFormRef}
+                  initialValues={collectingEventInitialValues}
+                >
+                  <CollectingEventFormLayout />
+                </DinaForm>
+              )
+            }
+          </TabPanel>
+          <TabPanel>
+            <CollectingEventLinker
+              onCollectingEventSelect={colEventToLink =>
+                setColEventId(colEventToLink.id)
+              }
+            />
+          </TabPanel>
+        </Tabs>
       </FieldSet>
       {buttonBar}
     </DinaForm>

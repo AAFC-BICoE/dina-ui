@@ -24,6 +24,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   attachSelected: "Attach Selected",
   associatedAgent: "Associated Agent",
   attachments: "Attachments",
+  attachExisting: "Attach Existing",
   attachExistingObjects: "Attach Existing Objects",
   attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
