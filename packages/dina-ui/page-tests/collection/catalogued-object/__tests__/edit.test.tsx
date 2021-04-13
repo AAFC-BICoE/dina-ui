@@ -311,7 +311,7 @@ describe("Catalogued Object View Page", () => {
         { apiBaseUrl: "/collection-api" }
       ],
       [
-        // New physical-entity created:
+        // Existing physical-entity updated:
         [
           {
             resource: {
