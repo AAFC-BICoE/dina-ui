@@ -128,6 +128,10 @@ export function CataloguedObjectForm({
         submittedCollectingEvent,
         colEventFormRef.current
       );
+
+      // Set the ColEventId here in case the next operation fails:
+      setColEventId(savedCollectingEvent.id);
+
       // Link the PhysicalEntity to the CollectingEvent:
       cataloguedObjectInput.collectingEvent = {
         id: savedCollectingEvent.id,
