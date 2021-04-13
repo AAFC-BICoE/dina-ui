@@ -256,4 +256,79 @@ describe("Catalogued Object View Page", () => {
       ]
     ]);
   });
+
+  it("Lets you remove the attached Collecting Event.", async () => {
+    const wrapper = mountWithAppContext(
+      <CataloguedObjectForm
+        cataloguedObject={testCataloguedObject()}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Existing CollectingEvent should show up:
+    expect(
+      wrapper.find(".startEventDateTime-field input").prop("value")
+    ).toEqual("2021-04-13");
+
+    wrapper.find("button.detach-collecting-event-button").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Existing CollectingEvent should be gone:
+    expect(
+      wrapper.find(".startEventDateTime-field input").prop("value")
+    ).toEqual("");
+
+    // Set the new Collecting Event's startEventDateTime:
+    wrapper
+      .find(".startEventDateTime-field input")
+      .simulate("change", { target: { value: "2019-12-21T16:00" } });
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave.mock.calls).toEqual([
+      [
+        // New collecting-event created:
+        [
+          {
+            resource: {
+              dwcOtherRecordNumbers: null,
+              relationships: {},
+              startEventDateTime: "2019-12-21T16:00",
+              type: "collecting-event"
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        // New physical-entity created:
+        [
+          {
+            resource: {
+              collectingEvent: {
+                id: "1",
+                type: "collecting-event"
+              },
+              dwcCatalogNumber: "my-number",
+              group: "test group",
+              id: "1",
+              type: "physical-entity"
+            },
+            type: "physical-entity"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
 });

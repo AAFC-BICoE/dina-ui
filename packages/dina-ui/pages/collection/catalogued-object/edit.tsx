@@ -6,6 +6,7 @@ import {
   DinaFormOnSubmit,
   DinaFormSection,
   FieldSet,
+  FormikButton,
   LoadingSpinner,
   Query,
   SubmitButton,
@@ -15,9 +16,10 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { cloneDeep } from "lodash";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
-import { TabList, Tabs, Tab, TabPanel } from "react-tabs";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { CollectingEventLinker } from "../../../components/collection/CollectingEventLinker";
@@ -95,7 +97,7 @@ export function CataloguedObjectForm({
   /** Used to get the values of the nested CollectingEvent form. */
   const colEventFormRef = useRef<FormikProps<any>>(null);
 
-  const [colEventId, setColEventId] = useState(
+  const [colEventId, setColEventId] = useState<string | null | undefined>(
     cataloguedObject?.collectingEvent?.id
   );
   const colEventQuery = useCollectingEventQuery(colEventId);
@@ -196,7 +198,26 @@ export function CataloguedObjectForm({
             {
               // If there is already a linked CollectingEvent then wait for it to load first:
               colEventId
-                ? withResponse(colEventQuery, () => nestedCollectingEventForm)
+                ? withResponse(colEventQuery, () => (
+                    <>
+                      <div className="form-group d-flex justify-content-end align-items-center">
+                        <Link
+                          href={`/collection/collecting-event/view?id=${colEventId}`}
+                        >
+                          <a target="_blank">
+                            <DinaMessage id="collectingEventDetailsPageLink" />
+                          </a>
+                        </Link>
+                        <FormikButton
+                          className="btn btn-danger detach-collecting-event-button ml-5"
+                          onClick={() => setColEventId(null)}
+                        >
+                          <DinaMessage id="detachCollectingEvent" />
+                        </FormikButton>
+                      </div>
+                      {nestedCollectingEventForm}
+                    </>
+                  ))
                 : nestedCollectingEventForm
             }
           </TabPanel>

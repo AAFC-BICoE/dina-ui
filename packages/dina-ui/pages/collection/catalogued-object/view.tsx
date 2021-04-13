@@ -9,6 +9,7 @@ import {
   withResponse
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
+import Link from "next/link";
 import { withRouter } from "next/router";
 import { Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
@@ -72,6 +73,15 @@ export function CataloguedObjectViewPage({ router }: WithRouterProps) {
             <FieldSet legend={<DinaMessage id="collectingEvent" />}>
               {collectingEvent && (
                 <DinaForm initialValues={collectingEvent} readOnly={true}>
+                  <div className="form-group d-flex justify-content-end align-items-center">
+                    <Link
+                      href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
+                    >
+                      <a target="_blank">
+                        <DinaMessage id="collectingEventDetailsPageLink" />
+                      </a>
+                    </Link>
+                  </div>
                   <CollectingEventFormLayout />
                 </DinaForm>
               )}

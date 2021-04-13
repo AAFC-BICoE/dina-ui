@@ -10,7 +10,7 @@ import {
 import { Metadata, Person } from "../../types/objectstore-api";
 import { useAttachmentsModal } from "../object-store";
 
-export function useCollectingEventQuery(id?: string) {
+export function useCollectingEventQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
 
   // TODO disable the fetch query when the ID is undefined.

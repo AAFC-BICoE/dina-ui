@@ -105,7 +105,7 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   return {
     error: task.error as any,
     loading: !!task.pending,
-    response: previousResponseRef.current
+    response: disabled ? undefined : previousResponseRef.current
   };
 }
 
