@@ -8,17 +8,16 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
-import { useRouter } from "next/router";
-import Link from "next/link";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { withRouter } from "next/router";
 import { Head, Nav } from "../../../components";
+import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
+import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { PhysicalEntity } from "../../../types/collection-api";
 import { CataloguedObjectFormLayout } from "./edit";
-import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
-import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 
-export default function PhysicalEntityViewPage() {
-  const router = useRouter();
+export function CataloguedObjectViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
 
   const { id } = router.query;
@@ -84,3 +83,5 @@ export default function PhysicalEntityViewPage() {
     </div>
   );
 }
+
+export default withRouter(CataloguedObjectViewPage);

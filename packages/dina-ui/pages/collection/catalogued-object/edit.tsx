@@ -201,9 +201,9 @@ export function CataloguedObjectForm({
           </TabPanel>
           <TabPanel>
             <CollectingEventLinker
-              onCollectingEventSelect={colEventToLink =>
-                setColEventId(colEventToLink.id)
-              }
+              onCollectingEventSelect={colEventToLink => {
+                setColEventId(colEventToLink.id);
+              }}
             />
           </TabPanel>
         </Tabs>

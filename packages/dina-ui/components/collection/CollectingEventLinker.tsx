@@ -1,6 +1,5 @@
 import {
   ColumnDefinition,
-  DateField,
   DinaForm,
   DinaFormSubmitParams,
   FieldSet,
@@ -10,7 +9,6 @@ import {
 } from "common-ui";
 import { FormikContextType, FormikProps } from "formik";
 import { FilterParam } from "kitsu";
-import moment from "moment";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -58,7 +56,7 @@ export function CollectingEventLinker({
             </a>
           </Link>
           <FormikButton
-            className="flex-grow-1 btn btn-link"
+            className="flex-grow-1 btn btn-link collecting-event-link-button"
             buttonProps={() => ({ style: { textDecorationLine: "underline" } })}
             onClick={(_, formik) =>
               onCollectingEventSelect(collectingEvent, formik)

@@ -260,19 +260,21 @@ export function CollectingEventFormLayout() {
                       >
                         {
                           // Only show the tabs when there is more than 1 assertion:
-                          assertions.length !== 1 && (
-                            <TabList>
-                              {assertions.map((assertion, index) => (
-                                <Tab key={assertion.id}>
-                                  <span className="m-3">{index + 1}</span>
-                                </Tab>
-                              ))}
-                            </TabList>
-                          )
+                          <TabList
+                            className={`react-tabs__tab-list ${
+                              assertions.length === 1 ? "d-none" : ""
+                            }`}
+                          >
+                            {assertions.map((assertion, index) => (
+                              <Tab key={assertion.id ?? index}>
+                                <span className="m-3">{index + 1}</span>
+                              </Tab>
+                            ))}
+                          </TabList>
                         }
                         {assertions.length
                           ? assertions.map((assertion, index) => (
-                              <TabPanel key={assertion.id}>
+                              <TabPanel key={assertion.id ?? index}>
                                 <GeoReferenceAssertionRow
                                   index={index}
                                   openAddPersonModal={openAddPersonModal}

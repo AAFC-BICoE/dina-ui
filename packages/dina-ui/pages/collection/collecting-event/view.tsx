@@ -12,7 +12,6 @@ import { withRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
-import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 

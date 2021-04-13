@@ -3,7 +3,7 @@ import { CollectingEventDetailsPage } from "../../../../pages/collection/collect
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
 
-/** Test organization with all fields defined. */
+/** Test Collecting Event with all fields defined. */
 const TEST_COLLECTION_EVENT: CollectingEvent = {
   startEventDateTime: "2019_01_01_10_10_10",
   endEventDateTime: "2019_01_06_10_10_10",
