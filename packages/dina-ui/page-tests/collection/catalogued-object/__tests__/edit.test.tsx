@@ -12,20 +12,24 @@ jest.mock("next/dynamic", () => () => {
   };
 });
 
-const TEST_COLLECTION_EVENT: Partial<CollectingEvent> = {
-  startEventDateTime: "2021-04-13",
-  id: "1",
-  type: "collecting-event",
-  group: "test group"
-};
+function testCollectionEvent(): Partial<CollectingEvent> {
+  return {
+    startEventDateTime: "2021-04-13",
+    id: "1",
+    type: "collecting-event",
+    group: "test group"
+  };
+}
 
-const TEST_CATALOGUED_OBJECT: PhysicalEntity = {
-  id: "1",
-  type: "physical-entity",
-  group: "test group",
-  dwcCatalogNumber: "my-number",
-  collectingEvent: { id: "1", type: "collecting-event" } as CollectingEvent
-};
+function testCataloguedObject(): PhysicalEntity {
+  return {
+    id: "1",
+    type: "physical-entity",
+    group: "test group",
+    dwcCatalogNumber: "my-number",
+    collectingEvent: { id: "1", type: "collecting-event" } as CollectingEvent
+  };
+}
 
 const mockGet = jest.fn(async path => {
   if (path === "user-api/group") {
@@ -33,30 +37,30 @@ const mockGet = jest.fn(async path => {
   }
   if (path === "collection-api/collecting-event") {
     // Populate the collecting-event linker table:
-    return { data: [TEST_COLLECTION_EVENT] };
+    return { data: [testCollectionEvent()] };
   }
   if (
     path ===
     "collection-api/collecting-event/1?include=collectors,geoReferenceAssertions,attachment"
   ) {
     // Populate the linker table:
-    return { data: TEST_COLLECTION_EVENT };
+    return { data: testCollectionEvent() };
   }
   if (path === "agent-api/person") {
     return { data: [] };
   }
 });
 
-const mockSave = jest.fn(async saves =>
-  saves.map(save => {
+const mockSave = jest.fn(async saves => {
+  return saves.map(save => {
     if (save.type === "physical-entity") {
-      return TEST_COLLECTION_EVENT;
+      return testCataloguedObject();
     }
     if (save.type === "collecting-event") {
-      return TEST_COLLECTION_EVENT;
+      return testCollectionEvent();
     }
-  })
-);
+  });
+});
 
 const testCtx = {
   apiContext: {
@@ -70,9 +74,7 @@ const testCtx = {
 const mockOnSaved = jest.fn();
 
 describe("Catalogued Object View Page", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+  beforeEach(jest.clearAllMocks);
 
   it("Submits a new physical-entity with a new CollectingEvent.", async () => {
     const wrapper = mountWithAppContext(
@@ -195,7 +197,7 @@ describe("Catalogued Object View Page", () => {
   it("Edits an existing physical-entity", async () => {
     const wrapper = mountWithAppContext(
       <CataloguedObjectForm
-        cataloguedObject={TEST_CATALOGUED_OBJECT}
+        cataloguedObject={testCataloguedObject()}
         onSaved={mockOnSaved}
       />,
       testCtx
@@ -203,6 +205,11 @@ describe("Catalogued Object View Page", () => {
 
     await new Promise(setImmediate);
     wrapper.update();
+
+    // Existing CollectingEvent should show up:
+    expect(
+      wrapper.find(".startEventDateTime-field input").prop("value")
+    ).toEqual("2021-04-13");
 
     wrapper
       .find(".dwcCatalogNumber-field input")
