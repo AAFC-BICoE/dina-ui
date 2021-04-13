@@ -43,7 +43,7 @@ export default function CataloguedObjectEditPage() {
     <div>
       <Head title={formatMessage("editCataloguedObjectTitle")} />
       <Nav />
-      <div className="container">
+      <div className="container-fluid">
         {id ? (
           <div>
             <h1>
@@ -102,7 +102,8 @@ export function CataloguedObjectForm({
 
   const {
     collectingEventInitialValues,
-    saveCollectingEvent
+    saveCollectingEvent,
+    attachedMetadatasUI
   } = useCollectingEventSave(colEventQuery.response?.data);
 
   const onSubmit: DinaFormOnSubmit<PhysicalEntity> = async ({
@@ -155,13 +156,29 @@ export function CataloguedObjectForm({
     </ButtonBar>
   );
 
+  /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */
+  const nestedCollectingEventForm = (
+    <DinaForm
+      innerRef={colEventFormRef}
+      initialValues={collectingEventInitialValues}
+    >
+      <CollectingEventFormLayout />
+      <div className="form-group">{attachedMetadatasUI}</div>
+    </DinaForm>
+  );
+
   // Wait for the CollectingEvent (if linked) to be ready before rendering:
   return (
     <DinaForm initialValues={cataloguedObject ?? {}} onSubmit={onSubmit}>
       {buttonBar}
       <CataloguedObjectFormLayout />
       <FieldSet legend={<DinaMessage id="collectingEvent" />}>
-        <Tabs key={colEventId}>
+        <Tabs
+          // Re-initialize the form when the linked CollectingEvent changes:
+          key={colEventId}
+          // Prevent unmounting the form on tab switch to avoid losing the form state:
+          forceRenderTabPanel={true}
+        >
           <TabList>
             <Tab>
               {colEventId ? (
@@ -177,23 +194,9 @@ export function CataloguedObjectForm({
           <TabPanel>
             {
               // If there is already a linked CollectingEvent then wait for it to load first:
-              colEventId ? (
-                withResponse(colEventQuery, () => (
-                  <DinaForm
-                    innerRef={colEventFormRef}
-                    initialValues={collectingEventInitialValues}
-                  >
-                    <CollectingEventFormLayout />
-                  </DinaForm>
-                ))
-              ) : (
-                <DinaForm
-                  innerRef={colEventFormRef}
-                  initialValues={collectingEventInitialValues}
-                >
-                  <CollectingEventFormLayout />
-                </DinaForm>
-              )
+              colEventId
+                ? withResponse(colEventQuery, () => nestedCollectingEventForm)
+                : nestedCollectingEventForm
             }
           </TabPanel>
           <TabPanel>

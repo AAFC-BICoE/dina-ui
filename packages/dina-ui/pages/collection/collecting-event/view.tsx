@@ -64,12 +64,6 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
               <CollectingEventFormLayout />
             </DinaForm>
           </div>
-          <div className="form-group">
-            <AttachmentReadOnlySection
-              attachmentPath={`collection-api/collecting-event/${id}/attachment`}
-              detachTotalSelected={true}
-            />
-          </div>
         </main>
       ))}
       {buttonBar}

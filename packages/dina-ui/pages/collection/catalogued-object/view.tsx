@@ -60,7 +60,7 @@ export default function PhysicalEntityViewPage() {
       <Head title={formatMessage("cataloguedObjectViewTitle")} />
       <Nav />
       {withResponse(physicalEntityQuery, ({ data: physicalEntity }) => (
-        <main className="container">
+        <main className="container-fluid">
           {buttonBar}
           <h1>
             <DinaMessage id="cataloguedObjectViewTitle" />

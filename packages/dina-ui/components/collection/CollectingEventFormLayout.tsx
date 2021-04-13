@@ -31,6 +31,7 @@ import {
   GeographicPlaceNameSource,
   GeoreferenceVerificationStatus
 } from "../../types/collection-api/resources/CollectingEvent";
+import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
@@ -473,6 +474,19 @@ export function CollectingEventFormLayout() {
           </div>
         </div>
       </FieldSet>
+
+      {readOnly && (
+        <div className="form-group">
+          <Field name="id">
+            {({ field: { value: id } }) => (
+              <AttachmentReadOnlySection
+                attachmentPath={`collection-api/collecting-event/${id}/attachment`}
+                detachTotalSelected={true}
+              />
+            )}
+          </Field>
+        </div>
+      )}
     </div>
   );
 }
