@@ -4,6 +4,8 @@ import {
   CollectingEvent,
   PhysicalEntity
 } from "../../../../types/collection-api";
+import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
+import { SRS } from "../../../../types/collection-api/resources/SRS";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -31,6 +33,16 @@ function testCataloguedObject(): PhysicalEntity {
   };
 }
 
+const TEST_SRS: SRS = {
+  srs: ["NAD27 (EPSG:4276)", "WGS84 (EPSG:4326)"],
+  type: "srs"
+};
+
+const TEST_COORDINATES: CoordinateSystem = {
+  coordinateSystem: ["decimal degrees", " degrees decimal"],
+  type: "coordinate-system"
+};
+
 const mockGet = jest.fn(async path => {
   if (path === "user-api/group") {
     return { data: [] };
@@ -48,6 +60,12 @@ const mockGet = jest.fn(async path => {
   }
   if (path === "agent-api/person") {
     return { data: [] };
+  }
+  if (path === "collection-api/srs") {
+    return { data: [TEST_SRS] };
+  }
+  if (path === "collection-api/coordinate-system") {
+    return { data: [TEST_COORDINATES] };
   }
 });
 
