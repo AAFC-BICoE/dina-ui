@@ -107,8 +107,7 @@ export function CataloguedObjectForm({
   } = useCollectingEventSave(colEventQuery.response?.data);
 
   const onSubmit: DinaFormOnSubmit<PhysicalEntity> = async ({
-    submittedValues,
-    formik
+    submittedValues
   }) => {
     const { ...cataloguedObjectValues } = submittedValues;
 
