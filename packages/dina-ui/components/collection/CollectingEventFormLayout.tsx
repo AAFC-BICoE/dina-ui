@@ -156,7 +156,7 @@ export function CollectingEventFormLayout() {
                         onChange={newValue =>
                           toggleRangeEnabled(newValue, form)
                         }
-                        checked={rangeEnabled || endEventDateTime || false}
+                        checked={rangeEnabled || !!endEventDateTime || false}
                         className="react-switch dateRange"
                       />
                     </label>

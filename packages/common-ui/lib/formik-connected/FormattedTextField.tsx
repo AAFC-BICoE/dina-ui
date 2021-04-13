@@ -1,5 +1,5 @@
 import Cleave from "cleave.js/react";
-import { InputHTMLAttributes } from "react";
+import { ChangeEvent, InputHTMLAttributes } from "react";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface FormattedTextFieldProps extends LabelWrapperParams {
@@ -35,9 +35,6 @@ export function FormattedTextField(props: FormattedTextFieldProps) {
           readOnly
         };
 
-        // The default Field component's inner text input needs to be replaced with our own
-        // controlled input that we manually pass the "onChange" and "value" props. Otherwise
-        // we will get React's warning about switching from an uncontrolled to controlled input.
         return (
           <Cleave
             {...inputPropsInternal}

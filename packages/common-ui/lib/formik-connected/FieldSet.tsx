@@ -1,6 +1,7 @@
 import { DinaFormSection, DinaFormSectionProps } from "./DinaForm";
 
 export interface FieldSetProps extends DinaFormSectionProps {
+  /** fieldset title. */
   legend: JSX.Element;
 }
 

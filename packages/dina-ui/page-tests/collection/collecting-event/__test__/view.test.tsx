@@ -26,7 +26,10 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
   // The get request will return the existing collecting-event.
-  if (model === "collection-api/collecting-event/100") {
+  if (
+    model ===
+    "collection-api/collecting-event/100?include=collectors,geoReferenceAssertions,attachment"
+  ) {
     return { data: TEST_COLLECTION_EVENT };
   } else if (model === "agent-api/person") {
     return { data: [TEST_AGENT] };
