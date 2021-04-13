@@ -4,6 +4,8 @@ import NumberFormat from "react-number-format";
 import CollectingEventEditPage from "../../../../pages/collection/collecting-event/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
+import { SRS } from "packages/dina-ui/types/collection-api/resources/SRS";
+import { CoordinateSystem } from "packages/dina-ui/types/collection-api/resources/CoordinateSystem";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -38,6 +40,10 @@ const mockGet = jest.fn(async model => {
     return { data: TEST_COLLECTING_EVENT };
   } else if (model === "agent-api/person") {
     return { data: [TEST_AGENT] };
+  } else if (model === "collection-api/srs") {
+    return { data: [TEST_SRS] };
+  } else if (model === "collection-api/coordinate-system") {
+    return { data: [TEST_COORDINATES] };
   }
 });
 
@@ -401,4 +407,14 @@ const TEST_AGENT: Person = {
   id: "1",
   type: "person",
   uuid: "323423-23423-234"
+};
+
+const TEST_SRS: SRS = {
+  srs: ["NAD27 (EPSG:4276)", "WGS84 (EPSG:4326)"],
+  type: "srs"
+};
+
+const TEST_COORDINATES: CoordinateSystem = {
+  coordinateSystem: ["decimal degrees", " degrees decimal"],
+  type: "coordinate-system"
 };

@@ -12,6 +12,7 @@ import {
 } from "common-ui";
 import { Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
+import { SRS } from "../../types/collection-api/resources/SRS";
 import { GeoreferenceVerificationStatus } from "../../types/collection-api/resources/GeoReferenceAssertion";
 import { useState } from "react";
 import Switch from "react-switch";
@@ -30,6 +31,8 @@ import {
   GeographicPlaceNameSource
 } from "../../types/collection-api/resources/CollectingEvent";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
+import { CoordinateSystem } from "../../types/collection-api/resources/CoordinateSystem";
+import AutoSuggest, { ShouldRenderReasons } from "react-autosuggest";
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
 export function CollectingEventFormLayout() {
@@ -114,6 +117,11 @@ export function CollectingEventFormLayout() {
     setImmediate(() =>
       document?.querySelector<HTMLElement>(".geo-search-button")?.click()
     );
+  }
+
+  /* Ensure config is rendered when input get focuse without needing to enter any value */
+  function shouldRenderSuggestions(value: string, reason: ShouldRenderReasons) {
+    return !value || value?.length >= 0 || reason?.length >= 0;
   }
 
   return (
@@ -234,8 +242,22 @@ export function CollectingEventFormLayout() {
             </div>
             <div className="col-md-6">
               <TextField name="dwcVerbatimCoordinates" />
-              <TextField name="dwcVerbatimCoordinateSystem" />
-              <TextField name="dwcVerbatimSRS" />
+              <AutoSuggestTextField<CoordinateSystem>
+                name="dwcVerbatimCoordinateSystem"
+                configQuery={() => ({
+                  path: "collection-api/coordinate-system"
+                })}
+                configSuggestion={src => src.coordinateSystem ?? []}
+                shouldRenderSuggestions={shouldRenderSuggestions}
+              />
+              <AutoSuggestTextField<SRS>
+                name="dwcVerbatimSRS"
+                configQuery={() => ({
+                  path: "collection-api/srs"
+                })}
+                configSuggestion={src => src.srs ?? []}
+                shouldRenderSuggestions={shouldRenderSuggestions}
+              />
               <TextField name="dwcVerbatimElevation" />
               <TextField name="dwcVerbatimDepth" />
             </div>
