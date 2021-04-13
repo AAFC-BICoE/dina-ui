@@ -118,12 +118,14 @@ export function CataloguedObjectForm({
     };
 
     // Save the linked CollectingEvent if included:
-    const submittedCollectingEvent = cloneDeep(colEventFormRef.current?.values);
-    if (submittedCollectingEvent) {
+    if (colEventFormRef.current) {
+      const submittedCollectingEvent = cloneDeep(
+        colEventFormRef.current?.values
+      );
       // Use the same save method as the Collecting Event page:
       const savedCollectingEvent = await saveCollectingEvent(
         submittedCollectingEvent,
-        formik
+        colEventFormRef.current
       );
       // Link the PhysicalEntity to the CollectingEvent:
       cataloguedObjectInput.collectingEvent = {
