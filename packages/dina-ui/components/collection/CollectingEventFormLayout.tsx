@@ -14,6 +14,7 @@ import {
 import { Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
 import { useState } from "react";
+import { ShouldRenderReasons } from "react-autosuggest";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
@@ -29,7 +30,9 @@ import {
   CollectingEvent,
   GeographicPlaceNameSource
 } from "../../types/collection-api/resources/CollectingEvent";
+import { CoordinateSystem } from "../../types/collection-api/resources/CoordinateSystem";
 import { GeoreferenceVerificationStatus } from "../../types/collection-api/resources/GeoReferenceAssertion";
+import { SRS } from "../../types/collection-api/resources/SRS";
 import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 
@@ -116,6 +119,11 @@ export function CollectingEventFormLayout() {
     setImmediate(() =>
       document?.querySelector<HTMLElement>(".geo-search-button")?.click()
     );
+  }
+
+  /* Ensure config is rendered when input get focuse without needing to enter any value */
+  function shouldRenderSuggestions(value: string, reason: ShouldRenderReasons) {
+    return !value || value?.length >= 0 || reason?.length >= 0;
   }
 
   return (
@@ -224,8 +232,22 @@ export function CollectingEventFormLayout() {
             </div>
             <div className="col-md-6">
               <TextField name="dwcVerbatimCoordinates" />
-              <TextField name="dwcVerbatimCoordinateSystem" />
-              <TextField name="dwcVerbatimSRS" />
+              <AutoSuggestTextField<CoordinateSystem>
+                name="dwcVerbatimCoordinateSystem"
+                configQuery={() => ({
+                  path: "collection-api/coordinate-system"
+                })}
+                configSuggestion={src => src.coordinateSystem ?? []}
+                shouldRenderSuggestions={shouldRenderSuggestions}
+              />
+              <AutoSuggestTextField<SRS>
+                name="dwcVerbatimSRS"
+                configQuery={() => ({
+                  path: "collection-api/srs"
+                })}
+                configSuggestion={src => src.srs ?? []}
+                shouldRenderSuggestions={shouldRenderSuggestions}
+              />
               <TextField name="dwcVerbatimElevation" />
               <TextField name="dwcVerbatimDepth" />
             </div>
@@ -372,18 +394,12 @@ export function CollectingEventFormLayout() {
                                 activeAssertion?.dwcDecimalLongitude;
 
                               const hasVerbatimLocality = !!colEvent.dwcVerbatimLocality;
-                              const hasVerbatimCoords = !!(
-                                colEvent.dwcVerbatimLatitude &&
-                                colEvent.dwcVerbatimLongitude
-                              );
                               const hasDecimalCoords = !!(
                                 decimalLat && decimalLon
                               );
 
                               const hasAnyLocation =
-                                hasVerbatimLocality ||
-                                hasVerbatimCoords ||
-                                hasDecimalCoords;
+                                hasVerbatimLocality || hasDecimalCoords;
 
                               return hasAnyLocation ? (
                                 <div className="form-group d-flex flex-row align-items-center">
@@ -401,20 +417,6 @@ export function CollectingEventFormLayout() {
                                     }
                                   >
                                     <DinaMessage id="field_dwcVerbatimLocality" />
-                                  </FormikButton>
-                                  <FormikButton
-                                    className={
-                                      hasVerbatimCoords
-                                        ? "btn btn-link"
-                                        : "d-none"
-                                    }
-                                    onClick={state =>
-                                      doGeoSearch(
-                                        `${state.dwcVerbatimLatitude}, ${state.dwcVerbatimLongitude}`
-                                      )
-                                    }
-                                  >
-                                    <DinaMessage id="verbatimLatLong" />
                                   </FormikButton>
                                   <FormikButton
                                     className={
