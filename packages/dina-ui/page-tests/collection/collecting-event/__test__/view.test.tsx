@@ -1,4 +1,4 @@
-import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
+import { Person } from "../../../../types/agent-api/resources/Person";
 import { CollectingEventDetailsPage } from "../../../../pages/collection/collecting-event/view";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";

@@ -38,7 +38,6 @@ export interface MetadataRelationships {
   acMetadataCreator?: Person | KitsuResource | null;
   dcCreator?: Person | KitsuResource | null;
   managedAttributeMap?: ManagedAttributeMap | null;
-  acDerivedFrom?: Metadata | null;
 }
 
 export type Metadata = KitsuResource &

@@ -38,16 +38,6 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
             value: <DateView date={metadata.xmpMetadataDate} />
           },
           "acMetadataCreator.displayName",
-          {
-            name: "acDerivedFrom",
-            value: metadata.acDerivedFrom ? (
-              <Link
-                href={`/object-store/object/view?id=${metadata.acDerivedFrom.id}`}
-              >
-                <a>{metadata.acDerivedFrom.originalFilename}</a>
-              </Link>
-            ) : null
-          },
           "acSubType"
         ]}
         title={formatMessage("metadataUploadDetailsLabel")}

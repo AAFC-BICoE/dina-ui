@@ -11,7 +11,7 @@ const checkboxProps = {
   style: {
     display: "block",
     height: "20px",
-    margin: "auto",
+    marginLeft: "15px",
     width: "20px"
   },
   type: "checkbox"
