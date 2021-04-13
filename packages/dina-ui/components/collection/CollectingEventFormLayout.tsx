@@ -386,18 +386,12 @@ export function CollectingEventFormLayout() {
                                 activeAssertion?.dwcDecimalLongitude;
 
                               const hasVerbatimLocality = !!colEvent.dwcVerbatimLocality;
-                              const hasVerbatimCoords = !!(
-                                colEvent.dwcVerbatimLatitude &&
-                                colEvent.dwcVerbatimLongitude
-                              );
                               const hasDecimalCoords = !!(
                                 decimalLat && decimalLon
                               );
 
                               const hasAnyLocation =
-                                hasVerbatimLocality ||
-                                hasVerbatimCoords ||
-                                hasDecimalCoords;
+                                hasVerbatimLocality || hasDecimalCoords;
 
                               return hasAnyLocation ? (
                                 <div className="form-group d-flex flex-row align-items-center">
@@ -415,20 +409,6 @@ export function CollectingEventFormLayout() {
                                     }
                                   >
                                     <DinaMessage id="field_dwcVerbatimLocality" />
-                                  </FormikButton>
-                                  <FormikButton
-                                    className={
-                                      hasVerbatimCoords
-                                        ? "btn btn-link"
-                                        : "d-none"
-                                    }
-                                    onClick={state =>
-                                      doGeoSearch(
-                                        `${state.dwcVerbatimLatitude}, ${state.dwcVerbatimLongitude}`
-                                      )
-                                    }
-                                  >
-                                    <DinaMessage id="verbatimLatLong" />
                                   </FormikButton>
                                   <FormikButton
                                     className={
