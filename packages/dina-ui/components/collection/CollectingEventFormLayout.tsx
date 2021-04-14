@@ -4,7 +4,7 @@ import {
   filterBy,
   FormattedTextField,
   FormikButton,
-  KeyboardEventHandlerWrappedTextField,
+  TextFieldWithCoordButtons,
   NominatumApiSearchResult,
   ResourceSelectField,
   TextField,
@@ -232,13 +232,13 @@ export function CollectingEventFormLayout() {
           </legend>
           <div className="row">
             <div className="col-md-6">
-              <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLocality" />
+              <TextFieldWithCoordButtons name="dwcVerbatimLocality" />
               <AutoSuggestTextField<CoordinateSystem>
                 name="dwcVerbatimCoordinateSystem"
                 configQuery={() => ({
                   path: "collection-api/coordinate-system"
                 })}
-                configSuggestion={src => src.coordinateSystem ?? []}
+                configSuggestion={src => src?.coordinateSystem ?? []}
                 shouldRenderSuggestions={shouldRenderSuggestions}
                 onSuggestionSelected={onSuggestionSelected}
               />
@@ -250,7 +250,7 @@ export function CollectingEventFormLayout() {
                     : ""
                 }
               />
-              <KeyboardEventHandlerWrappedTextField
+              <TextFieldWithCoordButtons
                 name="dwcVerbatimLatitude"
                 placeholder={
                   coordFields !== CoordinateSystemEnum.UTM
@@ -258,7 +258,7 @@ export function CollectingEventFormLayout() {
                     : null
                 }
               />
-              <KeyboardEventHandlerWrappedTextField
+              <TextFieldWithCoordButtons
                 name="dwcVerbatimLongitude"
                 placeholder={
                   coordFields !== CoordinateSystemEnum.UTM
@@ -439,18 +439,12 @@ export function CollectingEventFormLayout() {
                                 activeAssertion?.dwcDecimalLongitude;
 
                               const hasVerbatimLocality = !!colEvent.dwcVerbatimLocality;
-                              const hasVerbatimCoords = !!(
-                                colEvent.dwcVerbatimLatitude &&
-                                colEvent.dwcVerbatimLongitude
-                              );
                               const hasDecimalCoords = !!(
                                 decimalLat && decimalLon
                               );
 
                               const hasAnyLocation =
-                                hasVerbatimLocality ||
-                                hasVerbatimCoords ||
-                                hasDecimalCoords;
+                                hasVerbatimLocality || hasDecimalCoords;
 
                               return hasAnyLocation ? (
                                 <div className="form-group d-flex flex-row align-items-center">
@@ -468,20 +462,6 @@ export function CollectingEventFormLayout() {
                                     }
                                   >
                                     <DinaMessage id="field_dwcVerbatimLocality" />
-                                  </FormikButton>
-                                  <FormikButton
-                                    className={
-                                      hasVerbatimCoords
-                                        ? "btn btn-link"
-                                        : "d-none"
-                                    }
-                                    onClick={state =>
-                                      doGeoSearch(
-                                        `${state.dwcVerbatimLatitude}, ${state.dwcVerbatimLongitude}`
-                                      )
-                                    }
-                                  >
-                                    <DinaMessage id="verbatimLatLong" />
                                   </FormikButton>
                                   <FormikButton
                                     className={

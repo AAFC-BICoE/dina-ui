@@ -1,8 +1,7 @@
-import { TextField, TextFieldProps } from "common-ui";
+import { TextFieldProps } from "common-ui";
 import { FormikContextType, useFormikContext } from "formik";
 import { InputHTMLAttributes, useState } from "react";
 import { CommonMessage } from "../intl/common-ui-intl";
-import { KeyboardEventHandlerWrapper } from "../keyboard-event-handler/KeyboardEventHandlerWrappedTextField";
 import { useModal } from "../modal/modal";
 import { Tooltip } from "../tooltip/Tooltip";
 import { FormikButton } from "./FormikButton";
@@ -135,40 +134,38 @@ export function GeoSuggestSearchBox({
   return (
     <div className="form-group geo-suggest-search-box">
       <style>{`.autosuggest-highlighted { background-color: #ddd; }`}</style>
-      <KeyboardEventHandlerWrapper>
-        <label className="w-100">
-          <div>
-            <strong>
-              <CommonMessage id="autoFillGeoSuggestLabel" />
-            </strong>
+      <label className="w-100">
+        <div>
+          <strong>
+            <CommonMessage id="autoFillGeoSuggestLabel" />
+          </strong>
+        </div>
+        <div className="input-group">
+          <input
+            className="form-control"
+            onChange={e => setInputValue(e.target.value)}
+            // Pressing enter should open the modal, not submit the form:
+            onKeyDown={e => {
+              if (e.keyCode === 13) {
+                e.preventDefault();
+                openGeoSuggestModal();
+              }
+            }}
+            value={inputValue}
+            {...inputProps}
+          />
+          <div className="input-group-append">
+            <FormikButton
+              className="btn btn-info geo-suggest-button"
+              buttonProps={() => ({ disabled: suggestButtonIsDisabled })}
+              onClick={openGeoSuggestModal}
+            >
+              <CommonMessage id="geoSuggest" />
+            </FormikButton>
+            <Tooltip id="geoSuggestTooltip" />
           </div>
-          <div className="input-group">
-            <input
-              className="form-control"
-              onChange={e => setInputValue(e.target.value)}
-              // Pressing enter should open the modal, not submit the form:
-              onKeyDown={e => {
-                if (e.keyCode === 13) {
-                  e.preventDefault();
-                  openGeoSuggestModal();
-                }
-              }}
-              value={inputValue}
-              {...inputProps}
-            />
-            <div className="input-group-append">
-              <FormikButton
-                className="btn btn-info geo-suggest-button"
-                buttonProps={() => ({ disabled: suggestButtonIsDisabled })}
-                onClick={openGeoSuggestModal}
-              >
-                <CommonMessage id="geoSuggest" />
-              </FormikButton>
-              <Tooltip id="geoSuggestTooltip" />
-            </div>
-          </div>
-        </label>
-      </KeyboardEventHandlerWrapper>
+        </div>
+      </label>
     </div>
   );
 }
