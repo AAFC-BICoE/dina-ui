@@ -50,7 +50,7 @@ export function CollectingEventFormLayout() {
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
-  const [coordFields, setCoordFields] = useState(
+  const [coordSysSelected, setCoordSysSelected] = useState(
     `${values.dwcVerbatimCoordinateSystem}`
   );
 
@@ -128,7 +128,7 @@ export function CollectingEventFormLayout() {
     formik.values.dwcVerbatimCoordinates === null
       ? formik.setFieldValue("dwcVerbatimCoordinates", "")
       : formik.setFieldValue("dwcVerbatimCoordinates", null);
-    setCoordFields(selectedSuggestion);
+    setCoordSysSelected(selectedSuggestion);
   }
 
   return (
@@ -243,25 +243,55 @@ export function CollectingEventFormLayout() {
               <TextField
                 name="dwcVerbatimCoordinates"
                 placeholder={
-                  coordFields === CoordinateSystemEnum.UTM
-                    ? CoordinateSystemEnumPlaceHolder[coordFields]
+                  coordSysSelected === CoordinateSystemEnum.UTM
+                    ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
                     : ""
                 }
               />
               <TextFieldWithCoordButtons
                 name="dwcVerbatimLatitude"
                 placeholder={
-                  coordFields !== CoordinateSystemEnum.UTM
-                    ? CoordinateSystemEnumPlaceHolder[coordFields]
+                  coordSysSelected !== CoordinateSystemEnum.UTM
+                    ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
                     : null
+                }
+                isExternallyControlled={true}
+                shouldShowDegree={
+                  coordSysSelected ===
+                    CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
+                  coordSysSelected ===
+                    CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                }
+                shouldShowMinute={
+                  coordSysSelected ===
+                  CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                }
+                shouldShowSecond={
+                  coordSysSelected ===
+                  CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
                 }
               />
               <TextFieldWithCoordButtons
                 name="dwcVerbatimLongitude"
                 placeholder={
-                  coordFields !== CoordinateSystemEnum.UTM
-                    ? CoordinateSystemEnumPlaceHolder[coordFields]
+                  coordSysSelected !== CoordinateSystemEnum.UTM
+                    ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
                     : null
+                }
+                isExternallyControlled={true}
+                shouldShowDegree={
+                  coordSysSelected ===
+                    CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
+                  coordSysSelected ===
+                    CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                }
+                shouldShowMinute={
+                  coordSysSelected ===
+                  CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                }
+                shouldShowSecond={
+                  coordSysSelected ===
+                  CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
                 }
               />
               <div className="form-group">
@@ -284,7 +314,7 @@ export function CollectingEventFormLayout() {
                 configQuery={() => ({
                   path: "collection-api/srs"
                 })}
-                configSuggestion={src => src.srs ?? []}
+                configSuggestion={src => src?.srs ?? []}
                 shouldRenderSuggestions={shouldRenderSuggestions}
               />
               <TextField name="dwcVerbatimElevation" />
