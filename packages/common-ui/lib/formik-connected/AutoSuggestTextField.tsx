@@ -7,7 +7,7 @@ import {
 import { FormikContextType, useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { debounce, noop, uniq } from "lodash";
-import { InputHTMLAttributes, useCallback, useState } from "react";
+import React, { InputHTMLAttributes, useCallback, useState } from "react";
 import AutoSuggest, {
   InputProps,
   ShouldRenderReasons
@@ -29,7 +29,10 @@ interface AutoSuggestConfig<T extends KitsuResource> {
     value: string,
     reason: ShouldRenderReasons
   ) => boolean;
-  onSuggestionSelected?: (selectedSuggestion: string) => void;
+  onSuggestionSelected?: (
+    selectedSuggestion: string,
+    formik: FormikContextType<{}>
+  ) => void;
 }
 
 /**
@@ -116,7 +119,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
             inputProps.onChange?.({
               target: { value: data.suggestion }
             } as any);
-            onSuggestionSelected?.(data.suggestion);
+            onSuggestionSelected?.(data.suggestion, formikCtx);
           }}
           onSuggestionsClearRequested={() => {
             debouncedSetSearchValue.cancel();

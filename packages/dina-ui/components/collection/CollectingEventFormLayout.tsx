@@ -119,17 +119,17 @@ export function CollectingEventFormLayout() {
     return !value || value?.length >= 0 || reason?.length >= 0;
   }
 
-  function onSuggestionSelected(selectedSuggestion) {
+  function onSuggestionSelected(selectedSuggestion, formik) {
     /* To bring the effect as if the field's value is changed to reflect the placeholder change */
-    values.dwcVerbatimLatitude === null
-      ? setFieldValue("dwcVerbatimLatitude", "")
-      : setFieldValue("dwcVerbatimLatitude", null);
-    values.dwcVerbatimLongitude === null
-      ? setFieldValue("dwcVerbatimLongitude", "")
+    formik.values.dwcVerbatimLatitude === null
+      ? formik.setFieldValue("dwcVerbatimLatitude", "")
+      : formik.setFieldValue("dwcVerbatimLatitude", null);
+    formik.values.dwcVerbatimLongitude === null
+      ? formik.setFieldValue("dwcVerbatimLongitude", "")
       : setFieldValue("dwcVerbatimLongitude", null);
-    values.dwcVerbatimCoordinates === null
-      ? setFieldValue("dwcVerbatimCoordinates", "")
-      : setFieldValue("dwcVerbatimCoordinates", null);
+    formik.values.dwcVerbatimCoordinates === null
+      ? formik.setFieldValue("dwcVerbatimCoordinates", "")
+      : formik.setFieldValue("dwcVerbatimCoordinates", null);
     setCoordFields(selectedSuggestion);
   }
 
