@@ -13,7 +13,6 @@ import {
 import { Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
 import { SRS } from "../../types/collection-api/resources/SRS";
-import { GeoreferenceVerificationStatus } from "../../types/collection-api/resources/GeoReferenceAssertion";
 import { useState } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -121,6 +120,7 @@ export function CollectingEventFormLayout() {
   }
 
   function onSuggestionSelected(selectedSuggestion) {
+    /* To bring the effect as if the field's value is changed to reflect the placeholder change */
     values.dwcVerbatimLatitude === null
       ? setFieldValue("dwcVerbatimLatitude", "")
       : setFieldValue("dwcVerbatimLatitude", null);
@@ -260,7 +260,11 @@ export function CollectingEventFormLayout() {
               />
               <KeyboardEventHandlerWrappedTextField
                 name="dwcVerbatimLongitude"
-                placeholder={coordFields}
+                placeholder={
+                  coordFields !== CoordinateSystemEnum.UTM
+                    ? CoordinateSystemEnumPlaceHolder[coordFields]
+                    : null
+                }
               />
               <div className="form-group">
                 <SetCoordinatesFromVerbatimButton

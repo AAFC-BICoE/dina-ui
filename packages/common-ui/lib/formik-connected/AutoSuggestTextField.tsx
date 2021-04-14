@@ -81,9 +81,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   );
 
   const { loading, response } = useQuery<T[]>(
-    configQuery
-      ? configQuery(searchValue)
-      : (query?.(searchValue, formikCtx) as any)
+    configQuery ? configQuery() : (query?.(searchValue, formikCtx) as any)
   );
 
   const suggestions = !loading
