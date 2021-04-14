@@ -4,7 +4,7 @@ import {
   filterBy,
   FormattedTextField,
   FormikButton,
-  KeyboardEventHandlerWrappedTextField,
+  TextFieldWithCoordButtons,
   NominatumApiSearchResult,
   ResourceSelectField,
   TextField,
@@ -223,9 +223,9 @@ export function CollectingEventFormLayout() {
           </legend>
           <div className="row">
             <div className="col-md-6">
-              <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLocality" />
-              <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLatitude" />
-              <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLongitude" />
+              <TextFieldWithCoordButtons name="dwcVerbatimLocality" />
+              <TextFieldWithCoordButtons name="dwcVerbatimLatitude" />
+              <TextFieldWithCoordButtons name="dwcVerbatimLongitude" />
               <div className="form-group">
                 <SetCoordinatesFromVerbatimButton
                   sourceLatField="dwcVerbatimLatitude"

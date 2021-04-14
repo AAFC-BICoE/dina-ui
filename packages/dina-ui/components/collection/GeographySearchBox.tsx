@@ -6,7 +6,8 @@ import {
   NominatumApiSearchResult,
   OnFormikSubmit,
   Tooltip,
-  FormikButton
+  FormikButton,
+  InputWithCoordButtons
 } from "common-ui";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { FormikContextType } from "formik";
@@ -113,8 +114,8 @@ export function GeographySearchBox({
   }
 
   return (
-    <div>
-      <div className="d-flex flex-row form-group">
+    <div className="m-2">
+      <div className="d-flex form-group ">
         <label className="pt-2">
           <strong>
             <DinaMessage id="locationLabel" />
@@ -122,32 +123,30 @@ export function GeographySearchBox({
           <Tooltip id="geographySearchBoxTooltip" />
         </label>
         <div className="flex-grow-1">
-          <div className="input-group">
-            <input
-              className="form-control"
-              onChange={e => onInputChange(e.target.value)}
-              onFocus={e => e.target.select()}
-              onKeyDown={e => {
-                if (e.keyCode === 13) {
-                  e.preventDefault();
-                  doSearch();
-                }
-              }}
-              value={inputValue}
-            />
-            <div className="input-group-append">
-              <button
-                style={{ width: "10rem" }}
-                onClick={doSearch}
-                className="btn btn-primary geo-search-button"
-                type="button"
-                disabled={suggestButtonIsDisabled}
-              >
-                <DinaMessage id="searchButton" />
-              </button>
-            </div>
-          </div>
+          <InputWithCoordButtons
+            className="form-control"
+            onChange={e => onInputChange(e.target.value)}
+            onFocus={e => e.target.select()}
+            onKeyDown={e => {
+              if (e.keyCode === 13) {
+                e.preventDefault();
+                doSearch();
+              }
+            }}
+            value={inputValue}
+          />
         </div>
+      </div>
+      <div className="form-group d-flex">
+        <button
+          style={{ width: "10rem" }}
+          onClick={doSearch}
+          className="btn btn-primary ml-auto geo-search-button"
+          type="button"
+          disabled={suggestButtonIsDisabled}
+        >
+          <DinaMessage id="searchButton" />
+        </button>
       </div>
       {renderUnderSearchBar}
       <div className="list-group mb-3">
