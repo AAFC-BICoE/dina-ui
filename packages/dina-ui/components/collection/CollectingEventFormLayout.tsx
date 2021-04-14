@@ -45,9 +45,7 @@ export function CollectingEventFormLayout() {
   const [rangeEnabled, setRangeEnabled] = useState(false);
 
   const { readOnly } = useDinaFormContext();
-
-  const { values, setFieldValue } = useFormikContext<any>();
-
+  const { values } = useFormikContext<any>();
   const [activeTabIdx, setActiveTabIdx] = useState(0);
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
@@ -126,7 +124,7 @@ export function CollectingEventFormLayout() {
       : formik.setFieldValue("dwcVerbatimLatitude", null);
     formik.values.dwcVerbatimLongitude === null
       ? formik.setFieldValue("dwcVerbatimLongitude", "")
-      : setFieldValue("dwcVerbatimLongitude", null);
+      : formik.setFieldValue("dwcVerbatimLongitude", null);
     formik.values.dwcVerbatimCoordinates === null
       ? formik.setFieldValue("dwcVerbatimCoordinates", "")
       : formik.setFieldValue("dwcVerbatimCoordinates", null);
