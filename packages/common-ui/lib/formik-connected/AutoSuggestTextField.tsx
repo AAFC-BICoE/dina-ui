@@ -7,11 +7,17 @@ import {
 import { FormikContextType, useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { debounce, noop, uniq } from "lodash";
-import React, { InputHTMLAttributes, useCallback, useState } from "react";
+import React, {
+  InputHTMLAttributes,
+  useCallback,
+  useState,
+  ChangeEvent
+} from "react";
 import AutoSuggest, {
   InputProps,
   ShouldRenderReasons
 } from "react-autosuggest";
+import { OnFormikSubmit } from "./safeSubmit";
 
 export type AutoSuggestTextFieldProps<
   T extends KitsuResource
@@ -29,10 +35,7 @@ interface AutoSuggestConfig<T extends KitsuResource> {
     value: string,
     reason: ShouldRenderReasons
   ) => boolean;
-  onSuggestionSelected?: (
-    selectedSuggestion: string,
-    formik: FormikContextType<{}>
-  ) => void;
+  onSuggestionSelected?: OnFormikSubmit<ChangeEvent<HTMLInputElement>>;
 }
 
 /**
