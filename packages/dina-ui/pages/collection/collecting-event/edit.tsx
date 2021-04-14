@@ -13,8 +13,8 @@ import {
 import { KitsuResponse, PersistedResource } from "kitsu";
 import { orderBy } from "lodash";
 import { NextRouter, useRouter } from "next/router";
-import { CoordinateSystemEnum } from "packages/dina-ui/types/collection-api/resources/CoordinateSystem";
-import { SRSEnum } from "packages/dina-ui/types/collection-api/resources/SRS";
+import { CoordinateSystemEnum } from "../../../types/collection-api/resources/CoordinateSystem";
+import { SRSEnum } from "../../../types/collection-api/resources/SRS";
 import { useContext } from "react";
 import { Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
