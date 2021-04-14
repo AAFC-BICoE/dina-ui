@@ -29,6 +29,7 @@ interface AutoSuggestConfig<T extends KitsuResource> {
     value: string,
     reason: ShouldRenderReasons
   ) => boolean;
+  onSuggestionSelected?: (selectedSuggestion: string) => void;
 }
 
 /**
@@ -41,6 +42,7 @@ export function AutoSuggestTextField<T extends KitsuResource>({
   shouldRenderSuggestions,
   configQuery,
   configSuggestion,
+  onSuggestionSelected,
   ...textFieldProps
 }: AutoSuggestTextFieldProps<T>) {
   return (
@@ -54,6 +56,7 @@ export function AutoSuggestTextField<T extends KitsuResource>({
           configSuggestion={configSuggestion}
           {...inputProps}
           shouldRenderSuggestions={shouldRenderSuggestions}
+          onSuggestionSelected={onSuggestionSelected}
         />
       )}
     />
@@ -66,6 +69,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   shouldRenderSuggestions,
   configQuery,
   configSuggestion,
+  onSuggestionSelected,
   ...inputProps
 }: InputHTMLAttributes<any> & AutoSuggestConfig<T>) {
   const formikCtx = useFormikContext<any>();
@@ -77,7 +81,9 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   );
 
   const { loading, response } = useQuery<T[]>(
-    configQuery ? configQuery() : (query?.(searchValue, formikCtx) as any)
+    configQuery
+      ? configQuery(searchValue)
+      : (query?.(searchValue, formikCtx) as any)
   );
 
   const suggestions = !loading
@@ -108,9 +114,12 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
           onSuggestionsFetchRequested={({ value }) =>
             debouncedSetSearchValue(value)
           }
-          onSuggestionSelected={(_, data) =>
-            inputProps.onChange?.({ target: { value: data.suggestion } } as any)
-          }
+          onSuggestionSelected={(_, data) => {
+            inputProps.onChange?.({
+              target: { value: data.suggestion }
+            } as any);
+            onSuggestionSelected?.(data.suggestion);
+          }}
           onSuggestionsClearRequested={() => {
             debouncedSetSearchValue.cancel();
             debouncedSetSearchValue("");

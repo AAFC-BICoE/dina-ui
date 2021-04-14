@@ -31,8 +31,13 @@ import {
   GeographicPlaceNameSource
 } from "../../types/collection-api/resources/CollectingEvent";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
-import { CoordinateSystem } from "../../types/collection-api/resources/CoordinateSystem";
-import AutoSuggest, { ShouldRenderReasons } from "react-autosuggest";
+import {
+  CoordinateSystem,
+  CoordinateSystemEnum,
+  CoordinateSystemEnumPlaceHolder
+} from "../../types/collection-api/resources/CoordinateSystem";
+import { ShouldRenderReasons } from "react-autosuggest";
+import { useFormikContext } from "formik";
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
 export function CollectingEventFormLayout() {
@@ -42,9 +47,15 @@ export function CollectingEventFormLayout() {
 
   const { readOnly } = useDinaFormContext();
 
+  const { values, setFieldValue } = useFormikContext<any>();
+
   const [activeTabIdx, setActiveTabIdx] = useState(0);
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
+
+  const [coordFields, setCoordFields] = useState(
+    `${values.dwcVerbatimCoordinateSystem}`
+  );
 
   function toggleRangeEnabled(
     newValue: boolean,
@@ -95,21 +106,6 @@ export function CollectingEventFormLayout() {
     formik.setFieldValue("geographicPlaceNameSource", null);
   }
 
-  function onGeoReferencingImpossibleCheckBoxClick(
-    event,
-    formik: FormikContextType<{}>
-  ) {
-    if (event.target.checked === true) {
-      formik.setFieldValue(
-        "dwcGeoreferenceVerificationStatus",
-        GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
-      );
-      formik.setFieldValue("geoReferenceAssertions", []);
-    } else {
-      formik.setFieldValue("dwcGeoreferenceVerificationStatus", null);
-    }
-  }
-
   /** Does a Places search using the given search string. */
   function doGeoSearch(query: string) {
     setGeoSearchValue(query);
@@ -122,6 +118,19 @@ export function CollectingEventFormLayout() {
   /* Ensure config is rendered when input get focuse without needing to enter any value */
   function shouldRenderSuggestions(value: string, reason: ShouldRenderReasons) {
     return !value || value?.length >= 0 || reason?.length >= 0;
+  }
+
+  function onSuggestionSelected(selectedSuggestion) {
+    values.dwcVerbatimLatitude === null
+      ? setFieldValue("dwcVerbatimLatitude", "")
+      : setFieldValue("dwcVerbatimLatitude", null);
+    values.dwcVerbatimLongitude === null
+      ? setFieldValue("dwcVerbatimLongitude", "")
+      : setFieldValue("dwcVerbatimLongitude", null);
+    values.dwcVerbatimCoordinates === null
+      ? setFieldValue("dwcVerbatimCoordinates", "")
+      : setFieldValue("dwcVerbatimCoordinates", null);
+    setCoordFields(selectedSuggestion);
   }
 
   return (
@@ -224,8 +233,35 @@ export function CollectingEventFormLayout() {
           <div className="row">
             <div className="col-md-6">
               <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLocality" />
-              <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLatitude" />
-              <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLongitude" />
+              <AutoSuggestTextField<CoordinateSystem>
+                name="dwcVerbatimCoordinateSystem"
+                configQuery={() => ({
+                  path: "collection-api/coordinate-system"
+                })}
+                configSuggestion={src => src.coordinateSystem ?? []}
+                shouldRenderSuggestions={shouldRenderSuggestions}
+                onSuggestionSelected={onSuggestionSelected}
+              />
+              <TextField
+                name="dwcVerbatimCoordinates"
+                placeholder={
+                  coordFields === CoordinateSystemEnum.UTM
+                    ? CoordinateSystemEnumPlaceHolder[coordFields]
+                    : ""
+                }
+              />
+              <KeyboardEventHandlerWrappedTextField
+                name="dwcVerbatimLatitude"
+                placeholder={
+                  coordFields !== CoordinateSystemEnum.UTM
+                    ? CoordinateSystemEnumPlaceHolder[coordFields]
+                    : null
+                }
+              />
+              <KeyboardEventHandlerWrappedTextField
+                name="dwcVerbatimLongitude"
+                placeholder={coordFields}
+              />
               <div className="form-group">
                 <SetCoordinatesFromVerbatimButton
                   sourceLatField="dwcVerbatimLatitude"
@@ -241,15 +277,6 @@ export function CollectingEventFormLayout() {
               </div>
             </div>
             <div className="col-md-6">
-              <TextField name="dwcVerbatimCoordinates" />
-              <AutoSuggestTextField<CoordinateSystem>
-                name="dwcVerbatimCoordinateSystem"
-                configQuery={() => ({
-                  path: "collection-api/coordinate-system"
-                })}
-                configSuggestion={src => src.coordinateSystem ?? []}
-                shouldRenderSuggestions={shouldRenderSuggestions}
-              />
               <AutoSuggestTextField<SRS>
                 name="dwcVerbatimSRS"
                 configQuery={() => ({
