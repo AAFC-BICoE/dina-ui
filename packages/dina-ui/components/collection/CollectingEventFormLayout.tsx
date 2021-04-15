@@ -36,22 +36,26 @@ import {
   CoordinateSystemEnumPlaceHolder
 } from "../../types/collection-api/resources/CoordinateSystem";
 import { ShouldRenderReasons } from "react-autosuggest";
-import { useFormikContext } from "formik";
+
+interface CollectingEventFormLayoutProps {
+  dwcVerbatimCoord?: string | undefined;
+}
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
-export function CollectingEventFormLayout() {
+export function CollectingEventFormLayout(
+  props: CollectingEventFormLayoutProps
+) {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [rangeEnabled, setRangeEnabled] = useState(false);
 
   const { readOnly } = useDinaFormContext();
-  const { values } = useFormikContext<any>();
   const [activeTabIdx, setActiveTabIdx] = useState(0);
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
   const [coordSysSelected, setCoordSysSelected] = useState(
-    `${values.dwcVerbatimCoordinateSystem}`
+    props?.dwcVerbatimCoord
   );
 
   function toggleRangeEnabled(
@@ -252,7 +256,7 @@ export function CollectingEventFormLayout() {
                 name="dwcVerbatimLatitude"
                 placeholder={
                   coordSysSelected !== CoordinateSystemEnum.UTM
-                    ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
+                    ? CoordinateSystemEnumPlaceHolder[coordSysSelected ?? ""]
                     : null
                 }
                 isExternallyControlled={true}
@@ -275,7 +279,7 @@ export function CollectingEventFormLayout() {
                 name="dwcVerbatimLongitude"
                 placeholder={
                   coordSysSelected !== CoordinateSystemEnum.UTM
-                    ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
+                    ? CoordinateSystemEnumPlaceHolder[coordSysSelected ?? ""]
                     : null
                 }
                 isExternallyControlled={true}
