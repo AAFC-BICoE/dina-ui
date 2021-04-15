@@ -12,8 +12,8 @@ export enum CoordinateSystemEnum {
 }
 
 export const CoordinateSystemEnumPlaceHolder = {
-  "decimal degrees": "0.0000",
-  "degrees decimal minutes": "00°00.00N",
+  "decimal degrees": "0.0000°N",
+  "degrees decimal minutes": "00°00.00′N",
   "degrees minutes seconds": "00°00′00″N",
   UTM: "Enter UTM grid coordinates"
 };

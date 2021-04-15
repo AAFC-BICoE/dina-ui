@@ -55,7 +55,7 @@ export function CollectingEventFormLayout(
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
   const [coordSysSelected, setCoordSysSelected] = useState(
-    props?.dwcVerbatimCoord
+    props?.dwcVerbatimCoord ?? ""
   );
 
   function toggleRangeEnabled(
@@ -118,7 +118,11 @@ export function CollectingEventFormLayout(
 
   /* Ensure config is rendered when input get focuse without needing to enter any value */
   function shouldRenderSuggestions(value: string, reason: ShouldRenderReasons) {
-    return !value || value?.length >= 0 || reason?.length >= 0;
+    return (
+      value?.length >= 0 ||
+      reason === "input-changed" ||
+      reason === "input-focused"
+    );
   }
 
   function onSuggestionSelected(selectedSuggestion, formik) {
@@ -256,11 +260,12 @@ export function CollectingEventFormLayout(
                 name="dwcVerbatimLatitude"
                 placeholder={
                   coordSysSelected !== CoordinateSystemEnum.UTM
-                    ? CoordinateSystemEnumPlaceHolder[coordSysSelected ?? ""]
+                    ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
                     : null
                 }
                 isExternallyControlled={true}
                 shouldShowDegree={
+                  coordSysSelected === CoordinateSystemEnum.DECIMAL_DEGREE ||
                   coordSysSelected ===
                     CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
                   coordSysSelected ===
@@ -268,7 +273,9 @@ export function CollectingEventFormLayout(
                 }
                 shouldShowMinute={
                   coordSysSelected ===
-                  CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                    CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
+                  coordSysSelected ===
+                    CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
                 }
                 shouldShowSecond={
                   coordSysSelected ===
@@ -279,11 +286,12 @@ export function CollectingEventFormLayout(
                 name="dwcVerbatimLongitude"
                 placeholder={
                   coordSysSelected !== CoordinateSystemEnum.UTM
-                    ? CoordinateSystemEnumPlaceHolder[coordSysSelected ?? ""]
+                    ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
                     : null
                 }
                 isExternallyControlled={true}
                 shouldShowDegree={
+                  coordSysSelected === CoordinateSystemEnum.DECIMAL_DEGREE ||
                   coordSysSelected ===
                     CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
                   coordSysSelected ===
@@ -291,7 +299,9 @@ export function CollectingEventFormLayout(
                 }
                 shouldShowMinute={
                   coordSysSelected ===
-                  CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                    CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
+                  coordSysSelected ===
+                    CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
                 }
                 shouldShowSecond={
                   coordSysSelected ===
