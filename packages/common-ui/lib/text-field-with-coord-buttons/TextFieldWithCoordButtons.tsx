@@ -1,20 +1,50 @@
 import React, { ChangeEvent, InputHTMLAttributes, useRef } from "react";
 import { TextField, TextFieldProps } from "../formik-connected/TextField";
 
+export interface TextFieldWithCoordButtonsProps extends TextFieldProps {
+  isExternallyControlled?: boolean;
+  shouldShowDegree?: boolean;
+  shouldShowMinute?: boolean;
+  shouldShowSecond?: boolean;
+}
+
+export interface InputWithCoordButtonsProps extends InputHTMLAttributes<any> {
+  isExternallyControlled?: boolean;
+  shouldShowDegree?: boolean;
+  shouldShowMinute?: boolean;
+  shouldShowSecond?: boolean;
+}
+
 /**
  * Shows buttons for degree, minute and second entry.
  */
-export function TextFieldWithCoordButtons(props: TextFieldProps) {
+export function TextFieldWithCoordButtons(
+  props: TextFieldWithCoordButtonsProps
+) {
   return (
     <TextField
       {...props}
-      customInput={inputProps => <InputWithCoordButtons {...inputProps} />}
+      customInput={inputProps => (
+        <InputWithCoordButtons
+          shouldShowDegree={props.shouldShowDegree}
+          shouldShowMinute={props.shouldShowMinute}
+          shouldShowSecond={props.shouldShowSecond}
+          isExternallyControlled={props.isExternallyControlled}
+          {...inputProps}
+        />
+      )}
     />
   );
 }
 
-export function InputWithCoordButtons(inputProps: InputHTMLAttributes<any>) {
+export function InputWithCoordButtons(inputProps: InputWithCoordButtonsProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const {
+    isExternallyControlled,
+    shouldShowDegree,
+    shouldShowMinute,
+    shouldShowSecond
+  } = inputProps;
 
   function insertSymbol(symbol: string) {
     const input = inputRef.current;
@@ -34,7 +64,6 @@ export function InputWithCoordButtons(inputProps: InputHTMLAttributes<any>) {
       });
     }
   }
-
   return (
     <div className="input-group">
       <input type="text" {...inputProps} ref={inputRef} />
@@ -43,7 +72,15 @@ export function InputWithCoordButtons(inputProps: InputHTMLAttributes<any>) {
           <button
             key={symbol}
             tabIndex={-1}
-            className="btn btn-info coord-button"
+            className={
+              !isExternallyControlled
+                ? "btn btn-info coord-button"
+                : (symbol === "°" && shouldShowDegree) ||
+                  (symbol === "′" && shouldShowMinute) ||
+                  (symbol === "″" && shouldShowSecond)
+                ? "btn btn-info coord-button"
+                : "d-none"
+            }
             type="button"
             style={{ width: "3rem" }}
             onClick={() => insertSymbol(symbol)}

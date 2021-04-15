@@ -7,11 +7,17 @@ import {
 import { FormikContextType, useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { debounce, noop, uniq } from "lodash";
-import { InputHTMLAttributes, useCallback, useState } from "react";
+import React, {
+  InputHTMLAttributes,
+  useCallback,
+  useState,
+  ChangeEvent
+} from "react";
 import AutoSuggest, {
   InputProps,
   ShouldRenderReasons
 } from "react-autosuggest";
+import { OnFormikSubmit } from "./safeSubmit";
 
 export type AutoSuggestTextFieldProps<
   T extends KitsuResource
@@ -29,6 +35,7 @@ interface AutoSuggestConfig<T extends KitsuResource> {
     value: string,
     reason: ShouldRenderReasons
   ) => boolean;
+  onSuggestionSelected?: OnFormikSubmit<ChangeEvent<HTMLInputElement>>;
 }
 
 /**
@@ -41,6 +48,7 @@ export function AutoSuggestTextField<T extends KitsuResource>({
   shouldRenderSuggestions,
   configQuery,
   configSuggestion,
+  onSuggestionSelected,
   ...textFieldProps
 }: AutoSuggestTextFieldProps<T>) {
   return (
@@ -54,6 +62,7 @@ export function AutoSuggestTextField<T extends KitsuResource>({
           configSuggestion={configSuggestion}
           {...inputProps}
           shouldRenderSuggestions={shouldRenderSuggestions}
+          onSuggestionSelected={onSuggestionSelected}
         />
       )}
     />
@@ -66,6 +75,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   shouldRenderSuggestions,
   configQuery,
   configSuggestion,
+  onSuggestionSelected,
   ...inputProps
 }: InputHTMLAttributes<any> & AutoSuggestConfig<T>) {
   const formikCtx = useFormikContext<any>();
@@ -108,9 +118,12 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
           onSuggestionsFetchRequested={({ value }) =>
             debouncedSetSearchValue(value)
           }
-          onSuggestionSelected={(_, data) =>
-            inputProps.onChange?.({ target: { value: data.suggestion } } as any)
-          }
+          onSuggestionSelected={(_, data) => {
+            inputProps.onChange?.({
+              target: { value: data.suggestion }
+            } as any);
+            onSuggestionSelected?.(data.suggestion, formikCtx);
+          }}
           onSuggestionsClearRequested={() => {
             debouncedSetSearchValue.cancel();
             debouncedSetSearchValue("");
