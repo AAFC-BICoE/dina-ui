@@ -49,7 +49,7 @@ export default function MetadataViewPage() {
 
   const { loading, response } = useQuery<Metadata, ObjectUpload>(
     {
-      include: "acDerivedFrom,managedAttributeMap,acMetadataCreator,dcCreator",
+      include: "managedAttributeMap,acMetadataCreator,dcCreator",
       path: `objectstore-api/metadata/${id}`
     },
     {
@@ -80,7 +80,7 @@ export default function MetadataViewPage() {
 
     const fileId =
       metadata.acSubType === "THUMBNAIL"
-        ? `${metadata.fileIdentifier}.thumbnail`
+        ? `${metadata.fileIdentifier}/thumbnail`
         : metadata.fileIdentifier;
 
     const filePath = `/api/objectstore-api/file/${metadata.bucket}/${fileId}`;

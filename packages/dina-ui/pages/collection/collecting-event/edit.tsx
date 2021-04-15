@@ -13,6 +13,8 @@ import {
 import { KitsuResponse, PersistedResource } from "kitsu";
 import { orderBy } from "lodash";
 import { NextRouter, useRouter } from "next/router";
+import { CoordinateSystemEnum } from "../../../types/collection-api/resources/CoordinateSystem";
+import { SRSEnum } from "../../../types/collection-api/resources/SRS";
 import { useContext } from "react";
 import { Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
@@ -172,7 +174,9 @@ function CollectingEventForm({
         collectors: [],
         collectorGroups: [],
         startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
-        geoReferenceAssertions: [{}]
+        geoReferenceAssertions: [{}],
+        dwcVerbatimCoordinateSystem: CoordinateSystemEnum.DECIMAL_DEGREE,
+        dwcVerbatimSRS: SRSEnum.WGS84
       };
 
   const { save } = useApiClient();

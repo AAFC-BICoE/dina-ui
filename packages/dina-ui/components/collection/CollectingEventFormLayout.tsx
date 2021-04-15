@@ -4,7 +4,7 @@ import {
   filterBy,
   FormattedTextField,
   FormikButton,
-  KeyboardEventHandlerWrappedTextField,
+  TextFieldWithCoordButtons,
   NominatumApiSearchResult,
   ResourceSelectField,
   TextField,
@@ -12,7 +12,7 @@ import {
 } from "common-ui";
 import { Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
-import { GeoreferenceVerificationStatus } from "../../types/collection-api/resources/GeoReferenceAssertion";
+import { SRS } from "../../types/collection-api/resources/SRS";
 import { useState } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -30,6 +30,12 @@ import {
   GeographicPlaceNameSource
 } from "../../types/collection-api/resources/CollectingEvent";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
+import {
+  CoordinateSystem,
+  CoordinateSystemEnum,
+  CoordinateSystemEnumPlaceHolder
+} from "../../types/collection-api/resources/CoordinateSystem";
+import { ShouldRenderReasons } from "react-autosuggest";
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
 export function CollectingEventFormLayout() {
@@ -38,7 +44,6 @@ export function CollectingEventFormLayout() {
   const [rangeEnabled, setRangeEnabled] = useState(false);
 
   const { readOnly } = useDinaFormContext();
-
   const [activeTabIdx, setActiveTabIdx] = useState(0);
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
@@ -92,21 +97,6 @@ export function CollectingEventFormLayout() {
     formik.setFieldValue("geographicPlaceNameSource", null);
   }
 
-  function onGeoReferencingImpossibleCheckBoxClick(
-    event,
-    formik: FormikContextType<{}>
-  ) {
-    if (event.target.checked === true) {
-      formik.setFieldValue(
-        "dwcGeoreferenceVerificationStatus",
-        GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
-      );
-      formik.setFieldValue("geoReferenceAssertions", []);
-    } else {
-      formik.setFieldValue("dwcGeoreferenceVerificationStatus", null);
-    }
-  }
-
   /** Does a Places search using the given search string. */
   function doGeoSearch(query: string) {
     setGeoSearchValue(query);
@@ -114,6 +104,28 @@ export function CollectingEventFormLayout() {
     setImmediate(() =>
       document?.querySelector<HTMLElement>(".geo-search-button")?.click()
     );
+  }
+
+  /* Ensure config is rendered when input get focuse without needing to enter any value */
+  function shouldRenderSuggestions(value: string, reason: ShouldRenderReasons) {
+    return (
+      value?.length >= 0 ||
+      reason === "input-changed" ||
+      reason === "input-focused"
+    );
+  }
+
+  function onSuggestionSelected(_, formik) {
+    /* To bring the effect as if the field's value is changed to reflect the placeholder change */
+    formik.values.dwcVerbatimLatitude === null
+      ? formik.setFieldValue("dwcVerbatimLatitude", "")
+      : formik.setFieldValue("dwcVerbatimLatitude", null);
+    formik.values.dwcVerbatimLongitude === null
+      ? formik.setFieldValue("dwcVerbatimLongitude", "")
+      : formik.setFieldValue("dwcVerbatimLongitude", null);
+    formik.values.dwcVerbatimCoordinates === null
+      ? formik.setFieldValue("dwcVerbatimCoordinates", "")
+      : formik.setFieldValue("dwcVerbatimCoordinates", null);
   }
 
   return (
@@ -215,9 +227,84 @@ export function CollectingEventFormLayout() {
           </legend>
           <div className="row">
             <div className="col-md-6">
-              <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLocality" />
-              <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLatitude" />
-              <KeyboardEventHandlerWrappedTextField name="dwcVerbatimLongitude" />
+              <TextFieldWithCoordButtons name="dwcVerbatimLocality" />
+              <AutoSuggestTextField<CoordinateSystem>
+                name="dwcVerbatimCoordinateSystem"
+                configQuery={() => ({
+                  path: "collection-api/coordinate-system"
+                })}
+                configSuggestion={src => src?.coordinateSystem ?? []}
+                shouldRenderSuggestions={shouldRenderSuggestions}
+                onSuggestionSelected={onSuggestionSelected}
+              />
+              <Field name="dwcVerbatimCoordinateSystem">
+                {({ field: { value: coordSysSelected } }) => (
+                  <>
+                    <TextField
+                      name="dwcVerbatimCoordinates"
+                      placeholder={
+                        coordSysSelected === CoordinateSystemEnum.UTM
+                          ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
+                          : ""
+                      }
+                    />
+                    <TextFieldWithCoordButtons
+                      name="dwcVerbatimLatitude"
+                      placeholder={
+                        coordSysSelected !== CoordinateSystemEnum.UTM
+                          ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
+                          : null
+                      }
+                      isExternallyControlled={true}
+                      shouldShowDegree={
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DECIMAL_DEGREE ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                      }
+                      shouldShowMinute={
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                      }
+                      shouldShowSecond={
+                        coordSysSelected ===
+                        CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                      }
+                    />
+                    <TextFieldWithCoordButtons
+                      name="dwcVerbatimLongitude"
+                      placeholder={
+                        coordSysSelected !== CoordinateSystemEnum.UTM
+                          ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
+                          : null
+                      }
+                      isExternallyControlled={true}
+                      shouldShowDegree={
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DECIMAL_DEGREE ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                      }
+                      shouldShowMinute={
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                      }
+                      shouldShowSecond={
+                        coordSysSelected ===
+                        CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                      }
+                    />
+                  </>
+                )}
+              </Field>
               <div className="form-group">
                 <SetCoordinatesFromVerbatimButton
                   sourceLatField="dwcVerbatimLatitude"
@@ -233,9 +320,14 @@ export function CollectingEventFormLayout() {
               </div>
             </div>
             <div className="col-md-6">
-              <TextField name="dwcVerbatimCoordinates" />
-              <TextField name="dwcVerbatimCoordinateSystem" />
-              <TextField name="dwcVerbatimSRS" />
+              <AutoSuggestTextField<SRS>
+                name="dwcVerbatimSRS"
+                configQuery={() => ({
+                  path: "collection-api/srs"
+                })}
+                configSuggestion={src => src?.srs ?? []}
+                shouldRenderSuggestions={shouldRenderSuggestions}
+              />
               <TextField name="dwcVerbatimElevation" />
               <TextField name="dwcVerbatimDepth" />
             </div>
@@ -386,18 +478,12 @@ export function CollectingEventFormLayout() {
                                 activeAssertion?.dwcDecimalLongitude;
 
                               const hasVerbatimLocality = !!colEvent.dwcVerbatimLocality;
-                              const hasVerbatimCoords = !!(
-                                colEvent.dwcVerbatimLatitude &&
-                                colEvent.dwcVerbatimLongitude
-                              );
                               const hasDecimalCoords = !!(
                                 decimalLat && decimalLon
                               );
 
                               const hasAnyLocation =
-                                hasVerbatimLocality ||
-                                hasVerbatimCoords ||
-                                hasDecimalCoords;
+                                hasVerbatimLocality || hasDecimalCoords;
 
                               return hasAnyLocation ? (
                                 <div className="form-group d-flex flex-row align-items-center">
@@ -415,20 +501,6 @@ export function CollectingEventFormLayout() {
                                     }
                                   >
                                     <DinaMessage id="field_dwcVerbatimLocality" />
-                                  </FormikButton>
-                                  <FormikButton
-                                    className={
-                                      hasVerbatimCoords
-                                        ? "btn btn-link"
-                                        : "d-none"
-                                    }
-                                    onClick={state =>
-                                      doGeoSearch(
-                                        `${state.dwcVerbatimLatitude}, ${state.dwcVerbatimLongitude}`
-                                      )
-                                    }
-                                  >
-                                    <DinaMessage id="verbatimLatLong" />
                                   </FormikButton>
                                   <FormikButton
                                     className={
