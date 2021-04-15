@@ -351,9 +351,7 @@ function CollectingEventForm({
       enableReinitialize={true}
     >
       {buttonBar}
-      <CollectingEventFormLayout
-        dwcVerbatimCoord={initialValues.dwcVerbatimCoordinateSystem}
-      />
+      <CollectingEventFormLayout />
       <div className="form-group">{attachedMetadatasUI}</div>
       {buttonBar}
     </DinaForm>

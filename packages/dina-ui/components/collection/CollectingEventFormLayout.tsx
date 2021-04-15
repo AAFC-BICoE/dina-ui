@@ -37,14 +37,8 @@ import {
 } from "../../types/collection-api/resources/CoordinateSystem";
 import { ShouldRenderReasons } from "react-autosuggest";
 
-interface CollectingEventFormLayoutProps {
-  dwcVerbatimCoord?: string | undefined;
-}
-
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
-export function CollectingEventFormLayout(
-  props: CollectingEventFormLayoutProps
-) {
+export function CollectingEventFormLayout() {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [rangeEnabled, setRangeEnabled] = useState(false);
@@ -53,10 +47,6 @@ export function CollectingEventFormLayout(
   const [activeTabIdx, setActiveTabIdx] = useState(0);
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
-
-  const [coordSysSelected, setCoordSysSelected] = useState(
-    props?.dwcVerbatimCoord ?? ""
-  );
 
   function toggleRangeEnabled(
     newValue: boolean,
@@ -125,7 +115,7 @@ export function CollectingEventFormLayout(
     );
   }
 
-  function onSuggestionSelected(selectedSuggestion, formik) {
+  function onSuggestionSelected(_, formik) {
     /* To bring the effect as if the field's value is changed to reflect the placeholder change */
     formik.values.dwcVerbatimLatitude === null
       ? formik.setFieldValue("dwcVerbatimLatitude", "")
@@ -136,7 +126,6 @@ export function CollectingEventFormLayout(
     formik.values.dwcVerbatimCoordinates === null
       ? formik.setFieldValue("dwcVerbatimCoordinates", "")
       : formik.setFieldValue("dwcVerbatimCoordinates", null);
-    setCoordSysSelected(selectedSuggestion);
   }
 
   return (
@@ -248,66 +237,74 @@ export function CollectingEventFormLayout(
                 shouldRenderSuggestions={shouldRenderSuggestions}
                 onSuggestionSelected={onSuggestionSelected}
               />
-              <TextField
-                name="dwcVerbatimCoordinates"
-                placeholder={
-                  coordSysSelected === CoordinateSystemEnum.UTM
-                    ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
-                    : ""
-                }
-              />
-              <TextFieldWithCoordButtons
-                name="dwcVerbatimLatitude"
-                placeholder={
-                  coordSysSelected !== CoordinateSystemEnum.UTM
-                    ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
-                    : null
-                }
-                isExternallyControlled={true}
-                shouldShowDegree={
-                  coordSysSelected === CoordinateSystemEnum.DECIMAL_DEGREE ||
-                  coordSysSelected ===
-                    CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
-                  coordSysSelected ===
-                    CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
-                }
-                shouldShowMinute={
-                  coordSysSelected ===
-                    CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
-                  coordSysSelected ===
-                    CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
-                }
-                shouldShowSecond={
-                  coordSysSelected ===
-                  CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
-                }
-              />
-              <TextFieldWithCoordButtons
-                name="dwcVerbatimLongitude"
-                placeholder={
-                  coordSysSelected !== CoordinateSystemEnum.UTM
-                    ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
-                    : null
-                }
-                isExternallyControlled={true}
-                shouldShowDegree={
-                  coordSysSelected === CoordinateSystemEnum.DECIMAL_DEGREE ||
-                  coordSysSelected ===
-                    CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
-                  coordSysSelected ===
-                    CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
-                }
-                shouldShowMinute={
-                  coordSysSelected ===
-                    CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
-                  coordSysSelected ===
-                    CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
-                }
-                shouldShowSecond={
-                  coordSysSelected ===
-                  CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
-                }
-              />
+              <Field name="dwcVerbatimCoordinateSystem">
+                {({ field: { value: coordSysSelected } }) => (
+                  <>
+                    <TextField
+                      name="dwcVerbatimCoordinates"
+                      placeholder={
+                        coordSysSelected === CoordinateSystemEnum.UTM
+                          ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
+                          : ""
+                      }
+                    />
+                    <TextFieldWithCoordButtons
+                      name="dwcVerbatimLatitude"
+                      placeholder={
+                        coordSysSelected !== CoordinateSystemEnum.UTM
+                          ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
+                          : null
+                      }
+                      isExternallyControlled={true}
+                      shouldShowDegree={
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DECIMAL_DEGREE ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                      }
+                      shouldShowMinute={
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                      }
+                      shouldShowSecond={
+                        coordSysSelected ===
+                        CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                      }
+                    />
+                    <TextFieldWithCoordButtons
+                      name="dwcVerbatimLongitude"
+                      placeholder={
+                        coordSysSelected !== CoordinateSystemEnum.UTM
+                          ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
+                          : null
+                      }
+                      isExternallyControlled={true}
+                      shouldShowDegree={
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DECIMAL_DEGREE ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                      }
+                      shouldShowMinute={
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                      }
+                      shouldShowSecond={
+                        coordSysSelected ===
+                        CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                      }
+                    />
+                  </>
+                )}
+              </Field>
               <div className="form-group">
                 <SetCoordinatesFromVerbatimButton
                   sourceLatField="dwcVerbatimLatitude"
