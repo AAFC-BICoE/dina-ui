@@ -12,6 +12,7 @@ export interface GeoReferenceAssertionAttributes {
   dwcGeoreferenceProtocol?: string;
   dwcGeoreferenceSources?: string;
   dwcGeoreferenceRemarks?: string;
+  dwcGeodeticDatum?: string;
   dwcGeoreferenceVerificationStatus?: GeoreferenceVerificationStatus;
 }
 
