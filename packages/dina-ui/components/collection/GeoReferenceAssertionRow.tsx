@@ -16,7 +16,7 @@ import {
 } from "../../types/collection-api/resources/GeoReferenceAssertion";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
@@ -37,18 +37,23 @@ export function GeoReferenceAssertionRow({
       GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
   );
 
+  const reservedAssertion = useRef(assertion);
+
+  const commonRoot = `geoReferenceAssertions[${index}].`;
+
   function onGeoReferencingImpossibleCheckBoxClick(
     event,
     formik: FormikContextType<{}>
   ) {
     // On checked, set 3 fields editable, rest readonly; unchecked, all fields editable
-    const name = `geoReferenceAssertions[${index}].dwcGeoreferenceVerificationStatus`;
-    const dwcDecimalLatitude = `geoReferenceAssertions[${index}].dwcDecimalLatitude`;
-    const dwcDecimalLongitude = `geoReferenceAssertions[${index}].dwcDecimalLongitude`;
-    const dwcCoordinateUncertaintyInMeters = `geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`;
-    const dwcGeodeticDatum = `geoReferenceAssertions[${index}].dwcGeodeticDatum`;
-    const dwcGeoreferenceProtocol = `geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`;
-    const dwcGeoreferenceSources = `geoReferenceAssertions[${index}].dwcGeoreferenceSources`;
+    const name = commonRoot + "dwcGeoreferenceVerificationStatus";
+    const dwcDecimalLatitude = commonRoot + "dwcDecimalLatitude";
+    const dwcDecimalLongitude = commonRoot + "dwcDecimalLongitude";
+    const dwcCoordinateUncertaintyInMeters =
+      commonRoot + "dwcCoordinateUncertaintyInMeters";
+    const dwcGeodeticDatum = commonRoot + "dwcGeodeticDatum";
+    const dwcGeoreferenceProtocol = commonRoot + "dwcGeoreferenceProtocol";
+    const dwcGeoreferenceSources = commonRoot + "dwcGeoreferenceSources";
     if (event.target.checked === true) {
       formik.setFieldValue(dwcDecimalLatitude, null);
       formik.setFieldValue(dwcDecimalLongitude, null);
@@ -62,12 +67,30 @@ export function GeoReferenceAssertionRow({
       );
       setGeoreferenceDisabled(true);
     } else {
-      formik.setFieldValue(dwcDecimalLatitude, undefined);
-      formik.setFieldValue(dwcDecimalLongitude, undefined);
-      formik.setFieldValue(dwcCoordinateUncertaintyInMeters, undefined);
-      formik.setFieldValue(dwcGeodeticDatum, undefined);
-      formik.setFieldValue(dwcGeoreferenceProtocol, undefined);
-      formik.setFieldValue(dwcGeoreferenceSources, undefined);
+      formik.setFieldValue(
+        dwcDecimalLatitude,
+        reservedAssertion.current?.dwcDecimalLatitude ?? undefined
+      );
+      formik.setFieldValue(
+        dwcDecimalLongitude,
+        reservedAssertion.current?.dwcDecimalLongitude ?? undefined
+      );
+      formik.setFieldValue(
+        dwcCoordinateUncertaintyInMeters,
+        reservedAssertion.current?.dwcCoordinateUncertaintyInMeters ?? undefined
+      );
+      formik.setFieldValue(
+        dwcGeodeticDatum,
+        reservedAssertion.current?.dwcGeodeticDatum ?? undefined
+      );
+      formik.setFieldValue(
+        dwcGeoreferenceProtocol,
+        reservedAssertion.current?.dwcGeoreferenceProtocol ?? undefined
+      );
+      formik.setFieldValue(
+        dwcGeoreferenceSources,
+        reservedAssertion.current?.dwcGeoreferenceSources ?? undefined
+      );
       formik.setFieldValue(name, null);
       setGeoreferenceDisabled(false);
     }
@@ -79,12 +102,10 @@ export function GeoReferenceAssertionRow({
         {viewOnly && (
           <ViewInMapButton assertionPath={`geoReferenceAssertions.${index}`} />
         )}
-        <Field
-          name={`geoReferenceAssertions[${index}].dwcGeoreferenceVerificationStatus`}
-        >
+        <Field name={commonRoot + "dwcGeoreferenceVerificationStatus"}>
           {() => (
             <CheckBoxField
-              name={`geoReferenceAssertions[${index}].dwcGeoreferenceVerificationStatus`}
+              name={commonRoot + "dwcGeoreferenceVerificationStatus"}
               onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
               disabled={viewOnly}
               customName="dwcGeoreferenceVerificationStatus"
@@ -94,7 +115,7 @@ export function GeoReferenceAssertionRow({
           )}
         </Field>
         <NumberField
-          name={`geoReferenceAssertions[${index}].dwcDecimalLatitude`}
+          name={commonRoot + "dwcDecimalLatitude"}
           label={formatMessage("decimalLatitude")}
           className={"dwcDecimalLatitude"}
           // Can be null or a valid latitude number:
@@ -102,7 +123,7 @@ export function GeoReferenceAssertionRow({
           readOnly={georeferenceDisabled}
         />
         <NumberField
-          name={`geoReferenceAssertions[${index}].dwcDecimalLongitude`}
+          name={commonRoot + "dwcDecimalLongitude"}
           label={formatMessage("decimalLongitude")}
           readOnly={georeferenceDisabled}
           className={"dwcDecimalLongitude"}
@@ -110,29 +131,29 @@ export function GeoReferenceAssertionRow({
           isAllowed={({ floatValue: val }) => isValidLongitudeOrBlank(val)}
         />
         <NumberField
-          name={`geoReferenceAssertions[${index}].dwcCoordinateUncertaintyInMeters`}
+          name={commonRoot + "dwcCoordinateUncertaintyInMeters"}
           label={formatMessage("coordinateUncertaintyInMeters")}
           readOnly={georeferenceDisabled}
           className={"dwcCoordinateUncertaintyInMeters"}
         />
         <DateField
-          name={`geoReferenceAssertions[${index}].dwcGeoreferencedDate`}
+          name={commonRoot + "dwcGeoreferencedDate"}
           className={"dwcGeoreferencedDate"}
           label={formatMessage("georeferencedDateLabel")}
         />
         <TextField
-          name={`geoReferenceAssertions[${index}].dwcGeodeticDatum`}
+          name={commonRoot + "dwcGeodeticDatum"}
           className={"dwcGeodeticDatum"}
           customName="dwcGeodeticDatum"
           readOnly={georeferenceDisabled}
         />
         <TextField
-          name={`geoReferenceAssertions[${index}].literalGeoreferencedBy`}
+          name={commonRoot + "literalGeoreferencedBy"}
           className={"literalGeoreferencedBy"}
           label={formatMessage("literalGeoreferencedByLabel")}
         />
         <ResourceSelectField<Person>
-          name={`geoReferenceAssertions[${index}].georeferencedBy`}
+          name={commonRoot + "georeferencedBy"}
           arrayItemLink="/person/view?id="
           label={formatMessage("georeferencedByLabel")}
           filter={filterBy(["displayName"])}
@@ -147,19 +168,19 @@ export function GeoReferenceAssertionRow({
           ]}
         />
         <TextField
-          name={`geoReferenceAssertions[${index}].dwcGeoreferenceProtocol`}
+          name={commonRoot + "dwcGeoreferenceProtocol"}
           className={"dwcGeoreferenceProtocol"}
           customName={"dwcGeoreferenceProtocol"}
           readOnly={georeferenceDisabled}
         />
         <TextField
-          name={`geoReferenceAssertions[${index}].dwcGeoreferenceSources`}
+          name={commonRoot + "dwcGeoreferenceSources"}
           className={"dwcGeoreferenceSources"}
           customName={"dwcGeoreferenceSources"}
           readOnly={georeferenceDisabled}
         />
         <TextField
-          name={`geoReferenceAssertions[${index}].dwcGeoreferenceRemarks`}
+          name={commonRoot + "dwcGeoreferenceRemarks"}
           multiLines={true}
           className={"dwcGeoreferenceRemarks"}
           customName={"dwcGeoreferenceRemarks"}
