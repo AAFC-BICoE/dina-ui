@@ -88,6 +88,8 @@ export function GeoReferenceAssertionRow({
               onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
               disabled={viewOnly}
               customName="dwcGeoreferenceVerificationStatus"
+              type={viewOnly && !georeferenceDisabled ? "hidden" : "checkbox"}
+              hideLabel={viewOnly && !georeferenceDisabled ? true : false}
             />
           )}
         </Field>

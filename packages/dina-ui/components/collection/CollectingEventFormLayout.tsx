@@ -382,6 +382,7 @@ export function CollectingEventFormLayout() {
                                   index={index}
                                   openAddPersonModal={openAddPersonModal}
                                   assertion={assertion}
+                                  viewOnly={readOnly}
                                 />
                                 {!readOnly && (
                                   <div className="list-inline mb-3">
