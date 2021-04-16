@@ -41,7 +41,7 @@ export function GeoReferenceAssertionRow({
 
   const commonRoot = `geoReferenceAssertions[${index}].`;
 
-  function UpdatereservedAssertion(fieldName: string, fieldValue: string) {
+  function updateReservedAssertion(fieldName: string, fieldValue: string) {
     if (fieldValue !== null)
       reservedAssertion.current[fieldName.replace(commonRoot, "")] = fieldValue;
   }
@@ -60,12 +60,21 @@ export function GeoReferenceAssertionRow({
     const dwcGeoreferenceProtocol = commonRoot + "dwcGeoreferenceProtocol";
     const dwcGeoreferenceSources = commonRoot + "dwcGeoreferenceSources";
     if (event.target.checked === true) {
+      // setFieldTouched is needed for any fields that previously has no value
+      // but need to appear as readOnly after checkbox checked. To do this, needs
+      // to simulate the field value is actually changed to trigger
+      // the effect of feild properly set as readOnly
       formik.setFieldValue(dwcDecimalLatitude, null);
+      formik.setFieldTouched(dwcDecimalLatitude);
       formik.setFieldValue(dwcDecimalLongitude, null);
+      formik.setFieldTouched(dwcDecimalLongitude);
       formik.setFieldValue(dwcCoordinateUncertaintyInMeters, null);
       formik.setFieldValue(dwcGeodeticDatum, null);
+      formik.setFieldTouched(dwcGeodeticDatum);
       formik.setFieldValue(dwcGeoreferenceProtocol, null);
+      formik.setFieldTouched(dwcGeoreferenceProtocol);
       formik.setFieldValue(dwcGeoreferenceSources, null);
+      formik.setFieldTouched(dwcGeoreferenceSources);
       formik.setFieldValue(
         name,
         GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
@@ -126,7 +135,7 @@ export function GeoReferenceAssertionRow({
           // Can be null or a valid latitude number:
           isAllowed={({ floatValue: val }) => isValidLatitudeOrBlank(val)}
           readOnly={georeferenceDisabled}
-          onChangeExternal={UpdatereservedAssertion}
+          onChangeExternal={updateReservedAssertion}
         />
         <NumberField
           name={commonRoot + "dwcDecimalLongitude"}
@@ -135,14 +144,14 @@ export function GeoReferenceAssertionRow({
           className={"dwcDecimalLongitude"}
           // Can be null or a valid longitude number:
           isAllowed={({ floatValue: val }) => isValidLongitudeOrBlank(val)}
-          onChangeExternal={UpdatereservedAssertion}
+          onChangeExternal={updateReservedAssertion}
         />
         <NumberField
           name={commonRoot + "dwcCoordinateUncertaintyInMeters"}
           label={formatMessage("coordinateUncertaintyInMeters")}
           readOnly={georeferenceDisabled}
           className={"dwcCoordinateUncertaintyInMeters"}
-          onChangeExternal={UpdatereservedAssertion}
+          onChangeExternal={updateReservedAssertion}
         />
         <DateField
           name={commonRoot + "dwcGeoreferencedDate"}
@@ -154,7 +163,7 @@ export function GeoReferenceAssertionRow({
           className={"dwcGeodeticDatum"}
           customName="dwcGeodeticDatum"
           readOnly={georeferenceDisabled}
-          onChangeExternal={UpdatereservedAssertion}
+          onChangeExternal={updateReservedAssertion}
         />
         <TextField
           name={commonRoot + "literalGeoreferencedBy"}
@@ -181,14 +190,14 @@ export function GeoReferenceAssertionRow({
           className={"dwcGeoreferenceProtocol"}
           customName={"dwcGeoreferenceProtocol"}
           readOnly={georeferenceDisabled}
-          onChangeExternal={UpdatereservedAssertion}
+          onChangeExternal={updateReservedAssertion}
         />
         <TextField
           name={commonRoot + "dwcGeoreferenceSources"}
           className={"dwcGeoreferenceSources"}
           customName={"dwcGeoreferenceSources"}
           readOnly={georeferenceDisabled}
-          onChangeExternal={UpdatereservedAssertion}
+          onChangeExternal={updateReservedAssertion}
         />
         <TextField
           name={commonRoot + "dwcGeoreferenceRemarks"}
