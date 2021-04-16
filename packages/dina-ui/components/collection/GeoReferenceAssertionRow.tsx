@@ -41,6 +41,11 @@ export function GeoReferenceAssertionRow({
 
   const commonRoot = `geoReferenceAssertions[${index}].`;
 
+  function UpdatereservedAssertion(fieldName: string, fieldValue: string) {
+    if (fieldValue !== null)
+      reservedAssertion.current[fieldName.replace(commonRoot, "")] = fieldValue;
+  }
+
   function onGeoReferencingImpossibleCheckBoxClick(
     event,
     formik: FormikContextType<{}>
@@ -121,6 +126,7 @@ export function GeoReferenceAssertionRow({
           // Can be null or a valid latitude number:
           isAllowed={({ floatValue: val }) => isValidLatitudeOrBlank(val)}
           readOnly={georeferenceDisabled}
+          onChangeExternal={UpdatereservedAssertion}
         />
         <NumberField
           name={commonRoot + "dwcDecimalLongitude"}
@@ -129,12 +135,14 @@ export function GeoReferenceAssertionRow({
           className={"dwcDecimalLongitude"}
           // Can be null or a valid longitude number:
           isAllowed={({ floatValue: val }) => isValidLongitudeOrBlank(val)}
+          onChangeExternal={UpdatereservedAssertion}
         />
         <NumberField
           name={commonRoot + "dwcCoordinateUncertaintyInMeters"}
           label={formatMessage("coordinateUncertaintyInMeters")}
           readOnly={georeferenceDisabled}
           className={"dwcCoordinateUncertaintyInMeters"}
+          onChangeExternal={UpdatereservedAssertion}
         />
         <DateField
           name={commonRoot + "dwcGeoreferencedDate"}
@@ -146,6 +154,7 @@ export function GeoReferenceAssertionRow({
           className={"dwcGeodeticDatum"}
           customName="dwcGeodeticDatum"
           readOnly={georeferenceDisabled}
+          onChangeExternal={UpdatereservedAssertion}
         />
         <TextField
           name={commonRoot + "literalGeoreferencedBy"}
@@ -172,12 +181,14 @@ export function GeoReferenceAssertionRow({
           className={"dwcGeoreferenceProtocol"}
           customName={"dwcGeoreferenceProtocol"}
           readOnly={georeferenceDisabled}
+          onChangeExternal={UpdatereservedAssertion}
         />
         <TextField
           name={commonRoot + "dwcGeoreferenceSources"}
           className={"dwcGeoreferenceSources"}
           customName={"dwcGeoreferenceSources"}
           readOnly={georeferenceDisabled}
+          onChangeExternal={UpdatereservedAssertion}
         />
         <TextField
           name={commonRoot + "dwcGeoreferenceRemarks"}
