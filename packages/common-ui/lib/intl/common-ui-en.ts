@@ -63,6 +63,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   remove: "Remove",
   resetButtonText: "Reset",
   rows: "rows",
+  search: "Search",
   select: "Select",
   selected: "selected",
   selectLocation: "Select Location",

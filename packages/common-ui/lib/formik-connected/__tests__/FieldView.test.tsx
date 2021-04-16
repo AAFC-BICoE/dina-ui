@@ -11,7 +11,7 @@ describe("FieldView component", () => {
     );
 
     expect(wrapper.find("label strong").text()).toEqual("Test Object Name");
-    expect(wrapper.find("p").text()).toEqual("testName");
+    expect(wrapper.find(".field-view").text()).toEqual("testName");
   });
 
   it("Renders with a custom label.", () => {
@@ -45,6 +45,6 @@ describe("FieldView component", () => {
       </DinaForm>
     );
 
-    expect(wrapper.find("p").text()).toEqual("alias1, alias2");
+    expect(wrapper.find(".field-view").text()).toEqual("alias1, alias2");
   });
 });

@@ -2311,7 +2311,6 @@ commander@~2.17.1:
     react-error-boundary "^3.1.0"
     react-hooks-async "^3.10.1"
     react-intl "^5.0.2"
-    react-keyboard-event-handler "^1.5.4"
     react-modal "^3.11.2"
     react-number-format "^4.4.1"
     react-select "^3.1.0"
@@ -2362,6 +2361,11 @@ convert-source-map@1.7.0, convert-source-map@^1.4.0, convert-source-map@^1.5.0, 
   integrity sha512-4FJkXzKXEDB1snCFZlLP4gpC3JILicCpGbzG9f9G7tGqGCzETQ2hWPrcinA9oU4wtf2biUaEH5065UnMeR33oA==
   dependencies:
     safe-buffer "~5.1.1"
+
+coordinate-parser@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/coordinate-parser/-/coordinate-parser-1.0.7.tgz#9350485f03146af0f377dd51a0907a0ac684363e"
+  integrity sha512-pkcjigkAEjU5JsTYnuXLkRgR6T5fF/7GXR4p9vWJesy8fKwsheN8zC5d3sSvdMmWihHB4u48xWZ5mUCcgBIEpw==
 
 copy-descriptor@^0.1.0:
   version "0.1.1"
@@ -6555,7 +6559,7 @@ react-file-viewer@^1.2.1:
     prop-types "^15.5.10"
     react-data-grid "^5.0.5"
     react-visibility-sensor "^5.0.2"
-    three "0.125.0"
+    three "0.85.2"
     xlsx "^0.10.1"
 
 react-hooks-async@^3.10.1:
@@ -6599,11 +6603,6 @@ react-is@^17.0.1:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
-
-react-keyboard-event-handler@^1.5.4:
-  version "1.5.4"
-  resolved "https://registry.yarnpkg.com/react-keyboard-event-handler/-/react-keyboard-event-handler-1.5.4.tgz#bd0ccafbf62a96f605ddac78828f22efc54181f0"
-  integrity sha512-MSOxU/sQ5q9XWNHhXAJxzh4xVLZjKORGNC2Pzvx3qUo24TQeztGB0tq8oSArwX6vfKSIVijiw8wBmkN5pJOB4w==
 
 react-lifecycles-compat@^3.0.0:
   version "3.0.4"
@@ -7713,8 +7712,8 @@ test-exclude@^6.0.0:
     glob "^7.1.4"
     minimatch "^3.0.4"
 
-three@0.125.0:
-  version "0.125.0"
+three@0.85.2:
+  version "0.85.2"
   resolved "https://registry.yarnpkg.com/three/-/three-0.85.2.tgz#8936f89c3668f7bf12f9b085ddf5dd409916ea27"
   integrity sha1-iTb4nDZo978S+bCF3fXdQJkW6ic=
 

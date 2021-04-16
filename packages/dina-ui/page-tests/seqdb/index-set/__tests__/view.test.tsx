@@ -73,7 +73,9 @@ describe("Index Set View Page", () => {
     wrapper.update();
 
     // The index set name is displayed:
-    expect(wrapper.find("p[children='test index set']").exists()).toEqual(true);
+    expect(
+      wrapper.find(".field-view[children='test index set']").exists()
+    ).toEqual(true);
 
     // Wait for the NGS indexes table to load:
     await new Promise(setImmediate);

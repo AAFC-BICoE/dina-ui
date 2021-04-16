@@ -13,6 +13,7 @@
         "trailingComma": "none"
       }
     ],
+    "no-console": [true, "log", "info"],
     "interface-name": false,
     "jsx-no-lambda": false,
     "max-classes-per-file": false

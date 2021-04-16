@@ -2,26 +2,23 @@ import {
   ApiClientContext,
   BackButton,
   ButtonBar,
+  DeleteButton,
   DinaForm,
   EditButton,
-  FieldView,
   useQuery,
   withResponse
 } from "common-ui";
-import { FastField, FieldArray } from "formik";
 import { KitsuResponse } from "kitsu";
 import { orderBy } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
+import Link from "next/link";
 import { withRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
 import { GeoReferenceAssertion } from "packages/dina-ui/types/collection-api/resources/GeoReferenceAssertion";
 import { useContext } from "react";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { Footer, GroupFieldView, Head, Nav } from "../../../components";
-import { GeoReferenceAssertionRow } from "../../../components/collection/GeoReferenceAssertionRow";
+import { Footer, Head, Nav } from "../../../components";
+import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
-import Link from "next/link";
-import { ManagedAttributesViewer } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 
@@ -104,167 +101,46 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
     { onSuccess: initOneToManyRelations }
   );
 
+  const buttonBar = (
+    <ButtonBar>
+      <BackButton
+        entityId={id as string}
+        entityLink="/collection/collecting-event"
+        byPassView={true}
+      />
+      <EditButton
+        className="ml-auto"
+        entityId={id as string}
+        entityLink="collection/collecting-event"
+      />
+      <Link href={`/collection/collecting-event/revisions?id=${id}`}>
+        <a className="btn btn-info">
+          <DinaMessage id="revisionsButtonText" />
+        </a>
+      </Link>
+      <DeleteButton
+        className="ml-5"
+        id={id as string}
+        options={{ apiBaseUrl: "/collection-api" }}
+        postDeleteRedirect="/collection/collecting-event/list"
+        type="collecting-event"
+      />
+    </ButtonBar>
+  );
+
   return (
     <div>
       <Head title={formatMessage("collectingEventViewTitle")} />
       <Nav />
-      <ButtonBar>
-        <EditButton
-          entityId={id as string}
-          entityLink="collection/collecting-event"
-        />
-        <Link href={`/collection/collecting-event/revisions?id=${id}`}>
-          <a className="btn btn-info">
-            <DinaMessage id="revisionsButtonText" />
-          </a>
-        </Link>
-        <BackButton
-          entityId={id as string}
-          entityLink="/collection/collecting-event"
-          byPassView={true}
-        />
-      </ButtonBar>
+      {buttonBar}
       {withResponse(collectingEventQuery, ({ data: colEvent }) => (
         <main className="container-fluid">
           <h1>
             <DinaMessage id="collectingEventViewTitle" />
           </h1>
           <div className="form-group">
-            <DinaForm<CollectingEvent> initialValues={colEvent}>
-              <div className="row">
-                <GroupFieldView
-                  className="col-md-2"
-                  name="group"
-                  label={formatMessage("field_group")}
-                />
-              </div>
-              <div className="row">
-                <div className="col-md-6">
-                  <fieldset className="form-group border px-4 py-2">
-                    <legend className="w-auto">
-                      <DinaMessage id="collectingDateLegend" />
-                    </legend>
-                    <FieldView
-                      name="startEventDateTime"
-                      label={formatMessage("startEventDateTimeLabel")}
-                    />
-                    {colEvent.endEventDateTime && (
-                      <FieldView
-                        name="endEventDateTime"
-                        label={formatMessage("endEventDateTimeLabel")}
-                      />
-                    )}
-                    <FieldView
-                      name="verbatimEventDateTime"
-                      label={formatMessage("verbatimEventDateTimeLabel")}
-                    />
-                  </fieldset>
-                </div>
-                <div className="col-md-6">
-                  <fieldset className="form-group border px-4 py-2">
-                    <legend className="w-auto">
-                      <DinaMessage id="collectingAgentsLegend" />
-                    </legend>
-                    <FieldView name="dwcRecordedBy" />
-                    <FieldView name="collectors" />
-                    <FieldView name="dwcRecordNumber" />
-                    <FieldView name="dwcOtherRecordNumbers" />
-                  </fieldset>
-                </div>
-              </div>
-              <fieldset className="form-group border px-4 py-2">
-                <legend className="w-auto">
-                  <DinaMessage id="collectingLocationLegend" />
-                </legend>
-                <fieldset className="form-group border px-4 py-2">
-                  <legend className="w-auto">
-                    <DinaMessage id="verbatimCoordinatesLegend" />
-                  </legend>
-                  <FieldView name="dwcVerbatimLocality" />
-                  <div className="row">
-                    <div className="col-md-6">
-                      <FieldView name="dwcVerbatimLatitude" />
-                      <FieldView name="dwcVerbatimLongitude" />
-                    </div>
-                    <div className="col-md-6">
-                      <FieldView name="dwcVerbatimCoordinates" />
-                      <FieldView name="dwcVerbatimCoordinateSystem" />
-                      <FieldView name="dwcVerbatimSRS" />
-                      <FieldView name="dwcVerbatimElevation" />
-                      <FieldView name="dwcVerbatimDepth" />
-                    </div>
-                  </div>
-                </fieldset>
-                <div className="row">
-                  <div className="col-md-6">
-                    <fieldset className="form-group border px-4 py-2">
-                      <legend className="w-auto">
-                        <DinaMessage id="geoReferencingLegend" />
-                      </legend>
-                      <FieldArray name="geoReferenceAssertions">
-                        {({ form }) => {
-                          const assertions =
-                            (form.values as CollectingEvent)
-                              .geoReferenceAssertions ?? [];
-
-                          return (
-                            <Tabs>
-                              <TabList>
-                                {assertions.length
-                                  ? assertions.map((assertion, index) => (
-                                      <Tab key={assertion.id}>
-                                        <span className="m-3">{index + 1}</span>
-                                      </Tab>
-                                    ))
-                                  : null}
-                              </TabList>
-                              {assertions.length
-                                ? assertions.map((assertion, index) => (
-                                    <TabPanel key={assertion.id}>
-                                      <GeoReferenceAssertionRow
-                                        index={index}
-                                        viewOnly={true}
-                                      />
-                                    </TabPanel>
-                                  ))
-                                : null}
-                            </Tabs>
-                          );
-                        }}
-                      </FieldArray>
-                    </fieldset>
-                  </div>
-                  <div className="col-md-6">
-                    <fieldset className="form-group border px-4 py-2">
-                      <legend className="w-auto">
-                        <DinaMessage id="toponymyLegend" />
-                      </legend>
-                      <FieldView name="dwcMunicipality" />
-                      <FieldView name="dwcStateProvince" />
-                      <FieldView name="dwcCountry" />
-                    </fieldset>
-                  </div>
-                </div>
-              </fieldset>
-              <div className="row">
-                <div className="col-md-6">
-                  <fieldset className="form-group border px-4 py-2">
-                    <legend className="w-auto">
-                      <DinaMessage id="managedAttributeListTitle" />
-                    </legend>
-                    <FastField name="managedAttributeValues">
-                      {({ field: { value } }) => (
-                        <ManagedAttributesViewer
-                          values={value}
-                          managedAttributeApiPath={key =>
-                            `collection-api/managed-attribute/collecting_event.${key}`
-                          }
-                        />
-                      )}
-                    </FastField>
-                  </fieldset>
-                </div>
-              </div>
+            <DinaForm<CollectingEvent> initialValues={colEvent} readOnly={true}>
+              <CollectingEventFormLayout />
             </DinaForm>
           </div>
           <div className="form-group">
@@ -275,6 +151,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
           </div>
         </main>
       ))}
+      {buttonBar}
       <Footer />
     </div>
   );

@@ -59,7 +59,7 @@ describe("Single Stored Object details page", () => {
     wrapper.update();
 
     expect(wrapper.find(FileView).find("img").prop("src")).toEqual(
-      "/api/objectstore-api/file/testbucket/cf99c285-0353-4fed-a15d-ac963e0514f3.thumbnail?access_token=test-token"
+      "/api/objectstore-api/file/testbucket/cf99c285-0353-4fed-a15d-ac963e0514f3/thumbnail?access_token=test-token"
     );
   });
 });

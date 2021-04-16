@@ -16,20 +16,6 @@ export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
     createdDate: ({ original: { value } }) => <DateView date={value} />,
     xmpMetadataDate: ({ original: { value } }) => <DateView date={value} />,
     acDigitizationDate: ({ original: { value } }) => <DateView date={value} />,
-    // Link to the original metadata:
-    acDerivedFrom: ({ original: { value: instanceId } }) => {
-      return (
-        <ReferenceLink<Metadata>
-          baseApiPath="objectstore-api"
-          instanceId={instanceId}
-          link={({ id, originalFilename }) => (
-            <Link href={`/object-store/object/view?id=${id}`}>
-              <a>{originalFilename}</a>
-            </Link>
-          )}
-        />
-      );
-    },
     // Link to the Metadata creator:
     acMetadataCreator: ({ original: { value: relation } }) => {
       return (

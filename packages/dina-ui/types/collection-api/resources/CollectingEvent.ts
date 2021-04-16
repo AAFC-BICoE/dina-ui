@@ -1,5 +1,6 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
+import { GeographicPlaceNameSourceDetail } from "../GeographicPlaceNameSourceDetail";
 import { CollectorGroup } from "./CollectorGroup";
 import { GeoReferenceAssertion } from "./GeoReferenceAssertion";
 
@@ -32,7 +33,13 @@ export interface CollectingEventAttributes {
   collectorGroupUuid?: string;
   collectorGroups?: CollectorGroup[];
   group: string;
-  placeName?: string;
+  geographicPlaceName?: string;
+  geographicPlaceNameSourceDetail?: GeographicPlaceNameSourceDetail;
+  geographicPlaceNameSource?: GeographicPlaceNameSource;
+}
+
+export enum GeographicPlaceNameSource {
+  OSM = "OSM"
 }
 
 export interface CollectingEventRelationships {

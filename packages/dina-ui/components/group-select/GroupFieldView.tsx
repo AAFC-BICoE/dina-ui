@@ -10,14 +10,7 @@ export function GroupFieldView(props: GroupFieldViewProps) {
     <FastField name={props.name}>
       {({ field: { value: groupName } }: FieldProps) => (
         <FieldWrapper {...props}>
-          <p
-            className="group-label"
-            style={{
-              borderBottom: "1px solid black",
-              borderRight: "1px solid black",
-              minHeight: "25px"
-            }}
-          >
+          <p className="group-label" style={{ minHeight: "25px" }}>
             <GroupLabel groupName={groupName} />
           </p>
         </FieldWrapper>

@@ -63,7 +63,7 @@ export function GeographySearchDialog({
     setGeoApiRequestsOnHold(true);
     setTimeout(() => setGeoApiRequestsOnHold(false), 1000);
     const geoSearchResults = nominatimSearch(String(searchValue));
-    const newAdministrativeBoundaries = (await geoSearchResults);
+    const newAdministrativeBoundaries = await geoSearchResults;
     setAdministrativeBoundaries(newAdministrativeBoundaries);
   };
 

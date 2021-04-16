@@ -48,7 +48,7 @@ describe("Product details page", () => {
 
     // The product's name should be rendered in a FieldView.
     expect(wrapper.find(".name-field-header").exists()).toEqual(true);
-    expect(wrapper.containsMatchingElement(<p>Test Product 1</p>)).toEqual(
+    expect(wrapper.containsMatchingElement(<div>Test Product 1</div>)).toEqual(
       true
     );
   });
