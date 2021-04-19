@@ -247,6 +247,16 @@ export function CollectingEventFormLayout() {
                           ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
                           : ""
                       }
+                      className={
+                        coordSysSelected !==
+                          CoordinateSystemEnum.DECIMAL_DEGREE &&
+                        coordSysSelected !==
+                          CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES &&
+                        coordSysSelected !==
+                          CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                          ? ""
+                          : "d-none"
+                      }
                     />
                     <TextFieldWithCoordButtons
                       name="dwcVerbatimLatitude"
@@ -273,6 +283,16 @@ export function CollectingEventFormLayout() {
                       shouldShowSecond={
                         coordSysSelected ===
                         CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                      }
+                      className={
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DECIMAL_DEGREE ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                          ? ""
+                          : "d-none"
                       }
                     />
                     <TextFieldWithCoordButtons
@@ -301,23 +321,44 @@ export function CollectingEventFormLayout() {
                         coordSysSelected ===
                         CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
                       }
+                      className={
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DECIMAL_DEGREE ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                          ? ""
+                          : "d-none"
+                      }
                     />
+                    <div
+                      className={
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DECIMAL_DEGREE ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
+                        coordSysSelected ===
+                          CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
+                          ? "form-group"
+                          : "d-none"
+                      }
+                    >
+                      <SetCoordinatesFromVerbatimButton
+                        sourceLatField="dwcVerbatimLatitude"
+                        sourceLonField="dwcVerbatimLongitude"
+                        targetLatField={`geoReferenceAssertions[${activeTabIdx}].dwcDecimalLatitude`}
+                        targetLonField={`geoReferenceAssertions[${activeTabIdx}].dwcDecimalLongitude`}
+                        onClick={({ lat, lon }) =>
+                          setGeoSearchValue(`${lat}, ${lon}`)
+                        }
+                      >
+                        <DinaMessage id="latLongAutoSetterButton" />
+                      </SetCoordinatesFromVerbatimButton>
+                    </div>
                   </>
                 )}
               </Field>
-              <div className="form-group">
-                <SetCoordinatesFromVerbatimButton
-                  sourceLatField="dwcVerbatimLatitude"
-                  sourceLonField="dwcVerbatimLongitude"
-                  targetLatField={`geoReferenceAssertions[${activeTabIdx}].dwcDecimalLatitude`}
-                  targetLonField={`geoReferenceAssertions[${activeTabIdx}].dwcDecimalLongitude`}
-                  onClick={({ lat, lon }) =>
-                    setGeoSearchValue(`${lat}, ${lon}`)
-                  }
-                >
-                  <DinaMessage id="latLongAutoSetterButton" />
-                </SetCoordinatesFromVerbatimButton>
-              </div>
             </div>
             <div className="col-md-6">
               <AutoSuggestTextField<SRS>
