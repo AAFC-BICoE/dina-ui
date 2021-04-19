@@ -37,8 +37,16 @@ import {
 } from "../../types/collection-api/resources/CoordinateSystem";
 import { ShouldRenderReasons } from "react-autosuggest";
 
+interface CollectingEventFormLayoutProps {
+  setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
+  setDefaultVerbatimSRS?: (newValue: string | undefined | null) => void;
+}
+
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
-export function CollectingEventFormLayout() {
+export function CollectingEventFormLayout({
+  setDefaultVerbatimCoordSys,
+  setDefaultVerbatimSRS
+}: CollectingEventFormLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [rangeEnabled, setRangeEnabled] = useState(false);
@@ -240,6 +248,7 @@ export function CollectingEventFormLayout() {
               <Field name="dwcVerbatimCoordinateSystem">
                 {({ field: { value: coordSysSelected } }) => (
                   <>
+                    {setDefaultVerbatimCoordSys?.(coordSysSelected)}
                     <TextField
                       name="dwcVerbatimCoordinates"
                       placeholder={
@@ -369,6 +378,11 @@ export function CollectingEventFormLayout() {
                 configSuggestion={src => src?.srs ?? []}
                 shouldRenderSuggestions={shouldRenderSuggestions}
               />
+              <Field name="dwcVerbatimSRS">
+                {({ field: { value: dwcVerbatimSRS } }) => (
+                  <>{setDefaultVerbatimSRS?.(dwcVerbatimSRS)}</>
+                )}
+              </Field>
               <TextField name="dwcVerbatimElevation" />
               <TextField name="dwcVerbatimDepth" />
             </div>
