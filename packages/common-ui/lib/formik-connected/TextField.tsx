@@ -30,6 +30,12 @@ export function TextField(props: TextFieldProps) {
   } = props;
   const { name } = labelWrapperProps;
 
+  const onEnterPressed = e => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+    }
+  };
+
   return (
     <FieldWrapper {...labelWrapperProps}>
       <FastField name={name}>
@@ -48,6 +54,7 @@ export function TextField(props: TextFieldProps) {
             placeholder,
             className: "form-control",
             onChange,
+            onKeyDown: onEnterPressed,
             value: value || "",
             readOnly
           };
@@ -60,7 +67,11 @@ export function TextField(props: TextFieldProps) {
             (multiLines ? (
               <textarea rows={4} {...inputPropsInternal} />
             ) : (
-              <input type="text" {...inputPropsInternal} />
+              <input
+                type="text"
+                {...inputPropsInternal}
+                onKeyDown={onEnterPressed}
+              />
             ))
           );
         }}
