@@ -136,6 +136,26 @@ export function CollectingEventFormLayout({
       : formik.setFieldValue("dwcVerbatimCoordinates", null);
   }
 
+  const onChangeExternal = (form, name, value) => {
+    if (name === "dwcVerbatimCoordinateSystem") {
+      setDefaultVerbatimCoordSys?.(value);
+      /*When user enter other values instead of selecting from existing config,
+      correctly setting the placeHolder for verbatim coordinates */
+      if (
+        value !== CoordinateSystemEnum.DECIMAL_DEGREE &&
+        value !== CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES &&
+        value !== CoordinateSystemEnum.DEGREE_MINUTES_SECONDS &&
+        value !== CoordinateSystemEnum.UTM
+      ) {
+        form.values.dwcVerbatimCoordinates === null
+          ? form.setFieldValue("dwcVerbatimCoordinates", "")
+          : form.setFieldValue("dwcVerbatimCoordinates", null);
+      }
+    } else if (name === "dwcVerbatimSRS") {
+      setDefaultVerbatimSRS?.(value);
+    }
+  };
+
   return (
     <div>
       <DinaFormSection horizontal={[3, 9]}>
@@ -244,12 +264,12 @@ export function CollectingEventFormLayout({
                 configSuggestion={src => src?.coordinateSystem ?? []}
                 shouldRenderSuggestions={shouldRenderSuggestions}
                 onSuggestionSelected={onSuggestionSelected}
+                onChangeExternal={onChangeExternal}
               />
               <Field name="dwcVerbatimCoordinateSystem">
                 {({ field: { value: coordSysSelected } }) => {
                   /* note need to consider there is also possible user enter their own verbatime coordsys
                     and not select any one from the dropdown*/
-                  setDefaultVerbatimCoordSys?.(coordSysSelected);
                   const hasDegree =
                     coordSysSelected === CoordinateSystemEnum.DECIMAL_DEGREE;
 
@@ -270,7 +290,7 @@ export function CollectingEventFormLayout({
                         placeholder={
                           isUTM
                             ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
-                            : ""
+                            : null
                         }
                         className={
                           !hasDegree && !hasMinute && !hasSecond ? "" : "d-none"
@@ -338,12 +358,8 @@ export function CollectingEventFormLayout({
                 })}
                 configSuggestion={src => src?.srs ?? []}
                 shouldRenderSuggestions={shouldRenderSuggestions}
+                onChangeExternal={onChangeExternal}
               />
-              <Field name="dwcVerbatimSRS">
-                {({ field: { value: dwcVerbatimSRS } }) => (
-                  <>{setDefaultVerbatimSRS?.(dwcVerbatimSRS)}</>
-                )}
-              </Field>
               <TextField name="dwcVerbatimElevation" />
               <TextField name="dwcVerbatimDepth" />
             </div>
