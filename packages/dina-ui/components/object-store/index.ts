@@ -1,3 +1,5 @@
+export * from "./attachment-list/AttachmentSection";
+export * from "./attachment-list/attachments-modal";
 export * from "./attribute-builder/AttributeBuilder";
 export * from "./attribute-builder/AttributeGroup";
 export * from "./attribute-builder/AttributeRow";

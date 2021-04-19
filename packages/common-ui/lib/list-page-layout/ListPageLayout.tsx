@@ -1,7 +1,7 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { FormikProps } from "formik";
 import { FilterParam, KitsuResource } from "kitsu";
-import { Fragment } from "react";
+import { ReactNode } from "react";
 import { SortingRule } from "react-table";
 import { FilterAttribute, QueryTable, QueryTableProps } from "..";
 import { rsql } from "../filter-builder/rsql";
@@ -14,7 +14,7 @@ interface ListPageLayoutProps<TData extends KitsuResource> {
   filterFormchildren?: (formik: FormikProps<any>) => React.ReactElement;
   id: string;
   queryTableProps: QueryTableProps<TData>;
-  WrapTable?: React.ComponentType;
+  wrapTable?: (children: ReactNode) => ReactNode;
 }
 
 /**
@@ -28,7 +28,7 @@ export function ListPageLayout<TData extends KitsuResource>({
   filterFormchildren,
   id,
   queryTableProps,
-  WrapTable = Fragment
+  wrapTable = children => children
 }: ListPageLayoutProps<TData>) {
   const tablePageSizeKey = `${id}_tablePageSize`;
   const tableSortKey = `${id}_tableSort`;
@@ -83,7 +83,7 @@ export function ListPageLayout<TData extends KitsuResource>({
           {filterFormchildren}
         </FilterForm>
       )}
-      <WrapTable>
+      {wrapTable(
         <QueryTable<TData>
           defaultPageSize={defaultPageSize ?? undefined}
           defaultSort={defaultSort ?? undefined}
@@ -92,7 +92,7 @@ export function ListPageLayout<TData extends KitsuResource>({
           onSortedChange={newSort => setStoredDefaultSort(newSort)}
           {...queryTableProps}
         />
-      </WrapTable>
+      )}
     </div>
   );
 }

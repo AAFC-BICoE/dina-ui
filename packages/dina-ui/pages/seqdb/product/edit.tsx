@@ -1,14 +1,13 @@
 import {
   ButtonBar,
-  CancelButton,
+  BackButton,
   DinaForm,
   DinaFormOnSubmit,
   LabelView,
   LoadingSpinner,
   Query,
   SubmitButton,
-  TextField,
-  useAccount
+  TextField
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
@@ -61,10 +60,9 @@ export function ProductEditPage({ router }: WithRouterProps) {
 
 function ProductForm({ product, router }: ProductFormProps) {
   const { formatMessage } = useSeqdbIntl();
-  const { groupNames } = useAccount();
 
   const { id } = router.query;
-  const initialValues = product || { group: groupNames?.[0] };
+  const initialValues = product || {};
 
   const onSubmit: DinaFormOnSubmit = async ({
     api: { save },
@@ -88,11 +86,15 @@ function ProductForm({ product, router }: ProductFormProps) {
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <CancelButton entityId={id as string} entityLink="/seqdb/product" />
+        <BackButton entityId={id as string} entityLink="/seqdb/product" />
       </ButtonBar>
       <div>
         <div className="row">
-          <GroupSelectField className="col-md-2" name="group" />
+          <GroupSelectField
+            className="col-md-2"
+            name="group"
+            enableStoredDefaultGroup={true}
+          />
         </div>
         <div className="row">
           <LabelView

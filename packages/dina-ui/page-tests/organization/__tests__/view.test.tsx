@@ -1,6 +1,6 @@
 import { OrganizationDetailsPage } from "../../../pages/organization/view";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { Organization } from "../../../types/objectstore-api/resources/Organization";
+import { Organization } from "../../../types/agent-api/resources/Organization";
 
 /** Test organization with all fields defined. */
 const TEST_ORGANIZATION: Organization = {
@@ -55,12 +55,14 @@ describe("Organization details page", () => {
     expect(
       wrapper.containsMatchingElement(<strong>English Name</strong>)
     ).toEqual(true);
-    expect(wrapper.containsMatchingElement(<p>organization a</p>)).toEqual(
+    expect(wrapper.containsMatchingElement(<div>organization a</div>)).toEqual(
       true
     );
 
     // The organization's email should be rendered in a FieldView.
     expect(wrapper.find(".aliases-field-header").exists()).toEqual(true);
-    expect(wrapper.containsMatchingElement(<p>org1,org2</p>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<div>org1, org2</div>)).toEqual(
+      true
+    );
   });
 });

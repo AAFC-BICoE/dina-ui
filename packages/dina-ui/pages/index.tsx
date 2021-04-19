@@ -68,20 +68,6 @@ const Home: React.FunctionComponent = () => (
           </Link>
         </li>
       </ul>
-      <div className="d-none">
-        <h2>
-          <DinaMessage id="dinaUserSectionTitle" />
-        </h2>
-        <ul>
-          <li>
-            <Link href="/dina-user/view">
-              <a>
-                <DinaMessage id="whoAmITitle" />
-              </a>
-            </Link>
-          </li>
-        </ul>
-      </div>
       <h2>
         <SeqdbMessage id="seqdbTitle" />
       </h2>
@@ -141,14 +127,14 @@ const Home: React.FunctionComponent = () => (
       </h2>
       <ul>
         <li>
-          <Link href="/collecting-event/list">
+          <Link href="/collection/collecting-event/list">
             <a>
               <DinaMessage id="collectingEventListTitle" />
             </a>
           </Link>
         </li>
         <li className="d-none">
-          <Link href="/collector-group/list">
+          <Link href="/collection/collector-group/list">
             <a>
               <DinaMessage id="collectorGroupListTitle" />
             </a>

@@ -1,13 +1,12 @@
 import {
+  BackButton,
   ButtonBar,
-  CancelButton,
   DinaForm,
   DinaFormOnSubmit,
   FieldView,
   filterBy,
   ResourceSelectField,
   SubmitButton,
-  TextField,
   useQuery,
   withResponse
 } from "common-ui";
@@ -15,9 +14,8 @@ import { NextRouter, useRouter } from "next/router";
 import { Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
-import { DinaUser } from "../../types/objectstore-api/resources/DinaUser";
+import { DinaUser } from "../../types/user-api/resources/DinaUser";
 
-/** DinaUser with client-side-joined Agent. */
 interface DinaUserWithAgent extends DinaUser {
   agent?: Person;
 }
@@ -30,7 +28,7 @@ export default function DinaUserEditPage() {
 
   const { formatMessage } = useDinaIntl();
 
-  const userQuery = useQuery<DinaUser>(
+  const userQuery = useQuery<DinaUser & { agent?: Person }>(
     { path: `user-api/user/${id}` },
     {
       joinSpecs: [
@@ -48,10 +46,7 @@ export default function DinaUserEditPage() {
     <div>
       <Head title={formatMessage("editDinaUserTitle")} />
       <Nav />
-      <ButtonBar>
-        <CancelButton entityId={id as string} entityLink="/dina-user" />
-      </ButtonBar>
-      <main className="container-fluid">
+      <main className="container">
         <h1>
           <DinaMessage id="editDinaUserTitle" />
         </h1>
@@ -99,17 +94,14 @@ export function DinaUserForm({ dinaUser, router }: DinaUserFormProps) {
   return (
     <DinaForm<DinaUserWithAgent> initialValues={dinaUser} onSubmit={onSubmit}>
       <ButtonBar>
-        <SubmitButton />
-        <CancelButton
-          entityId={dinaUser.id as string}
-          entityLink="/dina-user"
-        />
+        <BackButton entityId={dinaUser.id as string} entityLink="/dina-user" />
+        <SubmitButton className="ml-auto" />
       </ButtonBar>
       <div>
         <div className="row">
-          <FieldView className="col-md-2" name="username" />
+          <FieldView className="col-md-6" name="username" />
           <ResourceSelectField<Person>
-            className="col-md-2"
+            className="col-md-6"
             name="agent"
             filter={filterBy(["displayName"])}
             model="agent-api/person"

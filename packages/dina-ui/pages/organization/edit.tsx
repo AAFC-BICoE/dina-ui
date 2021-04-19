@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  CancelButton,
+  BackButton,
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
@@ -15,7 +15,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   MultiligualName,
   Organization
-} from "../../types/objectstore-api/resources/Organization";
+} from "../../types/agent-api/resources/Organization";
 
 interface OrganizationFormProps {
   organization?: Organization;
@@ -161,7 +161,7 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <CancelButton
+        <BackButton
           entityId={id as string}
           entityLink="/organization"
           byPassView={true}

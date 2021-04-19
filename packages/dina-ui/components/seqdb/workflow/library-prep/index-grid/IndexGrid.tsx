@@ -90,7 +90,7 @@ export function IndexGrid(props: IndexGridProps) {
 
           return prep ? (
             <div className="h-100 w-100 list-group-item">
-              <div>{prep.sample.name}</div>
+              <div>{prep.molecularSample.name}</div>
               <div>
                 {prep.indexI5 && (
                   <div>

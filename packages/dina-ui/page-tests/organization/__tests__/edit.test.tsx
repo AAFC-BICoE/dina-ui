@@ -3,7 +3,7 @@ import OrganizationEditPage, {
   trimAliases
 } from "../../../pages/organization/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { Organization } from "../../../types/objectstore-api/resources/Organization";
+import { Organization } from "../../../types/agent-api/resources/Organization";
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 

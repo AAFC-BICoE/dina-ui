@@ -1,4 +1,8 @@
+import { FastField } from "formik";
+import { ReactNode } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
+import { useDinaFormContext } from "./DinaForm";
+import { ReadOnlyValue } from "./FieldView";
 
 export interface LabelWrapperParams {
   /** The CSS classes of the div wrapper. */
@@ -12,10 +16,22 @@ export interface LabelWrapperParams {
 
   /** The label for the field. */
   label?: string;
+
+  /** Override the default "name" prop used to get labels and tooltips from the intl messages. */
+  customName?: string;
+
+  /** Link href to render for a single string value. */
+  link?: string;
+
+  /** Link href to render on each array item. */
+  arrayItemLink?: string;
+
+  /** Custom element to render when the form is in read-only mode. */
+  readOnlyRender?: (value: any) => ReactNode;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
-  children: JSX.Element;
+  children?: JSX.Element;
 }
 
 /**
@@ -30,21 +46,50 @@ export function FieldWrapper({
   hideLabel = false,
   name,
   label,
-  children
+  children,
+  customName,
+  arrayItemLink,
+  link,
+  readOnlyRender
 }: FieldWrapperProps) {
-  const fieldLabel = label ?? <FieldHeader name={name} />;
+  const { horizontal, readOnly } = useDinaFormContext();
+
+  const fieldLabel = label ?? (
+    <FieldHeader name={name} customName={customName} />
+  );
+
+  const [labelCol, valueCol] =
+    typeof horizontal === "boolean" ? [6, 6] : horizontal || [];
 
   return (
     <div className={className}>
-      <div className={`form-group ${name}-field`}>
-        <label className="w-100">
-          {!hideLabel && (
-            <div>
-              <strong>{fieldLabel}</strong>
-            </div>
-          )}
-          {children}
+      <div className={`form-group ${name}-field ${horizontal ? "row" : ""}`}>
+        <label
+          className={[
+            `${labelCol ? `col-sm-${labelCol}` : ""}`,
+            // Adjust alignment for editable inputs:
+            horizontal && !readOnly ? "mt-sm-2" : ""
+          ].join(" ")}
+        >
+          {!hideLabel && <strong>{fieldLabel}</strong>}
         </label>
+        <div className={valueCol ? `col-sm-${valueCol}` : ""}>
+          {readOnly || !children ? (
+            <FastField name={name}>
+              {({ field: { value } }) =>
+                readOnlyRender?.(value) ?? (
+                  <ReadOnlyValue
+                    arrayItemLink={arrayItemLink}
+                    link={link}
+                    value={value}
+                  />
+                )
+              }
+            </FastField>
+          ) : (
+            children
+          )}
+        </div>
       </div>
     </div>
   );

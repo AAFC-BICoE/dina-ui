@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  CancelButton,
+  BackButton,
   DinaForm,
   EditButton,
   FieldView,
@@ -11,7 +11,7 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { Organization } from "../../types/objectstore-api/resources/Organization";
+import { Organization } from "../../types/agent-api/resources/Organization";
 
 export function OrganizationDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -23,7 +23,7 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
       <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="organization" />
-        <CancelButton
+        <BackButton
           entityId={id as string}
           entityLink="/organization"
           byPassView={true}

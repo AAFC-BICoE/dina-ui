@@ -8,6 +8,9 @@ export interface TextFieldProps extends LabelWrapperParams {
   multiLines?: boolean;
   inputProps?: InputHTMLAttributes<any> | TextareaHTMLAttributes<any>;
   placeholder?: string;
+
+  customInput?: (inputProps: InputHTMLAttributes<any>) => JSX.Element;
+  onChangeExternal?: (name, value) => void;
 }
 
 /**
@@ -21,6 +24,8 @@ export function TextField(props: TextFieldProps) {
     multiLines,
     inputProps: inputPropsExternal,
     placeholder,
+    customInput,
+    onChangeExternal,
     ...labelWrapperProps
   } = props;
   const { name } = labelWrapperProps;
@@ -35,10 +40,12 @@ export function TextField(props: TextFieldProps) {
           function onChange(event) {
             setFieldValue(name, event.target.value);
             setFieldTouched(name);
+            onChangeExternal?.(name, event.target.value);
           }
 
           const inputPropsInternal = {
             ...inputPropsExternal,
+            placeholder,
             className: "form-control",
             onChange,
             value: value || "",
@@ -48,14 +55,13 @@ export function TextField(props: TextFieldProps) {
           // The default Field component's inner text input needs to be replaced with our own
           // controlled input that we manually pass the "onChange" and "value" props. Otherwise
           // we will get React's warning about switching from an uncontrolled to controlled input.
-          return multiLines ? (
-            <textarea rows={4} {...inputPropsInternal} />
-          ) : (
-            <input
-              type="text"
-              {...inputPropsInternal}
-              placeholder={placeholder}
-            />
+          return (
+            customInput?.(inputPropsInternal) ??
+            (multiLines ? (
+              <textarea rows={4} {...inputPropsInternal} />
+            ) : (
+              <input type="text" {...inputPropsInternal} />
+            ))
           );
         }}
       </FastField>

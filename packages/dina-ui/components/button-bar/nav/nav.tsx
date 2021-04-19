@@ -78,17 +78,17 @@ export function Nav() {
             <li className="list-inline-item my-auto">
               <NavAgentsDropdown />
             </li>
-            {showUsersLinks && (
-              <li className="list-inline-item my-auto">
-                <NavDinaUserDropdown />
-              </li>
-            )}
             <li className="list-inline-item my-auto">
               <NavSeqDBDropdown />
             </li>
             <li className="list-inline-item my-auto">
               <NavCollectionDropdown />
             </li>
+            {showUsersLinks && (
+              <li className="list-inline-item my-auto">
+                <NavDinaUserDropdown />
+              </li>
+            )}
           </ul>
         </div>
       </div>
@@ -238,18 +238,23 @@ function NavCollectionDropdown() {
         <DinaMessage id="collectionSectionTitle" />
       </a>
       <div className="dropdown-menu m-0">
-        <Link href="/collecting-event/list">
+        <Link href="/collection/collecting-event/list">
           <a className="dropdown-item">
             <DinaMessage id="collectingEventListTitle" />
           </a>
         </Link>
         <div className="d-none">
-          <Link href="/collector-group/list">
+          <Link href="/collection/collector-group/list">
             <a className="dropdown-item">
               <DinaMessage id="collectorGroupListTitle" />
             </a>
           </Link>
         </div>
+        <Link href="/collection/revisions-by-user/">
+          <a className="dropdown-item">
+            <DinaMessage id="revisionsByUserPageTitle" />
+          </a>
+        </Link>
       </div>
     </div>
   );

@@ -1,16 +1,16 @@
 import { mount } from "enzyme";
 import { merge, noop } from "lodash";
 import { AccountContextI, AccountProvider } from "../account/AccountProvider";
-import { AuthenticatedApiClientProvider } from "../account/AuthenticatedApiClientProvider";
 import {
-  ApiClientContextI,
-  createContextValue
+  ApiClientI,
+  ApiClientImpl,
+  ApiClientProvider
 } from "../api-client/ApiClientContext";
 import { CommonUIIntlProvider } from "../intl/common-ui-intl";
 import { ModalProvider } from "../modal/modal";
 
 interface MockAppContextProviderProps {
-  apiContext?: ApiClientContextI;
+  apiContext?: ApiClientI;
   accountContext?: Partial<AccountContextI>;
   children?: React.ReactNode;
 }
@@ -28,15 +28,15 @@ export function MockAppContextProvider({
     <AccountProvider
       value={{ ...DEFAULT_MOCK_ACCOUNT_CONTEXT, ...accountContext }}
     >
-      <AuthenticatedApiClientProvider
-        apiContext={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContext)}
+      <ApiClientProvider
+        value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContext)}
       >
         <CommonUIIntlProvider>
           <ModalProvider appElement={document.querySelector("body")}>
             {children}
           </ModalProvider>
         </CommonUIIntlProvider>
-      </AuthenticatedApiClientProvider>
+      </ApiClientProvider>
     </AccountProvider>
   );
 }
@@ -66,6 +66,6 @@ const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = {
   username: "test-user"
 };
 
-const DEFAULT_API_CONTEXT_VALUE = createContextValue({
-  getTempIdGenerator: () => () => "00000000-0000-0000-0000-000000000000"
+const DEFAULT_API_CONTEXT_VALUE = new ApiClientImpl({
+  newId: () => "00000000-0000-0000-0000-000000000000"
 });

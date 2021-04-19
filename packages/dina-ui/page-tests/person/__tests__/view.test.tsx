@@ -1,6 +1,6 @@
 import { PersonDetailsPage } from "../../../pages/person/view";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { Person } from "../../../types/objectstore-api/resources/Person";
+import { Person } from "../../../types/agent-api/resources/Person";
 
 /** Test person with all fields defined. */
 const TEST_AGENT: Person = {
@@ -48,11 +48,11 @@ describe("Person details page", () => {
 
     // The person's name should be rendered in a FieldView.
     expect(wrapper.find(".displayName-field-header").exists()).toEqual(true);
-    expect(wrapper.containsMatchingElement(<p>person a</p>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<div>person a</div>)).toEqual(true);
 
     // The person's email should be rendered in a FieldView.
     expect(wrapper.find(".email-field-header").exists()).toEqual(true);
-    expect(wrapper.containsMatchingElement(<p>testperson@a.b</p>)).toEqual(
+    expect(wrapper.containsMatchingElement(<div>testperson@a.b</div>)).toEqual(
       true
     );
   });

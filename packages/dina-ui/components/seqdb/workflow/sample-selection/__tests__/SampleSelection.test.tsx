@@ -4,7 +4,7 @@ import {
   Chain,
   ChainStepTemplate,
   ChainTemplate,
-  Sample,
+  MolecularSample,
   StepResource,
   StepTemplate
 } from "../../../../../types/seqdb-api";
@@ -14,19 +14,34 @@ import { SampleSelection } from "../SampleSelection";
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 const TEST_SAMPLES = [
-  { id: "1", type: "sample", name: "test sample 1" },
-  { id: "2", type: "sample", name: "test sample 2" },
-  { id: "3", type: "sample", name: "test sample 3" },
-  { id: "4", type: "sample", name: "test sample 4" },
-  { id: "5", type: "sample", name: "test sample 5" }
-] as PersistedResource<Sample>[];
+  { id: "1", type: "molecularSample", name: "test sample 1" },
+  { id: "2", type: "molecularSample", name: "test sample 2" },
+  { id: "3", type: "molecularSample", name: "test sample 3" },
+  { id: "4", type: "molecularSample", name: "test sample 4" },
+  { id: "5", type: "molecularSample", name: "test sample 5" }
+] as PersistedResource<MolecularSample>[];
 
 const TEST_STEP_RESOURCES: PersistedResource<StepResource>[] = [
-  { id: "1", sample: TEST_SAMPLES[0] } as PersistedResource<StepResource>,
-  { id: "2", sample: TEST_SAMPLES[1] } as PersistedResource<StepResource>,
-  { id: "3", sample: TEST_SAMPLES[2] } as PersistedResource<StepResource>,
-  { id: "4", sample: TEST_SAMPLES[3] } as PersistedResource<StepResource>,
-  { id: "5", sample: TEST_SAMPLES[4] } as PersistedResource<StepResource>
+  {
+    id: "1",
+    molecularSample: TEST_SAMPLES[0]
+  } as PersistedResource<StepResource>,
+  {
+    id: "2",
+    molecularSample: TEST_SAMPLES[1]
+  } as PersistedResource<StepResource>,
+  {
+    id: "3",
+    molecularSample: TEST_SAMPLES[2]
+  } as PersistedResource<StepResource>,
+  {
+    id: "4",
+    molecularSample: TEST_SAMPLES[3]
+  } as PersistedResource<StepResource>,
+  {
+    id: "5",
+    molecularSample: TEST_SAMPLES[4]
+  } as PersistedResource<StepResource>
 ];
 
 const TEST_CHAIN_TEMPLATE: PersistedResource<ChainTemplate> = {
@@ -47,9 +62,10 @@ const TEST_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
   id: "1",
   stepNumber: 1,
-  stepTemplate: { id: "1", type: "stepTemplate" } as PersistedResource<
-    StepTemplate
-  >,
+  stepTemplate: {
+    id: "1",
+    type: "stepTemplate"
+  } as PersistedResource<StepTemplate>,
   type: "chainStepTemplate"
 };
 
@@ -57,7 +73,7 @@ const TEST_CHAIN_STEP_TEMPLATES = [TEST_CHAIN_STEP_TEMPLATE];
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
-  if (model === "seqdb-api/sample") {
+  if (model === "seqdb-api/molecularSample") {
     return { data: TEST_SAMPLES };
   } else if (model === "seqdb-api/stepResource") {
     return { data: TEST_STEP_RESOURCES };
@@ -83,7 +99,7 @@ function getWrapper() {
   );
 }
 
-describe("Sample Selection UI", () => {
+describe("MolecularSample Selection UI", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -129,8 +145,12 @@ describe("Sample Selection UI", () => {
               chainStepTemplate: {
                 data: { id: "1", type: "chainStepTemplate" }
               },
-              sample: {
-                data: { id: "1", name: "test sample 1", type: "sample" }
+              molecularSample: {
+                data: {
+                  id: "1",
+                  name: "test sample 1",
+                  type: "molecularSample"
+                }
               }
             },
             type: "stepResource"
@@ -188,7 +208,7 @@ describe("Sample Selection UI", () => {
               chainStepTemplate: {
                 data: { id: "1", type: "chainStepTemplate" }
               },
-              sample: { data: { id: "3", type: "sample" } }
+              molecularSample: { data: { id: "3", type: "molecularSample" } }
             },
             type: "stepResource"
           }
@@ -204,7 +224,7 @@ describe("Sample Selection UI", () => {
               chainStepTemplate: {
                 data: { id: "1", type: "chainStepTemplate" }
               },
-              sample: { data: { id: "4", type: "sample" } }
+              molecularSample: { data: { id: "4", type: "molecularSample" } }
             },
             type: "stepResource"
           }
@@ -220,7 +240,7 @@ describe("Sample Selection UI", () => {
               chainStepTemplate: {
                 data: { id: "1", type: "chainStepTemplate" }
               },
-              sample: { data: { id: "5", type: "sample" } }
+              molecularSample: { data: { id: "5", type: "molecularSample" } }
             },
             type: "stepResource"
           }

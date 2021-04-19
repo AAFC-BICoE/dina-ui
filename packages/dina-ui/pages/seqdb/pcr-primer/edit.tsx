@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  CancelButton,
+  BackButton,
   DateField,
   DinaForm,
   DinaFormOnSubmit,
@@ -11,8 +11,7 @@ import {
   ResourceSelectField,
   SelectField,
   SubmitButton,
-  TextField,
-  useAccount
+  TextField
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
@@ -68,10 +67,8 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
 
 function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
   const { id } = router.query;
-  const { groupNames } = useAccount();
 
   const initialValues = primer || {
-    group: groupNames?.[0],
     lotNumber: 1,
     seq: "",
     type: "PRIMER"
@@ -99,11 +96,15 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <CancelButton entityId={id as string} entityLink="/seqdb/pcr-primer" />
+        <BackButton entityId={id as string} entityLink="/seqdb/pcr-primer" />
       </ButtonBar>
       <div>
         <div className="row">
-          <GroupSelectField className="col-md-2" name="group" />
+          <GroupSelectField
+            className="col-md-2"
+            name="group"
+            enableStoredDefaultGroup={true}
+          />
         </div>
         <div className="row">
           <SelectField

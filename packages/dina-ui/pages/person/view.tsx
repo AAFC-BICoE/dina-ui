@@ -1,6 +1,6 @@
 import {
   ButtonBar,
-  CancelButton,
+  BackButton,
   DinaForm,
   EditButton,
   FieldView,
@@ -11,7 +11,7 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { Person } from "../../types/objectstore-api/resources/Person";
+import { Person } from "../../types/agent-api/resources/Person";
 
 export function PersonDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -23,7 +23,7 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
       <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="person" />
-        <CancelButton
+        <BackButton
           entityId={id as string}
           entityLink="/person"
           byPassView={true}
@@ -52,8 +52,19 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
                 <DinaForm<Person> initialValues={person}>
                   <div className="row">
                     <FieldView className="col-md-2" name="displayName" />
+                  </div>
+                  <div className="row">
+                    <FieldView className="col-md-2" name="givenNames" />
+                    <FieldView className="col-md-2" name="familyNames" />
+                  </div>
+                  <div className="row">
+                    <FieldView className="col-md-2" name="aliases" />
+                  </div>
+                  <div className="row">
                     <FieldView className="col-md-2" name="email" />
                     <FieldView className="col-md-2" name="organizations" />
+                  </div>
+                  <div className="row">
                     <FieldView className="col-md-2" name="createdBy" />
                     <FieldView className="col-md-2" name="createdOn" />
                   </div>

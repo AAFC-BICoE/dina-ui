@@ -3,7 +3,7 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { BulkMetadataEditor } from "../metadata-bulk-editor/BulkMetadataEditor";
 
 export interface BulkMetadataEditModalParams {
-  afterMetadatasSaved?: (metadataIds: string[]) => Promise<void>;
+  afterMetadatasSaved?: (metadataIds: string[]) => void | Promise<void>;
   objectUploadIds?: string[];
   metadataIds?: string[];
   group?: string;
@@ -28,7 +28,7 @@ export function useBulkMetadataEditModal() {
       <div className="modal-content">
         <style>{`
           .modal-dialog {
-            max-width: calc(100vw - 3rem) !important;
+            max-width: calc(100vw - 3rem);
           }
           .modal-content {
             max-height: calc(100vh - 3rem) !important;

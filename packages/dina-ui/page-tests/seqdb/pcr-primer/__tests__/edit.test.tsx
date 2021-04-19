@@ -1,4 +1,6 @@
+import { writeStorage } from "@rehooks/local-storage";
 import { OperationsResponse } from "common-ui";
+import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { PcrPrimerEditPage } from "../../../../pages/seqdb/pcr-primer/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
@@ -29,6 +31,8 @@ const apiContext: any = {
 
 describe("PcrPrimer edit page", () => {
   beforeEach(() => {
+    // Set the deault group selection:
+    writeStorage(DEFAULT_GROUP_STORAGE_KEY, "aafc");
     jest.clearAllMocks();
   });
 

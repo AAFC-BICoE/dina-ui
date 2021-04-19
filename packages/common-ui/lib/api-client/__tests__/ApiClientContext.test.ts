@@ -1,11 +1,15 @@
 import { AxiosError, AxiosRequestConfig } from "axios";
 import Kitsu from "kitsu";
 import {
+  ApiClientImpl,
   CustomDinaKitsu,
-  createContextValue,
   makeAxiosErrorMoreReadable
 } from "../ApiClientContext";
-import { Operation, OperationsResponse } from "../operations-types";
+import {
+  Operation,
+  OperationsResponse,
+  SuccessfulOperation
+} from "../operations-types";
 
 interface TestPcrPrimer {
   name: string;
@@ -171,7 +175,9 @@ const mockPatch = jest.fn((_, data) => {
   }
 });
 
-const { apiClient, bulkGet, doOperations, save } = createContextValue();
+const { apiClient, bulkGet, doOperations, save } = new ApiClientImpl({
+  newId: () => "00000000-0000-0000-0000-000000000000"
+});
 
 // Add the mocked "patch" method to the Axios instance:
 apiClient.axios = { patch: mockPatch } as any;
@@ -281,7 +287,7 @@ Constraint violation: description size must be between 1 and 10`;
           path: "pcrPrimer",
           value: {
             attributes: { lotNumber: 1, name: "testPrimer1" },
-            id: "-100",
+            id: "00000000-0000-0000-0000-000000000000",
             type: "pcrPrimer"
           }
         },
@@ -290,7 +296,7 @@ Constraint violation: description size must be between 1 and 10`;
           path: "pcrPrimer",
           value: {
             attributes: { lotNumber: 1, name: "testPrimer2" },
-            id: "-101",
+            id: "00000000-0000-0000-0000-000000000000",
             type: "pcrPrimer"
           }
         }
@@ -401,6 +407,23 @@ Constraint violation: description size must be between 1 and 10`;
     ]);
   });
 
+  it("Provides a save function that can delete resources.", async () => {
+    mockPatch.mockImplementationOnce(() => ({
+      data: [{ status: 204 } as SuccessfulOperation]
+    }));
+
+    const response = await save([
+      { delete: { id: "1234", type: "test-type" } }
+    ]);
+
+    expect(response).toEqual([undefined]);
+    expect(mockPatch).lastCalledWith(
+      "/operations",
+      [{ op: "DELETE", path: "test-type/1234" }],
+      expect.anything()
+    );
+  });
+
   it("Provides a bulk-get-by-ID function.", async () => {
     mockPatch.mockImplementationOnce(() => ({
       data: [
@@ -507,6 +530,38 @@ Constraint violation: description size must be between 1 and 10`;
 
     expect(() => makeAxiosErrorMoreReadable(axiosError as AxiosError)).toThrow(
       new Error("Service unavailable:\n/agent-api/operations: Bad Gateway")
+    );
+  });
+
+  it("Shows error messages coming from Spring Boot (In addition to Crnk's format).", () => {
+    const axiosError = {
+      isAxiosError: true,
+      config: {
+        url: "/agent-api/operations"
+      },
+      response: {
+        status: 422,
+        statusText: "Unprocessable Entity",
+        data: {
+          errors: [
+            {
+              status: "422",
+              title: "Data integrity violation",
+              detail:
+                "could not execute statement; SQL [n/a]; constraint [fk_metadata_managed_attribute_to_managed_attribute_id]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement"
+            }
+          ]
+        }
+      }
+    };
+
+    expect(() => makeAxiosErrorMoreReadable(axiosError as AxiosError)).toThrow(
+      new Error(
+        [
+          "/agent-api/operations: Unprocessable Entity",
+          "Data integrity violation: could not execute statement; SQL [n/a]; constraint [fk_metadata_managed_attribute_to_managed_attribute_id]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement"
+        ].join("\n")
+      )
     );
   });
 

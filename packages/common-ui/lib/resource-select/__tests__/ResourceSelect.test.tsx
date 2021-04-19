@@ -1,13 +1,9 @@
 import { KitsuResource } from "kitsu";
-import lodash from "lodash";
+import lodash, { last } from "lodash";
 import Select from "react-select/base";
-import {
-  ApiClientContext,
-  createContextValue,
-  ResourceSelect,
-  ResourceSelectProps
-} from "../..";
+import { ResourceSelect, ResourceSelectProps } from "../..";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { AsyncOption } from "../ResourceSelect";
 
 /** Example */
 interface Todo extends KitsuResource {
@@ -358,5 +354,81 @@ describe("ResourceSelect component", () => {
 
     // Only the todos should be options.
     expect((options as any[]).map(o => o.resource)).toEqual(MOCK_TODOS.data);
+  });
+
+  it("Allows a callback options prop to show special options that call a function (single dropdown mode).", async () => {
+    const TEST_ASYNC_TODO = { id: "100", type: "todo", name: "async todo" };
+    const mockGetResource = jest.fn(async () => TEST_ASYNC_TODO);
+    const mockOnChange = jest.fn();
+
+    const TEST_CALLBACK_OPTION: AsyncOption<Todo> = {
+      label: <>My Callback Option</>,
+      getResource: mockGetResource
+    };
+
+    const wrapper = mountWithContext(
+      <ResourceSelect<Todo>
+        {...DEFAULT_SELECT_PROPS}
+        asyncOptions={[TEST_CALLBACK_OPTION]}
+        onChange={mockOnChange}
+      />
+    );
+
+    // Wait for the options to load.
+    await Promise.resolve();
+    wrapper.update();
+
+    const options = wrapper.find(Select).prop("options");
+
+    // There should be 5 options including the <none> option and the custom callback option:
+    expect(options.length).toEqual(5);
+
+    // Select the callback option, which should call the callback:
+    wrapper.find(Select).prop("onChange")(last(options));
+
+    await Promise.resolve();
+    wrapper.update();
+
+    expect(mockGetResource).toHaveBeenCalledTimes(1);
+    expect(mockOnChange).lastCalledWith(TEST_ASYNC_TODO);
+  });
+
+  it("Allows a callback options prop to show special options that call a function (multi dropdown mode).", async () => {
+    const TEST_ASYNC_TODO = { id: "100", type: "todo", name: "async todo" };
+    const mockGetResource = jest.fn(async () => TEST_ASYNC_TODO);
+    const mockOnChange = jest.fn();
+
+    const TEST_CALLBACK_OPTION: AsyncOption<Todo> = {
+      label: <>My Callback Option</>,
+      getResource: mockGetResource
+    };
+
+    const wrapper = mountWithContext(
+      <ResourceSelect<Todo>
+        {...DEFAULT_SELECT_PROPS}
+        asyncOptions={[TEST_CALLBACK_OPTION]}
+        isMulti={true}
+        onChange={mockOnChange}
+      />
+    );
+
+    // Wait for the options to load.
+    await Promise.resolve();
+    wrapper.update();
+
+    const options = wrapper.find(Select).prop("options");
+
+    // There should be 4 options including the custom callback option:
+    expect(options.length).toEqual(4);
+
+    // Select the callback option, which should call the callback:
+    wrapper.find(Select).prop("onChange")([options[0], last(options)]);
+
+    await Promise.resolve();
+    wrapper.update();
+
+    expect(mockGetResource).toHaveBeenCalledTimes(1);
+    // Called with the normal option plus the async-fetched value:
+    expect(mockOnChange).lastCalledWith([options[0].resource, TEST_ASYNC_TODO]);
   });
 });

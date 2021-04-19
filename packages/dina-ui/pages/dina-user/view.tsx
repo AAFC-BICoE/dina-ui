@@ -1,85 +1,123 @@
 import {
+  BackButton,
   ButtonBar,
-  CancelButton,
   DinaForm,
   EditButton,
   FieldView,
-  LoadingSpinner,
-  Query
+  KeyValueTable,
+  useAccount,
+  useQuery,
+  withResponse
 } from "common-ui";
 import { useRouter } from "next/router";
-import { Footer, Head, Nav } from "../../components";
+import { Footer, GroupLabel, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
-import { DinaUser } from "../../types/objectstore-api/resources/DinaUser";
-
-/** DinaUser with client-side-joined Agent. */
-interface DinaUserWithAgent extends DinaUser {
-  agent?: Person;
-}
+import { DinaUser } from "../../types/user-api/resources/DinaUser";
 
 export default function DinaUserDetailsPage() {
   const router = useRouter();
-  const { id } = router.query;
+  const { roles: myRoles, subject } = useAccount();
+
+  // Get the user ID from the URL, otherwise use the current user:
+  const id = router.query.id?.toString() ?? subject;
 
   const { formatMessage } = useDinaIntl();
+
+  const userQuery = useQuery<DinaUser & { agent?: Person }>(
+    { path: `user-api/user/${id}` },
+    {
+      joinSpecs: [
+        {
+          apiBaseUrl: "/agent-api",
+          idField: "agentId",
+          joinField: "agent",
+          path: user => `person/${user.agentId}?include=organizations`
+        }
+      ]
+    }
+  );
+
+  const currentUserCanEdit =
+    myRoles.includes("collection-manager") || myRoles.includes("admin");
 
   return (
     <div>
       <Head title={formatMessage("userViewTitle")} />
       <Nav />
-      <ButtonBar>
-        <EditButton entityId={id as string} entityLink="dina-user" />
-        <CancelButton entityLink="/dina-user" navigateTo={`/`} />
-      </ButtonBar>
-      <Query<DinaUserWithAgent>
-        query={{ path: `user-api/user/${id}` }}
-        options={{
-          joinSpecs: [
-            {
-              apiBaseUrl: "/agent-api",
-              idField: "agentId",
-              joinField: "agent",
-              path: user => `person/${user.agentId}`
-            }
-          ]
-        }}
-      >
-        {({ loading, response }) => {
-          const dinaUser = response && {
-            ...response.data
-          };
-
-          return (
-            <main className="container-fluid">
-              <h1>
-                <DinaMessage id="userViewTitle" />
-              </h1>
-              <LoadingSpinner loading={loading} />
-              {dinaUser && (
-                <DinaForm<DinaUser> initialValues={dinaUser}>
-                  <div>
-                    <div className="row">
-                      <FieldView className="col-md-2" name="username" />
-                      <FieldView
-                        className="col-md-2"
-                        name="agent.displayName"
-                        link={`/person/view?id=${dinaUser.agent?.id}`}
-                      />
-                      <FieldView className="col-md-2" name="groups" />
-                      <FieldView className="col-md-2" name="roles" />
-                      <FieldView className="col-md-2" name="firstName" />
-                      <FieldView className="col-md-2" name="lastName" />
-                      <FieldView className="col-md-2" name="emailAddress" />
-                    </div>
+      {withResponse(userQuery, ({ data: dinaUser }) => (
+        <main className="container">
+          <ButtonBar>
+            <BackButton entityLink="/dina-user" />
+            {currentUserCanEdit && (
+              <EditButton
+                className="ml-auto"
+                entityId={id as string}
+                entityLink="dina-user"
+              />
+            )}
+          </ButtonBar>
+          <h1>
+            <DinaMessage id={"userViewTitle"} />
+          </h1>
+          <DinaForm<DinaUser> initialValues={dinaUser}>
+            <div>
+              <div className="form-group">
+                <div className="row">
+                  <FieldView className="col-md-3" name="username" />
+                  <FieldView className="col-md-3" name="groups" />
+                  <FieldView className="col-md-3" name="roles" />
+                  <FieldView
+                    className="col-md-3"
+                    name="agent.displayName"
+                    label={formatMessage("associatedAgent")}
+                    link={`/person/view?id=${dinaUser.agent?.id}`}
+                  />
+                </div>
+                <div className="row">
+                  <div className="col-4">
+                    <RolesPerGroupTable
+                      rolesPerGroup={dinaUser.rolesPerGroup}
+                    />
                   </div>
-                </DinaForm>
-              )}
-            </main>
-          );
-        }}
-      </Query>
+                </div>
+              </div>
+            </div>
+          </DinaForm>
+        </main>
+      ))}
       <Footer />
+    </div>
+  );
+}
+
+interface RolesPerGroupTableProps {
+  rolesPerGroup: Record<string, string[] | undefined>;
+}
+
+function RolesPerGroupTable({ rolesPerGroup }: RolesPerGroupTableProps) {
+  // Convert the rolesPerGroup to an object with comma-separated strings instead of arrays:
+  const stringRolesPerGroup: Record<string, string> = {};
+  // tslint:disable-next-line
+  for (const key in rolesPerGroup) {
+    stringRolesPerGroup[key] = rolesPerGroup[key]?.join(", ") ?? "";
+  }
+
+  return (
+    <div>
+      <h2>
+        <DinaMessage id="rolesPerGroup" />
+      </h2>
+      <KeyValueTable
+        data={stringRolesPerGroup}
+        attributeCell={({ original: { field } }) => (
+          <strong>
+            <GroupLabel groupName={field} />
+          </strong>
+        )}
+        attributeHeader={<DinaMessage id="group" />}
+        valueHeader={<DinaMessage id="roles" />}
+      />
     </div>
   );
 }

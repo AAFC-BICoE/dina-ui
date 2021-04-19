@@ -4,13 +4,15 @@ import {
   KitsuResource,
   PersistedResource
 } from "kitsu";
-import { debounce, isUndefined, omitBy } from "lodash";
+import { debounce, isArray, isUndefined, omitBy } from "lodash";
 import React, { useContext } from "react";
 import { useIntl } from "react-intl";
 import AsyncSelect from "react-select/async";
+import { components as reactSelectComponents } from "react-select";
 import { Styles } from "react-select/src/styles";
 import { OptionsType } from "react-select/src/types";
-import { ApiClientContext } from "../..";
+import { ApiClientContext, SelectOption } from "../..";
+import { SortableContainer, SortableElement } from "react-sortable-hoc";
 
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData extends KitsuResource> {
@@ -41,7 +43,27 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   sort?: string;
 
   /** react-select styles prop. */
-  styles?: Partial<Styles>;
+  styles?: Partial<Styles<SelectOption<any>, boolean>>;
+
+  /** Special dropdown options that can fetch an async value e.g. by creating a resource in a modal. */
+  asyncOptions?: AsyncOption<TData>[];
+
+  isDisabled?: boolean;
+}
+
+/**
+ * Special dropdown option that can fetch an async value.
+ * e.g. setting a resource after the user created it through a modal.
+ */
+export interface AsyncOption<TData extends KitsuResource> {
+  /** Option label. */
+  label: JSX.Element;
+
+  /**
+   * Function called to fetch the resource when the option is selected.
+   * Returning undefined doesn't set the value.
+   */
+  getResource: () => Promise<PersistedResource<TData> | undefined>;
 }
 
 /** An option the user can select to set the relationship to null. */
@@ -53,11 +75,13 @@ export function ResourceSelect<TData extends KitsuResource>({
   include,
   isMulti = false,
   model,
-  onChange = () => undefined,
+  onChange: onChangeProp = () => undefined,
   optionLabel,
   sort,
   styles,
-  value
+  value,
+  asyncOptions,
+  isDisabled
 }: ResourceSelectProps<TData>) {
   const { apiClient } = useContext(ApiClientContext);
   const { formatMessage } = useIntl();
@@ -86,22 +110,48 @@ export function ResourceSelect<TData extends KitsuResource>({
     }));
 
     // Only show the null option when in single-resource mode and when there is no search input value.
-    const options =
-      !isMulti && !inputValue
-        ? [NULL_OPTION, ...resourceOptions]
-        : resourceOptions;
+    const options = [
+      ...(!isMulti && !inputValue ? [NULL_OPTION] : []),
+      ...resourceOptions,
+      ...(asyncOptions
+        ? asyncOptions.map(option => ({
+            ...option,
+            label: <strong>{option.label}</strong>
+          }))
+        : [])
+    ];
 
     callback(options);
   }
 
-  function onChangeInternal(selectedOption) {
-    if (selectedOption?.resource) {
-      // Handle single select:
-      onChange(selectedOption.resource);
+  async function onChangeSingle(selectedOption) {
+    if (selectedOption?.getResource) {
+      const resource = await (selectedOption as AsyncOption<TData>).getResource();
+      if (resource) {
+        onChangeProp(resource);
+      }
+    } else if (selectedOption?.resource) {
+      onChangeProp(selectedOption.resource);
+    }
+  }
+
+  async function onChangeMulti(selectedOptions: any[] | null) {
+    const asyncOption: AsyncOption<TData> = selectedOptions?.find(
+      option => option?.getResource
+    );
+
+    if (asyncOption && selectedOptions) {
+      // For callback options, don't set any value:
+      const asyncResource = await asyncOption.getResource();
+      if (asyncResource) {
+        const newResources = selectedOptions.map(option =>
+          option === asyncOption ? asyncResource : option.resource
+        );
+        onChangeProp(newResources);
+      }
     } else {
-      // Handle multi select:
-      const resources = selectedOption?.map(o => o.resource) || [];
-      onChange(resources);
+      const resources = selectedOptions?.map(o => o.resource) || [];
+      onChangeProp(resources);
     }
   }
 
@@ -109,6 +159,12 @@ export function ResourceSelect<TData extends KitsuResource>({
   const debouncedOptionLoader = debounce((inputValue, callback) => {
     loadOptions(inputValue, callback);
   }, 250);
+
+  const onSortEnd = ({ oldIndex, newIndex }) => {
+    onChangeProp(
+      arrayMove((value ?? []) as PersistedResource<any>[], oldIndex, newIndex)
+    );
+  };
 
   // Set the component's value externally when used as a controlled input.
   let selectValue;
@@ -137,14 +193,35 @@ export function ResourceSelect<TData extends KitsuResource>({
   }
 
   return (
-    <AsyncSelect
+    <SortableSelect
+      // react-select AsyncSelect props:
       defaultOptions={true}
       isMulti={isMulti}
       loadOptions={debouncedOptionLoader}
-      onChange={onChangeInternal}
+      onChange={isMulti ? onChangeMulti : onChangeSingle}
       placeholder={formatMessage({ id: "typeHereToSearch" })}
-      styles={styles}
+      styles={{
+        multiValueLabel: base => ({ ...base, cursor: "move" }),
+        ...styles
+      }}
       value={selectValue}
+      // react-sortable-hoc config:
+      axis="xy"
+      onSortEnd={onSortEnd}
+      components={{
+        MultiValue: SortableMultiValue
+      }}
+      distance={4}
+      isDisabled={isDisabled}
     />
   );
 }
+
+// Drag/drop re-ordering support copied from https://github.com/JedWatson/react-select/pull/3645/files
+function arrayMove(array: any[], from: number, to: number) {
+  array = array.slice();
+  array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
+  return array;
+}
+const SortableMultiValue = SortableElement(reactSelectComponents.MultiValue);
+const SortableSelect = SortableContainer(AsyncSelect);

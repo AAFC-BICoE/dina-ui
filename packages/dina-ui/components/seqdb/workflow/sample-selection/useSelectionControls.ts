@@ -6,7 +6,7 @@ import { useContext, useState } from "react";
 import {
   Chain,
   ChainStepTemplate,
-  Sample,
+  MolecularSample,
   StepResource
 } from "../../../../types/seqdb-api";
 import { StepRendererProps } from "../StepRenderer";
@@ -17,14 +17,14 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
   // Keep track of the last save operation, so the data is re-fetched immediately after saving.
   const [lastSave, setLastSave] = useState<number>();
 
-  async function selectSamples(samples: Sample[]) {
+  async function selectSamples(samples: MolecularSample[]) {
     const newStepResources: StepResource[] = samples.map(sample => ({
       chain: { id: chain.id, type: chain.type } as Chain,
       chainStepTemplate: {
         id: step.id,
         type: "chainStepTemplate"
       } as ChainStepTemplate,
-      sample,
+      molecularSample: sample,
       type: "stepResource",
       value: "SAMPLE"
     }));
@@ -48,8 +48,8 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
 
     const samples = ids.map(id => ({
       id,
-      type: "sample"
-    })) as Sample[];
+      type: "molecularSample"
+    })) as MolecularSample[];
 
     await selectSamples(samples);
 

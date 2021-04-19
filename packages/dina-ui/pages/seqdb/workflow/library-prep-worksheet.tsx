@@ -235,8 +235,8 @@ function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
           return (
             <tr key={String(prep.id)}>
               <td>{wellLocation}</td>
-              <td>{prep.sample.name}</td>
-              <td>{prep.sample.version}</td>
+              <td>{prep.molecularSample.name}</td>
+              <td>{prep.molecularSample.version}</td>
               <td>{prep.indexI5 && prep.indexI5.name}</td>
               <td>{prep.indexI7 && prep.indexI7.name}</td>
             </tr>
@@ -289,7 +289,7 @@ function LibraryPrepGrid({ libraryPrepBatch, preps }: LibraryPrepTableProps) {
                 <td key={columnNumber}>
                   {prep && (
                     <div className="h-100 w-100">
-                      <div>{prep.sample.name}</div>
+                      <div>{prep.molecularSample.name}</div>
                       <div>
                         {prep.indexI5 && (
                           <div>

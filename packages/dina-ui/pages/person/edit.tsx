@@ -1,8 +1,8 @@
-import { ButtonBar, CancelButton, LoadingSpinner, Query } from "common-ui";
+import { ButtonBar, BackButton, LoadingSpinner, Query } from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav, PersonForm } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { Person } from "../../types/objectstore-api/resources/Person";
+import { Person } from "../../types/agent-api/resources/Person";
 
 export default function PersonEditPage() {
   const router = useRouter();
@@ -21,7 +21,7 @@ export default function PersonEditPage() {
       <Head title={formatMessage("editPersonTitle")} />
       <Nav />
       <ButtonBar>
-        <CancelButton
+        <BackButton
           entityId={id as string}
           entityLink="/person"
           byPassView={true}

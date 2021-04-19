@@ -30,9 +30,10 @@ const TEST_POOLING_CHAIN_STEP_TEMPLATE = {
   chainTemplate: TEST_CHAIN_TEMPLATE,
   id: "2",
   stepNumber: 2,
-  stepTemplate: { id: "2", type: "stepTemplate" } as PersistedResource<
-    StepTemplate
-  >,
+  stepTemplate: {
+    id: "2",
+    type: "stepTemplate"
+  } as PersistedResource<StepTemplate>,
   type: "chainStepTemplate"
 } as PersistedResource<ChainStepTemplate>;
 
@@ -393,7 +394,7 @@ describe("LibraryPoolingStep component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".name-field p").exists()).toEqual(true);
+    expect(wrapper.find(".name-field .field-view").exists()).toEqual(true);
   });
 
   it("Provides a button to edit the existing library pool.", async () => {

@@ -4,5 +4,12 @@ import { connect } from "formik";
 export const ErrorViewer = connect(function ErrorViewerInternal({
   formik: { status }
 }) {
-  return status ? <div className="alert alert-danger">{status}</div> : null;
+  return status ? (
+    <div
+      className="alert alert-danger"
+      style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}
+    >
+      {status}
+    </div>
+  ) : null;
 });

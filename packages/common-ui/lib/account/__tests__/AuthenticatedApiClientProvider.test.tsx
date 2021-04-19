@@ -1,5 +1,6 @@
 import { mount } from "enzyme";
 import { noop } from "lodash";
+import { ApiClientProvider } from "../../api-client/ApiClientContext";
 import { AccountContextI, AccountProvider } from "../AccountProvider";
 import { AuthenticatedApiClientProvider } from "../AuthenticatedApiClientProvider";
 
@@ -30,9 +31,11 @@ describe("AuthenticatedApiClientProvider", () => {
           initialized: true
         }}
       >
-        <AuthenticatedApiClientProvider apiContext={apiContext}>
-          <div className="test-child" />
-        </AuthenticatedApiClientProvider>
+        <ApiClientProvider value={apiContext}>
+          <AuthenticatedApiClientProvider>
+            <div className="test-child" />
+          </AuthenticatedApiClientProvider>
+        </ApiClientProvider>
       </AccountProvider>
     );
 
@@ -51,9 +54,11 @@ describe("AuthenticatedApiClientProvider", () => {
           login: mockLogin
         }}
       >
-        <AuthenticatedApiClientProvider apiContext={apiContext}>
-          <div className="test-child" />
-        </AuthenticatedApiClientProvider>
+        <ApiClientProvider value={apiContext}>
+          <AuthenticatedApiClientProvider>
+            <div className="test-child" />
+          </AuthenticatedApiClientProvider>
+        </ApiClientProvider>
       </AccountProvider>
     );
 
@@ -70,9 +75,11 @@ describe("AuthenticatedApiClientProvider", () => {
           token: "Mat's-test-token"
         }}
       >
-        <AuthenticatedApiClientProvider apiContext={apiContext}>
-          <div className="test-child" />
-        </AuthenticatedApiClientProvider>
+        <ApiClientProvider value={apiContext}>
+          <AuthenticatedApiClientProvider>
+            <div className="test-child" />
+          </AuthenticatedApiClientProvider>
+        </ApiClientProvider>
       </AccountProvider>
     );
 

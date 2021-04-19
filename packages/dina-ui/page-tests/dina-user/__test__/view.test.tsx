@@ -1,4 +1,4 @@
-import { DinaUser } from "../../../types/objectstore-api/resources/DinaUser";
+import { DinaUser } from "../../../types/user-api/resources/DinaUser";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import DinaUserDetailsPage from "../../../pages/dina-user/view";
 import { Person } from "../../../types/objectstore-api";
@@ -11,21 +11,9 @@ const TEST_DINAUSER: DinaUser = {
   roles: ["/dao/staff", "/cnd/collection-manager"],
   agentId: "e3a18289-4a9d-4ad6-ad06-3c7f1837406e",
   id: "1",
-  type: "user"
+  type: "user",
+  rolesPerGroup: { cnc: ["collection-manager"] }
 };
-
-/** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async () => {
-  return { data: TEST_DINAUSER };
-});
-
-const mockBulkGet = jest.fn(async paths => {
-  return (paths || []).map(path => {
-    if (path.startsWith("/agent-api/")) {
-      return TEST_AGENT;
-    }
-  });
-});
 
 const TEST_AGENT: Person = {
   displayName: "person a",
@@ -34,6 +22,20 @@ const TEST_AGENT: Person = {
   type: "person",
   uuid: "323423-23423-234"
 };
+
+/** Mock Kitsu "get" method. */
+const mockGet = jest.fn(async () => {
+  return { data: TEST_DINAUSER };
+});
+
+const mockBulkGet = jest.fn(async paths => {
+  return paths.map(path => {
+    if (path.startsWith("person")) {
+      return TEST_AGENT;
+    }
+    console.error("No mocked bulkGet response: ", paths);
+  });
+});
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);
@@ -71,20 +73,18 @@ describe("Dina user who am i page", () => {
 
     // The dina username should be rendered in a FieldView.
     expect(wrapper.find(".username-field-header").exists()).toEqual(true);
-    expect(wrapper.containsMatchingElement(<p>cnc-cm</p>)).toEqual(true);
-
-    // The dina user's email should be rendered in a FieldView.
-    expect(wrapper.find(".emailAddress-field-header").exists()).toEqual(true);
-    expect(wrapper.containsMatchingElement(<p>a.b@c.d</p>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<div>cnc-cm</div>)).toEqual(true);
 
     // The dina user's groups should be rendered in a FieldView.
     expect(wrapper.find(".groups-field-header").exists()).toEqual(true);
-    expect(wrapper.containsMatchingElement(<p>dao,cnc</p>)).toEqual(true);
+    expect(wrapper.containsMatchingElement(<div>dao, cnc</div>)).toEqual(true);
 
     // The dina user's roles should be rendered in a FieldView.
     expect(wrapper.find(".roles-field-header").exists()).toEqual(true);
     expect(
-      wrapper.containsMatchingElement(<p>/dao/staff,/cnd/collection-manager</p>)
+      wrapper.containsMatchingElement(
+        <div>/dao/staff, /cnd/collection-manager</div>
+      )
     ).toEqual(true);
   });
 });

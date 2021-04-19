@@ -6,6 +6,8 @@ interface FormikButtonProps {
   children?: React.ReactNode;
   onClick: OnFormikSubmit;
 
+  loading?: boolean;
+
   /** Override internal button props using the formik context. */
   buttonProps?: (
     ctx: FormikContextType<any>
@@ -16,8 +18,15 @@ interface FormikButtonProps {
  * Formik-connected button for click events other than main form submissions.
  */
 export const FormikButton = connect<FormikButtonProps>(
-  ({ buttonProps, className, children, formik, onClick }) =>
-    formik.isSubmitting ? (
+  ({
+    buttonProps,
+    className,
+    children,
+    formik,
+    loading: loadingProp,
+    onClick
+  }) =>
+    formik.isSubmitting || loadingProp ? (
       <LoadingSpinner loading={true} />
     ) : (
       <button
