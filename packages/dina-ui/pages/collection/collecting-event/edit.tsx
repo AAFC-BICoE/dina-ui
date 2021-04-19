@@ -59,6 +59,8 @@ export default function CollectingEventEditPage() {
 
 function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
   const router = useRouter();
+  const { id } = router.query;
+  const { formatMessage } = useDinaIntl();
 
   const {
     attachedMetadatasUI,

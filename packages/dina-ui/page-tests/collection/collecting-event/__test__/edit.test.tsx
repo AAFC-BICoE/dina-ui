@@ -4,8 +4,8 @@ import NumberFormat from "react-number-format";
 import CollectingEventEditPage from "../../../../pages/collection/collecting-event/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
-import { SRS } from "packages/dina-ui/types/collection-api/resources/SRS";
-import { CoordinateSystem } from "packages/dina-ui/types/collection-api/resources/CoordinateSystem";
+import { SRS } from "../../../../types/collection-api/resources/SRS";
+import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -169,6 +169,8 @@ describe("collecting-event edit page", () => {
           path: "collecting-event",
           value: {
             attributes: {
+              dwcVerbatimCoordinateSystem: "decimal degrees",
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               startEventDateTime: "2019-12-21T16:00",
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
               dwcOtherRecordNumbers: ["12", "23"]

@@ -7,6 +7,8 @@ import {
   CollectingEvent,
   GeoReferenceAssertion
 } from "../../types/collection-api";
+import { CoordinateSystemEnum } from "../../types/collection-api/resources/CoordinateSystem";
+import { SRSEnum } from "../../types/collection-api/resources/SRS";
 import { Metadata, Person } from "../../types/objectstore-api";
 import { useAttachmentsModal } from "../object-store";
 
@@ -106,7 +108,9 @@ export function useCollectingEventSave(
         startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
         collectors: [],
         collectorGroups: [],
-        geoReferenceAssertions: [{}]
+        geoReferenceAssertions: [{}],
+        dwcVerbatimCoordinateSystem: CoordinateSystemEnum.DECIMAL_DEGREE,
+        dwcVerbatimSRS: SRSEnum.WGS84
       };
 
   // The selected Metadatas to be attached to this Collecting Event:

@@ -5,6 +5,7 @@ import { OnFormikSubmit } from "./safeSubmit";
 export interface CheckBoxProps extends LabelWrapperParams {
   onCheckBoxClick?: OnFormikSubmit<ChangeEvent<HTMLInputElement>>;
   disabled?: boolean;
+  type?: string;
 }
 
 const checkboxProps = {
@@ -18,7 +19,7 @@ const checkboxProps = {
 };
 
 export function CheckBoxField(props: CheckBoxProps) {
-  const { onCheckBoxClick, disabled } = props;
+  const { onCheckBoxClick, disabled, type } = props;
   return (
     <FieldWrapper
       {...props}
@@ -28,11 +29,12 @@ export function CheckBoxField(props: CheckBoxProps) {
           checked={value || false}
           value={value || false}
           disabled={true}
+          type={type}
         />
       )}
     >
       {({ setValue, value, formik }) => {
-        function onChange(event) {
+        function onChange(event: ChangeEvent<HTMLInputElement>) {
           setValue(event.target.checked);
           onCheckBoxClick?.(event, formik);
         }

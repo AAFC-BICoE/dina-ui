@@ -123,6 +123,8 @@ describe("Catalogued Object View Page", () => {
           {
             resource: {
               dwcOtherRecordNumbers: null,
+              dwcVerbatimCoordinateSystem: "decimal degrees",
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               relationships: {},
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
@@ -319,6 +321,8 @@ describe("Catalogued Object View Page", () => {
           {
             resource: {
               dwcOtherRecordNumbers: null,
+              dwcVerbatimCoordinateSystem: "decimal degrees",
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               relationships: {},
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
