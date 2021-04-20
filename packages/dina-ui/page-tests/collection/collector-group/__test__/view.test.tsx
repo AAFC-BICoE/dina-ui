@@ -22,13 +22,16 @@ const TEST_AGENT: Person = {
   uuid: "323423-23423-234"
 };
 
-// mock out the Patch when trying to getAgent via BulkGet
-const mockPatch = jest.fn(async () => ({
-  data: [{ data: TEST_AGENT, status: 201 }]
-}));
+const mockBulkGet = jest.fn<any, any>(async paths =>
+  paths.map(path => {
+    if (path === "/person/a8fb14f7-cda9-4313-9cc7-f313db653cad") {
+      return TEST_AGENT;
+    }
+  })
+);
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async model => {
+const mockGet = jest.fn<any, any>(async model => {
   // The get request will return the existing collector-group.
   if (model === "collection-api/collector-group/100?include=agentIdentifiers") {
     return { data: TEST_COLLECTOR_GROUP };
@@ -39,8 +42,9 @@ const mockGet = jest.fn(async model => {
 jest.mock("next/link", () => () => <div />);
 
 // Mock API requests:
-const apiContext: any = {
-  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+const apiContext = {
+  bulkGet: mockBulkGet,
+  apiClient: { get: mockGet }
 };
 
 describe("CollectorGroup details page", () => {
@@ -65,7 +69,9 @@ describe("CollectorGroup details page", () => {
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
-    expect(wrapper.containsMatchingElement(<div>person a</div>)).toEqual(true);
+    expect(wrapper.find(".agents-field .field-view").text()).toEqual(
+      "person a"
+    );
     expect(
       wrapper.containsMatchingElement(<div> test collector group</div>)
     ).toEqual(true);
