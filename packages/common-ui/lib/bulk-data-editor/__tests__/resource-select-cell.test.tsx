@@ -18,7 +18,7 @@ const mockGet = jest.fn();
 // Called by the option loader function.
 const mockProcess = jest.fn();
 
-const mockApiContext: any = { apiClient: { get: mockGet } };
+const mockApiContext = { apiClient: { get: mockGet } };
 
 // Mock out the debounce function to avoid waiting during tests.
 jest.spyOn(lodash, "debounce").mockImplementation((fn: any) => fn);

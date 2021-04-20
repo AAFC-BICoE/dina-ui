@@ -2,14 +2,14 @@ import { ApiClientI } from "common-ui";
 import { flatMap, keys, uniq } from "lodash";
 import {
   ManagedAttribute,
-  ManagedAttributeMap
+  ManagedAttributeValues
 } from "../../../types/objectstore-api";
 
 /**
  * Initializes the editable managed attributes based on what attributes are set on the metadatas.
  */
 export async function getManagedAttributesInUse(
-  managedAttributeMaps: (ManagedAttributeMap["values"] | null | undefined)[],
+  managedAttributeMaps: (ManagedAttributeValues | null | undefined)[],
   bulkGet: ApiClientI["bulkGet"],
   {
     apiBaseUrl = "/objectstore-api",

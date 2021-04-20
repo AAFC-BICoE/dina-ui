@@ -45,7 +45,8 @@
     "xlsx": "^0.16.7"
   },
   "resolutions": {
-    "**/kitsu/axios": "^0.21.1"
+    "**/kitsu/axios": "^0.21.1",
+    "**/type-fest": "^1.0.2"
   },
   "husky": {
     "hooks": {
