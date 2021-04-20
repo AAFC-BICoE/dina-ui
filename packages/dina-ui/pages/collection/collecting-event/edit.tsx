@@ -10,6 +10,7 @@ import {
   SubmitButton,
   useApiClient
 } from "common-ui";
+import { useLocalStorage } from "@rehooks/local-storage";
 import { KitsuResponse, PersistedResource } from "kitsu";
 import { orderBy } from "lodash";
 import { NextRouter, useRouter } from "next/router";
@@ -157,11 +158,22 @@ function CollectingEventForm({
 }: CollectingEventFormProps) {
   const { id } = router.query;
   const { formatMessage } = useDinaIntl();
+  const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
+  const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
 
   // The selected Metadatas to be attached to this Collecting Event:
   const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal({
     initialMetadatas: collectingEvent?.attachment as PersistedResource<Metadata>[]
   });
+
+  const [defaultVerbatimCoordSys, setDefaultVerbatimCoordSys] = useLocalStorage<
+    string | null | undefined
+  >(DEFAULT_VERBATIM_COORDSYS_KEY);
+
+  const [defaultVerbatimSRS, setDefaultVerbatimSRS] = useLocalStorage<
+    string | null | undefined
+  >(DEFAULT_VERBATIM_SRS_KEY);
+
   const initialValues = collectingEvent
     ? {
         ...collectingEvent,
@@ -175,8 +187,9 @@ function CollectingEventForm({
         collectorGroups: [],
         startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
         geoReferenceAssertions: [{}],
-        dwcVerbatimCoordinateSystem: CoordinateSystemEnum.DECIMAL_DEGREE,
-        dwcVerbatimSRS: SRSEnum.WGS84
+        dwcVerbatimCoordinateSystem:
+          defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
+        dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84
       };
 
   const { save } = useApiClient();
@@ -351,7 +364,10 @@ function CollectingEventForm({
       enableReinitialize={true}
     >
       {buttonBar}
-      <CollectingEventFormLayout />
+      <CollectingEventFormLayout
+        setDefaultVerbatimCoordSys={setDefaultVerbatimCoordSys}
+        setDefaultVerbatimSRS={setDefaultVerbatimSRS}
+      />
       <div className="form-group">{attachedMetadatasUI}</div>
       {buttonBar}
     </DinaForm>

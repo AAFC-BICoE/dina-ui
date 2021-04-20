@@ -1,7 +1,8 @@
-import { KitsuResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
+import { Person } from "../../agent-api/resources/Person";
+import { Derivative } from "./Derivative";
 import { ManagedAttributeMap } from "./ManagedAttributeMap";
 import { DcType } from "./ObjectUpload";
-import { Person } from "../../agent-api/resources/Person";
 
 export interface MetadataAttributes {
   type: "metadata";
@@ -38,6 +39,7 @@ export interface MetadataRelationships {
   acMetadataCreator?: Person | KitsuResource | null;
   dcCreator?: Person | KitsuResource | null;
   managedAttributeMap?: ManagedAttributeMap | null;
+  derivatives?: PersistedResource<Derivative>[] | null;
 }
 
 export type Metadata = KitsuResource &

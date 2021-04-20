@@ -10,6 +10,7 @@ export interface TextFieldProps extends LabelWrapperParams {
   placeholder?: string;
 
   customInput?: (inputProps: InputHTMLAttributes<any>) => JSX.Element;
+  onChangeExternal?: (form, name, value) => void;
 }
 
 /**
@@ -24,6 +25,7 @@ export function TextField(props: TextFieldProps) {
     inputProps: inputPropsExternal,
     placeholder,
     customInput,
+    onChangeExternal,
     ...labelWrapperProps
   } = props;
   const { name } = labelWrapperProps;
@@ -31,13 +33,11 @@ export function TextField(props: TextFieldProps) {
   return (
     <FieldWrapper {...labelWrapperProps}>
       <FastField name={name}>
-        {({
-          field: { value },
-          form: { setFieldValue, setFieldTouched }
-        }: FieldProps) => {
+        {({ field: { value }, form }: FieldProps) => {
           function onChange(event) {
-            setFieldValue(name, event.target.value);
-            setFieldTouched(name);
+            form.setFieldValue(name, event.target.value);
+            form.setFieldTouched(name);
+            onChangeExternal?.(form, name, event.target.value);
           }
 
           const inputPropsInternal = {

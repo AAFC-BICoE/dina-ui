@@ -1,6 +1,6 @@
 import {
-  ButtonBar,
   BackButton,
+  ButtonBar,
   DateField,
   DeleteButton,
   DinaForm,
@@ -21,10 +21,8 @@ import { useFormikContext } from "formik";
 import { NextRouter, useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Head, Nav } from "../../../components";
-import {
-  FileView,
-  getManagedAttributesInUse
-} from "../../../components/object-store";
+import { getManagedAttributesInUse } from "../../../components/object-store";
+import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   License,
@@ -61,7 +59,7 @@ export default function MetadataEditPage() {
             <Query<Metadata>
               query={{
                 path: `objectstore-api/metadata/${id}`,
-                include: "managedAttributeMap,dcCreator"
+                include: "managedAttributeMap,dcCreator,derivatives"
               }}
               options={{
                 joinSpecs: [
@@ -121,6 +119,8 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
   }) => {
     const {
       acTags,
+      // Don't include derivatives in the form submission:
+      derivatives,
       license,
       managedAttributeMap,
       ...metadataValues
@@ -164,12 +164,6 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
     await router.push(`/object-store/object/view?id=${id}`);
   };
 
-  const filePath = `/api/objectstore-api/file/${metadata.bucket}/${metadata.fileIdentifier}`;
-  // fileExtension should always be available when getting the Metadata from the back-end:
-  const fileType = (metadata.fileExtension as string)
-    .replace(/\./, "")
-    .toLowerCase();
-
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
@@ -185,12 +179,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
       </ButtonBar>
       <div>
         <div className="form-group">
-          <FileView
-            clickToDownload={true}
-            filePath={filePath}
-            fileType={fileType}
-            imgHeight="15rem"
-          />
+          <MetadataFileView metadata={metadata} imgHeight="15rem" />
         </div>
         <div className="form-group">
           <h2>

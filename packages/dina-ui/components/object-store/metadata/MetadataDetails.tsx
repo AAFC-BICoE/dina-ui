@@ -1,7 +1,12 @@
-import { DateView, FieldHeader, useCollapser, useQuery } from "common-ui";
+import {
+  DateView,
+  FieldHeader,
+  useApiClient,
+  useCollapser,
+  useQuery
+} from "common-ui";
 import { PersistedResource } from "kitsu";
 import { get, toPairs } from "lodash";
-import Link from "next/link";
 import { ReactNode } from "react";
 import ReactTable from "react-table";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -10,10 +15,49 @@ import {
   ManagedAttributeMap,
   Metadata
 } from "../../../types/objectstore-api";
+import { ObjectUpload } from "../../../types/objectstore-api/resources/ObjectUpload";
 import { GroupLabel } from "../../group-select/GroupFieldView";
 
 export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
+}
+
+export function useMetadataQuery(id?: string) {
+  const { apiClient } = useApiClient();
+
+  const query = useQuery<Metadata & { objectUpload: ObjectUpload }>(
+    {
+      include: "managedAttributeMap,acMetadataCreator,dcCreator,derivatives",
+      path: `objectstore-api/metadata/${id}`
+    },
+    {
+      joinSpecs: [
+        {
+          apiBaseUrl: "/agent-api",
+          idField: "acMetadataCreator",
+          joinField: "acMetadataCreator",
+          path: metadata => `person/${metadata.acMetadataCreator.id}`
+        },
+        {
+          apiBaseUrl: "/agent-api",
+          idField: "dcCreator",
+          joinField: "dcCreator",
+          path: metadata => `person/${metadata.dcCreator.id}`
+        }
+      ],
+      onSuccess: async ({ data: metadata }) => {
+        const objectUploadResp = await apiClient.get<ObjectUpload>(
+          "objectstore-api/object-upload",
+          {
+            filter: { fileIdentifier: `${metadata.fileIdentifier}` }
+          }
+        );
+        metadata.objectUpload = objectUploadResp?.data?.[0];
+      }
+    }
+  );
+
+  return query;
 }
 
 /**

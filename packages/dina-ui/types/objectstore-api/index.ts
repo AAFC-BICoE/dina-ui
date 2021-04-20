@@ -1,5 +1,6 @@
 export * from "./resources/AuditSnapshot";
 export * from "./resources/DefaultValue";
+export * from "./resources/Derivative";
 export * from "./resources/License";
 export * from "../agent-api/resources/Person";
 export * from "./resources/ManagedAttribute";

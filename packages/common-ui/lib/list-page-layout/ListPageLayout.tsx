@@ -72,7 +72,8 @@ export function ListPageLayout<TData extends KitsuResource>({
   // Build the JSONAPI filter param to be sent to the back-end.
   const filterParam: FilterParam = {
     ...additionalFilters,
-    rsql: combinedRsql
+    // Only include rsql if it's not blank:
+    ...(combinedRsql && { rsql: combinedRsql })
   };
 
   return (
