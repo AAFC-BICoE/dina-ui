@@ -1,23 +1,31 @@
 import {
-  ButtonBar,
   BackButton,
+  ButtonBar,
   DinaForm,
+  EditButton,
   FieldView,
   KeyValueTable,
   useAccount,
   useQuery,
   withResponse
 } from "common-ui";
+import { useRouter } from "next/router";
 import { Footer, GroupLabel, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { Person } from "../../types/objectstore-api";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
 
 export default function DinaUserDetailsPage() {
-  const { subject } = useAccount();
+  const router = useRouter();
+  const { roles: myRoles, subject } = useAccount();
+
+  // Get the user ID from the URL, otherwise use the current user:
+  const id = router.query.id?.toString() ?? subject;
+
   const { formatMessage } = useDinaIntl();
 
-  const userQuery = useQuery<DinaUser>(
-    { path: `user-api/user/${subject}` },
+  const userQuery = useQuery<DinaUser & { agent?: Person }>(
+    { path: `user-api/user/${id}` },
     {
       joinSpecs: [
         {
@@ -30,34 +38,40 @@ export default function DinaUserDetailsPage() {
     }
   );
 
+  const currentUserCanEdit =
+    myRoles.includes("collection-manager") || myRoles.includes("admin");
+
   return (
     <div>
-      <Head title={formatMessage("whoAmITitle")} />
+      <Head title={formatMessage("userViewTitle")} />
       <Nav />
-      <ButtonBar>
-        <BackButton entityLink="/user" navigateTo={`/`} />
-      </ButtonBar>
       {withResponse(userQuery, ({ data: dinaUser }) => (
-        <main className="container-fluid">
+        <main className="container">
+          <ButtonBar>
+            <BackButton entityLink="/dina-user" />
+            {currentUserCanEdit && (
+              <EditButton
+                className="ml-auto"
+                entityId={id as string}
+                entityLink="dina-user"
+              />
+            )}
+          </ButtonBar>
           <h1>
-            <DinaMessage id="whoAmITitle" />
+            <DinaMessage id={"userViewTitle"} />
           </h1>
           <DinaForm<DinaUser> initialValues={dinaUser}>
             <div>
               <div className="form-group">
                 <div className="row">
-                  <FieldView className="col-md-2" name="username" />
-                  <FieldView className="col-md-2" name="groups" />
-                  <FieldView className="col-md-2" name="roles" />
+                  <FieldView className="col-md-3" name="username" />
+                  <FieldView className="col-md-3" name="groups" />
+                  <FieldView className="col-md-3" name="roles" />
                   <FieldView
-                    className="col-md-2"
-                    label={formatMessage("associatedAgent")}
+                    className="col-md-3"
                     name="agent.displayName"
-                    link={
-                      dinaUser.agentId
-                        ? `/person/view?id=${dinaUser.agentId}`
-                        : ""
-                    }
+                    label={formatMessage("associatedAgent")}
+                    link={`/person/view?id=${dinaUser.agent?.id}`}
                   />
                 </div>
                 <div className="row">

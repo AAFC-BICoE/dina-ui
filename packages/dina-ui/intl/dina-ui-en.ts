@@ -57,6 +57,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editableManagedAttributesRemoveInfo:
     "Note: Removing an attribute from the 'Visible Managed Attributes' list doesn't delete the value. To delete the value, clear the input below.",
   editCollectingEventTitle: "Edit Collecting Event",
+  editDinaUserTitle: "Edit User",
   editMetadataTitle: "Edit Metadata",
   editObjectSubtypeTitle: "Edit Object Subtype",
   editOrganizationTitle: "Edit Organization",
@@ -272,6 +273,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   uploadNewAttachments: "Upload New Attachments",
   uploadPageTitle: "Upload Files",
   useCollectorGroupLabel: "Use Collector Group",
+  userViewTitle: "User",
+  userListTitle: "Users",
   userMustBelongToGroup: "User must belong to a Group",
   verbatimEventDateTimeLabel: "Verbatim Event DateTime",
   verbatimCoordinatesLegend: "Verbatim Coordinates",

@@ -4,7 +4,13 @@ import { useAccount } from "./AccountProvider";
 
 /** Shows the logged-in user and the logout button. */
 export function NavbarUserControl() {
-  const { authenticated, initialized, logout, username } = useAccount();
+  const {
+    authenticated,
+    initialized,
+    logout,
+    subject,
+    username
+  } = useAccount();
 
   return (
     <div className="d-flex">
@@ -13,7 +19,7 @@ export function NavbarUserControl() {
           {username && (
             <span className="mr-2 my-auto">
               <CommonMessage id="loggedInAsUser" />{" "}
-              <Link href="/dina-user/view">
+              <Link href={`/dina-user/view?id=${subject}`}>
                 <a>{username}</a>
               </Link>
             </span>

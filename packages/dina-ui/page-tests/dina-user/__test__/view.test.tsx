@@ -29,14 +29,21 @@ const mockGet = jest.fn(async () => {
 });
 
 const mockBulkGet = jest.fn(async paths => {
-  if ((paths[0] as string).startsWith("person/")) {
-    return [TEST_AGENT];
-  }
-  return [];
+  return paths.map(path => {
+    if (path.startsWith("person")) {
+      return TEST_AGENT;
+    }
+    console.error("No mocked bulkGet response: ", paths);
+  });
 });
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);
+
+// Pretend we are at the page for index set id#100
+jest.mock("next/router", () => ({
+  useRouter: () => ({ query: { id: "1" } })
+}));
 
 // Mock API requests:
 const apiContext: any = {
