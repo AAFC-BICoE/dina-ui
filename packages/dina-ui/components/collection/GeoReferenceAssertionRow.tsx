@@ -41,7 +41,7 @@ export function GeoReferenceAssertionRow({
 
   const commonRoot = `geoReferenceAssertions[${index}].`;
 
-  function updateReservedAssertion(fieldName: string, fieldValue: string) {
+  function updateReservedAssertion(_, fieldName: string, fieldValue: string) {
     if (fieldValue !== null)
       reservedAssertion.current[fieldName.replace(commonRoot, "")] = fieldValue;
   }
