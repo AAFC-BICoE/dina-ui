@@ -128,8 +128,6 @@ const CustomDeleteButton = connect<{}, ObjectSubtype>(
   ({ formik: { values: subType } }) => (
     <DeleteButton
       className="ml-5"
-      // Disable the delete button if the subType is app-managed:
-      disabled={subType.appManaged}
       id={subType.id}
       options={{ apiBaseUrl: "/objectstore-api" }}
       postDeleteRedirect="/object-store/object-subtype/list"
