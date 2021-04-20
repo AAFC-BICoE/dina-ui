@@ -243,11 +243,15 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
             <NotPubliclyReleasableReasonField />
           </div>
         </div>
-        <ManagedAttributesEditor
-          valuesPath="managedAttributeMap.values"
-          managedAttributeApiPath="objectstore-api/managed-attribute"
-          apiBaseUrl="/objectstore-api"
-        />
+        <div className="row">
+          <div className="col-sm-6">
+            <ManagedAttributesEditor
+              valuesPath="managedAttributeMap.values"
+              managedAttributeApiPath="objectstore-api/managed-attribute"
+              apiBaseUrl="/objectstore-api"
+            />
+          </div>
+        </div>
       </div>
     </DinaForm>
   );

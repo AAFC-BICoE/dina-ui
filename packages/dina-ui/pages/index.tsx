@@ -133,6 +133,20 @@ const Home: React.FunctionComponent = () => (
             </a>
           </Link>
         </li>
+        <li>
+          <Link href="/collection/managed-attribute/list">
+            <a>
+              <DinaMessage id="managedAttributeListTitle" />
+            </a>
+          </Link>
+        </li>
+        <li>
+          <Link href="/collection/revisions-by-user">
+            <a>
+              <DinaMessage id="revisionsByUserPageTitle" />
+            </a>
+          </Link>
+        </li>
         <li className="d-none">
           <Link href="/collection/collector-group/list">
             <a>

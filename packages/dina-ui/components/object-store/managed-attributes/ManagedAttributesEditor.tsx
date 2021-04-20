@@ -1,4 +1,5 @@
 import {
+  DinaFormSection,
   FieldWrapper,
   filterBy,
   NumberField,
@@ -74,7 +75,7 @@ export function ManagedAttributesEditor({
         <DinaMessage id="metadataManagedAttributesLabel" />
       </h2>
       <div className="row">
-        <div className="col-md-3 col-sm-4">
+        <div className="col-sm-6">
           <FieldWrapper
             name="editableManagedAttributes"
             label={formatMessage("field_editableManagedAttributes")}
@@ -98,50 +99,56 @@ export function ManagedAttributesEditor({
             />
           </FieldWrapper>
         </div>
-        <div className="col-md-3 col-sm-4">
+        <div className="col-sm-6">
           <div className="alert alert-warning">
             <DinaMessage id="editableManagedAttributesRemoveInfo" />
           </div>
         </div>
       </div>
-      <div className="row" style={{ minHeight: "25rem" }}>
-        {editableManagedAttributes.map(attribute => {
-          const attributeKey = get(attribute, managedAttributeKeyField);
+      <div
+        style={{
+          minHeight: "25rem" /* Give extra room for the dropdown menus. */
+        }}
+      >
+        <div className="row">
+          {editableManagedAttributes.map(attribute => {
+            const attributeKey = get(attribute, managedAttributeKeyField);
 
-          const props = {
-            className: "col-md-3 col-sm-4",
-            key: attributeKey,
-            label: attribute.name ?? attributeKey,
-            name: `${valuesPath}.${attributeKey}.${valueFieldName}`
-          };
+            const props = {
+              className: "col-sm-6",
+              key: attributeKey,
+              label: attribute.name ?? attributeKey,
+              name: `${valuesPath}.${attributeKey}.${valueFieldName}`
+            };
 
-          if (
-            attribute.managedAttributeType === "STRING" &&
-            attribute.acceptedValues?.length
-          ) {
-            return (
-              <SelectField
-                {...props}
-                options={[
-                  { label: `<${formatMessage("none")}>`, value: "" },
-                  ...attribute.acceptedValues.map(value => ({
-                    label: value,
-                    value
-                  }))
-                ]}
-              />
-            );
-          } else if (attribute.managedAttributeType === "INTEGER") {
-            return <NumberField {...props} />;
-          } else {
-            return (
-              <TextField
-                {...props}
-                inputProps={{ type: "search" }} // Adds the 'X' clear button in the text input.
-              />
-            );
-          }
-        })}
+            if (
+              attribute.managedAttributeType === "STRING" &&
+              attribute.acceptedValues?.length
+            ) {
+              return (
+                <SelectField
+                  {...props}
+                  options={[
+                    { label: `<${formatMessage("none")}>`, value: "" },
+                    ...attribute.acceptedValues.map(value => ({
+                      label: value,
+                      value
+                    }))
+                  ]}
+                />
+              );
+            } else if (attribute.managedAttributeType === "INTEGER") {
+              return <NumberField {...props} />;
+            } else {
+              return (
+                <TextField
+                  {...props}
+                  inputProps={{ type: "search" }} // Adds the 'X' clear button in the text input.
+                />
+              );
+            }
+          })}
+        </div>
       </div>
     </div>
   );

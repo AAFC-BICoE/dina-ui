@@ -1,4 +1,10 @@
-import { useQuery } from "common-ui";
+import {
+  DinaForm,
+  DinaFormSection,
+  FieldView,
+  FieldWrapper,
+  useQuery
+} from "common-ui";
 import { KitsuResource } from "kitsu";
 import { toPairs } from "lodash";
 import ReactTable from "react-table";
@@ -23,46 +29,43 @@ export function ManagedAttributesViewer({
   managedAttributeApiPath
 }: ManagedAttributesViewerProps) {
   const managedAttributeValues = values
-    ? toPairs(values).map(([key, mav]) => ({ key, ...mav }))
+    ? toPairs(values).map(([key, mav]) => ({
+        key,
+        value: mav.value || mav.assignedValue
+      }))
     : [];
 
   return (
-    <ReactTable
-      className="-striped"
-      columns={[
-        {
-          Cell: ({ original: { key, name } }) => (
-            <strong>
-              {name ?? (
-                <ManagedAttributeName
-                  managedAttributeApiPath={managedAttributeApiPath}
-                  managedAttributeKey={key}
-                />
-              )}
-            </strong>
-          ),
-          Header: <DinaMessage id="attributeLabel" />,
-          accessor: row => row.name ?? row.key,
-          id: "name"
-        },
-        {
-          Header: <DinaMessage id="managedAttributeValueLabel" />,
-          accessor: row => row.value ?? row.assignedValue,
-          id: "value"
-        }
-      ]}
-      data={managedAttributeValues}
-      pageSize={managedAttributeValues.length || 1}
-      showPagination={false}
-    />
+    <DinaForm initialValues={managedAttributeValues} readOnly={true}>
+      <div className="row">
+        {managedAttributeValues.map((mav, index) => (
+          <FieldView
+            key={mav.key}
+            className="col-6"
+            label={
+              <ManagedAttributeName
+                managedAttributeApiPath={managedAttributeApiPath}
+                managedAttributeKey={mav.key}
+              />
+            }
+            name={`${index}.value`}
+          />
+        ))}
+      </div>
+    </DinaForm>
   );
+}
+
+export interface ManagedAttributeNameProps {
+  managedAttributeKey: string;
+  managedAttributeApiPath: (key: string) => string;
 }
 
 /** Render the name of a ManagedAttribute. */
 export function ManagedAttributeName({
   managedAttributeKey,
   managedAttributeApiPath
-}) {
+}: ManagedAttributeNameProps) {
   const { response } = useQuery<KitsuResource & { name: string }>({
     path: managedAttributeApiPath(managedAttributeKey)
   });
