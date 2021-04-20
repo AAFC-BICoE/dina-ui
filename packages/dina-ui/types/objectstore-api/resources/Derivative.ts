@@ -1,4 +1,5 @@
 import { KitsuResource } from "kitsu";
+import { Metadata } from "./Metadata";
 
 export interface DerivativeAttributes {
   type: "derivative";
@@ -16,7 +17,7 @@ export interface DerivativeAttributes {
 
 export interface DerivativeRelationships {
   generatedFromDerivative?: Derivative | KitsuResource | null;
-  acDerivedFrom?: Derivative | KitsuResource | null;
+  acDerivedFrom?: Metadata | KitsuResource | null;
 }
 
 export type Derivative = KitsuResource &
