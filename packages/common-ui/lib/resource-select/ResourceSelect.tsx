@@ -103,10 +103,18 @@ export function ResourceSelect<TData extends KitsuResource>({
     );
 
     // Send the API request.
-    const { data } = await apiClient.get<TData[]>(model, getParams);
+    const response = await apiClient.get<TData[]>(model, getParams);
+
+    if (!response) {
+      // This warning may appear in tests where apiClient.get hasn't been mocked:
+      console.warn("No response returned from apiClient.get for query: ", {
+        path: model,
+        ...getParams
+      });
+    }
 
     // Build the list of options from the returned resources.
-    const resourceOptions = data.map(resource => ({
+    const resourceOptions = response.data.map(resource => ({
       label: optionLabel(resource),
       resource,
       value: resource.id

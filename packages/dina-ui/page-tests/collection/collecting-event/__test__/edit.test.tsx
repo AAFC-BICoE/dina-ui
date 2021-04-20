@@ -44,6 +44,12 @@ const mockGet = jest.fn(async model => {
     return { data: [TEST_SRS] };
   } else if (model === "collection-api/coordinate-system") {
     return { data: [TEST_COORDINATES] };
+  } else if (model === "user-api/group") {
+    return { data: [] };
+  } else if (model === "collection-api/collecting-event") {
+    return { data: [] };
+  } else if (model === "collection-api/managed-attribute") {
+    return { data: [] };
   }
 });
 
@@ -80,6 +86,8 @@ const mockBulkGet = jest.fn(async paths => {
       georeferencedBy: [{ id: "1", type: "agent" }]
     }));
   }
+
+  console.warn("No mock value for bulkGet paths: ", paths);
 });
 
 const apiContext: any = {
@@ -328,7 +336,7 @@ describe("collecting-event edit page", () => {
     expect(mockPatch.mock.calls[1][0]).toBe("/collection-api/operations");
   });
 
-  it("Renders an error after form submit if one is returned from the back-end.", async done => {
+  it("Renders an error after form submit if one is returned from the back-end.", async () => {
     // The patch request will return an error.
     mockPatch.mockImplementationOnce(() => ({
       data: [
@@ -363,14 +371,12 @@ describe("collecting-event edit page", () => {
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-        "Constraint violation: Start event datetime should not be blank"
-      );
-      expect(mockPush).toBeCalledTimes(0);
-      done();
-    });
+    await new Promise(setImmediate);
+    wrapper.update();
+    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
+      "Constraint violation: Start event datetime should not be blank"
+    );
+    expect(mockPush).toBeCalledTimes(0);
   });
 });
 
