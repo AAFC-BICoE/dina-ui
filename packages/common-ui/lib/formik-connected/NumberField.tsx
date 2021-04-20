@@ -8,11 +8,12 @@ export interface NumberFieldProps extends LabelWrapperParams {
 
   /** Extra validation to prevent invalid numbers being written. */
   isAllowed?: (values: NumberFormatValues) => boolean;
+  onChangeExternal?: (name, value) => void;
 }
 
 /** Input field that only accepts a number. */
 export function NumberField(props: NumberFieldProps) {
-  const { name, readOnly } = props;
+  const { name, readOnly, onChangeExternal } = props;
 
   return (
     <FieldWrapper {...props}>
@@ -22,11 +23,10 @@ export function NumberField(props: NumberFieldProps) {
           form: { setFieldValue, setFieldTouched }
         }: FieldProps) => {
           function onValueChange({ floatValue }: NumberFormatValues) {
-            setFieldValue(
-              name,
-              typeof floatValue === "number" ? floatValue : null
-            );
+            const numValue = typeof floatValue === "number" ? floatValue : null;
+            setFieldValue(name, numValue);
             setFieldTouched(name);
+            onChangeExternal?.(name, numValue);
           }
 
           return (
