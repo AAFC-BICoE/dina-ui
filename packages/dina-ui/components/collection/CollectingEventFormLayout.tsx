@@ -8,7 +8,8 @@ import {
   NominatumApiSearchResult,
   ResourceSelectField,
   TextField,
-  useDinaFormContext
+  useDinaFormContext,
+  TextFieldWithRemoveButton
 } from "common-ui";
 import { Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
@@ -466,7 +467,7 @@ export function CollectingEventFormLayout({
                   {({ field: { value: detail } }) =>
                     detail ? (
                       <div>
-                        <TextField name="geographicPlaceName" readOnly={true} />
+                        <TextFieldWithRemoveButton name="geographicPlaceName" readOnly={true} />
                         <TextField name="dwcStateProvince" readOnly={true} />
                         <TextField name="dwcCountry" readOnly={true} />
                         <div className="row">
