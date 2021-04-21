@@ -57,6 +57,14 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
 
     const response = await apiClient.get<TData, TMeta>(path, getParams);
 
+    if (!response) {
+      // This warning may appear in tests where apiClient.get hasn't been mocked:
+      console.warn(
+        "No response returned from apiClient.get for query: ",
+        querySpec
+      );
+    }
+
     if (onSuccess) {
       await onSuccess(response);
     }
