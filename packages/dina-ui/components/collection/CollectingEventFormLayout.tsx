@@ -255,7 +255,7 @@ export function CollectingEventFormLayout({
           </legend>
           <div className="row">
             <div className="col-md-6">
-              <TextFieldWithCoordButtons name="dwcVerbatimLocality" />
+              <TextField name="dwcVerbatimLocality" />
               <AutoSuggestTextField<CoordinateSystem>
                 name="dwcVerbatimCoordinateSystem"
                 configQuery={() => ({
