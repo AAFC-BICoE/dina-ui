@@ -1,6 +1,5 @@
 import { ComponentType } from "react";
 import { CellInfo } from "react-table";
-import { METADATA_REVISION_ROW_CONFIG } from "./revision-row-configs/metadata-revision-row-config";
 
 // Custom Revision table row rendering per type
 
