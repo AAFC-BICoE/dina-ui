@@ -39,8 +39,16 @@ import { SRS } from "../../types/collection-api/resources/SRS";
 import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 
+interface CollectingEventFormLayoutProps {
+  setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
+  setDefaultVerbatimSRS?: (newValue: string | undefined | null) => void;
+}
+
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
-export function CollectingEventFormLayout() {
+export function CollectingEventFormLayout({
+  setDefaultVerbatimCoordSys,
+  setDefaultVerbatimSRS
+}: CollectingEventFormLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [rangeEnabled, setRangeEnabled] = useState(false);
@@ -130,6 +138,26 @@ export function CollectingEventFormLayout() {
       : formik.setFieldValue("dwcVerbatimCoordinates", null);
   }
 
+  const onChangeExternal = (form, name, value) => {
+    if (name === "dwcVerbatimCoordinateSystem") {
+      setDefaultVerbatimCoordSys?.(value);
+      /*When user enter other values instead of selecting from existing config,
+      correctly setting the placeHolder for verbatim coordinates */
+      if (
+        value !== CoordinateSystemEnum.DECIMAL_DEGREE &&
+        value !== CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES &&
+        value !== CoordinateSystemEnum.DEGREE_MINUTES_SECONDS &&
+        value !== CoordinateSystemEnum.UTM
+      ) {
+        form.values.dwcVerbatimCoordinates === null
+          ? form.setFieldValue("dwcVerbatimCoordinates", "")
+          : form.setFieldValue("dwcVerbatimCoordinates", null);
+      }
+    } else if (name === "dwcVerbatimSRS") {
+      setDefaultVerbatimSRS?.(value);
+    }
+  };
+
   return (
     <div>
       <DinaFormSection horizontal={[3, 9]}>
@@ -217,7 +245,7 @@ export function CollectingEventFormLayout() {
         <FieldSet legend={<DinaMessage id="verbatimCoordinatesLegend" />}>
           <div className="row">
             <div className="col-md-6">
-              <TextFieldWithCoordButtons name="dwcVerbatimLocality" />
+              <TextField name="dwcVerbatimLocality" />
               <AutoSuggestTextField<CoordinateSystem>
                 name="dwcVerbatimCoordinateSystem"
                 configQuery={() => ({
@@ -226,88 +254,91 @@ export function CollectingEventFormLayout() {
                 configSuggestion={src => src?.coordinateSystem ?? []}
                 shouldRenderSuggestions={shouldRenderSuggestions}
                 onSuggestionSelected={onSuggestionSelected}
+                onChangeExternal={onChangeExternal}
               />
               <Field name="dwcVerbatimCoordinateSystem">
-                {({ field: { value: coordSysSelected } }) => (
-                  <>
-                    <TextField
-                      name="dwcVerbatimCoordinates"
-                      placeholder={
-                        coordSysSelected === CoordinateSystemEnum.UTM
-                          ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
-                          : ""
-                      }
-                    />
-                    <TextFieldWithCoordButtons
-                      name="dwcVerbatimLatitude"
-                      placeholder={
-                        coordSysSelected !== CoordinateSystemEnum.UTM
-                          ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
-                          : null
-                      }
-                      isExternallyControlled={true}
-                      shouldShowDegree={
-                        coordSysSelected ===
-                          CoordinateSystemEnum.DECIMAL_DEGREE ||
-                        coordSysSelected ===
-                          CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
-                        coordSysSelected ===
-                          CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
-                      }
-                      shouldShowMinute={
-                        coordSysSelected ===
-                          CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
-                        coordSysSelected ===
-                          CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
-                      }
-                      shouldShowSecond={
-                        coordSysSelected ===
-                        CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
-                      }
-                    />
-                    <TextFieldWithCoordButtons
-                      name="dwcVerbatimLongitude"
-                      placeholder={
-                        coordSysSelected !== CoordinateSystemEnum.UTM
-                          ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
-                          : null
-                      }
-                      isExternallyControlled={true}
-                      shouldShowDegree={
-                        coordSysSelected ===
-                          CoordinateSystemEnum.DECIMAL_DEGREE ||
-                        coordSysSelected ===
-                          CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
-                        coordSysSelected ===
-                          CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
-                      }
-                      shouldShowMinute={
-                        coordSysSelected ===
-                          CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES ||
-                        coordSysSelected ===
-                          CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
-                      }
-                      shouldShowSecond={
-                        coordSysSelected ===
-                        CoordinateSystemEnum.DEGREE_MINUTES_SECONDS
-                      }
-                    />
-                  </>
-                )}
+                {({ field: { value: coordSysSelected } }) => {
+                  /* note need to consider there is also possible user enter their own verbatime coordsys
+                    and not select any one from the dropdown*/
+                  const hasDegree =
+                    coordSysSelected === CoordinateSystemEnum.DECIMAL_DEGREE;
+
+                  const hasMinute =
+                    coordSysSelected ===
+                    CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES;
+
+                  const hasSecond =
+                    coordSysSelected ===
+                    CoordinateSystemEnum.DEGREE_MINUTES_SECONDS;
+
+                  const isUTM = coordSysSelected === CoordinateSystemEnum.UTM;
+
+                  return (
+                    <>
+                      <TextField
+                        name="dwcVerbatimCoordinates"
+                        placeholder={
+                          isUTM
+                            ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
+                            : null
+                        }
+                        className={
+                          !hasDegree && !hasMinute && !hasSecond ? "" : "d-none"
+                        }
+                      />
+                      <TextFieldWithCoordButtons
+                        name="dwcVerbatimLatitude"
+                        placeholder={
+                          hasDegree || hasMinute || hasSecond
+                            ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
+                            : null
+                        }
+                        isExternallyControlled={true}
+                        shouldShowDegree={hasDegree || hasMinute || hasSecond}
+                        shouldShowMinute={hasMinute || hasSecond}
+                        shouldShowSecond={hasSecond}
+                        className={
+                          hasDegree || hasMinute || hasSecond ? "" : "d-none"
+                        }
+                      />
+                      <TextFieldWithCoordButtons
+                        name="dwcVerbatimLongitude"
+                        placeholder={
+                          hasDegree || hasMinute || hasSecond
+                            ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
+                            : null
+                        }
+                        isExternallyControlled={true}
+                        shouldShowDegree={hasDegree || hasMinute || hasSecond}
+                        shouldShowMinute={hasMinute || hasSecond}
+                        shouldShowSecond={hasSecond}
+                        className={
+                          hasDegree || hasMinute || hasSecond ? "" : "d-none"
+                        }
+                      />
+                      <div
+                        className={
+                          hasDegree || hasMinute || hasSecond
+                            ? "form-group"
+                            : "d-none"
+                        }
+                      >
+                        <SetCoordinatesFromVerbatimButton
+                          sourceLatField="dwcVerbatimLatitude"
+                          sourceLonField="dwcVerbatimLongitude"
+                          targetLatField={`geoReferenceAssertions[${activeTabIdx}].dwcDecimalLatitude`}
+                          targetLonField={`geoReferenceAssertions[${activeTabIdx}].dwcDecimalLongitude`}
+                          onClick={({ lat, lon }) =>
+                            setGeoSearchValue(`${lat}, ${lon}`)
+                          }
+                        >
+                          <DinaMessage id="latLongAutoSetterButton" />
+                        </SetCoordinatesFromVerbatimButton>
+                      </div>
+                    </>
+                  );
+                }}
               </Field>
-              <div className="form-group">
-                <SetCoordinatesFromVerbatimButton
-                  sourceLatField="dwcVerbatimLatitude"
-                  sourceLonField="dwcVerbatimLongitude"
-                  targetLatField={`geoReferenceAssertions[${activeTabIdx}].dwcDecimalLatitude`}
-                  targetLonField={`geoReferenceAssertions[${activeTabIdx}].dwcDecimalLongitude`}
-                  onClick={({ lat, lon }) =>
-                    setGeoSearchValue(`${lat}, ${lon}`)
-                  }
-                >
-                  <DinaMessage id="latLongAutoSetterButton" />
-                </SetCoordinatesFromVerbatimButton>
-              </div>
             </div>
             <div className="col-md-6">
               <AutoSuggestTextField<SRS>
@@ -317,6 +348,7 @@ export function CollectingEventFormLayout() {
                 })}
                 configSuggestion={src => src?.srs ?? []}
                 shouldRenderSuggestions={shouldRenderSuggestions}
+                onChangeExternal={onChangeExternal}
               />
               <TextField name="dwcVerbatimElevation" />
               <TextField name="dwcVerbatimDepth" />

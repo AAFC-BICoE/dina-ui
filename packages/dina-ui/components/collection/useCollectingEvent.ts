@@ -11,6 +11,10 @@ import { CoordinateSystemEnum } from "../../types/collection-api/resources/Coord
 import { SRSEnum } from "../../types/collection-api/resources/SRS";
 import { Metadata, Person } from "../../types/objectstore-api";
 import { useAttachmentsModal } from "../object-store";
+import { useLocalStorage } from "@rehooks/local-storage";
+
+export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
+export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
 
 export function useCollectingEventQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -93,6 +97,14 @@ export function useCollectingEventSave(
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
+  const [defaultVerbatimCoordSys, setDefaultVerbatimCoordSys] = useLocalStorage<
+    string | null | undefined
+  >(DEFAULT_VERBATIM_COORDSYS_KEY);
+
+  const [defaultVerbatimSRS, setDefaultVerbatimSRS] = useLocalStorage<
+    string | null | undefined
+  >(DEFAULT_VERBATIM_SRS_KEY);
+
   const collectingEventInitialValues = fetchedCollectingEvent
     ? {
         ...fetchedCollectingEvent,
@@ -109,8 +121,9 @@ export function useCollectingEventSave(
         collectors: [],
         collectorGroups: [],
         geoReferenceAssertions: [{}],
-        dwcVerbatimCoordinateSystem: CoordinateSystemEnum.DECIMAL_DEGREE,
-        dwcVerbatimSRS: SRSEnum.WGS84
+        dwcVerbatimCoordinateSystem:
+          defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
+        dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84
       };
 
   // The selected Metadatas to be attached to this Collecting Event:

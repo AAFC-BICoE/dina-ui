@@ -1,3 +1,4 @@
+import { useLocalStorage } from "@rehooks/local-storage";
 import {
   BackButton,
   ButtonBar,
@@ -11,6 +12,8 @@ import { useRouter } from "next/router";
 import { Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import {
+  DEFAULT_VERBATIM_COORDSYS_KEY,
+  DEFAULT_VERBATIM_SRS_KEY,
   useCollectingEventQuery,
   useCollectingEventSave
 } from "../../../components/collection/useCollectingEvent";
@@ -68,6 +71,14 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     saveCollectingEvent
   } = useCollectingEventSave(collectingEvent);
 
+  const [defaultVerbatimCoordSys, setDefaultVerbatimCoordSys] = useLocalStorage<
+    string | null | undefined
+  >(DEFAULT_VERBATIM_COORDSYS_KEY);
+
+  const [defaultVerbatimSRS, setDefaultVerbatimSRS] = useLocalStorage<
+    string | null | undefined
+  >(DEFAULT_VERBATIM_SRS_KEY);
+
   const onSubmit: DinaFormOnSubmit = async ({ submittedValues, formik }) => {
     const savedCollectingEvent = await saveCollectingEvent(
       submittedValues,
@@ -95,7 +106,10 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
       enableReinitialize={true}
     >
       {buttonBar}
-      <CollectingEventFormLayout />
+      <CollectingEventFormLayout
+        setDefaultVerbatimCoordSys={setDefaultVerbatimCoordSys}
+        setDefaultVerbatimSRS={setDefaultVerbatimSRS}
+      />
       <div className="form-group">{attachedMetadatasUI}</div>
       {buttonBar}
     </DinaForm>

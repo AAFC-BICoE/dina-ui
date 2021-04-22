@@ -1,3 +1,4 @@
+import { FormikProps } from "formik";
 import NumberFormat, { NumberFormatValues } from "react-number-format";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
@@ -6,7 +7,11 @@ export interface NumberFieldProps extends LabelWrapperParams {
 
   /** Extra validation to prevent invalid numbers being written. */
   isAllowed?: (values: NumberFormatValues) => boolean;
-  onChangeExternal?: (name, value) => void;
+  onChangeExternal?: (
+    form: FormikProps<any>,
+    name: string,
+    value: number | null
+  ) => void;
 }
 
 /** Input field that only accepts a number. */
@@ -14,11 +19,11 @@ export function NumberField(props: NumberFieldProps) {
   const { name, readOnly, onChangeExternal } = props;
   return (
     <FieldWrapper {...props}>
-      {({ setValue, value }) => {
+      {({ formik, setValue, value }) => {
         function onValueChange({ floatValue }: NumberFormatValues) {
           const numValue = typeof floatValue === "number" ? floatValue : null;
           setValue(numValue);
-          onChangeExternal?.(name, numValue);
+          onChangeExternal?.(formik, name, numValue);
         }
 
         const numberFormatValue =

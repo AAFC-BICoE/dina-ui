@@ -1,3 +1,4 @@
+import { FormikProps } from "formik";
 import { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
@@ -9,7 +10,11 @@ export interface TextFieldProps extends LabelWrapperParams {
   placeholder?: string;
 
   customInput?: (inputProps: InputHTMLAttributes<any>) => JSX.Element;
-  onChangeExternal?: (name, value) => void;
+  onChangeExternal?: (
+    form: FormikProps<any>,
+    name: string,
+    value: string | null
+  ) => void;
 }
 
 /**
@@ -30,10 +35,10 @@ export function TextField(props: TextFieldProps) {
 
   return (
     <FieldWrapper {...labelWrapperProps}>
-      {({ setValue, value }) => {
+      {({ formik, setValue, value }) => {
         function onChangeInternal(newValue: string) {
           setValue(newValue);
-          onChangeExternal?.(props.name, newValue);
+          onChangeExternal?.(formik, props.name, newValue);
         }
 
         const inputPropsInternal: InputHTMLAttributes<any> = {
