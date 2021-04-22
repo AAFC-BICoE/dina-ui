@@ -467,7 +467,24 @@ export function CollectingEventFormLayout({
                   {({ field: { value: detail } }) =>
                     detail ? (
                       <div>
-                        <TextFieldWithRemoveButton name="geographicPlaceName" readOnly={true} />
+                        <div className="m-3">
+                          <div className="d-flex form-group ">
+                            <label className="p-2 flex-fill">
+                              <strong>
+                                <DinaMessage id="locationLabel" />
+                              </strong>
+                            </label>
+                            <input className="p-2 form-control flex-fill" />                         
+                            <button
+                              className="mb-2 btn btn-primary"
+                              type="button"
+                            >
+                              <DinaMessage id="addCustomPlaceName" />
+                            </button>                            
+                          </div>
+                          </div>
+                        <TextFieldWithRemoveButton name="geographicPlaceName" readOnly={false} 
+                        />
                         <TextField name="dwcStateProvince" readOnly={true} />
                         <TextField name="dwcCountry" readOnly={true} />
                         <div className="row">

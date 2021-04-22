@@ -1,13 +1,14 @@
 /**
  * English Object Store messages. A message must be set here in English before other languages.
  */
-export const DINAUI_MESSAGES_ENGLISH = {
+export const DINAUI_MESSAGES_ENGLISH = {  
   addAnotherAssertion: "Add Another GeoReference",
   addAssertion: "Add GeoReference",
   addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
   addCollectingEventTitle: "Add Collecting Event",
   addCollectorGroupTitle: "Add Collector Group",
+  addCustomPlaceName: "Add",
   addFilesButton: "Add Files",
   addManagedAttributeButtonText: "Add New Managed Attribute",
   addNewPerson: "Add New Person",
