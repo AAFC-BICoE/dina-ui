@@ -20,11 +20,11 @@ export function TextFieldWithRemoveButton(props: TextFieldProps) {
           <input {...inputProps} type="text" />
           <div className="input-group-append">
             <button
+              className="btn btn-danger self-remove-button" aria-label="Close"
               onClick={() => removeEntry(inputProps.onChange)}
-              className="btn btn-danger self-remove-button"
               type="button"
             >
-              {"x"}
+              <span aria-hidden="true">&times;</span>
             </button>
           </div>
         </div>
