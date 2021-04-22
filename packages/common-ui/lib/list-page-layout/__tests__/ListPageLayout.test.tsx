@@ -49,7 +49,7 @@ describe("ListPageLayout component", () => {
     expect(mockGet).lastCalledWith(
       expect.anything(),
       expect.objectContaining({
-        filter: { rsql: "" }
+        filter: {}
       })
     );
   });

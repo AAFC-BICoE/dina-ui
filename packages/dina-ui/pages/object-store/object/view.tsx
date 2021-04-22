@@ -1,24 +1,21 @@
 import {
-  ApiClientContext,
   BackToListButton,
   ButtonBar,
   DeleteButton,
-  LoadingSpinner,
-  useQuery
+  LoadingSpinner
 } from "common-ui";
-import { KitsuResponse } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ObjectUpload } from "packages/dina-ui/types/objectstore-api/resources/ObjectUpload";
 import { Footer, Head, Nav } from "../../../components";
 import {
   ExifView,
   FileView,
-  MetadataDetails
+  MetadataDetails,
+  useMetadataQuery
 } from "../../../components/object-store";
+import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
-import { useContext, useState } from "react";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -28,48 +25,11 @@ const OBJECT_DETAILS_PAGE_CSS = `
 `;
 
 export default function MetadataViewPage() {
-  const { apiClient } = useContext(ApiClientContext);
-  const [objectUpload, setObjectUpload] = useState<ObjectUpload>();
   const router = useRouter();
 
-  const id = router.query.id as string;
+  const id = String(router.query.id);
 
-  const getObjetUpload = async (
-    mydata: KitsuResponse<Metadata, ObjectUpload>
-  ) => {
-    const objectUploadResp = await apiClient.get<ObjectUpload>(
-      "objectstore-api/object-upload",
-      {
-        filter: { fileIdentifier: `${mydata?.data.fileIdentifier}` }
-      }
-    );
-
-    setObjectUpload(objectUploadResp?.data[0]);
-  };
-
-  const { loading, response } = useQuery<Metadata, ObjectUpload>(
-    {
-      include: "managedAttributeMap,acMetadataCreator,dcCreator",
-      path: `objectstore-api/metadata/${id}`
-    },
-    {
-      joinSpecs: [
-        {
-          apiBaseUrl: "/agent-api",
-          idField: "acMetadataCreator",
-          joinField: "acMetadataCreator",
-          path: metadata => `person/${metadata.acMetadataCreator.id}`
-        },
-        {
-          apiBaseUrl: "/agent-api",
-          idField: "dcCreator",
-          joinField: "dcCreator",
-          path: metadata => `person/${metadata.dcCreator.id}`
-        }
-      ],
-      onSuccess: getObjetUpload
-    }
-  );
+  const { loading, response } = useMetadataQuery(id);
 
   if (loading) {
     return <LoadingSpinner loading={true} />;
@@ -77,17 +37,6 @@ export default function MetadataViewPage() {
 
   if (response) {
     const metadata = response.data;
-
-    const fileId =
-      metadata.acSubType === "THUMBNAIL"
-        ? `${metadata.fileIdentifier}/thumbnail`
-        : metadata.fileIdentifier;
-
-    const filePath = `/api/objectstore-api/file/${metadata.bucket}/${fileId}`;
-    // fileExtension should always be available when getting the Metadata from the back-end:
-    const fileType = (metadata.fileExtension as string)
-      .replace(/\./, "")
-      .toLowerCase();
 
     return (
       <div>
@@ -117,11 +66,7 @@ export default function MetadataViewPage() {
         <main className="container-fluid">
           <div className="row">
             <div className="col-md-4">
-              <FileView
-                clickToDownload={true}
-                filePath={filePath}
-                fileType={fileType}
-              />
+              <MetadataFileView metadata={metadata} />
             </div>
             <div className="col-md-8">
               <div className="container">
@@ -135,7 +80,7 @@ export default function MetadataViewPage() {
                   </Link>
                 </div>
                 <MetadataDetails metadata={metadata} />
-                <ExifView objectUpload={objectUpload as ObjectUpload} />
+                <ExifView objectUpload={metadata.objectUpload} />
               </div>
             </div>
           </div>

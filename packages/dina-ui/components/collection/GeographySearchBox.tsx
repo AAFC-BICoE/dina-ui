@@ -123,7 +123,7 @@ export function GeographySearchBox({
           <Tooltip id="geographySearchBoxTooltip" />
         </label>
         <div className="flex-grow-1">
-          <InputWithCoordButtons
+          <input
             className="form-control"
             onChange={e => onInputChange(e.target.value)}
             onFocus={e => e.target.select()}
