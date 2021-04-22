@@ -320,6 +320,12 @@ function CollectingEventForm({
     const geoReferenceAssertionsToSave = submittedValues.geoReferenceAssertions;
     delete submittedValues.geoReferenceAssertions;
 
+    // Convert custom placename to geographic name
+    if (submittedValues.customPlaceName) {
+      submittedValues.geographicPlaceName = submittedValues.customPlaceName;
+      delete submittedValues.customPlaceName;
+    }
+
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [
         {

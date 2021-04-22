@@ -20,7 +20,8 @@ export function TextFieldWithRemoveButton(props: TextFieldProps) {
           <input {...inputProps} type="text" />
           <div className="input-group-append">
             <button
-              className="btn btn-danger self-remove-button" aria-label="Close"
+              className="btn btn-danger self-remove-button"
+              aria-label="Close"
               onClick={() => removeEntry(inputProps.onChange)}
               type="button"
             >

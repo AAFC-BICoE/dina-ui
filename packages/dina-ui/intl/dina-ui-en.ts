@@ -40,6 +40,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectorGroupNameLabel: "Collector Group Name",
   collectorGroupViewTitle: "View Collector Group",
   coordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",
+  customPlaceName: "Custom Place Name",
   decimalLatLong: "Decimal Lat/Long",
   decimalLatitude: "Decimal Latitude",
   decimalLongitude: "Decimal Longitude",

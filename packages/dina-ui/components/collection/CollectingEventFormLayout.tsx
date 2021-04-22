@@ -57,6 +57,9 @@ export function CollectingEventFormLayout({
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
+  const [customPlaceValue, setCustomPlaceValue] = useState<string>("");
+  const [displayCustomPlace, setDisplayCustomPlace] = useState(false);
+
   function toggleRangeEnabled(
     newValue: boolean,
     formik: FormikContextType<{}>
@@ -104,6 +107,8 @@ export function CollectingEventFormLayout({
     // reset the source fields when user remove the place
     formik.setFieldValue("geographicPlaceNameSourceDetail", null);
     formik.setFieldValue("geographicPlaceNameSource", null);
+
+    setDisplayCustomPlace(false);
   }
 
   /** Does a Places search using the given search string. */
@@ -155,6 +160,11 @@ export function CollectingEventFormLayout({
     } else if (name === "dwcVerbatimSRS") {
       setDefaultVerbatimSRS?.(value);
     }
+  };
+
+  const setCustomPlaceName = form => {
+    form.values.customPlaceName = customPlaceValue;
+    setDisplayCustomPlace(true);
   };
 
   return (
@@ -464,31 +474,61 @@ export function CollectingEventFormLayout({
                 }}
               >
                 <Field name="geographicPlaceNameSourceDetail">
-                  {({ field: { value: detail } }) =>
+                  {({ field: { value: detail }, form }) =>
                     detail ? (
                       <div>
-                        <div className="m-3">
-                          <div className="d-flex form-group ">
-                            <label className="p-2 flex-fill">
-                              <strong>
-                                <DinaMessage id="locationLabel" />
-                              </strong>
-                            </label>
-                            <input className="p-2 form-control flex-fill" />
-                            <button
-                              className="mb-2 btn btn-primary"
-                              type="button"
-                            >
-                              <DinaMessage id="addCustomPlaceName" />
-                            </button>
+                        {!displayCustomPlace && !readOnly && (
+                          <div className="m-3">
+                            <div className="d-flex flex-row">
+                              <label
+                                className="p-2"
+                                style={{ marginLeft: -20 }}
+                              >
+                                <strong>
+                                  <DinaMessage id="customPlaceName" />
+                                </strong>
+                              </label>
+                              <input
+                                className="p-2 form-control"
+                                style={{ width: "60%" }}
+                                onChange={e =>
+                                  setCustomPlaceValue(e.target.value)
+                                }
+                                onKeyDown={e => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    if (customPlaceValue?.length > 0) {
+                                      setCustomPlaceName(form);
+                                    }
+                                  }
+                                }}
+                              />
+                              <button
+                                className="mb-2 btn btn-primary"
+                                type="button"
+                                onClick={() => setCustomPlaceName(form)}
+                              >
+                                <DinaMessage id="addCustomPlaceName" />
+                              </button>
+                            </div>
                           </div>
-                        </div>
+                        )}
+                        {displayCustomPlace && (
+                          <TextFieldWithRemoveButton
+                            name="customPlaceName"
+                            readOnly={true}
+                            hideLabel={true}
+                          />
+                        )}
                         <TextFieldWithRemoveButton
                           name="geographicPlaceName"
-                          readOnly={false}
+                          readOnly={true}
+                          hideLabel={true}
                         />
-                        <TextField name="dwcStateProvince" readOnly={true} />
-                        <TextField name="dwcCountry" readOnly={true} />
+                        <DinaFormSection horizontal={[3, 9]}>
+                          <TextField name="dwcStateProvince" readOnly={true} />
+                          <TextField name="dwcCountry" readOnly={true} />
+                        </DinaFormSection>
                         <div className="row">
                           {!readOnly && (
                             <div className="col-md-4">
