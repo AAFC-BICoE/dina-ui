@@ -140,7 +140,7 @@ const Home: React.FunctionComponent = () => (
             </a>
           </Link>
         </li>
-        <li>
+        <li className="d-none">
           <Link href="/collection/catalogued-object/list">
             <a>
               <DinaMessage id="cataloguedObjectListTitle" />
