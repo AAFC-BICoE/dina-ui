@@ -474,16 +474,18 @@ export function CollectingEventFormLayout({
                                 <DinaMessage id="locationLabel" />
                               </strong>
                             </label>
-                            <input className="p-2 form-control flex-fill" />                         
+                            <input className="p-2 form-control flex-fill" />
                             <button
                               className="mb-2 btn btn-primary"
                               type="button"
                             >
                               <DinaMessage id="addCustomPlaceName" />
-                            </button>                            
+                            </button>
                           </div>
-                          </div>
-                        <TextFieldWithRemoveButton name="geographicPlaceName" readOnly={false} 
+                        </div>
+                        <TextFieldWithRemoveButton
+                          name="geographicPlaceName"
+                          readOnly={false}
                         />
                         <TextField name="dwcStateProvince" readOnly={true} />
                         <TextField name="dwcCountry" readOnly={true} />
