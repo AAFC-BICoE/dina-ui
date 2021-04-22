@@ -45,7 +45,7 @@ export function TextField(props: TextFieldProps) {
             placeholder,
             className: "form-control",
             onChange,
-            value: value || "",
+            value: value || initialValue || "",
             readOnly
           };
 

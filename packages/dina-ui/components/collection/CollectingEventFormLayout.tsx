@@ -513,20 +513,29 @@ export function CollectingEventFormLayout({
                             </div>
                           </div>
                         )}
-                        {displayCustomPlace && (
-                          <TextFieldWithRemoveButton
-                            name="customPlaceName"
-                            readOnly={true}
-                            hideLabel={true}
-                          />
-                        )}
-                        {form.values.geographicPlaceName?.length > 0 && (
-                          <TextFieldWithRemoveButton
-                            name="geographicPlaceName"
-                            readOnly={true}
-                            hideLabel={true}
-                          />
-                        )}
+                        {form.values.geographicPlaceName?.length > 0 &&
+                          form.values.geographicPlaceName
+                            .split(",")
+                            .map((place, idx) => (
+                              <ul key={idx} className="list-group">
+                                {displayCustomPlace && idx === 0 && (
+                                  <TextFieldWithRemoveButton
+                                    name="customPlaceName"
+                                    readOnly={true}
+                                    hideLabel={true}
+                                    className="list-group-item list-group-item-primary"
+                                  />
+                                )}
+                                <TextFieldWithRemoveButton
+                                  name={`placeName[` + idx + `]`}
+                                  readOnly={true}
+                                  initialValue={place}
+                                  hideLabel={true}
+                                  key={idx}
+                                  className="list-group-item list-group-item-primary"
+                                />
+                              </ul>
+                            ))}
                         <DinaFormSection horizontal={[3, 9]}>
                           <TextField name="dwcStateProvince" readOnly={true} />
                           <TextField name="dwcCountry" readOnly={true} />

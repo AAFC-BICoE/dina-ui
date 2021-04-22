@@ -38,6 +38,8 @@ export interface CollectingEventAttributes {
   geographicPlaceNameSource?: GeographicPlaceNameSource;
 
   customPlaceName?: string;
+
+  placeNames?: string[];
 }
 
 export enum GeographicPlaceNameSource {
