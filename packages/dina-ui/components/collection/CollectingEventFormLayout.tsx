@@ -520,11 +520,13 @@ export function CollectingEventFormLayout({
                             hideLabel={true}
                           />
                         )}
-                        <TextFieldWithRemoveButton
-                          name="geographicPlaceName"
-                          readOnly={true}
-                          hideLabel={true}
-                        />
+                        {form.values.geographicPlaceName?.length > 0 && (
+                          <TextFieldWithRemoveButton
+                            name="geographicPlaceName"
+                            readOnly={true}
+                            hideLabel={true}
+                          />
+                        )}
                         <DinaFormSection horizontal={[3, 9]}>
                           <TextField name="dwcStateProvince" readOnly={true} />
                           <TextField name="dwcCountry" readOnly={true} />

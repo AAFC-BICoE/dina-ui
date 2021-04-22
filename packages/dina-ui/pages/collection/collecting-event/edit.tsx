@@ -323,8 +323,8 @@ function CollectingEventForm({
     // Convert custom placename to geographic name
     if (submittedValues.customPlaceName) {
       submittedValues.geographicPlaceName = submittedValues.customPlaceName;
-      delete submittedValues.customPlaceName;
     }
+    delete submittedValues.customPlaceName;
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [
