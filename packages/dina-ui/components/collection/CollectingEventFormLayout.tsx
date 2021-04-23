@@ -249,17 +249,13 @@ export function CollectingEventFormLayout({
         <legend className="w-auto">
           <DinaMessage id="collectingLocationLegend" />
         </legend>
-        <div className="row">
-          <div className="col-md-6">
-            <TextFieldWithCoordButtons name="dwcVerbatimLocality" />
-          </div>
-        </div>
         <fieldset className="form-group border px-4 py-2">
           <legend className="w-auto">
-            <DinaMessage id="verbatimCoordinatesLegend" />
+            <DinaMessage id="verbatimLabelLegend" />
           </legend>
           <div className="row">
             <div className="col-md-6">
+              <TextFieldWithCoordButtons name="dwcVerbatimLocality" />
               <AutoSuggestTextField<CoordinateSystem>
                 name="dwcVerbatimCoordinateSystem"
                 configQuery={() => ({
