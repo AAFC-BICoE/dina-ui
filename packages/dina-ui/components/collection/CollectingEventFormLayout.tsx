@@ -251,7 +251,7 @@ export function CollectingEventFormLayout({
         </legend>
         <fieldset className="form-group border px-4 py-2">
           <legend className="w-auto">
-            <DinaMessage id="verbatimCoordinatesLegend" />
+            <DinaMessage id="verbatimLabelLegend" />
           </legend>
           <div className="row">
             <div className="col-md-6">
@@ -300,8 +300,8 @@ export function CollectingEventFormLayout({
                         name="dwcVerbatimLatitude"
                         placeholder={
                           hasDegree || hasMinute || hasSecond
-                            ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
-                            : null
+                            ? `${CoordinateSystemEnumPlaceHolder[coordSysSelected]}N`
+                            : undefined
                         }
                         isExternallyControlled={true}
                         shouldShowDegree={hasDegree || hasMinute || hasSecond}
@@ -315,8 +315,8 @@ export function CollectingEventFormLayout({
                         name="dwcVerbatimLongitude"
                         placeholder={
                           hasDegree || hasMinute || hasSecond
-                            ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
-                            : null
+                            ? `${CoordinateSystemEnumPlaceHolder[coordSysSelected]}E`
+                            : undefined
                         }
                         isExternallyControlled={true}
                         shouldShowDegree={hasDegree || hasMinute || hasSecond}
