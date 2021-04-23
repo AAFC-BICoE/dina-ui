@@ -14,7 +14,6 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
 import { Person } from "packages/dina-ui/types/agent-api/resources/Person";
-import { GeoReferenceAssertion } from "packages/dina-ui/types/collection-api/resources/GeoReferenceAssertion";
 import { useContext } from "react";
 import { Footer, Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
@@ -39,43 +38,21 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
       response.data.collectors = agents.filter(it => it);
     }
 
-    if (response?.data?.geoReferenceAssertions) {
-      // Retrieve georeferenceAssertion with georeferencedBy
-      const geoReferenceAssertions = await bulkGet<GeoReferenceAssertion>(
-        response?.data?.geoReferenceAssertions.map(
-          it => `/georeference-assertion/${it.id}?include=georeferencedBy`
-        ),
-        { apiBaseUrl: "/collection-api", returnNullForMissingResource: true }
-      );
-
+    const geoReferenceAssertions = response?.data?.geoReferenceAssertions;
+    if (geoReferenceAssertions) {
       // Retrieve georeferencedBy associated agents
-      let agentBulkGetArgs: string[];
-      agentBulkGetArgs = [];
-      geoReferenceAssertions.forEach(async assert => {
-        if (assert.georeferencedBy) {
-          agentBulkGetArgs = agentBulkGetArgs.concat(
-            assert.georeferencedBy.map(it => `/person/${it.id}`)
+      for (const assertion of geoReferenceAssertions) {
+        if (assertion.georeferencedBy) {
+          assertion.georeferencedBy = await bulkGet<Person>(
+            assertion.georeferencedBy.map(personId => `/person/${personId}`),
+            {
+              apiBaseUrl: "/agent-api",
+              returnNullForMissingResource: true
+            }
           );
         }
-      });
+      }
 
-      const agents = await bulkGet<Person>(agentBulkGetArgs, {
-        apiBaseUrl: "/agent-api",
-        returnNullForMissingResource: true
-      });
-
-      geoReferenceAssertions.forEach(assert => {
-        const refers = assert.georeferencedBy;
-        refers?.map(refer => {
-          const index = assert.georeferencedBy?.findIndex(
-            it => it.id === refer.id
-          );
-          const agent = agents.filter(it => it.id === refer.id)?.[0];
-          if (assert.georeferencedBy !== undefined && index !== undefined) {
-            assert.georeferencedBy[index] = agent;
-          }
-        });
-      });
       response.data.geoReferenceAssertions = geoReferenceAssertions;
     }
 
