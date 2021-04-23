@@ -116,7 +116,6 @@ export function CollectingEventFormLayout({
     formik.setFieldValue("geographicPlaceNameSourceDetail", null);
     formik.setFieldValue("geographicPlaceNameSource", null);
 
-    formik.setFieldValue("customPlaceName", null);
     formik.setFieldValue("placeNames", null);
     setCustomPlaceValue("");
     setDisplayCustomPlace(false);

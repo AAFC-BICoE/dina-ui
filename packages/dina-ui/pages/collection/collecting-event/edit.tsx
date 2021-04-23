@@ -320,11 +320,24 @@ function CollectingEventForm({
     const geoReferenceAssertionsToSave = submittedValues.geoReferenceAssertions;
     delete submittedValues.geoReferenceAssertions;
 
-    // Convert custom placename to geographic name
-    if (submittedValues.customPlaceName) {
-      submittedValues.geographicPlaceName = submittedValues.customPlaceName;
+    // Combine placeNames to geographic name
+    if (submittedValues.placeNames?.length > 0) {
+      const combinedPlaceName = submittedValues.placeNames
+        .map(placeName =>
+          placeName
+            .slice(
+              0,
+              placeName.indexOf("[") !== -1
+                ? placeName.indexOf("[")
+                : placeName.length
+            )
+            .trim()
+        )
+        .join(", ");
+      submittedValues.geographicPlaceName = combinedPlaceName;
     }
-    delete submittedValues.customPlaceName;
+
+    delete submittedValues.placeNames;
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [
