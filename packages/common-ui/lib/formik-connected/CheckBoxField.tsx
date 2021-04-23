@@ -1,4 +1,3 @@
-import { FastField, FieldProps } from "formik";
 import React, { ChangeEvent } from "react";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 import { OnFormikSubmit } from "./safeSubmit";
@@ -20,7 +19,7 @@ const checkboxProps = {
 };
 
 export function CheckBoxField(props: CheckBoxProps) {
-  const { name, onCheckBoxClick, disabled, type } = props;
+  const { onCheckBoxClick, disabled, type } = props;
   return (
     <FieldWrapper
       {...props}
@@ -34,25 +33,22 @@ export function CheckBoxField(props: CheckBoxProps) {
         />
       )}
     >
-      <FastField name={name}>
-        {({ field: { value }, form }: FieldProps) => {
-          function onChange(event, formik) {
-            formik.setFieldValue(name, event.target.checked);
-            formik.setFieldTouched(name);
-            onCheckBoxClick?.(event, formik);
-          }
+      {({ setValue, value, formik }) => {
+        function onChange(event: ChangeEvent<HTMLInputElement>) {
+          setValue(event.target.checked);
+          onCheckBoxClick?.(event, formik);
+        }
 
-          return (
-            <input
-              {...checkboxProps}
-              checked={value || false}
-              onChange={event => onChange(event, form)}
-              value={value || false}
-              disabled={disabled}
-            />
-          );
-        }}
-      </FastField>
+        return (
+          <input
+            {...checkboxProps}
+            checked={value || false}
+            onChange={onChange}
+            value={value || false}
+            disabled={disabled}
+          />
+        );
+      }}
     </FieldWrapper>
   );
 }

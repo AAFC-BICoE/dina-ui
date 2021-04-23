@@ -64,10 +64,11 @@ describe("CollectorGroup details page", () => {
     wrapper.update();
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
-
-    expect(wrapper.containsMatchingElement(<div>person a</div>)).toEqual(true);
-    expect(
-      wrapper.containsMatchingElement(<div> test collector group</div>)
-    ).toEqual(true);
+    expect(wrapper.find(".agents-field .field-view").text()).toEqual(
+      "person a"
+    );
+    expect(wrapper.find(".name-field .field-view").text()).toEqual(
+      "test collector group"
+    );
   });
 });

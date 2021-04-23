@@ -3,12 +3,12 @@ import { CollectingEventDetailsPage } from "../../../../pages/collection/collect
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
 
-/** Test organization with all fields defined. */
+/** Test Collecting Event with all fields defined. */
 const TEST_COLLECTION_EVENT: CollectingEvent = {
   startEventDateTime: "2019_01_01_10_10_10",
   endEventDateTime: "2019_01_06_10_10_10",
   verbatimEventDateTime: "From 2019, 1,1,10,10,10 to 2019, 1.6, 10,10,10",
-  id: "1",
+  id: "100",
   type: "collecting-event",
   uuid: "323423-23423-234",
   group: "test group",
@@ -26,7 +26,10 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async model => {
   // The get request will return the existing collecting-event.
-  if (model === "collection-api/collecting-event/100") {
+  if (
+    model ===
+    "collection-api/collecting-event/100?include=collectors,attachment"
+  ) {
     return { data: TEST_COLLECTION_EVENT };
   } else if (model === "agent-api/person") {
     return { data: [TEST_AGENT] };
@@ -106,9 +109,9 @@ describe("CollectingEvent details page", () => {
       )
     ).toEqual(true);
 
-    expect(wrapper.containsMatchingElement(<div>12, 13, 14</div>)).toEqual(
-      true
-    );
+    expect(
+      wrapper.find(".dwcOtherRecordNumbers-field .field-view").text()
+    ).toEqual("12, 13, 14");
 
     expect(wrapper.containsMatchingElement(<div>12.5</div>)).toEqual(true);
 

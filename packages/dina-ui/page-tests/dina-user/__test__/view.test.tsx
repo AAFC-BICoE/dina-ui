@@ -1,7 +1,7 @@
-import { DinaUser } from "../../../types/user-api/resources/DinaUser";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import DinaUserDetailsPage from "../../../pages/dina-user/view";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Person } from "../../../types/objectstore-api";
+import { DinaUser } from "../../../types/user-api/resources/DinaUser";
 
 /** Test dina user with all fields defined. */
 const TEST_DINAUSER: DinaUser = {
@@ -73,18 +73,20 @@ describe("Dina user who am i page", () => {
 
     // The dina username should be rendered in a FieldView.
     expect(wrapper.find(".username-field-header").exists()).toEqual(true);
-    expect(wrapper.containsMatchingElement(<div>cnc-cm</div>)).toEqual(true);
+    expect(wrapper.find(".username-field .field-view").text()).toEqual(
+      "cnc-cm"
+    );
 
     // The dina user's groups should be rendered in a FieldView.
     expect(wrapper.find(".groups-field-header").exists()).toEqual(true);
-    expect(wrapper.containsMatchingElement(<div>dao, cnc</div>)).toEqual(true);
+    expect(wrapper.find(".groups-field .field-view").text()).toEqual(
+      "dao, cnc"
+    );
 
     // The dina user's roles should be rendered in a FieldView.
     expect(wrapper.find(".roles-field-header").exists()).toEqual(true);
-    expect(
-      wrapper.containsMatchingElement(
-        <div>/dao/staff, /cnd/collection-manager</div>
-      )
-    ).toEqual(true);
+    expect(wrapper.find(".roles-field .field-view").text()).toEqual(
+      "/dao/staff, /cnd/collection-manager"
+    );
   });
 });

@@ -6,7 +6,7 @@ import { GeoReferenceAssertion } from "./GeoReferenceAssertion";
 
 export interface CollectingEventAttributes {
   uuid: string;
-  attachment?: ResourceIdentifierObject[];
+
   startEventDateTime: string;
   endEventDateTime?: string;
   dwcRecordedBy?: string;
@@ -31,7 +31,7 @@ export interface CollectingEventAttributes {
   createdBy?: string;
   createdOn?: string;
   collectorGroupUuid?: string;
-  collectorGroups?: CollectorGroup[];
+
   group: string;
   geographicPlaceName?: string;
   geographicPlaceNameSourceDetail?: GeographicPlaceNameSourceDetail;
@@ -43,7 +43,9 @@ export enum GeographicPlaceNameSource {
 }
 
 export interface CollectingEventRelationships {
+  attachment?: ResourceIdentifierObject[];
   collectors?: KitsuResource[];
+  collectorGroups?: CollectorGroup[];
   geoReferenceAssertions?: GeoReferenceAssertion[];
 }
 

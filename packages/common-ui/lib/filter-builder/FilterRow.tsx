@@ -90,7 +90,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
         : STRING_SEARCH_TYPES;
 
     return (
-      <div className="list-inline row">
+      <div className="list-inline">
         <div
           aria-label="Filter Attribute"
           className="list-inline-item"
@@ -157,7 +157,11 @@ export class FilterRow extends React.Component<FilterRowProps> {
           )}
         </div>
         {attribute.type !== "DATE" && (
-          <div aria-label="Filter Search Type" style={{ width: "12rem" }}>
+          <div
+            className="list-inline-item"
+            aria-label="Filter Search Type"
+            style={{ width: "12rem" }}
+          >
             <Select
               className="filter-search-type"
               instanceId={`searchType_${model.id}`}
