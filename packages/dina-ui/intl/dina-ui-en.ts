@@ -287,7 +287,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   userListTitle: "Users",
   userMustBelongToGroup: "User must belong to a Group",
   verbatimEventDateTimeLabel: "Verbatim Event DateTime",
-  verbatimCoordinatesLegend: "Verbatim Coordinates",
+  verbatimLabelLegend: "Verbatim Label",
   verbatimLatLong: "Verbatim Lat/Long",
   viewDetailButtonLabel: " View Detail",
   viewOnMap: "View on Map",

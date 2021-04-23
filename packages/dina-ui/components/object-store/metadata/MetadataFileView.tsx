@@ -22,7 +22,11 @@ export function MetadataFileView({
       ? `${fileToDisplay.fileIdentifier}/thumbnail`
       : fileToDisplay.fileIdentifier;
 
-  const filePath = `/api/objectstore-api/file/${fileToDisplay.bucket}/${fileId}`;
+  const filePath = `/api/objectstore-api/file/${fileToDisplay.bucket}/${
+    // Add derivative/ before the fileIdentifier if the file to display is a derivative.
+    fileToDisplay.type === "derivative" ? "derivative/" : ""
+  }${fileId}`;
+
   // fileExtension should always be available when getting the Metadata from the back-end:
   const fileType = (fileToDisplay.fileExtension as string)
     .replace(/\./, "")

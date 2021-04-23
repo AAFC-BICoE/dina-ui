@@ -62,8 +62,6 @@ export default function CollectingEventEditPage() {
 
 function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
   const router = useRouter();
-  const { id } = router.query;
-  const { formatMessage } = useDinaIntl();
 
   const {
     attachedMetadatasUI,
@@ -71,19 +69,20 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     saveCollectingEvent
   } = useCollectingEventSave(collectingEvent);
 
-  const [defaultVerbatimCoordSys, setDefaultVerbatimCoordSys] = useLocalStorage<
+  const [, setDefaultVerbatimCoordSys] = useLocalStorage<
     string | null | undefined
   >(DEFAULT_VERBATIM_COORDSYS_KEY);
 
-  const [defaultVerbatimSRS, setDefaultVerbatimSRS] = useLocalStorage<
-    string | null | undefined
-  >(DEFAULT_VERBATIM_SRS_KEY);
+  const [, setDefaultVerbatimSRS] = useLocalStorage<string | null | undefined>(
+    DEFAULT_VERBATIM_SRS_KEY
+  );
 
   const onSubmit: DinaFormOnSubmit = async ({ submittedValues, formik }) => {
     const savedCollectingEvent = await saveCollectingEvent(
       submittedValues,
       formik
     );
+
     await router.push(
       `/collection/collecting-event/view?id=${savedCollectingEvent.id}`
     );

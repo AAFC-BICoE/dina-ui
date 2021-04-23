@@ -18,7 +18,7 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
       id: "1",
       type: "georeference-assertion",
       dwcDecimalLongitude: 12.5,
-      georeferencedBy: [{ id: "1", type: "agent" }]
+      georeferencedBy: ["1"]
     }
   ]
 };
@@ -33,6 +33,10 @@ const mockGet = jest.fn(async model => {
     return { data: TEST_COLLECTION_EVENT };
   } else if (model === "agent-api/person") {
     return { data: [TEST_AGENT] };
+  } else if (model === "collection-api/collecting-event/100/attachment") {
+    return { data: [] };
+  } else if (model === "user-api/group") {
+    return { data: [] };
   }
 });
 

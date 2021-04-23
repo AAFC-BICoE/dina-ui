@@ -52,8 +52,7 @@ const mockGet = jest.fn(async path => {
     return { data: [testCollectionEvent()] };
   }
   if (
-    path ===
-    "collection-api/collecting-event/1?include=collectors,geoReferenceAssertions,attachment"
+    path === "collection-api/collecting-event/1?include=collectors,attachment"
   ) {
     // Populate the linker table:
     return { data: testCollectionEvent() };
@@ -125,6 +124,7 @@ describe("Catalogued Object View Page", () => {
               dwcOtherRecordNumbers: null,
               dwcVerbatimCoordinateSystem: "decimal degrees",
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              geoReferenceAssertions: [{}],
               relationships: {},
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
@@ -184,6 +184,7 @@ describe("Catalogued Object View Page", () => {
           {
             resource: {
               dwcOtherRecordNumbers: null,
+              geoReferenceAssertions: [],
               group: "test group",
               id: "1",
               relationships: {},
@@ -249,6 +250,7 @@ describe("Catalogued Object View Page", () => {
               startEventDateTime: "2021-04-13",
               id: "1",
               type: "collecting-event",
+              geoReferenceAssertions: [],
               group: "test group",
               dwcOtherRecordNumbers: null,
               relationships: {}
@@ -323,6 +325,7 @@ describe("Catalogued Object View Page", () => {
               dwcOtherRecordNumbers: null,
               dwcVerbatimCoordinateSystem: "decimal degrees",
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              geoReferenceAssertions: [{}],
               relationships: {},
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"

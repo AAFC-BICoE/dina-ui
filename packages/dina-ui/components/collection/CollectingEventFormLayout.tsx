@@ -242,7 +242,7 @@ export function CollectingEventFormLayout({
         </div>
       </div>
       <FieldSet legend={<DinaMessage id="collectingLocationLegend" />}>
-        <FieldSet legend={<DinaMessage id="verbatimCoordinatesLegend" />}>
+        <FieldSet legend={<DinaMessage id="verbatimLabelLegend" />}>
           <div className="row">
             <div className="col-md-6">
               <TextField name="dwcVerbatimLocality" />
@@ -290,8 +290,8 @@ export function CollectingEventFormLayout({
                         name="dwcVerbatimLatitude"
                         placeholder={
                           hasDegree || hasMinute || hasSecond
-                            ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
-                            : null
+                            ? `${CoordinateSystemEnumPlaceHolder[coordSysSelected]}N`
+                            : undefined
                         }
                         isExternallyControlled={true}
                         shouldShowDegree={hasDegree || hasMinute || hasSecond}
@@ -305,8 +305,8 @@ export function CollectingEventFormLayout({
                         name="dwcVerbatimLongitude"
                         placeholder={
                           hasDegree || hasMinute || hasSecond
-                            ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
-                            : null
+                            ? `${CoordinateSystemEnumPlaceHolder[coordSysSelected]}E`
+                            : undefined
                         }
                         isExternallyControlled={true}
                         shouldShowDegree={hasDegree || hasMinute || hasSecond}
@@ -389,8 +389,8 @@ export function CollectingEventFormLayout({
                               assertions.length === 1 ? "d-none" : ""
                             }`}
                           >
-                            {assertions.map((assertion, index) => (
-                              <Tab key={assertion.id ?? index}>
+                            {assertions.map((_, index) => (
+                              <Tab key={index}>
                                 <span className="m-3">{index + 1}</span>
                               </Tab>
                             ))}
@@ -398,7 +398,7 @@ export function CollectingEventFormLayout({
                         }
                         {assertions.length
                           ? assertions.map((assertion, index) => (
-                              <TabPanel key={assertion.id ?? index}>
+                              <TabPanel key={index}>
                                 <GeoReferenceAssertionRow
                                   index={index}
                                   openAddPersonModal={openAddPersonModal}
