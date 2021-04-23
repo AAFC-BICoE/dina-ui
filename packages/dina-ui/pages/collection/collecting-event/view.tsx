@@ -133,24 +133,32 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("collectingEventViewTitle")} />
       <Nav />
       {buttonBar}
-      {withResponse(collectingEventQuery, ({ data: colEvent }) => (
-        <main className="container-fluid">
-          <h1>
-            <DinaMessage id="collectingEventViewTitle" />
-          </h1>
-          <div className="form-group">
-            <DinaForm<CollectingEvent> initialValues={colEvent} readOnly={true}>
-              <CollectingEventFormLayout />
-            </DinaForm>
-          </div>
-          <div className="form-group">
-            <AttachmentReadOnlySection
-              attachmentPath={`collection-api/collecting-event/${id}/attachment`}
-              detachTotalSelected={true}
-            />
-          </div>
-        </main>
-      ))}
+      {withResponse(collectingEventQuery, ({ data: colEvent }) => {
+        colEvent.placeNames = colEvent.geographicPlaceName
+          ? colEvent.geographicPlaceName.split(",")
+          : [];
+        return (
+          <main className="container-fluid">
+            <h1>
+              <DinaMessage id="collectingEventViewTitle" />
+            </h1>
+            <div className="form-group">
+              <DinaForm<CollectingEvent>
+                initialValues={colEvent}
+                readOnly={true}
+              >
+                <CollectingEventFormLayout />
+              </DinaForm>
+            </div>
+            <div className="form-group">
+              <AttachmentReadOnlySection
+                attachmentPath={`collection-api/collecting-event/${id}/attachment`}
+                detachTotalSelected={true}
+              />
+            </div>
+          </main>
+        );
+      })}
       {buttonBar}
       <Footer />
     </div>

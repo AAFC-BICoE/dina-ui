@@ -179,7 +179,10 @@ function CollectingEventForm({
         ...collectingEvent,
         dwcOtherRecordNumbers:
           collectingEvent.dwcOtherRecordNumbers?.concat("").join("\n") ?? "",
-        geoReferenceAssertions: collectingEvent.geoReferenceAssertions ?? []
+        geoReferenceAssertions: collectingEvent.geoReferenceAssertions ?? [],
+        placeNames: collectingEvent.geographicPlaceName
+          ? collectingEvent.geographicPlaceName.split(",")
+          : []
       }
     : {
         type: "collecting-event",
@@ -322,7 +325,10 @@ function CollectingEventForm({
 
     // Combine placeNames to geographic name
     if (submittedValues.placeNames?.length > 0) {
+      // Remove all the empty and only space strings, take away the "[" after which indicating a type
       const combinedPlaceName = submittedValues.placeNames
+        .map(e => e.trim())
+        .filter(e => e)
         .map(placeName =>
           placeName
             .slice(
