@@ -174,35 +174,35 @@ export function CollectingEventFormLayout({
   };
 
   const parseGeoNames = displayName => {
-    // set the placeNames parsed based on the search reasult display name field
-    // adding custom place name to the front if present
+    // Parse the placeNames based on the search reasult display name field
     const geoNameParsed = displayName.split(", ");
-    const geoNameParsedReduced = [];
+    const geoNameParsedReduced: string[] = [];
     Object.assign(geoNameParsedReduced, geoNameParsed);
     const keys = Object.keys(addressDetail.current);
     for (const key of keys) {
       geoNameParsed.map(geoName => {
         if (
-          (addressDetail.current[key] === geoName &&
-            (key === "state" || key === "country" || key === "country_code")) ||
-          key === "post_code"
+          addressDetail.current[key] === geoName &&
+          (key === "state" || key === "country" || key === "country_code")
         ) {
+          geoNameParsedReduced.splice(geoNameParsedReduced.indexOf(geoName), 1);
+        } else if (addressDetail.current[key] === geoName) {
           geoNameParsedReduced.splice(
-            geoNameParsedReduced.indexOf(geoName as never),
-            1
+            geoNameParsedReduced.indexOf(geoName),
+            1,
+            geoName + " [" + key + "]"
           );
         }
       });
     }
-
     return geoNameParsedReduced;
   };
 
-  const setCustomPlaceName = form => {
+  const addCustomPlaceName = form => {
     if (!customPlaceValue || customPlaceValue.length === 0) return;
     const geoNameParsed = parseGeoNames(form.values.geographicPlaceName);
     // Add user entered custom place in front
-    geoNameParsed?.unshift(customPlaceValue as never);
+    geoNameParsed?.unshift(customPlaceValue);
     form.setFieldValue("placeNames", geoNameParsed);
     setDisplayCustomPlace(true);
   };
@@ -538,7 +538,7 @@ export function CollectingEventFormLayout({
                                   if (e.key === "Enter") {
                                     e.preventDefault();
                                     if (customPlaceValue?.length > 0) {
-                                      setCustomPlaceName(form);
+                                      addCustomPlaceName(form);
                                     }
                                   }
                                 }}
@@ -546,7 +546,7 @@ export function CollectingEventFormLayout({
                               <button
                                 className="mb-2 btn btn-primary"
                                 type="button"
-                                onClick={() => setCustomPlaceName(form)}
+                                onClick={() => addCustomPlaceName(form)}
                               >
                                 <DinaMessage id="addCustomPlaceName" />
                               </button>
@@ -567,6 +567,13 @@ export function CollectingEventFormLayout({
                                       initialValue={geoName}
                                       removeFormGroupClass={true}
                                       key={idx}
+                                      inputProps={{
+                                        style: {
+                                          backgroundColor: `${
+                                            idx % 2 === 0 ? "#e9ecef" : "white"
+                                          }`
+                                        }
+                                      }}
                                     />
                                   ))}
                                 </div>

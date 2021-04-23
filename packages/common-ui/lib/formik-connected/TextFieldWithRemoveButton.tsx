@@ -2,17 +2,17 @@ import React, { ChangeEvent, useRef, useState } from "react";
 import { TextField, TextFieldProps } from "./TextField";
 
 export function TextFieldWithRemoveButton(props: TextFieldProps) {
-  const [newGeoGraphicPlace, setNewGeoGraphicPlace] = useState("");
+  const [shouldRemove, setShouldRemove] = useState(false);
 
   /* Clear the input value and remove the whole wrapping div */
   const removeEntry = onChange => {
     onChange?.({
       target: { value: "" }
     } as ChangeEvent<HTMLInputElement>);
-    setNewGeoGraphicPlace("removed");
+    setShouldRemove(true);
   };
 
-  return newGeoGraphicPlace !== "removed" ? (
+  return shouldRemove === false ? (
     <TextField
       {...props}
       customInput={inputProps => (
