@@ -513,29 +513,41 @@ export function CollectingEventFormLayout({
                             </div>
                           </div>
                         )}
-                        {form.values.geographicPlaceName?.length > 0 &&
-                          form.values.geographicPlaceName
-                            .split(",")
-                            .map((place, idx) => (
-                              <ul key={idx} className="list-group">
-                                {displayCustomPlace && idx === 0 && (
+                        {form.values.geographicPlaceName?.length > 0 && (
+                          <ul className="list-group">
+                            {form.values.geographicPlaceName
+                              .split(",")
+                              .map((place, idx) => (
+                                <>
+                                  {displayCustomPlace && idx === 0 && (
+                                    <TextFieldWithRemoveButton
+                                      name="customPlaceName"
+                                      readOnly={true}
+                                      removeLabel={true}
+                                      removeFormGroupClass={true}
+                                      className={
+                                        "list-group-item list-group-item-primary"
+                                      }
+                                    />
+                                  )}
                                   <TextFieldWithRemoveButton
-                                    name="customPlaceName"
+                                    name={`placeName[` + idx + `]`}
                                     readOnly={true}
-                                    hideLabel={true}
-                                    className="list-group-item list-group-item-primary"
+                                    initialValue={place}
+                                    removeLabel={true}
+                                    removeFormGroupClass={true}
+                                    key={idx}
+                                    className={`list-group-item  ${
+                                      idx % 2 === 0
+                                        ? "list-group-item-secondary"
+                                        : "list-group-item-primary"
+                                    }`}
                                   />
-                                )}
-                                <TextFieldWithRemoveButton
-                                  name={`placeName[` + idx + `]`}
-                                  readOnly={true}
-                                  initialValue={place}
-                                  hideLabel={true}
-                                  key={idx}
-                                  className="list-group-item list-group-item-primary"
-                                />
-                              </ul>
-                            ))}
+                                </>
+                              ))}
+                          </ul>
+                        )}
+
                         <DinaFormSection horizontal={[3, 9]}>
                           <TextField name="dwcStateProvince" readOnly={true} />
                           <TextField name="dwcCountry" readOnly={true} />

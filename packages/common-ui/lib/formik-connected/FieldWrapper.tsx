@@ -28,6 +28,11 @@ export interface LabelWrapperParams {
 
   /** Custom element to render when the form is in read-only mode. */
   readOnlyRender?: (value: any) => ReactNode;
+
+  removeFormGroupClass?: boolean;
+
+  /** Remove the label. */
+  removeLabel?: boolean;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -50,7 +55,9 @@ export function FieldWrapper({
   customName,
   arrayItemLink,
   link,
-  readOnlyRender
+  readOnlyRender,
+  removeFormGroupClass,
+  removeLabel
 }: FieldWrapperProps) {
   const { horizontal, readOnly } = useDinaFormContext();
 
@@ -63,16 +70,22 @@ export function FieldWrapper({
 
   return (
     <div className={className}>
-      <div className={`form-group ${name}-field ${horizontal ? "row" : ""}`}>
-        <label
-          className={[
-            `${labelCol ? `col-sm-${labelCol}` : ""}`,
-            // Adjust alignment for editable inputs:
-            horizontal && !readOnly ? "mt-sm-2" : ""
-          ].join(" ")}
-        >
-          {!hideLabel && <strong>{fieldLabel}</strong>}
-        </label>
+      <div
+        className={`${
+          removeFormGroupClass ? "" : "form-group"
+        }  ${name}-field ${horizontal ? "row" : ""}`}
+      >
+        {!removeLabel && (
+          <label
+            className={[
+              `${labelCol ? `col-sm-${labelCol}` : ""}`,
+              // Adjust alignment for editable inputs:
+              horizontal && !readOnly ? "mt-sm-2" : ""
+            ].join(" ")}
+          >
+            {!hideLabel && <strong>{fieldLabel}</strong>}
+          </label>
+        )}
         <div className={valueCol ? `col-sm-${valueCol}` : ""}>
           {readOnly || !children ? (
             <FastField name={name}>
