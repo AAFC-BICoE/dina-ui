@@ -101,6 +101,9 @@ export function CollectingEventFormLayout({
 
     // set initial address detail based on user selected search result
     addressDetail.current = result.address as any;
+
+    const geoNameParsed = parseGeoNames(result.display_name);
+    formik.setFieldValue("placeNames", geoNameParsed);
   }
 
   function removeThisPlace(formik: FormikContextType<{}>) {
@@ -113,6 +116,9 @@ export function CollectingEventFormLayout({
     formik.setFieldValue("geographicPlaceNameSourceDetail", null);
     formik.setFieldValue("geographicPlaceNameSource", null);
 
+    formik.setFieldValue("customPlaceName", null);
+    formik.setFieldValue("placeNames", null);
+    setCustomPlaceValue("");
     setDisplayCustomPlace(false);
   }
 
@@ -167,11 +173,10 @@ export function CollectingEventFormLayout({
     }
   };
 
-  const setCustomPlaceName = form => {
-    form.values.customPlaceName = customPlaceValue;
+  const parseGeoNames = displayName => {
     // set the placeNames parsed based on the search reasult display name field
     // adding custom place name to the front if present
-    const geoNameParsed = form.values.geographicPlaceName.split(", ");
+    const geoNameParsed = displayName.split(", ");
     const geoNameParsedReduced = [];
     Object.assign(geoNameParsedReduced, geoNameParsed);
     const keys = Object.keys(addressDetail.current);
@@ -189,9 +194,16 @@ export function CollectingEventFormLayout({
         }
       });
     }
+
+    return geoNameParsedReduced;
+  };
+
+  const setCustomPlaceName = form => {
+    if (!customPlaceValue || customPlaceValue.length === 0) return;
+    const geoNameParsed = parseGeoNames(form.values.geographicPlaceName);
     // Add user entered custom place in front
-    geoNameParsedReduced.unshift(customPlaceValue as never);
-    form.setFieldValue("placeNames", geoNameParsedReduced);
+    geoNameParsed?.unshift(customPlaceValue as never);
+    form.setFieldValue("placeNames", geoNameParsed);
     setDisplayCustomPlace(true);
   };
 
@@ -541,33 +553,27 @@ export function CollectingEventFormLayout({
                             </div>
                           </div>
                         )}
-                        {form.values.geographicPlaceName?.length > 0 && (
-                          <div className="pb-4">
-                            {form.values.geographicPlaceName
-                              .split(",")
-                              .map((place, idx) => (
-                                <>
-                                  {displayCustomPlace && idx === 0 && (
+                        {form.values.placeNames?.length > 0 && (
+                          <FieldArray name="placeNames">
+                            {({}) => {
+                              const geoNames = form.values.placeNames;
+                              return (
+                                <div className="pb-4">
+                                  {geoNames.map((geoName, idx) => (
                                     <TextFieldWithRemoveButton
-                                      name="customPlaceName"
+                                      name={`placeNames[` + idx + `]`}
                                       readOnly={true}
                                       removeLabel={true}
+                                      initialValue={geoName}
                                       removeFormGroupClass={true}
+                                      key={idx}
                                     />
-                                  )}
-                                  <TextFieldWithRemoveButton
-                                    name={`placeName[` + idx + `]`}
-                                    readOnly={true}
-                                    initialValue={place}
-                                    removeLabel={true}
-                                    removeFormGroupClass={true}
-                                    key={idx}
-                                  />
-                                </>
-                              ))}
-                          </div>
+                                  ))}
+                                </div>
+                              );
+                            }}
+                          </FieldArray>
                         )}
-
                         <DinaFormSection horizontal={[3, 9]}>
                           <TextField name="dwcStateProvince" readOnly={true} />
                           <TextField name="dwcCountry" readOnly={true} />
