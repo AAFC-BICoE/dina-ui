@@ -1,11 +1,11 @@
 import { OperationsResponse } from "common-ui";
-import { Person } from "../../../../types/agent-api/resources/Person";
 import NumberFormat from "react-number-format";
 import CollectingEventEditPage from "../../../../pages/collection/collecting-event/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { Person } from "../../../../types/agent-api/resources/Person";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
-import { SRS } from "../../../../types/collection-api/resources/SRS";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
+import { SRS } from "../../../../types/collection-api/resources/SRS";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -44,11 +44,11 @@ const mockGet = jest.fn(async model => {
     return { data: [TEST_SRS] };
   } else if (model === "collection-api/coordinate-system") {
     return { data: [TEST_COORDINATES] };
-  } else if (model === "user-api/group") {
-    return { data: [] };
   } else if (model === "collection-api/collecting-event") {
     return { data: [] };
   } else if (model === "collection-api/managed-attribute") {
+    return { data: [] };
+  } else if (model === "user-api/group") {
     return { data: [] };
   }
 });
@@ -73,20 +73,6 @@ const mockBulkGet = jest.fn(async paths => {
       originalFilename: "test-file"
     }));
   }
-
-  if (
-    (paths[0] as string).startsWith(
-      "/georeference-assertion/10?include=georeferencedBy"
-    )
-  ) {
-    return paths.map(path => ({
-      id: path.replace("/georeference-assertion/", ""),
-      type: "georeference-assertion",
-      dwcDecimalLongitude: 10,
-      georeferencedBy: [{ id: "1", type: "agent" }]
-    }));
-  }
-
   console.warn("No mock value for bulkGet paths: ", paths);
 });
 
@@ -181,7 +167,8 @@ describe("collecting-event edit page", () => {
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               startEventDateTime: "2019-12-21T16:00",
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
-              dwcOtherRecordNumbers: ["12", "23"]
+              dwcOtherRecordNumbers: ["12", "23"],
+              geoReferenceAssertions: [{}]
             },
             id: "00000000-0000-0000-0000-000000000000",
             type: "collecting-event"
@@ -261,29 +248,6 @@ describe("collecting-event edit page", () => {
           }
         ],
         expect.anything()
-      ],
-      [
-        "/collection-api/operations",
-        [
-          {
-            op: "POST",
-            path: "georeference-assertion",
-            value: {
-              attributes: {
-                dwcDecimalLatitude: 45.394728,
-                dwcDecimalLongitude: -75.701452
-              },
-              id: "00000000-0000-0000-0000-000000000000",
-              relationships: {
-                collectingEvent: {
-                  data: { id: "1", type: "collecting-event" }
-                }
-              },
-              type: "georeference-assertion"
-            }
-          }
-        ],
-        expect.anything()
       ]
     ]);
   });
@@ -331,9 +295,51 @@ describe("collecting-event edit page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(mockPatch).toBeCalledTimes(2);
-    expect(mockPatch.mock.calls[0][0]).toBe("/collection-api/operations");
-    expect(mockPatch.mock.calls[1][0]).toBe("/collection-api/operations");
+    expect(mockPatch).toBeCalledTimes(1);
+    expect(mockPatch).lastCalledWith(
+      "/collection-api/operations",
+      [
+        {
+          op: "PATCH",
+          path: "collecting-event/1",
+          value: {
+            attributes: {
+              dwcOtherRecordNumbers: ["12", "13", "14"],
+              endEventDateTime: "2019-11-12",
+              geoReferenceAssertions: [
+                {
+                  dwcDecimalLongitude: 10,
+                  georeferencedBy: ["1"],
+                  id: "10",
+                  type: "georeference-assertion"
+                }
+              ],
+              group: "test group",
+              startEventDateTime: "2019-11-11",
+              uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
+              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 6pm"
+            },
+            id: "1",
+            relationships: {
+              attachment: {
+                data: [
+                  { id: "88888", type: "metadata" },
+                  { id: "99999", type: "metadata" }
+                ]
+              },
+              collectors: {
+                data: [
+                  { id: "111", type: "agent" },
+                  { id: "222", type: "agent" }
+                ]
+              }
+            },
+            type: "collecting-event"
+          }
+        }
+      ],
+      expect.anything()
+    );
   });
 
   it("Renders an error after form submit if one is returned from the back-end.", async () => {
@@ -398,9 +404,9 @@ const TEST_COLLECTING_EVENT: CollectingEvent = {
   geoReferenceAssertions: [
     {
       id: "10",
-      dwcDecimalLatitude: 10,
-      georeferencedBy: [{ id: "1", type: "agent" }],
-      type: "georeference-assertion"
+      type: "georeference-assertion",
+      dwcDecimalLongitude: 10,
+      georeferencedBy: ["1"]
     }
   ],
   attachment: [

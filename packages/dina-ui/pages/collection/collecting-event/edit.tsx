@@ -1,3 +1,4 @@
+import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ApiClientContext,
   BackButton,
@@ -6,11 +7,9 @@ import {
   DinaFormOnSubmit,
   LoadingSpinner,
   Query,
-  SaveArgs,
   SubmitButton,
   useApiClient
 } from "common-ui";
-import { useLocalStorage } from "@rehooks/local-storage";
 import { KitsuResponse, PersistedResource } from "kitsu";
 import { orderBy } from "lodash";
 import { NextRouter, useRouter } from "next/router";
@@ -22,7 +21,6 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Person } from "../../../types/agent-api/resources/Person";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 import { CoordinateSystemEnum } from "../../../types/collection-api/resources/CoordinateSystem";
-import { GeoReferenceAssertion } from "../../../types/collection-api/resources/GeoReferenceAssertion";
 import { SRSEnum } from "../../../types/collection-api/resources/SRS";
 import { Metadata } from "../../../types/objectstore-api";
 
@@ -61,43 +59,21 @@ export default function CollectingEventEditPage() {
       response.data.attachment = metadatas.filter(it => it);
     }
 
-    if (response?.data?.geoReferenceAssertions) {
-      // Retrieve georeferenceAssertion with georeferencedBy
-      const geoReferenceAssertions = await bulkGet<GeoReferenceAssertion>(
-        response?.data?.geoReferenceAssertions.map(
-          it => `/georeference-assertion/${it.id}?include=georeferencedBy`
-        ),
-        { apiBaseUrl: "/collection-api", returnNullForMissingResource: true }
-      );
-
+    const geoReferenceAssertions = response?.data?.geoReferenceAssertions;
+    if (geoReferenceAssertions) {
       // Retrieve georeferencedBy associated agents
-      let agentBulkGetArgs: string[];
-      agentBulkGetArgs = [];
-      geoReferenceAssertions.forEach(async assert => {
-        if (assert.georeferencedBy) {
-          agentBulkGetArgs = agentBulkGetArgs.concat(
-            assert.georeferencedBy.map(it => `/person/${it.id}`)
+      for (const assertion of geoReferenceAssertions) {
+        if (assertion.georeferencedBy) {
+          assertion.georeferencedBy = await bulkGet<Person>(
+            assertion.georeferencedBy.map(personId => `/person/${personId}`),
+            {
+              apiBaseUrl: "/agent-api",
+              returnNullForMissingResource: true
+            }
           );
         }
-      });
+      }
 
-      const agents = await bulkGet<Person>(agentBulkGetArgs, {
-        apiBaseUrl: "/agent-api",
-        returnNullForMissingResource: true
-      });
-
-      geoReferenceAssertions.forEach(assert => {
-        const refers = assert.georeferencedBy;
-        refers?.map(refer => {
-          const index = assert.georeferencedBy?.findIndex(
-            it => it.id === refer.id
-          );
-          const agent = agents.filter(it => it.id === refer.id)?.[0];
-          if (assert.georeferencedBy !== undefined && index !== undefined) {
-            assert.georeferencedBy[index] = agent;
-          }
-        });
-      });
       response.data.geoReferenceAssertions = geoReferenceAssertions;
     }
 
@@ -194,49 +170,6 @@ function CollectingEventForm({
 
   const { save } = useApiClient();
 
-  async function saveGeoReferenceAssertion(
-    assertionsToSave: GeoReferenceAssertion[],
-    linkedCollectingEvent: PersistedResource<CollectingEvent>
-  ) {
-    const existingAssertions = initialValues.geoReferenceAssertions as PersistedResource<GeoReferenceAssertion>[];
-
-    const assertionIdsToSave = assertionsToSave.map(it => it.id);
-    const assertionsToDelete = existingAssertions.filter(
-      existingAssertion =>
-        existingAssertion.id &&
-        !assertionIdsToSave.includes(existingAssertion.id)
-    );
-
-    const saveArgs: SaveArgs[] = assertionsToSave
-      .filter(assertion => Object.keys(assertion).length > 0)
-      .map(assertion => {
-        return {
-          resource: {
-            ...assertion,
-            type: "georeference-assertion",
-            collectingEvent: {
-              type: linkedCollectingEvent.type,
-              id: linkedCollectingEvent.id
-            }
-          },
-          type: "georeference-assertion"
-        };
-      });
-
-    const deleteArgs = assertionsToDelete.map(assertion => ({
-      delete: assertion
-    }));
-
-    if (saveArgs.length) {
-      await save(saveArgs, { apiBaseUrl: "/collection-api" });
-    }
-    // Call the saves and deleted separately for now.
-    // TODO find out why an operations request with 1 save + 1 delete causes the delete to be ignored.
-    if (deleteArgs.length) {
-      await save(deleteArgs, { apiBaseUrl: "/collection-api" });
-    }
-  }
-
   const onSubmit: DinaFormOnSubmit = async ({ submittedValues, formik }) => {
     // Init relationships object for one-to-many relations:
     submittedValues.relationships = {};
@@ -304,21 +237,9 @@ function CollectingEventForm({
     delete submittedValues.attachment;
 
     // Convert georeferenceByAgents to relationship
-    submittedValues.geoReferenceAssertions?.map(assertion => {
-      if (assertion.georeferencedBy) {
-        assertion.relationships = {};
-        assertion.relationships.georeferencedBy = {
-          data: assertion.georeferencedBy.map(it => ({
-            id: it.id,
-            type: "agent"
-          }))
-        };
-      }
-      delete assertion.georeferencedBy;
-    });
-
-    const geoReferenceAssertionsToSave = submittedValues.geoReferenceAssertions;
-    delete submittedValues.geoReferenceAssertions;
+    for (const assertion of submittedValues.geoReferenceAssertions || []) {
+      assertion.georeferencedBy = assertion.georeferencedBy?.map(it => it.id);
+    }
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [
@@ -335,12 +256,6 @@ function CollectingEventForm({
     // Set the Collecting Event ID so if there is an error after this,
     // then subsequent submissions use PATCH instea of POST:
     formik.setFieldValue("id", savedCollectingEvent.id);
-
-    // save georeference assertions:
-    await saveGeoReferenceAssertion(
-      geoReferenceAssertionsToSave,
-      savedCollectingEvent
-    );
 
     await router.push(
       `/collection/collecting-event/view?id=${savedCollectingEvent.id}`

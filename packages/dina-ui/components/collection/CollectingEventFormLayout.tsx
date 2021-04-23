@@ -4,16 +4,16 @@ import {
   filterBy,
   FormattedTextField,
   FormikButton,
-  TextFieldWithCoordButtons,
   NominatumApiSearchResult,
   ResourceSelectField,
   TextField,
+  TextFieldWithCoordButtons,
   useDinaFormContext
 } from "common-ui";
 import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
-import { SRS } from "../../types/collection-api/resources/SRS";
 import { useState } from "react";
+import { ShouldRenderReasons } from "react-autosuggest";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
@@ -29,15 +29,15 @@ import {
   CollectingEvent,
   GeographicPlaceNameSource
 } from "../../types/collection-api/resources/CollectingEvent";
-import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import {
   CoordinateSystem,
   CoordinateSystemEnum,
   CoordinateSystemEnumPlaceHolder
 } from "../../types/collection-api/resources/CoordinateSystem";
-import { ShouldRenderReasons } from "react-autosuggest";
+import { SRS } from "../../types/collection-api/resources/SRS";
 import { ManagedAttributesEditor } from "../object-store/managed-attributes/ManagedAttributesEditor";
 import { ManagedAttributesViewer } from "../object-store/managed-attributes/ManagedAttributesViewer";
+import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -404,8 +404,8 @@ export function CollectingEventFormLayout({
                               assertions.length === 1 ? "d-none" : ""
                             }`}
                           >
-                            {assertions.map((assertion, index) => (
-                              <Tab key={assertion.id ?? index}>
+                            {assertions.map((_, index) => (
+                              <Tab key={index}>
                                 <span className="m-3">{index + 1}</span>
                               </Tab>
                             ))}
@@ -413,7 +413,7 @@ export function CollectingEventFormLayout({
                         }
                         {assertions.length
                           ? assertions.map((assertion, index) => (
-                              <TabPanel key={assertion.id ?? index}>
+                              <TabPanel key={index}>
                                 <GeoReferenceAssertionRow
                                   index={index}
                                   openAddPersonModal={openAddPersonModal}
