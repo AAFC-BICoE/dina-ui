@@ -14,7 +14,7 @@ import {
 import { Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
 import { SRS } from "../../types/collection-api/resources/SRS";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
@@ -60,6 +60,8 @@ export function CollectingEventFormLayout({
   const [customPlaceValue, setCustomPlaceValue] = useState<string>("");
   const [displayCustomPlace, setDisplayCustomPlace] = useState(false);
 
+  const addressDetail = useRef({});
+
   function toggleRangeEnabled(
     newValue: boolean,
     formik: FormikContextType<{}>
@@ -96,6 +98,9 @@ export function CollectingEventFormLayout({
       "geographicPlaceNameSourceDetail.geographicPlaceNameSource",
       GeographicPlaceNameSource.OSM
     );
+
+    // set initial address detail based on user selected search result
+    addressDetail.current = result.address as any;
   }
 
   function removeThisPlace(formik: FormikContextType<{}>) {
@@ -164,6 +169,29 @@ export function CollectingEventFormLayout({
 
   const setCustomPlaceName = form => {
     form.values.customPlaceName = customPlaceValue;
+    // set the placeNames parsed based on the search reasult display name field
+    // adding custom place name to the front if present
+    const geoNameParsed = form.values.geographicPlaceName.split(", ");
+    const geoNameParsedReduced = [];
+    Object.assign(geoNameParsedReduced, geoNameParsed);
+    const keys = Object.keys(addressDetail.current);
+    for (const key of keys) {
+      geoNameParsed.map(geoName => {
+        if (
+          (addressDetail.current[key] === geoName &&
+            (key === "state" || key === "country" || key === "country_code")) ||
+          key === "post_code"
+        ) {
+          geoNameParsedReduced.splice(
+            geoNameParsedReduced.indexOf(geoName as never),
+            1
+          );
+        }
+      });
+    }
+    // Add user entered custom place in front
+    geoNameParsedReduced.unshift(customPlaceValue as never);
+    form.setFieldValue("placeNames", geoNameParsedReduced);
     setDisplayCustomPlace(true);
   };
 
@@ -514,7 +542,7 @@ export function CollectingEventFormLayout({
                           </div>
                         )}
                         {form.values.geographicPlaceName?.length > 0 && (
-                          <ul className="list-group">
+                          <div className="pb-4">
                             {form.values.geographicPlaceName
                               .split(",")
                               .map((place, idx) => (
@@ -525,9 +553,6 @@ export function CollectingEventFormLayout({
                                       readOnly={true}
                                       removeLabel={true}
                                       removeFormGroupClass={true}
-                                      className={
-                                        "list-group-item list-group-item-primary"
-                                      }
                                     />
                                   )}
                                   <TextFieldWithRemoveButton
@@ -537,15 +562,10 @@ export function CollectingEventFormLayout({
                                     removeLabel={true}
                                     removeFormGroupClass={true}
                                     key={idx}
-                                    className={`list-group-item  ${
-                                      idx % 2 === 0
-                                        ? "list-group-item-secondary"
-                                        : "list-group-item-primary"
-                                    }`}
                                   />
                                 </>
                               ))}
-                          </ul>
+                          </div>
                         )}
 
                         <DinaFormSection horizontal={[3, 9]}>
