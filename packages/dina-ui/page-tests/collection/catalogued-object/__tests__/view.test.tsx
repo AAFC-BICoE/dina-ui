@@ -27,8 +27,7 @@ const mockGet = jest.fn(async path => {
   if (path === "collection-api/physical-entity/1?include=collectingEvent") {
     return { data: TEST_CATALOGUED_OBJECT };
   } else if (
-    path ===
-    "collection-api/collecting-event/1?include=collectors,geoReferenceAssertions,attachment"
+    path === "collection-api/collecting-event/1?include=collectors,attachment"
   ) {
     return { data: TEST_COLLECTION_EVENT };
   } else if (path === "collection-api/collecting-event/1/attachment") {
