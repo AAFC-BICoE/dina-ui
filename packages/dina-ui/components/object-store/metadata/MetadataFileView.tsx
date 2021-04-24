@@ -1,5 +1,5 @@
 import { Metadata } from "../../../types/objectstore-api";
-import { FileView } from "../file-view/FileView";
+import { DownLoadLinks, FileView } from "../file-view/FileView";
 
 export interface MetadataFileViewProps {
   metadata: Metadata;
@@ -27,6 +27,31 @@ export function MetadataFileView({
     fileToDisplay.type === "derivative" ? "derivative/" : ""
   }${fileId}`;
 
+  const downloadLinks: DownLoadLinks = {};
+
+  const COMMON_LINK_ROOT = "/api/objectstore-api/file/";
+
+  const largeImg = metadata.derivatives?.find(
+    it => it.derivativeType === "LARGE_IMAGE"
+  );
+  const thumbnailImg = metadata.derivatives?.find(
+    it => it.derivativeType === "THUMBNAIL_IMAGE"
+  );
+
+  // populate the original if this is thumbnail metadata
+  if (metadata.type === "metadata" && metadata.acSubType === "THUMBNAIL") {
+    const acDerivedFrom = thumbnailImg?.acDerivedFrom as any;
+    downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/${acDerivedFrom?.fileIdentifier}`;
+  }
+
+  // populate the original and thumbnail if this meta has large data,
+  // hence large data is available as default to download upon click
+  if (largeImg) {
+    downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/${metadata.fileIdentifier}`;
+    if (thumbnailImg)
+      downloadLinks.thumbNail = `${COMMON_LINK_ROOT}${metadata.bucket}/thumbnail/${thumbnailImg.fileIdentifier}`;
+  }
+
   // fileExtension should always be available when getting the Metadata from the back-end:
   const fileType = (fileToDisplay.fileExtension as string)
     .replace(/\./, "")
@@ -38,6 +63,7 @@ export function MetadataFileView({
       filePath={filePath}
       fileType={fileType}
       imgHeight={imgHeight}
+      downloadLinks={downloadLinks}
     />
   );
 }

@@ -2,12 +2,19 @@ import { useAccount } from "common-ui";
 import dynamic from "next/dynamic";
 import { ComponentType } from "react";
 
+export type DownLoadLinks = {
+  original?: string;
+  thumbNail?: string;
+  large?: string;
+};
+
 export interface FileViewProps {
   clickToDownload?: boolean;
   filePath: string;
   fileType: string;
   imgAlt?: string;
   imgHeight?: string;
+  downloadLinks?: DownLoadLinks;
 }
 
 // The FileViewer component can't be server-side rendered:
@@ -32,7 +39,8 @@ export function FileView({
   filePath,
   fileType,
   imgAlt,
-  imgHeight
+  imgHeight,
+  downloadLinks
 }: FileViewProps) {
   const { token } = useAccount();
 
@@ -77,6 +85,33 @@ export function FileView({
           />
         )}
       </a>
+
+      <div className="d-flex justify-content-center">
+        {downloadLinks?.original && (
+          <a
+            className="p-2"
+            href={`${downloadLinks?.original}?access_token=${token}`}
+          >
+            Original
+          </a>
+        )}
+        {downloadLinks?.thumbNail && (
+          <a
+            className="p-2"
+            href={`${downloadLinks?.thumbNail}?access_token=${token}`}
+          >
+            thumbnail
+          </a>
+        )}
+        {downloadLinks?.large && (
+          <a
+            className="p-2"
+            href={`${downloadLinks?.large}?access_token=${token}`}
+          >
+            large
+          </a>
+        )}
+      </div>
     </div>
   );
 }
