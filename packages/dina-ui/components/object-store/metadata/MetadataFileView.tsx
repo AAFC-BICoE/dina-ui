@@ -16,11 +16,7 @@ export function MetadataFileView({
     metadata.derivatives?.find(it => it.derivativeType === "LARGE_IMAGE") ??
     metadata;
 
-  // If the file is a thumbnail then show the thumbnail:
-  const fileId =
-    fileToDisplay.type === "metadata" && fileToDisplay.acSubType === "THUMBNAIL"
-      ? `${fileToDisplay.fileIdentifier}/thumbnail`
-      : fileToDisplay.fileIdentifier;
+  const fileId = fileToDisplay.fileIdentifier;
 
   const filePath = `/api/objectstore-api/file/${fileToDisplay.bucket}/${
     // Add derivative/ before the fileIdentifier if the file to display is a derivative.
@@ -31,25 +27,21 @@ export function MetadataFileView({
 
   const COMMON_LINK_ROOT = "/api/objectstore-api/file/";
 
-  const largeImg = metadata.derivatives?.find(
+  const largeImgDerivative = metadata.derivatives?.find(
     it => it.derivativeType === "LARGE_IMAGE"
   );
-  const thumbnailImg = metadata.derivatives?.find(
+  const thumbnailImgDerivative = metadata.derivatives?.find(
     it => it.derivativeType === "THUMBNAIL_IMAGE"
   );
 
-  // populate the original if this is thumbnail metadata
-  if (metadata.type === "metadata" && metadata.acSubType === "THUMBNAIL") {
-    const acDerivedFrom = thumbnailImg?.acDerivedFrom as any;
-    downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/${acDerivedFrom?.fileIdentifier}`;
+  // populate the original if this meta has large data
+  if (largeImgDerivative) {
+    downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/${metadata.fileIdentifier}`;
   }
 
-  // populate the original and thumbnail if this meta has large data,
-  // hence large data is available as default to download upon click
-  if (largeImg) {
-    downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/${metadata.fileIdentifier}`;
-    if (thumbnailImg)
-      downloadLinks.thumbNail = `${COMMON_LINK_ROOT}${metadata.bucket}/thumbnail/${thumbnailImg.fileIdentifier}`;
+  // populate the thumbnail
+  if (thumbnailImgDerivative) {
+    downloadLinks.thumbNail = `${COMMON_LINK_ROOT}${thumbnailImgDerivative.bucket}/${thumbnailImgDerivative?.fileIdentifier}/thumbnail`;
   }
 
   // fileExtension should always be available when getting the Metadata from the back-end:
