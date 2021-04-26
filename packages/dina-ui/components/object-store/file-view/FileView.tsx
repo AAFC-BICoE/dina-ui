@@ -6,6 +6,7 @@ import { ComponentType } from "react";
 export type DownLoadLinks = {
   original?: string;
   thumbNail?: string;
+  largeData?: string;
 };
 
 export interface FileViewProps {
@@ -96,6 +97,14 @@ export function FileView({
           </a>
         )}
         {downloadLinks?.thumbNail && (
+          <a
+            className="p-2"
+            href={`${downloadLinks?.thumbNail}?access_token=${token}`}
+          >
+            <DinaMessage id="thumbnailImgLink" />
+          </a>
+        )}
+        {downloadLinks?.largeData && (
           <a
             className="p-2"
             href={`${downloadLinks?.thumbNail}?access_token=${token}`}

@@ -34,14 +34,16 @@ export function MetadataFileView({
     it => it.derivativeType === "THUMBNAIL_IMAGE"
   );
 
-  // populate the original if this meta has large data
-  if (largeImgDerivative) {
-    downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/${metadata.fileIdentifier}`;
-  }
+  downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/${metadata.fileIdentifier}`;
 
-  // populate the thumbnail
+  // populate the thumbnail link
   if (thumbnailImgDerivative) {
     downloadLinks.thumbNail = `${COMMON_LINK_ROOT}${thumbnailImgDerivative.bucket}/${thumbnailImgDerivative?.fileIdentifier}/thumbnail`;
+  }
+
+  // populate the large data link
+  if (largeImgDerivative) {
+    downloadLinks.largeData = `${COMMON_LINK_ROOT}${largeImgDerivative.bucket}/derivative/${largeImgDerivative?.fileIdentifier}`;
   }
 
   // fileExtension should always be available when getting the Metadata from the back-end:

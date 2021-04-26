@@ -202,6 +202,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   longitudeValidationError:
     "Invalid longitude: {longtitude}, \
   \nValid longitude is between -180 to 180 for degree, and 0 to 60 for minute and second",
+  largeImgLink: "Large",
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",
   locationLabel: "Location",
   literalGeoreferencedByLabel: "Georeferenced By",
