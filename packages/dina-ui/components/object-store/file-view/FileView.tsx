@@ -1,11 +1,11 @@
 import { useAccount } from "common-ui";
 import dynamic from "next/dynamic";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { ComponentType } from "react";
 
 export type DownLoadLinks = {
   original?: string;
   thumbNail?: string;
-  large?: string;
 };
 
 export interface FileViewProps {
@@ -92,7 +92,7 @@ export function FileView({
             className="p-2"
             href={`${downloadLinks?.original}?access_token=${token}`}
           >
-            Original
+            <DinaMessage id="originalImgLink" />
           </a>
         )}
         {downloadLinks?.thumbNail && (
@@ -100,15 +100,7 @@ export function FileView({
             className="p-2"
             href={`${downloadLinks?.thumbNail}?access_token=${token}`}
           >
-            thumbnail
-          </a>
-        )}
-        {downloadLinks?.large && (
-          <a
-            className="p-2"
-            href={`${downloadLinks?.large}?access_token=${token}`}
-          >
-            large
+            <DinaMessage id="thumbnailImgLink" />
           </a>
         )}
       </div>
