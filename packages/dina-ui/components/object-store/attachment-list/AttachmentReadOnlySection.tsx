@@ -2,8 +2,9 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ExistingAttachmentsTable } from "./ExistingAttachmentsTable";
 import { TotalAttachmentsIndicator } from "./TotalAttachmentsIndicator";
 import { useState } from "react";
+import { useQuery } from "common-ui";
 
-export interface AttachmentReadOnlySection {
+export interface AttachmentReadOnlySectionProps {
   attachmentPath: string;
   detachTotalSelected?: boolean;
 }
@@ -11,9 +12,15 @@ export interface AttachmentReadOnlySection {
 export function AttachmentReadOnlySection({
   attachmentPath,
   detachTotalSelected
-}: AttachmentReadOnlySection) {
+}: AttachmentReadOnlySectionProps) {
   // JSX key to reload the child components after editing Metadatas.
   const [lastSave, setLastSave] = useState<number>();
+
+  // Just check if the object-store is up:
+  const { error } = useQuery<[]>(
+    { path: "objectstore-api/metadata" },
+    { deps: [lastSave] }
+  );
 
   return (
     <div key={lastSave}>
@@ -21,11 +28,15 @@ export function AttachmentReadOnlySection({
         <DinaMessage id="attachments" />{" "}
         <TotalAttachmentsIndicator attachmentPath={attachmentPath} />
       </h2>
-      <ExistingAttachmentsTable
-        attachmentPath={attachmentPath}
-        onMetadatasEdited={() => setLastSave(Date.now())}
-        detachTotalSelected={detachTotalSelected}
-      />
+      {error ? (
+        <DinaMessage id="objectStoreDataUnavailable" />
+      ) : (
+        <ExistingAttachmentsTable
+          attachmentPath={attachmentPath}
+          onMetadatasEdited={() => setLastSave(Date.now())}
+          detachTotalSelected={detachTotalSelected}
+        />
+      )}
     </div>
   );
 }
