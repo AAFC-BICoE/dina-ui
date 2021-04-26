@@ -1,6 +1,6 @@
 import { useAccount } from "common-ui";
 import dynamic from "next/dynamic";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ComponentType } from "react";
 
 export type DownLoadLinks = {
