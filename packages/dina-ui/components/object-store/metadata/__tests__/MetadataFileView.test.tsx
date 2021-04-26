@@ -72,7 +72,7 @@ describe("MetadataFileView component", () => {
       "/api/objectstore-api/file/dao/7baa76e3-8c35-4e4a-95b2-0209268a6cc7?access_token=test-token"
     );
     expect(wrapper.find("a.thumbnail").prop("href")).toEqual(
-      "/api/objectstore-api/file/dao/053eb70f-da3f-4943-b9ac-72d01f0826a2/thumbnail?access_token=test-token"
+      "/api/objectstore-api/file/dao/7baa76e3-8c35-4e4a-95b2-0209268a6cc7/thumbnail?access_token=test-token"
     );
     expect(wrapper.find("a.large").prop("href")).toEqual(
       "/api/objectstore-api/file/dao/derivative/529755e1-7d36-478c-b29b-679385de155b?access_token=test-token"
