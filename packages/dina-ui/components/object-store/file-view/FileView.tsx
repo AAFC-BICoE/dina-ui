@@ -90,7 +90,7 @@ export function FileView({
       <div className="d-flex justify-content-center">
         {downloadLinks?.original && (
           <a
-            className="p-2"
+            className="p-2 original"
             href={`${downloadLinks?.original}?access_token=${token}`}
           >
             <DinaMessage id="originalImgLink" />
@@ -98,7 +98,7 @@ export function FileView({
         )}
         {downloadLinks?.thumbNail && (
           <a
-            className="p-2"
+            className="p-2 thumbnail"
             href={`${downloadLinks?.thumbNail}?access_token=${token}`}
           >
             <DinaMessage id="thumbnailImgLink" />
@@ -106,10 +106,10 @@ export function FileView({
         )}
         {downloadLinks?.largeData && (
           <a
-            className="p-2"
-            href={`${downloadLinks?.thumbNail}?access_token=${token}`}
+            className="p-2 large"
+            href={`${downloadLinks?.largeData}?access_token=${token}`}
           >
-            <DinaMessage id="thumbnailImgLink" />
+            <DinaMessage id="largeImgLink" />
           </a>
         )}
       </div>
