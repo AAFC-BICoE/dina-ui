@@ -1,4 +1,4 @@
-import { FastField, FieldProps } from "formik";
+import { FormikProps } from "formik";
 import { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
@@ -10,7 +10,11 @@ export interface TextFieldProps extends LabelWrapperParams {
   placeholder?: string;
 
   customInput?: (inputProps: InputHTMLAttributes<any>) => JSX.Element;
-  onChangeExternal?: (form, name, value) => void;
+  onChangeExternal?: (
+    form: FormikProps<any>,
+    name: string,
+    value: string | null
+  ) => void;
 }
 
 /**
@@ -28,40 +32,36 @@ export function TextField(props: TextFieldProps) {
     onChangeExternal,
     ...labelWrapperProps
   } = props;
-  const { name } = labelWrapperProps;
 
   return (
     <FieldWrapper {...labelWrapperProps}>
-      <FastField name={name}>
-        {({ field: { value }, form }: FieldProps) => {
-          function onChange(event) {
-            form.setFieldValue(name, event.target.value);
-            form.setFieldTouched(name);
-            onChangeExternal?.(form, name, event.target.value);
-          }
+      {({ formik, setValue, value }) => {
+        function onChangeInternal(newValue: string) {
+          setValue(newValue);
+          onChangeExternal?.(formik, props.name, newValue);
+        }
 
-          const inputPropsInternal = {
-            ...inputPropsExternal,
-            placeholder,
-            className: "form-control",
-            onChange,
-            value: value || initialValue || "",
-            readOnly
-          };
+        const inputPropsInternal: InputHTMLAttributes<any> = {
+          ...inputPropsExternal,
+          placeholder,
+          className: "form-control",
+          onChange: event => onChangeInternal(event.target.value),
+          value: value || "",
+          readOnly
+        };
 
-          // The default Field component's inner text input needs to be replaced with our own
-          // controlled input that we manually pass the "onChange" and "value" props. Otherwise
-          // we will get React's warning about switching from an uncontrolled to controlled input.
-          return (
-            customInput?.(inputPropsInternal) ??
-            (multiLines ? (
-              <textarea rows={4} {...inputPropsInternal} />
-            ) : (
-              <input type="text" {...inputPropsInternal} />
-            ))
-          );
-        }}
-      </FastField>
+        // The default Field component's inner text input needs to be replaced with our own
+        // controlled input that we manually pass the "onChange" and "value" props. Otherwise
+        // we will get React's warning about switching from an uncontrolled to controlled input.
+        return (
+          customInput?.(inputPropsInternal) ??
+          (multiLines ? (
+            <textarea rows={4} {...inputPropsInternal} />
+          ) : (
+            <input type="text" {...inputPropsInternal} />
+          ))
+        );
+      }}
     </FieldWrapper>
   );
 }

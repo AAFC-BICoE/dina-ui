@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { CollectingEvent } from "./CollectingEvent";
+import { Person } from "../../objectstore-api";
 
 export interface GeoReferenceAssertionAttributes {
   createdBy?: string;
@@ -14,17 +14,12 @@ export interface GeoReferenceAssertionAttributes {
   dwcGeoreferenceRemarks?: string;
   dwcGeodeticDatum?: string;
   dwcGeoreferenceVerificationStatus?: GeoreferenceVerificationStatus;
+  georeferencedBy?: (string | Person)[];
 }
 
 export enum GeoreferenceVerificationStatus {
   GEOREFERENCING_NOT_POSSIBLE = "GEOREFERENCING_NOT_POSSIBLE"
 }
 
-export interface GeoReferenceAssertionRelationships {
-  collectingEvent?: CollectingEvent;
-  georeferencedBy?: KitsuResource[];
-}
-
 export type GeoReferenceAssertion = KitsuResource &
-  GeoReferenceAssertionAttributes &
-  GeoReferenceAssertionRelationships;
+  GeoReferenceAssertionAttributes;

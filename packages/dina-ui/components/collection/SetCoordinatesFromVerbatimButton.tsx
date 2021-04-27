@@ -39,8 +39,9 @@ export function SetCoordinatesFromVerbatimButton({
         `${get(values, sourceLatField)}, ${get(values, sourceLonField)}`
       );
 
-      const lat = coords.getLatitude();
-      const lon = coords.getLongitude();
+      // Limit to 6 decimal places:
+      const lat = Number(coords.getLatitude().toFixed(6));
+      const lon = Number(coords.getLongitude().toFixed(6));
 
       if (lat > 90 || lat < -90) {
         setError(

@@ -13,6 +13,7 @@ import { GroupLabel } from "./GroupFieldView";
 import { useStoredDefaultGroup } from "./useStoredDefaultGroup";
 
 interface GroupSelectFieldProps extends Omit<SelectFieldProps, "options"> {
+  /** Show the "any" option. */
   showAnyOption?: boolean;
 
   /**

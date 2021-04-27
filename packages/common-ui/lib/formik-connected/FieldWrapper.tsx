@@ -1,4 +1,4 @@
-import { FastField } from "formik";
+import { FastField, FormikProps } from "formik";
 import { ReactNode } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { useDinaFormContext } from "./DinaForm";
@@ -36,11 +36,19 @@ export interface LabelWrapperParams {
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
-  children?: JSX.Element;
+  children?:
+    | JSX.Element
+    | ((renderProps: FieldWrapperRenderProps) => JSX.Element);
+}
+
+export interface FieldWrapperRenderProps {
+  value: any;
+  setValue: (newValue: any) => void;
+  formik: FormikProps<any>;
 }
 
 /**
- * Wraps a field with a label of the field's name. The label can be auto-generated as a title-case
+ * Wraps a field with a label of the field's name and Formik's FastField. The label can be auto-generated as a title-case
  * version of the field name, or can be specified as a custom label string.
  *
  * This component also wraps the field in a div with the className `${fieldName}-field` for testing purposes.
@@ -87,21 +95,29 @@ export function FieldWrapper({
           </label>
         )}
         <div className={valueCol ? `col-sm-${valueCol}` : ""}>
-          {readOnly || !children ? (
-            <FastField name={name}>
-              {({ field: { value } }) =>
-                readOnlyRender?.(value) ?? (
-                  <ReadOnlyValue
-                    arrayItemLink={arrayItemLink}
-                    link={link}
-                    value={value}
-                  />
-                )
+          <FastField name={name}>
+            {({ field: { value }, form }) => {
+              if (readOnly || !children) {
+                return (
+                  readOnlyRender?.(value) ?? (
+                    <ReadOnlyValue
+                      arrayItemLink={arrayItemLink}
+                      link={link}
+                      value={value}
+                    />
+                  )
+                );
+              } else if (typeof children === "function") {
+                function setValue(newValue: any) {
+                  form.setFieldValue(name, newValue);
+                  form.setFieldTouched(name);
+                }
+
+                return children?.({ value, setValue, formik: form });
               }
-            </FastField>
-          ) : (
-            children
-          )}
+              return children;
+            }}
+          </FastField>
         </div>
       </div>
     </div>

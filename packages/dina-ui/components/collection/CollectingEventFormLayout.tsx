@@ -1,20 +1,22 @@
 import {
   AutoSuggestTextField,
   DinaFormSection,
+  FieldSet,
   filterBy,
   FormattedTextField,
   FormikButton,
-  TextFieldWithCoordButtons,
   NominatumApiSearchResult,
   ResourceSelectField,
   TextField,
-  useDinaFormContext,
+  useDinaFormContext,  
+  TextFieldWithCoordButtons,
   TextFieldWithRemoveButton
 } from "common-ui";
 import { Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
 import { SRS } from "../../types/collection-api/resources/SRS";
 import { useState, useRef } from "react";
+import { ShouldRenderReasons } from "react-autosuggest";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
@@ -30,13 +32,13 @@ import {
   CollectingEvent,
   GeographicPlaceNameSource
 } from "../../types/collection-api/resources/CollectingEvent";
-import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import {
   CoordinateSystem,
   CoordinateSystemEnum,
   CoordinateSystemEnumPlaceHolder
 } from "../../types/collection-api/resources/CoordinateSystem";
-import { ShouldRenderReasons } from "react-autosuggest";
+import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
+import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -220,10 +222,7 @@ export function CollectingEventFormLayout({
       </DinaFormSection>
       <div className="row">
         <div className="col-md-6">
-          <fieldset className="form-group border px-4 py-2">
-            <legend className="w-auto">
-              <DinaMessage id="collectingDateLegend" />
-            </legend>
+          <FieldSet legend={<DinaMessage id="collectingDateLegend" />}>
             <FormattedTextField
               name="startEventDateTime"
               className="startEventDateTime"
@@ -247,7 +246,7 @@ export function CollectingEventFormLayout({
                         onChange={newValue =>
                           toggleRangeEnabled(newValue, form)
                         }
-                        checked={rangeEnabled || endEventDateTime}
+                        checked={rangeEnabled || !!endEventDateTime || false}
                         className="react-switch dateRange"
                       />
                     </label>
@@ -259,13 +258,10 @@ export function CollectingEventFormLayout({
               name="verbatimEventDateTime"
               label={formatMessage("verbatimEventDateTimeLabel")}
             />
-          </fieldset>
+          </FieldSet>
         </div>
         <div className="col-md-6">
-          <fieldset className="form-group border px-4 py-2">
-            <legend className="w-auto">
-              <DinaMessage id="collectingAgentsLegend" />
-            </legend>
+          <FieldSet legend={<DinaMessage id="collectingAgentsLegend" />}>
             <AutoSuggestTextField<CollectingEvent>
               name="dwcRecordedBy"
               query={(searchValue, ctx) => ({
@@ -292,17 +288,11 @@ export function CollectingEventFormLayout({
               ]}
             />
             <TextField name="dwcRecordNumber" />
-          </fieldset>
+          </FieldSet>
         </div>
       </div>
-      <fieldset className="form-group border px-4 py-2">
-        <legend className="w-auto">
-          <DinaMessage id="collectingLocationLegend" />
-        </legend>
-        <fieldset className="form-group border px-4 py-2">
-          <legend className="w-auto">
-            <DinaMessage id="verbatimCoordinatesLegend" />
-          </legend>
+      <FieldSet legend={<DinaMessage id="collectingLocationLegend" />}>
+        <FieldSet legend={<DinaMessage id="verbatimLabelLegend" />}>
           <div className="row">
             <div className="col-md-6">
               <TextField name="dwcVerbatimLocality" />
@@ -350,8 +340,8 @@ export function CollectingEventFormLayout({
                         name="dwcVerbatimLatitude"
                         placeholder={
                           hasDegree || hasMinute || hasSecond
-                            ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
-                            : null
+                            ? `${CoordinateSystemEnumPlaceHolder[coordSysSelected]}N`
+                            : undefined
                         }
                         isExternallyControlled={true}
                         shouldShowDegree={hasDegree || hasMinute || hasSecond}
@@ -365,8 +355,8 @@ export function CollectingEventFormLayout({
                         name="dwcVerbatimLongitude"
                         placeholder={
                           hasDegree || hasMinute || hasSecond
-                            ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
-                            : null
+                            ? `${CoordinateSystemEnumPlaceHolder[coordSysSelected]}E`
+                            : undefined
                         }
                         isExternallyControlled={true}
                         shouldShowDegree={hasDegree || hasMinute || hasSecond}
@@ -414,13 +404,10 @@ export function CollectingEventFormLayout({
               <TextField name="dwcVerbatimDepth" />
             </div>
           </div>
-        </fieldset>
+        </FieldSet>
         <div className="row">
           <div className="col-lg-6">
-            <fieldset className="form-group border px-4 py-2">
-              <legend className="w-auto">
-                <DinaMessage id="geoReferencingLegend" />
-              </legend>
+            <FieldSet legend={<DinaMessage id="geoReferencingLegend" />}>
               <FieldArray name="geoReferenceAssertions">
                 {({ form, push, remove }) => {
                   const assertions =
@@ -447,19 +434,21 @@ export function CollectingEventFormLayout({
                       >
                         {
                           // Only show the tabs when there is more than 1 assertion:
-                          assertions.length !== 1 && (
-                            <TabList>
-                              {assertions.map((assertion, index) => (
-                                <Tab key={assertion.id}>
-                                  <span className="m-3">{index + 1}</span>
-                                </Tab>
-                              ))}
-                            </TabList>
-                          )
+                          <TabList
+                            className={`react-tabs__tab-list ${
+                              assertions.length === 1 ? "d-none" : ""
+                            }`}
+                          >
+                            {assertions.map((_, index) => (
+                              <Tab key={index}>
+                                <span className="m-3">{index + 1}</span>
+                              </Tab>
+                            ))}
+                          </TabList>
                         }
                         {assertions.length
                           ? assertions.map((assertion, index) => (
-                              <TabPanel key={assertion.id}>
+                              <TabPanel key={index}>
                                 <GeoReferenceAssertionRow
                                   index={index}
                                   openAddPersonModal={openAddPersonModal}
@@ -498,13 +487,10 @@ export function CollectingEventFormLayout({
                   );
                 }}
               </FieldArray>
-            </fieldset>
+            </FieldSet>
           </div>
           <div className="col-lg-6">
-            <fieldset className="form-group border px-4 py-2">
-              <legend className="w-auto">
-                <DinaMessage id="toponymyLegend" />
-              </legend>
+            <FieldSet legend={<DinaMessage id="toponymyLegend" />}>
               <div
                 style={{
                   overflowY: "auto",
@@ -679,10 +665,23 @@ export function CollectingEventFormLayout({
                   }
                 </Field>
               </div>
-            </fieldset>
+            </FieldSet>
           </div>
         </div>
-      </fieldset>
+      </FieldSet>
+
+      {readOnly && (
+        <div className="form-group">
+          <Field name="id">
+            {({ field: { value: id } }) => (
+              <AttachmentReadOnlySection
+                attachmentPath={`collection-api/collecting-event/${id}/attachment`}
+                detachTotalSelected={true}
+              />
+            )}
+          </Field>
+        </div>
+      )}
     </div>
   );
 }

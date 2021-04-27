@@ -1,4 +1,3 @@
-import { FastField, FieldProps } from "formik";
 import { isArray } from "lodash";
 import Select from "react-select";
 import { Styles } from "react-select/src/styles";
@@ -30,14 +29,10 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
     styles,
     ...labelWrapperProps
   } = props;
-  const { name } = labelWrapperProps;
 
   return (
-    <FastField name={name}>
-      {({
-        field: { value },
-        form: { setFieldValue, setFieldTouched }
-      }: FieldProps) => {
+    <FieldWrapper {...labelWrapperProps}>
+      {({ setValue, value }) => {
         function onChangeInternal(
           change: SelectOption<T>[] | SelectOption<T> | null
         ) {
@@ -49,8 +44,7 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
           const newValue = isArray(change)
             ? change.map(option => option.value)
             : change?.value;
-          setFieldValue(name, newValue);
-          setFieldTouched(name);
+          setValue(newValue);
           onChange?.(newValue);
         }
 
@@ -59,18 +53,16 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
           : options.find(option => option.value === value) ?? null;
 
         return (
-          <FieldWrapper {...labelWrapperProps}>
-            <Select
-              isDisabled={disabled}
-              isMulti={isMulti}
-              options={options}
-              onChange={onChangeInternal}
-              styles={styles}
-              value={selectedOption}
-            />
-          </FieldWrapper>
+          <Select
+            isDisabled={disabled}
+            isMulti={isMulti}
+            options={options}
+            onChange={onChangeInternal}
+            styles={styles}
+            value={selectedOption}
+          />
         );
       }}
-    </FastField>
+    </FieldWrapper>
   );
 }

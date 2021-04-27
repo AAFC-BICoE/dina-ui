@@ -66,12 +66,12 @@ export function FilterForm({
           <div className="d-inline-block">
             {children && children(formikProps)}
           </div>
-          <div className="d-inline-block pl-3">
-            <SubmitButton>
+          <div className="d-inline-block pl-3 list-inline">
+            <SubmitButton className="list-inline-item">
               <CommonMessage id="filterSubmitButtonText" />
             </SubmitButton>
             <button
-              className="btn btn-dark filter-reset-button"
+              className="btn btn-dark list-inline-item filter-reset-button"
               type="button"
               onClick={() => resetFilterForm(formikProps)}
             >

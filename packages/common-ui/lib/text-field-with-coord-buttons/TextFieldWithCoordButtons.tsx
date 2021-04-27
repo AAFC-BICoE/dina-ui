@@ -37,14 +37,14 @@ export function TextFieldWithCoordButtons(
   );
 }
 
-export function InputWithCoordButtons(inputProps: InputWithCoordButtonsProps) {
+export function InputWithCoordButtons({
+  isExternallyControlled,
+  shouldShowDegree,
+  shouldShowMinute,
+  shouldShowSecond,
+  ...inputProps
+}: InputWithCoordButtonsProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const {
-    isExternallyControlled,
-    shouldShowDegree,
-    shouldShowMinute,
-    shouldShowSecond
-  } = inputProps;
 
   function insertSymbol(symbol: string) {
     const input = inputRef.current;

@@ -29,6 +29,9 @@ export interface QueryOptions<TData extends KitsuResponseData, TMeta> {
 
   /** Client-side joins across multiple back-end APIs. */
   joinSpecs?: ClientSideJoinSpec[];
+
+  /** Disables the query. */
+  disabled?: boolean;
 }
 
 /**
@@ -37,7 +40,12 @@ export interface QueryOptions<TData extends KitsuResponseData, TMeta> {
  */
 export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   querySpec: JsonApiQuerySpec,
-  { deps, joinSpecs, onSuccess }: QueryOptions<TData, TMeta> = {}
+  {
+    deps,
+    joinSpecs,
+    onSuccess,
+    disabled = false
+  }: QueryOptions<TData, TMeta> = {}
 ): QueryState<TData, TMeta> {
   const { apiClient, bulkGet } = useContext(ApiClientContext);
 
@@ -47,6 +55,10 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
 
   // Memoize the callback. Only re-create it when the query spec changes.
   const fetchData = useCallback(async () => {
+    if (disabled) {
+      return undefined;
+    }
+
     // Omit undefined values from the GET params, which would otherwise cause an invalid request.
     // e.g. /api/region?fields=undefined
     const { path, fields, filter, sort, include, page } = querySpec;
@@ -56,6 +68,14 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
     );
 
     const response = await apiClient.get<TData, TMeta>(path, getParams);
+
+    if (!response) {
+      // This warning may appear in tests where apiClient.get hasn't been mocked:
+      console.warn(
+        "No response returned from apiClient.get for query: ",
+        querySpec
+      );
+    }
 
     if (onSuccess) {
       await onSuccess(response);
@@ -71,7 +91,7 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
     }
 
     return response;
-  }, [JSON.stringify(querySpec), ...(deps ?? [])]);
+  }, [JSON.stringify(querySpec), disabled, ...(deps ?? [])]);
 
   // fetchData function should re-run when the query spec changes.
   const task = useAsyncTask(fetchData);
@@ -85,7 +105,7 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   return {
     error: task.error as any,
     loading: !!task.pending,
-    response: previousResponseRef.current
+    response: disabled ? undefined : previousResponseRef.current
   };
 }
 

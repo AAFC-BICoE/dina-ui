@@ -1,5 +1,4 @@
 import { FieldWrapper, FieldWrapperProps, useQuery } from "common-ui";
-import { FastField, FieldProps } from "formik";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
 
@@ -7,15 +6,13 @@ export type GroupFieldViewProps = Omit<FieldWrapperProps, "children">;
 
 export function GroupFieldView(props: GroupFieldViewProps) {
   return (
-    <FastField name={props.name}>
-      {({ field: { value: groupName } }: FieldProps) => (
-        <FieldWrapper {...props}>
-          <p className="group-label" style={{ minHeight: "25px" }}>
-            <GroupLabel groupName={groupName} />
-          </p>
-        </FieldWrapper>
+    <FieldWrapper {...props}>
+      {({ value: groupName }) => (
+        <p className="group-label" style={{ minHeight: "25px" }}>
+          <GroupLabel groupName={groupName} />
+        </p>
       )}
-    </FastField>
+    </FieldWrapper>
   );
 }
 
