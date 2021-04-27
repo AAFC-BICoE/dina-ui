@@ -59,7 +59,7 @@ export default function ManagedAttributesListPage() {
         <ButtonBar>
           <Link href="/collection/managed-attribute/edit">
             <a className="btn btn-primary">
-              <CommonMessage id="createButtonText" />
+              <CommonMessage id="createNew" />
             </a>
           </Link>
         </ButtonBar>
