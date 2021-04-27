@@ -14,7 +14,7 @@ process.browser = true;
 const consoleError = console.error;
 jest.spyOn(console, "error").mockImplementation((...args) => {
   if (
-    !args[0].includes(
+    !args?.[0]?.includes?.(
       "Warning: An update to %s inside a test was not wrapped in act"
     )
   ) {

@@ -36,14 +36,14 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
 
     expect(
       wrapper.find(".decimalLatitude-field").find(NumberFormat).prop("value")
-    ).toEqual(45.540277777777774);
+    ).toEqual(45.540278);
     expect(
       wrapper.find(".decimalLongitude-field").find(NumberFormat).prop("value")
-    ).toEqual(-129.67527777777778);
+    ).toEqual(-129.675278);
 
     expect(onClickCallback).lastCalledWith({
-      lat: 45.540277777777774,
-      lon: -129.67527777777778
+      lat: 45.540278,
+      lon: -129.675278
     });
   });
 });

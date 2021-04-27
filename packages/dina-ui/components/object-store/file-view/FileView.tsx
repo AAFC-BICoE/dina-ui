@@ -1,6 +1,13 @@
 import { useAccount } from "common-ui";
 import dynamic from "next/dynamic";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ComponentType } from "react";
+
+export type DownLoadLinks = {
+  original?: string;
+  thumbNail?: string;
+  largeData?: string;
+};
 
 export interface FileViewProps {
   clickToDownload?: boolean;
@@ -8,6 +15,7 @@ export interface FileViewProps {
   fileType: string;
   imgAlt?: string;
   imgHeight?: string;
+  downloadLinks?: DownLoadLinks;
 }
 
 // The FileViewer component can't be server-side rendered:
@@ -32,7 +40,8 @@ export function FileView({
   filePath,
   fileType,
   imgAlt,
-  imgHeight
+  imgHeight,
+  downloadLinks
 }: FileViewProps) {
   const { token } = useAccount();
 
@@ -77,6 +86,33 @@ export function FileView({
           />
         )}
       </a>
+
+      <div className="d-flex justify-content-center">
+        {downloadLinks?.original && (
+          <a
+            className="p-2 original"
+            href={`${downloadLinks?.original}?access_token=${token}`}
+          >
+            <DinaMessage id="originalImgLink" />
+          </a>
+        )}
+        {downloadLinks?.thumbNail && (
+          <a
+            className="p-2 thumbnail"
+            href={`${downloadLinks?.thumbNail}?access_token=${token}`}
+          >
+            <DinaMessage id="thumbnailImgLink" />
+          </a>
+        )}
+        {downloadLinks?.largeData && (
+          <a
+            className="p-2 large"
+            href={`${downloadLinks?.largeData}?access_token=${token}`}
+          >
+            <DinaMessage id="largeImgLink" />
+          </a>
+        )}
+      </div>
     </div>
   );
 }

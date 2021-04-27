@@ -14,7 +14,7 @@ export function CreateButton({ entityLink }: CreateButtonProps) {
   return (
     <Link href={`${entityLink}/edit`}>
       <a className="btn btn-primary">
-        <CommonMessage id="createButtonText" />
+        <CommonMessage id="createNew" />
       </a>
     </Link>
   );

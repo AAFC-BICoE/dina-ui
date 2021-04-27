@@ -1,6 +1,7 @@
 import {
   AutoSuggestTextField,
   DinaFormSection,
+  FieldSet,
   filterBy,
   FormattedTextField,
   FormikButton,
@@ -35,6 +36,7 @@ import {
   CoordinateSystemEnumPlaceHolder
 } from "../../types/collection-api/resources/CoordinateSystem";
 import { SRS } from "../../types/collection-api/resources/SRS";
+import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
 import { ManagedAttributesEditor } from "../object-store/managed-attributes/ManagedAttributesEditor";
 import { ManagedAttributesViewer } from "../object-store/managed-attributes/ManagedAttributesViewer";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
@@ -172,10 +174,7 @@ export function CollectingEventFormLayout({
       </DinaFormSection>
       <div className="row">
         <div className="col-md-6">
-          <fieldset className="form-group border px-4 py-2">
-            <legend className="w-auto">
-              <DinaMessage id="collectingDateLegend" />
-            </legend>
+          <FieldSet legend={<DinaMessage id="collectingDateLegend" />}>
             <FormattedTextField
               name="startEventDateTime"
               className="startEventDateTime"
@@ -211,13 +210,10 @@ export function CollectingEventFormLayout({
               name="verbatimEventDateTime"
               label={formatMessage("verbatimEventDateTimeLabel")}
             />
-          </fieldset>
+          </FieldSet>
         </div>
         <div className="col-md-6">
-          <fieldset className="form-group border px-4 py-2">
-            <legend className="w-auto">
-              <DinaMessage id="collectingAgentsLegend" />
-            </legend>
+          <FieldSet legend={<DinaMessage id="collectingAgentsLegend" />}>
             <AutoSuggestTextField<CollectingEvent>
               name="dwcRecordedBy"
               query={(searchValue, ctx) => ({
@@ -244,17 +240,11 @@ export function CollectingEventFormLayout({
               ]}
             />
             <TextField name="dwcRecordNumber" />
-          </fieldset>
+          </FieldSet>
         </div>
       </div>
-      <fieldset className="form-group border px-4 py-2">
-        <legend className="w-auto">
-          <DinaMessage id="collectingLocationLegend" />
-        </legend>
-        <fieldset className="form-group border px-4 py-2">
-          <legend className="w-auto">
-            <DinaMessage id="verbatimCoordinatesLegend" />
-          </legend>
+      <FieldSet legend={<DinaMessage id="collectingLocationLegend" />}>
+        <FieldSet legend={<DinaMessage id="verbatimLabelLegend" />}>
           <div className="row">
             <div className="col-md-6">
               <TextField name="dwcVerbatimLocality" />
@@ -302,8 +292,8 @@ export function CollectingEventFormLayout({
                         name="dwcVerbatimLatitude"
                         placeholder={
                           hasDegree || hasMinute || hasSecond
-                            ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
-                            : null
+                            ? `${CoordinateSystemEnumPlaceHolder[coordSysSelected]}N`
+                            : undefined
                         }
                         isExternallyControlled={true}
                         shouldShowDegree={hasDegree || hasMinute || hasSecond}
@@ -317,8 +307,8 @@ export function CollectingEventFormLayout({
                         name="dwcVerbatimLongitude"
                         placeholder={
                           hasDegree || hasMinute || hasSecond
-                            ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
-                            : null
+                            ? `${CoordinateSystemEnumPlaceHolder[coordSysSelected]}E`
+                            : undefined
                         }
                         isExternallyControlled={true}
                         shouldShowDegree={hasDegree || hasMinute || hasSecond}
@@ -366,13 +356,10 @@ export function CollectingEventFormLayout({
               <TextField name="dwcVerbatimDepth" />
             </div>
           </div>
-        </fieldset>
+        </FieldSet>
         <div className="row">
           <div className="col-lg-6">
-            <fieldset className="form-group border px-4 py-2">
-              <legend className="w-auto">
-                <DinaMessage id="geoReferencingLegend" />
-              </legend>
+            <FieldSet legend={<DinaMessage id="geoReferencingLegend" />}>
               <FieldArray name="geoReferenceAssertions">
                 {({ form, push, remove }) => {
                   const assertions =
@@ -452,13 +439,10 @@ export function CollectingEventFormLayout({
                   );
                 }}
               </FieldArray>
-            </fieldset>
+            </FieldSet>
           </div>
           <div className="col-lg-6">
-            <fieldset className="form-group border px-4 py-2">
-              <legend className="w-auto">
-                <DinaMessage id="toponymyLegend" />
-              </legend>
+            <FieldSet legend={<DinaMessage id="toponymyLegend" />}>
               <div
                 style={{
                   overflowY: "auto",
@@ -568,40 +552,49 @@ export function CollectingEventFormLayout({
                   }
                 </Field>
               </div>
-            </fieldset>
+            </FieldSet>
           </div>
         </div>
-        <div className="row">
-          <div className="col-md-6">
-            <fieldset className="form-group border px-4 py-2">
-              <legend className="w-auto">
-                <DinaMessage id="managedAttributeListTitle" />
-              </legend>
-              {readOnly ? (
-                <FastField name="managedAttributeValues">
-                  {({ field: { value } }) => (
-                    <ManagedAttributesViewer
-                      values={value}
-                      managedAttributeApiPath={key =>
-                        `collection-api/managed-attribute/collecting_event.${key}`
-                      }
-                    />
-                  )}
-                </FastField>
-              ) : (
-                <ManagedAttributesEditor
-                  valuesPath="managedAttributeValues"
-                  valueFieldName="assignedValue"
-                  managedAttributeApiPath="collection-api/managed-attribute"
-                  apiBaseUrl="/collection-api"
-                  managedAttributeComponent="COLLECTING_EVENT"
-                  managedAttributeKeyField="key"
-                />
-              )}
-            </fieldset>
-          </div>
+      </FieldSet>
+      <div className="row">
+        <div className="col-md-6">
+          <FieldSet legend={<DinaMessage id="managedAttributeListTitle" />}>
+            {readOnly ? (
+              <FastField name="managedAttributeValues">
+                {({ field: { value } }) => (
+                  <ManagedAttributesViewer
+                    values={value}
+                    managedAttributeApiPath={key =>
+                      `collection-api/managed-attribute/collecting_event.${key}`
+                    }
+                  />
+                )}
+              </FastField>
+            ) : (
+              <ManagedAttributesEditor
+                valuesPath="managedAttributeValues"
+                valueFieldName="assignedValue"
+                managedAttributeApiPath="collection-api/managed-attribute"
+                apiBaseUrl="/collection-api"
+                managedAttributeComponent="COLLECTING_EVENT"
+                managedAttributeKeyField="key"
+              />
+            )}
+          </FieldSet>
         </div>
-      </fieldset>
+      </div>
+      {readOnly && (
+        <div className="form-group">
+          <Field name="id">
+            {({ field: { value: id } }) => (
+              <AttachmentReadOnlySection
+                attachmentPath={`collection-api/collecting-event/${id}/attachment`}
+                detachTotalSelected={true}
+              />
+            )}
+          </Field>
+        </div>
+      )}
     </div>
   );
 }

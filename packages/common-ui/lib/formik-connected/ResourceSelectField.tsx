@@ -1,6 +1,4 @@
-import { FastField, FieldProps } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { noop } from "lodash";
 import {
   ResourceSelect,
   ResourceSelectProps
@@ -20,34 +18,24 @@ export interface ResourceSelectFieldProps<TData extends KitsuResource>
 export function ResourceSelectField<TData extends KitsuResource>(
   resourceSelectFieldProps: ResourceSelectFieldProps<TData>
 ) {
-  const {
-    name,
-    onChange = noop,
-    ...resourceSelectProps
-  } = resourceSelectFieldProps;
+  const { name, onChange, ...resourceSelectProps } = resourceSelectFieldProps;
 
   return (
-    <FastField name={name}>
-      {({
-        field: { value },
-        form: { setFieldValue, setFieldTouched }
-      }: FieldProps) => {
+    <FieldWrapper {...resourceSelectFieldProps}>
+      {({ setValue, value }) => {
         function onChangeInternal(resource) {
-          setFieldValue(name, resource);
-          setFieldTouched(name);
-          onChange(resource);
+          setValue(resource);
+          onChange?.(resource);
         }
 
         return (
-          <FieldWrapper {...resourceSelectFieldProps}>
-            <ResourceSelect
-              {...resourceSelectProps}
-              onChange={onChangeInternal}
-              value={value}
-            />
-          </FieldWrapper>
+          <ResourceSelect
+            {...resourceSelectProps}
+            onChange={onChangeInternal}
+            value={value}
+          />
         );
       }}
-    </FastField>
+    </FieldWrapper>
   );
 }

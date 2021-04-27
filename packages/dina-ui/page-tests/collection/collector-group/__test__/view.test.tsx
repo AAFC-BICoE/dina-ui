@@ -72,8 +72,8 @@ describe("CollectorGroup details page", () => {
     expect(wrapper.find(".agents-field .field-view").text()).toEqual(
       "person a"
     );
-    expect(
-      wrapper.containsMatchingElement(<div> test collector group</div>)
-    ).toEqual(true);
+    expect(wrapper.find(".name-field .field-view").text()).toEqual(
+      "test collector group"
+    );
   });
 });
