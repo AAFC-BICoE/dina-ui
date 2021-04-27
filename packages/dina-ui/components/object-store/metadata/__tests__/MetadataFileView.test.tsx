@@ -11,16 +11,6 @@ const TEST_METADATA = {
   fileExtension: ".jpg"
 };
 
-const TEST_THMBNAIL_METADATA = {
-  id: "9978066e-4367-4975-8e32-cc46068ff7f0",
-  type: "metadata",
-  derivatives: [],
-  bucket: "dao",
-  fileIdentifier: "7baa76e3-8c35-4e4a-95b2-0209268a6cc7",
-  fileExtension: ".jpg",
-  acSubType: "THUMBNAIL"
-};
-
 const TEST_METADATA_WITH_LARGE_IMAGE_DERIVATIVE = {
   id: "9978066e-4367-4975-8e32-cc46068ff7f0",
   type: "metadata",
@@ -60,16 +50,6 @@ describe("MetadataFileView component", () => {
     );
   });
 
-  it("Displays the thumbnail url when the Metadata is for a thumbnail.", async () => {
-    const wrapper = mountWithAppContext(
-      <MetadataFileView metadata={TEST_THMBNAIL_METADATA as Metadata} />
-    );
-
-    expect(wrapper.find("img").prop("src")).toEqual(
-      "/api/objectstore-api/file/dao/7baa76e3-8c35-4e4a-95b2-0209268a6cc7/thumbnail?access_token=test-token"
-    );
-  });
-
   it("Displays the main Metadata's fileIdentifier by default.", async () => {
     const wrapper = mountWithAppContext(
       <MetadataFileView metadata={TEST_METADATA as Metadata} />
@@ -77,6 +57,25 @@ describe("MetadataFileView component", () => {
 
     expect(wrapper.find("img").prop("src")).toEqual(
       "/api/objectstore-api/file/dao/7baa76e3-8c35-4e4a-95b2-0209268a6cc7?access_token=test-token"
+    );
+  });
+
+  it("Displays 3 download links by default", async () => {
+    const wrapper = mountWithAppContext(
+      <MetadataFileView
+        metadata={TEST_METADATA_WITH_LARGE_IMAGE_DERIVATIVE as Metadata}
+      />
+    );
+    expect(wrapper.find("a").length).toBe(4);
+
+    expect(wrapper.find("a.original").prop("href")).toEqual(
+      "/api/objectstore-api/file/dao/7baa76e3-8c35-4e4a-95b2-0209268a6cc7?access_token=test-token"
+    );
+    expect(wrapper.find("a.thumbnail").prop("href")).toEqual(
+      "/api/objectstore-api/file/dao/7baa76e3-8c35-4e4a-95b2-0209268a6cc7/thumbnail?access_token=test-token"
+    );
+    expect(wrapper.find("a.large").prop("href")).toEqual(
+      "/api/objectstore-api/file/dao/derivative/529755e1-7d36-478c-b29b-679385de155b?access_token=test-token"
     );
   });
 });

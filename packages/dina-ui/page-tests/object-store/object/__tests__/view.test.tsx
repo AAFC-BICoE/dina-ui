@@ -48,18 +48,4 @@ describe("Single Stored Object details page", () => {
     await new Promise(setImmediate);
     wrapper.update();
   });
-
-  it("Renders the thumbnail if the metadata is a thumbnail type.", async () => {
-    const THUMBNAIL_METADATA = { ...TEST_METADATA, acSubType: "THUMBNAIL" };
-    mockGet.mockImplementation(async () => ({ data: THUMBNAIL_METADATA }));
-
-    const wrapper = mountWithAppContext(<MetadataViewPage />, { apiContext });
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(wrapper.find(FileView).find("img").prop("src")).toEqual(
-      "/api/objectstore-api/file/testbucket/cf99c285-0353-4fed-a15d-ac963e0514f3/thumbnail?access_token=test-token"
-    );
-  });
 });
