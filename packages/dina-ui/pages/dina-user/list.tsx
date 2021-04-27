@@ -29,7 +29,8 @@ const USER_TABLE_COLUMNS = [
         }
       />
     ),
-    accessor: "rolesPerGroup"
+    accessor: "rolesPerGroup",
+    sortable: false
   }
 ];
 
