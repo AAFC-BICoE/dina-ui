@@ -5,6 +5,7 @@ import {
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
+  FieldSet,
   filterBy,
   Query,
   ResourceSelectField,
@@ -155,85 +156,76 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
     await router.push(`/object-store/object/view?id=${id}`);
   };
 
+  const buttonBar = (
+    <ButtonBar>
+      <BackButton entityId={id as string} entityLink="/object-store/object" />
+      <SubmitButton className="ml-auto" />
+    </ButtonBar>
+  );
+
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
-      <ButtonBar>
-        <SubmitButton />
-        <BackButton entityId={id as string} entityLink="/object-store/object" />
-        <DeleteButton
-          className="ml-5"
-          id={id as string}
-          options={{ apiBaseUrl: "/objectstore-api" }}
-          postDeleteRedirect="/object/list"
-          type="metadata"
-        />
-      </ButtonBar>
-      <div>
-        <div className="form-group">
-          <MetadataFileView metadata={metadata} imgHeight="15rem" />
+      {buttonBar}
+      <div className="form-group">
+        <MetadataFileView metadata={metadata} imgHeight="15rem" />
+      </div>
+      <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
+        <div className="row">
+          <TextField
+            className="col-md-3 col-sm-4"
+            name="originalFilename"
+            readOnly={true}
+          />
+          <DateField
+            className="col-md-3 col-sm-4"
+            name="acDigitizationDate"
+            showTime={true}
+          />
         </div>
-        <div className="form-group">
-          <h2>
-            <DinaMessage id="metadataMediaDetailsLabel" />
-          </h2>
-          <div className="row">
-            <TextField
-              className="col-md-3 col-sm-4"
-              name="originalFilename"
-              readOnly={true}
-            />
-            <DateField
-              className="col-md-3 col-sm-4"
-              name="acDigitizationDate"
-              showTime={true}
-            />
-          </div>
-          <div className="row">
-            <SelectField
-              className="col-md-3 col-sm-4"
-              name="dcType"
-              options={DCTYPE_OPTIONS}
-            />
-            <TextField className="col-md-3 col-sm-4" name="acCaption" />
-            <TextField
-              className="col-md-3 col-sm-4"
-              name="acTags"
-              multiLines={true}
-              label={formatMessage("metadataBulkEditTagsLabel")}
-            />
-          </div>
-          <div className="row">
-            <ResourceSelectField<Person>
-              className="col-md-3 col-sm-4"
-              name="dcCreator"
-              filter={filterBy(["displayName"])}
-              model="agent-api/person"
-              optionLabel={person => person.displayName}
-              label={formatMessage("field_dcCreator.displayName")}
-            />
-          </div>
+        <div className="row">
+          <SelectField
+            className="col-md-3 col-sm-4"
+            name="dcType"
+            options={DCTYPE_OPTIONS}
+          />
+          <TextField className="col-md-3 col-sm-4" name="acCaption" />
+          <TextField
+            className="col-md-3 col-sm-4"
+            name="acTags"
+            multiLines={true}
+            label={formatMessage("metadataBulkEditTagsLabel")}
+          />
         </div>
-        <div className="form-group">
-          <h2>
-            <DinaMessage id="metadataRightsDetailsLabel" />
-          </h2>
-          <div className="row">
-            <TextField className="col-md-3 col-sm-4" name="dcRights" />
-            <ResourceSelectField<License>
-              className="col-md-3 col-sm-4"
-              name="license"
-              filter={() => ({})}
-              model="objectstore-api/license"
-              optionLabel={license => license.titles[locale] ?? license.url}
-            />
-            <SelectField
-              className="col-md-3 col-sm-4"
-              name="publiclyReleasable"
-              options={PUBLICLY_RELEASABLE_OPTIONS}
-            />
-            <NotPubliclyReleasableReasonField />
-          </div>
+        <div className="row">
+          <ResourceSelectField<Person>
+            className="col-md-3 col-sm-4"
+            name="dcCreator"
+            filter={filterBy(["displayName"])}
+            model="agent-api/person"
+            optionLabel={person => person.displayName}
+            label={formatMessage("field_dcCreator.displayName")}
+          />
         </div>
+      </FieldSet>
+      <FieldSet legend={<DinaMessage id="metadataRightsDetailsLabel" />}>
+        <div className="row">
+          <TextField className="col-md-3 col-sm-4" name="dcRights" />
+          <ResourceSelectField<License>
+            className="col-md-3 col-sm-4"
+            name="license"
+            filter={() => ({})}
+            model="objectstore-api/license"
+            optionLabel={license => license.titles[locale] ?? license.url}
+          />
+          <SelectField
+            className="col-md-3 col-sm-4"
+            name="publiclyReleasable"
+            options={PUBLICLY_RELEASABLE_OPTIONS}
+          />
+          <NotPubliclyReleasableReasonField />
+        </div>
+      </FieldSet>
+      <FieldSet legend={<DinaMessage id="managedAttributeListTitle" />}>
         <div className="row">
           <div className="col-sm-6">
             <ManagedAttributesEditor
@@ -243,7 +235,8 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
             />
           </div>
         </div>
-      </div>
+      </FieldSet>
+      {buttonBar}
     </DinaForm>
   );
 }

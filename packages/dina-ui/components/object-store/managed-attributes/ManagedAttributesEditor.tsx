@@ -1,6 +1,4 @@
 import {
-  DinaFormSection,
-  FieldWrapper,
   filterBy,
   NumberField,
   ResourceSelect,
@@ -71,33 +69,30 @@ export function ManagedAttributesEditor({
 
   return (
     <div className="form-group managed-attributes-editor">
-      <h2>
-        <DinaMessage id="metadataManagedAttributesLabel" />
-      </h2>
       <div className="row">
         <div className="col-sm-6">
-          <FieldWrapper
-            name="editableManagedAttributes"
-            label={formatMessage("field_editableManagedAttributes")}
-          >
-            <ResourceSelect<ManagedAttribute>
-              filter={input => ({
-                ...filterBy(["name"])(input),
-                ...(managedAttributeComponent
-                  ? { managedAttributeComponent }
-                  : {})
-              })}
-              model={managedAttributeApiPath}
-              optionLabel={attribute =>
-                attribute.name ?? get(attribute, managedAttributeKeyField)
-              }
-              isMulti={true}
-              onChange={ma =>
-                setEditableManagedAttributes(ma as ManagedAttribute[])
-              }
-              value={editableManagedAttributes}
-            />
-          </FieldWrapper>
+          <label>
+            <strong>
+              <DinaMessage id="field_editableManagedAttributes" />
+            </strong>
+          </label>
+          <ResourceSelect<ManagedAttribute>
+            filter={input => ({
+              ...filterBy(["name"])(input),
+              ...(managedAttributeComponent
+                ? { managedAttributeComponent }
+                : {})
+            })}
+            model={managedAttributeApiPath}
+            optionLabel={attribute =>
+              attribute.name ?? get(attribute, managedAttributeKeyField)
+            }
+            isMulti={true}
+            onChange={ma =>
+              setEditableManagedAttributes(ma as ManagedAttribute[])
+            }
+            value={editableManagedAttributes}
+          />
         </div>
         <div className="col-sm-6">
           <div className="alert alert-warning">

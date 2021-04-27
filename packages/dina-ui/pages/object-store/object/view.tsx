@@ -2,6 +2,7 @@ import {
   BackToListButton,
   ButtonBar,
   DeleteButton,
+  EditButton,
   LoadingSpinner
 } from "common-ui";
 import Link from "next/link";
@@ -38,32 +39,36 @@ export default function MetadataViewPage() {
   if (response) {
     const metadata = response.data;
 
+    const buttonBar = (
+      <ButtonBar>
+        <BackToListButton entityLink="/object-store/object" />
+        <Link href={`/object-store/metadata/single-record-edit?id=${id}`}>
+          <a className="btn btn-primary ml-auto" style={{ width: "10rem" }}>
+            <DinaMessage id="editButtonText" />
+          </a>
+        </Link>
+        <Link href={`/object-store/metadata/revisions?id=${id}`}>
+          <a className="btn btn-info">
+            <DinaMessage id="revisionsButtonText" />
+          </a>
+        </Link>
+        <DeleteButton
+          className="ml-5"
+          id={id}
+          options={{ apiBaseUrl: "/objectstore-api" }}
+          postDeleteRedirect="/object-store/object/list"
+          type="metadata"
+        />
+      </ButtonBar>
+    );
+
     return (
       <div>
         <Head title={metadata.originalFilename} />
         <Nav />
-        <ButtonBar>
-          <Link href={`/object-store/metadata/single-record-edit?id=${id}`}>
-            <a className="btn btn-primary">
-              <DinaMessage id="editButtonText" />
-            </a>
-          </Link>
-          <Link href={`/object-store/metadata/revisions?id=${id}`}>
-            <a className="btn btn-info">
-              <DinaMessage id="revisionsButtonText" />
-            </a>
-          </Link>
-          <BackToListButton entityLink="/object-store/object" />
-          <DeleteButton
-            className="ml-5"
-            id={id}
-            options={{ apiBaseUrl: "/objectstore-api" }}
-            postDeleteRedirect="/object-store/object/list"
-            type="metadata"
-          />
-        </ButtonBar>
         <style>{OBJECT_DETAILS_PAGE_CSS}</style>
         <main className="container-fluid">
+          {buttonBar}
           <div className="row">
             <div className="col-md-4">
               <MetadataFileView metadata={metadata} />
@@ -84,6 +89,7 @@ export default function MetadataViewPage() {
               </div>
             </div>
           </div>
+          {buttonBar}
         </main>
         <Footer />
       </div>
