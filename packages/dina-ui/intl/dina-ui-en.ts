@@ -247,6 +247,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   noFileToDisplay: "No file to display",
   noResultsFound: "No results found.",
   objectListTitle: "Stored Objects",
+  objectStoreDataUnavailable: "Object Store data unavailable",
   objectStoreDetailsTitle: "Object Store Details",
   objectStoreTitle: "Object Store",
   objectSubtypeListTitle: "Object Subtypes",

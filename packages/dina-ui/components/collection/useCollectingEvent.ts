@@ -37,15 +37,19 @@ export function useCollectingEventQuery(id?: string | null) {
         }
 
         if (data.attachment) {
-          const metadatas = await bulkGet<Metadata>(
-            data.attachment.map(collector => `/metadata/${collector.id}`),
-            {
-              apiBaseUrl: "/objectstore-api",
-              returnNullForMissingResource: true
-            }
-          );
-          // Omit null (deleted) records:
-          data.attachment = metadatas.filter(it => it);
+          try {
+            const metadatas = await bulkGet<Metadata>(
+              data.attachment.map(collector => `/metadata/${collector.id}`),
+              {
+                apiBaseUrl: "/objectstore-api",
+                returnNullForMissingResource: true
+              }
+            );
+            // Omit null (deleted) records:
+            data.attachment = metadatas.filter(it => it);
+          } catch (error) {
+            console.warn("Attachment join failed: ", error);
+          }
         }
 
         if (data.geoReferenceAssertions) {
@@ -115,7 +119,8 @@ export function useCollectingEventSave(
 
   // The selected Metadatas to be attached to this Collecting Event:
   const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal({
-    initialMetadatas: fetchedCollectingEvent?.attachment as PersistedResource<Metadata>[]
+    initialMetadatas: fetchedCollectingEvent?.attachment as PersistedResource<Metadata>[],
+    deps: [fetchedCollectingEvent?.id]
   });
 
   async function saveCollectingEvent(
