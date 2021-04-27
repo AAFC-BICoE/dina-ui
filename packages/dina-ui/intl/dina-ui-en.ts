@@ -212,7 +212,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   longitudeValidationError:
     "Invalid longitude: {longtitude}, \
   \nValid longitude is between -180 to 180 for degree, and 0 to 60 for minute and second",
-  largeImgLink: "Large",
+  largeImg: "Large Image",
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",
   locationLabel: "Location",
   literalGeoreferencedByLabel: "Georeferenced By",
@@ -257,7 +257,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organizationFrenchNameLabel: "French Name",
   organizationListTitle: "Organizations",
   organizationViewTitle: "View Organization",
-  originalImgLink: "Original",
+  originalFile: "Original File",
   personListTitle: "Persons",
   personViewTitle: "Person",
   preparationData: "Preparation Data",
@@ -276,9 +276,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",
   set: "Set",
+  showing: "Showing",
   startEventDateTimeLabel: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   thumbnailNotAvailableText: "No thumbnail available",
-  thumbnailImgLink: "Thumbnail",
+  thumbnail: "Thumbnail",
   to: "To",
   toponymyLegend: "Current Geographic Place",
   uploadButtonText: "Upload",
