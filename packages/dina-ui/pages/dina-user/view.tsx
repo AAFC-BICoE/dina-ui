@@ -65,8 +65,6 @@ export default function DinaUserDetailsPage() {
               <div className="form-group">
                 <div className="row">
                   <FieldView className="col-md-3" name="username" />
-                  <FieldView className="col-md-3" name="groups" />
-                  <FieldView className="col-md-3" name="roles" />
                   <FieldView
                     className="col-md-3"
                     name="agent.displayName"
@@ -91,11 +89,17 @@ export default function DinaUserDetailsPage() {
   );
 }
 
-interface RolesPerGroupTableProps {
+export interface RolesPerGroupTableProps {
   rolesPerGroup: Record<string, string[] | undefined>;
+  hideTitle?: boolean;
+  hideTable?: boolean;
 }
 
-function RolesPerGroupTable({ rolesPerGroup }: RolesPerGroupTableProps) {
+export function RolesPerGroupTable({
+  rolesPerGroup,
+  hideTitle,
+  hideTable
+}: RolesPerGroupTableProps) {
   // Convert the rolesPerGroup to an object with comma-separated strings instead of arrays:
   const stringRolesPerGroup: Record<string, string> = {};
   // tslint:disable-next-line
@@ -105,19 +109,23 @@ function RolesPerGroupTable({ rolesPerGroup }: RolesPerGroupTableProps) {
 
   return (
     <div>
-      <h2>
-        <DinaMessage id="rolesPerGroup" />
-      </h2>
-      <KeyValueTable
-        data={stringRolesPerGroup}
-        attributeCell={({ original: { field } }) => (
-          <strong>
-            <GroupLabel groupName={field} />
-          </strong>
-        )}
-        attributeHeader={<DinaMessage id="group" />}
-        valueHeader={<DinaMessage id="roles" />}
-      />
+      {!hideTitle && (
+        <h2>
+          <DinaMessage id="rolesPerGroup" />
+        </h2>
+      )}
+      {!hideTable && (
+        <KeyValueTable
+          data={stringRolesPerGroup}
+          attributeCell={({ original: { field } }) => (
+            <strong>
+              <GroupLabel groupName={field} />
+            </strong>
+          )}
+          attributeHeader={<DinaMessage id="group" />}
+          valueHeader={<DinaMessage id="roles" />}
+        />
+      )}
     </div>
   );
 }

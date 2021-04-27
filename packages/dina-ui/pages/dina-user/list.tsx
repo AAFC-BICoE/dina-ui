@@ -2,6 +2,7 @@ import { dateCell, ListPageLayout, stringArrayCell } from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { RolesPerGroupTable } from "./view";
 
 const USER_TABLE_COLUMNS = [
   {
@@ -10,8 +11,6 @@ const USER_TABLE_COLUMNS = [
     ),
     accessor: "username"
   },
-  "firstName",
-  "lastName",
   {
     Cell: ({ original: { agent } }) =>
       agent?.id ? (
@@ -20,9 +19,18 @@ const USER_TABLE_COLUMNS = [
     accessor: "agent.displayName",
     sortable: false
   },
-  { ...stringArrayCell("groups"), sortable: false },
-  { ...stringArrayCell("roles"), sortable: false },
-  dateCell("createdOn")
+  {
+    Cell: ({ original: { rolesPerGroup } }) => (
+      <RolesPerGroupTable
+        rolesPerGroup={rolesPerGroup}
+        hideTitle={true}
+        hideTable={
+          !Object.keys(rolesPerGroup) || Object.keys(rolesPerGroup).length === 0
+        }
+      />
+    ),
+    accessor: "rolesPerGroup"
+  }
 ];
 
 export default function AgentListPage() {
