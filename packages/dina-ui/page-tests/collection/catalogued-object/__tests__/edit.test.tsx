@@ -43,7 +43,7 @@ const TEST_COORDINATES: CoordinateSystem = {
   type: "coordinate-system"
 };
 
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn<any, any>(async path => {
   if (path === "user-api/group") {
     return { data: [] };
   }
@@ -66,9 +66,12 @@ const mockGet = jest.fn(async path => {
   if (path === "collection-api/coordinate-system") {
     return { data: [TEST_COORDINATES] };
   }
+  if (path === "collection-api/managed-attribute") {
+    return { data: [] };
+  }
 });
 
-const mockSave = jest.fn(async saves => {
+const mockSave = jest.fn<any, any>(async saves => {
   return saves.map(save => {
     if (save.type === "physical-entity") {
       return testCataloguedObject();
@@ -79,18 +82,25 @@ const mockSave = jest.fn(async saves => {
   });
 });
 
+const mockBulkGet = jest.fn<any, any>(async paths => {
+  if (!paths.length) {
+    return [];
+  }
+});
+
 const testCtx = {
   apiContext: {
+    bulkGet: mockBulkGet,
     save: mockSave,
     apiClient: {
       get: mockGet
-    } as any
+    }
   }
 };
 
 const mockOnSaved = jest.fn();
 
-describe("Catalogued Object View Page", () => {
+describe("Catalogued Object Edit Page", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Submits a new physical-entity with a new CollectingEvent.", async () => {

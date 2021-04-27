@@ -23,7 +23,7 @@ const TEST_CATALOGUED_OBJECT: PhysicalEntity = {
   collectingEvent: { id: "1", type: "collecting-event" } as CollectingEvent
 };
 
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn<any, any>(async path => {
   if (path === "collection-api/physical-entity/1?include=collectingEvent") {
     return { data: TEST_CATALOGUED_OBJECT };
   } else if (
@@ -37,11 +37,18 @@ const mockGet = jest.fn(async path => {
   }
 });
 
+const mockBulkGet = jest.fn<any, any>(async paths => {
+  if (!paths.length) {
+    return [];
+  }
+});
+
 const testCtx = {
   apiContext: {
     apiClient: {
       get: mockGet
-    } as any
+    },
+    bulkGet: mockBulkGet
   }
 };
 

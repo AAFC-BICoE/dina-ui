@@ -15,7 +15,7 @@ export interface LabelWrapperParams {
   name: string;
 
   /** The label for the field. */
-  label?: string;
+  label?: ReactNode;
 
   /** Override the default "name" prop used to get labels and tooltips from the intl messages. */
   customName?: string;

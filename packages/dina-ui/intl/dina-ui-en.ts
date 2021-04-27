@@ -35,6 +35,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   closePreviewButtonText: "Close Preview",
   collectingEvent: "Collecting Event",
   collectingEventDetailsPageLink: "Collecting Event Details Page",
+  collectionManagedAttributeListTitle: "Collection Module Managed Attributes",
   collectionSectionTitle: "Collections",
   collectingAgentsLegend: "Collecting Agents",
   collectingDateLegend: "Collecting Date",

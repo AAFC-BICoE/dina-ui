@@ -11,7 +11,7 @@ import {
   TextFieldWithCoordButtons,
   useDinaFormContext
 } from "common-ui";
-import { Field, FieldArray, FormikContextType } from "formik";
+import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
 import { useState } from "react";
 import { ShouldRenderReasons } from "react-autosuggest";
@@ -37,6 +37,8 @@ import {
 } from "../../types/collection-api/resources/CoordinateSystem";
 import { SRS } from "../../types/collection-api/resources/SRS";
 import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
+import { ManagedAttributesEditor } from "../object-store/managed-attributes/ManagedAttributesEditor";
+import { ManagedAttributesViewer } from "../object-store/managed-attributes/ManagedAttributesViewer";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 
 interface CollectingEventFormLayoutProps {
@@ -554,7 +556,33 @@ export function CollectingEventFormLayout({
           </div>
         </div>
       </FieldSet>
-
+      <div className="row">
+        <div className="col-md-6">
+          <FieldSet legend={<DinaMessage id="managedAttributeListTitle" />}>
+            {readOnly ? (
+              <FastField name="managedAttributeValues">
+                {({ field: { value } }) => (
+                  <ManagedAttributesViewer
+                    values={value}
+                    managedAttributeApiPath={key =>
+                      `collection-api/managed-attribute/collecting_event.${key}`
+                    }
+                  />
+                )}
+              </FastField>
+            ) : (
+              <ManagedAttributesEditor
+                valuesPath="managedAttributeValues"
+                valueFieldName="assignedValue"
+                managedAttributeApiPath="collection-api/managed-attribute"
+                apiBaseUrl="/collection-api"
+                managedAttributeComponent="COLLECTING_EVENT"
+                managedAttributeKeyField="key"
+              />
+            )}
+          </FieldSet>
+        </div>
+      </div>
       {readOnly && (
         <div className="form-group">
           <Field name="id">

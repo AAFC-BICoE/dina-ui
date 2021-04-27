@@ -1,11 +1,11 @@
 import { OperationsResponse } from "common-ui";
-import { Person } from "../../../../types/agent-api/resources/Person";
 import NumberFormat from "react-number-format";
 import CollectingEventEditPage from "../../../../pages/collection/collecting-event/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { Person } from "../../../../types/agent-api/resources/Person";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
-import { SRS } from "../../../../types/collection-api/resources/SRS";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
+import { SRS } from "../../../../types/collection-api/resources/SRS";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -45,6 +45,8 @@ const mockGet = jest.fn(async model => {
     return { data: [TEST_COORDINATES] };
   } else if (model === "collection-api/collecting-event") {
     return { data: [] };
+  } else if (model === "collection-api/managed-attribute") {
+    return { data: [] };
   } else if (model === "user-api/group") {
     return { data: [] };
   }
@@ -70,6 +72,7 @@ const mockBulkGet = jest.fn(async paths => {
       originalFilename: "test-file"
     }));
   }
+  console.warn("No mock value for bulkGet paths: ", paths);
 });
 
 const apiContext: any = {
@@ -289,6 +292,8 @@ describe("collecting-event edit page", () => {
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
+    wrapper.update();
+
     expect(mockPatch).toBeCalledTimes(1);
     expect(mockPatch).lastCalledWith(
       "/collection-api/operations",
@@ -336,7 +341,7 @@ describe("collecting-event edit page", () => {
     );
   });
 
-  it("Renders an error after form submit if one is returned from the back-end.", async done => {
+  it("Renders an error after form submit if one is returned from the back-end.", async () => {
     // The patch request will return an error.
     mockPatch.mockImplementationOnce(() => ({
       data: [
@@ -371,14 +376,12 @@ describe("collecting-event edit page", () => {
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-        "Constraint violation: Start event datetime should not be blank"
-      );
-      expect(mockPush).toBeCalledTimes(0);
-      done();
-    });
+    await new Promise(setImmediate);
+    wrapper.update();
+    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
+      "Constraint violation: Start event datetime should not be blank"
+    );
+    expect(mockPush).toBeCalledTimes(0);
   });
 });
 
