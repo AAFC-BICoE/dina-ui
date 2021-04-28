@@ -14,6 +14,7 @@ export interface GeoReferenceAssertionAttributes {
   dwcGeoreferenceRemarks?: string;
   dwcGeodeticDatum?: string;
   dwcGeoreferenceVerificationStatus?: GeoreferenceVerificationStatus;
+  isPrimary?: boolean;
   georeferencedBy?: (string | Person)[];
 }
 

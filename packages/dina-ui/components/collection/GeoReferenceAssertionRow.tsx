@@ -1,22 +1,25 @@
 import {
+  CheckBoxField,
   DateField,
   DinaFormSection,
+  FieldView,
   filterBy,
+  FormikButton,
   NumberField,
   ResourceSelectField,
   TextField,
-  CheckBoxField
+  Tooltip
 } from "common-ui";
-import { connect, FormikContextType, Field } from "formik";
+import { connect, Field, FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
 import { get } from "lodash";
+import { useRef, useState } from "react";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { Person } from "../../types/agent-api/resources/Person";
 import {
   GeoReferenceAssertion,
   GeoreferenceVerificationStatus
 } from "../../types/collection-api/resources/GeoReferenceAssertion";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { Person } from "../../types/agent-api/resources/Person";
-import { useState, useRef } from "react";
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
@@ -39,7 +42,9 @@ export function GeoReferenceAssertionRow({
 
   const reservedAssertion = useRef(assertion);
 
-  const commonRoot = `geoReferenceAssertions[${index}].`;
+  const assertionsPath = "geoReferenceAssertions";
+  const assertionPath = `${assertionsPath}[${index}]`;
+  const commonRoot = assertionPath + ".";
 
   function updateReservedAssertion(
     _,
@@ -114,11 +119,43 @@ export function GeoReferenceAssertionRow({
     }
   }
 
+  /** Make this Assertion the Primary. */
+  function makePrimary(formik: FormikContextType<any>) {
+    const assertions: GeoReferenceAssertion[] =
+      get(formik.values, assertionsPath) ?? [];
+
+    assertions.forEach((_, idx) => {
+      formik.setFieldValue(`${assertionsPath}[${idx}].isPrimary`, false);
+    });
+    formik.setFieldValue(`${assertionsPath}[${index}].isPrimary`, true);
+  }
+
   return (
     <div>
       <DinaFormSection horizontal={true}>
         {viewOnly && (
           <ViewInMapButton assertionPath={`geoReferenceAssertions.${index}`} />
+        )}
+        {!viewOnly && (
+          <div className="form-group">
+            <FormikButton
+              className="btn btn-primary primary-assertion-button"
+              buttonProps={ctx => {
+                const isPrimary =
+                  get(ctx.values, commonRoot + "isPrimary") ?? false;
+                return {
+                  disabled: isPrimary,
+                  children: isPrimary ? (
+                    <DinaMessage id="primary" />
+                  ) : (
+                    <DinaMessage id="makePrimary" />
+                  )
+                };
+              }}
+              onClick={(_, formik) => makePrimary(formik)}
+            />
+            <Tooltip id="primaryButton_tooltip" />
+          </div>
         )}
         <Field name={commonRoot + "dwcGeoreferenceVerificationStatus"}>
           {() => (

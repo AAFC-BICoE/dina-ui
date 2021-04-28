@@ -36,18 +36,20 @@ const mockGet = jest.fn(async model => {
   if (
     model === "collection-api/collecting-event/1?include=collectors,attachment"
   ) {
-    return { data: TEST_COLLECTING_EVENT };
+    return { data: testCollectingEvent() };
   } else if (model === "agent-api/person") {
-    return { data: [TEST_AGENT] };
+    return { data: [testAgent()] };
   } else if (model === "collection-api/srs") {
-    return { data: [TEST_SRS] };
+    return { data: [testSrs()] };
   } else if (model === "collection-api/coordinate-system") {
-    return { data: [TEST_COORDINATES] };
+    return { data: [testCoordinates()] };
   } else if (model === "collection-api/collecting-event") {
     return { data: [] };
   } else if (model === "collection-api/managed-attribute") {
     return { data: [] };
   } else if (model === "user-api/group") {
+    return { data: [] };
+  } else if (model === "objectstore-api/metadata") {
     return { data: [] };
   }
 });
@@ -167,7 +169,7 @@ describe("collecting-event edit page", () => {
               startEventDateTime: "2019-12-21T16:00",
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
               dwcOtherRecordNumbers: ["12", "23"],
-              geoReferenceAssertions: [{}]
+              geoReferenceAssertions: [{ isPrimary: true }]
             },
             id: "00000000-0000-0000-0000-000000000000",
             type: "collecting-event"
@@ -256,7 +258,7 @@ describe("collecting-event edit page", () => {
     mockPatch.mockReturnValueOnce({
       data: [
         {
-          data: TEST_COLLECTING_EVENT,
+          data: testCollectingEvent(),
           status: 201
         }
       ] as OperationsResponse
@@ -383,51 +385,88 @@ describe("collecting-event edit page", () => {
     );
     expect(mockPush).toBeCalledTimes(0);
   });
+
+  it("Lets you set the primary GeoReferenceAssertion.", async () => {
+    mockQuery = {};
+    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
+      apiContext
+    });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // The first assertion is already primary:
+    expect(
+      wrapper.find("button.primary-assertion-button").prop("disabled")
+    ).toEqual(true);
+
+    // Add a second assertion:
+    wrapper.find("button.add-assertion-button").at(0).simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Make 2nd assertion primary:
+    wrapper.find("button.primary-assertion-button").simulate("click");
+
+    const assertionTabs = wrapper.find(
+      ".georeference-assertion-section li.react-tabs__tab"
+    );
+
+    // There should be 2 assertion tabs:
+    expect(assertionTabs.length).toEqual(2);
+    expect(assertionTabs.at(0).text()).toEqual("1");
+    expect(assertionTabs.at(1).text()).toEqual("2 (Primary)");
+  });
 });
 
 /** Test collecting-event with all fields defined. */
+function testCollectingEvent(): CollectingEvent {
+  return {
+    uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
+    id: "1",
+    type: "collecting-event",
+    startEventDateTime: "2019-11-11",
+    endEventDateTime: "2019-11-12",
+    verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm",
+    group: "test group",
+    collectors: [
+      { id: "111", type: "agent" },
+      { id: "222", type: "agent" }
+    ],
+    dwcOtherRecordNumbers: ["12", "13", "14"],
+    geoReferenceAssertions: [
+      {
+        id: "10",
+        type: "georeference-assertion",
+        dwcDecimalLongitude: 10,
+        georeferencedBy: ["1"]
+      }
+    ],
+    attachment: [
+      { id: "88888", type: "metadata" },
+      { id: "99999", type: "metadata" }
+    ]
+  };
+}
 
-const TEST_COLLECTING_EVENT: CollectingEvent = {
-  uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
-  id: "1",
-  type: "collecting-event",
-  startEventDateTime: "2019-11-11",
-  endEventDateTime: "2019-11-12",
-  verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm",
-  group: "test group",
-  collectors: [
-    { id: "111", type: "agent" },
-    { id: "222", type: "agent" }
-  ],
-  dwcOtherRecordNumbers: ["12", "13", "14"],
-  geoReferenceAssertions: [
-    {
-      id: "10",
-      type: "georeference-assertion",
-      dwcDecimalLongitude: 10,
-      georeferencedBy: ["1"]
-    }
-  ],
-  attachment: [
-    { id: "88888", type: "metadata" },
-    { id: "99999", type: "metadata" }
-  ]
-};
+function testAgent(): Person {
+  return {
+    displayName: "person a",
+    email: "testperson@a.b",
+    id: "1",
+    type: "person",
+    uuid: "323423-23423-234"
+  };
+}
 
-const TEST_AGENT: Person = {
-  displayName: "person a",
-  email: "testperson@a.b",
-  id: "1",
-  type: "person",
-  uuid: "323423-23423-234"
-};
+function testSrs(): SRS {
+  return { srs: ["NAD27 (EPSG:4276)", "WGS84 (EPSG:4326)"], type: "srs" };
+}
 
-const TEST_SRS: SRS = {
-  srs: ["NAD27 (EPSG:4276)", "WGS84 (EPSG:4326)"],
-  type: "srs"
-};
-
-const TEST_COORDINATES: CoordinateSystem = {
-  coordinateSystem: ["decimal degrees", " degrees decimal"],
-  type: "coordinate-system"
-};
+function testCoordinates(): CoordinateSystem {
+  return {
+    coordinateSystem: ["decimal degrees", " degrees decimal"],
+    type: "coordinate-system"
+  };
+}
