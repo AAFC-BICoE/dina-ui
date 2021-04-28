@@ -384,3 +384,8 @@ a.btn,
   background-color: #18666d;
   border-color: #18666d;
 }
+
+a.nav-link.dropdown-toggle {
+  /* fix Element's background color could not be determined because it's partially obscured by another element */
+  background: #38414d;
+}
