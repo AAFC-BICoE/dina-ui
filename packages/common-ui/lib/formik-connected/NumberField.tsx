@@ -1,6 +1,5 @@
-import { FastField, FieldProps } from "formik";
-import NumberFormat from "react-number-format";
-import { NumberFormatValues } from "react-number-format";
+import { FormikProps } from "formik";
+import NumberFormat, { NumberFormatValues } from "react-number-format";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface NumberFieldProps extends LabelWrapperParams {
@@ -8,41 +7,42 @@ export interface NumberFieldProps extends LabelWrapperParams {
 
   /** Extra validation to prevent invalid numbers being written. */
   isAllowed?: (values: NumberFormatValues) => boolean;
-  onChangeExternal?: (form, name, value) => void;
+  onChangeExternal?: (
+    form: FormikProps<any>,
+    name: string,
+    value: number | null
+  ) => void;
 }
 
 /** Input field that only accepts a number. */
 export function NumberField(props: NumberFieldProps) {
   const { name, readOnly, onChangeExternal } = props;
-
   return (
     <FieldWrapper {...props}>
-      <FastField name={name}>
-        {({ field: { value }, form }: FieldProps) => {
-          function onValueChange({ floatValue }: NumberFormatValues) {
-            const numValue = typeof floatValue === "number" ? floatValue : null;
-            form.setFieldValue(name, numValue);
-            form.setFieldTouched(name);
-            onChangeExternal?.(form, name, numValue);
-          }
+      {({ formik, setValue, value }) => {
+        function onValueChange({ floatValue }: NumberFormatValues) {
+          const numValue = typeof floatValue === "number" ? floatValue : null;
+          setValue(numValue);
+          onChangeExternal?.(formik, name, numValue);
+        }
 
-          return (
-            <NumberFormat
-              isAllowed={props.isAllowed}
-              className="form-control"
-              onValueChange={onValueChange}
-              readOnly={readOnly}
-              value={
-                typeof value === "number"
-                  ? value
-                  : typeof value === "string"
-                  ? Number(value)
-                  : ""
-              }
-            />
-          );
-        }}
-      </FastField>
+        const numberFormatValue =
+          typeof value === "number"
+            ? value
+            : typeof value === "string"
+            ? Number(value)
+            : "";
+
+        return (
+          <NumberFormat
+            isAllowed={props.isAllowed}
+            className="form-control"
+            onValueChange={onValueChange}
+            readOnly={props.readOnly}
+            value={numberFormatValue}
+          />
+        );
+      }}
     </FieldWrapper>
   );
 }

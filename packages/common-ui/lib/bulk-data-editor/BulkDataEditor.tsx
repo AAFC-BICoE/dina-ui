@@ -4,18 +4,19 @@ import { GridSettings } from "handsontable";
 import { cloneDeep, isEmpty, isEqual, zipWith } from "lodash";
 import dynamic from "next/dynamic";
 import { Component, useEffect, useState } from "react";
+import { PartialDeep } from "type-fest";
 import { FormikButton } from "../formik-connected/FormikButton";
 import { OnFormikSubmit, safeSubmit } from "../formik-connected/safeSubmit";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
-import { difference, RecursivePartial } from "./difference";
+import { difference } from "./difference";
 import { getUserFriendlyAutoCompleteRenderer } from "./resource-select-cell";
 import { useBulkEditorFrontEndValidation } from "./useBulkEditorFrontEndValidation";
 import { useHeaderWidthFix } from "./useHeaderWidthFix";
 
 export interface RowChange<TRow> {
   original: TRow;
-  changes: RecursivePartial<TRow>;
+  changes: PartialDeep<TRow>;
 }
 
 export interface BulkDataEditorProps<TRow> {

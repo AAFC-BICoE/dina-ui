@@ -9,9 +9,7 @@ describe("FieldWrapper component.", () => {
   it("Adds a generated title-case label to the wrapped component.", () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
-        <FieldWrapper name="fieldName">
-          <div />
-        </FieldWrapper>
+        <FieldWrapper name="fieldName">{() => <div />}</FieldWrapper>
       </DinaForm>
     );
 
@@ -22,7 +20,7 @@ describe("FieldWrapper component.", () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <FieldWrapper className="col-6" name="fieldName">
-          <div />
+          {() => <div />}
         </FieldWrapper>
       </DinaForm>
     );
@@ -37,9 +35,7 @@ describe("FieldWrapper component.", () => {
         messages={{ field_testField: "My Field Label" }}
       >
         <DinaForm initialValues={{}}>
-          <FieldWrapper name="testField">
-            <div />
-          </FieldWrapper>
+          <FieldWrapper name="testField">{() => <div />}</FieldWrapper>
         </DinaForm>
       </IntlProvider>
     );
@@ -51,7 +47,7 @@ describe("FieldWrapper component.", () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <FieldWrapper label="The Group's Name" name="group.groupName">
-          <div />
+          {() => <div />}
         </FieldWrapper>
       </DinaForm>
     );

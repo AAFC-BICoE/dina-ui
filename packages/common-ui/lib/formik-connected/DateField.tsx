@@ -1,56 +1,52 @@
-import { FastField, FieldProps } from "formik";
+import { KeyboardEvent } from "react";
 import DatePicker from "react-datepicker";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface DateFieldProps {
   showTime?: boolean;
   disabled?: boolean;
+  onKeyDown?: (event: KeyboardEvent<HTMLDivElement>) => void;
 }
 
 /** Formik-connected date input. */
 export function DateField(props: LabelWrapperParams & DateFieldProps) {
-  const { name, showTime, disabled } = props;
+  const { showTime, disabled, onKeyDown } = props;
 
   return (
     <FieldWrapper {...props}>
-      <FastField name={name}>
-        {({
-          field: { value },
-          form: { setFieldValue, setFieldTouched }
-        }: FieldProps) => {
-          function onChange(date: Date) {
-            if (showTime) {
-              setFieldValue(name, date && date.toISOString());
-            } else {
-              setFieldValue(name, date && date.toISOString().slice(0, 10));
-            }
-            setFieldTouched(name);
+      {({ setValue, value }) => {
+        function onChange(date: Date) {
+          if (showTime) {
+            setValue(date && date.toISOString());
+          } else {
+            setValue(date && date.toISOString().slice(0, 10));
           }
+        }
 
-          return (
-            <div>
-              <DatePicker
-                className="form-control"
-                wrapperClassName="w-100"
-                dateFormat={showTime ? "Pp" : "yyyy-MM-dd"}
-                isClearable={!disabled}
-                onChange={onChange}
-                selected={
-                  value
-                    ? showTime
-                      ? new Date(`${value}`)
-                      : new Date(`${value}T12:00:00Z`)
-                    : null
-                }
-                showTimeSelect={showTime}
-                showYearDropdown={true}
-                todayButton="Today"
-                disabled={disabled}
-              />
-            </div>
-          );
-        }}
-      </FastField>
+        return (
+          <div>
+            <DatePicker
+              className="form-control"
+              wrapperClassName="w-100"
+              dateFormat={showTime ? "Pp" : "yyyy-MM-dd"}
+              isClearable={!disabled}
+              onChange={onChange}
+              selected={
+                value
+                  ? showTime
+                    ? new Date(`${value}`)
+                    : new Date(`${value}T12:00:00Z`)
+                  : null
+              }
+              showTimeSelect={showTime}
+              showYearDropdown={true}
+              todayButton="Today"
+              disabled={disabled}
+              onKeyDown={onKeyDown}
+            />
+          </div>
+        );
+      }}
     </FieldWrapper>
   );
 }

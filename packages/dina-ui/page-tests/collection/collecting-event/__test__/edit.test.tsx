@@ -1,11 +1,11 @@
 import { OperationsResponse } from "common-ui";
-import { Person } from "../../../../types/agent-api/resources/Person";
 import NumberFormat from "react-number-format";
 import CollectingEventEditPage from "../../../../pages/collection/collecting-event/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { Person } from "../../../../types/agent-api/resources/Person";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
-import { SRS } from "../../../../types/collection-api/resources/SRS";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
+import { SRS } from "../../../../types/collection-api/resources/SRS";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -34,19 +34,22 @@ let mockQuery: any = {};
 const mockGet = jest.fn(async model => {
   // The get request will return the existing collecting-event.
   if (
-    model ===
-    "collection-api/collecting-event/1?include=collectors,geoReferenceAssertions,attachment"
+    model === "collection-api/collecting-event/1?include=collectors,attachment"
   ) {
-    return { data: TEST_COLLECTING_EVENT };
+    return { data: testCollectingEvent() };
   } else if (model === "agent-api/person") {
-    return { data: [TEST_AGENT] };
+    return { data: [testAgent()] };
   } else if (model === "collection-api/srs") {
-    return { data: [TEST_SRS] };
+    return { data: [testSrs()] };
   } else if (model === "collection-api/coordinate-system") {
-    return { data: [TEST_COORDINATES] };
+    return { data: [testCoordinates()] };
   } else if (model === "collection-api/collecting-event") {
     return { data: [] };
+  } else if (model === "collection-api/managed-attribute") {
+    return { data: [] };
   } else if (model === "user-api/group") {
+    return { data: [] };
+  } else if (model === "objectstore-api/metadata") {
     return { data: [] };
   }
 });
@@ -71,6 +74,7 @@ const mockBulkGet = jest.fn(async paths => {
       originalFilename: "test-file"
     }));
   }
+  console.warn("No mock value for bulkGet paths: ", paths);
 });
 
 const apiContext: any = {
@@ -165,7 +169,7 @@ describe("collecting-event edit page", () => {
               startEventDateTime: "2019-12-21T16:00",
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
               dwcOtherRecordNumbers: ["12", "23"],
-              geoReferenceAssertions: [{}]
+              geoReferenceAssertions: [{ isPrimary: true }]
             },
             id: "00000000-0000-0000-0000-000000000000",
             type: "collecting-event"
@@ -254,7 +258,7 @@ describe("collecting-event edit page", () => {
     mockPatch.mockReturnValueOnce({
       data: [
         {
-          data: TEST_COLLECTING_EVENT,
+          data: testCollectingEvent(),
           status: 201
         }
       ] as OperationsResponse
@@ -290,6 +294,8 @@ describe("collecting-event edit page", () => {
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
+    wrapper.update();
+
     expect(mockPatch).toBeCalledTimes(1);
     expect(mockPatch).lastCalledWith(
       "/collection-api/operations",
@@ -303,10 +309,9 @@ describe("collecting-event edit page", () => {
               endEventDateTime: "2019-11-12",
               geoReferenceAssertions: [
                 {
+                  isPrimary: true,
                   dwcDecimalLongitude: 10,
-                  georeferencedBy: ["1"],
-                  id: "10",
-                  type: "georeference-assertion"
+                  georeferencedBy: ["1"]
                 }
               ],
               group: "test group",
@@ -337,7 +342,7 @@ describe("collecting-event edit page", () => {
     );
   });
 
-  it("Renders an error after form submit if one is returned from the back-end.", async done => {
+  it("Renders an error after form submit if one is returned from the back-end.", async () => {
     // The patch request will return an error.
     mockPatch.mockImplementationOnce(() => ({
       data: [
@@ -372,60 +377,94 @@ describe("collecting-event edit page", () => {
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-        "Constraint violation: Start event datetime should not be blank"
-      );
-      expect(mockPush).toBeCalledTimes(0);
-      done();
+    await new Promise(setImmediate);
+    wrapper.update();
+    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
+      "Constraint violation: Start event datetime should not be blank"
+    );
+    expect(mockPush).toBeCalledTimes(0);
+  });
+
+  it("Lets you set the primary GeoReferenceAssertion.", async () => {
+    mockQuery = {};
+    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
+      apiContext
     });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // The first assertion is already primary:
+    expect(
+      wrapper.find("button.primary-assertion-button").prop("disabled")
+    ).toEqual(true);
+
+    // Add a second assertion:
+    wrapper.find("button.add-assertion-button").at(0).simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Make 2nd assertion primary:
+    wrapper.find("button.primary-assertion-button").simulate("click");
+
+    const assertionTabs = wrapper.find(
+      ".georeference-assertion-section li.react-tabs__tab"
+    );
+
+    // There should be 2 assertion tabs:
+    expect(assertionTabs.length).toEqual(2);
+    expect(assertionTabs.at(0).text()).toEqual("1");
+    expect(assertionTabs.at(1).text()).toEqual("2 (Primary)");
   });
 });
 
 /** Test collecting-event with all fields defined. */
+function testCollectingEvent(): CollectingEvent {
+  return {
+    uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
+    id: "1",
+    type: "collecting-event",
+    startEventDateTime: "2019-11-11",
+    endEventDateTime: "2019-11-12",
+    verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm",
+    group: "test group",
+    collectors: [
+      { id: "111", type: "agent" },
+      { id: "222", type: "agent" }
+    ],
+    dwcOtherRecordNumbers: ["12", "13", "14"],
+    geoReferenceAssertions: [
+      {
+        isPrimary: true,
+        dwcDecimalLongitude: 10,
+        georeferencedBy: ["1"]
+      }
+    ],
+    attachment: [
+      { id: "88888", type: "metadata" },
+      { id: "99999", type: "metadata" }
+    ]
+  };
+}
 
-const TEST_COLLECTING_EVENT: CollectingEvent = {
-  uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
-  id: "1",
-  type: "collecting-event",
-  startEventDateTime: "2019-11-11",
-  endEventDateTime: "2019-11-12",
-  verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm",
-  group: "test group",
-  collectors: [
-    { id: "111", type: "agent" },
-    { id: "222", type: "agent" }
-  ],
-  dwcOtherRecordNumbers: ["12", "13", "14"],
-  geoReferenceAssertions: [
-    {
-      id: "10",
-      type: "georeference-assertion",
-      dwcDecimalLongitude: 10,
-      georeferencedBy: ["1"]
-    }
-  ],
-  attachment: [
-    { id: "88888", type: "metadata" },
-    { id: "99999", type: "metadata" }
-  ]
-};
+function testAgent(): Person {
+  return {
+    displayName: "person a",
+    email: "testperson@a.b",
+    id: "1",
+    type: "person",
+    uuid: "323423-23423-234"
+  };
+}
 
-const TEST_AGENT: Person = {
-  displayName: "person a",
-  email: "testperson@a.b",
-  id: "1",
-  type: "person",
-  uuid: "323423-23423-234"
-};
+function testSrs(): SRS {
+  return { srs: ["NAD27 (EPSG:4276)", "WGS84 (EPSG:4326)"], type: "srs" };
+}
 
-const TEST_SRS: SRS = {
-  srs: ["NAD27 (EPSG:4276)", "WGS84 (EPSG:4326)"],
-  type: "srs"
-};
-
-const TEST_COORDINATES: CoordinateSystem = {
-  coordinateSystem: ["decimal degrees", " degrees decimal"],
-  type: "coordinate-system"
-};
+function testCoordinates(): CoordinateSystem {
+  return {
+    coordinateSystem: ["decimal degrees", " degrees decimal"],
+    type: "coordinate-system"
+  };
+}

@@ -2,12 +2,17 @@ import { KitsuResource } from "kitsu";
 import { Metadata } from "./Metadata";
 
 export interface ManagedAttributeMapAttributes {
-  values: { [managedAttributeId: string]: ManagedAttributeValue };
+  values: ManagedAttributeValues;
 }
+
+export type ManagedAttributeValues = {
+  [managedAttributeId: string]: ManagedAttributeValue;
+};
 
 export interface ManagedAttributeValue {
   name?: string;
-  value: string;
+  value?: string;
+  assignedValue?: string;
 }
 
 export interface ManagedAttributeMapRelationships {

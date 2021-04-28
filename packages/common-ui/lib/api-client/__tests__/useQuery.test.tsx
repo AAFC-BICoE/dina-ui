@@ -49,11 +49,12 @@ describe("useQuery hook", () => {
 
   function TestComponent({
     deps = [] as any[],
-    joinSpecs = [] as ClientSideJoinSpec[]
+    joinSpecs = [] as ClientSideJoinSpec[],
+    disabled = false
   }) {
     queryState = useQuery(
       { path: "todo/1" },
-      { deps, onSuccess: mockOnSuccess, joinSpecs }
+      { deps, onSuccess: mockOnSuccess, joinSpecs, disabled }
     );
 
     return null;
@@ -165,5 +166,24 @@ describe("useQuery hook", () => {
         type: "todo"
       }
     ]);
+  });
+
+  it("Lets you disable the query.", async () => {
+    // Render with an initial 'deps' prop.
+    const wrapper = mount(
+      <MockContextProvider>
+        <TestComponent disabled={true} />
+      </MockContextProvider>
+    );
+    await new Promise(setImmediate);
+
+    expect(mockGet).toHaveBeenCalledTimes(0);
+
+    wrapper.setProps({
+      children: <TestComponent disabled={false} />
+    });
+    await new Promise(setImmediate);
+
+    expect(mockGet).toHaveBeenCalledTimes(1);
   });
 });

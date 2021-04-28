@@ -77,7 +77,7 @@ export default function ManagedAttributesListPage() {
         <ButtonBar>
           <Link href="/object-store/managedAttributesView/detailsView">
             <a className="btn btn-primary">
-              <CommonMessage id="createButtonText" />
+              <CommonMessage id="createNew" />
             </a>
           </Link>
         </ButtonBar>

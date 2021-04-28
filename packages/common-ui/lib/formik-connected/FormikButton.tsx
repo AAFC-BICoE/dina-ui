@@ -30,12 +30,11 @@ export const FormikButton = connect<FormikButtonProps>(
       <LoadingSpinner loading={true} />
     ) : (
       <button
+        children={children}
         {...buttonProps?.(formik)}
         className={className}
         onClick={() => safeSubmit(onClick)(formik.values, formik)}
         type="button"
-      >
-        {children}
-      </button>
+      />
     )
 );
