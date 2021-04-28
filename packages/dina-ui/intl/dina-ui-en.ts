@@ -216,6 +216,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",
   locationLabel: "Location",
   literalGeoreferencedByLabel: "Georeferenced By",
+  makePrimary: "Make Primary",
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
   managedAttributeValueLabel: "Value",
@@ -261,6 +262,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   personListTitle: "Persons",
   personViewTitle: "Person",
   preparationData: "Preparation Data",
+  primary: "Primary",
+  primaryButton_tooltip:
+    "Make this assertion the primary data point when exported. Only one assertion can be primary",
   removeAssertionLabel: "Remove this GeoReference",
   placeNameLabel: "Place Name",
   removeThisPlaceLabel: " Remove this Place",
