@@ -309,10 +309,9 @@ describe("collecting-event edit page", () => {
               endEventDateTime: "2019-11-12",
               geoReferenceAssertions: [
                 {
+                  isPrimary: true,
                   dwcDecimalLongitude: 10,
-                  georeferencedBy: ["1"],
-                  id: "10",
-                  type: "georeference-assertion"
+                  georeferencedBy: ["1"]
                 }
               ],
               group: "test group",
@@ -437,8 +436,7 @@ function testCollectingEvent(): CollectingEvent {
     dwcOtherRecordNumbers: ["12", "13", "14"],
     geoReferenceAssertions: [
       {
-        id: "10",
-        type: "georeference-assertion",
+        isPrimary: true,
         dwcDecimalLongitude: 10,
         georeferencedBy: ["1"]
       }

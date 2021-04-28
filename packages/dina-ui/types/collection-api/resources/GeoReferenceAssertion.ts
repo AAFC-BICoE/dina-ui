@@ -1,4 +1,3 @@
-import { KitsuResource } from "kitsu";
 import { Person } from "../../objectstore-api";
 
 export interface GeoReferenceAssertionAttributes {
@@ -22,5 +21,4 @@ export enum GeoreferenceVerificationStatus {
   GEOREFERENCING_NOT_POSSIBLE = "GEOREFERENCING_NOT_POSSIBLE"
 }
 
-export type GeoReferenceAssertion = KitsuResource &
-  GeoReferenceAssertionAttributes;
+export type GeoReferenceAssertion = GeoReferenceAssertionAttributes;
