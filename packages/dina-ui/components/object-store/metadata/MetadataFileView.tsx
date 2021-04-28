@@ -1,3 +1,4 @@
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import { DownLoadLinks, FileView } from "../file-view/FileView";
 
@@ -11,6 +12,8 @@ export function MetadataFileView({
   metadata,
   imgHeight
 }: MetadataFileViewProps) {
+  const { formatMessage } = useDinaIntl();
+
   // If there is a linked "LARGE_IMAGE" Derivative then render it:
   const fileToDisplay =
     metadata.derivatives?.find(it => it.derivativeType === "LARGE_IMAGE") ??
@@ -51,13 +54,42 @@ export function MetadataFileView({
     .replace(/\./, "")
     .toLowerCase();
 
+  const imgTypeText =
+    fileToDisplay.type === "derivative"
+      ? fileToDisplay.derivativeType === "LARGE_IMAGE"
+        ? "largeImg"
+        : fileToDisplay.derivativeType === "THUMBNAIL_IMAGE"
+        ? "thumbnail"
+        : null
+      : "originalFile";
+
   return (
-    <FileView
-      clickToDownload={true}
-      filePath={filePath}
-      fileType={fileType}
-      imgHeight={imgHeight}
-      downloadLinks={downloadLinks}
-    />
+    <div>
+      <div className="form-group">
+        <FileView
+          clickToDownload={true}
+          filePath={filePath}
+          fileType={fileType}
+          imgHeight={imgHeight}
+          downloadLinks={downloadLinks}
+        />
+      </div>
+      <div className="container">
+        {imgTypeText && (
+          <div className="form-group shown-file-type">
+            <strong>
+              <DinaMessage id="showing" />:
+            </strong>
+            {` ${formatMessage(imgTypeText)}`}
+          </div>
+        )}
+        <div className="form-group metadata-caption">
+          <strong>
+            <DinaMessage id="field_acCaption" />:
+          </strong>
+          {` ${metadata.acCaption}`}
+        </div>
+      </div>
+    </div>
   );
 }

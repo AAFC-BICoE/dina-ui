@@ -8,12 +8,14 @@ const TEST_METADATA = {
   derivatives: [],
   bucket: "dao",
   fileIdentifier: "7baa76e3-8c35-4e4a-95b2-0209268a6cc7",
-  fileExtension: ".jpg"
+  fileExtension: ".jpg",
+  acCaption: "test caption 1"
 };
 
 const TEST_METADATA_WITH_LARGE_IMAGE_DERIVATIVE = {
   id: "9978066e-4367-4975-8e32-cc46068ff7f0",
   type: "metadata",
+  acCaption: "test caption 2",
   derivatives: [
     {
       id: "1a572c4b-747b-4e80-a6ad-0755a5b5730e",
@@ -76,6 +78,31 @@ describe("MetadataFileView component", () => {
     );
     expect(wrapper.find("a.large").prop("href")).toEqual(
       "/api/objectstore-api/file/dao/derivative/529755e1-7d36-478c-b29b-679385de155b?access_token=test-token"
+    );
+  });
+
+  it("Displays the shown file's type and caption.", async () => {
+    const wrapper1 = mountWithAppContext(
+      <MetadataFileView metadata={TEST_METADATA as Metadata} />
+    );
+
+    expect(wrapper1.find(".shown-file-type").text()).toEqual(
+      "Showing: Original File"
+    );
+    expect(wrapper1.find(".metadata-caption").text()).toEqual(
+      "Caption: test caption 1"
+    );
+
+    const wrapper2 = mountWithAppContext(
+      <MetadataFileView
+        metadata={TEST_METADATA_WITH_LARGE_IMAGE_DERIVATIVE as Metadata}
+      />
+    );
+    expect(wrapper2.find(".shown-file-type").text()).toEqual(
+      "Showing: Large Image"
+    );
+    expect(wrapper2.find(".metadata-caption").text()).toEqual(
+      "Caption: test caption 2"
     );
   });
 });
