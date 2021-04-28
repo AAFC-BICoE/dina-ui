@@ -81,7 +81,7 @@ export function useCollectingEventQuery(id?: string | null) {
   return collectingEventQuery;
 }
 
-/** CollectingEvent save method to be re-used by CollectingEvent and PhysicalEntity forms. */
+/** CollectingEvent save method to be re-used by CollectingEvent and MaterialSample forms. */
 export function useCollectingEventSave(
   fetchedCollectingEvent?: PersistedResource<CollectingEvent>
 ) {
