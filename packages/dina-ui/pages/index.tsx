@@ -126,6 +126,13 @@ const Home: React.FunctionComponent = () => (
         <DinaMessage id="collectionSectionTitle" />
       </h2>
       <ul>
+        <li className="d-none">
+          <Link href="/collection/collector-group/list">
+            <a>
+              <DinaMessage id="collectorGroupListTitle" />
+            </a>
+          </Link>
+        </li>
         <li>
           <Link href="/collection/collecting-event/list">
             <a>
@@ -133,10 +140,24 @@ const Home: React.FunctionComponent = () => (
             </a>
           </Link>
         </li>
-        <li className="d-none">
-          <Link href="/collection/collector-group/list">
+        <li>
+          <Link href="/collection/managed-attribute/list">
             <a>
-              <DinaMessage id="collectorGroupListTitle" />
+              <DinaMessage id="managedAttributeListTitle" />
+            </a>
+          </Link>
+        </li>
+        <li>
+          <Link href="/collection/revisions-by-user">
+            <a>
+              <DinaMessage id="revisionsByUserPageTitle" />
+            </a>
+          </Link>
+        </li>
+        <li className="d-none">
+          <Link href="/collection/catalogued-object/list">
+            <a>
+              <DinaMessage id="cataloguedObjectListTitle" />
             </a>
           </Link>
         </li>
@@ -145,4 +166,5 @@ const Home: React.FunctionComponent = () => (
     <Footer />
   </div>
 );
+
 export default Home;

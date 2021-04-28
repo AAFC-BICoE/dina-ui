@@ -2,6 +2,7 @@ import { isDate, isNumber } from "lodash";
 import moment from "moment";
 import Link from "next/link";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
+import { Fragment } from "react";
 
 /** Renders the label and value of a field from Formik context. */
 export function FieldView(props: LabelWrapperParams) {
@@ -40,17 +41,21 @@ export function ReadOnlyValue({
             ? val
             : JSON.stringify(val);
 
-          return arrayItemLink ? (
-            <>
-              <Link href={arrayItemLink + val.id} key={val.id}>
-                <a>{displayString}</a>
-              </Link>
-              {idx <= value.length - 2 && <span>, </span>}
-            </>
-          ) : idx <= value.length - 2 ? (
-            displayString + ", "
-          ) : (
-            displayString
+          return (
+            <Fragment key={idx}>
+              {arrayItemLink ? (
+                <>
+                  <Link href={arrayItemLink + val.id} key={val.id}>
+                    <a>{displayString}</a>
+                  </Link>
+                  {idx <= value.length - 2 && <span>, </span>}
+                </>
+              ) : idx <= value.length - 2 ? (
+                displayString + ", "
+              ) : (
+                displayString
+              )}
+            </Fragment>
           );
         })
       ) : typeof value === "string" ? (

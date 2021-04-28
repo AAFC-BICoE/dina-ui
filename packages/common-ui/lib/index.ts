@@ -21,6 +21,7 @@ export * from "./formik-connected/DateField";
 export * from "./formik-connected/FormattedTextField";
 export * from "./formik-connected/DinaForm";
 export * from "./formik-connected/ErrorViewer";
+export * from "./formik-connected/FieldSet";
 export * from "./formik-connected/FieldView";
 export * from "./formik-connected/FieldWrapper";
 export * from "./formik-connected/FormikButton";

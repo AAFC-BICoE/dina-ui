@@ -1,4 +1,5 @@
 import { PersistedResource } from "kitsu";
+import { useState } from "react";
 import { last } from "lodash";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Metadata } from "../../../../types/objectstore-api";
@@ -15,8 +16,8 @@ function lastHookReturn() {
   >;
 }
 
-function TestComponent({ initialMetadatas }: AttachmentsModalParams) {
-  const hookReturn = useAttachmentsModal({ initialMetadatas });
+function TestComponent({ deps, initialMetadatas }: AttachmentsModalParams) {
+  const hookReturn = useAttachmentsModal({ initialMetadatas, deps });
   hookRender(hookReturn);
   return null;
 }
@@ -40,7 +41,7 @@ describe("Attachments modal", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Adds the selected Metadatas to the array.", async () => {
-    mountWithAppContext(<TestComponent />, { apiContext });
+    mountWithAppContext(<TestComponent deps={[]} />, { apiContext });
 
     // Initially empty:
     expect(lastHookReturn().selectedMetadatas).toEqual([]);
@@ -70,7 +71,7 @@ describe("Attachments modal", () => {
   });
 
   it("Removes selected Metadatas from the array", async () => {
-    mountWithAppContext(<TestComponent />, { apiContext });
+    mountWithAppContext(<TestComponent deps={[]} />, { apiContext });
 
     // Initially empty:
     expect(lastHookReturn().selectedMetadatas).toEqual([]);
@@ -91,28 +92,61 @@ describe("Attachments modal", () => {
   });
 
   it("Can be initialized with existing Metadatas.", async () => {
-    const TEST_METADATAS: PersistedResource<Metadata>[] = [
-      {
-        id: "1",
-        type: "metadata",
-        originalFilename: "test-file-1",
-        bucket: "bucket",
-        fileIdentifier: "111"
-      },
-      {
-        id: "2",
-        type: "metadata",
-        originalFilename: "test-file-2",
-        bucket: "bucket",
-        fileIdentifier: "222"
-      }
-    ];
-
-    mountWithAppContext(<TestComponent initialMetadatas={TEST_METADATAS} />, {
-      apiContext
-    });
+    mountWithAppContext(
+      <TestComponent deps={[]} initialMetadatas={TEST_METADATAS} />,
+      { apiContext }
+    );
 
     // Initially empty:
     expect(lastHookReturn().selectedMetadatas).toEqual(TEST_METADATAS);
   });
+
+  it("Re-initializes the attachment list when the passed dependencies change.", async () => {
+    function TestComponenWithDeps() {
+      const [metadatas, setMetadatas] = useState<PersistedResource<Metadata>[]>(
+        []
+      );
+      return (
+        <>
+          <TestComponent
+            initialMetadatas={metadatas}
+            deps={[metadatas.length]}
+          />
+          <button
+            className="set-metadatas"
+            onClick={() => setMetadatas(TEST_METADATAS)}
+          />
+        </>
+      );
+    }
+
+    const wrapper = mountWithAppContext(<TestComponenWithDeps />, {
+      apiContext
+    });
+    // Initially empty:
+    expect(lastHookReturn().selectedMetadatas).toEqual([]);
+
+    // Set the new Metadatas / deps:
+    wrapper.find("button.set-metadatas").simulate("click");
+
+    // Now the selected metadatas are re-initialized:
+    expect(lastHookReturn().selectedMetadatas).toEqual(TEST_METADATAS);
+  });
 });
+
+const TEST_METADATAS: PersistedResource<Metadata>[] = [
+  {
+    id: "1",
+    type: "metadata",
+    originalFilename: "test-file-1",
+    bucket: "bucket",
+    fileIdentifier: "111"
+  },
+  {
+    id: "2",
+    type: "metadata",
+    originalFilename: "test-file-2",
+    bucket: "bucket",
+    fileIdentifier: "222"
+  }
+];

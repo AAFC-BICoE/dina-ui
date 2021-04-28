@@ -6,17 +6,14 @@ import {
   useQuery
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { get, toPairs } from "lodash";
+import { get } from "lodash";
 import { ReactNode } from "react";
 import ReactTable from "react-table";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import {
-  ManagedAttribute,
-  ManagedAttributeMap,
-  Metadata
-} from "../../../types/objectstore-api";
+import { Metadata } from "../../../types/objectstore-api";
 import { ObjectUpload } from "../../../types/objectstore-api/resources/ObjectUpload";
 import { GroupLabel } from "../../group-select/GroupFieldView";
+import { ManagedAttributesViewer } from "../managed-attributes/ManagedAttributesViewer";
 
 export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
@@ -90,8 +87,11 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         collapserId="managed-attributes"
         title={formatMessage("metadataManagedAttributesLabel")}
       >
-        <MetadataManagedAttributes
-          managedAttributeMap={metadata.managedAttributeMap}
+        <ManagedAttributesViewer
+          values={metadata.managedAttributeMap?.values}
+          managedAttributeApiPath={id =>
+            `objectstore-api/managed-attribute/${id}`
+          }
         />
       </CollapsableSection>
       <MetadataAttributeGroup
@@ -180,40 +180,6 @@ function MetadataAttributeGroup({
   );
 }
 
-interface MetadataManagedAttributesProps {
-  managedAttributeMap?: ManagedAttributeMap | null;
-}
-
-export function MetadataManagedAttributes({
-  managedAttributeMap
-}: MetadataManagedAttributesProps) {
-  const managedAttributeValues = managedAttributeMap
-    ? toPairs(managedAttributeMap.values).map(([id, mav]) => ({ id, ...mav }))
-    : [];
-
-  return (
-    <ReactTable
-      className="-striped"
-      columns={[
-        {
-          Cell: ({ original: { id, name } }) => (
-            <strong>{name ?? <ManagedAttributeName id={id} />}</strong>
-          ),
-          Header: <DinaMessage id="attributeLabel" />,
-          accessor: "name"
-        },
-        {
-          Header: <DinaMessage id="managedAttributeValueLabel" />,
-          accessor: "value"
-        }
-      ]}
-      data={managedAttributeValues}
-      pageSize={managedAttributeValues.length || 1}
-      showPagination={false}
-    />
-  );
-}
-
 interface MetadataTagsProps {
   tags?: string[];
 }
@@ -270,18 +236,4 @@ function CollapsableSection({
       {!collapsed && children}
     </div>
   );
-}
-
-/** Render the name of a ManagedAttribute. */
-export function ManagedAttributeName({ id }) {
-  const { response } = useQuery<ManagedAttribute>({
-    path: `objectstore-api/managed-attribute/${id}`
-  });
-
-  if (response) {
-    const ma = response.data;
-    return <>{ma.name}</>;
-  }
-
-  return null;
 }

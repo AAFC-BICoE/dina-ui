@@ -7,22 +7,22 @@ import {
   FormikValues
 } from "formik";
 import { cloneDeep } from "lodash";
-import { createContext, PropsWithChildren, useContext } from "react";
+import { createContext, Fragment, PropsWithChildren, useContext } from "react";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
 import { ApiClientI, useApiClient } from "../api-client/ApiClientContext";
 import { ErrorViewer } from "./ErrorViewer";
 import { safeSubmit } from "./safeSubmit";
 
 export interface DinaFormProps<TValues>
-  extends Omit<FormikConfig<TValues>, "onSubmit"> {
+  extends Omit<FormikConfig<TValues>, "onSubmit">,
+    DinaFormContextI {
   onSubmit?: DinaFormOnSubmit<TValues>;
   values?: TValues;
-  readOnly?: boolean;
 }
 
 /** Values available to form elements. */
 export interface DinaFormContextI {
-  readOnly: boolean;
+  readOnly?: boolean;
   /*
    * Whether to layout the label and value horizontally (Default vertical).
    * If a [number, number] is passed then those are the bootstrap grid columns for the label and value.
@@ -49,6 +49,8 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
   const api = useApiClient();
   const account = useAccount();
 
+  const isNestedForm = !!useContext(DinaFormContext);
+
   const { children: childrenProp, onSubmit: onSubmitProp } = props;
 
   /** Wrapped onSubmit prop with erorr handling and API/Account params. */
@@ -63,17 +65,26 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
     });
   });
 
+  const FormWrapperInternal = isNestedForm ? Fragment : FormWrapper;
+
   const childrenInternal:
     | ((formikProps: FormikProps<Values>) => React.ReactNode)
     | React.ReactNode =
     typeof childrenProp === "function" ? (
-      formikProps => <FormWrapper>{childrenProp(formikProps)}</FormWrapper>
+      formikProps => (
+        <FormWrapperInternal>{childrenProp(formikProps)}</FormWrapperInternal>
+      )
     ) : (
-      <FormWrapper>{childrenProp}</FormWrapper>
+      <FormWrapperInternal>{childrenProp}</FormWrapperInternal>
     );
 
   return (
-    <DinaFormContext.Provider value={{ readOnly: props.readOnly ?? false }}>
+    <DinaFormContext.Provider
+      value={{
+        readOnly: props.readOnly ?? false,
+        horizontal: props.horizontal
+      }}
+    >
       <Formik {...props} onSubmit={onSubmitInternal}>
         {childrenInternal}
       </Formik>
@@ -101,6 +112,8 @@ export function useDinaFormContext() {
   return ctx;
 }
 
+export type DinaFormSectionProps = PropsWithChildren<Partial<DinaFormContextI>>;
+
 /**
  * Override context values for a section of the form.
  * e.g. making part of the form layout horizontal or readOnly.
@@ -108,7 +121,7 @@ export function useDinaFormContext() {
 export function DinaFormSection({
   children,
   ...ctxOverride
-}: PropsWithChildren<Partial<DinaFormContextI>>) {
+}: DinaFormSectionProps) {
   const ctx = useDinaFormContext();
 
   return (

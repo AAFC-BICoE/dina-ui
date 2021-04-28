@@ -12,7 +12,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<
   backToListButtonText: "Retour à la liste",
   cancelButtonText: "Annuler",
   closeButtonText: "Fermer",
-  createButtonText: "Créer nouveau",
+  createNew: "Créer nouveau",
   deleteButtonText: "Supprimer",
   editButtonText: "Modifier",
   filterBlankField: "Champ vide",

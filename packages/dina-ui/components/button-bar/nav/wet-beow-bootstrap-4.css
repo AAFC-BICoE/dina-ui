@@ -18,7 +18,7 @@ body {
   line-height: 1.4375;
 }
 a {
-  color: #284162;
+  /* color: #284162; Removed for better visibility. */
   text-decoration: underline;
 }
 .form-control::placeholder {

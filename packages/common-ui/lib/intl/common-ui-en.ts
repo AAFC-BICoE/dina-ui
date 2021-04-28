@@ -18,7 +18,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   checkAllTooltipMessage:
     "Check this header box to check all visible items in this page.",
   closeButtonText: "Close",
-  createButtonText: "Create New",
+  createNew: "Create New",
   deleteAllButtonText: "Delete All",
   deleteButtonText: "Delete",
   editableTable: "Editable Table",
@@ -80,5 +80,6 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   uiAppVersion: "UI Application Version: {version}",
   valueLabel: "Value",
   valueSourceType: "Value Source Type",
+  viewDetails: "View Details",
   yes: "Yes"
 };
