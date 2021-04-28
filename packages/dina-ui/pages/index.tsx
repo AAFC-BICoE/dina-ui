@@ -11,8 +11,7 @@ const Home: React.FunctionComponent = () => (
     <main role="main">
       <div className="container">
         <h1>
-          {" "}
-          <DinaMessage id="dinaHomeH1" />{" "}
+          <DinaMessage id="dinaHomeH1" />
         </h1>
         <h2>
           <DinaMessage id="objectStoreTitle" />
