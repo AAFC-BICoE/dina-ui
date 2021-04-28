@@ -18,7 +18,8 @@ body {
   line-height: 1.4375;
 }
 a {
-  /* color: #284162; Removed for better visibility. */
+  /* need this to resolve 23 link color ratio issuses*/
+  color: #284162;
   text-decoration: underline;
 }
 .form-control::placeholder {

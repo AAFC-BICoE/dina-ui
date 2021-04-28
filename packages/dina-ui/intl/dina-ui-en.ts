@@ -63,6 +63,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   deleteSelectedButtonText: "Delete Selected",
   detachSelectedButtonText: "Detach Selected",
   dinaUserSectionTitle: "Users",
+  dinaHomeH1: "Dina Home",
   editableManagedAttributesRemoveInfo:
     "Note: Removing an attribute from the 'Visible Managed Attributes' list doesn't delete the value. To delete the value, clear the input below.",
   editCataloguedObjectTitle: "Edit Catalogued Object",
