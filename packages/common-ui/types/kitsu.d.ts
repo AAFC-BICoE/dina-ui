@@ -1,6 +1,7 @@
 /// <reference types="node" />
 
 import { AxiosInstance } from "axios";
+import { SetRequired, SetOptional } from "type-fest";
 
 declare module "kitsu" {
   // export default Kitsu;
@@ -92,7 +93,23 @@ declare module "kitsu" {
   export type PersistedResource<TData extends KitsuResource = KitsuResource> = {
     [P in keyof TData]: TData[P] extends KitsuResource
       ? PersistedResource<TData[P]>
+      : TData[P] extends KitsuResource | undefined
+      ? PersistedResource<TData[P]> | undefined
       : TData[P];
   } &
     Required<KitsuResource>;
+
+  /**
+   * Used when creating or updating a resource.
+   * Makes the 'id' field optional on the main resource.
+   * Makes the 'id' field required on linked resources.
+   */
+  export type InputResource<TData extends KitsuResource> = SetOptional<
+    {
+      [P in keyof TData]: TData[P] extends KitsuResource | undefined
+        ? Required<KitsuResource> | undefined
+        : TData[P];
+    },
+    "id"
+  >;
 }

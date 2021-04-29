@@ -4,6 +4,10 @@ import { CollectingEvent } from "./CollectingEvent";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
+
+  // attributes to be added by the back-end:
+  name?: string;
+
   group?: string;
   createdOn?: string;
   createdBy?: string;
