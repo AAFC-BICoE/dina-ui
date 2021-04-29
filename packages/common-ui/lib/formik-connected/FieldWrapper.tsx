@@ -28,6 +28,8 @@ export interface LabelWrapperParams {
 
   /** Custom element to render when the form is in read-only mode. */
   readOnlyRender?: (value: any) => ReactNode;
+
+  id?: string;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -69,10 +71,12 @@ export function FieldWrapper({
   const [labelCol, valueCol] =
     typeof horizontal === "boolean" ? [6, 6] : horizontal || [];
 
+  const id = `${name}_${className}`;
   return (
     <div className={className}>
       <div className={`form-group ${name}-field ${horizontal ? "row" : ""}`}>
         <label
+          htmlFor={id}
           className={[
             `${labelCol ? `col-sm-${labelCol}` : ""}`,
             // Adjust alignment for editable inputs:

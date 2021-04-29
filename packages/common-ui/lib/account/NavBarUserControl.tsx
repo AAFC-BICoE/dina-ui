@@ -20,7 +20,7 @@ export function NavbarUserControl() {
             <span className="mr-2 my-auto">
               <CommonMessage id="loggedInAsUser" />{" "}
               <Link href={`/dina-user/view?id=${subject}`}>
-                <a>{username}</a>
+                <a style={{ color: "#284162" }}>{username}</a>
               </Link>
             </span>
           )}
