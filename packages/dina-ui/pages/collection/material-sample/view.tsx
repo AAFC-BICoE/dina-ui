@@ -70,8 +70,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             readOnly={true}
           >
             <MaterialSampleFormLayout />
-            <FieldSet legend={<DinaMessage id="collectingEvent" />}>
-              {collectingEvent && (
+            {collectingEvent && (
+              <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                 <DinaForm initialValues={collectingEvent} readOnly={true}>
                   <div className="form-group d-flex justify-content-end align-items-center">
                     <Link
@@ -84,8 +84,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   </div>
                   <CollectingEventFormLayout />
                 </DinaForm>
-              )}
-            </FieldSet>
+              </FieldSet>
+            )}
           </DinaForm>
           {buttonBar}
         </main>

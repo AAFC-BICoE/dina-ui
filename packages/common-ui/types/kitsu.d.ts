@@ -86,6 +86,11 @@ declare module "kitsu" {
     type: string;
   }
 
+  export interface KitsuResourceLink {
+    id: string | null;
+    type: string;
+  }
+
   /**
    * Makes the 'id' field required on a resource type and all of its relationships.
    * Used when assuming that data from the back-end always has the ID set.
@@ -107,7 +112,7 @@ declare module "kitsu" {
   export type InputResource<TData extends KitsuResource> = SetOptional<
     {
       [P in keyof TData]: TData[P] extends KitsuResource | undefined
-        ? Required<KitsuResource> | undefined
+        ? Required<KitsuResourceLink> | undefined
         : TData[P];
     },
     "id"

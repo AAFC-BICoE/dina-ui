@@ -84,10 +84,10 @@ export function MaterialSampleForm({
 }: MaterialSampleFormProps) {
   const { username } = useAccount();
 
-  const [showCollectingEvent, setShowCollectingEvent] = useState(
+  const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     !!materialSample?.collectingEvent
   );
-  const [showCatalogueInfo, setCatalogueInfo] = useState(false);
+  const [enableCatalogueInfo, setEnableCatalogueInfo] = useState(false);
 
   /** YYYY-MM-DD format. */
   const todayDate = new Date().toISOString().slice(0, 10);
@@ -124,8 +124,14 @@ export function MaterialSampleForm({
       ...materialSampleValues
     };
 
-    // Save the linked CollectingEvent if included:
-    if (colEventFormRef.current) {
+    if (!enableCollectingEvent) {
+      // Unlink the CollectingEvent if its switch is unchecked:
+      materialSampleInput.collectingEvent = {
+        id: null,
+        type: "collecting-event"
+      };
+    } else if (colEventFormRef.current) {
+      // Save the linked CollectingEvent if included:
       const submittedCollectingEvent = cloneDeep(
         colEventFormRef.current?.values
       );
@@ -198,8 +204,8 @@ export function MaterialSampleForm({
             </strong>
             <div className="mx-2">
               <Switch
-                checked={showCollectingEvent}
-                onChange={setShowCollectingEvent}
+                checked={enableCollectingEvent}
+                onChange={setEnableCollectingEvent}
               />
             </div>
           </label>
@@ -208,12 +214,15 @@ export function MaterialSampleForm({
               <DinaMessage id="catalogueInfo" />
             </strong>
             <div className="mx-2">
-              <Switch checked={showCatalogueInfo} onChange={setCatalogueInfo} />
+              <Switch
+                checked={enableCatalogueInfo}
+                onChange={setEnableCatalogueInfo}
+              />
             </div>
           </label>
         </div>
       </FieldSet>
-      {showCollectingEvent && (
+      <div className={enableCollectingEvent ? "" : "d-none"}>
         <FieldSet legend={<DinaMessage id="collectingEvent" />}>
           <Tabs
             // Re-initialize the form when the linked CollectingEvent changes:
@@ -269,7 +278,7 @@ export function MaterialSampleForm({
             </TabPanel>
           </Tabs>
         </FieldSet>
-      )}
+      </div>
       {buttonBar}
     </DinaForm>
   );

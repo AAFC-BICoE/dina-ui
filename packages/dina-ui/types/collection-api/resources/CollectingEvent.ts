@@ -5,6 +5,7 @@ import { CollectorGroup } from "./CollectorGroup";
 import { GeoReferenceAssertion } from "./GeoReferenceAssertion";
 
 export interface CollectingEventAttributes {
+  type: "collecting-event";
   uuid: string;
 
   startEventDateTime: string;
