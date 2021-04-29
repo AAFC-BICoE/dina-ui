@@ -8,15 +8,17 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
+import { Field } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
 import { Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
+import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
-import { MaterialSampleFormLayout } from "./edit";
+import { CatalogueInfoFormLayout, MaterialSampleFormLayout } from "./edit";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -24,7 +26,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { id } = router.query;
 
   const materialSampleQuery = useQuery<MaterialSample>({
-    path: `collection-api/material-sample/${id}?include=collectingEvent`
+    path: `collection-api/material-sample/${id}`,
+    include: "collectingEvent,attachment"
   });
 
   const colEventQuery = useCollectingEventQuery(
@@ -86,6 +89,18 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 </DinaForm>
               </FieldSet>
             )}
+            <CatalogueInfoFormLayout />
+            <div className="form-group">
+              <Field name="id">
+                {({ field: { value: materialSampleId } }) => (
+                  <AttachmentReadOnlySection
+                    attachmentPath={`collection-api/material-sample/${materialSampleId}/attachment`}
+                    detachTotalSelected={true}
+                    title={<DinaMessage id="collectingEventAttachments" />}
+                  />
+                )}
+              </Field>
+            </div>
           </DinaForm>
           {buttonBar}
         </main>

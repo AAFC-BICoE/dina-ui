@@ -122,7 +122,7 @@ export function DinaFormSection({
   children,
   ...ctxOverride
 }: DinaFormSectionProps) {
-  const ctx = useDinaFormContext();
+  const ctx = useContext(DinaFormContext);
 
   return (
     <DinaFormContext.Provider value={{ ...ctx, ...ctxOverride }}>

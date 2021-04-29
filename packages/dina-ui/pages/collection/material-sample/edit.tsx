@@ -1,6 +1,7 @@
 import {
   BackButton,
   ButtonBar,
+  DateField,
   DinaForm,
   DinaFormSubmitParams,
   FieldSet,
@@ -8,6 +9,8 @@ import {
   SubmitButton,
   TextField,
   useAccount,
+  useApiClient,
+  useDinaFormContext,
   useQuery,
   withResponse
 } from "common-ui";
@@ -26,8 +29,10 @@ import {
   useCollectingEventQuery,
   useCollectingEventSave
 } from "../../../components/collection";
+import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
+import { Metadata } from "../../../types/objectstore-api";
 
 export default function MaterialSampleEditPage() {
   const router = useRouter();
@@ -35,13 +40,33 @@ export default function MaterialSampleEditPage() {
     query: { id }
   } = router;
   const { formatMessage } = useDinaIntl();
+  const { bulkGet } = useApiClient();
 
   const materialSampleQuery = useQuery<MaterialSample>(
     {
       path: `collection-api/material-sample/${id}`,
-      include: "collectingEvent"
+      include: "collectingEvent,attachment"
     },
-    { disabled: !id }
+    {
+      disabled: !id,
+      onSuccess: async ({ data }) => {
+        if (data.attachment) {
+          try {
+            const metadatas = await bulkGet<Metadata>(
+              data.attachment.map(collector => `/metadata/${collector.id}`),
+              {
+                apiBaseUrl: "/objectstore-api",
+                returnNullForMissingResource: true
+              }
+            );
+            // Omit null (deleted) records:
+            data.attachment = metadatas.filter(it => it);
+          } catch (error) {
+            console.warn("Attachment join failed: ", error);
+          }
+        }
+      }
+    }
   );
 
   async function moveToViewPage(savedId: string) {
@@ -110,19 +135,27 @@ export function MaterialSampleForm({
   const {
     collectingEventInitialValues,
     saveCollectingEvent,
-    attachedMetadatasUI
+    attachedMetadatasUI: colEventAttachmentsUI
   } = useCollectingEventSave(colEventQuery.response?.data);
+
+  const {
+    attachedMetadatasUI: materialSampleAttachmentsUI,
+    selectedMetadatas
+  } = useAttachmentsModal({
+    initialMetadatas: materialSample?.attachment as PersistedResource<Metadata>[],
+    deps: [materialSample?.id],
+    title: <DinaMessage id="materialSampleAttachments" />
+  });
 
   async function onSubmit({
     api: { save },
     submittedValues
   }: DinaFormSubmitParams<InputResource<MaterialSample>>) {
-    const { ...materialSampleValues } = submittedValues;
+    // Init relationships object for one-to-many relations:
+    (submittedValues as any).relationships = {};
 
     /** Input to submit to the back-end API. */
-    const materialSampleInput = {
-      ...materialSampleValues
-    };
+    const { ...materialSampleInput } = submittedValues;
 
     if (!enableCollectingEvent) {
       // Unlink the CollectingEvent if its switch is unchecked:
@@ -153,6 +186,15 @@ export function MaterialSampleForm({
 
     // TODO enable this when the back-end supports it:
     delete materialSampleInput.name;
+
+    // Add attachments if they were selected:
+    if (selectedMetadatas.length) {
+      (materialSampleInput as any).relationships.attachment = {
+        data: selectedMetadatas.map(it => ({ id: it.id, type: it.type }))
+      };
+    }
+    // Delete the 'attachment' attribute because it should stay in the relationships field:
+    delete materialSampleInput.attachment;
 
     // Save the MaterialSample:
     const [savedMaterialSample] = await save(
@@ -185,7 +227,7 @@ export function MaterialSampleForm({
       initialValues={collectingEventInitialValues}
     >
       <CollectingEventFormLayout />
-      <div className="form-group">{attachedMetadatasUI}</div>
+      <div className="form-group">{colEventAttachmentsUI}</div>
     </DinaForm>
   );
 
@@ -279,6 +321,15 @@ export function MaterialSampleForm({
           </Tabs>
         </FieldSet>
       </div>
+      <div className={enableCatalogueInfo ? "" : "d-none"}>
+        <FieldSet
+          readOnly={true} // Disabled until back-end supports these fields.
+          legend={<DinaMessage id="catalogueInfo" />}
+        >
+          <CatalogueInfoFormLayout />
+        </FieldSet>
+      </div>
+      {materialSampleAttachmentsUI}
       {buttonBar}
     </DinaForm>
   );
@@ -297,6 +348,39 @@ export function MaterialSampleFormLayout() {
       </div>
       <div className="row">
         <TextField name="name" className="col-md-6" />
+      </div>
+    </div>
+  );
+}
+
+export function CatalogueInfoFormLayout() {
+  const { readOnly } = useDinaFormContext();
+
+  return (
+    <div>
+      <div className="row">
+        <div className="col-md-6">
+          <FieldSet legend={<DinaMessage id="preparation" />} horizontal={true}>
+            <TextField name="preparationMethod" />
+            <TextField name="preparedBy" />
+            <DateField name="datePrepared" />
+          </FieldSet>
+        </div>
+        <div className="col-md-6">
+          <FieldSet legend={<DinaMessage id="catalogueInfo" />}>
+            <TextField name="dwcCatalogNumber" />
+            {!readOnly && (
+              <FormikButton
+                // TODO onClick
+                onClick={() => undefined}
+                className="btn btn-primary"
+                buttonProps={() => ({ style: { width: "20rem" } })}
+              >
+                <DinaMessage id="makeThisThePrimaryIdentifier" />
+              </FormikButton>
+            )}
+          </FieldSet>
+        </div>
       </div>
     </div>
   );

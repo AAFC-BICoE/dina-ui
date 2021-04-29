@@ -17,12 +17,8 @@ import { useState } from "react";
 import { ShouldRenderReasons } from "react-autosuggest";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import {
-  GeographySearchBox,
-  GeoReferenceAssertionRow,
-  GroupSelectField,
-  useAddPersonModal
-} from "..";
+import { GroupSelectField, useAddPersonModal } from "..";
+import { GeographySearchBox, GeoReferenceAssertionRow } from ".";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
 import { geographicPlaceSourceUrl } from "../../types/collection-api/GeographicPlaceNameSourceDetail";
@@ -558,7 +554,9 @@ export function CollectingEventFormLayout({
       </FieldSet>
       <div className="row">
         <div className="col-md-6">
-          <FieldSet legend={<DinaMessage id="managedAttributeListTitle" />}>
+          <FieldSet
+            legend={<DinaMessage id="collectingEventManagedAttributes" />}
+          >
             {readOnly ? (
               <FastField name="managedAttributeValues">
                 {({ field: { value } }) => (
@@ -590,6 +588,7 @@ export function CollectingEventFormLayout({
               <AttachmentReadOnlySection
                 attachmentPath={`collection-api/collecting-event/${id}/attachment`}
                 detachTotalSelected={true}
+                title={<DinaMessage id="collectingEventAttachments" />}
               />
             )}
           </Field>
