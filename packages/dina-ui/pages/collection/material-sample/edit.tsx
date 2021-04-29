@@ -20,12 +20,12 @@ import { useRef, useState } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { GroupSelectField, Head, Nav } from "../../../components";
-import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
-import { CollectingEventLinker } from "../../../components/collection/CollectingEventLinker";
 import {
+  CollectingEventFormLayout,
+  CollectingEventLinker,
   useCollectingEventQuery,
   useCollectingEventSave
-} from "../../../components/collection/useCollectingEvent";
+} from "../../../components/collection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 
