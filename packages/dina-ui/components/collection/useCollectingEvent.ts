@@ -201,6 +201,30 @@ export function useCollectingEventSave(
       assertion.georeferencedBy = assertion.georeferencedBy?.map(it => it.id);
     }
 
+    // Parse placeNames to geographicPlaceNameSourceDetail
+    if (submittedValues.placeNames?.length > 0) {
+      // Remove all the empty and space only strings, take away the "[" after which indicating a type
+      submittedValues.placeNames
+        .map(e => e.trim())
+        .filter(e => e)
+        .map(placeName => {
+          const typeStart = placeName.indexOf("[");
+          const typeEnd = placeName.indexOf("]");
+          const place = placeName
+            .slice(0, typeStart !== -1 ? typeStart : placeName.length)
+            .trim();
+
+          let type = 0;
+          if (typeEnd !== -1 && typeStart !== -1)
+            type = placeName.slice(typeStart + 1, typeEnd);
+          submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = [];
+          submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace[0].name = place;
+          submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace[0].placeType = type;
+        });
+    }
+
+    delete submittedValues.placeNames;
+
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [
         {

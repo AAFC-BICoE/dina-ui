@@ -55,21 +55,24 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
       {buttonBar}
       {withResponse(collectingEventQuery, ({ data: colEvent }) => {
         colEvent.placeNames = colEvent.geographicPlaceName
-        ? colEvent.geographicPlaceName.split(",")
-        : [];
+          ? colEvent.geographicPlaceName.split(",")
+          : [];
         return (
-        <main className="container-fluid">
-          <h1>
-            <DinaMessage id="collectingEventViewTitle" />
-          </h1>
-          <div className="form-group">
-            <DinaForm<CollectingEvent> initialValues={colEvent} readOnly={true}>
-              <CollectingEventFormLayout />
-            </DinaForm>
-          </div>
-        </main>
-      )}
-      )}
+          <main className="container-fluid">
+            <h1>
+              <DinaMessage id="collectingEventViewTitle" />
+            </h1>
+            <div className="form-group">
+              <DinaForm<CollectingEvent>
+                initialValues={colEvent}
+                readOnly={true}
+              >
+                <CollectingEventFormLayout />
+              </DinaForm>
+            </div>
+          </main>
+        );
+      })}
       {buttonBar}
       <Footer />
     </div>

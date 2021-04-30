@@ -8,7 +8,7 @@ import {
   NominatumApiSearchResult,
   ResourceSelectField,
   TextField,
-  useDinaFormContext,  
+  useDinaFormContext,
   TextFieldWithCoordButtons,
   TextFieldWithRemoveButton
 } from "common-ui";
@@ -27,7 +27,7 @@ import {
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
-import { geographicPlaceSourceUrl } from "../../types/collection-api/GeographicPlaceNameSourceDetail";
+import { geographicPlaceSourceUrl } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import {
   CollectingEvent,
   GeographicPlaceNameSource
