@@ -134,7 +134,11 @@ describe("Catalogued Object Edit Page", () => {
               dwcOtherRecordNumbers: null,
               dwcVerbatimCoordinateSystem: "decimal degrees",
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              geoReferenceAssertions: [{}],
+              geoReferenceAssertions: [
+                {
+                  isPrimary: true
+                }
+              ],
               relationships: {},
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
@@ -335,7 +339,11 @@ describe("Catalogued Object Edit Page", () => {
               dwcOtherRecordNumbers: null,
               dwcVerbatimCoordinateSystem: "decimal degrees",
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              geoReferenceAssertions: [{}],
+              geoReferenceAssertions: [
+                {
+                  isPrimary: true
+                }
+              ],
               relationships: {},
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"

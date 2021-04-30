@@ -367,7 +367,7 @@ export function CollectingEventFormLayout({
                     [];
 
                   function addGeoReference() {
-                    push({});
+                    push({ isPrimary: assertions.length === 0 });
                     setActiveTabIdx(assertions.length);
                   }
 
@@ -379,7 +379,7 @@ export function CollectingEventFormLayout({
                     );
                   }
                   return (
-                    <div>
+                    <div className="georeference-assertion-section">
                       <Tabs
                         selectedIndex={activeTabIdx}
                         onSelect={setActiveTabIdx}
@@ -391,9 +391,13 @@ export function CollectingEventFormLayout({
                               assertions.length === 1 ? "d-none" : ""
                             }`}
                           >
-                            {assertions.map((_, index) => (
+                            {assertions.map((assertion, index) => (
                               <Tab key={index}>
-                                <span className="m-3">{index + 1}</span>
+                                <span className="m-3">
+                                  {index + 1}
+                                  {assertion.isPrimary &&
+                                    ` (${formatMessage("primary")})`}
+                                </span>
                               </Tab>
                             ))}
                           </TabList>

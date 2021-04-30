@@ -63,6 +63,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   deleteSelectedButtonText: "Delete Selected",
   detachSelectedButtonText: "Detach Selected",
   dinaUserSectionTitle: "Users",
+  dinaHomeH1: "Dina Home",
   editableManagedAttributesRemoveInfo:
     "Note: Removing an attribute from the 'Visible Managed Attributes' list doesn't delete the value. To delete the value, clear the input below.",
   editCataloguedObjectTitle: "Edit Catalogued Object",
@@ -212,10 +213,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   longitudeValidationError:
     "Invalid longitude: {longtitude}, \
   \nValid longitude is between -180 to 180 for degree, and 0 to 60 for minute and second",
-  largeImgLink: "Large",
+  largeImg: "Large Image",
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",
   locationLabel: "Location",
   literalGeoreferencedByLabel: "Georeferenced By",
+  makePrimary: "Make Primary",
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
   managedAttributeValueLabel: "Value",
@@ -257,10 +259,13 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organizationFrenchNameLabel: "French Name",
   organizationListTitle: "Organizations",
   organizationViewTitle: "View Organization",
-  originalImgLink: "Original",
+  originalFile: "Original File",
   personListTitle: "Persons",
   personViewTitle: "Person",
   preparationData: "Preparation Data",
+  primary: "Primary",
+  primaryButton_tooltip:
+    "Make this assertion the primary data point when exported. Only one assertion can be primary",
   removeAssertionLabel: "Remove this GeoReference",
   placeNameLabel: "Place Name",
   removeThisPlaceLabel: " Remove this Place",
@@ -276,9 +281,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",
   set: "Set",
+  showing: "Showing",
   startEventDateTimeLabel: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   thumbnailNotAvailableText: "No thumbnail available",
-  thumbnailImgLink: "Thumbnail",
+  thumbnail: "Thumbnail",
   to: "To",
   toponymyLegend: "Current Geographic Place",
   uploadButtonText: "Upload",

@@ -93,7 +93,7 @@ export function FileView({
             className="p-2 original"
             href={`${downloadLinks?.original}?access_token=${token}`}
           >
-            <DinaMessage id="originalImgLink" />
+            <DinaMessage id="originalFile" />
           </a>
         )}
         {downloadLinks?.thumbNail && (
@@ -101,7 +101,7 @@ export function FileView({
             className="p-2 thumbnail"
             href={`${downloadLinks?.thumbNail}?access_token=${token}`}
           >
-            <DinaMessage id="thumbnailImgLink" />
+            <DinaMessage id="thumbnail" />
           </a>
         )}
         {downloadLinks?.largeData && (
@@ -109,7 +109,7 @@ export function FileView({
             className="p-2 large"
             href={`${downloadLinks?.largeData}?access_token=${token}`}
           >
-            <DinaMessage id="largeImgLink" />
+            <DinaMessage id="largeImg" />
           </a>
         )}
       </div>
