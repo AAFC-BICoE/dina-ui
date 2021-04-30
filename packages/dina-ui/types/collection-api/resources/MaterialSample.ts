@@ -2,19 +2,19 @@ import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 import { CollectingEvent } from "./CollectingEvent";
 
-export interface PhysicalEntityAttributes {
-  type: "physical-entity";
+export interface MaterialSampleAttributes {
+  type: "material-sample";
   group?: string;
   createdOn?: string;
   createdBy?: string;
   dwcCatalogNumber?: string;
 }
 
-export interface PhysicalEntityRelationships {
+export interface MaterialSampleRelationships {
   collectingEvent?: CollectingEvent;
   attachment?: ResourceIdentifierObject[];
 }
 
-export type PhysicalEntity = KitsuResource &
-  PhysicalEntityAttributes &
-  PhysicalEntityRelationships;
+export type MaterialSample = KitsuResource &
+  MaterialSampleAttributes &
+  MaterialSampleRelationships;
