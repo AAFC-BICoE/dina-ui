@@ -1,8 +1,14 @@
 import { useLocalStorage } from "@rehooks/local-storage";
-import { FieldWrapper, LabelWrapperParams } from "common-ui";
+import {
+  FieldWrapper,
+  LabelWrapperParams,
+  SelectFieldProps,
+  SelectOption
+} from "common-ui";
 import Select from "react-select";
 import { DinaMessage } from "../../../../intl/dina-ui-intl";
 import { DefaultValuesConfig } from "./model-types";
+import { Styles } from "react-select/src/styles";
 
 export interface DefaultValueConfigSelectProps {
   allowBlank?: boolean;
@@ -10,6 +16,9 @@ export interface DefaultValueConfigSelectProps {
   onChangeConfigIndex: (index: number | null) => void;
   /** Mock this out in tests so it gives a predictable value. */
   dateSupplier?: () => string;
+  name?: string;
+  className?: string;
+  styles?: Partial<Styles<SelectOption<any>, boolean>>;
 }
 
 /** Lists, adds, edits, and removes Default Value Configs. */
@@ -97,7 +106,10 @@ export function useStoredDefaultValuesConfigs() {
 export function DefaultValuesConfigSelect({
   onChangeConfigIndex,
   ruleConfigIndex,
-  allowBlank
+  allowBlank,
+  name,
+  className,
+  styles
 }: DefaultValueConfigSelectProps) {
   const { storedDefaultValuesConfigs } = useStoredDefaultValuesConfigs();
 
@@ -110,21 +122,31 @@ export function DefaultValuesConfigSelect({
     ? [{ label: "<none>", value: null }, ...ruleConfigOptions]
     : ruleConfigOptions;
 
+  const id = name + "_" + className;
+
   return (
-    <Select<{ label: string; value: number | null }>
-      instanceId="config-select"
-      options={selectOptions}
-      onChange={(option: any) => onChangeConfigIndex(option.value)}
-      value={ruleConfigOptions[ruleConfigIndex ?? -1] ?? null}
-    />
+    <>
+      <Select<{ label: string; value: number | null }>
+        instanceId="config-select"
+        options={selectOptions}
+        onChange={(option: any) => onChangeConfigIndex(option.value)}
+        value={ruleConfigOptions[ruleConfigIndex ?? -1] ?? null}
+        inputId={id}
+        styles={styles}
+      />
+    </>
   );
 }
 
 /** Formik-connected DefaultValuesConfig Select Field. */
 export function DefaultValuesConfigSelectField(
-  props: LabelWrapperParams & { allowBlank?: boolean }
+  props: LabelWrapperParams & {
+    allowBlank?: boolean;
+    styles?: Partial<Styles<SelectOption<any>, boolean>>;
+  }
 ) {
-  const { allowBlank, ...labelWrapperProps } = props;
+  const { allowBlank, styles, ...labelWrapperProps } = props;
+
   return (
     <FieldWrapper {...labelWrapperProps}>
       {({ setValue, value }) => (
@@ -132,6 +154,9 @@ export function DefaultValuesConfigSelectField(
           allowBlank={allowBlank}
           onChangeConfigIndex={setValue}
           ruleConfigIndex={value}
+          name={labelWrapperProps.name}
+          className={labelWrapperProps.className}
+          styles={styles}
         />
       )}
     </FieldWrapper>

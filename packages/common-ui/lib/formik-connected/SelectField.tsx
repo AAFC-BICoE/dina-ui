@@ -61,7 +61,7 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
             onChange={onChangeInternal}
             styles={styles}
             value={selectedOption}
-            id={id}
+            inputId={id}
           />
         );
       }}

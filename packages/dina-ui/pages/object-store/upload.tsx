@@ -50,6 +50,14 @@ export default function UploadPage() {
     });
   }
 
+  // Fix the place holder text ...Select has not enough contrast ratio to the background issue
+  const customStyles = {
+    placeholder: (provided, _) => ({
+      ...provided,
+      color: "rgb(51,51,51)"
+    })
+  };
+
   return (
     <div>
       <Head title={formatMessage("uploadPageTitle")} />
@@ -76,6 +84,7 @@ export default function UploadPage() {
                 allowBlank={true}
                 name="defaultValuesConfig"
                 className="offset-md-3 col-md-3"
+                styles={customStyles}
               />
               <div className="col-md-3">
                 <FormikButton
