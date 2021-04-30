@@ -4,7 +4,7 @@ import {
   KitsuResource,
   PersistedResource
 } from "kitsu";
-import { debounce, isArray, isUndefined, omitBy } from "lodash";
+import { debounce, omitBy, isUndefined, isEqual } from "lodash";
 import React, { useContext } from "react";
 import { useIntl } from "react-intl";
 import AsyncSelect from "react-select/async";
@@ -90,17 +90,21 @@ export function ResourceSelect<TData extends KitsuResource>({
     inputValue: string,
     callback: (options: OptionsType<any>) => void
   ) {
-    const filterParam = inputValue ? filter(inputValue) : undefined;
+    // Omit blank/null filters:
+    const filterParam = omitBy(filter(inputValue), val =>
+      ["", null, undefined].includes(val)
+    ) as FilterParam;
 
     // Omit undefined values from the GET params, which would otherwise cause an invalid request.
     // e.g. /api/region?include=undefined
     const getParams = omitBy<GetParams>(
       { filter: filterParam, include, sort },
-      isUndefined
+      val => isUndefined(val) || isEqual(val, {})
     );
 
     // Send the API request.
     const response = await apiClient.get<TData[]>(model, getParams);
+
     if (!response) {
       // This warning may appear in tests where apiClient.get hasn't been mocked:
       console.warn("No response returned from apiClient.get for query: ", {
@@ -108,10 +112,9 @@ export function ResourceSelect<TData extends KitsuResource>({
         ...getParams
       });
     }
-    const { data } = response;
 
     // Build the list of options from the returned resources.
-    const resourceOptions = data.map(resource => ({
+    const resourceOptions = response.data.map(resource => ({
       label: optionLabel(resource),
       resource,
       value: resource.id

@@ -12,7 +12,7 @@ import {
   TextFieldWithCoordButtons,
   TextFieldWithRemoveButton
 } from "common-ui";
-import { Field, FieldArray, FormikContextType } from "formik";
+import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
 import { SRS } from "../../types/collection-api/resources/SRS";
 import { useState, useRef } from "react";
@@ -38,6 +38,8 @@ import {
   CoordinateSystemEnumPlaceHolder
 } from "../../types/collection-api/resources/CoordinateSystem";
 import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
+import { ManagedAttributesEditor } from "../object-store/managed-attributes/ManagedAttributesEditor";
+import { ManagedAttributesViewer } from "../object-store/managed-attributes/ManagedAttributesViewer";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 
 interface CollectingEventFormLayoutProps {
@@ -415,7 +417,7 @@ export function CollectingEventFormLayout({
                     [];
 
                   function addGeoReference() {
-                    push({});
+                    push({ isPrimary: assertions.length === 0 });
                     setActiveTabIdx(assertions.length);
                   }
 
@@ -427,7 +429,7 @@ export function CollectingEventFormLayout({
                     );
                   }
                   return (
-                    <div>
+                    <div className="georeference-assertion-section">
                       <Tabs
                         selectedIndex={activeTabIdx}
                         onSelect={setActiveTabIdx}
@@ -439,9 +441,13 @@ export function CollectingEventFormLayout({
                               assertions.length === 1 ? "d-none" : ""
                             }`}
                           >
-                            {assertions.map((_, index) => (
+                            {assertions.map((assertion, index) => (
                               <Tab key={index}>
-                                <span className="m-3">{index + 1}</span>
+                                <span className="m-3">
+                                  {index + 1}
+                                  {assertion.isPrimary &&
+                                    ` (${formatMessage("primary")})`}
+                                </span>
                               </Tab>
                             ))}
                           </TabList>
@@ -669,7 +675,33 @@ export function CollectingEventFormLayout({
           </div>
         </div>
       </FieldSet>
-
+      <div className="row">
+        <div className="col-md-6">
+          <FieldSet legend={<DinaMessage id="managedAttributeListTitle" />}>
+            {readOnly ? (
+              <FastField name="managedAttributeValues">
+                {({ field: { value } }) => (
+                  <ManagedAttributesViewer
+                    values={value}
+                    managedAttributeApiPath={key =>
+                      `collection-api/managed-attribute/collecting_event.${key}`
+                    }
+                  />
+                )}
+              </FastField>
+            ) : (
+              <ManagedAttributesEditor
+                valuesPath="managedAttributeValues"
+                valueFieldName="assignedValue"
+                managedAttributeApiPath="collection-api/managed-attribute"
+                apiBaseUrl="/collection-api"
+                managedAttributeComponent="COLLECTING_EVENT"
+                managedAttributeKeyField="key"
+              />
+            )}
+          </FieldSet>
+        </div>
+      </div>
       {readOnly && (
         <div className="form-group">
           <Field name="id">

@@ -9,7 +9,7 @@ import {
 import Link from "next/link";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { PhysicalEntity } from "../../../types/collection-api";
+import { MaterialSample } from "../../../types/collection-api";
 
 const CATALOGUED_OBJECT_FILTER_ATTRIBUTES: FilterAttribute[] = [
   "dwcCatalogNumber",
@@ -20,7 +20,7 @@ const CATALOGUED_OBJECT_FILTER_ATTRIBUTES: FilterAttribute[] = [
   }
 ];
 
-const CATALOGUED_OBJECT_TABLE_COLUMNS: ColumnDefinition<PhysicalEntity>[] = [
+const CATALOGUED_OBJECT_TABLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
   {
     Cell: ({ original: { id, dwcCatalogNumber } }) => (
       <Link href={`/collection/catalogued-object/view?id=${id}`}>
@@ -53,10 +53,10 @@ export default function CataloguedObjectListPage() {
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}
           filterAttributes={CATALOGUED_OBJECT_FILTER_ATTRIBUTES}
-          id="physical-entity-list"
+          id="material-sample-list"
           queryTableProps={{
             columns: CATALOGUED_OBJECT_TABLE_COLUMNS,
-            path: "collection-api/physical-entity"
+            path: "collection-api/material-sample"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="form-group">

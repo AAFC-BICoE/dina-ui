@@ -15,8 +15,7 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
   dwcOtherRecordNumbers: ["12", "13", "14"],
   geoReferenceAssertions: [
     {
-      id: "1",
-      type: "georeference-assertion",
+      isPrimary: true,
       dwcDecimalLongitude: 12.5,
       georeferencedBy: ["1"]
     }

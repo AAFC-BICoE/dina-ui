@@ -2,7 +2,7 @@ import { CataloguedObjectForm } from "../../../../pages/collection/catalogued-ob
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   CollectingEvent,
-  PhysicalEntity
+  MaterialSample
 } from "../../../../types/collection-api";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
 import { SRS } from "../../../../types/collection-api/resources/SRS";
@@ -23,10 +23,10 @@ function testCollectionEvent(): Partial<CollectingEvent> {
   };
 }
 
-function testCataloguedObject(): PhysicalEntity {
+function testCataloguedObject(): MaterialSample {
   return {
     id: "1",
-    type: "physical-entity",
+    type: "material-sample",
     group: "test group",
     dwcCatalogNumber: "my-number",
     collectingEvent: { id: "1", type: "collecting-event" } as CollectingEvent
@@ -43,7 +43,7 @@ const TEST_COORDINATES: CoordinateSystem = {
   type: "coordinate-system"
 };
 
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn<any, any>(async path => {
   if (path === "user-api/group") {
     return { data: [] };
   }
@@ -66,11 +66,14 @@ const mockGet = jest.fn(async path => {
   if (path === "collection-api/coordinate-system") {
     return { data: [TEST_COORDINATES] };
   }
+  if (path === "collection-api/managed-attribute") {
+    return { data: [] };
+  }
 });
 
-const mockSave = jest.fn(async saves => {
+const mockSave = jest.fn<any, any>(async saves => {
   return saves.map(save => {
-    if (save.type === "physical-entity") {
+    if (save.type === "material-sample") {
       return testCataloguedObject();
     }
     if (save.type === "collecting-event") {
@@ -79,21 +82,28 @@ const mockSave = jest.fn(async saves => {
   });
 });
 
+const mockBulkGet = jest.fn<any, any>(async paths => {
+  if (!paths.length) {
+    return [];
+  }
+});
+
 const testCtx = {
   apiContext: {
+    bulkGet: mockBulkGet,
     save: mockSave,
     apiClient: {
       get: mockGet
-    } as any
+    }
   }
 };
 
 const mockOnSaved = jest.fn();
 
-describe("Catalogued Object View Page", () => {
+describe("Catalogued Object Edit Page", () => {
   beforeEach(jest.clearAllMocks);
 
-  it("Submits a new physical-entity with a new CollectingEvent.", async () => {
+  it("Submits a new material-sample with a new CollectingEvent.", async () => {
     const wrapper = mountWithAppContext(
       <CataloguedObjectForm onSaved={mockOnSaved} />,
       testCtx
@@ -114,17 +124,21 @@ describe("Catalogued Object View Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Saves the Collecting Event and the Physical Entity:
+    // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
       [
-        // New physical-entity:
+        // New material-sample:
         [
           {
             resource: {
               dwcOtherRecordNumbers: null,
               dwcVerbatimCoordinateSystem: "decimal degrees",
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              geoReferenceAssertions: [{}],
+              geoReferenceAssertions: [
+                {
+                  isPrimary: true
+                }
+              ],
               relationships: {},
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
@@ -145,7 +159,7 @@ describe("Catalogued Object View Page", () => {
               },
               dwcCatalogNumber: "my-new-catalogued-object"
             },
-            type: "physical-entity"
+            type: "material-sample"
           }
         ],
         { apiBaseUrl: "/collection-api" }
@@ -153,7 +167,7 @@ describe("Catalogued Object View Page", () => {
     ]);
   });
 
-  it("Submits a new physical-entity linked to an existing CollectingEvent.", async () => {
+  it("Submits a new material-sample linked to an existing CollectingEvent.", async () => {
     const wrapper = mountWithAppContext(
       <CataloguedObjectForm onSaved={mockOnSaved} />,
       testCtx
@@ -176,7 +190,7 @@ describe("Catalogued Object View Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Saves the Collecting Event and the Physical Entity:
+    // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
       [
         // Saves the existing Collecting Event:
@@ -197,7 +211,7 @@ describe("Catalogued Object View Page", () => {
         { apiBaseUrl: "/collection-api" }
       ],
       [
-        // New physical-entity:
+        // New material-sample:
         [
           {
             resource: {
@@ -207,7 +221,7 @@ describe("Catalogued Object View Page", () => {
               },
               dwcCatalogNumber: "my-new-catalogued-object"
             },
-            type: "physical-entity"
+            type: "material-sample"
           }
         ],
         { apiBaseUrl: "/collection-api" }
@@ -215,7 +229,7 @@ describe("Catalogued Object View Page", () => {
     ]);
   });
 
-  it("Edits an existing physical-entity", async () => {
+  it("Edits an existing material-sample", async () => {
     const wrapper = mountWithAppContext(
       <CataloguedObjectForm
         cataloguedObject={testCataloguedObject()}
@@ -261,17 +275,17 @@ describe("Catalogued Object View Page", () => {
         { apiBaseUrl: "/collection-api" }
       ],
       [
-        // Edits existing physical-entity:
+        // Edits existing material-sample:
         [
           {
             resource: {
               id: "1",
-              type: "physical-entity",
+              type: "material-sample",
               group: "test group",
               dwcCatalogNumber: "edited-catalog-number",
               collectingEvent: { id: "1", type: "collecting-event" }
             },
-            type: "physical-entity"
+            type: "material-sample"
           }
         ],
         { apiBaseUrl: "/collection-api" }
@@ -325,7 +339,11 @@ describe("Catalogued Object View Page", () => {
               dwcOtherRecordNumbers: null,
               dwcVerbatimCoordinateSystem: "decimal degrees",
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              geoReferenceAssertions: [{}],
+              geoReferenceAssertions: [
+                {
+                  isPrimary: true
+                }
+              ],
               relationships: {},
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
@@ -336,7 +354,7 @@ describe("Catalogued Object View Page", () => {
         { apiBaseUrl: "/collection-api" }
       ],
       [
-        // Existing physical-entity updated:
+        // Existing material-sample updated:
         [
           {
             resource: {
@@ -347,9 +365,9 @@ describe("Catalogued Object View Page", () => {
               dwcCatalogNumber: "my-number",
               group: "test group",
               id: "1",
-              type: "physical-entity"
+              type: "material-sample"
             },
-            type: "physical-entity"
+            type: "material-sample"
           }
         ],
         { apiBaseUrl: "/collection-api" }

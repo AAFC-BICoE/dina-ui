@@ -1,7 +1,7 @@
-import { FieldHeader, useApiClient, useModal } from "common-ui";
+import { FieldHeader, useApiClient, useModal, useQuery } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { uniqBy } from "lodash";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReactTable from "react-table";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
@@ -10,16 +10,27 @@ import { AttachmentSection } from "./AttachmentSection";
 export interface AttachmentsModalParams {
   /** Pre-existing metadata attachments. */
   initialMetadatas?: PersistedResource<Metadata>[];
+
+  /** Dependencies for re-initializing the attachment list. */
+  deps: any[];
 }
 
 export function useAttachmentsModal({
-  initialMetadatas = []
+  initialMetadatas = [],
+  deps
 }: AttachmentsModalParams) {
   const { closeModal, openModal } = useModal();
+  const { bulkGet } = useApiClient();
+
   const [selectedMetadatas, setSelectedMetadatas] = useState<Metadata[]>(
     initialMetadatas
   );
-  const { bulkGet } = useApiClient();
+  useEffect(() => {
+    setSelectedMetadatas(initialMetadatas);
+  }, deps);
+
+  // Just check if the object-store is up:
+  const { error } = useQuery<[]>({ path: "objectstore-api/metadata" });
 
   async function addAttachedMetadatas(metadataIds: string[]) {
     const metadatas = await bulkGet<Metadata>(
@@ -72,42 +83,48 @@ export function useAttachmentsModal({
   const attachedMetadatasUI = (
     <div>
       <h2>Attachments ({selectedMetadatas.length})</h2>
-      {selectedMetadatas.length ? (
-        <ReactTable
-          columns={[
-            ...[
-              "originalFilename",
-              "acCaption",
-              "xmpMetadataDate",
-              "acTags"
-            ].map(accessor => ({
-              accessor,
-              Header: <FieldHeader name={accessor} />
-            })),
-            {
-              Cell: ({ original: { id } }) => (
-                <button
-                  className="btn btn-dark"
-                  onClick={() => removeMetadata(id)}
-                  type="button"
-                >
-                  <DinaMessage id="remove" />
-                </button>
-              )
-            }
-          ]}
-          data={selectedMetadatas}
-          minRows={selectedMetadatas.length}
-          showPagination={false}
-        />
-      ) : null}
-      <button
-        className="btn btn-primary"
-        type="button"
-        onClick={openAttachmentsModal}
-      >
-        <DinaMessage id="addAttachments" />
-      </button>
+      {error ? (
+        <DinaMessage id="objectStoreDataUnavailable" />
+      ) : (
+        <>
+          {selectedMetadatas.length ? (
+            <ReactTable
+              columns={[
+                ...[
+                  "originalFilename",
+                  "acCaption",
+                  "xmpMetadataDate",
+                  "acTags"
+                ].map(accessor => ({
+                  accessor,
+                  Header: <FieldHeader name={accessor} />
+                })),
+                {
+                  Cell: ({ original: { id } }) => (
+                    <button
+                      className="btn btn-dark"
+                      onClick={() => removeMetadata(id)}
+                      type="button"
+                    >
+                      <DinaMessage id="remove" />
+                    </button>
+                  )
+                }
+              ]}
+              data={selectedMetadatas}
+              minRows={selectedMetadatas.length}
+              showPagination={false}
+            />
+          ) : null}
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={openAttachmentsModal}
+          >
+            <DinaMessage id="addAttachments" />
+          </button>
+        </>
+      )}
     </div>
   );
 

@@ -2,7 +2,7 @@ import { CataloguedObjectViewPage } from "../../../../pages/collection/catalogue
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   CollectingEvent,
-  PhysicalEntity
+  MaterialSample
 } from "../../../../types/collection-api";
 
 const TEST_COLLECTION_EVENT: CollectingEvent = {
@@ -16,15 +16,15 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
   dwcOtherRecordNumbers: ["12", "13", "14"]
 };
 
-const TEST_CATALOGUED_OBJECT: PhysicalEntity = {
+const TEST_CATALOGUED_OBJECT: MaterialSample = {
   id: "1",
-  type: "physical-entity",
+  type: "material-sample",
   dwcCatalogNumber: "my-number",
   collectingEvent: { id: "1", type: "collecting-event" } as CollectingEvent
 };
 
-const mockGet = jest.fn(async path => {
-  if (path === "collection-api/physical-entity/1?include=collectingEvent") {
+const mockGet = jest.fn<any, any>(async path => {
+  if (path === "collection-api/material-sample/1?include=collectingEvent") {
     return { data: TEST_CATALOGUED_OBJECT };
   } else if (
     path === "collection-api/collecting-event/1?include=collectors,attachment"
@@ -37,11 +37,18 @@ const mockGet = jest.fn(async path => {
   }
 });
 
+const mockBulkGet = jest.fn<any, any>(async paths => {
+  if (!paths.length) {
+    return [];
+  }
+});
+
 const testCtx = {
   apiContext: {
     apiClient: {
       get: mockGet
-    } as any
+    },
+    bulkGet: mockBulkGet
   }
 };
 

@@ -37,15 +37,19 @@ export function useCollectingEventQuery(id?: string | null) {
         }
 
         if (data.attachment) {
-          const metadatas = await bulkGet<Metadata>(
-            data.attachment.map(collector => `/metadata/${collector.id}`),
-            {
-              apiBaseUrl: "/objectstore-api",
-              returnNullForMissingResource: true
-            }
-          );
-          // Omit null (deleted) records:
-          data.attachment = metadatas.filter(it => it);
+          try {
+            const metadatas = await bulkGet<Metadata>(
+              data.attachment.map(collector => `/metadata/${collector.id}`),
+              {
+                apiBaseUrl: "/objectstore-api",
+                returnNullForMissingResource: true
+              }
+            );
+            // Omit null (deleted) records:
+            data.attachment = metadatas.filter(it => it);
+          } catch (error) {
+            console.warn("Attachment join failed: ", error);
+          }
         }
 
         if (data.geoReferenceAssertions) {
@@ -77,7 +81,7 @@ export function useCollectingEventQuery(id?: string | null) {
   return collectingEventQuery;
 }
 
-/** CollectingEvent save method to be re-used by CollectingEvent and PhysicalEntity forms. */
+/** CollectingEvent save method to be re-used by CollectingEvent and MaterialSample forms. */
 export function useCollectingEventSave(
   fetchedCollectingEvent?: PersistedResource<CollectingEvent>
 ) {
@@ -107,7 +111,11 @@ export function useCollectingEventSave(
         startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
         collectors: [],
         collectorGroups: [],
-        geoReferenceAssertions: [{}],
+        geoReferenceAssertions: [
+          {
+            isPrimary: true
+          }
+        ],
         dwcVerbatimCoordinateSystem:
           defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
         dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84
@@ -115,7 +123,8 @@ export function useCollectingEventSave(
 
   // The selected Metadatas to be attached to this Collecting Event:
   const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal({
-    initialMetadatas: fetchedCollectingEvent?.attachment as PersistedResource<Metadata>[]
+    initialMetadatas: fetchedCollectingEvent?.attachment as PersistedResource<Metadata>[],
+    deps: [fetchedCollectingEvent?.id]
   });
 
   async function saveCollectingEvent(

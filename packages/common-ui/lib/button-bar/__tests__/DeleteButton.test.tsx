@@ -3,7 +3,7 @@ import { DeleteButton } from "../DeleteButton";
 
 const mockDoOperations = jest.fn();
 
-const apiContext = { doOperations: mockDoOperations } as any;
+const apiContext = { doOperations: mockDoOperations };
 
 const mockPush = jest.fn();
 

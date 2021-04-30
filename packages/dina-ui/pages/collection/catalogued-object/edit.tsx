@@ -28,7 +28,7 @@ import {
   useCollectingEventSave
 } from "../../../components/collection/useCollectingEvent";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { CollectingEvent, PhysicalEntity } from "../../../types/collection-api";
+import { CollectingEvent, MaterialSample } from "../../../types/collection-api";
 
 export default function CataloguedObjectEditPage() {
   const router = useRouter();
@@ -51,9 +51,9 @@ export default function CataloguedObjectEditPage() {
             <h1>
               <DinaMessage id="editCataloguedObjectTitle" />
             </h1>
-            <Query<PhysicalEntity>
+            <Query<MaterialSample>
               query={{
-                path: `collection-api/physical-entity/${id}?include=collectingEvent`
+                path: `collection-api/material-sample/${id}?include=collectingEvent`
               }}
             >
               {({ loading, response }) => (
@@ -83,7 +83,7 @@ export default function CataloguedObjectEditPage() {
 }
 
 export interface CataloguedObjectFormProps {
-  cataloguedObject?: PhysicalEntity;
+  cataloguedObject?: MaterialSample;
   onSaved?: (id: string) => Promise<void>;
 }
 
@@ -108,7 +108,7 @@ export function CataloguedObjectForm({
     attachedMetadatasUI
   } = useCollectingEventSave(colEventQuery.response?.data);
 
-  const onSubmit: DinaFormOnSubmit<PhysicalEntity> = async ({
+  const onSubmit: DinaFormOnSubmit<MaterialSample> = async ({
     submittedValues
   }) => {
     const { ...cataloguedObjectValues } = submittedValues;
@@ -132,25 +132,25 @@ export function CataloguedObjectForm({
       // Set the ColEventId here in case the next operation fails:
       setColEventId(savedCollectingEvent.id);
 
-      // Link the PhysicalEntity to the CollectingEvent:
+      // Link the MaterialSample to the CollectingEvent:
       cataloguedObjectInput.collectingEvent = {
         id: savedCollectingEvent.id,
         type: savedCollectingEvent.type
       } as CollectingEvent;
     }
 
-    // Save the PhysicalEntity:
-    const [savedPhysicalEntity] = await save<PhysicalEntity>(
+    // Save the MaterialSample:
+    const [savedMaterialSample] = await save<MaterialSample>(
       [
         {
           resource: cataloguedObjectInput,
-          type: "physical-entity"
+          type: "material-sample"
         }
       ],
       { apiBaseUrl: "/collection-api" }
     );
 
-    await onSaved?.(savedPhysicalEntity.id);
+    await onSaved?.(savedMaterialSample.id);
   };
 
   const buttonBar = (
