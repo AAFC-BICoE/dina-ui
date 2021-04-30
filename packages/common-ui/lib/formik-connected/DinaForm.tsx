@@ -15,9 +15,8 @@ import { safeSubmit } from "./safeSubmit";
 
 export interface DinaFormProps<TValues>
   extends Omit<FormikConfig<TValues>, "onSubmit">,
-    DinaFormContextI {
+    Omit<DinaFormContextI, "initialValues"> {
   onSubmit?: DinaFormOnSubmit<TValues>;
-  values?: TValues;
 }
 
 /** Values available to form elements. */
@@ -29,6 +28,9 @@ export interface DinaFormContextI {
    * "true" defaults to [6, 6].
    */
   horizontal?: boolean | [number, number];
+
+  /** The initial form values passed into Formik. */
+  initialValues?: any;
 }
 
 export type DinaFormOnSubmit<TValues = any> = (
@@ -82,7 +84,8 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
     <DinaFormContext.Provider
       value={{
         readOnly: props.readOnly ?? false,
-        horizontal: props.horizontal
+        horizontal: props.horizontal,
+        initialValues: props.initialValues
       }}
     >
       <Formik {...props} onSubmit={onSubmitInternal}>

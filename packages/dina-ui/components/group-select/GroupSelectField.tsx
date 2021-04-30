@@ -3,9 +3,9 @@ import {
   SelectFieldProps,
   SelectOption,
   useAccount,
+  useDinaFormContext,
   useQuery
 } from "common-ui";
-import { useFormikContext } from "formik";
 import { get, uniq } from "lodash";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
@@ -39,7 +39,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
 
   const { locale } = useDinaIntl();
   const { groupNames: myGroupNames } = useAccount();
-  const { initialValues } = useFormikContext<any>();
+  const { initialValues } = useDinaFormContext();
 
   const { setStoredDefaultGroupIfEnabled } = useStoredDefaultGroup({
     enable: enableStoredDefaultGroup,

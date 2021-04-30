@@ -114,6 +114,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "End event datetime format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
   field_collectingEvent_startDateTimeError:
     "Start event datetime format must be a subset of: YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
+  field_collectors: "Collectors",
   field_collectorGroup_agentsError:
     "At lease one agent should be specified for the group",
   field_createdBy: "Created By",
