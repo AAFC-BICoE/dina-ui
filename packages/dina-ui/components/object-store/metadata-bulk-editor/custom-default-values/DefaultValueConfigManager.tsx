@@ -1,10 +1,5 @@
 import { useLocalStorage } from "@rehooks/local-storage";
-import {
-  FieldWrapper,
-  LabelWrapperParams,
-  SelectFieldProps,
-  SelectOption
-} from "common-ui";
+import { FieldWrapper, LabelWrapperParams, SelectOption } from "common-ui";
 import Select from "react-select";
 import { DinaMessage } from "../../../../intl/dina-ui-intl";
 import { DefaultValuesConfig } from "./model-types";
@@ -16,9 +11,8 @@ export interface DefaultValueConfigSelectProps {
   onChangeConfigIndex: (index: number | null) => void;
   /** Mock this out in tests so it gives a predictable value. */
   dateSupplier?: () => string;
-  name?: string;
-  className?: string;
   styles?: Partial<Styles<SelectOption<any>, boolean>>;
+  id?: string;
 }
 
 /** Lists, adds, edits, and removes Default Value Configs. */
@@ -107,8 +101,7 @@ export function DefaultValuesConfigSelect({
   onChangeConfigIndex,
   ruleConfigIndex,
   allowBlank,
-  name,
-  className,
+  id,
   styles
 }: DefaultValueConfigSelectProps) {
   const { storedDefaultValuesConfigs } = useStoredDefaultValuesConfigs();
@@ -122,19 +115,15 @@ export function DefaultValuesConfigSelect({
     ? [{ label: "<none>", value: null }, ...ruleConfigOptions]
     : ruleConfigOptions;
 
-  const id = name + "_" + className;
-
   return (
-    <>
-      <Select<{ label: string; value: number | null }>
-        instanceId="config-select"
-        options={selectOptions}
-        onChange={(option: any) => onChangeConfigIndex(option.value)}
-        value={ruleConfigOptions[ruleConfigIndex ?? -1] ?? null}
-        inputId={id}
-        styles={styles}
-      />
-    </>
+    <Select<{ label: string; value: number | null }>
+      instanceId="config-select"
+      options={selectOptions}
+      onChange={(option: any) => onChangeConfigIndex(option.value)}
+      value={ruleConfigOptions[ruleConfigIndex ?? -1] ?? null}
+      inputId={id}
+      styles={styles}
+    />
   );
 }
 
@@ -154,9 +143,8 @@ export function DefaultValuesConfigSelectField(
           allowBlank={allowBlank}
           onChangeConfigIndex={setValue}
           ruleConfigIndex={value}
-          name={labelWrapperProps.name}
-          className={labelWrapperProps.className}
           styles={styles}
+          id={labelWrapperProps.id}
         />
       )}
     </FieldWrapper>

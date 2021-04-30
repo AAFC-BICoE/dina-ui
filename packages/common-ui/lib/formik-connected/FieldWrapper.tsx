@@ -60,6 +60,7 @@ export function FieldWrapper({
   customName,
   arrayItemLink,
   link,
+  id,
   readOnlyRender
 }: FieldWrapperProps) {
   const { horizontal, readOnly } = useDinaFormContext();
@@ -71,7 +72,6 @@ export function FieldWrapper({
   const [labelCol, valueCol] =
     typeof horizontal === "boolean" ? [6, 6] : horizontal || [];
 
-  const id = `${name}_${className}`;
   return (
     <div className={className}>
       <div className={`form-group ${name}-field ${horizontal ? "row" : ""}`}>

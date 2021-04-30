@@ -30,7 +30,6 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
     ...labelWrapperProps
   } = props;
 
-  const id = `${labelWrapperProps.name}_${labelWrapperProps.className}`;
   return (
     <FieldWrapper {...labelWrapperProps}>
       {({ setValue, value }) => {
@@ -61,7 +60,7 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
             onChange={onChangeInternal}
             styles={styles}
             value={selectedOption}
-            inputId={id}
+            inputId={labelWrapperProps.id}
           />
         );
       }}
