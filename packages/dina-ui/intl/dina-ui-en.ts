@@ -257,6 +257,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metadataRightsDetailsLabel: "Rights",
   metadataTagsLabel: "Tags",
   metadataUploadDetailsLabel: "Upload Details",
+  noManagedAttributeValues: "No Managed Attribute values.",
   noFileToDisplay: "No file to display",
   noResultsFound: "No results found.",
   objectListTitle: "Stored Objects",

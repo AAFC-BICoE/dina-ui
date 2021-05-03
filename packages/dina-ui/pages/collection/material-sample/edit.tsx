@@ -322,9 +322,7 @@ export function MaterialSampleForm({
         </FieldSet>
       </div>
       <div className={enableCatalogueInfo ? "" : "d-none"}>
-        <FieldSet legend={<DinaMessage id="catalogueInfo" />}>
-          <CatalogueInfoFormLayout />
-        </FieldSet>
+        <CatalogueInfoFormLayout />
       </div>
       {materialSampleAttachmentsUI}
       {buttonBar}
@@ -354,7 +352,7 @@ export function CatalogueInfoFormLayout() {
   const { readOnly } = useDinaFormContext();
 
   return (
-    <div>
+    <FieldSet legend={<DinaMessage id="catalogueInfo" />}>
       <div className="row">
         <div className="col-md-6">
           <FieldSet
@@ -383,6 +381,6 @@ export function CatalogueInfoFormLayout() {
           </FieldSet>
         </div>
       </div>
-    </div>
+    </FieldSet>
   );
 }
