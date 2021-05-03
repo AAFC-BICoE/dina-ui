@@ -102,8 +102,21 @@ export function CollectingEventFormLayout({
       result?.osm_type || null
     );
 
+    const osmTypeForSearch =
+      result?.osm_type === "relation"
+        ? "R"
+        : result?.osm_type === "way"
+        ? "W"
+        : result?.osm_type === "node"
+        ? "N"
+        : "N";
+
     const detailResults: NominatumApiAddressDetailSearchResult | null = await nominatimAddressDetailSearch(
-      { osmid: result.osm_id, osmtype: result.osm_type, class: result.category }
+      {
+        osmid: result.osm_id,
+        osmtype: osmTypeForSearch,
+        class: result.category
+      }
     );
     formik.setFieldValue(
       "geographicPlaceNameSourceDetail.sourceUrl",
@@ -125,13 +138,14 @@ export function CollectingEventFormLayout({
     detailResults: NominatumApiAddressDetailSearchResult | null
   ) {
     const editablePlaceNames: AddressDetail[] = [];
-    const detail: AddressDetail;
+    let detail: AddressDetail = {};
     detailResults?.address?.map(addr => {
       detail.localname = addr.localname;
       detail.osm_id = addr.osm_id;
       detail.osm_type = addr.osm_type;
       detail.place_type = addr.place_type ?? addr.class;
       editablePlaceNames.push(detail);
+      detail = {};
     });
     return editablePlaceNames;
   }
@@ -573,10 +587,10 @@ export function CollectingEventFormLayout({
                                 <div className="pb-4">
                                   {geoNames.map((geoName, idx) => (
                                     <TextFieldWithRemoveButton
-                                      name={`placeNames[` + idx + `]`}
+                                      name={`placeNames[` + idx + `].localname`}
                                       readOnly={true}
                                       removeLabel={true}
-                                      initialValue={geoName}
+                                      initialValue={geoName.localname}
                                       removeFormGroupClass={true}
                                       key={idx}
                                       inputProps={{

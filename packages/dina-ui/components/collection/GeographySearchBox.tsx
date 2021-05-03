@@ -43,7 +43,7 @@ export async function nominatimAddressDetailSearch(urlValue: {}): Promise<Nomina
   if (!Object.keys(urlValue)) {
     return null;
   }
-  const url = new URL(`https://nominatim.openstreetmap.org/detail.php`);
+  const url = new URL(`https://nominatim.openstreetmap.org/details.php`);
 
   url.search = new URLSearchParams({
     ...urlValue,
