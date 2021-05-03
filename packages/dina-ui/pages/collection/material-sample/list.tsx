@@ -12,8 +12,8 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 
 const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
-  "name",
   "createdBy",
+  "dwcCatalogNumber",
   {
     name: "createdOn",
     type: "DATE"
@@ -27,8 +27,10 @@ const MATERIAL_SAMPLE_TABLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
         {name || id}
       </Link>
     ),
-    accessor: "name"
+    accessor: "name",
+    sortable: false
   },
+  "dwcCatalogNumber",
   "createdBy",
   dateCell("createdOn")
 ];

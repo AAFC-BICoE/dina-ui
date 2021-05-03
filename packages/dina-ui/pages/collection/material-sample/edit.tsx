@@ -244,7 +244,7 @@ export function MaterialSampleForm({
             <strong>
               <DinaMessage id="collectingEvent" />
             </strong>
-            <div className="mx-2">
+            <div className="mx-2 enable-collecting-event">
               <Switch
                 checked={enableCollectingEvent}
                 onChange={setEnableCollectingEvent}
@@ -255,7 +255,7 @@ export function MaterialSampleForm({
             <strong>
               <DinaMessage id="catalogueInfo" />
             </strong>
-            <div className="mx-2">
+            <div className="mx-2 enable-catalogue-info">
               <Switch
                 checked={enableCatalogueInfo}
                 onChange={setEnableCatalogueInfo}
