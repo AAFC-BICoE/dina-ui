@@ -111,7 +111,11 @@ export function useCollectingEventSave(
         startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
         collectors: [],
         collectorGroups: [],
-        geoReferenceAssertions: [{}],
+        geoReferenceAssertions: [
+          {
+            isPrimary: true
+          }
+        ],
         dwcVerbatimCoordinateSystem:
           defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
         dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84
