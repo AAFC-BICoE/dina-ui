@@ -19,7 +19,7 @@ import { InputResource, PersistedResource } from "kitsu";
 import { cloneDeep } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useRef, useState } from "react";
+import { useRef, useState, useLayoutEffect } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { GroupSelectField, Head, Nav } from "../../../components";
@@ -147,6 +147,16 @@ export function MaterialSampleForm({
     title: <DinaMessage id="materialSampleAttachments" />
   });
 
+  // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
+  useLayoutEffect(() => {
+    const dataComponents = document?.querySelectorAll<HTMLDivElement>(
+      ".data-components > fieldset:not(.d-none)"
+    );
+    dataComponents?.forEach((element, index) => {
+      element.style.backgroundColor = index % 2 === 0 ? "#f3f3f3" : "";
+    });
+  });
+
   async function onSubmit({
     api: { save },
     submittedValues
@@ -264,8 +274,11 @@ export function MaterialSampleForm({
           </label>
         </div>
       </FieldSet>
-      <div className={enableCollectingEvent ? "" : "d-none"}>
-        <FieldSet legend={<DinaMessage id="collectingEvent" />}>
+      <div className="data-components">
+        <FieldSet
+          className={enableCollectingEvent ? "" : "d-none"}
+          legend={<DinaMessage id="collectingEvent" />}
+        >
           <Tabs
             // Re-initialize the form when the linked CollectingEvent changes:
             key={colEventId}
@@ -320,11 +333,11 @@ export function MaterialSampleForm({
             </TabPanel>
           </Tabs>
         </FieldSet>
+        <CatalogueInfoFormLayout
+          className={enableCatalogueInfo ? "" : "d-none"}
+        />
+        {materialSampleAttachmentsUI}
       </div>
-      <div className={enableCatalogueInfo ? "" : "d-none"}>
-        <CatalogueInfoFormLayout />
-      </div>
-      {materialSampleAttachmentsUI}
       {buttonBar}
     </DinaForm>
   );
@@ -348,11 +361,17 @@ export function MaterialSampleFormLayout() {
   );
 }
 
-export function CatalogueInfoFormLayout() {
+export interface CatalogueInfoFormLayoutProps {
+  className?: string;
+}
+
+export function CatalogueInfoFormLayout({
+  className
+}: CatalogueInfoFormLayoutProps) {
   const { readOnly } = useDinaFormContext();
 
   return (
-    <FieldSet legend={<DinaMessage id="catalogueInfo" />}>
+    <FieldSet className={className} legend={<DinaMessage id="catalogueInfo" />}>
       <div className="row">
         <div className="col-md-6">
           <FieldSet
