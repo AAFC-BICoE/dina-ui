@@ -11,7 +11,7 @@ export interface MaterialSampleAttributes {
   group?: string;
   createdOn?: string;
   createdBy?: string;
-  dwcCatalogNumber?: string;
+  dwcCatalogNumber?: string | null;
 }
 
 export interface MaterialSampleRelationships {

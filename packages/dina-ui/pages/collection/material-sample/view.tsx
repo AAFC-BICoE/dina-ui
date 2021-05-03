@@ -62,49 +62,52 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage("materialSampleViewTitle")} />
       <Nav />
-      {withResponse(materialSampleQuery, ({ data: materialSample }) => (
-        <main className="container-fluid">
-          {buttonBar}
-          <h1>
-            <DinaMessage id="materialSampleViewTitle" />
-          </h1>
-          <DinaForm<MaterialSample>
-            initialValues={materialSample}
-            readOnly={true}
-          >
-            <MaterialSampleFormLayout />
-            {collectingEvent && (
-              <FieldSet legend={<DinaMessage id="collectingEvent" />}>
-                <DinaForm initialValues={collectingEvent} readOnly={true}>
-                  <div className="form-group d-flex justify-content-end align-items-center">
-                    <Link
-                      href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
-                    >
-                      <a target="_blank">
-                        <DinaMessage id="collectingEventDetailsPageLink" />
-                      </a>
-                    </Link>
-                  </div>
-                  <CollectingEventFormLayout />
-                </DinaForm>
-              </FieldSet>
-            )}
-            <CatalogueInfoFormLayout />
-            <div className="form-group">
-              <Field name="id">
-                {({ field: { value: materialSampleId } }) => (
-                  <AttachmentReadOnlySection
-                    attachmentPath={`collection-api/material-sample/${materialSampleId}/attachment`}
-                    detachTotalSelected={true}
-                    title={<DinaMessage id="materialSampleAttachments" />}
-                  />
-                )}
-              </Field>
-            </div>
-          </DinaForm>
-          {buttonBar}
-        </main>
-      ))}
+      {withResponse(materialSampleQuery, ({ data: materialSample }) => {
+        const hasCatalogueInfo = !!materialSample?.dwcCatalogNumber;
+        return (
+          <main className="container-fluid">
+            {buttonBar}
+            <h1>
+              <DinaMessage id="materialSampleViewTitle" />
+            </h1>
+            <DinaForm<MaterialSample>
+              initialValues={materialSample}
+              readOnly={true}
+            >
+              <MaterialSampleFormLayout />
+              {collectingEvent && (
+                <FieldSet legend={<DinaMessage id="collectingEvent" />}>
+                  <DinaForm initialValues={collectingEvent} readOnly={true}>
+                    <div className="form-group d-flex justify-content-end align-items-center">
+                      <Link
+                        href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
+                      >
+                        <a target="_blank">
+                          <DinaMessage id="collectingEventDetailsPageLink" />
+                        </a>
+                      </Link>
+                    </div>
+                    <CollectingEventFormLayout />
+                  </DinaForm>
+                </FieldSet>
+              )}
+              {hasCatalogueInfo && <CatalogueInfoFormLayout />}
+              <div className="form-group">
+                <Field name="id">
+                  {({ field: { value: materialSampleId } }) => (
+                    <AttachmentReadOnlySection
+                      attachmentPath={`collection-api/material-sample/${materialSampleId}/attachment`}
+                      detachTotalSelected={true}
+                      title={<DinaMessage id="materialSampleAttachments" />}
+                    />
+                  )}
+                </Field>
+              </div>
+            </DinaForm>
+            {buttonBar}
+          </main>
+        );
+      })}
     </div>
   );
 }

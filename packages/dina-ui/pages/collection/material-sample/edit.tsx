@@ -1,4 +1,5 @@
 import {
+  AreYouSureModal,
   BackButton,
   ButtonBar,
   DateField,
@@ -11,6 +12,7 @@ import {
   useAccount,
   useApiClient,
   useDinaFormContext,
+  useModal,
   useQuery,
   withResponse
 } from "common-ui";
@@ -19,7 +21,13 @@ import { InputResource, PersistedResource } from "kitsu";
 import { cloneDeep } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useRef, useState, useLayoutEffect } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useLayoutEffect,
+  useRef,
+  useState
+} from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { GroupSelectField, Head, Nav } from "../../../components";
@@ -108,11 +116,17 @@ export function MaterialSampleForm({
   onSaved
 }: MaterialSampleFormProps) {
   const { username } = useAccount();
+  const { openModal } = useModal();
+  const { formatMessage } = useDinaIntl();
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     !!materialSample?.collectingEvent
   );
-  const [enableCatalogueInfo, setEnableCatalogueInfo] = useState(false);
+
+  const hasCatalogueInfo = !!materialSample?.dwcCatalogNumber;
+  const [enableCatalogueInfo, setEnableCatalogueInfo] = useState(
+    hasCatalogueInfo
+  );
 
   /** YYYY-MM-DD format. */
   const todayDate = new Date().toISOString().slice(0, 10);
@@ -157,6 +171,31 @@ export function MaterialSampleForm({
     });
   });
 
+  /** Wraps the useState setter with an AreYouSure modal when setting to false. */
+  function dataComponentToggler(
+    setBoolean: Dispatch<SetStateAction<boolean>>,
+    componentName: string
+  ) {
+    return function toggleDataComponent(enabled: boolean) {
+      if (!enabled) {
+        // When removing data, ask the user for confirmation first:
+        openModal(
+          <AreYouSureModal
+            actionMessage={
+              <DinaMessage
+                id="removeComponentData"
+                values={{ component: componentName }}
+              />
+            }
+            onYesButtonClicked={() => setBoolean(enabled)}
+          />
+        );
+      } else {
+        setBoolean(enabled);
+      }
+    };
+  }
+
   async function onSubmit({
     api: { save },
     submittedValues
@@ -166,6 +205,11 @@ export function MaterialSampleForm({
 
     /** Input to submit to the back-end API. */
     const { ...materialSampleInput } = submittedValues;
+
+    // Only persist the dwcCatalogNumber if CatalogueInfo is enabled:
+    if (!enableCatalogueInfo) {
+      materialSampleInput.dwcCatalogNumber = null;
+    }
 
     if (!enableCollectingEvent) {
       // Unlink the CollectingEvent if its switch is unchecked:
@@ -257,7 +301,10 @@ export function MaterialSampleForm({
             <div className="mx-2 enable-collecting-event">
               <Switch
                 checked={enableCollectingEvent}
-                onChange={setEnableCollectingEvent}
+                onChange={dataComponentToggler(
+                  setEnableCollectingEvent,
+                  formatMessage("collectingEvent")
+                )}
               />
             </div>
           </label>
@@ -268,7 +315,10 @@ export function MaterialSampleForm({
             <div className="mx-2 enable-catalogue-info">
               <Switch
                 checked={enableCatalogueInfo}
-                onChange={setEnableCatalogueInfo}
+                onChange={dataComponentToggler(
+                  setEnableCatalogueInfo,
+                  formatMessage("catalogueInfo")
+                )}
               />
             </div>
           </label>

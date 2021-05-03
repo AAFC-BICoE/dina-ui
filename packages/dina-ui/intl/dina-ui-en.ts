@@ -281,6 +281,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Make this assertion the primary data point when exported. Only one assertion can be primary",
   removeAssertionLabel: "Remove this GeoReference",
   placeNameLabel: "Place Name",
+  removeComponentData: "Remove {component} data",
   removeThisPlaceLabel: " Remove this Place",
   resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",
   revisionsListTitle: "Revisions for {name}",
