@@ -23,7 +23,10 @@ import {
   GeographySearchBox,
   GeoReferenceAssertionRow,
   GroupSelectField,
-  useAddPersonModal
+  nominatimAddressDetailSearch,
+  useAddPersonModal,
+  NominatumApiAddressDetailSearchResult,
+  AddressDetail
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
@@ -66,6 +69,8 @@ export function CollectingEventFormLayout({
 
   const addressDetail = useRef({});
 
+  const commonNameRoot = "geographicPlaceNameSourceDetail";
+
   function toggleRangeEnabled(
     newValue: boolean,
     formik: FormikContextType<{}>
@@ -76,23 +81,29 @@ export function CollectingEventFormLayout({
     setRangeEnabled(newValue);
   }
 
-  function selectSearchResult(
+  async function selectSearchResult(
     result: NominatumApiSearchResult,
     formik: FormikContextType<{}>
   ) {
-    // Set locality fields:
-    formik.setFieldValue("dwcCountry", result?.address?.country || null);
-    formik.setFieldValue("dwcStateProvince", result?.address?.state || null);
-    formik.setFieldValue("geographicPlaceName", result?.display_name || null);
-
-    // Set geo source fields:
     formik.setFieldValue(
-      "geographicPlaceNameSourceDetail.sourceID",
-      result.osm_id || null
+      `${commonNameRoot}.country.name`,
+      result?.address?.country || null
     );
     formik.setFieldValue(
-      "geographicPlaceNameSourceDetail.sourceIdType",
-      result.osm_type || null
+      `${commonNameRoot}.stateProvince.name`,
+      result?.address?.state || null
+    );
+    formik.setFieldValue(
+      "geographicPlaceNameSourceDetail.stateProvince.id",
+      result?.osm_id || null
+    );
+    formik.setFieldValue(
+      "geographicPlaceNameSourceDetail.stateProvince.element",
+      result?.osm_type || null
+    );
+
+    const detailResults: NominatumApiAddressDetailSearchResult | null = await nominatimAddressDetailSearch(
+      { osmid: result.osm_id, osmtype: result.osm_type, class: result.category }
     );
     formik.setFieldValue(
       "geographicPlaceNameSourceDetail.sourceUrl",
@@ -106,16 +117,26 @@ export function CollectingEventFormLayout({
     // set initial address detail based on user selected search result
     addressDetail.current = result.address as any;
 
-    const geoNameParsed = parseGeoNames(result.display_name);
+    const geoNameParsed = parseGeoAdminLevels(detailResults);
     formik.setFieldValue("placeNames", geoNameParsed);
   }
 
-  function removeThisPlace(formik: FormikContextType<{}>) {
-    // reset the fields when user remove the place
-    formik.setFieldValue("dwcCountry", null);
-    formik.setFieldValue("dwcStateProvince", null);
-    formik.setFieldValue("geographicPlaceName", null);
+  function parseGeoAdminLevels(
+    detailResults: NominatumApiAddressDetailSearchResult | null
+  ) {
+    const editablePlaceNames: AddressDetail[] = [];
+    const detail: AddressDetail;
+    detailResults?.address?.map(addr => {
+      detail.localname = addr.localname;
+      detail.osm_id = addr.osm_id;
+      detail.osm_type = addr.osm_type;
+      detail.place_type = addr.place_type ?? addr.class;
+      editablePlaceNames.push(detail);
+    });
+    return editablePlaceNames;
+  }
 
+  function removeThisPlace(formik: FormikContextType<{}>) {
     // reset the source fields when user remove the place
     formik.setFieldValue("geographicPlaceNameSourceDetail", null);
     formik.setFieldValue("geographicPlaceNameSource", null);

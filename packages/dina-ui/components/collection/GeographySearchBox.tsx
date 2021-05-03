@@ -22,6 +22,53 @@ interface GeographySearchBoxProps {
   renderUnderSearchBar?: ReactNode;
 }
 
+export interface AddressDetail {
+  localname?: string;
+  osm_id?: string;
+  osm_type?: string;
+  place_type?: string;
+  class?: string;
+}
+
+export interface NominatumApiAddressDetailSearchResult {
+  place_id?: string;
+  osm_type?: string;
+  osm_id?: string;
+  category?: string;
+  localname?: string;
+  address?: AddressDetail[];
+}
+
+export async function nominatimAddressDetailSearch(urlValue: {}): Promise<NominatumApiAddressDetailSearchResult | null> {
+  if (!Object.keys(urlValue)) {
+    return null;
+  }
+  const url = new URL(`https://nominatim.openstreetmap.org/detail.php`);
+
+  url.search = new URLSearchParams({
+    ...urlValue,
+    addressdetails: "1",
+    hierarchy: "0",
+    group_hierarchy: "1",
+    polygon_geojson: "1",
+    format: "json"
+  }).toString();
+
+  const fetchJson = urlArg => window.fetch(urlArg).then(res => res.json());
+
+  try {
+    const response = await fetchJson(url.toString());
+
+    if (response.error) {
+      throw new Error(String(response.error));
+    }
+    return response as NominatumApiAddressDetailSearchResult;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
 async function nominatimSearch(
   searchValue: string
 ): Promise<NominatumApiSearchResult[] | null> {

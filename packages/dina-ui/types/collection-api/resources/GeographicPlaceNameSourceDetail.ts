@@ -1,10 +1,10 @@
 import { KitsuResource } from "kitsu";
 
 export interface GeographicPlaceNameSourceDetailAttributes {
-  selectedGeographicPlace: SourceAdministrativeLevel[];
-  higherGeographicPlaces: SourceAdministrativeLevel[];
-  stateProvince: SourceAdministrativeLevel;
-  country: Country;
+  selectedGeographicPlace?: SourceAdministrativeLevel;
+  higherGeographicPlaces?: SourceAdministrativeLevel[];
+  stateProvince?: SourceAdministrativeLevel;
+  country?: Country;
   sourceUrl: string;
   recordedOn: string;
 }
@@ -12,15 +12,15 @@ export interface GeographicPlaceNameSourceDetailAttributes {
 export const geographicPlaceSourceUrl = "https://www.openstreetmap.org";
 
 export type SourceAdministrativeLevel = {
-  id: string;
-  element: string;
-  placeType: string;
-  name: string;
+  id?: string /* osm id */;
+  element?: string /* osm type */;
+  placeType?: string /* place type or class type */;
+  name?: string;
 };
 
 export type Country = {
-  code: string;
-  name: string;
+  code?: string;
+  name?: string;
 };
 
 export type GeographicPlaceNameSourceDetail = KitsuResource &

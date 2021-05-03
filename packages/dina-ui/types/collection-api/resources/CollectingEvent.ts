@@ -1,6 +1,9 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
-import { GeographicPlaceNameSourceDetail } from "../GeographicPlaceNameSourceDetail";
+import {
+  GeographicPlaceNameSourceDetail,
+  SourceAdministrativeLevel
+} from "./GeographicPlaceNameSourceDetail";
 import { CollectorGroup } from "./CollectorGroup";
 import { GeoReferenceAssertion } from "./GeoReferenceAssertion";
 
@@ -36,7 +39,7 @@ export interface CollectingEventAttributes {
   geographicPlaceName?: string;
   geographicPlaceNameSourceDetail?: GeographicPlaceNameSourceDetail;
   geographicPlaceNameSource?: GeographicPlaceNameSource;
-  placeNames?: string[];
+  placeNames?: SourceAdministrativeLevel[];
 }
 
 export enum GeographicPlaceNameSource {

@@ -9,6 +9,7 @@ import {
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
+import { SourceAdministrativeLevel } from "packages/dina-ui/types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { Footer, Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
@@ -48,15 +49,23 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
     </ButtonBar>
   );
 
+  const placeNameArray: SourceAdministrativeLevel[] = [];
+
   return (
     <div>
       <Head title={formatMessage("collectingEventViewTitle")} />
       <Nav />
       {buttonBar}
       {withResponse(collectingEventQuery, ({ data: colEvent }) => {
-        colEvent.placeNames = colEvent.geographicPlaceName
-          ? colEvent.geographicPlaceName.split(",")
-          : [];
+        if (colEvent.geographicPlaceNameSourceDetail?.selectedGeographicPlace)
+          placeNameArray.push(
+            colEvent.geographicPlaceNameSourceDetail?.selectedGeographicPlace
+          );
+        if (colEvent.geographicPlaceNameSourceDetail?.higherGeographicPlaces)
+          placeNameArray.concat(
+            colEvent.geographicPlaceNameSourceDetail?.higherGeographicPlaces
+          );
+        colEvent.placeNames = placeNameArray;
         return (
           <main className="container-fluid">
             <h1>

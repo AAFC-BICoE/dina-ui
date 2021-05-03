@@ -9,6 +9,7 @@ import { CoordinateSystemEnum } from "../../types/collection-api/resources/Coord
 import { SRSEnum } from "../../types/collection-api/resources/SRS";
 import { Metadata, Person } from "../../types/objectstore-api";
 import { useAttachmentsModal } from "../object-store";
+import { SourceAdministrativeLevel } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
@@ -96,6 +97,25 @@ export function useCollectingEventSave(
     DEFAULT_VERBATIM_SRS_KEY
   );
 
+  let placeNameArray: SourceAdministrativeLevel[] = [];
+
+  if (
+    fetchedCollectingEvent?.geographicPlaceNameSourceDetail
+      ?.selectedGeographicPlace
+  )
+    placeNameArray.push(
+      fetchedCollectingEvent?.geographicPlaceNameSourceDetail
+        ?.selectedGeographicPlace
+    );
+  if (
+    fetchedCollectingEvent?.geographicPlaceNameSourceDetail
+      ?.higherGeographicPlaces
+  )
+    placeNameArray = placeNameArray.concat(
+      fetchedCollectingEvent?.geographicPlaceNameSourceDetail
+        ?.higherGeographicPlaces
+    );
+
   const collectingEventInitialValues = fetchedCollectingEvent
     ? {
         ...fetchedCollectingEvent,
@@ -103,7 +123,8 @@ export function useCollectingEventSave(
           fetchedCollectingEvent.dwcOtherRecordNumbers?.concat("").join("\n") ??
           "",
         geoReferenceAssertions:
-          fetchedCollectingEvent.geoReferenceAssertions ?? []
+          fetchedCollectingEvent.geoReferenceAssertions ?? [],
+        placeNames: placeNameArray
       }
     : {
         type: "collecting-event",
@@ -203,23 +224,31 @@ export function useCollectingEventSave(
 
     // Parse placeNames to geographicPlaceNameSourceDetail
     if (submittedValues.placeNames?.length > 0) {
+      submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = [];
+      submittedValues.geographicPlaceNameSourceDetail.higerGeographicPlaces = [];
       // Remove all the empty and space only strings, take away the "[" after which indicating a type
       submittedValues.placeNames
         .map(e => e.trim())
         .filter(e => e)
-        .map(placeName => {
+        .map((placeName, idx) => {
           const typeStart = placeName.indexOf("[");
           const typeEnd = placeName.indexOf("]");
           const place = placeName
             .slice(0, typeStart !== -1 ? typeStart : placeName.length)
             .trim();
 
-          let type = 0;
+          let type;
           if (typeEnd !== -1 && typeStart !== -1)
             type = placeName.slice(typeStart + 1, typeEnd);
-          submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = [];
-          submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace[0].name = place;
-          submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace[0].placeType = type;
+          const srcAdminLevel: SourceAdministrativeLevel = {};
+          srcAdminLevel.name = place;
+          srcAdminLevel.placeType = type ?? null;
+
+          idx === 0
+            ? (submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = srcAdminLevel)
+            : submittedValues.geographicPlaceNameSourceDetail.higerGeographicPlaces.push(
+                srcAdminLevel
+              );
         });
     }
 
