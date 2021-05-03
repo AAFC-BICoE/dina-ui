@@ -96,7 +96,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   <AttachmentReadOnlySection
                     attachmentPath={`collection-api/material-sample/${materialSampleId}/attachment`}
                     detachTotalSelected={true}
-                    title={<DinaMessage id="collectingEventAttachments" />}
+                    title={<DinaMessage id="materialSampleAttachments" />}
                   />
                 )}
               </Field>

@@ -322,10 +322,7 @@ export function MaterialSampleForm({
         </FieldSet>
       </div>
       <div className={enableCatalogueInfo ? "" : "d-none"}>
-        <FieldSet
-          readOnly={true} // Disabled until back-end supports these fields.
-          legend={<DinaMessage id="catalogueInfo" />}
-        >
+        <FieldSet legend={<DinaMessage id="catalogueInfo" />}>
           <CatalogueInfoFormLayout />
         </FieldSet>
       </div>
@@ -360,7 +357,11 @@ export function CatalogueInfoFormLayout() {
     <div>
       <div className="row">
         <div className="col-md-6">
-          <FieldSet legend={<DinaMessage id="preparation" />} horizontal={true}>
+          <FieldSet
+            legend={<DinaMessage id="preparation" />}
+            horizontal={true}
+            readOnly={true} // Disabled until back-end supports these fields.
+          >
             <TextField name="preparationMethod" />
             <TextField name="preparedBy" />
             <DateField name="datePrepared" />
@@ -373,7 +374,7 @@ export function CatalogueInfoFormLayout() {
               <FormikButton
                 // TODO onClick
                 onClick={() => undefined}
-                className="btn btn-primary"
+                className="btn btn-primary form-group"
                 buttonProps={() => ({ style: { width: "20rem" } })}
               >
                 <DinaMessage id="makeThisThePrimaryIdentifier" />
