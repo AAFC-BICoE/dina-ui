@@ -49,7 +49,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
     </ButtonBar>
   );
 
-  const srcAdminLevels: SourceAdministrativeLevel[] = [];
+  let srcAdminLevels: SourceAdministrativeLevel[] = [];
 
   return (
     <div>
@@ -62,7 +62,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
             colEvent.geographicPlaceNameSourceDetail?.selectedGeographicPlace
           );
         if (colEvent.geographicPlaceNameSourceDetail?.higherGeographicPlaces)
-          srcAdminLevels.concat(
+          srcAdminLevels = srcAdminLevels.concat(
             colEvent.geographicPlaceNameSourceDetail?.higherGeographicPlaces
           );
         srcAdminLevels.map(

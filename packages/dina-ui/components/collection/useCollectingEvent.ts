@@ -227,7 +227,7 @@ export function useCollectingEventSave(
     // Parse srcAdminLevels to geographicPlaceNameSourceDetail
     if (submittedValues.srcAdminLevels?.length > 0) {
       if (submittedValues.srcAdminLevels?.length > 1)
-        submittedValues.geographicPlaceNameSourceDetail.higerGeographicPlaces = [];
+        submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces = [];
       submittedValues.srcAdminLevels.map((srcAdminLevel, idx) => {
         // remove the braceket from placeName
         const typeStart = srcAdminLevel.name.indexOf("[");
@@ -237,7 +237,7 @@ export function useCollectingEventSave(
 
         idx === 0
           ? (submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = srcAdminLevel)
-          : submittedValues.geographicPlaceNameSourceDetail.higerGeographicPlaces.push(
+          : submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces.push(
               srcAdminLevel
             );
       });
