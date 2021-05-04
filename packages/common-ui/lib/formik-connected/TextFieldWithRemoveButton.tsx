@@ -21,6 +21,7 @@ export function TextFieldWithRemoveButton(props: TextFieldProps) {
           <div className="input-group-append">
             <button
               className="btn btn-danger self-remove-button"
+              style={{ height: "97%" }}
               aria-label="Close"
               onClick={() => removeEntry(inputProps.onChange)}
               type="button"

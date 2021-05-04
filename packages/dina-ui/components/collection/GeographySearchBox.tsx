@@ -29,6 +29,7 @@ export interface AddressDetail {
   place_type?: string;
   class?: string;
   type?: string;
+  isaddress?: boolean;
 }
 
 export interface NominatumApiAddressDetailSearchResult {

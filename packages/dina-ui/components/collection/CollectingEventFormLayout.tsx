@@ -72,7 +72,7 @@ export function CollectingEventFormLayout({
 
   const addressDetail = useRef({});
 
-  const commonNameRoot = "geographicPlaceNameSourceDetail";
+  const commonSrcDetailRoot = "geographicPlaceNameSourceDetail";
 
   function toggleRangeEnabled(
     newValue: boolean,
@@ -89,19 +89,19 @@ export function CollectingEventFormLayout({
     formik: FormikContextType<{}>
   ) {
     formik.setFieldValue(
-      `${commonNameRoot}.country.name`,
+      `${commonSrcDetailRoot}.country.name`,
       result?.address?.country || null
     );
     formik.setFieldValue(
-      `${commonNameRoot}.stateProvince.name`,
+      `${commonSrcDetailRoot}.stateProvince.name`,
       result?.address?.state || null
     );
     formik.setFieldValue(
-      "geographicPlaceNameSourceDetail.stateProvince.id",
+      `${commonSrcDetailRoot}.stateProvince.id`,
       result?.osm_id || null
     );
     formik.setFieldValue(
-      "geographicPlaceNameSourceDetail.stateProvince.element",
+      `${commonSrcDetailRoot}.stateProvince.element`,
       result?.osm_type || null
     );
 
@@ -122,11 +122,11 @@ export function CollectingEventFormLayout({
       }
     );
     formik.setFieldValue(
-      "geographicPlaceNameSourceDetail.sourceUrl",
+      `${commonSrcDetailRoot}.sourceUrl`,
       geographicPlaceSourceUrl
     );
     formik.setFieldValue(
-      "geographicPlaceNameSourceDetail.geographicPlaceNameSource",
+      `${commonSrcDetailRoot}.geographicPlaceNameSource`,
       GeographicPlaceNameSource.OSM
     );
 
@@ -145,7 +145,10 @@ export function CollectingEventFormLayout({
       if (
         addr.type !== "country" &&
         addr.type !== "state" &&
-        addr.type !== "country_code"
+        addr.type !== "country_code" &&
+        addr.place_type !== "province" &&
+        addr.place_type !== "state" &&
+        addr.isaddress
       ) {
         detail.id = addr.osm_id;
         detail.element = addr.osm_type;
@@ -155,7 +158,21 @@ export function CollectingEventFormLayout({
       }
       // fill in the country code
       if (addr.type === "country_code")
-        formik.setFieldValue(`${commonNameRoot}.country.code`, addr.localname);
+        formik.setFieldValue(
+          `${commonSrcDetailRoot}.country.code`,
+          addr.localname
+        );
+
+      // fill in the state/province name if it is not yet filled up
+      if (
+        (addr.place_type === "province" || addr.place_type === "state") &&
+        !formik.values[`${commonSrcDetailRoot}.stateProvince.name`]
+      )
+        formik.setFieldValue(
+          `${commonSrcDetailRoot}.stateProvince.name`,
+          addr.localname
+        );
+
       detail = {};
     });
     return editableSrcAdmnLevels;
@@ -163,7 +180,7 @@ export function CollectingEventFormLayout({
 
   function removeThisPlace(formik: FormikContextType<{}>) {
     // reset the source fields when user remove the place
-    formik.setFieldValue("geographicPlaceNameSourceDetail", null);
+    formik.setFieldValue(commonSrcDetailRoot, null);
     formik.setFieldValue("geographicPlaceNameSource", null);
 
     formik.setFieldValue("srcAdminLevels", null);
@@ -619,8 +636,16 @@ export function CollectingEventFormLayout({
                           </FieldArray>
                         )}
                         <DinaFormSection horizontal={[3, 9]}>
-                          <TextField name="dwcStateProvince" readOnly={true} />
-                          <TextField name="dwcCountry" readOnly={true} />
+                          <TextField
+                            name={`${commonSrcDetailRoot}.stateProvince.name`}
+                            label={formatMessage("stateProvinceLabel")}
+                            readOnly={true}
+                          />
+                          <TextField
+                            name={`${commonSrcDetailRoot}.country.name`}
+                            label={formatMessage("countryLabel")}
+                            readOnly={true}
+                          />
                         </DinaFormSection>
                         <div className="row">
                           {!readOnly && (
