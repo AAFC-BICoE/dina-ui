@@ -147,7 +147,8 @@ export function CollectingEventFormLayout({
         addr.type !== "country_code" &&
         addr.place_type !== "province" &&
         addr.place_type !== "state" &&
-        addr.isaddress
+        addr.isaddress &&
+        addr.osm_id
       ) {
         detail.id = addr.osm_id;
         detail.element = addr.osm_type;
