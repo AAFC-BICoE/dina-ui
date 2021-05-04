@@ -116,6 +116,8 @@ export function useCollectingEventSave(
         ?.higherGeographicPlaces
     );
 
+  srcAdminLevels.map(admn => (admn.name += " [ " + admn.placeType + " ] "));
+
   const collectingEventInitialValues = fetchedCollectingEvent
     ? {
         ...fetchedCollectingEvent,

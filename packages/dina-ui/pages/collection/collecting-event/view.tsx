@@ -65,6 +65,9 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
           srcAdminLevels.concat(
             colEvent.geographicPlaceNameSourceDetail?.higherGeographicPlaces
           );
+        srcAdminLevels.map(
+          admn => (admn.name += " [ " + admn.placeType + " ] ")
+        );
         colEvent.srcAdminLevels = srcAdminLevels;
         return (
           <main className="container-fluid">

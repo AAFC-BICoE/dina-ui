@@ -25,8 +25,7 @@ import {
   GroupSelectField,
   nominatimAddressDetailSearch,
   useAddPersonModal,
-  NominatumApiAddressDetailSearchResult,
-  AddressDetail
+  NominatumApiAddressDetailSearchResult
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
