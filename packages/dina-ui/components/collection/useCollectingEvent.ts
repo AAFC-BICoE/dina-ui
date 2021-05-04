@@ -97,13 +97,13 @@ export function useCollectingEventSave(
     DEFAULT_VERBATIM_SRS_KEY
   );
 
-  let placeNameArray: SourceAdministrativeLevel[] = [];
+  let srcAdminLevels: SourceAdministrativeLevel[] = [];
 
   if (
     fetchedCollectingEvent?.geographicPlaceNameSourceDetail
       ?.selectedGeographicPlace
   )
-    placeNameArray.push(
+    srcAdminLevels.push(
       fetchedCollectingEvent?.geographicPlaceNameSourceDetail
         ?.selectedGeographicPlace
     );
@@ -111,7 +111,7 @@ export function useCollectingEventSave(
     fetchedCollectingEvent?.geographicPlaceNameSourceDetail
       ?.higherGeographicPlaces
   )
-    placeNameArray = placeNameArray.concat(
+    srcAdminLevels = srcAdminLevels.concat(
       fetchedCollectingEvent?.geographicPlaceNameSourceDetail
         ?.higherGeographicPlaces
     );
@@ -124,7 +124,7 @@ export function useCollectingEventSave(
           "",
         geoReferenceAssertions:
           fetchedCollectingEvent.geoReferenceAssertions ?? [],
-        placeNames: placeNameArray
+        srcAdminLevels
       }
     : {
         type: "collecting-event",
@@ -222,37 +222,26 @@ export function useCollectingEventSave(
       assertion.georeferencedBy = assertion.georeferencedBy?.map(it => it.id);
     }
 
-    // Parse placeNames to geographicPlaceNameSourceDetail
-    if (submittedValues.placeNames?.length > 0) {
-      submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = [];
-      submittedValues.geographicPlaceNameSourceDetail.higerGeographicPlaces = [];
-      // Remove all the empty and space only strings, take away the "[" after which indicating a type
-      submittedValues.placeNames
-        .map(e => e.trim())
-        .filter(e => e)
-        .map((placeName, idx) => {
-          const typeStart = placeName.indexOf("[");
-          const typeEnd = placeName.indexOf("]");
-          const place = placeName
-            .slice(0, typeStart !== -1 ? typeStart : placeName.length)
-            .trim();
+    // Parse srcAdminLevels to geographicPlaceNameSourceDetail
+    if (submittedValues.srcAdminLevels?.length > 0) {
+      if (submittedValues.srcAdminLevels?.length > 1)
+        submittedValues.geographicPlaceNameSourceDetail.higerGeographicPlaces = [];
+      submittedValues.srcAdminLevels.map((srcAdminLevel, idx) => {
+        // remove the braceket from placeName
+        const typeStart = srcAdminLevel.name.indexOf("[");
+        srcAdminLevel.name = srcAdminLevel.name
+          .slice(0, typeStart !== -1 ? typeStart : srcAdminLevel.name.length)
+          .trim();
 
-          let type;
-          if (typeEnd !== -1 && typeStart !== -1)
-            type = placeName.slice(typeStart + 1, typeEnd);
-          const srcAdminLevel: SourceAdministrativeLevel = {};
-          srcAdminLevel.name = place;
-          srcAdminLevel.placeType = type ?? null;
-
-          idx === 0
-            ? (submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = srcAdminLevel)
-            : submittedValues.geographicPlaceNameSourceDetail.higerGeographicPlaces.push(
-                srcAdminLevel
-              );
-        });
+        idx === 0
+          ? (submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = srcAdminLevel)
+          : submittedValues.geographicPlaceNameSourceDetail.higerGeographicPlaces.push(
+              srcAdminLevel
+            );
+      });
     }
 
-    delete submittedValues.placeNames;
+    delete submittedValues.srcAdminLevels;
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [

@@ -30,7 +30,10 @@ import {
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
-import { geographicPlaceSourceUrl } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
+import {
+  geographicPlaceSourceUrl,
+  SourceAdministrativeLevel
+} from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import {
   CollectingEvent,
   GeographicPlaceNameSource
@@ -127,27 +130,35 @@ export function CollectingEventFormLayout({
       GeographicPlaceNameSource.OSM
     );
 
-    // set initial address detail based on user selected search result
-    addressDetail.current = result.address as any;
-
-    const geoNameParsed = parseGeoAdminLevels(detailResults);
-    formik.setFieldValue("placeNames", geoNameParsed);
+    const geoNameParsed = parseGeoAdminLevels(detailResults, formik);
+    formik.setFieldValue("srcAdminLevels", geoNameParsed);
   }
 
   function parseGeoAdminLevels(
-    detailResults: NominatumApiAddressDetailSearchResult | null
+    detailResults: NominatumApiAddressDetailSearchResult | null,
+    formik
   ) {
-    const editablePlaceNames: AddressDetail[] = [];
-    let detail: AddressDetail = {};
+    const editableSrcAdmnLevels: SourceAdministrativeLevel[] = [];
+    let detail: SourceAdministrativeLevel = {};
     detailResults?.address?.map(addr => {
-      detail.localname = addr.localname;
-      detail.osm_id = addr.osm_id;
-      detail.osm_type = addr.osm_type;
-      detail.place_type = addr.place_type ?? addr.class;
-      editablePlaceNames.push(detail);
+      // omitting country and state
+      if (
+        addr.type !== "country" &&
+        addr.type !== "state" &&
+        addr.type !== "country_code"
+      ) {
+        detail.id = addr.osm_id;
+        detail.element = addr.osm_type;
+        detail.placeType = addr.place_type ?? addr.class;
+        detail.name = addr.localname + " [ " + detail.placeType + " ] ";
+        editableSrcAdmnLevels.push(detail);
+      }
+      // fill in the country code
+      if (addr.type === "country_code")
+        formik.setFieldValue(`${commonNameRoot}.country.code`, addr.localname);
       detail = {};
     });
-    return editablePlaceNames;
+    return editableSrcAdmnLevels;
   }
 
   function removeThisPlace(formik: FormikContextType<{}>) {
@@ -155,7 +166,7 @@ export function CollectingEventFormLayout({
     formik.setFieldValue("geographicPlaceNameSourceDetail", null);
     formik.setFieldValue("geographicPlaceNameSource", null);
 
-    formik.setFieldValue("placeNames", null);
+    formik.setFieldValue("srcAdminLevels", null);
     setCustomPlaceValue("");
     setDisplayCustomPlace(false);
   }
@@ -212,7 +223,7 @@ export function CollectingEventFormLayout({
   };
 
   const parseGeoNames = displayName => {
-    // Parse the placeNames based on the search reasult display name field
+    // Parse the srcAdminLevels based on the search reasult display name field
     const geoNameParsed = displayName.split(", ");
     const geoNameParsedReduced: string[] = [];
     Object.assign(geoNameParsedReduced, geoNameParsed);
@@ -241,7 +252,7 @@ export function CollectingEventFormLayout({
     const geoNameParsed = parseGeoNames(form.values.geographicPlaceName);
     // Add user entered custom place in front
     geoNameParsed?.unshift(customPlaceValue);
-    form.setFieldValue("placeNames", geoNameParsed);
+    form.setFieldValue("srcAdminLevels", geoNameParsed);
     setDisplayCustomPlace(true);
   };
 
@@ -579,18 +590,18 @@ export function CollectingEventFormLayout({
                             </div>
                           </div>
                         )}
-                        {form.values.placeNames?.length > 0 && (
-                          <FieldArray name="placeNames">
+                        {form.values.srcAdminLevels?.length > 0 && (
+                          <FieldArray name="srcAdminLevels">
                             {({}) => {
-                              const geoNames = form.values.placeNames;
+                              const geoNames = form.values.srcAdminLevels;
                               return (
                                 <div className="pb-4">
                                   {geoNames.map((geoName, idx) => (
                                     <TextFieldWithRemoveButton
-                                      name={`placeNames[` + idx + `].localname`}
+                                      name={`srcAdminLevels[` + idx + `].name`}
                                       readOnly={true}
                                       removeLabel={true}
-                                      initialValue={geoName.localname}
+                                      initialValue={geoName.name}
                                       removeFormGroupClass={true}
                                       key={idx}
                                       inputProps={{

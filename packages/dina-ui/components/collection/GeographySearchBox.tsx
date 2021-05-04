@@ -28,6 +28,7 @@ export interface AddressDetail {
   osm_type?: string;
   place_type?: string;
   class?: string;
+  type?: string;
 }
 
 export interface NominatumApiAddressDetailSearchResult {

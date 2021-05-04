@@ -49,7 +49,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
     </ButtonBar>
   );
 
-  const placeNameArray: SourceAdministrativeLevel[] = [];
+  const srcAdminLevels: SourceAdministrativeLevel[] = [];
 
   return (
     <div>
@@ -58,14 +58,14 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
       {buttonBar}
       {withResponse(collectingEventQuery, ({ data: colEvent }) => {
         if (colEvent.geographicPlaceNameSourceDetail?.selectedGeographicPlace)
-          placeNameArray.push(
+          srcAdminLevels.push(
             colEvent.geographicPlaceNameSourceDetail?.selectedGeographicPlace
           );
         if (colEvent.geographicPlaceNameSourceDetail?.higherGeographicPlaces)
-          placeNameArray.concat(
+          srcAdminLevels.concat(
             colEvent.geographicPlaceNameSourceDetail?.higherGeographicPlaces
           );
-        colEvent.placeNames = placeNameArray;
+        colEvent.srcAdminLevels = srcAdminLevels;
         return (
           <main className="container-fluid">
             <h1>

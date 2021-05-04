@@ -39,7 +39,7 @@ export interface CollectingEventAttributes {
   geographicPlaceName?: string;
   geographicPlaceNameSourceDetail?: GeographicPlaceNameSourceDetail;
   geographicPlaceNameSource?: GeographicPlaceNameSource;
-  placeNames?: SourceAdministrativeLevel[];
+  srcAdminLevels?: SourceAdministrativeLevel[];
 }
 
 export enum GeographicPlaceNameSource {
