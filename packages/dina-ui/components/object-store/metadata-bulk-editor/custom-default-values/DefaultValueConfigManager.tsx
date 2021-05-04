@@ -12,7 +12,6 @@ export interface DefaultValueConfigSelectProps {
   /** Mock this out in tests so it gives a predictable value. */
   dateSupplier?: () => string;
   styles?: Partial<Styles<SelectOption<any>, boolean>>;
-  id?: string;
 }
 
 /** Lists, adds, edits, and removes Default Value Configs. */
@@ -101,7 +100,6 @@ export function DefaultValuesConfigSelect({
   onChangeConfigIndex,
   ruleConfigIndex,
   allowBlank,
-  id,
   styles
 }: DefaultValueConfigSelectProps) {
   const { storedDefaultValuesConfigs } = useStoredDefaultValuesConfigs();
@@ -121,7 +119,6 @@ export function DefaultValuesConfigSelect({
       options={selectOptions}
       onChange={(option: any) => onChangeConfigIndex(option.value)}
       value={ruleConfigOptions[ruleConfigIndex ?? -1] ?? null}
-      inputId={id}
       styles={styles}
     />
   );
@@ -144,7 +141,6 @@ export function DefaultValuesConfigSelectField(
           onChangeConfigIndex={setValue}
           ruleConfigIndex={value}
           styles={styles}
-          id={labelWrapperProps.id}
         />
       )}
     </FieldWrapper>

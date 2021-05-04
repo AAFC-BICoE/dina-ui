@@ -85,7 +85,6 @@ export default function UploadPage() {
                 name="defaultValuesConfig"
                 className="offset-md-3 col-md-3"
                 styles={customStyles}
-                id={Math.random().toString()}
               />
               <div className="col-md-3">
                 <FormikButton

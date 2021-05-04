@@ -19,7 +19,7 @@ body {
 }
 a {
   /* need this to resolve 23 link color ratio issuses*/
-  color: #284162;
+  color: #0000cc;
   text-decoration: underline;
 }
 .form-control::placeholder {

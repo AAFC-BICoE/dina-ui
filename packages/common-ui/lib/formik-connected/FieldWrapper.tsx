@@ -28,8 +28,6 @@ export interface LabelWrapperParams {
 
   /** Custom element to render when the form is in read-only mode. */
   readOnlyRender?: (value: any) => ReactNode;
-
-  id?: string;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -60,7 +58,6 @@ export function FieldWrapper({
   customName,
   arrayItemLink,
   link,
-  id,
   readOnlyRender
 }: FieldWrapperProps) {
   const { horizontal, readOnly } = useDinaFormContext();
@@ -74,17 +71,19 @@ export function FieldWrapper({
 
   return (
     <div className={className}>
-      <div className={`form-group ${name}-field ${horizontal ? "row" : ""}`}>
-        <label
-          htmlFor={id}
+      <label
+        className={`form-group ${name}-field ${horizontal ? "row" : "w-100"}`}
+      >
+        <div
           className={[
             `${labelCol ? `col-sm-${labelCol}` : ""}`,
             // Adjust alignment for editable inputs:
-            horizontal && !readOnly ? "mt-sm-2" : ""
+            horizontal && !readOnly ? "mt-sm-2" : "",
+            "mb-2"
           ].join(" ")}
         >
           {!hideLabel && <strong>{fieldLabel}</strong>}
-        </label>
+        </div>
         <div className={valueCol ? `col-sm-${valueCol}` : ""}>
           <FastField name={name}>
             {({ field: { value }, form }) => {
@@ -110,7 +109,7 @@ export function FieldWrapper({
             }}
           </FastField>
         </div>
-      </div>
+      </label>
     </div>
   );
 }

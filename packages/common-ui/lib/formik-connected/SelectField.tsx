@@ -60,7 +60,6 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
             onChange={onChangeInternal}
             styles={styles}
             value={selectedOption}
-            inputId={labelWrapperProps.id}
           />
         );
       }}

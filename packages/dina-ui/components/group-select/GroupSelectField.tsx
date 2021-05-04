@@ -97,7 +97,6 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
         selectFieldProps.onChange?.(newValue);
       }}
       options={groupSelectOptions}
-      id={Math.random().toString()}
     />
   );
 }
