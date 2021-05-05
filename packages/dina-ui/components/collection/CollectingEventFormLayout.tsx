@@ -239,37 +239,14 @@ export function CollectingEventFormLayout({
     }
   };
 
-  const parseGeoNames = displayName => {
-    // Parse the srcAdminLevels based on the search reasult display name field
-    const geoNameParsed = displayName.split(", ");
-    const geoNameParsedReduced: string[] = [];
-    Object.assign(geoNameParsedReduced, geoNameParsed);
-    const keys = Object.keys(addressDetail.current);
-    for (const key of keys) {
-      geoNameParsed.map(geoName => {
-        if (
-          addressDetail.current[key] === geoName &&
-          (key === "state" || key === "country" || key === "country_code")
-        ) {
-          geoNameParsedReduced.splice(geoNameParsedReduced.indexOf(geoName), 1);
-        } else if (addressDetail.current[key] === geoName) {
-          geoNameParsedReduced.splice(
-            geoNameParsedReduced.indexOf(geoName),
-            1,
-            geoName + " [" + key + "]"
-          );
-        }
-      });
-    }
-    return geoNameParsedReduced;
-  };
-
   const addCustomPlaceName = form => {
     if (!customPlaceValue || customPlaceValue.length === 0) return;
-    const geoNameParsed = parseGeoNames(form.values.geographicPlaceName);
     // Add user entered custom place in front
-    geoNameParsed?.unshift(customPlaceValue);
-    form.setFieldValue("srcAdminLevels", geoNameParsed);
+    const customPlaceAsInSrcAdmnLevel: SourceAdministrativeLevel = {};
+    customPlaceAsInSrcAdmnLevel.name = customPlaceValue;
+    const srcAdminLevels = form.values.srcAdminLevels;
+    srcAdminLevels.unshift(customPlaceAsInSrcAdmnLevel);
+    form.setFieldValue("srcAdminLevels", srcAdminLevels);
     setDisplayCustomPlace(true);
   };
 
@@ -613,12 +590,11 @@ export function CollectingEventFormLayout({
                               const geoNames = form.values.srcAdminLevels;
                               return (
                                 <div className="pb-4">
-                                  {geoNames.map((geoName, idx) => (
+                                  {geoNames.map((_, idx) => (
                                     <TextFieldWithRemoveButton
-                                      name={`srcAdminLevels[` + idx + `].name`}
+                                      name={`srcAdminLevels[${idx}].name`}
                                       readOnly={true}
                                       removeLabel={true}
-                                      initialValue={geoName.name}
                                       removeFormGroupClass={true}
                                       key={idx}
                                       inputProps={{
