@@ -16,7 +16,7 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
-import { FormikProps } from "formik";
+import { Field, FormikContextType, FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { cloneDeep } from "lodash";
 import Link from "next/link";
@@ -417,6 +417,13 @@ export function CatalogueInfoFormLayout({
 }: CatalogueInfoFormLayoutProps) {
   const { readOnly } = useDinaFormContext();
 
+  function setNameToCatalogNumber(
+    values: InputResource<MaterialSample>,
+    form: FormikContextType<any>
+  ) {
+    form.setFieldValue("materialSampleName", values.dwcCatalogNumber);
+  }
+
   return (
     <FieldSet className={className} legend={<DinaMessage id="catalogueInfo" />}>
       <div className="row">
@@ -435,14 +442,26 @@ export function CatalogueInfoFormLayout({
           <FieldSet legend={<DinaMessage id="catalogueInfo" />}>
             <TextField name="dwcCatalogNumber" />
             {!readOnly && (
-              <FormikButton
-                // TODO onClick
-                onClick={() => undefined}
-                className="btn btn-primary form-group"
-                buttonProps={() => ({ style: { width: "20rem" } })}
-              >
-                <DinaMessage id="makeThisThePrimaryIdentifier" />
-              </FormikButton>
+              <Field name="dwcCatalogNumber">
+                {({
+                  form: {
+                    values: { dwcCatalogNumber, materialSampleName }
+                  }
+                }) =>
+                  !dwcCatalogNumber ||
+                  dwcCatalogNumber === materialSampleName ? null : (
+                    <FormikButton
+                      onClick={setNameToCatalogNumber}
+                      className="btn btn-primary form-group"
+                      buttonProps={() => ({
+                        style: { width: "20rem" }
+                      })}
+                    >
+                      <DinaMessage id="makeThisThePrimaryIdentifier" />
+                    </FormikButton>
+                  )
+                }
+              </Field>
             )}
           </FieldSet>
         </div>
