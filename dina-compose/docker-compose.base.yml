@@ -48,7 +48,6 @@ services:
         # Here we set the IP for Keycloak
         ipv4_address: ${KEYCLOAK_IP}
   dina-ui:
-    build: ../repos/dina-ui
     environment:
       AGENT_API_ADDRESS: agent-api:8080
       OBJECTSTORE_API_ADDRESS: objectstore-api:8080
@@ -62,7 +61,6 @@ services:
       - "traefik.http.routers.dina-ui.rule=Host(`${DINAUI_DOMAIN}`)"
       - "traefik.http.services.dina-ui.loadbalancer.server.port=8080"
   objectstore-api:
-    build: ../repos/objectstore-api
     environment:
       spring.datasource.url: jdbc:postgresql://database/dina?currentSchema=object_store
       spring.datasource.username: postgres
@@ -82,7 +80,6 @@ services:
       # Resolve the Keycloak domain to Keycloak's static IP:
       - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
   seqdb-api:
-    image: seqdb-api:tag
     environment:
       spring.datasource.url: jdbc:postgresql://database/dina?currentSchema=seqdb
       spring.datasource.username: postgres
@@ -94,7 +91,6 @@ services:
       # Resolve the Keycloak domain to Keycloak's static IP:
       - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
   agent-api:
-    build: ../repos/agent-api
     environment:
       spring.datasource.url: jdbc:postgresql://database/dina?currentSchema=agent
       spring.datasource.username: postgres
@@ -108,7 +104,6 @@ services:
       # Resolve the Keycloak domain to Keycloak's static IP:
       - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
   collection-api:
-    build: ../repos/collection-api
     environment:
       spring.datasource.url: jdbc:postgresql://database/dina?currentSchema=collection
       spring.datasource.username: postgres
@@ -122,7 +117,6 @@ services:
       # Resolve the Keycloak domain to Keycloak's static IP:
       - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
   user-api:
-    build: ../repos/dina-user-api
     environment:
       spring.datasource.url: jdbc:postgresql://database/dina?currentSchema=userapi
       spring.datasource.username: postgres
