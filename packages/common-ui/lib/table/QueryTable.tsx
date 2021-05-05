@@ -260,6 +260,7 @@ export function DefaultTd({ className, style, children, onClick }) {
       style={{ ...style, whiteSpace: "unset" }}
       // Hovering over the cell should show the value next to the cursor:
       title={typeof children === "string" ? children : undefined}
+      role="cell"
     >
       {content}
     </div>
