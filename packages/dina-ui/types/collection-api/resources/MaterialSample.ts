@@ -6,7 +6,7 @@ export interface MaterialSampleAttributes {
   type: "material-sample";
 
   // attributes to be added by the back-end:
-  name?: string;
+  materialSampleName?: string;
 
   group?: string;
   createdOn?: string;

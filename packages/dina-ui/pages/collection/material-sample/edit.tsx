@@ -135,7 +135,7 @@ export function MaterialSampleForm({
     ? { ...materialSample }
     : {
         type: "material-sample",
-        name: `${username}-${todayDate}`
+        materialSampleName: `${username}-${todayDate}`
       };
 
   /** Used to get the values of the nested CollectingEvent form. */
@@ -237,9 +237,6 @@ export function MaterialSampleForm({
         type: savedCollectingEvent.type
       };
     }
-
-    // TODO enable this when the back-end supports it:
-    delete materialSampleInput.name;
 
     // Add attachments if they were selected:
     if (selectedMetadatas.length) {
@@ -405,7 +402,7 @@ export function MaterialSampleFormLayout() {
         />
       </div>
       <div className="row">
-        <TextField name="name" className="col-md-6" />
+        <TextField name="materialSampleName" className="col-md-6" />
       </div>
     </div>
   );
