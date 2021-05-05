@@ -58,6 +58,7 @@ describe("User edit page", () => {
         {
           rolesPerGroup: {
             aafc: ["staff"],
+            cnc: [],
             "test-group": ["role1", "role2"]
           }
         }
