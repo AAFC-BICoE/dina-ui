@@ -36,7 +36,6 @@ export interface CollectingEventAttributes {
   collectorGroupUuid?: string;
 
   group: string;
-  geographicPlaceName?: string;
   geographicPlaceNameSourceDetail?: GeographicPlaceNameSourceDetail;
   geographicPlaceNameSource?: GeographicPlaceNameSource;
   srcAdminLevels?: SourceAdministrativeLevel[];

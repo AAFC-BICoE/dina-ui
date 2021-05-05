@@ -57,6 +57,13 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
       <Nav />
       {buttonBar}
       {withResponse(collectingEventQuery, ({ data: colEvent }) => {
+        // can either have one of customGeographicPlace or selectedGeographicPlace
+        if (colEvent?.geographicPlaceNameSourceDetail?.customGeographicPlace) {
+          const customPlaceNameAsInSrcAdmnLevel: SourceAdministrativeLevel = {};
+          customPlaceNameAsInSrcAdmnLevel.name =
+            colEvent.geographicPlaceNameSourceDetail.customGeographicPlace;
+          srcAdminLevels.push(customPlaceNameAsInSrcAdmnLevel);
+        }
         if (colEvent.geographicPlaceNameSourceDetail?.selectedGeographicPlace)
           srcAdminLevels.push(
             colEvent.geographicPlaceNameSourceDetail?.selectedGeographicPlace
@@ -66,7 +73,8 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
             colEvent.geographicPlaceNameSourceDetail?.higherGeographicPlaces
           );
         srcAdminLevels.map(
-          admn => (admn.name += " [ " + admn.placeType + " ] ")
+          admn =>
+            (admn.name += admn.placeType ? " [ " + admn.placeType + " ] " : "")
         );
         colEvent.srcAdminLevels = srcAdminLevels;
         return (

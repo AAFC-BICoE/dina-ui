@@ -1,6 +1,7 @@
 import { KitsuResource } from "kitsu";
 
 export interface GeographicPlaceNameSourceDetailAttributes {
+  customGeographicPlace?: string;
   selectedGeographicPlace?: SourceAdministrativeLevel;
   higherGeographicPlaces?: SourceAdministrativeLevel[];
   stateProvince?: SourceAdministrativeLevel;

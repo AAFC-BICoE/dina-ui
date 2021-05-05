@@ -153,7 +153,9 @@ export function CollectingEventFormLayout({
         detail.id = addr.osm_id;
         detail.element = addr.osm_type;
         detail.placeType = addr.place_type ?? addr.class;
-        detail.name = addr.localname + " [ " + detail.placeType + " ] ";
+        detail.name = detail.placeType
+          ? addr.localname + " [ " + detail.placeType + " ] "
+          : addr.localname;
         editableSrcAdmnLevels.push(detail);
       }
       // fill in the country code
@@ -596,7 +598,7 @@ export function CollectingEventFormLayout({
                                       readOnly={true}
                                       removeLabel={true}
                                       removeFormGroupClass={true}
-                                      key={idx}
+                                      key={Math.random()}
                                       inputProps={{
                                         style: {
                                           backgroundColor: `${

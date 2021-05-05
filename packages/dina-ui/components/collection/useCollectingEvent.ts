@@ -99,6 +99,17 @@ export function useCollectingEventSave(
 
   let srcAdminLevels: SourceAdministrativeLevel[] = [];
 
+  // can either have one of customGeographicPlace or selectedGeographicPlace
+  if (
+    fetchedCollectingEvent?.geographicPlaceNameSourceDetail
+      ?.customGeographicPlace
+  ) {
+    const customPlaceNameAsInSrcAdmnLevel: SourceAdministrativeLevel = {};
+    customPlaceNameAsInSrcAdmnLevel.name =
+      fetchedCollectingEvent?.geographicPlaceNameSourceDetail.customGeographicPlace;
+    srcAdminLevels.push(customPlaceNameAsInSrcAdmnLevel);
+  }
+
   if (
     fetchedCollectingEvent?.geographicPlaceNameSourceDetail
       ?.selectedGeographicPlace
@@ -235,8 +246,12 @@ export function useCollectingEventSave(
           .slice(0, typeStart !== -1 ? typeStart : srcAdminLevel.name.length)
           .trim();
 
+        // the first one can either be selectedGeographicPlace or customGeographicPlace
         idx === 0
-          ? (submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = srcAdminLevel)
+          ? srcAdminLevel.osm_id === null
+            ? (submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace =
+                srcAdminLevel.name)
+            : (submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = srcAdminLevel)
           : submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces.push(
               srcAdminLevel
             );
