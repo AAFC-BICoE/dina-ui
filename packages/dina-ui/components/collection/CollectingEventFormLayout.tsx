@@ -61,8 +61,19 @@ export function CollectingEventFormLayout({
   const { openAddPersonModal } = useAddPersonModal();
   const [rangeEnabled, setRangeEnabled] = useState(false);
 
-  const { readOnly } = useDinaFormContext();
-  const [activeTabIdx, setActiveTabIdx] = useState(0);
+  const { initialValues, readOnly } = useDinaFormContext();
+
+  // Open the tab with the Primary geoassertion even if it's not the first one.
+  // Defaults to 0 if there's no primary assertion.
+  const intialPrimaryAssertionIndex = clamp(
+    (initialValues as Partial<CollectingEvent>).geoReferenceAssertions?.findIndex(
+      assertion => assertion?.isPrimary
+    ) ?? 0,
+    0,
+    Infinity
+  );
+
+  const [activeTabIdx, setActiveTabIdx] = useState(intialPrimaryAssertionIndex);
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
