@@ -30,6 +30,14 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
     ...labelWrapperProps
   } = props;
 
+  // Fix the place holder text ...Select has not enough contrast ratio to the background issue
+  const customStyles = {
+    placeholder: (provided, _) => ({
+      ...provided,
+      color: "rgb(51,51,51)"
+    })
+  };
+
   return (
     <FieldWrapper {...labelWrapperProps}>
       {({ setValue, value }) => {
@@ -58,7 +66,7 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
             isMulti={isMulti}
             options={options}
             onChange={onChangeInternal}
-            styles={styles}
+            styles={{ ...styles, ...customStyles }}
             value={selectedOption}
           />
         );

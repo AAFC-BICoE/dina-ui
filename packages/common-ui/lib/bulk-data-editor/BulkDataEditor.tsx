@@ -129,6 +129,10 @@ export function BulkDataEditor<TRow>({
         .handsontableEditor.autocompleteEditor, .handsontableEditor.autocompleteEditor .ht_master .wtHolder {
           min-height: 138px;
         }
+        /* Fix the place holder color contrast */        
+        .htPlaceholder.htAutocomplete {
+          color: rgb(51,51,51);
+        }
       `}</style>
       {validationAlertJsx}
       <div
