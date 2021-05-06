@@ -78,10 +78,7 @@ export function CollectingEventFormLayout({
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
   const [customPlaceValue, setCustomPlaceValue] = useState<string>("");
-  const [displayCustomPlace, setDisplayCustomPlace] = useState(false);
-
-  const addressDetail = useRef({});
-
+  const [displayCustomPlace, setDisplayCustomPlace] = useState(true);
   const commonSrcDetailRoot = "geographicPlaceNameSourceDetail";
 
   function toggleRangeEnabled(
@@ -142,6 +139,7 @@ export function CollectingEventFormLayout({
 
     const geoNameParsed = parseGeoAdminLevels(detailResults, formik);
     formik.setFieldValue("srcAdminLevels", geoNameParsed);
+    setDisplayCustomPlace(false);
   }
 
   function parseGeoAdminLevels(
@@ -159,7 +157,7 @@ export function CollectingEventFormLayout({
         addr.place_type !== "province" &&
         addr.place_type !== "state" &&
         addr.isaddress &&
-        addr.osm_id
+        (addr.osm_id || addr.place_id)
       ) {
         detail.id = addr.osm_id;
         detail.element = addr.osm_type;
@@ -198,7 +196,7 @@ export function CollectingEventFormLayout({
 
     formik.setFieldValue("srcAdminLevels", null);
     setCustomPlaceValue("");
-    setDisplayCustomPlace(false);
+    setDisplayCustomPlace(true);
   }
 
   /** Does a Places search using the given search string. */
