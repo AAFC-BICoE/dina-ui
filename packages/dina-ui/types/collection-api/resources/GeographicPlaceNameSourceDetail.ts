@@ -10,7 +10,8 @@ export interface GeographicPlaceNameSourceDetailAttributes {
   recordedOn: string;
 }
 
-export const geographicPlaceSourceUrl = "https://www.openstreetmap.org";
+export const geographicPlaceSourceUrl =
+  "https://nominatim.openstreetmap.org/ui/details.html?";
 
 export type SourceAdministrativeLevel = {
   id?: string /* osm id */;

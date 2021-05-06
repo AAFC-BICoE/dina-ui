@@ -130,7 +130,7 @@ export function CollectingEventFormLayout({
     );
     formik.setFieldValue(
       `${commonSrcDetailRoot}.sourceUrl`,
-      geographicPlaceSourceUrl
+      `${geographicPlaceSourceUrl}osmtype=${osmTypeForSearch}&osmid=${result.osm_id}`
     );
     formik.setFieldValue(
       `${commonSrcDetailRoot}.geographicPlaceNameSource`,
@@ -651,9 +651,9 @@ export function CollectingEventFormLayout({
                             </div>
                           )}
                           <div className="col-md-4">
-                            {detail?.sourceIdType && detail?.sourceID && (
+                            {detail.sourceUrl && (
                               <a
-                                href={`${geographicPlaceSourceUrl}/${detail?.sourceIdType}/${detail?.sourceID}`}
+                                href={`${detail.sourceUrl}`}
                                 target="_blank"
                                 className="btn btn-info"
                               >

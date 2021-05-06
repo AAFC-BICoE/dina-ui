@@ -270,7 +270,7 @@ export function useCollectingEventSave(
 
     delete submittedValues.srcAdminLevels;
     if (
-      submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces
+      submittedValues.geographicPlaceNameSourceDetail?.higherGeographicPlaces
         ?.length === 0
     )
       delete submittedValues.geographicPlaceNameSourceDetail
