@@ -30,11 +30,7 @@ export function Tooltip({ id, intlValues, visibleElement }: TooltipProps) {
       >
         <span>
           {visibleElement ?? (
-            <img
-              src="/static/images/iconInformation.gif"
-              alt=""
-              aria-describedby={id}
-            />
+            <img src="/static/images/iconInformation.gif" alt="" />
           )}
         </span>
       </RcTooltip>
