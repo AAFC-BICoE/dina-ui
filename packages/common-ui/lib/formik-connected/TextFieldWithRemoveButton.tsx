@@ -1,14 +1,23 @@
 import React, { ChangeEvent, useRef, useState } from "react";
 import { TextField, TextFieldProps } from "./TextField";
 
-export function TextFieldWithRemoveButton(props: TextFieldProps) {
+interface TextFieldWithRemoveButtonProps extends TextFieldProps {
+  removeItem?: (idx: number) => void;
+  index?: number;
+}
+
+export function TextFieldWithRemoveButton(
+  props: TextFieldWithRemoveButtonProps
+) {
   const [shouldRemove, setShouldRemove] = useState(false);
+  const { removeItem, index } = props;
 
   /* Clear the input value and remove the whole wrapping div */
   const removeEntry = onChange => {
     onChange?.({
       target: { value: "" }
     } as ChangeEvent<HTMLInputElement>);
+    removeItem?.(index as any);
     setShouldRemove(true);
   };
 

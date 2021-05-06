@@ -244,20 +244,37 @@ export function useCollectingEventSave(
           .trim();
 
         // the first one can either be selectedGeographicPlace or customGeographicPlace
-        idx === 0
-          ? !srcAdminLevel.id &&
+        // when the entry only has name in it, it is considered as customPlaceName entry
+        if (idx === 0) {
+          if (
+            !srcAdminLevel.id &&
             !srcAdminLevel.placeType &&
             !srcAdminLevel.element
-            ? (submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace =
-                srcAdminLevel.name)
-            : (submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = srcAdminLevel)
-          : submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces.push(
-              srcAdminLevel
-            );
+          ) {
+            submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace =
+              srcAdminLevel.name;
+            delete submittedValues.geographicPlaceNameSourceDetail
+              .selectedGeographicPlace;
+          } else {
+            submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = srcAdminLevel;
+            delete submittedValues.geographicPlaceNameSourceDetail
+              .customGeographicPlace;
+          }
+        } else {
+          submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces.push(
+            srcAdminLevel
+          );
+        }
       });
     }
 
     delete submittedValues.srcAdminLevels;
+    if (
+      submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces
+        ?.length === 0
+    )
+      delete submittedValues.geographicPlaceNameSourceDetail
+        .higherGeographicPlaces;
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [

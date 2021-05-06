@@ -597,8 +597,11 @@ export function CollectingEventFormLayout({
                         )}
                         {form.values.srcAdminLevels?.length > 0 && (
                           <FieldArray name="srcAdminLevels">
-                            {({}) => {
+                            {({ remove }) => {
                               const geoNames = form.values.srcAdminLevels;
+                              function removeItem(index: number) {
+                                remove(index);
+                              }
                               return (
                                 <div className="pb-4">
                                   {geoNames.map((_, idx) => (
@@ -607,7 +610,9 @@ export function CollectingEventFormLayout({
                                       readOnly={true}
                                       removeLabel={true}
                                       removeFormGroupClass={true}
+                                      removeItem={removeItem}
                                       key={Math.random()}
+                                      index={idx}
                                       inputProps={{
                                         style: {
                                           backgroundColor: `${
