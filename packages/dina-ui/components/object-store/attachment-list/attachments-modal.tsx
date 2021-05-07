@@ -1,4 +1,10 @@
-import { FieldHeader, useApiClient, useModal, useQuery } from "common-ui";
+import {
+  FieldHeader,
+  FieldSet,
+  useApiClient,
+  useModal,
+  useQuery
+} from "common-ui";
 import { PersistedResource } from "kitsu";
 import { uniqBy } from "lodash";
 import { useEffect, useState } from "react";
@@ -13,11 +19,14 @@ export interface AttachmentsModalParams {
 
   /** Dependencies for re-initializing the attachment list. */
   deps: any[];
+
+  title?: JSX.Element;
 }
 
 export function useAttachmentsModal({
   initialMetadatas = [],
-  deps
+  deps,
+  title
 }: AttachmentsModalParams) {
   const { closeModal, openModal } = useModal();
   const { bulkGet } = useApiClient();
@@ -81,51 +90,59 @@ export function useAttachmentsModal({
   }
 
   const attachedMetadatasUI = (
-    <div>
-      <h2>Attachments ({selectedMetadatas.length})</h2>
+    <FieldSet
+      legend={
+        <>
+          {title ?? "Attachments"} ({selectedMetadatas.length})
+        </>
+      }
+    >
       {error ? (
         <DinaMessage id="objectStoreDataUnavailable" />
       ) : (
         <>
           {selectedMetadatas.length ? (
-            <ReactTable
-              columns={[
-                ...[
-                  "originalFilename",
-                  "acCaption",
-                  "xmpMetadataDate",
-                  "acTags"
-                ].map(accessor => ({
-                  accessor,
-                  Header: <FieldHeader name={accessor} />
-                })),
-                {
-                  Cell: ({ original: { id } }) => (
-                    <button
-                      className="btn btn-dark"
-                      onClick={() => removeMetadata(id)}
-                      type="button"
-                    >
-                      <DinaMessage id="remove" />
-                    </button>
-                  )
-                }
-              ]}
-              data={selectedMetadatas}
-              minRows={selectedMetadatas.length}
-              showPagination={false}
-            />
+            <div className="form-group">
+              <ReactTable
+                columns={[
+                  ...[
+                    "originalFilename",
+                    "acCaption",
+                    "xmpMetadataDate",
+                    "acTags"
+                  ].map(accessor => ({
+                    accessor,
+                    Header: <FieldHeader name={accessor} />
+                  })),
+                  {
+                    Cell: ({ original: { id } }) => (
+                      <button
+                        className="btn btn-dark"
+                        onClick={() => removeMetadata(id)}
+                        type="button"
+                      >
+                        <DinaMessage id="remove" />
+                      </button>
+                    )
+                  }
+                ]}
+                data={selectedMetadatas}
+                minRows={selectedMetadatas.length}
+                showPagination={false}
+              />
+            </div>
           ) : null}
           <button
-            className="btn btn-primary"
+            className="btn btn-primary form-group"
             type="button"
             onClick={openAttachmentsModal}
+            style={{ width: "10rem" }}
           >
             <DinaMessage id="addAttachments" />
           </button>
         </>
       )}
-    </div>
+    </FieldSet>
   );
 
   return {

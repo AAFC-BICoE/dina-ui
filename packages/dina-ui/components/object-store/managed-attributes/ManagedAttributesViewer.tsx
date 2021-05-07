@@ -37,21 +37,27 @@ export function ManagedAttributesViewer({
 
   return (
     <DinaForm initialValues={managedAttributeValues} readOnly={true}>
-      <div className="row">
-        {managedAttributeValues.map((mav, index) => (
-          <FieldView
-            key={mav.key}
-            className="col-6"
-            label={
-              <ManagedAttributeName
-                managedAttributeApiPath={managedAttributeApiPath}
-                managedAttributeKey={mav.key}
-              />
-            }
-            name={`${index}.value`}
-          />
-        ))}
-      </div>
+      {managedAttributeValues.length ? (
+        <div className="row">
+          {managedAttributeValues.map((mav, index) => (
+            <FieldView
+              key={mav.key}
+              className="col-6"
+              label={
+                <ManagedAttributeName
+                  managedAttributeApiPath={managedAttributeApiPath}
+                  managedAttributeKey={mav.key}
+                />
+              }
+              name={`${index}.value`}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="form-group">
+          <DinaMessage id="noManagedAttributeValues" />
+        </div>
+      )}
     </DinaForm>
   );
 }

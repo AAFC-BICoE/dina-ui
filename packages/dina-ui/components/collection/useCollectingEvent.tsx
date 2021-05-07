@@ -3,12 +3,13 @@ import { useApiClient, useQuery } from "common-ui";
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
 import { orderBy } from "lodash";
-import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/collection-api";
 import { CoordinateSystemEnum } from "../../types/collection-api/resources/CoordinateSystem";
 import { SRSEnum } from "../../types/collection-api/resources/SRS";
 import { Metadata, Person } from "../../types/objectstore-api";
 import { useAttachmentsModal } from "../object-store";
+import { SourceAdministrativeLevel } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
@@ -81,7 +82,7 @@ export function useCollectingEventQuery(id?: string | null) {
   return collectingEventQuery;
 }
 
-/** CollectingEvent save method to be re-used by CollectingEvent and PhysicalEntity forms. */
+/** CollectingEvent save method to be re-used by CollectingEvent and MaterialSample forms. */
 export function useCollectingEventSave(
   fetchedCollectingEvent?: PersistedResource<CollectingEvent>
 ) {
@@ -96,6 +97,35 @@ export function useCollectingEventSave(
     DEFAULT_VERBATIM_SRS_KEY
   );
 
+  let srcAdminLevels: SourceAdministrativeLevel[] = [];
+
+  // can either have one of customGeographicPlace or selectedGeographicPlace
+  if (
+    fetchedCollectingEvent?.geographicPlaceNameSourceDetail
+      ?.customGeographicPlace
+  ) {
+    const customPlaceNameAsInSrcAdmnLevel: SourceAdministrativeLevel = {};
+    customPlaceNameAsInSrcAdmnLevel.name =
+      fetchedCollectingEvent?.geographicPlaceNameSourceDetail.customGeographicPlace;
+    srcAdminLevels.push(customPlaceNameAsInSrcAdmnLevel);
+  }
+
+  if (
+    fetchedCollectingEvent?.geographicPlaceNameSourceDetail
+      ?.selectedGeographicPlace
+  )
+    srcAdminLevels.push(
+      fetchedCollectingEvent?.geographicPlaceNameSourceDetail
+        ?.selectedGeographicPlace
+    );
+  if (
+    fetchedCollectingEvent?.geographicPlaceNameSourceDetail
+      ?.higherGeographicPlaces
+  )
+    srcAdminLevels = srcAdminLevels.concat(
+      fetchedCollectingEvent?.geographicPlaceNameSourceDetail
+        ?.higherGeographicPlaces
+    );
   const collectingEventInitialValues = fetchedCollectingEvent
     ? {
         ...fetchedCollectingEvent,
@@ -103,7 +133,8 @@ export function useCollectingEventSave(
           fetchedCollectingEvent.dwcOtherRecordNumbers?.concat("").join("\n") ??
           "",
         geoReferenceAssertions:
-          fetchedCollectingEvent.geoReferenceAssertions ?? []
+          fetchedCollectingEvent.geoReferenceAssertions ?? [],
+        srcAdminLevels
       }
     : {
         type: "collecting-event",
@@ -124,7 +155,8 @@ export function useCollectingEventSave(
   // The selected Metadatas to be attached to this Collecting Event:
   const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal({
     initialMetadatas: fetchedCollectingEvent?.attachment as PersistedResource<Metadata>[],
-    deps: [fetchedCollectingEvent?.id]
+    deps: [fetchedCollectingEvent?.id],
+    title: <DinaMessage id="collectingEventAttachments" />
   });
 
   async function saveCollectingEvent(
@@ -200,6 +232,43 @@ export function useCollectingEventSave(
     for (const assertion of submittedValues.geoReferenceAssertions || []) {
       assertion.georeferencedBy = assertion.georeferencedBy?.map(it => it.id);
     }
+
+    // Parse srcAdminLevels to geographicPlaceNameSourceDetail
+    // Reset the 3 fields which should be updated with user address entries : srcAdminLevels
+    if (submittedValues.geographicPlaceNameSourceDetail) {
+      submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces = null;
+      submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = null;
+      submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace = null;
+    }
+
+    if (submittedValues.srcAdminLevels?.length > 0) {
+      if (submittedValues.srcAdminLevels?.length > 1)
+        submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces = [];
+      submittedValues.srcAdminLevels.map((srcAdminLevel, idx) => {
+        // remove the braceket from placeName
+        const typeStart = srcAdminLevel.name.indexOf("[");
+        srcAdminLevel.name = srcAdminLevel.name
+          .slice(0, typeStart !== -1 ? typeStart : srcAdminLevel.name.length)
+          .trim();
+        // the first one can either be selectedGeographicPlace or customGeographicPlace
+        // when the entry only has name in it, it is user entered customPlaceName entry
+        // when the enry does not have osm_id, it will be saved as customPlaceName (e.g central experimental farm)
+        if (idx === 0) {
+          if (!srcAdminLevel.id) {
+            submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace =
+              srcAdminLevel.name;
+          } else {
+            submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = srcAdminLevel;
+          }
+        } else {
+          submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces.push(
+            srcAdminLevel
+          );
+        }
+      });
+    }
+
+    delete submittedValues.srcAdminLevels;
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [

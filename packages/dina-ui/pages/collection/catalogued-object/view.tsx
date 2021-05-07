@@ -15,7 +15,7 @@ import { Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { PhysicalEntity } from "../../../types/collection-api";
+import { MaterialSample } from "../../../types/collection-api";
 import { CataloguedObjectFormLayout } from "./edit";
 
 export function CataloguedObjectViewPage({ router }: WithRouterProps) {
@@ -23,12 +23,12 @@ export function CataloguedObjectViewPage({ router }: WithRouterProps) {
 
   const { id } = router.query;
 
-  const physicalEntityQuery = useQuery<PhysicalEntity>({
-    path: `collection-api/physical-entity/${id}?include=collectingEvent`
+  const materialSampleQuery = useQuery<MaterialSample>({
+    path: `collection-api/material-sample/${id}?include=collectingEvent`
   });
 
   const colEventQuery = useCollectingEventQuery(
-    physicalEntityQuery.response?.data?.collectingEvent?.id
+    materialSampleQuery.response?.data?.collectingEvent?.id
   );
 
   const collectingEvent = colEventQuery.response?.data;
@@ -50,7 +50,7 @@ export function CataloguedObjectViewPage({ router }: WithRouterProps) {
         id={id as string}
         options={{ apiBaseUrl: "/collection-api" }}
         postDeleteRedirect="/collection/catalogued-object/list"
-        type="physical-entity"
+        type="material-sample"
       />
     </ButtonBar>
   );
@@ -59,14 +59,14 @@ export function CataloguedObjectViewPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage("cataloguedObjectViewTitle")} />
       <Nav />
-      {withResponse(physicalEntityQuery, ({ data: physicalEntity }) => (
+      {withResponse(materialSampleQuery, ({ data: materialSample }) => (
         <main className="container-fluid">
           {buttonBar}
           <h1>
             <DinaMessage id="cataloguedObjectViewTitle" />
           </h1>
-          <DinaForm<PhysicalEntity>
-            initialValues={physicalEntity}
+          <DinaForm<MaterialSample>
+            initialValues={materialSample}
             readOnly={true}
           >
             <CataloguedObjectFormLayout />

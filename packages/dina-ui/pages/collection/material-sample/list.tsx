@@ -11,51 +11,53 @@ import { GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 
-const CATALOGUED_OBJECT_FILTER_ATTRIBUTES: FilterAttribute[] = [
-  "dwcCatalogNumber",
+const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
   "createdBy",
+  "dwcCatalogNumber",
   {
     name: "createdOn",
     type: "DATE"
   }
 ];
 
-const CATALOGUED_OBJECT_TABLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
+const MATERIAL_SAMPLE_TABLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
   {
-    Cell: ({ original: { id, dwcCatalogNumber } }) => (
-      <Link href={`/collection/catalogued-object/view?id=${id}`}>
-        {dwcCatalogNumber || id}
+    Cell: ({ original: { id, name } }) => (
+      <Link href={`/collection/material-sample/view?id=${id}`}>
+        {name || id}
       </Link>
     ),
-    accessor: "dwcCatalogNumber"
+    accessor: "name",
+    sortable: false
   },
+  "dwcCatalogNumber",
   "createdBy",
   dateCell("createdOn")
 ];
 
-export default function CataloguedObjectListPage() {
+export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
 
   return (
     <div>
-      <Head title={formatMessage("cataloguedObjectListTitle")} />
+      <Head title={formatMessage("materialSampleListTitle")} />
       <Nav />
       <main className="container-fluid">
         <h1>
-          <DinaMessage id="cataloguedObjectListTitle" />
+          <DinaMessage id="materialSampleListTitle" />
         </h1>
         <ButtonBar>
-          <CreateButton entityLink="/collection/catalogued-object" />
+          <CreateButton entityLink="/collection/material-sample" />
         </ButtonBar>
         <ListPageLayout
           additionalFilters={filterForm => ({
             // Apply group filter:
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}
-          filterAttributes={CATALOGUED_OBJECT_FILTER_ATTRIBUTES}
+          filterAttributes={MATERIAL_SAMPLE_FILTER_ATTRIBUTES}
           id="material-sample-list"
           queryTableProps={{
-            columns: CATALOGUED_OBJECT_TABLE_COLUMNS,
+            columns: MATERIAL_SAMPLE_TABLE_COLUMNS,
             path: "collection-api/material-sample"
           }}
           filterFormchildren={({ submitForm }) => (

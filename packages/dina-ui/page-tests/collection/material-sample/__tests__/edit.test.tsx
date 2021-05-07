@@ -1,11 +1,13 @@
-import { CataloguedObjectForm } from "../../../../pages/collection/catalogued-object/edit";
+import { PersistedResource } from "kitsu";
+import { MaterialSampleForm } from "../../../../pages/collection/material-sample/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   CollectingEvent,
-  PhysicalEntity
+  MaterialSample
 } from "../../../../types/collection-api";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
 import { SRS } from "../../../../types/collection-api/resources/SRS";
+import Switch from "react-switch";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -23,13 +25,16 @@ function testCollectionEvent(): Partial<CollectingEvent> {
   };
 }
 
-function testCataloguedObject(): PhysicalEntity {
+function testMaterialSample(): PersistedResource<MaterialSample> {
   return {
     id: "1",
-    type: "physical-entity",
+    type: "material-sample",
     group: "test group",
     dwcCatalogNumber: "my-number",
-    collectingEvent: { id: "1", type: "collecting-event" } as CollectingEvent
+    collectingEvent: {
+      id: "1",
+      type: "collecting-event"
+    } as PersistedResource<CollectingEvent>
   };
 }
 
@@ -69,12 +74,15 @@ const mockGet = jest.fn<any, any>(async path => {
   if (path === "collection-api/managed-attribute") {
     return { data: [] };
   }
+  if (path === "objectstore-api/metadata") {
+    return { data: [] };
+  }
 });
 
 const mockSave = jest.fn<any, any>(async saves => {
   return saves.map(save => {
-    if (save.type === "physical-entity") {
-      return testCataloguedObject();
+    if (save.type === "material-sample") {
+      return testMaterialSample();
     }
     if (save.type === "collecting-event") {
       return testCollectionEvent();
@@ -100,21 +108,29 @@ const testCtx = {
 
 const mockOnSaved = jest.fn();
 
-describe("Catalogued Object Edit Page", () => {
+describe("Material Sample Edit Page", () => {
   beforeEach(jest.clearAllMocks);
 
-  it("Submits a new physical-entity with a new CollectingEvent.", async () => {
+  it("Submits a new material-sample with a new CollectingEvent.", async () => {
     const wrapper = mountWithAppContext(
-      <CataloguedObjectForm onSaved={mockOnSaved} />,
+      <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
 
     await new Promise(setImmediate);
     wrapper.update();
 
+    // Enable Collecting Event and catalogue info form sections:
+    wrapper.find(".enable-collecting-event").find(Switch).prop<any>("onChange")(
+      true
+    );
+    wrapper.find(".enable-catalogue-info").find(Switch).prop<any>("onChange")(
+      true
+    );
+
     wrapper
       .find(".dwcCatalogNumber-field input")
-      .simulate("change", { target: { value: "my-new-catalogued-object" } });
+      .simulate("change", { target: { value: "my-new-material-sample" } });
     wrapper
       .find(".startEventDateTime-field input")
       .simulate("change", { target: { value: "2019-12-21T16:00" } });
@@ -124,10 +140,10 @@ describe("Catalogued Object Edit Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Saves the Collecting Event and the Physical Entity:
+    // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
       [
-        // New physical-entity:
+        // New collecting-event:
         [
           {
             resource: {
@@ -149,7 +165,7 @@ describe("Catalogued Object Edit Page", () => {
         { apiBaseUrl: "/collection-api" }
       ],
       [
-        // New collecting-event:
+        // New material-sample:
         [
           {
             resource: {
@@ -157,9 +173,12 @@ describe("Catalogued Object Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
-              dwcCatalogNumber: "my-new-catalogued-object"
+              materialSampleName: expect.stringMatching(/test-user-.*/),
+              dwcCatalogNumber: "my-new-material-sample",
+              relationships: {},
+              type: "material-sample"
             },
-            type: "physical-entity"
+            type: "material-sample"
           }
         ],
         { apiBaseUrl: "/collection-api" }
@@ -167,18 +186,26 @@ describe("Catalogued Object Edit Page", () => {
     ]);
   });
 
-  it("Submits a new physical-entity linked to an existing CollectingEvent.", async () => {
+  it("Submits a new material-sample linked to an existing CollectingEvent.", async () => {
     const wrapper = mountWithAppContext(
-      <CataloguedObjectForm onSaved={mockOnSaved} />,
+      <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
     );
 
     await new Promise(setImmediate);
     wrapper.update();
 
+    // Enable Collecting Event and catalogue info form sections:
+    wrapper.find(".enable-collecting-event").find(Switch).prop<any>("onChange")(
+      true
+    );
+    wrapper.find(".enable-catalogue-info").find(Switch).prop<any>("onChange")(
+      true
+    );
+
     wrapper
       .find(".dwcCatalogNumber-field input")
-      .simulate("change", { target: { value: "my-new-catalogued-object" } });
+      .simulate("change", { target: { value: "my-new-material-sample" } });
 
     wrapper.find("button.collecting-event-link-button").simulate("click");
 
@@ -190,7 +217,7 @@ describe("Catalogued Object Edit Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Saves the Collecting Event and the Physical Entity:
+    // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
       [
         // Saves the existing Collecting Event:
@@ -211,7 +238,7 @@ describe("Catalogued Object Edit Page", () => {
         { apiBaseUrl: "/collection-api" }
       ],
       [
-        // New physical-entity:
+        // New material-sample:
         [
           {
             resource: {
@@ -219,9 +246,12 @@ describe("Catalogued Object Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
-              dwcCatalogNumber: "my-new-catalogued-object"
+              materialSampleName: expect.stringMatching(/test-user-.*/),
+              dwcCatalogNumber: "my-new-material-sample",
+              type: "material-sample",
+              relationships: {}
             },
-            type: "physical-entity"
+            type: "material-sample"
           }
         ],
         { apiBaseUrl: "/collection-api" }
@@ -229,10 +259,10 @@ describe("Catalogued Object Edit Page", () => {
     ]);
   });
 
-  it("Edits an existing physical-entity", async () => {
+  it("Edits an existing material-sample", async () => {
     const wrapper = mountWithAppContext(
-      <CataloguedObjectForm
-        cataloguedObject={testCataloguedObject()}
+      <MaterialSampleForm
+        materialSample={testMaterialSample()}
         onSaved={mockOnSaved}
       />,
       testCtx
@@ -275,17 +305,18 @@ describe("Catalogued Object Edit Page", () => {
         { apiBaseUrl: "/collection-api" }
       ],
       [
-        // Edits existing physical-entity:
+        // Edits existing material-sample:
         [
           {
             resource: {
               id: "1",
-              type: "physical-entity",
+              type: "material-sample",
               group: "test group",
               dwcCatalogNumber: "edited-catalog-number",
-              collectingEvent: { id: "1", type: "collecting-event" }
+              collectingEvent: { id: "1", type: "collecting-event" },
+              relationships: {}
             },
-            type: "physical-entity"
+            type: "material-sample"
           }
         ],
         { apiBaseUrl: "/collection-api" }
@@ -295,8 +326,8 @@ describe("Catalogued Object Edit Page", () => {
 
   it("Lets you remove the attached Collecting Event.", async () => {
     const wrapper = mountWithAppContext(
-      <CataloguedObjectForm
-        cataloguedObject={testCataloguedObject()}
+      <MaterialSampleForm
+        materialSample={testMaterialSample()}
         onSaved={mockOnSaved}
       />,
       testCtx
@@ -354,7 +385,7 @@ describe("Catalogued Object Edit Page", () => {
         { apiBaseUrl: "/collection-api" }
       ],
       [
-        // Existing physical-entity updated:
+        // Existing material-sample updated:
         [
           {
             resource: {
@@ -365,9 +396,10 @@ describe("Catalogued Object Edit Page", () => {
               dwcCatalogNumber: "my-number",
               group: "test group",
               id: "1",
-              type: "physical-entity"
+              type: "material-sample",
+              relationships: {}
             },
-            type: "physical-entity"
+            type: "material-sample"
           }
         ],
         { apiBaseUrl: "/collection-api" }

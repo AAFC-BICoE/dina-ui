@@ -18,7 +18,8 @@ body {
   line-height: 1.4375;
 }
 a {
-  /* color: #284162; Removed for better visibility. */
+  /* need this to resolve 23 link color ratio issuses*/
+  color: #0000cc;
   text-decoration: underline;
 }
 .form-control::placeholder {
@@ -382,4 +383,9 @@ a.btn,
 .btn-info:hover {
   background-color: #18666d;
   border-color: #18666d;
+}
+
+a.nav-link.dropdown-toggle {
+  /* fix Element's background color could not be determined because it's partially obscured by another element */
+  background: #38414d;
 }
