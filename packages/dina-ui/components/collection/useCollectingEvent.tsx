@@ -3,7 +3,7 @@ import { useApiClient, useQuery } from "common-ui";
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
 import { orderBy } from "lodash";
-import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/collection-api";
 import { CoordinateSystemEnum } from "../../types/collection-api/resources/CoordinateSystem";
 import { SRSEnum } from "../../types/collection-api/resources/SRS";
@@ -155,7 +155,8 @@ export function useCollectingEventSave(
   // The selected Metadatas to be attached to this Collecting Event:
   const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal({
     initialMetadatas: fetchedCollectingEvent?.attachment as PersistedResource<Metadata>[],
-    deps: [fetchedCollectingEvent?.id]
+    deps: [fetchedCollectingEvent?.id],
+    title: <DinaMessage id="collectingEventAttachments" />
   });
 
   async function saveCollectingEvent(

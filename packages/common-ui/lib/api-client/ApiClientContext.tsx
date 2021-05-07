@@ -2,6 +2,7 @@ import { AxiosError } from "axios";
 import { cacheAdapterEnhancer } from "axios-extensions";
 import Kitsu, { GetParams, KitsuResource, PersistedResource } from "kitsu";
 import { deserialise, error as kitsuError, query } from "kitsu-core";
+import { keys } from "lodash";
 import LRUCache from "lru-cache";
 import React, { PropsWithChildren, useContext, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -330,7 +331,17 @@ export class CustomDinaKitsu extends Kitsu {
         paramsSerializer: p => query(p)
       });
 
-      return deserialise(data);
+      const deserialized = await deserialise(data);
+
+      // Omit relationships where: { data: null } because they do not deserialize properly:
+      const relationships = deserialized?.data?.relationships;
+      for (const key of keys(relationships)) {
+        if (relationships?.[key]?.data === null) {
+          delete relationships[key];
+        }
+      }
+
+      return deserialized;
     } catch (E) {
       throw kitsuError(E);
     }

@@ -5,36 +5,25 @@ import {
   filterBy,
   FormattedTextField,
   FormikButton,
+  LoadingSpinner,
   NominatumApiSearchResult,
   ResourceSelectField,
   TextField,
-  useDinaFormContext,
   TextFieldWithCoordButtons,
   TextFieldWithRemoveButton,
-  LoadingSpinner
+  useDinaFormContext
 } from "common-ui";
 import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
-import { SRS } from "../../types/collection-api/resources/SRS";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { ShouldRenderReasons } from "react-autosuggest";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import {
-  GeographySearchBox,
-  GeoReferenceAssertionRow,
-  GroupSelectField,
-  nominatimAddressDetailSearch,
-  useAddPersonModal,
-  NominatumApiAddressDetailSearchResult,
-  NominatimAddressDetailSearchProps
-} from "..";
+import useSWR from "swr";
+import { GeographySearchBox, GeoReferenceAssertionRow } from ".";
+import { GroupSelectField, useAddPersonModal } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
-import {
-  geographicPlaceSourceUrl,
-  SourceAdministrativeLevel
-} from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import {
   CollectingEvent,
   GeographicPlaceNameSource
@@ -44,11 +33,20 @@ import {
   CoordinateSystemEnum,
   CoordinateSystemEnumPlaceHolder
 } from "../../types/collection-api/resources/CoordinateSystem";
+import {
+  geographicPlaceSourceUrl,
+  SourceAdministrativeLevel
+} from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
+import { SRS } from "../../types/collection-api/resources/SRS";
 import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
 import { ManagedAttributesEditor } from "../object-store/managed-attributes/ManagedAttributesEditor";
 import { ManagedAttributesViewer } from "../object-store/managed-attributes/ManagedAttributesViewer";
+import {
+  nominatimAddressDetailSearch,
+  NominatimAddressDetailSearchProps,
+  NominatumApiAddressDetailSearchResult
+} from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
-import useSWR from "swr";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -774,7 +772,9 @@ export function CollectingEventFormLayout({
       </FieldSet>
       <div className="row">
         <div className="col-md-6">
-          <FieldSet legend={<DinaMessage id="managedAttributeListTitle" />}>
+          <FieldSet
+            legend={<DinaMessage id="collectingEventManagedAttributes" />}
+          >
             {readOnly ? (
               <FastField name="managedAttributeValues">
                 {({ field: { value } }) => (
@@ -806,6 +806,7 @@ export function CollectingEventFormLayout({
               <AttachmentReadOnlySection
                 attachmentPath={`collection-api/collecting-event/${id}/attachment`}
                 detachTotalSelected={true}
+                title={<DinaMessage id="collectingEventAttachments" />}
               />
             )}
           </Field>
