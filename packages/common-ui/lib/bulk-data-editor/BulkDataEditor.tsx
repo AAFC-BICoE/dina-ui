@@ -3,6 +3,7 @@ import { FormikContextType, useFormikContext } from "formik";
 import { GridSettings } from "handsontable";
 import { cloneDeep, isEmpty, isEqual, zipWith } from "lodash";
 import dynamic from "next/dynamic";
+import { useLayoutEffect } from "react";
 import { Component, useEffect, useState } from "react";
 import { PartialDeep } from "type-fest";
 import { FormikButton } from "../formik-connected/FormikButton";
@@ -75,7 +76,6 @@ export function BulkDataEditor<TRow>({
     const newWorkingData = cloneDeep(loadedData);
     await applyCustomDefaultValues?.(newWorkingData);
     setWorkingTableData(newWorkingData);
-
     setLoading(false);
   });
 
@@ -83,6 +83,22 @@ export function BulkDataEditor<TRow>({
   useEffect(() => {
     loadDataInternal({}, formik);
   }, [lastSave]);
+
+  useLayoutEffect(() => {
+    makeHotTableContenHolderFocusable();
+  }, []);
+
+  const makeHotTableContenHolderFocusable = () => {
+    // Fix Ensure that scrollable region has keyboard access (making the scrollable region focusable)
+    const htHolder = tableWrapperRef.current?.querySelector<HTMLDivElement>(
+      ".ht_master .wtHolder"
+    );
+
+    if (htHolder) {
+      htHolder.style.overflowY = "auto";
+      htHolder.tabIndex = 0;
+    }
+  };
 
   // Show initial data loading errors here:
   const loadingFailed =
@@ -132,13 +148,17 @@ export function BulkDataEditor<TRow>({
         /* Fix the place holder color contrast */        
         .htPlaceholder.htAutocomplete {
           color: rgb(51,51,51);
-        }
+        }        
       `}</style>
       {validationAlertJsx}
       <div
         className="form-group"
         // Setting the width/height and overflowX:hidden here is detected by Handsontable and enables horizontal scrolling:
-        style={{ height: "100%", width: "100%", overflowX: "hidden" }}
+        style={{
+          height: "100%",
+          width: "100%",
+          overflowX: "hidden"
+        }}
       >
         <DynamicHotTable
           afterValidate={afterValidate}
