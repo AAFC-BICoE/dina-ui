@@ -82,7 +82,7 @@ export function CollectingEventFormLayout({
 
   const [customPlaceValue, setCustomPlaceValue] = useState<string>("");
   const [hideCustomPlace, setHideCustomPlace] = useState(true);
-  const [hideCloseBtn, setHideCloseBtn] = useState(true);
+  const [hideRemoveBtn, setHideRemoveBtn] = useState(true);
   const [selectedSearchResult, setSelectedSearchResult] = useState<{}>();
 
   const { isValidating: detailResultsIsLoading } = useSWR(
@@ -164,7 +164,7 @@ export function CollectingEventFormLayout({
     const geoNameParsed = parseGeoAdminLevels(detailResults as any, formik);
     formik.setFieldValue("srcAdminLevels", geoNameParsed);
     setHideCustomPlace(false);
-    setHideCloseBtn(false);
+    setHideRemoveBtn(false);
   }
 
   function parseGeoAdminLevels(
@@ -181,6 +181,7 @@ export function CollectingEventFormLayout({
         addr.type !== "country_code" &&
         addr.place_type !== "province" &&
         addr.place_type !== "state" &&
+        addr.place_type !== "country" &&
         addr.isaddress &&
         (addr.osm_id || addr.place_id)
       ) {
@@ -222,7 +223,7 @@ export function CollectingEventFormLayout({
     formik.setFieldValue("srcAdminLevels", null);
     setCustomPlaceValue("");
     setHideCustomPlace(true);
-    setHideCloseBtn(true);
+    setHideRemoveBtn(true);
   }
 
   /** Does a Places search using the given search string. */
@@ -642,7 +643,7 @@ export function CollectingEventFormLayout({
                                         removeItem={removeItem}
                                         key={Math.random()}
                                         index={idx}
-                                        hideCloseBtn={hideCloseBtn}
+                                        hideCloseBtn={hideRemoveBtn}
                                         inputProps={{
                                           style: {
                                             backgroundColor: `${
