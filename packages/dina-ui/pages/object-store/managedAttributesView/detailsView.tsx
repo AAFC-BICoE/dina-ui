@@ -80,7 +80,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
 
   const id = profile?.id;
 
-  const initialValues: Partial<ManagedAttributeFormFields> = profile || {
+  const initialValues: Partial<ManagedAttribute> = profile || {
     type: "managed-attribute"
   };
 
@@ -104,32 +104,32 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
 
   const onSubmit: DinaFormOnSubmit<Partial<ManagedAttribute>> = async ({
     api: { save },
-    submittedValues: { ...managedAttribute }
+    submittedValues
   }) => {
     // Treat empty array or undefined as null:
-    if (!managedAttribute.acceptedValues?.length) {
-      managedAttribute.acceptedValues = null;
+    if (!submittedValues.acceptedValues?.length) {
+      submittedValues.acceptedValues = null;
     }
 
-    if (!managedAttribute.name || !managedAttribute.managedAttributeType) {
+    if (!submittedValues.name || !submittedValues.managedAttributeType) {
       throw new Error(
         formatMessage("field_managedAttributeMandatoryFieldsError")
       );
     }
 
-    if (managedAttribute.managedAttributeType === "PICKLIST") {
-      managedAttribute.managedAttributeType = "STRING";
+    if (submittedValues.managedAttributeType === "PICKLIST") {
+      submittedValues.managedAttributeType = "STRING";
     } else if (
-      managedAttribute.managedAttributeType === "INTEGER" ||
-      managedAttribute.managedAttributeType === "STRING"
+      submittedValues.managedAttributeType === "INTEGER" ||
+      submittedValues.managedAttributeType === "STRING"
     ) {
-      managedAttribute.acceptedValues = null;
+      submittedValues.acceptedValues = null;
     }
 
     await save(
       [
         {
-          resource: managedAttribute,
+          resource: { type: "managed-attribute", ...submittedValues },
           type: "managed-attribute"
         }
       ],
