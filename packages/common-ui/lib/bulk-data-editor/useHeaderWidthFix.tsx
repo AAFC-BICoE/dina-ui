@@ -17,6 +17,16 @@ export function useHeaderWidthFix({ columns }: HeaderWidthFixParams) {
     setImmediate(() => {
       const wrapper = tableWrapperRef.current;
 
+      const makeHotTableContenHolderFocusable = () => {
+        // Fix Ensure that scrollable region has keyboard access (making the scrollable region focusable)
+        const htHolder = wrapper?.querySelector<HTMLDivElement>(
+          ".ht_master .wtHolder"
+        );
+        if (htHolder) {
+          htHolder.style.overflowY = "auto";
+          htHolder.tabIndex = 0;
+        }
+      };
       if (wrapper) {
         const header = wrapper.querySelector<HTMLDivElement>(
           ".ht_clone_top .wtHider"
@@ -29,6 +39,8 @@ export function useHeaderWidthFix({ columns }: HeaderWidthFixParams) {
           const requiredHeaderWidth = `${htCore.clientWidth}px`;
           header.style.width = requiredHeaderWidth;
         }
+
+        makeHotTableContenHolderFocusable();
       }
     });
   }, []);

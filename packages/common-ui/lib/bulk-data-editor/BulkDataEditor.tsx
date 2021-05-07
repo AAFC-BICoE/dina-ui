@@ -84,22 +84,6 @@ export function BulkDataEditor<TRow>({
     loadDataInternal({}, formik);
   }, [lastSave]);
 
-  useLayoutEffect(() => {
-    makeHotTableContenHolderFocusable();
-  }, []);
-
-  const makeHotTableContenHolderFocusable = () => {
-    // Fix Ensure that scrollable region has keyboard access (making the scrollable region focusable)
-    const htHolder = tableWrapperRef.current?.querySelector<HTMLDivElement>(
-      ".ht_master .wtHolder"
-    );
-
-    if (htHolder) {
-      htHolder.style.overflowY = "auto";
-      htHolder.tabIndex = 0;
-    }
-  };
-
   // Show initial data loading errors here:
   const loadingFailed =
     (!workingTableData || !initialTableData) && formik.status;
@@ -110,6 +94,16 @@ export function BulkDataEditor<TRow>({
   // Show loading state here:
   if (loading || !workingTableData || !initialTableData) {
     return <LoadingSpinner loading={true} />;
+  } else {
+    // console.log("tableWrapperRef.current " + tableWrapperRef.current?.innerHTML) ;
+    // const htHolder = tableWrapperRef.current?.querySelector<HTMLDivElement>(
+    //   ".ht_master .wtHolder"
+    // );
+    // console.log("htHolder " + JSON.stringify(htHolder)) ;
+    // if (htHolder) {
+    //   htHolder.style.overflowY = "auto";
+    //   htHolder.tabIndex = 0;
+    // }
   }
 
   const onSubmitInternal: OnFormikSubmit = async (
