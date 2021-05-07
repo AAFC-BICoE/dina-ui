@@ -10,7 +10,8 @@ import {
   TextField,
   useDinaFormContext,
   TextFieldWithCoordButtons,
-  TextFieldWithRemoveButton
+  TextFieldWithRemoveButton,
+  LoadingSpinner
 } from "common-ui";
 import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
@@ -25,7 +26,8 @@ import {
   GroupSelectField,
   nominatimAddressDetailSearch,
   useAddPersonModal,
-  NominatumApiAddressDetailSearchResult
+  NominatumApiAddressDetailSearchResult,
+  NominatimAddressDetailSearchProps
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
@@ -46,6 +48,7 @@ import { AttachmentReadOnlySection } from "../object-store/attachment-list/Attac
 import { ManagedAttributesEditor } from "../object-store/managed-attributes/ManagedAttributesEditor";
 import { ManagedAttributesViewer } from "../object-store/managed-attributes/ManagedAttributesViewer";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
+import useSWR from "swr";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -78,7 +81,19 @@ export function CollectingEventFormLayout({
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
   const [customPlaceValue, setCustomPlaceValue] = useState<string>("");
-  const [displayCustomPlace, setDisplayCustomPlace] = useState(true);
+  const [hideCustomPlace, setHideCustomPlace] = useState(true);
+  const [hideCloseBtn, setHideCloseBtn] = useState(true);
+  const [selectedSearchResult, setSelectedSearchResult] = useState<{}>();
+
+  const { isValidating: detailResultsIsLoading } = useSWR(
+    [selectedSearchResult, "nominatimAddressDetailSearch"],
+    nominatimAddressDetailSearch,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false
+    }
+  );
+
   const commonSrcDetailRoot = "geographicPlaceNameSourceDetail";
 
   function toggleRangeEnabled(
@@ -95,6 +110,15 @@ export function CollectingEventFormLayout({
     result: NominatumApiSearchResult,
     formik: FormikContextType<{}>
   ) {
+    const osmTypeForSearch =
+      result?.osm_type === "relation"
+        ? "R"
+        : result?.osm_type === "way"
+        ? "W"
+        : result?.osm_type === "node"
+        ? "N"
+        : "N";
+
     formik.setFieldValue(
       `${commonSrcDetailRoot}.country.name`,
       result?.address?.country || null
@@ -112,22 +136,6 @@ export function CollectingEventFormLayout({
       result?.osm_type || null
     );
 
-    const osmTypeForSearch =
-      result?.osm_type === "relation"
-        ? "R"
-        : result?.osm_type === "way"
-        ? "W"
-        : result?.osm_type === "node"
-        ? "N"
-        : "N";
-
-    const detailResults: NominatumApiAddressDetailSearchResult | null = await nominatimAddressDetailSearch(
-      {
-        osmid: result.osm_id,
-        osmtype: osmTypeForSearch,
-        class: result.category
-      }
-    );
     formik.setFieldValue(
       `${commonSrcDetailRoot}.sourceUrl`,
       `${geographicPlaceSourceUrl}osmtype=${osmTypeForSearch}&osmid=${result.osm_id}`
@@ -137,9 +145,26 @@ export function CollectingEventFormLayout({
       GeographicPlaceNameSource.OSM
     );
 
-    const geoNameParsed = parseGeoAdminLevels(detailResults, formik);
+    // get the address detail with another nomiature call
+
+    const detailSearchProps: NominatimAddressDetailSearchProps = {
+      urlValue: {
+        osmid: result.osm_id,
+        osmtype: osmTypeForSearch,
+        class: result.category
+      },
+      updateAdminLevels,
+      formik
+    };
+
+    setSelectedSearchResult(detailSearchProps);
+  }
+
+  function updateAdminLevels(detailResults, formik) {
+    const geoNameParsed = parseGeoAdminLevels(detailResults as any, formik);
     formik.setFieldValue("srcAdminLevels", geoNameParsed);
-    setDisplayCustomPlace(false);
+    setHideCustomPlace(false);
+    setHideCloseBtn(false);
   }
 
   function parseGeoAdminLevels(
@@ -196,7 +221,8 @@ export function CollectingEventFormLayout({
 
     formik.setFieldValue("srcAdminLevels", null);
     setCustomPlaceValue("");
-    setDisplayCustomPlace(true);
+    setHideCustomPlace(true);
+    setHideCloseBtn(true);
   }
 
   /** Does a Places search using the given search string. */
@@ -258,7 +284,7 @@ export function CollectingEventFormLayout({
     const srcAdminLevels = form.values.srcAdminLevels;
     srcAdminLevels.unshift(customPlaceAsInSrcAdmnLevel);
     form.setFieldValue("srcAdminLevels", srcAdminLevels);
-    setDisplayCustomPlace(true);
+    setHideCustomPlace(true);
   };
 
   return (
@@ -559,7 +585,7 @@ export function CollectingEventFormLayout({
                   {({ field: { value: detail }, form }) =>
                     detail ? (
                       <div>
-                        {!displayCustomPlace && !readOnly && (
+                        {!hideCustomPlace && !readOnly && (
                           <div className="m-3">
                             <div className="d-flex flex-row">
                               <label
@@ -595,37 +621,44 @@ export function CollectingEventFormLayout({
                             </div>
                           </div>
                         )}
-                        {form.values.srcAdminLevels?.length > 0 && (
-                          <FieldArray name="srcAdminLevels">
-                            {({ remove }) => {
-                              const geoNames = form.values.srcAdminLevels;
-                              function removeItem(index: number) {
-                                remove(index);
-                              }
-                              return (
-                                <div className="pb-4">
-                                  {geoNames.map((_, idx) => (
-                                    <TextFieldWithRemoveButton
-                                      name={`srcAdminLevels[${idx}].name`}
-                                      readOnly={true}
-                                      removeLabel={true}
-                                      removeFormGroupClass={true}
-                                      removeItem={removeItem}
-                                      key={Math.random()}
-                                      index={idx}
-                                      inputProps={{
-                                        style: {
-                                          backgroundColor: `${
-                                            idx % 2 === 0 ? "#e9ecef" : "white"
-                                          }`
-                                        }
-                                      }}
-                                    />
-                                  ))}
-                                </div>
-                              );
-                            }}
-                          </FieldArray>
+                        {detailResultsIsLoading ? (
+                          <LoadingSpinner loading={true} />
+                        ) : (
+                          form.values.srcAdminLevels?.length > 0 && (
+                            <FieldArray name="srcAdminLevels">
+                              {({ remove }) => {
+                                const geoNames = form.values.srcAdminLevels;
+                                function removeItem(index: number) {
+                                  remove(index);
+                                }
+                                return (
+                                  <div className="pb-4">
+                                    {geoNames.map((_, idx) => (
+                                      <TextFieldWithRemoveButton
+                                        name={`srcAdminLevels[${idx}].name`}
+                                        readOnly={true}
+                                        removeLabel={true}
+                                        removeFormGroupClass={true}
+                                        removeItem={removeItem}
+                                        key={Math.random()}
+                                        index={idx}
+                                        hideCloseBtn={hideCloseBtn}
+                                        inputProps={{
+                                          style: {
+                                            backgroundColor: `${
+                                              idx % 2 === 0
+                                                ? "#e9ecef"
+                                                : "white"
+                                            }`
+                                          }
+                                        }}
+                                      />
+                                    ))}
+                                  </div>
+                                );
+                              }}
+                            </FieldArray>
+                          )
                         )}
                         <DinaFormSection horizontal={[3, 9]}>
                           <TextField

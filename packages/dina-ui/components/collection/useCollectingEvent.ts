@@ -233,7 +233,10 @@ export function useCollectingEventSave(
     }
 
     // Parse srcAdminLevels to geographicPlaceNameSourceDetail
+    submittedValues.geographicPlaceNameSourceDetail = null;
+
     if (submittedValues.srcAdminLevels?.length > 0) {
+      submittedValues.geographicPlaceNameSourceDetail = {};
       if (submittedValues.srcAdminLevels?.length > 1)
         submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces = [];
       submittedValues.srcAdminLevels.map((srcAdminLevel, idx) => {
@@ -253,12 +256,10 @@ export function useCollectingEventSave(
           ) {
             submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace =
               srcAdminLevel.name;
-            delete submittedValues.geographicPlaceNameSourceDetail
-              .selectedGeographicPlace;
+            submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = null;
           } else {
             submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = srcAdminLevel;
-            delete submittedValues.geographicPlaceNameSourceDetail
-              .customGeographicPlace;
+            submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace = null;
           }
         } else {
           submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces.push(
@@ -273,8 +274,7 @@ export function useCollectingEventSave(
       submittedValues.geographicPlaceNameSourceDetail?.higherGeographicPlaces
         ?.length === 0
     )
-      delete submittedValues.geographicPlaceNameSourceDetail
-        .higherGeographicPlaces;
+      submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces = null;
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [

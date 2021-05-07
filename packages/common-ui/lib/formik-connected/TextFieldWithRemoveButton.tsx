@@ -4,13 +4,14 @@ import { TextField, TextFieldProps } from "./TextField";
 interface TextFieldWithRemoveButtonProps extends TextFieldProps {
   removeItem?: (idx: number) => void;
   index?: number;
+  hideCloseBtn?: boolean;
 }
 
 export function TextFieldWithRemoveButton(
   props: TextFieldWithRemoveButtonProps
 ) {
   const [shouldRemove, setShouldRemove] = useState(false);
-  const { removeItem, index } = props;
+  const { removeItem, index, hideCloseBtn } = props;
 
   /* Clear the input value and remove the whole wrapping div */
   const removeEntry = onChange => {
@@ -29,7 +30,9 @@ export function TextFieldWithRemoveButton(
           <input {...inputProps} type="text" />
           <div className="input-group-append">
             <button
-              className="btn btn-danger self-remove-button"
+              className={`btn btn-danger self-remove-button ${
+                hideCloseBtn ? "d-none" : ""
+              }`}
               style={{ height: "97%" }}
               aria-label="Close"
               onClick={() => removeEntry(inputProps.onChange)}

@@ -6,8 +6,7 @@ import {
   NominatumApiSearchResult,
   OnFormikSubmit,
   Tooltip,
-  FormikButton,
-  InputWithCoordButtons
+  FormikButton
 } from "common-ui";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { FormikContextType } from "formik";
@@ -42,7 +41,15 @@ export interface NominatumApiAddressDetailSearchResult {
   address?: AddressDetail[];
 }
 
-export async function nominatimAddressDetailSearch(urlValue: {}): Promise<NominatumApiAddressDetailSearchResult | null> {
+export interface NominatimAddressDetailSearchProps {
+  urlValue: {};
+  updateAdminLevels: (detailResult, formik) => void;
+  formik: FormikContextType<any>;
+}
+export async function nominatimAddressDetailSearch(
+  props: NominatimAddressDetailSearchProps
+) {
+  const { urlValue, updateAdminLevels, formik } = props;
   if (!Object.keys(urlValue)) {
     return null;
   }
@@ -65,10 +72,12 @@ export async function nominatimAddressDetailSearch(urlValue: {}): Promise<Nomina
     if (response.error) {
       throw new Error(String(response.error));
     }
-    return response as NominatumApiAddressDetailSearchResult;
+    updateAdminLevels(
+      response as NominatumApiAddressDetailSearchResult,
+      formik
+    );
   } catch (error) {
     console.error(error);
-    return null;
   }
 }
 
