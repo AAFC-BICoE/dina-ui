@@ -62,23 +62,13 @@ describe("PersonForm", () => {
     );
   });
 
-  it("Renders the aliases array as a multi-line text input.", async () => {
-    const wrapper = mountWithAppContext(
-      <PersonForm person={TEST_PERSON_WITH_ALIASES} />
-    );
-
-    expect(
-      wrapper.find(".aliasesAsLines-field textarea").prop("value")
-    ).toEqual(["alias1", "alias2", "alias3", ""].join("\n"));
-  });
-
   it("Submits the aliases as any array.", async () => {
     const wrapper = mountWithAppContext(
       <PersonForm person={TEST_PERSON_WITH_ALIASES} />,
       { apiContext: { apiClient: { get: mockGet } as any, save: mockSave } }
     );
 
-    wrapper.find(".aliasesAsLines-field textarea").prop<any>("onChange")({
+    wrapper.find(".aliases-field textarea").prop<any>("onChange")({
       target: { value: ["new-alias1", "new-alias2"].join("\n") }
     });
     wrapper.update();

@@ -85,9 +85,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   existingAttachments: "Existing Attachments",
   feedbackButtonText: "Feedback",
   field_acceptedValues: "Accepted Values",
-  field_acceptedValuesAsLines: "Accepted Values (One value per line)",
-  field_acceptedValuesAsLines_tooltip:
-    "Write one accepted value per line. Press enter while typing in the field to add a new line.",
   field_acCaption: "Caption",
   field_acSubtype: "Ac Subtype",
   field_acDerivedFrom: "Derived From",
@@ -103,9 +100,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_acSubType: "Object SubType",
   field_acTags: "Tags",
   field_aliases: "Aliases",
-  field_aliasesAsLines: "Aliases (One value per line)",
-  field_aliasesAsLines_tooltip:
-    "Write one accepted value per line. Press enter while typing in the field to add a new line.",
   "field_dcCreator.displayName": "Digitized By",
   field_attributesTemplate: "Set Attributes Template",
   field_collectingEvent_endDateTimeError:

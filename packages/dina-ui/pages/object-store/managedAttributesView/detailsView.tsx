@@ -8,6 +8,7 @@ import {
   LoadingSpinner,
   Query,
   SelectField,
+  StringArrayField,
   SubmitButton,
   TextField
 } from "common-ui";
@@ -22,10 +23,6 @@ import {
   ManagedAttributeType,
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../../types/objectstore-api/resources/ManagedAttribute";
-
-interface ManagedAttributeFormFields extends ManagedAttribute {
-  acceptedValuesAsLines?: string;
-}
 
 interface ManagedAttributeFormProps {
   profile?: ManagedAttribute;
@@ -101,25 +98,14 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
     initialValues.managedAttributeType = "PICKLIST";
   }
 
-  // Convert acceptedValues to easily editable string format:
-  initialValues.acceptedValuesAsLines =
-    initialValues.acceptedValues?.concat("")?.join("\n") ?? "";
-
   const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
     ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
   );
 
-  const onSubmit: DinaFormOnSubmit<ManagedAttributeFormFields> = async ({
+  const onSubmit: DinaFormOnSubmit<Partial<ManagedAttribute>> = async ({
     api: { save },
-    submittedValues: { acceptedValuesAsLines, ...managedAttribute }
+    submittedValues: { ...managedAttribute }
   }) => {
-    // Convert user-suplied string to string array:
-    managedAttribute.acceptedValues = (acceptedValuesAsLines || "")
-      // Split by line breaks:
-      .match(/[^\r\n]+/g)
-      // Remove empty lines:
-      ?.filter(line => line.trim());
-
     // Treat empty array or undefined as null:
     if (!managedAttribute.acceptedValues?.length) {
       managedAttribute.acceptedValues = null;
@@ -188,7 +174,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       </div>
       {type === "PICKLIST" && (
         <div style={{ width: "300px" }}>
-          <TextField name="acceptedValuesAsLines" multiLines={true} />
+          <StringArrayField name="acceptedValues" />
         </div>
       )}
       {id && (
