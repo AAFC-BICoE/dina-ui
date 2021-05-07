@@ -6,8 +6,7 @@ import {
   NominatumApiSearchResult,
   OnFormikSubmit,
   Tooltip,
-  FormikButton,
-  InputWithCoordButtons
+  FormikButton
 } from "common-ui";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { FormikContextType } from "formik";
@@ -20,6 +19,66 @@ interface GeographySearchBoxProps {
 
   /** Extra JSX to render under the search bar. */
   renderUnderSearchBar?: ReactNode;
+}
+
+export interface AddressDetail {
+  localname?: string;
+  osm_id?: string;
+  osm_type?: string;
+  place_type?: string;
+  class?: string;
+  type?: string;
+  isaddress?: boolean;
+  place_id?: string;
+}
+
+export interface NominatumApiAddressDetailSearchResult {
+  place_id?: string;
+  osm_type?: string;
+  osm_id?: string;
+  category?: string;
+  localname?: string;
+  address?: AddressDetail[];
+}
+
+export interface NominatimAddressDetailSearchProps {
+  urlValue: {};
+  updateAdminLevels: (detailResult, formik) => void;
+  formik: FormikContextType<any>;
+}
+export async function nominatimAddressDetailSearch(
+  props: NominatimAddressDetailSearchProps
+) {
+  const { urlValue, updateAdminLevels, formik } = props;
+  if (!Object.keys(urlValue)) {
+    return null;
+  }
+  const url = new URL(`https://nominatim.openstreetmap.org/details.php`);
+
+  url.search = new URLSearchParams({
+    ...urlValue,
+    addressdetails: "1",
+    hierarchy: "0",
+    group_hierarchy: "1",
+    polygon_geojson: "1",
+    format: "json"
+  }).toString();
+
+  const fetchJson = urlArg => window.fetch(urlArg).then(res => res.json());
+
+  try {
+    const response = await fetchJson(url.toString());
+
+    if (response.error) {
+      throw new Error(String(response.error));
+    }
+    updateAdminLevels(
+      response as NominatumApiAddressDetailSearchResult,
+      formik
+    );
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 async function nominatimSearch(

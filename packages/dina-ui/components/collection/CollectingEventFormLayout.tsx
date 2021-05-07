@@ -5,10 +5,12 @@ import {
   filterBy,
   FormattedTextField,
   FormikButton,
+  LoadingSpinner,
   NominatumApiSearchResult,
   ResourceSelectField,
   TextField,
   TextFieldWithCoordButtons,
+  TextFieldWithRemoveButton,
   useDinaFormContext
 } from "common-ui";
 import { FastField, Field, FieldArray, FormikContextType } from "formik";
@@ -17,11 +19,17 @@ import { useState } from "react";
 import { ShouldRenderReasons } from "react-autosuggest";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { GroupSelectField, useAddPersonModal } from "..";
+import useSWR from "swr";
 import { GeographySearchBox, GeoReferenceAssertionRow } from ".";
+import {
+  GroupSelectField,
+  nominatimAddressDetailSearch,
+  NominatimAddressDetailSearchProps,
+  NominatumApiAddressDetailSearchResult,
+  useAddPersonModal
+} from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
-import { geographicPlaceSourceUrl } from "../../types/collection-api/GeographicPlaceNameSourceDetail";
 import {
   CollectingEvent,
   GeographicPlaceNameSource
@@ -31,6 +39,10 @@ import {
   CoordinateSystemEnum,
   CoordinateSystemEnumPlaceHolder
 } from "../../types/collection-api/resources/CoordinateSystem";
+import {
+  geographicPlaceSourceUrl,
+  SourceAdministrativeLevel
+} from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { SRS } from "../../types/collection-api/resources/SRS";
 import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
 import { ManagedAttributesEditor } from "../object-store/managed-attributes/ManagedAttributesEditor";
@@ -67,6 +79,22 @@ export function CollectingEventFormLayout({
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
+  const [customPlaceValue, setCustomPlaceValue] = useState<string>("");
+  const [hideCustomPlace, setHideCustomPlace] = useState(true);
+  const [hideRemoveBtn, setHideRemoveBtn] = useState(true);
+  const [selectedSearchResult, setSelectedSearchResult] = useState<{}>();
+
+  const { isValidating: detailResultsIsLoading } = useSWR(
+    [selectedSearchResult, "nominatimAddressDetailSearch"],
+    nominatimAddressDetailSearch,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false
+    }
+  );
+
+  const commonSrcDetailRoot = "geographicPlaceNameSourceDetail";
+
   function toggleRangeEnabled(
     newValue: boolean,
     formik: FormikContextType<{}>
@@ -77,43 +105,124 @@ export function CollectingEventFormLayout({
     setRangeEnabled(newValue);
   }
 
-  function selectSearchResult(
+  async function selectSearchResult(
     result: NominatumApiSearchResult,
     formik: FormikContextType<{}>
   ) {
-    // Set locality fields:
-    formik.setFieldValue("dwcCountry", result?.address?.country || null);
-    formik.setFieldValue("dwcStateProvince", result?.address?.state || null);
-    formik.setFieldValue("geographicPlaceName", result?.display_name || null);
+    const osmTypeForSearch =
+      result?.osm_type === "relation"
+        ? "R"
+        : result?.osm_type === "way"
+        ? "W"
+        : result?.osm_type === "node"
+        ? "N"
+        : "N";
 
-    // Set geo source fields:
     formik.setFieldValue(
-      "geographicPlaceNameSourceDetail.sourceID",
-      result.osm_id || null
+      `${commonSrcDetailRoot}.country.name`,
+      result?.address?.country || null
     );
     formik.setFieldValue(
-      "geographicPlaceNameSourceDetail.sourceIdType",
-      result.osm_type || null
+      `${commonSrcDetailRoot}.stateProvince.name`,
+      result?.address?.state || null
     );
     formik.setFieldValue(
-      "geographicPlaceNameSourceDetail.sourceUrl",
-      geographicPlaceSourceUrl
+      `${commonSrcDetailRoot}.stateProvince.id`,
+      result?.osm_id || null
     );
     formik.setFieldValue(
-      "geographicPlaceNameSourceDetail.geographicPlaceNameSource",
+      `${commonSrcDetailRoot}.stateProvince.element`,
+      result?.osm_type || null
+    );
+
+    formik.setFieldValue(
+      `${commonSrcDetailRoot}.sourceUrl`,
+      `${geographicPlaceSourceUrl}osmtype=${osmTypeForSearch}&osmid=${result.osm_id}`
+    );
+    formik.setFieldValue(
+      `${commonSrcDetailRoot}.geographicPlaceNameSource`,
       GeographicPlaceNameSource.OSM
     );
+
+    // get the address detail with another nomiature call
+
+    const detailSearchProps: NominatimAddressDetailSearchProps = {
+      urlValue: {
+        osmid: result.osm_id,
+        osmtype: osmTypeForSearch,
+        class: result.category
+      },
+      updateAdminLevels,
+      formik
+    };
+
+    setSelectedSearchResult(detailSearchProps);
+  }
+
+  function updateAdminLevels(detailResults, formik) {
+    const geoNameParsed = parseGeoAdminLevels(detailResults as any, formik);
+    formik.setFieldValue("srcAdminLevels", geoNameParsed);
+    setHideCustomPlace(false);
+    setHideRemoveBtn(false);
+  }
+
+  function parseGeoAdminLevels(
+    detailResults: NominatumApiAddressDetailSearchResult | null,
+    formik
+  ) {
+    const editableSrcAdmnLevels: SourceAdministrativeLevel[] = [];
+    let detail: SourceAdministrativeLevel = {};
+    detailResults?.address?.map(addr => {
+      // omitting country and state
+      if (
+        addr.type !== "country" &&
+        addr.type !== "state" &&
+        addr.type !== "country_code" &&
+        addr.place_type !== "province" &&
+        addr.place_type !== "state" &&
+        addr.place_type !== "country" &&
+        addr.isaddress &&
+        (addr.osm_id || addr.place_id)
+      ) {
+        detail.id = addr.osm_id;
+        detail.element = addr.osm_type;
+        detail.placeType = addr.place_type ?? addr.class;
+        detail.name = detail.placeType
+          ? addr.localname + " [ " + detail.placeType + " ] "
+          : addr.localname;
+        editableSrcAdmnLevels.push(detail);
+      }
+      // fill in the country code
+      if (addr.type === "country_code")
+        formik.setFieldValue(
+          `${commonSrcDetailRoot}.country.code`,
+          addr.localname
+        );
+
+      // fill in the state/province name if it is not yet filled up
+      if (
+        (addr.place_type === "province" || addr.place_type === "state") &&
+        !formik.values[`${commonSrcDetailRoot}.stateProvince.name`]
+      )
+        formik.setFieldValue(
+          `${commonSrcDetailRoot}.stateProvince.name`,
+          addr.localname
+        );
+
+      detail = {};
+    });
+    return editableSrcAdmnLevels;
   }
 
   function removeThisPlace(formik: FormikContextType<{}>) {
-    // reset the fields when user remove the place
-    formik.setFieldValue("dwcCountry", null);
-    formik.setFieldValue("dwcStateProvince", null);
-    formik.setFieldValue("geographicPlaceName", null);
-
     // reset the source fields when user remove the place
-    formik.setFieldValue("geographicPlaceNameSourceDetail", null);
+    formik.setFieldValue(commonSrcDetailRoot, null);
     formik.setFieldValue("geographicPlaceNameSource", null);
+
+    formik.setFieldValue("srcAdminLevels", null);
+    setCustomPlaceValue("");
+    setHideCustomPlace(true);
+    setHideRemoveBtn(true);
   }
 
   /** Does a Places search using the given search string. */
@@ -165,6 +274,17 @@ export function CollectingEventFormLayout({
     } else if (name === "dwcVerbatimSRS") {
       setDefaultVerbatimSRS?.(value);
     }
+  };
+
+  const addCustomPlaceName = form => {
+    if (!customPlaceValue || customPlaceValue.length === 0) return;
+    // Add user entered custom place in front
+    const customPlaceAsInSrcAdmnLevel: SourceAdministrativeLevel = {};
+    customPlaceAsInSrcAdmnLevel.name = customPlaceValue;
+    const srcAdminLevels = form.values.srcAdminLevels;
+    srcAdminLevels.unshift(customPlaceAsInSrcAdmnLevel);
+    form.setFieldValue("srcAdminLevels", srcAdminLevels);
+    setHideCustomPlace(true);
   };
 
   return (
@@ -462,12 +582,96 @@ export function CollectingEventFormLayout({
                 }}
               >
                 <Field name="geographicPlaceNameSourceDetail">
-                  {({ field: { value: detail } }) =>
+                  {({ field: { value: detail }, form }) =>
                     detail ? (
                       <div>
-                        <TextField name="geographicPlaceName" readOnly={true} />
-                        <TextField name="dwcStateProvince" readOnly={true} />
-                        <TextField name="dwcCountry" readOnly={true} />
+                        {!hideCustomPlace && !readOnly && (
+                          <div className="m-3">
+                            <div className="d-flex flex-row">
+                              <label
+                                className="p-2"
+                                style={{ marginLeft: -20 }}
+                              >
+                                <strong>
+                                  <DinaMessage id="customPlaceName" />
+                                </strong>
+                              </label>
+                              <input
+                                className="p-2 form-control"
+                                style={{ width: "60%" }}
+                                onChange={e =>
+                                  setCustomPlaceValue(e.target.value)
+                                }
+                                onKeyDown={e => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    if (customPlaceValue?.length > 0) {
+                                      addCustomPlaceName(form);
+                                    }
+                                  }
+                                }}
+                              />
+                              <button
+                                className="mb-2 btn btn-primary"
+                                type="button"
+                                onClick={() => addCustomPlaceName(form)}
+                              >
+                                <DinaMessage id="addCustomPlaceName" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                        {detailResultsIsLoading ? (
+                          <LoadingSpinner loading={true} />
+                        ) : (
+                          form.values.srcAdminLevels?.length > 0 && (
+                            <FieldArray name="srcAdminLevels">
+                              {({ remove }) => {
+                                const geoNames = form.values.srcAdminLevels;
+                                function removeItem(index: number) {
+                                  remove(index);
+                                }
+                                return (
+                                  <div className="pb-4">
+                                    {geoNames.map((_, idx) => (
+                                      <TextFieldWithRemoveButton
+                                        name={`srcAdminLevels[${idx}].name`}
+                                        readOnly={true}
+                                        removeLabel={true}
+                                        removeFormGroupClass={true}
+                                        removeItem={removeItem}
+                                        key={Math.random()}
+                                        index={idx}
+                                        hideCloseBtn={hideRemoveBtn}
+                                        inputProps={{
+                                          style: {
+                                            backgroundColor: `${
+                                              idx % 2 === 0
+                                                ? "#e9ecef"
+                                                : "white"
+                                            }`
+                                          }
+                                        }}
+                                      />
+                                    ))}
+                                  </div>
+                                );
+                              }}
+                            </FieldArray>
+                          )
+                        )}
+                        <DinaFormSection horizontal={[3, 9]}>
+                          <TextField
+                            name={`${commonSrcDetailRoot}.stateProvince.name`}
+                            label={formatMessage("stateProvinceLabel")}
+                            readOnly={true}
+                          />
+                          <TextField
+                            name={`${commonSrcDetailRoot}.country.name`}
+                            label={formatMessage("countryLabel")}
+                            readOnly={true}
+                          />
+                        </DinaFormSection>
                         <div className="row">
                           {!readOnly && (
                             <div className="col-md-4">
@@ -480,9 +684,9 @@ export function CollectingEventFormLayout({
                             </div>
                           )}
                           <div className="col-md-4">
-                            {detail?.sourceIdType && detail?.sourceID && (
+                            {detail.sourceUrl && (
                               <a
-                                href={`${geographicPlaceSourceUrl}/${detail?.sourceIdType}/${detail?.sourceID}`}
+                                href={`${detail.sourceUrl}`}
                                 target="_blank"
                                 className="btn btn-info"
                               >
