@@ -21,13 +21,7 @@ import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import useSWR from "swr";
 import { GeographySearchBox, GeoReferenceAssertionRow } from ".";
-import {
-  GroupSelectField,
-  nominatimAddressDetailSearch,
-  NominatimAddressDetailSearchProps,
-  NominatumApiAddressDetailSearchResult,
-  useAddPersonModal
-} from "..";
+import { GroupSelectField, useAddPersonModal } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
 import {
@@ -47,6 +41,11 @@ import { SRS } from "../../types/collection-api/resources/SRS";
 import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
 import { ManagedAttributesEditor } from "../object-store/managed-attributes/ManagedAttributesEditor";
 import { ManagedAttributesViewer } from "../object-store/managed-attributes/ManagedAttributesViewer";
+import {
+  nominatimAddressDetailSearch,
+  NominatimAddressDetailSearchProps,
+  NominatumApiAddressDetailSearchResult
+} from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 
 interface CollectingEventFormLayoutProps {
