@@ -63,3 +63,4 @@ export * from "./button-bar/CreateButton";
 export * from "./button-bar/DeleteButton";
 export * from "./button-bar/EditButton";
 export * from "./button-bar/ButtonBar";
+export * from "./formik-connected/TextFieldWithRemoveButton";

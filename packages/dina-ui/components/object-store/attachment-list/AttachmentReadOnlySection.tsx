@@ -2,16 +2,18 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ExistingAttachmentsTable } from "./ExistingAttachmentsTable";
 import { TotalAttachmentsIndicator } from "./TotalAttachmentsIndicator";
 import { useState } from "react";
-import { useQuery } from "common-ui";
+import { FieldSet, useQuery } from "common-ui";
 
 export interface AttachmentReadOnlySectionProps {
   attachmentPath: string;
   detachTotalSelected?: boolean;
+  title?: JSX.Element;
 }
 
 export function AttachmentReadOnlySection({
   attachmentPath,
-  detachTotalSelected
+  detachTotalSelected,
+  title
 }: AttachmentReadOnlySectionProps) {
   // JSX key to reload the child components after editing Metadatas.
   const [lastSave, setLastSave] = useState<number>();
@@ -23,11 +25,15 @@ export function AttachmentReadOnlySection({
   );
 
   return (
-    <div key={lastSave}>
-      <h2>
-        <DinaMessage id="attachments" />{" "}
-        <TotalAttachmentsIndicator attachmentPath={attachmentPath} />
-      </h2>
+    <FieldSet
+      key={lastSave}
+      legend={
+        <>
+          {title ?? <DinaMessage id="attachments" />}{" "}
+          <TotalAttachmentsIndicator attachmentPath={attachmentPath} />
+        </>
+      }
+    >
       {error ? (
         <DinaMessage id="objectStoreDataUnavailable" />
       ) : (
@@ -37,6 +43,6 @@ export function AttachmentReadOnlySection({
           detachTotalSelected={detachTotalSelected}
         />
       )}
-    </div>
+    </FieldSet>
   );
 }

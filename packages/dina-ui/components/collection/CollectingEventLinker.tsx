@@ -38,8 +38,8 @@ export function CollectingEventLinker({
   const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition<CollectingEvent>[] = [
     "createdBy",
     {
-      Cell: ({ original: { dwcVerbatimLocality, geographicPlaceName } }) => (
-        <>{dwcVerbatimLocality || geographicPlaceName}</>
+      Cell: ({ original: { dwcVerbatimLocality } }) => (
+        <>{dwcVerbatimLocality}</>
       ),
       Header: <DinaMessage id="locationLabel" />,
       sortable: false
@@ -82,9 +82,7 @@ export function CollectingEventLinker({
       rsqlFilters.push(`createdBy==*${createdBy}*`);
     }
     if (location) {
-      rsqlFilters.push(
-        `(dwcVerbatimLocality==*${location}* or geographicPlaceName==*${location}*)`
-      );
+      rsqlFilters.push(`(dwcVerbatimLocality==*${location}*)`);
     }
     if (date?.min) {
       rsqlFilters.push(`startEventDateTime=ge=${date.min}`);

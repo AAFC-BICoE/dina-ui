@@ -1,4 +1,4 @@
-import { useQuery } from "common-ui";
+import { FieldSet } from "common-ui";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
@@ -49,16 +49,20 @@ export function AttachmentSection({
   }
 
   return (
-    <div key={lastSave}>
-      <h2>
-        <DinaMessage id="attachments" />{" "}
-        {attachmentPath && (
-          <TotalAttachmentsIndicator
-            attachmentPath={attachmentPath}
-            lastSave={lastSave}
-          />
-        )}
-      </h2>
+    <FieldSet
+      key={lastSave}
+      legend={
+        <>
+          <DinaMessage id="attachments" />{" "}
+          {attachmentPath && (
+            <TotalAttachmentsIndicator
+              attachmentPath={attachmentPath}
+              lastSave={lastSave}
+            />
+          )}
+        </>
+      }
+    >
       <Tabs>
         <TabList>
           {attachmentPath && (
@@ -93,6 +97,6 @@ export function AttachmentSection({
           />
         </TabPanel>
       </Tabs>
-    </div>
+    </FieldSet>
   );
 }
