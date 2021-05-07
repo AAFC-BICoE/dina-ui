@@ -233,10 +233,12 @@ export function useCollectingEventSave(
     }
 
     // Parse srcAdminLevels to geographicPlaceNameSourceDetail
-    submittedValues.geographicPlaceNameSourceDetail = null;
+    // Reset the 3 fields which should be updated with user address entries : srcAdminLevels
+    submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces = null;
+    submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = null;
+    submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace = null;
 
     if (submittedValues.srcAdminLevels?.length > 0) {
-      submittedValues.geographicPlaceNameSourceDetail = {};
       if (submittedValues.srcAdminLevels?.length > 1)
         submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces = [];
       submittedValues.srcAdminLevels.map((srcAdminLevel, idx) => {
@@ -245,21 +247,15 @@ export function useCollectingEventSave(
         srcAdminLevel.name = srcAdminLevel.name
           .slice(0, typeStart !== -1 ? typeStart : srcAdminLevel.name.length)
           .trim();
-
         // the first one can either be selectedGeographicPlace or customGeographicPlace
-        // when the entry only has name in it, it is considered as customPlaceName entry
+        // when the entry only has name in it, it is user entered customPlaceName entry
+        // when the enry does not have osm_id, it will be saved as customPlaceName (e.g central experimental farm)
         if (idx === 0) {
-          if (
-            !srcAdminLevel.id &&
-            !srcAdminLevel.placeType &&
-            !srcAdminLevel.element
-          ) {
+          if (!srcAdminLevel.id) {
             submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace =
               srcAdminLevel.name;
-            submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = null;
           } else {
             submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = srcAdminLevel;
-            submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace = null;
           }
         } else {
           submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces.push(
@@ -270,11 +266,6 @@ export function useCollectingEventSave(
     }
 
     delete submittedValues.srcAdminLevels;
-    if (
-      submittedValues.geographicPlaceNameSourceDetail?.higherGeographicPlaces
-        ?.length === 0
-    )
-      submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces = null;
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [
