@@ -234,9 +234,11 @@ export function useCollectingEventSave(
 
     // Parse srcAdminLevels to geographicPlaceNameSourceDetail
     // Reset the 3 fields which should be updated with user address entries : srcAdminLevels
-    submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces = null;
-    submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = null;
-    submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace = null;
+    if (submittedValues.geographicPlaceNameSourceDetail) {
+      submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces = null;
+      submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = null;
+      submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace = null;
+    }
 
     if (submittedValues.srcAdminLevels?.length > 0) {
       if (submittedValues.srcAdminLevels?.length > 1)
