@@ -9,8 +9,7 @@ const PREPARATION_TYPE_TABLE_COLUMNS = [
     Cell: ({ original: { id, name } }) => (
       <Link href={`/collection/preparation-type/view?id=${id}`}>{name}</Link>
     ),
-    accessor: "name",
-    sortable: false
+    accessor: "name"
   },
   "createdBy",
   dateCell("createdOn")
