@@ -3,7 +3,6 @@ import { FormikContextType, useFormikContext } from "formik";
 import { GridSettings } from "handsontable";
 import { cloneDeep, isEmpty, isEqual, zipWith } from "lodash";
 import dynamic from "next/dynamic";
-import { useLayoutEffect } from "react";
 import { Component, useEffect, useState } from "react";
 import { PartialDeep } from "type-fest";
 import { FormikButton } from "../formik-connected/FormikButton";
@@ -94,16 +93,6 @@ export function BulkDataEditor<TRow>({
   // Show loading state here:
   if (loading || !workingTableData || !initialTableData) {
     return <LoadingSpinner loading={true} />;
-  } else {
-    // console.log("tableWrapperRef.current " + tableWrapperRef.current?.innerHTML) ;
-    // const htHolder = tableWrapperRef.current?.querySelector<HTMLDivElement>(
-    //   ".ht_master .wtHolder"
-    // );
-    // console.log("htHolder " + JSON.stringify(htHolder)) ;
-    // if (htHolder) {
-    //   htHolder.style.overflowY = "auto";
-    //   htHolder.tabIndex = 0;
-    // }
   }
 
   const onSubmitInternal: OnFormikSubmit = async (
