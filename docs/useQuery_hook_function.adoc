@@ -46,3 +46,23 @@ function ExampleComponent() {
   }
 }
 ----
+
+Using the "withResponse" helper function to render generic loading and error components with minimal code,
+instead of writing if/else blocks for each state:
+[source,tsx]
+----
+import { useQuery, withResponse } from "../components";
+import { PcrPrimer } from "../types/seqdb-api/resources/PcrPrimer";
+
+function ExampleComponent() {
+  const primerQuery = useQuery<PcrPrimer[]>({ path: "pcrPrimer" });
+
+  return withResponse(primerQuery, ({ data: primers }) => (
+    <div>
+      {primers.map(primer => (
+        <PcrPrimerInfo key={primer.id} primer={primer} />
+      ))}
+    </div>
+  ));
+}
+----
