@@ -19,6 +19,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addPersonTitle: "Add Person",
   addPersonButtonText: "Add Person",
   addPersonPopupTooltip: "Add Person without leaving the page",
+  addPreparationTypeTitle: "Add Preparation Type",
   addRule: "Add Rule",
   addRuleSet: "Add Rule Set",
   agentsSectionTitle: "Agents",
@@ -279,6 +280,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   personViewTitle: "Person",
   preparation: "Preparation",
   preparationData: "Preparation Data",
+  preparationTypeListTitle: "Preparation Type",
+  preparationTypeNameLabel: "Preparation Type Name",
+  preparationTypeViewTitle: "View Preparation Type",
   primary: "Primary",
   primaryButton_tooltip:
     "Make this assertion the primary data point when exported. Only one assertion can be primary",
