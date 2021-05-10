@@ -11,7 +11,8 @@
     "lint": "yarn workspaces run lint",
     "lint:fix": "yarn workspaces run lint:fix",
     "test": "yarn workspaces run test",
-    "test:coverage": "yarn workspaces run test:coverage"
+    "test:coverage": "yarn workspaces run test:coverage",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@babel/runtime-corejs2": "^7.10.4",
@@ -50,10 +51,5 @@
     "**/react-file-viewer/**/underscore": "^1.13.1",
     "**/react-file-viewer/**/lodash": "^4.17.21",
     "**/type-fest": "^1.0.2"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn workspaces run lint-staged"
-    }
   }
 }
