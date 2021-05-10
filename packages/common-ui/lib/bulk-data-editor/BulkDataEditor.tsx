@@ -142,7 +142,15 @@ export function BulkDataEditor<TRow>({
         /* Fix the place holder color contrast */        
         .htPlaceholder.htAutocomplete {
           color: rgb(51,51,51);
-        }        
+        }
+        /* Fix need to review issue (critical): .htDimmed:nth-child(2) need sufficient color contrast */
+        .handsontable .htDimmed {
+          color: rgb(108,117,125); 
+        }
+        /* Fix need to review issue : ..htAutocompleteArrow need sufficient color contrast */
+        .htAutocomplete .htAutocompleteArrow {
+          color: rgb(108,117,125);
+        }
       `}</style>
       {validationAlertJsx}
       <div
