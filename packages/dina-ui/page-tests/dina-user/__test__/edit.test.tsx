@@ -2,6 +2,18 @@ import { DinaForm } from "common-ui";
 import { RolesPerGroupEditor } from "../../../pages/dina-user/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 
+const mockGet = jest.fn<any, any>(async path => {
+  if (path === "user-api/group") {
+    return { data: [] };
+  }
+});
+
+const apiContext = {
+  apiClient: {
+    get: mockGet
+  }
+};
+
 describe("User edit page", () => {
   it("Lets you edit the Roles per Group.", async () => {
     const mockSubmit = jest.fn();
@@ -21,6 +33,7 @@ describe("User edit page", () => {
         <RolesPerGroupEditor initialRolesPerGroup={testUser.rolesPerGroup} />
       </DinaForm>,
       {
+        apiContext,
         accountContext: {
           groupNames: ["cnc", "aafc", "test-group"]
         }
@@ -58,7 +71,6 @@ describe("User edit page", () => {
         {
           rolesPerGroup: {
             aafc: ["staff"],
-            cnc: [],
             "test-group": ["role1", "role2"]
           }
         }

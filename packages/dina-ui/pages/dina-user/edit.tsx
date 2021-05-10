@@ -88,14 +88,6 @@ export function DinaUserForm({
 
     if (submittedValues.rolesPerGroup) {
       updatedUser.rolesPerGroup = submittedValues.rolesPerGroup;
-
-      // Groups are removed by setting an empty roles array, not by removing the array:
-      const groupsToRemove = keys(initialValues.rolesPerGroup).filter(
-        groupName => !keys(submittedValues.rolesPerGroup).includes(groupName)
-      );
-      for (const groupToRemove of groupsToRemove) {
-        updatedUser.rolesPerGroup[groupToRemove] = [];
-      }
     }
 
     await save(
