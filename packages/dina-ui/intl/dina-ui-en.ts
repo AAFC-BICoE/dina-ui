@@ -230,7 +230,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   locationLabel: "Location",
   longitudeValidationError:
     "Invalid longitude: {longtitude},   \nValid longitude is between -180 to 180 for degree, and 0 to 60 for minute and second",
-  makeThisThePrimaryIdentifier: "Make this the Primary Identifier",
   makePrimary: "Make Primary",
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
