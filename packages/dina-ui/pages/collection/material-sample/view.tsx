@@ -17,7 +17,10 @@ import { CollectingEventFormLayout } from "../../../components/collection/Collec
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { MaterialSample } from "../../../types/collection-api";
+import {
+  MaterialSample,
+  SourceAdministrativeLevel
+} from "../../../types/collection-api";
 import { CatalogueInfoFormLayout, MaterialSampleFormLayout } from "./edit";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
@@ -35,6 +38,30 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   );
 
   const collectingEvent = colEventQuery.response?.data;
+
+  // Parse geogrphicPlaceNameDouceDetail place names to srcAdminLevels
+  // for display/editing purposes
+
+  let srcAdminLevels: SourceAdministrativeLevel[] = [];
+  if (collectingEvent?.geographicPlaceNameSourceDetail?.customGeographicPlace) {
+    const customPlaceNameAsInSrcAdmnLevel: SourceAdministrativeLevel = {};
+    customPlaceNameAsInSrcAdmnLevel.name =
+      collectingEvent.geographicPlaceNameSourceDetail.customGeographicPlace;
+    srcAdminLevels.push(customPlaceNameAsInSrcAdmnLevel);
+  }
+  if (collectingEvent?.geographicPlaceNameSourceDetail?.selectedGeographicPlace)
+    srcAdminLevels.push(
+      collectingEvent.geographicPlaceNameSourceDetail?.selectedGeographicPlace
+    );
+  if (collectingEvent?.geographicPlaceNameSourceDetail?.higherGeographicPlaces)
+    srcAdminLevels = srcAdminLevels.concat(
+      collectingEvent.geographicPlaceNameSourceDetail?.higherGeographicPlaces
+    );
+
+  srcAdminLevels?.map(
+    admn => (admn.name += admn.placeType ? " [ " + admn.placeType + " ] " : "")
+  );
+  if (collectingEvent) collectingEvent.srcAdminLevels = srcAdminLevels;
 
   const buttonBar = (
     <ButtonBar>

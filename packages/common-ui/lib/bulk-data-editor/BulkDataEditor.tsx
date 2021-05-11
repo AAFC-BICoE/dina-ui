@@ -75,7 +75,6 @@ export function BulkDataEditor<TRow>({
     const newWorkingData = cloneDeep(loadedData);
     await applyCustomDefaultValues?.(newWorkingData);
     setWorkingTableData(newWorkingData);
-
     setLoading(false);
   });
 
@@ -129,12 +128,28 @@ export function BulkDataEditor<TRow>({
         .handsontableEditor.autocompleteEditor, .handsontableEditor.autocompleteEditor .ht_master .wtHolder {
           min-height: 138px;
         }
+        /* Fix the place holder color contrast */        
+        .htPlaceholder.htAutocomplete {
+          color: rgb(51,51,51);
+        }
+        /* Fix need to review issue (critical): .htDimmed:nth-child(2) need sufficient color contrast */
+        .handsontable .htDimmed {
+          color: rgb(108,117,125); 
+        }
+        /* Fix need to review issue : ..htAutocompleteArrow need sufficient color contrast */
+        .htAutocomplete .htAutocompleteArrow {
+          color: rgb(108,117,125);
+        }
       `}</style>
       {validationAlertJsx}
       <div
         className="form-group"
         // Setting the width/height and overflowX:hidden here is detected by Handsontable and enables horizontal scrolling:
-        style={{ height: "100%", width: "100%", overflowX: "hidden" }}
+        style={{
+          height: "100%",
+          width: "100%",
+          overflowX: "hidden"
+        }}
       >
         <DynamicHotTable
           afterValidate={afterValidate}

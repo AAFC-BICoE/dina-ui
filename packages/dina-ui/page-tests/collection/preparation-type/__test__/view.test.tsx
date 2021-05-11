@@ -47,7 +47,7 @@ describe("PreparationType details page", () => {
     wrapper.update();
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
-    
+
     expect(wrapper.find(".name-field .field-view").text()).toEqual(
       "test preparation type"
     );

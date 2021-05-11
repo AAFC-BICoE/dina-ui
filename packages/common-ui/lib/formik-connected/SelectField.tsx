@@ -58,7 +58,6 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
             isMulti={isMulti}
             options={options}
             onChange={onChangeInternal}
-            styles={styles}
             value={selectedOption}
           />
         );

@@ -28,25 +28,17 @@ Generates the production build.
 
 === `yarn dev`
 
-Runs the UI application at localhost:8000 in dev mode using https://github.com/zeit/next.js[Next.js].
-If you edit and save a source file, the running application will reload itself.
-
-This command also sets up an HTTP proxy that redirects requests for localhost:8000/api/* endpoints to
-localhost:8080/api/. This lets developers test the app locally with a working backend API. Note that
-you must have https://github.com/AAFC-BICoE/seqdb-api[seqdb-api] running at localhost:8080 for the UI
-to connect to the API, and you must log into the API by browsing to localhost:8080 and logging in so
-the UI can authenticate with the API.
+Runs the UI application at localhost:3000 in dev mode using https://github.com/zeit/next.js[Next.js].
+When you save a file, you can refresh the page to see your changes without restarting the app.
+Note that this does not let the UI connect to the backend because there is no HTTP proxy set up. See
+"https://github.com/poffm/dina-dev" for the full dev mode with a proxy.
 
 === `yarn next`
 
 Runs the UI application at localhost:3000 in dev mode using https://github.com/zeit/next.js[Next.js].
+When you save a file, you can refresh the page to see your changes without restarting the app.
 Note that this does not let the UI connect to the backend because there is no HTTP proxy set up. See
-the "yarn dev" section for the full dev mode with a proxy.
-
-=== `yarn start`
-
-Runs the application in production mode. Requires a build first, which you can generate using
-`yarn build`.
+"https://github.com/poffm/dina-dev" for the full dev mode with a proxy.
 
 === `yarn test`
 
