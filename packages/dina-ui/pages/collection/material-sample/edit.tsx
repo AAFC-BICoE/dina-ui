@@ -291,33 +291,27 @@ export function MaterialSampleForm({
       <MaterialSampleFormLayout />
       <FieldSet legend={<DinaMessage id="components" />}>
         <div className="row">
-          <label className="d-flex align-items-center col-sm-3">
-            <strong>
-              <DinaMessage id="collectingEvent" />
-            </strong>
-            <div className="mx-2 enable-collecting-event">
-              <Switch
-                checked={enableCollectingEvent}
-                onChange={dataComponentToggler(
-                  setEnableCollectingEvent,
-                  formatMessage("collectingEvent")
-                )}
-              />
-            </div>
+          <label className="enable-collecting-event d-flex align-items-center font-weight-bold col-sm-3">
+            <Switch
+              className="mx-2"
+              checked={enableCollectingEvent}
+              onChange={dataComponentToggler(
+                setEnableCollectingEvent,
+                formatMessage("collectingEvent")
+              )}
+            />
+            <DinaMessage id="collectingEvent" />
           </label>
-          <label className="d-flex align-items-center col-sm-3">
-            <strong>
-              <DinaMessage id="catalogueInfo" />
-            </strong>
-            <div className="mx-2 enable-catalogue-info">
-              <Switch
-                checked={enableCatalogueInfo}
-                onChange={dataComponentToggler(
-                  setEnableCatalogueInfo,
-                  formatMessage("catalogueInfo")
-                )}
-              />
-            </div>
+          <label className="enable-catalogue-info d-flex align-items-center font-weight-bold col-sm-3">
+            <Switch
+              className="mx-2"
+              checked={enableCatalogueInfo}
+              onChange={dataComponentToggler(
+                setEnableCatalogueInfo,
+                formatMessage("catalogueInfo")
+              )}
+            />
+            <DinaMessage id="catalogueInfo" />
           </label>
         </div>
       </FieldSet>
