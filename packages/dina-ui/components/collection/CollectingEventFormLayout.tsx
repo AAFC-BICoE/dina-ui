@@ -469,6 +469,7 @@ export function CollectingEventFormLayout({
               </Field>
             </div>
             <div className="col-md-6">
+              <TextField name="habitat" />
               <AutoSuggestTextField<SRS>
                 name="dwcVerbatimSRS"
                 configQuery={() => ({
