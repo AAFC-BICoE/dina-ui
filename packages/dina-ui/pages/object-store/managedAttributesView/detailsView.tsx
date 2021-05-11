@@ -156,7 +156,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           type="managed-attribute"
         />
       </ButtonBar>
-      <div style={{ width: "300px" }}>
+      <div style={{ width: "25rem" }}>
         <TextField name="name" />
       </div>
       <div style={{ width: "70%" }}>
@@ -165,7 +165,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       <div style={{ width: "70%" }}>
         <TextField name="description.fr" multiLines={true} />
       </div>
-      <div style={{ width: "300px" }}>
+      <div style={{ width: "25rem" }}>
         <SelectField
           name="managedAttributeType"
           options={ATTRIBUTE_TYPE_OPTIONS}
@@ -173,12 +173,12 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
         />
       </div>
       {type === "PICKLIST" && (
-        <div style={{ width: "300px" }}>
+        <div style={{ width: "25rem" }}>
           <StringArrayField name="acceptedValues" />
         </div>
       )}
       {id && (
-        <div style={{ width: "300px" }}>
+        <div style={{ width: "25rem" }}>
           <h4>
             <DinaMessage id="field_managedAttributeCreatedOn" />
           </h4>
@@ -191,7 +191,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
         </div>
       )}
       {id && (
-        <div style={{ width: "300px" }}>
+        <div style={{ width: "25rem" }}>
           <h4>
             <DinaMessage id="field_managedAttributeCreatedBy" />
           </h4>

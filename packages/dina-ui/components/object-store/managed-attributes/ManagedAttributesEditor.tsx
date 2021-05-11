@@ -4,7 +4,8 @@ import {
   ResourceSelect,
   SelectField,
   TextField,
-  useApiClient
+  useApiClient,
+  useDinaFormContext
 } from "common-ui";
 import { useFormikContext } from "formik";
 import { get } from "lodash";
@@ -42,11 +43,11 @@ export function ManagedAttributesEditor({
   managedAttributeComponent,
   managedAttributeKeyField = "id"
 }: ManagedAttributesEditorProps) {
-  const { values: formValues } = useFormikContext<any>();
+  const { initialValues: formInitialValues } = useDinaFormContext();
   const { bulkGet } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
-  const managedAttributeValues = get(formValues, valuesPath);
+  const managedAttributeValues = get(formInitialValues, valuesPath);
 
   const [editableManagedAttributes, setEditableManagedAttributes] = useState<
     ManagedAttribute[]

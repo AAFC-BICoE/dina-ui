@@ -2,12 +2,12 @@
 import {
   ButtonBar,
   DateField,
-  DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
   LoadingSpinner,
   Query,
   SelectField,
+  StringArrayField,
   SubmitButton,
   TextField
 } from "common-ui";
@@ -18,6 +18,9 @@ import { useState } from "react";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
+  CollectionModuleType,
+  COLLECTION_MODULE_TYPES,
+  COLLECTION_MODULE_TYPE_LABELS,
   ManagedAttribute,
   ManagedAttributeType,
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
@@ -101,12 +104,18 @@ function ManagedAttributeForm({
     ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
   );
 
+  const ATTRIBUTE_COMPONENT_OPTIONS: {
+    label: string;
+    value: CollectionModuleType;
+  }[] = COLLECTION_MODULE_TYPES.map(dataType => ({
+    label: formatMessage(COLLECTION_MODULE_TYPE_LABELS[dataType] as any),
+    value: dataType
+  }));
+
   const onSubmit: DinaFormOnSubmit<Partial<ManagedAttribute>> = async ({
     api: { save },
     submittedValues
   }) => {
-    submittedValues.managedAttributeComponent = "COLLECTING_EVENT";
-
     // Treat empty array or undefined as null:
     if (!submittedValues.acceptedValues?.length) {
       submittedValues.acceptedValues = null;
@@ -144,10 +153,16 @@ function ManagedAttributeForm({
           </a>
         </Link>
       </ButtonBar>
-      <div style={{ width: "300px" }}>
+      <div style={{ width: "25rem" }}>
         <TextField name="name" readOnly={id !== undefined} />
       </div>
-      <div style={{ width: "300px" }}>
+      <div style={{ width: "25rem" }}>
+        <SelectField
+          name="managedAttributeComponent"
+          options={ATTRIBUTE_COMPONENT_OPTIONS}
+        />
+      </div>
+      <div style={{ width: "25rem" }}>
         <SelectField
           name="managedAttributeType"
           options={ATTRIBUTE_TYPE_OPTIONS}
@@ -155,12 +170,12 @@ function ManagedAttributeForm({
         />
       </div>
       {type === "PICKLIST" && (
-        <div style={{ width: "300px" }}>
-          <TextField name="acceptedValues" multiLines={true} />
+        <div style={{ width: "25rem" }}>
+          <StringArrayField name="acceptedValues" />
         </div>
       )}
       {id && (
-        <div style={{ width: "300px" }}>
+        <div style={{ width: "25rem" }}>
           <h4>
             <DinaMessage id="field_managedAttributeCreatedOn" />
           </h4>
@@ -173,7 +188,7 @@ function ManagedAttributeForm({
         </div>
       )}
       {id && (
-        <div style={{ width: "300px" }}>
+        <div style={{ width: "25rem" }}>
           <h4>
             <DinaMessage id="field_managedAttributeCreatedBy" />
           </h4>
