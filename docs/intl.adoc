@@ -16,11 +16,11 @@ You should instead reference a message key:
 
 [source,tsx]
 ----
-import { SeqDBMessage } from "../../intl/seqdb-intl.ts""
+import { DinaMessage } from "../../intl/dina-intl.ts""
 
 ...
 
-<h2><SeqDBMessage id="pcrPrimerListTitle" /></h2>
+<h2><DinaMessage id="pcrPrimerListTitle" /></h2>
 ----
 
 == formatMessage function
@@ -29,10 +29,10 @@ You can also use the "formatMessage" function if you want to reference a message
 
 [source,tsx]
 ----
-import { useSeqdbIntl } from "../../seqdb-intl.ts""
+import { useDinaIntl } from "../../dina-intl.ts""
 
 function MyComponent() {
-  const { formatMessage } = useSeqdbIntl();
+  const { formatMessage } = useDinaIntl();
 
   useEffect(() => {
     alert(formatMessage("greeting"));
@@ -46,31 +46,31 @@ function MyComponent() {
 
 == Defining messages
 
-The actual text for these messages needs to be defined in a messages file, like seqdb-en.ts. Each UI app
-( seqdb-ui, dina-ui, etc. ) should have its own messages files. common-ui has its own messages files
-for shared messages used by multiple apps.
+The actual text for these messages needs to be defined in a messages file, like dina-en.ts. Each UI app
+( dina-ui is the only UI app at the moment ) should have its own messages files. common-ui has its
+own messages files for shared messages used by multiple apps.
 
-seqdb-en.ts:
+dina-en.ts:
 
 [source,tsx]
 ----
-export const SEQDB_MESSAGES_ENGLISH = {
+export const DINA_MESSAGES_ENGLISH = {
   ...
   greeting: "Hello!"
   ...
 }
 ----
 
-Type-checking is enabled so the message ID passed into "SeqDBMessage" or "formatMessage" MUST be a key
+Type-checking is enabled so the message ID passed into "DinaMessage" or "formatMessage" MUST be a key
 in at least the English messages file. To add a French (or other language) translation
 for a message, the English version of the message must already be defined. The UI uses the English
 translation as a fallback if the message has no translation for the user's locale.
 
-Example from seqdb-fr.ts:
+Example from dina-fr.ts:
 
 [source,tsx]
 ----
-export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
+export const DINA_MESSAGES_FRENCH: Partial<typeof DINA_MESSAGES_ENGLISH> = {
   ...
   greeting: "Bonjour!", // If the key exists in the english messages file, Typescript allows it.
   otherKey: "C'est un autre message." // If "otherKey" isn't a key in the English messages, this should show an error in your IDE.
@@ -89,7 +89,7 @@ Example:
 
 [source,tsx]
 ----
-export const SEQDB_MESSAGES_ENGLISH = {
+export const DINA_MESSAGES_ENGLISH = {
   ...
   field_name: "Name",
   "field_group.groupName": "Group Name",
@@ -99,7 +99,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
 
 [source,tsx]
 ----
-export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
+export const DINA_MESSAGES_FRENCH: Partial<typeof DINA_MESSAGES_ENGLISH> = {
   ...
   field_name: "Nom",
   "field_group.groupName": "Nom de Groupe"

@@ -6,7 +6,7 @@ Example usage for selecting a Group from a list:
 [source,tsx]
 ----
 import { DinaForm, ResourceSelectField } from "common-ui";
-import { Group } from "../types/seqdb-api/resources/Group";
+import { Group } from "../types/user-api/resources/Group";
 
 /**
  * This page shows a dropdown for selecting a Group. You can type the name of a Group you're
