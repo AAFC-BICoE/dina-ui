@@ -40,7 +40,7 @@ function StringArrayFieldInternal(
 ) {
   const [textValue, setTextValue] = useState("");
 
-  // Set the inner text value from the outer form state:
+  // When the outer form state changes, set the inner text state:
   useEffect(() => {
     if (!isEqual(inputProps.value, asArray(textValue))) {
       setTextValue(asText((inputProps.value || []) as string[]));
@@ -52,6 +52,7 @@ function StringArrayFieldInternal(
 
     const newTextAsArray = asArray(newText);
 
+    // When the inner text state changes, set the outer form state:
     if (!isEqual(newTextAsArray, inputProps.value)) {
       inputProps.onChange?.({ target: { value: newTextAsArray } } as any);
     }

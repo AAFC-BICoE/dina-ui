@@ -50,7 +50,6 @@ describe("PersonForm", () => {
       [
         {
           resource: {
-            aliases: [],
             displayName: "new test person",
             email: "person@example.com",
             type: "person"
