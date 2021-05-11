@@ -415,15 +415,6 @@ export interface CatalogueInfoFormLayoutProps {
 export function CatalogueInfoFormLayout({
   className
 }: CatalogueInfoFormLayoutProps) {
-  const { readOnly } = useDinaFormContext();
-
-  function setNameToCatalogNumber(
-    values: InputResource<MaterialSample>,
-    form: FormikContextType<any>
-  ) {
-    form.setFieldValue("materialSampleName", values.dwcCatalogNumber);
-  }
-
   return (
     <FieldSet className={className} legend={<DinaMessage id="catalogueInfo" />}>
       <div className="row">
@@ -441,28 +432,6 @@ export function CatalogueInfoFormLayout({
         <div className="col-md-6">
           <FieldSet legend={<DinaMessage id="catalogueInfo" />}>
             <TextField name="dwcCatalogNumber" />
-            {!readOnly && (
-              <Field name="dwcCatalogNumber">
-                {({
-                  form: {
-                    values: { dwcCatalogNumber, materialSampleName }
-                  }
-                }) =>
-                  !dwcCatalogNumber ||
-                  dwcCatalogNumber === materialSampleName ? null : (
-                    <FormikButton
-                      onClick={setNameToCatalogNumber}
-                      className="btn btn-primary form-group"
-                      buttonProps={() => ({
-                        style: { width: "20rem" }
-                      })}
-                    >
-                      <DinaMessage id="makeThisThePrimaryIdentifier" />
-                    </FormikButton>
-                  )
-                }
-              </Field>
-            )}
           </FieldSet>
         </div>
       </div>

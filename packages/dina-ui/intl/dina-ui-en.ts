@@ -228,7 +228,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",
   locationLabel: "Location",
   literalGeoreferencedByLabel: "Georeferenced By",
-  makeThisThePrimaryIdentifier: "Make this the Primary Identifier",
   makePrimary: "Make Primary",
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
