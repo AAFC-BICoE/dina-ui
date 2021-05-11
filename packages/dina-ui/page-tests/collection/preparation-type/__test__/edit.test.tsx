@@ -44,7 +44,7 @@ describe("preparation-type edit page", () => {
         {
           data: {
             id: "1",
-            type: "preparation-type"  
+            type: "preparation-type"
           },
           status: 201
         }
@@ -74,7 +74,7 @@ describe("preparation-type edit page", () => {
           op: "POST",
           path: "preparation-type",
           value: {
-            attributes: {name: "updated Name"},
+            attributes: { name: "updated Name" },
             id: "00000000-0000-0000-0000-000000000000",
             type: "preparation-type"
           }
@@ -126,7 +126,7 @@ describe("preparation-type edit page", () => {
 /** Test preparation-type with all fields defined. */
 
 const TEST_PREPARATION_TYPE: PreparationType = {
-  uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",  
+  uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
   id: "1",
   name: "test preparation type",
   type: "preparation-type"
