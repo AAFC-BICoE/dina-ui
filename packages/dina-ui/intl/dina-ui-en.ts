@@ -182,6 +182,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_familyNames_tooltip: "Family name(s) including compound family names",
   field_givenNames_tooltip: "First and all middle names",
   field_license: "License",
+  field_managedAttributeComponent: "Target Data Component Type",
   field_managedAttributeCreatedOn: "Created On",
   field_managedAttributeCreatedBy: "Created By",
   field_managedAttributeMandatoryFieldsError:
@@ -233,6 +234,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",
   managedAttributeValueLabel: "Value",
+  materialSample: "Material Sample",
   materialSampleAttachments: "Material Sample Attachments",
   materialSampleListTitle: "Material Samples",
   materialSampleViewTitle: "Material Sample",
