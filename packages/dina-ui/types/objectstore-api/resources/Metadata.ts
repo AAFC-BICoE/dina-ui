@@ -23,7 +23,6 @@ export interface MetadataAttributes {
   acCaption?: string;
   dcFormat?: string;
   createdDate?: string;
-  deletedDate?: string;
   acDigitizationDate?: string | null;
   xmpMetadataDate?: string;
   acTags?: string[];

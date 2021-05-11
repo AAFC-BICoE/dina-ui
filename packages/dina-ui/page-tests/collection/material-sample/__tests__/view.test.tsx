@@ -1,4 +1,4 @@
-import { CataloguedObjectViewPage } from "../../../../pages/collection/catalogued-object/view";
+import { MaterialSampleViewPage } from "../../../../pages/collection/material-sample/view";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   CollectingEvent,
@@ -16,7 +16,7 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
   dwcOtherRecordNumbers: ["12", "13", "14"]
 };
 
-const TEST_CATALOGUED_OBJECT: MaterialSample = {
+const TEST_MATERIAL_SAMPLE: MaterialSample = {
   id: "1",
   type: "material-sample",
   dwcCatalogNumber: "my-number",
@@ -24,8 +24,8 @@ const TEST_CATALOGUED_OBJECT: MaterialSample = {
 };
 
 const mockGet = jest.fn<any, any>(async path => {
-  if (path === "collection-api/material-sample/1?include=collectingEvent") {
-    return { data: TEST_CATALOGUED_OBJECT };
+  if (path === "collection-api/material-sample/1") {
+    return { data: TEST_MATERIAL_SAMPLE };
   } else if (
     path === "collection-api/collecting-event/1?include=collectors,attachment"
   ) {
@@ -33,6 +33,10 @@ const mockGet = jest.fn<any, any>(async path => {
   } else if (path === "collection-api/collecting-event/1/attachment") {
     return { data: [] };
   } else if (path === "user-api/group") {
+    return { data: [] };
+  } else if (path === "objectstore-api/metadata") {
+    return { data: [] };
+  } else if (path === "collection-api/material-sample/1/attachment") {
     return { data: [] };
   }
 });
@@ -52,10 +56,10 @@ const testCtx = {
   }
 };
 
-describe("Catalogued Object View Page", () => {
-  it("Renders the Catalogued Object with the linked Collecting Event", async () => {
+describe("Material Sample View Page", () => {
+  it("Renders the Material Sample with the linked Collecting Event", async () => {
     const wrapper = mountWithAppContext(
-      <CataloguedObjectViewPage router={{ query: { id: "1" } } as any} />,
+      <MaterialSampleViewPage router={{ query: { id: "1" } } as any} />,
       testCtx
     );
 

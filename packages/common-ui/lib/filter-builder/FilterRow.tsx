@@ -91,7 +91,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
     return (
       <div className="list-inline">
-        <div
+        <label
           aria-label="Filter Attribute"
           className="list-inline-item"
           style={{ width: 320 }}
@@ -103,8 +103,8 @@ export class FilterRow extends React.Component<FilterRowProps> {
             onChange={this.onPropertyChanged}
             value={selectedAttributeOption}
           />
-        </div>
-        <div
+        </label>
+        <label
           aria-label="Filter Predicate"
           className="list-inline-item"
           style={{ width: "12rem" }}
@@ -118,8 +118,8 @@ export class FilterRow extends React.Component<FilterRowProps> {
               option => option.value === model.predicate
             )}
           />
-        </div>
-        <div aria-label="Filter Value" className="list-inline-item">
+        </label>
+        <label aria-label="Filter Value" className="list-inline-item">
           {attribute.type === "DATE" && (
             <FilterRowDatePicker
               isRange={model.predicate === "BETWEEN"}
@@ -155,9 +155,9 @@ export class FilterRow extends React.Component<FilterRowProps> {
               onChange={this.onValueChanged}
             />
           )}
-        </div>
+        </label>
         {attribute.type !== "DATE" && (
-          <div
+          <label
             className="list-inline-item"
             aria-label="Filter Search Type"
             style={{ width: "12rem" }}
@@ -171,7 +171,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
                 option => option.value === model.searchType
               )}
             />
-          </div>
+          </label>
         )}
         <div className="filter-row-buttons list-inline-item">
           <button

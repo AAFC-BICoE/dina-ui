@@ -20,7 +20,10 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   ManagedAttribute,
   ManagedAttributeType,
-  MANAGED_ATTRIBUTE_TYPE_OPTIONS
+  COLLECTION_MODULE_TYPES,
+  MANAGED_ATTRIBUTE_TYPE_OPTIONS,
+  CollectionModuleType,
+  COLLECTION_MODULE_TYPE_LABELS
 } from "../../../types/collection-api/resources/ManagedAttribute";
 
 interface ManagedAttributeFormFields extends ManagedAttribute {
@@ -109,12 +112,18 @@ function ManagedAttributeForm({
     ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
   );
 
+  const ATTRIBUTE_COMPONENT_OPTIONS: {
+    label: string;
+    value: CollectionModuleType;
+  }[] = COLLECTION_MODULE_TYPES.map(dataType => ({
+    label: formatMessage(COLLECTION_MODULE_TYPE_LABELS[dataType] as any),
+    value: dataType
+  }));
+
   const onSubmit: DinaFormOnSubmit<ManagedAttributeFormFields> = async ({
     api: { save },
     submittedValues: { acceptedValuesAsLines, ...submittedManagedAttribute }
   }) => {
-    submittedManagedAttribute.managedAttributeComponent = "COLLECTING_EVENT";
-
     // Convert user-suplied string to string array:
     submittedManagedAttribute.acceptedValues = (acceptedValuesAsLines || "")
       // Split by line breaks:
@@ -161,6 +170,12 @@ function ManagedAttributeForm({
       </ButtonBar>
       <div style={{ width: "300px" }}>
         <TextField name="name" readOnly={id !== undefined} />
+      </div>
+      <div style={{ width: "300px" }}>
+        <SelectField
+          name="managedAttributeComponent"
+          options={ATTRIBUTE_COMPONENT_OPTIONS}
+        />
       </div>
       <div style={{ width: "300px" }}>
         <SelectField

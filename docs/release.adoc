@@ -1,0 +1,20 @@
+# How to release dina-ui
+
+Instructions assume your are in the root folder of the project.
+
+## Prepare dev
+1. `git checkout dev`
+1. `git pull`
+1. Edit the file `packages/dina-ui/package.json` , change the value of `version` to match the version you are releasing
+1. `git commit` message is usualy "Prepare X.X.X release" where the X is replaced by the version
+1. `git push origin dev`
+
+Wait for CI completion since some issues detected by dependency-check only runs on dev
+
+## Merge to master
+On success dev build
+
+1. `git checkout master`
+1. `git pull`
+1. `git merge dev`
+1. `git push origin master`
