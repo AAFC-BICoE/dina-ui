@@ -203,6 +203,13 @@ export function ResourceSelect<TData extends KitsuResource>({
         };
   }
 
+  const customStyle = {
+    placeholder: (provided, _) => ({
+      ...provided,
+      color: "rgb(87,120,94)"
+    })
+  };
+
   return (
     <SortableSelect
       // react-select AsyncSelect props:
@@ -213,7 +220,8 @@ export function ResourceSelect<TData extends KitsuResource>({
       placeholder={formatMessage({ id: "typeHereToSearch" })}
       styles={{
         multiValueLabel: base => ({ ...base, cursor: "move" }),
-        ...styles
+        ...styles,
+        ...customStyle
       }}
       value={selectValue}
       // react-sortable-hoc config:
