@@ -213,7 +213,7 @@ export function GeoReferenceAssertionRow({
         />
         <ResourceSelectField<Person>
           name={commonRoot + "georeferencedBy"}
-          arrayItemLink="/person/view?id="
+          readOnlyLink="/person/view?id="
           label={formatMessage("georeferencedByLabel")}
           filter={filterBy(["displayName"])}
           model="agent-api/person"

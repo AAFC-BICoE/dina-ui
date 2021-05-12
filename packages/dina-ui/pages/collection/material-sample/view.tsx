@@ -30,7 +30,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
   const materialSampleQuery = useQuery<MaterialSample>({
     path: `collection-api/material-sample/${id}`,
-    include: "collectingEvent,attachment"
+    include: "collectingEvent,attachment,preparationType"
   });
 
   const colEventQuery = useCollectingEventQuery(

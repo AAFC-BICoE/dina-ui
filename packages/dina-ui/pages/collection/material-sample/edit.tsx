@@ -4,9 +4,12 @@ import {
   ButtonBar,
   DateField,
   DinaForm,
+  DinaFormSection,
   DinaFormSubmitParams,
   FieldSet,
+  filterBy,
   FormikButton,
+  ResourceSelectField,
   SubmitButton,
   TextField,
   useAccount,
@@ -40,6 +43,7 @@ import {
 import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
+import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
 import { Metadata } from "../../../types/objectstore-api";
 
 export default function MaterialSampleEditPage() {
@@ -53,7 +57,7 @@ export default function MaterialSampleEditPage() {
   const materialSampleQuery = useQuery<MaterialSample>(
     {
       path: `collection-api/material-sample/${id}`,
-      include: "collectingEvent,attachment"
+      include: "collectingEvent,attachment,preparationType"
     },
     {
       disabled: !id,
@@ -387,16 +391,10 @@ export function MaterialSampleForm({
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleFormLayout() {
   return (
-    <div>
-      <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-        />
-      </div>
-      <div className="row">
-        <TextField name="materialSampleName" className="col-md-6" />
+    <div className="row">
+      <div className="col-md-6">
+        <GroupSelectField name="group" enableStoredDefaultGroup={true} />
+        <TextField name="materialSampleName" />
       </div>
     </div>
   );
@@ -413,14 +411,20 @@ export function CatalogueInfoFormLayout({
     <FieldSet className={className} legend={<DinaMessage id="catalogueInfo" />}>
       <div className="row">
         <div className="col-md-6">
-          <FieldSet
-            legend={<DinaMessage id="preparation" />}
-            horizontal={true}
-            readOnly={true} // Disabled until back-end supports these fields.
-          >
-            <TextField name="preparationMethod" />
-            <TextField name="preparedBy" />
-            <DateField name="datePrepared" />
+          <FieldSet legend={<DinaMessage id="preparation" />} horizontal={true}>
+            <ResourceSelectField<PreparationType>
+              name="preparationType"
+              filter={filterBy(["name"])}
+              model="collection-api/preparation-type"
+              optionLabel={it => it.name}
+              readOnlyLink="/collection/preparation-type/view?id="
+            />
+            <DinaFormSection
+              readOnly={true} // Disabled until back-end supports these fields.
+            >
+              <TextField name="preparedBy" />
+              <DateField name="datePrepared" />
+            </DinaFormSection>
           </FieldSet>
         </div>
         <div className="col-md-6">
