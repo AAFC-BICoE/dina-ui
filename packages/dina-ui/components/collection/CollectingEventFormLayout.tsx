@@ -770,6 +770,13 @@ export function CollectingEventFormLayout({
             </FieldSet>
           </div>
         </div>
+        <FieldSet legend={<DinaMessage id="locationDescriptionLegend" />}>
+          <div className="row">
+            <div className="col-md-6">
+              <TextField name="habitat" />
+            </div>
+          </div>
+        </FieldSet>
       </FieldSet>
       <div className="row">
         <div className="col-md-6">
