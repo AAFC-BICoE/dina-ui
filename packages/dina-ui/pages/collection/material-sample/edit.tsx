@@ -291,33 +291,27 @@ export function MaterialSampleForm({
       <MaterialSampleFormLayout />
       <FieldSet legend={<DinaMessage id="components" />}>
         <div className="row">
-          <label className="d-flex align-items-center col-sm-3">
-            <strong>
-              <DinaMessage id="collectingEvent" />
-            </strong>
-            <div className="mx-2 enable-collecting-event">
-              <Switch
-                checked={enableCollectingEvent}
-                onChange={dataComponentToggler(
-                  setEnableCollectingEvent,
-                  formatMessage("collectingEvent")
-                )}
-              />
-            </div>
+          <label className="enable-collecting-event d-flex align-items-center font-weight-bold col-sm-3">
+            <Switch
+              className="mx-2"
+              checked={enableCollectingEvent}
+              onChange={dataComponentToggler(
+                setEnableCollectingEvent,
+                formatMessage("collectingEvent")
+              )}
+            />
+            <DinaMessage id="collectingEvent" />
           </label>
-          <label className="d-flex align-items-center col-sm-3">
-            <strong>
-              <DinaMessage id="catalogueInfo" />
-            </strong>
-            <div className="mx-2 enable-catalogue-info">
-              <Switch
-                checked={enableCatalogueInfo}
-                onChange={dataComponentToggler(
-                  setEnableCatalogueInfo,
-                  formatMessage("catalogueInfo")
-                )}
-              />
-            </div>
+          <label className="enable-catalogue-info d-flex align-items-center font-weight-bold col-sm-3">
+            <Switch
+              className="mx-2"
+              checked={enableCatalogueInfo}
+              onChange={dataComponentToggler(
+                setEnableCatalogueInfo,
+                formatMessage("catalogueInfo")
+              )}
+            />
+            <DinaMessage id="catalogueInfo" />
           </label>
         </div>
       </FieldSet>
@@ -415,15 +409,6 @@ export interface CatalogueInfoFormLayoutProps {
 export function CatalogueInfoFormLayout({
   className
 }: CatalogueInfoFormLayoutProps) {
-  const { readOnly } = useDinaFormContext();
-
-  function setNameToCatalogNumber(
-    values: InputResource<MaterialSample>,
-    form: FormikContextType<any>
-  ) {
-    form.setFieldValue("materialSampleName", values.dwcCatalogNumber);
-  }
-
   return (
     <FieldSet className={className} legend={<DinaMessage id="catalogueInfo" />}>
       <div className="row">
@@ -441,28 +426,6 @@ export function CatalogueInfoFormLayout({
         <div className="col-md-6">
           <FieldSet legend={<DinaMessage id="catalogueInfo" />}>
             <TextField name="dwcCatalogNumber" />
-            {!readOnly && (
-              <Field name="dwcCatalogNumber">
-                {({
-                  form: {
-                    values: { dwcCatalogNumber, materialSampleName }
-                  }
-                }) =>
-                  !dwcCatalogNumber ||
-                  dwcCatalogNumber === materialSampleName ? null : (
-                    <FormikButton
-                      onClick={setNameToCatalogNumber}
-                      className="btn btn-primary form-group"
-                      buttonProps={() => ({
-                        style: { width: "20rem" }
-                      })}
-                    >
-                      <DinaMessage id="makeThisThePrimaryIdentifier" />
-                    </FormikButton>
-                  )
-                }
-              </Field>
-            )}
           </FieldSet>
         </div>
       </div>

@@ -31,7 +31,6 @@
     "react-tabs": "^3.0.0"
   },
   "devDependencies": {
-    "@testing-library/react": "^10.4.4",
     "@types/bytes": "^3.1.0"
   },
   "lint-staged": {
