@@ -75,6 +75,29 @@ export function useCollectingEventQuery(id?: string | null) {
           data.geoReferenceAssertions,
           "createdOn"
         );
+        // Parse place names into srcAdminLevels
+        let srcAdminLevels: SourceAdministrativeLevel[] = [];
+
+        if (data?.geographicPlaceNameSourceDetail?.customGeographicPlace) {
+          const customPlaceNameAsInSrcAdmnLevel: SourceAdministrativeLevel = {};
+          customPlaceNameAsInSrcAdmnLevel.name =
+            data.geographicPlaceNameSourceDetail.customGeographicPlace;
+          srcAdminLevels.push(customPlaceNameAsInSrcAdmnLevel);
+        }
+        if (data.geographicPlaceNameSourceDetail?.selectedGeographicPlace)
+          srcAdminLevels.push(
+            data.geographicPlaceNameSourceDetail?.selectedGeographicPlace
+          );
+        if (data.geographicPlaceNameSourceDetail?.higherGeographicPlaces)
+          srcAdminLevels = srcAdminLevels.concat(
+            data.geographicPlaceNameSourceDetail?.higherGeographicPlaces
+          );
+
+        srcAdminLevels?.map(
+          admn =>
+            (admn.name += admn.placeType ? " [ " + admn.placeType + " ] " : "")
+        );
+        data.srcAdminLevels = srcAdminLevels;
       }
     }
   );
@@ -97,35 +120,6 @@ export function useCollectingEventSave(
     DEFAULT_VERBATIM_SRS_KEY
   );
 
-  let srcAdminLevels: SourceAdministrativeLevel[] = [];
-
-  // can either have one of customGeographicPlace or selectedGeographicPlace
-  if (
-    fetchedCollectingEvent?.geographicPlaceNameSourceDetail
-      ?.customGeographicPlace
-  ) {
-    const customPlaceNameAsInSrcAdmnLevel: SourceAdministrativeLevel = {};
-    customPlaceNameAsInSrcAdmnLevel.name =
-      fetchedCollectingEvent?.geographicPlaceNameSourceDetail.customGeographicPlace;
-    srcAdminLevels.push(customPlaceNameAsInSrcAdmnLevel);
-  }
-
-  if (
-    fetchedCollectingEvent?.geographicPlaceNameSourceDetail
-      ?.selectedGeographicPlace
-  )
-    srcAdminLevels.push(
-      fetchedCollectingEvent?.geographicPlaceNameSourceDetail
-        ?.selectedGeographicPlace
-    );
-  if (
-    fetchedCollectingEvent?.geographicPlaceNameSourceDetail
-      ?.higherGeographicPlaces
-  )
-    srcAdminLevels = srcAdminLevels.concat(
-      fetchedCollectingEvent?.geographicPlaceNameSourceDetail
-        ?.higherGeographicPlaces
-    );
   const collectingEventInitialValues = fetchedCollectingEvent
     ? {
         ...fetchedCollectingEvent,
@@ -134,7 +128,7 @@ export function useCollectingEventSave(
           "",
         geoReferenceAssertions:
           fetchedCollectingEvent.geoReferenceAssertions ?? [],
-        srcAdminLevels
+        srcAdminLevels: fetchedCollectingEvent.srcAdminLevels
       }
     : {
         type: "collecting-event",
