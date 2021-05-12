@@ -155,6 +155,7 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
+              managedAttributeValues: {},
               relationships: {},
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
@@ -173,6 +174,7 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
+              managedAttributeValues: {},
               materialSampleName: expect.stringMatching(/test-user-.*/),
               dwcCatalogNumber: "my-new-material-sample",
               relationships: {},
@@ -246,6 +248,7 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
+              managedAttributeValues: {},
               materialSampleName: expect.stringMatching(/test-user-.*/),
               dwcCatalogNumber: "my-new-material-sample",
               type: "material-sample",
@@ -375,6 +378,7 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
+              managedAttributeValues: {},
               relationships: {},
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
