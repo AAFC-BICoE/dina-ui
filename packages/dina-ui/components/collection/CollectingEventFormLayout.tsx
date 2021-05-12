@@ -469,7 +469,6 @@ export function CollectingEventFormLayout({
               </Field>
             </div>
             <div className="col-md-6">
-              <TextField name="habitat" />
               <AutoSuggestTextField<SRS>
                 name="dwcVerbatimSRS"
                 configQuery={() => ({
@@ -767,6 +766,11 @@ export function CollectingEventFormLayout({
                   }
                 </Field>
               </div>
+            </FieldSet>
+          </div>
+          <div className="col-lg-6">
+            <FieldSet legend={<DinaMessage id="locationDescriptionLegend" />}>
+              <TextField name="habitat" />
             </FieldSet>
           </div>
         </div>

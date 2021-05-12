@@ -34,7 +34,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
   cataloguedObjectListTitle: "Catalogued Objects",
-  changedProperties: "Changes",
   catalogueInfo: "Catalogue Info",
   cataloguedObjectViewTitle: "View Catalogued Object",
   changedProperties: "Changes",
@@ -185,7 +184,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_givenNames_tooltip: "First and all middle names",
   field_license: "License",
   field_managedAttributeComponent: "Target Data Component Type",
-  field_managedAttributeCreatedOn: "Created On",
   field_managedAttributeCreatedBy: "Created By",
   field_managedAttributeCreatedOn: "Created On",
   field_managedAttributeMandatoryFieldsError:
@@ -227,6 +225,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   latitudeValidationError:
     "Invalid latitude: {latitude},   \nValid latitude range is between -90 to 90 for degree, and 0 to 60 for minute and second",
   literalGeoreferencedByLabel: "Georeferenced By",
+  locationDescriptionLegend: "Location Description",
   locationLabel: "Location",
   longitudeValidationError:
     "Invalid longitude: {longtitude},   \nValid longitude is between -180 to 180 for degree, and 0 to 60 for minute and second",
@@ -281,7 +280,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   originalFile: "Original File",
   personListTitle: "Persons",
   personViewTitle: "Person",
-  placeNameLabel: "Place Name",
   preparation: "Preparation",
   preparationData: "Preparation Data",
   preparationTypeListTitle: "Preparation Type",
@@ -292,7 +290,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Make this assertion the primary data point when exported. Only one assertion can be primary",
   removeAssertionLabel: "Remove this GeoReference",
   removeGroup: "Remove Group",
-  placeNameLabel: "Place Name",
   removeComponentData: "Remove {component} data",
   removeThisPlaceLabel: " Remove this Place",
   resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",
@@ -311,7 +308,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   showing: "Showing",
   startEventDateTimeLabel: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   stateProvinceLabel: "State/Province",
-  thumbnailNotAvailableText: "No thumbnail available",
   thumbnail: "Thumbnail",
   thumbnailNotAvailableText: "No thumbnail available",
   to: "To",
