@@ -120,35 +120,6 @@ export function useCollectingEventSave(
     DEFAULT_VERBATIM_SRS_KEY
   );
 
-  // let srcAdminLevels: SourceAdministrativeLevel[] = [];
-
-  // // can either have one of customGeographicPlace or selectedGeographicPlace
-  // if (
-  //   fetchedCollectingEvent?.geographicPlaceNameSourceDetail
-  //     ?.customGeographicPlace
-  // ) {
-  //   const customPlaceNameAsInSrcAdmnLevel: SourceAdministrativeLevel = {};
-  //   customPlaceNameAsInSrcAdmnLevel.name =
-  //     fetchedCollectingEvent?.geographicPlaceNameSourceDetail.customGeographicPlace;
-  //   srcAdminLevels.push(customPlaceNameAsInSrcAdmnLevel);
-  // }
-
-  // if (
-  //   fetchedCollectingEvent?.geographicPlaceNameSourceDetail
-  //     ?.selectedGeographicPlace
-  // )
-  //   srcAdminLevels.push(
-  //     fetchedCollectingEvent?.geographicPlaceNameSourceDetail
-  //       ?.selectedGeographicPlace
-  //   );
-  // if (
-  //   fetchedCollectingEvent?.geographicPlaceNameSourceDetail
-  //     ?.higherGeographicPlaces
-  // )
-  //   srcAdminLevels = srcAdminLevels.concat(
-  //     fetchedCollectingEvent?.geographicPlaceNameSourceDetail
-  //       ?.higherGeographicPlaces
-  //   );
   const collectingEventInitialValues = fetchedCollectingEvent
     ? {
         ...fetchedCollectingEvent,
