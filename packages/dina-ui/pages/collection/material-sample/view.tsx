@@ -90,7 +90,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <Head title={formatMessage("materialSampleViewTitle")} />
       <Nav />
       {withResponse(materialSampleQuery, ({ data: materialSample }) => {
-        const hasCatalogueInfo = !!materialSample?.dwcCatalogNumber;
+        const hasCatalogueInfo =
+          !!materialSample?.dwcCatalogNumber ||
+          !!materialSample?.preparationType;
         return (
           <main className="container-fluid">
             {buttonBar}

@@ -127,7 +127,8 @@ export function MaterialSampleForm({
     !!materialSample?.collectingEvent
   );
 
-  const hasCatalogueInfo = !!materialSample?.dwcCatalogNumber;
+  const hasCatalogueInfo =
+    !!materialSample?.dwcCatalogNumber || !!materialSample?.preparationType;
   const [enableCatalogueInfo, setEnableCatalogueInfo] = useState(
     hasCatalogueInfo
   );
