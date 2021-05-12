@@ -71,12 +71,10 @@ export function ManagedAttributesEditor({
   return (
     <div className="form-group managed-attributes-editor">
       <div className="row">
-        <div className="col-sm-6">
-          <label>
-            <strong>
-              <DinaMessage id="field_editableManagedAttributes" />
-            </strong>
-          </label>
+        <label className="col-sm-6">
+          <strong>
+            <DinaMessage id="field_editableManagedAttributes" />
+          </strong>
           <ResourceSelect<ManagedAttribute>
             filter={input => ({
               ...filterBy(["name"])(input),
@@ -94,9 +92,13 @@ export function ManagedAttributesEditor({
             }
             value={editableManagedAttributes}
           />
-        </div>
+        </label>
         <div className="col-sm-6">
-          <div className="alert alert-warning">
+          <div
+            className="alert alert-warning"
+            role="region"
+            aria-label="Editable attribute removal info"
+          >
             <DinaMessage id="editableManagedAttributesRemoveInfo" />
           </div>
         </div>
