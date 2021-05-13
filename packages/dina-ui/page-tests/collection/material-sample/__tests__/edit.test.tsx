@@ -49,33 +49,22 @@ const TEST_COORDINATES: CoordinateSystem = {
 };
 
 const mockGet = jest.fn<any, any>(async path => {
-  if (path === "user-api/group") {
-    return { data: [] };
-  }
-  if (path === "collection-api/collecting-event") {
-    // Populate the collecting-event linker table:
-    return { data: [testCollectionEvent()] };
-  }
-  if (
-    path === "collection-api/collecting-event/1?include=collectors,attachment"
-  ) {
-    // Populate the linker table:
-    return { data: testCollectionEvent() };
-  }
-  if (path === "agent-api/person") {
-    return { data: [] };
-  }
-  if (path === "collection-api/srs") {
-    return { data: [TEST_SRS] };
-  }
-  if (path === "collection-api/coordinate-system") {
-    return { data: [TEST_COORDINATES] };
-  }
-  if (path === "collection-api/managed-attribute") {
-    return { data: [] };
-  }
-  if (path === "objectstore-api/metadata") {
-    return { data: [] };
+  switch (path) {
+    case "collection-api/collecting-event":
+      return { data: [testCollectionEvent()] };
+    case "collection-api/collecting-event/1?include=collectors,attachment":
+      // Populate the linker table:
+      return { data: testCollectionEvent() };
+    case "collection-api/srs":
+      return { data: [TEST_SRS] };
+    case "collection-api/coordinate-system":
+      return { data: [TEST_COORDINATES] };
+    case "collection-api/preparation-type":
+    case "collection-api/managed-attribute":
+    case "user-api/group":
+    case "agent-api/person":
+    case "objectstore-api/metadata":
+      return { data: [] };
   }
 });
 
@@ -155,6 +144,7 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
+              managedAttributeValues: {},
               relationships: {},
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
@@ -173,6 +163,7 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
+              managedAttributeValues: {},
               materialSampleName: expect.stringMatching(/test-user-.*/),
               dwcCatalogNumber: "my-new-material-sample",
               relationships: {},
@@ -246,6 +237,7 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
+              managedAttributeValues: {},
               materialSampleName: expect.stringMatching(/test-user-.*/),
               dwcCatalogNumber: "my-new-material-sample",
               type: "material-sample",
@@ -375,6 +367,7 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
+              managedAttributeValues: {},
               relationships: {},
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"

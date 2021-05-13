@@ -123,9 +123,6 @@ export function useCollectingEventSave(
   const collectingEventInitialValues = fetchedCollectingEvent
     ? {
         ...fetchedCollectingEvent,
-        dwcOtherRecordNumbers:
-          fetchedCollectingEvent.dwcOtherRecordNumbers?.concat("").join("\n") ??
-          "",
         geoReferenceAssertions:
           fetchedCollectingEvent.geoReferenceAssertions ?? [],
         srcAdminLevels: fetchedCollectingEvent.srcAdminLevels
@@ -143,7 +140,8 @@ export function useCollectingEventSave(
         ],
         dwcVerbatimCoordinateSystem:
           defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
-        dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84
+        dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84,
+        managedAttributeValues: {}
       };
 
   // The selected Metadatas to be attached to this Collecting Event:
@@ -198,15 +196,6 @@ export function useCollectingEventSave(
     if (submittedValues.collectorGroups?.id)
       submittedValues.collectorGroupUuid = submittedValues.collectorGroups.id;
     delete submittedValues.collectorGroups;
-
-    // Convert user-suplied string to string array:
-    submittedValues.dwcOtherRecordNumbers = (
-      submittedValues.dwcOtherRecordNumbers?.toString() || ""
-    )
-      // Split by line breaks:
-      .match(/[^\r\n]+/g)
-      // Remove empty lines:
-      ?.filter(line => line.trim());
 
     // Treat empty array or undefined as null:
     if (!submittedValues.dwcOtherRecordNumbers?.length) {

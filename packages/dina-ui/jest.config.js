@@ -20,5 +20,5 @@ module.exports = {
     "^.+\\.tsx?$": "babel-jest",
   },
   // Transform our local common-ui package
-  transformIgnorePatterns: [`/node_modules/(?!common-ui)`]
+  transformIgnorePatterns: [`/node_modules/(?!common-ui)`],
 };

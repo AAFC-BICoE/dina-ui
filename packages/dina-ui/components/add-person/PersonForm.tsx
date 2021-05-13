@@ -5,7 +5,9 @@ import {
   filterBy,
   SubmitButton,
   TextField,
-  useModal
+  useModal,
+  StringArrayField,
+  FormikButton
 } from "common-ui";
 import { ResourceSelectField } from "common-ui/lib";
 import { PersistedResource } from "kitsu";
@@ -18,23 +20,15 @@ interface PersonFormProps {
   onSubmitSuccess?: (person: PersistedResource<Person>) => void | Promise<void>;
 }
 
-interface PersonFormValues extends Partial<Person> {
-  aliasesAsLines?: string;
-}
-
 /** Form to add or edit a Person. */
 export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
-  const initialValues: PersonFormValues = person || { type: "person" };
-
-  // Convert acceptedValues to easily editable string format:
-  initialValues.aliasesAsLines =
-    initialValues.aliases?.concat("")?.join("\n") ?? "";
+  const initialValues: Partial<Person> = person || { type: "person" };
 
   const id = person?.id;
 
   const onSubmit: DinaFormOnSubmit = async ({
     api: { save },
-    submittedValues: { aliasesAsLines, ...submittedPerson }
+    submittedValues: { ...submittedPerson }
   }) => {
     const submitCopy = { ...submittedPerson };
     if (submitCopy.organizations) {
@@ -49,14 +43,6 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       );
       delete submittedPerson.organizations;
     }
-
-    // Convert user-suplied string to string array:
-    submittedPerson.aliases =
-      (aliasesAsLines || "")
-        // Split by line breaks:
-        .match(/[^\r\n]+/g)
-        // Remove empty lines:
-        ?.filter(line => line.trim()) ?? [];
 
     const [savedPerson] = await save<Person>(
       [
@@ -85,7 +71,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
         <TextField name="familyNames" />
       </div>
       <div style={{ width: "30rem" }}>
-        <TextField name="aliasesAsLines" multiLines={true} />
+        <StringArrayField name="aliases" />
       </div>
       <div style={{ width: "30rem" }}>
         <TextField name="email" />
