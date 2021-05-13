@@ -70,7 +70,7 @@ export function FileView({
       >
         {isImage ? (
           <img
-            alt={imgAlt}
+            alt={imgAlt ?? `File path : ${filePath}`}
             src={authenticatedFilePath}
             style={{ height: imgHeight }}
           />

@@ -4,9 +4,12 @@ import {
   ButtonBar,
   DateField,
   DinaForm,
+  DinaFormSection,
   DinaFormSubmitParams,
   FieldSet,
+  filterBy,
   FormikButton,
+  ResourceSelectField,
   SubmitButton,
   TextField,
   useAccount,
@@ -40,6 +43,7 @@ import {
 import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
+import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
 import { Metadata } from "../../../types/objectstore-api";
 
 export default function MaterialSampleEditPage() {
@@ -53,7 +57,7 @@ export default function MaterialSampleEditPage() {
   const materialSampleQuery = useQuery<MaterialSample>(
     {
       path: `collection-api/material-sample/${id}`,
-      include: "collectingEvent,attachment"
+      include: "collectingEvent,attachment,preparationType"
     },
     {
       disabled: !id,
@@ -123,7 +127,8 @@ export function MaterialSampleForm({
     !!materialSample?.collectingEvent
   );
 
-  const hasCatalogueInfo = !!materialSample?.dwcCatalogNumber;
+  const hasCatalogueInfo =
+    !!materialSample?.dwcCatalogNumber || !!materialSample?.preparationType;
   const [enableCatalogueInfo, setEnableCatalogueInfo] = useState(
     hasCatalogueInfo
   );
@@ -291,33 +296,27 @@ export function MaterialSampleForm({
       <MaterialSampleFormLayout />
       <FieldSet legend={<DinaMessage id="components" />}>
         <div className="row">
-          <label className="d-flex align-items-center col-sm-3">
-            <strong>
-              <DinaMessage id="collectingEvent" />
-            </strong>
-            <div className="mx-2 enable-collecting-event">
-              <Switch
-                checked={enableCollectingEvent}
-                onChange={dataComponentToggler(
-                  setEnableCollectingEvent,
-                  formatMessage("collectingEvent")
-                )}
-              />
-            </div>
+          <label className="enable-collecting-event d-flex align-items-center font-weight-bold col-sm-3">
+            <Switch
+              className="mx-2"
+              checked={enableCollectingEvent}
+              onChange={dataComponentToggler(
+                setEnableCollectingEvent,
+                formatMessage("collectingEvent")
+              )}
+            />
+            <DinaMessage id="collectingEvent" />
           </label>
-          <label className="d-flex align-items-center col-sm-3">
-            <strong>
-              <DinaMessage id="catalogueInfo" />
-            </strong>
-            <div className="mx-2 enable-catalogue-info">
-              <Switch
-                checked={enableCatalogueInfo}
-                onChange={dataComponentToggler(
-                  setEnableCatalogueInfo,
-                  formatMessage("catalogueInfo")
-                )}
-              />
-            </div>
+          <label className="enable-catalogue-info d-flex align-items-center font-weight-bold col-sm-3">
+            <Switch
+              className="mx-2"
+              checked={enableCatalogueInfo}
+              onChange={dataComponentToggler(
+                setEnableCatalogueInfo,
+                formatMessage("catalogueInfo")
+              )}
+            />
+            <DinaMessage id="catalogueInfo" />
           </label>
         </div>
       </FieldSet>
@@ -393,16 +392,10 @@ export function MaterialSampleForm({
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleFormLayout() {
   return (
-    <div>
-      <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-        />
-      </div>
-      <div className="row">
-        <TextField name="materialSampleName" className="col-md-6" />
+    <div className="row">
+      <div className="col-md-6">
+        <GroupSelectField name="group" enableStoredDefaultGroup={true} />
+        <TextField name="materialSampleName" />
       </div>
     </div>
   );
@@ -415,54 +408,29 @@ export interface CatalogueInfoFormLayoutProps {
 export function CatalogueInfoFormLayout({
   className
 }: CatalogueInfoFormLayoutProps) {
-  const { readOnly } = useDinaFormContext();
-
-  function setNameToCatalogNumber(
-    values: InputResource<MaterialSample>,
-    form: FormikContextType<any>
-  ) {
-    form.setFieldValue("materialSampleName", values.dwcCatalogNumber);
-  }
-
   return (
     <FieldSet className={className} legend={<DinaMessage id="catalogueInfo" />}>
       <div className="row">
         <div className="col-md-6">
-          <FieldSet
-            legend={<DinaMessage id="preparation" />}
-            horizontal={true}
-            readOnly={true} // Disabled until back-end supports these fields.
-          >
-            <TextField name="preparationMethod" />
-            <TextField name="preparedBy" />
-            <DateField name="datePrepared" />
+          <FieldSet legend={<DinaMessage id="preparation" />} horizontal={true}>
+            <ResourceSelectField<PreparationType>
+              name="preparationType"
+              filter={filterBy(["name"])}
+              model="collection-api/preparation-type"
+              optionLabel={it => it.name}
+              readOnlyLink="/collection/preparation-type/view?id="
+            />
+            <DinaFormSection
+              readOnly={true} // Disabled until back-end supports these fields.
+            >
+              <TextField name="preparedBy" />
+              <DateField name="datePrepared" />
+            </DinaFormSection>
           </FieldSet>
         </div>
         <div className="col-md-6">
           <FieldSet legend={<DinaMessage id="catalogueInfo" />}>
             <TextField name="dwcCatalogNumber" />
-            {!readOnly && (
-              <Field name="dwcCatalogNumber">
-                {({
-                  form: {
-                    values: { dwcCatalogNumber, materialSampleName }
-                  }
-                }) =>
-                  !dwcCatalogNumber ||
-                  dwcCatalogNumber === materialSampleName ? null : (
-                    <FormikButton
-                      onClick={setNameToCatalogNumber}
-                      className="btn btn-primary form-group"
-                      buttonProps={() => ({
-                        style: { width: "20rem" }
-                      })}
-                    >
-                      <DinaMessage id="makeThisThePrimaryIdentifier" />
-                    </FormikButton>
-                  )
-                }
-              </Field>
-            )}
           </FieldSet>
         </div>
       </div>

@@ -17,7 +17,10 @@ import { CollectingEventFormLayout } from "../../../components/collection/Collec
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { MaterialSample } from "../../../types/collection-api";
+import {
+  MaterialSample,
+  SourceAdministrativeLevel
+} from "../../../types/collection-api";
 import { CatalogueInfoFormLayout, MaterialSampleFormLayout } from "./edit";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
@@ -27,7 +30,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
   const materialSampleQuery = useQuery<MaterialSample>({
     path: `collection-api/material-sample/${id}`,
-    include: "collectingEvent,attachment"
+    include: "collectingEvent,attachment,preparationType"
   });
 
   const colEventQuery = useCollectingEventQuery(
@@ -35,7 +38,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   );
 
   const collectingEvent = colEventQuery.response?.data;
-
   const buttonBar = (
     <ButtonBar>
       <BackButton
@@ -63,7 +65,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <Head title={formatMessage("materialSampleViewTitle")} />
       <Nav />
       {withResponse(materialSampleQuery, ({ data: materialSample }) => {
-        const hasCatalogueInfo = !!materialSample?.dwcCatalogNumber;
+        const hasCatalogueInfo =
+          !!materialSample?.dwcCatalogNumber ||
+          !!materialSample?.preparationType;
         return (
           <main className="container-fluid">
             {buttonBar}

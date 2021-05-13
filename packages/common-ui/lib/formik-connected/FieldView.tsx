@@ -12,14 +12,9 @@ export function FieldView(props: LabelWrapperParams) {
 export interface ReadOnlyValueProps {
   value: any;
   link?: string;
-  arrayItemLink?: string;
 }
 
-export function ReadOnlyValue({
-  value,
-  link,
-  arrayItemLink
-}: ReadOnlyValueProps) {
+export function ReadOnlyValue({ value, link }: ReadOnlyValueProps) {
   return (
     <div
       className="field-view"
@@ -43,18 +38,7 @@ export function ReadOnlyValue({
 
           return (
             <Fragment key={idx}>
-              {arrayItemLink ? (
-                <>
-                  <Link href={arrayItemLink + val.id} key={val.id}>
-                    <a>{displayString}</a>
-                  </Link>
-                  {idx <= value.length - 2 && <span>, </span>}
-                </>
-              ) : idx <= value.length - 2 ? (
-                displayString + ", "
-              ) : (
-                displayString
-              )}
+              {idx <= value.length - 2 ? displayString + ", " : displayString}
             </Fragment>
           );
         })

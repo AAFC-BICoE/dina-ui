@@ -353,7 +353,7 @@ export function CollectingEventFormLayout({
             />
             <ResourceSelectField<Person>
               name="collectors"
-              arrayItemLink="/person/view?id="
+              readOnlyLink="/person/view?id="
               filter={filterBy(["displayName"])}
               model="agent-api/person"
               optionLabel={person => person.displayName}
@@ -766,6 +766,11 @@ export function CollectingEventFormLayout({
                   }
                 </Field>
               </div>
+            </FieldSet>
+          </div>
+          <div className="col-lg-6">
+            <FieldSet legend={<DinaMessage id="locationDescriptionLegend" />}>
+              <TextField name="habitat" />
             </FieldSet>
           </div>
         </div>

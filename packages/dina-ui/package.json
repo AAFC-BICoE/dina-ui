@@ -1,6 +1,6 @@
 {
   "name": "dina-ui",
-  "version": "0.44.0",
+  "version": "0.45.0",
   "scripts": {
     "build": "run-s next:build next:export",
     "dev": "next",
@@ -31,7 +31,6 @@
     "react-tabs": "^3.0.0"
   },
   "devDependencies": {
-    "@testing-library/react": "^10.4.4",
     "@types/bytes": "^3.1.0"
   },
   "lint-staged": {

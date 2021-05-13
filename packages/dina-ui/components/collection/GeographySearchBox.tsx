@@ -220,10 +220,16 @@ export function GeographySearchBox({
                 .searchResult {
                   font-size:13pt; font-family:verdana,sans-serif;
                 }     
+                .searchResultCategory {
+                  font-size:13pt; font-family:verdana,sans-serif; color: grey;
+                }                     
             `}</style>
               <div className="row">
-                <div className="col-md-12 searchResult">
+                <div className="col-md-8 searchResult">
                   {place.display_name}
+                </div>
+                <div className="col-md-4 searchResultCategory">
+                  {`[category: ${place.category}]`}
                 </div>
               </div>
               <div className="row">

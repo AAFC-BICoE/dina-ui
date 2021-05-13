@@ -1,17 +1,30 @@
 import { KitsuResource } from "kitsu";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
 
-export interface ManagedAttributeAttributes {
+export interface ManagedAttributeAttributes<TComponent = string> {
   type: string;
   name: string;
   managedAttributeType: string;
-  managedAttributeComponent: string;
+  managedAttributeComponent: TComponent;
   acceptedValues?: string[] | null;
   createdBy?: string;
   createdOn?: string;
 }
 
 export type ManagedAttributeType = "INTEGER" | "STRING" | "PICKLIST";
+
+export const COLLECTION_MODULE_TYPES = [
+  "COLLECTING_EVENT",
+  "MATERIAL_SAMPLE"
+] as const;
+export type CollectionModuleType = typeof COLLECTION_MODULE_TYPES[number];
+export const COLLECTION_MODULE_TYPE_LABELS: Record<
+  CollectionModuleType,
+  string
+> = {
+  COLLECTING_EVENT: "collectingEvent",
+  MATERIAL_SAMPLE: "materialSample"
+};
 
 export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
   labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH;
@@ -31,4 +44,5 @@ export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
   }
 ];
 
-export type ManagedAttribute = KitsuResource & ManagedAttributeAttributes;
+export type ManagedAttribute<TComponent = string> = KitsuResource &
+  ManagedAttributeAttributes<TComponent>;

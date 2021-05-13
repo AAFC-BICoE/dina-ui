@@ -22,13 +22,12 @@ const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
 
 const MATERIAL_SAMPLE_TABLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
   {
-    Cell: ({ original: { id, name } }) => (
+    Cell: ({ original: { id, materialSampleName } }) => (
       <Link href={`/collection/material-sample/view?id=${id}`}>
-        {name || id}
+        {materialSampleName || id}
       </Link>
     ),
-    accessor: "name",
-    sortable: false
+    accessor: "materialSampleName"
   },
   "dwcCatalogNumber",
   "createdBy",

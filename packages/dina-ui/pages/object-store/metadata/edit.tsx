@@ -28,20 +28,20 @@ export default function EditMetadatasPage() {
     <div>
       <Head title={formatMessage("metadataBulkEditTitle")} />
       <Nav />
-      <ButtonBar>
-        <>
-          {metadataIds?.length === 1 ? (
-            <BackButton
-              entityLink="/object-store/object"
-              entityId={metadataIds[0]}
-              byPassView={false}
-            />
-          ) : (
-            <BackButton entityLink="/object-store/object" />
-          )}
-        </>
-      </ButtonBar>
       <main className="container-fluid">
+        <ButtonBar>
+          <>
+            {metadataIds?.length === 1 ? (
+              <BackButton
+                entityLink="/object-store/object"
+                entityId={metadataIds[0]}
+                byPassView={false}
+              />
+            ) : (
+              <BackButton entityLink="/object-store/object" />
+            )}
+          </>
+        </ButtonBar>
         <BulkMetadataEditor
           metadataIds={metadataIds}
           objectUploadIds={objectUploadIds}

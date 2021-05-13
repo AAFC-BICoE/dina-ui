@@ -1,0 +1,42 @@
+= Performing write operations
+
+This application uses React's hooks and context API to provide a "save" function which allows
+you to perform write operations against the back-end API. "save" accepts an array of
+operations to perform, so you can submit multiple resource operations in a single transaction
+in a single HTTP request.
+
+If one operation fails, the entire transaction is cancelled, and "save" throws an Error,
+which provides an aggregation message of all of the error messages. This function relies on the back-end to
+support JSONAPI's jsonpatch extension (implemented by crnk-operations).
+
+Here is a simple example of a component that uses the "save" function from the context to
+provide a button that creates a new Region with a random name and symbol:
+
+[source,tsx]
+----
+import React from "react";
+import { useApiClient } from "common-ui";
+
+export funcion NewRegionButton() {
+  const { save } = useApiClient();
+
+  async function createRegion() {
+    await save(
+      [
+        {
+          resource: {
+            name: `new-region-${Math.random()}`,
+            seq: "",
+            symbol: `${Math.random()}`,
+            type: "PRIMER"
+          },
+          type: "region"
+        }
+      ],
+      { apiBaseUrl: "/seqdb-api" }
+    );
+  };
+
+  return <button onClick={this.createRegion}>Create Region</button>;
+}
+----

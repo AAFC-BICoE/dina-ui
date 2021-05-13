@@ -30,6 +30,13 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
     ...labelWrapperProps
   } = props;
 
+  const customStyle = {
+    placeholder: (provided, _) => ({
+      ...provided,
+      color: "rgb(87,120,94)"
+    })
+  };
+
   return (
     <FieldWrapper {...labelWrapperProps}>
       {({ setValue, value }) => {
@@ -58,8 +65,8 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
             isMulti={isMulti}
             options={options}
             onChange={onChangeInternal}
-            styles={styles}
             value={selectedOption}
+            styles={customStyle}
           />
         );
       }}
