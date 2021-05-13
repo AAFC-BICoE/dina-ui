@@ -107,13 +107,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_acSubtype: "Ac Subtype",
   field_acTags: "Tags",
   field_acceptedValues: "Accepted Values",
-  field_acceptedValuesAsLines: "Accepted Values (One value per line)",
-  field_acceptedValuesAsLines_tooltip:
-    "Write one accepted value per line. Press enter while typing in the field to add a new line.",
   field_aliases: "Aliases",
-  field_aliasesAsLines: "Aliases (One value per line)",
-  field_aliasesAsLines_tooltip:
-    "Write one accepted value per line. Press enter while typing in the field to add a new line.",
   field_attributesTemplate: "Set Attributes Template",
   field_collectingEvent_endDateTimeError:
     "End event datetime format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",

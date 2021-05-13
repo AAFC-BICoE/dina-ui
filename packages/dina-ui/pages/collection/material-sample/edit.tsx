@@ -140,7 +140,8 @@ export function MaterialSampleForm({
     ? { ...materialSample }
     : {
         type: "material-sample",
-        materialSampleName: `${username}-${todayDate}`
+        materialSampleName: `${username}-${todayDate}`,
+        managedAttributeValues: {}
       };
 
   /** Used to get the values of the nested CollectingEvent form. */

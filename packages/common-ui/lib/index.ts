@@ -31,6 +31,7 @@ export * from "./formik-connected/NumberField";
 export * from "./formik-connected/ResourceSelectField";
 export * from "./formik-connected/safeSubmit";
 export * from "./formik-connected/SelectField";
+export * from "./formik-connected/StringArrayField";
 export * from "./formik-connected/SubmitButton";
 export * from "./formik-connected/TextField";
 export * from "./formik-connected/safeSubmit";
