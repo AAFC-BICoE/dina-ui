@@ -23,9 +23,6 @@ export interface LabelWrapperParams {
   /** Link href to render for a single string value. */
   link?: string;
 
-  /** Link href to render on each array item. */
-  arrayItemLink?: string;
-
   /** Custom element to render when the form is in read-only mode. */
   readOnlyRender?: (value: any) => ReactNode;
 
@@ -61,7 +58,6 @@ export function FieldWrapper({
   label,
   children,
   customName,
-  arrayItemLink,
   link,
   readOnlyRender,
   removeFormGroupClass,
@@ -101,11 +97,7 @@ export function FieldWrapper({
               if (readOnly || !children) {
                 return (
                   readOnlyRender?.(value) ?? (
-                    <ReadOnlyValue
-                      arrayItemLink={arrayItemLink}
-                      link={link}
-                      value={value}
-                    />
+                    <ReadOnlyValue link={link} value={value} />
                   )
                 );
               } else if (typeof children === "function") {

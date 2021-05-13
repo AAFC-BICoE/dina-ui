@@ -1,6 +1,7 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 import { CollectingEvent } from "./CollectingEvent";
+import { PreparationType } from "./PreparationType";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -17,6 +18,7 @@ export interface MaterialSampleAttributes {
 export interface MaterialSampleRelationships {
   collectingEvent?: CollectingEvent;
   attachment?: ResourceIdentifierObject[];
+  preparationType?: PreparationType;
 }
 
 export type MaterialSample = KitsuResource &

@@ -49,33 +49,22 @@ const TEST_COORDINATES: CoordinateSystem = {
 };
 
 const mockGet = jest.fn<any, any>(async path => {
-  if (path === "user-api/group") {
-    return { data: [] };
-  }
-  if (path === "collection-api/collecting-event") {
-    // Populate the collecting-event linker table:
-    return { data: [testCollectionEvent()] };
-  }
-  if (
-    path === "collection-api/collecting-event/1?include=collectors,attachment"
-  ) {
-    // Populate the linker table:
-    return { data: testCollectionEvent() };
-  }
-  if (path === "agent-api/person") {
-    return { data: [] };
-  }
-  if (path === "collection-api/srs") {
-    return { data: [TEST_SRS] };
-  }
-  if (path === "collection-api/coordinate-system") {
-    return { data: [TEST_COORDINATES] };
-  }
-  if (path === "collection-api/managed-attribute") {
-    return { data: [] };
-  }
-  if (path === "objectstore-api/metadata") {
-    return { data: [] };
+  switch (path) {
+    case "collection-api/collecting-event":
+      return { data: [testCollectionEvent()] };
+    case "collection-api/collecting-event/1?include=collectors,attachment":
+      // Populate the linker table:
+      return { data: testCollectionEvent() };
+    case "collection-api/srs":
+      return { data: [TEST_SRS] };
+    case "collection-api/coordinate-system":
+      return { data: [TEST_COORDINATES] };
+    case "collection-api/preparation-type":
+    case "collection-api/managed-attribute":
+    case "user-api/group":
+    case "agent-api/person":
+    case "objectstore-api/metadata":
+      return { data: [] };
   }
 });
 

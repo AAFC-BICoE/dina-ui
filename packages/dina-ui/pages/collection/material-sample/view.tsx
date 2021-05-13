@@ -30,7 +30,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
   const materialSampleQuery = useQuery<MaterialSample>({
     path: `collection-api/material-sample/${id}`,
-    include: "collectingEvent,attachment"
+    include: "collectingEvent,attachment,preparationType"
   });
 
   const colEventQuery = useCollectingEventQuery(
@@ -65,7 +65,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <Head title={formatMessage("materialSampleViewTitle")} />
       <Nav />
       {withResponse(materialSampleQuery, ({ data: materialSample }) => {
-        const hasCatalogueInfo = !!materialSample?.dwcCatalogNumber;
+        const hasCatalogueInfo =
+          !!materialSample?.dwcCatalogNumber ||
+          !!materialSample?.preparationType;
         return (
           <main className="container-fluid">
             {buttonBar}

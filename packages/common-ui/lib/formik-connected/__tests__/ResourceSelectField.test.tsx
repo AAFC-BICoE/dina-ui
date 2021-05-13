@@ -141,4 +141,55 @@ describe("ResourceSelectField component", () => {
       type: "group"
     });
   });
+
+  it("Renders the read-only view.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{
+          singleGroup: { id: "1", groupName: "Group 1" },
+          multipleGroups: [
+            { id: "2", groupName: "Group 2" },
+            { id: "3", groupName: "Group 3" }
+          ]
+        }}
+        readOnly={true}
+      >
+        <ResourceSelectField<TestGroup>
+          name="singleGroup"
+          model="group"
+          filter={groupName => ({ groupName })}
+          optionLabel={group => group.groupName}
+          readOnlyLink="/group/view?id="
+        />
+        <ResourceSelectField<TestGroup>
+          name="multipleGroups"
+          model="group"
+          filter={groupName => ({ groupName })}
+          optionLabel={group => group.groupName}
+          isMulti={true}
+          readOnlyLink="/group/view?id="
+        />
+      </DinaForm>,
+      { apiContext }
+    );
+
+    expect(wrapper.find(".singleGroup-field .read-only-view").text()).toEqual(
+      "Group 1"
+    );
+    // Renders the link:
+    expect(
+      wrapper.find(".singleGroup-field .read-only-view a").prop("href")
+    ).toEqual("/group/view?id=1");
+
+    // Joins the names with commas:
+    expect(
+      wrapper.find(".multipleGroups-field .read-only-view").text()
+    ).toEqual("Group 2, Group 3");
+    // Renders each link:
+    expect(
+      wrapper
+        .find(".multipleGroups-field .read-only-view a")
+        .map(node => node.prop("href"))
+    ).toEqual(["/group/view?id=2", "/group/view?id=3"]);
+  });
 });

@@ -353,7 +353,7 @@ export function CollectingEventFormLayout({
             />
             <ResourceSelectField<Person>
               name="collectors"
-              arrayItemLink="/person/view?id="
+              readOnlyLink="/person/view?id="
               filter={filterBy(["displayName"])}
               model="agent-api/person"
               optionLabel={person => person.displayName}
