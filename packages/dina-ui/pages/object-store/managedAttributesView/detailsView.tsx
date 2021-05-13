@@ -179,9 +179,9 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       )}
       {id && (
         <div style={{ width: "25rem" }}>
-          <h4>
+          <h2>
             <DinaMessage id="field_managedAttributeCreatedOn" />
-          </h4>
+          </h2>
           <DateField
             showTime={true}
             name="createdOn"
@@ -192,9 +192,9 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       )}
       {id && (
         <div style={{ width: "25rem" }}>
-          <h4>
+          <h2>
             <DinaMessage id="field_managedAttributeCreatedBy" />
-          </h4>
+          </h2>
           <TextField name="createdBy" hideLabel={true} readOnly={true} />
         </div>
       )}
