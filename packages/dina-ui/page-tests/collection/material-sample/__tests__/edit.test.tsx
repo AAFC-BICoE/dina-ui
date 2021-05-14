@@ -201,6 +201,12 @@ describe("Material Sample Edit Page", () => {
 
     wrapper.find("button.collecting-event-link-button").simulate("click");
 
+    // group is mandatory
+    wrapper.find(".group-field Select").prop<any>("onChange")({
+      label: "group",
+      value: "test group"
+    });
+
     await new Promise(setImmediate);
     wrapper.update();
 
@@ -211,6 +217,24 @@ describe("Material Sample Edit Page", () => {
 
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
+      [
+        // Saves the existing Collecting Event:
+        [
+          {
+            resource: {
+              dwcOtherRecordNumbers: null,
+              geoReferenceAssertions: [],
+              group: "test group",
+              id: "1",
+              relationships: {},
+              startEventDateTime: "2021-04-13",
+              type: "collecting-event"
+            },
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
       [
         // New material-sample:
         [
@@ -339,35 +363,12 @@ describe("Material Sample Edit Page", () => {
 
     expect(mockSave.mock.calls).toEqual([
       [
-        // New collecting-event created:
-        [
-          {
-            resource: {
-              dwcOtherRecordNumbers: null,
-              dwcVerbatimCoordinateSystem: "decimal degrees",
-              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              geoReferenceAssertions: [
-                {
-                  isPrimary: true
-                }
-              ],
-              managedAttributeValues: {},
-              relationships: {},
-              startEventDateTime: "2019-12-21T16:00",
-              type: "collecting-event"
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
         // Existing material-sample updated:
         [
           {
             resource: {
               collectingEvent: {
-                id: "1",
+                id: undefined,
                 type: "collecting-event"
               },
               dwcCatalogNumber: "my-number",
