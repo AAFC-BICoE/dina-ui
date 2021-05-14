@@ -249,6 +249,7 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: expect.stringMatching(/test-user-.*/),
               dwcCatalogNumber: "my-new-material-sample",
               type: "material-sample",
+              group: "test group",
               relationships: {}
             },
             type: "material-sample"
@@ -363,12 +364,38 @@ describe("Material Sample Edit Page", () => {
 
     expect(mockSave.mock.calls).toEqual([
       [
+        // save the new collecting event:
+        [
+          {
+            resource: {
+              dwcOtherRecordNumbers: null,
+              dwcVerbatimCoordinateSystem: "decimal degrees",
+              dwcVerbatimSRS: "WGS84 (EPSG:4326)",
+              geoReferenceAssertions: [
+                {
+                  georeferencedBy: undefined,
+                  isPrimary: true
+                }
+              ],
+              group: "test group",
+              managedAttributeValues: {},
+              relationships: {},
+              startEventDateTime: "2019-12-21T16:00",
+              type: "collecting-event"
+            },
+            type: "collecting-event"
+          }
+        ],
+
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
         // Existing material-sample updated:
         [
           {
             resource: {
               collectingEvent: {
-                id: undefined,
+                id: "1",
                 type: "collecting-event"
               },
               dwcCatalogNumber: "my-number",
