@@ -163,7 +163,7 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
-              managedAttributeValues: {},
+              //              managedAttributeValues: {},
               materialSampleName: expect.stringMatching(/test-user-.*/),
               dwcCatalogNumber: "my-new-material-sample",
               relationships: {},
@@ -211,24 +211,6 @@ describe("Material Sample Edit Page", () => {
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
       [
-        // Saves the existing Collecting Event:
-        [
-          {
-            resource: {
-              dwcOtherRecordNumbers: null,
-              geoReferenceAssertions: [],
-              group: "test group",
-              id: "1",
-              relationships: {},
-              startEventDateTime: "2021-04-13",
-              type: "collecting-event"
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
         // New material-sample:
         [
           {
@@ -237,7 +219,7 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
-              managedAttributeValues: {},
+              //              managedAttributeValues: {},
               materialSampleName: expect.stringMatching(/test-user-.*/),
               dwcCatalogNumber: "my-new-material-sample",
               type: "material-sample",
