@@ -228,11 +228,17 @@ export function MaterialSampleForm({
       const submittedCollectingEvent = cloneDeep(
         colEventFormRef.current?.values
       );
-      // Use the same save method as the Collecting Event page:
-      const savedCollectingEvent = await saveCollectingEvent(
-        submittedCollectingEvent,
-        colEventFormRef.current
-      );
+
+      let savedCollectingEvent;
+      submittedCollectingEvent.id
+        ? // Avoid calling saveCollectingEvent when attach to an existing CE
+          // to allow attach to CE belongs to other groups
+          (savedCollectingEvent = submittedCollectingEvent)
+        : // Use the same save method as the Collecting Event page:
+          (savedCollectingEvent = await saveCollectingEvent(
+            submittedCollectingEvent,
+            colEventFormRef.current
+          ));
 
       // Set the ColEventId here in case the next operation fails:
       setColEventId(savedCollectingEvent.id);
@@ -252,6 +258,8 @@ export function MaterialSampleForm({
     }
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete materialSampleInput.attachment;
+    // delete the managed attribute temparorily until backend supports it
+    delete materialSampleInput.managedAttributeValues;
 
     // Save the MaterialSample:
     const [savedMaterialSample] = await save(
