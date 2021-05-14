@@ -230,9 +230,9 @@ export function MaterialSampleForm({
       );
 
       let savedCollectingEvent;
-      // Avoid patch collectingEvent when attach existing CE to newly created MS
-      // to allow attach CE belongs to other groups
-      submittedCollectingEvent.id && !materialSampleInput.id
+      // allow attach CE belongs to other groups, CE update can only happend when
+      // CE and MS are in the same group
+      materialSampleInput.group !== submittedCollectingEvent.group
         ? (savedCollectingEvent = submittedCollectingEvent)
         : // Use the same save method as the Collecting Event page:
           (savedCollectingEvent = await saveCollectingEvent(
