@@ -20,10 +20,6 @@ export function useDefaultValueRuleEditorModal() {
           .modal-dialog {
             max-width: 70rem !important;
           }
-          .modal-content {
-            max-height: calc(100vh - 3rem) !important;
-            overflow-y: scroll !important;
-          }
         `}</style>
         <div className="modal-header">
           <h2>
