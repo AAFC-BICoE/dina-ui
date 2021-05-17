@@ -1,5 +1,5 @@
 export interface DinaJsonMetaInfoAttributes {
-  warnings: Map<string, object>;
+  warnings: Record<string, object>;
 }
 
 export type DinaJsonMetaInfo = DinaJsonMetaInfoAttributes;

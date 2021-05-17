@@ -75,8 +75,7 @@ export default function UploadPage() {
               <tbody>
                 {objectUploadDuplicates.map(
                   (dup, idx) =>
-                    dup.originalFilename &&
-                    !!dup.meta?.warnings.duplicate_found(
+                    dup.originalFilename && (
                       <tr key={idx} className={`${idx}-row`}>
                         <td>{dup.originalFilename}</td>
                         <td>{dup.meta?.warnings.duplicate_found}</td>
