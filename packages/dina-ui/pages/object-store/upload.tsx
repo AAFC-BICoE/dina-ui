@@ -43,12 +43,29 @@ export default function UploadPage() {
 
     const uploadRespsT = await uploadFiles({ files: acceptedFiles, group });
 
-    const objectUploadDuplicates = uploadRespsT.map(
-      ({ meta, originalFilename }) =>
-        meta && Object.keys(meta.warnings) ? { originalFilename, meta } : {}
-    );
+    const objectUploadDuplicates = uploadRespsT
+      .filter(resp => resp.meta?.warnings?.duplicate_found)
+      .map(({ meta, originalFilename }) => ({ originalFilename, meta }));
 
-    if (objectUploadDuplicates.length > 0) {
+    const navigateToEditMetadata = async () => {
+      const objectUploadIds = uploadRespsT
+        .map(({ fileIdentifier }) => fileIdentifier)
+        .join(",");
+
+      await router.push({
+        pathname: "/object-store/metadata/edit",
+        query: {
+          group,
+          objectUploadIds,
+          ...(defaultValuesConfig !== null ? { defaultValuesConfig } : {})
+        }
+      });
+    };
+
+    if (Object.keys(objectUploadDuplicates)?.length === 0) {
+      // No duplicate files, proceed to edit metadata page
+      navigateToEditMetadata();
+    } else {
       openModal(
         <AreYouSureModal
           actionMessage={
@@ -85,20 +102,7 @@ export default function UploadPage() {
               </tbody>
             </table>
           }
-          onYesButtonClicked={async () => {
-            const objectUploadIds = uploadRespsT
-              .map(({ fileIdentifier }) => fileIdentifier)
-              .join(",");
-
-            await router.push({
-              pathname: "/object-store/metadata/edit",
-              query: {
-                group,
-                objectUploadIds,
-                ...(defaultValuesConfig !== null ? { defaultValuesConfig } : {})
-              }
-            });
-          }}
+          onYesButtonClicked={navigateToEditMetadata}
         />
       );
     }
