@@ -10,10 +10,14 @@ export interface AreYouSureModalProps {
   actionMessage: ReactNode;
 
   onYesButtonClicked: () => void | Promise<void>;
+
+  /** Describes the message displaying to the user in order to make action decision. */
+  messageBody: ReactNode;
 }
 
 export function AreYouSureModal({
   actionMessage,
+  messageBody,
   onYesButtonClicked
 }: AreYouSureModalProps) {
   const { closeModal } = useModal();
@@ -29,9 +33,13 @@ export function AreYouSureModal({
         <h2>{actionMessage}</h2>
       </div>
       <div className="modal-body">
-        <p>
-          <CommonMessage id="areYouSure" />
-        </p>
+        {messageBody ? (
+          <>{messageBody}</>
+        ) : (
+          <p>
+            <CommonMessage id="areYouSure" />
+          </p>
+        )}
         <DinaForm initialValues={{}} onSubmit={onYesClickInternal}>
           <div className="list-inline">
             <div className="list-inline-item" style={{ width: "8rem" }}>
