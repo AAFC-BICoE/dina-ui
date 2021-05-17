@@ -92,9 +92,9 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
       readOnlyRender={groupName =>
         groupName ? <GroupLabel groupName={groupName} /> : null
       }
-      onChange={(newValue: string | null | undefined) => {
+      onChange={(newValue: string | null | undefined, formik) => {
         setStoredDefaultGroupIfEnabled(newValue);
-        selectFieldProps.onChange?.(newValue);
+        selectFieldProps.onChange?.(newValue, formik);
       }}
       options={groupSelectOptions}
     />

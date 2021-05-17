@@ -14,7 +14,7 @@ import {
   withResponse
 } from "common-ui";
 import { FieldArray } from "formik";
-import { uniq, keys, omit } from "lodash";
+import { last, uniq, keys, omit } from "lodash";
 import { NextRouter, useRouter } from "next/router";
 import Select from "react-select";
 import { GroupLabel, Head, Nav } from "../../components";
@@ -22,7 +22,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
 
-interface DinaUserWithAgent extends DinaUser {
+interface DinaUserFormValues extends DinaUser {
   agent?: Person;
 }
 
@@ -65,7 +65,7 @@ export default function DinaUserEditPage() {
 }
 
 interface DinaUserFormProps {
-  dinaUser: DinaUserWithAgent;
+  dinaUser: DinaUserFormValues;
   router: NextRouter;
 }
 
@@ -73,7 +73,7 @@ export function DinaUserForm({
   dinaUser: initialValues,
   router
 }: DinaUserFormProps) {
-  const onSubmit: DinaFormOnSubmit<DinaUserWithAgent> = async ({
+  const onSubmit: DinaFormOnSubmit<DinaUserFormValues> = async ({
     api: { save },
     submittedValues
   }) => {
@@ -104,7 +104,7 @@ export function DinaUserForm({
   };
 
   return (
-    <DinaForm<DinaUserWithAgent>
+    <DinaForm<DinaUserFormValues>
       initialValues={initialValues}
       onSubmit={onSubmit}
     >
@@ -163,7 +163,7 @@ export function RolesPerGroupEditor({
                     <DinaMessage id="group" />
                   </th>
                   <th style={{ width: "40%" }}>
-                    <DinaMessage id="roles" />
+                    <DinaMessage id="role" />
                   </th>
                   <th style={{ width: "30%" }} />
                 </tr>
@@ -180,6 +180,14 @@ export function RolesPerGroupEditor({
                           name={`rolesPerGroup.${groupName}`}
                           hideLabel={true}
                           isMulti={true}
+                          // Only allow one group at a time:
+                          onChange={(selectedRoles, formik) => {
+                            const newRole = last(selectedRoles);
+                            formik.setFieldValue(
+                              `rolesPerGroup.${groupName}`,
+                              newRole ? [newRole] : []
+                            );
+                          }}
                           // Options should be the possible groups or the
                           options={uniq([
                             ...editableRoles,

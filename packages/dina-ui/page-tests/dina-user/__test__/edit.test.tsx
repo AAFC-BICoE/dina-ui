@@ -71,7 +71,8 @@ describe("User edit page", () => {
         {
           rolesPerGroup: {
             aafc: ["staff"],
-            "test-group": ["role1", "role2"]
+            // Only one role at a time is allowed for now:
+            "test-group": ["role2"]
           }
         }
       ]

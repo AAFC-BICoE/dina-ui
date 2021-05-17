@@ -292,6 +292,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   revisionsButtonText: "Revisions",
   revisionsByUserPageTitle: "Revisions by user",
   revisionsListTitle: "Revisions for {name}",
+  role: "Role",
   roles: "Roles",
   rolesPerGroup: "Roles Per Group",
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
