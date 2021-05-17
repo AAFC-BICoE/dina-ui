@@ -203,6 +203,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   footerContactInfo: "Contact information",
   footerPrivacy: "Privacy",
   footerTermsAndConditions: "Terms and conditions",
+  formNavigation: "Form Navigation",
   forTestingPurposesOnlyMessage:
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
   geoReferencing: "Geo-Referencing",
