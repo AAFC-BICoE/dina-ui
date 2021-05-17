@@ -230,9 +230,9 @@ export function MaterialSampleForm({
       );
 
       let savedCollectingEvent;
-      // allow attach CE belongs to other groups, CE update can only happend when
-      // CE and MS are in the same group
-      materialSampleInput.group !== submittedCollectingEvent.group
+      // allow attach CE belongs to other groups
+      materialSampleInput.group !== submittedCollectingEvent.group &&
+      !materialSampleInput.id
         ? (savedCollectingEvent = submittedCollectingEvent)
         : // Use the same save method as the Collecting Event page:
           (savedCollectingEvent = await saveCollectingEvent(
@@ -286,10 +286,11 @@ export function MaterialSampleForm({
   );
 
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */
-  const nestedCollectingEventForm = (
+  const nestedCollectingEventForm = readOnly => (
     <DinaForm
       innerRef={colEventFormRef}
       initialValues={collectingEventInitialValues}
+      readOnly={readOnly}
     >
       <CollectingEventFormLayout />
       <div className="form-group">{colEventAttachmentsUI}</div>
@@ -373,10 +374,13 @@ export function MaterialSampleForm({
                             <DinaMessage id="detachCollectingEvent" />
                           </FormikButton>
                         </div>
-                        {nestedCollectingEventForm}
+                        {colEventQuery.response?.data.group ===
+                        initialValues.group
+                          ? nestedCollectingEventForm(false)
+                          : nestedCollectingEventForm(true)}
                       </>
                     ))
-                  : nestedCollectingEventForm
+                  : nestedCollectingEventForm(false)
               }
             </TabPanel>
             <TabPanel>
