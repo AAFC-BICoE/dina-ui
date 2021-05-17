@@ -12,7 +12,7 @@ export interface AreYouSureModalProps {
   onYesButtonClicked: () => void | Promise<void>;
 
   /** Describes the message displaying to the user in order to make action decision. */
-  messageBody: ReactNode;
+  messageBody?: ReactNode;
 }
 
 export function AreYouSureModal({
