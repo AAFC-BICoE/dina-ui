@@ -127,6 +127,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "field_description.en": "English Description",
   "field_description.fr": "French Description",
   field_displayName: "Display Name",
+  field_dwcCatalogNumber: "Catalog Number",
   field_dwcCountry: "Country",
   field_dwcCountryCode: "Country Code",
   field_dwcGeodeticDatum: "Geodetic Datum",
