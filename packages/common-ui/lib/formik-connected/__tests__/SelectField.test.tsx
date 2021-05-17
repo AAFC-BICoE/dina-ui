@@ -86,7 +86,7 @@ describe("SelectField component", () => {
     wrapper.find(Select).prop("onChange")({ value: "newTestValue" }, null);
 
     // The mock function should have been called with the new value.
-    expect(mockOnChange).lastCalledWith("newTestValue");
+    expect(mockOnChange).lastCalledWith("newTestValue", expect.anything());
   });
 
   it("Allows multi-select.", async () => {
@@ -100,6 +100,6 @@ describe("SelectField component", () => {
     );
 
     // The mock function should have been called with the new value.
-    expect(mockOnChange).lastCalledWith(["PRIMER", "MID"]);
+    expect(mockOnChange).lastCalledWith(["PRIMER", "MID"], expect.anything());
   });
 });
