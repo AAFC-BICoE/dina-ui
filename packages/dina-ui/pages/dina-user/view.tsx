@@ -123,7 +123,7 @@ export function RolesPerGroupTable({
             </strong>
           )}
           attributeHeader={<DinaMessage id="group" />}
-          valueHeader={<DinaMessage id="roles" />}
+          valueHeader={<DinaMessage id="role" />}
         />
       )}
     </div>
