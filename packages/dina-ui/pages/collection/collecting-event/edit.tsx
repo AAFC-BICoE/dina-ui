@@ -66,7 +66,8 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
   const {
     attachedMetadatasUI,
     collectingEventInitialValues,
-    saveCollectingEvent
+    saveCollectingEvent,
+    collectingEventFormSchema
   } = useCollectingEventSave(collectingEvent);
 
   const [, setDefaultVerbatimCoordSys] = useLocalStorage<
@@ -103,6 +104,7 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
       initialValues={collectingEventInitialValues}
       onSubmit={onSubmit}
       enableReinitialize={true}
+      validationSchema={collectingEventFormSchema}
     >
       {buttonBar}
       <CollectingEventFormLayout

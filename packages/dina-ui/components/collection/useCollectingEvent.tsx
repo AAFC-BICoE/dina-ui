@@ -1,7 +1,7 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useApiClient, useQuery } from "common-ui";
 import { FormikContextType } from "formik";
-import { PersistedResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import { orderBy } from "lodash";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/collection-api";
@@ -10,6 +10,7 @@ import { SRSEnum } from "../../types/collection-api/resources/SRS";
 import { Metadata, Person } from "../../types/objectstore-api";
 import { useAttachmentsModal } from "../object-store";
 import { SourceAdministrativeLevel } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
+import { object, string, SchemaOf } from "yup";
 
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
@@ -112,6 +113,31 @@ export function useCollectingEventSave(
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
+  const datePrecision = [4, 6, 8, 12, 14, 17];
+  function isValidDatePrecision(value?: string) {
+    return Boolean(
+      value && datePrecision.includes(value.replace(/([^\d]+)/g, "").length)
+    );
+  }
+
+  /** Form validation schema. */
+  const collectingEventFormSchema: SchemaOf<
+    Pick<CollectingEvent, "startEventDateTime" | "endEventDateTime">
+  > = object({
+    startEventDateTime: string()
+      .required(formatMessage("field_collectingEvent_startDateTimeError"))
+      .test({
+        test: isValidDatePrecision,
+        message: formatMessage("field_collectingEvent_startDateTimeError")
+      }),
+    endEventDateTime: string()
+      .nullable()
+      .test({
+        test: val => (val ? isValidDatePrecision(val) : true),
+        message: formatMessage("field_collectingEvent_endDateTimeError")
+      })
+  });
+
   const [defaultVerbatimCoordSys] = useLocalStorage<string | null | undefined>(
     DEFAULT_VERBATIM_COORDSYS_KEY
   );
@@ -158,30 +184,6 @@ export function useCollectingEventSave(
     // Init relationships object for one-to-many relations:
     submittedValues.relationships = {};
 
-    if (!submittedValues.startEventDateTime) {
-      throw new Error(
-        formatMessage("field_collectingEvent_startDateTimeError")
-      );
-    }
-    const matcher = /([^\d]+)/g;
-    const startDateTime = submittedValues.startEventDateTime.replace(
-      matcher,
-      ""
-    );
-    const datePrecision = [4, 6, 8, 12, 14, 17];
-    if (!datePrecision.includes(startDateTime.length)) {
-      throw new Error(
-        formatMessage("field_collectingEvent_startDateTimeError")
-      );
-    }
-    if (submittedValues.endEventDateTime) {
-      const endDateTime = submittedValues.endEventDateTime.replace(matcher, "");
-      if (!datePrecision.includes(endDateTime.length)) {
-        throw new Error(
-          formatMessage("field_collectingEvent_endDateTimeError")
-        );
-      }
-    }
     // handle converting to relationship manually due to crnk bug
     if (submittedValues.collectors?.length > 0) {
       submittedValues.relationships.collectors = {
@@ -275,6 +277,7 @@ export function useCollectingEventSave(
   return {
     collectingEventInitialValues,
     saveCollectingEvent,
-    attachedMetadatasUI
+    attachedMetadatasUI,
+    collectingEventFormSchema
   };
 }
