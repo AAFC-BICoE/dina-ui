@@ -94,7 +94,7 @@ export function FieldWrapper({
         )}
         <div className={valueCol ? `col-sm-${valueCol}` : ""}>
           <FastField name={name}>
-            {({ field: { value }, form, meta: { touched, error } }) => (
+            {({ field: { value }, form, meta: { error } }) => (
               <>
                 {readOnly || !children
                   ? readOnlyRender?.(value) ?? (
@@ -102,7 +102,7 @@ export function FieldWrapper({
                     )
                   : typeof children === "function"
                   ? children?.({
-                      invalid: Boolean(touched && error),
+                      invalid: Boolean(error),
                       value,
                       setValue: newValue => {
                         // Remove the error message when the user edits the field:
@@ -113,9 +113,7 @@ export function FieldWrapper({
                       formik: form
                     })
                   : children}
-                {touched && error && (
-                  <div className="invalid-feedback">{error}</div>
-                )}
+                {error && <div className="invalid-feedback">{error}</div>}
               </>
             )}
           </FastField>

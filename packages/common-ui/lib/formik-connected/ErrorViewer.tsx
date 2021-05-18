@@ -5,7 +5,7 @@ import { useFieldLabels } from "../field-header/FieldHeader";
 
 /** Renders the Formik status as an error message. */
 export const ErrorViewer = connect(function ErrorViewerInternal({
-  formik: { isSubmitting, touched, errors, status }
+  formik: { isSubmitting, errors, status }
 }) {
   const { getFieldLabel } = useFieldLabels();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -14,7 +14,6 @@ export const ErrorViewer = connect(function ErrorViewerInternal({
   const errorMessage = useMemo(
     () => {
       const fieldErrorMsg = toPairs(errors)
-        .filter(([field]) => touched[field])
         .map(([field, error]) => `${getFieldLabel(field).fieldLabel}: ${error}`)
         .join("\n");
 
