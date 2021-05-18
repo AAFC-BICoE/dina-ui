@@ -1,17 +1,16 @@
 import { InputResource, PersistedResource } from "kitsu";
 import {
-  DinaFormSubmitParams,
   useAccount,
   useApiClient,
   useModal,
   useQuery
-} from "packages/common-ui/lib";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { Metadata } from "packages/dina-ui/types/objectstore-api";
+} from "../../../common-ui/lib";
+import { MaterialSample } from "../../../dina-ui/types/collection-api";
+import { Metadata } from "../../../dina-ui/types/objectstore-api";
 import { FormikProps } from "formik";
 import { useCollectingEventQuery, useCollectingEventSave } from ".";
 import { useAttachmentsModal } from "../object-store";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import { cloneDeep } from "lodash";
 import {
   Dispatch,
@@ -77,7 +76,7 @@ export function useMaterialSampleSave(
   /** YYYY-MM-DD format. */
   const todayDate = new Date().toISOString().slice(0, 10);
 
-  const materialSampleInitialValues: InputResource<MaterialSample> = materialSample
+  const initialValues: InputResource<MaterialSample> = materialSample
     ? { ...materialSample }
     : {
         type: "material-sample",
@@ -143,10 +142,7 @@ export function useMaterialSampleSave(
     };
   }
 
-  async function saveMaterialSample({
-    api: { save },
-    submittedValues
-  }: DinaFormSubmitParams<InputResource<MaterialSample>>) {
+  async function saveMaterialSample(save, submittedValues) {
     // Init relationships object for one-to-many relations:
     (submittedValues as any).relationships = {};
 
@@ -220,11 +216,17 @@ export function useMaterialSampleSave(
   );
 
   return {
-    materialSampleInitialValues,
+    initialValues,
     saveMaterialSample,
     nestedCollectingEventForm,
     dataComponentToggler,
+    enableCatalogueInfo,
     setEnableCatalogueInfo,
-    setEnableCollectingEvent
+    enableCollectingEvent,
+    setEnableCollectingEvent,
+    colEventId,
+    setColEventId,
+    colEventQuery,
+    materialSampleAttachmentsUI
   };
 }
