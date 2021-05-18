@@ -163,7 +163,6 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
-              managedAttributeValues: {},
               materialSampleName: expect.stringMatching(/test-user-.*/),
               dwcCatalogNumber: "my-new-material-sample",
               relationships: {},
@@ -237,7 +236,6 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
-              managedAttributeValues: {},
               materialSampleName: expect.stringMatching(/test-user-.*/),
               dwcCatalogNumber: "my-new-material-sample",
               type: "material-sample",
