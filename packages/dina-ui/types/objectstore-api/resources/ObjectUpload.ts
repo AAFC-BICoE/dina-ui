@@ -1,4 +1,5 @@
 import { KitsuResource } from "kitsu";
+import { DinaJsonMetaInfo } from "../../DinaJsonMetaInfo";
 
 export type DcType =
   | "Image"
@@ -25,6 +26,7 @@ export interface ObjectUploadAttributes {
   sizeInBytes: number;
   exif: Map<string, string>;
   dateTimeDigitized?: string;
+  meta?: DinaJsonMetaInfo;
 }
 
 export type ObjectUpload = KitsuResource & ObjectUploadAttributes;
