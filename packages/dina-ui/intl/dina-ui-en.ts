@@ -278,6 +278,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   personViewTitle: "Person",
   preparation: "Preparation",
   preparationData: "Preparation Data",
+  preparationProcessListTitle: "Preparation Processes",
   preparationTypeListTitle: "Preparation Method",
   preparationTypeNameLabel: "Preparation Method Name",
   preparationTypeViewTitle: "View Preparation Method",
