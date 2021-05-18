@@ -64,7 +64,7 @@ export default function UploadPage() {
 
     if (Object.keys(objectUploadDuplicates)?.length === 0) {
       // No duplicate files, proceed to edit metadata page
-      navigateToEditMetadata();
+      await navigateToEditMetadata();
     } else {
       openModal(
         <AreYouSureModal
