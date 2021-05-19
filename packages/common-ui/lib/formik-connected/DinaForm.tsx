@@ -88,7 +88,8 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
       value={{
         readOnly: props.readOnly ?? false,
         horizontal: props.horizontal,
-        initialValues: props.initialValues
+        initialValues: props.initialValues,
+        isTemplate: props.isTemplate
       }}
     >
       <Formik {...props} onSubmit={onSubmitInternal}>

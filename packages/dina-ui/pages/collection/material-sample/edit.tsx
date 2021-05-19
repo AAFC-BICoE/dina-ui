@@ -277,8 +277,7 @@ export function MaterialSampleForm({
     <DinaForm
       innerRef={colEventFormRef}
       initialValues={collectingEventInitialValues}
-      isTemplate={true}
-      readOnly={true}
+      isTemplate={isTemplate}
     >
       <CollectingEventFormLayout />
       <div className="form-group">{colEventAttachmentsUI}</div>
