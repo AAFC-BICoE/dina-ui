@@ -20,7 +20,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addPersonButtonText: "Add Person",
   addPersonPopupTooltip: "Add Person without leaving the page",
   addPersonTitle: "Add Person",
-  addPreparationTypeTitle: "Add Preparation Method",
+  addPreparationTypeTitle: "Add Preparation Type",
   addRule: "Add Rule",
   addRuleSet: "Add Rule Set",
   agentsSectionTitle: "Agents",
@@ -192,7 +192,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
   field_originalFilename: "Original Filename",
-  field_preparationType: "Preparation Method",
+  field_preparationType: "Preparation Type",
   field_publiclyReleasable: "Publicly releasable",
   field_publiclyReleasable_tooltip:
     "Indicates if the object could be released publicly on a web page or open data portals.",
@@ -280,9 +280,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   personViewTitle: "Person",
   preparation: "Preparation",
   preparationData: "Preparation Data",
-  preparationTypeListTitle: "Preparation Method",
-  preparationTypeNameLabel: "Preparation Method Name",
-  preparationTypeViewTitle: "View Preparation Method",
+  preparationTypeListTitle: "Preparation Type",
+  preparationTypeNameLabel: "Preparation Type Name",
+  preparationTypeViewTitle: "View Preparation Type",
   primary: "Primary",
   primaryButton_tooltip:
     "Make this assertion the primary data point when exported. Only one assertion can be primary",
