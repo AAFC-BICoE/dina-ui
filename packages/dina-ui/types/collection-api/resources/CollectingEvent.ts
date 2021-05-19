@@ -13,7 +13,7 @@ export interface CollectingEventAttributes {
   uuid: string;
 
   startEventDateTime: string;
-  endEventDateTime?: string;
+  endEventDateTime?: string | null;
   dwcRecordedBy?: string;
   verbatimEventDateTime?: string;
 

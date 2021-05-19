@@ -9,33 +9,37 @@ export interface FieldNameProps {
   customName?: string;
 }
 
+/** Get the field label and tooltip given the camelCase field key. */
+export function useFieldLabels() {
+  const { formatMessage, messages } = useIntl();
+
+  function getFieldLabel(name: string) {
+    const messageKey = `field_${name}`;
+    const tooltipKey = `${messageKey}_tooltip`;
+    const tooltip = messages[tooltipKey] ? <Tooltip id={tooltipKey} /> : null;
+
+    const fieldLabel = messages[messageKey]
+      ? formatMessage({ id: messageKey as any })
+      : titleCase(name);
+
+    return { tooltip, fieldLabel };
+  }
+
+  return { getFieldLabel };
+}
+
 /**
  * Field header with field name and optional tooltip.
  * The tooltip is found from the intl messages file using the key "field_{fieldName}_tooltip".
  * e.g. field_acMetadataCreator.displayName_tooltip
  */
-export function FieldHeader({
-  name: fieldName,
-  customName: customFieldName
-}: FieldNameProps) {
-  const { formatMessage, messages } = useIntl();
+export function FieldHeader({ name, customName }: FieldNameProps) {
+  const { getFieldLabel } = useFieldLabels();
+  const { fieldLabel, tooltip } = getFieldLabel(customName ?? name);
 
-  const messageKey = customFieldName
-    ? `field_${customFieldName}`
-    : `field_${fieldName}`;
-  const tooltipKey = `${messageKey}_tooltip`;
-  const tooltip = messages[tooltipKey] ? <Tooltip id={tooltipKey} /> : null;
   return (
-    <div
-      className={
-        customFieldName
-          ? `${customFieldName}-field-header`
-          : `${fieldName}-field-header`
-      }
-    >
-      {messages[messageKey]
-        ? formatMessage({ id: messageKey as any })
-        : titleCase(fieldName)}
+    <div className={`${customName ?? name}-field-header`}>
+      {fieldLabel}
       {tooltip}
     </div>
   );

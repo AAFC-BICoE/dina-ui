@@ -1,6 +1,8 @@
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
+import { SubmitButton } from "../SubmitButton";
 import { TextField } from "../TextField";
+import { object, string } from "yup";
 
 describe("TextField component", () => {
   it("Displays the field's label and value.", () => {
@@ -37,5 +39,30 @@ describe("TextField component", () => {
     });
 
     expect(wrapper.find("#value-display").text()).toEqual("new value");
+  });
+
+  it("Shows a field-level error message.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{ testField: "initial value" }}
+        validationSchema={object({
+          testField: string().test({
+            message: "Test Error",
+            test: () => false
+          })
+        })}
+      >
+        <TextField name="testField" />
+        <SubmitButton />
+      </DinaForm>
+    );
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find("input").hasClass("is-invalid")).toEqual(true);
+    expect(wrapper.find(".invalid-feedback").text()).toEqual("Test Error");
   });
 });

@@ -4,6 +4,7 @@ import TextareaAutosize, {
   TextareaAutosizeProps
 } from "react-textarea-autosize";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
+import classnames from "classnames";
 
 export interface TextFieldProps extends LabelWrapperParams {
   readOnly?: boolean;
@@ -36,7 +37,7 @@ export function TextField(props: TextFieldProps) {
 
   return (
     <FieldWrapper {...labelWrapperProps}>
-      {({ formik, setValue, value }) => {
+      {({ formik, setValue, value, invalid }) => {
         function onChangeInternal(newValue: string) {
           setValue(newValue);
           onChangeExternal?.(formik, props.name, newValue);
@@ -45,7 +46,7 @@ export function TextField(props: TextFieldProps) {
         const inputPropsInternal: InputHTMLAttributes<any> = {
           ...inputPropsExternal,
           placeholder,
-          className: "form-control",
+          className: classnames("form-control", { "is-invalid": invalid }),
           onChange: event => onChangeInternal(event.target.value),
           value: value || "",
           readOnly
