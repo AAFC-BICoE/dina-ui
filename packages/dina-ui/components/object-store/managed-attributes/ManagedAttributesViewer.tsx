@@ -54,7 +54,7 @@ export function ManagedAttributesViewer({
           ))}
         </div>
       ) : (
-        <div className="form-group">
+        <div className="mb-3">
           <DinaMessage id="noManagedAttributeValues" />
         </div>
       )}

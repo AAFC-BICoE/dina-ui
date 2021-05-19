@@ -351,7 +351,7 @@ export function BulkMetadataEditor({
       <h1>
         <DinaMessage id="metadataBulkEditTitle" />
       </h1>
-      <div className="form-group">
+      <div className="mb-3">
         <DinaForm<MetadataEditorControls>
           enableReinitialize={true}
           initialValues={initialFormControls}
@@ -371,7 +371,7 @@ export function BulkMetadataEditor({
                 <MetadataEditorAttributesControls
                   builtInAttributes={BUILT_IN_ATTRIBUTES_COLUMNS}
                 />
-                <div className="form-group">
+                <div className="mb-3">
                   <AddPersonButton />
                   <Tooltip id="addPersonPopupTooltip" />
                 </div>

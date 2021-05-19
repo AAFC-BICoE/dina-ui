@@ -58,7 +58,7 @@ export function LibraryPoolingStep(props: StepRendererProps) {
       <>
         <h2>Library Pool Details</h2>
         <button
-          className="btn btn-primary float-right"
+          className="btn btn-primary float-end"
           onClick={() => setEditPoolDetails(true)}
           type="button"
         >

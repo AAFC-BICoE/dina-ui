@@ -73,16 +73,16 @@ export function LibraryPrepStep(props: StepRendererProps) {
       <>
         <h2>Library Prep Batch</h2>
         <button
-          className="btn btn-primary float-right"
+          className="btn btn-primary float-end"
           onClick={() => setEditBatchDetails(true)}
           type="button"
         >
           Edit Batch Details
         </button>
-        <div className="form-group">
+        <div className="mb-3">
           <LibraryPrepBatchDetails libraryPrepBatch={libraryPrepBatch} />
         </div>
-        <div className="form-group list-inline">
+        <div className="mb-3 list-inline">
           <Link
             href={`/workflow/library-prep-worksheet?stepResourceId=${stepResource.id}&sampleLayout=table`}
           >
@@ -98,7 +98,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
             </a>
           </Link>
         </div>
-        <div className="form-group">
+        <div className="mb-3">
           <Tabs>
             <TabList>
               <Tab>Substep 1: Library Prep Details Table</Tab>

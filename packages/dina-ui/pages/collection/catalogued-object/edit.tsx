@@ -159,7 +159,7 @@ export function CataloguedObjectForm({
         entityId={cataloguedObject?.id}
         entityLink="/collection/catalogued-object"
       />
-      <SubmitButton className="ml-auto" />
+      <SubmitButton className="ms-auto" />
     </ButtonBar>
   );
 
@@ -170,7 +170,7 @@ export function CataloguedObjectForm({
       initialValues={collectingEventInitialValues}
     >
       <CollectingEventFormLayout />
-      <div className="form-group">{attachedMetadatasUI}</div>
+      <div className="mb-3">{attachedMetadatasUI}</div>
     </DinaForm>
   );
 
@@ -204,7 +204,7 @@ export function CataloguedObjectForm({
               colEventId
                 ? withResponse(colEventQuery, () => (
                     <>
-                      <div className="form-group d-flex justify-content-end align-items-center">
+                      <div className="mb-3 d-flex justify-content-end align-items-center">
                         <Link
                           href={`/collection/collecting-event/view?id=${colEventId}`}
                         >
@@ -213,7 +213,7 @@ export function CataloguedObjectForm({
                           </a>
                         </Link>
                         <FormikButton
-                          className="btn btn-danger detach-collecting-event-button ml-5"
+                          className="btn btn-danger detach-collecting-event-button ms-5"
                           onClick={() => setColEventId(null)}
                         >
                           <DinaMessage id="detachCollectingEvent" />

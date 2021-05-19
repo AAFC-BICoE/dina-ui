@@ -17,7 +17,7 @@ export function NavbarUserControl() {
       {initialized && authenticated ? (
         <>
           {username && (
-            <span className="mr-2 my-auto">
+            <span className="me-2 my-auto">
               <CommonMessage id="loggedInAsUser" />{" "}
               <Link href={`/dina-user/view?id=${subject}`}>
                 <a>{username}</a>

@@ -140,7 +140,7 @@ export function IndexGrid(props: IndexGridProps) {
             }
           `}</style>
         <div style={{ height: "50px" }}>
-          <div className="float-right">
+          <div className="float-end">
             <SubmitButton />
           </div>
         </div>

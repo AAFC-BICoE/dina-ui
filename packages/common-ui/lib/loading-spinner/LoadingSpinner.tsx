@@ -7,7 +7,7 @@ export interface LoadingSpinnerProps {
 export function LoadingSpinner({ loading }: LoadingSpinnerProps) {
   return loading ? (
     <div className="spinner-border" role="status">
-      <span className="sr-only">Loading...</span>
+      <span className="visually-hidden mb-3">Loading...</span>
     </div>
   ) : null;
 }

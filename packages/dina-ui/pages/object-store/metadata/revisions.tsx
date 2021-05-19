@@ -30,7 +30,7 @@ export default function MetadataRevisionListPage() {
         <Nav />
         <main className="container-fluid">
           <h1>{pageTitle}</h1>
-          <div className="form-group">
+          <div className="mb-3">
             <Link href={`/object-store/object/view?id=${metadata.id}`}>
               <a>
                 <DinaMessage id="detailsPageLink" />

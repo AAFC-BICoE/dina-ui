@@ -94,7 +94,7 @@ function CollectorGroupForm({
           byPassView={true}
         />
         <DeleteButton
-          className="ml-5"
+          className="ms-5"
           id={id as string}
           options={{ apiBaseUrl: "/collection-api" }}
           postDeleteRedirect="/collection/collector-group/list"

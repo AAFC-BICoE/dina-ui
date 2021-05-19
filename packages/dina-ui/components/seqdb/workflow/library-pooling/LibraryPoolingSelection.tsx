@@ -220,7 +220,7 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
       <>
         <div className="row">
           <div className="col-5 library-pool-content-selection-table">
-            <div className="float-right">
+            <div className="float-end">
               <strong>Hide used</strong>
               <input
                 className="hide-used-checkbox"

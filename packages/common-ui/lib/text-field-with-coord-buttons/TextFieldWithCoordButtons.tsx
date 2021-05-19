@@ -67,28 +67,26 @@ export function InputWithCoordButtons({
   return (
     <div className="input-group">
       <input type="text" {...inputProps} ref={inputRef} />
-      <div className="input-group-append">
-        {["°", "′", "″"].map(symbol => (
-          <button
-            key={symbol}
-            tabIndex={-1}
-            className={
-              !isExternallyControlled
-                ? "btn btn-info coord-button"
-                : (symbol === "°" && shouldShowDegree) ||
-                  (symbol === "′" && shouldShowMinute) ||
-                  (symbol === "″" && shouldShowSecond)
-                ? "btn btn-info coord-button"
-                : "d-none"
-            }
-            type="button"
-            style={{ width: "3rem" }}
-            onClick={() => insertSymbol(symbol)}
-          >
-            {symbol}
-          </button>
-        ))}
-      </div>
+      {["°", "′", "″"].map(symbol => (
+        <button
+          key={symbol}
+          tabIndex={-1}
+          className={
+            !isExternallyControlled
+              ? "btn btn-info coord-button"
+              : (symbol === "°" && shouldShowDegree) ||
+                (symbol === "′" && shouldShowMinute) ||
+                (symbol === "″" && shouldShowSecond)
+              ? "btn btn-info coord-button"
+              : "d-none"
+          }
+          type="button"
+          style={{ width: "3rem" }}
+          onClick={() => insertSymbol(symbol)}
+        >
+          {symbol}
+        </button>
+      ))}
     </div>
   );
 }

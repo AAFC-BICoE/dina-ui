@@ -128,8 +128,9 @@ export function MaterialSampleForm({
 
   const hasCatalogueInfo =
     !!materialSample?.dwcCatalogNumber || !!materialSample?.preparationType;
-  const [enableCatalogueInfo, setEnableCatalogueInfo] =
-    useState(hasCatalogueInfo);
+  const [enableCatalogueInfo, setEnableCatalogueInfo] = useState(
+    hasCatalogueInfo
+  );
 
   /** YYYY-MM-DD format. */
   const todayDate = new Date().toISOString().slice(0, 10);
@@ -160,8 +161,7 @@ export function MaterialSampleForm({
     attachedMetadatasUI: materialSampleAttachmentsUI,
     selectedMetadatas
   } = useAttachmentsModal({
-    initialMetadatas:
-      materialSample?.attachment as PersistedResource<Metadata>[],
+    initialMetadatas: materialSample?.attachment as PersistedResource<Metadata>[],
     deps: [materialSample?.id],
     title: <DinaMessage id="materialSampleAttachments" />
   });
@@ -272,7 +272,7 @@ export function MaterialSampleForm({
         entityId={materialSample?.id}
         entityLink="/collection/material-sample"
       />
-      <SubmitButton className="ml-auto" />
+      <SubmitButton className="ms-auto" />
     </ButtonBar>
   );
 
@@ -283,7 +283,7 @@ export function MaterialSampleForm({
       initialValues={collectingEventInitialValues}
     >
       <CollectingEventFormLayout />
-      <div className="form-group">{colEventAttachmentsUI}</div>
+      <div className="mb-3">{colEventAttachmentsUI}</div>
     </DinaForm>
   );
 
@@ -329,7 +329,7 @@ export function MaterialSampleForm({
           <MaterialSampleFormLayout />
           <FieldSet legend={<DinaMessage id="components" />}>
             <div className="row">
-              <label className="enable-collecting-event d-flex align-items-center font-weight-bold col-sm-3">
+              <label className="enable-collecting-event d-flex align-items-center fw-bold col-sm-3">
                 <Switch
                   className="mx-2"
                   checked={enableCollectingEvent}
@@ -340,7 +340,7 @@ export function MaterialSampleForm({
                 />
                 <DinaMessage id="collectingEvent" />
               </label>
-              <label className="enable-catalogue-info d-flex align-items-center font-weight-bold col-sm-3">
+              <label className="enable-catalogue-info d-flex align-items-center fw-bold col-sm-3">
                 <Switch
                   className="mx-2"
                   checked={enableCatalogueInfo}
@@ -383,7 +383,7 @@ export function MaterialSampleForm({
                     colEventId
                       ? withResponse(colEventQuery, () => (
                           <>
-                            <div className="form-group d-flex justify-content-end align-items-center">
+                            <div className="mb-3 d-flex justify-content-end align-items-center">
                               <Link
                                 href={`/collection/collecting-event/view?id=${colEventId}`}
                               >
@@ -392,7 +392,7 @@ export function MaterialSampleForm({
                                 </a>
                               </Link>
                               <FormikButton
-                                className="btn btn-danger detach-collecting-event-button ml-5"
+                                className="btn btn-danger detach-collecting-event-button ms-5"
                                 onClick={() => setColEventId(null)}
                               >
                                 <DinaMessage id="detachCollectingEvent" />

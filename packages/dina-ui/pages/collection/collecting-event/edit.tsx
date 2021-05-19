@@ -94,7 +94,7 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
         entityId={collectingEvent?.id}
         entityLink="/collection/collecting-event"
       />
-      <SubmitButton className="ml-auto" />
+      <SubmitButton className="ms-auto" />
     </ButtonBar>
   );
 
@@ -109,7 +109,7 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
         setDefaultVerbatimCoordSys={setDefaultVerbatimCoordSys}
         setDefaultVerbatimSRS={setDefaultVerbatimSRS}
       />
-      <div className="form-group">{attachedMetadatasUI}</div>
+      <div className="mb-3">{attachedMetadatasUI}</div>
       {buttonBar}
     </DinaForm>
   );

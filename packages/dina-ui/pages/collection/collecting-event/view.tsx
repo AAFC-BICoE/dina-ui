@@ -30,7 +30,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
         byPassView={true}
       />
       <EditButton
-        className="ml-auto"
+        className="ms-auto"
         entityId={id as string}
         entityLink="collection/collecting-event"
       />
@@ -40,7 +40,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
         </a>
       </Link>
       <DeleteButton
-        className="ml-5"
+        className="ms-5"
         id={id as string}
         options={{ apiBaseUrl: "/collection-api" }}
         postDeleteRedirect="/collection/collecting-event/list"
@@ -60,7 +60,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
             <h1>
               <DinaMessage id="collectingEventViewTitle" />
             </h1>
-            <div className="form-group">
+            <div className="mb-3">
               <DinaForm<CollectingEvent>
                 initialValues={colEvent}
                 readOnly={true}

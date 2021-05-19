@@ -114,7 +114,7 @@ export function GeoSuggestSearchBox({
               <button
                 type="button"
                 key={boundary.osm_id}
-                className="list-group-item btn btn-light text-left"
+                className="list-group-item btn btn-light text-start"
                 onClick={() => selectGeoResult(boundary)}
               >
                 {boundary.display_name}
@@ -132,7 +132,7 @@ export function GeoSuggestSearchBox({
   }
 
   return (
-    <div className="form-group geo-suggest-search-box">
+    <div className="mb-3 geo-suggest-search-box">
       <style>{`.autosuggest-highlighted { background-color: #ddd; }`}</style>
       <label className="w-100">
         <div>
@@ -154,16 +154,14 @@ export function GeoSuggestSearchBox({
             value={inputValue}
             {...inputProps}
           />
-          <div className="input-group-append">
-            <FormikButton
-              className="btn btn-info geo-suggest-button"
-              buttonProps={() => ({ disabled: suggestButtonIsDisabled })}
-              onClick={openGeoSuggestModal}
-            >
-              <CommonMessage id="geoSuggest" />
-            </FormikButton>
-            <Tooltip id="geoSuggestTooltip" />
-          </div>
+          <FormikButton
+            className="btn btn-info geo-suggest-button"
+            buttonProps={() => ({ disabled: suggestButtonIsDisabled })}
+            onClick={openGeoSuggestModal}
+          >
+            <CommonMessage id="geoSuggest" />
+          </FormikButton>
+          <Tooltip id="geoSuggestTooltip" />
         </div>
       </label>
     </div>

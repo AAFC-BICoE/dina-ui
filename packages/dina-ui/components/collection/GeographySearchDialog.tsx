@@ -108,7 +108,7 @@ export function GeographySearchDialog({
           <div className="col-md-1">
             <button
               onClick={() => searchByValueOnAdminBoundaries(inputValue as any)}
-              className="btn btn-light text-left"
+              className="btn btn-light text-start"
             >
               <DinaMessage id="searchButton" />
             </button>
@@ -123,7 +123,7 @@ export function GeographySearchDialog({
               <div className="col-md-4">
                 <button
                   type="button"
-                  className="btn btn-light text-left"
+                  className="btn btn-light text-start"
                   onClick={() => selectGeoResult(boundary)}
                 >
                   <CommonMessage id="select" />

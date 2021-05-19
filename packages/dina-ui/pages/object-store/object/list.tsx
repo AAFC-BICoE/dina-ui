@@ -156,7 +156,7 @@ export default function MetadataListPage() {
               value={listLayoutType ?? undefined}
             />
           </div>
-          <div className="list-inline-item float-right">
+          <div className="list-inline-item float-end">
             <Link href="/object-store/upload">
               <a>
                 <DinaMessage id="uploadPageTitle" />
@@ -182,7 +182,7 @@ export default function MetadataListPage() {
                 ]}
                 filterAttributes={METADATA_FILTER_ATTRIBUTES}
                 filterFormchildren={({ submitForm }) => (
-                  <div className="form-group">
+                  <div className="mb-3">
                     <div style={{ width: "300px" }}>
                       <GroupSelectField
                         onChange={() => setImmediate(submitForm)}
@@ -263,7 +263,7 @@ export default function MetadataListPage() {
                       </a>
                     </Link>
                     <button
-                      className="btn btn-dark float-right preview-button"
+                      className="btn btn-dark float-end preview-button"
                       type="button"
                       onClick={() => setPreviewMetadataId(null)}
                     >
@@ -301,11 +301,11 @@ function MetadataListWrapper({ children }) {
   return (
     <DinaForm<MetadataListFormValues> initialValues={{ selectedMetadatas: {} }}>
       <div style={{ height: "1rem" }}>
-        <div className="float-right">
+        <div className="float-end">
           <BulkDeleteButton />
           <FormikButton
             buttonProps={bulkButtonProps}
-            className="btn btn-primary ml-2 metadata-bulk-edit-button"
+            className="btn btn-primary ms-2 metadata-bulk-edit-button"
             onClick={async (values: MetadataListFormValues) => {
               const metadataIds = toPairs(values.selectedMetadatas)
                 .filter(pair => pair[1])

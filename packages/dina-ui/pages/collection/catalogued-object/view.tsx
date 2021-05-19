@@ -41,12 +41,12 @@ export function CataloguedObjectViewPage({ router }: WithRouterProps) {
         byPassView={true}
       />
       <EditButton
-        className="ml-auto"
+        className="ms-auto"
         entityId={id as string}
         entityLink="collection/catalogued-object"
       />
       <DeleteButton
-        className="ml-5"
+        className="ms-5"
         id={id as string}
         options={{ apiBaseUrl: "/collection-api" }}
         postDeleteRedirect="/collection/catalogued-object/list"
@@ -73,7 +73,7 @@ export function CataloguedObjectViewPage({ router }: WithRouterProps) {
             <FieldSet legend={<DinaMessage id="collectingEvent" />}>
               {collectingEvent && (
                 <DinaForm initialValues={collectingEvent} readOnly={true}>
-                  <div className="form-group d-flex justify-content-end align-items-center">
+                  <div className="mb-3 d-flex justify-content-end align-items-center">
                     <Link
                       href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
                     >
