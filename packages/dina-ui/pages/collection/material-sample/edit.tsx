@@ -128,9 +128,8 @@ export function MaterialSampleForm({
 
   const hasCatalogueInfo =
     !!materialSample?.dwcCatalogNumber || !!materialSample?.preparationType;
-  const [enableCatalogueInfo, setEnableCatalogueInfo] = useState(
-    hasCatalogueInfo
-  );
+  const [enableCatalogueInfo, setEnableCatalogueInfo] =
+    useState(hasCatalogueInfo);
 
   /** YYYY-MM-DD format. */
   const todayDate = new Date().toISOString().slice(0, 10);
@@ -139,8 +138,8 @@ export function MaterialSampleForm({
     ? { ...materialSample }
     : {
         type: "material-sample",
-        materialSampleName: `${username}-${todayDate}`,
-        managedAttributeValues: {}
+        materialSampleName: `${username}-${todayDate}`
+        // managedAttributeValues: {}
       };
 
   /** Used to get the values of the nested CollectingEvent form. */
@@ -161,7 +160,8 @@ export function MaterialSampleForm({
     attachedMetadatasUI: materialSampleAttachmentsUI,
     selectedMetadatas
   } = useAttachmentsModal({
-    initialMetadatas: materialSample?.attachment as PersistedResource<Metadata>[],
+    initialMetadatas:
+      materialSample?.attachment as PersistedResource<Metadata>[],
     deps: [materialSample?.id],
     title: <DinaMessage id="materialSampleAttachments" />
   });
