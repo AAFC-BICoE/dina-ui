@@ -63,21 +63,33 @@ export function FieldWrapper({
   removeFormGroupClass,
   removeLabel
 }: FieldWrapperProps) {
-  const { horizontal, readOnly } = useDinaFormContext();
+  const { horizontal, readOnly, isTemplate } = useDinaFormContext();
 
   const fieldLabel = label ?? (
     <FieldHeader name={name} customName={customName} />
   );
 
-  const [labelCol, valueCol] =
-    typeof horizontal === "boolean" ? [6, 6] : horizontal || [];
+  const [labelCol, valueCol] = isTemplate
+    ? [4, 6]
+    : typeof horizontal === "boolean"
+    ? [6, 6]
+    : horizontal || [];
 
   return (
-    <div className={className}>
+    <div className={`${className}`}>
+      {isTemplate && (
+        <input type="checkbox" className="col-sm-1 align-self-stretch" />
+      )}
       <label
-        className={`${name}-field ${horizontal ? "row" : "w-100"} ${
-          removeFormGroupClass ? "" : "form-group"
-        }`}
+        className={`${name}-field ${
+          isTemplate
+            ? horizontal
+              ? "row"
+              : "w-100"
+            : horizontal
+            ? "row"
+            : "w-100"
+        } ${removeFormGroupClass ? "" : "form-group"}`}
       >
         {!removeLabel && (
           <div

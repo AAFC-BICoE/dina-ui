@@ -31,6 +31,9 @@ export interface DinaFormContextI {
 
   /** The initial form values passed into Formik. */
   initialValues?: any;
+
+  /** Add a checkbox beside the wrapper field if true */
+  isTemplate?: boolean;
 }
 
 export type DinaFormOnSubmit<TValues = any> = (
