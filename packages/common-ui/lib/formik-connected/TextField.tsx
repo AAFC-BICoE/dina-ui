@@ -1,10 +1,13 @@
 import { FormikProps } from "formik";
 import { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
+import TextareaAutosize, {
+  TextareaAutosizeProps
+} from "react-textarea-autosize";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
+import classnames from "classnames";
 
 export interface TextFieldProps extends LabelWrapperParams {
   readOnly?: boolean;
-  initialValue?: string;
   multiLines?: boolean;
   inputProps?: InputHTMLAttributes<any> | TextareaHTMLAttributes<any>;
   placeholder?: string;
@@ -23,7 +26,6 @@ export interface TextFieldProps extends LabelWrapperParams {
  */
 export function TextField(props: TextFieldProps) {
   const {
-    initialValue,
     readOnly,
     multiLines,
     inputProps: inputPropsExternal,
@@ -35,7 +37,7 @@ export function TextField(props: TextFieldProps) {
 
   return (
     <FieldWrapper {...labelWrapperProps}>
-      {({ formik, setValue, value }) => {
+      {({ formik, setValue, value, invalid }) => {
         function onChangeInternal(newValue: string) {
           setValue(newValue);
           onChangeExternal?.(formik, props.name, newValue);
@@ -44,7 +46,7 @@ export function TextField(props: TextFieldProps) {
         const inputPropsInternal: InputHTMLAttributes<any> = {
           ...inputPropsExternal,
           placeholder,
-          className: "form-control",
+          className: classnames("form-control", { "is-invalid": invalid }),
           onChange: event => onChangeInternal(event.target.value),
           value: value || "",
           readOnly
@@ -56,7 +58,10 @@ export function TextField(props: TextFieldProps) {
         return (
           customInput?.(inputPropsInternal) ??
           (multiLines ? (
-            <textarea rows={4} {...inputPropsInternal} />
+            <TextareaAutosize
+              minRows={4}
+              {...(inputPropsInternal as TextareaAutosizeProps)}
+            />
           ) : (
             <input type="text" {...inputPropsInternal} />
           ))

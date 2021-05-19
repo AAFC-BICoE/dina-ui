@@ -39,6 +39,7 @@ export interface FieldWrapperProps extends LabelWrapperParams {
 }
 
 export interface FieldWrapperRenderProps {
+  invalid: boolean;
   value: any;
   setValue: (newValue: any) => void;
   formik: FormikProps<any>;
@@ -93,23 +94,28 @@ export function FieldWrapper({
         )}
         <div className={valueCol ? `col-sm-${valueCol}` : ""}>
           <FastField name={name}>
-            {({ field: { value }, form }) => {
-              if (readOnly || !children) {
-                return (
-                  readOnlyRender?.(value) ?? (
-                    <ReadOnlyValue link={link} value={value} />
-                  )
-                );
-              } else if (typeof children === "function") {
-                function setValue(newValue: any) {
-                  form.setFieldValue(name, newValue);
-                  form.setFieldTouched(name);
-                }
-
-                return children?.({ value, setValue, formik: form });
-              }
-              return children;
-            }}
+            {({ field: { value }, form, meta: { error } }) => (
+              <>
+                {readOnly || !children
+                  ? readOnlyRender?.(value) ?? (
+                      <ReadOnlyValue link={link} value={value} />
+                    )
+                  : typeof children === "function"
+                  ? children?.({
+                      invalid: Boolean(error),
+                      value,
+                      setValue: newValue => {
+                        // Remove the error message when the user edits the field:
+                        form.setFieldError(name, undefined);
+                        form.setFieldValue(name, newValue);
+                        form.setFieldTouched(name);
+                      },
+                      formik: form
+                    })
+                  : children}
+                {error && <div className="invalid-feedback">{error}</div>}
+              </>
+            )}
           </FastField>
         </div>
       </label>

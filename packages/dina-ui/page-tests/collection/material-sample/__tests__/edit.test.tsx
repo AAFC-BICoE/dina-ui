@@ -144,6 +144,7 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
+              managedAttributeValues: {},
               relationships: {},
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
@@ -364,6 +365,7 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
+              managedAttributeValues: {},
               relationships: {},
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"

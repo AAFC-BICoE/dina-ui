@@ -17,7 +17,7 @@
     "core-js": "^3.6.5",
     "custom-event": "^1.0.1",
     "dataloader": "^2.0.0",
-    "formik": "^2.1.4",
+    "formik": "^2.2.6",
     "handsontable": "6.2.2",
     "keycloak-js": "^10.0.2",
     "kitsu": "7.0.4",
@@ -39,10 +39,12 @@
     "react-select": "^3.1.0",
     "react-sortable-hoc": "^1.11.0",
     "react-table": "^6.11.5",
+    "react-textarea-autosize": "^8.3.2",
     "swr": "^0.4.2",
     "title-case": "2.1.1",
     "type-fest": "^1.0.2",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "yup": "^0.32.9"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.168",

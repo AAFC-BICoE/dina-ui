@@ -1,3 +1,4 @@
+import { FormikContextType } from "formik";
 import { isArray } from "lodash";
 import Select from "react-select";
 import { Styles } from "react-select/src/styles";
@@ -14,7 +15,10 @@ export interface SelectFieldProps<T = string> extends LabelWrapperParams {
   /** Whether this is a multi-select dropdown. */
   isMulti?: boolean;
 
-  onChange?: (value?: T | T[] | null) => void;
+  onChange?: (
+    value: T | T[] | null | undefined,
+    formik: FormikContextType<any>
+  ) => void;
   options: SelectOption<T>[];
   styles?: Partial<Styles<SelectOption<T | null | undefined>, boolean>>;
 }
@@ -39,7 +43,7 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
 
   return (
     <FieldWrapper {...labelWrapperProps}>
-      {({ setValue, value }) => {
+      {({ setValue, value, formik }) => {
         function onChangeInternal(
           change: SelectOption<T>[] | SelectOption<T> | null
         ) {
@@ -52,7 +56,7 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
             ? change.map(option => option.value)
             : change?.value;
           setValue(newValue);
-          onChange?.(newValue);
+          onChange?.(newValue, formik);
         }
 
         const selectedOption = isMulti

@@ -74,6 +74,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   detailsPageLink: "Details Page",
   dinaHomeH1: "Dina Home",
   dinaUserSectionTitle: "Users",
+  duplicateFilesFound: "duplicate files found",
   editCataloguedObjectTitle: "Edit Catalogued Object",
   editCollectingEventTitle: "Edit Collecting Event",
   editDinaUserTitle: "Edit User",
@@ -107,13 +108,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_acSubtype: "Ac Subtype",
   field_acTags: "Tags",
   field_acceptedValues: "Accepted Values",
-  field_acceptedValuesAsLines: "Accepted Values (One value per line)",
-  field_acceptedValuesAsLines_tooltip:
-    "Write one accepted value per line. Press enter while typing in the field to add a new line.",
   field_aliases: "Aliases",
-  field_aliasesAsLines: "Aliases (One value per line)",
-  field_aliasesAsLines_tooltip:
-    "Write one accepted value per line. Press enter while typing in the field to add a new line.",
   field_attributesTemplate: "Set Attributes Template",
   field_collectingEvent_endDateTimeError:
     "End event datetime format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
@@ -133,6 +128,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "field_description.en": "English Description",
   "field_description.fr": "French Description",
   field_displayName: "Display Name",
+  field_dwcCatalogNumber: "Catalog Number",
   field_dwcCountry: "Country",
   field_dwcCountryCode: "Country Code",
   field_dwcGeodeticDatum: "Geodetic Datum",
@@ -209,6 +205,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   footerContactInfo: "Contact information",
   footerPrivacy: "Privacy",
   footerTermsAndConditions: "Terms and conditions",
+  formNavigation: "Form Navigation",
   forTestingPurposesOnlyMessage:
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
   geoReferencing: "Geo-Referencing",
@@ -289,6 +286,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   primary: "Primary",
   primaryButton_tooltip:
     "Make this assertion the primary data point when exported. Only one assertion can be primary",
+  proceedToCreateMetadata: "Proceed to Create Metadata",
   removeAssertionLabel: "Remove this GeoReference",
   removeComponentData: "Remove {component} data",
   removeGroup: "Remove Group",
@@ -297,6 +295,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   revisionsButtonText: "Revisions",
   revisionsByUserPageTitle: "Revisions by user",
   revisionsListTitle: "Revisions for {name}",
+  role: "Role",
   roles: "Roles",
   rolesPerGroup: "Roles Per Group",
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
@@ -329,6 +328,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   viewDetailButtonLabel: " View Detail",
   viewOnMap: "View on Map",
   viewPreviewButtonText: "Preview",
+  warningMessage: "Warning Message",
   whoAmITitle: "Who Am I",
   year: "Year",
   yearMonth: "Year-Month",

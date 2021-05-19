@@ -55,6 +55,9 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   none: "None",
   noRowsFound: "No Rows Found",
   of: "of",
+  oneValuePerLine: "One value per line",
+  oneValuePerLineTooltip:
+    "Write one value per line. Press enter while typing in the field to add a new line.",
   page: "Page",
   previous: "Previous",
   queryTableMultiSortExplanation:

@@ -8,6 +8,7 @@ import {
   LoadingSpinner,
   NominatumApiSearchResult,
   ResourceSelectField,
+  StringArrayField,
   TextField,
   TextFieldWithCoordButtons,
   TextFieldWithRemoveButton,
@@ -139,7 +140,7 @@ export function CollectingEventFormLayout({
       `${geographicPlaceSourceUrl}osmtype=${osmTypeForSearch}&osmid=${result.osm_id}`
     );
     formik.setFieldValue(
-      `${commonSrcDetailRoot}.geographicPlaceNameSource`,
+      "geographicPlaceNameSource",
       GeographicPlaceNameSource.OSM
     );
 
@@ -294,7 +295,7 @@ export function CollectingEventFormLayout({
             <GroupSelectField name="group" enableStoredDefaultGroup={true} />
           </div>
           <div className="col-md-6">
-            <TextField name="dwcOtherRecordNumbers" multiLines={true} />
+            <StringArrayField name="dwcOtherRecordNumbers" />
           </div>
         </div>
       </DinaFormSection>

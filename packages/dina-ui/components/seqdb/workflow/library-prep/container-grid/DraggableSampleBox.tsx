@@ -10,6 +10,8 @@ interface DraggableSampleBoxProps {
   wasMoved: boolean;
 }
 
+export const SAMPLE_BOX_DRAG_KEY = "molecularSample";
+
 export function DraggableSampleBox({
   onClick = noop,
   sample,
@@ -17,7 +19,7 @@ export function DraggableSampleBox({
   wasMoved
 }: DraggableSampleBoxProps) {
   const [, drag] = useDrag({
-    item: { sample, type: "molecularSample" }
+    item: { sample, type: SAMPLE_BOX_DRAG_KEY }
   });
 
   return (

@@ -6,13 +6,14 @@ import {
 } from "./GeographicPlaceNameSourceDetail";
 import { CollectorGroup } from "./CollectorGroup";
 import { GeoReferenceAssertion } from "./GeoReferenceAssertion";
+import { ManagedAttributeValues } from "../../objectstore-api";
 
 export interface CollectingEventAttributes {
   type: "collecting-event";
   uuid: string;
 
   startEventDateTime: string;
-  endEventDateTime?: string;
+  endEventDateTime?: string | null;
   dwcRecordedBy?: string;
   verbatimEventDateTime?: string;
 
@@ -42,6 +43,8 @@ export interface CollectingEventAttributes {
   srcAdminLevels?: SourceAdministrativeLevel[];
 
   habitat?: string;
+
+  managedAttributeValues?: ManagedAttributeValues;
 }
 
 export enum GeographicPlaceNameSource {

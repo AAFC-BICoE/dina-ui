@@ -2,12 +2,12 @@
 import {
   ButtonBar,
   DateField,
-  DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
   LoadingSpinner,
   Query,
   SelectField,
+  StringArrayField,
   SubmitButton,
   TextField
 } from "common-ui";
@@ -18,17 +18,13 @@ import { useState } from "react";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
+  CollectionModuleType,
+  COLLECTION_MODULE_TYPES,
+  COLLECTION_MODULE_TYPE_LABELS,
   ManagedAttribute,
   ManagedAttributeType,
-  COLLECTION_MODULE_TYPES,
-  MANAGED_ATTRIBUTE_TYPE_OPTIONS,
-  CollectionModuleType,
-  COLLECTION_MODULE_TYPE_LABELS
+  MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../../types/collection-api/resources/ManagedAttribute";
-
-interface ManagedAttributeFormFields extends ManagedAttribute {
-  acceptedValuesAsLines?: string;
-}
 
 interface ManagedAttributeFormProps {
   fetchedManagedAttribute?: ManagedAttribute;
@@ -88,7 +84,7 @@ function ManagedAttributeForm({
 
   const id = fetchedManagedAttribute?.id;
 
-  const initialValues: Partial<ManagedAttributeFormFields> = fetchedManagedAttribute || {
+  const initialValues: Partial<ManagedAttribute> = fetchedManagedAttribute || {
     type: "managed-attribute"
   };
 
@@ -104,10 +100,6 @@ function ManagedAttributeForm({
     initialValues.managedAttributeType = "PICKLIST";
   }
 
-  // Convert acceptedValues to easily editable string format:
-  initialValues.acceptedValuesAsLines =
-    initialValues.acceptedValues?.concat("")?.join("\n") ?? "";
-
   const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
     ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
   );
@@ -120,35 +112,28 @@ function ManagedAttributeForm({
     value: dataType
   }));
 
-  const onSubmit: DinaFormOnSubmit<ManagedAttributeFormFields> = async ({
+  const onSubmit: DinaFormOnSubmit<Partial<ManagedAttribute>> = async ({
     api: { save },
-    submittedValues: { acceptedValuesAsLines, ...submittedManagedAttribute }
+    submittedValues
   }) => {
-    // Convert user-suplied string to string array:
-    submittedManagedAttribute.acceptedValues = (acceptedValuesAsLines || "")
-      // Split by line breaks:
-      .match(/[^\r\n]+/g)
-      // Remove empty lines:
-      ?.filter(line => line.trim());
-
     // Treat empty array or undefined as null:
-    if (!submittedManagedAttribute.acceptedValues?.length) {
-      submittedManagedAttribute.acceptedValues = null;
+    if (!submittedValues.acceptedValues?.length) {
+      submittedValues.acceptedValues = null;
     }
 
-    if (submittedManagedAttribute.managedAttributeType === "PICKLIST") {
-      submittedManagedAttribute.managedAttributeType = "STRING";
+    if (submittedValues.managedAttributeType === "PICKLIST") {
+      submittedValues.managedAttributeType = "STRING";
     } else if (
-      submittedManagedAttribute.managedAttributeType === "INTEGER" ||
-      submittedManagedAttribute.managedAttributeType === "STRING"
+      submittedValues.managedAttributeType === "INTEGER" ||
+      submittedValues.managedAttributeType === "STRING"
     ) {
-      submittedManagedAttribute.acceptedValues = null;
+      submittedValues.acceptedValues = null;
     }
 
     await save(
       [
         {
-          resource: submittedManagedAttribute,
+          resource: { type: "managed-attribute", ...submittedValues },
           type: "managed-attribute"
         }
       ],
@@ -168,16 +153,16 @@ function ManagedAttributeForm({
           </a>
         </Link>
       </ButtonBar>
-      <div style={{ width: "300px" }}>
+      <div style={{ width: "25rem" }}>
         <TextField name="name" readOnly={id !== undefined} />
       </div>
-      <div style={{ width: "300px" }}>
+      <div style={{ width: "25rem" }}>
         <SelectField
           name="managedAttributeComponent"
           options={ATTRIBUTE_COMPONENT_OPTIONS}
         />
       </div>
-      <div style={{ width: "300px" }}>
+      <div style={{ width: "25rem" }}>
         <SelectField
           name="managedAttributeType"
           options={ATTRIBUTE_TYPE_OPTIONS}
@@ -185,12 +170,12 @@ function ManagedAttributeForm({
         />
       </div>
       {type === "PICKLIST" && (
-        <div style={{ width: "300px" }}>
-          <TextField name="acceptedValuesAsLines" multiLines={true} />
+        <div style={{ width: "25rem" }}>
+          <StringArrayField name="acceptedValues" />
         </div>
       )}
       {id && (
-        <div style={{ width: "300px" }}>
+        <div style={{ width: "25rem" }}>
           <h4>
             <DinaMessage id="field_managedAttributeCreatedOn" />
           </h4>
@@ -203,7 +188,7 @@ function ManagedAttributeForm({
         </div>
       )}
       {id && (
-        <div style={{ width: "300px" }}>
+        <div style={{ width: "25rem" }}>
           <h4>
             <DinaMessage id="field_managedAttributeCreatedBy" />
           </h4>

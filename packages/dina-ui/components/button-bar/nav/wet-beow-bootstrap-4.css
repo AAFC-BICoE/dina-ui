@@ -389,3 +389,8 @@ a.nav-link.dropdown-toggle {
   /* fix Element's background color could not be determined because it's partially obscured by another element */
   background: #38414d;
 }
+
+/* fix elements must have suficient color contrast for the back to list button */
+.btn-outline-secondary {
+  color: #3838f3;
+}

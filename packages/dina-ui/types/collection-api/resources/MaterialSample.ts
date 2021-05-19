@@ -1,5 +1,6 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
+import { ManagedAttributeValues } from "../../objectstore-api";
 import { CollectingEvent } from "./CollectingEvent";
 import { PreparationType } from "./PreparationType";
 
@@ -13,6 +14,8 @@ export interface MaterialSampleAttributes {
   createdOn?: string;
   createdBy?: string;
   dwcCatalogNumber?: string | null;
+
+  managedAttributeValues?: ManagedAttributeValues;
 }
 
 export interface MaterialSampleRelationships {
