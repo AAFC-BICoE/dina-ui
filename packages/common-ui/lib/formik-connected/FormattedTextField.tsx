@@ -1,7 +1,7 @@
+import classnames from "classnames";
 import Cleave from "cleave.js/react";
-import { ChangeEvent, InputHTMLAttributes } from "react";
+import { InputHTMLAttributes } from "react";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
-
 export interface FormattedTextFieldProps extends LabelWrapperParams {
   readOnly?: boolean;
   initialValue?: string;
@@ -26,10 +26,10 @@ export function FormattedTextField(props: FormattedTextFieldProps) {
 
   return (
     <FieldWrapper {...labelWrapperProps}>
-      {({ setValue, value }) => {
+      {({ setValue, value, invalid }) => {
         const inputPropsInternal = {
           ...inputPropsExternal,
-          className: "form-control",
+          className: classnames("form-control", { "is-invalid": invalid }),
           onChange: event => setValue(event.target.value),
           value: value ?? "",
           readOnly

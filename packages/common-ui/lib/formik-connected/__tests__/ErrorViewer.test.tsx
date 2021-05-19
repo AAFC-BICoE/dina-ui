@@ -1,7 +1,9 @@
 import { Formik } from "formik";
 import { noop } from "lodash";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { DinaForm } from "../DinaForm";
 import { ErrorViewer } from "../ErrorViewer";
+import { SubmitButton } from "../SubmitButton";
 
 describe("ErrorViewer component", () => {
   it("Renders nothing when formik has no status.", () => {
@@ -14,25 +16,20 @@ describe("ErrorViewer component", () => {
     expect(wrapper.html()).toEqual('<div style="scroll-margin: 20px;"></div>');
   });
 
-  it("Renders the formik status as an error message.", () => {
+  it("Renders the formik status as an error message.", async () => {
     const wrapper = mountWithAppContext(
-      <Formik initialValues={{}} onSubmit={noop}>
-        {({ setStatus }) => {
-          function setError() {
-            setStatus("Test error");
-          }
-
-          return (
-            <div>
-              <button onClick={setError} />
-              <ErrorViewer />
-            </div>
-          );
-        }}
-      </Formik>
+      <DinaForm
+        initialValues={{}}
+        onSubmit={({ formik }) => formik.setStatus("Test error")}
+      >
+        <SubmitButton />
+      </DinaForm>
     );
 
-    wrapper.find("button").simulate("click");
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
 
     expect(wrapper.find(".alert.alert-danger").text()).toEqual("Test error");
   });
