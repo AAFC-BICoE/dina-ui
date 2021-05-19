@@ -163,8 +163,6 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
-              // Temparorily commented out til back end is ready
-              // managedAttributeValues: {},
               materialSampleName: expect.stringMatching(/test-user-.*/),
               dwcCatalogNumber: "my-new-material-sample",
               relationships: {},
@@ -244,8 +242,6 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
-              // Temparorily commented out til back end is ready
-              //  managedAttributeValues: {},
               materialSampleName: expect.stringMatching(/test-user-.*/),
               dwcCatalogNumber: "my-new-material-sample",
               type: "material-sample",

@@ -16,6 +16,7 @@ export function useCollapser(id: string) {
         className="collapser-button m-2 btn btn-secondary"
         onClick={() => setState(collapsed ? "OPEN" : "COLLAPSED")}
         type="button"
+        title="Collapser Button"
       >
         <i
           style={{

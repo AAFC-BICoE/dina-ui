@@ -91,11 +91,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
     return (
       <div className="list-inline">
-        <label
-          aria-label="Filter Attribute"
-          className="list-inline-item"
-          style={{ width: 320 }}
-        >
+        <label className="list-inline-item" style={{ width: 320 }}>
           <Select<FilterAttributeOption>
             className="filter-attribute"
             instanceId={`attribute_${model.id}`}
@@ -104,11 +100,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
             value={selectedAttributeOption}
           />
         </label>
-        <label
-          aria-label="Filter Predicate"
-          className="list-inline-item"
-          style={{ width: "12rem" }}
-        >
+        <label className="list-inline-item" style={{ width: "12rem" }}>
           <Select
             className="filter-predicate"
             instanceId={`predicate_${model.id}`}
@@ -119,7 +111,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
             )}
           />
         </label>
-        <label aria-label="Filter Value" className="list-inline-item">
+        <label className="list-inline-item">
           {attribute.type === "DATE" && (
             <FilterRowDatePicker
               isRange={model.predicate === "BETWEEN"}
@@ -145,6 +137,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
           {attribute.type === "STRING" && (
             <input
+              aria-label="Filter Value"
               className="filter-value form-control d-inline-block"
               style={{
                 width: "16rem",
@@ -157,11 +150,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
           )}
         </label>
         {attribute.type !== "DATE" && (
-          <label
-            className="list-inline-item"
-            aria-label="Filter Search Type"
-            style={{ width: "12rem" }}
-          >
+          <label className="list-inline-item" style={{ width: "12rem" }}>
             <Select
               className="filter-search-type"
               instanceId={`searchType_${model.id}`}
