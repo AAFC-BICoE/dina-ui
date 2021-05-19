@@ -70,22 +70,34 @@ export function FieldWrapper({
   );
 
   const [labelCol, valueCol] = isTemplate
-    ? [4, 6]
+    ? typeof horizontal === "boolean"
+      ? [6, 6]
+      : horizontal || [12, 12]
     : typeof horizontal === "boolean"
     ? [6, 6]
     : horizontal || [];
 
   return (
-    <div className={`${className}`}>
+    <div className={`${className} ${isTemplate ? "row" : ""}`}>
       {isTemplate && (
-        <input type="checkbox" className="col-sm-1 align-self-stretch" />
+        <input
+          type="checkbox"
+          style={{
+            display: "block",
+            height: "20px",
+            marginLeft: "15px",
+            width: "20px"
+          }}
+          className="col-sm-1 "
+          name={`enable${name}`}
+        />
       )}
       <label
         className={`${name}-field ${
           isTemplate
             ? horizontal
-              ? "row"
-              : "w-100"
+              ? "row col-sm-11"
+              : "col-sm-10"
             : horizontal
             ? "row"
             : "w-100"
