@@ -33,7 +33,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   attachments: "Attachments",
   attributeLabel: "Attribute",
   cancelButtonText: "Cancel",
-  catalogueInfo: "Catalogue Info",
   cataloguedObjectListTitle: "Catalogued Objects",
   cataloguedObjectViewTitle: "View Catalogued Object",
   changedProperties: "Changes",
@@ -188,10 +187,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeType_integer_label: "Numerical",
   field_managedAttributeType_picklist_label: "Pick List",
   field_managedAttributeType_text_label: "Text",
+  field_materialSampleName: "Material Sample ID",
   field_notPubliclyReleasableReason: "Not Publicly Releasable Reason",
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
   field_originalFilename: "Original Filename",
+  field_otherIds: "Other IDs",
   field_preparationType: "Preparation Method",
   field_publiclyReleasable: "Publicly releasable",
   field_publiclyReleasable_tooltip:
@@ -218,6 +219,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   governmentOfCanada: "Government of Canada",
   group: "Group",
   groupMustBeSelected: "Group must be selected",
+  identifiers: "Identifiers",
   largeImg: "Large Image",
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",
   latitudeValidationError:
@@ -233,6 +235,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeValueLabel: "Value",
   materialSample: "Material Sample",
   materialSampleAttachments: "Material Sample Attachments",
+  materialSampleIdOrCatalogNumberRequired:
+    'Either "Material Sample ID" or "Catalog Number" is required.',
   materialSampleListTitle: "Material Samples",
   materialSampleViewTitle: "Material Sample",
   metadataAttributesTemplateSave: "Save This Attributes Template",
@@ -280,6 +284,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   personViewTitle: "Person",
   preparation: "Preparation",
   preparationData: "Preparation Data",
+  preparations: "Preparations",
   preparationTypeListTitle: "Preparation Method",
   preparationTypeNameLabel: "Preparation Method Name",
   preparationTypeViewTitle: "View Preparation Method",
