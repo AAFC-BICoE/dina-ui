@@ -58,7 +58,8 @@ export function useMaterialSampleQuery(id?: string | null) {
 
 export function useMaterialSampleSave(
   materialSample?: PersistedResource<MaterialSample>,
-  onSaved?: (id: string) => Promise<void>
+  onSaved?: (id: string) => Promise<void>,
+  isTemplate?: boolean
 ) {
   const { username } = useAccount();
   const { openModal } = useModal();
@@ -209,6 +210,7 @@ export function useMaterialSampleSave(
     <DinaForm
       innerRef={colEventFormRef}
       initialValues={collectingEventInitialValues}
+      isTemplate={isTemplate}
     >
       <CollectingEventFormLayout />
       <div className="form-group">{colEventAttachmentsUI}</div>

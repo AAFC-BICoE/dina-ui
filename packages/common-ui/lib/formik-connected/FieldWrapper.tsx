@@ -89,7 +89,7 @@ export function FieldWrapper({
             width: "20px"
           }}
           className="col-sm-1 "
-          name={`enable${name}`}
+          name={`${name}Enabled`}
         />
       )}
       <label
