@@ -62,7 +62,7 @@ export interface CollectingEventAttributes {
   dwcVerbatimElevationEnabled?: boolean;
   dwcVerbatimDepthEnabled?: boolean;
 
-  includeAllColletingAgent?: boolean;
+  includeAllCollectingAgent?: boolean;
   dwcOtherRecordNumbersEnabled?: boolean;
   dwcRecordNumberEnabled?: boolean;
 

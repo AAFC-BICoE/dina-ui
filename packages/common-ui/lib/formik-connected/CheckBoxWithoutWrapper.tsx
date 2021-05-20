@@ -8,6 +8,7 @@ export interface CheckBoxWithoutWrapperProps {
   className?: string;
   parentContainerId?: string;
   includeAllLabel?: string;
+  customLayout?: string[];
 }
 
 const checkboxProps = {
@@ -25,7 +26,8 @@ export function CheckBoxWithoutWrapper(props: CheckBoxWithoutWrapperProps) {
     parentContainerId: id,
     onClickIncludeAll,
     className,
-    includeAllLabel
+    includeAllLabel,
+    customLayout
   } = props;
   return (
     <FastField {...props}>
@@ -42,10 +44,15 @@ export function CheckBoxWithoutWrapper(props: CheckBoxWithoutWrapperProps) {
               checked={value || false}
               onChange={onChange}
               value={value || false}
-              className={`${className} col-sm-1`}
+              className={`${className} ${
+                customLayout ? customLayout[0] : "col-sm-1"
+              }`}
               name={name}
             />
-            <div className="col-sm-10"> {includeAllLabel}</div>
+            <div className={`${customLayout ? customLayout[1] : "col-sm-10"}`}>
+              {" "}
+              {includeAllLabel}
+            </div>
           </label>
         ) : (
           <input

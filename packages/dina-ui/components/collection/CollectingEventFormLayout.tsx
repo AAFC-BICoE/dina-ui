@@ -319,16 +319,14 @@ export function CollectingEventFormLayout({
           >
             {isTemplate && (
               <Field name="includeAllCollectingDate">
-                {() => {
-                  return (
-                    <CheckBoxWithoutWrapper
-                      name="includeAllCollectingDate"
-                      parentContainerId="collectingDateLegend"
-                      onClickIncludeAll={OnClickIncludeAll}
-                      includeAllLabel={formatMessage("includeAll")}
-                    />
-                  );
-                }}
+                {() => (
+                  <CheckBoxWithoutWrapper
+                    name="includeAllCollectingDate"
+                    parentContainerId="collectingDateLegend"
+                    onClickIncludeAll={OnClickIncludeAll}
+                    includeAllLabel={formatMessage("includeAll")}
+                  />
+                )}
               </Field>
             )}
             <FormattedTextField
@@ -369,7 +367,22 @@ export function CollectingEventFormLayout({
           </FieldSet>
         </div>
         <div className="col-md-6">
-          <FieldSet legend={<DinaMessage id="collectingAgentsLegend" />}>
+          <FieldSet
+            legend={<DinaMessage id="collectingAgentsLegend" />}
+            id="collectingAgentsLegend"
+          >
+            {isTemplate && (
+              <Field name="includeAllCollectingAgent">
+                {() => (
+                  <CheckBoxWithoutWrapper
+                    name="includeAllCollectingAgent"
+                    parentContainerId="collectingAgentsLegend"
+                    onClickIncludeAll={OnClickIncludeAll}
+                    includeAllLabel={formatMessage("includeAll")}
+                  />
+                )}
+              </Field>
+            )}
             <AutoSuggestTextField<CollectingEvent>
               name="dwcRecordedBy"
               query={(searchValue, ctx) => ({
@@ -400,7 +413,27 @@ export function CollectingEventFormLayout({
         </div>
       </div>
       <FieldSet legend={<DinaMessage id="collectingLocationLegend" />}>
-        <FieldSet legend={<DinaMessage id="verbatimLabelLegend" />}>
+        <FieldSet
+          legend={<DinaMessage id="verbatimLabelLegend" />}
+          id="verbatimLabelLegend"
+        >
+          <div className="row">
+            <div className="col-md-6">
+              {isTemplate && (
+                <Field name="includeAllVerbatimCoordinates">
+                  {() => (
+                    <CheckBoxWithoutWrapper
+                      name="includeAllVerbatimCoordinates"
+                      parentContainerId="verbatimLabelLegend"
+                      onClickIncludeAll={OnClickIncludeAll}
+                      includeAllLabel={formatMessage("includeAll")}
+                      customLayout={["col-sm-1", "col-sm-4"]}
+                    />
+                  )}
+                </Field>
+              )}
+            </div>
+          </div>
           <div className="row">
             <div className="col-md-6">
               <TextField name="dwcVerbatimLocality" />
@@ -515,7 +548,23 @@ export function CollectingEventFormLayout({
         </FieldSet>
         <div className="row">
           <div className="col-lg-6">
-            <FieldSet legend={<DinaMessage id="geoReferencingLegend" />}>
+            <FieldSet
+              legend={<DinaMessage id="geoReferencingLegend" />}
+              id="geoReferencingLegend"
+            >
+              {isTemplate && (
+                <Field name="includeAllGeoReference">
+                  {() => (
+                    <CheckBoxWithoutWrapper
+                      name="includeAllGeoReference"
+                      parentContainerId="geoReferencingLegend"
+                      onClickIncludeAll={OnClickIncludeAll}
+                      includeAllLabel={formatMessage("includeAll")}
+                      customLayout={["col-sm-1", "col-sm-4"]}
+                    />
+                  )}
+                </Field>
+              )}
               <FieldArray name="geoReferenceAssertions">
                 {({ form, push, remove }) => {
                   const assertions =
