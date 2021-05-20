@@ -1,5 +1,6 @@
 import {
   AutoSuggestTextField,
+  CheckBoxWithoutWrapper,
   DinaFormSection,
   FieldSet,
   filterBy,
@@ -63,7 +64,7 @@ export function CollectingEventFormLayout({
   const { openAddPersonModal } = useAddPersonModal();
   const [rangeEnabled, setRangeEnabled] = useState(false);
 
-  const { initialValues, readOnly } = useDinaFormContext();
+  const { initialValues, readOnly, isTemplate } = useDinaFormContext();
 
   // Open the tab with the Primary geoassertion even if it's not the first one.
   // Defaults to 0 if there's no primary assertion.
@@ -287,6 +288,17 @@ export function CollectingEventFormLayout({
     setHideCustomPlace(true);
   };
 
+  const OnClickIncludeAll = (e, form, id) => {
+    const fields = Array.from(
+      document.getElementById(id)?.getElementsByClassName("templateCheckBox") ??
+        []
+    );
+    const { checked } = e.target;
+    fields.map(field => {
+      form.setFieldValue(field.attributes.name?.value, checked);
+      form.setFieldTouched(field.attributes.name?.value);
+    });
+  };
   return (
     <div>
       <DinaFormSection horizontal={[3, 9]}>
@@ -301,7 +313,24 @@ export function CollectingEventFormLayout({
       </DinaFormSection>
       <div className="row">
         <div className="col-md-6">
-          <FieldSet legend={<DinaMessage id="collectingDateLegend" />}>
+          <FieldSet
+            legend={<DinaMessage id="collectingDateLegend" />}
+            id="collectingDateLegend"
+          >
+            {isTemplate && (
+              <Field name="includeAllCollectingDate">
+                {() => {
+                  return (
+                    <CheckBoxWithoutWrapper
+                      name="includeAllCollectingDate"
+                      parentContainerId="collectingDateLegend"
+                      onClickIncludeAll={OnClickIncludeAll}
+                      includeAllLabel={formatMessage("includeAll")}
+                    />
+                  );
+                }}
+              </Field>
+            )}
             <FormattedTextField
               name="startEventDateTime"
               className="startEventDateTime"

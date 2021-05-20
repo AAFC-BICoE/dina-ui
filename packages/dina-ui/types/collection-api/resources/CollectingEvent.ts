@@ -46,7 +46,7 @@ export interface CollectingEventAttributes {
 
   managedAttributeValues?: ManagedAttributeValues;
 
-  includeAllColletingDate?: boolean;
+  includeAllCollectingDate?: boolean;
   startEventDateTimeEnabled?: boolean;
   endEventDateTimeEnabled?: boolean;
   dwcRecordedByEnabled?: boolean;

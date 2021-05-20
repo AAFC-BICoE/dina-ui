@@ -1,6 +1,7 @@
 import { FastField, FormikProps } from "formik";
 import { ReactNode } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
+import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
 import { useDinaFormContext } from "./DinaForm";
 import { ReadOnlyValue } from "./FieldView";
 
@@ -30,6 +31,8 @@ export interface LabelWrapperParams {
 
   /** Remove the label. */
   removeLabel?: boolean;
+
+  isTemplate?: boolean;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -81,16 +84,9 @@ export function FieldWrapper({
   return (
     <div className={`${className} ${isTemplate ? "row" : ""}`}>
       {isTemplate && (
-        <input
-          type="checkbox"
-          style={{
-            display: "block",
-            height: "20px",
-            marginLeft: "15px",
-            width: "20px"
-          }}
-          className="col-sm-1 "
+        <CheckBoxWithoutWrapper
           name={`${name}Enabled`}
+          className="col-sm-1 templateCheckBox"
         />
       )}
       <label
