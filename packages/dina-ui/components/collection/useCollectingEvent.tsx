@@ -1,16 +1,20 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useApiClient, useQuery } from "common-ui";
 import { FormikContextType } from "formik";
-import { InputResource, PersistedResource } from "kitsu";
+import { PersistedResource } from "kitsu";
 import { orderBy } from "lodash";
+import { useMemo } from "react";
+import * as yup from "yup";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { CollectingEvent } from "../../types/collection-api";
+import {
+  CollectingEvent,
+  GeoReferenceAssertion
+} from "../../types/collection-api";
 import { CoordinateSystemEnum } from "../../types/collection-api/resources/CoordinateSystem";
+import { SourceAdministrativeLevel } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { SRSEnum } from "../../types/collection-api/resources/SRS";
 import { Metadata, Person } from "../../types/objectstore-api";
 import { useAttachmentsModal } from "../object-store";
-import { SourceAdministrativeLevel } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
-import { object, string, SchemaOf } from "yup";
 
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
@@ -111,32 +115,7 @@ export function useCollectingEventSave(
   fetchedCollectingEvent?: PersistedResource<CollectingEvent>
 ) {
   const { save } = useApiClient();
-  const { formatMessage } = useDinaIntl();
-
-  const datePrecision = [4, 6, 8, 12, 14, 17];
-  function isValidDatePrecision(value?: string) {
-    return Boolean(
-      value && datePrecision.includes(value.replace(/([^\d]+)/g, "").length)
-    );
-  }
-
-  /** Form validation schema. */
-  const collectingEventFormSchema: SchemaOf<
-    Pick<CollectingEvent, "startEventDateTime" | "endEventDateTime">
-  > = object({
-    startEventDateTime: string()
-      .required(formatMessage("field_collectingEvent_startDateTimeError"))
-      .test({
-        test: isValidDatePrecision,
-        message: formatMessage("field_collectingEvent_startDateTimeError")
-      }),
-    endEventDateTime: string()
-      .nullable()
-      .test({
-        test: val => (val ? isValidDatePrecision(val) : true),
-        message: formatMessage("field_collectingEvent_endDateTimeError")
-      })
-  });
+  const collectingEventFormSchema = useCollectingEventFormSchema();
 
   const [defaultVerbatimCoordSys] = useLocalStorage<string | null | undefined>(
     DEFAULT_VERBATIM_COORDSYS_KEY
@@ -280,4 +259,81 @@ export function useCollectingEventSave(
     attachedMetadatasUI,
     collectingEventFormSchema
   };
+}
+
+function useCollectingEventFormSchema() {
+  const { formatMessage, locale } = useDinaIntl();
+
+  return useMemo(() => {
+    const datePrecision = [4, 6, 8, 12, 14, 17];
+    function isValidDatePrecision(value?: string) {
+      return Boolean(
+        value && datePrecision.includes(value.replace(/([^\d]+)/g, "").length)
+      );
+    }
+
+    function decimal(label: string) {
+      return yup
+        .number()
+        .nullable()
+        .notRequired()
+        .typeError(formatMessage("mustBeValidDecimalValue"))
+        .label(label);
+    }
+
+    function integer(label: string) {
+      return yup
+        .number()
+        .integer()
+        .nullable()
+        .notRequired()
+        .typeError(formatMessage("mustBeValidIntegerValue"))
+        .label(label);
+    }
+
+    const geoAssertionFormSchema: yup.SchemaOf<
+      Pick<
+        GeoReferenceAssertion,
+        | "dwcDecimalLatitude"
+        | "dwcDecimalLongitude"
+        | "dwcCoordinateUncertaintyInMeters"
+      >
+    > = yup.object({
+      dwcDecimalLatitude: decimal(formatMessage("field_dwcDecimalLatitude"))
+        .min(-90)
+        .max(90),
+      dwcDecimalLongitude: decimal(formatMessage("field_dwcDecimalLongitude"))
+        .min(-180)
+        .max(180),
+      dwcCoordinateUncertaintyInMeters: integer(
+        formatMessage("field_dwcCoordinateUncertaintyInMeters")
+      )
+    });
+
+    /** Form validation schema. */
+    const collectingEventFormSchema: yup.SchemaOf<
+      Pick<
+        CollectingEvent,
+        "startEventDateTime" | "endEventDateTime" | "geoReferenceAssertions"
+      >
+    > = yup.object({
+      startEventDateTime: yup
+        .string()
+        .required(formatMessage("field_collectingEvent_startDateTimeError"))
+        .test({
+          test: isValidDatePrecision,
+          message: formatMessage("field_collectingEvent_startDateTimeError")
+        }),
+      endEventDateTime: yup
+        .string()
+        .nullable()
+        .test({
+          test: val => (val ? isValidDatePrecision(val) : true),
+          message: formatMessage("field_collectingEvent_endDateTimeError")
+        }),
+      geoReferenceAssertions: yup.array().of(geoAssertionFormSchema as any)
+    });
+
+    return collectingEventFormSchema;
+  }, [locale]);
 }

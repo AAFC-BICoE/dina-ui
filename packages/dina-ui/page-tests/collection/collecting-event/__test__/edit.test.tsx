@@ -216,16 +216,18 @@ describe("collecting-event edit page", () => {
       }
     });
 
-    wrapper.find("button.add-assertion-button").simulate("click");
-
     wrapper
       .find(".dwcDecimalLatitude")
-      .find(NumberFormat)
-      .prop<any>("onValueChange")({ floatValue: 45.394728 });
+      .find("input")
+      .simulate("change", { target: { value: "45.394728" } });
     wrapper
       .find(".dwcDecimalLongitude")
-      .find(NumberFormat)
-      .prop<any>("onValueChange")({ floatValue: -75.701452 });
+      .find("input")
+      .simulate("change", { target: { value: "-75.701452" } });
+    wrapper
+      .find(".dwcCoordinateUncertaintyInMeters")
+      .find("input")
+      .simulate("change", { target: { value: "5" } });
 
     wrapper.find("form").simulate("submit");
 
@@ -242,7 +244,15 @@ describe("collecting-event edit page", () => {
             path: "collecting-event",
             value: {
               attributes: expect.objectContaining({
-                startEventDateTime: "2019-12-21T16:00"
+                startEventDateTime: "2019-12-21T16:00",
+                geoReferenceAssertions: [
+                  {
+                    isPrimary: true,
+                    dwcCoordinateUncertaintyInMeters: "5",
+                    dwcDecimalLatitude: "45.394728",
+                    dwcDecimalLongitude: "-75.701452"
+                  }
+                ]
               }),
               id: "00000000-0000-0000-0000-000000000000",
               type: "collecting-event"

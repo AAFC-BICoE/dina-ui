@@ -2,10 +2,8 @@ import {
   CheckBoxField,
   DateField,
   DinaFormSection,
-  FieldView,
   filterBy,
   FormikButton,
-  NumberField,
   ResourceSelectField,
   TextField,
   Tooltip
@@ -40,7 +38,7 @@ export function GeoReferenceAssertionRow({
       GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
   );
 
-  const reservedAssertion = useRef(assertion);
+  const reservedAssertion = useRef({ ...assertion });
 
   const assertionsPath = "geoReferenceAssertions";
   const assertionPath = `${assertionsPath}[${index}]`;
@@ -169,27 +167,23 @@ export function GeoReferenceAssertionRow({
             />
           )}
         </Field>
-        <NumberField
+        <TextField
           name={commonRoot + "dwcDecimalLatitude"}
-          label={formatMessage("decimalLatitude")}
+          label={formatMessage("field_dwcDecimalLatitude")}
           className={"dwcDecimalLatitude"}
-          // Can be null or a valid latitude number:
-          isAllowed={({ floatValue: val }) => isValidLatitudeOrBlank(val)}
           readOnly={georeferenceDisabled}
           onChangeExternal={updateReservedAssertion}
         />
-        <NumberField
+        <TextField
           name={commonRoot + "dwcDecimalLongitude"}
-          label={formatMessage("decimalLongitude")}
+          label={formatMessage("field_dwcDecimalLongitude")}
           readOnly={georeferenceDisabled}
           className={"dwcDecimalLongitude"}
-          // Can be null or a valid longitude number:
-          isAllowed={({ floatValue: val }) => isValidLongitudeOrBlank(val)}
           onChangeExternal={updateReservedAssertion}
         />
-        <NumberField
+        <TextField
           name={commonRoot + "dwcCoordinateUncertaintyInMeters"}
-          label={formatMessage("coordinateUncertaintyInMeters")}
+          label={formatMessage("field_dwcCoordinateUncertaintyInMeters")}
           readOnly={georeferenceDisabled}
           className={"dwcCoordinateUncertaintyInMeters"}
           onChangeExternal={updateReservedAssertion}
@@ -273,11 +267,3 @@ export const ViewInMapButton = connect<{ assertionPath: string }>(
     ) : null;
   }
 );
-
-export function isValidLatitudeOrBlank(val?: number) {
-  return !val || (val >= -90 && val <= 90);
-}
-
-export function isValidLongitudeOrBlank(val?: number) {
-  return !val || (val >= -180 && val <= 180);
-}

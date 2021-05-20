@@ -3,9 +3,9 @@ import { Person } from "../../objectstore-api";
 export interface GeoReferenceAssertionAttributes {
   createdBy?: string;
   createdOn?: string;
-  dwcDecimalLatitude?: number;
-  dwcDecimalLongitude?: number;
-  dwcCoordinateUncertaintyInMeters?: number;
+  dwcDecimalLatitude?: number | null;
+  dwcDecimalLongitude?: number | null;
+  dwcCoordinateUncertaintyInMeters?: number | null;
   dwcGeoreferencedDate?: string;
   literalGeoreferencedBy?: string;
   dwcGeoreferenceProtocol?: string;

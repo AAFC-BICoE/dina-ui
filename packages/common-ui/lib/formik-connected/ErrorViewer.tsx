@@ -1,20 +1,25 @@
-import { connect } from "formik";
-import { toPairs } from "lodash";
+import { useFormikContext } from "formik";
+import { last, toPairs } from "lodash";
 import { useEffect, useMemo, useRef } from "react";
+import { treeToFlatMap } from "tree-to-flat-map";
 import { useFieldLabels } from "../field-header/FieldHeader";
 
 /** Renders the Formik status as an error message. */
-export const ErrorViewer = connect(function ErrorViewerInternal({
-  formik: { isSubmitting, errors, status }
-}) {
+export function ErrorViewer() {
+  const { isSubmitting, errors, status } = useFormikContext();
   const { getFieldLabel } = useFieldLabels();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   /** A string of form-level and field-level error messages. */
   const errorMessage = useMemo(
     () => {
-      const fieldErrorMsg = toPairs(errors)
-        .map(([field, error]) => `${getFieldLabel(field).fieldLabel}: ${error}`)
+      const fieldErrorMsg = toPairs(treeToFlatMap(errors))
+        .map(
+          ([field, error]) =>
+            `${
+              getFieldLabel(String(last(field.split(".")))).fieldLabel
+            }: ${error}`
+        )
         .join("\n");
 
       return [status, fieldErrorMsg].filter(it => it).join("\n\n") || null;
@@ -42,4 +47,4 @@ export const ErrorViewer = connect(function ErrorViewerInternal({
       )}
     </div>
   );
-});
+}

@@ -33,4 +33,27 @@ describe("ErrorViewer component", () => {
 
     expect(wrapper.find(".alert.alert-danger").text()).toEqual("Test error");
   });
+
+  it("Renders field-level errors.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{}}
+        initialErrors={{
+          topLevelField: "Error",
+          nestedObject: { nestedField: "Nested Error" }
+        }}
+      >
+        <SubmitButton />
+      </DinaForm>
+    );
+
+    // wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
+      ["Nested Field: Nested Error", "Top Level Field: Error"].join("\n")
+    );
+  });
 });

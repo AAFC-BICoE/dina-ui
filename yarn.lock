@@ -2192,6 +2192,7 @@ commander@~2.17.1:
     react-textarea-autosize "^8.3.2"
     swr "^0.4.2"
     title-case "2.1.1"
+    tree-to-flat-map "^1.0.1"
     type-fest "^1.0.2"
     uuid "^8.3.2"
     yup "^0.32.9"
@@ -7569,6 +7570,11 @@ tr46@^2.0.2:
   integrity sha512-3n1qG+/5kg+jrbTzwAykB5yRYtQCTqOGKq5U5PE3b0a1/mzo6snDhjGS0zJVJunO0NrT3Dg1MLy5TjWP/UJppg==
   dependencies:
     punycode "^2.1.1"
+
+tree-to-flat-map@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/tree-to-flat-map/-/tree-to-flat-map-1.0.1.tgz#0c08f4f6627e4fb18314df58cfe0a74bfbff9cc5"
+  integrity sha512-HyDhTDTlJTMjZ9TICQsGzpNn1PybG9UcCjKkPtA2jDTw8DO/vONLHW3GayfEVmtyDbpbEA+wQOgUYKnSkvw78A==
 
 tryer@^1.0.0:
   version "1.0.1"
