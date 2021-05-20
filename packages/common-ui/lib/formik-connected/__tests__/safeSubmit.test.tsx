@@ -1,12 +1,12 @@
-import { mount } from "enzyme";
 import { Form, Formik } from "formik";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { ErrorViewer } from "../ErrorViewer";
 import { OnFormikSubmit, safeSubmit } from "../safeSubmit";
 
 function getWrapper(customOnSubmit: OnFormikSubmit) {
   const onSubmit = safeSubmit(customOnSubmit);
 
-  return mount(
+  return mountWithAppContext(
     <Formik initialValues={{ testProperty: "testValue" }} onSubmit={onSubmit}>
       <Form translate={undefined}>
         <ErrorViewer />

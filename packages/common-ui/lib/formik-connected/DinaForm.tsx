@@ -92,7 +92,14 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
         isTemplate: props.isTemplate
       }}
     >
-      <Formik {...props} onSubmit={onSubmitInternal}>
+      <Formik
+        // Don't use Formik's default validation triggers:
+        // Only validate on submit. And remove field error on field value change.
+        validateOnChange={false}
+        validateOnBlur={false}
+        {...props}
+        onSubmit={onSubmitInternal}
+      >
         {childrenInternal}
       </Formik>
     </DinaFormContext.Provider>

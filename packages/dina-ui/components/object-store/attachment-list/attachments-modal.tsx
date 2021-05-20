@@ -69,10 +69,6 @@ export function useAttachmentsModal({
         .modal-dialog {
           max-width: calc(100vw - 3rem);
         }
-        .modal-content {
-          max-height: calc(100vh - 3rem) !important;
-          overflow-y: scroll !important;
-        }
         .ht_master .wtHolder {
           height: 0% !important;
         }

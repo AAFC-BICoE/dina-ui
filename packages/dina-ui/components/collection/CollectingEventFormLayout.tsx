@@ -140,7 +140,7 @@ export function CollectingEventFormLayout({
       `${geographicPlaceSourceUrl}osmtype=${osmTypeForSearch}&osmid=${result.osm_id}`
     );
     formik.setFieldValue(
-      `${commonSrcDetailRoot}.geographicPlaceNameSource`,
+      "geographicPlaceNameSource",
       GeographicPlaceNameSource.OSM
     );
 

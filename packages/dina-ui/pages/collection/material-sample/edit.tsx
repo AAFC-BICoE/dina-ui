@@ -17,7 +17,7 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { cloneDeep } from "lodash";
+import { cloneDeep, isEmpty } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import {
@@ -124,7 +124,8 @@ export function MaterialSampleForm({
     !!materialSample?.collectingEvent
   );
 
-  const hasCatalogueInfo = !!materialSample?.dwcCatalogNumber;
+  const hasCatalogueInfo =
+    !!materialSample?.dwcCatalogNumber || !!materialSample?.preparationType;
   const [enableCatalogueInfo, setEnableCatalogueInfo] = useState(
     hasCatalogueInfo
   );
@@ -137,6 +138,7 @@ export function MaterialSampleForm({
     : {
         type: "material-sample",
         materialSampleName: `${username}-${todayDate}`
+        // managedAttributeValues: {}
       };
 
   /** Used to get the values of the nested CollectingEvent form. */
@@ -150,7 +152,8 @@ export function MaterialSampleForm({
   const {
     collectingEventInitialValues,
     saveCollectingEvent,
-    attachedMetadatasUI: colEventAttachmentsUI
+    attachedMetadatasUI: colEventAttachmentsUI,
+    collectingEventFormSchema
   } = useCollectingEventSave(colEventQuery.response?.data);
 
   const {
@@ -199,6 +202,7 @@ export function MaterialSampleForm({
 
   async function onSubmit({
     api: { save },
+    formik,
     submittedValues
   }: DinaFormSubmitParams<InputResource<MaterialSample>>) {
     // Init relationships object for one-to-many relations:
@@ -219,9 +223,16 @@ export function MaterialSampleForm({
         type: "collecting-event"
       };
     } else if (colEventFormRef.current) {
+      // Return if the Collecting Event sub-form has errors:
+      const colEventErrors = await colEventFormRef.current.validateForm();
+      if (!isEmpty(colEventErrors)) {
+        formik.setErrors({ ...formik.errors, ...colEventErrors });
+        return;
+      }
+
       // Save the linked CollectingEvent if included:
       const submittedCollectingEvent = cloneDeep(
-        colEventFormRef.current?.values
+        colEventFormRef.current.values
       );
       // Use the same save method as the Collecting Event page:
       const savedCollectingEvent = await saveCollectingEvent(
@@ -278,6 +289,7 @@ export function MaterialSampleForm({
       innerRef={colEventFormRef}
       initialValues={collectingEventInitialValues}
       isTemplate={isTemplate}
+      validationSchema={collectingEventFormSchema}
     >
       <CollectingEventFormLayout />
       <div className="form-group">{colEventAttachmentsUI}</div>

@@ -1,4 +1,10 @@
-import { DinaForm, FormikButton, useAccount } from "common-ui";
+import {
+  DinaForm,
+  FormikButton,
+  useAccount,
+  useModal,
+  AreYouSureModal
+} from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
 import { GroupSelectField } from "../../components/group-select/GroupSelectField";
@@ -22,6 +28,7 @@ export default function UploadPage() {
   const { initialized: accountInitialized, groupNames } = useAccount();
   const { uploadFiles } = useFileUpload();
   const { openDefaultValuesModal } = useDefaultValueRuleEditorModal();
+  const { openModal } = useModal();
 
   const acceptedFileTypes = "image/*,audio/*,video/*,.pdf,.doc,.docx,.png";
 
@@ -36,18 +43,69 @@ export default function UploadPage() {
 
     const uploadRespsT = await uploadFiles({ files: acceptedFiles, group });
 
-    const objectUploadIds = uploadRespsT
-      .map(({ fileIdentifier }) => fileIdentifier)
-      .join(",");
+    const objectUploadDuplicates = uploadRespsT
+      .filter(resp => resp.meta?.warnings?.duplicate_found)
+      .map(({ meta, originalFilename }) => ({ originalFilename, meta }));
 
-    await router.push({
-      pathname: "/object-store/metadata/edit",
-      query: {
-        group,
-        objectUploadIds,
-        ...(defaultValuesConfig !== null ? { defaultValuesConfig } : {})
-      }
-    });
+    const navigateToEditMetadata = async () => {
+      const objectUploadIds = uploadRespsT
+        .map(({ fileIdentifier }) => fileIdentifier)
+        .join(",");
+
+      await router.push({
+        pathname: "/object-store/metadata/edit",
+        query: {
+          group,
+          objectUploadIds,
+          ...(defaultValuesConfig !== null ? { defaultValuesConfig } : {})
+        }
+      });
+    };
+
+    if (Object.keys(objectUploadDuplicates)?.length === 0) {
+      // No duplicate files, proceed to edit metadata page
+      await navigateToEditMetadata();
+    } else {
+      openModal(
+        <AreYouSureModal
+          actionMessage={
+            <span>
+              <DinaMessage id="proceedToCreateMetadata" />
+              <p>
+                {`(${objectUploadDuplicates.length} `}
+                {formatMessage("duplicateFilesFound") + " )"}
+              </p>
+            </span>
+          }
+          messageBody={
+            <table className="table table-bordered">
+              <thead>
+                <tr>
+                  <th style={{ width: "30%" }}>
+                    <DinaMessage id="field_originalFilename" />
+                  </th>
+                  <th style={{ width: "40%" }}>
+                    <DinaMessage id="warningMessage" />
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {objectUploadDuplicates.map(
+                  (dup, idx) =>
+                    dup.originalFilename && (
+                      <tr key={idx} className={`${idx}-row`}>
+                        <td>{dup.originalFilename}</td>
+                        <td>{dup.meta?.warnings.duplicate_found}</td>
+                      </tr>
+                    )
+                )}
+              </tbody>
+            </table>
+          }
+          onYesButtonClicked={navigateToEditMetadata}
+        />
+      );
+    }
   }
 
   // Fix the place holder text ...Select has not enough contrast ratio to the background issue
