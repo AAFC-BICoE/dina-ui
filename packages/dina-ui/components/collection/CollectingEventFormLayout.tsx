@@ -295,8 +295,8 @@ export function CollectingEventFormLayout({
     );
     const { checked } = e.target;
     fields.map(field => {
-      form.setFieldValue(field.attributes.name?.value, checked);
-      form.setFieldTouched(field.attributes.name?.value);
+      // tslint:disable-next-line
+      form.setFieldValue(field.attributes["name"]?.value, checked);
     });
   };
   return (
