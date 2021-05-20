@@ -315,7 +315,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   uploadButtonText: "Upload",
   uploadFilesMaxSize: "The maximum file size is {maxSize}.",
   uploadFormInstructions:
-    "Drag and drop files here or click to open browse dialog. Only image, audio, video, .pdf, .doc and docx are accepted.",
+    "Drag and drop files here or click to open browse dialog.",
   uploadNewAttachments: "Upload New Attachments",
   uploadPageTitle: "Upload Files",
   useCollectorGroupLabel: "Use Collector Group",

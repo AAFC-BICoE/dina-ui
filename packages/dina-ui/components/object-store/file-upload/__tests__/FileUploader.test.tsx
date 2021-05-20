@@ -23,7 +23,7 @@ describe("FileUploader component", () => {
   it("Converts the API's max file size from a gigabytes string to bytes.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
-        <FileUploader acceptedFileTypes="image/*" onSubmit={noop} />
+        <FileUploader onSubmit={noop} />
       </DinaForm>,
       { apiContext: mockCtx }
     );
