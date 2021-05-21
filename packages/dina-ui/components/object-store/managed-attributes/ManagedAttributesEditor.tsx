@@ -7,7 +7,6 @@ import {
   useApiClient,
   useDinaFormContext
 } from "common-ui";
-import { useFormikContext } from "formik";
 import { get } from "lodash";
 import { useEffect, useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
