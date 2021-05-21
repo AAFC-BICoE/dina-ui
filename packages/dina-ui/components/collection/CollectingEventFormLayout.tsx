@@ -301,16 +301,18 @@ export function CollectingEventFormLayout({
   };
   return (
     <div>
-      <DinaFormSection horizontal={[3, 9]}>
-        <div className="row">
-          <div className="col-md-6">
-            <GroupSelectField name="group" enableStoredDefaultGroup={true} />
+      {!isTemplate && (
+        <DinaFormSection horizontal={[3, 9]}>
+          <div className="row">
+            <div className="col-md-6">
+              <GroupSelectField name="group" enableStoredDefaultGroup={true} />
+            </div>
+            <div className="col-md-6">
+              <StringArrayField name="dwcOtherRecordNumbers" />
+            </div>
           </div>
-          <div className="col-md-6">
-            <StringArrayField name="dwcOtherRecordNumbers" />
-          </div>
-        </div>
-      </DinaFormSection>
+        </DinaFormSection>
+      )}
       <div className="row">
         <div className="col-md-6">
           <FieldSet
