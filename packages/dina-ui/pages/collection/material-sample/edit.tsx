@@ -302,7 +302,7 @@ export function MaterialSampleForm({
       onSubmit={onSubmit}
       isTemplate={isTemplate}
     >
-      {buttonBar}
+      {!isTemplate && buttonBar}
       <div className="d-flex">
         <div>
           <nav
@@ -441,7 +441,7 @@ export function MaterialSampleForm({
           </div>
         </div>
       </div>
-      {buttonBar}
+      {!isTemplate && buttonBar}
     </DinaForm>
   );
 }

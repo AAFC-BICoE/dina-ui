@@ -314,6 +314,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   showing: "Showing",
   startEventDateTimeLabel: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   stateProvinceLabel: "State/Province",
+  templateNameMandatoryErrorMsg: "Please enter a workflow template name.",
   thumbnail: "Thumbnail",
   thumbnailNotAvailableText: "No thumbnail available",
   to: "To",

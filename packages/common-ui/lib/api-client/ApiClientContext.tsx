@@ -94,7 +94,7 @@ export function ApiClientImplProvider({
 export function useApiClient() {
   const ctx = useContext(ApiClientContext);
   if (!ctx) {
-    throw new Error("No ApiClientContext available.");
+    //    throw new Error("No ApiClientContext available.");
   }
   return ctx;
 }

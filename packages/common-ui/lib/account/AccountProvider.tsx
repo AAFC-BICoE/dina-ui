@@ -48,9 +48,9 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
 export function useAccount(): AccountContextI {
   const ctx = useContext(AccountContext);
   if (!ctx) {
-    throw new Error("No AccountContext available.");
+    // throw new Error("No AccountContext available.");
   }
-  return ctx;
+  return ctx as any;
 }
 
 /** Converts the Keycloak context to the generic AccountContextI. */
