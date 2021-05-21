@@ -23,7 +23,6 @@ export interface ManagedAttributesEditorProps {
 
   /**
    * The target component of the managed attribute e.g. COLLECTING_EVENT.
-   * Used for Collection API but not for Object Store API.
    */
   managedAttributeComponent?: string;
 
@@ -36,12 +35,12 @@ export interface ManagedAttributesEditorProps {
 
 /** Set of fields inside a Formik form to edit Managed Attributes. */
 export function ManagedAttributesEditor({
-  valuesPath,
+  valuesPath = "managedAttributeValues",
   managedAttributeApiPath,
-  valueFieldName = "value",
+  valueFieldName,
   apiBaseUrl,
   managedAttributeComponent,
-  managedAttributeKeyField = "id"
+  managedAttributeKeyField = "key"
 }: ManagedAttributesEditorProps) {
   const { initialValues: formInitialValues } = useDinaFormContext();
   const { bulkGet } = useApiClient();
@@ -116,7 +115,9 @@ export function ManagedAttributesEditor({
               className: `${attributeKey} col-sm-6`,
               key: attributeKey,
               label: attribute.name ?? attributeKey,
-              name: `${valuesPath}.${attributeKey}.${valueFieldName}`
+              name: `${valuesPath}.${attributeKey}${
+                valueFieldName ? `.${valueFieldName}` : ""
+              }`
             };
 
             if (
