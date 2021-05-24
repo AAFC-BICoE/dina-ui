@@ -3,17 +3,18 @@ import { FieldSet, TextField } from "../../../../common-ui";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { FormikProps } from "formik";
+import { FormikProps, Field } from "formik";
 import { useRef } from "react";
 import { Head, Nav } from "../../../components";
 import { ButtonBar, SubmitButton, DinaForm } from "../../../../common-ui";
+import React from "react";
 
 export default function PreparationProcessTemplatePage() {
   const { formatMessage } = useDinaIntl();
 
   const workflowType = useRef("createNew");
-  const workFlowTypeOnChange = e => {
-    workflowType.current = e.target.value;
+  const workFlowTypeOnChange = (e, form) => {
+    form.setFieldValue("workFlowType", e.target.value);
   };
 
   const materialSampleFormRef = useRef<FormikProps<any>>(null);
@@ -26,13 +27,14 @@ export default function PreparationProcessTemplatePage() {
     if (materialSampleFormRef.current) {
       const submittedMaterialSample = materialSampleFormRef.current.values;
     }
+    // console.log("values " + JSON.stringify(values));
+    // console.log("materialSampleFormRef.current " + JSON.stringify(materialSampleFormRef.current?.values));
   };
   const buttonBar = (
     <ButtonBar>
       <SubmitButton />
     </ButtonBar>
   );
-
   return (
     <div>
       <Head title={formatMessage("createWorkflowTemplateTitle")} />
@@ -41,7 +43,7 @@ export default function PreparationProcessTemplatePage() {
         <DinaMessage id="createWorkflowTemplateTitle" />
       </h1>
       <DinaForm
-        initialValues={{}}
+        initialValues={{ workFlowType: "createNew" }}
         onSubmit={onSaveTemplateSubmit}
         enableReinitialize={true}
       >
@@ -52,24 +54,32 @@ export default function PreparationProcessTemplatePage() {
               <TextField name="templateName" className="row" />
               <TextField name="templateDescription" className="row" />
             </div>
-            <div className="col-md-6 row">
-              <label className="col-md-2">
-                <input
-                  value="createNew"
-                  type="radio"
-                  onChange={workFlowTypeOnChange}
-                />
-                {formatMessage("creatNewWorkflow")}
-              </label>
-              <label className="col-md-2">
-                <input
-                  value="createSplit"
-                  type="radio"
-                  onChange={workFlowTypeOnChange}
-                />
-                {formatMessage("createSplitWorkflow")}
-              </label>
-            </div>
+            <Field>
+              {({ form }) => (
+                <div className="col-md-6 row">
+                  <label className="col-md-2">
+                    <input
+                      className="form-control"
+                      value="createNew"
+                      type="radio"
+                      name="workFlowType"
+                      onChange={e => workFlowTypeOnChange(e, form)}
+                    />
+                    {formatMessage("creatNewWorkflow")}
+                  </label>
+                  <label className="col-md-2">
+                    <input
+                      className="form-control"
+                      value="createSplit"
+                      type="radio"
+                      name="workFlowType"
+                      onChange={e => workFlowTypeOnChange(e, form)}
+                    />
+                    {formatMessage("createSplitWorkflow")}
+                  </label>
+                </div>
+              )}
+            </Field>
           </div>
         </FieldSet>
         <MaterialSampleForm isTemplate={true} />
