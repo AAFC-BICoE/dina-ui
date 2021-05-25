@@ -4,9 +4,12 @@ import {
   ButtonBar,
   DateField,
   DinaForm,
+  DinaFormSection,
   DinaFormSubmitParams,
   FieldSet,
+  filterBy,
   FormikButton,
+  ResourceSelectField,
   SubmitButton,
   TextField,
   useAccount,
@@ -39,6 +42,7 @@ import {
 import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
+import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
 import { Metadata } from "../../../types/objectstore-api";
 
 export default function MaterialSampleEditPage() {
@@ -52,7 +56,7 @@ export default function MaterialSampleEditPage() {
   const materialSampleQuery = useQuery<MaterialSample>(
     {
       path: `collection-api/material-sample/${id}`,
-      include: "collectingEvent,attachment"
+      include: "collectingEvent,attachment,preparationType"
     },
     {
       disabled: !id,
@@ -296,147 +300,6 @@ export function MaterialSampleForm({
     </DinaForm>
   );
 
-  const MaterialSampleInternal = () => (
-    <div className="d-flex">
-      <div>
-        <nav
-          className="card card-body sticky-top d-none d-md-block"
-          style={{ width: "20rem" }}
-        >
-          <h4>
-            <DinaMessage id="formNavigation" />
-          </h4>
-          <div className="list-group">
-            <a href="#material-sample-section" className="list-group-item">
-              <DinaMessage id="materialSample" />
-            </a>
-            {enableCollectingEvent && (
-              <a href="#collecting-event-section" className="list-group-item">
-                <DinaMessage id="collectingEvent" />
-              </a>
-            )}
-            {enableCatalogueInfo && (
-              <a href="#catalogue-info-section" className="list-group-item">
-                <DinaMessage id="catalogueInfo" />
-              </a>
-            )}
-            <a
-              href="#material-sample-attachments-section"
-              className="list-group-item"
-            >
-              <DinaMessage id="materialSampleAttachments" />
-            </a>
-          </div>
-        </nav>
-      </div>
-      <div className="flex-grow-1 container-fluid">
-        {!isTemplate && <MaterialSampleFormLayout />}
-        <FieldSet legend={<DinaMessage id="components" />}>
-          <div className="row">
-            <label className="enable-collecting-event d-flex align-items-center font-weight-bold col-sm-3">
-              <Switch
-                className="mx-2"
-                checked={enableCollectingEvent}
-                onChange={dataComponentToggler(
-                  setEnableCollectingEvent,
-                  formatMessage("collectingEvent")
-                )}
-              />
-              <DinaMessage id="collectingEvent" />
-            </label>
-            <label className="enable-catalogue-info d-flex align-items-center font-weight-bold col-sm-3">
-              <Switch
-                className="mx-2"
-                checked={enableCatalogueInfo}
-                onChange={dataComponentToggler(
-                  setEnableCatalogueInfo,
-                  formatMessage("catalogueInfo")
-                )}
-              />
-              <DinaMessage id="catalogueInfo" />
-            </label>
-          </div>
-        </FieldSet>
-        <div className="data-components">
-          <FieldSet
-            id="collecting-event-section"
-            className={enableCollectingEvent ? "" : "d-none"}
-            legend={<DinaMessage id="collectingEvent" />}
-          >
-            <Tabs
-              // Re-initialize the form when the linked CollectingEvent changes:
-              key={colEventId}
-              // Prevent unmounting the form on tab switch to avoid losing the form state:
-              forceRenderTabPanel={true}
-            >
-              <TabList>
-                <Tab>
-                  {colEventId ? (
-                    <DinaMessage id="attachedCollectingEvent" />
-                  ) : (
-                    <DinaMessage id="createNew" />
-                  )}
-                </Tab>
-                <Tab>
-                  <DinaMessage id="attachExisting" />
-                </Tab>
-              </TabList>
-              <TabPanel>
-                {
-                  // If there is already a linked CollectingEvent then wait for it to load first:
-                  colEventId
-                    ? withResponse(colEventQuery, () => (
-                        <>
-                          <div className="form-group d-flex justify-content-end align-items-center">
-                            <Link
-                              href={`/collection/collecting-event/view?id=${colEventId}`}
-                            >
-                              <a target="_blank">
-                                <DinaMessage id="collectingEventDetailsPageLink" />
-                              </a>
-                            </Link>
-                            <FormikButton
-                              className="btn btn-danger detach-collecting-event-button ml-5"
-                              onClick={() => setColEventId(null)}
-                            >
-                              <DinaMessage id="detachCollectingEvent" />
-                            </FormikButton>
-                          </div>
-                          {nestedCollectingEventForm}
-                        </>
-                      ))
-                    : nestedCollectingEventForm
-                }
-              </TabPanel>
-              <TabPanel>
-                <CollectingEventLinker
-                  onCollectingEventSelect={colEventToLink => {
-                    setColEventId(colEventToLink.id);
-                  }}
-                />
-              </TabPanel>
-            </Tabs>
-          </FieldSet>
-          <DinaForm initialValues={{}} isTemplate={isTemplate}>
-            <CatalogueInfoFormLayout
-              className={enableCatalogueInfo ? "" : "d-none"}
-            />
-          </DinaForm>
-          {!isTemplate && (
-            <div id="material-sample-attachments-section">
-              {materialSampleAttachmentsUI}
-            </div>
-          )}
-          {
-            <div id="material-sample-attachments-section">
-              <input type="checkbox" />
-            </div>
-          }
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <DinaForm<InputResource<MaterialSample>>
       initialValues={initialValues}
@@ -444,8 +307,144 @@ export function MaterialSampleForm({
       isTemplate={isTemplate}
     >
       {!isTemplate && buttonBar}
-      <MaterialSampleInternal />
-      {!isTemplate && buttonBar}
+      <div className="d-flex">
+        <div>
+          <nav
+            className="card card-body sticky-top d-none d-md-block"
+            style={{ width: "20rem" }}
+          >
+            <h4>
+              <DinaMessage id="formNavigation" />
+            </h4>
+            <div className="list-group">
+              <a href="#material-sample-section" className="list-group-item">
+                <DinaMessage id="materialSample" />
+              </a>
+              {enableCollectingEvent && (
+                <a href="#collecting-event-section" className="list-group-item">
+                  <DinaMessage id="collectingEvent" />
+                </a>
+              )}
+              {enableCatalogueInfo && (
+                <a href="#catalogue-info-section" className="list-group-item">
+                  <DinaMessage id="catalogueInfo" />
+                </a>
+              )}
+              <a
+                href="#material-sample-attachments-section"
+                className="list-group-item"
+              >
+                <DinaMessage id="materialSampleAttachments" />
+              </a>
+            </div>
+          </nav>
+        </div>
+        <div className="flex-grow-1 container-fluid">
+          {!isTemplate && <MaterialSampleFormLayout />}
+          <FieldSet legend={<DinaMessage id="components" />}>
+            <div className="row">
+              <label className="enable-collecting-event d-flex align-items-center font-weight-bold col-sm-3">
+                <Switch
+                  className="mx-2"
+                  checked={enableCollectingEvent}
+                  onChange={dataComponentToggler(
+                    setEnableCollectingEvent,
+                    formatMessage("collectingEvent")
+                  )}
+                />
+                <DinaMessage id="collectingEvent" />
+              </label>
+              <label className="enable-catalogue-info d-flex align-items-center font-weight-bold col-sm-3">
+                <Switch
+                  className="mx-2"
+                  checked={enableCatalogueInfo}
+                  onChange={dataComponentToggler(
+                    setEnableCatalogueInfo,
+                    formatMessage("catalogueInfo")
+                  )}
+                />
+                <DinaMessage id="catalogueInfo" />
+              </label>
+            </div>
+          </FieldSet>
+          <div className="data-components">
+            <FieldSet
+              id="collecting-event-section"
+              className={enableCollectingEvent ? "" : "d-none"}
+              legend={<DinaMessage id="collectingEvent" />}
+            >
+              <Tabs
+                // Re-initialize the form when the linked CollectingEvent changes:
+                key={colEventId}
+                // Prevent unmounting the form on tab switch to avoid losing the form state:
+                forceRenderTabPanel={true}
+              >
+                <TabList>
+                  <Tab>
+                    {colEventId ? (
+                      <DinaMessage id="attachedCollectingEvent" />
+                    ) : (
+                      <DinaMessage id="createNew" />
+                    )}
+                  </Tab>
+                  <Tab>
+                    <DinaMessage id="attachExisting" />
+                  </Tab>
+                </TabList>
+                <TabPanel>
+                  {
+                    // If there is already a linked CollectingEvent then wait for it to load first:
+                    colEventId
+                      ? withResponse(colEventQuery, () => (
+                          <>
+                            <div className="form-group d-flex justify-content-end align-items-center">
+                              <Link
+                                href={`/collection/collecting-event/view?id=${colEventId}`}
+                              >
+                                <a target="_blank">
+                                  <DinaMessage id="collectingEventDetailsPageLink" />
+                                </a>
+                              </Link>
+                              <FormikButton
+                                className="btn btn-danger detach-collecting-event-button ml-5"
+                                onClick={() => setColEventId(null)}
+                              >
+                                <DinaMessage id="detachCollectingEvent" />
+                              </FormikButton>
+                            </div>
+                            {nestedCollectingEventForm}
+                          </>
+                        ))
+                      : nestedCollectingEventForm
+                  }
+                </TabPanel>
+                <TabPanel>
+                  <CollectingEventLinker
+                    onCollectingEventSelect={colEventToLink => {
+                      setColEventId(colEventToLink.id);
+                    }}
+                  />
+                </TabPanel>
+              </Tabs>
+            </FieldSet>
+            {/* <DinaForm initialValues={{}} isTemplate={isTemplate}> */}
+            <CatalogueInfoFormLayout
+              className={enableCatalogueInfo ? "" : "d-none"}
+            />
+            {/* </DinaForm> */}
+            {!isTemplate && (
+              <div id="material-sample-attachments-section">
+                {materialSampleAttachmentsUI}
+              </div>
+            )}
+            {
+              <div id="material-sample-attachments-section">
+                <input type="checkbox" />
+              </div>
+            }
+          </div>
+        </div>
+      </div>
     </DinaForm>
   );
 }
@@ -453,16 +452,10 @@ export function MaterialSampleForm({
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleFormLayout() {
   return (
-    <div id="material-sample-section">
-      <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-        />
-      </div>
-      <div className="row">
-        <TextField name="materialSampleName" className="col-md-6" />
+    <div id="material-sample-section" className="row">
+      <div className="col-md-6">
+        <GroupSelectField name="group" enableStoredDefaultGroup={true} />
+        <TextField name="materialSampleName" />
       </div>
     </div>
   );
@@ -483,14 +476,20 @@ export function CatalogueInfoFormLayout({
     >
       <div className="row">
         <div className="col-md-6">
-          <FieldSet
-            legend={<DinaMessage id="preparation" />}
-            horizontal={true}
-            readOnly={true} // Disabled until back-end supports these fields.
-          >
-            <TextField name="preparationMethod" />
-            <TextField name="preparedBy" />
-            <DateField name="datePrepared" />
+          <FieldSet legend={<DinaMessage id="preparation" />} horizontal={true}>
+            <ResourceSelectField<PreparationType>
+              name="preparationType"
+              filter={filterBy(["name"])}
+              model="collection-api/preparation-type"
+              optionLabel={it => it.name}
+              readOnlyLink="/collection/preparation-type/view?id="
+            />
+            <DinaFormSection
+              readOnly={true} // Disabled until back-end supports these fields.
+            >
+              <TextField name="preparedBy" />
+              <DateField name="datePrepared" />
+            </DinaFormSection>
           </FieldSet>
         </div>
         <div className="col-md-6">
