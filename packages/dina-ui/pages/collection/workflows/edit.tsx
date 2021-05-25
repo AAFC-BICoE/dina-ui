@@ -13,6 +13,7 @@ import { Head, Nav } from "../../../components";
 import { ButtonBar, SubmitButton, DinaForm } from "../../../../common-ui";
 import React from "react";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { useAttachmentsModal } from "packages/dina-ui/components/object-store";
 
 /** A named set of templates used for editing workflow/preparation process. */
 export interface WorkflowTemplate {
@@ -31,13 +32,23 @@ export default function PreparationProcessTemplatePage() {
     WorkflowTemplate[]
   >("workflow_templates", []);
 
+  const {
+    attachedMetadatasUI: materialSampleAttachmentsUI
+  } = useAttachmentsModal({
+    initialMetadatas: [],
+    deps: [],
+    title: <DinaMessage id="materialSampleAttachments" />,
+    isTemplate: true,
+    allowNewFieldName: "materialSampleAllowNew",
+    allowExistingFieldName: "materialSampleAllowExisting"
+  });
+
   const workFlowTypeOnChange = (e, form) => {
     form.setFieldValue("workFlowType", e.target.value);
     setWorkflowType(e.target.value);
   };
 
   const materialSampleFormRef = useRef<FormikProps<any>>(null);
-  // const materialSampleFormRef = useRef<FormikProps<InputResource<MaterialSample>>>();
 
   const catelogueSectionRef = React.createRef<FormikProps<any>>();
 
@@ -120,6 +131,7 @@ export default function PreparationProcessTemplatePage() {
           {workflowType === "createSplit" && (
             <DinaForm initialValues={{}} innerRef={catelogueSectionRef}>
               <CatalogueInfoFormLayout isTemplate={true} />
+              {materialSampleAttachmentsUI}
             </DinaForm>
           )}
           {buttonBar}

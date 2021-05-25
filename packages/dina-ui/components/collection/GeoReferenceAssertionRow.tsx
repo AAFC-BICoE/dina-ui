@@ -8,7 +8,8 @@ import {
   NumberField,
   ResourceSelectField,
   TextField,
-  Tooltip
+  Tooltip,
+  useDinaFormContext
 } from "common-ui";
 import { connect, Field, FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
@@ -41,6 +42,8 @@ export function GeoReferenceAssertionRow({
   );
 
   const reservedAssertion = useRef(assertion);
+
+  const { isTemplate } = useDinaFormContext();
 
   const assertionsPath = "geoReferenceAssertions";
   const assertionPath = `${assertionsPath}[${index}]`;
@@ -136,7 +139,7 @@ export function GeoReferenceAssertionRow({
         {viewOnly && (
           <ViewInMapButton assertionPath={`geoReferenceAssertions.${index}`} />
         )}
-        {!viewOnly && (
+        {!viewOnly && !isTemplate && (
           <div className="form-group">
             <FormikButton
               className="btn btn-primary primary-assertion-button"

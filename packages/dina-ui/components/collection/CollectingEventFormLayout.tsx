@@ -618,7 +618,7 @@ export function CollectingEventFormLayout({
                                   assertion={assertion}
                                   viewOnly={readOnly}
                                 />
-                                {!readOnly && (
+                                {!readOnly && !isTemplate && (
                                   <div className="list-inline mb-3">
                                     <FormikButton
                                       className="list-inline-item btn btn-primary add-assertion-button"
@@ -856,35 +856,37 @@ export function CollectingEventFormLayout({
           </div>
         </div>
       </FieldSet>
-      <div className="row">
-        <div className="col-md-6">
-          <FieldSet
-            legend={<DinaMessage id="collectingEventManagedAttributes" />}
-          >
-            {readOnly ? (
-              <FastField name="managedAttributeValues">
-                {({ field: { value } }) => (
-                  <ManagedAttributesViewer
-                    values={value}
-                    managedAttributeApiPath={key =>
-                      `collection-api/managed-attribute/collecting_event.${key}`
-                    }
-                  />
-                )}
-              </FastField>
-            ) : (
-              <ManagedAttributesEditor
-                valuesPath="managedAttributeValues"
-                valueFieldName="assignedValue"
-                managedAttributeApiPath="collection-api/managed-attribute"
-                apiBaseUrl="/collection-api"
-                managedAttributeComponent="COLLECTING_EVENT"
-                managedAttributeKeyField="key"
-              />
-            )}
-          </FieldSet>
+      {!isTemplate && (
+        <div className="row">
+          <div className="col-md-6">
+            <FieldSet
+              legend={<DinaMessage id="collectingEventManagedAttributes" />}
+            >
+              {readOnly ? (
+                <FastField name="managedAttributeValues">
+                  {({ field: { value } }) => (
+                    <ManagedAttributesViewer
+                      values={value}
+                      managedAttributeApiPath={key =>
+                        `collection-api/managed-attribute/collecting_event.${key}`
+                      }
+                    />
+                  )}
+                </FastField>
+              ) : (
+                <ManagedAttributesEditor
+                  valuesPath="managedAttributeValues"
+                  valueFieldName="assignedValue"
+                  managedAttributeApiPath="collection-api/managed-attribute"
+                  apiBaseUrl="/collection-api"
+                  managedAttributeComponent="COLLECTING_EVENT"
+                  managedAttributeKeyField="key"
+                />
+              )}
+            </FieldSet>
+          </div>
         </div>
-      </div>
+      )}
       {readOnly && (
         <div className="form-group">
           <Field name="id">
