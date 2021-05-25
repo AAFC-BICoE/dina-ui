@@ -39,6 +39,8 @@ export const SEQDB_MESSAGES_ENGLISH = {
   field_targetDpSize: "Target Dp Size",
   indexI5: "Index i5",
   indexI7: "Index i7",
+  indexGridInstructions:
+    "Selecting a dropdown item along the top side sets the index for that column. Selecting a dropdown item along the left side sets the index for that row. Selecting None erases the Index.",
   indexSetListTitle: "Index Sets",
   indexSetMustBeSet: "Index Set must be set.",
   notShearedStatus: "Not Sheared",
@@ -64,6 +66,10 @@ export const SEQDB_MESSAGES_ENGLISH = {
   removeShearingDetailsButtonText: "Remove selected Shearing details",
   removeSizeSelectionDetailsButtonText:
     "Remove selected Size Selection details",
+  sampleGridInstructions:
+    'Drag and drop Samples between the Sample List and the Grid, or automatically place the Samples into the Grid by selecting a "Fill By" option and then clicking the "Move All" button.',
+  sampleSelectionInstructions:
+    "Your Sample selection is Saved when you press a Select or Deselect button. There is no separate Save button.",
   sampleSelectionTitle: "Sample Selection",
   selectAllCheckedSamplesButtonText: "Select all checked molecular samples -->",
   selectButtonText: "Select",
@@ -74,6 +80,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   sizeSelectedStatus: "Size Selection Added",
   sizeSelectionLabel: "Size Selection",
   wellCoordinates: "Well Coordinates",
+  workflowDetails: "Workflow Details",
   workflowDetailsTab: "Details",
   workflowListTitle: "NGS Workflows",
   workflowStepTab: "Step {number}: {name}",

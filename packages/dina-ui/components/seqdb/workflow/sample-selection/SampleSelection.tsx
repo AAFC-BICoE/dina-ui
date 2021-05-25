@@ -8,7 +8,6 @@ import {
   useGroupedCheckBoxes
 } from "common-ui";
 import { FilterParam } from "kitsu";
-import { noop } from "lodash";
 import { useState } from "react";
 import { SeqdbMessage } from "../../../../intl/seqdb-intl";
 import { StepResource } from "../../../../types/seqdb-api";
@@ -137,6 +136,9 @@ export function SampleSelection(props: StepRendererProps) {
         <DinaForm
           initialValues={{ sampleIdsToSelect: {}, stepResourcesToDelete: {} }}
         >
+          <div className="alert alert-warning d-inline-block">
+            <SeqdbMessage id="sampleSelectionInstructions" />
+          </div>
           <div className="row">
             <div className="col-5 available-samples">
               <strong>

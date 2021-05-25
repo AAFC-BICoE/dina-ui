@@ -170,7 +170,10 @@ export function BulkDataEditor<TRow>({
       <FormikButton
         className="btn btn-primary bulk-editor-submit-button"
         onClick={onSubmitInternal}
-        buttonProps={() => ({ disabled: hasValidationErrors })}
+        buttonProps={() => ({
+          disabled: hasValidationErrors,
+          style: { width: "10rem" }
+        })}
       >
         <CommonMessage id="submitBtnText" />
       </FormikButton>
