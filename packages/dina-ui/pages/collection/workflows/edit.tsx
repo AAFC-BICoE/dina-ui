@@ -19,7 +19,7 @@ export interface WorkflowTemplate {
   name: string;
   description?: string;
   type: string;
-  values: MaterialSample | Partial<MaterialSample>;
+  values?: Partial<MaterialSample>;
 }
 
 export default function PreparationProcessTemplatePage() {
@@ -45,7 +45,19 @@ export default function PreparationProcessTemplatePage() {
     if (!values.submittedValues.templateName) {
       throw new Error(formatMessage("templateNameMandatoryErrorMsg"));
     }
+    const workflow: WorkflowTemplate = {
+      name: values.submittedValues.templateName,
+      type: values.submittedValues.workFlowType
+    };
+    workflow.description = values.submittedValues.description;
+    values.submittedValues.workFlowType === "createSplit"
+      ? (workflow.values = catelogueSectionRef.current?.values)
+      : (workflow.values = materialSampleFormRef.current?.values);
+    const workflows = storedWorkflowTemplates;
+    workflows.push(workflow);
+    saveWorkflowTemplates(workflows);
   };
+
   const buttonBar = (
     <ButtonBar>
       <SubmitButton />
