@@ -113,12 +113,14 @@ export interface MaterialSampleFormProps {
   materialSample?: PersistedResource<MaterialSample>;
   onSaved?: (id: string) => Promise<void>;
   isTemplate?: boolean;
+  materialSampleRef?: React.Ref<FormikProps<any>>;
 }
 
 export function MaterialSampleForm({
   materialSample,
   onSaved,
-  isTemplate
+  isTemplate,
+  materialSampleRef
 }: MaterialSampleFormProps) {
   const { username } = useAccount();
   const { openModal } = useModal();
@@ -426,6 +428,7 @@ export function MaterialSampleForm({
           </FieldSet>
           <CatalogueInfoFormLayout
             className={enableCatalogueInfo ? "" : "d-none"}
+            isTemplate={isTemplate}
           />
           <div id="material-sample-attachments-section">
             {materialSampleAttachmentsUI}
@@ -439,6 +442,7 @@ export function MaterialSampleForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
       isTemplate={isTemplate}
+      innerRef={materialSampleRef}
     >
       {!isTemplate && buttonBar}
       {materialSampleInternal}
@@ -461,16 +465,19 @@ export function MaterialSampleFormLayout() {
 
 export interface CatalogueInfoFormLayoutProps {
   className?: string;
+  isTemplate?: boolean;
 }
 
 export function CatalogueInfoFormLayout({
-  className
+  className,
+  isTemplate
 }: CatalogueInfoFormLayoutProps) {
   return (
     <FieldSet
       className={className}
       id="catalogue-info-section"
       legend={<DinaMessage id="catalogueInfo" />}
+      isTemplate={isTemplate}
     >
       <div className="row">
         <div className="col-md-6">

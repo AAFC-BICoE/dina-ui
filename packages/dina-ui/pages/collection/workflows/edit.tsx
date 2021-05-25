@@ -1,28 +1,45 @@
 import {
   CatalogueInfoFormLayout,
-  MaterialSampleForm,
-  MaterialSampleFormLayout
+  MaterialSampleForm
 } from "../material-sample/edit";
-import { DinaFormSection, FieldSet, TextField } from "../../../../common-ui";
+import { FieldSet, TextField } from "../../../../common-ui";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { useLocalStorage } from "@rehooks/local-storage";
 
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { FormikProps, Field } from "formik";
-import { useRef, useState } from "react";
+import { useState, useRef } from "react";
 import { Head, Nav } from "../../../components";
 import { ButtonBar, SubmitButton, DinaForm } from "../../../../common-ui";
 import React from "react";
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
+
+/** A named set of templates used for editing workflow/preparation process. */
+export interface WorkflowTemplate {
+  name: string;
+  description?: string;
+  type: string;
+  values: MaterialSample | Partial<MaterialSample>;
+}
 
 export default function PreparationProcessTemplatePage() {
   const { formatMessage } = useDinaIntl();
 
   const [workflowType, setWorkflowType] = useState("createNew");
+
+  const [storedWorkflowTemplates, saveWorkflowTemplates] = useLocalStorage<
+    WorkflowTemplate[]
+  >("workflow_templates", []);
+
   const workFlowTypeOnChange = (e, form) => {
     form.setFieldValue("workFlowType", e.target.value);
     setWorkflowType(e.target.value);
   };
 
   const materialSampleFormRef = useRef<FormikProps<any>>(null);
+  // const materialSampleFormRef = useRef<FormikProps<InputResource<MaterialSample>>>();
+
+  const catelogueSectionRef = React.createRef<FormikProps<any>>();
 
   const onSaveTemplateSubmit = values => {
     if (!values.submittedValues.templateName) {
@@ -83,11 +100,14 @@ export default function PreparationProcessTemplatePage() {
             </div>
           </FieldSet>
           {workflowType === "createNew" && (
-            <MaterialSampleForm isTemplate={true} />
+            <MaterialSampleForm
+              isTemplate={true}
+              materialSampleRef={materialSampleFormRef}
+            />
           )}
           {workflowType === "createSplit" && (
-            <DinaForm initialValues={{}} isTemplate={true}>
-              <CatalogueInfoFormLayout />
+            <DinaForm initialValues={{}} innerRef={catelogueSectionRef}>
+              <CatalogueInfoFormLayout isTemplate={true} />
             </DinaForm>
           )}
           {buttonBar}
