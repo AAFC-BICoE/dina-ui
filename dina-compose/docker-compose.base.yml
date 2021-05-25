@@ -14,6 +14,7 @@ services:
       POSTGRES_PASSWORD: p
     volumes:
       - ./initdb.sql:/docker-entrypoint-initdb.d/1-initdb.sql
+      - "$HOME/dina_pg_data:/var/lib/postgresql/data"
     ports:
       - "5432:5432"
   minio:
@@ -25,7 +26,7 @@ services:
       - "traefik.http.routers.minio.rule=Host(`${MINIO_DOMAIN}`)"
     command: server /data
   keycloak:
-    image: jboss/keycloak:11.0.0
+    image: jboss/keycloak:13.0.1
     user: root
     command: ["-Djboss.http.port=80"]
     expose: [80]
