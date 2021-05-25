@@ -23,6 +23,9 @@ export interface MaterialSampleAttributes {
   datePreparedEnabled?: boolean;
 
   dwcCatalogNumberEnabled?: boolean;
+
+  materialSampleAllowNew?: boolean;
+  materialSampleAllowExisting?: boolean;
 }
 
 export interface MaterialSampleRelationships {

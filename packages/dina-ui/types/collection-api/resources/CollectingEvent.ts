@@ -72,8 +72,8 @@ export interface CollectingEventAttributes {
 
   managedAttributeValuesEnabled?: boolean;
 
-  allowNew?: boolean;
-  allowExisting?: boolean;
+  colEvntAllowNew?: boolean;
+  colEvntAllowExisting?: boolean;
 }
 
 export enum GeographicPlaceNameSource {

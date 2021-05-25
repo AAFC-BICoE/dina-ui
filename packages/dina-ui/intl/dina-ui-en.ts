@@ -24,6 +24,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addRule: "Add Rule",
   addRuleSet: "Add Rule Set",
   agentsSectionTitle: "Agents",
+  allowExisting: "Allow Existing",
+  allowNew: "Allow New",
   appTitle: "DINA",
   associatedAgent: "Associated Agent",
   attachExisting: "Attach Existing",

@@ -108,7 +108,8 @@ export function useCollectingEventQuery(id?: string | null) {
 
 /** CollectingEvent save method to be re-used by CollectingEvent and MaterialSample forms. */
 export function useCollectingEventSave(
-  fetchedCollectingEvent?: PersistedResource<CollectingEvent>
+  fetchedCollectingEvent?: PersistedResource<CollectingEvent>,
+  isTemplate?: boolean
 ) {
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
@@ -174,7 +175,10 @@ export function useCollectingEventSave(
   const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal({
     initialMetadatas: fetchedCollectingEvent?.attachment as PersistedResource<Metadata>[],
     deps: [fetchedCollectingEvent?.id],
-    title: <DinaMessage id="collectingEventAttachments" />
+    title: <DinaMessage id="collectingEventAttachments" />,
+    isTemplate,
+    allowNewFieldName: "colEvntAllowNew",
+    allowExistingFieldName: "colEvnAllowExisting"
   });
 
   async function saveCollectingEvent(

@@ -158,7 +158,7 @@ export function MaterialSampleForm({
     saveCollectingEvent,
     attachedMetadatasUI: colEventAttachmentsUI,
     collectingEventFormSchema
-  } = useCollectingEventSave(colEventQuery.response?.data);
+  } = useCollectingEventSave(colEventQuery.response?.data, isTemplate);
 
   const {
     attachedMetadatasUI: materialSampleAttachmentsUI,
@@ -166,7 +166,10 @@ export function MaterialSampleForm({
   } = useAttachmentsModal({
     initialMetadatas: materialSample?.attachment as PersistedResource<Metadata>[],
     deps: [materialSample?.id],
-    title: <DinaMessage id="materialSampleAttachments" />
+    title: <DinaMessage id="materialSampleAttachments" />,
+    isTemplate,
+    allowNewFieldName: "materialSampleAllowNew",
+    allowExistingFieldName: "materialSampleAllowExisting"
   });
 
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
@@ -424,16 +427,9 @@ export function MaterialSampleForm({
           <CatalogueInfoFormLayout
             className={enableCatalogueInfo ? "" : "d-none"}
           />
-          {!isTemplate && (
-            <div id="material-sample-attachments-section">
-              {materialSampleAttachmentsUI}
-            </div>
-          )}
-          {
-            <div id="material-sample-attachments-section">
-              <input type="checkbox" />
-            </div>
-          }
+          <div id="material-sample-attachments-section">
+            {materialSampleAttachmentsUI}
+          </div>
         </div>
       </div>
     </div>
