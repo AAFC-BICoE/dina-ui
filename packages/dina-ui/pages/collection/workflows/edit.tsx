@@ -62,6 +62,7 @@ export default function PreparationProcessTemplatePage() {
                         value="createNew"
                         type="radio"
                         name="workFlowType"
+                        checked={workflowType === "createNew"}
                         onChange={e => workFlowTypeOnChange(e, form)}
                       />
                       {formatMessage("creatNewWorkflow")}
