@@ -293,16 +293,21 @@ export function MaterialSampleForm({
   );
 
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */
-  const nestedCollectingEventForm = (
+  // Unwrap the DinaForm for template saving purpose
+  const nestedCollectingEventForm = !isTemplate ? (
     <DinaForm
       innerRef={colEventFormRef}
       initialValues={collectingEventInitialValues}
-      isTemplate={isTemplate}
       validationSchema={collectingEventFormSchema}
     >
       <CollectingEventFormLayout />
       <div className="form-group">{colEventAttachmentsUI}</div>
     </DinaForm>
+  ) : (
+    <>
+      <CollectingEventFormLayout />
+      <div className="form-group">{colEventAttachmentsUI}</div>
+    </>
   );
 
   const materialSampleInternal = (

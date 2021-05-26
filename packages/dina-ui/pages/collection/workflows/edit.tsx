@@ -12,8 +12,8 @@ import { useState, useRef } from "react";
 import { Head, Nav } from "../../../components";
 import { ButtonBar, SubmitButton, DinaForm } from "../../../../common-ui";
 import React from "react";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { useAttachmentsModal } from "packages/dina-ui/components/object-store";
+import { MaterialSample } from "../../../../dina-ui/types/collection-api";
+import { useAttachmentsModal } from "../../../../dina-ui/components/object-store";
 
 /** A named set of templates used for editing workflow/preparation process. */
 export interface WorkflowTemplate {
@@ -98,7 +98,7 @@ export default function PreparationProcessTemplatePage() {
                   <div className="col-md-6 row">
                     <label className="col-md-2">
                       <input
-                        className="form-control"
+                        className="form-control createNewWorkflow"
                         value="createNew"
                         type="radio"
                         name="workFlowType"
