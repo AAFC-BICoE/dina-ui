@@ -77,7 +77,7 @@ export function FieldWrapper({
     <div className={className}>
       <label
         className={`${name}-field ${horizontal ? "row" : "w-100"} ${
-          removeFormGroupClass ? "" : "form-group"
+          removeFormGroupClass ? "" : "mb-3"
         }`}
       >
         {!removeLabel && (

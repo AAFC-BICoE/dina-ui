@@ -35,14 +35,13 @@ export function ExistingObjectsAttacher({
     fieldName: "selectedMetadatas"
   });
 
-  const submitMetadataIds: OnFormikSubmit<ExistingObjectsAttacherForm> = async ({
-    selectedMetadatas
-  }) => {
-    const metadataIds = toPairs(selectedMetadatas)
-      .filter(pair => pair[1])
-      .map(pair => pair[0]);
-    await onMetadataIdsSubmitted(metadataIds);
-  };
+  const submitMetadataIds: OnFormikSubmit<ExistingObjectsAttacherForm> =
+    async ({ selectedMetadatas }) => {
+      const metadataIds = toPairs(selectedMetadatas)
+        .filter(pair => pair[1])
+        .map(pair => pair[0]);
+      await onMetadataIdsSubmitted(metadataIds);
+    };
 
   const METADATA_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
     {
@@ -79,7 +78,7 @@ export function ExistingObjectsAttacher({
       })}
       filterAttributes={METADATA_FILTER_ATTRIBUTES}
       filterFormchildren={({ submitForm }) => (
-        <div className="form-group">
+        <div className="mb-3">
           <div style={{ width: "300px" }}>
             <GroupSelectField
               onChange={() => setImmediate(submitForm)}
@@ -112,7 +111,7 @@ function MetadataListWrapper({ children, onAttachButtonClick }) {
         initialValues={{ selectedMetadatas: {} }}
       >
         <div style={{ height: "1rem" }}>
-          <div className="float-right">
+          <div className="float-end">
             <FormikButton
               className="btn btn-primary existing-objects-attach-button"
               onClick={onAttachButtonClick}

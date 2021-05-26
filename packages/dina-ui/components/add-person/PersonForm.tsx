@@ -85,7 +85,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
           optionLabel={organization => organization.names?.[0].name}
         />
       </div>
-      <div className="form-group list-inline">
+      <div className="mb-3 list-inline">
         <div className="list-inline-item">
           <SubmitButton />
         </div>

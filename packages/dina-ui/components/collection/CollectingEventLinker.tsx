@@ -107,7 +107,7 @@ export function CollectingEventLinker({
 
   return (
     <div>
-      <div className="form-group">
+      <div className="mb-3">
         <DinaForm<CollectingEventFilterFormValues>
           initialValues={{}}
           onSubmit={setFilters}
@@ -146,7 +146,7 @@ export function CollectingEventLinker({
               /> */}
               <div className="col-md-3">
                 <FormikButton
-                  className="btn btn-primary form-group"
+                  className="btn btn-primary mb-3"
                   buttonProps={() => ({
                     style: { width: "10rem", marginTop: "2rem" }
                   })}
@@ -159,10 +159,7 @@ export function CollectingEventLinker({
           </FieldSet>
         </DinaForm>
       </div>
-      <div
-        className="form-group"
-        style={{ maxHeight: "50rem", overflowY: "scroll" }}
-      >
+      <div className="mb-3" style={{ maxHeight: "50rem", overflowY: "scroll" }}>
         <QueryTable
           path="collection-api/collecting-event"
           columns={COLLECTING_EVENT_TABLE_COLUMNS}

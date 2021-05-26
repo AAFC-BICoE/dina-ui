@@ -2,7 +2,6 @@ import { LoadingSpinner } from "common-ui";
 import Link from "next/link";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ExifView } from "../exif-view/ExifView";
-import { FileView } from "../file-view/FileView";
 import { MetadataDetails, useMetadataQuery } from "./MetadataDetails";
 import { MetadataFileView } from "./MetadataFileView";
 

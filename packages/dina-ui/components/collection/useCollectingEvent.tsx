@@ -151,7 +151,8 @@ export function useCollectingEventSave(
 
   // The selected Metadatas to be attached to this Collecting Event:
   const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal({
-    initialMetadatas: fetchedCollectingEvent?.attachment as PersistedResource<Metadata>[],
+    initialMetadatas:
+      fetchedCollectingEvent?.attachment as PersistedResource<Metadata>[],
     deps: [fetchedCollectingEvent?.id],
     title: <DinaMessage id="collectingEventAttachments" />
   });
@@ -200,14 +201,18 @@ export function useCollectingEventSave(
     // Parse srcAdminLevels to geographicPlaceNameSourceDetail
     // Reset the 3 fields which should be updated with user address entries : srcAdminLevels
     if (submittedValues.geographicPlaceNameSourceDetail) {
-      submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces = null;
-      submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = null;
-      submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace = null;
+      submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces =
+        null;
+      submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace =
+        null;
+      submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace =
+        null;
     }
 
     if (submittedValues.srcAdminLevels?.length > 0) {
       if (submittedValues.srcAdminLevels?.length > 1)
-        submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces = [];
+        submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces =
+          [];
       submittedValues.srcAdminLevels.map((srcAdminLevel, idx) => {
         // remove the braceket from placeName
         const typeStart = srcAdminLevel.name.indexOf("[");
@@ -222,7 +227,8 @@ export function useCollectingEventSave(
             submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace =
               srcAdminLevel.name;
           } else {
-            submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace = srcAdminLevel;
+            submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace =
+              srcAdminLevel;
           }
         } else {
           submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces.push(

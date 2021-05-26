@@ -68,9 +68,9 @@ export function CollectingEventFormLayout({
   // Open the tab with the Primary geoassertion even if it's not the first one.
   // Defaults to 0 if there's no primary assertion.
   const intialPrimaryAssertionIndex = clamp(
-    (initialValues as Partial<CollectingEvent>).geoReferenceAssertions?.findIndex(
-      assertion => assertion?.isPrimary
-    ) ?? 0,
+    (
+      initialValues as Partial<CollectingEvent>
+    ).geoReferenceAssertions?.findIndex(assertion => assertion?.isPrimary) ?? 0,
     0,
     Infinity
   );
@@ -448,7 +448,7 @@ export function CollectingEventFormLayout({
                       <div
                         className={
                           hasDegree || hasMinute || hasSecond
-                            ? "form-group"
+                            ? "mb-3"
                             : "d-none"
                         }
                       >
@@ -704,7 +704,8 @@ export function CollectingEventFormLayout({
                         renderUnderSearchBar={
                           <Field>
                             {({ form: { values: formState } }) => {
-                              const colEvent: Partial<CollectingEvent> = formState;
+                              const colEvent: Partial<CollectingEvent> =
+                                formState;
                               const activeAssertion =
                                 colEvent.geoReferenceAssertions?.[activeTabIdx];
 
@@ -713,7 +714,8 @@ export function CollectingEventFormLayout({
                               const decimalLon =
                                 activeAssertion?.dwcDecimalLongitude;
 
-                              const hasVerbatimLocality = !!colEvent.dwcVerbatimLocality;
+                              const hasVerbatimLocality =
+                                !!colEvent.dwcVerbatimLocality;
                               const hasDecimalCoords = !!(
                                 decimalLat && decimalLon
                               );
@@ -722,8 +724,8 @@ export function CollectingEventFormLayout({
                                 hasVerbatimLocality || hasDecimalCoords;
 
                               return hasAnyLocation ? (
-                                <div className="form-group d-flex flex-row align-items-center">
-                                  <div className="pr-3">
+                                <div className="mb-3 d-flex flex-row align-items-center">
+                                  <div className="pe-3">
                                     <DinaMessage id="search" />:
                                   </div>
                                   <FormikButton
@@ -806,7 +808,7 @@ export function CollectingEventFormLayout({
         </div>
       </div>
       {readOnly && (
-        <div className="form-group">
+        <div className="mb-3">
           <Field name="id">
             {({ field: { value: id } }) => (
               <AttachmentReadOnlySection

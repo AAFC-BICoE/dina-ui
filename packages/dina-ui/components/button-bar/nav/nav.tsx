@@ -30,7 +30,7 @@ export function Nav() {
             </span>
             <meta property="areaServed" typeof="Country" content="Canada" />
           </div>
-          <section id="wb-lng" className="text-right ml-auto col-7 col-md-8">
+          <section id="wb-lng" className="text-end ms-auto col-7 col-md-8">
             <ul className="list-inline">
               <li className="list-inline-item mx-2">
                 <NavbarUserControl />
@@ -65,7 +65,7 @@ export function Nav() {
                 }
               `}
             </style>
-            <li className="list-inline-item mr-4">
+            <li className="list-inline-item me-4">
               <Link href="/">
                 <a className="app-name px-0">
                   <DinaMessage id="appTitle" />
@@ -255,13 +255,6 @@ function NavCollectionDropdown() {
             <DinaMessage id="materialSampleListTitle" />
           </a>
         </Link>
-        <div className="d-none">
-          <Link href="/collection/catalogued-object/list">
-            <a className="dropdown-item">
-              <DinaMessage id="cataloguedObjectListTitle" />
-            </a>
-          </Link>
-        </div>
         <Link href="/collection/preparation-type/list">
           <a className="dropdown-item">
             <DinaMessage id="preparationTypeListTitle" />
@@ -322,7 +315,7 @@ export function Footer() {
                 )}
               </div>
             </nav>
-            <div className="col-6 col-md-3 col-lg-2 text-right">
+            <div className="col-6 col-md-3 col-lg-2 text-end">
               <img
                 src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/assets/wmms-blk.svg"
                 alt="Symbol of the Government of Canada"

@@ -20,8 +20,6 @@ export function AttachmentUploader({
   const { uploadFiles } = useFileUpload();
   const { openMetadataEditorModal } = useBulkMetadataEditModal();
 
-  const acceptedFileTypes = "image/*,audio/*,video/*,.pdf,.doc,.docx,.png";
-
   async function onUploaderSubmit({
     acceptedFiles,
     group
@@ -53,10 +51,7 @@ export function AttachmentUploader({
         />
       </div>
       <div>
-        <FileUploader
-          onSubmit={onUploaderSubmit}
-          acceptedFileTypes={acceptedFileTypes}
-        />
+        <FileUploader onSubmit={onUploaderSubmit} />
       </div>
     </DinaForm>
   );

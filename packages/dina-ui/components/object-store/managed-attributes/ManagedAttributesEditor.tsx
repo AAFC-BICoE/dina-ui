@@ -7,7 +7,6 @@ import {
   useApiClient,
   useDinaFormContext
 } from "common-ui";
-import { useFormikContext } from "formik";
 import { get } from "lodash";
 import { useEffect, useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -23,7 +22,6 @@ export interface ManagedAttributesEditorProps {
 
   /**
    * The target component of the managed attribute e.g. COLLECTING_EVENT.
-   * Used for Collection API but not for Object Store API.
    */
   managedAttributeComponent?: string;
 
@@ -36,12 +34,12 @@ export interface ManagedAttributesEditorProps {
 
 /** Set of fields inside a Formik form to edit Managed Attributes. */
 export function ManagedAttributesEditor({
-  valuesPath,
+  valuesPath = "managedAttributeValues",
   managedAttributeApiPath,
-  valueFieldName = "value",
+  valueFieldName,
   apiBaseUrl,
   managedAttributeComponent,
-  managedAttributeKeyField = "id"
+  managedAttributeKeyField = "key"
 }: ManagedAttributesEditorProps) {
   const { initialValues: formInitialValues } = useDinaFormContext();
   const { bulkGet } = useApiClient();
@@ -69,7 +67,7 @@ export function ManagedAttributesEditor({
   }, []);
 
   return (
-    <div className="form-group managed-attributes-editor">
+    <div className="mb-3 managed-attributes-editor">
       <div className="row">
         <label className="col-sm-6">
           <strong>
@@ -116,7 +114,9 @@ export function ManagedAttributesEditor({
               className: `${attributeKey} col-sm-6`,
               key: attributeKey,
               label: attribute.name ?? attributeKey,
-              name: `${valuesPath}.${attributeKey}.${valueFieldName}`
+              name: `${valuesPath}.${attributeKey}${
+                valueFieldName ? `.${valueFieldName}` : ""
+              }`
             };
 
             if (

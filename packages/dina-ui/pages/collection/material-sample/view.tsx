@@ -17,11 +17,12 @@ import { CollectingEventFormLayout } from "../../../components/collection/Collec
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { MaterialSample } from "../../../types/collection-api";
 import {
-  MaterialSample,
-  SourceAdministrativeLevel
-} from "../../../types/collection-api";
-import { CatalogueInfoFormLayout, MaterialSampleFormLayout } from "./edit";
+  PreparationsFormLayout,
+  MaterialSampleIdentifiersFormLayout,
+  MaterialSampleMainInfoFormLayout
+} from "./edit";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -46,12 +47,12 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         byPassView={true}
       />
       <EditButton
-        className="ml-auto"
+        className="ms-auto"
         entityId={id as string}
         entityLink="collection/material-sample"
       />
       <DeleteButton
-        className="ml-5"
+        className="ms-5"
         id={id as string}
         options={{ apiBaseUrl: "/collection-api" }}
         postDeleteRedirect="/collection/material-sample/list"
@@ -65,9 +66,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <Head title={formatMessage("materialSampleViewTitle")} />
       <Nav />
       {withResponse(materialSampleQuery, ({ data: materialSample }) => {
-        const hasCatalogueInfo =
-          !!materialSample?.dwcCatalogNumber ||
-          !!materialSample?.preparationType;
+        const hasPreparations = !!materialSample.preparationType;
         return (
           <main className="container-fluid">
             {buttonBar}
@@ -78,11 +77,12 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               initialValues={materialSample}
               readOnly={true}
             >
-              <MaterialSampleFormLayout />
+              <MaterialSampleMainInfoFormLayout />
+              <MaterialSampleIdentifiersFormLayout />
               {collectingEvent && (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                   <DinaForm initialValues={collectingEvent} readOnly={true}>
-                    <div className="form-group d-flex justify-content-end align-items-center">
+                    <div className="mb-3 d-flex justify-content-end align-items-center">
                       <Link
                         href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
                       >
@@ -95,8 +95,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   </DinaForm>
                 </FieldSet>
               )}
-              {hasCatalogueInfo && <CatalogueInfoFormLayout />}
-              <div className="form-group">
+              {hasPreparations && <PreparationsFormLayout />}
+              <div className="mb-3">
                 <Field name="id">
                   {({ field: { value: materialSampleId } }) => (
                     <AttachmentReadOnlySection

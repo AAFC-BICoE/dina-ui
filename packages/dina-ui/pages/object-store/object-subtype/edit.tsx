@@ -127,7 +127,7 @@ function ObjectSubtypeForm({ objectSubtype, router }: ObjectSubtypeFormProps) {
 const CustomDeleteButton = connect<{}, ObjectSubtype>(
   ({ formik: { values: subType } }) => (
     <DeleteButton
-      className="ml-5"
+      className="ms-5"
       id={subType.id}
       options={{ apiBaseUrl: "/objectstore-api" }}
       postDeleteRedirect="/object-store/object-subtype/list"

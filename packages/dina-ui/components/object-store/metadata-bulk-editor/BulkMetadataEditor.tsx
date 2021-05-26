@@ -13,7 +13,7 @@ import {
   useResourceSelectCells
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { get, set } from "lodash";
+import { get, set, keys } from "lodash";
 import moment from "moment";
 import { useContext, useState } from "react";
 import { AddPersonButton } from "../../../components";
@@ -22,7 +22,6 @@ import {
   DefaultValue,
   License,
   ManagedAttribute,
-  ManagedAttributeMap,
   Metadata,
   Person
 } from "../../../types/objectstore-api";
@@ -90,9 +89,7 @@ export function BulkMetadataEditor({
     // When editing existing Metadatas:
     if (metadataIds) {
       const existingMetadatas = await bulkGet<Metadata>(
-        metadataIds.map(
-          id => `/metadata/${id}?include=managedAttributeMap,dcCreator`
-        ),
+        metadataIds.map(id => `/metadata/${id}?include=dcCreator`),
         {
           apiBaseUrl: "/objectstore-api",
           joinSpecs: [
@@ -129,9 +126,8 @@ export function BulkMetadataEditor({
       for (const defaultValue of defaultValues.filter(
         ({ type }) => type === "metadata"
       )) {
-        metadataDefaults[
-          defaultValue.attribute as keyof Metadata
-        ] = defaultValue.value as any;
+        metadataDefaults[defaultValue.attribute as keyof Metadata] =
+          defaultValue.value as any;
       }
 
       const newMetadatas = objectUploads.map<Metadata>(objectUpload => ({
@@ -162,7 +158,7 @@ export function BulkMetadataEditor({
     }
 
     const managedAttributesInUse = await getManagedAttributesInUse(
-      metadatas.map(it => it.managedAttributeMap?.values),
+      metadatas.map(it => it.managedAttributeValues),
       bulkGet
     );
     setInitialEditableManagedAttributes(managedAttributesInUse);
@@ -245,8 +241,6 @@ export function BulkMetadataEditor({
           ...metadata
         } as Metadata;
 
-        delete metadataEdit.managedAttributeMap;
-
         if (dcCreator !== undefined) {
           metadataEdit.dcCreator = {
             id: decodeResourceCell(dcCreator).id as any,
@@ -275,6 +269,16 @@ export function BulkMetadataEditor({
           metadataEdit.xmpRightsUsageTerms = "";
         }
 
+        // Remove blank managed attribute values from the map:
+        const blankValues: any[] = ["", null];
+        for (const maKey of keys(metadataEdit?.managedAttributeValues)) {
+          if (
+            blankValues.includes(metadataEdit?.managedAttributeValues?.[maKey])
+          ) {
+            delete metadataEdit?.managedAttributeValues?.[maKey];
+          }
+        }
+
         return {
           resource: metadataEdit,
           type: "metadata"
@@ -282,32 +286,9 @@ export function BulkMetadataEditor({
       })
     );
 
-    const editedManagedAttributeMaps = changes.map<
-      SaveArgs<ManagedAttributeMap>
-    >(row => {
-      const managedAttributeMap = row.changes.metadata?.managedAttributeMap;
-      const metadata = {
-        id: row.original.metadata.id,
-        type: row.original.metadata.type
-      };
-
-      return {
-        resource: {
-          ...managedAttributeMap,
-          metadata,
-          type: "managed-attribute-map"
-        } as ManagedAttributeMap,
-        type: "managed-attribute-map"
-      };
-    });
-
-    editedManagedAttributeMaps.forEach(saveArg => delete saveArg.resource.id);
-
     if (metadataIds) {
       // When editing existing Metadatas:
-      await save([...editedMetadatas, ...editedManagedAttributeMaps], {
-        apiBaseUrl: "/objectstore-api"
-      });
+      await save(editedMetadatas, { apiBaseUrl: "/objectstore-api" });
 
       await afterMetadatasSaved(metadataIds);
     } else if (objectUploadIds) {
@@ -320,17 +301,6 @@ export function BulkMetadataEditor({
       createdMetadatas.forEach((createdMetadata, index) => {
         // Set the original row's Metadata ID so if the Managed Attribute Map fails, you don't create duplicate Metadats:
         changes[index].original.metadata.id = createdMetadata.id;
-
-        // Link the managed attribute value with the newly created Metadata ID:
-        editedManagedAttributeMaps[index].resource.metadata = {
-          id: createdMetadata.id,
-          type: "metadata"
-        } as Metadata;
-      });
-
-      // Create the Managed Attribute Values:
-      await save(editedManagedAttributeMaps, {
-        apiBaseUrl: "/objectstore-api"
       });
 
       await afterMetadatasSaved(createdMetadatas.map(metadata => metadata.id));
@@ -351,7 +321,7 @@ export function BulkMetadataEditor({
       <h1>
         <DinaMessage id="metadataBulkEditTitle" />
       </h1>
-      <div className="form-group">
+      <div className="mb-3">
         <DinaForm<MetadataEditorControls>
           enableReinitialize={true}
           initialValues={initialFormControls}
@@ -371,7 +341,7 @@ export function BulkMetadataEditor({
                 <MetadataEditorAttributesControls
                   builtInAttributes={BUILT_IN_ATTRIBUTES_COLUMNS}
                 />
-                <div className="form-group">
+                <div className="mb-3">
                   <AddPersonButton />
                   <Tooltip id="addPersonPopupTooltip" />
                 </div>
@@ -391,7 +361,7 @@ export function BulkMetadataEditor({
   );
 }
 
-/** Gets the Metadata bulit in attrbute columns for the bulk editor. (Not including ManagedAttributes) */
+/** Gets the Metadata bulit in attribute columns for the bulk editor. (Not including ManagedAttributes) */
 export function useMetadataBuiltInAttributeColumns(): HotColumnProps[] {
   const { formatMessage, locale } = useDinaIntl();
   const resourceSelectCell = useResourceSelectCells();
@@ -472,7 +442,7 @@ export function managedAttributeColumns(
   editableManagedAttributes: ManagedAttribute[]
 ) {
   return editableManagedAttributes.map(attr => ({
-    data: `metadata.managedAttributeMap.values.${attr.id}.value`,
+    data: `metadata.managedAttributeValues.${attr.id}`,
     title: attr.name,
     ...(attr.acceptedValues?.length
       ? {

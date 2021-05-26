@@ -43,7 +43,7 @@ export default function MetadataViewPage() {
       <ButtonBar>
         <BackToListButton entityLink="/object-store/object" />
         <Link href={`/object-store/metadata/single-record-edit?id=${id}`}>
-          <a className="btn btn-primary ml-auto" style={{ width: "10rem" }}>
+          <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
             <DinaMessage id="editButtonText" />
           </a>
         </Link>
@@ -53,7 +53,7 @@ export default function MetadataViewPage() {
           </a>
         </Link>
         <DeleteButton
-          className="ml-5"
+          className="ms-5"
           id={id}
           options={{ apiBaseUrl: "/objectstore-api" }}
           postDeleteRedirect="/object-store/object/list"
@@ -75,7 +75,7 @@ export default function MetadataViewPage() {
             </div>
             <div className="col-md-8">
               <div className="container">
-                <div className="form-group">
+                <div className="mb-3">
                   <Link
                     href={`/object-store/metadata/single-record-edit?id=${id}`}
                   >

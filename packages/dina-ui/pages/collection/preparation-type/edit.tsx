@@ -92,7 +92,7 @@ function PreparationTypeForm({
           entityLink="/collection/preparation-type"
           byPassView={true}
         />
-        <SubmitButton className="ml-auto" />
+        <SubmitButton className="ms-auto" />
       </ButtonBar>
       <div>
         <div className="row">

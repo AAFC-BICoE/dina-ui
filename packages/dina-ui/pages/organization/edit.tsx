@@ -167,7 +167,7 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
           byPassView={true}
         />
         <DeleteButton
-          className="ml-5"
+          className="ms-5"
           id={id as string}
           options={{ apiBaseUrl: "/agent-api" }}
           postDeleteRedirect="/organization/list"

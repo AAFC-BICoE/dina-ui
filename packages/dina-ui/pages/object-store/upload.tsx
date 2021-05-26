@@ -30,8 +30,6 @@ export default function UploadPage() {
   const { openDefaultValuesModal } = useDefaultValueRuleEditorModal();
   const { openModal } = useModal();
 
-  const acceptedFileTypes = "image/*,audio/*,video/*,.pdf,.doc,.docx,.png";
-
   async function onSubmit({
     acceptedFiles,
     group,
@@ -160,10 +158,7 @@ export default function UploadPage() {
               </div>
             </div>
             <div>
-              <FileUploader
-                acceptedFileTypes={acceptedFileTypes}
-                onSubmit={onSubmit}
-              />
+              <FileUploader onSubmit={onSubmit} />
             </div>
           </DinaForm>
         )}
