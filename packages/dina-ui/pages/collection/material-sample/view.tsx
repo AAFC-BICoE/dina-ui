@@ -17,11 +17,12 @@ import { CollectingEventFormLayout } from "../../../components/collection/Collec
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { MaterialSample } from "../../../types/collection-api";
 import {
-  MaterialSample,
-  SourceAdministrativeLevel
-} from "../../../types/collection-api";
-import { CatalogueInfoFormLayout, MaterialSampleFormLayout } from "./edit";
+  PreparationsFormLayout,
+  MaterialSampleIdentifiersFormLayout,
+  MaterialSampleMainInfoFormLayout
+} from "./edit";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -65,9 +66,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <Head title={formatMessage("materialSampleViewTitle")} />
       <Nav />
       {withResponse(materialSampleQuery, ({ data: materialSample }) => {
-        const hasCatalogueInfo =
-          !!materialSample?.dwcCatalogNumber ||
-          !!materialSample?.preparationType;
+        const hasPreparations = !!materialSample.preparationType;
         return (
           <main className="container-fluid">
             {buttonBar}
@@ -78,7 +77,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               initialValues={materialSample}
               readOnly={true}
             >
-              <MaterialSampleFormLayout />
+              <MaterialSampleMainInfoFormLayout />
+              <MaterialSampleIdentifiersFormLayout />
               {collectingEvent && (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                   <DinaForm initialValues={collectingEvent} readOnly={true}>
@@ -95,7 +95,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   </DinaForm>
                 </FieldSet>
               )}
-              {hasCatalogueInfo && <CatalogueInfoFormLayout />}
+              {hasPreparations && <PreparationsFormLayout />}
               <div className="form-group">
                 <Field name="id">
                   {({ field: { value: materialSampleId } }) => (
