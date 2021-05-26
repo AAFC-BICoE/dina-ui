@@ -81,15 +81,8 @@ const TEST_METADATA: PersistedResource<Metadata> = {
     "https://open.canada.ca/en/open-government-licence-canada",
   id: "25f81de5-bbee-430c-b5fa-71986b70e612",
   type: "metadata",
-  managedAttributeMap: {
-    id: "map-id",
-    type: "managed-attribute-map",
-    values: {
-      "a360a695-bbff-4d58-9a07-b6d6c134b208": {
-        name: "test-managed-attribute",
-        value: "test-managed-attribute-value"
-      }
-    }
+  managedAttributeValues: {
+    "a360a695-bbff-4d58-9a07-b6d6c134b208": "test-managed-attribute-value"
   }
 };
 
@@ -171,6 +164,10 @@ describe("Metadata single record edit page.", () => {
             fileExtension: ".png",
             fileIdentifier: "9a85b858-f8f0-4a97-99a8-07b2cb759766",
             id: "25f81de5-bbee-430c-b5fa-71986b70e612",
+            managedAttributeValues: {
+              "a360a695-bbff-4d58-9a07-b6d6c134b208":
+                "new-managed-attribute-value"
+            },
             originalFilename: "test-file.png",
             type: "metadata",
             xmpRightsUsageTerms: "",
@@ -178,22 +175,6 @@ describe("Metadata single record edit page.", () => {
               "https://open.canada.ca/en/open-government-licence-canada"
           },
           type: "metadata"
-        },
-        {
-          resource: {
-            metadata: expect.objectContaining({
-              id: "25f81de5-bbee-430c-b5fa-71986b70e612",
-              type: "metadata"
-            }),
-            type: "managed-attribute-map",
-            values: {
-              "a360a695-bbff-4d58-9a07-b6d6c134b208": {
-                name: "test-managed-attribute",
-                value: "new-managed-attribute-value"
-              }
-            }
-          },
-          type: "managed-attribute-map"
         }
       ],
       { apiBaseUrl: "/objectstore-api" }
