@@ -65,9 +65,6 @@ export interface CollectingEventAttributes {
   includeAllCollectingAgent?: boolean;
   dwcOtherRecordNumbersEnabled?: boolean;
   dwcRecordNumberEnabled?: boolean;
-
-  locationEnabled?: boolean;
-
   habitatEnabled?: boolean;
 
   managedAttributeValuesEnabled?: boolean;
