@@ -79,7 +79,7 @@ export function ExistingObjectsAttacher({
       })}
       filterAttributes={METADATA_FILTER_ATTRIBUTES}
       filterFormchildren={({ submitForm }) => (
-        <div className="form-group">
+        <div className="mb-3">
           <div style={{ width: "300px" }}>
             <GroupSelectField
               onChange={() => setImmediate(submitForm)}
@@ -112,7 +112,7 @@ function MetadataListWrapper({ children, onAttachButtonClick }) {
         initialValues={{ selectedMetadatas: {} }}
       >
         <div style={{ height: "1rem" }}>
-          <div className="float-right">
+          <div className="float-end">
             <FormikButton
               className="btn btn-primary existing-objects-attach-button"
               onClick={onAttachButtonClick}

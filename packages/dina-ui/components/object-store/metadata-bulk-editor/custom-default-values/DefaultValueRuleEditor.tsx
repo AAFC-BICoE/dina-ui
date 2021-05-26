@@ -55,7 +55,7 @@ export function DefaultValueRuleEditor({
 
   return (
     <div>
-      <div className="form-group">
+      <div className="mb-3">
         <DefaultValueConfigManager
           ruleConfigIndex={ruleConfigIndex}
           onChangeConfigIndex={setRuleConfigIndex}

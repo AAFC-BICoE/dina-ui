@@ -69,10 +69,10 @@ export default function LibraryPrepWorksheetPage() {
           }
         `}</style>
         <main className="container-fluid">
-          <div className="form-group">
+          <div className="mb-3">
             <h2 className="d-inline">Library Prep Worksheet</h2>
             <button
-              className="btn btn-primary d-print-none d-inline float-right"
+              className="btn btn-primary d-print-none d-inline float-end"
               onClick={() => window.print()}
             >
               Print
@@ -102,7 +102,7 @@ export default function LibraryPrepWorksheetPage() {
                 <div className="col-12">
                   <HorizontalField label="Pos Control" />
                   <HorizontalField label="Neg Control" />
-                  <div className="row form-group">
+                  <div className="row mb-3">
                     <div className="col-3">
                       <input className="form-control" />
                     </div>
@@ -187,7 +187,7 @@ export default function LibraryPrepWorksheetPage() {
 
 function HorizontalField({ label, defaultValue = "" }) {
   return (
-    <div className="row form-group">
+    <div className="row mb-3">
       <strong className="col-3">{label}</strong>
       <div className="col-9">
         <input className="form-control" defaultValue={defaultValue} />
@@ -198,7 +198,7 @@ function HorizontalField({ label, defaultValue = "" }) {
 
 function BigField({ label, defaultValue = "" }) {
   return (
-    <div className="row form-group">
+    <div className="row mb-3">
       <div className="col-12">
         <strong>{label}</strong>
         <textarea className="form-control" defaultValue={defaultValue} />

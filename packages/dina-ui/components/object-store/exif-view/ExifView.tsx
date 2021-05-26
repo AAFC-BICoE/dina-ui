@@ -22,7 +22,7 @@ function CollapsableSection({
   const { Collapser, collapsed } = useCollapser(`view-exif-${collapserId}`);
 
   return (
-    <div className="form-group">
+    <div className="mb-3">
       <h4>
         {title}
         <Collapser />

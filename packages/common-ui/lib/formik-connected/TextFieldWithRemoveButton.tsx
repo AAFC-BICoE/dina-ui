@@ -28,19 +28,17 @@ export function TextFieldWithRemoveButton(
       customInput={inputProps => (
         <div className="input-group div-has-button">
           <input {...inputProps} type="text" />
-          <div className="input-group-append">
-            <button
-              className={`btn btn-danger self-remove-button ${
-                hideCloseBtn ? "d-none" : ""
-              }`}
-              style={{ height: "97%" }}
-              aria-label="Close"
-              onClick={() => removeEntry(inputProps.onChange)}
-              type="button"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
+          <button
+            className={`btn btn-danger self-remove-button ${
+              hideCloseBtn ? "d-none" : ""
+            }`}
+            style={{ height: "97%" }}
+            aria-label="Close"
+            onClick={() => removeEntry(inputProps.onChange)}
+            type="button"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
       )}
     />

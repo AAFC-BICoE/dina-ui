@@ -33,12 +33,12 @@ export function PreparationTypeDetailsPage({ router }: WithRouterProps) {
           byPassView={true}
         />
         <EditButton
-          className="ml-auto"
+          className="ms-auto"
           entityId={id as string}
           entityLink="collection/preparation-type"
         />
         <DeleteButton
-          className="ml-5"
+          className="ms-5"
           id={id as string}
           options={{ apiBaseUrl: "/collection-api" }}
           postDeleteRedirect="/collection/preparation-type/list"

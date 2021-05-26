@@ -67,7 +67,7 @@ export function ManagedAttributesEditor({
   }, []);
 
   return (
-    <div className="form-group managed-attributes-editor">
+    <div className="mb-3 managed-attributes-editor">
       <div className="row">
         <label className="col-sm-6">
           <strong>

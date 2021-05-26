@@ -143,7 +143,7 @@ export function BulkDataEditor<TRow>({
       `}</style>
       {validationAlertJsx}
       <div
-        className="form-group"
+        className="mb-3"
         // Setting the width/height and overflowX:hidden here is detected by Handsontable and enables horizontal scrolling:
         style={{
           height: "100%",
