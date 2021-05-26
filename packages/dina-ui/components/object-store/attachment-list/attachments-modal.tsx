@@ -21,12 +21,16 @@ export interface AttachmentsModalParams {
   deps: any[];
 
   title?: JSX.Element;
+
+  /** fieldset id */
+  id?: string;
 }
 
 export function useAttachmentsModal({
   initialMetadatas = [],
   deps,
-  title
+  title,
+  id
 }: AttachmentsModalParams) {
   const { closeModal, openModal } = useModal();
   const { bulkGet } = useApiClient();
@@ -55,10 +59,10 @@ export function useAttachmentsModal({
     closeModal();
   }
 
-  async function removeMetadata(id: string) {
+  async function removeMetadata(mId: string) {
     // Remove the selected Metadata from the array:
     setSelectedMetadatas(current =>
-      current.filter(metadata => metadata.id !== id)
+      current.filter(metadata => metadata.id !== mId)
     );
   }
 
@@ -87,6 +91,7 @@ export function useAttachmentsModal({
 
   const attachedMetadatasUI = (
     <FieldSet
+      id={id}
       legend={
         <>
           {title ?? "Attachments"} ({selectedMetadatas.length})
@@ -111,10 +116,10 @@ export function useAttachmentsModal({
                     Header: <FieldHeader name={accessor} />
                   })),
                   {
-                    Cell: ({ original: { id } }) => (
+                    Cell: ({ original: { id: mId } }) => (
                       <button
                         className="btn btn-dark"
-                        onClick={() => removeMetadata(id)}
+                        onClick={() => removeMetadata(mId)}
                         type="button"
                       >
                         <DinaMessage id="remove" />
