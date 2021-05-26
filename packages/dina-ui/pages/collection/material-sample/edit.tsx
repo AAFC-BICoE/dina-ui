@@ -33,6 +33,7 @@ import {
 } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import * as yup from "yup";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import {
   CollectingEventFormLayout,
