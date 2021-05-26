@@ -161,7 +161,8 @@ export function MaterialSampleForm({
     attachedMetadatasUI: materialSampleAttachmentsUI,
     selectedMetadatas
   } = useAttachmentsModal({
-    initialMetadatas: materialSample?.attachment as PersistedResource<Metadata>[],
+    initialMetadatas:
+      materialSample?.attachment as PersistedResource<Metadata>[],
     deps: [materialSample?.id],
     title: <DinaMessage id="materialSampleAttachments" />,
     id: "material-sample-attachments-section"

@@ -126,9 +126,8 @@ export function BulkMetadataEditor({
       for (const defaultValue of defaultValues.filter(
         ({ type }) => type === "metadata"
       )) {
-        metadataDefaults[
-          defaultValue.attribute as keyof Metadata
-        ] = defaultValue.value as any;
+        metadataDefaults[defaultValue.attribute as keyof Metadata] =
+          defaultValue.value as any;
       }
 
       const newMetadatas = objectUploads.map<Metadata>(objectUpload => ({

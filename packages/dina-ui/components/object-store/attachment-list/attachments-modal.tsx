@@ -35,9 +35,8 @@ export function useAttachmentsModal({
   const { closeModal, openModal } = useModal();
   const { bulkGet } = useApiClient();
 
-  const [selectedMetadatas, setSelectedMetadatas] = useState<Metadata[]>(
-    initialMetadatas
-  );
+  const [selectedMetadatas, setSelectedMetadatas] =
+    useState<Metadata[]>(initialMetadatas);
   useEffect(() => {
     setSelectedMetadatas(initialMetadatas);
   }, deps);
