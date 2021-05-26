@@ -330,12 +330,16 @@ export function MaterialSampleForm({
             <DinaMessage id="formNavigation" />
           </h4>
           <div className="list-group">
-            <a href="#material-sample-section" className="list-group-item">
-              <DinaMessage id="materialSample" />
-            </a>
-            <a href="#identifiers-section" className="list-group-item">
-              <DinaMessage id="identifiers" />
-            </a>
+            {!isTemplate && (
+              <a href="#material-sample-section" className="list-group-item">
+                <DinaMessage id="materialSample" />
+              </a>
+            )}
+            {!isTemplate && (
+              <a href="#identifiers-section" className="list-group-item">
+                <DinaMessage id="identifiers" />
+              </a>
+            )}
             {enableCollectingEvent && (
               <a href="#collecting-event-section" className="list-group-item">
                 <DinaMessage id="collectingEvent" />
@@ -404,9 +408,11 @@ export function MaterialSampleForm({
                     <DinaMessage id="createNew" />
                   )}
                 </Tab>
-                <Tab>
-                  <DinaMessage id="attachExisting" />
-                </Tab>
+                {!isTemplate && (
+                  <Tab>
+                    <DinaMessage id="attachExisting" />
+                  </Tab>
+                )}
               </TabList>
               <TabPanel>
                 {
@@ -435,13 +441,15 @@ export function MaterialSampleForm({
                     : nestedCollectingEventForm
                 }
               </TabPanel>
-              <TabPanel>
-                <CollectingEventLinker
-                  onCollectingEventSelect={colEventToLink => {
-                    setColEventId(colEventToLink.id);
-                  }}
-                />
-              </TabPanel>
+              {!isTemplate && (
+                <TabPanel>
+                  <CollectingEventLinker
+                    onCollectingEventSelect={colEventToLink => {
+                      setColEventId(colEventToLink.id);
+                    }}
+                  />
+                </TabPanel>
+              )}
             </Tabs>
           </FieldSet>
           <PreparationsFormLayout
