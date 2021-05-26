@@ -48,7 +48,8 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
 export function useAccount(): AccountContextI {
   const ctx = useContext(AccountContext);
   if (!ctx) {
-    // throw new Error("No AccountContext available.");
+    // tslint:disable-next-line
+    console.log("No AccountContext available.");
   }
   return ctx as any;
 }

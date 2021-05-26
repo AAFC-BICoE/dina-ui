@@ -94,7 +94,8 @@ export function ApiClientImplProvider({
 export function useApiClient() {
   const ctx = useContext(ApiClientContext);
   if (!ctx) {
-    //    throw new Error("No ApiClientContext available.");
+    // tslint:disable-next-line
+    console.log("No ApiClientContext available.")
   }
   return ctx;
 }
