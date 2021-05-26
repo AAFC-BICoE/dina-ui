@@ -1,8 +1,8 @@
 import {
-  CatalogueInfoFormLayout,
-  MaterialSampleForm
+  MaterialSampleForm,
+  PreparationsFormLayout
 } from "../material-sample/edit";
-import { FieldSet, TextField } from "../../../../common-ui";
+import { FieldSet, TextField } from "common-ui";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useLocalStorage } from "@rehooks/local-storage";
 
@@ -10,10 +10,10 @@ import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { FormikProps, Field } from "formik";
 import { useState, useRef } from "react";
 import { Head, Nav } from "../../../components";
-import { ButtonBar, SubmitButton, DinaForm } from "../../../../common-ui";
+import { ButtonBar, SubmitButton, DinaForm } from "common-ui";
 import React from "react";
-import { MaterialSample } from "../../../../dina-ui/types/collection-api";
-import { useAttachmentsModal } from "../../../../dina-ui/components/object-store";
+import { MaterialSample } from "../../../types/collection-api";
+import { useAttachmentsModal } from "../../../components/object-store";
 
 /** A named set of templates used for editing workflow/preparation process. */
 export interface WorkflowTemplate {
@@ -130,7 +130,7 @@ export default function PreparationProcessTemplatePage() {
           )}
           {workflowType === "createSplit" && (
             <DinaForm initialValues={{}} innerRef={catelogueSectionRef}>
-              <CatalogueInfoFormLayout isTemplate={true} />
+              <PreparationsFormLayout isTemplate={true} />
               {materialSampleAttachmentsUI}
             </DinaForm>
           )}

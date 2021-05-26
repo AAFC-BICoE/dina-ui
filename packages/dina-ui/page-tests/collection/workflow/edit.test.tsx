@@ -1,5 +1,5 @@
 import { mountWithAppContext } from "../../../../dina-ui/test-util/mock-app-context";
-import PreparationProcessTemplatePage from "../../../../dina-ui/pages/collection/workflows/edit";
+import PreparationProcessTemplatePage from "../../../pages/collection/workflow-template/edit";
 import Switch from "react-switch";
 
 describe("workflow edit page", () => {

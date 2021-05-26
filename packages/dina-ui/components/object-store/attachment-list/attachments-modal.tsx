@@ -27,6 +27,8 @@ export interface AttachmentsModalParams {
 
   allowNewFieldName?: string;
   allowExistingFieldName?: string;
+  /** fieldset id */
+  id?: string;
 }
 
 export function useAttachmentsModal({
@@ -35,7 +37,8 @@ export function useAttachmentsModal({
   title,
   isTemplate,
   allowNewFieldName,
-  allowExistingFieldName
+  allowExistingFieldName,
+  id
 }: AttachmentsModalParams) {
   const { closeModal, openModal } = useModal();
   const { bulkGet } = useApiClient();
@@ -66,10 +69,10 @@ export function useAttachmentsModal({
     closeModal();
   }
 
-  async function removeMetadata(id: string) {
+  async function removeMetadata(mId: string) {
     // Remove the selected Metadata from the array:
     setSelectedMetadatas(current =>
-      current.filter(metadata => metadata.id !== id)
+      current.filter(metadata => metadata.id !== mId)
     );
   }
 
@@ -98,6 +101,7 @@ export function useAttachmentsModal({
 
   const attachedMetadatasUI = (
     <FieldSet
+      id={id}
       legend={
         <>
           {title ?? "Attachments"}{" "}
@@ -124,6 +128,7 @@ export function useAttachmentsModal({
                       Header: <FieldHeader name={accessor} />
                     })),
                     {
+                      // tslint:disable-next-line
                       Cell: ({ original: { id } }) => (
                         <button
                           className="btn btn-dark"
