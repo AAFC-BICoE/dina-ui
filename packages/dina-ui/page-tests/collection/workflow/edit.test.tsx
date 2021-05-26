@@ -3,9 +3,6 @@ import PreparationProcessTemplatePage from "../../../../dina-ui/pages/collection
 import Switch from "react-switch";
 
 describe("workflow edit page", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
   it("Provides a form to add a new workflow.", async () => {
     const wrapper = mountWithAppContext(<PreparationProcessTemplatePage />);
 
