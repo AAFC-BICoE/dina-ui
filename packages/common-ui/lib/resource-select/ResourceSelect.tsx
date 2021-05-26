@@ -4,15 +4,15 @@ import {
   KitsuResource,
   PersistedResource
 } from "kitsu";
-import { debounce, omitBy, isUndefined, isEqual } from "lodash";
+import { debounce, isEqual, isUndefined, omitBy } from "lodash";
 import React, { useContext } from "react";
 import { useIntl } from "react-intl";
-import AsyncSelect from "react-select/async";
 import { components as reactSelectComponents } from "react-select";
+import AsyncSelect from "react-select/async";
 import { Styles } from "react-select/src/styles";
 import { OptionsType } from "react-select/src/types";
-import { ApiClientContext, SelectOption } from "../..";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
+import { ApiClientContext, SelectOption } from "../..";
 
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData extends KitsuResource> {
@@ -137,7 +137,9 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   async function onChangeSingle(selectedOption) {
     if (selectedOption?.getResource) {
-      const resource = await (selectedOption as AsyncOption<TData>).getResource();
+      const resource = await (
+        selectedOption as AsyncOption<TData>
+      ).getResource();
       if (resource) {
         onChangeProp(resource);
       }
@@ -181,16 +183,16 @@ export function ResourceSelect<TData extends KitsuResource>({
   let selectValue;
   if (isMulti) {
     const isArr = Array.isArray(value);
-    selectValue = ((isArr
-      ? value
-      : // tslint:disable-next-line: no-string-literal
-        (value ? value["data"] : []) || []) as PersistedResource<TData>[]).map(
-      resource => ({
-        label: optionLabel(resource),
-        resource,
-        value: resource.id
-      })
-    );
+    selectValue = (
+      (isArr
+        ? value
+        : // tslint:disable-next-line: no-string-literal
+          (value ? value["data"] : []) || []) as PersistedResource<TData>[]
+    ).map(resource => ({
+      label: optionLabel(resource),
+      resource,
+      value: resource.id
+    }));
   } else {
     selectValue = !value
       ? null
@@ -203,7 +205,8 @@ export function ResourceSelect<TData extends KitsuResource>({
         };
   }
 
-  const customStyle = {
+  const customStyle: any = {
+    multiValueLabel: base => ({ ...base, cursor: "move" }),
     placeholder: (provided, _) => ({
       ...provided,
       color: "rgb(87,120,94)"
@@ -219,11 +222,11 @@ export function ResourceSelect<TData extends KitsuResource>({
       onChange={isMulti ? onChangeMulti : onChangeSingle}
       placeholder={formatMessage({ id: "typeHereToSearch" })}
       styles={{
-        multiValueLabel: base => ({ ...base, cursor: "move" }),
         ...styles,
         ...customStyle
       }}
       value={selectValue}
+      isDisabled={isDisabled}
       // react-sortable-hoc config:
       axis="xy"
       onSortEnd={onSortEnd}
@@ -231,7 +234,6 @@ export function ResourceSelect<TData extends KitsuResource>({
         MultiValue: SortableMultiValue
       }}
       distance={4}
-      isDisabled={isDisabled}
     />
   );
 }

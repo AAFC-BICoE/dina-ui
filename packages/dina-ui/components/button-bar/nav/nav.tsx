@@ -255,13 +255,6 @@ function NavCollectionDropdown() {
             <DinaMessage id="materialSampleListTitle" />
           </a>
         </Link>
-        <div className="d-none">
-          <Link href="/collection/catalogued-object/list">
-            <a className="dropdown-item">
-              <DinaMessage id="cataloguedObjectListTitle" />
-            </a>
-          </Link>
-        </div>
         <Link href="/collection/preparation-type/list">
           <a className="dropdown-item">
             <DinaMessage id="preparationTypeListTitle" />

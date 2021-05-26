@@ -1,13 +1,6 @@
-import {
-  DinaForm,
-  DinaFormSection,
-  FieldView,
-  FieldWrapper,
-  useQuery
-} from "common-ui";
+import { DinaForm, FieldView, useQuery } from "common-ui";
 import { KitsuResource } from "kitsu";
 import { toPairs } from "lodash";
-import ReactTable from "react-table";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 export interface ManagedAttributesViewerProps {
@@ -17,7 +10,10 @@ export interface ManagedAttributesViewerProps {
    */
   values?: Record<
     string,
-    { name?: string; value?: string; assignedValue?: string }
+    | string
+    | null
+    | undefined
+    | { name?: string; value?: string; assignedValue?: string }
   >;
 
   /** Function that returns the API find-one path given the Managed Attribute key or ID. */
@@ -31,7 +27,7 @@ export function ManagedAttributesViewer({
   const managedAttributeValues = values
     ? toPairs(values).map(([key, mav]) => ({
         key,
-        value: mav.value || mav.assignedValue
+        value: typeof mav === "string" ? mav : mav?.value || mav?.assignedValue
       }))
     : [];
 

@@ -1,6 +1,6 @@
 {
   "name": "dina-ui",
-  "version": "0.45.0",
+  "version": "0.46.0",
   "scripts": {
     "build": "run-s next:build next:export",
     "dev": "next",
@@ -22,13 +22,13 @@
     "common-ui": "link:../common-ui",
     "coordinate-parser": "^1.0.7",
     "moment": "^2.27.0",
-    "next-transpile-modules": "^4.1.0",
+    "next-transpile-modules": "^7.1.2",
     "react-dnd-cjs": "^9.4.0",
     "react-dnd-html5-backend-cjs": "^9.4.0",
     "react-dropzone-uploader": "^2.11.0",
     "react-file-viewer": "^1.2.1",
-    "react-switch": "^5.0.1",
-    "react-tabs": "^3.0.0"
+    "react-switch": "^6.0.0",
+    "react-tabs": "^3.2.2"
   },
   "devDependencies": {
     "@types/bytes": "^3.1.0"
