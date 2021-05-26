@@ -88,7 +88,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         title={formatMessage("metadataManagedAttributesLabel")}
       >
         <ManagedAttributesViewer
-          values={metadata.managedAttributeMap?.values}
+          values={metadata.managedAttributeValues}
           managedAttributeApiPath={id =>
             `objectstore-api/managed-attribute/${id}`
           }

@@ -304,6 +304,7 @@ describe("Material Sample Edit Page", () => {
               group: "test group",
               dwcCatalogNumber: "edited-catalog-number",
               collectingEvent: { id: "1", type: "collecting-event" },
+              preparationType: { id: null, type: "preparation-type" },
               relationships: {}
             },
             type: "material-sample"
@@ -388,6 +389,7 @@ describe("Material Sample Edit Page", () => {
               group: "test group",
               id: "1",
               type: "material-sample",
+              preparationType: { id: null, type: "preparation-type" },
               relationships: {}
             },
             type: "material-sample"

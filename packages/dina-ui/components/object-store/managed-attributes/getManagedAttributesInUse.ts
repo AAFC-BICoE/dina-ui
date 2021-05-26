@@ -9,7 +9,12 @@ import {
  * Initializes the editable managed attributes based on what attributes are set on the metadatas.
  */
 export async function getManagedAttributesInUse(
-  managedAttributeMaps: (ManagedAttributeValues | null | undefined)[],
+  managedAttributeMaps: (
+    | ManagedAttributeValues
+    | Record<string, string | undefined | null>
+    | null
+    | undefined
+  )[],
   bulkGet: ApiClientI["bulkGet"],
   {
     apiBaseUrl = "/objectstore-api",

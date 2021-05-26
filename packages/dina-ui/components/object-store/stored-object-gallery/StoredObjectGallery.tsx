@@ -73,16 +73,15 @@ function GalleryItem({
   metadata,
   onSelectPreviewMetadataId
 }: GalleryItemProps) {
-  const { id, acCaption } = metadata;
+  const { id, acCaption, originalFilename } = metadata;
 
   const fileId = `${metadata.fileIdentifier}/thumbnail`;
   const filePath = `/api/objectstore-api/file/${metadata.bucket}/${fileId}`;
 
   const { formatMessage } = useDinaIntl();
-  // fileExtension should always be available when getting the Metadata from the back-end:
-  const fileType = (metadata.fileExtension as string)
-    .replace(/\./, "")
-    .toLowerCase();
+
+  /** The link text to display in the gallery item under the image. */
+  const linkText = acCaption || originalFilename || id;
 
   return (
     <div
@@ -107,9 +106,9 @@ function GalleryItem({
             whiteSpace: "nowrap",
             width: "100%"
           }}
-          title={acCaption}
+          title={linkText}
         >
-          {acCaption}
+          {linkText}
         </a>
       </Link>
       <div className="row">

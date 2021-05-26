@@ -68,9 +68,9 @@ export function CollectingEventFormLayout({
   // Open the tab with the Primary geoassertion even if it's not the first one.
   // Defaults to 0 if there's no primary assertion.
   const intialPrimaryAssertionIndex = clamp(
-    (initialValues as Partial<CollectingEvent>).geoReferenceAssertions?.findIndex(
-      assertion => assertion?.isPrimary
-    ) ?? 0,
+    (
+      initialValues as Partial<CollectingEvent>
+    ).geoReferenceAssertions?.findIndex(assertion => assertion?.isPrimary) ?? 0,
     0,
     Infinity
   );
@@ -140,7 +140,7 @@ export function CollectingEventFormLayout({
       `${geographicPlaceSourceUrl}osmtype=${osmTypeForSearch}&osmid=${result.osm_id}`
     );
     formik.setFieldValue(
-      `${commonSrcDetailRoot}.geographicPlaceNameSource`,
+      "geographicPlaceNameSource",
       GeographicPlaceNameSource.OSM
     );
 
@@ -704,7 +704,8 @@ export function CollectingEventFormLayout({
                         renderUnderSearchBar={
                           <Field>
                             {({ form: { values: formState } }) => {
-                              const colEvent: Partial<CollectingEvent> = formState;
+                              const colEvent: Partial<CollectingEvent> =
+                                formState;
                               const activeAssertion =
                                 colEvent.geoReferenceAssertions?.[activeTabIdx];
 
@@ -713,7 +714,8 @@ export function CollectingEventFormLayout({
                               const decimalLon =
                                 activeAssertion?.dwcDecimalLongitude;
 
-                              const hasVerbatimLocality = !!colEvent.dwcVerbatimLocality;
+                              const hasVerbatimLocality =
+                                !!colEvent.dwcVerbatimLocality;
                               const hasDecimalCoords = !!(
                                 decimalLat && decimalLon
                               );

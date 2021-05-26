@@ -10,6 +10,7 @@ import {
   filterBy,
   FormikButton,
   ResourceSelectField,
+  StringArrayField,
   SubmitButton,
   TextField,
   useAccount,
@@ -20,7 +21,7 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { cloneDeep } from "lodash";
+import { cloneDeep, isEmpty } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import {
@@ -126,10 +127,8 @@ export function MaterialSampleForm({
     !!materialSample?.collectingEvent
   );
 
-  const hasCatalogueInfo =
-    !!materialSample?.dwcCatalogNumber || !!materialSample?.preparationType;
-  const [enableCatalogueInfo, setEnableCatalogueInfo] =
-    useState(hasCatalogueInfo);
+  const hasPreparations = !!materialSample?.preparationType;
+  const [enablePreparations, setEnablePreparations] = useState(hasPreparations);
 
   /** YYYY-MM-DD format. */
   const todayDate = new Date().toISOString().slice(0, 10);
@@ -153,7 +152,8 @@ export function MaterialSampleForm({
   const {
     collectingEventInitialValues,
     saveCollectingEvent,
-    attachedMetadatasUI: colEventAttachmentsUI
+    attachedMetadatasUI: colEventAttachmentsUI,
+    collectingEventFormSchema
   } = useCollectingEventSave(colEventQuery.response?.data);
 
   const {
@@ -163,7 +163,8 @@ export function MaterialSampleForm({
     initialMetadatas:
       materialSample?.attachment as PersistedResource<Metadata>[],
     deps: [materialSample?.id],
-    title: <DinaMessage id="materialSampleAttachments" />
+    title: <DinaMessage id="materialSampleAttachments" />,
+    id: "material-sample-attachments-section"
   });
 
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
@@ -203,6 +204,7 @@ export function MaterialSampleForm({
 
   async function onSubmit({
     api: { save },
+    formik,
     submittedValues
   }: DinaFormSubmitParams<InputResource<MaterialSample>>) {
     // Init relationships object for one-to-many relations:
@@ -211,9 +213,19 @@ export function MaterialSampleForm({
     /** Input to submit to the back-end API. */
     const { ...materialSampleInput } = submittedValues;
 
-    // Only persist the dwcCatalogNumber if CatalogueInfo is enabled:
-    if (!enableCatalogueInfo) {
-      materialSampleInput.dwcCatalogNumber = null;
+    if (
+      !materialSampleInput.materialSampleName?.trim() &&
+      !materialSampleInput.dwcCatalogNumber?.trim()
+    ) {
+      throw new Error(formatMessage("materialSampleIdOrCatalogNumberRequired"));
+    }
+
+    // Only persist the preparation type if the preparations toggle is enabled:
+    if (!enablePreparations) {
+      materialSampleInput.preparationType = {
+        id: null,
+        type: "preparation-type"
+      };
     }
 
     if (!enableCollectingEvent) {
@@ -223,9 +235,16 @@ export function MaterialSampleForm({
         type: "collecting-event"
       };
     } else if (colEventFormRef.current) {
+      // Return if the Collecting Event sub-form has errors:
+      const colEventErrors = await colEventFormRef.current.validateForm();
+      if (!isEmpty(colEventErrors)) {
+        formik.setErrors({ ...formik.errors, ...colEventErrors });
+        return;
+      }
+
       // Save the linked CollectingEvent if included:
       const submittedCollectingEvent = cloneDeep(
-        colEventFormRef.current?.values
+        colEventFormRef.current.values
       );
       // Use the same save method as the Collecting Event page:
       const savedCollectingEvent = await saveCollectingEvent(
@@ -281,6 +300,7 @@ export function MaterialSampleForm({
     <DinaForm
       innerRef={colEventFormRef}
       initialValues={collectingEventInitialValues}
+      validationSchema={collectingEventFormSchema}
     >
       <CollectingEventFormLayout />
       <div className="form-group">{colEventAttachmentsUI}</div>
@@ -306,14 +326,17 @@ export function MaterialSampleForm({
               <a href="#material-sample-section" className="list-group-item">
                 <DinaMessage id="materialSample" />
               </a>
+              <a href="#identifiers-section" className="list-group-item">
+                <DinaMessage id="identifiers" />
+              </a>
               {enableCollectingEvent && (
                 <a href="#collecting-event-section" className="list-group-item">
                   <DinaMessage id="collectingEvent" />
                 </a>
               )}
-              {enableCatalogueInfo && (
-                <a href="#catalogue-info-section" className="list-group-item">
-                  <DinaMessage id="catalogueInfo" />
+              {enablePreparations && (
+                <a href="#preparations-section" className="list-group-item">
+                  <DinaMessage id="preparations" />
                 </a>
               )}
               <a
@@ -326,7 +349,8 @@ export function MaterialSampleForm({
           </nav>
         </div>
         <div className="flex-grow-1 container-fluid">
-          <MaterialSampleFormLayout />
+          <MaterialSampleMainInfoFormLayout />
+          <MaterialSampleIdentifiersFormLayout />
           <FieldSet legend={<DinaMessage id="components" />}>
             <div className="row">
               <label className="enable-collecting-event d-flex align-items-center font-weight-bold col-sm-3">
@@ -343,13 +367,13 @@ export function MaterialSampleForm({
               <label className="enable-catalogue-info d-flex align-items-center font-weight-bold col-sm-3">
                 <Switch
                   className="mx-2"
-                  checked={enableCatalogueInfo}
+                  checked={enablePreparations}
                   onChange={dataComponentToggler(
-                    setEnableCatalogueInfo,
-                    formatMessage("catalogueInfo")
+                    setEnablePreparations,
+                    formatMessage("preparations")
                   )}
                 />
-                <DinaMessage id="catalogueInfo" />
+                <DinaMessage id="preparations" />
               </label>
             </div>
           </FieldSet>
@@ -413,12 +437,10 @@ export function MaterialSampleForm({
                 </TabPanel>
               </Tabs>
             </FieldSet>
-            <CatalogueInfoFormLayout
-              className={enableCatalogueInfo ? "" : "d-none"}
+            <PreparationsFormLayout
+              className={enablePreparations ? "" : "d-none"}
             />
-            <div id="material-sample-attachments-section">
-              {materialSampleAttachmentsUI}
-            </div>
+            {materialSampleAttachmentsUI}
           </div>
         </div>
       </div>
@@ -427,15 +449,35 @@ export function MaterialSampleForm({
   );
 }
 
-/** Fields layout re-useable between view and edit pages. */
-export function MaterialSampleFormLayout() {
+export function MaterialSampleMainInfoFormLayout() {
   return (
-    <div id="material-sample-section" className="row">
-      <div className="col-md-6">
-        <GroupSelectField name="group" enableStoredDefaultGroup={true} />
-        <TextField name="materialSampleName" />
+    <div id="material-sample-section">
+      <div className="row">
+        <div className="col-md-6">
+          <GroupSelectField name="group" enableStoredDefaultGroup={true} />
+        </div>
       </div>
     </div>
+  );
+}
+
+/** Fields layout re-useable between view and edit pages. */
+export function MaterialSampleIdentifiersFormLayout() {
+  return (
+    <FieldSet
+      id="identifiers-section"
+      legend={<DinaMessage id="identifiers" />}
+    >
+      <div className="row">
+        <div className="col-md-6">
+          <TextField name="materialSampleName" />
+          <TextField name="dwcCatalogNumber" />
+        </div>
+        <div className="col-md-6">
+          <StringArrayField name="otherIds" readOnly={true} />
+        </div>
+      </div>
+    </FieldSet>
   );
 }
 
@@ -443,37 +485,30 @@ export interface CatalogueInfoFormLayoutProps {
   className?: string;
 }
 
-export function CatalogueInfoFormLayout({
+export function PreparationsFormLayout({
   className
 }: CatalogueInfoFormLayoutProps) {
   return (
     <FieldSet
       className={className}
-      id="catalogue-info-section"
-      legend={<DinaMessage id="catalogueInfo" />}
+      id="preparations-section"
+      legend={<DinaMessage id="preparations" />}
     >
       <div className="row">
         <div className="col-md-6">
-          <FieldSet legend={<DinaMessage id="preparation" />} horizontal={true}>
-            <ResourceSelectField<PreparationType>
-              name="preparationType"
-              filter={filterBy(["name"])}
-              model="collection-api/preparation-type"
-              optionLabel={it => it.name}
-              readOnlyLink="/collection/preparation-type/view?id="
-            />
-            <DinaFormSection
-              readOnly={true} // Disabled until back-end supports these fields.
-            >
-              <TextField name="preparedBy" />
-              <DateField name="datePrepared" />
-            </DinaFormSection>
-          </FieldSet>
-        </div>
-        <div className="col-md-6">
-          <FieldSet legend={<DinaMessage id="catalogueInfo" />}>
-            <TextField name="dwcCatalogNumber" />
-          </FieldSet>
+          <ResourceSelectField<PreparationType>
+            name="preparationType"
+            filter={filterBy(["name"])}
+            model="collection-api/preparation-type"
+            optionLabel={it => it.name}
+            readOnlyLink="/collection/preparation-type/view?id="
+          />
+          <DinaFormSection
+            readOnly={true} // Disabled until back-end supports these fields.
+          >
+            <TextField name="preparedBy" />
+            <DateField name="datePrepared" />
+          </DinaFormSection>
         </div>
       </div>
     </FieldSet>
