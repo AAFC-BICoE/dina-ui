@@ -33,7 +33,6 @@ import {
 } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import * as yup from "yup";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import {
   CollectingEventFormLayout,
@@ -298,7 +297,7 @@ export function MaterialSampleForm({
         entityId={materialSample?.id}
         entityLink="/collection/material-sample"
       />
-      <SubmitButton className="ml-auto" />
+      <SubmitButton className="ms-auto" />
     </ButtonBar>
   );
 
@@ -311,7 +310,7 @@ export function MaterialSampleForm({
       validationSchema={collectingEventFormSchema}
     >
       <CollectingEventFormLayout />
-      <div className="form-group">{colEventAttachmentsUI}</div>
+      <div className="mb-3">{colEventAttachmentsUI}</div>
     </DinaForm>
   ) : (
     <>

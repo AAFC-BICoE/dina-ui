@@ -512,7 +512,7 @@ export function CollectingEventFormLayout({
                       <div
                         className={
                           hasDegree || hasMinute || hasSecond
-                            ? "form-group"
+                            ? "mb-3"
                             : "d-none"
                         }
                       >
@@ -802,8 +802,8 @@ export function CollectingEventFormLayout({
                                 hasVerbatimLocality || hasDecimalCoords;
 
                               return hasAnyLocation ? (
-                                <div className="form-group d-flex flex-row align-items-center">
-                                  <div className="pr-3">
+                                <div className="mb-3 d-flex flex-row align-items-center">
+                                  <div className="pe-3">
                                     <DinaMessage id="search" />:
                                   </div>
                                   <FormikButton
@@ -888,7 +888,7 @@ export function CollectingEventFormLayout({
         </div>
       )}
       {readOnly && (
-        <div className="form-group">
+        <div className="mb-3">
           <Field name="id">
             {({ field: { value: id } }) => (
               <AttachmentReadOnlySection

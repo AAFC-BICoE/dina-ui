@@ -140,7 +140,7 @@ export function GeoReferenceAssertionRow({
           <ViewInMapButton assertionPath={`geoReferenceAssertions.${index}`} />
         )}
         {!viewOnly && !isTemplate && (
-          <div className="form-group">
+          <div className="mb-3">
             <FormikButton
               className="btn btn-primary primary-assertion-button"
               buttonProps={ctx => {
@@ -264,7 +264,7 @@ export const ViewInMapButton = connect<{ assertionPath: string }>(
     const showButton = typeof lat === "number" && typeof lon === "number";
 
     return showButton ? (
-      <div className="form-group">
+      <div className="mb-3">
         <a
           href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}`}
           target="_blank"

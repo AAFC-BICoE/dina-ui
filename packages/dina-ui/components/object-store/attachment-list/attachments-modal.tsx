@@ -115,7 +115,7 @@ export function useAttachmentsModal({
         ) : (
           <>
             {selectedMetadatas.length ? (
-              <div className="form-group">
+              <div className="mb-3">
                 <ReactTable
                   columns={[
                     ...[
@@ -128,11 +128,10 @@ export function useAttachmentsModal({
                       Header: <FieldHeader name={accessor} />
                     })),
                     {
-                      // tslint:disable-next-line
-                      Cell: ({ original: { id } }) => (
+                      Cell: ({ original: { id: mId } }) => (
                         <button
                           className="btn btn-dark"
-                          onClick={() => removeMetadata(id)}
+                          onClick={() => removeMetadata(mId)}
                           type="button"
                         >
                           <DinaMessage id="remove" />
