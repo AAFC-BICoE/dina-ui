@@ -447,6 +447,7 @@ export function MaterialSampleForm({
           </FieldSet>
           <PreparationsFormLayout
             className={enablePreparations ? "" : "d-none"}
+            isTemplate={isTemplate}
           />
           {materialSampleAttachmentsUI}
         </div>
