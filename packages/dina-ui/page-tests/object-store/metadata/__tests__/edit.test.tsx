@@ -239,20 +239,17 @@ describe("Metadata bulk edit page", () => {
 
     expect(columns).toEqual([
       {
-        data:
-          "metadata.managedAttributeValues.83748696-62b3-4db6-99cc-e4f546e7ecd7",
+        data: "metadata.managedAttributeValues.83748696-62b3-4db6-99cc-e4f546e7ecd7",
         source: ["Holotype", "Paratype", "Syntype"],
         title: "SpecimenID",
         type: "dropdown"
       },
       {
-        data:
-          "metadata.managedAttributeValues.83748696-62b3-4db6-99cc-e4f546e7ecd7",
+        data: "metadata.managedAttributeValues.83748696-62b3-4db6-99cc-e4f546e7ecd7",
         title: "Type Status"
       },
       {
-        data:
-          "metadata.managedAttributeValues.83748696-62b3-4db6-99cc-e4f546e7ecd7",
+        data: "metadata.managedAttributeValues.83748696-62b3-4db6-99cc-e4f546e7ecd7",
         title: "Scientific Name"
       }
     ]);

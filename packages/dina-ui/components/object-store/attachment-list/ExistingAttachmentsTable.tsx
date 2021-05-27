@@ -130,13 +130,13 @@ export function ExistingAttachmentsTable({
       initialValues={{ selectedMetadatas: {} }}
     >
       <div className="list-inline" style={{ minHeight: "3rem" }}>
-        <div className="float-left">
+        <div className="float-start">
           {detachTotalSelected && <DetachedTotalSelected />}
         </div>
-        <div className="float-right">
+        <div className="float-end">
           <FormikButton
             buttonProps={bulkButtonProps}
-            className="btn btn-primary ml-2 metadata-bulk-edit-button"
+            className="btn btn-primary ms-2 metadata-bulk-edit-button"
             onClick={editSelectedMetadatas}
           >
             <DinaMessage id="editSelectedAttachmentMetadata" />
@@ -144,7 +144,7 @@ export function ExistingAttachmentsTable({
           {onDetachMetadataIds && (
             <FormikButton
               buttonProps={bulkButtonProps}
-              className="btn btn-primary ml-2 metadata-detach-button"
+              className="btn btn-primary ms-2 metadata-detach-button"
               onClick={detachSelectedMetadatas}
             >
               <DinaMessage id="detachSelectedButtonText" />

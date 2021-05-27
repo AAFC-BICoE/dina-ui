@@ -47,12 +47,12 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         byPassView={true}
       />
       <EditButton
-        className="ml-auto"
+        className="ms-auto"
         entityId={id as string}
         entityLink="collection/material-sample"
       />
       <DeleteButton
-        className="ml-5"
+        className="ms-5"
         id={id as string}
         options={{ apiBaseUrl: "/collection-api" }}
         postDeleteRedirect="/collection/material-sample/list"
@@ -82,7 +82,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               {collectingEvent && (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                   <DinaForm initialValues={collectingEvent} readOnly={true}>
-                    <div className="form-group d-flex justify-content-end align-items-center">
+                    <div className="mb-3 d-flex justify-content-end align-items-center">
                       <Link
                         href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
                       >
@@ -96,7 +96,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 </FieldSet>
               )}
               {hasPreparations && <PreparationsFormLayout />}
-              <div className="form-group">
+              <div className="mb-3">
                 <Field name="id">
                   {({ field: { value: materialSampleId } }) => (
                     <AttachmentReadOnlySection

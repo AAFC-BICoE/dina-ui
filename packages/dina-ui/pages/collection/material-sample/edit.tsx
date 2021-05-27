@@ -164,7 +164,8 @@ export function MaterialSampleForm({
     attachedMetadatasUI: materialSampleAttachmentsUI,
     selectedMetadatas
   } = useAttachmentsModal({
-    initialMetadatas: materialSample?.attachment as PersistedResource<Metadata>[],
+    initialMetadatas:
+      materialSample?.attachment as PersistedResource<Metadata>[],
     deps: [materialSample?.id],
     title: <DinaMessage id="materialSampleAttachments" />,
     isTemplate,
@@ -381,7 +382,7 @@ export function MaterialSampleForm({
                 />
                 <DinaMessage id="collectingEvent" />
               </label>
-              <label className="enable-catalogue-info d-flex align-items-center font-weight-bold col-sm-3">
+              <label className="enable-catalogue-info d-flex align-items-center fw-bold col-sm-3">
                 <Switch
                   className="mx-2"
                   checked={enablePreparations}
@@ -435,7 +436,7 @@ export function MaterialSampleForm({
                                 </a>
                               </Link>
                               <FormikButton
-                                className="btn btn-danger detach-collecting-event-button ml-5"
+                                className="btn btn-danger detach-collecting-event-button ms-5"
                                 onClick={() => setColEventId(null)}
                               >
                                 <DinaMessage id="detachCollectingEvent" />

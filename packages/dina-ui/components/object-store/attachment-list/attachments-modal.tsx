@@ -6,8 +6,8 @@ import {
   useModal,
   useQuery
 } from "common-ui";
-import { PersistedResource } from "kitsu";
 import { uniqBy } from "lodash";
+import { PersistedResource } from "kitsu";
 import { useEffect, useState } from "react";
 import ReactTable from "react-table";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -43,9 +43,8 @@ export function useAttachmentsModal({
   const { closeModal, openModal } = useModal();
   const { bulkGet } = useApiClient();
 
-  const [selectedMetadatas, setSelectedMetadatas] = useState<Metadata[]>(
-    initialMetadatas
-  );
+  const [selectedMetadatas, setSelectedMetadatas] =
+    useState<Metadata[]>(initialMetadatas);
   useEffect(() => {
     setSelectedMetadatas(initialMetadatas);
   }, deps);

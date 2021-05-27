@@ -138,8 +138,7 @@ describe("Metadata single record edit page.", () => {
       .last()
       .simulate("change", {
         target: {
-          name:
-            "managedAttributeMap.values.39558b3c-02e9-476e-a9c8-7946f8bbff63.value",
+          name: "managedAttributeMap.values.39558b3c-02e9-476e-a9c8-7946f8bbff63.value",
           value: "new-managed-attribute-value"
         }
       });

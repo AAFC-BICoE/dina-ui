@@ -377,10 +377,12 @@ a.btn,
 }
 
 .btn-info {
+  color: white;
   background-color: #117c8d;
   border-color: #117c8d;
 }
 .btn-info:hover {
+  color: white;
   background-color: #18666d;
   border-color: #18666d;
 }

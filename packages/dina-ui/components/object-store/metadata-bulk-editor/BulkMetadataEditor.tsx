@@ -126,9 +126,8 @@ export function BulkMetadataEditor({
       for (const defaultValue of defaultValues.filter(
         ({ type }) => type === "metadata"
       )) {
-        metadataDefaults[
-          defaultValue.attribute as keyof Metadata
-        ] = defaultValue.value as any;
+        metadataDefaults[defaultValue.attribute as keyof Metadata] =
+          defaultValue.value as any;
       }
 
       const newMetadatas = objectUploads.map<Metadata>(objectUpload => ({
@@ -322,7 +321,7 @@ export function BulkMetadataEditor({
       <h1>
         <DinaMessage id="metadataBulkEditTitle" />
       </h1>
-      <div className="form-group">
+      <div className="mb-3">
         <DinaForm<MetadataEditorControls>
           enableReinitialize={true}
           initialValues={initialFormControls}
@@ -342,7 +341,7 @@ export function BulkMetadataEditor({
                 <MetadataEditorAttributesControls
                   builtInAttributes={BUILT_IN_ATTRIBUTES_COLUMNS}
                 />
-                <div className="form-group">
+                <div className="mb-3">
                   <AddPersonButton />
                   <Tooltip id="addPersonPopupTooltip" />
                 </div>

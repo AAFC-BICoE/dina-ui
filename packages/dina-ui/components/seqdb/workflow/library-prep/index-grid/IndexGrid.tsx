@@ -22,11 +22,8 @@ export function IndexGrid(props: IndexGridProps) {
 
   const { containerType, indexSet } = libraryPrepBatch;
 
-  const {
-    libraryPrepsLoading,
-    libraryPrepsResponse,
-    onSubmit
-  } = useIndexGridControls(props);
+  const { libraryPrepsLoading, libraryPrepsResponse, onSubmit } =
+    useIndexGridControls(props);
 
   if (libraryPrepsLoading) {
     return <LoadingSpinner loading={true} />;
@@ -140,7 +137,7 @@ export function IndexGrid(props: IndexGridProps) {
             }
           `}</style>
         <div style={{ height: "50px" }}>
-          <div className="float-right">
+          <div className="float-end">
             <SubmitButton />
           </div>
         </div>

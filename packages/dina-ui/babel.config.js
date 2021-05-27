@@ -5,12 +5,5 @@ module.exports = function (api) {
 
   const presets = [nextPreset];
 
-  if (process.env["ENV"] !== "test") {
-    nextPreset.push({
-      useBuiltIns: "usage",
-      targets: { ie: "11" },
-    });
-  }
-
   return { presets };
 };

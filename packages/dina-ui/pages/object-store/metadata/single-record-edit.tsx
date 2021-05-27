@@ -161,14 +161,14 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
   const buttonBar = (
     <ButtonBar>
       <BackButton entityId={id as string} entityLink="/object-store/object" />
-      <SubmitButton className="ml-auto" />
+      <SubmitButton className="ms-auto" />
     </ButtonBar>
   );
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       {buttonBar}
-      <div className="form-group">
+      <div className="mb-3">
         <MetadataFileView metadata={metadata} imgHeight="15rem" />
       </div>
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
