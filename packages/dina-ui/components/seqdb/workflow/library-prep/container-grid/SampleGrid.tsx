@@ -76,7 +76,7 @@ export function SampleGrid(props: ContainerGridProps) {
               </li>
             ))}
           </ul>
-          <div className="float-right list-inline">
+          <div className="float-end list-inline">
             <button
               className="btn btn-dark list-inline-item grid-clear"
               onClick={clearGrid}

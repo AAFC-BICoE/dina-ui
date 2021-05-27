@@ -18,7 +18,7 @@ export function FieldSet({
 }: FieldSetProps) {
   return (
     <fieldset
-      className={`form-group border card px-4 py-2 ${className ?? ""}`}
+      className={`mb-3 border card px-4 py-2 ${className ?? ""}`}
       id={id}
     >
       <legend className="w-auto">{legend}</legend>

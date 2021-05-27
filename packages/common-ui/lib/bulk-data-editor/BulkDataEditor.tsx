@@ -55,11 +55,8 @@ export function BulkDataEditor<TRow>({
 
   // Client-side validation errors caught by the handsontable's built-in error catching.
   // These should prevent submission of the table:
-  const {
-    hasValidationErrors,
-    afterValidate,
-    validationAlertJsx
-  } = useBulkEditorFrontEndValidation();
+  const { hasValidationErrors, afterValidate, validationAlertJsx } =
+    useBulkEditorFrontEndValidation();
 
   const { tableWrapperRef } = useHeaderWidthFix({ columns });
 
@@ -143,7 +140,7 @@ export function BulkDataEditor<TRow>({
       `}</style>
       {validationAlertJsx}
       <div
-        className="form-group"
+        className="mb-3"
         // Setting the width/height and overflowX:hidden here is detected by Handsontable and enables horizontal scrolling:
         style={{
           height: "100%",

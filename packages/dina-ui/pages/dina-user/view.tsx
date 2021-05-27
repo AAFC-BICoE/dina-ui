@@ -51,7 +51,7 @@ export default function DinaUserDetailsPage() {
             <BackButton entityLink="/dina-user" />
             {currentUserCanEdit && (
               <EditButton
-                className="ml-auto"
+                className="ms-auto"
                 entityId={id as string}
                 entityLink="dina-user"
               />
@@ -62,7 +62,7 @@ export default function DinaUserDetailsPage() {
           </h1>
           <DinaForm<DinaUser> initialValues={dinaUser}>
             <div>
-              <div className="form-group">
+              <div className="mb-3">
                 <div className="row">
                   <FieldView className="col-md-3" name="username" />
                   <FieldView

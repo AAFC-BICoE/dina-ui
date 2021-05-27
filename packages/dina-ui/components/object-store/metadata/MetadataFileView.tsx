@@ -65,7 +65,7 @@ export function MetadataFileView({
 
   return (
     <div>
-      <div className="form-group">
+      <div className="mb-3">
         <FileView
           clickToDownload={true}
           filePath={filePath}
@@ -76,14 +76,14 @@ export function MetadataFileView({
       </div>
       <div className="container">
         {imgTypeText && (
-          <div className="form-group shown-file-type">
+          <div className="mb-3 shown-file-type">
             <strong>
               <DinaMessage id="showing" />:
             </strong>
             {` ${formatMessage(imgTypeText)}`}
           </div>
         )}
-        <div className="form-group metadata-caption">
+        <div className="mb-3 metadata-caption">
           <strong>
             <DinaMessage id="field_acCaption" />:
           </strong>

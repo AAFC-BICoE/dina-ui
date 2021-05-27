@@ -149,7 +149,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           </a>
         </Link>
         <DeleteButton
-          className="ml-5"
+          className="ms-5"
           id={id}
           options={{ apiBaseUrl: "/objectstore-api" }}
           postDeleteRedirect="/object-store/managedAttributesView/listView"

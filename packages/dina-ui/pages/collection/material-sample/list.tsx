@@ -60,7 +60,7 @@ export default function MaterialSampleListPage() {
             path: "collection-api/material-sample"
           }}
           filterFormchildren={({ submitForm }) => (
-            <div className="form-group">
+            <div className="mb-3">
               <div style={{ width: "300px" }}>
                 <GroupSelectField
                   onChange={() => setImmediate(submitForm)}

@@ -88,7 +88,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         title={formatMessage("metadataManagedAttributesLabel")}
       >
         <ManagedAttributesViewer
-          values={metadata.managedAttributeMap?.values}
+          values={metadata.managedAttributeValues}
           managedAttributeApiPath={id =>
             `objectstore-api/managed-attribute/${id}`
           }
@@ -186,7 +186,7 @@ interface MetadataTagsProps {
 
 function MetadataTags({ tags }: MetadataTagsProps) {
   return (
-    <div className="form-group">
+    <div className="mb-3">
       <h4>
         <DinaMessage id="metadataTagsLabel" />
       </h4>
@@ -228,7 +228,7 @@ function CollapsableSection({
   );
 
   return (
-    <div className="form-group">
+    <div className="mb-3">
       <h4>
         {title}
         <Collapser />

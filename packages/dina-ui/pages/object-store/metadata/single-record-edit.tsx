@@ -2,7 +2,6 @@ import {
   BackButton,
   ButtonBar,
   DateField,
-  DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
   FieldSet,
@@ -16,6 +15,7 @@ import {
   withResponse
 } from "common-ui";
 import { useFormikContext } from "formik";
+import { keys } from "lodash";
 import { NextRouter, useRouter } from "next/router";
 import { Head, Nav } from "../../../components";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
@@ -51,7 +51,7 @@ export default function MetadataEditPage() {
             <Query<Metadata>
               query={{
                 path: `objectstore-api/metadata/${id}`,
-                include: "managedAttributeMap,dcCreator,derivatives"
+                include: "dcCreator,derivatives"
               }}
               options={{
                 joinSpecs: [
@@ -114,10 +114,8 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
       // Don't include derivatives in the form submission:
       derivatives,
       license,
-      managedAttributeMap,
       ...metadataValues
     } = submittedValues;
-    delete managedAttributeMap.id;
 
     if (license) {
       const selectedLicense = license?.id
@@ -139,15 +137,19 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
       acTags: acTags.split(",").map(tag => tag.trim())
     };
 
+    // Remove blank managed attribute values from the map:
+    const blankValues: any[] = ["", null];
+    for (const maKey of keys(metadataEdit?.managedAttributeValues)) {
+      if (blankValues.includes(metadataEdit?.managedAttributeValues?.[maKey])) {
+        delete metadataEdit?.managedAttributeValues?.[maKey];
+      }
+    }
+
     await save(
       [
         {
           resource: metadataEdit,
           type: "metadata"
-        },
-        {
-          resource: { ...managedAttributeMap, metadata },
-          type: "managed-attribute-map"
         }
       ],
       { apiBaseUrl: "/objectstore-api" }
@@ -159,14 +161,14 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
   const buttonBar = (
     <ButtonBar>
       <BackButton entityId={id as string} entityLink="/object-store/object" />
-      <SubmitButton className="ml-auto" />
+      <SubmitButton className="ms-auto" />
     </ButtonBar>
   );
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       {buttonBar}
-      <div className="form-group">
+      <div className="mb-3">
         <MetadataFileView metadata={metadata} imgHeight="15rem" />
       </div>
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
@@ -229,9 +231,10 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
         <div className="row">
           <div className="col-sm-6">
             <ManagedAttributesEditor
-              valuesPath="managedAttributeMap.values"
+              valuesPath="managedAttributeValues"
               managedAttributeApiPath="objectstore-api/managed-attribute"
               apiBaseUrl="/objectstore-api"
+              managedAttributeKeyField="id"
             />
           </div>
         </div>

@@ -38,10 +38,6 @@ describe("Upload page", () => {
     const wrapper = mountWithAppContext(<UploadPage />, {
       accountContext: MOCK_ACCOUNT_CONTEXT
     });
-
-    expect(wrapper.find(FileUploader).prop("acceptedFileTypes")).toEqual(
-      "image/*,audio/*,video/*,.pdf,.doc,.docx,.png"
-    );
   });
 
   it("Uploads files when you click the Upload button", async () => {

@@ -174,7 +174,7 @@ export function GeographySearchBox({
 
   return (
     <div className="m-2">
-      <div className="d-flex form-group ">
+      <div className="d-flex mb-3 ">
         <label className="pt-2">
           <strong>
             <DinaMessage id="locationLabel" />
@@ -196,11 +196,11 @@ export function GeographySearchBox({
           />
         </div>
       </div>
-      <div className="form-group d-flex">
+      <div className="mb-3 d-flex">
         <button
           style={{ width: "10rem" }}
           onClick={doSearch}
-          className="btn btn-primary ml-auto geo-search-button"
+          className="btn btn-primary ms-auto geo-search-button"
           type="button"
           disabled={suggestButtonIsDisabled}
         >

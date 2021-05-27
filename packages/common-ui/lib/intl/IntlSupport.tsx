@@ -1,5 +1,4 @@
 import { useLocalStorage } from "@rehooks/local-storage";
-import { PrimitiveType } from "intl-messageformat";
 import { createContext, useContext, useEffect, useMemo } from "react";
 import {
   FormattedMessage as ReactFormattedMessage,
@@ -84,7 +83,7 @@ export function getIntlSupport<TMessages extends MessageDictionary>({
 
     function formatMessage(
       id: keyof TMessages & string,
-      values?: { [key: string]: PrimitiveType }
+      values?: { [key: string]: string | number | undefined | null }
     ) {
       return reactIntl.formatMessage({ defaultMessage: " ", id }, values);
     }

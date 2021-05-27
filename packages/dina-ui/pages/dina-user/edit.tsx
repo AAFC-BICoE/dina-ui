@@ -113,7 +113,7 @@ export function DinaUserForm({
           entityId={initialValues.id as string}
           entityLink="/dina-user"
         />
-        <SubmitButton className="ml-auto" />
+        <SubmitButton className="ms-auto" />
       </ButtonBar>
       <div>
         <div className="row">
