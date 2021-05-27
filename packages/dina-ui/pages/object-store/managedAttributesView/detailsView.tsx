@@ -36,7 +36,7 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title="Managed Attribute Details" />
       <Nav />
-      <main className="container-fluid">
+      <main className="container">
         {id ? (
           <div>
             <h1>
@@ -156,37 +156,23 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           type="managed-attribute"
         />
       </ButtonBar>
-      <div style={{ width: "25rem" }}>
-        <TextField name="name" />
+      <div className="row">
+        <TextField className="col-md-6" name="name" />
+        <TextField className="col-md-6" name="key" readOnly={true} />
       </div>
-      <div style={{ width: "70%" }}>
-        <TextField name="description.en" multiLines={true} />
-      </div>
-      <div style={{ width: "70%" }}>
-        <TextField name="description.fr" multiLines={true} />
-      </div>
-      <div style={{ width: "25rem" }}>
+      <TextField name="description.en" multiLines={true} />
+      <TextField name="description.fr" multiLines={true} />
+      <div className="row">
         <SelectField
+          className="col-md-6"
           name="managedAttributeType"
           options={ATTRIBUTE_TYPE_OPTIONS}
           onChange={(selectValue: ManagedAttributeType) => setType(selectValue)}
         />
       </div>
-      {type === "PICKLIST" && (
-        <div style={{ width: "25rem" }}>
-          <StringArrayField name="acceptedValues" />
-        </div>
-      )}
-      {id && (
-        <div style={{ width: "25rem" }}>
-          <DateField showTime={true} name="createdOn" disabled={true} />
-        </div>
-      )}
-      {id && (
-        <div style={{ width: "25rem" }}>
-          <TextField name="createdBy" readOnly={true} />
-        </div>
-      )}
+      {type === "PICKLIST" && <StringArrayField name="acceptedValues" />}
+      {id && <DateField showTime={true} name="createdOn" disabled={true} />}
+      {id && <TextField name="createdBy" readOnly={true} />}
     </DinaForm>
   );
 }

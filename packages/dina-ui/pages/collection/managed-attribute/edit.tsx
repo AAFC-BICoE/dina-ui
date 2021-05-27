@@ -39,7 +39,7 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage("managedAttributeEditTitle")} />
       <Nav />
-      <main className="container-fluid">
+      <main className="container">
         {id ? (
           <div>
             <h1>
@@ -153,29 +153,38 @@ function ManagedAttributeForm({
           </a>
         </Link>
       </ButtonBar>
-      <div style={{ width: "25rem" }}>
-        <TextField name="name" readOnly={id !== undefined} />
+      <div className="row">
+        <TextField
+          className="col-md-6"
+          name="name"
+          readOnly={id !== undefined}
+        />
+        <TextField className="col-md-6" name="key" readOnly={true} />
       </div>
-      <div style={{ width: "25rem" }}>
+      <div className="row">
         <SelectField
+          className="col-md-6"
           name="managedAttributeComponent"
           options={ATTRIBUTE_COMPONENT_OPTIONS}
         />
       </div>
-      <div style={{ width: "25rem" }}>
+      <div className="row">
         <SelectField
+          className="col-md-6"
           name="managedAttributeType"
           options={ATTRIBUTE_TYPE_OPTIONS}
           onChange={(selectValue: ManagedAttributeType) => setType(selectValue)}
         />
       </div>
       {type === "PICKLIST" && (
-        <div style={{ width: "25rem" }}>
-          <StringArrayField name="acceptedValues" />
+        <div className="row">
+          <div className="col-md-6">
+            <StringArrayField name="acceptedValues" />
+          </div>
         </div>
       )}
       {id && (
-        <div style={{ width: "25rem" }}>
+        <div>
           <h4>
             <DinaMessage id="field_managedAttributeCreatedOn" />
           </h4>
@@ -188,7 +197,7 @@ function ManagedAttributeForm({
         </div>
       )}
       {id && (
-        <div style={{ width: "25rem" }}>
+        <div>
           <h4>
             <DinaMessage id="field_managedAttributeCreatedBy" />
           </h4>
