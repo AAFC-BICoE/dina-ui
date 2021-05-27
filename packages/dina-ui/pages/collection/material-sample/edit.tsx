@@ -113,11 +113,15 @@ export default function MaterialSampleEditPage() {
 export interface MaterialSampleFormProps {
   materialSample?: PersistedResource<MaterialSample>;
   onSaved?: (id: string) => Promise<void>;
+  isTemplate?: boolean;
+  materialSampleRef?: React.Ref<FormikProps<any>>;
 }
 
 export function MaterialSampleForm({
   materialSample,
-  onSaved
+  onSaved,
+  isTemplate,
+  materialSampleRef
 }: MaterialSampleFormProps) {
   const { username } = useAccount();
   const { openModal } = useModal();
@@ -154,7 +158,7 @@ export function MaterialSampleForm({
     saveCollectingEvent,
     attachedMetadatasUI: colEventAttachmentsUI,
     collectingEventFormSchema
-  } = useCollectingEventSave(colEventQuery.response?.data);
+  } = useCollectingEventSave(colEventQuery.response?.data, isTemplate);
 
   const {
     attachedMetadatasUI: materialSampleAttachmentsUI,
@@ -164,6 +168,9 @@ export function MaterialSampleForm({
       materialSample?.attachment as PersistedResource<Metadata>[],
     deps: [materialSample?.id],
     title: <DinaMessage id="materialSampleAttachments" />,
+    isTemplate,
+    allowNewFieldName: "materialSampleAllowNew",
+    allowExistingFieldName: "materialSampleAllowExisting",
     id: "material-sample-attachments-section"
   });
 
@@ -296,7 +303,8 @@ export function MaterialSampleForm({
   );
 
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */
-  const nestedCollectingEventForm = (
+  // Unwrap the DinaForm for template saving purpose
+  const nestedCollectingEventForm = !isTemplate ? (
     <DinaForm
       innerRef={colEventFormRef}
       initialValues={collectingEventInitialValues}
@@ -305,14 +313,20 @@ export function MaterialSampleForm({
       <CollectingEventFormLayout />
       <div className="mb-3">{colEventAttachmentsUI}</div>
     </DinaForm>
+  ) : (
+    <>
+      <CollectingEventFormLayout />
+      <div className="form-group">{colEventAttachmentsUI}</div>
+    </>
   );
-
   return (
     <DinaForm<InputResource<MaterialSample>>
       initialValues={initialValues}
       onSubmit={onSubmit}
+      isTemplate={isTemplate}
+      innerRef={materialSampleRef}
     >
-      {buttonBar}
+      {!isTemplate && buttonBar}
       <div className="d-flex">
         <div>
           <nav
@@ -323,12 +337,16 @@ export function MaterialSampleForm({
               <DinaMessage id="formNavigation" />
             </h4>
             <div className="list-group">
-              <a href="#material-sample-section" className="list-group-item">
-                <DinaMessage id="materialSample" />
-              </a>
-              <a href="#identifiers-section" className="list-group-item">
-                <DinaMessage id="identifiers" />
-              </a>
+              {!isTemplate && (
+                <a href="#material-sample-section" className="list-group-item">
+                  <DinaMessage id="materialSample" />
+                </a>
+              )}
+              {!isTemplate && (
+                <a href="#identifiers-section" className="list-group-item">
+                  <DinaMessage id="identifiers" />
+                </a>
+              )}
               {enableCollectingEvent && (
                 <a href="#collecting-event-section" className="list-group-item">
                   <DinaMessage id="collectingEvent" />
@@ -349,8 +367,8 @@ export function MaterialSampleForm({
           </nav>
         </div>
         <div className="flex-grow-1 container-fluid">
-          <MaterialSampleMainInfoFormLayout />
-          <MaterialSampleIdentifiersFormLayout />
+          {!isTemplate && <MaterialSampleMainInfoFormLayout />}
+          {!isTemplate && <MaterialSampleIdentifiersFormLayout />}
           <FieldSet legend={<DinaMessage id="components" />}>
             <div className="row">
               <label className="enable-collecting-event d-flex align-items-center fw-bold col-sm-3">
@@ -397,9 +415,11 @@ export function MaterialSampleForm({
                       <DinaMessage id="createNew" />
                     )}
                   </Tab>
-                  <Tab>
-                    <DinaMessage id="attachExisting" />
-                  </Tab>
+                  {!isTemplate && (
+                    <Tab>
+                      <DinaMessage id="attachExisting" />
+                    </Tab>
+                  )}
                 </TabList>
                 <TabPanel>
                   {
@@ -428,23 +448,26 @@ export function MaterialSampleForm({
                       : nestedCollectingEventForm
                   }
                 </TabPanel>
-                <TabPanel>
-                  <CollectingEventLinker
-                    onCollectingEventSelect={colEventToLink => {
-                      setColEventId(colEventToLink.id);
-                    }}
-                  />
-                </TabPanel>
+                {!isTemplate && (
+                  <TabPanel>
+                    <CollectingEventLinker
+                      onCollectingEventSelect={colEventToLink => {
+                        setColEventId(colEventToLink.id);
+                      }}
+                    />
+                  </TabPanel>
+                )}
               </Tabs>
             </FieldSet>
             <PreparationsFormLayout
               className={enablePreparations ? "" : "d-none"}
+              isTemplate={isTemplate}
             />
             {materialSampleAttachmentsUI}
           </div>
         </div>
       </div>
-      {buttonBar}
+      {!isTemplate && buttonBar}
     </DinaForm>
   );
 }
@@ -483,16 +506,19 @@ export function MaterialSampleIdentifiersFormLayout() {
 
 export interface CatalogueInfoFormLayoutProps {
   className?: string;
+  isTemplate?: boolean;
 }
 
 export function PreparationsFormLayout({
-  className
+  className,
+  isTemplate
 }: CatalogueInfoFormLayoutProps) {
   return (
     <FieldSet
       className={className}
       id="preparations-section"
       legend={<DinaMessage id="preparations" />}
+      isTemplate={isTemplate}
     >
       <div className="row">
         <div className="col-md-6">

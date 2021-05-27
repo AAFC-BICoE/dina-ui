@@ -59,9 +59,8 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     setAvailableItems: setLibraryPoolContents
   } = useGroupedCheckBoxes({ fieldName: "libraryPoolContentIdsToDelete" });
 
-  const [storedHideUsedItems, setHideUsedItems] = useLocalStorage(
-    HIDE_USED_ITEMS_KEY
-  );
+  const [storedHideUsedItems, setHideUsedItems] =
+    useLocalStorage(HIDE_USED_ITEMS_KEY);
   const hideUsedItems = storedHideUsedItems !== "false";
 
   const [nameFilter, setNameFilter] = useState<string>("");
@@ -80,41 +79,42 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     }`
   };
 
-  const LIBRARY_PREP_BATCH_TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch>[] = [
-    {
-      Header: "Name",
-      accessor: "name",
-      filterable: true
-    },
-    "dateUsed",
-    {
-      Cell: ({ original }) => {
-        const batch: LibraryPrepBatch = original;
-
-        return (
-          <div className="row" key={batch.id}>
-            <FormikButton
-              className="btn btn-primary btn-sm col-6 single-select-button"
-              onClick={async (_, formik) => {
-                await selectPooledItems([batch]);
-                formik.setFieldValue(
-                  `libraryPrepBatchIdsToSelect[${batch.id}]`,
-                  undefined
-                );
-              }}
-            >
-              Select
-            </FormikButton>
-            <div className="col-6">
-              <LibraryPrepBatchCheckBox resource={batch} />
-            </div>
-          </div>
-        );
+  const LIBRARY_PREP_BATCH_TABLE_COLUMNS: ColumnDefinition<LibraryPrepBatch>[] =
+    [
+      {
+        Header: "Name",
+        accessor: "name",
+        filterable: true
       },
-      Header: LibraryPrepBatchCheckBoxHeader,
-      sortable: false
-    }
-  ];
+      "dateUsed",
+      {
+        Cell: ({ original }) => {
+          const batch: LibraryPrepBatch = original;
+
+          return (
+            <div className="row" key={batch.id}>
+              <FormikButton
+                className="btn btn-primary btn-sm col-6 single-select-button"
+                onClick={async (_, formik) => {
+                  await selectPooledItems([batch]);
+                  formik.setFieldValue(
+                    `libraryPrepBatchIdsToSelect[${batch.id}]`,
+                    undefined
+                  );
+                }}
+              >
+                Select
+              </FormikButton>
+              <div className="col-6">
+                <LibraryPrepBatchCheckBox resource={batch} />
+              </div>
+            </div>
+          );
+        },
+        Header: LibraryPrepBatchCheckBoxHeader,
+        sortable: false
+      }
+    ];
 
   const LIBRARY_POOL_TABLE_COLUMNS: ColumnDefinition<LibraryPool>[] = [
     {
@@ -152,62 +152,63 @@ export function LibraryPoolingSelection(props: LibraryPoolingSelectionProps) {
     }
   ];
 
-  const LIBRARY_POOL_CONTENTS_TABLE_COLUMNS: ColumnDefinition<LibraryPoolContent>[] = [
-    {
-      Cell: ({ original }) => {
-        const lpc: LibraryPoolContent = original;
+  const LIBRARY_POOL_CONTENTS_TABLE_COLUMNS: ColumnDefinition<LibraryPoolContent>[] =
+    [
+      {
+        Cell: ({ original }) => {
+          const lpc: LibraryPoolContent = original;
 
-        return (
-          <>
-            {lpc.pooledLibraryPrepBatch
-              ? "Library"
-              : lpc.pooledLibraryPool
-              ? "Library Pool"
-              : ""}
-          </>
-        );
+          return (
+            <>
+              {lpc.pooledLibraryPrepBatch
+                ? "Library"
+                : lpc.pooledLibraryPool
+                ? "Library Pool"
+                : ""}
+            </>
+          );
+        },
+        Header: "Type",
+        sortable: false
       },
-      Header: "Type",
-      sortable: false
-    },
-    {
-      Cell: ({ original: content }) =>
-        content.pooledLibraryPrepBatch
-          ? content.pooledLibraryPrepBatch.name
-          : content.pooledLibraryPool
-          ? content.pooledLibraryPool.name
-          : "",
-      Header: "Name",
-      sortable: false
-    },
-    {
-      Cell: ({ original }) => {
-        const lpc: LibraryPoolContent = original;
+      {
+        Cell: ({ original: content }) =>
+          content.pooledLibraryPrepBatch
+            ? content.pooledLibraryPrepBatch.name
+            : content.pooledLibraryPool
+            ? content.pooledLibraryPool.name
+            : "",
+        Header: "Name",
+        sortable: false
+      },
+      {
+        Cell: ({ original }) => {
+          const lpc: LibraryPoolContent = original;
 
-        return (
-          <div className="row" key={lpc.id}>
-            <FormikButton
-              className="btn btn-dark btn-sm col-6 single-remove-button"
-              onClick={async (_, formik) => {
-                await deleteLibraryPoolContents([lpc]);
-                formik.setFieldValue(
-                  `libraryPoolContentIdsToDelete[${lpc.id}]`,
-                  undefined
-                );
-              }}
-            >
-              Remove
-            </FormikButton>
-            <div className="col-6">
-              <DeselectCheckBox resource={lpc} />
+          return (
+            <div className="row" key={lpc.id}>
+              <FormikButton
+                className="btn btn-dark btn-sm col-6 single-remove-button"
+                onClick={async (_, formik) => {
+                  await deleteLibraryPoolContents([lpc]);
+                  formik.setFieldValue(
+                    `libraryPoolContentIdsToDelete[${lpc.id}]`,
+                    undefined
+                  );
+                }}
+              >
+                Remove
+              </FormikButton>
+              <div className="col-6">
+                <DeselectCheckBox resource={lpc} />
+              </div>
             </div>
-          </div>
-        );
-      },
-      Header: DeselectCheckBoxHeader,
-      sortable: false
-    }
-  ];
+          );
+        },
+        Header: DeselectCheckBoxHeader,
+        sortable: false
+      }
+    ];
 
   return (
     <DinaForm<LibraryPoolingSelectionFormValues>

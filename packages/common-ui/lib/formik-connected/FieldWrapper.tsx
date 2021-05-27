@@ -1,6 +1,7 @@
 import { FastField, FormikProps } from "formik";
 import { ReactNode } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
+import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
 import { useDinaFormContext } from "./DinaForm";
 import { ReadOnlyValue } from "./FieldView";
 
@@ -30,6 +31,8 @@ export interface LabelWrapperParams {
 
   /** Remove the label. */
   removeLabel?: boolean;
+
+  isTemplate?: boolean;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -64,21 +67,38 @@ export function FieldWrapper({
   removeFormGroupClass,
   removeLabel
 }: FieldWrapperProps) {
-  const { horizontal, readOnly } = useDinaFormContext();
+  const { horizontal, readOnly, isTemplate } = useDinaFormContext();
 
   const fieldLabel = label ?? (
     <FieldHeader name={name} customName={customName} />
   );
 
-  const [labelCol, valueCol] =
-    typeof horizontal === "boolean" ? [6, 6] : horizontal || [];
+  const [labelCol, valueCol] = isTemplate
+    ? typeof horizontal === "boolean"
+      ? [6, 6]
+      : horizontal || [12, 12]
+    : typeof horizontal === "boolean"
+    ? [6, 6]
+    : horizontal || [];
 
   return (
-    <div className={className}>
+    <div className={`${className} ${isTemplate ? "row" : ""}`}>
+      {isTemplate && (
+        <CheckBoxWithoutWrapper
+          name={`${name}Enabled`}
+          className="col-sm-1 templateCheckBox"
+        />
+      )}
       <label
-        className={`${name}-field ${horizontal ? "row" : "w-100"} ${
-          removeFormGroupClass ? "" : "mb-3"
-        }`}
+        className={`${name}-field ${
+          isTemplate
+            ? horizontal
+              ? "row col-sm-11"
+              : "col-sm-10"
+            : horizontal
+            ? "row"
+            : "w-100"
+        } ${removeFormGroupClass ? "" : "form-group"}`}
       >
         {!removeLabel && (
           <div

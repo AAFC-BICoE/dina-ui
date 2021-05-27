@@ -38,9 +38,8 @@ export function GeographySearchDialog({
   closeModal,
   onSelectSearchResult
 }: GeoGraphySearchDialogProps) {
-  const [administrativeBoundaries, setAdministrativeBoundaries] = useState<
-    NominatumApiSearchResult[]
-  >();
+  const [administrativeBoundaries, setAdministrativeBoundaries] =
+    useState<NominatumApiSearchResult[]>();
   const [inputValue, setInputValue] = useState(searchByValue);
   /** Whether the Geo Api is on hold. Just to make sure we don't send more requests than we are allowed to. */
   const [geoApiRequestsOnHold, setGeoApiRequestsOnHold] = useState(false);

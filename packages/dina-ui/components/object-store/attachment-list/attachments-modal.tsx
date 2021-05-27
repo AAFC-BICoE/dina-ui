@@ -1,15 +1,16 @@
 import {
+  CheckBoxWithoutWrapper,
   FieldHeader,
   FieldSet,
   useApiClient,
   useModal,
   useQuery
 } from "common-ui";
-import { PersistedResource } from "kitsu";
 import { uniqBy } from "lodash";
+import { PersistedResource } from "kitsu";
 import { useEffect, useState } from "react";
 import ReactTable from "react-table";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import { AttachmentSection } from "./AttachmentSection";
 
@@ -22,6 +23,10 @@ export interface AttachmentsModalParams {
 
   title?: JSX.Element;
 
+  isTemplate?: boolean;
+
+  allowNewFieldName?: string;
+  allowExistingFieldName?: string;
   /** fieldset id */
   id?: string;
 }
@@ -30,6 +35,9 @@ export function useAttachmentsModal({
   initialMetadatas = [],
   deps,
   title,
+  isTemplate,
+  allowNewFieldName,
+  allowExistingFieldName,
   id
 }: AttachmentsModalParams) {
   const { closeModal, openModal } = useModal();
@@ -43,6 +51,8 @@ export function useAttachmentsModal({
 
   // Just check if the object-store is up:
   const { error } = useQuery<[]>({ path: "objectstore-api/metadata" });
+
+  const { formatMessage } = useDinaIntl();
 
   async function addAttachedMetadatas(metadataIds: string[]) {
     const metadatas = await bulkGet<Metadata>(
@@ -93,53 +103,67 @@ export function useAttachmentsModal({
       id={id}
       legend={
         <>
-          {title ?? "Attachments"} ({selectedMetadatas.length})
+          {title ?? "Attachments"}{" "}
+          {!isTemplate ? `(${selectedMetadatas.length})` : ""}
         </>
       }
     >
-      {error ? (
-        <DinaMessage id="objectStoreDataUnavailable" />
+      {!isTemplate ? (
+        error ? (
+          <DinaMessage id="objectStoreDataUnavailable" />
+        ) : (
+          <>
+            {selectedMetadatas.length ? (
+              <div className="mb-3">
+                <ReactTable
+                  columns={[
+                    ...[
+                      "originalFilename",
+                      "acCaption",
+                      "xmpMetadataDate",
+                      "acTags"
+                    ].map(accessor => ({
+                      accessor,
+                      Header: <FieldHeader name={accessor} />
+                    })),
+                    {
+                      Cell: ({ original: { id: mId } }) => (
+                        <button
+                          className="btn btn-dark"
+                          onClick={() => removeMetadata(mId)}
+                          type="button"
+                        >
+                          <DinaMessage id="remove" />
+                        </button>
+                      )
+                    }
+                  ]}
+                  data={selectedMetadatas}
+                  minRows={selectedMetadatas.length}
+                  showPagination={false}
+                />
+              </div>
+            ) : null}
+            <button
+              className="btn btn-primary mb-3"
+              type="button"
+              onClick={openAttachmentsModal}
+              style={{ width: "10rem" }}
+            >
+              <DinaMessage id="addAttachments" />
+            </button>
+          </>
+        )
       ) : (
         <>
-          {selectedMetadatas.length ? (
-            <div className="mb-3">
-              <ReactTable
-                columns={[
-                  ...[
-                    "originalFilename",
-                    "acCaption",
-                    "xmpMetadataDate",
-                    "acTags"
-                  ].map(accessor => ({
-                    accessor,
-                    Header: <FieldHeader name={accessor} />
-                  })),
-                  {
-                    Cell: ({ original: { id: mId } }) => (
-                      <button
-                        className="btn btn-dark"
-                        onClick={() => removeMetadata(mId)}
-                        type="button"
-                      >
-                        <DinaMessage id="remove" />
-                      </button>
-                    )
-                  }
-                ]}
-                data={selectedMetadatas}
-                minRows={selectedMetadatas.length}
-                showPagination={false}
-              />
-            </div>
-          ) : null}
-          <button
-            className="btn btn-primary mb-3"
-            type="button"
-            onClick={openAttachmentsModal}
-            style={{ width: "10rem" }}
-          >
-            <DinaMessage id="addAttachments" />
-          </button>
+          <CheckBoxWithoutWrapper
+            name={allowNewFieldName ?? "allowNew"}
+            includeAllLabel={formatMessage("allowNew")}
+          />
+          <CheckBoxWithoutWrapper
+            name={allowExistingFieldName ?? "allowExisting"}
+            includeAllLabel={formatMessage("allowExisting")}
+          />
         </>
       )}
     </FieldSet>

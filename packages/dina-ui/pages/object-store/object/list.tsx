@@ -73,14 +73,11 @@ export default function MetadataListPage() {
     fieldName: "selectedMetadatas"
   });
 
-  const [
-    listLayoutType,
-    setListLayoutType
-  ] = useLocalStorage<MetadataListLayoutType>(LIST_LAYOUT_STORAGE_KEY);
+  const [listLayoutType, setListLayoutType] =
+    useLocalStorage<MetadataListLayoutType>(LIST_LAYOUT_STORAGE_KEY);
 
-  const [previewMetadataId, setPreviewMetadataId] = useState<string | null>(
-    null
-  );
+  const [previewMetadataId, setPreviewMetadataId] =
+    useState<string | null>(null);
   const [tableSectionWidth, previewSectionWidth] = previewMetadataId
     ? [8, 4]
     : [12, 0];
@@ -213,8 +210,7 @@ export default function MetadataListPage() {
                     }
                   ],
                   onSuccess: res => setAvailableMetadatas(res.data),
-                  path:
-                    "objectstore-api/metadata?include=acMetadataCreator,dcCreator",
+                  path: "objectstore-api/metadata?include=acMetadataCreator,dcCreator",
                   reactTableProps: ({ response }) => {
                     TBodyGallery.innerComponent = (
                       <StoredObjectGallery

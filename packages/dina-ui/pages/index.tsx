@@ -165,11 +165,17 @@ const Home: React.FunctionComponent = () => (
               </a>
             </Link>
           </li>
-
           <li>
             <Link href="/collection/revisions-by-user">
               <a>
                 <DinaMessage id="revisionsByUserPageTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
+            <Link href="/collection/workflow-template/edit">
+              <a>
+                <DinaMessage id="workflowTemplateTitle" />
               </a>
             </Link>
           </li>

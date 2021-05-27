@@ -23,14 +23,11 @@ export function DefaultValueRuleEditor({
     column => !column.readOnly && column.type !== "dropdown"
   );
 
-  const {
-    storedDefaultValuesConfigs,
-    saveDefaultValuesConfigs
-  } = useStoredDefaultValuesConfigs();
+  const { storedDefaultValuesConfigs, saveDefaultValuesConfigs } =
+    useStoredDefaultValuesConfigs();
 
-  const [ruleConfigIndex, setRuleConfigIndex] = useState<number | null>(
-    initialIndex
-  );
+  const [ruleConfigIndex, setRuleConfigIndex] =
+    useState<number | null>(initialIndex);
 
   const selectedConfig: DefaultValuesConfig | undefined =
     storedDefaultValuesConfigs[ruleConfigIndex ?? -1] ?? undefined;
@@ -41,9 +38,8 @@ export function DefaultValueRuleEditor({
     const newDefaultValuesConfigs = [...storedDefaultValuesConfigs];
 
     if (selectedConfig) {
-      newDefaultValuesConfigs[
-        newDefaultValuesConfigs.indexOf(selectedConfig)
-      ] = submittedValues;
+      newDefaultValuesConfigs[newDefaultValuesConfigs.indexOf(selectedConfig)] =
+        submittedValues;
     } else {
       newDefaultValuesConfigs.push(submittedValues);
     }
