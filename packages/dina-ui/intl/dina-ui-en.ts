@@ -199,7 +199,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "At least one orgnization name is required",
   field_originalFilename: "Original Filename",
   field_preparationType: "Preparation Type",
-  field_otherIds: "Other IDs",
+  field_dwcOtherCatalogNumbers: "Other Catalog Numbers",
   field_publiclyReleasable: "Publicly releasable",
   field_publiclyReleasable_tooltip:
     "Indicates if the object could be released publicly on a web page or open data portals.",

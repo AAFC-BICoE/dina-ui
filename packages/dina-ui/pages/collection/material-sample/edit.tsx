@@ -497,7 +497,7 @@ export function MaterialSampleIdentifiersFormLayout() {
           <TextField name="dwcCatalogNumber" />
         </div>
         <div className="col-md-6">
-          <StringArrayField name="otherIds" readOnly={true} />
+          <StringArrayField name="dwcOtherCatalogNumbers" />
         </div>
       </div>
     </FieldSet>
