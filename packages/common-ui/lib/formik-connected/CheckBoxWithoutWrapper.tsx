@@ -49,7 +49,11 @@ export function CheckBoxWithoutWrapper(props: CheckBoxWithoutWrapperProps) {
               }`}
               name={name}
             />
-            <div className={`${customLayout ? customLayout[1] : "col-sm-10"}`}>
+            <div
+              className={`${
+                customLayout ? customLayout[1] : "col-sm-10"
+              } fw-bold`}
+            >
               {" "}
               {includeAllLabel}
             </div>

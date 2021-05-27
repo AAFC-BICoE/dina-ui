@@ -609,36 +609,45 @@ export function CollectingEventFormLayout({
                             ))}
                           </TabList>
                         }
-                        {assertions.length
-                          ? assertions.map((assertion, index) => (
-                              <TabPanel key={index}>
-                                <GeoReferenceAssertionRow
-                                  index={index}
-                                  openAddPersonModal={openAddPersonModal}
-                                  assertion={assertion}
-                                  viewOnly={readOnly}
-                                />
-                                {!readOnly && !isTemplate && (
-                                  <div className="list-inline mb-3">
-                                    <FormikButton
-                                      className="list-inline-item btn btn-primary add-assertion-button"
-                                      onClick={addGeoReference}
-                                    >
-                                      <DinaMessage id="addAnotherAssertion" />
-                                    </FormikButton>
-                                    <FormikButton
-                                      className="list-inline-item btn btn-dark"
-                                      onClick={() => removeGeoReference(index)}
-                                    >
-                                      <DinaMessage id="removeAssertionLabel" />
-                                    </FormikButton>
-                                  </div>
-                                )}
-                              </TabPanel>
-                            ))
-                          : null}
+                        {assertions.length ? (
+                          assertions.map((assertion, index) => (
+                            <TabPanel key={index}>
+                              <GeoReferenceAssertionRow
+                                index={index}
+                                openAddPersonModal={openAddPersonModal}
+                                assertion={assertion}
+                                viewOnly={readOnly}
+                              />
+                              {!readOnly && !isTemplate && (
+                                <div className="list-inline mb-3">
+                                  <FormikButton
+                                    className="list-inline-item btn btn-primary add-assertion-button"
+                                    onClick={addGeoReference}
+                                  >
+                                    <DinaMessage id="addAnotherAssertion" />
+                                  </FormikButton>
+                                  <FormikButton
+                                    className="list-inline-item btn btn-dark"
+                                    onClick={() => removeGeoReference(index)}
+                                  >
+                                    <DinaMessage id="removeAssertionLabel" />
+                                  </FormikButton>
+                                </div>
+                              )}
+                            </TabPanel>
+                          ))
+                        ) : (
+                          <TabPanel>
+                            <GeoReferenceAssertionRow
+                              index={0}
+                              openAddPersonModal={openAddPersonModal}
+                              assertion={{}}
+                              viewOnly={readOnly}
+                            />
+                          </TabPanel>
+                        )}
                       </Tabs>
-                      {!assertions.length && !readOnly && (
+                      {!assertions.length && !readOnly && !isTemplate && (
                         <FormikButton
                           className="btn btn-primary add-assertion-button"
                           onClick={addGeoReference}
