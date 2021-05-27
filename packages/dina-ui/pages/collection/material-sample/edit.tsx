@@ -45,6 +45,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
 import { Metadata } from "../../../types/objectstore-api";
+import { omit } from "lodash";
 
 export default function MaterialSampleEditPage() {
   const router = useRouter();
@@ -137,7 +138,7 @@ export function MaterialSampleForm({
   /** YYYY-MM-DD format. */
   const todayDate = new Date().toISOString().slice(0, 10);
 
-  const initialValues: InputResource<MaterialSample> = materialSample
+  let initialValues: InputResource<MaterialSample> = materialSample
     ? { ...materialSample }
     : {
         type: "material-sample",
@@ -315,10 +316,22 @@ export function MaterialSampleForm({
     </DinaForm>
   ) : (
     <>
-      <CollectingEventFormLayout />
-      <div className="form-group">{colEventAttachmentsUI}</div>
+      <CollectingEventFormLayout
+        initialValuesForTemplate={collectingEventInitialValues}
+      />
+      <div className="mb-3">{colEventAttachmentsUI}</div>
     </>
   );
+
+  initialValues = isTemplate
+    ? {
+        type: "material-sample",
+        materialSampleName: `${username}-${todayDate}`,
+        // managedAttributeValues: {},
+        ...omit(collectingEventInitialValues, "type")
+      }
+    : initialValues;
+
   return (
     <DinaForm<InputResource<MaterialSample>>
       initialValues={initialValues}
@@ -415,11 +428,9 @@ export function MaterialSampleForm({
                       <DinaMessage id="createNew" />
                     )}
                   </Tab>
-                  {!isTemplate && (
-                    <Tab>
-                      <DinaMessage id="attachExisting" />
-                    </Tab>
-                  )}
+                  <Tab>
+                    <DinaMessage id="attachExisting" />
+                  </Tab>
                 </TabList>
                 <TabPanel>
                   {
@@ -448,15 +459,13 @@ export function MaterialSampleForm({
                       : nestedCollectingEventForm
                   }
                 </TabPanel>
-                {!isTemplate && (
-                  <TabPanel>
-                    <CollectingEventLinker
-                      onCollectingEventSelect={colEventToLink => {
-                        setColEventId(colEventToLink.id);
-                      }}
-                    />
-                  </TabPanel>
-                )}
+                <TabPanel>
+                  <CollectingEventLinker
+                    onCollectingEventSelect={colEventToLink => {
+                      setColEventId(colEventToLink.id);
+                    }}
+                  />
+                </TabPanel>
               </Tabs>
             </FieldSet>
             <PreparationsFormLayout

@@ -53,12 +53,14 @@ import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimBu
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
   setDefaultVerbatimSRS?: (newValue: string | undefined | null) => void;
+  initialValuesForTemplate?: any;
 }
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
 export function CollectingEventFormLayout({
   setDefaultVerbatimCoordSys,
-  setDefaultVerbatimSRS
+  setDefaultVerbatimSRS,
+  initialValuesForTemplate
 }: CollectingEventFormLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
@@ -69,8 +71,9 @@ export function CollectingEventFormLayout({
   // Open the tab with the Primary geoassertion even if it's not the first one.
   // Defaults to 0 if there's no primary assertion.
   const intialPrimaryAssertionIndex = clamp(
-    (
-      initialValues as Partial<CollectingEvent>
+    (!isTemplate
+      ? (initialValues as Partial<CollectingEvent>)
+      : initialValuesForTemplate
     ).geoReferenceAssertions?.findIndex(assertion => assertion?.isPrimary) ?? 0,
     0,
     Infinity
@@ -570,11 +573,13 @@ export function CollectingEventFormLayout({
               <FieldArray name="geoReferenceAssertions">
                 {({ form, push, remove }) => {
                   const assertions =
-                    (form.values as CollectingEvent).geoReferenceAssertions ??
-                    [];
+                    (!isTemplate
+                      ? (form.values as CollectingEvent)
+                      : initialValuesForTemplate
+                    ).geoReferenceAssertions ?? [];
 
                   function addGeoReference() {
-                    push({ isPrimary: assertions.length === 0 });
+                    push({ isPrimary: assertions?.length === 0 });
                     setActiveTabIdx(assertions.length);
                   }
 
