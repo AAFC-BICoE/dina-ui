@@ -146,7 +146,7 @@ export function useAttachmentsModal({
               </div>
             ) : null}
             <button
-              className="btn btn-primary form-group"
+              className="btn btn-primary mb-3"
               type="button"
               onClick={openAttachmentsModal}
               style={{ width: "10rem" }}

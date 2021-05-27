@@ -1,6 +1,7 @@
 import { KitsuResource } from "kitsu";
 
 export interface PreparationTypeAttributes {
+  type: "preparation-type";
   uuid: string;
   name: string;
   createdBy?: string;
