@@ -6,7 +6,7 @@ describe("stringArrayCell", () => {
     const cell = stringArrayCell("myStringArrField");
 
     const wrapper = mountWithAppContext(
-      <cell.Cell original={{ myStringArrField: new Array(["org1", "org2"]) }} />
+      <cell.Cell original={{ myStringArrField: ["org1", "org2"] }} />
     );
 
     expect(cell.accessor).toEqual("myStringArrField");
