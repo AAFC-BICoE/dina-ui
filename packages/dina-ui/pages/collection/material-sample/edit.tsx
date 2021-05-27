@@ -316,7 +316,7 @@ export function MaterialSampleForm({
   ) : (
     <>
       <CollectingEventFormLayout />
-      <div className="form-group">{colEventAttachmentsUI}</div>
+      <div className="mb-3">{colEventAttachmentsUI}</div>
     </>
   );
   return (
