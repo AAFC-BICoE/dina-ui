@@ -1,7 +1,5 @@
 import { LoadingSpinner } from "common-ui";
 import { noop } from "lodash";
-import { DndProvider } from "react-dnd-cjs";
-import HTML5Backend from "react-dnd-html5-backend-cjs";
 import { SeqdbMessage } from "../../../../../intl/seqdb-intl";
 import {
   Chain,
@@ -51,7 +49,7 @@ export function SampleGrid(props: ContainerGridProps) {
   }
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <div>
       <div className="alert alert-warning d-inline-block">
         <SeqdbMessage id="sampleGridInstructions" />
       </div>
@@ -131,6 +129,6 @@ export function SampleGrid(props: ContainerGridProps) {
           />
         </div>
       </div>
-    </DndProvider>
+    </div>
   );
 }
