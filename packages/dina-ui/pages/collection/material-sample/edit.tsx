@@ -138,7 +138,7 @@ export function MaterialSampleForm({
   /** YYYY-MM-DD format. */
   const todayDate = new Date().toISOString().slice(0, 10);
 
-  let initialValues: InputResource<MaterialSample> = materialSample
+  const initialValues: InputResource<MaterialSample> = materialSample
     ? { ...materialSample }
     : {
         type: "material-sample",
@@ -159,7 +159,7 @@ export function MaterialSampleForm({
     saveCollectingEvent,
     attachedMetadatasUI: colEventAttachmentsUI,
     collectingEventFormSchema
-  } = useCollectingEventSave(colEventQuery.response?.data, isTemplate);
+  } = useCollectingEventSave(colEventQuery.response?.data);
 
   const {
     attachedMetadatasUI: materialSampleAttachmentsUI,
@@ -305,32 +305,17 @@ export function MaterialSampleForm({
 
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */
   // Unwrap the DinaForm for template saving purpose
-  const nestedCollectingEventForm = !isTemplate ? (
+  const nestedCollectingEventForm = (
     <DinaForm
       innerRef={colEventFormRef}
       initialValues={collectingEventInitialValues}
       validationSchema={collectingEventFormSchema}
+      isTemplate={isTemplate}
     >
       <CollectingEventFormLayout />
       <div className="mb-3">{colEventAttachmentsUI}</div>
     </DinaForm>
-  ) : (
-    <>
-      <CollectingEventFormLayout
-        initialValuesForTemplate={collectingEventInitialValues}
-      />
-      <div className="mb-3">{colEventAttachmentsUI}</div>
-    </>
   );
-
-  initialValues = isTemplate
-    ? {
-        type: "material-sample",
-        materialSampleName: `${username}-${todayDate}`,
-        // managedAttributeValues: {},
-        ...omit(collectingEventInitialValues, "type")
-      }
-    : initialValues;
 
   return (
     <DinaForm<InputResource<MaterialSample>>

@@ -59,8 +59,7 @@ interface CollectingEventFormLayoutProps {
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
 export function CollectingEventFormLayout({
   setDefaultVerbatimCoordSys,
-  setDefaultVerbatimSRS,
-  initialValuesForTemplate
+  setDefaultVerbatimSRS
 }: CollectingEventFormLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
@@ -71,9 +70,8 @@ export function CollectingEventFormLayout({
   // Open the tab with the Primary geoassertion even if it's not the first one.
   // Defaults to 0 if there's no primary assertion.
   const intialPrimaryAssertionIndex = clamp(
-    (!isTemplate
-      ? (initialValues as Partial<CollectingEvent>)
-      : initialValuesForTemplate
+    (
+      initialValues as Partial<CollectingEvent>
     ).geoReferenceAssertions?.findIndex(assertion => assertion?.isPrimary) ?? 0,
     0,
     Infinity
@@ -573,10 +571,8 @@ export function CollectingEventFormLayout({
               <FieldArray name="geoReferenceAssertions">
                 {({ form, push, remove }) => {
                   const assertions =
-                    (!isTemplate
-                      ? (form.values as CollectingEvent)
-                      : initialValuesForTemplate
-                    ).geoReferenceAssertions ?? [];
+                    (form.values as CollectingEvent).geoReferenceAssertions ??
+                    [];
 
                   function addGeoReference() {
                     push({ isPrimary: assertions?.length === 0 });
