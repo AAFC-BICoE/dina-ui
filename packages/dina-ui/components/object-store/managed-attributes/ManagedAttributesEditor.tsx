@@ -1,13 +1,17 @@
 import {
+  AreYouSureModal,
   filterBy,
   NumberField,
   ResourceSelect,
   SelectField,
   TextField,
   useApiClient,
-  useDinaFormContext
+  useDinaFormContext,
+  useModal
 } from "common-ui";
-import { get } from "lodash";
+import { Field } from "formik";
+import { PersistedResource } from "kitsu";
+import { castArray, get } from "lodash";
 import { useEffect, useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../types/objectstore-api";
@@ -44,11 +48,12 @@ export function ManagedAttributesEditor({
   const { initialValues: formInitialValues } = useDinaFormContext();
   const { bulkGet } = useApiClient();
   const { formatMessage } = useDinaIntl();
+  const { openModal } = useModal();
 
   const managedAttributeValues = get(formInitialValues, valuesPath);
 
   const [editableManagedAttributes, setEditableManagedAttributes] = useState<
-    ManagedAttribute[]
+    PersistedResource<ManagedAttribute>[]
   >([]);
 
   useEffect(() => {
@@ -66,40 +71,81 @@ export function ManagedAttributesEditor({
     })();
   }, []);
 
+  /** Gets the formik field path for a given Managed Attribute key. */
+  function fieldPath(managedAttributeKey: string) {
+    // Dot path to the attribute's form field:
+    return [valuesPath, managedAttributeKey, valueFieldName]
+      .filter(it => it) // Remove undefined
+      .join(".");
+  }
+
   return (
     <div className="mb-3 managed-attributes-editor">
       <div className="row">
-        <label className="col-sm-6">
+        <label className="editable-attribute-menu col-sm-6">
           <strong>
             <DinaMessage id="field_editableManagedAttributes" />
           </strong>
-          <ResourceSelect<ManagedAttribute>
-            filter={input => ({
-              ...filterBy(["name"])(input),
-              ...(managedAttributeComponent
-                ? { managedAttributeComponent }
-                : {})
-            })}
-            model={managedAttributeApiPath}
-            optionLabel={attribute =>
-              attribute.name ?? get(attribute, managedAttributeKeyField)
-            }
-            isMulti={true}
-            onChange={ma =>
-              setEditableManagedAttributes(ma as ManagedAttribute[])
-            }
-            value={editableManagedAttributes}
-          />
+          <Field>
+            {({ form: { setFieldValue } }) => (
+              <ResourceSelect<ManagedAttribute>
+                filter={input => ({
+                  ...filterBy(["name"])(input),
+                  ...(managedAttributeComponent
+                    ? { managedAttributeComponent }
+                    : {})
+                })}
+                model={managedAttributeApiPath}
+                optionLabel={attribute =>
+                  attribute.name ?? get(attribute, managedAttributeKeyField)
+                }
+                isMulti={true}
+                onChange={selectedValues => {
+                  const newList = castArray(selectedValues);
+                  if (newList.length < editableManagedAttributes.length) {
+                    const removedAttributes = editableManagedAttributes.filter(
+                      attr => !newList.includes(attr)
+                    );
+                    if (removedAttributes.length) {
+                      openModal(
+                        <AreYouSureModal
+                          actionMessage={
+                            <DinaMessage
+                              id="removeManagedAttributeValue"
+                              values={{
+                                attributeNames: removedAttributes
+                                  .map(it => it.name)
+                                  .join(", ")
+                              }}
+                            />
+                          }
+                          onYesButtonClicked={() => {
+                            for (const removedAttribute of removedAttributes) {
+                              // Remove the managed attribute value from the value map:
+                              const attributeKey = get(
+                                removedAttribute,
+                                managedAttributeKeyField
+                              );
+                              setFieldValue(
+                                `${valuesPath}.${attributeKey}`,
+                                undefined
+                              );
+                            }
+                            // Update the visibile attributes list:
+                            setEditableManagedAttributes(newList);
+                          }}
+                        />
+                      );
+                    }
+                  } else {
+                    setEditableManagedAttributes(newList);
+                  }
+                }}
+                value={editableManagedAttributes}
+              />
+            )}
+          </Field>
         </label>
-        <div className="col-sm-6">
-          <div
-            className="alert alert-warning"
-            role="region"
-            aria-label="Editable attribute removal info"
-          >
-            <DinaMessage id="editableManagedAttributesRemoveInfo" />
-          </div>
-        </div>
       </div>
       <div
         style={{
@@ -114,9 +160,7 @@ export function ManagedAttributesEditor({
               className: `${attributeKey} col-sm-6`,
               key: attributeKey,
               label: attribute.name ?? attributeKey,
-              name: `${valuesPath}.${attributeKey}${
-                valueFieldName ? `.${valueFieldName}` : ""
-              }`
+              name: fieldPath(attributeKey)
             };
 
             if (
