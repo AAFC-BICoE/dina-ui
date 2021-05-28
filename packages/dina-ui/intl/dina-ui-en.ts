@@ -242,8 +242,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeValueLabel: "Value",
   materialSample: "Material Sample",
   materialSampleAttachments: "Material Sample Attachments",
-  materialSampleIdOrCatalogNumberRequired:
-    'Either "Material Sample ID" or "Catalog Number" is required.',
   materialSampleListTitle: "Material Samples",
   materialSampleViewTitle: "Material Sample",
   metadataAttributesTemplateSave: "Save This Attributes Template",
