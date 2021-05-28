@@ -157,7 +157,11 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
         />
       </ButtonBar>
       <div className="row">
-        <TextField className="col-md-6" name="name" />
+        <TextField
+          className="col-md-6"
+          name="name"
+          readOnly={id !== undefined}
+        />
         <TextField className="col-md-6" name="key" readOnly={true} />
       </div>
       <TextField name="description.en" multiLines={true} />
