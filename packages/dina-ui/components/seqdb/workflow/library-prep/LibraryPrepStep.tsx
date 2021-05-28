@@ -79,10 +79,10 @@ export function LibraryPrepStep(props: StepRendererProps) {
         >
           Edit Batch Details
         </button>
-        <div className="form-group">
+        <div className="mb-3">
           <LibraryPrepBatchDetails libraryPrepBatch={libraryPrepBatch} />
         </div>
-        <div className="form-group list-inline">
+        <div className="mb-3 list-inline">
           <Link
             href={`/workflow/library-prep-worksheet?stepResourceId=${stepResource.id}&sampleLayout=table`}
           >
@@ -99,7 +99,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
           </Link>
         </div>
         <div
-          className="form-group"
+          className="mb-3"
           // Give this section enough min height so you don't lose your scroll position when changing tabs:
           style={{ minHeight: "70rem" }}
         >

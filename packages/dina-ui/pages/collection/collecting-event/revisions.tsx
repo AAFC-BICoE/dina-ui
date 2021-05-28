@@ -30,7 +30,7 @@ export default function CollectingEventRevisionListPage() {
         <Nav />
         <main className="container-fluid">
           <h1>{pageTitle}</h1>
-          <div className="form-group">
+          <div className="mb-3">
             <Link
               href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
             >

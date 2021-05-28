@@ -17,7 +17,6 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 /** FileUploader component props. */
 export interface FileUploaderProps<TValues = any> {
-  acceptedFileTypes: string;
   onSubmit: OnFormikSubmit<FileUploaderOnSubmitArgs<TValues>>;
 }
 
@@ -65,7 +64,6 @@ export interface FileUploadApiConfig extends KitsuResource {
  * Use this component's onSubmit prop instead of the parent Formik's onSubmit prop.
  */
 export function FileUploader<TValues = any>({
-  acceptedFileTypes,
   onSubmit
 }: FileUploaderProps<TValues>) {
   const { formatMessage } = useDinaIntl();
@@ -92,7 +90,6 @@ export function FileUploader<TValues = any>({
           />
         )}
         <Dropzone
-          accept={acceptedFileTypes}
           maxSizeBytes={maxSizeBytes}
           onSubmit={acceptedFiles =>
             safeSubmit(onSubmit)({ ...formik.values, acceptedFiles }, formik)

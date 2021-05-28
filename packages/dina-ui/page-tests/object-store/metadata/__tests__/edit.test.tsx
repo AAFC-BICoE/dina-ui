@@ -8,12 +8,7 @@ import {
 import { DefaultValuesConfig } from "../../../../components/object-store/metadata-bulk-editor/custom-default-values/model-types";
 import EditMetadatasPage from "../../../../pages/object-store/metadata/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import {
-  License,
-  ManagedAttributeMap,
-  Metadata,
-  Person
-} from "../../../../types/objectstore-api";
+import { License, Metadata, Person } from "../../../../types/objectstore-api";
 
 const TEST_METADATAS: PersistedResource<Metadata>[] = [
   {
@@ -37,15 +32,8 @@ const TEST_METADATAS: PersistedResource<Metadata>[] = [
     fileExtension: ".png",
     fileIdentifier: "72b4b907-c486-49a8-ab58-d01541d83eff",
     id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
-    managedAttributeMap: {
-      id: "N/A",
-      type: "managed-attribute-map",
-      values: {
-        "a360a695-bbff-4d58-9a07-b6d6c134b208": {
-          name: "existing-attribute",
-          value: "existingValue"
-        }
-      }
+    managedAttributeValues: {
+      "a360a695-bbff-4d58-9a07-b6d6c134b208": "existingValue"
     },
     type: "metadata"
   },
@@ -251,20 +239,17 @@ describe("Metadata bulk edit page", () => {
 
     expect(columns).toEqual([
       {
-        data:
-          "metadata.managedAttributeMap.values.83748696-62b3-4db6-99cc-e4f546e7ecd7.value",
+        data: "metadata.managedAttributeValues.83748696-62b3-4db6-99cc-e4f546e7ecd7",
         source: ["Holotype", "Paratype", "Syntype"],
         title: "SpecimenID",
         type: "dropdown"
       },
       {
-        data:
-          "metadata.managedAttributeMap.values.83748696-62b3-4db6-99cc-e4f546e7ecd7.value",
+        data: "metadata.managedAttributeValues.83748696-62b3-4db6-99cc-e4f546e7ecd7",
         title: "Type Status"
       },
       {
-        data:
-          "metadata.managedAttributeMap.values.83748696-62b3-4db6-99cc-e4f546e7ecd7.value",
+        data: "metadata.managedAttributeValues.83748696-62b3-4db6-99cc-e4f546e7ecd7",
         title: "Scientific Name"
       }
     ]);
@@ -313,9 +298,9 @@ describe("Metadata bulk edit page", () => {
     tableData[1].acTags = "newTag1, newTag2";
 
     // Set new managed attribute value:
-    (tableData[1].metadata.managedAttributeMap as ManagedAttributeMap).values[
+    (tableData[1].metadata.managedAttributeValues as Record<string, string>)[
       "4ed1dc15-c931-414a-ab13-cc766fd6fae2"
-    ] = { value: "new attr value" };
+    ] = "new attr value";
 
     wrapper.find("button.bulk-editor-submit-button").simulate("click");
 
@@ -324,7 +309,7 @@ describe("Metadata bulk edit page", () => {
 
     // Only 1 row should have been updated, using 2 operations for the row:
     // - The Metadata is updated with new dcCreator and new tags.
-    // - The metadata's managed-attribute-map is udpated with a new attribute value.
+    // - The metadata's managedAttributeValues is udpated with a new attribute value.
     expect(mockSave).lastCalledWith(
       [
         {
@@ -334,25 +319,13 @@ describe("Metadata bulk edit page", () => {
               type: "person"
             },
             acTags: ["newTag1", "newTag2"],
+            managedAttributeValues: {
+              "4ed1dc15-c931-414a-ab13-cc766fd6fae2": "new attr value"
+            },
             id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
             type: "metadata"
           },
           type: "metadata"
-        },
-        {
-          resource: {
-            metadata: {
-              id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
-              type: "metadata"
-            },
-            type: "managed-attribute-map",
-            values: {
-              "4ed1dc15-c931-414a-ab13-cc766fd6fae2": {
-                value: "new attr value"
-              }
-            }
-          },
-          type: "managed-attribute-map"
         }
       ],
       { apiBaseUrl: "/objectstore-api" }
@@ -396,16 +369,6 @@ describe("Metadata bulk edit page", () => {
             xmpRightsWebStatement: ""
           },
           type: "metadata"
-        },
-        {
-          resource: {
-            metadata: {
-              id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
-              type: "metadata"
-            },
-            type: "managed-attribute-map"
-          },
-          type: "managed-attribute-map"
         }
       ],
       { apiBaseUrl: "/objectstore-api" }
@@ -511,24 +474,6 @@ describe("Metadata bulk edit page", () => {
               type: "metadata"
             },
             type: "metadata"
-          }
-        ],
-        {
-          apiBaseUrl: "/objectstore-api"
-        }
-      ],
-      [
-        [
-          {
-            resource: {
-              metadata: {
-                // The new Metadata's ID should be included here:
-                id: "00000000-0000-0000-0000-000000000000",
-                type: "metadata"
-              },
-              type: "managed-attribute-map"
-            },
-            type: "managed-attribute-map"
           }
         ],
         {

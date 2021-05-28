@@ -45,6 +45,32 @@ export interface CollectingEventAttributes {
   habitat?: string;
 
   managedAttributeValues?: ManagedAttributeValues;
+
+  includeAllCollectingDate?: boolean;
+  startEventDateTimeEnabled?: boolean;
+  endEventDateTimeEnabled?: boolean;
+  dwcRecordedByEnabled?: boolean;
+  verbatimEventDateTimeEnabled?: boolean;
+
+  includeAllVerbatimCoordinates?: boolean;
+  dwcVerbatimLocalityEnabled?: boolean;
+  dwcVerbatimLatitudeEnabled?: boolean;
+  dwcVerbatimLongitudeEnabled?: boolean;
+  dwcVerbatimCoordinatesEnabled?: boolean;
+  dwcVerbatimCoordinateSystemEnabled?: boolean;
+  dwcVerbatimSRSEnabled?: boolean;
+  dwcVerbatimElevationEnabled?: boolean;
+  dwcVerbatimDepthEnabled?: boolean;
+
+  includeAllCollectingAgent?: boolean;
+  dwcOtherRecordNumbersEnabled?: boolean;
+  dwcRecordNumberEnabled?: boolean;
+  habitatEnabled?: boolean;
+
+  managedAttributeValuesEnabled?: boolean;
+
+  colEvntAllowNew?: boolean;
+  colEvntAllowExisting?: boolean;
 }
 
 export enum GeographicPlaceNameSource {

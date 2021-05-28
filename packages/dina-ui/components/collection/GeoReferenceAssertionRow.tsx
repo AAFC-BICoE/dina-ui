@@ -8,7 +8,8 @@ import {
   NumberField,
   ResourceSelectField,
   TextField,
-  Tooltip
+  Tooltip,
+  useDinaFormContext
 } from "common-ui";
 import { connect, Field, FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
@@ -41,6 +42,8 @@ export function GeoReferenceAssertionRow({
   );
 
   const reservedAssertion = useRef(assertion);
+
+  const { isTemplate } = useDinaFormContext();
 
   const assertionsPath = "geoReferenceAssertions";
   const assertionPath = `${assertionsPath}[${index}]`;
@@ -136,8 +139,8 @@ export function GeoReferenceAssertionRow({
         {viewOnly && (
           <ViewInMapButton assertionPath={`geoReferenceAssertions.${index}`} />
         )}
-        {!viewOnly && (
-          <div className="form-group">
+        {!viewOnly && !isTemplate && (
+          <div className="mb-3">
             <FormikButton
               className="btn btn-primary primary-assertion-button"
               buttonProps={ctx => {
@@ -261,7 +264,7 @@ export const ViewInMapButton = connect<{ assertionPath: string }>(
     const showButton = typeof lat === "number" && typeof lon === "number";
 
     return showButton ? (
-      <div className="form-group">
+      <div className="mb-3">
         <a
           href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}`}
           target="_blank"

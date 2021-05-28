@@ -46,7 +46,7 @@ export default function CollectingEventListPage() {
             path: "collection-api/collecting-event"
           }}
           filterFormchildren={({ submitForm }) => (
-            <div className="form-group">
+            <div className="mb-3">
               <div style={{ width: "300px" }}>
                 <GroupSelectField
                   onChange={() => setImmediate(submitForm)}

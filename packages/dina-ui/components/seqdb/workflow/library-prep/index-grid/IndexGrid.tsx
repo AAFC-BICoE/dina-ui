@@ -23,11 +23,8 @@ export function IndexGrid(props: IndexGridProps) {
 
   const { containerType, indexSet } = libraryPrepBatch;
 
-  const {
-    libraryPrepsLoading,
-    libraryPrepsResponse,
-    onSubmit
-  } = useIndexGridControls(props);
+  const { libraryPrepsLoading, libraryPrepsResponse, onSubmit } =
+    useIndexGridControls(props);
 
   if (libraryPrepsLoading) {
     return <LoadingSpinner loading={true} />;

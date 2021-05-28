@@ -132,7 +132,7 @@ export function SampleSelection(props: StepRendererProps) {
         id="sample-selection"
         onFilterFormSubmit={onFilterSubmit}
       />
-      <div className="form-group">
+      <div className="mb-3">
         <DinaForm
           initialValues={{ sampleIdsToSelect: {}, stepResourcesToDelete: {} }}
         >
