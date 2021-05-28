@@ -15,7 +15,7 @@ export interface ManagedAttributeValue {
   managedAttributeType?: string;
   value?: string;
   assignedValue?: string;
-  group: string;
+  group?: string;
 }
 
 export interface ManagedAttributeMapRelationships {
