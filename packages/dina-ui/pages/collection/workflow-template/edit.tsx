@@ -32,16 +32,15 @@ export default function PreparationProcessTemplatePage() {
     WorkflowTemplate[]
   >("workflow_templates", []);
 
-  const {
-    attachedMetadatasUI: materialSampleAttachmentsUI
-  } = useAttachmentsModal({
-    initialMetadatas: [],
-    deps: [],
-    title: <DinaMessage id="materialSampleAttachments" />,
-    isTemplate: true,
-    allowNewFieldName: "materialSampleAllowNew",
-    allowExistingFieldName: "materialSampleAllowExisting"
-  });
+  const { attachedMetadatasUI: materialSampleAttachmentsUI } =
+    useAttachmentsModal({
+      initialMetadatas: [],
+      deps: [],
+      title: <DinaMessage id="materialSampleAttachments" />,
+      isTemplate: true,
+      allowNewFieldName: "materialSampleAllowNew",
+      allowExistingFieldName: "materialSampleAllowExisting"
+    });
 
   const workFlowTypeOnChange = (e, form) => {
     form.setFieldValue("workFlowType", e.target.value);
@@ -98,7 +97,7 @@ export default function PreparationProcessTemplatePage() {
                   <div className="col-md-6 row">
                     <label className="col-md-2">
                       <input
-                        className="form-control createNewWorkflow"
+                        className="mb-3 createNewWorkflow"
                         value="createNew"
                         type="radio"
                         name="workFlowType"
@@ -109,7 +108,7 @@ export default function PreparationProcessTemplatePage() {
                     </label>
                     <label className="col-md-2">
                       <input
-                        className="form-control"
+                        className="mb-3"
                         value="createSplit"
                         type="radio"
                         name="workFlowType"

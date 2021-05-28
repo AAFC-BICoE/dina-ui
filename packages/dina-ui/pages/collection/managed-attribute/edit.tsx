@@ -26,6 +26,8 @@ import {
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../../types/collection-api/resources/ManagedAttribute";
 
+import { GroupSelectField } from "../../../components";
+
 interface ManagedAttributeFormProps {
   fetchedManagedAttribute?: ManagedAttribute;
   router: NextRouter;
@@ -154,6 +156,13 @@ function ManagedAttributeForm({
         </Link>
       </ButtonBar>
       <div className="row">
+        <GroupSelectField
+          className="col-md-6"
+          name="group"
+          enableStoredDefaultGroup={true}
+        />
+      </div>
+      <div className="row">
         <TextField
           className="col-md-6"
           name="name"
@@ -184,24 +193,14 @@ function ManagedAttributeForm({
         </div>
       )}
       {id && (
-        <div>
-          <h4>
-            <DinaMessage id="field_managedAttributeCreatedOn" />
-          </h4>
+        <div className="row">
           <DateField
+            className="col-md-6"
             showTime={true}
             name="createdOn"
             disabled={true}
-            hideLabel={true}
           />
-        </div>
-      )}
-      {id && (
-        <div>
-          <h4>
-            <DinaMessage id="field_managedAttributeCreatedBy" />
-          </h4>
-          <TextField name="createdBy" hideLabel={true} readOnly={true} />
+          <TextField className="col-md-6" name="createdBy" readOnly={true} />
         </div>
       )}
     </DinaForm>
