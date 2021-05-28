@@ -11,8 +11,11 @@ export type ManagedAttributeValues = {
 
 export interface ManagedAttributeValue {
   name?: string;
+  managedAttributeComponent: string;
+  managedAttributeType: string;
   value?: string;
   assignedValue?: string;
+  group: string;
 }
 
 export interface ManagedAttributeMapRelationships {
