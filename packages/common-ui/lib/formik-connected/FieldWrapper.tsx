@@ -98,7 +98,7 @@ export function FieldWrapper({
             : horizontal
             ? "row"
             : "w-100"
-        } ${removeFormGroupClass ? "" : "form-group"}`}
+        } ${removeFormGroupClass ? "" : "mb-3"}`}
       >
         {!removeLabel && (
           <div
