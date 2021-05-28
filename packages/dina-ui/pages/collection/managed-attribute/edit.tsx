@@ -26,6 +26,8 @@ import {
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../../types/collection-api/resources/ManagedAttribute";
 
+import { GroupSelectField } from "../../../components";
+
 interface ManagedAttributeFormProps {
   fetchedManagedAttribute?: ManagedAttribute;
   router: NextRouter;
@@ -153,6 +155,9 @@ function ManagedAttributeForm({
           </a>
         </Link>
       </ButtonBar>
+      <div style={{ width: "25rem" }}>
+        <GroupSelectField name="group" enableStoredDefaultGroup={true} />
+      </div>
       <div style={{ width: "25rem" }}>
         <TextField name="name" readOnly={id !== undefined} />
       </div>
