@@ -8,6 +8,8 @@ import {
 } from "common-ui";
 import { mount } from "enzyme";
 import { merge, noop } from "lodash";
+import { DndProvider } from "react-dnd-cjs";
+import HTML5Backend from "react-dnd-html5-backend-cjs";
 import { PartialDeep } from "type-fest";
 import { FileUploadProviderImpl } from "../components/object-store/file-upload/FileUploadProvider";
 import { DinaIntlProvider } from "../intl/dina-ui-intl";
@@ -54,9 +56,11 @@ export function MockAppContextProvider({
       >
         <FileUploadProviderImpl>
           <DinaIntlProvider>
-            <ModalProvider appElement={document.querySelector("body")}>
-              {children}
-            </ModalProvider>
+            <DndProvider backend={HTML5Backend}>
+              <ModalProvider appElement={document.querySelector("body")}>
+                {children}
+              </ModalProvider>{" "}
+            </DndProvider>
           </DinaIntlProvider>
         </FileUploadProviderImpl>
       </ApiClientProvider>
