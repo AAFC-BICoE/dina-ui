@@ -460,9 +460,12 @@ export function MaterialSampleForm({
               {materialSampleAttachmentsUI}
             </DinaForm>
           ) : (
-            <PreparationsFormLayout
-              className={enablePreparations ? "" : "d-none"}
-            />
+            <>
+              <PreparationsFormLayout
+                className={enablePreparations ? "" : "d-none"}
+              />
+              {materialSampleAttachmentsUI}
+            </>
           )}
         </div>
       </div>
