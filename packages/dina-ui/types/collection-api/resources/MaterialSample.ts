@@ -14,6 +14,7 @@ export interface MaterialSampleAttributes {
   createdOn?: string;
   createdBy?: string;
   dwcCatalogNumber?: string | null;
+  dwcOtherCatalogNumbers?: string[];
 
   managedAttributeValues?: ManagedAttributeValues;
 

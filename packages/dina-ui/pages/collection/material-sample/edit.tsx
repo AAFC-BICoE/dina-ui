@@ -45,6 +45,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
 import { Metadata } from "../../../types/objectstore-api";
+import { omit } from "lodash";
 
 export default function MaterialSampleEditPage() {
   const router = useRouter();
@@ -158,7 +159,7 @@ export function MaterialSampleForm({
     saveCollectingEvent,
     attachedMetadatasUI: colEventAttachmentsUI,
     collectingEventFormSchema
-  } = useCollectingEventSave(colEventQuery.response?.data, isTemplate);
+  } = useCollectingEventSave(colEventQuery.response?.data);
 
   const {
     attachedMetadatasUI: materialSampleAttachmentsUI,
@@ -304,21 +305,18 @@ export function MaterialSampleForm({
 
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */
   // Unwrap the DinaForm for template saving purpose
-  const nestedCollectingEventForm = !isTemplate ? (
+  const nestedCollectingEventForm = (
     <DinaForm
       innerRef={colEventFormRef}
       initialValues={collectingEventInitialValues}
       validationSchema={collectingEventFormSchema}
+      isTemplate={isTemplate}
     >
       <CollectingEventFormLayout />
       <div className="mb-3">{colEventAttachmentsUI}</div>
     </DinaForm>
-  ) : (
-    <>
-      <CollectingEventFormLayout />
-      <div className="mb-3">{colEventAttachmentsUI}</div>
-    </>
   );
+
   return (
     <DinaForm<InputResource<MaterialSample>>
       initialValues={initialValues}
@@ -415,11 +413,9 @@ export function MaterialSampleForm({
                       <DinaMessage id="createNew" />
                     )}
                   </Tab>
-                  {!isTemplate && (
-                    <Tab>
-                      <DinaMessage id="attachExisting" />
-                    </Tab>
-                  )}
+                  <Tab>
+                    <DinaMessage id="attachExisting" />
+                  </Tab>
                 </TabList>
                 <TabPanel>
                   {
@@ -448,15 +444,13 @@ export function MaterialSampleForm({
                       : nestedCollectingEventForm
                   }
                 </TabPanel>
-                {!isTemplate && (
-                  <TabPanel>
-                    <CollectingEventLinker
-                      onCollectingEventSelect={colEventToLink => {
-                        setColEventId(colEventToLink.id);
-                      }}
-                    />
-                  </TabPanel>
-                )}
+                <TabPanel>
+                  <CollectingEventLinker
+                    onCollectingEventSelect={colEventToLink => {
+                      setColEventId(colEventToLink.id);
+                    }}
+                  />
+                </TabPanel>
               </Tabs>
             </FieldSet>
             <PreparationsFormLayout
@@ -497,7 +491,7 @@ export function MaterialSampleIdentifiersFormLayout() {
           <TextField name="dwcCatalogNumber" />
         </div>
         <div className="col-md-6">
-          <StringArrayField name="otherIds" readOnly={true} />
+          <StringArrayField name="dwcOtherCatalogNumbers" />
         </div>
       </div>
     </FieldSet>

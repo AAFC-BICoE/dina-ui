@@ -4,7 +4,8 @@ import {
   CreateButton,
   dateCell,
   FilterAttribute,
-  ListPageLayout
+  ListPageLayout,
+  stringArrayCell
 } from "common-ui";
 import Link from "next/link";
 import { GroupSelectField, Head, Nav } from "../../../components";
@@ -30,6 +31,7 @@ const MATERIAL_SAMPLE_TABLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
     accessor: "materialSampleName"
   },
   "dwcCatalogNumber",
+  stringArrayCell("dwcOtherCatalogNumbers"),
   "createdBy",
   dateCell("createdOn")
 ];
