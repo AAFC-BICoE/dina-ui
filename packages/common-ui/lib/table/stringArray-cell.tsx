@@ -4,7 +4,7 @@ export function stringArrayCell(accessor: string) {
     Cell: ({ original }) => {
       const value = original[accessor];
       if (value) {
-        const joinedString = value.join();
+        const joinedString = value.join(", ");
         return <div className="stringArray-cell">{joinedString}</div>;
       }
       return null;
