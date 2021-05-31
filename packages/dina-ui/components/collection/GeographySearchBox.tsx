@@ -6,9 +6,10 @@ import {
   NominatumApiSearchResult,
   OnFormikSubmit,
   Tooltip,
-  FormikButton
+  FormikButton,
+  TextField
 } from "common-ui";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FormikContextType } from "formik";
 
 interface GeographySearchBoxProps {
@@ -19,6 +20,7 @@ interface GeographySearchBoxProps {
 
   /** Extra JSX to render under the search bar. */
   renderUnderSearchBar?: ReactNode;
+  isTemplate?: boolean;
 }
 
 export interface AddressDetail {
@@ -131,8 +133,11 @@ export function GeographySearchBox({
   onSelectSearchResult,
   inputValue,
   onInputChange,
-  renderUnderSearchBar
+  renderUnderSearchBar,
+  isTemplate
 }: GeographySearchBoxProps) {
+  const { formatMessage } = useDinaIntl();
+
   /** The query passed to the nominatum API. This state is only set when the user submits the search input. */
   const [searchValue, setSearchValue] = useState<string>("");
 
@@ -172,7 +177,7 @@ export function GeographySearchBox({
     setSearchValue(inputValue);
   }
 
-  return (
+  return !isTemplate ? (
     <div className="m-2">
       <div className="d-flex mb-3 ">
         <label className="pt-2">
@@ -256,6 +261,13 @@ export function GeographySearchBox({
           ))
         )}
       </div>
+    </div>
+  ) : (
+    <div className="m-2">
+      <TextField
+        name="locationSearchValue"
+        label={formatMessage("locationLabel")}
+      />
     </div>
   );
 }
