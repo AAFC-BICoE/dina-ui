@@ -118,6 +118,9 @@ describe("Material Sample Edit Page", () => {
     );
 
     wrapper
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "test-material-sample-id" } });
+    wrapper
       .find(".dwcCatalogNumber-field input")
       .simulate("change", { target: { value: "my-new-material-sample" } });
     wrapper
@@ -163,7 +166,7 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
-              materialSampleName: expect.stringMatching(/test-user-.*/),
+              materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
               relationships: {},
               type: "material-sample"
@@ -193,6 +196,9 @@ describe("Material Sample Edit Page", () => {
       true
     );
 
+    wrapper
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "test-material-sample-id" } });
     wrapper
       .find(".dwcCatalogNumber-field input")
       .simulate("change", { target: { value: "my-new-material-sample" } });
@@ -236,7 +242,7 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
-              materialSampleName: expect.stringMatching(/test-user-.*/),
+              materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
               type: "material-sample",
               relationships: {}
@@ -266,6 +272,9 @@ describe("Material Sample Edit Page", () => {
       wrapper.find(".startEventDateTime-field input").prop("value")
     ).toEqual("2021-04-13");
 
+    wrapper
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "test-material-sample-id" } });
     wrapper
       .find(".dwcCatalogNumber-field input")
       .simulate("change", { target: { value: "edited-catalog-number" } });
@@ -302,6 +311,7 @@ describe("Material Sample Edit Page", () => {
               id: "1",
               type: "material-sample",
               group: "test group",
+              materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "edited-catalog-number",
               collectingEvent: { id: "1", type: "collecting-event" },
               preparationType: { id: null, type: "preparation-type" },

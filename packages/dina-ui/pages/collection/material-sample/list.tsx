@@ -23,9 +23,11 @@ const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
 
 const MATERIAL_SAMPLE_TABLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
   {
-    Cell: ({ original: { id, materialSampleName } }) => (
+    Cell: ({
+      original: { id, materialSampleName, dwcOtherCatalogNumbers }
+    }) => (
       <Link href={`/collection/material-sample/view?id=${id}`}>
-        {materialSampleName || id}
+        {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
       </Link>
     ),
     accessor: "materialSampleName"

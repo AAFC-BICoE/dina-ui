@@ -45,7 +45,6 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
 import { Metadata } from "../../../types/objectstore-api";
-import { omit } from "lodash";
 
 export default function MaterialSampleEditPage() {
   const router = useRouter();
@@ -126,7 +125,6 @@ export function MaterialSampleForm({
   collectingEvtFormRef,
   catelogueSectionRef
 }: MaterialSampleFormProps) {
-  const { username } = useAccount();
   const { openModal } = useModal();
   const { formatMessage } = useDinaIntl();
 
@@ -137,14 +135,10 @@ export function MaterialSampleForm({
   const hasPreparations = !!materialSample?.preparationType;
   const [enablePreparations, setEnablePreparations] = useState(hasPreparations);
 
-  /** YYYY-MM-DD format. */
-  const todayDate = new Date().toISOString().slice(0, 10);
-
   const initialValues: InputResource<MaterialSample> = materialSample
     ? { ...materialSample }
     : {
-        type: "material-sample",
-        materialSampleName: `${username}-${todayDate}`
+        type: "material-sample"
         // managedAttributeValues: {}
       };
 
@@ -223,13 +217,6 @@ export function MaterialSampleForm({
 
     /** Input to submit to the back-end API. */
     const { ...materialSampleInput } = submittedValues;
-
-    if (
-      !materialSampleInput.materialSampleName?.trim() &&
-      !materialSampleInput.dwcCatalogNumber?.trim()
-    ) {
-      throw new Error(formatMessage("materialSampleIdOrCatalogNumberRequired"));
-    }
 
     // Only persist the preparation type if the preparations toggle is enabled:
     if (!enablePreparations) {
