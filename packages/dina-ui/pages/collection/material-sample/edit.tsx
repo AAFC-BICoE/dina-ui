@@ -315,7 +315,7 @@ export function MaterialSampleForm({
       initialValues={collectingEventInitialValues}
       validationSchema={collectingEventFormSchema}
       isTemplate={isTemplate}
-      readOnly={!!colEventId}
+      readOnly={isTemplate ? !!colEventId : false}
     >
       <CollectingEventFormLayout />
       <div className="mb-3">{colEventAttachmentsUI}</div>
