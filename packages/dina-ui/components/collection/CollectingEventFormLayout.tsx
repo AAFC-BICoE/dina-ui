@@ -845,6 +845,7 @@ export function CollectingEventFormLayout({
                             }}
                           </Field>
                         }
+                        isTemplate={isTemplate}
                       />
                     ) : null
                   }

@@ -46,6 +46,7 @@ export interface CollectingEventAttributes {
 
   managedAttributeValues?: ManagedAttributeValues;
 
+  /** For template purpose */
   includeAllCollectingDate?: boolean;
   startEventDateTimeEnabled?: boolean;
   endEventDateTimeEnabled?: boolean;
@@ -67,10 +68,12 @@ export interface CollectingEventAttributes {
   dwcRecordNumberEnabled?: boolean;
   habitatEnabled?: boolean;
 
-  managedAttributeValuesEnabled?: boolean;
-
   colEvntAllowNew?: boolean;
   colEvntAllowExisting?: boolean;
+
+  // For location template
+  locationSearchValue?: string;
+  locationSearchValueEnabled?: boolean;
 }
 
 export enum GeographicPlaceNameSource {

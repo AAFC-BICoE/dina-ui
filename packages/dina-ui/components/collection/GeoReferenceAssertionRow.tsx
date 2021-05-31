@@ -169,6 +169,7 @@ export function GeoReferenceAssertionRow({
               customName="dwcGeoreferenceVerificationStatus"
               type={viewOnly && !georeferenceDisabled ? "hidden" : "checkbox"}
               hideLabel={viewOnly && !georeferenceDisabled ? true : false}
+              className={"hidden"}
             />
           )}
         </Field>

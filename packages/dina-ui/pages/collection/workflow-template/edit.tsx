@@ -47,9 +47,9 @@ export default function PreparationProcessTemplatePage() {
     setWorkflowType(e.target.value);
   };
 
-  const materialSampleFormRef = useRef<FormikProps<any>>(null);
+  const collectingEvtFormRef = useRef<FormikProps<any>>(null);
 
-  const catelogueSectionRef = React.createRef<FormikProps<any>>();
+  const catelogueSectionRef = useRef<FormikProps<any>>(null);
 
   const onSaveTemplateSubmit = values => {
     if (!values.submittedValues.templateName) {
@@ -60,9 +60,13 @@ export default function PreparationProcessTemplatePage() {
       type: values.submittedValues.workFlowType
     };
     workflow.description = values.submittedValues.description;
-    values.submittedValues.workFlowType === "createSplit"
-      ? (workflow.values = catelogueSectionRef.current?.values)
-      : (workflow.values = materialSampleFormRef.current?.values);
+    if (values.submittedValues.workFlowType === "createSplit")
+      workflow.values = catelogueSectionRef.current?.values;
+    else {
+      workflow.values = catelogueSectionRef.current?.values;
+      if (workflow.values)
+        workflow.values.collectingEvent = collectingEvtFormRef.current?.values;
+    }
     const workflows = storedWorkflowTemplates;
     workflows.push(workflow);
     saveWorkflowTemplates(workflows);
@@ -124,12 +128,17 @@ export default function PreparationProcessTemplatePage() {
           {workflowType === "createNew" && (
             <MaterialSampleForm
               isTemplate={true}
-              materialSampleRef={materialSampleFormRef}
+              collectingEvtFormRef={collectingEvtFormRef}
+              catelogueSectionRef={catelogueSectionRef}
             />
           )}
           {workflowType === "createSplit" && (
-            <DinaForm initialValues={{}} innerRef={catelogueSectionRef}>
-              <PreparationsFormLayout isTemplate={true} />
+            <DinaForm
+              initialValues={{}}
+              innerRef={catelogueSectionRef}
+              isTemplate={true}
+            >
+              <PreparationsFormLayout />
               {materialSampleAttachmentsUI}
             </DinaForm>
           )}
