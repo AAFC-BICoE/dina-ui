@@ -1,7 +1,6 @@
 import { LoadingSpinner } from "common-ui";
 import { noop } from "lodash";
-import { DndProvider } from "react-dnd-cjs";
-import HTML5Backend from "react-dnd-html5-backend-cjs";
+import { SeqdbMessage } from "../../../../../intl/seqdb-intl";
 import {
   Chain,
   ChainStepTemplate,
@@ -50,7 +49,10 @@ export function SampleGrid(props: ContainerGridProps) {
   }
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <div>
+      <div className="alert alert-warning d-inline-block">
+        <SeqdbMessage id="sampleGridInstructions" />
+      </div>
       <div className="row">
         <div className="col-3" />
         <div className="col-9">
@@ -76,7 +78,10 @@ export function SampleGrid(props: ContainerGridProps) {
               </li>
             ))}
           </ul>
-          <div className="float-end list-inline">
+          <div
+            className="list-inline mb-3 d-inline"
+            style={{ marginLeft: "10rem" }}
+          >
             <button
               className="btn btn-dark list-inline-item grid-clear"
               onClick={clearGrid}
@@ -111,7 +116,7 @@ export function SampleGrid(props: ContainerGridProps) {
             onClick={moveAll}
             type="button"
           >
-            Move all
+            Move All
           </button>
         </div>
         <div className="col-9">
@@ -124,6 +129,6 @@ export function SampleGrid(props: ContainerGridProps) {
           />
         </div>
       </div>
-    </DndProvider>
+    </div>
   );
 }

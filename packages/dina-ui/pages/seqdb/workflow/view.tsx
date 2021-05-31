@@ -8,7 +8,6 @@ import {
   useQuery
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { GroupFieldView, Head, Nav } from "../../../components";
@@ -36,13 +35,9 @@ export default function WorkflowViewPage() {
       />
       <Nav />
       <ButtonBar>
-        <EditButton entityId={id as string} entityLink="seqdb/workflow" />
         <BackToListButton entityLink="/seqdb/workflow" />
       </ButtonBar>
       <main className="container-fluid">
-        <Link href="/seqdb/workflow/list">
-          <a>NGS Workflow list</a>
-        </Link>
         <h1>
           {formatMessage("workflowViewTitle")}
           {response && `: ${response.data.name}`}
@@ -110,10 +105,18 @@ function WorkflowSteps({ chain }: { chain: PersistedResource<Chain> }) {
         </div>
         <TabPanel>
           <DinaForm initialValues={chain}>
-            <div className="col-md-3">
-              <GroupFieldView name="group" />
-              <FieldView label="Template" name="chainTemplate.name" />
-              <FieldView name="name" />
+            <h2>
+              <SeqdbMessage id="workflowDetails" />
+            </h2>
+            <div className="mb-3">
+              <EditButton entityId={chain.id} entityLink="seqdb/workflow" />
+            </div>
+            <div className="row">
+              <div className="col-md-3">
+                <GroupFieldView name="group" />
+                <FieldView label="Template" name="chainTemplate.name" />
+                <FieldView name="name" />
+              </div>
             </div>
           </DinaForm>
         </TabPanel>
