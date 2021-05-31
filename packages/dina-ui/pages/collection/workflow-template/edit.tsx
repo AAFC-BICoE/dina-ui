@@ -133,8 +133,12 @@ export default function PreparationProcessTemplatePage() {
             />
           )}
           {workflowType === "createSplit" && (
-            <DinaForm initialValues={{}} innerRef={catelogueSectionRef}>
-              <PreparationsFormLayout isTemplate={true} />
+            <DinaForm
+              initialValues={{}}
+              innerRef={catelogueSectionRef}
+              isTemplate={true}
+            >
+              <PreparationsFormLayout />
               {materialSampleAttachmentsUI}
             </DinaForm>
           )}

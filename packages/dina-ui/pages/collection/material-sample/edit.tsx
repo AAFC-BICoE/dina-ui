@@ -309,13 +309,13 @@ export function MaterialSampleForm({
   );
 
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */
-  // Unwrap the DinaForm for template saving purpose
   const nestedCollectingEventForm = (
     <DinaForm
       innerRef={colEventFormRef}
       initialValues={collectingEventInitialValues}
       validationSchema={collectingEventFormSchema}
       isTemplate={isTemplate}
+      readOnly={!!colEventId}
     >
       <CollectingEventFormLayout />
       <div className="mb-3">{colEventAttachmentsUI}</div>
@@ -452,10 +452,13 @@ export function MaterialSampleForm({
             </Tabs>
           </FieldSet>
           {isTemplate ? (
-            <DinaForm initialValues={{}} innerRef={catelogueSectionRef}>
+            <DinaForm
+              initialValues={{}}
+              innerRef={catelogueSectionRef}
+              isTemplate={true}
+            >
               <PreparationsFormLayout
                 className={enablePreparations ? "" : "d-none"}
-                isTemplate={isTemplate}
               />
               {materialSampleAttachmentsUI}
             </DinaForm>
@@ -520,19 +523,16 @@ export function MaterialSampleIdentifiersFormLayout() {
 
 export interface CatalogueInfoFormLayoutProps {
   className?: string;
-  isTemplate?: boolean;
 }
 
 export function PreparationsFormLayout({
-  className,
-  isTemplate
+  className
 }: CatalogueInfoFormLayoutProps) {
   return (
     <FieldSet
       className={className}
       id="preparations-section"
       legend={<DinaMessage id="preparations" />}
-      isTemplate={isTemplate}
     >
       <div className="row">
         <div className="col-md-6">
