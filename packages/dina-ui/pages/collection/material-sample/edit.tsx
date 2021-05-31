@@ -451,13 +451,19 @@ export function MaterialSampleForm({
               </TabPanel>
             </Tabs>
           </FieldSet>
-          <DinaForm initialValues={{}} innerRef={catelogueSectionRef}>
+          {isTemplate ? (
+            <DinaForm initialValues={{}} innerRef={catelogueSectionRef}>
+              <PreparationsFormLayout
+                className={enablePreparations ? "" : "d-none"}
+                isTemplate={isTemplate}
+              />
+              {materialSampleAttachmentsUI}
+            </DinaForm>
+          ) : (
             <PreparationsFormLayout
               className={enablePreparations ? "" : "d-none"}
-              isTemplate={isTemplate}
             />
-            {materialSampleAttachmentsUI}
-          </DinaForm>
+          )}
         </div>
       </div>
     </div>
