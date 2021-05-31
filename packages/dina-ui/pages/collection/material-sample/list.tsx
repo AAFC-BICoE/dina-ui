@@ -4,7 +4,8 @@ import {
   CreateButton,
   dateCell,
   FilterAttribute,
-  ListPageLayout
+  ListPageLayout,
+  stringArrayCell
 } from "common-ui";
 import Link from "next/link";
 import { GroupSelectField, Head, Nav } from "../../../components";
@@ -22,14 +23,17 @@ const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
 
 const MATERIAL_SAMPLE_TABLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
   {
-    Cell: ({ original: { id, materialSampleName } }) => (
+    Cell: ({
+      original: { id, materialSampleName, dwcOtherCatalogNumbers }
+    }) => (
       <Link href={`/collection/material-sample/view?id=${id}`}>
-        {materialSampleName || id}
+        {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
       </Link>
     ),
     accessor: "materialSampleName"
   },
   "dwcCatalogNumber",
+  stringArrayCell("dwcOtherCatalogNumbers"),
   "createdBy",
   dateCell("createdOn")
 ];

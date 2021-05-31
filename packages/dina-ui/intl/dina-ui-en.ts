@@ -91,8 +91,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editPersonTitle: "Edit Person",
   editSelectedAttachmentMetadata: "Edit Selected Attachment Metadata",
   editSelectedButtonText: "Edit Selected",
-  editableManagedAttributesRemoveInfo:
-    "Note: Removing an attribute from the 'Visible Managed Attributes' list doesn't delete the value. To delete the value, clear the input below.",
   enableDateRangeLabel: "Enable Date Range",
   endEventDateTimeLabel: "End Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   exifProperties: "Exif Properties",
@@ -199,7 +197,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "At least one orgnization name is required",
   field_originalFilename: "Original Filename",
   field_preparationType: "Preparation Type",
-  field_otherIds: "Other IDs",
+  field_dwcOtherCatalogNumbers: "Other Catalog Numbers",
   field_publiclyReleasable: "Publicly releasable",
   field_publiclyReleasable_tooltip:
     "Indicates if the object could be released publicly on a web page or open data portals.",
@@ -242,8 +240,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeValueLabel: "Value",
   materialSample: "Material Sample",
   materialSampleAttachments: "Material Sample Attachments",
-  materialSampleIdOrCatalogNumberRequired:
-    'Either "Material Sample ID" or "Catalog Number" is required.',
   materialSampleListTitle: "Material Samples",
   materialSampleViewTitle: "Material Sample",
   metadataAttributesTemplateSave: "Save This Attributes Template",
@@ -302,6 +298,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   removeAssertionLabel: "Remove this GeoReference",
   removeComponentData: "Remove {component} data",
   removeGroup: "Remove Group",
+  removeManagedAttributeValue:
+    "Remove Managed Attribute Value: {attributeNames}",
   removeThisPlaceLabel: " Remove this Place",
   resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",
   revisionsButtonText: "Revisions",

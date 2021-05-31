@@ -38,7 +38,7 @@ export function CheckBoxWithoutWrapper(props: CheckBoxWithoutWrapperProps) {
         }
 
         return includeAllLabel ? (
-          <label className="row">
+          <label className="row mb-3">
             <input
               {...checkboxProps}
               checked={value || false}

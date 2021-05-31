@@ -6,11 +6,14 @@ import {
   ModalProvider
 } from "common-ui";
 import "common-ui/lib/button-bar/buttonbar.css";
+import "common-ui/lib/table/react-table-style.css";
 import "handsontable/dist/handsontable.full.min.css";
 import { AppProps } from "next/app";
 import "rc-tooltip/assets/bootstrap.css";
 import React from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import { DndProvider } from "react-dnd-cjs";
+import HTML5Backend from "react-dnd-html5-backend-cjs";
 import "react-dropzone-uploader/dist/styles.css";
 import "react-table/react-table.css";
 import "react-tabs/style/react-tabs.css";
@@ -18,7 +21,6 @@ import { ErrorBoundaryPage } from "../components";
 import "../components/button-bar/nav/app-top.css";
 import "../components/button-bar/nav/nav.css";
 import "../components/button-bar/nav/wet-beow-bootstrap-4.css";
-import "common-ui/lib/table/react-table-style.css";
 import { FileUploadProviderImpl } from "../components/object-store/file-upload/FileUploadProvider";
 import { DinaIntlProvider } from "../intl/dina-ui-intl";
 
@@ -39,9 +41,11 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
           <FileUploadProviderImpl>
             <DinaIntlProvider>
               <ErrorBoundaryPage>
-                <ModalProvider appElement={appElement}>
-                  <Component {...pageProps} />
-                </ModalProvider>
+                <DndProvider backend={HTML5Backend}>
+                  <ModalProvider appElement={appElement}>
+                    <Component {...pageProps} />
+                  </ModalProvider>
+                </DndProvider>
               </ErrorBoundaryPage>
             </DinaIntlProvider>
           </FileUploadProviderImpl>

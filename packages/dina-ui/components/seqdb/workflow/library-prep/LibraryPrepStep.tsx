@@ -73,7 +73,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
       <>
         <h2>Library Prep Batch</h2>
         <button
-          className="btn btn-primary float-end"
+          className="btn btn-primary mb-3"
           onClick={() => setEditBatchDetails(true)}
           type="button"
         >
@@ -98,7 +98,11 @@ export function LibraryPrepStep(props: StepRendererProps) {
             </a>
           </Link>
         </div>
-        <div className="mb-3">
+        <div
+          className="mb-3"
+          // Give this section enough min height so you don't lose your scroll position when changing tabs:
+          style={{ minHeight: "70rem" }}
+        >
           <Tabs>
             <TabList>
               <Tab>Substep 1: Library Prep Details Table</Tab>

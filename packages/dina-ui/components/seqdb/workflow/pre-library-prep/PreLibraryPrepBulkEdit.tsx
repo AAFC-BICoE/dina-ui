@@ -55,19 +55,23 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
     },
     {
       data: "plpStepResource.preLibraryPrep.inputAmount",
-      title: formatMessage("field_inputAmount")
+      title: formatMessage("field_inputAmount"),
+      type: "numeric"
     },
     {
       data: "plpStepResource.preLibraryPrep.concentration",
-      title: formatMessage("field_concentration")
+      title: formatMessage("field_concentration"),
+      type: "numeric"
     },
     {
       data: "plpStepResource.preLibraryPrep.targetDpSize",
-      title: formatMessage("field_targetDpSize")
+      title: formatMessage("field_targetDpSize"),
+      type: "numeric"
     },
     {
       data: "plpStepResource.preLibraryPrep.averageFragmentSize",
-      title: formatMessage("field_averageFragmentSize")
+      title: formatMessage("field_averageFragmentSize"),
+      type: "numeric"
     },
     {
       data: "plpStepResource.preLibraryPrep.quality",

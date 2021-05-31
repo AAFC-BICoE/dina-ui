@@ -32,25 +32,24 @@ export default function PreparationProcessTemplatePage() {
     WorkflowTemplate[]
   >("workflow_templates", []);
 
-  const {
-    attachedMetadatasUI: materialSampleAttachmentsUI
-  } = useAttachmentsModal({
-    initialMetadatas: [],
-    deps: [],
-    title: <DinaMessage id="materialSampleAttachments" />,
-    isTemplate: true,
-    allowNewFieldName: "materialSampleAllowNew",
-    allowExistingFieldName: "materialSampleAllowExisting"
-  });
+  const { attachedMetadatasUI: materialSampleAttachmentsUI } =
+    useAttachmentsModal({
+      initialMetadatas: [],
+      deps: [],
+      title: <DinaMessage id="materialSampleAttachments" />,
+      isTemplate: true,
+      allowNewFieldName: "materialSampleAllowNew",
+      allowExistingFieldName: "materialSampleAllowExisting"
+    });
 
   const workFlowTypeOnChange = (e, form) => {
     form.setFieldValue("workFlowType", e.target.value);
     setWorkflowType(e.target.value);
   };
 
-  const materialSampleFormRef = useRef<FormikProps<any>>(null);
+  const collectingEvtFormRef = useRef<FormikProps<any>>(null);
 
-  const catelogueSectionRef = React.createRef<FormikProps<any>>();
+  const catelogueSectionRef = useRef<FormikProps<any>>(null);
 
   const onSaveTemplateSubmit = values => {
     if (!values.submittedValues.templateName) {
@@ -61,9 +60,13 @@ export default function PreparationProcessTemplatePage() {
       type: values.submittedValues.workFlowType
     };
     workflow.description = values.submittedValues.description;
-    values.submittedValues.workFlowType === "createSplit"
-      ? (workflow.values = catelogueSectionRef.current?.values)
-      : (workflow.values = materialSampleFormRef.current?.values);
+    if (values.submittedValues.workFlowType === "createSplit")
+      workflow.values = catelogueSectionRef.current?.values;
+    else {
+      workflow.values = catelogueSectionRef.current?.values;
+      if (workflow.values)
+        workflow.values.collectingEvent = collectingEvtFormRef.current?.values;
+    }
     const workflows = storedWorkflowTemplates;
     workflows.push(workflow);
     saveWorkflowTemplates(workflows);
@@ -98,7 +101,7 @@ export default function PreparationProcessTemplatePage() {
                   <div className="col-md-6 row">
                     <label className="col-md-2">
                       <input
-                        className="form-control createNewWorkflow"
+                        className="mb-3 createNewWorkflow"
                         value="createNew"
                         type="radio"
                         name="workFlowType"
@@ -109,7 +112,7 @@ export default function PreparationProcessTemplatePage() {
                     </label>
                     <label className="col-md-2">
                       <input
-                        className="form-control"
+                        className="mb-3"
                         value="createSplit"
                         type="radio"
                         name="workFlowType"
@@ -125,12 +128,17 @@ export default function PreparationProcessTemplatePage() {
           {workflowType === "createNew" && (
             <MaterialSampleForm
               isTemplate={true}
-              materialSampleRef={materialSampleFormRef}
+              collectingEvtFormRef={collectingEvtFormRef}
+              catelogueSectionRef={catelogueSectionRef}
             />
           )}
           {workflowType === "createSplit" && (
-            <DinaForm initialValues={{}} innerRef={catelogueSectionRef}>
-              <PreparationsFormLayout isTemplate={true} />
+            <DinaForm
+              initialValues={{}}
+              innerRef={catelogueSectionRef}
+              isTemplate={true}
+            >
+              <PreparationsFormLayout />
               {materialSampleAttachmentsUI}
             </DinaForm>
           )}
