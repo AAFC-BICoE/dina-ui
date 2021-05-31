@@ -6,12 +6,12 @@ describe("stringArrayCell", () => {
     const cell = stringArrayCell("myStringArrField");
 
     const wrapper = mountWithAppContext(
-      <cell.Cell original={{ myStringArrField: new Array(["org1", "org2"]) }} />
+      <cell.Cell original={{ myStringArrField: ["org1", "org2"] }} />
     );
 
     expect(cell.accessor).toEqual("myStringArrField");
 
-    expect(wrapper.find(".stringArray-cell").text()).toEqual("org1,org2");
+    expect(wrapper.find(".stringArray-cell").text()).toEqual("org1, org2");
   });
 
   it("Renders nothing if string is missing", () => {

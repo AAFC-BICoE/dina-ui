@@ -53,6 +53,7 @@ import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimBu
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
   setDefaultVerbatimSRS?: (newValue: string | undefined | null) => void;
+  initialValuesForTemplate?: any;
 }
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
@@ -574,7 +575,7 @@ export function CollectingEventFormLayout({
                     [];
 
                   function addGeoReference() {
-                    push({ isPrimary: assertions.length === 0 });
+                    push({ isPrimary: assertions?.length === 0 });
                     setActiveTabIdx(assertions.length);
                   }
 
