@@ -156,7 +156,7 @@ export function MaterialSampleForm({
     saveCollectingEvent,
     attachedMetadatasUI: colEventAttachmentsUI,
     collectingEventFormSchema
-  } = useCollectingEventSave(colEventQuery.response?.data);
+  } = useCollectingEventSave(colEventQuery.response?.data, isTemplate);
 
   const {
     attachedMetadatasUI: materialSampleAttachmentsUI,

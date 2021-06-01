@@ -99,26 +99,25 @@ export default function PreparationProcessTemplatePage() {
               <Field>
                 {({ form }) => (
                   <div className="col-md-6 row">
-                    <label className="col-md-2">
+                    <label className="col-md-3">
                       <input
-                        className="mb-3 createNewWorkflow"
+                        className="createNewWorkflow"
                         value="createNew"
                         type="radio"
                         name="workFlowType"
                         checked={workflowType === "createNew"}
                         onChange={e => workFlowTypeOnChange(e, form)}
                       />
-                      {formatMessage("creatNewWorkflow")}
+                      <p>{formatMessage("creatNewWorkflow")}</p>
                     </label>
-                    <label className="col-md-2">
+                    <label className="col-md-3">
                       <input
-                        className="mb-3"
                         value="createSplit"
                         type="radio"
                         name="workFlowType"
                         onChange={e => workFlowTypeOnChange(e, form)}
                       />
-                      {formatMessage("createSplitWorkflow")}
+                      <p>{formatMessage("createSplitWorkflow")}</p>
                     </label>
                   </div>
                 )}

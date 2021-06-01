@@ -105,7 +105,7 @@ export function FieldWrapper({
             className={[
               `${labelCol ? `col-sm-${labelCol}` : ""}`,
               // Adjust alignment for editable inputs:
-              horizontal && !readOnly ? "mt-sm-2" : "",
+              horizontal && !readOnly && !isTemplate ? "mt-sm-2" : "",
               "mb-2"
             ].join(" ")}
           >
@@ -141,5 +141,6 @@ export function FieldWrapper({
       </label>
     </div>
   );
-  return className !== "hidden" ? wrapper : null;
+  // ensure hide the hidden fields when it is a tempalte
+  return className !== "hidden" || !isTemplate ? wrapper : null;
 }
