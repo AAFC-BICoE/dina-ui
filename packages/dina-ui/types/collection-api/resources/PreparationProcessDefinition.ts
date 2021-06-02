@@ -11,7 +11,7 @@ export interface FormTemplate<TFormValues> {
 
 /** Map of form field names to template field config. */
 export type TemplateFields<TFormValues = any> = {
-  [Field in keyof TFormValues]: TemplateField<TFormValues[Field]>;
+  [Field in keyof TFormValues]: TemplateField<TFormValues[Field]> | undefined;
 };
 
 /** Configures one field in a form template. */
@@ -23,6 +23,7 @@ export interface TemplateField<TFieldType> {
 export interface PreparationProcessDefinitionAttributes {
   type: "material-sample-action-definition";
   name: string;
+  actionType: string;
   createdBy?: string;
   createdOn?: string;
   group: string;

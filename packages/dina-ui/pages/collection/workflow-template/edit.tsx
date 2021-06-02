@@ -7,40 +7,34 @@ import {
   TextField
 } from "common-ui";
 import { FormikProps } from "formik";
+import { get, mapValues, cloneDeep } from "lodash";
 import React, { useRef, useState } from "react";
 import * as yup from "yup";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { PreparationProcessDefinition } from "../../../types/collection-api";
+import {
+  PreparationProcessDefinition,
+  TemplateFields
+} from "../../../types/collection-api";
 import {
   MaterialSampleForm,
   PreparationsFormLayout
 } from "../material-sample/edit";
 
-// const formTemplateSchema = yup.object({
-//   allowNew: yup.boolean().required(),
-//   allowExisting: yup.boolean().required(),
-//   templateFields: yup.mixed()
-// });
-
-const workflowFormSchema = yup.object({
+const workflowMainFieldsSchema = yup.object({
   name: yup.string().trim().required(),
   description: yup.string(),
   group: yup.string().required()
-  // formTemplates: yup.object({
-  //   COLLECTING_EVENT: formTemplateSchema,
-  //   MATERIAL_SAMPLE: formTemplateSchema
-  // })
 });
 
-type WorkflowFormValues = yup.InferType<typeof workflowFormSchema>;
+type WorkflowFormValues = yup.InferType<typeof workflowMainFieldsSchema>;
 
 export default function PreparationProcessTemplatePage() {
   const { formatMessage } = useDinaIntl();
 
-  const [workflowType, setWorkflowType] =
-    useState<"CREATE_NEW" | "SPLIT">("CREATE_NEW");
+  const [actionType, setActionType] =
+    useState<"ADD" | "SPLIT" | "MERGE">("ADD");
 
   const { attachedMetadatasUI: materialSampleAttachmentsUI } =
     useAttachmentsModal({
@@ -53,38 +47,44 @@ export default function PreparationProcessTemplatePage() {
     });
 
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
-
-  const catalogueSectionRef = useRef<FormikProps<any>>(null);
+  const materialSampleFormRef = useRef<FormikProps<any>>(null);
 
   async function onSaveTemplateSubmit({
-    submittedValues: mainTemplateFormValues
+    submittedValues: mainTemplateFields
   }: DinaFormSubmitParams<WorkflowFormValues>) {
-    if (!catalogueSectionRef.current || !collectingEvtFormRef.current) {
+    if (!materialSampleFormRef.current || !collectingEvtFormRef.current) {
       return;
     }
 
-    const catalogSectionValues = catalogueSectionRef.current.values;
-    const collectingEvtSectionValues = collectingEvtFormRef.current.values;
+    const materialSampleFormValues = cloneDeep(
+      materialSampleFormRef.current.values
+    );
+    const collectingEventSectionValues = cloneDeep(
+      collectingEvtFormRef.current.values
+    );
+
+    const materialSampleEnabledFields = getEnabledTemplateFieldsFromForm(
+      materialSampleFormValues
+    );
+    const collectingEventEnabledFields = getEnabledTemplateFieldsFromForm(
+      collectingEventSectionValues
+    );
 
     const definition: PreparationProcessDefinition = {
-      ...mainTemplateFormValues,
+      ...mainTemplateFields,
+      actionType,
       formTemplates: {
         MATERIAL_SAMPLE: {
-          ...catalogSectionValues.attachmentsConfig
+          ...materialSampleFormValues.attachmentsConfig,
+          templateFields: materialSampleEnabledFields
         },
         COLLECTING_EVENT: {
-          ...collectingEvtSectionValues.attachmentsConfig
+          ...collectingEventSectionValues.attachmentsConfig,
+          templateFields: collectingEventEnabledFields
         }
       },
       type: "material-sample-action-definition"
     };
-
-    // console.log({
-    //   mainTemplateFormValues,
-    //   collectingEvtFormRef,
-    //   catalogueSectionRef,
-    //   definition
-    // });
   }
 
   const initialValues: Partial<WorkflowFormValues> = {};
@@ -106,7 +106,7 @@ export default function PreparationProcessTemplatePage() {
         <DinaForm<Partial<WorkflowFormValues>>
           initialValues={initialValues}
           onSubmit={onSaveTemplateSubmit}
-          validationSchema={workflowFormSchema}
+          validationSchema={workflowMainFieldsSchema}
         >
           {buttonBar}
           <div className="container">
@@ -124,16 +124,16 @@ export default function PreparationProcessTemplatePage() {
                   <label className="mx-3">
                     <input
                       type="radio"
-                      checked={workflowType === "CREATE_NEW"}
-                      onChange={() => setWorkflowType("CREATE_NEW")}
+                      checked={actionType === "ADD"}
+                      onChange={() => setActionType("ADD")}
                     />
                     <p>{formatMessage("creatNewWorkflow")}</p>
                   </label>
                   <label className="mx-3">
                     <input
                       type="radio"
-                      checked={workflowType === "SPLIT"}
-                      onChange={() => setWorkflowType("SPLIT")}
+                      checked={actionType === "SPLIT"}
+                      onChange={() => setActionType("SPLIT")}
                     />
                     <p>{formatMessage("createSplitWorkflow")}</p>
                   </label>
@@ -141,17 +141,17 @@ export default function PreparationProcessTemplatePage() {
               </div>
             </FieldSet>
           </div>
-          {workflowType === "CREATE_NEW" && (
+          {actionType === "ADD" && (
             <MaterialSampleForm
               isTemplate={true}
               collectingEvtFormRef={collectingEvtFormRef}
-              catelogueSectionRef={catalogueSectionRef}
+              catelogueSectionRef={materialSampleFormRef}
             />
           )}
-          {workflowType === "SPLIT" && (
+          {actionType === "SPLIT" && (
             <DinaForm
               initialValues={{}}
-              innerRef={catalogueSectionRef}
+              innerRef={materialSampleFormRef}
               isTemplate={true}
             >
               <PreparationsFormLayout />
@@ -162,5 +162,21 @@ export default function PreparationProcessTemplatePage() {
         </DinaForm>
       </div>
     </div>
+  );
+}
+
+/** Get the enabled template fields with their default values from the form. */
+export function getEnabledTemplateFieldsFromForm(
+  formValues: any
+): TemplateFields {
+  return mapValues(
+    formValues.templateCheckboxes ?? {},
+    (val: boolean | undefined, key) =>
+      val
+        ? {
+            enabled: true,
+            defaultValue: get(formValues, key) || undefined
+          }
+        : undefined
   );
 }
