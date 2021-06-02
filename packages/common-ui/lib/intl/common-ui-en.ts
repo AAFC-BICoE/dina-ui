@@ -18,7 +18,9 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   checkAllTooltipMessage:
     "Check this header box to check all visible items in this page.",
   closeButtonText: "Close",
+  configureLabel: "Configure",
   createNew: "Create New",
+  description: "Description",
   deleteAllButtonText: "Delete All",
   deleteButtonText: "Delete",
   editableTable: "Editable Table",
@@ -63,6 +65,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   queryTableMultiSortExplanation:
     "To sort by multiple columns: Click one column header to sort by that column, then press shift while you click an additional header.",
   queryTableMultiSortTooltipTitle: "Multi-column sorting",
+  remarks: "Remarks",
   remove: "Remove",
   resetButtonText: "Reset",
   rows: "rows",
@@ -74,6 +77,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   somethingWentWrong: "Something went wrong",
   sourceField: "Source Field",
   sourceText: "Source Text",
+  startLabel: "Start",
+  stepLabel: "Step",
   submitBtnText: "Save",
   tableTotalCount: "Total matched records: {totalCount}",
   targetField: "Target Field",

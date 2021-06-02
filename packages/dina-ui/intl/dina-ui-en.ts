@@ -34,6 +34,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   attachedCollectingEvent: "Attached Collecting Event",
   attachments: "Attachments",
   attributeLabel: "Attribute",
+  baseNameLabel: "Base Name",
   cancelButtonText: "Cancel",
   cataloguedObjectListTitle: "Catalogued Objects",
   cataloguedObjectViewTitle: "View Catalogued Object",
@@ -316,6 +317,15 @@ export const DINAUI_MESSAGES_ENGLISH = {
   selectGroup: "Select Group",
   set: "Set",
   showing: "Showing",
+  splitSubsampleTitle: "Split(Subsample)",
+  splitSampleDescription:
+    "Split a Parent Sample into one of more Child Samples",
+  splitSampleActionMetadataLegend: "Action Metadata",
+  splitSampleRemarksPlaceholder:
+    " Describe what you did, what was changed, or what happened as a result. (i.e. removed leg)",
+  splitSampleConfigLegend: "Configure Action: Split",
+  splitSampleChildSamplesToCreateLabel: "Child Material Samples to create",
+  splitSampleTagOriginalAsDestroyed: 'Tag Original as "Destroyed"',
   startEventDateTimeLabel: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   stateProvinceLabel: "State/Province",
   templateNameMandatoryErrorMsg: "Please enter a workflow template name.",

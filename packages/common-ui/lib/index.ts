@@ -66,3 +66,4 @@ export * from "./button-bar/EditButton";
 export * from "./button-bar/ButtonBar";
 export * from "./formik-connected/TextFieldWithRemoveButton";
 export * from "./formik-connected/CheckBoxWithoutWrapper";
+export * from "./number-spinner/NumberSpinner";
