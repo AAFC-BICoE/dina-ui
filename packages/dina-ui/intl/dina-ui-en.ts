@@ -91,6 +91,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editPersonTitle: "Edit Person",
   editSelectedAttachmentMetadata: "Edit Selected Attachment Metadata",
   editSelectedButtonText: "Edit Selected",
+  editWorkflowTemplateTitle: "Edit Workflow Template",
   enableDateRangeLabel: "Enable Date Range",
   endEventDateTimeLabel: "End Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   exifProperties: "Exif Properties",

@@ -23,7 +23,7 @@ export interface TemplateField<TFieldType> {
 export interface PreparationProcessDefinitionAttributes {
   type: "material-sample-action-definition";
   name: string;
-  actionType: string;
+  actionType: "ADD" | "SPLIT" | "MERGE";
   createdBy?: string;
   createdOn?: string;
   group: string;
