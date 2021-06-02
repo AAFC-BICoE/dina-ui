@@ -340,6 +340,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   viewOnMap: "View on Map",
   viewPreviewButtonText: "Preview",
   warningMessage: "Warning Message",
+  workflowTemplateListTitle: "Workflow Templates",
   workflowTemplateTitle: "Workflow Template",
   whoAmITitle: "Who Am I",
   year: "Year",

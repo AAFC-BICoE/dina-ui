@@ -270,9 +270,9 @@ function NavCollectionDropdown() {
             <DinaMessage id="revisionsByUserPageTitle" />
           </a>
         </Link>
-        <Link href="/collection/workflow-template/edit">
+        <Link href="/collection/workflow-template/list">
           <a className="dropdown-item">
-            <DinaMessage id="workflowTemplateTitle" />
+            <DinaMessage id="workflowTemplateListTitle" />
           </a>
         </Link>
       </div>

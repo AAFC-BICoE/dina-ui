@@ -7,7 +7,8 @@ import {
   TextField
 } from "common-ui";
 import { FormikProps } from "formik";
-import { get, mapValues, cloneDeep } from "lodash";
+import { cloneDeep, get, mapValues } from "lodash";
+import { useRouter } from "next/router";
 import React, { useRef, useState } from "react";
 import * as yup from "yup";
 import { GroupSelectField, Head, Nav } from "../../../components";
@@ -32,6 +33,7 @@ type WorkflowFormValues = yup.InferType<typeof workflowMainFieldsSchema>;
 
 export default function PreparationProcessTemplatePage() {
   const { formatMessage } = useDinaIntl();
+  const router = useRouter();
 
   const [actionType, setActionType] =
     useState<"ADD" | "SPLIT" | "MERGE">("ADD");
@@ -50,6 +52,7 @@ export default function PreparationProcessTemplatePage() {
   const materialSampleFormRef = useRef<FormikProps<any>>(null);
 
   async function onSaveTemplateSubmit({
+    api: { save },
     submittedValues: mainTemplateFields
   }: DinaFormSubmitParams<WorkflowFormValues>) {
     if (!materialSampleFormRef.current || !collectingEvtFormRef.current) {
@@ -85,6 +88,18 @@ export default function PreparationProcessTemplatePage() {
       },
       type: "material-sample-action-definition"
     };
+
+    await save(
+      [
+        {
+          resource: definition,
+          type: "material-sample-action-definition"
+        }
+      ],
+      { apiBaseUrl: "/collection-api" }
+    );
+
+    await router.push("/collection/workflow-template/list");
   }
 
   const initialValues: Partial<WorkflowFormValues> = {};
