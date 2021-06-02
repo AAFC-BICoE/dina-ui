@@ -61,18 +61,13 @@ export interface UseMaterialSampleSaveParams {
   onSaved?: (id: string) => Promise<void>;
   isTemplate?: boolean;
   collectingEvtFormRef?: React.Ref<FormikProps<any>>;
-
-  attachmentsAllowNewFieldName?: string;
-  attachmentsAllowExistingFieldName?: string;
 }
 
 export function useMaterialSampleSave({
   materialSample,
   onSaved,
   isTemplate,
-  collectingEvtFormRef,
-  attachmentsAllowNewFieldName,
-  attachmentsAllowExistingFieldName
+  collectingEvtFormRef
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
@@ -115,8 +110,8 @@ export function useMaterialSampleSave({
     deps: [materialSample?.id],
     title: <DinaMessage id="materialSampleAttachments" />,
     isTemplate,
-    allowNewFieldName: attachmentsAllowNewFieldName,
-    allowExistingFieldName: attachmentsAllowExistingFieldName,
+    allowNewFieldName: "attachmentsConfig.allowNew",
+    allowExistingFieldName: "attachmentsConfig.allowExisting",
     id: "material-sample-attachments-section"
   });
 

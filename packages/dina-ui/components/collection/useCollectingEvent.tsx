@@ -178,8 +178,8 @@ export function useCollectingEventSave(
     deps: [fetchedCollectingEvent?.id],
     title: <DinaMessage id="collectingEventAttachments" />,
     isTemplate,
-    allowNewFieldName: "colEvntAllowNew",
-    allowExistingFieldName: "colEvnAllowExisting"
+    allowNewFieldName: "attachmentsConfig.allowNew",
+    allowExistingFieldName: "attachmentsConfig.allowExisting"
   });
 
   async function saveCollectingEvent(

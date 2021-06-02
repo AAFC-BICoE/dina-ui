@@ -72,9 +72,6 @@ export interface MaterialSampleFormProps {
   isTemplate?: boolean;
   collectingEvtFormRef?: React.Ref<FormikProps<any>>;
   catelogueSectionRef?: React.Ref<FormikProps<any>>;
-
-  attachmentsAllowNewFieldName?: string;
-  attachmentsAllowExistingFieldName?: string;
 }
 
 export function MaterialSampleForm({
@@ -82,9 +79,7 @@ export function MaterialSampleForm({
   onSaved,
   isTemplate,
   collectingEvtFormRef,
-  catelogueSectionRef,
-  attachmentsAllowExistingFieldName,
-  attachmentsAllowNewFieldName
+  catelogueSectionRef
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
   const {
@@ -104,9 +99,7 @@ export function MaterialSampleForm({
     materialSample,
     onSaved,
     isTemplate,
-    collectingEvtFormRef,
-    attachmentsAllowExistingFieldName,
-    attachmentsAllowNewFieldName
+    collectingEvtFormRef
   });
   const buttonBar = (
     <ButtonBar>

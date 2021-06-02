@@ -59,17 +59,21 @@ export default function PreparationProcessTemplatePage() {
   async function onSaveTemplateSubmit({
     submittedValues: mainTemplateFormValues
   }: DinaFormSubmitParams<WorkflowFormValues>) {
-    if (!catalogueSectionRef.current) {
+    if (!catalogueSectionRef.current || !collectingEvtFormRef.current) {
       return;
     }
 
-    const { attachmentsConfig } = catalogueSectionRef.current.values;
+    const catalogSectionValues = catalogueSectionRef.current.values;
+    const collectingEvtSectionValues = collectingEvtFormRef.current.values;
 
     const definition: PreparationProcessDefinition = {
       ...mainTemplateFormValues,
       formTemplates: {
         MATERIAL_SAMPLE: {
-          ...attachmentsConfig
+          ...catalogSectionValues.attachmentsConfig
+        },
+        COLLECTING_EVENT: {
+          ...collectingEvtSectionValues.attachmentsConfig
         }
       },
       type: "material-sample-action-definition"
@@ -142,8 +146,6 @@ export default function PreparationProcessTemplatePage() {
               isTemplate={true}
               collectingEvtFormRef={collectingEvtFormRef}
               catelogueSectionRef={catalogueSectionRef}
-              attachmentsAllowNewFieldName="attachmentsConfig.allowNew"
-              attachmentsAllowExistingFieldName="attachmentsConfig.allowExisting"
             />
           )}
           {workflowType === "SPLIT" && (

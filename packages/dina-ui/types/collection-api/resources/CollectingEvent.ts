@@ -68,9 +68,6 @@ export interface CollectingEventAttributes {
   dwcRecordNumberEnabled?: boolean;
   habitatEnabled?: boolean;
 
-  colEvntAllowNew?: boolean;
-  colEvntAllowExisting?: boolean;
-
   // For location template
   locationSearchValue?: string;
   locationSearchValueEnabled?: boolean;
