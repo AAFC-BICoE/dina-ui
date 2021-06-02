@@ -56,12 +56,24 @@ export function useMaterialSampleQuery(id?: string | null) {
   return materialSampleQuery;
 }
 
-export function useMaterialSampleSave(
-  materialSample?: PersistedResource<MaterialSample>,
-  onSaved?: (id: string) => Promise<void>,
-  isTemplate?: boolean,
-  collectingEvtFormRef?: React.Ref<FormikProps<any>>
-) {
+export interface UseMaterialSampleSaveParams {
+  materialSample?: PersistedResource<MaterialSample>;
+  onSaved?: (id: string) => Promise<void>;
+  isTemplate?: boolean;
+  collectingEvtFormRef?: React.Ref<FormikProps<any>>;
+
+  attachmentsAllowNewFieldName?: string;
+  attachmentsAllowExistingFieldName?: string;
+}
+
+export function useMaterialSampleSave({
+  materialSample,
+  onSaved,
+  isTemplate,
+  collectingEvtFormRef,
+  attachmentsAllowNewFieldName,
+  attachmentsAllowExistingFieldName
+}: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
@@ -103,8 +115,8 @@ export function useMaterialSampleSave(
     deps: [materialSample?.id],
     title: <DinaMessage id="materialSampleAttachments" />,
     isTemplate,
-    allowNewFieldName: "materialSampleAllowNew",
-    allowExistingFieldName: "materialSampleAllowExisting",
+    allowNewFieldName: attachmentsAllowNewFieldName,
+    allowExistingFieldName: attachmentsAllowExistingFieldName,
     id: "material-sample-attachments-section"
   });
 

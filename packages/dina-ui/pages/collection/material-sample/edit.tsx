@@ -72,6 +72,9 @@ export interface MaterialSampleFormProps {
   isTemplate?: boolean;
   collectingEvtFormRef?: React.Ref<FormikProps<any>>;
   catelogueSectionRef?: React.Ref<FormikProps<any>>;
+
+  attachmentsAllowNewFieldName?: string;
+  attachmentsAllowExistingFieldName?: string;
 }
 
 export function MaterialSampleForm({
@@ -79,7 +82,9 @@ export function MaterialSampleForm({
   onSaved,
   isTemplate,
   collectingEvtFormRef,
-  catelogueSectionRef
+  catelogueSectionRef,
+  attachmentsAllowExistingFieldName,
+  attachmentsAllowNewFieldName
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
   const {
@@ -95,12 +100,14 @@ export function MaterialSampleForm({
     colEventQuery,
     onSubmit,
     materialSampleAttachmentsUI
-  } = useMaterialSampleSave(
+  } = useMaterialSampleSave({
     materialSample,
     onSaved,
     isTemplate,
-    collectingEvtFormRef
-  );
+    collectingEvtFormRef,
+    attachmentsAllowExistingFieldName,
+    attachmentsAllowNewFieldName
+  });
   const buttonBar = (
     <ButtonBar>
       <BackButton

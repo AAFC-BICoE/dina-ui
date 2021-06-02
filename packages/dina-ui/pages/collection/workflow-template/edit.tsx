@@ -1,36 +1,46 @@
 import {
+  ButtonBar,
+  DinaForm,
+  DinaFormSubmitParams,
+  FieldSet,
+  SubmitButton,
+  TextField
+} from "common-ui";
+import { FormikProps } from "formik";
+import React, { useRef, useState } from "react";
+import * as yup from "yup";
+import { GroupSelectField, Head, Nav } from "../../../components";
+import { useAttachmentsModal } from "../../../components/object-store";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { PreparationProcessDefinition } from "../../../types/collection-api";
+import {
   MaterialSampleForm,
   PreparationsFormLayout
 } from "../material-sample/edit";
-import { FieldSet, TextField } from "common-ui";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { useLocalStorage } from "@rehooks/local-storage";
 
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { FormikProps, Field } from "formik";
-import { useState, useRef } from "react";
-import { Head, Nav } from "../../../components";
-import { ButtonBar, SubmitButton, DinaForm } from "common-ui";
-import React from "react";
-import { MaterialSample } from "../../../types/collection-api";
-import { useAttachmentsModal } from "../../../components/object-store";
+// const formTemplateSchema = yup.object({
+//   allowNew: yup.boolean().required(),
+//   allowExisting: yup.boolean().required(),
+//   templateFields: yup.mixed()
+// });
 
-/** A named set of templates used for editing workflow/preparation process. */
-export interface WorkflowTemplate {
-  name: string;
-  description?: string;
-  type: string;
-  values?: Partial<MaterialSample>;
-}
+const workflowFormSchema = yup.object({
+  name: yup.string().trim().required(),
+  description: yup.string(),
+  group: yup.string().required()
+  // formTemplates: yup.object({
+  //   COLLECTING_EVENT: formTemplateSchema,
+  //   MATERIAL_SAMPLE: formTemplateSchema
+  // })
+});
+
+type WorkflowFormValues = yup.InferType<typeof workflowFormSchema>;
 
 export default function PreparationProcessTemplatePage() {
   const { formatMessage } = useDinaIntl();
 
-  const [workflowType, setWorkflowType] = useState("createNew");
-
-  const [storedWorkflowTemplates, saveWorkflowTemplates] = useLocalStorage<
-    WorkflowTemplate[]
-  >("workflow_templates", []);
+  const [workflowType, setWorkflowType] =
+    useState<"CREATE_NEW" | "SPLIT">("CREATE_NEW");
 
   const { attachedMetadatasUI: materialSampleAttachmentsUI } =
     useAttachmentsModal({
@@ -38,103 +48,108 @@ export default function PreparationProcessTemplatePage() {
       deps: [],
       title: <DinaMessage id="materialSampleAttachments" />,
       isTemplate: true,
-      allowNewFieldName: "materialSampleAllowNew",
-      allowExistingFieldName: "materialSampleAllowExisting"
+      allowNewFieldName: "formTemplates.MATERIAL_SAMPLE.allowNew",
+      allowExistingFieldName: "formTemplates.MATERIAL_SAMPLE.allowExisting"
     });
-
-  const workFlowTypeOnChange = (e, form) => {
-    form.setFieldValue("workFlowType", e.target.value);
-    setWorkflowType(e.target.value);
-  };
 
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
 
-  const catelogueSectionRef = useRef<FormikProps<any>>(null);
+  const catalogueSectionRef = useRef<FormikProps<any>>(null);
 
-  const onSaveTemplateSubmit = values => {
-    if (!values.submittedValues.templateName) {
-      throw new Error(formatMessage("templateNameMandatoryErrorMsg"));
+  async function onSaveTemplateSubmit({
+    submittedValues: mainTemplateFormValues
+  }: DinaFormSubmitParams<WorkflowFormValues>) {
+    if (!catalogueSectionRef.current) {
+      return;
     }
-    const workflow: WorkflowTemplate = {
-      name: values.submittedValues.templateName,
-      type: values.submittedValues.workFlowType
+
+    const { attachmentsConfig } = catalogueSectionRef.current.values;
+
+    const definition: PreparationProcessDefinition = {
+      ...mainTemplateFormValues,
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          ...attachmentsConfig
+        }
+      },
+      type: "material-sample-action-definition"
     };
-    workflow.description = values.submittedValues.description;
-    if (values.submittedValues.workFlowType === "createSplit")
-      workflow.values = catelogueSectionRef.current?.values;
-    else {
-      workflow.values = catelogueSectionRef.current?.values;
-      if (workflow.values)
-        workflow.values.collectingEvent = collectingEvtFormRef.current?.values;
-    }
-    const workflows = storedWorkflowTemplates;
-    workflows.push(workflow);
-    saveWorkflowTemplates(workflows);
-  };
+
+    // console.log({
+    //   mainTemplateFormValues,
+    //   collectingEvtFormRef,
+    //   catalogueSectionRef,
+    //   definition
+    // });
+  }
+
+  const initialValues: Partial<WorkflowFormValues> = {};
 
   const buttonBar = (
     <ButtonBar>
       <SubmitButton />
     </ButtonBar>
   );
+
   return (
     <div>
       <Head title={formatMessage("createWorkflowTemplateTitle")} />
       <Nav />
-      <h1>
-        <DinaMessage id="createWorkflowTemplateTitle" />
-      </h1>
-      <DinaForm
-        initialValues={{ workFlowType: "createNew" }}
-        onSubmit={onSaveTemplateSubmit}
-      >
-        <>
+      <div className="container-fluid">
+        <h1>
+          <DinaMessage id="createWorkflowTemplateTitle" />
+        </h1>
+        <DinaForm<Partial<WorkflowFormValues>>
+          initialValues={initialValues}
+          onSubmit={onSaveTemplateSubmit}
+          validationSchema={workflowFormSchema}
+        >
           {buttonBar}
-          <FieldSet legend={<DinaMessage id="configureAction" />}>
-            <div className="row">
-              <div className="col-md-6">
-                <TextField name="templateName" className="row" />
-                <TextField name="templateDescription" className="row" />
+          <div className="container">
+            <FieldSet legend={<DinaMessage id="configureAction" />}>
+              <div className="row">
+                <div className="col-md-6">
+                  <TextField name="name" className="row" />
+                  <TextField name="description" className="row" />
+                  <GroupSelectField
+                    name="group"
+                    enableStoredDefaultGroup={true}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="mx-3">
+                    <input
+                      type="radio"
+                      checked={workflowType === "CREATE_NEW"}
+                      onChange={() => setWorkflowType("CREATE_NEW")}
+                    />
+                    <p>{formatMessage("creatNewWorkflow")}</p>
+                  </label>
+                  <label className="mx-3">
+                    <input
+                      type="radio"
+                      checked={workflowType === "SPLIT"}
+                      onChange={() => setWorkflowType("SPLIT")}
+                    />
+                    <p>{formatMessage("createSplitWorkflow")}</p>
+                  </label>
+                </div>
               </div>
-              <Field>
-                {({ form }) => (
-                  <div className="col-md-6 row">
-                    <label className="col-md-3">
-                      <input
-                        className="createNewWorkflow"
-                        value="createNew"
-                        type="radio"
-                        name="workFlowType"
-                        checked={workflowType === "createNew"}
-                        onChange={e => workFlowTypeOnChange(e, form)}
-                      />
-                      <p>{formatMessage("creatNewWorkflow")}</p>
-                    </label>
-                    <label className="col-md-3">
-                      <input
-                        value="createSplit"
-                        type="radio"
-                        name="workFlowType"
-                        onChange={e => workFlowTypeOnChange(e, form)}
-                      />
-                      <p>{formatMessage("createSplitWorkflow")}</p>
-                    </label>
-                  </div>
-                )}
-              </Field>
-            </div>
-          </FieldSet>
-          {workflowType === "createNew" && (
+            </FieldSet>
+          </div>
+          {workflowType === "CREATE_NEW" && (
             <MaterialSampleForm
               isTemplate={true}
               collectingEvtFormRef={collectingEvtFormRef}
-              catelogueSectionRef={catelogueSectionRef}
+              catelogueSectionRef={catalogueSectionRef}
+              attachmentsAllowNewFieldName="attachmentsConfig.allowNew"
+              attachmentsAllowExistingFieldName="attachmentsConfig.allowExisting"
             />
           )}
-          {workflowType === "createSplit" && (
+          {workflowType === "SPLIT" && (
             <DinaForm
               initialValues={{}}
-              innerRef={catelogueSectionRef}
+              innerRef={catalogueSectionRef}
               isTemplate={true}
             >
               <PreparationsFormLayout />
@@ -142,8 +157,8 @@ export default function PreparationProcessTemplatePage() {
             </DinaForm>
           )}
           {buttonBar}
-        </>
-      </DinaForm>
+        </DinaForm>
+      </div>
     </div>
   );
 }

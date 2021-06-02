@@ -31,8 +31,6 @@ export interface LabelWrapperParams {
 
   /** Remove the label. */
   removeLabel?: boolean;
-
-  isTemplate?: boolean;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -85,7 +83,7 @@ export function FieldWrapper({
     <div className={`${className} ${isTemplate ? "row" : ""}`}>
       {isTemplate && (
         <CheckBoxWithoutWrapper
-          name={`${name}Enabled`}
+          name={`templateCheckboxes.['${name}']`}
           className="col-sm-1 templateCheckBox"
         />
       )}
