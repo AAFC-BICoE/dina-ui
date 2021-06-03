@@ -1,9 +1,12 @@
 import {
+  ButtonBar,
   CheckBoxWithoutWrapper,
   DinaForm,
   FieldSet,
+  FormikButton,
   NumberField,
   SelectField,
+  SubmitButton,
   TextField
 } from "common-ui";
 import NumberSpinnerField from "packages/common-ui/lib/formik-connected/NumberSpinnerField";
@@ -11,7 +14,7 @@ import { Head, Nav } from "packages/dina-ui/components";
 import React, { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 
-interface SplitChildRowprops {
+interface SplitChildRowProps {
   index: number;
   baseName: string;
 }
@@ -23,8 +26,8 @@ export default function ConfigAction() {
   const [type, setType] = useState("Numerical");
   const [start, setStart] = useState(type === "Numerical" ? "1" : "A");
 
-  const onCreatedChildSplitSampleChange = e => {
-    setNumOfChildToCreate(e.target.value);
+  const onCreatedChildSplitSampleChange = value => {
+    setNumOfChildToCreate(value);
   };
 
   type SuffixOptions = "Numerical" | "Letter";
@@ -42,22 +45,24 @@ export default function ConfigAction() {
   const SplitChildHeader = () => (
     <div className="d-flex">
       <span className="col-md-1" />
-      <span className="col-md-3">{formatMessage("name")}</span>
-      <span className="col-md-3">{formatMessage("description")}</span>
+      <span className="col-md-3 fw-bold">{formatMessage("name")}</span>
+      <span className="col-md-3 fw-bold">{formatMessage("description")}</span>
     </div>
   );
 
   const SplitChildRow = ({
     index,
     baseName: sampleSrcName
-  }: SplitChildRowprops) => (
+  }: SplitChildRowProps) => (
     <div className="d-flex">
-      <span className="col-md-1">
+      <span className="col-md-1 fw-bold">
+        #
         {type === "Numerical"
           ? isNaN(parseInt(start, 10))
             ? index - 1
             : index - parseInt(start, 10) + 1
           : index}
+        :
       </span>
       <TextField
         className="col-md-3"
@@ -76,22 +81,38 @@ export default function ConfigAction() {
   );
 
   const SplitChildRows = () => {
-    const accumulate: any = [];
+    const childRows: any = [];
     for (let i = 0; i < numOfChildToCreate; i++) {
       type === "Numerical"
-        ? accumulate.push(
+        ? childRows.push(
             <SplitChildRow
               key={i}
               index={i + parseInt(start, 10)}
               baseName={baseName}
             />
           )
-        : accumulate.push(
+        : childRows.push(
             <SplitChildRow key={i} index={i + 1} baseName={baseName} />
           );
     }
-    return accumulate;
+    return childRows;
   };
+
+  const onSubmit = async ({}) => {
+    // submit to back end or save to local
+    // navigate to a run aciton page
+  };
+
+  const buttonBar = (
+    <ButtonBar>
+      <FormikButton
+        className="btn btn-dark"
+        onClick={(_, formik) => onSubmit(formik)}
+      >
+        <DinaMessage id="next" />
+      </FormikButton>
+    </ButtonBar>
+  );
 
   return (
     <div>
@@ -106,75 +127,69 @@ export default function ConfigAction() {
           {formatMessage("splitSampleDescription")}
         </p>
         <DinaForm initialValues={{ type: "Numerical" }}>
-          <>
-            <FieldSet
-              legend={<DinaMessage id="splitSampleActionMetadataLegend" />}
-            >
-              <TextField
-                name="remarks"
-                multiLines={true}
-                placeholder={formatMessage("splitSampleRemarksPlaceholder")}
+          {buttonBar}
+          <FieldSet
+            legend={<DinaMessage id="splitSampleActionMetadataLegend" />}
+          >
+            <TextField
+              name="remarks"
+              multiLines={true}
+              placeholder={formatMessage("splitSampleRemarksPlaceholder")}
+            />
+          </FieldSet>
+          <p className="fw-bold">
+            {formatMessage("stepLabel")}1: {formatMessage("configureLabel")}
+          </p>
+          <FieldSet legend={<DinaMessage id="splitSampleConfigLegend" />}>
+            <span className="fw-bold">
+              {formatMessage("splitSampleChildSamplesToCreateLabel")}{" "}
+            </span>
+            <div className="row">
+              <NumberSpinnerField
+                name="createdChilderenNum"
+                className="col-md-2"
+                onChange={onCreatedChildSplitSampleChange}
+                hideLabel={true}
+                defaultValue={numOfChildToCreate}
               />
-            </FieldSet>
-            <p className="fw-bold">
-              {formatMessage("stepLabel")}1: {formatMessage("configureLabel")}
-            </p>
-            <FieldSet legend={<DinaMessage id="splitSampleConfigLegend" />}>
-              <span className="fw-bold">
-                {formatMessage("splitSampleChildSamplesToCreateLabel")}{" "}
-              </span>
-              <div className="row">
-                <NumberSpinnerField
-                  name="createdChilderenNum"
-                  className="col-md-2"
-                  onChange={onCreatedChildSplitSampleChange}
-                  hideLabel={true}
-                  defaultValue={numOfChildToCreate}
+              <div className="col-md-4">
+                <CheckBoxWithoutWrapper
+                  name="destroyOriginal"
+                  includeAllLabel={formatMessage("destroyOriginal")}
                 />
-                <div className="col-md-4">
-                  <CheckBoxWithoutWrapper
-                    name="destroyOriginal"
-                    includeAllLabel={formatMessage("destroyOriginal")}
-                  />
-                </div>
               </div>
-              <div className="row">
-                <TextField
+            </div>
+            <div className="row">
+              <TextField
+                className="col-md-2"
+                name="baseName"
+                placeholder="ParentName"
+                onChangeExternal={(_, _name, value) =>
+                  setBaseName(value as any)
+                }
+              />
+              <SelectField
+                className="col-md-2"
+                name="type"
+                options={TYPE_OPTIONS}
+                onChange={(value, _) => setType(value as any)}
+              />
+              {type === "Numerical" ? (
+                <NumberField
                   className="col-md-2"
-                  name="baseName"
-                  placeholder="ParentName"
-                  onChangeExternal={(_, _name, value) =>
-                    setBaseName(value as any)
-                  }
+                  name="start"
+                  onChangeExternal={(_, _name, value) => setStart(value as any)}
                 />
-                <SelectField
-                  className="col-md-2"
-                  name="type"
-                  options={TYPE_OPTIONS}
-                  onChange={(value, _) => setType(value as any)}
-                />
-                {type === "Numerical" ? (
-                  <NumberField
-                    className="col-md-2"
-                    name="start"
-                    onChangeExternal={(_, _name, value) =>
-                      setStart(value as any)
-                    }
-                  />
-                ) : (
-                  <TextField
-                    className="col-md-2"
-                    name="start"
-                    placeholder="A"
-                  />
-                )}
-              </div>
-              <div>
-                <SplitChildHeader />
-                <SplitChildRows />
-              </div>
-            </FieldSet>
-          </>
+              ) : (
+                <TextField className="col-md-2" name="start" placeholder="A" />
+              )}
+            </div>
+            <div>
+              <SplitChildHeader />
+              <SplitChildRows />
+            </div>
+          </FieldSet>
+          {buttonBar}
         </DinaForm>
       </main>
     </div>
