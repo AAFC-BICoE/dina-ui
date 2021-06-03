@@ -220,26 +220,44 @@ export function MaterialSampleForm({
                 {
                   // If there is already a linked CollectingEvent then wait for it to load first:
                   colEventId
-                    ? withResponse(colEventQuery, () => (
-                        <>
-                          <div className="mb-3 d-flex justify-content-end align-items-center">
-                            <Link
-                              href={`/collection/collecting-event/view?id=${colEventId}`}
-                            >
-                              <a target="_blank">
-                                <DinaMessage id="collectingEventDetailsPageLink" />
-                              </a>
-                            </Link>
-                            <FormikButton
-                              className="btn btn-danger detach-collecting-event-button ms-5"
-                              onClick={() => setColEventId(null)}
-                            >
-                              <DinaMessage id="detachCollectingEvent" />
-                            </FormikButton>
-                          </div>
-                          {nestedCollectingEventForm}
-                        </>
-                      ))
+                    ? withResponse(
+                        colEventQuery,
+                        ({ data: linkedColEvent }) => (
+                          <>
+                            <div className="mb-3 d-flex justify-content-end align-items-center">
+                              <Link
+                                href={`/collection/collecting-event/view?id=${colEventId}`}
+                              >
+                                <a target="_blank">
+                                  <DinaMessage id="collectingEventDetailsPageLink" />
+                                </a>
+                              </Link>
+                              <FormikButton
+                                className="btn btn-danger detach-collecting-event-button ms-5"
+                                onClick={() => setColEventId(null)}
+                              >
+                                <DinaMessage id="detachCollectingEvent" />
+                              </FormikButton>
+                            </div>
+                            {
+                              // In template mode, only show a link to the linked Collecting Event:
+                              isTemplate ? (
+                                <>
+                                  <DinaMessage id="attachedCollectingEvent" />:{" "}
+                                  <Link
+                                    href={`/collection/collecting-event/view?id=${colEventId}`}
+                                  >
+                                    <a target="_blank">{linkedColEvent.id}</a>
+                                  </Link>
+                                </>
+                              ) : (
+                                // In form mode, show the actual editable Collecting Event form:
+                                nestedCollectingEventForm
+                              )
+                            }
+                          </>
+                        )
+                      )
                     : nestedCollectingEventForm
                 }
               </TabPanel>

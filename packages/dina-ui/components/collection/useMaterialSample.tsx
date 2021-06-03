@@ -85,10 +85,12 @@ export function useMaterialSampleSave({
   const { openModal } = useModal();
 
   const hasColEventTemplate =
-    isTemplate && !isEmpty(colEventTemplateInitialValues?.templateCheckboxes);
+    isTemplate &&
+    (!isEmpty(colEventTemplateInitialValues?.templateCheckboxes) ||
+      colEventTemplateInitialValues?.id);
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
-    hasColEventTemplate || !!materialSample?.collectingEvent
+    !!(hasColEventTemplate || !!materialSample?.collectingEvent)
   );
 
   const hasPreparationsTemplate =
@@ -110,7 +112,9 @@ export function useMaterialSampleSave({
     collectingEvtFormRef ?? useRef<FormikProps<any>>(null);
 
   const [colEventId, setColEventId] = useState<string | null | undefined>(
-    materialSample?.collectingEvent?.id
+    isTemplate
+      ? colEventTemplateInitialValues?.id
+      : materialSample?.collectingEvent?.id
   );
   const colEventQuery = useCollectingEventQuery(colEventId);
 

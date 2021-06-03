@@ -127,7 +127,11 @@ export function WorkflowTemplateForm({
     collectingEvtFormRef
   });
 
-  const { enableCollectingEvent, enablePreparations } = materialSampleSaveHook;
+  const {
+    colEventId: attachedColEventId,
+    enableCollectingEvent,
+    enablePreparations
+  } = materialSampleSaveHook;
 
   async function onSaveTemplateSubmit({
     api: { save },
@@ -147,15 +151,25 @@ export function WorkflowTemplateForm({
                 )
               : undefined
         },
-        COLLECTING_EVENT:
-          enableCollectingEvent && collectingEvtFormRef.current
+        COLLECTING_EVENT: enableCollectingEvent
+          ? attachedColEventId
             ? {
-                ...collectingEvtFormRef.current.values.attachmentsConfig,
-                templateFields: getEnabledTemplateFieldsFromForm(
-                  collectingEvtFormRef.current.values
-                )
+                // When linking the template to an existing Col event, only set the ID here:
+                templateFields: {
+                  id: { enabled: true, defaultValue: attachedColEventId }
+                }
               }
-            : undefined
+            : {
+                // When making a template for a new Collecting Event, set all chosen fields here:
+                ...collectingEvtFormRef.current?.values?.attachmentsConfig,
+                templateFields: {
+                  ...getEnabledTemplateFieldsFromForm(
+                    collectingEvtFormRef.current?.values
+                  ),
+                  id: undefined
+                }
+              }
+          : undefined
       },
       type: "material-sample-action-definition"
     };
