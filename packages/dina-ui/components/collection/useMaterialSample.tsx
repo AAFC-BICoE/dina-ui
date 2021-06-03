@@ -79,10 +79,11 @@ export function useMaterialSampleSave({
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
+  const hasColEventTemplate =
+    isTemplate && !isEmpty(colEventTemplateInitialValues?.templateCheckboxes);
+
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
-    isTemplate
-      ? !!colEventTemplateInitialValues
-      : !!materialSample?.collectingEvent
+    hasColEventTemplate || !!materialSample?.collectingEvent
   );
 
   const hasPreparations = !!materialSample?.preparationType;

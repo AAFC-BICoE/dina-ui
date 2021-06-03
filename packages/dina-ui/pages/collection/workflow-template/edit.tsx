@@ -1,6 +1,7 @@
 import {
   ButtonBar,
   DinaForm,
+  DinaFormSection,
   DinaFormSubmitParams,
   FieldSet,
   SubmitButton,
@@ -10,18 +11,19 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { PersistedResource } from "kitsu";
-import { cloneDeep, get, set, toPairs, mapValues } from "lodash";
-import { useRouter, NextRouter } from "next/router";
+import { get, mapValues, set, toPairs } from "lodash";
+import { NextRouter, useRouter } from "next/router";
 import React, { useRef, useState } from "react";
 import * as yup from "yup";
 import { GroupSelectField, Head, Nav } from "../../../components";
+import { useMaterialSampleSave } from "../../../components/collection/useMaterialSample";
 import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
-  PreparationProcessDefinition,
   FormTemplate,
-  TemplateFields,
-  TemplateField
+  PreparationProcessDefinition,
+  TemplateField,
+  TemplateFields
 } from "../../../types/collection-api";
 import {
   MaterialSampleForm,
@@ -106,7 +108,7 @@ export function WorkflowTemplateForm({
   const initialValues: Partial<WorkflowFormValues> = initialDefinition ?? {};
 
   // Initialize the tempalte form default values and checkbox states:
-  const colEventFormInitialValues =
+  const colEventTemplateInitialValues =
     getTemplateInitialValuesFromSavedFormTemplate(
       formTemplates?.COLLECTING_EVENT
     );
@@ -114,6 +116,14 @@ export function WorkflowTemplateForm({
     getTemplateInitialValuesFromSavedFormTemplate(
       formTemplates?.MATERIAL_SAMPLE
     );
+
+  const materialSampleSaveHook = useMaterialSampleSave({
+    isTemplate: true,
+    colEventTemplateInitialValues,
+    collectingEvtFormRef
+  });
+
+  const { enableCollectingEvent, enablePreparations } = materialSampleSaveHook;
 
   async function onSaveTemplateSubmit({
     api: { save },
@@ -124,22 +134,24 @@ export function WorkflowTemplateForm({
       ...mainTemplateFields,
       actionType,
       formTemplates: {
-        MATERIAL_SAMPLE: materialSampleFormRef.current
-          ? {
-              ...materialSampleFormRef.current.values.attachmentsConfig,
-              templateFields: getEnabledTemplateFieldsFromForm(
-                materialSampleFormRef.current.values
-              )
-            }
-          : undefined,
-        COLLECTING_EVENT: collectingEvtFormRef.current
-          ? {
-              ...collectingEvtFormRef.current.values.attachmentsConfig,
-              templateFields: getEnabledTemplateFieldsFromForm(
-                collectingEvtFormRef.current.values
-              )
-            }
-          : undefined
+        MATERIAL_SAMPLE:
+          enablePreparations && materialSampleFormRef.current
+            ? {
+                ...materialSampleFormRef.current.values.attachmentsConfig,
+                templateFields: getEnabledTemplateFieldsFromForm(
+                  materialSampleFormRef.current.values
+                )
+              }
+            : undefined,
+        COLLECTING_EVENT:
+          enableCollectingEvent && collectingEvtFormRef.current
+            ? {
+                ...collectingEvtFormRef.current.values.attachmentsConfig,
+                templateFields: getEnabledTemplateFieldsFromForm(
+                  collectingEvtFormRef.current.values
+                )
+              }
+            : undefined
       },
       type: "material-sample-action-definition"
     };
@@ -200,12 +212,12 @@ export function WorkflowTemplateForm({
         </FieldSet>
       </div>
       {actionType === "ADD" ? (
-        <MaterialSampleForm
-          isTemplate={true}
-          colEventTemplateInitialValues={colEventFormInitialValues}
-          collectingEvtFormRef={collectingEvtFormRef}
-          catelogueSectionRef={materialSampleFormRef}
-        />
+        <DinaFormSection isTemplate={true}>
+          <MaterialSampleForm
+            materialSampleSaveHook={materialSampleSaveHook}
+            catelogueSectionRef={materialSampleFormRef}
+          />
+        </DinaFormSection>
       ) : actionType === "SPLIT" ? (
         <DinaForm
           initialValues={materialSampleFormInitialValues}
@@ -260,5 +272,10 @@ export function getTemplateInitialValuesFromSavedFormTemplate<T>(
     }
   }
 
-  return { ...defaultValues, templateCheckboxes };
+  const { allowNew, allowExisting } = formTemplate;
+  return {
+    ...defaultValues,
+    templateCheckboxes,
+    attachmentsConfig: { allowNew, allowExisting }
+  };
 }

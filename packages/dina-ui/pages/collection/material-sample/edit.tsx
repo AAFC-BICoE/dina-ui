@@ -11,6 +11,7 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
+  useDinaFormContext,
   withResponse
 } from "common-ui";
 import { FormikProps } from "formik";
@@ -69,25 +70,21 @@ export default function MaterialSampleEditPage() {
 export interface MaterialSampleFormProps {
   materialSample?: PersistedResource<MaterialSample>;
   onSaved?: (id: string) => Promise<void>;
-  collectingEvtFormRef?: React.RefObject<FormikProps<any>>;
   catelogueSectionRef?: React.RefObject<FormikProps<any>>;
 
-  isTemplate?: boolean;
-  /** Default values and template checkboxes for the Collecting Event template form */
-  colEventTemplateInitialValues?: Partial<CollectingEvent> & {
-    templateCheckboxes?: Record<string, boolean | undefined>;
-  };
+  /** Optionally call the hook from the parent component. */
+  materialSampleSaveHook?: ReturnType<typeof useMaterialSampleSave>;
 }
 
 export function MaterialSampleForm({
   materialSample,
   onSaved,
-  isTemplate,
-  collectingEvtFormRef,
   catelogueSectionRef,
-  colEventTemplateInitialValues
+  materialSampleSaveHook
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
+  const { isTemplate } = useDinaFormContext();
+
   const {
     initialValues,
     nestedCollectingEventForm,
@@ -101,13 +98,14 @@ export function MaterialSampleForm({
     colEventQuery,
     onSubmit,
     materialSampleAttachmentsUI
-  } = useMaterialSampleSave({
-    materialSample,
-    onSaved,
-    isTemplate,
-    collectingEvtFormRef,
-    colEventTemplateInitialValues
-  });
+  } =
+    materialSampleSaveHook ??
+    useMaterialSampleSave({
+      materialSample,
+      onSaved,
+      isTemplate
+    });
+
   const buttonBar = (
     <ButtonBar>
       <BackButton
