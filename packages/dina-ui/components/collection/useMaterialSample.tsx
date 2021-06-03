@@ -1,16 +1,7 @@
-import { InputResource, PersistedResource } from "kitsu";
-import {
-  DinaFormSubmitParams,
-  useApiClient,
-  useModal,
-  useQuery
-} from "../../../common-ui/lib";
-import { MaterialSample } from "../../../dina-ui/types/collection-api";
-import { Metadata } from "../../../dina-ui/types/objectstore-api";
+import { AreYouSureModal, DinaForm } from "common-ui";
 import { FormikProps } from "formik";
-import { useCollectingEventQuery, useCollectingEventSave } from ".";
-import { useAttachmentsModal } from "../object-store";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { InputResource, PersistedResource } from "kitsu";
+import { cloneDeep, isEmpty } from "lodash";
 import {
   Dispatch,
   SetStateAction,
@@ -18,10 +9,21 @@ import {
   useRef,
   useState
 } from "react";
-import { cloneDeep, isEmpty } from "lodash";
-
-import { AreYouSureModal, DinaForm } from "common-ui";
+import { useCollectingEventQuery, useCollectingEventSave } from ".";
+import {
+  DinaFormSubmitParams,
+  useApiClient,
+  useModal,
+  useQuery
+} from "../../../common-ui/lib";
+import {
+  CollectingEvent,
+  MaterialSample
+} from "../../../dina-ui/types/collection-api";
+import { Metadata } from "../../../dina-ui/types/objectstore-api";
 import { CollectingEventFormLayout } from "../../components/collection";
+import { DinaMessage } from "../../intl/dina-ui-intl";
+import { useAttachmentsModal } from "../object-store";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -59,20 +61,28 @@ export function useMaterialSampleQuery(id?: string | null) {
 export interface UseMaterialSampleSaveParams {
   materialSample?: PersistedResource<MaterialSample>;
   onSaved?: (id: string) => Promise<void>;
+  collectingEvtFormRef?: React.RefObject<FormikProps<any>>;
+
   isTemplate?: boolean;
-  collectingEvtFormRef?: React.Ref<FormikProps<any>>;
+
+  colEventTemplateInitialValues?: Partial<CollectingEvent> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
 }
 
 export function useMaterialSampleSave({
   materialSample,
   onSaved,
+  collectingEvtFormRef,
   isTemplate,
-  collectingEvtFormRef
+  colEventTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
-    !!materialSample?.collectingEvent
+    isTemplate
+      ? !!colEventTemplateInitialValues
+      : !!materialSample?.collectingEvent
   );
 
   const hasPreparations = !!materialSample?.preparationType;
@@ -175,7 +185,7 @@ export function useMaterialSampleSave({
         id: null,
         type: "collecting-event"
       };
-    } else if ((colEventFormRef as any).current) {
+    } else if (colEventFormRef.current) {
       // Return if the Collecting Event sub-form has errors:
       const colEventErrors = await (
         colEventFormRef as any
@@ -232,7 +242,11 @@ export function useMaterialSampleSave({
   const nestedCollectingEventForm = (
     <DinaForm
       innerRef={colEventFormRef}
-      initialValues={collectingEventInitialValues}
+      initialValues={
+        isTemplate
+          ? colEventTemplateInitialValues
+          : collectingEventInitialValues
+      }
       validationSchema={collectingEventFormSchema}
       isTemplate={isTemplate}
       readOnly={isTemplate ? !!colEventId : false}

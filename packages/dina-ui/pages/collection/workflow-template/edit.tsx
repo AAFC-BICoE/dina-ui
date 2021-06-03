@@ -10,7 +10,7 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { PersistedResource } from "kitsu";
-import { cloneDeep, get, mapValues } from "lodash";
+import { cloneDeep, get, set, toPairs, mapValues } from "lodash";
 import { useRouter, NextRouter } from "next/router";
 import React, { useRef, useState } from "react";
 import * as yup from "yup";
@@ -19,7 +19,9 @@ import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   PreparationProcessDefinition,
-  TemplateFields
+  FormTemplate,
+  TemplateFields,
+  TemplateField
 } from "../../../types/collection-api";
 import {
   MaterialSampleForm,
@@ -99,42 +101,45 @@ export function WorkflowTemplateForm({
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
   const materialSampleFormRef = useRef<FormikProps<any>>(null);
 
-  const initialValues: Partial<WorkflowFormValues> = {};
+  const { formTemplates, ...initialDefinition } = fetchedActionDefinition ?? {};
+
+  const initialValues: Partial<WorkflowFormValues> = initialDefinition ?? {};
+
+  // Initialize the tempalte form default values and checkbox states:
+  const colEventFormInitialValues =
+    getTemplateInitialValuesFromSavedFormTemplate(
+      formTemplates?.COLLECTING_EVENT
+    );
+  const materialSampleFormInitialValues =
+    getTemplateInitialValuesFromSavedFormTemplate(
+      formTemplates?.MATERIAL_SAMPLE
+    );
 
   async function onSaveTemplateSubmit({
     api: { save },
     submittedValues: mainTemplateFields
   }: DinaFormSubmitParams<WorkflowFormValues>) {
-    if (!materialSampleFormRef.current || !collectingEvtFormRef.current) {
-      return;
-    }
-
-    const materialSampleFormValues = cloneDeep(
-      materialSampleFormRef.current.values
-    );
-    const collectingEventSectionValues = cloneDeep(
-      collectingEvtFormRef.current.values
-    );
-
-    const materialSampleEnabledFields = getEnabledTemplateFieldsFromForm(
-      materialSampleFormValues
-    );
-    const collectingEventEnabledFields = getEnabledTemplateFieldsFromForm(
-      collectingEventSectionValues
-    );
-
+    // Construct the template definition to persist based on the form values:
     const definition: PreparationProcessDefinition = {
       ...mainTemplateFields,
       actionType,
       formTemplates: {
-        MATERIAL_SAMPLE: {
-          ...materialSampleFormValues.attachmentsConfig,
-          templateFields: materialSampleEnabledFields
-        },
-        COLLECTING_EVENT: {
-          ...collectingEventSectionValues.attachmentsConfig,
-          templateFields: collectingEventEnabledFields
-        }
+        MATERIAL_SAMPLE: materialSampleFormRef.current
+          ? {
+              ...materialSampleFormRef.current.values.attachmentsConfig,
+              templateFields: getEnabledTemplateFieldsFromForm(
+                materialSampleFormRef.current.values
+              )
+            }
+          : undefined,
+        COLLECTING_EVENT: collectingEvtFormRef.current
+          ? {
+              ...collectingEvtFormRef.current.values.attachmentsConfig,
+              templateFields: getEnabledTemplateFieldsFromForm(
+                collectingEvtFormRef.current.values
+              )
+            }
+          : undefined
       },
       type: "material-sample-action-definition"
     };
@@ -194,23 +199,23 @@ export function WorkflowTemplateForm({
           </div>
         </FieldSet>
       </div>
-      {actionType === "ADD" && (
+      {actionType === "ADD" ? (
         <MaterialSampleForm
           isTemplate={true}
+          colEventTemplateInitialValues={colEventFormInitialValues}
           collectingEvtFormRef={collectingEvtFormRef}
           catelogueSectionRef={materialSampleFormRef}
         />
-      )}
-      {actionType === "SPLIT" && (
+      ) : actionType === "SPLIT" ? (
         <DinaForm
-          initialValues={{}}
+          initialValues={materialSampleFormInitialValues}
           innerRef={materialSampleFormRef}
           isTemplate={true}
         >
           <PreparationsFormLayout />
           {materialSampleAttachmentsUI}
         </DinaForm>
-      )}
+      ) : null}
       {buttonBar}
     </DinaForm>
   );
@@ -230,4 +235,30 @@ export function getEnabledTemplateFieldsFromForm(
           }
         : undefined
   );
+}
+
+/** Get the checkbox values for the template form from the persisted form template. */
+export function getTemplateInitialValuesFromSavedFormTemplate<T>(
+  formTemplate?: FormTemplate<T>
+): Partial<T> & { templateCheckboxes?: Record<string, true | undefined> } {
+  if (!formTemplate) {
+    return {};
+  }
+
+  // Get the checkbox state:
+  const templateCheckboxes = mapValues(formTemplate.templateFields, val =>
+    val?.enabled ? true : undefined
+  );
+
+  // Get the default values from the stored template:
+  const defaultValues: Partial<T> = {};
+  for (const [field, templateField] of toPairs<TemplateField<any> | undefined>(
+    formTemplate.templateFields
+  )) {
+    if (templateField?.enabled && templateField.defaultValue) {
+      set(defaultValues, field, templateField.defaultValue);
+    }
+  }
+
+  return { ...defaultValues, templateCheckboxes };
 }

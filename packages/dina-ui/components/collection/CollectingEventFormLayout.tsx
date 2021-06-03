@@ -349,7 +349,10 @@ export function CollectingEventFormLayout({
                     />
                   )}
                   {!readOnly && (
-                    <label style={{ marginLeft: 15, marginTop: -15 }}>
+                    <label
+                      className="mb-3"
+                      style={{ marginLeft: 15, marginTop: -15 }}
+                    >
                       <span>{formatMessage("enableDateRangeLabel")}</span>
                       <Switch
                         onChange={newValue =>

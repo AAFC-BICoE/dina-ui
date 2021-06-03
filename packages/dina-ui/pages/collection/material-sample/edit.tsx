@@ -26,7 +26,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { CollectingEventLinker } from "../../../components/collection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { MaterialSample } from "../../../types/collection-api";
+import { CollectingEvent, MaterialSample } from "../../../types/collection-api";
 import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
 
 export default function MaterialSampleEditPage() {
@@ -69,9 +69,14 @@ export default function MaterialSampleEditPage() {
 export interface MaterialSampleFormProps {
   materialSample?: PersistedResource<MaterialSample>;
   onSaved?: (id: string) => Promise<void>;
+  collectingEvtFormRef?: React.RefObject<FormikProps<any>>;
+  catelogueSectionRef?: React.RefObject<FormikProps<any>>;
+
   isTemplate?: boolean;
-  collectingEvtFormRef?: React.Ref<FormikProps<any>>;
-  catelogueSectionRef?: React.Ref<FormikProps<any>>;
+  /** Default values and template checkboxes for the Collecting Event template form */
+  colEventTemplateInitialValues?: Partial<CollectingEvent> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
 }
 
 export function MaterialSampleForm({
@@ -79,7 +84,8 @@ export function MaterialSampleForm({
   onSaved,
   isTemplate,
   collectingEvtFormRef,
-  catelogueSectionRef
+  catelogueSectionRef,
+  colEventTemplateInitialValues
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
   const {
@@ -99,7 +105,8 @@ export function MaterialSampleForm({
     materialSample,
     onSaved,
     isTemplate,
-    collectingEvtFormRef
+    collectingEvtFormRef,
+    colEventTemplateInitialValues
   });
   const buttonBar = (
     <ButtonBar>

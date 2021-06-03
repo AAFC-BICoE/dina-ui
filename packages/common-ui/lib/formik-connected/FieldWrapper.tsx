@@ -83,7 +83,7 @@ export function FieldWrapper({
     <div className={`${className} ${isTemplate ? "row" : ""}`}>
       {isTemplate && (
         <CheckBoxWithoutWrapper
-          name={`templateCheckboxes.['${name}']`}
+          name={`templateCheckboxes['${name}']`}
           className="col-sm-1 templateCheckBox"
         />
       )}
