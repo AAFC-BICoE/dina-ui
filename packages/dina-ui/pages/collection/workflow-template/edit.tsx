@@ -32,7 +32,6 @@ import {
 
 const workflowMainFieldsSchema = yup.object({
   name: yup.string().trim().required(),
-  description: yup.string(),
   group: yup.string().required()
 });
 
@@ -135,15 +134,15 @@ export function WorkflowTemplateForm({
       ...mainTemplateFields,
       actionType,
       formTemplates: {
-        MATERIAL_SAMPLE:
-          enablePreparations && materialSampleFormRef.current
-            ? {
-                ...materialSampleFormRef.current.values.attachmentsConfig,
-                templateFields: getEnabledTemplateFieldsFromForm(
+        MATERIAL_SAMPLE: {
+          ...materialSampleFormRef.current?.values.attachmentsConfig,
+          templateFields:
+            enablePreparations && materialSampleFormRef.current
+              ? getEnabledTemplateFieldsFromForm(
                   materialSampleFormRef.current.values
                 )
-              }
-            : undefined,
+              : undefined
+        },
         COLLECTING_EVENT:
           enableCollectingEvent && collectingEvtFormRef.current
             ? {
@@ -188,7 +187,6 @@ export function WorkflowTemplateForm({
           <div className="row">
             <div className="col-md-6">
               <TextField name="name" className="row" />
-              <TextField name="description" className="row" />
               <GroupSelectField name="group" enableStoredDefaultGroup={true} />
             </div>
             <div className="col-md-6">
