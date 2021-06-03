@@ -75,6 +75,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   deleteThisAttributesTemplate: "Delete This Template",
   deleted: "Deleted",
   deletedMetadata_tooltip: "Deleted Metadata ID: {id}",
+  destroyOriginal: 'Tag Original as "Destroyed"',
   detachCollectingEvent: "Detach Collecting Event",
   detachSelectedButtonText: "Detach Selected",
   detailsPageLink: "Details Page",
