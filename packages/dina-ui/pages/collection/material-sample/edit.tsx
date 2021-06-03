@@ -74,13 +74,19 @@ export interface MaterialSampleFormProps {
 
   /** Optionally call the hook from the parent component. */
   materialSampleSaveHook?: ReturnType<typeof useMaterialSampleSave>;
+
+  /** Template form values for template mode. */
+  materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
 }
 
 export function MaterialSampleForm({
   materialSample,
   onSaved,
   catelogueSectionRef,
-  materialSampleSaveHook
+  materialSampleSaveHook,
+  materialSampleTemplateInitialValues
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
   const { isTemplate } = useDinaFormContext();
@@ -247,7 +253,7 @@ export function MaterialSampleForm({
           </FieldSet>
           {isTemplate ? (
             <DinaForm
-              initialValues={{}}
+              initialValues={materialSampleTemplateInitialValues}
               innerRef={catelogueSectionRef}
               isTemplate={true}
             >

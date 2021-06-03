@@ -112,7 +112,7 @@ export function WorkflowTemplateForm({
     getTemplateInitialValuesFromSavedFormTemplate(
       formTemplates?.COLLECTING_EVENT
     );
-  const materialSampleFormInitialValues =
+  const materialSampleTemplateInitialValues =
     getTemplateInitialValuesFromSavedFormTemplate(
       formTemplates?.MATERIAL_SAMPLE
     );
@@ -120,6 +120,7 @@ export function WorkflowTemplateForm({
   const materialSampleSaveHook = useMaterialSampleSave({
     isTemplate: true,
     colEventTemplateInitialValues,
+    materialSampleTemplateInitialValues,
     collectingEvtFormRef
   });
 
@@ -214,13 +215,16 @@ export function WorkflowTemplateForm({
       {actionType === "ADD" ? (
         <DinaFormSection isTemplate={true}>
           <MaterialSampleForm
+            materialSampleTemplateInitialValues={
+              materialSampleTemplateInitialValues
+            }
             materialSampleSaveHook={materialSampleSaveHook}
             catelogueSectionRef={materialSampleFormRef}
           />
         </DinaFormSection>
       ) : actionType === "SPLIT" ? (
         <DinaForm
-          initialValues={materialSampleFormInitialValues}
+          initialValues={{}}
           innerRef={materialSampleFormRef}
           isTemplate={true}
         >

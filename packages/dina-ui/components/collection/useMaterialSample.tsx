@@ -61,11 +61,15 @@ export function useMaterialSampleQuery(id?: string | null) {
 export interface UseMaterialSampleSaveParams {
   materialSample?: PersistedResource<MaterialSample>;
   onSaved?: (id: string) => Promise<void>;
+
   collectingEvtFormRef?: React.RefObject<FormikProps<any>>;
 
   isTemplate?: boolean;
 
   colEventTemplateInitialValues?: Partial<CollectingEvent> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
+  materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 }
@@ -75,7 +79,8 @@ export function useMaterialSampleSave({
   onSaved,
   collectingEvtFormRef,
   isTemplate,
-  colEventTemplateInitialValues
+  colEventTemplateInitialValues,
+  materialSampleTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
@@ -86,8 +91,12 @@ export function useMaterialSampleSave({
     hasColEventTemplate || !!materialSample?.collectingEvent
   );
 
-  const hasPreparations = !!materialSample?.preparationType;
-  const [enablePreparations, setEnablePreparations] = useState(hasPreparations);
+  const hasPreparationsTemplate =
+    isTemplate &&
+    !isEmpty(materialSampleTemplateInitialValues?.templateCheckboxes);
+  const [enablePreparations, setEnablePreparations] = useState(
+    hasPreparationsTemplate || !!materialSample?.preparationType
+  );
 
   const initialValues: InputResource<MaterialSample> = materialSample
     ? { ...materialSample }
