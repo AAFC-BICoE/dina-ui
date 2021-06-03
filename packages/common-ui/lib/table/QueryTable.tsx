@@ -181,6 +181,8 @@ export function QueryTable<TData extends KitsuResource>({
       ? reactTableProps(queryState)
       : reactTableProps;
 
+  const shouldShowPagination = !!response?.data?.length;
+
   return (
     <div className="query-table-wrapper" ref={divWrapperRef}>
       {!omitPaging && (
@@ -229,7 +231,8 @@ export function QueryTable<TData extends KitsuResource>({
         onFetchData={onFetchData}
         pageSizeOptions={[25, 50, 100, 200, 500]}
         pages={numberOfPages}
-        showPaginationTop={true}
+        showPaginationTop={shouldShowPagination}
+        showPaginationBottom={shouldShowPagination}
         noDataText={<CommonMessage id="noRowsFound" />}
         ofText={<CommonMessage id="of" />}
         onPageSizeChange={onPageSizeChange}
@@ -237,7 +240,7 @@ export function QueryTable<TData extends KitsuResource>({
         rowsText={formatMessage({ id: "rows" })}
         previousText={<CommonMessage id="previous" />}
         nextText={<CommonMessage id="next" />}
-        showPagination={!omitPaging}
+        showPagination={!omitPaging && shouldShowPagination}
         {...resolvedReactTableProps}
         pageText={<CommonMessage id="page" />}
       />
