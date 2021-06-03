@@ -3,6 +3,7 @@ import {
   ButtonBar,
   DateField,
   DinaForm,
+  DinaFormContext,
   DinaFormSection,
   FieldSet,
   filterBy,
@@ -11,23 +12,23 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
-  useDinaFormContext,
   withResponse
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import {
-  useMaterialSampleQuery,
-  useMaterialSampleSave
-} from "../../../components/collection/useMaterialSample";
+import { useContext } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { CollectingEventLinker } from "../../../components/collection";
+import {
+  useMaterialSampleQuery,
+  useMaterialSampleSave
+} from "../../../components/collection/useMaterialSample";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { CollectingEvent, MaterialSample } from "../../../types/collection-api";
+import { MaterialSample } from "../../../types/collection-api";
 import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
 
 export default function MaterialSampleEditPage() {
@@ -89,7 +90,7 @@ export function MaterialSampleForm({
   materialSampleTemplateInitialValues
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
-  const { isTemplate } = useDinaFormContext();
+  const { isTemplate } = useContext(DinaFormContext) ?? {};
 
   const {
     initialValues,
