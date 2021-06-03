@@ -1,5 +1,5 @@
 import { DinaForm, FieldSet, TextField } from "common-ui";
-import NumberSpinner from "packages/common-ui/lib/number-spinner/NumberSpinner";
+import NumberSpinnerField from "packages/common-ui/lib/formik-connected/NumberSpinnerField";
 import { Head, Nav } from "packages/dina-ui/components";
 import React from "react";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
@@ -7,7 +7,7 @@ import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 export default function ConfigAction() {
   const { formatMessage } = useDinaIntl();
 
-  const onCreatedChildSplitSampleChange = e => {
+  const onCreatedChildSplitSampleChange = () => {
     //    console.log("e is " + e.target.value);
   };
 
@@ -39,15 +39,12 @@ export default function ConfigAction() {
               {formatMessage("stepLabel")}1: {formatMessage("configureLabel")}
             </p>
             <FieldSet legend={<DinaMessage id="splitSampleConfigLegend" />}>
-              <span className="fw-bold">
-                {formatMessage("splitSampleChildSamplesToCreateLabel")}:
-              </span>
-              <div className="col-md-1">
-                <NumberSpinner
-                  onChange={onCreatedChildSplitSampleChange}
-                  size={1}
-                />
-              </div>
+              <NumberSpinnerField
+                name="createdChilderenNum"
+                className="col-md-2"
+                onChange={onCreatedChildSplitSampleChange}
+                label={formatMessage("splitSampleChildSamplesToCreateLabel")}
+              />
             </FieldSet>
           </>
         </DinaForm>
