@@ -111,6 +111,10 @@ export function WorkflowTemplateForm({
     getTemplateInitialValuesFromSavedFormTemplate(
       formTemplates?.COLLECTING_EVENT
     );
+  if (!colEventTemplateInitialValues.geoReferenceAssertions?.length) {
+    colEventTemplateInitialValues.geoReferenceAssertions = [{}];
+  }
+
   const materialSampleTemplateInitialValues =
     getTemplateInitialValuesFromSavedFormTemplate(
       formTemplates?.MATERIAL_SAMPLE

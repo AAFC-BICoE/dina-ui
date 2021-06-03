@@ -18,6 +18,7 @@ const checkboxProps = {
     marginLeft: "15px",
     width: "20px"
   },
+  tabIndex: -1,
   type: "checkbox"
 };
 
