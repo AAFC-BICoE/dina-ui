@@ -4,7 +4,6 @@ import {
   DinaForm,
   FieldSet,
   FormikButton,
-  NumberField,
   SelectField,
   TextField
 } from "common-ui";
@@ -15,6 +14,7 @@ import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 interface SplitChildRowProps {
   index: number;
   baseName: string;
+  computedSuffix: string;
 }
 
 export default function ConfigAction(props) {
@@ -51,48 +51,66 @@ export default function ConfigAction(props) {
 
   const SplitChildRow = ({
     index,
-    baseName: sampleSrcName
-  }: SplitChildRowProps) => (
-    <div className="d-flex">
-      <span className="col-md-1 fw-bold">
-        #
-        {type === "Numerical"
-          ? isNaN(parseInt(start, 10))
-            ? index - 1
-            : index - parseInt(start, 10) + 1
-          : index}
-        :
-      </span>
-      <TextField
-        className="col-md-3"
-        hideLabel={true}
-        name={`"sampleName"${index}`}
-        placeholder={
-          sampleSrcName ? `${sampleSrcName}-${index}` : `parentName-${index}`
-        }
-      />
-      <TextField
-        className="col-md-3"
-        hideLabel={true}
-        name={`"description${index}`}
-      />
-    </div>
-  );
+    baseName: sampleSrcName,
+    computedSuffix
+  }: SplitChildRowProps) => {
+    return (
+      <div className="d-flex">
+        <span className="col-md-1 fw-bold">#{index}:</span>
+        <TextField
+          className="col-md-3"
+          hideLabel={true}
+          name={`sampleName${index}`}
+          placeholder={
+            sampleSrcName
+              ? `${sampleSrcName}-${computedSuffix}`
+              : `parentName-${computedSuffix}`
+          }
+        />
+        <TextField
+          className="col-md-3"
+          hideLabel={true}
+          name={`"description${index}`}
+        />
+      </div>
+    );
+  };
 
   const SplitChildRows = () => {
     const childRows: any = [];
     for (let i = 0; i < numOfChildToCreate; i++) {
-      type === "Numerical"
-        ? childRows.push(
+      if (type === "Numerical") {
+        // Handle when there null or empty numerical input , default to 1
+        const computedSuffix = isNaN(parseInt(start, 10))
+          ? 1
+          : i + parseInt(start, 10);
+        childRows.push(
+          <SplitChildRow
+            key={i}
+            index={i + 1}
+            computedSuffix={computedSuffix.toString()}
+            baseName={baseName}
+          />
+        );
+      } else {
+        let computedSuffix;
+        const charCode = start.charCodeAt(0) + i;
+        // Only if the char is a letter, split child row will be added
+        if (
+          (charCode >= 97 && charCode <= 122) ||
+          (charCode >= 65 && charCode <= 90)
+        ) {
+          computedSuffix = String.fromCharCode(charCode);
+          childRows.push(
             <SplitChildRow
               key={i}
-              index={i + parseInt(start, 10)}
+              index={i + 1}
               baseName={baseName}
+              computedSuffix={computedSuffix}
             />
-          )
-        : childRows.push(
-            <SplitChildRow key={i} index={i + 1} baseName={baseName} />
           );
+        }
+      }
     }
     return childRows;
   };
@@ -165,13 +183,26 @@ export default function ConfigAction(props) {
               onChange={(value, _) => setType(value as any)}
             />
             {type === "Numerical" ? (
-              <NumberField
+              <TextField
                 className="col-md-2"
                 name="start"
-                onChangeExternal={(_, _name, value) => setStart(value as any)}
+                placeholder="001"
+                numberOnly={true}
+                onChangeExternal={(_, _name, value) =>
+                  setStart(!value ? "1" : value)
+                }
               />
             ) : (
-              <TextField className="col-md-2" name="start" placeholder="A" />
+              <TextField
+                className="col-md-2"
+                name="start"
+                placeholder="A"
+                letterOnly={true}
+                inputProps={{ maxLength: 1 }}
+                onChangeExternal={(_, _name, value) =>
+                  setStart(!value ? "A" : value)
+                }
+              />
             )}
           </div>
           <div>
