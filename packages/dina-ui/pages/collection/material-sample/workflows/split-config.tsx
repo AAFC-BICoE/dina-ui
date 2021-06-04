@@ -82,7 +82,7 @@ export default function ConfigAction(props) {
       if (type === "Numerical") {
         // correclty set the start when numerical input is null/empty, default to 1
         const computedSuffix = isNaN(parseInt(start, 10))
-          ? 1
+          ? i + 1
           : i + parseInt(start, 10);
         childRows.push(
           <SplitChildRow
@@ -143,6 +143,7 @@ export default function ConfigAction(props) {
     formik.values.start === null
       ? formik.setFieldValue("start", "")
       : formik.setFieldValue("start", null);
+    isLetterType ? setStart("A") : setStart("1");
   };
 
   const isNumericalType = type === "Numerical";
@@ -202,15 +203,18 @@ export default function ConfigAction(props) {
               className="col-md-2"
               name="start"
               placeholder={isNumericalType ? "001" : "A"}
-              numberOnly={isNumericalType ? true : false}
-              letterOnly={isLetterType ? true : false}
-              inputProps={{ maxLength: type === "Letter" ? 1 : Infinity }}
+              numberOnly={isNumericalType ?? false}
+              letterOnly={isLetterType ?? false}
+              inputProps={{ maxLength: isLetterType ? 1 : Infinity }}
               onChangeExternal={(_, _name, value) => {
-                setStart(!value ? (type === "Numerical" ? "1" : "A") : value);
+                setStart(!value ? (isNumericalType ? "1" : "A") : value);
               }}
             />
           </div>
           <div>
+            <div className="alert alert-warning d-inline-block">
+              <DinaMessage id="splitSampleInstructions" />
+            </div>
             <SplitChildHeader />
             <SplitChildRows />
           </div>
