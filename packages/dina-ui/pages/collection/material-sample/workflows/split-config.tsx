@@ -35,11 +35,11 @@ export default function ConfigAction(props) {
     {
       label: "Numerical",
       value: "Numerical"
-    } // ,
-    // {
-    //   label: "Letter",
-    //   value: "Letter"
-    // }
+    },
+    {
+      label: "Letter",
+      value: "Letter"
+    }
   ];
   const SplitChildHeader = () => (
     <div className="d-flex">
@@ -80,7 +80,7 @@ export default function ConfigAction(props) {
     const childRows: any = [];
     for (let i = 0; i < numOfChildToCreate; i++) {
       if (type === "Numerical") {
-        // Handle when there null or empty numerical input , default to 1
+        // correclty set the start when numerical input is null/empty, default to 1
         const computedSuffix = isNaN(parseInt(start, 10))
           ? 1
           : i + parseInt(start, 10);
@@ -93,8 +93,13 @@ export default function ConfigAction(props) {
           />
         );
       } else {
+        let myStart = start;
         let computedSuffix;
-        const charCode = start.charCodeAt(0) + i;
+        // Correclty set the start value when letter input is null/empty, defualt to "A"
+        if (!myStart || myStart.length === 0 || !isNaN(parseInt(myStart, 10))) {
+          myStart = "A";
+        }
+        const charCode = myStart.charCodeAt(0) + i;
         // Only if the char is a letter, split child row will be added
         if (
           (charCode >= 97 && charCode <= 122) ||
@@ -131,6 +136,17 @@ export default function ConfigAction(props) {
       </FormikButton>
     </ButtonBar>
   );
+
+  const onChangeExternal = (value, formik) => {
+    setType(value as any);
+    // Make sure the placeholder is updated properly by simulating update the field value
+    formik.values.start === null
+      ? formik.setFieldValue("start", "")
+      : formik.setFieldValue("start", null);
+  };
+
+  const isNumericalType = type === "Numerical";
+  const isLetterType = type === "Letter";
 
   return (
     <div>
@@ -180,30 +196,19 @@ export default function ConfigAction(props) {
               className="col-md-2"
               name="type"
               options={TYPE_OPTIONS}
-              onChange={(value, _) => setType(value as any)}
+              onChange={onChangeExternal}
             />
-            {type === "Numerical" ? (
-              <TextField
-                className="col-md-2"
-                name="start"
-                placeholder="001"
-                numberOnly={true}
-                onChangeExternal={(_, _name, value) =>
-                  setStart(!value ? "1" : value)
-                }
-              />
-            ) : (
-              <TextField
-                className="col-md-2"
-                name="start"
-                placeholder="A"
-                letterOnly={true}
-                inputProps={{ maxLength: 1 }}
-                onChangeExternal={(_, _name, value) =>
-                  setStart(!value ? "A" : value)
-                }
-              />
-            )}
+            <TextField
+              className="col-md-2"
+              name="start"
+              placeholder={isNumericalType ? "001" : "A"}
+              numberOnly={isNumericalType ? true : false}
+              letterOnly={isLetterType ? true : false}
+              inputProps={{ maxLength: type === "Letter" ? 1 : Infinity }}
+              onChangeExternal={(_, _name, value) => {
+                setStart(!value ? (type === "Numerical" ? "1" : "A") : value);
+              }}
+            />
           </div>
           <div>
             <SplitChildHeader />
