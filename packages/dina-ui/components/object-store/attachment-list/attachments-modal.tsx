@@ -158,12 +158,14 @@ export function useAttachmentsModal({
         <>
           {allowNewFieldName && (
             <CheckBoxWithoutWrapper
+              className="allow-new-checkbox"
               name={allowNewFieldName}
               includeAllLabel={formatMessage("allowNew")}
             />
           )}
           {allowExistingFieldName && (
             <CheckBoxWithoutWrapper
+              className="allow-existing-checkbox"
               name={allowExistingFieldName}
               includeAllLabel={formatMessage("allowExisting")}
             />

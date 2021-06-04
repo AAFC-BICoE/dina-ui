@@ -355,13 +355,15 @@ export function PreparationsFormLayout({
     >
       <div className="row">
         <div className="col-md-6">
-          <ResourceSelectField<PreparationType>
-            name="preparationType"
-            filter={filterBy(["name"])}
-            model="collection-api/preparation-type"
-            optionLabel={it => it.name}
-            readOnlyLink="/collection/preparation-type/view?id="
-          />
+          <div className="preparation-type">
+            <ResourceSelectField<PreparationType>
+              name="preparationType"
+              filter={filterBy(["name"])}
+              model="collection-api/preparation-type"
+              optionLabel={it => it.name}
+              readOnlyLink="/collection/preparation-type/view?id="
+            />
+          </div>
           <DinaFormSection
             readOnly={true} // Disabled until back-end supports these fields.
           >

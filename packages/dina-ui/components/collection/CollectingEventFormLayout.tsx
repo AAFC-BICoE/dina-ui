@@ -17,7 +17,7 @@ import {
 } from "common-ui";
 import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
-import { useState } from "react";
+import { useRef, useState, ChangeEvent } from "react";
 import { ShouldRenderReasons } from "react-autosuggest";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -64,6 +64,7 @@ export function CollectingEventFormLayout({
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [rangeEnabled, setRangeEnabled] = useState(false);
+  const layoutWrapperRef = useRef<HTMLDivElement>(null);
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
 
@@ -289,19 +290,21 @@ export function CollectingEventFormLayout({
     setHideCustomPlace(true);
   };
 
-  const OnClickIncludeAll = (e, form, id) => {
-    const fields = Array.from(
-      document.getElementById(id)?.getElementsByClassName("templateCheckBox") ??
-        []
-    );
-    const { checked } = e.target;
-    fields.map(field => {
-      // tslint:disable-next-line
-      form.setFieldValue(field.attributes["name"]?.value, checked);
-    });
-  };
+  function onClickIncludeAll(
+    e: ChangeEvent<HTMLInputElement>,
+    form,
+    id: string
+  ) {
+    layoutWrapperRef.current
+      ?.querySelectorAll(`#${id} .templateCheckBox`)
+      ?.forEach(field => {
+        // tslint:disable-next-line
+        form.setFieldValue(field.attributes["name"]?.value, e.target.checked);
+      });
+  }
+
   return (
-    <div>
+    <div ref={layoutWrapperRef}>
       {!isTemplate && (
         <DinaFormSection horizontal={[3, 9]}>
           <div className="row">
@@ -326,7 +329,7 @@ export function CollectingEventFormLayout({
                   <CheckBoxWithoutWrapper
                     name="includeAllCollectingDate"
                     parentContainerId="collectingDateLegend"
-                    onClickIncludeAll={OnClickIncludeAll}
+                    onClickIncludeAll={onClickIncludeAll}
                     includeAllLabel={formatMessage("includeAll")}
                   />
                 )}
@@ -383,7 +386,7 @@ export function CollectingEventFormLayout({
                   <CheckBoxWithoutWrapper
                     name="includeAllCollectingAgent"
                     parentContainerId="collectingAgentsLegend"
-                    onClickIncludeAll={OnClickIncludeAll}
+                    onClickIncludeAll={onClickIncludeAll}
                     includeAllLabel={formatMessage("includeAll")}
                   />
                 )}
@@ -431,7 +434,7 @@ export function CollectingEventFormLayout({
                     <CheckBoxWithoutWrapper
                       name="includeAllVerbatimCoordinates"
                       parentContainerId="verbatimLabelLegend"
-                      onClickIncludeAll={OnClickIncludeAll}
+                      onClickIncludeAll={onClickIncludeAll}
                       includeAllLabel={formatMessage("includeAll")}
                       customLayout={["col-sm-1", "col-sm-4"]}
                     />
@@ -564,7 +567,7 @@ export function CollectingEventFormLayout({
                     <CheckBoxWithoutWrapper
                       name="includeAllGeoReference"
                       parentContainerId="geoReferencingLegend"
-                      onClickIncludeAll={OnClickIncludeAll}
+                      onClickIncludeAll={onClickIncludeAll}
                       includeAllLabel={formatMessage("includeAll")}
                       customLayout={["col-sm-1", "col-sm-4"]}
                     />

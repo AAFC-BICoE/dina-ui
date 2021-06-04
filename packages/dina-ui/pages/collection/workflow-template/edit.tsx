@@ -12,8 +12,9 @@ import {
 import { FormikProps } from "formik";
 import { PersistedResource } from "kitsu";
 import { get, mapValues, set, toPairs } from "lodash";
-import { NextRouter, useRouter } from "next/router";
+import { useRouter } from "next/router";
 import React, { useRef, useState } from "react";
+import { Promisable } from "type-fest";
 import * as yup from "yup";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { useMaterialSampleSave } from "../../../components/collection/useMaterialSample";
@@ -51,6 +52,10 @@ export default function PreparationProcessTemplatePage() {
     ? "editWorkflowTemplateTitle"
     : "createWorkflowTemplateTitle";
 
+  async function moveToNextPage() {
+    await router.push("/collection/workflow-template/list");
+  }
+
   return (
     <div>
       <Head title={formatMessage(pageTitle)} />
@@ -63,11 +68,11 @@ export default function PreparationProcessTemplatePage() {
           withResponse(workflowTemplateQuery, ({ data: fetchedDefinition }) => (
             <WorkflowTemplateForm
               fetchedActionDefinition={fetchedDefinition}
-              router={router}
+              onSaved={moveToNextPage}
             />
           ))
         ) : (
-          <WorkflowTemplateForm router={router} />
+          <WorkflowTemplateForm onSaved={moveToNextPage} />
         )}
       </div>
     </div>
@@ -76,12 +81,14 @@ export default function PreparationProcessTemplatePage() {
 
 export interface WorkflowTemplateFormProps {
   fetchedActionDefinition?: PersistedResource<PreparationProcessDefinition>;
-  router: NextRouter;
+  onSaved: (
+    savedDefinition: PersistedResource<PreparationProcessDefinition>
+  ) => Promisable<void>;
 }
 
 export function WorkflowTemplateForm({
   fetchedActionDefinition,
-  router
+  onSaved
 }: WorkflowTemplateFormProps) {
   const { formatMessage } = useDinaIntl();
 
@@ -142,15 +149,17 @@ export function WorkflowTemplateForm({
       ...mainTemplateFields,
       actionType,
       formTemplates: {
-        MATERIAL_SAMPLE: {
-          ...materialSampleFormRef.current?.values.attachmentsConfig,
-          templateFields:
-            enablePreparations && materialSampleFormRef.current
-              ? getEnabledTemplateFieldsFromForm(
-                  materialSampleFormRef.current.values
-                )
-              : undefined
-        },
+        MATERIAL_SAMPLE: enablePreparations
+          ? {
+              ...materialSampleFormRef.current?.values.attachmentsConfig,
+              templateFields:
+                enablePreparations && materialSampleFormRef.current
+                  ? getEnabledTemplateFieldsFromForm(
+                      materialSampleFormRef.current.values
+                    )
+                  : undefined
+            }
+          : undefined,
         COLLECTING_EVENT: enableCollectingEvent
           ? attachedColEventId
             ? {
@@ -174,7 +183,7 @@ export function WorkflowTemplateForm({
       type: "material-sample-action-definition"
     };
 
-    await save(
+    const [savedDefinition] = await save<PreparationProcessDefinition>(
       [
         {
           resource: definition,
@@ -184,7 +193,7 @@ export function WorkflowTemplateForm({
       { apiBaseUrl: "/collection-api" }
     );
 
-    await router.push("/collection/workflow-template/list");
+    await onSaved(savedDefinition);
   }
 
   const buttonBar = (
@@ -201,7 +210,10 @@ export function WorkflowTemplateForm({
     >
       {buttonBar}
       <div className="container">
-        <FieldSet legend={<DinaMessage id="configureAction" />}>
+        <FieldSet
+          className="workflow-main-details"
+          legend={<DinaMessage id="configureAction" />}
+        >
           <div className="row">
             <div className="col-md-6">
               <TextField name="name" className="row" />
