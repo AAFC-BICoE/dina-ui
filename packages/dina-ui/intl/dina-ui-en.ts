@@ -195,6 +195,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_notPubliclyReleasableReason: "Not Publicly Releasable Reason",
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
+  field_orientation: "Orientation",
   field_originalFilename: "Original Filename",
   field_preparationType: "Preparation Type",
   field_dwcOtherCatalogNumbers: "Other Catalog Numbers",
