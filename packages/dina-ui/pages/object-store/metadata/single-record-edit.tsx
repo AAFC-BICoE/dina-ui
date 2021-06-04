@@ -207,6 +207,11 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
             optionLabel={person => person.displayName}
             label={formatMessage("field_dcCreator.displayName")}
           />
+          <SelectField
+            className="col-md-3 col-sm-4"
+            name="orientation"
+            options={ORIENTATION_OPTIONS}
+          />
         </div>
       </FieldSet>
       <FieldSet legend={<DinaMessage id="metadataRightsDetailsLabel" />}>
@@ -266,3 +271,16 @@ const DCTYPE_OPTIONS = [
   { label: "Dataset", value: "DATASET" },
   { label: "Undetermined", value: "UNDETERMINED" }
 ];
+
+const ORIENTATION_OPTIONS = [
+  { label: "1 - Normal", value: 1 },
+  { label: "2 - Flipped", value: 2 },
+  { label: "3 - Rotated 180 degrees", value: 3 },
+  { label: "4 - Rotated 180 degrees + Flipped", value: 4 },
+  { label: "5 - Rotated 90 degrees CW + Flipped", value: 5 },
+  { label: "6 - Rotated 90 degrees CW", value: 6 },
+  { label: "7 - Rotated 90 degrees CCW + Flipped", value: 7 },
+  { label: "8 - Rotated 90 degrees CCW", value: 8 },
+  { label: "Undetermined", value: null }
+];
+  
