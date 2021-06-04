@@ -11,13 +11,13 @@ export interface FormTemplate<TFormValues> {
 
 /** Map of form field names to template field config. */
 export type TemplateFields<TFormValues = any> = {
-  [Field in keyof TFormValues]: TemplateField<TFormValues[Field]> | undefined;
+  [Field in keyof TFormValues]?: TemplateField<TFormValues[Field]>;
 };
 
 /** Configures one field in a form template. */
 export interface TemplateField<TFieldType> {
   enabled: boolean;
-  defaultValue: TFieldType;
+  defaultValue: TFieldType | null;
 }
 
 export interface PreparationProcessDefinitionAttributes {

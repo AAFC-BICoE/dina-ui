@@ -242,14 +242,14 @@ export function MaterialSampleForm({
                             {
                               // In template mode, only show a link to the linked Collecting Event:
                               isTemplate ? (
-                                <>
+                                <div className="attached-collecting-event-link">
                                   <DinaMessage id="attachedCollectingEvent" />:{" "}
                                   <Link
                                     href={`/collection/collecting-event/view?id=${colEventId}`}
                                   >
                                     <a target="_blank">{linkedColEvent.id}</a>
                                   </Link>
-                                </>
+                                </div>
                               ) : (
                                 // In form mode, show the actual editable Collecting Event form:
                                 nestedCollectingEventForm

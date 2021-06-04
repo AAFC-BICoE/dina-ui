@@ -1,9 +1,14 @@
 import { SaveArgs } from "common-ui";
+import { ReactWrapper } from "enzyme";
+import { PersistedResource } from "kitsu";
 import Select from "react-select";
 import ReactSwitch from "react-switch";
 import { WorkflowTemplateForm } from "../../../../pages/collection/workflow-template/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { CollectingEvent } from "../../../../types/collection-api";
+import {
+  CollectingEvent,
+  PreparationProcessDefinition
+} from "../../../../types/collection-api";
 
 const mockOnSaved = jest.fn();
 
@@ -40,6 +45,8 @@ const mockGet = jest.fn<any, any>(async path => {
       return { data: [] };
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
+    case "collection-api/collecting-event/321?include=collectors,attachment":
+      return { data: testCollectionEvent() };
     case "agent-api/person":
       return { data: [] };
     case "collection-api/preparation-type":
@@ -66,9 +73,14 @@ const apiContext = {
 };
 
 /** Mount the form and provide test util functions. */
-async function mountForm() {
+async function mountForm(
+  existingActionDefinition?: PersistedResource<PreparationProcessDefinition>
+) {
   const wrapper = mountWithAppContext(
-    <WorkflowTemplateForm onSaved={mockOnSaved} />,
+    <WorkflowTemplateForm
+      onSaved={mockOnSaved}
+      fetchedActionDefinition={existingActionDefinition}
+    />,
     { apiContext }
   );
 
@@ -80,16 +92,27 @@ async function mountForm() {
   const catalogSwitch = () =>
     wrapper.find(".enable-catalogue-info").find(ReactSwitch);
 
-  async function toggleColEvent(val: boolean) {
-    colEventSwitch().prop<any>("onChange")(val);
+  async function toggleDataComponent(
+    switchElement: ReactWrapper<any>,
+    val: boolean
+  ) {
+    switchElement.prop<any>("onChange")(val);
+    if (!val) {
+      // Click "yes" when asked Are You Sure:
+      await new Promise(setImmediate);
+      wrapper.update();
+      wrapper.find(".modal-content form").simulate("submit");
+    }
     await new Promise(setImmediate);
     wrapper.update();
   }
 
+  async function toggleColEvent(val: boolean) {
+    await toggleDataComponent(colEventSwitch(), val);
+  }
+
   async function togglePreparations(val: boolean) {
-    catalogSwitch().prop<any>("onChange")(val);
-    await new Promise(setImmediate);
-    wrapper.update();
+    await toggleDataComponent(catalogSwitch(), val);
   }
 
   async function fillOutRequiredFields() {
@@ -109,7 +132,6 @@ async function mountForm() {
 
   async function submitForm() {
     wrapper.find("form").simulate("submit");
-
     await new Promise(setImmediate);
     wrapper.update();
   }
@@ -128,7 +150,7 @@ async function mountForm() {
 describe("Workflow template edit page", () => {
   beforeEach(jest.clearAllMocks);
 
-  it("Renders the template edit page", async () => {
+  it("Renders the blank template edit page", async () => {
     const { colEventSwitch, catalogSwitch } = await mountForm();
     // Switches are off by default:
     expect(colEventSwitch().prop("checked")).toEqual(false);
@@ -137,7 +159,6 @@ describe("Workflow template edit page", () => {
 
   it("Submits a new action-definition: minimal form submission.", async () => {
     const {
-      wrapper,
       toggleColEvent,
       togglePreparations,
       catalogSwitch,
@@ -309,6 +330,10 @@ describe("Workflow template edit page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    expect(wrapper.find(".attached-collecting-event-link").text()).toEqual(
+      "Attached Collecting Event: 321"
+    );
+
     await submitForm();
 
     expect(mockOnSaved).lastCalledWith({
@@ -316,6 +341,7 @@ describe("Workflow template edit page", () => {
       formTemplates: {
         COLLECTING_EVENT: {
           templateFields: {
+            // Only includes the linked collecting event's ID:
             id: {
               defaultValue: "321",
               enabled: true
@@ -323,6 +349,230 @@ describe("Workflow template edit page", () => {
           }
         }
       },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+  });
+
+  it("Edits an existing action-definition: Renders the form with minimal data.", async () => {
+    const { colEventSwitch, catalogSwitch } = await mountForm({
+      actionType: "ADD",
+      formTemplates: {},
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+
+    // Checkboxes are unchecked:
+    expect(colEventSwitch().prop("checked")).toEqual(false);
+    expect(catalogSwitch().prop("checked")).toEqual(false);
+  });
+
+  it("Edits an existing action-definition: Can unlink an existing Collecting Event.", async () => {
+    const { wrapper, colEventSwitch, catalogSwitch, submitForm } =
+      await mountForm({
+        actionType: "ADD",
+        formTemplates: {
+          COLLECTING_EVENT: {
+            allowExisting: false,
+            allowNew: false,
+            templateFields: {
+              id: {
+                enabled: true,
+                defaultValue: "321"
+              }
+            }
+          }
+        },
+        group: "test-group-1",
+        id: "123",
+        name: "test-config",
+        type: "material-sample-action-definition"
+      });
+
+    expect(colEventSwitch().prop("checked")).toEqual(true);
+    expect(catalogSwitch().prop("checked")).toEqual(false);
+
+    expect(wrapper.find(".attached-collecting-event-link").text()).toEqual(
+      "Attached Collecting Event: 321"
+    );
+
+    // Unlink the Collecting Event:
+    wrapper.find("button.detach-collecting-event-button").simulate("click");
+
+    await submitForm();
+
+    // The template's link was removed:
+    expect(mockOnSaved).lastCalledWith({
+      actionType: "ADD",
+      formTemplates: {
+        COLLECTING_EVENT: {
+          allowExisting: false,
+          allowNew: false,
+          templateFields: {}
+        }
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+  });
+
+  it("Edits an existing action-definition: Can change the enabled and default values.", async () => {
+    const { wrapper, colEventSwitch, catalogSwitch, submitForm } =
+      await mountForm({
+        actionType: "ADD",
+        formTemplates: {
+          COLLECTING_EVENT: {
+            allowNew: true,
+            allowExisting: true,
+            templateFields: {
+              dwcRecordNumber: {
+                defaultValue: null,
+                enabled: true
+              },
+              verbatimEventDateTime: {
+                defaultValue: "test-verbatim-default-datetime",
+                enabled: true
+              }
+            }
+          },
+          MATERIAL_SAMPLE: {
+            allowNew: true,
+            allowExisting: true,
+            templateFields: {
+              preparationType: {
+                defaultValue: {
+                  id: "100",
+                  name: "test-prep-type",
+                  type: "preparation-type"
+                },
+                enabled: true
+              }
+            }
+          }
+        },
+        group: "test-group-1",
+        id: "123",
+        name: "test-config",
+        type: "material-sample-action-definition"
+      });
+
+    // Data Component checkboxes are checked:
+    expect(colEventSwitch().prop("checked")).toEqual(true);
+    expect(catalogSwitch().prop("checked")).toEqual(true);
+
+    // Change a default value:
+    wrapper.find(".dwcRecordNumber-field input").simulate("change", {
+      target: { value: "test-default-recorded-by" }
+    });
+    // Uncheck a box:
+    wrapper
+      .find("input[name='includeAllCollectingDate']")
+      .simulate("change", { target: { checked: false } });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    await submitForm();
+
+    // The template's link was removed:
+    expect(mockOnSaved).lastCalledWith({
+      actionType: "ADD",
+      formTemplates: {
+        COLLECTING_EVENT: {
+          allowExisting: true,
+          allowNew: true,
+          templateFields: {
+            // New values:
+            dwcRecordNumber: {
+              enabled: true,
+              defaultValue: "test-default-recorded-by"
+            }
+          }
+        },
+        MATERIAL_SAMPLE: {
+          allowExisting: true,
+          allowNew: true,
+          templateFields: {
+            preparationType: {
+              defaultValue: {
+                id: "100",
+                name: "test-prep-type",
+                type: "preparation-type"
+              },
+              enabled: true
+            }
+          }
+        }
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+  });
+
+  it("Edits an existing action-definition: Can remove the data components.", async () => {
+    const {
+      wrapper,
+      colEventSwitch,
+      catalogSwitch,
+      toggleColEvent,
+      togglePreparations,
+      submitForm
+    } = await mountForm({
+      actionType: "ADD",
+      formTemplates: {
+        COLLECTING_EVENT: {
+          allowNew: true,
+          allowExisting: true,
+          templateFields: {
+            verbatimEventDateTime: {
+              defaultValue: "test-verbatim-default-datetime",
+              enabled: true
+            }
+          }
+        },
+        MATERIAL_SAMPLE: {
+          allowNew: true,
+          allowExisting: true,
+          templateFields: {
+            preparationType: {
+              defaultValue: {
+                id: "100",
+                name: "test-prep-type",
+                type: "preparation-type"
+              },
+              enabled: true
+            }
+          }
+        }
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+
+    // Data Component checkboxes are checked:
+    expect(colEventSwitch().prop("checked")).toEqual(true);
+    expect(catalogSwitch().prop("checked")).toEqual(true);
+
+    // Remove both data components:
+    await toggleColEvent(false);
+    await togglePreparations(false);
+
+    await submitForm();
+
+    expect(mockOnSaved).lastCalledWith({
+      actionType: "ADD",
+      // Both data components removed:
+      formTemplates: {},
       group: "test-group-1",
       id: "123",
       name: "test-config",
