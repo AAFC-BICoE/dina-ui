@@ -120,16 +120,16 @@ export default function ConfigAction(props) {
     return childRows;
   };
 
-  const onSubmit = async ({}) => {
+  const onSubmit = async formik => {
     // submit to back end or save to local
     // navigate to a run aciton page
-    nextStep();
+    nextStep(formik.values);
   };
 
   const buttonBar = (
-    <ButtonBar>
+    <ButtonBar className="d-flex justify-content-center">
       <FormikButton
-        className="btn btn-dark"
+        className="btn btn-info "
         onClick={(_, formik) => onSubmit(formik)}
       >
         <DinaMessage id="next" />
@@ -151,12 +151,11 @@ export default function ConfigAction(props) {
 
   return (
     <div>
-      <p>
-        <span className="fw-bold">{formatMessage("description")}:</span>
-        {formatMessage("splitSampleDescription")}
-      </p>
       <DinaForm initialValues={{ type: "Numerical" }}>
-        {buttonBar}
+        <p>
+          <span className="fw-bold">{formatMessage("description")}:</span>
+          {formatMessage("splitSampleDescription")}
+        </p>
         <FieldSet legend={<DinaMessage id="splitSampleActionMetadataLegend" />}>
           <TextField
             name="remarks"

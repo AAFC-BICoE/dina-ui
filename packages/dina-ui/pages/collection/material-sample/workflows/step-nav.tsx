@@ -6,16 +6,21 @@ export default function StepNav(props) {
     const isActive = props.currentStep === i;
     dots.push(
       (
-        <span
-          key={`step-${i}`}
-          className={`dot ${isActive ? "active" : ""}`}
-          onClick={() => props.goToStep(i)}
-        >
-          {" "}
-          &bull;
-        </span>
+        <>
+          <span className="d-flex align-items-start flex-column">
+            <span
+              key={`step-${i}`}
+              className={`dot ${isActive ? "active" : ""}`}
+              onClick={() => props.goToStep(i)}
+            >
+              &bull;
+            </span>
+            <span>{"Step " + i}</span>
+          </span>
+          <span className="mb-auto p-4" />
+        </>
       ) as any
     );
   }
-  return <div className="nav">{dots}</div>;
+  return <div className="d-flex justify-content-center">{dots}</div>;
 }

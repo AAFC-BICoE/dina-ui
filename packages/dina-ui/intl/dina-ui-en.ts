@@ -320,7 +320,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   showing: "Showing",
   splitSubsampleTitle: "Split(Subsample)",
   splitSampleDescription:
-    "Split a Parent Sample into one of more Child Samples",
+    "Split a Parent Sample into one or more Child Samples",
   splitSampleActionMetadataLegend: "Action Metadata",
   splitSampleInstructions:
     "Letter suffix will only including A-Z or a-z ranges",
