@@ -46,34 +46,8 @@ export interface CollectingEventAttributes {
 
   managedAttributeValues?: ManagedAttributeValues;
 
-  /** For template purpose */
-  includeAllCollectingDate?: boolean;
-  startEventDateTimeEnabled?: boolean;
-  endEventDateTimeEnabled?: boolean;
-  dwcRecordedByEnabled?: boolean;
-  verbatimEventDateTimeEnabled?: boolean;
-
-  includeAllVerbatimCoordinates?: boolean;
-  dwcVerbatimLocalityEnabled?: boolean;
-  dwcVerbatimLatitudeEnabled?: boolean;
-  dwcVerbatimLongitudeEnabled?: boolean;
-  dwcVerbatimCoordinatesEnabled?: boolean;
-  dwcVerbatimCoordinateSystemEnabled?: boolean;
-  dwcVerbatimSRSEnabled?: boolean;
-  dwcVerbatimElevationEnabled?: boolean;
-  dwcVerbatimDepthEnabled?: boolean;
-
-  includeAllCollectingAgent?: boolean;
-  dwcOtherRecordNumbersEnabled?: boolean;
-  dwcRecordNumberEnabled?: boolean;
-  habitatEnabled?: boolean;
-
-  colEvntAllowNew?: boolean;
-  colEvntAllowExisting?: boolean;
-
   // For location template
   locationSearchValue?: string;
-  locationSearchValueEnabled?: boolean;
 }
 
 export enum GeographicPlaceNameSource {
