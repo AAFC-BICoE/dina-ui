@@ -5,9 +5,13 @@ import {
   FieldSet,
   FormikButton,
   SelectField,
-  TextField
+  TextField,
+  useAccount,
+  useApiClient
 } from "common-ui";
+import { useRouter } from "next/router";
 import NumberSpinnerField from "packages/common-ui/lib/formik-connected/NumberSpinnerField";
+import { PreparationProcessDefinition } from "packages/dina-ui/types/collection-api/resources/PreparationProcessDefinition";
 import React, { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 
@@ -18,6 +22,9 @@ interface SplitChildRowProps {
 }
 
 export default function ConfigAction(props) {
+  const api = useApiClient();
+  const { groupNames: myGroupNames } = useAccount();
+  const router = useRouter();
   const { nextStep } = props;
   const { formatMessage } = useDinaIntl();
   const [numOfChildToCreate, setNumOfChildToCreate] = useState(1);
@@ -60,7 +67,7 @@ export default function ConfigAction(props) {
         <TextField
           className="col-md-3"
           hideLabel={true}
-          name={`sampleName${index}`}
+          name={`sampleName[${index}]`}
           placeholder={
             sampleSrcName
               ? `${sampleSrcName}-${computedSuffix}`
@@ -120,17 +127,66 @@ export default function ConfigAction(props) {
     return childRows;
   };
 
-  const onSubmit = async formik => {
-    // submit to back end or save to local
+  const onSubmit = async ({ submittedValues: configActionFields }) => {
+    // submit to back end to save
+    const definition: PreparationProcessDefinition = {
+      name:
+        configActionFields.name ??
+        "preparationProcessDefinition" + Math.random(),
+      group: configActionFields.group ?? myGroupNames?.[0],
+      actionType: "SPLIT",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          templateFields: {
+            numberOfChildSamples: {
+              enabled: true,
+              defaultValue: configActionFields.numberOfChildSamples ?? 10
+            },
+            baseName: {
+              enabled: true,
+              defaultValue: configActionFields.baseName ?? "parentName"
+            },
+            start: {
+              enabled: true,
+              defaultValue: configActionFields.start ?? "001"
+            },
+            customChildSampleNames: {
+              enabled: true,
+              defaultValue: [
+                {
+                  index: 0,
+                  name: `${configActionFields.baseName ?? "parentName"}-001`
+                }
+              ]
+            }
+          }
+        }
+      },
+      type: "material-sample-action-definition"
+    };
+
+    const [savedDefinition] = await api.save(
+      [
+        {
+          resource: definition,
+          type: "material-sample-action-definition"
+        }
+      ],
+      { apiBaseUrl: "/collection-api" }
+    );
+
     // navigate to a run aciton page
-    nextStep(formik.values);
+    await router.push(
+      `/collection/material-sample/workflows/split?id=${savedDefinition.id}`
+    );
+    nextStep();
   };
 
   const buttonBar = (
     <ButtonBar className="d-flex justify-content-center">
       <FormikButton
         className="btn btn-info "
-        onClick={(_, formik) => onSubmit(formik)}
+        onClick={(submittedValues, _) => onSubmit({ submittedValues })}
       >
         <DinaMessage id="next" />
       </FormikButton>

@@ -18,6 +18,12 @@ export interface MaterialSampleAttributes {
 
   managedAttributeValues?: ManagedAttributeValues;
 
+  /* Config action related fields */
+  numberOfChildSamples: number;
+  baseName: string;
+  start: string;
+  customChildSampleNames?: { index: number; name: string }[];
+
   /** Template related boolean fields for preparation and catalogued info section */
   preparationTypeEnabled?: boolean;
   preparedByEnabled?: boolean;
