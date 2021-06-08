@@ -1,16 +1,7 @@
-import { InputResource, PersistedResource } from "kitsu";
-import {
-  DinaFormSubmitParams,
-  useApiClient,
-  useModal,
-  useQuery
-} from "../../../common-ui/lib";
-import { MaterialSample } from "../../../dina-ui/types/collection-api";
-import { Metadata } from "../../../dina-ui/types/objectstore-api";
+import { AreYouSureModal, DinaForm } from "common-ui";
 import { FormikProps } from "formik";
-import { useCollectingEventQuery, useCollectingEventSave } from ".";
-import { useAttachmentsModal } from "../object-store";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { InputResource, PersistedResource } from "kitsu";
+import { cloneDeep, isEmpty } from "lodash";
 import {
   Dispatch,
   SetStateAction,
@@ -18,10 +9,21 @@ import {
   useRef,
   useState
 } from "react";
-import { cloneDeep, isEmpty } from "lodash";
-
-import { AreYouSureModal, DinaForm } from "common-ui";
+import { useCollectingEventQuery, useCollectingEventSave } from ".";
+import {
+  DinaFormSubmitParams,
+  useApiClient,
+  useModal,
+  useQuery
+} from "../../../common-ui/lib";
+import {
+  CollectingEvent,
+  MaterialSample
+} from "../../../dina-ui/types/collection-api";
+import { Metadata } from "../../../dina-ui/types/objectstore-api";
 import { CollectingEventFormLayout } from "../../components/collection";
+import { DinaMessage } from "../../intl/dina-ui-intl";
+import { useAttachmentsModal } from "../object-store";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -56,20 +58,47 @@ export function useMaterialSampleQuery(id?: string | null) {
   return materialSampleQuery;
 }
 
-export function useMaterialSampleSave(
-  materialSample?: PersistedResource<MaterialSample>,
-  onSaved?: (id: string) => Promise<void>,
-  isTemplate?: boolean,
-  collectingEvtFormRef?: React.Ref<FormikProps<any>>
-) {
+export interface UseMaterialSampleSaveParams {
+  materialSample?: PersistedResource<MaterialSample>;
+  onSaved?: (id: string) => Promise<void>;
+
+  collectingEvtFormRef?: React.RefObject<FormikProps<any>>;
+
+  isTemplate?: boolean;
+
+  colEventTemplateInitialValues?: Partial<CollectingEvent> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
+  materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
+}
+
+export function useMaterialSampleSave({
+  materialSample,
+  onSaved,
+  collectingEvtFormRef,
+  isTemplate,
+  colEventTemplateInitialValues,
+  materialSampleTemplateInitialValues
+}: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
+  const hasColEventTemplate =
+    isTemplate &&
+    (!isEmpty(colEventTemplateInitialValues?.templateCheckboxes) ||
+      colEventTemplateInitialValues?.id);
+
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
-    !!materialSample?.collectingEvent
+    !!(hasColEventTemplate || !!materialSample?.collectingEvent)
   );
 
-  const hasPreparations = !!materialSample?.preparationType;
-  const [enablePreparations, setEnablePreparations] = useState(hasPreparations);
+  const hasPreparationsTemplate =
+    isTemplate &&
+    !isEmpty(materialSampleTemplateInitialValues?.templateCheckboxes);
+  const [enablePreparations, setEnablePreparations] = useState(
+    hasPreparationsTemplate || !!materialSample?.preparationType
+  );
 
   const initialValues: InputResource<MaterialSample> = materialSample
     ? { ...materialSample }
@@ -83,7 +112,9 @@ export function useMaterialSampleSave(
     collectingEvtFormRef ?? useRef<FormikProps<any>>(null);
 
   const [colEventId, setColEventId] = useState<string | null | undefined>(
-    materialSample?.collectingEvent?.id
+    isTemplate
+      ? colEventTemplateInitialValues?.id
+      : materialSample?.collectingEvent?.id
   );
   const colEventQuery = useCollectingEventQuery(colEventId);
 
@@ -103,8 +134,8 @@ export function useMaterialSampleSave(
     deps: [materialSample?.id],
     title: <DinaMessage id="materialSampleAttachments" />,
     isTemplate,
-    allowNewFieldName: "materialSampleAllowNew",
-    allowExistingFieldName: "materialSampleAllowExisting",
+    allowNewFieldName: "attachmentsConfig.allowNew",
+    allowExistingFieldName: "attachmentsConfig.allowExisting",
     id: "material-sample-attachments-section"
   });
 
@@ -168,7 +199,7 @@ export function useMaterialSampleSave(
         id: null,
         type: "collecting-event"
       };
-    } else if ((colEventFormRef as any).current) {
+    } else if (colEventFormRef.current) {
       // Return if the Collecting Event sub-form has errors:
       const colEventErrors = await (
         colEventFormRef as any
@@ -225,7 +256,11 @@ export function useMaterialSampleSave(
   const nestedCollectingEventForm = (
     <DinaForm
       innerRef={colEventFormRef}
-      initialValues={collectingEventInitialValues}
+      initialValues={
+        isTemplate
+          ? colEventTemplateInitialValues
+          : collectingEventInitialValues
+      }
       validationSchema={collectingEventFormSchema}
       isTemplate={isTemplate}
       readOnly={isTemplate ? !!colEventId : false}

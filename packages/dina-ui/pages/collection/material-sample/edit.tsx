@@ -3,6 +3,7 @@ import {
   ButtonBar,
   DateField,
   DinaForm,
+  DinaFormContext,
   DinaFormSection,
   FieldSet,
   filterBy,
@@ -17,14 +18,15 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import {
-  useMaterialSampleQuery,
-  useMaterialSampleSave
-} from "../../../components/collection/useMaterialSample";
+import { useContext } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { CollectingEventLinker } from "../../../components/collection";
+import {
+  useMaterialSampleQuery,
+  useMaterialSampleSave
+} from "../../../components/collection/useMaterialSample";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
@@ -69,19 +71,27 @@ export default function MaterialSampleEditPage() {
 export interface MaterialSampleFormProps {
   materialSample?: PersistedResource<MaterialSample>;
   onSaved?: (id: string) => Promise<void>;
-  isTemplate?: boolean;
-  collectingEvtFormRef?: React.Ref<FormikProps<any>>;
-  catelogueSectionRef?: React.Ref<FormikProps<any>>;
+  catelogueSectionRef?: React.RefObject<FormikProps<any>>;
+
+  /** Optionally call the hook from the parent component. */
+  materialSampleSaveHook?: ReturnType<typeof useMaterialSampleSave>;
+
+  /** Template form values for template mode. */
+  materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
 }
 
 export function MaterialSampleForm({
   materialSample,
   onSaved,
-  isTemplate,
-  collectingEvtFormRef,
-  catelogueSectionRef
+  catelogueSectionRef,
+  materialSampleSaveHook,
+  materialSampleTemplateInitialValues
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
+  const { isTemplate } = useContext(DinaFormContext) ?? {};
+
   const {
     initialValues,
     nestedCollectingEventForm,
@@ -95,12 +105,14 @@ export function MaterialSampleForm({
     colEventQuery,
     onSubmit,
     materialSampleAttachmentsUI
-  } = useMaterialSampleSave(
-    materialSample,
-    onSaved,
-    isTemplate,
-    collectingEvtFormRef
-  );
+  } =
+    materialSampleSaveHook ??
+    useMaterialSampleSave({
+      materialSample,
+      onSaved,
+      isTemplate
+    });
+
   const buttonBar = (
     <ButtonBar>
       <BackButton
@@ -208,26 +220,44 @@ export function MaterialSampleForm({
                 {
                   // If there is already a linked CollectingEvent then wait for it to load first:
                   colEventId
-                    ? withResponse(colEventQuery, () => (
-                        <>
-                          <div className="mb-3 d-flex justify-content-end align-items-center">
-                            <Link
-                              href={`/collection/collecting-event/view?id=${colEventId}`}
-                            >
-                              <a target="_blank">
-                                <DinaMessage id="collectingEventDetailsPageLink" />
-                              </a>
-                            </Link>
-                            <FormikButton
-                              className="btn btn-danger detach-collecting-event-button ms-5"
-                              onClick={() => setColEventId(null)}
-                            >
-                              <DinaMessage id="detachCollectingEvent" />
-                            </FormikButton>
-                          </div>
-                          {nestedCollectingEventForm}
-                        </>
-                      ))
+                    ? withResponse(
+                        colEventQuery,
+                        ({ data: linkedColEvent }) => (
+                          <>
+                            <div className="mb-3 d-flex justify-content-end align-items-center">
+                              <Link
+                                href={`/collection/collecting-event/view?id=${colEventId}`}
+                              >
+                                <a target="_blank">
+                                  <DinaMessage id="collectingEventDetailsPageLink" />
+                                </a>
+                              </Link>
+                              <FormikButton
+                                className="btn btn-danger detach-collecting-event-button ms-5"
+                                onClick={() => setColEventId(null)}
+                              >
+                                <DinaMessage id="detachCollectingEvent" />
+                              </FormikButton>
+                            </div>
+                            {
+                              // In template mode, only show a link to the linked Collecting Event:
+                              isTemplate ? (
+                                <div className="attached-collecting-event-link">
+                                  <DinaMessage id="attachedCollectingEvent" />:{" "}
+                                  <Link
+                                    href={`/collection/collecting-event/view?id=${colEventId}`}
+                                  >
+                                    <a target="_blank">{linkedColEvent.id}</a>
+                                  </Link>
+                                </div>
+                              ) : (
+                                // In form mode, show the actual editable Collecting Event form:
+                                nestedCollectingEventForm
+                              )
+                            }
+                          </>
+                        )
+                      )
                     : nestedCollectingEventForm
                 }
               </TabPanel>
@@ -242,7 +272,7 @@ export function MaterialSampleForm({
           </FieldSet>
           {isTemplate ? (
             <DinaForm
-              initialValues={{}}
+              initialValues={materialSampleTemplateInitialValues}
               innerRef={catelogueSectionRef}
               isTemplate={true}
             >
@@ -325,13 +355,15 @@ export function PreparationsFormLayout({
     >
       <div className="row">
         <div className="col-md-6">
-          <ResourceSelectField<PreparationType>
-            name="preparationType"
-            filter={filterBy(["name"])}
-            model="collection-api/preparation-type"
-            optionLabel={it => it.name}
-            readOnlyLink="/collection/preparation-type/view?id="
-          />
+          <div className="preparation-type">
+            <ResourceSelectField<PreparationType>
+              name="preparationType"
+              filter={filterBy(["name"])}
+              model="collection-api/preparation-type"
+              optionLabel={it => it.name}
+              readOnlyLink="/collection/preparation-type/view?id="
+            />
+          </div>
           <DinaFormSection
             readOnly={true} // Disabled until back-end supports these fields.
           >

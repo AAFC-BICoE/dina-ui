@@ -116,7 +116,7 @@ function FormWrapper({ children }: PropsWithChildren<{}>) {
   );
 }
 
-const DinaFormContext = createContext<DinaFormContextI | null>(null);
+export const DinaFormContext = createContext<DinaFormContextI | null>(null);
 
 export function useDinaFormContext() {
   const ctx = useContext(DinaFormContext);
