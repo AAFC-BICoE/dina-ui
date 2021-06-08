@@ -1,3 +1,4 @@
+import useLocalStorage from "@rehooks/local-storage";
 import {
   ButtonBar,
   CheckBoxWithoutWrapper,
@@ -11,7 +12,6 @@ import {
 } from "common-ui";
 import { useRouter } from "next/router";
 import NumberSpinnerField from "packages/common-ui/lib/formik-connected/NumberSpinnerField";
-import { PreparationProcessDefinition } from "packages/dina-ui/types/collection-api/resources/PreparationProcessDefinition";
 import React, { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 
@@ -21,9 +21,16 @@ interface SplitChildRowProps {
   computedSuffix: string;
 }
 
+/* Config action related fields */
+interface RunConfig {
+  numberOfChildSamples: number;
+  baseName: string;
+  start: string;
+  childSamples?: { index: number; name: string; description: string }[];
+}
+
 export default function ConfigAction(props) {
   const api = useApiClient();
-  const { groupNames: myGroupNames } = useAccount();
   const router = useRouter();
   const { nextStep } = props;
   const { formatMessage } = useDinaIntl();
@@ -31,6 +38,11 @@ export default function ConfigAction(props) {
   const [baseName, setBaseName] = useState("");
   const [type, setType] = useState("Numerical");
   const [start, setStart] = useState(type === "Numerical" ? "1" : "A");
+  const SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY = "split-child-sample-run-config";
+
+  const [_, setSplitChildSampleRunConfig] = useLocalStorage<
+    RunConfig | null | undefined
+  >(SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY);
 
   const onCreatedChildSplitSampleChange = value => {
     setNumOfChildToCreate(value);
@@ -77,7 +89,7 @@ export default function ConfigAction(props) {
         <TextField
           className="col-md-3"
           hideLabel={true}
-          name={`"description${index}`}
+          name={`"description[${index}]`}
         />
       </div>
     );
@@ -128,57 +140,23 @@ export default function ConfigAction(props) {
   };
 
   const onSubmit = async ({ submittedValues: configActionFields }) => {
-    // submit to back end to save
-    const definition: PreparationProcessDefinition = {
-      name:
-        configActionFields.name ??
-        "preparationProcessDefinition" + Math.random(),
-      group: configActionFields.group ?? myGroupNames?.[0],
-      actionType: "SPLIT",
-      formTemplates: {
-        MATERIAL_SAMPLE: {
-          templateFields: {
-            numberOfChildSamples: {
-              enabled: true,
-              defaultValue: configActionFields.numberOfChildSamples ?? 10
-            },
-            baseName: {
-              enabled: true,
-              defaultValue: configActionFields.baseName ?? "parentName"
-            },
-            start: {
-              enabled: true,
-              defaultValue: configActionFields.start ?? "001"
-            },
-            customChildSampleNames: {
-              enabled: true,
-              defaultValue: [
-                {
-                  index: 0,
-                  name: `${configActionFields.baseName ?? "parentName"}-001`
-                }
-              ]
+    const runConfig: RunConfig = {
+      numberOfChildSamples: configActionFields.numberOfChildSamples ?? 10,
+      baseName: configActionFields.baseName ?? "parentName",
+      start: configActionFields.start ?? "001",
+      // only record the child sample that has been given a custom name or description
+      childSamples: configActionFields.sampleNames.map((sampleName, idx) =>
+        sampleName || `${configActionFields.description[idx]}`
+          ? {
+              index: idx,
+              name: sampleName,
+              description: `${configActionFields.description[idx]}`
             }
-          }
-        }
-      },
-      type: "material-sample-action-definition"
+          : null
+      )
     };
-
-    const [savedDefinition] = await api.save(
-      [
-        {
-          resource: definition,
-          type: "material-sample-action-definition"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
-
-    // navigate to a run aciton page
-    await router.push(
-      `/collection/material-sample/workflows/split?id=${savedDefinition.id}`
-    );
+    // save the runConfig to local storage
+    setSplitChildSampleRunConfig(runConfig);
     nextStep();
   };
 
@@ -186,7 +164,7 @@ export default function ConfigAction(props) {
     <ButtonBar className="d-flex justify-content-center">
       <FormikButton
         className="btn btn-info "
-        onClick={(submittedValues, _) => onSubmit({ submittedValues })}
+        onClick={submittedValues => onSubmit({ submittedValues })}
       >
         <DinaMessage id="next" />
       </FormikButton>
@@ -246,7 +224,9 @@ export default function ConfigAction(props) {
               className="col-md-2"
               name="baseName"
               placeholder="ParentName"
-              onChangeExternal={(_, _name, value) => setBaseName(value as any)}
+              onChangeExternal={(_form, _name, value) =>
+                setBaseName(value as any)
+              }
             />
             <SelectField
               className="col-md-2"
@@ -261,7 +241,7 @@ export default function ConfigAction(props) {
               numberOnly={isNumericalType ?? false}
               letterOnly={isLetterType ?? false}
               inputProps={{ maxLength: isLetterType ? 1 : Infinity }}
-              onChangeExternal={(_, _name, value) => {
+              onChangeExternal={(_form, _name, value) => {
                 setStart(!value ? (isNumericalType ? "1" : "A") : value);
               }}
             />
