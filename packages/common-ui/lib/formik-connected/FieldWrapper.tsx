@@ -31,8 +31,6 @@ export interface LabelWrapperParams {
 
   /** Remove the label. */
   removeLabel?: boolean;
-
-  isTemplate?: boolean;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -85,7 +83,7 @@ export function FieldWrapper({
     <div className={`${className} ${isTemplate ? "row" : ""}`}>
       {isTemplate && (
         <CheckBoxWithoutWrapper
-          name={`${name}Enabled`}
+          name={`templateCheckboxes['${name}']`}
           className="col-sm-1 templateCheckBox"
         />
       )}
@@ -105,7 +103,7 @@ export function FieldWrapper({
             className={[
               `${labelCol ? `col-sm-${labelCol}` : ""}`,
               // Adjust alignment for editable inputs:
-              horizontal && !readOnly ? "mt-sm-2" : "",
+              horizontal && !readOnly && !isTemplate ? "mt-sm-2" : "",
               "mb-2"
             ].join(" ")}
           >
@@ -141,5 +139,6 @@ export function FieldWrapper({
       </label>
     </div>
   );
-  return className !== "hidden" ? wrapper : null;
+  // ensure hide the hidden fields when it is a tempalte
+  return className !== "hidden" || !isTemplate ? wrapper : null;
 }
