@@ -115,6 +115,22 @@ async function mountForm(
     await toggleDataComponent(catalogSwitch(), val);
   }
 
+  async function toggleActionType(
+    val: PreparationProcessDefinition["actionType"]
+  ) {
+    wrapper
+      .find(`input.actionType-${val}`)
+      .simulate("change", { target: { checked: true } });
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    if (wrapper.find(".modal-content form").exists()) {
+      wrapper.find(".modal-content form").simulate("submit");
+    }
+    await new Promise(setImmediate);
+    wrapper.update();
+  }
+
   async function fillOutRequiredFields() {
     // Set the name:
     wrapper
@@ -143,7 +159,8 @@ async function mountForm(
     colEventSwitch,
     catalogSwitch,
     fillOutRequiredFields,
-    submitForm
+    submitForm,
+    toggleActionType
   };
 }
 
@@ -157,7 +174,7 @@ describe("Workflow template edit page", () => {
     expect(catalogSwitch().prop("checked")).toEqual(false);
   });
 
-  it("Submits a new action-definition: minimal form submission.", async () => {
+  it("Submits a new ADD-type action-definition: minimal form submission.", async () => {
     const {
       toggleColEvent,
       togglePreparations,
@@ -195,7 +212,7 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Submits a new action-definition: Only set collecting event template fields.", async () => {
+  it("Submits a new ADD-type action-definition: Only set collecting event template fields.", async () => {
     const { wrapper, toggleColEvent, fillOutRequiredFields, submitForm } =
       await mountForm();
 
@@ -268,7 +285,7 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Submits a new action-definition: Only set preparations template fields.", async () => {
+  it("Submits a new ADD-type action-definition: Only set preparations template fields.", async () => {
     const { wrapper, togglePreparations, fillOutRequiredFields, submitForm } =
       await mountForm();
 
@@ -316,7 +333,7 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Submits a new action-definition: Link to an existing Collecting Event.", async () => {
+  it("Submits a new ADD-type action-definition: Link to an existing Collecting Event.", async () => {
     const { wrapper, toggleColEvent, fillOutRequiredFields, submitForm } =
       await mountForm();
 
@@ -519,7 +536,6 @@ describe("Workflow template edit page", () => {
 
   it("Edits an existing action-definition: Can remove the data components.", async () => {
     const {
-      wrapper,
       colEventSwitch,
       catalogSwitch,
       toggleColEvent,
@@ -573,6 +589,51 @@ describe("Workflow template edit page", () => {
       actionType: "ADD",
       // Both data components removed:
       formTemplates: {},
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+  });
+
+  it("Adds a new SPLIT-type action definition", async () => {
+    const { wrapper, fillOutRequiredFields, toggleActionType, submitForm } =
+      await mountForm();
+    await fillOutRequiredFields();
+    await toggleActionType("SPLIT");
+
+    // Only allow new attachments:
+    wrapper
+      .find("input.allow-new-checkbox")
+      .simulate("change", { target: { checked: true } });
+
+    // Set a default prep type:
+    wrapper
+      .find(".preparation-type input[type='checkbox']")
+      .simulate("change", { target: { checked: true } });
+    wrapper.find(".preparationType-field Select").prop<any>("onChange")({
+      resource: TEST_PREP_TYPE
+    });
+
+    await submitForm();
+
+    expect(mockOnSaved).lastCalledWith({
+      actionType: "SPLIT",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowNew: true,
+          templateFields: {
+            preparationType: {
+              defaultValue: {
+                id: "100",
+                name: "test-prep-type",
+                type: "preparation-type"
+              },
+              enabled: true
+            }
+          }
+        }
+      },
       group: "test-group-1",
       id: "123",
       name: "test-config",

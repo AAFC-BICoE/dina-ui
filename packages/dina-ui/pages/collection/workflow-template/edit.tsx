@@ -108,8 +108,8 @@ export function WorkflowTemplateForm({
       deps: [],
       title: <DinaMessage id="materialSampleAttachments" />,
       isTemplate: true,
-      allowNewFieldName: "formTemplates.MATERIAL_SAMPLE.allowNew",
-      allowExistingFieldName: "formTemplates.MATERIAL_SAMPLE.allowExisting"
+      allowNewFieldName: "attachmentsConfig.allowNew",
+      allowExistingFieldName: "attachmentsConfig.allowExisting"
     });
 
   const { formTemplates, ...initialDefinition } = fetchedActionDefinition ?? {};
@@ -151,38 +151,53 @@ export function WorkflowTemplateForm({
     const definition: PreparationProcessDefinition = {
       ...mainTemplateFields,
       actionType,
-      formTemplates: {
-        MATERIAL_SAMPLE: enablePreparations
+      formTemplates:
+        actionType === "ADD"
           ? {
-              ...materialSampleFormRef.current?.values.attachmentsConfig,
-              templateFields:
-                enablePreparations && materialSampleFormRef.current
+              MATERIAL_SAMPLE: enablePreparations
+                ? {
+                    ...materialSampleFormRef.current?.values.attachmentsConfig,
+                    templateFields:
+                      enablePreparations && materialSampleFormRef.current
+                        ? getEnabledTemplateFieldsFromForm(
+                            materialSampleFormRef.current.values
+                          )
+                        : undefined
+                  }
+                : undefined,
+              COLLECTING_EVENT: enableCollectingEvent
+                ? attachedColEventId
+                  ? {
+                      // When linking the template to an existing Col event, only set the ID here:
+                      templateFields: {
+                        id: { enabled: true, defaultValue: attachedColEventId }
+                      }
+                    }
+                  : {
+                      // When making a template for a new Collecting Event, set all chosen fields here:
+                      ...collectingEvtFormRef.current?.values
+                        ?.attachmentsConfig,
+                      templateFields: {
+                        ...getEnabledTemplateFieldsFromForm(
+                          collectingEvtFormRef.current?.values
+                        ),
+                        id: undefined
+                      }
+                    }
+                : undefined
+            }
+          : actionType === "SPLIT"
+          ? {
+              MATERIAL_SAMPLE: {
+                ...materialSampleFormRef.current?.values.attachmentsConfig,
+                templateFields: materialSampleFormRef.current
                   ? getEnabledTemplateFieldsFromForm(
                       materialSampleFormRef.current.values
                     )
                   : undefined
+              }
             }
-          : undefined,
-        COLLECTING_EVENT: enableCollectingEvent
-          ? attachedColEventId
-            ? {
-                // When linking the template to an existing Col event, only set the ID here:
-                templateFields: {
-                  id: { enabled: true, defaultValue: attachedColEventId }
-                }
-              }
-            : {
-                // When making a template for a new Collecting Event, set all chosen fields here:
-                ...collectingEvtFormRef.current?.values?.attachmentsConfig,
-                templateFields: {
-                  ...getEnabledTemplateFieldsFromForm(
-                    collectingEvtFormRef.current?.values
-                  ),
-                  id: undefined
-                }
-              }
-          : undefined
-      },
+          : {},
       type: "material-sample-action-definition"
     };
 
@@ -225,6 +240,7 @@ export function WorkflowTemplateForm({
             <div className="col-md-6">
               <label className="mx-3">
                 <input
+                  className="actionType-ADD"
                   type="radio"
                   checked={actionType === "ADD"}
                   onChange={() => setActionType("ADD")}
@@ -233,6 +249,7 @@ export function WorkflowTemplateForm({
               </label>
               <label className="mx-3">
                 <input
+                  className="actionType-SPLIT"
                   type="radio"
                   checked={actionType === "SPLIT"}
                   onChange={() => setActionType("SPLIT")}
@@ -255,7 +272,7 @@ export function WorkflowTemplateForm({
         </DinaFormSection>
       ) : actionType === "SPLIT" ? (
         <DinaForm
-          initialValues={{}}
+          initialValues={materialSampleTemplateInitialValues}
           innerRef={materialSampleFormRef}
           isTemplate={true}
         >
