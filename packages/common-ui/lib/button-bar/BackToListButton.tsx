@@ -14,7 +14,7 @@ export function BackToListButton({ entityLink }: BackToListButtonProps) {
   return (
     <Link href={`${entityLink}/list`}>
       <a className="btn btn-outline-secondary">
-        <CommonMessage id="backToListButtonText" />
+        <CommonMessage id="backToList" />
       </a>
     </Link>
   );
