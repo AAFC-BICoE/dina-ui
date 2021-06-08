@@ -219,8 +219,9 @@ describe("QueryTable component", () => {
       { apiContext }
     );
 
-    // Wait for page 1 to load.
+    // Making sure there are data before proceed to next step
     await new Promise(setImmediate);
+    wrapper.update();
 
     // Click the "Next" button.
     wrapper.find(".-next button").first().simulate("click");
@@ -526,11 +527,15 @@ describe("QueryTable component", () => {
     expect(window.scrollY).toEqual(200);
   });
 
-  it("Has the paginator at the top and bottom of the table.", () => {
+  it("Has the paginator at the top and bottom of the table.", async () => {
     const wrapper = mountWithAppContext(
       <QueryTable<Todo> path="todo" columns={["id", "name", "description"]} />,
       { apiContext }
     );
+
+    // Making sure there are data before proceed to next step
+    await new Promise(setImmediate);
+    wrapper.update();
 
     expect(wrapper.find(".pagination-top").exists()).toEqual(true);
     expect(wrapper.find(".pagination-bottom").exists()).toEqual(true);

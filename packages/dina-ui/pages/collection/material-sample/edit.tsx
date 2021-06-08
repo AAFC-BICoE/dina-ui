@@ -72,8 +72,10 @@ export interface MaterialSampleFormProps {
   materialSample?: PersistedResource<MaterialSample>;
   onSaved?: (id: string) => Promise<void>;
   catelogueSectionRef?: React.RefObject<FormikProps<any>>;
+
   /** Optionally call the hook from the parent component. */
   materialSampleSaveHook?: ReturnType<typeof useMaterialSampleSave>;
+
   /** Template form values for template mode. */
   materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
@@ -89,6 +91,7 @@ export function MaterialSampleForm({
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
   const { isTemplate } = useContext(DinaFormContext) ?? {};
+
   const {
     initialValues,
     nestedCollectingEventForm,
@@ -109,6 +112,7 @@ export function MaterialSampleForm({
       onSaved,
       isTemplate
     });
+
   const buttonBar = (
     <ButtonBar>
       <BackButton

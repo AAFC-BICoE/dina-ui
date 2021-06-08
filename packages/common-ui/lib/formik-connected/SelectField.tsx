@@ -25,20 +25,15 @@ export interface SelectFieldProps<T = string> extends LabelWrapperParams {
 
 /** Formik-connected select input. */
 export function SelectField<T = string>(props: SelectFieldProps<T>) {
-  const {
-    disabled,
-    isMulti,
-    onChange,
-    options,
-    styles,
-    ...labelWrapperProps
-  } = props;
+  const { disabled, isMulti, onChange, options, styles, ...labelWrapperProps } =
+    props;
 
   const customStyle = {
     placeholder: (provided, _) => ({
       ...provided,
       color: "rgb(87,120,94)"
-    })
+    }),
+    menu: base => ({ ...base, zIndex: 1050 })
   };
 
   return (

@@ -47,9 +47,11 @@ export default function PreparationProcessTemplatePage() {
     { path: `/collection-api/material-sample-action-definition/${id}` },
     { disabled: !id }
   );
+
   const pageTitle = id
     ? "editWorkflowTemplateTitle"
     : "createWorkflowTemplateTitle";
+
   async function moveToNextPage() {
     await router.push("/collection/workflow-template/list");
   }
@@ -76,6 +78,7 @@ export default function PreparationProcessTemplatePage() {
     </div>
   );
 }
+
 export interface WorkflowTemplateFormProps {
   fetchedActionDefinition?: PersistedResource<PreparationProcessDefinition>;
   onSaved: (
@@ -104,11 +107,12 @@ export function WorkflowTemplateForm({
     });
 
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
-
   const materialSampleFormRef = useRef<FormikProps<any>>(null);
 
   const { formTemplates, ...initialDefinition } = fetchedActionDefinition ?? {};
+
   const initialValues: Partial<WorkflowFormValues> = initialDefinition ?? {};
+
   // Initialize the tempalte form default values and checkbox states:
   const colEventTemplateInitialValues =
     getTemplateInitialValuesFromSavedFormTemplate(
@@ -122,17 +126,20 @@ export function WorkflowTemplateForm({
     getTemplateInitialValuesFromSavedFormTemplate(
       formTemplates?.MATERIAL_SAMPLE
     );
+
   const materialSampleSaveHook = useMaterialSampleSave({
     isTemplate: true,
     colEventTemplateInitialValues,
     materialSampleTemplateInitialValues,
     collectingEvtFormRef
   });
+
   const {
     colEventId: attachedColEventId,
     enableCollectingEvent,
     enablePreparations
   } = materialSampleSaveHook;
+
   async function onSaveTemplateSubmit({
     api: { save },
     submittedValues: mainTemplateFields
@@ -185,13 +192,16 @@ export function WorkflowTemplateForm({
       ],
       { apiBaseUrl: "/collection-api" }
     );
+
     await onSaved(savedDefinition);
   }
+
   const buttonBar = (
     <ButtonBar>
       <SubmitButton />
     </ButtonBar>
   );
+
   return (
     <DinaForm<Partial<WorkflowFormValues>>
       initialValues={initialValues}
@@ -218,14 +228,17 @@ export function WorkflowTemplateForm({
                 />
                 <p>{formatMessage("creatNewWorkflow")}</p>
               </label>
-              <label className="mx-3">
-                <input
-                  type="radio"
-                  checked={actionType === "SPLIT"}
-                  onChange={() => setActionType("SPLIT")}
-                />
-                <p>{formatMessage("createSplitWorkflow")}</p>
-              </label>
+              {/*
+                // Enable this later when the Split workflow can be stored.
+                <label className="mx-3">
+                  <input
+                    type="radio"
+                    checked={actionType === "SPLIT"}
+                    onChange={() => setActionType("SPLIT")}
+                  />
+                  <p>{formatMessage("createSplitWorkflow")}</p>
+                </label>
+              */}
             </div>
           </div>
         </FieldSet>
@@ -270,6 +283,7 @@ export function getEnabledTemplateFieldsFromForm(
         : undefined
   );
 }
+
 /** Get the checkbox values for the template form from the persisted form template. */
 export function getTemplateInitialValuesFromSavedFormTemplate<T>(
   formTemplate?: FormTemplate<T>
@@ -277,10 +291,12 @@ export function getTemplateInitialValuesFromSavedFormTemplate<T>(
   if (!formTemplate) {
     return {};
   }
+
   // Get the checkbox state:
   const templateCheckboxes = mapValues(formTemplate.templateFields, val =>
     val?.enabled ? true : undefined
   );
+
   // Get the default values from the stored template:
   const defaultValues: Partial<T> = {};
   for (const [field, templateField] of toPairs<TemplateField<any> | undefined>(
@@ -290,6 +306,7 @@ export function getTemplateInitialValuesFromSavedFormTemplate<T>(
       set(defaultValues, field, templateField.defaultValue);
     }
   }
+
   const { allowNew, allowExisting } = formTemplate;
   return {
     ...defaultValues,
