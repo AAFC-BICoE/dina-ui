@@ -1,4 +1,5 @@
 import {
+  AreYouSureModal,
   ButtonBar,
   DinaForm,
   DinaFormSection,
@@ -6,14 +7,15 @@ import {
   FieldSet,
   SubmitButton,
   TextField,
+  useModal,
   useQuery,
   withResponse
 } from "common-ui";
 import { FormikProps } from "formik";
 import { PersistedResource } from "kitsu";
-import { get, mapValues, set, toPairs } from "lodash";
+import { get, mapValues, set, toPairs, isEmpty } from "lodash";
 import { useRouter } from "next/router";
-import React, { useRef, useState } from "react";
+import React, { RefObject, useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
 import { GroupSelectField, Head, Nav } from "../../../components";
@@ -92,9 +94,13 @@ export function WorkflowTemplateForm({
 }: WorkflowTemplateFormProps) {
   const { formatMessage } = useDinaIntl();
 
-  const [actionType, setActionType] = useState<
-    PreparationProcessDefinition["actionType"]
-  >(fetchedActionDefinition?.actionType ?? "ADD");
+  const collectingEvtFormRef = useRef<FormikProps<any>>(null);
+  const materialSampleFormRef = useRef<FormikProps<any>>(null);
+
+  const { actionType, setActionType } = useActionTypeToggle(
+    fetchedActionDefinition?.actionType ?? "ADD",
+    [collectingEvtFormRef, materialSampleFormRef]
+  );
 
   const { attachedMetadatasUI: materialSampleAttachmentsUI } =
     useAttachmentsModal({
@@ -105,9 +111,6 @@ export function WorkflowTemplateForm({
       allowNewFieldName: "formTemplates.MATERIAL_SAMPLE.allowNew",
       allowExistingFieldName: "formTemplates.MATERIAL_SAMPLE.allowExisting"
     });
-
-  const collectingEvtFormRef = useRef<FormikProps<any>>(null);
-  const materialSampleFormRef = useRef<FormikProps<any>>(null);
 
   const { formTemplates, ...initialDefinition } = fetchedActionDefinition ?? {};
 
@@ -228,17 +231,14 @@ export function WorkflowTemplateForm({
                 />
                 <p>{formatMessage("creatNewWorkflow")}</p>
               </label>
-              {/*
-                // Enable this later when the Split workflow can be stored.
-                <label className="mx-3">
-                  <input
-                    type="radio"
-                    checked={actionType === "SPLIT"}
-                    onChange={() => setActionType("SPLIT")}
-                  />
-                  <p>{formatMessage("createSplitWorkflow")}</p>
-                </label>
-              */}
+              <label className="mx-3">
+                <input
+                  type="radio"
+                  checked={actionType === "SPLIT"}
+                  onChange={() => setActionType("SPLIT")}
+                />
+                <p>{formatMessage("createSplitWorkflow")}</p>
+              </label>
             </div>
           </div>
         </FieldSet>
@@ -266,6 +266,56 @@ export function WorkflowTemplateForm({
       {buttonBar}
     </DinaForm>
   );
+}
+
+export function useActionTypeToggle(
+  initialValue: PreparationProcessDefinition["actionType"],
+  templateFormRefs: RefObject<FormikProps<any>>[]
+) {
+  const { openModal } = useModal();
+  const { formatMessage } = useDinaIntl();
+  const [actionType, setActionTypeInner] = useState(initialValue ?? "ADD");
+
+  /** Prompt the user before removing their form template. */
+  function setActionType(newValue: PreparationProcessDefinition["actionType"]) {
+    const aTemplateIsDefined = Boolean(
+      templateFormRefs.filter(
+        ref => !isEmpty(ref.current?.values.templateCheckboxes)
+      ).length
+    );
+
+    // Only prompt if a template is already defined:
+    if (aTemplateIsDefined) {
+      openModal(
+        <AreYouSureModal
+          actionMessage={
+            <DinaMessage
+              id="switchToActionType"
+              values={{
+                actionType:
+                  newValue === "ADD"
+                    ? formatMessage("creatNewWorkflow")
+                    : newValue === "SPLIT"
+                    ? formatMessage("createSplitWorkflow")
+                    : newValue
+              }}
+            />
+          }
+          messageBody={
+            <DinaMessage
+              id="thisWillRemoveYourTemplate"
+              values={{ actionType: newValue }}
+            />
+          }
+          onYesButtonClicked={() => setActionTypeInner(newValue)}
+        />
+      );
+    } else {
+      setActionTypeInner(newValue);
+    }
+  }
+
+  return { actionType, setActionType };
 }
 
 /** Get the enabled template fields with their default values from the form. */

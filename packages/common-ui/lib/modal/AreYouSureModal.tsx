@@ -33,13 +33,7 @@ export function AreYouSureModal({
         <h2>{actionMessage}</h2>
       </div>
       <div className="modal-body">
-        {messageBody ? (
-          <>{messageBody}</>
-        ) : (
-          <p>
-            <CommonMessage id="areYouSure" />
-          </p>
-        )}
+        <p>{messageBody ?? <CommonMessage id="areYouSure" />}</p>
         <DinaForm initialValues={{}} onSubmit={onYesClickInternal}>
           <div className="list-inline">
             <div className="list-inline-item" style={{ width: "8rem" }}>
