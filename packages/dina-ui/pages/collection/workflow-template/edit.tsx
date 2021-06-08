@@ -228,14 +228,17 @@ export function WorkflowTemplateForm({
                 />
                 <p>{formatMessage("creatNewWorkflow")}</p>
               </label>
-              <label className="mx-3">
-                <input
-                  type="radio"
-                  checked={actionType === "SPLIT"}
-                  onChange={() => setActionType("SPLIT")}
-                />
-                <p>{formatMessage("createSplitWorkflow")}</p>
-              </label>
+              {/*
+                // Enable this later when the Split workflow can be stored.
+                <label className="mx-3">
+                  <input
+                    type="radio"
+                    checked={actionType === "SPLIT"}
+                    onChange={() => setActionType("SPLIT")}
+                  />
+                  <p>{formatMessage("createSplitWorkflow")}</p>
+                </label>
+              */}
             </div>
           </div>
         </FieldSet>
