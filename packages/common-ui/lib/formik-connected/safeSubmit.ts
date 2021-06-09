@@ -1,4 +1,5 @@
 import { FormikContextType } from "formik";
+import { DoOperationsError } from "../api-client/ApiClientContext";
 
 export type OnFormikSubmit<TValues = any> = (
   submittedValues: TValues,
@@ -14,9 +15,14 @@ export function safeSubmit(submitfn: OnFormikSubmit): OnFormikSubmit {
     formik.setSubmitting(true);
     try {
       await submitfn(submittedValues, formik);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(error);
-      formik.setStatus(error.message);
+      if (error instanceof Error) {
+        formik.setStatus(error.message);
+      }
+      if (error instanceof DoOperationsError) {
+        formik.setErrors(error.fieldErrors);
+      }
     }
     formik.setSubmitting(false);
   };

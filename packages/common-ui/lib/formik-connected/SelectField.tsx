@@ -3,6 +3,7 @@ import { isArray } from "lodash";
 import Select from "react-select";
 import { Styles } from "react-select/src/styles";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
+import classnames from "classnames";
 
 export interface SelectOption<T> {
   label: string;
@@ -28,17 +29,21 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
   const { disabled, isMulti, onChange, options, styles, ...labelWrapperProps } =
     props;
 
-  const customStyle = {
-    placeholder: (provided, _) => ({
-      ...provided,
-      color: "rgb(87,120,94)"
-    }),
-    menu: base => ({ ...base, zIndex: 1050 })
-  };
-
   return (
     <FieldWrapper {...labelWrapperProps}>
-      {({ setValue, value, formik }) => {
+      {({ setValue, value, formik, invalid }) => {
+        const customStyle: any = {
+          placeholder: (provided, _) => ({
+            ...provided,
+            color: "rgb(87,120,94)"
+          }),
+          menu: base => ({ ...base, zIndex: 1050 }),
+          control: base => ({
+            ...base,
+            borderColor: invalid ? "red" : base.borderColor
+          })
+        };
+
         function onChangeInternal(
           change: SelectOption<T>[] | SelectOption<T> | null
         ) {
@@ -60,6 +65,7 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
 
         return (
           <Select
+            className={classnames({ "is-invalid": invalid })}
             isDisabled={disabled}
             isMulti={isMulti}
             options={options}

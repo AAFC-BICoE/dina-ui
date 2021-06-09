@@ -13,6 +13,7 @@ import { Styles } from "react-select/src/styles";
 import { OptionsType } from "react-select/src/types";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { ApiClientContext, SelectOption } from "../..";
+import classnames from "classnames";
 
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData extends KitsuResource> {
@@ -49,6 +50,8 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   asyncOptions?: AsyncOption<TData>[];
 
   isDisabled?: boolean;
+
+  invalid?: boolean;
 }
 
 /**
@@ -81,7 +84,8 @@ export function ResourceSelect<TData extends KitsuResource>({
   styles,
   value,
   asyncOptions,
-  isDisabled
+  isDisabled,
+  invalid
 }: ResourceSelectProps<TData>) {
   const { apiClient } = useContext(ApiClientContext);
   const { formatMessage } = useIntl();
@@ -210,12 +214,17 @@ export function ResourceSelect<TData extends KitsuResource>({
     placeholder: (provided, _) => ({
       ...provided,
       color: "rgb(87,120,94)"
+    }),
+    control: base => ({
+      ...base,
+      borderColor: invalid ? "red" : base.borderColor
     })
   };
 
   return (
     <SortableSelect
       // react-select AsyncSelect props:
+      className={classnames({ "is-invalid": invalid })}
       defaultOptions={true}
       isMulti={isMulti}
       loadOptions={debouncedOptionLoader}
