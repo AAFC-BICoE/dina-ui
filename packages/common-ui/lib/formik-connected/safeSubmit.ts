@@ -15,7 +15,7 @@ export function safeSubmit(submitfn: OnFormikSubmit): OnFormikSubmit {
     formik.setSubmitting(true);
     try {
       await submitfn(submittedValues, formik);
-    } catch (error: unknown) {
+    } catch (error) {
       console.error(error);
       if (error instanceof Error) {
         formik.setStatus(error.message);
