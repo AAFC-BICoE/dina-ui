@@ -10,7 +10,10 @@ import {
   TextField
 } from "common-ui";
 import NumberSpinnerField from "packages/common-ui/lib/formik-connected/NumberSpinnerField";
-import { MaterialSampleRunConfig } from "packages/dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
+import {
+  MaterialSampleRunConfig,
+  MaterialSampleRunConfigConfiguration
+} from "packages/dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import React, { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 
@@ -45,7 +48,7 @@ export default function ConfigAction(props) {
   const SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY = "split-child-sample-run-config";
 
   const [_, setSplitChildSampleRunConfig] = useLocalStorage<
-    RunConfig | null | undefined
+    MaterialSampleRunConfig | null | undefined
   >(SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY);
 
   const onCreatedChildSplitSampleChange = value => {
@@ -116,24 +119,30 @@ export default function ConfigAction(props) {
 
   const onSubmit = async ({ submittedValues: configActionFields }) => {
     // record the customized user entry if there is any name or description provided
-    const customChildSample: any = [];
+    const sampleNames: any = [];
+    const sampleDescs: any = [];
     if (configActionFields.sampleName || configActionFields.description) {
       for (let i = 0; i < numOfChildToCreate; i++) {
-        customChildSample.push({
-          index: i,
-          name: configActionFields.sampleName[i],
-          description: configActionFields.description[i]
-        });
+        sampleNames.push(configActionFields.sampleName[i]);
+        sampleDescs.push(configActionFields.description[i]);
       }
     }
-
-    const runConfig: RunConfig = {
-      numOfChildToCreate:
-        configActionFields.numOfChildToCreate ?? numOfChildToCreate,
-      baseName: configActionFields.baseName ?? "parentName",
-      start: configActionFields.start ?? "001",
-      customChildSample: customChildSample?.length ? customChildSample : null,
-      type: configActionFields.type
+    const runConfig: MaterialSampleRunConfig = {
+      metadata: {
+        actionRemarks: configActionFields.remarks
+      },
+      configure: {
+        numOfChildToCreate:
+          configActionFields.numOfChildToCreate ?? numOfChildToCreate,
+        baseName: configActionFields.baseName,
+        start: configActionFields.start ?? start,
+        type: configActionFields.type,
+        destroyOriginal: configActionFields.destroyOriginal
+      },
+      configure_children: {
+        sampleNames,
+        sampleDescs
+      }
     };
 
     // save the runConfig to local storage
@@ -163,7 +172,7 @@ export default function ConfigAction(props) {
 
   /** Form validation schema. */
   const runConfigFormSchema: SchemaOf<
-    Pick<MaterialSampleRunConfig, "baseName">
+    Pick<MaterialSampleRunConfigConfiguration, "baseName">
   > = object({
     baseName: string().required(
       formatMessage("field_materialSampleRunConfig_baseNameError")
