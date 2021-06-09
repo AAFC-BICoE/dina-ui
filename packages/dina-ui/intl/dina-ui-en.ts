@@ -65,6 +65,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createSplitWorkflow: "Create Split",
   createWorkflowTemplateTitle: "Create Workflow Template",
   customPlaceName: "Custom Place Name",
+  dataEntryLabel: "Data Entry",
   decimalLatLong: "Decimal Lat/Long",
   decimalLatitude: "Decimal Latitude",
   decimalLongitude: "Decimal Longitude",

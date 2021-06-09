@@ -34,9 +34,12 @@ interface RunConfig {
 
 export interface ComputeSuffixProps {
   index: number;
-  start: string;
-  type: string;
+  start: string | undefined;
+  type: string | undefined;
 }
+
+export const SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY =
+  "split-child-sample-run-config";
 
 export default function ConfigAction(props) {
   const { nextStep } = props;
@@ -45,7 +48,6 @@ export default function ConfigAction(props) {
   const [baseName, setBaseName] = useState("");
   const [type, setType] = useState("Numerical");
   const [start, setStart] = useState(type === "Numerical" ? "1" : "A");
-  const SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY = "split-child-sample-run-config";
 
   const [_, setSplitChildSampleRunConfig] = useLocalStorage<
     MaterialSampleRunConfig | null | undefined
@@ -123,8 +125,8 @@ export default function ConfigAction(props) {
     const sampleDescs: any = [];
     if (configActionFields.sampleName || configActionFields.description) {
       for (let i = 0; i < numOfChildToCreate; i++) {
-        sampleNames.push(configActionFields.sampleName[i]);
-        sampleDescs.push(configActionFields.description[i]);
+        sampleNames.push(configActionFields.sampleName?.[i]);
+        sampleDescs.push(configActionFields.description?.[i]);
       }
     }
     const runConfig: MaterialSampleRunConfig = {
@@ -264,9 +266,9 @@ export const computeSuffix = ({ index, start, type }: ComputeSuffixProps) => {
   let computedSuffix;
   if (type === "Numerical") {
     // correclty set the start when numerical input is null/empty, default to 1
-    computedSuffix = isNaN(parseInt(start, 10))
+    computedSuffix = isNaN(parseInt(start as any, 10))
       ? index + 1
-      : index + parseInt(start, 10);
+      : index + parseInt(start as any, 10);
   } else {
     let myStart = start;
     // Correclty set the start value when letter input is null/empty, defualt to "A"

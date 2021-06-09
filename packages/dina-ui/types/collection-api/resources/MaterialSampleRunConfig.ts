@@ -5,10 +5,10 @@ export interface MaterialSampleRunConfigMetadata {
 }
 
 export interface MaterialSampleRunConfigConfiguration {
-  numOfChildToCreate: string;
+  numOfChildToCreate: number;
   baseName: string;
-  start?: string;
-  type: string;
+  start?: string | undefined;
+  type: string | undefined;
   destroyOriginal: boolean;
 }
 
