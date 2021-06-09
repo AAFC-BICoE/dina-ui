@@ -6,10 +6,9 @@ export default function StepNav(props) {
     const isActive = props.currentStep === i;
     dots.push(
       (
-        <>
+        <span key={`step-${i}`}>
           <span className="d-flex align-items-start flex-column">
             <span
-              key={`step-${i}`}
               className={`dot ${isActive ? "active" : ""}`}
               onClick={() => props.goToStep(i)}
             >
@@ -18,7 +17,7 @@ export default function StepNav(props) {
             <span>{"Step " + i}</span>
           </span>
           <span className="mb-auto p-4" />
-        </>
+        </span>
       ) as any
     );
   }

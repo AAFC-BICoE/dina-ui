@@ -23,15 +23,20 @@ interface SplitChildRowProps {
 
 /* Config action related fields */
 interface RunConfig {
-  numberOfChildSamples: number;
+  numOfChildToCreate: number;
   baseName: string;
   start: string;
-  childSamples?: { index: number; name: string; description: string }[];
+  type: string;
+  customChildSample?: { index: number; name: string; description: string }[];
+}
+
+export interface ComputeSuffixProps {
+  index: number;
+  start: string;
+  type: string;
 }
 
 export default function ConfigAction(props) {
-  const api = useApiClient();
-  const router = useRouter();
   const { nextStep } = props;
   const { formatMessage } = useDinaIntl();
   const [numOfChildToCreate, setNumOfChildToCreate] = useState(1);
@@ -75,7 +80,7 @@ export default function ConfigAction(props) {
   }: SplitChildRowProps) => {
     return (
       <div className="d-flex">
-        <span className="col-md-1 fw-bold">#{index}:</span>
+        <span className="col-md-1 fw-bold">#{index + 1}:</span>
         <TextField
           className="col-md-3"
           hideLabel={true}
@@ -89,72 +94,48 @@ export default function ConfigAction(props) {
         <TextField
           className="col-md-3"
           hideLabel={true}
-          name={`"description[${index}]`}
+          name={`description[${index}]`}
         />
       </div>
     );
   };
-
   const SplitChildRows = () => {
     const childRows: any = [];
     for (let i = 0; i < numOfChildToCreate; i++) {
-      if (type === "Numerical") {
-        // correclty set the start when numerical input is null/empty, default to 1
-        const computedSuffix = isNaN(parseInt(start, 10))
-          ? i + 1
-          : i + parseInt(start, 10);
-        childRows.push(
-          <SplitChildRow
-            key={i}
-            index={i + 1}
-            computedSuffix={computedSuffix.toString()}
-            baseName={baseName}
-          />
-        );
-      } else {
-        let myStart = start;
-        let computedSuffix;
-        // Correclty set the start value when letter input is null/empty, defualt to "A"
-        if (!myStart || myStart.length === 0 || !isNaN(parseInt(myStart, 10))) {
-          myStart = "A";
-        }
-        const charCode = myStart.charCodeAt(0) + i;
-        // Only if the char is a letter, split child row will be added
-        if (
-          (charCode >= 97 && charCode <= 122) ||
-          (charCode >= 65 && charCode <= 90)
-        ) {
-          computedSuffix = String.fromCharCode(charCode);
-          childRows.push(
-            <SplitChildRow
-              key={i}
-              index={i + 1}
-              baseName={baseName}
-              computedSuffix={computedSuffix}
-            />
-          );
-        }
-      }
+      const computedSuffix = computeSuffix({ index: i, start, type });
+      childRows.push(
+        <SplitChildRow
+          key={i}
+          index={i}
+          baseName={baseName}
+          computedSuffix={computedSuffix}
+        />
+      );
     }
     return childRows;
   };
 
   const onSubmit = async ({ submittedValues: configActionFields }) => {
+    // record the customized user entry if there is any name or description provided
+    const customChildSample: any = [];
+    if (configActionFields.sampleName || configActionFields.description) {
+      for (let i = 0; i < numOfChildToCreate; i++) {
+        customChildSample.push({
+          index: i,
+          name: configActionFields.sampleName[i],
+          description: configActionFields.description[i]
+        });
+      }
+    }
+
     const runConfig: RunConfig = {
-      numberOfChildSamples: configActionFields.numberOfChildSamples ?? 10,
+      numOfChildToCreate: configActionFields.numOfChildToCreate ?? 10,
       baseName: configActionFields.baseName ?? "parentName",
       start: configActionFields.start ?? "001",
-      // only record the child sample that has been given a custom name or description
-      childSamples: configActionFields.sampleNames.map((sampleName, idx) =>
-        sampleName || `${configActionFields.description[idx]}`
-          ? {
-              index: idx,
-              name: sampleName,
-              description: `${configActionFields.description[idx]}`
-            }
-          : null
-      )
+      customChildSample: customChildSample?.length ? customChildSample : null,
+      type: configActionFields.type
     };
+
     // save the runConfig to local storage
     setSplitChildSampleRunConfig(runConfig);
     nextStep();
@@ -206,7 +187,7 @@ export default function ConfigAction(props) {
           </span>
           <div className="row">
             <NumberSpinnerField
-              name="createdChilderenNum"
+              name="numOfChildToCreate"
               className="col-md-2"
               onChange={onCreatedChildSplitSampleChange}
               hideLabel={true}
@@ -259,3 +240,28 @@ export default function ConfigAction(props) {
     </div>
   );
 }
+
+export const computeSuffix = ({ index, start, type }: ComputeSuffixProps) => {
+  let computedSuffix;
+  if (type === "Numerical") {
+    // correclty set the start when numerical input is null/empty, default to 1
+    computedSuffix = isNaN(parseInt(start, 10))
+      ? index + 1
+      : index + parseInt(start, 10);
+  } else {
+    let myStart = start;
+    // Correclty set the start value when letter input is null/empty, defualt to "A"
+    if (!myStart || myStart.length === 0 || !isNaN(parseInt(myStart, 10))) {
+      myStart = "A";
+    }
+    const charCode = myStart.charCodeAt(0) + index;
+    // Only if the char is a letter, split child row will be added
+    if (
+      (charCode >= 97 && charCode <= 122) ||
+      (charCode >= 65 && charCode <= 90)
+    ) {
+      computedSuffix = String.fromCharCode(charCode);
+    }
+  }
+  return computedSuffix;
+};
