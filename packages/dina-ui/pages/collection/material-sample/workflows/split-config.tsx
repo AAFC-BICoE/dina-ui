@@ -1,17 +1,16 @@
 import useLocalStorage from "@rehooks/local-storage";
+import { object, SchemaOf, string } from "yup";
 import {
   ButtonBar,
   CheckBoxWithoutWrapper,
   DinaForm,
   FieldSet,
-  FormikButton,
   SelectField,
-  TextField,
-  useAccount,
-  useApiClient
+  SubmitButton,
+  TextField
 } from "common-ui";
-import { useRouter } from "next/router";
 import NumberSpinnerField from "packages/common-ui/lib/formik-connected/NumberSpinnerField";
+import { MaterialSampleRunConfig } from "packages/dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import React, { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 
@@ -129,7 +128,8 @@ export default function ConfigAction(props) {
     }
 
     const runConfig: RunConfig = {
-      numOfChildToCreate: configActionFields.numOfChildToCreate ?? 10,
+      numOfChildToCreate:
+        configActionFields.numOfChildToCreate ?? numOfChildToCreate,
       baseName: configActionFields.baseName ?? "parentName",
       start: configActionFields.start ?? "001",
       customChildSample: customChildSample?.length ? customChildSample : null,
@@ -143,12 +143,9 @@ export default function ConfigAction(props) {
 
   const buttonBar = (
     <ButtonBar className="d-flex justify-content-center">
-      <FormikButton
-        className="btn btn-info "
-        onClick={submittedValues => onSubmit({ submittedValues })}
-      >
+      <SubmitButton className="btn btn-info">
         <DinaMessage id="next" />
-      </FormikButton>
+      </SubmitButton>
     </ButtonBar>
   );
 
@@ -164,9 +161,22 @@ export default function ConfigAction(props) {
   const isNumericalType = type === "Numerical";
   const isLetterType = type === "Letter";
 
+  /** Form validation schema. */
+  const runConfigFormSchema: SchemaOf<
+    Pick<MaterialSampleRunConfig, "baseName">
+  > = object({
+    baseName: string().required(
+      formatMessage("field_materialSampleRunConfig_baseNameError")
+    )
+  });
+
   return (
     <div>
-      <DinaForm initialValues={{ type: "Numerical" }}>
+      <DinaForm
+        initialValues={{ type: "Numerical" }}
+        onSubmit={onSubmit}
+        validationSchema={runConfigFormSchema}
+      >
         <p>
           <span className="fw-bold">{formatMessage("description")}:</span>
           {formatMessage("splitSampleDescription")}

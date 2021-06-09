@@ -198,6 +198,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeType_picklist_label: "Pick List",
   field_managedAttributeType_text_label: "Text",
   field_materialSampleName: "Material Sample ID",
+  field_materialSampleRunConfig_baseNameError: "Parent sample name is required",
   field_notPubliclyReleasableReason: "Not Publicly Releasable Reason",
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
