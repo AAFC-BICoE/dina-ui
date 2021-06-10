@@ -11,7 +11,7 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { PersistedResource } from "kitsu";
-import { get, mapValues, set, toPairs } from "lodash";
+import { get, mapValues, pick, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import React, { useRef, useState } from "react";
 import { Promisable } from "type-fest";
@@ -32,6 +32,7 @@ import {
 } from "../material-sample/edit";
 
 const workflowMainFieldsSchema = yup.object({
+  id: yup.string(),
   name: yup.string().trim().required(),
   group: yup.string().required()
 });
@@ -107,7 +108,8 @@ export function WorkflowTemplateForm({
     });
 
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
-  const materialSampleFormRef = useRef<FormikProps<any>>(null);
+  const preparationsFormRef = useRef<FormikProps<any>>(null);
+  const identifiersSectionRef = useRef<FormikProps<any>>(null);
 
   const { formTemplates, ...initialDefinition } = fetchedActionDefinition ?? {};
 
@@ -122,15 +124,37 @@ export function WorkflowTemplateForm({
     colEventTemplateInitialValues.geoReferenceAssertions = [{}];
   }
 
-  const materialSampleTemplateInitialValues =
-    getTemplateInitialValuesFromSavedFormTemplate(
-      formTemplates?.MATERIAL_SAMPLE
-    );
+  // Split the material sample form template into Identifiers and Preparations:
+
+  const identifiersTemplate = {
+    templateFields: pick(
+      formTemplates?.MATERIAL_SAMPLE?.templateFields,
+      "materialSampleName",
+      "dwcCatalogNumber",
+      "dwcOtherCatalogNumbers"
+    )
+  };
+
+  const preparationsTemplate = {
+    allowNew: formTemplates?.MATERIAL_SAMPLE?.allowNew,
+    allowExisting: formTemplates?.MATERIAL_SAMPLE?.allowExisting,
+    templateFields: pick(
+      formTemplates?.MATERIAL_SAMPLE?.templateFields,
+      "preparationType",
+      "preparedBy",
+      "datePrepared"
+    )
+  };
+
+  const preparationsTemplateInitialValues =
+    getTemplateInitialValuesFromSavedFormTemplate(preparationsTemplate);
+  const identifiersTemplateInitialValues =
+    getTemplateInitialValuesFromSavedFormTemplate(identifiersTemplate);
 
   const materialSampleSaveHook = useMaterialSampleSave({
     isTemplate: true,
     colEventTemplateInitialValues,
-    materialSampleTemplateInitialValues,
+    preparationsTemplateInitialValues,
     collectingEvtFormRef
   });
 
@@ -149,17 +173,20 @@ export function WorkflowTemplateForm({
       ...mainTemplateFields,
       actionType,
       formTemplates: {
-        MATERIAL_SAMPLE: enablePreparations
-          ? {
-              ...materialSampleFormRef.current?.values.attachmentsConfig,
-              templateFields:
-                enablePreparations && materialSampleFormRef.current
-                  ? getEnabledTemplateFieldsFromForm(
-                      materialSampleFormRef.current.values
-                    )
-                  : undefined
-            }
-          : undefined,
+        MATERIAL_SAMPLE: {
+          ...preparationsFormRef.current?.values.attachmentsConfig,
+          templateFields: {
+            ...(identifiersSectionRef.current &&
+              getEnabledTemplateFieldsFromForm(
+                identifiersSectionRef.current.values
+              )),
+            ...(enablePreparations && preparationsFormRef.current
+              ? getEnabledTemplateFieldsFromForm(
+                  preparationsFormRef.current.values
+                )
+              : undefined)
+          }
+        },
         COLLECTING_EVENT: enableCollectingEvent
           ? attachedColEventId
             ? {
@@ -246,17 +273,19 @@ export function WorkflowTemplateForm({
       {actionType === "ADD" ? (
         <DinaFormSection isTemplate={true}>
           <MaterialSampleForm
-            materialSampleTemplateInitialValues={
-              materialSampleTemplateInitialValues
+            preparationsTemplateInitialValues={
+              preparationsTemplateInitialValues
             }
+            identifiersTemplateInitialValues={identifiersTemplateInitialValues}
             materialSampleSaveHook={materialSampleSaveHook}
-            catelogueSectionRef={materialSampleFormRef}
+            preparationsSectionRef={preparationsFormRef}
+            identifiersSectionRef={identifiersSectionRef}
           />
         </DinaFormSection>
       ) : actionType === "SPLIT" ? (
         <DinaForm
           initialValues={{}}
-          innerRef={materialSampleFormRef}
+          innerRef={preparationsFormRef}
           isTemplate={true}
         >
           <PreparationsFormLayout />
@@ -286,7 +315,7 @@ export function getEnabledTemplateFieldsFromForm(
 
 /** Get the checkbox values for the template form from the persisted form template. */
 export function getTemplateInitialValuesFromSavedFormTemplate<T>(
-  formTemplate?: FormTemplate<T>
+  formTemplate?: Partial<FormTemplate<T>>
 ): Partial<T> & { templateCheckboxes?: Record<string, true | undefined> } {
   if (!formTemplate) {
     return {};
