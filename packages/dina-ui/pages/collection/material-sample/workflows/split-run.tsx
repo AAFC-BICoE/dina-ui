@@ -27,7 +27,10 @@ import { MaterialSample } from "../../../../../dina-ui/types/collection-api";
 
 import { FieldArray } from "formik";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { PreparationsFormLayout } from "../edit";
+import {
+  MaterialSampleIdentifiersFormLayout,
+  PreparationsFormLayout
+} from "../edit";
 import { MaterialSampleRunActionResult } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunActionResult";
 import { Head } from "../../../../../dina-ui/components/head";
 import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
@@ -134,6 +137,11 @@ export default function SplitRunAction() {
     );
     // formik.setFieldValue(commonRoot+"preparedBy", response?.[0].preparedBy);
     // formik.setFieldValue(commonRoot+"datePrepared", response?.[0].preparationDate);
+
+    formik.setFieldValue(
+      commonRoot + "dwcCatalogNumber",
+      parentResp?.data[0].dwcCatalogNumber
+    );
   };
 
   return (
@@ -195,7 +203,18 @@ export default function SplitRunAction() {
                                   />
                                 )}
                               </Field>
-                              <PreparationsFormLayout namePrefix={commonRoot} />
+                              <div className="d-flex flex-row">
+                                <PreparationsFormLayout
+                                  namePrefix={commonRoot}
+                                  className="flex-grow-1"
+                                />
+                                <MaterialSampleIdentifiersFormLayout
+                                  namePrefix={commonRoot}
+                                  className="flex-grow-1"
+                                  hideSampleName={true}
+                                  hideOtherCatalogNumbers={true}
+                                />
+                              </div>
                             </TabPanel>
                           );
                         })

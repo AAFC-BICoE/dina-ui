@@ -320,21 +320,41 @@ export function MaterialSampleMainInfoFormLayout() {
   );
 }
 
+export interface MaterialSampleIdentifiersFormLayoutProps {
+  hideSampleName?: boolean;
+  hideOtherCatalogNumbers?: boolean;
+  className?: string;
+  namePrefix?: string;
+}
+
 /** Fields layout re-useable between view and edit pages. */
-export function MaterialSampleIdentifiersFormLayout() {
+export function MaterialSampleIdentifiersFormLayout({
+  hideSampleName,
+  hideOtherCatalogNumbers,
+  className,
+  namePrefix
+}: MaterialSampleIdentifiersFormLayoutProps) {
   return (
     <FieldSet
       id="identifiers-section"
       legend={<DinaMessage id="identifiers" />}
+      className={className}
     >
       <div className="row">
         <div className="col-md-6">
-          <TextField name="materialSampleName" />
-          <TextField name="dwcCatalogNumber" />
+          {!hideSampleName && <TextField name="materialSampleName" />}
+          <TextField
+            name={`${
+              namePrefix ? namePrefix + "dwcCatalogNumber" : "dwcCatalogNumber"
+            }`}
+            customName="dwcCatalogNumber"
+          />
         </div>
-        <div className="col-md-6">
-          <StringArrayField name="dwcOtherCatalogNumbers" />
-        </div>
+        {!hideOtherCatalogNumbers && (
+          <div className="col-md-6">
+            <StringArrayField name="dwcOtherCatalogNumbers" />
+          </div>
+        )}
       </div>
     </FieldSet>
   );
