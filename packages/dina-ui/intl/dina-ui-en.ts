@@ -61,6 +61,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   configureAction: "Configure Action",
   configureDefaultValues: "Configure default values",
   coordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",
+  copyFromParentLabel: "Copy From Parent",
   countryLabel: "Country",
   creatNewWorkflow: "Create New",
   createSplitWorkflow: "Create Split",

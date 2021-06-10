@@ -1,11 +1,16 @@
 import {
+  CheckBoxWithoutWrapper,
   DinaForm,
+  LoadingSpinner,
   useAccount,
-  useApiClient
+  useApiClient,
+  useQuery
 } from "../../../../../common-ui/lib";
 import { ButtonBar } from "../../../../../common-ui/lib/button-bar/ButtonBar";
 import { FormikButton } from "../../../../..//common-ui/lib/formik-connected/FormikButton";
 import { useRouter } from "next/router";
+
+import { Field } from "formik";
 
 import {
   DinaMessage,
@@ -35,7 +40,6 @@ export default function SplitRunAction() {
   const { save } = useApiClient();
   const { groupNames } = useAccount();
   const router = useRouter();
-
   const [splitChildSampleRunConfig, _setSplitChildSampleRunConfig] =
     useLocalStorage<MaterialSampleRunConfig | null | undefined>(
       SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
@@ -45,7 +49,6 @@ export default function SplitRunAction() {
     useLocalStorage<MaterialSampleRunActionResult[] | null | undefined>(
       SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY
     );
-
   const initialChildSamples: MaterialSample[] = [];
   const numOfChildToCreate =
     splitChildSampleRunConfig?.configure?.numOfChildToCreate ?? 1;
@@ -53,6 +56,19 @@ export default function SplitRunAction() {
   const type = splitChildSampleRunConfig?.configure?.type;
   const baseName = splitChildSampleRunConfig?.configure?.baseName;
 
+  // Retrive the parent material sample upfront
+  const { loading, response: parentResp } = useQuery<MaterialSample[]>({
+    filter: {
+      materialSampleName: baseName as string
+    },
+    path: "collection-api/material-sample",
+    include: "preparationType"
+  });
+
+  if (loading) {
+    return <LoadingSpinner loading={true} />;
+  }
+  // Get form initial values from run config
   for (let i = 0; i < numOfChildToCreate; i++) {
     const splitChildSampleName =
       splitChildSampleRunConfig?.configure_children?.sampleNames?.[i];
@@ -67,9 +83,9 @@ export default function SplitRunAction() {
 
   const onSubmit = async submittedValues => {
     const sampleRunActionResults: MaterialSampleRunActionResult[] = [];
-
     // submit to back end
     for (const sample of submittedValues.childSamples) {
+      delete sample.copyFromParent;
       const [response] = await save(
         [
           {
@@ -106,6 +122,19 @@ export default function SplitRunAction() {
       </FormikButton>
     </ButtonBar>
   );
+
+  const onCopyFromParent = ({ formik, index }) => {
+    const childSamplesPath = "childSamples";
+    const childSamplePath = `${childSamplesPath}[${index}]`;
+    const commonRoot = childSamplePath + ".";
+    // Use the first one from return til material sample name is unuque
+    formik.setFieldValue(
+      commonRoot + "preparationType",
+      parentResp?.data[0].preparationType
+    );
+    // formik.setFieldValue(commonRoot+"preparedBy", response?.[0].preparedBy);
+    // formik.setFieldValue(commonRoot+"datePrepared", response?.[0].preparationDate);
+  };
 
   return (
     <div>
@@ -153,6 +182,19 @@ export default function SplitRunAction() {
                           const commonRoot = childSamplePath + ".";
                           return (
                             <TabPanel key={index}>
+                              <Field>
+                                {({ form: formik }) => (
+                                  <CheckBoxWithoutWrapper
+                                    name={`${commonRoot}copyFromParent`}
+                                    onClickIncludeAll={() =>
+                                      onCopyFromParent({ formik, index })
+                                    }
+                                    includeAllLabel={formatMessage(
+                                      "copyFromParentLabel"
+                                    )}
+                                  />
+                                )}
+                              </Field>
                               <PreparationsFormLayout namePrefix={commonRoot} />
                             </TabPanel>
                           );
