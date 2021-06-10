@@ -126,7 +126,7 @@ export default function SplitRunAction() {
     </ButtonBar>
   );
 
-  const onCopyFromParent = ({ formik, index }) => {
+  const onCopyFromParent = ({ index, formik }) => {
     const childSamplesPath = "childSamples";
     const childSamplePath = `${childSamplesPath}[${index}]`;
     const commonRoot = childSamplePath + ".";
@@ -190,19 +190,14 @@ export default function SplitRunAction() {
                           const commonRoot = childSamplePath + ".";
                           return (
                             <TabPanel key={index}>
-                              <Field>
-                                {({ form: formik }) => (
-                                  <CheckBoxWithoutWrapper
-                                    name={`${commonRoot}copyFromParent`}
-                                    onClickIncludeAll={() =>
-                                      onCopyFromParent({ formik, index })
-                                    }
-                                    includeAllLabel={formatMessage(
-                                      "copyFromParentLabel"
-                                    )}
-                                  />
-                                )}
-                              </Field>
+                              <FormikButton
+                                onClick={() =>
+                                  onCopyFromParent({ index, formik: form })
+                                }
+                                className="btn btn-secondary m-1"
+                              >
+                                <DinaMessage id="copyFromParentLabel" />
+                              </FormikButton>
                               <div className="d-flex flex-row">
                                 <PreparationsFormLayout
                                   namePrefix={commonRoot}
