@@ -1,7 +1,7 @@
 import {
-  CheckBoxWithoutWrapper,
   DinaForm,
   LoadingSpinner,
+  TextField,
   useAccount,
   useApiClient,
   useQuery
@@ -9,8 +9,6 @@ import {
 import { ButtonBar } from "../../../../../common-ui/lib/button-bar/ButtonBar";
 import { FormikButton } from "../../../../..//common-ui/lib/formik-connected/FormikButton";
 import { useRouter } from "next/router";
-
-import { Field } from "formik";
 
 import {
   DinaMessage,
@@ -75,9 +73,12 @@ export default function SplitRunAction() {
   for (let i = 0; i < numOfChildToCreate; i++) {
     const splitChildSampleName =
       splitChildSampleRunConfig?.configure_children?.sampleNames?.[i];
+    const splitChildSampleDescription =
+      splitChildSampleRunConfig?.configure_children?.sampleDescs?.[i];
     initialChildSamples.push({
       group: groupNames?.[0],
       type: "material-sample",
+      description: splitChildSampleDescription,
       materialSampleName:
         splitChildSampleName ??
         baseName + "-" + computeSuffix({ index: i, start, type })
@@ -88,7 +89,7 @@ export default function SplitRunAction() {
     const sampleRunActionResults: MaterialSampleRunActionResult[] = [];
     // submit to back end
     for (const sample of submittedValues.childSamples) {
-      delete sample.copyFromParent;
+      delete sample.description;
       const [response] = await save(
         [
           {
@@ -190,6 +191,16 @@ export default function SplitRunAction() {
                           const commonRoot = childSamplePath + ".";
                           return (
                             <TabPanel key={index}>
+                              <span className="d-flex fw-bold flex-row">
+                                {formatMessage("materialSample") +
+                                  " " +
+                                  formatMessage("description")}
+                                :
+                              </span>
+                              <TextField
+                                name={commonRoot + "description"}
+                                hideLabel={true}
+                              />
                               <FormikButton
                                 onClick={() =>
                                   onCopyFromParent({ index, formik: form })
