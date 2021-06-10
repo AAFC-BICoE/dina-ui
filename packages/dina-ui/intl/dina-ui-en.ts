@@ -313,6 +313,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   role: "Role",
   roles: "Roles",
   rolesPerGroup: "Roles Per Group",
+  runWorkflow: "Run Workflow",
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
   searchButton: "Search",
   searchResults: "Search Results ({resultSize})",

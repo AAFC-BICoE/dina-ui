@@ -4,6 +4,7 @@ import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 const ACTION_DEFINITION_FILTER_ATTRIBUTES = ["name", "createdBy", "actionType"];
+
 const ACTION_DEFINITION_TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, name } }) => (
@@ -13,7 +14,25 @@ const ACTION_DEFINITION_TABLE_COLUMNS = [
   },
   "group",
   "createdBy",
-  dateCell("createdOn")
+  dateCell("createdOn"),
+  {
+    Cell: ({ original: { id } }) => (
+      <div className="list-inline">
+        <Link href={`/collection/workflow-template/edit?id=${id}`}>
+          <a className="list-inline-item btn btn-dark">
+            <DinaMessage id="editButtonText" />
+          </a>
+        </Link>
+        <Link href={`/collection/workflow-template/run?id=${id}`}>
+          <a className="list-inline-item btn btn-primary">
+            <DinaMessage id="runWorkflow" />
+          </a>
+        </Link>
+      </div>
+    ),
+    Header: "",
+    sortable: false
+  }
 ];
 
 export default function WorkflowTemplateListPage() {

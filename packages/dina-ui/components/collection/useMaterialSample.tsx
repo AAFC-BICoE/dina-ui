@@ -59,7 +59,11 @@ export function useMaterialSampleQuery(id?: string | null) {
 }
 
 export interface UseMaterialSampleSaveParams {
-  materialSample?: PersistedResource<MaterialSample>;
+  /** Material Sample form initial values. */
+  materialSample?: InputResource<MaterialSample>;
+  /** Initial values for creating a new Collecting Event with the Material Sample. */
+  collectingEventInitialValues?: InputResource<CollectingEvent>;
+
   onSaved?: (id: string) => Promise<void>;
 
   collectingEvtFormRef?: React.RefObject<FormikProps<any>>;
@@ -76,6 +80,7 @@ export interface UseMaterialSampleSaveParams {
 
 export function useMaterialSampleSave({
   materialSample,
+  collectingEventInitialValues: collectingEventInitialValuesProp,
   onSaved,
   collectingEvtFormRef,
   isTemplate,
@@ -90,7 +95,11 @@ export function useMaterialSampleSave({
       colEventTemplateInitialValues?.id);
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
-    !!(hasColEventTemplate || !!materialSample?.collectingEvent)
+    !!(
+      hasColEventTemplate ||
+      !!materialSample?.collectingEvent ||
+      collectingEventInitialValuesProp
+    )
   );
 
   const hasPreparationsTemplate =
@@ -259,7 +268,7 @@ export function useMaterialSampleSave({
       initialValues={
         isTemplate
           ? colEventTemplateInitialValues
-          : collectingEventInitialValues
+          : collectingEventInitialValuesProp ?? collectingEventInitialValues
       }
       validationSchema={collectingEventFormSchema}
       isTemplate={isTemplate}

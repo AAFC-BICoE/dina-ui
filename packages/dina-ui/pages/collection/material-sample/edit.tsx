@@ -15,7 +15,7 @@ import {
   withResponse
 } from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource, PersistedResource } from "kitsu";
+import { InputResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useContext } from "react";
@@ -28,7 +28,7 @@ import {
   useMaterialSampleSave
 } from "../../../components/collection/useMaterialSample";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { MaterialSample } from "../../../types/collection-api";
+import { CollectingEvent, MaterialSample } from "../../../types/collection-api";
 import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
 
 export default function MaterialSampleEditPage() {
@@ -69,7 +69,9 @@ export default function MaterialSampleEditPage() {
 }
 
 export interface MaterialSampleFormProps {
-  materialSample?: PersistedResource<MaterialSample>;
+  materialSample?: InputResource<MaterialSample>;
+  collectingEventInitialValues?: InputResource<CollectingEvent>;
+
   onSaved?: (id: string) => Promise<void>;
   catelogueSectionRef?: React.RefObject<FormikProps<any>>;
 
@@ -84,6 +86,7 @@ export interface MaterialSampleFormProps {
 
 export function MaterialSampleForm({
   materialSample,
+  collectingEventInitialValues,
   onSaved,
   catelogueSectionRef,
   materialSampleSaveHook,
@@ -109,6 +112,7 @@ export function MaterialSampleForm({
     materialSampleSaveHook ??
     useMaterialSampleSave({
       materialSample,
+      collectingEventInitialValues,
       onSaved,
       isTemplate
     });
