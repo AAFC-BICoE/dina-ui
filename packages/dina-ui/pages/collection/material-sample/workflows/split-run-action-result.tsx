@@ -1,0 +1,74 @@
+import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
+import { Head } from "../../../../../dina-ui/components/head";
+import {
+  DinaMessage,
+  useDinaIntl
+} from "../../../../../dina-ui/intl/dina-ui-intl";
+import React from "react";
+import Link from "next/link";
+import useLocalStorage from "@rehooks/local-storage";
+import { MaterialSampleRunActionResult } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunActionResult";
+import { SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY } from "./split-run";
+import { MaterialSampleRunConfig } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
+import { SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY } from "./split-config";
+
+export default function SplitRunActionResult() {
+  const { formatMessage } = useDinaIntl();
+
+  const [splitChildSampleRunActionResult] = useLocalStorage<
+    MaterialSampleRunActionResult[] | null | undefined
+  >(SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY);
+
+  const [splitChildSampleRunConfig, _setSplitChildSampleRunConfig] =
+    useLocalStorage<MaterialSampleRunConfig | null | undefined>(
+      SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
+    );
+
+  return (
+    <div>
+      <Head title={formatMessage("workflowCompleteTitle")} />
+      <Nav />
+      <main className="container-fluid">
+        <h1>
+          <DinaMessage id="workflowCompleteTitle" />
+        </h1>
+        <span>
+          <h3>{formatMessage("results")}:</h3>
+          <span className="fw-bold">
+            {formatMessage("originalMaterialSampleLabel")}:
+          </span>
+          <span className="d-flex flex-row">
+            {splitChildSampleRunConfig?.configure.destroyOriginal ? (
+              <>
+                <span className="text-primary">
+                  {" "}
+                  {splitChildSampleRunConfig?.configure.baseName}
+                </span>
+                <span className="text-danger">
+                  {" "}
+                  <DinaMessage id="destroyedLabel" />{" "}
+                </span>
+              </>
+            ) : (
+              <Link
+                href={`/collection/material-sample/view?id=${splitChildSampleRunConfig?.configure.baseName}`}
+              >
+                <a>{splitChildSampleRunConfig?.configure.baseName}</a>
+              </Link>
+            )}
+          </span>
+          <span className="fw-bold">
+            {formatMessage("childMaterialSamplesCreatedLabel")}:
+          </span>
+          {splitChildSampleRunActionResult?.map((result, idx) => (
+            <span className="d-flex flex-row" key={idx}>
+              <Link href={`/collection/material-sample/view?id=${result.id}`}>
+                <a>{result.name}</a>
+              </Link>
+            </span>
+          ))}
+        </span>
+      </main>
+    </div>
+  );
+}

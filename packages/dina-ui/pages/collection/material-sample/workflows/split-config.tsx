@@ -53,10 +53,9 @@ export default function ConfigAction(props) {
   const [start, setStart] = useState(type === "Numerical" ? "1" : "A");
   const router = useRouter();
 
-  const [_, setSplitChildSampleRunConfig, deleteSplitChildSampleRunConfig] =
-    useLocalStorage<MaterialSampleRunConfig | null | undefined>(
-      SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
-    );
+  const [_, setSplitChildSampleRunConfig] = useLocalStorage<
+    MaterialSampleRunConfig | null | undefined
+  >(SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY);
 
   const onCreatedChildSplitSampleChange = value => {
     setNumOfChildToCreate(value);
@@ -159,7 +158,7 @@ export default function ConfigAction(props) {
 
   const buttonBar = (
     <ButtonBar className="d-flex justify-content-center">
-      <SubmitButton className="btn btn-info">
+      <SubmitButton className="btn btn-info" hidePrimaryClass={true}>
         <DinaMessage id="next" />
       </SubmitButton>
     </ButtonBar>
@@ -199,6 +198,7 @@ export default function ConfigAction(props) {
           onSubmit={onSubmit}
           validationSchema={runConfigFormSchema}
         >
+          {buttonBar}
           <p>
             <span className="fw-bold">{formatMessage("description")}:</span>
             {formatMessage("splitSampleDescription")}

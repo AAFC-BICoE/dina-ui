@@ -342,10 +342,12 @@ export function MaterialSampleIdentifiersFormLayout() {
 
 export interface CatalogueInfoFormLayoutProps {
   className?: string;
+  namePrefix?: string;
 }
 
 export function PreparationsFormLayout({
-  className
+  className,
+  namePrefix
 }: CatalogueInfoFormLayoutProps) {
   return (
     <FieldSet
@@ -357,18 +359,29 @@ export function PreparationsFormLayout({
         <div className="col-md-6">
           <div className="preparation-type">
             <ResourceSelectField<PreparationType>
-              name="preparationType"
+              name={`${
+                namePrefix ? namePrefix + "preparationType" : "preparationType"
+              }`}
               filter={filterBy(["name"])}
               model="collection-api/preparation-type"
               optionLabel={it => it.name}
               readOnlyLink="/collection/preparation-type/view?id="
+              customName="preparationType"
             />
           </div>
           <DinaFormSection
             readOnly={true} // Disabled until back-end supports these fields.
           >
-            <TextField name="preparedBy" />
-            <DateField name="datePrepared" />
+            <TextField
+              name={`${namePrefix ? namePrefix + "preparedBy" : "preparedBy"}`}
+              customName="preparedBy"
+            />
+            <DateField
+              name={`${
+                namePrefix ? namePrefix + "datePrepared" : "datePrepared"
+              }`}
+              customName="datePrepared"
+            />
           </DinaFormSection>
         </div>
       </div>

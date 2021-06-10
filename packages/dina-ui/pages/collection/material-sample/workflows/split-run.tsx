@@ -1,6 +1,5 @@
 import {
   DinaForm,
-  TextField,
   useAccount,
   useApiClient
 } from "../../../../../common-ui/lib";
@@ -154,10 +153,7 @@ export default function SplitRunAction() {
                           const commonRoot = childSamplePath + ".";
                           return (
                             <TabPanel key={index}>
-                              <TextField
-                                name={`${commonRoot}materialSampleName`}
-                              />
-                              <PreparationsFormLayout />
+                              <PreparationsFormLayout namePrefix={commonRoot} />
                             </TabPanel>
                           );
                         })
