@@ -13,7 +13,7 @@
 }
 
 /*
-* Fixes WCAG contrast issue for placeholder text in the "Default Values Configs" textfield and others
+* Fixes WCAG contrast issue for placeholder text in the "Default Values Configs" textfield and possinly other textfields
 */
 .css-1wa3eu0-placeholder {
     color: #333333!important;
