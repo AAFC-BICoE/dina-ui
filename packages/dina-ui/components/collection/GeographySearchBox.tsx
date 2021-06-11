@@ -263,11 +263,6 @@ export function GeographySearchBox({
       </div>
     </div>
   ) : (
-    <div className="m-2">
-      <TextField
-        name="locationSearchValue"
-        label={formatMessage("locationLabel")}
-      />
-    </div>
+    <div className="m-2" />
   );
 }

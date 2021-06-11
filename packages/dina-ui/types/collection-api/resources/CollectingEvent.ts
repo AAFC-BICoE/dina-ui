@@ -44,9 +44,6 @@ export interface CollectingEventAttributes {
   habitat?: string;
 
   managedAttributeValues?: ManagedAttributeValues;
-
-  // For location template
-  locationSearchValue?: string;
 }
 
 export enum GeographicPlaceNameSource {
