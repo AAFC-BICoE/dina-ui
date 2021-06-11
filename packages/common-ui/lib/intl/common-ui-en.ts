@@ -11,8 +11,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   attributeLabel: "Attribute",
   autoFillGeoSuggestLabel:
     "Auto-fill Location Fields (This search box's value is not persisted)",
-  backLabel: "Back",
-  backToListButtonText: "Back to List",
+  backToList: "Back to list page",
+  backToReadOnlyPage: "Back to read-only page",
   bulkEditorValidationError: "Invalid value on row {row}: {value}",
   cancelButtonText: "Cancel",
   checkAllTooltipMessage:
