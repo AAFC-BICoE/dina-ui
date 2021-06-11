@@ -131,7 +131,7 @@ export default function SplitRunAction() {
   const buttonBar = (
     <ButtonBar className="justify-content-center">
       <FormikButton className="btn btn-secondary" onClick={onBack}>
-        <DinaMessage id="backLabel" />
+        <DinaMessage id="previous" />
       </FormikButton>
 
       <FormikButton className="btn btn-info" onClick={onSubmit}>

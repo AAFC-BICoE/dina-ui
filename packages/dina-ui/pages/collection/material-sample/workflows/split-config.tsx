@@ -90,7 +90,7 @@ export default function ConfigAction() {
       <div className="d-flex">
         <span className="col-md-1 fw-bold">#{index + 1}:</span>
         <TextField
-          className="col-md-3"
+          className={`col-md-3 sampleName${index}`}
           hideLabel={true}
           name={`sampleName[${index}]`}
           placeholder={
@@ -153,7 +153,7 @@ export default function ConfigAction() {
 
     // save the runConfig to local storage
     setSplitChildSampleRunConfig(runConfig);
-    await router.push(`/collection/material-sample/workflows/split-run`);
+    await router?.push(`/collection/material-sample/workflows/split-run`);
   };
 
   const buttonBar = (
