@@ -1,6 +1,6 @@
 import { useQuery, withResponse } from "common-ui";
-import { InputResource, PersistedResource } from "kitsu";
-import { isUndefined, mapValues, omitBy } from "lodash";
+import { InputResource, KitsuResource, PersistedResource } from "kitsu";
+import { isUndefined, mapValues, omitBy, toPairs, set } from "lodash";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
 import { Head, Nav } from "../../../components";
@@ -8,7 +8,8 @@ import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   CollectingEvent,
   MaterialSample,
-  PreparationProcessDefinition
+  PreparationProcessDefinition,
+  TemplateFields
 } from "../../../types/collection-api";
 import { MaterialSampleForm } from "../material-sample/edit";
 
@@ -79,21 +80,15 @@ function useWorkflowMaterialSampleInitialValues(
   actionDefinition: PreparationProcessDefinition
 ) {
   return useMemo(() => {
-    const materialSampleInitialValues = omitBy(
-      mapValues(
-        actionDefinition.formTemplates.MATERIAL_SAMPLE?.templateFields,
-        val => (val?.enabled && val.defaultValue) || undefined
-      ),
-      isUndefined
-    ) as InputResource<MaterialSample>;
+    const materialSampleInitialValues = getInitialValuesFromTemplateFields(
+      "material-sample",
+      actionDefinition.formTemplates.MATERIAL_SAMPLE?.templateFields
+    );
 
-    const collectingEvent = omitBy(
-      mapValues(
-        actionDefinition.formTemplates.COLLECTING_EVENT?.templateFields,
-        val => (val?.enabled ? val.defaultValue : undefined)
-      ),
-      isUndefined
-    ) as InputResource<CollectingEvent>;
+    const collectingEvent = getInitialValuesFromTemplateFields(
+      "collecting-event",
+      actionDefinition.formTemplates.COLLECTING_EVENT?.templateFields
+    );
 
     if (collectingEvent.id) {
       materialSampleInitialValues.collectingEvent = {
@@ -108,4 +103,18 @@ function useWorkflowMaterialSampleInitialValues(
 
     return { materialSampleInitialValues, collectingEventInitialValues };
   }, []);
+}
+
+/** Gets the form's initial values from the stored Template. */
+function getInitialValuesFromTemplateFields<TResource extends KitsuResource>(
+  type: TResource["type"],
+  templateFields?: TemplateFields<TResource>
+): InputResource<TResource> {
+  const initialValues = { type } as InputResource<TResource>;
+  for (const [key, val] of toPairs(templateFields)) {
+    if (val?.enabled && val.defaultValue !== undefined) {
+      set(initialValues, key, val.defaultValue);
+    }
+  }
+  return initialValues;
 }

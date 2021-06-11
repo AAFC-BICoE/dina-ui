@@ -317,7 +317,6 @@ describe("collecting-event edit page", () => {
               ],
               group: "test group",
               startEventDateTime: "2019-11-11",
-              uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 6pm"
             },
             id: "1",
@@ -423,7 +422,6 @@ describe("collecting-event edit page", () => {
 /** Test collecting-event with all fields defined. */
 function testCollectingEvent(): CollectingEvent {
   return {
-    uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
     id: "1",
     type: "collecting-event",
     startEventDateTime: "2019-11-11",

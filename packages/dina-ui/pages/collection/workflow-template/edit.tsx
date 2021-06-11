@@ -1,4 +1,5 @@
 import {
+  BackButton,
   ButtonBar,
   DinaForm,
   DinaFormSection,
@@ -198,7 +199,14 @@ export function WorkflowTemplateForm({
 
   const buttonBar = (
     <ButtonBar>
-      <SubmitButton />
+      <div className="container d-flex">
+        <BackButton
+          entityId={fetchedActionDefinition?.id}
+          entityLink="/collection/workflow-template"
+          byPassView={true}
+        />
+        <SubmitButton className="ms-auto" />
+      </div>
     </ButtonBar>
   );
 
