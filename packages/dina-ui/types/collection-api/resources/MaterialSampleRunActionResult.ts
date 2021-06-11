@@ -1,6 +1,9 @@
 export interface MaterialSampleRunActionResultAttributes {
-  id: string;
-  name: string;
+  parentSampleId: string;
+  childrenGenerated?: {
+    id: string;
+    name: string;
+  }[];
 }
 
 export type MaterialSampleRunActionResult =

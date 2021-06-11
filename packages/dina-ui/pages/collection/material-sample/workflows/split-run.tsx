@@ -38,7 +38,7 @@ export const SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY =
 
 export default function SplitRunAction() {
   const { formatMessage } = useDinaIntl();
-  const { save } = useApiClient();
+  const { save, doOperations } = useApiClient();
   const { groupNames } = useAccount();
   const router = useRouter();
   const [splitChildSampleRunConfig, _setSplitChildSampleRunConfig] =
@@ -47,7 +47,7 @@ export default function SplitRunAction() {
     );
 
   const [_splitChildSampleRunActionResult, setSplitChildSampleRunActionResult] =
-    useLocalStorage<MaterialSampleRunActionResult[] | null | undefined>(
+    useLocalStorage<MaterialSampleRunActionResult | null | undefined>(
       SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY
     );
   const initialChildSamples: MaterialSample[] = [];
@@ -56,6 +56,7 @@ export default function SplitRunAction() {
   const start = splitChildSampleRunConfig?.configure?.start;
   const type = splitChildSampleRunConfig?.configure?.type;
   const baseName = splitChildSampleRunConfig?.configure?.baseName;
+  const destroyOriginal = splitChildSampleRunConfig?.configure.destroyOriginal;
 
   // Retrive the parent material sample upfront
   const { loading, response: parentResp } = useQuery<MaterialSample[]>({
@@ -69,6 +70,9 @@ export default function SplitRunAction() {
   if (loading) {
     return <LoadingSpinner loading={true} />;
   }
+
+  const parentSampleId = parentResp?.data?.[0]?.id;
+
   // Get form initial values from run config
   for (let i = 0; i < numOfChildToCreate; i++) {
     const splitChildSampleName =
@@ -86,10 +90,38 @@ export default function SplitRunAction() {
   }
 
   const onSubmit = async submittedValues => {
-    const sampleRunActionResults: MaterialSampleRunActionResult[] = [];
+    const sampleRunActionResults: MaterialSampleRunActionResult = {
+      parentSampleId: parentSampleId as string,
+      childrenGenerated: []
+    };
+    // destroy original if checked and the baseName is correspondent to a valid sample id
+    if (destroyOriginal && parentSampleId) {
+      await doOperations(
+        [
+          {
+            op: "DELETE",
+            path: `material-sample/${parentSampleId}`,
+            value: {
+              id: parentSampleId as string,
+              type: "material-sample"
+            }
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      );
+    }
     // submit to back end
     for (const sample of submittedValues.childSamples) {
       delete sample.description;
+      // link to parent if detroy original is not checked.
+      if (!destroyOriginal && parentSampleId) {
+        sample.parentMaterialSample = {
+          type: "material-sample",
+          id: parentSampleId
+        };
+      }
       const [response] = await save(
         [
           {
@@ -99,7 +131,7 @@ export default function SplitRunAction() {
         ],
         { apiBaseUrl: "/collection-api" }
       );
-      sampleRunActionResults.push({
+      sampleRunActionResults.childrenGenerated?.push({
         id: response.id,
         name: sample.materialSampleName
       });
@@ -131,17 +163,18 @@ export default function SplitRunAction() {
     const childSamplesPath = "childSamples";
     const childSamplePath = `${childSamplesPath}[${index}]`;
     const commonRoot = childSamplePath + ".";
+    const parentSample = parentResp?.data?.[0];
     // Use the first one from return til material sample name is unuque
     formik.setFieldValue(
       commonRoot + "preparationType",
-      parentResp?.data[0].preparationType
+      parentSample?.preparationType
     );
     // formik.setFieldValue(commonRoot+"preparedBy", response?.[0].preparedBy);
     // formik.setFieldValue(commonRoot+"datePrepared", response?.[0].preparationDate);
 
     formik.setFieldValue(
       commonRoot + "dwcCatalogNumber",
-      parentResp?.data[0].dwcCatalogNumber
+      parentSample?.dwcCatalogNumber
     );
   };
 
@@ -169,12 +202,7 @@ export default function SplitRunAction() {
                 <div className="child-sample-section">
                   <Tabs>
                     {
-                      // Only show the tabs when there is more than 1 child sample:
-                      <TabList
-                        className={`react-tabs__tab-list ${
-                          samples.length === 1 ? "d-none" : ""
-                        }`}
-                      >
+                      <TabList>
                         {samples.map((sample, index) => (
                           <Tab key={index}>
                             <span className="m-3">
@@ -185,12 +213,16 @@ export default function SplitRunAction() {
                       </TabList>
                     }
                     {samples.length
-                      ? samples.map((_sample, index) => {
+                      ? samples.map((sample, index) => {
                           const childSamplesPath = "childSamples";
                           const childSamplePath = `${childSamplesPath}[${index}]`;
                           const commonRoot = childSamplePath + ".";
                           return (
                             <TabPanel key={index}>
+                              <h3 className="d-flex fw-bold flex-row">
+                                {" "}
+                                {sample.materialSampleName}
+                              </h3>
                               <span className="d-flex fw-bold flex-row">
                                 {formatMessage("materialSample") +
                                   " " +

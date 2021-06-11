@@ -16,7 +16,7 @@ export default function SplitRunActionResult() {
   const { formatMessage } = useDinaIntl();
 
   const [splitChildSampleRunActionResult] = useLocalStorage<
-    MaterialSampleRunActionResult[] | null | undefined
+    MaterialSampleRunActionResult | null | undefined
   >(SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY);
 
   const [splitChildSampleRunConfig, _setSplitChildSampleRunConfig] =
@@ -38,9 +38,10 @@ export default function SplitRunActionResult() {
             {formatMessage("originalMaterialSampleLabel")}:
           </span>
           <span className="d-flex flex-row">
-            {splitChildSampleRunConfig?.configure.destroyOriginal ? (
+            {splitChildSampleRunConfig?.configure.destroyOriginal &&
+            splitChildSampleRunActionResult?.parentSampleId ? (
               <>
-                <span className="text-primary">
+                <span className="text-primary mx-3">
                   {" "}
                   {splitChildSampleRunConfig?.configure.baseName}
                 </span>
@@ -49,24 +50,37 @@ export default function SplitRunActionResult() {
                   <DinaMessage id="destroyedLabel" />{" "}
                 </span>
               </>
-            ) : (
+            ) : splitChildSampleRunActionResult?.parentSampleId ? (
               <Link
-                href={`/collection/material-sample/view?id=${splitChildSampleRunConfig?.configure.baseName}`}
+                href={`/collection/material-sample/view?id=${splitChildSampleRunActionResult?.parentSampleId}`}
               >
                 <a>{splitChildSampleRunConfig?.configure.baseName}</a>
               </Link>
+            ) : (
+              <>
+                <span className="text-primary mx-3">
+                  {" "}
+                  {splitChildSampleRunConfig?.configure.baseName}
+                </span>
+                <span className="text-danger">
+                  {" "}
+                  <DinaMessage id="parentSampleNotFoundLabel" />{" "}
+                </span>
+              </>
             )}
           </span>
           <span className="fw-bold">
             {formatMessage("childMaterialSamplesCreatedLabel")}:
           </span>
-          {splitChildSampleRunActionResult?.map((result, idx) => (
-            <span className="d-flex flex-row" key={idx}>
-              <Link href={`/collection/material-sample/view?id=${result.id}`}>
-                <a>{result.name}</a>
-              </Link>
-            </span>
-          ))}
+          {splitChildSampleRunActionResult?.childrenGenerated?.map(
+            (result, idx) => (
+              <span className="d-flex flex-row mx-3" key={idx}>
+                <Link href={`/collection/material-sample/view?id=${result.id}`}>
+                  <a>{result.name}</a>
+                </Link>
+              </span>
+            )
+          )}
         </span>
       </main>
     </div>

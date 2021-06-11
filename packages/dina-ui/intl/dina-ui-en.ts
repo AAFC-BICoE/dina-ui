@@ -295,6 +295,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organizationViewTitle: "View Organization",
   originalFile: "Original File",
   originalMaterialSampleLabel: "Original Material Sample",
+  parentSampleNotFoundLabel: " Parent sample not found",
   personListTitle: "Persons",
   personViewTitle: "Person",
   preparation: "Preparation",
