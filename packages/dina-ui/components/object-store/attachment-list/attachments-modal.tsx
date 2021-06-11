@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import ReactTable from "react-table";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
-import { AttachmentSection } from "./AttachmentSection";
+import { AllowAttachmentsConfig, AttachmentSection } from "./AttachmentSection";
 
 export interface AttachmentsModalParams {
   /** Pre-existing metadata attachments. */
@@ -24,6 +24,9 @@ export interface AttachmentsModalParams {
   title?: JSX.Element;
 
   isTemplate?: boolean;
+
+  /** Manually set whether new/existing attachments can be added. */
+  allowAttachmentsConfig?: AllowAttachmentsConfig;
 
   allowNewFieldName?: string;
   allowExistingFieldName?: string;
@@ -38,7 +41,8 @@ export function useAttachmentsModal({
   isTemplate,
   allowNewFieldName,
   allowExistingFieldName,
-  id
+  id,
+  allowAttachmentsConfig
 }: AttachmentsModalParams) {
   const { closeModal, openModal } = useModal();
   const { bulkGet } = useApiClient();
@@ -92,7 +96,10 @@ export function useAttachmentsModal({
           </button>
         </div>
         <div className="modal-body">
-          <AttachmentSection afterMetadatasSaved={addAttachedMetadatas} />
+          <AttachmentSection
+            allowAttachmentsConfig={allowAttachmentsConfig}
+            afterMetadatasSaved={addAttachedMetadatas}
+          />
         </div>
       </div>
     );

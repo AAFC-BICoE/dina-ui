@@ -24,13 +24,22 @@ export interface AttachmentListProps
    * Omitting this gets rid of the Existing Attachments UI.
    */
   attachmentPath?: string;
+
+  /** Manually set whether new/existing attachments can be added. By default allow both. */
+  allowAttachmentsConfig?: AllowAttachmentsConfig;
+}
+
+export interface AllowAttachmentsConfig {
+  allowNew?: boolean;
+  allowExisting?: boolean;
 }
 
 /** UI section for reading and modifying file attachments. */
 export function AttachmentSection({
   attachmentPath,
   onDetachMetadataIds: onDetachMetadataIdsProp,
-  afterMetadatasSaved: afterMetadatasSavedProp
+  afterMetadatasSaved: afterMetadatasSavedProp,
+  allowAttachmentsConfig = { allowExisting: true, allowNew: true }
 }: AttachmentListProps) {
   const [lastSave, setLastSave] = useState(Date.now());
 
@@ -70,10 +79,10 @@ export function AttachmentSection({
               <DinaMessage id="existingAttachments" />
             </Tab>
           )}
-          <Tab>
+          <Tab disabled={!allowAttachmentsConfig.allowNew}>
             <DinaMessage id="uploadNewAttachments" />
           </Tab>
-          <Tab>
+          <Tab disabled={!allowAttachmentsConfig.allowExisting}>
             <DinaMessage id="attachExistingObjects" />
           </Tab>
         </TabList>

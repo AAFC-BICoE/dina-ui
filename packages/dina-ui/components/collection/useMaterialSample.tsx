@@ -23,7 +23,7 @@ import {
 import { Metadata } from "../../../dina-ui/types/objectstore-api";
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { useAttachmentsModal } from "../object-store";
+import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -79,6 +79,9 @@ export interface UseMaterialSampleSaveParams {
 
   /** Optionally restrict the form to these enabled fields. */
   collectingEventFormEnabledFields?: string[];
+
+  materialSampleAttachmentsConfig?: AllowAttachmentsConfig;
+  collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
 }
 
 export function useMaterialSampleSave({
@@ -89,7 +92,9 @@ export function useMaterialSampleSave({
   isTemplate,
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues,
-  collectingEventFormEnabledFields
+  collectingEventFormEnabledFields,
+  materialSampleAttachmentsConfig,
+  collectingEventAttachmentsConfig
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
@@ -136,7 +141,11 @@ export function useMaterialSampleSave({
     saveCollectingEvent,
     attachedMetadatasUI: colEventAttachmentsUI,
     collectingEventFormSchema
-  } = useCollectingEventSave(colEventQuery.response?.data, isTemplate);
+  } = useCollectingEventSave({
+    attachmentsConfig: collectingEventAttachmentsConfig,
+    fetchedCollectingEvent: colEventQuery.response?.data,
+    isTemplate
+  });
 
   const {
     attachedMetadatasUI: materialSampleAttachmentsUI,
@@ -147,6 +156,7 @@ export function useMaterialSampleSave({
     deps: [materialSample?.id],
     title: <DinaMessage id="materialSampleAttachments" />,
     isTemplate,
+    allowAttachmentsConfig: materialSampleAttachmentsConfig,
     allowNewFieldName: "attachmentsConfig.allowNew",
     allowExistingFieldName: "attachmentsConfig.allowExisting",
     id: "material-sample-attachments-section"

@@ -27,6 +27,7 @@ import {
   useMaterialSampleQuery,
   useMaterialSampleSave
 } from "../../../components/collection/useMaterialSample";
+import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent, MaterialSample } from "../../../types/collection-api";
 import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
@@ -88,6 +89,11 @@ export interface MaterialSampleFormProps {
     materialSample: string[];
     collectingEvent: string[];
   };
+
+  attachmentsConfig?: {
+    materialSample: AllowAttachmentsConfig;
+    collectingEvent: AllowAttachmentsConfig;
+  };
 }
 
 export function MaterialSampleForm({
@@ -97,7 +103,8 @@ export function MaterialSampleForm({
   catelogueSectionRef,
   materialSampleSaveHook,
   materialSampleTemplateInitialValues,
-  enabledFields
+  enabledFields,
+  attachmentsConfig
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
   const { isTemplate } = useContext(DinaFormContext) ?? {};
@@ -118,6 +125,8 @@ export function MaterialSampleForm({
   } =
     materialSampleSaveHook ??
     useMaterialSampleSave({
+      collectingEventAttachmentsConfig: attachmentsConfig?.collectingEvent,
+      materialSampleAttachmentsConfig: attachmentsConfig?.materialSample,
       materialSample,
       collectingEventInitialValues,
       onSaved,

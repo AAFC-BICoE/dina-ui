@@ -1,6 +1,6 @@
 import { useQuery, withResponse } from "common-ui";
 import { InputResource, KitsuResource, PersistedResource } from "kitsu";
-import { compact, set, toPairs } from "lodash";
+import { compact, set, toPairs, pick } from "lodash";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
 import { Head, Nav } from "../../../components";
@@ -73,6 +73,18 @@ export function CreateMaterialSampleFromWorkflowForm({
       collectingEventInitialValues={collectingEventInitialValues}
       onSaved={onSaved}
       enabledFields={enabledFields}
+      attachmentsConfig={{
+        collectingEvent: pick(
+          actionDefinition.formTemplates.COLLECTING_EVENT,
+          "allowNew",
+          "allowExisting"
+        ),
+        materialSample: pick(
+          actionDefinition.formTemplates.MATERIAL_SAMPLE,
+          "allowNew",
+          "allowExisting"
+        )
+      }}
     />
   );
 }
