@@ -329,8 +329,6 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
 
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleIdentifiersFormLayout({
-  hideSampleName,
-  hideOtherCatalogNumbers,
   className,
   namePrefix
 }: MaterialSampleIdentifiersFormLayoutProps) {
@@ -342,7 +340,15 @@ export function MaterialSampleIdentifiersFormLayout({
     >
       <div className="row">
         <div className="col-md-6">
-          {!hideSampleName && <TextField name="materialSampleName" />}
+          <TextField
+            name={`${
+              namePrefix
+                ? namePrefix + "materialSampleName"
+                : "materialSampleName"
+            }`}
+            customName="materialSampleName"
+          />
+
           <TextField
             name={`${
               namePrefix ? namePrefix + "dwcCatalogNumber" : "dwcCatalogNumber"
@@ -350,11 +356,16 @@ export function MaterialSampleIdentifiersFormLayout({
             customName="dwcCatalogNumber"
           />
         </div>
-        {!hideOtherCatalogNumbers && (
-          <div className="col-md-6">
-            <StringArrayField name="dwcOtherCatalogNumbers" />
-          </div>
-        )}
+        <div className="col-md-6">
+          <StringArrayField
+            name={`${
+              namePrefix
+                ? namePrefix + "dwcOtherCatalogNumbers"
+                : "dwcOtherCatalogNumbers"
+            }`}
+            customName="dwcOtherCatalogNumbers"
+          />
+        </div>
       </div>
     </FieldSet>
   );

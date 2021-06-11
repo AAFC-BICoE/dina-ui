@@ -150,6 +150,7 @@ export default function SplitRunAction() {
       commonRoot + "preparationType",
       parentSample?.preparationType
     );
+    // comment til backend ready
     // formik.setFieldValue(commonRoot+"preparedBy", response?.[0].preparedBy);
     // formik.setFieldValue(commonRoot+"datePrepared", response?.[0].preparationDate);
 
@@ -157,6 +158,17 @@ export default function SplitRunAction() {
       commonRoot + "dwcCatalogNumber",
       parentSample?.dwcCatalogNumber
     );
+
+    formik.setFieldValue(
+      commonRoot + "dwcOtherCatalogNumbers",
+      parentSample?.dwcOtherCatalogNumbers
+    );
+
+    // missing backend field, comment til backend ready
+    // formik.setFieldValue(
+    //   commonRoot + "description",
+    //   parentSample?.description
+    // );
   };
 
   return (
@@ -194,16 +206,12 @@ export default function SplitRunAction() {
                       </TabList>
                     }
                     {samples.length
-                      ? samples.map((sample, index) => {
+                      ? samples.map((_, index) => {
                           const childSamplesPath = "childSamples";
                           const childSamplePath = `${childSamplesPath}[${index}]`;
                           const commonRoot = childSamplePath + ".";
                           return (
                             <TabPanel key={index}>
-                              <h3 className="d-flex fw-bold flex-row">
-                                {" "}
-                                {sample.materialSampleName}
-                              </h3>
                               <span className="d-flex fw-bold flex-row">
                                 {formatMessage("materialSample") +
                                   " " +
@@ -230,8 +238,6 @@ export default function SplitRunAction() {
                                 <MaterialSampleIdentifiersFormLayout
                                   namePrefix={commonRoot}
                                   className="flex-grow-1"
-                                  hideSampleName={true}
-                                  hideOtherCatalogNumbers={true}
                                 />
                               </div>
                             </TabPanel>

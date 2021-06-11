@@ -38,35 +38,33 @@ export default function SplitRunActionResult() {
             {formatMessage("originalMaterialSampleLabel")}:
           </span>
           <span className="d-flex flex-row">
-            {splitChildSampleRunConfig?.configure.destroyOriginal &&
-            splitChildSampleRunActionResult?.parentSampleId ? (
+            {splitChildSampleRunActionResult?.parentSampleId ? (
+              <span className="d-flex flex-row mx-3">
+                <Link
+                  href={`/collection/material-sample/view?id=${splitChildSampleRunActionResult?.parentSampleId}`}
+                >
+                  <a>{splitChildSampleRunConfig?.configure.baseName}</a>
+                </Link>
+              </span>
+            ) : (
+              <span className="text-primary mx-3">
+                {" "}
+                {splitChildSampleRunConfig?.configure.baseName}
+              </span>
+            )}
+            {splitChildSampleRunConfig?.configure.destroyOriginal ? (
               <>
-                <span className="text-primary mx-3">
-                  {" "}
-                  {splitChildSampleRunConfig?.configure.baseName}
-                </span>
-                <span className="text-danger">
+                <img src="/static/images/originalDestroyed.png" />
+                <span className="text-danger mx-1">
                   {" "}
                   <DinaMessage id="destroyedLabel" />{" "}
                 </span>
               </>
-            ) : splitChildSampleRunActionResult?.parentSampleId ? (
-              <Link
-                href={`/collection/material-sample/view?id=${splitChildSampleRunActionResult?.parentSampleId}`}
-              >
-                <a>{splitChildSampleRunConfig?.configure.baseName}</a>
-              </Link>
             ) : (
-              <>
-                <span className="text-primary mx-3">
-                  {" "}
-                  {splitChildSampleRunConfig?.configure.baseName}
-                </span>
-                <span className="text-danger">
-                  {" "}
-                  <DinaMessage id="parentSampleNotFoundLabel" />{" "}
-                </span>
-              </>
+              <span className="text-danger">
+                {" "}
+                <DinaMessage id="parentSampleNotFoundLabel" />{" "}
+              </span>
             )}
           </span>
           <span className="fw-bold">

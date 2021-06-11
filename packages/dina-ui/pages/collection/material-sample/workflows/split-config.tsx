@@ -1,5 +1,4 @@
 import useLocalStorage from "@rehooks/local-storage";
-import { object, SchemaOf, string } from "yup";
 import { useRouter } from "next/router";
 import {
   ButtonBar,
@@ -11,10 +10,7 @@ import {
   TextField
 } from "common-ui";
 import NumberSpinnerField from "../../../../../common-ui/lib/formik-connected/NumberSpinnerField";
-import {
-  MaterialSampleRunConfig,
-  MaterialSampleRunConfigConfiguration
-} from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
+import { MaterialSampleRunConfig } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import React, { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
@@ -52,6 +48,7 @@ export default function ConfigAction() {
   const [type, setType] = useState("Numerical");
   const [start, setStart] = useState(type === "Numerical" ? "1" : "A");
   const router = useRouter();
+  const defaultBaseName = "parentName";
 
   const [_, setSplitChildSampleRunConfig] = useLocalStorage<
     MaterialSampleRunConfig | null | undefined
@@ -96,7 +93,7 @@ export default function ConfigAction() {
           placeholder={
             sampleSrcName
               ? `${sampleSrcName}-${computedSuffix}`
-              : `parentName-${computedSuffix}`
+              : `${defaultBaseName}-${computedSuffix}`
           }
         />
         <TextField
@@ -140,7 +137,7 @@ export default function ConfigAction() {
       configure: {
         numOfChildToCreate:
           configActionFields.numOfChildToCreate ?? numOfChildToCreate,
-        baseName: configActionFields.baseName,
+        baseName: configActionFields.baseName ?? defaultBaseName,
         start: configActionFields.start ?? start,
         type: configActionFields.type,
         destroyOriginal: configActionFields.destroyOriginal
@@ -176,15 +173,6 @@ export default function ConfigAction() {
   const isNumericalType = type === "Numerical";
   const isLetterType = type === "Letter";
 
-  /** Form validation schema. */
-  const runConfigFormSchema: SchemaOf<
-    Pick<MaterialSampleRunConfigConfiguration, "baseName">
-  > = object({
-    baseName: string().required(
-      formatMessage("field_materialSampleRunConfig_baseNameError")
-    )
-  });
-
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
@@ -193,11 +181,7 @@ export default function ConfigAction() {
         <h1>
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
-        <DinaForm
-          initialValues={{ type: "Numerical" }}
-          onSubmit={onSubmit}
-          validationSchema={runConfigFormSchema}
-        >
+        <DinaForm initialValues={{ type: "Numerical" }} onSubmit={onSubmit}>
           {buttonBar}
           <p>
             <span className="fw-bold">{formatMessage("description")}:</span>
@@ -238,7 +222,7 @@ export default function ConfigAction() {
               <TextField
                 className="col-md-2"
                 name="baseName"
-                placeholder="ParentName"
+                placeholder={`${defaultBaseName}`}
                 onChangeExternal={(_form, _name, value) =>
                   setBaseName(value as any)
                 }
