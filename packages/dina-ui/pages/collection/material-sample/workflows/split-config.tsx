@@ -35,6 +35,7 @@ interface RunConfig {
   customChildSample?: { index: number; name: string; description: string }[];
 }
 
+/* Props for computing suffix */
 export interface ComputeSuffixProps {
   index: number;
   start: string | undefined;
@@ -44,8 +45,7 @@ export interface ComputeSuffixProps {
 export const SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY =
   "split-child-sample-run-config";
 
-export default function ConfigAction(props) {
-  const { nextStep } = props;
+export default function ConfigAction() {
   const { formatMessage } = useDinaIntl();
   const [numOfChildToCreate, setNumOfChildToCreate] = useState(1);
   const [baseName, setBaseName] = useState("");

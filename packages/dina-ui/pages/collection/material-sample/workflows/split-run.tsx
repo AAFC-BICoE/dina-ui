@@ -56,7 +56,6 @@ export default function SplitRunAction() {
   const start = splitChildSampleRunConfig?.configure?.start;
   const type = splitChildSampleRunConfig?.configure?.type;
   const baseName = splitChildSampleRunConfig?.configure?.baseName;
-  const destroyOriginal = splitChildSampleRunConfig?.configure.destroyOriginal;
 
   // Retrive the parent material sample upfront
   const { loading, response: parentResp } = useQuery<MaterialSample[]>({
@@ -94,29 +93,11 @@ export default function SplitRunAction() {
       parentSampleId: parentSampleId as string,
       childrenGenerated: []
     };
-    // destroy original if checked and the baseName is correspondent to a valid sample id
-    if (destroyOriginal && parentSampleId) {
-      await doOperations(
-        [
-          {
-            op: "DELETE",
-            path: `material-sample/${parentSampleId}`,
-            value: {
-              id: parentSampleId as string,
-              type: "material-sample"
-            }
-          }
-        ],
-        {
-          apiBaseUrl: "/collection-api"
-        }
-      );
-    }
     // submit to back end
     for (const sample of submittedValues.childSamples) {
       delete sample.description;
-      // link to parent if detroy original is not checked.
-      if (!destroyOriginal && parentSampleId) {
+      // link to parent
+      if (parentSampleId) {
         sample.parentMaterialSample = {
           type: "material-sample",
           id: parentSampleId
@@ -244,7 +225,7 @@ export default function SplitRunAction() {
                               <div className="d-flex flex-row">
                                 <PreparationsFormLayout
                                   namePrefix={commonRoot}
-                                  className="flex-grow-1"
+                                  className="flex-grow-1 mx-1"
                                 />
                                 <MaterialSampleIdentifiersFormLayout
                                   namePrefix={commonRoot}
