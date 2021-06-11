@@ -1,5 +1,5 @@
 import { FastField, FormikProps } from "formik";
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
 import { useDinaFormContext } from "./DinaForm";
@@ -65,7 +65,15 @@ export function FieldWrapper({
   removeFormGroupClass,
   removeLabel
 }: FieldWrapperProps) {
-  const { horizontal, readOnly, isTemplate } = useDinaFormContext();
+  const { horizontal, readOnly, isTemplate, enabledFields } =
+    useDinaFormContext();
+
+  const isReadOnlyByContext = useMemo(
+    () => (enabledFields ? !enabledFields.includes(name) : false),
+    [enabledFields]
+  );
+
+  const readOnlyField = readOnly || isReadOnlyByContext;
 
   const fieldLabel = label ?? (
     <FieldHeader name={name} customName={customName} />
@@ -103,7 +111,7 @@ export function FieldWrapper({
             className={[
               `${labelCol ? `col-sm-${labelCol}` : ""}`,
               // Adjust alignment for editable inputs:
-              horizontal && !readOnly && !isTemplate ? "mt-sm-2" : "",
+              horizontal && !readOnlyField && !isTemplate ? "mt-sm-2" : "",
               "mb-2"
             ].join(" ")}
           >
@@ -114,7 +122,7 @@ export function FieldWrapper({
           <FastField name={name}>
             {({ field: { value }, form, meta: { error } }) => (
               <>
-                {readOnly || !children
+                {readOnlyField || !children
                   ? readOnlyRender?.(value) ?? (
                       <ReadOnlyValue link={link} value={value} />
                     )

@@ -1,13 +1,11 @@
 import { useQuery, withResponse } from "common-ui";
 import { InputResource, KitsuResource, PersistedResource } from "kitsu";
-import { isUndefined, mapValues, omitBy, toPairs, set } from "lodash";
+import { compact, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
 import { Head, Nav } from "../../../components";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
-  CollectingEvent,
-  MaterialSample,
   PreparationProcessDefinition,
   TemplateFields
 } from "../../../types/collection-api";
@@ -63,14 +61,18 @@ export function CreateMaterialSampleFromWorkflowForm({
   actionDefinition,
   onSaved
 }: CreateMaterialSampleFromWorkflowForm) {
-  const { materialSampleInitialValues, collectingEventInitialValues } =
-    useWorkflowMaterialSampleInitialValues(actionDefinition);
+  const {
+    materialSampleInitialValues,
+    collectingEventInitialValues,
+    enabledFields
+  } = useWorkflowMaterialSampleInitialValues(actionDefinition);
 
   return (
     <MaterialSampleForm
       materialSample={materialSampleInitialValues}
       collectingEventInitialValues={collectingEventInitialValues}
       onSaved={onSaved}
+      enabledFields={enabledFields}
     />
   );
 }
@@ -101,8 +103,25 @@ function useWorkflowMaterialSampleInitialValues(
       ? undefined
       : collectingEvent;
 
-    return { materialSampleInitialValues, collectingEventInitialValues };
-  }, []);
+    const enabledFields = {
+      materialSample: compact(
+        toPairs(
+          actionDefinition.formTemplates.MATERIAL_SAMPLE?.templateFields
+        ).map(([key, val]) => (val?.enabled ? key : null))
+      ),
+      collectingEvent: compact(
+        toPairs(
+          actionDefinition.formTemplates.COLLECTING_EVENT?.templateFields
+        ).map(([key, val]) => (val?.enabled ? key : null))
+      )
+    };
+
+    return {
+      materialSampleInitialValues,
+      collectingEventInitialValues,
+      enabledFields
+    };
+  }, [actionDefinition]);
 }
 
 /** Gets the form's initial values from the stored Template. */

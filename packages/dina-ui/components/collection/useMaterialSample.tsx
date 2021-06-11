@@ -76,6 +76,9 @@ export interface UseMaterialSampleSaveParams {
   materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
+
+  /** Optionally restrict the form to these enabled fields. */
+  collectingEventFormEnabledFields?: string[];
 }
 
 export function useMaterialSampleSave({
@@ -85,7 +88,8 @@ export function useMaterialSampleSave({
   collectingEvtFormRef,
   isTemplate,
   colEventTemplateInitialValues,
-  materialSampleTemplateInitialValues
+  materialSampleTemplateInitialValues,
+  collectingEventFormEnabledFields
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
@@ -273,6 +277,7 @@ export function useMaterialSampleSave({
       validationSchema={collectingEventFormSchema}
       isTemplate={isTemplate}
       readOnly={isTemplate ? !!colEventId : false}
+      enabledFields={collectingEventFormEnabledFields}
     >
       <CollectingEventFormLayout />
       <div className="mb-3">{colEventAttachmentsUI}</div>

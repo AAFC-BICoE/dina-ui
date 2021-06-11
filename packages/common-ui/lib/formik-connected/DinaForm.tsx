@@ -34,6 +34,9 @@ export interface DinaFormContextI {
 
   /** Add a checkbox beside the wrapper field if true */
   isTemplate?: boolean;
+
+  /** Optionally restrict the writable fields to this list. */
+  enabledFields?: string[];
 }
 
 export type DinaFormOnSubmit<TValues = any> = (
@@ -86,10 +89,8 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
   return (
     <DinaFormContext.Provider
       value={{
-        readOnly: props.readOnly ?? false,
-        horizontal: props.horizontal,
-        initialValues: props.initialValues,
-        isTemplate: props.isTemplate
+        ...props,
+        readOnly: props.readOnly ?? false
       }}
     >
       <Formik

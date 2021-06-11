@@ -82,6 +82,12 @@ export interface MaterialSampleFormProps {
   materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
+
+  /** The enabled fields if creating from a template. */
+  enabledFields?: {
+    materialSample: string[];
+    collectingEvent: string[];
+  };
 }
 
 export function MaterialSampleForm({
@@ -90,7 +96,8 @@ export function MaterialSampleForm({
   onSaved,
   catelogueSectionRef,
   materialSampleSaveHook,
-  materialSampleTemplateInitialValues
+  materialSampleTemplateInitialValues,
+  enabledFields
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
   const { isTemplate } = useContext(DinaFormContext) ?? {};
@@ -114,7 +121,8 @@ export function MaterialSampleForm({
       materialSample,
       collectingEventInitialValues,
       onSaved,
-      isTemplate
+      isTemplate,
+      collectingEventFormEnabledFields: enabledFields?.collectingEvent
     });
 
   const buttonBar = (
@@ -302,6 +310,7 @@ export function MaterialSampleForm({
     <DinaForm<InputResource<MaterialSample>>
       initialValues={initialValues}
       onSubmit={onSubmit}
+      enabledFields={enabledFields?.materialSample}
     >
       {buttonBar}
       {mateirialSampleInternal}
