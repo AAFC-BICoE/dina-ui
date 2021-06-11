@@ -97,6 +97,8 @@ function useWorkflowMaterialSampleInitialValues(
         type: "collecting-event",
         id: collectingEvent.id
       };
+    } else {
+      set(collectingEvent, "geoReferenceAssertions[0].isPrimary", true);
     }
 
     const collectingEventInitialValues = collectingEvent.id
@@ -104,11 +106,17 @@ function useWorkflowMaterialSampleInitialValues(
       : collectingEvent;
 
     const enabledFields = {
-      materialSample: compact(
-        toPairs(
-          actionDefinition.formTemplates.MATERIAL_SAMPLE?.templateFields
-        ).map(([key, val]) => (val?.enabled ? key : null))
-      ),
+      materialSample: [
+        ...compact(
+          toPairs(
+            actionDefinition.formTemplates.MATERIAL_SAMPLE?.templateFields
+          ).map(([key, val]) => (val?.enabled ? key : null))
+        ),
+        // The Identifiers fields should always be enabled:
+        "materialSampleName",
+        "dwcCatalogNumber",
+        "dwcOtherCatalogNumbers"
+      ],
       collectingEvent: compact(
         toPairs(
           actionDefinition.formTemplates.COLLECTING_EVENT?.templateFields
