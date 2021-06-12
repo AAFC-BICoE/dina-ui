@@ -8,7 +8,7 @@ export interface MaterialSampleRunConfigConfiguration {
   numOfChildToCreate: number;
   baseName: string;
   start?: string | undefined;
-  type: string | undefined;
+  suffixType: string | undefined;
   destroyOriginal: boolean;
 }
 
@@ -22,5 +22,10 @@ export interface MaterialSampleRunConfigAttributes {
   configure: MaterialSampleRunConfigConfiguration;
   configure_children?: MaterialSampleRunConfigChildConfiguration;
 }
+
+export const BASE_NAME = "ParentName";
+export const START = "001";
+export const TYPE_NUMERIC = "Numerical";
+export const TYPE_LETTER = "Letter";
 
 export type MaterialSampleRunConfig = MaterialSampleRunConfigAttributes;

@@ -16,7 +16,12 @@ import {
 } from "../../../../../dina-ui/intl/dina-ui-intl";
 import React from "react";
 import useLocalStorage from "@rehooks/local-storage";
-import { MaterialSampleRunConfig } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
+import {
+  BASE_NAME,
+  MaterialSampleRunConfig,
+  START,
+  TYPE_NUMERIC
+} from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import {
   computeSuffix,
   SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
@@ -38,7 +43,7 @@ export const SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY =
 
 export default function SplitRunAction() {
   const { formatMessage } = useDinaIntl();
-  const { save, doOperations } = useApiClient();
+  const { save } = useApiClient();
   const { groupNames } = useAccount();
   const router = useRouter();
   const [splitChildSampleRunConfig, _setSplitChildSampleRunConfig] =
@@ -53,9 +58,10 @@ export default function SplitRunAction() {
   const initialChildSamples: MaterialSample[] = [];
   const numOfChildToCreate =
     splitChildSampleRunConfig?.configure?.numOfChildToCreate ?? 1;
-  const start = splitChildSampleRunConfig?.configure?.start;
-  const type = splitChildSampleRunConfig?.configure?.type;
-  const baseName = splitChildSampleRunConfig?.configure?.baseName;
+  const start = splitChildSampleRunConfig?.configure?.start ?? START;
+  const suffixType =
+    splitChildSampleRunConfig?.configure?.suffixType ?? TYPE_NUMERIC;
+  const baseName = splitChildSampleRunConfig?.configure?.baseName ?? BASE_NAME;
 
   // Retrive the parent material sample upfront
   const { loading, response: parentResp } = useQuery<MaterialSample[]>({
@@ -84,7 +90,7 @@ export default function SplitRunAction() {
       description: splitChildSampleDescription,
       materialSampleName:
         splitChildSampleName ??
-        baseName + "-" + computeSuffix({ index: i, start, type })
+        baseName + "-" + computeSuffix({ index: i, start, suffixType })
     });
   }
 
@@ -134,7 +140,7 @@ export default function SplitRunAction() {
         <DinaMessage id="previous" />
       </FormikButton>
 
-      <FormikButton className="btn btn-info" onClick={onSubmit}>
+      <FormikButton className="btn btn-info runAction" onClick={onSubmit}>
         <DinaMessage id="next" />
       </FormikButton>
     </ButtonBar>
@@ -170,7 +176,6 @@ export default function SplitRunAction() {
     //   parentSample?.description
     // );
   };
-
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
@@ -226,7 +231,7 @@ export default function SplitRunAction() {
                                 onClick={() =>
                                   onCopyFromParent({ index, formik: form })
                                 }
-                                className="btn btn-secondary m-1"
+                                className="btn btn-secondary m-1 copyFromParent"
                               >
                                 <DinaMessage id="copyFromParentLabel" />
                               </FormikButton>

@@ -1,3 +1,9 @@
+import {
+  BASE_NAME,
+  START,
+  TYPE_NUMERIC
+} from "../../../../../../dina-ui/types/collection-api";
+import Select from "react-select";
 import ConfigAction, {
   SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
 } from "../../../../../pages/collection/material-sample/workflows/split-config";
@@ -24,7 +30,22 @@ const testRunConfig = {
 };
 
 describe("MaterialSample split workflow run config", () => {
-  it("Creates a new Material Sample workfow run config", async () => {
+  it("Initially display the workfow run config with defaults", async () => {
+    const wrapper = mountWithAppContext(<ConfigAction />, {});
+
+    expect(wrapper.find(".baseName-field input").prop("placeholder")).toEqual(
+      BASE_NAME
+    );
+
+    expect(wrapper.find(".start-field input").prop("placeholder")).toEqual(
+      START
+    );
+
+    const { value } = wrapper.find(Select).props();
+    expect(value.value).toEqual(TYPE_NUMERIC);
+  });
+
+  it("Creates a new Material Sample workfow run config with user custom entries", async () => {
     const wrapper = mountWithAppContext(<ConfigAction />, {});
 
     wrapper
@@ -55,7 +76,7 @@ describe("MaterialSample split workflow run config", () => {
       localStorage.getItem(SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY)?.length
     ).toBeGreaterThan(0);
 
-    // content contans the values in testRunConfig
+    // content contains the values user set
     expect(localStorage.getItem(SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY)).toContain(
       testRunConfig[SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY].metadata.actionRemarks
     );

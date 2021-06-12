@@ -347,6 +347,7 @@ export function MaterialSampleIdentifiersFormLayout({
                 : "materialSampleName"
             }`}
             customName="materialSampleName"
+            className="materialSampleName"
           />
 
           <TextField
@@ -354,6 +355,7 @@ export function MaterialSampleIdentifiersFormLayout({
               namePrefix ? namePrefix + "dwcCatalogNumber" : "dwcCatalogNumber"
             }`}
             customName="dwcCatalogNumber"
+            className="dwcCatalogNumber"
           />
         </div>
         <div className="col-md-6">

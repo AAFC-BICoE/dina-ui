@@ -10,7 +10,13 @@ import {
   TextField
 } from "common-ui";
 import NumberSpinnerField from "../../../../../common-ui/lib/formik-connected/NumberSpinnerField";
-import { MaterialSampleRunConfig } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
+import {
+  MaterialSampleRunConfig,
+  BASE_NAME,
+  START,
+  TYPE_LETTER,
+  TYPE_NUMERIC
+} from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import React, { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
@@ -27,7 +33,7 @@ interface RunConfig {
   numOfChildToCreate: number;
   baseName: string;
   start: string;
-  type: string;
+  sufficType: string;
   customChildSample?: { index: number; name: string; description: string }[];
 }
 
@@ -35,7 +41,7 @@ interface RunConfig {
 export interface ComputeSuffixProps {
   index: number;
   start: string | undefined;
-  type: string | undefined;
+  suffixType: string | undefined;
 }
 
 export const SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY =
@@ -45,10 +51,9 @@ export default function ConfigAction() {
   const { formatMessage } = useDinaIntl();
   const [numOfChildToCreate, setNumOfChildToCreate] = useState(1);
   const [baseName, setBaseName] = useState("");
-  const [type, setType] = useState("Numerical");
-  const [start, setStart] = useState(type === "Numerical" ? "1" : "A");
+  const [suffixType, setSuffixType] = useState(TYPE_NUMERIC);
+  const [start, setStart] = useState(suffixType === TYPE_NUMERIC ? "1" : "A");
   const router = useRouter();
-  const defaultBaseName = "parentName";
 
   const [_, setSplitChildSampleRunConfig] = useLocalStorage<
     MaterialSampleRunConfig | null | undefined
@@ -58,16 +63,16 @@ export default function ConfigAction() {
     setNumOfChildToCreate(value);
   };
 
-  type SuffixOptions = "Numerical" | "Letter";
+  type SuffixOptions = typeof TYPE_NUMERIC | typeof TYPE_LETTER;
 
   const TYPE_OPTIONS: { label: string; value: SuffixOptions }[] = [
     {
-      label: "Numerical",
-      value: "Numerical"
+      label: TYPE_NUMERIC,
+      value: TYPE_NUMERIC
     },
     {
-      label: "Letter",
-      value: "Letter"
+      label: TYPE_LETTER,
+      value: TYPE_LETTER
     }
   ];
   const SplitChildHeader = () => (
@@ -93,7 +98,7 @@ export default function ConfigAction() {
           placeholder={
             sampleSrcName
               ? `${sampleSrcName}-${computedSuffix}`
-              : `${defaultBaseName}-${computedSuffix}`
+              : `${BASE_NAME}-${computedSuffix}`
           }
         />
         <TextField
@@ -107,7 +112,7 @@ export default function ConfigAction() {
   const SplitChildRows = () => {
     const childRows: any = [];
     for (let i = 0; i < numOfChildToCreate; i++) {
-      const computedSuffix = computeSuffix({ index: i, start, type });
+      const computedSuffix = computeSuffix({ index: i, start, suffixType });
       childRows.push(
         <SplitChildRow
           key={i}
@@ -137,9 +142,9 @@ export default function ConfigAction() {
       configure: {
         numOfChildToCreate:
           configActionFields.numOfChildToCreate ?? numOfChildToCreate,
-        baseName: configActionFields.baseName ?? defaultBaseName,
-        start: configActionFields.start ?? start,
-        type: configActionFields.type,
+        baseName: configActionFields.baseName ?? BASE_NAME,
+        start: configActionFields.start ?? START,
+        suffixType: configActionFields.suffixType,
         destroyOriginal: configActionFields.destroyOriginal
       },
       configure_children: {
@@ -162,7 +167,7 @@ export default function ConfigAction() {
   );
 
   const onChangeExternal = (value, formik) => {
-    setType(value as any);
+    setSuffixType(value as any);
     // Make sure the placeholder is updated properly by simulating update the field value
     formik.values.start === null
       ? formik.setFieldValue("start", "")
@@ -170,8 +175,8 @@ export default function ConfigAction() {
     isLetterType ? setStart("A") : setStart("1");
   };
 
-  const isNumericalType = type === "Numerical";
-  const isLetterType = type === "Letter";
+  const isNumericalType = suffixType === TYPE_NUMERIC;
+  const isLetterType = suffixType === TYPE_LETTER;
 
   return (
     <div>
@@ -181,7 +186,10 @@ export default function ConfigAction() {
         <h1>
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
-        <DinaForm initialValues={{ type: "Numerical" }} onSubmit={onSubmit}>
+        <DinaForm
+          initialValues={{ suffixType: TYPE_NUMERIC }}
+          onSubmit={onSubmit}
+        >
           {buttonBar}
           <p>
             <span className="fw-bold">{formatMessage("description")}:</span>
@@ -222,14 +230,14 @@ export default function ConfigAction() {
               <TextField
                 className="col-md-2"
                 name="baseName"
-                placeholder={`${defaultBaseName}`}
+                placeholder={`${BASE_NAME}`}
                 onChangeExternal={(_form, _name, value) =>
                   setBaseName(value as any)
                 }
               />
               <SelectField
                 className="col-md-2"
-                name="type"
+                name="suffixType"
                 options={TYPE_OPTIONS}
                 onChange={onChangeExternal}
               />
@@ -260,9 +268,13 @@ export default function ConfigAction() {
   );
 }
 
-export const computeSuffix = ({ index, start, type }: ComputeSuffixProps) => {
+export const computeSuffix = ({
+  index,
+  start,
+  suffixType
+}: ComputeSuffixProps) => {
   let computedSuffix;
-  if (type === "Numerical") {
+  if (suffixType === TYPE_NUMERIC) {
     // correclty set the start when numerical input is null/empty, default to 1
     computedSuffix = isNaN(parseInt(start as any, 10))
       ? index + 1
