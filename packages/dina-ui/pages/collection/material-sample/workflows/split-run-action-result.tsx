@@ -11,9 +11,16 @@ import { MaterialSampleRunActionResult } from "../../../../../dina-ui/types/coll
 import { SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY } from "./split-run";
 import { MaterialSampleRunConfig } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import { SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY } from "./split-config";
+import {
+  ButtonBar,
+  DinaForm,
+  FormikButton
+} from "../../../../../common-ui/lib";
+import { useRouter } from "next/router";
 
 export default function SplitRunActionResult() {
   const { formatMessage } = useDinaIntl();
+  const router = useRouter();
 
   const [splitChildSampleRunActionResult] = useLocalStorage<
     MaterialSampleRunActionResult | null | undefined
@@ -24,62 +31,88 @@ export default function SplitRunActionResult() {
       SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
     );
 
+  const onPrevious = async () => {
+    await router.push(`/collection/material-sample/workflows/split-run`);
+  };
+
+  const onStartNewRunConfig = async () => {
+    await router.push(`/collection/material-sample/workflows/split-config`);
+  };
+
+  const buttonBar = (
+    <ButtonBar className="justify-content-center">
+      <FormikButton className="btn btn-secondary" onClick={onPrevious}>
+        <DinaMessage id="previous" />
+      </FormikButton>
+
+      <FormikButton className="btn btn-info" onClick={onStartNewRunConfig}>
+        <DinaMessage id="startNewRunConfigLabel" />
+      </FormikButton>
+    </ButtonBar>
+  );
+
   return (
     <div>
       <Head title={formatMessage("workflowCompleteTitle")} />
       <Nav />
-      <main className="container-fluid">
+      <main className="container-fluid ">
         <h1>
           <DinaMessage id="workflowCompleteTitle" />
         </h1>
-        <span>
-          <h3>{formatMessage("results")}:</h3>
-          <span className="fw-bold">
-            {formatMessage("originalMaterialSampleLabel")}:
-          </span>
-          <span className="d-flex flex-row">
-            {splitChildSampleRunActionResult?.parentSampleId ? (
-              <span className="d-flex flex-row mx-3">
-                <Link
-                  href={`/collection/material-sample/view?id=${splitChildSampleRunActionResult?.parentSampleId}`}
-                >
-                  <a>{splitChildSampleRunConfig?.configure.baseName}</a>
-                </Link>
-              </span>
-            ) : (
-              <span className="text-primary mx-3">
-                {" "}
-                {splitChildSampleRunConfig?.configure.baseName}
-              </span>
-            )}
-            {splitChildSampleRunConfig?.configure.destroyOriginal ? (
-              <>
-                <img src="/static/images/originalDestroyed.png" />
-                <span className="text-danger mx-1">
-                  {" "}
-                  <DinaMessage id="destroyedLabel" />{" "}
+
+        <DinaForm initialValues={{}}>
+          <span>
+            <h3>{formatMessage("results")}:</h3>
+            <span className="fw-bold">
+              {formatMessage("originalMaterialSampleLabel")}:
+            </span>
+            <span className="d-flex flex-row">
+              {splitChildSampleRunActionResult?.parentSampleId ? (
+                <span className="d-flex flex-row mx-3">
+                  <Link
+                    href={`/collection/material-sample/view?id=${splitChildSampleRunActionResult?.parentSampleId}`}
+                  >
+                    <a>{splitChildSampleRunConfig?.configure.baseName}</a>
+                  </Link>
                 </span>
-              </>
-            ) : (
-              <span className="text-danger">
-                {" "}
-                <DinaMessage id="parentSampleNotFoundLabel" />{" "}
-              </span>
+              ) : (
+                <span className="text-primary mx-3">
+                  {" "}
+                  {splitChildSampleRunConfig?.configure.baseName}
+                </span>
+              )}
+              {splitChildSampleRunConfig?.configure.destroyOriginal ? (
+                <>
+                  <img src="/static/images/originalDestroyed.png" />
+                  <span className="text-danger mx-1">
+                    {" "}
+                    <DinaMessage id="destroyedLabel" />{" "}
+                  </span>
+                </>
+              ) : (
+                <span className="text-danger">
+                  (
+                  <DinaMessage id="parentSampleNotFoundLabel" /> )
+                </span>
+              )}
+            </span>
+            <span className="fw-bold">
+              {formatMessage("childMaterialSamplesCreatedLabel")}:
+            </span>
+            {splitChildSampleRunActionResult?.childrenGenerated?.map(
+              (result, idx) => (
+                <span className="d-flex flex-row mx-3" key={idx}>
+                  <Link
+                    href={`/collection/material-sample/view?id=${result.id}`}
+                  >
+                    <a>{result.name}</a>
+                  </Link>
+                </span>
+              )
             )}
           </span>
-          <span className="fw-bold">
-            {formatMessage("childMaterialSamplesCreatedLabel")}:
-          </span>
-          {splitChildSampleRunActionResult?.childrenGenerated?.map(
-            (result, idx) => (
-              <span className="d-flex flex-row mx-3" key={idx}>
-                <Link href={`/collection/material-sample/view?id=${result.id}`}>
-                  <a>{result.name}</a>
-                </Link>
-              </span>
-            )
-          )}
-        </span>
+          {buttonBar}
+        </DinaForm>
       </main>
     </div>
   );
