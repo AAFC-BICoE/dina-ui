@@ -12,13 +12,14 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
+  useAccount,
   withResponse
 } from "common-ui";
-import { FormikProps } from "formik";
+import { FormikProps, Field } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useContext } from "react";
+import { useContext, useState, Dispatch, SetStateAction } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { GroupSelectField, Head, Nav } from "../../../components";
@@ -38,6 +39,8 @@ export default function MaterialSampleEditPage() {
   } = router;
   const { formatMessage } = useDinaIntl();
   const materialSampleQuery = useMaterialSampleQuery(id as any);
+  const { groupNames } = useAccount();
+  const [selectedGroup, setSelectedGroup] = useState(groupNames?.[0]);
 
   async function moveToViewPage(savedId: string) {
     await router.push(`/collection/material-sample/view?id=${savedId}`);
@@ -58,10 +61,16 @@ export default function MaterialSampleEditPage() {
             <MaterialSampleForm
               materialSample={data}
               onSaved={moveToViewPage}
+              setSelectedGroup={setSelectedGroup}
+              selectedGroup={selectedGroup}
             />
           ))
         ) : (
-          <MaterialSampleForm onSaved={moveToViewPage} />
+          <MaterialSampleForm
+            onSaved={moveToViewPage}
+            setSelectedGroup={setSelectedGroup}
+            selectedGroup={selectedGroup}
+          />
         )}
       </div>
     </div>
@@ -80,6 +89,8 @@ export interface MaterialSampleFormProps {
   materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
+  setSelectedGroup?: Dispatch<SetStateAction<string>>;
+  selectedGroup?: string;
 }
 
 export function MaterialSampleForm({
@@ -87,7 +98,9 @@ export function MaterialSampleForm({
   onSaved,
   catelogueSectionRef,
   materialSampleSaveHook,
-  materialSampleTemplateInitialValues
+  materialSampleTemplateInitialValues,
+  setSelectedGroup,
+  selectedGroup
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
   const { isTemplate } = useContext(DinaFormContext) ?? {};
@@ -164,7 +177,11 @@ export function MaterialSampleForm({
         </nav>
       </div>
       <div className="flex-grow-1 container-fluid">
-        {!isTemplate && <MaterialSampleMainInfoFormLayout />}
+        {!isTemplate && (
+          <MaterialSampleMainInfoFormLayout
+            setSelectedGroup={setSelectedGroup}
+          />
+        )}
         {!isTemplate && <MaterialSampleIdentifiersFormLayout />}
         <FieldSet legend={<DinaMessage id="components" />}>
           <div className="row">
@@ -278,6 +295,7 @@ export function MaterialSampleForm({
             >
               <PreparationsFormLayout
                 className={enablePreparations ? "" : "d-none"}
+                selectedGroup={selectedGroup}
               />
               {materialSampleAttachmentsUI}
             </DinaForm>
@@ -285,6 +303,7 @@ export function MaterialSampleForm({
             <>
               <PreparationsFormLayout
                 className={enablePreparations ? "" : "d-none"}
+                selectedGroup={selectedGroup}
               />
               {materialSampleAttachmentsUI}
             </>
@@ -308,12 +327,33 @@ export function MaterialSampleForm({
   );
 }
 
-export function MaterialSampleMainInfoFormLayout() {
+export interface MaterialSampleMainInfoFormLayoutProps {
+  setSelectedGroup?: Dispatch<SetStateAction<string>>;
+}
+
+export function MaterialSampleMainInfoFormLayout({
+  setSelectedGroup
+}: MaterialSampleMainInfoFormLayoutProps) {
+  function onGroupChanged(value, _) {
+    setSelectedGroup?.(value);
+  }
+
   return (
     <div id="material-sample-section">
       <div className="row">
         <div className="col-md-6">
-          <GroupSelectField name="group" enableStoredDefaultGroup={true} />
+          <Field name="group">
+            {({ field: { value } }) => {
+              setSelectedGroup?.(value);
+              return (
+                <GroupSelectField
+                  name="group"
+                  enableStoredDefaultGroup={true}
+                  onChange={onGroupChanged}
+                />
+              );
+            }}
+          </Field>
         </div>
       </div>
     </div>
@@ -342,10 +382,12 @@ export function MaterialSampleIdentifiersFormLayout() {
 
 export interface CatalogueInfoFormLayoutProps {
   className?: string;
+  selectedGroup?: string;
 }
 
 export function PreparationsFormLayout({
-  className
+  className,
+  selectedGroup
 }: CatalogueInfoFormLayoutProps) {
   return (
     <FieldSet
@@ -358,10 +400,13 @@ export function PreparationsFormLayout({
           <div className="preparation-type">
             <ResourceSelectField<PreparationType>
               name="preparationType"
-              filter={filterBy(["name"])}
               model="collection-api/preparation-type"
               optionLabel={it => it.name}
               readOnlyLink="/collection/preparation-type/view?id="
+              filter={input => ({
+                ...filterBy(["name"])(input),
+                ...(selectedGroup ? { group: selectedGroup } : {})
+              })}
             />
           </div>
           <DinaFormSection
