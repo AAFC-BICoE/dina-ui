@@ -280,6 +280,11 @@ function NavCollectionDropdown() {
             <DinaMessage id="workflowTemplateListTitle" />
           </a>
         </Link>
+        <Link href="/collection/material-sample/workflows/split-config">
+          <a className="dropdown-item">
+            <DinaMessage id="splitWorkflowRunConfigTitle" />
+          </a>
+        </Link>
       </div>
     </div>
   );

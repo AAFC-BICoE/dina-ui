@@ -340,6 +340,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   splitSampleConfigLegend: "Configure Action: Split",
   splitSampleChildSamplesToCreateLabel: "Child Material Samples to create",
   splitSampleTagOriginalAsDestroyed: 'Tag Original as "Destroyed"',
+  splitWorkflowRunConfigTitle: "Split Workflow Run Config",
   startEventDateTimeLabel: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   startNewRunConfigLabel: "Start a New Run ",
   stateProvinceLabel: "State/Province",

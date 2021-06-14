@@ -64,7 +64,9 @@ export default function SplitRunActionResult() {
                   <Link
                     href={`/collection/material-sample/view?id=${splitChildSampleRunActionResult?.parentSampleId}`}
                   >
-                    <a>{splitChildSampleRunConfig?.configure.baseName}</a>
+                    <a target="_blank">
+                      {splitChildSampleRunConfig?.configure.baseName}
+                    </a>
                   </Link>
                 </span>
               ) : (
@@ -97,7 +99,7 @@ export default function SplitRunActionResult() {
                   <Link
                     href={`/collection/material-sample/view?id=${result.id}`}
                   >
-                    <a>{result.name}</a>
+                    <a target="_blank">{result.name}</a>
                   </Link>
                 </span>
               )

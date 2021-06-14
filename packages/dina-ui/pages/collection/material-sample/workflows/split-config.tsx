@@ -190,7 +190,6 @@ export default function ConfigAction() {
           initialValues={{ suffixType: TYPE_NUMERIC }}
           onSubmit={onSubmit}
         >
-          {buttonBar}
           <p>
             <span className="fw-bold">{formatMessage("description")}:</span>
             {formatMessage("splitSampleDescription")}
