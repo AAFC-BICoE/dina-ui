@@ -189,7 +189,7 @@ const Home: React.FunctionComponent = () => (
           <li>
             <Link href="/collection/material-sample/workflows/split-config">
               <a>
-                <DinaMessage id="splitWorkflowRunConfigTitle" />
+                <DinaMessage id="splitWorkflowRunTitle" />
               </a>
             </Link>
           </li>
