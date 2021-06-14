@@ -68,12 +68,12 @@ export function FieldWrapper({
   const { horizontal, readOnly, isTemplate, enabledFields } =
     useDinaFormContext();
 
-  const isReadOnlyByContext = useMemo(
+  const isReadOnlyByFormTemplate = useMemo(
     () => (enabledFields ? !enabledFields.includes(name) : false),
     [enabledFields]
   );
 
-  const readOnlyField = readOnly || isReadOnlyByContext;
+  const readOnlyField = readOnly || isReadOnlyByFormTemplate;
 
   const fieldLabel = label ?? (
     <FieldHeader name={name} customName={customName} />

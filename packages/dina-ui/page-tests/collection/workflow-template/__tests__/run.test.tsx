@@ -3,7 +3,7 @@ import { CreateMaterialSampleFromWorkflowForm } from "../../../../pages/collecti
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   CollectingEvent,
-  MaterialSample
+  PreparationProcessDefinition
 } from "../../../../types/collection-api";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
 import { SRS } from "../../../../types/collection-api/resources/SRS";
@@ -11,22 +11,9 @@ import { SRS } from "../../../../types/collection-api/resources/SRS";
 function testCollectionEvent(): Partial<CollectingEvent> {
   return {
     startEventDateTime: "2021-04-13",
-    id: "1",
+    id: "555",
     type: "collecting-event",
     group: "test group"
-  };
-}
-
-function testMaterialSample(): PersistedResource<MaterialSample> {
-  return {
-    id: "1",
-    type: "material-sample",
-    group: "test group",
-    dwcCatalogNumber: "my-number",
-    collectingEvent: {
-      id: "1",
-      type: "collecting-event"
-    } as PersistedResource<CollectingEvent>
   };
 }
 
@@ -43,9 +30,18 @@ const TEST_COORDINATES: CoordinateSystem = {
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "collection-api/collecting-event":
-      return { data: [testCollectionEvent()] };
-    case "collection-api/collecting-event/1?include=collectors,attachment":
       // Populate the linker table:
+      return { data: [testCollectionEvent()] };
+    case "collection-api/collecting-event/2?include=collectors,attachment":
+      return {
+        data: {
+          startEventDateTime: "2021-04-13",
+          id: "2",
+          type: "collecting-event",
+          group: "test group"
+        }
+      };
+    case "collection-api/collecting-event/555?include=collectors,attachment":
       return { data: testCollectionEvent() };
     case "collection-api/srs":
       return { data: [TEST_SRS] };
@@ -69,10 +65,10 @@ const mockBulkGet = jest.fn<any, any>(async paths => {
 const mockSave = jest.fn<any, any>(async saves => {
   return saves.map(save => {
     if (save.type === "material-sample") {
-      return testMaterialSample();
+      return { ...save.resource, id: "1" };
     }
     if (save.type === "collecting-event") {
-      return testCollectionEvent();
+      return { ...save.resource, id: "2" };
     }
   });
 });
@@ -87,45 +83,49 @@ const apiContext = {
 
 const mockOnSaved = jest.fn();
 
-async function getWrapper() {
+async function getWrapper(
+  actionDefinition?: PersistedResource<PreparationProcessDefinition>
+) {
   const wrapper = mountWithAppContext(
     <CreateMaterialSampleFromWorkflowForm
-      actionDefinition={{
-        id: "1",
-        actionType: "ADD",
-        formTemplates: {
-          COLLECTING_EVENT: {
-            allowExisting: true,
-            allowNew: true,
-            templateFields: {
-              startEventDateTime: {
-                enabled: true,
-                defaultValue: "2019-12-21T16:00"
-              },
-              ...({
-                // On assertions only allow the lat/long fields:
-                "geoReferenceAssertions[0].dwcDecimalLatitude": {
+      actionDefinition={
+        actionDefinition ?? {
+          id: "1",
+          actionType: "ADD",
+          formTemplates: {
+            COLLECTING_EVENT: {
+              allowExisting: true,
+              allowNew: true,
+              templateFields: {
+                startEventDateTime: {
                   enabled: true,
-                  defaultValue: 1
+                  defaultValue: "2019-12-21T16:00"
                 },
-                "geoReferenceAssertions[0].dwcDecimalLongitude": {
-                  enabled: true,
-                  defaultValue: 2
-                }
-              } as any)
+                ...({
+                  // On assertions only allow the lat/long fields:
+                  "geoReferenceAssertions[0].dwcDecimalLatitude": {
+                    enabled: true,
+                    defaultValue: 1
+                  },
+                  "geoReferenceAssertions[0].dwcDecimalLongitude": {
+                    enabled: true,
+                    defaultValue: 2
+                  }
+                } as any)
+              }
+            },
+            MATERIAL_SAMPLE: {
+              allowExisting: true,
+              allowNew: true,
+              // Only show the Identifiers:
+              templateFields: {}
             }
           },
-          MATERIAL_SAMPLE: {
-            allowExisting: true,
-            allowNew: true,
-            // Only show the Identifiers:
-            templateFields: {}
-          }
-        },
-        group: "test-group",
-        name: "test-definition",
-        type: "material-sample-action-definition"
-      }}
+          group: "test-group",
+          name: "test-definition",
+          type: "material-sample-action-definition"
+        }
+      }
       onSaved={mockOnSaved}
     />,
     { apiContext }
@@ -138,6 +138,8 @@ async function getWrapper() {
 }
 
 describe("CreateMaterialSampleFromWorkflowPage", () => {
+  beforeEach(jest.clearAllMocks);
+
   it("Renders the Material Sample Form with the disabled/enabled fields and initial values", async () => {
     const wrapper = await getWrapper();
 
@@ -209,7 +211,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           {
             resource: {
               collectingEvent: {
-                id: "1",
+                id: "2",
                 type: "collecting-event"
               },
               preparationType: {
@@ -228,6 +230,82 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
       ]
     ]);
 
+    expect(mockOnSaved).lastCalledWith("1");
+  });
+
+  it("Renders the Material Sample Form with a pre-attached Collecting Event.", async () => {
+    const wrapper = await getWrapper({
+      id: "1",
+      actionType: "ADD",
+      formTemplates: {
+        COLLECTING_EVENT: {
+          allowExisting: true,
+          allowNew: true,
+          templateFields: {
+            id: {
+              defaultValue: "555",
+              enabled: true
+            }
+          }
+        },
+        MATERIAL_SAMPLE: {
+          allowExisting: true,
+          allowNew: true,
+          // Only show the Identifiers:
+          templateFields: {}
+        }
+      },
+      group: "test-group",
+      name: "test-definition",
+      type: "material-sample-action-definition"
+    });
+
+    // Identifiers fields are enabled:
+    expect(wrapper.find(".materialSampleName-field input").exists()).toEqual(
+      true
+    );
+
+    // Collecting Event field is set but the input is disabled:
+    expect(
+      wrapper.find(".startEventDateTime-field .field-view").text()
+    ).toEqual("2021-04-13");
+    expect(wrapper.find(".startEventDateTime-field input").exists()).toEqual(
+      false
+    );
+
+    wrapper
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "test-ms-name" } });
+
+    await wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Only the material sample is saved, and it's linked to the existing Collecting Event ID from the template:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              collectingEvent: {
+                id: "555",
+                type: "collecting-event"
+              },
+              materialSampleName: "test-ms-name",
+              preparationType: {
+                id: null,
+                type: "preparation-type"
+              },
+              relationships: {},
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
     expect(mockOnSaved).lastCalledWith("1");
   });
 });

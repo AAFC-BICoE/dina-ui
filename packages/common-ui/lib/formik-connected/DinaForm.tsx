@@ -7,7 +7,13 @@ import {
   FormikValues
 } from "formik";
 import { cloneDeep } from "lodash";
-import { createContext, Fragment, PropsWithChildren, useContext } from "react";
+import {
+  createContext,
+  Fragment,
+  PropsWithChildren,
+  useContext,
+  useMemo
+} from "react";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
 import { ApiClientI, useApiClient } from "../api-client/ApiClientContext";
 import { ErrorViewer } from "./ErrorViewer";
@@ -86,6 +92,12 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
       <FormWrapperInternal>{childrenProp}</FormWrapperInternal>
     );
 
+  // Clone the initialValues object so it isn't modified in the form:
+  const initialValues = useMemo(
+    () => cloneDeep(props.initialValues),
+    [props.initialValues]
+  );
+
   return (
     <DinaFormContext.Provider
       value={{
@@ -99,6 +111,7 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
         validateOnChange={false}
         validateOnBlur={false}
         {...props}
+        initialValues={initialValues}
         onSubmit={onSubmitInternal}
       >
         {childrenInternal}

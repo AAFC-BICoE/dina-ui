@@ -216,26 +216,9 @@ describe("Material Sample Edit Page", () => {
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
       [
-        // Saves the existing Collecting Event:
+        // Doesn't save the existing Collecting Event because it wasn't edited:
         [
-          {
-            resource: {
-              dwcOtherRecordNumbers: null,
-              geoReferenceAssertions: [],
-              group: "test group",
-              id: "1",
-              relationships: {},
-              startEventDateTime: "2021-04-13",
-              type: "collecting-event"
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        // New material-sample:
-        [
+          // New material-sample:
           {
             resource: {
               collectingEvent: {
@@ -285,24 +268,6 @@ describe("Material Sample Edit Page", () => {
     wrapper.update();
 
     expect(mockSave.mock.calls).toEqual([
-      [
-        // Edits existing collecting-event:
-        [
-          {
-            resource: {
-              startEventDateTime: "2021-04-13",
-              id: "1",
-              type: "collecting-event",
-              geoReferenceAssertions: [],
-              group: "test group",
-              dwcOtherRecordNumbers: null,
-              relationships: {}
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
       [
         // Edits existing material-sample:
         [

@@ -1,7 +1,7 @@
 import { AreYouSureModal, DinaForm } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { cloneDeep, isEmpty } from "lodash";
+import { cloneDeep, isEmpty, isEqual } from "lodash";
 import {
   Dispatch,
   SetStateAction,
@@ -137,7 +137,7 @@ export function useMaterialSampleSave({
   const colEventQuery = useCollectingEventQuery(colEventId);
 
   const {
-    collectingEventInitialValues,
+    collectingEventInitialValues: collectingEventHookInitialValues,
     saveCollectingEvent,
     attachedMetadatasUI: colEventAttachmentsUI,
     collectingEventFormSchema
@@ -161,6 +161,9 @@ export function useMaterialSampleSave({
     allowExistingFieldName: "attachmentsConfig.allowExisting",
     id: "material-sample-attachments-section"
   });
+
+  const collectingEventInitialValues =
+    collectingEventInitialValuesProp ?? collectingEventHookInitialValues;
 
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
@@ -236,11 +239,20 @@ export function useMaterialSampleSave({
       const submittedCollectingEvent = cloneDeep(
         (colEventFormRef as any).current.values
       );
-      // Use the same save method as the Collecting Event page:
-      const savedCollectingEvent = await saveCollectingEvent(
+
+      const collectingEventWasEdited = !isEqual(
         submittedCollectingEvent,
-        (colEventFormRef as any).current
+        collectingEventInitialValues
       );
+
+      // Only send the save request if the Collecting Event was edited:
+      const savedCollectingEvent = collectingEventWasEdited
+        ? // Use the same save method as the Collecting Event page:
+          await saveCollectingEvent(
+            submittedCollectingEvent,
+            (colEventFormRef as any).current
+          )
+        : submittedCollectingEvent;
 
       // Set the ColEventId here in case the next operation fails:
       setColEventId(savedCollectingEvent.id);
@@ -282,7 +294,7 @@ export function useMaterialSampleSave({
       initialValues={
         isTemplate
           ? colEventTemplateInitialValues
-          : collectingEventInitialValuesProp ?? collectingEventInitialValues
+          : collectingEventInitialValues
       }
       validationSchema={collectingEventFormSchema}
       isTemplate={isTemplate}
