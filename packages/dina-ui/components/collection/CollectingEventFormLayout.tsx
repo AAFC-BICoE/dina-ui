@@ -17,7 +17,7 @@ import {
 } from "common-ui";
 import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
-import { useRef, useState, ChangeEvent } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { ShouldRenderReasons } from "react-autosuggest";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -851,7 +851,6 @@ export function CollectingEventFormLayout({
                             }}
                           </Field>
                         }
-                        isTemplate={isTemplate}
                       />
                     ) : null
                   }
