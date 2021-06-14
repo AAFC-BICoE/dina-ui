@@ -282,7 +282,7 @@ function NavCollectionDropdown() {
         </Link>
         <Link href="/collection/material-sample/workflows/split-config">
           <a className="dropdown-item">
-            <DinaMessage id="splitWorkflowRunConfigTitle" />
+            <DinaMessage id="splitWorkflowRunTitle" />
           </a>
         </Link>
       </div>
