@@ -130,13 +130,13 @@ export default function SplitRunAction() {
     );
   };
 
-  const onBack = async () => {
+  const onPrevious = async () => {
     await router.push(`/collection/material-sample/workflows/split-config`);
   };
 
   const buttonBar = (
     <ButtonBar className="justify-content-center">
-      <FormikButton className="btn btn-secondary" onClick={onBack}>
+      <FormikButton className="btn btn-secondary" onClick={onPrevious}>
         <DinaMessage id="previous" />
       </FormikButton>
 

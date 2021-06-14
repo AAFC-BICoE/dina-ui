@@ -341,6 +341,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   splitSampleChildSamplesToCreateLabel: "Child Material Samples to create",
   splitSampleTagOriginalAsDestroyed: 'Tag Original as "Destroyed"',
   startEventDateTimeLabel: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
+  startNewRunConfigLabel: "Start a New Run ",
   stateProvinceLabel: "State/Province",
   switchToActionType: 'Switch to "{actionType}".',
   templateNameMandatoryErrorMsg: "Please enter a workflow template name.",
