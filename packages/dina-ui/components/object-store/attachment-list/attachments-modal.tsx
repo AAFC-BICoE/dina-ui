@@ -42,7 +42,7 @@ export function useAttachmentsModal({
   allowNewFieldName,
   allowExistingFieldName,
   id,
-  allowAttachmentsConfig
+  allowAttachmentsConfig = { allowExisting: true, allowNew: true }
 }: AttachmentsModalParams) {
   const { closeModal, openModal } = useModal();
   const { bulkGet } = useApiClient();
@@ -105,6 +105,10 @@ export function useAttachmentsModal({
     );
   }
 
+  // Whether to disable the "Add Attachments" button:
+  const addingAttachmentsDisabled =
+    !allowAttachmentsConfig?.allowExisting && !allowAttachmentsConfig?.allowNew;
+
   const attachedMetadatasUI = (
     <FieldSet
       id={id}
@@ -156,6 +160,7 @@ export function useAttachmentsModal({
               type="button"
               onClick={openAttachmentsModal}
               style={{ width: "10rem" }}
+              disabled={addingAttachmentsDisabled}
             >
               <DinaMessage id="addAttachments" />
             </button>

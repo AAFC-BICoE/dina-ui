@@ -79,12 +79,16 @@ export function AttachmentSection({
               <DinaMessage id="existingAttachments" />
             </Tab>
           )}
-          <Tab disabled={!allowAttachmentsConfig.allowNew}>
-            <DinaMessage id="uploadNewAttachments" />
-          </Tab>
-          <Tab disabled={!allowAttachmentsConfig.allowExisting}>
-            <DinaMessage id="attachExistingObjects" />
-          </Tab>
+          {allowAttachmentsConfig.allowNew && (
+            <Tab>
+              <DinaMessage id="uploadNewAttachments" />
+            </Tab>
+          )}
+          {allowAttachmentsConfig.allowExisting && (
+            <Tab>
+              <DinaMessage id="attachExistingObjects" />
+            </Tab>
+          )}
         </TabList>
         {attachmentPath && (
           <TabPanel>
@@ -95,16 +99,20 @@ export function AttachmentSection({
             />
           </TabPanel>
         )}
-        <TabPanel>
-          <AttachmentUploader
-            afterMetadatasSaved={afterMetadatasSavedInternal}
-          />
-        </TabPanel>
-        <TabPanel>
-          <ExistingObjectsAttacher
-            onMetadataIdsSubmitted={afterMetadatasSavedInternal}
-          />
-        </TabPanel>
+        {allowAttachmentsConfig.allowNew && (
+          <TabPanel>
+            <AttachmentUploader
+              afterMetadatasSaved={afterMetadatasSavedInternal}
+            />
+          </TabPanel>
+        )}
+        {allowAttachmentsConfig.allowExisting && (
+          <TabPanel>
+            <ExistingObjectsAttacher
+              onMetadataIdsSubmitted={afterMetadatasSavedInternal}
+            />
+          </TabPanel>
+        )}
       </Tabs>
     </FieldSet>
   );
