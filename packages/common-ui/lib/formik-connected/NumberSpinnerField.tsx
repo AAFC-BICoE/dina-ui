@@ -23,6 +23,18 @@ export default function NumberSpinnerField(props: NumberSpinnerFieldProps) {
   `}</style>
   );
 
+  /* Avoid entries like 'e' for valid number */
+  const onKeyDown = e => {
+    const NUMBER_ALLOWED_CHARS_REGEXP = /[0-9]+/;
+    const CTRL_ALLOWED_CHARS_REGEXP =
+      /^(Backspace|Delete|ArrowLeft|ArrowRight)$/;
+    if (
+      !NUMBER_ALLOWED_CHARS_REGEXP.test(e.key) &&
+      !CTRL_ALLOWED_CHARS_REGEXP.test(e.key)
+    ) {
+      e.preventDefault();
+    }
+  };
   return (
     <FieldWrapper {...props}>
       {({ setValue, value }) => {
@@ -48,6 +60,7 @@ export default function NumberSpinnerField(props: NumberSpinnerFieldProps) {
               max={max}
               size={size ?? 4}
               step={step ?? 1}
+              onKeyDown={onKeyDown}
               onChange={e => onChangeInternal(e.target.value)}
               value={value}
             />
