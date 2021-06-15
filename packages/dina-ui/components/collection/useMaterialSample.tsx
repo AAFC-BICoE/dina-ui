@@ -31,7 +31,7 @@ export function useMaterialSampleQuery(id?: string | null) {
   const materialSampleQuery = useQuery<MaterialSample>(
     {
       path: `collection-api/material-sample/${id}`,
-      include: "collectingEvent,attachment,preparationType"
+      include: "collectingEvent,attachment,preparationType,materialSampleType"
     },
     {
       disabled: !id,

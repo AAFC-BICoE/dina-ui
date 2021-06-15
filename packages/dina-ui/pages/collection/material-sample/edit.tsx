@@ -28,7 +28,10 @@ import {
   useMaterialSampleSave
 } from "../../../components/collection/useMaterialSample";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { MaterialSample } from "../../../types/collection-api";
+import {
+  MaterialSample,
+  MaterialSampleType
+} from "../../../types/collection-api";
 import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
 
 export default function MaterialSampleEditPage() {
@@ -314,6 +317,13 @@ export function MaterialSampleMainInfoFormLayout() {
       <div className="row">
         <div className="col-md-6">
           <GroupSelectField name="group" enableStoredDefaultGroup={true} />
+          <ResourceSelectField<MaterialSampleType>
+            name="materialSampleType"
+            filter={filterBy(["name"])}
+            model="collection-api/material-sample-type"
+            optionLabel={it => it.name}
+            readOnlyLink="/collection/material-sample-type/view?id="
+          />
         </div>
       </div>
     </div>

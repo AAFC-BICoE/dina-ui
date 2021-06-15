@@ -5,7 +5,7 @@
 
 /* Align the header titles to the left to match the cell text alignment. */
 .ReactTable .rt-thead .rt-tr {
-  text-align: left;
+  text-align: left !important;
 }
 
 /*
