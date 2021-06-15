@@ -11,11 +11,7 @@ import { MaterialSampleRunActionResult } from "../../../../../dina-ui/types/coll
 import { SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY } from "./split-run";
 import { MaterialSampleRunConfig } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import { SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY } from "./split-config";
-import {
-  ButtonBar,
-  DinaForm,
-  FormikButton
-} from "../../../../../common-ui/lib";
+import { ButtonBar, DinaForm } from "../../../../../common-ui/lib";
 import { useRouter } from "next/router";
 
 export default function SplitRunActionResult() {
@@ -31,15 +27,13 @@ export default function SplitRunActionResult() {
       SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
     );
 
-  const onStartNewRunConfig = async () => {
-    await router.push(`/collection/material-sample/workflows/split-config`);
-  };
-
   const buttonBar = (
     <ButtonBar className="justify-content-center">
-      <FormikButton className="btn btn-info" onClick={onStartNewRunConfig}>
-        <DinaMessage id="startNewRunConfigLabel" />
-      </FormikButton>
+      <Link href="/collection/material-sample/workflows/split-config">
+        <a className="btn btn-info">
+          <DinaMessage id="startNewRunConfigLabel" />
+        </a>
+      </Link>
     </ButtonBar>
   );
 

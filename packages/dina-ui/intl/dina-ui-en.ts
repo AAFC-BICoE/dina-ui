@@ -333,8 +333,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   splitSampleDescription:
     "Split a Parent Sample into one or more Child Samples",
   splitSampleActionMetadataLegend: "Action Metadata",
-  splitSampleInstructions:
-    "Letter suffix will only including A-Z or a-z ranges",
+  splitSampleInstructions: "Letter suffix allows one letter from A-Z or a-z",
   splitSampleRemarksPlaceholder:
     " Describe what you did, what was changed, or what happened as a result. (i.e. removed leg)",
   splitSampleConfigLegend: "Configure Action: Split",

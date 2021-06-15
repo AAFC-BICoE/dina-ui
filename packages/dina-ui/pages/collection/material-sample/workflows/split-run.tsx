@@ -9,6 +9,7 @@ import {
 import { ButtonBar } from "../../../../../common-ui/lib/button-bar/ButtonBar";
 import { FormikButton } from "../../../../..//common-ui/lib/formik-connected/FormikButton";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 import {
   DinaMessage,
@@ -134,16 +135,13 @@ export default function SplitRunAction() {
     );
   };
 
-  const onPrevious = async () => {
-    await router.push(`/collection/material-sample/workflows/split-config`);
-  };
-
   const buttonBar = (
     <ButtonBar className="justify-content-center">
-      <FormikButton className="btn btn-secondary" onClick={onPrevious}>
-        <DinaMessage id="previous" />
-      </FormikButton>
-
+      <Link href="/collection/material-sample/workflows/split-config">
+        <a className="btn btn-secondary">
+          <DinaMessage id="previous" />
+        </a>
+      </Link>
       <FormikButton className="btn btn-info runAction" onClick={onSubmit}>
         <DinaMessage id="next" />
       </FormikButton>
