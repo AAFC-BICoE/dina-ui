@@ -232,10 +232,6 @@ function NavSeqDBDropdown() {
 
 /** Collecting event links. */
 function NavCollectionDropdown() {
-  const { roles } = useAccount();
-
-  const isAdmin = roles.includes("admin");
-
   return (
     <div className="dropdown">
       <a className="nav-link dropdown-toggle" href="#">
@@ -249,13 +245,11 @@ function NavCollectionDropdown() {
             </a>
           </Link>
         </div>
-        {isAdmin && (
-          <Link href="/collection/collection/list">
-            <a className="dropdown-item">
-              <DinaMessage id="collectionListTitle" />
-            </a>
-          </Link>
-        )}
+        <Link href="/collection/collection/list">
+          <a className="dropdown-item">
+            <DinaMessage id="collectionListTitle" />
+          </a>
+        </Link>
         <Link href="/collection/collecting-event/list">
           <a className="dropdown-item">
             <DinaMessage id="collectingEventListTitle" />
