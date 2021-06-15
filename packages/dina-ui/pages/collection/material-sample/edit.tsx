@@ -325,12 +325,14 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   hideOtherCatalogNumbers?: boolean;
   className?: string;
   namePrefix?: string;
+  sampleNamePlaceHolder?: string;
 }
 
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleIdentifiersFormLayout({
   className,
-  namePrefix
+  namePrefix,
+  sampleNamePlaceHolder
 }: MaterialSampleIdentifiersFormLayoutProps) {
   return (
     <FieldSet
@@ -348,6 +350,7 @@ export function MaterialSampleIdentifiersFormLayout({
             }`}
             customName="materialSampleName"
             className="materialSampleName"
+            placeholder={sampleNamePlaceHolder}
           />
 
           <TextField

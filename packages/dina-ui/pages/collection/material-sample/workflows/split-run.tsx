@@ -101,6 +101,7 @@ export default function SplitRunAction() {
     };
     // submit to back end
     for (const sample of submittedValues.childSamples) {
+      let i = 0;
       delete sample.description;
       // link to parent
       if (parentSampleId) {
@@ -120,8 +121,11 @@ export default function SplitRunAction() {
       );
       sampleRunActionResults.childrenGenerated?.push({
         id: response.id,
-        name: sample.materialSampleName
+        name: sample.materialSampleName?.length
+          ? sample.materialSampleName
+          : computeDefaultSampleName(i)
       });
+      i++;
     }
     // save result to local for displaying on summary page
     setSplitChildSampleRunActionResult(sampleRunActionResults);
@@ -176,6 +180,11 @@ export default function SplitRunAction() {
     //   parentSample?.description
     // );
   };
+
+  function computeDefaultSampleName(index) {
+    return baseName + "-" + computeSuffix({ index, start, suffixType });
+  }
+
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
@@ -204,7 +213,9 @@ export default function SplitRunAction() {
                         {samples.map((sample, index) => (
                           <Tab key={index}>
                             <span className="m-3">
-                              {sample.materialSampleName}
+                              {sample.materialSampleName?.length
+                                ? sample.materialSampleName
+                                : computeDefaultSampleName(index)}
                             </span>
                           </Tab>
                         ))}
@@ -243,6 +254,9 @@ export default function SplitRunAction() {
                                 <MaterialSampleIdentifiersFormLayout
                                   namePrefix={commonRoot}
                                   className="flex-grow-1"
+                                  sampleNamePlaceHolder={computeDefaultSampleName(
+                                    index
+                                  )}
                                 />
                               </div>
                             </TabPanel>
