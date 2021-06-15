@@ -27,5 +27,6 @@ export const BASE_NAME = "ParentName";
 export const START = "001";
 export const TYPE_NUMERIC = "Numerical";
 export const TYPE_LETTER = "Letter";
+export const NUMERIC_UPPER_LIMIT = 10;
 
 export type MaterialSampleRunConfig = MaterialSampleRunConfigAttributes;

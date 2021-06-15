@@ -4,7 +4,7 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 interface NumberSpinnerFieldProps extends LabelWrapperParams {
   onChange?: (e) => void;
   min?: number;
-  max?: number;
+  max: number;
   defaultValue?: number;
   size?: number;
   step?: number;
@@ -25,11 +25,19 @@ export default function NumberSpinnerField(props: NumberSpinnerFieldProps) {
 
   return (
     <FieldWrapper {...props}>
-      {({ setValue }) => {
+      {({ setValue, value }) => {
         function onChangeInternal(newValue: string) {
-          setValue(newValue);
-          onChange?.(newValue);
+          const val = parseInt(newValue, 10);
+          // Reset to max if go above max
+          if (!isNaN(val) && val > max) {
+            setValue(max);
+            onChange?.(max);
+          } else {
+            setValue(newValue);
+            onChange?.(newValue);
+          }
         }
+
         return (
           <>
             {customStyle}
@@ -37,11 +45,11 @@ export default function NumberSpinnerField(props: NumberSpinnerFieldProps) {
               className="form-control"
               type="number"
               min={min ?? 1}
-              max={max ?? ""}
-              defaultValue={defaultValue ?? 1}
+              max={max}
               size={size ?? 4}
               step={step ?? 1}
               onChange={e => onChangeInternal(e.target.value)}
+              value={value}
             />
           </>
         );

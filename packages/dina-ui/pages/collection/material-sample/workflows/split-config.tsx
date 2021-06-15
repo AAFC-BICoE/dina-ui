@@ -15,7 +15,8 @@ import {
   BASE_NAME,
   START,
   TYPE_LETTER,
-  TYPE_NUMERIC
+  TYPE_NUMERIC,
+  NUMERIC_UPPER_LIMIT
 } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import React, { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
@@ -187,7 +188,7 @@ export default function ConfigAction() {
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
         <DinaForm
-          initialValues={{ suffixType: TYPE_NUMERIC }}
+          initialValues={{ suffixType: TYPE_NUMERIC, numOfChildToCreate }}
           onSubmit={onSubmit}
         >
           <p>
@@ -216,7 +217,7 @@ export default function ConfigAction() {
                 className="col-md-2"
                 onChange={onCreatedChildSplitSampleChange}
                 hideLabel={true}
-                defaultValue={numOfChildToCreate}
+                max={NUMERIC_UPPER_LIMIT}
               />
               <div className="col-md-4">
                 <CheckBoxWithoutWrapper
@@ -246,7 +247,9 @@ export default function ConfigAction() {
                 placeholder={isNumericalType ? "001" : "A"}
                 numberOnly={isNumericalType ?? false}
                 letterOnly={isLetterType ?? false}
-                inputProps={{ maxLength: isLetterType ? 1 : Infinity }}
+                inputProps={{
+                  maxLength: isLetterType ? 1 : NUMERIC_UPPER_LIMIT
+                }}
                 onChangeExternal={(_form, _name, value) => {
                   setStart(!value ? (isNumericalType ? "1" : "A") : value);
                 }}
