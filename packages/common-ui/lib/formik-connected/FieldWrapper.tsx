@@ -31,6 +31,14 @@ export interface LabelWrapperParams {
 
   /** Remove the label. */
   removeLabel?: boolean;
+
+  /**
+   * Custom field name for the template checkbox.
+   * e.g. passing "srcAdminLevels[0]" will change the default
+   * "templateCheckboxes['srcAdminLevels[0].name']"
+   * to "templateCheckboxes['srcAdminLevels[0]']".
+   */
+  templateCheckboxFieldName?: string;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -63,7 +71,8 @@ export function FieldWrapper({
   link,
   readOnlyRender,
   removeFormGroupClass,
-  removeLabel
+  removeLabel,
+  templateCheckboxFieldName
 }: FieldWrapperProps) {
   const { horizontal, readOnly, isTemplate, enabledFields } =
     useDinaFormContext();
@@ -91,7 +100,7 @@ export function FieldWrapper({
     <div className={`${className} ${isTemplate ? "row" : ""}`}>
       {isTemplate && (
         <CheckBoxWithoutWrapper
-          name={`templateCheckboxes['${name}']`}
+          name={`templateCheckboxes['${templateCheckboxFieldName ?? name}']`}
           className="col-sm-1 templateCheckBox"
         />
       )}
