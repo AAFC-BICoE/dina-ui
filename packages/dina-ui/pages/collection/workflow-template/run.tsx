@@ -136,7 +136,8 @@ function useWorkflowMaterialSampleInitialValues(
             actionDefinition.formTemplates.MATERIAL_SAMPLE?.templateFields
           ).map(([key, val]) => (val?.enabled ? key : null))
         ),
-        // The Identifiers fields should always be enabled:
+        // The group and Identifiers fields should always be enabled:
+        "group",
         "materialSampleName",
         "dwcCatalogNumber",
         "dwcOtherCatalogNumbers"

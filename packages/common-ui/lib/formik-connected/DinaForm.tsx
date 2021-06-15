@@ -42,7 +42,7 @@ export interface DinaFormContextI {
   isTemplate?: boolean;
 
   /** Optionally restrict the writable fields to this list. */
-  enabledFields?: string[];
+  enabledFields?: string[] | null;
 }
 
 export type DinaFormOnSubmit<TValues = any> = (

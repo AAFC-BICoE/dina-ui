@@ -915,14 +915,19 @@ export function CollectingEventFormLayout({
                   )}
                 </FastField>
               ) : (
-                <ManagedAttributesEditor
-                  valuesPath="managedAttributeValues"
-                  valueFieldName="assignedValue"
-                  managedAttributeApiPath="collection-api/managed-attribute"
-                  apiBaseUrl="/collection-api"
-                  managedAttributeComponent="COLLECTING_EVENT"
-                  managedAttributeKeyField="key"
-                />
+                <DinaFormSection
+                  // Disabled the template's restrictions for this section:
+                  enabledFields={null}
+                >
+                  <ManagedAttributesEditor
+                    valuesPath="managedAttributeValues"
+                    valueFieldName="assignedValue"
+                    managedAttributeApiPath="collection-api/managed-attribute"
+                    apiBaseUrl="/collection-api"
+                    managedAttributeComponent="COLLECTING_EVENT"
+                    managedAttributeKeyField="key"
+                  />
+                </DinaFormSection>
               )}
             </FieldSet>
           </div>
