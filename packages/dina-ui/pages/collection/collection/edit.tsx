@@ -77,7 +77,10 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
 
   const buttonBar = (
     <ButtonBar>
-      <BackButton entityId={collection?.id} entityLink="/collection" />
+      <BackButton
+        entityId={collection?.id}
+        entityLink="/collection/collection"
+      />
       <SubmitButton className="ms-auto" />
     </ButtonBar>
   );
