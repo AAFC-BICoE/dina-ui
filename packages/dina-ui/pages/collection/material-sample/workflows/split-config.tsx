@@ -112,16 +112,19 @@ export default function ConfigAction() {
   };
   const SplitChildRows = () => {
     const childRows: any = [];
+    let index = 0;
     for (let i = 0; i < numOfChildToCreate; i++) {
       const computedSuffix = computeSuffix({ index: i, start, suffixType });
-      childRows.push(
-        <SplitChildRow
-          key={i}
-          index={i}
-          baseName={baseName}
-          computedSuffix={computedSuffix}
-        />
-      );
+      if (computedSuffix) {
+        childRows.push(
+          <SplitChildRow
+            key={i}
+            index={index++}
+            baseName={baseName}
+            computedSuffix={computedSuffix}
+          />
+        );
+      }
     }
     return childRows;
   };

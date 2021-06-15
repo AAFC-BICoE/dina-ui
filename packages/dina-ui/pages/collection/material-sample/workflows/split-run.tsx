@@ -232,10 +232,13 @@ export default function SplitRunAction() {
                                   formatMessage("description")}
                                 :
                               </span>
-                              <TextField
-                                name={commonRoot + "description"}
-                                hideLabel={true}
-                              />
+                              <div className="container">
+                                <TextField
+                                  name={commonRoot + "description"}
+                                  hideLabel={true}
+                                  multiLines={true}
+                                />
+                              </div>
                               <FormikButton
                                 onClick={() =>
                                   onCopyFromParent({ index, formik: form })
