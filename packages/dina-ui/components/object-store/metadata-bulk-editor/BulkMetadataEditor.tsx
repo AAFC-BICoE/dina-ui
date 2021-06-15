@@ -405,7 +405,8 @@ export function useMetadataBuiltInAttributeColumns(): HotColumnProps[] {
         5,
         6,
         7,
-        8
+        8,
+        null
       ],
       title: formatMessage("field_orientation"),
       type: "dropdown"
