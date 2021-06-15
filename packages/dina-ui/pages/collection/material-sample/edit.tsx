@@ -405,7 +405,7 @@ export function PreparationsFormLayout({
               readOnlyLink="/collection/preparation-type/view?id="
               filter={input => ({
                 ...filterBy(["name"])(input),
-                ...(selectedGroup ? { group: selectedGroup } : {})
+                ...(selectedGroup ? { rsql: `group==${selectedGroup}` } : {})
               })}
             />
           </div>
