@@ -35,14 +35,13 @@ export function ExistingObjectsAttacher({
     fieldName: "selectedMetadatas"
   });
 
-  const submitMetadataIds: OnFormikSubmit<ExistingObjectsAttacherForm> = async ({
-    selectedMetadatas
-  }) => {
-    const metadataIds = toPairs(selectedMetadatas)
-      .filter(pair => pair[1])
-      .map(pair => pair[0]);
-    await onMetadataIdsSubmitted(metadataIds);
-  };
+  const submitMetadataIds: OnFormikSubmit<ExistingObjectsAttacherForm> =
+    async ({ selectedMetadatas }) => {
+      const metadataIds = toPairs(selectedMetadatas)
+        .filter(pair => pair[1])
+        .map(pair => pair[0]);
+      await onMetadataIdsSubmitted(metadataIds);
+    };
 
   const METADATA_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
     {

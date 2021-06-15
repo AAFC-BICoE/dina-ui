@@ -14,8 +14,19 @@ export interface MaterialSampleAttributes {
   createdOn?: string;
   createdBy?: string;
   dwcCatalogNumber?: string | null;
+  dwcOtherCatalogNumbers?: string[];
 
   managedAttributeValues?: ManagedAttributeValues;
+
+  /** Template related boolean fields for preparation and catalogued info section */
+  preparationTypeEnabled?: boolean;
+  preparedByEnabled?: boolean;
+  datePreparedEnabled?: boolean;
+
+  dwcCatalogNumberEnabled?: boolean;
+
+  materialSampleAllowNew?: boolean;
+  materialSampleAllowExisting?: boolean;
 }
 
 export interface MaterialSampleRelationships {

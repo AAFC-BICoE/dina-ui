@@ -6,6 +6,7 @@ import {
   SubmitButton
 } from "common-ui";
 import ReactTable, { Column } from "react-table";
+import { SeqdbMessage } from "../../../../../intl/seqdb-intl";
 import {
   LibraryPrep,
   LibraryPrepBatch,
@@ -22,11 +23,8 @@ export function IndexGrid(props: IndexGridProps) {
 
   const { containerType, indexSet } = libraryPrepBatch;
 
-  const {
-    libraryPrepsLoading,
-    libraryPrepsResponse,
-    onSubmit
-  } = useIndexGridControls(props);
+  const { libraryPrepsLoading, libraryPrepsResponse, onSubmit } =
+    useIndexGridControls(props);
 
   if (libraryPrepsLoading) {
     return <LoadingSpinner loading={true} />;
@@ -135,14 +133,15 @@ export function IndexGrid(props: IndexGridProps) {
         onSubmit={onSubmit}
       >
         <style>{`
-            .rt-td {
-              padding: 0 !important;
-            }
-          `}</style>
-        <div style={{ height: "50px" }}>
-          <div className="float-end">
-            <SubmitButton />
-          </div>
+          .rt-td {
+            padding: 0 !important;
+          }
+        `}</style>
+        <div className="alert alert-warning d-inline-block">
+          <SeqdbMessage id="indexGridInstructions" />
+        </div>
+        <div>
+          <SubmitButton className="mb-3" />
         </div>
         <ReactTable
           columns={columns}

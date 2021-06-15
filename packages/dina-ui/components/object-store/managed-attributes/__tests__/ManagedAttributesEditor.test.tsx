@@ -1,33 +1,46 @@
-import { DinaForm } from "common-ui";
+import { DinaForm, ResourceSelect } from "common-ui";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { ManagedAttributeValues } from "../../../../types/objectstore-api";
 import { ManagedAttributesEditor } from "../ManagedAttributesEditor";
 
+const EXAMPLE_MA_1 = {
+  id: "1",
+  key: "example_attribute_1",
+  name: "Example Attribute 1",
+  managedAttributeType: "STRING",
+  managedAttributeComponent: "COLLECTING_EVENT"
+};
+
+const EXAMPLE_MA_2 = {
+  id: "2",
+  key: "example_attribute_2",
+  name: "Example Attribute 2",
+  managedAttributeType: "STRING",
+  managedAttributeComponent: "COLLECTING_EVENT"
+};
+
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
   paths.map(path => {
-    if (path === "/managed-attribute/COLLECTING_EVENT.example_attribute_1") {
-      return {
-        id: "1",
-        key: "example_attribute_1",
-        name: "Example Attribute 1",
-        managedAttributeType: "STRING",
-        managedAttributeComponent: "COLLECTING_EVENT"
-      };
-    } else if (
-      path === "/managed-attribute/COLLECTING_EVENT.example_attribute_2"
-    ) {
-      return {
-        id: "2",
-        key: "example_attribute_2",
-        name: "Example Attribute 2",
-        managedAttributeType: "STRING",
-        managedAttributeComponent: "COLLECTING_EVENT"
-      };
+    switch (path) {
+      case "/managed-attribute/COLLECTING_EVENT.example_attribute_1":
+        return EXAMPLE_MA_1;
+      case "/managed-attribute/COLLECTING_EVENT.example_attribute_2":
+        return EXAMPLE_MA_2;
     }
   })
 );
 
+const mockGet = jest.fn<any, any>(async path => {
+  switch (path) {
+    case "collection-api/managed-attribute":
+      return { data: [] };
+  }
+});
+
 const apiContext = {
+  apiClient: {
+    get: mockGet
+  },
   bulkGet: mockBulkGet
 };
 
@@ -69,5 +82,57 @@ describe("ManagedAttributesEditor component", () => {
     expect(wrapper.find(".example_attribute_2 input").prop("value")).toEqual(
       "example-value-2"
     );
+  });
+
+  it("Lets you remove a managed attribute value by removing it from the dropdown menu.", async () => {
+    const mockSubmit = jest.fn();
+
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{ managedAttributeValues: exampleValues }}
+        onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
+      >
+        <ManagedAttributesEditor
+          valuesPath="managedAttributeValues"
+          valueFieldName="assignedValue"
+          managedAttributeApiPath="collection-api/managed-attribute"
+          apiBaseUrl="/collection-api"
+          managedAttributeComponent="COLLECTING_EVENT"
+          managedAttributeKeyField="key"
+        />
+      </DinaForm>,
+      { apiContext }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Remove attribute 2:
+    wrapper
+      .find(".editable-attribute-menu")
+      .find<any>(ResourceSelect)
+      .prop("onChange")([EXAMPLE_MA_1]);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Confirm "yes":
+    wrapper.find(".modal-body form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSubmit).lastCalledWith({
+      managedAttributeValues: {
+        example_attribute_1: {
+          assignedValue: "example-value-1"
+        }
+      }
+    });
   });
 });

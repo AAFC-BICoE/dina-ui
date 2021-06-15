@@ -55,11 +55,8 @@ export function BulkDataEditor<TRow>({
 
   // Client-side validation errors caught by the handsontable's built-in error catching.
   // These should prevent submission of the table:
-  const {
-    hasValidationErrors,
-    afterValidate,
-    validationAlertJsx
-  } = useBulkEditorFrontEndValidation();
+  const { hasValidationErrors, afterValidate, validationAlertJsx } =
+    useBulkEditorFrontEndValidation();
 
   const { tableWrapperRef } = useHeaderWidthFix({ columns });
 
@@ -170,7 +167,10 @@ export function BulkDataEditor<TRow>({
       <FormikButton
         className="btn btn-primary bulk-editor-submit-button"
         onClick={onSubmitInternal}
-        buttonProps={() => ({ disabled: hasValidationErrors })}
+        buttonProps={() => ({
+          disabled: hasValidationErrors,
+          style: { width: "10rem" }
+        })}
       >
         <CommonMessage id="submitBtnText" />
       </FormikButton>

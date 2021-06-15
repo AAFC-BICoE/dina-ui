@@ -8,6 +8,10 @@ file_server
 
 # Serve the unsupported-browser.html page when requesting from IE
 @internetexplorer  {
+	# Allow disabling the IE blocker using the  DISABLE_BROWSER_CHECK environment variable:
+	not {
+		expression {$DISABLE_BROWSER_CHECK:false}
+	}
 	header_regexp User-Agent .*(MSIE|Trident).*
 }
 rewrite @internetexplorer  /static/unsupported-browser.html

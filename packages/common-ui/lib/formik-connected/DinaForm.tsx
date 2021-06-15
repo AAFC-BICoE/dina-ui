@@ -31,6 +31,9 @@ export interface DinaFormContextI {
 
   /** The initial form values passed into Formik. */
   initialValues?: any;
+
+  /** Add a checkbox beside the wrapper field if true */
+  isTemplate?: boolean;
 }
 
 export type DinaFormOnSubmit<TValues = any> = (
@@ -85,7 +88,8 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
       value={{
         readOnly: props.readOnly ?? false,
         horizontal: props.horizontal,
-        initialValues: props.initialValues
+        initialValues: props.initialValues,
+        isTemplate: props.isTemplate
       }}
     >
       <Formik
@@ -112,7 +116,7 @@ function FormWrapper({ children }: PropsWithChildren<{}>) {
   );
 }
 
-const DinaFormContext = createContext<DinaFormContextI | null>(null);
+export const DinaFormContext = createContext<DinaFormContextI | null>(null);
 
 export function useDinaFormContext() {
   const ctx = useContext(DinaFormContext);

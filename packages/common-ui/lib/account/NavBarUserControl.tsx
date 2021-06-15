@@ -4,13 +4,8 @@ import { useAccount } from "./AccountProvider";
 
 /** Shows the logged-in user and the logout button. */
 export function NavbarUserControl() {
-  const {
-    authenticated,
-    initialized,
-    logout,
-    subject,
-    username
-  } = useAccount();
+  const { authenticated, initialized, logout, subject, username } =
+    useAccount();
 
   return (
     <div className="d-flex">

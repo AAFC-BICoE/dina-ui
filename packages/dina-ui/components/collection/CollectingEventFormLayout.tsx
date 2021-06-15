@@ -1,5 +1,6 @@
 import {
   AutoSuggestTextField,
+  CheckBoxWithoutWrapper,
   DinaFormSection,
   FieldSet,
   filterBy,
@@ -16,7 +17,7 @@ import {
 } from "common-ui";
 import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
-import { useState } from "react";
+import { useRef, useState, ChangeEvent } from "react";
 import { ShouldRenderReasons } from "react-autosuggest";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -52,6 +53,7 @@ import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimBu
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
   setDefaultVerbatimSRS?: (newValue: string | undefined | null) => void;
+  initialValuesForTemplate?: any;
 }
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
@@ -62,8 +64,9 @@ export function CollectingEventFormLayout({
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const [rangeEnabled, setRangeEnabled] = useState(false);
+  const layoutWrapperRef = useRef<HTMLDivElement>(null);
 
-  const { initialValues, readOnly } = useDinaFormContext();
+  const { initialValues, readOnly, isTemplate } = useDinaFormContext();
 
   // Open the tab with the Primary geoassertion even if it's not the first one.
   // Defaults to 0 if there's no primary assertion.
@@ -287,21 +290,51 @@ export function CollectingEventFormLayout({
     setHideCustomPlace(true);
   };
 
+  function onClickIncludeAll(
+    e: ChangeEvent<HTMLInputElement>,
+    form,
+    id: string
+  ) {
+    layoutWrapperRef.current
+      ?.querySelectorAll(`#${id} .templateCheckBox`)
+      ?.forEach(field => {
+        // tslint:disable-next-line
+        form.setFieldValue(field.attributes["name"]?.value, e.target.checked);
+      });
+  }
+
   return (
-    <div>
-      <DinaFormSection horizontal={[3, 9]}>
-        <div className="row">
-          <div className="col-md-6">
-            <GroupSelectField name="group" enableStoredDefaultGroup={true} />
+    <div ref={layoutWrapperRef}>
+      {!isTemplate && (
+        <DinaFormSection horizontal={[3, 9]}>
+          <div className="row">
+            <div className="col-md-6">
+              <GroupSelectField name="group" enableStoredDefaultGroup={true} />
+            </div>
+            <div className="col-md-6">
+              <StringArrayField name="dwcOtherRecordNumbers" />
+            </div>
           </div>
-          <div className="col-md-6">
-            <StringArrayField name="dwcOtherRecordNumbers" />
-          </div>
-        </div>
-      </DinaFormSection>
+        </DinaFormSection>
+      )}
       <div className="row">
         <div className="col-md-6">
-          <FieldSet legend={<DinaMessage id="collectingDateLegend" />}>
+          <FieldSet
+            legend={<DinaMessage id="collectingDateLegend" />}
+            id="collectingDateLegend"
+          >
+            {isTemplate && (
+              <Field name="includeAllCollectingDate">
+                {() => (
+                  <CheckBoxWithoutWrapper
+                    name="includeAllCollectingDate"
+                    parentContainerId="collectingDateLegend"
+                    onClickIncludeAll={onClickIncludeAll}
+                    includeAllLabel={formatMessage("includeAll")}
+                  />
+                )}
+              </Field>
+            )}
             <FormattedTextField
               name="startEventDateTime"
               className="startEventDateTime"
@@ -319,7 +352,10 @@ export function CollectingEventFormLayout({
                     />
                   )}
                   {!readOnly && (
-                    <label style={{ marginLeft: 15, marginTop: -15 }}>
+                    <label
+                      className="mb-3"
+                      style={{ marginLeft: 15, marginTop: -15 }}
+                    >
                       <span>{formatMessage("enableDateRangeLabel")}</span>
                       <Switch
                         onChange={newValue =>
@@ -340,7 +376,22 @@ export function CollectingEventFormLayout({
           </FieldSet>
         </div>
         <div className="col-md-6">
-          <FieldSet legend={<DinaMessage id="collectingAgentsLegend" />}>
+          <FieldSet
+            legend={<DinaMessage id="collectingAgentsLegend" />}
+            id="collectingAgentsLegend"
+          >
+            {isTemplate && (
+              <Field name="includeAllCollectingAgent">
+                {() => (
+                  <CheckBoxWithoutWrapper
+                    name="includeAllCollectingAgent"
+                    parentContainerId="collectingAgentsLegend"
+                    onClickIncludeAll={onClickIncludeAll}
+                    includeAllLabel={formatMessage("includeAll")}
+                  />
+                )}
+              </Field>
+            )}
             <AutoSuggestTextField<CollectingEvent>
               name="dwcRecordedBy"
               query={(searchValue, ctx) => ({
@@ -371,7 +422,27 @@ export function CollectingEventFormLayout({
         </div>
       </div>
       <FieldSet legend={<DinaMessage id="collectingLocationLegend" />}>
-        <FieldSet legend={<DinaMessage id="verbatimLabelLegend" />}>
+        <FieldSet
+          legend={<DinaMessage id="verbatimLabelLegend" />}
+          id="verbatimLabelLegend"
+        >
+          <div className="row">
+            <div className="col-md-6">
+              {isTemplate && (
+                <Field name="includeAllVerbatimCoordinates">
+                  {() => (
+                    <CheckBoxWithoutWrapper
+                      name="includeAllVerbatimCoordinates"
+                      parentContainerId="verbatimLabelLegend"
+                      onClickIncludeAll={onClickIncludeAll}
+                      includeAllLabel={formatMessage("includeAll")}
+                      customLayout={["col-sm-1", "col-sm-4"]}
+                    />
+                  )}
+                </Field>
+              )}
+            </div>
+          </div>
           <div className="row">
             <div className="col-md-6">
               <TextField name="dwcVerbatimLocality" />
@@ -486,7 +557,23 @@ export function CollectingEventFormLayout({
         </FieldSet>
         <div className="row">
           <div className="col-lg-6">
-            <FieldSet legend={<DinaMessage id="geoReferencingLegend" />}>
+            <FieldSet
+              legend={<DinaMessage id="geoReferencingLegend" />}
+              id="geoReferencingLegend"
+            >
+              {isTemplate && (
+                <Field name="includeAllGeoReference">
+                  {() => (
+                    <CheckBoxWithoutWrapper
+                      name="includeAllGeoReference"
+                      parentContainerId="geoReferencingLegend"
+                      onClickIncludeAll={onClickIncludeAll}
+                      includeAllLabel={formatMessage("includeAll")}
+                      customLayout={["col-sm-1", "col-sm-4"]}
+                    />
+                  )}
+                </Field>
+              )}
               <FieldArray name="geoReferenceAssertions">
                 {({ form, push, remove }) => {
                   const assertions =
@@ -494,7 +581,7 @@ export function CollectingEventFormLayout({
                     [];
 
                   function addGeoReference() {
-                    push({ isPrimary: assertions.length === 0 });
+                    push({ isPrimary: assertions?.length === 0 });
                     setActiveTabIdx(assertions.length);
                   }
 
@@ -538,7 +625,7 @@ export function CollectingEventFormLayout({
                                   assertion={assertion}
                                   viewOnly={readOnly}
                                 />
-                                {!readOnly && (
+                                {!readOnly && !isTemplate && (
                                   <div className="list-inline mb-3">
                                     <FormikButton
                                       className="list-inline-item btn btn-primary add-assertion-button"
@@ -558,7 +645,7 @@ export function CollectingEventFormLayout({
                             ))
                           : null}
                       </Tabs>
-                      {!assertions.length && !readOnly && (
+                      {!assertions.length && !readOnly && !isTemplate && (
                         <FormikButton
                           className="btn btn-primary add-assertion-button"
                           onClick={addGeoReference}
@@ -764,6 +851,7 @@ export function CollectingEventFormLayout({
                             }}
                           </Field>
                         }
+                        isTemplate={isTemplate}
                       />
                     ) : null
                   }
@@ -778,35 +866,37 @@ export function CollectingEventFormLayout({
           </div>
         </div>
       </FieldSet>
-      <div className="row">
-        <div className="col-md-6">
-          <FieldSet
-            legend={<DinaMessage id="collectingEventManagedAttributes" />}
-          >
-            {readOnly ? (
-              <FastField name="managedAttributeValues">
-                {({ field: { value } }) => (
-                  <ManagedAttributesViewer
-                    values={value}
-                    managedAttributeApiPath={key =>
-                      `collection-api/managed-attribute/collecting_event.${key}`
-                    }
-                  />
-                )}
-              </FastField>
-            ) : (
-              <ManagedAttributesEditor
-                valuesPath="managedAttributeValues"
-                valueFieldName="assignedValue"
-                managedAttributeApiPath="collection-api/managed-attribute"
-                apiBaseUrl="/collection-api"
-                managedAttributeComponent="COLLECTING_EVENT"
-                managedAttributeKeyField="key"
-              />
-            )}
-          </FieldSet>
+      {!isTemplate && (
+        <div className="row">
+          <div className="col-md-6">
+            <FieldSet
+              legend={<DinaMessage id="collectingEventManagedAttributes" />}
+            >
+              {readOnly ? (
+                <FastField name="managedAttributeValues">
+                  {({ field: { value } }) => (
+                    <ManagedAttributesViewer
+                      values={value}
+                      managedAttributeApiPath={key =>
+                        `collection-api/managed-attribute/collecting_event.${key}`
+                      }
+                    />
+                  )}
+                </FastField>
+              ) : (
+                <ManagedAttributesEditor
+                  valuesPath="managedAttributeValues"
+                  valueFieldName="assignedValue"
+                  managedAttributeApiPath="collection-api/managed-attribute"
+                  apiBaseUrl="/collection-api"
+                  managedAttributeComponent="COLLECTING_EVENT"
+                  managedAttributeKeyField="key"
+                />
+              )}
+            </FieldSet>
+          </div>
         </div>
-      </div>
+      )}
       {readOnly && (
         <div className="mb-3">
           <Field name="id">

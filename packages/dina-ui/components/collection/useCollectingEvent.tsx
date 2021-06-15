@@ -1,16 +1,16 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useApiClient, useQuery } from "common-ui";
 import { FormikContextType } from "formik";
-import { InputResource, PersistedResource } from "kitsu";
+import { PersistedResource } from "kitsu";
 import { orderBy } from "lodash";
+import { object, SchemaOf, string } from "yup";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/collection-api";
 import { CoordinateSystemEnum } from "../../types/collection-api/resources/CoordinateSystem";
+import { SourceAdministrativeLevel } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { SRSEnum } from "../../types/collection-api/resources/SRS";
 import { Metadata, Person } from "../../types/objectstore-api";
 import { useAttachmentsModal } from "../object-store";
-import { SourceAdministrativeLevel } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
-import { object, string, SchemaOf } from "yup";
 
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
@@ -108,7 +108,8 @@ export function useCollectingEventQuery(id?: string | null) {
 
 /** CollectingEvent save method to be re-used by CollectingEvent and MaterialSample forms. */
 export function useCollectingEventSave(
-  fetchedCollectingEvent?: PersistedResource<CollectingEvent>
+  fetchedCollectingEvent?: PersistedResource<CollectingEvent>,
+  isTemplate?: boolean
 ) {
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
@@ -175,7 +176,10 @@ export function useCollectingEventSave(
     initialMetadatas:
       fetchedCollectingEvent?.attachment as PersistedResource<Metadata>[],
     deps: [fetchedCollectingEvent?.id],
-    title: <DinaMessage id="collectingEventAttachments" />
+    title: <DinaMessage id="collectingEventAttachments" />,
+    isTemplate,
+    allowNewFieldName: "attachmentsConfig.allowNew",
+    allowExistingFieldName: "attachmentsConfig.allowExisting"
   });
 
   async function saveCollectingEvent(
