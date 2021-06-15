@@ -623,7 +623,6 @@ export function CollectingEventFormLayout({
                                   index={index}
                                   openAddPersonModal={openAddPersonModal}
                                   assertion={assertion}
-                                  viewOnly={readOnly}
                                 />
                                 {!readOnly && !isTemplate && (
                                   <div className="list-inline mb-3">

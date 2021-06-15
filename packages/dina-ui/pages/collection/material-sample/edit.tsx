@@ -18,7 +18,7 @@ import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useContext } from "react";
+import { ReactNode, useContext } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { GroupSelectField, Head, Nav } from "../../../components";
@@ -94,6 +94,8 @@ export interface MaterialSampleFormProps {
     materialSample: AllowAttachmentsConfig;
     collectingEvent: AllowAttachmentsConfig;
   };
+
+  buttonBar?: ReactNode;
 }
 
 export function MaterialSampleForm({
@@ -104,7 +106,16 @@ export function MaterialSampleForm({
   materialSampleSaveHook,
   materialSampleTemplateInitialValues,
   enabledFields,
-  attachmentsConfig
+  attachmentsConfig,
+  buttonBar = (
+    <ButtonBar>
+      <BackButton
+        entityId={materialSample?.id}
+        entityLink="/collection/material-sample"
+      />
+      <SubmitButton className="ms-auto" />
+    </ButtonBar>
+  )
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
   const { isTemplate } = useContext(DinaFormContext) ?? {};
@@ -133,16 +144,6 @@ export function MaterialSampleForm({
       isTemplate,
       collectingEventFormEnabledFields: enabledFields?.collectingEvent
     });
-
-  const buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={materialSample?.id}
-        entityLink="/collection/material-sample"
-      />
-      <SubmitButton className="ms-auto" />
-    </ButtonBar>
-  );
 
   const mateirialSampleInternal = (
     <div className="d-flex">

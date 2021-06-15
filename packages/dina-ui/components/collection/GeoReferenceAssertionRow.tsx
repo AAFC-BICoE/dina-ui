@@ -24,14 +24,12 @@ import {
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
-  viewOnly?: boolean;
   assertion: GeoReferenceAssertion;
   openAddPersonModal?: () => Promise<PersistedResource<Person> | undefined>;
 }
 
 export function GeoReferenceAssertionRow({
   index,
-  viewOnly,
   assertion,
   openAddPersonModal
 }: GeoReferenceAssertionRowProps) {
@@ -43,7 +41,7 @@ export function GeoReferenceAssertionRow({
 
   const reservedAssertion = useRef(assertion);
 
-  const { isTemplate } = useDinaFormContext();
+  const { isTemplate, readOnly } = useDinaFormContext();
 
   const assertionsPath = "geoReferenceAssertions";
   const assertionPath = `${assertionsPath}[${index}]`;
@@ -136,10 +134,10 @@ export function GeoReferenceAssertionRow({
   return (
     <div>
       <DinaFormSection horizontal={true}>
-        {viewOnly && (
+        {readOnly && (
           <ViewInMapButton assertionPath={`geoReferenceAssertions.${index}`} />
         )}
-        {!viewOnly && !isTemplate && (
+        {!readOnly && !isTemplate && (
           <div className="mb-3">
             <FormikButton
               className="btn btn-primary primary-assertion-button"
@@ -165,11 +163,10 @@ export function GeoReferenceAssertionRow({
             <CheckBoxField
               name={commonRoot + "dwcGeoreferenceVerificationStatus"}
               onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
-              disabled={viewOnly}
+              disabled={readOnly}
               customName="dwcGeoreferenceVerificationStatus"
-              type={viewOnly && !georeferenceDisabled ? "hidden" : "checkbox"}
-              hideLabel={viewOnly && !georeferenceDisabled ? true : false}
-              className={"hidden"}
+              type={readOnly && !georeferenceDisabled ? "hidden" : "checkbox"}
+              hideLabel={readOnly && !georeferenceDisabled ? true : false}
             />
           )}
         </Field>

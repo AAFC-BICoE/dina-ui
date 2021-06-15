@@ -1,4 +1,10 @@
-import { useQuery, withResponse } from "common-ui";
+import {
+  BackButton,
+  ButtonBar,
+  SubmitButton,
+  useQuery,
+  withResponse
+} from "common-ui";
 import { InputResource, KitsuResource, PersistedResource } from "kitsu";
 import { compact, set, toPairs, pick } from "lodash";
 import { useRouter } from "next/router";
@@ -69,6 +75,12 @@ export function CreateMaterialSampleFromWorkflowForm({
 
   return (
     <MaterialSampleForm
+      buttonBar={
+        <ButtonBar>
+          <BackButton entityLink="/collection/workflow-template" />
+          <SubmitButton className="ms-auto" />
+        </ButtonBar>
+      }
       materialSample={materialSampleInitialValues}
       collectingEventInitialValues={collectingEventInitialValues}
       onSaved={onSaved}
