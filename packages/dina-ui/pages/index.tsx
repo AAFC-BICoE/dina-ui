@@ -193,6 +193,13 @@ const Home: React.FunctionComponent = () => (
               </a>
             </Link>
           </li>
+          <li>
+            <Link href="/collection/material-sample/workflows/split-config">
+              <a>
+                <DinaMessage id="splitWorkflowRunTitle" />
+              </a>
+            </Link>
+          </li>
         </ul>
       </div>
     </main>

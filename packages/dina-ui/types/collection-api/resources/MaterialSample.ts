@@ -27,12 +27,15 @@ export interface MaterialSampleAttributes {
 
   materialSampleAllowNew?: boolean;
   materialSampleAllowExisting?: boolean;
+
+  description?: string;
 }
 
 export interface MaterialSampleRelationships {
   collectingEvent?: CollectingEvent;
   attachment?: ResourceIdentifierObject[];
   preparationType?: PreparationType;
+  parentMaterialSample?: MaterialSample;
 }
 
 export type MaterialSample = KitsuResource &

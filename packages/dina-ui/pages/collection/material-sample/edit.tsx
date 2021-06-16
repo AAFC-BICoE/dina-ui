@@ -330,20 +330,56 @@ export function MaterialSampleMainInfoFormLayout() {
   );
 }
 
+export interface MaterialSampleIdentifiersFormLayoutProps {
+  hideSampleName?: boolean;
+  hideOtherCatalogNumbers?: boolean;
+  className?: string;
+  namePrefix?: string;
+  sampleNamePlaceHolder?: string;
+}
+
 /** Fields layout re-useable between view and edit pages. */
-export function MaterialSampleIdentifiersFormLayout() {
+export function MaterialSampleIdentifiersFormLayout({
+  className,
+  namePrefix,
+  sampleNamePlaceHolder
+}: MaterialSampleIdentifiersFormLayoutProps) {
   return (
     <FieldSet
       id="identifiers-section"
       legend={<DinaMessage id="identifiers" />}
+      className={className}
     >
       <div className="row">
         <div className="col-md-6">
-          <TextField name="materialSampleName" />
-          <TextField name="dwcCatalogNumber" />
+          <TextField
+            name={`${
+              namePrefix
+                ? namePrefix + "materialSampleName"
+                : "materialSampleName"
+            }`}
+            customName="materialSampleName"
+            className="materialSampleName"
+            placeholder={sampleNamePlaceHolder}
+          />
+
+          <TextField
+            name={`${
+              namePrefix ? namePrefix + "dwcCatalogNumber" : "dwcCatalogNumber"
+            }`}
+            customName="dwcCatalogNumber"
+            className="dwcCatalogNumber"
+          />
         </div>
         <div className="col-md-6">
-          <StringArrayField name="dwcOtherCatalogNumbers" />
+          <StringArrayField
+            name={`${
+              namePrefix
+                ? namePrefix + "dwcOtherCatalogNumbers"
+                : "dwcOtherCatalogNumbers"
+            }`}
+            customName="dwcOtherCatalogNumbers"
+          />
         </div>
       </div>
     </FieldSet>
@@ -352,10 +388,12 @@ export function MaterialSampleIdentifiersFormLayout() {
 
 export interface CatalogueInfoFormLayoutProps {
   className?: string;
+  namePrefix?: string;
 }
 
 export function PreparationsFormLayout({
-  className
+  className,
+  namePrefix
 }: CatalogueInfoFormLayoutProps) {
   return (
     <FieldSet
@@ -367,18 +405,29 @@ export function PreparationsFormLayout({
         <div className="col-md-6">
           <div className="preparation-type">
             <ResourceSelectField<PreparationType>
-              name="preparationType"
+              name={`${
+                namePrefix ? namePrefix + "preparationType" : "preparationType"
+              }`}
               filter={filterBy(["name"])}
               model="collection-api/preparation-type"
               optionLabel={it => it.name}
               readOnlyLink="/collection/preparation-type/view?id="
+              customName="preparationType"
             />
           </div>
           <DinaFormSection
             readOnly={true} // Disabled until back-end supports these fields.
           >
-            <TextField name="preparedBy" />
-            <DateField name="datePrepared" />
+            <TextField
+              name={`${namePrefix ? namePrefix + "preparedBy" : "preparedBy"}`}
+              customName="preparedBy"
+            />
+            <DateField
+              name={`${
+                namePrefix ? namePrefix + "datePrepared" : "datePrepared"
+              }`}
+              customName="datePrepared"
+            />
           </DinaFormSection>
         </div>
       </div>
