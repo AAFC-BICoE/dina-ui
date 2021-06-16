@@ -202,7 +202,7 @@ export function useCollectingEventSave({
       submittedValues.relationships.collectors = {
         data: submittedValues.collectors.map(collector => ({
           id: collector.id,
-          type: "agent"
+          type: "person"
         }))
       };
     }

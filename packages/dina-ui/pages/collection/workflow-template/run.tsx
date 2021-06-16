@@ -6,7 +6,7 @@ import {
   withResponse
 } from "common-ui";
 import { InputResource, KitsuResource, PersistedResource } from "kitsu";
-import { compact, set, toPairs, pick } from "lodash";
+import { compact, isNil, set, toPairs, pick } from "lodash";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
 import { Head, Nav } from "../../../components";
@@ -164,7 +164,7 @@ function getInitialValuesFromTemplateFields<TResource extends KitsuResource>(
 ): InputResource<TResource> {
   const initialValues = { type } as InputResource<TResource>;
   for (const [key, val] of toPairs(templateFields)) {
-    if (val?.enabled && val.defaultValue !== undefined) {
+    if (val?.enabled && !isNil(val.defaultValue)) {
       set(initialValues, key, val.defaultValue);
     }
   }

@@ -31,10 +31,18 @@ export function useMaterialSampleQuery(id?: string | null) {
   const materialSampleQuery = useQuery<MaterialSample>(
     {
       path: `collection-api/material-sample/${id}`,
-      include: "collectingEvent,attachment,preparationType"
+      include: "collectingEvent,attachment,preparationType,preparedBy"
     },
     {
       disabled: !id,
+      joinSpecs: [
+        {
+          apiBaseUrl: "/agent-api",
+          idField: "preparedBy",
+          joinField: "preparedBy",
+          path: (ms: MaterialSample) => `person/${ms.preparedBy?.id}`
+        }
+      ],
       onSuccess: async ({ data }) => {
         if (data.attachment) {
           try {
@@ -104,10 +112,10 @@ export function useMaterialSampleSave({
       colEventTemplateInitialValues?.id);
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
-    !!(
+    Boolean(
       hasColEventTemplate ||
-      !!materialSample?.collectingEvent ||
-      collectingEventInitialValuesProp
+        materialSample?.collectingEvent ||
+        collectingEventFormEnabledFields?.length
     )
   );
 
@@ -115,7 +123,12 @@ export function useMaterialSampleSave({
     isTemplate &&
     !isEmpty(materialSampleTemplateInitialValues?.templateCheckboxes);
   const [enablePreparations, setEnablePreparations] = useState(
-    hasPreparationsTemplate || !!materialSample?.preparationType
+    Boolean(
+      hasPreparationsTemplate ||
+        materialSample?.preparationType ||
+        materialSample?.preparationDate ||
+        materialSample?.preparedBy
+    )
   );
 
   const initialValues: InputResource<MaterialSample> = materialSample
@@ -211,12 +224,14 @@ export function useMaterialSampleSave({
     /** Input to submit to the back-end API. */
     const { ...materialSampleInput } = submittedValues;
 
-    // Only persist the preparation type if the preparations toggle is enabled:
+    // Only persist the preparation fields if the preparations toggle is enabled:
     if (!enablePreparations) {
       materialSampleInput.preparationType = {
         id: null,
         type: "preparation-type"
       };
+      materialSampleInput.preparationDate = null;
+      materialSampleInput.preparedBy = { id: null };
     }
 
     if (!enableCollectingEvent) {

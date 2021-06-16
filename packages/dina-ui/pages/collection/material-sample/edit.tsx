@@ -29,6 +29,7 @@ import {
 } from "../../../components/collection/useMaterialSample";
 import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { Person } from "../../../types/agent-api";
 import { CollectingEvent, MaterialSample } from "../../../types/collection-api";
 import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
 
@@ -387,11 +388,14 @@ export function PreparationsFormLayout({
               readOnlyLink="/collection/preparation-type/view?id="
             />
           </div>
-          <DinaFormSection
-            readOnly={true} // Disabled until back-end supports these fields.
-          >
-            <TextField name="preparedBy" />
-            <DateField name="datePrepared" />
+          <DinaFormSection>
+            <ResourceSelectField<Person>
+              name="preparedBy"
+              filter={filterBy(["displayName"])}
+              model="agent-api/person"
+              optionLabel={person => person.displayName}
+            />
+            <DateField name="preparationDate" />
           </DinaFormSection>
         </div>
       </div>
