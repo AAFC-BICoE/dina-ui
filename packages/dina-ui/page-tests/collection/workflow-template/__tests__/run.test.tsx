@@ -1,4 +1,5 @@
 import { PersistedResource } from "kitsu";
+import ReactSwitch from "react-switch";
 import { CreateMaterialSampleFromWorkflowForm } from "../../../../pages/collection/workflow-template/run";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
@@ -214,10 +215,17 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 id: "2",
                 type: "collecting-event"
               },
+
+              // Preparations are not enabled, so the preparation fields are set to null:
+              preparationDate: null,
               preparationType: {
                 id: null,
                 type: "preparation-type"
               },
+              preparedBy: {
+                id: null
+              },
+
               relationships: {},
               type: "material-sample"
             },
@@ -293,10 +301,17 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 type: "collecting-event"
               },
               materialSampleName: "test-ms-name",
+
+              // Preparations are not enabled, so the preparation fields are set to null:
+              preparationDate: null,
               preparationType: {
                 id: null,
                 type: "preparation-type"
               },
+              preparedBy: {
+                id: null
+              },
+
               relationships: {},
               type: "material-sample"
             },
@@ -307,5 +322,98 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
       ]
     ]);
     expect(mockOnSaved).lastCalledWith("1");
+  });
+
+  it("Renders the Material Sample form with no template fields enabled.", async () => {
+    const wrapper = await getWrapper({
+      id: "1",
+      actionType: "ADD",
+      formTemplates: {},
+      group: "test-group",
+      name: "test-definition",
+      type: "material-sample-action-definition"
+    });
+
+    // Both should be disabled:
+    expect(
+      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+
+    wrapper
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "test-ms-name" } });
+
+    // Submit with only the name set:
+    await wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Only the material sample is saved, and it's linked to the existing Collecting Event ID from the template:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              collectingEvent: {
+                id: null,
+                type: "collecting-event"
+              },
+              materialSampleName: "test-ms-name",
+
+              // Preparations are not enabled, so the preparation fields are set to null:
+              preparationDate: null,
+              preparationType: {
+                id: null,
+                type: "preparation-type"
+              },
+              preparedBy: {
+                id: null
+              },
+
+              relationships: {},
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
+  });
+
+  it("Renders the Material Sample form with only Preparation fields enabled.", async () => {
+    const wrapper = await getWrapper({
+      id: "1",
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowExisting: true,
+          allowNew: true,
+          templateFields: {
+            preparedBy: {
+              defaultValue: null,
+              enabled: true
+            }
+          }
+        }
+      },
+      group: "test-group",
+      name: "test-definition",
+      type: "material-sample-action-definition"
+    });
+
+    // Only the Preparation section should be disabled:
+    expect(
+      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
   });
 });

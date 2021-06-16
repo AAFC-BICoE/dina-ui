@@ -1,4 +1,5 @@
 import { PersistedResource } from "kitsu";
+import Switch from "react-switch";
 import { MaterialSampleForm } from "../../../../pages/collection/material-sample/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
@@ -7,7 +8,6 @@ import {
 } from "../../../../types/collection-api";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
 import { SRS } from "../../../../types/collection-api/resources/SRS";
-import Switch from "react-switch";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -279,7 +279,17 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "edited-catalog-number",
               collectingEvent: { id: "1", type: "collecting-event" },
-              preparationType: { id: null, type: "preparation-type" },
+
+              // Preparations are not enabled, so the preparation fields are set to null:
+              preparationDate: null,
+              preparationType: {
+                id: null,
+                type: "preparation-type"
+              },
+              preparedBy: {
+                id: null
+              },
+
               relationships: {}
             },
             type: "material-sample"
@@ -364,7 +374,17 @@ describe("Material Sample Edit Page", () => {
               group: "test group",
               id: "1",
               type: "material-sample",
-              preparationType: { id: null, type: "preparation-type" },
+
+              // Preparations are not enabled, so the preparation fields are set to null:
+              preparationDate: null,
+              preparationType: {
+                id: null,
+                type: "preparation-type"
+              },
+              preparedBy: {
+                id: null
+              },
+
               relationships: {}
             },
             type: "material-sample"

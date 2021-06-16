@@ -329,8 +329,8 @@ describe("collecting-event edit page", () => {
               },
               collectors: {
                 data: [
-                  { id: "111", type: "agent" },
-                  { id: "222", type: "agent" }
+                  { id: "111", type: "person" },
+                  { id: "222", type: "person" }
                 ]
               }
             },
