@@ -31,6 +31,18 @@ export interface LabelWrapperParams {
 
   /** Remove the label. */
   removeLabel?: boolean;
+
+  /** Add an image inside of the tooltip. Provide the URL of the image to display it. */
+  tooltipImage?: string;
+
+  /** Accessability text, only used if a tooltip image is provided. */
+  tooltipImageAlt?: string;
+
+  /** Add a link to a tooltip. */
+  tooltipLink?: string;
+
+  /** The text that appears for the link. */
+  tooltipLinkText?: string;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -63,12 +75,23 @@ export function FieldWrapper({
   link,
   readOnlyRender,
   removeFormGroupClass,
-  removeLabel
+  removeLabel,
+  tooltipImage,
+  tooltipImageAlt,
+  tooltipLink,
+  tooltipLinkText
 }: FieldWrapperProps) {
   const { horizontal, readOnly, isTemplate } = useDinaFormContext();
 
   const fieldLabel = label ?? (
-    <FieldHeader name={name} customName={customName} />
+    <FieldHeader
+      name={name}
+      customName={customName}
+      tooltipImage={tooltipImage}
+      tooltipImageAlt={tooltipImageAlt}
+      tooltipLink={tooltipLink}
+      tooltipLinkText={tooltipLinkText}
+    />
   );
 
   const [labelCol, valueCol] = isTemplate

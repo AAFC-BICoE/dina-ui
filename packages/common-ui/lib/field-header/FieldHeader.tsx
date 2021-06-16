@@ -16,18 +16,35 @@ export interface FieldNameProps {
 
   /** Optional link. */
   tooltipLink?: string,
+
+  /** Optional link text, should be used when adding a link. */
+  tooltipLinkText?: string
 }
 
 /** Get the field label and tooltip given the camelCase field key. */
 export function useFieldLabels() {
   const { formatMessage, messages } = useIntl();
 
-  function getFieldLabel(name: string, tooltipImage?: string, tooltipImageAlt?: string, tooltipLink?: string) {
+  function getFieldLabel(
+    name: string,
+    tooltipImage?: string,
+    tooltipImageAlt?: string,
+    tooltipLink?: string,
+    tooltipLinkText?: string
+  ) {
+
     const messageKey = `field_${name}`;
     const tooltipKey = `${messageKey}_tooltip`;
+
     const tooltip =
       messages[tooltipKey] || tooltipImage || tooltipLink ? (
-        <Tooltip id={tooltipKey} image={tooltipImage} altImage={tooltipImageAlt} link={tooltipLink} />
+        <Tooltip
+          id={messages[tooltipKey] ? tooltipKey : undefined}
+          image={tooltipImage}
+          altImage={tooltipImageAlt}
+          link={tooltipLink}
+          linkText={tooltipLinkText}
+        />
       ) : null;
 
     const fieldLabel = messages[messageKey]
@@ -45,9 +62,22 @@ export function useFieldLabels() {
  * The tooltip is found from the intl messages file using the key "field_{fieldName}_tooltip".
  * e.g. field_acMetadataCreator.displayName_tooltip
  */
-export function FieldHeader({ name, customName, tooltipImage, tooltipImageAlt, tooltipLink }: FieldNameProps) {
+export function FieldHeader({
+  name,
+  customName,
+  tooltipImage,
+  tooltipImageAlt,
+  tooltipLink,
+  tooltipLinkText
+}: FieldNameProps) {
   const { getFieldLabel } = useFieldLabels();
-  const { fieldLabel, tooltip } = getFieldLabel((customName ?? name), tooltipImage, tooltipImageAlt, tooltipLink);
+  const { fieldLabel, tooltip } = getFieldLabel(
+    customName ?? name,
+    tooltipImage,
+    tooltipImageAlt,
+    tooltipLink,
+    tooltipLinkText
+  );
 
   return (
     <div className={`${customName ?? name}-field-header`}>

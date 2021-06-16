@@ -18,6 +18,9 @@ interface TooltipProps {
   /** Link attachment, links will always be opened in a new tab. */
   link?: string,
 
+  /** The text that appears for the link. */
+  linkText?: string,
+
   /** Image attachment, will display it under the tooltip message. */
   image?: string,
 
@@ -25,8 +28,17 @@ interface TooltipProps {
   altImage?: string;
 }
 
-export function Tooltip({ id, intlValues, visibleElement, link, image, altImage }: TooltipProps) {
+export function Tooltip({
+  id,
+  intlValues,
+  visibleElement,
+  link,
+  linkText,
+  image,
+  altImage
+}: TooltipProps) {
 
+  // Variables to hold the different sections of the tooltip.
   let tooltipMessage;
   let tooltipImage;
   let tooltipLink;
@@ -38,16 +50,23 @@ export function Tooltip({ id, intlValues, visibleElement, link, image, altImage 
 
   // Determine if an image should be displayed.
   if (image != null) {
-    tooltipImage = (
-      <div>
-        <img src={image} alt={altImage} />
-      </div>
-    );
+    tooltipImage = <img src={image} alt={altImage} width="100%" />;
   }
 
   // Determine if a link should be displayed.
   if (link != null) {
-    tooltipLink = <a href={link} target="_blank"></a>;
+    if (linkText == null) {
+      linkText = "tooltipDefaultLinkMessage";
+    }
+
+    // Generate the link html.
+    tooltipLink = (
+      <div>
+        <a href={link} target="_blank" style={{"color": "white"}}>
+          <FormattedMessage id={linkText}/>
+        </a>
+      </div>
+    );
   }
 
   return (
@@ -55,7 +74,6 @@ export function Tooltip({ id, intlValues, visibleElement, link, image, altImage 
       <RcTooltip
         id={id}
         overlay={
-          
           <div style={{ maxWidth: "15rem", whiteSpace: "pre-wrap" }}>
             {tooltipMessage}
             {tooltipImage}

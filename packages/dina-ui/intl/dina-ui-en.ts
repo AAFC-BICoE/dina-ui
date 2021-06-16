@@ -332,6 +332,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   thumbnail: "Thumbnail",
   thumbnailNotAvailableText: "No thumbnail available",
   to: "To",
+  tooltipDefaultLinkMessage: "Click here to learn more.",
   toponymyLegend: "Current Geographic Place",
   uploadButtonText: "Upload",
   uploadFilesMaxSize: "The maximum file size is {maxSize}.",
