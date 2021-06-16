@@ -77,11 +77,6 @@ export default function SplitRunActionResult() {
                     <DinaMessage id="destroyedLabel" />{" "}
                   </span>
                 </>
-              ) : !splitChildSampleRunActionResult?.parentSampleId ? (
-                <span className="text-danger">
-                  (
-                  <DinaMessage id="parentSampleNotFoundLabel" /> )
-                </span>
               ) : null}
             </span>
             <span className="fw-bold">
