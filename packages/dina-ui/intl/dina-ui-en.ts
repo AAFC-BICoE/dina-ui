@@ -334,8 +334,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   splitSampleDescription:
     "Split a Parent Sample into one or more Child Samples",
   splitSampleActionMetadataLegend: "Action Metadata",
-  splitSampleInstructions:
-    "Max number of child samples to create is 20, \nletter suffix start accepts one character: A-Z or a-z",
+  splitSampleInstructions: "Max number of child samples to create is 30",
   splitSampleRemarksPlaceholder:
     " Describe what you did, what was changed, or what happened as a result. (i.e. removed leg)",
   splitSampleConfigLegend: "Configure Action: Split",

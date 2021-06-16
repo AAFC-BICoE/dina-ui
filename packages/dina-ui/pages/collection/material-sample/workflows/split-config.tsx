@@ -22,6 +22,7 @@ import React, { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
 import { Head } from "../../../../../dina-ui/components/head";
+import SpreadSheetColumn from "spreadsheet-column";
 
 interface SplitChildRowProps {
   index: number;
@@ -250,9 +251,6 @@ export default function ConfigAction() {
                 placeholder={isNumericalType ? "001" : "A"}
                 numberOnly={isNumericalType ?? false}
                 letterOnly={isLetterType ?? false}
-                inputProps={{
-                  maxLength: isLetterType ? 1 : NUMERIC_UPPER_LIMIT
-                }}
                 onChangeExternal={(_form, _name, value) => {
                   setStart(!value ? (isNumericalType ? "1" : "A") : value);
                 }}
@@ -290,21 +288,8 @@ export const computeSuffix = ({
     if (!myStart || myStart.length === 0 || !isNaN(parseInt(myStart, 10))) {
       myStart = "A";
     }
-    const myStartCharCode = myStart.charCodeAt(0);
-    const charCode = myStartCharCode + index;
-    // Only if the char is a letter, split child row will be added
-    if (charCode >= 65 && charCode <= 90) {
-      computedSuffix = String.fromCharCode(charCode);
-    } else if (charCode > 90 && charCode < 97) {
-      // when there are disconnected letter suffix
-      if (97 + charCode - 90 <= 122)
-        computedSuffix = String.fromCharCode(97 + charCode - 90 - 1);
-    } else if (charCode >= 97 && charCode <= 122) {
-      // when there are disconnected letter suffix
-      if (myStartCharCode >= 65 && myStartCharCode <= 90)
-        computedSuffix = String.fromCharCode(103 + charCode - 97);
-      else computedSuffix = String.fromCharCode(charCode);
-    }
+    const sc = new SpreadSheetColumn();
+    computedSuffix = sc.fromInt(index + sc.fromStr(myStart));
   }
   return computedSuffix;
 };
