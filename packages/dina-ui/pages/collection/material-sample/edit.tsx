@@ -39,8 +39,6 @@ export default function MaterialSampleEditPage() {
   } = router;
   const { formatMessage } = useDinaIntl();
   const materialSampleQuery = useMaterialSampleQuery(id as any);
-  const { groupNames } = useAccount();
-  const [selectedGroup, setSelectedGroup] = useState(groupNames?.[0]);
 
   async function moveToViewPage(savedId: string) {
     await router.push(`/collection/material-sample/view?id=${savedId}`);
@@ -61,16 +59,10 @@ export default function MaterialSampleEditPage() {
             <MaterialSampleForm
               materialSample={data}
               onSaved={moveToViewPage}
-              setSelectedGroup={setSelectedGroup}
-              selectedGroup={selectedGroup}
             />
           ))
         ) : (
-          <MaterialSampleForm
-            onSaved={moveToViewPage}
-            setSelectedGroup={setSelectedGroup}
-            selectedGroup={selectedGroup}
-          />
+          <MaterialSampleForm onSaved={moveToViewPage} />
         )}
       </div>
     </div>
@@ -89,8 +81,6 @@ export interface MaterialSampleFormProps {
   materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
-  setSelectedGroup?: Dispatch<SetStateAction<string>>;
-  selectedGroup?: string;
 }
 
 export function MaterialSampleForm({
@@ -98,9 +88,7 @@ export function MaterialSampleForm({
   onSaved,
   catelogueSectionRef,
   materialSampleSaveHook,
-  materialSampleTemplateInitialValues,
-  setSelectedGroup,
-  selectedGroup
+  materialSampleTemplateInitialValues
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
   const { isTemplate } = useContext(DinaFormContext) ?? {};
@@ -126,6 +114,7 @@ export function MaterialSampleForm({
       isTemplate
     });
 
+  const [selectedGroup, setSelectedGroup] = useState(initialValues.group);
   const buttonBar = (
     <ButtonBar>
       <BackButton
