@@ -104,8 +104,8 @@ export default function SplitRunAction() {
       childrenGenerated: []
     };
     // submit to back end
-    for (const sample of submittedValues.childSamples) {
-      let i = 0;
+    const samplesToSave = submittedValues.childSamples;
+    for (const sample of samplesToSave) {
       delete sample.description;
       // link to parent
       if (parentSampleId) {
@@ -114,23 +114,25 @@ export default function SplitRunAction() {
           id: parentSampleId
         };
       }
-      const [response] = await save(
-        [
-          {
-            resource: sample,
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      );
-      sampleRunActionResults.childrenGenerated?.push({
-        id: response.id,
-        name: sample.materialSampleName?.length
-          ? sample.materialSampleName
-          : computeDefaultSampleName(i)
-      });
-      i++;
     }
+
+    const response = await save(
+      samplesToSave.map(sample => ({
+        resource: sample,
+        type: "material-sample"
+      })),
+      { apiBaseUrl: "/collection-api" }
+    );
+
+    response.map((resp, idx) =>
+      sampleRunActionResults.childrenGenerated?.push({
+        id: resp.id,
+        name: samplesToSave[idx].materialSampleName?.length
+          ? samplesToSave[idx].materialSampleName
+          : computeDefaultSampleName(idx)
+      })
+    );
+
     // save result to local for displaying on summary page
     setSplitChildSampleRunActionResult(sampleRunActionResults);
     await router.push(
