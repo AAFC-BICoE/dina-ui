@@ -1,4 +1,5 @@
-import { PersistedResource } from "kitsu";
+import { KitsuResourceLink, PersistedResource } from "kitsu";
+import ReactSwitch from "react-switch";
 import Switch from "react-switch";
 import { MaterialSampleForm } from "../../../../pages/collection/material-sample/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
@@ -393,5 +394,54 @@ describe("Material Sample Edit Page", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
+  });
+
+  it("Renders an existing Material Sample with the Preparations section enabled.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms",
+          preparationType: {
+            id: "65765",
+            type: "preparation-type",
+            name: "test-prep-type"
+          } as KitsuResourceLink
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Preparations are enabled:
+    expect(
+      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+  });
+
+  it("Renders an existing Material Sample with the Preparations section disabled (no Preparations fields set).", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms"
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Preparations are disabled:
+    expect(
+      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
   });
 });

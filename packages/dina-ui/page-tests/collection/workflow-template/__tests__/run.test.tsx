@@ -387,7 +387,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     ]);
   });
 
-  it("Renders the Material Sample form with only Preparation fields enabled.", async () => {
+  it("Renders the Material Sample form with only the Preparation section enabled.", async () => {
     const wrapper = await getWrapper({
       id: "1",
       actionType: "ADD",
@@ -408,12 +408,42 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
       type: "material-sample-action-definition"
     });
 
-    // Only the Preparation section should be disabled:
+    // Only the Preparation section should be enabled:
     expect(
       wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
     ).toEqual(false);
     expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
     ).toEqual(true);
+  });
+
+  it("Renders the Material Sample form with only the Collecting Event section enabled.", async () => {
+    const wrapper = await getWrapper({
+      id: "1",
+      actionType: "ADD",
+      formTemplates: {
+        COLLECTING_EVENT: {
+          allowExisting: true,
+          allowNew: true,
+          templateFields: {
+            startEventDateTime: {
+              defaultValue: null,
+              enabled: true
+            }
+          }
+        }
+      },
+      group: "test-group",
+      name: "test-definition",
+      type: "material-sample-action-definition"
+    });
+
+    // Only the Collecting Event section should be enabled:
+    expect(
+      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+    expect(
+      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
   });
 });

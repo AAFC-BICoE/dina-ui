@@ -143,7 +143,7 @@ export function MaterialSampleForm({
       collectingEventInitialValues,
       onSaved,
       isTemplate,
-      collectingEventFormEnabledFields: enabledFields?.collectingEvent
+      enabledFields
     });
 
   const mateirialSampleInternal = (

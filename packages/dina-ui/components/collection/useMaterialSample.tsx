@@ -1,7 +1,7 @@
 import { AreYouSureModal, DinaForm } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { cloneDeep, isEmpty, isEqual } from "lodash";
+import { cloneDeep, isEmpty, isEqual, keys } from "lodash";
 import {
   Dispatch,
   SetStateAction,
@@ -86,11 +86,20 @@ export interface UseMaterialSampleSaveParams {
   };
 
   /** Optionally restrict the form to these enabled fields. */
-  collectingEventFormEnabledFields?: string[];
+  enabledFields?: {
+    materialSample?: string[];
+    collectingEvent?: string[];
+  };
 
   materialSampleAttachmentsConfig?: AllowAttachmentsConfig;
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
 }
+
+const PREPARATION_FIELDS: (keyof MaterialSample)[] = [
+  "preparationType",
+  "preparationDate",
+  "preparedBy"
+];
 
 export function useMaterialSampleSave({
   materialSample,
@@ -100,34 +109,39 @@ export function useMaterialSampleSave({
   isTemplate,
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues,
-  collectingEventFormEnabledFields,
+  enabledFields,
   materialSampleAttachmentsConfig,
   collectingEventAttachmentsConfig
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
+  // For editing existing templates:
   const hasColEventTemplate =
     isTemplate &&
     (!isEmpty(colEventTemplateInitialValues?.templateCheckboxes) ||
       colEventTemplateInitialValues?.id);
+  // For editing existing templates:
+  const hasPreparationsTemplate =
+    isTemplate &&
+    !isEmpty(materialSampleTemplateInitialValues?.templateCheckboxes);
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(
       hasColEventTemplate ||
         materialSample?.collectingEvent ||
-        collectingEventFormEnabledFields?.length
+        enabledFields?.collectingEvent?.length
     )
   );
 
-  const hasPreparationsTemplate =
-    isTemplate &&
-    !isEmpty(materialSampleTemplateInitialValues?.templateCheckboxes);
   const [enablePreparations, setEnablePreparations] = useState(
     Boolean(
       hasPreparationsTemplate ||
-        materialSample?.preparationType ||
-        materialSample?.preparationDate ||
-        materialSample?.preparedBy
+        // Show the preparation section if a field is set or the field is enabled:
+        PREPARATION_FIELDS.some(
+          prepFieldName =>
+            keys(materialSample).includes(prepFieldName) ||
+            enabledFields?.materialSample?.includes(prepFieldName)
+        )
     )
   );
 
@@ -314,7 +328,7 @@ export function useMaterialSampleSave({
       validationSchema={collectingEventFormSchema}
       isTemplate={isTemplate}
       readOnly={isTemplate ? !!colEventId : false}
-      enabledFields={collectingEventFormEnabledFields}
+      enabledFields={enabledFields?.collectingEvent}
     >
       <CollectingEventFormLayout />
       <div className="mb-3">{colEventAttachmentsUI}</div>
