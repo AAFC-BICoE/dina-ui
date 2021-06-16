@@ -1,7 +1,7 @@
 import { AreYouSureModal, DinaForm } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { cloneDeep, isEmpty, isEqual, keys } from "lodash";
+import { cloneDeep, isEmpty, isEqual } from "lodash";
 import {
   Dispatch,
   SetStateAction,
@@ -139,7 +139,7 @@ export function useMaterialSampleSave({
         // Show the preparation section if a field is set or the field is enabled:
         PREPARATION_FIELDS.some(
           prepFieldName =>
-            keys(materialSample).includes(prepFieldName) ||
+            materialSample?.[prepFieldName] ||
             enabledFields?.materialSample?.includes(prepFieldName)
         )
     )
