@@ -16,8 +16,11 @@ const checkboxProps = {
     display: "block",
     height: "20px",
     marginLeft: "15px",
-    width: "20px"
+    width: "20px",
+    // So clicking the checkbox takes priority over the surrounding label:
+    zIndex: 1000
   },
+  tabIndex: -1,
   type: "checkbox"
 };
 

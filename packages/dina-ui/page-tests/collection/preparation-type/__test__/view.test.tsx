@@ -4,7 +4,6 @@ import { PreparationType } from "../../../../types/collection-api/resources/Prep
 
 /** Test preparation-type with all fields defined. */
 const TEST_PREPARATION_TYPE: PreparationType = {
-  uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
   id: "1",
   name: "test preparation type",
   type: "preparation-type"

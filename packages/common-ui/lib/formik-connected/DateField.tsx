@@ -1,5 +1,6 @@
 import { KeyboardEvent } from "react";
 import DatePicker from "react-datepicker";
+import { DateView } from "../date/DateView";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface DateFieldProps {
@@ -13,7 +14,7 @@ export function DateField(props: LabelWrapperParams & DateFieldProps) {
   const { showTime, disabled, onKeyDown } = props;
 
   return (
-    <FieldWrapper {...props}>
+    <FieldWrapper {...props} readOnlyRender={val => <DateView date={val} />}>
       {({ setValue, value }) => {
         function onChange(date: Date) {
           if (showTime) {

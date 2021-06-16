@@ -61,6 +61,7 @@ const mockGet = jest.fn<any, any>(async path => {
       return { data: [TEST_COORDINATES] };
     case "collection-api/preparation-type":
     case "collection-api/managed-attribute":
+    case "collection-api/material-sample-type":
     case "user-api/group":
     case "agent-api/person":
     case "objectstore-api/metadata":
