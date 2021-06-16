@@ -69,7 +69,7 @@ export interface UseMaterialSampleSaveParams {
   colEventTemplateInitialValues?: Partial<CollectingEvent> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
-  materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
+  preparationsTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 }
@@ -80,7 +80,7 @@ export function useMaterialSampleSave({
   collectingEvtFormRef,
   isTemplate,
   colEventTemplateInitialValues,
-  materialSampleTemplateInitialValues
+  preparationsTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
@@ -95,7 +95,7 @@ export function useMaterialSampleSave({
 
   const hasPreparationsTemplate =
     isTemplate &&
-    !isEmpty(materialSampleTemplateInitialValues?.templateCheckboxes);
+    !isEmpty(preparationsTemplateInitialValues?.templateCheckboxes);
   const [enablePreparations, setEnablePreparations] = useState(
     hasPreparationsTemplate || !!materialSample?.preparationType
   );

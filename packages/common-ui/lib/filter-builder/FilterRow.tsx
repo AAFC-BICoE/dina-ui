@@ -57,13 +57,8 @@ export class FilterRow extends React.Component<FilterRowProps> {
   public context!: FilterBuilderContextI;
 
   public render() {
-    const {
-      model,
-      onAndClick,
-      onRemoveClick,
-      onOrClick,
-      showRemoveButton
-    } = this.props;
+    const { model, onAndClick, onRemoveClick, onOrClick, showRemoveButton } =
+      this.props;
 
     // If only a string is passed, create the default attribute config object:
     const attribute = this.attributeConfig();

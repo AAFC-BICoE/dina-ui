@@ -74,13 +74,17 @@ export default function MaterialSampleEditPage() {
 export interface MaterialSampleFormProps {
   materialSample?: PersistedResource<MaterialSample>;
   onSaved?: (id: string) => Promise<void>;
-  catelogueSectionRef?: React.RefObject<FormikProps<any>>;
+  preparationsSectionRef?: React.RefObject<FormikProps<any>>;
+  identifiersSectionRef?: React.RefObject<FormikProps<any>>;
 
   /** Optionally call the hook from the parent component. */
   materialSampleSaveHook?: ReturnType<typeof useMaterialSampleSave>;
 
   /** Template form values for template mode. */
-  materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
+  preparationsTemplateInitialValues?: Partial<MaterialSample> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
+  identifiersTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 }
@@ -88,9 +92,11 @@ export interface MaterialSampleFormProps {
 export function MaterialSampleForm({
   materialSample,
   onSaved,
-  catelogueSectionRef,
+  preparationsSectionRef,
+  identifiersSectionRef,
   materialSampleSaveHook,
-  materialSampleTemplateInitialValues
+  preparationsTemplateInitialValues,
+  identifiersTemplateInitialValues
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
   const { isTemplate } = useContext(DinaFormContext) ?? {};
@@ -168,7 +174,17 @@ export function MaterialSampleForm({
       </div>
       <div className="flex-grow-1 container-fluid">
         {!isTemplate && <MaterialSampleMainInfoFormLayout />}
-        {!isTemplate && <MaterialSampleIdentifiersFormLayout />}
+        {isTemplate ? (
+          <DinaForm
+            initialValues={identifiersTemplateInitialValues}
+            innerRef={identifiersSectionRef}
+            isTemplate={true}
+          >
+            <MaterialSampleIdentifiersFormLayout />
+          </DinaForm>
+        ) : (
+          <MaterialSampleIdentifiersFormLayout />
+        )}
         <FieldSet legend={<DinaMessage id="components" />}>
           <div className="row">
             <label className="enable-collecting-event d-flex align-items-center fw-bold col-sm-3">
@@ -275,8 +291,8 @@ export function MaterialSampleForm({
           </FieldSet>
           {isTemplate ? (
             <DinaForm
-              initialValues={materialSampleTemplateInitialValues}
-              innerRef={catelogueSectionRef}
+              initialValues={preparationsTemplateInitialValues}
+              innerRef={preparationsSectionRef}
               isTemplate={true}
             >
               <PreparationsFormLayout

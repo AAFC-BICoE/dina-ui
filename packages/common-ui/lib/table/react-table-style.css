@@ -21,9 +21,9 @@
   -moz-appearance: textfield;
 }
 
-.ReactTable .rt-noData{
-  top:60%!important;
-  background:rgba(255,255,255,1)!important;
-  padding:0px!important;
-  color:rgba(0,0,0,0.8)!important;
+.ReactTable .rt-noData {
+  top: 60% !important;
+  background: rgba(255, 255, 255, 1) !important;
+  padding: 0px !important;
+  color: rgba(0, 0, 0, 0.8) !important;
 }

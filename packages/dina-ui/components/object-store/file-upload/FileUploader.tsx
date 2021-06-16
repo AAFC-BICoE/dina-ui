@@ -113,7 +113,7 @@ export function FileUploader<TValues = any>({
           }}
           styles={{
             dropzone: { overflow: "initial" },
-            inputLabel: { padding: "1.25rem", color:"#333333" },
+            inputLabel: { padding: "1.25rem", color: "#333333" },
             preview: { zIndex: "auto" }
           }}
           inputContent={formatMessage("uploadFormInstructions")}

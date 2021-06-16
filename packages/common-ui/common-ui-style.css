@@ -9,12 +9,12 @@
 * e.g. input[id^=react-select-attribute],input[id^=react-select-predicate],input[id^=react-select-searchType],input[id^=react-select-config]
 */
 .css-b8ldur-Input {
-    opacity: 0!important;
+  opacity: 0 !important;
 }
 
 /*
 * Fixes WCAG contrast issue for placeholder text in the "Default Values Configs" textfield and possinly other textfields
 */
 .css-1wa3eu0-placeholder {
-    color: #333333!important;
+  color: #333333 !important;
 }
