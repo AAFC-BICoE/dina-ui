@@ -138,6 +138,13 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
           <li>
+            <Link href="/collection/collection/list">
+              <a>
+                <DinaMessage id="collectionListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
             <Link href="/collection/collecting-event/list">
               <a>
                 <DinaMessage id="collectingEventListTitle" />
