@@ -81,18 +81,21 @@ export default function SplitRunAction() {
 
   // Get form initial values from run config
   for (let i = 0; i < numOfChildToCreate; i++) {
-    const splitChildSampleName =
-      splitChildSampleRunConfig?.configure_children?.sampleNames?.[i];
-    const splitChildSampleDescription =
-      splitChildSampleRunConfig?.configure_children?.sampleDescs?.[i];
-    initialChildSamples.push({
-      group: groupNames?.[0],
-      type: "material-sample",
-      description: splitChildSampleDescription,
-      materialSampleName:
-        splitChildSampleName ??
-        baseName + "-" + computeSuffix({ index: i, start, suffixType })
-    });
+    // populate initial childsamples when the computed suffix has value, handle when there are disconnected letter suffix
+    const computedSuffix = computeSuffix({ index: i, start, suffixType });
+    if (computedSuffix) {
+      const splitChildSampleName =
+        splitChildSampleRunConfig?.configure_children?.sampleNames?.[i];
+      const splitChildSampleDescription =
+        splitChildSampleRunConfig?.configure_children?.sampleDescs?.[i];
+      initialChildSamples.push({
+        group: groupNames?.[0],
+        type: "material-sample",
+        description: splitChildSampleDescription,
+        materialSampleName:
+          splitChildSampleName ?? baseName + "-" + computedSuffix
+      });
+    }
   }
 
   const onSubmit = async submittedValues => {

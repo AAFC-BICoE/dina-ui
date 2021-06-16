@@ -290,13 +290,20 @@ export const computeSuffix = ({
     if (!myStart || myStart.length === 0 || !isNaN(parseInt(myStart, 10))) {
       myStart = "A";
     }
-    const charCode = myStart.charCodeAt(0) + index;
+    const myStartCharCode = myStart.charCodeAt(0);
+    const charCode = myStartCharCode + index;
     // Only if the char is a letter, split child row will be added
-    if (
-      (charCode >= 97 && charCode <= 122) ||
-      (charCode >= 65 && charCode <= 90)
-    ) {
+    if (charCode >= 65 && charCode <= 90) {
       computedSuffix = String.fromCharCode(charCode);
+    } else if (charCode > 90 && charCode < 97) {
+      // when there are disconnected letter suffix
+      if (97 + charCode - 90 <= 122)
+        computedSuffix = String.fromCharCode(97 + charCode - 90 - 1);
+    } else if (charCode >= 97 && charCode <= 122) {
+      // when there are disconnected letter suffix
+      if (myStartCharCode >= 65 && myStartCharCode <= 90)
+        computedSuffix = String.fromCharCode(103 + charCode - 97);
+      else computedSuffix = String.fromCharCode(charCode);
     }
   }
   return computedSuffix;
