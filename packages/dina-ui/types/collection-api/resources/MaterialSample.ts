@@ -16,6 +16,7 @@ export interface MaterialSampleAttributes {
   dwcCatalogNumber?: string | null;
   dwcOtherCatalogNumbers?: string[];
   preparationDate?: string | null;
+  description?: string;
 
   managedAttributeValues?: ManagedAttributeValues;
 }
@@ -25,6 +26,7 @@ export interface MaterialSampleRelationships {
   attachment?: ResourceIdentifierObject[];
   preparationType?: PreparationType;
   preparedBy?: Person;
+  parentMaterialSample?: MaterialSample;
 }
 
 export type MaterialSample = KitsuResource &

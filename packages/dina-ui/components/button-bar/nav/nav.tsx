@@ -245,6 +245,11 @@ function NavCollectionDropdown() {
             </a>
           </Link>
         </div>
+        <Link href="/collection/collection/list">
+          <a className="dropdown-item">
+            <DinaMessage id="collectionListTitle" />
+          </a>
+        </Link>
         <Link href="/collection/collecting-event/list">
           <a className="dropdown-item">
             <DinaMessage id="collectingEventListTitle" />
@@ -278,6 +283,11 @@ function NavCollectionDropdown() {
         <Link href="/collection/workflow-template/list">
           <a className="dropdown-item">
             <DinaMessage id="workflowTemplateListTitle" />
+          </a>
+        </Link>
+        <Link href="/collection/material-sample/workflows/split-config">
+          <a className="dropdown-item">
+            <DinaMessage id="splitWorkflowRunTitle" />
           </a>
         </Link>
       </div>

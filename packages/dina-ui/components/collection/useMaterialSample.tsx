@@ -31,7 +31,8 @@ export function useMaterialSampleQuery(id?: string | null) {
   const materialSampleQuery = useQuery<MaterialSample>(
     {
       path: `collection-api/material-sample/${id}`,
-      include: "collectingEvent,attachment,preparationType,preparedBy"
+      include:
+        "collectingEvent,attachment,preparationType,materialSampleType,preparedBy"
     },
     {
       disabled: !id,
@@ -81,7 +82,7 @@ export interface UseMaterialSampleSaveParams {
   colEventTemplateInitialValues?: Partial<CollectingEvent> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
-  materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
+  preparationsTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 
@@ -108,10 +109,10 @@ export function useMaterialSampleSave({
   collectingEvtFormRef,
   isTemplate,
   colEventTemplateInitialValues,
-  materialSampleTemplateInitialValues,
   enabledFields,
   materialSampleAttachmentsConfig,
-  collectingEventAttachmentsConfig
+  collectingEventAttachmentsConfig,
+  preparationsTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
@@ -123,7 +124,7 @@ export function useMaterialSampleSave({
   // For editing existing templates:
   const hasPreparationsTemplate =
     isTemplate &&
-    !isEmpty(materialSampleTemplateInitialValues?.templateCheckboxes);
+    !isEmpty(preparationsTemplateInitialValues?.templateCheckboxes);
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(

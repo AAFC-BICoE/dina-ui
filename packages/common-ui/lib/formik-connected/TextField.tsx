@@ -11,7 +11,8 @@ export interface TextFieldProps extends LabelWrapperParams {
   multiLines?: boolean;
   inputProps?: InputHTMLAttributes<any> | TextareaHTMLAttributes<any>;
   placeholder?: string;
-
+  numberOnly?: boolean;
+  letterOnly?: boolean;
   customInput?: (inputProps: InputHTMLAttributes<any>) => JSX.Element;
   onChangeExternal?: (
     form: FormikProps<any>,
@@ -32,6 +33,8 @@ export function TextField(props: TextFieldProps) {
     placeholder,
     customInput,
     onChangeExternal,
+    numberOnly,
+    letterOnly,
     ...labelWrapperProps
   } = props;
 
@@ -52,6 +55,26 @@ export function TextField(props: TextFieldProps) {
           readOnly
         };
 
+        const onKeyDown = e => {
+          const NUMBER_ALLOWED_CHARS_REGEXP = /[0-9]+/;
+          const CTRL_ALLOWED_CHARS_REGEXP =
+            /^(Backspace|Delete|ArrowLeft|ArrowRight)$/;
+          const LETTER_ALLOWED_CHARS_REGEXP = /[A-Za-z]+/;
+          if (
+            numberOnly &&
+            !NUMBER_ALLOWED_CHARS_REGEXP.test(e.key) &&
+            !CTRL_ALLOWED_CHARS_REGEXP.test(e.key)
+          ) {
+            e.preventDefault();
+          } else if (
+            letterOnly &&
+            !LETTER_ALLOWED_CHARS_REGEXP.test(e.key) &&
+            !CTRL_ALLOWED_CHARS_REGEXP.test(e.key)
+          ) {
+            e.preventDefault();
+          }
+        };
+
         // The default Field component's inner text input needs to be replaced with our own
         // controlled input that we manually pass the "onChange" and "value" props. Otherwise
         // we will get React's warning about switching from an uncontrolled to controlled input.
@@ -63,7 +86,7 @@ export function TextField(props: TextFieldProps) {
               {...(inputPropsInternal as TextareaAutosizeProps)}
             />
           ) : (
-            <input type="text" {...inputPropsInternal} />
+            <input type="text" {...inputPropsInternal} onKeyDown={onKeyDown} />
           ))
         );
       }}
