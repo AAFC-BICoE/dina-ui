@@ -12,14 +12,20 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
-  useAccount,
   withResponse
 } from "common-ui";
-import { FormikProps, Field } from "formik";
+import { FormikProps, FastField } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useContext, useState, Dispatch, SetStateAction } from "react";
+import {
+  useContext,
+  useState,
+  Dispatch,
+  SetStateAction,
+  useRef,
+  MutableRefObject
+} from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { GroupSelectField, Head, Nav } from "../../../components";
@@ -117,7 +123,14 @@ export function MaterialSampleForm({
       isTemplate
     });
 
-  const [selectedGroup, setSelectedGroup] = useState(initialValues.group);
+  const materialSampleGroup = useRef(materialSample?.group);
+
+  const [_, setRenderEnabled] = useState(false);
+
+  function updateSelectedGroupRef(newGroup) {
+    materialSampleGroup.current = newGroup;
+  }
+
   const buttonBar = (
     <ButtonBar>
       <BackButton
@@ -171,7 +184,8 @@ export function MaterialSampleForm({
       <div className="flex-grow-1 container-fluid">
         {!isTemplate && (
           <MaterialSampleMainInfoFormLayout
-            setSelectedGroup={setSelectedGroup}
+            setRenderEnabled={setRenderEnabled}
+            updateSelectedGroupRef={updateSelectedGroupRef}
           />
         )}
         {!isTemplate && <MaterialSampleIdentifiersFormLayout />}
@@ -287,7 +301,7 @@ export function MaterialSampleForm({
             >
               <PreparationsFormLayout
                 className={enablePreparations ? "" : "d-none"}
-                selectedGroup={selectedGroup}
+                selectedGroupRef={materialSampleGroup}
               />
               {materialSampleAttachmentsUI}
             </DinaForm>
@@ -295,7 +309,7 @@ export function MaterialSampleForm({
             <>
               <PreparationsFormLayout
                 className={enablePreparations ? "" : "d-none"}
-                selectedGroup={selectedGroup}
+                selectedGroupRef={materialSampleGroup}
               />
               {materialSampleAttachmentsUI}
             </>
@@ -320,23 +334,26 @@ export function MaterialSampleForm({
 }
 
 export interface MaterialSampleMainInfoFormLayoutProps {
-  setSelectedGroup?: Dispatch<SetStateAction<string>>;
+  setRenderEnabled?: Dispatch<SetStateAction<boolean>>;
+  updateSelectedGroupRef?: (newGroup) => void;
 }
 
 export function MaterialSampleMainInfoFormLayout({
-  setSelectedGroup
+  setRenderEnabled,
+  updateSelectedGroupRef
 }: MaterialSampleMainInfoFormLayoutProps) {
   function onGroupChanged(value, _) {
-    setSelectedGroup?.(value);
+    updateSelectedGroupRef?.(value);
+    setRenderEnabled?.(true);
   }
 
   return (
     <div id="material-sample-section">
       <div className="row">
         <div className="col-md-6">
-          <Field name="group">
+          <FastField name="group">
             {({ field: { value } }) => {
-              setSelectedGroup?.(value);
+              updateSelectedGroupRef?.(value);
               return (
                 <GroupSelectField
                   name="group"
@@ -345,7 +362,7 @@ export function MaterialSampleMainInfoFormLayout({
                 />
               );
             }}
-          </Field>
+          </FastField>
           <ResourceSelectField<MaterialSampleType>
             name="materialSampleType"
             filter={filterBy(["name"])}
@@ -381,12 +398,12 @@ export function MaterialSampleIdentifiersFormLayout() {
 
 export interface CatalogueInfoFormLayoutProps {
   className?: string;
-  selectedGroup?: string;
+  selectedGroupRef?: MutableRefObject<string | undefined>;
 }
 
 export function PreparationsFormLayout({
   className,
-  selectedGroup
+  selectedGroupRef
 }: CatalogueInfoFormLayoutProps) {
   return (
     <FieldSet
@@ -404,7 +421,9 @@ export function PreparationsFormLayout({
               readOnlyLink="/collection/preparation-type/view?id="
               filter={input => ({
                 ...filterBy(["name"])(input),
-                ...(selectedGroup ? { rsql: `group==${selectedGroup}` } : {})
+                ...(selectedGroupRef?.current
+                  ? { rsql: `group==${selectedGroupRef?.current}` }
+                  : {})
               })}
             />
           </div>
