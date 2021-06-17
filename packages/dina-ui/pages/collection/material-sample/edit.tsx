@@ -125,7 +125,7 @@ export function MaterialSampleForm({
 
   const materialSampleGroup = useRef(materialSample?.group);
 
-  const [_, setRenderEnabled] = useState(false);
+  const [_, setRenderEnabled] = useState<boolean>(false);
 
   function updateSelectedGroupRef(newGroup) {
     materialSampleGroup.current = newGroup;
@@ -422,7 +422,7 @@ export function PreparationsFormLayout({
               filter={input => ({
                 ...filterBy(["name"])(input),
                 ...(selectedGroupRef?.current
-                  ? { rsql: `group==${selectedGroupRef?.current}` }
+                  ? filterBy(["group"])(`${selectedGroupRef?.current}`)
                   : {})
               })}
             />
