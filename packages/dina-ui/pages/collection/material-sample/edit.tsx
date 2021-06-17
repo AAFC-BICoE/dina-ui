@@ -74,13 +74,17 @@ export default function MaterialSampleEditPage() {
 export interface MaterialSampleFormProps {
   materialSample?: PersistedResource<MaterialSample>;
   onSaved?: (id: string) => Promise<void>;
-  catelogueSectionRef?: React.RefObject<FormikProps<any>>;
+  preparationsSectionRef?: React.RefObject<FormikProps<any>>;
+  identifiersSectionRef?: React.RefObject<FormikProps<any>>;
 
   /** Optionally call the hook from the parent component. */
   materialSampleSaveHook?: ReturnType<typeof useMaterialSampleSave>;
 
   /** Template form values for template mode. */
-  materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
+  preparationsTemplateInitialValues?: Partial<MaterialSample> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
+  identifiersTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 }
@@ -88,9 +92,11 @@ export interface MaterialSampleFormProps {
 export function MaterialSampleForm({
   materialSample,
   onSaved,
-  catelogueSectionRef,
+  preparationsSectionRef,
+  identifiersSectionRef,
   materialSampleSaveHook,
-  materialSampleTemplateInitialValues
+  preparationsTemplateInitialValues,
+  identifiersTemplateInitialValues
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
   const { isTemplate } = useContext(DinaFormContext) ?? {};
@@ -168,7 +174,17 @@ export function MaterialSampleForm({
       </div>
       <div className="flex-grow-1 container-fluid">
         {!isTemplate && <MaterialSampleMainInfoFormLayout />}
-        {!isTemplate && <MaterialSampleIdentifiersFormLayout />}
+        {isTemplate ? (
+          <DinaForm
+            initialValues={identifiersTemplateInitialValues}
+            innerRef={identifiersSectionRef}
+            isTemplate={true}
+          >
+            <MaterialSampleIdentifiersFormLayout />
+          </DinaForm>
+        ) : (
+          <MaterialSampleIdentifiersFormLayout />
+        )}
         <FieldSet legend={<DinaMessage id="components" />}>
           <div className="row">
             <label className="enable-collecting-event d-flex align-items-center fw-bold col-sm-3">
@@ -275,8 +291,8 @@ export function MaterialSampleForm({
           </FieldSet>
           {isTemplate ? (
             <DinaForm
-              initialValues={materialSampleTemplateInitialValues}
-              innerRef={catelogueSectionRef}
+              initialValues={preparationsTemplateInitialValues}
+              innerRef={preparationsSectionRef}
               isTemplate={true}
             >
               <PreparationsFormLayout
@@ -330,20 +346,56 @@ export function MaterialSampleMainInfoFormLayout() {
   );
 }
 
+export interface MaterialSampleIdentifiersFormLayoutProps {
+  hideSampleName?: boolean;
+  hideOtherCatalogNumbers?: boolean;
+  className?: string;
+  namePrefix?: string;
+  sampleNamePlaceHolder?: string;
+}
+
 /** Fields layout re-useable between view and edit pages. */
-export function MaterialSampleIdentifiersFormLayout() {
+export function MaterialSampleIdentifiersFormLayout({
+  className,
+  namePrefix,
+  sampleNamePlaceHolder
+}: MaterialSampleIdentifiersFormLayoutProps) {
   return (
     <FieldSet
       id="identifiers-section"
       legend={<DinaMessage id="identifiers" />}
+      className={className}
     >
       <div className="row">
         <div className="col-md-6">
-          <TextField name="materialSampleName" />
-          <TextField name="dwcCatalogNumber" />
+          <TextField
+            name={`${
+              namePrefix
+                ? namePrefix + "materialSampleName"
+                : "materialSampleName"
+            }`}
+            customName="materialSampleName"
+            className="materialSampleName"
+            placeholder={sampleNamePlaceHolder}
+          />
+
+          <TextField
+            name={`${
+              namePrefix ? namePrefix + "dwcCatalogNumber" : "dwcCatalogNumber"
+            }`}
+            customName="dwcCatalogNumber"
+            className="dwcCatalogNumber"
+          />
         </div>
         <div className="col-md-6">
-          <StringArrayField name="dwcOtherCatalogNumbers" />
+          <StringArrayField
+            name={`${
+              namePrefix
+                ? namePrefix + "dwcOtherCatalogNumbers"
+                : "dwcOtherCatalogNumbers"
+            }`}
+            customName="dwcOtherCatalogNumbers"
+          />
         </div>
       </div>
     </FieldSet>
@@ -352,10 +404,12 @@ export function MaterialSampleIdentifiersFormLayout() {
 
 export interface CatalogueInfoFormLayoutProps {
   className?: string;
+  namePrefix?: string;
 }
 
 export function PreparationsFormLayout({
-  className
+  className,
+  namePrefix
 }: CatalogueInfoFormLayoutProps) {
   return (
     <FieldSet
@@ -367,18 +421,29 @@ export function PreparationsFormLayout({
         <div className="col-md-6">
           <div className="preparation-type">
             <ResourceSelectField<PreparationType>
-              name="preparationType"
+              name={`${
+                namePrefix ? namePrefix + "preparationType" : "preparationType"
+              }`}
               filter={filterBy(["name"])}
               model="collection-api/preparation-type"
               optionLabel={it => it.name}
               readOnlyLink="/collection/preparation-type/view?id="
+              customName="preparationType"
             />
           </div>
           <DinaFormSection
             readOnly={true} // Disabled until back-end supports these fields.
           >
-            <TextField name="preparedBy" />
-            <DateField name="datePrepared" />
+            <TextField
+              name={`${namePrefix ? namePrefix + "preparedBy" : "preparedBy"}`}
+              customName="preparedBy"
+            />
+            <DateField
+              name={`${
+                namePrefix ? namePrefix + "datePrepared" : "datePrepared"
+              }`}
+              customName="datePrepared"
+            />
           </DinaFormSection>
         </div>
       </div>

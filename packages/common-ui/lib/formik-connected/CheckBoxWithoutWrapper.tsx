@@ -9,6 +9,7 @@ export interface CheckBoxWithoutWrapperProps {
   parentContainerId?: string;
   includeAllLabel?: string;
   customLayout?: string[];
+  notTakingFullRow?: boolean;
 }
 
 const checkboxProps = {
@@ -30,7 +31,8 @@ export function CheckBoxWithoutWrapper(props: CheckBoxWithoutWrapperProps) {
     onClickIncludeAll,
     className,
     includeAllLabel,
-    customLayout
+    customLayout,
+    notTakingFullRow
   } = props;
   return (
     <FastField {...props}>
@@ -41,7 +43,7 @@ export function CheckBoxWithoutWrapper(props: CheckBoxWithoutWrapperProps) {
         }
 
         return includeAllLabel ? (
-          <label className="row mb-3">
+          <label className={notTakingFullRow ? "mb-3" : "row mb-3"}>
             <input
               {...checkboxProps}
               checked={value || false}

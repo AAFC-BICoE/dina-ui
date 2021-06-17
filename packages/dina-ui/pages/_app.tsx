@@ -5,6 +5,7 @@ import {
   KeycloakAccountProvider,
   ModalProvider
 } from "common-ui";
+import "common-ui/common-ui-style.css";
 import "common-ui/lib/button-bar/buttonbar.css";
 import "common-ui/lib/table/react-table-style.css";
 import "handsontable/dist/handsontable.full.min.css";
