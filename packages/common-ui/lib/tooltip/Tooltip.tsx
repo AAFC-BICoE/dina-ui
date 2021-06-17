@@ -1,6 +1,7 @@
 import RcTooltip from "rc-tooltip";
 import { ReactNode } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
+import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 
 interface TooltipProps {
   /** The ID of the message to show in the tooltip. */
@@ -50,19 +51,30 @@ export function Tooltip({
 
   // Determine if an image should be displayed.
   if (image != null) {
-    tooltipImage = <img src={image} alt={altImage} width="100%" />;
+    // Check to see if alt text is using a intl key.
+    const { messages, formatMessage } = useIntl();
+    if (altImage && messages[altImage]) {
+      altImage = formatMessage({id:altImage});
+    }
+
+    tooltipImage = (
+      <div style={{"marginTop": "10px"}}>
+        <img src={image} alt={altImage} style={{"width": "100%"}} />
+      </div>
+    );
   }
 
   // Determine if a link should be displayed.
   if (link != null) {
     if (linkText == null) {
+      // Set the text link to use a generic link message.
       linkText = "tooltipDefaultLinkMessage";
     }
 
     // Generate the link html.
     tooltipLink = (
-      <div>
-        <a href={link} target="_blank" style={{"color": "white"}}>
+      <div style={{"marginTop": "10px"}}>
+        <a href={link} target="_blank" style={{"color": "white"}} className={"mrgn-tp-sm"}>
           <FormattedMessage id={linkText}/>
         </a>
       </div>
