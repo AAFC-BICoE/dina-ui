@@ -25,14 +25,13 @@ export interface FieldNameProps {
 export function useFieldLabels() {
   const { formatMessage, messages } = useIntl();
 
-  function getFieldLabel(
-    name: string,
-    tooltipImage?: string,
-    tooltipImageAlt?: string,
-    tooltipLink?: string,
-    tooltipLinkText?: string
-  ) {
-
+  function getFieldLabel({
+    name,
+    tooltipImage,
+    tooltipImageAlt,
+    tooltipLink,
+    tooltipLinkText
+  }: FieldNameProps = {}) {
     const messageKey = `field_${name}`;
     const tooltipKey = `${messageKey}_tooltip`;
 
@@ -71,13 +70,13 @@ export function FieldHeader({
   tooltipLinkText
 }: FieldNameProps) {
   const { getFieldLabel } = useFieldLabels();
-  const { fieldLabel, tooltip } = getFieldLabel(
-    customName ?? name,
-    tooltipImage,
-    tooltipImageAlt,
-    tooltipLink,
-    tooltipLinkText
-  );
+  const { fieldLabel, tooltip } = getFieldLabel({
+    name: customName ?? name,
+    tooltipImage: tooltipImage,
+    tooltipImageAlt: tooltipImageAlt,
+    tooltipLink: tooltipLink,
+    tooltipLinkText: tooltipLinkText
+  });
 
   return (
     <div className={`${customName ?? name}-field-header`}>

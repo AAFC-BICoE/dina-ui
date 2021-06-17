@@ -39,47 +39,29 @@ export function Tooltip({
   altImage
 }: TooltipProps) {
 
-  // Variables to hold the different sections of the tooltip.
-  let tooltipMessage;
-  let tooltipImage;
-  let tooltipLink;
+  // Setup the internationalization functions.
+  const { messages, formatMessage } = useIntl();
 
   // Determine if a tooltip message needs to be displayed.
-  if (id != null) {
-    tooltipMessage = <FormattedMessage id={id} values={intlValues} />;
-  }
+  const tooltipMessage = id != null ? <FormattedMessage id={id} values={intlValues} /> : null;
 
   // Determine if an image should be displayed.
-  if (image != null) {
-    // Check to see if alt text is using a intl key.
-    const { messages, formatMessage } = useIntl();
-    if (altImage && messages[altImage]) {
-      altImage = formatMessage({id:altImage});
-    }
-
-    tooltipImage = (
-      <div style={{"marginTop": "10px"}}>
-        <img src={image} alt={altImage} style={{"width": "100%"}} />
-      </div>
-    );
-  }
+  const tooltipImage = image != null ? (
+    <div style={{"marginTop": "10px"}}>
+      <img src={image} 
+           alt={(altImage && messages[altImage]) ? formatMessage({id: altImage}) : altImage} 
+           style={{"width": "100%"}} />
+    </div>
+  ) : null;
 
   // Determine if a link should be displayed.
-  if (link != null) {
-    if (linkText == null) {
-      // Set the text link to use a generic link message.
-      linkText = "tooltipDefaultLinkMessage";
-    }
-
-    // Generate the link html.
-    tooltipLink = (
-      <div style={{"marginTop": "10px"}}>
-        <a href={link} target="_blank" style={{"color": "white"}} className={"mrgn-tp-sm"}>
-          <FormattedMessage id={linkText}/>
-        </a>
-      </div>
-    );
-  }
+  const tooltipLink = link != null ? (
+    <div style={{"marginTop": "10px"}}>
+      <a href={link} target="_blank" style={{"color": "white"}} className={"mrgn-tp-sm"}>
+        <FormattedMessage id={linkText == null ? "tooltipDefaultLinkMessage" : linkText}/>
+      </a>
+    </div>
+  ) : null;
 
   return (
     <span className="m-2">
