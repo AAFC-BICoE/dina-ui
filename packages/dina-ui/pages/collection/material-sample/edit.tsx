@@ -12,21 +12,13 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
-  useApiClient,
   withResponse
 } from "common-ui";
 import { FormikProps, Field } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import {
-  useContext,
-  useState,
-  Dispatch,
-  SetStateAction,
-  useRef,
-  MutableRefObject
-} from "react";
+import { useContext, useRef, MutableRefObject } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { GroupSelectField, Head, Nav } from "../../../components";
@@ -102,7 +94,6 @@ export function MaterialSampleForm({
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
   const { isTemplate } = useContext(DinaFormContext) ?? {};
-  const materialSampleGroup = useRef(materialSample?.group);
 
   const {
     initialValues,
@@ -116,18 +107,16 @@ export function MaterialSampleForm({
     setColEventId,
     colEventQuery,
     onSubmit,
-    materialSampleAttachmentsUI
+    materialSampleAttachmentsUI,
+    materialSampleGroupRef,
+    updateSelectedGroupRef
   } =
     materialSampleSaveHook ??
     useMaterialSampleSave({
       materialSample,
       onSaved,
-      isTemplate,
-      selectedGroupRef: materialSampleGroup
+      isTemplate
     });
-  function updateSelectedGroupRef(newGroup) {
-    materialSampleGroup.current = newGroup;
-  }
 
   const buttonBar = (
     <ButtonBar>
@@ -298,7 +287,7 @@ export function MaterialSampleForm({
             >
               <PreparationsFormLayout
                 className={enablePreparations ? "" : "d-none"}
-                selectedGroupRef={materialSampleGroup}
+                selectedGroupRef={materialSampleGroupRef}
               />
               {materialSampleAttachmentsUI}
             </DinaForm>
@@ -306,7 +295,7 @@ export function MaterialSampleForm({
             <>
               <PreparationsFormLayout
                 className={enablePreparations ? "" : "d-none"}
-                selectedGroupRef={materialSampleGroup}
+                selectedGroupRef={materialSampleGroupRef}
               />
               {materialSampleAttachmentsUI}
             </>

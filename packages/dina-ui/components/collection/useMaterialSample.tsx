@@ -270,6 +270,12 @@ export function useMaterialSampleSave({
     </DinaForm>
   );
 
+  const materialSampleGroupRef = useRef(materialSample?.group);
+
+  function updateSelectedGroupRef(newGroup) {
+    materialSampleGroupRef.current = newGroup;
+  }
+
   return {
     initialValues,
     nestedCollectingEventForm,
@@ -282,6 +288,8 @@ export function useMaterialSampleSave({
     setColEventId,
     colEventQuery,
     materialSampleAttachmentsUI,
-    onSubmit
+    onSubmit,
+    materialSampleGroupRef,
+    updateSelectedGroupRef
   };
 }
