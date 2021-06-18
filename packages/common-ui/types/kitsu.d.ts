@@ -1,7 +1,7 @@
 /// <reference types="node" />
 
 import { AxiosInstance } from "axios";
-import { SetRequired } from "type-fest";
+import { JsonValue, SetRequired } from "type-fest";
 
 declare module "kitsu" {
   // export default Kitsu;
@@ -64,7 +64,7 @@ declare module "kitsu" {
   }
 
   /** Parameter for filtering listed data. */
-  export type FilterParam = string | Record<string, string>;
+  export type FilterParam = string | Record<string, JsonValue>;
 
   /** The response from a Kitsu GET request. */
   export interface KitsuResponse<

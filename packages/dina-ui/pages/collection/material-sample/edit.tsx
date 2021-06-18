@@ -14,7 +14,7 @@ import {
   TextField,
   withResponse
 } from "common-ui";
-import { FormikProps } from "formik";
+import { Field, FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -368,7 +368,6 @@ export function MaterialSampleForm({
     mateirialSampleInternal
   );
 }
-
 export function MaterialSampleMainInfoFormLayout() {
   return (
     <div id="material-sample-section">
@@ -462,16 +461,30 @@ export function PreparationsFormLayout({
       <div className="row">
         <div className="col-md-6">
           <div className="preparation-type">
-            <ResourceSelectField<PreparationType>
+            <Field
               name={`${
                 namePrefix ? namePrefix + "preparationType" : "preparationType"
               }`}
-              filter={filterBy(["name"])}
-              model="collection-api/preparation-type"
-              optionLabel={it => it.name}
-              readOnlyLink="/collection/preparation-type/view?id="
-              customName="preparationType"
-            />
+            >
+              {({ form: { values } }) => (
+                <ResourceSelectField<PreparationType>
+                  model="collection-api/preparation-type"
+                  optionLabel={it => it.name}
+                  readOnlyLink="/collection/preparation-type/view?id="
+                  filter={input => ({
+                    ...filterBy(["name"])(input),
+                    group: { EQ: `${values.group}` }
+                  })}
+                  name={`${
+                    namePrefix
+                      ? namePrefix + "preparationType"
+                      : "preparationType"
+                  }`}
+                  key={values.group}
+                  customName="preparationType"
+                />
+              )}
+            </Field>
           </div>
           <DinaFormSection>
             <ResourceSelectField<Person>
