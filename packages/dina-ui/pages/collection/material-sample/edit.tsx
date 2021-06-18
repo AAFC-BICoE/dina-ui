@@ -18,7 +18,7 @@ import { FormikProps, Field } from "formik";
 import { InputResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useContext, ReactNode, MutableRefObject } from "react";
+import { useContext, ReactNode } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { GroupSelectField, Head, Nav } from "../../../components";
@@ -143,9 +143,7 @@ export function MaterialSampleForm({
     setColEventId,
     colEventQuery,
     onSubmit,
-    materialSampleAttachmentsUI,
-    materialSampleGroupRef,
-    updateSelectedGroupRef
+    materialSampleAttachmentsUI
   } =
     materialSampleSaveHook ??
     useMaterialSampleSave({
@@ -199,11 +197,7 @@ export function MaterialSampleForm({
         </nav>
       </div>
       <div className="flex-grow-1 container-fluid">
-        {!isTemplate && (
-          <MaterialSampleMainInfoFormLayout
-            updateSelectedGroupRef={updateSelectedGroupRef}
-          />
-        )}
+        {!isTemplate && <MaterialSampleMainInfoFormLayout />}
         {isTemplate ? (
           <DinaForm
             initialValues={identifiersTemplateInitialValues}
@@ -327,7 +321,6 @@ export function MaterialSampleForm({
             >
               <PreparationsFormLayout
                 className={enablePreparations ? "" : "d-none"}
-                selectedGroupRef={materialSampleGroupRef}
               />
               {materialSampleAttachmentsUI}
             </DinaForm>
@@ -335,7 +328,6 @@ export function MaterialSampleForm({
             <>
               <PreparationsFormLayout
                 className={enablePreparations ? "" : "d-none"}
-                selectedGroupRef={materialSampleGroupRef}
               />
               {materialSampleAttachmentsUI}
             </>
@@ -359,34 +351,12 @@ export function MaterialSampleForm({
     mateirialSampleInternal
   );
 }
-
-export interface MaterialSampleMainInfoFormLayoutProps {
-  updateSelectedGroupRef?: (newGroup) => void;
-}
-
-export function MaterialSampleMainInfoFormLayout({
-  updateSelectedGroupRef
-}: MaterialSampleMainInfoFormLayoutProps) {
-  function onGroupChanged(value, _) {
-    updateSelectedGroupRef?.(value);
-  }
-
+export function MaterialSampleMainInfoFormLayout() {
   return (
     <div id="material-sample-section">
       <div className="row">
         <div className="col-md-6">
-          <Field name="group">
-            {({ field: { value } }) => {
-              updateSelectedGroupRef?.(value);
-              return (
-                <GroupSelectField
-                  name="group"
-                  enableStoredDefaultGroup={true}
-                  onChange={onGroupChanged}
-                />
-              );
-            }}
-          </Field>
+          <GroupSelectField name="group" enableStoredDefaultGroup={true} />
           <ResourceSelectField<MaterialSampleType>
             name="materialSampleType"
             filter={filterBy(["name"])}
@@ -458,13 +428,11 @@ export function MaterialSampleIdentifiersFormLayout({
 
 export interface CatalogueInfoFormLayoutProps {
   className?: string;
-  selectedGroupRef?: MutableRefObject<string | undefined>;
   namePrefix?: string;
 }
 
 export function PreparationsFormLayout({
   className,
-  selectedGroupRef,
   namePrefix
 }: CatalogueInfoFormLayoutProps) {
   return (
@@ -481,23 +449,21 @@ export function PreparationsFormLayout({
                 namePrefix ? namePrefix + "preparationType" : "preparationType"
               }`}
             >
-              {({}) => (
+              {({ form: { values } }) => (
                 <ResourceSelectField<PreparationType>
                   model="collection-api/preparation-type"
                   optionLabel={it => it.name}
                   readOnlyLink="/collection/preparation-type/view?id="
                   filter={input => ({
                     ...filterBy(["name"])(input),
-                    ...(selectedGroupRef?.current
-                      ? filterBy(["group"])(`${selectedGroupRef?.current}`)
-                      : {})
+                    ...filterBy(["group"])(`${values.group}`)
                   })}
                   name={`${
                     namePrefix
                       ? namePrefix + "preparationType"
                       : "preparationType"
                   }`}
-                  key={selectedGroupRef?.current}
+                  key={values.group}
                   customName="preparationType"
                 />
               )}
