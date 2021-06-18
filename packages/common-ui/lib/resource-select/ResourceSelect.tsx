@@ -92,7 +92,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   ) {
     // Omit blank/null filters:
     const filterParam = omitBy(filter(inputValue), val =>
-      ["", null, undefined].includes(val)
+      ["", null, undefined].includes(val as string)
     ) as FilterParam;
 
     // Omit undefined values from the GET params, which would otherwise cause an invalid request.
