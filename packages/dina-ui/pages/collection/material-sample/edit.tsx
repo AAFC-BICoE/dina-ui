@@ -12,9 +12,10 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
+  useApiClient,
   withResponse
 } from "common-ui";
-import { FormikProps, FastField } from "formik";
+import { FormikProps, Field } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -101,6 +102,7 @@ export function MaterialSampleForm({
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
   const { isTemplate } = useContext(DinaFormContext) ?? {};
+  const materialSampleGroup = useRef(materialSample?.group);
 
   const {
     initialValues,
@@ -120,13 +122,9 @@ export function MaterialSampleForm({
     useMaterialSampleSave({
       materialSample,
       onSaved,
-      isTemplate
+      isTemplate,
+      selectedGroupRef: materialSampleGroup
     });
-
-  const materialSampleGroup = useRef(materialSample?.group);
-
-  const [_, setRenderEnabled] = useState<boolean>(false);
-
   function updateSelectedGroupRef(newGroup) {
     materialSampleGroup.current = newGroup;
   }
@@ -184,7 +182,6 @@ export function MaterialSampleForm({
       <div className="flex-grow-1 container-fluid">
         {!isTemplate && (
           <MaterialSampleMainInfoFormLayout
-            setRenderEnabled={setRenderEnabled}
             updateSelectedGroupRef={updateSelectedGroupRef}
           />
         )}
@@ -334,24 +331,21 @@ export function MaterialSampleForm({
 }
 
 export interface MaterialSampleMainInfoFormLayoutProps {
-  setRenderEnabled?: Dispatch<SetStateAction<boolean>>;
   updateSelectedGroupRef?: (newGroup) => void;
 }
 
 export function MaterialSampleMainInfoFormLayout({
-  setRenderEnabled,
   updateSelectedGroupRef
 }: MaterialSampleMainInfoFormLayoutProps) {
   function onGroupChanged(value, _) {
     updateSelectedGroupRef?.(value);
-    setRenderEnabled?.(true);
   }
 
   return (
     <div id="material-sample-section">
       <div className="row">
         <div className="col-md-6">
-          <FastField name="group">
+          <Field name="group">
             {({ field: { value } }) => {
               updateSelectedGroupRef?.(value);
               return (
@@ -362,7 +356,7 @@ export function MaterialSampleMainInfoFormLayout({
                 />
               );
             }}
-          </FastField>
+          </Field>
           <ResourceSelectField<MaterialSampleType>
             name="materialSampleType"
             filter={filterBy(["name"])}
@@ -414,18 +408,23 @@ export function PreparationsFormLayout({
       <div className="row">
         <div className="col-md-6">
           <div className="preparation-type">
-            <ResourceSelectField<PreparationType>
-              name="preparationType"
-              model="collection-api/preparation-type"
-              optionLabel={it => it.name}
-              readOnlyLink="/collection/preparation-type/view?id="
-              filter={input => ({
-                ...filterBy(["name"])(input),
-                ...(selectedGroupRef?.current
-                  ? filterBy(["group"])(`${selectedGroupRef?.current}`)
-                  : {})
-              })}
-            />
+            <Field name="preparationType">
+              {({}) => (
+                <ResourceSelectField<PreparationType>
+                  model="collection-api/preparation-type"
+                  optionLabel={it => it.name}
+                  readOnlyLink="/collection/preparation-type/view?id="
+                  filter={input => ({
+                    ...filterBy(["name"])(input),
+                    ...(selectedGroupRef?.current
+                      ? filterBy(["group"])(`${selectedGroupRef?.current}`)
+                      : {})
+                  })}
+                  name="preparationType"
+                  key={selectedGroupRef?.current}
+                />
+              )}
+            </Field>
           </div>
           <DinaFormSection
             readOnly={true} // Disabled until back-end supports these fields.
