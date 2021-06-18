@@ -87,7 +87,7 @@ describe("collector-group edit page", () => {
                 data: [
                   {
                     id: "1",
-                    type: "agent"
+                    type: "person"
                   }
                 ]
               }
