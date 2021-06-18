@@ -64,7 +64,10 @@ declare module "kitsu" {
   }
 
   /** Parameter for filtering listed data. */
-  export type FilterParam = string | Record<string, string>;
+  export type FilterParam =
+    | string
+    | Record<string, string>
+    | Record<string, {}>;
 
   /** The response from a Kitsu GET request. */
   export interface KitsuResponse<
