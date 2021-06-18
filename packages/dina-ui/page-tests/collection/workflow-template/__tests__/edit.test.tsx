@@ -115,6 +115,22 @@ async function mountForm(
     await toggleDataComponent(catalogSwitch(), val);
   }
 
+  async function toggleActionType(
+    val: PreparationProcessDefinition["actionType"]
+  ) {
+    wrapper
+      .find(`input.actionType-${val}`)
+      .simulate("change", { target: { checked: true } });
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    if (wrapper.find(".modal-content form").exists()) {
+      wrapper.find(".modal-content form").simulate("submit");
+    }
+    await new Promise(setImmediate);
+    wrapper.update();
+  }
+
   async function fillOutRequiredFields() {
     // Set the name:
     wrapper
@@ -143,7 +159,8 @@ async function mountForm(
     colEventSwitch,
     catalogSwitch,
     fillOutRequiredFields,
-    submitForm
+    submitForm,
+    toggleActionType
   };
 }
 
@@ -157,7 +174,7 @@ describe("Workflow template edit page", () => {
     expect(catalogSwitch().prop("checked")).toEqual(false);
   });
 
-  it("Submits a new action-definition: minimal form submission.", async () => {
+  it("Submits a new ADD-type action-definition: minimal form submission.", async () => {
     const {
       toggleColEvent,
       togglePreparations,
@@ -195,7 +212,7 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Submits a new action-definition: Only set collecting event template fields.", async () => {
+  it("Submits a new ADD-type action-definition: Only set collecting event template fields.", async () => {
     const { wrapper, toggleColEvent, fillOutRequiredFields, submitForm } =
       await mountForm();
 
@@ -259,6 +276,9 @@ describe("Workflow template edit page", () => {
               enabled: true
             }
           }
+        },
+        MATERIAL_SAMPLE: {
+          templateFields: {}
         }
       },
       group: "test-group-1",
@@ -268,7 +288,7 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Submits a new action-definition: Only set preparations template fields.", async () => {
+  it("Submits a new ADD-type action-definition: Only set preparations template fields.", async () => {
     const { wrapper, togglePreparations, fillOutRequiredFields, submitForm } =
       await mountForm();
 
@@ -316,7 +336,7 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Submits a new action-definition: Link to an existing Collecting Event.", async () => {
+  it("Submits a new ADD-type action-definition: Link to an existing Collecting Event.", async () => {
     const { wrapper, toggleColEvent, fillOutRequiredFields, submitForm } =
       await mountForm();
 
@@ -347,6 +367,9 @@ describe("Workflow template edit page", () => {
               enabled: true
             }
           }
+        },
+        MATERIAL_SAMPLE: {
+          templateFields: {}
         }
       },
       group: "test-group-1",
@@ -412,6 +435,9 @@ describe("Workflow template edit page", () => {
         COLLECTING_EVENT: {
           allowExisting: false,
           allowNew: false,
+          templateFields: {}
+        },
+        MATERIAL_SAMPLE: {
           templateFields: {}
         }
       },
@@ -519,7 +545,6 @@ describe("Workflow template edit page", () => {
 
   it("Edits an existing action-definition: Can remove the data components.", async () => {
     const {
-      wrapper,
       colEventSwitch,
       catalogSwitch,
       toggleColEvent,
@@ -572,7 +597,157 @@ describe("Workflow template edit page", () => {
     expect(mockOnSaved).lastCalledWith({
       actionType: "ADD",
       // Both data components removed:
-      formTemplates: {},
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowNew: true,
+          allowExisting: true,
+          templateFields: {}
+        }
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+  });
+
+  it("Edits an existing action-definition: Splits the Material Sample's Identifiers and Preparation sub-forms correctly.", async () => {
+    const { wrapper, submitForm } = await mountForm({
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowNew: true,
+          allowExisting: true,
+          templateFields: {
+            materialSampleName: {
+              defaultValue: "test-default-name",
+              enabled: true
+            },
+            dwcCatalogNumber: {
+              defaultValue: "test-catalog-number",
+              enabled: true
+            },
+            dwcOtherCatalogNumbers: {
+              defaultValue: ["other-number-1", "other-number-2"],
+              enabled: true
+            },
+            preparationType: {
+              defaultValue: {
+                id: "100",
+                name: "test-prep-type",
+                type: "preparation-type"
+              },
+              enabled: true
+            }
+          }
+        }
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+
+    // The input values should be initialized:
+    expect(
+      wrapper.find(".materialSampleName-field input").prop("value")
+    ).toEqual("test-default-name");
+    expect(wrapper.find(".dwcCatalogNumber-field input").prop("value")).toEqual(
+      "test-catalog-number"
+    );
+    expect(
+      wrapper.find(".dwcOtherCatalogNumbers-field textarea").prop("value")
+    ).toEqual("other-number-1\nother-number-2\n");
+    expect(
+      wrapper.find(".preparationType-field ResourceSelect").prop<any>("value")
+    ).toEqual({
+      id: "100",
+      name: "test-prep-type",
+      type: "preparation-type"
+    });
+
+    wrapper
+      .find(".dwcCatalogNumber-field input")
+      .simulate("change", { target: { value: "edited-catalog-number" } });
+
+    await submitForm();
+
+    expect(mockOnSaved).lastCalledWith({
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowExisting: true,
+          allowNew: true,
+          templateFields: {
+            dwcCatalogNumber: {
+              // The edited value:
+              defaultValue: "edited-catalog-number",
+              enabled: true
+            },
+            dwcOtherCatalogNumbers: {
+              defaultValue: ["other-number-1", "other-number-2"],
+              enabled: true
+            },
+            materialSampleName: {
+              defaultValue: "test-default-name",
+              enabled: true
+            },
+            preparationType: {
+              defaultValue: {
+                id: "100",
+                name: "test-prep-type",
+                type: "preparation-type"
+              },
+              enabled: true
+            }
+          }
+        }
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+  });
+
+  it("Adds a new SPLIT-type action definition", async () => {
+    const { wrapper, fillOutRequiredFields, toggleActionType, submitForm } =
+      await mountForm();
+    await fillOutRequiredFields();
+    await toggleActionType("SPLIT");
+
+    // Only allow new attachments:
+    wrapper
+      .find("input.allow-new-checkbox")
+      .simulate("change", { target: { checked: true } });
+
+    // Set a default prep type:
+    wrapper
+      .find(".preparation-type input[type='checkbox']")
+      .simulate("change", { target: { checked: true } });
+    wrapper.find(".preparationType-field Select").prop<any>("onChange")({
+      resource: TEST_PREP_TYPE
+    });
+
+    await submitForm();
+
+    expect(mockOnSaved).lastCalledWith({
+      actionType: "SPLIT",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowNew: true,
+          templateFields: {
+            preparationType: {
+              defaultValue: {
+                id: "100",
+                name: "test-prep-type",
+                type: "preparation-type"
+              },
+              enabled: true
+            }
+          }
+        }
+      },
       group: "test-group-1",
       id: "123",
       name: "test-config",

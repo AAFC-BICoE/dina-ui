@@ -1,4 +1,6 @@
-import { PersistedResource } from "kitsu";
+import { KitsuResourceLink, PersistedResource } from "kitsu";
+import ReactSwitch from "react-switch";
+import Switch from "react-switch";
 import { MaterialSampleForm } from "../../../../pages/collection/material-sample/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
@@ -7,7 +9,6 @@ import {
 } from "../../../../types/collection-api";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
 import { SRS } from "../../../../types/collection-api/resources/SRS";
-import Switch from "react-switch";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -61,6 +62,7 @@ const mockGet = jest.fn<any, any>(async path => {
       return { data: [TEST_COORDINATES] };
     case "collection-api/preparation-type":
     case "collection-api/managed-attribute":
+    case "collection-api/material-sample-type":
     case "user-api/group":
     case "agent-api/person":
     case "objectstore-api/metadata":
@@ -216,26 +218,9 @@ describe("Material Sample Edit Page", () => {
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
       [
-        // Saves the existing Collecting Event:
+        // Doesn't save the existing Collecting Event because it wasn't edited:
         [
-          {
-            resource: {
-              dwcOtherRecordNumbers: null,
-              geoReferenceAssertions: [],
-              group: "test group",
-              id: "1",
-              relationships: {},
-              startEventDateTime: "2021-04-13",
-              type: "collecting-event"
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        // New material-sample:
-        [
+          // New material-sample:
           {
             resource: {
               collectingEvent: {
@@ -286,24 +271,6 @@ describe("Material Sample Edit Page", () => {
 
     expect(mockSave.mock.calls).toEqual([
       [
-        // Edits existing collecting-event:
-        [
-          {
-            resource: {
-              startEventDateTime: "2021-04-13",
-              id: "1",
-              type: "collecting-event",
-              geoReferenceAssertions: [],
-              group: "test group",
-              dwcOtherRecordNumbers: null,
-              relationships: {}
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
         // Edits existing material-sample:
         [
           {
@@ -314,7 +281,17 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "edited-catalog-number",
               collectingEvent: { id: "1", type: "collecting-event" },
-              preparationType: { id: null, type: "preparation-type" },
+
+              // Preparations are not enabled, so the preparation fields are set to null:
+              preparationDate: null,
+              preparationType: {
+                id: null,
+                type: "preparation-type"
+              },
+              preparedBy: {
+                id: null
+              },
+
               relationships: {}
             },
             type: "material-sample"
@@ -399,7 +376,17 @@ describe("Material Sample Edit Page", () => {
               group: "test group",
               id: "1",
               type: "material-sample",
-              preparationType: { id: null, type: "preparation-type" },
+
+              // Preparations are not enabled, so the preparation fields are set to null:
+              preparationDate: null,
+              preparationType: {
+                id: null,
+                type: "preparation-type"
+              },
+              preparedBy: {
+                id: null
+              },
+
               relationships: {}
             },
             type: "material-sample"
@@ -408,5 +395,54 @@ describe("Material Sample Edit Page", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
+  });
+
+  it("Renders an existing Material Sample with the Preparations section enabled.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms",
+          preparationType: {
+            id: "65765",
+            type: "preparation-type",
+            name: "test-prep-type"
+          } as KitsuResourceLink
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Preparations are enabled:
+    expect(
+      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+  });
+
+  it("Renders an existing Material Sample with the Preparations section disabled (no Preparations fields set).", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms"
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Preparations are disabled:
+    expect(
+      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
   });
 });

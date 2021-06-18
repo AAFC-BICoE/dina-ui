@@ -20,6 +20,7 @@ const TEST_METADATAS: PersistedResource<Metadata>[] = [
     acTags: ["tag1"],
     bucket: "testbucket",
     dcType: "Image",
+    orientation: 5,
     fileExtension: ".png",
     fileIdentifier: "9a85b858-f8f0-4a97-99a8-07b2cb759766",
     id: "6c524135-3c3e-41c1-a057-45afb4e3e7be",
