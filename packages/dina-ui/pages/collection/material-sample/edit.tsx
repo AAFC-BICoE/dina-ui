@@ -456,7 +456,7 @@ export function PreparationsFormLayout({
                   readOnlyLink="/collection/preparation-type/view?id="
                   filter={input => ({
                     ...filterBy(["name"])(input),
-                    ...filterBy(["group"])(`${values.group}`)
+                    group: { EQ: `${values.group}` }
                   })}
                   name={`${
                     namePrefix
