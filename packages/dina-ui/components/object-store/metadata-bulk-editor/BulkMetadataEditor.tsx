@@ -146,6 +146,7 @@ export function BulkMetadataEditor({
         dcType: objectUpload.dcType,
         fileIdentifier: objectUpload.id,
         originalFilename: objectUpload.originalFilename,
+        orientation: objectUpload.orientation,
         type: "metadata"
       }));
 
@@ -394,6 +395,22 @@ export function useMetadataBuiltInAttributeColumns(): HotColumnProps[] {
       data: "metadata.acCaption",
       title: formatMessage("field_acCaption")
     },
+    {
+      data: "metadata.orientation",
+      source: [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        null
+      ],
+      title: formatMessage("field_orientation"),
+      type: "dropdown"
+    }, 
     {
       data: "acTags",
       title: formatMessage("metadataBulkEditTagsLabel")

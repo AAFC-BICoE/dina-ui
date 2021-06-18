@@ -29,6 +29,7 @@ export interface MetadataAttributes {
   originalFilename?: string;
   notPubliclyReleasableReason?: string;
   publiclyReleasable?: boolean;
+  orientation?: number;
 
   acHashFunction?: string;
   acHashValue?: string;
