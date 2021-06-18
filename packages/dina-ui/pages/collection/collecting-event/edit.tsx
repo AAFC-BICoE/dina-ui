@@ -68,7 +68,7 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     collectingEventInitialValues,
     saveCollectingEvent,
     collectingEventFormSchema
-  } = useCollectingEventSave(collectingEvent);
+  } = useCollectingEventSave({ fetchedCollectingEvent: collectingEvent });
 
   const [, setDefaultVerbatimCoordSys] = useLocalStorage<
     string | null | undefined

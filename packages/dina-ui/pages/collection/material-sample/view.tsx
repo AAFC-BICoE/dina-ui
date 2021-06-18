@@ -5,7 +5,6 @@ import {
   DinaForm,
   EditButton,
   FieldSet,
-  useQuery,
   withResponse
 } from "common-ui";
 import { Field } from "formik";
@@ -15,24 +14,22 @@ import { withRouter } from "next/router";
 import { Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
+import { useMaterialSampleQuery } from "../../../components/collection/useMaterialSample";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import {
-  PreparationsFormLayout,
   MaterialSampleIdentifiersFormLayout,
-  MaterialSampleMainInfoFormLayout
+  MaterialSampleMainInfoFormLayout,
+  PreparationsFormLayout
 } from "./edit";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
 
-  const { id } = router.query;
+  const id = router.query.id?.toString();
 
-  const materialSampleQuery = useQuery<MaterialSample>({
-    path: `collection-api/material-sample/${id}`,
-    include: "collectingEvent,attachment,preparationType,materialSampleType"
-  });
+  const materialSampleQuery = useMaterialSampleQuery(id);
 
   const colEventQuery = useCollectingEventQuery(
     materialSampleQuery.response?.data?.collectingEvent?.id
@@ -66,7 +63,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <Head title={formatMessage("materialSampleViewTitle")} />
       <Nav />
       {withResponse(materialSampleQuery, ({ data: materialSample }) => {
-        const hasPreparations = !!materialSample.preparationType;
+        const hasPreparations = Boolean(
+          materialSample.preparationType ||
+            materialSample.preparationDate ||
+            materialSample.preparedBy
+        );
         return (
           <main className="container-fluid">
             {buttonBar}

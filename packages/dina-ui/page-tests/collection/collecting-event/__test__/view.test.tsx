@@ -10,7 +10,6 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
   verbatimEventDateTime: "From 2019, 1,1,10,10,10 to 2019, 1.6, 10,10,10",
   id: "100",
   type: "collecting-event",
-  uuid: "323423-23423-234",
   group: "test group",
   dwcOtherRecordNumbers: ["12", "13", "14"],
   geoReferenceAssertions: [

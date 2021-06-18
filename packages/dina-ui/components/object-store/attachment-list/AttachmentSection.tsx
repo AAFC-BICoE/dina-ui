@@ -24,13 +24,22 @@ export interface AttachmentListProps
    * Omitting this gets rid of the Existing Attachments UI.
    */
   attachmentPath?: string;
+
+  /** Manually set whether new/existing attachments can be added. By default allow both. */
+  allowAttachmentsConfig?: AllowAttachmentsConfig;
+}
+
+export interface AllowAttachmentsConfig {
+  allowNew?: boolean;
+  allowExisting?: boolean;
 }
 
 /** UI section for reading and modifying file attachments. */
 export function AttachmentSection({
   attachmentPath,
   onDetachMetadataIds: onDetachMetadataIdsProp,
-  afterMetadatasSaved: afterMetadatasSavedProp
+  afterMetadatasSaved: afterMetadatasSavedProp,
+  allowAttachmentsConfig = { allowExisting: true, allowNew: true }
 }: AttachmentListProps) {
   const [lastSave, setLastSave] = useState(Date.now());
 
@@ -70,12 +79,16 @@ export function AttachmentSection({
               <DinaMessage id="existingAttachments" />
             </Tab>
           )}
-          <Tab>
-            <DinaMessage id="uploadNewAttachments" />
-          </Tab>
-          <Tab>
-            <DinaMessage id="attachExistingObjects" />
-          </Tab>
+          {allowAttachmentsConfig.allowNew && (
+            <Tab>
+              <DinaMessage id="uploadNewAttachments" />
+            </Tab>
+          )}
+          {allowAttachmentsConfig.allowExisting && (
+            <Tab>
+              <DinaMessage id="attachExistingObjects" />
+            </Tab>
+          )}
         </TabList>
         {attachmentPath && (
           <TabPanel>
@@ -86,16 +99,20 @@ export function AttachmentSection({
             />
           </TabPanel>
         )}
-        <TabPanel>
-          <AttachmentUploader
-            afterMetadatasSaved={afterMetadatasSavedInternal}
-          />
-        </TabPanel>
-        <TabPanel>
-          <ExistingObjectsAttacher
-            onMetadataIdsSubmitted={afterMetadatasSavedInternal}
-          />
-        </TabPanel>
+        {allowAttachmentsConfig.allowNew && (
+          <TabPanel>
+            <AttachmentUploader
+              afterMetadatasSaved={afterMetadatasSavedInternal}
+            />
+          </TabPanel>
+        )}
+        {allowAttachmentsConfig.allowExisting && (
+          <TabPanel>
+            <ExistingObjectsAttacher
+              onMetadataIdsSubmitted={afterMetadatasSavedInternal}
+            />
+          </TabPanel>
+        )}
       </Tabs>
     </FieldSet>
   );

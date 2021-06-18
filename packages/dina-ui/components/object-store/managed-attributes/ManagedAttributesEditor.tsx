@@ -82,7 +82,7 @@ export function ManagedAttributesEditor({
   return (
     <div className="mb-3 managed-attributes-editor">
       <div className="row">
-        <label className="editable-attribute-menu col-sm-6">
+        <label className="editable-attribute-menu col-sm-6 mb-3">
           <strong>
             <DinaMessage id="field_editableManagedAttributes" />
           </strong>

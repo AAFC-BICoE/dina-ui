@@ -15,10 +15,10 @@ import {
   withResponse
 } from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource, PersistedResource } from "kitsu";
+import { InputResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useContext } from "react";
+import { ReactNode, useContext } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { GroupSelectField, Head, Nav } from "../../../components";
@@ -27,8 +27,11 @@ import {
   useMaterialSampleQuery,
   useMaterialSampleSave
 } from "../../../components/collection/useMaterialSample";
+import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { Person } from "../../../types/agent-api";
 import {
+  CollectingEvent,
   MaterialSample,
   MaterialSampleType
 } from "../../../types/collection-api";
@@ -72,7 +75,9 @@ export default function MaterialSampleEditPage() {
 }
 
 export interface MaterialSampleFormProps {
-  materialSample?: PersistedResource<MaterialSample>;
+  materialSample?: InputResource<MaterialSample>;
+  collectingEventInitialValues?: InputResource<CollectingEvent>;
+
   onSaved?: (id: string) => Promise<void>;
   preparationsSectionRef?: React.RefObject<FormikProps<any>>;
   identifiersSectionRef?: React.RefObject<FormikProps<any>>;
@@ -87,14 +92,39 @@ export interface MaterialSampleFormProps {
   identifiersTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
+
+  /** The enabled fields if creating from a template. */
+  enabledFields?: {
+    materialSample: string[];
+    collectingEvent: string[];
+  };
+
+  attachmentsConfig?: {
+    materialSample: AllowAttachmentsConfig;
+    collectingEvent: AllowAttachmentsConfig;
+  };
+
+  buttonBar?: ReactNode;
 }
 
 export function MaterialSampleForm({
   materialSample,
+  collectingEventInitialValues,
   onSaved,
   preparationsSectionRef,
   identifiersSectionRef,
   materialSampleSaveHook,
+  enabledFields,
+  attachmentsConfig,
+  buttonBar = (
+    <ButtonBar>
+      <BackButton
+        entityId={materialSample?.id}
+        entityLink="/collection/material-sample"
+      />
+      <SubmitButton className="ms-auto" />
+    </ButtonBar>
+  ),
   preparationsTemplateInitialValues,
   identifiersTemplateInitialValues
 }: MaterialSampleFormProps) {
@@ -117,20 +147,14 @@ export function MaterialSampleForm({
   } =
     materialSampleSaveHook ??
     useMaterialSampleSave({
+      collectingEventAttachmentsConfig: attachmentsConfig?.collectingEvent,
+      materialSampleAttachmentsConfig: attachmentsConfig?.materialSample,
       materialSample,
+      collectingEventInitialValues,
       onSaved,
-      isTemplate
+      isTemplate,
+      enabledFields
     });
-
-  const buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={materialSample?.id}
-        entityLink="/collection/material-sample"
-      />
-      <SubmitButton className="ms-auto" />
-    </ButtonBar>
-  );
 
   const mateirialSampleInternal = (
     <div className="d-flex">
@@ -317,6 +341,7 @@ export function MaterialSampleForm({
     <DinaForm<InputResource<MaterialSample>>
       initialValues={initialValues}
       onSubmit={onSubmit}
+      enabledFields={enabledFields?.materialSample}
     >
       {buttonBar}
       {mateirialSampleInternal}
@@ -431,19 +456,14 @@ export function PreparationsFormLayout({
               customName="preparationType"
             />
           </div>
-          <DinaFormSection
-            readOnly={true} // Disabled until back-end supports these fields.
-          >
-            <TextField
-              name={`${namePrefix ? namePrefix + "preparedBy" : "preparedBy"}`}
-              customName="preparedBy"
+          <DinaFormSection>
+            <ResourceSelectField<Person>
+              name="preparedBy"
+              filter={filterBy(["displayName"])}
+              model="agent-api/person"
+              optionLabel={person => person.displayName}
             />
-            <DateField
-              name={`${
-                namePrefix ? namePrefix + "datePrepared" : "datePrepared"
-              }`}
-              customName="datePrepared"
-            />
+            <DateField name="preparationDate" />
           </DinaFormSection>
         </div>
       </div>
