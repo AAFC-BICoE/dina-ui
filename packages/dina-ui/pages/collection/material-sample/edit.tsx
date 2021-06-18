@@ -15,7 +15,7 @@ import {
   withResponse
 } from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactNode, useContext } from "react";
@@ -156,6 +156,12 @@ export function MaterialSampleForm({
       enabledFields
     });
 
+  // CollectingEvent "id" being enabled in the template enabledFields means that the
+  // Template links an existing Collecting Event:
+  const templateAttachesCollectingEvent = Boolean(
+    enabledFields?.collectingEvent.includes("id")
+  );
+
   const mateirialSampleInternal = (
     <div className="d-flex">
       <div>
@@ -255,7 +261,7 @@ export function MaterialSampleForm({
                     <DinaMessage id="createNew" />
                   )}
                 </Tab>
-                <Tab>
+                <Tab disabled={templateAttachesCollectingEvent}>
                   <DinaMessage id="attachExisting" />
                 </Tab>
               </TabList>
@@ -275,23 +281,34 @@ export function MaterialSampleForm({
                                   <DinaMessage id="collectingEventDetailsPageLink" />
                                 </a>
                               </Link>
-                              <FormikButton
-                                className="btn btn-danger detach-collecting-event-button ms-5"
-                                onClick={() => setColEventId(null)}
-                              >
-                                <DinaMessage id="detachCollectingEvent" />
-                              </FormikButton>
+                              {
+                                // Do not allow changing an attached Collecting Event from a template:
+                                !templateAttachesCollectingEvent && (
+                                  <FormikButton
+                                    className="btn btn-danger detach-collecting-event-button ms-5"
+                                    onClick={() => setColEventId(null)}
+                                  >
+                                    <DinaMessage id="detachCollectingEvent" />
+                                  </FormikButton>
+                                )
+                              }
                             </div>
                             {
-                              // In template mode, only show a link to the linked Collecting Event:
-                              isTemplate ? (
-                                <div className="attached-collecting-event-link">
-                                  <DinaMessage id="attachedCollectingEvent" />:{" "}
-                                  <Link
-                                    href={`/collection/collecting-event/view?id=${colEventId}`}
-                                  >
-                                    <a target="_blank">{linkedColEvent.id}</a>
-                                  </Link>
+                              // In template mode or Workflow Run mode, only show a link to the linked Collecting Event:
+                              isTemplate || templateAttachesCollectingEvent ? (
+                                <div>
+                                  <div className="attached-collecting-event-link mb-3">
+                                    <DinaMessage id="attachedCollectingEvent" />
+                                    :{" "}
+                                    <Link
+                                      href={`/collection/collecting-event/view?id=${colEventId}`}
+                                    >
+                                      <a target="_blank">{linkedColEvent.id}</a>
+                                    </Link>
+                                  </div>
+                                  <CollectingEventBriefDetails
+                                    collectingEvent={linkedColEvent}
+                                  />
                                 </div>
                               ) : (
                                 // In form mode, show the actual editable Collecting Event form:
@@ -468,5 +485,38 @@ export function PreparationsFormLayout({
         </div>
       </div>
     </FieldSet>
+  );
+}
+
+export interface CollectingEventBriefDetailsProps {
+  collectingEvent: PersistedResource<CollectingEvent>;
+}
+
+/** Shows just the main details of a Collecting Event. */
+export function CollectingEventBriefDetails({
+  collectingEvent
+}: CollectingEventBriefDetailsProps) {
+  return (
+    <DinaForm initialValues={collectingEvent} readOnly={true}>
+      <div className="row">
+        <div className="col-sm-6">
+          <FieldSet legend={<DinaMessage id="collectingDateLegend" />}>
+            <TextField name="startEventDateTime" />
+            {collectingEvent.endEventDateTime && (
+              <TextField name="startEventDateTime" />
+            )}
+            <TextField name="verbatimEventDateTime" />
+          </FieldSet>
+        </div>
+        <div className="col-sm-6">
+          <FieldSet legend={<DinaMessage id="collectingLocationLegend" />}>
+            <TextField name="dwcVerbatimLocality" />
+            <TextField name="dwcVerbatimCoordinateSystem" />
+            <TextField name="dwcVerbatimLatitude" />
+            <TextField name="dwcVerbatimLongitude" />
+          </FieldSet>
+        </div>
+      </div>
+    </DinaForm>
   );
 }
