@@ -142,7 +142,7 @@ export default function ConfigAction() {
         actionRemarks: configActionFields.remarks
       },
       configure: {
-        identifier: configActionFields.identifier,
+        identifiers: configActionFields.identifiers,
         numOfChildToCreate:
           configActionFields.numOfChildToCreate ?? numOfChildToCreate,
         baseName: configActionFields.baseName ?? BASE_NAME,
