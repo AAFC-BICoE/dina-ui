@@ -100,6 +100,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editOrganizationAliasesLabel: "Aliases (Comma-separated)",
   editOrganizationTitle: "Edit Organization",
   editPersonTitle: "Edit Person",
+  editPreparationTypeTitle: "Edit Preparation Type",
   editSelectedAttachmentMetadata: "Edit Selected Attachment Metadata",
   editSelectedButtonText: "Edit Selected",
   editWorkflowTemplateTitle: "Edit Workflow Template",
@@ -211,7 +212,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
   field_orientation: "Orientation",
-  field_orientation_tooltip: 
+  field_orientation_tooltip:
     "Determines the way an image should be displayed based on its orientation value, must be a number from 1 to 8.",
   field_originalFilename: "Original Filename",
   field_preparationType: "Preparation Type",
