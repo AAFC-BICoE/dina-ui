@@ -8,7 +8,7 @@ import {
   SelectField,
   SubmitButton,
   TextField
-} from "common-ui";
+} from "../../../../../common-ui";
 import NumberSpinnerField from "../../../../../common-ui/lib/formik-connected/NumberSpinnerField";
 import {
   MaterialSampleRunConfig,
@@ -61,6 +61,7 @@ export default function ConfigAction() {
     splitChildSampleRunConfig?.configure?.start ??
       (suffixType === TYPE_NUMERIC ? "1" : "A")
   );
+
   const router = useRouter();
 
   const onCreatedChildSplitSampleChange = value => {
@@ -96,9 +97,9 @@ export default function ConfigAction() {
       <div className="d-flex">
         <span className="col-md-1 fw-bold">#{index + 1}:</span>
         <TextField
-          className={`col-md-3 sampleName${index}`}
+          className={`col-md-3 sampleNames${index}`}
           hideLabel={true}
-          name={`sampleName[${index}]`}
+          name={`sampleNames[${index}]`}
           placeholder={
             sampleSrcName
               ? `${sampleSrcName}-${computedSuffix}`
@@ -108,7 +109,7 @@ export default function ConfigAction() {
         <TextField
           className="col-md-3"
           hideLabel={true}
-          name={`description[${index}]`}
+          name={`sampleDescs[${index}]`}
         />
       </div>
     );
@@ -136,12 +137,6 @@ export default function ConfigAction() {
     // record the customized user entry if there is any name or description provided
     const sampleNames: any = [];
     const sampleDescs: any = [];
-    if (configActionFields.sampleName || configActionFields.description) {
-      for (let i = 0; i < numOfChildToCreate; i++) {
-        sampleNames.push(configActionFields.sampleName?.[i]);
-        sampleDescs.push(configActionFields.description?.[i]);
-      }
-    }
     const runConfig: MaterialSampleRunConfig = {
       metadata: {
         actionRemarks: configActionFields.remarks
@@ -156,8 +151,8 @@ export default function ConfigAction() {
         destroyOriginal: configActionFields.destroyOriginal
       },
       configure_children: {
-        sampleNames,
-        sampleDescs
+        sampleNames: configActionFields.sampleNames,
+        sampleDescs: configActionFields.sampleDescs
       }
     };
 
@@ -186,6 +181,14 @@ export default function ConfigAction() {
   const isNumericalType = suffixType === TYPE_NUMERIC;
   const isLetterType = suffixType === TYPE_LETTER;
 
+  const initialConfig = splitChildSampleRunConfig?.configure ?? {
+    suffixType: TYPE_NUMERIC,
+    numOfChildToCreate,
+    identifier: "MATERIAL_SAMPLE_ID"
+  };
+
+  const initialConfigChild = splitChildSampleRunConfig?.configure_children;
+
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
@@ -195,13 +198,7 @@ export default function ConfigAction() {
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
         <DinaForm
-          initialValues={
-            splitChildSampleRunConfig?.configure ?? {
-              suffixType: TYPE_NUMERIC,
-              numOfChildToCreate,
-              identifier: "MATERIAL_SAMPLE_ID"
-            }
-          }
+          initialValues={{ ...initialConfig, ...initialConfigChild }}
           onSubmit={onSubmit}
         >
           <p>
