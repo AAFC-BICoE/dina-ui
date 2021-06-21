@@ -61,7 +61,7 @@ describe("MaterialSample split workflow run config", () => {
       .simulate("change", { target: { value: "Remarks on this run config" } });
 
     wrapper
-      .find(".sampleName0 input")
+      .find(".sampleNames0 input")
       .simulate("change", { target: { value: "my custom name" } });
 
     wrapper.update();

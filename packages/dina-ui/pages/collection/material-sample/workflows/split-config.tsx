@@ -94,7 +94,10 @@ export default function ConfigAction() {
     computedSuffix
   }: SplitChildRowProps) => {
     return (
-      <div className="d-flex">
+      <div
+        className="d-flex"
+        style={{ backgroundColor: `${index % 2 === 0 ? "#f3f3f3" : ""}` }}
+      >
         <span className="col-md-1 fw-bold">#{index + 1}:</span>
         <TextField
           className={`col-md-3 sampleNames${index}`}
@@ -134,9 +137,6 @@ export default function ConfigAction() {
   };
 
   const onSubmit = async ({ submittedValues: configActionFields }) => {
-    // record the customized user entry if there is any name or description provided
-    const sampleNames: any = [];
-    const sampleDescs: any = [];
     const runConfig: MaterialSampleRunConfig = {
       metadata: {
         actionRemarks: configActionFields.remarks
