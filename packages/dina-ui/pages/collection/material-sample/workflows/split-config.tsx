@@ -184,7 +184,7 @@ export default function ConfigAction() {
   const initialConfig = splitChildSampleRunConfig?.configure ?? {
     suffixType: TYPE_NUMERIC,
     numOfChildToCreate,
-    identifier: "MATERIAL_SAMPLE_ID"
+    identifiers: "MATERIAL_SAMPLE_ID"
   };
 
   const initialConfigChild = splitChildSampleRunConfig?.configure_children;
