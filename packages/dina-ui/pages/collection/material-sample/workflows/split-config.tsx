@@ -16,7 +16,8 @@ import {
   START,
   TYPE_LETTER,
   TYPE_NUMERIC,
-  NUMERIC_UPPER_LIMIT
+  NUMERIC_UPPER_LIMIT,
+  IDENTIFIER_TYPE_OPTIONS
 } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import React, { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
@@ -145,6 +146,7 @@ export default function ConfigAction() {
         actionRemarks: configActionFields.remarks
       },
       configure: {
+        identifier: configActionFields.identifier,
         numOfChildToCreate:
           configActionFields.numOfChildToCreate ?? numOfChildToCreate,
         baseName: configActionFields.baseName ?? BASE_NAME,
@@ -192,7 +194,11 @@ export default function ConfigAction() {
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
         <DinaForm
-          initialValues={{ suffixType: TYPE_NUMERIC, numOfChildToCreate }}
+          initialValues={{
+            suffixType: TYPE_NUMERIC,
+            numOfChildToCreate,
+            identifier: "MATERIAL_SAMPLE_ID"
+          }}
           onSubmit={onSubmit}
         >
           <p>
@@ -231,6 +237,15 @@ export default function ConfigAction() {
               </div>
             </div>
             <div className="row">
+              <SelectField
+                className="col-md-2"
+                name="identifier"
+                options={IDENTIFIER_TYPE_OPTIONS.map(({ labelKey, value }) => ({
+                  label: formatMessage(labelKey),
+                  value
+                }))}
+              />
+
               <TextField
                 className="col-md-2"
                 name="baseName"

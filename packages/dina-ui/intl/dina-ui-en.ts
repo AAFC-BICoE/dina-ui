@@ -204,6 +204,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeType_integer_label: "Numerical",
   field_managedAttributeType_picklist_label: "Pick List",
   field_managedAttributeType_text_label: "Text",
+  field_materialSample_identifierType_materialSampleId_label:
+    "Material Sample ID",
+  field_materialSample_identifierType_catalogueNumber_label: "Catalogue Number",
   field_materialSampleName: "Material Sample ID",
   "field_materialSampleType.name": "Material Sample Type",
   "field_materialSampleType.uuid": "Material Sample Type",
@@ -211,7 +214,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
   field_orientation: "Orientation",
-  field_orientation_tooltip: 
+  field_orientation_tooltip:
     "Determines the way an image should be displayed based on its orientation value, must be a number from 1 to 8.",
   field_originalFilename: "Original Filename",
   field_preparationType: "Preparation Type",
