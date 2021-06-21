@@ -41,8 +41,8 @@ describe("MaterialSample split workflow run config", () => {
       START
     );
 
-    const { value } = wrapper.find(Select).props();
-    expect(value.value).toEqual(TYPE_NUMERIC);
+    const value = wrapper.find(".suffixType Select").prop("value");
+    expect(value).toEqual({ label: "Numerical", value: TYPE_NUMERIC });
   });
 
   it("Creates a new Material Sample workfow run config with user custom entries", async () => {

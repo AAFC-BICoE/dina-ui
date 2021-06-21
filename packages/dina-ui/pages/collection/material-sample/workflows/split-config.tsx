@@ -31,15 +31,6 @@ interface SplitChildRowProps {
   computedSuffix: string;
 }
 
-/* Config action related fields */
-interface RunConfig {
-  numOfChildToCreate: number;
-  baseName: string;
-  start: string;
-  sufficType: string;
-  customChildSample?: { index: number; name: string; description: string }[];
-}
-
 /* Props for computing suffix */
 export interface ComputeSuffixProps {
   index: number;
@@ -51,16 +42,26 @@ export const SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY =
   "split-child-sample-run-config";
 
 export default function ConfigAction() {
-  const { formatMessage } = useDinaIntl();
-  const [numOfChildToCreate, setNumOfChildToCreate] = useState(1);
-  const [baseName, setBaseName] = useState("");
-  const [suffixType, setSuffixType] = useState(TYPE_NUMERIC);
-  const [start, setStart] = useState(suffixType === TYPE_NUMERIC ? "1" : "A");
-  const router = useRouter();
+  const [splitChildSampleRunConfig, setSplitChildSampleRunConfig] =
+    useLocalStorage<MaterialSampleRunConfig | null | undefined>(
+      SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
+    );
 
-  const [_, setSplitChildSampleRunConfig] = useLocalStorage<
-    MaterialSampleRunConfig | null | undefined
-  >(SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY);
+  const { formatMessage } = useDinaIntl();
+  const [numOfChildToCreate, setNumOfChildToCreate] = useState(
+    splitChildSampleRunConfig?.configure?.numOfChildToCreate ?? 1
+  );
+  const [baseName, setBaseName] = useState(
+    splitChildSampleRunConfig?.configure?.baseName ?? ""
+  );
+  const [suffixType, setSuffixType] = useState(
+    splitChildSampleRunConfig?.configure?.suffixType ?? TYPE_NUMERIC
+  );
+  const [start, setStart] = useState(
+    splitChildSampleRunConfig?.configure?.start ??
+      (suffixType === TYPE_NUMERIC ? "1" : "A")
+  );
+  const router = useRouter();
 
   const onCreatedChildSplitSampleChange = value => {
     setNumOfChildToCreate(value);
@@ -194,11 +195,13 @@ export default function ConfigAction() {
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
         <DinaForm
-          initialValues={{
-            suffixType: TYPE_NUMERIC,
-            numOfChildToCreate,
-            identifier: "MATERIAL_SAMPLE_ID"
-          }}
+          initialValues={
+            splitChildSampleRunConfig?.configure ?? {
+              suffixType: TYPE_NUMERIC,
+              numOfChildToCreate,
+              identifier: "MATERIAL_SAMPLE_ID"
+            }
+          }
           onSubmit={onSubmit}
         >
           <p>
