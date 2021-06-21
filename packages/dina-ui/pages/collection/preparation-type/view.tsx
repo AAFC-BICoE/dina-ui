@@ -27,29 +27,29 @@ export function PreparationTypeDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage("preparationTypeViewTitle")} />
       <Nav />
-      <ButtonBar>
-        <BackButton
-          entityId={id as string}
-          entityLink="/collection/preparation-type"
-          byPassView={true}
-        />
-        <EditButton
-          className="ms-auto"
-          entityId={id as string}
-          entityLink="collection/preparation-type"
-        />
-        <DeleteButton
-          className="ms-5"
-          id={id as string}
-          options={{ apiBaseUrl: "/collection-api" }}
-          postDeleteRedirect="/collection/preparation-type/list"
-          type="preparation-type"
-        />
-      </ButtonBar>
       <main className="container">
         <h1>
           <DinaMessage id="preparationTypeViewTitle" />
         </h1>
+        <ButtonBar>
+          <BackButton
+            entityId={id as string}
+            entityLink="/collection/preparation-type"
+            byPassView={true}
+          />
+          <EditButton
+            className="ms-auto"
+            entityId={id as string}
+            entityLink="collection/preparation-type"
+          />
+          <DeleteButton
+            className="ms-5"
+            id={id as string}
+            options={{ apiBaseUrl: "/collection-api" }}
+            postDeleteRedirect="/collection/preparation-type/list"
+            type="preparation-type"
+          />
+        </ButtonBar>
         {withResponse(prepTypeQuery, ({ data: preparationType }) => (
           <DinaForm<PreparationType>
             initialValues={{

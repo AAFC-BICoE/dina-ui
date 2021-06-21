@@ -30,17 +30,19 @@ export default function PreparationTypeEditPage() {
   const { formatMessage } = useDinaIntl();
 
   async function goToViewPage(prepType: PersistedResource<PreparationType>) {
-    router.push(`/collection/preparation-type/view?id=${prepType.id}`);
+    await router.push(`/collection/preparation-type/view?id=${prepType.id}`);
   }
+
+  const title = id ? "editPreparationTypeTitle" : "addPreparationTypeTitle";
 
   return (
     <div>
-      <Head title={formatMessage("addPreparationTypeTitle")} />
+      <Head title={formatMessage(title)} />
       <Nav />
       <main className="container">
         <div>
           <h1>
-            <DinaMessage id="addPreparationTypeTitle" />
+            <DinaMessage id={title} />
           </h1>
           {id ? (
             <Query<PreparationType>
@@ -126,7 +128,6 @@ export function PreparationTypeForm({
         <BackButton
           entityId={fetchedPrepType?.id}
           entityLink="/collection/preparation-type"
-          byPassView={true}
         />
         <SubmitButton className="ms-auto" />
       </ButtonBar>
