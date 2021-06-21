@@ -217,7 +217,7 @@ export default function ConfigAction() {
                     });
                     return (
                       <SplitChildRow
-                        key={suffix}
+                        key={`${baseName}-${suffix}`}
                         index={index}
                         baseName={baseName}
                         computedSuffix={suffix}
