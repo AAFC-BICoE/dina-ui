@@ -1,23 +1,25 @@
 import {
   ApiClientContext,
-  ButtonBar,
   BackButton,
+  ButtonBar,
   DinaForm,
   DinaFormOnSubmit,
-  SubmitButton,
-  TextField,
   LoadingSpinner,
-  Query
+  Query,
+  SubmitButton,
+  TextField
 } from "common-ui";
-import { NextRouter, useRouter } from "next/router";
-import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
+import { InputResource, PersistedResource } from "kitsu";
+import { fromPairs, toPairs } from "lodash";
+import { useRouter } from "next/router";
 import { useContext } from "react";
-import { Head, Nav, GroupSelectField } from "../../../components";
+import { GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
 
 interface PreparationTypeFormProps {
   fetchedPrepType?: PreparationType;
-  router: NextRouter;
+  onSaved: (prepType: PersistedResource<PreparationType>) => Promise<void>;
 }
 
 export default function PreparationTypeEditPage() {
@@ -26,11 +28,16 @@ export default function PreparationTypeEditPage() {
     query: { id }
   } = router;
   const { formatMessage } = useDinaIntl();
+
+  async function goToViewPage(prepType: PersistedResource<PreparationType>) {
+    router.push(`/collection/preparation-type/view?id=${prepType.id}`);
+  }
+
   return (
     <div>
       <Head title={formatMessage("addPreparationTypeTitle")} />
       <Nav />
-      <main className="container-fluid">
+      <main className="container">
         <div>
           <h1>
             <DinaMessage id="addPreparationTypeTitle" />
@@ -45,14 +52,14 @@ export default function PreparationTypeEditPage() {
                   {response && (
                     <PreparationTypeForm
                       fetchedPrepType={response.data}
-                      router={router}
+                      onSaved={goToViewPage}
                     />
                   )}
                 </div>
               )}
             </Query>
           ) : (
-            <PreparationTypeForm router={router} />
+            <PreparationTypeForm onSaved={goToViewPage} />
           )}
         </div>
       </main>
@@ -60,20 +67,46 @@ export default function PreparationTypeEditPage() {
   );
 }
 
-function PreparationTypeForm({
+export interface PreparationTypeFormValues
+  extends InputResource<PreparationType> {
+  multilingualDescription?: Record<string, string | undefined>;
+}
+
+export function PreparationTypeForm({
   fetchedPrepType,
-  router
+  onSaved
 }: PreparationTypeFormProps) {
   const { save } = useContext(ApiClientContext);
-  const { id } = router.query;
-  const initialValues = fetchedPrepType || { type: "preparation-type" };
-  const { formatMessage } = useDinaIntl();
 
-  const onSubmit: DinaFormOnSubmit = async ({ submittedValues }) => {
-    await save(
+  const initialValues: PreparationTypeFormValues = fetchedPrepType
+    ? {
+        ...fetchedPrepType,
+        // Convert multilingualDescription to editable Dictionary format:
+        multilingualDescription: fromPairs<string | undefined>(
+          fetchedPrepType.multilingualDescription?.descriptions?.map(
+            ({ desc, lang }) => [lang ?? "", desc ?? ""]
+          )
+        )
+      }
+    : { name: "", type: "preparation-type" };
+
+  const onSubmit: DinaFormOnSubmit<PreparationTypeFormValues> = async ({
+    submittedValues
+  }) => {
+    const input: InputResource<PreparationType> = {
+      ...submittedValues,
+      // Convert the editable format to the stored format:
+      multilingualDescription: {
+        descriptions: toPairs(submittedValues.multilingualDescription).map(
+          ([lang, desc]) => ({ lang, desc })
+        )
+      }
+    };
+
+    const [savedPrepType] = await save<PreparationType>(
       [
         {
-          resource: submittedValues,
+          resource: input,
           type: "preparation-type"
         }
       ],
@@ -81,35 +114,62 @@ function PreparationTypeForm({
         apiBaseUrl: "/collection-api"
       }
     );
-    await router.push(`/collection/preparation-type/list`);
+    await onSaved(savedPrepType);
   };
 
   return (
-    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+    <DinaForm<PreparationTypeFormValues>
+      initialValues={initialValues}
+      onSubmit={onSubmit}
+    >
       <ButtonBar>
         <BackButton
-          entityId={id as string}
+          entityId={fetchedPrepType?.id}
           entityLink="/collection/preparation-type"
           byPassView={true}
         />
         <SubmitButton className="ms-auto" />
       </ButtonBar>
-      <div>
-        <div className="row">
-          <GroupSelectField
-            name="group"
-            enableStoredDefaultGroup={true}
-            className="col-md-6"
-          />
-        </div>
-        <div className="row">
-          <TextField
-            className="col-md-6 preparationTypeName"
-            name="name"
-            label={formatMessage("preparationTypeNameLabel")}
-          />
-        </div>
-      </div>
+      <PreparationTypeFormLayout />
     </DinaForm>
+  );
+}
+
+export function PreparationTypeFormLayout() {
+  const { formatMessage } = useDinaIntl();
+
+  return (
+    <div>
+      <div className="row">
+        <GroupSelectField
+          name="group"
+          enableStoredDefaultGroup={true}
+          className="col-md-6"
+        />
+      </div>
+      <div className="row">
+        <TextField
+          className="col-md-6 preparationTypeName"
+          name="name"
+          label={formatMessage("preparationTypeNameLabel")}
+        />
+      </div>
+      <div className="row">
+        <TextField
+          className="english-description"
+          name="multilingualDescription.en"
+          label={formatMessage("field_description.en")}
+          multiLines={true}
+        />
+      </div>
+      <div className="row">
+        <TextField
+          className="french-description"
+          name="multilingualDescription.fr"
+          label={formatMessage("field_description.fr")}
+          multiLines={true}
+        />
+      </div>
+    </div>
   );
 }
