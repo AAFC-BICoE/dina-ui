@@ -255,7 +255,7 @@ export default function ConfigAction() {
                 }
               />
               <SelectField
-                className="col-md-2"
+                className="col-md-2 suffixType"
                 name="suffixType"
                 options={TYPE_OPTIONS}
                 onChange={onChangeExternal}
