@@ -9,7 +9,10 @@ const mockGet = jest.fn<any, any>(async path => {
 });
 
 const mockSave = jest.fn(async saves => {
-  return saves.map(save => ({ ...save.resource, id: "123" }));
+  return saves.map(save => ({
+    ...save.resource,
+    id: save.resource.id ?? "123"
+  }));
 });
 
 const apiContext = {
