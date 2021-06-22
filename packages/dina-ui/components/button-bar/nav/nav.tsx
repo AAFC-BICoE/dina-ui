@@ -275,11 +275,6 @@ function NavCollectionDropdown() {
             <DinaMessage id="storageUnitTypeListTitle" />
           </a>
         </Link>
-        <Link href="/collection/storage-unit/list">
-          <a className="dropdown-item">
-            <DinaMessage id="storageUnitListTitle" />
-          </a>
-        </Link>
         <Link href="/collection/managed-attribute/list">
           <a className="dropdown-item">
             <DinaMessage id="managedAttributeListTitle" />
