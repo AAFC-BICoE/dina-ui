@@ -24,6 +24,7 @@ import { Metadata } from "../../../dina-ui/types/objectstore-api";
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
+import { toPairs, fromPairs } from "lodash";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -149,8 +150,8 @@ export function useMaterialSampleSave({
   const initialValues: InputResource<MaterialSample> = materialSample
     ? { ...materialSample }
     : {
-        type: "material-sample"
-        // managedAttributeValues: {}
+        type: "material-sample",
+        managedAttributeValues: {}
       };
 
   /** Used to get the values of the nested CollectingEvent form. */
@@ -274,7 +275,6 @@ export function useMaterialSampleSave({
         submittedCollectingEvent,
         collectingEventInitialValues
       );
-
       // Only send the save request if the Collecting Event was edited:
       const savedCollectingEvent = collectingEventWasEdited
         ? // Use the same save method as the Collecting Event page:
@@ -302,6 +302,18 @@ export function useMaterialSampleSave({
     }
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete materialSampleInput.attachment;
+
+    // Shuffle the managedAttributesValue to managedAttribute
+    materialSampleInput.managedAttributes = {};
+
+    materialSampleInput.managedAttributes = fromPairs(
+      toPairs(materialSampleInput.managedAttributeValues).map(value => [
+        value[0],
+        value[1]?.assignedValue as string
+      ])
+    );
+
+    delete materialSampleInput.managedAttributeValues;
 
     // Save the MaterialSample:
     const [savedMaterialSample] = await save(
