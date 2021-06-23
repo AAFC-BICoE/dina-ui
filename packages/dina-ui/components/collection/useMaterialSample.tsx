@@ -20,7 +20,10 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../dina-ui/types/collection-api";
-import { Metadata } from "../../../dina-ui/types/objectstore-api";
+import {
+  ManagedAttributeValues,
+  Metadata
+} from "../../../dina-ui/types/objectstore-api";
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
@@ -147,8 +150,17 @@ export function useMaterialSampleSave({
     )
   );
 
+  const managedAttributeValues: ManagedAttributeValues = {};
+  if (materialSample?.managedAttributes) {
+    toPairs(materialSample?.managedAttributes as any).map(
+      attr =>
+        (managedAttributeValues[attr[0]] = { assignedValue: attr[1] as any })
+    );
+    delete materialSample?.managedAttributes;
+  }
+
   const initialValues: InputResource<MaterialSample> = materialSample
-    ? { ...materialSample }
+    ? { ...materialSample, managedAttributeValues }
     : {
         type: "material-sample",
         managedAttributeValues: {}
