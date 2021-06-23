@@ -93,7 +93,11 @@ export function MaterialSampleTypeForm({
   };
 
   return (
-    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+    <DinaForm
+      initialValues={initialValues}
+      readOnly={!!fetchedMaterialSampleType?.id}
+      onSubmit={onSubmit}
+    >
       <ButtonBar>
         <BackButton
           entityId={fetchedMaterialSampleType?.id}
