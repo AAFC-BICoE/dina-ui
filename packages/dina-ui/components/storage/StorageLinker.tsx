@@ -13,17 +13,21 @@ export interface StorageLinkerProps {
   value?: PersistedResource<StorageUnit>;
   onChange: (newValue: PersistedResource<StorageUnit>) => void;
   fieldName: string;
+
+  /** Disable this option ID e.g. to avoid putting a storage unit inside itself. */
+  excludeOptionId?: string;
 }
 
 /** Multi-Tab Storage Assignment UI. */
 export function StorageLinker({
   onChange: onChangeProp,
   value,
-  fieldName
+  fieldName,
+  excludeOptionId
 }: StorageLinkerProps) {
   const [activeTab, setActiveTab] = useState(value ? 0 : 2);
 
-  function changeAndResetTab(newValue: PersistedResource<StorageUnit>) {
+  function changeStorageAndResetTab(newValue: PersistedResource<StorageUnit>) {
     onChangeProp(newValue);
     setActiveTab(0);
   }
@@ -45,10 +49,16 @@ export function StorageLinker({
         <AssignedStorage value={value} onChange={onChangeProp} />
       </TabPanel>
       <TabPanel>
-        <StorageSearchSelector fieldName={fieldName} />
+        <StorageSearchSelector
+          fieldName={fieldName}
+          excludeOptionId={excludeOptionId}
+        />
       </TabPanel>
       <TabPanel>
-        <BrowseStorageTree onSelect={changeAndResetTab} />
+        <BrowseStorageTree
+          onSelect={changeStorageAndResetTab}
+          excludeOptionId={excludeOptionId}
+        />
       </TabPanel>
     </Tabs>
   );
@@ -56,10 +66,14 @@ export function StorageLinker({
 
 export interface StorageLinkerFieldProps {
   name: string;
+  excludeOptionId?: string;
 }
 
 /** DinaForm-connected Storage Assignment UI. */
-export function StorageLinkerField({ name }: StorageLinkerFieldProps) {
+export function StorageLinkerField({
+  name,
+  excludeOptionId
+}: StorageLinkerFieldProps) {
   return (
     <FieldWrapper
       name={name}
@@ -73,7 +87,12 @@ export function StorageLinkerField({ name }: StorageLinkerFieldProps) {
       disableLabelClick={true}
     >
       {({ value, setValue }) => (
-        <StorageLinker fieldName={name} value={value} onChange={setValue} />
+        <StorageLinker
+          fieldName={name}
+          value={value}
+          onChange={setValue}
+          excludeOptionId={excludeOptionId}
+        />
       )}
     </FieldWrapper>
   );

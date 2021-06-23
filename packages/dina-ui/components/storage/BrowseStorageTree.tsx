@@ -9,11 +9,15 @@ import { StorageUnit } from "../../types/collection-api";
 export interface BrowseStorageTreeProps {
   parentId?: string;
   onSelect: (storageUnit: PersistedResource<StorageUnit>) => void;
+  excludeOptionId?: string;
+  disabled?: boolean;
 }
 
 export function BrowseStorageTree({
   onSelect,
-  parentId
+  parentId,
+  excludeOptionId,
+  disabled
 }: BrowseStorageTreeProps) {
   const storageUnitsQuery = useQuery<StorageUnit[]>({
     path: `collection-api/storage-unit`,
@@ -35,7 +39,12 @@ export function BrowseStorageTree({
             className={index === units.length - 1 ? "" : "my-2"}
             key={unit.id}
           >
-            <StorageUnitCollapser storageUnit={unit} onSelect={onSelect} />
+            <StorageUnitCollapser
+              storageUnit={unit}
+              onSelect={onSelect}
+              disabled={disabled || unit.id === excludeOptionId}
+              excludeOptionId={excludeOptionId}
+            />
           </div>
         ))
       )}
@@ -46,11 +55,15 @@ export function BrowseStorageTree({
 interface StorageUnitCollapserProps {
   storageUnit: PersistedResource<StorageUnit>;
   onSelect: (storageUnit: PersistedResource<StorageUnit>) => void;
+  excludeOptionId?: string;
+  disabled?: boolean;
 }
 
 function StorageUnitCollapser({
   storageUnit,
-  onSelect
+  onSelect,
+  disabled,
+  excludeOptionId
 }: StorageUnitCollapserProps) {
   const [isOpen, setOpen] = useState(false);
 
@@ -77,12 +90,18 @@ function StorageUnitCollapser({
             className="btn btn-primary btn-sm"
             type="button"
             onClick={() => onSelect(storageUnit)}
+            disabled={disabled}
           >
             <DinaMessage id="select" />
           </button>
         </div>
         {isOpen && (
-          <BrowseStorageTree parentId={storageUnit.id} onSelect={onSelect} />
+          <BrowseStorageTree
+            parentId={storageUnit.id}
+            onSelect={onSelect}
+            excludeOptionId={excludeOptionId}
+            disabled={disabled}
+          />
         )}
       </div>
     </div>

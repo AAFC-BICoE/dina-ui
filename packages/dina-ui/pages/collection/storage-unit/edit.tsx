@@ -113,7 +113,7 @@ export function StorageUnitForm({
 
 /** Re-usable field layout between edit and view pages. */
 export function StorageUnitFormFields() {
-  const { readOnly } = useDinaFormContext();
+  const { initialValues, readOnly } = useDinaFormContext();
 
   return (
     <div>
@@ -127,7 +127,10 @@ export function StorageUnitFormFields() {
       <div className="row">
         <TextField className="col-sm-6" name="name" />
       </div>
-      <StorageLinkerField name="parentStorageUnit" />
+      <StorageLinkerField
+        name="parentStorageUnit"
+        excludeOptionId={initialValues.id}
+      />
       {readOnly && (
         <div className="row">
           <DateField className="col-sm-6" name="createdOn" />
