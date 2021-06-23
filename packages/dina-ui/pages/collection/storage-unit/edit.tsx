@@ -14,7 +14,12 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import {
+  AssignToStorageField,
+  GroupSelectField,
+  Head,
+  Nav
+} from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnit } from "../../../types/collection-api";
 
@@ -129,8 +134,10 @@ export function StorageUnitFormFields() {
           model="collection-api/storage-unit"
           className="col-sm-6"
           optionLabel={unit => unit.name}
+          readOnlyLink="/collection/storage-unit/view?id="
         />
       </div>
+      <AssignToStorageField name="parentStorageUnit" />
       {readOnly && (
         <div className="row">
           <DateField className="col-sm-6" name="createdOn" />

@@ -31,6 +31,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   allowExisting: "Allow Existing",
   allowNew: "Allow New",
   appTitle: "DINA",
+  assignedStorage: "Assigned Storage",
   associatedAgent: "Associated Agent",
   attachExisting: "Attach Existing",
   attachExistingObjects: "Attach Existing Objects",
@@ -39,6 +40,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   attachments: "Attachments",
   attributeLabel: "Attribute",
   baseNameLabel: "Base Name",
+  browseStorage: "Browse Storage",
   cancelButtonText: "Cancel",
   cataloguedObjectListTitle: "Catalogued Objects",
   cataloguedObjectViewTitle: "View Catalogued Object",
@@ -338,6 +340,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
   searchButton: "Search",
   searchResults: "Search Results ({resultSize})",
+  searchStorage: "Search Storage",
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",
   selectGroup: "Select Group",

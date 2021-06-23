@@ -32,6 +32,9 @@ export interface LabelWrapperParams {
   /** Remove the label. */
   removeLabel?: boolean;
 
+  /** Disables how clicking a label clicks the inner element. */
+  disableLabelClick?: boolean;
+
   /**
    * Custom field name for the template checkbox.
    * e.g. passing "srcAdminLevels[0]" will change the default
@@ -63,6 +66,7 @@ export interface FieldWrapperRenderProps {
  */
 export function FieldWrapper({
   className,
+  disableLabelClick,
   hideLabel = false,
   name,
   label,
@@ -114,6 +118,7 @@ export function FieldWrapper({
             ? "row"
             : "w-100"
         } ${removeFormGroupClass ? "" : "mb-3"}`}
+        htmlFor={disableLabelClick ? "none" : undefined}
       >
         {!removeLabel && (
           <div
