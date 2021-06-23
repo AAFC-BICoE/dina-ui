@@ -146,6 +146,7 @@ describe("Material Sample Edit Page", () => {
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               geoReferenceAssertions: [
                 {
+                  georeferencedBy: undefined,
                   isPrimary: true
                 }
               ],
@@ -170,6 +171,7 @@ describe("Material Sample Edit Page", () => {
               },
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
+              managedAttributes: {},
               relationships: {},
               type: "material-sample"
             },
@@ -229,6 +231,7 @@ describe("Material Sample Edit Page", () => {
               },
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
+              managedAttributes: {},
               type: "material-sample",
               relationships: {}
             },
@@ -291,7 +294,7 @@ describe("Material Sample Edit Page", () => {
               preparedBy: {
                 id: null
               },
-
+              managedAttributes: {},
               relationships: {}
             },
             type: "material-sample"
@@ -386,7 +389,7 @@ describe("Material Sample Edit Page", () => {
               preparedBy: {
                 id: null
               },
-
+              managedAttributes: {},
               relationships: {}
             },
             type: "material-sample"

@@ -165,7 +165,7 @@ export function useMaterialSampleSave({
     ? { ...materialSample }
     : {
         type: "material-sample",
-        managedAttributeValues: {}
+        managedAttributes: {}
       };
 
   /** Used to get the values of the nested CollectingEvent form. */
