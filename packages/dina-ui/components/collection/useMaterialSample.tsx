@@ -64,6 +64,17 @@ export function useMaterialSampleQuery(id?: string | null) {
             console.warn("Attachment join failed: ", error);
           }
         }
+        if (data.managedAttributes) {
+          const managedAttributeValues: ManagedAttributeValues = {};
+          toPairs(data?.managedAttributes as any).map(
+            attr =>
+              (managedAttributeValues[attr[0]] = {
+                assignedValue: attr[1] as any
+              })
+          );
+          delete data?.managedAttributes;
+          data.managedAttributeValues = managedAttributeValues;
+        }
       }
     }
   );
@@ -150,17 +161,8 @@ export function useMaterialSampleSave({
     )
   );
 
-  const managedAttributeValues: ManagedAttributeValues = {};
-  if (materialSample?.managedAttributes) {
-    toPairs(materialSample?.managedAttributes as any).map(
-      attr =>
-        (managedAttributeValues[attr[0]] = { assignedValue: attr[1] as any })
-    );
-    delete materialSample?.managedAttributes;
-  }
-
   const initialValues: InputResource<MaterialSample> = materialSample
-    ? { ...materialSample, managedAttributeValues }
+    ? { ...materialSample }
     : {
         type: "material-sample",
         managedAttributeValues: {}

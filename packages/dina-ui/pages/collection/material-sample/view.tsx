@@ -67,18 +67,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <Head title={formatMessage("materialSampleViewTitle")} />
       <Nav />
       {withResponse(materialSampleQuery, ({ data: materialSample }) => {
-        if (materialSample.managedAttributes) {
-          const managedAttributeValues: ManagedAttributeValues = {};
-          toPairs(materialSample?.managedAttributes as any).map(
-            attr =>
-              (managedAttributeValues[attr[0]] = {
-                assignedValue: attr[1] as any
-              })
-          );
-          delete materialSample?.managedAttributes;
-          materialSample.managedAttributeValues = managedAttributeValues;
-        }
-
         const hasPreparations = Boolean(
           materialSample.preparationType ||
             materialSample.preparationDate ||
