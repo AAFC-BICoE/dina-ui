@@ -27,16 +27,18 @@ export function BrowseStorageTree({
 
   return withResponse(storageUnitsQuery, ({ data: units }) => (
     <div>
-      {!units.length
-        ? "No contents"
-        : units.map((unit, index) => (
-            <div
-              className={index === units.length - 1 ? "" : "my-2"}
-              key={unit.id}
-            >
-              <StorageUnitCollapser storageUnit={unit} onSelect={onSelect} />
-            </div>
-          ))}
+      {!units.length ? (
+        <DinaMessage id="noNestedStorageUnits" />
+      ) : (
+        units.map((unit, index) => (
+          <div
+            className={index === units.length - 1 ? "" : "my-2"}
+            key={unit.id}
+          >
+            <StorageUnitCollapser storageUnit={unit} onSelect={onSelect} />
+          </div>
+        ))
+      )}
     </div>
   ));
 }

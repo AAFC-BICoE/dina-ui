@@ -9,7 +9,8 @@
 * e.g. input[id^=react-select-attribute],input[id^=react-select-predicate],input[id^=react-select-searchType],input[id^=react-select-config]
 */
 .css-b8ldur-Input {
-  opacity: 0 !important;
+  /* Disabled because it makes the react-select search input invisible. */
+  /* opacity: 0 !important; */
 }
 
 /*

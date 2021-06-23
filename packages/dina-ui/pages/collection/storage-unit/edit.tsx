@@ -4,8 +4,6 @@ import {
   DateField,
   DinaForm,
   DinaFormSubmitParams,
-  filterBy,
-  ResourceSelectField,
   SubmitButton,
   TextField,
   useDinaFormContext,
@@ -15,10 +13,10 @@ import {
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import {
-  AssignToStorageField,
   GroupSelectField,
   Head,
-  Nav
+  Nav,
+  StorageLinkerField
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnit } from "../../../types/collection-api";
@@ -128,16 +126,8 @@ export function StorageUnitFormFields() {
       </div>
       <div className="row">
         <TextField className="col-sm-6" name="name" />
-        <ResourceSelectField<StorageUnit>
-          name="parentStorageUnit"
-          filter={filterBy(["name"])}
-          model="collection-api/storage-unit"
-          className="col-sm-6"
-          optionLabel={unit => unit.name}
-          readOnlyLink="/collection/storage-unit/view?id="
-        />
       </div>
-      <AssignToStorageField name="parentStorageUnit" />
+      <StorageLinkerField name="parentStorageUnit" />
       {readOnly && (
         <div className="row">
           <DateField className="col-sm-6" name="createdOn" />
