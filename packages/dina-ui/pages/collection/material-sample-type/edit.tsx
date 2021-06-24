@@ -95,7 +95,7 @@ export function MaterialSampleTypeForm({
   return (
     <DinaForm
       initialValues={initialValues}
-      readOnly={!!fetchedMaterialSampleType?.id}
+      readOnly={fetchedMaterialSampleType?.id ? true : false}
       onSubmit={onSubmit}
     >
       <ButtonBar>
