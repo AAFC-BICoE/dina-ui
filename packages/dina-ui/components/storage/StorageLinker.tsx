@@ -66,6 +66,8 @@ export function StorageLinker({
 
 export interface StorageLinkerFieldProps {
   name: string;
+
+  /** Disable this option ID e.g. to avoid putting a storage unit inside itself. */
   excludeOptionId?: string;
 }
 

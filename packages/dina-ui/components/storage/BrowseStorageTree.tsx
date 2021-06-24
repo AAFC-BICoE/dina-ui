@@ -8,7 +8,9 @@ import { StorageUnit } from "../../types/collection-api";
 
 export interface BrowseStorageTreeProps {
   parentId?: string;
-  onSelect: (storageUnit: PersistedResource<StorageUnit>) => void;
+  onSelect?: (storageUnit: PersistedResource<StorageUnit>) => void;
+
+  /** Disable this option ID e.g. to avoid putting a storage unit inside itself. */
   excludeOptionId?: string;
   disabled?: boolean;
 }
@@ -54,7 +56,9 @@ export function BrowseStorageTree({
 
 interface StorageUnitCollapserProps {
   storageUnit: PersistedResource<StorageUnit>;
-  onSelect: (storageUnit: PersistedResource<StorageUnit>) => void;
+  onSelect?: (storageUnit: PersistedResource<StorageUnit>) => void;
+
+  /** Disable this option ID e.g. to avoid putting a storage unit inside itself. */
   excludeOptionId?: string;
   disabled?: boolean;
 }
@@ -74,9 +78,9 @@ function StorageUnitCollapser({
   const CollapserIcon = isOpen ? FaMinusSquare : FaPlusSquare;
 
   return (
-    <div className="d-flex flex-row gap-2">
+    <div className={`d-flex flex-row gap-2 collapser-for-${storageUnit.id}`}>
       <CollapserIcon
-        className="align-top"
+        className="storage-collapser-icon align-top"
         size="2em"
         onClick={toggle}
         style={{ cursor: "pointer" }}
@@ -84,12 +88,14 @@ function StorageUnitCollapser({
       <div className="flex-grow-1">
         <div className="d-flex flex-row align-items-center gap-2 mb-3">
           <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
-            <a target="_blank">{storageUnit.name}</a>
+            <a className="storage-unit-name" target="_blank">
+              {storageUnit.name}
+            </a>
           </Link>
           <button
-            className="btn btn-primary btn-sm"
+            className="select-storage btn btn-primary btn-sm"
             type="button"
-            onClick={() => onSelect(storageUnit)}
+            onClick={() => onSelect?.(storageUnit)}
             disabled={disabled}
           >
             <DinaMessage id="select" />

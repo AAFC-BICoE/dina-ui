@@ -39,7 +39,8 @@ export function AssignedStorage({ onChange, value }: AssignedStorageProps) {
         // Loop through the Storage Units to get the full path:
         const storagePath: PersistedResource<StorageUnit>[] = [];
         for (
-          let unit: PersistedResource<StorageUnit> | undefined = storageUnit;
+          let unit: PersistedResource<StorageUnit> | null | undefined =
+            storageUnit;
           unit;
           unit = unit.parentStorageUnit
         ) {
@@ -48,7 +49,7 @@ export function AssignedStorage({ onChange, value }: AssignedStorageProps) {
 
         return (
           <div>
-            <div className="mb-3">
+            <div className="storage-path mb-3">
               {/* Show the path of links e.g. Container1 > Container2 > Container3 */}
               {storagePath.map((unit, index) => (
                 <Fragment key={index}>
@@ -61,7 +62,7 @@ export function AssignedStorage({ onChange, value }: AssignedStorageProps) {
             </div>
             <button
               type="button"
-              className="btn btn-danger"
+              className="remove-storage btn btn-danger"
               onClick={() => onChange({ id: null })}
             >
               <DinaMessage id="removeFromParentStorageUnit" />
