@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { FastField, FormikProps } from "formik";
 import { ReactNode, useMemo } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
@@ -77,12 +78,10 @@ export function FieldWrapper({
   const { horizontal, readOnly, isTemplate, enabledFields } =
     useDinaFormContext();
 
-  const isReadOnlyByFormTemplate = useMemo(
+  const disabledByFormTemplate = useMemo(
     () => (enabledFields ? !enabledFields.includes(name) : false),
     [enabledFields]
   );
-
-  const readOnlyField = readOnly || isReadOnlyByFormTemplate;
 
   const fieldLabel = label ?? (
     <FieldHeader name={name} customName={customName} />
@@ -96,8 +95,12 @@ export function FieldWrapper({
     ? [6, 6]
     : horizontal || [];
 
-  const wrapper = (
-    <div className={`${className} ${isTemplate ? "row" : ""}`}>
+  if (disabledByFormTemplate) {
+    return null;
+  }
+
+  return (
+    <div className={classNames(className, { row: isTemplate })}>
       {isTemplate && (
         <CheckBoxWithoutWrapper
           name={`templateCheckboxes['${templateCheckboxFieldName ?? name}']`}
@@ -120,7 +123,7 @@ export function FieldWrapper({
             className={[
               `${labelCol ? `col-sm-${labelCol}` : ""}`,
               // Adjust alignment for editable inputs:
-              horizontal && !readOnlyField && !isTemplate ? "mt-sm-2" : "",
+              horizontal && !readOnly && !isTemplate ? "mt-sm-2" : "",
               "mb-2"
             ].join(" ")}
           >
@@ -131,7 +134,7 @@ export function FieldWrapper({
           <FastField name={name}>
             {({ field: { value }, form, meta: { error } }) => (
               <>
-                {readOnlyField || !children
+                {readOnly || !children
                   ? readOnlyRender?.(value) ?? (
                       <ReadOnlyValue link={link} value={value} />
                     )
@@ -156,6 +159,4 @@ export function FieldWrapper({
       </label>
     </div>
   );
-  // ensure hide the hidden fields when it is a tempalte
-  return className !== "hidden" || !isTemplate ? wrapper : null;
 }
