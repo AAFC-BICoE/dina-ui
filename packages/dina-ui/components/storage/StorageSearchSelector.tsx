@@ -18,6 +18,7 @@ export function StorageSearchSelector({
       filter={input => ({
         rsql: `name=='*${input}*' and uuid!=${excludeOptionId}`
       })}
+      sort="-createdOn"
       model="collection-api/storage-unit"
       className="col-sm-6"
       optionLabel={unit => unit.name}

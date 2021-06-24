@@ -1,17 +1,24 @@
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
+import { Fragment } from "react";
 import { useQuery, withResponse } from "../../../common-ui/lib";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
-import { Fragment } from "react";
 
 export interface AssignedStorageProps {
+  readOnly?: boolean;
   value?: PersistedResource<StorageUnit>;
-  onChange: (newValue: PersistedResource<StorageUnit> | { id: null }) => void;
+  onChange?: (newValue: PersistedResource<StorageUnit> | { id: null }) => void;
+  noneMessage?: JSX.Element;
 }
 
 /** Displays the currently assigned Storage, and lets you unlink it. */
-export function AssignedStorage({ onChange, value }: AssignedStorageProps) {
+export function AssignedStorage({
+  onChange,
+  readOnly,
+  value,
+  noneMessage
+}: AssignedStorageProps) {
   const storageQuery = useQuery<StorageUnit>(
     {
       path: `collection-api/storage-unit/${value?.id}`,
@@ -60,18 +67,20 @@ export function AssignedStorage({ onChange, value }: AssignedStorageProps) {
                 </Fragment>
               ))}
             </div>
-            <button
-              type="button"
-              className="remove-storage btn btn-danger"
-              onClick={() => onChange({ id: null })}
-            >
-              <DinaMessage id="removeFromParentStorageUnit" />
-            </button>
+            {!readOnly && (
+              <button
+                type="button"
+                className="remove-storage btn btn-danger"
+                onClick={() => onChange?.({ id: null })}
+              >
+                <DinaMessage id="removeFromParentStorageUnit" />
+              </button>
+            )}
           </div>
         );
       })}
     </div>
   ) : (
-    <DinaMessage id="noneTopLevel" />
+    noneMessage ?? <DinaMessage id="none" />
   );
 }

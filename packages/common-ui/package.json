@@ -57,6 +57,7 @@
     "@types/react-modal": "^3.10.6",
     "@types/react-select": "^4.0.15",
     "@types/react-table": "^6.7.2",
+    "@types/react-tabs": "^2.3.2",
     "@types/styled-jsx": "^2.2.7"
   },
   "lint-staged": {

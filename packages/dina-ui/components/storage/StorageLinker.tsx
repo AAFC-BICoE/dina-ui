@@ -1,5 +1,4 @@
 import { PersistedResource } from "kitsu";
-import Link from "next/link";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { FieldWrapper } from "../../../common-ui/lib";
@@ -25,7 +24,7 @@ export function StorageLinker({
   fieldName,
   excludeOptionId
 }: StorageLinkerProps) {
-  const [activeTab, setActiveTab] = useState(value ? 0 : 2);
+  const [activeTab, setActiveTab] = useState(value ? 0 : 1);
 
   function changeStorageAndResetTab(newValue: PersistedResource<StorageUnit>) {
     onChangeProp(newValue);
@@ -79,13 +78,9 @@ export function StorageLinkerField({
   return (
     <FieldWrapper
       name={name}
-      readOnlyRender={value =>
-        value ? (
-          <Link href={`/collection/storage-unit/view?id=${value.id}`}>
-            <a target="_blank">{value.name}</a>
-          </Link>
-        ) : null
-      }
+      readOnlyRender={value => (
+        <AssignedStorage readOnly={true} value={value} />
+      )}
       disableLabelClick={true}
     >
       {({ value, setValue }) => (

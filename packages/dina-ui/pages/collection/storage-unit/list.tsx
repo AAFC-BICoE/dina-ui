@@ -3,11 +3,7 @@ import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
-const STORAGE_UNIT_FILTER_ATTRIBUTES = [
-  "name",
-  "parentStorageUnit.name",
-  "createdBy"
-];
+const STORAGE_UNIT_FILTER_ATTRIBUTES = ["name", "createdBy"];
 const STORAGE_UNIT_TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, name } }) => (
@@ -15,13 +11,12 @@ const STORAGE_UNIT_TABLE_COLUMNS = [
     ),
     accessor: "name"
   },
-  "parentStorageUnit.name",
   "group",
   "createdBy",
   dateCell("createdOn")
 ];
 
-export default function storageUnitListPage() {
+export default function StorageUnitListPage() {
   const { formatMessage } = useDinaIntl();
 
   return (
@@ -44,8 +39,7 @@ export default function storageUnitListPage() {
           id="storage-unit-list"
           queryTableProps={{
             columns: STORAGE_UNIT_TABLE_COLUMNS,
-            path: "collection-api/storage-unit",
-            include: "parentStorageUnit"
+            path: "collection-api/storage-unit"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">
