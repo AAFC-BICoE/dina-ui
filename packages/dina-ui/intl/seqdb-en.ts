@@ -36,7 +36,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   field_quality: "Quality",
   "field_sample.name": "Sample Name",
   field_size: "Size",
-  field_targetBpSize: "Target Bp Size",
+  field_targetBpSize: "Target Base Pair Size",
   indexI5: "Index i5",
   indexI7: "Index i7",
   indexGridInstructions:

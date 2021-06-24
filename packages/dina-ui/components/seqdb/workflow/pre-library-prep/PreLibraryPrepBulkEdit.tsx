@@ -63,7 +63,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
       type: "numeric"
     },
     {
-      data: "plpStepResource.preLibraryPrep.targetDpSize",
+      data: "plpStepResource.preLibraryPrep.targetBpSize",
       title: formatMessage("field_targetBpSize"),
       type: "numeric"
     },
