@@ -272,7 +272,7 @@ describe("Query component", () => {
     });
 
     // Wait for the second request to start:
-    await new Promise(setImmediate);
+    await Promise.resolve();
 
     expect(mockGet).toHaveBeenCalledTimes(2);
 

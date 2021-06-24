@@ -49,11 +49,14 @@ const mockGet = jest.fn<any, any>(async (path, params = {}) => {
   switch (path) {
     case "collection-api/storage-unit":
       if (params.filter?.parentStorageUnit === null) {
-        return { data: [STORAGE_A] };
+        return { data: [STORAGE_A], meta: { totalResourceCount: 1 } };
       } else if (params.filter?.rsql === "parentStorageUnit.uuid==A") {
-        return { data: [STORAGE_B, STORAGE_C] };
+        return {
+          data: [STORAGE_B, STORAGE_C],
+          meta: { totalResourceCount: 2 }
+        };
       } else if (params.filter?.rsql === "parentStorageUnit.uuid==C") {
-        return { data: [STORAGE_D] };
+        return { data: [STORAGE_D], meta: { totalResourceCount: 1 } };
       }
   }
 });
