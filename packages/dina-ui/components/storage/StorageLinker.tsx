@@ -54,10 +54,12 @@ export function StorageLinker({
         />
       </TabPanel>
       <TabPanel>
-        <BrowseStorageTree
-          onSelect={changeStorageAndResetTab}
-          excludeOptionId={excludeOptionId}
-        />
+        <div style={{ maxHeight: "45rem", overflowY: "scroll" }}>
+          <BrowseStorageTree
+            onSelect={changeStorageAndResetTab}
+            excludeOptionId={excludeOptionId}
+          />
+        </div>
       </TabPanel>
     </Tabs>
   );

@@ -2,9 +2,10 @@ import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useState } from "react";
 import { FaMinusSquare, FaPlusSquare } from "react-icons/fa";
-import { useQuery, withResponse } from "../../../common-ui/lib";
+import { MetaWithTotal, useQuery, withResponse } from "../../../common-ui/lib";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
+import Pagination from "rc-pagination";
 
 export interface BrowseStorageTreeProps {
   parentId?: string;
@@ -21,9 +22,13 @@ export function BrowseStorageTree({
   excludeOptionId,
   disabled
 }: BrowseStorageTreeProps) {
-  const storageUnitsQuery = useQuery<StorageUnit[]>({
+  const limit = 100;
+  const [pageNumber, setPageNumber] = useState(1);
+  const offset = (pageNumber - 1) * limit;
+
+  const storageUnitsQuery = useQuery<StorageUnit[], MetaWithTotal>({
     path: `collection-api/storage-unit`,
-    page: { limit: 1000 }, // TODO make sure more can be shown
+    page: { limit, offset },
     filter: parentId
       ? // For inner storage units:
         { rsql: `parentStorageUnit.uuid==${parentId}` }
@@ -31,27 +36,40 @@ export function BrowseStorageTree({
         { parentStorageUnit: null }
   });
 
-  return withResponse(storageUnitsQuery, ({ data: units }) => (
-    <div>
-      {!units.length ? (
-        <DinaMessage id="noNestedStorageUnits" />
-      ) : (
-        units.map((unit, index) => (
-          <div
-            className={index === units.length - 1 ? "" : "my-2"}
-            key={unit.id}
-          >
-            <StorageUnitCollapser
-              storageUnit={unit}
-              onSelect={onSelect}
-              disabled={disabled || unit.id === excludeOptionId}
-              excludeOptionId={excludeOptionId}
+  return withResponse(
+    storageUnitsQuery,
+    ({ data: units, meta: { totalResourceCount } }) => (
+      <div>
+        {totalResourceCount === 0 ? (
+          <DinaMessage id="noNestedStorageUnits" />
+        ) : (
+          <>
+            {units.map((unit, index) => (
+              <div
+                className={index === units.length - 1 ? "" : "my-2"}
+                key={unit.id}
+              >
+                <StorageUnitCollapser
+                  storageUnit={unit}
+                  onSelect={onSelect}
+                  disabled={disabled || unit.id === excludeOptionId}
+                  excludeOptionId={excludeOptionId}
+                />
+              </div>
+            ))}
+            <Pagination
+              total={totalResourceCount}
+              locale={{}}
+              pageSize={limit}
+              current={pageNumber}
+              onChange={setPageNumber}
+              hideOnSinglePage={true}
             />
-          </div>
-        ))
-      )}
-    </div>
-  ));
+          </>
+        )}
+      </div>
+    )
+  );
 }
 
 interface StorageUnitCollapserProps {
