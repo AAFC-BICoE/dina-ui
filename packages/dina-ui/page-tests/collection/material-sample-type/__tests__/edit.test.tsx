@@ -38,11 +38,9 @@ describe("MaterialSampleTypeForm component", () => {
       <MaterialSampleTypeForm onSaved={mockOnSaved} />,
       { apiContext }
     );
-
     wrapper
       .find(".name-field input")
       .simulate("change", { target: { value: "my-mst" } });
-
     wrapper.update();
 
     wrapper.find("form").simulate("submit");
@@ -55,28 +53,5 @@ describe("MaterialSampleTypeForm component", () => {
       type: "material-sample-type",
       name: "my-mst"
     });
-  });
-
-  it("Edits an existing Material Sample Type", async () => {
-    const wrapper = mountWithAppContext(
-      <MaterialSampleTypeForm
-        fetchedMaterialSampleType={TEST_MST}
-        onSaved={mockOnSaved}
-      />,
-      { apiContext }
-    );
-
-    wrapper
-      .find(".name-field input")
-      .simulate("change", { target: { value: "edited name" } });
-
-    wrapper.update();
-
-    wrapper.find("form").simulate("submit");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(mockOnSaved).lastCalledWith({ ...TEST_MST, name: "edited name" });
   });
 });
