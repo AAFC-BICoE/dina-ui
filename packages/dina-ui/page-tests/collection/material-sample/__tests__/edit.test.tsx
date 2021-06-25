@@ -457,4 +457,60 @@ describe("Material Sample Edit Page", () => {
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
     ).toEqual(false);
   });
+
+  it("Renders an existing Material Sample with the managed attribute when there is selected attribute with assinged value", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms",
+          managedAttributeValues: {
+            testAttr: { assignedValue: "do the test" }
+          }
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              collectingEvent: {
+                id: null,
+                type: "collecting-event"
+              },
+              id: "333",
+              managedAttributes: {
+                testAttr: "do the test"
+              },
+              materialSampleName: "test-ms",
+              preparationDate: null,
+              preparationType: {
+                id: null,
+                type: "preparation-type"
+              },
+              preparedBy: {
+                id: null
+              },
+              relationships: {},
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
+  });
 });
