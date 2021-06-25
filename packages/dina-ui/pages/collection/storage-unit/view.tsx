@@ -5,14 +5,19 @@ import {
   DinaForm,
   EditButton,
   useQuery,
-  withResponse
+  withResponse,
+  useModal,
+  AreYouSureModal,
+  ResourceSelect,
+  filterBy
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Head, Nav } from "../../../components";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { useDinaIntl, DinaMessage } from "../../../intl/dina-ui-intl";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitFormFields } from "./edit";
+import { useState } from "react";
 
 export function StorageUnitDetailsPage({ router }: WithRouterProps) {
   const id = String(router.query.id);
@@ -22,34 +27,84 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
     path: `collection-api/storage-unit/${id}`
   });
 
+  const { openModal } = useModal();
+
+  const [children, SetChildren] = useState([]);
+  const [parent, SetParent] = useState();
+
+  function moveAllContentToNewContainer(submittedValues) {
+    const parentUnit = submittedValues.parentStorageUnit;
+    StorageUnitQuery.response?.data.storageUnitChildren?.map(
+      child => (child.parentStorageUnit = parentUnit)
+    );
+    SetParent(parentUnit);
+  }
+
+  function onMoveAllContentClick() {
+    // request to remove all children
+    openModal(
+      <AreYouSureModal
+        actionMessage={
+          <span>
+            <DinaMessage id="specifyParentContainer" />
+          </span>
+        }
+        messageBody={
+          <ResourceSelect<StorageUnit>
+            model="collection-api/preparation-type"
+            optionLabel={it => it.name}
+            filter={input => ({
+              ...filterBy(["name"])(input)
+            })}
+          />
+        }
+        onYesButtonClicked={moveAllContentToNewContainer}
+      />
+    );
+
+    SetChildren([]);
+  }
+
   return (
     <div>
       <Head title={formatMessage("storageUnitViewTitle")} />
       <Nav />
       <main className="container">
-        <ButtonBar>
-          <BackButton
-            entityId={id}
-            entityLink="/collection/storage-unit"
-            byPassView={true}
-          />
-          <EditButton
-            className="ms-auto"
-            entityId={id}
-            entityLink="collection/storage-unit"
-          />
-          <DeleteButton
-            className="ms-5"
-            id={id}
-            options={{ apiBaseUrl: "/collection-api" }}
-            postDeleteRedirect="/collection/storage-unit/list"
-            type="storage-unit"
-          />
-        </ButtonBar>
         {withResponse(StorageUnitQuery, ({ data: storageUnit }) => (
-          <DinaForm<StorageUnit> initialValues={storageUnit} readOnly={true}>
-            <StorageUnitFormFields />
-          </DinaForm>
+          <>
+            <ButtonBar>
+              <BackButton
+                entityId={id}
+                entityLink="/collection/storage-unit"
+                byPassView={true}
+              />
+              {!storageUnit.storageUnitChildren?.length && (
+                <EditButton
+                  className="ms-auto"
+                  entityId={id}
+                  entityLink="collection/storage-unit"
+                />
+              )}
+              {!storageUnit.storageUnitChildren?.length && (
+                <DeleteButton
+                  className="ms-5"
+                  id={id}
+                  options={{ apiBaseUrl: "/collection-api" }}
+                  postDeleteRedirect="/collection/storage-unit/list"
+                  type="storage-unit"
+                />
+              )}
+              <button
+                className="btn btn-info moveAllContent"
+                onClick={onMoveAllContentClick}
+              >
+                <DinaMessage id="moveAllContent" />
+              </button>
+            </ButtonBar>
+            <DinaForm<StorageUnit> initialValues={storageUnit} readOnly={true}>
+              <StorageUnitFormFields />
+            </DinaForm>
+          </>
         ))}
       </main>
     </div>

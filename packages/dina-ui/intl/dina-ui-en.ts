@@ -291,6 +291,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metadataRightsDetailsLabel: "Rights",
   metadataTagsLabel: "Tags",
   metadataUploadDetailsLabel: "Upload Details",
+  moveAllContent: " Move All Content",
   noFileToDisplay: "No file to display",
   noGroups: "No Groups",
   noManagedAttributeValues: "No Managed Attribute values.",
@@ -343,6 +344,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   selectGroup: "Select Group",
   set: "Set",
   showing: "Showing",
+  specifyParentContainer: "Please select parent container",
   splitSubsampleTitle: "Split(Subsample)",
   splitSampleDescription:
     "Split a Parent Sample into one or more Child Samples",
