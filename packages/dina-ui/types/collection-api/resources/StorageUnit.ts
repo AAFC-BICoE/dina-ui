@@ -10,6 +10,7 @@ export interface StorageUnitAttributes {
 
 export interface StorageUnitRelationships {
   parentStorageUnit?: StorageUnit;
+  storageUnitChildren?: StorageUnit[];
 }
 
 export type StorageUnit = KitsuResource &

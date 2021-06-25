@@ -25,6 +25,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addPreparationTypeTitle: "Add Preparation Type",
   addRule: "Add Rule",
   addRuleSet: "Add Rule Set",
+  addStorageUnitTitle: "Add Storage Unit",
   addStorageUnitTypeTitle: "Add Storage Unit Type",
   agentsSectionTitle: "Agents",
   allowExisting: "Allow Existing",
@@ -104,6 +105,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editPreparationTypeTitle: "Edit Preparation Type",
   editSelectedAttachmentMetadata: "Edit Selected Attachment Metadata",
   editSelectedButtonText: "Edit Selected",
+  editStorageUnitTitle: "Edit Storage",
   editStorageUnitTypeTitle: "Edit Storage Type",
   editWorkflowTemplateTitle: "Edit Workflow Template",
   enableDateRangeLabel: "Enable Date Range",
@@ -358,6 +360,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   storageUnitListTitle: "Storage Units",
   storageUnitTypeListTitle: "Storage Unit Types",
   storageUnitTypeViewTitle: "Storage Unit Type",
+  storageUnitViewTitle: "Storage Unit",
   switchToActionType: 'Switch to "{actionType}".',
   templateNameMandatoryErrorMsg: "Please enter a workflow template name.",
   thisWillRemoveYourTemplate:
