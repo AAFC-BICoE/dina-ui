@@ -56,6 +56,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_managedAttributeName: "Nom de l'attribut",
   field_organizationMandatoryFieldsError:
     "Le nom d'au moins une organisation est requis",
+  field_orientation: "Orientation",
   field_originalFilename: "Nom du fichier original",
   field_type: "Catégorie",
   field_xmpMetadataDate: "Date d'application des métadonnées",

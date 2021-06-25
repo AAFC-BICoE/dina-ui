@@ -74,6 +74,7 @@ const TEST_METADATA: PersistedResource<Metadata> = {
   acTags: ["tag1", "tag2", "tag3"],
   bucket: "testbucket",
   dcType: "Image",
+  orientation: 5,
   fileExtension: ".png",
   fileIdentifier: "9a85b858-f8f0-4a97-99a8-07b2cb759766",
   originalFilename: "test-file.png",
@@ -160,6 +161,7 @@ describe("Metadata single record edit page.", () => {
               type: "person"
             },
             dcType: "Image",
+            orientation: 5,
             fileExtension: ".png",
             fileIdentifier: "9a85b858-f8f0-4a97-99a8-07b2cb759766",
             id: "25f81de5-bbee-430c-b5fa-71986b70e612",

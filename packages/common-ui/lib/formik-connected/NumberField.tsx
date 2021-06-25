@@ -12,11 +12,14 @@ export interface NumberFieldProps extends LabelWrapperParams {
     name: string,
     value: number | null
   ) => void;
+
+  /** Disables decimal places. */
+  isInteger?: boolean;
 }
 
 /** Input field that only accepts a number. */
 export function NumberField(props: NumberFieldProps) {
-  const { name, readOnly, onChangeExternal } = props;
+  const { name, readOnly, onChangeExternal, isInteger } = props;
   return (
     <FieldWrapper {...props}>
       {({ formik, setValue, value }) => {
@@ -39,6 +42,7 @@ export function NumberField(props: NumberFieldProps) {
             className="form-control"
             onValueChange={onValueChange}
             readOnly={props.readOnly}
+            decimalScale={isInteger ? 0 : undefined}
             value={numberFormatValue}
           />
         );

@@ -10,7 +10,7 @@ import { CoordinateSystemEnum } from "../../types/collection-api/resources/Coord
 import { SourceAdministrativeLevel } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { SRSEnum } from "../../types/collection-api/resources/SRS";
 import { Metadata, Person } from "../../types/objectstore-api";
-import { useAttachmentsModal } from "../object-store";
+import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
 
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
@@ -106,11 +106,18 @@ export function useCollectingEventQuery(id?: string | null) {
   return collectingEventQuery;
 }
 
+interface UseCollectingEventSaveParams {
+  fetchedCollectingEvent?: PersistedResource<CollectingEvent>;
+  isTemplate?: boolean;
+  attachmentsConfig?: AllowAttachmentsConfig;
+}
+
 /** CollectingEvent save method to be re-used by CollectingEvent and MaterialSample forms. */
-export function useCollectingEventSave(
-  fetchedCollectingEvent?: PersistedResource<CollectingEvent>,
-  isTemplate?: boolean
-) {
+export function useCollectingEventSave({
+  fetchedCollectingEvent,
+  isTemplate,
+  attachmentsConfig
+}: UseCollectingEventSaveParams) {
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
@@ -179,7 +186,8 @@ export function useCollectingEventSave(
     title: <DinaMessage id="collectingEventAttachments" />,
     isTemplate,
     allowNewFieldName: "attachmentsConfig.allowNew",
-    allowExistingFieldName: "attachmentsConfig.allowExisting"
+    allowExistingFieldName: "attachmentsConfig.allowExisting",
+    allowAttachmentsConfig: attachmentsConfig
   });
 
   async function saveCollectingEvent(
@@ -194,7 +202,7 @@ export function useCollectingEventSave(
       submittedValues.relationships.collectors = {
         data: submittedValues.collectors.map(collector => ({
           id: collector.id,
-          type: "agent"
+          type: "person"
         }))
       };
     }

@@ -1,5 +1,6 @@
+import classNames from "classnames";
 import { FastField, FormikProps } from "formik";
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
 import { useDinaFormContext } from "./DinaForm";
@@ -43,6 +44,14 @@ export interface LabelWrapperParams {
 
   /** The text that appears for the link. */
   tooltipLinkText?: string;
+
+  /**
+   * Custom field name for the template checkbox.
+   * e.g. passing "srcAdminLevels[0]" will change the default
+   * "templateCheckboxes['srcAdminLevels[0].name']"
+   * to "templateCheckboxes['srcAdminLevels[0]']".
+   */
+  templateCheckboxFieldName?: string;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -79,9 +88,16 @@ export function FieldWrapper({
   tooltipImage,
   tooltipImageAlt,
   tooltipLink,
-  tooltipLinkText
+  tooltipLinkText,
+  templateCheckboxFieldName
 }: FieldWrapperProps) {
-  const { horizontal, readOnly, isTemplate } = useDinaFormContext();
+  const { horizontal, readOnly, isTemplate, enabledFields } =
+    useDinaFormContext();
+
+  const disabledByFormTemplate = useMemo(
+    () => (enabledFields ? !enabledFields.includes(name) : false),
+    [enabledFields]
+  );
 
   const fieldLabel = label ?? (
     <FieldHeader
@@ -102,11 +118,15 @@ export function FieldWrapper({
     ? [6, 6]
     : horizontal || [];
 
-  const wrapper = (
-    <div className={`${className} ${isTemplate ? "row" : ""}`}>
+  if (disabledByFormTemplate) {
+    return null;
+  }
+
+  return (
+    <div className={classNames(className, { row: isTemplate })}>
       {isTemplate && (
         <CheckBoxWithoutWrapper
-          name={`templateCheckboxes['${name}']`}
+          name={`templateCheckboxes['${templateCheckboxFieldName ?? name}']`}
           className="col-sm-1 templateCheckBox"
         />
       )}
@@ -162,6 +182,4 @@ export function FieldWrapper({
       </label>
     </div>
   );
-  // ensure hide the hidden fields when it is a tempalte
-  return className !== "hidden" || !isTemplate ? wrapper : null;
 }
