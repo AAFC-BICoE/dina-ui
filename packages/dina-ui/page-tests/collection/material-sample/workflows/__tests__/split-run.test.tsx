@@ -84,7 +84,7 @@ describe("MaterialSample split workflow run action form with all default values"
     wrapper.update();
 
     expect(wrapper.find(".materialSampleName input").prop("value")).toEqual(
-      "ParentName-1"
+      "ParentName-001"
     );
   });
 

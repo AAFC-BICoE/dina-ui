@@ -270,14 +270,14 @@ function NavCollectionDropdown() {
             <DinaMessage id="preparationTypeListTitle" />
           </a>
         </Link>
+        <Link href="/collection/storage-unit-type/list">
+          <a className="dropdown-item">
+            <DinaMessage id="storageUnitTypeListTitle" />
+          </a>
+        </Link>
         <Link href="/collection/managed-attribute/list">
           <a className="dropdown-item">
             <DinaMessage id="managedAttributeListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/revisions-by-user/">
-          <a className="dropdown-item">
-            <DinaMessage id="revisionsByUserPageTitle" />
           </a>
         </Link>
         <Link href="/collection/workflow-template/list">
@@ -288,6 +288,11 @@ function NavCollectionDropdown() {
         <Link href="/collection/material-sample/workflows/split-config">
           <a className="dropdown-item">
             <DinaMessage id="splitWorkflowRunTitle" />
+          </a>
+        </Link>
+        <Link href="/collection/revisions-by-user/">
+          <a className="dropdown-item">
+            <DinaMessage id="revisionsByUserPageTitle" />
           </a>
         </Link>
       </div>
