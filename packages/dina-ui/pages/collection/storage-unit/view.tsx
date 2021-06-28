@@ -27,16 +27,16 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
     path: `collection-api/storage-unit/${id}`
   });
 
+  const storageUnit = StorageUnitQuery.response?.data;
+
   const { openModal } = useModal();
 
-  const [children, SetChildren] = useState([]);
+  const [children, SetChildren] = useState(storageUnit?.storageUnitChildren);
   const [parent, SetParent] = useState();
 
   function moveAllContentToNewContainer(submittedValues) {
     const parentUnit = submittedValues.parentStorageUnit;
-    StorageUnitQuery.response?.data.storageUnitChildren?.map(
-      child => (child.parentStorageUnit = parentUnit)
-    );
+    children?.map(child => (child.parentStorageUnit = parentUnit));
     SetParent(parentUnit);
   }
 
@@ -51,7 +51,7 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
         }
         messageBody={
           <ResourceSelect<StorageUnit>
-            model="collection-api/preparation-type"
+            model="collection-api/storage-unit"
             optionLabel={it => it.name}
             filter={input => ({
               ...filterBy(["name"])(input)
@@ -70,7 +70,7 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("storageUnitViewTitle")} />
       <Nav />
       <main className="container">
-        {withResponse(StorageUnitQuery, ({ data: storageUnit }) => (
+        {withResponse(StorageUnitQuery, ({ data: strgUnit }) => (
           <>
             <ButtonBar>
               <BackButton
@@ -78,14 +78,14 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
                 entityLink="/collection/storage-unit"
                 byPassView={true}
               />
-              {!storageUnit.storageUnitChildren?.length && (
+              {!strgUnit.storageUnitChildren?.length && (
                 <EditButton
                   className="ms-auto"
                   entityId={id}
                   entityLink="collection/storage-unit"
                 />
               )}
-              {!storageUnit.storageUnitChildren?.length && (
+              {!strgUnit.storageUnitChildren?.length && (
                 <DeleteButton
                   className="ms-5"
                   id={id}
