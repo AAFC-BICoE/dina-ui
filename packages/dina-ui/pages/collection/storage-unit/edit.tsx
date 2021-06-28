@@ -15,6 +15,8 @@ import { useRouter } from "next/router";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnit } from "../../../types/collection-api";
+import { useState } from "react";
+import { Treebeard } from "react-treebeard";
 
 export default function StorageUnitEditPage() {
   const router = useRouter();
@@ -106,7 +108,25 @@ export function StorageUnitForm({
 
 /** Re-usable field layout between edit and view pages. */
 export function StorageUnitFormFields() {
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, initialValues } = useDinaFormContext();
+  const storageUnitData = JSON.stringify(initialValues).replaceAll(
+    "storageUnitChildren",
+    "children"
+  );
+  const [data, setData] = useState(JSON.parse(storageUnitData));
+  const [cursor, setCursor] = useState({ active: false });
+
+  const onToggle = (node, toggled) => {
+    if (cursor) {
+      cursor.active = false;
+    }
+    node.active = true;
+    if (node.children) {
+      node.toggled = toggled;
+    }
+    setCursor(node);
+    setData(data);
+  };
 
   return (
     <div>
@@ -120,6 +140,7 @@ export function StorageUnitFormFields() {
       <div className="row">
         <TextField className="col-md-6" name="name" />
       </div>
+      {initialValues.id && <Treebeard data={data} onToggle={onToggle} />}
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />

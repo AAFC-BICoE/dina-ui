@@ -65,6 +65,38 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
     SetChildren([]);
   }
 
+  const buttonBar = (strgUnit: StorageUnit) => (
+    <ButtonBar>
+      <BackButton
+        entityId={id}
+        entityLink="/collection/storage-unit"
+        byPassView={true}
+      />
+      {!strgUnit.storageUnitChildren?.length && (
+        <EditButton
+          className="ms-auto"
+          entityId={id}
+          entityLink="collection/storage-unit"
+        />
+      )}
+      {!strgUnit.storageUnitChildren?.length && (
+        <DeleteButton
+          className="ms-5"
+          id={id}
+          options={{ apiBaseUrl: "/collection-api" }}
+          postDeleteRedirect="/collection/storage-unit/list"
+          type="storage-unit"
+        />
+      )}
+      <button
+        className="btn btn-info moveAllContent"
+        onClick={onMoveAllContentClick}
+      >
+        <DinaMessage id="moveAllContent" />
+      </button>
+    </ButtonBar>
+  );
+
   return (
     <div>
       <Head title={formatMessage("storageUnitViewTitle")} />
@@ -72,36 +104,8 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
       <main className="container">
         {withResponse(StorageUnitQuery, ({ data: strgUnit }) => (
           <>
-            <ButtonBar>
-              <BackButton
-                entityId={id}
-                entityLink="/collection/storage-unit"
-                byPassView={true}
-              />
-              {!strgUnit.storageUnitChildren?.length && (
-                <EditButton
-                  className="ms-auto"
-                  entityId={id}
-                  entityLink="collection/storage-unit"
-                />
-              )}
-              {!strgUnit.storageUnitChildren?.length && (
-                <DeleteButton
-                  className="ms-5"
-                  id={id}
-                  options={{ apiBaseUrl: "/collection-api" }}
-                  postDeleteRedirect="/collection/storage-unit/list"
-                  type="storage-unit"
-                />
-              )}
-              <button
-                className="btn btn-info moveAllContent"
-                onClick={onMoveAllContentClick}
-              >
-                <DinaMessage id="moveAllContent" />
-              </button>
-            </ButtonBar>
-            <DinaForm<StorageUnit> initialValues={storageUnit} readOnly={true}>
+            {buttonBar(strgUnit)}
+            <DinaForm<StorageUnit> initialValues={strgUnit} readOnly={true}>
               <StorageUnitFormFields />
             </DinaForm>
           </>
