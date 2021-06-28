@@ -16,18 +16,22 @@ export default function PersonEditPage() {
     await router.push(`/person/list`);
   }
 
+  const buttonBar = (
+    <ButtonBar>
+      <BackButton
+        entityId={id as string}
+        entityLink="/person"
+        byPassView={true}
+      />
+    </ButtonBar>
+  );
+
   return (
     <div>
       <Head title={formatMessage("editPersonTitle")} />
       <Nav />
-      <ButtonBar>
-        <BackButton
-          entityId={id as string}
-          entityLink="/person"
-          byPassView={true}
-        />
-      </ButtonBar>
       <main className="container-fluid">
+        {buttonBar}
         {id ? (
           <div>
             <h1>
