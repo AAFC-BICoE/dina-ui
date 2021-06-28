@@ -57,6 +57,8 @@ const mockGet = jest.fn<any, any>(async (path, params = {}) => {
         };
       } else if (params.filter?.rsql === "parentStorageUnit.uuid==C") {
         return { data: [STORAGE_D], meta: { totalResourceCount: 1 } };
+      } else if (params.filter?.rsql === "name==*test-search-text*") {
+        return { data: [], meta: { totalResourceCount: 0 } };
       }
   }
 });
@@ -164,5 +166,46 @@ describe("BrowseStorageTree component", () => {
         .first()
         .prop("disabled")
     ).toEqual(true);
+  });
+
+  it("Filters the list based on a text filter.", async () => {
+    const wrapper = mountWithAppContext(
+      <BrowseStorageTree onSelect={mockOnSelect} />,
+      { apiContext }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // With no filter, gets the top-level units:
+    expect(mockGet).lastCalledWith("collection-api/storage-unit", {
+      filter: {
+        parentStorageUnit: null,
+        rsql: ""
+      },
+      page: {
+        limit: 100,
+        offset: 0
+      }
+    });
+
+    wrapper
+      .find("input.storage-tree-search")
+      .simulate("change", { target: { value: "test-search-text" } });
+    wrapper.find("button.storage-tree-search").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // With a filter, gets units from any level matching the search text:
+    expect(mockGet).lastCalledWith("collection-api/storage-unit", {
+      filter: {
+        rsql: "name==*test-search-text*"
+      },
+      page: {
+        limit: 100,
+        offset: 0
+      }
+    });
   });
 });

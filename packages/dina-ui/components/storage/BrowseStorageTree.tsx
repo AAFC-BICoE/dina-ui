@@ -1,11 +1,18 @@
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
+import Pagination from "rc-pagination";
 import { useState } from "react";
 import { FaMinusSquare, FaPlusSquare } from "react-icons/fa";
-import { MetaWithTotal, useQuery, withResponse } from "../../../common-ui/lib";
+import {
+  FilterGroupModel,
+  MetaWithTotal,
+  rsql,
+  useQuery,
+  withResponse
+} from "../../../common-ui/lib";
+import { FilterRowModel } from "../../../common-ui/lib/filter-builder/FilterRow";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
-import Pagination from "rc-pagination";
 
 export interface BrowseStorageTreeProps {
   parentId?: string;
@@ -14,13 +21,78 @@ export interface BrowseStorageTreeProps {
   /** Disable this option ID e.g. to avoid putting a storage unit inside itself. */
   excludeOptionId?: string;
   disabled?: boolean;
+
+  filter?: FilterRowModel | null;
 }
 
-export function BrowseStorageTree({
+export function BrowseStorageTree(props: BrowseStorageTreeProps) {
+  const [searchText, setSearchText] = useState<string>("");
+
+  const [filter, setFilter] = useState<FilterRowModel | null>();
+
+  function doSearch() {
+    setFilter({
+      id: -321,
+      type: "FILTER_ROW" as const,
+      attribute: "name",
+      predicate: "IS" as const,
+      searchType: "PARTIAL_MATCH" as const,
+      value: searchText
+    });
+  }
+
+  function resetSearch() {
+    setSearchText("");
+    setFilter(null);
+  }
+
+  return (
+    <div>
+      <div className="input-group mb-3" style={{ width: "30rem" }}>
+        <input
+          className="storage-tree-search form-control"
+          type="text"
+          value={searchText}
+          onChange={e => setSearchText(e.target.value)}
+          // Pressing enter should set the filter, not submit the form:
+          onKeyDown={e => {
+            if (e.keyCode === 13) {
+              e.preventDefault();
+              doSearch();
+            }
+          }}
+        />
+        <button
+          className="storage-tree-search btn btn-primary"
+          type="button"
+          style={{ width: "10rem" }}
+          onClick={doSearch}
+        >
+          <DinaMessage id="search" />
+        </button>
+        <button className="btn btn-dark" type="button" onClick={resetSearch}>
+          <DinaMessage id="resetButtonText" />
+        </button>
+      </div>
+      <div className="fw-bold mb-3">
+        {filter ? (
+          <DinaMessage id="showingFilteredStorageUnits" />
+        ) : (
+          <DinaMessage id="showingTopLevelStorageUnits" />
+        )}
+        {":"}
+      </div>
+      <StorageTreeList {...props} filter={filter} />
+    </div>
+  );
+}
+
+export function StorageTreeList({
   onSelect,
   parentId,
   excludeOptionId,
-  disabled
+  disabled,
+  filter
 }: BrowseStorageTreeProps) {
   const limit = 100;
   const [pageNumber, setPageNumber] = useState(1);
@@ -29,11 +101,31 @@ export function BrowseStorageTree({
   const storageUnitsQuery = useQuery<StorageUnit[], MetaWithTotal>({
     path: `collection-api/storage-unit`,
     page: { limit, offset },
-    filter: parentId
-      ? // For inner storage units:
-        { rsql: `parentStorageUnit.uuid==${parentId}` }
-      : // For top-level storage units:
-        { parentStorageUnit: null }
+    filter: {
+      rsql: rsql({
+        type: "FILTER_GROUP",
+        id: -123,
+        operator: "AND",
+        children: [
+          // For inner storage units:
+          ...(parentId
+            ? [
+                {
+                  id: -321,
+                  type: "FILTER_ROW" as const,
+                  attribute: "parentStorageUnit.uuid",
+                  predicate: "IS" as const,
+                  searchType: "EXACT_MATCH" as const,
+                  value: parentId
+                }
+              ]
+            : []),
+          ...(filter ? [filter] : [])
+        ]
+      }),
+      // For top-level storage units:
+      ...(!filter && !parentId ? { parentStorageUnit: null } : {})
+    }
   });
 
   return withResponse(
@@ -120,7 +212,7 @@ function StorageUnitCollapser({
           </button>
         </div>
         {isOpen && (
-          <BrowseStorageTree
+          <StorageTreeList
             parentId={storageUnit.id}
             onSelect={onSelect}
             excludeOptionId={excludeOptionId}
