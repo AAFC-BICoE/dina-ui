@@ -207,5 +207,23 @@ describe("BrowseStorageTree component", () => {
         offset: 0
       }
     });
+
+    // Reset the search:
+    wrapper.find("button.storage-tree-search-reset").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // No filter again:
+    expect(mockGet).lastCalledWith("collection-api/storage-unit", {
+      filter: {
+        parentStorageUnit: null,
+        rsql: ""
+      },
+      page: {
+        limit: 100,
+        offset: 0
+      }
+    });
   });
 });

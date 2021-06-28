@@ -70,7 +70,11 @@ export function BrowseStorageTree(props: BrowseStorageTreeProps) {
         >
           <DinaMessage id="search" />
         </button>
-        <button className="btn btn-dark" type="button" onClick={resetSearch}>
+        <button
+          className="storage-tree-search-reset btn btn-dark"
+          type="button"
+          onClick={resetSearch}
+        >
           <DinaMessage id="resetButtonText" />
         </button>
       </div>
