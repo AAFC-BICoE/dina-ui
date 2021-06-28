@@ -3,10 +3,10 @@ import titleCase from "title-case";
 import { Tooltip } from "../tooltip/Tooltip";
 
 export interface FieldNameProps {
-  name: string;
+  name: string,
 
   /** Override the default "name" prop used to get labels and tooltips from the intl messages. */
-  customName?: string;
+  customName?: string,
 
   /** Optional image source to display an image in a tooltip. */
   tooltipImage?: string,
@@ -31,7 +31,8 @@ export function useFieldLabels() {
     tooltipImageAlt,
     tooltipLink,
     tooltipLinkText
-  }: FieldNameProps = {}) {
+  }: FieldNameProps) {
+
     const messageKey = `field_${name}`;
     const tooltipKey = `${messageKey}_tooltip`;
 
@@ -69,6 +70,7 @@ export function FieldHeader({
   tooltipLink,
   tooltipLinkText
 }: FieldNameProps) {
+
   const { getFieldLabel } = useFieldLabels();
   const { fieldLabel, tooltip } = getFieldLabel({
     name: customName ?? name,
