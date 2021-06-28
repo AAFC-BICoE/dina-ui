@@ -358,6 +358,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 type: "collecting-event"
               },
               managedAttributes: {},
+
               // Preparations are not enabled, so the preparation fields are set to null:
               preparationDate: null,
               preparationType: {
