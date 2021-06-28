@@ -37,9 +37,7 @@ describe("MaterialSample split workflow run config", () => {
       BASE_NAME
     );
 
-    expect(wrapper.find(".start-field input").prop("placeholder")).toEqual(
-      START
-    );
+    expect(wrapper.find(".start-field input").prop("value")).toEqual(START);
 
     const { value } = wrapper.find(Select).props();
     expect(value.value).toEqual(TYPE_NUMERIC);
