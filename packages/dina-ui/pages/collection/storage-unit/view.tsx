@@ -8,7 +8,7 @@ import {
   withResponse,
   useModal,
   AreYouSureModal,
-  ResourceSelect,
+  ResourceSelectField,
   filterBy
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -50,7 +50,8 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
           </span>
         }
         messageBody={
-          <ResourceSelect<StorageUnit>
+          <ResourceSelectField<StorageUnit>
+            name="parentStorageUnit"
             model="collection-api/storage-unit"
             optionLabel={it => it.name}
             filter={input => ({

@@ -12,7 +12,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { GroupSelectField, Head, Nav, TreeView } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnit } from "../../../types/collection-api";
 import { useState } from "react";
@@ -109,24 +109,8 @@ export function StorageUnitForm({
 /** Re-usable field layout between edit and view pages. */
 export function StorageUnitFormFields() {
   const { readOnly, initialValues } = useDinaFormContext();
-  const storageUnitData = JSON.stringify(initialValues).replaceAll(
-    "storageUnitChildren",
-    "children"
-  );
-  const [data, setData] = useState(JSON.parse(storageUnitData));
-  const [cursor, setCursor] = useState({ active: false });
-
-  const onToggle = (node, toggled) => {
-    if (cursor) {
-      cursor.active = false;
-    }
-    node.active = true;
-    if (node.children) {
-      node.toggled = toggled;
-    }
-    setCursor(node);
-    setData(data);
-  };
+  const initVal = JSON.stringify(initialValues).toString();
+  const storageUnitData = "aa".replaceAll("storageUnitChildren", "children");
 
   return (
     <div>
@@ -140,7 +124,7 @@ export function StorageUnitFormFields() {
       <div className="row">
         <TextField className="col-md-6" name="name" />
       </div>
-      {initialValues.id && <Treebeard data={data} onToggle={onToggle} />}
+      {initialValues.id && <TreeView data={storageUnitData} />}
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />

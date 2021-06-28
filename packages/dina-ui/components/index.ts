@@ -5,3 +5,4 @@ export * from "./group-select/GroupFieldView";
 export * from "./group-select/GroupSelectField";
 export * from "./revision-by-user/CommonRevisionsByUserPage";
 export * from "./head";
+export * from "./collection/TreeView";
