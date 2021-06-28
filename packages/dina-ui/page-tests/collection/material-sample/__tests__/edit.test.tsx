@@ -49,6 +49,12 @@ const TEST_COORDINATES: CoordinateSystem = {
   type: "coordinate-system"
 };
 
+const TEST_MANAGED_ATTRIBUTE = {
+  id: "1",
+  type: "managed-attribute",
+  name: "testAttr"
+};
+
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "collection-api/collecting-event":
@@ -84,6 +90,9 @@ const mockSave = jest.fn<any, any>(async saves => {
 const mockBulkGet = jest.fn<any, any>(async paths => {
   if (!paths.length) {
     return [];
+  }
+  if ((paths[0] as string).startsWith("/managed-attribute")) {
+    return [TEST_MANAGED_ATTRIBUTE];
   }
 });
 
@@ -146,6 +155,7 @@ describe("Material Sample Edit Page", () => {
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               geoReferenceAssertions: [
                 {
+                  georeferencedBy: undefined,
                   isPrimary: true
                 }
               ],
@@ -170,6 +180,7 @@ describe("Material Sample Edit Page", () => {
               },
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
+              managedAttributes: {},
               relationships: {},
               type: "material-sample"
             },
@@ -229,6 +240,7 @@ describe("Material Sample Edit Page", () => {
               },
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
+              managedAttributes: {},
               type: "material-sample",
               relationships: {}
             },
@@ -291,7 +303,7 @@ describe("Material Sample Edit Page", () => {
               preparedBy: {
                 id: null
               },
-
+              managedAttributes: {},
               relationships: {}
             },
             type: "material-sample"
@@ -386,7 +398,7 @@ describe("Material Sample Edit Page", () => {
               preparedBy: {
                 id: null
               },
-
+              managedAttributes: {},
               relationships: {}
             },
             type: "material-sample"
@@ -444,5 +456,61 @@ describe("Material Sample Edit Page", () => {
     expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
     ).toEqual(false);
+  });
+
+  it("Renders an existing Material Sample with the managed attribute when there is selected attribute with assinged value", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms",
+          managedAttributeValues: {
+            testAttr: { assignedValue: "do the test" }
+          }
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              collectingEvent: {
+                id: null,
+                type: "collecting-event"
+              },
+              id: "333",
+              managedAttributes: {
+                testAttr: "do the test"
+              },
+              materialSampleName: "test-ms",
+              preparationDate: null,
+              preparationType: {
+                id: null,
+                type: "preparation-type"
+              },
+              preparedBy: {
+                id: null
+              },
+              relationships: {},
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
   });
 });

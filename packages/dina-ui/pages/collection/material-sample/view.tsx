@@ -7,7 +7,7 @@ import {
   FieldSet,
   withResponse
 } from "common-ui";
-import { Field } from "formik";
+import { Field, FastField } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
@@ -23,6 +23,9 @@ import {
   MaterialSampleMainInfoFormLayout,
   PreparationsFormLayout
 } from "./edit";
+import { ManagedAttributesViewer } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
+import { toPairs } from "lodash";
+import { ManagedAttributeValues } from "packages/dina-ui/types/objectstore-api/resources/ManagedAttributeMap";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -36,6 +39,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   );
 
   const collectingEvent = colEventQuery.response?.data;
+
   const buttonBar = (
     <ButtonBar>
       <BackButton
@@ -97,6 +101,22 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 </FieldSet>
               )}
               {hasPreparations && <PreparationsFormLayout />}
+              <FieldSet
+                legend={<DinaMessage id="materialSampleManagedAttributes" />}
+              >
+                <div className="col-md-6">
+                  <FastField name="managedAttributeValues">
+                    {({ field: { value } }) => (
+                      <ManagedAttributesViewer
+                        values={value}
+                        managedAttributeApiPath={key =>
+                          `collection-api/managed-attribute/material_sample.${key}`
+                        }
+                      />
+                    )}
+                  </FastField>
+                </div>
+              </FieldSet>
               <div className="mb-3">
                 <Field name="id">
                   {({ field: { value: materialSampleId } }) => (

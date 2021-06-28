@@ -3,6 +3,7 @@ import { KitsuResource } from "kitsu";
 import { ManagedAttributeValues, Person } from "../../objectstore-api";
 import { CollectingEvent } from "./CollectingEvent";
 import { PreparationType } from "./PreparationType";
+import { JsonValue } from "type-fest";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -19,6 +20,7 @@ export interface MaterialSampleAttributes {
   description?: string;
 
   managedAttributeValues?: ManagedAttributeValues;
+  managedAttributes?: JsonValue;
 }
 
 export interface MaterialSampleRelationships {
