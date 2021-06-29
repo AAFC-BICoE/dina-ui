@@ -1,9 +1,8 @@
-import { COMMON_UI_MESSAGES_ENGLISH } from "common-ui";
-
 /**
  * English SeqDB messages. A message must be set here in English before other languages.
  */
 export const SEQDB_MESSAGES_ENGLISH = {
+  addPcrBatchTitle: "Add PCR Batch",
   addPcrPrimerTitle: "Add PCR Primer",
   addPcrProfileTitle: "Add Thermocycler Profile",
   addProductTitle: "Add Product",
@@ -17,13 +16,14 @@ export const SEQDB_MESSAGES_ENGLISH = {
   deselectAllCheckedSamplesButtonText:
     "<-- Deselect all checked molecular samples",
   deselectButtonText: "Deselect",
-  editableTable: "Editable Table",
+  editPcrBatchTitle: "Edit PCR Batch",
   editPcrPrimerTitle: "Edit PCR Primer",
   editPcrProfileTitle: "Edit Thermocycler Profile",
   editProductTitle: "Edit Product",
   editProtocolTitle: "Edit Protocol",
   editRegionTitle: "Edit Region",
   editWorkflowTitle: "Edit NGS Workflow",
+  editableTable: "Editable Table",
   field_averageFragmentSize: "Average Fragment Size",
   field_concentration: "Concentration",
   "field_group.groupName": "Group Name",
@@ -37,14 +37,16 @@ export const SEQDB_MESSAGES_ENGLISH = {
   "field_sample.name": "Sample Name",
   field_size: "Size",
   field_targetBpSize: "Target Base Pair Size",
-  indexI5: "Index i5",
-  indexI7: "Index i7",
   indexGridInstructions:
     "Selecting a dropdown item along the top side sets the index for that column. Selecting a dropdown item along the left side sets the index for that row. Selecting None erases the Index.",
+  indexI5: "Index i5",
+  indexI7: "Index i7",
   indexSetListTitle: "Index Sets",
   indexSetMustBeSet: "Index Set must be set.",
   notShearedStatus: "Not Sheared",
   notSizeSelectedStatus: "No Size Selection",
+  pcrBatchListTitle: "PCR Batches",
+  pcrBatchViewTitle: "View PCR Batch",
   pcrPrimerListTitle: "PCR Primers",
   pcrPrimerViewTitle: "PCR Primer",
   pcrProfileListTitle: "Thermocycler Profiles",
