@@ -109,8 +109,8 @@ export function StorageUnitForm({
 /** Re-usable field layout between edit and view pages. */
 export function StorageUnitFormFields() {
   const { readOnly, initialValues } = useDinaFormContext();
-  const initVal = JSON.stringify(initialValues).toString();
-  const storageUnitData = "aa".replaceAll("storageUnitChildren", "children");
+  const initVal = JSON.stringify(initialValues);
+  const storageUnitData = initVal.replace(/storageUnitChildren/g, "children");
 
   return (
     <div>
@@ -124,7 +124,12 @@ export function StorageUnitFormFields() {
       <div className="row">
         <TextField className="col-md-6" name="name" />
       </div>
-      {initialValues.id && <TreeView data={storageUnitData} />}
+      {initialValues.id && (
+        <TreeView
+          data={JSON.parse(storageUnitData)}
+          className="storageUnitTree"
+        />
+      )}
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />
