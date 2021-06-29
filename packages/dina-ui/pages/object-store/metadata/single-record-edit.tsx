@@ -211,6 +211,8 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
             className="col-md-3 col-sm-4"
             name="orientation"
             options={ORIENTATION_OPTIONS}
+            tooltipImage="/static/images/orientationDiagram.jpg"
+            tooltipImageAlt="field_orientation_tooltipAlt"
           />
         </div>
       </FieldSet>

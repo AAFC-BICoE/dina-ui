@@ -33,6 +33,18 @@ export interface LabelWrapperParams {
   /** Remove the label. */
   removeLabel?: boolean;
 
+  /** Add an image inside of the tooltip. Provide the URL of the image to display it. */
+  tooltipImage?: string;
+
+  /** Accessability text, only used if a tooltip image is provided. */
+  tooltipImageAlt?: string;
+
+  /** Add a link to a tooltip. */
+  tooltipLink?: string;
+
+  /** The text that appears for the link. */
+  tooltipLinkText?: string;
+
   /**
    * Custom field name for the template checkbox.
    * e.g. passing "srcAdminLevels[0]" will change the default
@@ -73,6 +85,10 @@ export function FieldWrapper({
   readOnlyRender,
   removeFormGroupClass,
   removeLabel,
+  tooltipImage,
+  tooltipImageAlt,
+  tooltipLink,
+  tooltipLinkText,
   templateCheckboxFieldName
 }: FieldWrapperProps) {
   const { horizontal, readOnly, isTemplate, enabledFields } =
@@ -84,7 +100,14 @@ export function FieldWrapper({
   );
 
   const fieldLabel = label ?? (
-    <FieldHeader name={name} customName={customName} />
+    <FieldHeader
+      name={name}
+      customName={customName}
+      tooltipImage={tooltipImage}
+      tooltipImageAlt={tooltipImageAlt}
+      tooltipLink={tooltipLink}
+      tooltipLinkText={tooltipLinkText}
+    />
   );
 
   const [labelCol, valueCol] = isTemplate

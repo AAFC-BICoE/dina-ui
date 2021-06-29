@@ -216,6 +216,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_orientation: "Orientation",
   field_orientation_tooltip:
     "Determines the way an image should be displayed based on its orientation value, must be a number from 1 to 8.",
+  field_orientation_tooltipAlt:
+    "Diagram of all the possible orientation values.",
   field_originalFilename: "Original Filename",
   field_preparationType: "Preparation Type",
   field_publiclyReleasable: "Publicly releasable",
@@ -366,6 +368,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   thumbnail: "Thumbnail",
   thumbnailNotAvailableText: "No thumbnail available",
   to: "To",
+  tooltipDefaultLinkMessage: "Click here to learn more.",
   toponymyLegend: "Current Geographic Place",
   uploadButtonText: "Upload",
   uploadFilesMaxSize: "The maximum file size is {maxSize}.",
