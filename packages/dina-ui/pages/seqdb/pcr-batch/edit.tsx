@@ -25,7 +25,12 @@ import {
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Person } from "../../../types/agent-api";
-import { PcrBatch, PcrPrimer, Region } from "../../../types/seqdb-api";
+import {
+  PcrBatch,
+  PcrPrimer,
+  PcrProfile,
+  Region
+} from "../../../types/seqdb-api";
 
 export function usePcrBatchQuery(id?: string) {
   const { bulkGet } = useApiClient();
@@ -33,7 +38,7 @@ export function usePcrBatchQuery(id?: string) {
   return useQuery<PcrBatch>(
     {
       path: `seqdb-api/pcr-batch/${id}`,
-      include: "primerForward,primerReverse,region"
+      include: "primerForward,primerReverse,region,thermocycleProfile"
     },
     {
       disabled: !id,
@@ -60,8 +65,8 @@ export default function PcrBatchEditPage() {
 
   const title = id ? "editPcrBatchTitle" : "addPcrBatchTitle";
 
-  async function moveToViewPage(mst: PersistedResource<PcrBatch>) {
-    await router.push(`/seqdb/pcr-batch/view?id=${mst.id}`);
+  async function moveToViewPage(savedResource: PersistedResource<PcrBatch>) {
+    await router.push(`/seqdb/pcr-batch/view?id=${savedResource.id}`);
   }
 
   return (
@@ -164,7 +169,17 @@ export function PcrBatchFormFields() {
         />
       </div>
       <div className="row">
-        {/* <TextField className="col-md-6" name="name" /> */}
+        <TextField className="col-md-6" name="name" />
+        <ResourceSelectField<PcrProfile>
+          className="col-md-6"
+          name="thermocycleProfile"
+          filter={filterBy(["name"])}
+          model="seqdb-api/thermocyclerprofile"
+          optionLabel={profile => profile.name}
+          readOnlyLink="/seqdb/pcr-profile/view?id="
+        />
+      </div>
+      <div className="row">
         <ResourceSelectField<Person>
           className="col-md-6"
           name="experimenters"
@@ -180,8 +195,6 @@ export function PcrBatchFormFields() {
             }
           ]}
         />
-      </div>
-      <div className="row">
         <ResourceSelectField<Region>
           className="col-md-6"
           name="region"

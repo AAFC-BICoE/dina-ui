@@ -38,6 +38,8 @@ const mockGet = jest.fn<any, any>(async path => {
       return { data: [] };
     case "seqdb-api/pcrPrimer":
       return { data: [] };
+    case "seqdb-api/thermocyclerprofile":
+      return { data: [] };
   }
 });
 
@@ -66,6 +68,10 @@ describe("PcrBatch edit page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    wrapper
+      .find(".name-field input")
+      .simulate("change", { target: { value: "test new batch" } });
+
     wrapper.find(".experimenters-field ResourceSelect").prop<any>("onChange")([
       {
         id: "1",
@@ -89,6 +95,7 @@ describe("PcrBatch edit page", () => {
       [
         {
           resource: {
+            name: "test new batch",
             // TODO let the back-end set "createdBy" instead of the front-end:
             createdBy: "test-user",
             experimenters: ["1", "2"],
