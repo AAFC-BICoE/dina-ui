@@ -12,24 +12,31 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { GroupSelectField, Head, Nav, TreeView } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { StorageUnit } from "../../../types/collection-api";
 import { useState } from "react";
 import { Treebeard } from "react-treebeard";
+import {
+  GroupSelectField,
+  Head,
+  Nav,
+  StorageLinkerField,
+  TreeView
+} from "../../../components";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { StorageUnit } from "../../../types/collection-api";
+
+export function useStorageUnit(id?: string) {
+  return useQuery<StorageUnit>(
+    { path: `collection-api/storage-unit/${id}`, include: "parentStorageUnit" },
+    { disabled: !id }
+  );
+}
 
 export default function StorageUnitEditPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
+  const id = router.query.id?.toString();
 
-  const {
-    query: { id }
-  } = router;
-
-  const StorageUnitQuery = useQuery<StorageUnit>(
-    { path: `collection-api/storage-unit/${id}` },
-    { disabled: !id }
-  );
+  const storageUnitQuery = useStorageUnit(id);
 
   const title = id ? "editStorageUnitTitle" : "addStorageUnitTitle";
 
@@ -46,7 +53,7 @@ export default function StorageUnitEditPage() {
           <DinaMessage id={title} />
         </h1>
         {id ? (
-          withResponse(StorageUnitQuery, ({ data }) => (
+          withResponse(storageUnitQuery, ({ data }) => (
             <StorageUnitForm storageUnit={data} onSaved={goToViewPage} />
           ))
         ) : (
@@ -130,6 +137,10 @@ export function StorageUnitFormFields() {
           className="storageUnitTree"
         />
       )}
+      <StorageLinkerField
+        name="parentStorageUnit"
+        excludeOptionId={initialValues.id}
+      />
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />

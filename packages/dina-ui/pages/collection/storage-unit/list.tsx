@@ -3,8 +3,8 @@ import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
-const STORAGE_UNIT__FILTER_ATTRIBUTES = ["name", "createdBy"];
-const STORAGE_UNIT__TABLE_COLUMNS = [
+const STORAGE_UNIT_FILTER_ATTRIBUTES = ["name", "createdBy"];
+const STORAGE_UNIT_TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, name } }) => (
       <Link href={`/collection/storage-unit/view?id=${id}`}>{name}</Link>
@@ -35,10 +35,10 @@ export default function storageUnitListPage() {
             // Apply group filter:
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}
-          filterAttributes={STORAGE_UNIT__FILTER_ATTRIBUTES}
+          filterAttributes={STORAGE_UNIT_FILTER_ATTRIBUTES}
           id="storage-unit-list"
           queryTableProps={{
-            columns: STORAGE_UNIT__TABLE_COLUMNS,
+            columns: STORAGE_UNIT_TABLE_COLUMNS,
             path: "collection-api/storage-unit"
           }}
           filterFormchildren={({ submitForm }) => (

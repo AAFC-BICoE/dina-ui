@@ -21,7 +21,12 @@ import { useRouter } from "next/router";
 import { ReactNode, useContext } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import {
+  GroupSelectField,
+  Head,
+  Nav,
+  StorageLinkerField
+} from "../../../components";
 import { CollectingEventLinker } from "../../../components/collection";
 import {
   useMaterialSampleQuery,
@@ -214,6 +219,11 @@ export function MaterialSampleForm({
           </DinaForm>
         ) : (
           <MaterialSampleIdentifiersFormLayout />
+        )}
+        {!isTemplate && (
+          <div className="card card-body mb-3">
+            <StorageLinkerField name="storageUnit" />
+          </div>
         )}
         <FieldSet legend={<DinaMessage id="components" />}>
           <div className="row">
