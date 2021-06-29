@@ -7,6 +7,7 @@ import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 import { castArray } from "lodash";
 import { Fragment } from "react";
 import Link from "next/link";
+import classNames from "classnames";
 
 /** The value could be one element or an array. */
 export type SingleOrArray<T> = T | T[];
@@ -25,12 +26,8 @@ export interface ResourceSelectFieldProps<TData extends KitsuResource>
 export function ResourceSelectField<TData extends KitsuResource>(
   resourceSelectFieldProps: ResourceSelectFieldProps<TData>
 ) {
-  const {
-    name,
-    onChange,
-    readOnlyLink,
-    ...resourceSelectProps
-  } = resourceSelectFieldProps;
+  const { name, onChange, readOnlyLink, ...resourceSelectProps } =
+    resourceSelectFieldProps;
 
   return (
     <FieldWrapper
@@ -60,7 +57,7 @@ export function ResourceSelectField<TData extends KitsuResource>(
         );
       }}
     >
-      {({ setValue, value }) => {
+      {({ setValue, value, invalid }) => {
         function onChangeInternal(resource) {
           setValue(resource);
           onChange?.(resource);
@@ -69,6 +66,7 @@ export function ResourceSelectField<TData extends KitsuResource>(
         return (
           <ResourceSelect
             {...resourceSelectProps}
+            invalid={invalid}
             onChange={onChangeInternal}
             value={value}
           />

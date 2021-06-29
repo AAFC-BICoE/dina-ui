@@ -1,8 +1,9 @@
 import { AxiosError } from "axios";
 import { cacheAdapterEnhancer } from "axios-extensions";
+import { FormikErrors } from "formik";
 import Kitsu, { GetParams, KitsuResource, PersistedResource } from "kitsu";
 import { deserialise, error as kitsuError, query } from "kitsu-core";
-import { keys } from "lodash";
+import { flatMap, fromPairs, isEmpty, keys } from "lodash";
 import LRUCache from "lru-cache";
 import React, { PropsWithChildren, useContext, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -174,11 +175,11 @@ export class ApiClientImpl implements ApiClientI {
 
     // Check for errors. At least one error means that the entire request's transaction was
     // cancelled.
-    const errorMessage = getErrorMessage(responses);
+    const { errorMessage, fieldErrors } = getErrorMessages(responses);
 
     // If there is an error message, throw it.
-    if (errorMessage) {
-      throw new Error(errorMessage);
+    if (errorMessage || !isEmpty(fieldErrors)) {
+      throw new DoOperationsError(errorMessage ?? "", fieldErrors);
     }
 
     // Return the successful jsonpatch response.
@@ -263,9 +264,10 @@ export class ApiClientImpl implements ApiClientI {
 }
 
 /** Gets the error message as a string from the JSONAPI jsonpatch/operations response. */
-function getErrorMessage(
-  operationsResponse: OperationsResponse
-): string | null {
+export function getErrorMessages(operationsResponse: OperationsResponse): {
+  errorMessage: string | null;
+  fieldErrors: FormikErrors<any>;
+} {
   // Filter down to just the error responses.
   const errorResponses = operationsResponse.filter(
     ({ status }) => !/2../.test(status.toString())
@@ -278,19 +280,43 @@ function getErrorMessage(
     .map(response => response.errors);
 
   // Convert the JsonApiErrors to an aggregated error string.
-  const message = jsonApiErrors
-    .map(errors =>
-      errors
-        .map(({ title, detail }) =>
-          // The error message is the title + detail, but remove one if the other is missing
-          [title, detail].filter(s => s?.trim()).join(": ")
-        )
-        .join("\n")
+  const errorMessage =
+    jsonApiErrors
+      .map(errors =>
+        errors
+          // Don't include field-level errors in the form-level error message:
+          .filter(error => !error.source?.pointer)
+          .map(({ title, detail }) =>
+            // The error message is the title + detail, but remove one if the other is missing
+            [title, detail].filter(s => s?.trim()).join(": ")
+          )
+          .join("\n")
+      )
+      .join("\n") || null;
+
+  const fieldErrors = fromPairs(
+    flatMap(
+      jsonApiErrors.map(response =>
+        response
+          // Only include field-level errors in the fieldErrors:
+          .filter(error => error.source?.pointer && error.detail)
+          .map<[string, string]>(error => [
+            error.source?.pointer?.toString?.() ?? "",
+            error.detail ?? ""
+          ])
+      )
     )
-    .join("\n");
+  );
 
   // Return the error message if there is one, or null otherwise.
-  return message || null;
+  return { errorMessage, fieldErrors };
+}
+
+/** Error class thrown by doOperations function. */
+export class DoOperationsError extends Error {
+  constructor(public message: string, public fieldErrors: FormikErrors<any>) {
+    super(message);
+  }
 }
 
 /** Show more details in the Axios errors. */
@@ -309,7 +335,8 @@ export function makeAxiosErrorMoreReadable(error: AxiosError) {
         status: error.response.status,
         errors: error.response.data.errors
       };
-      errorMessage += "\n" + getErrorMessage([jsonApiErrorResponse]);
+      errorMessage +=
+        "\n" + getErrorMessages([jsonApiErrorResponse]).errorMessage;
     }
 
     throw new Error(errorMessage);
