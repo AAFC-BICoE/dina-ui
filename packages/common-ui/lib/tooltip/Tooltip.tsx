@@ -17,13 +17,13 @@ interface TooltipProps {
   visibleElement?: ReactNode;
 
   /** Link attachment, links will always be opened in a new tab. */
-  link?: string,
+  link?: string;
 
   /** The text that appears for the link. */
-  linkText?: string,
+  linkText?: string;
 
   /** Image attachment, will display it under the tooltip message. */
-  image?: string,
+  image?: string;
 
   /** Image accessability text. */
   altImage?: string;
@@ -38,37 +38,52 @@ export function Tooltip({
   image,
   altImage
 }: TooltipProps) {
-
   // Setup the internationalization functions.
   const { messages, formatMessage } = useIntl();
 
   // Determine if a tooltip message needs to be displayed.
-  const tooltipMessage = id != null ? <FormattedMessage id={id} values={intlValues} /> : null;
+  const tooltipMessage =
+    id != null ? <FormattedMessage id={id} values={intlValues} /> : null;
 
   // Determine if an image should be displayed.
-  const tooltipImage = image != null ? (
-    <div style={{"marginTop": "10px"}}>
-      <img src={image} 
-           alt={(altImage && messages[altImage]) ? formatMessage({id: altImage}) : altImage} 
-           style={{"width": "100%"}} />
-    </div>
-  ) : null;
+  const tooltipImage =
+    image != null ? (
+      <div style={{ marginTop: "10px" }}>
+        <img
+          src={image}
+          alt={
+            altImage && messages[altImage]
+              ? formatMessage({ id: altImage })
+              : altImage
+          }
+          style={{ width: "100%" }}
+        />
+      </div>
+    ) : null;
 
   // Determine if a link should be displayed.
-  const tooltipLink = link != null ? (
-    <div style={{"marginTop": "10px"}}>
-      <a href={link} target="_blank" style={{"color": "white"}} className={"mrgn-tp-sm"}>
-        <FormattedMessage id={linkText == null ? "tooltipDefaultLinkMessage" : linkText}/>
-      </a>
-    </div>
-  ) : null;
+  const tooltipLink =
+    link != null ? (
+      <div style={{ marginTop: "10px" }}>
+        <a
+          href={link}
+          target="_blank"
+          style={{ color: "white" }}
+          className={"mrgn-tp-sm"}
+        >
+          <FormattedMessage
+            id={linkText == null ? "tooltipDefaultLinkMessage" : linkText}
+          />
+        </a>
+      </div>
+    ) : null;
 
   return (
     <span className="m-2">
       <RcTooltip
         id={id}
         overlay={
-          <div style={{ maxWidth: "15rem", whiteSpace: "pre-wrap" }}>
+          <div style={{ maxWidth: "25rem", whiteSpace: "pre-wrap" }}>
             {tooltipMessage}
             {tooltipImage}
             {tooltipLink}
