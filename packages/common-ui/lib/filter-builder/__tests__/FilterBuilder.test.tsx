@@ -340,7 +340,7 @@ describe("FilterBuilder component", () => {
 
     // Click the OR button
     wrapper.find(".filter-group-buttons button.or").simulate("click");
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
     expect(onChange).toHaveBeenCalledTimes(4);
     expect(onChange).lastCalledWith(wrapper.find(FilterBuilder).state().model);

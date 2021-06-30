@@ -33,6 +33,9 @@ export interface LabelWrapperParams {
   /** Remove the label. */
   removeLabel?: boolean;
 
+  /** Disables how clicking a label clicks the inner element. */
+  disableLabelClick?: boolean;
+
   /** Add an image inside of the tooltip. Provide the URL of the image to display it. */
   tooltipImage?: string;
 
@@ -76,6 +79,7 @@ export interface FieldWrapperRenderProps {
  */
 export function FieldWrapper({
   className,
+  disableLabelClick,
   hideLabel = false,
   name,
   label,
@@ -140,6 +144,7 @@ export function FieldWrapper({
             ? "row"
             : "w-100"
         } ${removeFormGroupClass ? "" : "mb-3"}`}
+        htmlFor={disableLabelClick ? "none" : undefined}
       >
         {!removeLabel && (
           <div
