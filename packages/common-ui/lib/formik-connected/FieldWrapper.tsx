@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { FastField, FormikProps } from "formik";
 import { ReactNode, useMemo } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
@@ -32,6 +33,21 @@ export interface LabelWrapperParams {
   /** Remove the label. */
   removeLabel?: boolean;
 
+  /** Disables how clicking a label clicks the inner element. */
+  disableLabelClick?: boolean;
+
+  /** Add an image inside of the tooltip. Provide the URL of the image to display it. */
+  tooltipImage?: string;
+
+  /** Accessability text, only used if a tooltip image is provided. */
+  tooltipImageAlt?: string;
+
+  /** Add a link to a tooltip. */
+  tooltipLink?: string;
+
+  /** The text that appears for the link. */
+  tooltipLinkText?: string;
+
   /**
    * Custom field name for the template checkbox.
    * e.g. passing "srcAdminLevels[0]" will change the default
@@ -63,6 +79,7 @@ export interface FieldWrapperRenderProps {
  */
 export function FieldWrapper({
   className,
+  disableLabelClick,
   hideLabel = false,
   name,
   label,
@@ -72,20 +89,29 @@ export function FieldWrapper({
   readOnlyRender,
   removeFormGroupClass,
   removeLabel,
+  tooltipImage,
+  tooltipImageAlt,
+  tooltipLink,
+  tooltipLinkText,
   templateCheckboxFieldName
 }: FieldWrapperProps) {
   const { horizontal, readOnly, isTemplate, enabledFields } =
     useDinaFormContext();
 
-  const isReadOnlyByFormTemplate = useMemo(
+  const disabledByFormTemplate = useMemo(
     () => (enabledFields ? !enabledFields.includes(name) : false),
     [enabledFields]
   );
 
-  const readOnlyField = readOnly || isReadOnlyByFormTemplate;
-
   const fieldLabel = label ?? (
-    <FieldHeader name={name} customName={customName} />
+    <FieldHeader
+      name={name}
+      customName={customName}
+      tooltipImage={tooltipImage}
+      tooltipImageAlt={tooltipImageAlt}
+      tooltipLink={tooltipLink}
+      tooltipLinkText={tooltipLinkText}
+    />
   );
 
   const [labelCol, valueCol] = isTemplate
@@ -96,8 +122,12 @@ export function FieldWrapper({
     ? [6, 6]
     : horizontal || [];
 
-  const wrapper = (
-    <div className={`${className} ${isTemplate ? "row" : ""}`}>
+  if (disabledByFormTemplate) {
+    return null;
+  }
+
+  return (
+    <div className={classNames(className, { row: isTemplate })}>
       {isTemplate && (
         <CheckBoxWithoutWrapper
           name={`templateCheckboxes['${templateCheckboxFieldName ?? name}']`}
@@ -114,13 +144,14 @@ export function FieldWrapper({
             ? "row"
             : "w-100"
         } ${removeFormGroupClass ? "" : "mb-3"}`}
+        htmlFor={disableLabelClick ? "none" : undefined}
       >
         {!removeLabel && (
           <div
             className={[
               `${labelCol ? `col-sm-${labelCol}` : ""}`,
               // Adjust alignment for editable inputs:
-              horizontal && !readOnlyField && !isTemplate ? "mt-sm-2" : "",
+              horizontal && !readOnly && !isTemplate ? "mt-sm-2" : "",
               "mb-2"
             ].join(" ")}
           >
@@ -131,7 +162,7 @@ export function FieldWrapper({
           <FastField name={name}>
             {({ field: { value }, form, meta: { error } }) => (
               <>
-                {readOnlyField || !children
+                {readOnly || !children
                   ? readOnlyRender?.(value) ?? (
                       <ReadOnlyValue link={link} value={value} />
                     )
@@ -156,6 +187,4 @@ export function FieldWrapper({
       </label>
     </div>
   );
-  // ensure hide the hidden fields when it is a tempalte
-  return className !== "hidden" || !isTemplate ? wrapper : null;
 }

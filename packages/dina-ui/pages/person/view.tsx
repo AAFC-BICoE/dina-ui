@@ -17,18 +17,21 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useDinaIntl();
 
+  const buttonBar = (
+    <ButtonBar>
+      <EditButton entityId={id as string} entityLink="person" />
+      <BackButton
+        entityId={id as string}
+        entityLink="/person"
+        byPassView={true}
+      />
+    </ButtonBar>
+  );
+
   return (
     <div>
       <Head title={formatMessage("personViewTitle")} />
       <Nav />
-      <ButtonBar>
-        <EditButton entityId={id as string} entityLink="person" />
-        <BackButton
-          entityId={id as string}
-          entityLink="/person"
-          byPassView={true}
-        />
-      </ButtonBar>
       <Query<Person>
         query={{ path: `agent-api/person/${id}?include=organizations` }}
       >
@@ -44,6 +47,7 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
 
           return (
             <main className="container-fluid">
+              {buttonBar}
               <h1>
                 <DinaMessage id="personViewTitle" />
               </h1>

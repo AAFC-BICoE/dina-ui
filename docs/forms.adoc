@@ -42,3 +42,40 @@ export default function ExampleFormPage() {
   );
 }
 ----
+
+== Tooltips
+
+The tooltip is found from the intl messages file using the key "field_{fieldName}_tooltip". As an example:
+
+[source,tsx]
+----
+<TextField name="name" />
+<TextField name="description" />
+
+// In the dina-ui-en.ts file:
+field_name_tooltip: "This message will appear in the name fields tooltip."
+field_description_tooltip: "This message will appear in the description fields tooltip."
+----
+
+
+Tooltip ids can also be manually added using the `customName` property. This can be handy for fields that share a common name like "description". Here is an example of using a custom tooltip id:
+
+[source,tsx]
+----
+<TextField name="name" customName="metadataName" />
+
+// In the dina-ui-en.ts file:
+field_metadataName_tooltip: "This will be the message that appears for the name fields tooltip."
+----
+
+You are also able to add images and links using the following properties on any of the Field components. Below is a table of all of the different supported properties for images and links.
+
+.Table Tooltip properties
+|===
+|Property Name | Description | Example
+
+| tooltipImage | URL of a image to display in the tooltip. It is displayed under the tooltip texts (if supplied). | tooltipImage="/images/tooltip_image.png"
+| tooltipImageAlt | Accessability text which should be used when a tooltipImage is provided. Best practice is to use internationalization key so it works in multiple languages. | tooltipImageAlt="tooltip_image_alt"
+| tooltipLink | URL of a link to display at the bottom of the tooltip. | tooltipLink="https//www.google.com"
+| tooltipLinkText | Text identifier to appear in the tooltip link text. Defaults to a generic message if not supplied. | tooltipLinkText="tooltip_link_reference"
+|===

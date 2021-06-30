@@ -7,7 +7,7 @@ import {
   SelectField,
   SubmitButton,
   TextField
-} from "common-ui";
+} from "../../../../../common-ui";
 import { Field } from "formik";
 import { padStart, range } from "lodash";
 import { useRouter } from "next/router";
@@ -18,6 +18,7 @@ import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
 import { Head } from "../../../../../dina-ui/components/head";
 import {
   BASE_NAME,
+  IDENTIFIER_TYPE_OPTIONS,
   MaterialSampleRunConfig,
   NUMERIC_UPPER_LIMIT,
   START,
@@ -25,15 +26,6 @@ import {
   TYPE_NUMERIC
 } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
-import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
-import { Head } from "../../../../../dina-ui/components/head";
-import SpreadSheetColumn from "spreadsheet-column";
-
-interface SplitChildRowProps {
-  index: number;
-  baseName: string;
-  computedSuffix: string;
-}
 
 /* Props for computing suffix */
 export interface ComputeSuffixProps {
@@ -52,7 +44,7 @@ export default function ConfigAction() {
     useLocalStorage<MaterialSampleRunConfig | null | undefined>(
       SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
     );
- type SuffixOptions = typeof TYPE_NUMERIC | typeof TYPE_LETTER;
+  type SuffixOptions = typeof TYPE_NUMERIC | typeof TYPE_LETTER;
 
   const TYPE_OPTIONS: { label: string; value: SuffixOptions }[] = [
     {
@@ -80,7 +72,8 @@ export default function ConfigAction() {
       configure: {
         identifiers: configActionFields.identifiers,
         numOfChildToCreate:
-          configActionFields.numOfChildToCreate ?? numOfChildToCreate,
+          configActionFields.numOfChildToCreate ??
+          configActionFields.numOfChildToCreate,
         baseName: configActionFields.baseName ?? BASE_NAME,
         start: configActionFields.start ?? START,
         suffixType: configActionFields.suffixType,
@@ -105,12 +98,10 @@ export default function ConfigAction() {
     </ButtonBar>
   );
 
-  const isNumericalType = suffixType === TYPE_NUMERIC;
-  const isLetterType = suffixType === TYPE_LETTER;
-
   const initialConfig = splitChildSampleRunConfig?.configure ?? {
     suffixType: TYPE_NUMERIC,
-    numOfChildToCreate,
+    numOfChildToCreate: 1,
+    start: "001",
     identifiers: "MATERIAL_SAMPLE_ID"
   };
 

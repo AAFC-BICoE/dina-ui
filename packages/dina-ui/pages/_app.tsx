@@ -10,6 +10,7 @@ import "common-ui/lib/button-bar/buttonbar.css";
 import "common-ui/lib/table/react-table-style.css";
 import "handsontable/dist/handsontable.full.min.css";
 import { AppProps } from "next/app";
+import "rc-pagination/assets/index.css";
 import "rc-tooltip/assets/bootstrap.css";
 import React from "react";
 import "react-datepicker/dist/react-datepicker.css";
