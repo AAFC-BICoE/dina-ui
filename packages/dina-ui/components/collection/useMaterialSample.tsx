@@ -1,7 +1,7 @@
 import { AreYouSureModal, DinaForm } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { cloneDeep, isEmpty } from "lodash";
+import { cloneDeep, isEmpty, isEqual } from "lodash";
 import {
   Dispatch,
   SetStateAction,
@@ -20,10 +20,14 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../dina-ui/types/collection-api";
-import { Metadata } from "../../../dina-ui/types/objectstore-api";
+import {
+  ManagedAttributeValues,
+  Metadata
+} from "../../../dina-ui/types/objectstore-api";
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { useAttachmentsModal } from "../object-store";
+import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
+import { toPairs, fromPairs } from "lodash";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -31,10 +35,19 @@ export function useMaterialSampleQuery(id?: string | null) {
   const materialSampleQuery = useQuery<MaterialSample>(
     {
       path: `collection-api/material-sample/${id}`,
-      include: "collectingEvent,attachment,preparationType,materialSampleType"
+      include:
+        "collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit"
     },
     {
       disabled: !id,
+      joinSpecs: [
+        {
+          apiBaseUrl: "/agent-api",
+          idField: "preparedBy",
+          joinField: "preparedBy",
+          path: (ms: MaterialSample) => `person/${ms.preparedBy?.id}`
+        }
+      ],
       onSuccess: async ({ data }) => {
         if (data.attachment) {
           try {
@@ -51,6 +64,17 @@ export function useMaterialSampleQuery(id?: string | null) {
             console.warn("Attachment join failed: ", error);
           }
         }
+        if (data.managedAttributes) {
+          const managedAttributeValues: ManagedAttributeValues = {};
+          toPairs(data?.managedAttributes as any).map(
+            attr =>
+              (managedAttributeValues[attr[0]] = {
+                assignedValue: attr[1] as any
+              })
+          );
+          delete data?.managedAttributes;
+          data.managedAttributeValues = managedAttributeValues;
+        }
       }
     }
   );
@@ -59,7 +83,11 @@ export function useMaterialSampleQuery(id?: string | null) {
 }
 
 export interface UseMaterialSampleSaveParams {
-  materialSample?: PersistedResource<MaterialSample>;
+  /** Material Sample form initial values. */
+  materialSample?: InputResource<MaterialSample>;
+  /** Initial values for creating a new Collecting Event with the Material Sample. */
+  collectingEventInitialValues?: InputResource<CollectingEvent>;
+
   onSaved?: (id: string) => Promise<void>;
 
   collectingEvtFormRef?: React.RefObject<FormikProps<any>>;
@@ -72,39 +100,72 @@ export interface UseMaterialSampleSaveParams {
   preparationsTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
+
+  /** Optionally restrict the form to these enabled fields. */
+  enabledFields?: {
+    materialSample?: string[];
+    collectingEvent?: string[];
+  };
+
+  materialSampleAttachmentsConfig?: AllowAttachmentsConfig;
+  collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
 }
+
+const PREPARATION_FIELDS: (keyof MaterialSample)[] = [
+  "preparationType",
+  "preparationDate",
+  "preparedBy"
+];
 
 export function useMaterialSampleSave({
   materialSample,
+  collectingEventInitialValues: collectingEventInitialValuesProp,
   onSaved,
   collectingEvtFormRef,
   isTemplate,
   colEventTemplateInitialValues,
+  enabledFields,
+  materialSampleAttachmentsConfig,
+  collectingEventAttachmentsConfig,
   preparationsTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
+  // For editing existing templates:
   const hasColEventTemplate =
     isTemplate &&
     (!isEmpty(colEventTemplateInitialValues?.templateCheckboxes) ||
       colEventTemplateInitialValues?.id);
-
-  const [enableCollectingEvent, setEnableCollectingEvent] = useState(
-    !!(hasColEventTemplate || !!materialSample?.collectingEvent)
-  );
-
+  // For editing existing templates:
   const hasPreparationsTemplate =
     isTemplate &&
     !isEmpty(preparationsTemplateInitialValues?.templateCheckboxes);
+
+  const [enableCollectingEvent, setEnableCollectingEvent] = useState(
+    Boolean(
+      hasColEventTemplate ||
+        materialSample?.collectingEvent ||
+        enabledFields?.collectingEvent?.length
+    )
+  );
+
   const [enablePreparations, setEnablePreparations] = useState(
-    hasPreparationsTemplate || !!materialSample?.preparationType
+    Boolean(
+      hasPreparationsTemplate ||
+        // Show the preparation section if a field is set or the field is enabled:
+        PREPARATION_FIELDS.some(
+          prepFieldName =>
+            materialSample?.[prepFieldName] ||
+            enabledFields?.materialSample?.includes(prepFieldName)
+        )
+    )
   );
 
   const initialValues: InputResource<MaterialSample> = materialSample
     ? { ...materialSample }
     : {
-        type: "material-sample"
-        // managedAttributeValues: {}
+        type: "material-sample",
+        managedAttributes: {}
       };
 
   /** Used to get the values of the nested CollectingEvent form. */
@@ -119,11 +180,15 @@ export function useMaterialSampleSave({
   const colEventQuery = useCollectingEventQuery(colEventId);
 
   const {
-    collectingEventInitialValues,
+    collectingEventInitialValues: collectingEventHookInitialValues,
     saveCollectingEvent,
     attachedMetadatasUI: colEventAttachmentsUI,
     collectingEventFormSchema
-  } = useCollectingEventSave(colEventQuery.response?.data, isTemplate);
+  } = useCollectingEventSave({
+    attachmentsConfig: collectingEventAttachmentsConfig,
+    fetchedCollectingEvent: colEventQuery.response?.data,
+    isTemplate
+  });
 
   const {
     attachedMetadatasUI: materialSampleAttachmentsUI,
@@ -134,10 +199,14 @@ export function useMaterialSampleSave({
     deps: [materialSample?.id],
     title: <DinaMessage id="materialSampleAttachments" />,
     isTemplate,
+    allowAttachmentsConfig: materialSampleAttachmentsConfig,
     allowNewFieldName: "attachmentsConfig.allowNew",
     allowExistingFieldName: "attachmentsConfig.allowExisting",
     id: "material-sample-attachments-section"
   });
+
+  const collectingEventInitialValues =
+    collectingEventInitialValuesProp ?? collectingEventHookInitialValues;
 
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
@@ -185,12 +254,14 @@ export function useMaterialSampleSave({
     /** Input to submit to the back-end API. */
     const { ...materialSampleInput } = submittedValues;
 
-    // Only persist the preparation type if the preparations toggle is enabled:
+    // Only persist the preparation fields if the preparations toggle is enabled:
     if (!enablePreparations) {
       materialSampleInput.preparationType = {
         id: null,
         type: "preparation-type"
       };
+      materialSampleInput.preparationDate = null;
+      materialSampleInput.preparedBy = { id: null };
     }
 
     if (!enableCollectingEvent) {
@@ -213,11 +284,19 @@ export function useMaterialSampleSave({
       const submittedCollectingEvent = cloneDeep(
         (colEventFormRef as any).current.values
       );
-      // Use the same save method as the Collecting Event page:
-      const savedCollectingEvent = await saveCollectingEvent(
+
+      const collectingEventWasEdited = !isEqual(
         submittedCollectingEvent,
-        (colEventFormRef as any).current
+        collectingEventInitialValues
       );
+      // Only send the save request if the Collecting Event was edited:
+      const savedCollectingEvent = collectingEventWasEdited
+        ? // Use the same save method as the Collecting Event page:
+          await saveCollectingEvent(
+            submittedCollectingEvent,
+            (colEventFormRef as any).current
+          )
+        : submittedCollectingEvent;
 
       // Set the ColEventId here in case the next operation fails:
       setColEventId(savedCollectingEvent.id);
@@ -237,6 +316,18 @@ export function useMaterialSampleSave({
     }
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete materialSampleInput.attachment;
+
+    // Shuffle the managedAttributesValue to managedAttribute
+    materialSampleInput.managedAttributes = {};
+
+    materialSampleInput.managedAttributes = fromPairs(
+      toPairs(materialSampleInput.managedAttributeValues).map(value => [
+        value[0],
+        value[1]?.assignedValue as string
+      ])
+    );
+
+    delete materialSampleInput.managedAttributeValues;
 
     // Save the MaterialSample:
     const [savedMaterialSample] = await save(
@@ -264,6 +355,7 @@ export function useMaterialSampleSave({
       validationSchema={collectingEventFormSchema}
       isTemplate={isTemplate}
       readOnly={isTemplate ? !!colEventId : false}
+      enabledFields={enabledFields?.collectingEvent}
     >
       <CollectingEventFormLayout />
       <div className="mb-3">{colEventAttachmentsUI}</div>

@@ -8,6 +8,7 @@ import {
   FormikButton,
   LoadingSpinner,
   NominatumApiSearchResult,
+  NumberField,
   ResourceSelectField,
   StringArrayField,
   TextField,
@@ -17,7 +18,7 @@ import {
 } from "common-ui";
 import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
-import { useRef, useState, ChangeEvent } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { ShouldRenderReasons } from "react-autosuggest";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -146,6 +147,13 @@ export function CollectingEventFormLayout({
       "geographicPlaceNameSource",
       GeographicPlaceNameSource.OSM
     );
+    if (isTemplate) {
+      // Include the hidden geographicPlaceNameSource value in the enabled template fields:
+      formik.setFieldValue(
+        "templateCheckboxes['geographicPlaceNameSource']",
+        true
+      );
+    }
 
     // get the address detail with another nomiature call
 
@@ -223,6 +231,29 @@ export function CollectingEventFormLayout({
     formik.setFieldValue("geographicPlaceNameSource", null);
 
     formik.setFieldValue("srcAdminLevels", null);
+
+    if (isTemplate) {
+      // Uncheck the templateCheckboxes in this form section:
+      formik.setFieldValue(
+        "templateCheckboxes['geographicPlaceNameSource']",
+        false
+      );
+      formik.setFieldValue(
+        "templateCheckboxes['geographicPlaceNameSourceDetail.country']",
+        false
+      );
+      formik.setFieldValue(
+        "templateCheckboxes['geographicPlaceNameSourceDetail.stateProvince']",
+        false
+      );
+      for (let idx = 0; idx <= 10; idx++) {
+        formik.setFieldValue(
+          `templateCheckboxes['srcAdminLevels[${idx}]']`,
+          false
+        );
+      }
+    }
+
     setCustomPlaceValue("");
     setHideCustomPlace(true);
     setHideRemoveBtn(true);
@@ -552,6 +583,11 @@ export function CollectingEventFormLayout({
               />
               <TextField name="dwcVerbatimElevation" />
               <TextField name="dwcVerbatimDepth" />
+              <NumberField
+                name="dwcMinimumElevationInMeters"
+                isInteger={true}
+              />
+              <NumberField name="dwcMinimumDepthInMeters" isInteger={true} />
             </div>
           </div>
         </FieldSet>
@@ -623,7 +659,6 @@ export function CollectingEventFormLayout({
                                   index={index}
                                   openAddPersonModal={openAddPersonModal}
                                   assertion={assertion}
-                                  viewOnly={readOnly}
                                 />
                                 {!readOnly && !isTemplate && (
                                   <div className="list-inline mb-3">
@@ -723,6 +758,7 @@ export function CollectingEventFormLayout({
                                     {geoNames.map((_, idx) => (
                                       <TextFieldWithRemoveButton
                                         name={`srcAdminLevels[${idx}].name`}
+                                        templateCheckboxFieldName={`srcAdminLevels[${idx}]`}
                                         readOnly={true}
                                         removeLabel={true}
                                         removeFormGroupClass={true}
@@ -750,11 +786,13 @@ export function CollectingEventFormLayout({
                         <DinaFormSection horizontal={[3, 9]}>
                           <TextField
                             name={`${commonSrcDetailRoot}.stateProvince.name`}
+                            templateCheckboxFieldName={`${commonSrcDetailRoot}.stateProvince`}
                             label={formatMessage("stateProvinceLabel")}
                             readOnly={true}
                           />
                           <TextField
                             name={`${commonSrcDetailRoot}.country.name`}
+                            templateCheckboxFieldName={`${commonSrcDetailRoot}.country`}
                             label={formatMessage("countryLabel")}
                             readOnly={true}
                           />
@@ -851,7 +889,6 @@ export function CollectingEventFormLayout({
                             }}
                           </Field>
                         }
-                        isTemplate={isTemplate}
                       />
                     ) : null
                   }
@@ -884,14 +921,19 @@ export function CollectingEventFormLayout({
                   )}
                 </FastField>
               ) : (
-                <ManagedAttributesEditor
-                  valuesPath="managedAttributeValues"
-                  valueFieldName="assignedValue"
-                  managedAttributeApiPath="collection-api/managed-attribute"
-                  apiBaseUrl="/collection-api"
-                  managedAttributeComponent="COLLECTING_EVENT"
-                  managedAttributeKeyField="key"
-                />
+                <DinaFormSection
+                  // Disabled the template's restrictions for this section:
+                  enabledFields={null}
+                >
+                  <ManagedAttributesEditor
+                    valuesPath="managedAttributeValues"
+                    valueFieldName="assignedValue"
+                    managedAttributeApiPath="collection-api/managed-attribute"
+                    apiBaseUrl="/collection-api"
+                    managedAttributeComponent="COLLECTING_EVENT"
+                    managedAttributeKeyField="key"
+                  />
+                </DinaFormSection>
               )}
             </FieldSet>
           </div>

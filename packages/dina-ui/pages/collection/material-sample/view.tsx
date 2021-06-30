@@ -5,40 +5,41 @@ import {
   DinaForm,
   EditButton,
   FieldSet,
-  useQuery,
   withResponse
 } from "common-ui";
-import { Field } from "formik";
+import { Field, FastField } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { Head, Nav, StorageLinkerField } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
+import { useMaterialSampleQuery } from "../../../components/collection/useMaterialSample";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import {
-  PreparationsFormLayout,
   MaterialSampleIdentifiersFormLayout,
-  MaterialSampleMainInfoFormLayout
+  MaterialSampleMainInfoFormLayout,
+  PreparationsFormLayout
 } from "./edit";
+import { ManagedAttributesViewer } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
+import { toPairs } from "lodash";
+import { ManagedAttributeValues } from "packages/dina-ui/types/objectstore-api/resources/ManagedAttributeMap";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
 
-  const { id } = router.query;
+  const id = router.query.id?.toString();
 
-  const materialSampleQuery = useQuery<MaterialSample>({
-    path: `collection-api/material-sample/${id}`,
-    include: "collectingEvent,attachment,preparationType,materialSampleType"
-  });
+  const materialSampleQuery = useMaterialSampleQuery(id);
 
   const colEventQuery = useCollectingEventQuery(
     materialSampleQuery.response?.data?.collectingEvent?.id
   );
 
   const collectingEvent = colEventQuery.response?.data;
+
   const buttonBar = (
     <ButtonBar>
       <BackButton
@@ -66,7 +67,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <Head title={formatMessage("materialSampleViewTitle")} />
       <Nav />
       {withResponse(materialSampleQuery, ({ data: materialSample }) => {
-        const hasPreparations = !!materialSample.preparationType;
+        const hasPreparations = Boolean(
+          materialSample.preparationType ||
+            materialSample.preparationDate ||
+            materialSample.preparedBy
+        );
         return (
           <main className="container-fluid">
             {buttonBar}
@@ -79,6 +84,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             >
               <MaterialSampleMainInfoFormLayout />
               <MaterialSampleIdentifiersFormLayout />
+              <div className="card card-body mb-3">
+                <StorageLinkerField name="storageUnit" />
+              </div>
               {collectingEvent && (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                   <DinaForm initialValues={collectingEvent} readOnly={true}>
@@ -96,6 +104,22 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 </FieldSet>
               )}
               {hasPreparations && <PreparationsFormLayout />}
+              <FieldSet
+                legend={<DinaMessage id="materialSampleManagedAttributes" />}
+              >
+                <div className="col-md-6">
+                  <FastField name="managedAttributeValues">
+                    {({ field: { value } }) => (
+                      <ManagedAttributesViewer
+                        values={value}
+                        managedAttributeApiPath={key =>
+                          `collection-api/managed-attribute/material_sample.${key}`
+                        }
+                      />
+                    )}
+                  </FastField>
+                </div>
+              </FieldSet>
               <div className="mb-3">
                 <Field name="id">
                   {({ field: { value: materialSampleId } }) => (

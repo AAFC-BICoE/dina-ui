@@ -3,7 +3,6 @@ import {
   ButtonBar,
   DeleteButton,
   DinaForm,
-  EditButton,
   useQuery,
   withResponse
 } from "common-ui";
@@ -12,6 +11,7 @@ import { withRouter } from "next/router";
 import { Head, Nav } from "../../../components";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSampleType } from "../../../types/collection-api";
+
 import { MaterialSampleTypeFormFields } from "./edit";
 
 export function MaterialSampleTypeDetailsPage({ router }: WithRouterProps) {
@@ -32,11 +32,6 @@ export function MaterialSampleTypeDetailsPage({ router }: WithRouterProps) {
             entityId={id}
             entityLink="/collection/material-sample-type"
             byPassView={true}
-          />
-          <EditButton
-            className="ms-auto"
-            entityId={id}
-            entityLink="collection/material-sample-type"
           />
           <DeleteButton
             className="ms-5"

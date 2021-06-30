@@ -106,7 +106,8 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
           "dcCreator.displayName",
           "dcType",
           "dcFormat",
-          "acCaption"
+          "acCaption",
+          "orientation"
         ]}
         title={formatMessage("metadataMediaDetailsLabel")}
       />

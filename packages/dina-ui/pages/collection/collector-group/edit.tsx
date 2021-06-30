@@ -64,7 +64,7 @@ function CollectorGroupForm({
       submittedValues.agentIdentifiers.map(agent =>
         submittedValues.relationships.agentIdentifiers.data.push({
           id: agent.id,
-          type: "agent"
+          type: "person"
         })
       );
       delete submittedValues.agentIdentifiers;

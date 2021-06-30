@@ -7,7 +7,13 @@ import {
   FormikValues
 } from "formik";
 import { cloneDeep } from "lodash";
-import { createContext, Fragment, PropsWithChildren, useContext } from "react";
+import {
+  createContext,
+  Fragment,
+  PropsWithChildren,
+  useContext,
+  useMemo
+} from "react";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
 import { ApiClientI, useApiClient } from "../api-client/ApiClientContext";
 import { ErrorViewer } from "./ErrorViewer";
@@ -34,6 +40,9 @@ export interface DinaFormContextI {
 
   /** Add a checkbox beside the wrapper field if true */
   isTemplate?: boolean;
+
+  /** Optionally restrict the writable fields to this list. */
+  enabledFields?: string[] | null;
 }
 
 export type DinaFormOnSubmit<TValues = any> = (
@@ -83,13 +92,17 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
       <FormWrapperInternal>{childrenProp}</FormWrapperInternal>
     );
 
+  // Clone the initialValues object so it isn't modified in the form:
+  const initialValues = useMemo(
+    () => cloneDeep(props.initialValues),
+    [props.initialValues]
+  );
+
   return (
     <DinaFormContext.Provider
       value={{
-        readOnly: props.readOnly ?? false,
-        horizontal: props.horizontal,
-        initialValues: props.initialValues,
-        isTemplate: props.isTemplate
+        ...props,
+        readOnly: props.readOnly ?? false
       }}
     >
       <Formik
@@ -98,6 +111,7 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
         validateOnChange={false}
         validateOnBlur={false}
         {...props}
+        initialValues={initialValues}
         onSubmit={onSubmitInternal}
       >
         {childrenInternal}

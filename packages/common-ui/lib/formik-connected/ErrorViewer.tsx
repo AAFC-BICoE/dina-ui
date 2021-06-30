@@ -14,7 +14,10 @@ export const ErrorViewer = connect(function ErrorViewerInternal({
   const errorMessage = useMemo(
     () => {
       const fieldErrorMsg = toPairs(errors)
-        .map(([field, error]) => `${getFieldLabel(field).fieldLabel}: ${error}`)
+        .map(
+          ([field, error]) =>
+            `${getFieldLabel({ name: field }).fieldLabel}: ${error}`
+        )
         .join("\n");
 
       return [status, fieldErrorMsg].filter(it => it).join("\n\n") || null;

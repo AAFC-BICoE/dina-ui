@@ -1,8 +1,9 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
-import { ManagedAttributeValues } from "../../objectstore-api";
+import { ManagedAttributeValues, Person } from "../../objectstore-api";
 import { CollectingEvent } from "./CollectingEvent";
 import { PreparationType } from "./PreparationType";
+import { JsonValue } from "type-fest";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -15,26 +16,18 @@ export interface MaterialSampleAttributes {
   createdBy?: string;
   dwcCatalogNumber?: string | null;
   dwcOtherCatalogNumbers?: string[];
+  preparationDate?: string | null;
+  description?: string;
 
   managedAttributeValues?: ManagedAttributeValues;
-
-  /** Template related boolean fields for preparation and catalogued info section */
-  preparationTypeEnabled?: boolean;
-  preparedByEnabled?: boolean;
-  datePreparedEnabled?: boolean;
-
-  dwcCatalogNumberEnabled?: boolean;
-
-  materialSampleAllowNew?: boolean;
-  materialSampleAllowExisting?: boolean;
-
-  description?: string;
+  managedAttributes?: JsonValue;
 }
 
 export interface MaterialSampleRelationships {
   collectingEvent?: CollectingEvent;
   attachment?: ResourceIdentifierObject[];
   preparationType?: PreparationType;
+  preparedBy?: Person;
   parentMaterialSample?: MaterialSample;
 }
 

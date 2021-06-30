@@ -16,19 +16,21 @@ import { Organization } from "../../types/agent-api/resources/Organization";
 export function OrganizationDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useDinaIntl();
+  const buttonBar = (
+    <ButtonBar>
+      <EditButton entityId={id as string} entityLink="organization" />
+      <BackButton
+        entityId={id as string}
+        entityLink="/organization"
+        byPassView={true}
+      />
+    </ButtonBar>
+  );
 
   return (
     <div>
       <Head title={formatMessage("organizationViewTitle")} />
       <Nav />
-      <ButtonBar>
-        <EditButton entityId={id as string} entityLink="organization" />
-        <BackButton
-          entityId={id as string}
-          entityLink="/organization"
-          byPassView={true}
-        />
-      </ButtonBar>
       <Query<Organization> query={{ path: `agent-api/organization/${id}` }}>
         {({ loading, response }) => {
           const organization = response && {
@@ -49,6 +51,7 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
           }
           return (
             <main className="container-fluid">
+              {buttonBar}
               <h1>
                 <DinaMessage id="organizationViewTitle" />
               </h1>

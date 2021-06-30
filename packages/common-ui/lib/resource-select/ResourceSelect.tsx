@@ -5,14 +5,14 @@ import {
   PersistedResource
 } from "kitsu";
 import { debounce, isEqual, isUndefined, omitBy } from "lodash";
-import React, { useContext } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { useIntl } from "react-intl";
 import { components as reactSelectComponents } from "react-select";
-import AsyncSelect from "react-select/async";
+import Select from "react-select";
 import { Styles } from "react-select/src/styles";
-import { OptionsType } from "react-select/src/types";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
-import { ApiClientContext, SelectOption } from "../..";
+import { SelectOption } from "../..";
+import { useQuery } from "../api-client/useQuery";
 
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData extends KitsuResource> {
@@ -83,57 +83,65 @@ export function ResourceSelect<TData extends KitsuResource>({
   asyncOptions,
   isDisabled
 }: ResourceSelectProps<TData>) {
-  const { apiClient } = useContext(ApiClientContext);
   const { formatMessage } = useIntl();
 
-  async function loadOptions(
-    inputValue: string,
-    callback: (options: OptionsType<any>) => void
-  ) {
-    // Omit blank/null filters:
-    const filterParam = omitBy(filter(inputValue), val =>
-      ["", null, undefined].includes(val)
-    ) as FilterParam;
+  const [search, setSearch] = useState({
+    /** The user's typed input. */
+    input: "",
+    /** The actual search value, which is updated after a throttle to avoid excessive API requests. */
+    value: ""
+  });
 
-    // Omit undefined values from the GET params, which would otherwise cause an invalid request.
-    // e.g. /api/region?include=undefined
-    const getParams = omitBy<GetParams>(
-      { filter: filterParam, include, sort },
-      val => isUndefined(val) || isEqual(val, {})
-    );
+  /** Updates the actual search value passed to the API. */
+  const debouncedSearchUpdate = useCallback(
+    debounce(() => setSearch(({ input }) => ({ input, value: input })), 250),
+    []
+  );
 
-    // Send the API request.
-    const response = await apiClient.get<TData[]>(model, getParams);
+  useEffect(debouncedSearchUpdate, [search.input]);
 
-    if (!response) {
-      // This warning may appear in tests where apiClient.get hasn't been mocked:
-      console.warn("No response returned from apiClient.get for query: ", {
-        path: model,
-        ...getParams
-      });
-    }
+  // Omit blank/null filters:
+  const filterParam = omitBy(filter(search.value), val =>
+    ["", null, undefined].includes(val as string)
+  ) as FilterParam;
 
-    // Build the list of options from the returned resources.
-    const resourceOptions = response.data.map(resource => ({
+  // Omit undefined values from the GET params, which would otherwise cause an invalid request.
+  // e.g. /api/region?include=undefined
+  const getParams = omitBy<GetParams>(
+    { filter: filterParam, include, sort },
+    val => isUndefined(val) || isEqual(val, {})
+  );
+
+  const {
+    loading: queryIsLoading,
+    response,
+    error
+  } = useQuery<TData[]>({
+    path: model,
+    ...getParams
+  });
+
+  const isLoading = queryIsLoading || search.input !== search.value;
+
+  // Build the list of options from the returned resources.
+  const resourceOptions =
+    response?.data.map(resource => ({
       label: optionLabel(resource),
       resource,
       value: resource.id
-    }));
+    })) ?? [];
 
-    // Only show the null option when in single-resource mode and when there is no search input value.
-    const options = [
-      ...(!isMulti && !inputValue ? [NULL_OPTION] : []),
-      ...resourceOptions,
-      ...(asyncOptions
-        ? asyncOptions.map(option => ({
-            ...option,
-            label: <strong>{option.label}</strong>
-          }))
-        : [])
-    ];
-
-    callback(options);
-  }
+  // Only show the null option when in single-resource mode and when there is no search input value.
+  const options = [
+    ...(!isMulti && !search.value ? [NULL_OPTION] : []),
+    ...resourceOptions,
+    ...(asyncOptions
+      ? asyncOptions.map(option => ({
+          ...option,
+          label: <strong>{option.label}</strong>
+        }))
+      : [])
+  ];
 
   async function onChangeSingle(selectedOption) {
     if (selectedOption?.getResource) {
@@ -167,11 +175,6 @@ export function ResourceSelect<TData extends KitsuResource>({
       onChangeProp(resources);
     }
   }
-
-  // Debounces the loadOptions function to avoid sending excessive API requests.
-  const debouncedOptionLoader = debounce((inputValue, callback) => {
-    loadOptions(inputValue, callback);
-  }, 250);
 
   const onSortEnd = ({ oldIndex, newIndex }) => {
     onChangeProp(
@@ -216,10 +219,14 @@ export function ResourceSelect<TData extends KitsuResource>({
   return (
     <SortableSelect
       // react-select AsyncSelect props:
-      defaultOptions={true}
       isMulti={isMulti}
-      loadOptions={debouncedOptionLoader}
+      onInputChange={newVal =>
+        setSearch(current => ({ ...current, input: newVal }))
+      }
+      inputValue={search.input}
       onChange={isMulti ? onChangeMulti : onChangeSingle}
+      isLoading={isLoading}
+      options={options}
       placeholder={formatMessage({ id: "typeHereToSearch" })}
       styles={{
         ...styles,
@@ -245,4 +252,4 @@ function arrayMove(array: any[], from: number, to: number) {
   return array;
 }
 const SortableMultiValue = SortableElement(reactSelectComponents.MultiValue);
-const SortableSelect = SortableContainer(AsyncSelect);
+const SortableSelect = SortableContainer(Select);

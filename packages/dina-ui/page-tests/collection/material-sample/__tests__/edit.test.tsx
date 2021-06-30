@@ -1,4 +1,6 @@
-import { PersistedResource } from "kitsu";
+import { KitsuResourceLink, PersistedResource } from "kitsu";
+import ReactSwitch from "react-switch";
+import Switch from "react-switch";
 import { MaterialSampleForm } from "../../../../pages/collection/material-sample/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
@@ -7,7 +9,6 @@ import {
 } from "../../../../types/collection-api";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
 import { SRS } from "../../../../types/collection-api/resources/SRS";
-import Switch from "react-switch";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -48,6 +49,12 @@ const TEST_COORDINATES: CoordinateSystem = {
   type: "coordinate-system"
 };
 
+const TEST_MANAGED_ATTRIBUTE = {
+  id: "1",
+  type: "managed-attribute",
+  name: "testAttr"
+};
+
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "collection-api/collecting-event":
@@ -83,6 +90,9 @@ const mockSave = jest.fn<any, any>(async saves => {
 const mockBulkGet = jest.fn<any, any>(async paths => {
   if (!paths.length) {
     return [];
+  }
+  if ((paths[0] as string).startsWith("/managed-attribute")) {
+    return [TEST_MANAGED_ATTRIBUTE];
   }
 });
 
@@ -145,10 +155,11 @@ describe("Material Sample Edit Page", () => {
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               geoReferenceAssertions: [
                 {
+                  georeferencedBy: undefined,
                   isPrimary: true
                 }
               ],
-              managedAttributeValues: {},
+              managedAttributes: {},
               relationships: {},
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
@@ -169,6 +180,7 @@ describe("Material Sample Edit Page", () => {
               },
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
+              managedAttributes: {},
               relationships: {},
               type: "material-sample"
             },
@@ -217,26 +229,9 @@ describe("Material Sample Edit Page", () => {
     // Saves the Collecting Event and the Material Sample:
     expect(mockSave.mock.calls).toEqual([
       [
-        // Saves the existing Collecting Event:
+        // Doesn't save the existing Collecting Event because it wasn't edited:
         [
-          {
-            resource: {
-              dwcOtherRecordNumbers: null,
-              geoReferenceAssertions: [],
-              group: "test group",
-              id: "1",
-              relationships: {},
-              startEventDateTime: "2021-04-13",
-              type: "collecting-event"
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
-        // New material-sample:
-        [
+          // New material-sample:
           {
             resource: {
               collectingEvent: {
@@ -245,6 +240,7 @@ describe("Material Sample Edit Page", () => {
               },
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
+              managedAttributes: {},
               type: "material-sample",
               relationships: {}
             },
@@ -287,24 +283,6 @@ describe("Material Sample Edit Page", () => {
 
     expect(mockSave.mock.calls).toEqual([
       [
-        // Edits existing collecting-event:
-        [
-          {
-            resource: {
-              startEventDateTime: "2021-04-13",
-              id: "1",
-              type: "collecting-event",
-              geoReferenceAssertions: [],
-              group: "test group",
-              dwcOtherRecordNumbers: null,
-              relationships: {}
-            },
-            type: "collecting-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
-      [
         // Edits existing material-sample:
         [
           {
@@ -315,7 +293,17 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "edited-catalog-number",
               collectingEvent: { id: "1", type: "collecting-event" },
-              preparationType: { id: null, type: "preparation-type" },
+
+              // Preparations are not enabled, so the preparation fields are set to null:
+              preparationDate: null,
+              preparationType: {
+                id: null,
+                type: "preparation-type"
+              },
+              preparedBy: {
+                id: null
+              },
+              managedAttributes: {},
               relationships: {}
             },
             type: "material-sample"
@@ -377,7 +365,7 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
-              managedAttributeValues: {},
+              managedAttributes: {},
               relationships: {},
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
@@ -400,13 +388,128 @@ describe("Material Sample Edit Page", () => {
               group: "test group",
               id: "1",
               type: "material-sample",
-              preparationType: { id: null, type: "preparation-type" },
+
+              // Preparations are not enabled, so the preparation fields are set to null:
+              preparationDate: null,
+              preparationType: {
+                id: null,
+                type: "preparation-type"
+              },
+              preparedBy: {
+                id: null
+              },
+              managedAttributes: {},
               relationships: {}
             },
             type: "material-sample"
           }
         ],
         { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Renders an existing Material Sample with the Preparations section enabled.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms",
+          preparationType: {
+            id: "65765",
+            type: "preparation-type",
+            name: "test-prep-type"
+          } as KitsuResourceLink
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Preparations are enabled:
+    expect(
+      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+  });
+
+  it("Renders an existing Material Sample with the Preparations section disabled (no Preparations fields set).", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms"
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Preparations are disabled:
+    expect(
+      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+  });
+
+  it("Renders an existing Material Sample with the managed attribute when there is selected attribute with assinged value", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms",
+          managedAttributeValues: {
+            testAttr: { assignedValue: "do the test" }
+          }
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              collectingEvent: {
+                id: null,
+                type: "collecting-event"
+              },
+              id: "333",
+              managedAttributes: {
+                testAttr: "do the test"
+              },
+              materialSampleName: "test-ms",
+              preparationDate: null,
+              preparationType: {
+                id: null,
+                type: "preparation-type"
+              },
+              preparedBy: {
+                id: null
+              },
+              relationships: {},
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
       ]
     ]);
   });

@@ -8,9 +8,10 @@ import { CollectorGroup } from "./CollectorGroup";
 import { GeoReferenceAssertion } from "./GeoReferenceAssertion";
 import { ManagedAttributeValues } from "../../objectstore-api";
 
+import { JsonValue } from "type-fest";
+
 export interface CollectingEventAttributes {
   type: "collecting-event";
-  uuid: string;
 
   startEventDateTime: string;
   endEventDateTime?: string | null;
@@ -37,7 +38,7 @@ export interface CollectingEventAttributes {
   createdOn?: string;
   collectorGroupUuid?: string;
 
-  group: string;
+  group?: string;
   geographicPlaceNameSourceDetail?: GeographicPlaceNameSourceDetail;
   geographicPlaceNameSource?: GeographicPlaceNameSource;
   srcAdminLevels?: SourceAdministrativeLevel[];
@@ -45,9 +46,7 @@ export interface CollectingEventAttributes {
   habitat?: string;
 
   managedAttributeValues?: ManagedAttributeValues;
-
-  // For location template
-  locationSearchValue?: string;
+  managedAttributes?: JsonValue;
 }
 
 export enum GeographicPlaceNameSource {

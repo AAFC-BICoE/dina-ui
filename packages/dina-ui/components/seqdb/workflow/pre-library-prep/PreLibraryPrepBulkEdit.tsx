@@ -42,9 +42,8 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
   const { formatMessage } = useSeqdbIntl();
   const resourceSelectCell = useResourceSelectCells();
 
-  const [plpEditMode, setPlpEditMode] = useState<PreLibraryPrepEditMode>(
-    "SHEARING"
-  );
+  const [plpEditMode, setPlpEditMode] =
+    useState<PreLibraryPrepEditMode>("SHEARING");
 
   const previousStep = chainStepTemplates[chainStepTemplates.indexOf(step) - 1];
 
@@ -64,8 +63,8 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
       type: "numeric"
     },
     {
-      data: "plpStepResource.preLibraryPrep.targetDpSize",
-      title: formatMessage("field_targetDpSize"),
+      data: "plpStepResource.preLibraryPrep.targetBpSize",
+      title: formatMessage("field_targetBpSize"),
       type: "numeric"
     },
     {

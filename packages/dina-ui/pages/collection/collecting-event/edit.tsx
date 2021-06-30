@@ -19,7 +19,7 @@ import {
 } from "../../../components/collection/useCollectingEvent";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
-
+import { omit, merge } from "lodash";
 interface CollectingEventFormProps {
   collectingEvent?: PersistedResource<CollectingEvent>;
 }
@@ -68,7 +68,7 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     collectingEventInitialValues,
     saveCollectingEvent,
     collectingEventFormSchema
-  } = useCollectingEventSave(collectingEvent);
+  } = useCollectingEventSave({ fetchedCollectingEvent: collectingEvent });
 
   const [, setDefaultVerbatimCoordSys] = useLocalStorage<
     string | null | undefined
@@ -78,7 +78,10 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     DEFAULT_VERBATIM_SRS_KEY
   );
 
-  const onSubmit: DinaFormOnSubmit = async ({ submittedValues, formik }) => {
+  const onSubmit: DinaFormOnSubmit<CollectingEvent> = async ({
+    submittedValues,
+    formik
+  }) => {
     const savedCollectingEvent = await saveCollectingEvent(
       submittedValues,
       formik
@@ -99,9 +102,12 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     </ButtonBar>
   );
 
+  const initValues = merge({}, omit(collectingEventInitialValues, "type"), {
+    type: "collecting-event" as any
+  });
   return (
-    <DinaForm
-      initialValues={collectingEventInitialValues}
+    <DinaForm<CollectingEvent>
+      initialValues={initValues}
       onSubmit={onSubmit}
       enableReinitialize={true}
       validationSchema={collectingEventFormSchema}
