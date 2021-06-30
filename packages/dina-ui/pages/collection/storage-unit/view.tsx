@@ -25,16 +25,16 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
   const [_, setParent] = useState<StorageUnit>();
 
-  const StorageUnitQuery = useQuery<StorageUnit>({
-    path: `collection-api/storage-unit/${id}`,
-    include: "storageUnitChildren, parentStorageUnit"
-  });
-
-  const storageUnit = StorageUnitQuery.response?.data;
-
   const { save } = useApiClient();
 
   const { openModal } = useModal();
+
+  const StorageUnitQuery = useQuery<StorageUnit>({
+    path: `collection-api/storage-unit/${id}`,
+    include: "storageUnitChildren,parentStorageUnit"
+  });
+
+  const storageUnit = StorageUnitQuery.response?.data;
 
   async function moveAllContentToNewContainer(submittedValues) {
     const parentUnit = submittedValues.parentStorageUnit;
@@ -68,8 +68,8 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
         { apiBaseUrl: "/collection-api" }
       );
     }
-
     setParent(parentUnit);
+    await router.push(`/collection/storage-unit/edit?id=${id}`);
   }
 
   function onMoveAllContentClick() {
@@ -119,7 +119,7 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
           type="storage-unit"
         />
       )}
-      {strgUnit.storageUnitChildren?.length && (
+      {!!strgUnit.storageUnitChildren?.length && (
         <button
           className="btn btn-info moveAllContent ms-auto"
           onClick={onMoveAllContentClick}
@@ -135,14 +135,16 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("storageUnitViewTitle")} />
       <Nav />
       <main className="container">
-        {withResponse(StorageUnitQuery, ({ data: strgUnit }) => (
-          <>
-            {buttonBar(strgUnit)}
-            <DinaForm<StorageUnit> initialValues={strgUnit} readOnly={true}>
-              <StorageUnitFormFields />
-            </DinaForm>
-          </>
-        ))}
+        {withResponse(StorageUnitQuery, ({ data: strgUnit }) => {
+          return (
+            <>
+              {buttonBar(strgUnit)}
+              <DinaForm<StorageUnit> initialValues={strgUnit} readOnly={true}>
+                <StorageUnitFormFields />
+              </DinaForm>
+            </>
+          );
+        })}
       </main>
     </div>
   );

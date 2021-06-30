@@ -26,15 +26,13 @@ export function BrowseStorageTreeField(props: BrowseStorageTreeFieldProps) {
         </strong>
       </div>
       <div style={{ borderStyle: "dotted" }}>
-        {hasChildUnits && (
-          <BrowseStorageTree
-            className={`col-md-6 mb-2 ${className}`}
-            hideResultMessage={hideResultMessage}
-            hideSearchSection={hideSearchSection}
-            hideSelectButton={hideSelectButton}
-            parentId={parentId}
-          />
-        )}
+        <BrowseStorageTree
+          className={`col-md-6 mb-2 ${className}`}
+          hideResultMessage={hideResultMessage}
+          hideSearchSection={hideSearchSection}
+          hideSelectButton={hideSelectButton}
+          parentId={parentId}
+        />
       </div>
     </label>
   );

@@ -2,29 +2,59 @@ import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { StorageUnitDetailsPage } from "../../../../pages/collection/storage-unit/view";
 
 const TEST_STRORAGE_DATA = {
-  id: "100",
-  name: "root",
+  id: "200",
   type: "storage-unit",
   storageUnitChildren: [
     {
+      id: "201",
       type: "storage-unit",
-      name: "firstLevelChild",
-      storageUnitChildren: [
-        {
-          type: "storage-unit",
-          name: "secLevelChild"
-        }
-      ]
+      storageUnitChildren: [],
+      parentStorageUnit: {
+        id: "200",
+        type: "storage-unit"
+      },
+      createdOn: "2021-06-29T18:57:11.937832Z",
+      createdBy: "cnc-cm",
+      group: "cnc",
+      name: "firstLevelChild"
     }
-  ]
+  ],
+  createdOn: "2021-06-29T18:56:54.85647Z",
+  createdBy: "cnc-cm",
+  group: "cnc",
+  name: "root"
 };
-/** Mock Kitsu "get" method. */
-const mockGet = jest.fn<any, any>(async model => {
-  // The get request will return the existing storage unit
-  if (model === "collection-api/storage-unit/100") {
-    return { data: TEST_STRORAGE_DATA };
-  } else if (model === "user-api/group") {
-    return [];
+
+// const mockGet = jest.fn();
+
+const mockGet = jest.fn<any, any>(async (path, params = {}) => {
+  switch (path) {
+    case "collection-api/storage-unit":
+    case "collection-api/storage-unit/200":
+      if (params.filter?.rsql === "") {
+        return {
+          data: [],
+          meta: { totalResourceCount: 0 }
+        };
+      } else if (params.include === "storageUnitChildren,parentStorageUnit") {
+        return {
+          data: [TEST_STRORAGE_DATA],
+          meta: { totalResourceCount: 1 }
+        };
+      } else if (params.filter?.parentStorageUnit === null) {
+        return {
+          data: [],
+          meta: { totalResourceCount: 0 }
+        };
+      } else {
+        return {
+          data: [],
+          meta: { totalResourceCount: 0 }
+        };
+      }
+
+    case "user-api/group":
+      return [];
   }
 });
 
@@ -37,9 +67,13 @@ const apiContext = {
 };
 
 describe("view page test", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("Renders initially with a loading spinner.", async () => {
     const wrapper = mountWithAppContext(
-      <StorageUnitDetailsPage router={{ query: { id: "100" } } as any} />,
+      <StorageUnitDetailsPage router={{ query: { id: "200" } } as any} />,
       { apiContext }
     );
 
@@ -48,7 +82,7 @@ describe("view page test", () => {
 
   it("Shows the data in a tree structure.", async () => {
     const wrapper = mountWithAppContext(
-      <StorageUnitDetailsPage router={{ query: { id: "100" } } as any} />,
+      <StorageUnitDetailsPage router={{ query: { id: "200" } } as any} />,
       { apiContext }
     );
 
@@ -59,16 +93,14 @@ describe("view page test", () => {
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
     // Initially show only the root node
-    expect(wrapper.find(".storageUnitTree NodeHeader").text()).toContain(
-      "root"
-    );
+    expect(wrapper.find(".storage-collapser-icon").text()).toContain("root");
 
-    wrapper.find(".storageUnitTree NodeHeader").simulate("click");
+    wrapper.find(".storage-collapser-icon").simulate("click");
     await new Promise(setImmediate);
     wrapper.update();
 
     // Show the first level node after click on root node
-    expect(wrapper.find(".storageUnitTree Drawer Header").text()).toContain(
+    expect(wrapper.find(".storage-collapser-icon").text()).toContain(
       "firstLevelChild"
     );
   });
