@@ -111,9 +111,9 @@ export function PcrBatchForm({ pcrBatch, onSaved }: PcrBatchFormProps) {
       ...submittedValues,
 
       // Convert the experimenters resources to a UUID array:
-      experimenters: (
-        submittedValues.experimenters as PersistedResource<Person>[]
-      )?.map(person => person.id),
+      experimenters: submittedValues.experimenters?.map(
+        person => (person as any).id
+      ),
 
       // Override the "type" attribute with the JSONAPI resource type:
       primerForward: submittedValues.primerForward

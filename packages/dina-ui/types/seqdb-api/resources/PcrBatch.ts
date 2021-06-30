@@ -1,5 +1,5 @@
-import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
+import { Person } from "../../objectstore-api";
 import { PcrPrimer } from "./PcrPrimer";
 import { Region } from "./Region";
 
@@ -11,8 +11,8 @@ export interface PcrBatchAttributes {
   createdBy?: string;
   createdOn?: string;
 
-  /** UUID array. */
-  experimenters?: string[];
+  /** UUID array (from the back-end JSON) or Person array (in the form state). */
+  experimenters?: (string | Person)[];
 }
 
 export interface PcrBatchRelationships {
