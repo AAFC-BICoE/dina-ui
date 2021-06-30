@@ -1,18 +1,19 @@
 import {
   BackButton,
   ButtonBar,
+  DeleteButton,
   DinaForm,
-  FieldView,
-  useQuery,
-  withResponse,
   EditButton,
-  DeleteButton
+  useQuery,
+  withResponse
 } from "common-ui";
+import { fromPairs } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { PreparationType } from "packages/dina-ui/types/collection-api/resources/PreparationType";
-import { Footer, Head, Nav, GroupSelectField } from "../../../components";
+import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { PreparationTypeFormLayout } from "./edit";
 
 export function PreparationTypeDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -26,50 +27,43 @@ export function PreparationTypeDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage("preparationTypeViewTitle")} />
       <Nav />
-      <ButtonBar>
-        <BackButton
-          entityId={id as string}
-          entityLink="/collection/preparation-type"
-          byPassView={true}
-        />
-        <EditButton
-          className="ms-auto"
-          entityId={id as string}
-          entityLink="collection/preparation-type"
-        />
-        <DeleteButton
-          className="ms-5"
-          id={id as string}
-          options={{ apiBaseUrl: "/collection-api" }}
-          postDeleteRedirect="/collection/preparation-type/list"
-          type="preparation-type"
-        />
-      </ButtonBar>
-      <main className="container-fluid">
+      <main className="container">
         <h1>
           <DinaMessage id="preparationTypeViewTitle" />
         </h1>
+        <ButtonBar>
+          <BackButton
+            entityId={id as string}
+            entityLink="/collection/preparation-type"
+            byPassView={true}
+          />
+          <EditButton
+            className="ms-auto"
+            entityId={id as string}
+            entityLink="collection/preparation-type"
+          />
+          <DeleteButton
+            className="ms-5"
+            id={id as string}
+            options={{ apiBaseUrl: "/collection-api" }}
+            postDeleteRedirect="/collection/preparation-type/list"
+            type="preparation-type"
+          />
+        </ButtonBar>
         {withResponse(prepTypeQuery, ({ data: preparationType }) => (
           <DinaForm<PreparationType>
-            initialValues={preparationType}
+            initialValues={{
+              ...preparationType,
+              // Convert multilingualDescription to editable Dictionary format:
+              multilingualDescription: fromPairs<string | undefined>(
+                preparationType.multilingualDescription?.descriptions?.map(
+                  ({ desc, lang }) => [lang ?? "", desc ?? ""]
+                )
+              )
+            }}
             readOnly={true}
           >
-            <div>
-              <div className="row">
-                <GroupSelectField
-                  name="group"
-                  enableStoredDefaultGroup={true}
-                  className="col-md-6"
-                />
-              </div>
-              <div className="row">
-                <FieldView
-                  className="col-md-6"
-                  name="name"
-                  label={formatMessage("preparationTypeNameLabel")}
-                />
-              </div>
-            </div>
+            <PreparationTypeFormLayout />
           </DinaForm>
         ))}
       </main>
