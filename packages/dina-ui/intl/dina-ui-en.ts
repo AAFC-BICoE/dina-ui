@@ -401,6 +401,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   viewPreviewButtonText: "Preview",
   warningMessage: "Warning Message",
   whoAmITitle: "Who Am I",
+  workbookGroupUploadTitle: "Upload Workbook",
+  workbookTitle: "Workbooks",
   workflowCompleteTitle: "Workflow Complete",
   workflowTemplateListTitle: "Workflow Templates",
   workflowTemplateTitle: "Workflow Template",
