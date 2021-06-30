@@ -119,6 +119,20 @@ export function StorageUnitFormFields() {
   const initVal = JSON.stringify(initialValues);
   const storageUnitData = initVal.replace(/storageUnitChildren/g, "children");
 
+  // Make the tree expand by default
+  function setDefaultExpanded(child) {
+    child.map(chld => {
+      chld.toggled = true;
+      if (chld.children) setDefaultExpanded(chld.children);
+    });
+  }
+
+  const storageUnitNew = JSON.parse(storageUnitData);
+  if (storageUnitNew.children) {
+    setDefaultExpanded(storageUnitNew.children);
+  }
+  storageUnitNew.toggled = "true";
+
   return (
     <div>
       <div className="row">
@@ -131,9 +145,9 @@ export function StorageUnitFormFields() {
       <div className="row">
         <TextField className="col-md-6" name="name" />
       </div>
-      {initialValues.id && (
+      {readOnly && (
         <TreeView
-          data={JSON.parse(storageUnitData)}
+          data={initialValues.storageUnitChildren ? storageUnitNew : null}
           className="storageUnitTree"
         />
       )}

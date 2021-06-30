@@ -9,7 +9,8 @@ import {
   useModal,
   AreYouSureModal,
   ResourceSelectField,
-  filterBy
+  filterBy,
+  useApiClient
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
@@ -17,27 +18,56 @@ import { Head, Nav } from "../../../components";
 import { useDinaIntl, DinaMessage } from "../../../intl/dina-ui-intl";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitFormFields } from "./edit";
-import { useState } from "react";
 
 export function StorageUnitDetailsPage({ router }: WithRouterProps) {
   const id = String(router.query.id);
   const { formatMessage } = useDinaIntl();
 
   const StorageUnitQuery = useQuery<StorageUnit>({
-    path: `collection-api/storage-unit/${id}`
+    path: `collection-api/storage-unit/${id}`,
+    include: "storageUnitChildren, parentStorageUnit"
   });
 
   const storageUnit = StorageUnitQuery.response?.data;
 
+  const { save } = useApiClient();
+
   const { openModal } = useModal();
 
-  const [children, SetChildren] = useState(storageUnit?.storageUnitChildren);
-  const [parent, SetParent] = useState();
-
-  function moveAllContentToNewContainer(submittedValues) {
+  async function moveAllContentToNewContainer(submittedValues) {
     const parentUnit = submittedValues.parentStorageUnit;
-    children?.map(child => (child.parentStorageUnit = parentUnit));
-    SetParent(parentUnit);
+    const children = storageUnit?.storageUnitChildren;
+    children?.map(child => {
+      child.parentStorageUnit = parentUnit;
+      return {
+        resource: child,
+        type: "storage-unit"
+      };
+    });
+
+    // Set first level children to new parent
+    if (children) {
+      const savedChildren = await save(
+        children?.map(child => {
+          (child as any).relationships = {};
+          (child as any).relationships.storageUnitChildren = {
+            data: child?.storageUnitChildren?.map(it => ({
+              id: it.id,
+              type: it.type
+            }))
+          };
+          delete child.storageUnitChildren;
+          child.parentStorageUnit = parentUnit;
+          return {
+            resource: child,
+            type: "storage-unit"
+          };
+        }) as any,
+        { apiBaseUrl: "/collection-api" }
+      );
+
+      await router.push(`/collection/storage-unit/edit?id=${id}`);
+    }
   }
 
   function onMoveAllContentClick() {
@@ -62,8 +92,6 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
         onYesButtonClicked={moveAllContentToNewContainer}
       />
     );
-
-    SetChildren([]);
   }
 
   const buttonBar = (strgUnit: StorageUnit) => (
@@ -89,12 +117,14 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
           type="storage-unit"
         />
       )}
-      <button
-        className="btn btn-info moveAllContent"
-        onClick={onMoveAllContentClick}
-      >
-        <DinaMessage id="moveAllContent" />
-      </button>
+      {strgUnit.storageUnitChildren?.length && (
+        <button
+          className="btn btn-info moveAllContent ms-auto"
+          onClick={onMoveAllContentClick}
+        >
+          <DinaMessage id="moveAllContent" />
+        </button>
+      )}
     </ButtonBar>
   );
 
