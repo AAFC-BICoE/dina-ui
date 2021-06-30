@@ -1,4 +1,7 @@
 import { KitsuResource } from "kitsu";
+import { MaterialSample } from "../../collection-api";
+import { Product } from "./Product";
+import { Protocol } from "./Protocol";
 
 export interface MolecularSampleAttributes {
   name: string;
@@ -6,11 +9,16 @@ export interface MolecularSampleAttributes {
 
   // Optional Fields
   group?: string;
-  sampleType?: string;
   notes?: string;
-  dateDiscarded?: string;
-  discardedNotes?: string;
   lastModified?: string;
 }
 
-export type MolecularSample = KitsuResource & MolecularSampleAttributes;
+export interface MolecularSampleRelationships {
+  kit?: Product;
+  protocol?: Protocol;
+  materialSample?: MaterialSample;
+}
+
+export type MolecularSample = KitsuResource &
+  MolecularSampleRelationships &
+  MolecularSampleAttributes;
