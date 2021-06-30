@@ -18,10 +18,12 @@ import { Head, Nav } from "../../../components";
 import { useDinaIntl, DinaMessage } from "../../../intl/dina-ui-intl";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitFormFields } from "./edit";
+import { useState } from "react";
 
 export function StorageUnitDetailsPage({ router }: WithRouterProps) {
   const id = String(router.query.id);
   const { formatMessage } = useDinaIntl();
+  const [_, setParent] = useState<StorageUnit>();
 
   const StorageUnitQuery = useQuery<StorageUnit>({
     path: `collection-api/storage-unit/${id}`,
@@ -65,9 +67,9 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
         }) as any,
         { apiBaseUrl: "/collection-api" }
       );
-
-      await router.push(`/collection/storage-unit/edit?id=${id}`);
     }
+
+    setParent(parentUnit);
   }
 
   function onMoveAllContentClick() {

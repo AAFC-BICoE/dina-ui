@@ -12,14 +12,12 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { Treebeard } from "react-treebeard";
 import {
   GroupSelectField,
   Head,
   Nav,
   StorageLinkerField,
-  TreeView
+  BrowseStorageTreeField
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnit } from "../../../types/collection-api";
@@ -146,9 +144,12 @@ export function StorageUnitFormFields() {
         <TextField className="col-md-6" name="name" />
       </div>
       {readOnly && (
-        <TreeView
-          data={initialValues.storageUnitChildren ? storageUnitNew : null}
-          className="storageUnitTree"
+        <BrowseStorageTreeField
+          parentId={initialValues.id}
+          hideResultMessage={true}
+          hideSearchSection={true}
+          hideSelectButton={true}
+          hasChildUnits={initialValues.storageUnitChildren ? true : false}
         />
       )}
       <StorageLinkerField

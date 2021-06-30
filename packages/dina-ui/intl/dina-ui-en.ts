@@ -46,7 +46,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   cataloguedObjectViewTitle: "View Catalogued Object",
   changedProperties: "Changes",
   childMaterialSamplesCreatedLabel: "Child Material Samples Created",
-  childStorageUnitLabel: "Child Storage Unit",
+  childStorageUnit: "Child Storage Unit",
   closePreviewButtonText: "Close Preview",
   collectingAgentsLegend: "Collecting Agents",
   collectingDateLegend: "Collecting Date",
