@@ -41,6 +41,7 @@ import {
   MaterialSampleType
 } from "../../../types/collection-api";
 import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
+import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 
 export default function MaterialSampleEditPage() {
   const router = useRouter();
@@ -198,6 +199,9 @@ export function MaterialSampleForm({
                 <DinaMessage id="preparations" />
               </a>
             )}
+            <a href="#managedAttributes-section" className="list-group-item">
+              <DinaMessage id="managedAttributeListTitle" />
+            </a>
             <a
               href="#material-sample-attachments-section"
               className="list-group-item"
@@ -356,6 +360,25 @@ export function MaterialSampleForm({
               <PreparationsFormLayout
                 className={enablePreparations ? "" : "d-none"}
               />
+
+              <FieldSet
+                legend={<DinaMessage id="managedAttributeListTitle" />}
+                id="managedAttributes-section"
+              >
+                <DinaFormSection
+                  // Disabled the template's restrictions for this section:
+                  enabledFields={null}
+                >
+                  <ManagedAttributesEditor
+                    valuesPath="managedAttributeValues"
+                    valueFieldName="assignedValue"
+                    managedAttributeApiPath="collection-api/managed-attribute"
+                    apiBaseUrl="/collection-api"
+                    managedAttributeComponent="MATERIAL_SAMPLE"
+                    managedAttributeKeyField="key"
+                  />
+                </DinaFormSection>
+              </FieldSet>
               {materialSampleAttachmentsUI}
             </>
           )}

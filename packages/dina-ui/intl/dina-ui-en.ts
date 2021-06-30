@@ -220,6 +220,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_orientation: "Orientation",
   field_orientation_tooltip:
     "Determines the way an image should be displayed based on its orientation value, must be a number from 1 to 8.",
+  field_orientation_tooltipAlt:
+    "Diagram of all the possible orientation values.",
   field_originalFilename: "Original Filename",
   field_preparationType: "Preparation Type",
   field_publiclyReleasable: "Publicly releasable",
@@ -265,6 +267,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeValueLabel: "Value",
   materialSample: "Material Sample",
   materialSampleAttachments: "Material Sample Attachments",
+  materialSampleManagedAttributes: "Material Sample Managed Attributes",
   materialSampleListTitle: "Material Samples",
   materialSampleTypeListTitle: "Material Sample Types",
   materialSampleTypeViewTitle: "Material Sample Type",
@@ -351,6 +354,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   set: "Set",
   showing: "Showing",
   showingFilteredStorageUnits: "Showing Filtered Storage Units",
+  showingTopLevelStorageUnits: "Showing Top Level Storage Units",
   splitSampleActionMetadataLegend: "Action Metadata",
   splitSampleChildSamplesToCreateLabel: "Child Material Samples to create",
   splitSampleConfigLegend: "Configure Action: Split",
@@ -377,7 +381,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   thumbnail: "Thumbnail",
   thumbnailNotAvailableText: "No thumbnail available",
   to: "To",
-  showingTopLevelStorageUnits: "Showing Top Level Storage Units",
+  tooltipDefaultLinkMessage: "Click here to learn more.",
   toponymyLegend: "Current Geographic Place",
   uploadButtonText: "Upload",
   uploadFilesMaxSize: "The maximum file size is {maxSize}.",

@@ -4,7 +4,7 @@ import { Product, Protocol } from "../..";
 export interface PreLibraryPrepAttributes {
   preLibraryPrepType: string;
   inputAmount: number;
-  targetDpSize: number;
+  targetBpSize: number;
   averageFragmentSize: number;
   concentration: number;
   quality: string;
