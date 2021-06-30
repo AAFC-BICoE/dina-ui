@@ -1,5 +1,4 @@
 import useLocalStorage from "@rehooks/local-storage";
-import { useRouter } from "next/router";
 import {
   ButtonBar,
   CheckBoxWithoutWrapper,
@@ -9,26 +8,23 @@ import {
   SubmitButton,
   TextField
 } from "common-ui";
+import { Field } from "formik";
+import { padStart, range } from "lodash";
+import { useRouter } from "next/router";
+import React from "react";
+import SpreadSheetColumn from "spreadsheet-column";
 import NumberSpinnerField from "../../../../../common-ui/lib/formik-connected/NumberSpinnerField";
-import {
-  MaterialSampleRunConfig,
-  BASE_NAME,
-  START,
-  TYPE_LETTER,
-  TYPE_NUMERIC,
-  NUMERIC_UPPER_LIMIT
-} from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
-import React, { useState } from "react";
-import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
 import { Head } from "../../../../../dina-ui/components/head";
-import SpreadSheetColumn from "spreadsheet-column";
-
-interface SplitChildRowProps {
-  index: number;
-  baseName: string;
-  computedSuffix: string;
-}
+import {
+  BASE_NAME,
+  MaterialSampleRunConfig,
+  NUMERIC_UPPER_LIMIT,
+  START,
+  TYPE_LETTER,
+  TYPE_NUMERIC
+} from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
+import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 
 /* Config action related fields */
 interface RunConfig {
@@ -51,19 +47,11 @@ export const SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY =
 
 export default function ConfigAction() {
   const { formatMessage } = useDinaIntl();
-  const [numOfChildToCreate, setNumOfChildToCreate] = useState(1);
-  const [baseName, setBaseName] = useState("");
-  const [suffixType, setSuffixType] = useState(TYPE_NUMERIC);
-  const [start, setStart] = useState(suffixType === TYPE_NUMERIC ? "1" : "A");
   const router = useRouter();
 
   const [_, setSplitChildSampleRunConfig] = useLocalStorage<
     MaterialSampleRunConfig | null | undefined
   >(SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY);
-
-  const onCreatedChildSplitSampleChange = value => {
-    setNumOfChildToCreate(value);
-  };
 
   type SuffixOptions = typeof TYPE_NUMERIC | typeof TYPE_LETTER;
 
@@ -85,57 +73,12 @@ export default function ConfigAction() {
     </div>
   );
 
-  const SplitChildRow = ({
-    index,
-    baseName: sampleSrcName,
-    computedSuffix
-  }: SplitChildRowProps) => {
-    return (
-      <div className="d-flex">
-        <span className="col-md-1 fw-bold">#{index + 1}:</span>
-        <TextField
-          className={`col-md-3 sampleName${index}`}
-          hideLabel={true}
-          name={`sampleName[${index}]`}
-          placeholder={
-            sampleSrcName
-              ? `${sampleSrcName}-${computedSuffix}`
-              : `${BASE_NAME}-${computedSuffix}`
-          }
-        />
-        <TextField
-          className="col-md-3"
-          hideLabel={true}
-          name={`description[${index}]`}
-        />
-      </div>
-    );
-  };
-  const SplitChildRows = () => {
-    const childRows: any = [];
-    let index = 0;
-    for (let i = 0; i < numOfChildToCreate; i++) {
-      const computedSuffix = computeSuffix({ index: i, start, suffixType });
-      if (computedSuffix) {
-        childRows.push(
-          <SplitChildRow
-            key={i}
-            index={index++}
-            baseName={baseName}
-            computedSuffix={computedSuffix}
-          />
-        );
-      }
-    }
-    return childRows;
-  };
-
   const onSubmit = async ({ submittedValues: configActionFields }) => {
     // record the customized user entry if there is any name or description provided
     const sampleNames: any = [];
     const sampleDescs: any = [];
     if (configActionFields.sampleName || configActionFields.description) {
-      for (let i = 0; i < numOfChildToCreate; i++) {
+      for (let i = 0; i < configActionFields.numOfChildToCreate; i++) {
         sampleNames.push(configActionFields.sampleName?.[i]);
         sampleDescs.push(configActionFields.description?.[i]);
       }
@@ -146,7 +89,8 @@ export default function ConfigAction() {
       },
       configure: {
         numOfChildToCreate:
-          configActionFields.numOfChildToCreate ?? numOfChildToCreate,
+          configActionFields.numOfChildToCreate ??
+          configActionFields.numOfChildToCreate,
         baseName: configActionFields.baseName ?? BASE_NAME,
         start: configActionFields.start ?? START,
         suffixType: configActionFields.suffixType,
@@ -171,18 +115,6 @@ export default function ConfigAction() {
     </ButtonBar>
   );
 
-  const onChangeExternal = (value, formik) => {
-    setSuffixType(value as any);
-    // Make sure the placeholder is updated properly by simulating update the field value
-    formik.values.start === null
-      ? formik.setFieldValue("start", "")
-      : formik.setFieldValue("start", null);
-    isLetterType ? setStart("A") : setStart("1");
-  };
-
-  const isNumericalType = suffixType === TYPE_NUMERIC;
-  const isLetterType = suffixType === TYPE_LETTER;
-
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
@@ -192,7 +124,11 @@ export default function ConfigAction() {
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
         <DinaForm
-          initialValues={{ suffixType: TYPE_NUMERIC, numOfChildToCreate }}
+          initialValues={{
+            suffixType: TYPE_NUMERIC,
+            numOfChildToCreate: 1,
+            start: "001"
+          }}
           onSubmit={onSubmit}
         >
           <p>
@@ -219,7 +155,9 @@ export default function ConfigAction() {
               <NumberSpinnerField
                 name="numOfChildToCreate"
                 className="col-md-2"
-                onChange={onCreatedChildSplitSampleChange}
+                onChange={(newValue, formik) =>
+                  formik.setFieldValue("numOfChildToCreate", newValue)
+                }
                 hideLabel={true}
                 max={NUMERIC_UPPER_LIMIT}
               />
@@ -235,33 +173,59 @@ export default function ConfigAction() {
                 className="col-md-2"
                 name="baseName"
                 placeholder={`${BASE_NAME}`}
-                onChangeExternal={(_form, _name, value) =>
-                  setBaseName(value as any)
-                }
               />
               <SelectField
                 className="col-md-2"
                 name="suffixType"
                 options={TYPE_OPTIONS}
-                onChange={onChangeExternal}
+                onChange={(newType, formik) =>
+                  formik.setFieldValue(
+                    "start",
+                    newType === "Numerical" ? "001" : "A"
+                  )
+                }
               />
-              <TextField
-                className="col-md-2"
-                name="start"
-                placeholder={isNumericalType ? "001" : "A"}
-                numberOnly={isNumericalType ?? false}
-                letterOnly={isLetterType ?? false}
-                onChangeExternal={(_form, _name, value) => {
-                  setStart(!value ? (isNumericalType ? "1" : "A") : value);
-                }}
-              />
+              <Field name="suffixType">
+                {({ field: { value: suffixType } }) => (
+                  <TextField
+                    className="col-md-2"
+                    // Select all text on click:
+                    inputProps={{ onClick: e => (e.target as any).select() }}
+                    name="start"
+                    numberOnly={suffixType === "Numerical"}
+                    letterOnly={suffixType === "Letter"}
+                  />
+                )}
+              </Field>
             </div>
             <div>
               <div className="alert alert-warning d-inline-block">
                 <DinaMessage id="splitSampleInstructions" />
               </div>
               <SplitChildHeader />
-              <SplitChildRows />
+              <Field name="start">
+                {({
+                  form: {
+                    values: { start, suffixType, numOfChildToCreate, baseName }
+                  }
+                }) =>
+                  range(0, numOfChildToCreate).map(index => {
+                    const suffix = computeSuffix({
+                      index,
+                      start,
+                      suffixType
+                    });
+                    return (
+                      <SplitChildRow
+                        key={`${baseName}-${suffix}`}
+                        index={index}
+                        baseName={baseName}
+                        computedSuffix={suffix}
+                      />
+                    );
+                  })
+                }
+              </Field>
             </div>
           </FieldSet>
           {buttonBar}
@@ -271,17 +235,19 @@ export default function ConfigAction() {
   );
 }
 
-export const computeSuffix = ({
+export function computeSuffix({
   index,
   start,
   suffixType
-}: ComputeSuffixProps) => {
-  let computedSuffix;
+}: ComputeSuffixProps) {
   if (suffixType === TYPE_NUMERIC) {
+    const suffixLength = start?.length ?? 3;
     // correclty set the start when numerical input is null/empty, default to 1
-    computedSuffix = isNaN(parseInt(start as any, 10))
+    const suffixNumber = isNaN(parseInt(start as any, 10))
       ? index + 1
       : index + parseInt(start as any, 10);
+
+    return padStart(String(suffixNumber), suffixLength, "0");
   } else {
     let myStart = start;
     // Correclty set the start value when letter input is null/empty, defualt to "A"
@@ -289,7 +255,39 @@ export const computeSuffix = ({
       myStart = "A";
     }
     const sc = new SpreadSheetColumn();
-    computedSuffix = sc.fromInt(index + sc.fromStr(myStart));
+    return sc.fromInt(index + sc.fromStr(myStart));
   }
-  return computedSuffix;
-};
+}
+
+interface SplitChildRowProps {
+  index: number;
+  baseName: string;
+  computedSuffix: string;
+}
+
+function SplitChildRow({
+  index,
+  baseName,
+  computedSuffix
+}: SplitChildRowProps) {
+  return (
+    <div className="d-flex">
+      <span className="col-md-1 fw-bold">#{index + 1}:</span>
+      <TextField
+        className={`col-md-3 sampleName${index}`}
+        hideLabel={true}
+        name={`sampleName[${index}]`}
+        placeholder={
+          baseName
+            ? `${baseName}-${computedSuffix}`
+            : `${BASE_NAME}-${computedSuffix}`
+        }
+      />
+      <TextField
+        className="col-md-3"
+        hideLabel={true}
+        name={`description[${index}]`}
+      />
+    </div>
+  );
+}

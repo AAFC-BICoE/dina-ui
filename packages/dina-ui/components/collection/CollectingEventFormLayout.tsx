@@ -8,6 +8,7 @@ import {
   FormikButton,
   LoadingSpinner,
   NominatumApiSearchResult,
+  NumberField,
   ResourceSelectField,
   StringArrayField,
   TextField,
@@ -582,6 +583,11 @@ export function CollectingEventFormLayout({
               />
               <TextField name="dwcVerbatimElevation" />
               <TextField name="dwcVerbatimDepth" />
+              <NumberField
+                name="dwcMinimumElevationInMeters"
+                isInteger={true}
+              />
+              <NumberField name="dwcMinimumDepthInMeters" isInteger={true} />
             </div>
           </div>
         </FieldSet>

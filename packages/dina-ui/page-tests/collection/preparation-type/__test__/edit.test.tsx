@@ -1,5 +1,7 @@
 import { OperationsResponse } from "common-ui";
-import PreparationTypeEditPage from "../../../../pages/collection/preparation-type/edit";
+import PreparationTypeEditPage, {
+  PreparationTypeForm
+} from "../../../../pages/collection/preparation-type/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { PreparationType } from "../../../../types/collection-api/resources/PreparationType";
 
@@ -63,6 +65,11 @@ describe("preparation-type edit page", () => {
         value: "updated Name"
       }
     });
+
+    wrapper.find(".english-description textarea").simulate("change", {
+      target: { value: "test english description" }
+    });
+
     // Submit the form.
     wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
@@ -74,7 +81,12 @@ describe("preparation-type edit page", () => {
           op: "POST",
           path: "preparation-type",
           value: {
-            attributes: { name: "updated Name" },
+            attributes: {
+              multilingualDescription: {
+                descriptions: [{ lang: "en", desc: "test english description" }]
+              },
+              name: "updated Name"
+            },
             id: "00000000-0000-0000-0000-000000000000",
             type: "preparation-type"
           }
@@ -84,7 +96,67 @@ describe("preparation-type edit page", () => {
     );
 
     // The user should be redirected to the new preparation-type's details page.
-    expect(mockPush).lastCalledWith("/collection/preparation-type/list");
+    expect(mockPush).lastCalledWith("/collection/preparation-type/view?id=1");
+  });
+
+  it("Edits an existing prep type.", async () => {
+    const mockOnSaved = jest.fn();
+
+    const wrapper = mountWithAppContext(
+      <PreparationTypeForm
+        onSaved={mockOnSaved}
+        fetchedPrepType={{
+          name: "test-prep-type",
+          type: "preparation-type",
+          multilingualDescription: {
+            descriptions: [{ lang: "en", desc: "test english description" }]
+          }
+        }}
+      />
+    );
+
+    expect(wrapper.find(".english-description textarea").prop("value")).toEqual(
+      "test english description"
+    );
+
+    wrapper.find(".french-description textarea").simulate("change", {
+      target: { value: "test french description" }
+    });
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockPatch).lastCalledWith(
+      "/collection-api/operations",
+      [
+        {
+          op: "POST",
+          path: "preparation-type",
+          value: {
+            attributes: {
+              multilingualDescription: {
+                descriptions: [
+                  {
+                    desc: "test english description",
+                    lang: "en"
+                  },
+                  {
+                    desc: "test french description",
+                    lang: "fr"
+                  }
+                ]
+              },
+              name: "test-prep-type"
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "preparation-type"
+          }
+        }
+      ],
+      expect.anything()
+    );
   });
 
   it("Renders an error after form submit without specifying madatory field.", async done => {

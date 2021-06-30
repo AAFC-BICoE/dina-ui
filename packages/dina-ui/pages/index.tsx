@@ -180,6 +180,20 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
           <li>
+            <Link href="/collection/storage-unit-type/list">
+              <a>
+                <DinaMessage id="storageUnitTypeListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
+            <Link href="/collection/storage-unit/list">
+              <a>
+                <DinaMessage id="storageUnitListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
             <Link href="/collection/revisions-by-user">
               <a>
                 <DinaMessage id="revisionsByUserPageTitle" />

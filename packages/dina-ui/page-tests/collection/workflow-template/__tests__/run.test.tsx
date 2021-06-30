@@ -144,9 +144,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
   it("Renders the Material Sample Form with the disabled/enabled fields and initial values", async () => {
     const wrapper = await getWrapper();
 
-    // Identifiers fields are enabled:
+    // Identifiers fields are disabled:
     expect(wrapper.find(".materialSampleName-field input").exists()).toEqual(
-      true
+      false
     );
 
     // Lat/Lng fields are enabled:
@@ -189,6 +189,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               dwcOtherRecordNumbers: null,
               geoReferenceAssertions: [
                 {
+                  georeferencedBy: undefined,
                   isPrimary: true,
                   // The added values:
                   dwcDecimalLatitude: 45.394728,
@@ -225,7 +226,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               preparedBy: {
                 id: null
               },
-
+              managedAttributes: {},
               relationships: {},
               type: "material-sample"
             },
@@ -259,7 +260,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
         MATERIAL_SAMPLE: {
           allowExisting: true,
           allowNew: true,
-          // Only show the Identifiers:
+          // Explicitly enable no fields:
           templateFields: {}
         }
       },
@@ -268,10 +269,13 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
       type: "material-sample-action-definition"
     });
 
-    // Identifiers fields are enabled:
+    // Identifiers fields are disabled:
     expect(wrapper.find(".materialSampleName-field input").exists()).toEqual(
-      true
+      false
     );
+
+    // Group field is enabled:
+    expect(wrapper.find(".group-field input").exists()).toEqual(true);
 
     // Collecting Event field is set but the input is disabled:
     expect(
@@ -280,10 +284,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     expect(wrapper.find(".startEventDateTime-field input").exists()).toEqual(
       false
     );
-
-    wrapper
-      .find(".materialSampleName-field input")
-      .simulate("change", { target: { value: "test-ms-name" } });
 
     await wrapper.find("form").simulate("submit");
 
@@ -300,7 +300,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 id: "555",
                 type: "collecting-event"
               },
-              materialSampleName: "test-ms-name",
 
               // Preparations are not enabled, so the preparation fields are set to null:
               preparationDate: null,
@@ -311,7 +310,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               preparedBy: {
                 id: null
               },
-
+              managedAttributes: {},
               relationships: {},
               type: "material-sample"
             },
@@ -342,10 +341,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
     ).toEqual(false);
 
-    wrapper
-      .find(".materialSampleName-field input")
-      .simulate("change", { target: { value: "test-ms-name" } });
-
     // Submit with only the name set:
     await wrapper.find("form").simulate("submit");
 
@@ -362,7 +357,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 id: null,
                 type: "collecting-event"
               },
-              materialSampleName: "test-ms-name",
+              managedAttributes: {},
 
               // Preparations are not enabled, so the preparation fields are set to null:
               preparationDate: null,

@@ -7,11 +7,11 @@ import {
   FieldSet,
   withResponse
 } from "common-ui";
-import { Field } from "formik";
+import { Field, FastField } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { Head, Nav, StorageLinkerField } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
 import { useMaterialSampleQuery } from "../../../components/collection/useMaterialSample";
@@ -23,6 +23,9 @@ import {
   MaterialSampleMainInfoFormLayout,
   PreparationsFormLayout
 } from "./edit";
+import { ManagedAttributesViewer } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
+import { toPairs } from "lodash";
+import { ManagedAttributeValues } from "packages/dina-ui/types/objectstore-api/resources/ManagedAttributeMap";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -36,6 +39,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   );
 
   const collectingEvent = colEventQuery.response?.data;
+
   const buttonBar = (
     <ButtonBar>
       <BackButton
@@ -80,6 +84,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             >
               <MaterialSampleMainInfoFormLayout />
               <MaterialSampleIdentifiersFormLayout />
+              <div className="card card-body mb-3">
+                <StorageLinkerField name="storageUnit" />
+              </div>
               {collectingEvent && (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                   <DinaForm initialValues={collectingEvent} readOnly={true}>
@@ -97,6 +104,22 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 </FieldSet>
               )}
               {hasPreparations && <PreparationsFormLayout />}
+              <FieldSet
+                legend={<DinaMessage id="materialSampleManagedAttributes" />}
+              >
+                <div className="col-md-6">
+                  <FastField name="managedAttributeValues">
+                    {({ field: { value } }) => (
+                      <ManagedAttributesViewer
+                        values={value}
+                        managedAttributeApiPath={key =>
+                          `collection-api/managed-attribute/material_sample.${key}`
+                        }
+                      />
+                    )}
+                  </FastField>
+                </div>
+              </FieldSet>
               <div className="mb-3">
                 <Field name="id">
                   {({ field: { value: materialSampleId } }) => (
