@@ -1,3 +1,5 @@
+import { ApiClientContext } from "common-ui";
+import { createContext, useContext } from "react";
 import { DinaForm } from "common-ui";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -5,16 +7,17 @@ import Dropzone from "react-dropzone-uploader";
 
 export default function UploadWorkbookPage() {
   const { formatMessage } = useDinaIntl();
+  const { apiClient } = useContext(ApiClientContext);
 
-  // specify upload params and url for your files
-  const getUploadParams = ({}) => {
-    return { url: "" };
-  };
+  async function onSubmit(acceptedFile) {
+    const formData = new FormData();
+    formData.append("file", acceptedFile[0].file);
 
-  // receives array of files that are done uploading when submit button is clicked
-  const handleSubmit = allFiles => {
-    allFiles.forEach(f => f.remove());
-  };
+    const response = apiClient.axios.post(
+      "/objectstore-api/conversion/workbook",
+      formData
+    );
+  }
 
   return (
     <div>
@@ -28,10 +31,9 @@ export default function UploadWorkbookPage() {
             </h1>
 
             <Dropzone
-              getUploadParams={getUploadParams}
+              onSubmit={onSubmit}
               multiple={false}
               maxFiles={1}
-              onSubmit={handleSubmit}
               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             />
           </div>
