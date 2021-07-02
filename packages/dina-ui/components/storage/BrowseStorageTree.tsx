@@ -23,17 +23,11 @@ export interface BrowseStorageTreeProps {
   disabled?: boolean;
 
   filter?: FilterRowModel | null;
-
-  hideSearchSection?: boolean;
-  hideResultMessage?: boolean;
-  hideSelectButton?: boolean;
-
   className?: string;
 }
 
 export function BrowseStorageTree(props: BrowseStorageTreeProps) {
-  const { hideSearchSection, hideResultMessage, hideSelectButton, className } =
-    props;
+  const { className } = props;
   const [searchText, setSearchText] = useState<string>("");
 
   const [filter, setFilter] = useState<FilterRowModel | null>();
@@ -56,10 +50,7 @@ export function BrowseStorageTree(props: BrowseStorageTreeProps) {
 
   return (
     <div className={className}>
-      <div
-        className={`input-group mb-3 ${hideSearchSection ? "d-none" : ""}`}
-        style={{ width: "30rem" }}
-      >
+      <div className={`input-group mb-3`} style={{ width: "30rem" }}>
         <input
           className="storage-tree-search form-control"
           type="text"
@@ -89,7 +80,7 @@ export function BrowseStorageTree(props: BrowseStorageTreeProps) {
           <DinaMessage id="resetButtonText" />
         </button>
       </div>
-      <div className={`fw-bold mb-3 ${hideResultMessage ? "d-none" : ""}`}>
+      <div className={`fw-bold mb-3`}>
         {filter ? (
           <DinaMessage id="showingFilteredStorageUnits" />
         ) : (
@@ -107,8 +98,7 @@ export function StorageTreeList({
   parentId,
   excludeOptionId,
   disabled,
-  filter,
-  hideSelectButton
+  filter
 }: BrowseStorageTreeProps) {
   const limit = 100;
   const [pageNumber, setPageNumber] = useState(1);
@@ -160,9 +150,7 @@ export function StorageTreeList({
                 <StorageUnitCollapser
                   storageUnit={unit}
                   onSelect={onSelect}
-                  disabled={
-                    hideSelectButton || disabled || unit.id === excludeOptionId
-                  }
+                  disabled={disabled || unit.id === excludeOptionId}
                   excludeOptionId={excludeOptionId}
                 />
               </div>

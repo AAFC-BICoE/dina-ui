@@ -17,7 +17,7 @@ import {
   Head,
   Nav,
   StorageLinkerField,
-  BrowseStorageTreeField
+  StorageTreeListField
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnit } from "../../../types/collection-api";
@@ -114,22 +114,6 @@ export function StorageUnitForm({
 /** Re-usable field layout between edit and view pages. */
 export function StorageUnitFormFields() {
   const { readOnly, initialValues } = useDinaFormContext();
-  const initVal = JSON.stringify(initialValues);
-  const storageUnitData = initVal.replace(/storageUnitChildren/g, "children");
-
-  // Make the tree expand by default
-  function setDefaultExpanded(child) {
-    child.map(chld => {
-      chld.toggled = true;
-      if (chld.children) setDefaultExpanded(chld.children);
-    });
-  }
-
-  const storageUnitNew = JSON.parse(storageUnitData);
-  if (storageUnitNew.children) {
-    setDefaultExpanded(storageUnitNew.children);
-  }
-  storageUnitNew.toggled = "true";
 
   return (
     <div>
@@ -144,13 +128,7 @@ export function StorageUnitFormFields() {
         <TextField className="col-md-6" name="name" />
       </div>
       {readOnly && (
-        <BrowseStorageTreeField
-          parentId={initialValues.id}
-          hideResultMessage={true}
-          hideSearchSection={true}
-          hideSelectButton={true}
-          hasChildUnits={initialValues.storageUnitChildren ? true : false}
-        />
+        <StorageTreeListField parentId={initialValues.id} disabled={true} />
       )}
       <StorageLinkerField
         name="parentStorageUnit"

@@ -8,4 +8,4 @@ export * from "./storage/StorageLinker";
 export * from "./head";
 export * from "./collection/TreeView";
 export * from "./storage/BrowseStorageTree";
-export * from "./storage/BrowseStorageTreeField";
+export * from "./storage/StorageTreeListField";

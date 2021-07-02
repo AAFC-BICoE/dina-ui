@@ -23,16 +23,19 @@ import { useState } from "react";
 export function StorageUnitDetailsPage({ router }: WithRouterProps) {
   const id = String(router.query.id);
   const { formatMessage } = useDinaIntl();
-  const [_, setParent] = useState<StorageUnit>();
+  const [parent, setParent] = useState<StorageUnit>();
 
   const { save } = useApiClient();
 
   const { openModal } = useModal();
 
-  const StorageUnitQuery = useQuery<StorageUnit>({
-    path: `collection-api/storage-unit/${id}`,
-    include: "storageUnitChildren,parentStorageUnit"
-  });
+  const StorageUnitQuery = useQuery<StorageUnit>(
+    {
+      path: `collection-api/storage-unit/${id}`,
+      include: "storageUnitChildren,parentStorageUnit"
+    },
+    { deps: [parent] }
+  );
 
   const storageUnit = StorageUnitQuery.response?.data;
 
@@ -69,11 +72,9 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
       );
     }
     setParent(parentUnit);
-    await router.push(`/collection/storage-unit/edit?id=${id}`);
   }
 
   function onMoveAllContentClick() {
-    // request to remove all children
     openModal(
       <AreYouSureModal
         actionMessage={
