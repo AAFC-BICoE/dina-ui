@@ -3,13 +3,15 @@ import type { Config } from "@jest/types";
 const config: Config.InitialOptions = {
   collectCoverageFrom: ["**/*.{ts,tsx,js,jsx}"],
   coveragePathIgnorePatterns: [
-    "/**/coverage/",
-    "/**/build/",
-    "/**/dina-ui/out/",
-    "/**/babel.config.js",
-    "/**/jest.config.js",
-    "/**/jest.setup.js",
-    "/**/next.config.js"
+    "/node_modules/",
+    "/.next/",
+    "/coverage/",
+    "/build/",
+    "/dina-ui/out/",
+    "/babel.config.js",
+    "/jest.config.ts",
+    "/jest.setup.js",
+    "/next.config.js"
   ],
   moduleNameMapper: {
     // Mocks CSS imports to prevent throwing an error during tests.
