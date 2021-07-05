@@ -48,7 +48,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
 
     const samples = ids.map(id => ({
       id,
-      type: "molecularSample"
+      type: "molecular-sample"
     })) as MolecularSample[];
 
     await selectSamples(samples);

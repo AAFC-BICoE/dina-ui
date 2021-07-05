@@ -162,7 +162,7 @@ export function SampleSelection(props: StepRendererProps) {
                 defaultPageSize={100}
                 filter={filter}
                 onSuccess={response => setAvailableSamples(response.data)}
-                path="seqdb-api/molecularSample"
+                path="seqdb-api/molecular-sample"
               />
             </div>
             <div className="col-2" style={{ marginTop: "100px" }}>

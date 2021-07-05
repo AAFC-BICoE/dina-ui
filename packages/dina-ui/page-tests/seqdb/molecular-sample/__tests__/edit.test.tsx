@@ -5,7 +5,7 @@ import { MolecularSample } from "../../../../types/seqdb-api";
 
 const TEST_MOLECULAR_SAMPLE: PersistedResource<MolecularSample> = {
   id: "123",
-  type: "molecularSample",
+  type: "molecular-sample",
   name: "test molecular sample",
   version: "A",
   group: "cnc",
@@ -18,7 +18,7 @@ const TEST_MOLECULAR_SAMPLE: PersistedResource<MolecularSample> = {
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
-    case "seqdb-api/molecularSample/123":
+    case "seqdb-api/molecular-sample/123":
       return { data: TEST_MOLECULAR_SAMPLE };
     case "user-api/group":
       return { data: [] };
@@ -72,10 +72,10 @@ describe("MolecularSampleForm", () => {
         {
           resource: {
             name: "my-molecular-sample",
-            type: "molecularSample",
+            type: "molecular-sample",
             version: "B"
           },
-          type: "molecularSample"
+          type: "molecular-sample"
         }
       ],
       { apiBaseUrl: "/seqdb-api" }
@@ -123,10 +123,10 @@ describe("MolecularSampleForm", () => {
               name: "test-protocol",
               type: "protocol"
             },
-            type: "molecularSample",
+            type: "molecular-sample",
             version: "A"
           },
-          type: "molecularSample"
+          type: "molecular-sample"
         }
       ],
       { apiBaseUrl: "/seqdb-api" }

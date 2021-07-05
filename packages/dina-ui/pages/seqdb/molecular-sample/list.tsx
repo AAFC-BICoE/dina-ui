@@ -41,7 +41,7 @@ export default function MolecularSampleListPage() {
           id="molecular-sample-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
-            path: "seqdb-api/molecularSample"
+            path: "seqdb-api/molecular-sample"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">

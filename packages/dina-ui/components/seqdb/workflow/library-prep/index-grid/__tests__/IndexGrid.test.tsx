@@ -39,7 +39,7 @@ function getWrapper(propsOverride?: Partial<IndexGridProps>) {
 const MOCK_LIBRARY_PREPS = [
   {
     id: "1",
-    molecularSample: { id: "1", type: "molecularSample", name: "SAMP1" },
+    molecularSample: { id: "1", type: "molecular-sample", name: "SAMP1" },
     type: "libraryPrep",
     wellColumn: 2,
     wellRow: "B"
@@ -48,21 +48,21 @@ const MOCK_LIBRARY_PREPS = [
     id: "2",
     indexI5: { id: "1", type: "ngsIndex", name: "test index 1" },
     indexI7: { id: "2", type: "ngsIndex", name: "test index 2" },
-    molecularSample: { id: "2", type: "molecularSample", name: "SAMP2" },
+    molecularSample: { id: "2", type: "molecular-sample", name: "SAMP2" },
     type: "libraryPrep",
     wellColumn: 3,
     wellRow: "B"
   },
   {
     id: "3",
-    molecularSample: { id: "3", type: "molecularSample", name: "SAMP3" },
+    molecularSample: { id: "3", type: "molecular-sample", name: "SAMP3" },
     type: "libraryPrep",
     wellColumn: 2,
     wellRow: "C"
   },
   {
     id: "4",
-    molecularSample: { id: "4", type: "molecularSample", name: "SAMP4" },
+    molecularSample: { id: "4", type: "molecular-sample", name: "SAMP4" },
     type: "libraryPrep",
     wellColumn: 3,
     wellRow: "C"

@@ -29,7 +29,7 @@ interface MolecularSampleFormProps {
 export function useMolecularSample(id?: string) {
   return useQuery<MolecularSample>(
     {
-      path: `seqdb-api/molecularSample/${id}`,
+      path: `seqdb-api/molecular-sample/${id}`,
       include: "materialSample,protocol,kit"
     },
     {
@@ -92,7 +92,7 @@ export function MolecularSampleForm({
 }: MolecularSampleFormProps) {
   const { save } = useApiClient();
   const initialValues = molecularSample || {
-    type: "molecularSample"
+    type: "molecular-sample"
   };
 
   const onSubmit: DinaFormOnSubmit<MolecularSample> = async ({
@@ -114,7 +114,7 @@ export function MolecularSampleForm({
       [
         {
           resource: inputResource,
-          type: "molecularSample"
+          type: "molecular-sample"
         }
       ],
       { apiBaseUrl: "/seqdb-api" }
@@ -177,7 +177,16 @@ export function MolecularSampleFields() {
         <ResourceSelectField<MaterialSample>
           name="materialSample"
           className="col-md-6"
-          filter={filterBy(["materialSampleName", "dwcCatalogNumber"])}
+          filter={filterBy(["materialSampleName", "dwcCatalogNumber"], {
+            // Only allow linking to the built-in Molecular Sample type:
+            extraFilters: [
+              {
+                selector: "materialSampleType.uuid",
+                comparison: "==",
+                arguments: "3426a6db-99db-4f9d-9c26-eaed1d6906e5"
+              }
+            ]
+          })}
           model="collection-api/material-sample"
           optionLabel={it =>
             it.materialSampleName || it.dwcCatalogNumber || it.id

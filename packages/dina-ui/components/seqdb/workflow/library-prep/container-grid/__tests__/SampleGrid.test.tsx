@@ -49,29 +49,31 @@ function getWrapper(propsOverride?: Partial<ContainerGridProps>) {
 const MOCK_LIBRARY_PREPS = [
   {
     id: "1",
-    molecularSample: { id: "2", name: "SAMP200", type: "molecularSample" },
+    molecularSample: { id: "2", name: "SAMP200", type: "molecular-sample" },
     type: "libraryPrep",
     wellColumn: 1,
     wellRow: "A"
   },
   {
     id: "2",
-    molecularSample: { id: "4", name: "SAMP400", type: "molecularSample" },
+    molecularSample: { id: "4", name: "SAMP400", type: "molecular-sample" },
     type: "libraryPrep",
     wellColumn: 2,
     wellRow: "B"
   },
   {
     id: "3",
-    molecularSample: { id: "6", name: "SAMP600", type: "molecularSample" },
+    molecularSample: { id: "6", name: "SAMP600", type: "molecular-sample" },
     type: "libraryPrep"
   }
 ];
 
 const MOCK_STEPRESOURCES_NO_WELL_COORDS = [
-  { molecularSample: { id: "6", name: "SAMP600", type: "molecularSample" } },
-  { molecularSample: { id: "10", name: "ZSAMP1000", type: "molecularSample" } },
-  { molecularSample: { id: "8", name: "SAMP800", type: "molecularSample" } }
+  { molecularSample: { id: "6", name: "SAMP600", type: "molecular-sample" } },
+  {
+    molecularSample: { id: "10", name: "ZSAMP1000", type: "molecular-sample" }
+  },
+  { molecularSample: { id: "8", name: "SAMP800", type: "molecular-sample" } }
 ] as StepResource[];
 
 describe("SampleGrid component", () => {
@@ -217,7 +219,7 @@ describe("SampleGrid component", () => {
             id: "3",
             molecularSample: expect.objectContaining({
               id: "6",
-              type: "molecularSample"
+              type: "molecular-sample"
             }),
             type: "libraryPrep",
             wellColumn: 3,
@@ -298,7 +300,7 @@ describe("SampleGrid component", () => {
             id: "3",
             molecularSample: expect.objectContaining({
               id: "6",
-              type: "molecularSample"
+              type: "molecular-sample"
             }),
             type: "libraryPrep",
             wellColumn: 3,
@@ -314,7 +316,7 @@ describe("SampleGrid component", () => {
             }),
             molecularSample: expect.objectContaining({
               id: "8",
-              type: "molecularSample"
+              type: "molecular-sample"
             }),
             type: "libraryPrep",
             wellColumn: 3,
@@ -330,7 +332,7 @@ describe("SampleGrid component", () => {
             }),
             molecularSample: expect.objectContaining({
               id: "10",
-              type: "molecularSample"
+              type: "molecular-sample"
             }),
             type: "libraryPrep",
             wellColumn: 4,
@@ -383,7 +385,7 @@ describe("SampleGrid component", () => {
             id: "3",
             molecularSample: expect.objectContaining({
               id: "6",
-              type: "molecularSample"
+              type: "molecular-sample"
             }),
             type: "libraryPrep",
             wellColumn: 11,
@@ -399,7 +401,7 @@ describe("SampleGrid component", () => {
             }),
             molecularSample: expect.objectContaining({
               id: "8",
-              type: "molecularSample"
+              type: "molecular-sample"
             }),
             type: "libraryPrep",
             wellColumn: 12,
@@ -415,7 +417,7 @@ describe("SampleGrid component", () => {
             }),
             molecularSample: expect.objectContaining({
               id: "10",
-              type: "molecularSample"
+              type: "molecular-sample"
             }),
             type: "libraryPrep",
             wellColumn: 1,
@@ -545,7 +547,7 @@ describe("SampleGrid component", () => {
             molecularSample: {
               id: "6",
               name: "SAMP600",
-              type: "molecularSample"
+              type: "molecular-sample"
             },
             type: "libraryPrep",
             wellColumn: 12,
@@ -558,7 +560,7 @@ describe("SampleGrid component", () => {
             molecularSample: {
               id: "8",
               name: "SAMP800",
-              type: "molecularSample"
+              type: "molecular-sample"
             },
             type: "libraryPrep",
             wellColumn: null,
@@ -571,7 +573,7 @@ describe("SampleGrid component", () => {
             molecularSample: {
               id: "10",
               name: "ZSAMP1000",
-              type: "molecularSample"
+              type: "molecular-sample"
             },
             type: "libraryPrep",
             wellColumn: null,

@@ -21,11 +21,11 @@ jest.mock("next/dynamic", () => () => {
 });
 
 const TEST_SAMPLES = [
-  { id: "1", type: "molecularSample", name: "test sample 1" },
-  { id: "2", type: "molecularSample", name: "test sample 2" },
-  { id: "3", type: "molecularSample", name: "test sample 3" },
-  { id: "4", type: "molecularSample", name: "test sample 4" },
-  { id: "5", type: "molecularSample", name: "test sample 5" }
+  { id: "1", type: "molecular-sample", name: "test sample 1" },
+  { id: "2", type: "molecular-sample", name: "test sample 2" },
+  { id: "3", type: "molecular-sample", name: "test sample 3" },
+  { id: "4", type: "molecular-sample", name: "test sample 4" },
+  { id: "5", type: "molecular-sample", name: "test sample 5" }
 ] as PersistedResource<MolecularSample>[];
 
 const TEST_SAMPLE_STEP_RESOURCES: PersistedResource<StepResource>[] = [
@@ -71,28 +71,30 @@ const TEST_CHAIN: PersistedResource<Chain> = {
 };
 
 /** This is the first step in the chain that precedes this one. */
-const TEST_SAMPLE_SELECTION_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> = {
-  chainTemplate: TEST_CHAIN_TEMPLATE,
-  id: "1",
-  stepNumber: 1,
-  stepTemplate: {
+const TEST_SAMPLE_SELECTION_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> =
+  {
+    chainTemplate: TEST_CHAIN_TEMPLATE,
     id: "1",
-    type: "stepTemplate"
-  } as PersistedResource<StepTemplate>,
-  type: "chainStepTemplate"
-};
+    stepNumber: 1,
+    stepTemplate: {
+      id: "1",
+      type: "stepTemplate"
+    } as PersistedResource<StepTemplate>,
+    type: "chainStepTemplate"
+  };
 
 /** This is the second and current step in the chain. */
-const TEST_PRE_LIBRARY_PREP_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> = {
-  chainTemplate: TEST_CHAIN_TEMPLATE,
-  id: "2",
-  stepNumber: 2,
-  stepTemplate: {
+const TEST_PRE_LIBRARY_PREP_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> =
+  {
+    chainTemplate: TEST_CHAIN_TEMPLATE,
     id: "2",
-    type: "stepTemplate"
-  } as PersistedResource<StepTemplate>,
-  type: "chainStepTemplate"
-};
+    stepNumber: 2,
+    stepTemplate: {
+      id: "2",
+      type: "stepTemplate"
+    } as PersistedResource<StepTemplate>,
+    type: "chainStepTemplate"
+  };
 
 const TEST_CHAIN_STEP_TEMPLATES = [
   TEST_SAMPLE_SELECTION_CHAIN_STEP_TEMPLATE,
@@ -272,7 +274,7 @@ describe("PreLibraryPrepStep UI", () => {
               molecularSample: {
                 data: {
                   id: "2",
-                  type: "molecularSample"
+                  type: "molecular-sample"
                 }
               }
             },
@@ -332,7 +334,7 @@ describe("PreLibraryPrepStep UI", () => {
                 inputAmount: 999,
                 type: "preLibraryPrep"
               },
-              molecularSample: { id: "10", type: "molecularSample" },
+              molecularSample: { id: "10", type: "molecular-sample" },
               type: "stepResource",
               value: "SIZE_SELECTION"
             }

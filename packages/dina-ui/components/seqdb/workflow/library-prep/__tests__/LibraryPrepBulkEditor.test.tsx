@@ -55,7 +55,7 @@ const MOCK_LIBRARY_PREPS = [
     id: "3",
     indexI5: { id: "1", type: "ngsIndex", name: "i5 index 1" },
     inputNg: 123,
-    molecularSample: { id: "6", name: "SAMP600", type: "molecularSample" },
+    molecularSample: { id: "6", name: "SAMP600", type: "molecular-sample" },
     size: "big",
     type: "libraryPrep",
     wellColumn: 5,
@@ -64,9 +64,11 @@ const MOCK_LIBRARY_PREPS = [
 ];
 
 const MOCK_SAMPLE_STEPRESOURCES = [
-  { molecularSample: { id: "6", name: "SAMP600", type: "molecularSample" } },
-  { molecularSample: { id: "10", name: "ZSAMP1000", type: "molecularSample" } },
-  { molecularSample: { id: "8", name: "SAMP800", type: "molecularSample" } }
+  { molecularSample: { id: "6", name: "SAMP600", type: "molecular-sample" } },
+  {
+    molecularSample: { id: "10", name: "ZSAMP1000", type: "molecular-sample" }
+  },
+  { molecularSample: { id: "8", name: "SAMP800", type: "molecular-sample" } }
 ];
 
 describe("LibraryPrepBulkEditor component", () => {

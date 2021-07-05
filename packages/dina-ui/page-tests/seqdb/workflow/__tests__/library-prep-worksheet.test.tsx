@@ -62,7 +62,7 @@ describe("Library Prep Worksheet page", () => {
               indexI7: { id: "4", type: "ngsIndex", name: "index 4" },
               molecularSample: {
                 id: "1",
-                type: "molecularSample",
+                type: "molecular-sample",
                 name: "SAMP1"
               },
               type: "libraryPrep",
@@ -75,7 +75,7 @@ describe("Library Prep Worksheet page", () => {
               indexI7: { id: "5", type: "ngsIndex", name: "index 5" },
               molecularSample: {
                 id: "1",
-                type: "molecularSample",
+                type: "molecular-sample",
                 name: "SAMP2"
               },
               type: "libraryPrep",
@@ -88,7 +88,7 @@ describe("Library Prep Worksheet page", () => {
               indexI7: { id: "6", type: "ngsIndex", name: "index 6" },
               molecularSample: {
                 id: "1",
-                type: "molecularSample",
+                type: "molecular-sample",
                 name: "SAMP3"
               },
               type: "libraryPrep",
