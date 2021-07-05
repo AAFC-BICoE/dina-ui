@@ -1,6 +1,15 @@
-/* Wraps long text instead of shortening it. */
+/* Wraps long text when necessary in columns */
+/* Corrects contrast issue for preview pane and details page when page is reduced in size */
 .ReactTable .rt-td {
-  white-space: unset !important;
+  white-space: normal!important;
+  flex: 50% 0!important;
+  width: auto!important;
+}
+
+/* Wraps long text in column header when necessary */
+/* Corrects contrast error when page size reduced */
+.ReactTable .rt-th {
+  white-space: normal!important;
 }
 
 /* Align the header titles to the left to match the cell text alignment. */
