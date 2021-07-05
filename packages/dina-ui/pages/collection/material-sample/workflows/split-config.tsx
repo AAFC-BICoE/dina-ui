@@ -152,10 +152,10 @@ export default function ConfigAction() {
               }
             >
               <TabList>
-                <Tab className={`react-tabs__tab batch-toggle`}>
+                <Tab className={`react-tabs__tab batch-tab`}>
                   <DinaMessage id="generateBatch" />
                 </Tab>
-                <Tab className={`react-tabs__tab series-toggle`}>
+                <Tab className={`react-tabs__tab series-tab`}>
                   <DinaMessage id="generateSeries" />
                 </Tab>
               </TabList>

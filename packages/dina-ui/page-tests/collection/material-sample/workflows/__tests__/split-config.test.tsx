@@ -29,12 +29,12 @@ const testRunConfig = {
   }
 };
 
-describe("MaterialSample split workflow run config", () => {
+describe("MaterialSample split workflow series-mode run config", () => {
   it("Initially display the workfow run config with defaults", async () => {
     const wrapper = mountWithAppContext(<ConfigAction />, {});
 
     // Switch to the "Series" tab:
-    wrapper.find("li.react-tabs__tab.series-toggle").simulate("click");
+    wrapper.find("li.react-tabs__tab.series-tab").simulate("click");
 
     expect(wrapper.find(".baseName-field input").prop("placeholder")).toEqual(
       BASE_NAME
@@ -46,11 +46,11 @@ describe("MaterialSample split workflow run config", () => {
     expect(value.value).toEqual(TYPE_NUMERIC);
   });
 
-  it("Creates a new Material Sample workfow run config with user custom entries", async () => {
+  it("Creates a new Material Sample workfow series-mode run config with user custom entries", async () => {
     const wrapper = mountWithAppContext(<ConfigAction />, {});
 
     // Switch to the "Series" tab:
-    wrapper.find("li.react-tabs__tab.series-toggle").simulate("click");
+    wrapper.find("li.react-tabs__tab.series-tab").simulate("click");
 
     wrapper
       .find(".baseName-field input")
@@ -91,5 +91,53 @@ describe("MaterialSample split workflow run config", () => {
       testRunConfig[SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY].configure_children
         .sampleNames[0]
     );
+  });
+
+  it("Creates a new Material Sample workfow series-mode run config with user custom entries", async () => {
+    const wrapper = mountWithAppContext(<ConfigAction />, {});
+
+    // Switch to the "Batch" tab:
+    wrapper.find("li.react-tabs__tab.batch-tab").simulate("click");
+
+    wrapper
+      .find(".baseName-field input")
+      .simulate("change", { target: { value: "TestBaseName" } });
+
+    wrapper
+      .find(".suffix-field input")
+      .simulate("change", { target: { value: "TestSuffix" } });
+
+    wrapper
+      .find(".numOfChildToCreate-field input")
+      .simulate("change", { target: { value: 3 } });
+
+    wrapper
+      .find(".sampleName0 input")
+      .simulate("change", { target: { value: "CustomName1" } });
+
+    wrapper.update();
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      JSON.parse(
+        localStorage.getItem(SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY) ?? "{}"
+      )
+    ).toEqual({
+      configure: {
+        baseName: "TestBaseName",
+        generationMode: "BATCH",
+        numOfChildToCreate: 3,
+        suffix: "TestSuffix"
+      },
+      configure_children: {
+        sampleDescs: [null, null, null],
+        sampleNames: ["CustomName1", null, null]
+      },
+      metadata: {}
+    });
   });
 });
