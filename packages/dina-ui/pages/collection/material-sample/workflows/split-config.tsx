@@ -65,6 +65,13 @@ export default function ConfigAction() {
   );
 
   const onSubmit = async ({ submittedValues: configActionFields }) => {
+    const childSampleNames: string[] = [];
+    const childSampleDescs: string[] = [];
+    for (let i = 0; i < configActionFields.numOfChildToCreate; i++) {
+      childSampleNames.push(configActionFields?.sampleName?.[i]);
+      childSampleDescs.push(configActionFields?.sampleDesc?.[i]);
+    }
+
     const runConfig: MaterialSampleRunConfig = {
       metadata: {
         actionRemarks: configActionFields.remarks
@@ -80,8 +87,8 @@ export default function ConfigAction() {
         destroyOriginal: configActionFields.destroyOriginal
       },
       configure_children: {
-        sampleNames: configActionFields.sampleNames,
-        sampleDescs: configActionFields.sampleDescs
+        sampleNames: childSampleNames,
+        sampleDescs: childSampleDescs
       }
     };
 
@@ -172,7 +179,7 @@ export default function ConfigAction() {
                 placeholder={`${BASE_NAME}`}
               />
               <SelectField
-                className="col-md-2"
+                className="col-md-2 suffixType"
                 name="suffixType"
                 options={TYPE_OPTIONS}
                 onChange={(newType, formik) =>
