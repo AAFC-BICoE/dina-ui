@@ -240,6 +240,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   forTestingPurposesOnlyMessage:
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
   formNavigation: "Form Navigation",
+  generateBatch: "Generate Batch",
+  generateSeries: "Generate Series",
   geoReferencing: "Geo-Referencing",
   geoReferencingLegend: "Georeferencing",
   geographyLegend: "Geography (Places)",
@@ -374,6 +376,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   storageUnitTypeViewTitle: "Storage Unit Type",
   storageUnitViewTitle: "Storage Unit",
   storagesCreatedByMe: "Storages Created By Me",
+  suffixOptional: "Suffix (Optional)",
   switchToActionType: 'Switch to "{actionType}".',
   templateNameMandatoryErrorMsg: "Please enter a workflow template name.",
   thisWillRemoveYourTemplate:

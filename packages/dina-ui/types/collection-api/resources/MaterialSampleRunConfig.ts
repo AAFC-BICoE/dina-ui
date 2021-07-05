@@ -7,8 +7,16 @@ export interface MaterialSampleRunConfigMetadata {
 export interface MaterialSampleRunConfigConfiguration {
   numOfChildToCreate: number;
   baseName: string;
+
+  generationMode: MaterialSampleGenerationMode;
+
+  /** Starting suffix and suffixType for Series mode */
   start?: string | undefined;
-  suffixType: string | undefined;
+  suffixType?: string | undefined;
+
+  /** Suffix for Batch mode */
+  suffix?: string;
+
   destroyOriginal: boolean;
 }
 
@@ -16,6 +24,11 @@ export interface MaterialSampleRunConfigChildConfiguration {
   sampleNames?: string[];
   sampleDescs?: string[];
 }
+
+export const MATERIAL_SAMPLE_GENERATION_MODES = ["BATCH", "SERIES"] as const;
+
+export type MaterialSampleGenerationMode =
+  typeof MATERIAL_SAMPLE_GENERATION_MODES[number];
 
 export interface MaterialSampleRunConfigAttributes {
   metadata: MaterialSampleRunConfigMetadata;

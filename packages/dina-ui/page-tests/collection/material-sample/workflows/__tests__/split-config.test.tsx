@@ -33,6 +33,9 @@ describe("MaterialSample split workflow run config", () => {
   it("Initially display the workfow run config with defaults", async () => {
     const wrapper = mountWithAppContext(<ConfigAction />, {});
 
+    // Switch to the "Series" tab:
+    wrapper.find("li.react-tabs__tab.series-toggle").simulate("click");
+
     expect(wrapper.find(".baseName-field input").prop("placeholder")).toEqual(
       BASE_NAME
     );
@@ -45,6 +48,9 @@ describe("MaterialSample split workflow run config", () => {
 
   it("Creates a new Material Sample workfow run config with user custom entries", async () => {
     const wrapper = mountWithAppContext(<ConfigAction />, {});
+
+    // Switch to the "Series" tab:
+    wrapper.find("li.react-tabs__tab.series-toggle").simulate("click");
 
     wrapper
       .find(".baseName-field input")
