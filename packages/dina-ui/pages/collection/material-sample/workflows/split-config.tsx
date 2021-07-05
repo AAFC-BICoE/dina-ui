@@ -70,7 +70,7 @@ export default function ConfigAction() {
         actionRemarks: configActionFields.remarks
       },
       configure: {
-        identifiers: configActionFields.identifiers,
+        identifier: configActionFields.identifier,
         numOfChildToCreate:
           configActionFields.numOfChildToCreate ??
           configActionFields.numOfChildToCreate,
@@ -102,7 +102,7 @@ export default function ConfigAction() {
     suffixType: TYPE_NUMERIC,
     numOfChildToCreate: 1,
     start: "001",
-    identifiers: "MATERIAL_SAMPLE_ID"
+    identifier: "MATERIAL_SAMPLE_ID"
   };
 
   const initialConfigChild = splitChildSampleRunConfig?.configure_children;
