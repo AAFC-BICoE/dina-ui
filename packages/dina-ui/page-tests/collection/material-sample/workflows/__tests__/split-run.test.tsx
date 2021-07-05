@@ -21,6 +21,7 @@ function testMaterialSample(): PersistedResource<MaterialSample>[] {
       type: "material-sample",
       group: "test group",
       dwcCatalogNumber: "my-number",
+      materialSampleName: "parent-sample-name",
       collectingEvent: {
         id: "1",
         type: "collecting-event"
@@ -122,7 +123,7 @@ describe("MaterialSample split workflow run action form with all default values"
           resource: {
             dwcCatalogNumber: "my-number",
             group: "aafc",
-            materialSampleName: "my custom name",
+            materialSampleName: "parent-sample-name",
             parentMaterialSample: {
               id: "1",
               type: "material-sample"
