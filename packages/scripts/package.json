@@ -4,20 +4,6 @@
   "license": "MIT",
   "scripts": {
     "export-intl-csv": "ts-node ./intl-support/export-intl-csv.script.ts",
-    "import-intl-csv": "ts-node ./intl-support/import-intl-csv.script.ts $CSVFILE && prettier --write ../**/intl/**/*.ts",
-    "lint": "tslint --project tsconfig.json",
-    "lint:fix": "tslint --project tsconfig.json --fix",
-    "test": "tsc && jest",
-    "test:coverage": "tsc && jest --coverage"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "tslint --project tsconfig.json --fix",
-      "git add"
-    ],
-    "*.{js,jsx,css,json,md}": [
-      "prettier --write",
-      "git add"
-    ]
+    "import-intl-csv": "ts-node ./intl-support/import-intl-csv.script.ts $CSVFILE && prettier --write ../**/intl/**/*.ts"
   }
 }
