@@ -4,4 +4,3 @@ export * from "./GeoReferenceAssertionRow";
 export * from "./GeographySearchDialog";
 export * from "./GeographySearchBox";
 export * from "./useCollectingEvent";
-export * from "./TreeView";
