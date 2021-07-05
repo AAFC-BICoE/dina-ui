@@ -5,3 +5,4 @@ code --install-extension ms-azuretools.vscode-docker
 code --install-extension gabrielbb.vscode-lombok
 code --install-extension esbenp.prettier-vscode
 code --install-extension ms-vscode.vscode-typescript-tslint-plugin
+code --install-extension firsttris.vscode-jest-runner
