@@ -52,7 +52,7 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
 
     // Set first level children to new parent
     if (children) {
-      const savedChildren = await save(
+      await save(
         children?.map(child => {
           (child as any).relationships = {};
           (child as any).relationships.storageUnitChildren = {
