@@ -113,6 +113,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   revisionsByUserPageTitle: "Révisions par l'utilisateur",
   searchButton: "Recherche",
   thumbnailNotAvailableText: "Aucune vignette disponible",
+  tooltipDefaultLinkMessage: "Cliquez ici pour en savoir plus.",
   uploadButtonText: "Télécharger",
   uploadFormInstructions:
     "Glisser-déposer les fichiers ici ou cliquer pour ouvrir la fenêtre de dialogue. Seuls les fichiers graphiques, audio, vidéo, .pdf, .doc et .docx sont acceptés.",

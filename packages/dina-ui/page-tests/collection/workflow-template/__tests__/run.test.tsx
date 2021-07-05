@@ -189,6 +189,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               dwcOtherRecordNumbers: null,
               geoReferenceAssertions: [
                 {
+                  georeferencedBy: undefined,
                   isPrimary: true,
                   // The added values:
                   dwcDecimalLatitude: 45.394728,
@@ -225,7 +226,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               preparedBy: {
                 id: null
               },
-
+              managedAttributes: {},
               relationships: {},
               type: "material-sample"
             },
@@ -309,7 +310,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               preparedBy: {
                 id: null
               },
-
+              managedAttributes: {},
               relationships: {},
               type: "material-sample"
             },
@@ -356,6 +357,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 id: null,
                 type: "collecting-event"
               },
+              managedAttributes: {},
 
               // Preparations are not enabled, so the preparation fields are set to null:
               preparationDate: null,
