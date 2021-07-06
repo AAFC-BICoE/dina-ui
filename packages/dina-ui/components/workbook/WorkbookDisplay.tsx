@@ -1,7 +1,13 @@
-import React from "react";
+import react, { Component } from "react";
 
-export class WorkbookDisplay extends React.Component {
+interface WorkbookDisplayProps {
+  jsonData: string;
+}
+
+export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
   render() {
-    return <div />;
+    return <p>{this.props.jsonData}</p>;
   }
 }
+
+export default WorkbookDisplay;
