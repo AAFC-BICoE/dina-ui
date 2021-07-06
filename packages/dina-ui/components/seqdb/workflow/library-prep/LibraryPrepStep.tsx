@@ -22,10 +22,10 @@ export function LibraryPrepStep(props: StepRendererProps) {
   const { loading, response } = useQuery<StepResource[]>(
     {
       fields: {
-        indexSet: "name",
+        "index-set": "name",
         product: "name",
         protocol: "name",
-        thermocyclerprofile: "name"
+        "thermocycler-profile": "name"
       },
       filter: {
         "chain.uuid": chain.id as string,
@@ -84,14 +84,14 @@ export function LibraryPrepStep(props: StepRendererProps) {
         </div>
         <div className="mb-3 list-inline">
           <Link
-            href={`/workflow/library-prep-worksheet?stepResourceId=${stepResource.id}&sampleLayout=table`}
+            href={`/seqdb/workflow/library-prep-worksheet?stepResourceId=${stepResource.id}&sampleLayout=table`}
           >
             <a className="list-inline-item btn btn-primary" target="_blank">
               Library Prep Worksheet With Table
             </a>
           </Link>
           <Link
-            href={`/workflow/library-prep-worksheet?stepResourceId=${stepResource.id}&sampleLayout=grid`}
+            href={`/seqdb/workflow/library-prep-worksheet?stepResourceId=${stepResource.id}&sampleLayout=grid`}
           >
             <a className="list-inline-item btn btn-primary" target="_blank">
               Library Prep Worksheet With Grid

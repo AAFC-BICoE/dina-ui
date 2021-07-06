@@ -116,7 +116,7 @@ export function LibraryPrepBulkEditor({
       "seqdb-api/step-resource",
       {
         fields: {
-          molecularSample: "name"
+          "molecular-sample": "name"
         },
         filter: {
           "chain.uuid": chain.id as string,

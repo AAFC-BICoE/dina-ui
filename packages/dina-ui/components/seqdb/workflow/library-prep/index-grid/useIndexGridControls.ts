@@ -11,8 +11,8 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
     useQuery<LibraryPrep[]>(
       {
         fields: {
-          ngsIndex: "name",
-          molecularSample: "name"
+          "ngs-index": "name",
+          "molecular-sample": "name"
         },
         include: "molecularSample,indexI5,indexI7",
         page: { limit: 1000 },

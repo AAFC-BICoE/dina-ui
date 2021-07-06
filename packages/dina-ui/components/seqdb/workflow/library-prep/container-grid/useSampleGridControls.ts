@@ -57,7 +57,7 @@ export function useSampleGridControls({
       {
         // Optimize query speed by reducing the amount of requested fields.
         fields: {
-          molecularSample: "name"
+          "molecular-sample": "name"
         },
         include: "molecularSample",
         page: { limit: 1000 },
@@ -90,7 +90,7 @@ export function useSampleGridControls({
           >("seqdb-api/step-resource", {
             // Get all the sample stepResources from the sample selection step that have no coords.
             fields: {
-              molecularSample: "name"
+              "molecular-sample": "name"
             },
             filter: {
               "chain.uuid": chain.id as string,

@@ -121,7 +121,7 @@ export function LibraryPrepBatchForm({
           className="col-md-2"
           name="indexSet"
           filter={filterBy(["name"])}
-          model="seqdb-api/indexSet"
+          model="seqdb-api/index-set"
           optionLabel={set => set.name}
         />
       </div>

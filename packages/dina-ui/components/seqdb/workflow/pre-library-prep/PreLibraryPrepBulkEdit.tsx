@@ -132,7 +132,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
         fields: {
           product: "name",
           protocol: "name",
-          molecularSample: "name,version"
+          "molecular-sample": "name,version"
         },
         filter: {
           "chain.uuid": chain.id,
