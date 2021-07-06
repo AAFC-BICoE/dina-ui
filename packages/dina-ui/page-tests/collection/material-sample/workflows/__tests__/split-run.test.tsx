@@ -123,7 +123,7 @@ describe("MaterialSample split workflow run action form with all default values"
           resource: {
             dwcCatalogNumber: "my-number",
             group: "aafc",
-            materialSampleName: "parent-sample-name",
+            materialSampleName: "my custom name",
             parentMaterialSample: {
               id: "1",
               type: "material-sample"
