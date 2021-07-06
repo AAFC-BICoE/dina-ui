@@ -327,6 +327,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   preparationTypeNameLabel: "Preparation Type Name",
   preparationTypeViewTitle: "View Preparation Type",
   preparations: "Preparations",
+  previewAndCustomizeLabel: "Preview and Customize",
   primary: "Primary",
   primaryButton_tooltip:
     "Make this assertion the primary data point when exported. Only one assertion can be primary",
