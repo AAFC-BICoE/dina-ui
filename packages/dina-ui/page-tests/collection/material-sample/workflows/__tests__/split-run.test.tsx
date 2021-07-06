@@ -4,14 +4,13 @@ import { mountWithAppContext } from "../../../../../test-util/mock-app-context";
 import { PersistedResource } from "kitsu";
 import {
   MaterialSample,
-  CollectingEvent
+  CollectingEvent,
+  MaterialSampleRunConfig
 } from "../../../../../../dina-ui/types/collection-api";
 import { PreparationType } from "../../../../../../dina-ui/types/collection-api/resources/PreparationType";
 
-const mockUseRouter = jest.fn();
-
 jest.mock("next/router", () => ({
-  useRouter: () => mockUseRouter()
+  useRouter: () => ({ push: jest.fn() })
 }));
 
 function testMaterialSample(): PersistedResource<MaterialSample>[] {
@@ -53,7 +52,12 @@ const mockGet = jest.fn<any, any>(async path => {
   }
 });
 
-const mockSave = jest.fn();
+const mockSave = jest.fn(ops =>
+  ops.map(op => ({
+    ...op.resource,
+    id: "11111111-1111-1111-1111-111111111111"
+  }))
+);
 
 const apiContext = {
   apiClient: {
@@ -62,16 +66,29 @@ const apiContext = {
   save: mockSave
 };
 
-const testRunConfigCustom = {
+const testSeriesModeRunConfig: MaterialSampleRunConfig = {
   metadata: { actionRemarks: "Remarks on this run config" },
   configure: {
-    numOfChildToCreate: "1",
+    generationMode: "SERIES",
+    numOfChildToCreate: 1,
     baseName: "CustomParentName",
     start: "10",
-    type: "Numerical",
+    suffixType: "Numerical",
     destroyOriginal: true
   },
   configure_children: { sampleNames: ["my custom name"], sampleDescs: [] }
+};
+
+const testBatchModeRunConfig: MaterialSampleRunConfig = {
+  metadata: { actionRemarks: "Remarks on this run config" },
+  configure: {
+    generationMode: "BATCH",
+    numOfChildToCreate: 2,
+    baseName: "CustomParentName",
+    suffix: "CustomSuffix",
+    destroyOriginal: true
+  },
+  configure_children: { sampleNames: [], sampleDescs: ["CustomDescription1"] }
 };
 
 describe("MaterialSample split workflow run action form with all default values", () => {
@@ -89,10 +106,10 @@ describe("MaterialSample split workflow run action form with all default values"
     );
   });
 
-  it("Submit a workflow run action, correct child sample is sent to be saved ", async () => {
+  it("Submit a workflow run action (series mode), correct child sample is sent to be saved ", async () => {
     localStorage.setItem(
       SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY,
-      JSON.stringify(testRunConfigCustom)
+      JSON.stringify(testSeriesModeRunConfig)
     );
     const wrapper = mountWithAppContext(<SplitRunAction />, { apiContext });
 
@@ -124,6 +141,57 @@ describe("MaterialSample split workflow run action form with all default values"
             dwcCatalogNumber: "my-number",
             group: "aafc",
             materialSampleName: "my custom name",
+            parentMaterialSample: {
+              id: "1",
+              type: "material-sample"
+            },
+            type: "material-sample"
+          },
+          type: "material-sample"
+        }
+      ],
+      {
+        apiBaseUrl: "/collection-api"
+      }
+    ]);
+  });
+
+  it("Submit a workflow run action (batch mode), correct child sample is sent to be saved ", async () => {
+    localStorage.setItem(
+      SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY,
+      JSON.stringify(testBatchModeRunConfig)
+    );
+    const wrapper = mountWithAppContext(<SplitRunAction />, { apiContext });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // child sample initially loaded with generated custom name
+    expect(wrapper.find(".materialSampleName input").prop("value")).toEqual(
+      "CustomParentNameCustomSuffix"
+    );
+
+    wrapper.find("button.runAction").simulate("click");
+
+    // When click next button, child samples are linked to parent sample and sent to save:
+    expect(mockSave.mock.calls[0]).toEqual([
+      [
+        {
+          resource: {
+            group: "aafc",
+            materialSampleName: "CustomParentNameCustomSuffix",
+            parentMaterialSample: {
+              id: "1",
+              type: "material-sample"
+            },
+            type: "material-sample"
+          },
+          type: "material-sample"
+        },
+        {
+          resource: {
+            group: "aafc",
+            materialSampleName: "CustomParentNameCustomSuffix",
             parentMaterialSample: {
               id: "1",
               type: "material-sample"
