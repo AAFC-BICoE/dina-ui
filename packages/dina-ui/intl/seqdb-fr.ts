@@ -4,7 +4,6 @@ import { SEQDB_MESSAGES_ENGLISH } from "./seqdb-en";
  * French translation of SeqDB English messages
  */
 export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
-  field_name: "Nom",
   addPcrPrimerTitle: "Ajouter une amorce PCR",
   addPcrProfileTitle: "Ajouter un profil de thermocycleur",
   addProductTitle: "Ajouter un produit",
@@ -30,6 +29,7 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   "field_group.groupName": "Nom du groupe",
   field_inputAmount: "Montant de l'entrée",
   field_inputNg: "Entrée (Ng)",
+  field_name: "Nom",
   field_notes: "Remarques",
   field_product: "Produit",
   field_protocol: "Protocole",
