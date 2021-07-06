@@ -19,6 +19,7 @@ import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
 import { Head } from "../../../../../dina-ui/components/head";
 import {
   BASE_NAME,
+  IDENTIFIER_TYPE_OPTIONS,
   MaterialSampleGenerationMode,
   MaterialSampleRunConfig,
   MATERIAL_SAMPLE_GENERATION_MODES,
@@ -65,15 +66,13 @@ export default function ConfigAction() {
   );
 
   const onSubmit = async ({ submittedValues: configActionFields }) => {
-    // record the customized user entry if there is any name or description provided
-    const sampleNames: any = [];
-    const sampleDescs: any = [];
-    if (configActionFields.sampleName || configActionFields.description) {
-      for (let i = 0; i < configActionFields.numOfChildToCreate; i++) {
-        sampleNames.push(configActionFields.sampleName?.[i]);
-        sampleDescs.push(configActionFields.description?.[i]);
-      }
+    const childSampleNames: string[] = [];
+    const childSampleDescs: string[] = [];
+    for (let i = 0; i < configActionFields.numOfChildToCreate; i++) {
+      childSampleNames.push(configActionFields?.sampleName?.[i]);
+      childSampleDescs.push(configActionFields?.sampleDesc?.[i]);
     }
+
     const runConfig: MaterialSampleRunConfig = {
       metadata: {
         actionRemarks: configActionFields.remarks
@@ -81,6 +80,7 @@ export default function ConfigAction() {
       configure: {
         generationMode,
         numOfChildToCreate: configActionFields.numOfChildToCreate,
+        identifier: configActionFields.identifier,
         baseName: configActionFields.baseName ?? BASE_NAME,
         ...(generationMode === "BATCH" && {
           suffix: configActionFields.suffix
@@ -92,8 +92,8 @@ export default function ConfigAction() {
         destroyOriginal: configActionFields.destroyOriginal
       },
       configure_children: {
-        sampleNames,
-        sampleDescs
+        sampleNames: childSampleNames,
+        sampleDescs: childSampleDescs
       }
     };
 
@@ -110,6 +110,15 @@ export default function ConfigAction() {
     </ButtonBar>
   );
 
+  const initialConfig = storedRunConfig?.configure ?? {
+    suffixType: TYPE_NUMERIC,
+    numOfChildToCreate: 1,
+    start: "001",
+    identifier: "MATERIAL_SAMPLE_ID"
+  };
+
+  const initialConfigChild = storedRunConfig?.configure_children;
+
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
@@ -119,11 +128,7 @@ export default function ConfigAction() {
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
         <DinaForm
-          initialValues={{
-            suffixType: TYPE_NUMERIC,
-            numOfChildToCreate: 1,
-            start: "001"
-          }}
+          initialValues={{ ...initialConfig, ...initialConfigChild }}
           onSubmit={onSubmit}
         >
           <p>
@@ -271,10 +276,18 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
         </div>
       </div>
       <div className="row">
+        <SelectField
+          className="col-md-2"
+          name="identifier"
+          options={IDENTIFIER_TYPE_OPTIONS.map(({ labelKey, value }) => ({
+            label: formatMessage(labelKey),
+            value
+          }))}
+        />
         <TextField
           className="col-md-2"
           name="baseName"
-          placeholder={`${BASE_NAME}`}
+          placeholder={BASE_NAME}
         />
         {generationMode === "BATCH" && (
           <TextField

@@ -8,8 +8,8 @@ https://code.visualstudio.com/[Visual Studio Code] is recommended for developmen
 
 - https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode[Prettier - Code formatter]: Formats your code when you press shift+alt+f.
 - https://marketplace.visualstudio.com/items?itemName=joaompinto.asciidoctor-vscode[AsciiDoc]: AsciiDoc rich language support.
+- https://marketplace.visualstudio.com/items?itemName=firsttris.vscode-jest-runner[Jest Runner]: Adds Run/Debug buttons to your test files.
 
 ## Browser Extensions
 
-- https://github.com/facebook/react-devtools[React Developer Tools] is a useful browser extension
-that lets you inspect the React component hierarchy.
+- https://github.com/facebook/react-devtools[React Developer Tools] Lets you inspect the React component hierarchy.
