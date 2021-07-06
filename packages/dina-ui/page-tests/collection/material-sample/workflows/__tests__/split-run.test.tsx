@@ -21,6 +21,7 @@ function testMaterialSample(): PersistedResource<MaterialSample>[] {
       type: "material-sample",
       group: "test group",
       dwcCatalogNumber: "my-number",
+      materialSampleName: "parent-sample-name",
       collectingEvent: {
         id: "1",
         type: "collecting-event"
