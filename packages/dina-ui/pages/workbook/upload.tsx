@@ -12,12 +12,15 @@ export default function UploadWorkbookPage() {
     <div>
       <Head title={formatMessage("workbookGroupUploadTitle")} />
       <Nav />
-      <div className="container">
-        <h1>
-          <DinaMessage id="workbookGroupUploadTitle" />
-        </h1>
-        <WorkbookConversion apiClient={apiClient} />
-      </div>
+      <main>
+        <div className="container" style={{ overflowX: "auto" }}>
+          <h1>
+            <DinaMessage id="workbookGroupUploadTitle" />
+          </h1>
+          <WorkbookConversion apiClient={apiClient} />
+        </div>
+      </main>
+
       <Footer />
     </div>
   );

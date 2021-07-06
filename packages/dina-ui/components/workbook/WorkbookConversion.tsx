@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { LoadingSpinner } from "common-ui";
-import { Kitsu } from "kitsu";
+import Kitsu from "kitsu";
 import WorkbookDisplay from "./WorkbookDisplay";
 import WorkbookUpload from "./WorkbookUpload";
 
@@ -9,7 +9,7 @@ interface WorkbookProps {
 }
 
 interface WorkbookStates {
-  jsonData?: string;
+  jsonData?: string[][];
   loading: boolean;
 }
 
@@ -49,7 +49,7 @@ export class WorkbookConversion extends Component<
       .post("/objectstore-api/conversion/workbook", formData)
       .then(response => {
         this.setState({
-          jsonData: JSON.stringify(response.data),
+          jsonData: response.data,
           loading: false
         });
       });
@@ -71,8 +71,6 @@ export class WorkbookConversion extends Component<
         return <WorkbookUpload submitData={this.submitFile} />;
       }
     }
-
-    return <div />;
   }
 }
 
