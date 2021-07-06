@@ -7,23 +7,21 @@ import { IndexGridProps } from "./IndexGrid";
 export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
   const [lastSave, setLastSave] = useState<number>();
 
-  const {
-    loading: libraryPrepsLoading,
-    response: libraryPrepsResponse
-  } = useQuery<LibraryPrep[]>(
-    {
-      fields: {
-        ngsIndex: "name",
-        molecularSample: "name"
+  const { loading: libraryPrepsLoading, response: libraryPrepsResponse } =
+    useQuery<LibraryPrep[]>(
+      {
+        fields: {
+          ngsIndex: "name",
+          molecularSample: "name"
+        },
+        include: "molecularSample,indexI5,indexI7",
+        page: { limit: 1000 },
+        path: `seqdb-api/library-prep-batch/${libraryPrepBatch.id}/libraryPreps`
       },
-      include: "molecularSample,indexI5,indexI7",
-      page: { limit: 1000 },
-      path: `seqdb-api/libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`
-    },
-    {
-      deps: [lastSave]
-    }
-  );
+      {
+        deps: [lastSave]
+      }
+    );
 
   const onSubmit: DinaFormOnSubmit = async ({
     api: { save },
@@ -41,7 +39,7 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
       for (const prep of colPreps) {
         if (prep.id) {
           const edit = edits[prep.id] || {};
-          edit.indexI7 = { id: index.id, type: "ngsIndex" } as NgsIndex;
+          edit.indexI7 = { id: index.id, type: "ngs-index" } as NgsIndex;
           edits[prep.id] = edit;
         }
       }
@@ -54,15 +52,15 @@ export function useIndexGridControls({ libraryPrepBatch }: IndexGridProps) {
       for (const prep of rowPreps) {
         if (prep.id) {
           const edit = edits[prep.id] || {};
-          edit.indexI5 = { id: index.id, type: "ngsIndex" } as NgsIndex;
+          edit.indexI5 = { id: index.id, type: "ngs-index" } as NgsIndex;
           edits[prep.id] = edit;
         }
       }
     }
 
     const saveOps: SaveArgs[] = toPairs(edits).map(([id, prepEdit]) => ({
-      resource: { id, type: "libraryPrep", ...prepEdit },
-      type: "libraryPrep"
+      resource: { id, type: "library-prep", ...prepEdit },
+      type: "library-prep"
     }));
 
     await save(saveOps, { apiBaseUrl: "/seqdb-api" });

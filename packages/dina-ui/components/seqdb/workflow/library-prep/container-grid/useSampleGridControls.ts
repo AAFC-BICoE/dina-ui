@@ -52,72 +52,70 @@ export function useSampleGridControls({
   });
 
   // Library prep and sample queries.
-  const {
-    loading: libraryPrepsLoading,
-    response: libraryPrepsResponse
-  } = useQuery<LibraryPrep[]>(
-    {
-      // Optimize query speed by reducing the amount of requested fields.
-      fields: {
-        molecularSample: "name"
+  const { loading: libraryPrepsLoading, response: libraryPrepsResponse } =
+    useQuery<LibraryPrep[]>(
+      {
+        // Optimize query speed by reducing the amount of requested fields.
+        fields: {
+          molecularSample: "name"
+        },
+        include: "molecularSample",
+        page: { limit: 1000 },
+        path: `seqdb-api/library-prep-batch/${libraryPrepBatch.id}/libraryPreps`
       },
-      include: "molecularSample",
-      page: { limit: 1000 },
-      path: `seqdb-api/libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`
-    },
-    {
-      deps: [lastSave],
-      onSuccess: async ({ data: libraryPreps }) => {
-        setSamplesLoading(true);
+      {
+        deps: [lastSave],
+        onSuccess: async ({ data: libraryPreps }) => {
+          setSamplesLoading(true);
 
-        const libraryPrepsWithCoords = libraryPreps.filter(
-          prep => prep.wellRow && prep.wellColumn
-        );
+          const libraryPrepsWithCoords = libraryPreps.filter(
+            prep => prep.wellRow && prep.wellColumn
+          );
 
-        const newCellGrid: CellGrid = {};
-        for (const {
-          wellRow,
-          wellColumn,
-          molecularSample
-        } of libraryPrepsWithCoords) {
-          newCellGrid[`${wellRow}_${wellColumn}`] = molecularSample;
+          const newCellGrid: CellGrid = {};
+          for (const {
+            wellRow,
+            wellColumn,
+            molecularSample
+          } of libraryPrepsWithCoords) {
+            newCellGrid[`${wellRow}_${wellColumn}`] = molecularSample;
+          }
+
+          const sampleIdsWithCoords = libraryPrepsWithCoords
+            .map(prep => prep.molecularSample.id)
+            .join();
+
+          const { data: selectionStepSrsNoCoords } = await apiClient.get<
+            SampleStepResource[]
+          >("seqdb-api/step-resource", {
+            // Get all the sample stepResources from the sample selection step that have no coords.
+            fields: {
+              molecularSample: "name"
+            },
+            filter: {
+              "chain.uuid": chain.id as string,
+              "chainStepTemplate.uuid": sampleSelectionStep.id as string,
+              rsql: `molecularSample.uuid=out=(${
+                sampleIdsWithCoords || "00000000-0000-0000-0000-000000000000"
+              })`
+            },
+            include: "molecularSample",
+            page: { limit: 1000 }
+          });
+
+          const newAvailableSamples = selectionStepSrsNoCoords
+            .map(sr => sr.molecularSample)
+            .sort(sampleSort);
+
+          setGridState({
+            availableSamples: newAvailableSamples,
+            cellGrid: newCellGrid,
+            movedSamples: []
+          });
+          setSamplesLoading(false);
         }
-
-        const sampleIdsWithCoords = libraryPrepsWithCoords
-          .map(prep => prep.molecularSample.id)
-          .join();
-
-        const { data: selectionStepSrsNoCoords } = await apiClient.get<
-          SampleStepResource[]
-        >("seqdb-api/stepResource", {
-          // Get all the sample stepResources from the sample selection step that have no coords.
-          fields: {
-            molecularSample: "name"
-          },
-          filter: {
-            "chain.uuid": chain.id as string,
-            "chainStepTemplate.uuid": sampleSelectionStep.id as string,
-            rsql: `molecularSample.uuid=out=(${
-              sampleIdsWithCoords || "00000000-0000-0000-0000-000000000000"
-            })`
-          },
-          include: "molecularSample",
-          page: { limit: 1000 }
-        });
-
-        const newAvailableSamples = selectionStepSrsNoCoords
-          .map(sr => sr.molecularSample)
-          .sort(sampleSort);
-
-        setGridState({
-          availableSamples: newAvailableSamples,
-          cellGrid: newCellGrid,
-          movedSamples: []
-        });
-        setSamplesLoading(false);
       }
-    }
-  );
+    );
 
   function moveSamples(samples: MolecularSample[], coords?: string) {
     setGridState(({ availableSamples, cellGrid, movedSamples }) => {
@@ -133,10 +131,8 @@ export function useSampleGridControls({
       if (coords) {
         const [rowLetter, colNumberString] = coords.split("_");
         const rowNumber = rowLetter.charCodeAt(0) - 64;
-        const {
-          numberOfColumns,
-          numberOfRows
-        } = libraryPrepBatch.containerType as ContainerType;
+        const { numberOfColumns, numberOfRows } =
+          libraryPrepBatch.containerType as ContainerType;
 
         let newCellNumber =
           fillMode === "ROW"
@@ -261,7 +257,7 @@ export function useSampleGridControls({
           : {
               libraryPrepBatch,
               molecularSample: movedSample,
-              type: "libraryPrep"
+              type: "library-prep"
             };
 
         let newWellColumn: number | null = null;
@@ -280,7 +276,7 @@ export function useSampleGridControls({
 
       const saveArgs = libraryPrepsToSave.map(prep => ({
         resource: prep,
-        type: "libraryPrep"
+        type: "library-prep"
       }));
 
       await save(saveArgs, { apiBaseUrl: "/seqdb-api" });

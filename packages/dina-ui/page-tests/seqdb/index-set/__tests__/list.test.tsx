@@ -9,12 +9,12 @@ const TEST_INDEX_SETS: IndexSet[] = [
   {
     id: "1",
     name: "index set 1",
-    type: "indexSet"
+    type: "index-set"
   },
   {
     id: "2",
     name: "index set 2",
-    type: "indexSet"
+    type: "index-set"
   }
 ];
 

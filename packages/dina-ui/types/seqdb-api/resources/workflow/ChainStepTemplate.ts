@@ -3,6 +3,7 @@ import { ChainTemplate } from "./ChainTemplate";
 import { StepTemplate } from "./StepTemplate";
 
 export interface ChainStepTemplateAttributes {
+  type: "chain-step-template";
   stepNumber: number;
 }
 

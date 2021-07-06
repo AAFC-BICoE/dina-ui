@@ -26,17 +26,17 @@ export function useLibraryPoolingSelectionControls({
       item => ({
         libraryPool,
         pooledLibraryPool:
-          item.type === "libraryPool" ? item : ({ id: null } as any),
+          item.type === "library-pool" ? item : ({ id: null } as any),
         pooledLibraryPrepBatch:
-          item.type === "libraryPrepBatch" ? item : ({ id: null } as any),
-        type: "libraryPoolContent"
+          item.type === "library-prep-batch" ? item : ({ id: null } as any),
+        type: "library-pool-content"
       })
     );
 
     await save(
       newLibraryPoolContents.map(lpc => ({
         resource: lpc,
-        type: "libraryPoolContent"
+        type: "library-pool-content"
       })),
       { apiBaseUrl: "/seqdb-api" }
     );
@@ -63,14 +63,14 @@ export function useLibraryPoolingSelectionControls({
         id =>
           ({
             id,
-            type: "libraryPool"
+            type: "library-pool"
           } as LibraryPool)
       ),
       ...libraryPrepBatchIds.map<LibraryPrepBatch>(
         id =>
           ({
             id,
-            type: "libraryPrepBatch"
+            type: "library-prep-batch"
           } as LibraryPrepBatch)
       )
     ];
@@ -84,10 +84,10 @@ export function useLibraryPoolingSelectionControls({
   async function deleteLibraryPoolContents(items: LibraryPoolContent[]) {
     const operations = items.map(item => ({
       op: "DELETE" as OperationVerb,
-      path: `libraryPoolContent/${item.id}`,
+      path: `library-pool-content/${item.id}`,
       value: {
         id: item.id as string,
-        type: "libraryPoolContent"
+        type: "library-pool-content"
       }
     }));
 
@@ -110,7 +110,7 @@ export function useLibraryPoolingSelectionControls({
       id =>
         ({
           id,
-          type: "libraryPoolContent"
+          type: "library-pool-content"
         } as LibraryPoolContent)
     );
 

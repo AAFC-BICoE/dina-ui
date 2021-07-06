@@ -11,7 +11,7 @@ jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async path => {
   // The get request will return the existing profile.
-  if (path === "seqdb-api/thermocyclerprofile/100") {
+  if (path === "seqdb-api/thermocycler-profile/100") {
     // The request for the profile returns the test profile.
     return { data: TEST_PROFILE };
   } else {
@@ -43,7 +43,7 @@ describe("PcrProfile edit page", () => {
         {
           data: {
             id: "1",
-            type: "thermocyclerprofile"
+            type: "thermocycler-profile"
           },
           status: 201
         }
@@ -69,14 +69,14 @@ describe("PcrProfile edit page", () => {
         [
           {
             op: "POST",
-            path: "thermocyclerprofile",
+            path: "thermocycler-profile",
             value: {
               attributes: {
                 group: "aafc",
                 name: "New PcrProfile"
               },
               id: "00000000-0000-0000-0000-000000000000",
-              type: "thermocyclerprofile"
+              type: "thermocycler-profile"
             }
           }
         ],
@@ -131,7 +131,7 @@ describe("PcrProfile edit page", () => {
         {
           data: {
             id: "1",
-            type: "thermocyclerprofile"
+            type: "thermocycler-profile"
           },
           status: 201
         }
@@ -172,7 +172,7 @@ describe("PcrProfile edit page", () => {
         [
           {
             op: "PATCH",
-            path: "thermocyclerprofile/1",
+            path: "thermocycler-profile/1",
             value: {
               attributes: expect.objectContaining({
                 application: "new app value",
@@ -185,7 +185,7 @@ describe("PcrProfile edit page", () => {
                   data: expect.objectContaining({ id: "2", type: "region" })
                 }
               },
-              type: "thermocyclerprofile"
+              type: "thermocycler-profile"
             }
           }
         ],
@@ -229,5 +229,5 @@ const TEST_PROFILE: Required<PcrProfile> = {
   step7: null,
   step8: null,
   step9: null,
-  type: "thermocyclerprofile"
+  type: "thermocycler-profile"
 };

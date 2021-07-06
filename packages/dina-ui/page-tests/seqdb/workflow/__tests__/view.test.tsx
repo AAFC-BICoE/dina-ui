@@ -42,7 +42,7 @@ describe("Workflow view page", () => {
             chainTemplate: {
               id: "1000",
               name: "test workflow template",
-              type: "chainTemplate"
+              type: "chain-template"
             },
             createdOn: "2019-11-20",
             id: "123",
@@ -51,7 +51,7 @@ describe("Workflow view page", () => {
           } as Chain
         };
       }
-      if (path === "seqdb-api/chainStepTemplate") {
+      if (path === "seqdb-api/chain-step-template") {
         return {
           data: [
             {
@@ -61,9 +61,9 @@ describe("Workflow view page", () => {
                 id: "1",
                 name: "step number 1",
                 outputs: ["TEST_OUTPUT"],
-                type: "stepTemplate"
+                type: "step-template"
               },
-              type: "chainStepTemplate"
+              type: "chain-step-template"
             },
             {
               id: "2",
@@ -72,9 +72,9 @@ describe("Workflow view page", () => {
                 id: "2",
                 name: "step number 2",
                 outputs: ["TEST_OUTPUT"],
-                type: "stepTemplate"
+                type: "step-template"
               },
-              type: "chainStepTemplate"
+              type: "chain-step-template"
             },
             {
               id: "3",
@@ -83,9 +83,9 @@ describe("Workflow view page", () => {
                 id: "3",
                 name: "step number 3",
                 outputs: ["TEST_OUTPUT"],
-                type: "stepTemplate"
+                type: "step-template"
               },
-              type: "chainStepTemplate"
+              type: "chain-step-template"
             }
           ] as ChainStepTemplate[]
         };

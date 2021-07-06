@@ -34,7 +34,7 @@ export function LibraryPoolDetailsForm({
       [
         {
           resource: submittedValues,
-          type: "libraryPool"
+          type: "library-pool"
         }
       ],
       { apiBaseUrl: "/seqdb-api" }
@@ -46,7 +46,7 @@ export function LibraryPoolDetailsForm({
         chain,
         chainStepTemplate: step,
         libraryPool: savedLibraryPool as LibraryPool,
-        type: "stepResource",
+        type: "step-resource",
         value: "LIBRARY_POOL"
       };
 
@@ -54,7 +54,7 @@ export function LibraryPoolDetailsForm({
         [
           {
             resource: newStepResource,
-            type: "stepResource"
+            type: "step-resource"
           }
         ],
         { apiBaseUrl: "/seqdb-api" }

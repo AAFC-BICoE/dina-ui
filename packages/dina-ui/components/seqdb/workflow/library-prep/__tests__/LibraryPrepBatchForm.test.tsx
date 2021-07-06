@@ -19,7 +19,7 @@ function getWrapper(propsOverride = {}) {
   return mountWithAppContext(
     <LibraryPrepBatchForm
       chain={{ id: "5", type: "chain" } as Chain}
-      step={{ id: "10", type: "chainStepTemplate" } as ChainStepTemplate}
+      step={{ id: "10", type: "chain-step-template" } as ChainStepTemplate}
       onSuccess={mockOnSuccess}
       {...propsOverride}
     />,
@@ -35,11 +35,11 @@ describe("Library Prep Batch form", () => {
   it("Lets you create a new library prep batch.", async () => {
     // Mock success response:
     mockSave.mockImplementation(async ops => {
-      if (ops[0].type === "libraryPrepBatch") {
-        return [{ id: "2", type: "libraryPrepBatch" }];
+      if (ops[0].type === "library-prep-batch") {
+        return [{ id: "2", type: "library-prep-batch" }];
       }
-      if (ops[0].type === "stepResource") {
-        return [{ id: "100", type: "stepResource" }];
+      if (ops[0].type === "step-resource") {
+        return [{ id: "100", type: "step-resource" }];
       }
     });
 
@@ -63,7 +63,7 @@ describe("Library Prep Batch form", () => {
             resource: {
               totalLibraryYieldNm: 2.5
             },
-            type: "libraryPrepBatch"
+            type: "library-prep-batch"
           }
         ],
         { apiBaseUrl: "/seqdb-api" }
@@ -78,16 +78,16 @@ describe("Library Prep Batch form", () => {
               },
               chainStepTemplate: {
                 id: "10",
-                type: "chainStepTemplate"
+                type: "chain-step-template"
               },
               libraryPrepBatch: {
                 id: "2",
-                type: "libraryPrepBatch"
+                type: "library-prep-batch"
               },
-              type: "stepResource",
+              type: "step-resource",
               value: "LIBRARY_PREP_BATCH"
             },
-            type: "stepResource"
+            type: "step-resource"
           }
         ],
         { apiBaseUrl: "/seqdb-api" }
@@ -100,8 +100,8 @@ describe("Library Prep Batch form", () => {
   it("Lets you edit an existing library prep batch.", async () => {
     // Mock success response:
     mockSave.mockImplementation(async ops => {
-      if (ops[0].type === "libraryPrepBatch") {
-        return [{ id: "2", type: "libraryPrepBatch" }];
+      if (ops[0].type === "library-prep-batch") {
+        return [{ id: "2", type: "library-prep-batch" }];
       }
     });
 
@@ -110,7 +110,7 @@ describe("Library Prep Batch form", () => {
         id: "2",
         notes: "test notes",
         totalLibraryYieldNm: 2.5,
-        type: "libraryPrepBatch"
+        type: "library-prep-batch"
       }
     });
 
@@ -151,9 +151,9 @@ describe("Library Prep Batch form", () => {
                 type: "protocol"
               },
               totalLibraryYieldNm: 2.5,
-              type: "libraryPrepBatch"
+              type: "library-prep-batch"
             },
-            type: "libraryPrepBatch"
+            type: "library-prep-batch"
           }
         ],
         { apiBaseUrl: "/seqdb-api" }

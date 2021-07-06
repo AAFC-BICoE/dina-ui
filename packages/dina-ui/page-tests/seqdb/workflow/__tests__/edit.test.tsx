@@ -29,7 +29,7 @@ const apiContext: any = {
 };
 
 const TEST_WORKFLOW: Chain = {
-  chainTemplate: { id: "1", type: "chainTemplate" } as ChainTemplate,
+  chainTemplate: { id: "1", type: "chain-template" } as ChainTemplate,
   createdOn: "2019-08-16",
   id: "5",
   name: "Mat's chain",
@@ -65,10 +65,12 @@ describe("Workflow edit page.", () => {
     wrapper.update();
 
     // Input form data.
-    (wrapper
-      .find(".chainTemplate-field")
-      .find(ResourceSelect)
-      .prop("onChange") as any)({
+    (
+      wrapper
+        .find(".chainTemplate-field")
+        .find(ResourceSelect)
+        .prop("onChange") as any
+    )({
       id: "1",
       type: "chainTemplate"
     });
