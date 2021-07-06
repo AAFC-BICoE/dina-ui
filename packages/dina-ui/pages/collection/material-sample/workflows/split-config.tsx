@@ -7,7 +7,7 @@ import {
   SelectField,
   SubmitButton,
   TextField
-} from "common-ui";
+} from "../../../../../common-ui";
 import { Field } from "formik";
 import { padStart, range } from "lodash";
 import { useRouter } from "next/router";
@@ -18,6 +18,7 @@ import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
 import { Head } from "../../../../../dina-ui/components/head";
 import {
   BASE_NAME,
+  IDENTIFIER_TYPE_OPTIONS,
   MaterialSampleRunConfig,
   NUMERIC_UPPER_LIMIT,
   START,
@@ -25,15 +26,6 @@ import {
   TYPE_NUMERIC
 } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
-
-/* Config action related fields */
-interface RunConfig {
-  numOfChildToCreate: number;
-  baseName: string;
-  start: string;
-  sufficType: string;
-  customChildSample?: { index: number; name: string; description: string }[];
-}
 
 /* Props for computing suffix */
 export interface ComputeSuffixProps {
@@ -48,11 +40,10 @@ export const SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY =
 export default function ConfigAction() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
-
-  const [_, setSplitChildSampleRunConfig] = useLocalStorage<
-    MaterialSampleRunConfig | null | undefined
-  >(SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY);
-
+  const [splitChildSampleRunConfig, setSplitChildSampleRunConfig] =
+    useLocalStorage<MaterialSampleRunConfig | null | undefined>(
+      SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
+    );
   type SuffixOptions = typeof TYPE_NUMERIC | typeof TYPE_LETTER;
 
   const TYPE_OPTIONS: { label: string; value: SuffixOptions }[] = [
@@ -74,20 +65,19 @@ export default function ConfigAction() {
   );
 
   const onSubmit = async ({ submittedValues: configActionFields }) => {
-    // record the customized user entry if there is any name or description provided
-    const sampleNames: any = [];
-    const sampleDescs: any = [];
-    if (configActionFields.sampleName || configActionFields.description) {
-      for (let i = 0; i < configActionFields.numOfChildToCreate; i++) {
-        sampleNames.push(configActionFields.sampleName?.[i]);
-        sampleDescs.push(configActionFields.description?.[i]);
-      }
+    const childSampleNames: string[] = [];
+    const childSampleDescs: string[] = [];
+    for (let i = 0; i < configActionFields.numOfChildToCreate; i++) {
+      childSampleNames.push(configActionFields?.sampleName?.[i]);
+      childSampleDescs.push(configActionFields?.sampleDesc?.[i]);
     }
+
     const runConfig: MaterialSampleRunConfig = {
       metadata: {
         actionRemarks: configActionFields.remarks
       },
       configure: {
+        identifier: configActionFields.identifier,
         numOfChildToCreate:
           configActionFields.numOfChildToCreate ??
           configActionFields.numOfChildToCreate,
@@ -97,8 +87,8 @@ export default function ConfigAction() {
         destroyOriginal: configActionFields.destroyOriginal
       },
       configure_children: {
-        sampleNames,
-        sampleDescs
+        sampleNames: childSampleNames,
+        sampleDescs: childSampleDescs
       }
     };
 
@@ -115,6 +105,15 @@ export default function ConfigAction() {
     </ButtonBar>
   );
 
+  const initialConfig = splitChildSampleRunConfig?.configure ?? {
+    suffixType: TYPE_NUMERIC,
+    numOfChildToCreate: 1,
+    start: "001",
+    identifier: "MATERIAL_SAMPLE_ID"
+  };
+
+  const initialConfigChild = splitChildSampleRunConfig?.configure_children;
+
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
@@ -124,11 +123,7 @@ export default function ConfigAction() {
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
         <DinaForm
-          initialValues={{
-            suffixType: TYPE_NUMERIC,
-            numOfChildToCreate: 1,
-            start: "001"
-          }}
+          initialValues={{ ...initialConfig, ...initialConfigChild }}
           onSubmit={onSubmit}
         >
           <p>
@@ -169,13 +164,22 @@ export default function ConfigAction() {
               </div>
             </div>
             <div className="row">
+              <SelectField
+                className="col-md-2"
+                name="identifier"
+                options={IDENTIFIER_TYPE_OPTIONS.map(({ labelKey, value }) => ({
+                  label: formatMessage(labelKey),
+                  value
+                }))}
+              />
+
               <TextField
                 className="col-md-2"
                 name="baseName"
                 placeholder={`${BASE_NAME}`}
               />
               <SelectField
-                className="col-md-2"
+                className="col-md-2 suffixType"
                 name="suffixType"
                 options={TYPE_OPTIONS}
                 onChange={(newType, formik) =>
