@@ -211,6 +211,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeType_integer_label: "Numerical",
   field_managedAttributeType_picklist_label: "Pick List",
   field_managedAttributeType_text_label: "Text",
+  field_materialSample_identifierType_materialSampleId_label:
+    "Material Sample ID",
+  field_materialSample_identifierType_catalogueNumber_label: "Catalogue Number",
   field_materialSampleName: "Material Sample ID",
   "field_materialSampleType.name": "Material Sample Type",
   "field_materialSampleType.uuid": "Material Sample Type",
@@ -240,6 +243,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   forTestingPurposesOnlyMessage:
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
   formNavigation: "Form Navigation",
+  generateBatch: "Generate Batch",
+  generateSeries: "Generate Series",
   geoReferencing: "Geo-Referencing",
   geoReferencingLegend: "Georeferencing",
   geographyLegend: "Geography (Places)",
@@ -374,6 +379,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   storageUnitTypeViewTitle: "Storage Unit Type",
   storageUnitViewTitle: "Storage Unit",
   storagesCreatedByMe: "Storages Created By Me",
+  suffixOptional: "Suffix (Optional)",
   switchToActionType: 'Switch to "{actionType}".',
   templateNameMandatoryErrorMsg: "Please enter a workflow template name.",
   thisWillRemoveYourTemplate:

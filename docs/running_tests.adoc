@@ -1,0 +1,15 @@
+= Running Tests
+
+== Run all tests
+
+Run `yarn test` from the top-level dina-ui repo.
+
+== Run individual tests
+
+Either 
+
+* From VS Code: Install the https://marketplace.visualstudio.com/items?itemName=firsttris.vscode-jest-runner[Jest Runner] extension, which adds Run/Debug buttons to your test files.
+
+* From the command line:
+** Using just the file name: `yarn jest QueryTable.test.tsx`
+** Using the full path (when there is more than one file with this name): `yarn jest packages/common-ui/lib/table/__tests__/QueryTable.test.tsx`
