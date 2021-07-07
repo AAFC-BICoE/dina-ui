@@ -4,13 +4,9 @@
   "scripts": {
     "build": "run-s next:build next:export",
     "dev": "next",
-    "lint": "tslint --project tsconfig.json",
-    "lint:fix": "tslint --project tsconfig.json --fix",
     "next": "next",
     "next:build": "node --require ./next.config.js ../../node_modules/.bin/next build",
     "next:export": "node --require ./next.config.js ../../node_modules/.bin/next export",
-    "test": "tsc && jest",
-    "test:coverage": "tsc && jest --coverage",
     "a11y-check": "pa11y-ci -j > pa11y-result.json",
     "a11y-generate-report": "pa11y-ci-reporter-html -s pa11y-result.json --destination ./pa11y-html-report"
   },
@@ -32,15 +28,5 @@
   },
   "devDependencies": {
     "@types/bytes": "^3.1.0"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "tslint --project tsconfig.json --fix",
-      "git add"
-    ],
-    "*.{js,jsx,css,json,md}": [
-      "prettier --write",
-      "git add"
-    ]
   }
 }

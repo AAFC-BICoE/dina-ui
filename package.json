@@ -1,5 +1,5 @@
 {
-  "name": "dina-ui",
+  "name": "dina-ui-monorepo",
   "private": true,
   "workspaces": {
     "packages": [
@@ -8,10 +8,10 @@
   },
   "scripts": {
     "docs": "asciidoctor -a copycss -a toc=left --safe-mode unsafe --destination-dir ./generated-docs ./docs/index.adoc",
-    "lint": "yarn workspaces run lint",
-    "lint:fix": "yarn workspaces run lint:fix",
-    "test": "yarn workspaces run test",
-    "test:coverage": "yarn workspaces run test:coverage",
+    "lint": "tslint --project tsconfig.json",
+    "lint:fix": "tslint --project tsconfig.json --fix",
+    "test": "tsc && jest",
+    "test:coverage": "tsc && jest --coverage",
     "prepare": "husky install"
   },
   "devDependencies": {
@@ -51,5 +51,15 @@
     "**/react-file-viewer/**/underscore": "^1.13.1",
     "**/react-file-viewer/**/lodash": "^4.17.21",
     "**/type-fest": "^1.0.2"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "tslint --project tsconfig.json --fix",
+      "git add"
+    ],
+    "*.{js,jsx,css,json,md}": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }
