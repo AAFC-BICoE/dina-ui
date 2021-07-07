@@ -70,7 +70,7 @@ services:
         -Dspring.datasource.password=p
         -Dspring.liquibase.user=postgres
         -Dspring.liquibase.password=p
-        -Dspring.liquibase.contexts=schema-change,sample-data
+        -Dspring.liquibase.contexts=schema-change,initial-data,sample-data
         -Dkeycloak.enabled=true
         -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
       \"
@@ -177,6 +177,7 @@ services:
         -Dspring.datasource.continue-on-error=true
         -Dspring.liquibase.user=postgres
         -Dspring.liquibase.password=p
+        -Dspring.jpa.show-sql=true
         -Dkeycloak.enabled=true
         -Dkeycloak.resource=dina
         -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
