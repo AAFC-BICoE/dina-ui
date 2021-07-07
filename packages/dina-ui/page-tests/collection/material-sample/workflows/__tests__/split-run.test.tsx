@@ -69,6 +69,7 @@ const apiContext = {
 const testSeriesModeRunConfig: MaterialSampleRunConfig = {
   metadata: { actionRemarks: "Remarks on this run config" },
   configure: {
+    identifier: "MATERIAL_SAMPLE_ID",
     generationMode: "SERIES",
     numOfChildToCreate: 1,
     baseName: "CustomParentName",
@@ -82,6 +83,7 @@ const testSeriesModeRunConfig: MaterialSampleRunConfig = {
 const testBatchModeRunConfig: MaterialSampleRunConfig = {
   metadata: { actionRemarks: "Remarks on this run config" },
   configure: {
+    identifier: "MATERIAL_SAMPLE_ID",
     generationMode: "BATCH",
     numOfChildToCreate: 2,
     baseName: "CustomParentName",

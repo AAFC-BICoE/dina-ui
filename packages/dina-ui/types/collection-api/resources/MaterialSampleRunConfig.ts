@@ -7,7 +7,7 @@ export interface MaterialSampleRunConfigMetadata {
 }
 
 export interface MaterialSampleRunConfigConfiguration {
-  identifier: string;
+  identifier: IdentifierType;
   numOfChildToCreate: number;
   baseName: string;
 
