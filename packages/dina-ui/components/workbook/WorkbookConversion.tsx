@@ -9,9 +9,23 @@ interface WorkbookProps {
 }
 
 interface WorkbookStates {
-  jsonData?: string[][];
+  jsonData: WorkbookJSON | null;
   loading: boolean;
 }
+
+/**
+ * Data returned from the Excel to JSON API from the object store module API.
+ */
+export interface WorkbookRow {
+  id: number;
+  rowNumber: number;
+  content: string[];
+}
+
+/**
+ * JSON workbook contains an array of rows, defined as a Workbook Row.
+ */
+export interface WorkbookJSON extends Array<WorkbookRow> {}
 
 /**
  * The parent component used for the workbook conversion task.
@@ -23,9 +37,9 @@ export class WorkbookConversion extends Component<
   constructor(props: WorkbookProps) {
     super(props);
 
-    // Configure default states.
     this.state = {
-      loading: false
+      loading: false,
+      jsonData: null
     };
   }
 
@@ -55,6 +69,16 @@ export class WorkbookConversion extends Component<
       });
   };
 
+  /**
+   * Back button functionality will reset the state to display the upload component.
+   */
+  backToUpload() {
+    this.setState({
+      loading: false,
+      jsonData: null
+    });
+  }
+
   render() {
     // Deconstruct the states.
     const { loading, jsonData } = this.state;
@@ -66,7 +90,9 @@ export class WorkbookConversion extends Component<
     } else {
       // If the json data is provided, display the JSON as a table. Otherwise display the uploading component.
       if (jsonData) {
-        return <WorkbookDisplay jsonData={jsonData} />;
+        return (
+          <WorkbookDisplay jsonData={jsonData} backButton={this.backToUpload} />
+        );
       } else {
         return <WorkbookUpload submitData={this.submitFile} />;
       }

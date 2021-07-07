@@ -1,4 +1,4 @@
-import react, { Component } from "react";
+import { Component } from "react";
 import Dropzone from "react-dropzone-uploader";
 
 interface WorkbookUploadProps {
