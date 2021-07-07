@@ -211,12 +211,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeType_integer_label: "Numerical",
   field_managedAttributeType_picklist_label: "Pick List",
   field_managedAttributeType_text_label: "Text",
-  field_materialSample_identifierType_materialSampleId_label:
-    "Material Sample ID",
-  field_materialSample_identifierType_catalogueNumber_label: "Catalogue Number",
   field_materialSampleName: "Material Sample ID",
   "field_materialSampleType.name": "Material Sample Type",
   "field_materialSampleType.uuid": "Material Sample Type",
+  field_materialSample_identifierType_catalogueNumber_label: "Catalogue Number",
+  field_materialSample_identifierType_materialSampleId_label:
+    "Material Sample ID",
   field_notPubliclyReleasableReason: "Not Publicly Releasable Reason",
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
@@ -272,8 +272,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeValueLabel: "Value",
   materialSample: "Material Sample",
   materialSampleAttachments: "Material Sample Attachments",
-  materialSampleManagedAttributes: "Material Sample Managed Attributes",
   materialSampleListTitle: "Material Samples",
+  materialSampleManagedAttributes: "Material Sample Managed Attributes",
   materialSampleTypeListTitle: "Material Sample Types",
   materialSampleTypeViewTitle: "Material Sample Type",
   materialSampleViewTitle: "Material Sample",
