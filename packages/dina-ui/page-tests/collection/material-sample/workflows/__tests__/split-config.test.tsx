@@ -3,7 +3,6 @@ import {
   START,
   TYPE_NUMERIC
 } from "../../../../../../dina-ui/types/collection-api";
-import Select from "react-select";
 import ConfigAction, {
   SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
 } from "../../../../../pages/collection/material-sample/workflows/split-config";
@@ -42,8 +41,10 @@ describe("MaterialSample split workflow series-mode run config", () => {
 
     expect(wrapper.find(".start-field input").prop("value")).toEqual(START);
 
-    const { value } = wrapper.find(Select).props();
-    expect(value.value).toEqual(TYPE_NUMERIC);
+    expect(wrapper.find(".suffixType-field Select").prop("value")).toEqual({
+      label: "Numerical",
+      value: TYPE_NUMERIC
+    });
   });
 
   it("Creates a new Material Sample workfow series-mode run config with user custom entries", async () => {
@@ -93,7 +94,7 @@ describe("MaterialSample split workflow series-mode run config", () => {
     );
   });
 
-  it("Creates a new Material Sample workfow series-mode run config with user custom entries", async () => {
+  it("Creates a new Material Sample workfow batch-mode run config with user custom entries", async () => {
     const wrapper = mountWithAppContext(<ConfigAction />, {});
 
     // Switch to the "Batch" tab:
@@ -130,6 +131,7 @@ describe("MaterialSample split workflow series-mode run config", () => {
       configure: {
         baseName: "TestBaseName",
         generationMode: "BATCH",
+        identifier: "MATERIAL_SAMPLE_ID",
         numOfChildToCreate: 3,
         suffix: "TestSuffix"
       },
