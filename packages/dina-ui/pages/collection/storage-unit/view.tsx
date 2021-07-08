@@ -42,14 +42,6 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
   async function moveAllContentToNewContainer(submittedValues) {
     const parentUnit = submittedValues.parentStorageUnit;
     const children = storageUnit?.storageUnitChildren;
-    children?.map(child => {
-      child.parentStorageUnit = parentUnit;
-      return {
-        resource: child,
-        type: "storage-unit"
-      };
-    });
-
     // Set first level children to new parent
     if (children) {
       await save(
@@ -62,9 +54,12 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
             }))
           };
           delete child.storageUnitChildren;
-          child.parentStorageUnit = parentUnit;
           return {
-            resource: child,
+            resource: {
+              type: child.type,
+              id: child.id,
+              parentStorageUnit: parentUnit
+            },
             type: "storage-unit"
           };
         }) as any,
