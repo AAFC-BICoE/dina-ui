@@ -34,7 +34,7 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
       path: `collection-api/storage-unit/${id}`,
       include: "storageUnitChildren,parentStorageUnit,storageUnitType"
     },
-    { deps: [parent] }
+    { deps: [parent?.id] }
   );
 
   const storageUnit = StorageUnitQuery.response?.data;
