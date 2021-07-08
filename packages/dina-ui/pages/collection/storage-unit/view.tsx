@@ -61,7 +61,9 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
     const exclusionNames: string[] = [];
     function setExclusionContainerNames(container: StorageUnit) {
       exclusionNames.push(container.name);
-      children?.map(child => setExclusionContainerNames(child));
+      container.storageUnitChildren?.map(child =>
+        setExclusionContainerNames(child)
+      );
     }
 
     setExclusionContainerNames(storageUnit as any);
