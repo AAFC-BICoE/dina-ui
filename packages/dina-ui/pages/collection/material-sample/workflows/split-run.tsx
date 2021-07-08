@@ -272,6 +272,7 @@ export default function SplitRunAction() {
                                   className="flex-grow-1 mx-1"
                                 />
                                 <MaterialSampleIdentifiersFormLayout
+                                  disableSampleName={true}
                                   namePrefix={commonRoot}
                                   className="flex-grow-1"
                                   sampleNamePlaceHolder={computeDefaultSampleName(
