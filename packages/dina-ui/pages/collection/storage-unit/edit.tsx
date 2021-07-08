@@ -4,6 +4,8 @@ import {
   DateField,
   DinaForm,
   DinaFormSubmitParams,
+  filterBy,
+  ResourceSelectField,
   SubmitButton,
   TextField,
   useDinaFormContext,
@@ -20,7 +22,7 @@ import {
   StorageTreeListField
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { StorageUnit } from "../../../types/collection-api";
+import { StorageUnit, StorageUnitType } from "../../../types/collection-api";
 
 export function useStorageUnit(id?: string) {
   return useQuery<StorageUnit>(
@@ -126,6 +128,15 @@ export function StorageUnitFormFields() {
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
+        <ResourceSelectField<StorageUnitType>
+          className="col-md-6"
+          model="collection-api/storage-unit-type"
+          name="storageUnitType"
+          optionLabel={it => it.name}
+          filter={input => ({
+            ...filterBy(["name"])(input)
+          })}
+        />
       </div>
       {readOnly && (
         <StorageTreeListField parentId={initialValues.id} disabled={true} />

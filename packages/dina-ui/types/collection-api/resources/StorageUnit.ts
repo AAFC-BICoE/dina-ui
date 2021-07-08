@@ -1,4 +1,5 @@
 import { KitsuResource } from "kitsu";
+import { StorageUnitType } from "./StorageUnitType";
 
 export interface StorageUnitAttributes {
   type: "storage-unit";
@@ -9,6 +10,7 @@ export interface StorageUnitAttributes {
 }
 
 export interface StorageUnitRelationships {
+  storageUnitType?: StorageUnitType;
   parentStorageUnit?: StorageUnit;
   storageUnitChildren?: StorageUnit[];
 }
