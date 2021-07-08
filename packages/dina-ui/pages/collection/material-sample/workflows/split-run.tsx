@@ -256,7 +256,7 @@ export default function SplitRunAction() {
                 <div className="child-sample-section">
                   <Tabs>
                     <TabList>
-                      <Tab>
+                      <Tab className="react-tabs__tab set-all-tab">
                         <DinaMessage id="setAll" />
                       </Tab>
                       {samples.map((sample, index) => (
