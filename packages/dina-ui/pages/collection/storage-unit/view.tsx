@@ -75,6 +75,16 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
   }
 
   function onMoveAllContentClick() {
+    const exclusionNames: string[] = [];
+    function setExclusionContainerNames(container: StorageUnit) {
+      exclusionNames.push(container.name);
+      container?.storageUnitChildren?.map(child =>
+        setExclusionContainerNames(child)
+      );
+    }
+
+    setExclusionContainerNames(storageUnit as any);
+
     openModal(
       <AreYouSureModal
         actionMessage={
@@ -85,10 +95,11 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
         messageBody={
           <ResourceSelectField<StorageUnit>
             name="parentStorageUnit"
-            model="collection-api/storage-unit"
+            model={`collection-api/storage-unit`}
             optionLabel={it => it.name}
             filter={input => ({
-              ...filterBy(["name"])(input)
+              ...filterBy(["name"])(input),
+              name: { NOT: `${exclusionNames}` }
             })}
           />
         }
