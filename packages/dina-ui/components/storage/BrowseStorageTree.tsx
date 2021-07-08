@@ -7,6 +7,7 @@ import {
   FilterGroupModel,
   MetaWithTotal,
   rsql,
+  useDinaFormContext,
   useQuery,
   withResponse
 } from "../../../common-ui/lib";
@@ -185,7 +186,8 @@ function StorageUnitCollapser({
   disabled,
   excludeOptionId
 }: StorageUnitCollapserProps) {
-  const [isOpen, setOpen] = useState(false);
+  const { readOnly } = useDinaFormContext();
+  const [isOpen, setOpen] = useState(readOnly ?? false);
 
   function toggle() {
     setOpen(current => !current);
