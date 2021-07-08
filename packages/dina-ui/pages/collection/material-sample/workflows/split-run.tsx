@@ -1,9 +1,11 @@
 import {
+  AreYouSureModal,
   DinaForm,
   LoadingSpinner,
   TextField,
   useAccount,
   useApiClient,
+  useModal,
   useQuery
 } from "../../../../../common-ui/lib";
 import { ButtonBar } from "../../../../../common-ui/lib/button-bar/ButtonBar";
@@ -151,11 +153,7 @@ export default function SplitRunAction() {
 
   const buttonBar = (
     <ButtonBar className="justify-content-center">
-      <Link href="/collection/material-sample/workflows/split-config">
-        <a className="btn btn-secondary">
-          <DinaMessage id="previous" />
-        </a>
-      </Link>
+      <PreviousButton />
       <FormikButton className="btn btn-info runAction" onClick={onSubmit}>
         <DinaMessage id="next" />
       </FormikButton>
@@ -293,5 +291,34 @@ export default function SplitRunAction() {
         </DinaForm>
       </main>
     </div>
+  );
+}
+
+/** "Previous" button with an AreYouSure confirmation modal. */
+function PreviousButton() {
+  const { openModal } = useModal();
+  const router = useRouter();
+
+  function openPreviousButtonModal() {
+    return openModal(
+      <AreYouSureModal
+        actionMessage={<DinaMessage id="goToThePreviousStep" />}
+        messageBody={<DinaMessage id="thisWillLoseAllDataEnteredInThisStep" />}
+        onYesButtonClicked={async () => {
+          await router.push(
+            "/collection/material-sample/workflows/split-config"
+          );
+        }}
+      />
+    );
+  }
+
+  return (
+    <FormikButton
+      className="btn btn-secondary previous-button"
+      onClick={openPreviousButtonModal}
+    >
+      <DinaMessage id="previous" />
+    </FormikButton>
   );
 }

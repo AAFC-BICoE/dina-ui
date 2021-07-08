@@ -253,6 +253,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   georeferencedByLabel: "Georeferenced By (agent)",
   georeferencedDateLabel: "Georeferenced Date",
   governmentOfCanada: "Government of Canada",
+  goToThePreviousStep: "Go to the previous step",
   group: "Group",
   groupMustBeSelected: "Group must be selected",
   identifiers: "Identifiers",
@@ -383,6 +384,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   suffixOptional: "Suffix (Optional)",
   switchToActionType: 'Switch to "{actionType}".',
   templateNameMandatoryErrorMsg: "Please enter a workflow template name.",
+  thisWillLoseAllDataEnteredInThisStep:
+    "This will lose all data entered in this step.",
   thisWillRemoveYourTemplate:
     "This will remove your selected template fields and default values.",
   thumbnail: "Thumbnail",
