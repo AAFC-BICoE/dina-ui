@@ -57,8 +57,9 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
 
           return (
             <div className="d-flex">
-              <label className="mx-auto" aria-label="Select">
+              <div className="mx-auto">
                 <input
+                  aria-label="Select"
                   checked={value || false}
                   onClick={onCheckBoxClick}
                   onChange={noop}
@@ -70,7 +71,7 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
                   type="checkbox"
                   value={value || false}
                 />
-              </label>
+              </div>
             </div>
           );
         }}
@@ -88,14 +89,13 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
     }
 
     return (
-      <label aria-label="Check All">
         <input
+          aria-label="Check All"
           className="check-all-checkbox"
           onClick={onCheckAllCheckBoxClick}
           style={{ height: "20px", width: "20px", marginLeft: "5px" }}
           type="checkbox"
         />
-      </label>
     );
   });
 

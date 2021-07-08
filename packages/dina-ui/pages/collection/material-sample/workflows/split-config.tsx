@@ -6,12 +6,13 @@ import {
   FieldSet,
   SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useCollapser
 } from "common-ui";
 import { Field } from "formik";
 import { padStart, range } from "lodash";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useState, ReactNode } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";
 import NumberSpinnerField from "../../../../../common-ui/lib/formik-connected/NumberSpinnerField";
@@ -52,6 +53,31 @@ const TYPE_OPTIONS: { label: string; value: SuffixOptions }[] = [
     value: TYPE_LETTER
   }
 ];
+
+interface CollapsableSectionProps {
+  children: ReactNode;
+  collapserId: string;
+  title: ReactNode;
+}
+
+/** Wrapper for the collapsible sections of the details UI. */
+function CollapsableSection({
+  children,
+  collapserId,
+  title
+}: CollapsableSectionProps) {
+  const { Collapser, collapsed } = useCollapser(`split-preview-${collapserId}`);
+
+  return (
+    <div className="mb-3">
+      <h4>
+        {title}
+        <Collapser />
+      </h4>
+      {!collapsed && children}
+    </div>
+  );
+}
 
 export default function ConfigAction() {
   const { formatMessage } = useDinaIntl();
@@ -330,45 +356,50 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
         <div className="alert alert-warning d-inline-block">
           <DinaMessage id="splitSampleInstructions" />
         </div>
-        <SplitChildHeader />
-        <Field name="start">
-          {({
-            form: {
-              values: {
-                start,
-                suffix,
-                suffixType,
-                numOfChildToCreate,
-                baseName
+        <CollapsableSection
+          collapserId={generationMode}
+          title={formatMessage("previewAndCustomizeLabel")}
+        >
+          <SplitChildHeader />
+          <Field name="start">
+            {({
+              form: {
+                values: {
+                  start,
+                  suffix,
+                  suffixType,
+                  numOfChildToCreate,
+                  baseName
+                }
               }
+            }) =>
+              range(0, numOfChildToCreate).map(index => {
+                const computedSuffix =
+                  generationMode === "BATCH"
+                    ? suffix || ""
+                    : generationMode === "SERIES"
+                    ? `-${computeSuffix({
+                        index,
+                        start,
+                        suffixType
+                      })}`
+                    : "";
+                return (
+                  <SplitChildRow
+                    key={
+                      generationMode === "BATCH"
+                        ? `${baseName}-${computedSuffix}-${index}`
+                        : `${baseName}-${computedSuffix}`
+                    }
+                    index={index}
+                    baseName={baseName}
+                    computedSuffix={computedSuffix}
+                  />
+                );
+              })
             }
-          }) =>
-            range(0, numOfChildToCreate).map(index => {
-              const computedSuffix =
-                generationMode === "BATCH"
-                  ? suffix || ""
-                  : generationMode === "SERIES"
-                  ? `-${computeSuffix({
-                      index,
-                      start,
-                      suffixType
-                    })}`
-                  : "";
-              return (
-                <SplitChildRow
-                  key={
-                    generationMode === "BATCH"
-                      ? `${baseName}-${computedSuffix}-${index}`
-                      : `${baseName}-${computedSuffix}`
-                  }
-                  index={index}
-                  baseName={baseName}
-                  computedSuffix={computedSuffix}
-                />
-              );
-            })
-          }
-        </Field>
+          </Field>
+        </CollapsableSection>
       </div>
     </div>
   );
