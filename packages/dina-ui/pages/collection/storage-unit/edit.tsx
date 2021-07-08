@@ -26,7 +26,10 @@ import { StorageUnit, StorageUnitType } from "../../../types/collection-api";
 
 export function useStorageUnit(id?: string) {
   return useQuery<StorageUnit>(
-    { path: `collection-api/storage-unit/${id}`, include: "parentStorageUnit" },
+    {
+      path: `collection-api/storage-unit/${id}`,
+      include: "parentStorageUnit,storageUnitType"
+    },
     { disabled: !id }
   );
 }
