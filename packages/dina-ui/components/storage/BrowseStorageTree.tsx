@@ -206,14 +206,15 @@ function StorageUnitCollapser({
               {storageUnit.name}
             </a>
           </Link>
-          <button
-            className="select-storage btn btn-primary btn-sm"
-            type="button"
-            onClick={() => onSelect?.(storageUnit)}
-            disabled={disabled}
-          >
-            <DinaMessage id="select" />
-          </button>
+          {!disabled && (
+            <button
+              className="select-storage btn btn-primary btn-sm"
+              type="button"
+              onClick={() => onSelect?.(storageUnit)}
+            >
+              <DinaMessage id="select" />
+            </button>
+          )}
         </div>
         {isOpen && (
           <StorageTreeList

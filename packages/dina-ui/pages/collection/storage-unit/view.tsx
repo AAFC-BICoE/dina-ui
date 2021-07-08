@@ -54,17 +54,18 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
         { apiBaseUrl: "/collection-api" }
       );
     }
-    router.push(`/collection/storage-unit/view?id=${id}`);
+    // Move to the new parent unit's page:
+    await router.push(`/collection/storage-unit/view?id=${parentUnit.id}`);
   }
 
   function onMoveAllContentClick() {
-    const exclusionNames: string[] = [];
-    function setExclusionContainerNames(container: StorageUnit) {
-      exclusionNames.push(container.name);
-      children?.map(child => setExclusionContainerNames(child));
-    }
+    // const exclusionNames: string[] = [];
+    // function setExclusionContainerNames(container: StorageUnit) {
+    //   exclusionNames.push(container.name);
+    //   children?.map(child => setExclusionContainerNames(child));
+    // }
 
-    setExclusionContainerNames(storageUnit as any);
+    // setExclusionContainerNames(storageUnit as any);
 
     openModal(
       <AreYouSureModal

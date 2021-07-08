@@ -141,13 +141,13 @@ export function StorageUnitFormFields() {
           })}
         />
       </div>
-      {readOnly && (
-        <StorageTreeListField parentId={initialValues.id} disabled={true} />
-      )}
       <StorageLinkerField
         name="parentStorageUnit"
         excludeOptionId={initialValues.id}
       />
+      {readOnly && (
+        <StorageTreeListField parentId={initialValues.id} disabled={true} />
+      )}
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />
