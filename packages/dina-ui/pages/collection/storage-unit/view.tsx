@@ -93,15 +93,20 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
           </span>
         }
         messageBody={
-          <ResourceSelectField<StorageUnit>
-            name="parentStorageUnit"
-            model={`collection-api/storage-unit`}
-            optionLabel={it => it.name}
-            filter={input => ({
-              ...filterBy(["name"])(input),
-              name: { NOT: `${exclusionNames}` }
-            })}
-          />
+          <div style={{ minHeight: "400px" }}>
+            <ResourceSelectField<StorageUnit>
+              name="parentStorageUnit"
+              model={`collection-api/storage-unit`}
+              optionLabel={it => it.name}
+              // Comment out as CRNK has not fully support on "NOT" operator yet
+              // https://www.crnk.io/releases/stable/documentation/#_nested_filtering
+              // https://github.com/crnk-project/crnk-framework/issues/278
+              filter={input => ({
+                ...filterBy(["name"])(input) // ,
+                //              name: { NOT: `${exclusionNames}` }
+              })}
+            />
+          </div>
         }
         onYesButtonClicked={moveAllContentToNewContainer}
       />
