@@ -60,12 +60,16 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
 
   function onMoveAllContentClick() {
     // const exclusionNames: string[] = [];
+    // exclusionNames.push(storageUnit?.name as string);
+
     // function setExclusionContainerNames(container: StorageUnit) {
     //   exclusionNames.push(container.name);
-    //   children?.map(child => setExclusionContainerNames(child));
+    //   container.storageUnitChildren?.map(child =>
+    //     setExclusionContainerNames(child)
+    //   );
     // }
 
-    // setExclusionContainerNames(storageUnit as any);
+    // children?.map(child => setExclusionContainerNames(child as any));
 
     openModal(
       <AreYouSureModal
