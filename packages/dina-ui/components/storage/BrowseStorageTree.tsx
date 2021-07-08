@@ -4,10 +4,8 @@ import Pagination from "rc-pagination";
 import { useState } from "react";
 import { FaMinusSquare, FaPlusSquare } from "react-icons/fa";
 import {
-  FilterGroupModel,
   MetaWithTotal,
   rsql,
-  useDinaFormContext,
   useQuery,
   withResponse
 } from "../../../common-ui/lib";
@@ -30,7 +28,6 @@ export interface BrowseStorageTreeProps {
 export function BrowseStorageTree(props: BrowseStorageTreeProps) {
   const { className } = props;
   const [searchText, setSearchText] = useState<string>("");
-
   const [filter, setFilter] = useState<FilterRowModel | null>();
 
   function doSearch() {
@@ -186,8 +183,7 @@ function StorageUnitCollapser({
   disabled,
   excludeOptionId
 }: StorageUnitCollapserProps) {
-  const { readOnly } = useDinaFormContext();
-  const [isOpen, setOpen] = useState(readOnly ?? false);
+  const [isOpen, setOpen] = useState(false);
 
   function toggle() {
     setOpen(current => !current);
