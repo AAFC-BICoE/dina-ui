@@ -4,7 +4,6 @@ import Pagination from "rc-pagination";
 import { useState } from "react";
 import { FaMinusSquare, FaPlusSquare } from "react-icons/fa";
 import {
-  FilterGroupModel,
   MetaWithTotal,
   rsql,
   useQuery,
@@ -23,11 +22,12 @@ export interface BrowseStorageTreeProps {
   disabled?: boolean;
 
   filter?: FilterRowModel | null;
+  className?: string;
 }
 
 export function BrowseStorageTree(props: BrowseStorageTreeProps) {
+  const { className } = props;
   const [searchText, setSearchText] = useState<string>("");
-
   const [filter, setFilter] = useState<FilterRowModel | null>();
 
   function doSearch() {
@@ -47,8 +47,8 @@ export function BrowseStorageTree(props: BrowseStorageTreeProps) {
   }
 
   return (
-    <div>
-      <div className="input-group mb-3" style={{ width: "30rem" }}>
+    <div className={className}>
+      <div className={`input-group mb-3`} style={{ width: "30rem" }}>
         <input
           className="storage-tree-search form-control"
           type="text"
@@ -78,7 +78,7 @@ export function BrowseStorageTree(props: BrowseStorageTreeProps) {
           <DinaMessage id="resetButtonText" />
         </button>
       </div>
-      <div className="fw-bold mb-3">
+      <div className={`fw-bold mb-3`}>
         {filter ? (
           <DinaMessage id="showingFilteredStorageUnits" />
         ) : (
@@ -206,14 +206,15 @@ function StorageUnitCollapser({
               {storageUnit.name}
             </a>
           </Link>
-          <button
-            className="select-storage btn btn-primary btn-sm"
-            type="button"
-            onClick={() => onSelect?.(storageUnit)}
-            disabled={disabled}
-          >
-            <DinaMessage id="select" />
-          </button>
+          {!disabled && (
+            <button
+              className="select-storage btn btn-primary btn-sm"
+              type="button"
+              onClick={() => onSelect?.(storageUnit)}
+            >
+              <DinaMessage id="select" />
+            </button>
+          )}
         </div>
         {isOpen && (
           <StorageTreeList
