@@ -32,7 +32,7 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
   const StorageUnitQuery = useQuery<StorageUnit>(
     {
       path: `collection-api/storage-unit/${id}`,
-      include: "storageUnitChildren,parentStorageUnit"
+      include: "storageUnitChildren,parentStorageUnit,storageUnitType"
     },
     { deps: [parent] }
   );
