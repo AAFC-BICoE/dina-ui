@@ -77,7 +77,7 @@ const testSeriesModeRunConfig: MaterialSampleRunConfig = {
     suffixType: "Numerical",
     destroyOriginal: true
   },
-  configure_children: { sampleNames: ["my custom name"], sampleDescs: [] }
+  configure_children: { sampleNames: ["my custom name"] }
 };
 
 const testBatchModeRunConfig: MaterialSampleRunConfig = {
@@ -90,7 +90,7 @@ const testBatchModeRunConfig: MaterialSampleRunConfig = {
     suffix: "CustomSuffix",
     destroyOriginal: true
   },
-  configure_children: { sampleNames: [], sampleDescs: ["CustomDescription1"] }
+  configure_children: { sampleNames: [] }
 };
 
 describe("MaterialSample split workflow run action form with all default values", () => {
@@ -102,6 +102,9 @@ describe("MaterialSample split workflow run action form with all default values"
     const wrapper = mountWithAppContext(<SplitRunAction />, { apiContext });
     await new Promise(setImmediate);
     wrapper.update();
+
+    // Open the first sample's tab:
+    wrapper.find("li.sample-tab-0").simulate("click");
 
     expect(wrapper.find(".materialSampleName input").prop("value")).toEqual(
       "ParentName-001"
@@ -117,6 +120,9 @@ describe("MaterialSample split workflow run action form with all default values"
 
     await new Promise(setImmediate);
     wrapper.update();
+
+    // Open the first sample's tab:
+    wrapper.find("li.sample-tab-0").simulate("click");
 
     // child sample initially loaded with user entered custom name
     expect(wrapper.find(".materialSampleName input").prop("value")).toEqual(
@@ -167,6 +173,9 @@ describe("MaterialSample split workflow run action form with all default values"
 
     await new Promise(setImmediate);
     wrapper.update();
+
+    // Open the first sample's tab:
+    wrapper.find("li.sample-tab-0").simulate("click");
 
     // child sample initially loaded with generated custom name
     expect(wrapper.find(".materialSampleName input").prop("value")).toEqual(
