@@ -22,7 +22,7 @@ export function SelectFieldWithNav<T = string>(
   const LeftArrowIcon = leftDisabled ? GoCircleSlash : FaCaretLeft;
   const RightArrowIcon = rightDisabled ? GoCircleSlash : FaCaretRight;
 
-  function onLeftClick() {
+  function findSelectionIndex() {
     let index = -1;
     options.map((option, idx) => {
       if (
@@ -32,25 +32,22 @@ export function SelectFieldWithNav<T = string>(
         index = idx;
       }
     });
+    return index;
+  }
+
+  function onLeftClick() {
+    const index = findSelectionIndex();
     if (index === 0) {
       setLeftDisabled(true);
       setRightDisabled(false);
     } else {
-      form.setFieldValue(name, options[index - 1].value);
+      form.setFieldValue(name, options[index - 1]?.value);
       setLeftDisabled(false);
     }
   }
 
   function onRightClick() {
-    let index = -1;
-    options.map((option, idx) => {
-      if (
-        JSON.stringify(option.value) ===
-        JSON.stringify(selectRef.current?.state.value?.value)
-      ) {
-        index = idx;
-      }
-    });
+    const index = findSelectionIndex();
     if (index === options.length - 1) {
       setRightDisabled(true);
       setLeftDisabled(false);
