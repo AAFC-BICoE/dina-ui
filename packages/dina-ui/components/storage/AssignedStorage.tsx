@@ -1,9 +1,9 @@
 import { PersistedResource } from "kitsu";
-import Link from "next/link";
-import { Fragment } from "react";
-import { useQuery, withResponse } from "../../../common-ui/lib";
+import { withResponse } from "../../../common-ui/lib";
 import { DinaMessage } from "../../intl/dina-ui-intl";
+import { useStorageUnit } from "../../pages/collection/storage-unit/edit";
 import { StorageUnit } from "../../types/collection-api";
+import { StorageUnitBreadCrumb } from "./StorageUnitBreadCrumb";
 
 export interface AssignedStorageProps {
   readOnly?: boolean;
@@ -19,26 +19,7 @@ export function AssignedStorage({
   value,
   noneMessage
 }: AssignedStorageProps) {
-  const storageQuery = useQuery<StorageUnit>(
-    {
-      path: `collection-api/storage-unit/${value?.id}`,
-      include: [
-        // TODO find a better way to query this:
-        // Include storage units 10 layers up.
-        "parentStorageUnit",
-        "parentStorageUnit.parentStorageUnit",
-        "parentStorageUnit.parentStorageUnit.parentStorageUnit",
-        "parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit",
-        "parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit",
-        "parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit",
-        "parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit",
-        "parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit",
-        "parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit",
-        "parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit.parentStorageUnit"
-      ].join(",")
-    },
-    { disabled: !value?.id }
-  );
+  const storageQuery = useStorageUnit(value?.id);
 
   return value?.id ? (
     <div>
@@ -57,15 +38,7 @@ export function AssignedStorage({
         return (
           <div>
             <div className="storage-path mb-3">
-              {/* Show the path of links e.g. Container1 > Container2 > Container3 */}
-              {storagePath.map((unit, index) => (
-                <Fragment key={index}>
-                  <Link href={`/collection/storage-unit/view?id=${unit.id}`}>
-                    <a target="_blank">{unit.name}</a>
-                  </Link>
-                  {index !== storagePath.length - 1 && <span>{" > "}</span>}
-                </Fragment>
-              ))}
+              <StorageUnitBreadCrumb storageUnit={storageUnit} />
             </div>
             {!readOnly && (
               <button

@@ -1,7 +1,7 @@
+import { FieldWrapper } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { FieldWrapper } from "../../../common-ui/lib";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
 import { AssignedStorage } from "./AssignedStorage";
@@ -31,14 +31,11 @@ export function StorageLinker({
     setActiveTab(0);
   }
 
-  return (
+  return value?.id ? (
+    <AssignedStorage value={value} onChange={onChangeProp} />
+  ) : (
     <Tabs selectedIndex={activeTab} onSelect={setActiveTab}>
       <TabList>
-        {value?.id && (
-          <Tab>
-            <DinaMessage id="assignedStorage" />
-          </Tab>
-        )}
         {!value?.id && (
           <Tab>
             <DinaMessage id="searchStorage" />
@@ -50,11 +47,6 @@ export function StorageLinker({
           </Tab>
         )}
       </TabList>
-      {value?.id && (
-        <TabPanel>
-          <AssignedStorage value={value} onChange={onChangeProp} />
-        </TabPanel>
-      )}
       {!value?.id && (
         <TabPanel>
           <StorageSearchSelector
@@ -65,7 +57,7 @@ export function StorageLinker({
       )}
       {!value?.id && (
         <TabPanel>
-          <div style={{ maxHeight: "50rem", overflowY: "scroll" }}>
+          <div style={{ height: "50rem", overflowY: "scroll" }}>
             <BrowseStorageTree
               onSelect={changeStorageAndResetTab}
               excludeOptionId={excludeOptionId}
