@@ -2,7 +2,7 @@ import { KitsuResource } from "kitsu";
 import { IndexSet } from "./IndexSet";
 
 export interface NgsIndexAttributes {
-  type: "ngsIndex";
+  type: "ngs-index";
   name: string;
   lotNumber?: number;
   direction?: string;

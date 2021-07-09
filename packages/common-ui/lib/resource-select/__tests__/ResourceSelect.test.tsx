@@ -62,7 +62,7 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     const options = (wrapper.find(Select).props() as any).options;
@@ -85,7 +85,7 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     const selectProps = wrapper.find(Select).props();
@@ -123,7 +123,7 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     expect(mockGet).toHaveBeenCalledTimes(1);
@@ -136,7 +136,7 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     expect(mockGet).toHaveBeenCalledTimes(1);
@@ -164,7 +164,7 @@ describe("ResourceSelect component", () => {
     onInputChange("test filter value", { action: "input-change" });
 
     // Wait for the options to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     // The GET function shsould have been called twice: for the initial query and again for the
@@ -230,7 +230,7 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     const { options, onChange } = wrapper.find(Select).props();
@@ -289,7 +289,7 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     const { options, onChange } = wrapper.find(Select).props();
@@ -335,7 +335,7 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     expect(wrapper.text()).toEqual("todo 2todo 3");
@@ -347,7 +347,7 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     const { options } = wrapper.find(Select).props();
@@ -375,7 +375,7 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     const options = wrapper.find(Select).prop("options");
@@ -386,7 +386,7 @@ describe("ResourceSelect component", () => {
     // Select the callback option, which should call the callback:
     wrapper.find(Select).prop("onChange")(last(options));
 
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     expect(mockGetResource).toHaveBeenCalledTimes(1);
@@ -413,7 +413,7 @@ describe("ResourceSelect component", () => {
     );
 
     // Wait for the options to load.
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     const options = wrapper.find(Select).prop("options");
@@ -424,7 +424,7 @@ describe("ResourceSelect component", () => {
     // Select the callback option, which should call the callback:
     wrapper.find(Select).prop("onChange")([options[0], last(options)]);
 
-    await Promise.resolve();
+    await new Promise(setImmediate);
     wrapper.update();
 
     expect(mockGetResource).toHaveBeenCalledTimes(1);

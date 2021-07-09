@@ -9,7 +9,7 @@ import { LibraryPrepBatch } from "./LibraryPrepBatch";
 import { PreLibraryPrep } from "./PreLibraryPrep";
 
 export interface StepResourceAttributes {
-  type: "stepResource";
+  type: "step-resource";
   value: string;
 }
 

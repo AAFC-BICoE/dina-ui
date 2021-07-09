@@ -56,13 +56,20 @@ export default function SplitRunAction() {
     useLocalStorage<MaterialSampleRunActionResult | null | undefined>(
       SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY
     );
+
+  const {
+    numOfChildToCreate = 1,
+    baseName = BASE_NAME,
+    start = START,
+    suffix = "",
+    suffixType = TYPE_NUMERIC,
+    generationMode = "SERIES"
+  } = splitChildSampleRunConfig?.configure ?? {};
+
+  const { sampleDescs = [], sampleNames = [] } =
+    splitChildSampleRunConfig?.configure_children ?? {};
+
   const initialChildSamples: MaterialSample[] = [];
-  const numOfChildToCreate =
-    splitChildSampleRunConfig?.configure?.numOfChildToCreate ?? 1;
-  const start = splitChildSampleRunConfig?.configure?.start ?? START;
-  const suffixType =
-    splitChildSampleRunConfig?.configure?.suffixType ?? TYPE_NUMERIC;
-  const baseName = splitChildSampleRunConfig?.configure?.baseName ?? BASE_NAME;
 
   // Retrive the parent material sample upfront
   const { loading, response: parentResp } = useQuery<MaterialSample[]>({
@@ -83,19 +90,21 @@ export default function SplitRunAction() {
   for (let i = 0; i < numOfChildToCreate; i++) {
     // populate initial childsamples when the computed suffix has value, handle when there are disconnected letter suffix
     const computedSuffix = computeSuffix({ index: i, start, suffixType });
-    if (computedSuffix) {
-      const splitChildSampleName =
-        splitChildSampleRunConfig?.configure_children?.sampleNames?.[i];
-      const splitChildSampleDescription =
-        splitChildSampleRunConfig?.configure_children?.sampleDescs?.[i];
-      initialChildSamples.push({
-        group: groupNames?.[0],
-        type: "material-sample",
-        description: splitChildSampleDescription,
-        materialSampleName:
-          splitChildSampleName ?? baseName + "-" + computedSuffix
-      });
-    }
+
+    const splitChildSampleName = sampleNames[i];
+    const splitChildSampleDescription = sampleDescs[i];
+
+    const generatedSampleName =
+      generationMode === "BATCH"
+        ? `${baseName}${suffix}`
+        : `${baseName}-${computedSuffix}`;
+
+    initialChildSamples.push({
+      group: groupNames?.[0],
+      type: "material-sample",
+      description: splitChildSampleDescription,
+      materialSampleName: splitChildSampleName ?? generatedSampleName
+    });
   }
 
   const onSubmit = async submittedValues => {
@@ -171,6 +180,11 @@ export default function SplitRunAction() {
       commonRoot + "dwcCatalogNumber",
       parentSample?.dwcCatalogNumber
     );
+
+    // formik.setFieldValue(
+    //   commonRoot + "materialSampleName",
+    //   parentSample?.materialSampleName
+    // );
 
     formik.setFieldValue(
       commonRoot + "dwcOtherCatalogNumbers",

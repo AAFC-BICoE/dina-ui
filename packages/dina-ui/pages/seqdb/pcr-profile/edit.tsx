@@ -39,7 +39,7 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
             <Query<PcrProfile>
               query={{
                 include: "region",
-                path: `seqdb-api/thermocyclerprofile/${id}`
+                path: `seqdb-api/thermocycler-profile/${id}`
               }}
             >
               {({ loading, response }) => (
@@ -69,7 +69,7 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
   const { id } = router.query;
 
   const initialValues = profile || {
-    type: "thermocyclerprofile"
+    type: "thermocycler-profile"
   };
 
   const onSubmit: DinaFormOnSubmit = async ({
@@ -80,7 +80,7 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
       [
         {
           resource: submittedValues,
-          type: "thermocyclerprofile"
+          type: "thermocycler-profile"
         }
       ],
       { apiBaseUrl: "/seqdb-api" }

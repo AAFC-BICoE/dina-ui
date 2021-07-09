@@ -1,6 +1,7 @@
 import { KitsuResource } from "kitsu";
 
 export interface ContainerTypeAttributes {
+  type: "container-type";
   baseType: string;
   group?: string;
   lastModified?: string;
