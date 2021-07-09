@@ -33,6 +33,7 @@ import {
   useMaterialSampleSave
 } from "../../../components/collection/useMaterialSample";
 import { AllowAttachmentsConfig } from "../../../components/object-store";
+import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Person } from "../../../types/agent-api";
 import {
@@ -41,7 +42,6 @@ import {
   MaterialSampleType
 } from "../../../types/collection-api";
 import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
-import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 
 export default function MaterialSampleEditPage() {
   const router = useRouter();
@@ -438,14 +438,12 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   hideOtherCatalogNumbers?: boolean;
   className?: string;
   namePrefix?: string;
-  sampleNamePlaceHolder?: string;
 }
 
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleIdentifiersFormLayout({
   className,
-  namePrefix,
-  sampleNamePlaceHolder
+  namePrefix
 }: MaterialSampleIdentifiersFormLayoutProps) {
   return (
     <FieldSet
@@ -463,7 +461,6 @@ export function MaterialSampleIdentifiersFormLayout({
             }`}
             customName="materialSampleName"
             className="materialSampleName"
-            placeholder={sampleNamePlaceHolder}
           />
 
           <TextField

@@ -242,9 +242,6 @@ export default function SplitRunAction() {
                       <div className="col-md-8">
                         <MaterialSampleIdentifiersFormLayout
                           namePrefix={commonRoot}
-                          sampleNamePlaceHolder={computeDefaultSampleName(
-                            index
-                          )}
                         />
                       </div>
                     </div>
