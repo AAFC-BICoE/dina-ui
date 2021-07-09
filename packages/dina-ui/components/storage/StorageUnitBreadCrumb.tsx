@@ -11,7 +11,9 @@ export function StorageUnitBreadCrumb({
   storageUnit
 }: StorageUnitBreadCrumbProps) {
   const parentPath = [
-    ...(storageUnit.parentStorageUnit?.hierarchy ?? [])
+    ...(storageUnit.parentStorageUnit?.hierarchy ??
+      storageUnit.hierarchy?.slice(0, -1) ??
+      [])
   ].reverse();
 
   const unitDisplayName = storageUnitDisplayName(storageUnit);

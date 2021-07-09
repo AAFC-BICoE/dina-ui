@@ -4,14 +4,15 @@ import Pagination from "rc-pagination";
 import { useState } from "react";
 import { FaMinusSquare, FaPlusSquare } from "react-icons/fa";
 import {
+  FilterGroupModel,
   MetaWithTotal,
   rsql,
   useQuery,
   withResponse
 } from "../../../common-ui/lib";
-import { FilterRowModel } from "../../../common-ui/lib/filter-builder/FilterRow";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
+import { StorageFilter } from "./StorageFilter";
 
 export interface BrowseStorageTreeProps {
   parentId?: string;
@@ -21,63 +22,18 @@ export interface BrowseStorageTreeProps {
   excludeOptionId?: string;
   disabled?: boolean;
 
-  filter?: FilterRowModel | null;
+  filter?: FilterGroupModel | null;
   className?: string;
 }
 
+/** Hierarchy of nodes UI to search for and find a Storage Unit. */
 export function BrowseStorageTree(props: BrowseStorageTreeProps) {
   const { className } = props;
-  const [searchText, setSearchText] = useState<string>("");
-  const [filter, setFilter] = useState<FilterRowModel | null>();
-
-  function doSearch() {
-    setFilter({
-      id: -321,
-      type: "FILTER_ROW" as const,
-      attribute: "name",
-      predicate: "IS" as const,
-      searchType: "PARTIAL_MATCH" as const,
-      value: searchText
-    });
-  }
-
-  function resetSearch() {
-    setSearchText("");
-    setFilter(null);
-  }
+  const [filter, setFilter] = useState<FilterGroupModel | null>(null);
 
   return (
     <div className={className}>
-      <div className={`input-group mb-3`} style={{ width: "30rem" }}>
-        <input
-          className="storage-tree-search form-control"
-          type="text"
-          value={searchText}
-          onChange={e => setSearchText(e.target.value)}
-          // Pressing enter should set the filter, not submit the form:
-          onKeyDown={e => {
-            if (e.keyCode === 13) {
-              e.preventDefault();
-              doSearch();
-            }
-          }}
-        />
-        <button
-          className="storage-tree-search btn btn-primary"
-          type="button"
-          style={{ width: "10rem" }}
-          onClick={doSearch}
-        >
-          <DinaMessage id="search" />
-        </button>
-        <button
-          className="storage-tree-search-reset btn btn-dark"
-          type="button"
-          onClick={resetSearch}
-        >
-          <DinaMessage id="resetButtonText" />
-        </button>
-      </div>
+      <StorageFilter onChange={setFilter} />
       <div className={`fw-bold mb-3`}>
         {filter ? (
           <DinaMessage id="showingFilteredStorageUnits" />
@@ -194,12 +150,14 @@ function StorageUnitCollapser({
 
   return (
     <div className={`d-flex flex-row gap-2 collapser-for-${storageUnit.id}`}>
-      <CollapserIcon
-        className="storage-collapser-icon align-top"
-        size="2em"
-        onClick={toggle}
-        style={{ cursor: "pointer" }}
-      />
+      {storageUnit.storageUnitChildren?.length && (
+        <CollapserIcon
+          className="storage-collapser-icon align-top"
+          size="2em"
+          onClick={toggle}
+          style={{ cursor: "pointer" }}
+        />
+      )}
       <div className="flex-grow-1">
         <div className="d-flex flex-row align-items-center gap-2 mb-3">
           <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>

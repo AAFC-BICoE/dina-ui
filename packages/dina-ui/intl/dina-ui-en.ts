@@ -31,6 +31,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   allowExisting: "Allow Existing",
   allowNew: "Allow New",
   appTitle: "DINA",
+  assignToStorage: "Assign to Storage",
   assignedStorage: "Assigned Storage",
   associatedAgent: "Associated Agent",
   attachExisting: "Attach Existing",

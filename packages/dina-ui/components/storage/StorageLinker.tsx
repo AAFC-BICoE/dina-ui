@@ -11,7 +11,6 @@ import { StorageSearchSelector } from "./StorageSearchSelector";
 export interface StorageLinkerProps {
   value?: PersistedResource<StorageUnit>;
   onChange: (newValue: PersistedResource<StorageUnit>) => void;
-  fieldName: string;
 
   /** Disable this option ID e.g. to avoid putting a storage unit inside itself. */
   excludeOptionId?: string;
@@ -21,7 +20,6 @@ export interface StorageLinkerProps {
 export function StorageLinker({
   onChange: onChangeProp,
   value,
-  fieldName,
   excludeOptionId
 }: StorageLinkerProps) {
   const [activeTab, setActiveTab] = useState(0);
@@ -50,7 +48,7 @@ export function StorageLinker({
       {!value?.id && (
         <TabPanel>
           <StorageSearchSelector
-            fieldName={fieldName}
+            onChange={changeStorageAndResetTab}
             excludeOptionId={excludeOptionId}
           />
         </TabPanel>
@@ -91,7 +89,6 @@ export function StorageLinkerField({
     >
       {({ value, setValue }) => (
         <StorageLinker
-          fieldName={name}
           value={value}
           onChange={setValue}
           excludeOptionId={excludeOptionId}
