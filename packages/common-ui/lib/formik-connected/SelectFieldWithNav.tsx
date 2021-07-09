@@ -1,23 +1,26 @@
 import { FaCaretRight, FaCaretLeft } from "react-icons/fa";
+import { GoCircleSlash } from "react-icons/go";
 import React, { useRef, useState } from "react";
 import { SelectField, SelectOption } from "./SelectField";
+import { FormikProps } from "formik";
 
 interface SelectFieldWithNavProps<T> {
   name: string;
   options: SelectOption<T>[];
   onSelectionChanged?: (currentSelectedValue) => void;
+  form: FormikProps<any>;
 }
 
 export function SelectFieldWithNav<T = string>(
   props: SelectFieldWithNavProps<T>
 ) {
-  const { name, options } = props;
-  const selectRef = useRef<HTMLSelectElement>(null);
+  const { name, options, form } = props;
+  const selectRef = useRef<any>(null);
   const [leftDisabled, setLeftDisabled] = useState(false);
   const [rightDisabled, setRightDisabled] = useState(false);
 
-  const LeftArrowIcon = leftDisabled ? FaCaretRight : FaCaretLeft;
-  const RightArrowIcon = rightDisabled ? FaCaretRight : FaCaretRight;
+  const LeftArrowIcon = leftDisabled ? GoCircleSlash : FaCaretLeft;
+  const RightArrowIcon = rightDisabled ? GoCircleSlash : FaCaretRight;
 
   function onLeftClick() {
     let index = -1;
@@ -29,11 +32,31 @@ export function SelectFieldWithNav<T = string>(
         index = idx;
       }
     });
-    if (index <= 1) {
+    if (index === 0) {
       setLeftDisabled(true);
-    } else if (selectRef.current) {
-      selectRef.current.selectedIndex = index - 1;
+      setRightDisabled(false);
+    } else {
+      form.setFieldValue(name, options[index - 1].value);
       setLeftDisabled(false);
+    }
+  }
+
+  function onRightClick() {
+    let index = -1;
+    options.map((option, idx) => {
+      if (
+        JSON.stringify(option.value) ===
+        JSON.stringify(selectRef.current?.state.value?.value)
+      ) {
+        index = idx;
+      }
+    });
+    if (index === options.length - 1) {
+      setRightDisabled(true);
+      setLeftDisabled(false);
+    } else {
+      form.setFieldValue(name, options[index + 1].value);
+      setRightDisabled(false);
     }
   }
 
@@ -59,6 +82,7 @@ export function SelectFieldWithNav<T = string>(
         className="col-md-1 rightArrow"
         size="2em"
         style={{ cursor: "pointer" }}
+        onClick={onRightClick}
       />
     </div>
   );
