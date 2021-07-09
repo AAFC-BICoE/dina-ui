@@ -1,6 +1,7 @@
 import { KitsuResource } from "kitsu";
 
 export interface MolecularSampleAttributes {
+  type: "molecular-sample";
   name: string;
   version: string;
 

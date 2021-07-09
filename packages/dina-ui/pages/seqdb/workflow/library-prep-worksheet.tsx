@@ -21,7 +21,7 @@ export default function LibraryPrepWorksheetPage() {
       "libraryPrepBatch.containerType",
       "chain"
     ].join(","),
-    path: `seqdb-api/stepResource/${stepResourceId}`
+    path: `seqdb-api/step-resource/${stepResourceId}`
   });
 
   const batch = srResponse && srResponse.data.libraryPrepBatch;
@@ -30,12 +30,12 @@ export default function LibraryPrepWorksheetPage() {
     LibraryPrep[]
   >({
     fields: {
-      ngsIndex: "name",
-      sample: "name,version"
+      "ngs-index": "name",
+      "molecular-sample": "name,version"
     },
-    include: "indexI5,indexI7,sample",
+    include: "indexI5,indexI7,molecularSample",
     page: { limit: 1000 },
-    path: `seqdb-api/libraryPrepBatch/${batch ? batch.id : 0}/libraryPreps`,
+    path: `seqdb-api/library-prep-batch/${batch ? batch.id : 0}/libraryPreps`,
     sort: "wellRow,wellColumn"
   });
 

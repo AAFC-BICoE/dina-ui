@@ -10,7 +10,7 @@ jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async path => {
-  if (path === "seqdb-api/pcrPrimer/100") {
+  if (path === "seqdb-api/pcr-primer/100") {
     // The request for the primer returns the test primer.
     return { data: TEST_PRIMER };
   } else {
@@ -42,7 +42,7 @@ describe("PcrPrimer edit page", () => {
         {
           data: {
             id: "1",
-            type: "pcrPrimer"
+            type: "pcr-primer"
           },
           status: 201
         }
@@ -71,7 +71,7 @@ describe("PcrPrimer edit page", () => {
       [
         {
           op: "POST",
-          path: "pcrPrimer",
+          path: "pcr-primer",
           value: {
             attributes: {
               group: "aafc",
@@ -81,7 +81,7 @@ describe("PcrPrimer edit page", () => {
               type: "PRIMER"
             },
             id: "00000000-0000-0000-0000-000000000000",
-            type: "pcrPrimer"
+            type: "pcr-primer"
           }
         }
       ],
@@ -135,7 +135,7 @@ describe("PcrPrimer edit page", () => {
         {
           data: {
             id: "1",
-            type: "pcrPrimer"
+            type: "pcr-primer"
           },
           status: 201
         }
@@ -180,7 +180,7 @@ describe("PcrPrimer edit page", () => {
       [
         {
           op: "PATCH",
-          path: "pcrPrimer/1",
+          path: "pcr-primer/1",
           value: {
             attributes: expect.objectContaining({
               application: null,
@@ -194,7 +194,7 @@ describe("PcrPrimer edit page", () => {
                 data: expect.objectContaining({ id: "2", type: "region" })
               }
             },
-            type: "pcrPrimer"
+            type: "pcr-primer"
           }
         }
       ],

@@ -28,7 +28,7 @@ export function PcrProfileDetailsPage({ router }: WithRouterProps) {
       <Query<PcrProfile>
         query={{
           include: "region",
-          path: `seqdb-api/thermocyclerprofile/${id}`
+          path: `seqdb-api/thermocycler-profile/${id}`
         }}
       >
         {({ loading, response }) => (
