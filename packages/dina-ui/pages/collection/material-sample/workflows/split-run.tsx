@@ -1,6 +1,7 @@
 import {
   DinaForm,
   LoadingSpinner,
+  SelectFieldWithNav,
   TextField,
   useAccount,
   useApiClient,
@@ -10,12 +11,11 @@ import { ButtonBar } from "../../../../../common-ui/lib/button-bar/ButtonBar";
 import { FormikButton } from "../../../../..//common-ui/lib/formik-connected/FormikButton";
 import { useRouter } from "next/router";
 import Link from "next/link";
-
 import {
   DinaMessage,
   useDinaIntl
 } from "../../../../../dina-ui/intl/dina-ui-intl";
-import React from "react";
+import React, { useState } from "react";
 import useLocalStorage from "@rehooks/local-storage";
 import {
   BASE_NAME,
@@ -47,6 +47,7 @@ export default function SplitRunAction() {
   const { save } = useApiClient();
   const { groupNames } = useAccount();
   const router = useRouter();
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [splitChildSampleRunConfig, _setSplitChildSampleRunConfig] =
     useLocalStorage<MaterialSampleRunConfig | null | undefined>(
       SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
@@ -202,6 +203,49 @@ export default function SplitRunAction() {
     return baseName + "-" + computeSuffix({ index, start, suffixType });
   }
 
+  function childSampleInternal(index, form) {
+    const childSamplesPath = "childSamples";
+    const childSamplePath =
+      index === -1 ? "setAll" : `${childSamplesPath}[${index}]`;
+    const commonRoot = childSamplePath + ".";
+    return (
+      <>
+        <span className="d-flex fw-bold flex-row">
+          {formatMessage("materialSample") + " " + formatMessage("description")}
+          :
+        </span>
+        <div className="container">
+          <TextField
+            name={commonRoot + "description"}
+            hideLabel={true}
+            multiLines={true}
+          />
+        </div>
+        <FormikButton
+          onClick={() => {
+            if (index !== -1) onCopyFromParent({ index, formik: form });
+          }}
+          className="btn btn-secondary m-1 copyFromParent"
+        >
+          <DinaMessage id="copyFromParentLabel" />
+        </FormikButton>
+        <div className="d-flex flex-row">
+          <PreparationsFormLayout
+            namePrefix={commonRoot}
+            className="flex-grow-1 mx-1"
+          />
+          <MaterialSampleIdentifiersFormLayout
+            namePrefix={commonRoot}
+            className="flex-grow-1"
+            sampleNamePlaceHolder={
+              index !== -1 ? computeDefaultSampleName(index) : ""
+            }
+          />
+        </div>
+      </>
+    );
+  }
+
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
@@ -210,7 +254,12 @@ export default function SplitRunAction() {
         <h1>
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
-        <DinaForm initialValues={{ childSamples: initialChildSamples ?? [] }}>
+        <DinaForm
+          initialValues={{
+            childSamples: initialChildSamples ?? [],
+            childSampleName: "Set All"
+          }}
+        >
           <p>
             <span className="fw-bold">{formatMessage("description")}:</span>
             {formatMessage("splitSampleDescription")}
@@ -222,7 +271,13 @@ export default function SplitRunAction() {
           <FieldArray name="childSamples">
             {({ form }) => {
               const samples = form.values.childSamples;
-              return (
+              const length = samples?.length;
+              const sampleNameOptions = samples?.map(sample => ({
+                label: sample.materialSampleName,
+                value: sample.materialSampleName
+              }));
+              sampleNameOptions.unshift({ label: "Set All", value: "Set All" });
+              return length < 10 ? (
                 <div className="child-sample-section">
                   <Tabs>
                     {
@@ -240,51 +295,28 @@ export default function SplitRunAction() {
                     }
                     {samples.length
                       ? samples.map((_, index) => {
-                          const childSamplesPath = "childSamples";
-                          const childSamplePath = `${childSamplesPath}[${index}]`;
-                          const commonRoot = childSamplePath + ".";
                           return (
                             <TabPanel key={index}>
-                              <span className="d-flex fw-bold flex-row">
-                                {formatMessage("materialSample") +
-                                  " " +
-                                  formatMessage("description")}
-                                :
-                              </span>
-                              <div className="container">
-                                <TextField
-                                  name={commonRoot + "description"}
-                                  hideLabel={true}
-                                  multiLines={true}
-                                />
-                              </div>
-                              <FormikButton
-                                onClick={() =>
-                                  onCopyFromParent({ index, formik: form })
-                                }
-                                className="btn btn-secondary m-1 copyFromParent"
-                              >
-                                <DinaMessage id="copyFromParentLabel" />
-                              </FormikButton>
-                              <div className="d-flex flex-row">
-                                <PreparationsFormLayout
-                                  namePrefix={commonRoot}
-                                  className="flex-grow-1 mx-1"
-                                />
-                                <MaterialSampleIdentifiersFormLayout
-                                  namePrefix={commonRoot}
-                                  className="flex-grow-1"
-                                  sampleNamePlaceHolder={computeDefaultSampleName(
-                                    index
-                                  )}
-                                />
-                              </div>
+                              {childSampleInternal(index, form)}
                             </TabPanel>
                           );
                         })
                       : null}
                   </Tabs>
                 </div>
+              ) : (
+                <>
+                  <SelectFieldWithNav
+                    form={form}
+                    name="childSampleName"
+                    options={sampleNameOptions}
+                    onSelectionChanged={setSelectedIndex}
+                  />
+                  {childSampleInternal(
+                    selectedIndex === 0 ? -1 : selectedIndex - 1,
+                    form
+                  )}
+                </>
               );
             }}
           </FieldArray>

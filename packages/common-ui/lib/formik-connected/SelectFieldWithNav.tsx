@@ -7,14 +7,14 @@ import { FormikProps } from "formik";
 interface SelectFieldWithNavProps<T> {
   name: string;
   options: SelectOption<T>[];
-  onSelectionChanged?: (currentSelectedValue) => void;
+  onSelectionChanged?: (index) => void;
   form: FormikProps<any>;
 }
 
 export function SelectFieldWithNav<T = string>(
   props: SelectFieldWithNavProps<T>
 ) {
-  const { name, options, form } = props;
+  const { name, options, form, onSelectionChanged } = props;
   const selectRef = useRef<any>(null);
   const [leftDisabled, setLeftDisabled] = useState(false);
   const [rightDisabled, setRightDisabled] = useState(false);
@@ -37,24 +37,30 @@ export function SelectFieldWithNav<T = string>(
 
   function onLeftClick() {
     const index = findSelectionIndex();
+    let newIdx = index;
     if (index === 0) {
       setLeftDisabled(true);
       setRightDisabled(false);
     } else {
-      form.setFieldValue(name, options[index - 1]?.value);
+      newIdx = index - 1;
+      form.setFieldValue(name, options[newIdx]?.value);
       setLeftDisabled(false);
     }
+    onSelectionChanged?.(newIdx);
   }
 
   function onRightClick() {
     const index = findSelectionIndex();
+    let newIdx = index;
     if (index === options.length - 1) {
       setRightDisabled(true);
       setLeftDisabled(false);
     } else {
-      form.setFieldValue(name, options[index + 1].value);
+      newIdx = index + 1;
+      form.setFieldValue(name, options[newIdx].value);
       setRightDisabled(false);
     }
+    onSelectionChanged?.(newIdx);
   }
 
   const ForwardSelectField = React.forwardRef<HTMLSelectElement>((_, ref) => (
