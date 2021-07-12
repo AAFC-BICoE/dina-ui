@@ -38,7 +38,7 @@ import {
 } from "./split-config";
 import { MaterialSample } from "../../../../../dina-ui/types/collection-api";
 
-import { FieldArray } from "formik";
+import { Field, FieldArray } from "formik";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
   MaterialSampleIdentifiersFormLayout,
@@ -176,6 +176,9 @@ export default function SplitRunAction() {
     };
     // submit to back end
     const samplesToSave = submittedValues.childSamples;
+    // the first is the default value
+    const defaultValueSample: MaterialSample = samplesToSave?.[0];
+
     for (const sample of samplesToSave) {
       delete sample.description;
       // link to parent
@@ -186,10 +189,11 @@ export default function SplitRunAction() {
         };
       }
     }
-
+    samplesToSave.splice(0, 1);
+    // save the other samples, taking the first as the default value
     const response = await save(
       samplesToSave.map(sample => ({
-        resource: sample,
+        resource: { ...defaultValueSample, ...sample },
         type: "material-sample"
       })),
       { apiBaseUrl: "/collection-api" }
@@ -329,7 +333,7 @@ export default function SplitRunAction() {
               namePrefix={commonRoot}
               className="flex-grow-1"
               sampleNamePlaceHolder={
-                index !== -1 ? computeDefaultSampleName(index) : ""
+                index > 0 ? computeDefaultSampleName(index - 1) : ""
               }
             />
             <FieldSet legend={<DinaMessage id="components" />}>
@@ -380,6 +384,16 @@ export default function SplitRunAction() {
     );
   }
 
+  const samples = initialChildSamples;
+  const length = samples.length;
+  const sampleNameOptions = samples?.map(sample => ({
+    label: sample.materialSampleName,
+    value: sample.materialSampleName
+  }));
+  sampleNameOptions.unshift({ label: "Set All", value: "Set All" });
+  const defaultSample: MaterialSample = { type: "material-sample" };
+  samples.unshift(defaultSample);
+
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
@@ -390,7 +404,7 @@ export default function SplitRunAction() {
         </h1>
         <DinaForm
           initialValues={{
-            childSamples: initialChildSamples ?? [],
+            childSamples: samples ?? [],
             childSampleName: "Set All"
           }}
         >
@@ -402,58 +416,56 @@ export default function SplitRunAction() {
             {formatMessage("stepLabel")}2: {formatMessage("dataEntryLabel")}
           </p>
 
-          <FieldArray name="childSamples">
-            {({ form }) => {
-              const samples = form.values.childSamples;
-              const length = samples?.length;
-              const sampleNameOptions = samples?.map(sample => ({
-                label: sample.materialSampleName,
-                value: sample.materialSampleName
-              }));
-              sampleNameOptions.unshift({ label: "Set All", value: "Set All" });
-              return length < 10 ? (
-                <div className="child-sample-section">
-                  <Tabs>
-                    {
-                      <TabList>
-                        {samples.map((sample, index) => (
-                          <Tab key={index}>
-                            <span className="m-3">
-                              {sample.materialSampleName?.length
-                                ? sample.materialSampleName
-                                : computeDefaultSampleName(index)}
-                            </span>
-                          </Tab>
-                        ))}
-                      </TabList>
-                    }
-                    {samples.length
-                      ? samples.map((_, index) => {
-                          return (
-                            <TabPanel key={index}>
-                              {childSampleInternal(index, form)}
-                            </TabPanel>
-                          );
-                        })
-                      : null}
-                  </Tabs>
-                </div>
-              ) : (
-                <>
-                  <SelectFieldWithNav
-                    form={form}
-                    name="childSampleName"
-                    options={sampleNameOptions}
-                    onSelectionChanged={setSelectedIndex}
-                  />
-                  {childSampleInternal(
-                    selectedIndex === 0 ? -1 : selectedIndex - 1,
-                    form
-                  )}
-                </>
-              );
-            }}
-          </FieldArray>
+          {length < 10 ? (
+            <FieldArray name="childSamples">
+              {({ form }) => {
+                return (
+                  <div className="child-sample-section">
+                    <Tabs>
+                      {
+                        <TabList>
+                          {samples.map((sample, index) => (
+                            <Tab key={index}>
+                              <span className="m-3">
+                                {sample.materialSampleName?.length
+                                  ? sample.materialSampleName
+                                  : computeDefaultSampleName(index)}
+                              </span>
+                            </Tab>
+                          ))}
+                        </TabList>
+                      }
+                      {samples.length
+                        ? samples.map((_, index) => {
+                            return (
+                              <TabPanel key={index}>
+                                {childSampleInternal(index, form)}
+                              </TabPanel>
+                            );
+                          })
+                        : null}
+                    </Tabs>
+                  </div>
+                );
+              }}
+            </FieldArray>
+          ) : (
+            <Field name="childSamples">
+              {({ form }) => {
+                return (
+                  <>
+                    <SelectFieldWithNav
+                      form={form}
+                      name="childSampleName"
+                      options={sampleNameOptions as any}
+                      onSelectionChanged={setSelectedIndex}
+                    />
+                    {childSampleInternal(selectedIndex, form)}
+                  </>
+                );
+              }}
+            </Field>
+          )}
           {buttonBar}
         </DinaForm>
       </main>

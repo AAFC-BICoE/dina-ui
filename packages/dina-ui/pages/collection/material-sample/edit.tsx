@@ -504,10 +504,14 @@ export function PreparationsFormLayout({
                   model="collection-api/preparation-type"
                   optionLabel={it => it.name}
                   readOnlyLink="/collection/preparation-type/view?id="
-                  filter={input => ({
-                    ...filterBy(["name"])(input),
-                    group: { EQ: `${values.group}` }
-                  })}
+                  filter={input =>
+                    values.group
+                      ? {
+                          ...filterBy(["name"])(input),
+                          group: { EQ: `${values.group}` }
+                        }
+                      : { ...filterBy(["name"])(input) }
+                  }
                   name={`${
                     namePrefix
                       ? namePrefix + "preparationType"
@@ -521,7 +525,7 @@ export function PreparationsFormLayout({
           </div>
           <DinaFormSection>
             <ResourceSelectField<Person>
-              name="preparedBy"
+              name={`${namePrefix ? namePrefix + "preparedBy" : "preparedBy"}`}
               filter={filterBy(["displayName"])}
               model="agent-api/person"
               optionLabel={person => person.displayName}
