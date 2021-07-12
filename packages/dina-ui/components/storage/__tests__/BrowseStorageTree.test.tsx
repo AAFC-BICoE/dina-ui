@@ -223,6 +223,7 @@ describe("BrowseStorageTree component", () => {
         parentStorageUnit: null,
         rsql: ""
       },
+      include: "hierarchy,storageUnitChildren",
       page: {
         limit: 100,
         offset: 0
