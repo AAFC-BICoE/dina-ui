@@ -4,6 +4,7 @@ import { COMMON_UI_MESSAGES_ENGLISH } from "common-ui";
  * English SeqDB messages. A message must be set here in English before other languages.
  */
 export const SEQDB_MESSAGES_ENGLISH = {
+  addMolecularSampleTitle: "Add Molecular Sample",
   addPcrPrimerTitle: "Add PCR Primer",
   addPcrProfileTitle: "Add Thermocycler Profile",
   addProductTitle: "Add Product",
@@ -18,6 +19,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
     "<-- Deselect all checked molecular samples",
   deselectButtonText: "Deselect",
   editableTable: "Editable Table",
+  editMolecularSampleTitle: "Edit Molecular Sample",
   editPcrPrimerTitle: "Edit PCR Primer",
   editPcrProfileTitle: "Edit Thermocycler Profile",
   editProductTitle: "Edit Product",
@@ -37,12 +39,14 @@ export const SEQDB_MESSAGES_ENGLISH = {
   "field_sample.name": "Sample Name",
   field_size: "Size",
   field_targetBpSize: "Target Base Pair Size",
-  indexI5: "Index i5",
-  indexI7: "Index i7",
   indexGridInstructions:
     "Selecting a dropdown item along the top side sets the index for that column. Selecting a dropdown item along the left side sets the index for that row. Selecting None erases the Index.",
+  indexI5: "Index i5",
+  indexI7: "Index i7",
   indexSetListTitle: "Index Sets",
   indexSetMustBeSet: "Index Set must be set.",
+  molecularSample: "Molecular Sample",
+  molecularSampleListTitle: "Molecular Samples",
   notShearedStatus: "Not Sheared",
   notSizeSelectedStatus: "No Size Selection",
   pcrPrimerListTitle: "PCR Primers",

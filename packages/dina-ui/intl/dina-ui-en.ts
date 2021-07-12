@@ -46,6 +46,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   cataloguedObjectViewTitle: "View Catalogued Object",
   changedProperties: "Changes",
   childMaterialSamplesCreatedLabel: "Child Material Samples Created",
+  childStorageUnit: "Child Storage Unit",
   closePreviewButtonText: "Close Preview",
   collectingAgentsLegend: "Collecting Agents",
   collectingDateLegend: "Collecting Date",
@@ -214,6 +215,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_materialSampleName: "Material Sample ID",
   "field_materialSampleType.name": "Material Sample Type",
   "field_materialSampleType.uuid": "Material Sample Type",
+  field_materialSample_identifierType_catalogueNumber_label: "Catalogue Number",
+  field_materialSample_identifierType_materialSampleId_label:
+    "Material Sample ID",
   field_notPubliclyReleasableReason: "Not Publicly Releasable Reason",
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
@@ -240,6 +244,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   forTestingPurposesOnlyMessage:
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
   formNavigation: "Form Navigation",
+  generateBatch: "Generate Batch",
+  generateSeries: "Generate Series",
   geoReferencing: "Geo-Referencing",
   geoReferencingLegend: "Georeferencing",
   geographyLegend: "Geography (Places)",
@@ -267,8 +273,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeValueLabel: "Value",
   materialSample: "Material Sample",
   materialSampleAttachments: "Material Sample Attachments",
-  materialSampleManagedAttributes: "Material Sample Managed Attributes",
   materialSampleListTitle: "Material Samples",
+  materialSampleManagedAttributes: "Material Sample Managed Attributes",
   materialSampleTypeListTitle: "Material Sample Types",
   materialSampleTypeViewTitle: "Material Sample Type",
   materialSampleViewTitle: "Material Sample",
@@ -297,6 +303,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metadataRightsDetailsLabel: "Rights",
   metadataTagsLabel: "Tags",
   metadataUploadDetailsLabel: "Upload Details",
+  moveAllContent: " Move All Content",
   noFileToDisplay: "No file to display",
   noGroups: "No Groups",
   noManagedAttributeValues: "No Managed Attribute values.",
@@ -325,6 +332,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   preparationTypeNameLabel: "Preparation Type Name",
   preparationTypeViewTitle: "View Preparation Type",
   preparations: "Preparations",
+  previewAndCustomizeLabel: "Preview and Customize",
   primary: "Primary",
   primaryButton_tooltip:
     "Make this assertion the primary data point when exported. Only one assertion can be primary",
@@ -355,6 +363,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   showing: "Showing",
   showingFilteredStorageUnits: "Showing Filtered Storage Units",
   showingTopLevelStorageUnits: "Showing Top Level Storage Units",
+  specifyParentContainer: "Please select parent container",
   splitSampleActionMetadataLegend: "Action Metadata",
   splitSampleChildSamplesToCreateLabel: "Child Material Samples to create",
   splitSampleConfigLegend: "Configure Action: Split",
@@ -374,6 +383,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   storageUnitTypeViewTitle: "Storage Unit Type",
   storageUnitViewTitle: "Storage Unit",
   storagesCreatedByMe: "Storages Created By Me",
+  suffixOptional: "Suffix (Optional)",
   switchToActionType: 'Switch to "{actionType}".',
   templateNameMandatoryErrorMsg: "Please enter a workflow template name.",
   thisWillRemoveYourTemplate:

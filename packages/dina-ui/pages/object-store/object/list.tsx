@@ -101,7 +101,10 @@ export default function MetadataListPage() {
     },
     dateCell("acDigitizationDate"),
     dateCell("xmpMetadataDate"),
-    { accessor: "acMetadataCreator.displayName", sortable: false },
+    {
+      accessor: "acMetadataCreator.displayName",
+      sortable: false
+    },
     {
       Cell: ({ original: { acTags } }) => <>{acTags?.join(", ")}</>,
       accessor: "acTags"
@@ -118,7 +121,7 @@ export default function MetadataListPage() {
           </button>
         </div>
       ),
-      Header: "",
+      Header: <div id="acPreviewLinksHeader">Preview Links</div>,
       sortable: false
     }
   ];

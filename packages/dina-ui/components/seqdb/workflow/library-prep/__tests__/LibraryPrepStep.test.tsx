@@ -14,8 +14,8 @@ const mockCtx = {
 };
 
 function getWrapper() {
-  const step = { id: "10", type: "chainStepTemplate" };
-  const steps = [{ id: "8", type: "chainStepTemplate" }, {}, step];
+  const step = { id: "10", type: "chain-step-template" };
+  const steps = [{ id: "8", type: "chain-step-template" }, {}, step];
 
   return mountWithAppContext(
     <LibraryPrepStep
@@ -29,7 +29,7 @@ function getWrapper() {
 
 function mockExistingBatch() {
   mockGet.mockImplementation(async path => {
-    if (path === "seqdb-api/stepResource") {
+    if (path === "seqdb-api/step-resource") {
       return {
         data: [
           {
@@ -38,7 +38,7 @@ function mockExistingBatch() {
               id: "1",
               notes: "new notes"
             },
-            type: "stepResource"
+            type: "step-resource"
           }
         ]
       };
@@ -50,7 +50,7 @@ function mockExistingBatch() {
 
 function mockNoExistingBatch() {
   mockGet.mockImplementation(async path => {
-    if (path === "seqdb-api/stepResource") {
+    if (path === "seqdb-api/step-resource") {
       return { data: [] };
     }
 
@@ -83,11 +83,11 @@ describe("LibraryPrepStepDetails component", () => {
     });
 
     mockSave.mockImplementation(async ops => {
-      if (ops[0].type === "libraryPrepBatch") {
-        return [{ id: "2", type: "libraryPrepBatch" }];
+      if (ops[0].type === "library-prep-batch") {
+        return [{ id: "2", type: "library-prep-batch" }];
       }
-      if (ops[0].type === "stepResource") {
-        return [{ id: "100", type: "stepResource" }];
+      if (ops[0].type === "step-resource") {
+        return [{ id: "100", type: "step-resource" }];
       }
     });
 
@@ -105,7 +105,7 @@ describe("LibraryPrepStepDetails component", () => {
             resource: {
               notes: "new notes"
             },
-            type: "libraryPrepBatch"
+            type: "library-prep-batch"
           }
         ],
         { apiBaseUrl: "/seqdb-api" }
@@ -120,16 +120,16 @@ describe("LibraryPrepStepDetails component", () => {
               },
               chainStepTemplate: {
                 id: "10",
-                type: "chainStepTemplate"
+                type: "chain-step-template"
               },
               libraryPrepBatch: {
                 id: "2",
-                type: "libraryPrepBatch"
+                type: "library-prep-batch"
               },
-              type: "stepResource",
+              type: "step-resource",
               value: "LIBRARY_PREP_BATCH"
             },
-            type: "stepResource"
+            type: "step-resource"
           }
         ],
         { apiBaseUrl: "/seqdb-api" }

@@ -54,7 +54,7 @@ export default function PcrProfileListPage() {
           queryTableProps={{
             columns: PCRPROFILE_TABLE_COLUMNS,
             include: "region",
-            path: "seqdb-api/thermocyclerprofile"
+            path: "seqdb-api/thermocycler-profile"
           }}
         />
       </main>

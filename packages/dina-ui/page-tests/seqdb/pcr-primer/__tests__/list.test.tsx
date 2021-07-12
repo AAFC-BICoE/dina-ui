@@ -65,7 +65,7 @@ describe("PcrPrimer list page", () => {
     wrapper.update();
 
     expect(mockGet).lastCalledWith(
-      "seqdb-api/pcrPrimer",
+      "seqdb-api/pcr-primer",
       expect.objectContaining({ filter: { rsql: "name==*101F*" } })
     );
     expect(wrapper.find(QueryTable).prop("filter")).toEqual({

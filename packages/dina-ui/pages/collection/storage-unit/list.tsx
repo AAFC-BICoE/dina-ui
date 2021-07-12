@@ -16,7 +16,7 @@ const STORAGE_UNIT_TABLE_COLUMNS = [
   dateCell("createdOn")
 ];
 
-export default function StorageUnitListPage() {
+export default function storageUnitListPage() {
   const { formatMessage } = useDinaIntl();
 
   return (

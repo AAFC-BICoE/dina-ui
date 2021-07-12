@@ -153,19 +153,17 @@ describe("BrowseStorageTree component", () => {
         .text()
     ).toEqual("D");
 
-    // C and its nested D are disabled:
+    // C and its nested D buttons are gone:
     expect(
       wrapper
         .find(".collapser-for-A .collapser-for-C button.select-storage")
-        .first()
-        .prop("disabled")
-    ).toEqual(true);
+        .exists()
+    ).toEqual(false);
     expect(
       wrapper
         .find(".collapser-for-C .collapser-for-D button.select-storage")
-        .first()
-        .prop("disabled")
-    ).toEqual(true);
+        .exists()
+    ).toEqual(false);
   });
 
   it("Filters the list based on a text filter.", async () => {

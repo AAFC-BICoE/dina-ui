@@ -1,6 +1,7 @@
 node_modules
+coverage
 **/node_modules
-packages/*/__tests__
+**/__tests__
 packages/*/coverage
 packages/*/build
 packages/*/.next

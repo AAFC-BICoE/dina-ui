@@ -113,7 +113,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
   async function loadData(): Promise<PreLibraryPrepBulkEditRow[]> {
     const { data: selectedSampleStepResources } = await apiClient.get<
       StepResource[]
-    >("seqdb-api/stepResource", {
+    >("seqdb-api/step-resource", {
       filter: {
         "chain.uuid": chain.id,
         "chainStepTemplate.uuid": previousStep.id
@@ -127,12 +127,12 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
       .filter(id => id) as string[];
 
     const { data: plpStepResources } = await apiClient.get<StepResource[]>(
-      "seqdb-api/stepResource",
+      "seqdb-api/step-resource",
       {
         fields: {
           product: "name",
           protocol: "name",
-          molecularSample: "name,version"
+          "molecular-sample": "name,version"
         },
         filter: {
           "chain.uuid": chain.id,
@@ -184,7 +184,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
 
       const plpEdit: PreLibraryPrep = {
         ...(row.changes.plpStepResource?.preLibraryPrep as any),
-        type: "preLibraryPrep",
+        type: "pre-library-prep",
         preLibraryPrepType: plpEditMode,
         ...(plpId ? { id: plpId } : {})
       };
@@ -200,7 +200,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
 
       return {
         resource: plpEdit,
-        type: "preLibraryPrep"
+        type: "pre-library-prep"
       };
     });
 
@@ -224,13 +224,13 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
           "id",
           "type"
         ),
-        type: "stepResource",
+        type: "step-resource",
         value: preLibraryPrep.preLibraryPrepType
       } as StepResource;
 
       return {
         resource: srEdit,
-        type: "stepResource"
+        type: "step-resource"
       };
     });
 
