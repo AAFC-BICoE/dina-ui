@@ -199,7 +199,7 @@ export function SampleSelection(props: StepRendererProps) {
                 }}
                 include="molecularSample"
                 onSuccess={res => setStepResources(res.data)}
-                path="seqdb-api/stepResource"
+                path="seqdb-api/step-resource"
               />
             </div>
           </div>

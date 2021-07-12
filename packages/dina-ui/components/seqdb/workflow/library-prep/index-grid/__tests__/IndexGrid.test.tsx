@@ -20,12 +20,12 @@ const TEST_LIBRARY_PREP_BATCH: LibraryPrepBatch = {
     name: "container type",
     numberOfColumns: 12,
     numberOfRows: 8,
-    type: "containerType"
+    type: "container-type"
   },
   id: "10",
-  indexSet: { id: "123", name: "test index set", type: "indexSet" },
+  indexSet: { id: "123", name: "test index set", type: "index-set" },
   name: "test library prep batch",
-  type: "libraryPrepBatch"
+  type: "library-prep-batch"
 };
 
 function getWrapper(propsOverride?: Partial<IndexGridProps>) {
@@ -40,30 +40,30 @@ const MOCK_LIBRARY_PREPS = [
   {
     id: "1",
     molecularSample: { id: "1", type: "molecular-sample", name: "SAMP1" },
-    type: "libraryPrep",
+    type: "library-prep",
     wellColumn: 2,
     wellRow: "B"
   },
   {
     id: "2",
-    indexI5: { id: "1", type: "ngsIndex", name: "test index 1" },
-    indexI7: { id: "2", type: "ngsIndex", name: "test index 2" },
+    indexI5: { id: "1", type: "ngs-index", name: "test index 1" },
+    indexI7: { id: "2", type: "ngs-index", name: "test index 2" },
     molecularSample: { id: "2", type: "molecular-sample", name: "SAMP2" },
-    type: "libraryPrep",
+    type: "library-prep",
     wellColumn: 3,
     wellRow: "B"
   },
   {
     id: "3",
     molecularSample: { id: "3", type: "molecular-sample", name: "SAMP3" },
-    type: "libraryPrep",
+    type: "library-prep",
     wellColumn: 2,
     wellRow: "C"
   },
   {
     id: "4",
     molecularSample: { id: "4", type: "molecular-sample", name: "SAMP4" },
-    type: "libraryPrep",
+    type: "library-prep",
     wellColumn: 3,
     wellRow: "C"
   }
@@ -74,7 +74,7 @@ describe("IndexGrid component", () => {
     jest.resetAllMocks();
 
     mockGet.mockImplementation(async path => {
-      if (path === "seqdb-api/libraryPrepBatch/10/libraryPreps") {
+      if (path === "seqdb-api/library-prep-batch/10/libraryPreps") {
         return { data: MOCK_LIBRARY_PREPS };
       }
 
@@ -163,37 +163,37 @@ describe("IndexGrid component", () => {
             id: "1",
             indexI7: {
               id: "100",
-              type: "ngsIndex"
+              type: "ngs-index"
             },
-            type: "libraryPrep"
+            type: "library-prep"
           },
-          type: "libraryPrep"
+          type: "library-prep"
         },
         {
           resource: {
             id: "3",
             indexI5: {
               id: "200",
-              type: "ngsIndex"
+              type: "ngs-index"
             },
             indexI7: {
               id: "100",
-              type: "ngsIndex"
+              type: "ngs-index"
             },
-            type: "libraryPrep"
+            type: "library-prep"
           },
-          type: "libraryPrep"
+          type: "library-prep"
         },
         {
           resource: {
             id: "4",
             indexI5: {
               id: "200",
-              type: "ngsIndex"
+              type: "ngs-index"
             },
-            type: "libraryPrep"
+            type: "library-prep"
           },
-          type: "libraryPrep"
+          type: "library-prep"
         }
       ],
       { apiBaseUrl: "/seqdb-api" }

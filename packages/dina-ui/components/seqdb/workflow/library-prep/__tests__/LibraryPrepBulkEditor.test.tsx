@@ -32,16 +32,16 @@ function getWrapper(propsOverride?: Partial<LibraryPrepBulkEditorProps>) {
           name: "96 well box",
           numberOfColumns: 12,
           numberOfRows: 8,
-          type: "containerType"
+          type: "container-type"
         },
         id: "5",
-        indexSet: { id: "1234", name: "test index set", type: "indexSet" },
+        indexSet: { id: "1234", name: "test index set", type: "index-set" },
         name: "test library prep batch",
-        type: "libraryPrepBatch"
+        type: "library-prep-batch"
       }}
       chain={{ id: "5", type: "chain" } as Chain}
       sampleSelectionStep={
-        { id: "1", type: "chainStepTemplate" } as ChainStepTemplate
+        { id: "1", type: "chain-step-template" } as ChainStepTemplate
       }
       editMode="DETAILS"
       {...propsOverride}
@@ -53,11 +53,11 @@ function getWrapper(propsOverride?: Partial<LibraryPrepBulkEditorProps>) {
 const MOCK_LIBRARY_PREPS = [
   {
     id: "3",
-    indexI5: { id: "1", type: "ngsIndex", name: "i5 index 1" },
+    indexI5: { id: "1", type: "ngs-index", name: "i5 index 1" },
     inputNg: 123,
     molecularSample: { id: "6", name: "SAMP600", type: "molecular-sample" },
     size: "big",
-    type: "libraryPrep",
+    type: "library-prep",
     wellColumn: 5,
     wellRow: "F"
   }
@@ -77,13 +77,13 @@ describe("LibraryPrepBulkEditor component", () => {
 
     mockGet.mockImplementation(async path => {
       // Mock the samples with libraryPreps:
-      if (path === "seqdb-api/libraryPrepBatch/5/libraryPreps") {
+      if (path === "seqdb-api/library-prep-batch/5/libraryPreps") {
         return {
           data: MOCK_LIBRARY_PREPS
         };
       }
       // Mock the samples without well coords:
-      if (path === "seqdb-api/stepResource") {
+      if (path === "seqdb-api/step-resource") {
         return {
           data: MOCK_SAMPLE_STEPRESOURCES
         };
@@ -152,7 +152,7 @@ describe("LibraryPrepBulkEditor component", () => {
     // The well coordinate column text should be formatted as F05.
     expect(tableData[0].wellCoordinates).toEqual("F05");
 
-    tableData[0].indexI5 = "i5 index 50 (ngsIndex/50)";
+    tableData[0].indexI5 = "i5 index 50 (ngs-index/50)";
 
     // Submit the bulk editor:
     wrapper.find("button.bulk-editor-submit-button").simulate("click");
@@ -167,7 +167,7 @@ describe("LibraryPrepBulkEditor component", () => {
           resource: expect.objectContaining({
             indexI5: {
               id: "50",
-              type: "ngsIndex"
+              type: "ngs-index"
             }
           })
         })
@@ -182,7 +182,7 @@ describe("LibraryPrepBulkEditor component", () => {
       libraryPrepBatch: {
         id: "5",
         name: "test library prep batch",
-        type: "libraryPrepBatch"
+        type: "library-prep-batch"
       }
     });
 

@@ -47,7 +47,7 @@ const TEST_STEP_RESOURCES: PersistedResource<StepResource>[] = [
 const TEST_CHAIN_TEMPLATE: PersistedResource<ChainTemplate> = {
   id: "1",
   name: "WGS",
-  type: "chainTemplate"
+  type: "chain-template"
 };
 
 const TEST_CHAIN: PersistedResource<Chain> = {
@@ -64,9 +64,9 @@ const TEST_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> = {
   stepNumber: 1,
   stepTemplate: {
     id: "1",
-    type: "stepTemplate"
+    type: "step-template"
   } as PersistedResource<StepTemplate>,
-  type: "chainStepTemplate"
+  type: "chain-step-template"
 };
 
 const TEST_CHAIN_STEP_TEMPLATES = [TEST_CHAIN_STEP_TEMPLATE];
@@ -75,7 +75,7 @@ const TEST_CHAIN_STEP_TEMPLATES = [TEST_CHAIN_STEP_TEMPLATE];
 const mockGet = jest.fn(async model => {
   if (model === "seqdb-api/molecular-sample") {
     return { data: TEST_SAMPLES };
-  } else if (model === "seqdb-api/stepResource") {
+  } else if (model === "seqdb-api/step-resource") {
     return { data: TEST_STEP_RESOURCES };
   } else {
     return { data: [] };
@@ -136,14 +136,14 @@ describe("MolecularSample Selection UI", () => {
       [
         {
           op: "POST",
-          path: "stepResource",
+          path: "step-resource",
           value: {
             attributes: { value: "SAMPLE" },
             id: "00000000-0000-0000-0000-000000000000",
             relationships: {
               chain: { data: { id: "1", type: "chain" } },
               chainStepTemplate: {
-                data: { id: "1", type: "chainStepTemplate" }
+                data: { id: "1", type: "chain-step-template" }
               },
               molecularSample: {
                 data: {
@@ -153,7 +153,7 @@ describe("MolecularSample Selection UI", () => {
                 }
               }
             },
-            type: "stepResource"
+            type: "step-resource"
           }
         }
       ],
@@ -199,50 +199,50 @@ describe("MolecularSample Selection UI", () => {
       [
         {
           op: "POST",
-          path: "stepResource",
+          path: "step-resource",
           value: {
             attributes: { value: "SAMPLE" },
             id: "00000000-0000-0000-0000-000000000000",
             relationships: {
               chain: { data: { id: "1", type: "chain" } },
               chainStepTemplate: {
-                data: { id: "1", type: "chainStepTemplate" }
+                data: { id: "1", type: "chain-step-template" }
               },
               molecularSample: { data: { id: "3", type: "molecular-sample" } }
             },
-            type: "stepResource"
+            type: "step-resource"
           }
         },
         {
           op: "POST",
-          path: "stepResource",
+          path: "step-resource",
           value: {
             attributes: { value: "SAMPLE" },
             id: "00000000-0000-0000-0000-000000000000",
             relationships: {
               chain: { data: { id: "1", type: "chain" } },
               chainStepTemplate: {
-                data: { id: "1", type: "chainStepTemplate" }
+                data: { id: "1", type: "chain-step-template" }
               },
               molecularSample: { data: { id: "4", type: "molecular-sample" } }
             },
-            type: "stepResource"
+            type: "step-resource"
           }
         },
         {
           op: "POST",
-          path: "stepResource",
+          path: "step-resource",
           value: {
             attributes: { value: "SAMPLE" },
             id: "00000000-0000-0000-0000-000000000000",
             relationships: {
               chain: { data: { id: "1", type: "chain" } },
               chainStepTemplate: {
-                data: { id: "1", type: "chainStepTemplate" }
+                data: { id: "1", type: "chain-step-template" }
               },
               molecularSample: { data: { id: "5", type: "molecular-sample" } }
             },
-            type: "stepResource"
+            type: "step-resource"
           }
         }
       ],
@@ -267,8 +267,8 @@ describe("MolecularSample Selection UI", () => {
       [
         {
           op: "DELETE",
-          path: "stepResource/1",
-          value: { id: "1", type: "stepResource" }
+          path: "step-resource/1",
+          value: { id: "1", type: "step-resource" }
         }
       ],
       expect.anything()
@@ -308,18 +308,18 @@ describe("MolecularSample Selection UI", () => {
       [
         {
           op: "DELETE",
-          path: "stepResource/2",
-          value: { id: "2", type: "stepResource" }
+          path: "step-resource/2",
+          value: { id: "2", type: "step-resource" }
         },
         {
           op: "DELETE",
-          path: "stepResource/3",
-          value: { id: "3", type: "stepResource" }
+          path: "step-resource/3",
+          value: { id: "3", type: "step-resource" }
         },
         {
           op: "DELETE",
-          path: "stepResource/4",
-          value: { id: "4", type: "stepResource" }
+          path: "step-resource/4",
+          value: { id: "4", type: "step-resource" }
         }
       ],
       expect.anything()

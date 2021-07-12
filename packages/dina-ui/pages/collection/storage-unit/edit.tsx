@@ -4,6 +4,8 @@ import {
   DateField,
   DinaForm,
   DinaFormSubmitParams,
+  filterBy,
+  ResourceSelectField,
   SubmitButton,
   TextField,
   useDinaFormContext,
@@ -16,14 +18,18 @@ import {
   GroupSelectField,
   Head,
   Nav,
-  StorageLinkerField
+  StorageLinkerField,
+  StorageTreeListField
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { StorageUnit } from "../../../types/collection-api";
+import { StorageUnit, StorageUnitType } from "../../../types/collection-api";
 
 export function useStorageUnit(id?: string) {
   return useQuery<StorageUnit>(
-    { path: `collection-api/storage-unit/${id}`, include: "parentStorageUnit" },
+    {
+      path: `collection-api/storage-unit/${id}`,
+      include: "parentStorageUnit,storageUnitType"
+    },
     { disabled: !id }
   );
 }
@@ -31,7 +37,6 @@ export function useStorageUnit(id?: string) {
 export default function StorageUnitEditPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
-
   const id = router.query.id?.toString();
 
   const storageUnitQuery = useStorageUnit(id);
@@ -113,7 +118,7 @@ export function StorageUnitForm({
 
 /** Re-usable field layout between edit and view pages. */
 export function StorageUnitFormFields() {
-  const { initialValues, readOnly } = useDinaFormContext();
+  const { readOnly, initialValues } = useDinaFormContext();
 
   return (
     <div>
@@ -121,20 +126,32 @@ export function StorageUnitFormFields() {
         <GroupSelectField
           name="group"
           enableStoredDefaultGroup={true}
-          className="col-sm-6"
+          className="col-md-6"
         />
       </div>
       <div className="row">
-        <TextField className="col-sm-6" name="name" />
+        <TextField className="col-md-6" name="name" />
+        <ResourceSelectField<StorageUnitType>
+          className="col-md-6"
+          model="collection-api/storage-unit-type"
+          name="storageUnitType"
+          optionLabel={it => it.name}
+          filter={input => ({
+            ...filterBy(["name"])(input)
+          })}
+        />
       </div>
       <StorageLinkerField
         name="parentStorageUnit"
         excludeOptionId={initialValues.id}
       />
       {readOnly && (
+        <StorageTreeListField parentId={initialValues.id} disabled={true} />
+      )}
+      {readOnly && (
         <div className="row">
-          <DateField className="col-sm-6" name="createdOn" />
-          <TextField className="col-sm-6" name="createdBy" />
+          <DateField className="col-md-6" name="createdOn" />
+          <TextField className="col-md-6" name="createdBy" />
         </div>
       )}
     </div>

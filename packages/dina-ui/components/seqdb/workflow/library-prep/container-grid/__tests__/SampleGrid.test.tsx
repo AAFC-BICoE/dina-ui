@@ -30,15 +30,15 @@ function getWrapper(propsOverride?: Partial<ContainerGridProps>) {
           name: "96 well box",
           numberOfColumns: 12,
           numberOfRows: 8,
-          type: "containerType"
+          type: "container-type"
         },
         id: "5",
         name: "test library prep batch",
-        type: "libraryPrepBatch"
+        type: "library-prep-batch"
       }}
       chain={{ id: "5", type: "chain" } as Chain}
       sampleSelectionStep={
-        { id: "1", type: "chainStepTemplate" } as ChainStepTemplate
+        { id: "1", type: "chain-step-template" } as ChainStepTemplate
       }
       {...propsOverride}
     />,
@@ -50,21 +50,21 @@ const MOCK_LIBRARY_PREPS = [
   {
     id: "1",
     molecularSample: { id: "2", name: "SAMP200", type: "molecular-sample" },
-    type: "libraryPrep",
+    type: "library-prep",
     wellColumn: 1,
     wellRow: "A"
   },
   {
     id: "2",
     molecularSample: { id: "4", name: "SAMP400", type: "molecular-sample" },
-    type: "libraryPrep",
+    type: "library-prep",
     wellColumn: 2,
     wellRow: "B"
   },
   {
     id: "3",
     molecularSample: { id: "6", name: "SAMP600", type: "molecular-sample" },
-    type: "libraryPrep"
+    type: "library-prep"
   }
 ];
 
@@ -82,13 +82,13 @@ describe("SampleGrid component", () => {
 
     mockGet.mockImplementation(async path => {
       // Mock the samples with libraryPreps:
-      if (path === "seqdb-api/libraryPrepBatch/5/libraryPreps") {
+      if (path === "seqdb-api/library-prep-batch/5/libraryPreps") {
         return {
           data: MOCK_LIBRARY_PREPS
         };
       }
       // Mock the samples without well coords:
-      if (path === "seqdb-api/stepResource") {
+      if (path === "seqdb-api/step-resource") {
         return {
           data: MOCK_STEPRESOURCES_NO_WELL_COORDS
         };
@@ -221,11 +221,11 @@ describe("SampleGrid component", () => {
               id: "6",
               type: "molecular-sample"
             }),
-            type: "libraryPrep",
+            type: "library-prep",
             wellColumn: 3,
             wellRow: "F"
           },
-          type: "libraryPrep"
+          type: "library-prep"
         }
       ],
       { apiBaseUrl: "/seqdb-api" }
@@ -302,43 +302,43 @@ describe("SampleGrid component", () => {
               id: "6",
               type: "molecular-sample"
             }),
-            type: "libraryPrep",
+            type: "library-prep",
             wellColumn: 3,
             wellRow: "G"
           },
-          type: "libraryPrep"
+          type: "library-prep"
         },
         {
           resource: {
             libraryPrepBatch: expect.objectContaining({
               id: "5",
-              type: "libraryPrepBatch"
+              type: "library-prep-batch"
             }),
             molecularSample: expect.objectContaining({
               id: "8",
               type: "molecular-sample"
             }),
-            type: "libraryPrep",
+            type: "library-prep",
             wellColumn: 3,
             wellRow: "H"
           },
-          type: "libraryPrep"
+          type: "library-prep"
         },
         {
           resource: {
             libraryPrepBatch: expect.objectContaining({
               id: "5",
-              type: "libraryPrepBatch"
+              type: "library-prep-batch"
             }),
             molecularSample: expect.objectContaining({
               id: "10",
               type: "molecular-sample"
             }),
-            type: "libraryPrep",
+            type: "library-prep",
             wellColumn: 4,
             wellRow: "A"
           },
-          type: "libraryPrep"
+          type: "library-prep"
         }
       ],
       { apiBaseUrl: "/seqdb-api" }
@@ -387,43 +387,43 @@ describe("SampleGrid component", () => {
               id: "6",
               type: "molecular-sample"
             }),
-            type: "libraryPrep",
+            type: "library-prep",
             wellColumn: 11,
             wellRow: "G"
           },
-          type: "libraryPrep"
+          type: "library-prep"
         },
         {
           resource: {
             libraryPrepBatch: expect.objectContaining({
               id: "5",
-              type: "libraryPrepBatch"
+              type: "library-prep-batch"
             }),
             molecularSample: expect.objectContaining({
               id: "8",
               type: "molecular-sample"
             }),
-            type: "libraryPrep",
+            type: "library-prep",
             wellColumn: 12,
             wellRow: "G"
           },
-          type: "libraryPrep"
+          type: "library-prep"
         },
         {
           resource: {
             libraryPrepBatch: expect.objectContaining({
               id: "5",
-              type: "libraryPrepBatch"
+              type: "library-prep-batch"
             }),
             molecularSample: expect.objectContaining({
               id: "10",
               type: "molecular-sample"
             }),
-            type: "libraryPrep",
+            type: "library-prep",
             wellColumn: 1,
             wellRow: "H"
           },
-          type: "libraryPrep"
+          type: "library-prep"
         }
       ],
       { apiBaseUrl: "/seqdb-api" }
@@ -549,11 +549,11 @@ describe("SampleGrid component", () => {
               name: "SAMP600",
               type: "molecular-sample"
             },
-            type: "libraryPrep",
+            type: "library-prep",
             wellColumn: 12,
             wellRow: "H"
           }),
-          type: "libraryPrep"
+          type: "library-prep"
         },
         {
           resource: expect.objectContaining({
@@ -562,11 +562,11 @@ describe("SampleGrid component", () => {
               name: "SAMP800",
               type: "molecular-sample"
             },
-            type: "libraryPrep",
+            type: "library-prep",
             wellColumn: null,
             wellRow: null
           }),
-          type: "libraryPrep"
+          type: "library-prep"
         },
         {
           resource: expect.objectContaining({
@@ -575,11 +575,11 @@ describe("SampleGrid component", () => {
               name: "ZSAMP1000",
               type: "molecular-sample"
             },
-            type: "libraryPrep",
+            type: "library-prep",
             wellColumn: null,
             wellRow: null
           }),
-          type: "libraryPrep"
+          type: "library-prep"
         }
       ],
       { apiBaseUrl: "/seqdb-api" }
@@ -591,7 +591,7 @@ describe("SampleGrid component", () => {
       libraryPrepBatch: {
         id: "5",
         name: "test library prep batch",
-        type: "libraryPrepBatch"
+        type: "library-prep-batch"
       }
     });
 

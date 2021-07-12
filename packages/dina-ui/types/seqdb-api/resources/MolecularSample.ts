@@ -4,6 +4,7 @@ import { Product } from "./Product";
 import { Protocol } from "./Protocol";
 
 export interface MolecularSampleAttributes {
+  type: "molecular-sample";
   name: string;
   version: string;
 

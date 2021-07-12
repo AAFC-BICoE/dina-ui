@@ -39,10 +39,10 @@ export const SEQDB_MESSAGES_ENGLISH = {
   "field_sample.name": "Sample Name",
   field_size: "Size",
   field_targetBpSize: "Target Base Pair Size",
-  indexI5: "Index i5",
-  indexI7: "Index i7",
   indexGridInstructions:
     "Selecting a dropdown item along the top side sets the index for that column. Selecting a dropdown item along the left side sets the index for that row. Selecting None erases the Index.",
+  indexI5: "Index i5",
+  indexI7: "Index i7",
   indexSetListTitle: "Index Sets",
   indexSetMustBeSet: "Index Set must be set.",
   molecularSample: "Molecular Sample",

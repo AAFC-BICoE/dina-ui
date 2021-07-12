@@ -27,7 +27,7 @@ describe("Library Prep Worksheet page", () => {
   beforeEach(() => {
     jest.resetAllMocks();
     mockGet.mockImplementation(async path => {
-      if (path === "seqdb-api/stepResource/5") {
+      if (path === "seqdb-api/step-resource/5") {
         return {
           data: {
             chain: {
@@ -43,55 +43,55 @@ describe("Library Prep Worksheet page", () => {
                 name: "container type",
                 numberOfColumns: 12,
                 numberOfRows: 8,
-                type: "containerType"
+                type: "container-type"
               },
               id: "200",
               name: "test batch",
-              type: "libraryPrepBatch"
+              type: "library-prep-batch"
             },
-            type: "stepResource"
+            type: "step-resource"
           } as StepResource
         };
       }
-      if (path === "seqdb-api/libraryPrepBatch/200/libraryPreps") {
+      if (path === "seqdb-api/library-prep-batch/200/libraryPreps") {
         return {
           data: [
             {
               id: "1",
-              indexI5: { id: "1", type: "ngsIndex", name: "index 1" },
-              indexI7: { id: "4", type: "ngsIndex", name: "index 4" },
+              indexI5: { id: "1", type: "ngs-index", name: "index 1" },
+              indexI7: { id: "4", type: "ngs-index", name: "index 4" },
               molecularSample: {
                 id: "1",
                 type: "molecular-sample",
                 name: "SAMP1"
               },
-              type: "libraryPrep",
+              type: "library-prep",
               wellColumn: 1,
               wellRow: "A"
             },
             {
               id: "2",
-              indexI5: { id: "2", type: "ngsIndex", name: "index 2" },
-              indexI7: { id: "5", type: "ngsIndex", name: "index 5" },
+              indexI5: { id: "2", type: "ngs-index", name: "index 2" },
+              indexI7: { id: "5", type: "ngs-index", name: "index 5" },
               molecularSample: {
                 id: "1",
                 type: "molecular-sample",
                 name: "SAMP2"
               },
-              type: "libraryPrep",
+              type: "library-prep",
               wellColumn: 2,
               wellRow: "A"
             },
             {
               id: "3",
-              indexI5: { id: "3", type: "ngsIndex", name: "index 3" },
-              indexI7: { id: "6", type: "ngsIndex", name: "index 6" },
+              indexI5: { id: "3", type: "ngs-index", name: "index 3" },
+              indexI7: { id: "6", type: "ngs-index", name: "index 6" },
               molecularSample: {
                 id: "1",
                 type: "molecular-sample",
                 name: "SAMP3"
               },
-              type: "libraryPrep",
+              type: "library-prep",
               wellColumn: 2,
               wellRow: "A"
             }

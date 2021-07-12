@@ -320,7 +320,7 @@ export function makeAxiosErrorMoreReadable(error: AxiosError) {
 export class CustomDinaKitsu extends Kitsu {
   /**
    * The default Kitsu 'get' method omits the last part of URLs with multiple slashes.
-   * e.g. "seqdb-api/indexSet/1/ngsindexes" becomes "seqdb-api/indexSet/1".
+   * e.g. "seqdb-api/index-set/1/ngsindexes" becomes "seqdb-api/index-set/1".
    * Override the 'get' method so it works with our long URLs:
    */
   async get(path: string, params: GetParams = {}) {
