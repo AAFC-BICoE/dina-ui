@@ -23,35 +23,22 @@ export function AssignedStorage({
 
   return value?.id ? (
     <div>
-      {withResponse(storageQuery, ({ data: storageUnit }) => {
-        // Loop through the Storage Units to get the full path:
-        const storagePath: PersistedResource<StorageUnit>[] = [];
-        for (
-          let unit: PersistedResource<StorageUnit> | null | undefined =
-            storageUnit;
-          unit;
-          unit = unit.parentStorageUnit
-        ) {
-          storagePath.unshift(unit);
-        }
-
-        return (
-          <div>
-            <div className="storage-path mb-3">
-              <StorageUnitBreadCrumb storageUnit={storageUnit} />
-            </div>
-            {!readOnly && (
-              <button
-                type="button"
-                className="remove-storage btn btn-danger"
-                onClick={() => onChange?.({ id: null })}
-              >
-                <DinaMessage id="removeFromParentStorageUnit" />
-              </button>
-            )}
+      {withResponse(storageQuery, ({ data: storageUnit }) => (
+        <div>
+          <div className="storage-path mb-3">
+            <StorageUnitBreadCrumb storageUnit={storageUnit} />
           </div>
-        );
-      })}
+          {!readOnly && (
+            <button
+              type="button"
+              className="remove-storage btn btn-danger"
+              onClick={() => onChange?.({ id: null })}
+            >
+              <DinaMessage id="removeFromParentStorageUnit" />
+            </button>
+          )}
+        </div>
+      ))}
     </div>
   ) : (
     noneMessage ?? <DinaMessage id="none" />

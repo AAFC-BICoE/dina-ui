@@ -21,24 +21,12 @@ const STORAGE_A: PersistedResource<StorageUnit> = {
     group: "group",
     name: "B",
     type: "storage-unit",
-    parentStorageUnit: {
-      id: "C",
-      group: "group",
-      name: "C",
-      type: "storage-unit",
-      parentStorageUnit: {
-        id: "D",
-        group: "group",
-        name: "D",
-        type: "storage-unit",
-        parentStorageUnit: {
-          id: "E",
-          group: "group",
-          name: "E",
-          type: "storage-unit"
-        }
-      }
-    }
+    hierarchy: [
+      { uuid: "B", name: "B" },
+      { uuid: "C", name: "C" },
+      { uuid: "D", name: "D" },
+      { uuid: "E", name: "E" }
+    ]
   }
 };
 
@@ -49,10 +37,31 @@ const mockGet = jest.fn<any, any>(async path => {
   }
 });
 
+const mockBulkGet = jest.fn(async paths =>
+  paths.map(path => {
+    switch (path) {
+      case "storage-unit/B?include=hierarchy":
+        return {
+          id: "B",
+          group: "group",
+          name: "B",
+          type: "storage-unit",
+          hierarchy: [
+            { uuid: "B", name: "B" },
+            { uuid: "C", name: "C" },
+            { uuid: "D", name: "D" },
+            { uuid: "E", name: "E" }
+          ]
+        };
+    }
+  })
+);
+
 const apiContext = {
   apiClient: {
     get: mockGet
-  }
+  },
+  bulkGet: mockBulkGet
 };
 
 const mockOnChange = jest.fn();
@@ -69,7 +78,11 @@ describe("AssignedStorage component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".storage-path").text()).toEqual("E > D > C > B > A");
+    expect(
+      wrapper
+        .find(".storage-path li.breadcrumb-item")
+        .map(node => node.text().trim())
+    ).toEqual(["E", "D", "C", "B", "A"]);
   });
 
   it("Lets you remove the storage unit", async () => {
