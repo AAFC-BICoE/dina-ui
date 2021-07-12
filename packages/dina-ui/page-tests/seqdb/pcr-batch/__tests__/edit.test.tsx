@@ -11,12 +11,12 @@ const TEST_PCRBATCH: PersistedResource<PcrBatch> = {
   createdBy: "poffm",
   primerForward: {
     id: "123",
-    type: "pcrPrimer",
+    type: "pcr-primer",
     name: "Primer 1"
   } as PersistedResource<PcrPrimer>,
   primerReverse: {
     id: "456",
-    type: "pcrPrimer",
+    type: "pcr-primer",
     name: "Primer 2"
   } as PersistedResource<PcrPrimer>,
   experimenters: [
@@ -36,12 +36,25 @@ const mockGet = jest.fn<any, any>(async path => {
       return { data: [] };
     case "seqdb-api/region":
       return { data: [] };
-    case "seqdb-api/pcrPrimer":
+    case "seqdb-api/pcr-primer":
       return { data: [] };
     case "seqdb-api/thermocycler-profile":
       return { data: [] };
   }
 });
+
+const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
+  paths.map(path => {
+    switch (path) {
+      case "agent/1":
+        return { id: "1", type: "agent", displayName: "agent 1" };
+      case "agent/2":
+        return { id: "2", type: "agent", displayName: "agent 2" };
+      case "agent/3":
+        return { id: "3", type: "agent", displayName: "agent 3" };
+    }
+  })
+);
 
 const mockSave = jest.fn(async ops => {
   return ops.map(({ resource }) => ({ ...resource, id: "123" }));
@@ -53,6 +66,7 @@ const apiContext = {
   apiClient: {
     get: mockGet
   },
+  bulkGet: mockBulkGet,
   save: mockSave
 };
 
@@ -98,10 +112,17 @@ describe("PcrBatch edit page", () => {
             name: "test new batch",
             // TODO let the back-end set "createdBy" instead of the front-end:
             createdBy: "test-user",
-            experimenters: ["1", "2"],
             primerForward: undefined,
             primerReverse: undefined,
-            type: "pcr-batch"
+            type: "pcr-batch",
+            relationships: {
+              experimenters: {
+                data: [
+                  { id: "1", type: "person" },
+                  { id: "2", type: "person" }
+                ]
+              }
+            }
           },
           type: "pcr-batch"
         }
@@ -129,21 +150,29 @@ describe("PcrBatch edit page", () => {
         {
           resource: {
             createdBy: "poffm",
-            experimenters: ["1", "2", "3"],
             group: "cnc",
             id: "123",
             name: "test pcr batch",
             primerForward: {
               id: "123",
               name: "Primer 1",
-              type: "pcrPrimer"
+              type: "pcr-primer"
             },
             primerReverse: {
               id: "456",
               name: "Primer 2",
-              type: "pcrPrimer"
+              type: "pcr-primer"
             },
-            type: "pcr-batch"
+            type: "pcr-batch",
+            relationships: {
+              experimenters: {
+                data: [
+                  { id: "1", type: "person" },
+                  { id: "2", type: "person" },
+                  { id: "3", type: "person" }
+                ]
+              }
+            }
           },
           type: "pcr-batch"
         }

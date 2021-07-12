@@ -38,18 +38,22 @@ export function usePcrBatchQuery(id?: string) {
   return useQuery<PcrBatch>(
     {
       path: `seqdb-api/pcr-batch/${id}`,
-      include: "primerForward,primerReverse,region,thermocycleProfile"
+      include:
+        "primerForward,primerReverse,region,thermocycleProfile,experimenters"
     },
     {
       disabled: !id,
       onSuccess: async ({ data: pcrBatch }) => {
-        // Convert UUID array to resource array:
-        (pcrBatch as any).experimenters = await bulkGet<Person>(
-          pcrBatch.experimenters?.map(
-            personId => `person/${String(personId)}`
-          ) ?? [],
-          { apiBaseUrl: "/agent-api", returnNullForMissingResource: true }
-        );
+        if (pcrBatch.experimenters) {
+          const agents = await bulkGet<Person>(
+            pcrBatch.experimenters.map(
+              experimenter => `/person/${experimenter.id}`
+            ),
+            { apiBaseUrl: "/agent-api", returnNullForMissingResource: true }
+          );
+          // Omit null (deleted) records:
+          pcrBatch.experimenters = agents.filter(it => it);
+        }
       }
     }
   );
@@ -107,20 +111,28 @@ export function PcrBatchForm({ pcrBatch, onSaved }: PcrBatchFormProps) {
     submittedValues,
     api: { save }
   }: DinaFormSubmitParams<PcrBatch>) {
+    // Init relationships object for one-to-many relations:
+    (submittedValues as any).relationships = {};
+
+    if (submittedValues.experimenters?.length) {
+      (submittedValues as any).relationships.experimenters = {
+        data: submittedValues?.experimenters.map(collector => ({
+          id: (collector as Person).id,
+          type: "person"
+        }))
+      };
+    }
+    delete submittedValues.experimenters;
+
     const inputResource = {
       ...submittedValues,
 
-      // Convert the experimenters resources to a UUID array:
-      experimenters: submittedValues.experimenters?.map(
-        person => (person as any).id
-      ),
-
       // Override the "type" attribute with the JSONAPI resource type:
       primerForward: submittedValues.primerForward
-        ? { ...submittedValues.primerForward, type: "pcrPrimer" }
+        ? { ...submittedValues.primerForward, type: "pcr-primer" }
         : undefined,
       primerReverse: submittedValues.primerReverse
-        ? { ...submittedValues.primerReverse, type: "pcrPrimer" }
+        ? { ...submittedValues.primerReverse, type: "pcr-primer" }
         : undefined
     };
 
@@ -208,7 +220,7 @@ export function PcrBatchFormFields() {
           className="col-md-6"
           name="primerForward"
           filter={filterBy(["name"])}
-          model="seqdb-api/pcrPrimer"
+          model="seqdb-api/pcr-primer"
           optionLabel={primer => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
         />
@@ -216,7 +228,7 @@ export function PcrBatchFormFields() {
           className="col-md-6"
           name="primerReverse"
           filter={filterBy(["name"])}
-          model="seqdb-api/pcrPrimer"
+          model="seqdb-api/pcr-primer"
           optionLabel={primer => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
         />

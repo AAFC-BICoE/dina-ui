@@ -12,7 +12,7 @@ export interface PcrBatchAttributes {
   createdOn?: string;
 
   /** UUID array (from the back-end JSON) or Person array (in the form state). */
-  experimenters?: (string | Person)[];
+  experimenters?: Person[];
 }
 
 export interface PcrBatchRelationships {
