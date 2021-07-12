@@ -57,7 +57,7 @@ export function StorageSearchSelector({
   return (
     <div className="storage-search-selector">
       <style>{`
-        .storage-search-selector .rt-tr:hover {
+        .storage-search-selector .rt-tr-group:hover {
           background-color: rgb(222, 252, 222) !important;
         }
       `}</style>
@@ -66,6 +66,9 @@ export function StorageSearchSelector({
         columns={tableColumns}
         path="collection-api/storage-unit"
         include="hierarchy,storageUnitType"
+        // Sort by newest:
+        defaultSort={[{ id: "createdOn", desc: true }]}
+        reactTableProps={() => ({ sortable: false })}
         filter={{
           rsql: rsql({
             type: "FILTER_GROUP",

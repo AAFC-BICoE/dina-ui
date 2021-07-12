@@ -1,6 +1,13 @@
+import {
+  filterBy,
+  FilterGroupModel,
+  ResourceSelect,
+  useAccount
+} from "common-ui";
+import { PersistedResource } from "kitsu";
 import { useEffect, useState } from "react";
-import { FilterGroupModel, useAccount } from "../../../common-ui/lib";
 import { DinaMessage } from "../../intl/dina-ui-intl";
+import { StorageUnitType } from "../../types/collection-api";
 
 export interface StorageFilterProps {
   onChange: (newValue: FilterGroupModel | null) => void;
@@ -8,6 +15,8 @@ export interface StorageFilterProps {
 
 export function StorageFilter({ onChange }: StorageFilterProps) {
   const [searchText, setSearchText] = useState<string>("");
+  const [storageTypeFilter, setStorageTypeFilter] =
+    useState<PersistedResource<StorageUnitType>>();
   const [createdByMeFilter, setCreatedByMeFilter] = useState(false);
   const { username } = useAccount();
 
@@ -40,21 +49,40 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
                 value: username
               }
             ]
+          : []),
+        ...(storageTypeFilter?.id
+          ? [
+              {
+                id: -1234321,
+                type: "FILTER_ROW" as const,
+                attribute: "storageUnitType.uuid",
+                predicate: "IS" as const,
+                searchType: "EXACT_MATCH" as const,
+                value: storageTypeFilter.id
+              }
+            ]
           : [])
       ]
     });
   }
 
-  useEffect(doSearch, [createdByMeFilter]);
+  // Do the search whenever the dropdown or checkbox value changes:
+  useEffect(doSearch, [createdByMeFilter, storageTypeFilter]);
 
   function resetSearch() {
+    setStorageTypeFilter(undefined);
     setSearchText("");
     onChange(null);
   }
 
   return (
-    <div className="d-flex flex-wrap align-items-center gap-5 mb-3">
-      <label className="d-flex align-items-center gap-2">
+    <div>
+      <div className="mb-3">
+        <strong>
+          <DinaMessage id="filterRecordsTitle" />
+        </strong>
+      </div>
+      <label className="d-flex align-items-center gap-2 mb-3">
         <input
           type="checkbox"
           onChange={e => setCreatedByMeFilter(e.target.checked)}
@@ -68,35 +96,57 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
           <DinaMessage id="storagesCreatedByMe" />
         </strong>
       </label>
-      <div className="input-group" style={{ width: "30rem" }}>
-        <input
-          className="storage-tree-search form-control"
-          type="text"
-          value={searchText}
-          onChange={e => setSearchText(e.target.value)}
-          // Pressing enter should set the filter, not submit the form:
-          onKeyDown={e => {
-            if (e.keyCode === 13) {
-              e.preventDefault();
-              doSearch();
-            }
-          }}
-        />
-        <button
-          className="storage-tree-search btn btn-primary"
-          type="button"
-          style={{ width: "10rem" }}
-          onClick={doSearch}
-        >
-          <DinaMessage id="search" />
-        </button>
-        <button
-          className="storage-tree-search-reset btn btn-dark"
-          type="button"
-          onClick={resetSearch}
-        >
-          <DinaMessage id="resetButtonText" />
-        </button>
+      <div className="row mb-3">
+        <div className="col-sm-6">
+          <label className="w-100">
+            <strong>
+              <DinaMessage id="storageUnitType" />
+            </strong>
+            <ResourceSelect<StorageUnitType>
+              model="collection-api/storage-unit-type"
+              optionLabel={it => it.name}
+              filter={filterBy(["name"])}
+              onChange={setStorageTypeFilter as any}
+              value={storageTypeFilter}
+            />
+          </label>
+        </div>
+        <div className="col-sm-6">
+          <label className="w-100">
+            <strong>
+              <DinaMessage id="name" />
+            </strong>
+            <div className="input-group col-sm-6">
+              <input
+                className="storage-tree-search form-control"
+                type="text"
+                value={searchText}
+                onChange={e => setSearchText(e.target.value)}
+                // Pressing enter should set the filter, not submit the form:
+                onKeyDown={e => {
+                  if (e.keyCode === 13) {
+                    e.preventDefault();
+                    doSearch();
+                  }
+                }}
+              />
+              <button
+                className="storage-tree-search btn btn-primary"
+                type="button"
+                onClick={doSearch}
+              >
+                <DinaMessage id="search" />
+              </button>
+              <button
+                className="storage-tree-search-reset btn btn-dark"
+                type="button"
+                onClick={resetSearch}
+              >
+                <DinaMessage id="resetButtonText" />
+              </button>
+            </div>
+          </label>
+        </div>
       </div>
     </div>
   );
