@@ -21,7 +21,7 @@ function getWrapper(propsOverride: Partial<LibraryPoolDetailsFormProps> = {}) {
   return mountWithAppContext(
     <LibraryPoolDetailsForm
       chain={{ id: "5", type: "chain" } as Chain}
-      step={{ id: "10", type: "chainStepTemplate" } as ChainStepTemplate}
+      step={{ id: "10", type: "chain-step-template" } as ChainStepTemplate}
       onSuccess={mockOnSuccess}
       {...propsOverride}
     />,
@@ -37,11 +37,11 @@ describe("LibraryPoolDetailsForm component", () => {
   it("Lets you create a new library pool.", async () => {
     // Mock success response:
     mockSave.mockImplementation(async ops => {
-      if (ops[0].type === "libraryPool") {
-        return [{ id: "2", type: "libraryPool" }];
+      if (ops[0].type === "library-pool") {
+        return [{ id: "2", type: "library-pool" }];
       }
-      if (ops[0].type === "stepResource") {
-        return [{ id: "100", type: "stepResource" }];
+      if (ops[0].type === "step-resource") {
+        return [{ id: "100", type: "step-resource" }];
       }
     });
 
@@ -66,7 +66,7 @@ describe("LibraryPoolDetailsForm component", () => {
             resource: {
               name: "new library pool"
             },
-            type: "libraryPool"
+            type: "library-pool"
           }
         ],
         { apiBaseUrl: "/seqdb-api" }
@@ -81,16 +81,16 @@ describe("LibraryPoolDetailsForm component", () => {
               },
               chainStepTemplate: {
                 id: "10",
-                type: "chainStepTemplate"
+                type: "chain-step-template"
               },
               libraryPool: {
                 id: "2",
-                type: "libraryPool"
+                type: "library-pool"
               },
-              type: "stepResource",
+              type: "step-resource",
               value: "LIBRARY_POOL"
             },
-            type: "stepResource"
+            type: "step-resource"
           }
         ],
         { apiBaseUrl: "/seqdb-api" }
@@ -103,8 +103,8 @@ describe("LibraryPoolDetailsForm component", () => {
   it("Lets you edit an existing library pool.", async () => {
     // Mock success response:
     mockSave.mockImplementation(async ops => {
-      if (ops[0].type === "libraryPool") {
-        return [{ id: "2", type: "libraryPool" }];
+      if (ops[0].type === "library-pool") {
+        return [{ id: "2", type: "library-pool" }];
       }
     });
 
@@ -112,7 +112,7 @@ describe("LibraryPoolDetailsForm component", () => {
       libraryPool: {
         id: "2",
         name: "existing test library pool",
-        type: "libraryPool"
+        type: "library-pool"
       }
     });
 
@@ -140,9 +140,9 @@ describe("LibraryPoolDetailsForm component", () => {
             resource: {
               id: "2",
               name: "edited name",
-              type: "libraryPool"
+              type: "library-pool"
             },
-            type: "libraryPool"
+            type: "library-pool"
           }
         ],
         { apiBaseUrl: "/seqdb-api" }

@@ -14,7 +14,7 @@ import { StepRenderer, StepRendererProps } from "../StepRenderer";
 const TEST_CHAIN_TEMPLATE = {
   id: "1",
   name: "WGS Pooling",
-  type: "chainTemplate"
+  type: "chain-template"
 } as PersistedResource<ChainTemplate>;
 
 const TEST_CHAIN = {

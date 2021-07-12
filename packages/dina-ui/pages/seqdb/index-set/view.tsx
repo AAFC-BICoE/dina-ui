@@ -17,7 +17,7 @@ export default function IndexSetViewPage() {
   } = useRouter();
 
   const { loading, response } = useQuery<IndexSet>({
-    path: `seqdb-api/indexSet/${id}`
+    path: `seqdb-api/index-set/${id}`
   });
 
   if (loading) {
@@ -48,7 +48,7 @@ export default function IndexSetViewPage() {
             <strong>NGS indexes:</strong>
             <QueryTable
               columns={["name", "lotNumber", "direction"]}
-              path={`seqdb-api/indexSet/${id}/ngsIndexes`}
+              path={`seqdb-api/index-set/${id}/ngsIndexes`}
             />
           </main>
         </DinaForm>

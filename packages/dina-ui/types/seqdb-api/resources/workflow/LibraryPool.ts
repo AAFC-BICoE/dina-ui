@@ -2,7 +2,7 @@ import { KitsuResource } from "kitsu";
 
 interface LibraryPoolAttributes {
   name: string;
-  type: "libraryPool";
+  type: "library-pool";
 }
 
 // interface LibraryPoolRelationships {}

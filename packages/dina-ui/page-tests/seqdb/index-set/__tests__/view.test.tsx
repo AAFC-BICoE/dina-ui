@@ -14,36 +14,36 @@ jest.mock("next/router", () => ({
 const TEST_INDEX_SET: IndexSet = {
   id: "100",
   name: "test index set",
-  type: "indexSet"
+  type: "index-set"
 };
 
 const TEST_NGS_INDEXES: NgsIndex[] = [
   {
     id: "1",
-    indexSet: { id: "100", type: "indexSet" } as IndexSet,
+    indexSet: { id: "100", type: "index-set" } as IndexSet,
     name: "index 1",
-    type: "ngsIndex"
+    type: "ngs-index"
   },
   {
     id: "2",
-    indexSet: { id: "100", type: "indexSet" } as IndexSet,
+    indexSet: { id: "100", type: "index-set" } as IndexSet,
     name: "index 2",
-    type: "ngsIndex"
+    type: "ngs-index"
   },
   {
     id: "3",
-    indexSet: { id: "100", type: "indexSet" } as IndexSet,
+    indexSet: { id: "100", type: "index-set" } as IndexSet,
     name: "index 3",
-    type: "ngsIndex"
+    type: "ngs-index"
   }
 ];
 
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async path => {
-  if (path === "seqdb-api/indexSet/100") {
+  if (path === "seqdb-api/index-set/100") {
     return { data: TEST_INDEX_SET };
   }
-  if (path === "seqdb-api/indexSet/100/ngsIndexes") {
+  if (path === "seqdb-api/index-set/100/ngsIndexes") {
     return { data: TEST_NGS_INDEXES };
   }
   return { data: [] };

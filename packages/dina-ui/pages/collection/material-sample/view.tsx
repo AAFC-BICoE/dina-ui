@@ -11,7 +11,7 @@ import { Field, FastField } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { Head, Nav, StorageLinkerField } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
 import { useMaterialSampleQuery } from "../../../components/collection/useMaterialSample";
@@ -84,6 +84,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             >
               <MaterialSampleMainInfoFormLayout />
               <MaterialSampleIdentifiersFormLayout />
+              <div className="card card-body mb-3">
+                <StorageLinkerField name="storageUnit" />
+              </div>
               {collectingEvent && (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                   <DinaForm initialValues={collectingEvent} readOnly={true}>

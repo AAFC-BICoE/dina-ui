@@ -7,7 +7,7 @@ function getWrapper() {
       libraryPool={{
         id: "100",
         name: "test library pool",
-        type: "libraryPool"
+        type: "library-pool"
       }}
     />
   );

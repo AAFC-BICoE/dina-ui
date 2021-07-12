@@ -48,7 +48,7 @@ export function LibraryPrepBatchForm({
       [
         {
           resource: submittedValues,
-          type: "libraryPrepBatch"
+          type: "library-prep-batch"
         }
       ],
       { apiBaseUrl: "/seqdb-api" }
@@ -60,7 +60,7 @@ export function LibraryPrepBatchForm({
         chain,
         chainStepTemplate: step,
         libraryPrepBatch: newLibraryPrepBatch as LibraryPrepBatch,
-        type: "stepResource",
+        type: "step-resource",
         value: "LIBRARY_PREP_BATCH"
       };
 
@@ -68,7 +68,7 @@ export function LibraryPrepBatchForm({
         [
           {
             resource: newStepResource,
-            type: "stepResource"
+            type: "step-resource"
           }
         ],
         { apiBaseUrl: "/seqdb-api" }
@@ -107,7 +107,7 @@ export function LibraryPrepBatchForm({
           className="col-md-2"
           name="containerType"
           filter={filterBy(["name"])}
-          model="seqdb-api/containerType"
+          model="seqdb-api/container-type"
           optionLabel={ct => ct.name}
         />
         <ResourceSelectField<PcrProfile>
@@ -121,7 +121,7 @@ export function LibraryPrepBatchForm({
           className="col-md-2"
           name="indexSet"
           filter={filterBy(["name"])}
-          model="seqdb-api/indexSet"
+          model="seqdb-api/index-set"
           optionLabel={set => set.name}
         />
       </div>

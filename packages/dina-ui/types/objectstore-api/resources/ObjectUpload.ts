@@ -14,7 +14,6 @@ export interface ObjectUploadAttributes {
   createdBy?: string;
   createdOn?: string;
   dcType?: DcType;
-  orientation?: number;
   fileIdentifier: string;
   metaFileEntryVersion: string;
   originalFilename: string;
