@@ -86,7 +86,9 @@ export function StorageTreeList({
         ]
       }),
       // For top-level storage units:
-      ...(!filter && !parentId ? { parentStorageUnit: null } : {})
+      ...(!filter?.children?.length && !parentId
+        ? { parentStorageUnit: null }
+        : {})
     }
   });
 
