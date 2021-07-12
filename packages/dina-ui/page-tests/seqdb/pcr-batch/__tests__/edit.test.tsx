@@ -38,7 +38,7 @@ const mockGet = jest.fn<any, any>(async path => {
       return { data: [] };
     case "seqdb-api/pcrPrimer":
       return { data: [] };
-    case "seqdb-api/thermocyclerprofile":
+    case "seqdb-api/thermocycler-profile":
       return { data: [] };
   }
 });

@@ -114,7 +114,7 @@ export function LibraryPrepBatchForm({
           className="col-md-2"
           name="thermocyclerProfile"
           filter={filterBy(["name"])}
-          model="seqdb-api/thermocyclerprofile"
+          model="seqdb-api/thermocycler-profile"
           optionLabel={profile => profile.name}
         />
         <ResourceSelectField<IndexSet>

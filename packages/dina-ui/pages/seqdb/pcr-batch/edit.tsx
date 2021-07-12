@@ -174,7 +174,7 @@ export function PcrBatchFormFields() {
           className="col-md-6"
           name="thermocycleProfile"
           filter={filterBy(["name"])}
-          model="seqdb-api/thermocyclerprofile"
+          model="seqdb-api/thermocycler-profile"
           optionLabel={profile => profile.name}
           readOnlyLink="/seqdb/pcr-profile/view?id="
         />
