@@ -39,7 +39,7 @@ export function usePcrBatchQuery(id?: string) {
     {
       path: `seqdb-api/pcr-batch/${id}`,
       include:
-        "primerForward,primerReverse,region,thermocycleProfile,experimenters"
+        "primerForward,primerReverse,region,thermocyclerProfile,experimenters"
     },
     {
       disabled: !id,
@@ -114,7 +114,7 @@ export function PcrBatchForm({ pcrBatch, onSaved }: PcrBatchFormProps) {
     // Init relationships object for one-to-many relations:
     (submittedValues as any).relationships = {};
 
-    if (submittedValues.experimenters?.length) {
+    if (submittedValues.experimenters) {
       (submittedValues as any).relationships.experimenters = {
         data: submittedValues?.experimenters.map(collector => ({
           id: (collector as Person).id,
@@ -184,7 +184,7 @@ export function PcrBatchFormFields() {
         <TextField className="col-md-6" name="name" />
         <ResourceSelectField<PcrProfile>
           className="col-md-6"
-          name="thermocycleProfile"
+          name="thermocyclerProfile"
           filter={filterBy(["name"])}
           model="seqdb-api/thermocycler-profile"
           optionLabel={profile => profile.name}
