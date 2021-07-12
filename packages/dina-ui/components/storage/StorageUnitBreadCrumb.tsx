@@ -12,7 +12,7 @@ export function StorageUnitBreadCrumb({
 }: StorageUnitBreadCrumbProps) {
   const parentPath = [
     ...(storageUnit.parentStorageUnit?.hierarchy ??
-      storageUnit.hierarchy?.slice(0, -1) ??
+      storageUnit.hierarchy?.slice(1) ??
       [])
   ].reverse();
 

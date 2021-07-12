@@ -48,7 +48,7 @@ export function StorageSearchSelector({
           <DinaMessage id="assignToStorage" />
         </button>
       ),
-      width: 200,
+      width: 250,
       accessor: "assignToStorage",
       sortable: false
     }

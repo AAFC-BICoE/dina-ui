@@ -31,7 +31,7 @@ export function useStorageUnit(id?: string) {
   return useQuery<StorageUnit>(
     {
       path: `collection-api/storage-unit/${id}`,
-      include: "parentStorageUnit,storageUnitType"
+      include: "storageUnitType,parentStorageUnit"
     },
     {
       disabled: !id,

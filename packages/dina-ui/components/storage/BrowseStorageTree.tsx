@@ -1,15 +1,16 @@
-import { PersistedResource } from "kitsu";
-import Link from "next/link";
-import Pagination from "rc-pagination";
-import { useState } from "react";
-import { FaMinusSquare, FaPlusSquare } from "react-icons/fa";
+import classNames from "classnames";
 import {
   FilterGroupModel,
   MetaWithTotal,
   rsql,
   useQuery,
   withResponse
-} from "../../../common-ui/lib";
+} from "common-ui";
+import { PersistedResource } from "kitsu";
+import Link from "next/link";
+import Pagination from "rc-pagination";
+import { useState } from "react";
+import { FaMinusSquare, FaPlusSquare } from "react-icons/fa";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
 import { StorageFilter } from "./StorageFilter";
@@ -60,7 +61,7 @@ export function StorageTreeList({
 
   const storageUnitsQuery = useQuery<StorageUnit[], MetaWithTotal>({
     path: `collection-api/storage-unit`,
-    include: "hierarchy",
+    include: "hierarchy,storageUnitChildren",
     page: { limit, offset },
     filter: {
       rsql: rsql({
@@ -148,16 +149,21 @@ function StorageUnitCollapser({
 
   const CollapserIcon = isOpen ? FaMinusSquare : FaPlusSquare;
 
+  const hasChildren = !!(storageUnit as any).relationships?.storageUnitChildren
+    ?.data?.length;
+
   return (
     <div className={`d-flex flex-row gap-2 collapser-for-${storageUnit.id}`}>
-      {storageUnit.storageUnitChildren?.length && (
-        <CollapserIcon
-          className="storage-collapser-icon align-top"
-          size="2em"
-          onClick={toggle}
-          style={{ cursor: "pointer" }}
-        />
-      )}
+      <CollapserIcon
+        className={classNames("storage-collapser-icon align-top", {
+          // Un-comment this when including storageUnitChildren is not affected by the top-level filter:
+          // Hide the expander button when there are no children:
+          // "visually-hidden": !hasChildren
+        })}
+        size="2em"
+        onClick={toggle}
+        style={{ cursor: "pointer" }}
+      />
       <div className="flex-grow-1">
         <div className="d-flex flex-row align-items-center gap-2 mb-3">
           <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
