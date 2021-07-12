@@ -111,7 +111,7 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
           <SelectField
             className="col-md-2"
             name="type"
-            label="Potocol Type"
+            label="Protocol Type"
             options={PROTOCOL_TYPE_OPTIONS}
           />
           <TextField className="col-md-2" name="name" />
