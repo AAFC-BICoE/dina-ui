@@ -375,6 +375,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   startEventDateTimeLabel: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   startNewRunConfigLabel: "Start a New Run ",
   stateProvinceLabel: "State/Province",
+  storage: "Storage",
   storageUnitListTitle: "Storage Units",
   storageUnitTypeListTitle: "Storage Unit Types",
   storageUnitTypeViewTitle: "Storage Unit Type",

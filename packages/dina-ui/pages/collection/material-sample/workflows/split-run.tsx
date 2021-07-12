@@ -5,17 +5,26 @@ import {
   TextField,
   useAccount,
   useApiClient,
-  useQuery
+  useQuery,
+  FieldSet,
+  useModal,
+  AreYouSureModal
 } from "../../../../../common-ui/lib";
 import { ButtonBar } from "../../../../../common-ui/lib/button-bar/ButtonBar";
 import { FormikButton } from "../../../../..//common-ui/lib/formik-connected/FormikButton";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import Switch from "react-switch";
 import {
   DinaMessage,
   useDinaIntl
 } from "../../../../../dina-ui/intl/dina-ui-intl";
-import React, { useState } from "react";
+import React, {
+  useState,
+  useLayoutEffect,
+  Dispatch,
+  SetStateAction
+} from "react";
 import useLocalStorage from "@rehooks/local-storage";
 import {
   BASE_NAME,
@@ -38,6 +47,8 @@ import {
 import { MaterialSampleRunActionResult } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunActionResult";
 import { Head } from "../../../../../dina-ui/components/head";
 import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
+import { useAttachmentsModal } from "../../../../../dina-ui/components/object-store";
+import { StorageLinkerField } from "../../../../../dina-ui/components/storage/StorageLinker";
 
 export const SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY =
   "split-child-sample-run-action-result";
@@ -48,6 +59,56 @@ export default function SplitRunAction() {
   const { groupNames } = useAccount();
   const router = useRouter();
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const { openModal } = useModal();
+
+  const { attachedMetadatasUI: materialSampleAttachmentsUI } =
+    useAttachmentsModal({
+      initialMetadatas: [],
+      deps: [],
+      title: <DinaMessage id="materialSampleAttachments" />,
+      isTemplate: false,
+      allowNewFieldName: "attachmentsConfig.allowNew",
+      allowExistingFieldName: "attachmentsConfig.allowExisting"
+    });
+
+  const [enablePreparations, setEnablePreparations] = useState(true);
+  const [enableStorage, setEnableStorage] = useState(true);
+
+  // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
+  useLayoutEffect(() => {
+    const dataComponents = document?.querySelectorAll<HTMLDivElement>(
+      ".data-components > fieldset:not(.d-none)"
+    );
+    dataComponents?.forEach((element, index) => {
+      element.style.backgroundColor = index % 2 === 0 ? "#f3f3f3" : "";
+    });
+  });
+
+  /** Wraps the useState setter with an AreYouSure modal when setting to false. */
+  function dataComponentToggler(
+    setBoolean: Dispatch<SetStateAction<boolean>>,
+    componentName: string
+  ) {
+    return function toggleDataComponent(enabled: boolean) {
+      if (!enabled) {
+        // When removing data, ask the user for confirmation first:
+        openModal(
+          <AreYouSureModal
+            actionMessage={
+              <DinaMessage
+                id="removeComponentData"
+                values={{ component: componentName }}
+              />
+            }
+            onYesButtonClicked={() => setBoolean(enabled)}
+          />
+        );
+      } else {
+        setBoolean(enabled);
+      }
+    };
+  }
+
   const [splitChildSampleRunConfig, _setSplitChildSampleRunConfig] =
     useLocalStorage<MaterialSampleRunConfig | null | undefined>(
       SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
@@ -229,18 +290,91 @@ export default function SplitRunAction() {
         >
           <DinaMessage id="copyFromParentLabel" />
         </FormikButton>
-        <div className="d-flex flex-row">
-          <PreparationsFormLayout
-            namePrefix={commonRoot}
-            className="flex-grow-1 mx-1"
-          />
-          <MaterialSampleIdentifiersFormLayout
-            namePrefix={commonRoot}
-            className="flex-grow-1"
-            sampleNamePlaceHolder={
-              index !== -1 ? computeDefaultSampleName(index) : ""
-            }
-          />
+
+        <div className="d-flex">
+          <div>
+            <nav
+              className="card card-body sticky-top d-none d-md-block"
+              style={{ width: "20rem" }}
+            >
+              <h4>
+                <DinaMessage id="formNavigation" />
+              </h4>
+              <div className="list-group">
+                <a href="#identifiers-section" className="list-group-item">
+                  <DinaMessage id="identifiers" />
+                </a>
+                {enablePreparations && (
+                  <a href="#preparations-section" className="list-group-item">
+                    <DinaMessage id="preparations" />
+                  </a>
+                )}
+                {enableStorage && (
+                  <a href="#storage-section" className="list-group-item">
+                    <DinaMessage id="storage" />
+                  </a>
+                )}
+                <a
+                  href="#material-sample-attachments-section"
+                  className="list-group-item"
+                >
+                  <DinaMessage id="materialSampleAttachments" />
+                </a>
+              </div>
+            </nav>
+            <div />
+          </div>
+          <div className="flex-grow-1 container-fluid">
+            <MaterialSampleIdentifiersFormLayout
+              namePrefix={commonRoot}
+              className="flex-grow-1"
+              sampleNamePlaceHolder={
+                index !== -1 ? computeDefaultSampleName(index) : ""
+              }
+            />
+            <FieldSet legend={<DinaMessage id="components" />}>
+              <div className="row">
+                <label className="enable-preparation d-flex align-items-center fw-bold col-sm-3">
+                  <Switch
+                    className="mx-2"
+                    checked={enablePreparations}
+                    onChange={dataComponentToggler(
+                      setEnablePreparations,
+                      formatMessage("preparations")
+                    )}
+                  />
+                  <DinaMessage id="preparations" />
+                </label>
+                <label className="enable-storage d-flex align-items-center fw-bold col-sm-3">
+                  <Switch
+                    className="mx-2"
+                    checked={enableStorage}
+                    onChange={dataComponentToggler(
+                      setEnableStorage,
+                      formatMessage("storage")
+                    )}
+                  />
+                  <DinaMessage id="storage" />
+                </label>
+              </div>
+            </FieldSet>
+            <div className="data-components">
+              {enablePreparations && (
+                <PreparationsFormLayout
+                  namePrefix={commonRoot}
+                  className="flex-grow-1 mx-1"
+                />
+              )}
+              {enableStorage && (
+                <div className="card card-body mb-3" id="storage-section">
+                  <StorageLinkerField name="storageUnit" />{" "}
+                </div>
+              )}
+              <div id="material-sample-attachments-section">
+                {materialSampleAttachmentsUI}
+              </div>
+            </div>
+          </div>
         </div>
       </>
     );
