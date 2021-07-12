@@ -155,12 +155,10 @@ describe("PcrBatch edit page", () => {
             name: "test pcr batch",
             primerForward: {
               id: "123",
-              name: "Primer 1",
               type: "pcr-primer"
             },
             primerReverse: {
               id: "456",
-              name: "Primer 2",
               type: "pcr-primer"
             },
             type: "pcr-batch",

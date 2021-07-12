@@ -128,12 +128,18 @@ export function PcrBatchForm({ pcrBatch, onSaved }: PcrBatchFormProps) {
       ...submittedValues,
 
       // Override the "type" attribute with the JSONAPI resource type:
-      primerForward: submittedValues.primerForward
-        ? { ...submittedValues.primerForward, type: "pcr-primer" }
-        : undefined,
-      primerReverse: submittedValues.primerReverse
-        ? { ...submittedValues.primerReverse, type: "pcr-primer" }
-        : undefined
+      ...(submittedValues.primerForward && {
+        primerForward: {
+          id: submittedValues.primerForward.id,
+          type: "pcr-primer"
+        }
+      }),
+      ...(submittedValues.primerReverse && {
+        primerReverse: {
+          id: submittedValues.primerReverse.id,
+          type: "pcr-primer"
+        }
+      })
     };
 
     const [savedResource] = await save<PcrBatch>(
@@ -213,6 +219,7 @@ export function PcrBatchFormFields() {
           filter={filterBy(["name"])}
           model="seqdb-api/region"
           optionLabel={region => region.name}
+          readOnlyLink="/seqdb/region/view?id="
         />
       </div>
       <div className="row">
