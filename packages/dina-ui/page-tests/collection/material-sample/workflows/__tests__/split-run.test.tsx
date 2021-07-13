@@ -48,6 +48,7 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/preparation-type":
       return { data: testPreparationType() };
     case "agent-api/person":
+    case "objectstore-api/metadata":
       return { data: [] };
   }
 });
@@ -103,8 +104,8 @@ describe("MaterialSample split workflow run action form with all default values"
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".materialSampleName input").prop("value")).toEqual(
-      "ParentName-001"
+    expect(wrapper.find(".materialSampleName0 input").prop("value")).toEqual(
+      ""
     );
   });
 
@@ -119,17 +120,17 @@ describe("MaterialSample split workflow run action form with all default values"
     wrapper.update();
 
     // child sample initially loaded with user entered custom name
-    expect(wrapper.find(".materialSampleName input").prop("value")).toEqual(
+    expect(wrapper.find(".materialSampleName1 input").prop("value")).toEqual(
       "my custom name"
     );
 
-    wrapper.find("button.copyFromParent").simulate("click");
+    wrapper.find("button.copyFromParent1").simulate("click");
 
     await new Promise(setImmediate);
     wrapper.update();
 
     // child sample will have the parent's value after click copyFromParent
-    expect(wrapper.find(".dwcCatalogNumber input").prop("value")).toEqual(
+    expect(wrapper.find(".dwcCatalogNumber1 input").prop("value")).toEqual(
       "my-number"
     );
 

@@ -426,13 +426,15 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   className?: string;
   namePrefix?: string;
   sampleNamePlaceHolder?: string;
+  index?: string;
 }
 
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleIdentifiersFormLayout({
   className,
   namePrefix,
-  sampleNamePlaceHolder
+  sampleNamePlaceHolder,
+  index
 }: MaterialSampleIdentifiersFormLayoutProps) {
   return (
     <FieldSet
@@ -449,7 +451,7 @@ export function MaterialSampleIdentifiersFormLayout({
                 : "materialSampleName"
             }`}
             customName="materialSampleName"
-            className="materialSampleName"
+            className={`materialSampleName${index}`}
             placeholder={sampleNamePlaceHolder}
           />
 
@@ -458,7 +460,7 @@ export function MaterialSampleIdentifiersFormLayout({
               namePrefix ? namePrefix + "dwcCatalogNumber" : "dwcCatalogNumber"
             }`}
             customName="dwcCatalogNumber"
-            className="dwcCatalogNumber"
+            className={`dwcCatalogNumber${index}`}
           />
         </div>
         <div className="col-md-6">
@@ -469,6 +471,7 @@ export function MaterialSampleIdentifiersFormLayout({
                 : "dwcOtherCatalogNumbers"
             }`}
             customName="dwcOtherCatalogNumbers"
+            className={`dwcOtherCatalogNumbers${index}`}
           />
         </div>
       </div>

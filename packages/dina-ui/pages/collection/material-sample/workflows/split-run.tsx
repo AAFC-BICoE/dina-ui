@@ -270,8 +270,7 @@ export default function SplitRunAction() {
 
   function childSampleInternal(index, form) {
     const childSamplesPath = "childSamples";
-    const childSamplePath =
-      index === -1 ? "setAll" : `${childSamplesPath}[${index}]`;
+    const childSamplePath = `${childSamplesPath}[${index}]`;
     const commonRoot = childSamplePath + ".";
     return (
       <>
@@ -288,9 +287,9 @@ export default function SplitRunAction() {
         </div>
         <FormikButton
           onClick={() => {
-            if (index !== -1) onCopyFromParent({ index, formik: form });
+            onCopyFromParent({ index, formik: form });
           }}
-          className="btn btn-secondary m-1 copyFromParent"
+          className={`btn btn-secondary m-1 copyFromParent${index}`}
         >
           <DinaMessage id="copyFromParentLabel" />
         </FormikButton>
@@ -332,6 +331,7 @@ export default function SplitRunAction() {
             <MaterialSampleIdentifiersFormLayout
               namePrefix={commonRoot}
               className="flex-grow-1"
+              index={index}
               sampleNamePlaceHolder={
                 index > 0 ? computeDefaultSampleName(index - 1) : ""
               }
@@ -374,9 +374,11 @@ export default function SplitRunAction() {
                   <StorageLinkerField name="storageUnit" />{" "}
                 </div>
               )}
-              <div id="material-sample-attachments-section">
-                {materialSampleAttachmentsUI}
-              </div>
+              {
+                <div id="material-sample-attachments-section">
+                  {materialSampleAttachmentsUI}
+                </div>
+              }
             </div>
           </div>
         </div>
@@ -385,7 +387,6 @@ export default function SplitRunAction() {
   }
 
   const samples = initialChildSamples;
-  const length = samples.length;
   const sampleNameOptions = samples?.map(sample => ({
     label: sample.materialSampleName,
     value: sample.materialSampleName
@@ -393,7 +394,7 @@ export default function SplitRunAction() {
   sampleNameOptions.unshift({ label: "Set All", value: "Set All" });
   const defaultSample: MaterialSample = { type: "material-sample" };
   samples.unshift(defaultSample);
-
+  const length = samples.length;
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
