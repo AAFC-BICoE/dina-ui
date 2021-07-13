@@ -12,6 +12,7 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
+import { Field } from "formik";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import {
@@ -19,7 +20,9 @@ import {
   Head,
   Nav,
   StorageLinkerField,
-  StorageTreeListField
+  StorageTreeListField,
+  StorageUnitBreadCrumb,
+  storageUnitDisplayName
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnit, StorageUnitType } from "../../../types/collection-api";
@@ -28,9 +31,21 @@ export function useStorageUnit(id?: string) {
   return useQuery<StorageUnit>(
     {
       path: `collection-api/storage-unit/${id}`,
-      include: "parentStorageUnit,storageUnitType"
+      include: "storageUnitType,parentStorageUnit"
     },
-    { disabled: !id }
+    {
+      disabled: !id,
+      // parentStorageUnit must be fetched separately to include its hierarchy:
+      joinSpecs: [
+        {
+          apiBaseUrl: "/collection-api",
+          idField: "parentStorageUnit.id",
+          joinField: "parentStorageUnit",
+          path: storageUnit =>
+            `storage-unit/${storageUnit.parentStorageUnit?.id}?include=hierarchy`
+        }
+      ]
+    }
   );
 }
 
@@ -57,7 +72,10 @@ export default function StorageUnitEditPage() {
         </h1>
         {id ? (
           withResponse(storageUnitQuery, ({ data }) => (
-            <StorageUnitForm storageUnit={data} onSaved={goToViewPage} />
+            <>
+              <Head title={storageUnitDisplayName(data)} />
+              <StorageUnitForm storageUnit={data} onSaved={goToViewPage} />
+            </>
           ))
         ) : (
           <StorageUnitForm onSaved={goToViewPage} />
@@ -122,6 +140,17 @@ export function StorageUnitFormFields() {
 
   return (
     <div>
+      <Field>
+        {({ form: { values: storageUnit } }) => (
+          <h2>
+            <StorageUnitBreadCrumb
+              storageUnit={storageUnit}
+              // Don't have the page link to itself:
+              disableLastLink={true}
+            />
+          </h2>
+        )}
+      </Field>
       <div className="row">
         <GroupSelectField
           name="group"

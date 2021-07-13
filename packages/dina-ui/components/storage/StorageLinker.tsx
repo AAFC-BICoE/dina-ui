@@ -1,7 +1,7 @@
+import { FieldWrapper } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { FieldWrapper } from "../../../common-ui/lib";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
 import { AssignedStorage } from "./AssignedStorage";
@@ -11,7 +11,6 @@ import { StorageSearchSelector } from "./StorageSearchSelector";
 export interface StorageLinkerProps {
   value?: PersistedResource<StorageUnit>;
   onChange: (newValue: PersistedResource<StorageUnit>) => void;
-  fieldName: string;
 
   /** Disable this option ID e.g. to avoid putting a storage unit inside itself. */
   excludeOptionId?: string;
@@ -21,7 +20,6 @@ export interface StorageLinkerProps {
 export function StorageLinker({
   onChange: onChangeProp,
   value,
-  fieldName,
   excludeOptionId
 }: StorageLinkerProps) {
   const [activeTab, setActiveTab] = useState(0);
@@ -31,14 +29,11 @@ export function StorageLinker({
     setActiveTab(0);
   }
 
-  return (
+  return value?.id ? (
+    <AssignedStorage value={value} onChange={onChangeProp} />
+  ) : (
     <Tabs selectedIndex={activeTab} onSelect={setActiveTab}>
       <TabList>
-        {value?.id && (
-          <Tab>
-            <DinaMessage id="assignedStorage" />
-          </Tab>
-        )}
         {!value?.id && (
           <Tab>
             <DinaMessage id="searchStorage" />
@@ -50,22 +45,17 @@ export function StorageLinker({
           </Tab>
         )}
       </TabList>
-      {value?.id && (
-        <TabPanel>
-          <AssignedStorage value={value} onChange={onChangeProp} />
-        </TabPanel>
-      )}
       {!value?.id && (
         <TabPanel>
           <StorageSearchSelector
-            fieldName={fieldName}
+            onChange={changeStorageAndResetTab}
             excludeOptionId={excludeOptionId}
           />
         </TabPanel>
       )}
       {!value?.id && (
         <TabPanel>
-          <div style={{ maxHeight: "50rem", overflowY: "scroll" }}>
+          <div style={{ height: "50rem", overflowY: "scroll" }}>
             <BrowseStorageTree
               onSelect={changeStorageAndResetTab}
               excludeOptionId={excludeOptionId}
@@ -99,7 +89,6 @@ export function StorageLinkerField({
     >
       {({ value, setValue }) => (
         <StorageLinker
-          fieldName={name}
           value={value}
           onChange={setValue}
           excludeOptionId={excludeOptionId}
