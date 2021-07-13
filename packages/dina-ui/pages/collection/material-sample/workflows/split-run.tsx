@@ -86,7 +86,7 @@ export default function SplitRunAction() {
     return <LoadingSpinner loading={true} />;
   }
 
-  const parentSampleId = parentResp?.data?.[0]?.id;
+  const parentSampleId = parentResp?.data?.[0]?.id ?? null;
 
   // Get form initial values from run config
   for (let i = 0; i < numOfChildToCreate; i++) {
@@ -114,7 +114,7 @@ export default function SplitRunAction() {
     };
 
     // submit to back end
-    const samplesToSave = (
+    const samplesToSave: InputResource<MaterialSample>[] = (
       submittedValues.childSamples as InputResource<MaterialSample>[]
     ).map(sample => ({
       // Apply the default "Set All" values, then apply the manually defined values:
