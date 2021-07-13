@@ -275,6 +275,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleAttachments: "Material Sample Attachments",
   materialSampleListTitle: "Material Samples",
   materialSampleManagedAttributes: "Material Sample Managed Attributes",
+  materialSampleName: "Material Sample Name",
   materialSampleTypeListTitle: "Material Sample Types",
   materialSampleTypeViewTitle: "Material Sample Type",
   materialSampleViewTitle: "Material Sample",
@@ -332,6 +333,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   preparationTypeNameLabel: "Preparation Type Name",
   preparationTypeViewTitle: "View Preparation Type",
   preparations: "Preparations",
+  preparedBy: "Prepared By",
   previewAndCustomizeLabel: "Preview and Customize",
   primary: "Primary",
   primaryButton_tooltip:

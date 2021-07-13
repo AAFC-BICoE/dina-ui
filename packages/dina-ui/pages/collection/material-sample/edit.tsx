@@ -436,6 +436,7 @@ export function MaterialSampleIdentifiersFormLayout({
   sampleNamePlaceHolder,
   index
 }: MaterialSampleIdentifiersFormLayoutProps) {
+  const { formatMessage } = useDinaIntl();
   return (
     <FieldSet
       id="identifiers-section"
@@ -450,7 +451,7 @@ export function MaterialSampleIdentifiersFormLayout({
                 ? namePrefix + "materialSampleName"
                 : "materialSampleName"
             }`}
-            customName="materialSampleName"
+            customName={formatMessage("materialSampleName")}
             className={`materialSampleName${index}`}
             placeholder={sampleNamePlaceHolder}
           />
@@ -488,6 +489,7 @@ export function PreparationsFormLayout({
   className,
   namePrefix
 }: CatalogueInfoFormLayoutProps) {
+  const { formatMessage } = useDinaIntl();
   return (
     <FieldSet
       className={className}
@@ -521,7 +523,7 @@ export function PreparationsFormLayout({
                       : "preparationType"
                   }`}
                   key={values.group}
-                  customName="preparationType"
+                  customName={formatMessage("preparationTypeListTitle")}
                 />
               )}
             </Field>
@@ -532,6 +534,7 @@ export function PreparationsFormLayout({
               filter={filterBy(["displayName"])}
               model="agent-api/person"
               optionLabel={person => person.displayName}
+              customName={formatMessage("preparedBy")}
             />
             <DateField name="preparationDate" />
           </DinaFormSection>

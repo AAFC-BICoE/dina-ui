@@ -82,12 +82,14 @@ export interface StorageLinkerFieldProps {
 
   /** Disable this option ID e.g. to avoid putting a storage unit inside itself. */
   excludeOptionId?: string;
+  customName?: string;
 }
 
 /** DinaForm-connected Storage Assignment UI. */
 export function StorageLinkerField({
   name,
-  excludeOptionId
+  excludeOptionId,
+  customName
 }: StorageLinkerFieldProps) {
   return (
     <FieldWrapper
@@ -96,6 +98,7 @@ export function StorageLinkerField({
         <AssignedStorage readOnly={true} value={value} />
       )}
       disableLabelClick={true}
+      customName={customName}
     >
       {({ value, setValue }) => (
         <StorageLinker

@@ -61,15 +61,14 @@ export default function SplitRunAction() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { openModal } = useModal();
 
-  const { attachedMetadatasUI: materialSampleAttachmentsUI } =
-    useAttachmentsModal({
-      initialMetadatas: [],
-      deps: [],
-      title: <DinaMessage id="materialSampleAttachments" />,
-      isTemplate: false,
-      allowNewFieldName: "attachmentsConfig.allowNew",
-      allowExistingFieldName: "attachmentsConfig.allowExisting"
-    });
+  const {
+    selectedMetadatas,
+    attachedMetadatasUI: materialSampleAttachmentsUI
+  } = useAttachmentsModal({
+    initialMetadatas: [],
+    deps: [],
+    title: <DinaMessage id="materialSampleAttachments" />
+  });
 
   const [enablePreparations, setEnablePreparations] = useState(true);
   const [enableStorage, setEnableStorage] = useState(true);
@@ -176,6 +175,7 @@ export default function SplitRunAction() {
     };
     // submit to back end
     const samplesToSave = submittedValues.childSamples;
+
     // the first is the default value
     const defaultValueSample: MaterialSample = samplesToSave?.[0];
 
@@ -187,6 +187,17 @@ export default function SplitRunAction() {
           type: "material-sample",
           id: parentSampleId
         };
+      }
+
+      sample.relationships = {};
+
+      if (sample.selectedMetadatas?.length) {
+        (sample as any).relationships.attachment = {
+          data: selectedMetadatas.map(it => ({ id: it.id, type: it.type }))
+        };
+        // Delete the 'attachment' attribute because it should stay in the relationships field:
+        delete sample.attachment;
+        delete sample.selectedMetadatas;
       }
     }
     samplesToSave.splice(0, 1);
@@ -371,12 +382,17 @@ export default function SplitRunAction() {
               )}
               {enableStorage && (
                 <div className="card card-body mb-3" id="storage-section">
-                  <StorageLinkerField name="storageUnit" />{" "}
+                  <StorageLinkerField
+                    name={`${commonRoot}storageUnit`}
+                    customName="storageUnit"
+                  />{" "}
                 </div>
               )}
               {
                 <div id="material-sample-attachments-section">
-                  {materialSampleAttachmentsUI}
+                  <Field name={`${commonRoot}selectedMetadatas`}>
+                    {({}) => materialSampleAttachmentsUI}
+                  </Field>
                 </div>
               }
             </div>
