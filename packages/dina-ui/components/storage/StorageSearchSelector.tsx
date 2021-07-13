@@ -1,9 +1,11 @@
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useState } from "react";
+import { Promisable } from "type-fest";
 import {
   ColumnDefinition,
   FilterGroupModel,
+  FormikButton,
   QueryTable,
   rsql
 } from "../../../common-ui/lib";
@@ -16,7 +18,7 @@ import {
 } from "./StorageUnitBreadCrumb";
 
 export interface StorageSearchSelectorProps {
-  onChange: (newValue: PersistedResource<StorageUnit>) => void;
+  onChange: (newValue: PersistedResource<StorageUnit>) => Promisable<void>;
   excludeOptionId?: string;
 }
 
@@ -44,9 +46,12 @@ export function StorageSearchSelector({
     },
     {
       Cell: ({ original }) => (
-        <button className="btn btn-primary" onClick={() => onChange(original)}>
+        <FormikButton
+          className="btn btn-primary select-storage"
+          onClick={async () => await onChange(original)}
+        >
           <DinaMessage id="assignToStorage" />
-        </button>
+        </FormikButton>
       ),
       width: 250,
       accessor: "assignToStorage",

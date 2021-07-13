@@ -161,7 +161,10 @@ export function FieldWrapper({
             {!hideLabel && <strong>{fieldLabel}</strong>}
           </div>
         )}
-        <div className={valueCol ? `col-sm-${valueCol}` : ""}>
+        <div
+          className={valueCol ? `col-sm-${valueCol}` : ""}
+          style={{ cursor: "auto" }}
+        >
           <FastField name={name}>
             {({ field: { value }, form, meta: { error } }) => (
               <>
