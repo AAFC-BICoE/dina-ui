@@ -16,7 +16,7 @@ export function SelectFieldWithNav<T = string>(
 ) {
   const { name, options, form, onSelectionChanged } = props;
   const selectRef = useRef<any>(null);
-  const [leftDisabled, setLeftDisabled] = useState(false);
+  const [leftDisabled, setLeftDisabled] = useState(true);
   const [rightDisabled, setRightDisabled] = useState(false);
 
   const LeftArrowIcon = leftDisabled ? GoCircleSlash : FaCaretLeft;
@@ -36,29 +36,27 @@ export function SelectFieldWithNav<T = string>(
   }
 
   function onLeftClick() {
+    if (leftDisabled) return;
     const index = findSelectionIndex();
-    let newIdx = index;
-    if (index === 0) {
+    const newIdx = index - 1;
+    form.setFieldValue(name, options[newIdx]?.value);
+    setLeftDisabled(false);
+    if (newIdx === 0) {
       setLeftDisabled(true);
       setRightDisabled(false);
-    } else {
-      newIdx = index - 1;
-      form.setFieldValue(name, options[newIdx]?.value);
-      setLeftDisabled(false);
     }
     onSelectionChanged?.(newIdx);
   }
 
   function onRightClick() {
+    if (rightDisabled) return;
     const index = findSelectionIndex();
-    let newIdx = index;
-    if (index === options.length - 1) {
+    const newIdx = index + 1;
+    form.setFieldValue(name, options[newIdx]?.value);
+    setRightDisabled(false);
+    if (newIdx === options.length - 1) {
       setRightDisabled(true);
       setLeftDisabled(false);
-    } else {
-      newIdx = index + 1;
-      form.setFieldValue(name, options[newIdx].value);
-      setRightDisabled(false);
     }
     onSelectionChanged?.(newIdx);
   }
@@ -78,13 +76,13 @@ export function SelectFieldWithNav<T = string>(
         className="col-md-1 leftArrow"
         size="2em"
         onClick={onLeftClick}
-        style={{ cursor: "pointer" }}
+        style={{ cursor: leftDisabled ? "not-allowed" : "pointer" }}
       />
       <ForwardSelectField ref={selectRef} />
       <RightArrowIcon
         className="col-md-1 rightArrow"
         size="2em"
-        style={{ cursor: "pointer" }}
+        style={{ cursor: rightDisabled ? "not-allowed" : "pointer" }}
         onClick={onRightClick}
       />
     </div>
