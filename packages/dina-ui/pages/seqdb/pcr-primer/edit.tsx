@@ -40,7 +40,7 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
               <SeqdbMessage id="editPcrPrimerTitle" />
             </h1>
             <Query<PcrPrimer>
-              query={{ include: "region", path: `seqdb-api/pcrPrimer/${id}` }}
+              query={{ include: "region", path: `seqdb-api/pcr-primer/${id}` }}
             >
               {({ loading, response }) => (
                 <div>
@@ -82,7 +82,7 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
       [
         {
           resource: submittedValues,
-          type: "pcrPrimer"
+          type: "pcr-primer"
         }
       ],
       { apiBaseUrl: "/seqdb-api" }

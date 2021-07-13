@@ -6,3 +6,5 @@ export * from "./group-select/GroupSelectField";
 export * from "./revision-by-user/CommonRevisionsByUserPage";
 export * from "./storage/StorageLinker";
 export * from "./head";
+export * from "./storage/BrowseStorageTree";
+export * from "./storage/StorageTreeListField";

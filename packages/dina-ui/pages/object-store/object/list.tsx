@@ -101,7 +101,7 @@ export default function MetadataListPage() {
     },
     dateCell("acDigitizationDate"),
     dateCell("xmpMetadataDate"),
-    { 
+    {
       accessor: "acMetadataCreator.displayName",
       sortable: false
     },

@@ -4,6 +4,7 @@ import { LibraryPrepBatch } from "./LibraryPrepBatch";
 import { NgsIndex } from "./NgsIndex";
 
 interface LibraryPrepAttributes {
+  type: "library-prep";
   inputNg?: number | null;
   quality?: string | null;
   size?: string | null;

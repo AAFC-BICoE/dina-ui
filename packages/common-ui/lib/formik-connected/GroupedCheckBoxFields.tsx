@@ -89,20 +89,21 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
     }
 
     return (
-        <input
-          aria-label="Check All"
-          className="check-all-checkbox"
-          onClick={onCheckAllCheckBoxClick}
-          style={{ height: "20px", width: "20px", marginLeft: "5px" }}
-          type="checkbox"
-        />
+      <input
+        aria-label="Check All"
+        className="check-all-checkbox"
+        onClick={onCheckAllCheckBoxClick}
+        style={{ height: "20px", width: "20px", marginLeft: "5px" }}
+        type="checkbox"
+      />
     );
   });
 
   /** Table column header with a CheckAllCheckBox for the QueryTable. */
   const CheckBoxHeader = connect(({ formik: { values } }) => {
-    const totalChecked = toPairs(values[fieldName]).filter(pair => pair[1])
-      .length;
+    const totalChecked = toPairs(values[fieldName]).filter(
+      pair => pair[1]
+    ).length;
     return (
       <div className="grouped-checkbox-header text-center">
         <div>
@@ -119,8 +120,9 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
   });
 
   const DetachedTotalSelected = connect(({ formik: { values } }) => {
-    const totalChecked = toPairs(values[fieldName]).filter(pair => pair[1])
-      .length;
+    const totalChecked = toPairs(values[fieldName]).filter(
+      pair => pair[1]
+    ).length;
     return (
       <div>
         {totalChecked} <CommonMessage id="selected" />

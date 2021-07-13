@@ -24,7 +24,7 @@ export function StorageLinker({
   fieldName,
   excludeOptionId
 }: StorageLinkerProps) {
-  const [activeTab, setActiveTab] = useState(value ? 0 : 1);
+  const [activeTab, setActiveTab] = useState(0);
 
   function changeStorageAndResetTab(newValue: PersistedResource<StorageUnit>) {
     onChangeProp(newValue);
@@ -34,33 +34,45 @@ export function StorageLinker({
   return (
     <Tabs selectedIndex={activeTab} onSelect={setActiveTab}>
       <TabList>
-        <Tab>
-          <DinaMessage id="assignedStorage" />
-        </Tab>
-        <Tab>
-          <DinaMessage id="searchStorage" />
-        </Tab>
-        <Tab>
-          <DinaMessage id="browseStorageTree" />
-        </Tab>
+        {value?.id && (
+          <Tab>
+            <DinaMessage id="assignedStorage" />
+          </Tab>
+        )}
+        {!value?.id && (
+          <Tab>
+            <DinaMessage id="searchStorage" />
+          </Tab>
+        )}
+        {!value?.id && (
+          <Tab>
+            <DinaMessage id="browseStorageTree" />
+          </Tab>
+        )}
       </TabList>
-      <TabPanel>
-        <AssignedStorage value={value} onChange={onChangeProp} />
-      </TabPanel>
-      <TabPanel>
-        <StorageSearchSelector
-          fieldName={fieldName}
-          excludeOptionId={excludeOptionId}
-        />
-      </TabPanel>
-      <TabPanel>
-        <div style={{ maxHeight: "50rem", overflowY: "scroll" }}>
-          <BrowseStorageTree
-            onSelect={changeStorageAndResetTab}
+      {value?.id && (
+        <TabPanel>
+          <AssignedStorage value={value} onChange={onChangeProp} />
+        </TabPanel>
+      )}
+      {!value?.id && (
+        <TabPanel>
+          <StorageSearchSelector
+            fieldName={fieldName}
             excludeOptionId={excludeOptionId}
           />
-        </div>
-      </TabPanel>
+        </TabPanel>
+      )}
+      {!value?.id && (
+        <TabPanel>
+          <div style={{ maxHeight: "50rem", overflowY: "scroll" }}>
+            <BrowseStorageTree
+              onSelect={changeStorageAndResetTab}
+              excludeOptionId={excludeOptionId}
+            />
+          </div>
+        </TabPanel>
+      )}
     </Tabs>
   );
 }

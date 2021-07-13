@@ -8,7 +8,7 @@ jest.mock("next/link", () => () => <div />);
 const TEST_PROFILE: PcrProfile = {
   id: "5",
   name: "Test Profile",
-  type: "thermocyclerprofile"
+  type: "thermocycler-profile"
 };
 
 /** Mock Kitsu "get" method. */
