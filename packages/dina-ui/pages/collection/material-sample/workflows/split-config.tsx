@@ -3,6 +3,7 @@ import {
   ButtonBar,
   CheckBoxWithoutWrapper,
   DinaForm,
+  DinaFormOnSubmit,
   FieldSet,
   SelectField,
   SubmitButton,
@@ -93,10 +94,8 @@ export default function ConfigAction() {
 
   const onSubmit = async ({ submittedValues: configActionFields }) => {
     const childSampleNames: string[] = [];
-    const childSampleDescs: string[] = [];
     for (let i = 0; i < configActionFields.numOfChildToCreate; i++) {
       childSampleNames.push(configActionFields?.sampleName?.[i]);
-      childSampleDescs.push(configActionFields?.sampleDesc?.[i]);
     }
 
     const runConfig: MaterialSampleRunConfig = {
@@ -118,8 +117,7 @@ export default function ConfigAction() {
         destroyOriginal: configActionFields.destroyOriginal
       },
       configure_children: {
-        sampleNames: childSampleNames,
-        sampleDescs: childSampleDescs
+        sampleNames: childSampleNames
       }
     };
 
@@ -212,9 +210,6 @@ function SplitChildHeader() {
       <span className="col-md-3 fw-bold">
         <DinaMessage id="name" />
       </span>
-      <span className="col-md-3 fw-bold">
-        <DinaMessage id="description" />
-      </span>
     </div>
   );
 }
@@ -262,11 +257,6 @@ function SplitChildRow({
         hideLabel={true}
         name={`sampleName[${index}]`}
         placeholder={`${baseName || BASE_NAME}${computedSuffix}`}
-      />
-      <TextField
-        className="col-md-3"
-        hideLabel={true}
-        name={`description[${index}]`}
       />
     </div>
   );

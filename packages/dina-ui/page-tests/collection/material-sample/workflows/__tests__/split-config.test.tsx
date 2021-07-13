@@ -24,7 +24,7 @@ const testRunConfig = {
       type: "Numerical",
       destroyOriginal: true
     },
-    configure_children: { sampleNames: ["my custom name"], sampleDescs: [] }
+    configure_children: { sampleNames: ["my custom name"] }
   }
 };
 
@@ -136,7 +136,6 @@ describe("MaterialSample split workflow series-mode run config", () => {
         suffix: "TestSuffix"
       },
       configure_children: {
-        sampleDescs: [null, null, null],
         sampleNames: ["CustomName1", null, null]
       },
       metadata: {}

@@ -25,7 +25,6 @@ export interface MaterialSampleRunConfigConfiguration {
 
 export interface MaterialSampleRunConfigChildConfiguration {
   sampleNames?: string[];
-  sampleDescs?: string[];
 }
 
 export const MATERIAL_SAMPLE_GENERATION_MODES = ["BATCH", "SERIES"] as const;
