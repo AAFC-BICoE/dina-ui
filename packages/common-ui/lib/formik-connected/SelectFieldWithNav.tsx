@@ -67,6 +67,11 @@ export function SelectFieldWithNav<T = string>(
       options={options}
       forwardedRef={ref as any}
       className={"col-md-4"}
+      onChange={(value, _form) =>
+        onSelectionChanged?.(
+          options.findIndex(option => value === option.value)
+        )
+      }
     />
   ));
 

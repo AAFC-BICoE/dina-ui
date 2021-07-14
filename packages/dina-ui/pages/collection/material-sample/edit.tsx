@@ -444,7 +444,7 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleIdentifiersFormLayout({
   className,
-  namePrefix,
+  namePrefix = "",
   sampleNamePlaceHolder
 }: MaterialSampleIdentifiersFormLayoutProps) {
   const { formatMessage } = useDinaIntl();
@@ -457,11 +457,7 @@ export function MaterialSampleIdentifiersFormLayout({
       <div className="row">
         <div className="col-md-6">
           <TextField
-            name={`${
-              namePrefix
-                ? namePrefix + "materialSampleName"
-                : "materialSampleName"
-            }`}
+            name={`${namePrefix}materialSampleName`}
             customName="materialSampleName"
             className="materialSampleName"
             placeholder={sampleNamePlaceHolder}
