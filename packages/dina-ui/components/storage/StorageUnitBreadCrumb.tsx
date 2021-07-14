@@ -20,7 +20,7 @@ export function StorageUnitBreadCrumb({
 
   return (
     <ol
-      className="breadcrumb"
+      className="breadcrumb mb-0"
       style={{ "--bs-breadcrumb-divider": "'>'" } as any}
     >
       {parentPath.map(node => (

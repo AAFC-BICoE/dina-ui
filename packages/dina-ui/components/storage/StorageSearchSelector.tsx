@@ -19,13 +19,11 @@ import {
 
 export interface StorageSearchSelectorProps {
   onChange: (newValue: PersistedResource<StorageUnit>) => Promisable<void>;
-  excludeOptionId?: string;
 }
 
 /** Table UI to search for and select a Storage Unit. */
 export function StorageSearchSelector({
-  onChange,
-  excludeOptionId = "00000000-0000-0000-0000-000000000000"
+  onChange
 }: StorageSearchSelectorProps) {
   const [filter, setFilter] = useState<FilterGroupModel | null>();
 
@@ -79,17 +77,7 @@ export function StorageSearchSelector({
             type: "FILTER_GROUP",
             id: -123,
             operator: "AND",
-            children: [
-              {
-                id: -321,
-                type: "FILTER_ROW" as const,
-                attribute: "uuid",
-                predicate: "IS NOT" as const,
-                searchType: "EXACT_MATCH" as const,
-                value: excludeOptionId
-              },
-              ...(filter ? [filter] : [])
-            ]
+            children: [...(filter ? [filter] : [])]
           })
         }}
       />

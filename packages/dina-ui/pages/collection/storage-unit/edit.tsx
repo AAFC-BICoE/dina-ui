@@ -183,7 +183,6 @@ export function StorageUnitFormFields() {
         />
       </div>
       <div className="row">
-        <TextField className="col-md-6" name="name" />
         <ResourceSelectField<StorageUnitType>
           className="col-md-6"
           model="collection-api/storage-unit-type"
@@ -191,12 +190,11 @@ export function StorageUnitFormFields() {
           optionLabel={it => it.name}
           filter={filterBy(["name"])}
           omitNullOption={true}
+          readOnlyLink="/collection/storage-unit-type/view?id="
         />
+        <TextField className="col-md-6" name="name" />
       </div>
-      <StorageLinkerField
-        name="parentStorageUnit"
-        excludeOptionId={initialValues.id}
-      />
+      <StorageLinkerField name="parentStorageUnit" />
       {readOnly && <StorageUnitChildrenViewer parentId={initialValues.id} />}
       {readOnly && (
         <div className="row">
