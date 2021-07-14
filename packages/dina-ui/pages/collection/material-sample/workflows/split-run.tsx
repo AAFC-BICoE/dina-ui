@@ -348,7 +348,6 @@ export default function SplitRunAction() {
             <MaterialSampleIdentifiersFormLayout
               namePrefix={commonRoot}
               className="flex-grow-1"
-              index={index}
               sampleNamePlaceHolder={
                 index > 0 ? computeDefaultSampleName(index - 1) : ""
               }

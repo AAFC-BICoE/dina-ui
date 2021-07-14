@@ -439,15 +439,13 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   className?: string;
   namePrefix?: string;
   sampleNamePlaceHolder?: string;
-  index?: string;
 }
 
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleIdentifiersFormLayout({
   className,
   namePrefix,
-  sampleNamePlaceHolder,
-  index
+  sampleNamePlaceHolder
 }: MaterialSampleIdentifiersFormLayoutProps) {
   const { formatMessage } = useDinaIntl();
   return (
