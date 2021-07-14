@@ -13,6 +13,7 @@ import { StorageUnit } from "../../types/collection-api";
 import { StorageTreeList } from "./BrowseStorageTree";
 import { StorageLinker } from "./StorageLinker";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 export interface StorageTreeFieldProps {
   parentId: string;
@@ -91,6 +92,15 @@ export function StorageUnitChildrenViewer({ parentId }: StorageTreeFieldProps) {
                 >
                   <DinaMessage id="moveAllContent" />
                 </button>
+              )}
+              {readOnly && (
+                <Link
+                  href={`/collection/storage-unit/edit?parentId=${parentId}`}
+                >
+                  <a className="btn btn-primary add-child-storage-unit">
+                    <DinaMessage id="addChildStorageUnit" />
+                  </a>
+                </Link>
               )}
             </div>
             <div style={{ borderStyle: "dotted" }}>

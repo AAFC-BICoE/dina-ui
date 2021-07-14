@@ -6,6 +6,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addAssertion: "Add GeoReference",
   addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
+  addChildStorageUnit: "Add Child Storage Unit",
   addCataloguedObjectTitle: "Add Catalogued Object",
   addCollectingEventTitle: "Add Collecting Event",
   addCollectionTitle: "Add Collection",

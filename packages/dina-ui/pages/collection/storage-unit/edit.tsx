@@ -15,19 +15,18 @@ import {
 import { Field } from "formik";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
+import { object } from "yup";
 import {
   GroupSelectField,
   Head,
   Nav,
   StorageLinkerField,
-  StorageUnitChildrenViewer,
   StorageUnitBreadCrumb,
+  StorageUnitChildrenViewer,
   storageUnitDisplayName
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnit, StorageUnitType } from "../../../types/collection-api";
-import { object } from "yup";
-import { truncate } from "fs";
 
 const storageUnitFormSchema = object({
   storageUnitType: object().required()
@@ -59,8 +58,11 @@ export default function StorageUnitEditPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
   const id = router.query.id?.toString();
+  const parentId = router.query.parentId?.toString();
 
   const storageUnitQuery = useStorageUnit(id);
+
+  const initialParentStorageUnitQuery = useStorageUnit(parentId);
 
   const title = id ? "editStorageUnitTitle" : "addStorageUnitTitle";
 
@@ -83,6 +85,16 @@ export default function StorageUnitEditPage() {
               <StorageUnitForm storageUnit={data} onSaved={goToViewPage} />
             </>
           ))
+        ) : parentId ? (
+          withResponse(
+            initialParentStorageUnitQuery,
+            ({ data: initialParent }) => (
+              <StorageUnitForm
+                initialParent={initialParent}
+                onSaved={goToViewPage}
+              />
+            )
+          )
         ) : (
           <StorageUnitForm onSaved={goToViewPage} />
         )}
@@ -92,15 +104,20 @@ export default function StorageUnitEditPage() {
 }
 
 export interface StorageUnitFormProps {
+  initialParent?: PersistedResource<StorageUnit>;
   storageUnit?: PersistedResource<StorageUnit>;
   onSaved: (storageUnit: PersistedResource<StorageUnit>) => Promise<void>;
 }
 
 export function StorageUnitForm({
+  initialParent,
   storageUnit,
   onSaved
 }: StorageUnitFormProps) {
-  const initialValues = storageUnit || { type: "storage-unit" };
+  const initialValues = storageUnit || {
+    type: "storage-unit",
+    parentStorageUnit: initialParent
+  };
 
   async function onSubmit({
     submittedValues,
