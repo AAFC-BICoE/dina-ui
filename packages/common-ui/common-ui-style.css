@@ -3,14 +3,11 @@
 */
 
 /*
-* Fixes WCAG contrast issue with ovelapped elements while still allowing these elements to be reached by tab navigation
-* The parent div element using the css-b8ldur-Input class wraps the input element and a div element conatin only a style attribute
-* Note: alternative fix is to use the CSS selector that combines the element name and attribute "element[attribute^=value]" 
-* e.g. input[id^=react-select-attribute],input[id^=react-select-predicate],input[id^=react-select-searchType],input[id^=react-select-config]
+* Fixes WCAG contrast issue. 
+* Not sure if why this works...perhaps padding the element renders it sufficiently for a contrast calculation.
 */
-.css-b8ldur-Input {
-  /* Disabled because it makes the react-select search input invisible. */
-  /* opacity: 0 !important; */
+input[id^=react-select] {
+  padding: 1px !important;
 }
 
 /*
