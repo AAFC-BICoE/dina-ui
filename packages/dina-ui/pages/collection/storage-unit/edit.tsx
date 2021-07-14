@@ -26,6 +26,12 @@ import {
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnit, StorageUnitType } from "../../../types/collection-api";
+import { object } from "yup";
+import { truncate } from "fs";
+
+const storageUnitFormSchema = object({
+  storageUnitType: object().required()
+});
 
 export function useStorageUnit(id?: string) {
   return useQuery<StorageUnit>(
@@ -126,6 +132,7 @@ export function StorageUnitForm({
   return (
     <DinaForm<Partial<StorageUnit>>
       initialValues={initialValues}
+      validationSchema={storageUnitFormSchema}
       onSubmit={onSubmit}
     >
       {buttonBar}
@@ -166,6 +173,7 @@ export function StorageUnitFormFields() {
           name="storageUnitType"
           optionLabel={it => it.name}
           filter={filterBy(["name"])}
+          omitNullOption={true}
         />
       </div>
       <StorageLinkerField
