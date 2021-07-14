@@ -15,7 +15,7 @@ import { FormikButton } from "../../../../..//common-ui/lib/formik-connected/For
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Switch from "react-switch";
-import { uniqBy } from "lodash";
+import { uniqBy, omitBy, isArray } from "lodash";
 import {
   DinaMessage,
   useDinaIntl
@@ -50,6 +50,7 @@ import { Head } from "../../../../../dina-ui/components/head";
 import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
 import { useAttachmentsModal } from "../../../../../dina-ui/components/object-store";
 import { StorageLinkerField } from "../../../../../dina-ui/components/storage/StorageLinker";
+import { InputResource } from "kitsu";
 
 export const SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY =
   "split-child-sample-run-action-result";
@@ -130,7 +131,7 @@ export default function SplitRunAction() {
     generationMode = "SERIES"
   } = splitChildSampleRunConfig?.configure ?? {};
 
-  const { sampleDescs = [], sampleNames = [] } =
+  const { sampleNames = [] } =
     splitChildSampleRunConfig?.configure_children ?? {};
 
   const initialChildSamples: MaterialSample[] = [];
@@ -148,7 +149,7 @@ export default function SplitRunAction() {
     return <LoadingSpinner loading={true} />;
   }
 
-  const parentSampleId = parentResp?.data?.[0]?.id;
+  const parentSampleId = parentResp?.data?.[0]?.id ?? null;
 
   // Get form initial values from run config
   for (let i = 0; i < numOfChildToCreate; i++) {
@@ -156,7 +157,6 @@ export default function SplitRunAction() {
     const computedSuffix = computeSuffix({ index: i, start, suffixType });
 
     const splitChildSampleName = sampleNames[i];
-    const splitChildSampleDescription = sampleDescs[i];
 
     const generatedSampleName =
       generationMode === "BATCH"
@@ -166,7 +166,6 @@ export default function SplitRunAction() {
     initialChildSamples.push({
       group: groupNames?.[0],
       type: "material-sample",
-      description: splitChildSampleDescription,
       materialSampleName: splitChildSampleName ?? generatedSampleName
     });
   }
@@ -216,7 +215,10 @@ export default function SplitRunAction() {
     // save samples with default value
     const response = await save(
       samplesToSave.map(sample => ({
-        resource: { ...defaultValueSample, ...sample },
+        resource: {
+          ...omitBy(defaultValueSample, isBlankResourceAttribute),
+          ...sample
+        },
         type: "material-sample"
       })),
       { apiBaseUrl: "/collection-api" }
@@ -225,9 +227,8 @@ export default function SplitRunAction() {
     response.map((resp, idx) =>
       sampleRunActionResults.childrenGenerated?.push({
         id: resp.id,
-        name: samplesToSave[idx].materialSampleName?.length
-          ? samplesToSave[idx].materialSampleName
-          : computeDefaultSampleName(idx)
+        name:
+          samplesToSave[idx].materialSampleName || computeDefaultSampleName(idx)
       })
     );
 
@@ -279,12 +280,6 @@ export default function SplitRunAction() {
       commonRoot + "dwcOtherCatalogNumbers",
       parentSample?.dwcOtherCatalogNumbers
     );
-
-    // missing backend field, comment til backend ready
-    // formik.setFieldValue(
-    //   commonRoot + "description",
-    //   parentSample?.description
-    // );
   };
 
   function computeDefaultSampleName(index) {
@@ -414,7 +409,10 @@ export default function SplitRunAction() {
     label: sample.materialSampleName,
     value: sample.materialSampleName
   }));
-  sampleNameOptions.unshift({ label: "Set All", value: "Set All" });
+  sampleNameOptions.unshift({
+    label: formatMessage("setAll"),
+    value: "Set All"
+  });
   const defaultSample: MaterialSample = { type: "material-sample" };
   samples.unshift(defaultSample);
   const length = samples?.length;
@@ -440,20 +438,23 @@ export default function SplitRunAction() {
             {formatMessage("stepLabel")}2: {formatMessage("dataEntryLabel")}
           </p>
 
-          {length < 2 ? (
+          {length < 10 ? (
             <FieldArray name="childSamples">
               {({ form }) => {
                 return (
                   <div className="child-sample-section">
-                    <Tabs>
+                    <Tabs
+                      selectedIndex={selectedIndex}
+                      onSelect={setSelectedIndex}
+                    >
                       {
                         <TabList>
-                          {samples.map((sample, index) => (
+                          {samples.map((_, index) => (
                             <Tab key={index}>
                               <span className="m-3">
-                                {sample.materialSampleName?.length
-                                  ? sample.materialSampleName
-                                  : computeDefaultSampleName(index)}
+                                {index === 0
+                                  ? formatMessage("setAll")
+                                  : computeDefaultSampleName(index - 1)}
                               </span>
                             </Tab>
                           ))}
@@ -493,4 +494,20 @@ export default function SplitRunAction() {
       </main>
     </div>
   );
+}
+
+/** CHecks whether an API resource's attribute is blank */
+function isBlankResourceAttribute(value: any) {
+  // "blank" means something different depending on the type:
+  switch (typeof value) {
+    case "string":
+      // Empty string:
+      return !value.trim();
+    case "object":
+    case "undefined":
+      // empty object or empty array:
+      return isArray(value) ? !value.join() : !value?.id;
+    default:
+      return false;
+  }
 }

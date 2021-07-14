@@ -24,7 +24,7 @@ export function StorageUnitTypeDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("storageUnitTypeViewTitle")} />
+      <Head title={formatMessage("storageUnitType")} />
       <Nav />
       <main className="container">
         <ButtonBar>

@@ -8,3 +8,4 @@ export * from "./storage/StorageLinker";
 export * from "./head";
 export * from "./storage/BrowseStorageTree";
 export * from "./storage/StorageTreeListField";
+export * from "./storage/StorageUnitBreadCrumb";

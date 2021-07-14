@@ -14,7 +14,7 @@ import {
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { Head, Nav, storageUnitDisplayName } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitFormFields, useStorageUnit } from "./edit";
@@ -101,7 +101,6 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("storageUnitViewTitle")} />
       <Nav />
       <main className="container">
         {withResponse(storageUnitQuery, ({ data: strgUnit }) => {
@@ -141,6 +140,7 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
 
           return (
             <>
+              <Head title={storageUnitDisplayName(strgUnit)} />
               {buttonBar}
               <DinaForm<StorageUnit> initialValues={strgUnit} readOnly={true}>
                 <StorageUnitFormFields />
