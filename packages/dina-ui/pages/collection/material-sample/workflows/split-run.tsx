@@ -69,7 +69,8 @@ export default function SplitRunAction() {
     initialMetadatas: [],
     deps: [],
     index: selectedIndex.toString(),
-    title: <DinaMessage id="materialSampleAttachments" />
+    title: <DinaMessage id="materialSampleAttachments" />,
+    id: "material-sample-attachments-section"
   });
 
   const [enablePreparations, setEnablePreparations] = useState(true);
@@ -77,7 +78,7 @@ export default function SplitRunAction() {
 
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
-    const dataComponents = document?.querySelectorAll<HTMLDivElement>(
+    const dataComponents = document?.querySelectorAll<any>(
       ".data-components > fieldset:not(.d-none)"
     );
     dataComponents?.forEach((element, index) => {
@@ -400,11 +401,7 @@ export default function SplitRunAction() {
                   />{" "}
                 </div>
               )}
-              {
-                <div id="material-sample-attachments-section">
-                  {materialSampleAttachmentsUI}
-                </div>
-              }
+              {materialSampleAttachmentsUI}
             </div>
           </div>
         </div>
