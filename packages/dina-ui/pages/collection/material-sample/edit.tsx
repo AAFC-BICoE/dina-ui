@@ -464,8 +464,8 @@ export function MaterialSampleIdentifiersFormLayout({
                 ? namePrefix + "materialSampleName"
                 : "materialSampleName"
             }`}
-            customName={formatMessage("materialSampleName")}
-            className={`materialSampleName${index}`}
+            customName="materialSampleName"
+            className="materialSampleName"
             placeholder={sampleNamePlaceHolder}
           />
 
@@ -474,7 +474,7 @@ export function MaterialSampleIdentifiersFormLayout({
               namePrefix ? namePrefix + "dwcCatalogNumber" : "dwcCatalogNumber"
             }`}
             customName="dwcCatalogNumber"
-            className={`dwcCatalogNumber${index}`}
+            className="dwcCatalogNumber"
           />
         </div>
         <div className="col-md-6">
@@ -485,7 +485,6 @@ export function MaterialSampleIdentifiersFormLayout({
                 : "dwcOtherCatalogNumbers"
             }`}
             customName="dwcOtherCatalogNumbers"
-            className={`dwcOtherCatalogNumbers${index}`}
           />
         </div>
       </div>
@@ -502,7 +501,6 @@ export function PreparationsFormLayout({
   className,
   namePrefix = ""
 }: CatalogueInfoFormLayoutProps) {
-  const { formatMessage } = useDinaIntl();
   return (
     <FieldSet
       className={className}
@@ -526,7 +524,7 @@ export function PreparationsFormLayout({
               }
               name={`${namePrefix}preparationType`}
               key={values.group}
-              customName={formatMessage("preparationTypeListTitle")}
+              customName="preparationType"
             />
           )}
         </Field>
@@ -534,10 +532,10 @@ export function PreparationsFormLayout({
       <DinaFormSection>
         <ResourceSelectField<Person>
           name={`${namePrefix}preparedBy`}
+          customName="preparedBy"
           filter={filterBy(["displayName"])}
           model="agent-api/person"
           optionLabel={person => person.displayName}
-          customName={formatMessage("preparedBy")}
         />
         <DateField
           name={`${namePrefix}preparationDate`}

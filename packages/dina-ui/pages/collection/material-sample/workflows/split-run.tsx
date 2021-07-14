@@ -190,13 +190,12 @@ export default function SplitRunAction() {
         };
       }
 
-      sample.relationships = {};
-
       // Apply default attachment and add additional attachments if any
       if (
         (index > 0 && selectedMetadatas?.get("0")?.length) ||
         selectedMetadatas?.get(index.toString())?.length
       ) {
+        sample.relationships = {};
         (sample as any).relationships.attachment = {
           data: uniqBy(
             [
@@ -216,7 +215,7 @@ export default function SplitRunAction() {
       samplesToSave.map(sample => ({
         resource: {
           ...omitBy(defaultValueSample, isBlankResourceAttribute),
-          ...sample
+          ...omitBy(sample, isBlankResourceAttribute)
         },
         type: "material-sample"
       })),
@@ -449,7 +448,14 @@ export default function SplitRunAction() {
                       {
                         <TabList>
                           {samples.map((_, index) => (
-                            <Tab key={index}>
+                            <Tab
+                              key={index}
+                              className={`${
+                                index === 0
+                                  ? "react-tabs__tab set-all-tab"
+                                  : "react-tabs__tab sample-tab-" + (index - 1)
+                              }`}
+                            >
                               <span className="m-3">
                                 {index === 0
                                   ? formatMessage("setAll")
@@ -505,7 +511,12 @@ function isBlankResourceAttribute(value: any) {
     case "object":
     case "undefined":
       // empty object or empty array:
-      return isArray(value) ? !value.join() : !value?.id;
+      // when object has id key and the id is null, or object has no keys for case like relationships
+      return isArray(value)
+        ? !value.join()
+        : (Object.keys(value).findIndex(key => key === "id") !== -1 &&
+            value?.id === null) ||
+            Object.keys(value)?.length === 0;
     default:
       return false;
   }

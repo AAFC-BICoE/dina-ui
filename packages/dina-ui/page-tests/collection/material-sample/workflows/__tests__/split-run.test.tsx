@@ -8,6 +8,7 @@ import {
   MaterialSampleRunConfig
 } from "../../../../../../dina-ui/types/collection-api";
 import { PreparationType } from "../../../../../../dina-ui/types/collection-api/resources/PreparationType";
+import { Person } from "../../../../../../dina-ui/types/agent-api";
 
 jest.mock("next/router", () => ({
   useRouter: () => ({ push: jest.fn() })
@@ -39,6 +40,19 @@ function testPreparationType(): PersistedResource<PreparationType>[] {
   ];
 }
 
+function testPersons(): PersistedResource<Person>[] {
+  return [
+    {
+      type: "person",
+      displayName: "test-person",
+      email: "a@b.com",
+      id: "2",
+      uuid: "1111",
+      aliases: ["alias1", "alias2", "alias3"]
+    }
+  ];
+}
+
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "collection-api/material-sample":
@@ -48,6 +62,9 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/preparation-type":
       return { data: testPreparationType() };
     case "agent-api/person":
+      return { data: testPersons() };
+    case "collection-api/storage-unit":
+    case "collection-api/storage-unit-type":
     case "objectstore-api/metadata":
       return { data: [] };
   }
@@ -104,9 +121,9 @@ describe("MaterialSample split workflow run action form with all default values"
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".materialSampleName0 input").prop("value")).toEqual(
-      ""
-    );
+    expect(
+      wrapper.find(".materialSampleName-field input").prop("value")
+    ).toEqual("");
   });
 
   it("Submit a workflow run action (series mode), correct child sample is sent to be saved ", async () => {
@@ -123,9 +140,9 @@ describe("MaterialSample split workflow run action form with all default values"
     wrapper.find("li.sample-tab-0").simulate("click");
 
     // child sample initially loaded with user entered custom name
-    expect(wrapper.find(".materialSampleName1 input").prop("value")).toEqual(
-      "my custom name"
-    );
+    expect(
+      wrapper.find(".materialSampleName-field input").prop("value")
+    ).toEqual("my custom name");
 
     wrapper.find("button.copyFromParent1").simulate("click");
 
@@ -133,7 +150,7 @@ describe("MaterialSample split workflow run action form with all default values"
     wrapper.update();
 
     // child sample will have the parent's value after click copyFromParent
-    expect(wrapper.find(".dwcCatalogNumber1 input").prop("value")).toEqual(
+    expect(wrapper.find(".dwcCatalogNumber-field input").prop("value")).toEqual(
       "my-number"
     );
 
@@ -176,9 +193,9 @@ describe("MaterialSample split workflow run action form with all default values"
     wrapper.find("li.sample-tab-0").simulate("click");
 
     // child sample initially loaded with generated custom name
-    expect(wrapper.find(".materialSampleName input").prop("value")).toEqual(
-      "CustomParentNameCustomSuffix"
-    );
+    expect(
+      wrapper.find(".materialSampleName-field input").prop("value")
+    ).toEqual("CustomParentNameCustomSuffix");
 
     wrapper.find("button.runAction").simulate("click");
 
@@ -260,7 +277,7 @@ describe("MaterialSample split workflow run action form with all default values"
       .simulate("change", { target: { value: "default-otherNumbers" } });
 
     // Leave Sample 0 blank:
-    wrapper.find("li.sample-tab-1").simulate("click");
+    wrapper.find("li.sample-tab-0").simulate("click");
 
     // Set preparedBy to the "None" option with a null ID:
     wrapper.find(".preparedBy-field ResourceSelect").prop<any>("onChange")({
