@@ -15,6 +15,7 @@ import { FormikButton } from "../../../../..//common-ui/lib/formik-connected/For
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Switch from "react-switch";
+import { uniqBy } from "lodash";
 import {
   DinaMessage,
   useDinaIntl
@@ -67,6 +68,7 @@ export default function SplitRunAction() {
   } = useAttachmentsModal({
     initialMetadatas: [],
     deps: [],
+    index: selectedIndex.toString(),
     title: <DinaMessage id="materialSampleAttachments" />
   });
 
@@ -173,12 +175,12 @@ export default function SplitRunAction() {
       parentSampleId: parentSampleId as string,
       childrenGenerated: []
     };
-    // submit to back end
     const samplesToSave = submittedValues.childSamples;
-
     // the first is the default value
     const defaultValueSample: MaterialSample = samplesToSave?.[0];
+    let index = 0;
 
+    // preprocess the samples to set the parent and the attachment
     for (const sample of samplesToSave) {
       delete sample.description;
       // link to parent
@@ -191,17 +193,26 @@ export default function SplitRunAction() {
 
       sample.relationships = {};
 
-      if (sample.selectedMetadatas?.length) {
+      // Apply default attachment and add additional attachments if any
+      if (
+        (index > 0 && selectedMetadatas?.get("0")?.length) ||
+        selectedMetadatas?.get(index.toString())?.length
+      ) {
         (sample as any).relationships.attachment = {
-          data: selectedMetadatas.map(it => ({ id: it.id, type: it.type }))
+          data: uniqBy(
+            [
+              ...(selectedMetadatas?.get("0") ?? []),
+              ...(selectedMetadatas?.get(index.toString()) ?? [])
+            ],
+            metadata => metadata.id
+          ).map(it => ({ id: it.id, type: it.type }))
         };
-        // Delete the 'attachment' attribute because it should stay in the relationships field:
-        delete sample.attachment;
-        delete sample.selectedMetadatas;
       }
+      index++;
     }
+    // Taking out the default before saving child samples
     samplesToSave.splice(0, 1);
-    // save the other samples, taking the first as the default value
+    // save samples with default value
     const response = await save(
       samplesToSave.map(sample => ({
         resource: { ...defaultValueSample, ...sample },
@@ -283,6 +294,7 @@ export default function SplitRunAction() {
     const childSamplesPath = "childSamples";
     const childSamplePath = `${childSamplesPath}[${index}]`;
     const commonRoot = childSamplePath + ".";
+
     return (
       <>
         <span className="d-flex fw-bold flex-row">
@@ -390,9 +402,7 @@ export default function SplitRunAction() {
               )}
               {
                 <div id="material-sample-attachments-section">
-                  <Field name={`${commonRoot}selectedMetadatas`}>
-                    {({}) => materialSampleAttachmentsUI}
-                  </Field>
+                  {materialSampleAttachmentsUI}
                 </div>
               }
             </div>
@@ -410,7 +420,7 @@ export default function SplitRunAction() {
   sampleNameOptions.unshift({ label: "Set All", value: "Set All" });
   const defaultSample: MaterialSample = { type: "material-sample" };
   samples.unshift(defaultSample);
-  const length = samples.length;
+  const length = samples?.length;
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
@@ -433,7 +443,7 @@ export default function SplitRunAction() {
             {formatMessage("stepLabel")}2: {formatMessage("dataEntryLabel")}
           </p>
 
-          {length < 10 ? (
+          {length < 2 ? (
             <FieldArray name="childSamples">
               {({ form }) => {
                 return (
@@ -452,7 +462,7 @@ export default function SplitRunAction() {
                           ))}
                         </TabList>
                       }
-                      {samples.length
+                      {samples?.length
                         ? samples.map((_, index) => {
                             return (
                               <TabPanel key={index}>
@@ -468,19 +478,17 @@ export default function SplitRunAction() {
             </FieldArray>
           ) : (
             <Field name="childSamples">
-              {({ form }) => {
-                return (
-                  <>
-                    <SelectFieldWithNav
-                      form={form}
-                      name="childSampleName"
-                      options={sampleNameOptions as any}
-                      onSelectionChanged={setSelectedIndex}
-                    />
-                    {childSampleInternal(selectedIndex, form)}
-                  </>
-                );
-              }}
+              {({ form }) => (
+                <>
+                  <SelectFieldWithNav
+                    form={form}
+                    name="childSampleName"
+                    options={sampleNameOptions as any}
+                    onSelectionChanged={setSelectedIndex}
+                  />
+                  {childSampleInternal(selectedIndex, form)}
+                </>
+              )}
             </Field>
           )}
           {buttonBar}
