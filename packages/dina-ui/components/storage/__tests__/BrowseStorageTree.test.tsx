@@ -49,6 +49,7 @@ const mockGet = jest.fn<any, any>(async (path, params = {}) => {
   switch (path) {
     case "collection-api/storage-unit":
       if (params.filter?.parentStorageUnit === null) {
+        // Top-level units:
         return { data: [STORAGE_A], meta: { totalResourceCount: 1 } };
       } else if (params.filter?.rsql === "parentStorageUnit.uuid==A") {
         return {
@@ -60,6 +61,8 @@ const mockGet = jest.fn<any, any>(async (path, params = {}) => {
       } else if (params.filter?.rsql === "name==*test-search-text*") {
         return { data: [], meta: { totalResourceCount: 0 } };
       }
+    case "collection-api/storage-unit-type":
+      return { data: [], meta: { totalResourceCount: 0 } };
   }
 });
 
@@ -181,6 +184,7 @@ describe("BrowseStorageTree component", () => {
         parentStorageUnit: null,
         rsql: ""
       },
+      include: "hierarchy,storageUnitChildren",
       page: {
         limit: 100,
         offset: 0
@@ -200,6 +204,7 @@ describe("BrowseStorageTree component", () => {
       filter: {
         rsql: "name==*test-search-text*"
       },
+      include: "hierarchy,storageUnitChildren",
       page: {
         limit: 100,
         offset: 0
@@ -218,6 +223,7 @@ describe("BrowseStorageTree component", () => {
         parentStorageUnit: null,
         rsql: ""
       },
+      include: "hierarchy,storageUnitChildren",
       page: {
         limit: 100,
         offset: 0

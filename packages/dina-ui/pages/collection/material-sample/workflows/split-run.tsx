@@ -50,7 +50,6 @@ import { Head } from "../../../../../dina-ui/components/head";
 import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
 import { useAttachmentsModal } from "../../../../../dina-ui/components/object-store";
 import { StorageLinkerField } from "../../../../../dina-ui/components/storage/StorageLinker";
-import { InputResource } from "kitsu";
 
 export const SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY =
   "split-child-sample-run-action-result";
@@ -420,7 +419,7 @@ export default function SplitRunAction() {
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
       <Nav />
-      <main className="container-fluid">
+      <main className="container">
         <h1>
           <DinaMessage id="splitSubsampleTitle" />
         </h1>

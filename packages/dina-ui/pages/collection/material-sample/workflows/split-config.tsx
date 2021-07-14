@@ -3,6 +3,7 @@ import {
   ButtonBar,
   CheckBoxWithoutWrapper,
   DinaForm,
+  DinaFormOnSubmit,
   FieldSet,
   SelectField,
   SubmitButton,

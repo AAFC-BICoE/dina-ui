@@ -524,9 +524,7 @@ export function PreparationsFormLayout({
                     }
                   : { ...filterBy(["name"])(input) }
               }
-              name={`${
-                namePrefix ? namePrefix + "preparationType" : "preparationType"
-              }`}
+              name={`${namePrefix}preparationType`}
               key={values.group}
               customName={formatMessage("preparationTypeListTitle")}
             />
