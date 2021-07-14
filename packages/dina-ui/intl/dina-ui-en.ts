@@ -229,6 +229,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_orientation_tooltipAlt:
     "Diagram of all the possible orientation values.",
   field_originalFilename: "Original Filename",
+  field_parentStorageUnit: "Location",
   field_preparationType: "Preparation Type",
   field_publiclyReleasable: "Publicly releasable",
   field_publiclyReleasable_tooltip:
