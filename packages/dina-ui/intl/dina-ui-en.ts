@@ -312,6 +312,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   noNestedStorageUnits: "No Nested Storage Units",
   noResultsFound: "No results found.",
   noneTopLevel: "None (Top-level)",
+  notEditableWhenThereAreChildStorageUnits:
+    "Not editable when there are child Storage Units.",
   objectListTitle: "Stored Objects",
   objectStoreDataUnavailable: "Object Store data unavailable",
   objectStoreDetailsTitle: "Object Store Details",

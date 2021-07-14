@@ -3,6 +3,7 @@ import {
   ButtonBar,
   DinaForm,
   EditButton,
+  Tooltip,
   useApiClient,
   useModal,
   useQuery,
@@ -59,6 +60,16 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
       <Nav />
       <main className="container">
         {withResponse(storageUnitQuery, ({ data: strgUnit }) => {
+          const hasChildren = !!children?.length;
+
+          const editButton = (
+            <EditButton
+              entityId={strgUnit.id}
+              entityLink="collection/storage-unit"
+              disabled={hasChildren}
+            />
+          );
+
           const buttonBar = (
             <ButtonBar>
               <BackButton
@@ -66,13 +77,16 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
                 entityLink="/collection/storage-unit"
                 byPassView={true}
               />
-              {!children?.length && (
-                <EditButton
-                  className="ms-auto"
-                  entityId={strgUnit.id}
-                  entityLink="collection/storage-unit"
-                />
-              )}
+              <div className="ms-auto">
+                {hasChildren ? (
+                  <Tooltip
+                    visibleElement={editButton}
+                    id="notEditableWhenThereAreChildStorageUnits"
+                  />
+                ) : (
+                  editButton
+                )}
+              </div>
             </ButtonBar>
           );
 
