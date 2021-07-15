@@ -20,7 +20,7 @@ export function StorageUnitBreadCrumb({
 
   return (
     <ol
-      className="breadcrumb"
+      className="breadcrumb mb-0"
       style={{ "--bs-breadcrumb-divider": "'>'" } as any}
     >
       {parentPath.map(node => (
@@ -46,7 +46,5 @@ export function StorageUnitBreadCrumb({
 }
 
 export function storageUnitDisplayName({ name, storageUnitType }: StorageUnit) {
-  return `${name || ""} ${
-    storageUnitType?.name ? `(${storageUnitType.name})` : ""
-  }`;
+  return [storageUnitType?.name, name].filter(it => it).join(" ");
 }

@@ -12,16 +12,12 @@ import { StorageSearchSelector } from "./StorageSearchSelector";
 export interface StorageLinkerProps {
   value?: PersistedResource<StorageUnit>;
   onChange: (newValue: PersistedResource<StorageUnit>) => Promisable<void>;
-
-  /** Disable this option ID e.g. to avoid putting a storage unit inside itself. */
-  excludeOptionId?: string;
 }
 
 /** Multi-Tab Storage Assignment UI. */
 export function StorageLinker({
   onChange: onChangeProp,
-  value,
-  excludeOptionId
+  value
 }: StorageLinkerProps) {
   const [activeTab, setActiveTab] = useState(0);
 
@@ -36,7 +32,7 @@ export function StorageLinker({
     <AssignedStorage value={value} onChange={onChangeProp} />
   ) : (
     <Tabs selectedIndex={activeTab} onSelect={setActiveTab}>
-      <TabList>
+      <TabList className="react-tabs__tab-list mb-0">
         {!value?.id && (
           <Tab>
             <DinaMessage id="searchStorage" />
@@ -48,42 +44,35 @@ export function StorageLinker({
           </Tab>
         )}
       </TabList>
-      {!value?.id && (
-        <TabPanel>
-          <div style={{ height: "60rem", overflowY: "scroll" }}>
-            <StorageSearchSelector
-              onChange={changeStorageAndResetTab}
-              excludeOptionId={excludeOptionId}
-            />
-          </div>
-        </TabPanel>
-      )}
-      {!value?.id && (
-        <TabPanel>
-          <div style={{ height: "60rem", overflowY: "scroll" }}>
-            <BrowseStorageTree
-              onSelect={changeStorageAndResetTab}
-              excludeOptionId={excludeOptionId}
-            />
-          </div>
-        </TabPanel>
-      )}
+      <div
+        className="card-body border-top-0"
+        style={{
+          border: "1px solid rgb(170, 170, 170)",
+          height: "60rem",
+          overflowY: "scroll"
+        }}
+      >
+        {!value?.id && (
+          <TabPanel>
+            <StorageSearchSelector onChange={changeStorageAndResetTab} />
+          </TabPanel>
+        )}
+        {!value?.id && (
+          <TabPanel>
+            <BrowseStorageTree onSelect={changeStorageAndResetTab} />
+          </TabPanel>
+        )}
+      </div>
     </Tabs>
   );
 }
 
 export interface StorageLinkerFieldProps {
   name: string;
-
-  /** Disable this option ID e.g. to avoid putting a storage unit inside itself. */
-  excludeOptionId?: string;
 }
 
 /** DinaForm-connected Storage Assignment UI. */
-export function StorageLinkerField({
-  name,
-  excludeOptionId
-}: StorageLinkerFieldProps) {
+export function StorageLinkerField({ name }: StorageLinkerFieldProps) {
   return (
     <FieldWrapper
       name={name}
@@ -93,11 +82,7 @@ export function StorageLinkerField({
       disableLabelClick={true}
     >
       {({ value, setValue }) => (
-        <StorageLinker
-          value={value}
-          onChange={setValue}
-          excludeOptionId={excludeOptionId}
-        />
+        <StorageLinker value={value} onChange={setValue} />
       )}
     </FieldWrapper>
   );

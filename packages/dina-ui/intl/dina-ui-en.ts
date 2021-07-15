@@ -6,11 +6,13 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addAssertion: "Add GeoReference",
   addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
+  addNewChildStorageUnit: "Add New Child Storage Unit",
   addCataloguedObjectTitle: "Add Catalogued Object",
   addCollectingEventTitle: "Add Collecting Event",
   addCollectionTitle: "Add Collection",
   addCollectorGroupTitle: "Add Collector Group",
   addCustomPlaceName: "Add",
+  addExistingStorageUnitAsChild: "Add Existing Storage Unit as Child",
   addFilesButton: "Add Files",
   addGroup: "Add Group",
   addManagedAttributeButtonText: "Add New Managed Attribute",
@@ -228,6 +230,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_orientation_tooltipAlt:
     "Diagram of all the possible orientation values.",
   field_originalFilename: "Original Filename",
+  field_parentStorageUnit: "Location",
   field_preparationType: "Preparation Type",
   field_publiclyReleasable: "Publicly releasable",
   field_publiclyReleasable_tooltip:
@@ -311,6 +314,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   noNestedStorageUnits: "No Nested Storage Units",
   noResultsFound: "No results found.",
   noneTopLevel: "None (Top-level)",
+  notEditableWhenThereAreChildStorageUnits:
+    "Not editable when there are child Storage Units.",
   objectListTitle: "Stored Objects",
   objectStoreDataUnavailable: "Object Store data unavailable",
   objectStoreDetailsTitle: "Object Store Details",

@@ -70,6 +70,7 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
   useEffect(doSearch, [createdByMeFilter, storageTypeFilter]);
 
   function resetSearch() {
+    setCreatedByMeFilter(false);
     setStorageTypeFilter(undefined);
     setSearchText("");
     onChange(null);
@@ -82,19 +83,21 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
           <DinaMessage id="filterRecordsTitle" />
         </strong>
       </div>
-      <label className="d-flex align-items-center gap-2 mb-3">
-        <input
-          type="checkbox"
-          onChange={e => setCreatedByMeFilter(e.target.checked)}
-          checked={createdByMeFilter}
-          style={{
-            height: "20px",
-            width: "20px"
-          }}
-        />
-        <strong>
-          <DinaMessage id="storagesCreatedByMe" />
-        </strong>
+      <label className="mb-3">
+        <div className="d-flex align-items-center gap-2">
+          <input
+            type="checkbox"
+            onChange={e => setCreatedByMeFilter(e.target.checked)}
+            checked={createdByMeFilter}
+            style={{
+              height: "20px",
+              width: "20px"
+            }}
+          />
+          <strong>
+            <DinaMessage id="storagesCreatedByMe" />
+          </strong>
+        </div>
       </label>
       <div className="row mb-3">
         <div className="col-sm-6">
