@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { CommonMessage } from "../../lib/intl/common-ui-intl";
+import classNames from "classnames";
 
 interface EditButtonProps {
   /** The link type for where to redirect the user. Gets appended with "/" + entityLink + "/edit/". */
@@ -10,6 +11,8 @@ interface EditButtonProps {
   entityId: string;
 
   className?: string;
+
+  disabled?: boolean;
 }
 
 /**
@@ -18,11 +21,15 @@ interface EditButtonProps {
 export function EditButton({
   entityId,
   entityLink,
-  className
+  className,
+  disabled
 }: EditButtonProps) {
   return (
     <Link href={`/${entityLink}/edit?id=${entityId}`}>
-      <a className={`btn btn-primary ${className}`} style={{ width: "10rem" }}>
+      <a
+        className={classNames("btn btn-primary", { disabled }, className)}
+        style={{ width: "10rem" }}
+      >
         <CommonMessage id="editButtonText" />
       </a>
     </Link>

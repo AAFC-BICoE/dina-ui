@@ -111,8 +111,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   "field_acMetadataCreator.displayName": "Téléchargé par",
   "field_acMetadataCreator.displayName_tooltip":
     "Agent qui a créé l'enregistrement de métadonnées.",
-  field_acSubType: "Sous-type d'objet",
-  field_acSubtype: "Sous-catégorie Ac ",
+  field_acSubtype: "Sous-type d'objet",
   field_acTags: "Balises",
   field_acceptedValues: "Valeurs acceptées",
   field_aliases: "Pseudonymes",

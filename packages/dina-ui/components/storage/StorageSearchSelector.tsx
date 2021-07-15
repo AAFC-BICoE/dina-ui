@@ -1,9 +1,11 @@
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useState } from "react";
+import { Promisable } from "type-fest";
 import {
   ColumnDefinition,
   FilterGroupModel,
+  FormikButton,
   QueryTable,
   rsql
 } from "../../../common-ui/lib";
@@ -16,14 +18,12 @@ import {
 } from "./StorageUnitBreadCrumb";
 
 export interface StorageSearchSelectorProps {
-  onChange: (newValue: PersistedResource<StorageUnit>) => void;
-  excludeOptionId?: string;
+  onChange: (newValue: PersistedResource<StorageUnit>) => Promisable<void>;
 }
 
 /** Table UI to search for and select a Storage Unit. */
 export function StorageSearchSelector({
-  onChange,
-  excludeOptionId = "00000000-0000-0000-0000-000000000000"
+  onChange
 }: StorageSearchSelectorProps) {
   const [filter, setFilter] = useState<FilterGroupModel | null>();
 
@@ -44,9 +44,12 @@ export function StorageSearchSelector({
     },
     {
       Cell: ({ original }) => (
-        <button className="btn btn-primary" onClick={() => onChange(original)}>
+        <FormikButton
+          className="btn btn-primary select-storage"
+          onClick={async () => await onChange(original)}
+        >
           <DinaMessage id="assignToStorage" />
-        </button>
+        </FormikButton>
       ),
       width: 250,
       accessor: "assignToStorage",
@@ -74,17 +77,7 @@ export function StorageSearchSelector({
             type: "FILTER_GROUP",
             id: -123,
             operator: "AND",
-            children: [
-              {
-                id: -321,
-                type: "FILTER_ROW" as const,
-                attribute: "uuid",
-                predicate: "IS NOT" as const,
-                searchType: "EXACT_MATCH" as const,
-                value: excludeOptionId
-              },
-              ...(filter ? [filter] : [])
-            ]
+            children: [...(filter ? [filter] : [])]
           })
         }}
       />

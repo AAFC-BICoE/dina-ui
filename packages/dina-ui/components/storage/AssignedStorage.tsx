@@ -1,4 +1,5 @@
 import { PersistedResource } from "kitsu";
+import { Promisable } from "type-fest";
 import { withResponse } from "../../../common-ui/lib";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { useStorageUnit } from "../../pages/collection/storage-unit/edit";
@@ -8,7 +9,9 @@ import { StorageUnitBreadCrumb } from "./StorageUnitBreadCrumb";
 export interface AssignedStorageProps {
   readOnly?: boolean;
   value?: PersistedResource<StorageUnit>;
-  onChange?: (newValue: PersistedResource<StorageUnit> | { id: null }) => void;
+  onChange?: (
+    newValue: PersistedResource<StorageUnit> | { id: null }
+  ) => Promisable<void>;
   noneMessage?: JSX.Element;
 }
 

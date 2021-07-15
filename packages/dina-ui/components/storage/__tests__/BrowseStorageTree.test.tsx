@@ -1,4 +1,5 @@
 import { PersistedResource } from "kitsu";
+import { DinaForm } from "../../../../common-ui/lib";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { StorageUnit } from "../../../types/collection-api";
 import { BrowseStorageTree } from "../BrowseStorageTree";
@@ -79,7 +80,9 @@ describe("BrowseStorageTree component", () => {
 
   it("Lets you navigate the tree and select a Storage Unit.", async () => {
     const wrapper = mountWithAppContext(
-      <BrowseStorageTree onSelect={mockOnSelect} />,
+      <DinaForm initialValues={{}}>
+        <BrowseStorageTree onSelect={mockOnSelect} />
+      </DinaForm>,
       { apiContext }
     );
 
@@ -115,63 +118,11 @@ describe("BrowseStorageTree component", () => {
     expect(mockOnSelect).lastCalledWith(STORAGE_C);
   });
 
-  it("Can disable a Storage node and its children from being selectable.", async () => {
-    // Disable selecting anything from C down.
-    const wrapper = mountWithAppContext(
-      <BrowseStorageTree onSelect={mockOnSelect} excludeOptionId="C" />,
-      { apiContext }
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Shows the top-level storage units:
-    expect(wrapper.find("a.storage-unit-name").text()).toEqual("A");
-
-    // Open the top-level unit to show the nested units "B" and "C":
-    wrapper.find("svg.storage-collapser-icon").simulate("click");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Shows the nested C Unit:
-    expect(
-      wrapper
-        .find(".collapser-for-A .collapser-for-C a.storage-unit-name")
-        .text()
-    ).toEqual("C");
-
-    // Open the C unit:
-    wrapper
-      .find(".collapser-for-C svg.storage-collapser-icon")
-      .simulate("click");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Shows the nested D Unit:
-    expect(
-      wrapper
-        .find(".collapser-for-C .collapser-for-D a.storage-unit-name")
-        .text()
-    ).toEqual("D");
-
-    // C and its nested D buttons are gone:
-    expect(
-      wrapper
-        .find(".collapser-for-A .collapser-for-C button.select-storage")
-        .exists()
-    ).toEqual(false);
-    expect(
-      wrapper
-        .find(".collapser-for-C .collapser-for-D button.select-storage")
-        .exists()
-    ).toEqual(false);
-  });
-
   it("Filters the list based on a text filter.", async () => {
     const wrapper = mountWithAppContext(
-      <BrowseStorageTree onSelect={mockOnSelect} />,
+      <DinaForm initialValues={{}}>
+        <BrowseStorageTree onSelect={mockOnSelect} />
+      </DinaForm>,
       { apiContext }
     );
 

@@ -29,8 +29,8 @@ export async function serialize<TData extends KitsuResource>({
   resource,
   type
 }: SerializeParams<TData>): Promise<ResourceObject> {
-  // Create a copy of the resource so the original is not affected.
-  const resourceCopy = { ...resource };
+  // Create a copy of the resource so the original is not affected, and omit "undefined" values.
+  const resourceCopy = JSON.parse(JSON.stringify(resource));
 
   // Get rid of undefined IDs, which can cause errors:
   if (typeof resourceCopy.id === "undefined") {
