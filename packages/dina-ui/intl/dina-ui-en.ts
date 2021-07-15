@@ -128,8 +128,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "field_acMetadataCreator.displayName": "Uploaded By",
   "field_acMetadataCreator.displayName_tooltip":
     "Agent who created the metadata record.",
-  field_acSubType: "Object SubType",
-  field_acSubtype: "Ac Subtype",
+  field_acSubtype: "Object Subtype",
   field_acTags: "Tags",
   field_acceptedValues: "Accepted Values",
   field_aliases: "Aliases",
