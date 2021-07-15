@@ -43,8 +43,8 @@ export function SelectFieldWithNav<T = string>(
     setLeftDisabled(false);
     if (newIdx === 0) {
       setLeftDisabled(true);
-      setRightDisabled(false);
     }
+    setRightDisabled(false);
     onSelectionChanged?.(newIdx);
   }
 
@@ -56,8 +56,8 @@ export function SelectFieldWithNav<T = string>(
     setRightDisabled(false);
     if (newIdx === options.length - 1) {
       setRightDisabled(true);
-      setLeftDisabled(false);
     }
+    setLeftDisabled(false);
     onSelectionChanged?.(newIdx);
   }
 
@@ -67,11 +67,20 @@ export function SelectFieldWithNav<T = string>(
       options={options}
       forwardedRef={ref as any}
       className={"col-md-4"}
-      onChange={(value, _form) =>
-        onSelectionChanged?.(
-          options.findIndex(option => value === option.value)
-        )
-      }
+      onChange={(value, _form) => {
+        const newIdx = options.findIndex(option => value === option.value);
+        if (newIdx === options.length - 1) {
+          setRightDisabled(true);
+          setLeftDisabled(false);
+        } else if (newIdx === 0) {
+          setLeftDisabled(true);
+          setRightDisabled(false);
+        } else {
+          setLeftDisabled(false);
+          setRightDisabled(false);
+        }
+        onSelectionChanged?.(newIdx);
+      }}
     />
   ));
 
