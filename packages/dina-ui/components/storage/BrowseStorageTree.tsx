@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import {
   FilterGroupModel,
+  FormikButton,
   MetaWithTotal,
   rsql,
   useQuery,
@@ -11,13 +12,14 @@ import Link from "next/link";
 import Pagination from "rc-pagination";
 import { useState } from "react";
 import { FaMinusSquare, FaPlusSquare } from "react-icons/fa";
+import { Promisable } from "type-fest";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
 import { StorageFilter } from "./StorageFilter";
 
 export interface BrowseStorageTreeProps {
   parentId?: string;
-  onSelect?: (storageUnit: PersistedResource<StorageUnit>) => void;
+  onSelect?: (storageUnit: PersistedResource<StorageUnit>) => Promisable<void>;
 
   /** Disable this option ID e.g. to avoid putting a storage unit inside itself. */
   excludeOptionId?: string;
@@ -174,13 +176,12 @@ function StorageUnitCollapser({
             </a>
           </Link>
           {!disabled && (
-            <button
+            <FormikButton
               className="select-storage btn btn-primary btn-sm"
-              type="button"
               onClick={() => onSelect?.(storageUnit)}
             >
               <DinaMessage id="select" />
-            </button>
+            </FormikButton>
           )}
         </div>
         {isOpen && (

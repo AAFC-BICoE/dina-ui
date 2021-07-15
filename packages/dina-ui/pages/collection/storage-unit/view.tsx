@@ -1,12 +1,8 @@
 import {
-  AreYouSureModal,
   BackButton,
   ButtonBar,
-  DeleteButton,
   DinaForm,
   EditButton,
-  filterBy,
-  ResourceSelectField,
   useApiClient,
   useModal,
   useQuery,
@@ -15,7 +11,7 @@ import {
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Head, Nav, storageUnitDisplayName } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitFormFields, useStorageUnit } from "./edit";
 
@@ -58,47 +54,6 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
     await router.push(`/collection/storage-unit/view?id=${parentUnit.id}`);
   }
 
-  function onMoveAllContentClick() {
-    // const exclusionNames: string[] = [];
-    // exclusionNames.push(storageUnit?.name as string);
-
-    // function setExclusionContainerNames(container: StorageUnit) {
-    //   exclusionNames.push(container.name);
-    //   container.storageUnitChildren?.map(child =>
-    //     setExclusionContainerNames(child)
-    //   );
-    // }
-
-    // children?.map(child => setExclusionContainerNames(child as any));
-
-    openModal(
-      <AreYouSureModal
-        actionMessage={
-          <span>
-            <DinaMessage id="specifyParentContainer" />
-          </span>
-        }
-        messageBody={
-          <div style={{ minHeight: "400px" }}>
-            <ResourceSelectField<StorageUnit>
-              name="parentStorageUnit"
-              model={`collection-api/storage-unit`}
-              optionLabel={it => it.name}
-              // Comment out as CRNK has not fully support on "NOT" operator yet
-              // https://www.crnk.io/releases/stable/documentation/#_nested_filtering
-              // https://github.com/crnk-project/crnk-framework/issues/278
-              filter={input => ({
-                ...filterBy(["name"])(input) // ,
-                //              name: { NOT: `${exclusionNames}` }
-              })}
-            />
-          </div>
-        }
-        onYesButtonClicked={moveAllContentToNewContainer}
-      />
-    );
-  }
-
   return (
     <div>
       <Nav />
@@ -117,23 +72,6 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
                   entityId={strgUnit.id}
                   entityLink="collection/storage-unit"
                 />
-              )}
-              {!children?.length && (
-                <DeleteButton
-                  className="ms-5"
-                  id={strgUnit.id}
-                  options={{ apiBaseUrl: "/collection-api" }}
-                  postDeleteRedirect="/collection/storage-unit/list"
-                  type="storage-unit"
-                />
-              )}
-              {!!children?.length && (
-                <button
-                  className="btn btn-info moveAllContent ms-auto"
-                  onClick={onMoveAllContentClick}
-                >
-                  <DinaMessage id="moveAllContent" />
-                </button>
               )}
             </ButtonBar>
           );

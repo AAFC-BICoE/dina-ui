@@ -20,7 +20,7 @@ import {
   Head,
   Nav,
   StorageLinkerField,
-  StorageTreeListField,
+  StorageUnitChildrenViewer,
   StorageUnitBreadCrumb,
   storageUnitDisplayName
 } from "../../../components";
@@ -165,18 +165,14 @@ export function StorageUnitFormFields() {
           model="collection-api/storage-unit-type"
           name="storageUnitType"
           optionLabel={it => it.name}
-          filter={input => ({
-            ...filterBy(["name"])(input)
-          })}
+          filter={filterBy(["name"])}
         />
       </div>
       <StorageLinkerField
         name="parentStorageUnit"
         excludeOptionId={initialValues.id}
       />
-      {readOnly && (
-        <StorageTreeListField parentId={initialValues.id} disabled={true} />
-      )}
+      {readOnly && <StorageUnitChildrenViewer parentId={initialValues.id} />}
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />

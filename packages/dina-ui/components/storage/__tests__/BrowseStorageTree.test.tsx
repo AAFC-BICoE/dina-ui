@@ -1,4 +1,5 @@
 import { PersistedResource } from "kitsu";
+import { DinaForm } from "../../../../common-ui/lib";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { StorageUnit } from "../../../types/collection-api";
 import { BrowseStorageTree } from "../BrowseStorageTree";
@@ -79,7 +80,9 @@ describe("BrowseStorageTree component", () => {
 
   it("Lets you navigate the tree and select a Storage Unit.", async () => {
     const wrapper = mountWithAppContext(
-      <BrowseStorageTree onSelect={mockOnSelect} />,
+      <DinaForm initialValues={{}}>
+        <BrowseStorageTree onSelect={mockOnSelect} />
+      </DinaForm>,
       { apiContext }
     );
 
@@ -118,7 +121,9 @@ describe("BrowseStorageTree component", () => {
   it("Can disable a Storage node and its children from being selectable.", async () => {
     // Disable selecting anything from C down.
     const wrapper = mountWithAppContext(
-      <BrowseStorageTree onSelect={mockOnSelect} excludeOptionId="C" />,
+      <DinaForm initialValues={{}}>
+        <BrowseStorageTree onSelect={mockOnSelect} excludeOptionId="C" />
+      </DinaForm>,
       { apiContext }
     );
 
@@ -171,7 +176,9 @@ describe("BrowseStorageTree component", () => {
 
   it("Filters the list based on a text filter.", async () => {
     const wrapper = mountWithAppContext(
-      <BrowseStorageTree onSelect={mockOnSelect} />,
+      <DinaForm initialValues={{}}>
+        <BrowseStorageTree onSelect={mockOnSelect} />
+      </DinaForm>,
       { apiContext }
     );
 
