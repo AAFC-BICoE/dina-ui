@@ -73,8 +73,12 @@ export default function SplitRunAction() {
     id: "material-sample-attachments-section"
   });
 
-  const [enablePreparations, setEnablePreparations] = useState(true);
-  const [enableStorage, setEnableStorage] = useState(true);
+  const [enablePreparations, setEnablePreparations] = useState<
+    Map<string, boolean>
+  >(new Map().set("0", true));
+  const [enableStorage, setEnableStorage] = useState<Map<string, boolean>>(
+    new Map().set("0", true)
+  );
 
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
@@ -88,8 +92,9 @@ export default function SplitRunAction() {
 
   /** Wraps the useState setter with an AreYouSure modal when setting to false. */
   function dataComponentToggler(
-    setBoolean: Dispatch<SetStateAction<boolean>>,
-    componentName: string
+    setBoolean: Dispatch<SetStateAction<Map<string, boolean>>>,
+    componentName: string,
+    index: string
   ) {
     return function toggleDataComponent(enabled: boolean) {
       if (!enabled) {
@@ -102,11 +107,13 @@ export default function SplitRunAction() {
                 values={{ component: componentName }}
               />
             }
-            onYesButtonClicked={() => setBoolean(enabled)}
+            onYesButtonClicked={() => {
+              setBoolean(prev => new Map(prev).set(index, enabled));
+            }}
           />
         );
       } else {
-        setBoolean(enabled);
+        setBoolean(prev => new Map(prev).set(index, enabled));
       }
     };
   }
@@ -188,7 +195,6 @@ export default function SplitRunAction() {
           id: parentSampleId
         };
       }
-
       // Apply default attachment and add additional attachments if any
       if (
         (index > 0 && selectedMetadatas?.get("0")?.length) ||
@@ -196,13 +202,25 @@ export default function SplitRunAction() {
       ) {
         sample.relationships = {};
         (sample as any).relationships.attachment = {
-          data: uniqBy(
-            [
-              ...(selectedMetadatas?.get("0") ?? []),
-              ...(selectedMetadatas?.get(index.toString()) ?? [])
-            ],
-            metadata => metadata.id
-          ).map(it => ({ id: it.id, type: it.type }))
+          data:
+            selectedMetadatas?.get(index.toString()) ??
+            selectedMetadatas?.get("0")
+        };
+      }
+
+      if (!enablePreparations.get(index.toString())) {
+        sample.preparationType = {
+          id: null,
+          type: "preparation-type"
+        };
+        sample.preparationDate = null;
+        sample.preparedBy = { id: null };
+      }
+
+      if (!enableStorage.get(index.toString())) {
+        sample.storageUnit = {
+          id: null,
+          type: "storage-unit"
         };
       }
       index++;
@@ -323,12 +341,12 @@ export default function SplitRunAction() {
                 <a href="#identifiers-section" className="list-group-item">
                   <DinaMessage id="identifiers" />
                 </a>
-                {enablePreparations && (
+                {enablePreparations.get(index.toString()) && (
                   <a href="#preparations-section" className="list-group-item">
                     <DinaMessage id="preparations" />
                   </a>
                 )}
-                {enableStorage && (
+                {enableStorage.get(index.toString()) && (
                   <a href="#storage-section" className="list-group-item">
                     <DinaMessage id="storage" />
                   </a>
@@ -356,10 +374,11 @@ export default function SplitRunAction() {
                 <label className="enable-preparation d-flex align-items-center fw-bold col-sm-3">
                   <Switch
                     className="mx-2"
-                    checked={enablePreparations}
+                    checked={!!enablePreparations.get(index.toString())}
                     onChange={dataComponentToggler(
                       setEnablePreparations,
-                      formatMessage("preparations")
+                      formatMessage("preparations"),
+                      index.toString()
                     )}
                   />
                   <DinaMessage id="preparations" />
@@ -367,10 +386,11 @@ export default function SplitRunAction() {
                 <label className="enable-storage d-flex align-items-center fw-bold col-sm-3">
                   <Switch
                     className="mx-2"
-                    checked={enableStorage}
+                    checked={!!enableStorage.get(index.toString())}
                     onChange={dataComponentToggler(
                       setEnableStorage,
-                      formatMessage("storage")
+                      formatMessage("storage"),
+                      index.toString()
                     )}
                   />
                   <DinaMessage id="storage" />
@@ -378,13 +398,13 @@ export default function SplitRunAction() {
               </div>
             </FieldSet>
             <div className="data-components">
-              {enablePreparations && (
+              {enablePreparations.get(index.toString()) && (
                 <PreparationsFormLayout
                   namePrefix={commonRoot}
                   className="flex-grow-1 mx-1"
                 />
               )}
-              {enableStorage && (
+              {enableStorage.get(index.toString()) && (
                 <FieldSet
                   id="storage-section"
                   legend={<DinaMessage id="storage" />}
@@ -515,8 +535,9 @@ function isBlankResourceAttribute(value: any) {
       // when object has id key and the id is null, or object has no keys for case like relationships
       return isArray(value)
         ? !value.join()
-        : (Object.keys(value).findIndex(key => key === "id") !== -1 &&
-            value?.id === null) ||
+        : value === null ||
+            (Object.keys(value).findIndex(key => key === "id") !== -1 &&
+              value?.id === null) ||
             Object.keys(value)?.length === 0;
     default:
       return false;
