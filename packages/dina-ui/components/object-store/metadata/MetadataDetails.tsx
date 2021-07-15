@@ -79,7 +79,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
             value: <DateView date={metadata.xmpMetadataDate} />
           },
           "acMetadataCreator.displayName",
-          "acSubType"
+          "acSubtype"
         ]}
         title={formatMessage("metadataUploadDetailsLabel")}
       />
