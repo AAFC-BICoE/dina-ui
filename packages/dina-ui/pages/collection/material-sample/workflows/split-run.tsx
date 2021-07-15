@@ -15,7 +15,7 @@ import { FormikButton } from "../../../../..//common-ui/lib/formik-connected/For
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Switch from "react-switch";
-import { uniqBy, omitBy, isArray } from "lodash";
+import { range, omitBy, isArray } from "lodash";
 import {
   DinaMessage,
   useDinaIntl
@@ -55,6 +55,31 @@ export const SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY =
   "split-child-sample-run-action-result";
 
 export default function SplitRunAction() {
+  // Load from local storage the run config
+  const [splitChildSampleRunConfig, _setSplitChildSampleRunConfig] =
+    useLocalStorage<MaterialSampleRunConfig | null | undefined>(
+      SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
+    );
+
+  const [_splitChildSampleRunActionResult, setSplitChildSampleRunActionResult] =
+    useLocalStorage<MaterialSampleRunActionResult | null | undefined>(
+      SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY
+    );
+
+  const {
+    numOfChildToCreate = 1,
+    baseName = BASE_NAME,
+    start = START,
+    suffix = "",
+    suffixType = TYPE_NUMERIC,
+    generationMode = "SERIES"
+  } = splitChildSampleRunConfig?.configure ?? {};
+
+  const { sampleNames = [] } =
+    splitChildSampleRunConfig?.configure_children ?? {};
+
+  const initialChildSamples: MaterialSample[] = [];
+
   const { formatMessage } = useDinaIntl();
   const { save } = useApiClient();
   const { groupNames } = useAccount();
@@ -73,12 +98,18 @@ export default function SplitRunAction() {
     id: "material-sample-attachments-section"
   });
 
-  const [enablePreparations, setEnablePreparations] = useState<
-    Map<string, boolean>
-  >(new Map().set("0", true));
-  const [enableStorage, setEnableStorage] = useState<Map<string, boolean>>(
-    new Map().set("0", true)
-  );
+  /* Initialize the prepatation and storage for all pages including default to be open by default */
+  const prepMap = new Map<string, boolean>();
+  const storageMap = new Map<string, boolean>();
+  range(0, numOfChildToCreate + 1).map(num => {
+    prepMap.set(num.toString(), true);
+    storageMap.set(num.toString(), true);
+  });
+
+  const [enablePreparations, setEnablePreparations] =
+    useState<Map<string, boolean>>(prepMap);
+  const [enableStorage, setEnableStorage] =
+    useState<Map<string, boolean>>(storageMap);
 
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
@@ -117,30 +148,6 @@ export default function SplitRunAction() {
       }
     };
   }
-
-  const [splitChildSampleRunConfig, _setSplitChildSampleRunConfig] =
-    useLocalStorage<MaterialSampleRunConfig | null | undefined>(
-      SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
-    );
-
-  const [_splitChildSampleRunActionResult, setSplitChildSampleRunActionResult] =
-    useLocalStorage<MaterialSampleRunActionResult | null | undefined>(
-      SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY
-    );
-
-  const {
-    numOfChildToCreate = 1,
-    baseName = BASE_NAME,
-    start = START,
-    suffix = "",
-    suffixType = TYPE_NUMERIC,
-    generationMode = "SERIES"
-  } = splitChildSampleRunConfig?.configure ?? {};
-
-  const { sampleNames = [] } =
-    splitChildSampleRunConfig?.configure_children ?? {};
-
-  const initialChildSamples: MaterialSample[] = [];
 
   // Retrive the parent material sample upfront
   const { loading, response: parentResp } = useQuery<MaterialSample[]>({
