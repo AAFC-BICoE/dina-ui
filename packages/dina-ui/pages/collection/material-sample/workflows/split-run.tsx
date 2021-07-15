@@ -181,7 +181,6 @@ export default function SplitRunAction() {
 
     // preprocess the samples to set the parent and the attachment
     for (const sample of samplesToSave) {
-      delete sample.description;
       // link to parent
       if (parentSampleId) {
         sample.parentMaterialSample = {
@@ -386,12 +385,15 @@ export default function SplitRunAction() {
                 />
               )}
               {enableStorage && (
-                <div className="card card-body mb-3" id="storage-section">
+                <FieldSet
+                  id="storage-section"
+                  legend={<DinaMessage id="storage" />}
+                >
                   <StorageLinkerField
                     name={`${commonRoot}storageUnit`}
                     customName="storageUnit"
                   />{" "}
-                </div>
+                </FieldSet>
               )}
               {materialSampleAttachmentsUI}
             </div>
@@ -402,9 +404,9 @@ export default function SplitRunAction() {
   }
 
   const samples = initialChildSamples;
-  const sampleNameOptions = samples?.map(sample => ({
+  const sampleNameOptions = samples?.map((sample, idx) => ({
     label: sample.materialSampleName,
-    value: sample.materialSampleName
+    value: idx + (sample.materialSampleName as any)
   }));
   sampleNameOptions.unshift({
     label: formatMessage("setAll"),
@@ -435,7 +437,7 @@ export default function SplitRunAction() {
             {formatMessage("stepLabel")}2: {formatMessage("dataEntryLabel")}
           </p>
 
-          {length < 10 ? (
+          {length < 11 ? (
             <FieldArray name="childSamples">
               {({ form }) => {
                 return (
