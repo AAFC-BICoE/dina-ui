@@ -1,9 +1,8 @@
-import { COMMON_UI_MESSAGES_ENGLISH } from "common-ui";
-
 /**
  * English SeqDB messages. A message must be set here in English before other languages.
  */
 export const SEQDB_MESSAGES_ENGLISH = {
+  addPcrBatchTitle: "Add PCR Batch",
   addMolecularSampleTitle: "Add Molecular Sample",
   addPcrPrimerTitle: "Add PCR Primer",
   addPcrProfileTitle: "Add Thermocycler Profile",
@@ -19,6 +18,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
     "<-- Deselect all checked molecular samples",
   deselectButtonText: "Deselect",
   editableTable: "Editable Table",
+  editPcrBatchTitle: "Edit PCR Batch",
   editMolecularSampleTitle: "Edit Molecular Sample",
   editPcrPrimerTitle: "Edit PCR Primer",
   editPcrProfileTitle: "Edit Thermocycler Profile",
@@ -49,6 +49,8 @@ export const SEQDB_MESSAGES_ENGLISH = {
   molecularSampleListTitle: "Molecular Samples",
   notShearedStatus: "Not Sheared",
   notSizeSelectedStatus: "No Size Selection",
+  pcrBatchListTitle: "PCR Batches",
+  pcrBatchViewTitle: "View PCR Batch",
   pcrPrimerListTitle: "PCR Primers",
   pcrPrimerViewTitle: "PCR Primer",
   pcrProfileListTitle: "Thermocycler Profiles",
