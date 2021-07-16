@@ -172,7 +172,7 @@ export default function MetadataListPage() {
                   // Apply group filter:
                   ...(filterForm.group && { bucket: filterForm.group }),
                   // Filter out the derived objects e.g. thumbnails:
-                  rsql: "acSubTypeId==null"
+                  rsql: "acSubtypeId==null"
                 })}
                 defaultSort={[
                   {

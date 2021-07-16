@@ -132,6 +132,13 @@ const Home: React.FunctionComponent = () => (
               </a>
             </Link>
           </li>
+          <li>
+            <Link href="/seqdb/molecular-sample/list">
+              <a>
+                <SeqdbMessage id="molecularSampleListTitle" />
+              </a>
+            </Link>
+          </li>
         </ul>
         <h2>
           <DinaMessage id="collectionSectionTitle" />

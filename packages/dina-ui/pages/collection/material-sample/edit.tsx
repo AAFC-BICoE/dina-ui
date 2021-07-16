@@ -33,6 +33,7 @@ import {
   useMaterialSampleSave
 } from "../../../components/collection/useMaterialSample";
 import { AllowAttachmentsConfig } from "../../../components/object-store";
+import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Person } from "../../../types/agent-api";
 import {
@@ -41,7 +42,6 @@ import {
   MaterialSampleType
 } from "../../../types/collection-api";
 import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
-import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 
 export default function MaterialSampleEditPage() {
   const router = useRouter();
@@ -213,17 +213,22 @@ export function MaterialSampleForm({
       </div>
       <div className="flex-grow-1 container-fluid">
         {!isTemplate && <MaterialSampleMainInfoFormLayout />}
-        {isTemplate ? (
-          <DinaForm
-            initialValues={identifiersTemplateInitialValues}
-            innerRef={identifiersSectionRef}
-            isTemplate={true}
-          >
-            <MaterialSampleIdentifiersFormLayout />
-          </DinaForm>
-        ) : (
-          <MaterialSampleIdentifiersFormLayout />
-        )}
+        <div className="row">
+          <div className="col-md-6">
+            {isTemplate ? (
+              <DinaForm
+                initialValues={identifiersTemplateInitialValues}
+                innerRef={identifiersSectionRef}
+                isTemplate={true}
+              >
+                <MaterialSampleIdentifiersFormLayout />
+              </DinaForm>
+            ) : (
+              <MaterialSampleIdentifiersFormLayout />
+            )}{" "}
+          </div>
+        </div>
+
         {!isTemplate && (
           <div className="card card-body mb-3">
             <StorageLinkerField name="storageUnit" />
@@ -350,16 +355,24 @@ export function MaterialSampleForm({
               innerRef={preparationsSectionRef}
               isTemplate={true}
             >
-              <PreparationsFormLayout
-                className={enablePreparations ? "" : "d-none"}
-              />
+              {enablePreparations && (
+                <div className="row">
+                  <div className="col-md-6">
+                    <PreparationsFormLayout />
+                  </div>
+                </div>
+              )}
               {materialSampleAttachmentsUI}
             </DinaForm>
           ) : (
             <>
-              <PreparationsFormLayout
-                className={enablePreparations ? "" : "d-none"}
-              />
+              {enablePreparations && (
+                <div className="row">
+                  <div className="col-md-6">
+                    <PreparationsFormLayout />
+                  </div>
+                </div>
+              )}
 
               <FieldSet
                 legend={<DinaMessage id="managedAttributeListTitle" />}
@@ -425,14 +438,12 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   hideOtherCatalogNumbers?: boolean;
   className?: string;
   namePrefix?: string;
-  sampleNamePlaceHolder?: string;
 }
 
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleIdentifiersFormLayout({
   className,
-  namePrefix,
-  sampleNamePlaceHolder
+  namePrefix
 }: MaterialSampleIdentifiersFormLayoutProps) {
   return (
     <FieldSet
@@ -450,7 +461,6 @@ export function MaterialSampleIdentifiersFormLayout({
             }`}
             customName="materialSampleName"
             className="materialSampleName"
-            placeholder={sampleNamePlaceHolder}
           />
 
           <TextField
@@ -483,7 +493,7 @@ export interface CatalogueInfoFormLayoutProps {
 
 export function PreparationsFormLayout({
   className,
-  namePrefix
+  namePrefix = ""
 }: CatalogueInfoFormLayoutProps) {
   return (
     <FieldSet
@@ -491,45 +501,37 @@ export function PreparationsFormLayout({
       id="preparations-section"
       legend={<DinaMessage id="preparations" />}
     >
-      <div className="row">
-        <div className="col-md-6">
-          <div className="preparation-type">
-            <Field
-              name={`${
-                namePrefix ? namePrefix + "preparationType" : "preparationType"
-              }`}
-            >
-              {({ form: { values } }) => (
-                <ResourceSelectField<PreparationType>
-                  model="collection-api/preparation-type"
-                  optionLabel={it => it.name}
-                  readOnlyLink="/collection/preparation-type/view?id="
-                  filter={input => ({
-                    ...filterBy(["name"])(input),
-                    group: { EQ: `${values.group}` }
-                  })}
-                  name={`${
-                    namePrefix
-                      ? namePrefix + "preparationType"
-                      : "preparationType"
-                  }`}
-                  key={values.group}
-                  customName="preparationType"
-                />
-              )}
-            </Field>
-          </div>
-          <DinaFormSection>
-            <ResourceSelectField<Person>
-              name="preparedBy"
-              filter={filterBy(["displayName"])}
-              model="agent-api/person"
-              optionLabel={person => person.displayName}
+      <div className="preparation-type">
+        <Field name={`${namePrefix}preparationType`}>
+          {({ form: { values } }) => (
+            <ResourceSelectField<PreparationType>
+              model="collection-api/preparation-type"
+              optionLabel={it => it.name}
+              readOnlyLink="/collection/preparation-type/view?id="
+              filter={input => ({
+                ...filterBy(["name"])(input),
+                group: { EQ: `${values.group}` }
+              })}
+              name={`${namePrefix}preparationType`}
+              key={values.group}
+              customName="preparationType"
             />
-            <DateField name="preparationDate" />
-          </DinaFormSection>
-        </div>
+          )}
+        </Field>
       </div>
+      <DinaFormSection>
+        <ResourceSelectField<Person>
+          name={`${namePrefix}preparedBy`}
+          customName="preparedBy"
+          filter={filterBy(["displayName"])}
+          model="agent-api/person"
+          optionLabel={person => person.displayName}
+        />
+        <DateField
+          name={`${namePrefix}preparationDate`}
+          customName="preparationDate"
+        />
+      </DinaFormSection>
     </FieldSet>
   );
 }

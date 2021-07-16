@@ -5,8 +5,14 @@ export interface StorageUnitAttributes {
   type: "storage-unit";
   name: string;
   group: string;
+  hierarchy?: HierarchyItem[];
   createdOn?: string;
   createdBy?: string;
+}
+
+export interface HierarchyItem {
+  uuid: string;
+  name: string;
 }
 
 export interface StorageUnitRelationships {

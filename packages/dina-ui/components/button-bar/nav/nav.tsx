@@ -230,6 +230,11 @@ function NavSeqDBDropdown() {
             <SeqdbMessage id="regionListTitle" />
           </a>
         </Link>
+        <Link href="/seqdb/molecular-sample/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="molecularSampleListTitle" />
+          </a>
+        </Link>
       </div>
     </div>
   );

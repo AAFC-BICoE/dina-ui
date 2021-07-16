@@ -8,6 +8,7 @@ import {
   useGroupedCheckBoxes
 } from "common-ui";
 import { FilterParam } from "kitsu";
+import Link from "next/link";
 import { useState } from "react";
 import { SeqdbMessage } from "../../../../intl/seqdb-intl";
 import { StepResource } from "../../../../types/seqdb-api";
@@ -46,7 +47,12 @@ export function SampleSelection(props: StepRendererProps) {
   const SAMPLE_FILTER_ATTRIBUTES = ["name"];
 
   const SELECTABLE_SAMPLE_COLUMNS: ColumnDefinition<any>[] = [
-    "name",
+    {
+      Cell: ({ original: { id, name } }) => (
+        <Link href={`/seqdb/molecular-sample/view?id=${id}`}>{name}</Link>
+      ),
+      accessor: "name"
+    },
     "version",
     {
       Cell: ({ original: molecularSample }) => (
@@ -75,8 +81,15 @@ export function SampleSelection(props: StepRendererProps) {
 
   const SELECTED_SAMPLE_COLUMNS: ColumnDefinition<any>[] = [
     {
-      Header: "Name",
-      accessor: "molecularSample.name"
+      Cell: ({ original: row }) => (
+        <Link
+          href={`/seqdb/molecular-sample/view?id=${row?.molecularSample?.id}`}
+        >
+          {row?.molecularSample?.name}
+        </Link>
+      ),
+      accessor: "molecularSample.name",
+      Header: "Name"
     },
     {
       Header: "Version",
