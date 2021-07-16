@@ -1,23 +1,28 @@
+import useLocalStorage from "@rehooks/local-storage";
+import { FieldArray } from "formik";
+import { InputResource } from "kitsu";
+import { isArray, omitBy } from "lodash";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import React from "react";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
   DinaForm,
   LoadingSpinner,
-  TextField,
   useAccount,
   useApiClient,
-  useQuery
-} from "../../../../../common-ui/lib";
-import { ButtonBar } from "../../../../../common-ui/lib/button-bar/ButtonBar";
-import { FormikButton } from "../../../../..//common-ui/lib/formik-connected/FormikButton";
-import { useRouter } from "next/router";
-import Link from "next/link";
-import { isArray, omitBy } from "lodash";
-
+  useQuery,
+  FormikButton,
+  ButtonBar
+} from "common-ui";
+import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
+import { Head } from "../../../../../dina-ui/components/head";
 import {
   DinaMessage,
   useDinaIntl
 } from "../../../../../dina-ui/intl/dina-ui-intl";
-import React from "react";
-import useLocalStorage from "@rehooks/local-storage";
+import { MaterialSample } from "../../../../../dina-ui/types/collection-api";
+import { MaterialSampleRunActionResult } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunActionResult";
 import {
   BASE_NAME,
   MaterialSampleRunConfig,
@@ -25,21 +30,14 @@ import {
   TYPE_NUMERIC
 } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import {
+  PreparationField,
+  PREPARATION_FIELDS
+} from "../../../../components/collection/PreparationField";
+import { MaterialSampleIdentifiersFormLayout } from "../edit";
+import {
   computeSuffix,
   SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
 } from "./split-config";
-import { MaterialSample } from "../../../../../dina-ui/types/collection-api";
-
-import { FieldArray } from "formik";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import {
-  MaterialSampleIdentifiersFormLayout,
-  PreparationsFormLayout
-} from "../edit";
-import { MaterialSampleRunActionResult } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunActionResult";
-import { Head } from "../../../../../dina-ui/components/head";
-import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
-import { InputResource } from "kitsu";
 
 export const SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY =
   "split-child-sample-run-action-result";
@@ -170,13 +168,9 @@ export default function SplitRunAction() {
     const commonRoot = childSamplePath + ".";
     const parentSample = parentResp?.data?.[0];
     // Use the first one from return til material sample name is unuque
-    formik.setFieldValue(
-      commonRoot + "preparationType",
-      parentSample?.preparationType
-    );
-    // comment til backend ready
-    // formik.setFieldValue(commonRoot+"preparedBy", response?.[0].preparedBy);
-    // formik.setFieldValue(commonRoot+"datePrepared", response?.[0].preparationDate);
+    for (const fieldName of PREPARATION_FIELDS) {
+      formik.setFieldValue(commonRoot + fieldName, parentSample?.[fieldName]);
+    }
 
     formik.setFieldValue(
       commonRoot + "dwcCatalogNumber",
@@ -237,7 +231,7 @@ export default function SplitRunAction() {
                     </FormikButton>
                     <div className="row">
                       <div className="col-md-4">
-                        <PreparationsFormLayout namePrefix={commonRoot} />
+                        <PreparationField namePrefix={commonRoot} />
                       </div>
                       <div className="col-md-8">
                         <MaterialSampleIdentifiersFormLayout
