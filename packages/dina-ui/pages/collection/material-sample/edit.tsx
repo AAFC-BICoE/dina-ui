@@ -1,20 +1,17 @@
 import {
   BackButton,
   ButtonBar,
-  DateField,
   DinaForm,
   DinaFormContext,
   DinaFormSection,
   FieldSet,
-  filterBy,
   FormikButton,
-  ResourceSelectField,
   StringArrayField,
   SubmitButton,
   TextField,
   withResponse
 } from "common-ui";
-import { Field, FormikProps } from "formik";
+import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -36,13 +33,7 @@ import {
 import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Person } from "../../../types/agent-api";
-import {
-  CollectingEvent,
-  MaterialSample,
-  MaterialSampleType
-} from "../../../types/collection-api";
-import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
+import { CollectingEvent, MaterialSample } from "../../../types/collection-api";
 
 export default function MaterialSampleEditPage() {
   const router = useRouter();
@@ -432,13 +423,16 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   hideOtherCatalogNumbers?: boolean;
   className?: string;
   namePrefix?: string;
+  sampleNamePlaceHolder?: string;
 }
 
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleIdentifiersFormLayout({
   className,
-  namePrefix
+  namePrefix = "",
+  sampleNamePlaceHolder
 }: MaterialSampleIdentifiersFormLayoutProps) {
+  const { formatMessage } = useDinaIntl();
   return (
     <FieldSet
       id="identifiers-section"
@@ -448,13 +442,10 @@ export function MaterialSampleIdentifiersFormLayout({
       <div className="row">
         <div className="col-md-6">
           <TextField
-            name={`${
-              namePrefix
-                ? namePrefix + "materialSampleName"
-                : "materialSampleName"
-            }`}
+            name={`${namePrefix}materialSampleName`}
             customName="materialSampleName"
             className="materialSampleName"
+            placeholder={sampleNamePlaceHolder}
           />
 
           <TextField

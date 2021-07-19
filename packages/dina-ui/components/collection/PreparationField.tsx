@@ -35,13 +35,13 @@ export const PREPARATION_FIELDS = [
 /** Blank values for all Preparation fields. */
 export const BLANK_PREPARATION: Required<
   Pick<InputResource<MaterialSample>, typeof PREPARATION_FIELDS[number]>
-> = {
-  materialSampleType: { id: null, type: "material-sample-type" },
-  preparationType: { id: null, type: "preparation-type" },
+> = Object.seal({
+  materialSampleType: Object.seal({ id: null, type: "material-sample-type" }),
+  preparationType: Object.seal({ id: null, type: "preparation-type" }),
   preparationDate: null,
-  preparedBy: { id: null, type: "person" },
+  preparedBy: Object.seal({ id: null, type: "person" }),
   preparationRemarks: null
-};
+});
 
 export function PreparationField({
   className,
@@ -81,10 +81,14 @@ export function PreparationField({
                 model="collection-api/preparation-type"
                 optionLabel={it => it.name}
                 readOnlyLink="/collection/preparation-type/view?id="
-                filter={input => ({
-                  ...filterBy(["name"])(input),
-                  group: { EQ: `${values.group}` }
-                })}
+                filter={input =>
+                  values.group
+                    ? {
+                        ...filterBy(["name"])(input),
+                        group: { EQ: `${values.group}` }
+                      }
+                    : { ...filterBy(["name"])(input) }
+                }
                 key={values.group}
               />
             )}

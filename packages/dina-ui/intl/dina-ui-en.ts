@@ -279,6 +279,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleAttachments: "Material Sample Attachments",
   materialSampleListTitle: "Material Samples",
   materialSampleManagedAttributes: "Material Sample Managed Attributes",
+  materialSampleName: "Material Sample Name",
   materialSampleTypeListTitle: "Material Sample Types",
   materialSampleTypeViewTitle: "Material Sample Type",
   materialSampleViewTitle: "Material Sample",
@@ -338,6 +339,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   preparationTypeNameLabel: "Preparation Type Name",
   preparationTypeViewTitle: "View Preparation Type",
   preparations: "Preparations",
+  preparedBy: "Prepared By",
   previewAndCustomizeLabel: "Preview and Customize",
   primary: "Primary",
   primaryButton_tooltip:
@@ -385,6 +387,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   startEventDateTimeLabel: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   startNewRunConfigLabel: "Start a New Run ",
   stateProvinceLabel: "State/Province",
+  storage: "Storage",
   storageUnitListTitle: "Storage Units",
   storageUnitType: "Storage Unit Type",
   storageUnitTypeListTitle: "Storage Unit Types",
