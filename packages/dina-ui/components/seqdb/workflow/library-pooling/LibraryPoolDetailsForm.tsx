@@ -75,8 +75,6 @@ export function LibraryPoolDetailsForm({
             className="col-md-2"
             enableStoredDefaultGroup={true}
           />
-        </div>
-        <div className="row">
           <TextField className="col-md-2" name="name" />
           <DateField className="col-md-2" name="dateUsed" />
         </div>

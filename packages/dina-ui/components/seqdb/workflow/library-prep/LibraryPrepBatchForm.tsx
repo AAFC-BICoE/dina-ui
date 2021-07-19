@@ -82,9 +82,7 @@ export function LibraryPrepBatchForm({
   return (
     <DinaForm initialValues={libraryPrepBatch || {}} onSubmit={onSubmit}>
       <div className="row">
-        <GroupSelectField className="col-md-4" name="group" />
-      </div>
-      <div className="row">
+        <GroupSelectField className="col-md-2" name="group" />
         <TextField
           className="col-md-2"
           label="Library Prep Batch Name"

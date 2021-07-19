@@ -245,7 +245,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
         <GroupSelectField
           name="group"
           enableStoredDefaultGroup={true}
-          className="col-md-6"
+          className="col-md-4"
         />
         <PreLibPrepEditModeSelector
           onChange={setPlpEditMode}
