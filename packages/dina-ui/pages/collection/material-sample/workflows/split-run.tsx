@@ -516,6 +516,8 @@ export default function SplitRunAction() {
                     name="childSampleName"
                     options={sampleNameOptions as any}
                     onSelectionChanged={setSelectedIndex}
+                    className="col-md-4"
+                    hideLabel={true}
                   />
                   {childSampleInternal(selectedIndex, form)}
                 </>
@@ -542,10 +544,7 @@ function isBlankResourceAttribute(value: any) {
       // when object has id key and the id is null, or object has no keys for case like relationships
       return isArray(value)
         ? !value.join()
-        : value === null ||
-            (Object.keys(value).findIndex(key => key === "id") !== -1 &&
-              value?.id === null) ||
-            Object.keys(value)?.length === 0;
+        : value === null || Object.keys(value)?.length === 0;
     default:
       return false;
   }

@@ -9,12 +9,15 @@ interface SelectFieldWithNavProps<T> {
   options: SelectOption<T>[];
   onSelectionChanged?: (index) => void;
   form: FormikProps<any>;
+  hideLabel?: boolean;
+  className?: string;
 }
 
 export function SelectFieldWithNav<T = string>(
   props: SelectFieldWithNavProps<T>
 ) {
-  const { name, options, form, onSelectionChanged } = props;
+  const { name, options, form, hideLabel, className, onSelectionChanged } =
+    props;
   const selectRef = useRef<any>(null);
   const [leftDisabled, setLeftDisabled] = useState(true);
   const [rightDisabled, setRightDisabled] = useState(false);
@@ -66,7 +69,8 @@ export function SelectFieldWithNav<T = string>(
       name={name}
       options={options}
       forwardedRef={ref as any}
-      className={"col-md-4"}
+      className={className}
+      hideLabel={hideLabel}
       onChange={(value, _form) => {
         const newIdx = options.findIndex(option => value === option.value);
         if (newIdx === options.length - 1) {
@@ -85,20 +89,31 @@ export function SelectFieldWithNav<T = string>(
   ));
 
   return (
-    <div className="row">
-      <LeftArrowIcon
-        className="col-md-1 leftArrow"
-        size="2em"
+    <div
+      className="d-flex flex-row justify-content-center align-items-center gap-3 "
+      style={{ backgroundColor: "#f3f3f3" }}
+    >
+      <button
+        className="btn btn-secondary leftArrow mb-2"
         onClick={onLeftClick}
-        style={{ cursor: leftDisabled ? "not-allowed" : "pointer" }}
-      />
+        type="button"
+      >
+        <LeftArrowIcon
+          size="1.5em"
+          style={{ cursor: leftDisabled ? "not-allowed" : "pointer" }}
+        />
+      </button>
       <ForwardSelectField ref={selectRef} />
-      <RightArrowIcon
-        className="col-md-1 rightArrow"
-        size="2em"
-        style={{ cursor: rightDisabled ? "not-allowed" : "pointer" }}
+      <button
+        className="btn btn-secondary rightArrow mb-2"
         onClick={onRightClick}
-      />
+        type="button"
+      >
+        <RightArrowIcon
+          size="1.5em"
+          style={{ cursor: rightDisabled ? "not-allowed" : "pointer" }}
+        />
+      </button>
     </div>
   );
 }

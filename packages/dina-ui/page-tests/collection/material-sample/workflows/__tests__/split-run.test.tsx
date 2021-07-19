@@ -276,21 +276,6 @@ describe("MaterialSample split workflow run action form with all default values"
       .find(".dwcOtherCatalogNumbers-field textarea")
       .simulate("change", { target: { value: "default-otherNumbers" } });
 
-    // Leave Sample 0 blank:
-    wrapper.find("li.sample-tab-0").simulate("click");
-
-    // Set preparedBy to the "None" option with a null ID:
-    wrapper.find(".preparedBy-field ResourceSelect").prop<any>("onChange")({
-      id: null
-    });
-    // Blank text fields:
-    wrapper
-      .find(".dwcCatalogNumber-field input")
-      .simulate("change", { target: { value: "" } });
-    wrapper
-      .find(".dwcOtherCatalogNumbers-field textarea")
-      .simulate("change", { target: { value: "" } });
-
     // Set Sample 1's values:
     wrapper.find("li.sample-tab-1").simulate("click");
 
