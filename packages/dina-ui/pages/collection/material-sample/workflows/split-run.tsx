@@ -1,32 +1,40 @@
+import useLocalStorage from "@rehooks/local-storage";
 import {
+  AreYouSureModal,
+  ButtonBar,
   DinaForm,
+  FieldSet,
+  FormikButton,
   LoadingSpinner,
   SelectFieldWithNav,
   TextField,
   useAccount,
   useApiClient,
-  useQuery,
-  FieldSet,
   useModal,
-  AreYouSureModal
-} from "../../../../../common-ui/lib";
-import { ButtonBar } from "../../../../../common-ui/lib/button-bar/ButtonBar";
-import { FormikButton } from "../../../../..//common-ui/lib/formik-connected/FormikButton";
-import { useRouter } from "next/router";
+  useQuery
+} from "common-ui";
+import { Field, FieldArray } from "formik";
+import { isArray, omitBy, range } from "lodash";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useLayoutEffect,
+  useState
+} from "react";
 import Switch from "react-switch";
-import { range, omitBy, isArray } from "lodash";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
+import { Head } from "../../../../../dina-ui/components/head";
+import { useAttachmentsModal } from "../../../../../dina-ui/components/object-store";
+import { StorageLinkerField } from "../../../../../dina-ui/components/storage/StorageLinker";
 import {
   DinaMessage,
   useDinaIntl
 } from "../../../../../dina-ui/intl/dina-ui-intl";
-import React, {
-  useState,
-  useLayoutEffect,
-  Dispatch,
-  SetStateAction
-} from "react";
-import useLocalStorage from "@rehooks/local-storage";
+import { MaterialSample } from "../../../../../dina-ui/types/collection-api";
+import { MaterialSampleRunActionResult } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunActionResult";
 import {
   BASE_NAME,
   MaterialSampleRunConfig,
@@ -34,22 +42,15 @@ import {
   TYPE_NUMERIC
 } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import {
+  BLANK_PREPARATION,
+  PreparationField,
+  PREPARATION_FIELDS
+} from "../../../../components/collection/PreparationField";
+import { MaterialSampleIdentifiersFormLayout } from "../edit";
+import {
   computeSuffix,
   SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
 } from "./split-config";
-import { MaterialSample } from "../../../../../dina-ui/types/collection-api";
-
-import { Field, FieldArray } from "formik";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import {
-  MaterialSampleIdentifiersFormLayout,
-  PreparationsFormLayout
-} from "../edit";
-import { MaterialSampleRunActionResult } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunActionResult";
-import { Head } from "../../../../../dina-ui/components/head";
-import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
-import { useAttachmentsModal } from "../../../../../dina-ui/components/object-store";
-import { StorageLinkerField } from "../../../../../dina-ui/components/storage/StorageLinker";
 
 export const SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY =
   "split-child-sample-run-action-result";
@@ -188,63 +189,52 @@ export default function SplitRunAction() {
       parentSampleId: parentSampleId as string,
       childrenGenerated: []
     };
-    const samplesToSave = submittedValues.childSamples;
     // the first is the default value
-    const defaultValueSample: MaterialSample = samplesToSave?.[0];
-    let index = 0;
+    const [defaultValueSample, ...samplesToSave] = submittedValues.childSamples;
 
-    // preprocess the samples to set the parent and the attachment
-    for (const sample of samplesToSave) {
+    const defaultValues = {
       // link to parent
-      if (parentSampleId) {
-        sample.parentMaterialSample = {
-          type: "material-sample",
-          id: parentSampleId
-        };
-      }
-      // Apply default attachment and add additional attachments if any
-      if (
-        (index > 0 && selectedMetadatas?.get("0")?.length) ||
-        selectedMetadatas?.get(index.toString())?.length
-      ) {
-        sample.relationships = {};
-        (sample as any).relationships.attachment = {
-          data:
-            selectedMetadatas?.get(index.toString()) ??
-            selectedMetadatas?.get("0")
-        };
-      }
+      ...(parentSampleId && {
+        parentMaterialSample: { type: "material-sample", id: parentSampleId }
+      }),
+      ...omitBy(defaultValueSample, isBlankResourceAttribute)
+    };
 
-      if (!enablePreparations.get(index.toString())) {
-        sample.preparationType = {
-          id: null,
-          type: "preparation-type"
-        };
-        sample.preparationDate = null;
-        sample.preparedBy = { id: null };
-      }
-
-      if (!enableStorage.get(index.toString())) {
-        sample.storageUnit = {
-          id: null,
-          type: "storage-unit"
-        };
-      }
-      index++;
-    }
-    // Taking out the default before saving child samples
-    samplesToSave.splice(0, 1);
-    // save samples with default value
-    const response = await save(
-      samplesToSave.map(sample => ({
+    const saveInputs = samplesToSave.map((sample, index) => {
+      const tabIndex = String(index + 1);
+      return {
         resource: {
-          ...omitBy(defaultValueSample, isBlankResourceAttribute),
-          ...omitBy(sample, isBlankResourceAttribute)
+          // Apply the default "Set All" values:
+          ...defaultValues,
+
+          // Apply the manually inputted values:
+          ...omitBy(sample, isBlankResourceAttribute),
+
+          // Only persist the preparation fields if the preparations toggle is enabled:
+          ...(!enablePreparations.get(tabIndex) && BLANK_PREPARATION),
+
+          // Only persist the Storage Unit field if the Storage Unit toggle is enabled:
+          ...(!enableStorage.get(tabIndex) && {
+            storageUnit: { id: null, type: "storage-unit" }
+          }),
+
+          // Apply default attachment or manual attachments if any:
+          relationships: {
+            attachment: {
+              data: selectedMetadatas?.get(tabIndex)?.length
+                ? selectedMetadatas?.get(tabIndex)
+                : selectedMetadatas?.get("0") ?? []
+            }
+          }
         },
         type: "material-sample"
-      })),
-      { apiBaseUrl: "/collection-api" }
-    );
+      };
+    });
+
+    // save samples
+    const response = await save<MaterialSample>(saveInputs, {
+      apiBaseUrl: "/collection-api"
+    });
 
     response.map((resp, idx) =>
       sampleRunActionResults.childrenGenerated?.push({
@@ -280,13 +270,9 @@ export default function SplitRunAction() {
     const commonRoot = childSamplePath + ".";
     const parentSample = parentResp?.data?.[0];
     // Use the first one from return til material sample name is unuque
-    formik.setFieldValue(
-      commonRoot + "preparationType",
-      parentSample?.preparationType
-    );
-    // comment til backend ready
-    // formik.setFieldValue(commonRoot+"preparedBy", response?.[0].preparedBy);
-    // formik.setFieldValue(commonRoot+"datePrepared", response?.[0].preparationDate);
+    for (const fieldName of PREPARATION_FIELDS) {
+      formik.setFieldValue(commonRoot + fieldName, parentSample?.[fieldName]);
+    }
 
     formik.setFieldValue(
       commonRoot + "dwcCatalogNumber",
@@ -406,7 +392,7 @@ export default function SplitRunAction() {
             </FieldSet>
             <div className="data-components">
               {enablePreparations.get(index.toString()) && (
-                <PreparationsFormLayout
+                <PreparationField
                   namePrefix={commonRoot}
                   className="flex-grow-1 mx-1"
                 />
@@ -541,10 +527,7 @@ function isBlankResourceAttribute(value: any) {
     case "object":
     case "undefined":
       // empty object or empty array:
-      // when object has id key and the id is null, or object has no keys for case like relationships
-      return isArray(value)
-        ? !value.join()
-        : value === null || Object.keys(value)?.length === 0;
+      return isArray(value) ? !value.join() : !value?.id;
     default:
       return false;
   }

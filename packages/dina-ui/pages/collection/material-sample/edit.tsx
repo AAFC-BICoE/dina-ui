@@ -1,20 +1,17 @@
 import {
   BackButton,
   ButtonBar,
-  DateField,
   DinaForm,
   DinaFormContext,
   DinaFormSection,
   FieldSet,
-  filterBy,
   FormikButton,
-  ResourceSelectField,
   StringArrayField,
   SubmitButton,
   TextField,
   withResponse
 } from "common-ui";
-import { Field, FormikProps } from "formik";
+import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -28,6 +25,7 @@ import {
   StorageLinkerField
 } from "../../../components";
 import { CollectingEventLinker } from "../../../components/collection";
+import { PreparationField } from "../../../components/collection/PreparationField";
 import {
   useMaterialSampleQuery,
   useMaterialSampleSave
@@ -35,13 +33,7 @@ import {
 import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Person } from "../../../types/agent-api";
-import {
-  CollectingEvent,
-  MaterialSample,
-  MaterialSampleType
-} from "../../../types/collection-api";
-import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
+import { CollectingEvent, MaterialSample } from "../../../types/collection-api";
 
 export default function MaterialSampleEditPage() {
   const router = useRouter();
@@ -358,7 +350,7 @@ export function MaterialSampleForm({
               {enablePreparations && (
                 <div className="row">
                   <div className="col-md-6">
-                    <PreparationsFormLayout />
+                    <PreparationField />
                   </div>
                 </div>
               )}
@@ -369,7 +361,7 @@ export function MaterialSampleForm({
               {enablePreparations && (
                 <div className="row">
                   <div className="col-md-6">
-                    <PreparationsFormLayout />
+                    <PreparationField />
                   </div>
                 </div>
               )}
@@ -420,13 +412,6 @@ export function MaterialSampleMainInfoFormLayout() {
       <div className="row">
         <div className="col-md-6">
           <GroupSelectField name="group" enableStoredDefaultGroup={true} />
-          <ResourceSelectField<MaterialSampleType>
-            name="materialSampleType"
-            filter={filterBy(["name"])}
-            model="collection-api/material-sample-type"
-            optionLabel={it => it.name}
-            readOnlyLink="/collection/material-sample-type/view?id="
-          />
         </div>
       </div>
     </div>
@@ -485,61 +470,6 @@ export function MaterialSampleIdentifiersFormLayout({
     </FieldSet>
   );
 }
-
-export interface CatalogueInfoFormLayoutProps {
-  className?: string;
-  namePrefix?: string;
-}
-
-export function PreparationsFormLayout({
-  className,
-  namePrefix = ""
-}: CatalogueInfoFormLayoutProps) {
-  return (
-    <FieldSet
-      className={className}
-      id="preparations-section"
-      legend={<DinaMessage id="preparations" />}
-    >
-      <div className="preparation-type">
-        <Field name={`${namePrefix}preparationType`}>
-          {({ form: { values } }) => (
-            <ResourceSelectField<PreparationType>
-              model="collection-api/preparation-type"
-              optionLabel={it => it.name}
-              readOnlyLink="/collection/preparation-type/view?id="
-              filter={input =>
-                values.group
-                  ? {
-                      ...filterBy(["name"])(input),
-                      group: { EQ: `${values.group}` }
-                    }
-                  : { ...filterBy(["name"])(input) }
-              }
-              name={`${namePrefix}preparationType`}
-              key={values.group}
-              customName="preparationType"
-            />
-          )}
-        </Field>
-      </div>
-      <DinaFormSection>
-        <ResourceSelectField<Person>
-          name={`${namePrefix}preparedBy`}
-          customName="preparedBy"
-          filter={filterBy(["displayName"])}
-          model="agent-api/person"
-          optionLabel={person => person.displayName}
-        />
-        <DateField
-          name={`${namePrefix}preparationDate`}
-          customName="preparationDate"
-        />
-      </DinaFormSection>
-    </FieldSet>
-  );
-}
-
 export interface CollectingEventBriefDetailsProps {
   collectingEvent: PersistedResource<CollectingEvent>;
 }

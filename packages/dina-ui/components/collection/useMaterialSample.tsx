@@ -28,6 +28,7 @@ import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
 import { toPairs, fromPairs } from "lodash";
+import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -110,12 +111,6 @@ export interface UseMaterialSampleSaveParams {
   materialSampleAttachmentsConfig?: AllowAttachmentsConfig;
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
 }
-
-const PREPARATION_FIELDS: (keyof MaterialSample)[] = [
-  "preparationType",
-  "preparationDate",
-  "preparedBy"
-];
 
 export function useMaterialSampleSave({
   materialSample,
@@ -256,12 +251,7 @@ export function useMaterialSampleSave({
 
     // Only persist the preparation fields if the preparations toggle is enabled:
     if (!enablePreparations) {
-      materialSampleInput.preparationType = {
-        id: null,
-        type: "preparation-type"
-      };
-      materialSampleInput.preparationDate = null;
-      materialSampleInput.preparedBy = { id: null };
+      Object.assign(materialSampleInput, BLANK_PREPARATION);
     }
 
     if (!enableCollectingEvent) {

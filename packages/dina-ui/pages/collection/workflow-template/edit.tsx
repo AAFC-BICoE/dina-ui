@@ -20,6 +20,10 @@ import React, { RefObject, useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
 import { GroupSelectField, Head, Nav } from "../../../components";
+import {
+  PreparationField,
+  PREPARATION_FIELDS
+} from "../../../components/collection/PreparationField";
 import { useMaterialSampleSave } from "../../../components/collection/useMaterialSample";
 import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -29,10 +33,7 @@ import {
   TemplateField,
   TemplateFields
 } from "../../../types/collection-api";
-import {
-  MaterialSampleForm,
-  PreparationsFormLayout
-} from "../material-sample/edit";
+import { MaterialSampleForm } from "../material-sample/edit";
 
 const workflowMainFieldsSchema = yup.object({
   id: yup.string(),
@@ -148,9 +149,7 @@ export function WorkflowTemplateForm({
     allowExisting: formTemplates?.MATERIAL_SAMPLE?.allowExisting,
     templateFields: pick(
       formTemplates?.MATERIAL_SAMPLE?.templateFields,
-      "preparationType",
-      "preparedBy",
-      "datePrepared"
+      ...PREPARATION_FIELDS
     )
   };
 
@@ -320,7 +319,7 @@ export function WorkflowTemplateForm({
           initialValues={preparationsTemplateInitialValues}
           isTemplate={true}
         >
-          <PreparationsFormLayout />
+          <PreparationField />
           {materialSampleAttachmentsUI}
         </DinaForm>
       ) : null}

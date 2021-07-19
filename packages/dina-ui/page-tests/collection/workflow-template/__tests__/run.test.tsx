@@ -218,14 +218,21 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               },
 
               // Preparations are not enabled, so the preparation fields are set to null:
+              materialSampleType: {
+                id: null,
+                type: "material-sample-type"
+              },
+              preparationRemarks: null,
               preparationDate: null,
               preparationType: {
                 id: null,
                 type: "preparation-type"
               },
               preparedBy: {
-                id: null
+                id: null,
+                type: "person"
               },
+
               managedAttributes: {},
               relationships: {},
               type: "material-sample"
@@ -302,14 +309,21 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               },
 
               // Preparations are not enabled, so the preparation fields are set to null:
+              materialSampleType: {
+                id: null,
+                type: "material-sample-type"
+              },
+              preparationRemarks: null,
               preparationDate: null,
               preparationType: {
                 id: null,
                 type: "preparation-type"
               },
               preparedBy: {
-                id: null
+                id: null,
+                type: "person"
               },
+
               managedAttributes: {},
               relationships: {},
               type: "material-sample"
@@ -360,13 +374,19 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               managedAttributes: {},
 
               // Preparations are not enabled, so the preparation fields are set to null:
+              materialSampleType: {
+                id: null,
+                type: "material-sample-type"
+              },
+              preparationRemarks: null,
               preparationDate: null,
               preparationType: {
                 id: null,
                 type: "preparation-type"
               },
               preparedBy: {
-                id: null
+                id: null,
+                type: "person"
               },
 
               relationships: {},

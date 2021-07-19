@@ -65,6 +65,7 @@ const mockGet = jest.fn<any, any>(async path => {
       return { data: testPersons() };
     case "collection-api/storage-unit":
     case "collection-api/storage-unit-type":
+    case "collection-api/material-sample-type":
     case "objectstore-api/metadata":
       return { data: [] };
   }
@@ -168,6 +169,11 @@ describe("MaterialSample split workflow run action form with all default values"
               id: "1",
               type: "material-sample"
             },
+            relationships: {
+              attachment: {
+                data: []
+              }
+            },
             type: "material-sample"
           },
           type: "material-sample"
@@ -210,6 +216,11 @@ describe("MaterialSample split workflow run action form with all default values"
               id: "1",
               type: "material-sample"
             },
+            relationships: {
+              attachment: {
+                data: []
+              }
+            },
             type: "material-sample"
           },
           type: "material-sample"
@@ -221,6 +232,11 @@ describe("MaterialSample split workflow run action form with all default values"
             parentMaterialSample: {
               id: "1",
               type: "material-sample"
+            },
+            relationships: {
+              attachment: {
+                data: []
+              }
             },
             type: "material-sample"
           },
@@ -312,6 +328,11 @@ describe("MaterialSample split workflow run action form with all default values"
               id: "1",
               type: "material-sample"
             },
+            relationships: {
+              attachment: {
+                data: []
+              }
+            },
             preparationType: {
               id: "1"
             },
@@ -332,6 +353,11 @@ describe("MaterialSample split workflow run action form with all default values"
             parentMaterialSample: {
               id: "1",
               type: "material-sample"
+            },
+            relationships: {
+              attachment: {
+                data: []
+              }
             },
             preparationType: {
               id: "100"
