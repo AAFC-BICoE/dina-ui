@@ -3,7 +3,7 @@ import { KitsuResource } from "kitsu";
 interface LibraryPoolAttributes {
   name: string;
   type: "library-pool";
-  group: string;
+  group?: string;
 }
 
 // interface LibraryPoolRelationships {}

@@ -10,7 +10,7 @@ export interface PreLibraryPrepAttributes {
   concentration: number;
   quality: string;
   notes: string;
-  group: string;
+  group?: string;
 }
 
 export interface PreLibraryPrepRelationships {

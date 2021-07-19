@@ -10,7 +10,7 @@ interface LibraryPrepAttributes {
   size?: string | null;
   wellColumn?: number | null;
   wellRow?: string | null;
-  group: string;
+  group?: string;
 }
 
 interface LibraryPrepRelationships {
