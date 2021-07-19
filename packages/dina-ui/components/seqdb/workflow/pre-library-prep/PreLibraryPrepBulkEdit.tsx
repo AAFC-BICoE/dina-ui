@@ -4,6 +4,7 @@ import {
   BulkDataEditor,
   decodeResourceCell,
   DinaForm,
+  DinaFormSection,
   encodeResourceCell,
   filterBy,
   RowChange,
@@ -11,6 +12,7 @@ import {
   useResourceSelectCells
 } from "common-ui";
 import { pick } from "lodash";
+import { GroupSelectField } from "../../../../../dina-ui/components/group-select/GroupSelectField";
 import { useContext, useState } from "react";
 import { SeqdbMessage, useSeqdbIntl } from "../../../../intl/seqdb-intl";
 import {
@@ -239,11 +241,16 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
 
   return (
     <>
-      <PreLibPrepEditModeSelector
-        onChange={setPlpEditMode}
-        editMode={plpEditMode}
-      />
       <DinaForm initialValues={{}}>
+        <GroupSelectField
+          name="group"
+          enableStoredDefaultGroup={true}
+          className="col-md-6"
+        />
+        <PreLibPrepEditModeSelector
+          onChange={setPlpEditMode}
+          editMode={plpEditMode}
+        />
         <strong>
           <SeqdbMessage id="editableTable" />:
         </strong>
