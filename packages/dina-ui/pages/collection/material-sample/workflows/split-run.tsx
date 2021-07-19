@@ -527,10 +527,7 @@ function isBlankResourceAttribute(value: any) {
     case "object":
     case "undefined":
       // empty object or empty array:
-      // when object has id key and the id is null, or object has no keys for case like relationships
-      return isArray(value)
-        ? !value.join()
-        : value === null || Object.keys(value)?.length === 0;
+      return isArray(value) ? !value.join() : !value?.id;
     default:
       return false;
   }
