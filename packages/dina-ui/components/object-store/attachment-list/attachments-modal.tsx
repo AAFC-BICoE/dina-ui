@@ -6,7 +6,7 @@ import {
   useModal,
   useQuery
 } from "common-ui";
-import { uniqBy } from "lodash";
+import { uniqBy, isArray } from "lodash";
 import { PersistedResource } from "kitsu";
 import { useEffect, useState } from "react";
 import ReactTable from "react-table";
@@ -32,6 +32,7 @@ export interface AttachmentsModalParams {
   allowExistingFieldName?: string;
   /** fieldset id */
   id?: string;
+  index?: string;
 }
 
 export function useAttachmentsModal({
@@ -42,15 +43,21 @@ export function useAttachmentsModal({
   allowNewFieldName,
   allowExistingFieldName,
   id,
+  index,
   allowAttachmentsConfig = { allowExisting: true, allowNew: true }
 }: AttachmentsModalParams) {
   const { closeModal, openModal } = useModal();
   const { bulkGet } = useApiClient();
 
-  const [selectedMetadatas, setSelectedMetadatas] =
-    useState<Metadata[]>(initialMetadatas);
+  const initSelectedMetadatas = !!index
+    ? new Map().set(index, initialMetadatas)
+    : initialMetadatas;
+
+  const [selectedMetadatas, setSelectedMetadatas] = useState<any>(
+    initSelectedMetadatas
+  );
   useEffect(() => {
-    setSelectedMetadatas(initialMetadatas);
+    setSelectedMetadatas(initSelectedMetadatas);
   }, deps);
 
   // Just check if the object-store is up:
@@ -66,7 +73,15 @@ export function useAttachmentsModal({
 
     // Add the selected Metadatas to the array, making sure there are no duplicates:
     setSelectedMetadatas(current =>
-      uniqBy([...current, ...metadatas], metadata => metadata.id)
+      !!index
+        ? current.set(
+            index,
+            uniqBy(
+              [...(current.get(index) ?? []), ...metadatas],
+              metadata => metadata.id
+            )
+          )
+        : uniqBy([...current, ...metadatas], metadata => metadata.id)
     );
 
     closeModal();
@@ -75,7 +90,12 @@ export function useAttachmentsModal({
   async function removeMetadata(mId: string) {
     // Remove the selected Metadata from the array:
     setSelectedMetadatas(current =>
-      current.filter(metadata => metadata.id !== mId)
+      !!index
+        ? current.set(
+            index,
+            current.get(index).filter(metadata => metadata.id !== mId)
+          )
+        : current.filter(metadata => metadata.id !== mId)
     );
   }
 
@@ -109,13 +129,18 @@ export function useAttachmentsModal({
   const addingAttachmentsDisabled =
     !allowAttachmentsConfig?.allowExisting && !allowAttachmentsConfig?.allowNew;
 
+  const selectedMetasLen = !!index
+    ? selectedMetadatas.get(index)
+      ? selectedMetadatas.get(index).length
+      : 0
+    : selectedMetadatas.length;
+
   const attachedMetadatasUI = (
     <FieldSet
       id={id}
       legend={
         <>
-          {title ?? "Attachments"}{" "}
-          {!isTemplate ? `(${selectedMetadatas.length})` : ""}
+          {title ?? "Attachments"} {!isTemplate ? `(${selectedMetasLen})` : ""}
         </>
       }
     >
@@ -124,7 +149,7 @@ export function useAttachmentsModal({
           <DinaMessage id="objectStoreDataUnavailable" />
         ) : (
           <>
-            {selectedMetadatas.length ? (
+            {selectedMetasLen ? (
               <div className="mb-3">
                 <ReactTable
                   columns={[
@@ -149,8 +174,10 @@ export function useAttachmentsModal({
                       )
                     }
                   ]}
-                  data={selectedMetadatas}
-                  minRows={selectedMetadatas.length}
+                  data={
+                    !!index ? selectedMetadatas.get(index) : selectedMetadatas
+                  }
+                  minRows={selectedMetasLen}
                   showPagination={false}
                 />
               </div>

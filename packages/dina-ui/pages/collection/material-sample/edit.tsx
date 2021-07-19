@@ -438,13 +438,16 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   hideOtherCatalogNumbers?: boolean;
   className?: string;
   namePrefix?: string;
+  sampleNamePlaceHolder?: string;
 }
 
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleIdentifiersFormLayout({
   className,
-  namePrefix
+  namePrefix = "",
+  sampleNamePlaceHolder
 }: MaterialSampleIdentifiersFormLayoutProps) {
+  const { formatMessage } = useDinaIntl();
   return (
     <FieldSet
       id="identifiers-section"
@@ -454,13 +457,10 @@ export function MaterialSampleIdentifiersFormLayout({
       <div className="row">
         <div className="col-md-6">
           <TextField
-            name={`${
-              namePrefix
-                ? namePrefix + "materialSampleName"
-                : "materialSampleName"
-            }`}
+            name={`${namePrefix}materialSampleName`}
             customName="materialSampleName"
             className="materialSampleName"
+            placeholder={sampleNamePlaceHolder}
           />
 
           <TextField
@@ -508,10 +508,14 @@ export function PreparationsFormLayout({
               model="collection-api/preparation-type"
               optionLabel={it => it.name}
               readOnlyLink="/collection/preparation-type/view?id="
-              filter={input => ({
-                ...filterBy(["name"])(input),
-                group: { EQ: `${values.group}` }
-              })}
+              filter={input =>
+                values.group
+                  ? {
+                      ...filterBy(["name"])(input),
+                      group: { EQ: `${values.group}` }
+                    }
+                  : { ...filterBy(["name"])(input) }
+              }
               name={`${namePrefix}preparationType`}
               key={values.group}
               customName="preparationType"
