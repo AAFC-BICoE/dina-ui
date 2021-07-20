@@ -419,7 +419,7 @@ export function MaterialSampleMainInfoFormLayout() {
 }
 
 export interface MaterialSampleIdentifiersFormLayoutProps {
-  hideSampleName?: boolean;
+  disableSampleName?: boolean;
   hideOtherCatalogNumbers?: boolean;
   className?: string;
   namePrefix?: string;
@@ -428,6 +428,7 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
 
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleIdentifiersFormLayout({
+  disableSampleName,
   className,
   namePrefix = "",
   sampleNamePlaceHolder
@@ -446,6 +447,7 @@ export function MaterialSampleIdentifiersFormLayout({
             customName="materialSampleName"
             className="materialSampleName"
             placeholder={sampleNamePlaceHolder}
+            readOnly={disableSampleName}
           />
 
           <TextField
