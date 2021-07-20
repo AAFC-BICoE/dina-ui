@@ -160,16 +160,14 @@ function StorageUnitCollapser({
 
   const CollapserIcon = isOpen ? FaMinusSquare : FaPlusSquare;
 
-  const hasChildren = !!(storageUnit as any).relationships?.storageUnitChildren
-    ?.data?.length;
+  const hasChildren = !!(storageUnit as any)?.storageUnitChildren?.length;
 
   return (
     <div className={`d-flex flex-row gap-2 collapser-for-${storageUnit.id}`}>
       <CollapserIcon
         className={classNames("storage-collapser-icon align-top", {
-          // Un-comment this when including storageUnitChildren is not affected by the top-level filter:
           // Hide the expander button when there are no children:
-          // "visually-hidden": !hasChildren
+          invisible: !hasChildren
         })}
         size="2em"
         onClick={toggle}
