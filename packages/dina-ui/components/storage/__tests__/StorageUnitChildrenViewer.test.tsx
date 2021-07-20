@@ -4,11 +4,19 @@ import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitChildrenViewer } from "../StorageUnitChildrenViewer";
 
-const STORAGE_UNIT_CHILDREN = ["B", "C", "D"].map(letter => ({
+const STORAGE_UNIT_CHILDREN = ["B", "C", "D"].map<
+  PersistedResource<StorageUnit>
+>(letter => ({
   id: letter,
   group: "group",
   name: letter,
-  type: "storage-unit" as const
+  type: "storage-unit",
+  storageUnitType: {
+    id: "BOX",
+    name: "Box",
+    group: "test-group",
+    type: "storage-unit-type"
+  }
 }));
 
 // Initial container:
@@ -53,7 +61,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/storage-unit":
       switch (params?.include) {
-        case "hierarchy,storageUnitChildren":
+        case "hierarchy,storageUnitChildren,storageUnitType":
           switch (params?.filter?.rsql) {
             case "parentStorageUnit.uuid==A":
               // The initial Storage Unit's children:
@@ -79,7 +87,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           }
       }
     case "collection-api/storage-unit-type":
-      return { data: [] };
+      return { data: [], meta: { totalResourceCount: 0 } };
     case "collection-api/storage-unit/A/storageUnitChildren":
       // The fetcher for all current children before executing the Save operation:
       return {
@@ -114,7 +122,7 @@ describe("StorageUnitChildrenViewer component", () => {
     wrapper.update();
 
     expect(wrapper.find(".storage-unit-name").map(node => node.text())).toEqual(
-      ["B", "C", "D"]
+      ["Box B", "Box C", "Box D"]
     );
   });
 

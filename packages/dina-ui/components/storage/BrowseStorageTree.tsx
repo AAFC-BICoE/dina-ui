@@ -16,7 +16,10 @@ import { Promisable } from "type-fest";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
 import { StorageFilter } from "./StorageFilter";
-import { StorageUnitBreadCrumb } from "./StorageUnitBreadCrumb";
+import {
+  StorageUnitBreadCrumb,
+  storageUnitDisplayName
+} from "./StorageUnitBreadCrumb";
 
 export interface BrowseStorageTreeProps {
   onSelect?: (storageUnit: PersistedResource<StorageUnit>) => Promisable<void>;
@@ -69,7 +72,7 @@ export function StorageTreeList({
 
   const storageUnitsQuery = useQuery<StorageUnit[], MetaWithTotal>({
     path: `collection-api/storage-unit`,
-    include: "hierarchy,storageUnitChildren",
+    include: "hierarchy,storageUnitChildren,storageUnitType",
     page: { limit, offset },
     filter: {
       rsql: rsql({
@@ -180,7 +183,7 @@ function StorageUnitCollapser({
           ) : (
             <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
               <a className="storage-unit-name" target="_blank">
-                {storageUnit.name}
+                {storageUnitDisplayName(storageUnit)}
               </a>
             </Link>
           )}

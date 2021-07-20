@@ -22,10 +22,10 @@ const STORAGE_A: PersistedResource<StorageUnit> = {
     name: "B",
     type: "storage-unit",
     hierarchy: [
-      { uuid: "B", name: "B" },
-      { uuid: "C", name: "C" },
-      { uuid: "D", name: "D" },
-      { uuid: "E", name: "E" }
+      { uuid: "B", name: "B", typeName: "Shelf", typeUuid: "SHELF" },
+      { uuid: "C", name: "C", typeName: "Cabinet", typeUuid: "CABINET" },
+      { uuid: "D", name: "D", typeName: "Room", typeUuid: "ROOM" },
+      { uuid: "E", name: "E", typeName: "Building", typeUuid: "BUILDING" }
     ]
   }
 };
