@@ -1,4 +1,5 @@
 // SSR polyfills:
+require("setimmediate");
 CustomEvent = require("custom-event");
 const LocalStorage = require("node-localstorage").LocalStorage;
 localStorage = new LocalStorage("./scratch");
@@ -13,9 +14,4 @@ const appVersion = `${require("./package.json").version}${
 
 module.exports = withTM({
   env: { UI_APP_VERSION: appVersion },
-  webpack: (config) => {
-    // Enable setImmediate polyfill:
-    config.node.setImmediate = true;
-    return config;
-  },
 });

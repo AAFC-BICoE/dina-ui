@@ -13,6 +13,7 @@ const config: Config.InitialOptions = {
     "/jest.setup.js",
     "/next.config.js"
   ],
+  testEnvironment: "jsdom",
   moduleNameMapper: {
     // Mocks CSS imports to prevent throwing an error during tests.
     "\\.css$": "identity-obj-proxy"
