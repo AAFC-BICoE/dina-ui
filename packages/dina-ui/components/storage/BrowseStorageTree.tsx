@@ -1,109 +1,75 @@
+import classNames from "classnames";
+import {
+  FilterGroupModel,
+  FormikButton,
+  MetaWithTotal,
+  rsql,
+  useQuery,
+  withResponse
+} from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import Pagination from "rc-pagination";
 import { useState } from "react";
 import { FaMinusSquare, FaPlusSquare } from "react-icons/fa";
-import {
-  FilterGroupModel,
-  MetaWithTotal,
-  rsql,
-  useQuery,
-  withResponse
-} from "../../../common-ui/lib";
-import { FilterRowModel } from "../../../common-ui/lib/filter-builder/FilterRow";
+import { Promisable } from "type-fest";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
+import { StorageFilter } from "./StorageFilter";
+import { StorageUnitBreadCrumb } from "./StorageUnitBreadCrumb";
 
 export interface BrowseStorageTreeProps {
-  parentId?: string;
-  onSelect?: (storageUnit: PersistedResource<StorageUnit>) => void;
-
-  /** Disable this option ID e.g. to avoid putting a storage unit inside itself. */
-  excludeOptionId?: string;
-  disabled?: boolean;
-
-  filter?: FilterRowModel | null;
+  onSelect?: (storageUnit: PersistedResource<StorageUnit>) => Promisable<void>;
 }
 
+/** Hierarchy of nodes UI to search for and find a Storage Unit. */
 export function BrowseStorageTree(props: BrowseStorageTreeProps) {
-  const [searchText, setSearchText] = useState<string>("");
+  const [filter, setFilter] = useState<FilterGroupModel | null>(null);
 
-  const [filter, setFilter] = useState<FilterRowModel | null>();
-
-  function doSearch() {
-    setFilter({
-      id: -321,
-      type: "FILTER_ROW" as const,
-      attribute: "name",
-      predicate: "IS" as const,
-      searchType: "PARTIAL_MATCH" as const,
-      value: searchText
-    });
-  }
-
-  function resetSearch() {
-    setSearchText("");
-    setFilter(null);
-  }
+  const isFiltered = !!filter?.children?.length;
 
   return (
     <div>
-      <div className="input-group mb-3" style={{ width: "30rem" }}>
-        <input
-          className="storage-tree-search form-control"
-          type="text"
-          value={searchText}
-          onChange={e => setSearchText(e.target.value)}
-          // Pressing enter should set the filter, not submit the form:
-          onKeyDown={e => {
-            if (e.keyCode === 13) {
-              e.preventDefault();
-              doSearch();
-            }
-          }}
-        />
-        <button
-          className="storage-tree-search btn btn-primary"
-          type="button"
-          style={{ width: "10rem" }}
-          onClick={doSearch}
-        >
-          <DinaMessage id="search" />
-        </button>
-        <button
-          className="storage-tree-search-reset btn btn-dark"
-          type="button"
-          onClick={resetSearch}
-        >
-          <DinaMessage id="resetButtonText" />
-        </button>
-      </div>
-      <div className="fw-bold mb-3">
-        {filter ? (
+      <StorageFilter onChange={setFilter} />
+      <div className={`fw-bold mb-3`}>
+        {isFiltered ? (
           <DinaMessage id="showingFilteredStorageUnits" />
         ) : (
           <DinaMessage id="showingTopLevelStorageUnits" />
         )}
         {":"}
       </div>
-      <StorageTreeList {...props} filter={filter} />
+      <StorageTreeList {...props} filter={filter} showPathInName={isFiltered} />
     </div>
   );
+}
+
+export interface StorageTreeListProps {
+  parentId?: string;
+  onSelect?: (storageUnit: PersistedResource<StorageUnit>) => Promisable<void>;
+
+  disabled?: boolean;
+
+  filter?: FilterGroupModel | null;
+
+  /** Show the hierarchy path in the name. (Top-level only). */
+  showPathInName?: boolean;
 }
 
 export function StorageTreeList({
   onSelect,
   parentId,
-  excludeOptionId,
   disabled,
-  filter
-}: BrowseStorageTreeProps) {
+  filter,
+  showPathInName
+}: StorageTreeListProps) {
   const limit = 100;
   const [pageNumber, setPageNumber] = useState(1);
   const offset = (pageNumber - 1) * limit;
 
   const storageUnitsQuery = useQuery<StorageUnit[], MetaWithTotal>({
     path: `collection-api/storage-unit`,
+    include: "hierarchy,storageUnitChildren",
     page: { limit, offset },
     filter: {
       rsql: rsql({
@@ -128,7 +94,9 @@ export function StorageTreeList({
         ]
       }),
       // For top-level storage units:
-      ...(!filter && !parentId ? { parentStorageUnit: null } : {})
+      ...(!filter?.children?.length && !parentId
+        ? { parentStorageUnit: null }
+        : {})
     }
   });
 
@@ -146,10 +114,10 @@ export function StorageTreeList({
                 key={unit.id}
               >
                 <StorageUnitCollapser
+                  showPathInName={showPathInName}
                   storageUnit={unit}
                   onSelect={onSelect}
-                  disabled={disabled || unit.id === excludeOptionId}
-                  excludeOptionId={excludeOptionId}
+                  disabled={disabled}
                 />
               </div>
             ))}
@@ -172,16 +140,17 @@ interface StorageUnitCollapserProps {
   storageUnit: PersistedResource<StorageUnit>;
   onSelect?: (storageUnit: PersistedResource<StorageUnit>) => void;
 
-  /** Disable this option ID e.g. to avoid putting a storage unit inside itself. */
-  excludeOptionId?: string;
   disabled?: boolean;
+
+  /** Show the hierarchy path in the name. (This collapser only). */
+  showPathInName?: boolean;
 }
 
 function StorageUnitCollapser({
   storageUnit,
   onSelect,
   disabled,
-  excludeOptionId
+  showPathInName
 }: StorageUnitCollapserProps) {
   const [isOpen, setOpen] = useState(false);
 
@@ -191,35 +160,45 @@ function StorageUnitCollapser({
 
   const CollapserIcon = isOpen ? FaMinusSquare : FaPlusSquare;
 
+  const hasChildren = !!(storageUnit as any).relationships?.storageUnitChildren
+    ?.data?.length;
+
   return (
     <div className={`d-flex flex-row gap-2 collapser-for-${storageUnit.id}`}>
       <CollapserIcon
-        className="storage-collapser-icon align-top"
+        className={classNames("storage-collapser-icon align-top", {
+          // Un-comment this when including storageUnitChildren is not affected by the top-level filter:
+          // Hide the expander button when there are no children:
+          // "visually-hidden": !hasChildren
+        })}
         size="2em"
         onClick={toggle}
         style={{ cursor: "pointer" }}
       />
       <div className="flex-grow-1">
         <div className="d-flex flex-row align-items-center gap-2 mb-3">
-          <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
-            <a className="storage-unit-name" target="_blank">
-              {storageUnit.name}
-            </a>
-          </Link>
-          <button
-            className="select-storage btn btn-primary btn-sm"
-            type="button"
-            onClick={() => onSelect?.(storageUnit)}
-            disabled={disabled}
-          >
-            <DinaMessage id="select" />
-          </button>
+          {showPathInName ? (
+            <StorageUnitBreadCrumb storageUnit={storageUnit} />
+          ) : (
+            <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
+              <a className="storage-unit-name" target="_blank">
+                {storageUnit.name}
+              </a>
+            </Link>
+          )}
+          {!disabled && (
+            <FormikButton
+              className="select-storage btn btn-primary btn-sm"
+              onClick={() => onSelect?.(storageUnit)}
+            >
+              <DinaMessage id="select" />
+            </FormikButton>
+          )}
         </div>
         {isOpen && (
           <StorageTreeList
             parentId={storageUnit.id}
             onSelect={onSelect}
-            excludeOptionId={excludeOptionId}
             disabled={disabled}
           />
         )}

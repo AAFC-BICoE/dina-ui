@@ -49,6 +49,11 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   asyncOptions?: AsyncOption<TData>[];
 
   isDisabled?: boolean;
+
+  /** Omits the "<none>" option. */
+  omitNullOption?: boolean;
+
+  invalid?: boolean;
 }
 
 /**
@@ -67,7 +72,11 @@ export interface AsyncOption<TData extends KitsuResource> {
 }
 
 /** An option the user can select to set the relationship to null. */
-const NULL_OPTION = { label: "<none>", resource: { id: null }, value: null };
+const NULL_OPTION = Object.seal({
+  label: "<none>",
+  resource: Object.seal({ id: null }),
+  value: null
+});
 
 /** Dropdown select input for selecting a resource from the API. */
 export function ResourceSelect<TData extends KitsuResource>({
@@ -81,7 +90,9 @@ export function ResourceSelect<TData extends KitsuResource>({
   styles,
   value,
   asyncOptions,
-  isDisabled
+  isDisabled,
+  omitNullOption,
+  invalid
 }: ResourceSelectProps<TData>) {
   const { formatMessage } = useIntl();
 
@@ -112,11 +123,7 @@ export function ResourceSelect<TData extends KitsuResource>({
     val => isUndefined(val) || isEqual(val, {})
   );
 
-  const {
-    loading: queryIsLoading,
-    response,
-    error
-  } = useQuery<TData[]>({
+  const { loading: queryIsLoading, response } = useQuery<TData[]>({
     path: model,
     ...getParams
   });
@@ -133,7 +140,7 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   // Only show the null option when in single-resource mode and when there is no search input value.
   const options = [
-    ...(!isMulti && !search.value ? [NULL_OPTION] : []),
+    ...(!isMulti && !search.value && !omitNullOption ? [NULL_OPTION] : []),
     ...resourceOptions,
     ...(asyncOptions
       ? asyncOptions.map(option => ({
@@ -210,9 +217,13 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   const customStyle: any = {
     multiValueLabel: base => ({ ...base, cursor: "move" }),
-    placeholder: (provided, _) => ({
-      ...provided,
-      color: "rgb(87,120,94)"
+    placeholder: base => ({ ...base, color: "rgb(87,120,94)" }),
+    control: base => ({
+      ...base,
+      ...(invalid && {
+        borderColor: "rgb(148, 26, 37)",
+        "&:hover": { borderColor: "rgb(148, 26, 37)" }
+      })
     })
   };
 

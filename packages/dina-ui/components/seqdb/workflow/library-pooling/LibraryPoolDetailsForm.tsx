@@ -5,6 +5,7 @@ import {
   SubmitButton,
   TextField
 } from "common-ui";
+import { GroupSelectField } from "../../../../../dina-ui/components/group-select/GroupSelectField";
 import {
   Chain,
   ChainStepTemplate,
@@ -34,7 +35,7 @@ export function LibraryPoolDetailsForm({
       [
         {
           resource: submittedValues,
-          type: "libraryPool"
+          type: "library-pool"
         }
       ],
       { apiBaseUrl: "/seqdb-api" }
@@ -46,7 +47,7 @@ export function LibraryPoolDetailsForm({
         chain,
         chainStepTemplate: step,
         libraryPool: savedLibraryPool as LibraryPool,
-        type: "stepResource",
+        type: "step-resource",
         value: "LIBRARY_POOL"
       };
 
@@ -54,7 +55,7 @@ export function LibraryPoolDetailsForm({
         [
           {
             resource: newStepResource,
-            type: "stepResource"
+            type: "step-resource"
           }
         ],
         { apiBaseUrl: "/seqdb-api" }
@@ -69,6 +70,11 @@ export function LibraryPoolDetailsForm({
       <h2>Library Pool</h2>
       <DinaForm initialValues={libraryPool || {}} onSubmit={onSubmit}>
         <div className="row">
+          <GroupSelectField
+            name="group"
+            className="col-md-2"
+            enableStoredDefaultGroup={true}
+          />
           <TextField className="col-md-2" name="name" />
           <DateField className="col-md-2" name="dateUsed" />
         </div>

@@ -22,15 +22,15 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
       chain: { id: chain.id, type: chain.type } as Chain,
       chainStepTemplate: {
         id: step.id,
-        type: "chainStepTemplate"
+        type: "chain-step-template"
       } as ChainStepTemplate,
       molecularSample: sample,
-      type: "stepResource",
+      type: "step-resource",
       value: "SAMPLE"
     }));
 
     await save(
-      newStepResources.map(sr => ({ resource: sr, type: "stepResource" })),
+      newStepResources.map(sr => ({ resource: sr, type: "step-resource" })),
       { apiBaseUrl: "/seqdb-api" }
     );
 
@@ -48,7 +48,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
 
     const samples = ids.map(id => ({
       id,
-      type: "molecularSample"
+      type: "molecular-sample"
     })) as MolecularSample[];
 
     await selectSamples(samples);
@@ -61,10 +61,10 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
   ) {
     const operations = stepResources.map(sr => ({
       op: "DELETE" as OperationVerb,
-      path: `stepResource/${sr.id}`,
+      path: `step-resource/${sr.id}`,
       value: {
         id: sr.id,
-        type: "stepResource"
+        type: "step-resource"
       }
     }));
 
@@ -85,7 +85,7 @@ export function useSelectionControls({ chain, step }: StepRendererProps) {
 
     const stepResources = ids.map(id => ({
       id,
-      type: "stepResource"
+      type: "step-resource"
     })) as PersistedResource<StepResource>[];
 
     await deleteStepResources(stepResources);

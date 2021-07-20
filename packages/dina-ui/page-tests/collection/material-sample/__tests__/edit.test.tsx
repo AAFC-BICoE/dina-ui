@@ -295,14 +295,21 @@ describe("Material Sample Edit Page", () => {
               collectingEvent: { id: "1", type: "collecting-event" },
 
               // Preparations are not enabled, so the preparation fields are set to null:
+              materialSampleType: {
+                id: null,
+                type: "material-sample-type"
+              },
+              preparationRemarks: null,
               preparationDate: null,
               preparationType: {
                 id: null,
                 type: "preparation-type"
               },
               preparedBy: {
-                id: null
+                id: null,
+                type: "person"
               },
+
               managedAttributes: {},
               relationships: {}
             },
@@ -390,13 +397,19 @@ describe("Material Sample Edit Page", () => {
               type: "material-sample",
 
               // Preparations are not enabled, so the preparation fields are set to null:
+              materialSampleType: {
+                id: null,
+                type: "material-sample-type"
+              },
+              preparationRemarks: null,
               preparationDate: null,
               preparationType: {
                 id: null,
                 type: "preparation-type"
               },
               preparedBy: {
-                id: null
+                id: null,
+                type: "person"
               },
               managedAttributes: {},
               relationships: {}
@@ -493,13 +506,19 @@ describe("Material Sample Edit Page", () => {
                 testAttr: "do the test"
               },
               materialSampleName: "test-ms",
+              materialSampleType: {
+                id: null,
+                type: "material-sample-type"
+              },
               preparationDate: null,
+              preparationRemarks: null,
               preparationType: {
                 id: null,
                 type: "preparation-type"
               },
               preparedBy: {
-                id: null
+                id: null,
+                type: "person"
               },
               relationships: {},
               type: "material-sample"

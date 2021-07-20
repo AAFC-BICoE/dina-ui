@@ -7,25 +7,26 @@ import {
   FieldSet,
   withResponse
 } from "common-ui";
-import { Field, FastField } from "formik";
+import { FastField, Field } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
 import { Head, Nav, StorageLinkerField } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
+import {
+  PreparationField,
+  PREPARATION_FIELDS
+} from "../../../components/collection/PreparationField";
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
 import { useMaterialSampleQuery } from "../../../components/collection/useMaterialSample";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
+import { ManagedAttributesViewer } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import {
   MaterialSampleIdentifiersFormLayout,
-  MaterialSampleMainInfoFormLayout,
-  PreparationsFormLayout
+  MaterialSampleMainInfoFormLayout
 } from "./edit";
-import { ManagedAttributesViewer } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
-import { toPairs } from "lodash";
-import { ManagedAttributeValues } from "packages/dina-ui/types/objectstore-api/resources/ManagedAttributeMap";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -67,11 +68,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <Head title={formatMessage("materialSampleViewTitle")} />
       <Nav />
       {withResponse(materialSampleQuery, ({ data: materialSample }) => {
-        const hasPreparations = Boolean(
-          materialSample.preparationType ||
-            materialSample.preparationDate ||
-            materialSample.preparedBy
+        const hasPreparations = PREPARATION_FIELDS.some(
+          fieldName => materialSample[fieldName]
         );
+
         return (
           <main className="container-fluid">
             {buttonBar}
@@ -103,7 +103,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   </DinaForm>
                 </FieldSet>
               )}
-              {hasPreparations && <PreparationsFormLayout />}
+              {hasPreparations && <PreparationField />}
               <FieldSet
                 legend={<DinaMessage id="materialSampleManagedAttributes" />}
               >

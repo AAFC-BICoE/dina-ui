@@ -135,15 +135,18 @@ export function FieldWrapper({
         />
       )}
       <label
-        className={`${name}-field ${
+        className={classNames(
+          `${name}-field`,
+          customName && `${customName}-field`,
           isTemplate
             ? horizontal
               ? "row col-sm-11"
               : "col-sm-10"
             : horizontal
             ? "row"
-            : "w-100"
-        } ${removeFormGroupClass ? "" : "mb-3"}`}
+            : "w-100",
+          !removeFormGroupClass && "mb-3"
+        )}
         htmlFor={disableLabelClick ? "none" : undefined}
       >
         {!removeLabel && (
@@ -158,7 +161,10 @@ export function FieldWrapper({
             {!hideLabel && <strong>{fieldLabel}</strong>}
           </div>
         )}
-        <div className={valueCol ? `col-sm-${valueCol}` : ""}>
+        <div
+          className={valueCol ? `col-sm-${valueCol}` : ""}
+          style={{ cursor: "auto" }}
+        >
           <FastField name={name}>
             {({ field: { value }, form, meta: { error } }) => (
               <>

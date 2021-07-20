@@ -13,6 +13,7 @@ export function LibraryPrepBatchDetails({
       {({ values: batch }) => (
         <>
           <div className="row">
+            <FieldView className="col-md-2" name="group" />
             <FieldView
               className="col-md-2"
               label="Library Prep Batch Name"

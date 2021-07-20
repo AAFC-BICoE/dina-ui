@@ -1,9 +1,9 @@
-import { COMMON_UI_MESSAGES_ENGLISH } from "common-ui";
-
 /**
  * English SeqDB messages. A message must be set here in English before other languages.
  */
 export const SEQDB_MESSAGES_ENGLISH = {
+  addPcrBatchTitle: "Add PCR Batch",
+  addMolecularSampleTitle: "Add Molecular Sample",
   addPcrPrimerTitle: "Add PCR Primer",
   addPcrProfileTitle: "Add Thermocycler Profile",
   addProductTitle: "Add Product",
@@ -17,13 +17,15 @@ export const SEQDB_MESSAGES_ENGLISH = {
   deselectAllCheckedSamplesButtonText:
     "<-- Deselect all checked molecular samples",
   deselectButtonText: "Deselect",
+  editableTable: "Editable Table",
+  editPcrBatchTitle: "Edit PCR Batch",
+  editMolecularSampleTitle: "Edit Molecular Sample",
   editPcrPrimerTitle: "Edit PCR Primer",
   editPcrProfileTitle: "Edit Thermocycler Profile",
   editProductTitle: "Edit Product",
   editProtocolTitle: "Edit Protocol",
   editRegionTitle: "Edit Region",
   editWorkflowTitle: "Edit NGS Workflow",
-  editableTable: "Editable Table",
   field_averageFragmentSize: "Average Fragment Size",
   field_concentration: "Concentration",
   "field_group.groupName": "Group Name",
@@ -43,8 +45,12 @@ export const SEQDB_MESSAGES_ENGLISH = {
   indexI7: "Index i7",
   indexSetListTitle: "Index Sets",
   indexSetMustBeSet: "Index Set must be set.",
+  molecularSample: "Molecular Sample",
+  molecularSampleListTitle: "Molecular Samples",
   notShearedStatus: "Not Sheared",
   notSizeSelectedStatus: "No Size Selection",
+  pcrBatchListTitle: "PCR Batches",
+  pcrBatchViewTitle: "View PCR Batch",
   pcrPrimerListTitle: "PCR Primers",
   pcrPrimerViewTitle: "PCR Primer",
   pcrProfileListTitle: "Thermocycler Profiles",

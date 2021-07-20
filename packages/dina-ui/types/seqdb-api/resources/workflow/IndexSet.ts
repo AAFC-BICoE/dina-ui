@@ -1,7 +1,7 @@
 import { KitsuResource } from "kitsu";
 
 export interface IndexSetAttributes {
-  type: "indexSet";
+  type: "index-set";
   name: string;
 }
 

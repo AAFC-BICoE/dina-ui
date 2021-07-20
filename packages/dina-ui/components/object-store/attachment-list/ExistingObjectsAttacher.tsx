@@ -74,7 +74,7 @@ export function ExistingObjectsAttacher({
         // Apply group filter:
         ...(filterForm.group && { bucket: filterForm.group }),
         // Filter out the derived objects e.g. thumbnails:
-        rsql: "acSubTypeId==null"
+        rsql: "acSubtypeId==null"
       })}
       filterAttributes={METADATA_FILTER_ATTRIBUTES}
       filterFormchildren={({ submitForm }) => (

@@ -12,4 +12,34 @@ describe("filterBy function", () => {
       rsql: "attribute1==*value*,attribute2==*value*"
     });
   });
+
+  it("Allows extra object filters to be passed in.", () => {
+    const rsqlFilter = filterBy(["attribute1", "attribute2"], {
+      extraFilters: [
+        {
+          selector: "attribute3",
+          arguments: "test-search-value",
+          comparison: "=="
+        }
+      ]
+    })("value");
+    expect(rsqlFilter).toEqual({
+      rsql: "(attribute1==*value*,attribute2==*value*);attribute3==test-search-value"
+    });
+  });
+
+  it("Omits the main filter attributes when the input is blank.", () => {
+    const rsqlFilter = filterBy(["attribute1", "attribute2"], {
+      extraFilters: [
+        {
+          selector: "attribute3",
+          arguments: "test-search-value",
+          comparison: "=="
+        }
+      ]
+    })("");
+    expect(rsqlFilter).toEqual({
+      rsql: "attribute3==test-search-value"
+    });
+  });
 });

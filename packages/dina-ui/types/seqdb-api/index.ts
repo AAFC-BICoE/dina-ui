@@ -1,4 +1,5 @@
 export * from "./resources/ContainerType";
+export * from "./resources/PcrBatch";
 export * from "./resources/PcrPrimer";
 export * from "./resources/PcrProfile";
 export * from "./resources/Product";
