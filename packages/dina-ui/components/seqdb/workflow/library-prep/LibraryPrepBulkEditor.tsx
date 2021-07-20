@@ -10,6 +10,7 @@ import {
   SaveArgs,
   useResourceSelectCells
 } from "common-ui";
+import { GroupSelectField } from "../../../../../dina-ui/components/group-select/GroupSelectField";
 import { useContext } from "react";
 import { SeqdbMessage, useSeqdbIntl } from "../../../../intl/seqdb-intl";
 import {

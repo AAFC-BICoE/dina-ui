@@ -35,7 +35,7 @@ export default function CollectionEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <div className="container">
+      <main className="container">
         <h1>
           <DinaMessage id={title} />
         </h1>
@@ -46,7 +46,7 @@ export default function CollectionEditPage() {
         ) : (
           <CollectionForm router={router} />
         )}
-      </div>
+      </main>
     </div>
   );
 }

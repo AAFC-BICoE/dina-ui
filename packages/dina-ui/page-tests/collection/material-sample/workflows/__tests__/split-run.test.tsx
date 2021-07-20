@@ -8,6 +8,7 @@ import {
   MaterialSampleRunConfig
 } from "../../../../../../dina-ui/types/collection-api";
 import { PreparationType } from "../../../../../../dina-ui/types/collection-api/resources/PreparationType";
+import { Person } from "../../../../../../dina-ui/types/agent-api";
 
 jest.mock("next/router", () => ({
   useRouter: () => ({ push: jest.fn() })
@@ -39,6 +40,19 @@ function testPreparationType(): PersistedResource<PreparationType>[] {
   ];
 }
 
+function testPersons(): PersistedResource<Person>[] {
+  return [
+    {
+      type: "person",
+      displayName: "test-person",
+      email: "a@b.com",
+      id: "2",
+      uuid: "1111",
+      aliases: ["alias1", "alias2", "alias3"]
+    }
+  ];
+}
+
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "collection-api/material-sample":
@@ -48,6 +62,11 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/preparation-type":
       return { data: testPreparationType() };
     case "agent-api/person":
+      return { data: testPersons() };
+    case "collection-api/storage-unit":
+    case "collection-api/storage-unit-type":
+    case "collection-api/material-sample-type":
+    case "objectstore-api/metadata":
       return { data: [] };
   }
 });
@@ -77,7 +96,7 @@ const testSeriesModeRunConfig: MaterialSampleRunConfig = {
     suffixType: "Numerical",
     destroyOriginal: true
   },
-  configure_children: { sampleNames: ["my custom name"], sampleDescs: [] }
+  configure_children: { sampleNames: ["my custom name"] }
 };
 
 const testBatchModeRunConfig: MaterialSampleRunConfig = {
@@ -90,7 +109,7 @@ const testBatchModeRunConfig: MaterialSampleRunConfig = {
     suffix: "CustomSuffix",
     destroyOriginal: true
   },
-  configure_children: { sampleNames: [], sampleDescs: ["CustomDescription1"] }
+  configure_children: { sampleNames: [] }
 };
 
 describe("MaterialSample split workflow run action form with all default values", () => {
@@ -103,9 +122,9 @@ describe("MaterialSample split workflow run action form with all default values"
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".materialSampleName input").prop("value")).toEqual(
-      "ParentName-001"
-    );
+    expect(
+      wrapper.find(".materialSampleName-field input").prop("value")
+    ).toEqual("");
   });
 
   it("Submit a workflow run action (series mode), correct child sample is sent to be saved ", async () => {
@@ -118,18 +137,21 @@ describe("MaterialSample split workflow run action form with all default values"
     await new Promise(setImmediate);
     wrapper.update();
 
-    // child sample initially loaded with user entered custom name
-    expect(wrapper.find(".materialSampleName input").prop("value")).toEqual(
-      "my custom name"
-    );
+    // Open the first sample's tab:
+    wrapper.find("li.sample-tab-0").simulate("click");
 
-    wrapper.find("button.copyFromParent").simulate("click");
+    // child sample initially loaded with user entered custom name
+    expect(
+      wrapper.find(".materialSampleName-field input").prop("value")
+    ).toEqual("my custom name");
+
+    wrapper.find("button.copyFromParent1").simulate("click");
 
     await new Promise(setImmediate);
     wrapper.update();
 
     // child sample will have the parent's value after click copyFromParent
-    expect(wrapper.find(".dwcCatalogNumber input").prop("value")).toEqual(
+    expect(wrapper.find(".dwcCatalogNumber-field input").prop("value")).toEqual(
       "my-number"
     );
 
@@ -146,6 +168,11 @@ describe("MaterialSample split workflow run action form with all default values"
             parentMaterialSample: {
               id: "1",
               type: "material-sample"
+            },
+            relationships: {
+              attachment: {
+                data: []
+              }
             },
             type: "material-sample"
           },
@@ -168,10 +195,13 @@ describe("MaterialSample split workflow run action form with all default values"
     await new Promise(setImmediate);
     wrapper.update();
 
+    // Open the first sample's tab:
+    wrapper.find("li.sample-tab-0").simulate("click");
+
     // child sample initially loaded with generated custom name
-    expect(wrapper.find(".materialSampleName input").prop("value")).toEqual(
-      "CustomParentNameCustomSuffix"
-    );
+    expect(
+      wrapper.find(".materialSampleName-field input").prop("value")
+    ).toEqual("CustomParentNameCustomSuffix");
 
     wrapper.find("button.runAction").simulate("click");
 
@@ -186,6 +216,11 @@ describe("MaterialSample split workflow run action form with all default values"
               id: "1",
               type: "material-sample"
             },
+            relationships: {
+              attachment: {
+                data: []
+              }
+            },
             type: "material-sample"
           },
           type: "material-sample"
@@ -197,6 +232,138 @@ describe("MaterialSample split workflow run action form with all default values"
             parentMaterialSample: {
               id: "1",
               type: "material-sample"
+            },
+            relationships: {
+              attachment: {
+                data: []
+              }
+            },
+            type: "material-sample"
+          },
+          type: "material-sample"
+        }
+      ],
+      {
+        apiBaseUrl: "/collection-api"
+      }
+    ]);
+  });
+
+  it("Submit a workflow run action (series mode) with the SetAll tab's default values, correct data is saved.", async () => {
+    // Config to generate 2 samples:
+    localStorage.setItem(
+      SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY,
+      JSON.stringify({
+        metadata: { actionRemarks: "Remarks on this run config" },
+        configure: {
+          identifier: "MATERIAL_SAMPLE_ID",
+          generationMode: "SERIES",
+          numOfChildToCreate: 2,
+          baseName: "CustomParentName",
+          start: "10",
+          suffixType: "Numerical",
+          destroyOriginal: true
+        },
+        configure_children: { sampleNames: ["my custom name"] }
+      })
+    );
+    const wrapper = mountWithAppContext(<SplitRunAction />, { apiContext });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Open the "Set All" tab to set the default values:
+    wrapper.find("li.set-all-tab").simulate("click");
+
+    // Set default values:
+    wrapper.find(".preparationType-field ResourceSelect").prop<any>("onChange")(
+      { id: "1" }
+    );
+    wrapper.find(".preparedBy-field ResourceSelect").prop<any>("onChange")({
+      id: "2"
+    });
+    wrapper
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "default-samplename" } });
+    wrapper
+      .find(".dwcCatalogNumber-field input")
+      .simulate("change", { target: { value: "default-number" } });
+    wrapper
+      .find(".dwcOtherCatalogNumbers-field textarea")
+      .simulate("change", { target: { value: "default-otherNumbers" } });
+
+    // Set Sample 1's values:
+    wrapper.find("li.sample-tab-1").simulate("click");
+
+    // Set default values:
+    wrapper.find(".preparationType-field ResourceSelect").prop<any>("onChange")(
+      { id: "100" }
+    );
+    wrapper.find(".preparedBy-field ResourceSelect").prop<any>("onChange")({
+      id: "200"
+    });
+    wrapper
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "manually-set-samplename" } });
+    wrapper
+      .find(".dwcCatalogNumber-field input")
+      .simulate("change", { target: { value: "manually-set-number" } });
+    wrapper
+      .find(".dwcOtherCatalogNumbers-field textarea")
+      .simulate("change", { target: { value: "manually-set-otherNumbers" } });
+
+    wrapper.find("button.runAction").simulate("click");
+
+    // When click next button, child samples are linked to parent sample and sent to save:
+    expect(mockSave.mock.calls[0]).toEqual([
+      [
+        // The first sample is saved using the default values:
+        {
+          resource: {
+            dwcCatalogNumber: "default-number",
+            dwcOtherCatalogNumbers: ["default-otherNumbers"],
+            group: "aafc",
+            materialSampleName: "my custom name",
+            parentMaterialSample: {
+              id: "1",
+              type: "material-sample"
+            },
+            relationships: {
+              attachment: {
+                data: []
+              }
+            },
+            preparationType: {
+              id: "1"
+            },
+            preparedBy: {
+              id: "2"
+            },
+            type: "material-sample"
+          },
+          type: "material-sample"
+        },
+        // The second sample is saved using the manual values:
+        {
+          resource: {
+            dwcCatalogNumber: "manually-set-number",
+            dwcOtherCatalogNumbers: ["manually-set-otherNumbers"],
+            group: "aafc",
+            materialSampleName: "manually-set-samplename",
+            parentMaterialSample: {
+              id: "1",
+              type: "material-sample"
+            },
+            relationships: {
+              attachment: {
+                data: []
+              }
+            },
+            preparationType: {
+              id: "100"
+            },
+            preparedBy: {
+              id: "200"
             },
             type: "material-sample"
           },

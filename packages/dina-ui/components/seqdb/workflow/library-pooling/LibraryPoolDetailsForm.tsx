@@ -5,6 +5,7 @@ import {
   SubmitButton,
   TextField
 } from "common-ui";
+import { GroupSelectField } from "../../../../../dina-ui/components/group-select/GroupSelectField";
 import {
   Chain,
   ChainStepTemplate,
@@ -69,6 +70,11 @@ export function LibraryPoolDetailsForm({
       <h2>Library Pool</h2>
       <DinaForm initialValues={libraryPool || {}} onSubmit={onSubmit}>
         <div className="row">
+          <GroupSelectField
+            name="group"
+            className="col-md-2"
+            enableStoredDefaultGroup={true}
+          />
           <TextField className="col-md-2" name="name" />
           <DateField className="col-md-2" name="dateUsed" />
         </div>

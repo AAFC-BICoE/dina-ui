@@ -214,11 +214,16 @@ export function CollectingEventFormLayout({
       if (
         (addr.place_type === "province" || addr.place_type === "state") &&
         !formik.values[`${commonSrcDetailRoot}.stateProvince.name`]
-      )
+      ) {
         formik.setFieldValue(
           `${commonSrcDetailRoot}.stateProvince.name`,
           addr.localname
         );
+        formik.setFieldValue(
+          `${commonSrcDetailRoot}.stateProvince.placeType`,
+          addr.place_type
+        );
+      }
 
       detail = {};
     });
