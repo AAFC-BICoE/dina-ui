@@ -11,7 +11,8 @@ import React, {
   InputHTMLAttributes,
   useCallback,
   useState,
-  ChangeEvent
+  ChangeEvent,
+  useEffect
 } from "react";
 import AutoSuggest, {
   InputProps,
@@ -96,6 +97,17 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
       ? configSuggestion(response?.data?.[0] as any)
       : uniq((response?.data ?? []).map(suggestion ?? noop))
     : [];
+
+  useEffect(() => {
+    const autosuggestGeneratedDivs =
+      document?.querySelectorAll<any>(".autosuggest div");
+    // Remove the role from react auto suggest generated div to fix WCAG issues, see #23517
+    autosuggestGeneratedDivs?.forEach(element => {
+      if (element.attributes.role) {
+        element.attributes.role.nodeValue = "";
+      }
+    });
+  }, []);
 
   return (
     <>
