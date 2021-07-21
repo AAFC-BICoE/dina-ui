@@ -38,6 +38,6 @@ describe("LanguageSelector component", () => {
     (process as any).browser = false;
 
     const wrapper = mountWithAppContext(<LanguageSelector />);
-    expect(wrapper.html()).toEqual("");
+    expect(wrapper.find(LanguageSelector).html()).toEqual("");
   });
 });
