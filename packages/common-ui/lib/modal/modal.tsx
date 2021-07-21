@@ -46,6 +46,7 @@ export function ModalProvider({ appElement, children }: ModalProviderProps) {
       {children}
       <ReactModal
         appElement={appElement ?? undefined}
+        ariaHideApp={!!appElement} // Gets rid of a warning in tests.
         isOpen={!!modals.length}
         className="Modal__Bootstrap modal-dialog"
         // Make sure the modal is in front of the Bootstrap nav bar:

@@ -63,7 +63,7 @@ export function MockAppContextProvider({
               <div ref={modalWrapperRef}>
                 <ModalProvider appElement={modalWrapperRef.current}>
                   {children}
-                </ModalProvider>{" "}
+                </ModalProvider>
               </div>
             </DndProvider>
           </DinaIntlProvider>
