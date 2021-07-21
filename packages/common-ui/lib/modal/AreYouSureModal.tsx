@@ -29,8 +29,7 @@ export function AreYouSureModal({
   ) {
     const yesBtnParam = pick(dinaFormSubmitParams, "submittedValues", "formik");
     await onYesButtonClicked(yesBtnParam.submittedValues, yesBtnParam.formik);
-    // Close the modal in the next tick; There is an error if the modal is closed before the Formik submission is done.
-    setImmediate(closeModal);
+    closeModal();
   }
 
   return (
