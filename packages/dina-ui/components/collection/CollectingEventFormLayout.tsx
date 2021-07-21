@@ -18,7 +18,7 @@ import {
 } from "common-ui";
 import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useRef, useState, useEffect } from "react";
 import { ShouldRenderReasons } from "react-autosuggest";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -338,6 +338,18 @@ export function CollectingEventFormLayout({
         form.setFieldValue(field.attributes["name"]?.value, e.target.checked);
       });
   }
+
+  useEffect(() => {
+    const autosuggestGeneratedDivs = document?.querySelectorAll<any>(
+      ".autosuggest div[id^='react-autowhatever-dwc'] "
+    );
+    // Remove the role from react auto suggest generated div, fix the 3 components's WCAG issues, see #23517
+    autosuggestGeneratedDivs?.forEach(element => {
+      if (element.attributes.role) {
+        element.attributes.role.nodeValue = "";
+      }
+    });
+  }, []);
 
   return (
     <div ref={layoutWrapperRef}>
