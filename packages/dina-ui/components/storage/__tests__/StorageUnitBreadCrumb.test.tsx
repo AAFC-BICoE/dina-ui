@@ -8,10 +8,16 @@ const storageUnitWithHierarchy: PersistedResource<StorageUnit> = {
   group: "group",
   name: "A",
   type: "storage-unit",
+  storageUnitType: {
+    name: "Box",
+    id: "BOX",
+    type: "storage-unit-type",
+    group: "test-group"
+  },
   hierarchy: [
-    { uuid: "A", name: "A" },
-    { uuid: "B", name: "B" },
-    { uuid: "C", name: "C" }
+    { uuid: "A", name: "A", typeName: "Shelf", typeUuid: "SHELF" },
+    { uuid: "B", name: "B", typeName: "Cabinet", typeUuid: "CABINET" },
+    { uuid: "C", name: "C", typeName: "Room", typeUuid: "ROOM" }
   ]
 };
 const storageUnitWithParentHierarchy: PersistedResource<StorageUnit> = {
@@ -19,14 +25,20 @@ const storageUnitWithParentHierarchy: PersistedResource<StorageUnit> = {
   group: "group",
   name: "A",
   type: "storage-unit",
+  storageUnitType: {
+    name: "Box",
+    id: "BOX",
+    type: "storage-unit-type",
+    group: "test-group"
+  },
   parentStorageUnit: {
     id: "B",
     group: "group",
     name: "B",
     type: "storage-unit",
     hierarchy: [
-      { uuid: "B", name: "B" },
-      { uuid: "C", name: "C" }
+      { uuid: "B", name: "B", typeName: "Cabinet", typeUuid: "CABINET" },
+      { uuid: "C", name: "C", typeName: "Room", typeUuid: "ROOM" }
     ]
   }
 };
@@ -39,7 +51,7 @@ describe("StorageUnitBreadCrumb component", () => {
 
     expect(
       wrapper.find("li.breadcrumb-item").map(node => node.text().trim())
-    ).toEqual(["C", "B", "A"]);
+    ).toEqual(["Room C", "Cabinet B", "Box A"]);
     expect(wrapper.find("a").map(node => node.prop("href"))).toEqual([
       "/collection/storage-unit/view?id=C",
       "/collection/storage-unit/view?id=B",
@@ -53,7 +65,7 @@ describe("StorageUnitBreadCrumb component", () => {
 
     expect(
       wrapper.find("li.breadcrumb-item").map(node => node.text().trim())
-    ).toEqual(["C", "B", "A"]);
+    ).toEqual(["Room C", "Cabinet B", "Box A"]);
     expect(wrapper.find("a").map(node => node.prop("href"))).toEqual([
       "/collection/storage-unit/view?id=C",
       "/collection/storage-unit/view?id=B",

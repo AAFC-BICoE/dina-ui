@@ -26,7 +26,9 @@ export function StorageUnitBreadCrumb({
       {parentPath.map(node => (
         <li className="breadcrumb-item" key={node.uuid}>
           <Link href={`/collection/storage-unit/view?id=${node.uuid}`}>
-            <a target="_blank">{node.name}</a>
+            <a target="_blank">
+              {node.typeName} {node.name}
+            </a>
           </Link>
         </li>
       ))}
