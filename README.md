@@ -4,7 +4,7 @@
 
 1. Clone the repo:
 ```
-git clone https://github.com/PoffM/dina-dev.git
+git clone git@github.com:AAFC-BICoE/dina-dev.git
 ```
 
 2. Run this script to clone the dina repos:
