@@ -1,0 +1,15 @@
+# Prod-specific docker-compose config.
+version: "3.7"
+services:
+  dina-ui:
+    build: ../repos/dina-ui
+  objectstore-api:
+    build: ../repos/objectstore-api
+  seqdb-api:
+    build: ../repos/seqdb-api
+  agent-api:
+    build: ../repos/agent-api
+  collection-api:
+    build: ../repos/collection-api
+  user-api:
+    build: ../repos/dina-user-api

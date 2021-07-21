@@ -1,0 +1,212 @@
+# Additional launch configuration for local dev instances.
+version: "3.7"
+services:
+  objectstore-api:
+    image: maven:3.6.3-jdk-11
+    # Run as Docker host user so generated files don't belong to root:
+    user: $UID:$GID
+    volumes:
+      - "../repos/objectstore-api:/app"
+      # Share host users:
+      - "/etc/group:/etc/group:ro"
+      - "/etc/passwd:/etc/passwd:ro"
+      - "/etc/shadow:/etc/shadow:ro"
+      # Use the host maven repository:
+      - "~/.m2:/var/maven/.m2"
+    ports:
+      - "5005:5005" # debug port
+    # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
+    command: >
+      bash -c "
+      mvn
+      -f /app/pom.xml
+      -Duser.home=/var/maven
+      -Dspring-boot-maven-plugin.fork=true
+      -Dspring-boot.run.jvmArguments=\"
+        -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
+        -Dspring.datasource.url=jdbc:postgresql://database/dina?currentSchema=object_store
+        -Dspring.datasource.username=postgres
+        -Dspring.datasource.password=p
+        -Dspring.datasource.continue-on-error=true
+        -Dspring.liquibase.user=postgres
+        -Dspring.liquibase.password=p
+        -Dspring.servlet.multipart.max-file-size=2GB
+        -Dspring.servlet.multipart.max-request-size=2GB
+        -Dminio.host=minio
+        -Dminio.port=9000
+        -Dminio.accessKey=minio
+        -Dminio.secretKey=minio123
+        -Dkeycloak.enabled=true
+        -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
+      \"
+      spring-boot:run
+      "
+  seqdb-api:
+    image: maven:3.6.3-jdk-11
+    # Run as Docker host user so generated files don't belong to root:
+    user: $UID:$GID
+    volumes:
+      - "../repos/seqdb-api:/app"
+      # Share host users:
+      - "/etc/group:/etc/group:ro"
+      - "/etc/passwd:/etc/passwd:ro"
+      - "/etc/shadow:/etc/shadow:ro"
+      # Use the host maven repository:
+      - "~/.m2:/var/maven/.m2"
+    ports:
+      - "8080:8080" # app port
+      - "5008:5005" # debug port
+    # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
+    command: >
+      bash -c "
+      mvn
+      -f /app/pom.xml
+      -Duser.home=/var/maven
+      -Dspring-boot-maven-plugin.fork=true
+      -Dspring-boot.run.jvmArguments=\"
+        -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
+        -Dspring.datasource.url=jdbc:postgresql://database/dina?currentSchema=seqdb
+        -Dspring.datasource.username=postgres
+        -Dspring.datasource.password=p
+        -Dspring.liquibase.user=postgres
+        -Dspring.liquibase.password=p
+        -Dspring.liquibase.contexts=schema-change,initial-data,sample-data
+        -Dkeycloak.enabled=true
+        -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
+      \"
+      spring-boot:run
+      "
+  agent-api:
+    image: maven:3.6.3-jdk-11
+    # Run as Docker host user so generated files don't belong to root:
+    user: $UID:$GID
+    volumes:
+      - "../repos/agent-api:/app"
+      # Share host users:
+      - "/etc/group:/etc/group:ro"
+      - "/etc/passwd:/etc/passwd:ro"
+      - "/etc/shadow:/etc/shadow:ro"
+      # Use the host maven repository:
+      - "~/.m2:/var/maven/.m2"
+    ports:
+      - "5006:5005" # debug port
+    # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
+    command: >
+      bash -c "
+      mvn
+      -f /app/pom.xml
+      -Duser.home=/var/maven
+      -Dspring-boot-maven-plugin.fork=true
+      -Dspring-boot.run.jvmArguments=\"
+        -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
+        -Dspring.datasource.url=jdbc:postgresql://database/dina?currentSchema=agent
+        -Dspring.datasource.username=postgres
+        -Dspring.datasource.password=p
+        -Dspring.datasource.continue-on-error=true
+        -Dspring.liquibase.user=postgres
+        -Dspring.liquibase.password=p
+        -Dkeycloak.enabled=true
+        -Dkeycloak.resource=dina
+        -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
+      \"
+      spring-boot:run
+      "
+  user-api:
+    image: maven:3.6.3-jdk-11
+    # Run as Docker host user so generated files don't belong to root:
+    user: $UID:$GID
+    volumes:
+      - "../repos/dina-user-api:/app"
+      # Share host users:
+      - "/etc/group:/etc/group:ro"
+      - "/etc/passwd:/etc/passwd:ro"
+      - "/etc/shadow:/etc/shadow:ro"
+      # Use the host maven repository:
+      - "~/.m2:/var/maven/.m2"
+    ports:
+      - "5007:5005" # debug port
+    # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
+    command: >
+      bash -c "
+      mvn
+      -f /app/pom.xml
+      -Duser.home=/var/maven
+      -Dspring-boot-maven-plugin.fork=true
+      -Dspring-boot.run.jvmArguments=\"
+        -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
+        -Dspring.datasource.url=jdbc:postgresql://database/dina?currentSchema=userapi
+        -Dspring.datasource.username=postgres
+        -Dspring.datasource.password=p
+        -Dspring.datasource.continue-on-error=true
+        -Dspring.liquibase.user=postgres
+        -Dspring.liquibase.password=p
+        -Dspring.liquibase.liquibase-schema=userapi
+        -Dkeycloak.enabled=true
+        -Dkeycloak.resource=user-svc
+        -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
+        -Dkeycloak.credentials.secret=120c0b7a-5ed2-4295-9a31-29c2fcbc714f
+      \"
+      spring-boot:run
+      "
+  collection-api:
+    image: maven:3.6.3-jdk-11
+    # Run as Docker host user so generated files don't belong to root:
+    user: $UID:$GID
+    volumes:
+      - "../repos/collection-api:/app"
+      # Share host users:
+      - "/etc/group:/etc/group:ro"
+      - "/etc/passwd:/etc/passwd:ro"
+      - "/etc/shadow:/etc/shadow:ro"
+      # Use the host maven repository:
+      - "~/.m2:/var/maven/.m2"
+    ports:
+      - "5009:5005" # debug port
+    # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
+    command: >
+      bash -c "
+      mvn
+      -f /app/pom.xml
+      -Duser.home=/var/maven
+      -Dspring-boot-maven-plugin.fork=true
+      -Dspring-boot.run.jvmArguments=\"
+        -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
+        -Dspring.datasource.url=jdbc:postgresql://database/dina?currentSchema=collection
+        -Dspring.datasource.username=postgres
+        -Dspring.datasource.password=p
+        -Dspring.datasource.continue-on-error=true
+        -Dspring.liquibase.user=postgres
+        -Dspring.liquibase.password=p
+        -Dspring.jpa.show-sql=true
+        -Dkeycloak.enabled=true
+        -Dkeycloak.resource=dina
+        -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
+      \"
+      spring-boot:run
+      "
+  # Nextjs's dev-mode server that hot-reloads the UI source code:
+  dina-ui-dev-server:
+    image: node:12.16.1
+    volumes:
+      - "../repos/dina-ui:/dina-ui"
+      # Share host home directory for yarn cache:
+      - /home/${USER}:/home/${USER}
+      # Share host users:
+      - /etc/group:/etc/group:ro
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/shadow:/etc/shadow:ro
+    # Run as Docker host user so generated files don't belong to root:
+    user: $UID:$GID
+    stop_signal: SIGKILL
+    command: >
+      bash -c "
+      yarn --cwd=/dina-ui/packages/dina-ui ;
+      yarn --cwd=/dina-ui/packages/dina-ui dev
+      "
+  # Front-end gateway that proxies URLs to the correct service:
+  dina-ui:
+    image: caddy/caddy:2.3.0-alpine
+    volumes:
+      - "../repos/dina-ui/packages/dina-ui/dev.Caddyfile:/etc/caddy/Caddyfile"
+    environment:
+      UI_DEV_SERVER_ADDRESS: dina-ui-dev-server:3000
