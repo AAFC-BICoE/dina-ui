@@ -724,6 +724,7 @@ export function CollectingEventFormLayout({
                                 </strong>
                               </label>
                               <input
+                                aria-label="customPlace"
                                 className="p-2 form-control"
                                 style={{ width: "60%" }}
                                 onChange={e =>
