@@ -78,7 +78,7 @@ describe("Protocol list page", () => {
 
     await new Promise(setImmediate);
     wrapper.update();
-    expect(mockGet).lastCalledWith(
+    expect(mockGet).toHaveBeenCalledWith(
       "seqdb-api/protocol",
       expect.objectContaining({ filter: { rsql: "name=='*Funnel trap*'" } })
     );

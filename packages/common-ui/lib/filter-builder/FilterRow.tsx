@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import moment from "moment";
-import React from "react";
+import React, { Context } from "react";
 import Select from "react-select";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { ResourceSelect } from "../resource-select/ResourceSelect";
@@ -54,7 +54,6 @@ export type FilterDropdownOption<TValue> = {
 
 export class FilterRow extends React.Component<FilterRowProps> {
   public static contextType = FilterBuilderContext;
-  public context!: FilterBuilderContextI;
 
   public render() {
     const { model, onAndClick, onRemoveClick, onOrClick, showRemoveButton } =
@@ -64,14 +63,14 @@ export class FilterRow extends React.Component<FilterRowProps> {
     const attribute = this.attributeConfig();
 
     // Get the selected Filter Attribute from the parent FilterBuilder's list:
-    const selectedAttributeOption = this.context.attributeOptions.find(
-      option => {
-        const optionAttrString =
-          typeof option.value === "string" ? option.value : option.value.name;
+    const selectedAttributeOption = (
+      this.context as FilterBuilderContextI
+    ).attributeOptions.find(option => {
+      const optionAttrString =
+        typeof option.value === "string" ? option.value : option.value.name;
 
-        return attribute.name === optionAttrString;
-      }
-    );
+      return attribute.name === optionAttrString;
+    });
 
     /** The predicate types to put into the dropdown. */
     const predicateTypes =

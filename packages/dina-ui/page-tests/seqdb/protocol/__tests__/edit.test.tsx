@@ -1,9 +1,9 @@
+import { writeStorage } from "@rehooks/local-storage";
 import { OperationsResponse } from "common-ui";
+import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { ProtocolEditPage } from "../../../../pages/seqdb/protocol/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Protocol } from "../../../../types/seqdb-api/resources/Protocol";
-import { writeStorage } from "@rehooks/local-storage";
-import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -89,7 +89,7 @@ describe("Protocol edit page", () => {
     });
   });
 
-  it("Provides a form to edit a Protocol.", async done => {
+  it("Provides a form to edit a Protocol.", async () => {
     // The get request will return the existing protocol.
     mockGet.mockImplementation(async model => {
       if (model === "seqdb-api/protocol/10") {
@@ -144,41 +144,40 @@ describe("Protocol edit page", () => {
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      // "patch" should have been called with a jsonpatch request containing the existing values
-      // and the modified one.
-      expect(mockPatch).lastCalledWith(
-        "/seqdb-api/operations",
-        [
-          {
-            op: "PATCH",
-            path: "protocol/10",
-            value: {
-              attributes: expect.objectContaining({
-                description: "new desc for protocol 10",
-                group: "aafc",
-                name: "PCR Standardized for Sequencing (10ul), +BSA"
-              }),
-              id: "10",
-              relationships: {
-                kit: {
-                  data: expect.objectContaining({ id: "10", type: "product" })
-                }
-              },
-              type: "protocol"
-            }
-          }
-        ],
-        expect.anything()
-      );
+    await new Promise(setImmediate);
 
-      // The user should be redirected to the existing protocol's details page.
-      expect(mockPush).lastCalledWith("/seqdb/protocol/view?id=10");
-      done();
-    });
+    // "patch" should have been called with a jsonpatch request containing the existing values
+    // and the modified one.
+    expect(mockPatch).lastCalledWith(
+      "/seqdb-api/operations",
+      [
+        {
+          op: "PATCH",
+          path: "protocol/10",
+          value: {
+            attributes: expect.objectContaining({
+              description: "new desc for protocol 10",
+              group: "aafc",
+              name: "PCR Standardized for Sequencing (10ul), +BSA"
+            }),
+            id: "10",
+            relationships: {
+              kit: {
+                data: expect.objectContaining({ id: "10", type: "product" })
+              }
+            },
+            type: "protocol"
+          }
+        }
+      ],
+      expect.anything()
+    );
+
+    // The user should be redirected to the existing protocol's details page.
+    expect(mockPush).lastCalledWith("/seqdb/protocol/view?id=10");
   });
 
-  it("Renders an error after form submit if one is returned from the back-end.", async done => {
+  it("Renders an error after form submit if one is returned from the back-end.", async () => {
     // The patch request will return an error.
     mockPatch.mockImplementationOnce(() => ({
       data: [
@@ -208,14 +207,13 @@ describe("Protocol edit page", () => {
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-        "Constraint violation: name size must be between 1 and 10"
-      );
-      expect(mockPush).toBeCalledTimes(0);
-      done();
-    });
+    await new Promise(setImmediate);
+
+    wrapper.update();
+    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
+      "Constraint violation: name size must be between 1 and 10"
+    );
+    expect(mockPush).toBeCalledTimes(0);
   });
 });
 

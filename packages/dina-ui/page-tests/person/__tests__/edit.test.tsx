@@ -100,7 +100,7 @@ describe("person edit page", () => {
     expect(mockPush).lastCalledWith("/person/list");
   });
 
-  it("Provides a form to edit an person.", async done => {
+  it("Provides a form to edit an person.", async () => {
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
       data: [
@@ -138,34 +138,33 @@ describe("person edit page", () => {
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      // "patch" should have been called with a jsonpatch request containing the existing values
-      // and the modified one.
-      expect(mockPatch).lastCalledWith(
-        "/agent-api/operations",
-        [
-          {
-            op: "PATCH",
-            path: "person/1",
-            value: {
-              attributes: expect.objectContaining({
-                displayName: "new test person"
-              }),
-              id: "1",
-              type: "person"
-            }
-          }
-        ],
-        expect.anything()
-      );
+    await new Promise(setImmediate);
 
-      // The user should be redirected to person's list page.
-      expect(mockPush).lastCalledWith("/person/list");
-      done();
-    });
+    // "patch" should have been called with a jsonpatch request containing the existing values
+    // and the modified one.
+    expect(mockPatch).lastCalledWith(
+      "/agent-api/operations",
+      [
+        {
+          op: "PATCH",
+          path: "person/1",
+          value: {
+            attributes: expect.objectContaining({
+              displayName: "new test person"
+            }),
+            id: "1",
+            type: "person"
+          }
+        }
+      ],
+      expect.anything()
+    );
+
+    // The user should be redirected to person's list page.
+    expect(mockPush).lastCalledWith("/person/list");
   });
 
-  it("Renders an error after form submit if one is returned from the back-end.", async done => {
+  it("Renders an error after form submit if one is returned from the back-end.", async () => {
     // The patch request will return an error.
     mockPatch.mockImplementationOnce(() => ({
       data: [
@@ -189,14 +188,13 @@ describe("person edit page", () => {
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-        "Constraint violation: displayName and email combination should be unique"
-      );
-      expect(mockPush).toBeCalledTimes(0);
-      done();
-    });
+    await new Promise(setImmediate);
+
+    wrapper.update();
+    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
+      "Constraint violation: displayName and email combination should be unique"
+    );
+    expect(mockPush).toBeCalledTimes(0);
   });
 });
 
