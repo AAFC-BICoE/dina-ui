@@ -34,12 +34,6 @@ describe("Upload page", () => {
     jest.clearAllMocks();
   });
 
-  it("renders FileUploader with the necessary props", () => {
-    const wrapper = mountWithAppContext(<UploadPage />, {
-      accountContext: MOCK_ACCOUNT_CONTEXT
-    });
-  });
-
   it("Uploads files when you click the Upload button", async () => {
     const mockPost = jest.fn(() => {
       return {

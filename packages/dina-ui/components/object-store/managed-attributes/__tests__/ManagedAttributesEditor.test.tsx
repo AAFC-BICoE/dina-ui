@@ -120,6 +120,7 @@ describe("ManagedAttributesEditor component", () => {
     wrapper.find(".modal-body form").simulate("submit");
 
     await new Promise(setImmediate);
+    await new Promise(setImmediate);
     wrapper.update();
 
     wrapper.find("form").simulate("submit");

@@ -135,7 +135,7 @@ describe("BrowseStorageTree component", () => {
         parentStorageUnit: null,
         rsql: ""
       },
-      include: "hierarchy,storageUnitChildren",
+      include: "hierarchy,storageUnitChildren,storageUnitType",
       page: {
         limit: 100,
         offset: 0
@@ -155,7 +155,7 @@ describe("BrowseStorageTree component", () => {
       filter: {
         rsql: "name==*test-search-text*"
       },
-      include: "hierarchy,storageUnitChildren",
+      include: "hierarchy,storageUnitChildren,storageUnitType",
       page: {
         limit: 100,
         offset: 0
@@ -174,7 +174,7 @@ describe("BrowseStorageTree component", () => {
         parentStorageUnit: null,
         rsql: ""
       },
-      include: "hierarchy,storageUnitChildren",
+      include: "hierarchy,storageUnitChildren,storageUnitType",
       page: {
         limit: 100,
         offset: 0

@@ -11,7 +11,8 @@ import React, {
   InputHTMLAttributes,
   useCallback,
   useState,
-  ChangeEvent
+  ChangeEvent,
+  useEffect
 } from "react";
 import AutoSuggest, {
   InputProps,
@@ -19,9 +20,8 @@ import AutoSuggest, {
 } from "react-autosuggest";
 import { OnFormikSubmit } from "./safeSubmit";
 
-export type AutoSuggestTextFieldProps<
-  T extends KitsuResource
-> = TextFieldProps & AutoSuggestConfig<T>;
+export type AutoSuggestTextFieldProps<T extends KitsuResource> =
+  TextFieldProps & AutoSuggestConfig<T>;
 
 interface AutoSuggestConfig<T extends KitsuResource> {
   query?: (
@@ -63,6 +63,7 @@ export function AutoSuggestTextField<T extends KitsuResource>({
           {...inputProps}
           shouldRenderSuggestions={shouldRenderSuggestions}
           onSuggestionSelected={onSuggestionSelected}
+          id={textFieldProps.name}
         />
       )}
     />
@@ -76,6 +77,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   configQuery,
   configSuggestion,
   onSuggestionSelected,
+  id,
   ...inputProps
 }: InputHTMLAttributes<any> & AutoSuggestConfig<T>) {
   const formikCtx = useFormikContext<any>();
@@ -96,6 +98,17 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
       : uniq((response?.data ?? []).map(suggestion ?? noop))
     : [];
 
+  useEffect(() => {
+    const autosuggestGeneratedDivs =
+      document?.querySelectorAll<any>(".autosuggest div");
+    // Remove the role from react auto suggest generated div to fix WCAG issues, see #23517
+    autosuggestGeneratedDivs?.forEach(element => {
+      if (element.attributes.role) {
+        element.attributes.role.nodeValue = "";
+      }
+    });
+  }, []);
+
   return (
     <>
       <style>{`
@@ -113,6 +126,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
         `}</style>
       <div className="autosuggest">
         <AutoSuggest
+          id={id}
           suggestions={suggestions}
           getSuggestionValue={s => s}
           onSuggestionsFetchRequested={({ value }) =>
