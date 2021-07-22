@@ -1,4 +1,5 @@
 import {
+  AutoSuggestTextField,
   DateField,
   FieldSet,
   filterBy,
@@ -12,7 +13,8 @@ import { Person } from "../../types/agent-api";
 import {
   MaterialSample,
   MaterialSampleType,
-  PreparationType
+  PreparationType,
+  Vocabulary
 } from "../../types/collection-api";
 
 export interface PreparationFieldProps {
@@ -29,7 +31,8 @@ export const PREPARATION_FIELDS = [
   "preparationType",
   "preparationDate",
   "preparedBy",
-  "preparationRemarks"
+  "preparationRemarks",
+  "dwcDegreeOfEstablishment"
 ] as const;
 
 /** Blank values for all Preparation fields. */
@@ -40,7 +43,8 @@ export const BLANK_PREPARATION: Required<
   preparationType: Object.seal({ id: null, type: "preparation-type" }),
   preparationDate: null,
   preparedBy: Object.seal({ id: null, type: "person" }),
-  preparationRemarks: null
+  preparationRemarks: null,
+  dwcDegreeOfEstablishment: null
 });
 
 export function PreparationField({
@@ -103,6 +107,18 @@ export function PreparationField({
           name={`${namePrefix}preparationRemarks`}
           customName="preparationRemarks"
           multiLines={true}
+        />
+        <AutoSuggestTextField<Vocabulary>
+          name={`${namePrefix}dwcDegreeOfEstablishment`}
+          customName="dwcDegreeOfEstablishment"
+          className="col-sm-6"
+          query={() => ({
+            path: "collection-api/vocabulary/degreeOfEstablishment"
+          })}
+          suggestion={vocabElement =>
+            vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ?? ""
+          }
+          shouldRenderSuggestions={() => true}
         />
       </div>
     </FieldSet>

@@ -20,6 +20,7 @@ export interface MaterialSampleAttributes {
   preparationDate?: string | null;
   preparationRemarks?: string | null;
   description?: string;
+  dwcDegreeOfEstablishment?: string | null;
 
   managedAttributeValues?: ManagedAttributeValues;
   managedAttributes?: JsonValue;
