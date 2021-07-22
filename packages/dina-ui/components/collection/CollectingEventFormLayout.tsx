@@ -338,7 +338,6 @@ export function CollectingEventFormLayout({
         form.setFieldValue(field.attributes["name"]?.value, e.target.checked);
       });
   }
-
   return (
     <div ref={layoutWrapperRef}>
       {!isTemplate && (
@@ -724,6 +723,7 @@ export function CollectingEventFormLayout({
                                 </strong>
                               </label>
                               <input
+                                aria-label="customPlace"
                                 className="p-2 form-control"
                                 style={{ width: "60%" }}
                                 onChange={e =>
