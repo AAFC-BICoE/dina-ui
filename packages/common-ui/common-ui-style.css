@@ -3,7 +3,7 @@
 */
 
 /*
-* Fixes WCAG contrast issue. 
+* Fixes WCAG contrast issue for react-select input elements
 * Not sure if why this works...perhaps padding the element renders it sufficiently for a contrast calculation.
 */
 input[id^=react-select] {
@@ -11,7 +11,7 @@ input[id^=react-select] {
 }
 
 /*
-* Fixes WCAG contrast issue for placeholder text in the "Default Values Configs" textfield and possinly other textfields
+* Fixes WCAG contrast issue for placeholder text in various textfields
 */
 .css-1wa3eu0-placeholder {
   color: #333333 !important;
