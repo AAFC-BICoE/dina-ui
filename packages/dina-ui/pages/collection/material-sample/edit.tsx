@@ -167,9 +167,9 @@ export function MaterialSampleForm({
           className="card card-body sticky-top d-none d-md-block"
           style={{ width: "20rem" }}
         >
-          <h4>
+          <h2>
             <DinaMessage id="formNavigation" />
-          </h4>
+          </h2>
           <div className="list-group">
             {!isTemplate && (
               <a href="#material-sample-section" className="list-group-item">
