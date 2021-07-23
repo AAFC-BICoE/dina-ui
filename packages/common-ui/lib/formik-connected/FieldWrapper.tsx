@@ -128,6 +128,38 @@ export function FieldWrapper({
     return null;
   }
 
+  const fieldWrapperInternal = (
+    <div
+      className={valueCol ? `col-sm-${valueCol}` : ""}
+      style={{ cursor: "auto" }}
+    >
+      <FastField name={name}>
+        {({ field: { value }, form, meta: { error } }) => (
+          <>
+            {readOnly || !children
+              ? readOnlyRender?.(value) ?? (
+                  <ReadOnlyValue link={link} value={value} />
+                )
+              : typeof children === "function"
+              ? children?.({
+                  invalid: Boolean(error),
+                  value,
+                  setValue: newValue => {
+                    // Remove the error message when the user edits the field:
+                    form.setFieldError(name, undefined);
+                    form.setFieldValue(name, newValue);
+                    form.setFieldTouched(name);
+                  },
+                  formik: form
+                })
+              : children}
+            {error && <div className="invalid-feedback">{error}</div>}
+          </>
+        )}
+      </FastField>
+    </div>
+  );
+
   return (
     <div className={classNames(className, { row: isTemplate })}>
       {isTemplate && (
@@ -141,35 +173,7 @@ export function FieldWrapper({
           <div className="mb-2">
             <strong>{fieldLabel}</strong>
           </div>
-          <div
-            className={valueCol ? `col-sm-${valueCol}` : ""}
-            style={{ cursor: "auto" }}
-          >
-            <FastField name={name}>
-              {({ field: { value }, form, meta: { error } }) => (
-                <>
-                  {readOnly || !children
-                    ? readOnlyRender?.(value) ?? (
-                        <ReadOnlyValue link={link} value={value} />
-                      )
-                    : typeof children === "function"
-                    ? children?.({
-                        invalid: Boolean(error),
-                        value,
-                        setValue: newValue => {
-                          // Remove the error message when the user edits the field:
-                          form.setFieldError(name, undefined);
-                          form.setFieldValue(name, newValue);
-                          form.setFieldTouched(name);
-                        },
-                        formik: form
-                      })
-                    : children}
-                  {error && <div className="invalid-feedback">{error}</div>}
-                </>
-              )}
-            </FastField>
-          </div>
+          {fieldWrapperInternal}
         </>
       ) : (
         <label
@@ -199,35 +203,7 @@ export function FieldWrapper({
               {!hideLabel && <strong>{fieldLabel}</strong>}
             </div>
           )}
-          <div
-            className={valueCol ? `col-sm-${valueCol}` : ""}
-            style={{ cursor: "auto" }}
-          >
-            <FastField name={name}>
-              {({ field: { value }, form, meta: { error } }) => (
-                <>
-                  {readOnly || !children
-                    ? readOnlyRender?.(value) ?? (
-                        <ReadOnlyValue link={link} value={value} />
-                      )
-                    : typeof children === "function"
-                    ? children?.({
-                        invalid: Boolean(error),
-                        value,
-                        setValue: newValue => {
-                          // Remove the error message when the user edits the field:
-                          form.setFieldError(name, undefined);
-                          form.setFieldValue(name, newValue);
-                          form.setFieldTouched(name);
-                        },
-                        formik: form
-                      })
-                    : children}
-                  {error && <div className="invalid-feedback">{error}</div>}
-                </>
-              )}
-            </FastField>
-          </div>
+          {fieldWrapperInternal}
         </label>
       )}
     </div>
