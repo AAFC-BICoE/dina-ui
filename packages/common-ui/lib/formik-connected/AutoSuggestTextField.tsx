@@ -58,8 +58,6 @@ export function AutoSuggestTextField<T extends KitsuResource>({
         <AutoSuggestTextFieldInternal
           query={query}
           suggestion={suggestion}
-          configQuery={configQuery}
-          configSuggestion={configSuggestion}
           {...inputProps}
           shouldRenderSuggestions={shouldRenderSuggestions}
           onSuggestionSelected={onSuggestionSelected}
@@ -74,8 +72,6 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   query,
   suggestion = it => String(it),
   shouldRenderSuggestions,
-  configQuery,
-  configSuggestion,
   onSuggestionSelected,
   id,
   ...inputProps
@@ -89,14 +85,12 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   );
 
   const { loading, response } = useQuery<T[]>(
-    configQuery ? configQuery() : (query?.(searchValue, formikCtx) as any)
+    query?.(searchValue, formikCtx) as any
   );
 
   const suggestions =
     response && !loading
-      ? configSuggestion
-        ? configSuggestion(response.data?.[0] as any)
-        : uniq(castArray(response.data).flatMap(suggestion))
+      ? uniq(castArray(response.data).flatMap(suggestion))
       : [];
 
   useEffect(() => {
