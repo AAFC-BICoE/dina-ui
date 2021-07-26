@@ -53,6 +53,6 @@ describe("DeleteButton", () => {
       { apiContext }
     );
 
-    expect(wrapper.html()).toEqual("");
+    expect(wrapper.find(DeleteButton).html()).toEqual(null);
   });
 });

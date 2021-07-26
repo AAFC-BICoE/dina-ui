@@ -1,3 +1,9 @@
+// SSR polyfills:
+
+// The "setimmediate" package from NPM doesn't wait long enough during tests.
+// Manually polyfill here:
+global.setImmediate = (fn) => global.setTimeout(fn, 0);
+
 // Setup Enzyme
 const Enzyme = require("enzyme");
 const Adapter = require("@wojtekmaj/enzyme-adapter-react-17");

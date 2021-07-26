@@ -1,5 +1,6 @@
 import { mount } from "enzyme";
 import { merge, noop } from "lodash";
+import { useRef } from "react";
 import { PartialDeep } from "type-fest";
 import { AccountContextI, AccountProvider } from "../account/AccountProvider";
 import {
@@ -43,6 +44,8 @@ export function MockAppContextProvider({
     }
   };
 
+  const modalWrapperRef = useRef<HTMLDivElement>(null);
+
   return (
     <AccountProvider
       value={{ ...DEFAULT_MOCK_ACCOUNT_CONTEXT, ...accountContext }}
@@ -51,9 +54,11 @@ export function MockAppContextProvider({
         value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
       >
         <CommonUIIntlProvider>
-          <ModalProvider appElement={document.querySelector("body")}>
-            {children}
-          </ModalProvider>
+          <div ref={modalWrapperRef}>
+            <ModalProvider appElement={modalWrapperRef.current}>
+              {children}
+            </ModalProvider>
+          </div>
         </CommonUIIntlProvider>
       </ApiClientProvider>
     </AccountProvider>

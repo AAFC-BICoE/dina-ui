@@ -55,6 +55,7 @@ describe("AreYouSureModal", () => {
     // Click Yes:
     wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
+    await new Promise(setImmediate);
     wrapper.update();
 
     // Should have run the function:

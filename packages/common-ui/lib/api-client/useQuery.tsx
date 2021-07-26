@@ -1,11 +1,12 @@
 import { DocWithErrors } from "jsonapi-typescript";
 import { GetParams, KitsuResponse, KitsuResponseData } from "kitsu";
 import { isArray, isUndefined, omitBy } from "lodash";
-import { useCallback, useContext, useRef } from "react";
-import { useAsyncRun, useAsyncTask } from "react-hooks-async";
+import { useContext, useDebugValue, useMemo } from "react";
+import useSWR from "swr";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { ApiClientContext } from "./ApiClientContext";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
+import { v4 as uuidv4 } from "uuid";
 
 /** Attributes that compose a JsonApi query. */
 export interface JsonApiQuerySpec extends GetParams {
@@ -41,20 +42,16 @@ export interface QueryOptions<TData extends KitsuResponseData, TMeta> {
 export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   querySpec: JsonApiQuerySpec,
   {
-    deps,
-    joinSpecs,
+    deps = [],
+    joinSpecs = [],
     onSuccess,
     disabled = false
   }: QueryOptions<TData, TMeta> = {}
 ): QueryState<TData, TMeta> {
   const { apiClient, bulkGet } = useContext(ApiClientContext);
 
-  const previousResponseRef = useRef<KitsuResponse<TData, TMeta> | undefined>(
-    undefined
-  );
-
   // Memoize the callback. Only re-create it when the query spec changes.
-  const fetchData = useCallback(async () => {
+  async function fetchData() {
     if (disabled) {
       return undefined;
     }
@@ -77,9 +74,7 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
       );
     }
 
-    if (onSuccess) {
-      await onSuccess(response);
-    }
+    await onSuccess?.(response);
 
     if (joinSpecs) {
       const { data } = response;
@@ -91,21 +86,28 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
     }
 
     return response;
-  }, [JSON.stringify(querySpec), disabled, ...(deps ?? [])]);
-
-  // fetchData function should re-run when the query spec changes.
-  const task = useAsyncTask(fetchData);
-  useAsyncRun(task);
-
-  // When the hook is re-fetching after a change of props, provide the previous response while loading.
-  if (task.result && task.result !== previousResponseRef.current) {
-    previousResponseRef.current = task.result;
   }
 
+  const queryKey = JSON.stringify({ querySpec, disabled, deps });
+
+  // Invalidate the query cache on query change, don't use SWR's built-in cache:
+  const cacheId = useMemo(() => uuidv4(), [queryKey]);
+
+  const {
+    data: apiResponse,
+    error,
+    isValidating: loading
+  } = useSWR([queryKey, cacheId], fetchData, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
+  });
+
+  useDebugValue({ querySpec });
+
   return {
-    error: task.error as any,
-    loading: !!task.pending,
-    response: disabled ? undefined : previousResponseRef.current
+    error,
+    loading,
+    response: disabled || loading ? undefined : apiResponse
   };
 }
 

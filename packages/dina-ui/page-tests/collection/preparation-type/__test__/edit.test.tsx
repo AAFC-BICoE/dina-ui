@@ -159,7 +159,7 @@ describe("preparation-type edit page", () => {
     );
   });
 
-  it("Renders an error after form submit without specifying madatory field.", async done => {
+  it("Renders an error after form submit without specifying madatory field.", async () => {
     // The patch request will return an error.
     mockPatch.mockImplementationOnce(() => ({
       data: [
@@ -184,14 +184,13 @@ describe("preparation-type edit page", () => {
 
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-        "Constraint violation: Name is mandatory"
-      );
-      expect(mockPush).toBeCalledTimes(0);
-      done();
-    });
+    await new Promise(setImmediate);
+
+    wrapper.update();
+    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
+      "Constraint violation: Name is mandatory"
+    );
+    expect(mockPush).toBeCalledTimes(0);
   });
 });
 
