@@ -6,13 +6,13 @@ import {
 } from "common-ui";
 import { FormikContextType, useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { debounce, noop, uniq } from "lodash";
+import { castArray, debounce, uniq } from "lodash";
 import React, {
+  ChangeEvent,
   InputHTMLAttributes,
   useCallback,
-  useState,
-  ChangeEvent,
-  useEffect
+  useEffect,
+  useState
 } from "react";
 import AutoSuggest, {
   InputProps,
@@ -28,7 +28,7 @@ interface AutoSuggestConfig<T extends KitsuResource> {
     searchValue: string,
     formikCtx: FormikContextType<any>
   ) => JsonApiQuerySpec;
-  suggestion?: (resource: PersistedResource<T>) => string;
+  suggestion?: (resource: PersistedResource<T>) => string | string[];
   configQuery?: () => JsonApiQuerySpec;
   configSuggestion?: (resource: PersistedResource<T>) => string[];
   shouldRenderSuggestions?: (
@@ -72,7 +72,7 @@ export function AutoSuggestTextField<T extends KitsuResource>({
 
 function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   query,
-  suggestion,
+  suggestion = it => String(it),
   shouldRenderSuggestions,
   configQuery,
   configSuggestion,
@@ -92,11 +92,12 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     configQuery ? configQuery() : (query?.(searchValue, formikCtx) as any)
   );
 
-  const suggestions = !loading
-    ? configSuggestion
-      ? configSuggestion(response?.data?.[0] as any)
-      : uniq((response?.data ?? []).map(suggestion ?? noop))
-    : [];
+  const suggestions =
+    response && !loading
+      ? configSuggestion
+        ? configSuggestion(response.data?.[0] as any)
+        : uniq(castArray(response.data).flatMap(suggestion))
+      : [];
 
   useEffect(() => {
     const autosuggestGeneratedDivs =
