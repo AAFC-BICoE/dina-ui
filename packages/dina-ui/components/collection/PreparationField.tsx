@@ -72,28 +72,27 @@ export function PreparationField({
           optionLabel={person => person.displayName}
           readOnlyLink="/person/view?id="
         />
-        <div className="preparation-type col-sm-6">
-          <Field name={`${namePrefix}preparationType`}>
-            {({ form: { values } }) => (
-              <ResourceSelectField<PreparationType>
-                name={`${namePrefix}preparationType`}
-                customName="preparationType"
-                model="collection-api/preparation-type"
-                optionLabel={it => it.name}
-                readOnlyLink="/collection/preparation-type/view?id="
-                filter={input =>
-                  values.group
-                    ? {
-                        ...filterBy(["name"])(input),
-                        group: { EQ: `${values.group}` }
-                      }
-                    : { ...filterBy(["name"])(input) }
-                }
-                key={values.group}
-              />
-            )}
-          </Field>
-        </div>
+        <Field name={`${namePrefix}preparationType`}>
+          {({ form: { values } }) => (
+            <ResourceSelectField<PreparationType>
+              name={`${namePrefix}preparationType`}
+              customName="preparationType"
+              model="collection-api/preparation-type"
+              optionLabel={it => it.name}
+              readOnlyLink="/collection/preparation-type/view?id="
+              className="col-sm-6 preparation-type"
+              filter={input =>
+                values.group
+                  ? {
+                      ...filterBy(["name"])(input),
+                      group: { EQ: `${values.group}` }
+                    }
+                  : { ...filterBy(["name"])(input) }
+              }
+              key={values.group}
+            />
+          )}
+        </Field>
         <DateField
           name={`${namePrefix}preparationDate`}
           customName="preparationDate"
