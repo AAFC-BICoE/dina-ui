@@ -53,7 +53,7 @@ export default function MaterialSampleEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         <h1>
           <DinaMessage id={title} />
         </h1>
@@ -67,7 +67,7 @@ export default function MaterialSampleEditPage() {
         ) : (
           <MaterialSampleForm onSaved={moveToViewPage} />
         )}
-      </div>
+      </main>
     </div>
   );
 }
@@ -167,9 +167,9 @@ export function MaterialSampleForm({
           className="card card-body sticky-top d-none d-md-block"
           style={{ width: "20rem" }}
         >
-          <h4>
+          <h2>
             <DinaMessage id="formNavigation" />
-          </h4>
+          </h2>
           <div className="list-group">
             {!isTemplate && (
               <a href="#material-sample-section" className="list-group-item">
@@ -223,7 +223,7 @@ export function MaterialSampleForm({
 
         {!isTemplate && (
           <div className="card card-body mb-3">
-            <StorageLinkerField name="storageUnit" />
+            <StorageLinkerField name="storageUnit" removeLabelTag={true} />
           </div>
         )}
         <FieldSet legend={<DinaMessage id="components" />}>
