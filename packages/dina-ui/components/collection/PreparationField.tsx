@@ -119,6 +119,7 @@ export function PreparationField({
             vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ?? ""
           }
           shouldRenderSuggestions={() => true}
+          tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"
         />
       </div>
     </FieldSet>

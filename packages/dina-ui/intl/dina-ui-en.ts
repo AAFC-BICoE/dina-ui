@@ -158,6 +158,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcCountry: "Country",
   field_dwcCountryCode: "Country Code",
   field_dwcDegreeOfEstablishment: "Degree of Establishment",
+  field_dwcDegreeOfEstablishment_tooltip:
+    "The degree to which an Organism survives, reproduces, and expands its range at the given place and time.",
   field_dwcGeodeticDatum: "Geodetic Datum",
   field_dwcGeodeticDatum_tooltip:
     "The geodetic datum upon which the geographic coordinates given in decimalLatitude and decimalLongitude is based. Recommended best practice is to use the EPSG code. Examples: EPSG:4326 (EPSG code for WGS84)",
