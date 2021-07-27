@@ -64,8 +64,15 @@ services:
       RABBITMQ_HOSTNAME: rabbitmq-dina
       IS_MESSAGE_CONSUMER: "true"
       IS_MESSAGE_PRODUCER: "true"
+      keycloak.openid_auth_server: http://${KEYCLOAK_DOMAIN}/auth/realms/dina/protocol/openid-connect/token
+      keycloak.client_id: dina
+      keycloak.username: admin
+      keycloak.password: admin
     stdin_open: true
     tty: true
+    extra_hosts:
+      # Resolve the Keycloak domain to Keycloak's static IP:
+      - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
 
   rabbitmq-dina:
     image: rabbitmq:3-management-alpine
