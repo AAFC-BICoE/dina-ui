@@ -56,7 +56,7 @@ export class WorkbookConversion extends Component<
     const formData = new FormData();
     formData.append("file", acceptedFiles[0].file);
 
-    // Display the loading spinner...
+    // Display the loading spinner, and reset any error messages.
     this.setState({ loading: true });
 
     // Attempt to call the conversion API.
@@ -65,6 +65,12 @@ export class WorkbookConversion extends Component<
       .then(response => {
         this.setState({
           jsonData: response.data,
+          loading: false
+        });
+      })
+      .catch(() => {
+        this.setState({
+          jsonData: null,
           loading: false
         });
       });
