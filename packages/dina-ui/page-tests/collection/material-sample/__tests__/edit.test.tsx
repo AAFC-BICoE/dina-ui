@@ -1,6 +1,7 @@
 import { KitsuResourceLink, PersistedResource } from "kitsu";
 import ReactSwitch from "react-switch";
 import Switch from "react-switch";
+import { BLANK_PREPARATION } from "../../../../components/collection/PreparationField";
 import { MaterialSampleForm } from "../../../../pages/collection/material-sample/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
@@ -295,14 +296,8 @@ describe("Material Sample Edit Page", () => {
               collectingEvent: { id: "1", type: "collecting-event" },
 
               // Preparations are not enabled, so the preparation fields are set to null:
-              preparationDate: null,
-              preparationType: {
-                id: null,
-                type: "preparation-type"
-              },
-              preparedBy: {
-                id: null
-              },
+              ...BLANK_PREPARATION,
+
               managedAttributes: {},
               relationships: {}
             },
@@ -390,14 +385,7 @@ describe("Material Sample Edit Page", () => {
               type: "material-sample",
 
               // Preparations are not enabled, so the preparation fields are set to null:
-              preparationDate: null,
-              preparationType: {
-                id: null,
-                type: "preparation-type"
-              },
-              preparedBy: {
-                id: null
-              },
+              ...BLANK_PREPARATION,
               managedAttributes: {},
               relationships: {}
             },
@@ -493,14 +481,7 @@ describe("Material Sample Edit Page", () => {
                 testAttr: "do the test"
               },
               materialSampleName: "test-ms",
-              preparationDate: null,
-              preparationType: {
-                id: null,
-                type: "preparation-type"
-              },
-              preparedBy: {
-                id: null
-              },
+              ...BLANK_PREPARATION,
               relationships: {},
               type: "material-sample"
             },

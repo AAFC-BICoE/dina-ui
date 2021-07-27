@@ -4,6 +4,7 @@ import {
   BulkDataEditor,
   decodeResourceCell,
   DinaForm,
+  DinaFormSection,
   encodeResourceCell,
   filterBy,
   RowChange,
@@ -11,6 +12,7 @@ import {
   useResourceSelectCells
 } from "common-ui";
 import { pick } from "lodash";
+import { GroupSelectField } from "../../../../../dina-ui/components/group-select/GroupSelectField";
 import { useContext, useState } from "react";
 import { SeqdbMessage, useSeqdbIntl } from "../../../../intl/seqdb-intl";
 import {
@@ -113,7 +115,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
   async function loadData(): Promise<PreLibraryPrepBulkEditRow[]> {
     const { data: selectedSampleStepResources } = await apiClient.get<
       StepResource[]
-    >("seqdb-api/stepResource", {
+    >("seqdb-api/step-resource", {
       filter: {
         "chain.uuid": chain.id,
         "chainStepTemplate.uuid": previousStep.id
@@ -127,12 +129,12 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
       .filter(id => id) as string[];
 
     const { data: plpStepResources } = await apiClient.get<StepResource[]>(
-      "seqdb-api/stepResource",
+      "seqdb-api/step-resource",
       {
         fields: {
           product: "name",
           protocol: "name",
-          molecularSample: "name,version"
+          "molecular-sample": "name,version"
         },
         filter: {
           "chain.uuid": chain.id,
@@ -184,7 +186,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
 
       const plpEdit: PreLibraryPrep = {
         ...(row.changes.plpStepResource?.preLibraryPrep as any),
-        type: "preLibraryPrep",
+        type: "pre-library-prep",
         preLibraryPrepType: plpEditMode,
         ...(plpId ? { id: plpId } : {})
       };
@@ -200,7 +202,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
 
       return {
         resource: plpEdit,
-        type: "preLibraryPrep"
+        type: "pre-library-prep"
       };
     });
 
@@ -224,13 +226,13 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
           "id",
           "type"
         ),
-        type: "stepResource",
+        type: "step-resource",
         value: preLibraryPrep.preLibraryPrepType
       } as StepResource;
 
       return {
         resource: srEdit,
-        type: "stepResource"
+        type: "step-resource"
       };
     });
 
@@ -239,11 +241,16 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
 
   return (
     <>
-      <PreLibPrepEditModeSelector
-        onChange={setPlpEditMode}
-        editMode={plpEditMode}
-      />
       <DinaForm initialValues={{}}>
+        <GroupSelectField
+          name="group"
+          enableStoredDefaultGroup={true}
+          className="col-md-4"
+        />
+        <PreLibPrepEditModeSelector
+          onChange={setPlpEditMode}
+          editMode={plpEditMode}
+        />
         <strong>
           <SeqdbMessage id="editableTable" />:
         </strong>

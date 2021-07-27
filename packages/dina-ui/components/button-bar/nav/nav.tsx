@@ -210,6 +210,11 @@ function NavSeqDBDropdown() {
             <SeqdbMessage id="pcrProfileListTitle" />
           </a>
         </Link>
+        <Link href="/seqdb/pcr-batch/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="pcrBatchListTitle" />
+          </a>
+        </Link>
         <Link href="/seqdb/product/list">
           <a className="dropdown-item">
             <SeqdbMessage id="productListTitle" />
@@ -223,6 +228,11 @@ function NavSeqDBDropdown() {
         <Link href="/seqdb/region/list">
           <a className="dropdown-item">
             <SeqdbMessage id="regionListTitle" />
+          </a>
+        </Link>
+        <Link href="/seqdb/molecular-sample/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="molecularSampleListTitle" />
           </a>
         </Link>
       </div>

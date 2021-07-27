@@ -101,7 +101,7 @@ function ChainForm({ chain, router }: ChainFormProps) {
               label="Workflow Template"
               name="chainTemplate"
               filter={filterBy(["name"])}
-              model="seqdb-api/chainTemplate"
+              model="seqdb-api/chain-template"
               optionLabel={template => template.name}
             />
           </div>

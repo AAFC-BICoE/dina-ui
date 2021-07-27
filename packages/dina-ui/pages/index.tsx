@@ -105,6 +105,13 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
           <li>
+            <Link href="/seqdb/pcr-batch/list">
+              <a>
+                <SeqdbMessage id="pcrBatchListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
             <Link href="/seqdb/product/list">
               <a>
                 <SeqdbMessage id="productListTitle" />
@@ -122,6 +129,13 @@ const Home: React.FunctionComponent = () => (
             <Link href="/seqdb/region/list">
               <a>
                 <SeqdbMessage id="regionListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
+            <Link href="/seqdb/molecular-sample/list">
+              <a>
+                <SeqdbMessage id="molecularSampleListTitle" />
               </a>
             </Link>
           </li>

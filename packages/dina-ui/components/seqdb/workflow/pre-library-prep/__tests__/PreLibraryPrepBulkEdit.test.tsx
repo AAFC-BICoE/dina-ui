@@ -21,45 +21,45 @@ jest.mock("next/dynamic", () => () => {
 });
 
 const TEST_SAMPLES = [
-  { id: "1", type: "molecularSample", name: "test sample 1" },
-  { id: "2", type: "molecularSample", name: "test sample 2" },
-  { id: "3", type: "molecularSample", name: "test sample 3" },
-  { id: "4", type: "molecularSample", name: "test sample 4" },
-  { id: "5", type: "molecularSample", name: "test sample 5" }
+  { id: "1", type: "molecular-sample", name: "test sample 1" },
+  { id: "2", type: "molecular-sample", name: "test sample 2" },
+  { id: "3", type: "molecular-sample", name: "test sample 3" },
+  { id: "4", type: "molecular-sample", name: "test sample 4" },
+  { id: "5", type: "molecular-sample", name: "test sample 5" }
 ] as PersistedResource<MolecularSample>[];
 
 const TEST_SAMPLE_STEP_RESOURCES: PersistedResource<StepResource>[] = [
   {
     id: "1",
     molecularSample: TEST_SAMPLES[0],
-    type: "stepResource"
+    type: "step-resource"
   } as PersistedResource<StepResource>,
   {
     id: "2",
     molecularSample: TEST_SAMPLES[1],
-    type: "stepResource"
+    type: "step-resource"
   } as PersistedResource<StepResource>,
   {
     id: "3",
     molecularSample: TEST_SAMPLES[2],
-    type: "stepResource"
+    type: "step-resource"
   } as PersistedResource<StepResource>,
   {
     id: "4",
     molecularSample: TEST_SAMPLES[3],
-    type: "stepResource"
+    type: "step-resource"
   } as PersistedResource<StepResource>,
   {
     id: "5",
     molecularSample: TEST_SAMPLES[4],
-    type: "stepResource"
+    type: "step-resource"
   } as PersistedResource<StepResource>
 ];
 
 const TEST_CHAIN_TEMPLATE: PersistedResource<ChainTemplate> = {
   id: "1",
   name: "WGS",
-  type: "chainTemplate"
+  type: "chain-template"
 };
 
 const TEST_CHAIN: PersistedResource<Chain> = {
@@ -71,28 +71,30 @@ const TEST_CHAIN: PersistedResource<Chain> = {
 };
 
 /** This is the first step in the chain that precedes this one. */
-const TEST_SAMPLE_SELECTION_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> = {
-  chainTemplate: TEST_CHAIN_TEMPLATE,
-  id: "1",
-  stepNumber: 1,
-  stepTemplate: {
+const TEST_SAMPLE_SELECTION_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> =
+  {
+    chainTemplate: TEST_CHAIN_TEMPLATE,
     id: "1",
-    type: "stepTemplate"
-  } as PersistedResource<StepTemplate>,
-  type: "chainStepTemplate"
-};
+    stepNumber: 1,
+    stepTemplate: {
+      id: "1",
+      type: "step-template"
+    } as PersistedResource<StepTemplate>,
+    type: "chain-step-template"
+  };
 
 /** This is the second and current step in the chain. */
-const TEST_PRE_LIBRARY_PREP_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> = {
-  chainTemplate: TEST_CHAIN_TEMPLATE,
-  id: "2",
-  stepNumber: 2,
-  stepTemplate: {
+const TEST_PRE_LIBRARY_PREP_CHAIN_STEP_TEMPLATE: PersistedResource<ChainStepTemplate> =
+  {
+    chainTemplate: TEST_CHAIN_TEMPLATE,
     id: "2",
-    type: "stepTemplate"
-  } as PersistedResource<StepTemplate>,
-  type: "chainStepTemplate"
-};
+    stepNumber: 2,
+    stepTemplate: {
+      id: "2",
+      type: "step-template"
+    } as PersistedResource<StepTemplate>,
+    type: "chain-step-template"
+  };
 
 const TEST_CHAIN_STEP_TEMPLATES = [
   TEST_SAMPLE_SELECTION_CHAIN_STEP_TEMPLATE,
@@ -123,7 +125,7 @@ describe("PreLibraryPrepStep UI", () => {
 
     /** Mock Kitsu "get" method. */
     mockGet.mockImplementation(async (path, params) => {
-      if (path === "seqdb-api/stepResource") {
+      if (path === "seqdb-api/step-resource") {
         if (params.include === "molecularSample") {
           return { data: TEST_SAMPLE_STEP_RESOURCES };
         } else if (params.include.includes("molecularSample,preLibraryPrep")) {
@@ -169,7 +171,7 @@ describe("PreLibraryPrepStep UI", () => {
     // Assume there are no stepresources for these samples,
     // so this form submit creates 3 stepResources and does not edit existing ones.
     mockPatch.mockImplementation(async (_, operations) => {
-      if (operations[0].path === "preLibraryPrep") {
+      if (operations[0].path === "pre-library-prep") {
         return {
           data: [
             {
@@ -178,16 +180,16 @@ describe("PreLibraryPrepStep UI", () => {
                   preLibraryPrepType: "SHEARING"
                 },
                 id: "2",
-                type: "preLibraryPrep"
+                type: "pre-library-prep"
               },
               status: 201
             }
           ]
         };
       }
-      if (operations[0].path === "stepResource") {
+      if (operations[0].path === "step-resource") {
         return {
-          data: [{ status: 201, data: { id: "12", type: "stepResource" } }]
+          data: [{ status: 201, data: { id: "12", type: "step-resource" } }]
         };
       }
     });
@@ -210,7 +212,7 @@ describe("PreLibraryPrepStep UI", () => {
       [
         {
           op: "POST",
-          path: "preLibraryPrep",
+          path: "pre-library-prep",
           value: {
             attributes: {
               inputAmount: 1234,
@@ -231,7 +233,7 @@ describe("PreLibraryPrepStep UI", () => {
                 }
               }
             },
-            type: "preLibraryPrep"
+            type: "pre-library-prep"
           }
         }
       ],
@@ -244,7 +246,7 @@ describe("PreLibraryPrepStep UI", () => {
       [
         {
           op: "POST",
-          path: "stepResource",
+          path: "step-resource",
           value: {
             attributes: {
               value: "SHEARING"
@@ -260,23 +262,23 @@ describe("PreLibraryPrepStep UI", () => {
               chainStepTemplate: {
                 data: {
                   id: "2",
-                  type: "chainStepTemplate"
+                  type: "chain-step-template"
                 }
               },
               preLibraryPrep: {
                 data: {
                   id: "2",
-                  type: "preLibraryPrep"
+                  type: "pre-library-prep"
                 }
               },
               molecularSample: {
                 data: {
                   id: "2",
-                  type: "molecularSample"
+                  type: "molecular-sample"
                 }
               }
             },
-            type: "stepResource"
+            type: "step-resource"
           }
         }
       ],
@@ -307,12 +309,16 @@ describe("PreLibraryPrepStep UI", () => {
     mockGet.mockImplementation(async (path, params) => {
       // The request for the sample stepResources.
       if (
-        path === "seqdb-api/stepResource" &&
+        path === "seqdb-api/step-resource" &&
         params.include === "molecularSample"
       ) {
         return {
           data: [
-            { id: "5", type: "stepResource", molecularSample: { id: "10" } }
+            {
+              id: "5",
+              type: "step-resource",
+              molecularSample: { id: "10", type: "molecular-sample" }
+            }
           ]
         };
       }
@@ -320,7 +326,7 @@ describe("PreLibraryPrepStep UI", () => {
       // The request for the preLibraryPrep stepResources; There should be a prelibraryprep with
       // an inputAmount for the sample.
       if (
-        path === "seqdb-api/stepResource" &&
+        path === "seqdb-api/step-resource" &&
         params.include.includes("molecularSample,preLibraryPrep")
       ) {
         return {
@@ -330,10 +336,10 @@ describe("PreLibraryPrepStep UI", () => {
               preLibraryPrep: {
                 id: "200",
                 inputAmount: 999,
-                type: "preLibraryPrep"
+                type: "pre-library-prep"
               },
-              molecularSample: { id: "10", type: "molecularSample" },
-              type: "stepResource",
+              molecularSample: { id: "10", type: "molecular-sample" },
+              type: "step-resource",
               value: "SIZE_SELECTION"
             }
           ]

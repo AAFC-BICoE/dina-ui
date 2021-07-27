@@ -8,6 +8,7 @@ import {
 } from "common-ui";
 import { mount } from "enzyme";
 import { merge, noop } from "lodash";
+import { useRef } from "react";
 import { DndProvider } from "react-dnd-cjs";
 import HTML5Backend from "react-dnd-html5-backend-cjs";
 import { PartialDeep } from "type-fest";
@@ -47,6 +48,8 @@ export function MockAppContextProvider({
     }
   };
 
+  const modalWrapperRef = useRef<HTMLDivElement>(null);
+
   return (
     <AccountProvider
       value={{ ...DEFAULT_MOCK_ACCOUNT_CONTEXT, ...accountContext }}
@@ -57,9 +60,11 @@ export function MockAppContextProvider({
         <FileUploadProviderImpl>
           <DinaIntlProvider>
             <DndProvider backend={HTML5Backend}>
-              <ModalProvider appElement={document.querySelector("body")}>
-                {children}
-              </ModalProvider>{" "}
+              <div ref={modalWrapperRef}>
+                <ModalProvider appElement={modalWrapperRef.current}>
+                  {children}
+                </ModalProvider>
+              </div>
             </DndProvider>
           </DinaIntlProvider>
         </FileUploadProviderImpl>

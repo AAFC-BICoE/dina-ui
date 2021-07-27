@@ -3,7 +3,6 @@ import {
   START,
   TYPE_NUMERIC
 } from "../../../../../../dina-ui/types/collection-api";
-import Select from "react-select";
 import ConfigAction, {
   SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
 } from "../../../../../pages/collection/material-sample/workflows/split-config";
@@ -25,13 +24,16 @@ const testRunConfig = {
       type: "Numerical",
       destroyOriginal: true
     },
-    configure_children: { sampleNames: ["my custom name"], sampleDescs: [] }
+    configure_children: { sampleNames: ["my custom name"] }
   }
 };
 
-describe("MaterialSample split workflow run config", () => {
+describe("MaterialSample split workflow series-mode run config", () => {
   it("Initially display the workfow run config with defaults", async () => {
     const wrapper = mountWithAppContext(<ConfigAction />, {});
+
+    // Switch to the "Series" tab:
+    wrapper.find("li.react-tabs__tab.series-tab").simulate("click");
 
     expect(wrapper.find(".baseName-field input").prop("placeholder")).toEqual(
       BASE_NAME
@@ -39,12 +41,17 @@ describe("MaterialSample split workflow run config", () => {
 
     expect(wrapper.find(".start-field input").prop("value")).toEqual(START);
 
-    const { value } = wrapper.find(Select).props();
-    expect(value.value).toEqual(TYPE_NUMERIC);
+    expect(wrapper.find(".suffixType-field Select").prop("value")).toEqual({
+      label: "Numerical",
+      value: TYPE_NUMERIC
+    });
   });
 
-  it("Creates a new Material Sample workfow run config with user custom entries", async () => {
+  it("Creates a new Material Sample workfow series-mode run config with user custom entries", async () => {
     const wrapper = mountWithAppContext(<ConfigAction />, {});
+
+    // Switch to the "Series" tab:
+    wrapper.find("li.react-tabs__tab.series-tab").simulate("click");
 
     wrapper
       .find(".baseName-field input")
@@ -85,5 +92,53 @@ describe("MaterialSample split workflow run config", () => {
       testRunConfig[SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY].configure_children
         .sampleNames[0]
     );
+  });
+
+  it("Creates a new Material Sample workfow batch-mode run config with user custom entries", async () => {
+    const wrapper = mountWithAppContext(<ConfigAction />, {});
+
+    // Switch to the "Batch" tab:
+    wrapper.find("li.react-tabs__tab.batch-tab").simulate("click");
+
+    wrapper
+      .find(".baseName-field input")
+      .simulate("change", { target: { value: "TestBaseName" } });
+
+    wrapper
+      .find(".suffix-field input")
+      .simulate("change", { target: { value: "TestSuffix" } });
+
+    wrapper
+      .find(".numOfChildToCreate-field input")
+      .simulate("change", { target: { value: 3 } });
+
+    wrapper
+      .find(".sampleName0 input")
+      .simulate("change", { target: { value: "CustomName1" } });
+
+    wrapper.update();
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      JSON.parse(
+        localStorage.getItem(SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY) ?? "{}"
+      )
+    ).toEqual({
+      configure: {
+        baseName: "TestBaseName",
+        generationMode: "BATCH",
+        identifier: "MATERIAL_SAMPLE_ID",
+        numOfChildToCreate: 3,
+        suffix: "TestSuffix"
+      },
+      configure_children: {
+        sampleNames: ["CustomName1", null, null]
+      },
+      metadata: {}
+    });
   });
 });

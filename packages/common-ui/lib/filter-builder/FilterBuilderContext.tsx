@@ -1,6 +1,6 @@
+import { startCase } from "lodash";
 import { createContext, useMemo } from "react";
 import { useIntl } from "react-intl";
-import titleCase from "title-case";
 import { FilterAttribute } from "./FilterBuilder";
 import { FilterAttributeOption } from "./FilterRow";
 
@@ -46,7 +46,7 @@ export function FilterBuilderContextProvider({
           customLabel ??
           (messages[messageKey]
             ? formatMessage({ id: messageKey })
-            : titleCase(fieldName));
+            : startCase(fieldName));
 
         return { label: optionLabel, value: attr };
       }),

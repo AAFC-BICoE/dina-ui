@@ -1,5 +1,6 @@
 import { PersistedResource } from "kitsu";
 import ReactSwitch from "react-switch";
+import { BLANK_PREPARATION } from "../../../../components/collection/PreparationField";
 import { CreateMaterialSampleFromWorkflowForm } from "../../../../pages/collection/workflow-template/run";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
@@ -218,14 +219,8 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               },
 
               // Preparations are not enabled, so the preparation fields are set to null:
-              preparationDate: null,
-              preparationType: {
-                id: null,
-                type: "preparation-type"
-              },
-              preparedBy: {
-                id: null
-              },
+              ...BLANK_PREPARATION,
+
               managedAttributes: {},
               relationships: {},
               type: "material-sample"
@@ -302,14 +297,8 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               },
 
               // Preparations are not enabled, so the preparation fields are set to null:
-              preparationDate: null,
-              preparationType: {
-                id: null,
-                type: "preparation-type"
-              },
-              preparedBy: {
-                id: null
-              },
+              ...BLANK_PREPARATION,
+
               managedAttributes: {},
               relationships: {},
               type: "material-sample"
@@ -360,14 +349,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               managedAttributes: {},
 
               // Preparations are not enabled, so the preparation fields are set to null:
-              preparationDate: null,
-              preparationType: {
-                id: null,
-                type: "preparation-type"
-              },
-              preparedBy: {
-                id: null
-              },
+              ...BLANK_PREPARATION,
 
               relationships: {},
               type: "material-sample"

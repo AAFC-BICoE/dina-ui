@@ -103,7 +103,7 @@ describe("collector-group edit page", () => {
     expect(mockPush).lastCalledWith("/collection/collector-group/list");
   });
 
-  it("Renders an error after form submit without specifying madatory field.", async done => {
+  it("Renders an error after form submit without specifying madatory field.", async () => {
     // The patch request will return an error.
     mockPatch.mockImplementationOnce(() => ({
       data: [
@@ -128,14 +128,13 @@ describe("collector-group edit page", () => {
 
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-        "At lease one agent should be specified for the group"
-      );
-      expect(mockPush).toBeCalledTimes(0);
-      done();
-    });
+    await new Promise(setImmediate);
+
+    wrapper.update();
+    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
+      "At lease one agent should be specified for the group"
+    );
+    expect(mockPush).toBeCalledTimes(0);
   });
 });
 

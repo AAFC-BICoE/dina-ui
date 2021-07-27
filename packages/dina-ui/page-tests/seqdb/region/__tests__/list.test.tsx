@@ -64,7 +64,7 @@ describe("Region list page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(mockGet).lastCalledWith(
+    expect(mockGet).toHaveBeenCalledWith(
       "seqdb-api/region",
       expect.objectContaining({ filter: { rsql: "name==*omni*" } })
     );

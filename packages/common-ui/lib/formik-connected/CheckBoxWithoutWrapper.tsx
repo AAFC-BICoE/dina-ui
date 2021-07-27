@@ -71,6 +71,7 @@ export function CheckBoxWithoutWrapper(props: CheckBoxWithoutWrapperProps) {
             value={value || false}
             className={className}
             name={name}
+            aria-label="selectField"
           />
         );
       }}

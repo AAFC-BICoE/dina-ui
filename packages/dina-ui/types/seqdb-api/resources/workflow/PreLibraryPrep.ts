@@ -2,6 +2,7 @@ import { KitsuResource } from "kitsu";
 import { Product, Protocol } from "../..";
 
 export interface PreLibraryPrepAttributes {
+  type: "pre-library-prep";
   preLibraryPrepType: string;
   inputAmount: number;
   targetBpSize: number;
@@ -9,6 +10,7 @@ export interface PreLibraryPrepAttributes {
   concentration: number;
   quality: string;
   notes: string;
+  group?: string;
 }
 
 export interface PreLibraryPrepRelationships {

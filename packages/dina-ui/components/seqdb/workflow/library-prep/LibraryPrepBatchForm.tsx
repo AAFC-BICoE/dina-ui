@@ -8,6 +8,7 @@ import {
   SubmitButton,
   TextField
 } from "common-ui";
+import { GroupSelectField } from "../../../../../dina-ui/components/group-select/GroupSelectField";
 import {
   Chain,
   ChainStepTemplate,
@@ -48,7 +49,7 @@ export function LibraryPrepBatchForm({
       [
         {
           resource: submittedValues,
-          type: "libraryPrepBatch"
+          type: "library-prep-batch"
         }
       ],
       { apiBaseUrl: "/seqdb-api" }
@@ -60,7 +61,7 @@ export function LibraryPrepBatchForm({
         chain,
         chainStepTemplate: step,
         libraryPrepBatch: newLibraryPrepBatch as LibraryPrepBatch,
-        type: "stepResource",
+        type: "step-resource",
         value: "LIBRARY_PREP_BATCH"
       };
 
@@ -68,7 +69,7 @@ export function LibraryPrepBatchForm({
         [
           {
             resource: newStepResource,
-            type: "stepResource"
+            type: "step-resource"
           }
         ],
         { apiBaseUrl: "/seqdb-api" }
@@ -81,6 +82,7 @@ export function LibraryPrepBatchForm({
   return (
     <DinaForm initialValues={libraryPrepBatch || {}} onSubmit={onSubmit}>
       <div className="row">
+        <GroupSelectField className="col-md-2" name="group" />
         <TextField
           className="col-md-2"
           label="Library Prep Batch Name"
@@ -107,21 +109,21 @@ export function LibraryPrepBatchForm({
           className="col-md-2"
           name="containerType"
           filter={filterBy(["name"])}
-          model="seqdb-api/containerType"
+          model="seqdb-api/container-type"
           optionLabel={ct => ct.name}
         />
         <ResourceSelectField<PcrProfile>
           className="col-md-2"
           name="thermocyclerProfile"
           filter={filterBy(["name"])}
-          model="seqdb-api/thermocyclerprofile"
+          model="seqdb-api/thermocycler-profile"
           optionLabel={profile => profile.name}
         />
         <ResourceSelectField<IndexSet>
           className="col-md-2"
           name="indexSet"
           filter={filterBy(["name"])}
-          model="seqdb-api/indexSet"
+          model="seqdb-api/index-set"
           optionLabel={set => set.name}
         />
       </div>

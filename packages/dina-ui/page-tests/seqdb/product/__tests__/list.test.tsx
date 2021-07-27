@@ -63,7 +63,7 @@ describe("Product list page", () => {
 
     await new Promise(setImmediate);
     wrapper.update();
-    expect(mockGet).lastCalledWith(
+    expect(mockGet).toHaveBeenCalledWith(
       "seqdb-api/product",
       expect.objectContaining({ filter: { rsql: "name==*omni*" } })
     );

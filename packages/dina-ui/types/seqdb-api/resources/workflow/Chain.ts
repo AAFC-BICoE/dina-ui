@@ -2,6 +2,7 @@ import { KitsuResource } from "kitsu";
 import { ChainTemplate } from "./ChainTemplate";
 
 export interface ChainAttributes {
+  type: "chain";
   name: string;
   createdOn?: string;
 }

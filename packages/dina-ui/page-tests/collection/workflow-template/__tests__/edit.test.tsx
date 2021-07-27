@@ -48,6 +48,7 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/collecting-event/321?include=collectors,attachment":
       return { data: testCollectionEvent() };
     case "agent-api/person":
+    case "collection-api/material-sample-type":
       return { data: [] };
     case "collection-api/preparation-type":
       return { data: [TEST_PREP_TYPE] };
@@ -102,6 +103,8 @@ async function mountForm(
       await new Promise(setImmediate);
       wrapper.update();
       wrapper.find(".modal-content form").simulate("submit");
+      await new Promise(setImmediate);
+      await new Promise(setImmediate);
     }
     await new Promise(setImmediate);
     wrapper.update();
@@ -127,6 +130,7 @@ async function mountForm(
     if (wrapper.find(".modal-content form").exists()) {
       wrapper.find(".modal-content form").simulate("submit");
     }
+    await new Promise(setImmediate);
     await new Promise(setImmediate);
     wrapper.update();
   }

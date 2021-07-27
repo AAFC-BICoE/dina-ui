@@ -119,6 +119,10 @@ export function FileUploader<TValues = any>({
           inputContent={formatMessage("uploadFormInstructions")}
           inputWithFilesContent={formatMessage("addFilesButton")}
           submitButtonContent={formatMessage("submitBtnText")}
+          classNames={{
+            submitButton: "btn btn-success",
+            inputLabelWithFiles: "btn btn-default dzu-inputLabelAddFiles"
+          }}
         />
       </div>
     );
