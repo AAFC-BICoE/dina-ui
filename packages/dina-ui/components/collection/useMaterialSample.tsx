@@ -156,6 +156,8 @@ export function useMaterialSampleSave({
     )
   );
 
+  const [enableDetermination, setEnableDetermination] = useState(false);
+
   const initialValues: InputResource<MaterialSample> = materialSample
     ? { ...materialSample }
     : {
@@ -206,7 +208,7 @@ export function useMaterialSampleSave({
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
     const dataComponents = document?.querySelectorAll<HTMLDivElement>(
-      ".data-components > fieldset:not(.d-none)"
+      ".data-components fieldset:not(.d-none)"
     );
     dataComponents?.forEach((element, index) => {
       element.style.backgroundColor = index % 2 === 0 ? "#f3f3f3" : "";
@@ -364,6 +366,8 @@ export function useMaterialSampleSave({
     setColEventId,
     colEventQuery,
     materialSampleAttachmentsUI,
-    onSubmit
+    onSubmit,
+    enableDetermination,
+    setEnableDetermination
   };
 }
