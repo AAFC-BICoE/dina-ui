@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { LoadingSpinner } from "common-ui";
+import { IFileWithMeta } from "../object-store/file-upload/FileUploader";
 import Kitsu from "kitsu";
 import WorkbookDisplay from "./WorkbookDisplay";
 import WorkbookUpload from "./WorkbookUpload";
@@ -50,10 +51,10 @@ export class WorkbookConversion extends Component<
    *
    * @param acceptedFile IMetadata file.
    */
-  submitFile = async acceptedFile => {
+  submitFile = async (acceptedFiles: IFileWithMeta[]) => {
     const { apiClient } = this.props;
     const formData = new FormData();
-    formData.append("file", acceptedFile[0].file);
+    formData.append("file", acceptedFiles[0].file);
 
     // Display the loading spinner...
     this.setState({ loading: true });
@@ -72,12 +73,12 @@ export class WorkbookConversion extends Component<
   /**
    * Back button functionality will reset the state to display the upload component.
    */
-  backToUpload() {
+  backToUpload = () => {
     this.setState({
       loading: false,
       jsonData: null
     });
-  }
+  };
 
   render() {
     // Deconstruct the states.
