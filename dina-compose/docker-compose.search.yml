@@ -1,0 +1,85 @@
+version: "3.7"
+
+services:
+  # Elasticsearch Docker Images: https://www.docker.elastic.co/
+  elasticsearch-dina:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.3
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    extra_hosts:
+      # Resolve the Keycloak domain to Keycloak's static IP:
+      - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
+    ports:
+      - 9200:9200
+      - 9300:9300
+    labels:
+      - "traefik.http.routers.elasticsearch.rule=Host(`${ELASTICSEARCH_DOMAIN}`)"
+
+  # Addition of Kibana, for development purpose or browsing through the dina indices.
+  kibana-dina:
+    image: docker.elastic.co/kibana/kibana:7.13.3
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch-dina:9200
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch-dina
+
+  # Check the status of elasticsearch and configure indices if not already present.
+  elastic-configurator:
+    build: ../repos/dina-search-api/es-init-container
+    environment:
+      ELASTIC_SERVER_URL: http://elasticsearch-dina:9200
+      INDEX_CREATE_CMD: ./create-index.sh
+      DINA_DOCUMENT_INDEX_NAME: dina_document_index
+      DINA_AGENT_INDEX_NAME: dina_agent_index
+      DINA_DOCUMENT_INDEX_SETTINGS_FILE: /usr/share/elastic-configurator/settings/default-document-index/dina_document_index_settings.json
+      DINA_AGENT_INDEX_SETTINGS_FILE: /usr/share/elastic-configurator/settings/agent-index/dina_agent_index_settings.json
+    volumes:
+      - ./elastic-configurator-settings:/usr/share/elastic-configurator/settings
+    depends_on:
+      - elasticsearch-dina
+
+  search-ws:
+    build: ../repos/dina-search-api/search-ws
+
+  search-cli:
+    build: ../repos/dina-search-api/search-cli
+    environment:
+      ELASTICSEARCH_URL: elasticsearch-dina
+      MATERIAL_SAMPLE_URL: http://collection-api:8080/api/v1/material-sample
+      METADATA_URL: http://objectstore-api:8080/api/v1/metadata
+      ORGANIZATION_URL: http://agent-api:8080/api/v1/organization
+      PERSON_URL: http://agent-api:8080/api/v1/person
+      RABBITMQ_HOSTNAME: rabbitmq-dina
+      IS_MESSAGE_CONSUMER: "true"
+      IS_MESSAGE_PRODUCER: "true"
+    stdin_open: true
+    tty: true
+
+  rabbitmq-dina:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq-dina'
+    ports:
+        - 5672:5672
+        - 15672:15672
+    volumes:
+        - rabbitmq-data:/var/lib/rabbitmq/
+
+volumes:
+  rabbitmq-data:
+    driver: local
+  elasticsearch-data:
+    driver: local
+  elastic-configurator-settings:
+    driver: local      

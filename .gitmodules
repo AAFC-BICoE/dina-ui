@@ -21,3 +21,7 @@ url = https://github.com/AAFC-BICoE/dina-user-api.git
 [submodule "collection-api"]
 path = repos/collection-api
 url = https://github.com/AAFC-BICoE/natural-history-collection-api.git
+
+[submodule "dina-search-api"]
+path = repos/dina-search-api
+url = https://github.com/AAFC-BICoE/dina-search-api.git
