@@ -15,7 +15,7 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { DeterminationField } from "packages/dina-ui/components/collection/DeterminationField";
+import { DeterminationField } from "../../../components/collection/DeterminationField";
 import { ReactNode, useContext } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
