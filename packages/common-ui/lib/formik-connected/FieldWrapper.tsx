@@ -100,8 +100,12 @@ export function FieldWrapper({
   const { horizontal, readOnly, isTemplate, enabledFields } =
     useDinaFormContext();
 
+  /** Whether this field should be hidden because the template doesn't specify that it should be shown. */
   const disabledByFormTemplate = useMemo(
-    () => (enabledFields ? !enabledFields.includes(name) : false),
+    () =>
+      enabledFields
+        ? !enabledFields.includes(templateCheckboxFieldName || name)
+        : false,
     [enabledFields]
   );
 
