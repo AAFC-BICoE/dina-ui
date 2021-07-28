@@ -29,6 +29,7 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
 import { toPairs, fromPairs } from "lodash";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
+import { ScientificNameSource } from "../../../dina-ui/types/collection-api/resources/Determination";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -162,7 +163,8 @@ export function useMaterialSampleSave({
     ? { ...materialSample }
     : {
         type: "material-sample",
-        managedAttributes: {}
+        managedAttributes: {},
+        determination: [{ type: "determination" }]
       };
 
   /** Used to get the values of the nested CollectingEvent form. */
@@ -320,6 +322,11 @@ export function useMaterialSampleSave({
     );
 
     delete materialSampleInput.managedAttributeValues;
+
+    materialSampleInput.determination?.map(det => {
+      det.scientificName = det.verbatimScientificName;
+      det.scientificNameSource = ScientificNameSource.COLPLUS;
+    });
 
     // Save the MaterialSample:
     const [savedMaterialSample] = await save(
