@@ -3,6 +3,7 @@ import Link from "next/link";
 import React from "react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
+import { SearchBox } from "../../search/SearchBox";
 
 export function Nav() {
   const { roles } = useAccount();
@@ -89,6 +90,9 @@ export function Nav() {
                 <NavDinaUserDropdown />
               </li>
             )}
+            <li className="ms-auto my-auto">
+              <SearchBox />
+            </li>
           </ul>
         </div>
       </div>
