@@ -90,7 +90,7 @@ export function Nav() {
                 <NavDinaUserDropdown />
               </li>
             )}
-            <li className="ms-auto my-auto">
+            <li className="ms-auto my-auto" style={{ width: "25rem" }}>
               <SearchBox />
             </li>
           </ul>

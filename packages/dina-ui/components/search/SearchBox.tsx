@@ -2,12 +2,14 @@ import { DocWithData } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 import { deserialise } from "kitsu-core";
 import { compact, debounce, get } from "lodash";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { useCallback, useState } from "react";
 import AutoSuggest, { InputProps } from "react-autosuggest";
 import useSWR from "swr";
-import { useApiClient } from "../../../common-ui/lib";
+import { LoadingSpinner, useApiClient } from "../../../common-ui/lib";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
-
 export interface SearchBoxProps {
   inputProps?: InputProps<any>;
 }
@@ -26,7 +28,7 @@ export interface AutocompleteSearchResponse {
  * Get the name and link for a resource.
  * This should be updated for any resource that doesn't have a "name" field.
  */
-function getLink(resource: KitsuResource): SearchLink {
+function getLink(resource: KitsuResource): SearchResult {
   const { id } = resource;
 
   switch (resource.type) {
@@ -42,13 +44,15 @@ function getLink(resource: KitsuResource): SearchLink {
   };
 }
 
-export interface SearchLink {
+export interface SearchResult {
   link?: string;
   name: string;
 }
 
 export function SearchBox({ inputProps }: SearchBoxProps) {
   const { apiClient } = useApiClient();
+  const router = useRouter();
+  const { formatMessage } = useDinaIntl();
 
   const [search, setSearch] = useState({
     /** The user's typed input. */
@@ -66,9 +70,9 @@ export function SearchBox({ inputProps }: SearchBoxProps) {
     []
   );
 
-  async function doSearch(): Promise<SearchLink[]> {
+  async function doSearch(): Promise<SearchResult[] | null> {
     if (!search.value) {
-      return [];
+      return null;
     }
 
     const response = await apiClient.axios.get<AutocompleteSearchResponse>(
@@ -99,42 +103,67 @@ export function SearchBox({ inputProps }: SearchBoxProps) {
 
   const { data, error, isValidating } = useSWR([search.value], doSearch);
 
+  function goToPage(link: string) {
+    router.push(link);
+  }
+
   return (
-    <div>
+    <div className="dropdown autosuggest">
       <style>{`
-        .autosuggest-container-open {      
-          position: absolute;
-          z-index: 2; 
-          margin: 0 0 0 -15px; 
-        },
-        .autosuggest-container {
-            display: none;
+        .autosuggest .dropdown-item {
+          white-space: normal;
         }
-        .autosuggest-highlighted { 
+        .autosuggest .suggestion-highlighted {
           background-color: #ddd;
         }
       `}</style>
-      <AutoSuggest<SearchLink>
+      <AutoSuggest<SearchResult>
         onSuggestionsFetchRequested={({ value }) =>
           debouncedSearchUpdate(value)
         }
         suggestions={data ?? []}
-        getSuggestionValue={s => s.name}
-        renderSuggestion={text => <div>{text.name}</div>}
+        getSuggestionValue={() => search.input}
+        highlightFirstSuggestion={true}
+        renderSuggestionsContainer={({ containerProps, children }) => (
+          <div {...containerProps}>
+            {!!data?.length && children}
+            {isValidating && (
+              <div className="dropdown-menu w-100 d-inline">
+                <div className="dropdown-item d-flex justify-content-center">
+                  <LoadingSpinner loading={true} />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        focusInputOnSuggestionClick={true}
+        renderSuggestion={result =>
+          result.link ? (
+            <Link href={result.link}>
+              <a>
+                <div className="w-100">{result.name}</div>
+              </a>
+            </Link>
+          ) : (
+            result.name
+          )
+        }
         inputProps={{
           className: "form-control",
+          placeholder: formatMessage("search"),
           ...inputProps,
 
           onChange: (_, { newValue }) =>
             setSearch(val => ({ ...val, input: newValue })),
           value: search.input
         }}
+        onSuggestionSelected={(_, { suggestion }) =>
+          suggestion.link && goToPage(suggestion.link)
+        }
         theme={{
-          suggestionsList: "list-group",
-          suggestion: "list-group-item",
-          suggestionHighlighted: "autosuggest-highlighted",
-          suggestionsContainerOpen: "autosuggest-container-open",
-          suggestionsContainer: "autosuggest-container"
+          suggestionsList: "dropdown-menu w-100 d-inline",
+          suggestion: "dropdown-item",
+          suggestionHighlighted: "suggestion-highlighted"
         }}
       />
     </div>
