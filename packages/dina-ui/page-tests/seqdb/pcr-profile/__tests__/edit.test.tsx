@@ -124,7 +124,7 @@ describe("PcrProfile edit page", () => {
     });
   });
 
-  it("Provides a form to edit a PcrProfile.", async done => {
+  it("Provides a form to edit a PcrProfile.", async () => {
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
       data: [
@@ -164,38 +164,37 @@ describe("PcrProfile edit page", () => {
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      // "patch" should have been called with a jsonpatch request containing the existing values
-      // and the modified one.
-      expect(mockPatch).lastCalledWith(
-        "/seqdb-api/operations",
-        [
-          {
-            op: "PATCH",
-            path: "thermocycler-profile/1",
-            value: {
-              attributes: expect.objectContaining({
-                application: "new app value",
-                group: "aafc",
-                name: "PROF1"
-              }),
-              id: "1",
-              relationships: {
-                region: {
-                  data: expect.objectContaining({ id: "2", type: "region" })
-                }
-              },
-              type: "thermocycler-profile"
-            }
-          }
-        ],
-        expect.anything()
-      );
+    await new Promise(setImmediate);
 
-      // The user should be redirected to the existing profile's details page.
-      expect(mockPush).lastCalledWith("/seqdb/pcr-profile/view?id=1");
-      done();
-    });
+    // "patch" should have been called with a jsonpatch request containing the existing values
+    // and the modified one.
+    expect(mockPatch).lastCalledWith(
+      "/seqdb-api/operations",
+      [
+        {
+          op: "PATCH",
+          path: "thermocycler-profile/1",
+          value: {
+            attributes: expect.objectContaining({
+              application: "new app value",
+              group: "aafc",
+              name: "PROF1"
+            }),
+            id: "1",
+            relationships: {
+              region: {
+                data: expect.objectContaining({ id: "2", type: "region" })
+              }
+            },
+            type: "thermocycler-profile"
+          }
+        }
+      ],
+      expect.anything()
+    );
+
+    // The user should be redirected to the existing profile's details page.
+    expect(mockPush).lastCalledWith("/seqdb/pcr-profile/view?id=1");
   });
 });
 

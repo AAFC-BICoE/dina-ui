@@ -170,7 +170,13 @@ export function QueryTable<TData extends KitsuResource>({
 
   const { error, loading: queryIsLoading, response } = queryState;
 
-  const totalCount = response?.meta?.totalResourceCount;
+  const lastSuccessfulResponse =
+    useRef<KitsuResponse<TData[], MetaWithTotal>>();
+  if (response) {
+    lastSuccessfulResponse.current = response;
+  }
+
+  const totalCount = lastSuccessfulResponse.current?.meta?.totalResourceCount;
 
   const numberOfPages = totalCount
     ? Math.ceil(totalCount / page.limit)
@@ -181,7 +187,9 @@ export function QueryTable<TData extends KitsuResource>({
       ? reactTableProps(queryState)
       : reactTableProps;
 
-  const shouldShowPagination = !!response?.data?.length;
+  // Show the last loaded page while loading the next page:
+  const displayData = lastSuccessfulResponse.current?.data;
+  const shouldShowPagination = !!displayData?.length;
 
   return (
     <div className="query-table-wrapper" ref={divWrapperRef}>
@@ -222,7 +230,7 @@ export function QueryTable<TData extends KitsuResource>({
         TdComponent={DefaultTd}
         className="-striped"
         columns={mappedColumns}
-        data={response?.data}
+        data={displayData}
         defaultPageSize={page.limit}
         defaultSorted={sortingRules}
         loading={loadingProp || queryIsLoading}

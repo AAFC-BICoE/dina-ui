@@ -1,4 +1,5 @@
 import {
+  AutoSuggestTextField,
   DateField,
   FieldSet,
   filterBy,
@@ -12,7 +13,8 @@ import { Person } from "../../types/agent-api";
 import {
   MaterialSample,
   MaterialSampleType,
-  PreparationType
+  PreparationType,
+  Vocabulary
 } from "../../types/collection-api";
 
 export interface PreparationFieldProps {
@@ -29,7 +31,8 @@ export const PREPARATION_FIELDS = [
   "preparationType",
   "preparationDate",
   "preparedBy",
-  "preparationRemarks"
+  "preparationRemarks",
+  "dwcDegreeOfEstablishment"
 ] as const;
 
 /** Blank values for all Preparation fields. */
@@ -40,7 +43,8 @@ export const BLANK_PREPARATION: Required<
   preparationType: Object.seal({ id: null, type: "preparation-type" }),
   preparationDate: null,
   preparedBy: Object.seal({ id: null, type: "person" }),
-  preparationRemarks: null
+  preparationRemarks: null,
+  dwcDegreeOfEstablishment: null
 });
 
 export function PreparationField({
@@ -72,28 +76,27 @@ export function PreparationField({
           optionLabel={person => person.displayName}
           readOnlyLink="/person/view?id="
         />
-        <div className="preparation-type col-sm-6">
-          <Field name={`${namePrefix}preparationType`}>
-            {({ form: { values } }) => (
-              <ResourceSelectField<PreparationType>
-                name={`${namePrefix}preparationType`}
-                customName="preparationType"
-                model="collection-api/preparation-type"
-                optionLabel={it => it.name}
-                readOnlyLink="/collection/preparation-type/view?id="
-                filter={input =>
-                  values.group
-                    ? {
-                        ...filterBy(["name"])(input),
-                        group: { EQ: `${values.group}` }
-                      }
-                    : { ...filterBy(["name"])(input) }
-                }
-                key={values.group}
-              />
-            )}
-          </Field>
-        </div>
+        <Field name={`${namePrefix}preparationType`}>
+          {({ form: { values } }) => (
+            <ResourceSelectField<PreparationType>
+              name={`${namePrefix}preparationType`}
+              customName="preparationType"
+              model="collection-api/preparation-type"
+              optionLabel={it => it.name}
+              readOnlyLink="/collection/preparation-type/view?id="
+              className="col-sm-6 preparation-type"
+              filter={input =>
+                values.group
+                  ? {
+                      ...filterBy(["name"])(input),
+                      group: { EQ: `${values.group}` }
+                    }
+                  : { ...filterBy(["name"])(input) }
+              }
+              key={values.group}
+            />
+          )}
+        </Field>
         <DateField
           name={`${namePrefix}preparationDate`}
           customName="preparationDate"
@@ -103,6 +106,19 @@ export function PreparationField({
           name={`${namePrefix}preparationRemarks`}
           customName="preparationRemarks"
           multiLines={true}
+        />
+        <AutoSuggestTextField<Vocabulary>
+          name={`${namePrefix}dwcDegreeOfEstablishment`}
+          customName="dwcDegreeOfEstablishment"
+          className="col-sm-6"
+          query={() => ({
+            path: "collection-api/vocabulary/degreeOfEstablishment"
+          })}
+          suggestion={vocabElement =>
+            vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ?? ""
+          }
+          shouldRenderSuggestions={() => true}
+          tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"
         />
       </div>
     </FieldSet>

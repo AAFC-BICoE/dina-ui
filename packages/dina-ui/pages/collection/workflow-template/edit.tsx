@@ -65,7 +65,7 @@ export default function PreparationProcessTemplatePage() {
     <div>
       <Head title={formatMessage(pageTitle)} />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         <h1>
           <DinaMessage id={pageTitle} />
         </h1>
@@ -79,7 +79,7 @@ export default function PreparationProcessTemplatePage() {
         ) : (
           <WorkflowTemplateForm onSaved={moveToNextPage} />
         )}
-      </div>
+      </main>
     </div>
   );
 }

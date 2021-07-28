@@ -9,7 +9,7 @@ import CoordinateParser from "coordinate-parser";
 import { FormikContextType } from "formik";
 import { ReactNode, useState } from "react";
 import useSWR from "swr";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 interface GeographySearchBoxProps {
   inputValue: string;
@@ -136,6 +136,8 @@ export function GeographySearchBox({
   /** The query passed to the nominatum API. This state is only set when the user submits the search input. */
   const [searchValue, setSearchValue] = useState<string>("");
 
+  const { formatMessage } = useDinaIntl();
+
   /** Whether the Geo Api is on hold. Just to make sure we don't send more requests than we are allowed to. */
   const [geoApiRequestsOnHold, setGeoApiRequestsOnHold] = useState(false);
 
@@ -183,6 +185,7 @@ export function GeographySearchBox({
         </label>
         <div className="flex-grow-1">
           <input
+            aria-label={formatMessage("locationLabel")}
             className="form-control"
             onChange={e => onInputChange(e.target.value)}
             onFocus={e => e.target.select()}

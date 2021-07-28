@@ -6,12 +6,13 @@ import {
 } from "common-ui";
 import { FormikContextType, useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { debounce, noop, uniq } from "lodash";
+import { castArray, debounce, uniq } from "lodash";
 import React, {
+  ChangeEvent,
   InputHTMLAttributes,
   useCallback,
-  useState,
-  ChangeEvent
+  useEffect,
+  useState
 } from "react";
 import AutoSuggest, {
   InputProps,
@@ -19,16 +20,15 @@ import AutoSuggest, {
 } from "react-autosuggest";
 import { OnFormikSubmit } from "./safeSubmit";
 
-export type AutoSuggestTextFieldProps<
-  T extends KitsuResource
-> = TextFieldProps & AutoSuggestConfig<T>;
+export type AutoSuggestTextFieldProps<T extends KitsuResource> =
+  TextFieldProps & AutoSuggestConfig<T>;
 
 interface AutoSuggestConfig<T extends KitsuResource> {
   query?: (
     searchValue: string,
     formikCtx: FormikContextType<any>
   ) => JsonApiQuerySpec;
-  suggestion?: (resource: PersistedResource<T>) => string;
+  suggestion?: (resource: PersistedResource<T>) => string | string[];
   configQuery?: () => JsonApiQuerySpec;
   configSuggestion?: (resource: PersistedResource<T>) => string[];
   shouldRenderSuggestions?: (
@@ -58,11 +58,10 @@ export function AutoSuggestTextField<T extends KitsuResource>({
         <AutoSuggestTextFieldInternal
           query={query}
           suggestion={suggestion}
-          configQuery={configQuery}
-          configSuggestion={configSuggestion}
           {...inputProps}
           shouldRenderSuggestions={shouldRenderSuggestions}
           onSuggestionSelected={onSuggestionSelected}
+          id={textFieldProps.name}
         />
       )}
     />
@@ -71,11 +70,10 @@ export function AutoSuggestTextField<T extends KitsuResource>({
 
 function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   query,
-  suggestion,
+  suggestion = it => String(it),
   shouldRenderSuggestions,
-  configQuery,
-  configSuggestion,
   onSuggestionSelected,
+  id,
   ...inputProps
 }: InputHTMLAttributes<any> & AutoSuggestConfig<T>) {
   const formikCtx = useFormikContext<any>();
@@ -87,14 +85,24 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   );
 
   const { loading, response } = useQuery<T[]>(
-    configQuery ? configQuery() : (query?.(searchValue, formikCtx) as any)
+    query?.(searchValue, formikCtx) as any
   );
 
-  const suggestions = !loading
-    ? configSuggestion
-      ? configSuggestion(response?.data?.[0] as any)
-      : uniq((response?.data ?? []).map(suggestion ?? noop))
-    : [];
+  const suggestions =
+    response && !loading
+      ? uniq(castArray(response.data).flatMap(suggestion))
+      : [];
+
+  useEffect(() => {
+    const autosuggestGeneratedDivs =
+      document?.querySelectorAll<any>(".autosuggest div");
+    // Remove the role from react auto suggest generated div to fix WCAG issues, see #23517
+    autosuggestGeneratedDivs?.forEach(element => {
+      if (element.attributes.role) {
+        element.attributes.role.nodeValue = "";
+      }
+    });
+  }, []);
 
   return (
     <>
@@ -113,6 +121,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
         `}</style>
       <div className="autosuggest">
         <AutoSuggest
+          id={id}
           suggestions={suggestions}
           getSuggestionValue={s => s}
           onSuggestionsFetchRequested={({ value }) =>

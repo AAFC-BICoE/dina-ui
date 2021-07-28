@@ -10,3 +10,4 @@ export * from "./resources/MaterialSampleType";
 export * from "./resources/MaterialSampleRunConfig";
 export * from "./resources/StorageUnit";
 export * from "./resources/StorageUnitType";
+export * from "./resources/VocabularyElement";

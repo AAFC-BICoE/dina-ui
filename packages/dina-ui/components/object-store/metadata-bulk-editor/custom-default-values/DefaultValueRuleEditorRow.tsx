@@ -1,7 +1,7 @@
 import { HotColumnProps } from "@handsontable/react";
 import { SelectField, TextField } from "common-ui";
 import { useFormikContext } from "formik";
-import titleCase from "title-case";
+import { startCase } from "lodash";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import { DefaultValueRule, DefaultValuesConfig } from "./model-types";
 
@@ -29,12 +29,12 @@ export function DefaultValueRuleEditorRow({
   }));
 
   const sourceTypeOptions = ["text", "objectUploadField"].map(sourceType => ({
-    label: formatMessage(sourceType as any).trim() || titleCase(sourceType),
+    label: formatMessage(sourceType as any).trim() || startCase(sourceType),
     value: sourceType
   }));
 
   const objectUploadFieldOptions = OBJECT_UPLOAD_FIELDS.map(field => ({
-    label: formatMessage(`field_${field}` as any).trim() || titleCase(field),
+    label: formatMessage(`field_${field}` as any).trim() || startCase(field),
     value: field
   }));
 
