@@ -2,14 +2,15 @@ import { DocWithData } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 import { deserialise } from "kitsu-core";
 import { compact, debounce, get } from "lodash";
-import Link from "next/link";
 import { useRouter } from "next/router";
-import { useCallback, useState } from "react";
-import AutoSuggest, { InputProps } from "react-autosuggest";
+import { useCallback, useEffect, useState } from "react";
+import { InputProps } from "react-autosuggest";
+import Select from "react-select";
 import useSWR from "swr";
-import { LoadingSpinner, useApiClient } from "../../../common-ui/lib";
+import { useApiClient } from "../../../common-ui/lib";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
+
 export interface SearchBoxProps {
   inputProps?: InputProps<any>;
 }
@@ -63,12 +64,11 @@ export function SearchBox({ inputProps }: SearchBoxProps) {
 
   /** Updates the actual search value passed to the API. */
   const debouncedSearchUpdate = useCallback(
-    debounce(
-      (newValue: string) => setSearch({ input: newValue, value: newValue }),
-      250
-    ),
+    debounce(() => setSearch(({ input }) => ({ input, value: input })), 250),
     []
   );
+
+  useEffect(debouncedSearchUpdate, [search.input]);
 
   async function doSearch(): Promise<SearchResult[] | null> {
     if (!search.value) {
@@ -107,65 +107,37 @@ export function SearchBox({ inputProps }: SearchBoxProps) {
     router.push(link);
   }
 
-  return (
-    <div className="dropdown autosuggest">
-      <style>{`
-        .autosuggest .dropdown-item {
-          white-space: normal;
-        }
-        .autosuggest .suggestion-highlighted {
-          background-color: #ddd;
-        }
-      `}</style>
-      <AutoSuggest<SearchResult>
-        onSuggestionsFetchRequested={({ value }) =>
-          debouncedSearchUpdate(value)
-        }
-        suggestions={data ?? []}
-        getSuggestionValue={() => search.input}
-        highlightFirstSuggestion={true}
-        renderSuggestionsContainer={({ containerProps, children }) => (
-          <div {...containerProps}>
-            {!!data?.length && children}
-            {isValidating && (
-              <div className="dropdown-menu w-100 d-inline">
-                <div className="dropdown-item d-flex justify-content-center">
-                  <LoadingSpinner loading={true} />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-        focusInputOnSuggestionClick={true}
-        renderSuggestion={result =>
-          result.link ? (
-            <Link href={result.link}>
-              <a>
-                <div className="w-100">{result.name}</div>
-              </a>
-            </Link>
-          ) : (
-            result.name
-          )
-        }
-        inputProps={{
-          className: "form-control",
-          placeholder: formatMessage("search"),
-          ...inputProps,
+  const selectOptions =
+    data?.map(result => ({
+      label: result.name,
+      value: result.link
+    })) ?? [];
 
-          onChange: (_, { newValue }) =>
-            setSearch(val => ({ ...val, input: newValue })),
-          value: search.input
-        }}
-        onSuggestionSelected={(_, { suggestion }) =>
-          suggestion.link && goToPage(suggestion.link)
-        }
-        theme={{
-          suggestionsList: "dropdown-menu w-100 d-inline",
-          suggestion: "dropdown-item",
-          suggestionHighlighted: "suggestion-highlighted"
-        }}
-      />
-    </div>
+  const customStyle: any = {
+    multiValueLabel: base => ({ ...base, cursor: "move" }),
+    placeholder: base => ({ ...base, color: "rgb(87,120,94)" }),
+    control: base => ({ ...base, cursor: "text" }),
+    dropdownIndicator: base => ({ ...base, display: "none" }),
+    // Hide the menu when there is no data:
+    menu: base => ({ ...base, ...(!data && { display: "none" }) }),
+    option: base => ({ ...base, cursor: "pointer" })
+  };
+
+  return (
+    <Select
+      placeholder={formatMessage("search")}
+      options={selectOptions}
+      onInputChange={newVal =>
+        setSearch(current => ({ ...current, input: newVal }))
+      }
+      onChange={option => option?.value && goToPage(option.value)}
+      inputValue={search.input}
+      isLoading={isValidating}
+      value={null}
+      styles={{
+        ...customStyle
+      }}
+      noOptionsMessage={() => formatMessage("noResultsFound")}
+    />
   );
 }
