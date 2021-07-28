@@ -14,7 +14,7 @@ import { withRouter } from "next/router";
 import {
   DeterminationField,
   DETERMINATION_FIELDS
-} from "packages/dina-ui/components/collection/DeterminationField";
+} from "../../../components/collection/DeterminationField";
 import { Head, Nav, StorageLinkerField } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import {

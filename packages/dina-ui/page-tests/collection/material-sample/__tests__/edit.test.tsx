@@ -72,6 +72,11 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/material-sample-type":
     case "user-api/group":
     case "agent-api/person":
+    case "collection-api/vocabulary/srs":
+    case "collection-api/vocabulary/coordinateSystem":
+    case "collection-api/vocabulary/degreeOfEstablishment":
+    case "collection-api/storage-unit-type":
+    case "collection-api/storage-unit":
     case "objectstore-api/metadata":
       return { data: [] };
   }
@@ -156,7 +161,6 @@ describe("Material Sample Edit Page", () => {
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               geoReferenceAssertions: [
                 {
-                  georeferencedBy: undefined,
                   isPrimary: true
                 }
               ],
@@ -179,6 +183,13 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
+              determination: [
+                {
+                  scientificName: undefined,
+                  scientificNameSource: "COLPLUS",
+                  type: "determination"
+                }
+              ],
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
@@ -239,6 +250,13 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
+              determination: [
+                {
+                  scientificName: undefined,
+                  scientificNameSource: "COLPLUS",
+                  type: "determination"
+                }
+              ],
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
