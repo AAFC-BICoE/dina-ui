@@ -10,6 +10,7 @@ import useSWR from "swr";
 import { useApiClient } from "../../../common-ui/lib";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
+import { AxiosInstance } from "axios";
 
 // The parts of the API response used by this component:
 export interface AutocompleteSearchResponse {
@@ -71,38 +72,9 @@ export function SearchBox() {
 
   useEffect(debouncedSearchUpdate, [search.input]);
 
-  async function doSearch(): Promise<SearchResult[] | null> {
-    if (!search.value) {
-      return null;
-    }
-
-    const response = await apiClient.axios.get<AutocompleteSearchResponse>(
-      "search-api/search/auto-complete",
-      {
-        params: {
-          prefix: search.value,
-          autoCompleteField: "data.attributes.displayName",
-          additionalField: "",
-          indexName: "dina_document_index"
-        }
-      }
-    );
-
-    const jsonApiDocs = compact(
-      response.data.hits?.hits?.map(hit => hit.sourceAsMap)
-    );
-
-    // Deserialize the responses to Kitsu format.
-    const resources = await Promise.all(
-      jsonApiDocs.map<Promise<KitsuResource>>(
-        async doc => (await deserialise(doc)).data
-      )
-    );
-
-    return resources.map(getLink);
-  }
-
-  const { data, error, isValidating } = useSWR([search.value], doSearch);
+  const { data, error, isValidating } = useSWR([search.value], () =>
+    doSearch(apiClient.axios, search.value)
+  );
 
   const selectOptions =
     data?.map(result => ({
@@ -165,4 +137,39 @@ function LinkOption(props: OptionProps<OptionTypeBase, boolean>) {
   ) : (
     option
   );
+}
+
+/** Does the search against the search API. */
+export async function doSearch(
+  axios: Pick<AxiosInstance, "get">,
+  searchValue?: string
+) {
+  if (!searchValue) {
+    return null;
+  }
+
+  const response = await axios.get<AutocompleteSearchResponse>(
+    "search-api/search/auto-complete",
+    {
+      params: {
+        prefix: searchValue,
+        autoCompleteField: "data.attributes.displayName",
+        additionalField: "",
+        indexName: "dina_document_index"
+      }
+    }
+  );
+
+  const jsonApiDocs = compact(
+    response.data.hits?.hits?.map(hit => hit.sourceAsMap)
+  );
+
+  // Deserialize the responses to Kitsu format.
+  const resources = await Promise.all(
+    jsonApiDocs.map<Promise<KitsuResource>>(
+      async doc => (await deserialise(doc)).data
+    )
+  );
+
+  return resources.map(getLink);
 }
