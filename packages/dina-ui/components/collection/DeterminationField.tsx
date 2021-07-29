@@ -126,6 +126,11 @@ export function DeterminationField({
                                 customName="typeStatusEvidence"
                                 multiLines={true}
                               />
+                              <TextField
+                                name={`${namePrefix}${commonRoot}qualifier`}
+                                customName="qualifier"
+                                multiLines={true}
+                              />
                             </div>
                             {!readOnly && !isTemplate && (
                               <div className="list-inline mb-3">
