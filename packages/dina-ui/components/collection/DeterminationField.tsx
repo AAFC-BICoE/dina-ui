@@ -62,7 +62,7 @@ export function DeterminationField({
           }
 
           return (
-            <div className="georeference-assertion-section">
+            <div className="determination-section">
               <Tabs selectedIndex={activeTabIdx} onSelect={setActiveTabIdx}>
                 {
                   // Only show the tabs when there is more than 1 assertion:
@@ -100,7 +100,7 @@ export function DeterminationField({
                                 })}
                                 suggestion={sample =>
                                   (sample.determination?.map(
-                                    det => det.verbatimAgent
+                                    det => det?.verbatimAgent
                                   ) as any) ?? []
                                 }
                               />

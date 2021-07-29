@@ -100,13 +100,15 @@ export function WorkflowTemplateForm({
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
   const preparationsAndAttachmentsFormRef = useRef<FormikProps<any>>(null);
   const identifiersSectionRef = useRef<FormikProps<any>>(null);
+  const determinationFormRef = useRef<FormikProps<any>>(null);
 
   const { actionType, setActionType } = useActionTypeToggle(
     fetchedActionDefinition?.actionType ?? "ADD",
     [
       collectingEvtFormRef,
       preparationsAndAttachmentsFormRef,
-      identifiersSectionRef
+      identifiersSectionRef,
+      determinationFormRef
     ]
   );
 
@@ -153,22 +155,34 @@ export function WorkflowTemplateForm({
     )
   };
 
+  const determinationTemplate = {
+    templateFields: {
+      determination: formTemplates?.MATERIAL_SAMPLE?.templateFields
+        .determination ?? { enabled: true, defaultValue: [{}] }
+    }
+  };
+
   const preparationsTemplateInitialValues =
     getTemplateInitialValuesFromSavedFormTemplate(preparationsTemplate);
   const identifiersTemplateInitialValues =
     getTemplateInitialValuesFromSavedFormTemplate(identifiersTemplate);
 
+  const determinationTemplateInitialValues =
+    getTemplateInitialValuesFromSavedFormTemplate(determinationTemplate);
+
   const materialSampleSaveHook = useMaterialSampleSave({
     isTemplate: true,
     colEventTemplateInitialValues,
     preparationsTemplateInitialValues,
-    collectingEvtFormRef
+    collectingEvtFormRef,
+    determinationTemplateInitialValues
   });
 
   const {
     colEventId: attachedColEventId,
     enableCollectingEvent,
-    enablePreparations
+    enablePreparations,
+    enableDetermination
   } = materialSampleSaveHook;
 
   async function onSaveTemplateSubmit({
@@ -194,6 +208,11 @@ export function WorkflowTemplateForm({
                   preparationsAndAttachmentsFormRef.current
                     ? getEnabledTemplateFieldsFromForm(
                         preparationsAndAttachmentsFormRef.current.values
+                      )
+                    : undefined),
+                  ...(enableDetermination && determinationFormRef.current
+                    ? getEnabledTemplateFieldsFromForm(
+                        determinationFormRef.current.values
                       )
                     : undefined)
                 }
@@ -307,10 +326,14 @@ export function WorkflowTemplateForm({
             preparationsTemplateInitialValues={
               preparationsTemplateInitialValues
             }
+            determinationTemplateInitialValues={
+              determinationTemplateInitialValues
+            }
             identifiersTemplateInitialValues={identifiersTemplateInitialValues}
             materialSampleSaveHook={materialSampleSaveHook}
             preparationsSectionRef={preparationsAndAttachmentsFormRef}
             identifiersSectionRef={identifiersSectionRef}
+            determinationSectionRef={determinationFormRef}
           />
         </DinaFormSection>
       ) : actionType === "SPLIT" ? (

@@ -111,6 +111,10 @@ function useWorkflowMaterialSampleInitialValues(
       actionDefinition.formTemplates.MATERIAL_SAMPLE?.templateFields
     );
 
+    if (!materialSampleInitialValues.determination) {
+      materialSampleInitialValues.determination = [{}];
+    }
+
     const collectingEvent = getInitialValuesFromTemplateFields(
       "collecting-event",
       actionDefinition.formTemplates.COLLECTING_EVENT?.templateFields

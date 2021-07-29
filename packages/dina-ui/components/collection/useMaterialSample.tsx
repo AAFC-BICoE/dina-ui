@@ -30,6 +30,7 @@ import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
 import { toPairs, fromPairs } from "lodash";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
 import { ScientificNameSource } from "../../../dina-ui/types/collection-api/resources/Determination";
+import { DETERMINATION_FIELDS } from "./DeterminationField";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -111,6 +112,10 @@ export interface UseMaterialSampleSaveParams {
 
   materialSampleAttachmentsConfig?: AllowAttachmentsConfig;
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
+
+  determinationTemplateInitialValues?: Partial<MaterialSample> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
 }
 
 export function useMaterialSampleSave({
@@ -123,7 +128,8 @@ export function useMaterialSampleSave({
   enabledFields,
   materialSampleAttachmentsConfig,
   collectingEventAttachmentsConfig,
-  preparationsTemplateInitialValues
+  preparationsTemplateInitialValues,
+  determinationTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
@@ -136,6 +142,10 @@ export function useMaterialSampleSave({
   const hasPreparationsTemplate =
     isTemplate &&
     !isEmpty(preparationsTemplateInitialValues?.templateCheckboxes);
+  // For editing existing templates:
+  const hasDeterminationTemplate =
+    isTemplate &&
+    !isEmpty(determinationTemplateInitialValues?.templateCheckboxes);
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(
@@ -157,14 +167,29 @@ export function useMaterialSampleSave({
     )
   );
 
-  const [enableDetermination, setEnableDetermination] = useState(false);
+  const [enableDetermination, setEnableDetermination] = useState(
+    Boolean(
+      hasDeterminationTemplate ||
+        DETERMINATION_FIELDS.some(detFieldName =>
+          materialSample?.determination
+            ?.map(
+              (det, idx) =>
+                det?.[detFieldName] ||
+                enabledFields?.materialSample?.[
+                  `determination[${idx}]`
+                ].includes(detFieldName)
+            )
+            .includes(true)
+        )
+    )
+  );
 
   const initialValues: InputResource<MaterialSample> = materialSample
     ? { ...materialSample }
     : {
         type: "material-sample",
         managedAttributes: {},
-        determination: [{ type: "determination" }]
+        determination: [{}]
       };
 
   /** Used to get the values of the nested CollectingEvent form. */
@@ -324,8 +349,10 @@ export function useMaterialSampleSave({
     delete materialSampleInput.managedAttributeValues;
 
     materialSampleInput.determination?.map(det => {
-      det.scientificName = det.verbatimScientificName;
-      det.scientificNameSource = ScientificNameSource.COLPLUS;
+      if (det) {
+        det.scientificName = det?.verbatimScientificName;
+        det.scientificNameSource = ScientificNameSource.COLPLUS;
+      }
     });
 
     // Save the MaterialSample:
