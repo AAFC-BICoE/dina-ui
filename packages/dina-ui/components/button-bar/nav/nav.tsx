@@ -1,6 +1,7 @@
 import { LanguageSelector, NavbarUserControl, useAccount } from "common-ui";
 import Link from "next/link";
 import React from "react";
+import { Container, Nav as BSNav, Navbar, NavItem } from "react-bootstrap";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { SearchBox } from "../../search/SearchBox";
@@ -54,47 +55,48 @@ export function Nav() {
         </div>
       </div>
       <div className="app-bar">
-        <div className="container">
-          <ul className="list-inline d-flex m-0">
-            <style>
-              {`
-                .dropdown:hover .dropdown-menu {
-                    display: block;
-                }
-                .dropdown a.nav-link {
-                  color: rgb(232, 230, 227);
-                }
-              `}
-            </style>
-            <li className="list-inline-item me-4">
-              <Link href="/">
-                <a className="app-name px-0">
+        <style>
+          {`
+            .navbar-collapse .dropdown:hover .dropdown-menu {
+              display: block;
+            }
+            .dropdown a.nav-link, .app-name {
+              color: rgb(232, 230, 227) !important;
+            }
+          `}
+        </style>
+        <Navbar collapseOnSelect={true} expand="lg">
+          <Container>
+            <Navbar.Toggle />
+            <Navbar.Collapse id="responsive-navbar-nav">
+              <BSNav className="d-flex">
+                <BSNav.Link href="/" className="app-name p-0 me-4">
                   <DinaMessage id="appTitle" />
-                </a>
-              </Link>
-            </li>
-            <li className="list-inline-item my-auto">
-              <NavObjectStoreDropdown />
-            </li>
-            <li className="list-inline-item my-auto">
-              <NavAgentsDropdown />
-            </li>
-            <li className="list-inline-item my-auto">
-              <NavSeqDBDropdown />
-            </li>
-            <li className="list-inline-item my-auto">
-              <NavCollectionDropdown />
-            </li>
-            {showUsersLinks && (
-              <li className="list-inline-item my-auto">
-                <NavDinaUserDropdown />
-              </li>
-            )}
-            <li className="ms-auto my-auto" style={{ width: "25rem" }}>
+                </BSNav.Link>
+                <NavItem className="my-auto">
+                  <NavObjectStoreDropdown />
+                </NavItem>
+                <NavItem className="my-auto">
+                  <NavAgentsDropdown />
+                </NavItem>
+                <NavItem className="my-auto">
+                  <NavSeqDBDropdown />
+                </NavItem>
+                <NavItem className="my-auto">
+                  <NavCollectionDropdown />
+                </NavItem>
+                {showUsersLinks && (
+                  <NavItem className="my-auto">
+                    <NavDinaUserDropdown />
+                  </NavItem>
+                )}
+              </BSNav>
+            </Navbar.Collapse>
+            <NavItem style={{ width: "25rem" }}>
               <SearchBox />
-            </li>
-          </ul>
-        </div>
+            </NavItem>
+          </Container>
+        </Navbar>
       </div>
     </header>
   );
