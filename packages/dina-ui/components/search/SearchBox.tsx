@@ -1,20 +1,17 @@
 import { DocWithData } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 import { deserialise } from "kitsu-core";
-import { compact, debounce, get } from "lodash";
+import { compact, debounce, get, startCase } from "lodash";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
-import { InputProps } from "react-autosuggest";
-import Select from "react-select";
+import Select, { components, OptionProps, OptionTypeBase } from "react-select";
 import useSWR from "swr";
 import { useApiClient } from "../../../common-ui/lib";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 
-export interface SearchBoxProps {
-  inputProps?: InputProps<any>;
-}
-
+// The parts of the API response used by this component:
 export interface AutocompleteSearchResponse {
   hits?: {
     hits?: {
@@ -23,6 +20,12 @@ export interface AutocompleteSearchResponse {
       sourceAsMap?: DocWithData;
     }[];
   };
+}
+
+// The data passed from each API search result into a Select Option:
+export interface SearchResult {
+  link?: string;
+  name: string;
 }
 
 /**
@@ -35,22 +38,20 @@ function getLink(resource: KitsuResource): SearchResult {
   switch (resource.type) {
     case "person":
       return {
-        name: (resource as Person).displayName,
+        name: `Person: ${(resource as Person).displayName}`,
         link: `/person/view?id=${id}`
       };
   }
 
   return {
-    name: get(resource, "name") ?? resource.id ?? String(resource)
+    name: `${startCase(resource.type)}: ${
+      get(resource, "name") ?? resource.id ?? String(resource)
+    }`
   };
 }
 
-export interface SearchResult {
-  link?: string;
-  name: string;
-}
-
-export function SearchBox({ inputProps }: SearchBoxProps) {
+/** Autocomplete search box to link to other pages of the application. */
+export function SearchBox() {
   const { apiClient } = useApiClient();
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
@@ -103,10 +104,6 @@ export function SearchBox({ inputProps }: SearchBoxProps) {
 
   const { data, error, isValidating } = useSWR([search.value], doSearch);
 
-  function goToPage(link: string) {
-    router.push(link);
-  }
-
   const selectOptions =
     data?.map(result => ({
       label: result.name,
@@ -114,7 +111,6 @@ export function SearchBox({ inputProps }: SearchBoxProps) {
     })) ?? [];
 
   const customStyle: any = {
-    multiValueLabel: base => ({ ...base, cursor: "move" }),
     placeholder: base => ({ ...base, color: "rgb(87,120,94)" }),
     control: base => ({ ...base, cursor: "text" }),
     dropdownIndicator: base => ({ ...base, display: "none" }),
@@ -130,14 +126,43 @@ export function SearchBox({ inputProps }: SearchBoxProps) {
       onInputChange={newVal =>
         setSearch(current => ({ ...current, input: newVal }))
       }
-      onChange={option => option?.value && goToPage(option.value)}
+      onChange={option => option?.value && router.push(option.value)}
       inputValue={search.input}
       isLoading={isValidating}
       value={null}
-      styles={{
-        ...customStyle
+      styles={customStyle}
+      components={{
+        Option: LinkOption
       }}
       noOptionsMessage={() => formatMessage("noResultsFound")}
     />
+  );
+}
+
+/** Changes the select menu Option into a regular link for the Search Box. */
+function LinkOption(props: OptionProps<OptionTypeBase, boolean>) {
+  const link = props.data.value;
+
+  // Customize react-select's Option component:
+  const option = (
+    <components.Option
+      {...props}
+      innerProps={{
+        ...props.innerProps,
+        // Middle clicking a link shouldn't close the menu:
+        ...{ onMouseDown: e => e.preventDefault() },
+        // Clicking a link shouldn't select the option:
+        onClick: () => undefined
+      }}
+    />
+  );
+
+  // Wrap the option in a Link:
+  return link ? (
+    <Link href={link}>
+      <a>{option}</a>
+    </Link>
+  ) : (
+    option
   );
 }
