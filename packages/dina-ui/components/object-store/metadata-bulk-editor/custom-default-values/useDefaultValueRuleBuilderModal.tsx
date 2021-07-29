@@ -22,11 +22,11 @@ export function useDefaultValueRuleEditorModal() {
           }
         `}</style>
         <div className="modal-header">
-          <h2>
+          <h1 style={{border:"none"}}>
             <DinaMessage id="defaultValuesConfigs" />
-          </h2>
+          </h1>
         </div>
-        <div className="modal-body">
+        <main className="modal-body">
           <DefaultValueRuleEditor
             initialIndex={index}
             onSave={newIndex => {
@@ -34,9 +34,9 @@ export function useDefaultValueRuleEditorModal() {
               onSave(newIndex);
             }}
           />
-        </div>
+        </main>
         <div className="modal-footer">
-          <button className="btn btn-dark" onClick={closeModal}>
+          <button className="btn btn-primary" onClick={closeModal}>
             <DinaMessage id="closeButtonText" />
           </button>
         </div>
