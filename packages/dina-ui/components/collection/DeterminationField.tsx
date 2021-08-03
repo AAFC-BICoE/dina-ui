@@ -12,6 +12,8 @@ import { FieldArray } from "formik";
 import { Determination } from "packages/dina-ui/types/collection-api/resources/Determination";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { useState } from "react";
+import { clamp } from "lodash";
 export interface DeterminationFieldProps {
   className?: string;
   namePrefix?: string;
@@ -34,6 +36,7 @@ export function DeterminationField({
   className,
   namePrefix = ""
 }: DeterminationFieldProps) {
+  const [activeTabIdx, setActiveTabIdx] = useState(0);
   const { readOnly, isTemplate } = useDinaFormContext();
   const determinationsPath = "determination";
   return (
@@ -48,15 +51,19 @@ export function DeterminationField({
             (form.values.determination as Determination[]) ?? [];
           function addDetermination() {
             push({});
+            setActiveTabIdx(determinations.length);
           }
 
           function removeDetermination(index: number) {
             remove(index);
+            setActiveTabIdx(current =>
+              clamp(current, 0, determinations.length - 2)
+            );
           }
 
           return (
             <div className="georeference-assertion-section">
-              <Tabs>
+              <Tabs selectedIndex={activeTabIdx} onSelect={setActiveTabIdx}>
                 {
                   // Only show the tabs when there is more than 1 assertion:
                   <TabList
@@ -78,34 +85,48 @@ export function DeterminationField({
                       return (
                         <TabPanel key={index}>
                           <div className="row">
-                            <TextFieldWithMultiplicationButton
-                              name={`${namePrefix}${commonRoot}verbatimScientificName`}
-                              customName="verbatimScientificName"
-                              className="col-sm-6"
-                            />
-                            <AutoSuggestTextField<MaterialSample>
-                              name={`${namePrefix}${commonRoot}verbatimAgent`}
-                              customName="verbatimAgent"
-                              className="col-sm-6"
-                              query={() => ({
-                                path: "collection-api/material-sample"
-                              })}
-                              suggestion={sample =>
-                                (sample.determination?.map(
-                                  det => det.verbatimAgent
-                                ) as any) ?? []
-                              }
-                            />
-                            <DateField
-                              name={`${namePrefix}${commonRoot}verbatimDate`}
-                              customName="verbatimDate"
-                              className="col-sm-6"
-                            />
-                            <TextField
-                              name={`${namePrefix}${commonRoot}verbatimRemarks`}
-                              customName="vebatimRemarks"
-                              multiLines={true}
-                            />
+                            <div className="col-md-6">
+                              <TextFieldWithMultiplicationButton
+                                name={`${namePrefix}${commonRoot}verbatimScientificName`}
+                                customName="verbatimScientificName"
+                                className="col-sm-6"
+                              />
+                              <AutoSuggestTextField<MaterialSample>
+                                name={`${namePrefix}${commonRoot}verbatimAgent`}
+                                customName="verbatimAgent"
+                                className="col-sm-6"
+                                query={() => ({
+                                  path: "collection-api/material-sample"
+                                })}
+                                suggestion={sample =>
+                                  (sample.determination?.map(
+                                    det => det.verbatimAgent
+                                  ) as any) ?? []
+                                }
+                              />
+                              <DateField
+                                name={`${namePrefix}${commonRoot}verbatimDate`}
+                                customName="verbatimDate"
+                                className="col-sm-6"
+                              />
+                              <TextField
+                                name={`${namePrefix}${commonRoot}verbatimRemarks`}
+                                customName="vebatimRemarks"
+                                multiLines={true}
+                              />
+                            </div>
+                            <div className="col-md-6">
+                              <TextField
+                                name={`${namePrefix}${commonRoot}typeStatus`}
+                                customName="typeStatus"
+                                multiLines={true}
+                              />
+                              <TextField
+                                name={`${namePrefix}${commonRoot}typeStatusEvidence`}
+                                customName="typeStatusEvidence"
+                                multiLines={true}
+                              />
+                            </div>
                             {!readOnly && !isTemplate && (
                               <div className="list-inline mb-3">
                                 <FormikButton
