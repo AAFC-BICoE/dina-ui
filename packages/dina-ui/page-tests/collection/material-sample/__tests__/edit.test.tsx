@@ -424,7 +424,35 @@ describe("Material Sample Edit Page", () => {
     ).toEqual(true);
   });
 
-  it("Renders an existing Material Sample with the Preparations section disabled (no Preparations fields set).", async () => {
+  it("Renders an existing Material Sample with the Storage section enabled.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms",
+          storageUnit: {
+            id: "76575",
+            type: "storage-unit",
+            name: "test-storage-unit"
+          } as KitsuResourceLink
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Storage is enabled:
+    expect(
+      wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+    expect(wrapper.find("#storage-section").exists()).toEqual(true);
+  });
+
+  it("Renders an existing Material Sample with all toggleable data components disabled.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
@@ -440,9 +468,15 @@ describe("Material Sample Edit Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Preparations are disabled:
+    // Data components are disabled:
     expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
     ).toEqual(false);
   });
 

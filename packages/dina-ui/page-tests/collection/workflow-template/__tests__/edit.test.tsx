@@ -3,11 +3,13 @@ import { ReactWrapper } from "enzyme";
 import { PersistedResource } from "kitsu";
 import Select from "react-select";
 import ReactSwitch from "react-switch";
+import { StorageLinker } from "../../../../components";
 import { WorkflowTemplateForm } from "../../../../pages/collection/workflow-template/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   CollectingEvent,
-  PreparationProcessDefinition
+  PreparationProcessDefinition,
+  StorageUnit
 } from "../../../../types/collection-api";
 
 const mockOnSaved = jest.fn();
@@ -92,6 +94,7 @@ async function mountForm(
     wrapper.find(".enable-collecting-event").find(ReactSwitch);
   const catalogSwitch = () =>
     wrapper.find(".enable-catalogue-info").find(ReactSwitch);
+  const storageSwitch = () => wrapper.find(".enable-storage").find(ReactSwitch);
 
   async function toggleDataComponent(
     switchElement: ReactWrapper<any>,
@@ -116,6 +119,10 @@ async function mountForm(
 
   async function togglePreparations(val: boolean) {
     await toggleDataComponent(catalogSwitch(), val);
+  }
+
+  async function toggleStorage(val: boolean) {
+    await toggleDataComponent(storageSwitch(), val);
   }
 
   async function toggleActionType(
@@ -160,8 +167,10 @@ async function mountForm(
     wrapper,
     toggleColEvent,
     togglePreparations,
+    toggleStorage,
     colEventSwitch,
     catalogSwitch,
+    storageSwitch,
     fillOutRequiredFields,
     submitForm,
     toggleActionType
@@ -172,18 +181,21 @@ describe("Workflow template edit page", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Renders the blank template edit page", async () => {
-    const { colEventSwitch, catalogSwitch } = await mountForm();
+    const { colEventSwitch, catalogSwitch, storageSwitch } = await mountForm();
     // Switches are off by default:
     expect(colEventSwitch().prop("checked")).toEqual(false);
     expect(catalogSwitch().prop("checked")).toEqual(false);
+    expect(storageSwitch().prop("checked")).toEqual(false);
   });
 
   it("Submits a new ADD-type action-definition: minimal form submission.", async () => {
     const {
       toggleColEvent,
       togglePreparations,
+      toggleStorage,
       catalogSwitch,
       colEventSwitch,
+      storageSwitch,
       fillOutRequiredFields,
       submitForm
     } = await mountForm();
@@ -193,6 +205,8 @@ describe("Workflow template edit page", () => {
     expect(colEventSwitch().prop("checked")).toEqual(true);
     await togglePreparations(true);
     expect(catalogSwitch().prop("checked")).toEqual(true);
+    await toggleStorage(true);
+    expect(storageSwitch().prop("checked")).toEqual(true);
 
     await fillOutRequiredFields();
 
@@ -383,6 +397,49 @@ describe("Workflow template edit page", () => {
     });
   });
 
+  it("Submits a new ADD-type action-definition: Only set the storage template fields.", async () => {
+    const { wrapper, toggleStorage, fillOutRequiredFields, submitForm } =
+      await mountForm();
+
+    await fillOutRequiredFields();
+
+    // Enable the component toggles:
+    await toggleStorage(true);
+
+    // Add a default storage unit:
+    wrapper
+      .find("#storage-section input[type='checkbox']")
+      .first()
+      .simulate("change", { target: { checked: true } });
+    wrapper.find(StorageLinker).prop<any>("onChange")({
+      id: "TEST_STORAGE",
+      name: "TEST_STORAGE"
+    });
+
+    await submitForm();
+
+    expect(mockOnSaved).lastCalledWith({
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          templateFields: {
+            storageUnit: {
+              enabled: true,
+              defaultValue: {
+                id: "TEST_STORAGE",
+                name: "TEST_STORAGE"
+              }
+            }
+          }
+        }
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+  });
+
   it("Edits an existing action-definition: Renders the form with minimal data.", async () => {
     const { colEventSwitch, catalogSwitch } = await mountForm({
       actionType: "ADD",
@@ -551,8 +608,10 @@ describe("Workflow template edit page", () => {
     const {
       colEventSwitch,
       catalogSwitch,
+      storageSwitch,
       toggleColEvent,
       togglePreparations,
+      toggleStorage,
       submitForm
     } = await mountForm({
       actionType: "ADD",
@@ -578,6 +637,14 @@ describe("Workflow template edit page", () => {
                 type: "preparation-type"
               },
               enabled: true
+            },
+            storageUnit: {
+              enabled: true,
+              defaultValue: {
+                id: "TEST_STORAGE",
+                type: "storage-unit",
+                name: "TEST_STORAGE"
+              } as StorageUnit
             }
           }
         }
@@ -591,10 +658,12 @@ describe("Workflow template edit page", () => {
     // Data Component checkboxes are checked:
     expect(colEventSwitch().prop("checked")).toEqual(true);
     expect(catalogSwitch().prop("checked")).toEqual(true);
+    expect(storageSwitch().prop("checked")).toEqual(true);
 
     // Remove both data components:
     await toggleColEvent(false);
     await togglePreparations(false);
+    await toggleStorage(false);
 
     await submitForm();
 
