@@ -221,6 +221,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              determination: [],
 
               managedAttributes: {},
               relationships: {},
@@ -300,6 +301,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              determination: [],
 
               managedAttributes: {},
               relationships: {},
@@ -334,6 +336,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     expect(
       wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
     ).toEqual(false);
+    expect(
+      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
 
     // Submit with only the name set:
     await wrapper.find("form").simulate("submit");
@@ -356,6 +361,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              determination: [],
 
               relationships: {},
               type: "material-sample"
@@ -397,6 +403,35 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     ).toEqual(false);
     expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+  });
+
+  it("Renders the Material Sample form with only the Determinations section enabled.", async () => {
+    const wrapper = await getWrapper({
+      id: "1",
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowExisting: true,
+          allowNew: true,
+          templateFields: {
+            ...({
+              "determination[0].verbatimScientificName": {
+                enabled: true,
+                defaultValue: "test verbatim scientific name"
+              }
+            } as any)
+          }
+        }
+      },
+      group: "test-group",
+      name: "test-definition",
+      type: "material-sample-action-definition"
+    });
+
+    // Only the Determination section should be enabled:
+    expect(
+      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
     ).toEqual(true);
   });
 

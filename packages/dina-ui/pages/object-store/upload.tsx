@@ -130,31 +130,33 @@ export default function UploadPage() {
           <DinaForm<OnSubmitValues>
             initialValues={{ defaultValuesConfig: null }}
           >
-            <div className="row">
-              <GroupSelectField
-                className="col-md-3"
-                name="group"
-                enableStoredDefaultGroup={true}
-              />
-              <DefaultValuesConfigSelectField
-                allowBlank={true}
-                name="defaultValuesConfig"
-                className="offset-md-3 col-md-3"
-                styles={customStyles}
-              />
-              <div className="col-md-3">
-                <FormikButton
-                  className="btn btn-primary mt-4"
-                  onClick={({ defaultValuesConfig }, { setFieldValue }) =>
-                    openDefaultValuesModal({
-                      index: defaultValuesConfig,
-                      onSave: index =>
-                        setFieldValue("defaultValuesConfig", index)
-                    })
-                  }
-                >
-                  <DinaMessage id="configureDefaultValues" />
-                </FormikButton>
+            <div className="container">
+              <div className="row">
+                <GroupSelectField
+                  className="col-md-3"
+                  name="group"
+                  enableStoredDefaultGroup={true}
+                />
+                <DefaultValuesConfigSelectField
+                  allowBlank={true}
+                  name="defaultValuesConfig"
+                  className="offset-md-3 col-md-3"
+                  styles={customStyles}
+                />
+                <div className="col-md-3" style={{ margin: "2em 0em 2em 0em" }}>
+                  <FormikButton
+                    className="btn btn-primary"
+                    onClick={({ defaultValuesConfig }, { setFieldValue }) =>
+                      openDefaultValuesModal({
+                        index: defaultValuesConfig,
+                        onSave: index =>
+                          setFieldValue("defaultValuesConfig", index)
+                      })
+                    }
+                  >
+                    <DinaMessage id="configureDefaultValues" />
+                  </FormikButton>
+                </div>
               </div>
             </div>
             <div>

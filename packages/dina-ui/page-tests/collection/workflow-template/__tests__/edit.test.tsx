@@ -51,6 +51,8 @@ const mockGet = jest.fn<any, any>(async path => {
       return { data: testCollectionEvent() };
     case "agent-api/person":
     case "collection-api/material-sample-type":
+    case "collection-api/vocabulary/degreeOfEstablishment":
+    case "collection-api/vocabulary/srs":
       return { data: [] };
     case "collection-api/preparation-type":
       return { data: [TEST_PREP_TYPE] };
@@ -95,6 +97,8 @@ async function mountForm(
   const catalogSwitch = () =>
     wrapper.find(".enable-catalogue-info").find(ReactSwitch);
   const storageSwitch = () => wrapper.find(".enable-storage").find(ReactSwitch);
+  const determinationSwitch = () =>
+    wrapper.find(".enable-determination").find(ReactSwitch);
 
   async function toggleDataComponent(
     switchElement: ReactWrapper<any>,
@@ -123,6 +127,10 @@ async function mountForm(
 
   async function toggleStorage(val: boolean) {
     await toggleDataComponent(storageSwitch(), val);
+  }
+
+  async function toggleDeterminations(val: boolean) {
+    await toggleDataComponent(determinationSwitch(), val);
   }
 
   async function toggleActionType(
@@ -168,9 +176,11 @@ async function mountForm(
     toggleColEvent,
     togglePreparations,
     toggleStorage,
+    toggleDeterminations,
     colEventSwitch,
     catalogSwitch,
     storageSwitch,
+    determinationSwitch,
     fillOutRequiredFields,
     submitForm,
     toggleActionType
@@ -342,6 +352,50 @@ describe("Workflow template edit page", () => {
                 name: "test-prep-type",
                 type: "preparation-type"
               },
+              enabled: true
+            }
+          }
+        }
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+  });
+
+  it("Submits a new ADD-type action-definition: Only set Determinations template fields.", async () => {
+    const { wrapper, toggleDeterminations, fillOutRequiredFields, submitForm } =
+      await mountForm();
+
+    await fillOutRequiredFields();
+
+    // Enable the component toggles:
+    await toggleDeterminations(true);
+
+    // Only allow new attachments:
+    wrapper
+      .find("#material-sample-attachments-section input.allow-new-checkbox")
+      .simulate("change", { target: { checked: true } });
+
+    // Set a default verbatim scientific name:
+    wrapper
+      .find(".verbatimScientificName input[type='checkbox']")
+      .simulate("change", { target: { checked: true } });
+    wrapper
+      .find(".verbatimScientificName-field input")
+      .simulate("change", { target: { value: "test scientific name" } });
+
+    await submitForm();
+
+    expect(mockOnSaved).lastCalledWith({
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowNew: true,
+          templateFields: {
+            "determination[0].verbatimScientificName": {
+              defaultValue: "test scientific name",
               enabled: true
             }
           }
@@ -609,9 +663,11 @@ describe("Workflow template edit page", () => {
       colEventSwitch,
       catalogSwitch,
       storageSwitch,
+      determinationSwitch,
       toggleColEvent,
       togglePreparations,
       toggleStorage,
+      toggleDeterminations,
       submitForm
     } = await mountForm({
       actionType: "ADD",
@@ -645,6 +701,12 @@ describe("Workflow template edit page", () => {
                 type: "storage-unit",
                 name: "TEST_STORAGE"
               } as StorageUnit
+            },
+            ...{
+              "determination[0].verbatimScientificName": {
+                defaultValue: "test scientific name",
+                enabled: true
+              }
             }
           }
         }
@@ -659,11 +721,13 @@ describe("Workflow template edit page", () => {
     expect(colEventSwitch().prop("checked")).toEqual(true);
     expect(catalogSwitch().prop("checked")).toEqual(true);
     expect(storageSwitch().prop("checked")).toEqual(true);
+    expect(determinationSwitch().prop("checked")).toEqual(true);
 
-    // Remove both data components:
+    // Remove all data components:
     await toggleColEvent(false);
     await togglePreparations(false);
     await toggleStorage(false);
+    await toggleDeterminations(false);
 
     await submitForm();
 

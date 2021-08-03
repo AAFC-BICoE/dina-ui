@@ -15,6 +15,7 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { DeterminationField } from "../../../components/collection/DeterminationField";
 import { ReactNode, useContext } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -79,6 +80,7 @@ export interface MaterialSampleFormProps {
   onSaved?: (id: string) => Promise<void>;
   preparationsSectionRef?: React.RefObject<FormikProps<any>>;
   identifiersSectionRef?: React.RefObject<FormikProps<any>>;
+  determinationSectionRef?: React.RefObject<FormikProps<any>>;
 
   /** Optionally call the hook from the parent component. */
   materialSampleSaveHook?: ReturnType<typeof useMaterialSampleSave>;
@@ -88,6 +90,10 @@ export interface MaterialSampleFormProps {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
   identifiersTemplateInitialValues?: Partial<MaterialSample> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
+
+  determinationTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 
@@ -124,7 +130,9 @@ export function MaterialSampleForm({
     </ButtonBar>
   ),
   preparationsTemplateInitialValues,
-  identifiersTemplateInitialValues
+  identifiersTemplateInitialValues,
+  determinationTemplateInitialValues,
+  determinationSectionRef
 }: MaterialSampleFormProps) {
   const { isTemplate } = useContext(DinaFormContext) ?? {};
 
@@ -189,6 +197,11 @@ export function MaterialSampleForm({
             {dataComponentState.enablePreparations && (
               <a href="#preparations-section" className="list-group-item">
                 <DinaMessage id="preparations" />
+              </a>
+            )}
+            {dataComponentState.enableDetermination && (
+              <a href="#determination-section" className="list-group-item">
+                <DinaMessage id="determination" />
               </a>
             )}
             <a href="#managedAttributes-section" className="list-group-item">
@@ -320,30 +333,29 @@ export function MaterialSampleForm({
             </Tabs>
           </FieldSet>
           {isTemplate ? (
-            <DinaForm
-              initialValues={preparationsTemplateInitialValues}
-              innerRef={preparationsSectionRef}
-              isTemplate={true}
-            >
-              {dataComponentState.enablePreparations && (
-                <div className="row">
-                  <div className="col-md-6">
-                    <PreparationField />
-                  </div>
-                </div>
-              )}
-              {materialSampleAttachmentsUI}
-            </DinaForm>
+            <>
+              <DinaForm
+                initialValues={preparationsTemplateInitialValues}
+                innerRef={preparationsSectionRef}
+                isTemplate={true}
+              >
+                {dataComponentState.enablePreparations && <PreparationField />}
+              </DinaForm>
+              <DinaForm
+                initialValues={determinationTemplateInitialValues}
+                innerRef={determinationSectionRef}
+                isTemplate={true}
+              >
+                {dataComponentState.enableDetermination && (
+                  <DeterminationField />
+                )}
+                {materialSampleAttachmentsUI}
+              </DinaForm>
+            </>
           ) : (
             <>
-              {dataComponentState.enablePreparations && (
-                <div className="row">
-                  <div className="col-md-6">
-                    <PreparationField />
-                  </div>
-                </div>
-              )}
-
+              {dataComponentState.enablePreparations && <PreparationField />}
+              {dataComponentState.enableDetermination && <DeterminationField />}
               <FieldSet
                 legend={<DinaMessage id="managedAttributeListTitle" />}
                 id="managedAttributes-section"
@@ -510,6 +522,12 @@ function DataComponentToggler({
             className: "enable-catalogue-info",
             enabled: state.enablePreparations,
             setEnabled: state.setEnablePreparations
+          },
+          {
+            name: formatMessage("determination"),
+            className: "enable-determination",
+            enabled: state.enableDetermination,
+            setEnabled: state.setEnableDetermination
           }
         ].map(section => (
           <label

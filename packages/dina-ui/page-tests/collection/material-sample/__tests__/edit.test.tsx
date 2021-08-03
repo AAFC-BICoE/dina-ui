@@ -1,6 +1,5 @@
 import { KitsuResourceLink, PersistedResource } from "kitsu";
-import ReactSwitch from "react-switch";
-import Switch from "react-switch";
+import { default as ReactSwitch, default as Switch } from "react-switch";
 import { BLANK_PREPARATION } from "../../../../components/collection/PreparationField";
 import { MaterialSampleForm } from "../../../../pages/collection/material-sample/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
@@ -72,6 +71,11 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/material-sample-type":
     case "user-api/group":
     case "agent-api/person":
+    case "collection-api/vocabulary/srs":
+    case "collection-api/vocabulary/coordinateSystem":
+    case "collection-api/vocabulary/degreeOfEstablishment":
+    case "collection-api/storage-unit-type":
+    case "collection-api/storage-unit":
     case "objectstore-api/metadata":
       return { data: [] };
   }
@@ -156,7 +160,6 @@ describe("Material Sample Edit Page", () => {
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               geoReferenceAssertions: [
                 {
-                  georeferencedBy: undefined,
                   isPrimary: true
                 }
               ],
@@ -183,6 +186,7 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
+              determination: [],
               relationships: {},
               type: "material-sample"
             },
@@ -244,6 +248,7 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
+              determination: [],
               type: "material-sample",
               relationships: {}
             },
@@ -300,6 +305,7 @@ describe("Material Sample Edit Page", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              determination: [],
 
               managedAttributes: {},
               relationships: {}
@@ -390,6 +396,7 @@ describe("Material Sample Edit Page", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              determination: [],
               managedAttributes: {},
               relationships: {}
             },
@@ -456,6 +463,32 @@ describe("Material Sample Edit Page", () => {
     expect(wrapper.find("#storage-section").exists()).toEqual(true);
   });
 
+  it("Renders an existing Material Sample with the Determinations section enabled.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms",
+          determination: [
+            { verbatimScientificName: "test verbatim scientific name" }
+          ]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Determinations are enabled:
+    expect(
+      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+    expect(wrapper.find("#determination-section").exists()).toEqual(true);
+  });
+
   it("Renders an existing Material Sample with all toggleable data components disabled.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
@@ -481,6 +514,9 @@ describe("Material Sample Edit Page", () => {
     ).toEqual(false);
     expect(
       wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
     ).toEqual(false);
   });
 
@@ -521,6 +557,7 @@ describe("Material Sample Edit Page", () => {
               },
               materialSampleName: "test-ms",
               ...BLANK_PREPARATION,
+              determination: [],
               relationships: {},
               type: "material-sample"
             },

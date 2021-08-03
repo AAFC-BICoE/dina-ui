@@ -21,6 +21,7 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../dina-ui/types/collection-api";
+import { ScientificNameSource } from "../../../dina-ui/types/collection-api/resources/Determination";
 import {
   ManagedAttributeValues,
   Metadata
@@ -113,6 +114,10 @@ export interface UseMaterialSampleSaveParams {
 
   materialSampleAttachmentsConfig?: AllowAttachmentsConfig;
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
+
+  determinationTemplateInitialValues?: Partial<MaterialSample> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
 }
 
 export function useMaterialSampleSave({
@@ -125,8 +130,9 @@ export function useMaterialSampleSave({
   materialSampleAttachmentsConfig,
   collectingEventAttachmentsConfig,
   colEventTemplateInitialValues,
+  materialSampleTemplateInitialValues,
   preparationsTemplateInitialValues,
-  materialSampleTemplateInitialValues
+  determinationTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
@@ -138,9 +144,15 @@ export function useMaterialSampleSave({
   const hasPreparationsTemplate =
     isTemplate &&
     !isEmpty(preparationsTemplateInitialValues?.templateCheckboxes);
+
   const hasStorageTemplate =
     isTemplate &&
     materialSampleTemplateInitialValues?.templateCheckboxes?.storageUnit;
+
+  // For editing existing templates:
+  const hasDeterminationTemplate =
+    isTemplate &&
+    !isEmpty(determinationTemplateInitialValues?.templateCheckboxes);
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(
@@ -166,8 +178,19 @@ export function useMaterialSampleSave({
     // Show the Storage section if the storage field is set or the template enables it:
     Boolean(
       hasStorageTemplate ||
-        materialSample?.storageUnit ||
+        materialSample?.storageUnit?.id ||
         enabledFields?.materialSample?.includes("storageUnit")
+    )
+  );
+
+  const [enableDetermination, setEnableDetermination] = useState(
+    Boolean(
+      hasDeterminationTemplate ||
+        // Show the determination section if a field is set or the field is enabled:
+        materialSample?.determination?.some(det => !isEmpty(det)) ||
+        enabledFields?.materialSample?.some(enabledField =>
+          enabledField.startsWith("determination[")
+        )
     )
   );
 
@@ -179,6 +202,8 @@ export function useMaterialSampleSave({
     setEnablePreparations,
     enableStorage,
     setEnableStorage,
+    enableDetermination,
+    setEnableDetermination,
     /** Wraps the useState setter with an AreYouSure modal when setting to false. */
     dataComponentToggler(
       setBoolean: Dispatch<SetStateAction<boolean>>,
@@ -209,7 +234,8 @@ export function useMaterialSampleSave({
     ? { ...materialSample }
     : {
         type: "material-sample",
-        managedAttributes: {}
+        managedAttributes: {},
+        ...(enableDetermination && { determination: [{}] })
       };
 
   /** Used to get the values of the nested CollectingEvent form. */
@@ -255,7 +281,7 @@ export function useMaterialSampleSave({
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
     const dataComponents = document?.querySelectorAll<HTMLDivElement>(
-      ".data-components > fieldset:not(.d-none)"
+      ".data-components fieldset:not(.d-none)"
     );
     dataComponents?.forEach((element, index) => {
       element.style.backgroundColor = index % 2 === 0 ? "#f3f3f3" : "";
@@ -350,6 +376,18 @@ export function useMaterialSampleSave({
     );
 
     delete materialSampleInput.managedAttributeValues;
+
+    // Only persist determination when enabled
+    if (enableDetermination) {
+      materialSampleInput.determination?.map(det => {
+        if (det) {
+          det.scientificName = det?.verbatimScientificName;
+          det.scientificNameSource = ScientificNameSource.COLPLUS;
+        }
+      });
+    } else {
+      materialSampleInput.determination = [];
+    }
 
     // Save the MaterialSample:
     const [savedMaterialSample] = await save(
