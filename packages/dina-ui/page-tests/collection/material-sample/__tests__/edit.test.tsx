@@ -183,13 +183,6 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
-              determination: [
-                {
-                  scientificName: undefined,
-                  scientificNameSource: "COLPLUS",
-                  type: "determination"
-                }
-              ],
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
@@ -250,13 +243,6 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
-              determination: [
-                {
-                  scientificName: undefined,
-                  scientificNameSource: "COLPLUS",
-                  type: "determination"
-                }
-              ],
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},

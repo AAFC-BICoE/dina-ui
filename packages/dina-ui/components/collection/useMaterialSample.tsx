@@ -356,6 +356,8 @@ export function useMaterialSampleSave({
           det.scientificNameSource = ScientificNameSource.COLPLUS;
         }
       });
+    } else {
+      delete materialSampleInput.determination;
     }
 
     // Save the MaterialSample:

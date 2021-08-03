@@ -147,8 +147,6 @@ export function WorkflowTemplateForm({
   };
 
   const preparationsTemplate = {
-    allowNew: formTemplates?.MATERIAL_SAMPLE?.allowNew,
-    allowExisting: formTemplates?.MATERIAL_SAMPLE?.allowExisting,
     templateFields: pick(
       formTemplates?.MATERIAL_SAMPLE?.templateFields,
       ...PREPARATION_FIELDS
@@ -162,6 +160,8 @@ export function WorkflowTemplateForm({
       )
     : ["determination"];
   const determinationTemplate = {
+    allowNew: formTemplates?.MATERIAL_SAMPLE?.allowNew,
+    allowExisting: formTemplates?.MATERIAL_SAMPLE?.allowExisting,
     templateFields:
       derminationTemplateKeys.length === 1 &&
       derminationTemplateKeys[0] === "determination"
@@ -209,8 +209,7 @@ export function WorkflowTemplateForm({
         actionType === "ADD"
           ? {
               MATERIAL_SAMPLE: {
-                ...preparationsAndAttachmentsFormRef.current?.values
-                  .attachmentsConfig,
+                ...determinationFormRef.current?.values.attachmentsConfig,
                 templateFields: {
                   ...(identifiersSectionRef.current &&
                     getEnabledTemplateFieldsFromForm(

@@ -382,8 +382,8 @@ export function MaterialSampleForm({
                 isTemplate={true}
               >
                 {enableDetermination && <DeterminationField />}
+                {materialSampleAttachmentsUI}
               </DinaForm>
-              {materialSampleAttachmentsUI}
             </>
           ) : (
             <>
