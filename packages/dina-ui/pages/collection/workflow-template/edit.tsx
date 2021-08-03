@@ -98,7 +98,7 @@ export function WorkflowTemplateForm({
   const { formatMessage } = useDinaIntl();
 
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
-  const preparationsAndAttachmentsFormRef = useRef<FormikProps<any>>(null);
+  const preparationsFormRef = useRef<FormikProps<any>>(null);
   const identifiersSectionRef = useRef<FormikProps<any>>(null);
   const determinationFormRef = useRef<FormikProps<any>>(null);
 
@@ -106,7 +106,7 @@ export function WorkflowTemplateForm({
     fetchedActionDefinition?.actionType ?? "ADD",
     [
       collectingEvtFormRef,
-      preparationsAndAttachmentsFormRef,
+      preparationsFormRef,
       identifiersSectionRef,
       determinationFormRef
     ]
@@ -147,6 +147,8 @@ export function WorkflowTemplateForm({
   };
 
   const preparationsTemplate = {
+    allowNew: formTemplates?.MATERIAL_SAMPLE?.allowNew,
+    allowExisting: formTemplates?.MATERIAL_SAMPLE?.allowExisting,
     templateFields: pick(
       formTemplates?.MATERIAL_SAMPLE?.templateFields,
       ...PREPARATION_FIELDS
@@ -215,10 +217,9 @@ export function WorkflowTemplateForm({
                     getEnabledTemplateFieldsFromForm(
                       identifiersSectionRef.current.values
                     )),
-                  ...(enablePreparations &&
-                  preparationsAndAttachmentsFormRef.current
+                  ...(enablePreparations && preparationsFormRef.current
                     ? getEnabledTemplateFieldsFromForm(
-                        preparationsAndAttachmentsFormRef.current.values
+                        preparationsFormRef.current.values
                       )
                     : undefined),
                   ...(enableDetermination && determinationFormRef.current
@@ -252,11 +253,10 @@ export function WorkflowTemplateForm({
           : actionType === "SPLIT"
           ? {
               MATERIAL_SAMPLE: {
-                ...preparationsAndAttachmentsFormRef.current?.values
-                  .attachmentsConfig,
-                templateFields: preparationsAndAttachmentsFormRef.current
+                ...preparationsFormRef.current?.values.attachmentsConfig,
+                templateFields: preparationsFormRef.current
                   ? getEnabledTemplateFieldsFromForm(
-                      preparationsAndAttachmentsFormRef.current.values
+                      preparationsFormRef.current.values
                     )
                   : undefined
               }
@@ -342,14 +342,14 @@ export function WorkflowTemplateForm({
             }
             identifiersTemplateInitialValues={identifiersTemplateInitialValues}
             materialSampleSaveHook={materialSampleSaveHook}
-            preparationsSectionRef={preparationsAndAttachmentsFormRef}
+            preparationsSectionRef={preparationsFormRef}
             identifiersSectionRef={identifiersSectionRef}
             determinationSectionRef={determinationFormRef}
           />
         </DinaFormSection>
       ) : actionType === "SPLIT" ? (
         <DinaForm
-          innerRef={preparationsAndAttachmentsFormRef}
+          innerRef={preparationsFormRef}
           initialValues={preparationsTemplateInitialValues}
           isTemplate={true}
         >
