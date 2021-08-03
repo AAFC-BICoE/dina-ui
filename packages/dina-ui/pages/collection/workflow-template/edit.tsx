@@ -155,11 +155,23 @@ export function WorkflowTemplateForm({
     )
   };
 
+  // Extract the atual determination fields from templateFields when there is any
+  const derminationTemplateKeys = formTemplates?.MATERIAL_SAMPLE?.templateFields
+    ? Object.keys(formTemplates?.MATERIAL_SAMPLE?.templateFields as any).filter(
+        key => key.includes("determination")
+      )
+    : ["determination"];
   const determinationTemplate = {
-    templateFields: {
-      determination: formTemplates?.MATERIAL_SAMPLE?.templateFields
-        .determination ?? { enabled: true, defaultValue: [{}] }
-    }
+    templateFields:
+      derminationTemplateKeys.length === 1 &&
+      derminationTemplateKeys[0] === "determination"
+        ? {}
+        : derminationTemplateKeys.length >= 1
+        ? pick(
+            formTemplates?.MATERIAL_SAMPLE?.templateFields,
+            derminationTemplateKeys
+          )
+        : {}
   };
 
   const preparationsTemplateInitialValues =
@@ -405,6 +417,8 @@ export function useActionTypeToggle(
 export function getEnabledTemplateFieldsFromForm(
   formValues: any
 ): TemplateFields {
+  // delete the key "determination" as children with index are actual keys
+  delete formValues.templateCheckboxes?.determination;
   return mapValues(
     formValues.templateCheckboxes ?? {},
     (val: boolean | undefined, key) =>

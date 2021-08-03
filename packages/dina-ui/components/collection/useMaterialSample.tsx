@@ -177,9 +177,9 @@ export function useMaterialSampleSave({
                 det?.[detFieldName] ||
                 enabledFields?.materialSample?.[
                   `determination[${idx}]`
-                ].includes(detFieldName)
+                ]?.includes(detFieldName)
             )
-            .includes(true)
+            ?.includes(true)
         )
     )
   );
@@ -348,12 +348,15 @@ export function useMaterialSampleSave({
 
     delete materialSampleInput.managedAttributeValues;
 
-    materialSampleInput.determination?.map(det => {
-      if (det) {
-        det.scientificName = det?.verbatimScientificName;
-        det.scientificNameSource = ScientificNameSource.COLPLUS;
-      }
-    });
+    // Only persist determination when enabled
+    if (enableDetermination) {
+      materialSampleInput.determination?.map(det => {
+        if (det) {
+          det.scientificName = det?.verbatimScientificName;
+          det.scientificNameSource = ScientificNameSource.COLPLUS;
+        }
+      });
+    }
 
     // Save the MaterialSample:
     const [savedMaterialSample] = await save(
