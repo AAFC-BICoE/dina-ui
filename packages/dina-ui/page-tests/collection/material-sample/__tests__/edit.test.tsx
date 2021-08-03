@@ -183,16 +183,10 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
-              determination: [
-                {
-                  scientificName: undefined,
-                  scientificNameSource: "COLPLUS",
-                  type: "determination"
-                }
-              ],
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
+              determination: [],
               relationships: {},
               type: "material-sample"
             },
@@ -250,16 +244,10 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
-              determination: [
-                {
-                  scientificName: undefined,
-                  scientificNameSource: "COLPLUS",
-                  type: "determination"
-                }
-              ],
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
+              determination: [],
               type: "material-sample",
               relationships: {}
             },
@@ -315,6 +303,7 @@ describe("Material Sample Edit Page", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              determination: [],
 
               managedAttributes: {},
               relationships: {}
@@ -404,6 +393,7 @@ describe("Material Sample Edit Page", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              determination: [],
               managedAttributes: {},
               relationships: {}
             },
@@ -439,6 +429,31 @@ describe("Material Sample Edit Page", () => {
     // Preparations are enabled:
     expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+  });
+
+  it("Renders an existing Material Sample with the Determinations section enabled.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms",
+          determination: [
+            { verbatimScientificName: "test verbatim scientific name" }
+          ]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Determinations are enabled:
+    expect(
+      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
     ).toEqual(true);
   });
 
@@ -500,6 +515,7 @@ describe("Material Sample Edit Page", () => {
               },
               materialSampleName: "test-ms",
               ...BLANK_PREPARATION,
+              determination: [],
               relationships: {},
               type: "material-sample"
             },

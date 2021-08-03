@@ -77,7 +77,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         );
 
         const hasDetermination = DETERMINATION_FIELDS.some(fieldName =>
-          materialSample.determination?.map(det => det[fieldName])
+          materialSample.determination?.map(det => det?.[fieldName])
         );
 
         return (

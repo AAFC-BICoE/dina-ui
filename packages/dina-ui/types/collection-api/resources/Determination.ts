@@ -17,4 +17,4 @@ export enum ScientificNameSource {
   COLPLUS = "COLPLUS"
 }
 
-export type Determination = KitsuResource & DeterminationAttributes;
+export type Determination = DeterminationAttributes | undefined;

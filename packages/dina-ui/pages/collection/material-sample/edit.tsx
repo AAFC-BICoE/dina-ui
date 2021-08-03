@@ -80,6 +80,7 @@ export interface MaterialSampleFormProps {
   onSaved?: (id: string) => Promise<void>;
   preparationsSectionRef?: React.RefObject<FormikProps<any>>;
   identifiersSectionRef?: React.RefObject<FormikProps<any>>;
+  determinationSectionRef?: React.RefObject<FormikProps<any>>;
 
   /** Optionally call the hook from the parent component. */
   materialSampleSaveHook?: ReturnType<typeof useMaterialSampleSave>;
@@ -89,6 +90,10 @@ export interface MaterialSampleFormProps {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
   identifiersTemplateInitialValues?: Partial<MaterialSample> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
+
+  determinationTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 
@@ -125,7 +130,9 @@ export function MaterialSampleForm({
     </ButtonBar>
   ),
   preparationsTemplateInitialValues,
-  identifiersTemplateInitialValues
+  identifiersTemplateInitialValues,
+  determinationTemplateInitialValues,
+  determinationSectionRef
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
   const { isTemplate } = useContext(DinaFormContext) ?? {};
@@ -361,20 +368,23 @@ export function MaterialSampleForm({
             </Tabs>
           </FieldSet>
           {isTemplate ? (
-            <DinaForm
-              initialValues={preparationsTemplateInitialValues}
-              innerRef={preparationsSectionRef}
-              isTemplate={true}
-            >
-              {enablePreparations && (
-                <div className="row">
-                  <div className="col-md-6">
-                    <PreparationField />
-                  </div>
-                </div>
-              )}
-              {materialSampleAttachmentsUI}
-            </DinaForm>
+            <>
+              <DinaForm
+                initialValues={preparationsTemplateInitialValues}
+                innerRef={preparationsSectionRef}
+                isTemplate={true}
+              >
+                {enablePreparations && <PreparationField />}
+              </DinaForm>
+              <DinaForm
+                initialValues={determinationTemplateInitialValues}
+                innerRef={determinationSectionRef}
+                isTemplate={true}
+              >
+                {enableDetermination && <DeterminationField />}
+                {materialSampleAttachmentsUI}
+              </DinaForm>
+            </>
           ) : (
             <>
               {enablePreparations && <PreparationField />}
