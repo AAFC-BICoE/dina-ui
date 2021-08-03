@@ -1,7 +1,14 @@
-import { AreYouSureModal, DinaForm } from "common-ui";
+import {
+  AreYouSureModal,
+  DinaForm,
+  DinaFormSubmitParams,
+  useApiClient,
+  useModal,
+  useQuery
+} from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { cloneDeep, isEmpty, isEqual } from "lodash";
+import { cloneDeep, fromPairs, isEmpty, isEqual, toPairs } from "lodash";
 import {
   Dispatch,
   SetStateAction,
@@ -10,12 +17,6 @@ import {
   useState
 } from "react";
 import { useCollectingEventQuery, useCollectingEventSave } from ".";
-import {
-  DinaFormSubmitParams,
-  useApiClient,
-  useModal,
-  useQuery
-} from "../../../common-ui/lib";
 import {
   CollectingEvent,
   MaterialSample
@@ -27,7 +28,6 @@ import {
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
-import { toPairs, fromPairs } from "lodash";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
 
 export function useMaterialSampleQuery(id?: string | null) {
@@ -101,6 +101,9 @@ export interface UseMaterialSampleSaveParams {
   preparationsTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
+  materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
 
   /** Optionally restrict the form to these enabled fields. */
   enabledFields?: {
@@ -118,11 +121,12 @@ export function useMaterialSampleSave({
   onSaved,
   collectingEvtFormRef,
   isTemplate,
-  colEventTemplateInitialValues,
   enabledFields,
   materialSampleAttachmentsConfig,
   collectingEventAttachmentsConfig,
-  preparationsTemplateInitialValues
+  colEventTemplateInitialValues,
+  preparationsTemplateInitialValues,
+  materialSampleTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
@@ -131,10 +135,12 @@ export function useMaterialSampleSave({
     isTemplate &&
     (!isEmpty(colEventTemplateInitialValues?.templateCheckboxes) ||
       colEventTemplateInitialValues?.id);
-  // For editing existing templates:
   const hasPreparationsTemplate =
     isTemplate &&
     !isEmpty(preparationsTemplateInitialValues?.templateCheckboxes);
+  const hasStorageTemplate =
+    isTemplate &&
+    materialSampleTemplateInitialValues?.templateCheckboxes?.storageUnit;
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(
@@ -155,6 +161,49 @@ export function useMaterialSampleSave({
         )
     )
   );
+
+  const [enableStorage, setEnableStorage] = useState(
+    // Show the Storage section if the storage field is set or the template enables it:
+    Boolean(
+      hasStorageTemplate ||
+        materialSample?.storageUnit ||
+        enabledFields?.materialSample?.includes("storageUnit")
+    )
+  );
+
+  // The state describing which Data components (Form sections) are enabled:
+  const dataComponentState = {
+    enableCollectingEvent,
+    setEnableCollectingEvent,
+    enablePreparations,
+    setEnablePreparations,
+    enableStorage,
+    setEnableStorage,
+    /** Wraps the useState setter with an AreYouSure modal when setting to false. */
+    dataComponentToggler(
+      setBoolean: Dispatch<SetStateAction<boolean>>,
+      componentName: string
+    ) {
+      return function toggleDataComponent(enabled: boolean) {
+        if (!enabled) {
+          // When removing data, ask the user for confirmation first:
+          openModal(
+            <AreYouSureModal
+              actionMessage={
+                <DinaMessage
+                  id="removeComponentData"
+                  values={{ component: componentName }}
+                />
+              }
+              onYesButtonClicked={() => setBoolean(enabled)}
+            />
+          );
+        } else {
+          setBoolean(enabled);
+        }
+      };
+    }
+  };
 
   const initialValues: InputResource<MaterialSample> = materialSample
     ? { ...materialSample }
@@ -213,31 +262,6 @@ export function useMaterialSampleSave({
     });
   });
 
-  /** Wraps the useState setter with an AreYouSure modal when setting to false. */
-  function dataComponentToggler(
-    setBoolean: Dispatch<SetStateAction<boolean>>,
-    componentName: string
-  ) {
-    return function toggleDataComponent(enabled: boolean) {
-      if (!enabled) {
-        // When removing data, ask the user for confirmation first:
-        openModal(
-          <AreYouSureModal
-            actionMessage={
-              <DinaMessage
-                id="removeComponentData"
-                values={{ component: componentName }}
-              />
-            }
-            onYesButtonClicked={() => setBoolean(enabled)}
-          />
-        );
-      } else {
-        setBoolean(enabled);
-      }
-    };
-  }
-
   async function onSubmit({
     api: { save },
     formik,
@@ -252,6 +276,14 @@ export function useMaterialSampleSave({
     // Only persist the preparation fields if the preparations toggle is enabled:
     if (!enablePreparations) {
       Object.assign(materialSampleInput, BLANK_PREPARATION);
+    }
+
+    // Only persist the storage link if the Storage toggle is enabled:
+    if (!enableStorage) {
+      materialSampleInput.storageUnit = {
+        id: null,
+        type: "storage-unit"
+      };
     }
 
     if (!enableCollectingEvent) {
@@ -355,11 +387,7 @@ export function useMaterialSampleSave({
   return {
     initialValues,
     nestedCollectingEventForm,
-    dataComponentToggler,
-    enablePreparations,
-    setEnablePreparations,
-    enableCollectingEvent,
-    setEnableCollectingEvent,
+    dataComponentState,
     colEventId,
     setColEventId,
     colEventQuery,

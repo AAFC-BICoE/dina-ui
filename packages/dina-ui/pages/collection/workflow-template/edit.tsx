@@ -13,7 +13,7 @@ import {
   withResponse
 } from "common-ui";
 import { FormikProps } from "formik";
-import { PersistedResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import { get, isEmpty, mapValues, pick, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import React, { RefObject, useRef, useState } from "react";
@@ -38,7 +38,10 @@ import { MaterialSampleForm } from "../material-sample/edit";
 const workflowMainFieldsSchema = yup.object({
   id: yup.string(),
   name: yup.string().trim().required(),
-  group: yup.string().required()
+  group: yup.string().required(),
+
+  storageUnit: yup.mixed(),
+  templateCheckboxes: yup.mixed()
 });
 
 type WorkflowFormValues = yup.InferType<typeof workflowMainFieldsSchema>;
@@ -122,8 +125,6 @@ export function WorkflowTemplateForm({
 
   const { formTemplates, ...initialDefinition } = fetchedActionDefinition ?? {};
 
-  const initialValues: Partial<WorkflowFormValues> = initialDefinition ?? {};
-
   // Initialize the tempalte form default values and checkbox states:
   const colEventTemplateInitialValues =
     getTemplateInitialValuesFromSavedFormTemplate(
@@ -157,26 +158,41 @@ export function WorkflowTemplateForm({
     getTemplateInitialValuesFromSavedFormTemplate(preparationsTemplate);
   const identifiersTemplateInitialValues =
     getTemplateInitialValuesFromSavedFormTemplate(identifiersTemplate);
+  const materialSampleTemplateInitialValues =
+    getTemplateInitialValuesFromSavedFormTemplate(
+      formTemplates?.MATERIAL_SAMPLE
+    );
+
+  const initialValues: Partial<WorkflowFormValues> = {
+    ...initialDefinition,
+    ...materialSampleTemplateInitialValues
+  };
 
   const materialSampleSaveHook = useMaterialSampleSave({
     isTemplate: true,
     colEventTemplateInitialValues,
     preparationsTemplateInitialValues,
+    materialSampleTemplateInitialValues,
     collectingEvtFormRef
   });
 
   const {
     colEventId: attachedColEventId,
-    enableCollectingEvent,
-    enablePreparations
+    dataComponentState: {
+      enableCollectingEvent,
+      enablePreparations,
+      enableStorage
+    }
   } = materialSampleSaveHook;
 
   async function onSaveTemplateSubmit({
     api: { save },
-    submittedValues: mainTemplateFields
+    submittedValues
   }: DinaFormSubmitParams<WorkflowFormValues>) {
+    const mainTemplateFields = pick(submittedValues, "id", "group", "name");
+
     // Construct the template definition to persist based on the form values:
-    const definition: PreparationProcessDefinition = {
+    const definition: InputResource<PreparationProcessDefinition> = {
       ...mainTemplateFields,
       actionType,
       formTemplates:
@@ -195,7 +211,12 @@ export function WorkflowTemplateForm({
                     ? getEnabledTemplateFieldsFromForm(
                         preparationsAndAttachmentsFormRef.current.values
                       )
-                    : undefined)
+                    : undefined),
+                  ...(enableStorage && {
+                    storageUnit:
+                      getEnabledTemplateFieldsFromForm(submittedValues)
+                        .storageUnit
+                  })
                 }
               },
               COLLECTING_EVENT: enableCollectingEvent

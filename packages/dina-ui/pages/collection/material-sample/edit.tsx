@@ -126,17 +126,12 @@ export function MaterialSampleForm({
   preparationsTemplateInitialValues,
   identifiersTemplateInitialValues
 }: MaterialSampleFormProps) {
-  const { formatMessage } = useDinaIntl();
   const { isTemplate } = useContext(DinaFormContext) ?? {};
 
   const {
     initialValues,
     nestedCollectingEventForm,
-    dataComponentToggler,
-    enablePreparations,
-    setEnablePreparations,
-    enableCollectingEvent,
-    setEnableCollectingEvent,
+    dataComponentState,
     colEventId,
     setColEventId,
     colEventQuery,
@@ -181,12 +176,17 @@ export function MaterialSampleForm({
                 <DinaMessage id="identifiers" />
               </a>
             )}
-            {enableCollectingEvent && (
+            {dataComponentState.enableStorage && (
+              <a href="#storage-section" className="list-group-item">
+                <DinaMessage id="storage" />
+              </a>
+            )}
+            {dataComponentState.enableCollectingEvent && (
               <a href="#collecting-event-section" className="list-group-item">
                 <DinaMessage id="collectingEvent" />
               </a>
             )}
-            {enablePreparations && (
+            {dataComponentState.enablePreparations && (
               <a href="#preparations-section" className="list-group-item">
                 <DinaMessage id="preparations" />
               </a>
@@ -220,42 +220,20 @@ export function MaterialSampleForm({
             )}{" "}
           </div>
         </div>
-
-        {!isTemplate && (
-          <div className="card card-body mb-3">
-            <StorageLinkerField name="storageUnit" removeLabelTag={true} />
-          </div>
-        )}
-        <FieldSet legend={<DinaMessage id="components" />}>
-          <div className="row">
-            <label className="enable-collecting-event d-flex align-items-center fw-bold col-sm-3">
-              <Switch
-                className="mx-2"
-                checked={enableCollectingEvent}
-                onChange={dataComponentToggler(
-                  setEnableCollectingEvent,
-                  formatMessage("collectingEvent")
-                )}
-              />
-              <DinaMessage id="collectingEvent" />
-            </label>
-            <label className="enable-catalogue-info d-flex align-items-center fw-bold col-sm-3">
-              <Switch
-                className="mx-2"
-                checked={enablePreparations}
-                onChange={dataComponentToggler(
-                  setEnablePreparations,
-                  formatMessage("preparations")
-                )}
-              />
-              <DinaMessage id="preparations" />
-            </label>
-          </div>
-        </FieldSet>
+        <DataComponentToggler state={dataComponentState} />
         <div className="data-components">
           <FieldSet
+            id="storage-section"
+            className={dataComponentState.enableStorage ? "" : "d-none"}
+            legend={<DinaMessage id="storage" />}
+          >
+            <div className="card card-body mb-3">
+              <StorageLinkerField name="storageUnit" removeLabelTag={true} />
+            </div>
+          </FieldSet>
+          <FieldSet
             id="collecting-event-section"
-            className={enableCollectingEvent ? "" : "d-none"}
+            className={dataComponentState.enableCollectingEvent ? "" : "d-none"}
             legend={<DinaMessage id="collectingEvent" />}
           >
             <Tabs
@@ -347,7 +325,7 @@ export function MaterialSampleForm({
               innerRef={preparationsSectionRef}
               isTemplate={true}
             >
-              {enablePreparations && (
+              {dataComponentState.enablePreparations && (
                 <div className="row">
                   <div className="col-md-6">
                     <PreparationField />
@@ -358,7 +336,7 @@ export function MaterialSampleForm({
             </DinaForm>
           ) : (
             <>
-              {enablePreparations && (
+              {dataComponentState.enablePreparations && (
                 <div className="row">
                   <div className="col-md-6">
                     <PreparationField />
@@ -433,7 +411,6 @@ export function MaterialSampleIdentifiersFormLayout({
   namePrefix = "",
   sampleNamePlaceHolder
 }: MaterialSampleIdentifiersFormLayoutProps) {
-  const { formatMessage } = useDinaIntl();
   return (
     <FieldSet
       id="identifiers-section"
@@ -502,5 +479,55 @@ export function CollectingEventBriefDetails({
         </div>
       </div>
     </DinaForm>
+  );
+}
+
+/** Toggles to enable/disable form sections. */
+function DataComponentToggler({
+  state
+}: {
+  state: ReturnType<typeof useMaterialSampleSave>["dataComponentState"];
+}) {
+  const { formatMessage } = useDinaIntl();
+  return (
+    <FieldSet legend={<DinaMessage id="components" />}>
+      <div className="d-flex gap-5">
+        {[
+          {
+            name: formatMessage("storage"),
+            className: "enable-storage",
+            enabled: state.enableStorage,
+            setEnabled: state.setEnableStorage
+          },
+          {
+            name: formatMessage("collectingEvent"),
+            className: "enable-collecting-event",
+            enabled: state.enableCollectingEvent,
+            setEnabled: state.setEnableCollectingEvent
+          },
+          {
+            name: formatMessage("preparations"),
+            className: "enable-catalogue-info",
+            enabled: state.enablePreparations,
+            setEnabled: state.setEnablePreparations
+          }
+        ].map(section => (
+          <label
+            className={`${section.className} d-flex align-items-center fw-bold`}
+            key={section.name}
+          >
+            <Switch
+              className="mx-2"
+              checked={section.enabled}
+              onChange={state.dataComponentToggler(
+                section.setEnabled,
+                section.name
+              )}
+            />
+            {section.name}
+          </label>
+        ))}
+      </div>
+    </FieldSet>
   );
 }
