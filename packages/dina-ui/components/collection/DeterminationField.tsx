@@ -67,8 +67,8 @@ export function DeterminationField({
                 <div className="col-md-6">
                   <TextFieldWithMultiplicationButton
                     name={`${namePrefix}${commonRoot}verbatimScientificName`}
-                    label="verbatimScientificName"
-                    className="col-sm-6"
+                    customName="verbatimScientificName"
+                    className="col-sm-6 verbatimScientificName"
                   />
                   <AutoSuggestTextField<MaterialSample>
                     name={`${namePrefix}${commonRoot}verbatimAgent`}
@@ -127,7 +127,7 @@ export function DeterminationField({
                     </FormikButton>
                   </div>
                 )}
-              </div>{" "}
+              </div>
             </TabPanel>
           );
           // Always shows the panel without tabs when it is a template
@@ -158,6 +158,14 @@ export function DeterminationField({
                     })
                   : null}
               </Tabs>
+              {!readOnly && !isTemplate && !determinations?.length && (
+                <FormikButton
+                  className="list-inline-item btn btn-primary add-assertion-button"
+                  onClick={addDetermination}
+                >
+                  <DinaMessage id="addDetermination" />
+                </FormikButton>
+              )}
             </div>
           );
         }}

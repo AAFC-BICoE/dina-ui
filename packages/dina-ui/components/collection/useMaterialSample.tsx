@@ -1,7 +1,14 @@
-import { AreYouSureModal, DinaForm } from "common-ui";
+import {
+  AreYouSureModal,
+  DinaForm,
+  DinaFormSubmitParams,
+  useApiClient,
+  useModal,
+  useQuery
+} from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { cloneDeep, isEmpty, isEqual } from "lodash";
+import { cloneDeep, fromPairs, isEmpty, isEqual, toPairs } from "lodash";
 import {
   Dispatch,
   SetStateAction,
@@ -11,15 +18,10 @@ import {
 } from "react";
 import { useCollectingEventQuery, useCollectingEventSave } from ".";
 import {
-  DinaFormSubmitParams,
-  useApiClient,
-  useModal,
-  useQuery
-} from "../../../common-ui/lib";
-import {
   CollectingEvent,
   MaterialSample
 } from "../../../dina-ui/types/collection-api";
+import { ScientificNameSource } from "../../../dina-ui/types/collection-api/resources/Determination";
 import {
   ManagedAttributeValues,
   Metadata
@@ -27,10 +29,7 @@ import {
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
-import { toPairs, fromPairs } from "lodash";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
-import { ScientificNameSource } from "../../../dina-ui/types/collection-api/resources/Determination";
-import { DETERMINATION_FIELDS } from "./DeterminationField";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -170,16 +169,10 @@ export function useMaterialSampleSave({
   const [enableDetermination, setEnableDetermination] = useState(
     Boolean(
       hasDeterminationTemplate ||
-        DETERMINATION_FIELDS.some(detFieldName =>
-          materialSample?.determination
-            ?.map(
-              (det, idx) =>
-                det?.[detFieldName] ||
-                enabledFields?.materialSample?.[
-                  `determination[${idx}]`
-                ]?.includes(detFieldName)
-            )
-            ?.includes(true)
+        // Show the determination section if a field is set or the field is enabled:
+        materialSample?.determination?.some(det => !isEmpty(det)) ||
+        enabledFields?.materialSample?.some(enabledField =>
+          enabledField.startsWith("determination[")
         )
     )
   );
@@ -189,7 +182,7 @@ export function useMaterialSampleSave({
     : {
         type: "material-sample",
         managedAttributes: {},
-        determination: [{}]
+        ...(enableDetermination && { determination: [{}] })
       };
 
   /** Used to get the values of the nested CollectingEvent form. */
@@ -357,7 +350,7 @@ export function useMaterialSampleSave({
         }
       });
     } else {
-      delete materialSampleInput.determination;
+      materialSampleInput.determination = [];
     }
 
     // Save the MaterialSample:
