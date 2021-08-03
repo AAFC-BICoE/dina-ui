@@ -235,7 +235,7 @@ export function useMaterialSampleSave({
     : {
         type: "material-sample",
         managedAttributes: {},
-        ...(enableDetermination && { determination: [{}] })
+        determination: [{}]
       };
 
   /** Used to get the values of the nested CollectingEvent form. */
