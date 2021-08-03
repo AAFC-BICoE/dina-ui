@@ -149,9 +149,13 @@ export function CollectingEventFormLayout({
       GeographicPlaceNameSource.OSM
     );
     if (isTemplate) {
-      // Include the hidden geographicPlaceNameSource value in the enabled template fields:
+      // Include the hidden geographicPlaceNameSource and sourceUrl values in the enabled template fields:
       formik.setFieldValue(
         "templateCheckboxes['geographicPlaceNameSource']",
+        true
+      );
+      formik.setFieldValue(
+        "templateCheckboxes['geographicPlaceNameSourceDetail.sourceUrl']",
         true
       );
     }
@@ -242,6 +246,10 @@ export function CollectingEventFormLayout({
       // Uncheck the templateCheckboxes in this form section:
       formik.setFieldValue(
         "templateCheckboxes['geographicPlaceNameSource']",
+        false
+      );
+      formik.setFieldValue(
+        "templateCheckboxes['geographicPlaceNameSourceDetail.sourceUrl']",
         false
       );
       formik.setFieldValue(
