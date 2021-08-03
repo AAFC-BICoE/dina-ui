@@ -29,6 +29,7 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
 import { toPairs, fromPairs } from "lodash";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
+import { ScientificNameSource } from "../../../dina-ui/types/collection-api/resources/Determination";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -156,11 +157,14 @@ export function useMaterialSampleSave({
     )
   );
 
+  const [enableDetermination, setEnableDetermination] = useState(false);
+
   const initialValues: InputResource<MaterialSample> = materialSample
     ? { ...materialSample }
     : {
         type: "material-sample",
-        managedAttributes: {}
+        managedAttributes: {},
+        determination: [{ type: "determination" }]
       };
 
   /** Used to get the values of the nested CollectingEvent form. */
@@ -206,7 +210,7 @@ export function useMaterialSampleSave({
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
     const dataComponents = document?.querySelectorAll<HTMLDivElement>(
-      ".data-components > fieldset:not(.d-none)"
+      ".data-components fieldset:not(.d-none)"
     );
     dataComponents?.forEach((element, index) => {
       element.style.backgroundColor = index % 2 === 0 ? "#f3f3f3" : "";
@@ -319,6 +323,11 @@ export function useMaterialSampleSave({
 
     delete materialSampleInput.managedAttributeValues;
 
+    materialSampleInput.determination?.map(det => {
+      det.scientificName = det.verbatimScientificName;
+      det.scientificNameSource = ScientificNameSource.COLPLUS;
+    });
+
     // Save the MaterialSample:
     const [savedMaterialSample] = await save(
       [
@@ -364,6 +373,8 @@ export function useMaterialSampleSave({
     setColEventId,
     colEventQuery,
     materialSampleAttachmentsUI,
-    onSubmit
+    onSubmit,
+    enableDetermination,
+    setEnableDetermination
   };
 }

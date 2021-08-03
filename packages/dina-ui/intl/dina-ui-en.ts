@@ -3,6 +3,7 @@
  */
 export const DINAUI_MESSAGES_ENGLISH = {
   addAnotherAssertion: "Add Another GeoReference",
+  addAnotherDetermination: "Add Another Determination",
   addAssertion: "Add GeoReference",
   addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
@@ -95,6 +96,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   detachCollectingEvent: "Detach Collecting Event",
   detachSelectedButtonText: "Detach Selected",
   detailsPageLink: "Details Page",
+  determination: "Determination",
   dinaHomeH1: "Dina Home",
   dinaUserSectionTitle: "Users",
   duplicateFilesFound: "duplicate files found",
@@ -351,6 +353,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   proceedToCreateMetadata: "Proceed to Create Metadata",
   removeAssertionLabel: "Remove this GeoReference",
   removeComponentData: "Remove {component} data",
+  removeDeterminationLabel: "Remove this Determination",
   removeFromParentStorageUnit: "Remove From Parent Storage Unit",
   removeGroup: "Remove Group",
   removeManagedAttributeValue:

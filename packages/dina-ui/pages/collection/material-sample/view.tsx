@@ -11,6 +11,10 @@ import { FastField, Field } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
+import {
+  DeterminationField,
+  DETERMINATION_FIELDS
+} from "../../../components/collection/DeterminationField";
 import { Head, Nav, StorageLinkerField } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import {
@@ -72,6 +76,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           fieldName => materialSample[fieldName]
         );
 
+        const hasDetermination = DETERMINATION_FIELDS.some(fieldName =>
+          materialSample.determination?.map(det => det[fieldName])
+        );
+
         return (
           <main className="container-fluid">
             {buttonBar}
@@ -104,6 +112,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 </FieldSet>
               )}
               {hasPreparations && <PreparationField />}
+              {hasDetermination && <DeterminationField />}
               <FieldSet
                 legend={<DinaMessage id="materialSampleManagedAttributes" />}
               >

@@ -15,6 +15,7 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { DeterminationField } from "../../../components/collection/DeterminationField";
 import { ReactNode, useContext } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -141,7 +142,9 @@ export function MaterialSampleForm({
     setColEventId,
     colEventQuery,
     onSubmit,
-    materialSampleAttachmentsUI
+    materialSampleAttachmentsUI,
+    enableDetermination,
+    setEnableDetermination
   } =
     materialSampleSaveHook ??
     useMaterialSampleSave({
@@ -189,6 +192,11 @@ export function MaterialSampleForm({
             {enablePreparations && (
               <a href="#preparations-section" className="list-group-item">
                 <DinaMessage id="preparations" />
+              </a>
+            )}
+            {enableDetermination && (
+              <a href="#determination-section" className="list-group-item">
+                <DinaMessage id="determination" />
               </a>
             )}
             <a href="#managedAttributes-section" className="list-group-item">
@@ -249,6 +257,17 @@ export function MaterialSampleForm({
                 )}
               />
               <DinaMessage id="preparations" />
+            </label>
+            <label className="enable-determination d-flex align-items-center fw-bold col-sm-3">
+              <Switch
+                className="mx-2"
+                checked={enableDetermination}
+                onChange={dataComponentToggler(
+                  setEnableDetermination,
+                  formatMessage("determination")
+                )}
+              />
+              <DinaMessage id="determination" />
             </label>
           </div>
         </FieldSet>
@@ -358,14 +377,8 @@ export function MaterialSampleForm({
             </DinaForm>
           ) : (
             <>
-              {enablePreparations && (
-                <div className="row">
-                  <div className="col-md-6">
-                    <PreparationField />
-                  </div>
-                </div>
-              )}
-
+              {enablePreparations && <PreparationField />}
+              {enableDetermination && <DeterminationField />}
               <FieldSet
                 legend={<DinaMessage id="managedAttributeListTitle" />}
                 id="managedAttributes-section"
