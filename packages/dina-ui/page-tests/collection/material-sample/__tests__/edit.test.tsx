@@ -179,6 +179,7 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
@@ -239,6 +240,7 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
@@ -294,6 +296,7 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "edited-catalog-number",
               collectingEvent: { id: "1", type: "collecting-event" },
+              storageUnit: { id: null, type: "storage-unit" },
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
@@ -379,6 +382,7 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
               dwcCatalogNumber: "my-number",
               group: "test group",
               id: "1",
@@ -510,6 +514,7 @@ describe("Material Sample Edit Page", () => {
                 id: null,
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
               id: "333",
               managedAttributes: {
                 testAttr: "do the test"

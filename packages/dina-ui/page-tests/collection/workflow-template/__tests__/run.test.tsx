@@ -217,6 +217,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 id: "2",
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
@@ -295,6 +296,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 id: "555",
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
@@ -349,6 +351,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 id: null,
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
               managedAttributes: {},
 
               // Preparations are not enabled, so the preparation fields are set to null:
