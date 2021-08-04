@@ -3,6 +3,7 @@
  */
 export const DINAUI_MESSAGES_ENGLISH = {
   addAnotherAssertion: "Add Another GeoReference",
+  addAnotherDetermination: "Add Another Determination",
   addAssertion: "Add GeoReference",
   addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",
@@ -12,6 +13,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addCollectionTitle: "Add Collection",
   addCollectorGroupTitle: "Add Collector Group",
   addCustomPlaceName: "Add",
+  addDetermination: "Add Determination",
   addExistingStorageUnitAsChild: "Add Existing Storage Unit as Child",
   addFilesButton: "Add Files",
   addGroup: "Add Group",
@@ -95,6 +97,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   detachCollectingEvent: "Detach Collecting Event",
   detachSelectedButtonText: "Detach Selected",
   detailsPageLink: "Details Page",
+  determination: "Determination",
   dinaHomeH1: "Dina Home",
   dinaUserSectionTitle: "Users",
   duplicateFilesFound: "duplicate files found",
@@ -238,7 +241,14 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_publiclyReleasable: "Publicly releasable",
   field_publiclyReleasable_tooltip:
     "Indicates if the object could be released publicly on a web page or open data portals.",
+  field_qualifier: "Transcriber's Notes",
   field_type: "Type",
+  field_typeStatus: "Type Status",
+  field_typeStatusEvidence: "Type Status Evidence",
+  field_verbatimScientificName: "Verbatim Scientific Name",
+  field_verbatimAgent: "Verbatim Agent",
+  field_verbatimDate: "Verbatim Date",
+  field_vebatimRemarks: "Vebatim Remarks",
   field_xmpMetadataDate: "Last Updated On",
   field_xmpMetadataDate_tooltip:
     "Date and time of when the record was last updated.",
@@ -351,6 +361,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   proceedToCreateMetadata: "Proceed to Create Metadata",
   removeAssertionLabel: "Remove this GeoReference",
   removeComponentData: "Remove {component} data",
+  removeDeterminationLabel: "Remove this Determination",
   removeFromParentStorageUnit: "Remove From Parent Storage Unit",
   removeGroup: "Remove Group",
   removeManagedAttributeValue:
@@ -364,6 +375,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   roles: "Roles",
   rolesPerGroup: "Roles Per Group",
   runWorkflow: "Run Workflow",
+  saveAndGoToViewPageButton: "Save & Go To View Page",
+  saveAndCreateNewMaterialSampleButton: "Save & Create New Material Sample",
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
   searchButton: "Search",
   searchResults: "Search Results ({resultSize})",
