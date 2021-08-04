@@ -38,8 +38,8 @@ export default function CreateMaterialSampleFromWorkflowPage() {
       : ""
   }`;
 
-  async function moveToSampleListPage() {
-    await router.push(`/collection/material-sample/list`);
+  async function moveToSampleViewPage(id: string) {
+    await router.push(`/collection/material-sample/view?id=${id}`);
   }
 
   async function moveToNewRunPage() {
@@ -56,7 +56,7 @@ export default function CreateMaterialSampleFromWorkflowPage() {
           <CreateMaterialSampleFromWorkflowForm
             actionDefinition={data}
             moveToNewRunPage={moveToNewRunPage}
-            moveToSampleListPage={moveToSampleListPage}
+            moveToSampleViewPage={moveToSampleViewPage}
           />
         ))}
       </div>
@@ -66,13 +66,13 @@ export default function CreateMaterialSampleFromWorkflowPage() {
 
 export interface CreateMaterialSampleFromWorkflowForm {
   actionDefinition: PersistedResource<PreparationProcessDefinition>;
-  moveToSampleListPage: () => Promise<void>;
+  moveToSampleViewPage: (id: string) => Promise<void>;
   moveToNewRunPage: () => Promise<void>;
 }
 
 export function CreateMaterialSampleFromWorkflowForm({
   actionDefinition,
-  moveToSampleListPage,
+  moveToSampleViewPage,
   moveToNewRunPage
 }: CreateMaterialSampleFromWorkflowForm) {
   const {
@@ -81,15 +81,15 @@ export function CreateMaterialSampleFromWorkflowForm({
     enabledFields
   } = useWorkflowMaterialSampleInitialValues(actionDefinition);
 
-  type RoutingButtonStrings = "newRun" | "listSample";
+  type RoutingButtonStrings = "newRun" | "viewSample";
 
   /* Route to either new workflow run page with the same tempalte id or
   material sample list page based on button clicked */
   function selectOnSaved(routeString: RoutingButtonStrings) {
-    return routeString === "newRun" ? moveToNewRunPage : moveToSampleListPage;
+    return routeString === "newRun" ? moveToNewRunPage : moveToSampleViewPage;
   }
 
-  const [onSaveString, setOnSaveString] = useState("listSample");
+  const [onSaveString, setOnSaveString] = useState("viewSample");
 
   return (
     <MaterialSampleForm
@@ -109,11 +109,11 @@ export function CreateMaterialSampleFromWorkflowForm({
           </SubmitButton>
           <SubmitButton
             buttonProps={() => ({
-              onClick: () => setOnSaveString("listSample"),
+              onClick: () => setOnSaveString("viewSample"),
               style: { width: "15rem" }
             })}
           >
-            <DinaMessage id="saveAndGoToListPageButton" />
+            <DinaMessage id="saveAndGoToViewPageButton" />
           </SubmitButton>
         </ButtonBar>
       }

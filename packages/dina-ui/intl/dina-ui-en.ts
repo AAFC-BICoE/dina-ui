@@ -364,7 +364,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   roles: "Roles",
   rolesPerGroup: "Roles Per Group",
   runWorkflow: "Run Workflow",
-  saveAndGoToListPageButton: "Save & Go To List Page",
+  saveAndGoToViewPageButton: "Save & Go To View Page",
   saveAndCreateNewMaterialSampleButton: "Save & Create New Material Sample",
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
   searchButton: "Search",
