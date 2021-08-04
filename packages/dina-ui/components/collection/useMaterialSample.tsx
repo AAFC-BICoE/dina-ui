@@ -232,13 +232,17 @@ export function useMaterialSampleSave({
     }
   };
 
-  const initialValues: InputResource<MaterialSample> = materialSample
-    ? { ...materialSample }
-    : {
-        type: "material-sample",
-        managedAttributes: {},
-        determination: [{}]
-      };
+  const initialValues: InputResource<MaterialSample> = {
+    ...(materialSample
+      ? { ...materialSample }
+      : {
+          type: "material-sample",
+          managedAttributes: {}
+        }),
+    determination: materialSample?.determination?.length
+      ? materialSample?.determination
+      : [{}]
+  };
 
   /** Used to get the values of the nested CollectingEvent form. */
   const colEventFormRef =

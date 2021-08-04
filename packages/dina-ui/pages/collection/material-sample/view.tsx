@@ -8,15 +8,13 @@ import {
   withResponse
 } from "common-ui";
 import { FastField, Field } from "formik";
+import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import {
-  DeterminationField,
-  DETERMINATION_FIELDS
-} from "../../../components/collection/DeterminationField";
 import { Head, Nav, StorageLinkerField } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
+import { DeterminationField } from "../../../components/collection/DeterminationField";
 import {
   PreparationField,
   PREPARATION_FIELDS
@@ -76,8 +74,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           fieldName => materialSample[fieldName]
         );
 
-        const hasDetermination = DETERMINATION_FIELDS.some(fieldName =>
-          materialSample.determination?.map(det => det?.[fieldName])
+        const hasDetermination = materialSample?.determination?.some(
+          det => !isEmpty(det)
         );
 
         return (
