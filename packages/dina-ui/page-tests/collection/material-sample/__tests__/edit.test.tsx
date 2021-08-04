@@ -215,6 +215,9 @@ describe("Material Sample Edit Page", () => {
       true
     );
 
+    await new Promise(setImmediate);
+    wrapper.update();
+
     wrapper
       .find(".materialSampleName-field input")
       .simulate("change", { target: { value: "test-material-sample-id" } });
