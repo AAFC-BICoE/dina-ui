@@ -128,7 +128,8 @@ async function getWrapper(
           type: "material-sample-action-definition"
         }
       }
-      onSaved={mockOnSaved}
+      moveToSampleViewPage={mockOnSaved}
+      moveToNewRunPage={mockOnSaved}
     />,
     { apiContext }
   );
