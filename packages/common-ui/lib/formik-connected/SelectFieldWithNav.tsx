@@ -1,8 +1,8 @@
-import { FaCaretRight, FaCaretLeft } from "react-icons/fa";
-import { GoCircleSlash } from "react-icons/go";
-import React, { useRef, useState } from "react";
-import { SelectField, SelectOption } from "./SelectField";
 import { FormikProps } from "formik";
+import React, { useRef, useState } from "react";
+import { FaCaretLeft, FaCaretRight } from "react-icons/fa";
+import { GoCircleSlash } from "react-icons/go";
+import { SelectField, SelectOption } from "./SelectField";
 
 interface SelectFieldWithNavProps<T> {
   name: string;
@@ -21,9 +21,6 @@ export function SelectFieldWithNav<T = string>(
   const selectRef = useRef<any>(null);
   const [leftDisabled, setLeftDisabled] = useState(true);
   const [rightDisabled, setRightDisabled] = useState(false);
-
-  const LeftArrowIcon = leftDisabled ? GoCircleSlash : FaCaretLeft;
-  const RightArrowIcon = rightDisabled ? GoCircleSlash : FaCaretRight;
 
   function findSelectionIndex() {
     let index = -1;
@@ -97,22 +94,24 @@ export function SelectFieldWithNav<T = string>(
         className="btn btn-secondary leftArrow mb-2"
         onClick={onLeftClick}
         type="button"
+        style={{
+          cursor: "pointer",
+          visibility: leftDisabled ? "hidden" : undefined
+        }}
       >
-        <LeftArrowIcon
-          size="1.5em"
-          style={{ cursor: leftDisabled ? "not-allowed" : "pointer" }}
-        />
+        <FaCaretLeft size="1.5em" />
       </button>
       <ForwardSelectField ref={selectRef} />
       <button
         className="btn btn-secondary rightArrow mb-2"
         onClick={onRightClick}
         type="button"
+        style={{
+          cursor: "pointer",
+          visibility: rightDisabled ? "hidden" : undefined
+        }}
       >
-        <RightArrowIcon
-          size="1.5em"
-          style={{ cursor: rightDisabled ? "not-allowed" : "pointer" }}
-        />
+        <FaCaretRight size="1.5em" />
       </button>
     </div>
   );
