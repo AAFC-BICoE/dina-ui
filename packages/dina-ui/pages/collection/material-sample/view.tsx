@@ -46,17 +46,24 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const collectingEvent = colEventQuery.response?.data;
 
   const buttonBar = (
-    <ButtonBar>
+    <ButtonBar className="flex">
       <BackButton
         entityId={id as string}
         entityLink="/collection/material-sample"
         byPassView={true}
+        className="flex-grow-1"
       />
       <EditButton
-        className="ms-auto"
         entityId={id as string}
         entityLink="collection/material-sample"
       />
+      <Link
+        href={`/collection/material-sample/workflows/split-config?id=${id}`}
+      >
+        <a className="btn btn-info">
+          <DinaMessage id="splitButton" />
+        </a>
+      </Link>
       <DeleteButton
         className="ms-5"
         id={id as string}

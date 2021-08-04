@@ -390,6 +390,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   showingFilteredStorageUnits: "Showing Filtered Storage Units",
   showingTopLevelStorageUnits: "Showing Top Level Storage Units",
   specifyParentContainer: "Please select parent container",
+  splitButton: "Split",
   splitSampleActionMetadataLegend: "Action Metadata",
   splitSampleChildSamplesToCreateLabel: "Child Material Samples to create",
   splitSampleConfigLegend: "Configure Action: Split",
