@@ -167,11 +167,6 @@ export function MaterialSampleForm({
                 <DinaMessage id="identifiers" />
               </a>
             )}
-            {dataComponentState.enableStorage && (
-              <a href="#storage-section" className="list-group-item">
-                <DinaMessage id="storage" />
-              </a>
-            )}
             {dataComponentState.enableCollectingEvent && (
               <a href="#collecting-event-section" className="list-group-item">
                 <DinaMessage id="collectingEvent" />
@@ -185,6 +180,11 @@ export function MaterialSampleForm({
             {dataComponentState.enableDetermination && (
               <a href="#determination-section" className="list-group-item">
                 <DinaMessage id="determination" />
+              </a>
+            )}
+            {dataComponentState.enableStorage && (
+              <a href="#storage-section" className="list-group-item">
+                <DinaMessage id="storage" />
               </a>
             )}
             <a href="#managedAttributes-section" className="list-group-item">
@@ -210,7 +210,6 @@ export function MaterialSampleForm({
         <div className="data-components">
           <FieldSet
             id="collecting-event-section"
-            className={dataComponentState.enableCollectingEvent ? "" : "d-none"}
             legend={<DinaMessage id="collectingEvent" />}
           >
             <Tabs
@@ -296,17 +295,18 @@ export function MaterialSampleForm({
               </TabPanel>
             </Tabs>
           </FieldSet>
-          <FieldSet
-            id="storage-section"
-            className={dataComponentState.enableStorage ? "" : "d-none"}
-            legend={<DinaMessage id="storage" />}
-          >
-            <div className="card card-body mb-3">
-              <StorageLinkerField name="storageUnit" removeLabelTag={true} />
-            </div>
-          </FieldSet>
           {dataComponentState.enablePreparations && <PreparationField />}
           {dataComponentState.enableDetermination && <DeterminationField />}
+          {dataComponentState.enableStorage && (
+            <FieldSet
+              id="storage-section"
+              legend={<DinaMessage id="storage" />}
+            >
+              <div className="card card-body mb-3">
+                <StorageLinkerField name="storageUnit" removeLabelTag={true} />
+              </div>
+            </FieldSet>
+          )}
           {!isTemplate && (
             <FieldSet
               legend={<DinaMessage id="managedAttributeListTitle" />}
