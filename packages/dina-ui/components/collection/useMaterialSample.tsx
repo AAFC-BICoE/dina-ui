@@ -29,6 +29,7 @@ import {
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
+import { DETERMINATION_FIELDS } from "./DeterminationField";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
 
 export function useMaterialSampleQuery(id?: string | null) {
@@ -111,10 +112,6 @@ export interface UseMaterialSampleSaveParams {
 
   materialSampleAttachmentsConfig?: AllowAttachmentsConfig;
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
-
-  determinationTemplateInitialValues?: Partial<MaterialSample> & {
-    templateCheckboxes?: Record<string, boolean | undefined>;
-  };
 }
 
 export function useMaterialSampleSave({
@@ -127,8 +124,7 @@ export function useMaterialSampleSave({
   materialSampleAttachmentsConfig,
   collectingEventAttachmentsConfig,
   colEventTemplateInitialValues,
-  materialSampleTemplateInitialValues,
-  determinationTemplateInitialValues
+  materialSampleTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
@@ -153,7 +149,12 @@ export function useMaterialSampleSave({
   // For editing existing templates:
   const hasDeterminationTemplate =
     isTemplate &&
-    !isEmpty(determinationTemplateInitialValues?.templateCheckboxes);
+    !isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        ...DETERMINATION_FIELDS.map(field => `determination[0].${field}`)
+      )
+    );
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(

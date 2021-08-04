@@ -18,6 +18,7 @@ import React, { useRef } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
 import { GroupSelectField, Head, Nav } from "../../../components";
+import { DETERMINATION_FIELDS } from "../../../components/collection/DeterminationField";
 import { PREPARATION_FIELDS } from "../../../components/collection/PreparationField";
 import { useMaterialSampleSave } from "../../../components/collection/useMaterialSample";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -36,6 +37,7 @@ const workflowMainFieldsSchema = yup.object({
   id: yup.string(),
   name: yup.string().trim().required(),
   group: yup.string().required(),
+  attachmentsConfig: yup.mixed(),
 
   storageUnit: yup.mixed(),
   templateCheckboxes: yup.mixed()
@@ -96,7 +98,6 @@ export function WorkflowTemplateForm({
   onSaved
 }: WorkflowTemplateFormProps) {
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
-  const determinationFormRef = useRef<FormikProps<any>>(null);
 
   const { formTemplates, ...initialDefinition } = fetchedActionDefinition ?? {};
 
@@ -109,27 +110,6 @@ export function WorkflowTemplateForm({
     colEventTemplateInitialValues.geoReferenceAssertions = [{}];
   }
 
-  // Extract the atual determination fields from templateFields when there is any
-  const derminationTemplateKeys = formTemplates?.MATERIAL_SAMPLE?.templateFields
-    ? Object.keys(formTemplates?.MATERIAL_SAMPLE?.templateFields as any).filter(
-        key => key.includes("determination")
-      )
-    : ["determination"];
-  const determinationTemplate = {
-    allowNew: formTemplates?.MATERIAL_SAMPLE?.allowNew,
-    allowExisting: formTemplates?.MATERIAL_SAMPLE?.allowExisting,
-    templateFields:
-      derminationTemplateKeys.length === 1 &&
-      derminationTemplateKeys[0] === "determination"
-        ? {}
-        : derminationTemplateKeys.length >= 1
-        ? pick(
-            formTemplates?.MATERIAL_SAMPLE?.templateFields,
-            derminationTemplateKeys
-          )
-        : {}
-  };
-
   const materialSampleTemplateInitialValues =
     getTemplateInitialValuesFromSavedFormTemplate(
       formTemplates?.MATERIAL_SAMPLE
@@ -140,15 +120,11 @@ export function WorkflowTemplateForm({
     ...materialSampleTemplateInitialValues
   };
 
-  const determinationTemplateInitialValues =
-    getTemplateInitialValuesFromSavedFormTemplate(determinationTemplate);
-
   const materialSampleSaveHook = useMaterialSampleSave({
     isTemplate: true,
     colEventTemplateInitialValues,
     materialSampleTemplateInitialValues,
-    collectingEvtFormRef,
-    determinationTemplateInitialValues
+    collectingEvtFormRef
   });
 
   const {
@@ -167,15 +143,24 @@ export function WorkflowTemplateForm({
   }: DinaFormSubmitParams<WorkflowFormValues>) {
     const mainTemplateFields = pick(submittedValues, "id", "group", "name");
 
+    const enabledTemplateFields =
+      getEnabledTemplateFieldsFromForm(submittedValues);
+
     const identifierTemplateFields = pick(
-      getEnabledTemplateFieldsFromForm(submittedValues),
+      enabledTemplateFields,
       ...IDENTIFIERS_FIELDS
     );
     const preparationTemplateFields = enablePreparations
+      ? pick(enabledTemplateFields, ...PREPARATION_FIELDS)
+      : {};
+    const determinationTemplateFields = enableDetermination
       ? pick(
-          getEnabledTemplateFieldsFromForm(submittedValues),
-          ...PREPARATION_FIELDS
+          enabledTemplateFields,
+          ...DETERMINATION_FIELDS.map(field => `determination[0].${field}`)
         )
+      : {};
+    const storageTemplateFields = enableStorage
+      ? pick(enabledTemplateFields, "storageUnit")
       : {};
 
     // Construct the template definition to persist based on the form values:
@@ -184,19 +169,12 @@ export function WorkflowTemplateForm({
       actionType: "ADD",
       formTemplates: {
         MATERIAL_SAMPLE: {
-          ...determinationFormRef.current?.values.attachmentsConfig,
+          ...submittedValues.attachmentsConfig,
           templateFields: {
             ...identifierTemplateFields,
             ...preparationTemplateFields,
-            ...(enableDetermination && determinationFormRef.current
-              ? getEnabledTemplateFieldsFromForm(
-                  determinationFormRef.current.values
-                )
-              : undefined),
-            ...(enableStorage && {
-              storageUnit:
-                getEnabledTemplateFieldsFromForm(submittedValues).storageUnit
-            })
+            ...determinationTemplateFields,
+            ...storageTemplateFields
           }
         },
         COLLECTING_EVENT: enableCollectingEvent
@@ -270,12 +248,8 @@ export function WorkflowTemplateForm({
       </div>
       <DinaFormSection isTemplate={true}>
         <MaterialSampleForm
-          determinationTemplateInitialValues={
-            determinationTemplateInitialValues
-          }
           templateInitialValues={materialSampleTemplateInitialValues}
           materialSampleSaveHook={materialSampleSaveHook}
-          determinationSectionRef={determinationFormRef}
         />
       </DinaFormSection>
       {buttonBar}

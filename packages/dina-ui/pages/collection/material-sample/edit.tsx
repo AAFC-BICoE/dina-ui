@@ -11,11 +11,9 @@ import {
   TextField,
   withResponse
 } from "common-ui";
-import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { DeterminationField } from "../../../components/collection/DeterminationField";
 import { ReactNode, useContext } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -26,6 +24,7 @@ import {
   StorageLinkerField
 } from "../../../components";
 import { CollectingEventLinker } from "../../../components/collection";
+import { DeterminationField } from "../../../components/collection/DeterminationField";
 import { PreparationField } from "../../../components/collection/PreparationField";
 import {
   useMaterialSampleQuery,
@@ -78,18 +77,12 @@ export interface MaterialSampleFormProps {
   collectingEventInitialValues?: InputResource<CollectingEvent>;
 
   onSaved?: (id: string) => Promise<void>;
-  identifiersSectionRef?: React.RefObject<FormikProps<any>>;
-  determinationSectionRef?: React.RefObject<FormikProps<any>>;
 
   /** Optionally call the hook from the parent component. */
   materialSampleSaveHook?: ReturnType<typeof useMaterialSampleSave>;
 
   /** Template form values for template mode. */
   templateInitialValues?: Partial<MaterialSample> & {
-    templateCheckboxes?: Record<string, boolean | undefined>;
-  };
-
-  determinationTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 
@@ -122,10 +115,7 @@ export function MaterialSampleForm({
       />
       <SubmitButton className="ms-auto" />
     </ButtonBar>
-  ),
-  templateInitialValues,
-  determinationTemplateInitialValues,
-  determinationSectionRef
+  )
 }: MaterialSampleFormProps) {
   const { isTemplate } = useContext(DinaFormContext) ?? {};
 
@@ -316,43 +306,28 @@ export function MaterialSampleForm({
             </div>
           </FieldSet>
           {dataComponentState.enablePreparations && <PreparationField />}
-          {isTemplate ? (
-            <>
-              <DinaForm
-                initialValues={determinationTemplateInitialValues}
-                innerRef={determinationSectionRef}
-                isTemplate={true}
+          {dataComponentState.enableDetermination && <DeterminationField />}
+          {!isTemplate && (
+            <FieldSet
+              legend={<DinaMessage id="managedAttributeListTitle" />}
+              id="managedAttributes-section"
+            >
+              <DinaFormSection
+                // Disabled the template's restrictions for this section:
+                enabledFields={null}
               >
-                {dataComponentState.enableDetermination && (
-                  <DeterminationField />
-                )}
-                {materialSampleAttachmentsUI}
-              </DinaForm>
-            </>
-          ) : (
-            <>
-              {dataComponentState.enableDetermination && <DeterminationField />}
-              <FieldSet
-                legend={<DinaMessage id="managedAttributeListTitle" />}
-                id="managedAttributes-section"
-              >
-                <DinaFormSection
-                  // Disabled the template's restrictions for this section:
-                  enabledFields={null}
-                >
-                  <ManagedAttributesEditor
-                    valuesPath="managedAttributeValues"
-                    valueFieldName="assignedValue"
-                    managedAttributeApiPath="collection-api/managed-attribute"
-                    apiBaseUrl="/collection-api"
-                    managedAttributeComponent="MATERIAL_SAMPLE"
-                    managedAttributeKeyField="key"
-                  />
-                </DinaFormSection>
-              </FieldSet>
-              {materialSampleAttachmentsUI}
-            </>
+                <ManagedAttributesEditor
+                  valuesPath="managedAttributeValues"
+                  valueFieldName="assignedValue"
+                  managedAttributeApiPath="collection-api/managed-attribute"
+                  apiBaseUrl="/collection-api"
+                  managedAttributeComponent="MATERIAL_SAMPLE"
+                  managedAttributeKeyField="key"
+                />
+              </DinaFormSection>
+            </FieldSet>
           )}
+          {materialSampleAttachmentsUI}
         </div>
       </div>
     </div>
