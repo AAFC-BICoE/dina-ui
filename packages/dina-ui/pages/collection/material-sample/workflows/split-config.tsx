@@ -13,6 +13,7 @@ import {
 import { Field } from "formik";
 import { padStart, range } from "lodash";
 import { useRouter } from "next/router";
+import { useMaterialSampleQuery } from "../../../../../dina-ui/components/collection/useMaterialSample";
 import React, { useState, ReactNode } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";
@@ -84,6 +85,10 @@ export default function ConfigAction() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
 
+  const {
+    query: { id: parentId }
+  } = router;
+
   const [storedRunConfig, setStoredRunConfig] = useLocalStorage<
     MaterialSampleRunConfig | null | undefined
   >(SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY);
@@ -143,6 +148,17 @@ export default function ConfigAction() {
 
   const initialConfigChild = storedRunConfig?.configure_children;
 
+  const materialSampleQuery = useMaterialSampleQuery(parentId as string);
+  if (parentId && materialSampleQuery.loading) return null;
+  const { materialSampleName, dwcCatalogNumber } =
+    materialSampleQuery?.response?.data ?? {};
+
+  const computedInitConfigValues = { ...initialConfig, ...initialConfigChild };
+  Object.assign(
+    computedInitConfigValues,
+    parentId ? { baseName: materialSampleName ?? dwcCatalogNumber } : {}
+  );
+
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
@@ -151,10 +167,14 @@ export default function ConfigAction() {
         <h1>
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
-        <DinaForm
-          initialValues={{ ...initialConfig, ...initialConfigChild }}
-          onSubmit={onSubmit}
-        >
+        <h2>
+          {materialSampleName && dwcCatalogNumber
+            ? `${materialSampleName} | ${dwcCatalogNumber} `
+            : materialSampleName
+            ? materialSampleName
+            : dwcCatalogNumber}
+        </h2>
+        <DinaForm initialValues={computedInitConfigValues} onSubmit={onSubmit}>
           <p>
             <span className="fw-bold">{formatMessage("description")}:</span>
             {formatMessage("splitSampleDescription")}

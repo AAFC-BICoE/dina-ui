@@ -400,7 +400,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   splitSampleRemarksPlaceholder:
     " Describe what you did, what was changed, or what happened as a result. (i.e. removed leg)",
   splitSampleTagOriginalAsDestroyed: 'Tag Original as "Destroyed"',
-  splitSubsampleTitle: "Split(Subsample)",
+  splitSubsampleTitle: "Split Material Sample",
   splitWorkflowRunTitle: "Split Workflow Run",
   startEventDateTimeLabel: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   startNewRunConfigLabel: "Start a New Run ",
