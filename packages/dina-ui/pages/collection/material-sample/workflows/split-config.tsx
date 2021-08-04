@@ -3,7 +3,6 @@ import {
   ButtonBar,
   CheckBoxWithoutWrapper,
   DinaForm,
-  DinaFormOnSubmit,
   FieldSet,
   SelectField,
   SubmitButton,
@@ -11,8 +10,8 @@ import {
   useCollapser
 } from "common-ui";
 import { Field } from "formik";
+import { WithRouterProps } from "next/dist/client/with-router";
 import { padStart, range } from "lodash";
-import { useRouter } from "next/router";
 import { useMaterialSampleQuery } from "../../../../../dina-ui/components/collection/useMaterialSample";
 import React, { useState, ReactNode } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -81,13 +80,8 @@ function CollapsableSection({
   );
 }
 
-export default function ConfigAction() {
+export default function ConfigAction({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
-  const router = useRouter();
-
-  const {
-    query: { id: parentId }
-  } = router;
 
   const [storedRunConfig, setStoredRunConfig] = useLocalStorage<
     MaterialSampleRunConfig | null | undefined
@@ -148,16 +142,23 @@ export default function ConfigAction() {
 
   const initialConfigChild = storedRunConfig?.configure_children;
 
-  const materialSampleQuery = useMaterialSampleQuery(parentId as string);
-  if (parentId && materialSampleQuery.loading) return null;
-  const { materialSampleName, dwcCatalogNumber } =
-    materialSampleQuery?.response?.data ?? {};
+  const parentId = router?.query?.id;
 
   const computedInitConfigValues = { ...initialConfig, ...initialConfigChild };
-  Object.assign(
-    computedInitConfigValues,
-    parentId ? { baseName: materialSampleName ?? dwcCatalogNumber } : {}
-  );
+
+  let materialSampleName;
+  let catalogNumber;
+
+  if (parentId) {
+    const materialSampleQuery = useMaterialSampleQuery(parentId as string);
+    if (materialSampleQuery.loading) return null;
+    materialSampleName =
+      materialSampleQuery?.response?.data?.materialSampleName;
+    catalogNumber = materialSampleQuery?.response?.data?.dwcCatalogNumber;
+    Object.assign(computedInitConfigValues, {
+      baseName: materialSampleName ?? catalogNumber
+    });
+  }
 
   return (
     <div>
@@ -167,13 +168,15 @@ export default function ConfigAction() {
         <h1>
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
-        <h2>
-          {materialSampleName && dwcCatalogNumber
-            ? `${materialSampleName} | ${dwcCatalogNumber} `
-            : materialSampleName
-            ? materialSampleName
-            : dwcCatalogNumber}
-        </h2>
+        {parentId && (
+          <h2>
+            {materialSampleName && catalogNumber
+              ? `${materialSampleName} | ${catalogNumber} `
+              : materialSampleName
+              ? materialSampleName
+              : catalogNumber}
+          </h2>
+        )}
         <DinaForm initialValues={computedInitConfigValues} onSubmit={onSubmit}>
           <p>
             <span className="fw-bold">{formatMessage("description")}:</span>
