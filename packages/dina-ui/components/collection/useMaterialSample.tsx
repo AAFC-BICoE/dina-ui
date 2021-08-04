@@ -8,7 +8,7 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { cloneDeep, fromPairs, isEmpty, isEqual, toPairs } from "lodash";
+import { cloneDeep, fromPairs, isEmpty, isEqual, pick, toPairs } from "lodash";
 import {
   Dispatch,
   SetStateAction,
@@ -99,9 +99,6 @@ export interface UseMaterialSampleSaveParams {
   colEventTemplateInitialValues?: Partial<CollectingEvent> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
-  preparationsTemplateInitialValues?: Partial<MaterialSample> & {
-    templateCheckboxes?: Record<string, boolean | undefined>;
-  };
   materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
@@ -131,7 +128,6 @@ export function useMaterialSampleSave({
   collectingEventAttachmentsConfig,
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues,
-  preparationsTemplateInitialValues,
   determinationTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
@@ -143,7 +139,12 @@ export function useMaterialSampleSave({
       colEventTemplateInitialValues?.id);
   const hasPreparationsTemplate =
     isTemplate &&
-    !isEmpty(preparationsTemplateInitialValues?.templateCheckboxes);
+    !isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        ...PREPARATION_FIELDS
+      )
+    );
 
   const hasStorageTemplate =
     isTemplate &&

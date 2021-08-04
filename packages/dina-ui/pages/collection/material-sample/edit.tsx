@@ -78,7 +78,6 @@ export interface MaterialSampleFormProps {
   collectingEventInitialValues?: InputResource<CollectingEvent>;
 
   onSaved?: (id: string) => Promise<void>;
-  preparationsSectionRef?: React.RefObject<FormikProps<any>>;
   identifiersSectionRef?: React.RefObject<FormikProps<any>>;
   determinationSectionRef?: React.RefObject<FormikProps<any>>;
 
@@ -86,10 +85,7 @@ export interface MaterialSampleFormProps {
   materialSampleSaveHook?: ReturnType<typeof useMaterialSampleSave>;
 
   /** Template form values for template mode. */
-  preparationsTemplateInitialValues?: Partial<MaterialSample> & {
-    templateCheckboxes?: Record<string, boolean | undefined>;
-  };
-  identifiersTemplateInitialValues?: Partial<MaterialSample> & {
+  templateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 
@@ -115,8 +111,6 @@ export function MaterialSampleForm({
   materialSample,
   collectingEventInitialValues,
   onSaved,
-  preparationsSectionRef,
-  identifiersSectionRef,
   materialSampleSaveHook,
   enabledFields,
   attachmentsConfig,
@@ -129,8 +123,7 @@ export function MaterialSampleForm({
       <SubmitButton className="ms-auto" />
     </ButtonBar>
   ),
-  preparationsTemplateInitialValues,
-  identifiersTemplateInitialValues,
+  templateInitialValues,
   determinationTemplateInitialValues,
   determinationSectionRef
 }: MaterialSampleFormProps) {
@@ -220,30 +213,11 @@ export function MaterialSampleForm({
         {!isTemplate && <MaterialSampleMainInfoFormLayout />}
         <div className="row">
           <div className="col-md-6">
-            {isTemplate ? (
-              <DinaForm
-                initialValues={identifiersTemplateInitialValues}
-                innerRef={identifiersSectionRef}
-                isTemplate={true}
-              >
-                <MaterialSampleIdentifiersFormLayout />
-              </DinaForm>
-            ) : (
-              <MaterialSampleIdentifiersFormLayout />
-            )}{" "}
+            <MaterialSampleIdentifiersFormLayout />
           </div>
         </div>
         <DataComponentToggler state={dataComponentState} />
         <div className="data-components">
-          <FieldSet
-            id="storage-section"
-            className={dataComponentState.enableStorage ? "" : "d-none"}
-            legend={<DinaMessage id="storage" />}
-          >
-            <div className="card card-body mb-3">
-              <StorageLinkerField name="storageUnit" removeLabelTag={true} />
-            </div>
-          </FieldSet>
           <FieldSet
             id="collecting-event-section"
             className={dataComponentState.enableCollectingEvent ? "" : "d-none"}
@@ -332,15 +306,18 @@ export function MaterialSampleForm({
               </TabPanel>
             </Tabs>
           </FieldSet>
+          <FieldSet
+            id="storage-section"
+            className={dataComponentState.enableStorage ? "" : "d-none"}
+            legend={<DinaMessage id="storage" />}
+          >
+            <div className="card card-body mb-3">
+              <StorageLinkerField name="storageUnit" removeLabelTag={true} />
+            </div>
+          </FieldSet>
+          {dataComponentState.enablePreparations && <PreparationField />}
           {isTemplate ? (
             <>
-              <DinaForm
-                initialValues={preparationsTemplateInitialValues}
-                innerRef={preparationsSectionRef}
-                isTemplate={true}
-              >
-                {dataComponentState.enablePreparations && <PreparationField />}
-              </DinaForm>
               <DinaForm
                 initialValues={determinationTemplateInitialValues}
                 innerRef={determinationSectionRef}
@@ -354,7 +331,6 @@ export function MaterialSampleForm({
             </>
           ) : (
             <>
-              {dataComponentState.enablePreparations && <PreparationField />}
               {dataComponentState.enableDetermination && <DeterminationField />}
               <FieldSet
                 legend={<DinaMessage id="managedAttributeListTitle" />}
@@ -382,7 +358,9 @@ export function MaterialSampleForm({
     </div>
   );
 
-  return !isTemplate ? (
+  return isTemplate ? (
+    mateirialSampleInternal
+  ) : (
     <DinaForm<InputResource<MaterialSample>>
       initialValues={initialValues}
       onSubmit={onSubmit}
@@ -392,8 +370,6 @@ export function MaterialSampleForm({
       {mateirialSampleInternal}
       {buttonBar}
     </DinaForm>
-  ) : (
-    mateirialSampleInternal
   );
 }
 export function MaterialSampleMainInfoFormLayout() {
@@ -415,6 +391,12 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   namePrefix?: string;
   sampleNamePlaceHolder?: string;
 }
+
+export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
+  "materialSampleName",
+  "dwcCatalogNumber",
+  "dwcOtherCatalogNumbers"
+];
 
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleIdentifiersFormLayout({
@@ -506,12 +488,6 @@ function DataComponentToggler({
       <div className="d-flex gap-5">
         {[
           {
-            name: formatMessage("storage"),
-            className: "enable-storage",
-            enabled: state.enableStorage,
-            setEnabled: state.setEnableStorage
-          },
-          {
             name: formatMessage("collectingEvent"),
             className: "enable-collecting-event",
             enabled: state.enableCollectingEvent,
@@ -528,6 +504,12 @@ function DataComponentToggler({
             className: "enable-determination",
             enabled: state.enableDetermination,
             setEnabled: state.setEnableDetermination
+          },
+          {
+            name: formatMessage("storage"),
+            className: "enable-storage",
+            enabled: state.enableStorage,
+            setEnabled: state.setEnableStorage
           }
         ].map(section => (
           <label

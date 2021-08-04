@@ -2,35 +2,39 @@ import {
   AutoSuggestTextField,
   DateField,
   FieldSet,
+  FormikButton,
   TextField,
   TextFieldWithMultiplicationButton,
-  useDinaFormContext,
-  FormikButton
+  useDinaFormContext
 } from "common-ui";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FieldArray } from "formik";
-import { Determination } from "packages/dina-ui/types/collection-api/resources/Determination";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { useState } from "react";
 import { clamp } from "lodash";
+import { useState } from "react";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { DinaMessage } from "../../intl/dina-ui-intl";
+import { Determination, MaterialSample } from "../../types/collection-api";
+
 export interface DeterminationFieldProps {
   className?: string;
   namePrefix?: string;
 }
 
-export const DETERMINATION_FIELDS = [
-  "verbatimScientificName",
-  "verbatimAgent",
-  "verbatimDate",
-  "typeStatus",
-  "typeStatusEvidence",
-  "determiner",
-  "determinedOn",
-  "qualifier",
-  "scientificNameSource",
-  "scientificName"
-] as const;
+const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
+  {
+    verbatimScientificName: true,
+    verbatimAgent: true,
+    verbatimDate: true,
+    typeStatus: true,
+    typeStatusEvidence: true,
+    determiner: true,
+    determinedOn: true,
+    qualifier: true,
+    scientificNameSource: true,
+    scientificName: true
+  };
+
+// All fields of the Determination type.
+export const DETERMINATION_FIELDS = Object.keys(DETERMINATION_FIELDS_OBJECT);
 
 export function DeterminationField({
   className,
