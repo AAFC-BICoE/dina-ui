@@ -92,11 +92,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             >
               <MaterialSampleMainInfoFormLayout />
               <MaterialSampleIdentifiersFormLayout />
-              {materialSample.storageUnit && (
-                <div className="card card-body mb-3">
-                  <StorageLinkerField name="storageUnit" />
-                </div>
-              )}
               {collectingEvent && (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                   <DinaForm initialValues={collectingEvent} readOnly={true}>
@@ -115,6 +110,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               )}
               {hasPreparations && <PreparationField />}
               {hasDetermination && <DeterminationField />}
+              {materialSample.storageUnit && (
+                <div className="card card-body mb-3">
+                  <StorageLinkerField name="storageUnit" />
+                </div>
+              )}
               <FieldSet
                 legend={<DinaMessage id="materialSampleManagedAttributes" />}
               >
