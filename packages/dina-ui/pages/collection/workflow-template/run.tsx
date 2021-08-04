@@ -8,7 +8,7 @@ import {
 import { InputResource, KitsuResource, PersistedResource } from "kitsu";
 import { compact, isNil, set, toPairs, pick } from "lodash";
 import { useRouter } from "next/router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Head, Nav } from "../../../components";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
@@ -16,6 +16,7 @@ import {
   TemplateFields
 } from "../../../types/collection-api";
 import { MaterialSampleForm } from "../material-sample/edit";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 export default function CreateMaterialSampleFromWorkflowPage() {
   const router = useRouter();
@@ -37,8 +38,12 @@ export default function CreateMaterialSampleFromWorkflowPage() {
       : ""
   }`;
 
-  async function moveToViewPage(savedId: string) {
-    await router.push(`/collection/material-sample/view?id=${savedId}`);
+  async function moveToSampleListPage() {
+    await router.push(`/collection/material-sample/list`);
+  }
+
+  async function moveToNewRunPage() {
+    await router.reload();
   }
 
   return (
@@ -50,7 +55,8 @@ export default function CreateMaterialSampleFromWorkflowPage() {
         {withResponse(actionDefinitionQuery, ({ data }) => (
           <CreateMaterialSampleFromWorkflowForm
             actionDefinition={data}
-            onSaved={moveToViewPage}
+            moveToNewRunPage={moveToNewRunPage}
+            moveToSampleListPage={moveToSampleListPage}
           />
         ))}
       </div>
@@ -60,12 +66,14 @@ export default function CreateMaterialSampleFromWorkflowPage() {
 
 export interface CreateMaterialSampleFromWorkflowForm {
   actionDefinition: PersistedResource<PreparationProcessDefinition>;
-  onSaved: (id: string) => Promise<void>;
+  moveToSampleListPage: () => Promise<void>;
+  moveToNewRunPage: () => Promise<void>;
 }
 
 export function CreateMaterialSampleFromWorkflowForm({
   actionDefinition,
-  onSaved
+  moveToSampleListPage,
+  moveToNewRunPage
 }: CreateMaterialSampleFromWorkflowForm) {
   const {
     materialSampleInitialValues,
@@ -73,17 +81,45 @@ export function CreateMaterialSampleFromWorkflowForm({
     enabledFields
   } = useWorkflowMaterialSampleInitialValues(actionDefinition);
 
+  type RoutingButtonStrings = "newRun" | "listSample";
+
+  /* Route to either new workflow run page with the same tempalte id or
+  material sample list page based on button clicked */
+  function selectOnSaved(routeString: RoutingButtonStrings) {
+    return routeString === "newRun" ? moveToNewRunPage : moveToSampleListPage;
+  }
+
+  const [onSaveString, setOnSaveString] = useState("listSample");
+
   return (
     <MaterialSampleForm
       buttonBar={
-        <ButtonBar>
-          <BackButton entityLink="/collection/workflow-template" />
-          <SubmitButton className="ms-auto" />
+        <ButtonBar className="d-flex">
+          <BackButton
+            entityLink="/collection/workflow-template"
+            className="flex-grow-1"
+          />
+          <SubmitButton
+            buttonProps={() => ({
+              onClick: () => setOnSaveString("newRun"),
+              style: { width: "20rem" }
+            })}
+          >
+            <DinaMessage id="saveAndCreateNewMaterialSampleButton" />
+          </SubmitButton>
+          <SubmitButton
+            buttonProps={() => ({
+              onClick: () => setOnSaveString("listSample"),
+              style: { width: "15rem" }
+            })}
+          >
+            <DinaMessage id="saveAndGoToListPageButton" />
+          </SubmitButton>
         </ButtonBar>
       }
       materialSample={materialSampleInitialValues}
       collectingEventInitialValues={collectingEventInitialValues}
-      onSaved={onSaved}
+      onSaved={selectOnSaved(onSaveString as RoutingButtonStrings)}
       enabledFields={enabledFields}
       attachmentsConfig={{
         collectingEvent: pick(
