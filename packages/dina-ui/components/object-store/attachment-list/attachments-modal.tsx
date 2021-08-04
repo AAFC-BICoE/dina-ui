@@ -163,6 +163,7 @@ export function useAttachmentsModal({
                       Header: <FieldHeader name={accessor} />
                     })),
                     {
+                      Header: <FieldHeader name={formatMessage("remove")} />,
                       Cell: ({ original: { id: mId } }) => (
                         <button
                           className="btn btn-dark"

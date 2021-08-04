@@ -1,7 +1,14 @@
-import { AreYouSureModal, DinaForm } from "common-ui";
+import {
+  AreYouSureModal,
+  DinaForm,
+  DinaFormSubmitParams,
+  useApiClient,
+  useModal,
+  useQuery
+} from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { cloneDeep, isEmpty, isEqual } from "lodash";
+import { cloneDeep, fromPairs, isEmpty, isEqual, toPairs } from "lodash";
 import {
   Dispatch,
   SetStateAction,
@@ -11,15 +18,10 @@ import {
 } from "react";
 import { useCollectingEventQuery, useCollectingEventSave } from ".";
 import {
-  DinaFormSubmitParams,
-  useApiClient,
-  useModal,
-  useQuery
-} from "../../../common-ui/lib";
-import {
   CollectingEvent,
   MaterialSample
 } from "../../../dina-ui/types/collection-api";
+import { ScientificNameSource } from "../../../dina-ui/types/collection-api/resources/Determination";
 import {
   ManagedAttributeValues,
   Metadata
@@ -27,7 +29,6 @@ import {
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
-import { toPairs, fromPairs } from "lodash";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
 
 export function useMaterialSampleQuery(id?: string | null) {
@@ -110,6 +111,10 @@ export interface UseMaterialSampleSaveParams {
 
   materialSampleAttachmentsConfig?: AllowAttachmentsConfig;
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
+
+  determinationTemplateInitialValues?: Partial<MaterialSample> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
 }
 
 export function useMaterialSampleSave({
@@ -122,7 +127,8 @@ export function useMaterialSampleSave({
   enabledFields,
   materialSampleAttachmentsConfig,
   collectingEventAttachmentsConfig,
-  preparationsTemplateInitialValues
+  preparationsTemplateInitialValues,
+  determinationTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
@@ -135,6 +141,10 @@ export function useMaterialSampleSave({
   const hasPreparationsTemplate =
     isTemplate &&
     !isEmpty(preparationsTemplateInitialValues?.templateCheckboxes);
+  // For editing existing templates:
+  const hasDeterminationTemplate =
+    isTemplate &&
+    !isEmpty(determinationTemplateInitialValues?.templateCheckboxes);
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(
@@ -156,11 +166,23 @@ export function useMaterialSampleSave({
     )
   );
 
+  const [enableDetermination, setEnableDetermination] = useState(
+    Boolean(
+      hasDeterminationTemplate ||
+        // Show the determination section if a field is set or the field is enabled:
+        materialSample?.determination?.some(det => !isEmpty(det)) ||
+        enabledFields?.materialSample?.some(enabledField =>
+          enabledField.startsWith("determination[")
+        )
+    )
+  );
+
   const initialValues: InputResource<MaterialSample> = materialSample
     ? { ...materialSample }
     : {
         type: "material-sample",
-        managedAttributes: {}
+        managedAttributes: {},
+        ...(enableDetermination && { determination: [{}] })
       };
 
   /** Used to get the values of the nested CollectingEvent form. */
@@ -206,7 +228,7 @@ export function useMaterialSampleSave({
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
     const dataComponents = document?.querySelectorAll<HTMLDivElement>(
-      ".data-components > fieldset:not(.d-none)"
+      ".data-components fieldset:not(.d-none)"
     );
     dataComponents?.forEach((element, index) => {
       element.style.backgroundColor = index % 2 === 0 ? "#f3f3f3" : "";
@@ -319,6 +341,18 @@ export function useMaterialSampleSave({
 
     delete materialSampleInput.managedAttributeValues;
 
+    // Only persist determination when enabled
+    if (enableDetermination) {
+      materialSampleInput.determination?.map(det => {
+        if (det) {
+          det.scientificName = det?.verbatimScientificName;
+          det.scientificNameSource = ScientificNameSource.COLPLUS;
+        }
+      });
+    } else {
+      materialSampleInput.determination = [];
+    }
+
     // Save the MaterialSample:
     const [savedMaterialSample] = await save(
       [
@@ -364,6 +398,8 @@ export function useMaterialSampleSave({
     setColEventId,
     colEventQuery,
     materialSampleAttachmentsUI,
-    onSubmit
+    onSubmit,
+    enableDetermination,
+    setEnableDetermination
   };
 }

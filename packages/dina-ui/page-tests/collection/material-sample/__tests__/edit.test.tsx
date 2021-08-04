@@ -1,6 +1,7 @@
 import { KitsuResourceLink, PersistedResource } from "kitsu";
 import ReactSwitch from "react-switch";
 import Switch from "react-switch";
+import { BLANK_PREPARATION } from "../../../../components/collection/PreparationField";
 import { MaterialSampleForm } from "../../../../pages/collection/material-sample/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
@@ -71,6 +72,11 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/material-sample-type":
     case "user-api/group":
     case "agent-api/person":
+    case "collection-api/vocabulary/srs":
+    case "collection-api/vocabulary/coordinateSystem":
+    case "collection-api/vocabulary/degreeOfEstablishment":
+    case "collection-api/storage-unit-type":
+    case "collection-api/storage-unit":
     case "objectstore-api/metadata":
       return { data: [] };
   }
@@ -155,7 +161,6 @@ describe("Material Sample Edit Page", () => {
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               geoReferenceAssertions: [
                 {
-                  georeferencedBy: undefined,
                   isPrimary: true
                 }
               ],
@@ -181,6 +186,7 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
+              determination: [],
               relationships: {},
               type: "material-sample"
             },
@@ -241,6 +247,7 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
+              determination: [],
               type: "material-sample",
               relationships: {}
             },
@@ -295,20 +302,8 @@ describe("Material Sample Edit Page", () => {
               collectingEvent: { id: "1", type: "collecting-event" },
 
               // Preparations are not enabled, so the preparation fields are set to null:
-              materialSampleType: {
-                id: null,
-                type: "material-sample-type"
-              },
-              preparationRemarks: null,
-              preparationDate: null,
-              preparationType: {
-                id: null,
-                type: "preparation-type"
-              },
-              preparedBy: {
-                id: null,
-                type: "person"
-              },
+              ...BLANK_PREPARATION,
+              determination: [],
 
               managedAttributes: {},
               relationships: {}
@@ -397,20 +392,8 @@ describe("Material Sample Edit Page", () => {
               type: "material-sample",
 
               // Preparations are not enabled, so the preparation fields are set to null:
-              materialSampleType: {
-                id: null,
-                type: "material-sample-type"
-              },
-              preparationRemarks: null,
-              preparationDate: null,
-              preparationType: {
-                id: null,
-                type: "preparation-type"
-              },
-              preparedBy: {
-                id: null,
-                type: "person"
-              },
+              ...BLANK_PREPARATION,
+              determination: [],
               managedAttributes: {},
               relationships: {}
             },
@@ -446,6 +429,31 @@ describe("Material Sample Edit Page", () => {
     // Preparations are enabled:
     expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+  });
+
+  it("Renders an existing Material Sample with the Determinations section enabled.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms",
+          determination: [
+            { verbatimScientificName: "test verbatim scientific name" }
+          ]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Determinations are enabled:
+    expect(
+      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
     ).toEqual(true);
   });
 
@@ -506,20 +514,8 @@ describe("Material Sample Edit Page", () => {
                 testAttr: "do the test"
               },
               materialSampleName: "test-ms",
-              materialSampleType: {
-                id: null,
-                type: "material-sample-type"
-              },
-              preparationDate: null,
-              preparationRemarks: null,
-              preparationType: {
-                id: null,
-                type: "preparation-type"
-              },
-              preparedBy: {
-                id: null,
-                type: "person"
-              },
+              ...BLANK_PREPARATION,
+              determination: [],
               relationships: {},
               type: "material-sample"
             },

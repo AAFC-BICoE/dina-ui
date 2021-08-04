@@ -18,6 +18,7 @@ import {
 } from "common-ui";
 import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
+import { Vocabulary } from "../../types/collection-api";
 import { ChangeEvent, useRef, useState } from "react";
 import { ShouldRenderReasons } from "react-autosuggest";
 import Switch from "react-switch";
@@ -148,9 +149,13 @@ export function CollectingEventFormLayout({
       GeographicPlaceNameSource.OSM
     );
     if (isTemplate) {
-      // Include the hidden geographicPlaceNameSource value in the enabled template fields:
+      // Include the hidden geographicPlaceNameSource and sourceUrl values in the enabled template fields:
       formik.setFieldValue(
         "templateCheckboxes['geographicPlaceNameSource']",
+        true
+      );
+      formik.setFieldValue(
+        "templateCheckboxes['geographicPlaceNameSourceDetail.sourceUrl']",
         true
       );
     }
@@ -241,6 +246,10 @@ export function CollectingEventFormLayout({
       // Uncheck the templateCheckboxes in this form section:
       formik.setFieldValue(
         "templateCheckboxes['geographicPlaceNameSource']",
+        false
+      );
+      formik.setFieldValue(
+        "templateCheckboxes['geographicPlaceNameSourceDetail.sourceUrl']",
         false
       );
       formik.setFieldValue(
@@ -481,12 +490,15 @@ export function CollectingEventFormLayout({
           <div className="row">
             <div className="col-md-6">
               <TextField name="dwcVerbatimLocality" />
-              <AutoSuggestTextField<CoordinateSystem>
+              <AutoSuggestTextField<Vocabulary>
                 name="dwcVerbatimCoordinateSystem"
-                configQuery={() => ({
-                  path: "collection-api/coordinate-system"
+                query={() => ({
+                  path: "collection-api/vocabulary/coordinateSystem"
                 })}
-                configSuggestion={src => src?.coordinateSystem ?? []}
+                suggestion={vocabElement =>
+                  vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ??
+                  ""
+                }
                 shouldRenderSuggestions={shouldRenderSuggestions}
                 onSuggestionSelected={onSuggestionSelected}
                 onChangeExternal={onChangeExternal}
@@ -576,12 +588,15 @@ export function CollectingEventFormLayout({
               </Field>
             </div>
             <div className="col-md-6">
-              <AutoSuggestTextField<SRS>
+              <AutoSuggestTextField<Vocabulary>
                 name="dwcVerbatimSRS"
-                configQuery={() => ({
-                  path: "collection-api/srs"
+                query={() => ({
+                  path: "collection-api/vocabulary/srs"
                 })}
-                configSuggestion={src => src?.srs ?? []}
+                suggestion={vocabElement =>
+                  vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ??
+                  ""
+                }
                 shouldRenderSuggestions={shouldRenderSuggestions}
                 onChangeExternal={onChangeExternal}
               />

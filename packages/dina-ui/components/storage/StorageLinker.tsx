@@ -70,12 +70,14 @@ export function StorageLinker({
 export interface StorageLinkerFieldProps {
   name: string;
   customName?: string;
+  removeLabelTag?: boolean;
 }
 
 /** DinaForm-connected Storage Assignment UI. */
 export function StorageLinkerField({
   name,
-  customName
+  customName,
+  removeLabelTag
 }: StorageLinkerFieldProps) {
   return (
     <FieldWrapper
@@ -85,6 +87,7 @@ export function StorageLinkerField({
       )}
       disableLabelClick={true}
       customName={customName}
+      removeLabelTag={removeLabelTag}
     >
       {({ value, setValue }) => (
         <StorageLinker value={value} onChange={setValue} />

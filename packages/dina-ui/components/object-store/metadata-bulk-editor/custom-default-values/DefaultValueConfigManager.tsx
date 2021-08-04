@@ -115,7 +115,8 @@ export function DefaultValuesConfigSelect({
 
   return (
     <Select<{ label: string; value: number | null }>
-      instanceId="config-select"
+      instanceId={"config-select-"+document.getElementsByClassName("ReactModalPortal").length}
+      aria-label="Select Rule Set"
       options={selectOptions}
       onChange={(option: any) => onChangeConfigIndex(option.value)}
       value={ruleConfigOptions[ruleConfigIndex ?? -1] ?? null}

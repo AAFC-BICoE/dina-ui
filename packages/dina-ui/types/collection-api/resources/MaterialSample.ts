@@ -5,6 +5,7 @@ import { CollectingEvent } from "./CollectingEvent";
 import { PreparationType } from "./PreparationType";
 import { JsonValue } from "type-fest";
 import { MaterialSampleType } from "./MaterialSampleType";
+import { Determination } from "./Determination";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -20,9 +21,12 @@ export interface MaterialSampleAttributes {
   preparationDate?: string | null;
   preparationRemarks?: string | null;
   description?: string;
+  dwcDegreeOfEstablishment?: string | null;
 
   managedAttributeValues?: ManagedAttributeValues;
   managedAttributes?: JsonValue;
+
+  determination?: Determination[];
 }
 
 export interface MaterialSampleRelationships {

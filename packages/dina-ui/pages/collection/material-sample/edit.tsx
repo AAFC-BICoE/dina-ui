@@ -15,6 +15,7 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { DeterminationField } from "../../../components/collection/DeterminationField";
 import { ReactNode, useContext } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -53,7 +54,7 @@ export default function MaterialSampleEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <div className="container-fluid">
+      <main className="container-fluid">
         <h1>
           <DinaMessage id={title} />
         </h1>
@@ -67,7 +68,7 @@ export default function MaterialSampleEditPage() {
         ) : (
           <MaterialSampleForm onSaved={moveToViewPage} />
         )}
-      </div>
+      </main>
     </div>
   );
 }
@@ -79,6 +80,7 @@ export interface MaterialSampleFormProps {
   onSaved?: (id: string) => Promise<void>;
   preparationsSectionRef?: React.RefObject<FormikProps<any>>;
   identifiersSectionRef?: React.RefObject<FormikProps<any>>;
+  determinationSectionRef?: React.RefObject<FormikProps<any>>;
 
   /** Optionally call the hook from the parent component. */
   materialSampleSaveHook?: ReturnType<typeof useMaterialSampleSave>;
@@ -88,6 +90,10 @@ export interface MaterialSampleFormProps {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
   identifiersTemplateInitialValues?: Partial<MaterialSample> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
+
+  determinationTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 
@@ -124,7 +130,9 @@ export function MaterialSampleForm({
     </ButtonBar>
   ),
   preparationsTemplateInitialValues,
-  identifiersTemplateInitialValues
+  identifiersTemplateInitialValues,
+  determinationTemplateInitialValues,
+  determinationSectionRef
 }: MaterialSampleFormProps) {
   const { formatMessage } = useDinaIntl();
   const { isTemplate } = useContext(DinaFormContext) ?? {};
@@ -141,7 +149,9 @@ export function MaterialSampleForm({
     setColEventId,
     colEventQuery,
     onSubmit,
-    materialSampleAttachmentsUI
+    materialSampleAttachmentsUI,
+    enableDetermination,
+    setEnableDetermination
   } =
     materialSampleSaveHook ??
     useMaterialSampleSave({
@@ -167,9 +177,9 @@ export function MaterialSampleForm({
           className="card card-body sticky-top d-none d-md-block"
           style={{ width: "20rem" }}
         >
-          <h4>
+          <h2>
             <DinaMessage id="formNavigation" />
-          </h4>
+          </h2>
           <div className="list-group">
             {!isTemplate && (
               <a href="#material-sample-section" className="list-group-item">
@@ -189,6 +199,11 @@ export function MaterialSampleForm({
             {enablePreparations && (
               <a href="#preparations-section" className="list-group-item">
                 <DinaMessage id="preparations" />
+              </a>
+            )}
+            {enableDetermination && (
+              <a href="#determination-section" className="list-group-item">
+                <DinaMessage id="determination" />
               </a>
             )}
             <a href="#managedAttributes-section" className="list-group-item">
@@ -223,7 +238,7 @@ export function MaterialSampleForm({
 
         {!isTemplate && (
           <div className="card card-body mb-3">
-            <StorageLinkerField name="storageUnit" />
+            <StorageLinkerField name="storageUnit" removeLabelTag={true} />
           </div>
         )}
         <FieldSet legend={<DinaMessage id="components" />}>
@@ -249,6 +264,17 @@ export function MaterialSampleForm({
                 )}
               />
               <DinaMessage id="preparations" />
+            </label>
+            <label className="enable-determination d-flex align-items-center fw-bold col-sm-3">
+              <Switch
+                className="mx-2"
+                checked={enableDetermination}
+                onChange={dataComponentToggler(
+                  setEnableDetermination,
+                  formatMessage("determination")
+                )}
+              />
+              <DinaMessage id="determination" />
             </label>
           </div>
         </FieldSet>
@@ -342,30 +368,27 @@ export function MaterialSampleForm({
             </Tabs>
           </FieldSet>
           {isTemplate ? (
-            <DinaForm
-              initialValues={preparationsTemplateInitialValues}
-              innerRef={preparationsSectionRef}
-              isTemplate={true}
-            >
-              {enablePreparations && (
-                <div className="row">
-                  <div className="col-md-6">
-                    <PreparationField />
-                  </div>
-                </div>
-              )}
-              {materialSampleAttachmentsUI}
-            </DinaForm>
+            <>
+              <DinaForm
+                initialValues={preparationsTemplateInitialValues}
+                innerRef={preparationsSectionRef}
+                isTemplate={true}
+              >
+                {enablePreparations && <PreparationField />}
+              </DinaForm>
+              <DinaForm
+                initialValues={determinationTemplateInitialValues}
+                innerRef={determinationSectionRef}
+                isTemplate={true}
+              >
+                {enableDetermination && <DeterminationField />}
+                {materialSampleAttachmentsUI}
+              </DinaForm>
+            </>
           ) : (
             <>
-              {enablePreparations && (
-                <div className="row">
-                  <div className="col-md-6">
-                    <PreparationField />
-                  </div>
-                </div>
-              )}
-
+              {enablePreparations && <PreparationField />}
+              {enableDetermination && <DeterminationField />}
               <FieldSet
                 legend={<DinaMessage id="managedAttributeListTitle" />}
                 id="managedAttributes-section"
