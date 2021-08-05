@@ -44,6 +44,10 @@ const apiContext = {
   }
 };
 
+jest.mock("next/router", () => ({
+  withRouter: () => ({ push: jest.fn() })
+}));
+
 describe("MaterialSample split workflow series-mode run config", () => {
   it("Initially display the workfow run config with defaults", async () => {
     const wrapper = mountWithAppContext(
@@ -95,7 +99,7 @@ describe("MaterialSample split workflow series-mode run config", () => {
       .simulate("change", { target: { value: "Remarks on this run config" } });
 
     wrapper
-      .find(".sampleName0 input")
+      .find(".sampleNames0 input")
       .simulate("change", { target: { value: "my custom name" } });
 
     wrapper.update();
@@ -148,7 +152,7 @@ describe("MaterialSample split workflow series-mode run config", () => {
       .simulate("change", { target: { value: 3 } });
 
     wrapper
-      .find(".sampleName0 input")
+      .find(".sampleNames0 input")
       .simulate("change", { target: { value: "CustomName1" } });
 
     wrapper.update();

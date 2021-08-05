@@ -98,7 +98,7 @@ export function ConfigAction({ router }: WithRouterProps) {
   const onSubmit = async ({ submittedValues: configActionFields }) => {
     const childSampleNames: string[] = [];
     for (let i = 0; i < configActionFields.numOfChildToCreate; i++) {
-      childSampleNames.push(configActionFields?.sampleName?.[i]);
+      childSampleNames.push(configActionFields?.sampleNames?.[i]);
     }
 
     const runConfig: MaterialSampleRunConfig = {
@@ -267,15 +267,51 @@ function SplitChildRow({
     <div className="d-flex">
       <span className="col-md-1 fw-bold">#{index + 1}:</span>
       <TextField
-        className={`col-md-3 sampleName${index}`}
+        className={`col-md-3 sampleNames${index}`}
         hideLabel={true}
-        name={`sampleName[${index}]`}
+        name={`sampleNames[${index}]`}
         placeholder={`${baseName || BASE_NAME}${computedSuffix}`}
       />
     </div>
   );
 }
 
+function computingSuffix(generationMode, suffix, index, start, suffixType) {
+  return generationMode === "BATCH"
+    ? suffix || ""
+    : generationMode === "SERIES"
+    ? `-${computeSuffix({
+        index,
+        start,
+        suffixType
+      })}`
+    : "";
+}
+
+const setChildSampleNames = (form, name, value) => {
+  const {
+    generationMode,
+    suffix,
+    start,
+    suffixType,
+    baseName,
+    numOfChildToCreate
+  } = form.values;
+
+  range(0, numOfChildToCreate).map(index => {
+    const computedSuffix = computingSuffix(
+      generationMode,
+      suffix,
+      index,
+      start,
+      suffixType
+    );
+    form.setFieldValue(
+      `sampleNames[${index}]`,
+      `${baseName || BASE_NAME}${computedSuffix}`
+    );
+  });
+};
 interface SplitConfigFormProps {
   generationMode: MaterialSampleGenerationMode;
 }
@@ -292,9 +328,10 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
         <NumberSpinnerField
           name="numOfChildToCreate"
           className="col-md-2"
-          onChange={(newValue, formik) =>
-            formik.setFieldValue("numOfChildToCreate", newValue)
-          }
+          onChangeExternal={(form, name, value) => {
+            form.setFieldValue("numOfChildToCreate", value);
+            setChildSampleNames(form, name, value);
+          }}
           hideLabel={true}
           max={NUMERIC_UPPER_LIMIT}
         />
@@ -318,12 +355,14 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
           className="col-md-2"
           name="baseName"
           placeholder={BASE_NAME}
+          onChangeExternal={setChildSampleNames}
         />
         {generationMode === "BATCH" && (
           <TextField
             name="suffix"
             className="col-md-2"
             label={<DinaMessage id="suffixOptional" />}
+            onChangeExternal={setChildSampleNames}
           />
         )}
         {generationMode === "SERIES" && (
@@ -332,12 +371,13 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
               className="col-md-2"
               name="suffixType"
               options={TYPE_OPTIONS}
-              onChange={(newType, formik) =>
+              onChange={(newType, formik) => {
                 formik.setFieldValue(
                   "start",
                   newType === "Numerical" ? "001" : "A"
-                )
-              }
+                );
+                setChildSampleNames(formik, null, newType);
+              }}
             />
             <Field name="suffixType">
               {({ field: { value: suffixType } }) => (
@@ -350,6 +390,7 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
                   name="start"
                   numberOnly={suffixType === "Numerical"}
                   letterOnly={suffixType === "Letter"}
+                  onChangeExternal={setChildSampleNames}
                 />
               )}
             </Field>
