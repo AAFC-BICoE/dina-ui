@@ -3,7 +3,8 @@ import {
   START,
   TYPE_NUMERIC
 } from "../../../../../../dina-ui/types/collection-api";
-import ConfigAction, {
+import {
+  ConfigAction,
   SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
 } from "../../../../../pages/collection/material-sample/workflows/split-config";
 import { mountWithAppContext } from "../../../../../test-util/mock-app-context";
@@ -46,9 +47,13 @@ const apiContext = {
 describe("MaterialSample split workflow series-mode run config", () => {
   it("Initially display the workfow run config with defaults", async () => {
     const wrapper = mountWithAppContext(
-      <ConfigAction router={{ query: { id: undefined } } as any} />,
+      <ConfigAction router={{ query: { id: "123" } } as any} />,
       { apiContext }
     );
+
+    // Making sure the fetching of material sample parent query promise returns
+    await new Promise(setImmediate);
+    wrapper.update();
 
     // Switch to the "Series" tab:
     wrapper.find("li.react-tabs__tab.series-tab").simulate("click");
@@ -67,9 +72,12 @@ describe("MaterialSample split workflow series-mode run config", () => {
 
   it("Creates a new Material Sample workfow series-mode run config with user custom entries", async () => {
     const wrapper = mountWithAppContext(
-      <ConfigAction router={{ query: { id: undefined } } as any} />,
+      <ConfigAction router={{ query: { id: "123" } } as any} />,
       { apiContext }
     );
+
+    await new Promise(setImmediate);
+    wrapper.update();
 
     // Switch to the "Series" tab:
     wrapper.find("li.react-tabs__tab.series-tab").simulate("click");
@@ -117,9 +125,12 @@ describe("MaterialSample split workflow series-mode run config", () => {
 
   it("Creates a new Material Sample workfow batch-mode run config with user custom entries", async () => {
     const wrapper = mountWithAppContext(
-      <ConfigAction router={{ query: { id: undefined } } as any} />,
+      <ConfigAction router={{ query: { id: "123" } } as any} />,
       { apiContext }
     );
+
+    await new Promise(setImmediate);
+    wrapper.update();
 
     // Switch to the "Batch" tab:
     wrapper.find("li.react-tabs__tab.batch-tab").simulate("click");
