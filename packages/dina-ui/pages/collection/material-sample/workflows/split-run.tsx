@@ -355,7 +355,9 @@ export default function SplitRunAction() {
               namePrefix={commonRoot}
               className="flex-grow-1"
               sampleNamePlaceHolder={
-                index > 0 ? computeDefaultSampleName(index - 1) : ""
+                index === 0
+                  ? formatMessage("multiple")
+                  : computeDefaultSampleName(index - 1)
               }
             />
             <FieldSet legend={<DinaMessage id="components" />}>
