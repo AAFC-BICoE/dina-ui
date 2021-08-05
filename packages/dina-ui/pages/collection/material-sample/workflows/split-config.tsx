@@ -3,7 +3,6 @@ import {
   ButtonBar,
   CheckBoxWithoutWrapper,
   DinaForm,
-  DinaFormOnSubmit,
   FieldSet,
   SelectField,
   SubmitButton,
@@ -11,8 +10,9 @@ import {
   useCollapser
 } from "common-ui";
 import { Field } from "formik";
+import { WithRouterProps } from "next/dist/client/with-router";
 import { padStart, range } from "lodash";
-import { useRouter } from "next/router";
+import { useMaterialSampleQuery } from "../../../../../dina-ui/components/collection/useMaterialSample";
 import React, { useState, ReactNode } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";
@@ -31,6 +31,7 @@ import {
   TYPE_NUMERIC
 } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
+import { withRouter } from "next/router";
 
 /* Props for computing suffix */
 export interface ComputeSuffixProps {
@@ -80,9 +81,11 @@ function CollapsableSection({
   );
 }
 
-export default function ConfigAction() {
+export function ConfigAction({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
-  const router = useRouter();
+  const parentId = router.query.id?.toString();
+
+  const materialSampleQuery = useMaterialSampleQuery(parentId as string);
 
   const [storedRunConfig, setStoredRunConfig] = useLocalStorage<
     MaterialSampleRunConfig | null | undefined
@@ -143,6 +146,15 @@ export default function ConfigAction() {
 
   const initialConfigChild = storedRunConfig?.configure_children;
 
+  const computedInitConfigValues = { ...initialConfig, ...initialConfigChild };
+
+  if (materialSampleQuery.loading) return null;
+  const { materialSampleName, dwcCatalogNumber } =
+    materialSampleQuery?.response?.data ?? {};
+  Object.assign(computedInitConfigValues, {
+    baseName: materialSampleName ?? dwcCatalogNumber
+  });
+
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
@@ -151,10 +163,12 @@ export default function ConfigAction() {
         <h1>
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
-        <DinaForm
-          initialValues={{ ...initialConfig, ...initialConfigChild }}
-          onSubmit={onSubmit}
-        >
+        <h2>
+          {materialSampleName && dwcCatalogNumber
+            ? `${materialSampleName} | ${dwcCatalogNumber} `
+            : materialSampleName ?? dwcCatalogNumber}
+        </h2>
+        <DinaForm initialValues={computedInitConfigValues} onSubmit={onSubmit}>
           <p>
             <span className="fw-bold">{formatMessage("description")}:</span>
             {formatMessage("splitSampleDescription")}
@@ -394,3 +408,4 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
     </div>
   );
 }
+export default withRouter(ConfigAction);
