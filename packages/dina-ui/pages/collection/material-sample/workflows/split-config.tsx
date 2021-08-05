@@ -31,6 +31,7 @@ import {
   TYPE_NUMERIC
 } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
+import { withRouter } from "next/router";
 
 /* Props for computing suffix */
 export interface ComputeSuffixProps {
@@ -80,8 +81,11 @@ function CollapsableSection({
   );
 }
 
-export default function ConfigAction({ router }: WithRouterProps) {
+export function ConfigAction({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
+  const parentId = router.query.id?.toString();
+
+  const materialSampleQuery = useMaterialSampleQuery(parentId as string);
 
   const [storedRunConfig, setStoredRunConfig] = useLocalStorage<
     MaterialSampleRunConfig | null | undefined
@@ -142,23 +146,14 @@ export default function ConfigAction({ router }: WithRouterProps) {
 
   const initialConfigChild = storedRunConfig?.configure_children;
 
-  const parentId = router?.query?.id;
-
   const computedInitConfigValues = { ...initialConfig, ...initialConfigChild };
 
-  let materialSampleName;
-  let catalogNumber;
-
-  if (parentId) {
-    const materialSampleQuery = useMaterialSampleQuery(parentId as string);
-    if (materialSampleQuery.loading) return null;
-    materialSampleName =
-      materialSampleQuery?.response?.data?.materialSampleName;
-    catalogNumber = materialSampleQuery?.response?.data?.dwcCatalogNumber;
-    Object.assign(computedInitConfigValues, {
-      baseName: materialSampleName ?? catalogNumber
-    });
-  }
+  if (materialSampleQuery.loading) return null;
+  const { materialSampleName, dwcCatalogNumber } =
+    materialSampleQuery?.response?.data ?? {};
+  Object.assign(computedInitConfigValues, {
+    baseName: materialSampleName ?? dwcCatalogNumber
+  });
 
   return (
     <div>
@@ -168,15 +163,11 @@ export default function ConfigAction({ router }: WithRouterProps) {
         <h1>
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
-        {parentId && (
-          <h2>
-            {materialSampleName && catalogNumber
-              ? `${materialSampleName} | ${catalogNumber} `
-              : materialSampleName
-              ? materialSampleName
-              : catalogNumber}
-          </h2>
-        )}
+        <h2>
+          {materialSampleName && dwcCatalogNumber
+            ? `${materialSampleName} | ${dwcCatalogNumber} `
+            : materialSampleName ?? dwcCatalogNumber}
+        </h2>
         <DinaForm initialValues={computedInitConfigValues} onSubmit={onSubmit}>
           <p>
             <span className="fw-bold">{formatMessage("description")}:</span>
@@ -417,3 +408,4 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
     </div>
   );
 }
+export default withRouter(ConfigAction);
