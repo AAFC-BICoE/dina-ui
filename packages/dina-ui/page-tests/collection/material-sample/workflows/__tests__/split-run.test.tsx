@@ -11,7 +11,8 @@ import { PreparationType } from "../../../../../../dina-ui/types/collection-api/
 import { Person } from "../../../../../../dina-ui/types/agent-api";
 
 jest.mock("next/router", () => ({
-  useRouter: () => ({ push: jest.fn() })
+  useRouter: () => ({ push: jest.fn() }),
+  withRouter: jest.fn()
 }));
 
 function testMaterialSample(): PersistedResource<MaterialSample>[] {
@@ -66,6 +67,7 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/storage-unit":
     case "collection-api/storage-unit-type":
     case "collection-api/material-sample-type":
+    case "collection-api/vocabulary/degreeOfEstablishment":
     case "objectstore-api/metadata":
       return { data: [] };
   }
