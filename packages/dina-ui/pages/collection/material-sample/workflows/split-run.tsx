@@ -296,17 +296,6 @@ export default function SplitRunAction() {
 
     return (
       <>
-        <span className="d-flex fw-bold flex-row">
-          {formatMessage("materialSample") + " " + formatMessage("description")}
-          :
-        </span>
-        <div className="container">
-          <TextField
-            name={commonRoot + "description"}
-            hideLabel={true}
-            multiLines={true}
-          />
-        </div>
         <FormikButton
           onClick={() => {
             onCopyFromParent({ index, formik: form });
