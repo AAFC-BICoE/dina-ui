@@ -10,7 +10,7 @@ import {
   TextField,
   useCollapser
 } from "common-ui";
-import { Field } from "formik";
+import { Field, FieldProps } from "formik";
 import { padStart, range } from "lodash";
 import { useRouter } from "next/router";
 import React, { useState, ReactNode } from "react";
@@ -54,31 +54,6 @@ const TYPE_OPTIONS: { label: string; value: SuffixOptions }[] = [
     value: TYPE_LETTER
   }
 ];
-
-interface CollapsableSectionProps {
-  children: ReactNode;
-  collapserId: string;
-  title: ReactNode;
-}
-
-/** Wrapper for the collapsible sections of the details UI. */
-function CollapsableSection({
-  children,
-  collapserId,
-  title
-}: CollapsableSectionProps) {
-  const { Collapser, collapsed } = useCollapser(`split-preview-${collapserId}`);
-
-  return (
-    <div className="mb-3">
-      <h4>
-        {title}
-        <Collapser />
-      </h4>
-      {!collapsed && children}
-    </div>
-  );
-}
 
 export default function ConfigAction() {
   const { formatMessage } = useDinaIntl();
@@ -346,51 +321,75 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
         <div className="alert alert-warning d-inline-block">
           <DinaMessage id="splitSampleInstructions" />
         </div>
-        <CollapsableSection
-          collapserId={generationMode}
-          title={formatMessage("previewAndCustomizeLabel")}
-        >
-          <SplitChildHeader />
-          <Field name="start">
-            {({
-              form: {
-                values: {
-                  start,
-                  suffix,
-                  suffixType,
-                  numOfChildToCreate,
-                  baseName
-                }
+        <div className="d-flex gap-3 mb-3">
+          <h4>
+            <DinaMessage id="previewAndCustomizeLabel" />
+          </h4>
+          <ResetNamesButton />
+        </div>
+        <SplitChildHeader />
+        <Field name="start">
+          {({
+            form: {
+              values: {
+                start,
+                suffix,
+                suffixType,
+                numOfChildToCreate,
+                baseName
               }
-            }) =>
-              range(0, numOfChildToCreate).map(index => {
-                const computedSuffix =
-                  generationMode === "BATCH"
-                    ? suffix || ""
-                    : generationMode === "SERIES"
-                    ? `-${computeSuffix({
-                        index,
-                        start,
-                        suffixType
-                      })}`
-                    : "";
-                return (
-                  <SplitChildRow
-                    key={
-                      generationMode === "BATCH"
-                        ? `${baseName}-${computedSuffix}-${index}`
-                        : `${baseName}-${computedSuffix}`
-                    }
-                    index={index}
-                    baseName={baseName}
-                    computedSuffix={computedSuffix}
-                  />
-                );
-              })
             }
-          </Field>
-        </CollapsableSection>
+          }) =>
+            range(0, numOfChildToCreate).map(index => {
+              const computedSuffix =
+                generationMode === "BATCH"
+                  ? suffix || ""
+                  : generationMode === "SERIES"
+                  ? `-${computeSuffix({
+                      index,
+                      start,
+                      suffixType
+                    })}`
+                  : "";
+              return (
+                <SplitChildRow
+                  key={
+                    generationMode === "BATCH"
+                      ? `${baseName}-${computedSuffix}-${index}`
+                      : `${baseName}-${computedSuffix}`
+                  }
+                  index={index}
+                  baseName={baseName}
+                  computedSuffix={computedSuffix}
+                />
+              );
+            })
+          }
+        </Field>
       </div>
     </div>
+  );
+}
+
+/** Resets the sample names to the initial state. */
+function ResetNamesButton() {
+  return (
+    <Field>
+      {({ form: { initialValues, setFieldValue } }: FieldProps) => {
+        function resetSampleNames() {
+          setFieldValue("sampleNames", initialValues.sampleNames);
+        }
+
+        return (
+          <button
+            className="btn btn-dark"
+            type="button"
+            onClick={resetSampleNames}
+          >
+            <DinaMessage id="resetNamesToInitialValues" />
+          </button>
+        );
+      }}
+    </Field>
   );
 }
