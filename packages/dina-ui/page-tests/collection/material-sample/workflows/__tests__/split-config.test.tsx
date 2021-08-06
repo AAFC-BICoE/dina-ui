@@ -61,11 +61,9 @@ describe("MaterialSample split workflow series-mode run config", () => {
 
     // Switch to the "Series" tab:
     wrapper.find("li.react-tabs__tab.series-tab").simulate("click");
-
     expect(wrapper.find(".baseName-field input").prop("placeholder")).toEqual(
       BASE_NAME
     );
-
     expect(wrapper.find(".start-field input").prop("value")).toEqual(START);
 
     expect(wrapper.find(".suffixType-field Select").prop("value")).toEqual({
@@ -175,7 +173,7 @@ describe("MaterialSample split workflow series-mode run config", () => {
         suffix: "TestSuffix"
       },
       configure_children: {
-        sampleNames: ["CustomName1", null, null]
+        sampleNames: ["CustomName1", "my-number", "my-number"]
       },
       metadata: {}
     });

@@ -255,9 +255,15 @@ export function computeSuffix({
 
 interface SplitChildRowProps {
   index: number;
+  baseName: string;
+  computedSuffix: string;
 }
 
-function SplitChildRow({ index }: SplitChildRowProps) {
+function SplitChildRow({
+  index,
+  baseName,
+  computedSuffix
+}: SplitChildRowProps) {
   return (
     <div className="d-flex">
       <span className="col-md-1 fw-bold">#{index + 1}:</span>
@@ -265,7 +271,7 @@ function SplitChildRow({ index }: SplitChildRowProps) {
         className={`col-md-3 sampleNames${index}`}
         hideLabel={true}
         name={`sampleNames[${index}]`}
-        //      placeholder={`${baseName || BASE_NAME}${computedSuffix}`}
+        placeholder={`${baseName || BASE_NAME}${computedSuffix}`}
       />
     </div>
   );
@@ -275,7 +281,7 @@ function computingSuffix(generationMode, suffix, index, start, suffixType) {
   return generationMode === "BATCH"
     ? suffix || ""
     : generationMode === "SERIES"
-    ? `-${computeSuffix({
+    ? `${computeSuffix({
         index,
         start,
         suffixType
@@ -285,7 +291,11 @@ function computingSuffix(generationMode, suffix, index, start, suffixType) {
 
 const setChildSampleNames = (formik, name, value, generationMode) => {
   const newValues = { ...formik.values };
-  if (name) newValues[name] = value;
+  if (name) {
+    newValues[name] = value;
+    formik.setFieldValue(name, value);
+    formik.setFieldTouched(name);
+  }
 
   const { suffix, start, suffixType, baseName, numOfChildToCreate } = newValues;
 
@@ -301,6 +311,7 @@ const setChildSampleNames = (formik, name, value, generationMode) => {
       `sampleNames[${index}]`,
       `${baseName || BASE_NAME}${computedSuffix}`
     );
+    formik.setFieldTouched(`sampleNames[${index}]`);
   });
 };
 
@@ -345,6 +356,7 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
         <TextField
           className="col-md-2"
           name="baseName"
+          placeholder={BASE_NAME}
           onChangeExternal={(formik, name, value) =>
             setChildSampleNames(formik, name, value, generationMode)
           }
@@ -410,7 +422,13 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
           <Field name="start">
             {({
               form: {
-                values: { start, suffix, suffixType, numOfChildToCreate }
+                values: {
+                  start,
+                  suffix,
+                  suffixType,
+                  numOfChildToCreate,
+                  baseName
+                }
               }
             }) =>
               range(0, numOfChildToCreate).map(index => {
@@ -429,6 +447,8 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
                         : `${computedSuffix}`
                     }
                     index={index}
+                    baseName={baseName}
+                    computedSuffix={computedSuffix}
                   />
                 );
               })
