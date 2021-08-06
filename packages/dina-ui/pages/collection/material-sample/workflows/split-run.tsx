@@ -174,7 +174,7 @@ export default function SplitRunAction() {
     const generatedSampleName =
       generationMode === "BATCH"
         ? `${baseName}${suffix}`
-        : `${baseName}-${computedSuffix}`;
+        : `${baseName}${computedSuffix}`;
 
     initialChildSamples.push({
       group: groupNames?.[0],
@@ -286,7 +286,10 @@ export default function SplitRunAction() {
   };
 
   function computeDefaultSampleName(index) {
-    return baseName + "-" + computeSuffix({ index, start, suffixType });
+    return (
+      initialChildSamples[index + 1].materialSampleName ??
+      baseName + computeSuffix({ index, start, suffixType })
+    );
   }
 
   function childSampleInternal(index, form) {

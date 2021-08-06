@@ -98,7 +98,7 @@ export function ConfigAction({ router }: WithRouterProps) {
   const onSubmit = async ({ submittedValues: configActionFields }) => {
     const childSampleNames: string[] = [];
     for (let i = 0; i < configActionFields.numOfChildToCreate; i++) {
-      childSampleNames.push(configActionFields?.sampleName?.[i]);
+      childSampleNames.push(configActionFields?.sampleNames?.[i]);
     }
 
     const runConfig: MaterialSampleRunConfig = {
@@ -151,9 +151,10 @@ export function ConfigAction({ router }: WithRouterProps) {
   if (materialSampleQuery.loading) return null;
   const { materialSampleName, dwcCatalogNumber } =
     materialSampleQuery?.response?.data ?? {};
-  Object.assign(computedInitConfigValues, {
-    baseName: materialSampleName ?? dwcCatalogNumber
-  });
+  if (materialSampleName || dwcCatalogNumber)
+    Object.assign(computedInitConfigValues, {
+      baseName: materialSampleName ?? dwcCatalogNumber
+    });
 
   return (
     <div>
@@ -269,7 +270,7 @@ function SplitChildRow({
       <TextField
         className={`col-md-3 sampleName${index}`}
         hideLabel={true}
-        name={`sampleName[${index}]`}
+        name={`sampleNames[${index}]`}
         placeholder={`${baseName || BASE_NAME}${computedSuffix}`}
       />
     </div>
@@ -382,7 +383,7 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
                   generationMode === "BATCH"
                     ? suffix || ""
                     : generationMode === "SERIES"
-                    ? `-${computeSuffix({
+                    ? `${computeSuffix({
                         index,
                         start,
                         suffixType
