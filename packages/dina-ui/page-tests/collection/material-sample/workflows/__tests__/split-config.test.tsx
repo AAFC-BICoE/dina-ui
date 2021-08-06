@@ -44,6 +44,10 @@ const apiContext = {
   }
 };
 
+jest.mock("next/router", () => ({
+  withRouter: () => ({ push: jest.fn() })
+}));
+
 describe("MaterialSample split workflow series-mode run config", () => {
   it("Initially display the workfow run config with defaults", async () => {
     const wrapper = mountWithAppContext(
@@ -57,11 +61,9 @@ describe("MaterialSample split workflow series-mode run config", () => {
 
     // Switch to the "Series" tab:
     wrapper.find("li.react-tabs__tab.series-tab").simulate("click");
-
     expect(wrapper.find(".baseName-field input").prop("placeholder")).toEqual(
       BASE_NAME
     );
-
     expect(wrapper.find(".start-field input").prop("value")).toEqual(START);
 
     expect(wrapper.find(".suffixType-field Select").prop("value")).toEqual({
@@ -95,7 +97,7 @@ describe("MaterialSample split workflow series-mode run config", () => {
       .simulate("change", { target: { value: "Remarks on this run config" } });
 
     wrapper
-      .find(".sampleName0 input")
+      .find(".sampleNames0 input")
       .simulate("change", { target: { value: "my custom name" } });
 
     wrapper.update();
@@ -148,7 +150,7 @@ describe("MaterialSample split workflow series-mode run config", () => {
       .simulate("change", { target: { value: 3 } });
 
     wrapper
-      .find(".sampleName0 input")
+      .find(".sampleNames0 input")
       .simulate("change", { target: { value: "CustomName1" } });
 
     wrapper.update();
@@ -171,7 +173,11 @@ describe("MaterialSample split workflow series-mode run config", () => {
         suffix: "TestSuffix"
       },
       configure_children: {
-        sampleNames: ["CustomName1", null, null]
+        sampleNames: [
+          "CustomName1",
+          "TestBaseNameTestSuffix",
+          "TestBaseNameTestSuffix"
+        ]
       },
       metadata: {}
     });

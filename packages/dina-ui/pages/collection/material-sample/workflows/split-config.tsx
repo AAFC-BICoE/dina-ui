@@ -24,6 +24,7 @@ import {
   IDENTIFIER_TYPE_OPTIONS,
   MaterialSampleGenerationMode,
   MaterialSampleRunConfig,
+  MaterialSampleRunConfigConfiguration,
   MATERIAL_SAMPLE_GENERATION_MODES,
   NUMERIC_UPPER_LIMIT,
   START,
@@ -32,6 +33,8 @@ import {
 } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import { withRouter } from "next/router";
+import { useEffect } from "react";
+import { useFormikContext } from "formik";
 
 /* Props for computing suffix */
 export interface ComputeSuffixProps {
@@ -268,7 +271,7 @@ function SplitChildRow({
     <div className="d-flex">
       <span className="col-md-1 fw-bold">#{index + 1}:</span>
       <TextField
-        className={`col-md-3 sampleName${index}`}
+        className={`col-md-3 sampleNames${index}`}
         hideLabel={true}
         name={`sampleNames[${index}]`}
         placeholder={`${baseName || BASE_NAME}${computedSuffix}`}
@@ -277,12 +280,54 @@ function SplitChildRow({
   );
 }
 
+function computingSuffix(generationMode, suffix, index, start, suffixType) {
+  return generationMode === "BATCH"
+    ? suffix || ""
+    : generationMode === "SERIES"
+    ? `${computeSuffix({
+        index,
+        start,
+        suffixType
+      })}`
+    : "";
+}
+
+const setChildSampleNames = (formik, generationMode) => {
+  const newValues = { ...formik.values };
+  const { suffix, start, suffixType, baseName, numOfChildToCreate } = newValues;
+  range(0, numOfChildToCreate).map(index => {
+    const computedSuffix = computingSuffix(
+      generationMode,
+      suffix,
+      index,
+      start,
+      suffixType
+    );
+    formik.setFieldValue(
+      `sampleNames[${index}]`,
+      `${baseName || BASE_NAME}${computedSuffix}`
+    );
+    formik.setFieldTouched(`sampleNames[${index}]`);
+  });
+};
 interface SplitConfigFormProps {
   generationMode: MaterialSampleGenerationMode;
 }
 
 function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
   const { formatMessage } = useDinaIntl();
+  const formikCtx = useFormikContext<MaterialSampleRunConfigConfiguration>();
+  useEffect(() => {
+    // Set the child sample names based on all current state of affecting fields' values
+    setChildSampleNames(formikCtx, generationMode);
+  }, [
+    formikCtx.values.numOfChildToCreate,
+    formikCtx.values.baseName,
+    formikCtx.values.suffixType,
+    formikCtx.values.suffix,
+    formikCtx.values.numOfChildToCreate,
+    formikCtx.values.start
+  ]);
 
   return (
     <div>
@@ -293,9 +338,6 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
         <NumberSpinnerField
           name="numOfChildToCreate"
           className="col-md-2"
-          onChange={(newValue, formik) =>
-            formik.setFieldValue("numOfChildToCreate", newValue)
-          }
           hideLabel={true}
           max={NUMERIC_UPPER_LIMIT}
         />
@@ -333,12 +375,12 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
               className="col-md-2"
               name="suffixType"
               options={TYPE_OPTIONS}
-              onChange={(newType, formik) =>
+              onChange={(newType, formik) => {
                 formik.setFieldValue(
                   "start",
                   newType === "Numerical" ? "001" : "A"
-                )
-              }
+                );
+              }}
             />
             <Field name="suffixType">
               {({ field: { value: suffixType } }) => (
@@ -379,22 +421,19 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
               }
             }) =>
               range(0, numOfChildToCreate).map(index => {
-                const computedSuffix =
-                  generationMode === "BATCH"
-                    ? suffix || ""
-                    : generationMode === "SERIES"
-                    ? `${computeSuffix({
-                        index,
-                        start,
-                        suffixType
-                      })}`
-                    : "";
+                const computedSuffix = computingSuffix(
+                  generationMode,
+                  suffix,
+                  index,
+                  start,
+                  suffixType
+                );
                 return (
                   <SplitChildRow
                     key={
                       generationMode === "BATCH"
-                        ? `${baseName}-${computedSuffix}-${index}`
-                        : `${baseName}-${computedSuffix}`
+                        ? `${computedSuffix}-${index}`
+                        : `${computedSuffix}`
                     }
                     index={index}
                     baseName={baseName}
