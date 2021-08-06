@@ -2,40 +2,42 @@ import {
   AutoSuggestTextField,
   DateField,
   FieldSet,
+  FormikButton,
   TextField,
   TextFieldWithMultiplicationButton,
-  useDinaFormContext,
-  FormikButton
+  useDinaFormContext
 } from "common-ui";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FieldArray } from "formik";
-import { Determination } from "packages/dina-ui/types/collection-api/resources/Determination";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { useState } from "react";
 import { clamp } from "lodash";
+import { useState } from "react";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { DinaMessage } from "../../intl/dina-ui-intl";
+import { Determination, MaterialSample } from "../../types/collection-api";
+
 export interface DeterminationFieldProps {
   className?: string;
   namePrefix?: string;
 }
 
-export const DETERMINATION_FIELDS = [
-  "verbatimScientificName",
-  "verbatimAgent",
-  "verbatimDate",
-  "typeStatus",
-  "typeStatusEvidence",
-  "determiner",
-  "determinedOn",
-  "qualifier",
-  "scientificNameSource",
-  "scientificName"
-] as const;
+/** Type-safe object with all determination fields. */
+const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
+  {
+    verbatimScientificName: true,
+    verbatimAgent: true,
+    verbatimDate: true,
+    typeStatus: true,
+    typeStatusEvidence: true,
+    determiner: true,
+    determinedOn: true,
+    qualifier: true,
+    scientificNameSource: true,
+    scientificName: true
+  };
 
-export function DeterminationField({
-  className,
-  namePrefix = ""
-}: DeterminationFieldProps) {
+// All fields of the Determination type.
+export const DETERMINATION_FIELDS = Object.keys(DETERMINATION_FIELDS_OBJECT);
+
+export function DeterminationField({ className }: DeterminationFieldProps) {
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const { readOnly, isTemplate } = useDinaFormContext();
   const determinationsPath = "determination";
@@ -61,80 +63,83 @@ export function DeterminationField({
             );
           }
 
-          const determinationInternal = (index, commonRoot) => (
-            <TabPanel key={index}>
-              <div className="row">
-                <div className="col-md-6">
-                  <TextFieldWithMultiplicationButton
-                    name={`${namePrefix}${commonRoot}verbatimScientificName`}
-                    customName="verbatimScientificName"
-                    className="col-sm-6 verbatimScientificName"
-                  />
-                  <AutoSuggestTextField<MaterialSample>
-                    name={`${namePrefix}${commonRoot}verbatimAgent`}
-                    customName="verbatimAgent"
-                    className="col-sm-6"
-                    query={() => ({
-                      path: "collection-api/material-sample"
-                    })}
-                    suggestion={sample =>
-                      (sample.determination?.map(
-                        det => det?.verbatimAgent
-                      ) as any) ?? []
-                    }
-                  />
-                  <DateField
-                    name={`${namePrefix}${commonRoot}verbatimDate`}
-                    customName="verbatimDate"
-                    className="col-sm-6"
-                  />
-                  <TextField
-                    name={`${namePrefix}${commonRoot}verbatimRemarks`}
-                    customName="vebatimRemarks"
-                    multiLines={true}
-                  />
-                </div>
-                <div className="col-md-6">
-                  <TextField
-                    name={`${namePrefix}${commonRoot}typeStatus`}
-                    customName="typeStatus"
-                    multiLines={true}
-                  />
-                  <TextField
-                    name={`${namePrefix}${commonRoot}typeStatusEvidence`}
-                    customName="typeStatusEvidence"
-                    multiLines={true}
-                  />
-                  <TextField
-                    name={`${namePrefix}${commonRoot}qualifier`}
-                    customName="qualifier"
-                    multiLines={true}
-                  />
-                </div>
-                {!readOnly && !isTemplate && (
-                  <div className="list-inline mb-3">
-                    <FormikButton
-                      className="list-inline-item btn btn-primary add-assertion-button"
-                      onClick={addDetermination}
-                    >
-                      <DinaMessage id="addAnotherDetermination" />
-                    </FormikButton>
-                    <FormikButton
-                      className="list-inline-item btn btn-dark"
-                      onClick={() => removeDetermination(index)}
-                    >
-                      <DinaMessage id="removeDeterminationLabel" />
-                    </FormikButton>
+          function determinationInternal(index: number) {
+            /** Applies name prefix to field props */
+            function fieldProps(fieldName: string) {
+              return {
+                name: `${determinationsPath}[${index}].${fieldName}`,
+                // If the first determination is enabled, then enable multiple determinations:
+                templateCheckboxFieldName: `${determinationsPath}[0].${fieldName}`,
+                // Don't use the prefix for the labels and tooltips:
+                customName: fieldName
+              };
+            }
+
+            return (
+              <TabPanel key={index}>
+                <div className="row">
+                  <div className="col-md-6">
+                    <TextFieldWithMultiplicationButton
+                      {...fieldProps("verbatimScientificName")}
+                      className="col-sm-6 verbatimScientificName"
+                    />
+                    <AutoSuggestTextField<MaterialSample>
+                      {...fieldProps("verbatimAgent")}
+                      className="col-sm-6"
+                      query={() => ({
+                        path: "collection-api/material-sample"
+                      })}
+                      suggestion={sample =>
+                        (sample.determination?.map(
+                          det => det?.verbatimAgent
+                        ) as any) ?? []
+                      }
+                    />
+                    <DateField
+                      {...fieldProps("verbatimDate")}
+                      className="col-sm-6"
+                    />
+                    <TextField
+                      {...fieldProps("transcriberRemarks")}
+                      multiLines={true}
+                    />
                   </div>
-                )}
-              </div>
-            </TabPanel>
-          );
+                  <div className="col-md-6">
+                    <TextField
+                      {...fieldProps("typeStatus")}
+                      multiLines={true}
+                    />
+                    <TextField
+                      {...fieldProps("typeStatusEvidence")}
+                      multiLines={true}
+                    />
+                    <TextField {...fieldProps("qualifier")} multiLines={true} />
+                  </div>
+                  {!readOnly && !isTemplate && (
+                    <div className="list-inline mb-3">
+                      <FormikButton
+                        className="list-inline-item btn btn-primary add-assertion-button"
+                        onClick={addDetermination}
+                      >
+                        <DinaMessage id="addAnotherDetermination" />
+                      </FormikButton>
+                      <FormikButton
+                        className="list-inline-item btn btn-dark"
+                        onClick={() => removeDetermination(index)}
+                      >
+                        <DinaMessage id="removeDeterminationLabel" />
+                      </FormikButton>
+                    </div>
+                  )}
+                </div>
+              </TabPanel>
+            );
+          }
           // Always shows the panel without tabs when it is a template
           return (
             <div className="determination-section">
               <Tabs selectedIndex={activeTabIdx} onSelect={setActiveTabIdx}>
-                {isTemplate ? null : (
+                {!isTemplate && (
                   // Only show the tabs when there is more than 1 assertion:
                   <TabList
                     className={`react-tabs__tab-list ${
@@ -149,13 +154,11 @@ export function DeterminationField({
                   </TabList>
                 )}
                 {isTemplate
-                  ? determinationInternal(0, `${determinationsPath}[${0}].`)
+                  ? determinationInternal(0)
                   : determinations.length
-                  ? determinations.map((_, index) => {
-                      const determinationPath = `${determinationsPath}[${index}]`;
-                      const commonRoot = determinationPath + ".";
-                      return determinationInternal(index, commonRoot);
-                    })
+                  ? determinations.map((_, index) =>
+                      determinationInternal(index)
+                    )
                   : null}
               </Tabs>
               {!readOnly && !isTemplate && !determinations?.length && (

@@ -1,6 +1,4 @@
-import { KitsuResource } from "kitsu";
-
-export interface DeterminationAttributes {
+export interface Determination {
   verbatimScientificName?: string;
   verbatimAgent?: string;
   verbatimDate?: string;
@@ -16,5 +14,3 @@ export interface DeterminationAttributes {
 export enum ScientificNameSource {
   COLPLUS = "COLPLUS"
 }
-
-export type Determination = DeterminationAttributes | undefined;
