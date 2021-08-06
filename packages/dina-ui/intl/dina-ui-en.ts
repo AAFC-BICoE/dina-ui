@@ -323,6 +323,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metadataTagsLabel: "Tags",
   metadataUploadDetailsLabel: "Upload Details",
   moveAllContent: " Move All Content",
+  multiple: "Multiple",
   noFileToDisplay: "No file to display",
   noGroups: "No Groups",
   noManagedAttributeValues: "No Managed Attribute values.",
