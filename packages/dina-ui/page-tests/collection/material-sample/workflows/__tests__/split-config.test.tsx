@@ -173,7 +173,11 @@ describe("MaterialSample split workflow series-mode run config", () => {
         suffix: "TestSuffix"
       },
       configure_children: {
-        sampleNames: ["CustomName1", "my-number", "my-number"]
+        sampleNames: [
+          "CustomName1",
+          "TestBaseNameTestSuffix",
+          "TestBaseNameTestSuffix"
+        ]
       },
       metadata: {}
     });

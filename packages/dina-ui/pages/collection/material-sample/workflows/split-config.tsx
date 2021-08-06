@@ -24,6 +24,7 @@ import {
   IDENTIFIER_TYPE_OPTIONS,
   MaterialSampleGenerationMode,
   MaterialSampleRunConfig,
+  MaterialSampleRunConfigConfiguration,
   MATERIAL_SAMPLE_GENERATION_MODES,
   NUMERIC_UPPER_LIMIT,
   START,
@@ -32,6 +33,8 @@ import {
 } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import { withRouter } from "next/router";
+import { useEffect } from "react";
+import { useFormikContext } from "formik";
 
 /* Props for computing suffix */
 export interface ComputeSuffixProps {
@@ -289,16 +292,9 @@ function computingSuffix(generationMode, suffix, index, start, suffixType) {
     : "";
 }
 
-const setChildSampleNames = (formik, name, value, generationMode) => {
+const setChildSampleNames = (formik, generationMode) => {
   const newValues = { ...formik.values };
-  if (name) {
-    newValues[name] = value;
-    formik.setFieldValue(name, value);
-    formik.setFieldTouched(name);
-  }
-
   const { suffix, start, suffixType, baseName, numOfChildToCreate } = newValues;
-
   range(0, numOfChildToCreate).map(index => {
     const computedSuffix = computingSuffix(
       generationMode,
@@ -314,13 +310,25 @@ const setChildSampleNames = (formik, name, value, generationMode) => {
     formik.setFieldTouched(`sampleNames[${index}]`);
   });
 };
-
 interface SplitConfigFormProps {
   generationMode: MaterialSampleGenerationMode;
 }
 
 function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
   const { formatMessage } = useDinaIntl();
+  const formikCtx = useFormikContext<MaterialSampleRunConfigConfiguration>();
+  useEffect(() => {
+    // Set the child sample names based on all current state of affecting fields' values
+    setChildSampleNames(formikCtx, generationMode);
+  }, [
+    formikCtx.values.numOfChildToCreate,
+    formikCtx.values.baseName,
+    formikCtx.values.suffixType,
+    formikCtx.values.suffix,
+    formikCtx.values.numOfChildToCreate,
+    formikCtx.values.start
+  ]);
+
   return (
     <div>
       <span className="fw-bold">
@@ -330,10 +338,6 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
         <NumberSpinnerField
           name="numOfChildToCreate"
           className="col-md-2"
-          onChangeExternal={(form, name, value) => {
-            form.setFieldValue("numOfChildToCreate", value);
-            setChildSampleNames(form, name, value, generationMode);
-          }}
           hideLabel={true}
           max={NUMERIC_UPPER_LIMIT}
         />
@@ -357,18 +361,12 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
           className="col-md-2"
           name="baseName"
           placeholder={BASE_NAME}
-          onChangeExternal={(formik, name, value) =>
-            setChildSampleNames(formik, name, value, generationMode)
-          }
         />
         {generationMode === "BATCH" && (
           <TextField
             name="suffix"
             className="col-md-2"
             label={<DinaMessage id="suffixOptional" />}
-            onChangeExternal={(formik, name, value) =>
-              setChildSampleNames(formik, name, value, generationMode)
-            }
           />
         )}
         {generationMode === "SERIES" && (
@@ -381,12 +379,6 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
                 formik.setFieldValue(
                   "start",
                   newType === "Numerical" ? "001" : "A"
-                );
-                setChildSampleNames(
-                  formik,
-                  "suffixType",
-                  newType,
-                  generationMode
                 );
               }}
             />
@@ -401,9 +393,6 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
                   name="start"
                   numberOnly={suffixType === "Numerical"}
                   letterOnly={suffixType === "Letter"}
-                  onChangeExternal={(formik, name, value) =>
-                    setChildSampleNames(formik, name, value, generationMode)
-                  }
                 />
               )}
             </Field>
