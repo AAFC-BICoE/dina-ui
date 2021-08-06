@@ -1,6 +1,5 @@
 import { KitsuResourceLink, PersistedResource } from "kitsu";
-import ReactSwitch from "react-switch";
-import Switch from "react-switch";
+import { default as ReactSwitch, default as Switch } from "react-switch";
 import { BLANK_PREPARATION } from "../../../../components/collection/PreparationField";
 import { MaterialSampleForm } from "../../../../pages/collection/material-sample/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
@@ -183,6 +182,7 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
@@ -215,6 +215,9 @@ describe("Material Sample Edit Page", () => {
       true
     );
 
+    await new Promise(setImmediate);
+    wrapper.update();
+
     wrapper
       .find(".materialSampleName-field input")
       .simulate("change", { target: { value: "test-material-sample-id" } });
@@ -244,6 +247,7 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
@@ -300,6 +304,7 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               dwcCatalogNumber: "edited-catalog-number",
               collectingEvent: { id: "1", type: "collecting-event" },
+              storageUnit: { id: null, type: "storage-unit" },
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
@@ -386,6 +391,7 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
               dwcCatalogNumber: "my-number",
               group: "test group",
               id: "1",
@@ -432,6 +438,34 @@ describe("Material Sample Edit Page", () => {
     ).toEqual(true);
   });
 
+  it("Renders an existing Material Sample with the Storage section enabled.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms",
+          storageUnit: {
+            id: "76575",
+            type: "storage-unit",
+            name: "test-storage-unit"
+          } as KitsuResourceLink
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Storage is enabled:
+    expect(
+      wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+    expect(wrapper.find("#storage-section").exists()).toEqual(true);
+  });
+
   it("Renders an existing Material Sample with the Determinations section enabled.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
@@ -455,9 +489,10 @@ describe("Material Sample Edit Page", () => {
     expect(
       wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
     ).toEqual(true);
+    expect(wrapper.find("#determination-section").exists()).toEqual(true);
   });
 
-  it("Renders an existing Material Sample with the Preparations section disabled (no Preparations fields set).", async () => {
+  it("Renders an existing Material Sample with all toggleable data components disabled.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
@@ -473,9 +508,18 @@ describe("Material Sample Edit Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Preparations are disabled:
+    // Data components are disabled:
     expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
     ).toEqual(false);
   });
 
@@ -509,6 +553,7 @@ describe("Material Sample Edit Page", () => {
                 id: null,
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
               id: "333",
               managedAttributes: {
                 testAttr: "do the test"

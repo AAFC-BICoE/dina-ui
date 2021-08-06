@@ -22,7 +22,7 @@ export function useDefaultValueRuleEditorModal() {
           }
         `}</style>
         <div className="modal-header">
-          <h1 style={{border:"none"}}>
+          <h1 style={{ border: "none" }}>
             <DinaMessage id="defaultValuesConfigs" />
           </h1>
         </div>

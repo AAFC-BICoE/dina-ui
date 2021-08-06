@@ -26,8 +26,9 @@ export function DefaultValueRuleEditor({
   const { storedDefaultValuesConfigs, saveDefaultValuesConfigs } =
     useStoredDefaultValuesConfigs();
 
-  const [ruleConfigIndex, setRuleConfigIndex] =
-    useState<number | null>(initialIndex);
+  const [ruleConfigIndex, setRuleConfigIndex] = useState<number | null>(
+    initialIndex
+  );
 
   const selectedConfig: DefaultValuesConfig | undefined =
     storedDefaultValuesConfigs[ruleConfigIndex ?? -1] ?? undefined;
@@ -67,7 +68,7 @@ export function DefaultValueRuleEditor({
           {({ values }) => (
             <div>
               <TextField className="col-md-3" name="name" />
-              <ul className="list-group" style={{listStyleType:"none"}}>
+              <ul className="list-group" style={{ listStyleType: "none" }}>
                 <FieldArray name="defaultValueRules">
                   {arrayHelpers =>
                     values.defaultValueRules.length ? (

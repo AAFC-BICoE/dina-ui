@@ -296,17 +296,6 @@ export default function SplitRunAction() {
 
     return (
       <>
-        <span className="d-flex fw-bold flex-row">
-          {formatMessage("materialSample") + " " + formatMessage("description")}
-          :
-        </span>
-        <div className="container">
-          <TextField
-            name={commonRoot + "description"}
-            hideLabel={true}
-            multiLines={true}
-          />
-        </div>
         <FormikButton
           onClick={() => {
             onCopyFromParent({ index, formik: form });
@@ -355,7 +344,9 @@ export default function SplitRunAction() {
               namePrefix={commonRoot}
               className="flex-grow-1"
               sampleNamePlaceHolder={
-                index > 0 ? computeDefaultSampleName(index - 1) : ""
+                index === 0
+                  ? formatMessage("multiple")
+                  : computeDefaultSampleName(index - 1)
               }
             />
             <FieldSet legend={<DinaMessage id="components" />}>
