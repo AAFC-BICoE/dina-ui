@@ -151,9 +151,10 @@ export function ConfigAction({ router }: WithRouterProps) {
   if (materialSampleQuery.loading) return null;
   const { materialSampleName, dwcCatalogNumber } =
     materialSampleQuery?.response?.data ?? {};
-  Object.assign(computedInitConfigValues, {
-    baseName: materialSampleName ?? dwcCatalogNumber
-  });
+  if (materialSampleName || dwcCatalogNumber)
+    Object.assign(computedInitConfigValues, {
+      baseName: materialSampleName ?? dwcCatalogNumber
+    });
 
   return (
     <div>
@@ -264,6 +265,7 @@ function SplitChildRow({ index }: SplitChildRowProps) {
         className={`col-md-3 sampleNames${index}`}
         hideLabel={true}
         name={`sampleNames[${index}]`}
+        //      placeholder={`${baseName || BASE_NAME}${computedSuffix}`}
       />
     </div>
   );
