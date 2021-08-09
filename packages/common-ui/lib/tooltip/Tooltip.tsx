@@ -79,7 +79,7 @@ export function Tooltip({
     ) : null;
 
   return (
-    <span className="m-2">
+    <span className="m-2" tabIndex={0}>
       <RcTooltip
         id={id}
         overlay={
