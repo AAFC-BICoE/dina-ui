@@ -239,6 +239,10 @@ export function PcrBatchFormFields() {
           optionLabel={primer => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
         />
+        <TextField className="col-md-6" name="thermocycler" />
+        <TextField className="col-md-6" name="objective" />
+        <TextField className="col-md-6" name="positiveControl" />
+        <TextField className="col-md-6" name="reactionVolume" />
       </div>
       {readOnly && (
         <div className="row">
