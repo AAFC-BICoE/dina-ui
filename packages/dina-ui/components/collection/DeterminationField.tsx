@@ -76,91 +76,110 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
             }
 
             return (
-              <TabPanel key={index}>
-                <div className="row">
-                  <div className="col-md-6">
-                    <TextFieldWithMultiplicationButton
-                      {...fieldProps("verbatimScientificName")}
-                      className="col-sm-6 verbatimScientificName"
-                    />
-                    <AutoSuggestTextField<MaterialSample>
-                      {...fieldProps("verbatimAgent")}
-                      className="col-sm-6"
-                      query={() => ({
-                        path: "collection-api/material-sample"
-                      })}
-                      suggestion={sample =>
-                        (sample.determination?.map(
-                          det => det?.verbatimAgent
-                        ) as any) ?? []
-                      }
-                    />
-                    <DateField
-                      {...fieldProps("verbatimDate")}
-                      className="col-sm-6"
-                    />
-                    <TextField
-                      {...fieldProps("transcriberRemarks")}
-                      multiLines={true}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <TextField
-                      {...fieldProps("typeStatus")}
-                      multiLines={true}
-                    />
-                    <TextField
-                      {...fieldProps("typeStatusEvidence")}
-                      multiLines={true}
-                    />
-                    <TextField {...fieldProps("qualifier")} multiLines={true} />
-                  </div>
-                  {!readOnly && !isTemplate && (
-                    <div className="list-inline mb-3">
-                      <FormikButton
-                        className="list-inline-item btn btn-primary add-assertion-button"
-                        onClick={addDetermination}
-                      >
-                        <DinaMessage id="addAnotherDetermination" />
-                      </FormikButton>
-                      <FormikButton
-                        className="list-inline-item btn btn-dark"
-                        onClick={() => removeDetermination(index)}
-                      >
-                        <DinaMessage id="removeDeterminationLabel" />
-                      </FormikButton>
-                    </div>
-                  )}
+              <div className="row">
+                <div className="col-md-6">
+                  <TextFieldWithMultiplicationButton
+                    {...fieldProps("verbatimScientificName")}
+                    className="col-sm-6 verbatimScientificName"
+                  />
+                  <AutoSuggestTextField<MaterialSample>
+                    {...fieldProps("verbatimAgent")}
+                    className="col-sm-6"
+                    query={() => ({
+                      path: "collection-api/material-sample"
+                    })}
+                    suggestion={sample =>
+                      (sample.determination?.map(
+                        det => det?.verbatimAgent
+                      ) as any) ?? []
+                    }
+                  />
+                  <DateField
+                    {...fieldProps("verbatimDate")}
+                    className="col-sm-6"
+                  />
+                  <TextField
+                    {...fieldProps("transcriberRemarks")}
+                    multiLines={true}
+                  />
                 </div>
-              </TabPanel>
+                <div className="col-md-6">
+                  <TextField {...fieldProps("typeStatus")} multiLines={true} />
+                  <TextField
+                    {...fieldProps("typeStatusEvidence")}
+                    multiLines={true}
+                  />
+                  <TextField {...fieldProps("qualifier")} multiLines={true} />
+                </div>
+                {!readOnly && !isTemplate && (
+                  <div className="list-inline mb-3">
+                    <FormikButton
+                      className="list-inline-item btn btn-primary add-assertion-button"
+                      onClick={addDetermination}
+                    >
+                      <DinaMessage id="addAnotherDetermination" />
+                    </FormikButton>
+                    <FormikButton
+                      className="list-inline-item btn btn-dark"
+                      onClick={() => removeDetermination(index)}
+                    >
+                      <DinaMessage id="removeDeterminationLabel" />
+                    </FormikButton>
+                  </div>
+                )}
+              </div>
             );
           }
           // Always shows the panel without tabs when it is a template
           return (
             <div className="determination-section">
-              <Tabs selectedIndex={activeTabIdx} onSelect={setActiveTabIdx}>
-                {!isTemplate && (
-                  // Only show the tabs when there is more than 1 assertion:
-                  <TabList
-                    className={`react-tabs__tab-list ${
-                      determinations.length === 1 ? "d-none" : ""
-                    }`}
-                  >
+              {readOnly ? (
+                determinations.length === 1 ? (
+                  determinationInternal(0)
+                ) : (
+                  <div className="accordion">
+                    <style>{`.determination-section .accordion-button::after { background-image: none; }`}</style>
                     {determinations.map((_, index) => (
-                      <Tab key={index}>
-                        <span className="m-3">{index + 1}</span>
-                      </Tab>
+                      <div className="accordion-item" key={index}>
+                        <div className="accordion-header">
+                          <strong className="accordion-button collapsed text-decoration-underline">
+                            <DinaMessage id="determination" /> {index + 1}
+                          </strong>
+                        </div>
+                        <div className="accordion-body">
+                          {determinationInternal(index)}
+                        </div>
+                      </div>
                     ))}
-                  </TabList>
-                )}
-                {isTemplate
-                  ? determinationInternal(0)
-                  : determinations.length
-                  ? determinations.map((_, index) =>
-                      determinationInternal(index)
-                    )
-                  : null}
-              </Tabs>
+                  </div>
+                )
+              ) : (
+                <Tabs selectedIndex={activeTabIdx} onSelect={setActiveTabIdx}>
+                  {!isTemplate && (
+                    // Only show the tabs when there is more than 1 assertion:
+                    <TabList
+                      className={`react-tabs__tab-list ${
+                        determinations.length === 1 || readOnly ? "d-none" : ""
+                      }`}
+                    >
+                      {determinations.map((_, index) => (
+                        <Tab key={index}>
+                          <span className="m-3">{index + 1}</span>
+                        </Tab>
+                      ))}
+                    </TabList>
+                  )}
+                  {isTemplate ? (
+                    <TabPanel>{determinationInternal(0)}</TabPanel>
+                  ) : determinations.length ? (
+                    determinations.map((_, index) => (
+                      <TabPanel key={index}>
+                        {determinationInternal(index)}
+                      </TabPanel>
+                    ))
+                  ) : null}
+                </Tabs>
+              )}
               {!readOnly && !isTemplate && !determinations?.length && (
                 <FormikButton
                   className="list-inline-item btn btn-primary add-assertion-button"
