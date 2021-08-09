@@ -71,6 +71,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectorGroupListTitle: "Collector Group",
   collectorGroupNameLabel: "Collector Group Name",
   collectorGroupViewTitle: "View Collector Group",
+  colSearchLabel: "Name Search",
   components: "Components",
   configureAction: "Configure Action",
   configureDefaultValues: "Configure default values",
