@@ -93,7 +93,10 @@ export function Tooltip({
       >
         <span>
           {visibleElement ?? (
-            <img src="/static/images/iconInformation.gif" alt="" />
+            <img
+              src="/static/images/iconInformation.gif"
+              alt={id ? formatMessage({ id }) : ""}
+            />
           )}
         </span>
       </RcTooltip>
