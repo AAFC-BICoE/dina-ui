@@ -42,13 +42,13 @@ export function AreYouSureModal({
           <main>{messageBody ?? <p style={{fontSize:"x-large"}} ><CommonMessage id="areYouSure" /></p>}</main>
           <div className="row">
             <div className="col-md-3">
-              <SubmitButton className="form-control">
+              <SubmitButton className="form-control yes-button">
                 <CommonMessage id="yes" />
               </SubmitButton>
             </div>
             <div className="offset-md-6 col-md-3">
               <FormikButton
-                className="btn btn-dark form-control"
+                className="btn btn-dark form-control no-button"
                 onClick={closeModal}
               >
                 <CommonMessage id="no" />
