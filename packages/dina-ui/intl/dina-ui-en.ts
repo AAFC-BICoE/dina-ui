@@ -391,6 +391,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   showing: "Showing",
   showingFilteredStorageUnits: "Showing Filtered Storage Units",
   showingTopLevelStorageUnits: "Showing Top Level Storage Units",
+  source: "Source",
   specifyParentContainer: "Please select parent container",
   splitButton: "Split",
   splitSampleActionMetadataLegend: "Action Metadata",

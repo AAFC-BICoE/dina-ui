@@ -384,14 +384,7 @@ export function useMaterialSampleSave({
     delete materialSampleInput.managedAttributeValues;
 
     // Only persist determination when enabled
-    if (enableDetermination) {
-      materialSampleInput.determination?.map(det => {
-        if (det) {
-          det.scientificName = det?.verbatimScientificName;
-          det.scientificNameSource = ScientificNameSource.COLPLUS;
-        }
-      });
-    } else {
+    if (!enableDetermination) {
       materialSampleInput.determination = [];
     }
 

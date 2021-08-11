@@ -24,7 +24,6 @@ import {
   StorageLinkerField
 } from "../../../components";
 import { CollectingEventLinker } from "../../../components/collection";
-import { CatalogueOfLifeSearchBox } from "../../../components/collection/CatalogueOfLifeSearchBox";
 import { DeterminationField } from "../../../components/collection/DeterminationField";
 import { PreparationField } from "../../../components/collection/PreparationField";
 import {
@@ -207,7 +206,6 @@ export function MaterialSampleForm({
             <MaterialSampleIdentifiersFormLayout />
           </div>
         </div>
-        <CatalogueOfLifeSearchBox />
         <DataComponentToggler state={dataComponentState} />
         <div className="data-components">
           {dataComponentState.enableCollectingEvent && (

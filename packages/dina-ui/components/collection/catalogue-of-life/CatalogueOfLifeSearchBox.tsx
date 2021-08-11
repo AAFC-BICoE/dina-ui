@@ -1,17 +1,20 @@
 import { LoadingSpinner, Tooltip } from "common-ui";
-import { compact } from "lodash";
-import { useState } from "react";
-import useSWR from "swr";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import DOMPurify from "dompurify";
+import { compact } from "lodash";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export interface CatalogueOfLifeSearchBoxProps {
   /** Optionally mock out the HTTP fetch for testing. */
   fetchJson?: (url: string) => Promise<any>;
+
+  onSelect?: (selection: string | null) => void;
 }
 
 export function CatalogueOfLifeSearchBox({
-  fetchJson
+  fetchJson,
+  onSelect
 }: CatalogueOfLifeSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
 
@@ -24,12 +27,6 @@ export function CatalogueOfLifeSearchBox({
    */
   const [searchValue, setSearchValue] = useState("");
 
-  /**
-   * Whether the Catalogue of Life Api is on hold
-   * to make sure we don't send more requests than we are allowed to.
-   */
-  const [colApiRequestsOnHold, setColApiRequestsOnHold] = useState(false);
-
   const { isValidating: colSearchIsLoading, data: searchResult } = useSWR(
     [searchValue],
     () => catalogueOfLifeSearch(searchValue, fetchJson),
@@ -39,6 +36,19 @@ export function CatalogueOfLifeSearchBox({
     }
   );
 
+  /**
+   * Whether the Catalogue of Life Api is throttled
+   * to make sure we don't send more requests than we are allowed to.
+   */
+  const [colApiRequestsOnHold, setColApiRequestsOnHold] = useState(false);
+  useEffect(() => {
+    if (searchValue) {
+      setColApiRequestsOnHold(true);
+      const timeout = setTimeout(() => setColApiRequestsOnHold(false), 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [searchValue]);
+
   const suggestButtonIsDisabled =
     colApiRequestsOnHold || !inputValue || colSearchIsLoading;
 
@@ -47,8 +57,6 @@ export function CatalogueOfLifeSearchBox({
     if (suggestButtonIsDisabled) {
       return;
     }
-    setColApiRequestsOnHold(true);
-    setTimeout(() => setColApiRequestsOnHold(false), 1000);
 
     // Set the new search value which will make useSWR do the lookup:
     setSearchValue(inputValue);
@@ -63,7 +71,7 @@ export function CatalogueOfLifeSearchBox({
     ]).filter(it => it.authorship);
 
   return (
-    <div className="card card-body border mb-3" style={{ maxWidth: "40rem" }}>
+    <div className="card card-body border mb-3">
       <div className="d-flex align-items-center mb-3">
         <label className="pt-2 d-flex align-items-center">
           <strong>
@@ -74,8 +82,8 @@ export function CatalogueOfLifeSearchBox({
         <div className="flex-grow-1">
           <div className="input-group">
             <input
-              aria-label={formatMessage("locationLabel")}
-              className="form-control"
+              aria-label={formatMessage("colSearchLabel")}
+              className="form-control col-search-input"
               onChange={e => setInputValue(e.target.value)}
               onFocus={e => e.target.select()}
               onKeyDown={e => {
@@ -101,28 +109,36 @@ export function CatalogueOfLifeSearchBox({
       {colSearchIsLoading && <LoadingSpinner loading={true} />}
       {!!nameResults?.length && (
         <div className="list-group">
-          {nameResults.map((result, index) => (
-            <div
-              key={result.id ?? index}
-              className="list-group-item list-group-item-action d-flex"
-            >
-              <div className="flex-grow-1 d-flex align-items-center">
-                <span
-                  dangerouslySetInnerHTML={{
-                    // Use DOMPurify to sanitize against XSS when using dangerouslySetInnerHTML:
-                    __html: DOMPurify.sanitize(result.labelHtml)
-                  }}
-                />
-              </div>
-              <button
-                type="button"
-                className="btn btn-primary"
-                style={{ width: "8rem" }}
+          {nameResults.map((result, index) => {
+            // Use DOMPurify to sanitize against XSS when using dangerouslySetInnerHTML:
+            const safeHtmlLabel: string = DOMPurify.sanitize(
+              result.labelHtml + (result.id ? ` (nidx ${result.id})` : "")
+            );
+
+            return (
+              <div
+                key={result.id ?? index}
+                className="list-group-item list-group-item-action d-flex"
               >
-                <DinaMessage id="select" />
-              </button>
-            </div>
-          ))}
+                <div className="flex-grow-1 d-flex align-items-center col-search-result-label">
+                  <span dangerouslySetInnerHTML={{ __html: safeHtmlLabel }} />
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-primary col-name-select-button"
+                  style={{ width: "8rem" }}
+                  onClick={() => {
+                    const element = document.createElement("div");
+                    element.innerHTML = safeHtmlLabel;
+                    const plainTextLabel = element.textContent;
+                    onSelect?.(plainTextLabel);
+                  }}
+                >
+                  <DinaMessage id="select" />
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
       {nameResults?.length === 0 && (
@@ -134,14 +150,14 @@ export function CatalogueOfLifeSearchBox({
   );
 }
 
-interface CatalogueOfLifeNameSearchResult {
+export interface CatalogueOfLifeNameSearchResult {
   name?: CatalogueOfLifeName;
   type?: string;
   alternatives?: CatalogueOfLifeName[];
-  nameKey?: string;
+  nameKey?: number;
 }
 
-interface CatalogueOfLifeName {
+export interface CatalogueOfLifeName {
   created?: string;
   modified?: string;
   canonicalId?: number;
@@ -149,11 +165,14 @@ interface CatalogueOfLifeName {
   rank?: string;
   genus?: string;
   specificEpithet?: string;
-  canonical?: true;
   labelHtml?: string;
   parsed?: true;
   id?: number;
   authorship?: string;
+  canonical?: boolean;
+  combinationAuthorship?: {
+    authors?: string[];
+  };
 }
 
 async function catalogueOfLifeSearch(
@@ -165,7 +184,7 @@ async function catalogueOfLifeSearch(
     return null;
   }
 
-  const url = new URL(`https://api.catalogueoflife.org/name/matching`);
+  const url = new URL("https://api.catalogueoflife.org/nidx/match");
   url.search = new URLSearchParams({
     q: searchValue,
     verbose: "true"

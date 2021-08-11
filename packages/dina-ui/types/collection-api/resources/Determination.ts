@@ -8,6 +8,7 @@ export interface Determination {
   determinedOn?: string;
   qualifier?: string;
   scientificNameSource?: ScientificNameSource;
+  scientificNameDetails?: string;
   scientificName?: string;
 }
 

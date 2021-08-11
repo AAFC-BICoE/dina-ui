@@ -11,6 +11,7 @@ import { FieldArray } from "formik";
 import { clamp } from "lodash";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { CatalogueOfLifeNameField } from ".";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Determination, MaterialSample } from "../../types/collection-api";
 
@@ -31,6 +32,7 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     determinedOn: true,
     qualifier: true,
     scientificNameSource: true,
+    scientificNameDetails: true,
     scientificName: true
   };
 
@@ -76,56 +78,80 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
             }
 
             return (
-              <div className="row">
-                <div className="col-md-6">
-                  <TextFieldWithMultiplicationButton
-                    {...fieldProps("verbatimScientificName")}
-                    className="col-sm-6 verbatimScientificName"
-                  />
-                  <AutoSuggestTextField<MaterialSample>
-                    {...fieldProps("verbatimAgent")}
-                    className="col-sm-6"
-                    query={() => ({
-                      path: "collection-api/material-sample"
-                    })}
-                    suggestion={sample =>
-                      (sample.determination?.map(
-                        det => det?.verbatimAgent
-                      ) as any) ?? []
-                    }
-                  />
-                  <DateField
-                    {...fieldProps("verbatimDate")}
-                    className="col-sm-6"
-                  />
-                  <TextField
-                    {...fieldProps("transcriberRemarks")}
-                    multiLines={true}
-                  />
+              <div>
+                <div className="row">
+                  <div className="col-md-6">
+                    <TextFieldWithMultiplicationButton
+                      {...fieldProps("verbatimScientificName")}
+                      className="col-sm-6 verbatimScientificName"
+                    />
+                    <AutoSuggestTextField<MaterialSample>
+                      {...fieldProps("verbatimAgent")}
+                      className="col-sm-6"
+                      query={() => ({
+                        path: "collection-api/material-sample"
+                      })}
+                      suggestion={sample =>
+                        (sample.determination?.map(
+                          det => det?.verbatimAgent
+                        ) as any) ?? []
+                      }
+                    />
+                    <DateField
+                      {...fieldProps("verbatimDate")}
+                      className="col-sm-6"
+                    />
+                    <TextField
+                      {...fieldProps("transcriberRemarks")}
+                      multiLines={true}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <TextField
+                      {...fieldProps("typeStatus")}
+                      multiLines={true}
+                    />
+                    <TextField
+                      {...fieldProps("typeStatusEvidence")}
+                      multiLines={true}
+                    />
+                    <TextField {...fieldProps("qualifier")} multiLines={true} />
+                  </div>
                 </div>
-                <div className="col-md-6">
-                  <TextField {...fieldProps("typeStatus")} multiLines={true} />
-                  <TextField
-                    {...fieldProps("typeStatusEvidence")}
-                    multiLines={true}
-                  />
-                  <TextField {...fieldProps("qualifier")} multiLines={true} />
+                <div className="row">
+                  <div className="col-sm-6">
+                    <CatalogueOfLifeNameField
+                      {...fieldProps("scientificName")}
+                      scientificNameSourceField={
+                        fieldProps("scientificNameSource").name
+                      }
+                      onChange={(newValue, formik) =>
+                        formik.setFieldValue(
+                          fieldProps("scientificNameSource").name,
+                          newValue ? "COLPLUS" : null
+                        )
+                      }
+                    />
+                  </div>
                 </div>
                 {!readOnly && !isTemplate && (
-                  <div className="list-inline mb-3">
-                    <FormikButton
-                      className="list-inline-item btn btn-primary add-assertion-button"
-                      onClick={addDetermination}
-                    >
-                      <DinaMessage id="addAnotherDetermination" />
-                    </FormikButton>
-                    <FormikButton
-                      className="list-inline-item btn btn-dark"
-                      onClick={() => removeDetermination(index)}
-                    >
-                      <DinaMessage id="removeDeterminationLabel" />
-                    </FormikButton>
-                  </div>
+                  <>
+                    <hr />
+                    <div className="list-inline mb-3">
+                      <FormikButton
+                        className="list-inline-item btn btn-primary add-assertion-button"
+                        onClick={addDetermination}
+                      >
+                        <DinaMessage id="addAnotherDetermination" />
+                      </FormikButton>
+                      <FormikButton
+                        className="list-inline-item btn btn-dark"
+                        onClick={() => removeDetermination(index)}
+                      >
+                        <DinaMessage id="removeDeterminationLabel" />
+                      </FormikButton>
+                    </div>
+                  </>
                 )}
               </div>
             );
