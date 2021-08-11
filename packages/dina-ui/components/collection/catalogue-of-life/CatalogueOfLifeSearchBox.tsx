@@ -64,11 +64,7 @@ export function CatalogueOfLifeSearchBox({
 
   const nameResults =
     searchResult &&
-    compact([
-      searchResult?.name,
-      ...(searchResult?.alternatives ?? [])
-      // Only include results with authorship:
-    ]).filter(it => it.authorship);
+    compact([searchResult?.name, ...(searchResult?.alternatives ?? [])]);
 
   return (
     <div className="card card-body border mb-3">
