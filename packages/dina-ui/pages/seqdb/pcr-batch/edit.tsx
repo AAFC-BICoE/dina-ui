@@ -17,6 +17,7 @@ import {
 import { Field } from "formik";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
+import { ReactNode } from "react";
 import {
   GroupSelectField,
   Head,
@@ -36,7 +37,7 @@ import {
   Region
 } from "../../../types/seqdb-api";
 
-export function usePcrBatchQuery(id?: string) {
+export function usePcrBatchQuery(id?: string, deps?: any[]) {
   const { bulkGet } = useApiClient();
 
   return useQuery<PcrBatch>(
@@ -74,7 +75,8 @@ export function usePcrBatchQuery(id?: string) {
             console.warn("Attachment join failed: ", error);
           }
         }
-      }
+      },
+      deps
     }
   );
 }
@@ -116,9 +118,19 @@ export default function PcrBatchEditPage() {
 export interface PcrBatchFormProps {
   pcrBatch?: PersistedResource<PcrBatch>;
   onSaved: (resource: PersistedResource<PcrBatch>) => Promise<void>;
+  buttonBar?: ReactNode;
 }
 
-export function PcrBatchForm({ pcrBatch, onSaved }: PcrBatchFormProps) {
+export function PcrBatchForm({
+  pcrBatch,
+  onSaved,
+  buttonBar = (
+    <ButtonBar>
+      <BackButton entityId={pcrBatch?.id} entityLink="/seqdb/pcr-batch" />
+      <SubmitButton className="ms-auto" />
+    </ButtonBar>
+  )
+}: PcrBatchFormProps) {
   const { username } = useAccount();
 
   // The selected Metadatas to be attached to this Collecting Event:
@@ -190,13 +202,6 @@ export function PcrBatchForm({ pcrBatch, onSaved }: PcrBatchFormProps) {
     await onSaved(savedResource);
   }
 
-  const buttonBar = (
-    <ButtonBar>
-      <BackButton entityId={pcrBatch?.id} entityLink="/seqdb/pcr-batch" />
-      <SubmitButton className="ms-auto" />
-    </ButtonBar>
-  );
-
   return (
     <DinaForm<Partial<PcrBatch>>
       initialValues={initialValues}
@@ -205,6 +210,7 @@ export function PcrBatchForm({ pcrBatch, onSaved }: PcrBatchFormProps) {
       {buttonBar}
       <PcrBatchFormFields />
       {attachedMetadatasUI}
+      {buttonBar}
     </DinaForm>
   );
 }

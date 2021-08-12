@@ -1,7 +1,6 @@
 import {
   ButtonBar,
   ColumnDefinition,
-  CreateButton,
   dateCell,
   FilterAttribute,
   ListPageLayout
@@ -56,7 +55,6 @@ export default function SangerWorkflowListPage() {
               <SeqdbMessage id="startNewWorkflow" />
             </a>
           </Link>
-          <CreateButton entityLink="/seqdb/sanger-workflow" />
         </ButtonBar>
         <ListPageLayout
           additionalFilters={filterForm => ({
