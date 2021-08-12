@@ -322,6 +322,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   selectGroup: "Sélectionnez Groupe",
   set: "Ensemble",
   showing: "Affiché",
+  skipToMainContent: "Passer au contenu principal",
+  skipToAboutThisApplication: "Passer à « À propos de ce site »",
+  skipToBasicHtmlVersion: "Passer à la version HTML simplifiée",
   startEventDateTimeLabel:
     "Date/heure de début de l'événement (AAAA-MM-JJTHH:MM:SS.MMM)",
   stateProvinceLabel: "État/province",
