@@ -14,6 +14,7 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
+import { Field } from "formik";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import {
@@ -22,9 +23,12 @@ import {
   Nav,
   useAddPersonModal
 } from "../../../components";
+import { useAttachmentsModal } from "../../../components/object-store";
+import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Person } from "../../../types/agent-api";
+import { Metadata } from "../../../types/objectstore-api";
 import {
   PcrBatch,
   PcrPrimer,
@@ -39,7 +43,7 @@ export function usePcrBatchQuery(id?: string) {
     {
       path: `seqdb-api/pcr-batch/${id}`,
       include:
-        "primerForward,primerReverse,region,thermocyclerProfile,experimenters"
+        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment"
     },
     {
       disabled: !id,
@@ -53,6 +57,22 @@ export function usePcrBatchQuery(id?: string) {
           );
           // Omit null (deleted) records:
           pcrBatch.experimenters = agents.filter(it => it);
+        }
+
+        if (pcrBatch.attachment) {
+          try {
+            const metadatas = await bulkGet<Metadata>(
+              pcrBatch.attachment.map(collector => `/metadata/${collector.id}`),
+              {
+                apiBaseUrl: "/objectstore-api",
+                returnNullForMissingResource: true
+              }
+            );
+            // Omit null (deleted) records:
+            pcrBatch.attachment = metadatas.filter(it => it);
+          } catch (error) {
+            console.warn("Attachment join failed: ", error);
+          }
         }
       }
     }
@@ -101,6 +121,13 @@ export interface PcrBatchFormProps {
 export function PcrBatchForm({ pcrBatch, onSaved }: PcrBatchFormProps) {
   const { username } = useAccount();
 
+  // The selected Metadatas to be attached to this Collecting Event:
+  const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal({
+    initialMetadatas: pcrBatch?.attachment as PersistedResource<Metadata>[],
+    deps: [pcrBatch?.id],
+    title: <DinaMessage id="attachments" />
+  });
+
   const initialValues = pcrBatch || {
     // TODO let the back-end set this:
     createdBy: username,
@@ -123,6 +150,15 @@ export function PcrBatchForm({ pcrBatch, onSaved }: PcrBatchFormProps) {
       };
     }
     delete submittedValues.experimenters;
+
+    // Add attachments if they were selected:
+    if (selectedMetadatas.length) {
+      (submittedValues as any).relationships.attachment = {
+        data: selectedMetadatas.map(it => ({ id: it.id, type: it.type }))
+      };
+    }
+    // Delete the 'attachment' attribute because it should stay in the relationships field:
+    delete submittedValues.attachment;
 
     const inputResource = {
       ...submittedValues,
@@ -168,6 +204,7 @@ export function PcrBatchForm({ pcrBatch, onSaved }: PcrBatchFormProps) {
     >
       {buttonBar}
       <PcrBatchFormFields />
+      {attachedMetadatasUI}
     </DinaForm>
   );
 }
@@ -239,7 +276,25 @@ export function PcrBatchFormFields() {
           optionLabel={primer => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
         />
+        <TextField className="col-md-6" name="thermocycler" />
+        <TextField className="col-md-6" name="objective" />
+        <TextField className="col-md-6" name="positiveControl" />
+        <TextField className="col-md-6" name="reactionVolume" />
+        <DateField className="col-md-6" name="reactionDate" />
       </div>
+      {readOnly && (
+        <div className="mb-3">
+          <Field name="id">
+            {({ field: { value: id } }) => (
+              <AttachmentReadOnlySection
+                attachmentPath={`seqdb-api/pcr-batch/${id}/attachment`}
+                detachTotalSelected={true}
+                title={<DinaMessage id="attachments" />}
+              />
+            )}
+          </Field>
+        </div>
+      )}
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />

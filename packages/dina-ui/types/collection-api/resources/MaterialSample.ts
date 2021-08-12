@@ -5,6 +5,7 @@ import { CollectingEvent } from "./CollectingEvent";
 import { PreparationType } from "./PreparationType";
 import { JsonValue } from "type-fest";
 import { MaterialSampleType } from "./MaterialSampleType";
+import { StorageUnit } from "./StorageUnit";
 import { Determination } from "./Determination";
 
 export interface MaterialSampleAttributes {
@@ -36,6 +37,7 @@ export interface MaterialSampleRelationships {
   preparationType?: PreparationType;
   preparedBy?: Person;
   parentMaterialSample?: MaterialSample;
+  storageUnit?: StorageUnit;
 }
 
 export type MaterialSample = KitsuResource &

@@ -3,16 +3,11 @@ import {
   START,
   TYPE_NUMERIC
 } from "../../../../../../dina-ui/types/collection-api";
-import ConfigAction, {
+import {
+  ConfigAction,
   SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
 } from "../../../../../pages/collection/material-sample/workflows/split-config";
 import { mountWithAppContext } from "../../../../../test-util/mock-app-context";
-
-const mockUseRouter = jest.fn();
-
-jest.mock("next/router", () => ({
-  useRouter: () => mockUseRouter()
-}));
 
 const testRunConfig = {
   "split-child-sample-run-config": {
@@ -28,17 +23,47 @@ const testRunConfig = {
   }
 };
 
+const testMaterialSample = {
+  id: "123",
+  type: "material-sample",
+  dwcCatalogNumber: "my-number"
+};
+
+const mockGet = jest.fn<any, any>(async path => {
+  switch (path) {
+    case "collection-api/material-sample/123":
+      return {
+        data: testMaterialSample
+      };
+  }
+});
+
+const apiContext = {
+  apiClient: {
+    get: mockGet
+  }
+};
+
+jest.mock("next/router", () => ({
+  withRouter: () => ({ push: jest.fn() })
+}));
+
 describe("MaterialSample split workflow series-mode run config", () => {
   it("Initially display the workfow run config with defaults", async () => {
-    const wrapper = mountWithAppContext(<ConfigAction />, {});
+    const wrapper = mountWithAppContext(
+      <ConfigAction router={{ query: { id: "123" } } as any} />,
+      { apiContext }
+    );
+
+    // Making sure the fetching of material sample parent query promise returns
+    await new Promise(setImmediate);
+    wrapper.update();
 
     // Switch to the "Series" tab:
     wrapper.find("li.react-tabs__tab.series-tab").simulate("click");
-
     expect(wrapper.find(".baseName-field input").prop("placeholder")).toEqual(
       BASE_NAME
     );
-
     expect(wrapper.find(".start-field input").prop("value")).toEqual(START);
 
     expect(wrapper.find(".suffixType-field Select").prop("value")).toEqual({
@@ -48,7 +73,13 @@ describe("MaterialSample split workflow series-mode run config", () => {
   });
 
   it("Creates a new Material Sample workfow series-mode run config with user custom entries", async () => {
-    const wrapper = mountWithAppContext(<ConfigAction />, {});
+    const wrapper = mountWithAppContext(
+      <ConfigAction router={{ query: { id: "123" } } as any} />,
+      { apiContext }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
 
     // Switch to the "Series" tab:
     wrapper.find("li.react-tabs__tab.series-tab").simulate("click");
@@ -66,7 +97,7 @@ describe("MaterialSample split workflow series-mode run config", () => {
       .simulate("change", { target: { value: "Remarks on this run config" } });
 
     wrapper
-      .find(".sampleName0 input")
+      .find(".sampleNames0 input")
       .simulate("change", { target: { value: "my custom name" } });
 
     wrapper.update();
@@ -95,7 +126,13 @@ describe("MaterialSample split workflow series-mode run config", () => {
   });
 
   it("Creates a new Material Sample workfow batch-mode run config with user custom entries", async () => {
-    const wrapper = mountWithAppContext(<ConfigAction />, {});
+    const wrapper = mountWithAppContext(
+      <ConfigAction router={{ query: { id: "123" } } as any} />,
+      { apiContext }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
 
     // Switch to the "Batch" tab:
     wrapper.find("li.react-tabs__tab.batch-tab").simulate("click");
@@ -113,7 +150,7 @@ describe("MaterialSample split workflow series-mode run config", () => {
       .simulate("change", { target: { value: 3 } });
 
     wrapper
-      .find(".sampleName0 input")
+      .find(".sampleNames0 input")
       .simulate("change", { target: { value: "CustomName1" } });
 
     wrapper.update();
@@ -136,9 +173,25 @@ describe("MaterialSample split workflow series-mode run config", () => {
         suffix: "TestSuffix"
       },
       configure_children: {
-        sampleNames: ["CustomName1", null, null]
+        sampleNames: [
+          "CustomName1",
+          "TestBaseNameTestSuffix",
+          "TestBaseNameTestSuffix"
+        ]
       },
       metadata: {}
     });
+  });
+
+  it("When come from material sample view page, baseName is set with parent sample name", async () => {
+    const wrapper = mountWithAppContext(
+      <ConfigAction router={{ query: { id: "123" } } as any} />,
+      { apiContext }
+    );
+    await new Promise(setImmediate);
+    wrapper.update();
+    expect(wrapper.find(".baseName-field input").prop("value")).toEqual(
+      "my-number"
+    );
   });
 });

@@ -79,7 +79,7 @@ export function Tooltip({
     ) : null;
 
   return (
-    <span className="m-2">
+    <span className="m-2" tabIndex={0}>
       <RcTooltip
         id={id}
         overlay={
@@ -93,7 +93,10 @@ export function Tooltip({
       >
         <span>
           {visibleElement ?? (
-            <img src="/static/images/iconInformation.gif" alt="" />
+            <img
+              src="/static/images/iconInformation.gif"
+              alt={id ? formatMessage({ id }) : ""}
+            />
           )}
         </span>
       </RcTooltip>

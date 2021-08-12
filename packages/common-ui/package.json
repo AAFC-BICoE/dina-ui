@@ -11,6 +11,7 @@
     "core-js": "^3.12.1",
     "custom-event": "^1.0.1",
     "dataloader": "^2.0.0",
+    "dompurify": "^2.3.0",
     "formik": "^2.2.7",
     "handsontable": "6.2.2",
     "keycloak-js": "^14.0.0",
