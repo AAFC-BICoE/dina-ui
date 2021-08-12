@@ -5,15 +5,18 @@ import {
   FormikButton,
   QueryTable,
   SubmitButton,
+  useAccount,
+  useApiClient,
   useGroupedCheckBoxes
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
-import { toPairs } from "lodash";
+import { InputResource, KitsuResourceLink } from "kitsu";
+import { pick, toPairs } from "lodash";
 import Link from "next/link";
 import { useState } from "react";
 import { FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { MolecularSample } from "../../../types/seqdb-api";
+import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
@@ -22,7 +25,13 @@ export interface SangerSampleSelectionStepProps {
 export function SangerSampleSelectionStep({
   pcrBatchId
 }: SangerSampleSelectionStepProps) {
+  const { apiClient, save } = useApiClient();
+  const { username } = useAccount();
+
   const [searchValue, setSearchValue] = useState("");
+
+  // Keep track of the last save operation, so the data is re-fetched immediately after saving.
+  const [lastSave, setLastSave] = useState<number>();
 
   const {
     CheckBoxHeader: SampleSelectCheckBoxHeader,
@@ -37,7 +46,7 @@ export function SangerSampleSelectionStep({
     CheckBoxField: SampleDeselectCheckBox,
     setAvailableItems: setRemoveableSamples
   } = useGroupedCheckBoxes({
-    fieldName: "sampleIdsToRemove"
+    fieldName: "pcrBatchItemIdsToRemove"
   });
 
   const SELECTABLE_SAMPLE_COLUMNS: ColumnDefinition<any>[] = [
@@ -75,6 +84,33 @@ export function SangerSampleSelectionStep({
     }
   ];
 
+  async function selectSamples(sampleLinks: KitsuResourceLink[]) {
+    const { data: pcrBatch } = await apiClient.get<PcrBatch>(
+      `seqdb-api/pcr-batch/${pcrBatchId}`,
+      {}
+    );
+
+    const newPcrBatchItems = sampleLinks.map<InputResource<PcrBatchItem>>(
+      sampleLink => ({
+        sample: sampleLink,
+        pcrBatch: pick(pcrBatch, "id", "type"),
+        group: pcrBatch.group,
+        createdBy: username,
+        type: "pcr-batch-item"
+      })
+    );
+
+    await save(
+      newPcrBatchItems.map(item => ({
+        resource: item,
+        type: "pcr-batch-item"
+      })),
+      { apiBaseUrl: "/seqdb-api" }
+    );
+
+    setLastSave(Date.now());
+  }
+
   async function selectAllCheckedSamples(
     formValues,
     formik: FormikContextType<any>
@@ -87,9 +123,9 @@ export function SangerSampleSelectionStep({
     const samples = ids.map(id => ({
       id,
       type: "molecular-sample"
-    })) as MolecularSample[];
+    }));
 
-    // await selectSamples(samples);
+    await selectSamples(samples);
 
     formik.setFieldValue("sampleIdsToSelect", {});
   }
@@ -195,6 +231,7 @@ export function SangerSampleSelectionStep({
                 reactTableProps={{ sortable: false }}
                 onSuccess={response => setAvailableSamples(response.data)}
                 path="seqdb-api/pcr-batch-item"
+                deps={[lastSave]}
               />
             </div>
           </div>

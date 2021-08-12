@@ -13,7 +13,7 @@ import { PcrBatch } from "../../../types/seqdb-api";
 const TABLE_COLUMNS: ColumnDefinition<PcrBatch>[] = [
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/seqdb/sanger-workflow/view?pcrBatchId=${id}`}>
+      <Link href={`/seqdb/sanger-workflow/run?pcrBatchId=${id}`}>
         {name || id}
       </Link>
     ),
