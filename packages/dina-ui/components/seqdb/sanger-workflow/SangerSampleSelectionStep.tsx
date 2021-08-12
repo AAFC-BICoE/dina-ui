@@ -10,7 +10,7 @@ import {
   useGroupedCheckBoxes
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
-import { InputResource, KitsuResourceLink } from "kitsu";
+import { InputResource, KitsuResourceLink, PersistedResource } from "kitsu";
 import { pick, toPairs } from "lodash";
 import Link from "next/link";
 import { useState } from "react";
@@ -44,9 +44,9 @@ export function SangerSampleSelectionStep({
   const {
     CheckBoxHeader: SampleDeselectCheckBoxHeader,
     CheckBoxField: SampleDeselectCheckBox,
-    setAvailableItems: setRemoveableSamples
+    setAvailableItems: setRemoveablePcrBatchItems
   } = useGroupedCheckBoxes({
-    fieldName: "pcrBatchItemIdsToRemove"
+    fieldName: "pcrBatchItemIdsToDelete"
   });
 
   const SELECTABLE_SAMPLE_COLUMNS: ColumnDefinition<any>[] = [
@@ -70,7 +70,14 @@ export function SangerSampleSelectionStep({
 
   const PCRBATCH_ITEM_COLUMNS: ColumnDefinition<any>[] = [
     {
-      accessor: "id",
+      Cell: ({ original: pcrBatchItem }) => (
+        <Link
+          href={`/seqdb/molecular-sample/view?id=${pcrBatchItem?.sample?.id}`}
+        >
+          {pcrBatchItem?.sample?.name}
+        </Link>
+      ),
+      accessor: "sample.name",
       sortable: false
     },
     {
@@ -130,6 +137,35 @@ export function SangerSampleSelectionStep({
     formik.setFieldValue("sampleIdsToSelect", {});
   }
 
+  async function deletePcrBatchItems(pcrBatchItems: KitsuResourceLink[]) {
+    await save(
+      pcrBatchItems.map(item => ({ delete: item })),
+      { apiBaseUrl: "/seqdb-api" }
+    );
+
+    setLastSave(Date.now());
+  }
+
+  async function deleteAllCheckedPcrBatchItems(
+    formValues,
+    formik: FormikContextType<any>
+  ) {
+    const { pcrBatchItemIdsToDelete } = formValues;
+
+    const ids = toPairs(pcrBatchItemIdsToDelete)
+      .filter(pair => pair[1])
+      .map(pair => pair[0]);
+
+    const pcrBatchItems = ids.map<KitsuResourceLink>(id => ({
+      id,
+      type: "pcr-batch-item"
+    }));
+
+    await deletePcrBatchItems(pcrBatchItems);
+
+    formik.setFieldValue("pcrBatchItemIdsToDelete", {});
+  }
+
   return (
     <div>
       <h2>
@@ -168,7 +204,7 @@ export function SangerSampleSelectionStep({
       </div>
       <div className="mb-3">
         <DinaForm
-          initialValues={{ sampleIdsToSelect: {}, stepResourcesToDelete: {} }}
+          initialValues={{ sampleIdsToSelect: {}, pcrBatchItemIdsToDelete: {} }}
         >
           <div className="row">
             <div className="col-5 available-samples">
@@ -202,7 +238,7 @@ export function SangerSampleSelectionStep({
               <div>
                 <FormikButton
                   className="btn btn-dark w-100 mb-5 deselect-all-checked-button"
-                  onClick={() => undefined} // deleteAllCheckedStepResources}
+                  onClick={deleteAllCheckedPcrBatchItems}
                 >
                   <FiChevronsLeft />
                 </FormikButton>
@@ -229,8 +265,11 @@ export function SangerSampleSelectionStep({
                   { id: "sample.version", desc: false }
                 ]}
                 reactTableProps={{ sortable: false }}
-                onSuccess={response => setAvailableSamples(response.data)}
+                onSuccess={response =>
+                  setRemoveablePcrBatchItems(response.data)
+                }
                 path="seqdb-api/pcr-batch-item"
+                include="sample"
                 deps={[lastSave]}
               />
             </div>
