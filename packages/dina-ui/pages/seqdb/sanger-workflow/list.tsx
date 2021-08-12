@@ -50,7 +50,7 @@ export default function SangerWorkflowListPage() {
       <main className="container-fluid">
         <h1>{title}</h1>
         <ButtonBar>
-          <Link href={`/seqdb/sanger-workflow/edit`}>
+          <Link href={`/seqdb/sanger-workflow/run`}>
             <a className="btn btn-primary">
               <SeqdbMessage id="startNewWorkflow" />
             </a>
