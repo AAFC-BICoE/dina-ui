@@ -42,7 +42,7 @@ export default function SplitRunActionResult() {
       <Head title={formatMessage("workflowCompleteTitle")} />
       <Nav />
       <main className="container-fluid ">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="workflowCompleteTitle" />
         </h1>
 

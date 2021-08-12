@@ -57,7 +57,7 @@ export default function DinaUserDetailsPage() {
               />
             )}
           </ButtonBar>
-          <h1>
+          <h1 id="wb-cont">
             <DinaMessage id={"userViewTitle"} />
           </h1>
           <DinaForm<DinaUser> initialValues={dinaUser}>

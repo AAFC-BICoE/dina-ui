@@ -28,7 +28,7 @@ export function PreparationTypeDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("preparationTypeViewTitle")} />
       <Nav />
       <main className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="preparationTypeViewTitle" />
         </h1>
         <ButtonBar>

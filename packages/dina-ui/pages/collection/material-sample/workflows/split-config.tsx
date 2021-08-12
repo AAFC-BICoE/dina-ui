@@ -164,7 +164,7 @@ export function ConfigAction({ router }: WithRouterProps) {
       <Head title={formatMessage("splitSubsampleTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
         <h2>

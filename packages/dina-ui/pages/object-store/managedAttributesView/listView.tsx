@@ -40,13 +40,12 @@ const ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] = [
   },
   {
     Cell: ({ original: { acceptedValues, managedAttributeType } }) => {
-      const labelKey:
-        | keyof typeof DINAUI_MESSAGES_ENGLISH
-        | undefined = acceptedValues?.length
-        ? "field_managedAttributeType_picklist_label"
-        : MANAGED_ATTRIBUTE_TYPE_OPTIONS.find(
-            option => option.value === managedAttributeType
-          )?.labelKey;
+      const labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH | undefined =
+        acceptedValues?.length
+          ? "field_managedAttributeType_picklist_label"
+          : MANAGED_ATTRIBUTE_TYPE_OPTIONS.find(
+              option => option.value === managedAttributeType
+            )?.labelKey;
 
       return <div>{labelKey && <DinaMessage id={labelKey} />}</div>;
     },
@@ -71,7 +70,7 @@ export default function ManagedAttributesListPage() {
       <Head title="Managed Attributes" />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="managedAttributeListTitle" />
         </h1>
         <ButtonBar>
