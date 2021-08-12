@@ -78,7 +78,7 @@ export default function PcrBatchEditPage() {
       <Head title={formatMessage(title)} />
       <Nav />
       <div className="container">
-        <h1>
+        <h1 id="wb-cont">
           <SeqdbMessage id={title} />
         </h1>
         {id ? (

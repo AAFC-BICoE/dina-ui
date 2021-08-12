@@ -34,7 +34,7 @@ export default function IndexSetViewPage() {
         </ButtonBar>
         <DinaForm initialValues={response.data}>
           <main className="container-fluid">
-            <h1>Index Set Details</h1>
+            <h1 id="wb-cont">Index Set Details</h1>
             <div className="row">
               <GroupFieldView className="col-md-2" name="group" />
             </div>

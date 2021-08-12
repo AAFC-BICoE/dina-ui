@@ -45,7 +45,7 @@ export default function PcrProfileListPage() {
         <CreateButton entityLink="/seqdb/pcr-profile" />
       </ButtonBar>
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <SeqdbMessage id="pcrProfileListTitle" />
         </h1>
         <ListPageLayout
