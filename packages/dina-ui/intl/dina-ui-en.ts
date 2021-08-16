@@ -100,6 +100,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   detachSelectedButtonText: "Detach Selected",
   detailsPageLink: "Details Page",
   determination: "Determination",
+  determinations: "Determinations",
   dinaHomeH1: "Dina Home",
   dinaUserSectionTitle: "Users",
   duplicateFilesFound: "duplicate files found",
