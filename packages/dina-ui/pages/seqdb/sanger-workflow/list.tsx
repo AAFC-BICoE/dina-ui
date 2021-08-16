@@ -6,7 +6,7 @@ import {
   ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
 
@@ -81,6 +81,7 @@ export default function SangerWorkflowListPage() {
           )}
         />
       </main>
+      <Footer />
     </div>
   );
 }

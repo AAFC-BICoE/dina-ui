@@ -2,7 +2,7 @@ import { BackToListButton, ButtonBar } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { Head, Nav } from "../../../components";
+import { Footer, Head, Nav } from "../../../components";
 import { PcrBatchStep } from "../../../components/seqdb/sanger-workflow/SangerPcrBatchStep";
 import { SangerSampleSelectionStep } from "../../../components/seqdb/sanger-workflow/SangerSampleSelectionStep";
 import { useSeqdbIntl } from "../../../intl/seqdb-intl";
@@ -63,6 +63,7 @@ export default function SangerWorkFlowEditPage() {
           </TabPanel>
         </Tabs>
       </main>
+      <Footer />
     </div>
   );
 }
