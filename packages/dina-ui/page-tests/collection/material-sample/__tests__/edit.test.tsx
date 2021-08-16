@@ -7,8 +7,6 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
-import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
-import { SRS } from "../../../../types/collection-api/resources/SRS";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -39,16 +37,6 @@ function testMaterialSample(): PersistedResource<MaterialSample> {
   };
 }
 
-const TEST_SRS: SRS = {
-  srs: ["NAD27 (EPSG:4276)", "WGS84 (EPSG:4326)"],
-  type: "srs"
-};
-
-const TEST_COORDINATES: CoordinateSystem = {
-  coordinateSystem: ["decimal degrees", " degrees decimal"],
-  type: "coordinate-system"
-};
-
 const TEST_MANAGED_ATTRIBUTE = {
   id: "1",
   type: "managed-attribute",
@@ -62,10 +50,6 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/collecting-event/1?include=collectors,attachment":
       // Populate the linker table:
       return { data: testCollectionEvent() };
-    case "collection-api/srs":
-      return { data: [TEST_SRS] };
-    case "collection-api/coordinate-system":
-      return { data: [TEST_COORDINATES] };
     case "collection-api/preparation-type":
     case "collection-api/managed-attribute":
     case "collection-api/material-sample-type":
@@ -74,6 +58,7 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/vocabulary/srs":
     case "collection-api/vocabulary/coordinateSystem":
     case "collection-api/vocabulary/degreeOfEstablishment":
+    case "collection-api/vocabulary/typeStatus":
     case "collection-api/storage-unit-type":
     case "collection-api/storage-unit":
     case "objectstore-api/metadata":
