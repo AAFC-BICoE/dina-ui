@@ -1,16 +1,20 @@
 import {
+  ButtonBar,
   ColumnDefinition,
   DinaForm,
   filterBy,
   FormikButton,
+  MetaWithTotal,
   QueryTable,
   SubmitButton,
   useAccount,
   useApiClient,
-  useGroupedCheckBoxes
+  useGroupedCheckBoxes,
+  useQuery,
+  withResponse
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
-import { InputResource, KitsuResourceLink, PersistedResource } from "kitsu";
+import { InputResource, KitsuResourceLink, KitsuResponse } from "kitsu";
 import { pick, toPairs } from "lodash";
 import Link from "next/link";
 import { useState } from "react";
@@ -25,13 +29,14 @@ export interface SangerSampleSelectionStepProps {
 export function SangerSampleSelectionStep({
   pcrBatchId
 }: SangerSampleSelectionStepProps) {
-  const { apiClient, save } = useApiClient();
-  const { username } = useAccount();
+  const pcrBatchItemQuery = usePcrBatchItemQuery(
+    pcrBatchId,
+    async ({ meta: { totalResourceCount } }) => setEditMode(!totalResourceCount)
+  );
+
+  const [editMode, setEditMode] = useState(false);
 
   const [searchValue, setSearchValue] = useState("");
-
-  // Keep track of the last save operation, so the data is re-fetched immediately after saving.
-  const [lastSave, setLastSave] = useState<number>();
 
   const {
     CheckBoxHeader: SampleSelectCheckBoxHeader,
@@ -80,16 +85,177 @@ export function SangerSampleSelectionStep({
       accessor: "sample.name",
       sortable: false
     },
-    {
-      Cell: ({ original: pcrBatchItem }) => (
-        <div key={pcrBatchItem.id}>
-          <SampleDeselectCheckBox resource={pcrBatchItem} />
-        </div>
-      ),
-      Header: SampleDeselectCheckBoxHeader,
-      sortable: false
-    }
+    ...(editMode
+      ? [
+          {
+            Cell: ({ original: pcrBatchItem }) => (
+              <div key={pcrBatchItem.id}>
+                <SampleDeselectCheckBox resource={pcrBatchItem} />
+              </div>
+            ),
+            Header: SampleDeselectCheckBoxHeader,
+            sortable: false
+          }
+        ]
+      : [])
   ];
+
+  const { deleteAllCheckedPcrBatchItems, lastSave, selectAllCheckedSamples } =
+    useSangerSampleSelection(pcrBatchId);
+
+  const selectedItemsTable = (
+    <div>
+      <ButtonBar>
+        <button
+          className="btn btn-primary"
+          type="button"
+          onClick={() => setEditMode(true)}
+          style={{ width: "10rem" }}
+        >
+          <SeqdbMessage id="editButtonText" />
+        </button>
+      </ButtonBar>
+      <strong>
+        <SeqdbMessage id="selectedSamplesTitle" />
+      </strong>
+      <QueryTable
+        columns={PCRBATCH_ITEM_COLUMNS}
+        defaultPageSize={100}
+        filter={filterBy([], {
+          extraFilters: [
+            {
+              selector: "pcrBatch.uuid",
+              comparison: "==",
+              arguments: pcrBatchId
+            }
+          ]
+        })("")}
+        defaultSort={[
+          { id: "sample.name", desc: false },
+          { id: "sample.version", desc: false }
+        ]}
+        reactTableProps={{ sortable: false }}
+        onSuccess={response => setRemoveablePcrBatchItems(response.data)}
+        path="seqdb-api/pcr-batch-item"
+        include="sample"
+        deps={[lastSave]}
+      />
+    </div>
+  );
+
+  const buttonBar = (
+    <ButtonBar>
+      <button
+        className="btn btn-primary"
+        type="button"
+        onClick={() => setEditMode(false)}
+        style={{ width: "10rem" }}
+      >
+        <SeqdbMessage id="done" />
+      </button>
+    </ButtonBar>
+  );
+
+  return withResponse(pcrBatchItemQuery, () =>
+    editMode ? (
+      <div>
+        {buttonBar}
+        <div className="alert alert-warning d-inline-block">
+          <SeqdbMessage id="sampleSelectionInstructions" />
+        </div>
+        <div className="mb-3">
+          <DinaForm
+            initialValues={{ inputValue: "" }}
+            onSubmit={({ submittedValues: { inputValue } }) =>
+              setSearchValue(inputValue)
+            }
+          >
+            <div className="input-group" style={{ width: "30rem" }}>
+              <Field
+                autoComplete="off"
+                name="inputValue"
+                className="form-control"
+              />
+              <SubmitButton className="btn btn-primary">
+                <SeqdbMessage id="search" />
+              </SubmitButton>
+              <FormikButton
+                className="btn btn-dark"
+                onClick={(_, form) => {
+                  form.resetForm();
+                  form.submitForm();
+                }}
+              >
+                <SeqdbMessage id="resetButtonText" />
+              </FormikButton>
+            </div>
+          </DinaForm>
+        </div>
+        <div className="mb-3">
+          <DinaForm
+            initialValues={{
+              sampleIdsToSelect: {},
+              pcrBatchItemIdsToDelete: {}
+            }}
+          >
+            <div className="row">
+              <div className="col-5 available-samples">
+                <strong>
+                  <SeqdbMessage id="availableSamplesTitle" />
+                </strong>
+                <QueryTable
+                  columns={SELECTABLE_SAMPLE_COLUMNS}
+                  defaultPageSize={100}
+                  filter={
+                    searchValue ? filterBy(["name"])(searchValue) : undefined
+                  }
+                  defaultSort={[
+                    { id: "name", desc: false },
+                    { id: "version", desc: false }
+                  ]}
+                  reactTableProps={{ sortable: false }}
+                  onSuccess={response => setAvailableSamples(response.data)}
+                  path="seqdb-api/molecular-sample"
+                />
+              </div>
+              <div className="col-2" style={{ marginTop: "100px" }}>
+                <div>
+                  <FormikButton
+                    className="btn btn-primary w-100 mb-5 select-all-checked-button"
+                    onClick={selectAllCheckedSamples}
+                  >
+                    <FiChevronsRight />
+                  </FormikButton>
+                </div>
+                <div>
+                  <FormikButton
+                    className="btn btn-dark w-100 mb-5 deselect-all-checked-button"
+                    onClick={deleteAllCheckedPcrBatchItems}
+                  >
+                    <FiChevronsLeft />
+                  </FormikButton>
+                </div>
+              </div>
+              <div className="col-5 available-samples">
+                {selectedItemsTable}
+              </div>
+            </div>
+          </DinaForm>
+        </div>
+        {buttonBar}
+      </div>
+    ) : (
+      selectedItemsTable
+    )
+  );
+}
+
+export function useSangerSampleSelection(pcrBatchId: string) {
+  const { apiClient, save } = useApiClient();
+  const { username } = useAccount();
+
+  // Keep track of the last save operation, so the data is re-fetched immediately after saving.
+  const [lastSave, setLastSave] = useState<number>();
 
   async function selectSamples(sampleLinks: KitsuResourceLink[]) {
     const { data: pcrBatch } = await apiClient.get<PcrBatch>(
@@ -166,116 +332,32 @@ export function SangerSampleSelectionStep({
     formik.setFieldValue("pcrBatchItemIdsToDelete", {});
   }
 
-  return (
-    <div>
-      <h2>
-        <SeqdbMessage id="sampleSelectionTitle" />
-      </h2>
-      <div className="alert alert-warning d-inline-block">
-        <SeqdbMessage id="sampleSelectionInstructions" />
-      </div>
-      <div className="mb-3">
-        <DinaForm
-          initialValues={{ inputValue: "" }}
-          onSubmit={({ submittedValues: { inputValue } }) =>
-            setSearchValue(inputValue)
+  return {
+    selectAllCheckedSamples,
+    deleteAllCheckedPcrBatchItems,
+    lastSave
+  };
+}
+
+export function usePcrBatchItemQuery(
+  pcrBatchId: string,
+  onSuccess:
+    | ((response: KitsuResponse<PcrBatchItem, MetaWithTotal>) => void)
+    | undefined
+) {
+  return useQuery<PcrBatchItem, MetaWithTotal>(
+    {
+      path: "seqdb-api/pcr-batch-item",
+      filter: filterBy([], {
+        extraFilters: [
+          {
+            selector: "pcrBatch.uuid",
+            comparison: "==",
+            arguments: pcrBatchId
           }
-        >
-          <div className="input-group" style={{ width: "30rem" }}>
-            <Field
-              autoComplete="off"
-              name="inputValue"
-              className="form-control"
-            />
-            <SubmitButton className="btn btn-primary">
-              <SeqdbMessage id="search" />
-            </SubmitButton>
-            <FormikButton
-              className="btn btn-dark"
-              onClick={(_, form) => {
-                form.resetForm();
-                form.submitForm();
-              }}
-            >
-              <SeqdbMessage id="resetButtonText" />
-            </FormikButton>
-          </div>
-        </DinaForm>
-      </div>
-      <div className="mb-3">
-        <DinaForm
-          initialValues={{ sampleIdsToSelect: {}, pcrBatchItemIdsToDelete: {} }}
-        >
-          <div className="row">
-            <div className="col-5 available-samples">
-              <strong>
-                <SeqdbMessage id="availableSamplesTitle" />
-              </strong>
-              <QueryTable
-                columns={SELECTABLE_SAMPLE_COLUMNS}
-                defaultPageSize={100}
-                filter={
-                  searchValue ? filterBy(["name"])(searchValue) : undefined
-                }
-                defaultSort={[
-                  { id: "name", desc: false },
-                  { id: "version", desc: false }
-                ]}
-                reactTableProps={{ sortable: false }}
-                onSuccess={response => setAvailableSamples(response.data)}
-                path="seqdb-api/molecular-sample"
-              />
-            </div>
-            <div className="col-2" style={{ marginTop: "100px" }}>
-              <div>
-                <FormikButton
-                  className="btn btn-primary w-100 mb-5 select-all-checked-button"
-                  onClick={selectAllCheckedSamples}
-                >
-                  <FiChevronsRight />
-                </FormikButton>
-              </div>
-              <div>
-                <FormikButton
-                  className="btn btn-dark w-100 mb-5 deselect-all-checked-button"
-                  onClick={deleteAllCheckedPcrBatchItems}
-                >
-                  <FiChevronsLeft />
-                </FormikButton>
-              </div>
-            </div>
-            <div className="col-5 available-samples">
-              <strong>
-                <SeqdbMessage id="selectedSamplesTitle" />
-              </strong>
-              <QueryTable
-                columns={PCRBATCH_ITEM_COLUMNS}
-                defaultPageSize={100}
-                filter={filterBy([], {
-                  extraFilters: [
-                    {
-                      selector: "pcrBatch.uuid",
-                      comparison: "==",
-                      arguments: pcrBatchId
-                    }
-                  ]
-                })("")}
-                defaultSort={[
-                  { id: "sample.name", desc: false },
-                  { id: "sample.version", desc: false }
-                ]}
-                reactTableProps={{ sortable: false }}
-                onSuccess={response =>
-                  setRemoveablePcrBatchItems(response.data)
-                }
-                path="seqdb-api/pcr-batch-item"
-                include="sample"
-                deps={[lastSave]}
-              />
-            </div>
-          </div>
-        </DinaForm>
-      </div>
-    </div>
+        ]
+      })("")
+    },
+    { onSuccess }
   );
 }
