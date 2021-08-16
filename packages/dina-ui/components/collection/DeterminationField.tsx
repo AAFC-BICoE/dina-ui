@@ -13,7 +13,11 @@ import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { CatalogueOfLifeNameField } from ".";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { Determination, MaterialSample } from "../../types/collection-api";
+import {
+  Determination,
+  MaterialSample,
+  Vocabulary
+} from "../../types/collection-api";
 
 export interface DeterminationFieldProps {
   className?: string;
@@ -43,6 +47,7 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const { readOnly, isTemplate } = useDinaFormContext();
   const determinationsPath = "determination";
+
   return (
     <FieldSet
       className={className}
@@ -107,9 +112,16 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                     />
                   </div>
                   <div className="col-md-6">
-                    <TextField
+                    <AutoSuggestTextField<Vocabulary>
                       {...fieldProps("typeStatus")}
-                      multiLines={true}
+                      query={() => ({
+                        path: "collection-api/vocabulary/typeStatus"
+                      })}
+                      suggestion={vocabElement =>
+                        vocabElement?.vocabularyElements?.map(
+                          it => it?.name ?? ""
+                        ) ?? ""
+                      }
                     />
                     <TextField
                       {...fieldProps("typeStatusEvidence")}
