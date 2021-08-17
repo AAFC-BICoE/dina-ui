@@ -12,15 +12,19 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     autoFillGeoSuggestLabel:
       "Remplissage automatique des champs de localisation (la valeur de ce champ de recherche nest pas conservée)",
     backToList: "Retour à la page de liste",
+    backToReadOnlyPage: "Retour à la page en mode lecture seule",
     bulkEditorValidationError:
       "Valeur non valide sur la ligne {row} : {valeur}",
     cancelButtonText: "Annuler",
     checkAllTooltipMessage:
       "Cochez cette case pour cocher tous les articles visibles dans cette page. ",
     closeButtonText: "Fermer",
+    configureLabel: "Configurer",
     createNew: "Créer nouveau",
     deleteAllButtonText: "Tout supprimer",
     deleteButtonText: "Supprimer",
+    description: "Description",
+    destroyedLabel: "Détruit",
     editButtonText: "Modifier",
     editableTable: "Tableau modifiable",
     errorPageTitle: "Erreur",
@@ -63,8 +67,10 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     queryTableMultiSortExplanation:
       "Pour trier la liste en fonction de plusieurs colonnes : Cliquez sur un en-tête de colonne pour trier par cette colonne, puis appuyez sur la touche Maj pendant que vous cliquez sur un autre en-tête.",
     queryTableMultiSortTooltipTitle: "Trier en fonction de plusieurs colonnes ",
+    remarks: "Remarques",
     remove: "Retirer",
     resetButtonText: "Réinitialiser",
+    results: "Résultats",
     rows: "rangées",
     search: "Rechercher",
     select: "Sélectionner ",
@@ -74,6 +80,8 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     somethingWentWrong: "Un problème est survenu",
     sourceField: "Champ source",
     sourceText: "Texte de départ",
+    startLabel: "Démarrer",
+    stepLabel: "Étape",
     submitBtnText: "Enregistrer",
     tableTotalCount: "Nombre de dossiers correspondants : {totalCount}",
     targetField: "Champ cible",
@@ -84,13 +92,5 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     valueLabel: "Valeur",
     valueSourceType: "Type de valeur de départ",
     viewDetails: "Voir les détails",
-    yes: "Oui",
-    backToReadOnlyPage: "Retour à la page en mode lecture seule",
-    configureLabel: "Configurer",
-    description: "Description",
-    destroyedLabel: "Détruit",
-    remarks: "Remarques",
-    results: "Résultats",
-    startLabel: "Démarrer",
-    stepLabel: "Étape"
+    yes: "Oui"
   };

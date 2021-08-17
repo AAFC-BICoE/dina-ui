@@ -4,6 +4,8 @@ import { SEQDB_MESSAGES_ENGLISH } from "./seqdb-en";
  * French translation of SeqDB English messages
  */
 export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
+  addMolecularSampleTitle: "Ajouter l’échantillon moléculaire",
+  addPcrBatchTitle: "Ajouter le lot PCR",
   addPcrPrimerTitle: "Ajouter une amorce PCR",
   addPcrProfileTitle: "Ajouter un profil de thermocycleur",
   addProductTitle: "Ajouter un produit",
@@ -17,6 +19,8 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   deselectAllCheckedSamplesButtonText:
     "<-- Désélectionner tous les échantillons cochés ",
   deselectButtonText: "Désélectionner",
+  editMolecularSampleTitle: "Modifier l’échantillon moléculaire",
+  editPcrBatchTitle: "Modifier le lot PCR",
   editPcrPrimerTitle: "Modifier l’amorce PCR",
   editPcrProfileTitle: "Modifier le profil de thermocycleur",
   editProductTitle: "Modifier le produit",
@@ -41,8 +45,12 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   indexI7: "Indice i7",
   indexSetListTitle: "Ensembles d’indices",
   indexSetMustBeSet: "L’ensemble d’indices doit être défini.",
+  molecularSample: "Échantillon moléculaire",
+  molecularSampleListTitle: "Échantillons moléculaires",
   notShearedStatus: "Sans cisaillement",
   notSizeSelectedStatus: "Sans sélection de taille",
+  pcrBatchListTitle: "Lots PCR",
+  pcrBatchViewTitle: "Visualiser le lot PCR",
   pcrPrimerListTitle: "Amorces PCR",
   pcrPrimerViewTitle: "Amorce PCR",
   pcrProfileListTitle: "Profils de thermocycleur",
@@ -66,6 +74,8 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
     "Supprimer les détails sur le cisaillement sélectionnés",
   removeSizeSelectionDetailsButtonText:
     "Supprimer les détails sur la sélection de taille sélectionnés",
+  sampleSelectionInstructions:
+    "Votre sélection d’échantillons est sauvegardée lorsque vous appuyez sur un bouton de sélection ou de désélection. Il n’y a pas de bouton Enregistrer distinct.",
   sampleSelectionTitle: "Sélection d’échantillons",
   selectAllCheckedSamplesButtonText:
     "Sélectionner tous les échantillons cochés -->",
@@ -77,19 +87,9 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   sizeSelectedStatus: "Sélection de taille ajoutée",
   sizeSelectionLabel: "Sélection de taille",
   wellCoordinates: "Coordonnées du puits",
+  workflowDetails: "Détails du flux de travail",
   workflowDetailsTab: "Détails",
   workflowListTitle: "Flux de SNG",
   workflowStepTab: "Étape {number} : {name}",
-  workflowViewTitle: "Flux de SNG",
-  addPcrBatchTitle: "Ajouter le lot PCR",
-  addMolecularSampleTitle: "Ajouter l’échantillon moléculaire",
-  editPcrBatchTitle: "Modifier le lot PCR",
-  editMolecularSampleTitle: "Modifier l’échantillon moléculaire",
-  molecularSample: "Échantillon moléculaire",
-  molecularSampleListTitle: "Échantillons moléculaires",
-  pcrBatchListTitle: "Lots PCR",
-  pcrBatchViewTitle: "Visualiser le lot PCR",
-  sampleSelectionInstructions:
-    "Votre sélection d’échantillons est sauvegardée lorsque vous appuyez sur un bouton de sélection ou de désélection. Il n’y a pas de bouton Enregistrer distinct.",
-  workflowDetails: "Détails du flux de travail"
+  workflowViewTitle: "Flux de SNG"
 };
