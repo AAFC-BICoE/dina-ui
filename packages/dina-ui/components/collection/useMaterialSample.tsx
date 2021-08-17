@@ -9,7 +9,6 @@ import {
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { cloneDeep, fromPairs, isEmpty, isEqual, pick, toPairs } from "lodash";
-import { TypeStatusEnum } from "../../../dina-ui/types/collection-api/resources/TypeStatus";
 import {
   Dispatch,
   SetStateAction,
