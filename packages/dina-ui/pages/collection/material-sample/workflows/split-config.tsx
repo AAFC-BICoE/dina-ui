@@ -298,7 +298,11 @@ function useDefaultSampleNames(generationMode: MaterialSampleGenerationMode) {
     ]
   );
 
-  return { resetSampleNames };
+  const sampleNamesHaveBeenEdited = !!(
+    formikCtx.touched as any
+  ).sampleNames?.some(it => it);
+
+  return { resetSampleNames, sampleNamesHaveBeenEdited };
 }
 
 interface SplitConfigFormProps {
@@ -308,7 +312,8 @@ interface SplitConfigFormProps {
 function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
   const { formatMessage } = useDinaIntl();
 
-  const { resetSampleNames } = useDefaultSampleNames(generationMode);
+  const { resetSampleNames, sampleNamesHaveBeenEdited } =
+    useDefaultSampleNames(generationMode);
 
   return (
     <div>
@@ -384,13 +389,15 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
           <h4>
             <DinaMessage id="previewAndCustomizeLabel" />
           </h4>
-          <button
-            className="btn btn-dark"
-            type="button"
-            onClick={resetSampleNames}
-          >
-            <DinaMessage id="resetNamesToInitialValues" />
-          </button>
+          {sampleNamesHaveBeenEdited && (
+            <button
+              className="btn btn-dark reset-sample-names"
+              type="button"
+              onClick={resetSampleNames}
+            >
+              <DinaMessage id="resetNamesToDefaultValues" />
+            </button>
+          )}
         </div>
         <SplitChildHeader />
         <Field name="start">
