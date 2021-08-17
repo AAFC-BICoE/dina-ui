@@ -8,10 +8,11 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { FieldArray } from "formik";
-import { Accordion } from "react-bootstrap";
+import { Accordion, useAccordionButton } from "react-bootstrap";
 import { CatalogueOfLifeNameField } from ".";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Determination, MaterialSample } from "../../types/collection-api";
+import { VscTriangleRight, VscTriangleDown } from "react-icons/vsc";
 
 export interface DeterminationFieldProps {
   className?: string;
@@ -156,11 +157,9 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                 determinationInternal(0)
               ) : (
                 <div>
-                  <div
-                    className="d-flex"
-                    style={{ padding: "1rem 2.5rem 1rem 1.25rem" }}
-                  >
-                    <div className="row fw-bold text-decoration-underline flex-grow-1">
+                  <div className="d-flex" style={{ padding: "1rem 1.25rem" }}>
+                    <div className="spacer me-3" style={{ width: "16px" }} />
+                    <div className="row fw-bold flex-grow-1">
                       <div className="col-3">
                         <DinaMessage id="field_verbatimScientificName" />
                       </div>
@@ -173,12 +172,17 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                     </div>
                   </div>
                   <style>{`.accordion-button { padding: 0.5rem 1.25rem !important; }`}</style>
-                  {/* Zebra striping: */}
                   <style>{`
+                    /* Zebra striping: */
                     .accordion:nth-child(even) .accordion-button { background-color: #f3f3f3 !important; }
                     .accordion:nth-child(even) .accordion-item { background-color: #f3f3f3 !important; }
                     .accordion:nth-child(odd) .accordion-button { background-color: #fff !important; }
                     .accordion:nth-child(odd) .accordion-item { background-color: #fff !important; }
+ 
+                    /* Put the accordion arrow on the left side: */
+                    .accordion-button::after { display: none !important; }
+                    .accordion-button.collapsed .down-arrow { display: none !important; }
+                    .accordion-button:not(.collapsed) .right-arrow { display: none !important; }
                   `}</style>
                   {isTemplate
                     ? determinationInternal(0)
@@ -191,6 +195,8 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                         >
                           <Accordion.Item eventKey={String(index)}>
                             <Accordion.Header className="mt-0">
+                              <VscTriangleDown className="down-arrow me-3" />
+                              <VscTriangleRight className="right-arrow me-3" />
                               <div className="row align-items-center flex-grow-1 fw-bold">
                                 <div className="col-3 my-2">
                                   {determination.verbatimScientificName}
@@ -201,11 +207,11 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                                 <div className="col-3">
                                   {determination.verbatimAgent}
                                 </div>
-                                <div className="col-3">
+                                <div className="col-3 d-flex">
                                   {!readOnly && !isTemplate && (
                                     <button
                                       type="button"
-                                      className="btn btn-dark"
+                                      className="btn btn-dark mx-auto"
                                       onClick={event => {
                                         event.stopPropagation();
                                         removeDetermination(index);
