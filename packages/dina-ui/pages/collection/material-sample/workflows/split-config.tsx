@@ -8,7 +8,7 @@ import {
   SubmitButton,
   TextField
 } from "common-ui";
-import { Field, FieldProps, useFormikContext } from "formik";
+import { Field, FieldProps, FormikContextType, useFormikContext } from "formik";
 import { padStart, range } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
@@ -121,15 +121,18 @@ export function ConfigAction({ router }: WithRouterProps) {
 
   const initialConfigChild = storedRunConfig?.configure_children;
 
-  const computedInitConfigValues = { ...initialConfig, ...initialConfigChild };
-
   if (materialSampleQuery.loading) return null;
+
   const { materialSampleName, dwcCatalogNumber } =
     materialSampleQuery?.response?.data ?? {};
-  if (materialSampleName || dwcCatalogNumber)
-    Object.assign(computedInitConfigValues, {
-      baseName: materialSampleName ?? dwcCatalogNumber
-    });
+
+  const computedInitConfigValues = {
+    ...initialConfig,
+    ...initialConfigChild,
+    ...(materialSampleName || dwcCatalogNumber
+      ? { baseName: materialSampleName || dwcCatalogNumber }
+      : {})
+  };
 
   return (
     <div>
@@ -234,11 +237,7 @@ interface SplitChildRowProps {
   computedSuffix: string;
 }
 
-function SplitChildRow({
-  index,
-  baseName,
-  computedSuffix
-}: SplitChildRowProps) {
+function SplitChildRow({ index }: SplitChildRowProps) {
   return (
     <div className="d-flex">
       <span className="col-md-1 fw-bold">#{index + 1}:</span>
@@ -246,7 +245,6 @@ function SplitChildRow({
         className={`col-md-3 sampleNames${index}`}
         hideLabel={true}
         name={`sampleNames[${index}]`}
-        placeholder={`${baseName || BASE_NAME}${computedSuffix}`}
       />
     </div>
   );
@@ -264,42 +262,53 @@ function computingSuffix(generationMode, suffix, index, start, suffixType) {
     : "";
 }
 
-const setChildSampleNames = (formik, generationMode) => {
-  const newValues = { ...formik.values };
-  const { suffix, start, suffixType, baseName, numOfChildToCreate } = newValues;
-  range(0, numOfChildToCreate).map(index => {
-    const computedSuffix = computingSuffix(
-      generationMode,
-      suffix,
-      index,
-      start,
-      suffixType
-    );
-    formik.setFieldValue(
-      `sampleNames[${index}]`,
-      `${baseName || BASE_NAME}${computedSuffix}`
-    );
-    formik.setFieldTouched(`sampleNames[${index}]`);
-  });
-};
+function useDefaultSampleNames(generationMode: MaterialSampleGenerationMode) {
+  const formikCtx = useFormikContext<MaterialSampleRunConfigConfiguration>();
+
+  function resetSampleNames() {
+    const newValues = { ...formikCtx.values };
+    const { suffix, start, suffixType, baseName, numOfChildToCreate } =
+      newValues;
+    range(0, numOfChildToCreate).map(index => {
+      const computedSuffix = computingSuffix(
+        generationMode,
+        suffix,
+        index,
+        start,
+        suffixType
+      );
+      formikCtx.setFieldValue(
+        `sampleNames[${index}]`,
+        `${baseName || BASE_NAME}${computedSuffix}`
+      );
+      formikCtx.setFieldTouched(`sampleNames[${index}]`, false);
+    });
+  }
+
+  useEffect(
+    // Set the child sample names based on all current state of affecting fields' values
+    resetSampleNames,
+    [
+      formikCtx.values.numOfChildToCreate,
+      formikCtx.values.baseName,
+      formikCtx.values.suffixType,
+      formikCtx.values.suffix,
+      formikCtx.values.numOfChildToCreate,
+      formikCtx.values.start
+    ]
+  );
+
+  return { resetSampleNames };
+}
+
 interface SplitConfigFormProps {
   generationMode: MaterialSampleGenerationMode;
 }
 
 function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
   const { formatMessage } = useDinaIntl();
-  const formikCtx = useFormikContext<MaterialSampleRunConfigConfiguration>();
-  useEffect(() => {
-    // Set the child sample names based on all current state of affecting fields' values
-    setChildSampleNames(formikCtx, generationMode);
-  }, [
-    formikCtx.values.numOfChildToCreate,
-    formikCtx.values.baseName,
-    formikCtx.values.suffixType,
-    formikCtx.values.suffix,
-    formikCtx.values.numOfChildToCreate,
-    formikCtx.values.start
-  ]);
+
+  const { resetSampleNames } = useDefaultSampleNames(generationMode);
 
   return (
     <div>
@@ -329,11 +338,7 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
             value
           }))}
         />
-        <TextField
-          className="col-md-2"
-          name="baseName"
-          placeholder={BASE_NAME}
-        />
+        <TextField className="col-md-2" name="baseName" />
         {generationMode === "BATCH" && (
           <TextField
             name="suffix"
@@ -379,7 +384,13 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
           <h4>
             <DinaMessage id="previewAndCustomizeLabel" />
           </h4>
-          <ResetNamesButton />
+          <button
+            className="btn btn-dark"
+            type="button"
+            onClick={resetSampleNames}
+          >
+            <DinaMessage id="resetNamesToInitialValues" />
+          </button>
         </div>
         <SplitChildHeader />
         <Field name="start">
@@ -419,29 +430,6 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
         </Field>
       </div>
     </div>
-  );
-}
-
-/** Resets the sample names to the initial state. */
-function ResetNamesButton() {
-  return (
-    <Field>
-      {({ form: { initialValues, setFieldValue } }: FieldProps) => {
-        function resetSampleNames() {
-          setFieldValue("sampleNames", initialValues.sampleNames);
-        }
-
-        return (
-          <button
-            className="btn btn-dark"
-            type="button"
-            onClick={resetSampleNames}
-          >
-            <DinaMessage id="resetNamesToInitialValues" />
-          </button>
-        );
-      }}
-    </Field>
   );
 }
 
