@@ -26,7 +26,7 @@ export interface LabelWrapperParams {
   link?: string;
 
   /** Custom element to render when the form is in read-only mode. */
-  readOnlyRender?: (value: any) => ReactNode;
+  readOnlyRender?: (value: any, form: FormikProps<any>) => ReactNode;
 
   removeFormGroupClass?: boolean;
 
@@ -141,7 +141,7 @@ export function FieldWrapper({
         {({ field: { value }, form, meta: { error } }) => (
           <>
             {readOnly || !children
-              ? readOnlyRender?.(value) ?? (
+              ? readOnlyRender?.(value, form) ?? (
                   <ReadOnlyValue link={link} value={value} />
                 )
               : typeof children === "function"

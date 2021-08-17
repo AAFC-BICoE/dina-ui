@@ -143,7 +143,7 @@ export default function UploadPage() {
                   className="offset-md-3 col-md-3"
                   styles={customStyles}
                 />
-                <div className="col-md-3" style={{margin: "2em 0em 2em 0em"}} >
+                <div className="col-md-3" style={{ margin: "2em 0em 2em 0em" }}>
                   <FormikButton
                     className="btn btn-primary"
                     onClick={({ defaultValuesConfig }, { setFieldValue }) =>

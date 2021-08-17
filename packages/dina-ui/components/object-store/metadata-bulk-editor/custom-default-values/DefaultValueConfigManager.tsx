@@ -21,10 +21,8 @@ export function DefaultValueConfigManager({
   onChangeConfigIndex,
   dateSupplier = () => new Date().toLocaleString()
 }: DefaultValueConfigSelectProps) {
-  const {
-    storedDefaultValuesConfigs,
-    saveDefaultValuesConfigs
-  } = useStoredDefaultValuesConfigs();
+  const { storedDefaultValuesConfigs, saveDefaultValuesConfigs } =
+    useStoredDefaultValuesConfigs();
 
   function addNewConfig() {
     const newConfigs = [
@@ -84,13 +82,8 @@ export function DefaultValueConfigManager({
 }
 
 export function useStoredDefaultValuesConfigs() {
-  const [
-    storedDefaultValuesConfigs,
-    saveDefaultValuesConfigs
-  ] = useLocalStorage<DefaultValuesConfig[]>(
-    "metadata_defaultValuesConfigs",
-    []
-  );
+  const [storedDefaultValuesConfigs, saveDefaultValuesConfigs] =
+    useLocalStorage<DefaultValuesConfig[]>("metadata_defaultValuesConfigs", []);
 
   return { storedDefaultValuesConfigs, saveDefaultValuesConfigs };
 }
@@ -115,7 +108,10 @@ export function DefaultValuesConfigSelect({
 
   return (
     <Select<{ label: string; value: number | null }>
-      instanceId={"config-select-"+document.getElementsByClassName("ReactModalPortal").length}
+      instanceId={
+        "config-select-" +
+        document.getElementsByClassName("ReactModalPortal").length
+      }
       aria-label="Select Rule Set"
       options={selectOptions}
       onChange={(option: any) => onChangeConfigIndex(option.value)}

@@ -3,27 +3,28 @@ import {
   ButtonBar,
   CheckBoxWithoutWrapper,
   DinaForm,
-  DinaFormOnSubmit,
   FieldSet,
   SelectField,
   SubmitButton,
-  TextField,
-  useCollapser
+  TextField
 } from "common-ui";
-import { Field, FieldProps } from "formik";
+import { Field, FieldProps, useFormikContext } from "formik";
 import { padStart, range } from "lodash";
-import { useRouter } from "next/router";
-import React, { useState, ReactNode } from "react";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { withRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";
 import NumberSpinnerField from "../../../../../common-ui/lib/formik-connected/NumberSpinnerField";
 import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
+import { useMaterialSampleQuery } from "../../../../../dina-ui/components/collection/useMaterialSample";
 import { Head } from "../../../../../dina-ui/components/head";
 import {
   BASE_NAME,
   IDENTIFIER_TYPE_OPTIONS,
   MaterialSampleGenerationMode,
   MaterialSampleRunConfig,
+  MaterialSampleRunConfigConfiguration,
   MATERIAL_SAMPLE_GENERATION_MODES,
   NUMERIC_UPPER_LIMIT,
   START,
@@ -55,9 +56,11 @@ const TYPE_OPTIONS: { label: string; value: SuffixOptions }[] = [
   }
 ];
 
-export default function ConfigAction() {
+export function ConfigAction({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
-  const router = useRouter();
+  const parentId = router.query.id?.toString();
+
+  const materialSampleQuery = useMaterialSampleQuery(parentId as string);
 
   const [storedRunConfig, setStoredRunConfig] = useLocalStorage<
     MaterialSampleRunConfig | null | undefined
@@ -70,7 +73,7 @@ export default function ConfigAction() {
   const onSubmit = async ({ submittedValues: configActionFields }) => {
     const childSampleNames: string[] = [];
     for (let i = 0; i < configActionFields.numOfChildToCreate; i++) {
-      childSampleNames.push(configActionFields?.sampleName?.[i]);
+      childSampleNames.push(configActionFields?.sampleNames?.[i]);
     }
 
     const runConfig: MaterialSampleRunConfig = {
@@ -118,6 +121,16 @@ export default function ConfigAction() {
 
   const initialConfigChild = storedRunConfig?.configure_children;
 
+  const computedInitConfigValues = { ...initialConfig, ...initialConfigChild };
+
+  if (materialSampleQuery.loading) return null;
+  const { materialSampleName, dwcCatalogNumber } =
+    materialSampleQuery?.response?.data ?? {};
+  if (materialSampleName || dwcCatalogNumber)
+    Object.assign(computedInitConfigValues, {
+      baseName: materialSampleName ?? dwcCatalogNumber
+    });
+
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
@@ -126,10 +139,12 @@ export default function ConfigAction() {
         <h1>
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
-        <DinaForm
-          initialValues={{ ...initialConfig, ...initialConfigChild }}
-          onSubmit={onSubmit}
-        >
+        <h2>
+          {materialSampleName && dwcCatalogNumber
+            ? `${materialSampleName} | ${dwcCatalogNumber} `
+            : materialSampleName ?? dwcCatalogNumber}
+        </h2>
+        <DinaForm initialValues={computedInitConfigValues} onSubmit={onSubmit}>
           <p>
             <span className="fw-bold">{formatMessage("description")}:</span>
             {formatMessage("splitSampleDescription")}
@@ -228,21 +243,63 @@ function SplitChildRow({
     <div className="d-flex">
       <span className="col-md-1 fw-bold">#{index + 1}:</span>
       <TextField
-        className={`col-md-3 sampleName${index}`}
+        className={`col-md-3 sampleNames${index}`}
         hideLabel={true}
-        name={`sampleName[${index}]`}
+        name={`sampleNames[${index}]`}
         placeholder={`${baseName || BASE_NAME}${computedSuffix}`}
       />
     </div>
   );
 }
 
+function computingSuffix(generationMode, suffix, index, start, suffixType) {
+  return generationMode === "BATCH"
+    ? suffix || ""
+    : generationMode === "SERIES"
+    ? `${computeSuffix({
+        index,
+        start,
+        suffixType
+      })}`
+    : "";
+}
+
+const setChildSampleNames = (formik, generationMode) => {
+  const newValues = { ...formik.values };
+  const { suffix, start, suffixType, baseName, numOfChildToCreate } = newValues;
+  range(0, numOfChildToCreate).map(index => {
+    const computedSuffix = computingSuffix(
+      generationMode,
+      suffix,
+      index,
+      start,
+      suffixType
+    );
+    formik.setFieldValue(
+      `sampleNames[${index}]`,
+      `${baseName || BASE_NAME}${computedSuffix}`
+    );
+    formik.setFieldTouched(`sampleNames[${index}]`);
+  });
+};
 interface SplitConfigFormProps {
   generationMode: MaterialSampleGenerationMode;
 }
 
 function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
   const { formatMessage } = useDinaIntl();
+  const formikCtx = useFormikContext<MaterialSampleRunConfigConfiguration>();
+  useEffect(() => {
+    // Set the child sample names based on all current state of affecting fields' values
+    setChildSampleNames(formikCtx, generationMode);
+  }, [
+    formikCtx.values.numOfChildToCreate,
+    formikCtx.values.baseName,
+    formikCtx.values.suffixType,
+    formikCtx.values.suffix,
+    formikCtx.values.numOfChildToCreate,
+    formikCtx.values.start
+  ]);
 
   return (
     <div>
@@ -253,9 +310,6 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
         <NumberSpinnerField
           name="numOfChildToCreate"
           className="col-md-2"
-          onChange={(newValue, formik) =>
-            formik.setFieldValue("numOfChildToCreate", newValue)
-          }
           hideLabel={true}
           max={NUMERIC_UPPER_LIMIT}
         />
@@ -293,12 +347,12 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
               className="col-md-2"
               name="suffixType"
               options={TYPE_OPTIONS}
-              onChange={(newType, formik) =>
+              onChange={(newType, formik) => {
                 formik.setFieldValue(
                   "start",
                   newType === "Numerical" ? "001" : "A"
-                )
-              }
+                );
+              }}
             />
             <Field name="suffixType">
               {({ field: { value: suffixType } }) => (
@@ -341,16 +395,13 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
             }
           }) =>
             range(0, numOfChildToCreate).map(index => {
-              const computedSuffix =
-                generationMode === "BATCH"
-                  ? suffix || ""
-                  : generationMode === "SERIES"
-                  ? `-${computeSuffix({
-                      index,
-                      start,
-                      suffixType
-                    })}`
-                  : "";
+              const computedSuffix = computingSuffix(
+                generationMode,
+                suffix,
+                index,
+                start,
+                suffixType
+              );
               return (
                 <SplitChildRow
                   key={
@@ -393,3 +444,5 @@ function ResetNamesButton() {
     </Field>
   );
 }
+
+export default withRouter(ConfigAction);

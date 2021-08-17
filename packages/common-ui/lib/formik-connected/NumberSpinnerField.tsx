@@ -3,7 +3,7 @@ import React from "react";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 interface NumberSpinnerFieldProps extends LabelWrapperParams {
-  onChange?: (e, formik: FormikProps<any>) => void;
+  onChangeExternal?: (formik: FormikProps<any>, name, newValue) => void;
   min?: number;
   max: number;
   defaultValue?: number;
@@ -12,7 +12,7 @@ interface NumberSpinnerFieldProps extends LabelWrapperParams {
 }
 
 export default function NumberSpinnerField(props: NumberSpinnerFieldProps) {
-  const { min, max, defaultValue, size, step, onChange, name } = props;
+  const { min, max, size, step, onChangeExternal, name } = props;
 
   const customStyle = (
     <style>{`
@@ -44,10 +44,10 @@ export default function NumberSpinnerField(props: NumberSpinnerFieldProps) {
           // Reset to max if go above max
           if (!isNaN(val) && val > max) {
             setValue(max);
-            onChange?.(max, formik);
+            onChangeExternal?.(formik, name, max);
           } else {
             setValue(newValue);
-            onChange?.(newValue, formik);
+            onChangeExternal?.(formik, name, newValue);
           }
         }
 
