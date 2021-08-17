@@ -262,6 +262,10 @@ function computingSuffix(generationMode, suffix, index, start, suffixType) {
     : "";
 }
 
+/**
+ * Sets the default sample names automatically when the generation inputs change,
+ * or when the user manually resets them.
+ */
 function useDefaultSampleNames(generationMode: MaterialSampleGenerationMode) {
   const formikCtx = useFormikContext<MaterialSampleRunConfigConfiguration>();
 
@@ -298,11 +302,11 @@ function useDefaultSampleNames(generationMode: MaterialSampleGenerationMode) {
     ]
   );
 
-  const sampleNamesHaveBeenEdited = !!(
-    formikCtx.touched as any
-  ).sampleNames?.some(it => it);
+  const sampleNamesWereEdited = !!(formikCtx.touched as any).sampleNames?.some(
+    it => it
+  );
 
-  return { resetSampleNames, sampleNamesHaveBeenEdited };
+  return { resetSampleNames, sampleNamesWereEdited };
 }
 
 interface SplitConfigFormProps {
@@ -312,7 +316,7 @@ interface SplitConfigFormProps {
 function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
   const { formatMessage } = useDinaIntl();
 
-  const { resetSampleNames, sampleNamesHaveBeenEdited } =
+  const { resetSampleNames, sampleNamesWereEdited } =
     useDefaultSampleNames(generationMode);
 
   return (
@@ -389,7 +393,7 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
           <h4>
             <DinaMessage id="previewAndCustomizeLabel" />
           </h4>
-          {sampleNamesHaveBeenEdited && (
+          {sampleNamesWereEdited && (
             <button
               className="btn btn-dark reset-sample-names"
               type="button"

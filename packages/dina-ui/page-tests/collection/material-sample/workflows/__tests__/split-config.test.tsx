@@ -49,6 +49,8 @@ jest.mock("next/router", () => ({
 }));
 
 describe("MaterialSample split workflow series-mode run config", () => {
+  beforeEach(() => localStorage.clear());
+
   it("Initially display the workfow run config with defaults", async () => {
     const wrapper = mountWithAppContext(
       <ConfigAction router={{ query: { id: "123" } } as any} />,
@@ -61,9 +63,6 @@ describe("MaterialSample split workflow series-mode run config", () => {
 
     // Switch to the "Series" tab:
     wrapper.find("li.react-tabs__tab.series-tab").simulate("click");
-    expect(wrapper.find(".baseName-field input").prop("placeholder")).toEqual(
-      BASE_NAME
-    );
     expect(wrapper.find(".start-field input").prop("value")).toEqual(START);
 
     expect(wrapper.find(".suffixType-field Select").prop("value")).toEqual({
@@ -193,5 +192,79 @@ describe("MaterialSample split workflow series-mode run config", () => {
     expect(wrapper.find(".baseName-field input").prop("value")).toEqual(
       "my-number"
     );
+  });
+
+  it("Has a reset button to revert to the default sample names.", async () => {
+    const wrapper = mountWithAppContext(
+      <ConfigAction router={{ query: { id: "123" } } as any} />,
+      { apiContext }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Reset button is initially hidden:
+    expect(wrapper.find("button.reset-sample-names").exists()).toEqual(false);
+
+    // The input begins with the default value:
+    expect(wrapper.find(".sampleNames0 input").prop("value")).toEqual(
+      "my-number"
+    );
+
+    // Edit a sample name:
+    wrapper
+      .find(".sampleNames0 input")
+      .simulate("change", { target: { value: "my custom name" } });
+
+    // Reset button appears when a name value is changed:
+    expect(wrapper.find("button.reset-sample-names").exists()).toEqual(true);
+
+    // Press the reset button:
+    wrapper.find("button.reset-sample-names").simulate("click");
+    // The reset button disappears again because the names were reset:
+    expect(wrapper.find("button.reset-sample-names").exists()).toEqual(false);
+  });
+
+  it("The reset button still works when using a custom suffix.", async () => {
+    const wrapper = mountWithAppContext(
+      <ConfigAction router={{ query: { id: "123" } } as any} />,
+      { apiContext }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Switch to the "Series" tab:
+    wrapper.find("li.react-tabs__tab.series-tab").simulate("click");
+
+    wrapper
+      .find(".start-field input")
+      .simulate("change", { target: { value: "005" } });
+
+    // The input begins with the default value:
+    expect(wrapper.find(".sampleNames0 input").prop("value")).toEqual(
+      "my-number005"
+    );
+    // Reset button is initially hidden:
+    expect(wrapper.find("button.reset-sample-names").exists()).toEqual(false);
+
+    // Edit a sample name:
+    wrapper
+      .find(".sampleNames0 input")
+      .simulate("change", { target: { value: "my custom name" } });
+
+    // Reset button appears when a name value is changed:
+    expect(wrapper.find("button.reset-sample-names").exists()).toEqual(true);
+
+    // Press the reset button:
+    wrapper.find("button.reset-sample-names").simulate("click");
+
+    // The sample name is reverted to the default value:
+    expect(wrapper.find(".sampleNames0 input").prop("value")).toEqual(
+      "my-number005"
+    );
+
+    // The reset button is hidden again:
+    expect(wrapper.find("button.reset-sample-names").exists()).toEqual(false);
   });
 });
