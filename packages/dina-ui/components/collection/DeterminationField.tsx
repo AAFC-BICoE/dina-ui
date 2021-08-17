@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { FieldArray } from "formik";
 import { clamp } from "lodash";
-import { TypeStatusEnum } from "packages/dina-ui/types/collection-api/resources/TypeStatus";
+import { TypeStatusEnum } from "../../../dina-ui/types/collection-api/resources/TypeStatus";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { CatalogueOfLifeNameField } from ".";
