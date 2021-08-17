@@ -9,6 +9,7 @@ import {
 } from "common-ui";
 import { FieldArray } from "formik";
 import { clamp } from "lodash";
+import { TypeStatusEnum } from "packages/dina-ui/types/collection-api/resources/TypeStatus";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { CatalogueOfLifeNameField } from ".";
@@ -118,9 +119,9 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                         path: "collection-api/vocabulary/typeStatus"
                       })}
                       suggestion={vocabElement =>
-                        vocabElement?.vocabularyElements?.map(
-                          it => it?.name ?? ""
-                        ) ?? ""
+                        vocabElement?.vocabularyElements
+                          ?.filter(it => it?.name !== TypeStatusEnum.NONE)
+                          .map(it => it?.name ?? "") ?? ""
                       }
                     />
                     <TextField

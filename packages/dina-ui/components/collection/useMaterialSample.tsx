@@ -241,7 +241,7 @@ export function useMaterialSampleSave({
         }),
     determination: materialSample?.determination?.length
       ? materialSample?.determination
-      : [{ typeStatus: TypeStatusEnum.NONE }]
+      : []
   };
 
   /** Used to get the values of the nested CollectingEvent form. */
