@@ -126,17 +126,27 @@ export function CatalogueOfLifeSearchBox({
                   })
                 : null;
 
-              const selectedName =
+              const selectedNameText =
                 nameUsageSearchResult?.result
-                  ?.map(
-                    it =>
-                      `${it.label} synonym of ${it.accepted?.name?.scientificName}`
-                  )
+                  ?.map(it => {
+                    const link = document.createElement("a");
+                    if (dataSet?.key) {
+                      link.setAttribute(
+                        "href",
+                        `https://data.catalogueoflife.org/dataset/${dataSet.key}/taxon/${it.id}`
+                      );
+                    }
+                    link.innerText = String(it.id);
+
+                    return `${it.labelHtml} synonym of ${
+                      it.accepted?.name?.scientificName
+                    } ${DOMPurify.sanitize(link.outerHTML)}`;
+                  })
                   .join("\n") ??
                 result.scientificName ??
                 String(result);
 
-              onSelect?.(selectedName);
+              onSelect?.(selectedNameText);
             }
 
             return (
