@@ -1,8 +1,6 @@
-import { LoadingSpinner, Tooltip } from "common-ui";
+import { LoadingSpinner, Tooltip, useThrottledFetch } from "common-ui";
 import DOMPurify from "dompurify";
 import { compact } from "lodash";
-import { useEffect, useState } from "react";
-import useSWR from "swr";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export interface CatalogueOfLifeSearchBoxProps {
@@ -18,53 +16,23 @@ export function CatalogueOfLifeSearchBox({
 }: CatalogueOfLifeSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
 
-  /** The value of the input element. */
-  const [inputValue, setInputValue] = useState("");
-
-  /**
-   * The query passed to the Catalogue of Life API.
-   * This state is only set when the user submits the search input.
-   */
-  const [searchValue, setSearchValue] = useState("");
-
-  const { isValidating: colSearchIsLoading, data: searchResult } = useSWR(
-    [searchValue],
-    () => catalogueOfLifeSearch(searchValue, fetchJson),
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false
-    }
-  );
-
-  /**
-   * Whether the Catalogue of Life Api is throttled
-   * to make sure we don't send more requests than we are allowed to.
-   */
-  const [colApiRequestsOnHold, setColApiRequestsOnHold] = useState(false);
-  useEffect(() => {
-    if (searchValue) {
-      setColApiRequestsOnHold(true);
-      const timeout = setTimeout(() => setColApiRequestsOnHold(false), 1000);
-      return () => clearTimeout(timeout);
-    }
-  }, [searchValue]);
-
-  const suggestButtonIsDisabled =
-    colApiRequestsOnHold || !inputValue || colSearchIsLoading;
-
-  function doSearch() {
-    // Set a 1-second API request throttle:
-    if (suggestButtonIsDisabled) {
-      return;
-    }
-
-    // Set the new search value which will make useSWR do the lookup:
-    setSearchValue(inputValue);
-  }
+  const {
+    searchIsLoading,
+    searchResult,
+    inputValue,
+    setInputValue,
+    suggestButtonIsDisabled,
+    doSearch
+  } = useThrottledFetch({
+    fetcher: searchValue => catalogueOfLifeSearch(searchValue, fetchJson),
+    timeoutMs: 1000
+  });
 
   const nameResults =
     searchResult &&
-    compact([searchResult?.name, ...(searchResult?.alternatives ?? [])]);
+    compact([searchResult?.name, ...(searchResult?.alternatives ?? [])]).filter(
+      it => !it.canonical
+    );
 
   return (
     <div className="card card-body border mb-3">
@@ -102,14 +70,12 @@ export function CatalogueOfLifeSearchBox({
           </div>
         </div>
       </div>
-      {colSearchIsLoading && <LoadingSpinner loading={true} />}
+      {searchIsLoading && <LoadingSpinner loading={true} />}
       {!!nameResults?.length && (
         <div className="list-group">
           {nameResults.map((result, index) => {
             // Use DOMPurify to sanitize against XSS when using dangerouslySetInnerHTML:
-            const safeHtmlLabel: string = DOMPurify.sanitize(
-              result.labelHtml + (result.id ? ` (nidx ${result.id})` : "")
-            );
+            const safeHtmlLabel: string = DOMPurify.sanitize(result.labelHtml);
 
             return (
               <div

@@ -46,15 +46,15 @@ describe("CatalogueOfLifeNameField component", () => {
     expect(
       wrapper.find(".col-search-result-label").map(node => node.text())
     ).toEqual([
-      "Poa muralis (nidx 6488604)",
-      "Poa muralis Wibel, nom. illeg. (nidx 6488605)",
-      "Poa muralis Honck. (nidx 6488611)"
+      "Poa muralis",
+      "Poa muralis Wibel, nom. illeg.",
+      "Poa muralis Honck."
     ]);
 
     wrapper.find("button.col-name-select-button").at(1).simulate("click");
 
     expect(mockOnChange).lastCalledWith(
-      "Poa muralis Wibel, nom. illeg. (nidx 6488605)",
+      "Poa muralis Wibel, nom. illeg.",
       expect.anything()
     );
     expect(mockFetchJson).lastCalledWith(
@@ -69,7 +69,7 @@ describe("CatalogueOfLifeNameField component", () => {
     wrapper.update();
 
     expect(mockOnSubmit).lastCalledWith({
-      scientificName: "Poa muralis Wibel, nom. illeg. (nidx 6488605)",
+      scientificName: "Poa muralis Wibel, nom. illeg.",
       scientificNameSource: "COLPLUS"
     });
   });
@@ -78,7 +78,7 @@ describe("CatalogueOfLifeNameField component", () => {
     const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{
-          scientificName: "Poa muralis Wibel, nom. illeg. (nidx 6488605)",
+          scientificName: "Poa muralis Wibel, nom. illeg.",
           scientificNameSource: "COLPLUS"
         }}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
