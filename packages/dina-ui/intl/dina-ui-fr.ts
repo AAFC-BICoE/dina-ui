@@ -381,6 +381,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   set: "Ensemble",
   setAll: "Tous les ensembles",
   showing: "Affiché",
+  skipToMainContent: "Passer au contenu principal",
+  skipToAboutThisApplication: "Passer à « À propos de ce site »",
+  skipToBasicHtmlVersion: "Passer à la version HTML simplifiée",
   showingFilteredStorageUnits: "Afficher les unités de stockage filtrées",
   showingTopLevelStorageUnits:
     "Afficher les unités de stockage de niveau supérieur",

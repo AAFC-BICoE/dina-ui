@@ -59,7 +59,7 @@ export default function MaterialSampleListPage() {
       <Head title={formatMessage("materialSampleListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="materialSampleListTitle" />
         </h1>
         <ButtonBar>

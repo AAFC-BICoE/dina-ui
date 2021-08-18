@@ -31,7 +31,7 @@ export function ProductEditPage({ router }: WithRouterProps) {
       <main className="container-fluid">
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="editProductTitle" />
             </h1>
             <Query<Product> query={{ path: `seqdb-api/product/${id}` }}>
@@ -47,7 +47,7 @@ export function ProductEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="addProductTitle" />
             </h1>
             <ProductForm router={router} />

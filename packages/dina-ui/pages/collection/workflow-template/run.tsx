@@ -51,7 +51,7 @@ export default function CreateMaterialSampleFromWorkflowPage() {
       <Head title={pageTitle} />
       <Nav />
       <div className="container-fluid">
-        <h1>{pageTitle}</h1>
+        <h1 id="wb-cont">{pageTitle}</h1>
         {withResponse(actionDefinitionQuery, ({ data }) => (
           <CreateMaterialSampleFromWorkflowForm
             actionDefinition={data}
