@@ -19,6 +19,7 @@ import {
   MaterialSample,
   Vocabulary
 } from "../../types/collection-api";
+import { ShouldRenderReasons } from "react-autosuggest";
 
 export interface DeterminationFieldProps {
   className?: string;
@@ -48,6 +49,15 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const { readOnly, isTemplate } = useDinaFormContext();
   const determinationsPath = "determination";
+
+  /* Ensure config is rendered when input get focuse without needing to enter any value */
+  function shouldRenderSuggestions(value: string, reason: ShouldRenderReasons) {
+    return (
+      value?.length >= 0 ||
+      reason === "input-changed" ||
+      reason === "input-focused"
+    );
+  }
 
   return (
     <FieldSet
@@ -118,11 +128,13 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                       query={() => ({
                         path: "collection-api/vocabulary/typeStatus"
                       })}
-                      suggestion={vocabElement =>
+                      suggestion={(vocabElement, searchValue) =>
                         vocabElement?.vocabularyElements
                           ?.filter(it => it?.name !== TypeStatusEnum.NONE)
-                          .map(it => it?.name ?? "") ?? ""
+                          .filter(it => it?.name?.includes(searchValue))
+                          .map(it => it?.name ?? "")
                       }
+                      shouldRenderSuggestions={shouldRenderSuggestions}
                     />
                     <TextField
                       {...fieldProps("typeStatusEvidence")}
