@@ -388,13 +388,6 @@ export function CollectingEventFormLayout({
             <Field name="endEventDateTime">
               {({ field: { value: endEventDateTime }, form }) => (
                 <div>
-                  {(rangeEnabled || endEventDateTime) && (
-                    <FormattedTextField
-                      name="endEventDateTime"
-                      label={formatMessage("endEventDateTimeLabel")}
-                      placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
-                    />
-                  )}
                   {!readOnly && (
                     <label
                       className="mb-3"
@@ -409,6 +402,13 @@ export function CollectingEventFormLayout({
                         className="react-switch dateRange"
                       />
                     </label>
+                  )}
+                  {(rangeEnabled || endEventDateTime) && (
+                    <FormattedTextField
+                      name="endEventDateTime"
+                      label={formatMessage("endEventDateTimeLabel")}
+                      placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
+                    />
                   )}
                 </div>
               )}

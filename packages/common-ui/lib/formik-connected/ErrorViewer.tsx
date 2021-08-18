@@ -15,8 +15,10 @@ export const ErrorViewer = connect(function ErrorViewerInternal({
     () => {
       const fieldErrorMsg = toPairs(errors)
         .map(
-          ([field, error]) =>
-            `${getFieldLabel({ name: field }).fieldLabel}: ${error}`
+          ([field, error], index) =>
+            `${index + 1} : ${
+              getFieldLabel({ name: field }).fieldLabel
+            } - ${error}`
         )
         .join("\n");
 
@@ -38,6 +40,7 @@ export const ErrorViewer = connect(function ErrorViewerInternal({
       {errorMessage && (
         <div
           className="alert alert-danger"
+          role="status"
           style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}
         >
           {errorMessage}
