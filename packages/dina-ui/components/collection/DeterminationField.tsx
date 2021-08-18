@@ -8,11 +8,17 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { FieldArray } from "formik";
-import { Accordion, useAccordionButton } from "react-bootstrap";
+import { ShouldRenderReasons } from "react-autosuggest";
+import { Accordion } from "react-bootstrap";
+import { VscTriangleDown, VscTriangleRight } from "react-icons/vsc";
 import { CatalogueOfLifeNameField } from ".";
+import { TypeStatusEnum } from "../../../dina-ui/types/collection-api/resources/TypeStatus";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { Determination, MaterialSample } from "../../types/collection-api";
-import { VscTriangleRight, VscTriangleDown } from "react-icons/vsc";
+import {
+  Determination,
+  MaterialSample,
+  Vocabulary
+} from "../../types/collection-api";
 
 export interface DeterminationFieldProps {
   className?: string;
@@ -41,6 +47,15 @@ export const DETERMINATION_FIELDS = Object.keys(DETERMINATION_FIELDS_OBJECT);
 export function DeterminationField({ className }: DeterminationFieldProps) {
   const { readOnly, isTemplate } = useDinaFormContext();
   const determinationsPath = "determination";
+
+  /* Ensure config is rendered when input get focuse without needing to enter any value */
+  function shouldRenderSuggestions(value: string, reason: ShouldRenderReasons) {
+    return (
+      value?.length >= 0 ||
+      reason === "input-changed" ||
+      reason === "input-focused"
+    );
+  }
 
   return (
     <FieldArray name="determination">
@@ -75,40 +90,58 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
 
           return (
             <div>
-              <div className="row">
-                <div className="col-md-6">
-                  <TextFieldWithMultiplicationButton
-                    {...fieldProps("verbatimScientificName")}
-                    className="col-sm-6 verbatimScientificName"
-                  />
-                  <AutoSuggestTextField<MaterialSample>
-                    {...fieldProps("verbatimAgent")}
-                    className="col-sm-6"
-                    query={() => ({
-                      path: "collection-api/material-sample"
-                    })}
-                    suggestion={sample =>
-                      (sample.determination?.map(
-                        det => det?.verbatimAgent
-                      ) as any) ?? []
-                    }
-                  />
-                  <DateField
-                    {...fieldProps("verbatimDate")}
-                    className="col-sm-6"
-                  />
-                  <TextField
-                    {...fieldProps("transcriberRemarks")}
-                    multiLines={true}
-                  />
-                </div>
-                <div className="col-md-6">
-                  <TextField {...fieldProps("typeStatus")} multiLines={true} />
-                  <TextField
-                    {...fieldProps("typeStatusEvidence")}
-                    multiLines={true}
-                  />
-                  <TextField {...fieldProps("qualifier")} multiLines={true} />
+              <div>
+                <div className="row">
+                  <div className="col-md-6">
+                    <TextFieldWithMultiplicationButton
+                      {...fieldProps("verbatimScientificName")}
+                      className="col-sm-6 verbatimScientificName"
+                    />
+                    <AutoSuggestTextField<MaterialSample>
+                      {...fieldProps("verbatimAgent")}
+                      className="col-sm-6"
+                      query={() => ({
+                        path: "collection-api/material-sample"
+                      })}
+                      suggestion={sample =>
+                        (sample.determination?.map(
+                          det => det?.verbatimAgent
+                        ) as any) ?? []
+                      }
+                    />
+                    <DateField
+                      {...fieldProps("verbatimDate")}
+                      className="col-sm-6"
+                    />
+                    <TextField
+                      {...fieldProps("transcriberRemarks")}
+                      multiLines={true}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <AutoSuggestTextField<Vocabulary>
+                      {...fieldProps("typeStatus")}
+                      query={() => ({
+                        path: "collection-api/vocabulary/typeStatus"
+                      })}
+                      suggestion={(vocabElement, searchValue) =>
+                        vocabElement?.vocabularyElements
+                          ?.filter(it => it?.name !== TypeStatusEnum.NONE)
+                          .filter(it =>
+                            it?.name
+                              ?.toLowerCase?.()
+                              ?.includes(searchValue?.toLowerCase?.())
+                          )
+                          .map(it => it?.name ?? "")
+                      }
+                      shouldRenderSuggestions={shouldRenderSuggestions}
+                    />
+                    <TextField
+                      {...fieldProps("typeStatusEvidence")}
+                      multiLines={true}
+                    />
+                    <TextField {...fieldProps("qualifier")} multiLines={true} />
+                  </div>
                 </div>
               </div>
               <div className="row">

@@ -28,7 +28,10 @@ interface AutoSuggestConfig<T extends KitsuResource> {
     searchValue: string,
     formikCtx: FormikContextType<any>
   ) => JsonApiQuerySpec;
-  suggestion?: (resource: PersistedResource<T>) => string | string[];
+  suggestion?: (
+    resource: PersistedResource<T>,
+    searchValue: string
+  ) => string | string[] | undefined;
   configQuery?: () => JsonApiQuerySpec;
   configSuggestion?: (resource: PersistedResource<T>) => string[];
   shouldRenderSuggestions?: (
@@ -70,7 +73,7 @@ export function AutoSuggestTextField<T extends KitsuResource>({
 
 function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   query,
-  suggestion = it => String(it),
+  suggestion = (it, searchVal) => (!searchVal ? String(it) : String(searchVal)),
   shouldRenderSuggestions,
   onSuggestionSelected,
   id,
@@ -90,7 +93,9 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
 
   const suggestions =
     response && !loading
-      ? uniq(castArray(response.data).flatMap(suggestion))
+      ? uniq(
+          castArray(response.data).flatMap(it => suggestion(it, searchValue))
+        )
       : [];
 
   useEffect(() => {
