@@ -34,7 +34,7 @@ export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
       <main className="container-fluid">
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="editObjectSubtypeTitle" />
             </h1>
             <Query<ObjectSubtype>

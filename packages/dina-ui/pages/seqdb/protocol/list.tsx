@@ -46,7 +46,7 @@ export default function ProtocolListPage() {
         <CreateButton entityLink="/seqdb/protocol" />
       </ButtonBar>
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <SeqdbMessage id="protocolListTitle" />
         </h1>
         <ListPageLayout

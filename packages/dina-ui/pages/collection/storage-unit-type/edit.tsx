@@ -40,7 +40,7 @@ export default function StorageUnitTypeEditPage() {
       <Head title={formatMessage(title)} />
       <Nav />
       <div className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id={title} />
         </h1>
         {id ? (

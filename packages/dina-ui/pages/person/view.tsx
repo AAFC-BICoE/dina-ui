@@ -48,7 +48,7 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
           return (
             <main className="container-fluid">
               {buttonBar}
-              <h1>
+              <h1 id="wb-cont">
                 <DinaMessage id="personViewTitle" />
               </h1>
               <LoadingSpinner loading={loading} />

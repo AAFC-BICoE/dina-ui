@@ -40,7 +40,7 @@ export default function ProductListPage() {
         <CreateButton entityLink="/seqdb/product" />
       </ButtonBar>
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <SeqdbMessage id="productListTitle" />
         </h1>
         <ListPageLayout

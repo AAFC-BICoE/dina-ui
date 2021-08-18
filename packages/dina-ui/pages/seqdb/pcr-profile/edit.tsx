@@ -33,7 +33,7 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
       <main className="container-fluid">
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="editPcrProfileTitle" />
             </h1>
             <Query<PcrProfile>
@@ -54,7 +54,7 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="addPcrProfileTitle" />
             </h1>
             <PcrProfileForm router={router} />

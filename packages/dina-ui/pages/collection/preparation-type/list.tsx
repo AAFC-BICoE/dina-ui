@@ -24,7 +24,7 @@ export default function preparationTypeListPage() {
       <Head title={formatMessage("preparationTypeListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="preparationTypeListTitle" />
         </h1>
         <ButtonBar>

@@ -423,7 +423,7 @@ export default function SplitRunAction() {
       <Head title={formatMessage("splitSubsampleTitle")} />
       <Nav />
       <main className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
         <DinaForm
