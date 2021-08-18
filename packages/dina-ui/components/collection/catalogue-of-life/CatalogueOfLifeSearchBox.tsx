@@ -1,4 +1,9 @@
-import { LoadingSpinner, Tooltip, useThrottledFetch } from "common-ui";
+import {
+  FormikButton,
+  LoadingSpinner,
+  Tooltip,
+  useThrottledFetch
+} from "common-ui";
 import DOMPurify from "dompurify";
 import { compact } from "lodash";
 import { useState } from "react";
@@ -6,6 +11,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ColDataSetDropdown } from "./ColDataSetDropdown";
 import { DataSetResult } from "./dataset-search-types";
 import { CatalogueOfLifeNameSearchResult } from "./name-search-types";
+import { NameUsageSearchResult } from "./nameusage-types";
 
 export interface CatalogueOfLifeSearchBoxProps {
   /** Optionally mock out the HTTP fetch for testing. */
@@ -34,7 +40,7 @@ export function CatalogueOfLifeSearchBox({
     doThrottledSearch
   } = useThrottledFetch({
     fetcher: searchValue =>
-      catalogueOfLifeSearch<CatalogueOfLifeNameSearchResult>({
+      catalogueOfLifeQuery<CatalogueOfLifeNameSearchResult>({
         url: "https://api.catalogueoflife.org/nidx/match",
         params: {
           q: searchValue,
@@ -110,6 +116,29 @@ export function CatalogueOfLifeSearchBox({
             // Use DOMPurify to sanitize against XSS when using dangerouslySetInnerHTML:
             const safeHtmlLabel: string = DOMPurify.sanitize(result.labelHtml);
 
+            async function selectName() {
+              const nameUsageSearchResult = dataSet?.key
+                ? await catalogueOfLifeQuery<NameUsageSearchResult>({
+                    url: `https://api.catalogueoflife.org/dataset/${dataSet.key}/nameusage`,
+                    params: { nidx: String(result.canonicalId) },
+                    searchValue: String(result.canonicalId),
+                    fetchJson
+                  })
+                : null;
+
+              const selectedName =
+                nameUsageSearchResult?.result
+                  ?.map(
+                    it =>
+                      `${it.label} synonym of ${it.accepted?.name?.scientificName}`
+                  )
+                  .join("\n") ??
+                result.scientificName ??
+                String(result);
+
+              onSelect?.(selectedName);
+            }
+
             return (
               <div
                 key={result.id ?? index}
@@ -118,19 +147,13 @@ export function CatalogueOfLifeSearchBox({
                 <div className="flex-grow-1 d-flex align-items-center col-search-result-label">
                   <span dangerouslySetInnerHTML={{ __html: safeHtmlLabel }} />
                 </div>
-                <button
-                  type="button"
+                <FormikButton
                   className="btn btn-primary col-name-select-button"
-                  style={{ width: "8rem" }}
-                  onClick={() => {
-                    const element = document.createElement("div");
-                    element.innerHTML = safeHtmlLabel;
-                    const plainTextLabel = element.textContent;
-                    onSelect?.(plainTextLabel);
-                  }}
+                  buttonProps={() => ({ style: { width: "8rem" } })}
+                  onClick={selectName}
                 >
                   <DinaMessage id="select" />
-                </button>
+                </FormikButton>
               </div>
             );
           })}
@@ -151,7 +174,7 @@ export interface CatalogueOfLifeSearchParams {
   fetchJson?: (url: string) => Promise<any>;
 }
 
-export async function catalogueOfLifeSearch<T>({
+export async function catalogueOfLifeQuery<T>({
   url,
   params,
   searchValue,

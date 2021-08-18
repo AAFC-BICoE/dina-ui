@@ -71,7 +71,7 @@ export function CatalogueOfLifeNameField({
 
 function CatalogueOfLifeNameReadOnly({ value, scientificNameSource }) {
   return (
-    <div>
+    <div style={{ whiteSpace: "pre-wrap" }}>
       <p>{value}</p>{" "}
       {scientificNameSource && (
         <p>

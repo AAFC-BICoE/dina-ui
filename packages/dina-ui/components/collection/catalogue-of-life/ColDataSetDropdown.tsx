@@ -1,7 +1,7 @@
 import { useDebouncedFetch } from "common-ui";
 import Select from "react-select";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { catalogueOfLifeSearch } from "./CatalogueOfLifeSearchBox";
+import { catalogueOfLifeQuery } from "./CatalogueOfLifeSearchBox";
 import {
   CatalogueOfLifeDataSetSearchResult,
   DataSetResult
@@ -25,7 +25,7 @@ export function ColDataSetDropdown({
   const { inputValue, isLoading, searchResult, setInputValue } =
     useDebouncedFetch({
       fetcher: searchValue =>
-        catalogueOfLifeSearch<CatalogueOfLifeDataSetSearchResult>({
+        catalogueOfLifeQuery<CatalogueOfLifeDataSetSearchResult>({
           url: "https://api.catalogueoflife.org/dataset",
           params: {
             q: searchValue,
@@ -37,11 +37,14 @@ export function ColDataSetDropdown({
       timeoutMs: 1000
     });
 
-  const selectOptions =
-    searchResult?.result?.map(result => ({
-      label: result.title ?? "",
-      value: result
-    })) ?? [];
+  function toOption(dataset: DataSetResult) {
+    return {
+      label: `${dataset.title} ${dataset.key}`,
+      value: dataset
+    };
+  }
+
+  const selectOptions = searchResult?.result?.map(toOption) ?? [];
 
   return (
     <Select<{ label: string; value?: DataSetResult }>
@@ -49,7 +52,7 @@ export function ColDataSetDropdown({
       inputValue={inputValue}
       onInputChange={newVal => setInputValue(newVal)}
       // Selected value state:
-      value={value && { label: value.title ?? String(value), value }}
+      value={value && toOption(value)}
       onChange={selection => onChange(selection?.value)}
       // Other Select component config:
       isLoading={isLoading}
