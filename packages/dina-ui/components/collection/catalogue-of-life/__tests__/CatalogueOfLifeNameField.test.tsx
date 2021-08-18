@@ -1,7 +1,7 @@
 import { DinaForm } from "../../../../../common-ui/lib";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CatalogueOfLifeNameField } from "../CatalogueOfLifeNameField";
-import { CatalogueOfLifeNameSearchResult } from "../CatalogueOfLifeSearchBox";
+import { CatalogueOfLifeNameSearchResult } from "../name-search-types";
 
 const mockOnChange = jest.fn((val, form) =>
   form.setFieldValue("scientificNameSource", val ? "COLPLUS" : null)
