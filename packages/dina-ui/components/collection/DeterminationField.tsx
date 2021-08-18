@@ -131,7 +131,11 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                       suggestion={(vocabElement, searchValue) =>
                         vocabElement?.vocabularyElements
                           ?.filter(it => it?.name !== TypeStatusEnum.NONE)
-                          .filter(it => it?.name?.includes(searchValue))
+                          .filter(it =>
+                            it?.name
+                              ?.toLowerCase?.()
+                              ?.includes(searchValue?.toLowerCase?.())
+                          )
                           .map(it => it?.name ?? "")
                       }
                       shouldRenderSuggestions={shouldRenderSuggestions}
