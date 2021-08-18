@@ -1,7 +1,11 @@
 import { LoadingSpinner, Tooltip, useThrottledFetch } from "common-ui";
 import DOMPurify from "dompurify";
 import { compact } from "lodash";
+import { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { ColDataSetDropdown } from "./ColDataSetDropdown";
+import { DataSetResult } from "./dataset-search-types";
+import { CatalogueOfLifeNameSearchResult } from "./name-search-types";
 
 export interface CatalogueOfLifeSearchBoxProps {
   /** Optionally mock out the HTTP fetch for testing. */
@@ -16,15 +20,29 @@ export function CatalogueOfLifeSearchBox({
 }: CatalogueOfLifeSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
 
+  const [dataSet, setDataSet] = useState<DataSetResult | undefined>({
+    title: "Catalogue of Life Checklist",
+    key: 2328
+  });
+
   const {
     searchIsLoading,
     searchResult,
     inputValue,
     setInputValue,
-    suggestButtonIsDisabled,
-    doSearch
+    searchIsDisabled,
+    doThrottledSearch
   } = useThrottledFetch({
-    fetcher: searchValue => catalogueOfLifeSearch(searchValue, fetchJson),
+    fetcher: searchValue =>
+      catalogueOfLifeSearch<CatalogueOfLifeNameSearchResult>({
+        url: "https://api.catalogueoflife.org/nidx/match",
+        params: {
+          q: searchValue,
+          verbose: "true"
+        },
+        searchValue,
+        fetchJson
+      }),
     timeoutMs: 1000
   });
 
@@ -36,6 +54,21 @@ export function CatalogueOfLifeSearchBox({
 
   return (
     <div className="card card-body border mb-3">
+      <div className="d-flex align-items-center mb-3">
+        <label className="pt-2 d-flex align-items-center">
+          <strong>
+            <DinaMessage id="dataset" />
+          </strong>
+          <Tooltip id="datasetSearchTooltip" />
+        </label>
+        <div className="flex-grow-1">
+          <ColDataSetDropdown
+            onChange={setDataSet}
+            value={dataSet}
+            fetchJson={fetchJson}
+          />
+        </div>
+      </div>
       <div className="d-flex align-items-center mb-3">
         <label className="pt-2 d-flex align-items-center">
           <strong>
@@ -53,17 +86,17 @@ export function CatalogueOfLifeSearchBox({
               onKeyDown={e => {
                 if (e.keyCode === 13) {
                   e.preventDefault();
-                  doSearch();
+                  doThrottledSearch();
                 }
               }}
               value={inputValue}
             />
             <button
               style={{ width: "10rem" }}
-              onClick={doSearch}
+              onClick={doThrottledSearch}
               className="btn btn-primary ms-auto col-search-button"
               type="button"
-              disabled={suggestButtonIsDisabled}
+              disabled={searchIsDisabled}
             >
               <DinaMessage id="searchButton" />
             </button>
@@ -111,58 +144,37 @@ export function CatalogueOfLifeSearchBox({
     </div>
   );
 }
-
-export interface CatalogueOfLifeNameSearchResult {
-  name?: CatalogueOfLifeName;
-  type?: string;
-  alternatives?: CatalogueOfLifeName[];
-  nameKey?: number;
+export interface CatalogueOfLifeSearchParams {
+  url: string;
+  params: Record<string, string>;
+  searchValue: string;
+  fetchJson?: (url: string) => Promise<any>;
 }
 
-export interface CatalogueOfLifeName {
-  created?: string;
-  modified?: string;
-  canonicalId?: number;
-  scientificName?: string;
-  rank?: string;
-  genus?: string;
-  specificEpithet?: string;
-  labelHtml?: string;
-  parsed?: true;
-  id?: number;
-  authorship?: string;
-  canonical?: boolean;
-  combinationAuthorship?: {
-    authors?: string[];
-  };
-}
-
-async function catalogueOfLifeSearch(
-  searchValue: string,
-  fetchJson: (url: string) => Promise<any> = urlArg =>
-    window.fetch(urlArg).then(res => res.json())
-): Promise<CatalogueOfLifeNameSearchResult | null> {
+export async function catalogueOfLifeSearch<T>({
+  url,
+  params,
+  searchValue,
+  fetchJson = urlArg => window.fetch(urlArg).then(res => res.json())
+}: CatalogueOfLifeSearchParams): Promise<T | null> {
   if (!searchValue?.trim()) {
     return null;
   }
 
-  const url = new URL("https://api.catalogueoflife.org/nidx/match");
-  url.search = new URLSearchParams({
-    q: searchValue,
-    verbose: "true"
-  }).toString();
+  const urlObject = new URL(url);
+  urlObject.search = new URLSearchParams(params).toString();
 
   try {
-    const response = await fetchJson(url.toString());
+    const response = await fetchJson(urlObject.toString());
 
     if (response.error) {
       throw new Error(String(response.error));
     }
 
     // Search API returns an array ; Reverse API returns a single place:
-    return response as CatalogueOfLifeNameSearchResult;
+    return response as T;
   } catch (error) {
     console.error(error);
-    return {};
+    return null;
   }
 }

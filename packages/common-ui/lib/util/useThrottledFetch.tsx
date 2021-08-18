@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import useSWR from "swr";
+import { useDebounce } from "use-debounce";
 
 export interface UseThrottledFetchParams<TData> {
   fetcher: (query: string) => Promise<TData>;
@@ -41,11 +42,12 @@ export function useThrottledFetch<TData>({
     }
   );
 
-  const suggestButtonIsDisabled = throttled || !inputValue || searchIsLoading;
+  const searchIsDisabled = throttled || !inputValue || searchIsLoading;
 
-  function doSearch() {
+  /** Executes the search immediately and delays further calls. */
+  function doThrottledSearch() {
     // Set a 1-second API request throttle:
-    if (suggestButtonIsDisabled) {
+    if (searchIsDisabled) {
       return;
     }
 
@@ -56,9 +58,33 @@ export function useThrottledFetch<TData>({
   return {
     inputValue,
     setInputValue,
-    suggestButtonIsDisabled,
-    doSearch,
+    searchIsDisabled,
+    doThrottledSearch,
     searchResult,
     searchIsLoading
   };
+}
+
+export function useDebouncedFetch<TData>({
+  fetcher,
+  timeoutMs
+}: UseThrottledFetchParams<TData>) {
+  /** The value of the input element. */
+  const [inputValue, setInputValue] = useState("");
+
+  /** The debounced input value passed to the fetcher. */
+  const [searchValue, { isPending }] = useDebounce(inputValue, timeoutMs);
+
+  const { isValidating: searchIsLoading, data: searchResult } = useSWR(
+    [searchValue],
+    () => fetcher(searchValue),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false
+    }
+  );
+
+  const isLoading = !!inputValue && (searchIsLoading || isPending());
+
+  return { inputValue, setInputValue, isLoading, searchResult };
 }

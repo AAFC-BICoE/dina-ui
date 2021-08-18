@@ -84,6 +84,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createWorkflowTemplateTitle: "Create Workflow Template",
   customPlaceName: "Custom Place Name",
   dataEntryLabel: "Data Entry",
+  dataset: "Dataset",
+  datasetSearchTooltip: "For using a different Catalog of Life dataset.",
   decimalLatLong: "Decimal Lat/Long",
   decimalLatitude: "Decimal Latitude",
   decimalLongitude: "Decimal Longitude",
