@@ -70,7 +70,7 @@ export function InputWithCoordButtons({
       {["°", "′", "″"].map(symbol => (
         <button
           key={symbol}
-          tabIndex={0}
+          tabIndex={-1}
           className={
             !isExternallyControlled
               ? "btn btn-info coord-button"
