@@ -100,6 +100,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   detachSelectedButtonText: "Detach Selected",
   detailsPageLink: "Details Page",
   determination: "Determination",
+  determinations: "Determinations",
   dinaHomeH1: "Dina Home",
   dinaUserSectionTitle: "Users",
   duplicateFilesFound: "duplicate files found",
@@ -244,7 +245,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_publiclyReleasable_tooltip:
     "Indicates if the object could be released publicly on a web page or open data portals.",
   field_qualifier: "Transcriber's Notes",
-  field_transcriberRemarks: "Transcriber Remarks",
+  field_transcriberRemarks: "Verbatim Remarks",
   field_type: "Type",
   field_typeStatus: "Type Status",
   field_typeStatusEvidence: "Type Status Evidence",
