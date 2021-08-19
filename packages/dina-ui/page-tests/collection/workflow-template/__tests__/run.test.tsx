@@ -434,6 +434,13 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     expect(
       wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
     ).toEqual(true);
+
+    // Renders the determination section:
+    expect(
+      wrapper
+        .find(".determination-section .verbatimScientificName-field input")
+        .exists()
+    ).toEqual(true);
   });
 
   it("Renders the Material Sample form with only the Collecting Event section enabled.", async () => {

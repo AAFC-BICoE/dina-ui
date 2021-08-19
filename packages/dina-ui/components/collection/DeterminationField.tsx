@@ -7,7 +7,8 @@ import {
   TextFieldWithMultiplicationButton,
   useDinaFormContext
 } from "common-ui";
-import { FieldArray } from "formik";
+import { FieldArray, useFormikContext } from "formik";
+import { useEffect } from "react";
 import { ShouldRenderReasons } from "react-autosuggest";
 import { Accordion } from "react-bootstrap";
 import { VscTriangleDown, VscTriangleRight } from "react-icons/vsc";
@@ -58,154 +59,159 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
   }
 
   return (
-    <FieldArray name="determination">
-      {({ form, push, remove }) => {
-        const determinations =
-          (form.values.determination as Determination[]) ?? [];
-        function addDetermination() {
-          push({});
-          setImmediate(() => {
-            // Scroll to the new accordion item:
-            document
-              .querySelector(".determination-section .accordion:last-child")
-              ?.scrollIntoView({ behavior: "smooth", block: "center" });
-          });
-        }
-
-        function removeDetermination(index: number) {
-          remove(index);
-        }
-
-        function determinationInternal(index: number) {
-          /** Applies name prefix to field props */
-          function fieldProps(fieldName: string) {
-            return {
-              name: `${determinationsPath}[${index}].${fieldName}`,
-              // If the first determination is enabled, then enable multiple determinations:
-              templateCheckboxFieldName: `${determinationsPath}[0].${fieldName}`,
-              // Don't use the prefix for the labels and tooltips:
-              customName: fieldName
-            };
+    <div>
+      <EnsureAtLeastOneDetermination />
+      <FieldArray name="determination">
+        {({ form, push, remove }) => {
+          const determinations =
+            (form.values.determination as Determination[]) ?? [];
+          function addDetermination() {
+            push({});
+            setImmediate(() => {
+              // Scroll to the new accordion item:
+              document
+                .querySelector(".determination-section .accordion:last-child")
+                ?.scrollIntoView({ behavior: "smooth", block: "center" });
+            });
           }
 
-          return (
-            <div>
-              <div>
-                <div className="row">
-                  <div className="col-md-6">
-                    <TextFieldWithMultiplicationButton
-                      {...fieldProps("verbatimScientificName")}
-                      className="col-sm-6 verbatimScientificName"
-                    />
-                    <AutoSuggestTextField<MaterialSample>
-                      {...fieldProps("verbatimAgent")}
-                      className="col-sm-6"
-                      query={() => ({
-                        path: "collection-api/material-sample"
-                      })}
-                      suggestion={sample =>
-                        (sample.determination?.map(
-                          det => det?.verbatimAgent
-                        ) as any) ?? []
-                      }
-                    />
-                    <DateField
-                      {...fieldProps("verbatimDate")}
-                      className="col-sm-6"
-                    />
-                    <TextField
-                      {...fieldProps("transcriberRemarks")}
-                      multiLines={true}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <AutoSuggestTextField<Vocabulary>
-                      {...fieldProps("typeStatus")}
-                      query={() => ({
-                        path: "collection-api/vocabulary/typeStatus"
-                      })}
-                      suggestion={(vocabElement, searchValue) =>
-                        vocabElement?.vocabularyElements
-                          ?.filter(it => it?.name !== TypeStatusEnum.NONE)
-                          .filter(it =>
-                            it?.name
-                              ?.toLowerCase?.()
-                              ?.includes(searchValue?.toLowerCase?.())
-                          )
-                          .map(it => it?.name ?? "")
-                      }
-                      shouldRenderSuggestions={shouldRenderSuggestions}
-                    />
-                    <TextField
-                      {...fieldProps("typeStatusEvidence")}
-                      multiLines={true}
-                    />
-                    <TextField {...fieldProps("qualifier")} multiLines={true} />
-                  </div>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-sm-6">
-                  <CatalogueOfLifeNameField
-                    {...fieldProps("scientificName")}
-                    scientificNameSourceField={
-                      fieldProps("scientificNameSource").name
-                    }
-                    onChange={(newValue, formik) =>
-                      formik.setFieldValue(
-                        fieldProps("scientificNameSource").name,
-                        newValue ? "COLPLUS" : null
-                      )
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-          );
-        }
+          function removeDetermination(index: number) {
+            remove(index);
+          }
 
-        // Always shows the panel without tabs when it is a template
-        return (
-          <FieldSet
-            className={className}
-            id="determination-section"
-            legend={
-              <div className="list-inline">
-                <div className="d-flex gap-3 mb-2">
-                  <DinaMessage id="determinations" />
-                  {!readOnly && !isTemplate && determinations?.length && (
-                    <FormikButton
-                      className="list-inline-item btn btn-primary add-assertion-button"
-                      onClick={addDetermination}
-                    >
-                      <DinaMessage id="addAnotherDetermination" />
-                    </FormikButton>
-                  )}
-                </div>
-              </div>
+          function determinationInternal(index: number) {
+            /** Applies name prefix to field props */
+            function fieldProps(fieldName: string) {
+              return {
+                name: `${determinationsPath}[${index}].${fieldName}`,
+                // If the first determination is enabled, then enable multiple determinations:
+                templateCheckboxFieldName: `${determinationsPath}[0].${fieldName}`,
+                // Don't use the prefix for the labels and tooltips:
+                customName: fieldName
+              };
             }
-          >
-            <div className="determination-section">
-              {determinations.length === 1 ? (
-                determinationInternal(0)
-              ) : (
+
+            return (
+              <div>
                 <div>
-                  <div className="d-flex" style={{ padding: "1rem 1.25rem" }}>
-                    <div className="spacer me-3" style={{ width: "16px" }} />
-                    <div className="row fw-bold flex-grow-1">
-                      <div className="col-3">
-                        <DinaMessage id="field_verbatimScientificName" />
-                      </div>
-                      <div className="col-3">
-                        <DinaMessage id="field_verbatimDate" />
-                      </div>
-                      <div className="col-3">
-                        <DinaMessage id="field_verbatimAgent" />
-                      </div>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <TextFieldWithMultiplicationButton
+                        {...fieldProps("verbatimScientificName")}
+                        className="col-sm-6 verbatimScientificName"
+                      />
+                      <AutoSuggestTextField<MaterialSample>
+                        {...fieldProps("verbatimAgent")}
+                        className="col-sm-6"
+                        query={() => ({
+                          path: "collection-api/material-sample"
+                        })}
+                        suggestion={sample =>
+                          (sample.determination?.map(
+                            det => det?.verbatimAgent
+                          ) as any) ?? []
+                        }
+                      />
+                      <DateField
+                        {...fieldProps("verbatimDate")}
+                        className="col-sm-6"
+                      />
+                      <TextField
+                        {...fieldProps("transcriberRemarks")}
+                        multiLines={true}
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <AutoSuggestTextField<Vocabulary>
+                        {...fieldProps("typeStatus")}
+                        query={() => ({
+                          path: "collection-api/vocabulary/typeStatus"
+                        })}
+                        suggestion={(vocabElement, searchValue) =>
+                          vocabElement?.vocabularyElements
+                            ?.filter(it => it?.name !== TypeStatusEnum.NONE)
+                            .filter(it =>
+                              it?.name
+                                ?.toLowerCase?.()
+                                ?.includes(searchValue?.toLowerCase?.())
+                            )
+                            .map(it => it?.name ?? "")
+                        }
+                        shouldRenderSuggestions={shouldRenderSuggestions}
+                      />
+                      <TextField
+                        {...fieldProps("typeStatusEvidence")}
+                        multiLines={true}
+                      />
+                      <TextField
+                        {...fieldProps("qualifier")}
+                        multiLines={true}
+                      />
                     </div>
                   </div>
-                  <style>{`.accordion-button { padding: 0.5rem 1.25rem !important; }`}</style>
-                  <style>{`
+                </div>
+                <div className="row">
+                  <div className="col-sm-6">
+                    <CatalogueOfLifeNameField
+                      {...fieldProps("scientificName")}
+                      scientificNameSourceField={
+                        fieldProps("scientificNameSource").name
+                      }
+                      onChange={(newValue, formik) =>
+                        formik.setFieldValue(
+                          fieldProps("scientificNameSource").name,
+                          newValue ? "COLPLUS" : null
+                        )
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          // Always shows the panel without tabs when it is a template
+          return (
+            <FieldSet
+              className={className}
+              id="determination-section"
+              legend={
+                <div className="list-inline">
+                  <div className="d-flex gap-3 mb-2">
+                    <DinaMessage id="determinations" />
+                    {!readOnly && !isTemplate && determinations?.length && (
+                      <FormikButton
+                        className="list-inline-item btn btn-primary add-determination-button"
+                        onClick={addDetermination}
+                      >
+                        <DinaMessage id="addAnotherDetermination" />
+                      </FormikButton>
+                    )}
+                  </div>
+                </div>
+              }
+            >
+              <div className="determination-section">
+                {determinations.length === 1 ? (
+                  determinationInternal(0)
+                ) : (
+                  <div>
+                    <div className="d-flex" style={{ padding: "1rem 1.25rem" }}>
+                      <div className="spacer me-3" style={{ width: "16px" }} />
+                      <div className="row fw-bold flex-grow-1">
+                        <div className="col-3">
+                          <DinaMessage id="field_verbatimScientificName" />
+                        </div>
+                        <div className="col-3">
+                          <DinaMessage id="field_verbatimDate" />
+                        </div>
+                        <div className="col-3">
+                          <DinaMessage id="field_verbatimAgent" />
+                        </div>
+                      </div>
+                    </div>
+                    <style>{`.accordion-button { padding: 0.5rem 1.25rem !important; }`}</style>
+                    <style>{`
                     /* Zebra striping: */
                     .accordion:nth-child(even) .accordion-button { background-color: #f3f3f3 !important; }
                     .accordion:nth-child(even) .accordion-item { background-color: #f3f3f3 !important; }
@@ -217,57 +223,72 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                     .accordion-button.collapsed .down-arrow { display: none !important; }
                     .accordion-button:not(.collapsed) .right-arrow { display: none !important; }
                   `}</style>
-                  {isTemplate
-                    ? determinationInternal(0)
-                    : determinations.map((determination, index) => (
-                        <Accordion
-                          key={index}
-                          defaultActiveKey={String(
-                            readOnly ? -1 : determinations.length - 1
-                          )}
-                        >
-                          <Accordion.Item eventKey={String(index)}>
-                            <Accordion.Header className="mt-0">
-                              <VscTriangleDown className="down-arrow me-3" />
-                              <VscTriangleRight className="right-arrow me-3" />
-                              <div className="row align-items-center flex-grow-1 fw-bold">
-                                <div className="col-3 my-2">
-                                  {determination.verbatimScientificName}
+                    {isTemplate
+                      ? determinationInternal(0)
+                      : determinations.map((determination, index) => (
+                          <Accordion
+                            key={index}
+                            defaultActiveKey={String(
+                              readOnly ? -1 : determinations.length - 1
+                            )}
+                          >
+                            <Accordion.Item eventKey={String(index)}>
+                              <Accordion.Header className="mt-0">
+                                <VscTriangleDown className="down-arrow me-3" />
+                                <VscTriangleRight className="right-arrow me-3" />
+                                <div className="row align-items-center flex-grow-1 fw-bold">
+                                  <div className="col-3 my-2">
+                                    {determination.verbatimScientificName}
+                                  </div>
+                                  <div className="col-3">
+                                    {determination.verbatimDate}
+                                  </div>
+                                  <div className="col-3">
+                                    {determination.verbatimAgent}
+                                  </div>
+                                  <div className="col-3 d-flex">
+                                    {!readOnly && !isTemplate && (
+                                      <button
+                                        type="button"
+                                        className="btn btn-dark mx-auto"
+                                        onClick={event => {
+                                          event.stopPropagation();
+                                          removeDetermination(index);
+                                        }}
+                                      >
+                                        <DinaMessage id="deleteButtonText" />
+                                      </button>
+                                    )}
+                                  </div>
                                 </div>
-                                <div className="col-3">
-                                  {determination.verbatimDate}
-                                </div>
-                                <div className="col-3">
-                                  {determination.verbatimAgent}
-                                </div>
-                                <div className="col-3 d-flex">
-                                  {!readOnly && !isTemplate && (
-                                    <button
-                                      type="button"
-                                      className="btn btn-dark mx-auto"
-                                      onClick={event => {
-                                        event.stopPropagation();
-                                        removeDetermination(index);
-                                      }}
-                                    >
-                                      <DinaMessage id="deleteButtonText" />
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            </Accordion.Header>
-                            <Accordion.Body>
-                              {determinationInternal(index)}
-                            </Accordion.Body>
-                          </Accordion.Item>
-                        </Accordion>
-                      ))}
-                </div>
-              )}
-            </div>
-          </FieldSet>
-        );
-      }}
-    </FieldArray>
+                              </Accordion.Header>
+                              <Accordion.Body>
+                                {determinationInternal(index)}
+                              </Accordion.Body>
+                            </Accordion.Item>
+                          </Accordion>
+                        ))}
+                  </div>
+                )}
+              </div>
+            </FieldSet>
+          );
+        }}
+      </FieldArray>
+    </div>
   );
+}
+
+/** Adds a blank determination when there are none. */
+function EnsureAtLeastOneDetermination() {
+  const { values, setFieldValue } = useFormikContext<MaterialSample>();
+
+  // When there is no determination, add a blank one:
+  useEffect(() => {
+    if (!values.determination?.length) {
+      setFieldValue("determination", [{}]);
+    }
+  }, [values.determination?.length]);
+
+  return null;
 }
