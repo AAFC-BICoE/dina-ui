@@ -38,7 +38,7 @@ export function useMaterialSampleQuery(id?: string | null) {
     {
       path: `collection-api/material-sample/${id}`,
       include:
-        "collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit"
+        "collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit,hierarchy"
     },
     {
       disabled: !id,
