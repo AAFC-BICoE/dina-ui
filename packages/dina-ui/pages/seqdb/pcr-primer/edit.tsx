@@ -36,7 +36,7 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
       <main className="container-fluid">
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="editPcrPrimerTitle" />
             </h1>
             <Query<PcrPrimer>
@@ -54,7 +54,7 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="addPcrPrimerTitle" />
             </h1>
             <PcrPrimerForm router={router} />

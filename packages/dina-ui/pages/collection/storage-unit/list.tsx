@@ -38,7 +38,7 @@ export default function storageUnitListPage() {
       <Head title={formatMessage("storageUnitListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="storageUnitListTitle" />
         </h1>
         <ButtonBar>

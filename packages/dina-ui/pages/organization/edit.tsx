@@ -38,7 +38,7 @@ export default function OrganizationEditPage() {
       <main className="container-fluid">
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="editOrganizationTitle" />
             </h1>
             <Query<Organization>

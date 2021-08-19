@@ -69,7 +69,7 @@ export default function MolecularSampleEditPage() {
       <Nav />
       <main className="container">
         <div>
-          <h1>{pageTitle}</h1>
+          <h1 id="wb-cont">{pageTitle}</h1>
           {id ? (
             withResponse(molecularSampleQuery, ({ data }) => (
               <MolecularSampleForm

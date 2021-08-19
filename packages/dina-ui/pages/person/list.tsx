@@ -32,7 +32,7 @@ export default function AgentListPage() {
       <Head title={formatMessage("personListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="personListTitle" />
         </h1>
         <ButtonBar>

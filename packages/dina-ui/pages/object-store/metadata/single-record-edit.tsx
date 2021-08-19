@@ -45,7 +45,7 @@ export default function MetadataEditPage() {
       <main className="container-fluid">
         {id && (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="editMetadataTitle" />
             </h1>
             <Query<Metadata>

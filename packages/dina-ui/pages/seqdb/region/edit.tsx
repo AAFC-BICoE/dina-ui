@@ -30,7 +30,7 @@ export function RegionEditPage({ router }: WithRouterProps) {
       <main className="container-fluid">
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="editRegionTitle" />
             </h1>
             <Query<Region> query={{ path: `seqdb-api/region/${id}` }}>
@@ -46,7 +46,7 @@ export function RegionEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="addRegionTitle" />
             </h1>
             <RegionForm router={router} />

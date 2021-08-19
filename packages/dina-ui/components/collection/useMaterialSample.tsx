@@ -21,7 +21,6 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../dina-ui/types/collection-api";
-import { ScientificNameSource } from "../../../dina-ui/types/collection-api/resources/Determination";
 import {
   ManagedAttributeValues,
   Metadata
@@ -241,7 +240,7 @@ export function useMaterialSampleSave({
         }),
     determination: materialSample?.determination?.length
       ? materialSample?.determination
-      : [{}]
+      : []
   };
 
   /** Used to get the values of the nested CollectingEvent form. */

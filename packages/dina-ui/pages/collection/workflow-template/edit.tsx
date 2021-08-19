@@ -68,7 +68,7 @@ export default function PreparationProcessTemplatePage() {
       <Head title={formatMessage(pageTitle)} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id={pageTitle} />
         </h1>
         {id ? (

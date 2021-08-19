@@ -35,11 +35,17 @@ export function AreYouSureModal({
   return (
     <div className="modal-content">
       <div className="modal-header">
-        <h1 style={{border:"none"}}>{actionMessage}</h1>
+        <h1 style={{ border: "none" }}>{actionMessage}</h1>
       </div>
       <div className="modal-body">
         <DinaForm initialValues={{}} onSubmit={onYesClickInternal}>
-          <main>{messageBody ?? <p style={{fontSize:"x-large"}} ><CommonMessage id="areYouSure" /></p>}</main>
+          <main>
+            {messageBody ?? (
+              <p style={{ fontSize: "x-large" }}>
+                <CommonMessage id="areYouSure" />
+              </p>
+            )}
+          </main>
           <div className="row">
             <div className="col-md-3">
               <SubmitButton className="form-control yes-button">

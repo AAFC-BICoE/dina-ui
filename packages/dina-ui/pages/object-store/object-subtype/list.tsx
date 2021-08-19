@@ -38,7 +38,7 @@ export default function ObjectSubtypeListPage() {
       <Head title={formatMessage("objectSubtypeListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="objectSubtypeListTitle" />
         </h1>
         <ButtonBar>

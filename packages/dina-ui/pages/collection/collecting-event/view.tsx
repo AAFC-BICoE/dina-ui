@@ -55,7 +55,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
       {withResponse(collectingEventQuery, ({ data: colEvent }) => {
         return (
           <main className="container-fluid">
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="collectingEventViewTitle" />
             </h1>
             {buttonBar}

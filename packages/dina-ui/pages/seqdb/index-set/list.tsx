@@ -33,7 +33,7 @@ export default function IndexSetListPage() {
       <Head title={formatMessage("indexSetListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <SeqdbMessage id="indexSetListTitle" />
         </h1>
         <ListPageLayout
