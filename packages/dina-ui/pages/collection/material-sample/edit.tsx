@@ -20,6 +20,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
   GroupSelectField,
   Head,
+  MaterialSampleBreadCrumb,
   Nav,
   StorageLinkerField
 } from "../../../components";
@@ -200,6 +201,12 @@ export function MaterialSampleForm({
         </nav>
       </div>
       <div className="flex-grow-1 container-fluid">
+        {!isTemplate && materialSample && (
+          <MaterialSampleBreadCrumb
+            disableLastLink={true}
+            materialSample={materialSample as any}
+          />
+        )}
         {!isTemplate && <MaterialSampleMainInfoFormLayout />}
         <div className="row">
           <div className="col-md-6">
