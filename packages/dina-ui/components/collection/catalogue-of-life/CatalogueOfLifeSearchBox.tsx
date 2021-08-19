@@ -5,12 +5,9 @@ import {
   useThrottledFetch
 } from "common-ui";
 import DOMPurify from "dompurify";
-import { compact } from "lodash";
 import { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ColDataSetDropdown } from "./ColDataSetDropdown";
 import { DataSetResult } from "./dataset-search-types";
-import { CatalogueOfLifeNameSearchResult } from "./name-search-types";
 import { NameUsageSearchResult } from "./nameusage-types";
 
 export interface CatalogueOfLifeSearchBoxProps {
@@ -26,7 +23,7 @@ export function CatalogueOfLifeSearchBox({
 }: CatalogueOfLifeSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
 
-  const [dataSet, setDataSet] = useState<DataSetResult | undefined>({
+  const [dataSet, setDataSet] = useState<DataSetResult>({
     title: "Catalogue of Life Checklist",
     key: 2328
   });
@@ -40,11 +37,10 @@ export function CatalogueOfLifeSearchBox({
     doThrottledSearch
   } = useThrottledFetch({
     fetcher: searchValue =>
-      catalogueOfLifeQuery<CatalogueOfLifeNameSearchResult>({
-        url: "https://api.catalogueoflife.org/nidx/match",
+      catalogueOfLifeQuery<NameUsageSearchResult>({
+        url: `https://api.catalogueoflife.org/dataset/${dataSet.key}/nameusage`,
         params: {
-          q: searchValue,
-          verbose: "true"
+          q: searchValue
         },
         searchValue,
         fetchJson
@@ -52,15 +48,12 @@ export function CatalogueOfLifeSearchBox({
     timeoutMs: 1000
   });
 
-  const nameResults =
-    searchResult &&
-    compact([searchResult?.name, ...(searchResult?.alternatives ?? [])]).filter(
-      it => !it.canonical
-    );
+  const nameResults = searchResult?.result;
 
   return (
     <div className="card card-body border mb-3">
-      <div className="d-flex align-items-center mb-3">
+      {/* Hide this for now for the demo */}
+      {/* <div className="d-flex align-items-center mb-3">
         <label className="pt-2 d-flex align-items-center">
           <strong>
             <DinaMessage id="dataset" />
@@ -74,7 +67,7 @@ export function CatalogueOfLifeSearchBox({
             fetchJson={fetchJson}
           />
         </div>
-      </div>
+      </div> */}
       <div className="d-flex align-items-center mb-3">
         <label className="pt-2 d-flex align-items-center">
           <strong>
@@ -113,41 +106,15 @@ export function CatalogueOfLifeSearchBox({
       {!!nameResults?.length && (
         <div className="list-group">
           {nameResults.map((result, index) => {
+            const link = document.createElement("a");
+            link.setAttribute(
+              "href",
+              `https://data.catalogueoflife.org/dataset/${dataSet.key}/name/${result.name?.id}`
+            );
+            link.innerHTML = result.labelHtml ?? String(result);
+
             // Use DOMPurify to sanitize against XSS when using dangerouslySetInnerHTML:
-            const safeHtmlLabel: string = DOMPurify.sanitize(result.labelHtml);
-
-            async function selectName() {
-              const nameUsageSearchResult = dataSet?.key
-                ? await catalogueOfLifeQuery<NameUsageSearchResult>({
-                    url: `https://api.catalogueoflife.org/dataset/${dataSet.key}/nameusage`,
-                    params: { nidx: String(result.canonicalId) },
-                    searchValue: String(result.canonicalId),
-                    fetchJson
-                  })
-                : null;
-
-              const selectedNameText =
-                nameUsageSearchResult?.result
-                  ?.map(it => {
-                    const link = document.createElement("a");
-                    if (dataSet?.key) {
-                      link.setAttribute(
-                        "href",
-                        `https://data.catalogueoflife.org/dataset/${dataSet.key}/taxon/${it.id}`
-                      );
-                    }
-                    link.innerText = String(it.id);
-
-                    return `${it.labelHtml} synonym of ${
-                      it.accepted?.name?.scientificName
-                    } ${DOMPurify.sanitize(link.outerHTML)}`;
-                  })
-                  .join("\n") ??
-                result.scientificName ??
-                String(result);
-
-              onSelect?.(selectedNameText);
-            }
+            const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML);
 
             return (
               <div
@@ -155,12 +122,12 @@ export function CatalogueOfLifeSearchBox({
                 className="list-group-item list-group-item-action d-flex"
               >
                 <div className="flex-grow-1 d-flex align-items-center col-search-result-label">
-                  <span dangerouslySetInnerHTML={{ __html: safeHtmlLabel }} />
+                  <span dangerouslySetInnerHTML={{ __html: safeHtmlLink }} />
                 </div>
                 <FormikButton
                   className="btn btn-primary col-name-select-button"
                   buttonProps={() => ({ style: { width: "8rem" } })}
-                  onClick={selectName}
+                  onClick={() => onSelect?.(safeHtmlLink)}
                 >
                   <DinaMessage id="select" />
                 </FormikButton>

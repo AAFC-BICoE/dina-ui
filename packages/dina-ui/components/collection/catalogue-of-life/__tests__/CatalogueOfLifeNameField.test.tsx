@@ -2,6 +2,7 @@ import { DinaForm } from "../../../../../common-ui/lib";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CatalogueOfLifeNameField } from "../CatalogueOfLifeNameField";
 import { CatalogueOfLifeNameSearchResult } from "../name-search-types";
+import { NameUsageSearchResult } from "../nameusage-types";
 
 const mockOnChange = jest.fn((val, form) =>
   form.setFieldValue("scientificNameSource", val ? "COLPLUS" : null)
@@ -45,20 +46,16 @@ describe("CatalogueOfLifeNameField component", () => {
 
     expect(
       wrapper.find(".col-search-result-label").map(node => node.text())
-    ).toEqual([
-      "Poa muralis",
-      "Poa muralis Wibel, nom. illeg.",
-      "Poa muralis Honck."
-    ]);
+    ).toEqual(["Poa muralis Honck.", "Poa muralis Wibel, nom. illeg."]);
 
     wrapper.find("button.col-name-select-button").at(1).simulate("click");
 
     expect(mockOnChange).lastCalledWith(
-      "Poa muralis Wibel, nom. illeg.",
+      '<a href="https://data.catalogueoflife.org/dataset/2328/name/f3d46805-704b-459a-a3f6-58816dad2138"><i>Poa muralis</i> Wibel, nom. illeg.</a>',
       expect.anything()
     );
     expect(mockFetchJson).lastCalledWith(
-      "https://api.catalogueoflife.org/nidx/match?q=Poa+muralis&verbose=true"
+      "https://api.catalogueoflife.org/dataset/2328/nameusage?q=Poa+muralis"
     );
 
     wrapper.update();
@@ -69,7 +66,8 @@ describe("CatalogueOfLifeNameField component", () => {
     wrapper.update();
 
     expect(mockOnSubmit).lastCalledWith({
-      scientificName: "Poa muralis Wibel, nom. illeg.",
+      scientificName:
+        '<a href="https://data.catalogueoflife.org/dataset/2328/name/f3d46805-704b-459a-a3f6-58816dad2138"><i>Poa muralis</i> Wibel, nom. illeg.</a>',
       scientificNameSource: "COLPLUS"
     });
   });
@@ -107,56 +105,170 @@ describe("CatalogueOfLifeNameField component", () => {
   });
 });
 
-const EXAMPLE_RESPONSE: CatalogueOfLifeNameSearchResult = {
-  name: {
-    created: "2021-03-31T04:16:28.703958",
-    modified: "2021-03-31T04:16:28.703958",
-    canonicalId: 6488604,
-    scientificName: "Poa muralis",
-    rank: "species",
-    genus: "Poa",
-    specificEpithet: "muralis",
-    canonical: true,
-    labelHtml: "<i>Poa muralis</i>",
-    parsed: true,
-    id: 6488604
-  },
-  type: "exact",
-  alternatives: [
+const EXAMPLE_RESPONSE: NameUsageSearchResult = {
+  offset: 0,
+  limit: 10,
+  total: 2,
+  result: [
     {
-      created: "2021-03-31T04:16:28.7051",
-      modified: "2021-03-31T04:16:28.7051",
-      canonicalId: 6488604,
-      scientificName: "Poa muralis",
-      authorship: "Wibel, nom. illeg.",
-      rank: "species",
-      genus: "Poa",
-      specificEpithet: "muralis",
-      combinationAuthorship: {
-        authors: ["Wibel"]
+      created: "2021-01-19T21:29:45.536939",
+      createdBy: 102,
+      modified: "2021-01-19T21:29:45.536939",
+      modifiedBy: 102,
+      datasetKey: 2328,
+      id: "4KMB5",
+      sectorKey: 85,
+      name: {
+        created: "2021-01-19T21:29:45.536939",
+        createdBy: 102,
+        modified: "2021-01-19T21:29:45.536939",
+        modifiedBy: 102,
+        datasetKey: 2328,
+        id: "bb22f455-9a7b-47f0-8108-292f42a6fefd",
+        sectorKey: 85,
+        homotypicNameId: "bb22f455-9a7b-47f0-8108-292f42a6fefd",
+        scientificName: "Poa muralis",
+        authorship: "Honck.",
+        rank: "species",
+        genus: "Poa",
+        specificEpithet: "muralis",
+        combinationAuthorship: {
+          authors: ["Honck."]
+        },
+        code: "botanical",
+        publishedInId: "370ce65b-44f8-4fc8-9982-106e411314ac",
+        origin: "source",
+        type: "scientific",
+        parsed: true
       },
-      canonical: false,
-      labelHtml: "<i>Poa muralis</i> Wibel, nom. illeg.",
-      parsed: true,
-      id: 6488605
+      status: "synonym",
+      origin: "source",
+      parentId: "4KMBQ",
+      accepted: {
+        created: "2021-01-19T21:16:26.153047",
+        createdBy: 102,
+        modified: "2021-01-19T21:16:26.153047",
+        modifiedBy: 102,
+        datasetKey: 2328,
+        id: "4KMBQ",
+        sectorKey: 85,
+        name: {
+          created: "2021-01-19T21:16:26.153047",
+          createdBy: 102,
+          modified: "2021-01-19T21:16:26.153047",
+          modifiedBy: 102,
+          datasetKey: 2328,
+          id: "46962c1e-714c-4bdd-afb3-08594a0bfbae",
+          sectorKey: 85,
+          homotypicNameId: "46962c1e-714c-4bdd-afb3-08594a0bfbae",
+          scientificName: "Poa nemoralis",
+          authorship: "L.",
+          rank: "species",
+          genus: "Poa",
+          specificEpithet: "nemoralis",
+          combinationAuthorship: {
+            authors: ["L."]
+          },
+          code: "botanical",
+          publishedInId: "561512ca-d64f-45bc-a416-24da46ec780b",
+          origin: "source",
+          type: "scientific",
+          parsed: true
+        },
+        status: "accepted",
+        origin: "source",
+        parentId: "6T8N",
+        scrutinizer: "Govaerts R.",
+        scrutinizerDate: "2017-08",
+        extinct: false,
+        label: "Poa nemoralis L.",
+        labelHtml: "<i>Poa nemoralis</i> L."
+      },
+      homotypic: false,
+      label: "Poa muralis Honck.",
+      labelHtml: "<i>Poa muralis</i> Honck."
     },
     {
-      created: "2021-03-31T04:16:28.717123",
-      modified: "2021-03-31T04:16:28.717123",
-      canonicalId: 6488604,
-      scientificName: "Poa muralis",
-      authorship: "Honck.",
-      rank: "species",
-      genus: "Poa",
-      specificEpithet: "muralis",
-      combinationAuthorship: {
-        authors: ["Honck."]
+      created: "2021-01-19T21:29:23.033685",
+      createdBy: 102,
+      modified: "2021-01-19T21:29:23.033685",
+      modifiedBy: 102,
+      datasetKey: 2328,
+      id: "4KMB6",
+      sectorKey: 85,
+      name: {
+        created: "2021-01-19T21:29:23.033685",
+        createdBy: 102,
+        modified: "2021-01-19T21:29:23.033685",
+        modifiedBy: 102,
+        datasetKey: 2328,
+        id: "f3d46805-704b-459a-a3f6-58816dad2138",
+        sectorKey: 85,
+        homotypicNameId: "f3d46805-704b-459a-a3f6-58816dad2138",
+        scientificName: "Poa muralis",
+        authorship: "Wibel, nom. illeg.",
+        rank: "species",
+        genus: "Poa",
+        specificEpithet: "muralis",
+        combinationAuthorship: {
+          authors: ["Wibel"]
+        },
+        code: "botanical",
+        nomStatus: "unacceptable",
+        publishedInId: "8fccf819-24c7-4841-a0d7-94544c717e69",
+        origin: "source",
+        type: "scientific",
+        nomenclaturalNote: "nom.illeg.",
+        parsed: true
       },
-      canonical: false,
-      labelHtml: "<i>Poa muralis</i> Honck.",
-      parsed: true,
-      id: 6488611
+      status: "synonym",
+      origin: "source",
+      parentId: "4KLK3",
+      accepted: {
+        created: "2021-01-19T21:16:26.153047",
+        createdBy: 102,
+        modified: "2021-01-19T21:16:26.153047",
+        modifiedBy: 102,
+        datasetKey: 2328,
+        id: "4KLK3",
+        sectorKey: 85,
+        name: {
+          created: "2021-01-19T21:16:26.153047",
+          createdBy: 102,
+          modified: "2021-01-19T21:16:26.153047",
+          modifiedBy: 102,
+          datasetKey: 2328,
+          id: "72cb6a0c-1310-4a46-9c0c-6bbaf83203ae",
+          sectorKey: 85,
+          homotypicNameId: "72cb6a0c-1310-4a46-9c0c-6bbaf83203ae",
+          scientificName: "Poa compressa",
+          authorship: "L.",
+          rank: "species",
+          genus: "Poa",
+          specificEpithet: "compressa",
+          combinationAuthorship: {
+            authors: ["L."]
+          },
+          code: "botanical",
+          publishedInId: "561512ca-d64f-45bc-a416-24da46ec780b",
+          origin: "source",
+          type: "scientific",
+          parsed: true
+        },
+        status: "accepted",
+        origin: "source",
+        parentId: "6T8N",
+        scrutinizer: "Govaerts R.",
+        scrutinizerDate: "2017-08",
+        extinct: false,
+        label: "Poa compressa L.",
+        labelHtml: "<i>Poa compressa</i> L."
+      },
+      homotypic: false,
+      label: "Poa muralis Wibel, nom. illeg.",
+      labelHtml: "<i>Poa muralis</i> Wibel, nom. illeg."
     }
   ],
-  nameKey: 6488604
+  last: true,
+  empty: false
 };

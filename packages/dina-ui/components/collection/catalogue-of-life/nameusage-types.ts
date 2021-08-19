@@ -12,9 +12,9 @@ export interface CombinationAuthorship {
 }
 
 export interface Name {
-  created?: Date;
+  created?: string;
   createdBy?: number;
-  modified?: Date;
+  modified?: string;
   modifiedBy?: number;
   datasetKey?: number;
   id?: string;
@@ -36,9 +36,9 @@ export interface Name {
 }
 
 export interface Accepted {
-  created?: Date;
+  created?: string;
   createdBy?: number;
-  modified?: Date;
+  modified?: string;
   modifiedBy?: number;
   datasetKey?: number;
   id?: string;
@@ -55,9 +55,9 @@ export interface Accepted {
 }
 
 export interface Result {
-  created?: Date;
+  created?: string;
   createdBy?: number;
-  modified?: Date;
+  modified?: string;
   modifiedBy?: number;
   datasetKey?: number;
   id?: string;
