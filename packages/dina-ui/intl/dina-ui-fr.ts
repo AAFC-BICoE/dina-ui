@@ -274,7 +274,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   latitudeValidationError:
     "Latitude invalide : {latitude}, \nLa plage de latitude valide est comprise entre -90 et 90 pour les degrés, et entre 0 et 60 pour les minutes et les secondes",
   literalGeoreferencedByLabel: "Géoréférencé par",
-  locationDescriptionLegend: "Description de l’emplacement",
   locationLabel: "Emplacement",
   longitudeValidationError:
     "Longitude invalide : {longtitude}, \nLa longitude valide est comprise entre -180 et 180 pour les degrés, et entre 0 et 60 pour les minutes et les secondes",

@@ -916,11 +916,12 @@ export function CollectingEventFormLayout({
               </div>
             </FieldSet>
           </div>
-          <div className="col-lg-6">
-            <FieldSet legend={<DinaMessage id="locationDescriptionLegend" />}>
-              <TextField name="habitat" />
-            </FieldSet>
-          </div>
+          <FieldSet legend={<DinaMessage id="collectingEventDetailsLegend" />}>
+            <div className="row">
+              <TextField name="habitat" className="col-md-6" />
+              <TextField name="host" className="col-md-6" />
+            </div>
+          </FieldSet>
         </div>
       </FieldSet>
       {!isTemplate && (
