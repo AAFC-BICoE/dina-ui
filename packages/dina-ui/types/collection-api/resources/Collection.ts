@@ -9,4 +9,9 @@ export interface CollectionAttributes {
   createdBy?: string;
 }
 
+export interface CollectionMeta {
+  permissions?: string[];
+  warnings?: any;
+}
+
 export type Collection = KitsuResource & CollectionAttributes;

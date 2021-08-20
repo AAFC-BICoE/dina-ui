@@ -33,6 +33,8 @@ export interface QueryOptions<TData extends KitsuResponseData, TMeta> {
 
   /** Disables the query. */
   disabled?: boolean;
+
+  header?: {};
 }
 
 /**
@@ -45,10 +47,12 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
     deps = [],
     joinSpecs = [],
     onSuccess,
+    header = {},
     disabled = false
   }: QueryOptions<TData, TMeta> = {}
 ): QueryState<TData, TMeta> {
   const { apiClient, bulkGet } = useContext(ApiClientContext);
+  apiClient.headers = { ...apiClient.headers, ...header };
 
   // Memoize the callback. Only re-create it when the query spec changes.
   async function fetchData() {
