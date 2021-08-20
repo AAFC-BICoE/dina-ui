@@ -1,9 +1,14 @@
-import { LoadingSpinner, Tooltip } from "common-ui";
+import {
+  FormikButton,
+  LoadingSpinner,
+  Tooltip,
+  useThrottledFetch
+} from "common-ui";
 import DOMPurify from "dompurify";
-import { compact } from "lodash";
-import { useEffect, useState } from "react";
-import useSWR from "swr";
+import { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DataSetResult } from "./dataset-search-types";
+import { NameUsageSearchResult } from "./nameusage-types";
 
 export interface CatalogueOfLifeSearchBoxProps {
   /** Optionally mock out the HTTP fetch for testing. */
@@ -18,56 +23,51 @@ export function CatalogueOfLifeSearchBox({
 }: CatalogueOfLifeSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
 
-  /** The value of the input element. */
-  const [inputValue, setInputValue] = useState("");
+  const [dataSet, setDataSet] = useState<DataSetResult>({
+    title: "Catalogue of Life Checklist",
+    key: 2328
+  });
 
-  /**
-   * The query passed to the Catalogue of Life API.
-   * This state is only set when the user submits the search input.
-   */
-  const [searchValue, setSearchValue] = useState("");
+  const {
+    searchIsLoading,
+    searchResult,
+    inputValue,
+    setInputValue,
+    searchIsDisabled,
+    doThrottledSearch
+  } = useThrottledFetch({
+    fetcher: searchValue =>
+      catalogueOfLifeQuery<NameUsageSearchResult>({
+        url: `https://api.catalogueoflife.org/dataset/${dataSet.key}/nameusage`,
+        params: {
+          q: searchValue
+        },
+        searchValue,
+        fetchJson
+      }),
+    timeoutMs: 1000
+  });
 
-  const { isValidating: colSearchIsLoading, data: searchResult } = useSWR(
-    [searchValue],
-    () => catalogueOfLifeSearch(searchValue, fetchJson),
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false
-    }
-  );
-
-  /**
-   * Whether the Catalogue of Life Api is throttled
-   * to make sure we don't send more requests than we are allowed to.
-   */
-  const [colApiRequestsOnHold, setColApiRequestsOnHold] = useState(false);
-  useEffect(() => {
-    if (searchValue) {
-      setColApiRequestsOnHold(true);
-      const timeout = setTimeout(() => setColApiRequestsOnHold(false), 1000);
-      return () => clearTimeout(timeout);
-    }
-  }, [searchValue]);
-
-  const suggestButtonIsDisabled =
-    colApiRequestsOnHold || !inputValue || colSearchIsLoading;
-
-  function doSearch() {
-    // Set a 1-second API request throttle:
-    if (suggestButtonIsDisabled) {
-      return;
-    }
-
-    // Set the new search value which will make useSWR do the lookup:
-    setSearchValue(inputValue);
-  }
-
-  const nameResults =
-    searchResult &&
-    compact([searchResult?.name, ...(searchResult?.alternatives ?? [])]);
+  const nameResults = searchResult?.result;
 
   return (
     <div className="card card-body border mb-3">
+      {/* Hide this for now for the demo */}
+      {/* <div className="d-flex align-items-center mb-3">
+        <label className="pt-2 d-flex align-items-center">
+          <strong>
+            <DinaMessage id="dataset" />
+          </strong>
+          <Tooltip id="datasetSearchTooltip" />
+        </label>
+        <div className="flex-grow-1">
+          <ColDataSetDropdown
+            onChange={setDataSet}
+            value={dataSet}
+            fetchJson={fetchJson}
+          />
+        </div>
+      </div> */}
       <div className="d-flex align-items-center mb-3">
         <label className="pt-2 d-flex align-items-center">
           <strong>
@@ -85,31 +85,36 @@ export function CatalogueOfLifeSearchBox({
               onKeyDown={e => {
                 if (e.keyCode === 13) {
                   e.preventDefault();
-                  doSearch();
+                  doThrottledSearch();
                 }
               }}
               value={inputValue}
             />
             <button
               style={{ width: "10rem" }}
-              onClick={doSearch}
+              onClick={doThrottledSearch}
               className="btn btn-primary ms-auto col-search-button"
               type="button"
-              disabled={suggestButtonIsDisabled}
+              disabled={searchIsDisabled}
             >
               <DinaMessage id="searchButton" />
             </button>
           </div>
         </div>
       </div>
-      {colSearchIsLoading && <LoadingSpinner loading={true} />}
+      {searchIsLoading && <LoadingSpinner loading={true} />}
       {!!nameResults?.length && (
         <div className="list-group">
           {nameResults.map((result, index) => {
-            // Use DOMPurify to sanitize against XSS when using dangerouslySetInnerHTML:
-            const safeHtmlLabel: string = DOMPurify.sanitize(
-              result.labelHtml + (result.id ? ` (nidx ${result.id})` : "")
+            const link = document.createElement("a");
+            link.setAttribute(
+              "href",
+              `https://data.catalogueoflife.org/dataset/${dataSet.key}/name/${result.name?.id}`
             );
+            link.innerHTML = result.labelHtml ?? String(result);
+
+            // Use DOMPurify to sanitize against XSS when using dangerouslySetInnerHTML:
+            const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML);
 
             return (
               <div
@@ -117,21 +122,15 @@ export function CatalogueOfLifeSearchBox({
                 className="list-group-item list-group-item-action d-flex"
               >
                 <div className="flex-grow-1 d-flex align-items-center col-search-result-label">
-                  <span dangerouslySetInnerHTML={{ __html: safeHtmlLabel }} />
+                  <span dangerouslySetInnerHTML={{ __html: safeHtmlLink }} />
                 </div>
-                <button
-                  type="button"
+                <FormikButton
                   className="btn btn-primary col-name-select-button"
-                  style={{ width: "8rem" }}
-                  onClick={() => {
-                    const element = document.createElement("div");
-                    element.innerHTML = safeHtmlLabel;
-                    const plainTextLabel = element.textContent;
-                    onSelect?.(plainTextLabel);
-                  }}
+                  buttonProps={() => ({ style: { width: "8rem" } })}
+                  onClick={() => onSelect?.(safeHtmlLink)}
                 >
                   <DinaMessage id="select" />
-                </button>
+                </FormikButton>
               </div>
             );
           })}
@@ -145,58 +144,37 @@ export function CatalogueOfLifeSearchBox({
     </div>
   );
 }
-
-export interface CatalogueOfLifeNameSearchResult {
-  name?: CatalogueOfLifeName;
-  type?: string;
-  alternatives?: CatalogueOfLifeName[];
-  nameKey?: number;
+export interface CatalogueOfLifeSearchParams {
+  url: string;
+  params: Record<string, string>;
+  searchValue: string;
+  fetchJson?: (url: string) => Promise<any>;
 }
 
-export interface CatalogueOfLifeName {
-  created?: string;
-  modified?: string;
-  canonicalId?: number;
-  scientificName?: string;
-  rank?: string;
-  genus?: string;
-  specificEpithet?: string;
-  labelHtml?: string;
-  parsed?: true;
-  id?: number;
-  authorship?: string;
-  canonical?: boolean;
-  combinationAuthorship?: {
-    authors?: string[];
-  };
-}
-
-async function catalogueOfLifeSearch(
-  searchValue: string,
-  fetchJson: (url: string) => Promise<any> = urlArg =>
-    window.fetch(urlArg).then(res => res.json())
-): Promise<CatalogueOfLifeNameSearchResult | null> {
+export async function catalogueOfLifeQuery<T>({
+  url,
+  params,
+  searchValue,
+  fetchJson = urlArg => window.fetch(urlArg).then(res => res.json())
+}: CatalogueOfLifeSearchParams): Promise<T | null> {
   if (!searchValue?.trim()) {
     return null;
   }
 
-  const url = new URL("https://api.catalogueoflife.org/nidx/match");
-  url.search = new URLSearchParams({
-    q: searchValue,
-    verbose: "true"
-  }).toString();
+  const urlObject = new URL(url);
+  urlObject.search = new URLSearchParams(params).toString();
 
   try {
-    const response = await fetchJson(url.toString());
+    const response = await fetchJson(urlObject.toString());
 
     if (response.error) {
       throw new Error(String(response.error));
     }
 
     // Search API returns an array ; Reverse API returns a single place:
-    return response as CatalogueOfLifeNameSearchResult;
+    return response as T;
   } catch (error) {
     console.error(error);
-    return {};
+    return null;
   }
 }
