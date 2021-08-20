@@ -12,7 +12,12 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { Head, Nav, StorageLinkerField } from "../../../components";
+import {
+  Head,
+  MaterialSampleBreadCrumb,
+  Nav,
+  StorageLinkerField
+} from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { DeterminationField } from "../../../components/collection/DeterminationField";
 import {
@@ -95,6 +100,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               initialValues={materialSample}
               readOnly={true}
             >
+              <MaterialSampleBreadCrumb
+                materialSample={materialSample}
+                disableLastLink={true}
+              />
               <MaterialSampleMainInfoFormLayout />
               <MaterialSampleIdentifiersFormLayout />
               {collectingEvent && (

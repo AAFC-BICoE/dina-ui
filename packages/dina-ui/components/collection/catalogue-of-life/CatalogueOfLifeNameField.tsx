@@ -2,6 +2,7 @@ import { FieldWrapper, FieldWrapperProps } from "common-ui";
 import { FormikProps } from "formik";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CatalogueOfLifeSearchBox } from "./CatalogueOfLifeSearchBox";
+import DOMPurify from "dompurify";
 
 export interface CatalogueOfLifeNameFieldProps extends FieldWrapperProps {
   scientificNameSourceField?: string;
@@ -70,9 +71,11 @@ export function CatalogueOfLifeNameField({
 }
 
 function CatalogueOfLifeNameReadOnly({ value, scientificNameSource }) {
+  const sanitizedHtml = DOMPurify.sanitize(value);
+
   return (
-    <div>
-      <p>{value}</p>{" "}
+    <div style={{ whiteSpace: "pre-wrap" }}>
+      <p dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />{" "}
       {scientificNameSource && (
         <p>
           <strong>

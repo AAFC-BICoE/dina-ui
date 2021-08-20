@@ -5,7 +5,7 @@ import { CollectingEvent } from "./CollectingEvent";
 import { PreparationType } from "./PreparationType";
 import { JsonValue } from "type-fest";
 import { MaterialSampleType } from "./MaterialSampleType";
-import { StorageUnit } from "./StorageUnit";
+import { HierarchyItem, StorageUnit } from "./StorageUnit";
 import { Determination } from "./Determination";
 
 export interface MaterialSampleAttributes {
@@ -28,8 +28,8 @@ export interface MaterialSampleAttributes {
   managedAttributes?: JsonValue;
 
   determination?: Determination[];
+  hierarchy?: HierarchyItem[];
 }
-
 export interface MaterialSampleRelationships {
   materialSampleType?: MaterialSampleType;
   collectingEvent?: CollectingEvent;
