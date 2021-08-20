@@ -7,8 +7,7 @@ import {
   TextFieldWithMultiplicationButton,
   useDinaFormContext
 } from "common-ui";
-import { FieldArray, useFormikContext } from "formik";
-import { useEffect } from "react";
+import { FieldArray } from "formik";
 import { ShouldRenderReasons } from "react-autosuggest";
 import { Accordion } from "react-bootstrap";
 import { VscTriangleDown, VscTriangleRight } from "react-icons/vsc";
@@ -195,20 +194,28 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                   determinationInternal(0)
                 ) : (
                   <div>
-                    <div className="d-flex" style={{ padding: "1rem 1.25rem" }}>
-                      <div className="spacer me-3" style={{ width: "16px" }} />
-                      <div className="row fw-bold flex-grow-1">
-                        <div className="col-3">
-                          <DinaMessage id="field_verbatimScientificName" />
-                        </div>
-                        <div className="col-3">
-                          <DinaMessage id="field_verbatimDate" />
-                        </div>
-                        <div className="col-3">
-                          <DinaMessage id="field_verbatimAgent" />
+                    {!isTemplate && (
+                      <div
+                        className="d-flex"
+                        style={{ padding: "1rem 1.25rem" }}
+                      >
+                        <div
+                          className="spacer me-3"
+                          style={{ width: "16px" }}
+                        />
+                        <div className="row fw-bold flex-grow-1">
+                          <div className="col-3">
+                            <DinaMessage id="field_verbatimScientificName" />
+                          </div>
+                          <div className="col-3">
+                            <DinaMessage id="field_verbatimDate" />
+                          </div>
+                          <div className="col-3">
+                            <DinaMessage id="field_verbatimAgent" />
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                     <style>{`.accordion-button { padding: 0.5rem 1.25rem !important; }`}</style>
                     <style>{`
                     /* Zebra striping: */
