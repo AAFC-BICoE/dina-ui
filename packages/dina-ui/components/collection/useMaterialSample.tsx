@@ -240,7 +240,7 @@ export function useMaterialSampleSave({
         }),
     determination: materialSample?.determination?.length
       ? materialSample?.determination
-      : []
+      : [{}]
   };
 
   /** Used to get the values of the nested CollectingEvent form. */
