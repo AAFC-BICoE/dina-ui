@@ -60,7 +60,6 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
 
   return (
     <div>
-      <EnsureAtLeastOneDetermination />
       <FieldArray name="determination">
         {({ form, push, remove }) => {
           const determinations =
@@ -277,18 +276,4 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
       </FieldArray>
     </div>
   );
-}
-
-/** Adds a blank determination when there are none. */
-function EnsureAtLeastOneDetermination() {
-  const { values, setFieldValue } = useFormikContext<MaterialSample>();
-
-  // When there is no determination, add a blank one:
-  useEffect(() => {
-    if (!values.determination?.length) {
-      setFieldValue("determination", [{}]);
-    }
-  }, [values.determination?.length]);
-
-  return null;
 }
