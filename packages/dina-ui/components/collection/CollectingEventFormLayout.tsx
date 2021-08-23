@@ -9,6 +9,7 @@ import {
   LoadingSpinner,
   NominatumApiSearchResult,
   NumberField,
+  NumberRangeFields,
   ResourceSelectField,
   StringArrayField,
   TextField,
@@ -929,56 +930,16 @@ export function CollectingEventFormLayout({
         </div>
         <div className="row">
           <div className="col-md-6">
-            <label className="w-100">
-              <strong>
-                <DinaMessage id="elevationInMeters" />
-              </strong>
-              <div className="d-flex align-items-center mb-3">
-                <NumberField
-                  removeLabel={true}
-                  removeBottomMargin={true}
-                  name="elevationMin"
-                  className="flex-grow-1"
-                  placeholder={formatMessage("min")}
-                />
-                <span className="mx-3">
-                  <DinaMessage id="to" />
-                </span>
-                <NumberField
-                  removeLabel={true}
-                  removeBottomMargin={true}
-                  name="elevationMax"
-                  className="flex-grow-1"
-                  placeholder={formatMessage("max")}
-                />
-              </div>
-            </label>
+            <NumberRangeFields
+              names={["elevationMin", "elevationMax"]}
+              labelMsg={<DinaMessage id="elevationInMeters" />}
+            />
           </div>
           <div className="col-md-6">
-            <label className="w-100">
-              <strong>
-                <DinaMessage id="depthInMeters" />
-              </strong>
-              <div className="d-flex align-items-center mb-3">
-                <NumberField
-                  removeLabel={true}
-                  removeBottomMargin={true}
-                  name="depthMin"
-                  className="flex-grow-1"
-                  placeholder={formatMessage("min")}
-                />
-                <span className="mx-3">
-                  <DinaMessage id="to" />
-                </span>
-                <NumberField
-                  removeLabel={true}
-                  removeBottomMargin={true}
-                  name="depthMax"
-                  className="flex-grow-1"
-                  placeholder={formatMessage("max")}
-                />
-              </div>
-            </label>
+            <NumberRangeFields
+              names={["depthMin", "depthMax"]}
+              labelMsg={<DinaMessage id="depthInMeters" />}
+            />
           </div>
         </div>
         <div>

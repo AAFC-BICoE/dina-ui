@@ -87,6 +87,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   tableTotalCount: "Total matched records: {totalCount}",
   targetField: "Target Field",
   text: "Text",
+  to: "To",
   true: "True",
   typeHereToSearch: "Type here to search.",
   uiAppVersion: "UI Application Version: {version}",
