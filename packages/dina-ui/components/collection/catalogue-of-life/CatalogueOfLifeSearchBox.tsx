@@ -4,7 +4,6 @@ import {
   Tooltip,
   useThrottledFetch
 } from "common-ui";
-import DOMPurify from "dompurify";
 import { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { DataSetResult } from "./dataset-search-types";
@@ -111,10 +110,14 @@ export function CatalogueOfLifeSearchBox({
               "href",
               `https://data.catalogueoflife.org/dataset/${dataSet.key}/name/${result.name?.id}`
             );
+            link.setAttribute("target", "_blank");
+            link.setAttribute("rel", "noopener");
+
             link.innerHTML = result.labelHtml ?? String(result);
 
-            // Use DOMPurify to sanitize against XSS when using dangerouslySetInnerHTML:
-            const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML);
+            // Comment out usage of DOMPurify, as it also remove
+            // the previously set target attribute, instead adding rel= noopener to secure the html
+            const safeHtmlLink: string = link.outerHTML;
 
             return (
               <div
