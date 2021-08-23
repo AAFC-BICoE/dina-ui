@@ -52,6 +52,7 @@ import {
   NominatumApiAddressDetailSearchResult
 } from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
+import { VocabularySelectField } from "./VocabularySelectField";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -926,7 +927,12 @@ export function CollectingEventFormLayout({
         </div>
         <div className="row">
           <TextField name="collectionMethod" className="col-md-6" />
-          <TextField name="substrate" className="col-md-6" />
+          <VocabularySelectField
+            path="collection-api/vocabulary/substrate"
+            name="substrate"
+            isMulti={true}
+            className="col-md-6"
+          />
         </div>
         <div className="row">
           <div className="col-md-6">

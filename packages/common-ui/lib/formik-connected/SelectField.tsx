@@ -24,6 +24,7 @@ export interface SelectFieldProps<T = string> extends LabelWrapperParams {
   styles?: Partial<Styles<SelectOption<T | null | undefined>, boolean>>;
 
   forwardedRef?: RefObject<HTMLSelectElement>;
+  isLoading?: boolean;
 }
 
 /** Formik-connected select input. */
@@ -35,6 +36,7 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
     options,
     styles,
     forwardedRef,
+    isLoading,
     ...labelWrapperProps
   } = props;
 
@@ -76,6 +78,7 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
             onChange={onChangeInternal}
             value={selectedOption}
             styles={customStyle}
+            isLoading={isLoading}
             ref={forwardedRef as any}
           />
         );
