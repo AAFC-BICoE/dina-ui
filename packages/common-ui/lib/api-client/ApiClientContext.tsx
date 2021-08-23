@@ -105,7 +105,7 @@ export class ApiClientImpl implements ApiClientI {
   constructor(private cfg: ApiClientConfig = {}) {
     this.apiClient = new CustomDinaKitsu({
       baseURL: cfg.baseURL ?? "/api",
-      headers: { "Crnk-Compact": "true" },
+      headers: { "Crnk-Compact": "true", "include-dina-permission": "true" },
       pluralize: false,
       resourceCase: "none"
     });
