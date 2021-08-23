@@ -28,16 +28,6 @@ export function CatalogueOfLifeSearchBox({
     key: 2328
   });
 
-  /* set back the attributes after Dompurify sanitize the html */
-  DOMPurify.addHook("afterSanitizeAttributes", node => {
-    if ("target" in node) {
-      node.setAttribute("target", "_blank");
-    }
-    if ("rel" in node) {
-      node.setAttribute("rel", "noopener");
-    }
-  });
-
   const {
     searchIsLoading,
     searchResult,
@@ -127,7 +117,9 @@ export function CatalogueOfLifeSearchBox({
             link.innerHTML = result.labelHtml ?? String(result);
 
             // Use DOMPurify to sanitize against XSS when using dangerouslySetInnerHTML:
-            const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML);
+            const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML, {
+              ADD_ATTR: ["target", "rel"]
+            });
             return (
               <div
                 key={result.id ?? index}

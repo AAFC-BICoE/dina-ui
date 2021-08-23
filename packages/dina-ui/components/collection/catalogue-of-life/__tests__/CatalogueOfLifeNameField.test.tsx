@@ -51,7 +51,7 @@ describe("CatalogueOfLifeNameField component", () => {
     wrapper.find("button.col-name-select-button").at(1).simulate("click");
 
     expect(mockOnChange).lastCalledWith(
-      '<a rel="noopener" href="https://data.catalogueoflife.org/dataset/2328/name/f3d46805-704b-459a-a3f6-58816dad2138" target="_blank"><i>Poa muralis</i> Wibel, nom. illeg.</a>',
+      '<a rel="noopener" target="_blank" href="https://data.catalogueoflife.org/dataset/2328/name/f3d46805-704b-459a-a3f6-58816dad2138"><i>Poa muralis</i> Wibel, nom. illeg.</a>',
       expect.anything()
     );
     expect(mockFetchJson).lastCalledWith(
@@ -67,7 +67,7 @@ describe("CatalogueOfLifeNameField component", () => {
 
     expect(mockOnSubmit).lastCalledWith({
       scientificName:
-        '<a rel="noopener" href="https://data.catalogueoflife.org/dataset/2328/name/f3d46805-704b-459a-a3f6-58816dad2138" target="_blank"><i>Poa muralis</i> Wibel, nom. illeg.</a>',
+        '<a rel="noopener" target="_blank" href="https://data.catalogueoflife.org/dataset/2328/name/f3d46805-704b-459a-a3f6-58816dad2138"><i>Poa muralis</i> Wibel, nom. illeg.</a>',
       scientificNameSource: "COLPLUS"
     });
   });
