@@ -52,6 +52,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   loadingText: "Loading...",
   loggedInAsUser: "Logged in as:",
   logoutBtn: "Logout",
+  max: "Max",
+  min: "Min",
   name: "Name",
   next: "Next",
   no: "No",

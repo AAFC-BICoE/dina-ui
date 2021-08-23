@@ -28,7 +28,7 @@ export interface LabelWrapperParams {
   /** Custom element to render when the form is in read-only mode. */
   readOnlyRender?: (value: any, form: FormikProps<any>) => ReactNode;
 
-  removeFormGroupClass?: boolean;
+  removeBottomMargin?: boolean;
 
   /** Remove the label. */
   removeLabel?: boolean;
@@ -88,7 +88,7 @@ export function FieldWrapper({
   customName,
   link,
   readOnlyRender,
-  removeFormGroupClass,
+  removeBottomMargin,
   removeLabel,
   tooltipImage,
   tooltipImageAlt,
@@ -191,7 +191,7 @@ export function FieldWrapper({
               : horizontal
               ? "row"
               : "w-100",
-            !removeFormGroupClass && "mb-3"
+            !removeBottomMargin && "mb-3"
           )}
           htmlFor={disableLabelClick ? "none" : undefined}
         >

@@ -781,7 +781,7 @@ export function CollectingEventFormLayout({
                                         templateCheckboxFieldName={`srcAdminLevels[${idx}]`}
                                         readOnly={true}
                                         removeLabel={true}
-                                        removeFormGroupClass={true}
+                                        removeBottomMargin={true}
                                         removeItem={removeItem}
                                         key={Math.random()}
                                         index={idx}
@@ -916,12 +916,73 @@ export function CollectingEventFormLayout({
               </div>
             </FieldSet>
           </div>
-          <FieldSet legend={<DinaMessage id="collectingEventDetailsLegend" />}>
-            <div className="row">
-              <TextField name="habitat" className="col-md-6" />
-              <TextField name="host" className="col-md-6" />
-            </div>
-          </FieldSet>
+        </div>
+      </FieldSet>
+      <FieldSet legend={<DinaMessage id="collectingEventDetails" />}>
+        <div className="row">
+          <TextField name="habitat" className="col-md-6" />
+          <TextField name="host" className="col-md-6" />
+        </div>
+        <div className="row">
+          <TextField name="collectionMethod" className="col-md-6" />
+          <TextField name="substrate" className="col-md-6" />
+        </div>
+        <div className="row">
+          <div className="col-md-6">
+            <label className="w-100">
+              <strong>
+                <DinaMessage id="elevationInMeters" />
+              </strong>
+              <div className="d-flex align-items-center mb-3">
+                <NumberField
+                  removeLabel={true}
+                  removeBottomMargin={true}
+                  name="elevationMin"
+                  className="flex-grow-1"
+                  placeholder={formatMessage("min")}
+                />
+                <span className="mx-3">
+                  <DinaMessage id="to" />
+                </span>
+                <NumberField
+                  removeLabel={true}
+                  removeBottomMargin={true}
+                  name="elevationMax"
+                  className="flex-grow-1"
+                  placeholder={formatMessage("max")}
+                />
+              </div>
+            </label>
+          </div>
+          <div className="col-md-6">
+            <label className="w-100">
+              <strong>
+                <DinaMessage id="depthInMeters" />
+              </strong>
+              <div className="d-flex align-items-center mb-3">
+                <NumberField
+                  removeLabel={true}
+                  removeBottomMargin={true}
+                  name="depthMin"
+                  className="flex-grow-1"
+                  placeholder={formatMessage("min")}
+                />
+                <span className="mx-3">
+                  <DinaMessage id="to" />
+                </span>
+                <NumberField
+                  removeLabel={true}
+                  removeBottomMargin={true}
+                  name="depthMax"
+                  className="flex-grow-1"
+                  placeholder={formatMessage("max")}
+                />
+              </div>
+            </label>
+          </div>
+        </div>
+        <div>
+          <TextField name="collectingEventRemarks" multiLines={true} />
         </div>
       </FieldSet>
       {!isTemplate && (
