@@ -8,6 +8,7 @@ import { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { DataSetResult } from "./dataset-search-types";
 import { NameUsageSearchResult } from "./nameusage-types";
+import DOMPurify from "dompurify";
 
 export interface CatalogueOfLifeSearchBoxProps {
   /** Optionally mock out the HTTP fetch for testing. */
@@ -25,6 +26,16 @@ export function CatalogueOfLifeSearchBox({
   const [dataSet, setDataSet] = useState<DataSetResult>({
     title: "Catalogue of Life Checklist",
     key: 2328
+  });
+
+  /* set back the attributes after Dompurify sanitize the html */
+  DOMPurify.addHook("afterSanitizeAttributes", node => {
+    if ("target" in node) {
+      node.setAttribute("target", "_blank");
+    }
+    if ("rel" in node) {
+      node.setAttribute("rel", "noopener");
+    }
   });
 
   const {
@@ -115,10 +126,8 @@ export function CatalogueOfLifeSearchBox({
 
             link.innerHTML = result.labelHtml ?? String(result);
 
-            // Comment out usage of DOMPurify, as it also remove
-            // the previously set target attribute, instead adding rel= noopener to secure the html
-            const safeHtmlLink: string = link.outerHTML;
-
+            // Use DOMPurify to sanitize against XSS when using dangerouslySetInnerHTML:
+            const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML);
             return (
               <div
                 key={result.id ?? index}
