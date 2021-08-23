@@ -252,7 +252,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_typeStatus: "Type Status",
   field_typeStatusEvidence: "Type Status Evidence",
   field_verbatimScientificName: "Verbatim Scientific Name",
-  field_verbatimAgent: "Verbatim Agent",
+  field_verbatimDeterminer: "Verbatim Determiner",
   field_verbatimDate: "Verbatim Date",
   field_xmpMetadataDate: "Last Updated On",
   field_xmpMetadataDate_tooltip:
