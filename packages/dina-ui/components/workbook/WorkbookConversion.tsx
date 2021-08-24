@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { LoadingSpinner } from "common-ui";
 import { IFileWithMeta } from "../object-store/file-upload/FileUploader";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import Kitsu from "kitsu";
 import WorkbookDisplay from "./WorkbookDisplay";
 import WorkbookUpload from "./WorkbookUpload";
@@ -12,6 +13,7 @@ interface WorkbookProps {
 interface WorkbookStates {
   jsonData: WorkbookJSON | null;
   loading: boolean;
+  failed: boolean;
 }
 
 /**
@@ -40,7 +42,8 @@ export class WorkbookConversion extends Component<
 
     this.state = {
       loading: false,
-      jsonData: null
+      jsonData: null,
+      failed: false
     };
   }
 
@@ -65,13 +68,15 @@ export class WorkbookConversion extends Component<
       .then(response => {
         this.setState({
           jsonData: response.data,
-          loading: false
+          loading: false,
+          failed: false
         });
       })
       .catch(() => {
         this.setState({
           jsonData: null,
-          loading: false
+          loading: false,
+          failed: true
         });
       });
   };
@@ -88,20 +93,32 @@ export class WorkbookConversion extends Component<
 
   render() {
     // Deconstruct the states.
-    const { loading, jsonData } = this.state;
+    const { loading, jsonData, failed } = this.state;
+    const failedMessage = failed ? (
+      <div className="alert alert-danger">
+        <DinaMessage id="cancelButtonText" />
+      </div>
+    ) : undefined;
 
     // Determine which component should be rendered based on the states.
     if (loading) {
       // Display the loading spinner.
       return <LoadingSpinner loading={true} />;
     } else {
+      // If failed display the error message.
+
       // If the json data is provided, display the JSON as a table. Otherwise display the uploading component.
       if (jsonData) {
         return (
           <WorkbookDisplay jsonData={jsonData} backButton={this.backToUpload} />
         );
       } else {
-        return <WorkbookUpload submitData={this.submitFile} />;
+        return (
+          <div>
+            {failedMessage}
+            <WorkbookUpload submitData={this.submitFile} />
+          </div>
+        );
       }
     }
   }
