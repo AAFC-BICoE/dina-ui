@@ -19,34 +19,34 @@ export function CollecitonMethodDetailsPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
 
   const prepTypeQuery = useQuery<CollectionMethod>({
-    path: `collection-api/colleciton-method/${id}`
+    path: `collection-api/collection-method/${id}`
   });
 
   return (
     <div>
-      <Head title={formatMessage("collecitonMethodViewTitle")} />
+      <Head title={formatMessage("collectionMethodViewTitle")} />
       <Nav />
       <main className="container">
         <h1 id="wb-cont">
-          <DinaMessage id="collecitonMethodViewTitle" />
+          <DinaMessage id="collectionMethodViewTitle" />
         </h1>
         <ButtonBar>
           <BackButton
             entityId={id as string}
-            entityLink="/collection/colleciton-method"
+            entityLink="/collection/collection-method"
             byPassView={true}
           />
           <EditButton
             className="ms-auto"
             entityId={id as string}
-            entityLink="collection/colleciton-method"
+            entityLink="collection/collection-method"
           />
           <DeleteButton
             className="ms-5"
             id={id as string}
             options={{ apiBaseUrl: "/collection-api" }}
-            postDeleteRedirect="/collection/colleciton-method/list"
-            type="colleciton-method"
+            postDeleteRedirect="/collection/collection-method/list"
+            type="collection-method"
           />
         </ButtonBar>
         {withResponse(prepTypeQuery, ({ data: collectionMethod }) => (
