@@ -7,7 +7,6 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
-import { fromPairs } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { CollectionMethod } from "../../../types/collection-api/resources/CollectionMethod";
