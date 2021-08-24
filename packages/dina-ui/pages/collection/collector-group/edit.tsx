@@ -34,7 +34,7 @@ export default function CollectorGroupEditPage() {
       <Nav />
       <main className="container-fluid">
         <div>
-          <h1>
+          <h1 id="wb-cont">
             <DinaMessage id="addCollectorGroupTitle" />
           </h1>
           <CollectorGroupForm router={router} />

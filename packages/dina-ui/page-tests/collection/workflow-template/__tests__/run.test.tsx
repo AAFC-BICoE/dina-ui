@@ -128,7 +128,8 @@ async function getWrapper(
           type: "material-sample-action-definition"
         }
       }
-      onSaved={mockOnSaved}
+      moveToSampleViewPage={mockOnSaved}
+      moveToNewRunPage={mockOnSaved}
     />,
     { apiContext }
   );
@@ -217,9 +218,11 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 id: "2",
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              determination: [],
 
               managedAttributes: {},
               relationships: {},
@@ -295,9 +298,11 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 id: "555",
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              determination: [],
 
               managedAttributes: {},
               relationships: {},
@@ -329,6 +334,12 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
     ).toEqual(false);
+    expect(
+      wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
 
     // Submit with only the name set:
     await wrapper.find("form").simulate("submit");
@@ -346,10 +357,12 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 id: null,
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
               managedAttributes: {},
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              determination: [],
 
               relationships: {},
               type: "material-sample"
@@ -394,6 +407,42 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     ).toEqual(true);
   });
 
+  it("Renders the Material Sample form with only the Determinations section enabled.", async () => {
+    const wrapper = await getWrapper({
+      id: "1",
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowExisting: true,
+          allowNew: true,
+          templateFields: {
+            ...({
+              "determination[0].verbatimScientificName": {
+                enabled: true,
+                defaultValue: "test verbatim scientific name"
+              }
+            } as any)
+          }
+        }
+      },
+      group: "test-group",
+      name: "test-definition",
+      type: "material-sample-action-definition"
+    });
+
+    // Only the Determination section should be enabled:
+    expect(
+      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+
+    // Renders the determination section:
+    expect(
+      wrapper
+        .find(".determination-section .verbatimScientificName-field input")
+        .exists()
+    ).toEqual(true);
+  });
+
   it("Renders the Material Sample form with only the Collecting Event section enabled.", async () => {
     const wrapper = await getWrapper({
       id: "1",
@@ -419,6 +468,39 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     expect(
       wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
     ).toEqual(true);
+    expect(
+      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+  });
+
+  it("Renders the Material Sample form with only the Storage section enabled.", async () => {
+    const wrapper = await getWrapper({
+      id: "1",
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowExisting: false,
+          allowNew: false,
+          templateFields: {
+            storageUnit: {
+              enabled: true,
+              defaultValue: null
+            }
+          }
+        }
+      },
+      group: "test-group",
+      name: "test-definition",
+      type: "material-sample-action-definition"
+    });
+
+    // Only the Collecting Event section should be enabled:
+    expect(
+      wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+    expect(
+      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
     expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
     ).toEqual(false);

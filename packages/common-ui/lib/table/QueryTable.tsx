@@ -192,7 +192,12 @@ export function QueryTable<TData extends KitsuResource>({
   const shouldShowPagination = !!displayData?.length;
 
   return (
-    <div className="query-table-wrapper" ref={divWrapperRef}>
+    <div
+      className="query-table-wrapper"
+      ref={divWrapperRef}
+      role="search"
+      aria-label="Query Table"
+    >
       {!omitPaging && (
         <span>
           <CommonMessage id="tableTotalCount" values={{ totalCount }} />

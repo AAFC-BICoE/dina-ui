@@ -42,7 +42,7 @@ export default function AgentListPage() {
       <Head title={formatMessage("userListTitle")} />
       <Nav />
       <div className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="userListTitle" />
         </h1>
         <ListPageLayout

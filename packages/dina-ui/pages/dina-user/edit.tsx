@@ -53,7 +53,7 @@ export default function DinaUserEditPage() {
       <Head title={formatMessage("editDinaUserTitle")} />
       <Nav />
       <main className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="editDinaUserTitle" />
         </h1>
         {withResponse(userQuery, response => (

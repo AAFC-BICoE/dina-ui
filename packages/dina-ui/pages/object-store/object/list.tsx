@@ -76,8 +76,9 @@ export default function MetadataListPage() {
   const [listLayoutType, setListLayoutType] =
     useLocalStorage<MetadataListLayoutType>(LIST_LAYOUT_STORAGE_KEY);
 
-  const [previewMetadataId, setPreviewMetadataId] =
-    useState<string | null>(null);
+  const [previewMetadataId, setPreviewMetadataId] = useState<string | null>(
+    null
+  );
   const [tableSectionWidth, previewSectionWidth] = previewMetadataId
     ? [8, 4]
     : [12, 0];
@@ -146,7 +147,7 @@ export default function MetadataListPage() {
       <main className="container-fluid">
         <div className="list-inline">
           <div className="list-inline-item">
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="objectListTitle" />
             </h1>
           </div>

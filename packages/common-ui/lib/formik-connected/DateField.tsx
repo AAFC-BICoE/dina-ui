@@ -14,7 +14,10 @@ export function DateField(props: LabelWrapperParams & DateFieldProps) {
   const { showTime, disabled, onKeyDown } = props;
 
   return (
-    <FieldWrapper {...props} readOnlyRender={val => <DateView date={val} />}>
+    <FieldWrapper
+      {...props}
+      readOnlyRender={val => (showTime ? <DateView date={val} /> : val)}
+    >
       {({ setValue, value }) => {
         function onChange(date: Date) {
           if (showTime) {

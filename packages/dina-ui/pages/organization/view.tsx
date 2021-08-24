@@ -52,7 +52,7 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
           return (
             <main className="container-fluid">
               {buttonBar}
-              <h1>
+              <h1 id="wb-cont">
                 <DinaMessage id="organizationViewTitle" />
               </h1>
               <LoadingSpinner loading={loading} />

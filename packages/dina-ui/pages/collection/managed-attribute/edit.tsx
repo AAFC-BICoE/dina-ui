@@ -44,7 +44,7 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
       <main className="container">
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="managedAttributeEditTitle" />
             </h1>
             <Query<ManagedAttribute>
