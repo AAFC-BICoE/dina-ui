@@ -114,7 +114,7 @@ declare module "kitsu" {
       ? PersistedResource<TData[P]> | undefined
       : TData[P];
   } &
-    Required<KitsuResource>;
+    Required<Omit<KitsuResource, "meta">>;
 
   /**
    * Used when creating or updating a resource.
