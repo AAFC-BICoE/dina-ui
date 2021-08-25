@@ -84,11 +84,6 @@ declare module "kitsu" {
   export interface KitsuResource {
     id?: string;
     type: string;
-    meta?: {
-      permissionsProvider?: string;
-      permissions?: string[];
-      warnings?: any;
-    };
   }
 
   export type KitsuResourceLink =
@@ -114,7 +109,7 @@ declare module "kitsu" {
       ? PersistedResource<TData[P]> | undefined
       : TData[P];
   } &
-    Required<Omit<KitsuResource, "meta">>;
+    Required<KitsuResource>;
 
   /**
    * Used when creating or updating a resource.

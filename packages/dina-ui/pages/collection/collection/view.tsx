@@ -10,11 +10,9 @@ import {
 import { WithRouterProps } from "next/dist/client/with-router";
 import { Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Collection } from "../../../types/collection-api";
+import { Collection, PERMISSIONS } from "../../../types/collection-api";
 import { CollectionFormFields } from "./edit";
 import { withRouter } from "next/router";
-
-export const PERMISSIONS = ["create", "update", "delete"] as const;
 
 export function CollectionDetailsPage({ router }: WithRouterProps) {
   const id = String(router.query.id);

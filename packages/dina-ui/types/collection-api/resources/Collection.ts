@@ -9,4 +9,12 @@ export interface CollectionAttributes {
   createdBy?: string;
 }
 
-export type Collection = KitsuResource & CollectionAttributes;
+export interface CollectionMeta {
+  permissionsProvider?: string;
+  permissions?: string[];
+  warnings?: any;
+}
+
+export const PERMISSIONS = ["create", "update", "delete"] as const;
+
+export type Collection = KitsuResource & CollectionAttributes & CollectionMeta;
