@@ -1,4 +1,5 @@
 import { KitsuResource } from "kitsu";
+import { MultilingualDescription } from "./PreparationType";
 
 export interface CollectionMethodAttributes {
   type: "collection-method";
@@ -6,6 +7,7 @@ export interface CollectionMethodAttributes {
   createdBy?: string;
   createdOn?: string;
   group?: string;
+  multilingualDescription?: MultilingualDescription;
 }
 
 export type CollectionMethod = KitsuResource & CollectionMethodAttributes;

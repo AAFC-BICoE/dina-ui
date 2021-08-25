@@ -7,6 +7,7 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
+import { fromPairs } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { CollectionMethod } from "../../../types/collection-api/resources/CollectionMethod";
@@ -14,7 +15,7 @@ import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectionMethodFormLayout } from "./edit";
 
-export function CollecitonMethodDetailsPage({ router }: WithRouterProps) {
+export function CollectionMethodDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useDinaIntl();
 
@@ -52,7 +53,13 @@ export function CollecitonMethodDetailsPage({ router }: WithRouterProps) {
         {withResponse(prepTypeQuery, ({ data: collectionMethod }) => (
           <DinaForm<CollectionMethod>
             initialValues={{
-              ...collectionMethod
+              ...collectionMethod,
+              // Convert multilingualDescription to editable Dictionary format:
+              multilingualDescription: fromPairs<string | undefined>(
+                collectionMethod.multilingualDescription?.descriptions?.map(
+                  ({ desc, lang }) => [lang ?? "", desc ?? ""]
+                )
+              )
             }}
             readOnly={true}
           >
@@ -65,4 +72,4 @@ export function CollecitonMethodDetailsPage({ router }: WithRouterProps) {
   );
 }
 
-export default withRouter(CollecitonMethodDetailsPage);
+export default withRouter(CollectionMethodDetailsPage);

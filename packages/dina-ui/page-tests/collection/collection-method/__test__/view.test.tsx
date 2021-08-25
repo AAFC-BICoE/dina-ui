@@ -1,6 +1,6 @@
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CollectionMethod } from "../../../../types/collection-api/resources/CollectionMethod";
-import { CollecitonMethodDetailsPage } from "../../../../pages/collection/collection-method/view";
+import { CollectionMethodDetailsPage } from "../../../../pages/collection/collection-method/view";
 
 /** Test collection-method with all fields defined. */
 const TEST_COLLECTION_METHOD: CollectionMethod = {
@@ -28,7 +28,7 @@ const apiContext = {
 describe("CollectionMethod details page", () => {
   it("Renders initially with a loading spinner.", () => {
     const wrapper = mountWithAppContext(
-      <CollecitonMethodDetailsPage router={{ query: { id: "100" } } as any} />,
+      <CollectionMethodDetailsPage router={{ query: { id: "100" } } as any} />,
       { apiContext }
     );
 
@@ -37,7 +37,7 @@ describe("CollectionMethod details page", () => {
 
   it("Render the CollectionMethod details", async () => {
     const wrapper = mountWithAppContext(
-      <CollecitonMethodDetailsPage router={{ query: { id: "100" } } as any} />,
+      <CollectionMethodDetailsPage router={{ query: { id: "100" } } as any} />,
       { apiContext }
     );
 

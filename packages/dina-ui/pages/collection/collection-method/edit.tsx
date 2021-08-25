@@ -10,6 +10,7 @@ import {
   TextField
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
+import { fromPairs, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
 import { GroupSelectField, Head, Nav } from "../../../components";
@@ -79,7 +80,13 @@ export function CollectionMethodForm({
 
   const initialValues: CollectionMethodFormValues = fetchedCollectionMethod
     ? {
-        ...fetchedCollectionMethod
+        ...fetchedCollectionMethod,
+        // Convert multilingualDescription to editable Dictionary format:
+        multilingualDescription: fromPairs<string | undefined>(
+          fetchedCollectionMethod.multilingualDescription?.descriptions?.map(
+            ({ desc, lang }) => [lang ?? "", desc ?? ""]
+          )
+        )
       }
     : { name: "", type: "collection-method" };
 
@@ -87,7 +94,13 @@ export function CollectionMethodForm({
     submittedValues
   }) => {
     const input: InputResource<CollectionMethod> = {
-      ...submittedValues
+      ...submittedValues,
+      // Convert the editable format to the stored format:
+      multilingualDescription: {
+        descriptions: toPairs(submittedValues.multilingualDescription).map(
+          ([lang, desc]) => ({ lang, desc })
+        )
+      }
     };
 
     const [saveColMethod] = await save<CollectionMethod>(
@@ -138,6 +151,22 @@ export function CollectionMethodFormLayout() {
           className="col-md-6 name"
           name="name"
           label={formatMessage("collectionMethodNameLabel")}
+        />
+      </div>
+      <div className="row">
+        <TextField
+          className="english-description"
+          name="multilingualDescription.en"
+          label={formatMessage("field_description.en")}
+          multiLines={true}
+        />
+      </div>
+      <div className="row">
+        <TextField
+          className="french-description"
+          name="multilingualDescription.fr"
+          label={formatMessage("field_description.fr")}
+          multiLines={true}
         />
       </div>
     </div>

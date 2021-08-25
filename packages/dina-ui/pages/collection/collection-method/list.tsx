@@ -7,7 +7,7 @@ const COLLECTION_METHOD_FILTER_ATTRIBUTES = ["createdBy"];
 const COLLECTION_METHOD_TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/collection/colleciton-method/view?id=${id}`}>{name}</Link>
+      <Link href={`/collection/collection-method/view?id=${id}`}>{name}</Link>
     ),
     accessor: "name"
   },
@@ -16,7 +16,7 @@ const COLLECTION_METHOD_TABLE_COLUMNS = [
   dateCell("createdOn")
 ];
 
-export default function collecitonMethodListPage() {
+export default function collectionMethodListPage() {
   const { formatMessage } = useDinaIntl();
 
   return (
@@ -36,10 +36,10 @@ export default function collecitonMethodListPage() {
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}
           filterAttributes={COLLECTION_METHOD_FILTER_ATTRIBUTES}
-          id="colleciton-method-list"
+          id="collection-method-list"
           queryTableProps={{
             columns: COLLECTION_METHOD_TABLE_COLUMNS,
-            path: "collection-api/colleciton-method"
+            path: "collection-api/collection-method"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">

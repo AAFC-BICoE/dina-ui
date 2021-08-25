@@ -61,6 +61,10 @@ describe("collection-method edit page", () => {
       }
     });
 
+    wrapper.find(".english-description textarea").simulate("change", {
+      target: { value: "test english description" }
+    });
+
     // Submit the form.
     wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
@@ -73,6 +77,9 @@ describe("collection-method edit page", () => {
           path: "collection-method",
           value: {
             attributes: {
+              multilingualDescription: {
+                descriptions: [{ lang: "en", desc: "test english description" }]
+              },
               name: "updated Name"
             },
             id: "00000000-0000-0000-0000-000000000000",
@@ -94,11 +101,22 @@ describe("collection-method edit page", () => {
         fetchedCollectionMethod={{
           name: "test-col-method",
           type: "collection-method",
+          multilingualDescription: {
+            descriptions: [{ lang: "en", desc: "test english description" }]
+          },
           id: "1"
         }}
       />,
       { apiContext }
     );
+
+    expect(wrapper.find(".english-description textarea").prop("value")).toEqual(
+      "test english description"
+    );
+
+    wrapper.find(".french-description textarea").simulate("change", {
+      target: { value: "test french description" }
+    });
 
     wrapper.find(".name input").simulate("change", {
       target: {
@@ -120,6 +138,18 @@ describe("collection-method edit page", () => {
           path: "collection-method/1",
           value: {
             attributes: {
+              multilingualDescription: {
+                descriptions: [
+                  {
+                    desc: "test english description",
+                    lang: "en"
+                  },
+                  {
+                    desc: "test french description",
+                    lang: "fr"
+                  }
+                ]
+              },
               name: "updated Name"
             },
             id: "1",
