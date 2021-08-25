@@ -21,11 +21,11 @@ export default function collecitonMethodListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("collecitonMethodListTitle")} />
+      <Head title={formatMessage("collectionMethodListTitle")} />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
-          <DinaMessage id="collecitonMethodListTitle" />
+          <DinaMessage id="collectionMethodListTitle" />
         </h1>
         <ButtonBar>
           <CreateButton entityLink="/collection/collection-method" />
