@@ -5,7 +5,11 @@ import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { FieldWrapper } from "../FieldWrapper";
 
+const mockSubmit = jest.fn();
+
 describe("FieldWrapper component.", () => {
+  beforeEach(jest.clearAllMocks);
+
   it("Adds a generated title-case label to the wrapped component.", () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
@@ -76,5 +80,77 @@ describe("FieldWrapper component.", () => {
     );
 
     expect(wrapper.find(".custom-div").text()).toEqual("my value");
+  });
+
+  it("Accepts a custom field name for the template checkbox.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{ myField: "my value", templateCheckboxes: {} }}
+        isTemplate={true}
+        onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
+      >
+        <FieldWrapper
+          templateCheckboxFieldName="customTemplateFieldName"
+          name="myField"
+        >
+          {({ value }) => <>{value}</>}
+        </FieldWrapper>
+      </DinaForm>
+    );
+
+    wrapper
+      .find("input[type='checkbox']")
+      .simulate("change", { target: { checked: true } });
+    wrapper.update();
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSubmit).lastCalledWith({
+      myField: "my value",
+      templateCheckboxes: {
+        customTemplateFieldName: true
+      }
+    });
+  });
+
+  it("Properly hides the field when the form template has disabled it.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{ myField1: "my value", templateCheckboxes: {} }}
+        // enabledField2 uses a custom tempalte field name:
+        enabledFields={["enabledField1", "customTemplateFieldName"]}
+        onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
+      >
+        {/* Enabled Fields: */}
+        <FieldWrapper name="enabledField1">
+          {() => <div className="enabledField1" />}
+        </FieldWrapper>
+        <FieldWrapper
+          templateCheckboxFieldName="customTemplateFieldName"
+          name="enabledField2"
+        >
+          {() => <div className="enabledField2" />}
+        </FieldWrapper>
+
+        {/* Disabled Fields: */}
+        <FieldWrapper name="disabledField1">
+          {() => <div className="disabledField1" />}
+        </FieldWrapper>
+        <FieldWrapper
+          templateCheckboxFieldName="disabledCustomTemplateFieldName"
+          name="disabledField2"
+        >
+          {() => <div className="disabledField2" />}
+        </FieldWrapper>
+      </DinaForm>
+    );
+
+    expect(wrapper.find(".enabledField1").exists()).toEqual(true);
+    expect(wrapper.find(".enabledField2").exists()).toEqual(true);
+    expect(wrapper.find(".disabledField1").exists()).toEqual(false);
+    expect(wrapper.find(".disabledField2").exists()).toEqual(false);
   });
 });

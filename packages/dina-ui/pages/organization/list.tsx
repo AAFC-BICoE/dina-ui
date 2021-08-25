@@ -41,7 +41,7 @@ export default function OrganizationListPage() {
       <Head title={formatMessage("organizationListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="organizationListTitle" />
         </h1>
         <ButtonBar>

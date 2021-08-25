@@ -26,7 +26,7 @@ export interface LabelWrapperParams {
   link?: string;
 
   /** Custom element to render when the form is in read-only mode. */
-  readOnlyRender?: (value: any) => ReactNode;
+  readOnlyRender?: (value: any, form: FormikProps<any>) => ReactNode;
 
   removeFormGroupClass?: boolean;
 
@@ -61,6 +61,7 @@ export interface FieldWrapperProps extends LabelWrapperParams {
   children?:
     | JSX.Element
     | ((renderProps: FieldWrapperRenderProps) => JSX.Element);
+  removeLabelTag?: boolean;
 }
 
 export interface FieldWrapperRenderProps {
@@ -93,13 +94,18 @@ export function FieldWrapper({
   tooltipImageAlt,
   tooltipLink,
   tooltipLinkText,
-  templateCheckboxFieldName
+  templateCheckboxFieldName,
+  removeLabelTag
 }: FieldWrapperProps) {
   const { horizontal, readOnly, isTemplate, enabledFields } =
     useDinaFormContext();
 
+  /** Whether this field should be hidden because the template doesn't specify that it should be shown. */
   const disabledByFormTemplate = useMemo(
-    () => (enabledFields ? !enabledFields.includes(name) : false),
+    () =>
+      enabledFields
+        ? !enabledFields.includes(templateCheckboxFieldName || name)
+        : false,
     [enabledFields]
   );
 
@@ -126,6 +132,38 @@ export function FieldWrapper({
     return null;
   }
 
+  const fieldWrapperInternal = (
+    <div
+      className={valueCol ? `col-sm-${valueCol}` : ""}
+      style={{ cursor: "auto" }}
+    >
+      <FastField name={name}>
+        {({ field: { value }, form, meta: { error } }) => (
+          <>
+            {readOnly || !children
+              ? readOnlyRender?.(value, form) ?? (
+                  <ReadOnlyValue link={link} value={value} />
+                )
+              : typeof children === "function"
+              ? children?.({
+                  invalid: Boolean(error),
+                  value,
+                  setValue: newValue => {
+                    // Remove the error message when the user edits the field:
+                    form.setFieldError(name, undefined);
+                    form.setFieldValue(name, newValue);
+                    form.setFieldTouched(name);
+                  },
+                  formik: form
+                })
+              : children}
+            {error && <div className="invalid-feedback">{error}</div>}
+          </>
+        )}
+      </FastField>
+    </div>
+  );
+
   return (
     <div className={classNames(className, { row: isTemplate })}>
       {isTemplate && (
@@ -134,57 +172,44 @@ export function FieldWrapper({
           className="col-sm-1 templateCheckBox"
         />
       )}
-      <label
-        className={`${name}-field ${
-          isTemplate
-            ? horizontal
-              ? "row col-sm-11"
-              : "col-sm-10"
-            : horizontal
-            ? "row"
-            : "w-100"
-        } ${removeFormGroupClass ? "" : "mb-3"}`}
-        htmlFor={disableLabelClick ? "none" : undefined}
-      >
-        {!removeLabel && (
-          <div
-            className={[
-              `${labelCol ? `col-sm-${labelCol}` : ""}`,
-              // Adjust alignment for editable inputs:
-              horizontal && !readOnly && !isTemplate ? "mt-sm-2" : "",
-              "mb-2"
-            ].join(" ")}
-          >
-            {!hideLabel && <strong>{fieldLabel}</strong>}
+      {removeLabelTag ? (
+        <>
+          <div className="mb-2">
+            <strong>{fieldLabel}</strong>
           </div>
-        )}
-        <div className={valueCol ? `col-sm-${valueCol}` : ""}>
-          <FastField name={name}>
-            {({ field: { value }, form, meta: { error } }) => (
-              <>
-                {readOnly || !children
-                  ? readOnlyRender?.(value) ?? (
-                      <ReadOnlyValue link={link} value={value} />
-                    )
-                  : typeof children === "function"
-                  ? children?.({
-                      invalid: Boolean(error),
-                      value,
-                      setValue: newValue => {
-                        // Remove the error message when the user edits the field:
-                        form.setFieldError(name, undefined);
-                        form.setFieldValue(name, newValue);
-                        form.setFieldTouched(name);
-                      },
-                      formik: form
-                    })
-                  : children}
-                {error && <div className="invalid-feedback">{error}</div>}
-              </>
-            )}
-          </FastField>
-        </div>
-      </label>
+          {fieldWrapperInternal}
+        </>
+      ) : (
+        <label
+          className={classNames(
+            `${name}-field`,
+            customName && `${customName}-field`,
+            isTemplate
+              ? horizontal
+                ? "row col-sm-11"
+                : "col-sm-10"
+              : horizontal
+              ? "row"
+              : "w-100",
+            !removeFormGroupClass && "mb-3"
+          )}
+          htmlFor={disableLabelClick ? "none" : undefined}
+        >
+          {!removeLabel && (
+            <div
+              className={[
+                `${labelCol ? `col-sm-${labelCol}` : ""}`,
+                // Adjust alignment for editable inputs:
+                horizontal && !readOnly && !isTemplate ? "mt-sm-2" : "",
+                "mb-2"
+              ].join(" ")}
+            >
+              {!hideLabel && <strong>{fieldLabel}</strong>}
+            </div>
+          )}
+          {fieldWrapperInternal}
+        </label>
+      )}
     </div>
   );
 }

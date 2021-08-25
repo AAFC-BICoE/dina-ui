@@ -8,32 +8,30 @@ import {
   SubmitButton,
   TextField
 } from "common-ui";
-import { Field } from "formik";
+import { Field, FieldProps, FormikContextType, useFormikContext } from "formik";
 import { padStart, range } from "lodash";
-import { useRouter } from "next/router";
-import React from "react";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { withRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";
 import NumberSpinnerField from "../../../../../common-ui/lib/formik-connected/NumberSpinnerField";
 import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
+import { useMaterialSampleQuery } from "../../../../../dina-ui/components/collection/useMaterialSample";
 import { Head } from "../../../../../dina-ui/components/head";
 import {
   BASE_NAME,
+  IDENTIFIER_TYPE_OPTIONS,
+  MaterialSampleGenerationMode,
   MaterialSampleRunConfig,
+  MaterialSampleRunConfigConfiguration,
+  MATERIAL_SAMPLE_GENERATION_MODES,
   NUMERIC_UPPER_LIMIT,
   START,
   TYPE_LETTER,
   TYPE_NUMERIC
 } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
-
-/* Config action related fields */
-interface RunConfig {
-  numOfChildToCreate: number;
-  baseName: string;
-  start: string;
-  sufficType: string;
-  customChildSample?: { index: number; name: string; description: string }[];
-}
 
 /* Props for computing suffix */
 export interface ComputeSuffixProps {
@@ -45,65 +43,64 @@ export interface ComputeSuffixProps {
 export const SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY =
   "split-child-sample-run-config";
 
-export default function ConfigAction() {
-  const { formatMessage } = useDinaIntl();
-  const router = useRouter();
+type SuffixOptions = typeof TYPE_NUMERIC | typeof TYPE_LETTER;
 
-  const [_, setSplitChildSampleRunConfig] = useLocalStorage<
+const TYPE_OPTIONS: { label: string; value: SuffixOptions }[] = [
+  {
+    label: TYPE_NUMERIC,
+    value: TYPE_NUMERIC
+  },
+  {
+    label: TYPE_LETTER,
+    value: TYPE_LETTER
+  }
+];
+
+export function ConfigAction({ router }: WithRouterProps) {
+  const { formatMessage } = useDinaIntl();
+  const parentId = router.query.id?.toString();
+
+  const materialSampleQuery = useMaterialSampleQuery(parentId as string);
+
+  const [storedRunConfig, setStoredRunConfig] = useLocalStorage<
     MaterialSampleRunConfig | null | undefined
   >(SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY);
 
-  type SuffixOptions = typeof TYPE_NUMERIC | typeof TYPE_LETTER;
-
-  const TYPE_OPTIONS: { label: string; value: SuffixOptions }[] = [
-    {
-      label: TYPE_NUMERIC,
-      value: TYPE_NUMERIC
-    },
-    {
-      label: TYPE_LETTER,
-      value: TYPE_LETTER
-    }
-  ];
-  const SplitChildHeader = () => (
-    <div className="d-flex">
-      <span className="col-md-1" />
-      <span className="col-md-3 fw-bold">{formatMessage("name")}</span>
-      <span className="col-md-3 fw-bold">{formatMessage("description")}</span>
-    </div>
+  const [generationMode, setGenerationMode] = useState(
+    storedRunConfig?.configure?.generationMode ?? "BATCH"
   );
 
   const onSubmit = async ({ submittedValues: configActionFields }) => {
-    // record the customized user entry if there is any name or description provided
-    const sampleNames: any = [];
-    const sampleDescs: any = [];
-    if (configActionFields.sampleName || configActionFields.description) {
-      for (let i = 0; i < configActionFields.numOfChildToCreate; i++) {
-        sampleNames.push(configActionFields.sampleName?.[i]);
-        sampleDescs.push(configActionFields.description?.[i]);
-      }
+    const childSampleNames: string[] = [];
+    for (let i = 0; i < configActionFields.numOfChildToCreate; i++) {
+      childSampleNames.push(configActionFields?.sampleNames?.[i]);
     }
+
     const runConfig: MaterialSampleRunConfig = {
       metadata: {
         actionRemarks: configActionFields.remarks
       },
       configure: {
-        numOfChildToCreate:
-          configActionFields.numOfChildToCreate ??
-          configActionFields.numOfChildToCreate,
+        generationMode,
+        numOfChildToCreate: configActionFields.numOfChildToCreate,
+        identifier: configActionFields.identifier,
         baseName: configActionFields.baseName ?? BASE_NAME,
-        start: configActionFields.start ?? START,
-        suffixType: configActionFields.suffixType,
+        ...(generationMode === "BATCH" && {
+          suffix: configActionFields.suffix
+        }),
+        ...(generationMode === "SERIES" && {
+          start: configActionFields.start ?? START,
+          suffixType: configActionFields.suffixType
+        }),
         destroyOriginal: configActionFields.destroyOriginal
       },
       configure_children: {
-        sampleNames,
-        sampleDescs
+        sampleNames: childSampleNames
       }
     };
 
     // save the runConfig to local storage
-    setSplitChildSampleRunConfig(runConfig);
+    setStoredRunConfig(runConfig);
     await router?.push(`/collection/material-sample/workflows/split-run`);
   };
 
@@ -115,22 +112,42 @@ export default function ConfigAction() {
     </ButtonBar>
   );
 
+  const initialConfig = storedRunConfig?.configure ?? {
+    suffixType: TYPE_NUMERIC,
+    numOfChildToCreate: 1,
+    start: "001",
+    identifier: "MATERIAL_SAMPLE_ID"
+  };
+
+  const initialConfigChild = storedRunConfig?.configure_children;
+
+  if (materialSampleQuery.loading) return null;
+
+  const { materialSampleName, dwcCatalogNumber } =
+    materialSampleQuery?.response?.data ?? {};
+
+  const computedInitConfigValues = {
+    ...initialConfig,
+    ...initialConfigChild,
+    ...(materialSampleName || dwcCatalogNumber
+      ? { baseName: materialSampleName || dwcCatalogNumber }
+      : {})
+  };
+
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
-        <DinaForm
-          initialValues={{
-            suffixType: TYPE_NUMERIC,
-            numOfChildToCreate: 1,
-            start: "001"
-          }}
-          onSubmit={onSubmit}
-        >
+        <h2>
+          {materialSampleName && dwcCatalogNumber
+            ? `${materialSampleName} | ${dwcCatalogNumber} `
+            : materialSampleName ?? dwcCatalogNumber}
+        </h2>
+        <DinaForm initialValues={computedInitConfigValues} onSubmit={onSubmit}>
           <p>
             <span className="fw-bold">{formatMessage("description")}:</span>
             {formatMessage("splitSampleDescription")}
@@ -148,89 +165,44 @@ export default function ConfigAction() {
             {formatMessage("stepLabel")}1: {formatMessage("configureLabel")}
           </p>
           <FieldSet legend={<DinaMessage id="splitSampleConfigLegend" />}>
-            <span className="fw-bold">
-              {formatMessage("splitSampleChildSamplesToCreateLabel")}{" "}
-            </span>
-            <div className="row">
-              <NumberSpinnerField
-                name="numOfChildToCreate"
-                className="col-md-2"
-                onChange={(newValue, formik) =>
-                  formik.setFieldValue("numOfChildToCreate", newValue)
-                }
-                hideLabel={true}
-                max={NUMERIC_UPPER_LIMIT}
-              />
-              <div className="col-md-4">
-                <CheckBoxWithoutWrapper
-                  name="destroyOriginal"
-                  includeAllLabel={formatMessage("destroyOriginal")}
-                />
-              </div>
-            </div>
-            <div className="row">
-              <TextField
-                className="col-md-2"
-                name="baseName"
-                placeholder={`${BASE_NAME}`}
-              />
-              <SelectField
-                className="col-md-2"
-                name="suffixType"
-                options={TYPE_OPTIONS}
-                onChange={(newType, formik) =>
-                  formik.setFieldValue(
-                    "start",
-                    newType === "Numerical" ? "001" : "A"
-                  )
-                }
-              />
-              <Field name="suffixType">
-                {({ field: { value: suffixType } }) => (
-                  <TextField
-                    className="col-md-2"
-                    // Select all text on click:
-                    inputProps={{ onClick: e => (e.target as any).select() }}
-                    name="start"
-                    numberOnly={suffixType === "Numerical"}
-                    letterOnly={suffixType === "Letter"}
-                  />
-                )}
-              </Field>
-            </div>
-            <div>
-              <div className="alert alert-warning d-inline-block">
-                <DinaMessage id="splitSampleInstructions" />
-              </div>
-              <SplitChildHeader />
-              <Field name="start">
-                {({
-                  form: {
-                    values: { start, suffixType, numOfChildToCreate, baseName }
-                  }
-                }) =>
-                  range(0, numOfChildToCreate).map(index => {
-                    const suffix = computeSuffix({
-                      index,
-                      start,
-                      suffixType
-                    });
-                    return (
-                      <SplitChildRow
-                        key={`${baseName}-${suffix}`}
-                        index={index}
-                        baseName={baseName}
-                        computedSuffix={suffix}
-                      />
-                    );
-                  })
-                }
-              </Field>
-            </div>
+            <Tabs
+              selectedIndex={MATERIAL_SAMPLE_GENERATION_MODES.indexOf(
+                generationMode
+              )}
+              onSelect={index =>
+                setGenerationMode(MATERIAL_SAMPLE_GENERATION_MODES[index])
+              }
+            >
+              <TabList>
+                <Tab className={`react-tabs__tab batch-tab`}>
+                  <DinaMessage id="generateBatch" />
+                </Tab>
+                <Tab className={`react-tabs__tab series-tab`}>
+                  <DinaMessage id="generateSeries" />
+                </Tab>
+              </TabList>
+              <TabPanel>
+                <SplitConfigFormFields generationMode={generationMode} />
+              </TabPanel>
+              <TabPanel>
+                <SplitConfigFormFields generationMode={generationMode} />
+              </TabPanel>
+            </Tabs>
           </FieldSet>
           {buttonBar}
         </DinaForm>
       </main>
+    </div>
+  );
+}
+
+function SplitChildHeader() {
+  return (
+    <div className="d-flex">
+      <span className="col-md-1" />
+      <span className="col-md-3 fw-bold">
+        <DinaMessage id="name" />
+      </span>
     </div>
   );
 }
@@ -255,7 +227,7 @@ export function computeSuffix({
       myStart = "A";
     }
     const sc = new SpreadSheetColumn();
-    return sc.fromInt(index + sc.fromStr(myStart));
+    return sc.fromInt(index + sc.fromStr(myStart)) as string;
   }
 }
 
@@ -265,29 +237,211 @@ interface SplitChildRowProps {
   computedSuffix: string;
 }
 
-function SplitChildRow({
-  index,
-  baseName,
-  computedSuffix
-}: SplitChildRowProps) {
+function SplitChildRow({ index }: SplitChildRowProps) {
   return (
     <div className="d-flex">
       <span className="col-md-1 fw-bold">#{index + 1}:</span>
       <TextField
-        className={`col-md-3 sampleName${index}`}
+        className={`col-md-3 sampleNames${index}`}
         hideLabel={true}
-        name={`sampleName[${index}]`}
-        placeholder={
-          baseName
-            ? `${baseName}-${computedSuffix}`
-            : `${BASE_NAME}-${computedSuffix}`
-        }
-      />
-      <TextField
-        className="col-md-3"
-        hideLabel={true}
-        name={`description[${index}]`}
+        name={`sampleNames[${index}]`}
       />
     </div>
   );
 }
+
+function computingSuffix(generationMode, suffix, index, start, suffixType) {
+  return generationMode === "BATCH"
+    ? suffix || ""
+    : generationMode === "SERIES"
+    ? `${computeSuffix({
+        index,
+        start,
+        suffixType
+      })}`
+    : "";
+}
+
+/**
+ * Sets the default sample names automatically when the generation inputs change,
+ * or when the user manually resets them.
+ */
+function useDefaultSampleNames(generationMode: MaterialSampleGenerationMode) {
+  const formikCtx = useFormikContext<MaterialSampleRunConfigConfiguration>();
+
+  function resetSampleNames() {
+    const newValues = { ...formikCtx.values };
+    const { suffix, start, suffixType, baseName, numOfChildToCreate } =
+      newValues;
+    range(0, numOfChildToCreate).map(index => {
+      const computedSuffix = computingSuffix(
+        generationMode,
+        suffix,
+        index,
+        start,
+        suffixType
+      );
+      formikCtx.setFieldValue(
+        `sampleNames[${index}]`,
+        `${baseName || BASE_NAME}${computedSuffix}`
+      );
+      formikCtx.setFieldTouched(`sampleNames[${index}]`, false);
+    });
+  }
+
+  useEffect(
+    // Set the child sample names based on all current state of affecting fields' values
+    resetSampleNames,
+    [
+      formikCtx.values.numOfChildToCreate,
+      formikCtx.values.baseName,
+      formikCtx.values.suffixType,
+      formikCtx.values.suffix,
+      formikCtx.values.numOfChildToCreate,
+      formikCtx.values.start
+    ]
+  );
+
+  const sampleNamesWereEdited = !!(formikCtx.touched as any).sampleNames?.some(
+    it => it
+  );
+
+  return { resetSampleNames, sampleNamesWereEdited };
+}
+
+interface SplitConfigFormProps {
+  generationMode: MaterialSampleGenerationMode;
+}
+
+function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
+  const { formatMessage } = useDinaIntl();
+
+  const { resetSampleNames, sampleNamesWereEdited } =
+    useDefaultSampleNames(generationMode);
+
+  return (
+    <div>
+      <span className="fw-bold">
+        {formatMessage("splitSampleChildSamplesToCreateLabel")}{" "}
+      </span>
+      <div className="row">
+        <NumberSpinnerField
+          name="numOfChildToCreate"
+          className="col-md-2"
+          hideLabel={true}
+          max={NUMERIC_UPPER_LIMIT}
+        />
+        <div className="col-md-4">
+          <CheckBoxWithoutWrapper
+            name="destroyOriginal"
+            includeAllLabel={formatMessage("destroyOriginal")}
+          />
+        </div>
+      </div>
+      <div className="row">
+        <SelectField
+          className="col-md-2"
+          name="identifier"
+          options={IDENTIFIER_TYPE_OPTIONS.map(({ labelKey, value }) => ({
+            label: formatMessage(labelKey),
+            value
+          }))}
+        />
+        <TextField className="col-md-2" name="baseName" />
+        {generationMode === "BATCH" && (
+          <TextField
+            name="suffix"
+            className="col-md-2"
+            label={<DinaMessage id="suffixOptional" />}
+          />
+        )}
+        {generationMode === "SERIES" && (
+          <>
+            <SelectField
+              className="col-md-2"
+              name="suffixType"
+              options={TYPE_OPTIONS}
+              onChange={(newType, formik) => {
+                formik.setFieldValue(
+                  "start",
+                  newType === "Numerical" ? "001" : "A"
+                );
+              }}
+            />
+            <Field name="suffixType">
+              {({ field: { value: suffixType } }) => (
+                <TextField
+                  className="col-md-2"
+                  // Select all text on click:
+                  inputProps={{
+                    onClick: e => (e.target as any).select()
+                  }}
+                  name="start"
+                  numberOnly={suffixType === "Numerical"}
+                  letterOnly={suffixType === "Letter"}
+                />
+              )}
+            </Field>
+          </>
+        )}
+      </div>
+      <div>
+        <div className="alert alert-warning d-inline-block">
+          <DinaMessage id="splitSampleInstructions" />
+        </div>
+        <div className="d-flex gap-3 mb-3">
+          <h4>
+            <DinaMessage id="previewAndCustomizeLabel" />
+          </h4>
+          {sampleNamesWereEdited && (
+            <button
+              className="btn btn-dark reset-sample-names"
+              type="button"
+              onClick={resetSampleNames}
+            >
+              <DinaMessage id="resetNamesToDefaultValues" />
+            </button>
+          )}
+        </div>
+        <SplitChildHeader />
+        <Field name="start">
+          {({
+            form: {
+              values: {
+                start,
+                suffix,
+                suffixType,
+                numOfChildToCreate,
+                baseName
+              }
+            }
+          }) =>
+            range(0, numOfChildToCreate).map(index => {
+              const computedSuffix = computingSuffix(
+                generationMode,
+                suffix,
+                index,
+                start,
+                suffixType
+              );
+              return (
+                <SplitChildRow
+                  key={
+                    generationMode === "BATCH"
+                      ? `${baseName}-${computedSuffix}-${index}`
+                      : `${baseName}-${computedSuffix}`
+                  }
+                  index={index}
+                  baseName={baseName}
+                  computedSuffix={computedSuffix}
+                />
+              );
+            })
+          }
+        </Field>
+      </div>
+    </div>
+  );
+}
+
+export default withRouter(ConfigAction);

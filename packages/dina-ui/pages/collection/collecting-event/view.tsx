@@ -9,7 +9,6 @@ import {
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { SourceAdministrativeLevel } from "packages/dina-ui/types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { Footer, Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
@@ -53,13 +52,13 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage("collectingEventViewTitle")} />
       <Nav />
-      {buttonBar}
       {withResponse(collectingEventQuery, ({ data: colEvent }) => {
         return (
           <main className="container-fluid">
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="collectingEventViewTitle" />
             </h1>
+            {buttonBar}
             <div className="mb-3">
               <DinaForm<CollectingEvent>
                 initialValues={colEvent}
@@ -68,10 +67,10 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
                 <CollectingEventFormLayout />
               </DinaForm>
             </div>
+            {buttonBar}
           </main>
         );
       })}
-      {buttonBar}
       <Footer />
     </div>
   );

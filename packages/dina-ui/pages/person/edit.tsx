@@ -34,7 +34,7 @@ export default function PersonEditPage() {
         {buttonBar}
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="editPersonTitle" />
             </h1>
             <Query<Person>
@@ -55,7 +55,7 @@ export default function PersonEditPage() {
           </div>
         ) : (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="addPersonTitle" />
             </h1>
             <PersonForm onSubmitSuccess={onSubmitSuccess} />

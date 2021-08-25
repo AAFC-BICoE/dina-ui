@@ -76,8 +76,9 @@ export default function MetadataListPage() {
   const [listLayoutType, setListLayoutType] =
     useLocalStorage<MetadataListLayoutType>(LIST_LAYOUT_STORAGE_KEY);
 
-  const [previewMetadataId, setPreviewMetadataId] =
-    useState<string | null>(null);
+  const [previewMetadataId, setPreviewMetadataId] = useState<string | null>(
+    null
+  );
   const [tableSectionWidth, previewSectionWidth] = previewMetadataId
     ? [8, 4]
     : [12, 0];
@@ -101,7 +102,10 @@ export default function MetadataListPage() {
     },
     dateCell("acDigitizationDate"),
     dateCell("xmpMetadataDate"),
-    { accessor: "acMetadataCreator.displayName", sortable: false },
+    {
+      accessor: "acMetadataCreator.displayName",
+      sortable: false
+    },
     {
       Cell: ({ original: { acTags } }) => <>{acTags?.join(", ")}</>,
       accessor: "acTags"
@@ -118,7 +122,7 @@ export default function MetadataListPage() {
           </button>
         </div>
       ),
-      Header: "",
+      Header: <div id="acPreviewLinksHeader">Preview Links</div>,
       sortable: false
     }
   ];
@@ -143,7 +147,7 @@ export default function MetadataListPage() {
       <main className="container-fluid">
         <div className="list-inline">
           <div className="list-inline-item">
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="objectListTitle" />
             </h1>
           </div>
@@ -169,7 +173,7 @@ export default function MetadataListPage() {
                   // Apply group filter:
                   ...(filterForm.group && { bucket: filterForm.group }),
                   // Filter out the derived objects e.g. thumbnails:
-                  rsql: "acSubTypeId==null"
+                  rsql: "acSubtypeId==null"
                 })}
                 defaultSort={[
                   {

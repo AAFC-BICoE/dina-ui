@@ -18,6 +18,7 @@ import {
 } from "common-ui";
 import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
+import { Vocabulary } from "../../types/collection-api";
 import { ChangeEvent, useRef, useState } from "react";
 import { ShouldRenderReasons } from "react-autosuggest";
 import Switch from "react-switch";
@@ -148,9 +149,13 @@ export function CollectingEventFormLayout({
       GeographicPlaceNameSource.OSM
     );
     if (isTemplate) {
-      // Include the hidden geographicPlaceNameSource value in the enabled template fields:
+      // Include the hidden geographicPlaceNameSource and sourceUrl values in the enabled template fields:
       formik.setFieldValue(
         "templateCheckboxes['geographicPlaceNameSource']",
+        true
+      );
+      formik.setFieldValue(
+        "templateCheckboxes['geographicPlaceNameSourceDetail.sourceUrl']",
         true
       );
     }
@@ -214,11 +219,16 @@ export function CollectingEventFormLayout({
       if (
         (addr.place_type === "province" || addr.place_type === "state") &&
         !formik.values[`${commonSrcDetailRoot}.stateProvince.name`]
-      )
+      ) {
         formik.setFieldValue(
           `${commonSrcDetailRoot}.stateProvince.name`,
           addr.localname
         );
+        formik.setFieldValue(
+          `${commonSrcDetailRoot}.stateProvince.placeType`,
+          addr.place_type
+        );
+      }
 
       detail = {};
     });
@@ -236,6 +246,10 @@ export function CollectingEventFormLayout({
       // Uncheck the templateCheckboxes in this form section:
       formik.setFieldValue(
         "templateCheckboxes['geographicPlaceNameSource']",
+        false
+      );
+      formik.setFieldValue(
+        "templateCheckboxes['geographicPlaceNameSourceDetail.sourceUrl']",
         false
       );
       formik.setFieldValue(
@@ -333,7 +347,6 @@ export function CollectingEventFormLayout({
         form.setFieldValue(field.attributes["name"]?.value, e.target.checked);
       });
   }
-
   return (
     <div ref={layoutWrapperRef}>
       {!isTemplate && (
@@ -375,13 +388,6 @@ export function CollectingEventFormLayout({
             <Field name="endEventDateTime">
               {({ field: { value: endEventDateTime }, form }) => (
                 <div>
-                  {(rangeEnabled || endEventDateTime) && (
-                    <FormattedTextField
-                      name="endEventDateTime"
-                      label={formatMessage("endEventDateTimeLabel")}
-                      placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
-                    />
-                  )}
                   {!readOnly && (
                     <label
                       className="mb-3"
@@ -396,6 +402,13 @@ export function CollectingEventFormLayout({
                         className="react-switch dateRange"
                       />
                     </label>
+                  )}
+                  {(rangeEnabled || endEventDateTime) && (
+                    <FormattedTextField
+                      name="endEventDateTime"
+                      label={formatMessage("endEventDateTimeLabel")}
+                      placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
+                    />
                   )}
                 </div>
               )}
@@ -477,12 +490,15 @@ export function CollectingEventFormLayout({
           <div className="row">
             <div className="col-md-6">
               <TextField name="dwcVerbatimLocality" />
-              <AutoSuggestTextField<CoordinateSystem>
+              <AutoSuggestTextField<Vocabulary>
                 name="dwcVerbatimCoordinateSystem"
-                configQuery={() => ({
-                  path: "collection-api/coordinate-system"
+                query={() => ({
+                  path: "collection-api/vocabulary/coordinateSystem"
                 })}
-                configSuggestion={src => src?.coordinateSystem ?? []}
+                suggestion={vocabElement =>
+                  vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ??
+                  ""
+                }
                 shouldRenderSuggestions={shouldRenderSuggestions}
                 onSuggestionSelected={onSuggestionSelected}
                 onChangeExternal={onChangeExternal}
@@ -572,12 +588,15 @@ export function CollectingEventFormLayout({
               </Field>
             </div>
             <div className="col-md-6">
-              <AutoSuggestTextField<SRS>
+              <AutoSuggestTextField<Vocabulary>
                 name="dwcVerbatimSRS"
-                configQuery={() => ({
-                  path: "collection-api/srs"
+                query={() => ({
+                  path: "collection-api/vocabulary/srs"
                 })}
-                configSuggestion={src => src?.srs ?? []}
+                suggestion={vocabElement =>
+                  vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ??
+                  ""
+                }
                 shouldRenderSuggestions={shouldRenderSuggestions}
                 onChangeExternal={onChangeExternal}
               />
@@ -719,6 +738,7 @@ export function CollectingEventFormLayout({
                                 </strong>
                               </label>
                               <input
+                                aria-label="customPlace"
                                 className="p-2 form-control"
                                 style={{ width: "60%" }}
                                 onChange={e =>
@@ -896,11 +916,12 @@ export function CollectingEventFormLayout({
               </div>
             </FieldSet>
           </div>
-          <div className="col-lg-6">
-            <FieldSet legend={<DinaMessage id="locationDescriptionLegend" />}>
-              <TextField name="habitat" />
-            </FieldSet>
-          </div>
+          <FieldSet legend={<DinaMessage id="collectingEventDetailsLegend" />}>
+            <div className="row">
+              <TextField name="habitat" className="col-md-6" />
+              <TextField name="host" className="col-md-6" />
+            </div>
+          </FieldSet>
         </div>
       </FieldSet>
       {!isTemplate && (

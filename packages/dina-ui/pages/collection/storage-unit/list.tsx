@@ -1,22 +1,36 @@
 import { ButtonBar, CreateButton, ListPageLayout, dateCell } from "common-ui";
 import Link from "next/link";
-import { Footer, GroupSelectField, Head, Nav } from "../../../components";
+import {
+  Footer,
+  GroupSelectField,
+  Head,
+  Nav,
+  StorageUnitBreadCrumb,
+  storageUnitDisplayName
+} from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 const STORAGE_UNIT_FILTER_ATTRIBUTES = ["name", "createdBy"];
 const STORAGE_UNIT_TABLE_COLUMNS = [
   {
-    Cell: ({ original: { id, name } }) => (
-      <Link href={`/collection/storage-unit/view?id=${id}`}>{name}</Link>
+    Cell: ({ original: storage }) => (
+      <Link href={`/collection/storage-unit/view?id=${storage.id}`}>
+        {storageUnitDisplayName(storage)}
+      </Link>
     ),
     accessor: "name"
+  },
+  {
+    Cell: ({ original }) => <StorageUnitBreadCrumb storageUnit={original} />,
+    accessor: "location",
+    sortable: false
   },
   "group",
   "createdBy",
   dateCell("createdOn")
 ];
 
-export default function StorageUnitListPage() {
+export default function storageUnitListPage() {
   const { formatMessage } = useDinaIntl();
 
   return (
@@ -24,7 +38,7 @@ export default function StorageUnitListPage() {
       <Head title={formatMessage("storageUnitListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="storageUnitListTitle" />
         </h1>
         <ButtonBar>
@@ -39,7 +53,8 @@ export default function StorageUnitListPage() {
           id="storage-unit-list"
           queryTableProps={{
             columns: STORAGE_UNIT_TABLE_COLUMNS,
-            path: "collection-api/storage-unit"
+            path: "collection-api/storage-unit",
+            include: "hierarchy,storageUnitType"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">

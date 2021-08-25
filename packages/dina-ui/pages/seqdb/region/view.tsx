@@ -28,7 +28,7 @@ export function RegionDetailsPage({ router }: WithRouterProps) {
       <Query<Region> query={{ path: `seqdb-api/region/${id}` }}>
         {({ loading, response }) => (
           <main className="container-fluid">
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="regionViewTitle" />
             </h1>
             <LoadingSpinner loading={loading} />

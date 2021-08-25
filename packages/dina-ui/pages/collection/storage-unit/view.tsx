@@ -1,14 +1,17 @@
 import {
   BackButton,
   ButtonBar,
-  DeleteButton,
   DinaForm,
   EditButton,
+  Tooltip,
+  useApiClient,
+  useModal,
+  useQuery,
   withResponse
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { Head, Nav, storageUnitDisplayName } from "../../../components";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitFormFields, useStorageUnit } from "./edit";
@@ -17,37 +20,86 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
   const id = router.query.id?.toString();
   const { formatMessage } = useDinaIntl();
 
+  const { save } = useApiClient();
+
+  const { openModal } = useModal();
+
   const storageUnitQuery = useStorageUnit(id);
+  const childrenQuery = useQuery<StorageUnit[]>(
+    {
+      path: `collection-api/storage-unit/${id}/storageUnitChildren`
+    },
+    { disabled: !id }
+  );
+  const children = childrenQuery.response?.data;
+
+  const storageUnit = storageUnitQuery.response?.data;
+
+  async function moveAllContentToNewContainer(submittedValues) {
+    const parentUnit = submittedValues.parentStorageUnit;
+    // Set first level children to new parent
+    if (children) {
+      await save(
+        children.map(child => ({
+          resource: {
+            type: child.type,
+            id: child.id,
+            parentStorageUnit: parentUnit
+          },
+          type: "storage-unit"
+        })),
+        { apiBaseUrl: "/collection-api" }
+      );
+    }
+    // Move to the new parent unit's page:
+    await router.push(`/collection/storage-unit/view?id=${parentUnit.id}`);
+  }
 
   return (
     <div>
-      <Head title={formatMessage("storageUnitViewTitle")} />
       <Nav />
       <main className="container">
-        {withResponse(storageUnitQuery, ({ data: storageUnit }) => (
-          <DinaForm<StorageUnit> initialValues={storageUnit} readOnly={true}>
+        {withResponse(storageUnitQuery, ({ data: strgUnit }) => {
+          const hasChildren = !!children?.length;
+
+          const editButton = (
+            <EditButton
+              entityId={strgUnit.id}
+              entityLink="collection/storage-unit"
+              disabled={hasChildren}
+            />
+          );
+
+          const buttonBar = (
             <ButtonBar>
               <BackButton
-                entityId={storageUnit.id}
+                entityId={strgUnit.id}
                 entityLink="/collection/storage-unit"
                 byPassView={true}
               />
-              <EditButton
-                className="ms-auto"
-                entityId={storageUnit.id}
-                entityLink="collection/storage-unit"
-              />
-              <DeleteButton
-                className="ms-5"
-                id={id}
-                options={{ apiBaseUrl: "/collection-api" }}
-                postDeleteRedirect="/collection/storage-unit/list"
-                type="storage-unit"
-              />
+              <div className="ms-auto">
+                {hasChildren ? (
+                  <Tooltip
+                    visibleElement={editButton}
+                    id="notEditableWhenThereAreChildStorageUnits"
+                  />
+                ) : (
+                  editButton
+                )}
+              </div>
             </ButtonBar>
-            <StorageUnitFormFields />
-          </DinaForm>
-        ))}
+          );
+
+          return (
+            <>
+              <Head title={storageUnitDisplayName(strgUnit)} />
+              {buttonBar}
+              <DinaForm<StorageUnit> initialValues={strgUnit} readOnly={true}>
+                <StorageUnitFormFields />
+              </DinaForm>
+            </>
+          );
+        })}
       </main>
     </div>
   );

@@ -24,7 +24,7 @@ const mockApiContext = { apiClient: { get: mockGet } };
 jest.spyOn(lodash, "debounce").mockImplementation((fn: any) => fn);
 
 describe("resource-select-cell", () => {
-  it("Provides a select cell that queries the back-end.", async done => {
+  it("Provides a select cell that queries the back-end.", done => {
     mockGet.mockImplementationOnce(async () => ({
       data: [
         { id: "1", type: "todo", name: "todo 1" },
@@ -65,7 +65,7 @@ describe("resource-select-cell", () => {
     mountWithAppContext(<TestComponent />, { apiContext: mockApiContext });
   });
 
-  it("Does not submit a filter when the cell already has an encoded resource in it.", async done => {
+  it("Does not submit a filter when the cell already has an encoded resource in it.", done => {
     mockGet.mockImplementationOnce(async () => ({
       data: [
         { id: "1", type: "todo", name: "todo 1" },
@@ -111,9 +111,8 @@ describe("resource-select-cell", () => {
       TD.innerHTML = `<div class="htAutocompleteArrow">▼</div>Mat Poff (agent/0c900d69-c04c-491f-850a-fa72c089ff6d)`;
     });
 
-    const userFriendlyAutoCompleteRenderer = getUserFriendlyAutoCompleteRenderer(
-      mockOriginalAutocompleteRenderer
-    );
+    const userFriendlyAutoCompleteRenderer =
+      getUserFriendlyAutoCompleteRenderer(mockOriginalAutocompleteRenderer);
 
     // Apply the custom renderer:
     userFriendlyAutoCompleteRenderer(null, td);

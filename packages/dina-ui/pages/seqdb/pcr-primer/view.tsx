@@ -28,11 +28,11 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
       </ButtonBar>
 
       <Query<PcrPrimer>
-        query={{ include: "region", path: `seqdb-api/pcrPrimer/${id}` }}
+        query={{ include: "region", path: `seqdb-api/pcr-primer/${id}` }}
       >
         {({ loading, response }) => (
           <main className="container-fluid">
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="pcrPrimerViewTitle" />
             </h1>
             <LoadingSpinner loading={loading} />

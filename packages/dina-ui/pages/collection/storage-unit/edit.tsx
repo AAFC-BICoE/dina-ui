@@ -4,37 +4,65 @@ import {
   DateField,
   DinaForm,
   DinaFormSubmitParams,
+  filterBy,
+  ResourceSelectField,
   SubmitButton,
   TextField,
   useDinaFormContext,
   useQuery,
   withResponse
 } from "common-ui";
+import { Field } from "formik";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
+import { object } from "yup";
 import {
   GroupSelectField,
   Head,
   Nav,
-  StorageLinkerField
+  StorageLinkerField,
+  StorageUnitBreadCrumb,
+  StorageUnitChildrenViewer,
+  storageUnitDisplayName
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { StorageUnit } from "../../../types/collection-api";
+import { StorageUnit, StorageUnitType } from "../../../types/collection-api";
+
+const storageUnitFormSchema = object({
+  storageUnitType: object().required()
+});
 
 export function useStorageUnit(id?: string) {
   return useQuery<StorageUnit>(
-    { path: `collection-api/storage-unit/${id}`, include: "parentStorageUnit" },
-    { disabled: !id }
+    {
+      path: `collection-api/storage-unit/${id}`,
+      include: "storageUnitType,parentStorageUnit"
+    },
+    {
+      disabled: !id,
+      // parentStorageUnit must be fetched separately to include its hierarchy:
+      joinSpecs: [
+        {
+          apiBaseUrl: "/collection-api",
+          idField: "parentStorageUnit.id",
+          joinField: "parentStorageUnit",
+          path: storageUnit =>
+            `storage-unit/${storageUnit.parentStorageUnit?.id}?include=hierarchy`
+        }
+      ]
+    }
   );
 }
 
 export default function StorageUnitEditPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
-
   const id = router.query.id?.toString();
+  const parentId = router.query.parentId?.toString();
 
   const storageUnitQuery = useStorageUnit(id);
+
+  const initialParentStorageUnitQuery = useStorageUnit(parentId);
 
   const title = id ? "editStorageUnitTitle" : "addStorageUnitTitle";
 
@@ -47,13 +75,26 @@ export default function StorageUnitEditPage() {
       <Head title={formatMessage(title)} />
       <Nav />
       <div className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id={title} />
         </h1>
         {id ? (
           withResponse(storageUnitQuery, ({ data }) => (
-            <StorageUnitForm storageUnit={data} onSaved={goToViewPage} />
+            <>
+              <Head title={storageUnitDisplayName(data)} />
+              <StorageUnitForm storageUnit={data} onSaved={goToViewPage} />
+            </>
           ))
+        ) : parentId ? (
+          withResponse(
+            initialParentStorageUnitQuery,
+            ({ data: initialParent }) => (
+              <StorageUnitForm
+                initialParent={initialParent}
+                onSaved={goToViewPage}
+              />
+            )
+          )
         ) : (
           <StorageUnitForm onSaved={goToViewPage} />
         )}
@@ -63,15 +104,20 @@ export default function StorageUnitEditPage() {
 }
 
 export interface StorageUnitFormProps {
+  initialParent?: PersistedResource<StorageUnit>;
   storageUnit?: PersistedResource<StorageUnit>;
   onSaved: (storageUnit: PersistedResource<StorageUnit>) => Promise<void>;
 }
 
 export function StorageUnitForm({
+  initialParent,
   storageUnit,
   onSaved
 }: StorageUnitFormProps) {
-  const initialValues = storageUnit || { type: "storage-unit" };
+  const initialValues = storageUnit || {
+    type: "storage-unit",
+    parentStorageUnit: initialParent
+  };
 
   async function onSubmit({
     submittedValues,
@@ -103,6 +149,7 @@ export function StorageUnitForm({
   return (
     <DinaForm<Partial<StorageUnit>>
       initialValues={initialValues}
+      validationSchema={storageUnitFormSchema}
       onSubmit={onSubmit}
     >
       {buttonBar}
@@ -113,28 +160,46 @@ export function StorageUnitForm({
 
 /** Re-usable field layout between edit and view pages. */
 export function StorageUnitFormFields() {
-  const { initialValues, readOnly } = useDinaFormContext();
+  const { readOnly, initialValues } = useDinaFormContext();
 
   return (
     <div>
+      <Field>
+        {({ form: { values: storageUnit } }) => (
+          <h2>
+            <StorageUnitBreadCrumb
+              storageUnit={storageUnit}
+              // Don't have the page link to itself:
+              disableLastLink={true}
+            />
+          </h2>
+        )}
+      </Field>
       <div className="row">
         <GroupSelectField
           name="group"
           enableStoredDefaultGroup={true}
-          className="col-sm-6"
+          className="col-md-6"
         />
       </div>
       <div className="row">
-        <TextField className="col-sm-6" name="name" />
+        <ResourceSelectField<StorageUnitType>
+          className="col-md-6"
+          model="collection-api/storage-unit-type"
+          name="storageUnitType"
+          optionLabel={it => it.name}
+          filter={filterBy(["name"])}
+          omitNullOption={true}
+          readOnlyLink="/collection/storage-unit-type/view?id="
+        />
+        <TextField className="col-md-6" name="name" />
       </div>
-      <StorageLinkerField
-        name="parentStorageUnit"
-        excludeOptionId={initialValues.id}
-      />
+      <StorageLinkerField name="parentStorageUnit" />
+      {readOnly && <StorageUnitChildrenViewer parentId={initialValues.id} />}
       {readOnly && (
         <div className="row">
-          <DateField className="col-sm-6" name="createdOn" />
-          <TextField className="col-sm-6" name="createdBy" />
+          <DateField className="col-md-6" name="createdOn" />
+          <TextField className="col-md-6" name="createdBy" />
         </div>
       )}
     </div>

@@ -45,7 +45,7 @@ export default function PcrProfileListPage() {
         <CreateButton entityLink="/seqdb/pcr-profile" />
       </ButtonBar>
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <SeqdbMessage id="pcrProfileListTitle" />
         </h1>
         <ListPageLayout
@@ -54,7 +54,7 @@ export default function PcrProfileListPage() {
           queryTableProps={{
             columns: PCRPROFILE_TABLE_COLUMNS,
             include: "region",
-            path: "seqdb-api/thermocyclerprofile"
+            path: "seqdb-api/thermocycler-profile"
           }}
         />
       </main>

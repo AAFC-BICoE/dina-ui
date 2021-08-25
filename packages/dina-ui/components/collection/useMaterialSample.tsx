@@ -1,7 +1,14 @@
-import { AreYouSureModal, DinaForm } from "common-ui";
+import {
+  AreYouSureModal,
+  DinaForm,
+  DinaFormSubmitParams,
+  useApiClient,
+  useModal,
+  useQuery
+} from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { cloneDeep, isEmpty, isEqual } from "lodash";
+import { cloneDeep, fromPairs, isEmpty, isEqual, pick, toPairs } from "lodash";
 import {
   Dispatch,
   SetStateAction,
@@ -10,12 +17,6 @@ import {
   useState
 } from "react";
 import { useCollectingEventQuery, useCollectingEventSave } from ".";
-import {
-  DinaFormSubmitParams,
-  useApiClient,
-  useModal,
-  useQuery
-} from "../../../common-ui/lib";
 import {
   CollectingEvent,
   MaterialSample
@@ -27,7 +28,8 @@ import {
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
-import { toPairs, fromPairs } from "lodash";
+import { DETERMINATION_FIELDS } from "./DeterminationField";
+import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -36,7 +38,7 @@ export function useMaterialSampleQuery(id?: string | null) {
     {
       path: `collection-api/material-sample/${id}`,
       include:
-        "collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit"
+        "collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit,hierarchy"
     },
     {
       disabled: !id,
@@ -97,7 +99,7 @@ export interface UseMaterialSampleSaveParams {
   colEventTemplateInitialValues?: Partial<CollectingEvent> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
-  preparationsTemplateInitialValues?: Partial<MaterialSample> & {
+  materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 
@@ -111,23 +113,17 @@ export interface UseMaterialSampleSaveParams {
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
 }
 
-const PREPARATION_FIELDS: (keyof MaterialSample)[] = [
-  "preparationType",
-  "preparationDate",
-  "preparedBy"
-];
-
 export function useMaterialSampleSave({
   materialSample,
   collectingEventInitialValues: collectingEventInitialValuesProp,
   onSaved,
   collectingEvtFormRef,
   isTemplate,
-  colEventTemplateInitialValues,
   enabledFields,
   materialSampleAttachmentsConfig,
   collectingEventAttachmentsConfig,
-  preparationsTemplateInitialValues
+  colEventTemplateInitialValues,
+  materialSampleTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
@@ -136,10 +132,28 @@ export function useMaterialSampleSave({
     isTemplate &&
     (!isEmpty(colEventTemplateInitialValues?.templateCheckboxes) ||
       colEventTemplateInitialValues?.id);
-  // For editing existing templates:
   const hasPreparationsTemplate =
     isTemplate &&
-    !isEmpty(preparationsTemplateInitialValues?.templateCheckboxes);
+    !isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        ...PREPARATION_FIELDS
+      )
+    );
+
+  const hasStorageTemplate =
+    isTemplate &&
+    materialSampleTemplateInitialValues?.templateCheckboxes?.storageUnit;
+
+  // For editing existing templates:
+  const hasDeterminationTemplate =
+    isTemplate &&
+    !isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        ...DETERMINATION_FIELDS.map(field => `determination[0].${field}`)
+      )
+    );
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(
@@ -161,12 +175,73 @@ export function useMaterialSampleSave({
     )
   );
 
-  const initialValues: InputResource<MaterialSample> = materialSample
-    ? { ...materialSample }
-    : {
-        type: "material-sample",
-        managedAttributes: {}
+  const [enableStorage, setEnableStorage] = useState(
+    // Show the Storage section if the storage field is set or the template enables it:
+    Boolean(
+      hasStorageTemplate ||
+        materialSample?.storageUnit?.id ||
+        enabledFields?.materialSample?.includes("storageUnit")
+    )
+  );
+
+  const [enableDetermination, setEnableDetermination] = useState(
+    Boolean(
+      hasDeterminationTemplate ||
+        // Show the determination section if a field is set or the field is enabled:
+        materialSample?.determination?.some(det => !isEmpty(det)) ||
+        enabledFields?.materialSample?.some(enabledField =>
+          enabledField.startsWith("determination[")
+        )
+    )
+  );
+
+  // The state describing which Data components (Form sections) are enabled:
+  const dataComponentState = {
+    enableCollectingEvent,
+    setEnableCollectingEvent,
+    enablePreparations,
+    setEnablePreparations,
+    enableStorage,
+    setEnableStorage,
+    enableDetermination,
+    setEnableDetermination,
+    /** Wraps the useState setter with an AreYouSure modal when setting to false. */
+    dataComponentToggler(
+      setBoolean: Dispatch<SetStateAction<boolean>>,
+      componentName: string
+    ) {
+      return function toggleDataComponent(enabled: boolean) {
+        if (!enabled) {
+          // When removing data, ask the user for confirmation first:
+          openModal(
+            <AreYouSureModal
+              actionMessage={
+                <DinaMessage
+                  id="removeComponentData"
+                  values={{ component: componentName }}
+                />
+              }
+              onYesButtonClicked={() => setBoolean(enabled)}
+            />
+          );
+        } else {
+          setBoolean(enabled);
+        }
       };
+    }
+  };
+
+  const initialValues: InputResource<MaterialSample> = {
+    ...(materialSample
+      ? { ...materialSample }
+      : {
+          type: "material-sample",
+          managedAttributes: {}
+        }),
+    determination: materialSample?.determination?.length
+      ? materialSample?.determination
+      : [{}]
+  };
 
   /** Used to get the values of the nested CollectingEvent form. */
   const colEventFormRef =
@@ -211,37 +286,12 @@ export function useMaterialSampleSave({
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
     const dataComponents = document?.querySelectorAll<HTMLDivElement>(
-      ".data-components > fieldset:not(.d-none)"
+      ".data-components fieldset:not(.d-none)"
     );
     dataComponents?.forEach((element, index) => {
       element.style.backgroundColor = index % 2 === 0 ? "#f3f3f3" : "";
     });
   });
-
-  /** Wraps the useState setter with an AreYouSure modal when setting to false. */
-  function dataComponentToggler(
-    setBoolean: Dispatch<SetStateAction<boolean>>,
-    componentName: string
-  ) {
-    return function toggleDataComponent(enabled: boolean) {
-      if (!enabled) {
-        // When removing data, ask the user for confirmation first:
-        openModal(
-          <AreYouSureModal
-            actionMessage={
-              <DinaMessage
-                id="removeComponentData"
-                values={{ component: componentName }}
-              />
-            }
-            onYesButtonClicked={() => setBoolean(enabled)}
-          />
-        );
-      } else {
-        setBoolean(enabled);
-      }
-    };
-  }
 
   async function onSubmit({
     api: { save },
@@ -256,12 +306,15 @@ export function useMaterialSampleSave({
 
     // Only persist the preparation fields if the preparations toggle is enabled:
     if (!enablePreparations) {
-      materialSampleInput.preparationType = {
+      Object.assign(materialSampleInput, BLANK_PREPARATION);
+    }
+
+    // Only persist the storage link if the Storage toggle is enabled:
+    if (!enableStorage) {
+      materialSampleInput.storageUnit = {
         id: null,
-        type: "preparation-type"
+        type: "storage-unit"
       };
-      materialSampleInput.preparationDate = null;
-      materialSampleInput.preparedBy = { id: null };
     }
 
     if (!enableCollectingEvent) {
@@ -329,6 +382,11 @@ export function useMaterialSampleSave({
 
     delete materialSampleInput.managedAttributeValues;
 
+    // Only persist determination when enabled
+    if (!enableDetermination) {
+      materialSampleInput.determination = [];
+    }
+
     // Save the MaterialSample:
     const [savedMaterialSample] = await save(
       [
@@ -365,11 +423,7 @@ export function useMaterialSampleSave({
   return {
     initialValues,
     nestedCollectingEventForm,
-    dataComponentToggler,
-    enablePreparations,
-    setEnablePreparations,
-    enableCollectingEvent,
-    setEnableCollectingEvent,
+    dataComponentState,
     colEventId,
     setColEventId,
     colEventQuery,

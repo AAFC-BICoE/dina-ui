@@ -7,25 +7,33 @@ import {
   FieldSet,
   withResponse
 } from "common-ui";
-import { Field, FastField } from "formik";
+import { FastField, Field } from "formik";
+import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { Head, Nav, StorageLinkerField } from "../../../components";
+import {
+  Head,
+  MaterialSampleBreadCrumb,
+  Nav,
+  StorageLinkerField
+} from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
+import { DeterminationField } from "../../../components/collection/DeterminationField";
+import {
+  PreparationField,
+  PREPARATION_FIELDS
+} from "../../../components/collection/PreparationField";
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
 import { useMaterialSampleQuery } from "../../../components/collection/useMaterialSample";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
+import { ManagedAttributesViewer } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import {
   MaterialSampleIdentifiersFormLayout,
-  MaterialSampleMainInfoFormLayout,
-  PreparationsFormLayout
+  MaterialSampleMainInfoFormLayout
 } from "./edit";
-import { ManagedAttributesViewer } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
-import { toPairs } from "lodash";
-import { ManagedAttributeValues } from "packages/dina-ui/types/objectstore-api/resources/ManagedAttributeMap";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -41,17 +49,24 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const collectingEvent = colEventQuery.response?.data;
 
   const buttonBar = (
-    <ButtonBar>
+    <ButtonBar className="flex">
       <BackButton
         entityId={id as string}
         entityLink="/collection/material-sample"
         byPassView={true}
+        className="flex-grow-1"
       />
       <EditButton
-        className="ms-auto"
         entityId={id as string}
         entityLink="collection/material-sample"
       />
+      <Link
+        href={`/collection/material-sample/workflows/split-config?id=${id}`}
+      >
+        <a className="btn btn-info">
+          <DinaMessage id="splitButton" />
+        </a>
+      </Link>
       <DeleteButton
         className="ms-5"
         id={id as string}
@@ -67,26 +82,30 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <Head title={formatMessage("materialSampleViewTitle")} />
       <Nav />
       {withResponse(materialSampleQuery, ({ data: materialSample }) => {
-        const hasPreparations = Boolean(
-          materialSample.preparationType ||
-            materialSample.preparationDate ||
-            materialSample.preparedBy
+        const hasPreparations = PREPARATION_FIELDS.some(
+          fieldName => materialSample[fieldName]
         );
+
+        const hasDetermination = materialSample?.determination?.some(
+          det => !isEmpty(det)
+        );
+
         return (
           <main className="container-fluid">
             {buttonBar}
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="materialSampleViewTitle" />
             </h1>
             <DinaForm<MaterialSample>
               initialValues={materialSample}
               readOnly={true}
             >
+              <MaterialSampleBreadCrumb
+                materialSample={materialSample}
+                disableLastLink={true}
+              />
               <MaterialSampleMainInfoFormLayout />
               <MaterialSampleIdentifiersFormLayout />
-              <div className="card card-body mb-3">
-                <StorageLinkerField name="storageUnit" />
-              </div>
               {collectingEvent && (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                   <DinaForm initialValues={collectingEvent} readOnly={true}>
@@ -103,7 +122,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   </DinaForm>
                 </FieldSet>
               )}
-              {hasPreparations && <PreparationsFormLayout />}
+              {hasPreparations && <PreparationField />}
+              {hasDetermination && <DeterminationField />}
+              {materialSample.storageUnit && (
+                <div className="card card-body mb-3">
+                  <StorageLinkerField name="storageUnit" />
+                </div>
+              )}
               <FieldSet
                 legend={<DinaMessage id="materialSampleManagedAttributes" />}
               >

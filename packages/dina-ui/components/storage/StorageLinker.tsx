@@ -1,7 +1,8 @@
+import { FieldWrapper } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { FieldWrapper } from "../../../common-ui/lib";
+import { Promisable } from "type-fest";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
 import { AssignedStorage } from "./AssignedStorage";
@@ -10,72 +11,73 @@ import { StorageSearchSelector } from "./StorageSearchSelector";
 
 export interface StorageLinkerProps {
   value?: PersistedResource<StorageUnit>;
-  onChange: (newValue: PersistedResource<StorageUnit>) => void;
-  fieldName: string;
-
-  /** Disable this option ID e.g. to avoid putting a storage unit inside itself. */
-  excludeOptionId?: string;
+  onChange: (newValue: PersistedResource<StorageUnit>) => Promisable<void>;
 }
 
 /** Multi-Tab Storage Assignment UI. */
 export function StorageLinker({
   onChange: onChangeProp,
-  value,
-  fieldName,
-  excludeOptionId
+  value
 }: StorageLinkerProps) {
-  const [activeTab, setActiveTab] = useState(value ? 0 : 1);
+  const [activeTab, setActiveTab] = useState(0);
 
-  function changeStorageAndResetTab(newValue: PersistedResource<StorageUnit>) {
-    onChangeProp(newValue);
+  async function changeStorageAndResetTab(
+    newValue: PersistedResource<StorageUnit>
+  ) {
+    await onChangeProp(newValue);
     setActiveTab(0);
   }
 
-  return (
+  return value?.id ? (
+    <AssignedStorage value={value} onChange={onChangeProp} />
+  ) : (
     <Tabs selectedIndex={activeTab} onSelect={setActiveTab}>
-      <TabList>
-        <Tab>
-          <DinaMessage id="assignedStorage" />
-        </Tab>
-        <Tab>
-          <DinaMessage id="searchStorage" />
-        </Tab>
-        <Tab>
-          <DinaMessage id="browseStorageTree" />
-        </Tab>
+      <TabList className="react-tabs__tab-list mb-0">
+        {!value?.id && (
+          <Tab>
+            <DinaMessage id="searchStorage" />
+          </Tab>
+        )}
+        {!value?.id && (
+          <Tab>
+            <DinaMessage id="browseStorageTree" />
+          </Tab>
+        )}
       </TabList>
-      <TabPanel>
-        <AssignedStorage value={value} onChange={onChangeProp} />
-      </TabPanel>
-      <TabPanel>
-        <StorageSearchSelector
-          fieldName={fieldName}
-          excludeOptionId={excludeOptionId}
-        />
-      </TabPanel>
-      <TabPanel>
-        <div style={{ maxHeight: "50rem", overflowY: "scroll" }}>
-          <BrowseStorageTree
-            onSelect={changeStorageAndResetTab}
-            excludeOptionId={excludeOptionId}
-          />
-        </div>
-      </TabPanel>
+      <div
+        className="card-body border-top-0"
+        style={{
+          border: "1px solid rgb(170, 170, 170)",
+          height: "60rem",
+          overflowY: "scroll"
+        }}
+      >
+        {!value?.id && (
+          <TabPanel>
+            <StorageSearchSelector onChange={changeStorageAndResetTab} />
+          </TabPanel>
+        )}
+        {!value?.id && (
+          <TabPanel>
+            <BrowseStorageTree onSelect={changeStorageAndResetTab} />
+          </TabPanel>
+        )}
+      </div>
     </Tabs>
   );
 }
 
 export interface StorageLinkerFieldProps {
   name: string;
-
-  /** Disable this option ID e.g. to avoid putting a storage unit inside itself. */
-  excludeOptionId?: string;
+  customName?: string;
+  removeLabelTag?: boolean;
 }
 
 /** DinaForm-connected Storage Assignment UI. */
 export function StorageLinkerField({
   name,
-  excludeOptionId
+  customName,
+  removeLabelTag
 }: StorageLinkerFieldProps) {
   return (
     <FieldWrapper
@@ -84,14 +86,11 @@ export function StorageLinkerField({
         <AssignedStorage readOnly={true} value={value} />
       )}
       disableLabelClick={true}
+      customName={customName}
+      removeLabelTag={removeLabelTag}
     >
       {({ value, setValue }) => (
-        <StorageLinker
-          fieldName={name}
-          value={value}
-          onChange={setValue}
-          excludeOptionId={excludeOptionId}
-        />
+        <StorageLinker value={value} onChange={setValue} />
       )}
     </FieldWrapper>
   );

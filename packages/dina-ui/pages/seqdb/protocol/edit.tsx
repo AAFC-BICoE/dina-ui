@@ -37,7 +37,7 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
       <main className="container-fluid">
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="editProtocolTitle" />
             </h1>
             <Query<Protocol>
@@ -55,7 +55,7 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="addProtocolTitle" />
             </h1>
             <ProtocolForm router={router} />
@@ -111,7 +111,7 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
           <SelectField
             className="col-md-2"
             name="type"
-            label="Potocol Type"
+            label="Protocol Type"
             options={PROTOCOL_TYPE_OPTIONS}
           />
           <TextField className="col-md-2" name="name" />

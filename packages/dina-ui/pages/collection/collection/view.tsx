@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { Head, Nav } from "../../../components";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Collection } from "../../../types/collection-api";
 import { CollectionFormFields } from "./edit";
 import { withRouter } from "next/router";
@@ -27,6 +27,9 @@ export function CollectionDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("collectionViewTitle")} />
       <Nav />
       <main className="container">
+        <h1 id="wb-cont">
+          <DinaMessage id="collectionViewTitle" />
+        </h1>
         <ButtonBar>
           <BackButton
             entityId={id}

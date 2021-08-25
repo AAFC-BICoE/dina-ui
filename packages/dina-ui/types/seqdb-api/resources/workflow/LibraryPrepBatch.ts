@@ -6,9 +6,9 @@ import { Protocol } from "../Protocol";
 import { IndexSet } from "./IndexSet";
 
 interface LibraryPrepBatchAttributes {
+  type: "library-prep-batch";
   name: string;
   totalLibraryYieldNm?: number | null;
-  type: "libraryPrepBatch";
   notes?: string | null;
   cleanUpNotes?: string | null;
   yieldNotes?: string | null;

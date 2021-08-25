@@ -1,24 +1,24 @@
+import { startCase } from "lodash";
 import { useIntl } from "react-intl";
-import titleCase from "title-case";
 import { Tooltip } from "../tooltip/Tooltip";
 
 export interface FieldNameProps {
-  name: string,
+  name: string;
 
   /** Override the default "name" prop used to get labels and tooltips from the intl messages. */
-  customName?: string,
+  customName?: string;
 
   /** Optional image source to display an image in a tooltip. */
-  tooltipImage?: string,
+  tooltipImage?: string;
 
   /** Optional image alt text for image accessability. */
-  tooltipImageAlt?: string,
+  tooltipImageAlt?: string;
 
   /** Optional link. */
-  tooltipLink?: string,
+  tooltipLink?: string;
 
   /** Optional link text, should be used when adding a link. */
-  tooltipLinkText?: string
+  tooltipLinkText?: string;
 }
 
 /** Get the field label and tooltip given the camelCase field key. */
@@ -32,7 +32,6 @@ export function useFieldLabels() {
     tooltipLink,
     tooltipLinkText
   }: FieldNameProps) {
-
     const messageKey = `field_${name}`;
     const tooltipKey = `${messageKey}_tooltip`;
 
@@ -49,7 +48,7 @@ export function useFieldLabels() {
 
     const fieldLabel = messages[messageKey]
       ? formatMessage({ id: messageKey as any })
-      : titleCase(name);
+      : startCase(name);
 
     return { tooltip, fieldLabel };
   }
@@ -70,14 +69,13 @@ export function FieldHeader({
   tooltipLink,
   tooltipLinkText
 }: FieldNameProps) {
-
   const { getFieldLabel } = useFieldLabels();
   const { fieldLabel, tooltip } = getFieldLabel({
     name: customName ?? name,
-    tooltipImage: tooltipImage,
-    tooltipImageAlt: tooltipImageAlt,
-    tooltipLink: tooltipLink,
-    tooltipLinkText: tooltipLinkText
+    tooltipImage,
+    tooltipImageAlt,
+    tooltipLink,
+    tooltipLinkText
   });
 
   return (

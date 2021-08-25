@@ -7,10 +7,11 @@ import { SeqdbMessage } from "../intl/seqdb-intl";
 const Home: React.FunctionComponent = () => (
   <div>
     <Head title="Home" />
+
     <Nav />
     <main role="main">
       <div className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="dinaHomeH1" />
         </h1>
         <h2>
@@ -105,6 +106,13 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
           <li>
+            <Link href="/seqdb/pcr-batch/list">
+              <a>
+                <SeqdbMessage id="pcrBatchListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
             <Link href="/seqdb/product/list">
               <a>
                 <SeqdbMessage id="productListTitle" />
@@ -122,6 +130,13 @@ const Home: React.FunctionComponent = () => (
             <Link href="/seqdb/region/list">
               <a>
                 <SeqdbMessage id="regionListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
+            <Link href="/seqdb/molecular-sample/list">
+              <a>
+                <SeqdbMessage id="molecularSampleListTitle" />
               </a>
             </Link>
           </li>
@@ -207,10 +222,15 @@ const Home: React.FunctionComponent = () => (
               </a>
             </Link>
           </li>
+        </ul>
+        <h2>
+          <DinaMessage id="workbookTitle" />
+        </h2>
+        <ul>
           <li>
-            <Link href="/collection/material-sample/workflows/split-config">
+            <Link href="/workbook/upload">
               <a>
-                <DinaMessage id="splitWorkflowRunTitle" />
+                <DinaMessage id="workbookGroupUploadTitle" />
               </a>
             </Link>
           </li>

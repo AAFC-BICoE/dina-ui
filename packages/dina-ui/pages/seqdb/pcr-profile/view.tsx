@@ -28,12 +28,12 @@ export function PcrProfileDetailsPage({ router }: WithRouterProps) {
       <Query<PcrProfile>
         query={{
           include: "region",
-          path: `seqdb-api/thermocyclerprofile/${id}`
+          path: `seqdb-api/thermocycler-profile/${id}`
         }}
       >
         {({ loading, response }) => (
           <main className="container-fluid">
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="pcrProfileViewTitle" />
             </h1>
             <LoadingSpinner loading={loading} />

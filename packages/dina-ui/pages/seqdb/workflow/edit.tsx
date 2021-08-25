@@ -31,7 +31,7 @@ export function ChainEditPage({ router }: WithRouterProps) {
       <main className="container-fluid">
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="editWorkflowTitle" />
             </h1>
             <Query<Chain>
@@ -52,7 +52,7 @@ export function ChainEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="addWorkflowTitle" />
             </h1>
             <ChainForm router={router} />
@@ -101,7 +101,7 @@ function ChainForm({ chain, router }: ChainFormProps) {
               label="Workflow Template"
               name="chainTemplate"
               filter={filterBy(["name"])}
-              model="seqdb-api/chainTemplate"
+              model="seqdb-api/chain-template"
               optionLabel={template => template.name}
             />
           </div>

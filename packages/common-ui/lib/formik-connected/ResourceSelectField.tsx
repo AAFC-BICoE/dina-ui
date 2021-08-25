@@ -25,12 +25,8 @@ export interface ResourceSelectFieldProps<TData extends KitsuResource>
 export function ResourceSelectField<TData extends KitsuResource>(
   resourceSelectFieldProps: ResourceSelectFieldProps<TData>
 ) {
-  const {
-    name,
-    onChange,
-    readOnlyLink,
-    ...resourceSelectProps
-  } = resourceSelectFieldProps;
+  const { name, onChange, readOnlyLink, ...resourceSelectProps } =
+    resourceSelectFieldProps;
 
   return (
     <FieldWrapper
@@ -60,18 +56,21 @@ export function ResourceSelectField<TData extends KitsuResource>(
         );
       }}
     >
-      {({ setValue, value }) => {
+      {({ setValue, value, invalid }) => {
         function onChangeInternal(resource) {
           setValue(resource);
           onChange?.(resource);
         }
 
         return (
-          <ResourceSelect
-            {...resourceSelectProps}
-            onChange={onChangeInternal}
-            value={value}
-          />
+          <div className={invalid ? "is-invalid" : ""}>
+            <ResourceSelect
+              {...resourceSelectProps}
+              invalid={invalid}
+              onChange={onChangeInternal}
+              value={value}
+            />
+          </div>
         );
       }}
     </FieldWrapper>

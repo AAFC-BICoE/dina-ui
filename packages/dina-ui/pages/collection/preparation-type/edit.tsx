@@ -41,7 +41,7 @@ export default function PreparationTypeEditPage() {
       <Nav />
       <main className="container">
         <div>
-          <h1>
+          <h1 id="wb-cont">
             <DinaMessage id={title} />
           </h1>
           {id ? (

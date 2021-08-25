@@ -38,7 +38,7 @@ export default function WorkflowViewPage() {
         <BackToListButton entityLink="/seqdb/workflow" />
       </ButtonBar>
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           {formatMessage("workflowViewTitle")}
           {response && `: ${response.data.name}`}
         </h1>
@@ -53,7 +53,7 @@ function WorkflowSteps({ chain }: { chain: PersistedResource<Chain> }) {
   const { loading, response } = useQuery<ChainStepTemplate[]>({
     filter: { "chainTemplate.uuid": chain.chainTemplate.id as string },
     include: "stepTemplate",
-    path: "seqdb-api/chainStepTemplate"
+    path: "seqdb-api/chain-step-template"
   });
 
   const router = useRouter();

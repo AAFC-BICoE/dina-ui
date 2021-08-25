@@ -32,7 +32,7 @@ export const SubmitButton = connect<SubmitButtonProps>(
       <button
         {...buttonPropsObj}
         className={`btn ${className} ${hidePrimaryClass ? "" : "btn-primary"}`}
-        style={{ ...buttonPropsObj.style, width: "10rem" }}
+        style={{ width: "10rem", ...buttonPropsObj.style }}
         type="submit"
       >
         {children || <CommonMessage id="submitBtnText" />}
