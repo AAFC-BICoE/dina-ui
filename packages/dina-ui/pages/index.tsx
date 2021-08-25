@@ -7,10 +7,11 @@ import { SeqdbMessage } from "../intl/seqdb-intl";
 const Home: React.FunctionComponent = () => (
   <div>
     <Head title="Home" />
+
     <Nav />
     <main role="main">
       <div className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="dinaHomeH1" />
         </h1>
         <h2>

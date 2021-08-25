@@ -27,7 +27,7 @@ export function CollectionDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("collectionViewTitle")} />
       <Nav />
       <main className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="collectionViewTitle" />
         </h1>
         <ButtonBar>

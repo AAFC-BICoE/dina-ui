@@ -28,7 +28,7 @@ export default function MolecularSampleListPage() {
       <Head title={title} />
       <Nav />
       <main className="container-fluid">
-        <h1>{title}</h1>
+        <h1 id="wb-cont">{title}</h1>
         <ButtonBar>
           <CreateButton entityLink="/seqdb/molecular-sample" />
         </ButtonBar>

@@ -21,7 +21,6 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../dina-ui/types/collection-api";
-import { ScientificNameSource } from "../../../dina-ui/types/collection-api/resources/Determination";
 import {
   ManagedAttributeValues,
   Metadata
@@ -39,7 +38,7 @@ export function useMaterialSampleQuery(id?: string | null) {
     {
       path: `collection-api/material-sample/${id}`,
       include:
-        "collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit"
+        "collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit,hierarchy"
     },
     {
       disabled: !id,
@@ -384,14 +383,7 @@ export function useMaterialSampleSave({
     delete materialSampleInput.managedAttributeValues;
 
     // Only persist determination when enabled
-    if (enableDetermination) {
-      materialSampleInput.determination?.map(det => {
-        if (det) {
-          det.scientificName = det?.verbatimScientificName;
-          det.scientificNameSource = ScientificNameSource.COLPLUS;
-        }
-      });
-    } else {
+    if (!enableDetermination) {
       materialSampleInput.determination = [];
     }
 

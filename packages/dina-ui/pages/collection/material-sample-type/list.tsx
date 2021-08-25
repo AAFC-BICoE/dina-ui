@@ -26,7 +26,7 @@ export default function MaterialSampleTypeListPage() {
       <Head title={formatMessage("materialSampleTypeListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="materialSampleTypeListTitle" />
         </h1>
         <ButtonBar>

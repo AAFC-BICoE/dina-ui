@@ -6,18 +6,18 @@ import {
   FieldSet,
   SelectField,
   SubmitButton,
-  TextField,
-  useCollapser
+  TextField
 } from "common-ui";
-import { Field } from "formik";
-import { WithRouterProps } from "next/dist/client/with-router";
+import { Field, FieldProps, FormikContextType, useFormikContext } from "formik";
 import { padStart, range } from "lodash";
-import { useMaterialSampleQuery } from "../../../../../dina-ui/components/collection/useMaterialSample";
-import React, { useState, ReactNode } from "react";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { withRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";
 import NumberSpinnerField from "../../../../../common-ui/lib/formik-connected/NumberSpinnerField";
 import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
+import { useMaterialSampleQuery } from "../../../../../dina-ui/components/collection/useMaterialSample";
 import { Head } from "../../../../../dina-ui/components/head";
 import {
   BASE_NAME,
@@ -32,9 +32,6 @@ import {
   TYPE_NUMERIC
 } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
-import { withRouter } from "next/router";
-import { useEffect } from "react";
-import { useFormikContext } from "formik";
 
 /* Props for computing suffix */
 export interface ComputeSuffixProps {
@@ -58,31 +55,6 @@ const TYPE_OPTIONS: { label: string; value: SuffixOptions }[] = [
     value: TYPE_LETTER
   }
 ];
-
-interface CollapsableSectionProps {
-  children: ReactNode;
-  collapserId: string;
-  title: ReactNode;
-}
-
-/** Wrapper for the collapsible sections of the details UI. */
-function CollapsableSection({
-  children,
-  collapserId,
-  title
-}: CollapsableSectionProps) {
-  const { Collapser, collapsed } = useCollapser(`split-preview-${collapserId}`);
-
-  return (
-    <div className="mb-3">
-      <h4>
-        {title}
-        <Collapser />
-      </h4>
-      {!collapsed && children}
-    </div>
-  );
-}
 
 export function ConfigAction({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -149,22 +121,25 @@ export function ConfigAction({ router }: WithRouterProps) {
 
   const initialConfigChild = storedRunConfig?.configure_children;
 
-  const computedInitConfigValues = { ...initialConfig, ...initialConfigChild };
-
   if (materialSampleQuery.loading) return null;
+
   const { materialSampleName, dwcCatalogNumber } =
     materialSampleQuery?.response?.data ?? {};
-  if (materialSampleName || dwcCatalogNumber)
-    Object.assign(computedInitConfigValues, {
-      baseName: materialSampleName ?? dwcCatalogNumber
-    });
+
+  const computedInitConfigValues = {
+    ...initialConfig,
+    ...initialConfigChild,
+    ...(materialSampleName || dwcCatalogNumber
+      ? { baseName: materialSampleName || dwcCatalogNumber }
+      : {})
+  };
 
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
         <h2>
@@ -262,11 +237,7 @@ interface SplitChildRowProps {
   computedSuffix: string;
 }
 
-function SplitChildRow({
-  index,
-  baseName,
-  computedSuffix
-}: SplitChildRowProps) {
+function SplitChildRow({ index }: SplitChildRowProps) {
   return (
     <div className="d-flex">
       <span className="col-md-1 fw-bold">#{index + 1}:</span>
@@ -274,7 +245,6 @@ function SplitChildRow({
         className={`col-md-3 sampleNames${index}`}
         hideLabel={true}
         name={`sampleNames[${index}]`}
-        placeholder={`${baseName || BASE_NAME}${computedSuffix}`}
       />
     </div>
   );
@@ -292,42 +262,62 @@ function computingSuffix(generationMode, suffix, index, start, suffixType) {
     : "";
 }
 
-const setChildSampleNames = (formik, generationMode) => {
-  const newValues = { ...formik.values };
-  const { suffix, start, suffixType, baseName, numOfChildToCreate } = newValues;
-  range(0, numOfChildToCreate).map(index => {
-    const computedSuffix = computingSuffix(
-      generationMode,
-      suffix,
-      index,
-      start,
-      suffixType
-    );
-    formik.setFieldValue(
-      `sampleNames[${index}]`,
-      `${baseName || BASE_NAME}${computedSuffix}`
-    );
-    formik.setFieldTouched(`sampleNames[${index}]`);
-  });
-};
+/**
+ * Sets the default sample names automatically when the generation inputs change,
+ * or when the user manually resets them.
+ */
+function useDefaultSampleNames(generationMode: MaterialSampleGenerationMode) {
+  const formikCtx = useFormikContext<MaterialSampleRunConfigConfiguration>();
+
+  function resetSampleNames() {
+    const newValues = { ...formikCtx.values };
+    const { suffix, start, suffixType, baseName, numOfChildToCreate } =
+      newValues;
+    range(0, numOfChildToCreate).map(index => {
+      const computedSuffix = computingSuffix(
+        generationMode,
+        suffix,
+        index,
+        start,
+        suffixType
+      );
+      formikCtx.setFieldValue(
+        `sampleNames[${index}]`,
+        `${baseName || BASE_NAME}${computedSuffix}`
+      );
+      formikCtx.setFieldTouched(`sampleNames[${index}]`, false);
+    });
+  }
+
+  useEffect(
+    // Set the child sample names based on all current state of affecting fields' values
+    resetSampleNames,
+    [
+      formikCtx.values.numOfChildToCreate,
+      formikCtx.values.baseName,
+      formikCtx.values.suffixType,
+      formikCtx.values.suffix,
+      formikCtx.values.numOfChildToCreate,
+      formikCtx.values.start
+    ]
+  );
+
+  const sampleNamesWereEdited = !!(formikCtx.touched as any).sampleNames?.some(
+    it => it
+  );
+
+  return { resetSampleNames, sampleNamesWereEdited };
+}
+
 interface SplitConfigFormProps {
   generationMode: MaterialSampleGenerationMode;
 }
 
 function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
   const { formatMessage } = useDinaIntl();
-  const formikCtx = useFormikContext<MaterialSampleRunConfigConfiguration>();
-  useEffect(() => {
-    // Set the child sample names based on all current state of affecting fields' values
-    setChildSampleNames(formikCtx, generationMode);
-  }, [
-    formikCtx.values.numOfChildToCreate,
-    formikCtx.values.baseName,
-    formikCtx.values.suffixType,
-    formikCtx.values.suffix,
-    formikCtx.values.numOfChildToCreate,
-    formikCtx.values.start
-  ]);
+
+  const { resetSampleNames, sampleNamesWereEdited } =
+    useDefaultSampleNames(generationMode);
 
   return (
     <div>
@@ -357,11 +347,7 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
             value
           }))}
         />
-        <TextField
-          className="col-md-2"
-          name="baseName"
-          placeholder={BASE_NAME}
-        />
+        <TextField className="col-md-2" name="baseName" />
         {generationMode === "BATCH" && (
           <TextField
             name="suffix"
@@ -403,49 +389,59 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
         <div className="alert alert-warning d-inline-block">
           <DinaMessage id="splitSampleInstructions" />
         </div>
-        <CollapsableSection
-          collapserId={generationMode}
-          title={formatMessage("previewAndCustomizeLabel")}
-        >
-          <SplitChildHeader />
-          <Field name="start">
-            {({
-              form: {
-                values: {
-                  start,
-                  suffix,
-                  suffixType,
-                  numOfChildToCreate,
-                  baseName
-                }
+        <div className="d-flex gap-3 mb-3">
+          <h4>
+            <DinaMessage id="previewAndCustomizeLabel" />
+          </h4>
+          {sampleNamesWereEdited && (
+            <button
+              className="btn btn-dark reset-sample-names"
+              type="button"
+              onClick={resetSampleNames}
+            >
+              <DinaMessage id="resetNamesToDefaultValues" />
+            </button>
+          )}
+        </div>
+        <SplitChildHeader />
+        <Field name="start">
+          {({
+            form: {
+              values: {
+                start,
+                suffix,
+                suffixType,
+                numOfChildToCreate,
+                baseName
               }
-            }) =>
-              range(0, numOfChildToCreate).map(index => {
-                const computedSuffix = computingSuffix(
-                  generationMode,
-                  suffix,
-                  index,
-                  start,
-                  suffixType
-                );
-                return (
-                  <SplitChildRow
-                    key={
-                      generationMode === "BATCH"
-                        ? `${computedSuffix}-${index}`
-                        : `${computedSuffix}`
-                    }
-                    index={index}
-                    baseName={baseName}
-                    computedSuffix={computedSuffix}
-                  />
-                );
-              })
             }
-          </Field>
-        </CollapsableSection>
+          }) =>
+            range(0, numOfChildToCreate).map(index => {
+              const computedSuffix = computingSuffix(
+                generationMode,
+                suffix,
+                index,
+                start,
+                suffixType
+              );
+              return (
+                <SplitChildRow
+                  key={
+                    generationMode === "BATCH"
+                      ? `${baseName}-${computedSuffix}-${index}`
+                      : `${baseName}-${computedSuffix}`
+                  }
+                  index={index}
+                  baseName={baseName}
+                  computedSuffix={computedSuffix}
+                />
+              );
+            })
+          }
+        </Field>
       </div>
     </div>
   );
 }
+
 export default withRouter(ConfigAction);

@@ -40,7 +40,7 @@ export default function CollectingEventEditPage() {
       <main className="container-fluid">
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="editCollectingEventTitle" />
             </h1>
             {withResponse(collectingEventQuery, ({ data }) => (

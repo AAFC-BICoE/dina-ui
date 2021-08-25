@@ -388,13 +388,6 @@ export function CollectingEventFormLayout({
             <Field name="endEventDateTime">
               {({ field: { value: endEventDateTime }, form }) => (
                 <div>
-                  {(rangeEnabled || endEventDateTime) && (
-                    <FormattedTextField
-                      name="endEventDateTime"
-                      label={formatMessage("endEventDateTimeLabel")}
-                      placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
-                    />
-                  )}
                   {!readOnly && (
                     <label
                       className="mb-3"
@@ -409,6 +402,13 @@ export function CollectingEventFormLayout({
                         className="react-switch dateRange"
                       />
                     </label>
+                  )}
+                  {(rangeEnabled || endEventDateTime) && (
+                    <FormattedTextField
+                      name="endEventDateTime"
+                      label={formatMessage("endEventDateTimeLabel")}
+                      placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
+                    />
                   )}
                 </div>
               )}
@@ -916,11 +916,12 @@ export function CollectingEventFormLayout({
               </div>
             </FieldSet>
           </div>
-          <div className="col-lg-6">
-            <FieldSet legend={<DinaMessage id="locationDescriptionLegend" />}>
-              <TextField name="habitat" />
-            </FieldSet>
-          </div>
+          <FieldSet legend={<DinaMessage id="collectingEventDetailsLegend" />}>
+            <div className="row">
+              <TextField name="habitat" className="col-md-6" />
+              <TextField name="host" className="col-md-6" />
+            </div>
+          </FieldSet>
         </div>
       </FieldSet>
       {!isTemplate && (

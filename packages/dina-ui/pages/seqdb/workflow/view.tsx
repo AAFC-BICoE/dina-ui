@@ -38,7 +38,7 @@ export default function WorkflowViewPage() {
         <BackToListButton entityLink="/seqdb/workflow" />
       </ButtonBar>
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           {formatMessage("workflowViewTitle")}
           {response && `: ${response.data.name}`}
         </h1>

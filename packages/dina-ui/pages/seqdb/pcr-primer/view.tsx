@@ -32,7 +32,7 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
       >
         {({ loading, response }) => (
           <main className="container-fluid">
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="pcrPrimerViewTitle" />
             </h1>
             <LoadingSpinner loading={loading} />

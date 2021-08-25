@@ -44,6 +44,7 @@ export interface CollectingEventAttributes {
   srcAdminLevels?: SourceAdministrativeLevel[];
 
   habitat?: string;
+  host?: string;
 
   managedAttributeValues?: ManagedAttributeValues;
   managedAttributes?: JsonValue;

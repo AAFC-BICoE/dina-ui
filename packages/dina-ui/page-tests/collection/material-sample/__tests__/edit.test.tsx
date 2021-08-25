@@ -7,8 +7,6 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
-import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
-import { SRS } from "../../../../types/collection-api/resources/SRS";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -39,16 +37,6 @@ function testMaterialSample(): PersistedResource<MaterialSample> {
   };
 }
 
-const TEST_SRS: SRS = {
-  srs: ["NAD27 (EPSG:4276)", "WGS84 (EPSG:4326)"],
-  type: "srs"
-};
-
-const TEST_COORDINATES: CoordinateSystem = {
-  coordinateSystem: ["decimal degrees", " degrees decimal"],
-  type: "coordinate-system"
-};
-
 const TEST_MANAGED_ATTRIBUTE = {
   id: "1",
   type: "managed-attribute",
@@ -62,18 +50,16 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/collecting-event/1?include=collectors,attachment":
       // Populate the linker table:
       return { data: testCollectionEvent() };
-    case "collection-api/srs":
-      return { data: [TEST_SRS] };
-    case "collection-api/coordinate-system":
-      return { data: [TEST_COORDINATES] };
     case "collection-api/preparation-type":
     case "collection-api/managed-attribute":
+    case "collection-api/material-sample":
     case "collection-api/material-sample-type":
     case "user-api/group":
     case "agent-api/person":
     case "collection-api/vocabulary/srs":
     case "collection-api/vocabulary/coordinateSystem":
     case "collection-api/vocabulary/degreeOfEstablishment":
+    case "collection-api/vocabulary/typeStatus":
     case "collection-api/storage-unit-type":
     case "collection-api/storage-unit":
     case "objectstore-api/metadata":
@@ -570,6 +556,86 @@ describe("Material Sample Edit Page", () => {
         {
           apiBaseUrl: "/collection-api"
         }
+      ]
+    ]);
+  });
+
+  it("Submits a new Material Sample with 3 Determinations.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm onSaved={mockOnSaved} />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "test-material-sample-id" } });
+
+    // Enable Collecting Event and catalogue info form sections:
+    wrapper.find(".enable-determination").find(Switch).prop<any>("onChange")(
+      true
+    );
+
+    wrapper.update();
+
+    function fillOutDetermination(num: number) {
+      wrapper
+        .find(".verbatimScientificName-field input")
+        .last()
+        .simulate("change", { target: { value: `test-name-${num}` } });
+      wrapper
+        .find(".verbatimDeterminer-field input")
+        .last()
+        .simulate("change", { target: { value: `test-agent-${num}` } });
+    }
+
+    // Enter the first determination:
+    fillOutDetermination(1);
+
+    // Enter the second determination:
+    wrapper.find("button.add-determination-button").simulate("click");
+    await new Promise(setImmediate);
+    fillOutDetermination(2);
+
+    // Enter the third determination:
+    wrapper.find("button.add-determination-button").simulate("click");
+    await new Promise(setImmediate);
+    fillOutDetermination(3);
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Saves the Material Sample:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              // The 3 determinations are added:
+              determination: [
+                {
+                  verbatimDeterminer: "test-agent-1",
+                  verbatimScientificName: "test-name-1"
+                },
+                {
+                  verbatimDeterminer: "test-agent-2",
+                  verbatimScientificName: "test-name-2"
+                },
+                {
+                  verbatimDeterminer: "test-agent-3",
+                  verbatimScientificName: "test-name-3"
+                }
+              ],
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
       ]
     ]);
   });

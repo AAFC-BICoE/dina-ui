@@ -43,7 +43,7 @@ export default function WorkflowTemplateListPage() {
       <Head title={formatMessage("workflowTemplateListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="workflowTemplateListTitle" />
         </h1>
         <ButtonBar>

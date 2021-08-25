@@ -28,7 +28,7 @@ export default function CollectingEventListPage() {
       <Head title={formatMessage("collectingEventListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="collectingEventListTitle" />
         </h1>
         <ButtonBar>

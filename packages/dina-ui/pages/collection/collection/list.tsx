@@ -41,7 +41,7 @@ export default function CollectionListPage() {
       <Head title={formatMessage("collectionListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="collectionListTitle" />
         </h1>
         <ButtonBar>

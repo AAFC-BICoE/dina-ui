@@ -1,62 +1,87 @@
 import { LanguageSelector, NavbarUserControl, useAccount } from "common-ui";
 import Link from "next/link";
 import React from "react";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
+import { useContext } from "react";
+import { intlContext } from "../../../../common-ui/lib/intl/IntlSupport";
 
 export function Nav() {
   const { roles } = useAccount();
+  const { formatMessage } = useDinaIntl();
+  const { locale } = useContext(intlContext);
 
   // Only show the Users UI to collection-managers and admins:
   const showUsersLinks =
     roles.includes("collection-manager") || roles.includes("admin");
 
   return (
-    <header className="py-3">
-      <div id="wb-bnr" className="container">
-        <div className="row d-flex">
-          <div
-            className="brand col-5 col-md-4"
-            property="publisher"
-            typeof="GovernmentOrganization"
-          >
-            <img
-              src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/assets/sig-blk-en.svg"
-              alt=""
-              property="logo"
-            />
-            <span className="wb-inv" property="name">
-              <DinaMessage id="governmentOfCanada" />
-            </span>
-            <meta property="areaServed" typeof="Country" content="Canada" />
+    <>
+      <nav>
+        <ul id="wb-tphp" className="wb-inv wb-init wb-disable-inited">
+          <li className="wb-slc">
+            <a className="wb-sl" href="#wb-cont">
+              <DinaMessage id="skipToMainContent" />
+            </a>
+          </li>
+          <li className="wb-slc visible-sm visible-md visible-lg">
+            <a className="wb-sl" href="#wb-info">
+              <DinaMessage id="skipToAboutThisApplication" />
+            </a>
+          </li>
+          <li className="wb-slc">
+            <a className="wb-sl" rel="alternate" href="?wbdisable=true">
+              <DinaMessage id="skipToBasicHtmlVersion" />
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <header className="py-3">
+        <div id="wb-bnr" className="container">
+          <div className="row d-flex">
+            <div
+              className="brand col-5 col-md-4"
+              property="publisher"
+              typeof="GovernmentOrganization"
+            >
+              <img
+                src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/assets/sig-blk-en.svg"
+                alt={formatMessage("governmentOfCanada")}
+                property="logo"
+              />
+              <span className="wb-inv" property="name" tabIndex={0}>
+                <span lang={locale}>
+                  <DinaMessage id="governmentOfCanada" />
+                </span>
+              </span>
+              <meta property="areaServed" typeof="Country" content="Canada" />
+            </div>
+            <section id="wb-lng" className="text-end ms-auto col-7 col-md-8">
+              <ul className="list-inline">
+                <li className="list-inline-item mx-2">
+                  <NavbarUserControl />
+                </li>
+                <li className="list-inline-item mx-2 my-auto">
+                  <a
+                    className="btn btn-info"
+                    href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
+                    target="_blank"
+                  >
+                    <DinaMessage id="feedbackButtonText" />
+                  </a>
+                </li>
+                <li className="list-inline-item mx-2">
+                  <LanguageSelector />
+                </li>
+              </ul>
+            </section>
           </div>
-          <section id="wb-lng" className="text-end ms-auto col-7 col-md-8">
-            <ul className="list-inline">
-              <li className="list-inline-item mx-2">
-                <NavbarUserControl />
-              </li>
-              <li className="list-inline-item mx-2 my-auto">
-                <a
-                  className="btn btn-info"
-                  style={{ backgroundColor: "#117C8D" }}
-                  href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
-                  target="_blank"
-                >
-                  <DinaMessage id="feedbackButtonText" />
-                </a>
-              </li>
-              <li className="list-inline-item mx-2">
-                <LanguageSelector />
-              </li>
-            </ul>
-          </section>
         </div>
-      </div>
-      <div className="app-bar">
-        <div className="container">
-          <ul className="list-inline d-flex m-0">
-            <style>
-              {`
+        <div className="app-bar">
+          <div className="container">
+            <ul className="list-inline d-flex m-0">
+              <style>
+                {`
                 .dropdown:hover .dropdown-menu {
                     display: block;
                 }
@@ -64,35 +89,36 @@ export function Nav() {
                   color: rgb(232, 230, 227);
                 }
               `}
-            </style>
-            <li className="list-inline-item me-4">
-              <Link href="/">
-                <a className="app-name px-0">
-                  <DinaMessage id="appTitle" />
-                </a>
-              </Link>
-            </li>
-            <li className="list-inline-item my-auto">
-              <NavObjectStoreDropdown />
-            </li>
-            <li className="list-inline-item my-auto">
-              <NavAgentsDropdown />
-            </li>
-            <li className="list-inline-item my-auto">
-              <NavSeqDBDropdown />
-            </li>
-            <li className="list-inline-item my-auto">
-              <NavCollectionDropdown />
-            </li>
-            {showUsersLinks && (
-              <li className="list-inline-item my-auto">
-                <NavDinaUserDropdown />
+              </style>
+              <li className="list-inline-item me-4">
+                <Link href="/">
+                  <a className="app-name px-0">
+                    <DinaMessage id="appTitle" />
+                  </a>
+                </Link>
               </li>
-            )}
-          </ul>
+              <li className="list-inline-item my-auto">
+                <NavObjectStoreDropdown />
+              </li>
+              <li className="list-inline-item my-auto">
+                <NavAgentsDropdown />
+              </li>
+              <li className="list-inline-item my-auto">
+                <NavSeqDBDropdown />
+              </li>
+              <li className="list-inline-item my-auto">
+                <NavCollectionDropdown />
+              </li>
+              {showUsersLinks && (
+                <li className="list-inline-item my-auto">
+                  <NavDinaUserDropdown />
+                </li>
+              )}
+            </ul>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }
 

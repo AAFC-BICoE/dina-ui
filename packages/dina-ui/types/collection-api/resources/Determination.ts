@@ -1,6 +1,6 @@
 export interface Determination {
   verbatimScientificName?: string;
-  verbatimAgent?: string;
+  verbatimDeterminer?: string;
   verbatimDate?: string;
   typeStatus?: string;
   typeStatusEvidence?: string;
@@ -8,6 +8,7 @@ export interface Determination {
   determinedOn?: string;
   qualifier?: string;
   scientificNameSource?: ScientificNameSource;
+  scientificNameDetails?: string;
   scientificName?: string;
 }
 

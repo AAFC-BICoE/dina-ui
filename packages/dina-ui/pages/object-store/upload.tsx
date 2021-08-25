@@ -119,7 +119,7 @@ export default function UploadPage() {
       <Head title={formatMessage("uploadPageTitle")} />
       <Nav />
       <main className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="uploadPageTitle" />
         </h1>
         {!accountInitialized || !groupNames?.length ? (
