@@ -84,6 +84,11 @@ declare module "kitsu" {
   export interface KitsuResource {
     id?: string;
     type: string;
+    meta?: {
+      permissionsProvider?: string;
+      permissions?: string[];
+      warnings?: any;
+    };
   }
 
   export type KitsuResourceLink =

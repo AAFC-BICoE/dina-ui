@@ -14,6 +14,8 @@ import { Collection } from "../../../types/collection-api";
 import { CollectionFormFields } from "./edit";
 import { withRouter } from "next/router";
 
+export const PERMISSIONS = ["create", "update", "delete"] as const;
+
 export function CollectionDetailsPage({ router }: WithRouterProps) {
   const id = String(router.query.id);
   const { formatMessage } = useDinaIntl();
@@ -35,15 +37,15 @@ export function CollectionDetailsPage({ router }: WithRouterProps) {
           entityLink="/collection/collection"
           byPassView={true}
         />
-        {(collection.meta?.permissions?.includes("create") ||
-          collection.meta?.permissions?.includes("update")) && (
+        {(collection.meta?.permissions?.includes(PERMISSIONS?.[0]) ||
+          collection.meta?.permissions?.includes(PERMISSIONS?.[1])) && (
           <EditButton
             className="ms-auto"
             entityId={id}
             entityLink="collection/collection"
           />
         )}
-        {collection.meta?.permissions?.includes("delete") && (
+        {collection.meta?.permissions?.includes(PERMISSIONS?.[2]) && (
           <DeleteButton
             className="ms-5"
             id={id}
