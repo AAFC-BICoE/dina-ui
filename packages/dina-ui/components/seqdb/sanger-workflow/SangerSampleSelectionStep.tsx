@@ -130,10 +130,7 @@ export function SangerSampleSelectionStep({
             }
           ]
         })("")}
-        defaultSort={[
-          { id: "sample.name", desc: false },
-          { id: "sample.version", desc: false }
-        ]}
+        defaultSort={[{ id: "sample.name", desc: false }]}
         reactTableProps={{ sortable: false }}
         onSuccess={response => setRemoveablePcrBatchItems(response.data)}
         path="seqdb-api/pcr-batch-item"
@@ -209,10 +206,7 @@ export function SangerSampleSelectionStep({
                   filter={
                     searchValue ? filterBy(["name"])(searchValue) : undefined
                   }
-                  defaultSort={[
-                    { id: "name", desc: false },
-                    { id: "version", desc: false }
-                  ]}
+                  defaultSort={[{ id: "name", desc: false }]}
                   reactTableProps={{ sortable: false }}
                   onSuccess={response => setAvailableSamples(response.data)}
                   path="seqdb-api/molecular-sample"
