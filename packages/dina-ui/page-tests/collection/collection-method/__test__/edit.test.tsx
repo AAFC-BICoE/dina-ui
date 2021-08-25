@@ -18,9 +18,7 @@ jest.mock("next/router", () => ({
 /** Mock next.js' router "push" function for navigating pages. */
 const mockPush = jest.fn();
 
-const mockRouter = {
-  push: mockPush
-};
+const mockOnSaved = jest.fn();
 
 /** The mock URL query string params. */
 let mockQuery: any = {};
@@ -35,7 +33,9 @@ const mockGet = jest.fn(async model => {
   }
 });
 
-const mockPatch = jest.fn();
+const mockPatch = jest.fn(() => ({
+  data: [{ data: TEST_COLLECTION_METHOD, status: 201 }] as OperationsResponse
+}));
 
 const apiContext: any = {
   apiClient: { get: mockGet, axios: { patch: mockPatch } }
@@ -47,10 +47,6 @@ describe("collection-method edit page", () => {
     mockQuery = {};
   });
   it("Provides a form to add a collection-method.", async () => {
-    mockPatch.mockImplementationOnce(() => ({
-      data: [{ data: TEST_COLLECTION_METHOD, status: 201 }]
-    }));
-
     const wrapper = mountWithAppContext(<CollectionMethodEditPage />, {
       apiContext
     });
@@ -92,18 +88,16 @@ describe("collection-method edit page", () => {
   });
 
   it("Edits an existing collection method.", async () => {
-    mockPatch.mockImplementationOnce(() => ({
-      data: [{ data: TEST_COLLECTION_METHOD, status: 201 }]
-    }));
-    const mockOnSaved = jest.fn();
     const wrapper = mountWithAppContext(
       <CollectionMethodForm
         onSaved={mockOnSaved}
         fetchedCollectionMethod={{
           name: "test-col-method",
-          type: "collection-method"
+          type: "collection-method",
+          id: "1"
         }}
-      />
+      />,
+      { apiContext }
     );
 
     wrapper.find(".name input").simulate("change", {
@@ -122,13 +116,13 @@ describe("collection-method edit page", () => {
       "/collection-api/operations",
       [
         {
-          op: "POST",
-          path: "collection-method",
+          op: "PATCH",
+          path: "collection-method/1",
           value: {
             attributes: {
               name: "updated Name"
             },
-            id: "00000000-0000-0000-0000-000000000000",
+            id: "1",
             type: "collection-method"
           }
         }
