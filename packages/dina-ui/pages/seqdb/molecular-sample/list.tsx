@@ -11,7 +11,6 @@ const TABLE_COLUMNS = [
     ),
     accessor: "name"
   },
-  "version",
   "sampleType",
   "group",
   "createdBy",
