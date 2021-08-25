@@ -441,6 +441,12 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   viewPreviewButtonText: "Prévisualiser",
   warningMessage: "Messages d’avertissement",
   whoAmITitle: "Qui suis-je?",
+  workbookGroupUploadTitle: "Télécharger le cahier d'exercices",
+  workbookTitle: "Cahiers d'exercices",
+  workbookUploadInstructions:
+    "Faites glisser et déposez une feuille de calcul ici ou cliquez pour ouvrir la boîte de dialogue de navigation.",
+  workbookUploadFailure:
+    "Un problème est survenu lors de la tentative de lecture de la feuille de calcul téléchargée.",
   workflowCompleteTitle: "Flux de travail achevé",
   workflowTemplateListTitle: "Modèles de flux de travail",
   workflowTemplateTitle: "Modèle de flux des travaux",

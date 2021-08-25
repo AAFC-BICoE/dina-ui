@@ -223,6 +223,18 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
         </ul>
+        <h2>
+          <DinaMessage id="workbookTitle" />
+        </h2>
+        <ul>
+          <li>
+            <Link href="/workbook/upload">
+              <a>
+                <DinaMessage id="workbookGroupUploadTitle" />
+              </a>
+            </Link>
+          </li>
+        </ul>
       </div>
     </main>
     <Footer />

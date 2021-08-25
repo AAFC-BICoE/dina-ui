@@ -452,6 +452,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   viewPreviewButtonText: "Preview",
   warningMessage: "Warning Message",
   whoAmITitle: "Who Am I",
+  workbookGroupUploadTitle: "Upload Workbook",
+  workbookTitle: "Workbooks",
+  workbookUploadInstructions:
+    "Drag and drop a spreadsheet here or click to open browse dialog.",
+  workbookUploadFailure:
+    "A problem occurred while trying to read the uploaded spreadsheet.",
   workflowCompleteTitle: "Workflow Complete",
   workflowTemplateListTitle: "Workflow Templates",
   workflowTemplateTitle: "Workflow Template",
