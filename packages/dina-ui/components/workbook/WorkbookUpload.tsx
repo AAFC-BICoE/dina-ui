@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { IFileWithMeta } from "../object-store/file-upload/FileUploader";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import Dropzone from "react-dropzone-uploader/dist/react-dropzone-uploader";
 
 interface WorkbookUploadProps {
@@ -28,6 +29,7 @@ export class WorkbookUpload extends Component<WorkbookUploadProps> {
               alignSelf: "flex-end"
             }
           }}
+          inputContent={<DinaMessage id="workbookUploadInstructions" />}
         />
       </form>
     );

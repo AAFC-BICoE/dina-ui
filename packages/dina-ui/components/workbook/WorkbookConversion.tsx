@@ -96,7 +96,7 @@ export class WorkbookConversion extends Component<
     const { loading, jsonData, failed } = this.state;
     const failedMessage = failed ? (
       <div className="alert alert-danger">
-        <DinaMessage id="cancelButtonText" />
+        <DinaMessage id="workbookUploadFailure" />
       </div>
     ) : undefined;
 
