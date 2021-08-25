@@ -1,0 +1,181 @@
+import { OperationsResponse } from "common-ui";
+import CollectionMethodEditPage, {
+  CollectionMethodForm
+} from "../../../../pages/collection/collection-method/edit";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { CollectionMethod } from "../../../../types/collection-api/resources/CollectionMethod";
+
+// Mock out the Link component, which normally fails when used outside of a Next app.
+jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
+
+jest.mock("next/router", () => ({
+  useRouter: () => ({
+    push: mockPush,
+    query: mockQuery
+  })
+}));
+
+/** Mock next.js' router "push" function for navigating pages. */
+const mockPush = jest.fn();
+
+const mockRouter = {
+  push: mockPush
+};
+
+/** The mock URL query string params. */
+let mockQuery: any = {};
+
+/** Mock Kitsu "get" method. */
+const mockGet = jest.fn(async model => {
+  // The get request will return the existing collection-method.
+  if (model === "collection-api/collection-method/1") {
+    return { data: TEST_COLLECTION_METHOD };
+  } else if (model === "user-api/group") {
+    return [];
+  }
+});
+
+const mockPatch = jest.fn();
+
+const apiContext: any = {
+  apiClient: { get: mockGet, axios: { patch: mockPatch } }
+};
+
+describe("collection-method edit page", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockQuery = {};
+  });
+  it("Provides a form to add a collection-method.", async () => {
+    mockPatch.mockImplementationOnce(() => ({
+      data: [{ data: TEST_COLLECTION_METHOD, status: 201 }]
+    }));
+
+    const wrapper = mountWithAppContext(<CollectionMethodEditPage />, {
+      apiContext
+    });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find(".name input").simulate("change", {
+      target: {
+        name: "name",
+        value: "updated Name"
+      }
+    });
+
+    // Submit the form.
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+
+    expect(mockPatch).lastCalledWith(
+      "/collection-api/operations",
+      [
+        {
+          op: "POST",
+          path: "collection-method",
+          value: {
+            attributes: {
+              name: "updated Name"
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "collection-method"
+          }
+        }
+      ],
+      expect.anything()
+    );
+
+    // The user should be redirected to the new collection-method's details page.
+    expect(mockPush).lastCalledWith("/collection/collection-method/view?id=1");
+  });
+
+  it("Edits an existing collection method.", async () => {
+    mockPatch.mockImplementationOnce(() => ({
+      data: [{ data: TEST_COLLECTION_METHOD, status: 201 }]
+    }));
+    const mockOnSaved = jest.fn();
+    const wrapper = mountWithAppContext(
+      <CollectionMethodForm
+        onSaved={mockOnSaved}
+        fetchedCollectionMethod={{
+          name: "test-col-method",
+          type: "collection-method"
+        }}
+      />
+    );
+
+    wrapper.find(".name input").simulate("change", {
+      target: {
+        name: "name",
+        value: "updated Name"
+      }
+    });
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockPatch).lastCalledWith(
+      "/collection-api/operations",
+      [
+        {
+          op: "POST",
+          path: "collection-method",
+          value: {
+            attributes: {
+              name: "updated Name"
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "collection-method"
+          }
+        }
+      ],
+      expect.anything()
+    );
+  });
+
+  it("Renders an error after form submit without specifying madatory field.", async () => {
+    // The patch request will return an error.
+    mockPatch.mockImplementationOnce(() => ({
+      data: [
+        {
+          errors: [
+            {
+              detail: "Name is mandatory",
+              status: "422",
+              title: "Constraint violation"
+            }
+          ],
+          status: 422
+        }
+      ] as OperationsResponse
+    }));
+
+    mockQuery = {};
+
+    const wrapper = mountWithAppContext(<CollectionMethodEditPage />, {
+      apiContext
+    });
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+
+    wrapper.update();
+    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
+      "Constraint violation: Name is mandatory"
+    );
+    expect(mockPush).toBeCalledTimes(0);
+  });
+});
+
+/** Test collection-method with all fields defined. */
+
+const TEST_COLLECTION_METHOD: CollectionMethod = {
+  id: "1",
+  name: "test collection method",
+  type: "collection-method"
+};

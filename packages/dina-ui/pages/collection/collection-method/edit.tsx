@@ -18,7 +18,7 @@ import { CollectionMethod } from "../../../types/collection-api/resources/Collec
 
 interface CollectionMethodFormProps {
   fetchedCollectionMethod?: CollectionMethod;
-  onSaved: (prepType: PersistedResource<CollectionMethod>) => Promise<void>;
+  onSaved: (colMethod: PersistedResource<CollectionMethod>) => Promise<void>;
 }
 
 export default function CollectionMethodEditPage() {
@@ -28,8 +28,8 @@ export default function CollectionMethodEditPage() {
   } = router;
   const { formatMessage } = useDinaIntl();
 
-  async function goToViewPage(prepType: PersistedResource<CollectionMethod>) {
-    await router.push(`/collection/collection-method/view?id=${prepType.id}`);
+  async function goToViewPage(colMethod: PersistedResource<CollectionMethod>) {
+    await router.push(`/collection/collection-method/view?id=${colMethod.id}`);
   }
 
   const title = id ? "editCollectionMethodTitle" : "addCollectionMethodTitle";
@@ -90,7 +90,7 @@ export function CollectionMethodForm({
       ...submittedValues
     };
 
-    const [savedPrepType] = await save<CollectionMethod>(
+    const [saveColMethod] = await save<CollectionMethod>(
       [
         {
           resource: input,
@@ -101,7 +101,7 @@ export function CollectionMethodForm({
         apiBaseUrl: "/collection-api"
       }
     );
-    await onSaved(savedPrepType);
+    await onSaved(saveColMethod);
   };
 
   return (
@@ -135,7 +135,7 @@ export function CollectionMethodFormLayout() {
       </div>
       <div className="row">
         <TextField
-          className="col-md-6 preparationTypeName"
+          className="col-md-6 name"
           name="name"
           label={formatMessage("collectionMethodNameLabel")}
         />
