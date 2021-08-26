@@ -71,8 +71,9 @@ export function CatalogueOfLifeNameField({
 }
 
 function CatalogueOfLifeNameReadOnly({ value, scientificNameSource }) {
-  const sanitizedHtml = DOMPurify.sanitize(value);
-
+  const sanitizedHtml = DOMPurify.sanitize(value, {
+    ADD_ATTR: ["target", "rel"]
+  });
   return (
     <div style={{ whiteSpace: "pre-wrap" }}>
       <p dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />{" "}
