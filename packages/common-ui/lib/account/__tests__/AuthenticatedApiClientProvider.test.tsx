@@ -1,8 +1,11 @@
 import { mount } from "enzyme";
 import { noop } from "lodash";
+import { getIntlSupport } from "../../intl/IntlSupport";
 import { ApiClientProvider } from "../../api-client/ApiClientContext";
 import { AccountContextI, AccountProvider } from "../AccountProvider";
 import { AuthenticatedApiClientProvider } from "../AuthenticatedApiClientProvider";
+import { COMMON_UI_MESSAGES_ENGLISH } from "../../intl/common-ui-en";
+import { COMMON_UI_MESSAGES_FR } from "../../intl/common-ui-fr";
 
 const mockInterceptorUse = jest.fn();
 const apiContext: any = {
@@ -11,11 +14,21 @@ const apiContext: any = {
       interceptors: {
         request: {
           use: mockInterceptorUse
+        },
+        response: {
+          use: mockInterceptorUse
         }
       }
     }
   }
 };
+
+const en = { ...COMMON_UI_MESSAGES_ENGLISH };
+const fr = { ...COMMON_UI_MESSAGES_FR };
+const { IntlProvider } = getIntlSupport({
+  defaultMessages: en,
+  translations: { en, fr }
+});
 
 describe("AuthenticatedApiClientProvider", () => {
   beforeEach(() => {
@@ -24,19 +37,21 @@ describe("AuthenticatedApiClientProvider", () => {
 
   it("Renders children only when authenticated", () => {
     const wrapper = mount(
-      <AccountProvider
-        value={{
-          ...MOCK_ACCOUNT_CONTEXT,
-          authenticated: true,
-          initialized: true
-        }}
-      >
-        <ApiClientProvider value={apiContext}>
-          <AuthenticatedApiClientProvider>
-            <div className="test-child" />
-          </AuthenticatedApiClientProvider>
-        </ApiClientProvider>
-      </AccountProvider>
+      <IntlProvider>
+        <AccountProvider
+          value={{
+            ...MOCK_ACCOUNT_CONTEXT,
+            authenticated: true,
+            initialized: true
+          }}
+        >
+          <ApiClientProvider value={apiContext}>
+            <AuthenticatedApiClientProvider>
+              <div className="test-child" />
+            </AuthenticatedApiClientProvider>
+          </ApiClientProvider>
+        </AccountProvider>
+      </IntlProvider>
     );
 
     expect(wrapper.find("div.test-child").exists()).toEqual(true);
@@ -46,20 +61,22 @@ describe("AuthenticatedApiClientProvider", () => {
     const mockLogin = jest.fn();
 
     mount(
-      <AccountProvider
-        value={{
-          ...MOCK_ACCOUNT_CONTEXT,
-          authenticated: false,
-          initialized: true,
-          login: mockLogin
-        }}
-      >
-        <ApiClientProvider value={apiContext}>
-          <AuthenticatedApiClientProvider>
-            <div className="test-child" />
-          </AuthenticatedApiClientProvider>
-        </ApiClientProvider>
-      </AccountProvider>
+      <IntlProvider>
+        <AccountProvider
+          value={{
+            ...MOCK_ACCOUNT_CONTEXT,
+            authenticated: false,
+            initialized: true,
+            login: mockLogin
+          }}
+        >
+          <ApiClientProvider value={apiContext}>
+            <AuthenticatedApiClientProvider>
+              <div className="test-child" />
+            </AuthenticatedApiClientProvider>
+          </ApiClientProvider>
+        </AccountProvider>
+      </IntlProvider>
     );
 
     expect(mockLogin).toHaveBeenCalledTimes(1);
@@ -67,23 +84,25 @@ describe("AuthenticatedApiClientProvider", () => {
 
   it("Adds the bearer header to axios requests.", () => {
     mount(
-      <AccountProvider
-        value={{
-          ...MOCK_ACCOUNT_CONTEXT,
-          authenticated: true,
-          initialized: true,
-          token: "Mat's-test-token"
-        }}
-      >
-        <ApiClientProvider value={apiContext}>
-          <AuthenticatedApiClientProvider>
-            <div className="test-child" />
-          </AuthenticatedApiClientProvider>
-        </ApiClientProvider>
-      </AccountProvider>
+      <IntlProvider>
+        <AccountProvider
+          value={{
+            ...MOCK_ACCOUNT_CONTEXT,
+            authenticated: true,
+            initialized: true,
+            token: "Mat's-test-token"
+          }}
+        >
+          <ApiClientProvider value={apiContext}>
+            <AuthenticatedApiClientProvider>
+              <div className="test-child" />
+            </AuthenticatedApiClientProvider>
+          </ApiClientProvider>
+        </AccountProvider>
+      </IntlProvider>
     );
 
-    expect(mockInterceptorUse).toHaveBeenCalledTimes(1);
+    expect(mockInterceptorUse).toHaveBeenCalledTimes(2);
     expect(mockInterceptorUse.mock.calls[0][0]({ headers: {} })).toEqual({
       headers: { Authorization: "Bearer Mat's-test-token" }
     });
