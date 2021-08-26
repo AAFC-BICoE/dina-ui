@@ -41,9 +41,9 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
   return (
     <KeycloakAccountProvider>
       <ApiClientImplProvider>
-        <AuthenticatedApiClientProvider>
-          <FileUploadProviderImpl>
-            <DinaIntlProvider>
+        <DinaIntlProvider>
+          <AuthenticatedApiClientProvider>
+            <FileUploadProviderImpl>
               <ErrorBoundaryPage>
                 <DndProvider backend={HTML5Backend}>
                   <ModalProvider appElement={appElement}>
@@ -51,9 +51,9 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
                   </ModalProvider>
                 </DndProvider>
               </ErrorBoundaryPage>
-            </DinaIntlProvider>
-          </FileUploadProviderImpl>
-        </AuthenticatedApiClientProvider>
+            </FileUploadProviderImpl>
+          </AuthenticatedApiClientProvider>
+        </DinaIntlProvider>
       </ApiClientImplProvider>
     </KeycloakAccountProvider>
   );
