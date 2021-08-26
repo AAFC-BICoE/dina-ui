@@ -160,6 +160,13 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
           <li>
+            <Link href="/collection/collection-method/list">
+              <a>
+                <DinaMessage id="collectionMethodListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
             <Link href="/collection/collecting-event/list">
               <a>
                 <DinaMessage id="collectingEventListTitle" />
@@ -219,6 +226,18 @@ const Home: React.FunctionComponent = () => (
             <Link href="/collection/workflow-template/list">
               <a>
                 <DinaMessage id="workflowTemplateListTitle" />
+              </a>
+            </Link>
+          </li>
+        </ul>
+        <h2>
+          <DinaMessage id="workbookTitle" />
+        </h2>
+        <ul>
+          <li>
+            <Link href="/workbook/upload">
+              <a>
+                <DinaMessage id="workbookGroupUploadTitle" />
               </a>
             </Link>
           </li>
