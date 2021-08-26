@@ -586,7 +586,7 @@ describe("Material Sample Edit Page", () => {
         .last()
         .simulate("change", { target: { value: `test-name-${num}` } });
       wrapper
-        .find(".verbatimAgent-field input")
+        .find(".verbatimDeterminer-field input")
         .last()
         .simulate("change", { target: { value: `test-agent-${num}` } });
     }
@@ -618,15 +618,15 @@ describe("Material Sample Edit Page", () => {
               // The 3 determinations are added:
               determination: [
                 {
-                  verbatimAgent: "test-agent-1",
+                  verbatimDeterminer: "test-agent-1",
                   verbatimScientificName: "test-name-1"
                 },
                 {
-                  verbatimAgent: "test-agent-2",
+                  verbatimDeterminer: "test-agent-2",
                   verbatimScientificName: "test-name-2"
                 },
                 {
-                  verbatimAgent: "test-agent-3",
+                  verbatimDeterminer: "test-agent-3",
                   verbatimScientificName: "test-name-3"
                 }
               ],

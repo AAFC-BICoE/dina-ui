@@ -29,7 +29,7 @@ export interface DeterminationFieldProps {
 const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
   {
     verbatimScientificName: true,
-    verbatimAgent: true,
+    verbatimDeterminer: true,
     verbatimDate: true,
     typeStatus: true,
     typeStatusEvidence: true,
@@ -99,18 +99,18 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                         className="col-sm-6 verbatimScientificName"
                       />
                       <AutoSuggestTextField<MaterialSample>
-                        {...fieldProps("verbatimAgent")}
+                        {...fieldProps("verbatimDeterminer")}
                         className="col-sm-6"
                         query={() => ({
                           path: "collection-api/material-sample"
                         })}
                         suggestion={sample =>
                           (sample.determination?.map(
-                            det => det?.verbatimAgent
+                            det => det?.verbatimDeterminer
                           ) as any) ?? []
                         }
                       />
-                      <DateField
+                      <TextField
                         {...fieldProps("verbatimDate")}
                         className="col-sm-6"
                       />
@@ -211,7 +211,7 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                             <DinaMessage id="field_verbatimDate" />
                           </div>
                           <div className="col-3">
-                            <DinaMessage id="field_verbatimAgent" />
+                            <DinaMessage id="field_verbatimDeterminer" />
                           </div>
                         </div>
                       </div>
@@ -250,7 +250,7 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                                     {determination.verbatimDate}
                                   </div>
                                   <div className="col-3">
-                                    {determination.verbatimAgent}
+                                    {determination.verbatimDeterminer}
                                   </div>
                                   <div className="col-3 d-flex">
                                     {!readOnly && !isTemplate && (
