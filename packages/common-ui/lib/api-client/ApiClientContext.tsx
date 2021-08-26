@@ -326,7 +326,9 @@ export class CustomDinaKitsu extends Kitsu {
   async get(path: string, params: GetParams = {}) {
     try {
       const { data } = await this.axios.get(path, {
-        headers: this.headers,
+        headers: path.includes("collection-api/collection/")
+          ? { ...this.headers, "include-dina-permission": "true" }
+          : this.headers,
         params,
         paramsSerializer: p => query(p)
       });
