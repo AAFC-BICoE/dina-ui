@@ -18,14 +18,9 @@ export function CollectionDetailsPage({ router }: WithRouterProps) {
   const id = String(router.query.id);
   const { formatMessage } = useDinaIntl();
 
-  const collectionQuery = useQuery<Collection>(
-    {
-      path: `collection-api/collection/${id}`
-    },
-    {
-      header: { "include-dina-permission": "true" }
-    }
-  );
+  const collectionQuery = useQuery<Collection>({
+    path: `collection-api/collection/${id}`
+  });
 
   const buttonBar = collection => {
     return (
