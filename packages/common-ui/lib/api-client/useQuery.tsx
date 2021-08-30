@@ -4,13 +4,14 @@ import { isArray, isUndefined, omitBy } from "lodash";
 import { useContext, useDebugValue, useMemo } from "react";
 import useSWR from "swr";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
-import { ApiClientContext } from "./ApiClientContext";
+import { ApiClientContext, useApiClient } from "./ApiClientContext";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
 import { v4 as uuidv4 } from "uuid";
 
 /** Attributes that compose a JsonApi query. */
 export interface JsonApiQuerySpec extends GetParams {
   path: string;
+  header?: {};
 }
 
 /** Query hook state. */
@@ -57,12 +58,13 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
 
     // Omit undefined values from the GET params, which would otherwise cause an invalid request.
     // e.g. /api/region?fields=undefined
-    const { path, fields, filter, sort, include, page } = querySpec;
+    const { path, fields, filter, sort, include, page, header } = querySpec;
     const getParams = omitBy<GetParams>(
       { fields, filter, sort, include, page },
       isUndefined
     );
 
+    getParams.header = header;
     const response = await apiClient.get<TData, TMeta>(path, getParams);
 
     if (!response) {
