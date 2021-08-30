@@ -58,11 +58,14 @@ export interface CollectionFormProps {
 
 export function CollectionForm({ collection, router }: CollectionFormProps) {
   const initialValues = collection || { type: "collection" };
-
   async function onSubmit({
     submittedValues,
     api: { save }
   }: DinaFormSubmitParams<Collection>) {
+    /* Delete meta which got returned as part of the useQuery/Inital values to avoid error 
+    INTERNAL_SERVER_ERROR: expected meta being an attribute expected:<ATTRIBUTE> but was:<META_INFORMATION> */
+    delete submittedValues.meta;
+
     const [savedCollection] = await save(
       [
         {
