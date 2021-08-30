@@ -4,7 +4,7 @@ import { isArray, isUndefined, omitBy } from "lodash";
 import { useContext, useDebugValue, useMemo } from "react";
 import useSWR from "swr";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
-import { ApiClientContext, useApiClient } from "./ApiClientContext";
+import { ApiClientContext } from "./ApiClientContext";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
 import { v4 as uuidv4 } from "uuid";
 
