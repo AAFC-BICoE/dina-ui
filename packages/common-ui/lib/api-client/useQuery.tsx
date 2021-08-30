@@ -60,11 +60,10 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
     // e.g. /api/region?fields=undefined
     const { path, fields, filter, sort, include, page, header } = querySpec;
     const getParams = omitBy<GetParams>(
-      { fields, filter, sort, include, page },
+      { fields, filter, sort, include, page, header },
       isUndefined
     );
 
-    getParams.header = header;
     const response = await apiClient.get<TData, TMeta>(path, getParams);
 
     if (!response) {
