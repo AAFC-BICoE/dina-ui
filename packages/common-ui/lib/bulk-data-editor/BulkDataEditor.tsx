@@ -181,7 +181,7 @@ export function BulkDataEditor<TRow>({
 /**
  * A wrapper around Handsontable that avoids server-side rendering Handsontable, which would cause errors.
  */
-const DynamicHotTable = dynamic(
+export const DynamicHotTable = dynamic(
   async () => {
     // Handsontable must only be loaded in the browser, because it depends on the global
     // navigator object to be available.

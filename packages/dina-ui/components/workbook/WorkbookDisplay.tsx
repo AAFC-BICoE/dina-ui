@@ -1,6 +1,8 @@
+import { HotColumnProps } from "@handsontable/react";
 import { Component } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { WorkbookJSON, WorkbookRow } from "./WorkbookConversion";
+import { DynamicHotTable } from "../../../common-ui/lib/bulk-data-editor/BulkDataEditor";
 
 interface WorkbookDisplayProps {
   jsonData: WorkbookJSON;
@@ -22,35 +24,37 @@ export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
             <DinaMessage id="cancelButtonText" />
           </button>
           <div>
-            <table className="table">
-              <thead>
-                <tr>
-                  {jsonData[0].content.map(col => (
-                    <th key={col}>{col}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {jsonData.map((row: WorkbookRow, index: number) => {
-                  // Skip the first row since it's already been displayed.
-                  if (index !== 0) {
-                    return (
-                      <tr key={row.rowNumber}>
-                        {row.content.map(col => {
-                          // Render the columns inside of the row.
-                          return <td key={col}>{col}</td>;
-                        })}
-                      </tr>
-                    );
-                  }
-                })}
-              </tbody>
-            </table>
+            <DynamicHotTable
+              // afterValidate={afterValidate}
+              columns={generateWorkbookColumns(jsonData)}
+              // data={workingTableData as any}
+              manualColumnResize={true}
+              rowHeaders={true}
+              // viewportColumnRenderingOffset={1000}
+              // viewportRowRenderingOffset={1000}
+            />
           </div>
         </div>
       );
     }
   }
+}
+
+/**
+ * Generate the columns structure required for handsontable.
+ */
+export function generateWorkbookColumns(
+  jsonData: WorkbookJSON
+): HotColumnProps[] {
+  const generateColumns: HotColumnProps[] = [];
+  jsonData[0].content.map(columnName => {
+    generateColumns.push({
+      data: "",
+      title: columnName
+    });
+  });
+
+  return generateColumns;
 }
 
 export default WorkbookDisplay;
