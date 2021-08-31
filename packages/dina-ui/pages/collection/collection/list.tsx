@@ -65,6 +65,7 @@ export default function CollectionListPage() {
                   onChange={() => setImmediate(submitForm)}
                   name="group"
                   showAnyOption={true}
+                  showAllGroups={true}
                 />
               </div>
             </div>

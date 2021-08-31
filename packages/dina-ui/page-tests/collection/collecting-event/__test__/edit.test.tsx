@@ -112,18 +112,8 @@ describe("collecting-event edit page", () => {
     });
 
     expect(wrapper.find(".startEventDateTime-field")).toHaveLength(1);
-    // initially renders without end event datetime
-    expect(wrapper.find(".endEventDateTime-field")).toHaveLength(0);
+    expect(wrapper.find(".endEventDateTime-field")).toHaveLength(1);
     expect(wrapper.find(".verbatimEventDateTime-field")).toHaveLength(1);
-
-    // simulate turn on the date range switch
-    wrapper.find(".react-switch.dateRange input").simulate("change", {
-      target: {
-        type: "checkbox",
-        checked: true
-      }
-    });
-    await new Promise(setImmediate);
 
     // renders end event datetime
     expect(wrapper.find(".endEventDateTime-field")).toHaveLength(1);
