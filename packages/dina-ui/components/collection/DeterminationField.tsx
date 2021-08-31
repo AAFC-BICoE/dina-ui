@@ -104,11 +104,10 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                   >
                     <TextFieldWithMultiplicationButton
                       {...fieldProps("verbatimScientificName")}
-                      className="col-sm-6 verbatimScientificName"
+                      className="verbatimScientificName"
                     />
                     <AutoSuggestTextField<MaterialSample>
                       {...fieldProps("verbatimDeterminer")}
-                      className="col-sm-6"
                       query={() => ({
                         path: "collection-api/material-sample"
                       })}
@@ -118,10 +117,7 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                         ) as any) ?? []
                       }
                     />
-                    <TextField
-                      {...fieldProps("verbatimDate")}
-                      className="col-sm-6"
-                    />
+                    <TextField {...fieldProps("verbatimDate")} />
                     <TextField
                       {...fieldProps("transcriberRemarks")}
                       multiLines={true}
