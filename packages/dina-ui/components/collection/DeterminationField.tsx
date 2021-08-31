@@ -96,105 +96,103 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
             }
 
             return (
-              <div>
-                <FieldSet
-                  legend={<DinaMessage id="verbatimDeterminationLegend" />}
-                >
-                  <div className="row">
-                    <div className="col-md-6">
-                      <TextFieldWithMultiplicationButton
-                        {...fieldProps("verbatimScientificName")}
-                        className="col-sm-6 verbatimScientificName"
-                      />
-                      <AutoSuggestTextField<MaterialSample>
-                        {...fieldProps("verbatimDeterminer")}
-                        className="col-sm-6"
-                        query={() => ({
-                          path: "collection-api/material-sample"
-                        })}
-                        suggestion={sample =>
-                          (sample.determination?.map(
-                            det => det?.verbatimDeterminer
-                          ) as any) ?? []
+              <div className="row">
+                <div className="col-md-6">
+                  <FieldSet
+                    legend={<DinaMessage id="verbatimDeterminationLegend" />}
+                    className="non-strip"
+                  >
+                    <TextFieldWithMultiplicationButton
+                      {...fieldProps("verbatimScientificName")}
+                      className="col-sm-6 verbatimScientificName"
+                    />
+                    <AutoSuggestTextField<MaterialSample>
+                      {...fieldProps("verbatimDeterminer")}
+                      className="col-sm-6"
+                      query={() => ({
+                        path: "collection-api/material-sample"
+                      })}
+                      suggestion={sample =>
+                        (sample.determination?.map(
+                          det => det?.verbatimDeterminer
+                        ) as any) ?? []
+                      }
+                    />
+                    <TextField
+                      {...fieldProps("verbatimDate")}
+                      className="col-sm-6"
+                    />
+                    <TextField
+                      {...fieldProps("transcriberRemarks")}
+                      multiLines={true}
+                    />
+                    <TextField {...fieldProps("qualifier")} multiLines={true} />
+                  </FieldSet>
+                </div>
+                <div className="col-md-6">
+                  <FieldSet
+                    legend={<DinaMessage id="determination" />}
+                    className="non-strip"
+                  >
+                    <CatalogueOfLifeNameField
+                      {...fieldProps("scientificName")}
+                      scientificNameSourceField={
+                        fieldProps("scientificNameSource").name
+                      }
+                      onChange={(newValue, formik) =>
+                        formik.setFieldValue(
+                          fieldProps("scientificNameSource").name,
+                          newValue ? "COLPLUS" : null
+                        )
+                      }
+                    />
+                    <ResourceSelectField<Person>
+                      {...fieldProps("determiner")}
+                      label={formatMessage("determiningAgents")}
+                      readOnlyLink="/person/view?id="
+                      filter={filterBy(["displayName"])}
+                      model="agent-api/person"
+                      optionLabel={person => person.displayName}
+                      isMulti={true}
+                      asyncOptions={[
+                        {
+                          label: <DinaMessage id="addNewPerson" />,
+                          getResource: openAddPersonModal
                         }
-                      />
-                      <TextField
-                        {...fieldProps("verbatimDate")}
-                        className="col-sm-6"
-                      />
-                      <TextField
-                        {...fieldProps("transcriberRemarks")}
-                        multiLines={true}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <AutoSuggestTextField<Vocabulary>
-                        {...fieldProps("typeStatus")}
-                        query={() => ({
-                          path: "collection-api/vocabulary/typeStatus"
-                        })}
-                        suggestion={(vocabElement, searchValue) =>
-                          vocabElement?.vocabularyElements
-                            ?.filter(it => it?.name !== TypeStatusEnum.NONE)
-                            .filter(it =>
-                              it?.name
-                                ?.toLowerCase?.()
-                                ?.includes(searchValue?.toLowerCase?.())
-                            )
-                            .map(it => it?.name ?? "")
-                        }
-                        shouldRenderSuggestions={shouldRenderSuggestions}
-                      />
-                      <TextField
-                        {...fieldProps("typeStatusEvidence")}
-                        multiLines={true}
-                      />
-                      <TextField
-                        {...fieldProps("qualifier")}
-                        multiLines={true}
-                      />
-                    </div>
-                  </div>
-                </FieldSet>
-                <FieldSet legend={<DinaMessage id="determination" />}>
-                  <div className="row">
-                    <div className="col-sm-6">
-                      <CatalogueOfLifeNameField
-                        {...fieldProps("scientificName")}
-                        scientificNameSourceField={
-                          fieldProps("scientificNameSource").name
-                        }
-                        onChange={(newValue, formik) =>
-                          formik.setFieldValue(
-                            fieldProps("scientificNameSource").name,
-                            newValue ? "COLPLUS" : null
+                      ]}
+                    />
+                    <DateField
+                      {...fieldProps("determinedOn")}
+                      label={formatMessage("determiningDate")}
+                    />
+                  </FieldSet>
+                  <FieldSet
+                    legend={<DinaMessage id="typeSpecimen" />}
+                    className="non-strip"
+                  >
+                    <AutoSuggestTextField<Vocabulary>
+                      {...fieldProps("typeStatus")}
+                      query={() => ({
+                        path: "collection-api/vocabulary/typeStatus"
+                      })}
+                      suggestion={(vocabElement, searchValue) =>
+                        vocabElement?.vocabularyElements
+                          ?.filter(it => it?.name !== TypeStatusEnum.NONE)
+                          .filter(it =>
+                            it?.name
+                              ?.toLowerCase?.()
+                              ?.includes(searchValue?.toLowerCase?.())
                           )
-                        }
-                      />
-                    </div>
-                    <div className="col-sm-6">
-                      <ResourceSelectField<Person>
-                        {...fieldProps("determiner")}
-                        label={formatMessage("determiningAgent")}
-                        readOnlyLink="/person/view?id="
-                        filter={filterBy(["displayName"])}
-                        model="agent-api/person"
-                        optionLabel={person => person.displayName}
-                        isMulti={true}
-                        asyncOptions={[
-                          {
-                            label: <DinaMessage id="addNewPerson" />,
-                            getResource: openAddPersonModal
-                          }
-                        ]}
-                      />
-                      <DateField
-                        {...fieldProps("determinedOn")}
-                        label={formatMessage("determiningDate")}
-                      />
-                    </div>
-                  </div>
-                </FieldSet>
+                          .map(it => it?.name ?? "")
+                      }
+                      shouldRenderSuggestions={shouldRenderSuggestions}
+                    />
+                    <TextField
+                      {...fieldProps("typeStatusEvidence")}
+                      multiLines={true}
+                    />
+                  </FieldSet>
+                </div>
               </div>
             );
           }

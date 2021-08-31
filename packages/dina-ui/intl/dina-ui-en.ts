@@ -107,7 +107,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   detailsPageLink: "Details Page",
   determination: "Determination",
   determinations: "Determinations",
-  determiningAgent: "Determining Agent",
+  determiningAgents: "Determining Agents",
   determiningDate: "Determining Date",
   dinaHomeH1: "Dina Home",
   dinaUserSectionTitle: "Users",
@@ -441,6 +441,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   to: "To",
   tooltipDefaultLinkMessage: "Click here to learn more.",
   toponymyLegend: "Current Geographic Place",
+  typeSpecimen: "Type Specimen",
   uploadButtonText: "Upload",
   uploadFilesMaxSize: "The maximum file size is {maxSize}.",
   uploadFormInstructions:
