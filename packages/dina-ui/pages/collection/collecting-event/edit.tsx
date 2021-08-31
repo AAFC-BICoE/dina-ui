@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { Footer, Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import {
   DEFAULT_VERBATIM_COORDSYS_KEY,
@@ -56,6 +56,7 @@ export default function CollectingEventEditPage() {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }

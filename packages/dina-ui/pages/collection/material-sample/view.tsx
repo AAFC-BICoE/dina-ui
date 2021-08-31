@@ -13,6 +13,7 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
 import {
+  Footer,
   Head,
   MaterialSampleBreadCrumb,
   Nav,
@@ -161,6 +162,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           </main>
         );
       })}
+      <Footer />
     </div>
   );
 }
