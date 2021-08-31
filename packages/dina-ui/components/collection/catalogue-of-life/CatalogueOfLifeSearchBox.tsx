@@ -115,7 +115,7 @@ export function CatalogueOfLifeSearchBox({
           const hasVerbatimScientificName = !!verbatimScientificName;
           return (
             hasVerbatimScientificName && (
-              <div className="d-flex align-items-center">
+              <div className="d-flex align-items-center mb-3">
                 <div className="pe-3">
                   <DinaMessage id="search" />:
                 </div>
