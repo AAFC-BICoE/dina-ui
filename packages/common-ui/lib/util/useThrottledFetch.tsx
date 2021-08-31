@@ -52,7 +52,7 @@ export function useThrottledFetch<TData>({
     }
 
     // Set the new search value which will make useSWR do the lookup:
-    const value = inputValue?.length > 0 ? inputValue : scientificName;
+    const value = scientificName?.length > 0 ? scientificName : inputValue;
     setInputValue(value);
     setSearchValue(value);
   }
