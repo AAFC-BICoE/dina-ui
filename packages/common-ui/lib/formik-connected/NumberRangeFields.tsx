@@ -27,8 +27,15 @@ export function NumberRangeFields({
   return (
     <label className="w-100">
       <strong>{labelMsg}</strong>
-      {readOnly && !bothAreDefined ? (
-        <div className="mb-3">{minVal ?? maxVal ?? ""}</div>
+      {readOnly ? (
+        bothAreDefined ? (
+          <div className="mb-3">
+            <span>{minVal} </span>
+            <CommonMessage id="to" /> <span>{maxVal}</span>
+          </div>
+        ) : (
+          <div className="mb-3">{minVal ?? maxVal ?? ""}</div>
+        )
       ) : (
         <div className="d-flex align-items-center mb-3">
           <NumberField

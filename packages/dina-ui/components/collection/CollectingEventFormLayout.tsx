@@ -53,6 +53,7 @@ import {
 } from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import { VocabularySelectField } from "./VocabularySelectField";
+import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -570,11 +571,6 @@ export function CollectingEventFormLayout({
               />
               <TextField name="dwcVerbatimElevation" />
               <TextField name="dwcVerbatimDepth" />
-              <NumberField
-                name="dwcMinimumElevationInMeters"
-                isInteger={true}
-              />
-              <NumberField name="dwcMinimumDepthInMeters" isInteger={true} />
             </div>
           </div>
         </FieldSet>
@@ -892,30 +888,40 @@ export function CollectingEventFormLayout({
           <TextField name="host" className="col-md-6" />
         </div>
         <div className="row">
-          <TextField name="collectionMethod" className="col-md-6" />
+          <ResourceSelectField<CollectionMethod>
+            name="collectionMethod"
+            className="col-md-6"
+            readOnlyLink="/collection/collection-method/view?id="
+            filter={filterBy(["name"])}
+            model="collection-api/collection-method"
+            optionLabel={cm => cm.name}
+            isDisabled={true}
+          />
           <VocabularySelectField
             path="collection-api/vocabulary/substrate"
             name="substrate"
-            isMulti={true}
             className="col-md-6"
           />
         </div>
         <div className="row">
           <div className="col-md-6">
             <NumberRangeFields
-              names={["elevationMin", "elevationMax"]}
+              names={[
+                "dwcMinimumElevationInMeters",
+                "dwcMaximumElevationInMeters"
+              ]}
               labelMsg={<DinaMessage id="elevationInMeters" />}
             />
           </div>
           <div className="col-md-6">
             <NumberRangeFields
-              names={["depthMin", "depthMax"]}
+              names={["dwcMinimumDepthInMeters", "dwcMaximumDepthInMeters"]}
               labelMsg={<DinaMessage id="depthInMeters" />}
             />
           </div>
         </div>
         <div>
-          <TextField name="collectingEventRemarks" multiLines={true} />
+          <TextField name="remarks" multiLines={true} />
         </div>
       </FieldSet>
       {!isTemplate && (
