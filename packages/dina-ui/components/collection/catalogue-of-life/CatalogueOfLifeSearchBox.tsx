@@ -4,11 +4,11 @@ import {
   Tooltip,
   useThrottledFetch
 } from "common-ui";
-import DOMPurify from "dompurify";
 import { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { DataSetResult } from "./dataset-search-types";
 import { NameUsageSearchResult } from "./nameusage-types";
+import DOMPurify from "dompurify";
 
 export interface CatalogueOfLifeSearchBoxProps {
   /** Optionally mock out the HTTP fetch for testing. */
@@ -111,11 +111,15 @@ export function CatalogueOfLifeSearchBox({
               "href",
               `https://data.catalogueoflife.org/dataset/${dataSet.key}/name/${result.name?.id}`
             );
+            link.setAttribute("target", "_blank");
+            link.setAttribute("rel", "noopener");
+
             link.innerHTML = result.labelHtml ?? String(result);
 
             // Use DOMPurify to sanitize against XSS when using dangerouslySetInnerHTML:
-            const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML);
-
+            const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML, {
+              ADD_ATTR: ["target", "rel"]
+            });
             return (
               <div
                 key={result.id ?? index}
@@ -136,7 +140,7 @@ export function CatalogueOfLifeSearchBox({
           })}
         </div>
       )}
-      {nameResults?.length === 0 && (
+      {searchResult?.empty && (
         <p>
           <DinaMessage id="noResultsFound" />
         </p>

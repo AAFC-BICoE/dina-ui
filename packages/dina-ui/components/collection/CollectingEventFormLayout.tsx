@@ -67,7 +67,6 @@ export function CollectingEventFormLayout({
 }: CollectingEventFormLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
-  const [rangeEnabled, setRangeEnabled] = useState(false);
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
@@ -101,16 +100,6 @@ export function CollectingEventFormLayout({
   );
 
   const commonSrcDetailRoot = "geographicPlaceNameSourceDetail";
-
-  function toggleRangeEnabled(
-    newValue: boolean,
-    formik: FormikContextType<{}>
-  ) {
-    if (!newValue) {
-      formik.setFieldValue("endEventDateTime", null);
-    }
-    setRangeEnabled(newValue);
-  }
 
   async function selectSearchResult(
     result: NominatumApiSearchResult,
@@ -381,43 +370,20 @@ export function CollectingEventFormLayout({
                 )}
               </Field>
             )}
+            <TextField
+              name="verbatimEventDateTime"
+              label={formatMessage("verbatimEventDateTimeLabel")}
+            />
             <FormattedTextField
               name="startEventDateTime"
               className="startEventDateTime"
               label={formatMessage("startEventDateTimeLabel")}
               placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
-            <Field name="endEventDateTime">
-              {({ field: { value: endEventDateTime }, form }) => (
-                <div>
-                  {!readOnly && (
-                    <label
-                      className="mb-3"
-                      style={{ marginLeft: 15, marginTop: -15 }}
-                    >
-                      <span>{formatMessage("enableDateRangeLabel")}</span>
-                      <Switch
-                        onChange={newValue =>
-                          toggleRangeEnabled(newValue, form)
-                        }
-                        checked={rangeEnabled || !!endEventDateTime || false}
-                        className="react-switch dateRange"
-                      />
-                    </label>
-                  )}
-                  {(rangeEnabled || endEventDateTime) && (
-                    <FormattedTextField
-                      name="endEventDateTime"
-                      label={formatMessage("endEventDateTimeLabel")}
-                      placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
-                    />
-                  )}
-                </div>
-              )}
-            </Field>
-            <TextField
-              name="verbatimEventDateTime"
-              label={formatMessage("verbatimEventDateTimeLabel")}
+            <FormattedTextField
+              name="endEventDateTime"
+              label={formatMessage("endEventDateTimeLabel")}
+              placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
           </FieldSet>
         </div>

@@ -1,62 +1,45 @@
-import {
-  ButtonBar,
-  ColumnDefinition,
-  CreateButton,
-  dateCell,
-  FilterAttribute,
-  ListPageLayout
-} from "common-ui";
+import { ButtonBar, CreateButton, ListPageLayout, dateCell } from "common-ui";
 import Link from "next/link";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Collection } from "../../../types/collection-api";
 
-const COLLECTION_TABLE_COLUMNS: ColumnDefinition<Collection>[] = [
+const COLLECTION_METHOD_FILTER_ATTRIBUTES = ["createdBy"];
+const COLLECTION_METHOD_TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/collection/collection/view?id=${id}`}>{name || id}</Link>
+      <Link href={`/collection/collection-method/view?id=${id}`}>{name}</Link>
     ),
     accessor: "name"
   },
-  "code",
+  "group",
   "createdBy",
   dateCell("createdOn")
 ];
 
-const COLLECTION_FILTER_ATTRIBUTES: FilterAttribute[] = [
-  "name",
-  "code",
-  {
-    name: "createdOn",
-    type: "DATE"
-  },
-  "createdBy"
-];
-
-export default function CollectionListPage() {
+export default function collectionMethodListPage() {
   const { formatMessage } = useDinaIntl();
 
   return (
     <div>
-      <Head title={formatMessage("collectionListTitle")} />
+      <Head title={formatMessage("collectionMethodListTitle")} />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
-          <DinaMessage id="collectionListTitle" />
+          <DinaMessage id="collectionMethodListTitle" />
         </h1>
         <ButtonBar>
-          <CreateButton entityLink="/collection/collection" />
+          <CreateButton entityLink="/collection/collection-method" />
         </ButtonBar>
         <ListPageLayout
           additionalFilters={filterForm => ({
             // Apply group filter:
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}
-          filterAttributes={COLLECTION_FILTER_ATTRIBUTES}
-          id="collection-list"
+          filterAttributes={COLLECTION_METHOD_FILTER_ATTRIBUTES}
+          id="collection-method-list"
           queryTableProps={{
-            columns: COLLECTION_TABLE_COLUMNS,
-            path: "collection-api/collection"
+            columns: COLLECTION_METHOD_TABLE_COLUMNS,
+            path: "collection-api/collection-method"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">
@@ -65,13 +48,13 @@ export default function CollectionListPage() {
                   onChange={() => setImmediate(submitForm)}
                   name="group"
                   showAnyOption={true}
-                  showAllGroups={true}
                 />
               </div>
             </div>
           )}
         />
       </main>
+      <Footer />
     </div>
   );
 }

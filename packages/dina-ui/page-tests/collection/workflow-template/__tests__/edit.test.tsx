@@ -281,6 +281,10 @@ describe("Workflow template edit page", () => {
               // No default value set:
               enabled: true
             },
+            endEventDateTime: {
+              // No default value set:
+              enabled: true
+            },
             verbatimEventDateTime: {
               defaultValue: "test-verbatim-default-datetime",
               enabled: true
