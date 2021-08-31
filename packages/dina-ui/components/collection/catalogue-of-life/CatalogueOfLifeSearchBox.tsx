@@ -111,7 +111,7 @@ export function CatalogueOfLifeSearchBox({
         {({ form: { values: formState } }) => {
           const materialSample = formState;
           const verbatimScientificName =
-            materialSample.determination[index ?? 0]?.verbatimScientificName;
+            materialSample.determination?.[index ?? 0]?.verbatimScientificName;
           const hasVerbatimScientificName = !!verbatimScientificName;
           return (
             hasVerbatimScientificName && (
