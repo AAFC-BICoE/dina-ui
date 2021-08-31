@@ -147,50 +147,44 @@ export function ManagedAttributesEditor({
           </Field>
         </label>
       </div>
-      <div
-        style={{
-          minHeight: "25rem" /* Give extra room for the dropdown menus. */
-        }}
-      >
-        <div className="row">
-          {editableManagedAttributes.map(attribute => {
-            const attributeKey = get(attribute, managedAttributeKeyField);
+      <div className="row">
+        {editableManagedAttributes.map(attribute => {
+          const attributeKey = get(attribute, managedAttributeKeyField);
 
-            const props = {
-              className: `${attributeKey} col-sm-6`,
-              key: attributeKey,
-              label: attribute.name ?? attributeKey,
-              name: fieldPath(attributeKey)
-            };
+          const props = {
+            className: `${attributeKey} col-sm-6`,
+            key: attributeKey,
+            label: attribute.name ?? attributeKey,
+            name: fieldPath(attributeKey)
+          };
 
-            if (
-              attribute.managedAttributeType === "STRING" &&
-              attribute.acceptedValues?.length
-            ) {
-              return (
-                <SelectField
-                  {...props}
-                  options={[
-                    { label: `<${formatMessage("none")}>`, value: "" },
-                    ...attribute.acceptedValues.map(value => ({
-                      label: value,
-                      value
-                    }))
-                  ]}
-                />
-              );
-            } else if (attribute.managedAttributeType === "INTEGER") {
-              return <NumberField {...props} />;
-            } else {
-              return (
-                <TextField
-                  {...props}
-                  inputProps={{ type: "search" }} // Adds the 'X' clear button in the text input.
-                />
-              );
-            }
-          })}
-        </div>
+          if (
+            attribute.managedAttributeType === "STRING" &&
+            attribute.acceptedValues?.length
+          ) {
+            return (
+              <SelectField
+                {...props}
+                options={[
+                  { label: `<${formatMessage("none")}>`, value: "" },
+                  ...attribute.acceptedValues.map(value => ({
+                    label: value,
+                    value
+                  }))
+                ]}
+              />
+            );
+          } else if (attribute.managedAttributeType === "INTEGER") {
+            return <NumberField {...props} />;
+          } else {
+            return (
+              <TextField
+                {...props}
+                inputProps={{ type: "search" }} // Adds the 'X' clear button in the text input.
+              />
+            );
+          }
+        })}
       </div>
     </div>
   );

@@ -18,6 +18,7 @@ import { ReactNode, useContext } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
+  Footer,
   GroupSelectField,
   Head,
   MaterialSampleBreadCrumb,
@@ -69,6 +70,7 @@ export default function MaterialSampleEditPage() {
           <MaterialSampleForm onSaved={moveToViewPage} />
         )}
       </main>
+      <Footer />
     </div>
   );
 }
