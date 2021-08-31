@@ -24,12 +24,14 @@ export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
             <DinaMessage id="cancelButtonText" />
           </button>
           <div>
+            <br />
             <DynamicHotTable
               // afterValidate={afterValidate}
               columns={generateWorkbookColumns(jsonData)}
-              // data={workingTableData as any}
+              data={generateWorkbookRows(jsonData)}
               manualColumnResize={true}
               rowHeaders={true}
+              debug={true}
               // viewportColumnRenderingOffset={1000}
               // viewportRowRenderingOffset={1000}
             />
@@ -41,20 +43,38 @@ export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
 }
 
 /**
- * Generate the columns structure required for handsontable.
+ * Generate the columns structure required for handsontable. The headers will be the first
+ * row found on the workbook uploaded by default.
+ *
+ * @param jsonData Excel data from the workbook.
  */
-export function generateWorkbookColumns(
-  jsonData: WorkbookJSON
-): HotColumnProps[] {
+function generateWorkbookColumns(jsonData: WorkbookJSON): HotColumnProps[] {
   const generateColumns: HotColumnProps[] = [];
   jsonData[0].content.map(columnName => {
     generateColumns.push({
-      data: "",
+      data: columnName,
       title: columnName
     });
   });
 
   return generateColumns;
+}
+
+/**
+ * Generate the rows for each of the rows uploaded.
+ *
+ * @param jsonData Excel data from the workbook.
+ */
+function generateWorkbookRows(jsonData: WorkbookJSON) {
+  const generateRows: string[][] = [];
+  jsonData.map((row: WorkbookRow, index: number) => {
+    // Skip the header row since it has been already generated.
+    if (index !== 0) {
+      generateRows.push(row.content);
+    }
+  });
+
+  return generateRows;
 }
 
 export default WorkbookDisplay;
