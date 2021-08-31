@@ -9,12 +9,14 @@ export interface CatalogueOfLifeNameFieldProps extends FieldWrapperProps {
   onChange?: (selection: string | null, formik: FormikProps<any>) => void;
   /** Overridable for mocking in tests. */
   fetchJson?: (url: string) => Promise<any>;
+  index?: number;
 }
 
 export function CatalogueOfLifeNameField({
   onChange,
   scientificNameSourceField,
   fetchJson,
+  index,
   ...fieldWrapperProps
 }: CatalogueOfLifeNameFieldProps) {
   return (
@@ -63,6 +65,7 @@ export function CatalogueOfLifeNameField({
               onChange?.(newValue, formik);
               setValue(newValue);
             }}
+            index={index}
           />
         )
       }

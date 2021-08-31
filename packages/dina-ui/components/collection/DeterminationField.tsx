@@ -161,6 +161,7 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                           newValue ? "COLPLUS" : null
                         )
                       }
+                      index={index}
                     />
                   </div>
                 </div>
