@@ -23,7 +23,8 @@ import {
 } from "../../../dina-ui/types/collection-api";
 import {
   ManagedAttributeValues,
-  Metadata
+  Metadata,
+  Person
 } from "../../../dina-ui/types/objectstore-api";
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -76,6 +77,22 @@ export function useMaterialSampleQuery(id?: string | null) {
           );
           delete data?.managedAttributes;
           data.managedAttributeValues = managedAttributeValues;
+        }
+        if (data.determination) {
+          // Retrieve determiner arrays on determination.
+          for (const determination of data.determination) {
+            if (determination.determiner) {
+              determination.determiner = await bulkGet<Person>(
+                determination.determiner.map(
+                  (personId: string) => `/person/${personId}`
+                ),
+                {
+                  apiBaseUrl: "/agent-api",
+                  returnNullForMissingResource: true
+                }
+              );
+            }
+          }
         }
       }
     }
@@ -286,7 +303,7 @@ export function useMaterialSampleSave({
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
     const dataComponents = document?.querySelectorAll<HTMLDivElement>(
-      ".data-components fieldset:not(.d-none)"
+      ".data-components fieldset:not(.d-none, .non-strip)"
     );
     dataComponents?.forEach((element, index) => {
       element.style.backgroundColor = index % 2 === 0 ? "#f3f3f3" : "";
@@ -385,6 +402,18 @@ export function useMaterialSampleSave({
     // Only persist determination when enabled
     if (!enableDetermination) {
       materialSampleInput.determination = [];
+    }
+
+    // convert determination determiner to list
+    if (materialSampleInput.determination) {
+      for (const determination of materialSampleInput.determination) {
+        const determinerRef = determination.determiner;
+        if (determinerRef && typeof determinerRef !== "string") {
+          determination.determiner = determinerRef.map(it =>
+            typeof it !== "string" ? it.id : (null as any)
+          );
+        }
+      }
     }
 
     // Save the MaterialSample:

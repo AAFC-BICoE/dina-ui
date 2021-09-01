@@ -47,7 +47,7 @@ const mockGet = jest.fn<any, any>(async path => {
       return { data: [] };
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
-    case "collection-api/collecting-event/321?include=collectors,attachment":
+    case "collection-api/collecting-event/321?include=collectors,attachment,collectionMethod":
       return { data: testCollectionEvent() };
     case "agent-api/person":
     case "collection-api/material-sample-type":
@@ -278,6 +278,10 @@ describe("Workflow template edit page", () => {
               enabled: true
             },
             startEventDateTime: {
+              // No default value set:
+              enabled: true
+            },
+            endEventDateTime: {
               // No default value set:
               enabled: true
             },

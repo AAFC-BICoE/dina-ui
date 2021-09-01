@@ -10,7 +10,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   MaterialSample,
@@ -90,6 +90,7 @@ export default function MaterialSampleListPage() {
           )}
         />
       </main>
+      <Footer />
     </div>
   );
 }

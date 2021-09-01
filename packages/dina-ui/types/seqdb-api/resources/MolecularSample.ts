@@ -6,12 +6,9 @@ import { Protocol } from "./Protocol";
 export interface MolecularSampleAttributes {
   type: "molecular-sample";
   name: string;
-  version: string;
 
   // Optional Fields
   group?: string;
-  notes?: string;
-  lastModified?: string;
 }
 
 export interface MolecularSampleRelationships {

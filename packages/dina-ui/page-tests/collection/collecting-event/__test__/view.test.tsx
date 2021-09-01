@@ -26,7 +26,7 @@ const mockGet = jest.fn(async model => {
   // The get request will return the existing collecting-event.
   if (
     model ===
-    "collection-api/collecting-event/100?include=collectors,attachment"
+    "collection-api/collecting-event/100?include=collectors,attachment,collectionMethod"
   ) {
     return { data: TEST_COLLECTION_EVENT };
   } else if (model === "agent-api/person") {

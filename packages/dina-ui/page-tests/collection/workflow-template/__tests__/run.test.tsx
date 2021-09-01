@@ -34,7 +34,7 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/collecting-event":
       // Populate the linker table:
       return { data: [testCollectionEvent()] };
-    case "collection-api/collecting-event/2?include=collectors,attachment":
+    case "collection-api/collecting-event/2?include=collectors,attachment,collectionMethod":
       return {
         data: {
           startEventDateTime: "2021-04-13",
@@ -43,7 +43,7 @@ const mockGet = jest.fn<any, any>(async path => {
           group: "test group"
         }
       };
-    case "collection-api/collecting-event/555?include=collectors,attachment":
+    case "collection-api/collecting-event/555?include=collectors,attachment,collectionMethod":
       return { data: testCollectionEvent() };
     case "collection-api/srs":
       return { data: [TEST_SRS] };
