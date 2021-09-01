@@ -52,7 +52,7 @@ export const DETERMINATION_FIELDS = Object.keys(DETERMINATION_FIELDS_OBJECT);
 export function DeterminationField({ className }: DeterminationFieldProps) {
   const { readOnly, isTemplate } = useDinaFormContext();
   const { openAddPersonModal } = useAddPersonModal();
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage, locale } = useDinaIntl();
   const determinationsPath = "determination";
 
   /* Ensure config is rendered when input get focuse without needing to enter any value */
@@ -181,7 +181,7 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                               ?.toLowerCase?.()
                               ?.includes(searchValue?.toLowerCase?.())
                           )
-                          .map(it => it?.name ?? "")
+                          .map(it => it?.labels?.[locale] ?? "")
                       }
                       shouldRenderSuggestions={shouldRenderSuggestions}
                     />

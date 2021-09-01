@@ -63,7 +63,7 @@ export function CollectingEventFormLayout({
   setDefaultVerbatimCoordSys,
   setDefaultVerbatimSRS
 }: CollectingEventFormLayoutProps) {
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage, locale } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
 
@@ -462,8 +462,9 @@ export function CollectingEventFormLayout({
                   path: "collection-api/vocabulary/coordinateSystem"
                 })}
                 suggestion={vocabElement =>
-                  vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ??
-                  ""
+                  vocabElement?.vocabularyElements?.map(
+                    it => it?.labels?.[locale] ?? ""
+                  ) ?? ""
                 }
                 shouldRenderSuggestions={shouldRenderSuggestions}
                 onSuggestionSelected={onSuggestionSelected}
@@ -560,8 +561,9 @@ export function CollectingEventFormLayout({
                   path: "collection-api/vocabulary/srs"
                 })}
                 suggestion={vocabElement =>
-                  vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ??
-                  ""
+                  vocabElement?.vocabularyElements?.map(
+                    it => it?.labels?.[locale] ?? ""
+                  ) ?? ""
                 }
                 shouldRenderSuggestions={shouldRenderSuggestions}
                 onChangeExternal={onChangeExternal}
