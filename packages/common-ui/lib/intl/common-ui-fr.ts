@@ -35,7 +35,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     field_commitDateTime: "Date et heure de validation ",
     field_group: "Groupe",
     field_resourceName: "Nom de la ressource",
-    field_snapshotType: "Type d’instantanée",
+    field_snapshotType: "Type d’instantané",
     field_version: "Version",
     filterBetween: "ENTRE",
     filterBlankField: "Champ vide",
