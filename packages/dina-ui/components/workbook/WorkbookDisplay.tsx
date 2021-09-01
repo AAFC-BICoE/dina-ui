@@ -31,9 +31,18 @@ export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
               data={generateWorkbookRows(jsonData)}
               manualColumnResize={true}
               rowHeaders={true}
-              debug={true}
-              // viewportColumnRenderingOffset={1000}
-              // viewportRowRenderingOffset={1000}
+              contextMenu={[
+                "row_above",
+                "row_below",
+                "col_left",
+                "col_right",
+                "remove_row",
+                "clear_column",
+                "undo",
+                "redo"
+              ]}
+              manualColumnFreeze={true}
+              dropdownMenu={["remove_col"]}
             />
           </div>
         </div>
@@ -52,8 +61,8 @@ function generateWorkbookColumns(jsonData: WorkbookJSON): HotColumnProps[] {
   const generateColumns: HotColumnProps[] = [];
   jsonData[0].content.map(columnName => {
     generateColumns.push({
-      data: columnName,
-      title: columnName
+      title: columnName,
+      type: "text"
     });
   });
 
