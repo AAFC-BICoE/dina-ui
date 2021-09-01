@@ -47,7 +47,7 @@ const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
-    case "collection-api/collecting-event/1?include=collectors,attachment":
+    case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod":
       // Populate the linker table:
       return { data: testCollectionEvent() };
     case "collection-api/preparation-type":
