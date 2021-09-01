@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from "uuid";
 /** Attributes that compose a JsonApi query. */
 export interface JsonApiQuerySpec extends GetParams {
   path: string;
+  header?: {};
 }
 
 /** Query hook state. */
@@ -49,7 +50,6 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   }: QueryOptions<TData, TMeta> = {}
 ): QueryState<TData, TMeta> {
   const { apiClient, bulkGet } = useContext(ApiClientContext);
-
   // Memoize the callback. Only re-create it when the query spec changes.
   async function fetchData() {
     if (disabled) {
@@ -58,9 +58,9 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
 
     // Omit undefined values from the GET params, which would otherwise cause an invalid request.
     // e.g. /api/region?fields=undefined
-    const { path, fields, filter, sort, include, page } = querySpec;
+    const { path, fields, filter, sort, include, page, header } = querySpec;
     const getParams = omitBy<GetParams>(
-      { fields, filter, sort, include, page },
+      { fields, filter, sort, include, page, header },
       isUndefined
     );
 
