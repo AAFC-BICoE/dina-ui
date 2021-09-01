@@ -42,7 +42,8 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     qualifier: true,
     scientificNameSource: true,
     scientificNameDetails: true,
-    scientificName: true
+    scientificName: true,
+    transcriberRemarks: true
   };
 
 /** All fields of the Determination type. */
