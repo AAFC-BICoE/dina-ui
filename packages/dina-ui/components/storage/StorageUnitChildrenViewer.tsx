@@ -28,31 +28,35 @@ export function StorageUnitChildrenViewer({ parentId }: StorageTreeFieldProps) {
 
   const [actionMode, setActionMode] = useState<StorageActionMode>("VIEW");
 
-  const childrenPath = `collection-api/storage-unit/${parentId}/storageUnitChildren`;
+  const childrenPath = `collection-api/storage-unit/${parentId}?include=storageUnitChildren`;
 
-  const childrenQuery = useQuery<StorageUnit[], MetaWithTotal>({
+  const childrenQuery = useQuery<StorageUnit, MetaWithTotal>({
     path: childrenPath
   });
 
   async function moveAllContent(targetUnit: PersistedResource<StorageUnit>) {
-    const { data: children } = await apiClient.get<StorageUnit[]>(
+    const {
+      data: { storageUnitChildren: children }
+    } = await apiClient.get<StorageUnit>(
       childrenPath,
       // As of writing this code the "limit" is ignored and the API returns all chlidren:
       { page: { limit: 1000 } }
     );
 
     // Set first level children to new parent
-    await save(
-      children.map(child => ({
-        resource: {
-          type: child.type,
-          id: child.id,
-          parentStorageUnit: { type: targetUnit.type, id: targetUnit.id }
-        },
-        type: "storage-unit"
-      })),
-      { apiBaseUrl: "/collection-api" }
-    );
+    if (children) {
+      await save(
+        children.map(child => ({
+          resource: {
+            type: child.type,
+            id: child.id,
+            parentStorageUnit: { type: targetUnit.type, id: targetUnit.id }
+          },
+          type: "storage-unit"
+        })),
+        { apiBaseUrl: "/collection-api" }
+      );
+    }
 
     // Move to the new parent unit's page:
     await router.push(`/collection/storage-unit/view?id=${targetUnit.id}`);
@@ -73,9 +77,9 @@ export function StorageUnitChildrenViewer({ parentId }: StorageTreeFieldProps) {
     await router.reload();
   }
 
-  return withResponse(
-    childrenQuery,
-    ({ data: { length: numberOfChildren } }) => (
+  return withResponse(childrenQuery, ({ data }) => {
+    const numberOfChildren = data.storageUnitChildren?.length;
+    return (
       <div className="mb-3">
         {actionMode !== "VIEW" && (
           <FieldSet
@@ -143,6 +147,6 @@ export function StorageUnitChildrenViewer({ parentId }: StorageTreeFieldProps) {
           </div>
         )}
       </div>
-    )
-  );
+    );
+  });
 }
