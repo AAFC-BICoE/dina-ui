@@ -14,6 +14,7 @@ import { StorageTreeList } from "./BrowseStorageTree";
 import { StorageLinker } from "./StorageLinker";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { omit } from "lodash";
 
 export interface StorageTreeFieldProps {
   parentId: string;
@@ -48,8 +49,7 @@ export function StorageUnitChildrenViewer({ parentId }: StorageTreeFieldProps) {
       await save(
         children.map(child => ({
           resource: {
-            type: child.type,
-            id: child.id,
+            ...omit(child, "uuid"),
             parentStorageUnit: { type: targetUnit.type, id: targetUnit.id }
           },
           type: "storage-unit"

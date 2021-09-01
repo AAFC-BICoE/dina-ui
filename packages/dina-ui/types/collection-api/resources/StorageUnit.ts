@@ -8,6 +8,7 @@ export interface StorageUnitAttributes {
   hierarchy?: StorageHierarchyItem[];
   createdOn?: string;
   createdBy?: string;
+  storageUnitChildren?: StorageUnit[];
 }
 
 export interface HierarchyItem {
@@ -23,7 +24,6 @@ export interface StorageHierarchyItem extends HierarchyItem {
 export interface StorageUnitRelationships {
   storageUnitType?: StorageUnitType;
   parentStorageUnit?: StorageUnit;
-  storageUnitChildren?: StorageUnit[];
 }
 
 export type StorageUnit = KitsuResource &
