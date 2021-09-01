@@ -30,11 +30,12 @@ export function NumberRangeFields({
       {readOnly ? (
         bothAreDefined ? (
           <div className="mb-3">
-            <span>{minVal} </span>
-            <CommonMessage id="to" /> <span>{maxVal}</span>
+            <span>
+              {minVal}–{maxVal}m
+            </span>
           </div>
         ) : (
-          <div className="mb-3">{minVal ?? maxVal ?? ""}</div>
+          <div className="mb-3">{minVal ?? maxVal ?? ""}m</div>
         )
       ) : (
         <div className="d-flex align-items-center mb-3">

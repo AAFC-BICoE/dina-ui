@@ -895,7 +895,6 @@ export function CollectingEventFormLayout({
             filter={filterBy(["name"])}
             model="collection-api/collection-method"
             optionLabel={cm => cm.name}
-            isDisabled={true} // TODO re-enable when the back end has the field.
           />
           <VocabularySelectField
             path="collection-api/vocabulary/substrate"
