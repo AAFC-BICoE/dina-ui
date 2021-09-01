@@ -24,6 +24,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   deleteButtonText: "Delete",
   description: "Description",
   destroyedLabel: "Destroyed",
+  done: "Done",
   editButtonText: "Edit",
   editableTable: "Editable Table",
   errorPageTitle: "Error",

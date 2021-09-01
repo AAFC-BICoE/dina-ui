@@ -2,7 +2,9 @@ import {
   AutoSuggestTextField,
   DateField,
   FieldSet,
+  filterBy,
   FormikButton,
+  ResourceSelectField,
   TextField,
   TextFieldWithMultiplicationButton,
   useDinaFormContext
@@ -12,13 +14,15 @@ import { ShouldRenderReasons } from "react-autosuggest";
 import { Accordion } from "react-bootstrap";
 import { VscTriangleDown, VscTriangleRight } from "react-icons/vsc";
 import { CatalogueOfLifeNameField } from ".";
+import { Person } from "../../../dina-ui/types/agent-api/resources/Person";
 import { TypeStatusEnum } from "../../../dina-ui/types/collection-api/resources/TypeStatus";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   Determination,
   MaterialSample,
   Vocabulary
 } from "../../types/collection-api";
+import { useAddPersonModal } from "../add-person/PersonForm";
 
 export interface DeterminationFieldProps {
   className?: string;
@@ -38,7 +42,8 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     qualifier: true,
     scientificNameSource: true,
     scientificNameDetails: true,
-    scientificName: true
+    scientificName: true,
+    transcriberRemarks: true
   };
 
 /** All fields of the Determination type. */
@@ -46,6 +51,8 @@ export const DETERMINATION_FIELDS = Object.keys(DETERMINATION_FIELDS_OBJECT);
 
 export function DeterminationField({ className }: DeterminationFieldProps) {
   const { readOnly, isTemplate } = useDinaFormContext();
+  const { openAddPersonModal } = useAddPersonModal();
+  const { formatMessage } = useDinaIntl();
   const determinationsPath = "determination";
 
   /* Ensure config is rendered when input get focuse without needing to enter any value */
@@ -91,7 +98,9 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
 
             return (
               <div>
-                <div>
+                <FieldSet
+                  legend={<DinaMessage id="verbatimDeterminationLegend" />}
+                >
                   <div className="row">
                     <div className="col-md-6">
                       <TextFieldWithMultiplicationButton
@@ -147,23 +156,47 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                       />
                     </div>
                   </div>
-                </div>
-                <div className="row">
-                  <div className="col-sm-6">
-                    <CatalogueOfLifeNameField
-                      {...fieldProps("scientificName")}
-                      scientificNameSourceField={
-                        fieldProps("scientificNameSource").name
-                      }
-                      onChange={(newValue, formik) =>
-                        formik.setFieldValue(
-                          fieldProps("scientificNameSource").name,
-                          newValue ? "COLPLUS" : null
-                        )
-                      }
-                    />
+                </FieldSet>
+                <FieldSet legend={<DinaMessage id="determination" />}>
+                  <div className="row">
+                    <div className="col-sm-6">
+                      <CatalogueOfLifeNameField
+                        {...fieldProps("scientificName")}
+                        scientificNameSourceField={
+                          fieldProps("scientificNameSource").name
+                        }
+                        onChange={(newValue, formik) =>
+                          formik.setFieldValue(
+                            fieldProps("scientificNameSource").name,
+                            newValue ? "COLPLUS" : null
+                          )
+                        }
+                        index={index}
+                      />
+                    </div>
+                    <div className="col-sm-6">
+                      <ResourceSelectField<Person>
+                        {...fieldProps("determiner")}
+                        label={formatMessage("determiningAgent")}
+                        readOnlyLink="/person/view?id="
+                        filter={filterBy(["displayName"])}
+                        model="agent-api/person"
+                        optionLabel={person => person.displayName}
+                        isMulti={true}
+                        asyncOptions={[
+                          {
+                            label: <DinaMessage id="addNewPerson" />,
+                            getResource: openAddPersonModal
+                          }
+                        ]}
+                      />
+                      <DateField
+                        {...fieldProps("determinedOn")}
+                        label={formatMessage("determiningDate")}
+                      />
+                    </div>
                   </div>
-                </div>
+                </FieldSet>
               </div>
             );
           }
