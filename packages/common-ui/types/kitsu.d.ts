@@ -56,6 +56,9 @@ declare module "kitsu" {
 
     /** Vendor-specific parameter for paginating listed data. */
     page?: any;
+
+    /** Custom headers for the request */
+    header?: {};
   }
 
   /** Parameter for requesting sparse fields. */

@@ -53,6 +53,7 @@ import {
 } from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import { VocabularySelectField } from "./VocabularySelectField";
+import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -67,7 +68,6 @@ export function CollectingEventFormLayout({
 }: CollectingEventFormLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
-  const [rangeEnabled, setRangeEnabled] = useState(false);
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
@@ -101,16 +101,6 @@ export function CollectingEventFormLayout({
   );
 
   const commonSrcDetailRoot = "geographicPlaceNameSourceDetail";
-
-  function toggleRangeEnabled(
-    newValue: boolean,
-    formik: FormikContextType<{}>
-  ) {
-    if (!newValue) {
-      formik.setFieldValue("endEventDateTime", null);
-    }
-    setRangeEnabled(newValue);
-  }
 
   async function selectSearchResult(
     result: NominatumApiSearchResult,
@@ -381,43 +371,20 @@ export function CollectingEventFormLayout({
                 )}
               </Field>
             )}
+            <TextField
+              name="verbatimEventDateTime"
+              label={formatMessage("verbatimEventDateTimeLabel")}
+            />
             <FormattedTextField
               name="startEventDateTime"
               className="startEventDateTime"
               label={formatMessage("startEventDateTimeLabel")}
               placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
-            <Field name="endEventDateTime">
-              {({ field: { value: endEventDateTime }, form }) => (
-                <div>
-                  {!readOnly && (
-                    <label
-                      className="mb-3"
-                      style={{ marginLeft: 15, marginTop: -15 }}
-                    >
-                      <span>{formatMessage("enableDateRangeLabel")}</span>
-                      <Switch
-                        onChange={newValue =>
-                          toggleRangeEnabled(newValue, form)
-                        }
-                        checked={rangeEnabled || !!endEventDateTime || false}
-                        className="react-switch dateRange"
-                      />
-                    </label>
-                  )}
-                  {(rangeEnabled || endEventDateTime) && (
-                    <FormattedTextField
-                      name="endEventDateTime"
-                      label={formatMessage("endEventDateTimeLabel")}
-                      placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
-                    />
-                  )}
-                </div>
-              )}
-            </Field>
-            <TextField
-              name="verbatimEventDateTime"
-              label={formatMessage("verbatimEventDateTimeLabel")}
+            <FormattedTextField
+              name="endEventDateTime"
+              label={formatMessage("endEventDateTimeLabel")}
+              placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
           </FieldSet>
         </div>
@@ -604,11 +571,6 @@ export function CollectingEventFormLayout({
               />
               <TextField name="dwcVerbatimElevation" />
               <TextField name="dwcVerbatimDepth" />
-              <NumberField
-                name="dwcMinimumElevationInMeters"
-                isInteger={true}
-              />
-              <NumberField name="dwcMinimumDepthInMeters" isInteger={true} />
             </div>
           </div>
         </FieldSet>
@@ -926,30 +888,40 @@ export function CollectingEventFormLayout({
           <TextField name="host" className="col-md-6" />
         </div>
         <div className="row">
-          <TextField name="collectionMethod" className="col-md-6" />
+          <ResourceSelectField<CollectionMethod>
+            name="collectionMethod"
+            className="col-md-6"
+            readOnlyLink="/collection/collection-method/view?id="
+            filter={filterBy(["name"])}
+            model="collection-api/collection-method"
+            optionLabel={cm => cm.name}
+            isDisabled={true} // TODO re-enable when the back end has the field.
+          />
           <VocabularySelectField
             path="collection-api/vocabulary/substrate"
             name="substrate"
-            isMulti={true}
             className="col-md-6"
           />
         </div>
         <div className="row">
           <div className="col-md-6">
             <NumberRangeFields
-              names={["elevationMin", "elevationMax"]}
+              names={[
+                "dwcMinimumElevationInMeters",
+                "dwcMaximumElevationInMeters"
+              ]}
               labelMsg={<DinaMessage id="elevationInMeters" />}
             />
           </div>
           <div className="col-md-6">
             <NumberRangeFields
-              names={["depthMin", "depthMax"]}
+              names={["dwcMinimumDepthInMeters", "dwcMaximumDepthInMeters"]}
               labelMsg={<DinaMessage id="depthInMeters" />}
             />
           </div>
         </div>
         <div>
-          <TextField name="collectingEventRemarks" multiLines={true} />
+          <TextField name="remarks" multiLines={true} />
         </div>
       </FieldSet>
       {!isTemplate && (

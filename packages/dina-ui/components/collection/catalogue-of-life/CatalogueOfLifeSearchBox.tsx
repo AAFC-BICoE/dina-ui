@@ -140,7 +140,7 @@ export function CatalogueOfLifeSearchBox({
           })}
         </div>
       )}
-      {nameResults?.length === 0 && (
+      {searchResult?.empty && (
         <p>
           <DinaMessage id="noResultsFound" />
         </p>
