@@ -45,14 +45,16 @@ export function useThrottledFetch<TData>({
   const searchIsDisabled = throttled || !inputValue || searchIsLoading;
 
   /** Executes the search immediately and delays further calls. */
-  function doThrottledSearch() {
+  function doThrottledSearch(scientificName) {
     // Set a 1-second API request throttle:
-    if (searchIsDisabled) {
+    if (searchIsDisabled && !scientificName) {
       return;
     }
 
     // Set the new search value which will make useSWR do the lookup:
-    setSearchValue(inputValue);
+    const value = scientificName?.length > 0 ? scientificName : inputValue;
+    setInputValue(value);
+    setSearchValue(value);
   }
 
   return {
