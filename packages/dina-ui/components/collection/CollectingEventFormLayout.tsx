@@ -9,6 +9,7 @@ import {
   LoadingSpinner,
   NominatumApiSearchResult,
   NumberField,
+  NumberRangeFields,
   ResourceSelectField,
   StringArrayField,
   TextField,
@@ -51,6 +52,8 @@ import {
   NominatumApiAddressDetailSearchResult
 } from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
+import { VocabularySelectField } from "./VocabularySelectField";
+import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -568,11 +571,6 @@ export function CollectingEventFormLayout({
               />
               <TextField name="dwcVerbatimElevation" />
               <TextField name="dwcVerbatimDepth" />
-              <NumberField
-                name="dwcMinimumElevationInMeters"
-                isInteger={true}
-              />
-              <NumberField name="dwcMinimumDepthInMeters" isInteger={true} />
             </div>
           </div>
         </FieldSet>
@@ -747,7 +745,7 @@ export function CollectingEventFormLayout({
                                         templateCheckboxFieldName={`srcAdminLevels[${idx}]`}
                                         readOnly={true}
                                         removeLabel={true}
-                                        removeFormGroupClass={true}
+                                        removeBottomMargin={true}
                                         removeItem={removeItem}
                                         key={Math.random()}
                                         index={idx}
@@ -882,12 +880,47 @@ export function CollectingEventFormLayout({
               </div>
             </FieldSet>
           </div>
-          <FieldSet legend={<DinaMessage id="collectingEventDetailsLegend" />}>
-            <div className="row">
-              <TextField name="habitat" className="col-md-6" />
-              <TextField name="host" className="col-md-6" />
-            </div>
-          </FieldSet>
+        </div>
+      </FieldSet>
+      <FieldSet legend={<DinaMessage id="collectingEventDetails" />}>
+        <div className="row">
+          <TextField name="habitat" className="col-md-6" />
+          <TextField name="host" className="col-md-6" />
+        </div>
+        <div className="row">
+          <ResourceSelectField<CollectionMethod>
+            name="collectionMethod"
+            className="col-md-6"
+            readOnlyLink="/collection/collection-method/view?id="
+            filter={filterBy(["name"])}
+            model="collection-api/collection-method"
+            optionLabel={cm => cm.name}
+          />
+          <VocabularySelectField
+            path="collection-api/vocabulary/substrate"
+            name="substrate"
+            className="col-md-6"
+          />
+        </div>
+        <div className="row">
+          <div className="col-md-6">
+            <NumberRangeFields
+              names={[
+                "dwcMinimumElevationInMeters",
+                "dwcMaximumElevationInMeters"
+              ]}
+              labelMsg={<DinaMessage id="elevationInMeters" />}
+            />
+          </div>
+          <div className="col-md-6">
+            <NumberRangeFields
+              names={["dwcMinimumDepthInMeters", "dwcMaximumDepthInMeters"]}
+              labelMsg={<DinaMessage id="depthInMeters" />}
+            />
+          </div>
+        </div>
+        <div>
+          <TextField name="remarks" multiLines={true} />
         </div>
       </FieldSet>
       {!isTemplate && (

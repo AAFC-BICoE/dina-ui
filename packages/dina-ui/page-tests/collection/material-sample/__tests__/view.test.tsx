@@ -26,7 +26,8 @@ const mockGet = jest.fn<any, any>(async path => {
   if (path === "collection-api/material-sample/1") {
     return { data: TEST_MATERIAL_SAMPLE };
   } else if (
-    path === "collection-api/collecting-event/1?include=collectors,attachment"
+    path ===
+    "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod"
   ) {
     return { data: TEST_COLLECTION_EVENT };
   } else if (path === "collection-api/collecting-event/1/attachment") {

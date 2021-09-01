@@ -59,6 +59,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingDateLegend: "Collecting Date",
   collectingEvent: "Collecting Event",
   collectingEventAttachments: "Collecting Event Attachments",
+  collectingEventDetails: "Collecting Event Details",
   collectingEventDetailsPageLink: "Collecting Event Details Page",
   collectingEventListTitle: "Collecting Event",
   collectingEventManagedAttributes: "Collecting Event Managed Attributes",
@@ -101,6 +102,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   deleteThisAttributesTemplate: "Delete This Template",
   deleted: "Deleted",
   deletedMetadata_tooltip: "Deleted Metadata ID: {id}",
+  depthInMeters: "Depth in Meters",
   destroyOriginal: 'Tag Original as "Destroyed"',
   detachCollectingEvent: "Detach Collecting Event",
   detachSelectedButtonText: "Detach Selected",
@@ -130,6 +132,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editStorageUnitTitle: "Edit Storage Unit",
   editStorageUnitTypeTitle: "Edit Storage Type",
   editWorkflowTemplateTitle: "Edit Workflow Template",
+  elevationInMeters: "Elevation in Meters",
   enableDateRangeLabel: "Enable Date Range",
   endEventDateTimeLabel: "End Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   exifProperties: "Exif Properties",
@@ -293,7 +296,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   latitudeValidationError:
     "Invalid latitude: {latitude},   \nValid latitude range is between -90 to 90 for degree, and 0 to 60 for minute and second",
   literalGeoreferencedByLabel: "Georeferenced By",
-  collectingEventDetailsLegend: "Collecting Event Details",
   locationLabel: "Location",
   longitudeValidationError:
     "Invalid longitude: {longtitude},   \nValid longitude is between -180 to 180 for degree, and 0 to 60 for minute and second",
