@@ -41,7 +41,6 @@ export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
                 "undo",
                 "redo"
               ]}
-              manualColumnFreeze={true}
               dropdownMenu={["remove_col"]}
             />
           </div>

@@ -11,9 +11,9 @@ export interface CollectionAttributes {
 }
 
 export const ImportCollection = object({
-  group: string(),
-  name: string(),
-  code: string(),
+  group: string().required(),
+  name: string().required(),
+  code: string().required(),
   createdOn: string(),
   createdBy: string()
 });

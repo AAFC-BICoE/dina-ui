@@ -15,9 +15,31 @@ interface WorkbookProps {
 }
 
 interface WorkbookStates {
+  /** Json data provided directly from the spreadsheet. */
   jsonData: WorkbookJSON | null;
+
+  /** Loading state to display a loading indicator. */
   loading: boolean;
+
+  /** Boolean state to determine if an error message should be displayed. */
   failed: boolean;
+
+  /** The type of import the user is trying to perform. */
+  selectedType: string | null;
+
+  /** Workbook columns. */
+  selectedColumns: WorkbookColumn[] | null;
+}
+
+interface WorkbookColumn {
+  /** Spreadsheet column name provided. */
+  columnName: string;
+
+  /** Index where the column is presented. */
+  columnIndex: number;
+
+  /** What the column represents when importing. */
+  typeColumn: string;
 }
 
 /**
@@ -47,6 +69,8 @@ export class WorkbookConversion extends Component<
     this.state = {
       loading: false,
       jsonData: null,
+      selectedColumns: [],
+      selectedType: null,
       failed: false
     };
   }
@@ -111,22 +135,34 @@ export class WorkbookConversion extends Component<
   determineType = (workbookData: WorkbookJSON) => {
     // Get the spreadsheet header row, this will be used to determine the import type.s
     const workbookHeader: string[] = workbookData[0].content;
+    let highestMatchedColumns = 0;
+    let highestMatchedType = "";
 
     // Loop through each header provided by the uploaded workbook.
     workbookHeader.map(header => {
       // Loop through each of the supported types.
       definedTypes.map(type => {
+        let matches = 0;
         const definedTypeFields: string[] = Object.keys(type.describe().fields);
 
         // Loop through the supported columns.
         definedTypeFields.map(field => {
-          // if (header === field) {
-          //  console.log("Matched!");
-          // } else {
-          //  console.log("No match for field.");
-          // }
+          if (header === field) {
+            matches++;
+          }
         });
+
+        // If this has more matches, then it becomes the recommended type.
+        if (matches > highestMatchedColumns) {
+          highestMatchedColumns = matches;
+          highestMatchedType = type.type;
+        }
       });
+    });
+
+    // Change the type based on the highest match.
+    this.setState({
+      selectedType: highestMatchedType
     });
   };
 
