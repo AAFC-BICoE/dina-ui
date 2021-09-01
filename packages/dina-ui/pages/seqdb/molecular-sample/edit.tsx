@@ -152,10 +152,6 @@ export function MolecularSampleFields() {
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
-        <TextField className="col-md-6" name="version" />
-      </div>
-      <div className="row">
-        <TextField className="col-md-6" name="notes" multiLines={true} />
       </div>
       <div className="row">
         <ResourceSelectField<Product>

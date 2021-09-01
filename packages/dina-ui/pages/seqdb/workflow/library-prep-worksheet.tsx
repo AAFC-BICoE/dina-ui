@@ -31,7 +31,7 @@ export default function LibraryPrepWorksheetPage() {
   >({
     fields: {
       "ngs-index": "name",
-      "molecular-sample": "name,version"
+      "molecular-sample": "name"
     },
     include: "indexI5,indexI7,molecularSample",
     page: { limit: 1000 },
@@ -219,7 +219,6 @@ function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
         <tr>
           <th>Well Location</th>
           <th>Sample Name</th>
-          <th>Sample Version</th>
           <th>Index i5</th>
           <th>Index i7</th>
         </tr>
@@ -236,7 +235,6 @@ function LibraryPrepTable({ preps }: LibraryPrepTableProps) {
             <tr key={String(prep.id)}>
               <td>{wellLocation}</td>
               <td>{prep.molecularSample.name}</td>
-              <td>{prep.molecularSample.version}</td>
               <td>{prep.indexI5 && prep.indexI5.name}</td>
               <td>{prep.indexI7 && prep.indexI7.name}</td>
             </tr>

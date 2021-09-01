@@ -2,19 +2,19 @@ import {
   AutoSuggestTextField,
   DateField,
   FieldSet,
+  filterBy,
   FormikButton,
+  ResourceSelectField,
   TextField,
   TextFieldWithMultiplicationButton,
-  useDinaFormContext,
-  ResourceSelectField,
-  filterBy
+  useDinaFormContext
 } from "common-ui";
 import { FieldArray } from "formik";
-import { Person } from "../../../dina-ui/types/agent-api/resources/Person";
 import { ShouldRenderReasons } from "react-autosuggest";
 import { Accordion } from "react-bootstrap";
 import { VscTriangleDown, VscTriangleRight } from "react-icons/vsc";
 import { CatalogueOfLifeNameField } from ".";
+import { Person } from "../../../dina-ui/types/agent-api/resources/Person";
 import { TypeStatusEnum } from "../../../dina-ui/types/collection-api/resources/TypeStatus";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import {
@@ -42,7 +42,8 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     qualifier: true,
     scientificNameSource: true,
     scientificNameDetails: true,
-    scientificName: true
+    scientificName: true,
+    transcriberRemarks: true
   };
 
 /** All fields of the Determination type. */
@@ -141,6 +142,7 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                           newValue ? "COLPLUS" : null
                         )
                       }
+                      index={index}
                     />
                     <ResourceSelectField<Person>
                       {...fieldProps("determiner")}

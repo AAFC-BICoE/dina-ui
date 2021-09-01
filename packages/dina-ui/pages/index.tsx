@@ -85,6 +85,13 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
           <li>
+            <Link href="/seqdb/sanger-workflow/list">
+              <a>
+                <SeqdbMessage id="sangerWorkflowListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
             <Link href="/seqdb/index-set/list">
               <a>
                 <SeqdbMessage id="indexSetListTitle" />

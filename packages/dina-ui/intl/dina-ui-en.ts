@@ -219,7 +219,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcVerbatimSRS_tooltip:
     "The ellipsoid, geodetic datum, or spatial reference system (SRS) upon which coordinates given in verbatimLatitude and verbatimLongitude, or verbatimCoordinates are based. Recommended best practice is to use the EPSG code of the SRS, if known. Examples: EPSG:4326, WGS84, NAD27",
   field_editableBuiltInAttributes: "Visible Built In Attributes",
-  field_editableManagedAttributes: "Visible Managed Attributes",
+  field_editableManagedAttributes: "Managed Attributes In Use",
   field_email: "Email",
   field_familyNames_tooltip: "Family name(s) including compound family names",
   field_givenNames_tooltip: "First and all middle names",

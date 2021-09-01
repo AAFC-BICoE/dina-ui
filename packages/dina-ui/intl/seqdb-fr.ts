@@ -41,6 +41,8 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   "field_sample.name": "Nom d’échantillon",
   field_size: "Taille",
   field_targetBpSize: "Taille de la paire de bases cible",
+  indexGridInstructions:
+    "La sélection d'un élément de la liste déroulante située dans la partie supérieure définit l'index de cette colonne. La sélection d'un élément de la liste déroulante située dans la partie gauche définit l'index de cette ligne. La sélection de l'option « Aucun » efface l'index.",
   indexI5: "Indice i5",
   indexI7: "Indice i7",
   indexSetListTitle: "Ensembles d’indices",
@@ -76,6 +78,8 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
     "Supprimer les détails sur la sélection de taille sélectionnés",
   sampleSelectionInstructions:
     "Votre sélection d’échantillons est sauvegardée lorsque vous appuyez sur un bouton de sélection ou de désélection. Il n’y a pas de bouton Enregistrer distinct.",
+  sampleGridInstructions:
+    "Faites glisser et déposez des échantillons entre la liste d'échantillons et la grille, ou placez automatiquement les échantillons dans la grille en sélectionnant une option « Remplir par » puis en cliquant sur le bouton « Déplacer tout ».",
   sampleSelectionTitle: "Sélection d’échantillons",
   selectAllCheckedSamplesButtonText:
     "Sélectionner tous les échantillons cochés -->",
