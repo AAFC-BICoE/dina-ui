@@ -14,12 +14,15 @@ import {
 } from "../../../pages/seqdb/pcr-batch/edit";
 import { PcrBatch } from "../../../types/seqdb-api";
 
-export interface PcrBatchStepProps {
+export interface SangerPcrBatchStepProps {
   pcrBatchId?: string;
   onSaved: (resource: PersistedResource<PcrBatch>) => Promise<void>;
 }
 
-export function PcrBatchStep({ pcrBatchId, onSaved }: PcrBatchStepProps) {
+export function SangerPcrBatchStep({
+  pcrBatchId,
+  onSaved
+}: SangerPcrBatchStepProps) {
   const [editMode, setEditMode] = useState(!pcrBatchId);
 
   const pcrBatchQuery = usePcrBatchQuery(pcrBatchId, [editMode]);
@@ -53,7 +56,7 @@ export function PcrBatchStep({ pcrBatchId, onSaved }: PcrBatchStepProps) {
         <DinaForm<PcrBatch> initialValues={pcrBatch} readOnly={true}>
           <ButtonBar>
             <button
-              className="btn btn-primary"
+              className="btn btn-primary edit-button"
               type="button"
               onClick={() => setEditMode(true)}
               style={{ width: "10rem" }}

@@ -31,6 +31,7 @@ export function SangerSampleSelectionStep({
 }: SangerSampleSelectionStepProps) {
   const pcrBatchItemQuery = usePcrBatchItemQuery(
     pcrBatchId,
+    // Default to edit mode when there are no items selected:
     async ({ meta: { totalResourceCount } }) => setEditMode(!totalResourceCount)
   );
 
@@ -107,7 +108,7 @@ export function SangerSampleSelectionStep({
     <div>
       <ButtonBar>
         <button
-          className="btn btn-primary"
+          className="btn btn-primary edit-button"
           type="button"
           onClick={() => setEditMode(true)}
           style={{ width: "10rem" }}
@@ -230,9 +231,7 @@ export function SangerSampleSelectionStep({
                   </FormikButton>
                 </div>
               </div>
-              <div className="col-5 available-samples">
-                {selectedItemsTable}
-              </div>
+              <div className="col-5 selected-samples">{selectedItemsTable}</div>
             </div>
           </DinaForm>
         </div>

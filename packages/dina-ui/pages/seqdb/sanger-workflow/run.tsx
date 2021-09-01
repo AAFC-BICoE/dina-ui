@@ -3,12 +3,12 @@ import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { Footer, Head, Nav } from "../../../components";
-import { PcrBatchStep } from "../../../components/seqdb/sanger-workflow/SangerPcrBatchStep";
+import { SangerPcrBatchStep } from "../../../components/seqdb/sanger-workflow/SangerPcrBatchStep";
 import { SangerSampleSelectionStep } from "../../../components/seqdb/sanger-workflow/SangerSampleSelectionStep";
 import { useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
 
-export default function SangerWorkFlowEditPage() {
+export default function SangerWorkFlowRunPage() {
   const router = useRouter();
   const { formatMessage } = useSeqdbIntl();
 
@@ -21,10 +21,6 @@ export default function SangerWorkFlowEditPage() {
       pathname: router.pathname,
       query: { ...router.query, step: newIndex }
     });
-  }
-
-  function goToNextStep() {
-    goToStep(stepNumber + 1);
   }
 
   async function finishPcrBatchStep(pcrBatch: PersistedResource<PcrBatch>) {
@@ -44,14 +40,14 @@ export default function SangerWorkFlowEditPage() {
         <ButtonBar>
           <BackToListButton entityLink="/seqdb/sanger-workflow" />
         </ButtonBar>
-        <h1>{formatMessage("sangerWorkflow")}</h1>
+        <h1>{title}</h1>
         <Tabs selectedIndex={stepNumber} onSelect={goToStep}>
           <TabList>
             <Tab>{formatMessage("pcrBatch")}</Tab>
             <Tab disabled={!pcrBatchId}>{formatMessage("selectSamples")}</Tab>
           </TabList>
           <TabPanel>
-            <PcrBatchStep
+            <SangerPcrBatchStep
               pcrBatchId={pcrBatchId}
               onSaved={finishPcrBatchStep}
             />
