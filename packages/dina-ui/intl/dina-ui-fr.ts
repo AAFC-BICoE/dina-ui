@@ -58,7 +58,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   collectingDateLegend: "Date de collecte",
   collectingEvent: "Événement de collecte",
   collectingEventAttachments: "Pièces jointes de l’événement de collecte",
-  collectingEventDetailsLegend: "Détails de l'activité de collecte",
+  collectingEventDetails: "Détails de l'activité de collecte",
   collectingEventDetailsPageLink: "Page des détails de l’événement de collecte",
   collectingEventListTitle: "Événement de collecte",
   collectingEventManagedAttributes:
@@ -66,7 +66,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   collectingEventViewTitle: "Voir l’événement de collecte",
   collectingLocationLegend: "Lieu de collecte",
   collectionListTitle: "Collections",
-  collectionManagedAttributeListTitle: "Attributs gérés du module de collections",
+  collectionManagedAttributeListTitle:
+    "Attributs gérés du module de collections",
   collectionSectionTitle: "Collections",
   collectionViewTitle: "Collection",
   collectorGroupAgentsLabel: "Agents du groupe de collecte",
