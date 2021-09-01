@@ -7,7 +7,6 @@ const TEST_MOLECULAR_SAMPLE: PersistedResource<MolecularSample> = {
   id: "123",
   type: "molecular-sample",
   name: "test molecular sample",
-  version: "A",
   group: "cnc",
   materialSample: {
     id: "999",
@@ -57,9 +56,6 @@ describe("MolecularSampleForm", () => {
     wrapper
       .find(".name-field input")
       .simulate("change", { target: { value: "my-molecular-sample" } });
-    wrapper
-      .find(".version-field input")
-      .simulate("change", { target: { value: "B" } });
     wrapper.update();
 
     wrapper.find("form").simulate("submit");
@@ -72,8 +68,7 @@ describe("MolecularSampleForm", () => {
         {
           resource: {
             name: "my-molecular-sample",
-            type: "molecular-sample",
-            version: "B"
+            type: "molecular-sample"
           },
           type: "molecular-sample"
         }
@@ -123,8 +118,7 @@ describe("MolecularSampleForm", () => {
               name: "test-protocol",
               type: "protocol"
             },
-            type: "molecular-sample",
-            version: "A"
+            type: "molecular-sample"
           },
           type: "molecular-sample"
         }

@@ -1,35 +1,60 @@
-import { ButtonBar, CreateButton, dateCell, ListPageLayout } from "common-ui";
+import {
+  ButtonBar,
+  ColumnDefinition,
+  dateCell,
+  FilterAttribute,
+  ListPageLayout
+} from "common-ui";
 import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
-import { useSeqdbIntl } from "../../../intl/seqdb-intl";
+import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
+import { PcrBatch } from "../../../types/seqdb-api";
 
-const FILTER_ATTRIBUTES = ["name", "createdBy"];
-const TABLE_COLUMNS = [
+const TABLE_COLUMNS: ColumnDefinition<PcrBatch>[] = [
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/seqdb/molecular-sample/view?id=${id}`}>{name}</Link>
+      <Link href={`/seqdb/sanger-workflow/run?pcrBatchId=${id}`}>
+        {name || id}
+      </Link>
     ),
-    accessor: "name"
+    accessor: "name",
+    Header: () => <SeqdbMessage id="pcrBatchName" />
   },
-  "sampleType",
   "group",
+  "primerForward.name",
+  "primerReverse.name",
   "createdBy",
   dateCell("createdOn")
 ];
 
-export default function MolecularSampleListPage() {
+const FILTER_ATTRIBUTES: FilterAttribute[] = [
+  "name",
+  "primerForward.name",
+  "primerReverse.name",
+  {
+    name: "createdOn",
+    type: "DATE"
+  },
+  "createdBy"
+];
+
+export default function SangerWorkflowListPage() {
   const { formatMessage } = useSeqdbIntl();
 
-  const title = formatMessage("molecularSampleListTitle");
+  const title = formatMessage("sangerWorkflowListTitle");
 
   return (
     <div>
       <Head title={title} />
       <Nav />
       <main className="container-fluid">
-        <h1 id="wb-cont">{title}</h1>
+        <h1>{title}</h1>
         <ButtonBar>
-          <CreateButton entityLink="/seqdb/molecular-sample" />
+          <Link href={`/seqdb/sanger-workflow/run`}>
+            <a className="btn btn-primary">
+              <SeqdbMessage id="startNewWorkflow" />
+            </a>
+          </Link>
         </ButtonBar>
         <ListPageLayout
           additionalFilters={filterForm => ({
@@ -37,10 +62,11 @@ export default function MolecularSampleListPage() {
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}
           filterAttributes={FILTER_ATTRIBUTES}
-          id="molecular-sample-list"
+          id="sanger-workflow-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
-            path: "seqdb-api/molecular-sample"
+            path: "seqdb-api/pcr-batch",
+            include: "primerForward,primerReverse"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">

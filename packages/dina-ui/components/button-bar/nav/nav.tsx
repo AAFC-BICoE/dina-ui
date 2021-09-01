@@ -221,6 +221,11 @@ function NavSeqDBDropdown() {
             <SeqdbMessage id="workflowListTitle" />
           </a>
         </Link>
+        <Link href="/seqdb/sanger-workflow/list">
+          <a className="dropdown-item">
+            <SeqdbMessage id="sangerWorkflowListTitle" />
+          </a>
+        </Link>
         <Link href="/seqdb/index-set/list">
           <a className="dropdown-item">
             <SeqdbMessage id="indexSetListTitle" />

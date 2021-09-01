@@ -1,6 +1,11 @@
 import { AxiosError } from "axios";
 import { cacheAdapterEnhancer } from "axios-extensions";
-import Kitsu, { GetParams, KitsuResource, PersistedResource } from "kitsu";
+import Kitsu, {
+  GetParams,
+  KitsuResource,
+  KitsuResourceLink,
+  PersistedResource
+} from "kitsu";
 import { deserialise, error as kitsuError, query } from "kitsu-core";
 import { keys, omit } from "lodash";
 import LRUCache from "lru-cache";
@@ -69,7 +74,7 @@ export interface SaveArgs<T extends KitsuResource = KitsuResource> {
 }
 
 export interface DeleteArgs {
-  delete: PersistedResource<any>;
+  delete: KitsuResourceLink | PersistedResource<any>;
 }
 
 /**
