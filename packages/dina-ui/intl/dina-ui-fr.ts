@@ -2,6 +2,7 @@ import { DINAUI_MESSAGES_ENGLISH } from "./dina-ui-en";
 
 export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addAnotherAssertion: "Ajouter une autre géoréférence",
+  addAnotherDetermination: "Ajouter une autre détermination",
   addAssertion: "Ajouter une géoréférence",
   addAttachments: "Ajouter des pièces jointes",
   addAttributesTemplateTitle: "Nouveau modèle d’attributs",
@@ -10,6 +11,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addCollectionTitle: "Ajouter une collection",
   addCollectorGroupTitle: "Ajouter un groupe de collecte",
   addCustomPlaceName: "Ajouter",
+  addDetermination: "Ajouter une détermination",
   addExistingStorageUnitAsChild:
     "Ajouter une unité de stockage existante comme enfant",
   addFilesButton: "Ajouter des fichiers",
@@ -56,6 +58,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   collectingDateLegend: "Date de collecte",
   collectingEvent: "Événement de collecte",
   collectingEventAttachments: "Pièces jointes de l’événement de collecte",
+  collectingEventDetailsLegend: "Détails de l'activité de collecte",
   collectingEventDetailsPageLink: "Page des détails de l’événement de collecte",
   collectingEventListTitle: "Événement de collecte",
   collectingEventManagedAttributes:
@@ -70,6 +73,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   collectorGroupListTitle: "Groupe de collecte",
   collectorGroupNameLabel: "Nom du groupe de collecte",
   collectorGroupViewTitle: "Voir le groupe de collecte",
+  colSearchBoxTooltip: "Rechercher dans le Catalogue de la vie",
+  colSearchLabel: "Recherche de nom",
   components: "Composants",
   configureAction: "Configurer l’action",
   configureDefaultValues: "Configurer les valeurs par défaut",
@@ -81,6 +86,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   createWorkflowTemplateTitle: "Créer un modèle de flux des travaux",
   customPlaceName: "Nom de lieu personnalisé",
   dataEntryLabel: "Saisie de données",
+  dataset: "Ensemble de données",
+  datasetSearchTooltip:
+    "Pour utiliser un ensemble de données différent du Catalogue de la vie.",
   decimalLatLong: "Lat/Long décimales",
   decimalLatitude: "Latitude décimale",
   decimalLongitude: "Longitude décimale",
@@ -96,6 +104,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   detachCollectingEvent: "Détacher l’événement de collecte",
   detachSelectedButtonText: "Détacher la sélection",
   detailsPageLink: "Page des détails",
+  determination: "Détermination",
+  determinations: "Déterminations",
   dinaHomeH1: "Dina Accueil",
   dinaUserSectionTitle: "Utilisateur Dina ",
   duplicateFilesFound: "fichiers en double trouvés",
@@ -160,6 +170,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_dwcCatalogNumber: "Numéro de catalogue",
   field_dwcCountry: "Pays",
   field_dwcCountryCode: "Code du pays",
+  field_dwcDegreeOfEstablishment: "Degré d'établissement",
+  field_dwcDegreeOfEstablishment_tooltip:
+    "La mesure dans laquelle un organisme survit, se reproduit et étend son aire de répartition à un endroit et à un moment donnés.",
   field_dwcGeodeticDatum: "Référence géodésique",
   field_dwcGeodeticDatum_tooltip:
     "La référence géodésique sur laquelle les coordonnées géographiques decimalLatitude et decimalLongitude sont fondées. La pratique exemplaire recommandée est ",
@@ -241,7 +254,13 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_publiclyReleasable: "Accessible au public",
   field_publiclyReleasable_tooltip:
     "Indique si l’objet peut être diffusé publiquement sur une page Web ou sur des portails de données ouvertes.",
+  field_qualifier: "Notes du transcripteur",
+  field_transcriberRemarks: "Verbatim - Remarques",
   field_type: "Catégorie",
+  field_typeStatus: "Type de statut",
+  field_typeStatusEvidence: "Type de statut - Preuve",
+  field_verbatimScientificName: "Verbatim - Nom scientifique",
+  field_verbatimDate: "Verbatim - Date",
   field_xmpMetadataDate: "Date d’application des métadonnées",
   field_xmpMetadataDate_tooltip:
     "Date et heure de la dernière mise à jour du dossier.",
@@ -317,6 +336,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   metadataTagsLabel: "Balises",
   metadataUploadDetailsLabel: "Télécharger les détails",
   moveAllContent: "Déplacer tout le contenu",
+  multiple: "Multiple",
   noFileToDisplay: "Aucun fichier à afficher",
   noGroups: "Aucun groupe",
   noManagedAttributeValues: "Aucune valeur d’attribut géré.",
@@ -356,6 +376,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   proceedToCreateMetadata: "Passez à la création de métadonnées",
   removeAssertionLabel: "Supprimer cette géoréférence",
   removeComponentData: "Suppression des données de {composant}",
+  removeDeterminationLabel: "Supprimer cette détermination",
   removeGroup: "Supprimer un groupe",
   removeFromParentStorageUnit: "Retirer de l’unité de stockage parent",
   removeManagedAttributeValue:
@@ -363,6 +384,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   removeThisPlaceLabel: " Supprimer ce lieu",
   resetMetadataEditorAttributesButtonText:
     "Réinitialiser à la disposition initiale des attributs",
+  resetNamesToDefaultValues: "Réinitialiser les noms aux valeurs par défaut",
   revisionsButtonText: "Révisions",
   revisionsByUserPageTitle: "Révisions par l’utilisateur",
   revisionsListTitle: "Révisions pour {name}",
@@ -370,6 +392,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   roles: "Rôles",
   rolesPerGroup: "Rôles par groupe",
   runWorkflow: "Exécuter le flux de travail",
+  saveAndGoToViewPageButton: "Enregistrer et passer à la page Visualiser",
+  saveAndCreateNewMaterialSampleButton:
+    "Enregistrer et créer un nouvel échantillon de matière",
   saveGeoReferenceAssertion: "Sauvegarder l’assertion de géoréférence",
   searchButton: "Recherche",
   searchResults: "Résultats de la recherche ({resultSize})",
@@ -386,7 +411,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   showingFilteredStorageUnits: "Afficher les unités de stockage filtrées",
   showingTopLevelStorageUnits:
     "Afficher les unités de stockage de niveau supérieur",
+  source: "Source",
   specifyParentContainer: "Veuillez sélectionner le contenant parent",
+  splitButton: "Diviser",
   splitSampleActionMetadataLegend: "Métadonnées sur les mesures",
   splitSampleChildSamplesToCreateLabel:
     "Échantillons de matière enfant à créer",
