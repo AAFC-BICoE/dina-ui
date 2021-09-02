@@ -4,6 +4,7 @@ import {
   DeleteButton,
   DinaForm,
   EditButton,
+  useAccount,
   useQuery,
   withResponse
 } from "common-ui";
@@ -18,6 +19,9 @@ import { fromPairs } from "lodash";
 export function InstitutionDetailsPage({ router }: WithRouterProps) {
   const id = String(router.query.id);
   const { formatMessage } = useDinaIntl();
+  const { roles } = useAccount();
+
+  const isaDinaAdmin = roles.includes("dina-admin");
 
   const institutionQuery = useQuery<Institution>({
     path: `collection-api/institution/${id}`
@@ -34,18 +38,22 @@ export function InstitutionDetailsPage({ router }: WithRouterProps) {
             entityLink="/collection/institution"
             byPassView={true}
           />
-          <EditButton
-            className="ms-auto"
-            entityId={id}
-            entityLink="collection/institution"
-          />
-          <DeleteButton
-            className="ms-5"
-            id={id}
-            options={{ apiBaseUrl: "/collection-api" }}
-            postDeleteRedirect="/collection/institution/list"
-            type="institution"
-          />
+          {isaDinaAdmin && (
+            <>
+              <EditButton
+                className="ms-auto"
+                entityId={id}
+                entityLink="collection/institution"
+              />
+              <DeleteButton
+                className="ms-5"
+                id={id}
+                options={{ apiBaseUrl: "/collection-api" }}
+                postDeleteRedirect="/collection/institution/list"
+                type="institution"
+              />
+            </>
+          )}
         </ButtonBar>
         {withResponse(institutionQuery, ({ data: institution }) => (
           <DinaForm<Institution>
