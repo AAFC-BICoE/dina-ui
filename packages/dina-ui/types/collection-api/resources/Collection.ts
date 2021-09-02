@@ -16,6 +16,6 @@ export const ImportCollection = object({
   code: string().required(),
   createdOn: string(),
   createdBy: string()
-});
+}).label("container");
 
 export type Collection = KitsuResource & CollectionAttributes;

@@ -56,6 +56,13 @@ export interface WorkbookRow {
  */
 export interface WorkbookJSON extends Array<WorkbookRow> {}
 
+export interface SchemaDescription {
+  type: string;
+  label: string;
+  meta: object;
+  tests: { name: string; params: object }[];
+}
+
 /**
  * The parent component used for the workbook conversion task.
  */
@@ -135,35 +142,45 @@ export class WorkbookConversion extends Component<
   determineType = (workbookData: WorkbookJSON) => {
     // Get the spreadsheet header row, this will be used to determine the import type.s
     const workbookHeader: string[] = workbookData[0].content;
+    let matches = 0;
     let highestMatchedColumns = 0;
-    let highestMatchedType = "";
+    let highestMatchedType;
 
-    // Loop through each header provided by the uploaded workbook.
-    workbookHeader.map(header => {
-      // Loop through each of the supported types.
-      definedTypes.map(type => {
-        let matches = 0;
+    // Loop through each of the supported types.
+    definedTypes.map(type => {
+      // Reset the match count since we are now looking at a different type.
+      matches = 0;
+
+      // Loop through each header provided by the uploaded workbook.
+      workbookHeader.map(header => {
+        // Loop through the supported columns from the supported types..
         const definedTypeFields: string[] = Object.keys(type.describe().fields);
-
-        // Loop through the supported columns.
         definedTypeFields.map(field => {
-          if (header === field) {
+          // Column from the uploaded spreadsheet matches a column from a supported type.
+          if (header.toLowerCase() === field.toLowerCase()) {
             matches++;
           }
-        });
 
-        // If this has more matches, then it becomes the recommended type.
-        if (matches > highestMatchedColumns) {
-          highestMatchedColumns = matches;
-          highestMatchedType = type.type;
-        }
+          // If this has more matches, then it becomes the recommended type.
+          if (matches > highestMatchedColumns) {
+            highestMatchedColumns = matches;
+            highestMatchedType = type.describe().label;
+          }
+        });
       });
     });
 
-    // Change the type based on the highest match.
-    this.setState({
-      selectedType: highestMatchedType
-    });
+    if (highestMatchedColumns === 0) {
+      // No matches found, just set the selected type as null. User will need to manually enter this.
+      this.setState({
+        selectedType: null
+      });
+    } else {
+      // Change the type based on the highest match.
+      this.setState({
+        selectedType: highestMatchedType
+      });
+    }
   };
 
   /**
