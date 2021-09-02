@@ -25,7 +25,7 @@ export function VocabularySelectField({
   ...labelWrapperProps
 }: VocabularySelectFieldProps) {
   const { response, loading } = useQuery<Vocabulary>({ path });
-  const { locale } = useDinaIntl();
+  const { locale, formatMessage } = useDinaIntl();
 
   const options =
     response?.data?.vocabularyElements?.map(el => {
@@ -61,6 +61,7 @@ export function VocabularySelectField({
             onChange={setAsStringArray}
             value={selectValue}
             formatCreateLabel={inputValue => `Add "${inputValue}"`}
+            placeholder={formatMessage("selectOrType")}
             {...selectProps}
           />
         );
