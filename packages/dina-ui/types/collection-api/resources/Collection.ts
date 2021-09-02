@@ -10,7 +10,7 @@ export interface CollectionAttributes {
   createdBy?: string;
 }
 
-export const ImportCollection = object({
+export const CollectionImport = object({
   group: string().required(),
   name: string().required(),
   code: string().required(),

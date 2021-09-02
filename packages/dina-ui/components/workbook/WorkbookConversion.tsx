@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { ImportCollection } from "../../types/collection-api/";
+import { CollectionImport } from "../../types/collection-api";
+import { RegionImport } from "../../types/seqdb-api";
 import { LoadingSpinner } from "common-ui";
 import { IFileWithMeta } from "../object-store/file-upload/FileUploader";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -8,7 +9,7 @@ import Kitsu from "kitsu";
 import WorkbookDisplay from "./WorkbookDisplay";
 import WorkbookUpload from "./WorkbookUpload";
 
-export const definedTypes: AnyObjectSchema[] = [ImportCollection];
+export const definedTypes: AnyObjectSchema[] = [CollectionImport, RegionImport];
 
 interface WorkbookProps {
   apiClient: Kitsu;
@@ -31,7 +32,7 @@ interface WorkbookStates {
   selectedColumns: WorkbookColumn[] | null;
 }
 
-interface WorkbookColumn {
+export interface WorkbookColumn {
   /** Spreadsheet column name provided. */
   columnName: string;
 
@@ -183,8 +184,15 @@ export class WorkbookConversion extends Component<
     }
   };
 
+  /**
+   * Change the workbook type, this method is called when the dropdown has been changed.
+   *
+   * @param newType Selected type from the dropdown after change.
+   */
   changeType = (newType: string) => {
-    return newType;
+    this.setState({
+      selectedType: newType
+    });
   };
 
   /**
@@ -199,7 +207,8 @@ export class WorkbookConversion extends Component<
 
   render() {
     // Deconstruct the states.
-    const { loading, jsonData, failed, selectedType } = this.state;
+    const { loading, jsonData, failed, selectedType, selectedColumns } =
+      this.state;
     const failedMessage = failed ? (
       <div className="alert alert-danger">
         <DinaMessage id="workbookUploadFailure" />
@@ -221,6 +230,7 @@ export class WorkbookConversion extends Component<
             backButton={this.backToUpload}
             changeType={this.changeType}
             currentType={selectedType}
+            selectedColumns={selectedColumns}
           />
         );
       } else {

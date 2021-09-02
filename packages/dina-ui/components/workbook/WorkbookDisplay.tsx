@@ -1,7 +1,12 @@
 import { HotColumnProps } from "@handsontable/react";
 import { Component } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { WorkbookJSON, WorkbookRow, definedTypes } from "./WorkbookConversion";
+import {
+  WorkbookJSON,
+  WorkbookRow,
+  WorkbookColumn,
+  definedTypes
+} from "./WorkbookConversion";
 import { DynamicHotTable } from "../../../common-ui/lib/bulk-data-editor/BulkDataEditor";
 import Select from "react-select";
 import { AnyObjectSchema } from "yup";
@@ -10,13 +15,14 @@ interface WorkbookDisplayProps {
   jsonData: WorkbookJSON;
   currentType: string | null;
   backButton: () => void;
-  changeType: (value: string) => void;
+  changeType: (value: string | null) => void;
+  selectedColumns: WorkbookColumn[] | null;
 }
 
 export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
   render() {
     const types: AnyObjectSchema[] = definedTypes;
-    const { jsonData } = this.props;
+    const { jsonData, selectedColumns } = this.props;
 
     if (jsonData) {
       return (
@@ -36,15 +42,28 @@ export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
                 value: type.describe().label
               };
             })}
-            className="col-md-3"
+            className="col-md-3 mrgn-tp-md"
             name="importType"
             // onChange={this.props.changeType}
           />
 
+          {selectedColumns?.map((column: WorkbookColumn) => {
+            return (
+              <Select
+                options={[
+                  {
+                    label: "test",
+                    value: "test"
+                  }
+                ]}
+                key=""
+              />
+            );
+          })}
+
           <div>
             <br />
             <DynamicHotTable
-              // afterValidate={afterValidate}
               columns={generateWorkbookColumns(jsonData)}
               data={generateWorkbookRows(jsonData)}
               manualColumnResize={true}
@@ -59,7 +78,7 @@ export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
                 "undo",
                 "redo"
               ]}
-              dropdownMenu={["remove_col"]}
+              dropdownMenu={true}
             />
           </div>
         </div>
