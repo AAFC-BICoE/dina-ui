@@ -47,7 +47,7 @@ describe("VocabularySelectField component", () => {
 
     // The value was converted to a string:
     expect(mockOnSubmit).lastCalledWith({
-      fieldName: "new-val-1, new-val-2"
+      fieldName: ["new-val-1", "new-val-2"]
     });
   });
 });

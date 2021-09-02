@@ -52,8 +52,8 @@ export function VocabularySelectField({
             : []
         ).map(toOption);
 
-        function setAsStringValue(selected: VocabularyOption[]) {
-          setValue(selected.map(option => option.value).join(", "));
+        function setAsStringArray(selected: VocabularyOption[]) {
+          setValue(selected.map(option => option.value));
         }
 
         return (
@@ -62,7 +62,7 @@ export function VocabularySelectField({
             options={options}
             isLoading={loading}
             isMulti={true}
-            onChange={setAsStringValue}
+            onChange={setAsStringArray}
             value={selectValue}
             formatCreateLabel={inputValue => `Add "${inputValue}"`}
             {...selectProps}
