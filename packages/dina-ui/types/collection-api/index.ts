@@ -4,6 +4,7 @@ export * from "./resources/CollectorGroup";
 export * from "./resources/Determination";
 export * from "./resources/GeographicPlaceNameSourceDetail";
 export * from "./resources/GeoReferenceAssertion";
+export * from "./resources/Institution";
 export * from "./resources/MaterialSample";
 export * from "./resources/PreparationType";
 export * from "./resources/PreparationProcessDefinition";
