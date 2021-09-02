@@ -25,7 +25,7 @@ export function VocabularySelectField({
   ...labelWrapperProps
 }: VocabularySelectFieldProps) {
   const { response, loading } = useQuery<Vocabulary>({ path });
-  const { locale } = useDinaIntl();
+  const { locale, formatMessage } = useDinaIntl();
 
   const options =
     response?.data?.vocabularyElements?.map(el => {
@@ -44,16 +44,12 @@ export function VocabularySelectField({
       {...labelWrapperProps}
     >
       {({ setValue, value }) => {
-        const selectValue = (
-          value
-            ? String(value)
-                .split(",")
-                .map(val => val.trim())
-            : []
-        ).map(toOption);
+        const selectValue = (value ? value.map(val => val.trim()) : []).map(
+          toOption
+        );
 
-        function setAsStringValue(selected: VocabularyOption[]) {
-          setValue(selected.map(option => option.value).join(", "));
+        function setAsStringArray(selected: VocabularyOption[]) {
+          setValue(selected.map(option => option.value));
         }
 
         return (
@@ -62,9 +58,10 @@ export function VocabularySelectField({
             options={options}
             isLoading={loading}
             isMulti={true}
-            onChange={setAsStringValue}
+            onChange={setAsStringArray}
             value={selectValue}
             formatCreateLabel={inputValue => `Add "${inputValue}"`}
+            placeholder={formatMessage("selectOrType")}
             {...selectProps}
           />
         );
