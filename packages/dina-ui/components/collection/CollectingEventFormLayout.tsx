@@ -896,10 +896,17 @@ export function CollectingEventFormLayout({
             model="collection-api/collection-method"
             optionLabel={cm => cm.name}
           />
-          <VocabularySelectField
-            path="collection-api/vocabulary/substrate"
+          <AutoSuggestTextField<CollectingEvent>
             name="substrate"
             className="col-md-6"
+            query={(searchValue, ctx) => ({
+              path: "collection-api/collecting-event",
+              filter: {
+                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                rsql: `substrate==${searchValue}*`
+              }
+            })}
+            suggestion={collEvent => collEvent.substrate ?? ""}
           />
         </div>
         <div className="row">
