@@ -27,11 +27,33 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
   const storageUnitQuery = useStorageUnit(id);
   const childrenQuery = useQuery<StorageUnit[]>(
     {
-      path: `collection-api/storage-unit/${id}?include=storageUnitChildren`
+      path: `collection-api/storage-unit/${id}/storageUnitChildren`
     },
     { disabled: !id }
   );
   const children = childrenQuery.response?.data;
+
+  const storageUnit = storageUnitQuery.response?.data;
+
+  async function moveAllContentToNewContainer(submittedValues) {
+    const parentUnit = submittedValues.parentStorageUnit;
+    // Set first level children to new parent
+    if (children) {
+      await save(
+        children.map(child => ({
+          resource: {
+            type: child.type,
+            id: child.id,
+            parentStorageUnit: parentUnit
+          },
+          type: "storage-unit"
+        })),
+        { apiBaseUrl: "/collection-api" }
+      );
+    }
+    // Move to the new parent unit's page:
+    await router.push(`/collection/storage-unit/view?id=${parentUnit.id}`);
+  }
 
   return (
     <div>
