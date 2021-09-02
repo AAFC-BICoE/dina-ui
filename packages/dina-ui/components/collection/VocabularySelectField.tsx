@@ -44,13 +44,9 @@ export function VocabularySelectField({
       {...labelWrapperProps}
     >
       {({ setValue, value }) => {
-        const selectValue = (
-          value
-            ? String(value)
-                .split(",")
-                .map(val => val.trim())
-            : []
-        ).map(toOption);
+        const selectValue = (value ? value.map(val => val.trim()) : []).map(
+          toOption
+        );
 
         function setAsStringArray(selected: VocabularyOption[]) {
           setValue(selected.map(option => option.value));

@@ -8,7 +8,7 @@ describe("VocabularySelectField component", () => {
   it("Renders and sets values correctly", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm
-        initialValues={{ fieldName: "val1, val2,val3" }}
+        initialValues={{ fieldName: ["val1", "val2", "val3"] }}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
       >
         <VocabularySelectField
@@ -45,7 +45,7 @@ describe("VocabularySelectField component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // The value was converted to a string:
+    // The value was converted to an array:
     expect(mockOnSubmit).lastCalledWith({
       fieldName: ["new-val-1", "new-val-2"]
     });
