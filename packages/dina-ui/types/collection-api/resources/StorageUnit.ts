@@ -9,6 +9,7 @@ export interface StorageUnitAttributes {
   createdOn?: string;
   createdBy?: string;
   storageUnitChildren?: StorageUnit[];
+  uuid?: string;
 }
 
 export interface HierarchyItem {

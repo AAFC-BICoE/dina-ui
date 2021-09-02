@@ -49,7 +49,8 @@ export function StorageUnitChildrenViewer({ parentId }: StorageTreeFieldProps) {
       await save(
         children.map(child => ({
           resource: {
-            ...omit(child, "uuid"),
+            id: child.uuid ?? child.id,
+            type: child.type,
             parentStorageUnit: { type: targetUnit.type, id: targetUnit.id }
           },
           type: "storage-unit"
