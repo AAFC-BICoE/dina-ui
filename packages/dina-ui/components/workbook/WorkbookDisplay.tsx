@@ -1,16 +1,21 @@
 import { HotColumnProps } from "@handsontable/react";
 import { Component } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { WorkbookJSON, WorkbookRow } from "./WorkbookConversion";
+import { WorkbookJSON, WorkbookRow, definedTypes } from "./WorkbookConversion";
 import { DynamicHotTable } from "../../../common-ui/lib/bulk-data-editor/BulkDataEditor";
+import Select from "react-select";
+import { AnyObjectSchema } from "yup";
 
 interface WorkbookDisplayProps {
   jsonData: WorkbookJSON;
+  currentType: string | null;
   backButton: () => void;
+  changeType: (value: string) => void;
 }
 
 export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
   render() {
+    const types: AnyObjectSchema[] = definedTypes;
     const { jsonData } = this.props;
 
     if (jsonData) {
@@ -23,6 +28,19 @@ export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
           >
             <DinaMessage id="cancelButtonText" />
           </button>
+
+          <Select
+            options={types.map(type => {
+              return {
+                label: type.describe().label,
+                value: type.describe().label
+              };
+            })}
+            className="col-md-3"
+            name="importType"
+            // onChange={this.props.changeType}
+          />
+
           <div>
             <br />
             <DynamicHotTable

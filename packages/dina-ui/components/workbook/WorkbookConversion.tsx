@@ -8,7 +8,7 @@ import Kitsu from "kitsu";
 import WorkbookDisplay from "./WorkbookDisplay";
 import WorkbookUpload from "./WorkbookUpload";
 
-const definedTypes: AnyObjectSchema[] = [ImportCollection];
+export const definedTypes: AnyObjectSchema[] = [ImportCollection];
 
 interface WorkbookProps {
   apiClient: Kitsu;
@@ -183,6 +183,10 @@ export class WorkbookConversion extends Component<
     }
   };
 
+  changeType = (newType: string) => {
+    return newType;
+  };
+
   /**
    * Back button functionality will reset the state to display the upload component.
    */
@@ -195,7 +199,7 @@ export class WorkbookConversion extends Component<
 
   render() {
     // Deconstruct the states.
-    const { loading, jsonData, failed } = this.state;
+    const { loading, jsonData, failed, selectedType } = this.state;
     const failedMessage = failed ? (
       <div className="alert alert-danger">
         <DinaMessage id="workbookUploadFailure" />
@@ -212,7 +216,12 @@ export class WorkbookConversion extends Component<
       // If the json data is provided, display the JSON as a table. Otherwise display the uploading component.
       if (jsonData) {
         return (
-          <WorkbookDisplay jsonData={jsonData} backButton={this.backToUpload} />
+          <WorkbookDisplay
+            jsonData={jsonData}
+            backButton={this.backToUpload}
+            changeType={this.changeType}
+            currentType={selectedType}
+          />
         );
       } else {
         return (
