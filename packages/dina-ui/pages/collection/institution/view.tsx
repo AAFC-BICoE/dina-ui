@@ -1,30 +1,19 @@
-import {
-  BackButton,
-  ButtonBar,
-  DeleteButton,
-  DinaForm,
-  EditButton,
-  useAccount,
-  useQuery,
-  withResponse
-} from "common-ui";
+import { DinaForm, useQuery, withResponse } from "common-ui";
+import { fromPairs } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { Head, Nav, ResourceViewButtonBar } from "../../../components";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Institution } from "../../../types/collection-api";
 import { InstitutionFormLayout } from "./edit";
-import { fromPairs } from "lodash";
 
 export function InstitutionDetailsPage({ router }: WithRouterProps) {
   const id = String(router.query.id);
   const { formatMessage } = useDinaIntl();
-  const { roles } = useAccount();
-
-  const isaDinaAdmin = roles.includes("dina-admin");
 
   const institutionQuery = useQuery<Institution>({
-    path: `collection-api/institution/${id}`
+    path: `collection-api/institution/${id}`,
+    header: { "include-dina-permission": "true" }
   });
 
   return (
@@ -32,29 +21,6 @@ export function InstitutionDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("institution")} />
       <Nav />
       <main className="container">
-        <ButtonBar>
-          <BackButton
-            entityId={id}
-            entityLink="/collection/institution"
-            byPassView={true}
-          />
-          {isaDinaAdmin && (
-            <>
-              <EditButton
-                className="ms-auto"
-                entityId={id}
-                entityLink="collection/institution"
-              />
-              <DeleteButton
-                className="ms-5"
-                id={id}
-                options={{ apiBaseUrl: "/collection-api" }}
-                postDeleteRedirect="/collection/institution/list"
-                type="institution"
-              />
-            </>
-          )}
-        </ButtonBar>
         {withResponse(institutionQuery, ({ data: institution }) => (
           <DinaForm<Institution>
             initialValues={{
@@ -68,6 +34,11 @@ export function InstitutionDetailsPage({ router }: WithRouterProps) {
             }}
             readOnly={true}
           >
+            <ResourceViewButtonBar
+              resource={institution}
+              apiBaseUrl="/collection-api"
+              resourceBaseUrl="/collection/institution"
+            />
             <InstitutionFormLayout />
           </DinaForm>
         ))}
