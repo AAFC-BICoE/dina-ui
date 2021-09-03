@@ -54,6 +54,7 @@ import {
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import { VocabularySelectField } from "./VocabularySelectField";
 import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
+import { CollectionMethodSelectField } from "../resource-select-fields/resource-select-fields";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -879,13 +880,9 @@ export function CollectingEventFormLayout({
           <TextField name="host" className="col-md-6" />
         </div>
         <div className="row">
-          <ResourceSelectField<CollectionMethod>
+          <CollectionMethodSelectField
             name="collectionMethod"
             className="col-md-6"
-            readOnlyLink="/collection/collection-method/view?id="
-            filter={filterBy(["name"])}
-            model="collection-api/collection-method"
-            optionLabel={cm => cm.name}
           />
           <AutoSuggestTextField<CollectingEvent>
             name="substrate"

@@ -18,6 +18,7 @@ import { ReactNode, useContext } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
+  CollectionSelectField,
   Footer,
   GroupSelectField,
   Head,
@@ -402,20 +403,16 @@ export function MaterialSampleIdentifiersFormLayout({
     >
       <div className="row">
         <div className="col-md-6">
+          <CollectionSelectField
+            name={`${namePrefix}collection`}
+            customName="collection"
+          />
           <TextField
             name={`${namePrefix}materialSampleName`}
             customName="materialSampleName"
             className="materialSampleName"
             placeholder={sampleNamePlaceHolder}
             readOnly={disableSampleName}
-          />
-
-          <TextField
-            name={`${
-              namePrefix ? namePrefix + "dwcCatalogNumber" : "dwcCatalogNumber"
-            }`}
-            customName="dwcCatalogNumber"
-            className="dwcCatalogNumber"
           />
         </div>
         <div className="col-md-6">

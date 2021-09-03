@@ -44,6 +44,15 @@ const MATERIAL_SAMPLE_TABLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
     ),
     accessor: "materialSampleName"
   },
+  {
+    Cell: ({ original: { collection } }) =>
+      collection?.id ? (
+        <Link href={`/collection/collection/view?id=${collection?.id}`}>
+          {collection?.name}
+        </Link>
+      ) : null,
+    accessor: "collection.name"
+  },
   "dwcCatalogNumber",
   stringArrayCell("dwcOtherCatalogNumbers"),
   { accessor: "materialSampleType.name" },
@@ -75,7 +84,7 @@ export default function MaterialSampleListPage() {
           queryTableProps={{
             columns: MATERIAL_SAMPLE_TABLE_COLUMNS,
             path: "collection-api/material-sample",
-            include: "materialSampleType"
+            include: "collection,materialSampleType"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">

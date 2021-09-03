@@ -12,6 +12,7 @@ export function CollectionDetailsPage({ router }: WithRouterProps) {
 
   const collectionQuery = useQuery<Collection>({
     path: `collection-api/collection/${id}`,
+    include: "institution",
     header: { "include-dina-permission": "true" }
   });
 
