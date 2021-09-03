@@ -1,4 +1,5 @@
 import { KitsuResource } from "kitsu";
+import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
 
 export interface InstitutionAttributes {
   createdOn?: string;
@@ -14,4 +15,6 @@ export interface InstitutionAttributes {
   };
 }
 
-export type Institution = KitsuResource & InstitutionAttributes;
+export type Institution = KitsuResource &
+  InstitutionAttributes &
+  HasDinaMetaInfo;
