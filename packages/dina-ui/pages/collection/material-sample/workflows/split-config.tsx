@@ -3,10 +3,12 @@ import {
   ButtonBar,
   CheckBoxWithoutWrapper,
   DinaForm,
+  DinaFormSection,
   FieldSet,
   SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  withResponse
 } from "common-ui";
 import { Field, FieldProps, FormikContextType, useFormikContext } from "formik";
 import { padStart, range } from "lodash";
@@ -21,7 +23,6 @@ import { useMaterialSampleQuery } from "../../../../../dina-ui/components/collec
 import { Head } from "../../../../../dina-ui/components/head";
 import {
   BASE_NAME,
-  IDENTIFIER_TYPE_OPTIONS,
   MaterialSampleGenerationMode,
   MaterialSampleRunConfig,
   MaterialSampleRunConfigConfiguration,
@@ -31,6 +32,7 @@ import {
   TYPE_LETTER,
   TYPE_NUMERIC
 } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
+import { CollectionSelectField } from "../../../../components";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 
 /* Props for computing suffix */
@@ -83,7 +85,6 @@ export function ConfigAction({ router }: WithRouterProps) {
       configure: {
         generationMode,
         numOfChildToCreate: configActionFields.numOfChildToCreate,
-        identifier: configActionFields.identifier,
         baseName: configActionFields.baseName ?? BASE_NAME,
         ...(generationMode === "BATCH" && {
           suffix: configActionFields.suffix
@@ -92,7 +93,11 @@ export function ConfigAction({ router }: WithRouterProps) {
           start: configActionFields.start ?? START,
           suffixType: configActionFields.suffixType
         }),
-        destroyOriginal: configActionFields.destroyOriginal
+        destroyOriginal: configActionFields.destroyOriginal,
+        collection: configActionFields.collection || {
+          id: null,
+          type: "collection"
+        }
       },
       configure_children: {
         sampleNames: childSampleNames
@@ -115,76 +120,91 @@ export function ConfigAction({ router }: WithRouterProps) {
   const initialConfig = storedRunConfig?.configure ?? {
     suffixType: TYPE_NUMERIC,
     numOfChildToCreate: 1,
-    start: "001",
-    identifier: "MATERIAL_SAMPLE_ID"
+    start: "001"
   };
 
   const initialConfigChild = storedRunConfig?.configure_children;
-
-  if (materialSampleQuery.loading) return null;
-
-  const { materialSampleName } = materialSampleQuery?.response?.data ?? {};
-
-  const computedInitConfigValues = {
-    ...initialConfig,
-    ...initialConfigChild,
-    ...(materialSampleName ? { baseName: materialSampleName } : {})
-  };
 
   return (
     <div>
       <Head title={formatMessage("splitSubsampleTitle")} />
       <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id="splitSubsampleTitle" />
-        </h1>
-        <h2>{materialSampleName}</h2>
-        <DinaForm initialValues={computedInitConfigValues} onSubmit={onSubmit}>
-          <p>
-            <span className="fw-bold">{formatMessage("description")}:</span>
-            {formatMessage("splitSampleDescription")}
-          </p>
-          <FieldSet
-            legend={<DinaMessage id="splitSampleActionMetadataLegend" />}
-          >
-            <TextField
-              name="remarks"
-              multiLines={true}
-              placeholder={formatMessage("splitSampleRemarksPlaceholder")}
-            />
-          </FieldSet>
-          <p className="fw-bold">
-            {formatMessage("stepLabel")}1: {formatMessage("configureLabel")}
-          </p>
-          <FieldSet legend={<DinaMessage id="splitSampleConfigLegend" />}>
-            <Tabs
-              selectedIndex={MATERIAL_SAMPLE_GENERATION_MODES.indexOf(
-                generationMode
-              )}
-              onSelect={index =>
-                setGenerationMode(MATERIAL_SAMPLE_GENERATION_MODES[index])
-              }
+      {withResponse(materialSampleQuery, ({ data: parentSample }) => {
+        const computedInitConfigValues = {
+          ...initialConfig,
+          ...initialConfigChild,
+          baseName: parentSample.materialSampleName || "",
+          collection: parentSample.collection || undefined
+        };
+
+        return (
+          <main className="container">
+            <h1 id="wb-cont">
+              <DinaMessage id="splitSubsampleTitle" />
+            </h1>
+            <h2>{parentSample.materialSampleName}</h2>
+            <DinaForm
+              initialValues={computedInitConfigValues}
+              onSubmit={onSubmit}
             >
-              <TabList>
-                <Tab className={`react-tabs__tab batch-tab`}>
-                  <DinaMessage id="generateBatch" />
-                </Tab>
-                <Tab className={`react-tabs__tab series-tab`}>
-                  <DinaMessage id="generateSeries" />
-                </Tab>
-              </TabList>
-              <TabPanel>
-                <SplitConfigFormFields generationMode={generationMode} />
-              </TabPanel>
-              <TabPanel>
-                <SplitConfigFormFields generationMode={generationMode} />
-              </TabPanel>
-            </Tabs>
-          </FieldSet>
-          {buttonBar}
-        </DinaForm>
-      </main>
+              <p>
+                <span className="fw-bold">{formatMessage("description")}:</span>
+                {formatMessage("splitSampleDescription")}
+              </p>
+              <FieldSet
+                legend={<DinaMessage id="splitSampleActionMetadataLegend" />}
+              >
+                <TextField
+                  name="remarks"
+                  multiLines={true}
+                  placeholder={formatMessage("splitSampleRemarksPlaceholder")}
+                />
+              </FieldSet>
+              <p className="fw-bold">
+                {formatMessage("stepLabel")}1: {formatMessage("configureLabel")}
+              </p>
+              <FieldSet legend={<DinaMessage id="splitSampleConfigLegend" />}>
+                <label className="d-flex align-items-center gap-2 fw-bold mb-3">
+                  {formatMessage("splitSampleChildSamplesToCreateLabel")}
+                  {": "}
+                  <div style={{ width: "10rem" }}>
+                    <NumberSpinnerField
+                      name="numOfChildToCreate"
+                      max={NUMERIC_UPPER_LIMIT}
+                      removeLabel={true}
+                      removeBottomMargin={true}
+                    />
+                  </div>
+                </label>
+                <Tabs
+                  selectedIndex={MATERIAL_SAMPLE_GENERATION_MODES.indexOf(
+                    generationMode
+                  )}
+                  onSelect={index =>
+                    setGenerationMode(MATERIAL_SAMPLE_GENERATION_MODES[index])
+                  }
+                >
+                  <TabList>
+                    <Tab className={`react-tabs__tab batch-tab`}>
+                      <DinaMessage id="generateBatch" />
+                    </Tab>
+                    <Tab className={`react-tabs__tab series-tab`}>
+                      <DinaMessage id="generateSeries" />
+                    </Tab>
+                  </TabList>
+                  <TabPanel>
+                    <SplitConfigFormFields generationMode={generationMode} />
+                  </TabPanel>
+                  <TabPanel>
+                    <SplitConfigFormFields generationMode={generationMode} />
+                  </TabPanel>
+                </Tabs>
+              </FieldSet>
+              {buttonBar}
+            </DinaForm>
+          </main>
+        );
+      })}
     </div>
   );
 }
@@ -314,44 +334,26 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
 
   return (
     <div>
-      <span className="fw-bold">
-        {formatMessage("splitSampleChildSamplesToCreateLabel")}{" "}
-      </span>
+      <CheckBoxWithoutWrapper
+        name="destroyOriginal"
+        includeAllLabel={formatMessage("destroyOriginal")}
+      />
       <div className="row">
-        <NumberSpinnerField
-          name="numOfChildToCreate"
-          className="col-md-2"
-          hideLabel={true}
-          max={NUMERIC_UPPER_LIMIT}
-        />
-        <div className="col-md-4">
-          <CheckBoxWithoutWrapper
-            name="destroyOriginal"
-            includeAllLabel={formatMessage("destroyOriginal")}
-          />
+        <div className="col-md-3">
+          <CollectionSelectField name="collection" />
+          <TextField name="baseName" />
         </div>
-      </div>
-      <div className="row">
-        <SelectField
-          className="col-md-2"
-          name="identifier"
-          options={IDENTIFIER_TYPE_OPTIONS.map(({ labelKey, value }) => ({
-            label: formatMessage(labelKey),
-            value
-          }))}
-        />
-        <TextField className="col-md-2" name="baseName" />
         {generationMode === "BATCH" && (
           <TextField
             name="suffix"
-            className="col-md-2"
+            className="col-md-3"
             label={<DinaMessage id="suffixOptional" />}
           />
         )}
         {generationMode === "SERIES" && (
           <>
             <SelectField
-              className="col-md-2"
+              className="col-md-3"
               name="suffixType"
               options={TYPE_OPTIONS}
               onChange={(newType, formik) => {
