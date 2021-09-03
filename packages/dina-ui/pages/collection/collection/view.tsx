@@ -21,29 +21,27 @@ export function CollectionDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("collectionViewTitle")} />
       <Nav />
       <main className="container">
-        {withResponse(collectionQuery, ({ data: collection }) => {
-          return (
-            <DinaForm<Collection>
-              initialValues={{
-                ...collection,
-                // Convert multilingualDescription to editable Dictionary format:
-                multilingualDescription: fromPairs<string | undefined>(
-                  collection.multilingualDescription?.descriptions?.map(
-                    ({ desc, lang }) => [lang ?? "", desc ?? ""]
-                  )
+        {withResponse(collectionQuery, ({ data: collection }) => (
+          <DinaForm<Collection>
+            initialValues={{
+              ...collection,
+              // Convert multilingualDescription to editable Dictionary format:
+              multilingualDescription: fromPairs<string | undefined>(
+                collection.multilingualDescription?.descriptions?.map(
+                  ({ desc, lang }) => [lang ?? "", desc ?? ""]
                 )
-              }}
-              readOnly={true}
-            >
-              <ResourceViewButtonBar
-                resource={collection}
-                apiBaseUrl="/collection-api"
-                resourceBaseUrl="collection/collection"
-              />
-              <CollectionFormFields title={"collectionViewTitle"} />
-            </DinaForm>
-          );
-        })}
+              )
+            }}
+            readOnly={true}
+          >
+            <ResourceViewButtonBar
+              resource={collection}
+              apiBaseUrl="/collection-api"
+              resourceBaseUrl="collection/collection"
+            />
+            <CollectionFormFields title={"collectionViewTitle"} />
+          </DinaForm>
+        ))}
       </main>
     </div>
   );
