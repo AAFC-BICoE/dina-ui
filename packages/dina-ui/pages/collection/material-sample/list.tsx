@@ -19,7 +19,8 @@ import {
 
 const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
   "createdBy",
-  "dwcCatalogNumber",
+  "collection.name",
+  "collection.code",
   {
     name: "materialSampleType.uuid",
     type: "DROPDOWN",
@@ -53,7 +54,6 @@ const MATERIAL_SAMPLE_TABLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
       ) : null,
     accessor: "collection.name"
   },
-  "dwcCatalogNumber",
   stringArrayCell("dwcOtherCatalogNumbers"),
   { accessor: "materialSampleType.name" },
   "createdBy",

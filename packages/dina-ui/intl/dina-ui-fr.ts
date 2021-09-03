@@ -168,7 +168,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   "field_description.en": "Description anglaise",
   "field_description.fr": "Description française",
   field_displayName: "Visualiser le nom",
-  field_dwcCatalogNumber: "Numéro de catalogue",
   field_dwcCountry: "Pays",
   field_dwcCountryCode: "Code du pays",
   field_dwcDegreeOfEstablishment: "Degré d'établissement",

@@ -123,15 +123,12 @@ export function ConfigAction({ router }: WithRouterProps) {
 
   if (materialSampleQuery.loading) return null;
 
-  const { materialSampleName, dwcCatalogNumber } =
-    materialSampleQuery?.response?.data ?? {};
+  const { materialSampleName } = materialSampleQuery?.response?.data ?? {};
 
   const computedInitConfigValues = {
     ...initialConfig,
     ...initialConfigChild,
-    ...(materialSampleName || dwcCatalogNumber
-      ? { baseName: materialSampleName || dwcCatalogNumber }
-      : {})
+    ...(materialSampleName ? { baseName: materialSampleName } : {})
   };
 
   return (
@@ -142,11 +139,7 @@ export function ConfigAction({ router }: WithRouterProps) {
         <h1 id="wb-cont">
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
-        <h2>
-          {materialSampleName && dwcCatalogNumber
-            ? `${materialSampleName} | ${dwcCatalogNumber} `
-            : materialSampleName ?? dwcCatalogNumber}
-        </h2>
+        <h2>{materialSampleName}</h2>
         <DinaForm initialValues={computedInitConfigValues} onSubmit={onSubmit}>
           <p>
             <span className="fw-bold">{formatMessage("description")}:</span>

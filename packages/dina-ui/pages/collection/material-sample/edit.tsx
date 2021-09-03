@@ -383,8 +383,8 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
 }
 
 export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
+  "collection",
   "materialSampleName",
-  "dwcCatalogNumber",
   "dwcOtherCatalogNumbers"
 ];
 

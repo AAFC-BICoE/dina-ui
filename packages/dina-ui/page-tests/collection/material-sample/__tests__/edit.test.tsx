@@ -29,7 +29,7 @@ function testMaterialSample(): PersistedResource<MaterialSample> {
     id: "1",
     type: "material-sample",
     group: "test group",
-    dwcCatalogNumber: "my-number",
+    materialSampleName: "my-sample-name",
     collectingEvent: {
       id: "1",
       type: "collecting-event"
@@ -123,9 +123,6 @@ describe("Material Sample Edit Page", () => {
       .find(".materialSampleName-field input")
       .simulate("change", { target: { value: "test-material-sample-id" } });
     wrapper
-      .find(".dwcCatalogNumber-field input")
-      .simulate("change", { target: { value: "my-new-material-sample" } });
-    wrapper
       .find(".startEventDateTime-field input")
       .simulate("change", { target: { value: "2019-12-21T16:00" } });
 
@@ -170,7 +167,6 @@ describe("Material Sample Edit Page", () => {
               },
               storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
-              dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
               determination: [],
               relationships: {},
@@ -207,9 +203,6 @@ describe("Material Sample Edit Page", () => {
     wrapper
       .find(".materialSampleName-field input")
       .simulate("change", { target: { value: "test-material-sample-id" } });
-    wrapper
-      .find(".dwcCatalogNumber-field input")
-      .simulate("change", { target: { value: "my-new-material-sample" } });
 
     wrapper.find("button.collecting-event-link-button").simulate("click");
 
@@ -235,7 +228,6 @@ describe("Material Sample Edit Page", () => {
               },
               storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
-              dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
               determination: [],
               type: "material-sample",
@@ -269,9 +261,6 @@ describe("Material Sample Edit Page", () => {
     wrapper
       .find(".materialSampleName-field input")
       .simulate("change", { target: { value: "test-material-sample-id" } });
-    wrapper
-      .find(".dwcCatalogNumber-field input")
-      .simulate("change", { target: { value: "edited-catalog-number" } });
 
     wrapper.find("form").simulate("submit");
 
@@ -288,7 +277,6 @@ describe("Material Sample Edit Page", () => {
               type: "material-sample",
               group: "test group",
               materialSampleName: "test-material-sample-id",
-              dwcCatalogNumber: "edited-catalog-number",
               collectingEvent: { id: "1", type: "collecting-event" },
               storageUnit: { id: null, type: "storage-unit" },
 
@@ -378,7 +366,7 @@ describe("Material Sample Edit Page", () => {
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
-              dwcCatalogNumber: "my-number",
+              materialSampleName: "my-sample-name",
               group: "test group",
               id: "1",
               type: "material-sample",

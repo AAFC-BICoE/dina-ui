@@ -269,11 +269,6 @@ export default function SplitRunAction() {
       formik.setFieldValue(commonRoot + fieldName, parentSample?.[fieldName]);
     }
 
-    formik.setFieldValue(
-      commonRoot + "dwcCatalogNumber",
-      parentSample?.dwcCatalogNumber
-    );
-
     // formik.setFieldValue(
     //   commonRoot + "materialSampleName",
     //   parentSample?.materialSampleName
