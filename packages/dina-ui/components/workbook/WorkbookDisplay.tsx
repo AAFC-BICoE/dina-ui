@@ -13,10 +13,15 @@ import { AnyObjectSchema } from "yup";
 
 interface WorkbookDisplayProps {
   jsonData: WorkbookJSON;
-  currentType: string | null;
+  currentType: AnyObjectSchema | null;
   backButton: () => void;
-  changeType: (value: string | null) => void;
+  changeType: (value: SelectImportType) => void;
   selectedColumns: WorkbookColumn[] | null;
+}
+
+export interface SelectImportType {
+  label: string;
+  value: AnyObjectSchema;
 }
 
 export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
@@ -35,16 +40,16 @@ export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
             <DinaMessage id="cancelButtonText" />
           </button>
 
-          <Select
+          <Select<SelectImportType>
             options={types.map(type => {
               return {
                 label: type.describe().label,
-                value: type.describe().label
-              };
+                value: type
+              } as SelectImportType;
             })}
             className="col-md-3 mrgn-tp-md"
             name="importType"
-            // onChange={this.props.changeType}
+            onChange={this.props.changeType}
           />
 
           {selectedColumns?.map((column: WorkbookColumn) => {

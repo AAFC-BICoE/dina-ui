@@ -6,7 +6,7 @@ import { IFileWithMeta } from "../object-store/file-upload/FileUploader";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AnyObjectSchema } from "yup";
 import Kitsu from "kitsu";
-import WorkbookDisplay from "./WorkbookDisplay";
+import WorkbookDisplay, { SelectImportType } from "./WorkbookDisplay";
 import WorkbookUpload from "./WorkbookUpload";
 
 export const definedTypes: AnyObjectSchema[] = [CollectionImport, RegionImport];
@@ -26,7 +26,7 @@ interface WorkbookStates {
   failed: boolean;
 
   /** The type of import the user is trying to perform. */
-  selectedType: string | null;
+  selectedType: AnyObjectSchema | null;
 
   /** Workbook columns. */
   selectedColumns: WorkbookColumn[] | null;
@@ -145,18 +145,18 @@ export class WorkbookConversion extends Component<
     const workbookHeader: string[] = workbookData[0].content;
     let matches = 0;
     let highestMatchedColumns = 0;
-    let highestMatchedType;
+    let highestMatchedType: AnyObjectSchema | null = null;
 
     // Loop through each of the supported types.
-    definedTypes.map(type => {
+    definedTypes.map((type: AnyObjectSchema) => {
       // Reset the match count since we are now looking at a different type.
       matches = 0;
 
       // Loop through each header provided by the uploaded workbook.
-      workbookHeader.map(header => {
+      workbookHeader.map((header: string) => {
         // Loop through the supported columns from the supported types..
         const definedTypeFields: string[] = Object.keys(type.describe().fields);
-        definedTypeFields.map(field => {
+        definedTypeFields.map((field: string) => {
           // Column from the uploaded spreadsheet matches a column from a supported type.
           if (header.toLowerCase() === field.toLowerCase()) {
             matches++;
@@ -165,7 +165,7 @@ export class WorkbookConversion extends Component<
           // If this has more matches, then it becomes the recommended type.
           if (matches > highestMatchedColumns) {
             highestMatchedColumns = matches;
-            highestMatchedType = type.describe().label;
+            highestMatchedType = type;
           }
         });
       });
@@ -181,7 +181,45 @@ export class WorkbookConversion extends Component<
       this.setState({
         selectedType: highestMatchedType
       });
+
+      // Match the columns with the new selected type.
+      this.determineColumns();
     }
+  };
+
+  /**
+   * Based on the selected import type, we will try to match the columns of the spreadsheet
+   * with the properties of the import type.
+   */
+  determineColumns = () => {
+    const { selectedType, jsonData } = this.state;
+
+    // Can't determine the columns if the selected type has not been selected.
+    if (selectedType === null || jsonData === null) {
+      return;
+    }
+
+    // Workbook column structure.
+    const columnStructure: WorkbookColumn[] = [];
+
+    // Get the fields for the selected type.
+    Object.keys(selectedType.describe().fields).map((field: string) => {
+      // Go through each of the spreadsheet headers and match it to a field.
+      jsonData[0].content?.map((header: string, index: number) => {
+        if (field.toLowerCase() === header.toLowerCase()) {
+          columnStructure.push({
+            columnIndex: index,
+            columnName: field,
+            typeColumn: "string"
+          });
+        }
+      });
+    });
+
+    // Set the workbook columns as a state to the workbook.
+    this.setState({
+      selectedColumns: columnStructure
+    });
   };
 
   /**
@@ -189,10 +227,16 @@ export class WorkbookConversion extends Component<
    *
    * @param newType Selected type from the dropdown after change.
    */
-  changeType = (newType: string) => {
-    this.setState({
-      selectedType: newType
-    });
+  changeType = (newType: SelectImportType) => {
+    this.setState(
+      {
+        selectedType: newType.value
+      },
+      () => {
+        // Match the columns with the new selected type.
+        this.determineColumns();
+      }
+    );
   };
 
   /**
