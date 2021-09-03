@@ -37,7 +37,7 @@ export function InstitutionDetailsPage({ router }: WithRouterProps) {
             <ResourceViewButtonBar
               resource={institution}
               apiBaseUrl="/collection-api"
-              resourceBaseUrl="/collection/institution"
+              resourceBaseUrl="collection/institution"
             />
             <InstitutionFormLayout />
           </DinaForm>

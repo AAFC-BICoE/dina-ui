@@ -25,7 +25,7 @@ export function ResourceViewButtonBar<
     <ButtonBar>
       <BackButton
         entityId={resource.id}
-        entityLink={`${resourceBaseUrl}`}
+        entityLink={`/${resourceBaseUrl}`}
         byPassView={true}
       />
       {canEdit && (
