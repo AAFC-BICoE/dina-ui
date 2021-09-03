@@ -5,31 +5,30 @@ import {
   WorkbookJSON,
   WorkbookRow,
   WorkbookColumn,
-  definedTypes
+  Workbook,
+  definedTypes,
+  WorkbookType
 } from "./WorkbookConversion";
 import { DynamicHotTable } from "../../../common-ui/lib/bulk-data-editor/BulkDataEditor";
 import Select from "react-select";
-import { AnyObjectSchema } from "yup";
 
 interface WorkbookDisplayProps {
-  jsonData: WorkbookJSON;
-  currentType: AnyObjectSchema | null;
+  workbook: Workbook;
   backButton: () => void;
   changeType: (value: SelectImportType) => void;
-  selectedColumns: WorkbookColumn[] | null;
 }
 
 export interface SelectImportType {
   label: string;
-  value: AnyObjectSchema;
+  value: WorkbookType;
 }
 
 export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
   render() {
-    const types: AnyObjectSchema[] = definedTypes;
-    const { jsonData, selectedColumns } = this.props;
+    // const types: AnyObjectSchema[] = definedTypes;
+    const { workbook } = this.props;
 
-    if (jsonData) {
+    if (workbook.data) {
       return (
         <div>
           <button
@@ -41,9 +40,9 @@ export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
           </button>
 
           <Select<SelectImportType>
-            options={types.map(type => {
+            options={definedTypes.map((type: WorkbookType) => {
               return {
-                label: type.describe().label,
+                label: type.name,
                 value: type
               } as SelectImportType;
             })}
@@ -52,12 +51,12 @@ export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
             onChange={this.props.changeType}
           />
 
-          {selectedColumns?.map((column: WorkbookColumn) => {
+          {workbook.columns?.map((column: WorkbookColumn) => {
             return (
               <Select
                 options={[
                   {
-                    label: "test",
+                    label: column.name,
                     value: "test"
                   }
                 ]}
@@ -69,8 +68,8 @@ export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
           <div>
             <br />
             <DynamicHotTable
-              columns={generateWorkbookColumns(jsonData)}
-              data={generateWorkbookRows(jsonData)}
+              columns={generateWorkbookColumns(workbook.columns)}
+              data={generateWorkbookRows(workbook.data)}
               manualColumnResize={true}
               rowHeaders={true}
               contextMenu={[
@@ -98,11 +97,11 @@ export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
  *
  * @param jsonData Excel data from the workbook.
  */
-function generateWorkbookColumns(jsonData: WorkbookJSON): HotColumnProps[] {
+function generateWorkbookColumns(columns: WorkbookColumn[]): HotColumnProps[] {
   const generateColumns: HotColumnProps[] = [];
-  jsonData[0].content.map(columnName => {
+  columns.map((column: WorkbookColumn) => {
     generateColumns.push({
-      title: columnName,
+      title: column.name,
       type: "text"
     });
   });

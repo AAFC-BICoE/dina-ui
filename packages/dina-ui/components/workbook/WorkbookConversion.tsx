@@ -9,38 +9,110 @@ import Kitsu from "kitsu";
 import WorkbookDisplay, { SelectImportType } from "./WorkbookDisplay";
 import WorkbookUpload from "./WorkbookUpload";
 
-export const definedTypes: AnyObjectSchema[] = [CollectionImport, RegionImport];
+export const definedTypes: WorkbookType[] = [
+  {
+    name: "collection",
+    fields: [
+      {
+        name: "group",
+        required: true
+      } as WorkbookGroupField,
+      {
+        name: "name",
+        required: true,
+        maxLength: 250
+      } as WorkbookStringField,
+      {
+        name: "code",
+        required: false,
+        maxLength: 10
+      } as WorkbookStringField
+    ]
+  },
+  {
+    name: "region",
+    fields: [
+      {
+        name: "group",
+        required: true
+      } as WorkbookGroupField,
+      {
+        name: "symbol",
+        required: true,
+        maxLength: 50
+      } as WorkbookStringField,
+      {
+        name: "name",
+        required: false
+      } as WorkbookStringField,
+      {
+        name: "description",
+        required: false
+      } as WorkbookStringField,
+      {
+        name: "aliases",
+        required: false
+      } as WorkbookStringField
+    ]
+  }
+];
+
+export interface Workbook {
+  columns: WorkbookColumn[];
+  data: WorkbookJSON | null;
+  type: WorkbookType | null;
+}
+
+export interface WorkbookColumn {
+  name: string;
+  index: number;
+  field: WorkbookField;
+}
+
+export interface WorkbookType {
+  name: string;
+  fields: WorkbookField[];
+}
+
+export interface WorkbookField {
+  name: string;
+  value: any;
+  required: boolean;
+}
+
+export interface WorkbookStringField extends WorkbookField {
+  value: string;
+  minLength: number;
+  maxLength: number;
+}
+
+export interface WorkbookNumberField extends WorkbookField {
+  value: number;
+  minValue: number;
+  maxValue: number;
+}
+
+export interface WorkbookDropdownField extends WorkbookField {
+  value: string;
+}
+
+export interface WorkbookGroupField extends WorkbookField {
+  value: number;
+}
 
 interface WorkbookProps {
   apiClient: Kitsu;
 }
 
 interface WorkbookStates {
-  /** Json data provided directly from the spreadsheet. */
-  jsonData: WorkbookJSON | null;
+  /** Workbook Object */
+  workbook: Workbook | null;
 
   /** Loading state to display a loading indicator. */
   loading: boolean;
 
   /** Boolean state to determine if an error message should be displayed. */
   failed: boolean;
-
-  /** The type of import the user is trying to perform. */
-  selectedType: AnyObjectSchema | null;
-
-  /** Workbook columns. */
-  selectedColumns: WorkbookColumn[] | null;
-}
-
-export interface WorkbookColumn {
-  /** Spreadsheet column name provided. */
-  columnName: string;
-
-  /** Index where the column is presented. */
-  columnIndex: number;
-
-  /** What the column represents when importing. */
-  typeColumn: string;
 }
 
 /**
@@ -57,13 +129,6 @@ export interface WorkbookRow {
  */
 export interface WorkbookJSON extends Array<WorkbookRow> {}
 
-export interface SchemaDescription {
-  type: string;
-  label: string;
-  meta: object;
-  tests: { name: string; params: object }[];
-}
-
 /**
  * The parent component used for the workbook conversion task.
  */
@@ -75,10 +140,8 @@ export class WorkbookConversion extends Component<
     super(props);
 
     this.state = {
+      workbook: null,
       loading: false,
-      jsonData: null,
-      selectedColumns: [],
-      selectedType: null,
       failed: false
     };
   }
@@ -105,29 +168,33 @@ export class WorkbookConversion extends Component<
         // Ensure a proper response has been given.
         if (!response.data) {
           this.setState({
-            jsonData: null,
+            workbook: null,
             loading: false,
             failed: true
           });
         }
 
         this.setState({
-          jsonData: response.data,
+          workbook: {
+            data: response.data,
+            columns: [],
+            type: null
+          } as Workbook,
           loading: false,
           failed: false
         });
       })
       .catch(() => {
         this.setState({
-          jsonData: null,
+          workbook: null,
           loading: false,
           failed: true
         });
       });
 
     // If not failed, then we can try to determine the workbook type.
-    if (!this.state.failed && this.state.jsonData) {
-      this.determineType(this.state.jsonData);
+    if (!this.state.failed && this.state.workbook !== undefined) {
+      this.determineType();
     }
   };
 
@@ -140,25 +207,29 @@ export class WorkbookConversion extends Component<
    *
    * If none can be determine, the user can always manually select an import type.
    */
-  determineType = (workbookData: WorkbookJSON) => {
+  determineType = () => {
+    const { workbook } = this.state;
+    if (workbook === null || workbook.data === null) {
+      return;
+    }
+
     // Get the spreadsheet header row, this will be used to determine the import type.s
-    const workbookHeader: string[] = workbookData[0].content;
+    const workbookHeader: string[] = workbook.data[0].content;
     let matches = 0;
     let highestMatchedColumns = 0;
-    let highestMatchedType: AnyObjectSchema | null = null;
+    let highestMatchedType: WorkbookType | null = null;
 
     // Loop through each of the supported types.
-    definedTypes.map((type: AnyObjectSchema) => {
+    definedTypes.map((type: WorkbookType) => {
       // Reset the match count since we are now looking at a different type.
       matches = 0;
 
       // Loop through each header provided by the uploaded workbook.
       workbookHeader.map((header: string) => {
         // Loop through the supported columns from the supported types..
-        const definedTypeFields: string[] = Object.keys(type.describe().fields);
-        definedTypeFields.map((field: string) => {
+        type.fields.map((field: WorkbookField) => {
           // Column from the uploaded spreadsheet matches a column from a supported type.
-          if (header.toLowerCase() === field.toLowerCase()) {
+          if (header.toLowerCase() === field.name.toLowerCase()) {
             matches++;
           }
 
@@ -173,14 +244,10 @@ export class WorkbookConversion extends Component<
 
     if (highestMatchedColumns === 0) {
       // No matches found, just set the selected type as null. User will need to manually enter this.
-      this.setState({
-        selectedType: null
-      });
+      workbook.type = null;
     } else {
       // Change the type based on the highest match.
-      this.setState({
-        selectedType: highestMatchedType
-      });
+      workbook.type = highestMatchedType;
 
       // Match the columns with the new selected type.
       this.determineColumns();
@@ -192,34 +259,35 @@ export class WorkbookConversion extends Component<
    * with the properties of the import type.
    */
   determineColumns = () => {
-    const { selectedType, jsonData } = this.state;
+    const { workbook } = this.state;
 
     // Can't determine the columns if the selected type has not been selected.
-    if (selectedType === null || jsonData === null) {
+    if (workbook === null || workbook.data === null) {
       return;
     }
+
+    // Workbook headers.
+    const workbookHeader: string[] = workbook.data[0].content;
 
     // Workbook column structure.
     const columnStructure: WorkbookColumn[] = [];
 
     // Get the fields for the selected type.
-    Object.keys(selectedType.describe().fields).map((field: string) => {
+    workbook.type?.fields.map((field: WorkbookField) => {
       // Go through each of the spreadsheet headers and match it to a field.
-      jsonData[0].content?.map((header: string, index: number) => {
-        if (field.toLowerCase() === header.toLowerCase()) {
+      workbookHeader.map((header: string, index: number) => {
+        if (field.name.toLowerCase() === header.toLowerCase()) {
           columnStructure.push({
-            columnIndex: index,
-            columnName: field,
-            typeColumn: "string"
+            index,
+            name: header,
+            field
           });
         }
       });
     });
 
     // Set the workbook columns as a state to the workbook.
-    this.setState({
-      selectedColumns: columnStructure
-    });
+    workbook.columns = columnStructure;
   };
 
   /**
@@ -228,15 +296,13 @@ export class WorkbookConversion extends Component<
    * @param newType Selected type from the dropdown after change.
    */
   changeType = (newType: SelectImportType) => {
-    this.setState(
-      {
-        selectedType: newType.value
-      },
-      () => {
-        // Match the columns with the new selected type.
-        this.determineColumns();
-      }
-    );
+    const { workbook } = this.state;
+    if (workbook === null) {
+      return;
+    }
+
+    workbook.type = newType.value;
+    this.determineColumns();
   };
 
   /**
@@ -245,14 +311,15 @@ export class WorkbookConversion extends Component<
   backToUpload = () => {
     this.setState({
       loading: false,
-      jsonData: null
+      workbook: null
     });
   };
 
   render() {
     // Deconstruct the states.
-    const { loading, jsonData, failed, selectedType, selectedColumns } =
-      this.state;
+    const { loading, failed, workbook } = this.state;
+
+    // If failed display the error message.
     const failedMessage = failed ? (
       <div className="alert alert-danger">
         <DinaMessage id="workbookUploadFailure" />
@@ -264,17 +331,13 @@ export class WorkbookConversion extends Component<
       // Display the loading spinner.
       return <LoadingSpinner loading={true} />;
     } else {
-      // If failed display the error message.
-
       // If the json data is provided, display the JSON as a table. Otherwise display the uploading component.
-      if (jsonData) {
+      if (workbook?.data) {
         return (
           <WorkbookDisplay
-            jsonData={jsonData}
+            workbook={workbook}
             backButton={this.backToUpload}
             changeType={this.changeType}
-            currentType={selectedType}
-            selectedColumns={selectedColumns}
           />
         );
       } else {
