@@ -117,7 +117,7 @@ export function PreparationField({
           suggestion={vocabElement =>
             vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ?? ""
           }
-          shouldRenderSuggestions={() => true}
+          alwaysShowSuggestions={true}
           tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"
         />
       </div>

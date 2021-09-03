@@ -33,12 +33,10 @@ interface AutoSuggestConfig<T extends KitsuResource> {
     searchValue: string
   ) => string | string[] | undefined;
   configSuggestion?: (resource: PersistedResource<T>) => string[];
-  shouldRenderSuggestions?: (
-    value: string,
-    reason: ShouldRenderReasons
-  ) => boolean;
   onSuggestionSelected?: OnFormikSubmit<ChangeEvent<HTMLInputElement>>;
   timeoutMs?: number;
+  /** Show the suggestions even when the input is blank. */
+  alwaysShowSuggestions?: boolean;
 }
 
 /**
@@ -48,10 +46,10 @@ interface AutoSuggestConfig<T extends KitsuResource> {
 export function AutoSuggestTextField<T extends KitsuResource>({
   query,
   suggestion,
-  shouldRenderSuggestions,
   configSuggestion,
   onSuggestionSelected,
   timeoutMs,
+  alwaysShowSuggestions,
   ...textFieldProps
 }: AutoSuggestTextFieldProps<T>) {
   return (
@@ -62,8 +60,8 @@ export function AutoSuggestTextField<T extends KitsuResource>({
           query={query}
           suggestion={suggestion}
           {...inputProps}
-          shouldRenderSuggestions={shouldRenderSuggestions}
           onSuggestionSelected={onSuggestionSelected}
+          alwaysShowSuggestions={alwaysShowSuggestions}
           id={textFieldProps.name}
           timeoutMs={timeoutMs}
         />
@@ -75,10 +73,10 @@ export function AutoSuggestTextField<T extends KitsuResource>({
 function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   query,
   suggestion = (it, searchVal) => (!searchVal ? String(it) : String(searchVal)),
-  shouldRenderSuggestions,
   onSuggestionSelected,
   id,
   timeoutMs = 250,
+  alwaysShowSuggestions,
   ...inputProps
 }: InputHTMLAttributes<any> & AutoSuggestConfig<T>) {
   const formikCtx = useFormikContext<any>();
@@ -92,7 +90,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     query?.(debouncedSearchValue, formikCtx) as any,
     {
       // Don't show results when the search is empty:
-      disabled: !debouncedSearchValue?.trim()
+      disabled: !alwaysShowSuggestions && !debouncedSearchValue?.trim()
     }
   );
 
@@ -129,6 +127,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
           display: block;
           position: absolute;
           width: 100%;
+          z-index: 2;
         }
         .autosuggest .suggestion-highlighted { 
           background-color: #ddd;
@@ -149,7 +148,9 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
           }}
           onSuggestionsClearRequested={() => setSearchValue("")}
           renderSuggestion={text => <div>{text}</div>}
-          shouldRenderSuggestions={shouldRenderSuggestions}
+          shouldRenderSuggestions={
+            alwaysShowSuggestions ? () => !!alwaysShowSuggestions : undefined
+          }
           inputProps={inputProps as InputProps<any>}
           theme={{
             suggestionsList: "list-group",
