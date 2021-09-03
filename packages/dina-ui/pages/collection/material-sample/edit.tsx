@@ -6,6 +6,7 @@ import {
   DinaFormSection,
   FieldSet,
   FormikButton,
+  LoadingSpinner,
   StringArrayField,
   SubmitButton,
   TextField,
@@ -131,7 +132,8 @@ export function MaterialSampleForm({
     setColEventId,
     colEventQuery,
     onSubmit,
-    materialSampleAttachmentsUI
+    materialSampleAttachmentsUI,
+    loading
   } =
     materialSampleSaveHook ??
     useMaterialSampleSave({
@@ -350,6 +352,8 @@ export function MaterialSampleForm({
 
   return isTemplate ? (
     mateirialSampleInternal
+  ) : loading ? (
+    <LoadingSpinner loading={true} />
   ) : (
     <DinaForm<InputResource<MaterialSample>>
       initialValues={initialValues}

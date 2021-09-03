@@ -237,7 +237,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeType_integer_label: "Numerical",
   field_managedAttributeType_picklist_label: "Pick List",
   field_managedAttributeType_text_label: "Text",
-  field_materialSampleName: "Material Sample ID",
+  field_materialSampleName: "Primary ID",
   "field_materialSampleType.name": "Material Sample Type",
   "field_materialSampleType.uuid": "Material Sample Type",
   field_materialSample_identifierType_catalogueNumber_label: "Catalogue Number",

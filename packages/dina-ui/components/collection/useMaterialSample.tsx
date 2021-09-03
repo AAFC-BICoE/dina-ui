@@ -31,6 +31,7 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
 import { DETERMINATION_FIELDS } from "./DeterminationField";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
+import { useLastUsedCollection } from "./useLastUsedCollection";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -248,12 +249,16 @@ export function useMaterialSampleSave({
     }
   };
 
+  const { loading, lastUsedCollection } = useLastUsedCollection();
+
   const initialValues: InputResource<MaterialSample> = {
     ...(materialSample
       ? { ...materialSample }
       : {
           type: "material-sample",
-          managedAttributes: {}
+          managedAttributes: {},
+          // Defaults to the last Collection used to create a Material Sample:
+          collection: lastUsedCollection
         }),
     determination: materialSample?.determination?.length
       ? materialSample?.determination
@@ -457,6 +462,7 @@ export function useMaterialSampleSave({
     setColEventId,
     colEventQuery,
     materialSampleAttachmentsUI,
-    onSubmit
+    onSubmit,
+    loading
   };
 }
