@@ -28,6 +28,10 @@ export interface CollectingEventAttributes {
   dwcVerbatimDepth?: string;
   dwcOtherRecordNumbers?: string[];
   dwcRecordNumber?: string;
+  dwcMinimumElevationInMeters?: number;
+  dwcMinimumDepthInMeters?: number;
+  dwcMaximumElevationInMeters?: number;
+  dwcMaximumDepthInMeters?: number;
 
   dwcCountry?: string;
   dwcCountryCode?: string;
@@ -45,6 +49,9 @@ export interface CollectingEventAttributes {
 
   habitat?: string;
   host?: string;
+
+  substrate?: string;
+  remarks?: string;
 
   managedAttributeValues?: ManagedAttributeValues;
   managedAttributes?: JsonValue;

@@ -274,15 +274,6 @@ export function CollectingEventFormLayout({
     );
   }
 
-  /* Ensure config is rendered when input get focuse without needing to enter any value */
-  function shouldRenderSuggestions(value: string, reason: ShouldRenderReasons) {
-    return (
-      value?.length >= 0 ||
-      reason === "input-changed" ||
-      reason === "input-focused"
-    );
-  }
-
   function onSuggestionSelected(_, formik) {
     /* To bring the effect as if the field's value is changed to reflect the placeholder change */
     formik.values.dwcVerbatimLatitude === null
@@ -468,8 +459,8 @@ export function CollectingEventFormLayout({
                   vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ??
                   ""
                 }
-                shouldRenderSuggestions={shouldRenderSuggestions}
                 onSuggestionSelected={onSuggestionSelected}
+                alwaysShowSuggestions={true}
                 onChangeExternal={onChangeExternal}
               />
               <Field name="dwcVerbatimCoordinateSystem">
@@ -566,7 +557,7 @@ export function CollectingEventFormLayout({
                   vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ??
                   ""
                 }
-                shouldRenderSuggestions={shouldRenderSuggestions}
+                alwaysShowSuggestions={true}
                 onChangeExternal={onChangeExternal}
               />
               <TextField name="dwcVerbatimElevation" />
@@ -896,10 +887,17 @@ export function CollectingEventFormLayout({
             model="collection-api/collection-method"
             optionLabel={cm => cm.name}
           />
-          <VocabularySelectField
-            path="collection-api/vocabulary/substrate"
+          <AutoSuggestTextField<CollectingEvent>
             name="substrate"
             className="col-md-6"
+            query={(searchValue, ctx) => ({
+              path: "collection-api/collecting-event",
+              filter: {
+                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                rsql: `substrate==${searchValue}*`
+              }
+            })}
+            suggestion={collEvent => collEvent.substrate ?? ""}
           />
         </div>
         <div className="row">
