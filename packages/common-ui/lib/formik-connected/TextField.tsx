@@ -13,6 +13,7 @@ export interface TextFieldProps extends LabelWrapperParams {
   placeholder?: string;
   numberOnly?: boolean;
   letterOnly?: boolean;
+  noSpace?: boolean;
   customInput?: (inputProps: InputHTMLAttributes<any>) => JSX.Element;
   onChangeExternal?: (
     form: FormikProps<any>,
@@ -35,6 +36,7 @@ export function TextField(props: TextFieldProps) {
     onChangeExternal,
     numberOnly,
     letterOnly,
+    noSpace,
     ...labelWrapperProps
   } = props;
 
@@ -61,15 +63,10 @@ export function TextField(props: TextFieldProps) {
             /^(Backspace|Delete|ArrowLeft|ArrowRight)$/;
           const LETTER_ALLOWED_CHARS_REGEXP = /[A-Za-z]+/;
           if (
-            numberOnly &&
-            !NUMBER_ALLOWED_CHARS_REGEXP.test(e.key) &&
-            !CTRL_ALLOWED_CHARS_REGEXP.test(e.key)
-          ) {
-            e.preventDefault();
-          } else if (
-            letterOnly &&
-            !LETTER_ALLOWED_CHARS_REGEXP.test(e.key) &&
-            !CTRL_ALLOWED_CHARS_REGEXP.test(e.key)
+            (!CTRL_ALLOWED_CHARS_REGEXP.test(e.key) &&
+              ((numberOnly && !NUMBER_ALLOWED_CHARS_REGEXP.test(e.key)) ||
+                (letterOnly && !LETTER_ALLOWED_CHARS_REGEXP.test(e.key)))) ||
+            (noSpace && e.code === "Space")
           ) {
             e.preventDefault();
           }

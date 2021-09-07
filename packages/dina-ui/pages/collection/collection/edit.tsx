@@ -154,11 +154,12 @@ export function CollectionFormFields({ title }) {
           optionLabel={collection => collection.name as any}
           className="col-md-6"
           isDisabled={true}
+          label={formatMessage("parentCollectionLabel")}
         />
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
-        <TextField className="col-md-6" name="code" />
+        <TextField className="col-md-6" name="code" noSpace={true} />
       </div>
       <div className="row">
         <TextField
