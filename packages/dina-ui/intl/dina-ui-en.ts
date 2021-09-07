@@ -66,6 +66,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingEventManagedAttributes: "Collecting Event Managed Attributes",
   collectingEventViewTitle: "View Collecting Event",
   collectingLocationLegend: "Collecting Location",
+  collection: "Collection",
   collectionListTitle: "Collections",
   collectionManagedAttributeListTitle: "Collection Module Managed Attributes",
   collectionMethodNameLabel: "Collection Method Name",
@@ -374,6 +375,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   preparedBy: "Prepared By",
   previewAndCustomizeLabel: "Preview and Customize",
   primary: "Primary",
+  primaryId: "Primary ID",
   primaryButton_tooltip:
     "Make this assertion the primary data point when exported. Only one assertion can be primary",
   proceedToCreateMetadata: "Proceed to Create Metadata",

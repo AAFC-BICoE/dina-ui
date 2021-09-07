@@ -10,6 +10,7 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
+  useDinaFormContext,
   withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
@@ -146,6 +147,8 @@ export function MaterialSampleForm({
       enabledFields
     });
 
+  const { formatMessage } = useDinaIntl();
+
   // CollectingEvent "id" being enabled in the template enabledFields means that the
   // Template links an existing Collecting Event:
   const templateAttachesCollectingEvent = Boolean(
@@ -215,7 +218,9 @@ export function MaterialSampleForm({
         {!isTemplate && <MaterialSampleMainInfoFormLayout />}
         <div className="row">
           <div className="col-md-6">
-            <MaterialSampleIdentifiersFormLayout />
+            <MaterialSampleIdentifiersFormLayout
+              sampleNamePlaceHolder={formatMessage("baseNameLabel")}
+            />
           </div>
         </div>
         <DataComponentToggler state={dataComponentState} />
@@ -399,6 +404,9 @@ export function MaterialSampleIdentifiersFormLayout({
   namePrefix = "",
   sampleNamePlaceHolder
 }: MaterialSampleIdentifiersFormLayoutProps) {
+  const { formatMessage } = useDinaIntl();
+  const { readOnly } = useDinaFormContext();
+
   return (
     <FieldSet
       id="identifiers-section"
@@ -407,25 +415,28 @@ export function MaterialSampleIdentifiersFormLayout({
     >
       <div className="row">
         <div className="col-md-6">
-          <CollectionSelectField
-            name={`${namePrefix}collection`}
-            customName="collection"
-          />
-          <TextField
-            name={`${namePrefix}materialSampleName`}
-            customName="materialSampleName"
-            className="materialSampleName"
-            placeholder={sampleNamePlaceHolder}
-            readOnly={disableSampleName}
-          />
+          <label className="w-100">
+            <div className="fw-bold mb-2">{formatMessage("primaryId")}</div>
+            <CollectionSelectField
+              name={`${namePrefix}collection`}
+              customName="collection"
+              removeLabel={true}
+              selectProps={{ placeholder: formatMessage("collection") }}
+              removeBottomMargin={readOnly}
+            />
+            <TextField
+              name={`${namePrefix}materialSampleName`}
+              customName="materialSampleName"
+              className="materialSampleName"
+              placeholder={sampleNamePlaceHolder}
+              readOnly={disableSampleName}
+              removeLabel={true}
+            />
+          </label>
         </div>
         <div className="col-md-6">
           <StringArrayField
-            name={`${
-              namePrefix
-                ? namePrefix + "dwcOtherCatalogNumbers"
-                : "dwcOtherCatalogNumbers"
-            }`}
+            name={`${namePrefix}dwcOtherCatalogNumbers`}
             customName="dwcOtherCatalogNumbers"
           />
         </div>
