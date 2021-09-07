@@ -7,7 +7,8 @@ import {
   WorkbookColumn,
   Workbook,
   definedTypes,
-  WorkbookType
+  WorkbookType,
+  WorkbookField
 } from "./WorkbookConversion";
 import { DynamicHotTable } from "../../../common-ui/lib/bulk-data-editor/BulkDataEditor";
 import Select from "react-select";
@@ -16,11 +17,18 @@ interface WorkbookDisplayProps {
   workbook: Workbook;
   backButton: () => void;
   changeType: (value: SelectImportType) => void;
+  changeColumn: (value: SelectColumnDefinition) => void;
 }
 
 export interface SelectImportType {
   label: string;
   value: WorkbookType;
+}
+
+export interface SelectColumnDefinition {
+  label: string;
+  value: WorkbookField;
+  index: number;
 }
 
 export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
@@ -46,21 +54,30 @@ export class WorkbookDisplay extends Component<WorkbookDisplayProps> {
                 value: type
               } as SelectImportType;
             })}
+            value={
+              {
+                label: workbook.type?.name,
+                value: workbook.type
+              } as SelectImportType
+            }
+            key="importType"
             className="col-md-3 mrgn-tp-md"
             name="importType"
             onChange={this.props.changeType}
           />
 
-          {workbook.columns?.map((column: WorkbookColumn) => {
+          {workbook.columns?.map((column: WorkbookColumn, index: number) => {
             return (
               <Select
-                options={[
-                  {
-                    label: column.name,
-                    value: "test"
-                  }
-                ]}
-                key=""
+                options={workbook.type?.fields.map((field: WorkbookField) => {
+                  return {
+                    label: field.name,
+                    value: field,
+                    index
+                  };
+                })}
+                key={column.name}
+                onChange={this.props.changeColumn}
               />
             );
           })}

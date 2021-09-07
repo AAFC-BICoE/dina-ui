@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import { CollectionImport } from "../../types/collection-api";
-import { RegionImport } from "../../types/seqdb-api";
 import { LoadingSpinner } from "common-ui";
 import { IFileWithMeta } from "../object-store/file-upload/FileUploader";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { AnyObjectSchema } from "yup";
 import Kitsu from "kitsu";
-import WorkbookDisplay, { SelectImportType } from "./WorkbookDisplay";
+import WorkbookDisplay, {
+  SelectColumnDefinition,
+  SelectImportType
+} from "./WorkbookDisplay";
 import WorkbookUpload from "./WorkbookUpload";
 
 export const definedTypes: WorkbookType[] = [
@@ -242,12 +242,20 @@ export class WorkbookConversion extends Component<
       });
     });
 
-    if (highestMatchedColumns === 0) {
+    if (highestMatchedType === null) {
       // No matches found, just set the selected type as null. User will need to manually enter this.
-      workbook.type = null;
+      this.setState(prevState => {
+        const newWorkbook = Object.assign({}, prevState.workbook);
+        newWorkbook.type = null;
+        return { workbook: newWorkbook };
+      });
     } else {
       // Change the type based on the highest match.
-      workbook.type = highestMatchedType;
+      this.setState(prevState => {
+        const newWorkbook = Object.assign({}, prevState.workbook);
+        newWorkbook.type = highestMatchedType;
+        return { workbook: newWorkbook };
+      });
 
       // Match the columns with the new selected type.
       this.determineColumns();
@@ -287,7 +295,22 @@ export class WorkbookConversion extends Component<
     });
 
     // Set the workbook columns as a state to the workbook.
-    workbook.columns = columnStructure;
+    this.setState(prevState => {
+      // Create a copy of the workbook structure, then apply the new changes.
+      const newWorkbook = Object.assign({}, prevState.workbook);
+      newWorkbook.columns = columnStructure;
+      return { workbook: newWorkbook };
+    });
+  };
+
+  generateColumnStructure = () => {
+    const { workbook } = this.state;
+    if (workbook === null) {
+      return;
+    }
+
+    // Create a copy of the existing column structure to alter.
+    const columnStructure = Object.assign({}, workbook?.columns);
   };
 
   /**
@@ -301,8 +324,28 @@ export class WorkbookConversion extends Component<
       return;
     }
 
-    workbook.type = newType.value;
+    // Create a copy of the workbook structure, then apply the new changes.
+    this.setState(prevState => {
+      const newWorkbook = Object.assign({}, prevState.workbook);
+      newWorkbook.type = newType.value;
+      return { workbook: newWorkbook };
+    });
+
     this.determineColumns();
+  };
+
+  /**
+   * The user can manually change any of the columns to point to a different field.
+   *
+   * @param newColumn Selected new field for one of the columns.
+   */
+  changeColumn = (newColumn: SelectColumnDefinition) => {
+    const { workbook } = this.state;
+    if (workbook === null) {
+      return;
+    }
+
+    this.generateColumnStructure();
   };
 
   /**
@@ -338,6 +381,7 @@ export class WorkbookConversion extends Component<
             workbook={workbook}
             backButton={this.backToUpload}
             changeType={this.changeType}
+            changeColumn={this.changeColumn}
           />
         );
       } else {
