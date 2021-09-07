@@ -153,6 +153,7 @@ export function CollectionFormFields({ title }) {
           model="collection-api/collection"
           optionLabel={collection => collection.name as any}
           className="col-md-6"
+          isDisabled={true}
         />
       </div>
       <div className="row">
