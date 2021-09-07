@@ -89,7 +89,6 @@ const apiContext = {
 const testSeriesModeRunConfig: MaterialSampleRunConfig = {
   metadata: { actionRemarks: "Remarks on this run config" },
   configure: {
-    identifier: "MATERIAL_SAMPLE_ID",
     generationMode: "SERIES",
     numOfChildToCreate: 1,
     baseName: "CustomParentName",
@@ -103,7 +102,6 @@ const testSeriesModeRunConfig: MaterialSampleRunConfig = {
 const testBatchModeRunConfig: MaterialSampleRunConfig = {
   metadata: { actionRemarks: "Remarks on this run config" },
   configure: {
-    identifier: "MATERIAL_SAMPLE_ID",
     generationMode: "BATCH",
     numOfChildToCreate: 2,
     baseName: "CustomParentName",
@@ -154,7 +152,7 @@ describe("MaterialSample split workflow run action form with all default values"
     // child sample will have the parent's value after click copyFromParent
     expect(
       wrapper.find(".materialSampleName-field input").prop("value")
-    ).toEqual("my-custom-name");
+    ).toEqual("my custom name");
 
     wrapper.find("button.runAction").simulate("click");
 
@@ -164,7 +162,7 @@ describe("MaterialSample split workflow run action form with all default values"
         {
           resource: {
             group: "aafc",
-            materialSampleName: "my-custom-name",
+            materialSampleName: "my custom name",
             parentMaterialSample: {
               id: "1",
               type: "material-sample"

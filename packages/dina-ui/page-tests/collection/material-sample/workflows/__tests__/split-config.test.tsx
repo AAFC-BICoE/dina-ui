@@ -165,9 +165,12 @@ describe("MaterialSample split workflow series-mode run config", () => {
       )
     ).toEqual({
       configure: {
+        collection: {
+          id: null,
+          type: "collection"
+        },
         baseName: "TestBaseName",
         generationMode: "BATCH",
-        identifier: "MATERIAL_SAMPLE_ID",
         numOfChildToCreate: 3,
         suffix: "TestSuffix"
       },

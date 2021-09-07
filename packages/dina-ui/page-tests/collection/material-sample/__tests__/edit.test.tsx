@@ -513,6 +513,9 @@ describe("Material Sample Edit Page", () => {
       testCtx
     );
 
+    await new Promise(setImmediate);
+    wrapper.update();
+
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
