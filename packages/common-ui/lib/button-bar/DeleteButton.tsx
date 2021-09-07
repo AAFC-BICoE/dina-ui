@@ -24,6 +24,8 @@ interface DeleteButtonProps {
   postDeleteRedirect: string;
 
   options?: DoOperationsOptions;
+
+  withLeadingSlash?: boolean;
 }
 
 export function DeleteButton({
@@ -32,7 +34,8 @@ export function DeleteButton({
   id,
   options,
   postDeleteRedirect,
-  type
+  type,
+  withLeadingSlash
 }: DeleteButtonProps) {
   const { openModal } = useModal();
   const { doOperations } = useContext(ApiClientContext);
@@ -49,7 +52,9 @@ export function DeleteButton({
       options
     );
 
-    await router.push(postDeleteRedirect);
+    await router.push(
+      withLeadingSlash ? "/" + postDeleteRedirect : postDeleteRedirect
+    );
   }
 
   if (!id) {

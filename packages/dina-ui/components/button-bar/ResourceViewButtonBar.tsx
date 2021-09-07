@@ -8,6 +8,7 @@ export interface ResourceViewButtonBarProps<
   resource: TResource;
   resourceBaseUrl: string;
   apiBaseUrl: string;
+  withLeadingSlash?: boolean;
 }
 
 /** Button bar for a resource's View page. */
@@ -16,7 +17,8 @@ export function ResourceViewButtonBar<
 >({
   resource,
   resourceBaseUrl,
-  apiBaseUrl
+  apiBaseUrl,
+  withLeadingSlash
 }: ResourceViewButtonBarProps<TResource>) {
   const canEdit = resource.meta?.permissions?.includes("update");
   const canDelete = resource.meta?.permissions?.includes("delete");
@@ -42,6 +44,7 @@ export function ResourceViewButtonBar<
           options={{ apiBaseUrl }}
           postDeleteRedirect={`${resourceBaseUrl}/list`}
           type={resource.type}
+          withLeadingSlash={withLeadingSlash}
         />
       )}
     </ButtonBar>

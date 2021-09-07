@@ -38,6 +38,7 @@ export function CollectionDetailsPage({ router }: WithRouterProps) {
               resource={collection}
               apiBaseUrl="/collection-api"
               resourceBaseUrl="collection/collection"
+              withLeadingSlash={true}
             />
             <CollectionFormFields title={"collectionViewTitle"} />
           </DinaForm>
