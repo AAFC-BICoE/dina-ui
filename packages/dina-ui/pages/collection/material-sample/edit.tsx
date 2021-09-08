@@ -435,6 +435,7 @@ export function MaterialSampleIdentifiersFormLayout({
           </label>
         </div>
         <div className="col-md-6">
+          <TextField name={`${namePrefix}barcode`} customName="barcode" />
           <StringArrayField
             name={`${namePrefix}dwcOtherCatalogNumbers`}
             customName="dwcOtherCatalogNumbers"
