@@ -29,6 +29,8 @@ export interface MaterialSampleAttributes {
 
   determination?: Determination[];
   hierarchy?: HierarchyItem[];
+
+  barcode?: string;
 }
 export interface MaterialSampleRelationships {
   collection?: Collection;
