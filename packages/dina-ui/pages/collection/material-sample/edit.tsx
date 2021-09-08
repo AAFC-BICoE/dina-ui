@@ -10,7 +10,6 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
-  useDinaFormContext,
   withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
@@ -28,7 +27,10 @@ import {
   Nav,
   StorageLinkerField
 } from "../../../components";
-import { CollectingEventLinker } from "../../../components/collection";
+import {
+  CollectingEventLinker,
+  SetDefaultSampleName
+} from "../../../components/collection";
 import { DeterminationField } from "../../../components/collection/DeterminationField";
 import { PreparationField } from "../../../components/collection/PreparationField";
 import {
@@ -218,9 +220,7 @@ export function MaterialSampleForm({
         {!isTemplate && <MaterialSampleMainInfoFormLayout />}
         <div className="row">
           <div className="col-md-6">
-            <MaterialSampleIdentifiersFormLayout
-              sampleNamePlaceHolder={formatMessage("baseNameLabel")}
-            />
+            <MaterialSampleIdentifiersFormLayout />
           </div>
         </div>
         <DataComponentToggler state={dataComponentState} />
@@ -365,6 +365,7 @@ export function MaterialSampleForm({
       onSubmit={onSubmit}
       enabledFields={enabledFields?.materialSample}
     >
+      {!initialValues.id && <SetDefaultSampleName />}
       {buttonBar}
       {mateirialSampleInternal}
       {buttonBar}
@@ -388,7 +389,6 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   hideOtherCatalogNumbers?: boolean;
   className?: string;
   namePrefix?: string;
-  sampleNamePlaceHolder?: string;
 }
 
 export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
@@ -401,12 +401,8 @@ export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
 export function MaterialSampleIdentifiersFormLayout({
   disableSampleName,
   className,
-  namePrefix = "",
-  sampleNamePlaceHolder
+  namePrefix = ""
 }: MaterialSampleIdentifiersFormLayoutProps) {
-  const { formatMessage } = useDinaIntl();
-  const { readOnly } = useDinaFormContext();
-
   return (
     <FieldSet
       id="identifiers-section"
@@ -415,24 +411,16 @@ export function MaterialSampleIdentifiersFormLayout({
     >
       <div className="row">
         <div className="col-md-6">
-          <label className="w-100">
-            <div className="fw-bold mb-2">{formatMessage("primaryId")}</div>
-            <CollectionSelectField
-              name={`${namePrefix}collection`}
-              customName="collection"
-              removeLabel={true}
-              selectProps={{ placeholder: formatMessage("collection") }}
-              removeBottomMargin={readOnly}
-            />
-            <TextField
-              name={`${namePrefix}materialSampleName`}
-              customName="materialSampleName"
-              className="materialSampleName"
-              placeholder={sampleNamePlaceHolder}
-              readOnly={disableSampleName}
-              removeLabel={true}
-            />
-          </label>
+          <CollectionSelectField
+            name={`${namePrefix}collection`}
+            customName="collection"
+          />
+          <TextField
+            name={`${namePrefix}materialSampleName`}
+            customName="materialSampleName"
+            className="materialSampleName"
+            readOnly={disableSampleName}
+          />
         </div>
         <div className="col-md-6">
           <StringArrayField
