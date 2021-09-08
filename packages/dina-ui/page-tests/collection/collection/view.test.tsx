@@ -13,7 +13,7 @@ const TEST_COLLECTION: Collection = {
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
-    case "collection-api/collection/123?include=institution":
+    case "collection-api/collection/123":
       return { data: TEST_COLLECTION };
     case "user-api/group":
       return [];
