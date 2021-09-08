@@ -72,7 +72,8 @@ export default function SplitRunAction() {
     start = START,
     suffix = "",
     suffixType = TYPE_NUMERIC,
-    generationMode = "SERIES"
+    generationMode = "SERIES",
+    collection
   } = splitChildSampleRunConfig?.configure ?? {};
 
   const { sampleNames = [] } =
@@ -179,7 +180,8 @@ export default function SplitRunAction() {
     initialChildSamples.push({
       group: groupNames?.[0],
       type: "material-sample",
-      materialSampleName: splitChildSampleName ?? generatedSampleName
+      materialSampleName: splitChildSampleName ?? generatedSampleName,
+      collection
     });
   }
 
@@ -268,11 +270,6 @@ export default function SplitRunAction() {
     for (const fieldName of PREPARATION_FIELDS) {
       formik.setFieldValue(commonRoot + fieldName, parentSample?.[fieldName]);
     }
-
-    formik.setFieldValue(
-      commonRoot + "dwcCatalogNumber",
-      parentSample?.dwcCatalogNumber
-    );
 
     // formik.setFieldValue(
     //   commonRoot + "materialSampleName",

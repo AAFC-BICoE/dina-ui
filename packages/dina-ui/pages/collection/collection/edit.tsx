@@ -14,7 +14,12 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import {
+  GroupSelectField,
+  Head,
+  InstitutionSelectField,
+  Nav
+} from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Collection, Institution } from "../../../types/collection-api";
 import { toPairs, fromPairs } from "lodash";
@@ -28,7 +33,7 @@ export default function CollectionEditPage() {
   } = router;
 
   const collectionQuery = useQuery<Collection>(
-    { path: `collection-api/collection/${id}?include=institution` },
+    { path: `collection-api/collection/${id}`, include: "institution" },
     { disabled: !id }
   );
 
@@ -126,6 +131,9 @@ export function CollectionFormFields({ title }) {
 
   return (
     <div>
+      <div className="row">
+        <InstitutionSelectField name="institution" className="col-md-6" />
+      </div>
       <div className="row">
         <GroupSelectField
           name="group"
