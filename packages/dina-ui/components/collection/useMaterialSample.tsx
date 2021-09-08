@@ -323,9 +323,6 @@ export function useMaterialSampleSave({
     // Init relationships object for one-to-many relations:
     (submittedValues as any).relationships = {};
 
-    // TODO remove this when barcode is available on the back-end:
-    delete (submittedValues as any).barcode;
-
     /** Input to submit to the back-end API. */
     const { ...materialSampleInput } = submittedValues;
 
