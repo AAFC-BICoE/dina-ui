@@ -12,8 +12,7 @@ export function MaterialSampleBreadCrumb({
 }: MaterialSampleBreadCrumbProps) {
   const parentPath = [...(materialSample.hierarchy?.slice(1) ?? [])].reverse();
 
-  const displayName =
-    materialSample.materialSampleName ?? materialSample.dwcCatalogNumber;
+  const displayName = materialSample.materialSampleName;
 
   return (
     <ol

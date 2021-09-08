@@ -7,6 +7,7 @@ import { JsonValue } from "type-fest";
 import { MaterialSampleType } from "./MaterialSampleType";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
 import { Determination } from "./Determination";
+import { Collection } from "./Collection";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -17,7 +18,6 @@ export interface MaterialSampleAttributes {
   group?: string;
   createdOn?: string;
   createdBy?: string;
-  dwcCatalogNumber?: string | null;
   dwcOtherCatalogNumbers?: string[];
   preparationDate?: string | null;
   preparationRemarks?: string | null;
@@ -29,8 +29,11 @@ export interface MaterialSampleAttributes {
 
   determination?: Determination[];
   hierarchy?: HierarchyItem[];
+
+  barcode?: string;
 }
 export interface MaterialSampleRelationships {
+  collection?: Collection;
   materialSampleType?: MaterialSampleType;
   collectingEvent?: CollectingEvent;
   attachment?: ResourceIdentifierObject[];

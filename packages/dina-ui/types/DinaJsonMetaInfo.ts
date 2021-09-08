@@ -1,5 +1,9 @@
-export interface DinaJsonMetaInfoAttributes {
-  warnings: Record<string, object>;
+export interface DinaJsonMetaInfo {
+  permissionsProvider?: string;
+  permissions?: string[];
+  warnings?: Record<string, object>;
 }
 
-export type DinaJsonMetaInfo = DinaJsonMetaInfoAttributes;
+export interface HasDinaMetaInfo {
+  meta?: DinaJsonMetaInfo;
+}

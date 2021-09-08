@@ -5,7 +5,7 @@ import {
   PersistedResource
 } from "kitsu";
 import { debounce, isEqual, isUndefined, omitBy } from "lodash";
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useEffect, useCallback, useState, ComponentProps } from "react";
 import { useIntl } from "react-intl";
 import { components as reactSelectComponents } from "react-select";
 import Select from "react-select";
@@ -54,6 +54,8 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   omitNullOption?: boolean;
 
   invalid?: boolean;
+
+  selectProps?: Partial<ComponentProps<typeof Select>>;
 }
 
 /**
@@ -92,7 +94,8 @@ export function ResourceSelect<TData extends KitsuResource>({
   asyncOptions,
   isDisabled,
   omitNullOption,
-  invalid
+  invalid,
+  selectProps
 }: ResourceSelectProps<TData>) {
   const { formatMessage } = useIntl();
 
@@ -252,6 +255,7 @@ export function ResourceSelect<TData extends KitsuResource>({
         MultiValue: SortableMultiValue
       }}
       distance={4}
+      {...selectProps}
     />
   );
 }

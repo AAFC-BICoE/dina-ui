@@ -173,7 +173,7 @@ export function MolecularSampleFields() {
         <ResourceSelectField<MaterialSample>
           name="materialSample"
           className="col-md-6"
-          filter={filterBy(["materialSampleName", "dwcCatalogNumber"], {
+          filter={filterBy(["materialSampleName"], {
             // Only allow linking to the built-in Molecular Sample type:
             extraFilters: [
               {
@@ -184,9 +184,7 @@ export function MolecularSampleFields() {
             ]
           })}
           model="collection-api/material-sample"
-          optionLabel={it =>
-            it.materialSampleName || it.dwcCatalogNumber || it.id
-          }
+          optionLabel={it => it.materialSampleName || it.id}
           readOnlyLink="/collection/material-sample/view?id="
         />
       </div>

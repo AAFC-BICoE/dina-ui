@@ -10,7 +10,6 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { FieldArray } from "formik";
-import { ShouldRenderReasons } from "react-autosuggest";
 import { Accordion } from "react-bootstrap";
 import { VscTriangleDown, VscTriangleRight } from "react-icons/vsc";
 import { CatalogueOfLifeNameField } from ".";
@@ -52,17 +51,8 @@ export const DETERMINATION_FIELDS = Object.keys(DETERMINATION_FIELDS_OBJECT);
 export function DeterminationField({ className }: DeterminationFieldProps) {
   const { readOnly, isTemplate } = useDinaFormContext();
   const { openAddPersonModal } = useAddPersonModal();
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage, locale } = useDinaIntl();
   const determinationsPath = "determination";
-
-  /* Ensure config is rendered when input get focuse without needing to enter any value */
-  function shouldRenderSuggestions(value: string, reason: ShouldRenderReasons) {
-    return (
-      value?.length >= 0 ||
-      reason === "input-changed" ||
-      reason === "input-focused"
-    );
-  }
 
   return (
     <div>
@@ -181,9 +171,9 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                               ?.toLowerCase?.()
                               ?.includes(searchValue?.toLowerCase?.())
                           )
-                          .map(it => it?.name ?? "")
+                          .map(it => it?.labels?.[locale] ?? "")
                       }
-                      shouldRenderSuggestions={shouldRenderSuggestions}
+                      alwaysShowSuggestions={true}
                     />
                     <TextField
                       {...fieldProps("typeStatusEvidence")}

@@ -746,10 +746,6 @@ describe("Workflow template edit page", () => {
               defaultValue: "test-default-name",
               enabled: true
             },
-            dwcCatalogNumber: {
-              defaultValue: "test-catalog-number",
-              enabled: true
-            },
             dwcOtherCatalogNumbers: {
               defaultValue: ["other-number-1", "other-number-2"],
               enabled: true
@@ -775,9 +771,6 @@ describe("Workflow template edit page", () => {
     expect(
       wrapper.find(".materialSampleName-field input").prop("value")
     ).toEqual("test-default-name");
-    expect(wrapper.find(".dwcCatalogNumber-field input").prop("value")).toEqual(
-      "test-catalog-number"
-    );
     expect(
       wrapper.find(".dwcOtherCatalogNumbers-field textarea").prop("value")
     ).toEqual("other-number-1\nother-number-2\n");
@@ -790,8 +783,8 @@ describe("Workflow template edit page", () => {
     });
 
     wrapper
-      .find(".dwcCatalogNumber-field input")
-      .simulate("change", { target: { value: "edited-catalog-number" } });
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "edited-material-sample-name" } });
 
     await submitForm();
 
@@ -802,17 +795,13 @@ describe("Workflow template edit page", () => {
           allowExisting: true,
           allowNew: true,
           templateFields: {
-            dwcCatalogNumber: {
-              // The edited value:
-              defaultValue: "edited-catalog-number",
-              enabled: true
-            },
             dwcOtherCatalogNumbers: {
               defaultValue: ["other-number-1", "other-number-2"],
               enabled: true
             },
             materialSampleName: {
-              defaultValue: "test-default-name",
+              // The edited value:
+              defaultValue: "edited-material-sample-name",
               enabled: true
             },
             preparationType: {

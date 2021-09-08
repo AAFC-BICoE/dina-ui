@@ -18,7 +18,7 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
 const TEST_MATERIAL_SAMPLE: MaterialSample = {
   id: "1",
   type: "material-sample",
-  dwcCatalogNumber: "my-number",
+  materialSampleName: "my-sample-name",
   collectingEvent: { id: "1", type: "collecting-event" } as CollectingEvent
 };
 
@@ -68,9 +68,9 @@ describe("Material Sample View Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".dwcCatalogNumber-field .field-view").text()).toEqual(
-      "my-number"
-    );
+    expect(
+      wrapper.find(".materialSampleName-field .field-view").text()
+    ).toEqual("my-sample-name");
     expect(
       wrapper.find(".startEventDateTime-field .field-view").text()
     ).toEqual("2019_01_01_10_10_10");

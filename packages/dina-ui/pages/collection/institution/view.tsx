@@ -1,34 +1,33 @@
 import { DinaForm, useQuery, withResponse } from "common-ui";
+import { fromPairs } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Head, Nav, ResourceViewButtonBar } from "../../../components";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Collection } from "../../../types/collection-api";
-import { CollectionFormFields } from "./edit";
-import { fromPairs } from "lodash";
+import { Institution } from "../../../types/collection-api";
+import { InstitutionFormLayout } from "./edit";
 
-export function CollectionDetailsPage({ router }: WithRouterProps) {
+export function InstitutionDetailsPage({ router }: WithRouterProps) {
   const id = String(router.query.id);
   const { formatMessage } = useDinaIntl();
 
-  const collectionQuery = useQuery<Collection>({
-    path: `collection-api/collection/${id}`,
-    include: "institution",
+  const institutionQuery = useQuery<Institution>({
+    path: `collection-api/institution/${id}`,
     header: { "include-dina-permission": "true" }
   });
 
   return (
     <div>
-      <Head title={formatMessage("collectionViewTitle")} />
+      <Head title={formatMessage("institution")} />
       <Nav />
       <main className="container">
-        {withResponse(collectionQuery, ({ data: collection }) => (
-          <DinaForm<Collection>
+        {withResponse(institutionQuery, ({ data: institution }) => (
+          <DinaForm<Institution>
             initialValues={{
-              ...collection,
+              ...institution,
               // Convert multilingualDescription to editable Dictionary format:
               multilingualDescription: fromPairs<string | undefined>(
-                collection.multilingualDescription?.descriptions?.map(
+                institution.multilingualDescription?.descriptions?.map(
                   ({ desc, lang }) => [lang ?? "", desc ?? ""]
                 )
               )
@@ -36,12 +35,11 @@ export function CollectionDetailsPage({ router }: WithRouterProps) {
             readOnly={true}
           >
             <ResourceViewButtonBar
-              resource={collection}
+              resource={institution}
               apiBaseUrl="/collection-api"
-              resourceBaseUrl="collection/collection"
-              withLeadingSlash={true}
+              resourceBaseUrl="collection/institution"
             />
-            <CollectionFormFields title={"collectionViewTitle"} />
+            <InstitutionFormLayout />
           </DinaForm>
         ))}
       </main>
@@ -49,4 +47,4 @@ export function CollectionDetailsPage({ router }: WithRouterProps) {
   );
 }
 
-export default withRouter(CollectionDetailsPage);
+export default withRouter(InstitutionDetailsPage);

@@ -8,7 +8,7 @@ import {
 } from "common-ui";
 import { Field } from "formik";
 import { InputResource } from "kitsu";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api";
 import {
   MaterialSample,
@@ -51,6 +51,8 @@ export function PreparationField({
   className,
   namePrefix = ""
 }: PreparationFieldProps) {
+  const { locale } = useDinaIntl();
+
   return (
     <FieldSet
       className={className}
@@ -115,9 +117,11 @@ export function PreparationField({
             path: "collection-api/vocabulary/degreeOfEstablishment"
           })}
           suggestion={vocabElement =>
-            vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ?? ""
+            vocabElement?.vocabularyElements?.map(
+              it => it?.labels?.[locale] ?? ""
+            ) ?? ""
           }
-          shouldRenderSuggestions={() => true}
+          alwaysShowSuggestions={true}
           tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"
         />
       </div>
