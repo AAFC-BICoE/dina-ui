@@ -216,13 +216,9 @@ export function MaterialSampleForm({
           />
         )}
         {!isTemplate && <MaterialSampleMainInfoFormLayout />}
-        <div className="row">
-          <div className="col-md-6">
-            <MaterialSampleIdentifiersFormLayout
-              sampleNamePlaceHolder={formatMessage("baseNameLabel")}
-            />
-          </div>
-        </div>
+        <MaterialSampleIdentifiersFormLayout
+          sampleNamePlaceHolder={formatMessage("baseNameLabel")}
+        />
         <DataComponentToggler state={dataComponentState} />
         <div className="data-components">
           {dataComponentState.enableCollectingEvent && (
