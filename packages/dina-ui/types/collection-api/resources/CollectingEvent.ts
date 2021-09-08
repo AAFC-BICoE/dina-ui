@@ -13,7 +13,7 @@ import { JsonValue } from "type-fest";
 export interface CollectingEventAttributes {
   type: "collecting-event";
 
-  startEventDateTime: string;
+  startEventDateTime: string | null | undefined;
   endEventDateTime?: string | null;
   dwcRecordedBy?: string;
   verbatimEventDateTime?: string;
