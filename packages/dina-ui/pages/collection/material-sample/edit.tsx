@@ -218,11 +218,7 @@ export function MaterialSampleForm({
           />
         )}
         {!isTemplate && <MaterialSampleMainInfoFormLayout />}
-        <div className="row">
-          <div className="col-md-6">
-            <MaterialSampleIdentifiersFormLayout />
-          </div>
-        </div>
+        <MaterialSampleIdentifiersFormLayout />
         <DataComponentToggler state={dataComponentState} />
         <div className="data-components">
           {dataComponentState.enableCollectingEvent && (
@@ -424,6 +420,7 @@ export function MaterialSampleIdentifiersFormLayout({
             readOnly={disableSampleName}
             placeholder={sampleNamePlaceHolder}
           />
+          <TextField name={`${namePrefix}barcode`} customName="barcode" />
         </div>
         <div className="col-md-6">
           <StringArrayField
