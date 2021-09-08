@@ -389,6 +389,7 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   hideOtherCatalogNumbers?: boolean;
   className?: string;
   namePrefix?: string;
+  sampleNamePlaceHolder?: string;
 }
 
 export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
@@ -401,7 +402,8 @@ export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
 export function MaterialSampleIdentifiersFormLayout({
   disableSampleName,
   className,
-  namePrefix = ""
+  namePrefix = "",
+  sampleNamePlaceHolder
 }: MaterialSampleIdentifiersFormLayoutProps) {
   return (
     <FieldSet
@@ -420,6 +422,7 @@ export function MaterialSampleIdentifiersFormLayout({
             customName="materialSampleName"
             className="materialSampleName"
             readOnly={disableSampleName}
+            placeholder={sampleNamePlaceHolder}
           />
         </div>
         <div className="col-md-6">
