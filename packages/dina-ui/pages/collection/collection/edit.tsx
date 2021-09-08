@@ -8,7 +8,9 @@ import {
   TextField,
   useDinaFormContext,
   useQuery,
-  withResponse
+  withResponse,
+  ResourceSelectField,
+  filterBy
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
@@ -19,7 +21,8 @@ import {
   Nav
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Collection } from "../../../types/collection-api";
+import { Collection, Institution } from "../../../types/collection-api";
+import { toPairs, fromPairs } from "lodash";
 
 export default function CollectionEditPage() {
   const router = useRouter();
@@ -41,9 +44,6 @@ export default function CollectionEditPage() {
       <Head title={formatMessage(title)} />
       <Nav />
       <main className="container">
-        <h1 id="wb-cont">
-          <DinaMessage id={title} />
-        </h1>
         {id ? (
           withResponse(collectionQuery, ({ data }) => (
             <CollectionForm collection={data} router={router} />
@@ -62,19 +62,42 @@ export interface CollectionFormProps {
 }
 
 export function CollectionForm({ collection, router }: CollectionFormProps) {
-  const initialValues = collection || { type: "collection" };
+  const initialValues = collection
+    ? {
+        ...collection,
+        // Convert multilingualDescription to editable Dictionary format:
+        multilingualDescription: fromPairs<string | undefined>(
+          collection.multilingualDescription?.descriptions?.map(
+            ({ desc, lang }) => [lang ?? "", desc ?? ""]
+          )
+        )
+      }
+    : { type: "collection", institution: undefined };
+
+  const {
+    query: { id }
+  } = router;
+
+  const title = id ? "editCollectionTitle" : "addCollectionTitle";
+
   async function onSubmit({
     submittedValues,
     api: { save }
   }: DinaFormSubmitParams<Collection>) {
-    /* Delete meta which got returned as part of the useQuery/Inital values to avoid error 
-    INTERNAL_SERVER_ERROR: expected meta being an attribute expected:<ATTRIBUTE> but was:<META_INFORMATION> */
-    delete submittedValues.meta;
+    const input: Collection = {
+      ...submittedValues,
+      // Convert the editable format to the stored format:
+      multilingualDescription: {
+        descriptions: toPairs(submittedValues.multilingualDescription).map(
+          ([lang, desc]) => ({ lang, desc: desc as any })
+        )
+      }
+    };
 
     const [savedCollection] = await save(
       [
         {
-          resource: submittedValues,
+          resource: input,
           type: "collection"
         }
       ],
@@ -96,15 +119,15 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
   return (
     <DinaForm<Collection> initialValues={initialValues} onSubmit={onSubmit}>
       {buttonBar}
-      <CollectionFormFields />
+      <CollectionFormFields title={title} />
     </DinaForm>
   );
 }
 
 /** Re-usable field layout between edit and view pages. */
-export function CollectionFormFields() {
-  const { initialValues, readOnly } = useDinaFormContext();
-  const collection: Collection = initialValues;
+export function CollectionFormFields({ title }) {
+  const { readOnly } = useDinaFormContext();
+  const { formatMessage } = useDinaIntl();
 
   return (
     <div>
@@ -116,11 +139,49 @@ export function CollectionFormFields() {
           name="group"
           enableStoredDefaultGroup={true}
           className="col-md-6"
+          showAllGroups={true}
+        />
+      </div>
+      <h1 id="wb-cont">
+        <DinaMessage id={title} />
+      </h1>
+      <div className="row">
+        <ResourceSelectField<Institution>
+          name="institution"
+          readOnlyLink="/collection/institution/view?id="
+          filter={filterBy(["name"])}
+          model="collection-api/institution"
+          optionLabel={institution => institution.name as any}
+          className="col-md-6"
+        />
+        <ResourceSelectField<Collection>
+          name="collection"
+          readOnlyLink="/collection/collection/view?id="
+          filter={filterBy(["name"])}
+          model="collection-api/collection"
+          optionLabel={collection => collection.name as any}
+          className="col-md-6"
+          isDisabled={true}
+          label={formatMessage("parentCollectionLabel")}
         />
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
-        <TextField className="col-md-6" name="code" />
+        <TextField className="col-md-6" name="code" noSpace={true} />
+      </div>
+      <div className="row">
+        <TextField
+          className="english-description col-md-6"
+          name="multilingualDescription.en"
+          label={formatMessage("field_description.en")}
+          multiLines={true}
+        />
+        <TextField
+          className="french-description col-md-6"
+          name="multilingualDescription.fr"
+          label={formatMessage("field_description.fr")}
+          multiLines={true}
+        />
       </div>
       {readOnly && (
         <div className="row">

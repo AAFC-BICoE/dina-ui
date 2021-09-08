@@ -7,13 +7,16 @@ const TEST_COLLECTION: Collection = {
   type: "collection",
   name: "test collection",
   code: "test-code",
-  group: "cnc"
+  group: "cnc",
+  institution: { id: "1", type: "institution", name: "test institution" }
 };
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
-    case "collection-api/collection/123":
+    case "collection-api/collection/123?include=institution":
       return { data: TEST_COLLECTION };
+    case "user-api/group":
+      return [];
   }
 });
 

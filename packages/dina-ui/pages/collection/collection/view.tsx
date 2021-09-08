@@ -2,9 +2,10 @@ import { DinaForm, useQuery, withResponse } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { Head, Nav, ResourceViewButtonBar } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Collection } from "../../../types/collection-api";
 import { CollectionFormFields } from "./edit";
+import { fromPairs } from "lodash";
 
 export function CollectionDetailsPage({ router }: WithRouterProps) {
   const id = String(router.query.id);
@@ -21,17 +22,26 @@ export function CollectionDetailsPage({ router }: WithRouterProps) {
       <Head title={formatMessage("collectionViewTitle")} />
       <Nav />
       <main className="container">
-        <h1 id="wb-cont">
-          <DinaMessage id="collectionViewTitle" />
-        </h1>
         {withResponse(collectionQuery, ({ data: collection }) => (
-          <DinaForm<Collection> initialValues={collection} readOnly={true}>
+          <DinaForm<Collection>
+            initialValues={{
+              ...collection,
+              // Convert multilingualDescription to editable Dictionary format:
+              multilingualDescription: fromPairs<string | undefined>(
+                collection.multilingualDescription?.descriptions?.map(
+                  ({ desc, lang }) => [lang ?? "", desc ?? ""]
+                )
+              )
+            }}
+            readOnly={true}
+          >
             <ResourceViewButtonBar
               resource={collection}
               apiBaseUrl="/collection-api"
-              resourceBaseUrl="/collection/collection"
+              resourceBaseUrl="collection/collection"
+              withLeadingSlash={true}
             />
-            <CollectionFormFields />
+            <CollectionFormFields title={"collectionViewTitle"} />
           </DinaForm>
         ))}
       </main>
