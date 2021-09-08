@@ -71,6 +71,7 @@ export function CollectionSelectField(
           `${coll.name || coll.id}${coll.code ? ` (${coll.code})` : ""}`
         }
         isDisabled={collectionCannotBeChanged}
+        omitNullOption={true}
         {...props}
       />
     );
