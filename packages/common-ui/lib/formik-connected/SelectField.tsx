@@ -68,7 +68,11 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
 
         const selectedOption = isMulti
           ? options?.filter(option => value?.includes(option.value))
-          : options?.find(option => option.value === value) ?? null;
+          : value &&
+            (options?.find(option => option.value === value) ?? {
+              label: String(value),
+              value
+            });
 
         return (
           <Select
