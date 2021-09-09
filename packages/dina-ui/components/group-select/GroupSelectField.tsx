@@ -11,6 +11,8 @@ import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
 import { GroupLabel } from "./GroupFieldView";
 import { useStoredDefaultGroup } from "./useStoredDefaultGroup";
+import { useField } from "formik";
+import { useEffect } from "react";
 
 interface GroupSelectFieldProps extends Omit<SelectFieldProps, "options"> {
   /** Show the "any" option. */
@@ -38,8 +40,9 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
   } = groupSelectFieldProps;
 
   const { locale } = useDinaIntl();
-  const { groupNames: myGroupNames } = useAccount();
+  const { groupNames: myGroupNames, roles } = useAccount();
   const { initialValues } = useDinaFormContext();
+  const [{ value }, {}, { setValue }] = useField(selectFieldProps.name);
 
   const { setStoredDefaultGroupIfEnabled } = useStoredDefaultGroup({
     enable: enableStoredDefaultGroup,
@@ -80,11 +83,23 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
     selectableGroupNames?.map(name => ({ label: name, value: name })) ??
     [];
 
-  if (showAnyOption) {
-    groupSelectOptions.unshift({ label: "<any>", value: undefined });
-  }
+  const hasOnlyOneOption =
+    enableStoredDefaultGroup &&
+    !roles.includes("dina-admin") &&
+    groupSelectOptions.length === 1;
 
-  return (
+  useEffect(() => {
+    if (hasOnlyOneOption && value === undefined) {
+      setValue(groupSelectOptions[0].value);
+    }
+  }, [String(groupSelectOptions), hasOnlyOneOption]);
+
+  const options = [
+    ...(showAnyOption ? [{ label: "<any>", value: undefined }] : []),
+    ...groupSelectOptions
+  ];
+
+  return hasOnlyOneOption ? null : (
     <SelectField
       // Re-initialize the component if the labels change:
       key={groupSelectOptions.map(option => option.label).join()}
@@ -96,7 +111,8 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
         setStoredDefaultGroupIfEnabled(newValue);
         selectFieldProps.onChange?.(newValue, formik);
       }}
-      options={groupSelectOptions}
+      options={options}
+      selectProps={{ isDisabled: hasOnlyOneOption }}
     />
   );
 }
