@@ -40,13 +40,16 @@ const mockGet = jest.fn(async model => {
     return { data: testCollectingEvent() };
   } else if (model === "agent-api/person") {
     return { data: [testAgent()] };
-  } else if (model === "collection-api/srs") {
+  } else if (model === "collection-api/vocabulary/srs") {
     return { data: [testSrs()] };
-  } else if (model === "collection-api/coordinate-system") {
+  } else if (model === "collection-api/vocabulary/coordinateSystem") {
     return { data: [testCoordinates()] };
   } else if (model === "collection-api/collecting-event") {
     return { data: [] };
-  } else if (model === "collection-api/managed-attribute") {
+  } else if (
+    model === "collection-api/managed-attribute" ||
+    model === "collection-api/collection-method"
+  ) {
     return { data: [] };
   } else if (model === "user-api/group") {
     return { data: [] };
@@ -115,18 +118,6 @@ describe("collecting-event edit page", () => {
     expect(wrapper.find(".startEventDateTime-field")).toHaveLength(1);
     expect(wrapper.find(".endEventDateTime-field")).toHaveLength(1);
     expect(wrapper.find(".verbatimEventDateTime-field")).toHaveLength(1);
-
-    // renders end event datetime
-    expect(wrapper.find(".endEventDateTime-field")).toHaveLength(1);
-
-    // Edit the start event datetime
-    wrapper.find(".startEventDateTime-field input").simulate("change", {
-      target: {
-        name: "startEventDateTime",
-        value: "201912211600"
-      }
-    });
-
     // Edit the verbatime datetime
     wrapper.find(".verbatimEventDateTime-field input").simulate("change", {
       target: {
@@ -158,7 +149,6 @@ describe("collecting-event edit page", () => {
               dwcVerbatimCoordinateSystem: "decimal degrees",
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               managedAttributes: {},
-              startEventDateTime: "2019-12-21T16:00",
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
               dwcOtherRecordNumbers: ["12", "23"],
               geoReferenceAssertions: [{ isPrimary: true }]
@@ -199,11 +189,11 @@ describe("collecting-event edit page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Edit the start event datetime
-    wrapper.find(".startEventDateTime-field input").simulate("change", {
+    // Edit the verbatime datetime
+    wrapper.find(".verbatimEventDateTime-field input").simulate("change", {
       target: {
-        name: "startEventDateTime",
-        value: "201912211600"
+        name: "verbatimEventDateTime",
+        value: "From 2019,12,21 4pm to 2019,12,22 5pm"
       }
     });
 
@@ -233,7 +223,7 @@ describe("collecting-event edit page", () => {
             path: "collecting-event",
             value: {
               attributes: expect.objectContaining({
-                startEventDateTime: "2019-12-21T16:00"
+                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
               }),
               id: "00000000-0000-0000-0000-000000000000",
               type: "collecting-event"
@@ -354,11 +344,6 @@ describe("collecting-event edit page", () => {
 
     const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
       apiContext
-    });
-
-    // Need to emulate by setting the value to test back end error is actually rendered
-    wrapper.find(".startEventDateTime input").simulate("change", {
-      target: { name: "startEventDateTime", value: "2020" }
     });
 
     wrapper.find(".group-field Select").prop<any>("onChange")([

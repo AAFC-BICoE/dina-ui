@@ -8,7 +8,6 @@ import {
   FormikButton,
   LoadingSpinner,
   NominatumApiSearchResult,
-  NumberField,
   NumberRangeFields,
   ResourceSelectField,
   StringArrayField,
@@ -21,8 +20,6 @@ import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
 import { Vocabulary } from "../../types/collection-api";
 import { ChangeEvent, useRef, useState } from "react";
-import { ShouldRenderReasons } from "react-autosuggest";
-import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import useSWR from "swr";
 import { GeographySearchBox, GeoReferenceAssertionRow } from ".";
@@ -34,7 +31,6 @@ import {
   GeographicPlaceNameSource
 } from "../../types/collection-api/resources/CollectingEvent";
 import {
-  CoordinateSystem,
   CoordinateSystemEnum,
   CoordinateSystemEnumPlaceHolder
 } from "../../types/collection-api/resources/CoordinateSystem";
