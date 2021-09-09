@@ -5,6 +5,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { useContext } from "react";
 import { intlContext } from "../../../../common-ui/lib/intl/IntlSupport";
+import Dropdown from "react-bootstrap/Dropdown";
 
 export function Nav() {
   const { roles } = useAccount();
@@ -85,7 +86,7 @@ export function Nav() {
                 .dropdown:hover .dropdown-menu {
                     display: block;
                 }
-                .dropdown a.nav-link {
+                .dropdown .nav-link {
                   color: rgb(232, 230, 227);
                 }
               `}
@@ -125,61 +126,59 @@ export function Nav() {
 /** Object Store links. */
 function NavObjectStoreDropdown() {
   return (
-    <div className="dropdown">
-      <a className="nav-link dropdown-toggle" href="#">
+    <Dropdown className="dropdown">
+      <Dropdown.Toggle className="nav-link dropdown-toggle">
         <DinaMessage id="objectStoreTitle" />
-      </a>
-      <div className="dropdown-menu m-0">
-        <Link href="/object-store/upload">
-          <a className="dropdown-item">
-            <DinaMessage id="uploadPageTitle" />
-          </a>
-        </Link>
-        <Link href="/object-store/object/list">
-          <a className="dropdown-item">
-            <DinaMessage id="objectListTitle" />
-          </a>
-        </Link>
-        <Link href="/object-store/managedAttributesView/listView">
-          <a className="dropdown-item">
-            <DinaMessage id="managedAttributeListTitle" />
-          </a>
-        </Link>
-        <Link href="/object-store/object-subtype/list">
-          <a className="dropdown-item">
-            <DinaMessage id="objectSubtypeListTitle" />
-          </a>
-        </Link>
-        <Link href="/object-store/revisions-by-user">
-          <a className="dropdown-item">
-            <DinaMessage id="revisionsByUserPageTitle" />
-          </a>
-        </Link>
-      </div>
-    </div>
+      </Dropdown.Toggle>
+      <Dropdown.Menu className="dropdown-menu m-0">
+        <Dropdown.Item className="dropdown-item" href="/object-store/upload">
+          <DinaMessage id="uploadPageTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/object-store/object/list"
+        >
+          <DinaMessage id="objectListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/object-store/managedAttributesView/listView"
+        >
+          <DinaMessage id="managedAttributeListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/object-store/object-subtype/list"
+        >
+          <DinaMessage id="objectSubtypeListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/object-store/revisions-by-user"
+        >
+          <DinaMessage id="revisionsByUserPageTitle" />
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 }
 
 /** Agents links. */
 function NavAgentsDropdown() {
   return (
-    <div className="dropdown">
-      <a className="nav-link dropdown-toggle" href="#">
+    <Dropdown className="dropdown">
+      <Dropdown.Toggle className="nav-link dropdown-toggle">
         <DinaMessage id="agentsSectionTitle" />
-      </a>
-      <div className="dropdown-menu m-0">
-        <Link href="/person/list">
-          <a className="dropdown-item">
-            <DinaMessage id="personListTitle" />
-          </a>
-        </Link>
-        <Link href="/organization/list">
-          <a className="dropdown-item">
-            <DinaMessage id="organizationListTitle" />
-          </a>
-        </Link>
-      </div>
-    </div>
+      </Dropdown.Toggle>
+      <Dropdown.Menu className="dropdown-menu m-0">
+        <Dropdown.Item href="/person/list" className="dropdown-item">
+          <DinaMessage id="personListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/organization/list" className="dropdown-item">
+          <DinaMessage id="organizationListTitle" />
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 }
 
@@ -188,166 +187,162 @@ function NavDinaUserDropdown() {
   const { subject } = useAccount();
 
   return (
-    <div className="dropdown">
-      <a className="nav-link dropdown-toggle" href="#">
+    <Dropdown className="dropdown">
+      <Dropdown.Toggle className="nav-link dropdown-toggle">
         <DinaMessage id="dinaUserSectionTitle" />
-      </a>
-      <div className="dropdown-menu m-0">
-        <Link href="/dina-user/list">
-          <a className="dropdown-item">
-            <DinaMessage id="userListTitle" />
-          </a>
-        </Link>
-        <Link href={`/dina-user/view?id=${subject}`}>
-          <a className="dropdown-item">
-            <DinaMessage id="whoAmITitle" />
-          </a>
-        </Link>
-      </div>
-    </div>
+      </Dropdown.Toggle>
+      <Dropdown.Menu className="dropdown-menu m-0">
+        <Dropdown.Item className="dropdown-item" href="/dina-user/list">
+          <DinaMessage id="userListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href={`/dina-user/view?id=${subject}`}
+        >
+          <DinaMessage id="whoAmITitle" />
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 }
 
 /** Seqdb UI links. */
 function NavSeqDBDropdown() {
   return (
-    <div className="dropdown">
-      <a className="nav-link dropdown-toggle" href="#">
+    <Dropdown className="dropdown">
+      <Dropdown.Toggle className="nav-link dropdown-toggle" href="#">
         <SeqdbMessage id="seqdbTitle" />
-      </a>
-      <div className="dropdown-menu m-0">
-        <Link href="/seqdb/workflow/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="workflowListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/sanger-workflow/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="sangerWorkflowListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/index-set/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="indexSetListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/pcr-primer/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="pcrPrimerListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/pcr-profile/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="pcrProfileListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/pcr-batch/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="pcrBatchListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/product/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="productListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/protocol/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="protocolListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/region/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="regionListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/molecular-sample/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="molecularSampleListTitle" />
-          </a>
-        </Link>
-      </div>
-    </div>
+      </Dropdown.Toggle>
+      <Dropdown.Menu className="dropdown-menu m-0">
+        <Dropdown.Item className="dropdown-item" href="/seqdb/workflow/list">
+          <SeqdbMessage id="workflowListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/seqdb/sanger-workflow/list"
+        >
+          <SeqdbMessage id="sangerWorkflowListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item className="dropdown-item" href="/seqdb/index-set/list">
+          <SeqdbMessage id="indexSetListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item className="dropdown-item" href="/seqdb/pcr-primer/list">
+          <SeqdbMessage id="pcrPrimerListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item className="dropdown-item" href="/seqdb/pcr-profile/list">
+          <SeqdbMessage id="pcrProfileListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item className="dropdown-item" href="/seqdb/pcr-batch/list">
+          <SeqdbMessage id="pcrBatchListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item className="dropdown-item" href="/seqdb/product/list">
+          <SeqdbMessage id="productListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item className="dropdown-item" href="/seqdb/protocol/list">
+          <SeqdbMessage id="protocolListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item className="dropdown-item" href="/seqdb/region/list">
+          <SeqdbMessage id="regionListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/seqdb/molecular-sample/list"
+        >
+          <SeqdbMessage id="molecularSampleListTitle" />
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 }
 
 /** Collecting event links. */
 function NavCollectionDropdown() {
   return (
-    <div className="dropdown">
-      <a className="nav-link dropdown-toggle" href="#">
+    <Dropdown className="dropdown">
+      <Dropdown.Toggle className="nav-link dropdown-toggle" href="#">
         <DinaMessage id="collectionSectionTitle" />
-      </a>
-      <div className="dropdown-menu m-0">
-        <div className="d-none">
-          <Link href="/collection/collector-group/list">
-            <a className="dropdown-item">
-              <DinaMessage id="collectorGroupListTitle" />
-            </a>
-          </Link>
-        </div>
-        <Link href="/collection/collection/list">
-          <a className="dropdown-item">
-            <DinaMessage id="collectionListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/collection-method/list">
-          <a className="dropdown-item">
-            <DinaMessage id="collectionMethodListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/institution/list">
-          <a className="dropdown-item">
-            <DinaMessage id="institutionListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/collecting-event/list">
-          <a className="dropdown-item">
-            <DinaMessage id="collectingEventListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/material-sample/list">
-          <a className="dropdown-item">
-            <DinaMessage id="materialSampleListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/material-sample-type/list">
-          <a className="dropdown-item">
-            <DinaMessage id="materialSampleTypeListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/preparation-type/list">
-          <a className="dropdown-item">
-            <DinaMessage id="preparationTypeListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/storage-unit-type/list">
-          <a className="dropdown-item">
-            <DinaMessage id="storageUnitTypeListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/storage-unit/list">
-          <a className="dropdown-item">
-            <DinaMessage id="storageUnitListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/managed-attribute/list">
-          <a className="dropdown-item">
-            <DinaMessage id="managedAttributeListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/workflow-template/list">
-          <a className="dropdown-item">
-            <DinaMessage id="workflowTemplateListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/revisions-by-user/">
-          <a className="dropdown-item">
-            <DinaMessage id="revisionsByUserPageTitle" />
-          </a>
-        </Link>
-      </div>
-    </div>
+      </Dropdown.Toggle>
+      <Dropdown.Menu className="dropdown-menu m-0">
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/collection/collection/list"
+        >
+          <DinaMessage id="collectionListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/collection/collection-method/list"
+        >
+          <DinaMessage id="collectionMethodListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/collection/institution/list"
+        >
+          <DinaMessage id="institutionListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/collection/collecting-event/list"
+        >
+          <DinaMessage id="collectingEventListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/collection/material-sample/list"
+        >
+          <DinaMessage id="materialSampleListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/collection/material-sample-type/list"
+        >
+          <DinaMessage id="materialSampleTypeListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/collection/preparation-type/list"
+        >
+          <DinaMessage id="preparationTypeListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/collection/storage-unit-type/list"
+        >
+          <DinaMessage id="storageUnitTypeListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/collection/storage-unit/list"
+        >
+          <DinaMessage id="storageUnitListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/collection/managed-attribute/list"
+        >
+          <DinaMessage id="managedAttributeListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/collection/workflow-template/list"
+        >
+          <DinaMessage id="workflowTemplateListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item"
+          href="/collection/revisions-by-user/"
+        >
+          <DinaMessage id="revisionsByUserPageTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="dropdown-item d-none"
+          href="/collection/collector-group/list"
+        >
+          <DinaMessage id="collectorGroupListTitle" />
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 }
 
