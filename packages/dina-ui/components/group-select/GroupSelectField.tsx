@@ -41,7 +41,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
 
   const { locale } = useDinaIntl();
   const { groupNames: myGroupNames, roles } = useAccount();
-  const { initialValues } = useDinaFormContext();
+  const { initialValues, readOnly } = useDinaFormContext();
   const [{ value }, {}, { setValue }] = useField(selectFieldProps.name);
 
   const { setStoredDefaultGroupIfEnabled } = useStoredDefaultGroup({
@@ -99,7 +99,12 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
     ...groupSelectOptions
   ];
 
-  return hasOnlyOneOption ? null : (
+  // Hide the field when there is only one group to pick from:
+  if (hasOnlyOneOption && !readOnly) {
+    return null;
+  }
+
+  return (
     <SelectField
       // Re-initialize the component if the labels change:
       key={groupSelectOptions.map(option => option.label).join()}
