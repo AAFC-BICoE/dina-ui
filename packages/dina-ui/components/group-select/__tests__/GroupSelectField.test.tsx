@@ -7,6 +7,12 @@ import Select from "react-select";
 
 const mockSubmit = jest.fn();
 
+const testCtx = {
+  apiContext: {
+    apiClient: { get: () => undefined } as any
+  }
+};
+
 describe("GroupSelectField component", () => {
   // Clear the local storage:
   beforeEach(() => deleteFromStorage(DEFAULT_GROUP_STORAGE_KEY));
@@ -17,7 +23,8 @@ describe("GroupSelectField component", () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <GroupSelectField name="group" />
-      </DinaForm>
+      </DinaForm>,
+      testCtx
     );
 
     await new Promise(setImmediate);
@@ -81,7 +88,8 @@ describe("GroupSelectField component", () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <GroupSelectField name="group" />
-      </DinaForm>
+      </DinaForm>,
+      testCtx
     );
 
     await new Promise(setImmediate);
@@ -96,7 +104,8 @@ describe("GroupSelectField component", () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <GroupSelectField name="group" enableStoredDefaultGroup={true} />
-      </DinaForm>
+      </DinaForm>,
+      testCtx
     );
 
     await new Promise(setImmediate);
@@ -116,7 +125,7 @@ describe("GroupSelectField component", () => {
         <GroupSelectField name="group" enableStoredDefaultGroup={true} />
       </DinaForm>,
       // User has only one group:
-      { accountContext: { groupNames: ["cnc"] } }
+      { ...testCtx, accountContext: { groupNames: ["cnc"] } }
     );
 
     await new Promise(setImmediate);
@@ -137,7 +146,7 @@ describe("GroupSelectField component", () => {
         <GroupSelectField name="group" enableStoredDefaultGroup={true} />
       </DinaForm>,
       // User has only one group:
-      { accountContext: { groupNames: ["cnc"] } }
+      { ...testCtx, accountContext: { groupNames: ["cnc"] } }
     );
 
     await new Promise(setImmediate);
@@ -163,7 +172,7 @@ describe("GroupSelectField component", () => {
         <GroupSelectField name="group" enableStoredDefaultGroup={true} />
       </DinaForm>,
       // User has only one group:
-      { accountContext: { groupNames: ["cnc"] } }
+      { ...testCtx, accountContext: { groupNames: ["cnc"] } }
     );
 
     await new Promise(setImmediate);
