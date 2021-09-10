@@ -101,7 +101,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
 
   // Hide the field when there is only one group to pick from:
   if (hasOnlyOneOption && !readOnly) {
-    return <div />;
+    return null;
   }
 
   return (
@@ -110,7 +110,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
       key={groupSelectOptions.map(option => option.label).join()}
       {...selectFieldProps}
       readOnlyRender={groupName =>
-        groupName ? <GroupLabel groupName={groupName} /> : <div />
+        groupName ? <GroupLabel groupName={groupName} /> : null
       }
       onChange={(newValue: string | null | undefined, formik) => {
         setStoredDefaultGroupIfEnabled(newValue);

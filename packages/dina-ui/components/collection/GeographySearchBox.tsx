@@ -145,6 +145,7 @@ export function GeographySearchBox({
     [searchValue, "nominatum-search"],
     nominatimSearch,
     {
+      shouldRetryOnError: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false
     }
