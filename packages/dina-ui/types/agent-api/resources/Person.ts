@@ -1,4 +1,5 @@
 import { KitsuResource } from "kitsu";
+import { Identifier } from "./Identifier";
 import { Organization } from "./Organization";
 
 export interface PersonAttributes {
@@ -8,9 +9,10 @@ export interface PersonAttributes {
   familyNames?: string;
   aliases?: string[];
   email: string;
-  uuid: string;
+  uuid: string | undefined;
   createdBy?: string;
   createdOn?: string;
+  identifiers?: Identifier[];
 }
 
 export interface PersonRelationships {
