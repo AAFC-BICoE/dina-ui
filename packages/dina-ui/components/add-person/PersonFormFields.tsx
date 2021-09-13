@@ -78,7 +78,7 @@ export function PersonFormFields({
                 ))}
                 {!readOnly && identifiers.length === 0 && (
                   <FormikButton
-                    className="btn btn-primary add-assertion-button"
+                    className="btn btn-primary add-assertion-button mb-2"
                     onClick={addIdentifier}
                   >
                     <DinaMessage id="addIdentifier" />

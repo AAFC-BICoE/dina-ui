@@ -55,10 +55,6 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
               <LoadingSpinner loading={loading} />
               {person && (
                 <DinaForm<Person> initialValues={person} readOnly={true}>
-                  <PersonFormFields
-                    divClassName="row"
-                    fieldClassName="col-md-4"
-                  />
                   <div className="row">
                     <FieldView className="col-md-2" name="displayName" />
                   </div>
@@ -73,6 +69,10 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
                     <FieldView className="col-md-2" name="email" />
                     <FieldView className="col-md-2" name="organizations" />
                   </div>
+                  <PersonFormFields
+                    divClassName="row"
+                    fieldClassName="col-md-4"
+                  />                  
                   <div className="row">
                     <FieldView className="col-md-2" name="createdBy" />
                     <FieldView className="col-md-2" name="createdOn" />

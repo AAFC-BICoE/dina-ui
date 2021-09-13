@@ -10,6 +10,7 @@ import {
 } from "common-ui";
 import { ResourceSelectField } from "common-ui/lib";
 import { PersistedResource } from "kitsu";
+import { IdentifierType } from "packages/dina-ui/types/agent-api/resources/Identifier";
 import { Organization } from "../../../dina-ui/types/agent-api/resources/Organization";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
@@ -24,7 +25,7 @@ interface PersonFormProps {
 export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   const initialValues: Partial<Person> = person || {
     type: "person",
-    identifiers: [{}]
+    identifiers: [{ type: IdentifierType.ORCID }]
   };
   const id = person?.id;
 
@@ -63,7 +64,6 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
-      <PersonFormFields width="30rem" />
       <div style={{ width: "30rem" }}>
         <TextField name="displayName" />
       </div>
@@ -88,6 +88,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
           optionLabel={organization => organization.names?.[0].name}
         />
       </div>
+      <PersonFormFields width="30rem" />
       <div className="mb-3 list-inline">
         <div className="list-inline-item">
           <SubmitButton />
