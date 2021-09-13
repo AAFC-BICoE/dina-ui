@@ -10,7 +10,7 @@ import {
 } from "common-ui";
 import { ResourceSelectField } from "common-ui/lib";
 import { PersistedResource } from "kitsu";
-import { IdentifierType } from "packages/dina-ui/types/agent-api/resources/Identifier";
+import { IdentifierType } from "../../../dina-ui/types/agent-api/resources/Identifier";
 import { Organization } from "../../../dina-ui/types/agent-api/resources/Organization";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";

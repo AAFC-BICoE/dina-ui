@@ -1,5 +1,5 @@
 import { TextField, SelectField, SelectOption } from "common-ui";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { IdentifierType } from "../../../dina-ui/types/agent-api/resources/Identifier";
 import { Fragment } from "react";
 
