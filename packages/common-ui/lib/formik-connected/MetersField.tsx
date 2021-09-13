@@ -1,4 +1,5 @@
-import { all, create, MathJsStatic } from "mathjs";
+import { clamp } from "lodash";
+import { all, create, MathJsStatic, BigNumber } from "mathjs";
 import { ChangeEvent, useState } from "react";
 import { TextField, TextFieldProps } from "./TextField";
 
@@ -15,12 +16,14 @@ function MetersFieldInternal(inputProps: React.InputHTMLAttributes<any>) {
   // The value that shows up in the input. Stores the non-meters value (e.g. feet) while the user is typing.
   const [inputVal, setInputVal] = useState(String(inputProps.value ?? ""));
 
+  const MAX_DECIMAL_PLACES = 2;
+
   function onChange(event: ChangeEvent<HTMLInputElement>) {
     const newVal = event.target.value;
 
     setInputVal(newVal);
 
-    const metersVal = toMeters(newVal);
+    const metersVal = toMeters(newVal, MAX_DECIMAL_PLACES);
     inputProps.onChange?.({
       target: { value: metersVal?.toString() ?? newVal }
     } as ChangeEvent<HTMLInputElement>);
@@ -40,6 +43,10 @@ function MetersFieldInternal(inputProps: React.InputHTMLAttributes<any>) {
 
 const math = create(all) as MathJsStatic;
 math.createUnit("yds", "1 yd");
+math.config({
+  // Use BigNumber to retain trailing zeroes:
+  number: "BigNumber"
+});
 
 // French units:
 math.createUnit("pd", "1 foot");
@@ -58,21 +65,33 @@ math.createUnit("millimetres", "1 millimeter");
 const FEET_INCH_REGEX =
   /\s*([\d|\.]+)\s*(feet|foot|ft|pieds|pied|pd)\s*([\d|\.]+)\s*(inches|inch|in|pouces|pouce|po)\s*/i;
 
+const NUMBERS_ONLY_REGEX = /^\s*([\d|\.]+)\s*$/;
+
 /** Returns a string if the conversion can be done, otherwise returns null. */
-export function toMeters(text: string): number | null {
+export function toMeters(
+  text: string,
+  maxDecimalPlaces?: number
+): string | null {
+  const numberOnlyMatch = NUMBERS_ONLY_REGEX.exec(text);
+  if (numberOnlyMatch) {
+    return toMeters(`${text} meters`, maxDecimalPlaces);
+  }
+
   // Special case matcher for "x feet x inches" -formatted text:
   const feetInchMatch = FEET_INCH_REGEX.exec(text);
   if (feetInchMatch) {
     const [_, feet, __, inches] = feetInchMatch;
-    const feetInMeters = toMeters(`${feet} feet`);
-    const inchesInMeters = toMeters(`${inches} inches`);
-    if (feetInMeters && inchesInMeters) {
-      return feetInMeters + inchesInMeters;
-    }
+    return toMeters(`${feet} feet + ${inches} inches`, maxDecimalPlaces);
   }
 
   try {
-    return math.unit(text.toLowerCase()).toNumber("m");
+    const inMeters = math
+      .evaluate(text.toLowerCase())
+      .toNumber("m") as BigNumber;
+    const decimalPlaces = math.bignumber(inMeters).decimalPlaces();
+    return maxDecimalPlaces !== undefined
+      ? inMeters.toFixed(clamp(decimalPlaces, maxDecimalPlaces))
+      : String(inMeters);
   } catch (error) {
     return null;
   }
