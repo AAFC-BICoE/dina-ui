@@ -83,6 +83,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   components: "Components",
   configureAction: "Configure Action",
   configureDefaultValues: "Configure default values",
+  convertToElevationMinMax: "Convert to Elevation Min/Max",
+  convertToDepthMinMax: "Convert to Depth Min/Max",
   coordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",
   copyFromParentLabel: "Copy From Parent",
   countryLabel: "Country",

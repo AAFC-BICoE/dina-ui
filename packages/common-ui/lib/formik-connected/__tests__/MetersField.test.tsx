@@ -1,5 +1,6 @@
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
+import { FormikButton } from "../FormikButton";
 import { MetersField, toMeters } from "../MetersField";
 
 const mockSubmit = jest.fn();
@@ -92,5 +93,40 @@ describe("MetersField component", () => {
     expect(mockSubmit).lastCalledWith({
       length: "0.30"
     });
+  });
+
+  it("Renders the initial value.", () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{ length: "10.00" }}
+        onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
+      >
+        <MetersField name="length" />
+      </DinaForm>
+    );
+
+    expect(wrapper.find(".length-field input").prop("value")).toEqual("10.00");
+  });
+
+  it("Updates the input value when the form state changes.", () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{ length: "10.00" }}
+        onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
+      >
+        <MetersField name="length" />
+        <FormikButton
+          onClick={(_, form) => form.setFieldValue("length", "20.5")}
+        >
+          Change Val
+        </FormikButton>
+      </DinaForm>
+    );
+
+    // Initial value:
+    expect(wrapper.find(".length-field input").prop("value")).toEqual("10.00");
+    wrapper.find("button").simulate("click");
+    // The new value is rendered:
+    expect(wrapper.find(".length-field input").prop("value")).toEqual("20.5");
   });
 });
