@@ -52,7 +52,12 @@ describe("PersonForm", () => {
           resource: {
             displayName: "new test person",
             email: "person@example.com",
-            type: "person"
+            type: "person",
+            identifiers: [
+              {
+                type: "ORCID"
+              }
+            ]
           },
           type: "person"
         }
