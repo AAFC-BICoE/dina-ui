@@ -15,11 +15,13 @@ export interface NumberFieldProps extends LabelWrapperParams {
 
   /** Disables decimal places. */
   isInteger?: boolean;
+
+  placeholder?: string;
 }
 
 /** Input field that only accepts a number. */
 export function NumberField(props: NumberFieldProps) {
-  const { name, readOnly, onChangeExternal, isInteger } = props;
+  const { name, onChangeExternal, isInteger, placeholder } = props;
   return (
     <FieldWrapper {...props}>
       {({ formik, setValue, value }) => {
@@ -44,6 +46,7 @@ export function NumberField(props: NumberFieldProps) {
             readOnly={props.readOnly}
             decimalScale={isInteger ? 0 : undefined}
             value={numberFormatValue}
+            placeholder={placeholder}
           />
         );
       }}

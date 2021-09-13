@@ -8,7 +8,7 @@ import {
   FormikButton,
   LoadingSpinner,
   NominatumApiSearchResult,
-  NumberField,
+  NumberRangeFields,
   ResourceSelectField,
   StringArrayField,
   TextField,
@@ -20,8 +20,6 @@ import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
 import { Vocabulary } from "../../types/collection-api";
 import { ChangeEvent, useRef, useState } from "react";
-import { ShouldRenderReasons } from "react-autosuggest";
-import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import useSWR from "swr";
 import { GeographySearchBox, GeoReferenceAssertionRow } from ".";
@@ -33,7 +31,6 @@ import {
   GeographicPlaceNameSource
 } from "../../types/collection-api/resources/CollectingEvent";
 import {
-  CoordinateSystem,
   CoordinateSystemEnum,
   CoordinateSystemEnumPlaceHolder
 } from "../../types/collection-api/resources/CoordinateSystem";
@@ -51,6 +48,9 @@ import {
   NominatumApiAddressDetailSearchResult
 } from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
+import { VocabularySelectField } from "./VocabularySelectField";
+import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
+import { CollectionMethodSelectField } from "../resource-select-fields/resource-select-fields";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -63,9 +63,8 @@ export function CollectingEventFormLayout({
   setDefaultVerbatimCoordSys,
   setDefaultVerbatimSRS
 }: CollectingEventFormLayoutProps) {
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage, locale } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
-  const [rangeEnabled, setRangeEnabled] = useState(false);
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
@@ -99,16 +98,6 @@ export function CollectingEventFormLayout({
   );
 
   const commonSrcDetailRoot = "geographicPlaceNameSourceDetail";
-
-  function toggleRangeEnabled(
-    newValue: boolean,
-    formik: FormikContextType<{}>
-  ) {
-    if (!newValue) {
-      formik.setFieldValue("endEventDateTime", null);
-    }
-    setRangeEnabled(newValue);
-  }
 
   async function selectSearchResult(
     result: NominatumApiSearchResult,
@@ -282,15 +271,6 @@ export function CollectingEventFormLayout({
     );
   }
 
-  /* Ensure config is rendered when input get focuse without needing to enter any value */
-  function shouldRenderSuggestions(value: string, reason: ShouldRenderReasons) {
-    return (
-      value?.length >= 0 ||
-      reason === "input-changed" ||
-      reason === "input-focused"
-    );
-  }
-
   function onSuggestionSelected(_, formik) {
     /* To bring the effect as if the field's value is changed to reflect the placeholder change */
     formik.values.dwcVerbatimLatitude === null
@@ -379,43 +359,20 @@ export function CollectingEventFormLayout({
                 )}
               </Field>
             )}
+            <TextField
+              name="verbatimEventDateTime"
+              label={formatMessage("verbatimEventDateTimeLabel")}
+            />
             <FormattedTextField
               name="startEventDateTime"
               className="startEventDateTime"
               label={formatMessage("startEventDateTimeLabel")}
               placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
-            <Field name="endEventDateTime">
-              {({ field: { value: endEventDateTime }, form }) => (
-                <div>
-                  {(rangeEnabled || endEventDateTime) && (
-                    <FormattedTextField
-                      name="endEventDateTime"
-                      label={formatMessage("endEventDateTimeLabel")}
-                      placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
-                    />
-                  )}
-                  {!readOnly && (
-                    <label
-                      className="mb-3"
-                      style={{ marginLeft: 15, marginTop: -15 }}
-                    >
-                      <span>{formatMessage("enableDateRangeLabel")}</span>
-                      <Switch
-                        onChange={newValue =>
-                          toggleRangeEnabled(newValue, form)
-                        }
-                        checked={rangeEnabled || !!endEventDateTime || false}
-                        className="react-switch dateRange"
-                      />
-                    </label>
-                  )}
-                </div>
-              )}
-            </Field>
-            <TextField
-              name="verbatimEventDateTime"
-              label={formatMessage("verbatimEventDateTimeLabel")}
+            <FormattedTextField
+              name="endEventDateTime"
+              label={formatMessage("endEventDateTimeLabel")}
+              placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
           </FieldSet>
         </div>
@@ -496,11 +453,12 @@ export function CollectingEventFormLayout({
                   path: "collection-api/vocabulary/coordinateSystem"
                 })}
                 suggestion={vocabElement =>
-                  vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ??
-                  ""
+                  vocabElement?.vocabularyElements?.map(
+                    it => it?.labels?.[locale] ?? ""
+                  ) ?? ""
                 }
-                shouldRenderSuggestions={shouldRenderSuggestions}
                 onSuggestionSelected={onSuggestionSelected}
+                alwaysShowSuggestions={true}
                 onChangeExternal={onChangeExternal}
               />
               <Field name="dwcVerbatimCoordinateSystem">
@@ -594,19 +552,15 @@ export function CollectingEventFormLayout({
                   path: "collection-api/vocabulary/srs"
                 })}
                 suggestion={vocabElement =>
-                  vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ??
-                  ""
+                  vocabElement?.vocabularyElements?.map(
+                    it => it?.labels?.[locale] ?? ""
+                  ) ?? ""
                 }
-                shouldRenderSuggestions={shouldRenderSuggestions}
+                alwaysShowSuggestions={true}
                 onChangeExternal={onChangeExternal}
               />
               <TextField name="dwcVerbatimElevation" />
               <TextField name="dwcVerbatimDepth" />
-              <NumberField
-                name="dwcMinimumElevationInMeters"
-                isInteger={true}
-              />
-              <NumberField name="dwcMinimumDepthInMeters" isInteger={true} />
             </div>
           </div>
         </FieldSet>
@@ -781,7 +735,7 @@ export function CollectingEventFormLayout({
                                         templateCheckboxFieldName={`srcAdminLevels[${idx}]`}
                                         readOnly={true}
                                         removeLabel={true}
-                                        removeFormGroupClass={true}
+                                        removeBottomMargin={true}
                                         removeItem={removeItem}
                                         key={Math.random()}
                                         index={idx}
@@ -916,11 +870,50 @@ export function CollectingEventFormLayout({
               </div>
             </FieldSet>
           </div>
-          <div className="col-lg-6">
-            <FieldSet legend={<DinaMessage id="locationDescriptionLegend" />}>
-              <TextField name="habitat" />
-            </FieldSet>
+        </div>
+      </FieldSet>
+      <FieldSet legend={<DinaMessage id="collectingEventDetails" />}>
+        <div className="row">
+          <TextField name="habitat" className="col-md-6" />
+          <TextField name="host" className="col-md-6" />
+        </div>
+        <div className="row">
+          <CollectionMethodSelectField
+            name="collectionMethod"
+            className="col-md-6"
+          />
+          <AutoSuggestTextField<CollectingEvent>
+            name="substrate"
+            className="col-md-6"
+            query={(searchValue, ctx) => ({
+              path: "collection-api/collecting-event",
+              filter: {
+                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                rsql: `substrate==${searchValue}*`
+              }
+            })}
+            suggestion={collEvent => collEvent.substrate ?? ""}
+          />
+        </div>
+        <div className="row">
+          <div className="col-md-6">
+            <NumberRangeFields
+              names={[
+                "dwcMinimumElevationInMeters",
+                "dwcMaximumElevationInMeters"
+              ]}
+              labelMsg={<DinaMessage id="elevationInMeters" />}
+            />
           </div>
+          <div className="col-md-6">
+            <NumberRangeFields
+              names={["dwcMinimumDepthInMeters", "dwcMaximumDepthInMeters"]}
+              labelMsg={<DinaMessage id="depthInMeters" />}
+            />
+          </div>
+        </div>
+        <div>
+          <TextField name="remarks" multiLines={true} />
         </div>
       </FieldSet>
       {!isTemplate && (

@@ -17,7 +17,7 @@ import {
 import { useFormikContext } from "formik";
 import { keys } from "lodash";
 import { NextRouter, useRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { Footer, Head, Nav } from "../../../components";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -45,7 +45,7 @@ export default function MetadataEditPage() {
       <main className="container-fluid">
         {id && (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="editMetadataTitle" />
             </h1>
             <Query<Metadata>
@@ -86,6 +86,7 @@ export default function MetadataEditPage() {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }

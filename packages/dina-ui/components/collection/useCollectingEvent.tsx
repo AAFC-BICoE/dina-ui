@@ -26,7 +26,7 @@ export function useCollectingEventQuery(id?: string | null) {
   // TODO disable the fetch query when the ID is undefined.
   const collectingEventQuery = useQuery<CollectingEvent>(
     {
-      path: `collection-api/collecting-event/${id}?include=collectors,attachment`
+      path: `collection-api/collecting-event/${id}?include=collectors,attachment,collectionMethod`
     },
     {
       // Return undefined when ID is undefined:
@@ -151,9 +151,9 @@ export function useCollectingEventSave({
     Pick<CollectingEvent, "startEventDateTime" | "endEventDateTime">
   > = object({
     startEventDateTime: string()
-      .required(formatMessage("field_collectingEvent_startDateTimeError"))
+      .nullable()
       .test({
-        test: isValidDatePrecision,
+        test: val => (val ? isValidDatePrecision(val) : true),
         message: formatMessage("field_collectingEvent_startDateTimeError")
       }),
     endEventDateTime: string()
@@ -181,8 +181,6 @@ export function useCollectingEventSave({
       }
     : {
         type: "collecting-event",
-        // This value needs to be here or else Cleave throws an error when Enzyme simulates a change:
-        startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
         collectors: [],
         collectorGroups: [],
         geoReferenceAssertions: [

@@ -69,7 +69,7 @@ export default function MolecularSampleEditPage() {
       <Nav />
       <main className="container">
         <div>
-          <h1>{pageTitle}</h1>
+          <h1 id="wb-cont">{pageTitle}</h1>
           {id ? (
             withResponse(molecularSampleQuery, ({ data }) => (
               <MolecularSampleForm
@@ -152,10 +152,6 @@ export function MolecularSampleFields() {
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
-        <TextField className="col-md-6" name="version" />
-      </div>
-      <div className="row">
-        <TextField className="col-md-6" name="notes" multiLines={true} />
       </div>
       <div className="row">
         <ResourceSelectField<Product>
@@ -177,7 +173,7 @@ export function MolecularSampleFields() {
         <ResourceSelectField<MaterialSample>
           name="materialSample"
           className="col-md-6"
-          filter={filterBy(["materialSampleName", "dwcCatalogNumber"], {
+          filter={filterBy(["materialSampleName"], {
             // Only allow linking to the built-in Molecular Sample type:
             extraFilters: [
               {
@@ -188,9 +184,7 @@ export function MolecularSampleFields() {
             ]
           })}
           model="collection-api/material-sample"
-          optionLabel={it =>
-            it.materialSampleName || it.dwcCatalogNumber || it.id
-          }
+          optionLabel={it => it.materialSampleName || it.id}
           readOnlyLink="/collection/material-sample/view?id="
         />
       </div>

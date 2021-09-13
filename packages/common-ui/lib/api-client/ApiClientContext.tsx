@@ -1,8 +1,13 @@
 import { AxiosError } from "axios";
 import { cacheAdapterEnhancer } from "axios-extensions";
-import Kitsu, { GetParams, KitsuResource, PersistedResource } from "kitsu";
+import Kitsu, {
+  GetParams,
+  KitsuResource,
+  KitsuResourceLink,
+  PersistedResource
+} from "kitsu";
 import { deserialise, error as kitsuError, query } from "kitsu-core";
-import { keys } from "lodash";
+import { keys, omit } from "lodash";
 import LRUCache from "lru-cache";
 import React, { PropsWithChildren, useContext, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -69,7 +74,7 @@ export interface SaveArgs<T extends KitsuResource = KitsuResource> {
 }
 
 export interface DeleteArgs {
-  delete: PersistedResource<any>;
+  delete: KitsuResourceLink | PersistedResource<any>;
 }
 
 /**
@@ -324,10 +329,11 @@ export class CustomDinaKitsu extends Kitsu {
    * Override the 'get' method so it works with our long URLs:
    */
   async get(path: string, params: GetParams = {}) {
+    const paramsNet = omit(params, "header");
     try {
       const { data } = await this.axios.get(path, {
-        headers: this.headers,
-        params,
+        headers: { ...this.headers, ...params.header },
+        params: paramsNet,
         paramsSerializer: p => query(p)
       });
 

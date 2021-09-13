@@ -7,10 +7,11 @@ import { SeqdbMessage } from "../intl/seqdb-intl";
 const Home: React.FunctionComponent = () => (
   <div>
     <Head title="Home" />
+
     <Nav />
     <main role="main">
       <div className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="dinaHomeH1" />
         </h1>
         <h2>
@@ -80,6 +81,13 @@ const Home: React.FunctionComponent = () => (
             <Link href="/seqdb/workflow/list">
               <a>
                 <SeqdbMessage id="workflowListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
+            <Link href="/seqdb/sanger-workflow/list">
+              <a>
+                <SeqdbMessage id="sangerWorkflowListTitle" />
               </a>
             </Link>
           </li>
@@ -159,6 +167,20 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
           <li>
+            <Link href="/collection/collection-method/list">
+              <a>
+                <DinaMessage id="collectionMethodListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
+            <Link href="/collection/institution/list">
+              <a>
+                <DinaMessage id="institutionListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
             <Link href="/collection/collecting-event/list">
               <a>
                 <DinaMessage id="collectingEventListTitle" />
@@ -218,13 +240,6 @@ const Home: React.FunctionComponent = () => (
             <Link href="/collection/workflow-template/list">
               <a>
                 <DinaMessage id="workflowTemplateListTitle" />
-              </a>
-            </Link>
-          </li>
-          <li>
-            <Link href="/collection/material-sample/workflows/split-config">
-              <a>
-                <DinaMessage id="splitWorkflowRunTitle" />
               </a>
             </Link>
           </li>

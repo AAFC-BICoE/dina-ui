@@ -10,7 +10,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   MaterialSample,
@@ -19,7 +19,8 @@ import {
 
 const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
   "createdBy",
-  "dwcCatalogNumber",
+  "collection.name",
+  "collection.code",
   {
     name: "materialSampleType.uuid",
     type: "DROPDOWN",
@@ -44,7 +45,15 @@ const MATERIAL_SAMPLE_TABLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
     ),
     accessor: "materialSampleName"
   },
-  "dwcCatalogNumber",
+  {
+    Cell: ({ original: { collection } }) =>
+      collection?.id ? (
+        <Link href={`/collection/collection/view?id=${collection?.id}`}>
+          {collection?.name}
+        </Link>
+      ) : null,
+    accessor: "collection.name"
+  },
   stringArrayCell("dwcOtherCatalogNumbers"),
   { accessor: "materialSampleType.name" },
   "createdBy",
@@ -59,7 +68,7 @@ export default function MaterialSampleListPage() {
       <Head title={formatMessage("materialSampleListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="materialSampleListTitle" />
         </h1>
         <ButtonBar>
@@ -75,7 +84,7 @@ export default function MaterialSampleListPage() {
           queryTableProps={{
             columns: MATERIAL_SAMPLE_TABLE_COLUMNS,
             path: "collection-api/material-sample",
-            include: "materialSampleType"
+            include: "collection,materialSampleType"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">
@@ -90,6 +99,7 @@ export default function MaterialSampleListPage() {
           )}
         />
       </main>
+      <Footer />
     </div>
   );
 }

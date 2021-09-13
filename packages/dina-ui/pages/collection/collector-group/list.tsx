@@ -24,7 +24,7 @@ export default function collectorGroupListPage() {
       <Head title={formatMessage("collectorGroupListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="collectorGroupListTitle" />
         </h1>
         <ButtonBar>

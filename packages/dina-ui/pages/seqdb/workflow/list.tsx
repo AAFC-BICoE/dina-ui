@@ -35,7 +35,7 @@ export default function WorkflowListPage() {
         <CreateButton entityLink="/seqdb/workflow" />
       </ButtonBar>
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <SeqdbMessage id="workflowListTitle" />
         </h1>
         <ListPageLayout

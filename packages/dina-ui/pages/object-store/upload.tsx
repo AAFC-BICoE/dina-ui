@@ -93,7 +93,7 @@ export default function UploadPage() {
                     dup.originalFilename && (
                       <tr key={idx} className={`${idx}-row`}>
                         <td>{dup.originalFilename}</td>
-                        <td>{dup.meta?.warnings.duplicate_found}</td>
+                        <td>{dup.meta?.warnings?.duplicate_found}</td>
                       </tr>
                     )
                 )}
@@ -119,7 +119,7 @@ export default function UploadPage() {
       <Head title={formatMessage("uploadPageTitle")} />
       <Nav />
       <main className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="uploadPageTitle" />
         </h1>
         {!accountInitialized || !groupNames?.length ? (
@@ -143,7 +143,7 @@ export default function UploadPage() {
                   className="offset-md-3 col-md-3"
                   styles={customStyles}
                 />
-                <div className="col-md-3" style={{margin: "2em 0em 2em 0em"}} >
+                <div className="col-md-3" style={{ margin: "2em 0em 2em 0em" }}>
                   <FormikButton
                     className="btn btn-primary"
                     onClick={({ defaultValuesConfig }, { setFieldValue }) =>

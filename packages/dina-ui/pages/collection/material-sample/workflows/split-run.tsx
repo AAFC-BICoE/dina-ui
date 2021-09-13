@@ -72,7 +72,8 @@ export default function SplitRunAction() {
     start = START,
     suffix = "",
     suffixType = TYPE_NUMERIC,
-    generationMode = "SERIES"
+    generationMode = "SERIES",
+    collection
   } = splitChildSampleRunConfig?.configure ?? {};
 
   const { sampleNames = [] } =
@@ -174,12 +175,13 @@ export default function SplitRunAction() {
     const generatedSampleName =
       generationMode === "BATCH"
         ? `${baseName}${suffix}`
-        : `${baseName}-${computedSuffix}`;
+        : `${baseName}${computedSuffix}`;
 
     initialChildSamples.push({
       group: groupNames?.[0],
       type: "material-sample",
-      materialSampleName: splitChildSampleName ?? generatedSampleName
+      materialSampleName: splitChildSampleName ?? generatedSampleName,
+      collection
     });
   }
 
@@ -269,11 +271,6 @@ export default function SplitRunAction() {
       formik.setFieldValue(commonRoot + fieldName, parentSample?.[fieldName]);
     }
 
-    formik.setFieldValue(
-      commonRoot + "dwcCatalogNumber",
-      parentSample?.dwcCatalogNumber
-    );
-
     // formik.setFieldValue(
     //   commonRoot + "materialSampleName",
     //   parentSample?.materialSampleName
@@ -286,7 +283,10 @@ export default function SplitRunAction() {
   };
 
   function computeDefaultSampleName(index) {
-    return baseName + "-" + computeSuffix({ index, start, suffixType });
+    return (
+      initialChildSamples[index + 1].materialSampleName ??
+      baseName + computeSuffix({ index, start, suffixType })
+    );
   }
 
   function childSampleInternal(index, form) {
@@ -296,17 +296,6 @@ export default function SplitRunAction() {
 
     return (
       <>
-        <span className="d-flex fw-bold flex-row">
-          {formatMessage("materialSample") + " " + formatMessage("description")}
-          :
-        </span>
-        <div className="container">
-          <TextField
-            name={commonRoot + "description"}
-            hideLabel={true}
-            multiLines={true}
-          />
-        </div>
         <FormikButton
           onClick={() => {
             onCopyFromParent({ index, formik: form });
@@ -355,7 +344,9 @@ export default function SplitRunAction() {
               namePrefix={commonRoot}
               className="flex-grow-1"
               sampleNamePlaceHolder={
-                index > 0 ? computeDefaultSampleName(index - 1) : ""
+                index === 0
+                  ? formatMessage("multiple")
+                  : computeDefaultSampleName(index - 1)
               }
             />
             <FieldSet legend={<DinaMessage id="components" />}>
@@ -429,7 +420,7 @@ export default function SplitRunAction() {
       <Head title={formatMessage("splitSubsampleTitle")} />
       <Nav />
       <main className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
         <DinaForm

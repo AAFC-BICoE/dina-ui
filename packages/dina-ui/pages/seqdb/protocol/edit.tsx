@@ -37,7 +37,7 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
       <main className="container-fluid">
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="editProtocolTitle" />
             </h1>
             <Query<Protocol>
@@ -55,7 +55,7 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="addProtocolTitle" />
             </h1>
             <ProtocolForm router={router} />

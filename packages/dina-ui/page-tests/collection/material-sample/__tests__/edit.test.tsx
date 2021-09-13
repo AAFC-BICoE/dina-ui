@@ -1,6 +1,5 @@
 import { KitsuResourceLink, PersistedResource } from "kitsu";
-import ReactSwitch from "react-switch";
-import Switch from "react-switch";
+import { default as ReactSwitch, default as Switch } from "react-switch";
 import { BLANK_PREPARATION } from "../../../../components/collection/PreparationField";
 import { MaterialSampleForm } from "../../../../pages/collection/material-sample/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
@@ -8,8 +7,6 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
-import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
-import { SRS } from "../../../../types/collection-api/resources/SRS";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -21,6 +18,7 @@ jest.mock("next/dynamic", () => () => {
 function testCollectionEvent(): Partial<CollectingEvent> {
   return {
     startEventDateTime: "2021-04-13",
+    verbatimEventDateTime: "2021-04-13",
     id: "1",
     type: "collecting-event",
     group: "test group"
@@ -32,23 +30,13 @@ function testMaterialSample(): PersistedResource<MaterialSample> {
     id: "1",
     type: "material-sample",
     group: "test group",
-    dwcCatalogNumber: "my-number",
+    materialSampleName: "my-sample-name",
     collectingEvent: {
       id: "1",
       type: "collecting-event"
     } as PersistedResource<CollectingEvent>
   };
 }
-
-const TEST_SRS: SRS = {
-  srs: ["NAD27 (EPSG:4276)", "WGS84 (EPSG:4326)"],
-  type: "srs"
-};
-
-const TEST_COORDINATES: CoordinateSystem = {
-  coordinateSystem: ["decimal degrees", " degrees decimal"],
-  type: "coordinate-system"
-};
 
 const TEST_MANAGED_ATTRIBUTE = {
   id: "1",
@@ -60,24 +48,25 @@ const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
-    case "collection-api/collecting-event/1?include=collectors,attachment":
+    case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod":
       // Populate the linker table:
       return { data: testCollectionEvent() };
-    case "collection-api/srs":
-      return { data: [TEST_SRS] };
-    case "collection-api/coordinate-system":
-      return { data: [TEST_COORDINATES] };
     case "collection-api/preparation-type":
     case "collection-api/managed-attribute":
+    case "collection-api/material-sample":
     case "collection-api/material-sample-type":
     case "user-api/group":
     case "agent-api/person":
     case "collection-api/vocabulary/srs":
     case "collection-api/vocabulary/coordinateSystem":
     case "collection-api/vocabulary/degreeOfEstablishment":
+    case "collection-api/vocabulary/typeStatus":
     case "collection-api/storage-unit-type":
     case "collection-api/storage-unit":
     case "objectstore-api/metadata":
+    case "collection-api/collection":
+    case "collection-api/collection-method":
+    case "collection-api/storage-unit/76575":
       return { data: [] };
   }
 });
@@ -138,12 +127,8 @@ describe("Material Sample Edit Page", () => {
       .find(".materialSampleName-field input")
       .simulate("change", { target: { value: "test-material-sample-id" } });
     wrapper
-      .find(".dwcCatalogNumber-field input")
-      .simulate("change", { target: { value: "my-new-material-sample" } });
-    wrapper
-      .find(".startEventDateTime-field input")
+      .find(".verbatimEventDateTime-field input")
       .simulate("change", { target: { value: "2019-12-21T16:00" } });
-
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
@@ -166,7 +151,7 @@ describe("Material Sample Edit Page", () => {
               ],
               managedAttributes: {},
               relationships: {},
-              startEventDateTime: "2019-12-21T16:00",
+              verbatimEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
             },
             type: "collecting-event"
@@ -183,8 +168,8 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
-              dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
               determination: [],
               relationships: {},
@@ -215,12 +200,12 @@ describe("Material Sample Edit Page", () => {
       true
     );
 
+    await new Promise(setImmediate);
+    wrapper.update();
+
     wrapper
       .find(".materialSampleName-field input")
       .simulate("change", { target: { value: "test-material-sample-id" } });
-    wrapper
-      .find(".dwcCatalogNumber-field input")
-      .simulate("change", { target: { value: "my-new-material-sample" } });
 
     wrapper.find("button.collecting-event-link-button").simulate("click");
 
@@ -244,8 +229,8 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
-              dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
               determination: [],
               type: "material-sample",
@@ -279,9 +264,6 @@ describe("Material Sample Edit Page", () => {
     wrapper
       .find(".materialSampleName-field input")
       .simulate("change", { target: { value: "test-material-sample-id" } });
-    wrapper
-      .find(".dwcCatalogNumber-field input")
-      .simulate("change", { target: { value: "edited-catalog-number" } });
 
     wrapper.find("form").simulate("submit");
 
@@ -298,8 +280,8 @@ describe("Material Sample Edit Page", () => {
               type: "material-sample",
               group: "test group",
               materialSampleName: "test-material-sample-id",
-              dwcCatalogNumber: "edited-catalog-number",
               collectingEvent: { id: "1", type: "collecting-event" },
+              storageUnit: { id: null, type: "storage-unit" },
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
@@ -330,7 +312,7 @@ describe("Material Sample Edit Page", () => {
 
     // Existing CollectingEvent should show up:
     expect(
-      wrapper.find(".startEventDateTime-field input").prop("value")
+      wrapper.find(".verbatimEventDateTime-field input").prop("value")
     ).toEqual("2021-04-13");
 
     wrapper.find("button.detach-collecting-event-button").simulate("click");
@@ -340,12 +322,12 @@ describe("Material Sample Edit Page", () => {
 
     // Existing CollectingEvent should be gone:
     expect(
-      wrapper.find(".startEventDateTime-field input").prop("value")
+      wrapper.find(".verbatimEventDateTime-field input").prop("value")
     ).toEqual("");
 
-    // Set the new Collecting Event's startEventDateTime:
+    // Set the new Collecting Event's verbatimEventDateTime:
     wrapper
-      .find(".startEventDateTime-field input")
+      .find(".verbatimEventDateTime-field input")
       .simulate("change", { target: { value: "2019-12-21T16:00" } });
 
     wrapper.find("form").simulate("submit");
@@ -369,7 +351,7 @@ describe("Material Sample Edit Page", () => {
               ],
               managedAttributes: {},
               relationships: {},
-              startEventDateTime: "2019-12-21T16:00",
+              verbatimEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
             },
             type: "collecting-event"
@@ -386,7 +368,8 @@ describe("Material Sample Edit Page", () => {
                 id: "1",
                 type: "collecting-event"
               },
-              dwcCatalogNumber: "my-number",
+              storageUnit: { id: null, type: "storage-unit" },
+              materialSampleName: "my-sample-name",
               group: "test group",
               id: "1",
               type: "material-sample",
@@ -432,6 +415,34 @@ describe("Material Sample Edit Page", () => {
     ).toEqual(true);
   });
 
+  it("Renders an existing Material Sample with the Storage section enabled.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms",
+          storageUnit: {
+            id: "76575",
+            type: "storage-unit",
+            name: "test-storage-unit"
+          } as KitsuResourceLink
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Storage is enabled:
+    expect(
+      wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+    expect(wrapper.find("#storage-section").exists()).toEqual(true);
+  });
+
   it("Renders an existing Material Sample with the Determinations section enabled.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
@@ -455,9 +466,10 @@ describe("Material Sample Edit Page", () => {
     expect(
       wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
     ).toEqual(true);
+    expect(wrapper.find("#determination-section").exists()).toEqual(true);
   });
 
-  it("Renders an existing Material Sample with the Preparations section disabled (no Preparations fields set).", async () => {
+  it("Renders an existing Material Sample with all toggleable data components disabled.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
@@ -473,9 +485,18 @@ describe("Material Sample Edit Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Preparations are disabled:
+    // Data components are disabled:
     expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
     ).toEqual(false);
   });
 
@@ -495,6 +516,9 @@ describe("Material Sample Edit Page", () => {
       testCtx
     );
 
+    await new Promise(setImmediate);
+    wrapper.update();
+
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
@@ -509,6 +533,7 @@ describe("Material Sample Edit Page", () => {
                 id: null,
                 type: "collecting-event"
               },
+              storageUnit: { id: null, type: "storage-unit" },
               id: "333",
               managedAttributes: {
                 testAttr: "do the test"
@@ -525,6 +550,86 @@ describe("Material Sample Edit Page", () => {
         {
           apiBaseUrl: "/collection-api"
         }
+      ]
+    ]);
+  });
+
+  it("Submits a new Material Sample with 3 Determinations.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm onSaved={mockOnSaved} />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "test-material-sample-id" } });
+
+    // Enable Collecting Event and catalogue info form sections:
+    wrapper.find(".enable-determination").find(Switch).prop<any>("onChange")(
+      true
+    );
+
+    wrapper.update();
+
+    function fillOutDetermination(num: number) {
+      wrapper
+        .find(".verbatimScientificName-field input")
+        .last()
+        .simulate("change", { target: { value: `test-name-${num}` } });
+      wrapper
+        .find(".verbatimDeterminer-field input")
+        .last()
+        .simulate("change", { target: { value: `test-agent-${num}` } });
+    }
+
+    // Enter the first determination:
+    fillOutDetermination(1);
+
+    // Enter the second determination:
+    wrapper.find("button.add-determination-button").simulate("click");
+    await new Promise(setImmediate);
+    fillOutDetermination(2);
+
+    // Enter the third determination:
+    wrapper.find("button.add-determination-button").simulate("click");
+    await new Promise(setImmediate);
+    fillOutDetermination(3);
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Saves the Material Sample:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              // The 3 determinations are added:
+              determination: [
+                {
+                  verbatimDeterminer: "test-agent-1",
+                  verbatimScientificName: "test-name-1"
+                },
+                {
+                  verbatimDeterminer: "test-agent-2",
+                  verbatimScientificName: "test-name-2"
+                },
+                {
+                  verbatimDeterminer: "test-agent-3",
+                  verbatimScientificName: "test-name-3"
+                }
+              ],
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
       ]
     ]);
   });

@@ -5,7 +5,9 @@ import { CollectingEvent } from "./CollectingEvent";
 import { PreparationType } from "./PreparationType";
 import { JsonValue } from "type-fest";
 import { MaterialSampleType } from "./MaterialSampleType";
+import { HierarchyItem, StorageUnit } from "./StorageUnit";
 import { Determination } from "./Determination";
+import { Collection } from "./Collection";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -16,7 +18,6 @@ export interface MaterialSampleAttributes {
   group?: string;
   createdOn?: string;
   createdBy?: string;
-  dwcCatalogNumber?: string | null;
   dwcOtherCatalogNumbers?: string[];
   preparationDate?: string | null;
   preparationRemarks?: string | null;
@@ -27,15 +28,19 @@ export interface MaterialSampleAttributes {
   managedAttributes?: JsonValue;
 
   determination?: Determination[];
-}
+  hierarchy?: HierarchyItem[];
 
+  barcode?: string;
+}
 export interface MaterialSampleRelationships {
+  collection?: Collection;
   materialSampleType?: MaterialSampleType;
   collectingEvent?: CollectingEvent;
   attachment?: ResourceIdentifierObject[];
   preparationType?: PreparationType;
   preparedBy?: Person;
   parentMaterialSample?: MaterialSample;
+  storageUnit?: StorageUnit;
 }
 
 export type MaterialSample = KitsuResource &

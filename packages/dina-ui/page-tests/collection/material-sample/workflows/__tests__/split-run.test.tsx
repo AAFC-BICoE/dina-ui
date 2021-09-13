@@ -11,7 +11,8 @@ import { PreparationType } from "../../../../../../dina-ui/types/collection-api/
 import { Person } from "../../../../../../dina-ui/types/agent-api";
 
 jest.mock("next/router", () => ({
-  useRouter: () => ({ push: jest.fn() })
+  useRouter: () => ({ push: jest.fn() }),
+  withRouter: jest.fn()
 }));
 
 function testMaterialSample(): PersistedResource<MaterialSample>[] {
@@ -20,7 +21,6 @@ function testMaterialSample(): PersistedResource<MaterialSample>[] {
       id: "1",
       type: "material-sample",
       group: "test group",
-      dwcCatalogNumber: "my-number",
       materialSampleName: "parent-sample-name",
       collectingEvent: {
         id: "1",
@@ -66,6 +66,7 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/storage-unit":
     case "collection-api/storage-unit-type":
     case "collection-api/material-sample-type":
+    case "collection-api/vocabulary/degreeOfEstablishment":
     case "objectstore-api/metadata":
       return { data: [] };
   }
@@ -88,7 +89,6 @@ const apiContext = {
 const testSeriesModeRunConfig: MaterialSampleRunConfig = {
   metadata: { actionRemarks: "Remarks on this run config" },
   configure: {
-    identifier: "MATERIAL_SAMPLE_ID",
     generationMode: "SERIES",
     numOfChildToCreate: 1,
     baseName: "CustomParentName",
@@ -102,7 +102,6 @@ const testSeriesModeRunConfig: MaterialSampleRunConfig = {
 const testBatchModeRunConfig: MaterialSampleRunConfig = {
   metadata: { actionRemarks: "Remarks on this run config" },
   configure: {
-    identifier: "MATERIAL_SAMPLE_ID",
     generationMode: "BATCH",
     numOfChildToCreate: 2,
     baseName: "CustomParentName",
@@ -151,9 +150,9 @@ describe("MaterialSample split workflow run action form with all default values"
     wrapper.update();
 
     // child sample will have the parent's value after click copyFromParent
-    expect(wrapper.find(".dwcCatalogNumber-field input").prop("value")).toEqual(
-      "my-number"
-    );
+    expect(
+      wrapper.find(".materialSampleName-field input").prop("value")
+    ).toEqual("my custom name");
 
     wrapper.find("button.runAction").simulate("click");
 
@@ -162,7 +161,6 @@ describe("MaterialSample split workflow run action form with all default values"
       [
         {
           resource: {
-            dwcCatalogNumber: "my-number",
             group: "aafc",
             materialSampleName: "my custom name",
             parentMaterialSample: {
@@ -286,9 +284,6 @@ describe("MaterialSample split workflow run action form with all default values"
       .find(".materialSampleName-field input")
       .simulate("change", { target: { value: "default-samplename" } });
     wrapper
-      .find(".dwcCatalogNumber-field input")
-      .simulate("change", { target: { value: "default-number" } });
-    wrapper
       .find(".dwcOtherCatalogNumbers-field textarea")
       .simulate("change", { target: { value: "default-otherNumbers" } });
 
@@ -306,9 +301,6 @@ describe("MaterialSample split workflow run action form with all default values"
       .find(".materialSampleName-field input")
       .simulate("change", { target: { value: "manually-set-samplename" } });
     wrapper
-      .find(".dwcCatalogNumber-field input")
-      .simulate("change", { target: { value: "manually-set-number" } });
-    wrapper
       .find(".dwcOtherCatalogNumbers-field textarea")
       .simulate("change", { target: { value: "manually-set-otherNumbers" } });
 
@@ -320,7 +312,6 @@ describe("MaterialSample split workflow run action form with all default values"
         // The first sample is saved using the default values:
         {
           resource: {
-            dwcCatalogNumber: "default-number",
             dwcOtherCatalogNumbers: ["default-otherNumbers"],
             group: "aafc",
             materialSampleName: "my custom name",
@@ -346,7 +337,6 @@ describe("MaterialSample split workflow run action form with all default values"
         // The second sample is saved using the manual values:
         {
           resource: {
-            dwcCatalogNumber: "manually-set-number",
             dwcOtherCatalogNumbers: ["manually-set-otherNumbers"],
             group: "aafc",
             materialSampleName: "manually-set-samplename",

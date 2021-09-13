@@ -49,7 +49,7 @@ export default function MaterialSampleTypeEditPage() {
       <Nav />
       <main className="container">
         <div>
-          <h1>
+          <h1 id="wb-cont">
             <DinaMessage id={pageTitle} />
           </h1>
           {id ? (

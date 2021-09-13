@@ -48,7 +48,7 @@ export function CollectorGroupDetailsPage({ router }: WithRouterProps) {
         />
       </ButtonBar>
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="collectorGroupViewTitle" />
         </h1>
         {withResponse(collGroupQuery, ({ data: collectorGroup }) => (
