@@ -294,6 +294,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   group: "Group",
   groupMustBeSelected: "Group must be selected",
   identifiers: "Identifiers",
+  identifierType: "Identifier Type",
+  identifierURI: "Identifier URI",
   includeAll: "Include All",
   institution: "Institution",
   institutionListTitle: "Institutions",

@@ -6,19 +6,14 @@ import {
   SubmitButton,
   TextField,
   useModal,
-  StringArrayField,
-  FormikButton
+  StringArrayField
 } from "common-ui";
 import { ResourceSelectField } from "common-ui/lib";
 import { PersistedResource } from "kitsu";
 import { Organization } from "../../../dina-ui/types/agent-api/resources/Organization";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
-import { FieldArray } from "formik";
-import { clamp } from "lodash";
-import { useState } from "react";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { IdentifierRow } from "../collection/IdentifierRow";
+import { PersonFormFields } from "./PersonFormFields";
 
 interface PersonFormProps {
   person?: Person;
@@ -27,10 +22,10 @@ interface PersonFormProps {
 
 /** Form to add or edit a Person. */
 export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
-  const initialValues: Partial<Person> = person || { type: "person" };
-
-  const [activeTabIdx, setActiveTabIdx] = useState(0);
-
+  const initialValues: Partial<Person> = person || {
+    type: "person",
+    identifiers: [{}]
+  };
   const id = person?.id;
 
   const onSubmit: DinaFormOnSubmit = async ({
@@ -68,68 +63,9 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+      <PersonFormFields width="30rem" />
       <div style={{ width: "30rem" }}>
-        <FieldArray name="identifiers">
-          {({ form, push, remove }) => {
-            const identifiers = (form.values as Person).identifiers ?? [{}];
-
-            function addIdentifier() {
-              push({});
-              setActiveTabIdx(identifiers.length);
-            }
-
-            function removeIdentifier(index: number) {
-              remove(index);
-              // Stay on the current tab number, or reduce if removeing the last element:
-              setActiveTabIdx(current =>
-                clamp(current, 0, identifiers.length - 2)
-              );
-            }
-            return (
-              <div className="identifier-section">
-                <Tabs selectedIndex={activeTabIdx} onSelect={setActiveTabIdx}>
-                  {
-                    // Only show the tabs when there is more than 1 identifier:
-                    <TabList
-                      className={`react-tabs__tab-list ${
-                        identifiers.length === 1 ? "d-none" : ""
-                      }`}
-                    >
-                      {identifiers.map((_, index) => (
-                        <Tab key={index}>
-                          <span className="m-3">{index + 1}</span>
-                        </Tab>
-                      ))}
-                    </TabList>
-                  }
-                  {identifiers.length
-                    ? identifiers.map((_, index) => (
-                        <TabPanel key={index}>
-                          <IdentifierRow index={index} />
-                          <div className="list-inline mb-3">
-                            <FormikButton
-                              className="list-inline-item btn btn-primary add-identifier-button"
-                              onClick={addIdentifier}
-                            >
-                              <DinaMessage id="addAnotherIdentifier" />
-                            </FormikButton>
-                            {identifiers.length > 1 && (
-                              <FormikButton
-                                className="list-inline-item btn btn-dark"
-                                onClick={() => removeIdentifier(index)}
-                              >
-                                <DinaMessage id="removeIdentifier" />
-                              </FormikButton>
-                            )}
-                          </div>
-                        </TabPanel>
-                      ))
-                    : null}
-                </Tabs>
-              </div>
-            );
-          }}
-        </FieldArray>
+        <TextField name="displayName" />
       </div>
       <div style={{ width: "30rem" }}>
         <TextField name="givenNames" />

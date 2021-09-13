@@ -1,6 +1,6 @@
 export interface IdentifierAttributes {
-  type: IdentifierType;
-  uri: string;
+  type?: IdentifierType;
+  uri?: string;
 }
 
 export enum IdentifierType {

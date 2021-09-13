@@ -1,4 +1,5 @@
 import { TextField, SelectField, SelectOption } from "common-ui";
+import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { IdentifierType } from "../../../dina-ui/types/agent-api/resources/Identifier";
 
 export interface IdentifierRowProps {
@@ -21,10 +22,19 @@ export function IdentifierRow({ index }: IdentifierRowProps) {
   const identifierPath = `${identifiersPath}[${index}]`;
   const commonRoot = identifierPath + ".";
 
+  const { formatMessage } = useDinaIntl();
+
   return (
     <>
-      <SelectField name={commonRoot + "type"} options={typeOptions as any} />
-      <TextField name={commonRoot + "URI"} />
+      <SelectField
+        name={commonRoot + "type"}
+        options={typeOptions as any}
+        label={formatMessage("identifierType")}
+      />
+      <TextField
+        name={commonRoot + "uri"}
+        label={formatMessage("identifierURI")}
+      />
     </>
   );
 }
