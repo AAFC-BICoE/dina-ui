@@ -35,19 +35,22 @@ export function IdentifierRow({ index }: IdentifierRowProps) {
       <TextField
         name={commonRoot + "uri"}
         label={formatMessage("identifierURI")}
-        readOnlyRender={value =>
-          value ? (
-            value.includes("http") || value.includes("https") ? (
-              <Fragment key={value}>
-                <a target="_blank" href={value} rel="noopener noreferrer">
-                  {value}
-                </a>
-              </Fragment>
-            ) : (
-              value
-            )
-          ) : null
-        }
+        readOnlyRender={value => {
+          try {
+            const url = new URL(value);
+            if (url.protocol === "http:" || url.protocol === "https:") {
+              return (
+                <Fragment key={value}>
+                  <a target="_blank" href={value} rel="noopener noreferrer">
+                    {value}
+                  </a>
+                </Fragment>
+              );
+            }
+          } catch (_) {
+            return value;
+          }
+        }}
       />
     </>
   );

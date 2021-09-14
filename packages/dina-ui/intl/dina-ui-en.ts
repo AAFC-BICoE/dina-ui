@@ -293,6 +293,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   goToThePreviousStep: "Go to the previous step",
   group: "Group",
   groupMustBeSelected: "Group must be selected",
+  identifierLegend: "Identifiers",
   identifiers: "Identifiers",
   identifierType: "Identifier Type",
   identifierURI: "Identifier URI",
