@@ -24,8 +24,7 @@ interface PersonFormProps {
 /** Form to add or edit a Person. */
 export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   const initialValues: Partial<Person> = person || {
-    type: "person",
-    identifiers: [{ type: IdentifierType.ORCID }]
+    type: "person"
   };
   const id = person?.id;
 

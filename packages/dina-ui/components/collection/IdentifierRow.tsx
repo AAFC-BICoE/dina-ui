@@ -36,13 +36,17 @@ export function IdentifierRow({ index }: IdentifierRowProps) {
         name={commonRoot + "uri"}
         label={formatMessage("identifierURI")}
         readOnlyRender={value =>
-          (value.includes("http") || value.includes("https")) && (
-            <Fragment key={value}>
-              <a target="_blank" href={value} rel="noopener noreferrer">
-                {value}
-              </a>
-            </Fragment>
-          )
+          value ? (
+            value.includes("http") || value.includes("https") ? (
+              <Fragment key={value}>
+                <a target="_blank" href={value} rel="noopener noreferrer">
+                  {value}
+                </a>
+              </Fragment>
+            ) : (
+              value
+            )
+          ) : null
         }
       />
     </>

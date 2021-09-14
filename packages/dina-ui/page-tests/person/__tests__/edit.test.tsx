@@ -86,12 +86,7 @@ describe("person edit page", () => {
           path: "person",
           value: {
             attributes: {
-              displayName: "test person updated",
-              identifiers: [
-                {
-                  type: "ORCID"
-                }
-              ]
+              displayName: "test person updated"
             },
             id: "00000000-0000-0000-0000-000000000000",
             type: "person"
