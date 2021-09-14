@@ -1,7 +1,7 @@
 import { useFormikContext } from "formik";
 import { isNil } from "lodash";
 import { useIntl } from "react-intl";
-import { CommonMessage } from "..";
+import { CommonMessage, Tooltip } from "..";
 import { useDinaFormContext } from "./DinaForm";
 import { MetersField } from "./MetersField";
 
@@ -29,6 +29,7 @@ export function NumberRangeFields({
     <label className="w-100">
       <div className="mb-2">
         <strong>{labelMsg}</strong>
+        <Tooltip id="metersField_tooltip" />
       </div>
       <div className="mb-3">
         {readOnly ? (

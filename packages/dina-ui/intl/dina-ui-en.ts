@@ -340,6 +340,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metadataRightsDetailsLabel: "Rights",
   metadataTagsLabel: "Tags",
   metadataUploadDetailsLabel: "Upload Details",
+  metersField_tooltip:
+    "Use the following units for auto-conversion: ft, in, ft in, yd, mm, cm, km, pd, po, pd po.",
   moveAllContent: " Move All Content",
   multiple: "Multiple",
   noFileToDisplay: "No file to display",
