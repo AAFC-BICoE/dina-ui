@@ -67,11 +67,14 @@ const FEET_INCH_REGEX =
 
 const NUMBERS_ONLY_REGEX = /^\s*([\d|\.]+)\s*$/;
 
+const CONTAINS_NUMBERS_REGEX = /([\d|\.]+)/;
+
 /** Returns a string if the conversion can be done, otherwise returns null. */
 export function toMeters(
   text: string,
   maxDecimalPlaces?: number
 ): string | null {
+  // If the input is just a number:
   const numberOnlyMatch = NUMBERS_ONLY_REGEX.exec(text);
   if (numberOnlyMatch) {
     return toMeters(`${text} meters`, maxDecimalPlaces);
@@ -85,6 +88,7 @@ export function toMeters(
   }
 
   try {
+    // If the input is a number with a known distance unit:
     const inMeters = math
       .evaluate(text.toLowerCase())
       .toNumber("m") as BigNumber;
@@ -93,6 +97,13 @@ export function toMeters(
       ? inMeters.toFixed(clamp(decimalPlaces, maxDecimalPlaces))
       : String(inMeters);
   } catch (error) {
+    // If the input contains a number:
+    const containsNumbersMatch = CONTAINS_NUMBERS_REGEX.exec(text);
+    if (containsNumbersMatch) {
+      const [_, matchedNumber] = containsNumbersMatch;
+      return toMeters(matchedNumber, maxDecimalPlaces);
+    }
+
     return null;
   }
 }

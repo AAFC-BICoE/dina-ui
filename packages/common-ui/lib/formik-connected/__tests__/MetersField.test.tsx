@@ -41,6 +41,10 @@ describe("MetersField component", () => {
 
     // Accepts a value without units as meters:
     expect(toMeters("1.1111")).toEqual("1.1111");
+
+    // Matches a number in a string with other unknown text in it:
+    expect(toMeters(": 36 kl")).toEqual("36");
+    expect(toMeters(": 36.5 kl")).toEqual("36.5");
   });
 
   it("Can set maximum decimal places.", () => {
