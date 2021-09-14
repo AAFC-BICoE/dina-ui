@@ -1,6 +1,7 @@
 import { clamp } from "lodash";
-import { all, create, MathJsStatic, BigNumber } from "mathjs";
+import { all, BigNumber, create, MathJsStatic } from "mathjs";
 import { ChangeEvent, useState } from "react";
+import accents from "remove-accents";
 import { TextField, TextFieldProps } from "./TextField";
 
 export function MetersField(props: TextFieldProps) {
@@ -61,6 +62,8 @@ math.createUnit("centimetre", "1 centimeter");
 math.createUnit("centimetres", "1 centimeter");
 math.createUnit("millimetre", "1 millimeter");
 math.createUnit("millimetres", "1 millimeter");
+math.createUnit("kilometre", "1 kilometer");
+math.createUnit("kilometres", "1 kilometer");
 
 const FEET_INCH_REGEX =
   /\s*([\d|\.]+)\s*(feet|foot|ft|pieds|pied|pd)\s*([\d|\.]+)\s*(inches|inch|in|pouces|pouce|po)\s*/i;
@@ -90,7 +93,7 @@ export function toMeters(
   try {
     // If the input is a number with a known distance unit:
     const inMeters = math
-      .evaluate(text.toLowerCase())
+      .evaluate(accents.remove(text).toLowerCase())
       .toNumber("m") as BigNumber;
     const decimalPlaces = math.bignumber(inMeters).decimalPlaces();
     return maxDecimalPlaces !== undefined
