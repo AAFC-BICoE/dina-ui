@@ -92,6 +92,7 @@ export function CollectingEventFormLayout({
     [selectedSearchResult, "nominatimAddressDetailSearch"],
     nominatimAddressDetailSearch,
     {
+      shouldRetryOnError: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false
     }
