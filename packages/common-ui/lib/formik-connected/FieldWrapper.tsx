@@ -120,23 +120,20 @@ export function FieldWrapper({
     />
   );
 
-  const [labelCol, valueCol] = isTemplate
-    ? typeof horizontal === "boolean"
-      ? [6, 6]
-      : horizontal || [12, 12]
-    : typeof horizontal === "boolean"
-    ? [6, 6]
-    : horizontal || [];
+  const [labelClass, valueClass] =
+    typeof horizontal === "boolean"
+      ? ["col-sm-6", "col-sm-6"]
+      : horizontal === "flex"
+      ? ["", "flex-grow-1"]
+      : horizontal?.map(col => `col-sm-${col}`) ||
+        (isTemplate ? ["col-sm-12", "col-sm-12"] : []);
 
   if (disabledByFormTemplate) {
     return null;
   }
 
   const fieldWrapperInternal = (
-    <div
-      className={valueCol ? `col-sm-${valueCol}` : ""}
-      style={{ cursor: "auto" }}
-    >
+    <div className={valueClass} style={{ cursor: "auto" }}>
       <FastField name={name}>
         {({ field: { value }, form, meta: { error } }) => (
           <>
@@ -184,13 +181,9 @@ export function FieldWrapper({
           className={classNames(
             `${name}-field`,
             customName && `${customName}-field`,
-            isTemplate
-              ? horizontal
-                ? "row col-sm-11"
-                : "col-sm-10"
-              : horizontal
-              ? "row"
-              : "w-100",
+            horizontal && (horizontal === "flex" ? "d-flex gap-2" : "row"),
+            isTemplate && `col-sm-${horizontal ? "11" : "10"}`,
+            !isTemplate && !horizontal && "w-100",
             !removeBottomMargin && "mb-3"
           )}
           htmlFor={disableLabelClick ? "none" : undefined}
@@ -198,7 +191,7 @@ export function FieldWrapper({
           {!removeLabel && (
             <div
               className={[
-                `${labelCol ? `col-sm-${labelCol}` : ""}`,
+                labelClass,
                 // Adjust alignment for editable inputs:
                 horizontal && !readOnly && !isTemplate ? "mt-sm-2" : "",
                 "mb-2"
