@@ -107,6 +107,7 @@ describe("Metadata single record edit page.", () => {
     jest.clearAllMocks();
     mockSave.mockImplementation(args => args.map(({ resource }) => resource));
     mockUseRouter.mockReturnValue({
+      push: () => undefined,
       query: {
         id: "25f81de5-bbee-430c-b5fa-71986b70e612"
       }

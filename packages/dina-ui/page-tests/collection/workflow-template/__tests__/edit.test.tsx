@@ -138,11 +138,6 @@ async function mountForm(
     wrapper
       .find(".workflow-main-details .name-field input")
       .simulate("change", { target: { value: "test-config" } });
-    // Set the group:
-    wrapper
-      .find(".workflow-main-details .group-field")
-      .find(Select)
-      .prop<any>("onChange")({ value: TEST_GROUP_1.name });
 
     await new Promise(setImmediate);
     wrapper.update();

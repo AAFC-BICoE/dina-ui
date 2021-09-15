@@ -132,9 +132,6 @@ export function CollectionFormFields({ title }) {
   return (
     <div>
       <div className="row">
-        <InstitutionSelectField name="institution" className="col-md-6" />
-      </div>
-      <div className="row">
         <GroupSelectField
           name="group"
           enableStoredDefaultGroup={true}

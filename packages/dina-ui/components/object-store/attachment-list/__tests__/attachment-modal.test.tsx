@@ -34,6 +34,7 @@ const mockBulkGet = jest.fn(async paths => {
 });
 
 const apiContext: any = {
+  apiClient: { get: () => undefined },
   bulkGet: mockBulkGet
 };
 

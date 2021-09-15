@@ -113,7 +113,7 @@ export function CollectingEventLinker({
           onSubmit={setFilters}
           innerRef={filterFormRef}
         >
-          <FieldSet legend={<DinaMessage id="search" />}>
+          <FieldSet legend={<DinaMessage id="search" />} className="non-strip">
             <div className="row">
               {/* Filter by agent? Un-comment when the back-end can allow this. */}
               {/* <ResourceSelectField<Person>

@@ -8,7 +8,7 @@ import {
 } from "common-ui";
 import { mount } from "enzyme";
 import { merge, noop } from "lodash";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { DndProvider } from "react-dnd-cjs";
 import HTML5Backend from "react-dnd-html5-backend-cjs";
 import { PartialDeep } from "type-fest";
@@ -30,6 +30,28 @@ export function MockAppContextProvider({
   apiContext,
   children
 }: MockAppContextProviderProps) {
+  const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = useMemo(
+    () => ({
+      authenticated: true,
+      groupNames: ["aafc", "cnc"],
+      initialized: true,
+      login: noop,
+      logout: noop,
+      roles: ["user"],
+      token: "test-token",
+      username: "test-user"
+    }),
+    []
+  );
+
+  const DEFAULT_API_CONTEXT_VALUE = useMemo(
+    () =>
+      new ApiClientImpl({
+        newId: () => "00000000-0000-0000-0000-000000000000"
+      }),
+    []
+  );
+
   const apiContextWithWarnings = {
     ...apiContext,
     // Add a warning when bulkGet doesn't return anything in a test:
@@ -86,18 +108,3 @@ export function mountWithAppContext(
     </MockAppContextProvider>
   );
 }
-
-const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = {
-  authenticated: true,
-  groupNames: ["aafc", "cnc"],
-  initialized: true,
-  login: noop,
-  logout: noop,
-  roles: ["user"],
-  token: "test-token",
-  username: "test-user"
-};
-
-const DEFAULT_API_CONTEXT_VALUE = new ApiClientImpl({
-  newId: () => "00000000-0000-0000-0000-000000000000"
-});

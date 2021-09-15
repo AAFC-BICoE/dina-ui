@@ -18,6 +18,7 @@ jest.mock("next/dynamic", () => () => {
 function testCollectionEvent(): Partial<CollectingEvent> {
   return {
     startEventDateTime: "2021-04-13",
+    verbatimEventDateTime: "2021-04-13",
     id: "1",
     type: "collecting-event",
     group: "test group"
@@ -63,6 +64,9 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/storage-unit-type":
     case "collection-api/storage-unit":
     case "objectstore-api/metadata":
+    case "collection-api/collection":
+    case "collection-api/collection-method":
+    case "collection-api/storage-unit/76575":
       return { data: [] };
   }
 });
@@ -123,9 +127,8 @@ describe("Material Sample Edit Page", () => {
       .find(".materialSampleName-field input")
       .simulate("change", { target: { value: "test-material-sample-id" } });
     wrapper
-      .find(".startEventDateTime-field input")
+      .find(".verbatimEventDateTime-field input")
       .simulate("change", { target: { value: "2019-12-21T16:00" } });
-
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
@@ -148,7 +151,7 @@ describe("Material Sample Edit Page", () => {
               ],
               managedAttributes: {},
               relationships: {},
-              startEventDateTime: "2019-12-21T16:00",
+              verbatimEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
             },
             type: "collecting-event"
@@ -309,7 +312,7 @@ describe("Material Sample Edit Page", () => {
 
     // Existing CollectingEvent should show up:
     expect(
-      wrapper.find(".startEventDateTime-field input").prop("value")
+      wrapper.find(".verbatimEventDateTime-field input").prop("value")
     ).toEqual("2021-04-13");
 
     wrapper.find("button.detach-collecting-event-button").simulate("click");
@@ -319,12 +322,12 @@ describe("Material Sample Edit Page", () => {
 
     // Existing CollectingEvent should be gone:
     expect(
-      wrapper.find(".startEventDateTime-field input").prop("value")
+      wrapper.find(".verbatimEventDateTime-field input").prop("value")
     ).toEqual("");
 
-    // Set the new Collecting Event's startEventDateTime:
+    // Set the new Collecting Event's verbatimEventDateTime:
     wrapper
-      .find(".startEventDateTime-field input")
+      .find(".verbatimEventDateTime-field input")
       .simulate("change", { target: { value: "2019-12-21T16:00" } });
 
     wrapper.find("form").simulate("submit");
@@ -348,7 +351,7 @@ describe("Material Sample Edit Page", () => {
               ],
               managedAttributes: {},
               relationships: {},
-              startEventDateTime: "2019-12-21T16:00",
+              verbatimEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
             },
             type: "collecting-event"
