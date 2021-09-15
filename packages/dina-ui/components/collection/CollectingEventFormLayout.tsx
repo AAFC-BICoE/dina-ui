@@ -18,14 +18,18 @@ import {
 } from "common-ui";
 import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
-import { Vocabulary } from "../../types/collection-api";
 import { ChangeEvent, useRef, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import useSWR from "swr";
 import { GeographySearchBox, GeoReferenceAssertionRow } from ".";
-import { GroupSelectField, useAddPersonModal } from "..";
+import {
+  GroupSelectField,
+  ParseVerbatimToRangeButton,
+  useAddPersonModal
+} from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
+import { Vocabulary } from "../../types/collection-api";
 import {
   CollectingEvent,
   GeographicPlaceNameSource
@@ -38,19 +42,16 @@ import {
   geographicPlaceSourceUrl,
   SourceAdministrativeLevel
 } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
-import { SRS } from "../../types/collection-api/resources/SRS";
 import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
 import { ManagedAttributesEditor } from "../object-store/managed-attributes/ManagedAttributesEditor";
 import { ManagedAttributesViewer } from "../object-store/managed-attributes/ManagedAttributesViewer";
+import { CollectionMethodSelectField } from "../resource-select-fields/resource-select-fields";
 import {
   nominatimAddressDetailSearch,
   NominatimAddressDetailSearchProps,
   NominatumApiAddressDetailSearchResult
 } from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
-import { VocabularySelectField } from "./VocabularySelectField";
-import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
-import { CollectionMethodSelectField } from "../resource-select-fields/resource-select-fields";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -92,6 +93,7 @@ export function CollectingEventFormLayout({
     [selectedSearchResult, "nominatimAddressDetailSearch"],
     nominatimAddressDetailSearch,
     {
+      shouldRetryOnError: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false
     }
@@ -555,7 +557,28 @@ export function CollectingEventFormLayout({
               onChangeExternal={onChangeExternal}
             />
             <TextField name="dwcVerbatimElevation" />
+            <div>
+              <ParseVerbatimToRangeButton
+                verbatimField="dwcVerbatimElevation"
+                rangeFields={[
+                  "dwcMinimumElevationInMeters",
+                  "dwcMaximumElevationInMeters"
+                ]}
+                buttonText={formatMessage("convertToElevationMinMax")}
+              />
+            </div>
             <TextField name="dwcVerbatimDepth" />
+            <div>
+              {" "}
+              <ParseVerbatimToRangeButton
+                verbatimField="dwcVerbatimDepth"
+                rangeFields={[
+                  "dwcMinimumDepthInMeters",
+                  "dwcMaximumDepthInMeters"
+                ]}
+                buttonText={formatMessage("convertToDepthMinMax")}
+              />
+            </div>
           </FieldSet>
         </div>
         <div className="col-md-6">

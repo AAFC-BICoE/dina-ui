@@ -98,6 +98,7 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
     error,
     isValidating: loading
   } = useSWR([queryKey, cacheId], fetchData, {
+    shouldRetryOnError: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false
   });
