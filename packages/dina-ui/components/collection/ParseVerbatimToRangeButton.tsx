@@ -1,4 +1,9 @@
-import { FormikButton, OnFormikSubmit, toMeters } from "common-ui";
+import {
+  FormikButton,
+  OnFormikSubmit,
+  toMeters,
+  useDinaFormContext
+} from "common-ui";
 import { useField } from "formik";
 import { get } from "lodash";
 import { CollectingEvent } from "../../types/collection-api";
@@ -34,7 +39,9 @@ export function ParseVerbatimToRangeButton({
     }
   };
 
-  return (
+  const { readOnly } = useDinaFormContext();
+
+  return readOnly ? null : (
     <FormikButton
       className="btn btn-info mb-3 parse-verbatim-to-range-button"
       onClick={convertToMinMax}
