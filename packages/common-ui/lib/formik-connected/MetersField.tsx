@@ -1,6 +1,6 @@
-import { clamp } from "lodash";
-import { all, BigNumber, create, MathJsStatic } from "mathjs";
-import { ChangeEvent, useState } from "react";
+import { clamp, isEqual } from "lodash";
+import { all, create, MathJsStatic, BigNumber } from "mathjs";
+import { ChangeEvent, useEffect, useState } from "react";
 import accents from "remove-accents";
 import { TextField, TextFieldProps } from "./TextField";
 
@@ -15,7 +15,7 @@ export function MetersField(props: TextFieldProps) {
 
 function MetersFieldInternal(inputProps: React.InputHTMLAttributes<any>) {
   // The value that shows up in the input. Stores the non-meters value (e.g. feet) while the user is typing.
-  const [inputVal, setInputVal] = useState(String(inputProps.value ?? ""));
+  const [inputVal, setInputVal] = useState("");
 
   const MAX_DECIMAL_PLACES = 2;
 
@@ -29,6 +29,14 @@ function MetersFieldInternal(inputProps: React.InputHTMLAttributes<any>) {
       target: { value: metersVal?.toString() ?? newVal }
     } as ChangeEvent<HTMLInputElement>);
   }
+
+  // When the outer form state changes, set the inner text state:
+  useEffect(() => {
+    const formStateVal = inputProps.value?.toString() ?? "";
+    if (!isEqual(toMeters(formStateVal), toMeters(inputVal))) {
+      setInputVal(formStateVal);
+    }
+  }, [inputProps.value]);
 
   return (
     <input
