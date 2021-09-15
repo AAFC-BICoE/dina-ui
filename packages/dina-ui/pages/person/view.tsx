@@ -9,6 +9,7 @@ import {
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
+import { PersonFormFields } from "../../../dina-ui/components/add-person/PersonFormFields";
 import { Footer, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
@@ -53,7 +54,7 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
               </h1>
               <LoadingSpinner loading={loading} />
               {person && (
-                <DinaForm<Person> initialValues={person}>
+                <DinaForm<Person> initialValues={person} readOnly={true}>
                   <div className="row">
                     <FieldView className="col-md-2" name="displayName" />
                   </div>
@@ -68,6 +69,12 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
                     <FieldView className="col-md-2" name="email" />
                     <FieldView className="col-md-2" name="organizations" />
                   </div>
+                  {!!person?.identifiers?.length && (
+                    <PersonFormFields
+                      divClassName="row"
+                      fieldClassName="col-md-4"
+                    />
+                  )}
                   <div className="row">
                     <FieldView className="col-md-2" name="createdBy" />
                     <FieldView className="col-md-2" name="createdOn" />

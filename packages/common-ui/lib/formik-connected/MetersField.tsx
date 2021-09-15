@@ -1,6 +1,7 @@
 import { clamp, isEqual } from "lodash";
 import { all, create, MathJsStatic, BigNumber } from "mathjs";
 import { ChangeEvent, useEffect, useState } from "react";
+import accents from "remove-accents";
 import { TextField, TextFieldProps } from "./TextField";
 
 export function MetersField(props: TextFieldProps) {
@@ -69,17 +70,22 @@ math.createUnit("centimetre", "1 centimeter");
 math.createUnit("centimetres", "1 centimeter");
 math.createUnit("millimetre", "1 millimeter");
 math.createUnit("millimetres", "1 millimeter");
+math.createUnit("kilometre", "1 kilometer");
+math.createUnit("kilometres", "1 kilometer");
 
 const FEET_INCH_REGEX =
   /\s*([\d|\.]+)\s*(feet|foot|ft|pieds|pied|pd)\s*([\d|\.]+)\s*(inches|inch|in|pouces|pouce|po)\s*/i;
 
 const NUMBERS_ONLY_REGEX = /^\s*([\d|\.]+)\s*$/;
 
+const CONTAINS_NUMBERS_REGEX = /([\d|\.]+)/;
+
 /** Returns a string if the conversion can be done, otherwise returns null. */
 export function toMeters(
   text: string,
   maxDecimalPlaces?: number
 ): string | null {
+  // If the input is just a number:
   const numberOnlyMatch = NUMBERS_ONLY_REGEX.exec(text);
   if (numberOnlyMatch) {
     return toMeters(`${text} meters`, maxDecimalPlaces);
@@ -93,14 +99,22 @@ export function toMeters(
   }
 
   try {
+    // If the input is a number with a known distance unit:
     const inMeters = math
-      .evaluate(text.toLowerCase())
+      .evaluate(accents.remove(text).toLowerCase())
       .toNumber("m") as BigNumber;
     const decimalPlaces = math.bignumber(inMeters).decimalPlaces();
     return maxDecimalPlaces !== undefined
       ? inMeters.toFixed(clamp(decimalPlaces, maxDecimalPlaces))
       : String(inMeters);
   } catch (error) {
+    // If the input contains a number:
+    const containsNumbersMatch = CONTAINS_NUMBERS_REGEX.exec(text);
+    if (containsNumbersMatch) {
+      const [_, matchedNumber] = containsNumbersMatch;
+      return toMeters(matchedNumber, maxDecimalPlaces);
+    }
+
     return null;
   }
 }

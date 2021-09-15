@@ -32,6 +32,9 @@ describe("MetersField component", () => {
     expect(toMeters("1 meter")).toEqual("1");
     expect(toMeters("1 metre")).toEqual("1");
     expect(toMeters("1 metres")).toEqual("1");
+    expect(toMeters("1 kilometer")).toEqual("1000");
+    expect(toMeters("1 kilometre")).toEqual("1000");
+    expect(toMeters("1 kilometres")).toEqual("1000");
     expect(toMeters("1 pd")).toEqual("0.3048");
     expect(toMeters("1 pied")).toEqual("0.3048");
     expect(toMeters("1 pieds")).toEqual("0.3048");
@@ -40,8 +43,15 @@ describe("MetersField component", () => {
     expect(toMeters("1 pouces")).toEqual("0.0254");
     expect(toMeters("3pd 3po")).toEqual("0.9906");
 
+    // Accepts french units with the accent:
+    expect(toMeters("1 kilomètre")).toEqual("1000");
+
     // Accepts a value without units as meters:
     expect(toMeters("1.1111")).toEqual("1.1111");
+
+    // Matches a number in a string with other unknown text in it:
+    expect(toMeters(": 36 kl")).toEqual("36");
+    expect(toMeters(": 36.5 kl")).toEqual("36.5");
   });
 
   it("Can set maximum decimal places.", () => {

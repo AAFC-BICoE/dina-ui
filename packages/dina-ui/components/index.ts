@@ -1,4 +1,5 @@
 export * from "./add-person/PersonForm";
+export * from "./add-person/PersonFormFields";
 export * from "./button-bar/nav/nav";
 export * from "./button-bar/ResourceViewButtonBar";
 export * from "./error/ErrorBoundaryPage";
