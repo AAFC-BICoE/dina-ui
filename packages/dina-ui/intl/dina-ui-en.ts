@@ -411,6 +411,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   saveAndCreateNewMaterialSampleButton: "Save & Create New Material Sample",
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
   searchButton: "Search",
+  searchPreviousTags: "Search previous tags",
   searchResults: "Search Results ({resultSize})",
   searchStorage: "Search Storage",
   selectCollectorGroupLabel:
@@ -461,6 +462,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   to: "To",
   tooltipDefaultLinkMessage: "Click here to learn more.",
   toponymyLegend: "Current Geographic Place",
+  typeNewTagOrSearchPreviousTags: "Type New Tag or Search Previous Tags",
   typeSpecimen: "Type Specimen",
   uploadButtonText: "Upload",
   uploadFilesMaxSize: "The maximum file size is {maxSize}.",

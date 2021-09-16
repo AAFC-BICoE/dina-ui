@@ -1,20 +1,20 @@
-import {
-  DinaFormSection,
-  FieldWrapper,
-  FieldWrapperProps,
-  ToggleField
-} from "common-ui";
-import { AiFillTag, AiFillTags } from "react-icons/ai";
-import CreatableSelect from "react-select/creatable";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { DinaFormSection, ToggleField } from "common-ui";
+import { AiFillTags } from "react-icons/ai";
+import { DinaMessage } from "../../intl/dina-ui-intl";
+import { TagSelectField } from "./TagSelectField";
 
-// export interface TagFieldProps extends FieldWrapperProps {}
+export interface TagsAndRestrictionsSection {
+  resourcePath?: string;
+}
 
-export function TagsAndRestrictionsSection() {
+export function TagsAndRestrictionsSection({
+  resourcePath
+}: TagsAndRestrictionsSection) {
   return (
     <div className="row">
       <DinaFormSection horizontal="flex">
         <TagSelectField
+          resourcePath={resourcePath}
           className="col-sm-6"
           name="tags"
           label={
@@ -26,60 +26,5 @@ export function TagsAndRestrictionsSection() {
         <ToggleField className="col-sm-6" name="publiclyReleasable" />
       </DinaFormSection>
     </div>
-  );
-}
-
-export interface TagSelectOption {
-  label: string;
-  value: string;
-}
-
-export function TagSelectField(props: FieldWrapperProps) {
-  const { formatMessage } = useDinaIntl();
-
-  function toOption(value: string): TagSelectOption {
-    return { label: value, value };
-  }
-
-  return (
-    <FieldWrapper
-      {...props}
-      readOnlyRender={value => (
-        <div className="d-flex flex-wrap gap-2">
-          {(value ?? []).map((tag, index) => (
-            <div
-              key={index}
-              className="card p-1 flex-row align-items-center gap-1"
-              style={{ background: "rgb(221, 221, 221)" }}
-            >
-              <AiFillTag />
-              <span>{tag}</span>
-            </div>
-          ))}
-        </div>
-      )}
-    >
-      {({ value, setValue }) => {
-        const selectedOptions = (value ?? []).map(toOption);
-
-        function setAsStringArray(selected: TagSelectOption[]) {
-          setValue(selected.map(option => option.value));
-        }
-
-        return (
-          <CreatableSelect<TagSelectOption, true>
-            isMulti={true}
-            isClearable={true}
-            options={[]}
-            value={selectedOptions}
-            onChange={setAsStringArray}
-            placeholder={formatMessage("selectOrType")}
-            formatCreateLabel={inputValue =>
-              `${formatMessage("add")} "${inputValue}"`
-            }
-          />
-        );
-      }}
-    </FieldWrapper>
   );
 }
