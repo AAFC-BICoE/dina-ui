@@ -1,17 +1,30 @@
-import { DinaFormSection, FieldWrapper, FieldWrapperProps } from "common-ui";
+import {
+  DinaFormSection,
+  FieldWrapper,
+  FieldWrapperProps,
+  ToggleField
+} from "common-ui";
+import { AiFillTag, AiFillTags } from "react-icons/ai";
 import CreatableSelect from "react-select/creatable";
-import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 // export interface TagFieldProps extends FieldWrapperProps {}
 
 export function TagsAndRestrictionsSection() {
   return (
     <div className="row">
-      <div className="col-6">
-        <DinaFormSection horizontal="flex">
-          <TagSelectField name="tags" />
-        </DinaFormSection>
-      </div>
+      <DinaFormSection horizontal="flex">
+        <TagSelectField
+          className="col-sm-6"
+          name="tags"
+          label={
+            <span>
+              <AiFillTags /> <DinaMessage id="tags" />
+            </span>
+          }
+        />
+        <ToggleField className="col-sm-6" name="publiclyReleasable" />
+      </DinaFormSection>
     </div>
   );
 }
@@ -29,7 +42,23 @@ export function TagSelectField(props: FieldWrapperProps) {
   }
 
   return (
-    <FieldWrapper {...props}>
+    <FieldWrapper
+      {...props}
+      readOnlyRender={value => (
+        <div className="d-flex flex-wrap gap-2">
+          {(value ?? []).map((tag, index) => (
+            <div
+              key={index}
+              className="card p-1 flex-row align-items-center gap-1"
+              style={{ background: "rgb(221, 221, 221)" }}
+            >
+              <AiFillTag />
+              <span>{tag}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    >
       {({ value, setValue }) => {
         const selectedOptions = (value ?? []).map(toOption);
 

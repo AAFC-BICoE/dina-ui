@@ -17,7 +17,8 @@ import {
   Head,
   MaterialSampleBreadCrumb,
   Nav,
-  StorageLinkerField
+  StorageLinkerField,
+  TagsAndRestrictionsSection
 } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { DeterminationField } from "../../../components/collection/DeterminationField";
@@ -106,6 +107,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 disableLastLink={true}
               />
               <MaterialSampleMainInfoFormLayout />
+              <TagsAndRestrictionsSection />
               <MaterialSampleIdentifiersFormLayout />
               {collectingEvent && (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
