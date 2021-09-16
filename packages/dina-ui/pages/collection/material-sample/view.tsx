@@ -17,6 +17,7 @@ import {
   Head,
   MaterialSampleBreadCrumb,
   Nav,
+  NotPubliclyReleasableWarning,
   StorageLinkerField,
   TagsAndRestrictionsSection
 } from "../../../components";
@@ -95,9 +96,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         return (
           <main className="container-fluid">
             {buttonBar}
-            <h1 id="wb-cont">
-              <DinaMessage id="materialSampleViewTitle" />
-            </h1>
             <DinaForm<MaterialSample>
               initialValues={materialSample}
               readOnly={true}
@@ -106,6 +104,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 materialSample={materialSample}
                 disableLastLink={true}
               />
+              <NotPubliclyReleasableWarning />
+              <h1 id="wb-cont">
+                <DinaMessage id="materialSampleViewTitle" />
+              </h1>
               <MaterialSampleMainInfoFormLayout />
               <TagsAndRestrictionsSection />
               <MaterialSampleIdentifiersFormLayout />

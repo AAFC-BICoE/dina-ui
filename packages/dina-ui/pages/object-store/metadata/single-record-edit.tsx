@@ -17,7 +17,13 @@ import {
 import { useFormikContext } from "formik";
 import { keys } from "lodash";
 import { NextRouter, useRouter } from "next/router";
-import { Footer, Head, Nav } from "../../../components";
+import {
+  Footer,
+  Head,
+  Nav,
+  NotPubliclyReleasableWarning,
+  TagsAndRestrictionsSection
+} from "../../../components";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -100,18 +106,13 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
     { label: formatMessage("false"), value: false }
   ];
 
-  // Convert acTags array to a comma-separated string:
-  const initialValues = {
-    ...metadata,
-    acTags: metadata.acTags?.join(", ") ?? ""
-  };
+  const initialValues = { ...metadata };
 
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
     api: { apiClient, save }
   }) => {
     const {
-      acTags,
       // Don't include derivatives in the form submission:
       derivatives,
       license,
@@ -133,10 +134,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
       metadataValues.xmpRightsUsageTerms = "";
     }
 
-    const metadataEdit = {
-      ...metadataValues,
-      acTags: acTags.split(",").map(tag => tag.trim())
-    };
+    const metadataEdit = { ...metadataValues };
 
     // Remove blank managed attribute values from the map:
     const blankValues: any[] = ["", null];
@@ -168,10 +166,15 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+      <NotPubliclyReleasableWarning />
       {buttonBar}
       <div className="mb-3">
         <MetadataFileView metadata={metadata} imgHeight="15rem" />
       </div>
+      <TagsAndRestrictionsSection
+        resourcePath="objectstore-api/metadata"
+        tagsFieldName="acTags"
+      />
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
         <div className="row">
           <TextField
@@ -192,12 +195,6 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
             options={DCTYPE_OPTIONS}
           />
           <TextField className="col-md-3 col-sm-4" name="acCaption" />
-          <TextField
-            className="col-md-3 col-sm-4"
-            name="acTags"
-            multiLines={true}
-            label={formatMessage("metadataBulkEditTagsLabel")}
-          />
         </div>
         <div className="row">
           <ResourceSelectField<Person>

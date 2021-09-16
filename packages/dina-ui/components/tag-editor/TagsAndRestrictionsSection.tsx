@@ -5,10 +5,12 @@ import { TagSelectField } from "./TagSelectField";
 
 export interface TagsAndRestrictionsSection {
   resourcePath?: string;
+  tagsFieldName?: string;
 }
 
 export function TagsAndRestrictionsSection({
-  resourcePath
+  resourcePath,
+  tagsFieldName = "tags"
 }: TagsAndRestrictionsSection) {
   return (
     <div className="row">
@@ -16,7 +18,7 @@ export function TagsAndRestrictionsSection({
         <TagSelectField
           resourcePath={resourcePath}
           className="col-sm-6"
-          name="tags"
+          name={tagsFieldName}
           label={
             <span>
               <AiFillTags /> <DinaMessage id="tags" />

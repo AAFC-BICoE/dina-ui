@@ -66,10 +66,17 @@ interface TagSelectProps {
   onChange: (newValue: string[]) => void;
   resourcePath?: string;
   invalid?: boolean;
+  tagsFieldName?: string;
 }
 
 /** Tag Select/Create field. */
-function TagSelect({ value, onChange, resourcePath, invalid }: TagSelectProps) {
+function TagSelect({
+  value,
+  onChange,
+  resourcePath,
+  invalid,
+  tagsFieldName = "tags"
+}: TagSelectProps) {
   const { formatMessage } = useDinaIntl();
   const { roles, groupNames } = useAccount();
 
@@ -79,7 +86,7 @@ function TagSelect({ value, onChange, resourcePath, invalid }: TagSelectProps) {
   const typeName = last(resourcePath?.split("/"));
 
   const filter = filterBy(
-    ["tags"],
+    [tagsFieldName],
     !roles.includes("dina-admin")
       ? {
           extraFilters: [
@@ -98,7 +105,7 @@ function TagSelect({ value, onChange, resourcePath, invalid }: TagSelectProps) {
     {
       path: resourcePath ?? "",
       sort: "-createdOn",
-      fields: typeName ? { [typeName]: "tags" } : undefined,
+      fields: typeName ? { [typeName]: tagsFieldName } : undefined,
       filter: {
         tags: { NEQ: "null" },
         ...filter("")

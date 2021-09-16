@@ -359,6 +359,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   noneTopLevel: "None (Top-level)",
   notEditableWhenThereAreChildStorageUnits:
     "Not editable when there are child Storage Units.",
+  notPubliclyReleasable: "Not Publicly Releasable",
   objectListTitle: "Stored Objects",
   objectStoreDataUnavailable: "Object Store data unavailable",
   objectStoreDetailsTitle: "Object Store Details",
