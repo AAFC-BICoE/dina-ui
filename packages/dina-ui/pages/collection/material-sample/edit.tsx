@@ -219,7 +219,7 @@ export function MaterialSampleForm({
           />
         )}
         {!isTemplate && <MaterialSampleMainInfoFormLayout />}
-        <TagsAndRestrictionsSection />
+        <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
         <MaterialSampleIdentifiersFormLayout />
         <DataComponentToggler state={dataComponentState} />
         <div className="data-components">

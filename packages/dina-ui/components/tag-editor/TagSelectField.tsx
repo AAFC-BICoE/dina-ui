@@ -1,6 +1,6 @@
 import { FieldWrapper, FieldWrapperProps, useQuery } from "common-ui";
 import { KitsuResource } from "kitsu";
-import { compact, uniq } from "lodash";
+import { compact, uniq, last } from "lodash";
 import { useMemo, useState } from "react";
 import { AiFillTag } from "react-icons/ai";
 import CreatableSelect from "react-select/creatable";
@@ -8,6 +8,7 @@ import { useDebounce } from "use-debounce";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface TagSelectFieldProps extends FieldWrapperProps {
+  /** The API path to search for previous tags. */
   resourcePath?: string;
 }
 
@@ -70,22 +71,26 @@ function TagSelect({ value, onChange, resourcePath, invalid }: TagSelectProps) {
   const [inputValue, setInputValue] = useState("");
 
   /** The debounced input value passed to the fetcher. */
-  const [searchValue, { isPending }] = useDebounce(inputValue, 250);
+  // const [searchValue, { isPending }] = useDebounce(inputValue, 250);
+
+  const typeName = last(resourcePath?.split("/"));
 
   const { loading, response } = useQuery<KitsuResourceWithTags[]>(
     {
       path: resourcePath ?? "",
       sort: "-createdOn",
-      filter: { rsql: `tags==*${searchValue}*` }
+      fields: typeName ? { [typeName]: "tags" } : undefined,
+      filter: { tags: { NEQ: "null" } },
+      page: { limit: 100 }
     },
     { disabled: !resourcePath }
   );
 
   const previousTagsOptions = useMemo(
     () =>
-      uniq(compact((response?.data ?? []).flatMap(({ tags }) => tags))).map(
-        tag => ({ label: tag, value: tag })
-      ),
+      uniq(compact((response?.data ?? []).flatMap(({ tags }) => tags)))
+        .filter(tag => tag.includes(inputValue))
+        .map(tag => ({ label: tag, value: tag })),
     [response]
   );
 
@@ -129,7 +134,7 @@ function TagSelect({ value, onChange, resourcePath, invalid }: TagSelectProps) {
       // Select config:
       styles={customStyle}
       isMulti={true}
-      isLoading={loading || isPending()}
+      isLoading={loading}
       allowCreateWhileLoading={true}
       isClearable={true}
       placeholder={formatMessage("typeNewTagOrSearchPreviousTags")}
