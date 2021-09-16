@@ -3,7 +3,7 @@ import Link from "next/link";
 import React from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { intlContext } from "../../../../common-ui/lib/intl/IntlSupport";
 import Dropdown from "react-bootstrap/Dropdown";
 
@@ -123,10 +123,29 @@ export function Nav() {
   );
 }
 
+function menuDisplayControl() {
+  const [show, setShow] = useState(false);
+  const showDropdown = () => {
+    setShow(true);
+  };
+  const hideDropdown = () => {
+    setShow(false);
+  };
+  return { show, showDropdown, hideDropdown };
+}
+
 /** Object Store links. */
 function NavObjectStoreDropdown() {
+  const { show, showDropdown, hideDropdown } = menuDisplayControl();
+
   return (
-    <Dropdown className="dropdown">
+    <Dropdown
+      className="dropdown"
+      show={show}
+      onMouseOver={showDropdown}
+      onMouseOut={hideDropdown}
+      onKeyDown={showDropdown}
+    >
       <Dropdown.Toggle className="nav-link dropdown-toggle">
         <DinaMessage id="objectStoreTitle" />
       </Dropdown.Toggle>
@@ -155,6 +174,7 @@ function NavObjectStoreDropdown() {
         <Dropdown.Item
           className="dropdown-item"
           href="/object-store/revisions-by-user"
+          onBlur={hideDropdown}
         >
           <DinaMessage id="revisionsByUserPageTitle" />
         </Dropdown.Item>
@@ -165,8 +185,15 @@ function NavObjectStoreDropdown() {
 
 /** Agents links. */
 function NavAgentsDropdown() {
+  const { show, showDropdown, hideDropdown } = menuDisplayControl();
   return (
-    <Dropdown className="dropdown">
+    <Dropdown
+      className="dropdown"
+      show={show}
+      onMouseOver={showDropdown}
+      onMouseOut={hideDropdown}
+      onKeyDown={showDropdown}
+    >
       <Dropdown.Toggle className="nav-link dropdown-toggle">
         <DinaMessage id="agentsSectionTitle" />
       </Dropdown.Toggle>
@@ -174,7 +201,11 @@ function NavAgentsDropdown() {
         <Dropdown.Item href="/person/list" className="dropdown-item">
           <DinaMessage id="personListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/organization/list" className="dropdown-item">
+        <Dropdown.Item
+          href="/organization/list"
+          className="dropdown-item"
+          onBlur={hideDropdown}
+        >
           <DinaMessage id="organizationListTitle" />
         </Dropdown.Item>
       </Dropdown.Menu>
@@ -185,9 +216,16 @@ function NavAgentsDropdown() {
 /** Dina User links. */
 function NavDinaUserDropdown() {
   const { subject } = useAccount();
+  const { show, showDropdown, hideDropdown } = menuDisplayControl();
 
   return (
-    <Dropdown className="dropdown">
+    <Dropdown
+      className="dropdown"
+      show={show}
+      onMouseOver={showDropdown}
+      onMouseOut={hideDropdown}
+      onKeyDown={showDropdown}
+    >
       <Dropdown.Toggle className="nav-link dropdown-toggle">
         <DinaMessage id="dinaUserSectionTitle" />
       </Dropdown.Toggle>
@@ -198,6 +236,7 @@ function NavDinaUserDropdown() {
         <Dropdown.Item
           className="dropdown-item"
           href={`/dina-user/view?id=${subject}`}
+          onBlur={hideDropdown}
         >
           <DinaMessage id="whoAmITitle" />
         </Dropdown.Item>
@@ -208,8 +247,15 @@ function NavDinaUserDropdown() {
 
 /** Seqdb UI links. */
 function NavSeqDBDropdown() {
+  const { show, showDropdown, hideDropdown } = menuDisplayControl();
   return (
-    <Dropdown className="dropdown">
+    <Dropdown
+      className="dropdown"
+      show={show}
+      onMouseOver={showDropdown}
+      onMouseOut={hideDropdown}
+      onKeyDown={showDropdown}
+    >
       <Dropdown.Toggle className="nav-link dropdown-toggle" href="#">
         <SeqdbMessage id="seqdbTitle" />
       </Dropdown.Toggle>
@@ -247,6 +293,7 @@ function NavSeqDBDropdown() {
         <Dropdown.Item
           className="dropdown-item"
           href="/seqdb/molecular-sample/list"
+          onBlur={hideDropdown}
         >
           <SeqdbMessage id="molecularSampleListTitle" />
         </Dropdown.Item>
@@ -257,8 +304,15 @@ function NavSeqDBDropdown() {
 
 /** Collecting event links. */
 function NavCollectionDropdown() {
+  const { show, showDropdown, hideDropdown } = menuDisplayControl();
   return (
-    <Dropdown className="dropdown">
+    <Dropdown
+      className="dropdown"
+      show={show}
+      onMouseOver={showDropdown}
+      onMouseOut={hideDropdown}
+      onKeyDown={showDropdown}
+    >
       <Dropdown.Toggle className="nav-link dropdown-toggle" href="#">
         <DinaMessage id="collectionSectionTitle" />
       </Dropdown.Toggle>
@@ -338,6 +392,7 @@ function NavCollectionDropdown() {
         <Dropdown.Item
           className="dropdown-item d-none"
           href="/collection/collector-group/list"
+          onBlur={hideDropdown}
         >
           <DinaMessage id="collectorGroupListTitle" />
         </Dropdown.Item>
