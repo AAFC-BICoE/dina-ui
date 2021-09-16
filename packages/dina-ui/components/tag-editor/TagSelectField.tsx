@@ -1,10 +1,15 @@
-import { FieldWrapper, FieldWrapperProps, useQuery } from "common-ui";
+import {
+  FieldWrapper,
+  FieldWrapperProps,
+  filterBy,
+  useAccount,
+  useQuery
+} from "common-ui";
 import { KitsuResource } from "kitsu";
-import { compact, uniq, last } from "lodash";
+import { compact, last, uniq } from "lodash";
 import { useMemo, useState } from "react";
 import { AiFillTag } from "react-icons/ai";
 import CreatableSelect from "react-select/creatable";
-import { useDebounce } from "use-debounce";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface TagSelectFieldProps extends FieldWrapperProps {
@@ -66,21 +71,38 @@ interface TagSelectProps {
 /** Tag Select/Create field. */
 function TagSelect({ value, onChange, resourcePath, invalid }: TagSelectProps) {
   const { formatMessage } = useDinaIntl();
+  const { roles, groupNames } = useAccount();
 
   /** The value of the input element. */
   const [inputValue, setInputValue] = useState("");
 
-  /** The debounced input value passed to the fetcher. */
-  // const [searchValue, { isPending }] = useDebounce(inputValue, 250);
-
   const typeName = last(resourcePath?.split("/"));
+
+  const filter = filterBy(
+    ["tags"],
+    !roles.includes("dina-admin")
+      ? {
+          extraFilters: [
+            // Restrict the list to just the user's groups:
+            {
+              selector: "group",
+              comparison: "=in=",
+              arguments: (groupNames || []).join(",")
+            }
+          ]
+        }
+      : undefined
+  );
 
   const { loading, response } = useQuery<KitsuResourceWithTags[]>(
     {
       path: resourcePath ?? "",
       sort: "-createdOn",
       fields: typeName ? { [typeName]: "tags" } : undefined,
-      filter: { tags: { NEQ: "null" } },
+      filter: {
+        tags: { NEQ: "null" },
+        ...filter("")
+      },
       page: { limit: 100 }
     },
     { disabled: !resourcePath }
