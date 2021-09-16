@@ -85,6 +85,7 @@ export function Nav() {
                 {`
                 .dropdown:hover .dropdown-menu {
                     display: block;
+                    margin-top: -5px;
                 }
                 .dropdown .nav-link {
                   color: rgb(232, 230, 227);
@@ -140,16 +141,15 @@ function NavObjectStoreDropdown() {
 
   return (
     <Dropdown
-      className="dropdown"
-      show={show}
       onMouseOver={showDropdown}
-      onMouseOut={hideDropdown}
       onKeyDown={showDropdown}
+      onMouseLeave={hideDropdown}
+      show={show}
     >
-      <Dropdown.Toggle className="nav-link dropdown-toggle">
+      <Dropdown.Toggle className="nav-link">
         <DinaMessage id="objectStoreTitle" />
       </Dropdown.Toggle>
-      <Dropdown.Menu className="dropdown-menu m-0">
+      <Dropdown.Menu>
         <Dropdown.Item className="dropdown-item" href="/object-store/upload">
           <DinaMessage id="uploadPageTitle" />
         </Dropdown.Item>
@@ -188,16 +188,15 @@ function NavAgentsDropdown() {
   const { show, showDropdown, hideDropdown } = menuDisplayControl();
   return (
     <Dropdown
-      className="dropdown"
       show={show}
       onMouseOver={showDropdown}
-      onMouseOut={hideDropdown}
+      onMouseLeave={hideDropdown}
       onKeyDown={showDropdown}
     >
-      <Dropdown.Toggle className="nav-link dropdown-toggle">
+      <Dropdown.Toggle className="nav-link">
         <DinaMessage id="agentsSectionTitle" />
       </Dropdown.Toggle>
-      <Dropdown.Menu className="dropdown-menu m-0">
+      <Dropdown.Menu>
         <Dropdown.Item href="/person/list" className="dropdown-item">
           <DinaMessage id="personListTitle" />
         </Dropdown.Item>
@@ -220,16 +219,15 @@ function NavDinaUserDropdown() {
 
   return (
     <Dropdown
-      className="dropdown"
       show={show}
       onMouseOver={showDropdown}
-      onMouseOut={hideDropdown}
+      onMouseLeave={hideDropdown}
       onKeyDown={showDropdown}
     >
-      <Dropdown.Toggle className="nav-link dropdown-toggle">
+      <Dropdown.Toggle className="nav-link">
         <DinaMessage id="dinaUserSectionTitle" />
       </Dropdown.Toggle>
-      <Dropdown.Menu className="dropdown-menu m-0">
+      <Dropdown.Menu>
         <Dropdown.Item className="dropdown-item" href="/dina-user/list">
           <DinaMessage id="userListTitle" />
         </Dropdown.Item>
@@ -250,16 +248,15 @@ function NavSeqDBDropdown() {
   const { show, showDropdown, hideDropdown } = menuDisplayControl();
   return (
     <Dropdown
-      className="dropdown"
       show={show}
       onMouseOver={showDropdown}
-      onMouseOut={hideDropdown}
+      onMouseLeave={hideDropdown}
       onKeyDown={showDropdown}
     >
-      <Dropdown.Toggle className="nav-link dropdown-toggle" href="#">
+      <Dropdown.Toggle className="nav-link" href="#">
         <SeqdbMessage id="seqdbTitle" />
       </Dropdown.Toggle>
-      <Dropdown.Menu className="dropdown-menu m-0">
+      <Dropdown.Menu>
         <Dropdown.Item className="dropdown-item" href="/seqdb/workflow/list">
           <SeqdbMessage id="workflowListTitle" />
         </Dropdown.Item>
@@ -307,16 +304,15 @@ function NavCollectionDropdown() {
   const { show, showDropdown, hideDropdown } = menuDisplayControl();
   return (
     <Dropdown
-      className="dropdown"
       show={show}
       onMouseOver={showDropdown}
-      onMouseOut={hideDropdown}
+      onMouseLeave={hideDropdown}
       onKeyDown={showDropdown}
     >
-      <Dropdown.Toggle className="nav-link dropdown-toggle" href="#">
+      <Dropdown.Toggle className="nav-link" href="#">
         <DinaMessage id="collectionSectionTitle" />
       </Dropdown.Toggle>
-      <Dropdown.Menu className="dropdown-menu m-0">
+      <Dropdown.Menu>
         <Dropdown.Item
           className="dropdown-item"
           href="/collection/collection/list"
