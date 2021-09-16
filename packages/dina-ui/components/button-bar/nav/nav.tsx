@@ -89,6 +89,10 @@ export function Nav() {
                 }
                 .dropdown .nav-link {
                   color: rgb(232, 230, 227);
+                  border-width: 0px;
+                }
+                .dropdown:hover .nav-link{
+                  background-color: #38414d;
                 }
               `}
               </style>
