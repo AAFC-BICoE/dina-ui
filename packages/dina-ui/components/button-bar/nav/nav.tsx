@@ -386,13 +386,13 @@ function NavCollectionDropdown() {
         <Dropdown.Item
           className="dropdown-item"
           href="/collection/revisions-by-user/"
+          onBlur={hideDropdown}
         >
           <DinaMessage id="revisionsByUserPageTitle" />
         </Dropdown.Item>
         <Dropdown.Item
           className="dropdown-item d-none"
           href="/collection/collector-group/list"
-          onBlur={hideDropdown}
         >
           <DinaMessage id="collectorGroupListTitle" />
         </Dropdown.Item>
