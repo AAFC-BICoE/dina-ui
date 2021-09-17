@@ -1,4 +1,5 @@
-import { DinaFormSection, ToggleField } from "common-ui";
+import { DinaFormSection, TextField, ToggleField } from "common-ui";
+import { Field } from "formik";
 import { AiFillTags } from "react-icons/ai";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { TagSelectField } from "./TagSelectField";
@@ -25,7 +26,22 @@ export function TagsAndRestrictionsSection({
             </span>
           }
         />
-        <ToggleField className="col-sm-6" name="publiclyReleasable" />
+        <div className="col-sm-6">
+          <ToggleField name="publiclyReleasable" />
+          <DinaFormSection horizontal={false}>
+            <Field name="publiclyReleasable">
+              {({ field: { value: pr } }) =>
+                !pr ? (
+                  <TextField
+                    name="notPubliclyReleasableReason"
+                    className="flex-grow-1"
+                    multiLines={true}
+                  />
+                ) : null
+              }
+            </Field>
+          </DinaFormSection>
+        </div>
       </DinaFormSection>
     </div>
   );

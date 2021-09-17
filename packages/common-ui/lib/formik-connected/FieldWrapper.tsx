@@ -122,11 +122,11 @@ export function FieldWrapper({
   );
 
   const [labelClass, valueClass] =
-    typeof horizontal === "boolean"
+    horizontal === true
       ? ["col-sm-6", "col-sm-6"]
       : horizontal === "flex"
       ? ["", "flex-grow-1"]
-      : horizontal?.map(col => `col-sm-${col}`) ||
+      : (horizontal || []).map(col => `col-sm-${col}`) ||
         (isTemplate ? ["col-sm-12", "col-sm-12"] : []);
 
   if (disabledByFormTemplate) {

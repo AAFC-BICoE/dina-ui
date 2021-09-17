@@ -337,12 +337,15 @@ export function CollectingEventFormLayout({
       {!isTemplate && (
         <DinaFormSection horizontal={[3, 9]}>
           <div className="row">
-            <div className="col-md-6">
-              <GroupSelectField name="group" enableStoredDefaultGroup={true} />
-            </div>
-            <div className="col-md-6">
-              <StringArrayField name="dwcOtherRecordNumbers" />
-            </div>
+            <GroupSelectField
+              className="col-md-6"
+              name="group"
+              enableStoredDefaultGroup={true}
+            />
+            <StringArrayField
+              className="col-md-6"
+              name="dwcOtherRecordNumbers"
+            />
           </div>
         </DinaFormSection>
       )}
