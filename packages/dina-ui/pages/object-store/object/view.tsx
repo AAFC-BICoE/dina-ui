@@ -72,32 +72,23 @@ export default function MetadataViewPage() {
         <Nav />
         <style>{OBJECT_DETAILS_PAGE_CSS}</style>
         <main className="container-fluid">
-          {buttonBar}
           <div className="row">
             <div className="col-md-4">
               <MetadataFileView metadata={metadata} />
             </div>
             <div className="col-md-8">
               <div className="container">
+                {buttonBar}
                 <DinaForm initialValues={metadata} readOnly={true}>
-                  <div className="mb-3">
-                    <Link
-                      href={`/object-store/metadata/single-record-edit?id=${id}`}
-                    >
-                      <a className="btn btn-primary">
-                        <DinaMessage id="editButtonText" />
-                      </a>
-                    </Link>
-                  </div>
                   <NotPubliclyReleasableWarning />
                   <TagsAndRestrictionsSection tagsFieldName="acTags" />
                   <MetadataDetails metadata={metadata} />
                   <ExifView objectUpload={metadata.objectUpload} />
                 </DinaForm>
+                {buttonBar}
               </div>
             </div>
           </div>
-          {buttonBar}
         </main>
         <Footer />
       </div>
