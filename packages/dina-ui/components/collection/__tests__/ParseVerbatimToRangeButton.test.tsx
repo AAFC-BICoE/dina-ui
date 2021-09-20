@@ -57,21 +57,4 @@ describe("ParseVerbatimToRangeButton component", () => {
       min: "1"
     });
   });
-
-  it("Disables the button when there is a current min value.", async () => {
-    const wrapper = mountWithAppContext(
-      <DinaForm
-        initialValues={{ verbatim: "1m to 20m ", min: "4.5" }}
-        onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
-      >
-        <ParseVerbatimToRangeButton
-          buttonText="buttonText"
-          rangeFields={["min", "max"]}
-          verbatimField="verbatim"
-        />
-      </DinaForm>
-    );
-
-    expect(wrapper.find("button").prop("disabled")).toEqual(true);
-  });
 });
