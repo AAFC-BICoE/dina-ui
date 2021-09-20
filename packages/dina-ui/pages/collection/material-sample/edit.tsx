@@ -444,7 +444,14 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
 export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
   "collection",
   "materialSampleName",
-  "dwcOtherCatalogNumbers"
+  "dwcOtherCatalogNumbers",
+  "barcode"
+];
+
+export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
+  "materialSampleRemarks",
+  "materialSampleState",
+  "materialSampleType"
 ];
 
 /** Fields layout re-useable between view and edit pages. */
