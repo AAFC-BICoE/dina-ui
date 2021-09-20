@@ -177,14 +177,6 @@ export function MaterialSampleForm({
           </h2>
           <div className="list-group">
             {!isTemplate && (
-              <a
-                href="#material-sample-info-section"
-                className="list-group-item"
-              >
-                <DinaMessage id="materialSampleInfo" />
-              </a>
-            )}
-            {!isTemplate && (
               <a href="#identifiers-section" className="list-group-item">
                 <DinaMessage id="identifiers" />
               </a>
