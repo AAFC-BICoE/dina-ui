@@ -33,7 +33,8 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import {
   MaterialSampleIdentifiersFormLayout,
-  MaterialSampleMainInfoFormLayout
+  MaterialSampleInfoFormLayout,
+  MaterialSampleFormLayout
 } from "./edit";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
@@ -105,8 +106,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 materialSample={materialSample}
                 disableLastLink={true}
               />
-              <MaterialSampleMainInfoFormLayout />
+              <MaterialSampleInfoFormLayout />
               <MaterialSampleIdentifiersFormLayout />
+              <MaterialSampleFormLayout />
               {collectingEvent && (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                   <DinaForm initialValues={collectingEvent} readOnly={true}>

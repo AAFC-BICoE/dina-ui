@@ -10,7 +10,10 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
-  withResponse
+  withResponse,
+  ResourceSelectField,
+  filterBy,
+  AutoSuggestTextField
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -40,7 +43,12 @@ import {
 import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { CollectingEvent, MaterialSample } from "../../../types/collection-api";
+import {
+  CollectingEvent,
+  MaterialSample,
+  MaterialSampleType,
+  Vocabulary
+} from "../../../types/collection-api";
 
 export default function MaterialSampleEditPage() {
   const router = useRouter();
@@ -169,13 +177,21 @@ export function MaterialSampleForm({
           </h2>
           <div className="list-group">
             {!isTemplate && (
-              <a href="#material-sample-section" className="list-group-item">
-                <DinaMessage id="materialSample" />
+              <a
+                href="#material-sample-info-section"
+                className="list-group-item"
+              >
+                <DinaMessage id="materialSampleInfo" />
               </a>
             )}
             {!isTemplate && (
               <a href="#identifiers-section" className="list-group-item">
                 <DinaMessage id="identifiers" />
+              </a>
+            )}
+            {!isTemplate && (
+              <a href="#material-sample-section" className="list-group-item">
+                <DinaMessage id="materialSample" />
               </a>
             )}
             {dataComponentState.enableCollectingEvent && (
@@ -217,8 +233,9 @@ export function MaterialSampleForm({
             materialSample={materialSample as any}
           />
         )}
-        {!isTemplate && <MaterialSampleMainInfoFormLayout />}
+        {!isTemplate && <MaterialSampleInfoFormLayout />}
         <MaterialSampleIdentifiersFormLayout />
+        <MaterialSampleFormLayout />
         <DataComponentToggler state={dataComponentState} />
         <div className="data-components">
           {dataComponentState.enableCollectingEvent && (
@@ -368,9 +385,9 @@ export function MaterialSampleForm({
     </DinaForm>
   );
 }
-export function MaterialSampleMainInfoFormLayout() {
+export function MaterialSampleInfoFormLayout() {
   return (
-    <div id="material-sample-section">
+    <div id="material-sample-info-section">
       <div className="row">
         <div className="col-md-6">
           <GroupSelectField name="group" enableStoredDefaultGroup={true} />
@@ -380,6 +397,42 @@ export function MaterialSampleMainInfoFormLayout() {
   );
 }
 
+export function MaterialSampleFormLayout() {
+  const { locale } = useDinaIntl();
+  return (
+    <FieldSet
+      id="material-sample-section"
+      legend={<DinaMessage id="materialSample" />}
+    >
+      <div className="row">
+        <div className="col-md-6">
+          <ResourceSelectField<MaterialSampleType>
+            name="materialSampleType"
+            filter={filterBy(["name"])}
+            model="collection-api/material-sample-type"
+            optionLabel={it => it.name}
+            readOnlyLink="/collection/material-sample-type/view?id="
+          />
+          <AutoSuggestTextField<Vocabulary>
+            name="materialSampleState"
+            query={() => ({
+              path: "collection-api/vocabulary/materialSampleState"
+            })}
+            suggestion={vocabElement =>
+              vocabElement?.vocabularyElements?.map(
+                it => it?.labels?.[locale] ?? ""
+              ) ?? ""
+            }
+            alwaysShowSuggestions={true}
+          />
+        </div>
+        <div className="col-md-6">
+          <TextField name="materialSampleRemarks" multiLines={true} />
+        </div>
+      </div>
+    </FieldSet>
+  );
+}
 export interface MaterialSampleIdentifiersFormLayoutProps {
   disableSampleName?: boolean;
   hideOtherCatalogNumbers?: boolean;

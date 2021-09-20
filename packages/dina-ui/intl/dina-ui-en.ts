@@ -316,6 +316,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeValueLabel: "Value",
   materialSample: "Material Sample",
   materialSampleAttachments: "Material Sample Attachments",
+  materialSampleInfo: "Material Sample Info",
   materialSampleListTitle: "Material Samples",
   materialSampleManagedAttributes: "Material Sample Managed Attributes",
   materialSampleName: "Material Sample Name",
