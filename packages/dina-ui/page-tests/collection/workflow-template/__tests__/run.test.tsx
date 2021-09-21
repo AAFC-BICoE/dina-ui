@@ -219,11 +219,10 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
-
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               determination: [],
-
+              organism: null,
               managedAttributes: {},
               materialSampleName: "",
               relationships: {},
@@ -304,7 +303,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               determination: [],
-
+              organism: null,
               managedAttributes: {},
               materialSampleName: "",
               relationships: {},
@@ -365,6 +364,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              organism: null,
               determination: [],
 
               relationships: {},

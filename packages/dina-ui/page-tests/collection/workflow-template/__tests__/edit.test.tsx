@@ -1,7 +1,6 @@
 import { SaveArgs } from "common-ui";
 import { ReactWrapper } from "enzyme";
 import { PersistedResource } from "kitsu";
-import Select from "react-select";
 import ReactSwitch from "react-switch";
 import { StorageLinker } from "../../../../components";
 import { WorkflowTemplateForm } from "../../../../pages/collection/workflow-template/edit";

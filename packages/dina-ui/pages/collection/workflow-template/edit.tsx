@@ -14,6 +14,7 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { get, mapValues, pick, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
+import { ORGANISM_FIELDS } from "../../../components/collection/OrganismStateField";
 import React, { useRef } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
@@ -134,7 +135,8 @@ export function WorkflowTemplateForm({
       enableCollectingEvent,
       enablePreparations,
       enableStorage,
-      enableDetermination
+      enableDetermination,
+      enableOrganism
     }
   } = materialSampleSaveHook;
 
@@ -160,6 +162,14 @@ export function WorkflowTemplateForm({
     const preparationTemplateFields = enablePreparations
       ? pick(enabledTemplateFields, ...PREPARATION_FIELDS)
       : {};
+
+    const organismTemplateFields = enableOrganism
+      ? pick(
+          enabledTemplateFields,
+          ...ORGANISM_FIELDS.map(field => `organism.${field}`)
+        )
+      : {};
+
     const determinationTemplateFields = enableDetermination
       ? pick(
           enabledTemplateFields,
@@ -181,6 +191,7 @@ export function WorkflowTemplateForm({
             ...identifierTemplateFields,
             ...materialSampleFieldsetTemplateFields,
             ...preparationTemplateFields,
+            ...organismTemplateFields,
             ...determinationTemplateFields,
             ...storageTemplateFields
           }
