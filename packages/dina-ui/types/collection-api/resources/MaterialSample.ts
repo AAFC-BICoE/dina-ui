@@ -8,6 +8,7 @@ import { MaterialSampleType } from "./MaterialSampleType";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
 import { Determination } from "./Determination";
 import { Collection } from "./Collection";
+import { Organism } from "./Organism";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -34,6 +35,8 @@ export interface MaterialSampleAttributes {
 
   materialSampleState?: string;
   materialSampleRemarks?: string;
+
+  organism?: Organism;
 }
 export interface MaterialSampleRelationships {
   collection?: Collection;

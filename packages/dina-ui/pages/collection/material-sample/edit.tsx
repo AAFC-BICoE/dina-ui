@@ -18,6 +18,7 @@ import {
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { OrganismStateField } from "packages/dina-ui/components/collection/OrganismStateField";
 import { ReactNode, useContext } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -196,6 +197,11 @@ export function MaterialSampleForm({
                 <DinaMessage id="preparations" />
               </a>
             )}
+            {dataComponentState.enableOrganism && (
+              <a href="#organism-state-section" className="list-group-item">
+                <DinaMessage id="organismState" />
+              </a>
+            )}
             {dataComponentState.enableDetermination && (
               <a href="#determination-section" className="list-group-item">
                 <DinaMessage id="determination" />
@@ -323,6 +329,7 @@ export function MaterialSampleForm({
             </FieldSet>
           )}
           {dataComponentState.enablePreparations && <PreparationField />}
+          {dataComponentState.enableOrganism && <OrganismStateField />}
           {dataComponentState.enableDetermination && <DeterminationField />}
           {dataComponentState.enableStorage && (
             <FieldSet
@@ -539,6 +546,12 @@ function DataComponentToggler({
             className: "enable-catalogue-info",
             enabled: state.enablePreparations,
             setEnabled: state.setEnablePreparations
+          },
+          {
+            name: formatMessage("organismState"),
+            className: "enable-organism-state",
+            enabled: state.enableOrganism,
+            setEnabled: state.setEnableOrganism
           },
           {
             name: formatMessage("determination"),

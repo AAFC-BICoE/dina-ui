@@ -367,6 +367,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   objectSubtypeListTitle: "Object Subtypes",
   objectSubtypeTitle: "Object Subtype",
   openGeographySearchButtonLabel: "Search On Open Street Maps",
+  organismState: "Organism State",
   organizationEnglishNameLabel: "English Name",
   organizationFrenchNameLabel: "French Name",
   organizationListTitle: "Organizations",

@@ -30,6 +30,7 @@ import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
 import { DETERMINATION_FIELDS } from "./DeterminationField";
+import { BLANK_ORGANISM, ORGANISM_FIELDS } from "./OrganismStateField";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
 import { useLastUsedCollection } from "./useLastUsedCollection";
 
@@ -159,6 +160,15 @@ export function useMaterialSampleSave({
       )
     );
 
+  const hasOrganismTemplate =
+    isTemplate &&
+    !isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        ...ORGANISM_FIELDS
+      )
+    );
+
   const hasStorageTemplate =
     isTemplate &&
     materialSampleTemplateInitialValues?.templateCheckboxes?.storageUnit;
@@ -193,6 +203,20 @@ export function useMaterialSampleSave({
     )
   );
 
+  const [enableOrganism, setEnableOrganism] = useState(
+    Boolean(
+      hasOrganismTemplate ||
+        // Show the preparation section if a field is set or the field is enabled:
+        ORGANISM_FIELDS.some(
+          organismFieldName =>
+            materialSample?.[`organism.${organismFieldName}`] ||
+            enabledFields?.materialSample?.includes(
+              `organism.${organismFieldName}`
+            )
+        )
+    )
+  );
+
   const [enableStorage, setEnableStorage] = useState(
     // Show the Storage section if the storage field is set or the template enables it:
     Boolean(
@@ -219,6 +243,8 @@ export function useMaterialSampleSave({
     setEnableCollectingEvent,
     enablePreparations,
     setEnablePreparations,
+    enableOrganism,
+    setEnableOrganism,
     enableStorage,
     setEnableStorage,
     enableDetermination,
@@ -329,6 +355,11 @@ export function useMaterialSampleSave({
     // Only persist the preparation fields if the preparations toggle is enabled:
     if (!enablePreparations) {
       Object.assign(materialSampleInput, BLANK_PREPARATION);
+    }
+
+    // Only persist the organism fields if toggle is enabled:
+    if (!enableOrganism) {
+      Object.assign(materialSampleInput, BLANK_ORGANISM);
     }
 
     // Only persist the storage link if the Storage toggle is enabled:
