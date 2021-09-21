@@ -9,7 +9,9 @@ import { KitsuResource } from "kitsu";
 import { compact, last, uniq } from "lodash";
 import { useMemo, useState } from "react";
 import { AiFillTag } from "react-icons/ai";
+import { components as reactSelectComponents } from "react-select";
 import CreatableSelect from "react-select/creatable";
+import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface TagSelectFieldProps extends FieldWrapperProps {
@@ -145,8 +147,12 @@ function TagSelect({
     onChange(selected.map(option => option.value));
   }
 
+  const onSortEnd = ({ oldIndex, newIndex }) => {
+    onChange(arrayMove(value ?? [], oldIndex, newIndex));
+  };
+
   return (
-    <CreatableSelect<TagSelectOption, true>
+    <SortableSelect
       // Input value:
       inputValue={inputValue}
       onInputChange={newVal => setInputValue(newVal)}
@@ -169,6 +175,22 @@ function TagSelect({
       placeholder={formatMessage("typeNewTagOrSearchPreviousTags")}
       noOptionsMessage={() => formatMessage("typeNewTagOrSearchPreviousTags")}
       formatCreateLabel={input => `${formatMessage("add")} "${input}"`}
+      // react-sortable-hoc config:
+      axis="xy"
+      onSortEnd={onSortEnd}
+      components={{
+        MultiValue: SortableMultiValue
+      }}
+      distance={4}
     />
   );
 }
+
+// Drag/drop re-ordering support copied from https://github.com/JedWatson/react-select/pull/3645/files
+function arrayMove(array: any[], from: number, to: number) {
+  array = array.slice();
+  array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
+  return array;
+}
+const SortableMultiValue = SortableElement(reactSelectComponents.MultiValue);
+const SortableSelect = SortableContainer(CreatableSelect);

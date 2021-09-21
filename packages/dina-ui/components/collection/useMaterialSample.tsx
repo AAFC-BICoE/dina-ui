@@ -258,7 +258,8 @@ export function useMaterialSampleSave({
           type: "material-sample",
           managedAttributes: {},
           // Defaults to the last Collection used to create a Material Sample:
-          collection: lastUsedCollection
+          collection: lastUsedCollection,
+          publiclyReleasable: true
         }),
     determination: materialSample?.determination?.length
       ? materialSample?.determination

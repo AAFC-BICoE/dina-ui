@@ -7,7 +7,6 @@ import {
   FormikButton,
   LoadingSpinner,
   SelectFieldWithNav,
-  TextField,
   useAccount,
   useApiClient,
   useModal,
@@ -163,7 +162,8 @@ export default function SplitRunAction() {
     return <LoadingSpinner loading={true} />;
   }
 
-  const parentSampleId = parentResp?.data?.[0]?.id ?? null;
+  const parentSample = parentResp?.data?.[0];
+  const parentSampleId = parentSample?.id ?? null;
 
   // Get form initial values from run config
   for (let i = 0; i < numOfChildToCreate; i++) {
@@ -198,6 +198,9 @@ export default function SplitRunAction() {
       ...(parentSampleId && {
         parentMaterialSample: { type: "material-sample", id: parentSampleId }
       }),
+      // Re-use the publiclyReleasable value from the parent. TODO review this:
+      publiclyReleasable: parentSample?.publiclyReleasable,
+
       ...omitBy(defaultValueSample, isBlankResourceAttribute)
     };
 
@@ -265,7 +268,6 @@ export default function SplitRunAction() {
     const childSamplesPath = "childSamples";
     const childSamplePath = `${childSamplesPath}[${index}]`;
     const commonRoot = childSamplePath + ".";
-    const parentSample = parentResp?.data?.[0];
     // Use the first one from return til material sample name is unuque
     for (const fieldName of PREPARATION_FIELDS) {
       formik.setFieldValue(commonRoot + fieldName, parentSample?.[fieldName]);

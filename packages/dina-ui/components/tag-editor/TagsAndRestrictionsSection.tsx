@@ -1,4 +1,10 @@
-import { DinaFormSection, TextField, ToggleField } from "common-ui";
+import {
+  DinaFormSection,
+  InverseToggleField,
+  TextField,
+  ToggleField,
+  Tooltip
+} from "common-ui";
 import { Field } from "formik";
 import { AiFillTags } from "react-icons/ai";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -27,7 +33,15 @@ export function TagsAndRestrictionsSection({
           }
         />
         <div className="col-sm-6">
-          <ToggleField name="publiclyReleasable" />
+          <InverseToggleField
+            name="publiclyReleasable"
+            label={
+              <>
+                <DinaMessage id="notPubliclyReleasable" />
+                <Tooltip id="field_publiclyReleasable_tooltip" />
+              </>
+            }
+          />
           <DinaFormSection horizontal={false}>
             <Field name="publiclyReleasable">
               {({ field: { value: pr } }) =>
