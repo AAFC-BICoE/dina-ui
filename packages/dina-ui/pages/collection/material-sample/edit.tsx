@@ -13,6 +13,8 @@ import {
   withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
+import { compact } from "lodash";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactNode, useContext } from "react";
@@ -41,6 +43,7 @@ import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent, MaterialSample } from "../../../types/collection-api";
+import classNames from "classnames";
 
 export default function MaterialSampleEditPage() {
   const router = useRouter();
@@ -149,8 +152,6 @@ export function MaterialSampleForm({
       enabledFields
     });
 
-  const { formatMessage } = useDinaIntl();
-
   // CollectingEvent "id" being enabled in the template enabledFields means that the
   // Template links an existing Collecting Event:
   const templateAttachesCollectingEvent = Boolean(
@@ -159,57 +160,7 @@ export function MaterialSampleForm({
 
   const mateirialSampleInternal = (
     <div className="d-flex">
-      <div>
-        <nav
-          className="card card-body sticky-top d-none d-md-block"
-          style={{ width: "20rem" }}
-        >
-          <h2>
-            <DinaMessage id="formNavigation" />
-          </h2>
-          <div className="list-group">
-            {!isTemplate && (
-              <a href="#material-sample-section" className="list-group-item">
-                <DinaMessage id="materialSample" />
-              </a>
-            )}
-            {!isTemplate && (
-              <a href="#identifiers-section" className="list-group-item">
-                <DinaMessage id="identifiers" />
-              </a>
-            )}
-            {dataComponentState.enableCollectingEvent && (
-              <a href="#collecting-event-section" className="list-group-item">
-                <DinaMessage id="collectingEvent" />
-              </a>
-            )}
-            {dataComponentState.enablePreparations && (
-              <a href="#preparations-section" className="list-group-item">
-                <DinaMessage id="preparations" />
-              </a>
-            )}
-            {dataComponentState.enableDetermination && (
-              <a href="#determination-section" className="list-group-item">
-                <DinaMessage id="determination" />
-              </a>
-            )}
-            {dataComponentState.enableStorage && (
-              <a href="#storage-section" className="list-group-item">
-                <DinaMessage id="storage" />
-              </a>
-            )}
-            <a href="#managedAttributes-section" className="list-group-item">
-              <DinaMessage id="managedAttributeListTitle" />
-            </a>
-            <a
-              href="#material-sample-attachments-section"
-              className="list-group-item"
-            >
-              <DinaMessage id="materialSampleAttachments" />
-            </a>
-          </div>
-        </nav>
-      </div>
+      <MaterialSampleNav dataComponentState={dataComponentState} />
       <div className="flex-grow-1 container-fluid">
         {!isTemplate && materialSample && (
           <MaterialSampleBreadCrumb
@@ -219,7 +170,6 @@ export function MaterialSampleForm({
         )}
         {!isTemplate && <MaterialSampleMainInfoFormLayout />}
         <MaterialSampleIdentifiersFormLayout />
-        <DataComponentToggler state={dataComponentState} />
         <div className="data-components">
           {dataComponentState.enableCollectingEvent && (
             <FieldSet
@@ -370,11 +320,9 @@ export function MaterialSampleForm({
 }
 export function MaterialSampleMainInfoFormLayout() {
   return (
-    <div id="material-sample-section">
-      <div className="row">
-        <div className="col-md-6">
-          <GroupSelectField name="group" enableStoredDefaultGroup={true} />
-        </div>
+    <div className="row">
+      <div className="col-md-6">
+        <GroupSelectField name="group" enableStoredDefaultGroup={true} />
       </div>
     </div>
   );
@@ -465,58 +413,102 @@ export function CollectingEventBriefDetails({
   );
 }
 
-/** Toggles to enable/disable form sections. */
-function DataComponentToggler({
-  state
-}: {
-  state: ReturnType<typeof useMaterialSampleSave>["dataComponentState"];
-}) {
+interface MaterialSampleNavProps {
+  dataComponentState: ReturnType<
+    typeof useMaterialSampleSave
+  >["dataComponentState"];
+}
+
+const ScrollSpyNav = dynamic<any>(() => import("react-scrollspy-nav"), {
+  ssr: false
+});
+
+/** Form navigation and toggles to enable/disable form sections. */
+function MaterialSampleNav({ dataComponentState }: MaterialSampleNavProps) {
   const { formatMessage } = useDinaIntl();
+
+  const scrollTargets = [
+    { id: "identifiers-section", msg: <DinaMessage id="identifiers" /> },
+    {
+      id: "collecting-event-section",
+      msg: formatMessage("collectingEvent"),
+      className: "enable-collecting-event",
+      disabled: !dataComponentState.enableCollectingEvent,
+      setEnabled: dataComponentState.setEnableCollectingEvent
+    },
+    {
+      id: "preparations-section",
+      msg: formatMessage("preparations"),
+      className: "enable-catalogue-info",
+      disabled: !dataComponentState.enablePreparations,
+      setEnabled: dataComponentState.setEnablePreparations
+    },
+    {
+      id: "determination-section",
+      msg: formatMessage("determination"),
+      className: "enable-determination",
+      disabled: !dataComponentState.enableDetermination,
+      setEnabled: dataComponentState.setEnableDetermination
+    },
+    {
+      id: "storage-section",
+      msg: formatMessage("storage"),
+      className: "enable-storage",
+      disabled: !dataComponentState.enableStorage,
+      setEnabled: dataComponentState.setEnableStorage
+    },
+    {
+      id: "managedAttributes-section",
+      msg: formatMessage("managedAttributeListTitle")
+    },
+    {
+      id: "material-sample-attachments-section",
+      msg: formatMessage("materialSampleAttachments")
+    }
+  ];
+
   return (
-    <FieldSet legend={<DinaMessage id="components" />}>
-      <div className="d-flex gap-5">
-        {[
-          {
-            name: formatMessage("collectingEvent"),
-            className: "enable-collecting-event",
-            enabled: state.enableCollectingEvent,
-            setEnabled: state.setEnableCollectingEvent
-          },
-          {
-            name: formatMessage("preparations"),
-            className: "enable-catalogue-info",
-            enabled: state.enablePreparations,
-            setEnabled: state.setEnablePreparations
-          },
-          {
-            name: formatMessage("determination"),
-            className: "enable-determination",
-            enabled: state.enableDetermination,
-            setEnabled: state.setEnableDetermination
-          },
-          {
-            name: formatMessage("storage"),
-            className: "enable-storage",
-            enabled: state.enableStorage,
-            setEnabled: state.setEnableStorage
-          }
-        ].map(section => (
-          <label
-            className={`${section.className} d-flex align-items-center fw-bold`}
-            key={section.name}
-          >
-            <Switch
-              className="mx-2"
-              checked={section.enabled}
-              onChange={state.dataComponentToggler(
-                section.setEnabled,
-                section.name
-              )}
-            />
-            {section.name}
-          </label>
-        ))}
-      </div>
-    </FieldSet>
+    <ScrollSpyNav
+      key={scrollTargets.filter(it => !it.disabled).length}
+      scrollTargetIds={scrollTargets
+        .filter(it => !it.disabled)
+        .map(it => it.id)}
+      activeNavClass="active"
+      offset={-20}
+      scrollDuration="100"
+    >
+      <nav
+        className="card card-body sticky-top d-none d-md-block"
+        style={{ width: "20rem" }}
+      >
+        <h2>
+          <DinaMessage id="formNavigation" />
+        </h2>
+        <div className="list-group">
+          {scrollTargets.map(section => {
+            const Tag = section.disabled ? "div" : "a";
+            return (
+              <Tag
+                key={section.id}
+                className="d-flex list-group-item"
+                href={section.disabled ? undefined : `#${section.id}`}
+              >
+                {section.msg}
+                {section.setEnabled && (
+                  <Switch
+                    className="ms-auto"
+                    checked={!section.disabled}
+                    onChange={dataComponentState.dataComponentToggler(
+                      section.setEnabled,
+                      section.msg
+                    )}
+                  />
+                )}
+              </Tag>
+            );
+          })}
+        </div>
+      </nav>
+    </ScrollSpyNav>
   );
 }
