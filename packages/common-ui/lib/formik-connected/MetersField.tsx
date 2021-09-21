@@ -19,12 +19,17 @@ function MetersFieldInternal(inputProps: React.InputHTMLAttributes<any>) {
 
   const MAX_DECIMAL_PLACES = 2;
 
+  /** Convert the input to meters format. */
+  function convertInput(text: string) {
+    return toMeters(text, MAX_DECIMAL_PLACES);
+  }
+
   function onChange(event: ChangeEvent<HTMLInputElement>) {
     const newVal = event.target.value;
 
     setInputVal(newVal);
 
-    const metersVal = toMeters(newVal, MAX_DECIMAL_PLACES);
+    const metersVal = convertInput(newVal);
     inputProps.onChange?.({
       target: { value: metersVal?.toString() ?? newVal }
     } as ChangeEvent<HTMLInputElement>);
@@ -33,7 +38,7 @@ function MetersFieldInternal(inputProps: React.InputHTMLAttributes<any>) {
   // When the outer form state changes, set the inner text state:
   useEffect(() => {
     const formStateVal = inputProps.value?.toString() ?? "";
-    if (!isEqual(toMeters(formStateVal), toMeters(inputVal))) {
+    if (!isEqual(convertInput(formStateVal), convertInput(inputVal))) {
       setInputVal(formStateVal);
     }
   }, [inputProps.value]);
