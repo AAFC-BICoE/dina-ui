@@ -30,7 +30,7 @@ import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
 import { DETERMINATION_FIELDS } from "./DeterminationField";
-import { BLANK_ORGANISM, ORGANISM_FIELDS } from "./OrganismStateField";
+import { ORGANISM_FIELDS } from "./OrganismStateField";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
 import { useLastUsedCollection } from "./useLastUsedCollection";
 
@@ -41,7 +41,7 @@ export function useMaterialSampleQuery(id?: string | null) {
     {
       path: `collection-api/material-sample/${id}`,
       include:
-        "collection,collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit,hierarchy"
+        "collection,collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit,hierarchy,organism"
     },
     {
       disabled: !id,
@@ -359,7 +359,7 @@ export function useMaterialSampleSave({
 
     // Only persist the organism fields if toggle is enabled:
     if (!enableOrganism) {
-      Object.assign(materialSampleInput, BLANK_ORGANISM);
+      materialSampleInput.organism = null as any;
     }
 
     // Only persist the storage link if the Storage toggle is enabled:

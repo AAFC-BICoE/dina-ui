@@ -1,4 +1,4 @@
-import { AutoSuggestTextField, FieldSet, TextField } from "common-ui";
+import { AutoSuggestTextField, FieldSet, filterBy, TextField } from "common-ui";
 import { InputResource } from "kitsu";
 import { Organism } from "packages/dina-ui/types/collection-api/resources/Organism";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -14,16 +14,6 @@ export const ORGANISM_FIELDS = [
   "substrate",
   "remarks"
 ] as const;
-
-/** Blank values for all organism fields. */
-export const BLANK_ORGANISM: Required<
-  Pick<InputResource<Organism>, typeof ORGANISM_FIELDS[number]>
-> = Object.seal({
-  lifeStage: null,
-  sex: null,
-  substrate: null,
-  remarks: null
-});
 
 export interface OrganismStateFieldProps {
   className?: string;
@@ -41,29 +31,42 @@ export function OrganismStateField({
       legend={<DinaMessage id="organismState" />}
     >
       <div className="row">
-        <TextField
-          name={`${namePrefix}organism.lifeStage`}
-          customName="lifeState"
-        />
-        <TextField name={`${namePrefix}organism.sex`} customName="sex" />
-        <AutoSuggestTextField<MaterialSample>
-          name="organism.substrate"
-          customName="substrate"
-          query={(searchValue, ctx) => ({
-            path: "collection-api/material-sample",
-            filter: {
-              ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-              rsql: `organism.substrate==*${searchValue}*`
-            },
-            include: "organism"
-          })}
-          suggestion={matSample => matSample.organism?.substrate ?? ""}
-        />
-        <TextField
-          name={`${namePrefix}organism.remarks`}
-          customName="remarks"
-          multiLines={true}
-        />
+        <div className="col-md-6">
+          <AutoSuggestTextField<MaterialSample>
+            name={`${namePrefix}organism.lifeStage`}
+            customName="lifeStage"
+            query={(_, _ctx) => ({
+              path: "collection-api/material-sample",
+              include: "organism"
+            })}
+            suggestion={matSample => matSample.organism?.lifeStage ?? ""}
+          />
+          <AutoSuggestTextField<MaterialSample>
+            name={`${namePrefix}organism.sex`}
+            customName="sex"
+            query={(_, _ctx) => ({
+              path: "collection-api/material-sample",
+              include: "organism"
+            })}
+            suggestion={matSample => matSample.organism?.sex ?? ""}
+          />
+        </div>
+        <div className="col-md-6">
+          <AutoSuggestTextField<MaterialSample>
+            name={`${namePrefix}organism.substrate`}
+            customName="substrate"
+            query={(_, _ctx) => ({
+              path: "collection-api/material-sample",
+              include: "organism"
+            })}
+            suggestion={matSample => matSample.organism?.substrate ?? ""}
+          />
+          <TextField
+            name={`${namePrefix}organism.remarks`}
+            customName="remarks"
+            multiLines={true}
+          />
+        </div>
       </div>
     </FieldSet>
   );

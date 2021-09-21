@@ -76,7 +76,7 @@ export default function MaterialSampleEditPage() {
         {id ? (
           withResponse(materialSampleQuery, ({ data }) => (
             <MaterialSampleForm
-              materialSample={data}
+              materialSample={data as any}
               onSaved={moveToViewPage}
             />
           ))

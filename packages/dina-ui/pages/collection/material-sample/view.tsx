@@ -13,6 +13,10 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
 import {
+  OrganismStateField,
+  ORGANISM_FIELDS
+} from "packages/dina-ui/components/collection/OrganismStateField";
+import {
   Footer,
   Head,
   MaterialSampleBreadCrumb,
@@ -88,6 +92,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           fieldName => materialSample[fieldName]
         );
 
+        const hasOrganism = ORGANISM_FIELDS.some(
+          fieldName => materialSample.organism?.[fieldName]
+        );
+
         const hasDetermination = materialSample?.determination?.some(
           det => !isEmpty(det)
         );
@@ -126,6 +134,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 </FieldSet>
               )}
               {hasPreparations && <PreparationField />}
+              {hasOrganism && <OrganismStateField />}
               {hasDetermination && <DeterminationField />}
               {materialSample.storageUnit && (
                 <div className="card card-body mb-3">
