@@ -36,7 +36,7 @@ export interface MaterialSampleAttributes {
   materialSampleState?: string;
   materialSampleRemarks?: string;
 
-  organism?: Organism | null;
+  organism?: Organism;
 }
 export interface MaterialSampleRelationships {
   collection?: Collection;

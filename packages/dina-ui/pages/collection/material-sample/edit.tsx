@@ -18,7 +18,7 @@ import {
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { OrganismStateField } from "packages/dina-ui/components/collection/OrganismStateField";
+import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
 import { ReactNode, useContext } from "react";
 import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";

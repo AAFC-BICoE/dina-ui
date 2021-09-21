@@ -40,6 +40,7 @@ export function OrganismStateField({
               include: "organism"
             })}
             suggestion={matSample => matSample.organism?.lifeStage ?? ""}
+            alwaysShowSuggestions={true}
           />
           <AutoSuggestTextField<MaterialSample>
             name={`${namePrefix}organism.sex`}
@@ -49,6 +50,7 @@ export function OrganismStateField({
               include: "organism"
             })}
             suggestion={matSample => matSample.organism?.sex ?? ""}
+            alwaysShowSuggestions={true}
           />
         </div>
         <div className="col-md-6">
@@ -60,6 +62,7 @@ export function OrganismStateField({
               include: "organism"
             })}
             suggestion={matSample => matSample.organism?.substrate ?? ""}
+            alwaysShowSuggestions={true}
           />
           <TextField
             name={`${namePrefix}organism.remarks`}

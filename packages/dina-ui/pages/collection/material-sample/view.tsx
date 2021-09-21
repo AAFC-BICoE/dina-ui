@@ -15,7 +15,7 @@ import { withRouter } from "next/router";
 import {
   OrganismStateField,
   ORGANISM_FIELDS
-} from "packages/dina-ui/components/collection/OrganismStateField";
+} from "../../../../dina-ui/components/collection/OrganismStateField";
 import {
   Footer,
   Head,
