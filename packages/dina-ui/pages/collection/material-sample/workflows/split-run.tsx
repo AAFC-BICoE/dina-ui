@@ -271,7 +271,7 @@ export default function SplitRunAction() {
     // Use the first one from return til material sample name is unuque
     if (parentSample) {
       const keys: (keyof MaterialSample)[] = Object.keys(
-        omit(parentSample, ["id"])
+        omit(parentSample, ["id", "materialSampleName"])
       ) as any;
       for (const fieldName of keys) {
         formik.setFieldValue(commonRoot + fieldName, parentSample?.[fieldName]);
