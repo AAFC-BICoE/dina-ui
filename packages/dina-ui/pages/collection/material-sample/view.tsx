@@ -128,9 +128,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   </DinaForm>
                 </FieldSet>
               )}
-              <ChildSamplesView
-                childSamples={materialSample.materialSampleChildren}
-              />
+              {!!materialSample.materialSampleChildren?.length && (
+                <ChildSamplesView
+                  childSamples={materialSample.materialSampleChildren}
+                />
+              )}
               {hasPreparations && <PreparationField />}
               {hasDetermination && <DeterminationField />}
               {materialSample.storageUnit && (
