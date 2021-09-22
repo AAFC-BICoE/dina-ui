@@ -98,7 +98,7 @@ export function useMaterialSampleQuery(id?: string | null) {
         if (data.materialSampleChildren) {
           data.materialSampleChildren = await bulkGet<MaterialSample>(
             data.materialSampleChildren.map(
-              child => `/material-sample/${child.id}`
+              child => `/material-sample/${child.id}?include=materialSampleType`
             ),
             {
               apiBaseUrl: "/collection-api",
