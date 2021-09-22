@@ -2,21 +2,25 @@ import {
   BackToListButton,
   ButtonBar,
   DeleteButton,
-  EditButton,
+  DinaForm,
   LoadingSpinner
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Footer, Head, Nav } from "../../../components";
+import {
+  Footer,
+  Head,
+  Nav,
+  NotPubliclyReleasableWarning,
+  TagsAndRestrictionsSection
+} from "../../../components";
 import {
   ExifView,
-  FileView,
   MetadataDetails,
   useMetadataQuery
 } from "../../../components/object-store";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { Metadata } from "../../../types/objectstore-api";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -68,28 +72,23 @@ export default function MetadataViewPage() {
         <Nav />
         <style>{OBJECT_DETAILS_PAGE_CSS}</style>
         <main className="container-fluid">
-          {buttonBar}
           <div className="row">
             <div className="col-md-4">
               <MetadataFileView metadata={metadata} />
             </div>
             <div className="col-md-8">
               <div className="container">
-                <div className="mb-3">
-                  <Link
-                    href={`/object-store/metadata/single-record-edit?id=${id}`}
-                  >
-                    <a className="btn btn-primary">
-                      <DinaMessage id="editButtonText" />
-                    </a>
-                  </Link>
-                </div>
-                <MetadataDetails metadata={metadata} />
-                <ExifView objectUpload={metadata.objectUpload} />
+                {buttonBar}
+                <DinaForm initialValues={metadata} readOnly={true}>
+                  <NotPubliclyReleasableWarning />
+                  <TagsAndRestrictionsSection tagsFieldName="acTags" />
+                  <MetadataDetails metadata={metadata} />
+                  <ExifView objectUpload={metadata.objectUpload} />
+                </DinaForm>
+                {buttonBar}
               </div>
             </div>
           </div>
-          {buttonBar}
         </main>
         <Footer />
       </div>

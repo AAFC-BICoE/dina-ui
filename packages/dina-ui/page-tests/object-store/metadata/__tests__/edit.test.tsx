@@ -435,6 +435,7 @@ describe("Metadata bulk edit page", () => {
           xmpRightsOwner: "default-value",
           xmpRightsUsageTerms: "default-value",
           xmpRightsWebStatement: "default-value",
+          publiclyReleasable: true, // Default Value
           type: "metadata"
         },
         // The ObjectUpload is included in the initial table data to provide values for Default Values Configs:
@@ -472,6 +473,7 @@ describe("Metadata bulk edit page", () => {
               xmpRightsOwner: "default-value",
               xmpRightsUsageTerms: "default-value",
               xmpRightsWebStatement: "default-value",
+              publiclyReleasable: true, // Default Value
               type: "metadata"
             },
             type: "metadata"

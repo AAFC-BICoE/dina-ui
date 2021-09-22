@@ -1,5 +1,9 @@
-import { LoadingSpinner } from "common-ui";
+import { DinaForm, LoadingSpinner } from "common-ui";
 import Link from "next/link";
+import {
+  NotPubliclyReleasableWarning,
+  TagsAndRestrictionsSection
+} from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ExifView } from "../exif-view/ExifView";
 import { MetadataDetails, useMetadataQuery } from "./MetadataDetails";
@@ -30,24 +34,30 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
 
     return (
       <div className="metadata-preview">
-        <style>{METADATA_PREVIEW_STYLE}</style>
-        <div className="metadata-edit-link">
-          <Link
-            href={`/object-store/metadata/single-record-edit?id=${metadataId}`}
-          >
-            <a className="btn btn-primary metadata-edit-link">
-              <DinaMessage id="editButtonText" />
+        <DinaForm initialValues={metadata} readOnly={true}>
+          <style>{METADATA_PREVIEW_STYLE}</style>
+          <div className="metadata-edit-link">
+            <Link
+              href={`/object-store/metadata/single-record-edit?id=${metadataId}`}
+            >
+              <a className="btn btn-primary metadata-edit-link">
+                <DinaMessage id="editButtonText" />
+              </a>
+            </Link>
+          </div>
+          <Link href={`/object-store/metadata/revisions?id=${metadataId}`}>
+            <a className="btn btn-info metadata-revisions-link">
+              <DinaMessage id="revisionsButtonText" />
             </a>
           </Link>
-        </div>
-        <Link href={`/object-store/metadata/revisions?id=${metadataId}`}>
-          <a className="btn btn-info metadata-revisions-link">
-            <DinaMessage id="revisionsButtonText" />
-          </a>
-        </Link>
-        <MetadataFileView metadata={metadata} />
-        <MetadataDetails metadata={metadata} />
-        <ExifView objectUpload={metadata.objectUpload} />
+          <MetadataFileView metadata={metadata} />
+          <NotPubliclyReleasableWarning />
+          <div className="px-3">
+            <TagsAndRestrictionsSection tagsFieldName="acTags" />
+          </div>
+          <MetadataDetails metadata={metadata} />
+          <ExifView objectUpload={metadata.objectUpload} />
+        </DinaForm>
       </div>
     );
   }
