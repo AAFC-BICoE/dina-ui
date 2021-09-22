@@ -161,12 +161,13 @@ describe("MaterialSample split workflow run action form with all default values"
       [
         {
           resource: {
-            group: "aafc",
+            group: "test group",
             materialSampleName: "my custom name",
             parentMaterialSample: {
               id: "1",
               type: "material-sample"
             },
+            publiclyReleaseable: undefined,
             relationships: {
               attachment: {
                 data: []
