@@ -1,4 +1,4 @@
-import SplitRunAction from "../../../../../pages/collection/material-sample/workflows/split-run";
+import { SplitRunAction } from "../../../../../pages/collection/material-sample/workflows/split-run";
 import { SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY } from "../../../../../pages/collection/material-sample/workflows/split-config";
 import { mountWithAppContext } from "../../../../../test-util/mock-app-context";
 import { PersistedResource } from "kitsu";
@@ -59,6 +59,10 @@ const mockGet = jest.fn<any, any>(async path => {
       return {
         data: testMaterialSample()
       };
+    case "collection-api/material-sample/1":
+      return {
+        data: testMaterialSample()[0]
+      };
     case "collection-api/preparation-type":
       return { data: testPreparationType() };
     case "agent-api/person":
@@ -117,7 +121,10 @@ describe("MaterialSample split workflow run action form with all default values"
   });
 
   it("Display Material Sample workfow run action page based on configuration", async () => {
-    const wrapper = mountWithAppContext(<SplitRunAction />, { apiContext });
+    const wrapper = mountWithAppContext(
+      <SplitRunAction router={{ query: { id: "1" } } as any} />,
+      { apiContext }
+    );
     await new Promise(setImmediate);
     wrapper.update();
 
@@ -131,7 +138,10 @@ describe("MaterialSample split workflow run action form with all default values"
       SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY,
       JSON.stringify(testSeriesModeRunConfig)
     );
-    const wrapper = mountWithAppContext(<SplitRunAction />, { apiContext });
+    const wrapper = mountWithAppContext(
+      <SplitRunAction router={{ query: { id: "1" } } as any} />,
+      { apiContext }
+    );
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -189,7 +199,10 @@ describe("MaterialSample split workflow run action form with all default values"
       SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY,
       JSON.stringify(testBatchModeRunConfig)
     );
-    const wrapper = mountWithAppContext(<SplitRunAction />, { apiContext });
+    const wrapper = mountWithAppContext(
+      <SplitRunAction router={{ query: { id: "1" } } as any} />,
+      { apiContext }
+    );
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -215,6 +228,7 @@ describe("MaterialSample split workflow run action form with all default values"
               id: "1",
               type: "material-sample"
             },
+            publiclyReleasable: undefined,
             relationships: {
               attachment: {
                 data: []
@@ -232,6 +246,7 @@ describe("MaterialSample split workflow run action form with all default values"
               id: "1",
               type: "material-sample"
             },
+            publiclyReleasable: undefined,
             relationships: {
               attachment: {
                 data: []
@@ -266,7 +281,10 @@ describe("MaterialSample split workflow run action form with all default values"
         configure_children: { sampleNames: ["my custom name"] }
       })
     );
-    const wrapper = mountWithAppContext(<SplitRunAction />, { apiContext });
+    const wrapper = mountWithAppContext(
+      <SplitRunAction router={{ query: { id: "1" } } as any} />,
+      { apiContext }
+    );
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -325,6 +343,7 @@ describe("MaterialSample split workflow run action form with all default values"
                 data: []
               }
             },
+            publiclyReleasable: undefined,
             preparationType: {
               id: "1"
             },
@@ -345,6 +364,7 @@ describe("MaterialSample split workflow run action form with all default values"
               id: "1",
               type: "material-sample"
             },
+            publiclyReleasable: undefined,
             relationships: {
               attachment: {
                 data: []
