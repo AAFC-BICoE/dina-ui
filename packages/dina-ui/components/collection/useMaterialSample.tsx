@@ -165,7 +165,9 @@ export function useMaterialSampleSave({
     !isEmpty(
       pick(
         materialSampleTemplateInitialValues?.templateCheckboxes,
-        ...ORGANISM_FIELDS
+        ORGANISM_FIELDS.map(
+          organismFieldName => `organism.${organismFieldName}`
+        )
       )
     );
 
@@ -206,10 +208,10 @@ export function useMaterialSampleSave({
   const [enableOrganism, setEnableOrganism] = useState(
     Boolean(
       hasOrganismTemplate ||
-        // Show the preparation section if a field is set or the field is enabled:
+        // Show the organism section if a field is set or the field is enabled:
         ORGANISM_FIELDS.some(
           organismFieldName =>
-            materialSample?.[`organism.${organismFieldName}`] ||
+            materialSample.organism?.[`${organismFieldName}`] ||
             enabledFields?.materialSample?.includes(
               `organism.${organismFieldName}`
             )
@@ -451,7 +453,6 @@ export function useMaterialSampleSave({
         }
       }
     }
-
     // Save the MaterialSample:
     const [savedMaterialSample] = await save(
       [

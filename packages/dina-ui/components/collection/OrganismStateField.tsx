@@ -32,28 +32,32 @@ export function OrganismStateField({
     >
       <div className="row">
         <div className="col-md-6">
-          <AutoSuggestTextField<MaterialSample>
-            name={`${namePrefix}organism.lifeStage`}
-            customName="lifeStage"
-            query={(_, _ctx) => ({
-              path: "collection-api/material-sample",
-              include: "organism"
-            })}
-            suggestion={matSample => matSample.organism?.lifeStage ?? ""}
-            alwaysShowSuggestions={true}
-          />
-          <AutoSuggestTextField<MaterialSample>
-            name={`${namePrefix}organism.sex`}
-            customName="sex"
-            query={(_, _ctx) => ({
-              path: "collection-api/material-sample",
-              include: "organism"
-            })}
-            suggestion={matSample => matSample.organism?.sex ?? ""}
-            alwaysShowSuggestions={true}
-          />
-        </div>
-        <div className="col-md-6">
+          <div className="row">
+            <div className="col-md-6">
+              <AutoSuggestTextField<MaterialSample>
+                name={`${namePrefix}organism.lifeStage`}
+                customName="lifeStage"
+                query={(_, _ctx) => ({
+                  path: "collection-api/material-sample",
+                  include: "organism"
+                })}
+                suggestion={matSample => matSample.organism?.lifeStage ?? ""}
+                alwaysShowSuggestions={true}
+              />
+            </div>
+            <div className="col-md-6">
+              <AutoSuggestTextField<MaterialSample>
+                name={`${namePrefix}organism.sex`}
+                customName="sex"
+                query={(_, _ctx) => ({
+                  path: "collection-api/material-sample",
+                  include: "organism"
+                })}
+                suggestion={matSample => matSample.organism?.sex ?? ""}
+                alwaysShowSuggestions={true}
+              />
+            </div>
+          </div>
           <AutoSuggestTextField<MaterialSample>
             name={`${namePrefix}organism.substrate`}
             customName="substrate"
@@ -64,6 +68,8 @@ export function OrganismStateField({
             suggestion={matSample => matSample.organism?.substrate ?? ""}
             alwaysShowSuggestions={true}
           />
+        </div>
+        <div className="col-md-6">
           <TextField
             name={`${namePrefix}organism.remarks`}
             customName="remarks"
