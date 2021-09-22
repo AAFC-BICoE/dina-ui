@@ -122,7 +122,9 @@ export function BulkMetadataEditor({
         "objectstore-api/config/default-values",
         {}
       );
-      const metadataDefaults: Partial<Metadata> = {};
+      const metadataDefaults: Partial<Metadata> = {
+        publiclyReleasable: true
+      };
       for (const defaultValue of defaultValues.filter(
         ({ type }) => type === "metadata"
       )) {

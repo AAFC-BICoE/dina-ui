@@ -152,6 +152,7 @@ describe("Material Sample Edit Page", () => {
               managedAttributes: {},
               relationships: {},
               verbatimEventDateTime: "2019-12-21T16:00",
+              publiclyReleasable: true, // Default value
               type: "collecting-event"
             },
             type: "collecting-event"
@@ -172,6 +173,7 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               managedAttributes: {},
               determination: [],
+              publiclyReleasable: true, // Default value
               relationships: {},
               type: "material-sample"
             },
@@ -233,6 +235,7 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               managedAttributes: {},
               determination: [],
+              publiclyReleasable: true, // Default value
               type: "material-sample",
               relationships: {}
             },
@@ -352,6 +355,7 @@ describe("Material Sample Edit Page", () => {
               managedAttributes: {},
               relationships: {},
               verbatimEventDateTime: "2019-12-21T16:00",
+              publiclyReleasable: true, // Default Value
               type: "collecting-event"
             },
             type: "collecting-event"

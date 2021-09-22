@@ -31,7 +31,7 @@ export function NumberRangeFields({
         <strong>{labelMsg}</strong>
         <Tooltip id="metersField_tooltip" />
       </div>
-      <div className="mb-3">
+      <div className="mb-3" style={{ minHeight: "25px" }}>
         {readOnly ? (
           bothAreDefined ? (
             <span>

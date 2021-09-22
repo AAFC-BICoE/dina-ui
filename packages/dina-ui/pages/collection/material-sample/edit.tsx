@@ -25,7 +25,8 @@ import {
   Head,
   MaterialSampleBreadCrumb,
   Nav,
-  StorageLinkerField
+  StorageLinkerField,
+  TagsAndRestrictionsSection
 } from "../../../components";
 import {
   CollectingEventLinker,
@@ -218,6 +219,7 @@ export function MaterialSampleForm({
           />
         )}
         {!isTemplate && <MaterialSampleMainInfoFormLayout />}
+        <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
         <MaterialSampleIdentifiersFormLayout />
         <DataComponentToggler state={dataComponentState} />
         <div className="data-components">

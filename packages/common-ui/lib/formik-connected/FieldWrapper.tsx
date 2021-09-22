@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import { FastField, FormikProps } from "formik";
+import { isArray } from "lodash";
 import { ReactNode, useMemo } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
@@ -120,23 +121,20 @@ export function FieldWrapper({
     />
   );
 
-  const [labelCol, valueCol] = isTemplate
-    ? typeof horizontal === "boolean"
-      ? [6, 6]
-      : horizontal || [12, 12]
-    : typeof horizontal === "boolean"
-    ? [6, 6]
-    : horizontal || [];
+  const [labelClass, valueClass] =
+    horizontal === true
+      ? ["col-sm-6", "col-sm-6"]
+      : horizontal === "flex"
+      ? ["", "flex-grow-1"]
+      : (horizontal || []).map(col => `col-sm-${col}`) ||
+        (isTemplate ? ["col-sm-12", "col-sm-12"] : []);
 
   if (disabledByFormTemplate) {
     return null;
   }
 
   const fieldWrapperInternal = (
-    <div
-      className={valueCol ? `col-sm-${valueCol}` : ""}
-      style={{ cursor: "auto" }}
-    >
+    <div className={valueClass} style={{ minHeight: "25px", cursor: "auto" }}>
       <FastField name={name}>
         {({ field: { value }, form, meta: { error } }) => (
           <>
@@ -184,26 +182,17 @@ export function FieldWrapper({
           className={classNames(
             `${name}-field`,
             customName && `${customName}-field`,
-            isTemplate
-              ? horizontal
-                ? "row col-sm-11"
-                : "col-sm-10"
-              : horizontal
-              ? "row"
-              : "w-100",
+            horizontal === "flex" && "d-flex gap-2",
+            horizontal ? "align-items-center" : "mb-2",
+            (horizontal === true || isArray(horizontal)) && "row",
+            isTemplate && `col-sm-${horizontal ? "11" : "10"}`,
+            !isTemplate && !horizontal && "w-100",
             !removeBottomMargin && "mb-3"
           )}
           htmlFor={disableLabelClick ? "none" : undefined}
         >
           {!removeLabel && (
-            <div
-              className={[
-                `${labelCol ? `col-sm-${labelCol}` : ""}`,
-                // Adjust alignment for editable inputs:
-                horizontal && !readOnly && !isTemplate ? "mt-sm-2" : "",
-                "mb-2"
-              ].join(" ")}
-            >
+            <div className={classNames(labelClass, !horizontal && "mb-2")}>
               {!hideLabel && <strong>{fieldLabel}</strong>}
             </div>
           )}

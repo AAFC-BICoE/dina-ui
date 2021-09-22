@@ -20,6 +20,7 @@ import {
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 import { omit, merge } from "lodash";
+
 interface CollectingEventFormProps {
   collectingEvent?: PersistedResource<CollectingEvent>;
 }
@@ -103,9 +104,11 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     </ButtonBar>
   );
 
-  const initValues = merge({}, omit(collectingEventInitialValues, "type"), {
-    type: "collecting-event" as any
-  });
+  const initValues = {
+    ...collectingEventInitialValues,
+    type: "collecting-event" as const
+  };
+
   return (
     <DinaForm<CollectingEvent>
       initialValues={initValues}
