@@ -47,7 +47,6 @@ export function ChildSamplesView({ childSamples }: ChildSampleViewProps) {
   return (
     <FieldSet legend={<DinaMessage id="childMaterialSamples" />}>
       <ReactTable
-        showPagination={false}
         columns={CHILD_SAMPLES_COLUMNS}
         className="-striped"
         data={childSamples}
