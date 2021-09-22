@@ -13,7 +13,7 @@ import {
   useQuery
 } from "common-ui";
 import { Field, FieldArray } from "formik";
-import { isArray, omitBy, range } from "lodash";
+import { isArray, omitBy, range, omit } from "lodash";
 import { useRouter } from "next/router";
 import React, {
   Dispatch,
@@ -41,8 +41,7 @@ import {
 } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import {
   BLANK_PREPARATION,
-  PreparationField,
-  PREPARATION_FIELDS
+  PreparationField
 } from "../../../../components/collection/PreparationField";
 import { MaterialSampleIdentifiersFormLayout } from "../edit";
 import {
@@ -50,10 +49,14 @@ import {
   SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY
 } from "./split-config";
 
+import { WithRouterProps } from "next/dist/client/with-router";
+import { withRouter } from "next/router";
+
 export const SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY =
   "split-child-sample-run-action-result";
 
-export default function SplitRunAction() {
+export function SplitRunAction({ router }: WithRouterProps) {
+  const parentId = router.query.id?.toString();
   // Load from local storage the run config
   const [splitChildSampleRunConfig, _setSplitChildSampleRunConfig] =
     useLocalStorage<MaterialSampleRunConfig | null | undefined>(
@@ -83,7 +86,6 @@ export default function SplitRunAction() {
   const { formatMessage } = useDinaIntl();
   const { save } = useApiClient();
   const { groupNames } = useAccount();
-  const router = useRouter();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { openModal } = useModal();
 
@@ -150,19 +152,16 @@ export default function SplitRunAction() {
   }
 
   // Retrive the parent material sample upfront
-  const { loading, response: parentResp } = useQuery<MaterialSample[]>({
-    filter: {
-      materialSampleName: baseName as string
-    },
-    path: "collection-api/material-sample",
-    include: "preparationType"
+  const { loading, response: parentResp } = useQuery<MaterialSample>({
+    path: `collection-api/material-sample/${parentId}`,
+    include: "preparationType,materialSampleType"
   });
 
   if (loading) {
     return <LoadingSpinner loading={true} />;
   }
 
-  const parentSample = parentResp?.data?.[0];
+  const parentSample = parentResp?.data;
   const parentSampleId = parentSample?.id ?? null;
 
   // Get form initial values from run config
@@ -269,19 +268,18 @@ export default function SplitRunAction() {
     const childSamplePath = `${childSamplesPath}[${index}]`;
     const commonRoot = childSamplePath + ".";
     // Use the first one from return til material sample name is unuque
-    for (const fieldName of PREPARATION_FIELDS) {
-      formik.setFieldValue(commonRoot + fieldName, parentSample?.[fieldName]);
+    if (parentSample) {
+      const keys: (keyof MaterialSample)[] = Object.keys(
+        omit(parentSample, ["id", "materialSampleName", "collectingEvent"])
+      ) as any;
+      for (const fieldName of keys) {
+        formik.setFieldValue(commonRoot + fieldName, parentSample?.[fieldName]);
+      }
+      formik.setFieldValue(
+        commonRoot + "dwcOtherCatalogNumbers",
+        parentSample?.dwcOtherCatalogNumbers
+      );
     }
-
-    // formik.setFieldValue(
-    //   commonRoot + "materialSampleName",
-    //   parentSample?.materialSampleName
-    // );
-
-    formik.setFieldValue(
-      commonRoot + "dwcOtherCatalogNumbers",
-      parentSample?.dwcOtherCatalogNumbers
-    );
   };
 
   function computeDefaultSampleName(index) {
@@ -550,3 +548,5 @@ function isBlankResourceAttribute(value: any) {
       return false;
   }
 }
+
+export default withRouter(SplitRunAction);

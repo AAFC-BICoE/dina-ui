@@ -12,6 +12,7 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
+import { ChildSamplesView } from "../../../../dina-ui/components/collection/ChildSamplesView";
 import {
   Footer,
   Head,
@@ -126,6 +127,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     <CollectingEventFormLayout />
                   </DinaForm>
                 </FieldSet>
+              )}
+              {!!materialSample.materialSampleChildren?.length && (
+                <ChildSamplesView
+                  childSamples={materialSample.materialSampleChildren}
+                />
               )}
               {hasPreparations && <PreparationField />}
               {hasDetermination && <DeterminationField />}

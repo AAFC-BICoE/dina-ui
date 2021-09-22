@@ -106,7 +106,9 @@ export function ConfigAction({ router }: WithRouterProps) {
 
     // save the runConfig to local storage
     setStoredRunConfig(runConfig);
-    await router?.push(`/collection/material-sample/workflows/split-run`);
+    await router?.push(
+      `/collection/material-sample/workflows/split-run?id=${parentId}`
+    );
   };
 
   const buttonBar = (
