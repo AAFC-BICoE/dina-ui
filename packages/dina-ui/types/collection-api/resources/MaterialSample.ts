@@ -33,6 +33,7 @@ export interface MaterialSampleAttributes {
   barcode?: string;
   publiclyReleasable?: boolean;
   notPubliclyReleasableReason?: string;
+  materialSampleChildren?: Partial<MaterialSample>[];
 }
 export interface MaterialSampleRelationships {
   collection?: Collection;
