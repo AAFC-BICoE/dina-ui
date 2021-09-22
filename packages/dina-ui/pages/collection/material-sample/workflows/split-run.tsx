@@ -155,7 +155,7 @@ export default function SplitRunAction() {
       materialSampleName: baseName as string
     },
     path: "collection-api/material-sample",
-    include: "preparationType"
+    include: "preparationType,materialSampleType"
   });
 
   if (loading) {
