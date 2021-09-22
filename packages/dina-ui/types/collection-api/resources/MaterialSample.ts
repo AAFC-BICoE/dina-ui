@@ -34,6 +34,7 @@ export interface MaterialSampleAttributes {
   publiclyReleasable?: boolean;
   notPubliclyReleasableReason?: string;
   materialSampleChildren?: Partial<MaterialSample>[];
+  tags?: string[];
 }
 export interface MaterialSampleRelationships {
   collection?: Collection;

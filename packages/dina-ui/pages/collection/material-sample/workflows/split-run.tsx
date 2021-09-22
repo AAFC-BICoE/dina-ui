@@ -13,7 +13,7 @@ import {
   useQuery
 } from "common-ui";
 import { Field, FieldArray } from "formik";
-import { isArray, omitBy, range } from "lodash";
+import { isArray, omitBy, range, omit } from "lodash";
 import { useRouter } from "next/router";
 import React, {
   Dispatch,
@@ -269,19 +269,18 @@ export default function SplitRunAction() {
     const childSamplePath = `${childSamplesPath}[${index}]`;
     const commonRoot = childSamplePath + ".";
     // Use the first one from return til material sample name is unuque
-    for (const fieldName of PREPARATION_FIELDS) {
-      formik.setFieldValue(commonRoot + fieldName, parentSample?.[fieldName]);
+    if (parentSample) {
+      const keys: (keyof MaterialSample)[] = Object.keys(
+        omit(parentSample, ["id"])
+      ) as any;
+      for (const fieldName of keys) {
+        formik.setFieldValue(commonRoot + fieldName, parentSample?.[fieldName]);
+      }
+      formik.setFieldValue(
+        commonRoot + "dwcOtherCatalogNumbers",
+        parentSample?.dwcOtherCatalogNumbers
+      );
     }
-
-    // formik.setFieldValue(
-    //   commonRoot + "materialSampleName",
-    //   parentSample?.materialSampleName
-    // );
-
-    formik.setFieldValue(
-      commonRoot + "dwcOtherCatalogNumbers",
-      parentSample?.dwcOtherCatalogNumbers
-    );
   };
 
   function computeDefaultSampleName(index) {
