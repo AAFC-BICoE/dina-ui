@@ -25,9 +25,22 @@ export function ChildSamplesView({ childSamples }: ChildSampleViewProps) {
         </Link>
       ),
       accessor: "id",
-      Header: formatMessage("primaryId")
+      Header: formatMessage("field_materialSampleName")
     },
-    { ...dateCell("createdOn"), Header: formatMessage("field_createdOn") }
+    {
+      accessor: "materialSampleType.name",
+      sortable: false,
+      Header: formatMessage("field_materialSampleType.name")
+    },
+    {
+      ...dateCell("createdOn"),
+      Header: formatMessage("field_createdOn")
+    },
+    {
+      Cell: ({ original: { tags } }) => <>{tags?.join(", ")}</>,
+      accessor: "tags",
+      Header: formatMessage("tags")
+    }
   ];
 
   // JSONAPI sort attribute.
