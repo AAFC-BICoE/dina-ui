@@ -211,7 +211,7 @@ export function useMaterialSampleSave({
         // Show the organism section if a field is set or the field is enabled:
         ORGANISM_FIELDS.some(
           organismFieldName =>
-            materialSample.organism?.[`${organismFieldName}`] ||
+            materialSample?.organism?.[`${organismFieldName}`] ||
             enabledFields?.materialSample?.includes(
               `organism.${organismFieldName}`
             )
