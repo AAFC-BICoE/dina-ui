@@ -6,6 +6,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   IS: "IS",
   ISNOT: "IS NOT",
   OR: "OR",
+  add: "Add",
   addNew: "Add New",
   areYouSure: "Are you sure?",
   attributeLabel: "Attribute",

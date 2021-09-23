@@ -14,3 +14,5 @@ export * from "./storage/StorageUnitBreadCrumb";
 export * from "./collection/MaterialSampleBreadCrumb";
 export * from "./resource-select-fields/resource-select-fields";
 export * from "./collection/ParseVerbatimToRangeButton";
+export * from "./tag-editor/TagsAndRestrictionsSection";
+export * from "./tag-editor/NotPubliclyReleasableWarning";

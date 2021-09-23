@@ -12,12 +12,15 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
+import { ChildSamplesView } from "../../../../dina-ui/components/collection/ChildSamplesView";
 import {
   Footer,
   Head,
   MaterialSampleBreadCrumb,
   Nav,
-  StorageLinkerField
+  NotPubliclyReleasableWarning,
+  StorageLinkerField,
+  TagsAndRestrictionsSection
 } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { DeterminationField } from "../../../components/collection/DeterminationField";
@@ -94,9 +97,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         return (
           <main className="container-fluid">
             {buttonBar}
-            <h1 id="wb-cont">
-              <DinaMessage id="materialSampleViewTitle" />
-            </h1>
             <DinaForm<MaterialSample>
               initialValues={materialSample}
               readOnly={true}
@@ -105,7 +105,12 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 materialSample={materialSample}
                 disableLastLink={true}
               />
+              <NotPubliclyReleasableWarning />
+              <h1 id="wb-cont">
+                <DinaMessage id="materialSampleViewTitle" />
+              </h1>
               <MaterialSampleMainInfoFormLayout />
+              <TagsAndRestrictionsSection />
               <MaterialSampleIdentifiersFormLayout />
               {collectingEvent && (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
@@ -122,6 +127,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     <CollectingEventFormLayout />
                   </DinaForm>
                 </FieldSet>
+              )}
+              {!!materialSample.materialSampleChildren?.length && (
+                <ChildSamplesView
+                  childSamples={materialSample.materialSampleChildren}
+                />
               )}
               {hasPreparations && <PreparationField />}
               {hasDetermination && <DeterminationField />}

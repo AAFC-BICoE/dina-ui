@@ -40,7 +40,7 @@ export function useMaterialSampleQuery(id?: string | null) {
     {
       path: `collection-api/material-sample/${id}`,
       include:
-        "collection,collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit,hierarchy"
+        "collection,collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit,hierarchy,materialSampleChildren"
     },
     {
       disabled: !id,
@@ -94,6 +94,17 @@ export function useMaterialSampleQuery(id?: string | null) {
               );
             }
           }
+        }
+        if (data.materialSampleChildren) {
+          data.materialSampleChildren = await bulkGet<MaterialSample>(
+            data.materialSampleChildren.map(
+              child => `/material-sample/${child.id}?include=materialSampleType`
+            ),
+            {
+              apiBaseUrl: "/collection-api",
+              returnNullForMissingResource: true
+            }
+          );
         }
       }
     }
@@ -258,7 +269,8 @@ export function useMaterialSampleSave({
           type: "material-sample",
           managedAttributes: {},
           // Defaults to the last Collection used to create a Material Sample:
-          collection: lastUsedCollection
+          collection: lastUsedCollection,
+          publiclyReleasable: true
         }),
     determination: materialSample?.determination?.length
       ? materialSample?.determination

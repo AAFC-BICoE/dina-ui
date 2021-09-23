@@ -56,6 +56,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   cataloguedObjectListTitle: "Catalogued Objects",
   cataloguedObjectViewTitle: "View Catalogued Object",
   changedProperties: "Changes",
+  childMaterialSamples: "Child Material Samples",
   childMaterialSamplesCreatedLabel: "Child Material Samples Created",
   closePreviewButtonText: "Close Preview",
   collectingAgentsLegend: "Collecting Agents",
@@ -359,6 +360,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   noneTopLevel: "None (Top-level)",
   notEditableWhenThereAreChildStorageUnits:
     "Not editable when there are child Storage Units.",
+  notPubliclyReleasable: "Not Publicly Releasable",
   objectListTitle: "Stored Objects",
   objectStoreDataUnavailable: "Object Store data unavailable",
   objectStoreDetailsTitle: "Object Store Details",
@@ -385,7 +387,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   preparedBy: "Prepared By",
   previewAndCustomizeLabel: "Preview and Customize",
   primary: "Primary",
-  primaryId: "Primary ID",
   primaryButton_tooltip:
     "Make this assertion the primary data point when exported. Only one assertion can be primary",
   proceedToCreateMetadata: "Proceed to Create Metadata",
@@ -411,6 +412,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   saveAndCreateNewMaterialSampleButton: "Save & Create New Material Sample",
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
   searchButton: "Search",
+  searchPreviousTags: "Search previous tags",
   searchResults: "Search Results ({resultSize})",
   searchStorage: "Search Storage",
   selectCollectorGroupLabel:
@@ -450,6 +452,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   storagesCreatedByMe: "Storages Created By Me",
   suffixOptional: "Suffix (Optional)",
   switchToActionType: 'Switch to "{actionType}".',
+  tags: "Tags",
   templateNameMandatoryErrorMsg: "Please enter a workflow template name.",
   thisWillLoseAllDataEnteredInThisStep:
     "This will lose all data entered in this step.",
@@ -460,6 +463,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   to: "To",
   tooltipDefaultLinkMessage: "Click here to learn more.",
   toponymyLegend: "Current Geographic Place",
+  typeNewTagOrSearchPreviousTags: "Type New Tag or Search Previous Tags",
   typeSpecimen: "Type Specimen",
   uploadButtonText: "Upload",
   uploadFilesMaxSize: "The maximum file size is {maxSize}.",

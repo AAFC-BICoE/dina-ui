@@ -24,7 +24,9 @@ import useSWR from "swr";
 import { GeographySearchBox, GeoReferenceAssertionRow } from ".";
 import {
   GroupSelectField,
+  NotPubliclyReleasableWarning,
   ParseVerbatimToRangeButton,
+  TagsAndRestrictionsSection,
   useAddPersonModal
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -331,18 +333,23 @@ export function CollectingEventFormLayout({
   }
   return (
     <div ref={layoutWrapperRef}>
+      <NotPubliclyReleasableWarning />
       {!isTemplate && (
         <DinaFormSection horizontal={[3, 9]}>
           <div className="row">
-            <div className="col-md-6">
-              <GroupSelectField name="group" enableStoredDefaultGroup={true} />
-            </div>
-            <div className="col-md-6">
-              <StringArrayField name="dwcOtherRecordNumbers" />
-            </div>
+            <GroupSelectField
+              className="col-md-6"
+              name="group"
+              enableStoredDefaultGroup={true}
+            />
+            <StringArrayField
+              className="col-md-6"
+              name="dwcOtherRecordNumbers"
+            />
           </div>
         </DinaFormSection>
       )}
+      <TagsAndRestrictionsSection resourcePath="collection-api/collecting-event" />
       <div className="row">
         <div className="col-md-6">
           <FieldSet

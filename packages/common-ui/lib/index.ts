@@ -38,6 +38,7 @@ export * from "./formik-connected/TextField";
 export * from "./formik-connected/safeSubmit";
 export * from "./formik-connected/CheckBoxField";
 export * from "./formik-connected/NumberRangeFields";
+export * from "./formik-connected/ToggleField";
 export * from "./intl/common-ui-en";
 export * from "./intl/common-ui-fr";
 export * from "./intl/common-ui-intl";

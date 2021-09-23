@@ -4,7 +4,6 @@ import {
   toMeters,
   useDinaFormContext
 } from "common-ui";
-import { useField } from "formik";
 import { get } from "lodash";
 import { CollectingEvent } from "../../types/collection-api";
 
@@ -23,20 +22,13 @@ export function ParseVerbatimToRangeButton({
     values,
     formik
   ) => {
-    const currentMin = get(values, minField);
-    const currentMax = get(values, maxField);
-
     const verbatimText: string = get(values, verbatimField)?.toString() ?? "";
     const [newMin, newMax] = verbatimText
       .split(/to|\-/)
       .map(text => toMeters(text));
 
-    if (newMin && !currentMin) {
-      formik.setFieldValue(minField, newMin);
-      if (newMax && !currentMax) {
-        formik.setFieldValue(maxField, newMax);
-      }
-    }
+    formik.setFieldValue(minField, newMin);
+    formik.setFieldValue(maxField, newMax);
   };
 
   const { readOnly } = useDinaFormContext();
@@ -45,7 +37,6 @@ export function ParseVerbatimToRangeButton({
     <FormikButton
       className="btn btn-info mb-3 parse-verbatim-to-range-button"
       onClick={convertToMinMax}
-      buttonProps={({ values }) => ({ disabled: !!get(values, minField) })}
     >
       {buttonText}
     </FormikButton>

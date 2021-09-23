@@ -31,6 +31,10 @@ export interface MaterialSampleAttributes {
   hierarchy?: HierarchyItem[];
 
   barcode?: string;
+  publiclyReleasable?: boolean;
+  notPubliclyReleasableReason?: string;
+  materialSampleChildren?: Partial<MaterialSample>[];
+  tags?: string[];
 }
 export interface MaterialSampleRelationships {
   collection?: Collection;
