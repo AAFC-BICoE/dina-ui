@@ -30,6 +30,7 @@ import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
 import { DETERMINATION_FIELDS } from "./DeterminationField";
+import { ORGANISM_FIELDS } from "./OrganismStateField";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
 import { useLastUsedCollection } from "./useLastUsedCollection";
 
@@ -40,7 +41,7 @@ export function useMaterialSampleQuery(id?: string | null) {
     {
       path: `collection-api/material-sample/${id}`,
       include:
-        "collection,collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit,hierarchy,materialSampleChildren"
+        "collection,collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit,hierarchy,organism,materialSampleChildren"
     },
     {
       disabled: !id,
@@ -170,6 +171,17 @@ export function useMaterialSampleSave({
       )
     );
 
+  const hasOrganismTemplate =
+    isTemplate &&
+    !isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        ORGANISM_FIELDS.map(
+          organismFieldName => `organism.${organismFieldName}`
+        )
+      )
+    );
+
   const hasStorageTemplate =
     isTemplate &&
     materialSampleTemplateInitialValues?.templateCheckboxes?.storageUnit;
@@ -204,6 +216,20 @@ export function useMaterialSampleSave({
     )
   );
 
+  const [enableOrganism, setEnableOrganism] = useState(
+    Boolean(
+      hasOrganismTemplate ||
+        // Show the organism section if a field is set or the field is enabled:
+        ORGANISM_FIELDS.some(
+          organismFieldName =>
+            materialSample?.organism?.[`${organismFieldName}`] ||
+            enabledFields?.materialSample?.includes(
+              `organism.${organismFieldName}`
+            )
+        )
+    )
+  );
+
   const [enableStorage, setEnableStorage] = useState(
     // Show the Storage section if the storage field is set or the template enables it:
     Boolean(
@@ -230,6 +256,8 @@ export function useMaterialSampleSave({
     setEnableCollectingEvent,
     enablePreparations,
     setEnablePreparations,
+    enableOrganism,
+    setEnableOrganism,
     enableStorage,
     setEnableStorage,
     enableDetermination,
@@ -343,6 +371,11 @@ export function useMaterialSampleSave({
       Object.assign(materialSampleInput, BLANK_PREPARATION);
     }
 
+    // Only persist the organism fields if toggle is enabled:
+    if (!enableOrganism) {
+      materialSampleInput.organism = null as any;
+    }
+
     // Only persist the storage link if the Storage toggle is enabled:
     if (!enableStorage) {
       materialSampleInput.storageUnit = {
@@ -432,7 +465,6 @@ export function useMaterialSampleSave({
         }
       }
     }
-
     // Save the MaterialSample:
     const [savedMaterialSample] = await save(
       [

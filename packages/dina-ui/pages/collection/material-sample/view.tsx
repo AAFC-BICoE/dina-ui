@@ -14,6 +14,10 @@ import Link from "next/link";
 import { withRouter } from "next/router";
 import { ChildSamplesView } from "../../../../dina-ui/components/collection/ChildSamplesView";
 import {
+  OrganismStateField,
+  ORGANISM_FIELDS
+} from "../../../../dina-ui/components/collection/OrganismStateField";
+import {
   Footer,
   Head,
   MaterialSampleBreadCrumb,
@@ -36,7 +40,8 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import {
   MaterialSampleIdentifiersFormLayout,
-  MaterialSampleMainInfoFormLayout
+  MaterialSampleInfoFormLayout,
+  MaterialSampleFormLayout
 } from "./edit";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
@@ -90,6 +95,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           fieldName => materialSample[fieldName]
         );
 
+        const hasOrganism = ORGANISM_FIELDS.some(
+          fieldName => materialSample.organism?.[fieldName]
+        );
+
         const hasDetermination = materialSample?.determination?.some(
           det => !isEmpty(det)
         );
@@ -109,9 +118,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               <h1 id="wb-cont">
                 <DinaMessage id="materialSampleViewTitle" />
               </h1>
-              <MaterialSampleMainInfoFormLayout />
+              <MaterialSampleInfoFormLayout />
               <TagsAndRestrictionsSection />
               <MaterialSampleIdentifiersFormLayout />
+              <MaterialSampleFormLayout />
               {collectingEvent && (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                   <DinaForm initialValues={collectingEvent} readOnly={true}>
@@ -134,6 +144,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 />
               )}
               {hasPreparations && <PreparationField />}
+              {hasOrganism && <OrganismStateField />}
               {hasDetermination && <DeterminationField />}
               {materialSample.storageUnit && (
                 <div className="card card-body mb-3">
