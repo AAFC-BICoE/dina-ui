@@ -2,8 +2,7 @@ import {
   DinaFormSection,
   InverseToggleField,
   TextField,
-  ToggleField,
-  Tooltip
+  useDinaFormContext
 } from "common-ui";
 import { Field } from "formik";
 import { AiFillTags } from "react-icons/ai";
@@ -19,6 +18,7 @@ export function TagsAndRestrictionsSection({
   resourcePath,
   tagsFieldName = "tags"
 }: TagsAndRestrictionsSection) {
+  const { readOnly } = useDinaFormContext();
   return (
     <div className="row">
       <DinaFormSection horizontal="flex">
@@ -33,15 +33,24 @@ export function TagsAndRestrictionsSection({
           }
         />
         <div className="col-sm-6">
-          <InverseToggleField
-            name="publiclyReleasable"
-            label={
-              <>
-                <DinaMessage id="notPubliclyReleasable" />
-                <Tooltip id="field_publiclyReleasable_tooltip" />
-              </>
-            }
-          />
+          <Field name="publiclyReleasable">
+            {({ field: { value: pr } }) => (
+              <InverseToggleField
+                name="publiclyReleasable"
+                label={
+                  readOnly ? (
+                    !pr ? (
+                      <DinaMessage id="notPubliclyReleasable" />
+                    ) : (
+                      <DinaMessage id="field_publiclyReleasable" />
+                    )
+                  ) : (
+                    <DinaMessage id="notPubliclyReleasable" />
+                  )
+                }
+              />
+            )}
+          </Field>
           <DinaFormSection horizontal={false}>
             <Field name="publiclyReleasable">
               {({ field: { value: pr } }) =>
