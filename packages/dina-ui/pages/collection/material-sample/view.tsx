@@ -118,8 +118,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               <h1 id="wb-cont">
                 <DinaMessage id="materialSampleViewTitle" />
               </h1>
-              <TagsAndRestrictionsSection />
               <MaterialSampleInfoFormLayout />
+              <TagsAndRestrictionsSection />
               <MaterialSampleIdentifiersFormLayout />
               <MaterialSampleFormLayout />
               {collectingEvent && (

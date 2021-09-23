@@ -233,8 +233,8 @@ export function MaterialSampleForm({
             materialSample={materialSample as any}
           />
         )}
-        <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
         {!isTemplate && <MaterialSampleInfoFormLayout />}
+        <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
         <MaterialSampleIdentifiersFormLayout />
         <MaterialSampleFormLayout />
         <DataComponentToggler state={dataComponentState} />
