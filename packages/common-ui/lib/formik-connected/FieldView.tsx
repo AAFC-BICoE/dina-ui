@@ -16,10 +16,7 @@ export interface ReadOnlyValueProps {
 
 export function ReadOnlyValue({ value, link }: ReadOnlyValueProps) {
   return (
-    <div
-      className="field-view"
-      style={{ minHeight: "25px", whiteSpace: "pre-wrap" }}
-    >
+    <div className="field-view" style={{ whiteSpace: "pre-wrap" }}>
       {link ? (
         <Link href={link}>
           <a>{value}</a>

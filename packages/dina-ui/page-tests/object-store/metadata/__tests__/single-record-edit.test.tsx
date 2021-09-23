@@ -2,6 +2,7 @@ import { PersistedResource } from "kitsu";
 import { License, Metadata, Person } from "../../../../types/objectstore-api";
 import MetadataEditPage from "../../../../pages/object-store/metadata/single-record-edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import CreatableSelect from "react-select/creatable";
 
 const mockGet = jest.fn(async path => {
   if (
@@ -124,17 +125,22 @@ describe("Metadata single record edit page.", () => {
     expect(wrapper.find(".originalFilename-field input").prop("value")).toEqual(
       "test-file.png"
     );
-    expect(wrapper.find(".acTags-field textarea").prop("value")).toEqual(
-      "tag1, tag2, tag3"
-    );
+    expect(
+      wrapper.find(".acTags-field").find(CreatableSelect).prop("value")
+    ).toEqual([
+      { label: "tag1", value: "tag1" },
+      { label: "tag2", value: "tag2" },
+      { label: "tag3", value: "tag3" }
+    ]);
     expect(
       wrapper.find(".managed-attributes-editor input").last().prop("value")
     ).toEqual("test-managed-attribute-value");
 
     // Set new values:
-    wrapper.find(".acTags-field textarea").simulate("change", {
-      target: { name: "acTags", value: "new tag 1, new tag 2" }
-    });
+    wrapper.find(".acTags-field").find(CreatableSelect).prop("onChange")([
+      { label: "new tag 1", value: "new tag 1" },
+      { label: "new tag 2", value: "new tag 2" }
+    ]);
     wrapper
       .find(".managed-attributes-editor input")
       .last()

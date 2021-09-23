@@ -191,7 +191,8 @@ export function useCollectingEventSave({
         dwcVerbatimCoordinateSystem:
           defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
         dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84,
-        managedAttributeValues: {}
+        managedAttributeValues: {},
+        publiclyReleasable: true
       };
 
   // The selected Metadatas to be attached to this Collecting Event:

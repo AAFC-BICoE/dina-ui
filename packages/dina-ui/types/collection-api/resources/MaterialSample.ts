@@ -37,6 +37,10 @@ export interface MaterialSampleAttributes {
   materialSampleRemarks?: string;
 
   organism?: Organism;
+  publiclyReleasable?: boolean;
+  notPubliclyReleasableReason?: string;
+  materialSampleChildren?: Partial<MaterialSample>[];
+  tags?: string[];
 }
 export interface MaterialSampleRelationships {
   collection?: Collection;

@@ -149,6 +149,7 @@ describe("collecting-event edit page", () => {
               dwcVerbatimCoordinateSystem: "decimal degrees",
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               managedAttributes: {},
+              publiclyReleasable: true, // Default value
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
               dwcOtherRecordNumbers: ["12", "23"],
               geoReferenceAssertions: [{ isPrimary: true }]
