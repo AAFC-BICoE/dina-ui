@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React from "react";
+import React, { CSSProperties } from "react";
 import { CommonMessage } from "../../lib/intl/common-ui-intl";
 import classNames from "classnames";
 
@@ -13,6 +13,8 @@ interface EditButtonProps {
   className?: string;
 
   disabled?: boolean;
+
+  style?: CSSProperties;
 }
 
 /**
@@ -22,13 +24,14 @@ export function EditButton({
   entityId,
   entityLink,
   className,
-  disabled
+  disabled,
+  style
 }: EditButtonProps) {
   return (
     <Link href={`/${entityLink}/edit?id=${entityId}`}>
       <a
         className={classNames("btn btn-primary", { disabled }, className)}
-        style={{ width: "10rem" }}
+        style={{ width: "10rem", ...style }}
       >
         <CommonMessage id="editButtonText" />
       </a>

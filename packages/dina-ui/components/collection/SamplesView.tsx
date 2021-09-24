@@ -8,6 +8,8 @@ import { dateCell } from "../../../common-ui/lib/table/date-cell";
 import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { FieldSet } from "../../../common-ui/lib";
 
+import { EditButton, DeleteButton } from "../../../common-ui";
+
 export interface SamplesViewProps {
   samples?: Partial<MaterialSample>[];
   fieldSetId: JSX.Element;
@@ -41,6 +43,33 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
       Cell: ({ original: { tags } }) => <>{tags?.join(", ")}</>,
       accessor: "tags",
       Header: formatMessage("tags")
+    },
+    {
+      Cell: ({ original: { id } }) => (
+        <div className="d-flex">
+          <EditButton
+            className="mx-2"
+            entityId={id as string}
+            entityLink="collection/material-sample"
+            style={{ width: "5rem" }}
+          />
+          <Link
+            href={`/collection/material-sample/workflows/split-config?id=${id}`}
+          >
+            <a className="btn btn-info mx-2">
+              <DinaMessage id="splitButton" />
+            </a>
+          </Link>
+          <DeleteButton
+            id={id as string}
+            options={{ apiBaseUrl: "/collection-api" }}
+            postDeleteRedirect="/collection/material-sample/list"
+            type="material-sample"
+          />
+        </div>
+      ),
+      Header: formatMessage("actions"),
+      sortable: false
     }
   ];
 
