@@ -38,6 +38,8 @@ const mockGet = jest.fn<any, any>(async path => {
     return { data: [] };
   } else if (path === "collection-api/material-sample/1/attachment") {
     return { data: [] };
+  } else if (path === "collection-api/collection") {
+    return { data: [] };
   }
 });
 
@@ -57,7 +59,7 @@ const testCtx = {
 };
 
 describe("Material Sample View Page", () => {
-  it("Renders the Material Sample with the linked Collecting Event", async () => {
+  it("Renders the Material Sample page", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleViewPage router={{ query: { id: "1" } } as any} />,
       testCtx
@@ -71,8 +73,5 @@ describe("Material Sample View Page", () => {
     expect(
       wrapper.find(".materialSampleName-field .field-view").text()
     ).toEqual("my-sample-name");
-    expect(
-      wrapper.find(".startEventDateTime-field .field-view").text()
-    ).toEqual("2019_01_01_10_10_10");
   });
 });
