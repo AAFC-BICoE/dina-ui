@@ -117,7 +117,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   disableLastLink={true}
                 />
               </h1>
-              <MaterialSampleInfoFormLayout />
               <TagsAndRestrictionsSection />
               <MaterialSampleIdentifiersFormLayout />
               {!!materialSample.materialSampleChildren?.length && (
