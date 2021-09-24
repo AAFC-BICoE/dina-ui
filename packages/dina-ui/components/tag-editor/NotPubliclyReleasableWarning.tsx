@@ -1,6 +1,6 @@
 import { useDinaFormContext } from "common-ui";
 import { useFormikContext } from "formik";
-import { AiFillWarning } from "react-icons/ai";
+import { MdVpnLock } from "react-icons/md";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export function NotPubliclyReleasableWarning() {
@@ -12,8 +12,8 @@ export function NotPubliclyReleasableWarning() {
   }
 
   return (
-    <div className="alert alert-danger d-flex gap-2 align-items-center">
-      <AiFillWarning style={{ width: "24px", height: "24px" }} />
+    <div className="alert alert-warning d-flex gap-2 align-items-center">
+      <MdVpnLock style={{ width: "24px", height: "24px" }} />
       <div>
         <DinaMessage id="notPubliclyReleasable" />
       </div>

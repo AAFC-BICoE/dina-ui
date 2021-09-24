@@ -105,18 +105,17 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
         return (
           <main className="container-fluid">
-            {buttonBar}
             <DinaForm<MaterialSample>
               initialValues={materialSample}
               readOnly={true}
             >
-              <MaterialSampleBreadCrumb
-                materialSample={materialSample}
-                disableLastLink={true}
-              />
               <NotPubliclyReleasableWarning />
+              {buttonBar}
               <h1 id="wb-cont">
-                <DinaMessage id="materialSampleViewTitle" />
+                <MaterialSampleBreadCrumb
+                  materialSample={materialSample}
+                  disableLastLink={true}
+                />
               </h1>
               <MaterialSampleInfoFormLayout />
               <TagsAndRestrictionsSection />
