@@ -99,6 +99,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
         pages={numberOfPages}
         ofText={<CommonMessage id="of" />}
         rowsText={formatMessage("rows")}
+        showPagination={!(totalCount === 1)}
       />
     </FieldSet>
   );
