@@ -120,63 +120,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               <MaterialSampleInfoFormLayout />
               <TagsAndRestrictionsSection />
               <MaterialSampleIdentifiersFormLayout />
-              <MaterialSampleFormLayout />
-              {collectingEvent && (
-                <FieldSet legend={<DinaMessage id="collectingEvent" />}>
-                  <DinaForm initialValues={collectingEvent} readOnly={true}>
-                    <div className="mb-3 d-flex justify-content-end align-items-center">
-                      <Link
-                        href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
-                      >
-                        <a target="_blank">
-                          <DinaMessage id="collectingEventDetailsPageLink" />
-                        </a>
-                      </Link>
-                    </div>
-                    <CollectingEventFormLayout />
-                  </DinaForm>
-                </FieldSet>
-              )}
               {!!materialSample.materialSampleChildren?.length && (
                 <ChildSamplesView
                   childSamples={materialSample.materialSampleChildren}
                 />
               )}
-              {hasPreparations && <PreparationField />}
-              {hasOrganism && <OrganismStateField />}
-              {hasDetermination && <DeterminationField />}
-              {materialSample.storageUnit && (
-                <div className="card card-body mb-3">
-                  <StorageLinkerField name="storageUnit" />
-                </div>
-              )}
-              <FieldSet
-                legend={<DinaMessage id="materialSampleManagedAttributes" />}
-              >
-                <div className="col-md-6">
-                  <FastField name="managedAttributeValues">
-                    {({ field: { value } }) => (
-                      <ManagedAttributesViewer
-                        values={value}
-                        managedAttributeApiPath={key =>
-                          `collection-api/managed-attribute/material_sample.${key}`
-                        }
-                      />
-                    )}
-                  </FastField>
-                </div>
-              </FieldSet>
-              <div className="mb-3">
-                <Field name="id">
-                  {({ field: { value: materialSampleId } }) => (
-                    <AttachmentReadOnlySection
-                      attachmentPath={`collection-api/material-sample/${materialSampleId}/attachment`}
-                      detachTotalSelected={true}
-                      title={<DinaMessage id="materialSampleAttachments" />}
-                    />
-                  )}
-                </Field>
-              </div>
             </DinaForm>
             {buttonBar}
           </main>
