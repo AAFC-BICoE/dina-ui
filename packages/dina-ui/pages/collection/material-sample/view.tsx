@@ -12,7 +12,7 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { ChildSamplesView } from "../../../../dina-ui/components/collection/ChildSamplesView";
+import { SamplesView } from "../../../../dina-ui/components/collection/SamplesView";
 import {
   OrganismStateField,
   ORGANISM_FIELDS
@@ -138,9 +138,16 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   </DinaForm>
                 </FieldSet>
               )}
+              {materialSample.parentMaterialSample && (
+                <SamplesView
+                  samples={[materialSample.parentMaterialSample]}
+                  fieldSetId={<DinaMessage id="parentMaterialSample" />}
+                />
+              )}
               {!!materialSample.materialSampleChildren?.length && (
-                <ChildSamplesView
-                  childSamples={materialSample.materialSampleChildren}
+                <SamplesView
+                  samples={materialSample.materialSampleChildren}
+                  fieldSetId={<DinaMessage id="childMaterialSamples" />}
                 />
               )}
               {hasPreparations && <PreparationField />}

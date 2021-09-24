@@ -8,11 +8,12 @@ import { dateCell } from "../../../common-ui/lib/table/date-cell";
 import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { FieldSet } from "../../../common-ui/lib";
 
-export interface ChildSampleViewProps {
-  childSamples?: Partial<MaterialSample>[];
+export interface SamplesViewProps {
+  samples?: Partial<MaterialSample>[];
+  fieldSetId: JSX.Element;
 }
 
-export function ChildSamplesView({ childSamples }: ChildSampleViewProps) {
+export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
   const DEFAULT_PAGE_SIZE = 25;
   const defaultSort = [];
   const { formatMessage } = useDinaIntl();
@@ -21,7 +22,7 @@ export function ChildSamplesView({ childSamples }: ChildSampleViewProps) {
     {
       Cell: ({ original: { id, materialSampleName } }) => (
         <Link href={`/collection/material-sample/view?id=${id}`}>
-          <a target="_blank">{materialSampleName}</a>
+          <a>{materialSampleName}</a>
         </Link>
       ),
       accessor: "id",
@@ -51,18 +52,18 @@ export function ChildSamplesView({ childSamples }: ChildSampleViewProps) {
     offset: 0
   });
 
-  const totalCount = childSamples?.length;
+  const totalCount = samples?.length;
 
   const numberOfPages = totalCount
     ? Math.ceil(totalCount / page.limit)
     : undefined;
 
   return (
-    <FieldSet legend={<DinaMessage id="childMaterialSamples" />}>
+    <FieldSet legend={fieldSetId}>
       <ReactTable
         columns={CHILD_SAMPLES_COLUMNS}
         className="-striped"
-        data={childSamples}
+        data={samples}
         defaultSorted={sortingRules}
         minRows={1}
         pageSizeOptions={[25, 50, 100, 200, 500]}

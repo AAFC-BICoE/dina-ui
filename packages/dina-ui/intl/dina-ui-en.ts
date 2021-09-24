@@ -377,6 +377,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   originalFile: "Original File",
   originalMaterialSampleLabel: "Original Material Sample",
   parentCollectionLabel: "Parent Collection",
+  parentMaterialSample: " Parent Sample",
   parentSampleNotFoundLabel: " Parent sample not found",
   personListTitle: "Persons",
   personViewTitle: "Person",
