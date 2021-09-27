@@ -13,9 +13,23 @@ export interface MaterialSampleNavProps {
 const ScrollSpyNav =
   process.env.NODE_ENV === "test"
     ? ("div" as any)
-    : dynamic<any>(() => import("react-scrollspy-nav"), {
-        ssr: false
-      });
+    : dynamic(
+        async () => {
+          const NavClass = await import("react-scrollspy-nav");
+
+          // Put the "active" class on the list-group-item instead of the <a> tag:
+          class MyNavClass extends NavClass.default {
+            getNavLinkElement(sectionID) {
+              return super
+                .getNavLinkElement(sectionID)
+                ?.closest(".list-group-item");
+            }
+          }
+
+          return MyNavClass as any;
+        },
+        { ssr: false }
+      );
 
 /** Form navigation and toggles to enable/disable form sections. */
 export function MaterialSampleFormNav({
@@ -64,47 +78,47 @@ export function MaterialSampleFormNav({
   ];
 
   return (
-    <ScrollSpyNav
-      key={scrollTargets.filter(it => !it.disabled).length}
-      scrollTargetIds={scrollTargets
-        .filter(it => !it.disabled)
-        .map(it => it.id)}
-      activeNavClass="active"
-      offset={-20}
-      scrollDuration="100"
-    >
-      <nav className="card card-body sticky-md-top">
-        <h3>
-          <DinaMessage id="dataComponents" />
-        </h3>
-        <div className="list-group">
-          {scrollTargets.map(section => {
-            const Tag = section.disabled ? "div" : "a";
-            return (
-              <Tag
-                key={section.id}
-                className={classNames(
-                  "d-flex list-group-item",
-                  section.className
-                )}
-                href={section.disabled ? undefined : `#${section.id}`}
-              >
-                {section.msg}
-                {section.setEnabled && (
-                  <Switch
-                    className="ms-auto"
-                    checked={!section.disabled}
-                    onChange={dataComponentState.dataComponentToggler(
-                      section.setEnabled,
-                      section.msg
-                    )}
-                  />
-                )}
-              </Tag>
-            );
-          })}
-        </div>
-      </nav>
-    </ScrollSpyNav>
+    <div className="sticky-md-top material-sample-nav">
+      <style>{`.material-sample-nav .active a { color: inherit !important; }`}</style>
+      <ScrollSpyNav
+        key={scrollTargets.filter(it => !it.disabled).length}
+        scrollTargetIds={scrollTargets
+          .filter(it => !it.disabled)
+          .map(it => it.id)}
+        activeNavClass="active"
+        offset={-20}
+        scrollDuration="100"
+      >
+        <nav className="card card-body">
+          <h3>
+            <DinaMessage id="dataComponents" />
+          </h3>
+          <div className="list-group">
+            {scrollTargets.map(section => {
+              const Tag = section.disabled ? "div" : "a";
+              return (
+                <div className="d-flex list-group-item" key={section.id}>
+                  <Tag
+                    className={classNames(section.className, "flex-grow-1")}
+                    href={section.disabled ? undefined : `#${section.id}`}
+                  >
+                    {section.msg}
+                  </Tag>
+                  {section.setEnabled && (
+                    <Switch
+                      checked={!section.disabled}
+                      onChange={dataComponentState.dataComponentToggler(
+                        section.setEnabled,
+                        section.msg
+                      )}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </nav>
+      </ScrollSpyNav>
+    </div>
   );
 }
