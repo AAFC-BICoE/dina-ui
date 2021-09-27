@@ -67,9 +67,7 @@ export function DeleteButton({
       }
     } else {
       await router.push(
-        withLeadingSlash ? "/" + postDeleteRedirect : postDeleteRedirect,
-        undefined,
-        { shallow: true, scroll: false }
+        withLeadingSlash ? "/" + postDeleteRedirect : postDeleteRedirect
       );
     }
   }
