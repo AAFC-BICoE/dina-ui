@@ -70,6 +70,7 @@ export function SamplesView({
             options={{ apiBaseUrl: "/collection-api" }}
             postDeleteRedirect={postDeleteRedirect}
             type="material-sample"
+            reload={true}
           />
         </div>
       ),

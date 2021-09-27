@@ -26,6 +26,8 @@ interface DeleteButtonProps {
   options?: DoOperationsOptions;
 
   withLeadingSlash?: boolean;
+
+  reload?: boolean;
 }
 
 export function DeleteButton({
@@ -35,7 +37,8 @@ export function DeleteButton({
   options,
   postDeleteRedirect,
   type,
-  withLeadingSlash
+  withLeadingSlash,
+  reload
 }: DeleteButtonProps) {
   const { openModal } = useModal();
   const { doOperations } = useContext(ApiClientContext);
@@ -52,9 +55,23 @@ export function DeleteButton({
       options
     );
 
-    await router.push(
-      withLeadingSlash ? "/" + postDeleteRedirect : postDeleteRedirect
-    );
+    // Force reload the postredirect page after deletion
+    if (reload) {
+      if (typeof window !== "undefined") {
+        const hostname = window.location.hostname;
+        window.location.href = new URL(
+          "http://" +
+            hostname +
+            (withLeadingSlash ? "/" + postDeleteRedirect : postDeleteRedirect)
+        ).href;
+      }
+    } else {
+      await router.push(
+        withLeadingSlash ? "/" + postDeleteRedirect : postDeleteRedirect,
+        undefined,
+        { shallow: true, scroll: false }
+      );
+    }
   }
 
   if (!id) {
