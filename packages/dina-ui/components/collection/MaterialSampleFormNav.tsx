@@ -97,9 +97,15 @@ export function MaterialSampleFormNav({
             {scrollTargets.map(section => {
               const Tag = section.disabled ? "div" : "a";
               return (
-                <div className="d-flex list-group-item" key={section.id}>
+                <div
+                  className={classNames(
+                    section.className,
+                    "d-flex list-group-item"
+                  )}
+                  key={section.id}
+                >
                   <Tag
-                    className={classNames(section.className, "flex-grow-1")}
+                    className={"flex-grow-1"}
                     href={section.disabled ? undefined : `#${section.id}`}
                   >
                     {section.msg}
