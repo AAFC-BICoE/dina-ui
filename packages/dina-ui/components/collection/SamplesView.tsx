@@ -87,6 +87,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
     ? Math.ceil(totalCount / page.limit)
     : undefined;
 
+  const shouldShowPagination = !!totalCount && totalCount > 25;
   return (
     <FieldSet legend={fieldSetId}>
       <ReactTable
@@ -99,7 +100,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
         pages={numberOfPages}
         ofText={<CommonMessage id="of" />}
         rowsText={formatMessage("rows")}
-        showPagination={!(totalCount === 1)}
+        showPagination={shouldShowPagination}
       />
     </FieldSet>
   );
