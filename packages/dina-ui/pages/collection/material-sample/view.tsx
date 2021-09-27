@@ -102,6 +102,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         const hasDetermination = materialSample?.determination?.some(
           det => !isEmpty(det)
         );
+        const postDeleteRedirect = router.asPath;
 
         return (
           <main className="container-fluid">
@@ -142,12 +143,14 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 <SamplesView
                   samples={[materialSample.parentMaterialSample]}
                   fieldSetId={<DinaMessage id="parentMaterialSample" />}
+                  postDeleteRedirect={postDeleteRedirect}
                 />
               )}
               {!!materialSample.materialSampleChildren?.length && (
                 <SamplesView
                   samples={materialSample.materialSampleChildren}
                   fieldSetId={<DinaMessage id="childMaterialSamples" />}
+                  postDeleteRedirect={postDeleteRedirect}
                 />
               )}
               {hasPreparations && <PreparationField />}

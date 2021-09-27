@@ -228,12 +228,18 @@ export function computeSuffix({
   suffixType
 }: ComputeSuffixProps) {
   if (suffixType === TYPE_NUMERIC) {
+    const suffixLength = start?.length;
     // correclty set the start when numerical input is null/empty, default to 1
     const suffixNumber = isNaN(parseInt(start as any, 10))
       ? index + 1
       : index + parseInt(start as any, 10);
 
-    return String(suffixNumber);
+    const computedSuffixLen =
+      suffixLength && String(suffixNumber).length > suffixLength
+        ? String(suffixNumber).length
+        : suffixLength ?? String(suffixNumber).length;
+
+    return padStart(String(suffixNumber), computedSuffixLen, "0");
   } else {
     let myStart = start;
     // Correclty set the start value when letter input is null/empty, defualt to "A"

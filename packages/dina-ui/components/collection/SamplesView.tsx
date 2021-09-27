@@ -13,9 +13,14 @@ import { EditButton, DeleteButton } from "../../../common-ui";
 export interface SamplesViewProps {
   samples?: Partial<MaterialSample>[];
   fieldSetId: JSX.Element;
+  postDeleteRedirect: string;
 }
 
-export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
+export function SamplesView({
+  samples,
+  fieldSetId,
+  postDeleteRedirect
+}: SamplesViewProps) {
   const DEFAULT_PAGE_SIZE = 25;
   const defaultSort = [];
   const { formatMessage } = useDinaIntl();
@@ -63,7 +68,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
           <DeleteButton
             id={id as string}
             options={{ apiBaseUrl: "/collection-api" }}
-            postDeleteRedirect="/collection/material-sample/list"
+            postDeleteRedirect={postDeleteRedirect}
             type="material-sample"
           />
         </div>
