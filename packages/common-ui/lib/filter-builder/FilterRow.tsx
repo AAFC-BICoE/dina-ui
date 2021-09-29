@@ -83,6 +83,19 @@ export class FilterRow extends React.Component<FilterRowProps> {
         ? SEARCH_TYPES_EXACT_ONLY
         : STRING_SEARCH_TYPES;
 
+    const customStyle: any = {
+      multiValueLabel: base => ({ ...base, cursor: "move" }),
+      placeholder: base => ({ ...base, color: "rgb(87,120,94)" }),
+      option: (_, state) => ({
+        ...{
+          backgroundColor:
+            // Use the same color for all dropdown items when highlighting regardless they are selected or not
+            state.isFocused ? "#DEEBFF" : "transparent",
+          padding: "8px 12px"
+        }
+      })
+    };
+
     return (
       <div className="list-inline">
         <div className="list-inline-item" style={{ width: 320 }}>
@@ -93,6 +106,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
             options={this.context.attributeOptions}
             onChange={this.onPropertyChanged}
             value={selectedAttributeOption}
+            styles={customStyle}
           />
         </div>
         <div className="list-inline-item" style={{ width: "12rem" }}>
@@ -105,6 +119,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
             value={predicateTypes.find(
               option => option.value === model.predicate
             )}
+            styles={customStyle}
           />
         </div>
         <div className="list-inline-item">
@@ -158,6 +173,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
               value={searchTypes.find(
                 option => option.value === model.searchType
               )}
+              styles={customStyle}
             />
           </div>
         )}
