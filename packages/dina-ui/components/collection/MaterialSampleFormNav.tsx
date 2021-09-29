@@ -54,6 +54,13 @@ export function MaterialSampleFormNav({
       setEnabled: dataComponentState.setEnablePreparations
     },
     {
+      id: "organism-state-section",
+      msg: formatMessage("organismState"),
+      className: "enable-organism-state",
+      disabled: !dataComponentState.enableOrganism,
+      setEnabled: dataComponentState.setEnableOrganism
+    },
+    {
       id: "determination-section",
       msg: formatMessage("determination"),
       className: "enable-determination",
