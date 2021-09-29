@@ -95,6 +95,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createSplitWorkflow: "Create Split",
   createWorkflowTemplateTitle: "Create Workflow Template",
   customPlaceName: "Custom Place Name",
+  dataComponents: "Data Components",
   dataEntryLabel: "Data Entry",
   dataset: "Dataset",
   datasetSearchTooltip: "For using a different Catalog of Life dataset.",
