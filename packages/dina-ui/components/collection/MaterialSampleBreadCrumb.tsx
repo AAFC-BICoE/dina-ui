@@ -17,7 +17,7 @@ export function MaterialSampleBreadCrumb({
   return (
     <ol
       className="breadcrumb mb-3"
-      style={{ "--bs-breadcrumb-divider": "'>'", fontSize: "2em" } as any}
+      style={{ "--bs-breadcrumb-divider": "'>'" } as any}
     >
       {parentPath.map(node => (
         <li className="breadcrumb-item" key={node.uuid}>

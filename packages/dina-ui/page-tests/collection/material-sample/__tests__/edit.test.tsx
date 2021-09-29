@@ -175,6 +175,8 @@ describe("Material Sample Edit Page", () => {
               determination: [],
               publiclyReleasable: true, // Default value
               relationships: {},
+              organism: null,
+              collection: undefined,
               type: "material-sample"
             },
             type: "material-sample"
@@ -235,6 +237,8 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               managedAttributes: {},
               determination: [],
+              organism: null,
+              collection: undefined,
               publiclyReleasable: true, // Default value
               type: "material-sample",
               relationships: {}
@@ -289,7 +293,7 @@ describe("Material Sample Edit Page", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               determination: [],
-
+              organism: null,
               managedAttributes: {},
               relationships: {}
             },
@@ -382,6 +386,7 @@ describe("Material Sample Edit Page", () => {
               ...BLANK_PREPARATION,
               determination: [],
               managedAttributes: {},
+              organism: null,
               relationships: {}
             },
             type: "material-sample"
@@ -545,6 +550,7 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-ms",
               ...BLANK_PREPARATION,
               determination: [],
+              organism: null,
               relationships: {},
               type: "material-sample"
             },

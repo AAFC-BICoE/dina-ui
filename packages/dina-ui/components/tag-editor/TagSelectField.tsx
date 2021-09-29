@@ -36,20 +36,22 @@ export function TagSelectField({
   return (
     <FieldWrapper
       {...props}
-      readOnlyRender={tagsVal => (
-        <div className="d-flex flex-wrap gap-2">
-          {(tagsVal ?? []).map((tag, index) => (
-            <div
-              key={index}
-              className="card p-1 flex-row align-items-center gap-1"
-              style={{ background: "rgb(221, 221, 221)" }}
-            >
-              <AiFillTag />
-              <span>{tag}</span>
-            </div>
-          ))}
-        </div>
-      )}
+      readOnlyRender={tagsVal =>
+        !!tagsVal?.length && (
+          <div className="d-flex flex-wrap gap-2">
+            {(tagsVal ?? []).map((tag, index) => (
+              <div
+                key={index}
+                className="card p-1 flex-row align-items-center gap-1"
+                style={{ background: "rgb(221, 221, 221)" }}
+              >
+                <AiFillTag />
+                <span>{tag}</span>
+              </div>
+            ))}
+          </div>
+        )
+      }
     >
       {({ value, setValue, invalid }) => (
         <TagSelect

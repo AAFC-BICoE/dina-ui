@@ -18,7 +18,7 @@ export function ToggleField(props: FieldWrapperProps) {
 /** Toggle UI showing the opposite state (true -> off, false -> on) for a boolean field. */
 export function InverseToggleField(props: FieldWrapperProps) {
   return (
-    <FieldWrapper {...props} readOnlyRender={value => String(!value)}>
+    <FieldWrapper {...props}>
       {({ value, setValue }) => (
         <Switch
           checked={!value ?? true}

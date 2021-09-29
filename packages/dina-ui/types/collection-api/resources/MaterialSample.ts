@@ -8,6 +8,7 @@ import { MaterialSampleType } from "./MaterialSampleType";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
 import { Determination } from "./Determination";
 import { Collection } from "./Collection";
+import { Organism } from "./Organism";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -31,8 +32,15 @@ export interface MaterialSampleAttributes {
   hierarchy?: HierarchyItem[];
 
   barcode?: string;
+
+  materialSampleState?: string;
+  materialSampleRemarks?: string;
+
+  organism?: Organism;
   publiclyReleasable?: boolean;
   notPubliclyReleasableReason?: string;
+  materialSampleChildren?: Partial<MaterialSample>[];
+  tags?: string[];
 }
 export interface MaterialSampleRelationships {
   collection?: Collection;

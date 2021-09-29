@@ -10,11 +10,15 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
-  withResponse
+  withResponse,
+  ResourceSelectField,
+  filterBy,
+  AutoSuggestTextField
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
 import { ReactNode, useContext } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
@@ -41,7 +45,13 @@ import {
 import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { CollectingEvent, MaterialSample } from "../../../types/collection-api";
+import {
+  CollectingEvent,
+  MaterialSample,
+  MaterialSampleType,
+  Vocabulary
+} from "../../../types/collection-api";
+import { capitalize } from "lodash";
 
 export default function MaterialSampleEditPage() {
   const router = useRouter();
@@ -68,7 +78,7 @@ export default function MaterialSampleEditPage() {
         {id ? (
           withResponse(materialSampleQuery, ({ data }) => (
             <MaterialSampleForm
-              materialSample={data}
+              materialSample={data as any}
               onSaved={moveToViewPage}
             />
           ))
@@ -168,9 +178,10 @@ export function MaterialSampleForm({
             materialSample={materialSample as any}
           />
         )}
-        {!isTemplate && <MaterialSampleMainInfoFormLayout />}
+        {!isTemplate && <MaterialSampleInfoFormLayout />}
         <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
         <MaterialSampleIdentifiersFormLayout />
+        <MaterialSampleFormLayout />
         <div className="data-components">
           {dataComponentState.enableCollectingEvent && (
             <FieldSet
@@ -265,6 +276,7 @@ export function MaterialSampleForm({
             </FieldSet>
           )}
           {dataComponentState.enablePreparations && <PreparationField />}
+          {dataComponentState.enableOrganism && <OrganismStateField />}
           {dataComponentState.enableDetermination && <DeterminationField />}
           {dataComponentState.enableStorage && (
             <FieldSet
@@ -319,7 +331,7 @@ export function MaterialSampleForm({
     </DinaForm>
   );
 }
-export function MaterialSampleMainInfoFormLayout() {
+export function MaterialSampleInfoFormLayout() {
   return (
     <div className="row">
       <div className="col-md-6">
@@ -329,6 +341,42 @@ export function MaterialSampleMainInfoFormLayout() {
   );
 }
 
+export function MaterialSampleFormLayout() {
+  const { locale } = useDinaIntl();
+  return (
+    <FieldSet
+      id="material-sample-section"
+      legend={<DinaMessage id="materialSample" />}
+    >
+      <div className="row">
+        <div className="col-md-6">
+          <ResourceSelectField<MaterialSampleType>
+            name="materialSampleType"
+            filter={filterBy(["name"])}
+            model="collection-api/material-sample-type"
+            optionLabel={it => it.name}
+            readOnlyLink="/collection/material-sample-type/view?id="
+          />
+          <AutoSuggestTextField<Vocabulary>
+            name="materialSampleState"
+            query={() => ({
+              path: "collection-api/vocabulary/materialSampleState"
+            })}
+            suggestion={vocabElement =>
+              vocabElement?.vocabularyElements?.map(
+                it => it?.labels?.[locale] ?? ""
+              ) ?? ""
+            }
+            alwaysShowSuggestions={true}
+          />
+        </div>
+        <div className="col-md-6">
+          <TextField name="materialSampleRemarks" multiLines={true} />
+        </div>
+      </div>
+    </FieldSet>
+  );
+}
 export interface MaterialSampleIdentifiersFormLayoutProps {
   disableSampleName?: boolean;
   hideOtherCatalogNumbers?: boolean;
@@ -340,7 +388,14 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
 export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
   "collection",
   "materialSampleName",
-  "dwcOtherCatalogNumbers"
+  "dwcOtherCatalogNumbers",
+  "barcode"
+];
+
+export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
+  "materialSampleRemarks",
+  "materialSampleState",
+  "materialSampleType"
 ];
 
 /** Fields layout re-useable between view and edit pages. */
