@@ -89,8 +89,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
       option: (_, state) => ({
         ...{
           backgroundColor:
-            // Use the color being consistent with the other dropdowns when highlighting then,
-            // such as group, which may not have a selected value
+            // Use the same color for all dropdown items when highlighting regardless they are selected or not
             state.isFocused ? "#DEEBFF" : "transparent",
           padding: "8px 12px"
         }
