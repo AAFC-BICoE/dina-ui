@@ -12,7 +12,11 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { ChildSamplesView } from "../../../../dina-ui/components/collection/ChildSamplesView";
+import { SamplesView } from "../../../../dina-ui/components/collection/SamplesView";
+import {
+  OrganismStateField,
+  ORGANISM_FIELDS
+} from "../../../../dina-ui/components/collection/OrganismStateField";
 import {
   Footer,
   Head,
@@ -36,7 +40,8 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import {
   MaterialSampleIdentifiersFormLayout,
-  MaterialSampleMainInfoFormLayout
+  MaterialSampleInfoFormLayout,
+  MaterialSampleFormLayout
 } from "./edit";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
@@ -90,28 +95,42 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           fieldName => materialSample[fieldName]
         );
 
+        const hasOrganism = ORGANISM_FIELDS.some(
+          fieldName => materialSample.organism?.[fieldName]
+        );
+
         const hasDetermination = materialSample?.determination?.some(
           det => !isEmpty(det)
         );
-
         return (
           <main className="container-fluid">
-            {buttonBar}
             <DinaForm<MaterialSample>
               initialValues={materialSample}
               readOnly={true}
             >
-              <MaterialSampleBreadCrumb
-                materialSample={materialSample}
-                disableLastLink={true}
-              />
               <NotPubliclyReleasableWarning />
+              {buttonBar}
               <h1 id="wb-cont">
-                <DinaMessage id="materialSampleViewTitle" />
+                <MaterialSampleBreadCrumb
+                  materialSample={materialSample}
+                  disableLastLink={true}
+                />
               </h1>
-              <MaterialSampleMainInfoFormLayout />
               <TagsAndRestrictionsSection />
               <MaterialSampleIdentifiersFormLayout />
+              {materialSample.parentMaterialSample && (
+                <SamplesView
+                  samples={[materialSample.parentMaterialSample]}
+                  fieldSetId={<DinaMessage id="parentMaterialSample" />}
+                />
+              )}
+              {!!materialSample.materialSampleChildren?.length && (
+                <SamplesView
+                  samples={materialSample.materialSampleChildren}
+                  fieldSetId={<DinaMessage id="childMaterialSamples" />}
+                />
+              )}
+              <MaterialSampleFormLayout />
               {collectingEvent && (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                   <DinaForm initialValues={collectingEvent} readOnly={true}>
@@ -128,12 +147,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   </DinaForm>
                 </FieldSet>
               )}
-              {!!materialSample.materialSampleChildren?.length && (
-                <ChildSamplesView
-                  childSamples={materialSample.materialSampleChildren}
-                />
-              )}
               {hasPreparations && <PreparationField />}
+              {hasOrganism && <OrganismStateField />}
               {hasDetermination && <DeterminationField />}
               {materialSample.storageUnit && (
                 <div className="card card-body mb-3">
