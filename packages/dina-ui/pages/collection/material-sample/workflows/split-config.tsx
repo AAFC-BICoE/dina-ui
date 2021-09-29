@@ -228,13 +228,18 @@ export function computeSuffix({
   suffixType
 }: ComputeSuffixProps) {
   if (suffixType === TYPE_NUMERIC) {
-    const suffixLength = start?.length ?? 3;
+    const suffixLength = start?.length;
     // correclty set the start when numerical input is null/empty, default to 1
     const suffixNumber = isNaN(parseInt(start as any, 10))
       ? index + 1
       : index + parseInt(start as any, 10);
 
-    return padStart(String(suffixNumber), suffixLength, "0");
+    const computedSuffixLen =
+      suffixLength && String(suffixNumber).length > suffixLength
+        ? String(suffixNumber).length
+        : suffixLength ?? String(suffixNumber).length;
+
+    return padStart(String(suffixNumber), computedSuffixLen, "0");
   } else {
     let myStart = start;
     // Correclty set the start value when letter input is null/empty, defualt to "A"
@@ -361,7 +366,7 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
               onChange={(newType, formik) => {
                 formik.setFieldValue(
                   "start",
-                  newType === "Numerical" ? "001" : "A"
+                  newType === "Numerical" ? "1" : "A"
                 );
               }}
             />

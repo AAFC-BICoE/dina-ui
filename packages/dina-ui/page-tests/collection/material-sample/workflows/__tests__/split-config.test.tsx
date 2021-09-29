@@ -242,11 +242,11 @@ describe("MaterialSample split workflow series-mode run config", () => {
 
     wrapper
       .find(".start-field input")
-      .simulate("change", { target: { value: "005" } });
+      .simulate("change", { target: { value: "5" } });
 
     // The input begins with the default value:
     expect(wrapper.find(".sampleNames0 input").prop("value")).toEqual(
-      "my-sample-name005"
+      "my-sample-name5"
     );
     // Reset button is initially hidden:
     expect(wrapper.find("button.reset-sample-names").exists()).toEqual(false);
@@ -264,7 +264,7 @@ describe("MaterialSample split workflow series-mode run config", () => {
 
     // The sample name is reverted to the default value:
     expect(wrapper.find(".sampleNames0 input").prop("value")).toEqual(
-      "my-sample-name005"
+      "my-sample-name5"
     );
 
     // The reset button is hidden again:
