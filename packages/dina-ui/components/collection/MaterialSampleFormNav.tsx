@@ -90,9 +90,11 @@ export function MaterialSampleFormNav({
         scrollDuration="100"
       >
         <nav className="card card-body">
-          <h3>
-            <DinaMessage id="dataComponents" />
-          </h3>
+          <label className="mb-2 text-uppercase">
+            <strong>
+              <DinaMessage id="dataComponents" />
+            </strong>
+          </label>
           <div className="list-group">
             {scrollTargets.map(section => {
               const Tag = section.disabled ? "div" : "a";
@@ -100,12 +102,13 @@ export function MaterialSampleFormNav({
                 <div
                   className={classNames(
                     section.className,
-                    "d-flex list-group-item"
+                    "list-group-item d-flex align-items-center"
                   )}
                   key={section.id}
+                  style={{ height: "3rem" }}
                 >
                   <Tag
-                    className={"flex-grow-1"}
+                    className="flex-grow-1 text-decoration-none"
                     href={section.disabled ? undefined : `#${section.id}`}
                   >
                     {section.msg}
