@@ -105,22 +105,25 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
         return (
           <main className="container-fluid">
-            {buttonBar}
             <DinaForm<MaterialSample>
               initialValues={materialSample}
               readOnly={true}
             >
-              <MaterialSampleBreadCrumb
-                materialSample={materialSample}
-                disableLastLink={true}
-              />
               <NotPubliclyReleasableWarning />
+              {buttonBar}
               <h1 id="wb-cont">
-                <DinaMessage id="materialSampleViewTitle" />
+                <MaterialSampleBreadCrumb
+                  materialSample={materialSample}
+                  disableLastLink={true}
+                />
               </h1>
-              <MaterialSampleInfoFormLayout />
               <TagsAndRestrictionsSection />
               <MaterialSampleIdentifiersFormLayout />
+              {!!materialSample.materialSampleChildren?.length && (
+                <ChildSamplesView
+                  childSamples={materialSample.materialSampleChildren}
+                />
+              )}
               <MaterialSampleFormLayout />
               {collectingEvent && (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
