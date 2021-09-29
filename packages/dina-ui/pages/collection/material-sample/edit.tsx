@@ -29,6 +29,7 @@ import {
   Head,
   MaterialSampleBreadCrumb,
   Nav,
+  ScheduledActionsField,
   StorageLinkerField,
   TagsAndRestrictionsSection
 } from "../../../components";
@@ -365,6 +366,7 @@ export function MaterialSampleForm({
             </FieldSet>
           )}
           {materialSampleAttachmentsUI}
+          <ScheduledActionsField />
         </div>
       </div>
     </div>
