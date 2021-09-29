@@ -118,9 +118,16 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               </h1>
               <TagsAndRestrictionsSection />
               <MaterialSampleIdentifiersFormLayout />
+              {materialSample.parentMaterialSample && (
+                <SamplesView
+                  samples={[materialSample.parentMaterialSample]}
+                  fieldSetId={<DinaMessage id="parentMaterialSample" />}
+                />
+              )}
               {!!materialSample.materialSampleChildren?.length && (
-                <ChildSamplesView
-                  childSamples={materialSample.materialSampleChildren}
+                <SamplesView
+                  samples={materialSample.materialSampleChildren}
+                  fieldSetId={<DinaMessage id="childMaterialSamples" />}
                 />
               )}
               <MaterialSampleFormLayout />
@@ -139,18 +146,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     <CollectingEventFormLayout />
                   </DinaForm>
                 </FieldSet>
-              )}
-              {materialSample.parentMaterialSample && (
-                <SamplesView
-                  samples={[materialSample.parentMaterialSample]}
-                  fieldSetId={<DinaMessage id="parentMaterialSample" />}
-                />
-              )}
-              {!!materialSample.materialSampleChildren?.length && (
-                <SamplesView
-                  samples={materialSample.materialSampleChildren}
-                  fieldSetId={<DinaMessage id="childMaterialSamples" />}
-                />
               )}
               {hasPreparations && <PreparationField />}
               {hasOrganism && <OrganismStateField />}
