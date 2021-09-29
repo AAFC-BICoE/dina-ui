@@ -21,7 +21,7 @@ interface DeleteButtonProps {
   type: string;
 
   /** URL to redirect to after deleting. */
-  postDeleteRedirect: string;
+  postDeleteRedirect?: string;
 
   options?: DoOperationsOptions;
 
@@ -55,12 +55,14 @@ export function DeleteButton({
       options
     );
 
-    await router.push(
-      withLeadingSlash ? "/" + postDeleteRedirect : postDeleteRedirect
-    );
-
     // Force reload the postredirect page after deletion
-    if (reload) router.reload();
+    if (reload) {
+      router.reload();
+    } else if (postDeleteRedirect) {
+      await router.push(
+        withLeadingSlash ? "/" + postDeleteRedirect : postDeleteRedirect
+      );
+    }
   }
 
   if (!id) {
