@@ -18,10 +18,19 @@ describe("ScheduledActionsField", () => {
     // No actions initially:
     expect(wrapper.find(".ReactTable").exists()).toEqual(false);
 
+    // Add first action:
+    wrapper
+      .find(".actionType-field input")
+      .simulate("change", { target: { value: "at1" } });
+    wrapper
+      .find(".actionStatus-field input")
+      .simulate("change", { target: { value: "as1" } });
     wrapper
       .find(".remarks-field textarea")
       .simulate("change", { target: { value: "remarks-1" } });
     wrapper.find("button.save-button").simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
@@ -29,7 +38,13 @@ describe("ScheduledActionsField", () => {
 
     // One action added:
     expect(mockOnSubmit).lastCalledWith({
-      scheduledActions: [{ remarks: "remarks-1" }]
+      scheduledActions: [
+        {
+          actionType: "at1",
+          actionStatus: "as1",
+          remarks: "remarks-1"
+        }
+      ]
     });
 
     // The table is shown now:
@@ -39,10 +54,17 @@ describe("ScheduledActionsField", () => {
     // Add a second Action:
     wrapper.find("button.add-new-button").simulate("click");
     wrapper
+      .find(".actionType-field input")
+      .simulate("change", { target: { value: "at2" } });
+    wrapper
+      .find(".actionStatus-field input")
+      .simulate("change", { target: { value: "as2" } });
+    wrapper
       .find(".remarks-field textarea")
       .simulate("change", { target: { value: "remarks-2" } });
     wrapper.find("button.save-button").simulate("click");
-
+    await new Promise(setImmediate);
+    wrapper.update();
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
@@ -50,7 +72,18 @@ describe("ScheduledActionsField", () => {
 
     // Two actions added:
     expect(mockOnSubmit).lastCalledWith({
-      scheduledActions: [{ remarks: "remarks-1" }, { remarks: "remarks-2" }]
+      scheduledActions: [
+        {
+          actionType: "at1",
+          actionStatus: "as1",
+          remarks: "remarks-1"
+        },
+        {
+          actionType: "at2",
+          actionStatus: "as2",
+          remarks: "remarks-2"
+        }
+      ]
     });
 
     expect(wrapper.find(".ReactTable .rt-tbody .rt-tr").length).toEqual(2);
@@ -61,7 +94,8 @@ describe("ScheduledActionsField", () => {
       .find(".remarks-field textarea")
       .simulate("change", { target: { value: "edited-remarks-1" } });
     wrapper.find("button.save-button").simulate("click");
-
+    await new Promise(setImmediate);
+    wrapper.update();
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
@@ -70,8 +104,16 @@ describe("ScheduledActionsField", () => {
     // Two actions saved:
     expect(mockOnSubmit).lastCalledWith({
       scheduledActions: [
-        { remarks: "edited-remarks-1" },
-        { remarks: "remarks-2" }
+        {
+          actionType: "at1",
+          actionStatus: "as1",
+          remarks: "edited-remarks-1"
+        },
+        {
+          actionType: "at2",
+          actionStatus: "as2",
+          remarks: "remarks-2"
+        }
       ]
     });
 
@@ -85,7 +127,13 @@ describe("ScheduledActionsField", () => {
 
     // One action saved:
     expect(mockOnSubmit).lastCalledWith({
-      scheduledActions: [{ remarks: "edited-remarks-1" }]
+      scheduledActions: [
+        {
+          actionType: "at1",
+          actionStatus: "as1",
+          remarks: "edited-remarks-1"
+        }
+      ]
     });
   });
 });
