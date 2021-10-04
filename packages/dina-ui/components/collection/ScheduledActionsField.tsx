@@ -3,15 +3,15 @@ import {
   DinaForm,
   FieldSet,
   FormikButton,
-  TextField
+  TextField,
+  useDinaFormContext
 } from "common-ui";
-import { FastField } from "formik";
+import { FastField, FormikContextType } from "formik";
 import { useState } from "react";
-import ReactTable, { Column } from "react-table";
+import ReactTable, { CellInfo, Column } from "react-table";
 import { UserSelectField } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { ScheduledAction } from "../../types/collection-api";
-import { isPlainObject } from "lodash";
 
 export interface ScheduledActionsFieldProps {
   className?: string;
@@ -26,8 +26,21 @@ export function ScheduledActionsField({
     "NEW" | { index: number; viewIndex: number } | null
   >("NEW");
 
-  function expandRow(row) {
+  function openRowEditor(row: CellInfo) {
     setActionToEdit({ index: row.index, viewIndex: row.viewIndex });
+  }
+
+  function removeAction(
+    formik: FormikContextType<ScheduledAction>,
+    index: number
+  ) {
+    const scheduledActions =
+      formik.getFieldMeta<ScheduledAction[]>(fieldName).value ?? [];
+    // Remove the item at the index:
+    formik.setFieldValue(fieldName, [
+      ...scheduledActions.slice(0, index),
+      ...scheduledActions.slice(index + 1)
+    ]);
   }
 
   const actionColumns: Column[] = [
@@ -38,13 +51,22 @@ export function ScheduledActionsField({
     { accessor: "remarks", Header: "Remarks" },
     {
       Cell: row => (
-        <FormikButton
-          className="btn btn-primary mb-3"
-          buttonProps={() => ({ style: { width: "10rem" } })}
-          onClick={() => expandRow(row)}
-        >
-          <DinaMessage id="editButtonText" />
-        </FormikButton>
+        <div className={`d-flex index-${row.index}`}>
+          <FormikButton
+            className="btn btn-primary mb-3 edit-button"
+            buttonProps={() => ({ style: { width: "10rem" } })}
+            onClick={() => openRowEditor(row)}
+          >
+            <DinaMessage id="editButtonText" />
+          </FormikButton>
+          <FormikButton
+            className="btn btn-danger mb-3 remove-button"
+            buttonProps={() => ({ style: { width: "10rem" } })}
+            onClick={(_, form) => removeAction(form, row.index)}
+          >
+            <DinaMessage id="remove" />
+          </FormikButton>
+        </div>
       )
     }
   ];
@@ -55,8 +77,6 @@ export function ScheduledActionsField({
         const scheduledActions = (value ?? []) as ScheduledAction[];
 
         const hasActions = !!scheduledActions.length;
-
-        const isEditingExisting = isPlainObject(actionToEdit);
 
         async function saveAction(savedAction: ScheduledAction) {
           if (actionToEdit === "NEW") {
@@ -141,6 +161,8 @@ export function ScheduledActionSubForm({
   onCancelClick,
   actionToEdit
 }: ScheduledActionSubFormProps) {
+  const { isTemplate } = useDinaFormContext();
+
   function disableEnterToSubmitOuterForm(e) {
     // Pressing enter should not submit the outer form:
     if (e.keyCode === 13 && e.target.tagName !== "TEXTAREA") {
@@ -152,7 +174,7 @@ export function ScheduledActionSubForm({
   return (
     <div onKeyDown={disableEnterToSubmitOuterForm}>
       <FieldSet legend={<DinaMessage id="addScheduledAction" />}>
-        <DinaForm initialValues={actionToEdit ?? {}}>
+        <DinaForm initialValues={actionToEdit ?? {}} isTemplate={isTemplate}>
           <div className="row">
             <TextField name="actionType" className="col-sm-6" />
             <DateField name="date" className="col-sm-6" />
@@ -164,7 +186,7 @@ export function ScheduledActionSubForm({
           <TextField name="remarks" multiLines={true} />
           <div className="d-flex justify-content-center gap-2">
             <FormikButton
-              className="btn btn-primary mb-3 add-button"
+              className="btn btn-primary mb-3 save-button"
               buttonProps={() => ({ style: { width: "10rem" } })}
               onClick={onSaveAction}
             >
