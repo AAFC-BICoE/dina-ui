@@ -14,12 +14,17 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { get, mapValues, pick, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
-import { ORGANISM_FIELDS } from "../../../components/collection/OrganismStateField";
 import React, { useRef } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import {
+  GroupSelectField,
+  Head,
+  Nav,
+  SCHEDULEDACTION_FIELDS
+} from "../../../components";
 import { DETERMINATION_FIELDS } from "../../../components/collection/DeterminationField";
+import { ORGANISM_FIELDS } from "../../../components/collection/OrganismStateField";
 import { PREPARATION_FIELDS } from "../../../components/collection/PreparationField";
 import { useMaterialSampleSave } from "../../../components/collection/useMaterialSample";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -136,7 +141,8 @@ export function WorkflowTemplateForm({
       enablePreparations,
       enableStorage,
       enableDetermination,
-      enableOrganism
+      enableOrganism,
+      enableScheduledActions
     }
   } = materialSampleSaveHook;
 
@@ -176,8 +182,16 @@ export function WorkflowTemplateForm({
           ...DETERMINATION_FIELDS.map(field => `determination[0].${field}`)
         )
       : {};
+
     const storageTemplateFields = enableStorage
       ? pick(enabledTemplateFields, "storageUnit")
+      : {};
+
+    const scheduledActionsTemplateFields = enableScheduledActions
+      ? pick(
+          enabledTemplateFields,
+          ...SCHEDULEDACTION_FIELDS.map(field => `scheduledAction.${field}`)
+        )
       : {};
 
     // Construct the template definition to persist based on the form values:
@@ -193,7 +207,8 @@ export function WorkflowTemplateForm({
             ...preparationTemplateFields,
             ...organismTemplateFields,
             ...determinationTemplateFields,
-            ...storageTemplateFields
+            ...storageTemplateFields,
+            ...scheduledActionsTemplateFields
           }
         },
         COLLECTING_EVENT: enableCollectingEvent

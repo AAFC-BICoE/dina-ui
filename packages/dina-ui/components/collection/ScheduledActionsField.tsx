@@ -199,10 +199,11 @@ export function ScheduledActionSubForm({
 
   /** Applies name prefix to field props */
   function fieldProps(fieldName: keyof ScheduledAction) {
+    const templateFieldName = `scheduledAction.${fieldName}`;
     return {
-      name: fieldName, // isTemplate ? `scheduledAction.${fieldName}` : fieldName,
+      name: isTemplate ? templateFieldName : fieldName,
       // If the first determination is enabled, then enable multiple determinations:
-      templateCheckboxFieldName: `scheduledAction.${fieldName}`,
+      templateCheckboxFieldName: templateFieldName,
       // Don't use the prefix for the labels and tooltips:
       customName: fieldName
     };
