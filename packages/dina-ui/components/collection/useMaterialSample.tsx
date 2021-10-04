@@ -265,7 +265,9 @@ export function useMaterialSampleSave({
     Boolean(
       hasScheduledActionsTemplate ||
         materialSample?.scheduledActions?.length ||
-        enabledFields?.materialSample?.includes("scheduledActions")
+        enabledFields?.materialSample?.some(enabledField =>
+          enabledField.startsWith("scheduledAction.")
+        )
     )
   );
 

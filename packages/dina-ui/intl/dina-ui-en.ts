@@ -2,6 +2,7 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
+  actionType: "Action Type",
   addAnotherAssertion: "Add Another GeoReference",
   addAnotherDetermination: "Add Another Determination",
   addAnotherIdentifier: "Add Another Identifier",
@@ -42,6 +43,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   appTitle: "DINA",
   assignToStorage: "Assign to Storage",
   assignedStorage: "Assigned Storage",
+  assignedTo: "Assigned To",
   assignContentsToNewStorage: "Assign Contents to New Storage",
   associatedAgent: "Associated Agent",
   attachExisting: "Attach Existing",
@@ -450,6 +452,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   startEventDateTimeLabel: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   startNewRunConfigLabel: "Start a New Run ",
   stateProvinceLabel: "State/Province",
+  status: "Status",
   storage: "Storage",
   storageUnitListTitle: "Storage Units",
   storageUnitType: "Storage Unit Type",

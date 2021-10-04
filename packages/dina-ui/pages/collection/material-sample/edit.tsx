@@ -52,7 +52,6 @@ import {
   MaterialSampleType,
   Vocabulary
 } from "../../../types/collection-api";
-import { capitalize } from "lodash";
 
 export default function MaterialSampleEditPage() {
   const router = useRouter();

@@ -10,8 +10,9 @@ import { FastField, FormikContextType } from "formik";
 import { Fragment, useState } from "react";
 import ReactTable, { CellInfo, Column } from "react-table";
 import { UserSelectField } from "..";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { ScheduledAction } from "../../types/collection-api";
+import { pick } from "lodash";
 
 /** Type-safe object with all ScheduledAction fields. */
 export const SCHEDULEDACTION_FIELDS_OBJECT: Required<
@@ -39,6 +40,7 @@ export function ScheduledActionsField({
   const fieldName = "scheduledActions";
 
   const { readOnly } = useDinaFormContext();
+  const { formatMessage } = useDinaIntl();
 
   const [actionToEdit, setActionToEdit] = useState<
     "NEW" | { index: number; viewIndex: number } | null
@@ -63,11 +65,11 @@ export function ScheduledActionsField({
   }
 
   const actionColumns: Column[] = [
-    { accessor: "actionType", Header: "Action Type" },
-    { accessor: "date", Header: "Date" },
-    { accessor: "status", Header: "Status" },
-    { accessor: "assignedTo", Header: "Assigned to" },
-    { accessor: "remarks", Header: "Remarks" },
+    { accessor: "actionType", Header: formatMessage("actionType") },
+    { accessor: "date", Header: formatMessage("date") },
+    { accessor: "actionStatus", Header: formatMessage("status") },
+    { accessor: "assignedTo", Header: formatMessage("assignedTo") },
+    { accessor: "remarks", Header: formatMessage("remarks") },
     ...(readOnly
       ? []
       : [
@@ -184,7 +186,15 @@ export function ScheduledActionSubForm({
   onCancelClick,
   actionToEdit
 }: ScheduledActionSubFormProps) {
-  const { isTemplate } = useDinaFormContext();
+  const { enabledFields, initialValues, isTemplate } = useDinaFormContext();
+
+  const actionsEnabledFields = enabledFields?.filter(it =>
+    it.startsWith("scheduledAction.")
+  );
+
+  const actionTemplateInitialValues = enabledFields
+    ? initialValues.scheduledAction
+    : undefined;
 
   function disableEnterToSubmitOuterForm(e) {
     // Pressing enter should not submit the outer form:
@@ -212,7 +222,10 @@ export function ScheduledActionSubForm({
   return (
     <div onKeyDown={disableEnterToSubmitOuterForm}>
       <FieldSet legend={<DinaMessage id="addScheduledAction" />}>
-        <FormWrapper initialValues={actionToEdit ?? {}}>
+        <FormWrapper
+          initialValues={actionToEdit ?? actionTemplateInitialValues ?? {}}
+          enabledFields={actionsEnabledFields}
+        >
           <div className="row">
             <TextField {...fieldProps("actionType")} className="col-sm-6" />
             <DateField {...fieldProps("date")} className="col-sm-6" />
