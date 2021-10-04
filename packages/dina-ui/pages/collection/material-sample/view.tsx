@@ -23,6 +23,7 @@ import {
   MaterialSampleBreadCrumb,
   Nav,
   NotPubliclyReleasableWarning,
+  ScheduledActionsField,
   StorageLinkerField,
   TagsAndRestrictionsSection
 } from "../../../components";
@@ -151,6 +152,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   <StorageLinkerField name="storageUnit" />
                 </div>
               )}
+              <ScheduledActionsField />
               <FieldSet
                 legend={<DinaMessage id="materialSampleManagedAttributes" />}
               >

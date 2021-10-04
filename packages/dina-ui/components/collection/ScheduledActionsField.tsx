@@ -7,7 +7,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { FastField, FormikContextType } from "formik";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import ReactTable, { CellInfo, Column } from "react-table";
 import { UserSelectField } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -22,9 +22,11 @@ export function ScheduledActionsField({
 }: ScheduledActionsFieldProps) {
   const fieldName = "scheduledActions";
 
+  const { readOnly } = useDinaFormContext();
+
   const [actionToEdit, setActionToEdit] = useState<
     "NEW" | { index: number; viewIndex: number } | null
-  >("NEW");
+  >(null);
 
   function openRowEditor(row: CellInfo) {
     setActionToEdit({ index: row.index, viewIndex: row.viewIndex });
@@ -34,6 +36,7 @@ export function ScheduledActionsField({
     formik: FormikContextType<ScheduledAction>,
     index: number
   ) {
+    setActionToEdit(null);
     const scheduledActions =
       formik.getFieldMeta<ScheduledAction[]>(fieldName).value ?? [];
     // Remove the item at the index:
@@ -49,26 +52,30 @@ export function ScheduledActionsField({
     { accessor: "status", Header: "Status" },
     { accessor: "assignedTo", Header: "Assigned to" },
     { accessor: "remarks", Header: "Remarks" },
-    {
-      Cell: row => (
-        <div className={`d-flex index-${row.index}`}>
-          <FormikButton
-            className="btn btn-primary mb-3 edit-button"
-            buttonProps={() => ({ style: { width: "10rem" } })}
-            onClick={() => openRowEditor(row)}
-          >
-            <DinaMessage id="editButtonText" />
-          </FormikButton>
-          <FormikButton
-            className="btn btn-danger mb-3 remove-button"
-            buttonProps={() => ({ style: { width: "10rem" } })}
-            onClick={(_, form) => removeAction(form, row.index)}
-          >
-            <DinaMessage id="remove" />
-          </FormikButton>
-        </div>
-      )
-    }
+    ...(readOnly
+      ? []
+      : [
+          {
+            Cell: row => (
+              <div className={`d-flex gap-3 index-${row.index}`}>
+                <FormikButton
+                  className="btn btn-primary mb-3 edit-button"
+                  buttonProps={() => ({ style: { width: "7rem" } })}
+                  onClick={() => openRowEditor(row)}
+                >
+                  <DinaMessage id="editButtonText" />
+                </FormikButton>
+                <FormikButton
+                  className="btn btn-danger mb-3 remove-button"
+                  buttonProps={() => ({ style: { width: "7rem" } })}
+                  onClick={(_, form) => removeAction(form, row.index)}
+                >
+                  <DinaMessage id="remove" />
+                </FormikButton>
+              </div>
+            )
+          }
+        ])
   ];
 
   return (
@@ -79,7 +86,7 @@ export function ScheduledActionsField({
         const hasActions = !!scheduledActions.length;
 
         async function saveAction(savedAction: ScheduledAction) {
-          if (actionToEdit === "NEW") {
+          if (actionToEdit === "NEW" || !actionToEdit) {
             form.setFieldValue(fieldName, [...scheduledActions, savedAction]);
           } else {
             form.setFieldValue(
@@ -127,7 +134,7 @@ export function ScheduledActionsField({
                 sortable={false}
               />
             )}
-            {!hasActions || actionToEdit === "NEW" ? (
+            {readOnly ? null : !hasActions || actionToEdit === "NEW" ? (
               <ScheduledActionSubForm
                 onSaveAction={saveAction}
                 onCancelClick={
@@ -171,38 +178,57 @@ export function ScheduledActionSubForm({
     }
   }
 
+  // Use a subform for Material Sample form, or use the parent template form for templates.
+  const FormWrapper = isTemplate ? Fragment : DinaForm;
+
+  /** Applies name prefix to field props */
+  function fieldProps(fieldName: string) {
+    return {
+      name: fieldName, // isTemplate ? `scheduledAction.${fieldName}` : fieldName,
+      // If the first determination is enabled, then enable multiple determinations:
+      templateCheckboxFieldName: `scheduledAction.${fieldName}`,
+      // Don't use the prefix for the labels and tooltips:
+      customName: fieldName
+    };
+  }
+
   return (
     <div onKeyDown={disableEnterToSubmitOuterForm}>
       <FieldSet legend={<DinaMessage id="addScheduledAction" />}>
-        <DinaForm initialValues={actionToEdit ?? {}} isTemplate={isTemplate}>
+        <FormWrapper initialValues={actionToEdit ?? {}}>
           <div className="row">
-            <TextField name="actionType" className="col-sm-6" />
-            <DateField name="date" className="col-sm-6" />
+            <TextField {...fieldProps("actionType")} className="col-sm-6" />
+            <DateField {...fieldProps("date")} className="col-sm-6" />
           </div>
           <div className="row">
-            <TextField name="actionStatus" className="col-sm-6" />
-            <UserSelectField name="assignedTo" className="col-sm-6" />
+            <TextField {...fieldProps("actionStatus")} className="col-sm-6" />
+            <UserSelectField
+              {...fieldProps("assignedTo")}
+              className="col-sm-6"
+            />
           </div>
-          <TextField name="remarks" multiLines={true} />
-          <div className="d-flex justify-content-center gap-2">
-            <FormikButton
-              className="btn btn-primary mb-3 save-button"
-              buttonProps={() => ({ style: { width: "10rem" } })}
-              onClick={onSaveAction}
-            >
-              <DinaMessage id={actionToEdit ? "submitBtnText" : "add"} />
-            </FormikButton>
-            {onCancelClick && (
+          <TextField {...fieldProps("remarks")} multiLines={true} />
+          {!isTemplate && (
+            <div className="d-flex justify-content-center gap-2">
               <FormikButton
-                className="btn btn-dark mb-3"
+                className="btn btn-primary mb-3 save-button"
                 buttonProps={() => ({ style: { width: "10rem" } })}
-                onClick={onCancelClick}
+                onClick={onSaveAction}
               >
-                <DinaMessage id="cancelButtonText" />
+                <DinaMessage id={actionToEdit ? "submitBtnText" : "add"} />
               </FormikButton>
-            )}
-          </div>
-        </DinaForm>
+              {onCancelClick && (
+                <FormikButton
+                  className="btn btn-dark mb-3"
+                  buttonProps={() => ({ style: { width: "10rem" } })}
+                  onClick={onCancelClick}
+                >
+                  <DinaMessage id="cancelButtonText" />
+                </FormikButton>
+              )}
+            </div>
+          )}
+        </FormWrapper>
       </FieldSet>
     </div>
   );

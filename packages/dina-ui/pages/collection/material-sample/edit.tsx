@@ -345,6 +345,7 @@ export function MaterialSampleForm({
               </div>
             </FieldSet>
           )}
+          <ScheduledActionsField />
           {!isTemplate && (
             <FieldSet
               legend={<DinaMessage id="managedAttributeListTitle" />}
@@ -366,7 +367,6 @@ export function MaterialSampleForm({
             </FieldSet>
           )}
           {materialSampleAttachmentsUI}
-          <ScheduledActionsField />
         </div>
       </div>
     </div>
