@@ -341,6 +341,12 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     expect(
       wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
     ).toEqual(false);
+    expect(
+      wrapper
+        .find(".enable-scheduled-actions")
+        .find(ReactSwitch)
+        .prop("checked")
+    ).toEqual(false);
 
     // Submit with only the name set:
     await wrapper.find("form").simulate("submit");
@@ -507,5 +513,49 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
     ).toEqual(false);
+  });
+
+  it("Renders the Material Sample form with only the Storage section enabled.", async () => {
+    const wrapper = await getWrapper({
+      id: "1",
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowExisting: false,
+          allowNew: false,
+          templateFields: {
+            ...({
+              "scheduledAction.remarks": {
+                defaultValue: "default-remarks",
+                enabled: true
+              }
+            } as any)
+          }
+        }
+      },
+      group: "test-group",
+      name: "test-definition",
+      type: "material-sample-action-definition"
+    });
+
+    // Only the Scheduled Actions section should be enabled:
+    expect(
+      wrapper
+        .find(".enable-scheduled-actions")
+        .find(ReactSwitch)
+        .prop("checked")
+    ).toEqual(true);
+    expect(
+      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+
+    expect(
+      wrapper
+        .find("#scheduled-actions-section .remarks-field textarea")
+        .prop("value")
+    ).toEqual("default-remarks");
   });
 });
