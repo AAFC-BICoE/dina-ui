@@ -15,6 +15,11 @@ interface EditButtonProps {
   disabled?: boolean;
 
   style?: CSSProperties;
+
+  onKeyUp?: React.KeyboardEventHandler;
+  onMouseOver?: React.KeyboardEventHandler;
+  onMouseOut?: React.KeyboardEventHandler;
+  onBlur?: React.KeyboardEventHandler;
 }
 
 /**
