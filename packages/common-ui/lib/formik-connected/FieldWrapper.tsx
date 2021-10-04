@@ -172,9 +172,12 @@ export function FieldWrapper({
       )}
       {removeLabelTag ? (
         <>
-          <div className="mb-2">
-            <strong>{fieldLabel}</strong>
-          </div>
+          {!removeLabel && (
+            <div className={classNames(labelClass, !horizontal && "mb-2")}>
+              {!hideLabel && <strong>{fieldLabel}</strong>}
+            </div>
+          )}
+
           {fieldWrapperInternal}
         </>
       ) : (

@@ -20,7 +20,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
 import { ReactNode, useContext } from "react";
-import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
   CollectionSelectField,
@@ -28,6 +27,7 @@ import {
   GroupSelectField,
   Head,
   MaterialSampleBreadCrumb,
+  MaterialSampleFormNav,
   Nav,
   ScheduledActionsField,
   StorageLinkerField,
@@ -161,8 +161,6 @@ export function MaterialSampleForm({
       enabledFields
     });
 
-  const { formatMessage } = useDinaIntl();
-
   // CollectingEvent "id" being enabled in the template enabledFields means that the
   // Template links an existing Collecting Event:
   const templateAttachesCollectingEvent = Boolean(
@@ -170,62 +168,9 @@ export function MaterialSampleForm({
   );
 
   const mateirialSampleInternal = (
-    <div className="d-flex">
-      <div>
-        <nav
-          className="card card-body sticky-top d-none d-md-block"
-          style={{ width: "20rem" }}
-        >
-          <h2>
-            <DinaMessage id="formNavigation" />
-          </h2>
-          <div className="list-group">
-            {!isTemplate && (
-              <a href="#identifiers-section" className="list-group-item">
-                <DinaMessage id="identifiers" />
-              </a>
-            )}
-            {!isTemplate && (
-              <a href="#material-sample-section" className="list-group-item">
-                <DinaMessage id="materialSample" />
-              </a>
-            )}
-            {dataComponentState.enableCollectingEvent && (
-              <a href="#collecting-event-section" className="list-group-item">
-                <DinaMessage id="collectingEvent" />
-              </a>
-            )}
-            {dataComponentState.enablePreparations && (
-              <a href="#preparations-section" className="list-group-item">
-                <DinaMessage id="preparations" />
-              </a>
-            )}
-            {dataComponentState.enableOrganism && (
-              <a href="#organism-state-section" className="list-group-item">
-                <DinaMessage id="organismState" />
-              </a>
-            )}
-            {dataComponentState.enableDetermination && (
-              <a href="#determination-section" className="list-group-item">
-                <DinaMessage id="determination" />
-              </a>
-            )}
-            {dataComponentState.enableStorage && (
-              <a href="#storage-section" className="list-group-item">
-                <DinaMessage id="storage" />
-              </a>
-            )}
-            <a href="#managedAttributes-section" className="list-group-item">
-              <DinaMessage id="managedAttributeListTitle" />
-            </a>
-            <a
-              href="#material-sample-attachments-section"
-              className="list-group-item"
-            >
-              <DinaMessage id="materialSampleAttachments" />
-            </a>
-          </div>
-        </nav>
+    <div className="d-md-flex">
+      <div style={{ minWidth: "20rem" }}>
+        <MaterialSampleFormNav dataComponentState={dataComponentState} />
       </div>
       <div className="flex-grow-1 container-fluid">
         {!isTemplate && materialSample && (
@@ -238,7 +183,6 @@ export function MaterialSampleForm({
         <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
         <MaterialSampleIdentifiersFormLayout />
         <MaterialSampleFormLayout />
-        <DataComponentToggler state={dataComponentState} />
         <div className="data-components">
           {dataComponentState.enableCollectingEvent && (
             <FieldSet
@@ -393,11 +337,9 @@ export function MaterialSampleForm({
 }
 export function MaterialSampleInfoFormLayout() {
   return (
-    <div id="material-sample-info-section">
-      <div className="row">
-        <div className="col-md-6">
-          <GroupSelectField name="group" enableStoredDefaultGroup={true} />
-        </div>
+    <div className="row">
+      <div className="col-md-6">
+        <GroupSelectField name="group" enableStoredDefaultGroup={true} />
       </div>
     </div>
   );
@@ -528,67 +470,5 @@ export function CollectingEventBriefDetails({
         </div>
       </div>
     </DinaForm>
-  );
-}
-
-/** Toggles to enable/disable form sections. */
-function DataComponentToggler({
-  state
-}: {
-  state: ReturnType<typeof useMaterialSampleSave>["dataComponentState"];
-}) {
-  const { formatMessage } = useDinaIntl();
-  return (
-    <FieldSet legend={<DinaMessage id="components" />}>
-      <div className="d-flex gap-5">
-        {[
-          {
-            name: formatMessage("collectingEvent"),
-            className: "enable-collecting-event",
-            enabled: state.enableCollectingEvent,
-            setEnabled: state.setEnableCollectingEvent
-          },
-          {
-            name: formatMessage("preparations"),
-            className: "enable-catalogue-info",
-            enabled: state.enablePreparations,
-            setEnabled: state.setEnablePreparations
-          },
-          {
-            name: formatMessage("organismState"),
-            className: "enable-organism-state",
-            enabled: state.enableOrganism,
-            setEnabled: state.setEnableOrganism
-          },
-          {
-            name: formatMessage("determination"),
-            className: "enable-determination",
-            enabled: state.enableDetermination,
-            setEnabled: state.setEnableDetermination
-          },
-          {
-            name: formatMessage("storage"),
-            className: "enable-storage",
-            enabled: state.enableStorage,
-            setEnabled: state.setEnableStorage
-          }
-        ].map(section => (
-          <label
-            className={`${section.className} d-flex align-items-center fw-bold`}
-            key={section.name}
-          >
-            <Switch
-              className="mx-2"
-              checked={section.enabled}
-              onChange={state.dataComponentToggler(
-                section.setEnabled,
-                section.name
-              )}
-            />
-            {section.name}
-          </label>
-        ))}
-      </div>
-    </FieldSet>
   );
 }

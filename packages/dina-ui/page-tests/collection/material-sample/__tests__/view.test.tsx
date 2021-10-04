@@ -38,6 +38,8 @@ const mockGet = jest.fn<any, any>(async path => {
     return { data: [] };
   } else if (path === "collection-api/material-sample/1/attachment") {
     return { data: [] };
+  } else if (path === "collection-api/collection") {
+    return { data: [] };
   }
 });
 

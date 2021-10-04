@@ -19,7 +19,17 @@ export function TagsAndRestrictionsSection({
   tagsFieldName = "tags"
 }: TagsAndRestrictionsSection) {
   const { readOnly } = useDinaFormContext();
-  return (
+  return readOnly ? (
+    <>
+      <TagSelectField
+        resourcePath={resourcePath}
+        className="row mb-3"
+        name={tagsFieldName}
+        removeLabel={true}
+        removeLabelTag={true}
+      />
+    </>
+  ) : (
     <div className="row">
       <DinaFormSection horizontal="flex">
         <TagSelectField
@@ -33,24 +43,10 @@ export function TagsAndRestrictionsSection({
           }
         />
         <div className="col-sm-6">
-          <Field name="publiclyReleasable">
-            {({ field: { value: pr } }) => (
-              <InverseToggleField
-                name="publiclyReleasable"
-                label={
-                  readOnly ? (
-                    !pr ? (
-                      <DinaMessage id="notPubliclyReleasable" />
-                    ) : (
-                      <DinaMessage id="field_publiclyReleasable" />
-                    )
-                  ) : (
-                    <DinaMessage id="notPubliclyReleasable" />
-                  )
-                }
-              />
-            )}
-          </Field>
+          <InverseToggleField
+            name="publiclyReleasable"
+            label={<DinaMessage id="notPubliclyReleasable" />}
+          />
           <DinaFormSection horizontal={false}>
             <Field name="publiclyReleasable">
               {({ field: { value: pr } }) =>

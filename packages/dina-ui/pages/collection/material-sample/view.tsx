@@ -12,7 +12,7 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { ChildSamplesView } from "../../../../dina-ui/components/collection/ChildSamplesView";
+import { SamplesView } from "../../../../dina-ui/components/collection/SamplesView";
 import {
   OrganismStateField,
   ORGANISM_FIELDS
@@ -103,25 +103,34 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         const hasDetermination = materialSample?.determination?.some(
           det => !isEmpty(det)
         );
-
         return (
           <main className="container-fluid">
-            {buttonBar}
             <DinaForm<MaterialSample>
               initialValues={materialSample}
               readOnly={true}
             >
-              <MaterialSampleBreadCrumb
-                materialSample={materialSample}
-                disableLastLink={true}
-              />
               <NotPubliclyReleasableWarning />
+              {buttonBar}
               <h1 id="wb-cont">
-                <DinaMessage id="materialSampleViewTitle" />
+                <MaterialSampleBreadCrumb
+                  materialSample={materialSample}
+                  disableLastLink={true}
+                />
               </h1>
-              <MaterialSampleInfoFormLayout />
               <TagsAndRestrictionsSection />
               <MaterialSampleIdentifiersFormLayout />
+              {materialSample.parentMaterialSample && (
+                <SamplesView
+                  samples={[materialSample.parentMaterialSample]}
+                  fieldSetId={<DinaMessage id="parentMaterialSample" />}
+                />
+              )}
+              {!!materialSample.materialSampleChildren?.length && (
+                <SamplesView
+                  samples={materialSample.materialSampleChildren}
+                  fieldSetId={<DinaMessage id="childMaterialSamples" />}
+                />
+              )}
               <MaterialSampleFormLayout />
               {collectingEvent && (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
@@ -138,11 +147,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     <CollectingEventFormLayout />
                   </DinaForm>
                 </FieldSet>
-              )}
-              {!!materialSample.materialSampleChildren?.length && (
-                <ChildSamplesView
-                  childSamples={materialSample.materialSampleChildren}
-                />
               )}
               {hasPreparations && <PreparationField />}
               {hasOrganism && <OrganismStateField />}

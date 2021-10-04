@@ -1,7 +1,8 @@
 import { useDinaFormContext } from "common-ui";
 import { useFormikContext } from "formik";
-import { AiFillWarning } from "react-icons/ai";
+import { MdVpnLock } from "react-icons/md";
 import { DinaMessage } from "../../intl/dina-ui-intl";
+import { TextField } from "../../../common-ui/lib/formik-connected/TextField";
 
 export function NotPubliclyReleasableWarning() {
   const { readOnly } = useDinaFormContext();
@@ -12,11 +13,19 @@ export function NotPubliclyReleasableWarning() {
   }
 
   return (
-    <div className="alert alert-danger d-flex gap-2 align-items-center">
-      <AiFillWarning style={{ width: "24px", height: "24px" }} />
-      <div>
+    <div className="alert alert-warning">
+      <div className=" d-flex gap-2 align-items-center">
+        <MdVpnLock style={{ width: "24px", height: "24px" }} />
         <DinaMessage id="notPubliclyReleasable" />
       </div>
+      {!!values.notPubliclyReleasableReason && (
+        <TextField
+          name="notPubliclyReleasableReason"
+          className="flex-grow-1"
+          multiLines={true}
+          hideLabel={true}
+        />
+      )}
     </div>
   );
 }
