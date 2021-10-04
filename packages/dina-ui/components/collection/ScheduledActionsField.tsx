@@ -13,6 +13,22 @@ import { UserSelectField } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { ScheduledAction } from "../../types/collection-api";
 
+/** Type-safe object with all ScheduledAction fields. */
+export const SCHEDULEDACTION_FIELDS_OBJECT: Required<
+  Record<keyof ScheduledAction, true>
+> = {
+  actionStatus: true,
+  actionType: true,
+  assignedTo: true,
+  date: true,
+  remarks: true
+};
+
+/** All fields of the ScheduledAction type. */
+export const SCHEDULEDACTION_FIELDS = Object.keys(
+  SCHEDULEDACTION_FIELDS_OBJECT
+);
+
 export interface ScheduledActionsFieldProps {
   className?: string;
 }
@@ -182,7 +198,7 @@ export function ScheduledActionSubForm({
   const FormWrapper = isTemplate ? Fragment : DinaForm;
 
   /** Applies name prefix to field props */
-  function fieldProps(fieldName: string) {
+  function fieldProps(fieldName: keyof ScheduledAction) {
     return {
       name: fieldName, // isTemplate ? `scheduledAction.${fieldName}` : fieldName,
       // If the first determination is enabled, then enable multiple determinations:

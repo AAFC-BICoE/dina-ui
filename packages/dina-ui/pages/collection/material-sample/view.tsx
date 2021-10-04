@@ -152,7 +152,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   <StorageLinkerField name="storageUnit" />
                 </div>
               )}
-              <ScheduledActionsField />
+              {!!materialSample?.scheduledActions?.length && (
+                <ScheduledActionsField />
+              )}
               <FieldSet
                 legend={<DinaMessage id="materialSampleManagedAttributes" />}
               >

@@ -345,7 +345,9 @@ export function MaterialSampleForm({
               </div>
             </FieldSet>
           )}
-          <ScheduledActionsField />
+          {dataComponentState.enableScheduledActions && (
+            <ScheduledActionsField />
+          )}
           {!isTemplate && (
             <FieldSet
               legend={<DinaMessage id="managedAttributeListTitle" />}

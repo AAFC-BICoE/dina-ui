@@ -17,6 +17,7 @@ import {
   useState
 } from "react";
 import { useCollectingEventQuery, useCollectingEventSave } from ".";
+import { SCHEDULEDACTION_FIELDS } from "..";
 import {
   CollectingEvent,
   MaterialSample
@@ -196,6 +197,15 @@ export function useMaterialSampleSave({
       )
     );
 
+  const hasScheduledActionsTemplate =
+    isTemplate &&
+    !isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        SCHEDULEDACTION_FIELDS.map(fieldName => `scheduledAction.${fieldName}`)
+      )
+    );
+
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(
       hasColEventTemplate ||
@@ -250,6 +260,15 @@ export function useMaterialSampleSave({
     )
   );
 
+  const [enableScheduledActions, setEnableScheduledActions] = useState(
+    // Show the Scheduled Actions section if the field is set or the template enables it:
+    Boolean(
+      hasScheduledActionsTemplate ||
+        materialSample?.scheduledActions?.length ||
+        enabledFields?.materialSample?.includes("scheduledActions")
+    )
+  );
+
   // The state describing which Data components (Form sections) are enabled:
   const dataComponentState = {
     enableCollectingEvent,
@@ -262,6 +281,8 @@ export function useMaterialSampleSave({
     setEnableStorage,
     enableDetermination,
     setEnableDetermination,
+    enableScheduledActions,
+    setEnableScheduledActions,
     /** Wraps the useState setter with an AreYouSure modal when setting to false. */
     dataComponentToggler(
       setBoolean: Dispatch<SetStateAction<boolean>>,
