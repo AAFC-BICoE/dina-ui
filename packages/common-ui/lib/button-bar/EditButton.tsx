@@ -17,9 +17,10 @@ interface EditButtonProps {
   style?: CSSProperties;
 
   onKeyUp?: React.KeyboardEventHandler;
-  onMouseOver?: React.KeyboardEventHandler;
-  onMouseOut?: React.KeyboardEventHandler;
-  onBlur?: React.KeyboardEventHandler;
+  onMouseOver?: React.MouseEventHandler;
+  onMouseOut?: React.MouseEventHandler;
+  onBlur?: React.FocusEventHandler;
+  ariaDescribedBy?: string;
 }
 
 /**
@@ -30,13 +31,23 @@ export function EditButton({
   entityLink,
   className,
   disabled,
-  style
+  style,
+  onMouseOver,
+  onMouseOut,
+  onBlur,
+  onKeyUp,
+  ariaDescribedBy
 }: EditButtonProps) {
   return (
     <Link href={`/${entityLink}/edit?id=${entityId}`}>
       <a
         className={classNames("btn btn-primary", { disabled }, className)}
         style={{ width: "10rem", ...style }}
+        onMouseOver={onMouseOver}
+        onMouseOut={onMouseOut}
+        onBlur={onBlur}
+        onKeyUp={onKeyUp}
+        aria-describedby={ariaDescribedBy}
       >
         <CommonMessage id="editButtonText" />
       </a>

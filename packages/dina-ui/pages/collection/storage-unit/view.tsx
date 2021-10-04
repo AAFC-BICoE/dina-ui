@@ -19,13 +19,14 @@ import { useState } from "react";
 export function StorageUnitDetailsPage({ router }: WithRouterProps) {
   const id = router.query.id?.toString();
   const storageUnitQuery = useStorageUnit(id);
-  const childrenQuery = useQuery<StorageUnit[]>(
+  const childrenQuery = useQuery<StorageUnit>(
     {
       path: `collection-api/storage-unit/${id}?include=storageUnitChildren`
     },
     { disabled: !id }
   );
-  const children = childrenQuery.response?.data;
+
+  const children = childrenQuery.response?.data.storageUnitChildren;
 
   const [visible, setVisible] = useState(false);
 
@@ -47,6 +48,7 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
               onMouseOver={() => setVisible(true)}
               onMouseOut={() => setVisible(false)}
               onBlur={() => setVisible(false)}
+              ariaDescribedBy={"notEditableWhenThereAreChildStorageUnits"}
             />
           );
 
