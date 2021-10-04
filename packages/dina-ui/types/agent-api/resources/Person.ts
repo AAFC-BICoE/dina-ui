@@ -13,6 +13,8 @@ export interface PersonAttributes {
   createdBy?: string;
   createdOn?: string;
   identifiers?: Identifier[];
+  webpage?: URL;
+  remarks?: string;
 }
 
 export interface PersonRelationships {
