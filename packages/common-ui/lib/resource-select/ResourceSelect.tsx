@@ -4,7 +4,15 @@ import {
   KitsuResource,
   PersistedResource
 } from "kitsu";
-import { castArray, debounce, isEqual, isUndefined, omitBy } from "lodash";
+import {
+  castArray,
+  keys,
+  compact,
+  debounce,
+  isEqual,
+  isUndefined,
+  omitBy
+} from "lodash";
 import React, { ComponentProps, useCallback, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import Select, { components as reactSelectComponents } from "react-select";
@@ -12,6 +20,7 @@ import { Styles } from "react-select/src/styles";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { SelectOption } from "../..";
 import { useQuery } from "../api-client/useQuery";
+import { useBulkGet } from "./useBulkGet";
 
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData extends KitsuResource> {
@@ -187,8 +196,20 @@ export function ResourceSelect<TData extends KitsuResource>({
     );
   };
 
-  // Set the component's value externally when used as a controlled input.
-  const selectedAsArray = castArray(value).map(resource => {
+  const valueAsArray = compact(castArray(value));
+
+  // Sometimes only the ID and type are available in the form state:
+  const valueIsShallowReference = isShallowReference(valueAsArray);
+
+  const selectedResources =
+    useBulkGet<TData>({
+      ids: valueAsArray.map(it => it.id),
+      listPath: model,
+      disabled: !valueIsShallowReference
+    }) ?? valueAsArray;
+
+  // Convert the field value to react-select option objects:
+  const selectedAsArray = selectedResources.map(resource => {
     if (!resource) {
       return null;
     }
@@ -196,14 +217,15 @@ export function ResourceSelect<TData extends KitsuResource>({
       return NULL_OPTION;
     }
     return {
-      label: optionLabel(resource),
+      label: optionLabel(resource) ?? resource.id,
       resource,
       value: resource.id
     };
   });
-  const selectValue = isMulti ? selectedAsArray : selectedAsArray[0];
+  const selectValue = isMulti ? selectedAsArray : selectedAsArray[0] ?? null;
 
   const customStyle: any = {
+    ...styles,
     multiValueLabel: base => ({ ...base, cursor: "move" }),
     placeholder: base => ({ ...base, color: "rgb(87,120,94)" }),
     control: base => ({
@@ -227,10 +249,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       isLoading={isLoading}
       options={options}
       placeholder={formatMessage({ id: "typeHereToSearch" })}
-      styles={{
-        ...styles,
-        ...customStyle
-      }}
+      styles={customStyle}
       value={selectValue}
       isDisabled={isDisabled}
       // react-sortable-hoc config:
@@ -253,3 +272,7 @@ function arrayMove(array: any[], from: number, to: number) {
 }
 const SortableMultiValue = SortableElement(reactSelectComponents.MultiValue);
 const SortableSelect = SortableContainer(Select);
+
+export function isShallowReference(resourceArray: any[]) {
+  return isEqual(keys(castArray(resourceArray)[0]).sort(), ["id", "type"]);
+}
