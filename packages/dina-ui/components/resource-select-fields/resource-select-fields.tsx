@@ -99,9 +99,11 @@ export function UserSelectField(
   return (
     <ResourceSelectField<DinaUser>
       readOnlyLink="/dina-user/view?id="
-      filter={input => ({ username: input })}
       model="user-api/user"
-      optionLabel={user => user.username || user.id}
+      optionLabel={user => user.username}
+      // TODO allow filtering by group
+      filter={() => ({})}
+      pageSize={1000}
       {...props}
     />
   );

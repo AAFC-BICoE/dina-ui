@@ -1,6 +1,7 @@
 import {
   DateField,
   DinaForm,
+  DinaFormSection,
   FieldSet,
   FormikButton,
   OnFormikSubmit,
@@ -79,7 +80,18 @@ export function ScheduledActionsField({
     { accessor: "actionType", Header: formatMessage("actionType") },
     { accessor: "date", Header: formatMessage("date") },
     { accessor: "actionStatus", Header: formatMessage("status") },
-    { accessor: "assignedTo", Header: formatMessage("assignedTo") },
+    {
+      accessor: "assignedTo",
+      Header: formatMessage("assignedTo"),
+      Cell: row => (
+        <DinaFormSection readOnly={true}>
+          <UserSelectField
+            name={`${fieldName}[${row.index}].assignedTo`}
+            removeLabel={true}
+          />
+        </DinaFormSection>
+      )
+    },
     { accessor: "remarks", Header: formatMessage("remarks") },
     ...(readOnly
       ? []

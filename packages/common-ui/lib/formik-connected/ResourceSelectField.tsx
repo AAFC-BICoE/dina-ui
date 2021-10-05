@@ -44,7 +44,9 @@ export function ResourceSelectField<TData extends KitsuResource>(
               return (
                 <Fragment key={resource?.id ?? index}>
                   {readOnlyLink && resource ? (
-                    <Link href={readOnlyLink + resource.id}>{valueText}</Link>
+                    <Link href={readOnlyLink + resource.id}>
+                      {valueText ?? ""}
+                    </Link>
                   ) : (
                     valueText
                   )}

@@ -4,11 +4,10 @@ import {
   KitsuResource,
   PersistedResource
 } from "kitsu";
-import { debounce, isEqual, isUndefined, omitBy } from "lodash";
-import React, { useEffect, useCallback, useState, ComponentProps } from "react";
+import { castArray, debounce, isEqual, isUndefined, omitBy } from "lodash";
+import React, { ComponentProps, useCallback, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
-import { components as reactSelectComponents } from "react-select";
-import Select from "react-select";
+import Select, { components as reactSelectComponents } from "react-select";
 import { Styles } from "react-select/src/styles";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { SelectOption } from "../..";
@@ -17,7 +16,7 @@ import { useQuery } from "../api-client/useQuery";
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData extends KitsuResource> {
   /** Sets the input's value so the value can be controlled externally. */
-  value?: TData | TData[];
+  value?: PersistedResource<TData> | PersistedResource<TData>[];
 
   /** Function called when an option is selected. */
   onChange?: (
@@ -56,6 +55,9 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   invalid?: boolean;
 
   selectProps?: Partial<ComponentProps<typeof Select>>;
+
+  /** Page limit. */
+  pageSize?: number;
 }
 
 /**
@@ -95,7 +97,8 @@ export function ResourceSelect<TData extends KitsuResource>({
   isDisabled,
   omitNullOption,
   invalid,
-  selectProps
+  selectProps,
+  pageSize
 }: ResourceSelectProps<TData>) {
   const { formatMessage } = useIntl();
 
@@ -119,10 +122,12 @@ export function ResourceSelect<TData extends KitsuResource>({
     ["", null, undefined].includes(val as string)
   ) as FilterParam;
 
+  const page = pageSize ? { limit: pageSize } : undefined;
+
   // Omit undefined values from the GET params, which would otherwise cause an invalid request.
   // e.g. /api/region?include=undefined
   const getParams = omitBy<GetParams>(
-    { filter: filterParam, include, sort },
+    { filter: filterParam, include, sort, page },
     val => isUndefined(val) || isEqual(val, {})
   );
 
@@ -153,36 +158,26 @@ export function ResourceSelect<TData extends KitsuResource>({
       : [])
   ];
 
-  async function onChangeSingle(selectedOption) {
-    if (selectedOption?.getResource) {
-      const resource = await (
-        selectedOption as AsyncOption<TData>
-      ).getResource();
-      if (resource) {
-        onChangeProp(resource);
-      }
-    } else if (selectedOption?.resource) {
-      onChangeProp(selectedOption.resource);
-    }
-  }
+  async function onChange(newSelectedRaw) {
+    const newSelected = castArray(newSelectedRaw);
 
-  async function onChangeMulti(selectedOptions: any[] | null) {
-    const asyncOption: AsyncOption<TData> = selectedOptions?.find(
+    // If an async option is selected:
+    const asyncOption: AsyncOption<TData> | undefined = newSelected?.find(
       option => option?.getResource
     );
 
-    if (asyncOption && selectedOptions) {
+    if (asyncOption && newSelectedRaw) {
       // For callback options, don't set any value:
       const asyncResource = await asyncOption.getResource();
       if (asyncResource) {
-        const newResources = selectedOptions.map(option =>
+        const newResources = newSelected.map(option =>
           option === asyncOption ? asyncResource : option.resource
         );
-        onChangeProp(newResources);
+        onChangeProp(isMulti ? newResources : newResources[0]);
       }
     } else {
-      const resources = selectedOptions?.map(o => o.resource) || [];
-      onChangeProp(resources);
+      const resources = newSelected?.map(o => o.resource) || [];
+      onChangeProp(isMulti ? resources : resources[0]);
     }
   }
 
@@ -193,30 +188,20 @@ export function ResourceSelect<TData extends KitsuResource>({
   };
 
   // Set the component's value externally when used as a controlled input.
-  let selectValue;
-  if (isMulti) {
-    const isArr = Array.isArray(value);
-    selectValue = (
-      (isArr
-        ? value
-        : // tslint:disable-next-line: no-string-literal
-          (value ? value["data"] : []) || []) as PersistedResource<TData>[]
-    ).map(resource => ({
+  const selectedAsArray = castArray(value).map(resource => {
+    if (!resource) {
+      return null;
+    }
+    if (resource.id === null) {
+      return NULL_OPTION;
+    }
+    return {
       label: optionLabel(resource),
       resource,
       value: resource.id
-    }));
-  } else {
-    selectValue = !value
-      ? null
-      : (value as TData).id === null
-      ? NULL_OPTION
-      : {
-          label: optionLabel(value as PersistedResource<TData>),
-          resource: value,
-          value: (value as TData).id
-        };
-  }
+    };
+  });
+  const selectValue = isMulti ? selectedAsArray : selectedAsArray[0];
 
   const customStyle: any = {
     multiValueLabel: base => ({ ...base, cursor: "move" }),
@@ -238,7 +223,7 @@ export function ResourceSelect<TData extends KitsuResource>({
         setSearch(current => ({ ...current, input: newVal }))
       }
       inputValue={search.input}
-      onChange={isMulti ? onChangeMulti : onChangeSingle}
+      onChange={onChange}
       isLoading={isLoading}
       options={options}
       placeholder={formatMessage({ id: "typeHereToSearch" })}
