@@ -3,7 +3,8 @@ import {
   ApiClientImplProvider,
   AuthenticatedApiClientProvider,
   KeycloakAccountProvider,
-  ModalProvider
+  ModalProvider,
+  UserSessionTimeout
 } from "common-ui";
 import "common-ui/common-ui-style.css";
 import "common-ui/lib/button-bar/buttonbar.css";
@@ -48,7 +49,9 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
               <ErrorBoundaryPage>
                 <DndProvider backend={HTML5Backend}>
                   <ModalProvider appElement={appElement}>
-                    <Component {...pageProps} />
+                    <UserSessionTimeout>
+                      <Component {...pageProps} />
+                    </UserSessionTimeout>
                   </ModalProvider>
                 </DndProvider>
               </ErrorBoundaryPage>
