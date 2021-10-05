@@ -13,6 +13,9 @@ export interface InstitutionAttributes {
         }[]
       | null;
   };
+  webpage?: URL;
+  address?: string;
+  remarks?: string;
 }
 
 export type Institution = KitsuResource &
