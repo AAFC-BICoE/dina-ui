@@ -2,15 +2,16 @@ import {
   FilterParam,
   GetParams,
   KitsuResource,
+  KitsuResourceLink,
   PersistedResource
 } from "kitsu";
 import {
   castArray,
-  keys,
   compact,
   debounce,
   isEqual,
   isUndefined,
+  keys,
   omitBy
 } from "lodash";
 import React, { ComponentProps, useCallback, useEffect, useState } from "react";
@@ -25,7 +26,10 @@ import { useBulkGet } from "./useBulkGet";
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData extends KitsuResource> {
   /** Sets the input's value so the value can be controlled externally. */
-  value?: PersistedResource<TData> | PersistedResource<TData>[];
+  value?:
+    | PersistedResource<TData>
+    | PersistedResource<TData>[]
+    | KitsuResourceLink;
 
   /** Function called when an option is selected. */
   onChange?: (
@@ -203,7 +207,7 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   const selectedResources =
     useBulkGet<TData>({
-      ids: valueAsArray.map(it => it.id),
+      ids: valueAsArray.map(it => String(it.id)),
       listPath: model,
       disabled: !valueIsShallowReference
     }) ?? valueAsArray;
@@ -217,7 +221,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       return NULL_OPTION;
     }
     return {
-      label: optionLabel(resource) ?? resource.id,
+      label: optionLabel(resource as PersistedResource<TData>) ?? resource.id,
       resource,
       value: resource.id
     };
@@ -274,5 +278,8 @@ const SortableMultiValue = SortableElement(reactSelectComponents.MultiValue);
 const SortableSelect = SortableContainer(Select);
 
 export function isShallowReference(resourceArray: any[]) {
-  return isEqual(keys(castArray(resourceArray)[0]).sort(), ["id", "type"]);
+  const firstElement = castArray(resourceArray)[0];
+  return (
+    !!firstElement?.id && isEqual(keys(firstElement).sort(), ["id", "type"])
+  );
 }

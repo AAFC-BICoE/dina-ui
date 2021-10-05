@@ -741,6 +741,10 @@ describe("Workflow template edit page", () => {
               "determination[0].verbatimScientificName": {
                 defaultValue: "test scientific name",
                 enabled: true
+              },
+              "scheduledAction.remarks": {
+                defaultValue: "default-remarks",
+                enabled: true
               }
             }
           }
