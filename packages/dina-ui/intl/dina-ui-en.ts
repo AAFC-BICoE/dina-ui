@@ -170,6 +170,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_collectorGroup_agentsError:
     "At lease one agent should be specified for the group",
   field_collectors: "Collectors",
+  field_contact: " Contact",
   field_createdBy: "Created By",
   field_createdDate: "Created Date",
   field_createdOn: "Created On",
