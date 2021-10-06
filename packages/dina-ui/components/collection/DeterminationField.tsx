@@ -1,6 +1,7 @@
 import {
   AutoSuggestTextField,
   DateField,
+  DinaFormSection,
   FieldSet,
   filterBy,
   FormikButton,
@@ -9,6 +10,7 @@ import {
   TextFieldWithMultiplicationButton,
   useDinaFormContext
 } from "common-ui";
+import DOMPurify from "dompurify";
 import { FieldArray } from "formik";
 import { clamp } from "lodash";
 import { useState } from "react";
@@ -198,7 +200,7 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                   {
                     // Only show the tabs when there is more than 1 assertion:
                     <TabList
-                      className={`react-tabs__tab-list ${
+                      className={`react-tabs__tab-list mb-0 ${
                         determinations.length === 1 ? "d-none" : ""
                       }`}
                     >
@@ -212,23 +214,28 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                   {determinations.length
                     ? determinations.map((_, index) => (
                         <TabPanel key={index}>
-                          {determinationInternal(index)}
-                          {!readOnly && !isTemplate && (
-                            <div className="list-inline mb-3">
-                              <FormikButton
-                                className="list-inline-item btn btn-primary add-determination-button"
-                                onClick={addDetermination}
-                              >
-                                <DinaMessage id="addAnotherDetermination" />
-                              </FormikButton>
-                              <FormikButton
-                                className="list-inline-item btn btn-dark"
-                                onClick={() => removeDetermination(index)}
-                              >
-                                <DinaMessage id="removeDeterminationLabel" />
-                              </FormikButton>
-                            </div>
-                          )}
+                          <div
+                            className="card-body border-top-0 mb-3"
+                            style={{ border: "1px solid rgb(170, 170, 170)" }}
+                          >
+                            {determinationInternal(index)}
+                            {!readOnly && !isTemplate && (
+                              <div className="list-inline">
+                                <FormikButton
+                                  className="list-inline-item btn btn-primary add-determination-button"
+                                  onClick={addDetermination}
+                                >
+                                  <DinaMessage id="addAnotherDetermination" />
+                                </FormikButton>
+                                <FormikButton
+                                  className="list-inline-item btn btn-dark"
+                                  onClick={() => removeDetermination(index)}
+                                >
+                                  <DinaMessage id="removeDeterminationLabel" />
+                                </FormikButton>
+                              </div>
+                            )}
+                          </div>
                         </TabPanel>
                       ))
                     : null}
@@ -241,6 +248,29 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                     <DinaMessage id="addDetermination" />
                   </FormikButton>
                 )}
+              </div>
+              <div className="row">
+                <DinaFormSection horizontal="flex">
+                  <AutoSuggestTextField
+                    name="filedAs"
+                    className="col-sm-6"
+                    alwaysShowSuggestions={true}
+                    placeholder={formatMessage(
+                      "typeAnythingOrPickAScientificName"
+                    )}
+                    suggestions={() =>
+                      determinations.flatMap(det => [
+                        det.verbatimScientificName,
+                        // Scientific name can be html:
+                        det.scientificName &&
+                          new DOMParser().parseFromString(
+                            DOMPurify.sanitize(det.scientificName),
+                            "text/html"
+                          ).documentElement.textContent
+                      ]) ?? []
+                    }
+                  />
+                </DinaFormSection>
               </div>
             </FieldSet>
           );

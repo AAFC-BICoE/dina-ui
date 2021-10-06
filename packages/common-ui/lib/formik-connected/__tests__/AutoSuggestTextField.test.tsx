@@ -51,4 +51,22 @@ describe("AutoSuggestTextField", () => {
       filter: { rsql: "name==*p*" }
     });
   });
+
+  it("Can render custom suggestions passed via props.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <AutoSuggestTextField<Person>
+          name="examplePersonNameField"
+          suggestions={() => ["suggestion-1", "suggestion-2"]}
+          timeoutMs={0}
+        />
+      </DinaForm>,
+      { apiContext }
+    );
+
+    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
+      "suggestion-1",
+      "suggestion-2"
+    ]);
+  });
 });
