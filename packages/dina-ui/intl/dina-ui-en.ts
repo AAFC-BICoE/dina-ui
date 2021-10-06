@@ -267,6 +267,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_publiclyReleasable_tooltip:
     "Indicates if the object could be released publicly on a web page or open data portals.",
   field_qualifier: "Transcriber's Notes",
+  field_remarks: "Remarks",
   field_startEventDateTime: "Start Event Date Time",
   field_transcriberRemarks: "Verbatim Remarks",
   field_type: "Type",
@@ -275,6 +276,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_verbatimScientificName: "Verbatim Scientific Name",
   field_verbatimDeterminer: "Verbatim Determiner",
   field_verbatimDate: "Verbatim Date",
+  field_webpage: "Web Page",
   field_verbatimEventDateTime: "Verbatim Event Date Time",
   field_xmpMetadataDate: "Last Updated On",
   field_xmpMetadataDate_tooltip:

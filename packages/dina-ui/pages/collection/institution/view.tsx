@@ -38,6 +38,7 @@ export function InstitutionDetailsPage({ router }: WithRouterProps) {
               resource={institution}
               apiBaseUrl="/collection-api"
               resourceBaseUrl="collection/institution"
+              withLeadingSlash={true}
             />
             <InstitutionFormLayout />
           </DinaForm>
