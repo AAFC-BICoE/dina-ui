@@ -30,7 +30,7 @@ export function LanguageSelector() {
                 className="btn btn-link px-0"
                 style={{ color: "#0000cc" }}
                 onClick={onClick}
-                lang={locale}
+                lang={key}
               >
                 {LANGUAGE_LABELS[key]}
               </button>
