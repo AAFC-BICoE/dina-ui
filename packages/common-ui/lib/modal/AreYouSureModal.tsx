@@ -22,7 +22,7 @@ export interface AreYouSureModalProps {
   onNoButtonClicked?: () => void;
 
   /** number of seconds and minutes left before timeout */
-  timeLeft?: { timeLeftMin; timeLeftSec };
+  timeLeft?: { min; sec };
 
   setTimeLeft?: React.Dispatch<React.SetStateAction<any>>;
 }
@@ -37,7 +37,7 @@ export function AreYouSureModal({
   const { closeModal } = useModal();
   const { formatMessage } = useDinaIntl();
   const [shouldSignIn, setShouldSignIn] = useState(
-    timeLeft && timeLeft.timeLeftMin === 0 && timeLeft.timeLeftSec === 0
+    timeLeft && timeLeft.min === 0 && timeLeft.sec === 0
   );
 
   async function onYesClickInternal(
@@ -54,12 +54,10 @@ export function AreYouSureModal({
       clearInterval(myInterval);
     }
     timeRemain = millisToMinutesAndSeconds(
-      timeRemain?.timeLeftMin * 60000 + timeRemain?.timeLeftSec * 1000 - 1000
+      timeRemain?.min * 60000 + timeRemain?.sec * 1000 - 1000
     );
     const myShouldSignIn =
-      timeRemain &&
-      timeRemain.timeLeftMin === 0 &&
-      timeRemain.timeLeftSec === 0;
+      timeRemain && timeRemain.min === 0 && timeRemain.sec === 0;
     const component = document.getElementById("sessionExpireWaring");
 
     if (component) {
@@ -83,13 +81,7 @@ export function AreYouSureModal({
           <main>
             {messageBody ?? timeLeft ? (
               <p style={{ fontSize: "x-large" }} id="sessionExpireWaring">
-                <FormattedMessage
-                  id="sessionAboutToExpire"
-                  values={{
-                    timeLeftMin: timeLeft?.timeLeftMin,
-                    timeLeftSec: timeLeft?.timeLeftSec
-                  }}
-                />
+                <FormattedMessage id="sessionAboutToExpire" values={timeLeft} />
               </p>
             ) : (
               <p style={{ fontSize: "x-large" }}>

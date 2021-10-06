@@ -6,30 +6,24 @@ import { AreYouSureModal, useAccount, useModal } from "..";
 export function millisToMinutesAndSeconds(millis) {
   const minutes = Math.floor(millis / 60000);
   const seconds = ((millis % 60000) / 1000).toFixed(0);
-  return { timeLeftMin: minutes, timeLeftSec: parseFloat(seconds) };
+  return { min: minutes, sec: parseFloat(seconds) };
 }
 
 export function UserSessionTimeout({ children }: { children: ReactNode }) {
   const { openModal } = useModal();
   const { logout } = useAccount();
 
-  /* warning user 3 minutes before the actual timeout */
-  const [timeLeft, setTimeLeft] = useState({ timeLeftMin: 3, timeLeftSec: 0 });
-
   const handleOnIdle = () => {
-    const timeLeftMin = millisToMinutesAndSeconds(180000).timeLeftMin;
-    const timeLeftSec = millisToMinutesAndSeconds(180000).timeLeftSec;
+    /* warning user 3 minutes before the actual timeout */
+    const timeLeft = millisToMinutesAndSeconds(180000);
 
-    setTimeLeft({ timeLeftMin, timeLeftSec });
-
-    if (!isNaN(timeLeftMin) && !isNaN(timeLeftSec)) {
+    if (!isNaN(timeLeft.min) && !isNaN(timeLeft.sec)) {
       openModal(
         <AreYouSureModal
           actionMessage={<DinaMessage id="sessionTimeoutWarning" />}
           onYesButtonClicked={() => reset()}
           onNoButtonClicked={() => logout()}
           timeLeft={timeLeft}
-          setTimeLeft={setTimeLeft}
         />
       );
     }
