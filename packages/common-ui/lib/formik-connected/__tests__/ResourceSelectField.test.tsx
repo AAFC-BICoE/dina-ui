@@ -112,7 +112,7 @@ describe("ResourceSelectField component", () => {
     wrapper.update();
 
     // The "get" function should have been called with the filter.
-    expect(mockGet).lastCalledWith("group", {
+    expect(mockGet).lastCalledWith("test-api/group", {
       filter: {
         groupName: "Mat"
       }
