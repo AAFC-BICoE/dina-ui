@@ -342,6 +342,7 @@ function NavCollectionDropdown() {
 }
 
 export function Footer() {
+  const { formatMessage } = useDinaIntl();
   return (
     <footer id="wb-info" className="my-3" style={{ zIndex: 0 }}>
       <div className="brand">
@@ -384,7 +385,7 @@ export function Footer() {
             <div className="col-6 col-md-3 col-lg-2 text-end">
               <img
                 src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/assets/wmms-blk.svg"
-                alt="Symbol of the Government of Canada"
+                alt={formatMessage("governmentOfCanadaSymbol")}
               />
             </div>
           </div>

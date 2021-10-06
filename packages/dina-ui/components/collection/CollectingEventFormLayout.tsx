@@ -371,17 +371,17 @@ export function CollectingEventFormLayout({
             )}
             <TextField
               name="verbatimEventDateTime"
-              label={formatMessage("verbatimEventDateTimeLabel")}
+              label={formatMessage("verbatimEventDateTime")}
             />
             <FormattedTextField
               name="startEventDateTime"
               className="startEventDateTime"
-              label={formatMessage("startEventDateTimeLabel")}
+              label={formatMessage("startEventDateTime")}
               placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
             <FormattedTextField
               name="endEventDateTime"
-              label={formatMessage("endEventDateTimeLabel")}
+              label={formatMessage("endEventDateTime")}
               placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
           </FieldSet>

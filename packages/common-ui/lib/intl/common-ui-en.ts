@@ -52,6 +52,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   geoSuggest: "Geo-Suggest",
   geoSuggestTooltip:
     "This button shows some suggested geo-locations based on what you've typed into the field.",
+  jumpToPage: "jump to page",
+  rowsPerPage: "rows per page",
   loadingText: "Loading...",
   loggedInAsUser: "Logged in as:",
   logoutBtn: "Logout",
