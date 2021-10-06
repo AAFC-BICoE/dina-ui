@@ -13,7 +13,7 @@ export interface InstitutionAttributes {
         }[]
       | null;
   };
-  webpage?: URL;
+  webpage?: string;
   address?: string;
   remarks?: string;
 }
