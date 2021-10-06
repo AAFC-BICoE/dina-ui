@@ -216,7 +216,11 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                         <TabPanel key={index}>
                           <div
                             className="card-body border-top-0 mb-3"
-                            style={{ border: "1px solid rgb(170, 170, 170)" }}
+                            style={
+                              determinations.length > 1
+                                ? { border: "1px solid rgb(170, 170, 170)" }
+                                : undefined
+                            }
                           >
                             {determinationInternal(index)}
                             {!readOnly && !isTemplate && (
