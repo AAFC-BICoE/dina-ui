@@ -1,4 +1,4 @@
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import React, { ReactNode, useState } from "react";
 import { useIdleTimer } from "react-idle-timer";
 import { AreYouSureModal, useAccount, useModal } from "..";
@@ -6,7 +6,7 @@ import { AreYouSureModal, useAccount, useModal } from "..";
 export function millisToMinutesAndSeconds(millis) {
   const minutes = Math.floor(millis / 60000);
   const seconds = ((millis % 60000) / 1000).toFixed(0);
-  return { timeLeftMin: minutes, timeLeftSec: seconds };
+  return { timeLeftMin: minutes, timeLeftSec: parseFloat(seconds) };
 }
 
 export function UserSessionTimeout({ children }: { children: ReactNode }) {
@@ -20,9 +20,9 @@ export function UserSessionTimeout({ children }: { children: ReactNode }) {
     const timeLeftMin = millisToMinutesAndSeconds(180000).timeLeftMin;
     const timeLeftSec = millisToMinutesAndSeconds(180000).timeLeftSec;
 
-    setTimeLeft({ timeLeftMin, timeLeftSec: parseFloat(timeLeftSec) });
+    setTimeLeft({ timeLeftMin, timeLeftSec });
 
-    if (!isNaN(timeLeftMin) && !isNaN(parseFloat(timeLeftSec))) {
+    if (!isNaN(timeLeftMin) && !isNaN(timeLeftSec)) {
       openModal(
         <AreYouSureModal
           actionMessage={<DinaMessage id="sessionTimeoutWarning" />}
