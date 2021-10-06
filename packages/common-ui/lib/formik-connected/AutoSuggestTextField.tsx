@@ -4,12 +4,13 @@ import {
   TextFieldProps,
   useQuery
 } from "common-ui";
-import { FormikContextType } from "formik";
+import { FormikContextType, useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { castArray, compact, uniq } from "lodash";
 import React, {
   ChangeEvent,
   InputHTMLAttributes,
+  useCallback,
   useEffect,
   useState
 } from "react";
@@ -57,12 +58,11 @@ export function AutoSuggestTextField<T extends KitsuResource>({
   return (
     <TextField
       {...textFieldProps}
-      customInput={(inputProps, formik) => (
+      customInput={inputProps => (
         <AutoSuggestTextFieldInternal
           query={query}
           suggestion={suggestion}
           suggestions={suggestions}
-          formik={formik}
           {...inputProps}
           onSuggestionSelected={onSuggestionSelected}
           alwaysShowSuggestions={alwaysShowSuggestions}
@@ -82,10 +82,10 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   id,
   timeoutMs = 250,
   alwaysShowSuggestions,
-  formik,
   ...inputProps
-}: InputHTMLAttributes<any> &
-  AutoSuggestConfig<T> & { formik: FormikContextType<any> }) {
+}: InputHTMLAttributes<any> & AutoSuggestConfig<T>) {
+  const formik = useFormikContext<any>();
+
   const [searchValue, setSearchValue] = useState("");
   const [debouncedSearchValue] = timeoutMs
     ? useDebounce(searchValue, timeoutMs)

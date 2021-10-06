@@ -258,8 +258,8 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                     placeholder={formatMessage(
                       "typeAnythingOrPickAScientificName"
                     )}
-                    suggestions={() =>
-                      determinations.flatMap(det => [
+                    suggestions={(_, formik) =>
+                      formik.values.determination?.flatMap(det => [
                         det.verbatimScientificName,
                         // Scientific name can be html:
                         det.scientificName &&
