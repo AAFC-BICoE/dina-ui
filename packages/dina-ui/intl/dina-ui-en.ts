@@ -424,8 +424,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   selectGroup: "Select Group",
   selectOrType: "Select or Type",
   sessionAboutToExpire:
-    "Session will expire in {timeLeft} seconds, do you want to extend?",
+    "Session will expire in {timeLeftMin} minutes and {timeLeftSec} seconds, do you want to extend?",
   sessionTimeoutWarning: "Session time out warning",
+  sessionExpiredMessage:
+    "Sorry your session has already expired. Please sign in again.",
   set: "Set",
   setAll: "Set All",
   showing: "Showing",
