@@ -11,7 +11,7 @@ export interface CollectionAttributes {
   createdOn?: string;
   createdBy?: string;
   multilingualDescription?: MultilingualDescription;
-  webpage?: URL;
+  webpage?: string;
   contact?: string;
   address?: string;
   remarks?: string;
