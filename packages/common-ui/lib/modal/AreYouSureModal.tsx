@@ -37,9 +37,7 @@ export function AreYouSureModal({
   const { closeModal } = useModal();
   const { formatMessage } = useDinaIntl();
   const [shouldSignIn, setShouldSignIn] = useState(
-    timeLeft &&
-      timeLeft.timeLeftMin === 0 &&
-      parseFloat(timeLeft.timeLeftSec) === 0
+    timeLeft && timeLeft.timeLeftMin === 0 && timeLeft.timeLeftSec === 0
   );
 
   async function onYesClickInternal(
@@ -56,14 +54,12 @@ export function AreYouSureModal({
       clearInterval(myInterval);
     }
     timeRemain = millisToMinutesAndSeconds(
-      timeRemain?.timeLeftMin * 60000 +
-        parseFloat(timeRemain?.timeLeftSec) * 1000 -
-        1000
+      timeRemain?.timeLeftMin * 60000 + timeRemain?.timeLeftSec * 1000 - 1000
     );
     const myShouldSignIn =
       timeRemain &&
       timeRemain.timeLeftMin === 0 &&
-      parseFloat(timeRemain.timeLeftSec) === 0;
+      timeRemain.timeLeftSec === 0;
     const component = document.getElementById("sessionExpireWaring");
 
     if (component) {

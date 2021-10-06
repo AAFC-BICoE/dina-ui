@@ -36,9 +36,10 @@ export function UserSessionTimeout({ children }: { children: ReactNode }) {
   };
 
   const { reset } = useIdleTimer({
-    timeout: 10 * 1000,
+    /** 20 minutes minus 3 to start warning user of session timeout */
+    timeout: 17 * 60 * 1000,
     onIdle: handleOnIdle,
-    debounce: 50
+    debounce: 500
   });
 
   return <>{children}</>;
