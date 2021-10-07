@@ -5,7 +5,7 @@ import { OnFormikSubmit } from "../formik-connected/safeSubmit";
 import { SubmitButton } from "../formik-connected/SubmitButton";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { useModal } from "./modal";
-import { pick } from "lodash";
+import { isNumber, pick } from "lodash";
 import { FormattedMessage } from "react-intl";
 import { millisToMinutesAndSeconds } from "../account/UserSessionTimeout";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
@@ -23,8 +23,6 @@ export interface AreYouSureModalProps {
 
   /** number of seconds and minutes left before timeout */
   timeLeft?: { min; sec };
-
-  setTimeLeft?: React.Dispatch<React.SetStateAction<any>>;
 }
 
 export function AreYouSureModal({
@@ -45,14 +43,22 @@ export function AreYouSureModal({
   ) {
     const yesBtnParam = pick(dinaFormSubmitParams, "submittedValues", "formik");
     await onYesButtonClicked(yesBtnParam.submittedValues, yesBtnParam.formik);
+    clearInterval(myInterval);
     closeModal();
   }
 
   let timeRemain = timeLeft;
   const myInterval = setInterval(() => {
-    if (shouldSignIn) {
+    /* making sure to clear timer when there is
+     * 1.custom message body,
+     * 2. not used as sessiontimeout,
+     * 3. and user session expired/neeed to sign in */
+
+    if (messageBody || !timeLeft || shouldSignIn) {
       clearInterval(myInterval);
+      return;
     }
+    /* caculate time remain in warning for counting down display */
     timeRemain = millisToMinutesAndSeconds(
       timeRemain?.min * 60000 + timeRemain?.sec * 1000 - 1000
     );
@@ -79,15 +85,19 @@ export function AreYouSureModal({
       <div className="modal-body">
         <DinaForm initialValues={{}} onSubmit={onYesClickInternal}>
           <main>
-            {messageBody ?? timeLeft ? (
-              <p style={{ fontSize: "x-large" }} id="sessionExpireWaring">
-                <FormattedMessage id="sessionAboutToExpire" values={timeLeft} />
-              </p>
-            ) : (
-              <p style={{ fontSize: "x-large" }}>
-                <CommonMessage id="areYouSure" />
-              </p>
-            )}
+            {messageBody ??
+              (isNumber(timeLeft?.min) && isNumber(timeLeft?.sec) ? (
+                <p style={{ fontSize: "x-large" }} id="sessionExpireWaring">
+                  <FormattedMessage
+                    id="sessionAboutToExpire"
+                    values={timeLeft}
+                  />
+                </p>
+              ) : (
+                <p style={{ fontSize: "x-large" }}>
+                  <CommonMessage id="areYouSure" />
+                </p>
+              ))}
           </main>
           <div className="row">
             {!shouldSignIn ? (
@@ -102,7 +112,9 @@ export function AreYouSureModal({
                 className="btn btn-dark form-control no-button"
                 onClick={() =>
                   onNoButtonClicked
-                    ? (onNoButtonClicked(), closeModal())
+                    ? (clearInterval(myInterval),
+                      onNoButtonClicked(),
+                      closeModal())
                     : closeModal()
                 }
               >

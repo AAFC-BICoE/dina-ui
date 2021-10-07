@@ -1,5 +1,5 @@
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode } from "react";
 import { useIdleTimer } from "react-idle-timer";
 import { AreYouSureModal, useAccount, useModal } from "..";
 
