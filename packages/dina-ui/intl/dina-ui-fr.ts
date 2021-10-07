@@ -129,8 +129,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   editStorageUnitTypeTitle: "Modifier le type de stockage",
   editWorkflowTemplateTitle: "Modifier le modèle de flux de travail",
   enableDateRangeLabel: "Activer la plage de dates",
-  endEventDateTimeLabel:
-    "Date/heure de fin d’événement (AAAA-MM-JJTHH:MM:SS.MMM)",
+  endEventDateTime: "Date/heure de fin d’événement (AAAA-MM-JJTHH:MM:SS.MMM)",
   exifProperties: "Propriétés existantes",
   existingAttachments: "Pièces jointes existantes",
   feedbackButtonText: "Commentaires",
@@ -427,7 +426,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   splitSampleTagOriginalAsDestroyed: "Identifier l’original comme « Détruit »",
   splitSubsampleTitle: "Division (sous-échantillon)",
   splitWorkflowRunTitle: "Exécuter la division du flux de travail ",
-  startEventDateTimeLabel:
+  startEventDateTime:
     "Date/heure de début de l’événement (AAAA-MM-JJTHH:MM:SS.MMM)",
   startNewRunConfigLabel: "Lancer une nouvelle éxécution",
   stateProvinceLabel: "État/province",
@@ -460,7 +459,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   userListTitle: "Utilisateurs",
   userMustBelongToGroup: "L’utilisateur doit appartenir à un groupe",
   userViewTitle: "Utilisateur",
-  verbatimEventDateTimeLabel: "Date et heure de l’événement Verbatim",
+  verbatimEventDateTime: "Date et heure de l’événement Verbatim",
   verbatimLabelLegend: "Étiquette Verbatim",
   verbatimLatLong: "Verbatim Lat/Long",
   viewDetailButtonLabel: "Afficher détails",

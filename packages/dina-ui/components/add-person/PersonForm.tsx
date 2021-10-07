@@ -10,7 +10,6 @@ import {
 } from "common-ui";
 import { ResourceSelectField } from "common-ui/lib";
 import { PersistedResource } from "kitsu";
-import { IdentifierType } from "../../../dina-ui/types/agent-api/resources/Identifier";
 import { Organization } from "../../../dina-ui/types/agent-api/resources/Organization";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
@@ -88,6 +87,12 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
         />
       </div>
       <PersonFormFields width="30rem" />
+      <div style={{ width: "30rem" }}>
+        <TextField name="webpage" />
+      </div>
+      <div style={{ width: "30rem" }}>
+        <TextField name="remarks" multiLines={true} />
+      </div>
       <div className="mb-3 list-inline">
         <div className="list-inline-item">
           <SubmitButton />

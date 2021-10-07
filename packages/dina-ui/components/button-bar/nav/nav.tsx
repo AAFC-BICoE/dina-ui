@@ -18,25 +18,18 @@ export function Nav() {
 
   return (
     <>
-      <nav>
-        <ul id="wb-tphp" className="wb-inv wb-init wb-disable-inited">
-          <li className="wb-slc">
-            <a className="wb-sl" href="#wb-cont">
-              <DinaMessage id="skipToMainContent" />
-            </a>
-          </li>
-          <li className="wb-slc visible-sm visible-md visible-lg">
-            <a className="wb-sl" href="#wb-info">
-              <DinaMessage id="skipToAboutThisApplication" />
-            </a>
-          </li>
-          <li className="wb-slc">
-            <a className="wb-sl" rel="alternate" href="?wbdisable=true">
-              <DinaMessage id="skipToBasicHtmlVersion" />
-            </a>
-          </li>
-        </ul>
-      </nav>
+      <div id="wb-tphp" className="d-flex flex-column align-items-center">
+        <a className="wb-link-inv wb-sl" href="#wb-cont">
+          <DinaMessage id="skipToMainContent" />
+        </a>
+        <a className="wb-link-inv wb-sl" href="#wb-info">
+          <DinaMessage id="skipToAboutThisApplication" />
+        </a>
+        <a className="wb-link-inv wb-sl" rel="alternate" href="?wbdisable=true">
+          <DinaMessage id="skipToBasicHtmlVersion" />
+        </a>
+      </div>
+
       <header className="py-3">
         <div id="wb-bnr" className="container">
           <div className="row d-flex">
@@ -50,7 +43,7 @@ export function Nav() {
                 alt={formatMessage("governmentOfCanada")}
                 property="logo"
               />
-              <span className="wb-inv" property="name" tabIndex={0}>
+              <span className="wb-inv" property="name">
                 <span lang={locale}>
                   <DinaMessage id="governmentOfCanada" />
                 </span>
@@ -349,6 +342,7 @@ function NavCollectionDropdown() {
 }
 
 export function Footer() {
+  const { formatMessage } = useDinaIntl();
   return (
     <footer id="wb-info" className="my-3" style={{ zIndex: 0 }}>
       <div className="brand">
@@ -391,7 +385,7 @@ export function Footer() {
             <div className="col-6 col-md-3 col-lg-2 text-end">
               <img
                 src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/assets/wmms-blk.svg"
-                alt="Symbol of the Government of Canada"
+                alt={formatMessage("governmentOfCanadaSymbol")}
               />
             </div>
           </div>

@@ -6,17 +6,15 @@ import {
 } from "common-ui";
 import { FormikContextType, useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { castArray, uniq } from "lodash";
+import { castArray, compact, uniq } from "lodash";
 import React, {
   ChangeEvent,
   InputHTMLAttributes,
+  useCallback,
   useEffect,
   useState
 } from "react";
-import AutoSuggest, {
-  InputProps,
-  ShouldRenderReasons
-} from "react-autosuggest";
+import AutoSuggest, { InputProps } from "react-autosuggest";
 import { useDebounce } from "use-debounce";
 import { OnFormikSubmit } from "./safeSubmit";
 
@@ -28,11 +26,16 @@ interface AutoSuggestConfig<T extends KitsuResource> {
     searchValue: string,
     formikCtx: FormikContextType<any>
   ) => JsonApiQuerySpec;
+  /** Hard-coded suggestions */
+  suggestions?: (
+    searchValue: string,
+    formikCtx: FormikContextType<any>
+  ) => (string | null | undefined)[];
+  /** Configures a  */
   suggestion?: (
     resource: PersistedResource<T>,
     searchValue: string
   ) => string | string[] | undefined;
-  configSuggestion?: (resource: PersistedResource<T>) => string[];
   onSuggestionSelected?: OnFormikSubmit<ChangeEvent<HTMLInputElement>>;
   timeoutMs?: number;
   /** Show the suggestions even when the input is blank. */
@@ -46,7 +49,7 @@ interface AutoSuggestConfig<T extends KitsuResource> {
 export function AutoSuggestTextField<T extends KitsuResource>({
   query,
   suggestion,
-  configSuggestion,
+  suggestions,
   onSuggestionSelected,
   timeoutMs,
   alwaysShowSuggestions,
@@ -59,6 +62,7 @@ export function AutoSuggestTextField<T extends KitsuResource>({
         <AutoSuggestTextFieldInternal
           query={query}
           suggestion={suggestion}
+          suggestions={suggestions}
           {...inputProps}
           onSuggestionSelected={onSuggestionSelected}
           alwaysShowSuggestions={alwaysShowSuggestions}
@@ -72,6 +76,7 @@ export function AutoSuggestTextField<T extends KitsuResource>({
 
 function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   query,
+  suggestions,
   suggestion = (it, searchVal) => (!searchVal ? String(it) : String(searchVal)),
   onSuggestionSelected,
   id,
@@ -79,7 +84,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   alwaysShowSuggestions,
   ...inputProps
 }: InputHTMLAttributes<any> & AutoSuggestConfig<T>) {
-  const formikCtx = useFormikContext<any>();
+  const formik = useFormikContext<any>();
 
   const [searchValue, setSearchValue] = useState("");
   const [debouncedSearchValue] = timeoutMs
@@ -87,21 +92,24 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     : [searchValue];
 
   const { loading, response } = useQuery<T[]>(
-    query?.(debouncedSearchValue, formikCtx) as any,
+    query?.(debouncedSearchValue, formik) as any,
     {
       // Don't show results when the search is empty:
-      disabled: !alwaysShowSuggestions && !debouncedSearchValue?.trim()
+      disabled:
+        !query || (!alwaysShowSuggestions && !debouncedSearchValue?.trim())
     }
   );
 
-  const suggestions =
-    response && !loading
+  const allSuggestions = compact([
+    ...(suggestions?.(searchValue, formik) || []),
+    ...(response && !loading
       ? uniq(
           castArray(response.data).flatMap(it =>
             suggestion(it, debouncedSearchValue)
           )
         )
-      : [];
+      : [])
+  ]);
 
   useEffect(() => {
     const autosuggestGeneratedDivs =
@@ -137,14 +145,14 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
       <div className="autosuggest">
         <AutoSuggest
           id={id}
-          suggestions={suggestions}
+          suggestions={allSuggestions}
           getSuggestionValue={s => s}
           onSuggestionsFetchRequested={({ value }) => setSearchValue(value)}
           onSuggestionSelected={(_, data) => {
             inputProps.onChange?.({
               target: { value: data.suggestion }
             } as any);
-            onSuggestionSelected?.(data.suggestion, formikCtx);
+            onSuggestionSelected?.(data.suggestion, formik);
           }}
           onSuggestionsClearRequested={() => setSearchValue("")}
           renderSuggestion={text => <div>{text}</div>}
