@@ -236,6 +236,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_endEventDateTime: "End Event Date Time",
   field_familyNames_tooltip: "Family name(s) including compound family names",
   field_givenNames_tooltip: "First and all middle names",
+  field_isInseperable: "Keep Contents Together",
+  field_isInseperable_tooltip: "Contents are inseparable",
   field_license: "License",
   field_managedAttributeComponent: "Target Data Component Type",
   field_managedAttributeCreatedBy: "Created By",

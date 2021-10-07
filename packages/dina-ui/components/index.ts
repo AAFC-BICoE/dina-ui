@@ -15,5 +15,6 @@ export * from "./storage/StorageLinker";
 export * from "./storage/BrowseStorageTree";
 export * from "./storage/StorageUnitBreadCrumb";
 export * from "./storage/StorageUnitChildrenViewer";
+export * from "./storage-unit-type/KeepContentsTogetherToggleForm";
 export * from "./tag-editor/TagsAndRestrictionsSection";
 export * from "./tag-editor/NotPubliclyReleasableWarning";
