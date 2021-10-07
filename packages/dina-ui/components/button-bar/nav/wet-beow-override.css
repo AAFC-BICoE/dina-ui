@@ -22,7 +22,6 @@ a.wb-link-inv:focus {
 a.wb-link-inv {
   color: transparent;
   background-color: transparent;
-  /*clip: auto;*/
   clip: rect(1px, 1px, 1px, 1px);
   height: auto;
   margin-top: 15px;
