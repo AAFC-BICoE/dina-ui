@@ -6,6 +6,7 @@ export interface StorageUnitTypeAttributes {
   group: string;
   createdBy?: string;
   createdOn?: string;
+  isInseperable?: boolean;
 }
 
 export type StorageUnitType = KitsuResource & StorageUnitTypeAttributes;

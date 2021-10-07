@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { Promisable } from "type-fest";
-import { withResponse } from "../../../common-ui/lib";
+import { withResponse, QueryTable } from "common-ui";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { useStorageUnit } from "../../pages/collection/storage-unit/edit";
 import { StorageUnit } from "../../types/collection-api";
@@ -39,6 +39,13 @@ export function AssignedStorage({
             >
               <DinaMessage id="removeFromParentStorageUnit" />
             </button>
+          )}
+          {storageUnit.storageUnitType?.isInseperable && (
+            <div>
+              <label>
+                <DinaMessage id="otherContents" />
+              </label>
+            </div>
           )}
         </div>
       ))}
