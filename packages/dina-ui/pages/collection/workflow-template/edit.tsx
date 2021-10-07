@@ -116,6 +116,9 @@ export function WorkflowTemplateForm({
     getTemplateInitialValuesFromSavedFormTemplate(
       formTemplates?.MATERIAL_SAMPLE
     );
+  if (!materialSampleTemplateInitialValues.determination?.length) {
+    materialSampleTemplateInitialValues.determination = [{}];
+  }
 
   const initialValues: Partial<WorkflowFormValues> = {
     ...initialDefinition,

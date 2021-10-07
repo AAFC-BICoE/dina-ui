@@ -477,6 +477,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   to: "To",
   tooltipDefaultLinkMessage: "Click here to learn more.",
   toponymyLegend: "Current Geographic Place",
+  typeAnythingOrPickAScientificName: "Type anything or pick a Scientific Name",
   typeNewTagOrSearchPreviousTags: "Type New Tag or Search Previous Tags",
   typeSpecimen: "Type Specimen",
   uploadButtonText: "Upload",
