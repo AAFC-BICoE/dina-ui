@@ -20,62 +20,23 @@ export interface AreYouSureModalProps {
   messageBody?: ReactNode;
 
   onNoButtonClicked?: () => void;
-
-  /** number of seconds and minutes left before timeout */
-  timeLeft?: { min; sec };
 }
 
 export function AreYouSureModal({
   actionMessage,
   messageBody,
   onYesButtonClicked,
-  onNoButtonClicked,
-  timeLeft
+  onNoButtonClicked
 }: AreYouSureModalProps) {
   const { closeModal } = useModal();
-  const { formatMessage } = useDinaIntl();
-  const [shouldSignIn, setShouldSignIn] = useState(
-    timeLeft && timeLeft.min === 0 && timeLeft.sec === 0
-  );
 
   async function onYesClickInternal(
     dinaFormSubmitParams: DinaFormSubmitParams<any>
   ) {
     const yesBtnParam = pick(dinaFormSubmitParams, "submittedValues", "formik");
     await onYesButtonClicked(yesBtnParam.submittedValues, yesBtnParam.formik);
-    clearInterval(myInterval);
     closeModal();
   }
-
-  let timeRemain = timeLeft;
-  const myInterval = setInterval(() => {
-    /* making sure to clear timer when there is
-     * 1.custom message body,
-     * 2. not used as sessiontimeout,
-     * 3. and user session expired/neeed to sign in */
-
-    if (messageBody || !timeLeft || shouldSignIn) {
-      clearInterval(myInterval);
-      return;
-    }
-    /* caculate time remain in warning for counting down display */
-    timeRemain = millisToMinutesAndSeconds(
-      timeRemain?.min * 60000 + timeRemain?.sec * 1000 - 1000
-    );
-    const myShouldSignIn =
-      timeRemain && timeRemain.min === 0 && timeRemain.sec === 0;
-    const component = document.getElementById("sessionExpireWaring");
-
-    if (component) {
-      if (myShouldSignIn || shouldSignIn) {
-        component.innerHTML = formatMessage("sessionExpiredMessage");
-        setShouldSignIn?.(true);
-        clearInterval(myInterval);
-      } else {
-        component.innerHTML = formatMessage("sessionAboutToExpire", timeRemain);
-      }
-    }
-  }, 1000);
 
   return (
     <div className="modal-content">
@@ -85,44 +46,24 @@ export function AreYouSureModal({
       <div className="modal-body">
         <DinaForm initialValues={{}} onSubmit={onYesClickInternal}>
           <main>
-            {messageBody ??
-              (isNumber(timeLeft?.min) && isNumber(timeLeft?.sec) ? (
-                <p style={{ fontSize: "x-large" }} id="sessionExpireWaring">
-                  <FormattedMessage
-                    id="sessionAboutToExpire"
-                    values={timeLeft}
-                  />
-                </p>
-              ) : (
-                <p style={{ fontSize: "x-large" }}>
-                  <CommonMessage id="areYouSure" />
-                </p>
-              ))}
+            {messageBody ?? (
+              <p style={{ fontSize: "x-large" }}>
+                <CommonMessage id="areYouSure" />
+              </p>
+            )}
           </main>
           <div className="row">
-            {!shouldSignIn ? (
-              <div className="col-md-3">
-                <SubmitButton className="form-control yes-button">
-                  <CommonMessage id="yes" />
-                </SubmitButton>
-              </div>
-            ) : null}
+            <div className="col-md-3">
+              <SubmitButton className="form-control yes-button">
+                <CommonMessage id="yes" />
+              </SubmitButton>
+            </div>
             <div className="offset-md-6 col-md-3">
               <FormikButton
                 className="btn btn-dark form-control no-button"
-                onClick={() =>
-                  onNoButtonClicked
-                    ? (clearInterval(myInterval),
-                      onNoButtonClicked(),
-                      closeModal())
-                    : closeModal()
-                }
+                onClick={() => (onNoButtonClicked?.(), closeModal())}
               >
-                {shouldSignIn ? (
-                  <CommonMessage id="signin" />
-                ) : (
-                  <CommonMessage id="no" />
-                )}
+                <CommonMessage id="no" />
               </FormikButton>
             </div>
           </div>
