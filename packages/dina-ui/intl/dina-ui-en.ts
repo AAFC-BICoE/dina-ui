@@ -111,6 +111,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   deleteSelectedButtonText: "Delete Selected",
   deleteThisAttributesTemplate: "Delete This Template",
   deleted: "Deleted",
+  deleteEmptyStorageWarning:
+    "Storage {storageName} is empty. Would you like to permanently delete this Storage Container?",
   deletedMetadata_tooltip: "Deleted Metadata ID: {id}",
   depthInMeters: "Depth in Meters",
   destroyOriginal: 'Tag Original as "Destroyed"',

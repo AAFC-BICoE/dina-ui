@@ -43,6 +43,12 @@ export interface DinaFormContextI {
 
   /** Optionally restrict the writable fields to this list. */
   enabledFields?: string[] | null;
+
+  /**
+   * @deperecated
+   * Whether this DinaForm is nested in another DinaForm. Nested forms are bad so avoid this.
+   */
+  isNestedForm?: boolean;
 }
 
 export type DinaFormOnSubmit<TValues = any> = (
@@ -102,6 +108,7 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
     <DinaFormContext.Provider
       value={{
         ...props,
+        isNestedForm,
         readOnly: props.readOnly ?? false
       }}
     >

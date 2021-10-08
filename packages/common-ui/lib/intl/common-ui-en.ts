@@ -102,5 +102,6 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   valueLabel: "Value",
   valueSourceType: "Value Source Type",
   viewDetails: "View Details",
+  warning: "Warning",
   yes: "Yes"
 };

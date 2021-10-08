@@ -1,6 +1,6 @@
+import { FormikButton, withResponse } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { Promisable } from "type-fest";
-import { withResponse, QueryTable } from "common-ui";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { useStorageUnit } from "../../pages/collection/storage-unit/edit";
 import { StorageUnit } from "../../types/collection-api";
@@ -32,13 +32,12 @@ export function AssignedStorage({
             <StorageUnitBreadCrumb storageUnit={storageUnit} />
           </div>
           {!readOnly && (
-            <button
-              type="button"
+            <FormikButton
               className="remove-storage btn btn-danger"
-              onClick={() => onChange?.({ id: null })}
+              onClick={async () => await onChange?.({ id: null })}
             >
               <DinaMessage id="removeFromParentStorageUnit" />
-            </button>
+            </FormikButton>
           )}
           {storageUnit.storageUnitType?.isInseperable && (
             <div>
