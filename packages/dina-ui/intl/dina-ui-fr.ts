@@ -397,7 +397,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   primary: "Principal",
   primaryButton_tooltip:
     "Faites de cette affirmation le point de données principal lors de l’exportation. Une seule hypothèse peut servir d’hypothèse principale",
-  primaryId: "Identifiant principal",
   proceedToCreateMetadata: "Passez à la création de métadonnées",
   removeAssertionLabel: "Supprimer cette géoréférence",
   removeComponentData: "Suppression des données de {composant}",
@@ -417,7 +416,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   role: "Role",
   roles: "Rôles",
   rolesPerGroup: "Rôles par groupe",
-  rowsPerPage: " fr for rows",
   runWorkflow: "Exécuter le flux de travail",
   saveAndGoToViewPageButton: "Enregistrer et passer à la page Visualiser",
   saveAndCreateNewMaterialSampleButton:
