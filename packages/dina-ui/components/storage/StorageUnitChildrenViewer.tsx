@@ -8,7 +8,7 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
-import { FilterParam, InputResource, PersistedResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
