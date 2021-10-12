@@ -91,7 +91,7 @@ export function QueryTable<TData extends KitsuResource>({
   path,
   reactTableProps
 }: QueryTableProps<TData>) {
-  const { formatMessage, messages } = useIntl();
+  const { formatMessage } = useIntl();
 
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
@@ -247,16 +247,59 @@ export function QueryTable<TData extends KitsuResource>({
         showPaginationTop={shouldShowPagination}
         showPaginationBottom={shouldShowPagination}
         noDataText={<CommonMessage id="noRowsFound" />}
-        ofText={<CommonMessage id="of" />}
         onPageSizeChange={onPageSizeChange}
         onSortedChange={onSortedChange}
         rowsText={formatMessage({ id: "rows" })}
-        previousText={<CommonMessage id="previous" />}
-        nextText={<CommonMessage id="next" />}
         showPagination={!omitPaging && shouldShowPagination}
         {...resolvedReactTableProps}
-        pageText={<CommonMessage id="page" />}
+        PaginationComponent={DefaultPagination}
       />
+    </div>
+  );
+}
+
+export function DefaultPagination() {
+  const { formatMessage } = useIntl();
+  const rows = formatMessage({ id: "rows" });
+  const rowsPerPage = formatMessage({ id: "rowsPerPage" });
+  const page = formatMessage({ id: "page" });
+  const of = formatMessage({ id: "of" });
+  const previous = formatMessage({ id: "previous" });
+  const next = formatMessage({ id: "next" });
+  const jumpToPage = formatMessage({ id: "jumpToPage" });
+
+  return (
+    <div>
+      <div className="-pagination">
+        <div className="-previous">
+          <button type="button" className="-btn">
+            {previous}
+          </button>
+        </div>
+        <div className="-center">
+          <span className="-pageInfo">
+            {page}
+            <div className="-pageJump">
+              <input aria-label={jumpToPage} type="number" value="1" />
+            </div>
+            {of} <span className="-totalPages">1</span>
+          </span>
+          <span className="select-wrap -pageSizeOptions">
+            <select aria-label={rowsPerPage}>
+              <option value="25">25 {rows}</option>
+              <option value="50">50 {rows}</option>
+              <option value="100">100 {rows}</option>
+              <option value="200">200 {rows}</option>
+              <option value="500">500 {rows}</option>
+            </select>
+          </span>
+        </div>
+        <div className="-next">
+          <button type="button" className="-btn">
+            {next}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
