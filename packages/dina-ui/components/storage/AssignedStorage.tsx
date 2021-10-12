@@ -8,6 +8,8 @@ import { StorageUnit } from "../../types/collection-api";
 import { StorageUnitBreadCrumb } from "./StorageUnitBreadCrumb";
 
 export interface AssignedStorageProps {
+  /** ID of the stored object. */
+  contentId?: string;
   readOnly?: boolean;
   value?: PersistedResource<StorageUnit>;
   onChange?: (
@@ -18,6 +20,7 @@ export interface AssignedStorageProps {
 
 /** Displays the currently assigned Storage, and lets you unlink it. */
 export function AssignedStorage({
+  contentId,
   onChange,
   readOnly,
   value,
@@ -34,7 +37,7 @@ export function AssignedStorage({
           </div>
           {!readOnly && (
             <FormikButton
-              className="remove-storage btn btn-danger"
+              className="remove-storage btn btn-danger mb-3"
               onClick={async () => await onChange?.({ id: null })}
             >
               <DinaMessage id="removeFromParentStorageUnit" />
@@ -45,7 +48,10 @@ export function AssignedStorage({
               <label>
                 <DinaMessage id="otherContents" />
               </label>
-              <StorageUnitContents storageId={storageUnit.id} />
+              <StorageUnitContents
+                storageId={storageUnit.id}
+                excludeContentId={contentId}
+              />
             </div>
           )}
         </div>

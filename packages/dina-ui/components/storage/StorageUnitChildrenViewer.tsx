@@ -183,10 +183,14 @@ export function StorageUnitChildrenViewer({ parentId }: StorageTreeFieldProps) {
 
 export interface StorageUnitContentsProps {
   storageId: string;
+  excludeContentId?: string;
 }
 
 /** Material Sample table and nested Storage Units UI. */
-export function StorageUnitContents({ storageId }) {
+export function StorageUnitContents({
+  excludeContentId = "00000000-0000-0000-0000-000000000000",
+  storageId
+}) {
   const materialSampleColumns: ColumnDefinition<MaterialSample>[] = [
     {
       Cell: ({
@@ -212,7 +216,9 @@ export function StorageUnitContents({ storageId }) {
         <QueryTable
           columns={materialSampleColumns}
           path="collection-api/material-sample"
-          filter={{ rsql: `storageUnit.uuid==${storageId}` }}
+          filter={{
+            rsql: `storageUnit.uuid==${storageId} and uuid!=${excludeContentId}`
+          }}
         />
       </div>
       <div className="mb-3">
