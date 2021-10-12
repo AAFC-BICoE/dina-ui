@@ -1,13 +1,13 @@
 import {
+  AreYouSureModal,
   ButtonBar,
   FieldWrapper,
-  MetaWithTotal,
   SubmitButton,
   useApiClient,
-  useModal,
-  AreYouSureModal
+  useModal
 } from "common-ui";
-import { KitsuResource, KitsuResourceLink, PersistedResource } from "kitsu";
+import { useField } from "formik";
+import { KitsuResource, PersistedResource } from "kitsu";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { Promisable } from "type-fest";
@@ -17,7 +17,6 @@ import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { AssignedStorage } from "./AssignedStorage";
 import { BrowseStorageTree } from "./BrowseStorageTree";
 import { StorageSearchSelector } from "./StorageSearchSelector";
-import { useField } from "formik";
 
 export interface StorageLinkerProps {
   value?: PersistedResource<StorageUnit>;
