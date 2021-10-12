@@ -482,7 +482,7 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Submits a new ADD-type action-definition: Only set the storage template fields.", async () => {
+  it("Submits a new ADD-type action-definition: Only set the scheduled action template fields.", async () => {
     const {
       wrapper,
       toggleScheduledActions,
