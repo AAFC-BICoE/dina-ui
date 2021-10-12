@@ -41,11 +41,9 @@ export function AreYouSureModal({
         <DinaForm initialValues={{}} onSubmit={onYesClickInternal}>
           <main>
             <div className="message-body">
-              {messageBody ?? (
-                <p style={{ fontSize: "x-large" }}>
-                  <CommonMessage id="areYouSure" />
-                </p>
-              )}
+              <p style={{ fontSize: "x-large" }}>
+                {messageBody ?? <CommonMessage id="areYouSure" />}
+              </p>
             </div>
           </main>
           <div className="row">

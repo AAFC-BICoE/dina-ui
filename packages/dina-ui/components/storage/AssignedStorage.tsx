@@ -1,6 +1,7 @@
 import { FormikButton, withResponse } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { Promisable } from "type-fest";
+import { StorageUnitContents } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { useStorageUnit } from "../../pages/collection/storage-unit/edit";
 import { StorageUnit } from "../../types/collection-api";
@@ -44,6 +45,7 @@ export function AssignedStorage({
               <label>
                 <DinaMessage id="otherContents" />
               </label>
+              <StorageUnitContents storageId={storageUnit.id} />
             </div>
           )}
         </div>
