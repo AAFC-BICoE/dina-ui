@@ -2,6 +2,7 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
+  actionType: "Action Type",
   addAnotherAssertion: "Add Another GeoReference",
   addAnotherDetermination: "Add Another Determination",
   addAnotherIdentifier: "Add Another Identifier",
@@ -33,6 +34,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addPreparationTypeTitle: "Add Preparation Type",
   addRule: "Add Rule",
   addRuleSet: "Add Rule Set",
+  addScheduledAction: "Add Scheduled Action",
   addStorageUnitTitle: "Add Storage Unit",
   addStorageUnitTypeTitle: "Add Storage Unit Type",
   agentsSectionTitle: "Agents",
@@ -41,6 +43,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   appTitle: "DINA",
   assignToStorage: "Assign to Storage",
   assignedStorage: "Assigned Storage",
+  assignedTo: "Assigned To",
   assignContentsToNewStorage: "Assign Contents to New Storage",
   associatedAgent: "Associated Agent",
   attachExisting: "Attach Existing",
@@ -236,6 +239,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_endEventDateTime: "End Event Date Time",
   field_familyNames_tooltip: "Family name(s) including compound family names",
   field_givenNames_tooltip: "First and all middle names",
+  field_isInseperable: "Keep Contents Together",
+  field_isInseperable_tooltip: "Contents are inseparable",
   field_license: "License",
   field_managedAttributeComponent: "Target Data Component Type",
   field_managedAttributeCreatedBy: "Created By",
@@ -425,6 +430,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   saveAndGoToViewPageButton: "Save & Go To View Page",
   saveAndCreateNewMaterialSampleButton: "Save & Create New Material Sample",
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
+  scheduledActions: "Scheduled Actions",
   searchButton: "Search",
   searchPreviousTags: "Search previous tags",
   searchResults: "Search Results ({resultSize})",
@@ -458,6 +464,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   startEventDateTime: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   startNewRunConfigLabel: "Start a New Run ",
   stateProvinceLabel: "State/Province",
+  status: "Status",
   storage: "Storage",
   storageUnitListTitle: "Storage Units",
   storageUnitType: "Storage Unit Type",

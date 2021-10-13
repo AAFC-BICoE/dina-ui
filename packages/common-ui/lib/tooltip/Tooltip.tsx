@@ -1,5 +1,5 @@
 import RcTooltip from "rc-tooltip";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 
@@ -27,6 +27,9 @@ interface TooltipProps {
 
   /** Image accessability text. */
   altImage?: string;
+
+  setVisible?: React.Dispatch<React.SetStateAction<boolean>>;
+  visible?: boolean;
 }
 
 export function Tooltip({
@@ -36,10 +39,17 @@ export function Tooltip({
   link,
   linkText,
   image,
-  altImage
+  altImage,
+  setVisible,
+  visible
 }: TooltipProps) {
   // Setup the internationalization functions.
   const { messages, formatMessage } = useIntl();
+  let [popupVisible, setPopupVisible] = useState(false);
+  if (setVisible && visible) {
+    setPopupVisible = setVisible;
+    popupVisible = visible;
+  }
 
   // Determine if a tooltip message needs to be displayed.
   const tooltipMessage =
@@ -56,6 +66,7 @@ export function Tooltip({
               ? formatMessage({ id: altImage })
               : altImage
           }
+          tabIndex={0}
           style={{ width: "100%" }}
         />
       </div>
@@ -79,7 +90,7 @@ export function Tooltip({
     ) : null;
 
   return (
-    <span className="m-2" tabIndex={0}>
+    <span className="m-2">
       <RcTooltip
         id={id}
         overlay={
@@ -90,12 +101,23 @@ export function Tooltip({
           </div>
         }
         placement="top"
+        trigger={["focus", "hover"]}
+        visible={popupVisible}
       >
         <span>
           {visibleElement ?? (
             <img
               src="/static/images/iconInformation.gif"
               alt={id ? formatMessage({ id }) : ""}
+              tabIndex={0}
+              onKeyUp={e =>
+                e.key === "Escape"
+                  ? setPopupVisible(false)
+                  : setPopupVisible(true)
+              }
+              onMouseOver={() => setPopupVisible(true)}
+              onMouseOut={() => setPopupVisible(false)}
+              onBlur={() => setPopupVisible(false)}
             />
           )}
         </span>
