@@ -191,6 +191,8 @@ export function QueryTable<TData extends KitsuResource>({
   const displayData = lastSuccessfulResponse.current?.data;
   const shouldShowPagination = !!displayData?.length;
 
+  const [visible, setVisible] = useState(false);
+
   return (
     <div
       className="query-table-wrapper"
@@ -207,8 +209,19 @@ export function QueryTable<TData extends KitsuResource>({
         <span className="mx-3">
           <Tooltip
             id="queryTableMultiSortExplanation"
+            setVisible={setVisible}
+            visible={visible}
             visibleElement={
-              <a href="#">
+              <a
+                href="#"
+                aria-describedby={"queryTableMultiSortExplanation"}
+                onKeyUp={e =>
+                  e.key === "Escape" ? setVisible(false) : setVisible(true)
+                }
+                onMouseOver={() => setVisible(true)}
+                onMouseOut={() => setVisible(false)}
+                onBlur={() => setVisible(false)}
+              >
                 <CommonMessage id="queryTableMultiSortTooltipTitle" />
               </a>
             }
