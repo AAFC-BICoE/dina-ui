@@ -22,7 +22,7 @@ export function MaterialSampleBreadCrumb({
       {parentPath.map(node => (
         <li className="breadcrumb-item" key={node.uuid}>
           <Link href={`/collection/material-sample/view?id=${node.uuid}`}>
-            <a target="_blank">{node.name}</a>
+            <a>{node.name}</a>
           </Link>
         </li>
       ))}
@@ -32,7 +32,7 @@ export function MaterialSampleBreadCrumb({
             <Link
               href={`/collection/material-sample/view?id=${materialSample.id}`}
             >
-              <a target="_blank">{displayName}</a>
+              <a>{displayName}</a>
             </Link>
           ) : (
             displayName
