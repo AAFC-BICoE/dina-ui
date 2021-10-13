@@ -1,11 +1,14 @@
-import { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import { DinaForm, DinaFormSubmitParams } from "../formik-connected/DinaForm";
 import { FormikButton } from "../formik-connected/FormikButton";
 import { OnFormikSubmit } from "../formik-connected/safeSubmit";
 import { SubmitButton } from "../formik-connected/SubmitButton";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { useModal } from "./modal";
-import { pick } from "lodash";
+import { isNumber, pick } from "lodash";
+import { FormattedMessage } from "react-intl";
+import { millisToMinutesAndSeconds } from "../account/UserSessionTimeout";
+import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 
 export interface AreYouSureModalProps {
   /** Describes the acion you're asking the user about. */
@@ -15,12 +18,15 @@ export interface AreYouSureModalProps {
 
   /** Describes the message displaying to the user in order to make action decision. */
   messageBody?: ReactNode;
+
+  onNoButtonClicked?: () => void;
 }
 
 export function AreYouSureModal({
   actionMessage,
   messageBody,
-  onYesButtonClicked
+  onYesButtonClicked,
+  onNoButtonClicked
 }: AreYouSureModalProps) {
   const { closeModal } = useModal();
 
@@ -55,7 +61,7 @@ export function AreYouSureModal({
             <div className="offset-md-6 col-md-3">
               <FormikButton
                 className="btn btn-dark form-control no-button"
-                onClick={closeModal}
+                onClick={() => (onNoButtonClicked?.(), closeModal())}
               >
                 <CommonMessage id="no" />
               </FormikButton>

@@ -437,6 +437,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Select a collector group to pre-poplulate 'Collectors' field",
   selectGroup: "Select Group",
   selectOrType: "Select or Type",
+  sessionAboutToExpire:
+    "Session will expire in {min} minutes and {sec} seconds, do you want to extend?",
+  sessionTimeoutWarning: "Session time out warning",
+  sessionExpiredMessage:
+    "Sorry your session has already expired. Please sign in again.",
   set: "Set",
   setAll: "Set All",
   showing: "Showing",

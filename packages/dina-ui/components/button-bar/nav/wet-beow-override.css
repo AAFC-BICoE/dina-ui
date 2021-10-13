@@ -16,12 +16,13 @@ a.wb-link-inv:focus {
   color: white;
   text-decoration: none;
   margin-top: 25px;
+  clip: auto;
 }
 
 a.wb-link-inv {
   color: transparent;
   background-color: transparent;
-  clip: auto;
+  clip: rect(1px, 1px, 1px, 1px);
   height: auto;
   margin-top: 15px;
   overflow: hidden;

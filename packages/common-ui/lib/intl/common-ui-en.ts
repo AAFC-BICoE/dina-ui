@@ -87,6 +87,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   selectLocation: "Select Location",
   selected: "selected",
   showChanges: "Show Changes",
+  signin: " Sign In",
   somethingWentWrong: "Something went wrong",
   sourceField: "Source Field",
   sourceText: "Source Text",
