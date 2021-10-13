@@ -11,6 +11,7 @@
 
 /* css for the 3 non visible skip links, make the background color same as the app bar */
 a.wb-link-inv:focus {
+  clip: auto;
   background-color: #26374a;
   display: block;
   color: white;
@@ -19,9 +20,9 @@ a.wb-link-inv:focus {
 }
 
 a.wb-link-inv {
+  clip: rect(1px, 1px, 1px, 1px);
   color: transparent;
   background-color: transparent;
-  clip: auto;
   height: auto;
   margin-top: 15px;
   overflow: hidden;
