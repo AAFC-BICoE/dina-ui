@@ -38,5 +38,10 @@
 }
 
 .query-table-wrapper .ReactTable .rt-tr-group:hover {
+  /* Highlights the hovered table row in green. */
   background-color: rgb(222, 252, 222) !important;
+}
+
+.ReactTable .-pagination .-center .select-wrap.-pageSizeOptions > select:focus {
+  border-color: #66afe9;
 }
