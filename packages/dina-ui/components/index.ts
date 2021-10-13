@@ -5,6 +5,7 @@ export * from "./button-bar/ResourceViewButtonBar";
 export * from "./collection/MaterialSampleBreadCrumb";
 export * from "./collection/ParseVerbatimToRangeButton";
 export * from "./collection/MaterialSampleFormNav";
+export * from "./collection/ScheduledActionsField";
 export * from "./error/ErrorBoundaryPage";
 export * from "./group-select/GroupFieldView";
 export * from "./group-select/GroupSelectField";

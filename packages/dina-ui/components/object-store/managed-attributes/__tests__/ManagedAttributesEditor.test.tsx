@@ -73,7 +73,11 @@ describe("ManagedAttributesEditor component", () => {
         [
           "/managed-attribute/COLLECTING_EVENT.example_attribute_1",
           "/managed-attribute/COLLECTING_EVENT.example_attribute_2"
-        ]
+        ],
+        {
+          apiBaseUrl: "/collection-api",
+          returnNullForMissingResource: true
+        }
       ]
     ]);
     expect(wrapper.find(".example_attribute_1 input").prop("value")).toEqual(

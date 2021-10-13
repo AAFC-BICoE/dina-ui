@@ -75,6 +75,13 @@ export function MaterialSampleFormNav({
       setEnabled: dataComponentState.setEnableStorage
     },
     {
+      id: "scheduled-actions-section",
+      msg: formatMessage("scheduledActions"),
+      className: "enable-scheduled-actions",
+      disabled: !dataComponentState.enableScheduledActions,
+      setEnabled: dataComponentState.setEnableScheduledActions
+    },
+    {
       id: "managedAttributes-section",
       msg: formatMessage("managedAttributeListTitle")
     },

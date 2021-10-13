@@ -1,6 +1,6 @@
-import { KitsuResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
 import moment from "moment";
-import React, { Context } from "react";
+import React from "react";
 import Select from "react-select";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { ResourceSelect } from "../resource-select/ResourceSelect";
@@ -141,7 +141,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
                 optionLabel={attribute.optionLabel ?? (() => "---")}
                 value={
                   typeof model.value !== "string"
-                    ? (model.value as KitsuResource)
+                    ? (model.value as PersistedResource)
                     : undefined
                 }
               />

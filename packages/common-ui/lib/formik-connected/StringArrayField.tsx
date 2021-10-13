@@ -25,7 +25,7 @@ export function StringArrayField(
             <FieldHeader name={props.name} customName={props.customName} />
           )}
           <div className={horizontal ? "" : "ms-2"}>
-            (<CommonMessage id="oneValuePerLine" />)
+            {!readOnly && <CommonMessage id="oneValuePerLine" />}
             {!readOnly && <Tooltip id="oneValuePerLineTooltip" />}
           </div>
         </div>
