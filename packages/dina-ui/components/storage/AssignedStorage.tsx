@@ -32,8 +32,15 @@ export function AssignedStorage({
     <div>
       {withResponse(storageQuery, ({ data: storageUnit }) => (
         <div>
-          <div className="storage-path mb-3">
-            <StorageUnitBreadCrumb storageUnit={storageUnit} />
+          <div className="list-inline mb-3">
+            <div className="storage-path list-inline-item">
+              <StorageUnitBreadCrumb storageUnit={storageUnit} />
+            </div>
+            {storageUnit.storageUnitType?.isInseperable && (
+              <div className="list-inline-item">
+                (<DinaMessage id="keepContentsTogether" />)
+              </div>
+            )}
           </div>
           {!readOnly && (
             <FormikButton
@@ -43,17 +50,15 @@ export function AssignedStorage({
               <DinaMessage id="removeFromParentStorageUnit" />
             </FormikButton>
           )}
-          {storageUnit.storageUnitType?.isInseperable && (
-            <div>
-              <label>
-                <DinaMessage id="otherContents" />
-              </label>
-              <StorageUnitContents
-                storageId={storageUnit.id}
-                excludeContentId={contentId}
-              />
-            </div>
-          )}
+          <div>
+            <label>
+              <DinaMessage id="otherContents" />
+            </label>
+            <StorageUnitContents
+              storageId={storageUnit.id}
+              excludeContentId={contentId}
+            />
+          </div>
         </div>
       ))}
     </div>

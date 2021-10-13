@@ -321,6 +321,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   includeAll: "Include All",
   institution: "Institution",
   institutionListTitle: "Institutions",
+  keepContentsTogether: "Keep Contents Together",
   largeImg: "Large Image",
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",
   latitudeValidationError:
