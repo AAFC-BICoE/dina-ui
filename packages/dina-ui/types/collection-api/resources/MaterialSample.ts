@@ -1,5 +1,5 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
-import { KitsuResource } from "kitsu";
+import { KitsuResource, KitsuResourceLink } from "kitsu";
 import { ManagedAttributeValues, Person } from "../../objectstore-api";
 import { CollectingEvent } from "./CollectingEvent";
 import { PreparationType } from "./PreparationType";
@@ -41,7 +41,18 @@ export interface MaterialSampleAttributes {
   notPubliclyReleasableReason?: string;
   materialSampleChildren?: Partial<MaterialSample>[];
   tags?: string[];
+
+  scheduledActions?: ScheduledAction[];
 }
+
+export interface ScheduledAction {
+  actionType: string;
+  date: string;
+  actionStatus?: string;
+  assignedTo?: KitsuResourceLink;
+  remarks?: string;
+}
+
 export interface MaterialSampleRelationships {
   collection?: Collection;
   materialSampleType?: MaterialSampleType;

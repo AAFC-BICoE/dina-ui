@@ -36,3 +36,7 @@
   padding: 0px !important;
   color: rgba(0, 0, 0, 0.8) !important;
 }
+
+.ReactTable .-pagination .-center .select-wrap.-pageSizeOptions > select:focus {
+  border-color: #66afe9;
+}

@@ -245,6 +245,11 @@ export class ApiClientImpl implements ApiClientI {
       returnNullForMissingResource
     }: BulkGetOptions = {}
   ) {
+    // Don't do an empty operations request:
+    if (!paths.length) {
+      return [];
+    }
+
     const getOperations = paths.map<Operation>(path => ({
       op: "GET",
       path

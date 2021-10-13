@@ -74,21 +74,6 @@ export function Nav() {
         <div className="app-bar">
           <div className="container">
             <ul className="list-inline d-flex m-0">
-              <style>
-                {`
-                .dropdown:hover .dropdown-menu {
-                    display: block;
-                    margin-top: -5px;
-                }
-                .dropdown .nav-link {
-                  color: rgb(232, 230, 227);
-                  border-width: 0px;
-                }
-                .dropdown:hover .nav-link{
-                  background-color: #38414d;
-                }
-              `}
-              </style>
               <li className="list-inline-item me-4">
                 <Link href="/">
                   <a className="app-name px-0">
@@ -349,13 +334,6 @@ export function Footer() {
         <div className="container">
           <div className="row">
             <nav className="col-md-10 ftr-urlt-lnk py-3">
-              <style>
-                {`
-                  .ftr-urlt-lnk li {
-                    float: initial !important;
-                  }
-                `}
-              </style>
               <ul>
                 <li>
                   <a href="https://www.canada.ca/en/contact.html">
