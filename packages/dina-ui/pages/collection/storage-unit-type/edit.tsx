@@ -6,6 +6,7 @@ import {
   DinaFormSubmitParams,
   SubmitButton,
   TextField,
+  ToggleField,
   useDinaFormContext,
   useQuery,
   withResponse
@@ -124,6 +125,7 @@ export function StorageUnitTypeFormFields() {
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
+        <ToggleField className="col-md-6" name="isInseperable" />
       </div>
       {readOnly && (
         <div className="row">
