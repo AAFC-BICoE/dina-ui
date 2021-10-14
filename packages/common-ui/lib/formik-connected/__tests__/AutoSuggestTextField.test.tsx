@@ -1,12 +1,8 @@
 import { KitsuResource } from "kitsu";
-import lodash from "lodash";
 import AutoSuggest from "react-autosuggest";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { AutoSuggestTextField } from "../AutoSuggestTextField";
 import { DinaForm } from "../DinaForm";
-
-// Mock out the debounce function to avoid waiting during tests.
-jest.spyOn(lodash, "debounce").mockImplementation((fn: any) => fn);
 
 interface Person extends KitsuResource {
   name: string;
@@ -35,6 +31,7 @@ describe("AutoSuggestTextField", () => {
             }
           })}
           suggestion={person => person.name}
+          timeoutMs={0}
         />
       </DinaForm>,
       { apiContext }
@@ -53,5 +50,23 @@ describe("AutoSuggestTextField", () => {
     expect(mockGet).lastCalledWith("agent-api/person", {
       filter: { rsql: "name==*p*" }
     });
+  });
+
+  it("Can render custom suggestions passed via props.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <AutoSuggestTextField<Person>
+          name="examplePersonNameField"
+          suggestions={() => ["suggestion-1", "suggestion-2"]}
+          timeoutMs={0}
+        />
+      </DinaForm>,
+      { apiContext }
+    );
+
+    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
+      "suggestion-1",
+      "suggestion-2"
+    ]);
   });
 });

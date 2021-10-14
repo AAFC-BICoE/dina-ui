@@ -1,5 +1,4 @@
 import { transformToRSQL } from "@molgenis/rsql";
-import { FilterParam } from "kitsu";
 
 interface RsqlFilterOptions {
   extraFilters?: RsqlFilterObject[];
@@ -10,7 +9,15 @@ interface RsqlFilterObject {
   selector: string;
 
   /** The comparison operator. */
-  comparison: "==" | "!=" | "=ge=" | "=gt=" | "=le=" | "=lt=";
+  comparison:
+    | "=="
+    | "!="
+    | "=ge="
+    | "=gt="
+    | "=le="
+    | "=lt="
+    | "=in="
+    | "=out=";
 
   /** The search value. */
   arguments: string;

@@ -17,8 +17,14 @@ import { useRouter } from "next/router";
 import React, { useRef } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import {
+  GroupSelectField,
+  Head,
+  Nav,
+  SCHEDULEDACTION_FIELDS
+} from "../../../components";
 import { DETERMINATION_FIELDS } from "../../../components/collection/DeterminationField";
+import { ORGANISM_FIELDS } from "../../../components/collection/OrganismStateField";
 import { PREPARATION_FIELDS } from "../../../components/collection/PreparationField";
 import { useMaterialSampleSave } from "../../../components/collection/useMaterialSample";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -30,7 +36,8 @@ import {
 } from "../../../types/collection-api";
 import {
   IDENTIFIERS_FIELDS,
-  MaterialSampleForm
+  MaterialSampleForm,
+  MATERIALSAMPLE_FIELDSET_FIELDS
 } from "../material-sample/edit";
 
 const workflowMainFieldsSchema = yup.object({
@@ -114,6 +121,9 @@ export function WorkflowTemplateForm({
     getTemplateInitialValuesFromSavedFormTemplate(
       formTemplates?.MATERIAL_SAMPLE
     );
+  if (!materialSampleTemplateInitialValues.determination?.length) {
+    materialSampleTemplateInitialValues.determination = [{}];
+  }
 
   const initialValues: Partial<WorkflowFormValues> = {
     ...initialDefinition,
@@ -133,7 +143,9 @@ export function WorkflowTemplateForm({
       enableCollectingEvent,
       enablePreparations,
       enableStorage,
-      enableDetermination
+      enableDetermination,
+      enableOrganism,
+      enableScheduledActions
     }
   } = materialSampleSaveHook;
 
@@ -150,17 +162,39 @@ export function WorkflowTemplateForm({
       enabledTemplateFields,
       ...IDENTIFIERS_FIELDS
     );
+
+    const materialSampleFieldsetTemplateFields = pick(
+      enabledTemplateFields,
+      ...MATERIALSAMPLE_FIELDSET_FIELDS
+    );
+
     const preparationTemplateFields = enablePreparations
       ? pick(enabledTemplateFields, ...PREPARATION_FIELDS)
       : {};
+
+    const organismTemplateFields = enableOrganism
+      ? pick(
+          enabledTemplateFields,
+          ...ORGANISM_FIELDS.map(field => `organism.${field}`)
+        )
+      : {};
+
     const determinationTemplateFields = enableDetermination
       ? pick(
           enabledTemplateFields,
           ...DETERMINATION_FIELDS.map(field => `determination[0].${field}`)
         )
       : {};
+
     const storageTemplateFields = enableStorage
       ? pick(enabledTemplateFields, "storageUnit")
+      : {};
+
+    const scheduledActionsTemplateFields = enableScheduledActions
+      ? pick(
+          enabledTemplateFields,
+          ...SCHEDULEDACTION_FIELDS.map(field => `scheduledAction.${field}`)
+        )
       : {};
 
     // Construct the template definition to persist based on the form values:
@@ -172,9 +206,12 @@ export function WorkflowTemplateForm({
           ...submittedValues.attachmentsConfig,
           templateFields: {
             ...identifierTemplateFields,
+            ...materialSampleFieldsetTemplateFields,
             ...preparationTemplateFields,
+            ...organismTemplateFields,
             ...determinationTemplateFields,
-            ...storageTemplateFields
+            ...storageTemplateFields,
+            ...scheduledActionsTemplateFields
           }
         },
         COLLECTING_EVENT: enableCollectingEvent

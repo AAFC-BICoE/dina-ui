@@ -8,7 +8,8 @@ const TEST_COLLECTION: PersistedResource<Collection> = {
   type: "collection",
   name: "test collection",
   code: "test-code",
-  group: "cnc"
+  group: "cnc",
+  institution: { id: "1", type: "institution", name: "test institution" }
 };
 
 const mockGet = jest.fn<any, any>(async path => {
@@ -16,6 +17,10 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/collection/123":
       return { data: TEST_COLLECTION };
     case "user-api/group":
+      return { data: [] };
+    case "collection-api/institution":
+      return { data: [TEST_COLLECTION] };
+    case "collection-api/collection":
       return { data: [] };
   }
 });
@@ -34,7 +39,8 @@ const apiContext = {
 const mockPush = jest.fn();
 
 const mockRouter = {
-  push: mockPush
+  push: mockPush,
+  query: { id: "123" }
 };
 
 describe("Collection edit page", () => {
@@ -63,11 +69,11 @@ describe("Collection edit page", () => {
     expect(mockSave).lastCalledWith(
       [
         {
-          resource: {
+          resource: expect.objectContaining({
             code: "test-code",
             name: "test-name",
             type: "collection"
-          },
+          }),
           type: "collection"
         }
       ],
@@ -103,10 +109,15 @@ describe("Collection edit page", () => {
     expect(mockSave).lastCalledWith(
       [
         {
-          resource: {
+          resource: expect.objectContaining({
             ...TEST_COLLECTION,
+            institution: {
+              id: "1",
+              name: "test institution",
+              type: "institution"
+            },
             code: "edited code" // Only this was edited.
-          },
+          }),
           type: "collection"
         }
       ],

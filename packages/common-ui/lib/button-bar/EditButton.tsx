@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React from "react";
+import React, { CSSProperties } from "react";
 import { CommonMessage } from "../../lib/intl/common-ui-intl";
 import classNames from "classnames";
 
@@ -13,6 +13,14 @@ interface EditButtonProps {
   className?: string;
 
   disabled?: boolean;
+
+  style?: CSSProperties;
+
+  onKeyUp?: React.KeyboardEventHandler;
+  onMouseOver?: React.MouseEventHandler;
+  onMouseOut?: React.MouseEventHandler;
+  onBlur?: React.FocusEventHandler;
+  ariaDescribedBy?: string;
 }
 
 /**
@@ -22,13 +30,24 @@ export function EditButton({
   entityId,
   entityLink,
   className,
-  disabled
+  disabled,
+  style,
+  onMouseOver,
+  onMouseOut,
+  onBlur,
+  onKeyUp,
+  ariaDescribedBy
 }: EditButtonProps) {
   return (
     <Link href={`/${entityLink}/edit?id=${entityId}`}>
       <a
         className={classNames("btn btn-primary", { disabled }, className)}
-        style={{ width: "10rem" }}
+        style={{ width: "10rem", ...style }}
+        onMouseOver={onMouseOver}
+        onMouseOut={onMouseOut}
+        onBlur={onBlur}
+        onKeyUp={onKeyUp}
+        aria-describedby={ariaDescribedBy}
       >
         <CommonMessage id="editButtonText" />
       </a>

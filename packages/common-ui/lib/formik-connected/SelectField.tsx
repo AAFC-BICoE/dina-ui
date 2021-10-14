@@ -1,6 +1,6 @@
 import { FormikContextType } from "formik";
 import { isArray } from "lodash";
-import { RefObject } from "react";
+import { ComponentProps, RefObject } from "react";
 import Select from "react-select";
 import { Styles } from "react-select/src/styles";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
@@ -24,6 +24,9 @@ export interface SelectFieldProps<T = string> extends LabelWrapperParams {
   styles?: Partial<Styles<SelectOption<T | null | undefined>, boolean>>;
 
   forwardedRef?: RefObject<HTMLSelectElement>;
+  isLoading?: boolean;
+
+  selectProps?: Partial<ComponentProps<typeof Select>>;
 }
 
 /** Formik-connected select input. */
@@ -35,6 +38,8 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
     options,
     styles,
     forwardedRef,
+    isLoading,
+    selectProps,
     ...labelWrapperProps
   } = props;
 
@@ -66,7 +71,12 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
 
         const selectedOption = isMulti
           ? options?.filter(option => value?.includes(option.value))
-          : options?.find(option => option.value === value) ?? null;
+          : value
+          ? options?.find(option => option.value === value) ?? {
+              label: String(value),
+              value
+            }
+          : null;
 
         return (
           <Select
@@ -76,7 +86,9 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
             onChange={onChangeInternal}
             value={selectedOption}
             styles={customStyle}
+            isLoading={isLoading}
             ref={forwardedRef as any}
+            {...selectProps}
           />
         );
       }}

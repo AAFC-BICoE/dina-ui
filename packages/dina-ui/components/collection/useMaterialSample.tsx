@@ -17,6 +17,7 @@ import {
   useState
 } from "react";
 import { useCollectingEventQuery, useCollectingEventSave } from ".";
+import { SCHEDULEDACTION_FIELDS } from "..";
 import {
   CollectingEvent,
   MaterialSample
@@ -30,7 +31,9 @@ import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
 import { DETERMINATION_FIELDS } from "./DeterminationField";
+import { ORGANISM_FIELDS } from "./OrganismStateField";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
+import { useLastUsedCollection } from "./useLastUsedCollection";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -39,7 +42,7 @@ export function useMaterialSampleQuery(id?: string | null) {
     {
       path: `collection-api/material-sample/${id}`,
       include:
-        "collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit,hierarchy"
+        "collection,collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit,hierarchy,organism,materialSampleChildren,parentMaterialSample"
     },
     {
       disabled: !id,
@@ -93,6 +96,17 @@ export function useMaterialSampleQuery(id?: string | null) {
               );
             }
           }
+        }
+        if (data.materialSampleChildren) {
+          data.materialSampleChildren = await bulkGet<MaterialSample>(
+            data.materialSampleChildren.map(
+              child => `/material-sample/${child.id}?include=materialSampleType`
+            ),
+            {
+              apiBaseUrl: "/collection-api",
+              returnNullForMissingResource: true
+            }
+          );
         }
       }
     }
@@ -158,6 +172,17 @@ export function useMaterialSampleSave({
       )
     );
 
+  const hasOrganismTemplate =
+    isTemplate &&
+    !isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        ORGANISM_FIELDS.map(
+          organismFieldName => `organism.${organismFieldName}`
+        )
+      )
+    );
+
   const hasStorageTemplate =
     isTemplate &&
     materialSampleTemplateInitialValues?.templateCheckboxes?.storageUnit;
@@ -169,6 +194,15 @@ export function useMaterialSampleSave({
       pick(
         materialSampleTemplateInitialValues?.templateCheckboxes,
         ...DETERMINATION_FIELDS.map(field => `determination[0].${field}`)
+      )
+    );
+
+  const hasScheduledActionsTemplate =
+    isTemplate &&
+    !isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        SCHEDULEDACTION_FIELDS.map(fieldName => `scheduledAction.${fieldName}`)
       )
     );
 
@@ -188,6 +222,20 @@ export function useMaterialSampleSave({
           prepFieldName =>
             materialSample?.[prepFieldName] ||
             enabledFields?.materialSample?.includes(prepFieldName)
+        )
+    )
+  );
+
+  const [enableOrganism, setEnableOrganism] = useState(
+    Boolean(
+      hasOrganismTemplate ||
+        // Show the organism section if a field is set or the field is enabled:
+        ORGANISM_FIELDS.some(
+          organismFieldName =>
+            materialSample?.organism?.[`${organismFieldName}`] ||
+            enabledFields?.materialSample?.includes(
+              `organism.${organismFieldName}`
+            )
         )
     )
   );
@@ -212,16 +260,31 @@ export function useMaterialSampleSave({
     )
   );
 
+  const [enableScheduledActions, setEnableScheduledActions] = useState(
+    // Show the Scheduled Actions section if the field is set or the template enables it:
+    Boolean(
+      hasScheduledActionsTemplate ||
+        materialSample?.scheduledActions?.length ||
+        enabledFields?.materialSample?.some(enabledField =>
+          enabledField.startsWith("scheduledAction.")
+        )
+    )
+  );
+
   // The state describing which Data components (Form sections) are enabled:
   const dataComponentState = {
     enableCollectingEvent,
     setEnableCollectingEvent,
     enablePreparations,
     setEnablePreparations,
+    enableOrganism,
+    setEnableOrganism,
     enableStorage,
     setEnableStorage,
     enableDetermination,
     setEnableDetermination,
+    enableScheduledActions,
+    setEnableScheduledActions,
     /** Wraps the useState setter with an AreYouSure modal when setting to false. */
     dataComponentToggler(
       setBoolean: Dispatch<SetStateAction<boolean>>,
@@ -248,12 +311,17 @@ export function useMaterialSampleSave({
     }
   };
 
+  const { loading, lastUsedCollection } = useLastUsedCollection();
+
   const initialValues: InputResource<MaterialSample> = {
     ...(materialSample
       ? { ...materialSample }
       : {
           type: "material-sample",
-          managedAttributes: {}
+          managedAttributes: {},
+          // Defaults to the last Collection used to create a Material Sample:
+          collection: lastUsedCollection,
+          publiclyReleasable: true
         }),
     determination: materialSample?.determination?.length
       ? materialSample?.determination
@@ -303,7 +371,7 @@ export function useMaterialSampleSave({
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
     const dataComponents = document?.querySelectorAll<HTMLDivElement>(
-      ".data-components fieldset:not(.d-none)"
+      ".data-components fieldset:not(.d-none, .non-strip)"
     );
     dataComponents?.forEach((element, index) => {
       element.style.backgroundColor = index % 2 === 0 ? "#f3f3f3" : "";
@@ -324,6 +392,11 @@ export function useMaterialSampleSave({
     // Only persist the preparation fields if the preparations toggle is enabled:
     if (!enablePreparations) {
       Object.assign(materialSampleInput, BLANK_PREPARATION);
+    }
+
+    // Only persist the organism fields if toggle is enabled:
+    if (!enableOrganism) {
+      materialSampleInput.organism = null as any;
     }
 
     // Only persist the storage link if the Storage toggle is enabled:
@@ -415,7 +488,6 @@ export function useMaterialSampleSave({
         }
       }
     }
-
     // Save the MaterialSample:
     const [savedMaterialSample] = await save(
       [
@@ -457,6 +529,7 @@ export function useMaterialSampleSave({
     setColEventId,
     colEventQuery,
     materialSampleAttachmentsUI,
-    onSubmit
+    onSubmit,
+    loading
   };
 }

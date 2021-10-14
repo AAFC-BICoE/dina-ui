@@ -6,7 +6,7 @@ import {
 } from "common-ui";
 import { FormikContextType, useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { castArray, debounce, uniq } from "lodash";
+import { castArray, compact, uniq } from "lodash";
 import React, {
   ChangeEvent,
   InputHTMLAttributes,
@@ -14,10 +14,8 @@ import React, {
   useEffect,
   useState
 } from "react";
-import AutoSuggest, {
-  InputProps,
-  ShouldRenderReasons
-} from "react-autosuggest";
+import AutoSuggest, { InputProps } from "react-autosuggest";
+import { useDebounce } from "use-debounce";
 import { OnFormikSubmit } from "./safeSubmit";
 
 export type AutoSuggestTextFieldProps<T extends KitsuResource> =
@@ -28,17 +26,20 @@ interface AutoSuggestConfig<T extends KitsuResource> {
     searchValue: string,
     formikCtx: FormikContextType<any>
   ) => JsonApiQuerySpec;
+  /** Hard-coded suggestions */
+  suggestions?: (
+    searchValue: string,
+    formikCtx: FormikContextType<any>
+  ) => (string | null | undefined)[];
+  /** Configures a  */
   suggestion?: (
     resource: PersistedResource<T>,
     searchValue: string
   ) => string | string[] | undefined;
-  configQuery?: () => JsonApiQuerySpec;
-  configSuggestion?: (resource: PersistedResource<T>) => string[];
-  shouldRenderSuggestions?: (
-    value: string,
-    reason: ShouldRenderReasons
-  ) => boolean;
   onSuggestionSelected?: OnFormikSubmit<ChangeEvent<HTMLInputElement>>;
+  timeoutMs?: number;
+  /** Show the suggestions even when the input is blank. */
+  alwaysShowSuggestions?: boolean;
 }
 
 /**
@@ -48,10 +49,10 @@ interface AutoSuggestConfig<T extends KitsuResource> {
 export function AutoSuggestTextField<T extends KitsuResource>({
   query,
   suggestion,
-  shouldRenderSuggestions,
-  configQuery,
-  configSuggestion,
+  suggestions,
   onSuggestionSelected,
+  timeoutMs,
+  alwaysShowSuggestions,
   ...textFieldProps
 }: AutoSuggestTextFieldProps<T>) {
   return (
@@ -61,10 +62,12 @@ export function AutoSuggestTextField<T extends KitsuResource>({
         <AutoSuggestTextFieldInternal
           query={query}
           suggestion={suggestion}
+          suggestions={suggestions}
           {...inputProps}
-          shouldRenderSuggestions={shouldRenderSuggestions}
           onSuggestionSelected={onSuggestionSelected}
+          alwaysShowSuggestions={alwaysShowSuggestions}
           id={textFieldProps.name}
+          timeoutMs={timeoutMs}
         />
       )}
     />
@@ -73,30 +76,40 @@ export function AutoSuggestTextField<T extends KitsuResource>({
 
 function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   query,
+  suggestions,
   suggestion = (it, searchVal) => (!searchVal ? String(it) : String(searchVal)),
-  shouldRenderSuggestions,
   onSuggestionSelected,
   id,
+  timeoutMs = 250,
+  alwaysShowSuggestions,
   ...inputProps
 }: InputHTMLAttributes<any> & AutoSuggestConfig<T>) {
-  const formikCtx = useFormikContext<any>();
+  const formik = useFormikContext<any>();
 
   const [searchValue, setSearchValue] = useState("");
-  const debouncedSetSearchValue = useCallback(
-    debounce(setSearchValue, 250),
-    []
-  );
+  const [debouncedSearchValue] = timeoutMs
+    ? useDebounce(searchValue, timeoutMs)
+    : [searchValue];
 
   const { loading, response } = useQuery<T[]>(
-    query?.(searchValue, formikCtx) as any
+    query?.(debouncedSearchValue, formik) as any,
+    {
+      // Don't show results when the search is empty:
+      disabled:
+        !query || (!alwaysShowSuggestions && !debouncedSearchValue?.trim())
+    }
   );
 
-  const suggestions =
-    response && !loading
+  const allSuggestions = compact([
+    ...(suggestions?.(searchValue, formik) || []),
+    ...(response && !loading
       ? uniq(
-          castArray(response.data).flatMap(it => suggestion(it, searchValue))
+          castArray(response.data).flatMap(it =>
+            suggestion(it, debouncedSearchValue)
+          )
         )
-      : [];
+      : [])
+  ]);
 
   useEffect(() => {
     const autosuggestGeneratedDivs =
@@ -112,45 +125,48 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   return (
     <>
       <style>{`
-        .autosuggest .container-open {      
-            position: absolute;
-            z-index: 2; 
-            margin: 0 0 0 -15px; 
-         },
-        .autosuggest .container {
-           display:none;
+        .autosuggest-container {
+          position: relative;
         }
-        .autosuggest .autosuggest-highlighted { 
-          background-color: #ddd; 
+        .autosuggest .suggestions-container {
+          display: none;
+        }
+        .autosuggest .suggestions-container-open {
+          display: block;
+          position: absolute;
+          width: 100%;
+          z-index: 20;
+        }
+        .autosuggest .suggestion-highlighted { 
+          background-color: #ddd;
+          cursor: pointer;
         }
         `}</style>
       <div className="autosuggest">
         <AutoSuggest
           id={id}
-          suggestions={suggestions}
+          suggestions={allSuggestions}
           getSuggestionValue={s => s}
-          onSuggestionsFetchRequested={({ value }) =>
-            debouncedSetSearchValue(value)
-          }
+          onSuggestionsFetchRequested={({ value }) => setSearchValue(value)}
           onSuggestionSelected={(_, data) => {
             inputProps.onChange?.({
               target: { value: data.suggestion }
             } as any);
-            onSuggestionSelected?.(data.suggestion, formikCtx);
+            onSuggestionSelected?.(data.suggestion, formik);
           }}
-          onSuggestionsClearRequested={() => {
-            debouncedSetSearchValue.cancel();
-            debouncedSetSearchValue("");
-          }}
+          onSuggestionsClearRequested={() => setSearchValue("")}
           renderSuggestion={text => <div>{text}</div>}
-          shouldRenderSuggestions={shouldRenderSuggestions}
+          shouldRenderSuggestions={
+            alwaysShowSuggestions ? () => !!alwaysShowSuggestions : undefined
+          }
           inputProps={inputProps as InputProps<any>}
           theme={{
             suggestionsList: "list-group",
             suggestion: "list-group-item",
-            suggestionHighlighted: "autosuggest-highlighted",
-            suggestionsContainerOpen: "container-open",
-            suggestionsContainer: "container"
+            suggestionHighlighted: "suggestion-highlighted",
+            suggestionsContainerOpen: "suggestions-container-open",
+            suggestionsContainer: "suggestions-container",
+            container: "autosuggest-container"
           }}
         />
       </div>

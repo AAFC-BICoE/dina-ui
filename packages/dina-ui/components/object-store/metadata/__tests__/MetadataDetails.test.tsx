@@ -34,20 +34,6 @@ describe("MetadataDetails component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(
-      wrapper.find(".metadata-tags span").map(node => node.text())
-    ).toEqual(["tag1", "tag2"]);
-  });
-
-  it("Renders 'None' in the tag section when there are no tags.", async () => {
-    const wrapper = mountWithAppContext(
-      <MetadataDetails metadata={{ ...TEST_METADATA, acTags: [] }} />,
-      { apiContext }
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(wrapper.find(".metadata-tags").text()).toEqual("None");
+    expect(wrapper.text().includes("attr1 value")).toEqual(true);
   });
 });

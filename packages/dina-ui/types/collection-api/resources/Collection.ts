@@ -1,22 +1,27 @@
 import { KitsuResource } from "kitsu";
+import { Institution } from "..";
+import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
+import { MultilingualDescription } from "./PreparationType";
 
 export interface CollectionAttributes {
-  type: "collection";
+  type: "collection" | string;
   group?: string;
   name?: string;
   code?: string;
   createdOn?: string;
   createdBy?: string;
-  // Add meta here as unlike other attribute fields, it will remain as is/not flattened out in response
-  meta?: CollectionMeta;
+  multilingualDescription?: MultilingualDescription;
+  webpage?: string;
+  contact?: string;
+  address?: string;
+  remarks?: string;
 }
 
-export interface CollectionMeta {
-  permissionsProvider?: string;
-  permissions?: string[];
-  warnings?: any;
+export interface CollectionRelationships {
+  institution: Institution | undefined;
 }
 
-export const PERMISSIONS = ["create", "update", "delete"] as const;
-
-export type Collection = KitsuResource & CollectionAttributes;
+export type Collection = KitsuResource &
+  CollectionAttributes &
+  HasDinaMetaInfo &
+  CollectionRelationships;

@@ -22,10 +22,18 @@ const mockPush = jest.fn();
 let mockQuery: any = {};
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async model => {
-  // The get request will return the existing preparation-type.
-  if (model === "collection-api/preparation-type/1") {
-    return { data: TEST_PREPARATION_TYPE };
+const mockGet = jest.fn(async path => {
+  switch (path) {
+    // The get request will return the existing preparation-type.
+    case "collection-api/preparation-type/1":
+      return {
+        data: {
+          id: "1",
+          name: "test preparation type",
+          type: "preparation-type",
+          group: "preptype-test-group"
+        }
+      };
   }
 });
 
@@ -112,7 +120,8 @@ describe("preparation-type edit page", () => {
             descriptions: [{ lang: "en", desc: "test english description" }]
           }
         }}
-      />
+      />,
+      { apiContext }
     );
 
     expect(wrapper.find(".english-description textarea").prop("value")).toEqual(
@@ -193,11 +202,3 @@ describe("preparation-type edit page", () => {
     expect(mockPush).toBeCalledTimes(0);
   });
 });
-
-/** Test preparation-type with all fields defined. */
-
-const TEST_PREPARATION_TYPE: PreparationType = {
-  id: "1",
-  name: "test preparation type",
-  type: "preparation-type"
-};

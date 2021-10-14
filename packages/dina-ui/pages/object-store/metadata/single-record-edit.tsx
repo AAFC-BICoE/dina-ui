@@ -14,10 +14,15 @@ import {
   useApiClient,
   withResponse
 } from "common-ui";
-import { useFormikContext } from "formik";
 import { keys } from "lodash";
 import { NextRouter, useRouter } from "next/router";
-import { Footer, Head, Nav } from "../../../components";
+import {
+  Footer,
+  Head,
+  Nav,
+  NotPubliclyReleasableWarning,
+  TagsAndRestrictionsSection
+} from "../../../components";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -42,7 +47,7 @@ export default function MetadataEditPage() {
     <div>
       <Head title={formatMessage("editMetadataTitle")} />
       <Nav />
-      <main className="container-fluid">
+      <main className="container">
         {id && (
           <div>
             <h1 id="wb-cont">
@@ -100,18 +105,13 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
     { label: formatMessage("false"), value: false }
   ];
 
-  // Convert acTags array to a comma-separated string:
-  const initialValues = {
-    ...metadata,
-    acTags: metadata.acTags?.join(", ") ?? ""
-  };
+  const initialValues = { ...metadata };
 
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
     api: { apiClient, save }
   }) => {
     const {
-      acTags,
       // Don't include derivatives in the form submission:
       derivatives,
       license,
@@ -133,10 +133,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
       metadataValues.xmpRightsUsageTerms = "";
     }
 
-    const metadataEdit = {
-      ...metadataValues,
-      acTags: acTags.split(",").map(tag => tag.trim())
-    };
+    const metadataEdit = { ...metadataValues };
 
     // Remove blank managed attribute values from the map:
     const blankValues: any[] = ["", null];
@@ -168,40 +165,39 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+      <NotPubliclyReleasableWarning />
       {buttonBar}
       <div className="mb-3">
         <MetadataFileView metadata={metadata} imgHeight="15rem" />
       </div>
+      <TagsAndRestrictionsSection
+        resourcePath="objectstore-api/metadata"
+        tagsFieldName="acTags"
+      />
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
         <div className="row">
           <TextField
-            className="col-md-3 col-sm-4"
+            className="col-md-6"
             name="originalFilename"
             readOnly={true}
           />
           <DateField
-            className="col-md-3 col-sm-4"
+            className="col-md-6"
             name="acDigitizationDate"
             showTime={true}
           />
         </div>
         <div className="row">
           <SelectField
-            className="col-md-3 col-sm-4"
+            className="col-md-6"
             name="dcType"
             options={DCTYPE_OPTIONS}
           />
-          <TextField className="col-md-3 col-sm-4" name="acCaption" />
-          <TextField
-            className="col-md-3 col-sm-4"
-            name="acTags"
-            multiLines={true}
-            label={formatMessage("metadataBulkEditTagsLabel")}
-          />
+          <TextField className="col-md-6" name="acCaption" />
         </div>
         <div className="row">
           <ResourceSelectField<Person>
-            className="col-md-3 col-sm-4"
+            className="col-md-6"
             name="dcCreator"
             filter={filterBy(["displayName"])}
             model="agent-api/person"
@@ -209,7 +205,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
             label={formatMessage("field_dcCreator.displayName")}
           />
           <SelectField
-            className="col-md-3 col-sm-4"
+            className="col-md-6"
             name="orientation"
             options={ORIENTATION_OPTIONS}
             tooltipImage="/static/images/orientationDiagram.jpg"
@@ -219,50 +215,26 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
       </FieldSet>
       <FieldSet legend={<DinaMessage id="metadataRightsDetailsLabel" />}>
         <div className="row">
-          <TextField className="col-md-3 col-sm-4" name="dcRights" />
+          <TextField className="col-sm-6" name="dcRights" />
           <ResourceSelectField<License>
-            className="col-md-3 col-sm-4"
+            className="col-sm-6"
             name="license"
             filter={() => ({})}
             model="objectstore-api/license"
             optionLabel={license => license.titles[locale] ?? license.url}
           />
-          <SelectField
-            className="col-md-3 col-sm-4"
-            name="publiclyReleasable"
-            options={PUBLICLY_RELEASABLE_OPTIONS}
-          />
-          <NotPubliclyReleasableReasonField />
         </div>
       </FieldSet>
       <FieldSet legend={<DinaMessage id="managedAttributeListTitle" />}>
-        <div className="row">
-          <div className="col-sm-6">
-            <ManagedAttributesEditor
-              valuesPath="managedAttributeValues"
-              managedAttributeApiPath="objectstore-api/managed-attribute"
-              apiBaseUrl="/objectstore-api"
-              managedAttributeKeyField="id"
-            />
-          </div>
-        </div>
+        <ManagedAttributesEditor
+          valuesPath="managedAttributeValues"
+          managedAttributeApiPath="objectstore-api/managed-attribute"
+          apiBaseUrl="/objectstore-api"
+          managedAttributeKeyField="id"
+        />
       </FieldSet>
       {buttonBar}
     </DinaForm>
-  );
-}
-
-function NotPubliclyReleasableReasonField() {
-  const {
-    values: { publiclyReleasable }
-  } = useFormikContext<Metadata>();
-
-  return publiclyReleasable ? null : (
-    <TextField
-      className="col-md-3 col-sm-4"
-      name="notPubliclyReleasableReason"
-      multiLines={true}
-    />
   );
 }
 

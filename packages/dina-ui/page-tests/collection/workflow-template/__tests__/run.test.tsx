@@ -34,7 +34,7 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/collecting-event":
       // Populate the linker table:
       return { data: [testCollectionEvent()] };
-    case "collection-api/collecting-event/2?include=collectors,attachment":
+    case "collection-api/collecting-event/2?include=collectors,attachment,collectionMethod":
       return {
         data: {
           startEventDateTime: "2021-04-13",
@@ -43,7 +43,7 @@ const mockGet = jest.fn<any, any>(async path => {
           group: "test group"
         }
       };
-    case "collection-api/collecting-event/555?include=collectors,attachment":
+    case "collection-api/collecting-event/555?include=collectors,attachment,collectionMethod":
       return { data: testCollectionEvent() };
     case "collection-api/srs":
       return { data: [TEST_SRS] };
@@ -219,12 +219,12 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
-
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               determination: [],
-
+              organism: null,
               managedAttributes: {},
+              materialSampleName: "",
               relationships: {},
               type: "material-sample"
             },
@@ -303,8 +303,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               determination: [],
-
+              organism: null,
               managedAttributes: {},
+              materialSampleName: "",
               relationships: {},
               type: "material-sample"
             },
@@ -340,6 +341,12 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     expect(
       wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
     ).toEqual(false);
+    expect(
+      wrapper
+        .find(".enable-scheduled-actions")
+        .find(ReactSwitch)
+        .prop("checked")
+    ).toEqual(false);
 
     // Submit with only the name set:
     await wrapper.find("form").simulate("submit");
@@ -359,9 +366,11 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               },
               storageUnit: { id: null, type: "storage-unit" },
               managedAttributes: {},
+              materialSampleName: "",
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              organism: null,
               determination: [],
 
               relationships: {},
@@ -504,5 +513,49 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
     ).toEqual(false);
+  });
+
+  it("Renders the Material Sample form with only the Storage section enabled.", async () => {
+    const wrapper = await getWrapper({
+      id: "1",
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowExisting: false,
+          allowNew: false,
+          templateFields: {
+            ...({
+              "scheduledAction.remarks": {
+                defaultValue: "default-remarks",
+                enabled: true
+              }
+            } as any)
+          }
+        }
+      },
+      group: "test-group",
+      name: "test-definition",
+      type: "material-sample-action-definition"
+    });
+
+    // Only the Scheduled Actions section should be enabled:
+    expect(
+      wrapper
+        .find(".enable-scheduled-actions")
+        .find(ReactSwitch)
+        .prop("checked")
+    ).toEqual(true);
+    expect(
+      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+
+    expect(
+      wrapper
+        .find("#scheduled-actions-section .remarks-field textarea")
+        .prop("value")
+    ).toEqual("default-remarks");
   });
 });

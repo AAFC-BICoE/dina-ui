@@ -395,21 +395,11 @@ a.btn,
   border-color: #18666d;
 }
 
-a.nav-link.dropdown-toggle {
+.nav-link.dropdown-toggle {
   /* fix Element's background color could not be determined because it's partially obscured by another element */
   background: #38414d;
 }
-
 /* fix elements must have suficient color contrast for the back to list button */
 .btn-outline-secondary {
   color: #3838f3;
-}
-
-.wb-inv {
-  clip: rect(1px, 1px, 1px, 1px);
-  height: 1px;
-  margin: 0;
-  overflow: hidden;
-  position: absolute;
-  width: 1px;
 }

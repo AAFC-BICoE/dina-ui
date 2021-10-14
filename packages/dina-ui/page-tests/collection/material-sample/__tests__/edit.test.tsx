@@ -18,6 +18,7 @@ jest.mock("next/dynamic", () => () => {
 function testCollectionEvent(): Partial<CollectingEvent> {
   return {
     startEventDateTime: "2021-04-13",
+    verbatimEventDateTime: "2021-04-13",
     id: "1",
     type: "collecting-event",
     group: "test group"
@@ -29,7 +30,7 @@ function testMaterialSample(): PersistedResource<MaterialSample> {
     id: "1",
     type: "material-sample",
     group: "test group",
-    dwcCatalogNumber: "my-number",
+    materialSampleName: "my-sample-name",
     collectingEvent: {
       id: "1",
       type: "collecting-event"
@@ -47,7 +48,7 @@ const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
-    case "collection-api/collecting-event/1?include=collectors,attachment":
+    case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod":
       // Populate the linker table:
       return { data: testCollectionEvent() };
     case "collection-api/preparation-type":
@@ -63,6 +64,9 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/storage-unit-type":
     case "collection-api/storage-unit":
     case "objectstore-api/metadata":
+    case "collection-api/collection":
+    case "collection-api/collection-method":
+    case "collection-api/storage-unit/76575":
       return { data: [] };
   }
 });
@@ -123,12 +127,8 @@ describe("Material Sample Edit Page", () => {
       .find(".materialSampleName-field input")
       .simulate("change", { target: { value: "test-material-sample-id" } });
     wrapper
-      .find(".dwcCatalogNumber-field input")
-      .simulate("change", { target: { value: "my-new-material-sample" } });
-    wrapper
-      .find(".startEventDateTime-field input")
+      .find(".verbatimEventDateTime-field input")
       .simulate("change", { target: { value: "2019-12-21T16:00" } });
-
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
@@ -151,7 +151,8 @@ describe("Material Sample Edit Page", () => {
               ],
               managedAttributes: {},
               relationships: {},
-              startEventDateTime: "2019-12-21T16:00",
+              verbatimEventDateTime: "2019-12-21T16:00",
+              publiclyReleasable: true, // Default value
               type: "collecting-event"
             },
             type: "collecting-event"
@@ -170,10 +171,12 @@ describe("Material Sample Edit Page", () => {
               },
               storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
-              dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
               determination: [],
+              publiclyReleasable: true, // Default value
               relationships: {},
+              organism: null,
+              collection: undefined,
               type: "material-sample"
             },
             type: "material-sample"
@@ -207,9 +210,6 @@ describe("Material Sample Edit Page", () => {
     wrapper
       .find(".materialSampleName-field input")
       .simulate("change", { target: { value: "test-material-sample-id" } });
-    wrapper
-      .find(".dwcCatalogNumber-field input")
-      .simulate("change", { target: { value: "my-new-material-sample" } });
 
     wrapper.find("button.collecting-event-link-button").simulate("click");
 
@@ -235,9 +235,11 @@ describe("Material Sample Edit Page", () => {
               },
               storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
-              dwcCatalogNumber: "my-new-material-sample",
               managedAttributes: {},
               determination: [],
+              organism: null,
+              collection: undefined,
+              publiclyReleasable: true, // Default value
               type: "material-sample",
               relationships: {}
             },
@@ -269,9 +271,6 @@ describe("Material Sample Edit Page", () => {
     wrapper
       .find(".materialSampleName-field input")
       .simulate("change", { target: { value: "test-material-sample-id" } });
-    wrapper
-      .find(".dwcCatalogNumber-field input")
-      .simulate("change", { target: { value: "edited-catalog-number" } });
 
     wrapper.find("form").simulate("submit");
 
@@ -288,14 +287,13 @@ describe("Material Sample Edit Page", () => {
               type: "material-sample",
               group: "test group",
               materialSampleName: "test-material-sample-id",
-              dwcCatalogNumber: "edited-catalog-number",
               collectingEvent: { id: "1", type: "collecting-event" },
               storageUnit: { id: null, type: "storage-unit" },
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               determination: [],
-
+              organism: null,
               managedAttributes: {},
               relationships: {}
             },
@@ -321,7 +319,7 @@ describe("Material Sample Edit Page", () => {
 
     // Existing CollectingEvent should show up:
     expect(
-      wrapper.find(".startEventDateTime-field input").prop("value")
+      wrapper.find(".verbatimEventDateTime-field input").prop("value")
     ).toEqual("2021-04-13");
 
     wrapper.find("button.detach-collecting-event-button").simulate("click");
@@ -331,12 +329,12 @@ describe("Material Sample Edit Page", () => {
 
     // Existing CollectingEvent should be gone:
     expect(
-      wrapper.find(".startEventDateTime-field input").prop("value")
+      wrapper.find(".verbatimEventDateTime-field input").prop("value")
     ).toEqual("");
 
-    // Set the new Collecting Event's startEventDateTime:
+    // Set the new Collecting Event's verbatimEventDateTime:
     wrapper
-      .find(".startEventDateTime-field input")
+      .find(".verbatimEventDateTime-field input")
       .simulate("change", { target: { value: "2019-12-21T16:00" } });
 
     wrapper.find("form").simulate("submit");
@@ -360,7 +358,8 @@ describe("Material Sample Edit Page", () => {
               ],
               managedAttributes: {},
               relationships: {},
-              startEventDateTime: "2019-12-21T16:00",
+              verbatimEventDateTime: "2019-12-21T16:00",
+              publiclyReleasable: true, // Default Value
               type: "collecting-event"
             },
             type: "collecting-event"
@@ -378,7 +377,7 @@ describe("Material Sample Edit Page", () => {
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
-              dwcCatalogNumber: "my-number",
+              materialSampleName: "my-sample-name",
               group: "test group",
               id: "1",
               type: "material-sample",
@@ -387,6 +386,7 @@ describe("Material Sample Edit Page", () => {
               ...BLANK_PREPARATION,
               determination: [],
               managedAttributes: {},
+              organism: null,
               relationships: {}
             },
             type: "material-sample"
@@ -525,6 +525,9 @@ describe("Material Sample Edit Page", () => {
       testCtx
     );
 
+    await new Promise(setImmediate);
+    wrapper.update();
+
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
@@ -547,6 +550,7 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-ms",
               ...BLANK_PREPARATION,
               determination: [],
+              organism: null,
               relationships: {},
               type: "material-sample"
             },

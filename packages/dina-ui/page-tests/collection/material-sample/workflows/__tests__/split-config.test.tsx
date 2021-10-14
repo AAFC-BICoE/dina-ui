@@ -26,7 +26,7 @@ const testRunConfig = {
 const testMaterialSample = {
   id: "123",
   type: "material-sample",
-  dwcCatalogNumber: "my-number"
+  materialSampleName: "my-sample-name"
 };
 
 const mockGet = jest.fn<any, any>(async path => {
@@ -165,9 +165,12 @@ describe("MaterialSample split workflow series-mode run config", () => {
       )
     ).toEqual({
       configure: {
+        collection: {
+          id: null,
+          type: "collection"
+        },
         baseName: "TestBaseName",
         generationMode: "BATCH",
-        identifier: "MATERIAL_SAMPLE_ID",
         numOfChildToCreate: 3,
         suffix: "TestSuffix"
       },
@@ -190,7 +193,7 @@ describe("MaterialSample split workflow series-mode run config", () => {
     await new Promise(setImmediate);
     wrapper.update();
     expect(wrapper.find(".baseName-field input").prop("value")).toEqual(
-      "my-number"
+      "my-sample-name"
     );
   });
 
@@ -208,7 +211,7 @@ describe("MaterialSample split workflow series-mode run config", () => {
 
     // The input begins with the default value:
     expect(wrapper.find(".sampleNames0 input").prop("value")).toEqual(
-      "my-number"
+      "my-sample-name"
     );
 
     // Edit a sample name:
@@ -239,11 +242,11 @@ describe("MaterialSample split workflow series-mode run config", () => {
 
     wrapper
       .find(".start-field input")
-      .simulate("change", { target: { value: "005" } });
+      .simulate("change", { target: { value: "5" } });
 
     // The input begins with the default value:
     expect(wrapper.find(".sampleNames0 input").prop("value")).toEqual(
-      "my-number005"
+      "my-sample-name5"
     );
     // Reset button is initially hidden:
     expect(wrapper.find("button.reset-sample-names").exists()).toEqual(false);
@@ -261,7 +264,7 @@ describe("MaterialSample split workflow series-mode run config", () => {
 
     // The sample name is reverted to the default value:
     expect(wrapper.find(".sampleNames0 input").prop("value")).toEqual(
-      "my-number005"
+      "my-sample-name5"
     );
 
     // The reset button is hidden again:
