@@ -14,6 +14,7 @@ import { FastField, FormikContextType } from "formik";
 import { isEmpty } from "lodash";
 import { Fragment, useState } from "react";
 import ReactTable, { CellInfo, Column } from "react-table";
+import * as yup from "yup";
 import { UserSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSample, ScheduledAction } from "../../types/collection-api";
@@ -33,6 +34,10 @@ export const SCHEDULEDACTION_FIELDS_OBJECT: Required<
 export const SCHEDULEDACTION_FIELDS = Object.keys(
   SCHEDULEDACTION_FIELDS_OBJECT
 );
+
+export const scheduledActionSchema = yup.object({
+  actionType: yup.string().required()
+});
 
 export interface ScheduledActionsFieldProps {
   className?: string;
@@ -278,6 +283,7 @@ export function ScheduledActionSubForm({
     <div onKeyDown={disableEnterToSubmitOuterForm}>
       <FieldSet legend={<DinaMessage id="addScheduledAction" />}>
         <FormWrapper
+          validationSchema={scheduledActionSchema}
           initialValues={
             actionToEdit ?? actionTemplateInitialValues ?? defaultInitialValues
           }
