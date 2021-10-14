@@ -14,7 +14,6 @@ import { FastField, FormikContextType } from "formik";
 import { isEmpty } from "lodash";
 import { Fragment, useState } from "react";
 import ReactTable, { CellInfo, Column } from "react-table";
-import * as yup from "yup";
 import { UserSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSample, ScheduledAction } from "../../types/collection-api";
@@ -35,17 +34,15 @@ export const SCHEDULEDACTION_FIELDS = Object.keys(
   SCHEDULEDACTION_FIELDS_OBJECT
 );
 
-export const scheduledActionSchema = yup.object({
-  actionType: yup.string().required(),
-  date: yup.string().required()
-});
-
 export interface ScheduledActionsFieldProps {
   className?: string;
+  defaultDate?: string;
 }
 
 export function ScheduledActionsField({
-  className
+  className,
+  // The default date is today:
+  defaultDate = new Date().toISOString().slice(0, 10)
 }: ScheduledActionsFieldProps) {
   const fieldName = "scheduledActions";
 
@@ -167,6 +164,7 @@ export function ScheduledActionsField({
                   <div className="m-2">
                     <ScheduledActionSubForm
                       actionToEdit={row.original}
+                      defaultDate={defaultDate}
                       onSaveAction={saveAction}
                       onCancelClick={
                         hasActions ? () => setActionToEdit(null) : undefined
@@ -179,6 +177,7 @@ export function ScheduledActionsField({
             )}
             {readOnly ? null : !hasActions || actionToEdit === "NEW" ? (
               <ScheduledActionSubForm
+                defaultDate={defaultDate}
                 onSaveAction={saveAction}
                 onCancelClick={
                   hasActions ? () => setActionToEdit(null) : undefined
@@ -204,12 +203,14 @@ export interface ScheduledActionSubFormProps {
   onSaveAction: (action: ScheduledAction) => Promise<void>;
   onCancelClick?: () => void;
   actionToEdit?: ScheduledAction;
+  defaultDate: string;
 }
 
 export function ScheduledActionSubForm({
   onSaveAction,
   onCancelClick,
-  actionToEdit
+  actionToEdit,
+  defaultDate
 }: ScheduledActionSubFormProps) {
   const { enabledFields, initialValues, isTemplate } = useDinaFormContext();
 
@@ -269,12 +270,17 @@ export function ScheduledActionSubForm({
     page: { limit: 50 }
   });
 
+  const defaultInitialValues = {
+    date: defaultDate
+  };
+
   return (
     <div onKeyDown={disableEnterToSubmitOuterForm}>
       <FieldSet legend={<DinaMessage id="addScheduledAction" />}>
         <FormWrapper
-          validationSchema={scheduledActionSchema}
-          initialValues={actionToEdit ?? actionTemplateInitialValues ?? {}}
+          initialValues={
+            actionToEdit ?? actionTemplateInitialValues ?? defaultInitialValues
+          }
           enabledFields={actionsEnabledFields}
         >
           <div className="row">
