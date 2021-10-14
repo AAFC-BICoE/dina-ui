@@ -48,7 +48,8 @@ describe("AutoSuggestTextField", () => {
       "person3"
     ]);
     expect(mockGet).lastCalledWith("agent-api/person", {
-      filter: { rsql: "name==*p*", sort: "-createdOn" }
+      filter: { rsql: "name==*p*" },
+      sort: "-createdOn"
     });
   });
 
