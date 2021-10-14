@@ -95,7 +95,7 @@ export function PreparationField({
               path: "collection-api/material-sample",
               filter: {
                 ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                rsql: `preparationMethod==*${search}*`
+                rsql: `preparationMethod==${search}*`
               }
             })}
             alwaysShowSuggestions={true}
