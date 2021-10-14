@@ -114,17 +114,21 @@ function menuDisplayControl() {
   const hideDropdown = () => {
     setShow(false);
   };
-  return { show, showDropdown, hideDropdown };
+  function onKeyDown(e) {
+    if (!show && (e.key === "ArrowDown" || e.key === "ArrowUp")) showDropdown();
+    else if (e.key === "Escape" || (e.shiftKey && e.key === "Tab"))
+      hideDropdown();
+  }
+  return { show, showDropdown, hideDropdown, onKeyDown };
 }
 
 /** Object Store links. */
 function NavObjectStoreDropdown() {
-  const { show, showDropdown, hideDropdown } = menuDisplayControl();
-
+  const { show, showDropdown, hideDropdown, onKeyDown } = menuDisplayControl();
   return (
     <Dropdown
       onMouseOver={showDropdown}
-      onKeyDown={showDropdown}
+      onKeyDown={onKeyDown}
       onMouseLeave={hideDropdown}
       show={show}
     >
@@ -157,13 +161,13 @@ function NavObjectStoreDropdown() {
 
 /** Agents links. */
 function NavAgentsDropdown() {
-  const { show, showDropdown, hideDropdown } = menuDisplayControl();
+  const { show, showDropdown, hideDropdown, onKeyDown } = menuDisplayControl();
   return (
     <Dropdown
       show={show}
       onMouseOver={showDropdown}
       onMouseLeave={hideDropdown}
-      onKeyDown={showDropdown}
+      onKeyDown={onKeyDown}
     >
       <Dropdown.Toggle className="nav-link">
         <DinaMessage id="agentsSectionTitle" />
@@ -183,14 +187,14 @@ function NavAgentsDropdown() {
 /** Dina User links. */
 function NavDinaUserDropdown() {
   const { subject } = useAccount();
-  const { show, showDropdown, hideDropdown } = menuDisplayControl();
+  const { show, showDropdown, hideDropdown, onKeyDown } = menuDisplayControl();
 
   return (
     <Dropdown
       show={show}
       onMouseOver={showDropdown}
       onMouseLeave={hideDropdown}
-      onKeyDown={showDropdown}
+      onKeyDown={onKeyDown}
     >
       <Dropdown.Toggle className="nav-link">
         <DinaMessage id="dinaUserSectionTitle" />
@@ -212,13 +216,13 @@ function NavDinaUserDropdown() {
 
 /** Seqdb UI links. */
 function NavSeqDBDropdown() {
-  const { show, showDropdown, hideDropdown } = menuDisplayControl();
+  const { show, showDropdown, hideDropdown, onKeyDown } = menuDisplayControl();
   return (
     <Dropdown
       show={show}
       onMouseOver={showDropdown}
       onMouseLeave={hideDropdown}
-      onKeyDown={showDropdown}
+      onKeyDown={onKeyDown}
     >
       <Dropdown.Toggle className="nav-link" href="#">
         <SeqdbMessage id="seqdbTitle" />
@@ -264,13 +268,13 @@ function NavSeqDBDropdown() {
 
 /** Collecting event links. */
 function NavCollectionDropdown() {
-  const { show, showDropdown, hideDropdown } = menuDisplayControl();
+  const { show, showDropdown, hideDropdown, onKeyDown } = menuDisplayControl();
   return (
     <Dropdown
       show={show}
       onMouseOver={showDropdown}
       onMouseLeave={hideDropdown}
-      onKeyDown={showDropdown}
+      onKeyDown={onKeyDown}
     >
       <Dropdown.Toggle className="nav-link" href="#">
         <DinaMessage id="collectionSectionTitle" />
