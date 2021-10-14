@@ -9,11 +9,9 @@ const mockGet = jest.fn<any, any>(async path => {
         data: { id: "A", type: "storage-unit", name: "A" }
       };
     case "collection-api/storage-unit":
-      return { data: [] };
     case "collection-api/material-sample":
-      return { data: [] };
     case "collection-api/storage-unit-type":
-      return { data: [] };
+      return { data: [], meta: { totalResourceCount: 0 } };
   }
 });
 
