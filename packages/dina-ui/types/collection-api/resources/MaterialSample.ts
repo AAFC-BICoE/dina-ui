@@ -20,6 +20,7 @@ export interface MaterialSampleAttributes {
   createdOn?: string;
   createdBy?: string;
   dwcOtherCatalogNumbers?: string[];
+  preparationMethod?: string | null;
   preparationDate?: string | null;
   preparationRemarks?: string | null;
   description?: string;

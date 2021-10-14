@@ -92,7 +92,12 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     : [searchValue];
 
   const { loading, response } = useQuery<T[]>(
-    query?.(debouncedSearchValue, formik) as any,
+    {
+      path: "",
+      // Default newest first:
+      sort: "-createdOn",
+      ...query?.(debouncedSearchValue, formik)
+    },
     {
       // Don't show results when the search is empty:
       disabled:
