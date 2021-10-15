@@ -212,7 +212,9 @@ export function StorageUnitContents({
   return (
     <div className="p-2 mb-3" style={{ borderStyle: "dotted" }}>
       <div className="mb-3">
-        <strong>Material Samples</strong>
+        <strong>
+          <DinaMessage id="materialSamples" />
+        </strong>
         <QueryTable
           columns={materialSampleColumns}
           path="collection-api/material-sample"
@@ -222,7 +224,9 @@ export function StorageUnitContents({
         />
       </div>
       <div className="mb-3">
-        <strong>Nested Storage Units</strong>
+        <strong>
+          <DinaMessage id="nestedStorageUnits" />
+        </strong>
         <StorageTreeList parentId={storageId} disabled={true} />
       </div>
     </div>
