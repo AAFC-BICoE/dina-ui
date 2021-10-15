@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { PersonIdentifier } from "./Identifier";
+import { PersonIdentifier } from "./PersonIdentifier";
 import { Organization } from "./Organization";
 
 export interface PersonAttributes {
