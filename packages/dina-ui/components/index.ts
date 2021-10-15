@@ -19,3 +19,5 @@ export * from "./storage/StorageUnitChildrenViewer";
 export * from "./storage-unit-type/KeepContentsTogetherToggleForm";
 export * from "./tag-editor/TagsAndRestrictionsSection";
 export * from "./tag-editor/NotPubliclyReleasableWarning";
+export * from "./identifier/IdentifierFields";
+export * from "./identifier/IdentifierRow";

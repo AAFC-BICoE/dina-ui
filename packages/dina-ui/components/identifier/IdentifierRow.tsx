@@ -1,24 +1,13 @@
 import { TextField, SelectField, SelectOption } from "common-ui";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { IdentifierType } from "../../../dina-ui/types/agent-api/resources/Identifier";
 import { Fragment } from "react";
 
 export interface IdentifierRowProps {
   index: number;
+  typeOptions: SelectOption<string | undefined>[];
 }
 
-export function IdentifierRow({ index }: IdentifierRowProps) {
-  const typeOptions: SelectOption<string | undefined>[] = [
-    {
-      label: IdentifierType.ORCID,
-      value: IdentifierType.ORCID
-    },
-    {
-      label: IdentifierType.WIKIDATA,
-      value: IdentifierType.WIKIDATA
-    }
-  ];
-
+export function IdentifierRow({ index, typeOptions }: IdentifierRowProps) {
   const identifiersPath = "identifiers";
   const identifierPath = `${identifiersPath}[${index}]`;
   const commonRoot = identifierPath + ".";

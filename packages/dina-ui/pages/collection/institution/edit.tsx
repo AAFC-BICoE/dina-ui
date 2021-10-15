@@ -4,6 +4,7 @@ import {
   DateField,
   DinaForm,
   DinaFormSubmitParams,
+  SelectOption,
   SubmitButton,
   TextField,
   useDinaFormContext,
@@ -13,9 +14,11 @@ import {
 import { InputResource, PersistedResource } from "kitsu";
 import { toPairs, fromPairs } from "lodash";
 import { useRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { Head, Nav, IdentifierFields } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Institution } from "../../../types/collection-api";
+import { Field } from "formik";
+import { InstitutionIdentifierType } from "packages/dina-ui/types/collection-api/resources/InstitutionIdentifier";
 
 export default function InstitutionEditPage() {
   const router = useRouter();
@@ -124,6 +127,12 @@ export function InstitutionForm({
 export function InstitutionFormLayout() {
   const { formatMessage } = useDinaIntl();
   const { readOnly } = useDinaFormContext();
+  const typeOptions: SelectOption<string | undefined>[] = [
+    {
+      label: InstitutionIdentifierType.GRSCICOLL,
+      value: InstitutionIdentifierType.GRSCICOLL
+    }
+  ];
 
   return (
     <div>
@@ -153,6 +162,15 @@ export function InstitutionFormLayout() {
       <div className="row">
         <TextField name="remarks" multiLines={true} />
       </div>
+      <Field name="identifiers">
+        {({ form: { values: formState } }) =>
+          !readOnly ? (
+            <IdentifierFields typeOptions={typeOptions} />
+          ) : !!formState.identifiers?.length ? (
+            <IdentifierFields typeOptions={typeOptions} />
+          ) : null
+        }
+      </Field>
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />
