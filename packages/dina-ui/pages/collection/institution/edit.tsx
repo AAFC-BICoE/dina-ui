@@ -18,7 +18,7 @@ import { Head, Nav, IdentifierFields } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Institution } from "../../../types/collection-api";
 import { Field } from "formik";
-import { InstitutionIdentifierType } from "packages/dina-ui/types/collection-api/resources/InstitutionIdentifier";
+import { InstitutionIdentifierType } from "../../../types/collection-api/resources/InstitutionIdentifier";
 
 export default function InstitutionEditPage() {
   const router = useRouter();
