@@ -115,9 +115,15 @@ function menuDisplayControl() {
     setShow(false);
   };
   function onKeyDown(e) {
-    if (!show && (e.key === "ArrowDown" || e.key === "ArrowUp")) showDropdown();
-    else if (e.key === "Escape" || (e.shiftKey && e.key === "Tab"))
+    if (
+      e.key === "ArrowDown" ||
+      e.key === "ArrowUp" ||
+      (!e.shiftKey && e.key === "Tab")
+    ) {
+      showDropdown();
+    } else if (e.key === "Escape" || (e.shiftKey && e.key === "Tab")) {
       hideDropdown();
+    }
   }
   return { show, showDropdown, hideDropdown, onKeyDown };
 }
