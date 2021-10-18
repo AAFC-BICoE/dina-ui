@@ -119,8 +119,7 @@ function menuDisplayControl() {
       e.key === "ArrowDown" ||
       e.key === "ArrowUp" ||
       e.key === "Space" ||
-      e.key === "Enter" ||
-      (!e.shiftKey && e.key === "Tab")
+      e.key === "Enter"
     ) {
       showDropdown();
     } else if (e.key === "Escape" || (e.shiftKey && e.key === "Tab")) {
