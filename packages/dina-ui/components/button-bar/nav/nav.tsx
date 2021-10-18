@@ -118,6 +118,8 @@ function menuDisplayControl() {
     if (
       e.key === "ArrowDown" ||
       e.key === "ArrowUp" ||
+      e.key === "Space" ||
+      e.key === "Enter" ||
       (!e.shiftKey && e.key === "Tab")
     ) {
       showDropdown();
