@@ -1,5 +1,5 @@
 import { connect, FormikContextType } from "formik";
-import { LoadingSpinner } from "..";
+import { FormikButton, LoadingSpinner, useDinaFormContext } from "..";
 import { CommonMessage } from "../intl/common-ui-intl";
 
 interface SubmitButtonProps {
@@ -24,17 +24,27 @@ export const SubmitButton = connect<SubmitButtonProps>(
     formik,
     hidePrimaryClass
   }) {
-    const buttonPropsObj = buttonProps?.(formik) ?? {};
+    const { isNestedForm } = useDinaFormContext();
+
+    const passedButtonProps = buttonProps?.(formik);
+    const resolvedButtonProps = {
+      ...passedButtonProps,
+      className: `btn ${className} ${hidePrimaryClass ? "" : "btn-primary"}`,
+      style: { width: "10rem", ...passedButtonProps?.style }
+    };
 
     return formik.isSubmitting ? (
       <LoadingSpinner loading={formik.isSubmitting} />
-    ) : (
-      <button
-        {...buttonPropsObj}
-        className={`btn ${className} ${hidePrimaryClass ? "" : "btn-primary"}`}
-        style={{ width: "10rem", ...buttonPropsObj.style }}
-        type="submit"
+    ) : isNestedForm ? (
+      <FormikButton
+        className={resolvedButtonProps.className}
+        buttonProps={() => resolvedButtonProps}
+        onClick={async () => await formik.submitForm()}
       >
+        {children || <CommonMessage id="submitBtnText" />}
+      </FormikButton>
+    ) : (
+      <button {...resolvedButtonProps} type="submit">
         {children || <CommonMessage id="submitBtnText" />}
       </button>
     );
