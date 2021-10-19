@@ -17,7 +17,18 @@ import {
   MaterialSampleType
 } from "../../../types/collection-api";
 
-export function SampleListLayout() {
+export interface SampleListLayoutProps {
+  onSelect?: (sample) => void;
+  classNames?: string;
+  btnMsg?: string;
+}
+
+export function SampleListLayout({
+  onSelect,
+  classNames,
+  btnMsg
+}: SampleListLayoutProps) {
+  const { formatMessage } = useDinaIntl();
   const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
     "createdBy",
     "collection.name",
@@ -58,7 +69,24 @@ export function SampleListLayout() {
     stringArrayCell("dwcOtherCatalogNumbers"),
     { accessor: "materialSampleType.name" },
     "createdBy",
-    dateCell("createdOn")
+    dateCell("createdOn"),
+    onSelect
+      ? {
+          Cell: ({ original: sample }) => (
+            <div className="d-flex">
+              <button
+                type="button"
+                className={classNames}
+                onClick={() => onSelect(sample)}
+              >
+                {btnMsg}
+              </button>
+            </div>
+          ),
+          Header: formatMessage("actions"),
+          sortable: false
+        }
+      : {}
   ];
 
   return (

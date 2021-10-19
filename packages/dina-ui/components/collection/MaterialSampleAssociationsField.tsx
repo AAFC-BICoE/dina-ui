@@ -13,10 +13,9 @@ import { FastField, FormikContextType } from "formik";
 import { Fragment, useState, useRef } from "react";
 import { MaterialSampleAssociation } from "../../../dina-ui/types/collection-api/resources/MaterialSample";
 import ReactTable, { CellInfo, Column } from "react-table";
-
-import MaterialSampleListPage, {
-  SampleListLayout
-} from "../../../dina-ui/pages/collection/material-sample/list";
+import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list";
+import { RiDeleteBinLine } from "react-icons/ri";
+import classNames from "classnames";
 
 /** Type-safe object with all MaterialSampleAssociation fields. */
 export const ASSOCIATION_FIELDS_OBJECT: Required<
@@ -76,7 +75,10 @@ export function MaterialSampleAssociationsField({
 
   const associationColumns: Column[] = [
     { accessor: "associationType", Header: formatMessage("associationType") },
-    { accessor: "associatedSample", Header: formatMessage("status") },
+    {
+      accessor: "associatedSample.materialSampleName",
+      Header: formatMessage("associatedMaterialSample")
+    },
     { accessor: "remarks", Header: formatMessage("remarks") },
     ...(readOnly
       ? []
@@ -204,6 +206,8 @@ export function MaterialSampleAssociationSubForm({
   const { enabledFields, initialValues, isTemplate } = useDinaFormContext();
   const listRef = useRef<HTMLDivElement>(null);
   const { formatMessage } = useDinaIntl();
+  const [showSearchAssociatedSample, setShowSearchAssociatedSample] =
+    useState(false);
 
   const associationsEnabledFields = enabledFields?.filter(it =>
     it.startsWith("associations.")
@@ -257,61 +261,118 @@ export function MaterialSampleAssociationSubForm({
     }
 
     return (
-      <div ref={listRef} className={"w3-hide"}>
+      <div
+        ref={listRef}
+        className={classNames("mb-2", !showSearchAssociatedSample && "d-none")}
+        style={{ borderStyle: "revert", borderTopColor: "red" }}
+      >
         <div className="mb-2">
-          <span className="me-2">{formatMessage("search")}</span>
+          <span className="me-2 fw-bold">{formatMessage("search")}</span>
           <a href="#association" onClick={onCloseClicked}>
             {formatMessage("closeButtonText")}
           </a>
         </div>
-        <SampleListLayout />
+        <SampleListLayout
+          onSelect={onAssociatedSampleSelected}
+          classNames="btn btn-primary"
+          btnMsg={formatMessage("select")}
+        />
       </div>
     );
   };
 
+  const onAssociatedSampleSelected = sample => {
+    if (associationToEdit) associationToEdit.associatedSample = sample;
+  };
+  const onDeleteAssociatedSample = () => {
+    setShowSearchAssociatedSample(false);
+  };
+
+  function onSearchClicked() {
+    if (listRef.current) {
+      listRef.current.className = listRef.current.className.replaceAll(
+        "d-none",
+        ""
+      );
+    }
+    setShowSearchAssociatedSample(true);
+  }
+
   return (
     <div onKeyDown={disableEnterToSubmitOuterForm}>
-      <FieldSet legend={<DinaMessage id="addAssociationLegend" />}>
-        <FormWrapper
-          validationSchema={associationSchema}
-          initialValues={
-            associationToEdit ?? associationTemplateInitialValues ?? {}
-          }
-          enabledFields={associationsEnabledFields}
-        >
-          <div className="row">
-            <div className="col-sm-6" id="association">
-              <TextField {...fieldProps("associationType")} />
-              <TextField {...fieldProps("associatedSample")} />
-            </div>
-            <div className="col-sm-6">
-              <TextField {...fieldProps("remarks")} multiLines={true} />
-            </div>
-            <MaterialSampleList />
-          </div>
-
-          {!isTemplate && (
-            <div className="d-flex justify-content-center gap-2">
-              <FormikButton
-                className="btn btn-primary mb-3 save-button"
-                buttonProps={() => ({ style: { width: "10rem" } })}
-                onClick={submitAssociation}
+      <FormWrapper
+        validationSchema={associationSchema}
+        initialValues={
+          associationToEdit ?? associationTemplateInitialValues ?? {}
+        }
+        enabledFields={associationsEnabledFields}
+      >
+        <div className="row">
+          <div className="col-sm-6" id="association">
+            <TextField {...fieldProps("associationType")} />
+            {!showSearchAssociatedSample ? (
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => onSearchClicked()}
               >
-                <DinaMessage id={associationToEdit ? "submitBtnText" : "add"} />
+                {formatMessage("search") + "..."}
+              </button>
+            ) : (
+              <div>
+                <label className="w-100">
+                  {" "}
+                  <strong>
+                    {formatMessage("associatedMaterialSample")}{" "}
+                  </strong>{" "}
+                </label>
+                <div className={"d-flex flex-row"}>
+                  <TextField
+                    {...fieldProps("associatedSample")}
+                    className={"flex-md-grow-1"}
+                    hideLabel={true}
+                  />
+                  <button
+                    className="btn mb-2"
+                    onClick={onDeleteAssociatedSample}
+                    type="button"
+                    style={{
+                      cursor: "pointer"
+                    }}
+                  >
+                    <RiDeleteBinLine size="1.8em" className="ms-auto" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="col-sm-6">
+            <TextField {...fieldProps("remarks")} multiLines={true} />
+          </div>
+          <MaterialSampleList />
+        </div>
+
+        {!isTemplate && (
+          <div className="d-flex justify-content-center gap-2">
+            <FormikButton
+              className="btn btn-primary mb-3 save-button"
+              buttonProps={() => ({ style: { width: "10rem" } })}
+              onClick={submitAssociation}
+            >
+              <DinaMessage id={associationToEdit ? "submitBtnText" : "add"} />
+            </FormikButton>
+            {onCancelClick && (
+              <FormikButton
+                className="btn btn-dark mb-3"
+                buttonProps={() => ({ style: { width: "10rem" } })}
+                onClick={onCancelClick}
+              >
+                <DinaMessage id="cancelButtonText" />
               </FormikButton>
-              {onCancelClick && (
-                <FormikButton
-                  className="btn btn-dark mb-3"
-                  buttonProps={() => ({ style: { width: "10rem" } })}
-                  onClick={onCancelClick}
-                >
-                  <DinaMessage id="cancelButtonText" />
-                </FormikButton>
-              )}
-            </div>
-          )}
-        </FormWrapper>
-      </FieldSet>
+            )}
+          </div>
+        )}
+      </FormWrapper>
     </div>
   );
 }
