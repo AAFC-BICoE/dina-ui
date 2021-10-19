@@ -17,48 +17,77 @@ import {
   MaterialSampleType
 } from "../../../types/collection-api";
 
-const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
-  "createdBy",
-  "collection.name",
-  "collection.code",
-  {
-    name: "materialSampleType.uuid",
-    type: "DROPDOWN",
-    resourcePath: "collection-api/material-sample-type",
-    filter: filterBy(["name"]),
-    optionLabel: (it: PersistedResource<MaterialSampleType>) => it.name
-  },
-  {
-    name: "createdOn",
-    type: "DATE"
-  }
-];
+export function SampleListLayout() {
+  const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
+    "createdBy",
+    "collection.name",
+    "collection.code",
+    {
+      name: "materialSampleType.uuid",
+      type: "DROPDOWN",
+      resourcePath: "collection-api/material-sample-type",
+      filter: filterBy(["name"]),
+      optionLabel: (it: PersistedResource<MaterialSampleType>) => it.name
+    },
+    {
+      name: "createdOn",
+      type: "DATE"
+    }
+  ];
 
-const MATERIAL_SAMPLE_TABLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
-  {
-    Cell: ({
-      original: { id, materialSampleName, dwcOtherCatalogNumbers }
-    }) => (
-      <Link href={`/collection/material-sample/view?id=${id}`}>
-        {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
-      </Link>
-    ),
-    accessor: "materialSampleName"
-  },
-  {
-    Cell: ({ original: { collection } }) =>
-      collection?.id ? (
-        <Link href={`/collection/collection/view?id=${collection?.id}`}>
-          {collection?.name}
+  const MATERIAL_SAMPLE_TABLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
+    {
+      Cell: ({
+        original: { id, materialSampleName, dwcOtherCatalogNumbers }
+      }) => (
+        <Link href={`/collection/material-sample/view?id=${id}`}>
+          {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
         </Link>
-      ) : null,
-    accessor: "collection.name"
-  },
-  stringArrayCell("dwcOtherCatalogNumbers"),
-  { accessor: "materialSampleType.name" },
-  "createdBy",
-  dateCell("createdOn")
-];
+      ),
+      accessor: "materialSampleName"
+    },
+    {
+      Cell: ({ original: { collection } }) =>
+        collection?.id ? (
+          <Link href={`/collection/collection/view?id=${collection?.id}`}>
+            {collection?.name}
+          </Link>
+        ) : null,
+      accessor: "collection.name"
+    },
+    stringArrayCell("dwcOtherCatalogNumbers"),
+    { accessor: "materialSampleType.name" },
+    "createdBy",
+    dateCell("createdOn")
+  ];
+
+  return (
+    <ListPageLayout
+      additionalFilters={filterForm => ({
+        // Apply group filter:
+        ...(filterForm.group && { rsql: `group==${filterForm.group}` })
+      })}
+      filterAttributes={MATERIAL_SAMPLE_FILTER_ATTRIBUTES}
+      id="material-sample-list"
+      queryTableProps={{
+        columns: MATERIAL_SAMPLE_TABLE_COLUMNS,
+        path: "collection-api/material-sample",
+        include: "collection,materialSampleType"
+      }}
+      filterFormchildren={({ submitForm }) => (
+        <div className="mb-3">
+          <div style={{ width: "300px" }}>
+            <GroupSelectField
+              onChange={() => setImmediate(submitForm)}
+              name="group"
+              showAnyOption={true}
+            />
+          </div>
+        </div>
+      )}
+    />
+  );
+}
 
 export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
@@ -74,30 +103,7 @@ export default function MaterialSampleListPage() {
         <ButtonBar>
           <CreateButton entityLink="/collection/material-sample" />
         </ButtonBar>
-        <ListPageLayout
-          additionalFilters={filterForm => ({
-            // Apply group filter:
-            ...(filterForm.group && { rsql: `group==${filterForm.group}` })
-          })}
-          filterAttributes={MATERIAL_SAMPLE_FILTER_ATTRIBUTES}
-          id="material-sample-list"
-          queryTableProps={{
-            columns: MATERIAL_SAMPLE_TABLE_COLUMNS,
-            path: "collection-api/material-sample",
-            include: "collection,materialSampleType"
-          }}
-          filterFormchildren={({ submitForm }) => (
-            <div className="mb-3">
-              <div style={{ width: "300px" }}>
-                <GroupSelectField
-                  onChange={() => setImmediate(submitForm)}
-                  name="group"
-                  showAnyOption={true}
-                />
-              </div>
-            </div>
-          )}
-        />
+        <SampleListLayout />
       </main>
       <Footer />
     </div>
