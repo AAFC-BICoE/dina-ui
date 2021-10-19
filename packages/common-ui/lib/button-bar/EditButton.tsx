@@ -16,10 +16,10 @@ interface EditButtonProps {
 
   style?: CSSProperties;
 
-  onKeyUp?: React.KeyboardEventHandler;
-  onMouseOver?: React.MouseEventHandler;
-  onMouseOut?: React.MouseEventHandler;
-  onBlur?: React.FocusEventHandler;
+  onKeyUp?: React.KeyboardEventHandler<HTMLAnchorElement>;
+  onMouseOver?: React.MouseEventHandler<HTMLAnchorElement>;
+  onMouseOut?: React.MouseEventHandler<HTMLAnchorElement>;
+  onBlur?: React.FocusEventHandler<HTMLAnchorElement>;
   ariaDescribedBy?: string;
 }
 
