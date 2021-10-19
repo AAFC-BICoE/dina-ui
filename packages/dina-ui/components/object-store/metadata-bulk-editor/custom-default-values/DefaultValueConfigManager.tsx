@@ -1,9 +1,8 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { FieldWrapper, LabelWrapperParams, SelectOption } from "common-ui";
-import Select from "react-select";
+import Select, { StylesConfig } from "react-select";
 import { DinaMessage } from "../../../../intl/dina-ui-intl";
 import { DefaultValuesConfig } from "./model-types";
-import { Styles } from "react-select/src/styles";
 
 export interface DefaultValueConfigSelectProps {
   allowBlank?: boolean;
@@ -11,7 +10,7 @@ export interface DefaultValueConfigSelectProps {
   onChangeConfigIndex: (index: number | null) => void;
   /** Mock this out in tests so it gives a predictable value. */
   dateSupplier?: () => string;
-  styles?: Partial<Styles<SelectOption<any>, boolean>>;
+  styles?: Partial<StylesConfig<SelectOption<any>, boolean>>;
 }
 
 /** Lists, adds, edits, and removes Default Value Configs. */
@@ -125,7 +124,7 @@ export function DefaultValuesConfigSelect({
 export function DefaultValuesConfigSelectField(
   props: LabelWrapperParams & {
     allowBlank?: boolean;
-    styles?: Partial<Styles<SelectOption<any>, boolean>>;
+    styles?: Partial<StylesConfig<SelectOption<any>, boolean>>;
   }
 ) {
   const { allowBlank, styles, ...labelWrapperProps } = props;

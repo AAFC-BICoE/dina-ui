@@ -16,8 +16,10 @@ import {
 } from "lodash";
 import React, { ComponentProps, useCallback, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
-import Select, { components as reactSelectComponents } from "react-select";
-import { Styles } from "react-select/src/styles";
+import Select, {
+  StylesConfig,
+  components as reactSelectComponents
+} from "react-select";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { SelectOption } from "../..";
 import { useQuery } from "../api-client/useQuery";
@@ -55,7 +57,7 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   sort?: string;
 
   /** react-select styles prop. */
-  styles?: Partial<Styles<SelectOption<any>, boolean>>;
+  styles?: Partial<StylesConfig<SelectOption<any>, boolean>>;
 
   /** Special dropdown options that can fetch an async value e.g. by creating a resource in a modal. */
   asyncOptions?: AsyncOption<TData>[];

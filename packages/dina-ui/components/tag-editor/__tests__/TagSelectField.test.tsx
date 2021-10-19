@@ -91,7 +91,9 @@ describe("TagSelectField", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    wrapper.find(CreatableSelect).prop("onChange")([{ value: "my-tag-1" }]);
+    wrapper.find(CreatableSelect).prop<any>("onChange")([
+      { value: "my-tag-1" }
+    ]);
 
     await new Promise(setImmediate);
     wrapper.update();
