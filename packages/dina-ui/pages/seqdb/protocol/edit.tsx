@@ -29,11 +29,15 @@ interface ProtocolFormProps {
 export function ProtocolEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useSeqdbIntl();
+  const title = id ? "editProtocolTitle" : "addProtocolTitle";
 
   return (
     <div>
-      <Head title={formatMessage("editProtocolTitle")} />
-      <Nav />
+      <Head title={formatMessage(title)}
+						lang={formatMessage("languageOfPage")} 
+						creator={formatMessage("agricultureCanada")}
+						subject={formatMessage("subjectTermsForPage")} />
+			<Nav />
       <main className="container-fluid">
         {id ? (
           <div>

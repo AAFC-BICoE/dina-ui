@@ -70,7 +70,10 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
 
           return (
             <>
-              <Head title={storageUnitDisplayName(strgUnit)} />
+              <Head title={storageUnitDisplayName(strgUnit)} 
+                    lang={formatMessage("languageOfPage")}
+                    creator={formatMessage("agricultureCanada")}
+                    subject={formatMessage("subjectTermsForPage")} />
               {buttonBar}
               <DinaForm<StorageUnit> initialValues={strgUnit} readOnly={true}>
                 <StorageUnitFormFields />
