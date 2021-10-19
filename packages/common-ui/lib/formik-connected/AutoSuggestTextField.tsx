@@ -10,13 +10,14 @@ import { castArray, compact, uniq } from "lodash";
 import React, {
   ChangeEvent,
   InputHTMLAttributes,
-  useCallback,
   useEffect,
   useState
 } from "react";
 import AutoSuggest, { InputProps } from "react-autosuggest";
 import { useDebounce } from "use-debounce";
 import { OnFormikSubmit } from "./safeSubmit";
+
+type SingleOrArray<T> = T | T[];
 
 export type AutoSuggestTextFieldProps<T extends KitsuResource> =
   TextFieldProps & AutoSuggestConfig<T>;
@@ -35,7 +36,7 @@ interface AutoSuggestConfig<T extends KitsuResource> {
   suggestion?: (
     resource: PersistedResource<T>,
     searchValue: string
-  ) => string | string[] | undefined;
+  ) => SingleOrArray<string | null | undefined>;
   onSuggestionSelected?: OnFormikSubmit<ChangeEvent<HTMLInputElement>>;
   timeoutMs?: number;
   /** Show the suggestions even when the input is blank. */

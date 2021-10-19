@@ -1,4 +1,6 @@
 import {
+  AutoSuggestTextField,
+  AutoSuggestTextFieldProps,
   DateField,
   DinaForm,
   DinaFormSection,
@@ -15,7 +17,7 @@ import ReactTable, { CellInfo, Column } from "react-table";
 import * as yup from "yup";
 import { UserSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { ScheduledAction } from "../../types/collection-api";
+import { MaterialSample, ScheduledAction } from "../../types/collection-api";
 
 /** Type-safe object with all ScheduledAction fields. */
 export const SCHEDULEDACTION_FIELDS_OBJECT: Required<
@@ -34,16 +36,18 @@ export const SCHEDULEDACTION_FIELDS = Object.keys(
 );
 
 export const scheduledActionSchema = yup.object({
-  actionStatus: yup.string().required(),
   actionType: yup.string().required()
 });
 
 export interface ScheduledActionsFieldProps {
   className?: string;
+  defaultDate?: string;
 }
 
 export function ScheduledActionsField({
-  className
+  className,
+  // The default date is today:
+  defaultDate = new Date().toISOString().slice(0, 10)
 }: ScheduledActionsFieldProps) {
   const fieldName = "scheduledActions";
 
@@ -165,6 +169,7 @@ export function ScheduledActionsField({
                   <div className="m-2">
                     <ScheduledActionSubForm
                       actionToEdit={row.original}
+                      defaultDate={defaultDate}
                       onSaveAction={saveAction}
                       onCancelClick={
                         hasActions ? () => setActionToEdit(null) : undefined
@@ -177,6 +182,7 @@ export function ScheduledActionsField({
             )}
             {readOnly ? null : !hasActions || actionToEdit === "NEW" ? (
               <ScheduledActionSubForm
+                defaultDate={defaultDate}
                 onSaveAction={saveAction}
                 onCancelClick={
                   hasActions ? () => setActionToEdit(null) : undefined
@@ -202,12 +208,14 @@ export interface ScheduledActionSubFormProps {
   onSaveAction: (action: ScheduledAction) => Promise<void>;
   onCancelClick?: () => void;
   actionToEdit?: ScheduledAction;
+  defaultDate: string;
 }
 
 export function ScheduledActionSubForm({
   onSaveAction,
   onCancelClick,
-  actionToEdit
+  actionToEdit,
+  defaultDate
 }: ScheduledActionSubFormProps) {
   const { enabledFields, initialValues, isTemplate } = useDinaFormContext();
 
@@ -252,20 +260,57 @@ export function ScheduledActionSubForm({
     await onSaveAction(newAction);
   };
 
+  // Fetch the last 50 scheduled actions.
+  // No filtering by search text yet due to API limitations. The future search API should provide better autocomplete support.
+  const autoSuggestQuery: AutoSuggestTextFieldProps<MaterialSample>["query"] = (
+    _,
+    ctx
+  ) => ({
+    path: "collection-api/material-sample",
+    fields: { "material-sample": "scheduledActions" },
+    filter: {
+      scheduledActions: { NEQ: "null" },
+      ...(ctx.values.group && { group: { EQ: ctx.values.group } })
+    },
+    page: { limit: 50 }
+  });
+
+  const defaultInitialValues = {
+    date: defaultDate
+  };
+
   return (
     <div onKeyDown={disableEnterToSubmitOuterForm}>
       <FieldSet legend={<DinaMessage id="addScheduledAction" />}>
         <FormWrapper
           validationSchema={scheduledActionSchema}
-          initialValues={actionToEdit ?? actionTemplateInitialValues ?? {}}
+          initialValues={
+            actionToEdit ?? actionTemplateInitialValues ?? defaultInitialValues
+          }
           enabledFields={actionsEnabledFields}
         >
           <div className="row">
-            <TextField {...fieldProps("actionType")} className="col-sm-6" />
+            <AutoSuggestTextField<MaterialSample>
+              {...fieldProps("actionType")}
+              query={autoSuggestQuery}
+              suggestion={matSample =>
+                matSample.scheduledActions?.map(it => it?.actionType)
+              }
+              alwaysShowSuggestions={true}
+              className="col-sm-6"
+            />
             <DateField {...fieldProps("date")} className="col-sm-6" />
           </div>
           <div className="row">
-            <TextField {...fieldProps("actionStatus")} className="col-sm-6" />
+            <AutoSuggestTextField<MaterialSample>
+              {...fieldProps("actionStatus")}
+              query={autoSuggestQuery}
+              suggestion={matSample =>
+                matSample.scheduledActions?.map(it => it?.actionStatus)
+              }
+              alwaysShowSuggestions={true}
+              className="col-sm-6"
+            />
             <UserSelectField
               {...fieldProps("assignedTo")}
               className="col-sm-6"
