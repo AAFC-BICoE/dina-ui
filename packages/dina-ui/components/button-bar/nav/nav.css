@@ -12,10 +12,9 @@ body {
   color: rgb(232, 230, 227);
   border-width: 0px;
 }
-.dropdown:hover .nav-link{
+.dropdown:hover .nav-link {
   background-color: #38414d;
 }
 .ftr-urlt-lnk li {
   float: initial !important;
 }
-

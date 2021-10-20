@@ -1,13 +1,14 @@
 import { FieldWrapper, LabelWrapperParams, useQuery } from "common-ui";
-import CreatableSelect, {
-  Props as CreatableSelectProps
-} from "react-select/creatable";
+import CreatableSelect, { CreatableProps } from "react-select/creatable";
+import { GroupBase } from "react-select";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Vocabulary } from "../../types/collection-api";
 
 export interface VocabularySelectFieldProps extends LabelWrapperParams {
   path: string;
-  selectProps?: Partial<CreatableSelectProps<VocabularyOption, true>>;
+  selectProps?: Partial<
+    CreatableProps<VocabularyOption, true, GroupBase<VocabularyOption>>
+  >;
 }
 
 export interface VocabularyOption {

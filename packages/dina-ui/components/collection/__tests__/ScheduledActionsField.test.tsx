@@ -11,7 +11,7 @@ describe("ScheduledActionsField", () => {
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
       >
-        <ScheduledActionsField />
+        <ScheduledActionsField defaultDate="2021-10-12" />
       </DinaForm>
     );
 
@@ -42,6 +42,7 @@ describe("ScheduledActionsField", () => {
         {
           actionType: "at1",
           actionStatus: "as1",
+          date: "2021-10-12",
           remarks: "remarks-1"
         }
       ]
@@ -76,11 +77,13 @@ describe("ScheduledActionsField", () => {
         {
           actionType: "at1",
           actionStatus: "as1",
+          date: "2021-10-12",
           remarks: "remarks-1"
         },
         {
           actionType: "at2",
           actionStatus: "as2",
+          date: "2021-10-12",
           remarks: "remarks-2"
         }
       ]
@@ -107,11 +110,13 @@ describe("ScheduledActionsField", () => {
         {
           actionType: "at1",
           actionStatus: "as1",
+          date: "2021-10-12",
           remarks: "edited-remarks-1"
         },
         {
           actionType: "at2",
           actionStatus: "as2",
+          date: "2021-10-12",
           remarks: "remarks-2"
         }
       ]
@@ -131,6 +136,7 @@ describe("ScheduledActionsField", () => {
         {
           actionType: "at1",
           actionStatus: "as1",
+          date: "2021-10-12",
           remarks: "edited-remarks-1"
         }
       ]

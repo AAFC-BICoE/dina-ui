@@ -43,6 +43,12 @@ export interface DinaFormContextI {
 
   /** Optionally restrict the writable fields to this list. */
   enabledFields?: string[] | null;
+
+  /**
+   * @deperecated
+   * Whether this DinaForm is nested in another DinaForm. Nested forms are bad so avoid this.
+   */
+  isNestedForm?: boolean;
 }
 
 export type DinaFormOnSubmit<TValues = any> = (
@@ -79,17 +85,13 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
     });
   });
 
-  const FormWrapperInternal = isNestedForm ? Fragment : FormWrapper;
-
   const childrenInternal:
     | ((formikProps: FormikProps<Values>) => React.ReactNode)
     | React.ReactNode =
     typeof childrenProp === "function" ? (
-      formikProps => (
-        <FormWrapperInternal>{childrenProp(formikProps)}</FormWrapperInternal>
-      )
+      formikProps => <FormWrapper>{childrenProp(formikProps)}</FormWrapper>
     ) : (
-      <FormWrapperInternal>{childrenProp}</FormWrapperInternal>
+      <FormWrapper>{childrenProp}</FormWrapper>
     );
 
   // Clone the initialValues object so it isn't modified in the form:
@@ -102,6 +104,7 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
     <DinaFormContext.Provider
       value={{
         ...props,
+        isNestedForm,
         readOnly: props.readOnly ?? false
       }}
     >
@@ -122,11 +125,25 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
 
 /** Wraps the inner content with the Form + ErrorViewer components. */
 function FormWrapper({ children }: PropsWithChildren<{}>) {
+  const { isNestedForm } = useDinaFormContext();
+
+  // Disable enter to submit form in nested forms.
+  function disableEnterToSubmitOuterForm(e) {
+    // Pressing enter should not submit the outer form:
+    if (e.keyCode === 13 && e.target.tagName !== "TEXTAREA") {
+      e.preventDefault();
+    }
+  }
+
+  const Wrapper = isNestedForm ? "div" : Form;
+
   return (
-    <Form>
+    <Wrapper
+      onKeyDown={isNestedForm ? disableEnterToSubmitOuterForm : undefined}
+    >
       <ErrorViewer />
       {children}
-    </Form>
+    </Wrapper>
   );
 }
 
