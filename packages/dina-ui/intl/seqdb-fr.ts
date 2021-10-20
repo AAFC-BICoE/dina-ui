@@ -50,6 +50,7 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   indexSetViewTitle: "L'ensemble d’indices",
   indexSetMustBeSet: "L’ensemble d’indices doit être défini.",
   languageOfPage: "fra",
+  molecularSample: "Échantillon moléculaire",
   molecularSampleViewTitle: "Échantillon moléculaire",
   molecularSampleListTitle: "Échantillons moléculaires",
   notShearedStatus: "Sans cisaillement",

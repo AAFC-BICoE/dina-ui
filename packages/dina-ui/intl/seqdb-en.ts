@@ -48,6 +48,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   indexSetViewTitle: "Index Set",
   indexSetMustBeSet: "Index Set must be set.",
   languageOfPage: "eng",
+  molecularSample: "Molecular Sample",
   molecularSampleViewTitle: "Molecular Sample",
   molecularSampleListTitle: "Molecular Samples",
   notShearedStatus: "Not Sheared",
