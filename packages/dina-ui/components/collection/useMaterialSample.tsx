@@ -29,7 +29,7 @@ import {
 } from "../../../dina-ui/types/objectstore-api";
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
+import { AllowAttachmentsConfig } from "../object-store";
 import { DETERMINATION_FIELDS } from "./DeterminationField";
 import { ORGANISM_FIELDS } from "./OrganismStateField";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
@@ -152,8 +152,6 @@ export interface UseMaterialSampleSaveParams {
     collectingEvent?: string[];
   };
 
-  materialSampleAttachmentsConfig?: AllowAttachmentsConfig;
-  preparationsAttachmentsConfig?: AllowAttachmentsConfig;
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
 }
 
@@ -164,8 +162,6 @@ export function useMaterialSampleSave({
   collectingEvtFormRef,
   isTemplate,
   enabledFields,
-  materialSampleAttachmentsConfig,
-  preparationsAttachmentsConfig,
   collectingEventAttachmentsConfig,
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues
@@ -364,36 +360,6 @@ export function useMaterialSampleSave({
     isTemplate
   });
 
-  const {
-    attachedMetadatasUI: materialSampleAttachmentsUI,
-    selectedMetadatas: materialSampleSelectedMetadatas
-  } = useAttachmentsModal({
-    initialMetadatas:
-      materialSample?.attachment as PersistedResource<Metadata>[],
-    deps: [materialSample?.id],
-    title: <DinaMessage id="materialSampleAttachments" />,
-    isTemplate,
-    allowAttachmentsConfig: materialSampleAttachmentsConfig,
-    allowNewFieldName: "attachmentsConfig.allowNew",
-    allowExistingFieldName: "attachmentsConfig.allowExisting",
-    id: "material-sample-attachments-section"
-  });
-
-  const {
-    attachedMetadatasUI: preparationsAttachmentsUI,
-    selectedMetadatas: preparationsSelectedMetadatas
-  } = useAttachmentsModal({
-    initialMetadatas:
-      materialSample?.preparationAttachment as PersistedResource<Metadata>[],
-    deps: [materialSample?.id],
-    title: <DinaMessage id="preparationProtocols" />,
-    isTemplate,
-    allowAttachmentsConfig: preparationsAttachmentsConfig,
-    allowNewFieldName: "attachmentsConfig.allowNew",
-    allowExistingFieldName: "attachmentsConfig.allowExisting",
-    id: "preparation-protocols-section"
-  });
-
   const collectingEventInitialValues =
     collectingEventInitialValuesProp ?? collectingEventHookInitialValues;
 
@@ -481,17 +447,17 @@ export function useMaterialSampleSave({
     }
 
     // Add attachments if they were selected:
-    if (materialSampleSelectedMetadatas.length) {
+    if (materialSampleInput.attachment?.length) {
       (materialSampleInput as any).relationships.attachment = {
-        data: materialSampleSelectedMetadatas.map(it => ({
+        data: materialSampleInput.attachment.map(it => ({
           id: it.id,
           type: it.type
         }))
       };
     }
-    if (preparationsSelectedMetadatas.length) {
+    if (materialSampleInput.preparationAttachment?.length) {
       (materialSampleInput as any).relationships.preparationAttachment = {
-        data: preparationsSelectedMetadatas.map(it => ({
+        data: materialSampleInput.preparationAttachment.map(it => ({
           id: it.id,
           type: it.type
         }))
@@ -569,8 +535,6 @@ export function useMaterialSampleSave({
     colEventId,
     setColEventId,
     colEventQuery,
-    materialSampleAttachmentsUI,
-    preparationsAttachmentsUI,
     onSubmit,
     loading
   };

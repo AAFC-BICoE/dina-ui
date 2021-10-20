@@ -4,11 +4,12 @@ import {
   FieldSet,
   filterBy,
   ResourceSelectField,
-  TextField
+  TextField,
+  useDinaFormContext
 } from "common-ui";
 import { Field } from "formik";
 import { InputResource } from "kitsu";
-import { ReactNode } from "react";
+import { AttachmentsField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api";
 import {
@@ -16,11 +17,12 @@ import {
   PreparationType,
   Vocabulary
 } from "../../types/collection-api";
+import { AllowAttachmentsConfig } from "../object-store";
 
 export interface PreparationFieldProps {
   className?: string;
   namePrefix?: string;
-  attachmentsUI?: ReactNode;
+  attachmentsConfig?: AllowAttachmentsConfig;
 }
 
 /**
@@ -53,9 +55,10 @@ export const BLANK_PREPARATION: Required<
 export function PreparationField({
   className,
   namePrefix = "",
-  attachmentsUI
+  attachmentsConfig = { allowExisting: true, allowNew: true }
 }: PreparationFieldProps) {
   const { locale } = useDinaIntl();
+  const { initialValues } = useDinaFormContext();
 
   /** Applies name prefix to field props */
   function fieldProps(fieldName: string) {
@@ -133,7 +136,17 @@ export function PreparationField({
           />
         </div>
       </div>
-      <div>{attachmentsUI}</div>
+      <div>
+        <AttachmentsField
+          name="preparationAttachment"
+          title={<DinaMessage id="preparationProtocols" />}
+          allowNewFieldName="attachmentsConfig.allowNew"
+          allowExistingFieldName="attachmentsConfig.allowExisting"
+          id="preparation-protocols-section"
+          allowAttachmentsConfig={attachmentsConfig}
+          attachmentPath={`collection-api/${initialValues.type}/${initialValues.id}/preparationAttachment`}
+        />
+      </div>
     </FieldSet>
   );
 }

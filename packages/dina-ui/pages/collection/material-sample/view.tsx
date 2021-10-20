@@ -144,17 +144,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   </DinaForm>
                 </FieldSet>
               )}
-              {hasPreparations && id && (
-                <PreparationField
-                  attachmentsUI={
-                    <AttachmentReadOnlySection
-                      attachmentPath={`collection-api/material-sample/${id}/preparationAttachment`}
-                      detachTotalSelected={true}
-                      title={<DinaMessage id="preparationProtocols" />}
-                    />
-                  }
-                />
-              )}
+              {hasPreparations && <PreparationField />}
               {hasOrganism && <OrganismStateField />}
               {hasDetermination && <DeterminationField />}
               {materialSample.storageUnit && (
