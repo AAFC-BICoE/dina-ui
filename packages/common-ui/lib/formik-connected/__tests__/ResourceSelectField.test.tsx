@@ -118,12 +118,12 @@ describe("ResourceSelectField component", () => {
       }
     });
 
-    const { onChange, options } = wrapper.find(Select).props();
+    const { onChange, options } = wrapper.find<any>(Select).props();
 
     const groupToSelect = options[0];
 
     // Simulate selecting a new option.
-    onChange(groupToSelect, null);
+    onChange(groupToSelect);
 
     // The new selected group's name should be rendered into the value-display div.
     expect(wrapper.find("#value-display").text()).toEqual("Mat's Group");
@@ -146,10 +146,9 @@ describe("ResourceSelectField component", () => {
     );
 
     // Change the value.
-    wrapper.find(Select).prop("onChange")(
-      { resource: MOCK_GROUPS.data[1] },
-      null
-    );
+    wrapper.find(Select).prop<any>("onChange")({
+      resource: MOCK_GROUPS.data[1]
+    });
 
     expect(mockOnChange).lastCalledWith({
       groupName: "Group 2",

@@ -46,8 +46,8 @@ export interface MaterialSampleAttributes {
 }
 
 export interface ScheduledAction {
-  actionType: string;
-  date: string;
+  actionType?: string;
+  date?: string;
   actionStatus?: string;
   assignedTo?: KitsuResourceLink;
   remarks?: string;

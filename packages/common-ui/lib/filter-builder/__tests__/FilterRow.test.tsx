@@ -105,11 +105,9 @@ describe("FilterRow component", () => {
     const wrapper = mountFilterRow();
     const model = wrapper.find(FilterRow).props().model;
 
-    wrapper
-      .find(".filter-attribute")
-      .find(Select)
-      .props()
-      .onChange({ value: "description" }, null);
+    wrapper.find(".filter-attribute").find(Select).prop<any>("onChange")({
+      value: "description"
+    });
 
     expect(model.attribute).toEqual("description");
   });
@@ -118,11 +116,9 @@ describe("FilterRow component", () => {
     const wrapper = mountFilterRow();
     const model = wrapper.find(FilterRow).props().model;
 
-    wrapper
-      .find(".filter-predicate")
-      .find(Select)
-      .props()
-      .onChange({ value: "IS NOT" }, null);
+    wrapper.find(".filter-predicate").find(Select).prop<any>("onChange")({
+      value: "IS NOT"
+    });
 
     expect(model.predicate).toEqual("IS NOT");
   });
@@ -144,11 +140,9 @@ describe("FilterRow component", () => {
 
     expect(model.searchType).toEqual("PARTIAL_MATCH");
 
-    wrapper
-      .find(".filter-search-type")
-      .find(Select)
-      .props()
-      .onChange({ value: "EXACT_MATCH" }, null);
+    wrapper.find(".filter-search-type").find(Select).prop<any>("onChange")({
+      value: "EXACT_MATCH"
+    });
 
     expect(model.searchType).toEqual("EXACT_MATCH");
   });
@@ -165,19 +159,15 @@ describe("FilterRow component", () => {
     const wrapper = mountFilterRow();
 
     // Change the filtered field.
-    wrapper
-      .find(".filter-attribute")
-      .find(Select)
-      .props()
-      .onChange({ value: "description" }, null);
+    wrapper.find(".filter-attribute").find(Select).prop<any>("onChange")({
+      value: "description"
+    });
     expect(mockOnChange).toHaveBeenCalledTimes(1);
 
     // Change the filter predicate (IS / IS NOT).
-    wrapper
-      .find(".filter-predicate")
-      .find(Select)
-      .props()
-      .onChange({ value: "IS NOT" }, null);
+    wrapper.find(".filter-predicate").find(Select).prop<any>("onChange")({
+      value: "IS NOT"
+    });
     expect(mockOnChange).toHaveBeenCalledTimes(2);
 
     // Change the filter value.
@@ -186,11 +176,9 @@ describe("FilterRow component", () => {
       .simulate("change", { target: { value: "101F" } });
     expect(mockOnChange).toHaveBeenCalledTimes(3);
 
-    wrapper
-      .find(".filter-search-type")
-      .find(Select)
-      .props()
-      .onChange({ value: "EXACT_MATCH" }, null);
+    wrapper.find(".filter-search-type").find(Select).prop<any>("onChange")({
+      value: "EXACT_MATCH"
+    });
     expect(mockOnChange).toHaveBeenCalledTimes(4);
   });
 
@@ -203,11 +191,9 @@ describe("FilterRow component", () => {
     ).toEqual(undefined);
 
     // Change the search type to "BLANK_FIELD".
-    wrapper
-      .find(".filter-search-type")
-      .find(Select)
-      .props()
-      .onChange({ value: "BLANK_FIELD" }, null);
+    wrapper.find(".filter-search-type").find(Select).prop<any>("onChange")({
+      value: "BLANK_FIELD"
+    });
     wrapper.update();
 
     // The input should now be hidden.

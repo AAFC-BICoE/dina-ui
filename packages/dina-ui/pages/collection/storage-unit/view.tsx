@@ -4,17 +4,20 @@ import {
   DinaForm,
   EditButton,
   Tooltip,
-  useApiClient,
-  useModal,
   useQuery,
   withResponse
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
-import { Head, Nav, storageUnitDisplayName } from "../../../components";
-import { StorageUnit } from "../../../types/collection-api";
-import { StorageUnitFormFields, useStorageUnit } from "./edit";
 import { useState } from "react";
+import {
+  Head,
+  Nav,
+  storageUnitDisplayName,
+  StorageUnitFormFields
+} from "../../../components";
+import { StorageUnit } from "../../../types/collection-api";
+import { useStorageUnit } from "./edit";
 
 export function StorageUnitDetailsPage({ router }: WithRouterProps) {
   const id = router.query.id?.toString();

@@ -1,8 +1,7 @@
 import { FormikContextType } from "formik";
 import { isArray } from "lodash";
 import { ComponentProps, RefObject } from "react";
-import Select from "react-select";
-import { Styles } from "react-select/src/styles";
+import Select, { StylesConfig } from "react-select";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 
 export interface SelectOption<T> {
@@ -21,7 +20,7 @@ export interface SelectFieldProps<T = string> extends LabelWrapperParams {
     formik: FormikContextType<any>
   ) => void;
   options: SelectOption<T>[];
-  styles?: Partial<Styles<SelectOption<T | null | undefined>, boolean>>;
+  styles?: Partial<StylesConfig<SelectOption<T | null | undefined>, boolean>>;
 
   forwardedRef?: RefObject<HTMLSelectElement>;
   isLoading?: boolean;
