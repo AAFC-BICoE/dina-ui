@@ -159,7 +159,7 @@ export function AttachmentsEditor({
                       Header: <FieldHeader name={formatMessage("remove")} />,
                       Cell: ({ original: { id: mId } }) => (
                         <button
-                          className="btn btn-dark"
+                          className="btn btn-dark remove-attachment"
                           onClick={() => removeMetadata(mId)}
                           type="button"
                         >
@@ -175,7 +175,7 @@ export function AttachmentsEditor({
               </div>
             ) : null}
             <button
-              className="btn btn-primary mb-3"
+              className="btn btn-primary add-attachments mb-3"
               type="button"
               onClick={openAttachmentsModal}
               style={{ width: "10rem" }}

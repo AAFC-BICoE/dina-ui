@@ -312,6 +312,7 @@ export function MaterialSampleForm({
           )}
           <AttachmentsField
             name="attachment"
+            title={<DinaMessage id="materialSampleAttachments" />}
             id="material-sample-attachments-section"
             allowNewFieldName="attachmentsConfig.allowNew"
             allowExistingFieldName="attachmentsConfig.allowExisting"

@@ -51,6 +51,7 @@ import {
 
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
+import { AttachmentsField } from "../../../../components";
 
 export const SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY =
   "split-child-sample-run-action-result";
@@ -395,7 +396,12 @@ export function SplitRunAction({ router }: WithRouterProps) {
                   />{" "}
                 </FieldSet>
               )}
-              {materialSampleAttachmentsUI}
+              <AttachmentsField
+                name={`${commonRoot}attachment`}
+                title={<DinaMessage id="materialSampleAttachments" />}
+                attachmentPath="collection-api/material-sample/TODO/attachment"
+                id="material-sample-attachments-section"
+              />
             </div>
           </div>
         </div>
