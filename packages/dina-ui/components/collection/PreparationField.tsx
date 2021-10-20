@@ -138,7 +138,7 @@ export function PreparationField({
       </div>
       <div>
         <AttachmentsField
-          name="preparationAttachment"
+          {...fieldProps("preparationAttachment")}
           title={<DinaMessage id="preparationProtocols" />}
           allowNewFieldName="attachmentsConfig.allowNew"
           allowExistingFieldName="attachmentsConfig.allowExisting"

@@ -2,9 +2,9 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { useApiClient, useQuery } from "common-ui";
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
-import { orderBy } from "lodash";
+import { fromPairs, orderBy, toPairs } from "lodash";
 import { object, SchemaOf, string } from "yup";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/collection-api";
 import { CoordinateSystemEnum } from "../../types/collection-api/resources/CoordinateSystem";
 import { SourceAdministrativeLevel } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
@@ -14,8 +14,7 @@ import {
   Metadata,
   Person
 } from "../../types/objectstore-api";
-import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
-import { toPairs, fromPairs } from "lodash";
+import { AllowAttachmentsConfig } from "../object-store";
 
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
@@ -195,18 +194,6 @@ export function useCollectingEventSave({
         publiclyReleasable: true
       };
 
-  // The selected Metadatas to be attached to this Collecting Event:
-  const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal({
-    initialMetadatas:
-      fetchedCollectingEvent?.attachment as PersistedResource<Metadata>[],
-    deps: [fetchedCollectingEvent?.id],
-    title: <DinaMessage id="collectingEventAttachments" />,
-    isTemplate,
-    allowNewFieldName: "attachmentsConfig.allowNew",
-    allowExistingFieldName: "attachmentsConfig.allowExisting",
-    allowAttachmentsConfig: attachmentsConfig
-  });
-
   async function saveCollectingEvent(
     submittedValues: CollectingEvent,
     collectingEventFormik: FormikContextType<any>
@@ -241,9 +228,12 @@ export function useCollectingEventSave({
     }
 
     // Add attachments if they were selected:
-    if (selectedMetadatas.length) {
+    if (submittedValues.attachment?.length) {
       (submittedValues as any).relationships.attachment = {
-        data: selectedMetadatas.map(it => ({ id: it.id, type: it.type }))
+        data: submittedValues.attachment.map(it => ({
+          id: it.id,
+          type: it.type
+        }))
       };
     }
     // Delete the 'attachment' attribute because it should stay in the relationships field:
@@ -336,7 +326,7 @@ export function useCollectingEventSave({
   return {
     collectingEventInitialValues,
     saveCollectingEvent,
-    attachedMetadatasUI,
+    attachmentsConfig,
     collectingEventFormSchema
   };
 }

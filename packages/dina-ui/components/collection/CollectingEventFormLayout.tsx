@@ -23,6 +23,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import useSWR from "swr";
 import { GeographySearchBox, GeoReferenceAssertionRow } from ".";
 import {
+  AttachmentsField,
   GroupSelectField,
   NotPubliclyReleasableWarning,
   ParseVerbatimToRangeButton,
@@ -44,6 +45,7 @@ import {
   geographicPlaceSourceUrl,
   SourceAdministrativeLevel
 } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
+import { AllowAttachmentsConfig } from "../object-store";
 import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
 import { ManagedAttributesEditor } from "../object-store/managed-attributes/ManagedAttributesEditor";
 import { ManagedAttributesViewer } from "../object-store/managed-attributes/ManagedAttributesViewer";
@@ -59,12 +61,14 @@ interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
   setDefaultVerbatimSRS?: (newValue: string | undefined | null) => void;
   initialValuesForTemplate?: any;
+  attachmentsConfig?: AllowAttachmentsConfig;
 }
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
 export function CollectingEventFormLayout({
   setDefaultVerbatimCoordSys,
-  setDefaultVerbatimSRS
+  setDefaultVerbatimSRS,
+  attachmentsConfig
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
@@ -958,19 +962,20 @@ export function CollectingEventFormLayout({
           )}
         </FieldSet>
       )}
-      {readOnly && (
-        <div className="mb-3">
-          <Field name="id">
-            {({ field: { value: id } }) => (
-              <AttachmentReadOnlySection
-                attachmentPath={`collection-api/collecting-event/${id}/attachment`}
-                detachTotalSelected={true}
-                title={<DinaMessage id="collectingEventAttachments" />}
-              />
-            )}
-          </Field>
-        </div>
-      )}
+      <div className="mb-3">
+        <Field name="id">
+          {({ field: { value: id } }) => (
+            <AttachmentsField
+              name="attachment"
+              title={<DinaMessage id="collectingEventAttachments" />}
+              allowNewFieldName="attachmentsConfig.allowNew"
+              allowExistingFieldName="attachmentsConfig.allowExisting"
+              allowAttachmentsConfig={attachmentsConfig}
+              attachmentPath={`collection-api/collecting-event/${id}/attachment`}
+            />
+          )}
+        </Field>
+      </div>
     </div>
   );
 }

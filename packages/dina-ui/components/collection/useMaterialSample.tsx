@@ -352,7 +352,6 @@ export function useMaterialSampleSave({
   const {
     collectingEventInitialValues: collectingEventHookInitialValues,
     saveCollectingEvent,
-    attachedMetadatasUI: colEventAttachmentsUI,
     collectingEventFormSchema
   } = useCollectingEventSave({
     attachmentsConfig: collectingEventAttachmentsConfig,
@@ -523,8 +522,9 @@ export function useMaterialSampleSave({
       readOnly={isTemplate ? !!colEventId : false}
       enabledFields={enabledFields?.collectingEvent}
     >
-      <CollectingEventFormLayout />
-      <div className="mb-3">{colEventAttachmentsUI}</div>
+      <CollectingEventFormLayout
+        attachmentsConfig={collectingEventAttachmentsConfig}
+      />
     </DinaForm>
   );
 
