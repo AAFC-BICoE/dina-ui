@@ -22,6 +22,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   closeButtonText: "Close",
   configureLabel: "Configure",
   createNew: "Create New",
+  date: "Date",
   deleteAllButtonText: "Delete All",
   deleteButtonText: "Delete",
   description: "Description",
@@ -102,5 +103,6 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   valueLabel: "Value",
   valueSourceType: "Value Source Type",
   viewDetails: "View Details",
+  warning: "Warning",
   yes: "Yes"
 };

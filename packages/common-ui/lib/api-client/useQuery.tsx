@@ -3,10 +3,10 @@ import { GetParams, KitsuResponse, KitsuResponseData } from "kitsu";
 import { isArray, isUndefined, omitBy } from "lodash";
 import { useContext, useDebugValue, useMemo } from "react";
 import useSWR from "swr";
+import { v4 as uuidv4 } from "uuid";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { ApiClientContext } from "./ApiClientContext";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
-import { v4 as uuidv4 } from "uuid";
 
 /** Attributes that compose a JsonApi query. */
 export interface JsonApiQuerySpec extends GetParams {
@@ -118,7 +118,9 @@ export function withResponse<
   TMeta = undefined
 >(
   { loading, error, response }: QueryState<TData, TMeta>,
-  responseRenderer: (response: KitsuResponse<TData, TMeta>) => JSX.Element
+  responseRenderer: (
+    response: KitsuResponse<TData, TMeta>
+  ) => JSX.Element | null
 ): JSX.Element | null {
   if (loading) {
     return <LoadingSpinner loading={true} />;

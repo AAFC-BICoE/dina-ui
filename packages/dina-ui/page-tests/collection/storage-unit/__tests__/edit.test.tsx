@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { StorageUnitForm } from "../../../../pages/collection/storage-unit/edit";
+import { StorageUnitForm } from "../../../../components";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { StorageUnit } from "../../../../types/collection-api";
 

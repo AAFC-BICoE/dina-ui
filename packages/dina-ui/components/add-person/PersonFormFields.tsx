@@ -1,15 +1,18 @@
 import {
   FieldSet,
   FormikButton,
-  useDinaFormContext
+  useDinaFormContext,
+  SelectOption
 } from "../../../common-ui/lib";
 import { Person } from "../../../dina-ui/types/objectstore-api";
 import React, { useState } from "react";
 import { FieldArray } from "formik";
 import { clamp } from "lodash";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { IdentifierRow } from "../collection/IdentifierRow";
+
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { PersonIdentifierType } from "../../../dina-ui/types/agent-api/resources/PersonIdentifier";
+import { IdentifierRow } from "../identifier/IdentifierRow";
 
 export interface PersonFormFieldsProps {
   divClassName?: string;
@@ -24,6 +27,17 @@ export function PersonFormFields({
 }: PersonFormFieldsProps) {
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const { readOnly } = useDinaFormContext();
+  const typeOptions: SelectOption<string | undefined>[] = [
+    {
+      label: PersonIdentifierType.ORCID,
+      value: PersonIdentifierType.ORCID
+    },
+    {
+      label: PersonIdentifierType.WIKIDATA,
+      value: PersonIdentifierType.WIKIDATA
+    }
+  ];
+
   return (
     <div className={divClassName} style={{ width: `${width}` }}>
       <div className={`${fieldClassName}`}>
@@ -66,7 +80,10 @@ export function PersonFormFields({
                     }
                     {identifiers.map((_, index) => (
                       <TabPanel key={index}>
-                        <IdentifierRow index={index} />
+                        <IdentifierRow
+                          index={index}
+                          typeOptions={typeOptions}
+                        />
                         {!readOnly && (
                           <div className="list-inline mb-3">
                             <FormikButton

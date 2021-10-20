@@ -14,7 +14,7 @@ import {
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { Promisable } from "type-fest";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSampleType } from "../../../types/collection-api";
 
@@ -118,13 +118,6 @@ export function MaterialSampleTypeFormFields() {
 
   return (
     <div>
-      <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-        />
-      </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
       </div>

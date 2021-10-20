@@ -1,7 +1,7 @@
 /**
  * English Object Store messages. A message must be set here in English before other languages.
  */
- export const DINAUI_MESSAGES_ENGLISH = {
+export const DINAUI_MESSAGES_ENGLISH = {
   actionType: "Action Type",
   addAnotherAssertion: "Add Another GeoReference",
   addAnotherDetermination: "Add Another Determination",

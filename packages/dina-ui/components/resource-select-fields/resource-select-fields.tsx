@@ -10,6 +10,7 @@ import {
 import { Collection, Institution } from "../../types/collection-api";
 import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
 import { useField } from "formik";
+import { DinaUser } from "../../types/user-api/resources/DinaUser";
 
 type OmittedProps = "readOnlyLink" | "filter" | "model" | "optionLabel";
 
@@ -87,6 +88,22 @@ export function InstitutionSelectField(
       filter={filterBy(["name"])}
       model="collection-api/institution"
       optionLabel={inst => inst.name || inst.id}
+      {...props}
+    />
+  );
+}
+
+export function UserSelectField(
+  props: Omit<ResourceSelectFieldProps<DinaUser>, OmittedProps>
+) {
+  return (
+    <ResourceSelectField<DinaUser>
+      readOnlyLink="/dina-user/view?id="
+      model="user-api/user"
+      optionLabel={user => user.username}
+      // TODO allow filtering by group
+      filter={() => ({})}
+      pageSize={1000}
       {...props}
     />
   );

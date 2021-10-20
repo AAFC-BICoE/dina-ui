@@ -55,8 +55,8 @@ export function MockAppContextProvider({
   const apiContextWithWarnings = {
     ...apiContext,
     // Add a warning when bulkGet doesn't return anything in a test:
-    bulkGet: async (paths: string[]) => {
-      const resources = await apiContext?.bulkGet?.(paths);
+    bulkGet: async (paths: string[], options) => {
+      const resources = await apiContext?.bulkGet?.(paths, options);
       if (!resources) {
         console.warn("No response returned for bulkGet paths: ", paths);
       } else {

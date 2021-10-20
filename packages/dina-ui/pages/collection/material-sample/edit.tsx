@@ -29,6 +29,7 @@ import {
   MaterialSampleBreadCrumb,
   MaterialSampleFormNav,
   Nav,
+  ScheduledActionsField,
   StorageLinkerField,
   TagsAndRestrictionsSection
 } from "../../../components";
@@ -51,7 +52,6 @@ import {
   MaterialSampleType,
   Vocabulary
 } from "../../../types/collection-api";
-import { capitalize } from "lodash";
 
 export default function MaterialSampleEditPage() {
   const router = useRouter();
@@ -290,6 +290,9 @@ export function MaterialSampleForm({
                 <StorageLinkerField name="storageUnit" removeLabelTag={true} />
               </div>
             </FieldSet>
+          )}
+          {dataComponentState.enableScheduledActions && (
+            <ScheduledActionsField />
           )}
           {!isTemplate && (
             <FieldSet
