@@ -18,8 +18,11 @@ import {
 } from "../../../components";
 import { StorageUnit } from "../../../types/collection-api";
 import { useStorageUnit } from "./edit";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
+
 
 export function StorageUnitDetailsPage({ router }: WithRouterProps) {
+  const { formatMessage } = useDinaIntl();
   const id = router.query.id?.toString();
   const storageUnitQuery = useStorageUnit(id);
   const childrenQuery = useQuery<StorageUnit>(
