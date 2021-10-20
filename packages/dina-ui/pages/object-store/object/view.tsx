@@ -20,7 +20,7 @@ import {
   useMetadataQuery
 } from "../../../components/object-store";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -31,6 +31,7 @@ const OBJECT_DETAILS_PAGE_CSS = `
 
 export default function MetadataViewPage() {
   const router = useRouter();
+  const { formatMessage } = useDinaIntl();
 
   const id = String(router.query.id);
 
