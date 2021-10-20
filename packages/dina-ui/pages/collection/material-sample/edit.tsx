@@ -147,6 +147,7 @@ export function MaterialSampleForm({
     colEventQuery,
     onSubmit,
     materialSampleAttachmentsUI,
+    preparationsAttachmentsUI,
     loading
   } =
     materialSampleSaveHook ??
@@ -275,7 +276,9 @@ export function MaterialSampleForm({
               </Tabs>
             </FieldSet>
           )}
-          {dataComponentState.enablePreparations && <PreparationField />}
+          {dataComponentState.enablePreparations && (
+            <PreparationField attachmentsUI={preparationsAttachmentsUI} />
+          )}
           {dataComponentState.enableOrganism && <OrganismStateField />}
           {dataComponentState.enableDetermination && <DeterminationField />}
           {dataComponentState.enableStorage && (

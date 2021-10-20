@@ -41,8 +41,20 @@ export function useMaterialSampleQuery(id?: string | null) {
   const materialSampleQuery = useQuery<MaterialSample>(
     {
       path: `collection-api/material-sample/${id}`,
-      include:
-        "collection,collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit,hierarchy,organism,materialSampleChildren,parentMaterialSample"
+      include: [
+        "collection",
+        "collectingEvent",
+        "attachment",
+        "preparationAttachment",
+        "preparationType",
+        "materialSampleType",
+        "preparedBy",
+        "storageUnit",
+        "hierarchy",
+        "organism",
+        "materialSampleChildren",
+        "parentMaterialSample"
+      ].join(",")
     },
     {
       disabled: !id,
@@ -141,6 +153,7 @@ export interface UseMaterialSampleSaveParams {
   };
 
   materialSampleAttachmentsConfig?: AllowAttachmentsConfig;
+  preparationsAttachmentsConfig?: AllowAttachmentsConfig;
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
 }
 
@@ -152,6 +165,7 @@ export function useMaterialSampleSave({
   isTemplate,
   enabledFields,
   materialSampleAttachmentsConfig,
+  preparationsAttachmentsConfig,
   collectingEventAttachmentsConfig,
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues
@@ -352,7 +366,7 @@ export function useMaterialSampleSave({
 
   const {
     attachedMetadatasUI: materialSampleAttachmentsUI,
-    selectedMetadatas
+    selectedMetadatas: materialSampleSelectedMetadatas
   } = useAttachmentsModal({
     initialMetadatas:
       materialSample?.attachment as PersistedResource<Metadata>[],
@@ -363,6 +377,21 @@ export function useMaterialSampleSave({
     allowNewFieldName: "attachmentsConfig.allowNew",
     allowExistingFieldName: "attachmentsConfig.allowExisting",
     id: "material-sample-attachments-section"
+  });
+
+  const {
+    attachedMetadatasUI: preparationsAttachmentsUI,
+    selectedMetadatas: preparationsSelectedMetadatas
+  } = useAttachmentsModal({
+    initialMetadatas:
+      materialSample?.preparationAttachment as PersistedResource<Metadata>[],
+    deps: [materialSample?.id],
+    title: <DinaMessage id="preparationProtocols" />,
+    isTemplate,
+    allowAttachmentsConfig: preparationsAttachmentsConfig,
+    allowNewFieldName: "attachmentsConfig.allowNew",
+    allowExistingFieldName: "attachmentsConfig.allowExisting",
+    id: "preparation-protocols-section"
   });
 
   const collectingEventInitialValues =
@@ -452,13 +481,25 @@ export function useMaterialSampleSave({
     }
 
     // Add attachments if they were selected:
-    if (selectedMetadatas.length) {
+    if (materialSampleSelectedMetadatas.length) {
       (materialSampleInput as any).relationships.attachment = {
-        data: selectedMetadatas.map(it => ({ id: it.id, type: it.type }))
+        data: materialSampleSelectedMetadatas.map(it => ({
+          id: it.id,
+          type: it.type
+        }))
+      };
+    }
+    if (preparationsSelectedMetadatas.length) {
+      (materialSampleInput as any).relationships.preparationAttachment = {
+        data: preparationsSelectedMetadatas.map(it => ({
+          id: it.id,
+          type: it.type
+        }))
       };
     }
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete materialSampleInput.attachment;
+    delete materialSampleInput.preparationAttachment;
 
     // Shuffle the managedAttributesValue to managedAttribute
     materialSampleInput.managedAttributes = {};
@@ -529,6 +570,7 @@ export function useMaterialSampleSave({
     setColEventId,
     colEventQuery,
     materialSampleAttachmentsUI,
+    preparationsAttachmentsUI,
     onSubmit,
     loading
   };

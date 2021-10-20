@@ -8,6 +8,7 @@ import {
 } from "common-ui";
 import { Field } from "formik";
 import { InputResource } from "kitsu";
+import { ReactNode } from "react";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api";
 import {
@@ -19,6 +20,7 @@ import {
 export interface PreparationFieldProps {
   className?: string;
   namePrefix?: string;
+  attachmentsUI?: ReactNode;
 }
 
 /**
@@ -31,7 +33,8 @@ export const PREPARATION_FIELDS = [
   "preparationMethod",
   "preparedBy",
   "preparationRemarks",
-  "dwcDegreeOfEstablishment"
+  "dwcDegreeOfEstablishment",
+  "preparationAttachment"
 ] as const;
 
 /** Blank values for all Preparation fields. */
@@ -43,12 +46,14 @@ export const BLANK_PREPARATION: Required<
   preparedBy: Object.seal({ id: null, type: "person" }),
   preparationRemarks: null,
   dwcDegreeOfEstablishment: null,
-  preparationMethod: null
+  preparationMethod: null,
+  preparationAttachment: []
 });
 
 export function PreparationField({
   className,
-  namePrefix = ""
+  namePrefix = "",
+  attachmentsUI
 }: PreparationFieldProps) {
   const { locale } = useDinaIntl();
 
@@ -128,6 +133,7 @@ export function PreparationField({
           />
         </div>
       </div>
+      <div>{attachmentsUI}</div>
     </FieldSet>
   );
 }

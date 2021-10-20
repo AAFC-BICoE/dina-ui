@@ -59,6 +59,7 @@ export interface MaterialSampleRelationships {
   materialSampleType?: MaterialSampleType;
   collectingEvent?: CollectingEvent;
   attachment?: ResourceIdentifierObject[];
+  preparationAttachment?: ResourceIdentifierObject[];
   preparationType?: PreparationType;
   preparedBy?: Person;
   parentMaterialSample?: MaterialSample;

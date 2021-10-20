@@ -12,11 +12,11 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { SamplesView } from "../../../../dina-ui/components/collection/SamplesView";
 import {
   OrganismStateField,
   ORGANISM_FIELDS
 } from "../../../../dina-ui/components/collection/OrganismStateField";
+import { SamplesView } from "../../../../dina-ui/components/collection/SamplesView";
 import {
   Footer,
   Head,
@@ -40,9 +40,8 @@ import { ManagedAttributesViewer } from "../../../components/object-store/manage
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import {
-  MaterialSampleIdentifiersFormLayout,
-  MaterialSampleInfoFormLayout,
-  MaterialSampleFormLayout
+  MaterialSampleFormLayout,
+  MaterialSampleIdentifiersFormLayout
 } from "./edit";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
@@ -58,18 +57,15 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
   const collectingEvent = colEventQuery.response?.data;
 
-  const buttonBar = (
+  const buttonBar = id && (
     <ButtonBar className="flex">
       <BackButton
-        entityId={id as string}
+        entityId={id}
         entityLink="/collection/material-sample"
         byPassView={true}
         className="flex-grow-1"
       />
-      <EditButton
-        entityId={id as string}
-        entityLink="collection/material-sample"
-      />
+      <EditButton entityId={id} entityLink="collection/material-sample" />
       <Link
         href={`/collection/material-sample/workflows/split-config?id=${id}`}
       >
@@ -79,7 +75,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       </Link>
       <DeleteButton
         className="ms-5"
-        id={id as string}
+        id={id}
         options={{ apiBaseUrl: "/collection-api" }}
         postDeleteRedirect="/collection/material-sample/list"
         type="material-sample"
@@ -148,7 +144,17 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   </DinaForm>
                 </FieldSet>
               )}
-              {hasPreparations && <PreparationField />}
+              {hasPreparations && id && (
+                <PreparationField
+                  attachmentsUI={
+                    <AttachmentReadOnlySection
+                      attachmentPath={`collection-api/material-sample/${id}/preparationAttachment`}
+                      detachTotalSelected={true}
+                      title={<DinaMessage id="preparationProtocols" />}
+                    />
+                  }
+                />
+              )}
               {hasOrganism && <OrganismStateField />}
               {hasDetermination && <DeterminationField />}
               {materialSample.storageUnit && (
