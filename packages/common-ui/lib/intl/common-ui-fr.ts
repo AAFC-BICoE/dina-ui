@@ -7,6 +7,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     ISNOT: "N’EST PAS",
     OR: "OU",
     addNew: "Ajouter nouveau",
+    agricultureCanada: "Agriculture et Agroalimentaire Canada",
     areYouSure: "Êtes-vous certain(e)?",
     attributeLabel: "Attribut",
     autoFillGeoSuggestLabel:
@@ -51,6 +52,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     geoSuggest: "Géo-Suggestion",
     geoSuggestTooltip:
       "Ce bouton affiche des suggestions de géolocalisations fondées sur ce que vous avez saisi dans le champ.",
+    languageOfPage: "fra",
     loadingText: "Chargement en cours...",
     loggedInAsUser: "Connecté en tant que :",
     logoutBtn: "Fermer la session",
@@ -85,6 +87,8 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     sourceText: "Texte de départ",
     startLabel: "Démarrer",
     stepLabel: "Étape",
+    subjectTermsForPage:
+      "information gouvernemental, information scientifique, recherche scientifique",
     submitBtnText: "Enregistrer",
     tableTotalCount: "Nombre d'enregistrements correspondants : {totalCount}",
     targetField: "Champ cible",

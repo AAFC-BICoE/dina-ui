@@ -21,8 +21,11 @@ export default function preparationTypeListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("preparationTypeListTitle")} />
-      <Nav />
+      <Head title={formatMessage("preparationTypeListTitle")}
+						lang={formatMessage("languageOfPage")} 
+						creator={formatMessage("agricultureCanada")}
+						subject={formatMessage("subjectTermsForPage")} />
+			<Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="preparationTypeListTitle" />

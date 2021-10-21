@@ -39,8 +39,11 @@ export default function PcrProfileListPage() {
 
   return (
     <>
-      <Head title={formatMessage("pcrProfileListTitle")} />
-      <Nav />
+      <Head title={formatMessage("pcrProfileListTitle")}
+						lang={formatMessage("languageOfPage")} 
+						creator={formatMessage("agricultureCanada")}
+						subject={formatMessage("subjectTermsForPage")} />
+			<Nav />
       <ButtonBar>
         <CreateButton entityLink="/seqdb/pcr-profile" />
       </ButtonBar>

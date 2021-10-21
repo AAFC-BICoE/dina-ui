@@ -23,6 +23,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addIdentifier: "Add Identifier",
   addInstitutionTitle: "Add Institution",
   addManagedAttributeButtonText: "Add New Managed Attribute",
+  addManagedAttributeTitle: "Add New Managed Attribute",
   addMaterialSampleTitle: "Add Material Sample",
   addMaterialSampleTypeTitle: "Add Material Sample Type",
   addNewPerson: "Add New Person",
@@ -135,6 +136,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editCollectionTitle: "Edit Collection",
   editDinaUserTitle: "Edit User",
   editInstitutionTitle: "Edit Institution",
+  editManagedAttributeTitle: "Edit Managed Attribute",
   editMaterialSampleTitle: "Edit Material Sample",
   editMaterialSampleTypeTitle: "Edit Material Sample Type",
   editMetadataTitle: "Edit Metadata",
@@ -326,6 +328,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   institution: "Institution",
   institutionListTitle: "Institutions",
   keepContentsTogether: "Keep Contents Together",
+  languageOfPage: "eng",
   largeImg: "Large Image",
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",
   latitudeValidationError:
