@@ -47,7 +47,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   assignContentsToNewStorage: "Assign Contents to New Storage",
   associatedAgent: "Associated Agent",
   associatedMaterialSample: " Associated Material Sample",
-  associationLegend: "Association",
+  associationsLegend: "Associations",
   associationType: "Association Type",
   attachExisting: "Attach Existing",
   attachExistingObjects: "Attach Existing Objects",

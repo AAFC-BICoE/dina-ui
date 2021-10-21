@@ -19,6 +19,7 @@ import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
+import { AssociationsField } from "../../../../dina-ui/components/collection/AssociationsField";
 import { ReactNode, useContext } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
@@ -278,6 +279,7 @@ export function MaterialSampleForm({
           {dataComponentState.enablePreparations && <PreparationField />}
           {dataComponentState.enableOrganism && <OrganismStateField />}
           {dataComponentState.enableDetermination && <DeterminationField />}
+          {dataComponentState.enableAssociations && <AssociationsField />}
           {dataComponentState.enableStorage && (
             <FieldSet
               id="storage-section"

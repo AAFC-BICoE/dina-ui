@@ -208,8 +208,9 @@ export function MaterialSampleAssociationSubForm({
   const inputRef = useRef<any>(null);
 
   const { formatMessage } = useDinaIntl();
-  const [showSearchAssociatedSample, setShowSearchAssociatedSample] =
-    useState(false);
+  const [showSearchAssociatedSample, setShowSearchAssociatedSample] = useState(
+    associationToEdit === "NEW" || !associationToEdit ? false : true
+  );
 
   const associationsEnabledFields = enabledFields?.filter(it =>
     it.startsWith("associations.")

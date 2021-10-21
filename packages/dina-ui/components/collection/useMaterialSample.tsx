@@ -30,6 +30,10 @@ import {
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
+import {
+  HOSTORGANISM_FIELDS,
+  MATERIALSAMPLE_ASSOCIATION_FIELDS
+} from "./AssociationsField";
 import { DETERMINATION_FIELDS } from "./DeterminationField";
 import { ORGANISM_FIELDS } from "./OrganismStateField";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
@@ -206,6 +210,23 @@ export function useMaterialSampleSave({
       )
     );
 
+  const hasAssociationsTemplate =
+    isTemplate &&
+    (!isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        MATERIALSAMPLE_ASSOCIATION_FIELDS.map(
+          fieldName => `association.${fieldName}`
+        )
+      )
+    ) ||
+      !isEmpty(
+        pick(
+          materialSampleTemplateInitialValues?.templateCheckboxes,
+          HOSTORGANISM_FIELDS.map(fieldName => `hostOrganism.${fieldName}`)
+        )
+      ));
+
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(
       hasColEventTemplate ||
@@ -271,6 +292,20 @@ export function useMaterialSampleSave({
     )
   );
 
+  const [enableAssociations, setEnableAssociations] = useState(
+    // Show the associations section if the field is set or the template enables it:
+    Boolean(
+      hasAssociationsTemplate ||
+        materialSample?.associations?.length ||
+        enabledFields?.materialSample?.some(enabledField =>
+          enabledField.startsWith("association.")
+        ) ||
+        enabledFields?.materialSample?.some(enbldField =>
+          enbldField.startsWith("hostOrganism.")
+        )
+    )
+  );
+
   // The state describing which Data components (Form sections) are enabled:
   const dataComponentState = {
     enableCollectingEvent,
@@ -285,6 +320,8 @@ export function useMaterialSampleSave({
     setEnableDetermination,
     enableScheduledActions,
     setEnableScheduledActions,
+    enableAssociations,
+    setEnableAssociations,
     /** Wraps the useState setter with an AreYouSure modal when setting to false. */
     dataComponentToggler(
       setBoolean: Dispatch<SetStateAction<boolean>>,

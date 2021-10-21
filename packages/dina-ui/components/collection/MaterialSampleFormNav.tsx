@@ -68,6 +68,13 @@ export function MaterialSampleFormNav({
       setEnabled: dataComponentState.setEnableDetermination
     },
     {
+      id: "associations-section",
+      msg: formatMessage("associationsLegend"),
+      className: "enable-associations",
+      disabled: !dataComponentState.enableAssociations,
+      setEnabled: dataComponentState.setEnableAssociations
+    },
+    {
       id: "storage-section",
       msg: formatMessage("storage"),
       className: "enable-storage",
