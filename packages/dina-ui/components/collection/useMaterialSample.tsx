@@ -355,8 +355,7 @@ export function useMaterialSampleSave({
     collectingEventFormSchema
   } = useCollectingEventSave({
     attachmentsConfig: collectingEventAttachmentsConfig,
-    fetchedCollectingEvent: colEventQuery.response?.data,
-    isTemplate
+    fetchedCollectingEvent: colEventQuery.response?.data
   });
 
   const collectingEventInitialValues =
@@ -446,24 +445,24 @@ export function useMaterialSampleSave({
     }
 
     // Add attachments if they were selected:
-    if (materialSampleInput.attachment?.length) {
-      (materialSampleInput as any).relationships.attachment = {
-        data: materialSampleInput.attachment.map(it => ({
+    (materialSampleInput as any).relationships.attachment = {
+      data:
+        materialSampleInput.attachment?.map(it => ({
           id: it.id,
           type: it.type
-        }))
-      };
-    }
-    if (materialSampleInput.preparationAttachment?.length) {
-      (materialSampleInput as any).relationships.preparationAttachment = {
-        data: materialSampleInput.preparationAttachment.map(it => ({
-          id: it.id,
-          type: it.type
-        }))
-      };
-    }
+        })) ?? []
+    };
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete materialSampleInput.attachment;
+
+    (materialSampleInput as any).relationships.preparationAttachment = {
+      data:
+        materialSampleInput.preparationAttachment?.map(it => ({
+          id: it.id,
+          type: it.type
+        })) ?? []
+    };
+    // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete materialSampleInput.preparationAttachment;
 
     // Shuffle the managedAttributesValue to managedAttribute

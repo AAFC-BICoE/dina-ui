@@ -963,18 +963,14 @@ export function CollectingEventFormLayout({
         </FieldSet>
       )}
       <div className="mb-3">
-        <Field name="id">
-          {({ field: { value: id } }) => (
-            <AttachmentsField
-              name="attachment"
-              title={<DinaMessage id="collectingEventAttachments" />}
-              allowNewFieldName="attachmentsConfig.allowNew"
-              allowExistingFieldName="attachmentsConfig.allowExisting"
-              allowAttachmentsConfig={attachmentsConfig}
-              attachmentPath={`collection-api/collecting-event/${id}/attachment`}
-            />
-          )}
-        </Field>
+        <AttachmentsField
+          name="attachment"
+          title={<DinaMessage id="collectingEventAttachments" />}
+          allowNewFieldName="attachmentsConfig.allowNew"
+          allowExistingFieldName="attachmentsConfig.allowExisting"
+          allowAttachmentsConfig={attachmentsConfig}
+          attachmentPath={`collection-api/collecting-event/${initialValues.id}/attachment`}
+        />
       </div>
     </div>
   );

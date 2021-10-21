@@ -125,14 +125,12 @@ export function useCollectingEventQuery(id?: string | null) {
 
 interface UseCollectingEventSaveParams {
   fetchedCollectingEvent?: PersistedResource<CollectingEvent>;
-  isTemplate?: boolean;
   attachmentsConfig?: AllowAttachmentsConfig;
 }
 
 /** CollectingEvent save method to be re-used by CollectingEvent and MaterialSample forms. */
 export function useCollectingEventSave({
   fetchedCollectingEvent,
-  isTemplate,
   attachmentsConfig
 }: UseCollectingEventSaveParams) {
   const { save } = useApiClient();
@@ -228,14 +226,13 @@ export function useCollectingEventSave({
     }
 
     // Add attachments if they were selected:
-    if (submittedValues.attachment?.length) {
-      (submittedValues as any).relationships.attachment = {
-        data: submittedValues.attachment.map(it => ({
+    (submittedValues as any).relationships.attachment = {
+      data:
+        submittedValues.attachment?.map(it => ({
           id: it.id,
           type: it.type
-        }))
-      };
-    }
+        })) ?? []
+    };
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
 
