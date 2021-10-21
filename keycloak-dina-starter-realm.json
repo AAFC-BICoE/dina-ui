@@ -403,6 +403,17 @@
           "subGroups": []
         },
         {
+          "id": "4ad80118-6317-4a3d-af07-a83a3edef5b3",
+          "name": "dina-admin",
+          "path": "/aafc/dina-admin",
+          "attributes": {},
+          "realmRoles": [
+            "dina-admin"
+          ],
+          "clientRoles": {},
+          "subGroups": []
+        },
+        {
           "id": "7c7a9cae-a36c-4ee2-b01c-fce91653001f",
           "name": "staff",
           "path": "/aafc/staff",
@@ -1113,7 +1124,7 @@
       "username": "dina-admin",
       "enabled": true,
       "realmRoles": ["user", "dina-admin"],
-      "groups": [],
+      "groups": ["aafc/dina-admin"],
       "credentials": [
         {
           "type": "password",
