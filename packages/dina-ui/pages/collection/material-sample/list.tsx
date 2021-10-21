@@ -102,17 +102,6 @@ export function SampleListLayout({
         path: "collection-api/material-sample",
         include: "collection,materialSampleType"
       }}
-      filterFormchildren={({ submitForm }) => (
-        <div className="mb-3">
-          <div style={{ width: "300px" }}>
-            <GroupSelectField
-              onChange={() => setImmediate(submitForm)}
-              name="group"
-              showAnyOption={true}
-            />
-          </div>
-        </div>
-      )}
     />
   );
 }

@@ -16,12 +16,12 @@ import ReactTable, { CellInfo, Column } from "react-table";
 import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list";
 import { RiDeleteBinLine } from "react-icons/ri";
 import classNames from "classnames";
+import React from "react";
 
 /** Type-safe object with all MaterialSampleAssociation fields. */
 export const ASSOCIATION_FIELDS_OBJECT: Required<
   Record<keyof MaterialSampleAssociation, true>
 > = {
-  sample: true,
   associatedSample: true,
   associationType: true,
   remarks: true
@@ -76,7 +76,7 @@ export function MaterialSampleAssociationsField({
   const associationColumns: Column[] = [
     { accessor: "associationType", Header: formatMessage("associationType") },
     {
-      accessor: "associatedSample.materialSampleName",
+      accessor: "associatedSample",
       Header: formatMessage("associatedMaterialSample")
     },
     { accessor: "remarks", Header: formatMessage("remarks") },
@@ -205,6 +205,8 @@ export function MaterialSampleAssociationSubForm({
 }: MaterialSampleAssociationSubFormProps) {
   const { enabledFields, initialValues, isTemplate } = useDinaFormContext();
   const listRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<any>(null);
+
   const { formatMessage } = useDinaIntl();
   const [showSearchAssociatedSample, setShowSearchAssociatedSample] =
     useState(false);
@@ -230,7 +232,7 @@ export function MaterialSampleAssociationSubForm({
 
   /** Applies name prefix to field props */
   function fieldProps(fieldName: keyof MaterialSampleAssociation) {
-    const templateFieldName = `associations.${fieldName}`;
+    const templateFieldName = `association.${fieldName}`;
     return {
       name: isTemplate ? templateFieldName : fieldName,
       // If the first determination is enabled, then enable multiple determinations:
@@ -282,9 +284,16 @@ export function MaterialSampleAssociationSubForm({
   };
 
   const onAssociatedSampleSelected = sample => {
-    if (associationToEdit) associationToEdit.associatedSample = sample;
+    if (inputRef.current) {
+      inputRef.current.value = sample.id;
+    }
+    setShowSearchAssociatedSample(false);
+    setShowSearchAssociatedSample(true);
   };
   const onDeleteAssociatedSample = () => {
+    if (inputRef.current) {
+      inputRef.current.value = null;
+    }
     setShowSearchAssociatedSample(false);
   };
 
@@ -331,6 +340,7 @@ export function MaterialSampleAssociationSubForm({
                     {...fieldProps("associatedSample")}
                     className={"flex-md-grow-1"}
                     hideLabel={true}
+                    forwardedRef={inputRef as any}
                   />
                   <button
                     className="btn mb-2"

@@ -1,10 +1,11 @@
 import { FormikProps } from "formik";
-import { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
+import { InputHTMLAttributes, RefObject, TextareaHTMLAttributes } from "react";
 import TextareaAutosize, {
   TextareaAutosizeProps
 } from "react-textarea-autosize";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 import classnames from "classnames";
+import React from "react";
 
 export interface TextFieldProps extends LabelWrapperParams {
   readOnly?: boolean;
@@ -23,6 +24,7 @@ export interface TextFieldProps extends LabelWrapperParams {
     name: string,
     value: string | null
   ) => void;
+  forwardedRef?: RefObject<HTMLInputElement>;
 }
 
 /**
@@ -40,6 +42,7 @@ export function TextField(props: TextFieldProps) {
     numberOnly,
     letterOnly,
     noSpace,
+    forwardedRef,
     ...labelWrapperProps
   } = props;
 
@@ -86,7 +89,12 @@ export function TextField(props: TextFieldProps) {
               {...(inputPropsInternal as TextareaAutosizeProps)}
             />
           ) : (
-            <input type="text" {...inputPropsInternal} onKeyDown={onKeyDown} />
+            <input
+              type="text"
+              {...inputPropsInternal}
+              onKeyDown={onKeyDown}
+              ref={forwardedRef}
+            />
           ))
         );
       }}
