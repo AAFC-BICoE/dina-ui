@@ -14,7 +14,6 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
-import { Field } from "formik";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
@@ -25,8 +24,6 @@ import {
   Nav,
   useAddPersonModal
 } from "../../../components";
-import { useAttachmentsModal } from "../../../components/object-store";
-import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Person } from "../../../types/agent-api";

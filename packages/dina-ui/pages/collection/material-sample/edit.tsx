@@ -274,7 +274,12 @@ export function MaterialSampleForm({
               </Tabs>
             </FieldSet>
           )}
-          {dataComponentState.enablePreparations && <PreparationField />}
+          {dataComponentState.enablePreparations && (
+            <PreparationField
+              // Use the same attachments config for preparations as the Material Sample:
+              attachmentsConfig={attachmentsConfig?.materialSample}
+            />
+          )}
           {dataComponentState.enableOrganism && <OrganismStateField />}
           {dataComponentState.enableDetermination && <DeterminationField />}
           {dataComponentState.enableStorage && (
@@ -316,6 +321,7 @@ export function MaterialSampleForm({
             id="material-sample-attachments-section"
             allowNewFieldName="attachmentsConfig.allowNew"
             allowExistingFieldName="attachmentsConfig.allowExisting"
+            allowAttachmentsConfig={attachmentsConfig?.materialSample}
             attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
           />
         </div>
