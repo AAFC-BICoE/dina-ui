@@ -70,8 +70,11 @@ export default function MaterialSampleEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage(title)} />
-      <Nav />
+      <Head title={formatMessage(title)}
+						lang={formatMessage("languageOfPage")}
+						creator={formatMessage("agricultureCanada")}
+						subject={formatMessage("subjectTermsForPage")} />
+			<Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id={title} />

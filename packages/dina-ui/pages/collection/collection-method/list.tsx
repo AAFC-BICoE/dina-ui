@@ -21,8 +21,11 @@ export default function collectionMethodListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("collectionMethodListTitle")} />
-      <Nav />
+      <Head title={formatMessage("collectionMethodListTitle")}
+						lang={formatMessage("languageOfPage")} 
+						creator={formatMessage("agricultureCanada")}
+						subject={formatMessage("subjectTermsForPage")} />
+			<Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="collectionMethodListTitle" />

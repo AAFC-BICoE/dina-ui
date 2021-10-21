@@ -17,7 +17,7 @@ import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { Promisable } from "type-fest";
 import { GroupSelectField, Head, Nav } from "../../../components";
-import { useSeqdbIntl } from "../../../intl/seqdb-intl";
+import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import { MolecularSample, Product, Protocol } from "../../../types/seqdb-api";
 
@@ -51,9 +51,7 @@ export default function MolecularSampleEditPage() {
   const id = router.query.id?.toString();
   const { formatMessage } = useSeqdbIntl();
 
-  const pageTitle = formatMessage(
-    id ? "editMolecularSampleTitle" : "addMolecularSampleTitle"
-  );
+  const title = id ? "editMolecularSampleTitle" : "addMolecularSampleTitle";
 
   const molecularSampleQuery = useMolecularSample(id);
 
@@ -65,11 +63,16 @@ export default function MolecularSampleEditPage() {
 
   return (
     <div>
-      <Head title={pageTitle} />
+      <Head title={formatMessage(title)}
+						lang={formatMessage("languageOfPage")} 
+						creator={formatMessage("agricultureCanada")}
+						subject={formatMessage("subjectTermsForPage")} />
       <Nav />
       <main className="container">
         <div>
-          <h1 id="wb-cont">{pageTitle}</h1>
+          <h1 id="wb-cont">
+            <SeqdbMessage id={title} />
+          </h1>
           {id ? (
             withResponse(molecularSampleQuery, ({ data }) => (
               <MolecularSampleForm

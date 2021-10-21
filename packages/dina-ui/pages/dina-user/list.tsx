@@ -39,8 +39,11 @@ export default function AgentListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("userListTitle")} />
-      <Nav />
+      <Head title={formatMessage("userListTitle")}
+						lang={formatMessage("languageOfPage")} 
+						creator={formatMessage("agricultureCanada")}
+						subject={formatMessage("subjectTermsForPage")} />
+			<Nav />
       <div className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="userListTitle" />

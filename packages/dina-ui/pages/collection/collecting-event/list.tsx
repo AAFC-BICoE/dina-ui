@@ -25,8 +25,11 @@ export default function CollectingEventListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("collectingEventListTitle")} />
-      <Nav />
+      <Head title={formatMessage("collectingEventListTitle")}
+						lang={formatMessage("languageOfPage")} 
+						creator={formatMessage("agricultureCanada")}
+						subject={formatMessage("subjectTermsForPage")} />
+			<Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="collectingEventListTitle" />

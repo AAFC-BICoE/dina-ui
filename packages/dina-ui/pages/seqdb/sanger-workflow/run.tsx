@@ -34,7 +34,10 @@ export default function SangerWorkFlowRunPage() {
 
   return (
     <div>
-      <Head title={title} />
+      <Head title={title}
+            lang={formatMessage("languageOfPage")} 
+            creator={formatMessage("agricultureCanada")}
+            subject={formatMessage("subjectTermsForPage")} />
       <Nav />
       <main className="container">
         <ButtonBar>
