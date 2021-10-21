@@ -59,6 +59,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
     "This button shows some suggested geo-locations based on what you've typed into the field.",
   jumpToPage: "jump to page",
   rowsPerPage: "rows per page",
+  languageOfPage: "eng",
   loadingText: "Loading...",
   loggedInAsUser: "Logged in as:",
   logoutBtn: "Logout",
@@ -93,6 +94,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   sourceText: "Source Text",
   startLabel: "Start",
   stepLabel: "Step",
+  subjectTermsForPage:
+    "government information, scientific information, scientific research",
   submitBtnText: "Save",
   tableTotalCount: "Total matched records: {totalCount}",
   targetField: "Target Field",

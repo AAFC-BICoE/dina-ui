@@ -46,7 +46,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   indexSetListTitle: "Index Sets",
   indexSetViewTitle: "Index Set",
   indexSetMustBeSet: "Index Set must be set.",
-  languageOfPage: "eng",
   molecularSample: "Molecular Sample",
   molecularSampleViewTitle: "Molecular Sample",
   molecularSampleListTitle: "Molecular Samples",
@@ -93,8 +92,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   shearingLabel: "Shearing",
   sizeSelectedStatus: "Size Selection Added",
   sizeSelectionLabel: "Size Selection",
-  subjectTermsForPage:
-    "government information, scientific information, scientific research",
   startNewWorkflow: "Start New Workflow",
   wellCoordinates: "Well Coordinates",
   workflowDetails: "Workflow Details",

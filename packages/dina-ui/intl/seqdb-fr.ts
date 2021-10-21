@@ -48,7 +48,6 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   indexSetListTitle: "Ensembles d’indices",
   indexSetViewTitle: "L'ensemble d’indices",
   indexSetMustBeSet: "L’ensemble d’indices doit être défini.",
-  languageOfPage: "fra",
   molecularSample: "Échantillon moléculaire",
   molecularSampleViewTitle: "Échantillon moléculaire",
   molecularSampleListTitle: "Échantillons moléculaires",
@@ -99,8 +98,6 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   sizeSelectedStatus: "Sélection de taille ajoutée",
   sizeSelectionLabel: "Sélection de taille",
   startNewWorkflow: "Commencer nouveau flux de travail",
-  subjectTermsForPage:
-    "information gouvernemental, information scientifique, recherche scientifique",
   wellCoordinates: "Coordonnées du puits",
   workflowDetails: "Détails du flux de travail",
   workflowDetailsTab: "Détails",
