@@ -155,14 +155,13 @@ export function PcrBatchForm({
     delete submittedValues.experimenters;
 
     // Add attachments if they were selected:
-    if (submittedValues.attachment?.length) {
-      (submittedValues as any).relationships.attachment = {
-        data: submittedValues.attachment.map(it => ({
+    (submittedValues as any).relationships.attachment = {
+      data:
+        submittedValues.attachment?.map(it => ({
           id: it.id,
           type: it.type
-        }))
-      };
-    }
+        })) ?? []
+    };
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
 
