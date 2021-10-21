@@ -12,7 +12,6 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   addProtocolTitle: "Ajouter un protocole",
   addRegionTitle: "Ajouter une région",
   addWorkflowTitle: "Ajouter un flux de SNG",
-  agricultureCanada: "Agriculture et Agroalimentaire Canada",
   availableSamplesTitle: "Échantillons disponibles",
   backToListButtonText: "Retour à la liste",
   cancelButtonText: "Annuler",
@@ -100,7 +99,8 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   sizeSelectedStatus: "Sélection de taille ajoutée",
   sizeSelectionLabel: "Sélection de taille",
   startNewWorkflow: "Commencer nouveau flux de travail",
-  subjectTermsForPage: "information gouvernemental, information scientifique, recherche scientifique",
+  subjectTermsForPage:
+    "information gouvernemental, information scientifique, recherche scientifique",
   wellCoordinates: "Coordonnées du puits",
   workflowDetails: "Détails du flux de travail",
   workflowDetailsTab: "Détails",

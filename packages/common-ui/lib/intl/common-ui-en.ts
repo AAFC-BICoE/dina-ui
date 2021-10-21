@@ -9,6 +9,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   actions: "Actions",
   add: "Add",
   addNew: "Add New",
+  agricultureCanada: "Agriculture and Agri-Food Canada",
   areYouSure: "Are you sure?",
   attributeLabel: "Attribute",
   autoFillGeoSuggestLabel:

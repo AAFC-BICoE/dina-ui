@@ -39,7 +39,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addStorageUnitTitle: "Add Storage Unit",
   addStorageUnitTypeTitle: "Add Storage Unit Type",
   agentsSectionTitle: "Agents",
-  agricultureCanada: "Agriculture and Agri-Food Canada",
   allowExisting: "Allow Existing",
   allowNew: "Allow New",
   appTitle: "DINA",
@@ -485,7 +484,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   storageUnitTypeListTitle: "Storage Unit Types",
   storageUnitViewTitle: "Storage Unit",
   storagesCreatedByMe: "Storages Created By Me",
-  subjectTermsForPage: "government information, scientific information, scientific research",
+  subjectTermsForPage:
+    "government information, scientific information, scientific research",
   suffixOptional: "Suffix (Optional)",
   switchToActionType: 'Switch to "{actionType}".',
   tags: "Tags",

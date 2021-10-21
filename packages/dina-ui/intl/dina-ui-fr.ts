@@ -37,7 +37,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addStorageUnitTitle: "Ajouter une unité de stockage",
   addStorageUnitTypeTitle: "Ajouter un type d’unité de stockage",
   agentsSectionTitle: "Agents",
-  agricultureCanada: "Agriculture et Agroalimentaire Canada",
   allowExisting: "Autoriser l’existant",
   allowNew: "Autoriser le nouveau",
   appTitle: "DINA",
@@ -467,7 +466,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   storageUnitTypeListTitle: "Types d’unités de stockage",
   storageUnitViewTitle: "Unité de stockage",
   storagesCreatedByMe: "Stockages créés par moi",
-  subjectTermsForPage: "information gouvernemental, information scientifique, recherche scientifique",
+  subjectTermsForPage:
+    "information gouvernemental, information scientifique, recherche scientifique",
   suffixOptional: "Suffixe (facultatif)",
   switchToActionType: 'Passer à "{actionType}".',
   templateNameMandatoryErrorMsg:

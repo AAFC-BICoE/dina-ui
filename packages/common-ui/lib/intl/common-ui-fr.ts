@@ -7,6 +7,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     ISNOT: "N’EST PAS",
     OR: "OU",
     addNew: "Ajouter nouveau",
+    agricultureCanada: "Agriculture et Agroalimentaire Canada",
     areYouSure: "Êtes-vous certain(e)?",
     attributeLabel: "Attribut",
     autoFillGeoSuggestLabel:

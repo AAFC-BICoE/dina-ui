@@ -10,7 +10,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   addProtocolTitle: "Add Protocol",
   addRegionTitle: "Add Region",
   addWorkflowTitle: "Add NGS Workflow",
-  agricultureCanada: "Agriculture and Agri-Food Canada",
   availableSamplesTitle: "Available Molecular Samples",
   backToListButtonText: "Back to List",
   cancelButtonText: "Cancel",
@@ -94,7 +93,8 @@ export const SEQDB_MESSAGES_ENGLISH = {
   shearingLabel: "Shearing",
   sizeSelectedStatus: "Size Selection Added",
   sizeSelectionLabel: "Size Selection",
-  subjectTermsForPage: "government information, scientific information, scientific research",
+  subjectTermsForPage:
+    "government information, scientific information, scientific research",
   startNewWorkflow: "Start New Workflow",
   wellCoordinates: "Well Coordinates",
   workflowDetails: "Workflow Details",
