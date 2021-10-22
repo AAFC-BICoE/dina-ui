@@ -24,7 +24,6 @@ export interface TextFieldProps extends LabelWrapperParams {
     name: string,
     value: string | null
   ) => void;
-  forwardedRef?: RefObject<HTMLInputElement>;
 }
 
 /**
@@ -42,7 +41,6 @@ export function TextField(props: TextFieldProps) {
     numberOnly,
     letterOnly,
     noSpace,
-    forwardedRef,
     ...labelWrapperProps
   } = props;
 
@@ -89,12 +87,7 @@ export function TextField(props: TextFieldProps) {
               {...(inputPropsInternal as TextareaAutosizeProps)}
             />
           ) : (
-            <input
-              type="text"
-              {...inputPropsInternal}
-              onKeyDown={onKeyDown}
-              ref={forwardedRef}
-            />
+            <input type="text" {...inputPropsInternal} onKeyDown={onKeyDown} />
           ))
         );
       }}

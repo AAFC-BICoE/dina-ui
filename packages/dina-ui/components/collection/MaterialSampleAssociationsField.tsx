@@ -5,7 +5,8 @@ import {
   useDinaFormContext,
   FormikButton,
   OnFormikSubmit,
-  DinaForm
+  DinaForm,
+  AssociatedMaterialSampleSearchBox
 } from "common-ui";
 import * as yup from "yup";
 import { isEmpty } from "lodash";
@@ -13,9 +14,6 @@ import { FastField, FormikContextType } from "formik";
 import { Fragment, useState, useRef } from "react";
 import { MaterialSampleAssociation } from "../../../dina-ui/types/collection-api/resources/MaterialSample";
 import ReactTable, { CellInfo, Column } from "react-table";
-import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list";
-import { RiDeleteBinLine } from "react-icons/ri";
-import classNames from "classnames";
 import React from "react";
 
 /** Type-safe object with all MaterialSampleAssociation fields. */
@@ -204,10 +202,8 @@ export function MaterialSampleAssociationSubForm({
   associationToEdit
 }: MaterialSampleAssociationSubFormProps) {
   const { enabledFields, initialValues, isTemplate } = useDinaFormContext();
-  const listRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<any>(null);
 
-  const { formatMessage } = useDinaIntl();
+  const inputRef = useRef<HTMLInputElement>(null);
   const [showSearchAssociatedSample, setShowSearchAssociatedSample] = useState(
     associationToEdit === "NEW" || !associationToEdit ? false : true
   );
@@ -256,58 +252,6 @@ export function MaterialSampleAssociationSubForm({
     await onSaveAssociation(newAssociation);
   };
 
-  /* function returns the search list of material samples */
-  const MaterialSampleList = () => {
-    function onCloseClicked() {
-      if (listRef.current)
-        listRef.current.className = listRef.current.className + " d-none";
-    }
-
-    return (
-      <div
-        ref={listRef}
-        className={classNames("mb-2", !showSearchAssociatedSample && "d-none")}
-        style={{ borderStyle: "revert", borderTopColor: "red" }}
-      >
-        <div className="mb-2">
-          <span className="me-2 fw-bold">{formatMessage("search")}</span>
-          <a href="#association" onClick={onCloseClicked}>
-            {formatMessage("closeButtonText")}
-          </a>
-        </div>
-        <SampleListLayout
-          onSelect={onAssociatedSampleSelected}
-          classNames="btn btn-primary"
-          btnMsg={formatMessage("select")}
-        />
-      </div>
-    );
-  };
-
-  const onAssociatedSampleSelected = sample => {
-    if (inputRef.current) {
-      inputRef.current.value = sample.id;
-    }
-    setShowSearchAssociatedSample(false);
-    setShowSearchAssociatedSample(true);
-  };
-  const onDeleteAssociatedSample = () => {
-    if (inputRef.current) {
-      inputRef.current.value = null;
-    }
-    setShowSearchAssociatedSample(false);
-  };
-
-  function onSearchClicked() {
-    if (listRef.current) {
-      listRef.current.className = listRef.current.className.replaceAll(
-        "d-none",
-        ""
-      );
-    }
-    setShowSearchAssociatedSample(true);
-  }
-
   return (
     <div onKeyDown={disableEnterToSubmitOuterForm}>
       <FormWrapper
@@ -320,47 +264,16 @@ export function MaterialSampleAssociationSubForm({
         <div className="row">
           <div className="col-sm-6" id="association">
             <TextField {...fieldProps("associationType")} />
-            {!showSearchAssociatedSample ? (
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => onSearchClicked()}
-              >
-                {formatMessage("search") + "..."}
-              </button>
-            ) : (
-              <div>
-                <label className="w-100">
-                  {" "}
-                  <strong>
-                    {formatMessage("associatedMaterialSample")}{" "}
-                  </strong>{" "}
-                </label>
-                <div className={"d-flex flex-row"}>
-                  <TextField
-                    {...fieldProps("associatedSample")}
-                    className={"flex-md-grow-1"}
-                    hideLabel={true}
-                    forwardedRef={inputRef as any}
-                  />
-                  <button
-                    className="btn mb-2"
-                    onClick={onDeleteAssociatedSample}
-                    type="button"
-                    style={{
-                      cursor: "pointer"
-                    }}
-                  >
-                    <RiDeleteBinLine size="1.8em" className="ms-auto" />
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
           <div className="col-sm-6">
             <TextField {...fieldProps("remarks")} multiLines={true} />
           </div>
-          <MaterialSampleList />
+          <AssociatedMaterialSampleSearchBox
+            showSearchAssociatedSample={showSearchAssociatedSample}
+            setShowSearchAssociatedSample={setShowSearchAssociatedSample}
+            forwardedRef={inputRef as any}
+            {...fieldProps("associatedSample")}
+          />
         </div>
 
         {!isTemplate && (
