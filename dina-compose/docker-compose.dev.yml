@@ -186,7 +186,7 @@ services:
       "
   # Nextjs's dev-mode server that hot-reloads the UI source code:
   dina-ui-dev-server:
-    image: node:12.16.1
+    image: node:14.18.1
     volumes:
       - "../repos/dina-ui:/dina-ui"
       # Share host home directory for yarn cache:
