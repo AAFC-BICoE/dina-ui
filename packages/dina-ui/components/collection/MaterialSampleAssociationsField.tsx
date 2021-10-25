@@ -201,19 +201,24 @@ export function MaterialSampleAssociationSubForm({
   onCancelClick,
   associationToEdit
 }: MaterialSampleAssociationSubFormProps) {
-  const { enabledFields, initialValues, isTemplate } = useDinaFormContext();
+  const { enabledFields, initialValues, isTemplate, isTemplateRun } =
+    useDinaFormContext();
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [showSearchAssociatedSample, setShowSearchAssociatedSample] = useState(
-    associationToEdit === "NEW" || !associationToEdit ? false : true
+    isTemplateRun
+      ? true
+      : associationToEdit === "NEW" || !associationToEdit
+      ? false
+      : true
   );
 
   const associationsEnabledFields = enabledFields?.filter(it =>
-    it.startsWith("associations.")
+    it.startsWith("association.")
   );
 
   const associationTemplateInitialValues = enabledFields
-    ? initialValues.associations
+    ? initialValues.association
     : undefined;
 
   function disableEnterToSubmitOuterForm(e) {

@@ -137,8 +137,7 @@ export function MaterialSampleForm({
     </ButtonBar>
   )
 }: MaterialSampleFormProps) {
-  const { isTemplate } = useContext(DinaFormContext) ?? {};
-
+  const { isTemplate, isTemplateRun } = useContext(DinaFormContext) ?? {};
   const {
     initialValues,
     nestedCollectingEventForm,
@@ -328,6 +327,7 @@ export function MaterialSampleForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
       enabledFields={enabledFields?.materialSample}
+      isTemplateRun={isTemplateRun}
     >
       {!initialValues.id && <SetDefaultSampleName />}
       {buttonBar}

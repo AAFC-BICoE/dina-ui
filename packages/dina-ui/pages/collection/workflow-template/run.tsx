@@ -3,7 +3,8 @@ import {
   ButtonBar,
   SubmitButton,
   useQuery,
-  withResponse
+  withResponse,
+  DinaForm
 } from "common-ui";
 import { InputResource, KitsuResource, PersistedResource } from "kitsu";
 import { compact, isNil, set, toPairs, pick } from "lodash";
@@ -92,48 +93,50 @@ export function CreateMaterialSampleFromWorkflowForm({
   const [onSaveString, setOnSaveString] = useState("viewSample");
 
   return (
-    <MaterialSampleForm
-      buttonBar={
-        <ButtonBar className="d-flex">
-          <BackButton
-            entityLink="/collection/workflow-template"
-            className="flex-grow-1"
-          />
-          <SubmitButton
-            buttonProps={() => ({
-              onClick: () => setOnSaveString("newRun"),
-              style: { width: "20rem" }
-            })}
-          >
-            <DinaMessage id="saveAndCreateNewMaterialSampleButton" />
-          </SubmitButton>
-          <SubmitButton
-            buttonProps={() => ({
-              onClick: () => setOnSaveString("viewSample"),
-              style: { width: "15rem" }
-            })}
-          >
-            <DinaMessage id="saveAndGoToViewPageButton" />
-          </SubmitButton>
-        </ButtonBar>
-      }
-      materialSample={materialSampleInitialValues}
-      collectingEventInitialValues={collectingEventInitialValues}
-      onSaved={selectOnSaved(onSaveString as RoutingButtonStrings)}
-      enabledFields={enabledFields}
-      attachmentsConfig={{
-        collectingEvent: pick(
-          actionDefinition.formTemplates.COLLECTING_EVENT,
-          "allowNew",
-          "allowExisting"
-        ),
-        materialSample: pick(
-          actionDefinition.formTemplates.MATERIAL_SAMPLE,
-          "allowNew",
-          "allowExisting"
-        )
-      }}
-    />
+    <DinaForm initialValues={materialSampleInitialValues} isTemplateRun={true}>
+      <MaterialSampleForm
+        buttonBar={
+          <ButtonBar className="d-flex">
+            <BackButton
+              entityLink="/collection/workflow-template"
+              className="flex-grow-1"
+            />
+            <SubmitButton
+              buttonProps={() => ({
+                onClick: () => setOnSaveString("newRun"),
+                style: { width: "20rem" }
+              })}
+            >
+              <DinaMessage id="saveAndCreateNewMaterialSampleButton" />
+            </SubmitButton>
+            <SubmitButton
+              buttonProps={() => ({
+                onClick: () => setOnSaveString("viewSample"),
+                style: { width: "15rem" }
+              })}
+            >
+              <DinaMessage id="saveAndGoToViewPageButton" />
+            </SubmitButton>
+          </ButtonBar>
+        }
+        materialSample={materialSampleInitialValues}
+        collectingEventInitialValues={collectingEventInitialValues}
+        onSaved={selectOnSaved(onSaveString as RoutingButtonStrings)}
+        enabledFields={enabledFields}
+        attachmentsConfig={{
+          collectingEvent: pick(
+            actionDefinition.formTemplates.COLLECTING_EVENT,
+            "allowNew",
+            "allowExisting"
+          ),
+          materialSample: pick(
+            actionDefinition.formTemplates.MATERIAL_SAMPLE,
+            "allowNew",
+            "allowExisting"
+          )
+        }}
+      />
+    </DinaForm>
   );
 }
 
@@ -185,7 +188,6 @@ function useWorkflowMaterialSampleInitialValues(
         ).map(([key, val]) => (val?.enabled ? key : null))
       )
     };
-
     return {
       materialSampleInitialValues,
       collectingEventInitialValues,

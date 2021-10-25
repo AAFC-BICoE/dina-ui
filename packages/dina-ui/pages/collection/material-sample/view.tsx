@@ -41,9 +41,12 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import {
   MaterialSampleIdentifiersFormLayout,
-  MaterialSampleInfoFormLayout,
   MaterialSampleFormLayout
 } from "./edit";
+import {
+  AssociationsField,
+  HOSTORGANISM_FIELDS
+} from "packages/dina-ui/components/collection/AssociationsField";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -103,6 +106,15 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         const hasDetermination = materialSample?.determination?.some(
           det => !isEmpty(det)
         );
+        /* Consider as having association if either host ognaism any field has value or having any non empty association in the array */
+        const hasAssociations = materialSample?.associations?.some(
+          assct =>
+            !isEmpty(assct) ||
+            HOSTORGANISM_FIELDS.some(
+              fieldName => materialSample.hostOrganism?.[fieldName]
+            )
+        );
+
         return (
           <main className="container-fluid">
             <DinaForm<MaterialSample>
@@ -151,6 +163,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               {hasPreparations && <PreparationField />}
               {hasOrganism && <OrganismStateField />}
               {hasDetermination && <DeterminationField />}
+              {hasAssociations && <AssociationsField />}
               {materialSample.storageUnit && (
                 <div className="card card-body mb-3">
                   <StorageLinkerField name="storageUnit" />

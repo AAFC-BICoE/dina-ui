@@ -297,11 +297,10 @@ export function useMaterialSampleSave({
     Boolean(
       hasAssociationsTemplate ||
         materialSample?.associations?.length ||
-        enabledFields?.materialSample?.some(enabledField =>
-          enabledField.startsWith("association.")
-        ) ||
-        enabledFields?.materialSample?.some(enbldField =>
-          enbldField.startsWith("hostOrganism.")
+        enabledFields?.materialSample?.some(
+          enabledField =>
+            enabledField.startsWith("association.") ||
+            enabledField.startsWith("hostOrganism.")
         )
     )
   );

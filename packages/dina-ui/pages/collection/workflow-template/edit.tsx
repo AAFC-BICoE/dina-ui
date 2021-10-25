@@ -14,6 +14,10 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { get, mapValues, pick, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
+import {
+  HOSTORGANISM_FIELDS,
+  MATERIALSAMPLE_ASSOCIATION_FIELDS
+} from "packages/dina-ui/components/collection";
 import React, { useRef } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
@@ -145,7 +149,8 @@ export function WorkflowTemplateForm({
       enableStorage,
       enableDetermination,
       enableOrganism,
-      enableScheduledActions
+      enableScheduledActions,
+      enableAssociations
     }
   } = materialSampleSaveHook;
 
@@ -197,6 +202,21 @@ export function WorkflowTemplateForm({
         )
       : {};
 
+    const associationTemplateFields = enableAssociations
+      ? {
+          ...pick(
+            enabledTemplateFields,
+            ...HOSTORGANISM_FIELDS.map(field => `hostOrganism.${field}`)
+          ),
+          ...pick(
+            enabledTemplateFields,
+            ...MATERIALSAMPLE_ASSOCIATION_FIELDS.map(
+              field => `association.${field}`
+            )
+          )
+        }
+      : {};
+
     // Construct the template definition to persist based on the form values:
     const definition: InputResource<PreparationProcessDefinition> = {
       ...mainTemplateFields,
@@ -211,7 +231,8 @@ export function WorkflowTemplateForm({
             ...organismTemplateFields,
             ...determinationTemplateFields,
             ...storageTemplateFields,
-            ...scheduledActionsTemplateFields
+            ...scheduledActionsTemplateFields,
+            ...associationTemplateFields
           }
         },
         COLLECTING_EVENT: enableCollectingEvent
