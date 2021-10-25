@@ -64,4 +64,27 @@ describe("SetDefaultSampleName", () => {
       wrapper.find(".materialSampleName-field input").prop("value")
     ).toEqual("TEST_CODE_2-my_custom_name");
   });
+
+  it("Doesn't change the sample name when it already starts with the prefix.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{
+          materialSampleName: "INITIAL-CODE-100",
+          collection: { id: "1", type: "collection", code: "INITIAL-CODE" }
+        }}
+      >
+        <SetDefaultSampleName />
+        <MaterialSampleIdentifiersFormLayout />
+      </DinaForm>,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Initial value is correct to begin with so isn't altered:
+    expect(
+      wrapper.find(".materialSampleName-field input").prop("value")
+    ).toEqual("INITIAL-CODE-100");
+  });
 });
