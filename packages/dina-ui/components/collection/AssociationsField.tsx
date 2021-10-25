@@ -1,15 +1,13 @@
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { FieldSet, TextField } from "common-ui";
 import { CatalogueOfLifeNameField } from ".";
-import { MaterialSampleAssociationsField } from "./MaterialSampleAssociationsField";
-import * as yup from "yup";
 import {
-  HostOrganism,
-  MaterialSample,
-  MaterialSampleAssociation
-} from "../../../dina-ui/types/collection-api";
+  MaterialSampleAssociationsField,
+  MATERIALSAMPLE_ASSOCIATION_FIELDS_OBJECT
+} from "./MaterialSampleAssociationsField";
+import { HostOrganism } from "../../../dina-ui/types/collection-api";
 
-/** Type-safe object with all ScheduledAction fields. */
+/** Type-safe object with all hostotganism fields. */
 export const HOSTORGANISM_FIELDS_OBJECT: Required<
   Record<keyof HostOrganism, true>
 > = {
@@ -17,26 +15,15 @@ export const HOSTORGANISM_FIELDS_OBJECT: Required<
   remarks: true
 };
 
-export const MATERIALSAMPLE_ASSOCIATION_FIELDS_OBJECT: Required<
-  Record<keyof MaterialSampleAssociation, true>
-> = {
-  associatedSample: true,
-  associationType: true,
-  remarks: true
-};
+export const HOSTORGANISM_FIELDS = Object.keys(HOSTORGANISM_FIELDS_OBJECT);
 
 export const ASSOCIATION_FIELDS_OBJECT = {
   MATERIALSAMPLE_ASSOCIATION_FIELDS_OBJECT,
   HOSTORGANISM_FIELDS_OBJECT
 };
+
 /** All fields of the association type. */
 export const ASSOCIATION_FIELDS = Object.keys(ASSOCIATION_FIELDS_OBJECT);
-
-export const MATERIALSAMPLE_ASSOCIATION_FIELDS = Object.keys(
-  MATERIALSAMPLE_ASSOCIATION_FIELDS_OBJECT
-);
-
-export const HOSTORGANISM_FIELDS = Object.keys(HOSTORGANISM_FIELDS_OBJECT);
 
 export function AssociationsField() {
   return (

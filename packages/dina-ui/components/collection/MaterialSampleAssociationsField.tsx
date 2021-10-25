@@ -12,14 +12,14 @@ import {
 import * as yup from "yup";
 import { isEmpty } from "lodash";
 import { FastField, FormikContextType } from "formik";
-import { Fragment, useState, useRef } from "react";
+import { Fragment, useState } from "react";
 import { MaterialSampleAssociation } from "../../../dina-ui/types/collection-api/resources/MaterialSample";
 import ReactTable, { CellInfo, Column } from "react-table";
 import React from "react";
-import { Vocabulary } from "packages/dina-ui/types/collection-api/resources/VocabularyElement";
+import { Vocabulary } from "../../../dina-ui/types/collection-api/resources/VocabularyElement";
 
 /** Type-safe object with all MaterialSampleAssociation fields. */
-export const ASSOCIATION_FIELDS_OBJECT: Required<
+export const MATERIALSAMPLE_ASSOCIATION_FIELDS_OBJECT: Required<
   Record<keyof MaterialSampleAssociation, true>
 > = {
   associatedSample: true,
@@ -28,7 +28,9 @@ export const ASSOCIATION_FIELDS_OBJECT: Required<
 };
 
 /** All fields of the MaterialSampleAssociation type. */
-export const ASSOCIATION_FIELDS = Object.keys(ASSOCIATION_FIELDS_OBJECT);
+export const MATERIALSAMPLE_ASSOCIATION_FIELDS = Object.keys(
+  MATERIALSAMPLE_ASSOCIATION_FIELDS_OBJECT
+);
 
 export const associationSchema = yup.object({
   associatedSample: yup.string().required(),

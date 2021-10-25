@@ -30,11 +30,9 @@ import {
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
-import {
-  HOSTORGANISM_FIELDS,
-  MATERIALSAMPLE_ASSOCIATION_FIELDS
-} from "./AssociationsField";
+import { HOSTORGANISM_FIELDS } from "./AssociationsField";
 import { DETERMINATION_FIELDS } from "./DeterminationField";
+import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "./MaterialSampleAssociationsField";
 import { ORGANISM_FIELDS } from "./OrganismStateField";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
 import { useLastUsedCollection } from "./useLastUsedCollection";
