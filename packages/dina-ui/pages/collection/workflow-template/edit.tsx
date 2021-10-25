@@ -17,7 +17,7 @@ import { useRouter } from "next/router";
 import {
   HOSTORGANISM_FIELDS,
   MATERIALSAMPLE_ASSOCIATION_FIELDS
-} from "packages/dina-ui/components/collection";
+} from "../../../components/collection";
 import React, { useRef } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";

@@ -6,7 +6,8 @@ import {
   FormikButton,
   OnFormikSubmit,
   DinaForm,
-  AssociatedMaterialSampleSearchBox
+  AssociatedMaterialSampleSearchBox,
+  AutoSuggestTextField
 } from "common-ui";
 import * as yup from "yup";
 import { isEmpty } from "lodash";
@@ -15,6 +16,7 @@ import { Fragment, useState, useRef } from "react";
 import { MaterialSampleAssociation } from "../../../dina-ui/types/collection-api/resources/MaterialSample";
 import ReactTable, { CellInfo, Column } from "react-table";
 import React from "react";
+import { Vocabulary } from "packages/dina-ui/types/collection-api/resources/VocabularyElement";
 
 /** Type-safe object with all MaterialSampleAssociation fields. */
 export const ASSOCIATION_FIELDS_OBJECT: Required<
@@ -201,17 +203,9 @@ export function MaterialSampleAssociationSubForm({
   onCancelClick,
   associationToEdit
 }: MaterialSampleAssociationSubFormProps) {
-  const { enabledFields, initialValues, isTemplate, isTemplateRun } =
-    useDinaFormContext();
+  const { enabledFields, initialValues, isTemplate } = useDinaFormContext();
 
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [showSearchAssociatedSample, setShowSearchAssociatedSample] = useState(
-    isTemplateRun
-      ? true
-      : associationToEdit === "NEW" || !associationToEdit
-      ? false
-      : true
-  );
+  const { locale } = useDinaIntl();
 
   const associationsEnabledFields = enabledFields?.filter(it =>
     it.startsWith("association.")
@@ -221,6 +215,11 @@ export function MaterialSampleAssociationSubForm({
     ? initialValues.association
     : undefined;
 
+  /* if template mode having any enabled fields or in editing association mode, will hide the search button and 
+  show the search result list and associated sample input; otherwise vice versus */
+  const showSearchAssociatedSampleInit =
+    !!associationsEnabledFields?.length ??
+    (associationToEdit === "NEW" || !associationToEdit ? false : true);
   function disableEnterToSubmitOuterForm(e) {
     // Pressing enter should not submit the outer form:
     if (e.keyCode === 13 && e.target.tagName !== "TEXTAREA") {
@@ -268,15 +267,24 @@ export function MaterialSampleAssociationSubForm({
       >
         <div className="row">
           <div className="col-sm-6" id="association">
-            <TextField {...fieldProps("associationType")} />
+            <AutoSuggestTextField<Vocabulary>
+              {...fieldProps("associationType")}
+              query={() => ({
+                path: "collection-api/vocabulary/associationType"
+              })}
+              suggestion={vocabElement =>
+                vocabElement?.vocabularyElements?.map(
+                  it => it?.labels?.[locale] ?? ""
+                ) ?? ""
+              }
+              alwaysShowSuggestions={true}
+            />
           </div>
           <div className="col-sm-6">
             <TextField {...fieldProps("remarks")} multiLines={true} />
           </div>
           <AssociatedMaterialSampleSearchBox
-            showSearchAssociatedSample={showSearchAssociatedSample}
-            setShowSearchAssociatedSample={setShowSearchAssociatedSample}
-            forwardedRef={inputRef as any}
+            showSearchAssociatedSampleInit={showSearchAssociatedSampleInit}
             {...fieldProps("associatedSample")}
           />
         </div>

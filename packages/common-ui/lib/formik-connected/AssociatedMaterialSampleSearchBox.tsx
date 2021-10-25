@@ -1,4 +1,4 @@
-import React, { ChangeEvent, RefObject, useRef } from "react";
+import React, { ChangeEvent, RefObject, useRef, useState } from "react";
 import { TextField, TextFieldProps } from "./TextField";
 import classNames from "classnames";
 import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list";
@@ -6,22 +6,23 @@ import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { RiDeleteBinLine } from "react-icons/ri";
 
 interface AssociatedMaterialSampleSearchBoxProps extends TextFieldProps {
-  forwardedRef?: RefObject<HTMLInputElement>;
-  showSearchAssociatedSample: boolean;
-  setShowSearchAssociatedSample: React.Dispatch<React.SetStateAction<boolean>>;
+  showSearchAssociatedSampleInit?: boolean;
 }
 
 export function AssociatedMaterialSampleSearchBox(
   props: AssociatedMaterialSampleSearchBoxProps
 ) {
-  const { showSearchAssociatedSample, setShowSearchAssociatedSample } = props;
+  const { showSearchAssociatedSampleInit } = props;
+  const [showSearchAssociatedSample, setShowSearchAssociatedSample] = useState(
+    showSearchAssociatedSampleInit
+  );
 
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const { formatMessage } = useDinaIntl();
 
   function onSearchClicked() {
-    setShowSearchAssociatedSample?.(true);
+    setShowSearchAssociatedSample(true);
   }
 
   /* Clear the input value */
@@ -51,7 +52,7 @@ export function AssociatedMaterialSampleSearchBox(
         </div>
         <SampleListLayout
           onSelect={sample => onAssociatedSampleSelected(sample, onChange)}
-          classNames="btn btn-primary"
+          classNames="btn btn-primary selectMaterialSample"
           btnMsg={formatMessage("select")}
         />
       </div>
@@ -75,7 +76,7 @@ export function AssociatedMaterialSampleSearchBox(
       {!showSearchAssociatedSample ? (
         <button
           type="button"
-          className="btn btn-secondary mb-2 col-md-4"
+          className="btn btn-secondary mb-2 col-md-4 searchSample"
           onClick={() => onSearchClicked()}
         >
           {formatMessage("search") + "..."}
@@ -91,7 +92,9 @@ export function AssociatedMaterialSampleSearchBox(
                   <input
                     {...inputProps}
                     type="text"
-                    className={"flex-md-grow-1 form-control"}
+                    className={
+                      "flex-md-grow-1 form-control associatedSampleInput"
+                    }
                     ref={inputRef}
                   />
                   <button

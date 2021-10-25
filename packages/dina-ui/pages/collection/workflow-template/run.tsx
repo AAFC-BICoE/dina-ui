@@ -93,50 +93,48 @@ export function CreateMaterialSampleFromWorkflowForm({
   const [onSaveString, setOnSaveString] = useState("viewSample");
 
   return (
-    <DinaForm initialValues={materialSampleInitialValues} isTemplateRun={true}>
-      <MaterialSampleForm
-        buttonBar={
-          <ButtonBar className="d-flex">
-            <BackButton
-              entityLink="/collection/workflow-template"
-              className="flex-grow-1"
-            />
-            <SubmitButton
-              buttonProps={() => ({
-                onClick: () => setOnSaveString("newRun"),
-                style: { width: "20rem" }
-              })}
-            >
-              <DinaMessage id="saveAndCreateNewMaterialSampleButton" />
-            </SubmitButton>
-            <SubmitButton
-              buttonProps={() => ({
-                onClick: () => setOnSaveString("viewSample"),
-                style: { width: "15rem" }
-              })}
-            >
-              <DinaMessage id="saveAndGoToViewPageButton" />
-            </SubmitButton>
-          </ButtonBar>
-        }
-        materialSample={materialSampleInitialValues}
-        collectingEventInitialValues={collectingEventInitialValues}
-        onSaved={selectOnSaved(onSaveString as RoutingButtonStrings)}
-        enabledFields={enabledFields}
-        attachmentsConfig={{
-          collectingEvent: pick(
-            actionDefinition.formTemplates.COLLECTING_EVENT,
-            "allowNew",
-            "allowExisting"
-          ),
-          materialSample: pick(
-            actionDefinition.formTemplates.MATERIAL_SAMPLE,
-            "allowNew",
-            "allowExisting"
-          )
-        }}
-      />
-    </DinaForm>
+    <MaterialSampleForm
+      buttonBar={
+        <ButtonBar className="d-flex">
+          <BackButton
+            entityLink="/collection/workflow-template"
+            className="flex-grow-1"
+          />
+          <SubmitButton
+            buttonProps={() => ({
+              onClick: () => setOnSaveString("newRun"),
+              style: { width: "20rem" }
+            })}
+          >
+            <DinaMessage id="saveAndCreateNewMaterialSampleButton" />
+          </SubmitButton>
+          <SubmitButton
+            buttonProps={() => ({
+              onClick: () => setOnSaveString("viewSample"),
+              style: { width: "15rem" }
+            })}
+          >
+            <DinaMessage id="saveAndGoToViewPageButton" />
+          </SubmitButton>
+        </ButtonBar>
+      }
+      materialSample={materialSampleInitialValues}
+      collectingEventInitialValues={collectingEventInitialValues}
+      onSaved={selectOnSaved(onSaveString as RoutingButtonStrings)}
+      enabledFields={enabledFields}
+      attachmentsConfig={{
+        collectingEvent: pick(
+          actionDefinition.formTemplates.COLLECTING_EVENT,
+          "allowNew",
+          "allowExisting"
+        ),
+        materialSample: pick(
+          actionDefinition.formTemplates.MATERIAL_SAMPLE,
+          "allowNew",
+          "allowExisting"
+        )
+      }}
+    />
   );
 }
 

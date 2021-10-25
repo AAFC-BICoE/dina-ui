@@ -46,7 +46,7 @@ import {
 import {
   AssociationsField,
   HOSTORGANISM_FIELDS
-} from "packages/dina-ui/components/collection/AssociationsField";
+} from "../../../components/collection/AssociationsField";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
