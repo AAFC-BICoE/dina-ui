@@ -1,4 +1,5 @@
 import {
+  AutoSuggestTextField,
   BackButton,
   ButtonBar,
   DateField,
@@ -26,7 +27,12 @@ import {
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { License, Metadata, Person } from "../../../types/objectstore-api";
+import {
+  License,
+  Metadata,
+  ObjectSubtype,
+  Person
+} from "../../../types/objectstore-api";
 
 interface SingleMetadataFormProps {
   /** Existing Metadata is required, no new ones are added with this form. */
@@ -45,11 +51,13 @@ export default function MetadataEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage("editMetadataTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage("editMetadataTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <main className="container">
         {id && (
           <div>
@@ -196,6 +204,22 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
             name="dcType"
             options={DCTYPE_OPTIONS}
           />
+          <AutoSuggestTextField<ObjectSubtype>
+            name="acSubtype"
+            className="col-md-6"
+            query={(input, form) => ({
+              path: "objectstore-api/object-subtype",
+              filter: {
+                rsql: `acSubtype==${input}* ${
+                  form.values.dcType ? `and dcType==${form.values.dcType}` : ""
+                }`
+              }
+            })}
+            suggestion={ost => ost.acSubtype}
+            alwaysShowSuggestions={true}
+          />
+        </div>
+        <div className="row">
           <TextField className="col-md-6" name="acCaption" />
         </div>
         <div className="row">

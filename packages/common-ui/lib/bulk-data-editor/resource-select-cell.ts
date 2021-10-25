@@ -10,7 +10,7 @@ import { debounce } from "lodash";
 import { useContext } from "react";
 import { useIntl } from "react-intl";
 import { ApiClientContext, encodeResourceCell } from "..";
-import { ENCODED_RESOURCE_MATCHER } from "./encode-resource-cell";
+import { ENCODED_RESOURCE_TYPE_ID_MATCHER } from "./encode-resource-cell";
 
 interface ResourceSelectCellProps<T extends KitsuResource> {
   model: string;
@@ -33,11 +33,12 @@ export function useResourceSelectCells() {
     gridSettings?: GridSettings
   ): HotColumnProps {
     async function loadOptions(query: string, process) {
-      const isEncodedResource = ENCODED_RESOURCE_MATCHER.test(query);
+      const isEncodedResource = ENCODED_RESOURCE_TYPE_ID_MATCHER.test(query);
 
-      const requestParams: GetParams = isEncodedResource
-        ? {}
-        : { filter: filter(query) };
+      const requestParams: GetParams = {
+        ...(!isEncodedResource ? { filter: filter(query) } : {}),
+        sort: "-createdOn"
+      };
 
       // Send the API request.
       const { data } = await apiClient.get<T[]>(model, requestParams);
@@ -59,7 +60,7 @@ export function useResourceSelectCells() {
       source: debouncedOptionLoader as any,
       type: "dropdown",
       validator: (value, callback) =>
-        callback(value === "" || ENCODED_RESOURCE_MATCHER.test(value)),
+        callback(value === "" || ENCODED_RESOURCE_TYPE_ID_MATCHER.test(value)),
       ...gridSettings
     };
   };
@@ -88,8 +89,8 @@ export function makeDropdownOptionsUserFriendly(element: ParentNode) {
 
 /** Returns the table cell text without the {type}/{UUID} identifier. */
 function withoutIdentifier(tdHtml: string): string {
-  if (ENCODED_RESOURCE_MATCHER.test(tdHtml)) {
-    let newHtml = tdHtml.replace(ENCODED_RESOURCE_MATCHER, "");
+  if (ENCODED_RESOURCE_TYPE_ID_MATCHER.test(tdHtml)) {
+    let newHtml = tdHtml.replace(ENCODED_RESOURCE_TYPE_ID_MATCHER, "");
     newHtml = newHtml.substring(0, newHtml.length - 2);
     return newHtml;
   }
