@@ -1,4 +1,4 @@
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { BsFillFileEarmarkCheckFill } from "react-icons/bs";
 
 export interface SaveAndCopyToNextSuccessAlertProps {
