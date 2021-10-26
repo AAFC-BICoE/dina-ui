@@ -30,10 +30,16 @@ export default function OrganizationEditPage() {
     query: { id }
   } = router;
   const { formatMessage } = useDinaIntl();
+  const title = id ? "editOrganizationTitle" : "addOrganizationTitle";
 
   return (
     <div>
-      <Head title={formatMessage("editOrganizationTitle")} />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
         {id ? (

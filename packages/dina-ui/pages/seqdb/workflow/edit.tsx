@@ -23,10 +23,16 @@ interface ChainFormProps {
 export function ChainEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useSeqdbIntl();
+  const title = id ? "editWorkflowTitle" : "addWorkflowTitle";
 
   return (
     <div>
-      <Head title={formatMessage("editWorkflowTitle")} />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
         {id ? (

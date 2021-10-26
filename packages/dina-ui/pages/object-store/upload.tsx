@@ -116,7 +116,12 @@ export default function UploadPage() {
 
   return (
     <div>
-      <Head title={formatMessage("uploadPageTitle")} />
+      <Head
+        title={formatMessage("uploadPageTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container">
         <h1 id="wb-cont">

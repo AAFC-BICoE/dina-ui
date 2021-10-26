@@ -45,10 +45,17 @@ export default function SangerWorkflowListPage() {
 
   return (
     <div>
-      <Head title={title} />
+      <Head
+        title={title}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
-        <h1>{title}</h1>
+        <h1 id="wb-cont">
+          <SeqdbMessage id="sangerWorkflowListTitle" />
+        </h1>
         <ButtonBar>
           <Link href={`/seqdb/sanger-workflow/run`}>
             <a className="btn btn-primary">

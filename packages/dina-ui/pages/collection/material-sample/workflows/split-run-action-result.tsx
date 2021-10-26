@@ -39,7 +39,12 @@ export default function SplitRunActionResult() {
 
   return (
     <div>
-      <Head title={formatMessage("workflowCompleteTitle")} />
+      <Head
+        title={formatMessage("workflowCompleteTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid ">
         <h1 id="wb-cont">

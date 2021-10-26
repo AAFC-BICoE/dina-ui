@@ -18,8 +18,10 @@ import {
 } from "../../../components";
 import { StorageUnit } from "../../../types/collection-api";
 import { useStorageUnit } from "./edit";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export function StorageUnitDetailsPage({ router }: WithRouterProps) {
+  const { formatMessage } = useDinaIntl();
   const id = router.query.id?.toString();
   const storageUnitQuery = useStorageUnit(id);
   const childrenQuery = useQuery<StorageUnit>(
@@ -79,7 +81,12 @@ export function StorageUnitDetailsPage({ router }: WithRouterProps) {
 
           return (
             <>
-              <Head title={storageUnitDisplayName(strgUnit)} />
+              <Head
+                title={storageUnitDisplayName(strgUnit)}
+                lang={formatMessage("languageOfPage")}
+                creator={formatMessage("agricultureCanada")}
+                subject={formatMessage("subjectTermsForPage")}
+              />
               {buttonBar}
               <DinaForm<StorageUnit> initialValues={strgUnit} readOnly={true}>
                 <StorageUnitFormFields />

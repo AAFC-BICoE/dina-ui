@@ -22,7 +22,12 @@ export default function MaterialSampleTypeListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("materialSampleTypeListTitle")} />
+      <Head
+        title={formatMessage("materialSampleTypeListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">

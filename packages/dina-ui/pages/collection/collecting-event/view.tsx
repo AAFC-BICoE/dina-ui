@@ -50,7 +50,12 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("collectingEventViewTitle")} />
+      <Head
+        title={formatMessage("collectingEventViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       {withResponse(collectingEventQuery, ({ data: colEvent }) => {
         return (

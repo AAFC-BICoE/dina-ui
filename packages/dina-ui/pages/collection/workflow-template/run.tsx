@@ -49,7 +49,12 @@ export default function CreateMaterialSampleFromWorkflowPage() {
 
   return (
     <div>
-      <Head title={pageTitle} />
+      <Head
+        title={pageTitle}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <div className="container-fluid">
         <h1 id="wb-cont">{pageTitle}</h1>

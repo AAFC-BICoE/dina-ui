@@ -30,7 +30,7 @@ describe("FilterBuilderField component", () => {
   it("Exposes the passed filter attributes as filter options.", () => {
     const wrapper = mountForm();
 
-    expect(wrapper.find(Select).first().props().options).toEqual([
+    expect(wrapper.find<any>(Select).first().props().options).toEqual([
       { label: "Name", value: "name" },
       { label: "Group Name", value: "group.groupName" }
     ]);

@@ -1,13 +1,17 @@
 import Link from "next/link";
 import React from "react";
 import { Footer, Head, Nav } from "../components";
-import { DinaMessage } from "../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../intl/dina-ui-intl";
 import { SeqdbMessage } from "../intl/seqdb-intl";
 
 const Home: React.FunctionComponent = () => (
   <div>
-    <Head title="Home" />
-
+    <Head
+      title={useDinaIntl().formatMessage("dinaHomeH1")}
+      lang={useDinaIntl().formatMessage("languageOfPage")}
+      creator={useDinaIntl().formatMessage("agricultureCanada")}
+      subject={useDinaIntl().formatMessage("subjectTermsForPage")}
+    />
     <Nav />
     <main role="main">
       <div className="container">

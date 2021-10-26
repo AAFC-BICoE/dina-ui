@@ -45,7 +45,12 @@ export default function MaterialSampleTypeEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage(pageTitle)} />
+      <Head
+        title={formatMessage(pageTitle)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container">
         <div>

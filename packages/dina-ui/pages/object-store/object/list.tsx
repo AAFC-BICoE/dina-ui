@@ -142,7 +142,12 @@ export default function MetadataListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("objectListTitle")} />
+      <Head
+        title={formatMessage("objectListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
         <div className="list-inline">

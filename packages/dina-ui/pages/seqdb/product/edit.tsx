@@ -23,10 +23,16 @@ interface ProductFormProps {
 export function ProductEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useSeqdbIntl();
+  const title = id ? "editProductTitle" : "addProductTitle";
 
   return (
     <div>
-      <Head title={formatMessage("editProductTitle")} />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
         {id ? (

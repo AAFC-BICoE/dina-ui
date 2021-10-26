@@ -19,7 +19,12 @@ export function ProductDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("productViewTitle")} />
+      <Head
+        title={formatMessage("productViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="seqdb/product" />

@@ -33,7 +33,12 @@ export default function StorageUnitTypeListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("storageUnitTypeListTitle")} />
+      <Head
+        title={formatMessage("storageUnitTypeListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">

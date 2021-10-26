@@ -137,7 +137,7 @@ describe("Metadata single record edit page.", () => {
     ).toEqual("test-managed-attribute-value");
 
     // Set new values:
-    wrapper.find(".acTags-field").find(CreatableSelect).prop("onChange")([
+    wrapper.find(".acTags-field").find(CreatableSelect).prop<any>("onChange")([
       { label: "new tag 1", value: "new tag 1" },
       { label: "new tag 2", value: "new tag 2" }
     ]);

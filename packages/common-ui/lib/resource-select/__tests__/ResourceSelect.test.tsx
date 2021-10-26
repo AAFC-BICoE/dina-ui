@@ -104,11 +104,11 @@ describe("ResourceSelect component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const selectProps = wrapper.find(Select).props();
+    const selectProps = wrapper.find<any>(Select).props();
     const { options, onChange } = selectProps;
 
     // Select the third option (excluding the <none option>).
-    onChange(options[3], null);
+    onChange(options[3]);
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).lastCalledWith({
@@ -252,7 +252,7 @@ describe("ResourceSelect component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const { options, onChange } = wrapper.find(Select).props();
+    const { options, onChange } = wrapper.find<any>(Select).props();
 
     const nullOption = options[0];
 
@@ -265,7 +265,7 @@ describe("ResourceSelect component", () => {
     });
 
     // Select the null option.
-    onChange(nullOption, null);
+    onChange(nullOption);
 
     // This should call the onChange prop function with { id: null }.
     expect(mockOnChange).toHaveBeenCalledTimes(1);
@@ -311,10 +311,10 @@ describe("ResourceSelect component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const { options, onChange } = wrapper.find(Select).props();
+    const { options, onChange } = wrapper.find<any>(Select).props();
 
     // Select the second and third options.
-    onChange([options[1], options[2]], null);
+    onChange([options[1], options[2]]);
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).lastCalledWith([
@@ -403,7 +403,7 @@ describe("ResourceSelect component", () => {
     expect(options.length).toEqual(5);
 
     // Select the callback option, which should call the callback:
-    wrapper.find(Select).prop("onChange")(last(options));
+    wrapper.find(Select).prop<any>("onChange")(last(options));
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -435,13 +435,13 @@ describe("ResourceSelect component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const options = wrapper.find(Select).prop("options");
+    const options = wrapper.find(Select).prop<any>("options");
 
     // There should be 4 options including the custom callback option:
     expect(options.length).toEqual(4);
 
     // Select the callback option, which should call the callback:
-    wrapper.find(Select).prop("onChange")([options[0], last(options)]);
+    wrapper.find(Select).prop<any>("onChange")([options[0], last(options)]);
 
     await new Promise(setImmediate);
     wrapper.update();

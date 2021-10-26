@@ -33,7 +33,12 @@ export default function InstitutionListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("institutionListTitle")} />
+      <Head
+        title={formatMessage("institutionListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">

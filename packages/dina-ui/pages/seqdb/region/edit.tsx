@@ -22,10 +22,16 @@ interface RegionFormProps {
 export function RegionEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useSeqdbIntl();
+  const title = id ? "editRegionTitle" : "addRegionTitle";
 
   return (
     <div>
-      <Head title={formatMessage("editRegionTitle")} />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
         {id ? (

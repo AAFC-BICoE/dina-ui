@@ -50,7 +50,12 @@ export default function DinaUserEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage("editDinaUserTitle")} />
+      <Head
+        title={formatMessage("editDinaUserTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container">
         <h1 id="wb-cont">

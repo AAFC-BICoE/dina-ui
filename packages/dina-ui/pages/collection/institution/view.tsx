@@ -18,7 +18,12 @@ export function InstitutionDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("institution")} />
+      <Head
+        title={formatMessage("institution")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container">
         {withResponse(institutionQuery, ({ data: institution }) => (

@@ -6,7 +6,7 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../../components";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   ManagedAttribute,
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
@@ -65,9 +65,16 @@ const ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] = [
 const ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
 
 export default function ManagedAttributesListPage() {
+  const { formatMessage } = useDinaIntl();
+
   return (
     <div>
-      <Head title="Managed Attributes" />
+      <Head
+        title={formatMessage("managedAttributeListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">

@@ -40,7 +40,12 @@ export default function WorkflowTemplateListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("workflowTemplateListTitle")} />
+      <Head
+        title={formatMessage("workflowTemplateListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">

@@ -19,7 +19,12 @@ export function PcrProfileDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("pcrProfileViewTitle")} />
+      <Head
+        title={formatMessage("pcrProfileViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="seqdb/pcr-profile" />

@@ -25,7 +25,12 @@ export function CollectionMethodDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("collectionMethodViewTitle")} />
+      <Head
+        title={formatMessage("collectionMethodViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container">
         <h1 id="wb-cont">
