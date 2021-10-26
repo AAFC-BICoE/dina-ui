@@ -123,7 +123,8 @@ export default function MaterialSampleEditPage() {
           !!copyFromId &&
           withResponse(copyFromQuery, ({ data: originalSample }) => (
             <SaveAndCopyToNextSuccessAlert
-              id={
+              id={copyFromId}
+              displayName={
                 !!originalSample.materialSampleName?.length
                   ? originalSample.materialSampleName
                   : copyFromId
