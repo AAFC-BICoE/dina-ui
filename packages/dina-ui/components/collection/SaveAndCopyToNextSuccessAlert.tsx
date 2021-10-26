@@ -19,7 +19,7 @@ export function SaveAndCopyToNextSuccessAlert({
     <div className="alert alert-success">
       <div className=" d-flex gap-3">
         <BsFillFileEarmarkCheckFill style={{ width: "24px", height: "24px" }} />
-        <a href={`/${entityPath}/edit?id=${id}`} className={className}>
+        <a href={`/${entityPath}/view?id=${id}`} className={className}>
           <span style={{ fontSize: "1.2em", font: "fw-bold" }}>
             {" "}
             {displayName}
