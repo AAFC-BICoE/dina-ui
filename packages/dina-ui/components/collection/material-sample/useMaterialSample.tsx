@@ -16,25 +16,32 @@ import {
   useRef,
   useState
 } from "react";
-import { useCollectingEventQuery, useCollectingEventSave } from ".";
-import { SCHEDULEDACTION_FIELDS } from "..";
+import {
+  BLANK_PREPARATION,
+  CollectingEventFormLayout,
+  DETERMINATION_FIELDS,
+  ORGANISM_FIELDS,
+  PREPARATION_FIELDS,
+  SCHEDULEDACTION_FIELDS,
+  useCollectingEventQuery,
+  useCollectingEventSave,
+  useDuplicateSampleNameDetection,
+  useLastUsedCollection
+} from "..";
 import {
   CollectingEvent,
   MaterialSample
-} from "../../../dina-ui/types/collection-api";
+} from "../../../../dina-ui/types/collection-api";
 import {
   ManagedAttributeValues,
   Metadata,
   Person
-} from "../../../dina-ui/types/objectstore-api";
-import { CollectingEventFormLayout } from "../../components/collection";
-import { DinaMessage } from "../../intl/dina-ui-intl";
-import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
-import { DETERMINATION_FIELDS } from "./DeterminationField";
-import { ORGANISM_FIELDS } from "./OrganismStateField";
-import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
-import { useDuplicateSampleNameDetection } from "./useDuplicateSampleNameDetection";
-import { useLastUsedCollection } from "./useLastUsedCollection";
+} from "../../../../dina-ui/types/objectstore-api";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
+import {
+  AllowAttachmentsConfig,
+  useAttachmentsModal
+} from "../../object-store";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();

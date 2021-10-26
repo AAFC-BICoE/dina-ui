@@ -5,7 +5,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { get } from "lodash";
-import { CollectingEvent } from "../../types/collection-api";
+import { CollectingEvent } from "../../../types/collection-api";
 
 export interface ParseVerbatimToRangeButtonProps {
   verbatimField: string;

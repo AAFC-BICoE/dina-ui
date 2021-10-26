@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import dynamic from "next/dynamic";
 import Switch from "react-switch";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useMaterialSampleSave } from "./useMaterialSample";
 
 export interface MaterialSampleNavProps {

@@ -8,13 +8,13 @@ import {
 } from "common-ui";
 import { Field } from "formik";
 import { InputResource } from "kitsu";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { Person } from "../../types/agent-api";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { Person } from "../../../types/agent-api";
 import {
   MaterialSample,
   PreparationType,
   Vocabulary
-} from "../../types/collection-api";
+} from "../../../types/collection-api";
 
 export interface PreparationFieldProps {
   className?: string;

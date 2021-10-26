@@ -1,5 +1,5 @@
 import { DinaForm } from "common-ui";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { ScheduledActionsField } from "../ScheduledActionsField";
 
 const mockOnSubmit = jest.fn();

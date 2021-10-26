@@ -1,8 +1,8 @@
 import { useApiClient } from "common-ui";
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
-import { MaterialSample } from "../../../dina-ui/types/collection-api";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { MaterialSample } from "../../../../dina-ui/types/collection-api";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useState } from "react";
 
 /** Hook to detect and warn about duplicate sample names.  */

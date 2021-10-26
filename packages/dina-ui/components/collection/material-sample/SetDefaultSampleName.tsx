@@ -1,6 +1,6 @@
 import { useFormikContext } from "formik";
 import { useEffect, useRef } from "react";
-import { MaterialSample } from "../../types/collection-api";
+import { MaterialSample } from "../../../types/collection-api";
 
 /** Prefixes the sample name with the collection code. */
 export function SetDefaultSampleName() {

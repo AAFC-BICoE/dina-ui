@@ -17,16 +17,14 @@ import { useRouter } from "next/router";
 import React, { useRef } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
+import { GroupSelectField, Head, Nav } from "../../../components";
 import {
-  GroupSelectField,
-  Head,
-  Nav,
-  SCHEDULEDACTION_FIELDS
-} from "../../../components";
-import { DETERMINATION_FIELDS } from "../../../components/collection/DeterminationField";
-import { ORGANISM_FIELDS } from "../../../components/collection/OrganismStateField";
-import { PREPARATION_FIELDS } from "../../../components/collection/PreparationField";
-import { useMaterialSampleSave } from "../../../components/collection/useMaterialSample";
+  DETERMINATION_FIELDS,
+  ORGANISM_FIELDS,
+  PREPARATION_FIELDS,
+  SCHEDULEDACTION_FIELDS,
+  useMaterialSampleSave
+} from "../../../components/collection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   FormTemplate,
@@ -62,7 +60,9 @@ export default function PreparationProcessTemplatePage() {
     { disabled: !id }
   );
 
-  const pageTitle = id ? "editWorkflowTemplateTitle" : "createWorkflowTemplateTitle";
+  const pageTitle = id
+    ? "editWorkflowTemplateTitle"
+    : "createWorkflowTemplateTitle";
 
   async function moveToNextPage() {
     await router.push("/collection/workflow-template/list");
@@ -70,11 +70,13 @@ export default function PreparationProcessTemplatePage() {
 
   return (
     <div>
-      <Head title={formatMessage(pageTitle)}
-      			lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage(pageTitle)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id={pageTitle} />

@@ -10,8 +10,8 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
-import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
-import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
+import { useCollectingEventQuery } from "../../../components/collection";
+import { CollectingEventFormLayout } from "../../../components/collection/collecting-event/CollectingEventFormLayout";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 
@@ -50,11 +50,13 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("collectingEventViewTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage("collectingEventViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       {withResponse(collectingEventQuery, ({ data: colEvent }) => {
         return (
           <main className="container-fluid">

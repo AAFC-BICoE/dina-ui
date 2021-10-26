@@ -1,6 +1,6 @@
 import { KitsuResourceLink, PersistedResource } from "kitsu";
 import { default as ReactSwitch, default as Switch } from "react-switch";
-import { BLANK_PREPARATION } from "../../../../components/collection/PreparationField";
+import { BLANK_PREPARATION } from "../../../../components/collection";
 import {
   MaterialSampleForm,
   nextSampleInitialValues

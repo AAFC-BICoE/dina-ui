@@ -4,17 +4,20 @@ import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
 import { orderBy } from "lodash";
 import { object, SchemaOf, string } from "yup";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { CollectingEvent } from "../../types/collection-api";
-import { CoordinateSystemEnum } from "../../types/collection-api/resources/CoordinateSystem";
-import { SourceAdministrativeLevel } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
-import { SRSEnum } from "../../types/collection-api/resources/SRS";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { CollectingEvent } from "../../../types/collection-api";
+import { CoordinateSystemEnum } from "../../../types/collection-api/resources/CoordinateSystem";
+import { SourceAdministrativeLevel } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
+import { SRSEnum } from "../../../types/collection-api/resources/SRS";
 import {
   ManagedAttributeValues,
   Metadata,
   Person
-} from "../../types/objectstore-api";
-import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
+} from "../../../types/objectstore-api";
+import {
+  AllowAttachmentsConfig,
+  useAttachmentsModal
+} from "../../object-store";
 import { toPairs, fromPairs } from "lodash";
 
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";

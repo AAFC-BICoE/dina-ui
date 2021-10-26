@@ -1,24 +1,24 @@
 import {
+  AutoSuggestTextField,
   BackButton,
   ButtonBar,
   DinaForm,
   DinaFormContext,
   DinaFormSection,
   FieldSet,
+  filterBy,
   FormikButton,
   LoadingSpinner,
+  ResourceSelectField,
   StringArrayField,
   SubmitButton,
   TextField,
-  withResponse,
-  ResourceSelectField,
-  filterBy,
-  AutoSuggestTextField
+  withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
+import { padStart } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
 import { ReactNode, useContext, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
@@ -29,20 +29,19 @@ import {
   MaterialSampleBreadCrumb,
   MaterialSampleFormNav,
   Nav,
-  ScheduledActionsField,
   StorageLinkerField,
   TagsAndRestrictionsSection
 } from "../../../components";
 import {
   CollectingEventLinker,
-  SetDefaultSampleName
-} from "../../../components/collection";
-import { DeterminationField } from "../../../components/collection/DeterminationField";
-import { PreparationField } from "../../../components/collection/PreparationField";
-import {
+  DeterminationField,
+  OrganismStateField,
+  PreparationField,
+  ScheduledActionsField,
+  SetDefaultSampleName,
   useMaterialSampleQuery,
   useMaterialSampleSave
-} from "../../../components/collection/useMaterialSample";
+} from "../../../components/collection";
 import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -52,7 +51,6 @@ import {
   MaterialSampleType,
   Vocabulary
 } from "../../../types/collection-api";
-import { padStart } from "lodash";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
@@ -110,11 +108,13 @@ export default function MaterialSampleEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage(title)}
-						lang={formatMessage("languageOfPage")}
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id={title} />

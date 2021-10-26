@@ -10,16 +10,15 @@ import {
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
-import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import {
+  CollectingEventFormLayout,
   DEFAULT_VERBATIM_COORDSYS_KEY,
   DEFAULT_VERBATIM_SRS_KEY,
   useCollectingEventQuery,
   useCollectingEventSave
-} from "../../../components/collection/useCollectingEvent";
+} from "../../../components/collection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
-import { omit, merge } from "lodash";
 
 interface CollectingEventFormProps {
   collectingEvent?: PersistedResource<CollectingEvent>;
@@ -32,17 +31,19 @@ export default function CollectingEventEditPage() {
   } = router;
   const { formatMessage } = useDinaIntl();
 
-  const title = id ? "editCollectingEventTitle" : "addCollectingEventTitle"
+  const title = id ? "editCollectingEventTitle" : "addCollectingEventTitle";
 
   const collectingEventQuery = useCollectingEventQuery(id?.toString());
 
   return (
     <div>
-      <Head title={formatMessage(title)}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <main className="container-fluid">
         {id ? (
           <div>

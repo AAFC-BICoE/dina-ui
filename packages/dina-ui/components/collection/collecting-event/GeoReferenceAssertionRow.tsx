@@ -15,12 +15,12 @@ import { connect, Field, FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
 import { get } from "lodash";
 import { useRef, useState } from "react";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { Person } from "../../types/agent-api/resources/Person";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { Person } from "../../../types/agent-api/resources/Person";
 import {
   GeoReferenceAssertion,
   GeoreferenceVerificationStatus
-} from "../../types/collection-api/resources/GeoReferenceAssertion";
+} from "../../../types/collection-api/resources/GeoReferenceAssertion";
 
 export interface GeoReferenceAssertionRowProps {
   index: number;

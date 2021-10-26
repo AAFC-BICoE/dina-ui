@@ -11,9 +11,9 @@ import { FormikContextType, FormikProps } from "formik";
 import { FilterParam } from "kitsu";
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { DinaMessage } from "../../intl/dina-ui-intl";
-import { CollectingEvent } from "../../types/collection-api";
-import { Person } from "../../types/objectstore-api";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { CollectingEvent } from "../../../types/collection-api";
+import { Person } from "../../../types/objectstore-api";
 
 export interface CollectingEventFilterFormValues {
   createdBy?: string;
