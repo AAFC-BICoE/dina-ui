@@ -41,19 +41,27 @@ export function AssociatedMaterialSampleSearchBox(
     return (
       <div
         ref={listRef}
-        className={classNames("mt-2", !showSearchAssociatedSample && "d-none")}
+        className={classNames(
+          "p-2 mt-2",
+          !showSearchAssociatedSample && "d-none"
+        )}
         style={{ borderStyle: "dashed" }}
       >
-        <div className="mb-2">
-          <span className="me-2 fw-bold">{formatMessage("search")}</span>
+        <div className="mb-4">
+          <span className="me-2 fw-bold" style={{ fontSize: "1.2em" }}>
+            {formatMessage("search")}
+          </span>
           <a href="#association" onClick={onCloseClicked}>
-            {formatMessage("closeButtonText")}
+            <span style={{ fontSize: "1.2em" }}>
+              {formatMessage("closeButtonText")}{" "}
+            </span>
           </a>
         </div>
         <SampleListLayout
           onSelect={sample => onAssociatedSampleSelected(sample, onChange)}
           classNames="btn btn-primary selectMaterialSample"
           btnMsg={formatMessage("select")}
+          hideTopPagination={true}
         />
       </div>
     );

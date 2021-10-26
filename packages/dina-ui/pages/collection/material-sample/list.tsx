@@ -21,12 +21,14 @@ export interface SampleListLayoutProps {
   onSelect?: (sample) => void;
   classNames?: string;
   btnMsg?: string;
+  hideTopPagination?: boolean;
 }
 
 export function SampleListLayout({
   onSelect,
   classNames,
-  btnMsg
+  btnMsg,
+  hideTopPagination
 }: SampleListLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
@@ -100,7 +102,8 @@ export function SampleListLayout({
       queryTableProps={{
         columns: MATERIAL_SAMPLE_TABLE_COLUMNS,
         path: "collection-api/material-sample",
-        include: "collection,materialSampleType"
+        include: "collection,materialSampleType",
+        hideTopPagination
       }}
     />
   );
