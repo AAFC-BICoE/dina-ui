@@ -53,6 +53,7 @@ import {
   Vocabulary
 } from "../../../types/collection-api";
 import { padStart } from "lodash";
+import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
@@ -110,12 +111,27 @@ export default function MaterialSampleEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage(title)}
-						lang={formatMessage("languageOfPage")}
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <main className="container-fluid">
+        {!id &&
+          !!copyFromId &&
+          withResponse(copyFromQuery, ({ data: originalSample }) => (
+            <SaveAndCopyToNextSuccessAlert
+              id={copyFromId}
+              displayName={
+                !!originalSample.materialSampleName?.length
+                  ? originalSample.materialSampleName
+                  : copyFromId
+              }
+              entityPath={"collection/material-sample"}
+            />
+          ))}
         <h1 id="wb-cont">
           <DinaMessage id={title} />
         </h1>
