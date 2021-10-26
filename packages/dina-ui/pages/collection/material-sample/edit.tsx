@@ -42,6 +42,7 @@ import {
   useMaterialSampleQuery,
   useMaterialSampleSave
 } from "../../../components/collection";
+import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -116,6 +117,19 @@ export default function MaterialSampleEditPage() {
       />
       <Nav />
       <main className="container-fluid">
+        {!id &&
+          !!copyFromId &&
+          withResponse(copyFromQuery, ({ data: originalSample }) => (
+            <SaveAndCopyToNextSuccessAlert
+              id={copyFromId}
+              displayName={
+                !!originalSample.materialSampleName?.length
+                  ? originalSample.materialSampleName
+                  : copyFromId
+              }
+              entityPath={"collection/material-sample"}
+            />
+          ))}
         <h1 id="wb-cont">
           <DinaMessage id={title} />
         </h1>
