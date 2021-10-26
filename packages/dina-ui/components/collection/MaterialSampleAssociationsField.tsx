@@ -217,11 +217,14 @@ export function MaterialSampleAssociationSubForm({
     ? initialValues.association
     : undefined;
 
-  /* if template mode having any enabled fields or in editing association mode, will hide the search button and 
-  show the search result list and associated sample input; otherwise vice versus */
+  /* if template edit/run mode having any association related enabled fields/values,
+   or in editing association mode,
+  will hide the search button and show the search result list and associated sample input; otherwise vice versus */
   const showSearchAssociatedSampleInit =
-    !!associationsEnabledFields?.length ??
+    !!associationsEnabledFields?.length ||
+    (!!initialValues.association && isTemplate) ||
     (associationToEdit === "NEW" || !associationToEdit ? false : true);
+
   function disableEnterToSubmitOuterForm(e) {
     // Pressing enter should not submit the outer form:
     if (e.keyCode === 13 && e.target.tagName !== "TEXTAREA") {
