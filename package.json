@@ -60,5 +60,15 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "dependencies": {
+    "@arcgis/core": "^4.21.2",
+    "@esri/react-arcgis": "^5.1.0",
+    "esri-loader": "^3.3.0",
+    "esri-loader-hooks": "^0.4.0",
+    "esri-loader-react": "^2.0.3",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   }
 }

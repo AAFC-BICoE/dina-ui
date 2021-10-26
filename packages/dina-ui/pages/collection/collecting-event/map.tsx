@@ -1,3 +1,5 @@
+import React from "react";
+import { useMap, useGraphics, useGraphic, useEvent } from "esri-loader-hooks";
 import {
   BackButton,
   ButtonBar,
@@ -11,6 +13,7 @@ import Link from "next/link";
 import { withRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
+import { CollectingEventMap } from "../../../components/collection/event-map/CollectingEventMap";
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
@@ -48,20 +51,39 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
     </ButtonBar>
   );
 
+  // Getting params from URL
+  const queryParams = new URLSearchParams(window.location.search);
+  const latitude = queryParams.get('mlat');
+  const longitude = queryParams.get('mlon');
+
   return (
     <div>
       <Head title={formatMessage("collectingEventViewTitle")} 
       />
       <Nav />
-        <div>
-          <iframe id="ifranecbdd6677-bc8d-4901-9ae7-a1eb2f9d44c0"
-            sandbox="allow-scripts"
-            scrolling="no" 
-            width="100%"
-            height="500"
-            src="https://www-dev.agr.gc.ca/atlas/samples/liz/aef/nosurround.html?AGRIAPP=3&APPID=a5fc89c63b4647908e968e41a4f4dcba&dontchangetitle=true&top_app_iframe=ifranecbdd6677-bc8d-4901-9ae7-a1eb2f9d44c0">
-          </iframe>
-        </div>
+      <CollectingEventMap 
+          latitude={latitude} 
+          longitude={longitude} 
+          geometry={{
+            type: "point", // autocasts as new Point()
+            latitude,
+            longitude
+          }} 
+          symbol={{
+            type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+            color: [226, 119, 40],
+            size: "10px",  // pixels
+          }}
+          map={{
+            basemap: "hybrid"
+          }}
+          options={{
+            view: {
+              center: [longitude, latitude],
+              zoom: 5
+            }
+          }}
+      />
       <Footer />
     </div>
   );
