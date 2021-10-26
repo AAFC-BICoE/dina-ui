@@ -2,12 +2,14 @@ import {
   ApiClientContext,
   BackButton,
   ButtonBar,
+  DateField,
   DinaForm,
   DinaFormOnSubmit,
   LoadingSpinner,
   Query,
   SubmitButton,
-  TextField
+  TextField,
+  useDinaFormContext
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
@@ -37,11 +39,13 @@ export default function CollectionMethodEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage(title)}
-						lang={formatMessage("languageOfPage")}
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <main className="container">
         <div>
           <h1 id="wb-cont">
@@ -138,6 +142,7 @@ export function CollectionMethodForm({
 }
 
 export function CollectionMethodFormLayout() {
+  const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
 
   return (
@@ -172,6 +177,12 @@ export function CollectionMethodFormLayout() {
           multiLines={true}
         />
       </div>
+      {readOnly && (
+        <div className="row">
+          <DateField name="createdOn" />
+          <TextField name="createdBy" />
+        </div>
+      )}
     </div>
   );
 }

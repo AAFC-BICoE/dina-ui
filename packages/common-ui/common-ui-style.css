@@ -3,6 +3,14 @@
 */
 
 /*
+ * Changes the default color of the badge to dark grey. 
+ * Currently no background is added using bootstrap.
+ */
+.badge {
+  background-color: #333333;
+}
+
+/*
 * Fixes WCAG contrast issue for react-select input elements
 * Not sure if why this works...perhaps padding the element renders it sufficiently for a contrast calculation.
 */

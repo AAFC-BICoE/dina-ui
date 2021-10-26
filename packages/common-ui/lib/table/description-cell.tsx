@@ -5,6 +5,7 @@ import {
 } from "../../../dina-ui/types/collection-api/resources/PreparationType";
 import { useContext } from "react";
 import { intlContext } from "../intl/IntlSupport";
+import { LANGUAGE_LABELS } from "../intl/LanguageSelector";
 
 /**
  * Used for multilingual descriptions which contain an English and French version of the
@@ -32,19 +33,38 @@ export function descriptionCell(accessor: string) {
         return <div />;
       }
 
+      // Remove any blank descriptions.
       const descriptionPairs: MultilingualPair[] =
-        multilingualDescription.descriptions;
+        multilingualDescription.descriptions.filter(
+          description => description.desc !== ""
+        );
 
       // Loop through all of the descriptions provided, the preferred one is always the currently used language.
       for (const description of descriptionPairs) {
         if (description.lang === language) {
-          return <div>description.desc</div>;
+          return (
+            <div>
+              {description.desc} {languageBadge(description.lang)}
+            </div>
+          );
         }
       }
 
       // Preferred language could not be found above. Use another language and make sure it's indicated.
-      return <div>{descriptionPairs[0] ? descriptionPairs[0].desc : ""}</div>;
+      // There is also the possibility that this is blank.
+      return descriptionPairs.at(0) !== null ? (
+        <div>
+          {descriptionPairs.at(0)?.desc}{" "}
+          {languageBadge(descriptionPairs.at(0)?.lang)}
+        </div>
+      ) : (
+        <div />
+      );
     },
     accessor
   };
+}
+
+function languageBadge(language) {
+  return <span className="badge">{LANGUAGE_LABELS[language]}</span>;
 }

@@ -47,7 +47,7 @@ describe("descriptionCell", () => {
     );
 
     expect(cell.accessor).toEqual(fieldName);
-    expect(wrapper).toEqual(englishDescription);
+    expect(wrapper.find("div").text()).toEqual(englishDescription);
   });
 
   it("Both description languages provided, french as the selected language.", () => {
@@ -60,7 +60,7 @@ describe("descriptionCell", () => {
     );
 
     expect(cell.accessor).toEqual(fieldName);
-    expect(wrapper).toEqual(frenchDescription);
+    expect(wrapper.find("div").text()).toEqual(frenchDescription);
   });
 
   it("English description provided, language selected is french.", () => {

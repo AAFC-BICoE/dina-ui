@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { intlContext } from "./IntlSupport";
 
-const LANGUAGE_LABELS = {
+export const LANGUAGE_LABELS = {
   en: "English",
   fr: "Français"
 };
