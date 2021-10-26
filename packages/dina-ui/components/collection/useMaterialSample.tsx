@@ -33,6 +33,7 @@ import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
 import { DETERMINATION_FIELDS } from "./DeterminationField";
 import { ORGANISM_FIELDS } from "./OrganismStateField";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
+import { useDuplicateSampleNameDetection } from "./useDuplicateSampleNameDetection";
 import { useLastUsedCollection } from "./useLastUsedCollection";
 
 export function useMaterialSampleQuery(id?: string | null) {
@@ -378,6 +379,8 @@ export function useMaterialSampleSave({
     });
   });
 
+  const { detectDuplicateSampleName } = useDuplicateSampleNameDetection();
+
   async function onSubmit({
     api: { save },
     formik,
@@ -388,6 +391,17 @@ export function useMaterialSampleSave({
 
     /** Input to submit to the back-end API. */
     const { ...materialSampleInput } = submittedValues;
+
+    // Check for duplicate materialSampleName on new sample creation:
+    if (!materialSampleInput.id) {
+      const duplicateName = await detectDuplicateSampleName(
+        formik,
+        materialSampleInput.materialSampleName
+      );
+      if (duplicateName) {
+        return;
+      }
+    }
 
     // Only persist the preparation fields if the preparations toggle is enabled:
     if (!enablePreparations) {

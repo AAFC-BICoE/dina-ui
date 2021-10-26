@@ -47,7 +47,7 @@ const TEST_MANAGED_ATTRIBUTE = {
   name: "testAttr"
 };
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
@@ -57,12 +57,22 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/preparation-type":
     case "collection-api/managed-attribute":
     case "collection-api/material-sample":
+      // Return a test sample for when there should be a duplicate detected:
+      if (params?.filter?.materialSampleName?.EQ === "test-duplicate-name") {
+        return {
+          data: [
+            { id: "test-duplicate", materialSampleName: "test-duplicate-name" }
+          ],
+          meta: { totalResourceCount: 1 }
+        };
+      }
     case "collection-api/material-sample-type":
     case "user-api/group":
     case "agent-api/person":
     case "collection-api/vocabulary/srs":
     case "collection-api/vocabulary/coordinateSystem":
     case "collection-api/vocabulary/degreeOfEstablishment":
+    case "collection-api/vocabulary/materialSampleState":
     case "collection-api/vocabulary/typeStatus":
     case "collection-api/storage-unit-type":
     case "collection-api/storage-unit":
@@ -685,5 +695,51 @@ describe("Material Sample Edit Page", () => {
       type: "material-sample",
       materialSampleName: ""
     });
+  });
+
+  it("Submits a new Material Sample with a duplicate sample name: Shows an error", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm onSaved={mockOnSaved} />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "test-duplicate-name" } });
+
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper.find(".materialSampleName-field input").hasClass("is-invalid")
+    ).toEqual(true);
+
+    // You should not be able to submit the form until this error is resolved:
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockOnSaved).toHaveBeenCalledTimes(0);
+
+    // Click the "allow" button:
+    wrapper.find("button.allow-duplicate-button").first().simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper.find(".materialSampleName-field input").hasClass("is-invalid")
+    ).toEqual(false);
+
+    // Submit the form with no errors:
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Form submitted successfully:
+    expect(mockOnSaved).lastCalledWith("1");
   });
 });
