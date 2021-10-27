@@ -1,27 +1,29 @@
 import {
+  AutoSuggestTextField,
   BackButton,
   ButtonBar,
   DinaForm,
   DinaFormContext,
   DinaFormSection,
   FieldSet,
+  filterBy,
   FormikButton,
   LoadingSpinner,
+  ResourceSelectField,
   StringArrayField,
   SubmitButton,
   TextField,
-  withResponse,
-  ResourceSelectField,
-  filterBy,
-  AutoSuggestTextField
+  withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
+import { padStart } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
 import { ReactNode, useContext, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
 import {
+  AttachmentsField,
   CollectionSelectField,
   Footer,
   GroupSelectField,
@@ -39,6 +41,7 @@ import {
 } from "../../../components/collection";
 import { DeterminationField } from "../../../components/collection/DeterminationField";
 import { PreparationField } from "../../../components/collection/PreparationField";
+import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import {
   useMaterialSampleQuery,
   useMaterialSampleSave
@@ -52,8 +55,6 @@ import {
   MaterialSampleType,
   Vocabulary
 } from "../../../types/collection-api";
-import { padStart } from "lodash";
-import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
@@ -213,13 +214,11 @@ export function MaterialSampleForm({
     setColEventId,
     colEventQuery,
     onSubmit,
-    materialSampleAttachmentsUI,
     loading
   } =
     materialSampleSaveHook ??
     useMaterialSampleSave({
       collectingEventAttachmentsConfig: attachmentsConfig?.collectingEvent,
-      materialSampleAttachmentsConfig: attachmentsConfig?.materialSample,
       materialSample,
       collectingEventInitialValues,
       onSaved,
@@ -342,7 +341,12 @@ export function MaterialSampleForm({
               </Tabs>
             </FieldSet>
           )}
-          {dataComponentState.enablePreparations && <PreparationField />}
+          {dataComponentState.enablePreparations && (
+            <PreparationField
+              // Use the same attachments config for preparations as the Material Sample:
+              attachmentsConfig={attachmentsConfig?.materialSample}
+            />
+          )}
           {dataComponentState.enableOrganism && <OrganismStateField />}
           {dataComponentState.enableDetermination && <DeterminationField />}
           {dataComponentState.enableStorage && (
@@ -378,7 +382,15 @@ export function MaterialSampleForm({
               </DinaFormSection>
             </FieldSet>
           )}
-          {materialSampleAttachmentsUI}
+          <AttachmentsField
+            name="attachment"
+            title={<DinaMessage id="materialSampleAttachments" />}
+            id="material-sample-attachments-section"
+            allowNewFieldName="attachmentsConfig.allowNew"
+            allowExistingFieldName="attachmentsConfig.allowExisting"
+            allowAttachmentsConfig={attachmentsConfig?.materialSample}
+            attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
+          />
         </div>
       </div>
     </div>

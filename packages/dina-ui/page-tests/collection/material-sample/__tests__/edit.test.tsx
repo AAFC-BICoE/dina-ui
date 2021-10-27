@@ -37,7 +37,8 @@ function testMaterialSample(): PersistedResource<MaterialSample> {
     collectingEvent: {
       id: "1",
       type: "collecting-event"
-    } as PersistedResource<CollectingEvent>
+    } as PersistedResource<CollectingEvent>,
+    attachment: [{ id: "attach-1", type: "metadata" }]
   };
 }
 
@@ -74,16 +75,12 @@ const mockGet = jest.fn<any, any>(async path => {
   }
 });
 
-const mockSave = jest.fn<any, any>(async saves => {
-  return saves.map(save => {
-    if (save.type === "material-sample") {
-      return testMaterialSample();
-    }
-    if (save.type === "collecting-event") {
-      return testCollectionEvent();
-    }
-  });
-});
+const mockSave = jest.fn<any, any>(ops =>
+  ops.map(op => ({
+    ...op.resource,
+    id: op.resource.id ?? "11111111-1111-1111-1111-111111111111"
+  }))
+);
 
 const mockBulkGet = jest.fn<any, any>(async paths => {
   if (!paths.length) {
@@ -153,7 +150,11 @@ describe("Material Sample Edit Page", () => {
                 }
               ],
               managedAttributes: {},
-              relationships: {},
+              relationships: {
+                attachment: {
+                  data: []
+                }
+              },
               verbatimEventDateTime: "2019-12-21T16:00",
               publiclyReleasable: true, // Default value
               type: "collecting-event"
@@ -169,7 +170,7 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               collectingEvent: {
-                id: "1",
+                id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
@@ -177,7 +178,14 @@ describe("Material Sample Edit Page", () => {
               managedAttributes: {},
               determination: [],
               publiclyReleasable: true, // Default value
-              relationships: {},
+              relationships: {
+                attachment: {
+                  data: []
+                },
+                preparationAttachment: {
+                  data: []
+                }
+              },
               organism: null,
               collection: undefined,
               type: "material-sample"
@@ -244,7 +252,14 @@ describe("Material Sample Edit Page", () => {
               collection: undefined,
               publiclyReleasable: true, // Default value
               type: "material-sample",
-              relationships: {}
+              relationships: {
+                attachment: {
+                  data: []
+                },
+                preparationAttachment: {
+                  data: []
+                }
+              }
             },
             type: "material-sample"
           }
@@ -295,10 +310,23 @@ describe("Material Sample Edit Page", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              preparationAttachment: undefined,
               determination: [],
               organism: null,
               managedAttributes: {},
-              relationships: {}
+              relationships: {
+                attachment: {
+                  data: [
+                    {
+                      id: "attach-1",
+                      type: "metadata"
+                    }
+                  ]
+                },
+                preparationAttachment: {
+                  data: []
+                }
+              }
             },
             type: "material-sample"
           }
@@ -360,7 +388,11 @@ describe("Material Sample Edit Page", () => {
                 }
               ],
               managedAttributes: {},
-              relationships: {},
+              relationships: {
+                attachment: {
+                  data: []
+                }
+              },
               verbatimEventDateTime: "2019-12-21T16:00",
               publiclyReleasable: true, // Default Value
               type: "collecting-event"
@@ -376,7 +408,7 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               collectingEvent: {
-                id: "1",
+                id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
@@ -387,10 +419,21 @@ describe("Material Sample Edit Page", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              preparationAttachment: undefined,
               determination: [],
               managedAttributes: {},
               organism: null,
-              relationships: {}
+              relationships: {
+                attachment: {
+                  data: [
+                    {
+                      id: "attach-1",
+                      type: "metadata"
+                    }
+                  ]
+                },
+                preparationAttachment: { data: [] }
+              }
             },
             type: "material-sample"
           }
@@ -552,9 +595,13 @@ describe("Material Sample Edit Page", () => {
               },
               materialSampleName: "test-ms",
               ...BLANK_PREPARATION,
+              preparationAttachment: undefined,
               determination: [],
               organism: null,
-              relationships: {},
+              relationships: {
+                attachment: { data: [] },
+                preparationAttachment: { data: [] }
+              },
               type: "material-sample"
             },
             type: "material-sample"

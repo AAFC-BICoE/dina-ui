@@ -23,7 +23,8 @@ const TEST_PCRBATCH: PersistedResource<PcrBatch> = {
     { id: "1", type: "agent", displayName: "agent 1" },
     { id: "2", type: "agent", displayName: "agent 2" },
     { id: "3", type: "agent", displayName: "agent 3" }
-  ] as any
+  ] as any,
+  attachment: [{ id: "attach-1", type: "metadata" }]
 };
 
 const mockGet = jest.fn<any, any>(async path => {
@@ -121,6 +122,9 @@ describe("PcrBatch edit page", () => {
                   { id: "1", type: "person" },
                   { id: "2", type: "person" }
                 ]
+              },
+              attachment: {
+                data: []
               }
             }
           },
@@ -169,6 +173,9 @@ describe("PcrBatch edit page", () => {
                   { id: "2", type: "person" },
                   { id: "3", type: "person" }
                 ]
+              },
+              attachment: {
+                data: [{ id: "attach-1", type: "metadata" }]
               }
             }
           },

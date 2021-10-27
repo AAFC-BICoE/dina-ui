@@ -44,11 +44,11 @@ export function useBulkGet<TData extends KitsuResource>({
   const queryKey = JSON.stringify({ ids, disabled });
   const cacheId = useMemo(() => uuidv4(), [queryKey]);
 
-  const { data: resources } = useSWR([cacheId], fetchResources, {
+  const { data, isValidating } = useSWR([cacheId], fetchResources, {
     shouldRetryOnError: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false
   });
 
-  return resources;
+  return { data, loading: isValidating };
 }
