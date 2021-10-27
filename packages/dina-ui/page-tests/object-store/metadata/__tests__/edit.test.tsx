@@ -12,6 +12,7 @@ import { License, Metadata, Person } from "../../../../types/objectstore-api";
 
 const TEST_METADATAS: PersistedResource<Metadata>[] = [
   {
+    acSubtype: "IMAGE-SUBTYPE",
     dcCreator: {
       displayName: "Mat Poff",
       id: "6e80e42a-bcf6-4062-9db3-946e0f26458f",
@@ -189,6 +190,7 @@ describe("Metadata bulk edit page", () => {
     expect(wrapper.find("MockHotTable").prop("data")).toEqual([
       {
         dcCreator: "Mat Poff (person/6e80e42a-bcf6-4062-9db3-946e0f26458f)",
+        acSubtype: "IMAGE-SUBTYPE",
         acTags: "tag1",
         license: "",
         metadata: expect.objectContaining({
@@ -197,6 +199,7 @@ describe("Metadata bulk edit page", () => {
       },
       {
         dcCreator: "",
+        acSubtype: "",
         acTags: "tag1, tag2",
         license: "",
         metadata: expect.objectContaining({
@@ -204,6 +207,7 @@ describe("Metadata bulk edit page", () => {
         })
       },
       {
+        acSubtype: "",
         dcCreator: "",
         acTags: "",
         license:
@@ -291,6 +295,9 @@ describe("Metadata bulk edit page", () => {
       .find("MockHotTable")
       .prop<BulkMetadataEditRow[]>("data");
 
+    // Update the acSubtype field:
+    tableData[1].acSubtype = "CHANGED-SUBTYPE (object-subtype/123123123)";
+
     // Update the metadata creator field:
     tableData[1].dcCreator =
       "Mat (person/63eead51-142f-4a67-a596-68fd35a36ed8)";
@@ -315,6 +322,7 @@ describe("Metadata bulk edit page", () => {
       [
         {
           resource: {
+            acSubtype: "CHANGED-SUBTYPE",
             dcCreator: {
               id: "63eead51-142f-4a67-a596-68fd35a36ed8",
               type: "person"
@@ -415,6 +423,7 @@ describe("Metadata bulk edit page", () => {
     // Expect the initial data:
     expect(tableData).toEqual([
       {
+        acSubtype: "",
         acTags: "",
         dcCreator: "",
         // Default license is loaded:
