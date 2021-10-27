@@ -71,7 +71,7 @@ describe("AssociatedMaterialSampleSearchBox component", () => {
 
     /* expected the selected sample is being populated to the sample input */
     expect(wrapper.find("input.associatedSampleInput").prop("value")).toEqual(
-      "1"
+      "my-sample-name"
     );
   });
 });
