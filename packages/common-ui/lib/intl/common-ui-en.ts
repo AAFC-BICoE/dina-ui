@@ -22,6 +22,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
     "Check this header box to check all visible items in this page.",
   closeButtonText: "Close",
   configureLabel: "Configure",
+  created: "created",
   createNew: "Create New",
   date: "Date",
   deleteAllButtonText: "Delete All",

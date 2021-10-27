@@ -332,7 +332,7 @@ function NavCollectionDropdown() {
           <DinaMessage id="workflowTemplateListTitle" />
         </Dropdown.Item>
         <Dropdown.Item
-          href="/collection/revisions-by-user/"
+          href="/collection/revisions-by-user"
           onKeyDown={onKeyDownLastItem}
         >
           <DinaMessage id="revisionsByUserPageTitle" />
