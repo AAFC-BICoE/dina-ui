@@ -13,6 +13,7 @@ export interface Determination {
   scientificNameDetails?: string;
   scientificName?: string;
   transcriberRemarks?: string;
+  isPrimary?: boolean;
 }
 
 export enum ScientificNameSource {
