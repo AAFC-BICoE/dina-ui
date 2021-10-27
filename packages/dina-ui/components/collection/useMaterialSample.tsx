@@ -553,12 +553,9 @@ export function useMaterialSampleSave({
     // convert associated material sample from primary id to uuid for saving
     if (materialSampleInput.associations) {
       materialSampleInput.associations.map(assctn => {
-        if (
-          !!associatedSampleMapRef?.current.get(assctn.associatedSample as any)
-        )
-          assctn.associatedSample = associatedSampleMapRef?.current.get(
-            assctn.associatedSample as any
-          );
+        assctn.associatedSample =
+          associatedSampleMapRef?.current.get(assctn.associatedSample as any) ??
+          assctn.associatedSample;
       });
     }
 
