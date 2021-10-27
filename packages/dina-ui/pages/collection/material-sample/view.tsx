@@ -73,6 +73,12 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           <DinaMessage id="splitButton" />
         </a>
       </Link>
+      {/* Uncomment if we need copy + create next
+      <Link href={`/collection/material-sample/edit/?copyFromId=${id}`}>
+        <a className="btn btn-info">
+          <DinaMessage id="copyAndCreateNextSample" />
+        </a>
+      </Link> */}
       <DeleteButton
         className="ms-5"
         id={id}
@@ -85,11 +91,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("materialSampleViewTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage("materialSampleViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       {withResponse(materialSampleQuery, ({ data: materialSample }) => {
         const hasPreparations = PREPARATION_FIELDS.some(
           fieldName => materialSample[fieldName]

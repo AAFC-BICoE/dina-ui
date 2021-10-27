@@ -1,7 +1,10 @@
 import { KitsuResourceLink, PersistedResource } from "kitsu";
 import { default as ReactSwitch, default as Switch } from "react-switch";
 import { BLANK_PREPARATION } from "../../../../components/collection/PreparationField";
-import { MaterialSampleForm } from "../../../../pages/collection/material-sample/edit";
+import {
+  MaterialSampleForm,
+  nextSampleInitialValues
+} from "../../../../pages/collection/material-sample/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   CollectingEvent,
@@ -670,15 +673,18 @@ describe("Material Sample Edit Page", () => {
               determination: [
                 {
                   verbatimDeterminer: "test-agent-1",
-                  verbatimScientificName: "test-name-1"
+                  verbatimScientificName: "test-name-1",
+                  isPrimary: true
                 },
                 {
                   verbatimDeterminer: "test-agent-2",
-                  verbatimScientificName: "test-name-2"
+                  verbatimScientificName: "test-name-2",
+                  isPrimary: false
                 },
                 {
                   verbatimDeterminer: "test-agent-3",
-                  verbatimScientificName: "test-name-3"
+                  verbatimScientificName: "test-name-3",
+                  isPrimary: false
                 }
               ],
               type: "material-sample"
@@ -689,5 +695,45 @@ describe("Material Sample Edit Page", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
+  });
+
+  it("Creates the next material sample based on the original sample's values.", () => {
+    expect(
+      nextSampleInitialValues({
+        id: "123",
+        type: "material-sample",
+        createdBy: "Mat",
+        createdOn: "2020-05-04",
+        materialSampleName: "MY-SAMPLE-001"
+      })
+    ).toEqual({
+      // Omits id/createdBy/createdOn, increments the name:
+      type: "material-sample",
+      materialSampleName: "MY-SAMPLE-002"
+    });
+
+    expect(
+      nextSampleInitialValues({
+        id: "123",
+        type: "material-sample",
+        materialSampleName: "MY-SAMPLE-9"
+      })
+    ).toEqual({
+      // Increments the name:
+      type: "material-sample",
+      materialSampleName: "MY-SAMPLE-10"
+    });
+
+    expect(
+      nextSampleInitialValues({
+        id: "123",
+        type: "material-sample",
+        materialSampleName: "1-MY-SAMPLE"
+      })
+    ).toEqual({
+      // No way to increment the name, so it becomes blank:
+      type: "material-sample",
+      materialSampleName: ""
+    });
   });
 });

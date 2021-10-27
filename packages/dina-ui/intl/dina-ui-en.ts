@@ -93,6 +93,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   convertToElevationMinMax: "Convert to Elevation Min/Max",
   convertToDepthMinMax: "Convert to Depth Min/Max",
   coordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",
+  copyAndCreateNextSample: "Copy & Create Next Sample",
   copyFromParentLabel: "Copy From Parent",
   countryLabel: "Country",
   createAndAssign: "Create & Assign",
@@ -422,6 +423,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   primary: "Primary",
   primaryButton_tooltip:
     "Make this assertion the primary data point when exported. Only one assertion can be primary",
+  primaryDeterminationButton_tooltip:
+    "Make this determination the primary data point when exported. Only one determination can be primary",
   proceedToCreateMetadata: "Proceed to Create Metadata",
   removeAssertionLabel: "Remove this GeoReference",
   removeComponentData: "Remove {component} data",
@@ -442,6 +445,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   rolesPerGroup: "Roles Per Group",
   runWorkflow: "Run Workflow",
   saveAndGoToViewPageButton: "Save & Go To View Page",
+  saveAndCopyToNext: "Save & Copy To Next",
   saveAndCreateNewMaterialSampleButton: "Save & Create New Material Sample",
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
   scheduledActions: "Scheduled Actions",
