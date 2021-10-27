@@ -46,6 +46,8 @@ export interface MaterialSampleAttributes {
 
   hostOrganism?: HostOrganism;
   associations?: MaterialSampleAssociation[];
+
+  association?: MaterialSampleAssociation;
 }
 
 export interface HostOrganism {
