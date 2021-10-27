@@ -221,7 +221,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               storageUnit: { id: null, type: "storage-unit" },
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
-              determination: [],
+              determination: [{ isPrimary: true }],
               organism: null,
               managedAttributes: {},
               relationships: {},
@@ -301,7 +301,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
-              determination: [],
+              determination: [{ isPrimary: true }],
               organism: null,
               managedAttributes: {},
               relationships: {},
@@ -338,7 +338,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     ).toEqual(false);
     expect(
       wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
-    ).toEqual(false);
+    ).toEqual(true);
     expect(
       wrapper
         .find(".enable-scheduled-actions")
@@ -368,7 +368,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               organism: null,
-              determination: [],
+              determination: [{ isPrimary: true }],
 
               relationships: {},
               type: "material-sample"
