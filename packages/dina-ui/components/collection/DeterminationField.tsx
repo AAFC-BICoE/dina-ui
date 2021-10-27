@@ -61,12 +61,11 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
 
   // Open the tab with the Primary determination even if it's not the first one.
   // Defaults to 0 if there's no primary determination.
-  const intialPrimaryDeterminationIndex = clamp(
+  const intialPrimaryDeterminationIndex = Math.max(
+    0,
     (initialValues as Partial<MaterialSample>).determination?.findIndex(
       dtmntn => dtmntn?.isPrimary
-    ) ?? 0,
-    0,
-    Infinity
+    ) ?? 0
   );
 
   const [activeTabIdx, setActiveTabIdx] = useState(
