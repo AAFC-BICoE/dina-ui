@@ -5,18 +5,13 @@ import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import CreatableSelect from "react-select/creatable";
 
 const mockGet = jest.fn(async path => {
-  if (
-    path === "objectstore-api/metadata/25f81de5-bbee-430c-b5fa-71986b70e612"
-  ) {
-    return { data: TEST_METADATA };
-  } else if (path === "objectstore-api/license") {
-    return { data: TEST_LICENSES };
-  } else if (
-    path === "objectstore-api/license/open-government-license-canada"
-  ) {
-    return { data: TEST_LICENSES[0] };
-  } else {
-    return { data: [] };
+  switch (path) {
+    case "objectstore-api/metadata/25f81de5-bbee-430c-b5fa-71986b70e612":
+      return { data: TEST_METADATA };
+    case "objectstore-api/license":
+      return { data: TEST_LICENSES };
+    case "objectstore-api/license/open-government-license-canada":
+      return { data: TEST_LICENSES[0] };
   }
 });
 
@@ -67,6 +62,7 @@ const TEST_LICENSES: PersistedResource<License>[] = [
 ];
 
 const TEST_METADATA: PersistedResource<Metadata> = {
+  acSubtype: "TEST_SUBTYPE",
   dcCreator: {
     displayName: "Mat Poff",
     id: "6e80e42a-bcf6-4062-9db3-946e0f26458f",
@@ -160,6 +156,7 @@ describe("Metadata single record edit page.", () => {
       [
         {
           resource: {
+            acSubtype: "TEST_SUBTYPE",
             acTags: ["new tag 1", "new tag 2"],
             bucket: "testbucket",
             dcCreator: {
