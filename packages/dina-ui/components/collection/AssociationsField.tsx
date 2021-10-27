@@ -7,6 +7,8 @@ import {
 } from "./MaterialSampleAssociationsField";
 import { HostOrganism } from "../../../dina-ui/types/collection-api";
 
+import { MutableRefObject } from "react";
+
 /** Type-safe object with all hostotganism fields. */
 export const HOSTORGANISM_FIELDS_OBJECT: Required<
   Record<keyof HostOrganism, true>
@@ -25,7 +27,13 @@ export const ASSOCIATION_FIELDS_OBJECT = {
 /** All fields of the association type. */
 export const ASSOCIATION_FIELDS = Object.keys(ASSOCIATION_FIELDS_OBJECT);
 
-export function AssociationsField() {
+export interface AssociationsFieldProps {
+  associatedSampleMapRef?: MutableRefObject<Map<string, string>>;
+}
+
+export function AssociationsField({
+  associatedSampleMapRef
+}: AssociationsFieldProps) {
   return (
     <FieldSet
       legend={<DinaMessage id="associationsLegend" />}
@@ -42,7 +50,9 @@ export function AssociationsField() {
           customName="remarks"
         />
       </FieldSet>
-      <MaterialSampleAssociationsField />
+      <MaterialSampleAssociationsField
+        associatedSampleMapRef={associatedSampleMapRef}
+      />
     </FieldSet>
   );
 }

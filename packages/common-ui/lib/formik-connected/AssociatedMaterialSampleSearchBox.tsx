@@ -1,18 +1,22 @@
-import React, { ChangeEvent, RefObject, useRef, useState } from "react";
+import React, { ChangeEvent, MutableRefObject, useRef, useState } from "react";
 import { TextField, TextFieldProps } from "./TextField";
 import classNames from "classnames";
 import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { RiDeleteBinLine } from "react-icons/ri";
+import { MaterialSample } from "../../../dina-ui/types/collection-api/resources/MaterialSample";
+import { FormikContextType } from "formik";
 
 interface AssociatedMaterialSampleSearchBoxProps extends TextFieldProps {
   showSearchAssociatedSampleInit?: boolean;
+  form?: FormikContextType<MaterialSample>;
+  associatedSampleMapRef?: MutableRefObject<Map<string, string>>;
 }
 
 export function AssociatedMaterialSampleSearchBox(
   props: AssociatedMaterialSampleSearchBoxProps
 ) {
-  const { showSearchAssociatedSampleInit } = props;
+  const { showSearchAssociatedSampleInit, associatedSampleMapRef } = props;
   const [showSearchAssociatedSample, setShowSearchAssociatedSample] = useState(
     showSearchAssociatedSampleInit
   );
@@ -69,9 +73,15 @@ export function AssociatedMaterialSampleSearchBox(
 
   const onAssociatedSampleSelected = (sample, onChange) => {
     if (inputRef.current) {
-      inputRef.current.value = sample.id;
+      const sampleId = !!sample.materialSampleName?.length
+        ? sample.materialSampleName
+        : sample.id;
+      inputRef.current.value = sampleId;
+      if (associatedSampleMapRef?.current) {
+        associatedSampleMapRef.current.set(sampleId, sample.id);
+      }
       onChange?.({
-        target: { value: sample.id }
+        target: { value: sampleId }
       } as ChangeEvent<HTMLInputElement>);
     }
   };

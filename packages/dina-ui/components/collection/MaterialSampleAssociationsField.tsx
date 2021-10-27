@@ -12,7 +12,7 @@ import {
 import * as yup from "yup";
 import { isEmpty } from "lodash";
 import { FastField, FormikContextType } from "formik";
-import { Fragment, useState } from "react";
+import { Fragment, useState, MutableRefObject } from "react";
 import { MaterialSampleAssociation } from "../../../dina-ui/types/collection-api/resources/MaterialSample";
 import ReactTable, { CellInfo, Column } from "react-table";
 import React from "react";
@@ -39,10 +39,12 @@ export const associationSchema = yup.object({
 
 export interface MaterialSampleAssociationsFieldProps {
   className?: string;
+  associatedSampleMapRef?: MutableRefObject<Map<string, string>>;
 }
 
 export function MaterialSampleAssociationsField({
-  className
+  className,
+  associatedSampleMapRef
 }: MaterialSampleAssociationsFieldProps) {
   const fieldName = "associations";
 
@@ -157,6 +159,7 @@ export function MaterialSampleAssociationsField({
                 SubComponent={row => (
                   <div className="m-2">
                     <MaterialSampleAssociationSubForm
+                      associatedSampleMapRef={associatedSampleMapRef}
                       associationToEdit={row.original}
                       onSaveAssociation={saveAssociation}
                       onCancelClick={
@@ -173,6 +176,7 @@ export function MaterialSampleAssociationsField({
             {readOnly ? null : !hasAssociations ||
               associationToEdit === "NEW" ? (
               <MaterialSampleAssociationSubForm
+                associatedSampleMapRef={associatedSampleMapRef}
                 onSaveAssociation={saveAssociation}
                 onCancelClick={
                   hasAssociations ? () => setAssociationToEdit(null) : undefined
@@ -198,12 +202,14 @@ export interface MaterialSampleAssociationSubFormProps {
   onSaveAssociation: (association: MaterialSampleAssociation) => Promise<void>;
   onCancelClick?: () => void;
   associationToEdit?: MaterialSampleAssociation;
+  associatedSampleMapRef?: MutableRefObject<Map<string, string>>;
 }
 
 export function MaterialSampleAssociationSubForm({
   onSaveAssociation,
   onCancelClick,
-  associationToEdit
+  associationToEdit,
+  associatedSampleMapRef
 }: MaterialSampleAssociationSubFormProps) {
   const { enabledFields, initialValues, isTemplate } = useDinaFormContext();
 
@@ -291,6 +297,7 @@ export function MaterialSampleAssociationSubForm({
           <AssociatedMaterialSampleSearchBox
             showSearchAssociatedSampleInit={showSearchAssociatedSampleInit}
             {...fieldProps("associatedSample")}
+            associatedSampleMapRef={associatedSampleMapRef}
           />
         </div>
 

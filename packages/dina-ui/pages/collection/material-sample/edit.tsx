@@ -20,7 +20,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
 import { AssociationsField } from "../../../../dina-ui/components/collection/AssociationsField";
-import { ReactNode, useContext, useState } from "react";
+import { ReactNode, useContext, useState, useRef } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
   CollectionSelectField,
@@ -191,6 +191,7 @@ export function MaterialSampleForm({
   )
 }: MaterialSampleFormProps) {
   const { isTemplate, isTemplateRun } = useContext(DinaFormContext) ?? {};
+  const associatedSampleMapRef = useRef(new Map<string, string>());
   const {
     initialValues,
     nestedCollectingEventForm,
@@ -210,7 +211,8 @@ export function MaterialSampleForm({
       collectingEventInitialValues,
       onSaved,
       isTemplate,
-      enabledFields
+      enabledFields,
+      associatedSampleMapRef
     });
 
   // CollectingEvent "id" being enabled in the template enabledFields means that the
@@ -331,7 +333,11 @@ export function MaterialSampleForm({
           {dataComponentState.enablePreparations && <PreparationField />}
           {dataComponentState.enableOrganism && <OrganismStateField />}
           {dataComponentState.enableDetermination && <DeterminationField />}
-          {dataComponentState.enableAssociations && <AssociationsField />}
+          {dataComponentState.enableAssociations && (
+            <AssociationsField
+              associatedSampleMapRef={associatedSampleMapRef}
+            />
+          )}
           {dataComponentState.enableStorage && (
             <FieldSet
               id="storage-section"

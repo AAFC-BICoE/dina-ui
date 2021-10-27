@@ -14,7 +14,8 @@ import {
   SetStateAction,
   useLayoutEffect,
   useRef,
-  useState
+  useState,
+  MutableRefObject
 } from "react";
 import { useCollectingEventQuery, useCollectingEventSave } from ".";
 import { SCHEDULEDACTION_FIELDS } from "..";
@@ -110,6 +111,30 @@ export function useMaterialSampleQuery(id?: string | null) {
             }
           );
         }
+        /* Map associated sample to primary id if there is one for display purpose */
+        if (data.associations) {
+          const associatedMaterialSamples: MaterialSample[] =
+            await bulkGet<MaterialSample>(
+              data.associations.map(
+                assctn => `/material-sample/${assctn.associatedSample}`
+              ),
+              {
+                apiBaseUrl: "/collection-api",
+                returnNullForMissingResource: true
+              }
+            );
+          for (const association of associatedMaterialSamples) {
+            data.associations
+              .filter(assctn => association.id === assctn.associatedSample)
+              .map(
+                assctn =>
+                  (assctn.associatedSample = !!association.materialSampleName
+                    ?.length
+                    ? association.materialSampleName
+                    : association.id)
+              );
+          }
+        }
       }
     }
   );
@@ -144,6 +169,8 @@ export interface UseMaterialSampleSaveParams {
 
   materialSampleAttachmentsConfig?: AllowAttachmentsConfig;
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
+
+  associatedSampleMapRef?: MutableRefObject<Map<string, string>>;
 }
 
 export function useMaterialSampleSave({
@@ -156,7 +183,8 @@ export function useMaterialSampleSave({
   materialSampleAttachmentsConfig,
   collectingEventAttachmentsConfig,
   colEventTemplateInitialValues,
-  materialSampleTemplateInitialValues
+  materialSampleTemplateInitialValues,
+  associatedSampleMapRef
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
@@ -521,6 +549,17 @@ export function useMaterialSampleSave({
           );
         }
       }
+    }
+    // convert associated material sample from primary id to uuid for saving
+    if (materialSampleInput.associations) {
+      materialSampleInput.associations.map(assctn => {
+        if (
+          !!associatedSampleMapRef?.current.get(assctn.associatedSample as any)
+        )
+          assctn.associatedSample = associatedSampleMapRef?.current.get(
+            assctn.associatedSample as any
+          );
+      });
     }
     // Save the MaterialSample:
     const [savedMaterialSample] = await save(

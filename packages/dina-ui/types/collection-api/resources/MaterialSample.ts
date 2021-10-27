@@ -54,7 +54,7 @@ export interface HostOrganism {
 }
 
 export interface MaterialSampleAssociation {
-  associatedSample?: MaterialSample;
+  associatedSample?: string;
   associationType?: string;
   remarks?: string;
 }
