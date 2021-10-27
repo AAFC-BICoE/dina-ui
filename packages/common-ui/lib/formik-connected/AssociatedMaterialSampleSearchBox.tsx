@@ -110,6 +110,7 @@ export function AssociatedMaterialSampleSearchBox(
                   <input
                     {...inputProps}
                     type="text"
+                    disabled={true}
                     className={
                       "flex-md-grow-1 form-control associatedSampleInput"
                     }
