@@ -8,7 +8,6 @@ const config: Config.InitialOptions = {
     "/coverage/",
     "/build/",
     "/dina-ui/out/",
-    "/babel.config.js",
     "/jest.config.ts",
     "/jest.setup.js",
     "/next.config.js"
@@ -22,7 +21,20 @@ const config: Config.InitialOptions = {
   testPathIgnorePatterns: ["/.next/", "/node_modules/"],
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|js?|tsx?|ts?)$",
   transform: {
-    "^.+\\.tsx?$": "babel-jest"
+    "^.+\\.tsx?$": [
+      "@swc/jest",
+      {
+        jsc: {
+          // Disable transform to older ES code:
+          target: "es2022",
+          transform: {
+            react: {
+              runtime: "automatic"
+            }
+          }
+        }
+      }
+    ]
   },
   // Transform our local common-ui package
   transformIgnorePatterns: [`/node_modules/(?!common-ui)`]
