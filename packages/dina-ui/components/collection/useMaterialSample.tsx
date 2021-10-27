@@ -561,6 +561,9 @@ export function useMaterialSampleSave({
           );
       });
     }
+
+    delete materialSampleInput.association;
+
     // Save the MaterialSample:
     const [savedMaterialSample] = await save(
       [
