@@ -71,7 +71,6 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
   const router = useRouter();
 
   const {
-    attachedMetadatasUI,
     collectingEventInitialValues,
     saveCollectingEvent,
     collectingEventFormSchema
@@ -126,7 +125,6 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
         setDefaultVerbatimCoordSys={setDefaultVerbatimCoordSys}
         setDefaultVerbatimSRS={setDefaultVerbatimSRS}
       />
-      <div className="mb-3">{attachedMetadatasUI}</div>
       {buttonBar}
     </DinaForm>
   );

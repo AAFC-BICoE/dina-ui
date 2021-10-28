@@ -212,7 +212,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       ids: valueAsArray.map(it => String(it.id)),
       listPath: model,
       disabled: !valueIsShallowReference
-    }) ?? valueAsArray;
+    }).data ?? valueAsArray;
 
   // Convert the field value to react-select option objects:
   const selectedAsArray = selectedResources.map(resource => {
