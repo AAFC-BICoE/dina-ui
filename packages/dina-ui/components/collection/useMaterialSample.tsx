@@ -598,7 +598,7 @@ export function useMaterialSampleSave({
           promises.push(
             apiClient.get<MaterialSample[]>("collection-api/material-sample", {
               fields: {
-                "material-sample": "id,materialSampleName,barcode"
+                "material-sample": "id,materialSampleName"
               },
               filter: {
                 rsql: `materialSampleName==${assctn.associatedSample}`
@@ -613,7 +613,7 @@ export function useMaterialSampleSave({
       Promise.all(promises).then(async results => {
         materialSampleInput.associations?.map(assctn => {
           // Take the first sample whose sampleName match the one about to sent for save
-          // duplication is not handled be design for now
+          // duplication is not handled by design for now
           results.map(result => {
             if (
               assctn.associatedSample === result.data?.[0]?.materialSampleName
