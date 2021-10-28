@@ -628,8 +628,9 @@ export function useMaterialSampleSave({
         });
         saveAndProceed(materialSampleInput);
       });
+    } else {
+      saveAndProceed(materialSampleInput);
     }
-    saveAndProceed(materialSampleInput);
   }
 
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */

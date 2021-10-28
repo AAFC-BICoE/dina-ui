@@ -55,9 +55,14 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod":
       // Populate the linker table:
       return { data: testCollectionEvent() };
+    case "collection-api/material-sample":
+      return {
+        data: [
+          { id: "1", materialSampleName: "test name", type: "material-sample" }
+        ]
+      };
     case "collection-api/preparation-type":
     case "collection-api/managed-attribute":
-    case "collection-api/material-sample":
     case "collection-api/material-sample-type":
     case "user-api/group":
     case "agent-api/person":
@@ -530,6 +535,119 @@ describe("Material Sample Edit Page", () => {
       wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
     ).toEqual(true);
     expect(wrapper.find("#determination-section").exists()).toEqual(true);
+  });
+
+  it("Renders an existing Material Sample with the Assoication section enabled.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms",
+          associations: [
+            { associatedSample: "test name", associationType: "host" }
+          ]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Assoications are enabled:
+    expect(
+      wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+    expect(wrapper.find("#associations-section").exists()).toEqual(true);
+  });
+
+  it("Save association with uuid mapped correctly for saving.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms",
+          associations: [
+            { associatedSample: "test name", associationType: "host" }
+          ]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Associations are enabled:
+    expect(
+      wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+    expect(wrapper.find("#associations-section").exists()).toEqual(true);
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Saves the Material Sample:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              associations: [
+                {
+                  associatedSample: "1",
+                  associationType: "host"
+                }
+              ],
+              collectingEvent: {
+                id: null,
+                type: "collecting-event"
+              },
+              determination: [],
+              dwcDegreeOfEstablishment: null,
+              id: "333",
+              managedAttributes: {},
+              materialSampleName: "test-ms",
+              organism: null,
+              preparationDate: null,
+              preparationMethod: null,
+              preparationRemarks: null,
+              preparationType: {
+                id: null,
+                type: "preparation-type"
+              },
+              preparedBy: {
+                id: null,
+                type: "person"
+              },
+              relationships: {
+                attachment: {
+                  data: []
+                },
+                preparationAttachment: {
+                  data: []
+                }
+              },
+              storageUnit: {
+                id: null,
+                type: "storage-unit"
+              },
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
   });
 
   it("Renders an existing Material Sample with all toggleable data components disabled.", async () => {
