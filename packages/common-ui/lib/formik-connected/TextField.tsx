@@ -1,5 +1,5 @@
 import { FormikProps } from "formik";
-import { InputHTMLAttributes, RefObject, TextareaHTMLAttributes } from "react";
+import { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
 import TextareaAutosize, {
   TextareaAutosizeProps
 } from "react-textarea-autosize";

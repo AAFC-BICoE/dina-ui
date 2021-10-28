@@ -45,7 +45,7 @@ export interface MaterialSampleAttributes {
 
   scheduledActions?: ScheduledAction[];
 
-  hostOrganism?: HostOrganism;
+  hostOrganism?: HostOrganism | null;
   associations?: MaterialSampleAssociation[];
 
   association?: MaterialSampleAssociation;

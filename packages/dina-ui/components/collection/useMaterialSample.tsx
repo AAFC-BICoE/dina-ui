@@ -7,7 +7,7 @@ import {
   useQuery
 } from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource, PersistedResource } from "kitsu";
+import { InputResource, KitsuResponse } from "kitsu";
 import { cloneDeep, fromPairs, isEmpty, isEqual, pick, toPairs } from "lodash";
 import {
   Dispatch,
@@ -441,7 +441,7 @@ export function useMaterialSampleSave({
   });
 
   async function onSubmit({
-    api: { save },
+    api: { save, apiClient },
     formik,
     submittedValues
   }: DinaFormSubmitParams<InputResource<MaterialSample>>) {
@@ -450,6 +450,20 @@ export function useMaterialSampleSave({
 
     /** Input to submit to the back-end API. */
     const { ...materialSampleInput } = submittedValues;
+
+    async function saveAndProceed(mtrSmplIpt) {
+      // Save the MaterialSample:
+      const [savedMaterialSample] = await save(
+        [
+          {
+            resource: mtrSmplIpt,
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      );
+      await onSaved?.(savedMaterialSample.id);
+    }
 
     // Only persist the preparation fields if the preparations toggle is enabled:
     if (!enablePreparations) {
@@ -562,29 +576,60 @@ export function useMaterialSampleSave({
         }
       }
     }
-    // convert associated material sample from primary id to uuid for saving
-    if (materialSampleInput.associations) {
-      materialSampleInput.associations.map(assctn => {
-        assctn.associatedSample =
-          associatedSampleMapRef?.current.get(assctn.associatedSample as any) ??
-          assctn.associatedSample;
-      });
+
+    if (!enableAssociations) {
+      materialSampleInput.associations = [];
+      materialSampleInput.hostOrganism = null;
     }
 
     delete materialSampleInput.association;
 
-    // Save the MaterialSample:
-    const [savedMaterialSample] = await save(
-      [
-        {
-          resource: materialSampleInput,
-          type: "material-sample"
+    // convert associated material sample from primary id to uuid for saving
+    if (materialSampleInput.associations) {
+      const promises: Promise<KitsuResponse<MaterialSample[], undefined>>[] =
+        [];
+      materialSampleInput.associations?.map(async assctn => {
+        const id = associatedSampleMapRef?.current.get(
+          assctn.associatedSample as any
+        );
+        if (id) {
+          assctn.associatedSample = id;
+        } else {
+          promises.push(
+            apiClient.get<MaterialSample[]>("collection-api/material-sample", {
+              fields: {
+                "material-sample": "id,materialSampleName,barcode"
+              },
+              filter: {
+                rsql: `materialSampleName==${assctn.associatedSample}`
+              },
+              page: { limit: 1000 }
+            })
+          );
         }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
+      });
 
-    await onSaved?.(savedMaterialSample.id);
+      // Set the associatedSample to id if it does not exist in the live map
+      Promise.all(promises).then(async results => {
+        materialSampleInput.associations?.map(assctn => {
+          // Take the first sample whose sampleName match the one about to sent for save
+          // duplication is not handled be design for now
+          results.map(result => {
+            if (
+              assctn.associatedSample === result.data?.[0]?.materialSampleName
+            ) {
+              associatedSampleMapRef?.current.set(
+                assctn.associatedSample as string,
+                result?.data?.[0]?.id
+              );
+              assctn.associatedSample = result?.data?.[0]?.id;
+            }
+          });
+        });
+        saveAndProceed(materialSampleInput);
+      });
+    }
+    saveAndProceed(materialSampleInput);
   }
 
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */

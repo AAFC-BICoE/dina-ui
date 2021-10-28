@@ -169,12 +169,14 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
+              associations: [],
               collectingEvent: {
                 id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
+              hostOrganism: null,
               managedAttributes: {},
               determination: [],
               publiclyReleasable: true, // Default value
@@ -240,12 +242,14 @@ describe("Material Sample Edit Page", () => {
           // New material-sample:
           {
             resource: {
+              associations: [],
               collectingEvent: {
                 id: "1",
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
+              hostOrganism: null,
               managedAttributes: {},
               determination: [],
               organism: null,
@@ -302,6 +306,7 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               id: "1",
+              associations: [],
               type: "material-sample",
               group: "test group",
               materialSampleName: "test-material-sample-id",
@@ -311,6 +316,7 @@ describe("Material Sample Edit Page", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
+              hostOrganism: null,
               determination: [],
               organism: null,
               managedAttributes: {},
@@ -407,6 +413,7 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
+              associations: [],
               collectingEvent: {
                 id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
@@ -421,6 +428,7 @@ describe("Material Sample Edit Page", () => {
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
               determination: [],
+              hostOrganism: null,
               managedAttributes: {},
               organism: null,
               relationships: {
@@ -584,12 +592,14 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
+              associations: [],
               collectingEvent: {
                 id: null,
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
               id: "333",
+              hostOrganism: null,
               managedAttributes: {
                 testAttr: "do the test"
               },
