@@ -1,82 +1,29 @@
-import {
-  BackButton,
-  ButtonBar,
-  DeleteButton,
-  DinaForm,
-  EditButton,
-  withResponse
-} from "common-ui";
-import { WithRouterProps } from "next/dist/client/with-router";
-import Link from "next/link";
-import { withRouter } from "next/router";
-import { Footer, Head, Nav } from "../../../components";
+import { DinaForm } from "common-ui";
+import { ViewPageLayout } from "../../../components";
+import { useCollectingEventQuery } from "../../../components/collection";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
-import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 
-export function CollectingEventDetailsPage({ router }: WithRouterProps) {
-  const { id } = router.query;
-  const { formatMessage } = useDinaIntl();
-
-  const collectingEventQuery = useCollectingEventQuery(id?.toString());
-
-  const buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={id as string}
-        entityLink="/collection/collecting-event"
-        byPassView={true}
-      />
-      <EditButton
-        className="ms-auto"
-        entityId={id as string}
-        entityLink="collection/collecting-event"
-      />
-      <Link href={`/collection/collecting-event/revisions?id=${id}`}>
-        <a className="btn btn-info">
-          <DinaMessage id="revisionsButtonText" />
-        </a>
-      </Link>
-      <DeleteButton
-        className="ms-5"
-        id={id as string}
-        options={{ apiBaseUrl: "/collection-api" }}
-        postDeleteRedirect="/collection/collecting-event/list"
-        type="collecting-event"
-      />
-    </ButtonBar>
-  );
-
+export default function CollectingEventDetailsPage() {
   return (
-    <div>
-      <Head title={formatMessage("collectingEventViewTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
-      {withResponse(collectingEventQuery, ({ data: colEvent }) => {
-        return (
-          <main className="container-fluid">
-            <h1 id="wb-cont">
-              <DinaMessage id="collectingEventViewTitle" />
-            </h1>
-            {buttonBar}
-            <div className="mb-3">
-              <DinaForm<CollectingEvent>
-                initialValues={colEvent}
-                readOnly={true}
-              >
-                <CollectingEventFormLayout />
-              </DinaForm>
-            </div>
-            {buttonBar}
-          </main>
-        );
-      })}
-      <Footer />
-    </div>
+    <ViewPageLayout<CollectingEvent>
+      form={props => (
+        <DinaForm<CollectingEvent> {...props}>
+          <h1 id="wb-cont">
+            <DinaMessage id="collectingEventViewTitle" />
+          </h1>
+          <CollectingEventFormLayout />
+        </DinaForm>
+      )}
+      query={id => ({ path: `collection-api/collecting-event/${id}` })}
+      customQueryHook={id => useCollectingEventQuery(id)}
+      nameField="id"
+      entityLink="/collection/collecting-event"
+      type="collecting-event"
+      apiBaseUrl="/collection-api"
+      mainClass="container-fluid"
+      showRevisionsLink={true}
+    />
   );
 }
-
-export default withRouter(CollectingEventDetailsPage);
