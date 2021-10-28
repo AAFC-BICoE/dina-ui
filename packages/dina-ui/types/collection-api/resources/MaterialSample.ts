@@ -20,6 +20,7 @@ export interface MaterialSampleAttributes {
   createdOn?: string;
   createdBy?: string;
   dwcOtherCatalogNumbers?: string[];
+  preparationMethod?: string | null;
   preparationDate?: string | null;
   preparationRemarks?: string | null;
   description?: string;
@@ -74,6 +75,7 @@ export interface MaterialSampleRelationships {
   materialSampleType?: MaterialSampleType;
   collectingEvent?: CollectingEvent;
   attachment?: ResourceIdentifierObject[];
+  preparationAttachment?: ResourceIdentifierObject[];
   preparationType?: PreparationType;
   preparedBy?: Person;
   parentMaterialSample?: MaterialSample;

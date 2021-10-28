@@ -1,13 +1,13 @@
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ExistingAttachmentsTable } from "./ExistingAttachmentsTable";
 import { TotalAttachmentsIndicator } from "./TotalAttachmentsIndicator";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { FieldSet, useQuery } from "common-ui";
 
 export interface AttachmentReadOnlySectionProps {
   attachmentPath: string;
   detachTotalSelected?: boolean;
-  title?: JSX.Element;
+  title?: ReactNode;
 }
 
 export function AttachmentReadOnlySection({

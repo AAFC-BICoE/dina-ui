@@ -1,6 +1,10 @@
 import { KitsuResource } from "kitsu";
 
-export const ENCODED_RESOURCE_MATCHER = /(\()[^()]*(?=\)$)/;
+/** Matches the {type}/{id} e.g. "person/1111" from "Mat (person/1111)". */
+export const ENCODED_RESOURCE_TYPE_ID_MATCHER = /(\()[^()]*(?=\)$)/;
+
+/** Matches the name e.g. "Mat" from "Mat (person/1111)". */
+export const ENCODED_RESOURCE_NAME_MATCHER = /^(.*)\s\(.*\)$/;
 
 export interface EncodeResourceCellParams {
   label?: string;
@@ -30,7 +34,8 @@ export function decodeResourceCell(
   cellValue: string
 ): Required<KitsuResource> | { id: null } {
   // Get the {type}/{id} identifier from the end of the string if it exists.
-  const identifier = ENCODED_RESOURCE_MATCHER.exec(cellValue)?.[0].substr(1);
+  const identifier =
+    ENCODED_RESOURCE_TYPE_ID_MATCHER.exec(cellValue)?.[0].substr(1);
 
   if (identifier) {
     const [type, id] = identifier.split("/");

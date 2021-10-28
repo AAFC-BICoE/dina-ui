@@ -30,8 +30,8 @@ import {
 } from "../../../dina-ui/types/objectstore-api";
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
 import { HOSTORGANISM_FIELDS } from "./AssociationsField";
+import { AllowAttachmentsConfig } from "../object-store";
 import { DETERMINATION_FIELDS } from "./DeterminationField";
 import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "./MaterialSampleAssociationsField";
 import { ORGANISM_FIELDS } from "./OrganismStateField";
@@ -44,8 +44,20 @@ export function useMaterialSampleQuery(id?: string | null) {
   const materialSampleQuery = useQuery<MaterialSample>(
     {
       path: `collection-api/material-sample/${id}`,
-      include:
-        "collection,collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit,hierarchy,organism,materialSampleChildren,parentMaterialSample"
+      include: [
+        "collection",
+        "collectingEvent",
+        "attachment",
+        "preparationAttachment",
+        "preparationType",
+        "materialSampleType",
+        "preparedBy",
+        "storageUnit",
+        "hierarchy",
+        "organism",
+        "materialSampleChildren",
+        "parentMaterialSample"
+      ].join(",")
     },
     {
       disabled: !id,
@@ -167,7 +179,6 @@ export interface UseMaterialSampleSaveParams {
     collectingEvent?: string[];
   };
 
-  materialSampleAttachmentsConfig?: AllowAttachmentsConfig;
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
 
   associatedSampleMapRef?: MutableRefObject<Map<string, string>>;
@@ -180,7 +191,6 @@ export function useMaterialSampleSave({
   collectingEvtFormRef,
   isTemplate,
   enabledFields,
-  materialSampleAttachmentsConfig,
   collectingEventAttachmentsConfig,
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues,
@@ -394,7 +404,7 @@ export function useMaterialSampleSave({
         }),
     determination: materialSample?.determination?.length
       ? materialSample?.determination
-      : [{}]
+      : [{ isPrimary: true }]
   };
 
   /** Used to get the values of the nested CollectingEvent form. */
@@ -411,27 +421,10 @@ export function useMaterialSampleSave({
   const {
     collectingEventInitialValues: collectingEventHookInitialValues,
     saveCollectingEvent,
-    attachedMetadatasUI: colEventAttachmentsUI,
     collectingEventFormSchema
   } = useCollectingEventSave({
     attachmentsConfig: collectingEventAttachmentsConfig,
-    fetchedCollectingEvent: colEventQuery.response?.data,
-    isTemplate
-  });
-
-  const {
-    attachedMetadatasUI: materialSampleAttachmentsUI,
-    selectedMetadatas
-  } = useAttachmentsModal({
-    initialMetadatas:
-      materialSample?.attachment as PersistedResource<Metadata>[],
-    deps: [materialSample?.id],
-    title: <DinaMessage id="materialSampleAttachments" />,
-    isTemplate,
-    allowAttachmentsConfig: materialSampleAttachmentsConfig,
-    allowNewFieldName: "attachmentsConfig.allowNew",
-    allowExistingFieldName: "attachmentsConfig.allowExisting",
-    id: "material-sample-attachments-section"
+    fetchedCollectingEvent: colEventQuery.response?.data
   });
 
   const collectingEventInitialValues =
@@ -521,13 +514,25 @@ export function useMaterialSampleSave({
     }
 
     // Add attachments if they were selected:
-    if (selectedMetadatas.length) {
-      (materialSampleInput as any).relationships.attachment = {
-        data: selectedMetadatas.map(it => ({ id: it.id, type: it.type }))
-      };
-    }
+    (materialSampleInput as any).relationships.attachment = {
+      data:
+        materialSampleInput.attachment?.map(it => ({
+          id: it.id,
+          type: it.type
+        })) ?? []
+    };
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete materialSampleInput.attachment;
+
+    (materialSampleInput as any).relationships.preparationAttachment = {
+      data:
+        materialSampleInput.preparationAttachment?.map(it => ({
+          id: it.id,
+          type: it.type
+        })) ?? []
+    };
+    // Delete the 'attachment' attribute because it should stay in the relationships field:
+    delete materialSampleInput.preparationAttachment;
 
     // Shuffle the managedAttributesValue to managedAttribute
     materialSampleInput.managedAttributes = {};
@@ -596,8 +601,9 @@ export function useMaterialSampleSave({
       readOnly={isTemplate ? !!colEventId : false}
       enabledFields={enabledFields?.collectingEvent}
     >
-      <CollectingEventFormLayout />
-      <div className="mb-3">{colEventAttachmentsUI}</div>
+      <CollectingEventFormLayout
+        attachmentsConfig={collectingEventAttachmentsConfig}
+      />
     </DinaForm>
   );
 
@@ -608,7 +614,6 @@ export function useMaterialSampleSave({
     colEventId,
     setColEventId,
     colEventQuery,
-    materialSampleAttachmentsUI,
     onSubmit,
     loading
   };

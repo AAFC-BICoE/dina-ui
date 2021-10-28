@@ -2,114 +2,111 @@ import {
   CheckBoxWithoutWrapper,
   FieldHeader,
   FieldSet,
-  useApiClient,
+  LoadingSpinner,
+  useBulkGet,
+  useDinaFormContext,
   useModal,
   useQuery
 } from "common-ui";
-import { uniqBy, isArray } from "lodash";
-import { PersistedResource } from "kitsu";
-import { useEffect, useState } from "react";
+import { FastField } from "formik";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
+import { ReactNode } from "react";
 import ReactTable from "react-table";
+import { AllowAttachmentsConfig, AttachmentSection } from "..";
+import { AttachmentReadOnlySection } from "./AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
-import { AllowAttachmentsConfig, AttachmentSection } from "./AttachmentSection";
 
-export interface AttachmentsModalParams {
-  /** Pre-existing metadata attachments. */
-  initialMetadatas?: PersistedResource<Metadata>[];
-
-  /** Dependencies for re-initializing the attachment list. */
-  deps: any[];
-
-  title?: JSX.Element;
-
-  isTemplate?: boolean;
-
-  /** Manually set whether new/existing attachments can be added. */
-  allowAttachmentsConfig?: AllowAttachmentsConfig;
-
+export interface AttachmentsFieldProps {
+  name: string;
+  id?: string;
+  title?: ReactNode;
   allowNewFieldName?: string;
   allowExistingFieldName?: string;
-  /** fieldset id */
-  id?: string;
-  index?: string;
+  /** Manually set whether new/existing attachments can be added. By default allow both. */
+  allowAttachmentsConfig?: AllowAttachmentsConfig;
+  /** Attachment API path for the read-only view. */
+  attachmentPath: string;
 }
 
-export function useAttachmentsModal({
-  initialMetadatas = [],
-  deps,
-  title,
-  isTemplate,
-  allowNewFieldName,
-  allowExistingFieldName,
-  id,
-  index,
-  allowAttachmentsConfig = { allowExisting: true, allowNew: true }
-}: AttachmentsModalParams) {
-  const { closeModal, openModal } = useModal();
-  const { bulkGet } = useApiClient();
+export function AttachmentsField(props: AttachmentsFieldProps) {
+  const { readOnly } = useDinaFormContext();
 
-  const initSelectedMetadatas = !!index
-    ? new Map().set(index, initialMetadatas)
-    : initialMetadatas;
+  return readOnly ? (
+    <AttachmentReadOnlySection
+      attachmentPath={props.attachmentPath}
+      detachTotalSelected={true}
+      title={props.title}
+    />
+  ) : (
+    <FastField name={props.name}>
+      {({ field: { value }, form }) => {
+        const metadatas =
+          (value as ResourceIdentifierObject[] | undefined) ?? [];
 
-  const [selectedMetadatas, setSelectedMetadatas] = useState<any>(
-    initSelectedMetadatas
+        return (
+          <AttachmentsEditor
+            {...props}
+            value={metadatas}
+            onChange={newMetadatas =>
+              form.setFieldValue(props.name, newMetadatas)
+            }
+          />
+        );
+      }}
+    </FastField>
   );
-  useEffect(() => {
-    setSelectedMetadatas(initSelectedMetadatas);
-  }, deps);
+}
+
+export interface AttachmentsEditorProps extends AttachmentsFieldProps {
+  value: ResourceIdentifierObject[];
+  onChange: (newMetadatas: ResourceIdentifierObject[]) => void;
+}
+
+export function AttachmentsEditor({
+  value,
+  onChange,
+  id,
+  title,
+  allowExistingFieldName,
+  allowNewFieldName,
+  allowAttachmentsConfig = { allowExisting: true, allowNew: true }
+}: AttachmentsEditorProps) {
+  const { isTemplate } = useDinaFormContext();
+  const { formatMessage } = useDinaIntl();
+  const { closeModal, openModal } = useModal();
 
   // Just check if the object-store is up:
-  const { error } = useQuery<[]>({ path: "objectstore-api/metadata" });
+  const { error: objectStoreError } = useQuery<[]>({
+    path: "objectstore-api/metadata"
+  });
 
-  const { formatMessage } = useDinaIntl();
+  const { data: metadatas, loading } = useBulkGet<Metadata>({
+    ids: value.map(it => it.id),
+    listPath: "objectstore-api/metadata"
+  });
 
-  async function addAttachedMetadatas(metadataIds: string[]) {
-    const metadatas = await bulkGet<Metadata>(
-      metadataIds.map(mId => `/metadata/${mId}`),
-      { apiBaseUrl: "/objectstore-api" }
-    );
-
-    // Add the selected Metadatas to the array, making sure there are no duplicates:
-    setSelectedMetadatas(current =>
-      !!index
-        ? current.set(
-            index,
-            uniqBy(
-              [...(current.get(index) ?? []), ...metadatas],
-              metadata => metadata.id
-            )
-          )
-        : uniqBy([...current, ...metadatas], metadata => metadata.id)
-    );
-
+  async function addAttachedMetadatas(newIds: string[]) {
+    onChange([...value, ...newIds.map(it => ({ id: it, type: "metadata" }))]);
     closeModal();
   }
 
-  async function removeMetadata(mId: string) {
-    // Remove the selected Metadata from the array:
-    setSelectedMetadatas(current =>
-      !!index
-        ? current.set(
-            index,
-            current.get(index).filter(metadata => metadata.id !== mId)
-          )
-        : current.filter(metadata => metadata.id !== mId)
-    );
+  function removeMetadata(removedId: string) {
+    const newMetadatas = value.filter(it => it.id !== removedId);
+    onChange(newMetadatas);
   }
 
   function openAttachmentsModal() {
     openModal(
       <div className="modal-content">
         <style>{`
-        .modal-dialog {
-          max-width: calc(100vw - 3rem);
-        }
-        .ht_master .wtHolder {
-          height: 0% !important;
-        }
-      `}</style>
+          .modal-dialog {
+            max-width: calc(100vw - 3rem);
+          }
+          .ht_master .wtHolder {
+            height: 0% !important;
+          }
+        `}</style>
         <div className="modal-header">
           <button className="btn btn-dark" onClick={closeModal}>
             <DinaMessage id="cancelButtonText" />
@@ -129,27 +126,23 @@ export function useAttachmentsModal({
   const addingAttachmentsDisabled =
     !allowAttachmentsConfig?.allowExisting && !allowAttachmentsConfig?.allowNew;
 
-  const selectedMetasLen = !!index
-    ? selectedMetadatas.get(index)
-      ? selectedMetadatas.get(index).length
-      : 0
-    : selectedMetadatas.length;
-
-  const attachedMetadatasUI = (
+  return (
     <FieldSet
       id={id}
       legend={
         <>
-          {title ?? "Attachments"} {!isTemplate ? `(${selectedMetasLen})` : ""}
+          {title ?? "Attachments"} {!isTemplate ? `(${value.length})` : ""}
         </>
       }
     >
-      {!isTemplate ? (
-        error ? (
+      {loading ? (
+        <LoadingSpinner loading={true} />
+      ) : !isTemplate ? (
+        objectStoreError ? (
           <DinaMessage id="objectStoreDataUnavailable" />
         ) : (
           <>
-            {selectedMetasLen ? (
+            {value.length ? (
               <div className="mb-3">
                 <ReactTable
                   columns={[
@@ -166,7 +159,7 @@ export function useAttachmentsModal({
                       Header: <FieldHeader name={formatMessage("remove")} />,
                       Cell: ({ original: { id: mId } }) => (
                         <button
-                          className="btn btn-dark"
+                          className="btn btn-dark remove-attachment"
                           onClick={() => removeMetadata(mId)}
                           type="button"
                         >
@@ -175,16 +168,14 @@ export function useAttachmentsModal({
                       )
                     }
                   ]}
-                  data={
-                    !!index ? selectedMetadatas.get(index) : selectedMetadatas
-                  }
-                  minRows={selectedMetasLen}
+                  data={metadatas}
+                  minRows={value.length}
                   showPagination={false}
                 />
               </div>
             ) : null}
             <button
-              className="btn btn-primary mb-3"
+              className="btn btn-primary add-attachments mb-3"
               type="button"
               onClick={openAttachmentsModal}
               style={{ width: "10rem" }}
@@ -214,11 +205,4 @@ export function useAttachmentsModal({
       )}
     </FieldSet>
   );
-
-  return {
-    addAttachedMetadatas,
-    attachedMetadatasUI,
-    removeMetadata,
-    selectedMetadatas
-  };
 }

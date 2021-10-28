@@ -153,8 +153,12 @@ function useWorkflowMaterialSampleInitialValues(
       actionDefinition.formTemplates.MATERIAL_SAMPLE?.templateFields
     );
 
+    /* If no template entrry for determination or there is only one determination, make it primary
+     * same as georeference assertion */
     if (!materialSampleInitialValues.determination) {
-      materialSampleInitialValues.determination = [{}];
+      materialSampleInitialValues.determination = [{ isPrimary: true }];
+    } else if (materialSampleInitialValues.determination.length === 1) {
+      materialSampleInitialValues.determination[0].isPrimary = true;
     }
 
     const collectingEvent = getInitialValuesFromTemplateFields(

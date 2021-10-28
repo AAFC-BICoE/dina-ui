@@ -14,6 +14,7 @@ import React, {
   useState
 } from "react";
 import AutoSuggest, { InputProps } from "react-autosuggest";
+import { useIntl } from "react-intl";
 import { useDebounce } from "use-debounce";
 import { OnFormikSubmit } from "./safeSubmit";
 
@@ -86,6 +87,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   ...inputProps
 }: InputHTMLAttributes<any> & AutoSuggestConfig<T>) {
   const formik = useFormikContext<any>();
+  const { formatMessage } = useIntl();
 
   const [searchValue, setSearchValue] = useState("");
   const [debouncedSearchValue] = timeoutMs
@@ -93,7 +95,12 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     : [searchValue];
 
   const { loading, response } = useQuery<T[]>(
-    query?.(debouncedSearchValue, formik) as any,
+    {
+      path: "",
+      // Default newest first:
+      sort: "-createdOn",
+      ...query?.(debouncedSearchValue, formik)
+    },
     {
       // Don't show results when the search is empty:
       disabled:
@@ -160,7 +167,10 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
           shouldRenderSuggestions={
             alwaysShowSuggestions ? () => !!alwaysShowSuggestions : undefined
           }
-          inputProps={inputProps as InputProps<any>}
+          inputProps={{
+            ...(inputProps as InputProps<any>),
+            placeholder: formatMessage({ id: "typeHereToSearch" })
+          }}
           theme={{
             suggestionsList: "list-group",
             suggestion: "list-group-item",

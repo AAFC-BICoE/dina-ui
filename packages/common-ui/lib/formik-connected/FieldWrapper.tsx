@@ -56,6 +56,9 @@ export interface LabelWrapperParams {
    * to "templateCheckboxes['srcAdminLevels[0]']".
    */
   templateCheckboxFieldName?: string;
+
+  /** Override FastField's default shouldComponentUpdate */
+  shouldUpdate?: (nextProps: LabelWrapperParams, props: {}) => boolean;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -96,7 +99,8 @@ export function FieldWrapper({
   tooltipLink,
   tooltipLinkText,
   templateCheckboxFieldName,
-  removeLabelTag
+  removeLabelTag,
+  shouldUpdate
 }: FieldWrapperProps) {
   const { horizontal, readOnly, isTemplate, enabledFields } =
     useDinaFormContext();
@@ -135,7 +139,7 @@ export function FieldWrapper({
 
   const fieldWrapperInternal = (
     <div className={valueClass} style={{ minHeight: "25px", cursor: "auto" }}>
-      <FastField name={name}>
+      <FastField name={name} shouldUpdate={shouldUpdate}>
         {({ field: { value }, form, meta: { error } }) => (
           <>
             {readOnly || !children

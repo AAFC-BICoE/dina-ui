@@ -63,7 +63,11 @@ describe("SangerPcrBatchStep component", () => {
       createdBy: "test-user",
       id: "11111111-1111-1111-1111-111111111111",
       name: "test-batch",
-      relationships: {},
+      relationships: {
+        attachment: {
+          data: []
+        }
+      },
       type: "pcr-batch"
     });
   });
@@ -103,7 +107,11 @@ describe("SangerPcrBatchStep component", () => {
       id: "11111111-1111-1111-1111-111111111111",
       name: "test-batch",
       objective: "test-objective",
-      relationships: {},
+      relationships: {
+        attachment: {
+          data: []
+        }
+      },
       type: "pcr-batch"
     });
 
