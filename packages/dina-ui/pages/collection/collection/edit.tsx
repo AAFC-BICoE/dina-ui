@@ -44,8 +44,11 @@ export default function CollectionEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage(title)} />
-      <Nav />
+      <Head title={formatMessage(title)}
+						lang={formatMessage("languageOfPage")}
+						creator={formatMessage("agricultureCanada")}
+						subject={formatMessage("subjectTermsForPage")} />
+			<Nav />
       <main className="container">
         {id ? (
           withResponse(collectionQuery, ({ data }) => (

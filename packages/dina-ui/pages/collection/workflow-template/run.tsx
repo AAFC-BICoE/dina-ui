@@ -48,7 +48,12 @@ export default function CreateMaterialSampleFromWorkflowPage() {
 
   return (
     <div>
-      <Head title={pageTitle} />
+      <Head
+        title={pageTitle}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <div className="container-fluid">
         <h1 id="wb-cont">{pageTitle}</h1>
@@ -147,8 +152,12 @@ function useWorkflowMaterialSampleInitialValues(
       actionDefinition.formTemplates.MATERIAL_SAMPLE?.templateFields
     );
 
+    /* If no template entrry for determination or there is only one determination, make it primary
+     * same as georeference assertion */
     if (!materialSampleInitialValues.determination) {
-      materialSampleInitialValues.determination = [{}];
+      materialSampleInitialValues.determination = [{ isPrimary: true }];
+    } else if (materialSampleInitialValues.determination.length === 1) {
+      materialSampleInitialValues.determination[0].isPrimary = true;
     }
 
     const collectingEvent = getInitialValuesFromTemplateFields(

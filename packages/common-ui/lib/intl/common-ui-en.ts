@@ -9,6 +9,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   actions: "Actions",
   add: "Add",
   addNew: "Add New",
+  agricultureCanada: "Agriculture and Agri-Food Canada",
   areYouSure: "Are you sure?",
   attributeLabel: "Attribute",
   autoFillGeoSuggestLabel:
@@ -21,6 +22,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
     "Check this header box to check all visible items in this page.",
   closeButtonText: "Close",
   configureLabel: "Configure",
+  created: "created",
   createNew: "Create New",
   date: "Date",
   deleteAllButtonText: "Delete All",
@@ -58,6 +60,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
     "This button shows some suggested geo-locations based on what you've typed into the field.",
   jumpToPage: "jump to page",
   rowsPerPage: "rows per page",
+  languageOfPage: "eng",
   loadingText: "Loading...",
   loggedInAsUser: "Logged in as:",
   logoutBtn: "Logout",
@@ -92,6 +95,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   sourceText: "Source Text",
   startLabel: "Start",
   stepLabel: "Step",
+  subjectTermsForPage:
+    "government information, scientific information, scientific research",
   submitBtnText: "Save",
   tableTotalCount: "Total matched records: {totalCount}",
   targetField: "Target Field",

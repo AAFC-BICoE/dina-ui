@@ -26,7 +26,10 @@ export default function CollectingEventRevisionListPage() {
 
     return (
       <>
-        <Head title={pageTitle} />
+        <Head title={pageTitle} 
+						  lang={formatMessage("languageOfPage")} 
+						  creator={formatMessage("agricultureCanada")}
+						  subject={formatMessage("subjectTermsForPage")} />
         <Nav />
         <main className="container-fluid">
           <h1 id="wb-cont">{pageTitle}</h1>

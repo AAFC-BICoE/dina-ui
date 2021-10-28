@@ -1,27 +1,29 @@
 import {
+  AutoSuggestTextField,
   BackButton,
   ButtonBar,
   DinaForm,
   DinaFormContext,
   DinaFormSection,
   FieldSet,
+  filterBy,
   FormikButton,
   LoadingSpinner,
+  ResourceSelectField,
   StringArrayField,
   SubmitButton,
   TextField,
-  withResponse,
-  ResourceSelectField,
-  filterBy,
-  AutoSuggestTextField
+  withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
+import { padStart } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
-import { ReactNode, useContext } from "react";
+import { ReactNode, useContext, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
 import {
+  AttachmentsField,
   CollectionSelectField,
   Footer,
   GroupSelectField,
@@ -39,6 +41,7 @@ import {
 } from "../../../components/collection";
 import { DeterminationField } from "../../../components/collection/DeterminationField";
 import { PreparationField } from "../../../components/collection/PreparationField";
+import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import {
   useMaterialSampleQuery,
   useMaterialSampleSave
@@ -53,37 +56,102 @@ import {
   Vocabulary
 } from "../../../types/collection-api";
 
+export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
+
 export default function MaterialSampleEditPage() {
   const router = useRouter();
-  const {
-    query: { id }
-  } = router;
+
+  const id = router.query.id?.toString();
+  const copyFromId = router.query.copyFromId?.toString();
+
   const { formatMessage } = useDinaIntl();
-  const materialSampleQuery = useMaterialSampleQuery(id as any);
+
+  const materialSampleQuery = useMaterialSampleQuery(id);
+  const copyFromQuery = useMaterialSampleQuery(copyFromId);
+
+  /** The page to redirect to after saving. */
+  const [saveRedirect, setSaveRedirect] = useState<PostSaveRedirect>("VIEW");
 
   async function moveToViewPage(savedId: string) {
     await router.push(`/collection/material-sample/view?id=${savedId}`);
   }
 
+  async function moveToNextSamplePage(savedId: string) {
+    await router.push(`/collection/material-sample/edit?copyFromId=${savedId}`);
+  }
+
   const title = id ? "editMaterialSampleTitle" : "addMaterialSampleTitle";
+
+  const sampleFormProps = {
+    buttonBar: (
+      <ButtonBar>
+        <BackButton
+          className="me-auto"
+          entityId={id}
+          entityLink="/collection/material-sample"
+        />
+        {!id && (
+          <SubmitButton
+            buttonProps={() => ({
+              style: { width: "12rem" },
+              onClick: () => setSaveRedirect("CREATE_NEXT")
+            })}
+          >
+            <DinaMessage id="saveAndCopyToNext" />
+          </SubmitButton>
+        )}
+        <SubmitButton
+          buttonProps={() => ({ onClick: () => setSaveRedirect("VIEW") })}
+        />
+      </ButtonBar>
+    ),
+    // On save either redirect to the view page or create the next sample with the same values:
+    onSaved:
+      saveRedirect === "CREATE_NEXT" ? moveToNextSamplePage : moveToViewPage
+  };
 
   return (
     <div>
-      <Head title={formatMessage(title)} />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
+        {!id &&
+          !!copyFromId &&
+          withResponse(copyFromQuery, ({ data: originalSample }) => (
+            <SaveAndCopyToNextSuccessAlert
+              id={copyFromId}
+              displayName={
+                !!originalSample.materialSampleName?.length
+                  ? originalSample.materialSampleName
+                  : copyFromId
+              }
+              entityPath={"collection/material-sample"}
+            />
+          ))}
         <h1 id="wb-cont">
           <DinaMessage id={title} />
         </h1>
         {id ? (
-          withResponse(materialSampleQuery, ({ data }) => (
-            <MaterialSampleForm
-              materialSample={data as any}
-              onSaved={moveToViewPage}
-            />
+          withResponse(materialSampleQuery, ({ data: sample }) => (
+            <MaterialSampleForm {...sampleFormProps} materialSample={sample} />
           ))
+        ) : copyFromId ? (
+          withResponse(copyFromQuery, ({ data: originalSample }) => {
+            const initialValues = nextSampleInitialValues(originalSample);
+            return (
+              <MaterialSampleForm
+                {...sampleFormProps}
+                materialSample={initialValues}
+              />
+            );
+          })
         ) : (
-          <MaterialSampleForm onSaved={moveToViewPage} />
+          <MaterialSampleForm {...sampleFormProps} />
         )}
       </main>
       <Footer />
@@ -146,13 +214,11 @@ export function MaterialSampleForm({
     setColEventId,
     colEventQuery,
     onSubmit,
-    materialSampleAttachmentsUI,
     loading
   } =
     materialSampleSaveHook ??
     useMaterialSampleSave({
       collectingEventAttachmentsConfig: attachmentsConfig?.collectingEvent,
-      materialSampleAttachmentsConfig: attachmentsConfig?.materialSample,
       materialSample,
       collectingEventInitialValues,
       onSaved,
@@ -275,7 +341,12 @@ export function MaterialSampleForm({
               </Tabs>
             </FieldSet>
           )}
-          {dataComponentState.enablePreparations && <PreparationField />}
+          {dataComponentState.enablePreparations && (
+            <PreparationField
+              // Use the same attachments config for preparations as the Material Sample:
+              attachmentsConfig={attachmentsConfig?.materialSample}
+            />
+          )}
           {dataComponentState.enableOrganism && <OrganismStateField />}
           {dataComponentState.enableDetermination && <DeterminationField />}
           {dataComponentState.enableStorage && (
@@ -311,7 +382,15 @@ export function MaterialSampleForm({
               </DinaFormSection>
             </FieldSet>
           )}
-          {materialSampleAttachmentsUI}
+          <AttachmentsField
+            name="attachment"
+            title={<DinaMessage id="materialSampleAttachments" />}
+            id="material-sample-attachments-section"
+            allowNewFieldName="attachmentsConfig.allowNew"
+            allowExistingFieldName="attachmentsConfig.allowExisting"
+            allowAttachmentsConfig={attachmentsConfig?.materialSample}
+            attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
+          />
         </div>
       </div>
     </div>
@@ -470,4 +549,47 @@ export function CollectingEventBriefDetails({
       </div>
     </DinaForm>
   );
+}
+
+/** Calculates the next sample name based on the previous name's suffix. */
+export function nextSampleName(previousName?: string | null): string {
+  if (!previousName) {
+    return "";
+  }
+
+  const originalNumberSuffix = /\d+$/.exec(previousName)?.[0];
+
+  if (!originalNumberSuffix) {
+    return "";
+  }
+
+  const suffixLength = originalNumberSuffix.length;
+  const nextNumberSuffix = padStart(
+    (Number(originalNumberSuffix) + 1).toString(),
+    suffixLength,
+    "0"
+  );
+  const newMaterialSampleName = nextNumberSuffix
+    ? previousName.replace(/\d+$/, nextNumberSuffix)
+    : previousName;
+
+  return newMaterialSampleName;
+}
+
+export function nextSampleInitialValues(
+  originalSample: PersistedResource<MaterialSample>
+) {
+  // Use the copied sample as a base, omitting some fields that shouldn't be copied:
+  const { id, createdOn, createdBy, materialSampleName, ...copiedValues } =
+    originalSample;
+
+  // Calculate the next suffix:
+  const newMaterialSampleName = nextSampleName(materialSampleName);
+
+  const initialValues = {
+    ...copiedValues,
+    materialSampleName: newMaterialSampleName
+  };
+
+  return initialValues;
 }

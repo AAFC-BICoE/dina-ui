@@ -22,8 +22,11 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("protocolViewTitle")} />
-      <Nav />
+      <Head title={formatMessage("protocolViewTitle")}
+						lang={formatMessage("languageOfPage")} 
+						creator={formatMessage("agricultureCanada")}
+						subject={formatMessage("subjectTermsForPage")} />
+			<Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="seqdb/protocol" />
         <BackToListButton entityLink="/seqdb/protocol" />

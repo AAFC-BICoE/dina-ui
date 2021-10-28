@@ -198,7 +198,11 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                   dwcDecimalLongitude: -75.701452
                 }
               ],
-              relationships: {},
+              relationships: {
+                attachment: {
+                  data: []
+                }
+              },
               // The template's default value:
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
@@ -221,11 +225,18 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               storageUnit: { id: null, type: "storage-unit" },
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
-              determination: [],
+              preparationAttachment: undefined,
+              determination: [{ isPrimary: true }],
               organism: null,
               managedAttributes: {},
-              materialSampleName: "",
-              relationships: {},
+              relationships: {
+                attachment: {
+                  data: []
+                },
+                preparationAttachment: {
+                  data: []
+                }
+              },
               type: "material-sample"
             },
             type: "material-sample"
@@ -302,11 +313,18 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
-              determination: [],
+              preparationAttachment: undefined,
+              determination: [{ isPrimary: true }],
               organism: null,
               managedAttributes: {},
-              materialSampleName: "",
-              relationships: {},
+              relationships: {
+                attachment: {
+                  data: []
+                },
+                preparationAttachment: {
+                  data: []
+                }
+              },
               type: "material-sample"
             },
             type: "material-sample"
@@ -340,7 +358,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     ).toEqual(false);
     expect(
       wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
-    ).toEqual(false);
+    ).toEqual(true);
     expect(
       wrapper
         .find(".enable-scheduled-actions")
@@ -366,14 +384,21 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               },
               storageUnit: { id: null, type: "storage-unit" },
               managedAttributes: {},
-              materialSampleName: "",
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              preparationAttachment: undefined,
               organism: null,
-              determination: [],
+              determination: [{ isPrimary: true }],
 
-              relationships: {},
+              relationships: {
+                attachment: {
+                  data: []
+                },
+                preparationAttachment: {
+                  data: []
+                }
+              },
               type: "material-sample"
             },
             type: "material-sample"

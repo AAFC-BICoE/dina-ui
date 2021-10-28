@@ -4,6 +4,7 @@ import {
   BulkDataEditor,
   decodeResourceCell,
   DinaForm,
+  ENCODED_RESOURCE_NAME_MATCHER,
   encodeResourceCell,
   LoadingSpinner,
   RowChange,
@@ -23,6 +24,7 @@ import {
   License,
   ManagedAttribute,
   Metadata,
+  ObjectSubtype,
   Person
 } from "../../../types/objectstore-api";
 import { ObjectUpload } from "../../../types/objectstore-api/resources/ObjectUpload";
@@ -49,6 +51,7 @@ export interface BulkMetadataEditRow {
   acTags: string;
   dcCreator: string;
   license: string;
+  acSubtype: string;
   metadata: Metadata;
 
   /** Included in the row data for new Metadata records. */
@@ -82,9 +85,8 @@ export function BulkMetadataEditor({
   async function loadData() {
     const metadatas: Metadata[] = [];
     // tslint:disable-next-line
-    let objectUploads:
-      | PersistedResource<ObjectUpload>[]
-      | undefined = undefined;
+    let objectUploads: PersistedResource<ObjectUpload>[] | undefined =
+      undefined;
 
     // When editing existing Metadatas:
     if (metadataIds) {
@@ -183,6 +185,7 @@ export function BulkMetadataEditor({
 
           return {
             acTags: metadata.acTags?.join(", ") ?? "",
+            acSubtype: metadata.acSubtype ?? "",
             dcCreator: encodeResourceCell(dcCreator, {
               label: dcCreator?.displayName
             }),
@@ -229,7 +232,7 @@ export function BulkMetadataEditor({
     const editedMetadatas = await Promise.all(
       changes.map<Promise<SaveArgs<Metadata>>>(async row => {
         const {
-          changes: { acTags, dcCreator, license, metadata },
+          changes: { acTags, acSubtype, dcCreator, license, metadata },
           original: {
             metadata: { id, type }
           }
@@ -248,6 +251,12 @@ export function BulkMetadataEditor({
             id: decodeResourceCell(dcCreator).id as any,
             type: "person"
           };
+        }
+
+        if (acSubtype !== undefined) {
+          const subtypeName =
+            ENCODED_RESOURCE_NAME_MATCHER.exec(acSubtype)?.[1] ?? "";
+          metadataEdit.acSubtype = subtypeName;
         }
 
         if (acTags !== undefined) {
@@ -392,6 +401,18 @@ export function useMetadataBuiltInAttributeColumns(): HotColumnProps[] {
       title: formatMessage("field_dcType"),
       type: "dropdown"
     },
+    resourceSelectCell<ObjectSubtype>(
+      {
+        filter: input => ({ rsql: `acSubtype==${input}*` }),
+        label: ost => ost.acSubtype,
+        model: "objectstore-api/object-subtype",
+        type: "object-subtype"
+      },
+      {
+        data: "acSubtype",
+        title: formatMessage("field_acSubtype")
+      }
+    ),
     {
       data: "metadata.acCaption",
       title: formatMessage("field_acCaption")
@@ -408,7 +429,7 @@ export function useMetadataBuiltInAttributeColumns(): HotColumnProps[] {
     },
     resourceSelectCell<Person>(
       {
-        filter: input => ({ rsql: `displayName==*${input}*` }),
+        filter: input => ({ rsql: `displayName==${input}*` }),
         label: person => person.displayName,
         model: "agent-api/person",
         type: "person"

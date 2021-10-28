@@ -21,6 +21,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addIdentifier: "Ajouter un identifiant",
   addInstitutionTitle: "Ajouter un établissement",
   addManagedAttributeButtonText: "Ajouter un nouvel attribut géré",
+  addManagedAttributeTitle: "Ajouter un nouvel attribut géré",
   addMaterialSampleTitle: "Ajouter un échantillon de matériau",
   addMaterialSampleTypeTitle: "Ajouter un type d’échantillon de matière",
   addNewChildStorageUnit: "Ajouter une nouvelle unité de stockage pour enfant",
@@ -129,6 +130,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   editCollectionTitle: "Modifier la collection",
   editDinaUserTitle: "Modifier l’utilisateur",
   editInstitutionTitle: "Modifier l’établissement",
+  editManagedAttributeTitle: "Modifier l’attribut géré",
   editMaterialSampleTitle: "Modifier l’échantillon de matériaux",
   editMaterialSampleTypeTitle: "Modifier le type d’échantillon de matière",
   editMetadataTitle: "Modifier les métadonnées",
@@ -309,6 +311,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   includeAll: "Inclure tous",
   institution: "Établissement",
   institutionListTitle: "Établissements",
+  languageOfPage: "fra",
   largeImg: "Grande image",
   latLongAutoSetterButton: "Convertir en décimal Lat/Long",
   latitudeValidationError:

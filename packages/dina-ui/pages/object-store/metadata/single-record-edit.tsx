@@ -1,4 +1,5 @@
 import {
+  AutoSuggestTextField,
   BackButton,
   ButtonBar,
   DateField,
@@ -26,7 +27,13 @@ import {
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { License, Metadata, Person } from "../../../types/objectstore-api";
+import {
+  License,
+  Metadata,
+  ObjectSubtype,
+  Person
+} from "../../../types/objectstore-api";
+import { Field } from "formik";
 
 interface SingleMetadataFormProps {
   /** Existing Metadata is required, no new ones are added with this form. */
@@ -45,7 +52,12 @@ export default function MetadataEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage("editMetadataTitle")} />
+      <Head
+        title={formatMessage("editMetadataTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container">
         {id && (
@@ -100,12 +112,17 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
   const { formatMessage, locale } = useDinaIntl();
   const { id } = router.query;
 
-  const PUBLICLY_RELEASABLE_OPTIONS = [
-    { label: formatMessage("true"), value: true },
-    { label: formatMessage("false"), value: false }
-  ];
-
-  const initialValues = { ...metadata };
+  const initialValues = {
+    ...metadata,
+    // Convert the string to an object for the dropdown:
+    acSubtype: metadata.acSubtype
+      ? {
+          id: "id-unavailable",
+          type: "object-subtype",
+          acSubtype: metadata.acSubtype
+        }
+      : null
+  };
 
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
@@ -115,6 +132,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
       // Don't include derivatives in the form submission:
       derivatives,
       license,
+      acSubtype,
       ...metadataValues
     } = submittedValues;
 
@@ -133,7 +151,11 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
       metadataValues.xmpRightsUsageTerms = "";
     }
 
-    const metadataEdit = { ...metadataValues };
+    const metadataEdit = {
+      ...metadataValues,
+      // Convert the object back to a string:
+      acSubtype: acSubtype?.acSubtype ?? null
+    };
 
     // Remove blank managed attribute values from the map:
     const blankValues: any[] = ["", null];
@@ -193,6 +215,25 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
             name="dcType"
             options={DCTYPE_OPTIONS}
           />
+          <Field name="dcType">
+            {({ field: { value: dcType } }) => (
+              <ResourceSelectField<ObjectSubtype>
+                name="acSubtype"
+                className="col-md-6"
+                filter={input => ({
+                  rsql:
+                    `acSubtype=='${input}*'` +
+                    (dcType ? ` and dcType==${dcType}` : "")
+                })}
+                model="objectstore-api/object-subtype"
+                optionLabel={ost => ost.acSubtype}
+                // Force re-render when the dcType changes:
+                shouldUpdate={() => true}
+              />
+            )}
+          </Field>
+        </div>
+        <div className="row">
           <TextField className="col-md-6" name="acCaption" />
         </div>
         <div className="row">

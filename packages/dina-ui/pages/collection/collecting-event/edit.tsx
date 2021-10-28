@@ -32,17 +32,22 @@ export default function CollectingEventEditPage() {
   } = router;
   const { formatMessage } = useDinaIntl();
 
+  const title = id ? "editCollectingEventTitle" : "addCollectingEventTitle"
+
   const collectingEventQuery = useCollectingEventQuery(id?.toString());
 
   return (
     <div>
-      <Head title={formatMessage("editCollectingEventTitle")} />
-      <Nav />
+      <Head title={formatMessage(title)}
+						lang={formatMessage("languageOfPage")} 
+						creator={formatMessage("agricultureCanada")}
+						subject={formatMessage("subjectTermsForPage")} />
+			<Nav />
       <main className="container-fluid">
         {id ? (
           <div>
             <h1 id="wb-cont">
-              <DinaMessage id="editCollectingEventTitle" />
+              <DinaMessage id={title} />
             </h1>
             {withResponse(collectingEventQuery, ({ data }) => (
               <CollectingEventForm collectingEvent={data} />
@@ -51,7 +56,7 @@ export default function CollectingEventEditPage() {
         ) : (
           <div>
             <h1>
-              <DinaMessage id="addCollectingEventTitle" />
+              <DinaMessage id={title} />
             </h1>
             <CollectingEventForm />
           </div>
@@ -66,7 +71,6 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
   const router = useRouter();
 
   const {
-    attachedMetadatasUI,
     collectingEventInitialValues,
     saveCollectingEvent,
     collectingEventFormSchema
@@ -121,7 +125,6 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
         setDefaultVerbatimCoordSys={setDefaultVerbatimCoordSys}
         setDefaultVerbatimSRS={setDefaultVerbatimSRS}
       />
-      <div className="mb-3">{attachedMetadatasUI}</div>
       {buttonBar}
     </DinaForm>
   );
