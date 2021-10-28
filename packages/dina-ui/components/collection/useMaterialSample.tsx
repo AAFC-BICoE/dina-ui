@@ -323,6 +323,13 @@ export function useMaterialSampleSave({
     Boolean(
       hasAssociationsTemplate ||
         materialSample?.associations?.length ||
+        HOSTORGANISM_FIELDS.some(
+          organismFieldName =>
+            materialSample?.hostOrganism?.[`${organismFieldName}`] ||
+            enabledFields?.materialSample?.includes(
+              `hostOrganism.${organismFieldName}`
+            )
+        ) ||
         enabledFields?.materialSample?.some(
           enabledField =>
             enabledField.startsWith("association.") ||

@@ -114,14 +114,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         const hasDetermination = materialSample?.determination?.some(
           det => !isEmpty(det)
         );
-        /* Consider as having association if either host ognaism any field has value or having any non empty association in the array */
-        const hasAssociations = materialSample?.associations?.some(
-          assct =>
-            !isEmpty(assct) ||
-            HOSTORGANISM_FIELDS.some(
-              fieldName => materialSample.hostOrganism?.[fieldName]
-            )
-        );
+
+        /* Consider as having association if either host orgnaism any field has value or having any non empty association in the array */
+        const hasAssociations =
+          materialSample?.associations?.some(assct => !isEmpty(assct)) ||
+          HOSTORGANISM_FIELDS.some(
+            fieldName => materialSample.hostOrganism?.[fieldName]
+          );
 
         return (
           <main className="container-fluid">

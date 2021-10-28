@@ -190,7 +190,7 @@ export function MaterialSampleForm({
     </ButtonBar>
   )
 }: MaterialSampleFormProps) {
-  const { isTemplate, isTemplateRun } = useContext(DinaFormContext) ?? {};
+  const { isTemplate } = useContext(DinaFormContext) ?? {};
   const associatedSampleMapRef = useRef(new Map<string, string>());
   const {
     initialValues,
@@ -386,7 +386,6 @@ export function MaterialSampleForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
       enabledFields={enabledFields?.materialSample}
-      isTemplateRun={isTemplateRun}
     >
       {!initialValues.id && <SetDefaultSampleName />}
       {buttonBar}
