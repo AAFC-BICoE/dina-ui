@@ -585,7 +585,7 @@ export function useMaterialSampleSave({
     delete materialSampleInput.association;
 
     // convert associated material sample from primary id to uuid for saving
-    if (materialSampleInput.associations) {
+    if (!!materialSampleInput.associations?.length) {
       const promises: Promise<KitsuResponse<MaterialSample[], undefined>>[] =
         [];
       materialSampleInput.associations?.map(async assctn => {
