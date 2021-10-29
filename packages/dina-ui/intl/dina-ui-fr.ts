@@ -1,6 +1,7 @@
 import { DINAUI_MESSAGES_ENGLISH } from "./dina-ui-en";
 
 export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
+  actionType: "Type d'action",
   addAnotherAssertion: "Ajouter une autre géoréférence",
   addAnotherDetermination: "Ajouter une autre détermination",
   addAnotherIdentifier: "Ajouter un autre identifiant",
@@ -34,6 +35,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addPreparationTypeTitle: "Ajouter un type de préparation",
   addRule: "Ajouter une règle",
   addRuleSet: "Ajouter un ensemble de règles",
+  addScheduledAction: "Ajouter une action prévue",
   addStorageUnitTitle: "Ajouter une unité de stockage",
   addStorageUnitTypeTitle: "Ajouter un type d’unité de stockage",
   agentsSectionTitle: "Agents",
@@ -42,6 +44,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   appTitle: "DINA",
   assignContentsToNewStorage: "Assigner le contenu au nouveau stockage",
   assignedStorage: "Stockage assigné",
+  assignedTo: "Attribué à",
   assignToStorage: "Assigner au stockage",
   associatedAgent: "Agent associé",
   attachExisting: "Joindre l’existant",
@@ -57,6 +60,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   cataloguedObjectListTitle: "Objets catalogués",
   cataloguedObjectViewTitle: "Voir l’objet catalogué",
   changedProperties: "Modifications",
+  childMaterialSamples: "Sous-échantillons de matière",
   childMaterialSamplesCreatedLabel: "Création d’échantillons de matière enfant",
   closePreviewButtonText: "Fermer la prévisualisation",
   collectingAgentsLegend: "Agents de collecte",
@@ -97,6 +101,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   createSplitWorkflow: "Créer un fractionnement",
   createWorkflowTemplateTitle: "Créer un modèle de flux des travaux",
   customPlaceName: "Nom de lieu personnalisé",
+  dataComponents: "Éléments de données",
   dataEntryLabel: "Saisie de données",
   dataset: "Ensemble de données",
   datasetSearchTooltip:
@@ -174,6 +179,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_collectorGroup_agentsError:
     "Au moins un agent doit être précisé pour le groupe",
   field_collectors: "Collecteurs",
+  field_contact: "Contact",
   field_createdBy: "Créé par",
   field_createdDate: "Date de création",
   field_createdOn: "Créé le",
@@ -237,10 +243,15 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "L’ellipsoïde, le datum géodésique ou le système de référence spatiale (SRS) sur lesquels sont basées les coordonnées données dans verbatimLatitude et verbatimLongitude, ou verbatimCoordinates. La meilleure pratique recommandée est d’utiliser le code EPSG du SRS, s’il est connu. Exemples : EPSG:4326, WGS84, NAD27",
   field_editableBuiltInAttributes: "Attributs intégrés",
   field_editableManagedAttributes: "Attributs gérés",
+  field_endEventDateTime: "Date et heure de l'événement final",
   field_email: "Courriel",
+  field_familyNames: "Noms de famille",
   field_familyNames_tooltip:
     "Nom(s) de famille, y compris les noms de famille composés",
+  field_givenNames: "Prénoms",
   field_givenNames_tooltip: "Prénom et tous les seconds prénoms",
+  field_isInseperable: "Garder les contenus ensemble",
+  field_isInseperable_tooltip: "Les contenus sont inséparables",
   field_license: "Licence",
   field_managedAttributeComponent: "Type de composant des données cibles",
   field_managedAttributeCreatedBy: "Créé par",
@@ -272,6 +283,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_publiclyReleasable_tooltip:
     "Indique si l’objet peut être diffusé publiquement sur une page Web ou sur des portails de données ouvertes.",
   field_qualifier: "Notes du transcripteur",
+  field_remarks: "Remarques",
+  field_startEventDateTime: "Date et heure de l'événement initial",
   field_transcriberRemarks: "Verbatim - Remarques",
   field_type: "Catégorie",
   field_typeStatus: "Type de statut",
@@ -279,12 +292,17 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_verbatimScientificName: "Verbatim - Nom scientifique",
   field_verbatimDate: "Verbatim - Date",
   field_verbatimDeterminer: "Déterminant verbatim",
+  field_verbatimEventDateTime: "Date et heure de l'événement textuel",
+  field_webpage: "Page Web",
   field_xmpMetadataDate: "Date d’application des métadonnées",
   field_xmpMetadataDate_tooltip:
     "Date et heure de la dernière mise à jour du dossier.",
   field_xmpRightsWebStatement: "Licence",
   fileTooBig: "Fichier trop volumineux",
+  filterAttribute: "Attribut filtre",
   filterByGroup: "Filtrer par groupe",
+  filterPredicate: "Prédicat filtre",
+  filterValue: "Valeur filtre",
   footerContactInfo: "Coordonnées du contact ",
   footerPrivacy: "Protection de la vie privée",
   footerTermsAndConditions: "Modalités ",
@@ -302,6 +320,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   georeferencedDateLabel: "Date géoréférencée",
   goToThePreviousStep: "Aller à la prochaine étape",
   governmentOfCanada: "Gouvernement du Canada",
+  governmentOfCanadaSymbol: "Symbole du gouvernement du Canada",
   group: "Groupe",
   groupMustBeSelected: "Un groupe doit être sélectionné ",
   identifierLegend: "Identifiants",
@@ -326,6 +345,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   managedAttributeValueLabel: "Valeur",
   materialSample: "Échantillon de matériaux",
   materialSampleAttachments: "Pièces jointes de l’échantillon de matériaux",
+  materialSampleInfo: "Info sur l'échantillon de matière",
   materialSampleManagedAttributes:
     "Attributs gérés de l’échantillon de matière",
   materialSampleName: "Nom de l’échantillon de matière",
@@ -371,6 +391,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   noResultsFound: "Aucun résultat trouvé.",
   notEditableWhenThereAreChildStorageUnits:
     "Non modifiable lorsqu’il y a des unités de stockage enfant ",
+  notPubliclyReleasable: "Diffusion publique interdite",
   objectListTitle: "Objets stockés",
   objectStoreDataUnavailable:
     "Les données du stockage de l’objet ne sont pas disponibles",
@@ -379,6 +400,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   objectSubtypeListTitle: "Sous-types d’objet",
   objectSubtypeTitle: "Sous-type d’objet",
   openGeographySearchButtonLabel: "Recherche sur Open Street Maps",
+  organismState: "État de l'organisme",
   organizationEnglishNameLabel: "Nom anglais ",
   organizationFrenchNameLabel: "Nom français ",
   organizationListTitle: "Organisations",
@@ -386,6 +408,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   originalFile: "Fichier original",
   originalMaterialSampleLabel: "Échantillon de matière original",
   parentCollectionLabel: "Collection mère",
+  parentMaterialSample: "Échantillon d'origine",
   parentSampleNotFoundLabel: "Échantillon parent non trouvé",
   personListTitle: "Personnes",
   personViewTitle: "Personne",
@@ -424,7 +447,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   saveAndCreateNewMaterialSampleButton:
     "Enregistrer et créer un nouvel échantillon de matière",
   saveGeoReferenceAssertion: "Sauvegarder l’assertion de géoréférence",
+  scheduledActions: "Actions prévues",
   searchButton: "Recherche",
+  searchPreviousTags: "Consulter les précédentes étiquettes",
   searchResults: "Résultats de la recherche ({resultSize})",
   searchStorage: "Recherche dans le stockage",
   selectCollectorGroupLabel:
@@ -460,6 +485,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Date/heure de début de l’événement (AAAA-MM-JJTHH:MM:SS.MMM)",
   startNewRunConfigLabel: "Lancer une nouvelle éxécution",
   stateProvinceLabel: "État/province",
+  status: "Statut",
   storage: "Stockage",
   storageUnitListTitle: "Unités de stockage",
   storageUnitType: "Type d’unité de stockage",
@@ -468,6 +494,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   storagesCreatedByMe: "Stockages créés par moi",
   suffixOptional: "Suffixe (facultatif)",
   switchToActionType: 'Passer à "{actionType}".',
+  tags: "Étiquettes",
   templateNameMandatoryErrorMsg:
     "Veuillez entrer un nom de modèle de flux de travaux.",
   thisWillLoseAllDataEnteredInThisStep:
@@ -479,6 +506,10 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   to: "À",
   tooltipDefaultLinkMessage: "Cliquez ici pour en savoir plus.",
   toponymyLegend: "Lieu géographique actuel",
+  typeAnythingOrPickAScientificName:
+    "Taper quelque chose ou choisir un nom scientifique",
+  typeNewTagOrSearchPreviousTags:
+    "Entrer la nouvelle étiquette ou consulter les précédentes étiquettes",
   typeSpecimen: "Taper spécimen",
   uploadButtonText: "Téléverser",
   uploadFilesMaxSize: "La taille maximale des fichiers est de {maxSize}",
