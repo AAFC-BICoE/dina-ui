@@ -80,6 +80,10 @@ export function AssociatedMaterialSampleSearchBox(
       if (associatedSampleMapRef?.current) {
         associatedSampleMapRef.current.set(sampleId, sample.id);
       }
+      // Close the search result list box when a selection is made
+      // so that it is easier for user to see the Add button
+      if (listRef.current)
+        listRef.current.className = listRef.current.className + " d-none";
       onChange?.({
         target: { value: sampleId }
       } as ChangeEvent<HTMLInputElement>);
