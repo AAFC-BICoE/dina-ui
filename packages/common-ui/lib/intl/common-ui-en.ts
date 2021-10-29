@@ -21,6 +21,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   checkAllTooltipMessage:
     "Check this header box to check all visible items in this page.",
   closeButtonText: "Close",
+  collapse: " Collapse",
   configureLabel: "Configure",
   created: "created",
   createNew: "Create New",
@@ -34,6 +35,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   editableTable: "Editable Table",
   errorPageTitle: "Error",
   existing: "Existing",
+  expand: "Expand",
   false: "False",
   field_address: "Address",
   field_author: "Author",
