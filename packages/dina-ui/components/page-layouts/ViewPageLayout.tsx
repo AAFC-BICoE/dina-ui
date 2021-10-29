@@ -10,7 +10,7 @@ import {
   withResponse
 } from "common-ui";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { get } from "lodash";
+import { castArray, get } from "lodash";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { Footer, Head, Nav } from "..";
@@ -29,7 +29,7 @@ export interface ViewPageLayoutProps<T extends KitsuResource> {
   apiBaseUrl: string;
 
   /** The field on the resource to use as the page title. */
-  nameField?: string;
+  nameField?: string | string[];
 
   /** main tag class, defaults to "container" */
   mainClass?: string;
@@ -91,9 +91,15 @@ export function ViewPageLayout<T extends KitsuResource>({
             ? data.meta?.permissions?.includes("delete")
             : true;
 
+          const nameFields = castArray(nameField);
+          const title = [...nameFields, "id"].reduce(
+            (lastValue, currentField) => lastValue || get(data, currentField),
+            ""
+          );
+
           return (
             <>
-              <Head title={get(data, nameField)} />
+              <Head title={title} />
               <ButtonBar>
                 <BackButton
                   entityId={id}
@@ -123,6 +129,7 @@ export function ViewPageLayout<T extends KitsuResource>({
                     />
                   ))}
               </ButtonBar>
+              <h1 id="wb-cont">{title}</h1>
               {form(formProps)}
               <Footer />
             </>

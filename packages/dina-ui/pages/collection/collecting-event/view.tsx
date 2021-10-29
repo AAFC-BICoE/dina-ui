@@ -2,7 +2,6 @@ import { DinaForm } from "common-ui";
 import { ViewPageLayout } from "../../../components";
 import { useCollectingEventQuery } from "../../../components/collection";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 
 export default function CollectingEventDetailsPage() {
@@ -10,9 +9,6 @@ export default function CollectingEventDetailsPage() {
     <ViewPageLayout<CollectingEvent>
       form={props => (
         <DinaForm<CollectingEvent> {...props}>
-          <h1 id="wb-cont">
-            <DinaMessage id="collectingEventViewTitle" />
-          </h1>
           <CollectingEventFormLayout />
         </DinaForm>
       )}

@@ -1,4 +1,4 @@
-import { PcrPrimerDetailsPage } from "../../../../pages/seqdb/pcr-primer/view";
+import PcrPrimerDetailsPage from "../../../../pages/seqdb/pcr-primer/view";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
 
@@ -27,21 +27,23 @@ const apiContext: any = {
   }
 };
 
+jest.mock("next/router", () => ({
+  useRouter: () => ({ query: { id: "100" } })
+}));
+
 describe("PcrPrimer details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(
-      <PcrPrimerDetailsPage router={{ query: { id: "100" } } as any} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<PcrPrimerDetailsPage />, {
+      apiContext
+    });
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
   });
 
   it("Render the PCR primer details", async () => {
-    const wrapper = mountWithAppContext(
-      <PcrPrimerDetailsPage router={{ query: { id: "100" } } as any} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<PcrPrimerDetailsPage />, {
+      apiContext
+    });
 
     // Wait for the page to load.
     await new Promise(setImmediate);
