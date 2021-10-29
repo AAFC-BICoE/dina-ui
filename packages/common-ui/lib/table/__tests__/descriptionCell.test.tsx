@@ -1,7 +1,6 @@
-import { descriptionCell } from "../description-cell";
+import { descriptionCell, LANGUAGE_BADGE_KEYS } from "../description-cell";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { MultilingualDescription } from "packages/dina-ui/types/collection-api/resources/PreparationType";
-import { LANGUAGE_LABELS } from "../..";
 
 const fieldName = "myDescriptionField";
 const englishDescription = "English description";
@@ -60,7 +59,7 @@ describe("descriptionCell", () => {
     );
 
     expect(cell.accessor).toEqual(fieldName);
-    expect(wrapper.find(".badge").text()).toEqual(LANGUAGE_LABELS.en);
+    expect(wrapper.find(".badge").text()).toEqual(LANGUAGE_BADGE_KEYS.en);
     expect(wrapper.find(".description").text()).toEqual(englishDescription);
   });
 
@@ -72,7 +71,7 @@ describe("descriptionCell", () => {
     );
 
     expect(cell.accessor).toEqual(fieldName);
-    expect(wrapper.find(".badge").text()).toEqual(LANGUAGE_LABELS.fr);
+    expect(wrapper.find(".badge").text()).toEqual(LANGUAGE_BADGE_KEYS.fr);
     expect(wrapper.find(".description").text()).toEqual(frenchDescription);
   });
 
@@ -95,7 +94,7 @@ describe("descriptionCell", () => {
     );
 
     expect(cell.accessor).toEqual(fieldName);
-    expect(wrapper.find(".badge").text()).toEqual(LANGUAGE_LABELS.fr);
+    expect(wrapper.find(".badge").text()).toEqual(LANGUAGE_BADGE_KEYS.fr);
     expect(wrapper.find(".description").text()).toEqual(frenchDescription);
   });
 });

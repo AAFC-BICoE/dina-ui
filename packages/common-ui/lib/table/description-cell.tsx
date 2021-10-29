@@ -5,7 +5,15 @@ import {
 } from "../../../dina-ui/types/collection-api/resources/PreparationType";
 import { useContext } from "react";
 import { intlContext } from "../intl/IntlSupport";
-import { LANGUAGE_LABELS } from "../intl/LanguageSelector";
+import { useIntl } from "react-intl";
+
+/**
+ * Points to the translation key, used for the language badge.
+ */
+export const LANGUAGE_BADGE_KEYS = {
+  en: "languageDescriptionEnglish",
+  fr: "languageDescriptionFrench"
+};
 
 /**
  * Used for multilingual descriptions which contain an English and French version of the
@@ -70,6 +78,20 @@ export function descriptionCell(accessor: string) {
   };
 }
 
+/**
+ * Generate the language badge using the MultilingualDescription language string.
+ *
+ * This badge will automatically get translated as well.
+ *
+ * @param language MultilingualDescription lang string.
+ * @returns Language description badge element.
+ */
 function languageBadge(language) {
-  return <span className="badge">{LANGUAGE_LABELS[language]}</span>;
+  const { formatMessage } = useIntl();
+
+  return (
+    <span className="badge">
+      {formatMessage({ id: LANGUAGE_BADGE_KEYS[language] })}
+    </span>
+  );
 }
