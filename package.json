@@ -16,8 +16,6 @@
   },
   "devDependencies": {
     "@phenomnomnominal/tsquery": "^4.1.1",
-    "@swc/core": "1.2.103",
-    "@swc/jest": "^0.2.5",
     "@types/enzyme": "^3.10.8",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.11.1",
