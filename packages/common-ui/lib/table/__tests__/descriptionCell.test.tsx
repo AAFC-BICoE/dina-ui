@@ -1,6 +1,7 @@
 import { descriptionCell } from "../description-cell";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { MultilingualDescription } from "packages/dina-ui/types/collection-api/resources/PreparationType";
+import { LANGUAGE_LABELS } from "../..";
 
 const fieldName = "myDescriptionField";
 const englishDescription = "English description";
@@ -37,6 +38,19 @@ const descriptionDataBlank: MultilingualDescription = {
   ]
 };
 
+const descriptionDataEnBlank: MultilingualDescription = {
+  descriptions: [
+    {
+      lang: "en",
+      desc: ""
+    },
+    {
+      lang: "fr",
+      desc: frenchDescription
+    }
+  ]
+};
+
 describe("descriptionCell", () => {
   it("Both description languages provided, english as selected language.", () => {
     const cell = descriptionCell(fieldName);
@@ -46,7 +60,7 @@ describe("descriptionCell", () => {
     );
 
     expect(cell.accessor).toEqual(fieldName);
-    expect(wrapper.find(".badge").text()).toEqual("English");
+    expect(wrapper.find(".badge").text()).toEqual(LANGUAGE_LABELS.en);
     expect(wrapper.find(".description").text()).toEqual(englishDescription);
   });
 
@@ -58,7 +72,7 @@ describe("descriptionCell", () => {
     );
 
     expect(cell.accessor).toEqual(fieldName);
-    expect(wrapper.find(".badge").text()).toEqual("");
+    expect(wrapper.find(".badge").text()).toEqual(LANGUAGE_LABELS.fr);
     expect(wrapper.find(".description").text()).toEqual(frenchDescription);
   });
 
@@ -71,5 +85,17 @@ describe("descriptionCell", () => {
 
     expect(cell.accessor).toEqual(fieldName);
     expect(wrapper.text()).toEqual("");
+  });
+
+  it("Selected language blank, other language description provided", () => {
+    const cell = descriptionCell(fieldName);
+
+    const wrapper = mountWithAppContext(
+      <cell.Cell original={{ myDescriptionField: descriptionDataEnBlank }} />
+    );
+
+    expect(cell.accessor).toEqual(fieldName);
+    expect(wrapper.find(".badge").text()).toEqual(LANGUAGE_LABELS.fr);
+    expect(wrapper.find(".description").text()).toEqual(frenchDescription);
   });
 });

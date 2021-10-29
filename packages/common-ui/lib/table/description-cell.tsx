@@ -44,7 +44,9 @@ export function descriptionCell(accessor: string) {
         if (description.lang === language) {
           return (
             <div>
-              <span className="description">{description.desc}</span>
+              <span className="description list-inline-item">
+                {description.desc}
+              </span>
               {languageBadge(description.lang)}
             </div>
           );
@@ -53,10 +55,12 @@ export function descriptionCell(accessor: string) {
 
       // Preferred language could not be found above. Use another language and make sure it's indicated.
       // There is also the possibility that this is blank.
-      return descriptionPairs.at(0) !== null ? (
+      return descriptionPairs.length !== 0 && descriptionPairs[0] !== null ? (
         <div>
-          <span className="description">{descriptionPairs.at(0)?.desc}</span>
-          {languageBadge(descriptionPairs.at(0)?.lang)}
+          <span className="description list-inline-item">
+            {descriptionPairs[0].desc}
+          </span>
+          {languageBadge(descriptionPairs[0].lang)}
         </div>
       ) : (
         <div />
@@ -67,5 +71,5 @@ export function descriptionCell(accessor: string) {
 }
 
 function languageBadge(language) {
-  return <span className="badge mrgn-lft-md">{LANGUAGE_LABELS[language]}</span>;
+  return <span className="badge">{LANGUAGE_LABELS[language]}</span>;
 }
