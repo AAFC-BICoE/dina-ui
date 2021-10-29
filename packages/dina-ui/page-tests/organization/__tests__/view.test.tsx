@@ -62,7 +62,6 @@ describe("Organization details page", () => {
     );
 
     // The organization's email should be rendered in a FieldView.
-    expect(wrapper.find(".aliases-field-header").exists()).toEqual(true);
     expect(wrapper.find(".aliases-field .field-view").text()).toEqual(
       "org1, org2"
     );
