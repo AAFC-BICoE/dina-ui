@@ -44,7 +44,8 @@ export function descriptionCell(accessor: string) {
         if (description.lang === language) {
           return (
             <div>
-              {description.desc} {languageBadge(description.lang)}
+              <span className="description">{description.desc}</span>
+              {languageBadge(description.lang)}
             </div>
           );
         }
@@ -54,7 +55,7 @@ export function descriptionCell(accessor: string) {
       // There is also the possibility that this is blank.
       return descriptionPairs.at(0) !== null ? (
         <div>
-          {descriptionPairs.at(0)?.desc}{" "}
+          <span className="description">{descriptionPairs.at(0)?.desc}</span>
           {languageBadge(descriptionPairs.at(0)?.lang)}
         </div>
       ) : (
@@ -66,5 +67,5 @@ export function descriptionCell(accessor: string) {
 }
 
 function languageBadge(language) {
-  return <span className="badge">{LANGUAGE_LABELS[language]}</span>;
+  return <span className="badge mrgn-lft-md">{LANGUAGE_LABELS[language]}</span>;
 }
