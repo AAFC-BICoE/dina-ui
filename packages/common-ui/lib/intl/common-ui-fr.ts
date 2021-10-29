@@ -2,7 +2,10 @@ import { COMMON_UI_MESSAGES_ENGLISH } from "./common-ui-en";
 
 export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
   {
+    actions: "Actions",
+    add: "Ajouter",
     AND: "ET",
+    date: "Date",
     IS: "EST",
     ISNOT: "N’EST PAS",
     OR: "OU",
@@ -32,9 +35,12 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     errorPageTitle: "Erreur",
     existing: "Existante",
     false: "Faux",
+    field_address: "Adresse",
     field_author: "Auteur",
     field_changedProperties: "Propriétés modifiées ",
     field_commitDateTime: "Date et heure de validation ",
+    field_familyNames: "Noms de famille",
+    field_givenNames: "Prénoms",
     field_group: "Groupe",
     field_resourceName: "Nom de la ressource",
     field_snapshotType: "Type d’instantané",
@@ -52,6 +58,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     geoSuggest: "Géo-Suggestion",
     geoSuggestTooltip:
       "Ce bouton affiche des suggestions de géolocalisations fondées sur ce que vous avez saisi dans le champ.",
+    jumpToPage: "Passer à la page",
     languageOfPage: "fra",
     loadingText: "Chargement en cours...",
     loggedInAsUser: "Connecté en tant que :",
@@ -77,6 +84,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     resetButtonText: "Réinitialiser",
     results: "Résultats",
     rows: "rangées",
+    rowsPerPage: "Colonnes par page",
     search: "Rechercher",
     select: "Sélectionner ",
     selectLocation: "Sélectionner l’emplacement",
