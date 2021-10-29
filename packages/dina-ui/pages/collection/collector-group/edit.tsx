@@ -30,12 +30,7 @@ export default function CollectorGroupEditPage() {
   const { formatMessage } = useDinaIntl();
   return (
     <div>
-      <Head
-        title={formatMessage("addCollectorGroupTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("addCollectorGroupTitle")} />
       <Nav />
       <main className="container-fluid">
         <div>

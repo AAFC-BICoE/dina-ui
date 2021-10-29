@@ -43,11 +43,8 @@ export default function DinaUserDetailsPage() {
 
   return (
     <div>
-      <Head title={formatMessage("userViewTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head title={formatMessage("userViewTitle")} />
+      <Nav />
       {withResponse(userQuery, ({ data: dinaUser }) => (
         <main className="container">
           <ButtonBar>

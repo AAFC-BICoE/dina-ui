@@ -11,7 +11,7 @@ export default function PersonEditPage() {
   } = router;
 
   const { formatMessage } = useDinaIntl();
-  const title = id ? "editPersonTitle" : "addPersonTitle"
+  const title = id ? "editPersonTitle" : "addPersonTitle";
 
   async function onSubmitSuccess() {
     await router.push(`/person/list`);
@@ -29,11 +29,8 @@ export default function PersonEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage(title)}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head title={formatMessage(title)} />
+      <Nav />
       <main className="container-fluid">
         {buttonBar}
         {id ? (

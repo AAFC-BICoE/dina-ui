@@ -129,11 +129,8 @@ export function ConfigAction({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("splitSubsampleTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head title={formatMessage("splitSubsampleTitle")} />
+      <Nav />
       {withResponse(materialSampleQuery, ({ data: parentSample }) => {
         const computedInitConfigValues = {
           ...initialConfig,

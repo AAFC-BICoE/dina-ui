@@ -62,7 +62,9 @@ export default function PreparationProcessTemplatePage() {
     { disabled: !id }
   );
 
-  const pageTitle = id ? "editWorkflowTemplateTitle" : "createWorkflowTemplateTitle";
+  const pageTitle = id
+    ? "editWorkflowTemplateTitle"
+    : "createWorkflowTemplateTitle";
 
   async function moveToNextPage() {
     await router.push("/collection/workflow-template/list");
@@ -70,11 +72,8 @@ export default function PreparationProcessTemplatePage() {
 
   return (
     <div>
-      <Head title={formatMessage(pageTitle)}
-      			lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head title={formatMessage(pageTitle)} />
+      <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id={pageTitle} />

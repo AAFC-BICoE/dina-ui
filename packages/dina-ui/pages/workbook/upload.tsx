@@ -10,11 +10,8 @@ export default function UploadWorkbookPage() {
 
   return (
     <div>
-      <Head title={formatMessage("workbookGroupUploadTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head title={formatMessage("workbookGroupUploadTitle")} />
+      <Nav />
       <main>
         <div className="container" style={{ overflowX: "auto" }}>
           <h1>
