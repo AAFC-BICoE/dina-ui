@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
-const COLLECTION_METHOD_FILTER_ATTRIBUTES = ["createdBy"];
+const COLLECTION_METHOD_FILTER_ATTRIBUTES = ["name"];
 const COLLECTION_METHOD_TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, name } }) => (
@@ -21,11 +21,13 @@ export default function collectionMethodListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("collectionMethodListTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage("collectionMethodListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="collectionMethodListTitle" />
@@ -42,7 +44,13 @@ export default function collectionMethodListPage() {
           id="collection-method-list"
           queryTableProps={{
             columns: COLLECTION_METHOD_TABLE_COLUMNS,
-            path: "collection-api/collection-method"
+            path: "collection-api/collection-method",
+            defaultSort: [
+              {
+                id: "name",
+                desc: false
+              }
+            ]
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">
