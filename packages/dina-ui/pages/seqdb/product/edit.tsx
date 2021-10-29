@@ -1,6 +1,6 @@
 import {
-  ButtonBar,
   BackButton,
+  ButtonBar,
   DinaForm,
   DinaFormOnSubmit,
   LabelView,
@@ -27,11 +27,13 @@ export function ProductEditPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage(title)}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <main className="container-fluid">
         {id ? (
           <div>
@@ -92,35 +94,44 @@ function ProductForm({ product, router }: ProductFormProps) {
         <SubmitButton />
         <BackButton entityId={id as string} entityLink="/seqdb/product" />
       </ButtonBar>
-      <div>
-        <div className="row">
-          <GroupSelectField
-            className="col-md-2"
-            name="group"
-            enableStoredDefaultGroup={true}
-          />
-        </div>
-        <div className="row">
-          <LabelView
-            className="col-md-2"
-            name="labelname"
-            label={formatMessage("productUpcFieldHelpText")}
-          />
-        </div>
-        <div className="row">
-          <TextField className="col-md-2" name="name" />
-          <TextField
-            className="col-md-2"
-            name="upc"
-            label="Universal Product Code (UPC)"
-          />
-          <TextField className="col-md-2" name="type" />
-        </div>
-        <div className="row">
-          <TextField className="col-md-4" name="description" />
-        </div>
-      </div>
+      <ProductFormFields />
     </DinaForm>
   );
 }
+
+export function ProductFormFields() {
+  const { formatMessage } = useSeqdbIntl();
+
+  return (
+    <div>
+      <div className="row">
+        <GroupSelectField
+          className="col-md-2"
+          name="group"
+          enableStoredDefaultGroup={true}
+        />
+      </div>
+      <div className="row">
+        <LabelView
+          className="col-md-2"
+          name="labelname"
+          label={formatMessage("productUpcFieldHelpText")}
+        />
+      </div>
+      <div className="row">
+        <TextField className="col-md-2" name="name" />
+        <TextField
+          className="col-md-2"
+          name="upc"
+          label="Universal Product Code (UPC)"
+        />
+        <TextField className="col-md-2" name="type" />
+      </div>
+      <div className="row">
+        <TextField className="col-md-4" name="description" />
+      </div>
+    </div>
+  );
+}
+
 export default withRouter(ProductEditPage);

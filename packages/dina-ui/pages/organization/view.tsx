@@ -1,11 +1,9 @@
-import { DinaForm, FieldView } from "common-ui";
+import { DinaForm } from "common-ui";
 import { ViewPageLayout } from "../../components";
-import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Organization } from "../../types/agent-api/resources/Organization";
+import { OrganizationFields } from "./edit";
 
 export default function OrganizationDetailsPage() {
-  const { formatMessage } = useDinaIntl();
-
   return (
     <ViewPageLayout<Organization>
       form={props => {
@@ -26,21 +24,7 @@ export default function OrganizationDetailsPage() {
 
         return (
           <DinaForm<Organization> {...props} initialValues={organization}>
-            <div className="row">
-              <FieldView
-                className="col-md-2"
-                name="name.EN"
-                label={formatMessage("organizationEnglishNameLabel")}
-              />
-              <FieldView
-                className="col-md-2"
-                name="name.FR"
-                label={formatMessage("organizationFrenchNameLabel")}
-              />
-              <FieldView className="col-md-3" name="aliases" />
-              <FieldView className="col-md-2" name="createdBy" />
-              <FieldView className="col-md-2" name="createdOn" />
-            </div>
+            <OrganizationFields />
           </DinaForm>
         );
       }}
@@ -48,7 +32,7 @@ export default function OrganizationDetailsPage() {
       entityLink="/organization"
       type="organization"
       apiBaseUrl="/agent-api"
-      nameField={["name.EN", "name.FR"]}
+      nameField={["names[0].name", "names[1].name"]}
       deleteButton={() => null}
     />
   );
