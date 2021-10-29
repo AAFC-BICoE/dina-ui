@@ -15,7 +15,6 @@ export default function RegionDetailsPage() {
       entityLink="/seqdb/region"
       type="region"
       apiBaseUrl="/seqdb-api"
-      mainClass="container-fluid"
     />
   );
 }

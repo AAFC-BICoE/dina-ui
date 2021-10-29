@@ -28,7 +28,7 @@ export function RegionEditPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container-fluid">
+      <main className="container">
         {id ? (
           <div>
             <h1 id="wb-cont">
@@ -96,15 +96,17 @@ export function RegionFormFields() {
     <div>
       <div className="row">
         <GroupSelectField
-          className="col-md-2"
+          className="col-md-6"
           name="group"
           enableStoredDefaultGroup={true}
         />
       </div>
       <div className="row">
-        <TextField className="col-md-2" name="name" />
-        <TextField className="col-md-2" name="symbol" />
-        <TextField className="col-md-2" name="description" />
+        <TextField className="col-md-6" name="name" />
+        <TextField className="col-md-6" name="symbol" />
+      </div>
+      <div className="row">
+        <TextField className="col-md-6" name="description" />
       </div>
     </div>
   );
