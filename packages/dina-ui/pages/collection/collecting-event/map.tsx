@@ -53,8 +53,11 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
 
   // Getting params from URL
   const queryParams = new URLSearchParams(window.location.search);
-  const latitude = queryParams.get('mlat') as string;
-  const longitude = queryParams.get('mlon') as string;
+  const mlat = queryParams.get('mlat') as string;
+  const mlon = queryParams.get('mlon') as string;
+  // casting to numbers
+  const latitude = mlat as number;
+  const longitude = mlon as number;
 
   return (
     <div>
