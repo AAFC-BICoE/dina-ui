@@ -56,8 +56,8 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const mlat = queryParams.get('mlat') as string;
   const mlon = queryParams.get('mlon') as string;
   // casting to numbers
-  const latitude = mlat as number;
-  const longitude = mlon as number;
+  const latitude = Number(mlat);
+  const longitude = Number(mlon);
 
   return (
     <div>
