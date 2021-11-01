@@ -59,9 +59,8 @@ export function CollectingEventMap({
   });
 
   return (
-    <div ref={ref}>
+    <div style={{ height: 800 }} ref={ref}>
       <Head>
-        <title>Collecting Event Map</title>
         <link
           href="https://js.arcgis.com/4.21/esri/themes/dark/main.css"
           rel="stylesheet"
