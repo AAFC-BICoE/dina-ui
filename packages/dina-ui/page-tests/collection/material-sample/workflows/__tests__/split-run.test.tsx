@@ -181,6 +181,9 @@ describe("MaterialSample split workflow run action form with all default values"
             relationships: {
               attachment: {
                 data: []
+              },
+              preparationAttachment: {
+                data: []
               }
             },
             type: "material-sample"
@@ -232,6 +235,9 @@ describe("MaterialSample split workflow run action form with all default values"
             relationships: {
               attachment: {
                 data: []
+              },
+              preparationAttachment: {
+                data: []
               }
             },
             type: "material-sample"
@@ -249,6 +255,9 @@ describe("MaterialSample split workflow run action form with all default values"
             publiclyReleasable: undefined,
             relationships: {
               attachment: {
+                data: []
+              },
+              preparationAttachment: {
                 data: []
               }
             },
@@ -341,6 +350,9 @@ describe("MaterialSample split workflow run action form with all default values"
             relationships: {
               attachment: {
                 data: []
+              },
+              preparationAttachment: {
+                data: []
               }
             },
             publiclyReleasable: undefined,
@@ -367,6 +379,9 @@ describe("MaterialSample split workflow run action form with all default values"
             publiclyReleasable: undefined,
             relationships: {
               attachment: {
+                data: []
+              },
+              preparationAttachment: {
                 data: []
               }
             },

@@ -14,18 +14,16 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
-import { Field } from "formik";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import {
+  AttachmentsField,
   GroupSelectField,
   Head,
   Nav,
   useAddPersonModal
 } from "../../../components";
-import { useAttachmentsModal } from "../../../components/object-store";
-import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Person } from "../../../types/agent-api";
@@ -133,13 +131,6 @@ export function PcrBatchForm({
 }: PcrBatchFormProps) {
   const { username } = useAccount();
 
-  // The selected Metadatas to be attached to this Collecting Event:
-  const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal({
-    initialMetadatas: pcrBatch?.attachment as PersistedResource<Metadata>[],
-    deps: [pcrBatch?.id],
-    title: <DinaMessage id="attachments" />
-  });
-
   const initialValues = pcrBatch || {
     // TODO let the back-end set this:
     createdBy: username,
@@ -164,11 +155,13 @@ export function PcrBatchForm({
     delete submittedValues.experimenters;
 
     // Add attachments if they were selected:
-    if (selectedMetadatas.length) {
-      (submittedValues as any).relationships.attachment = {
-        data: selectedMetadatas.map(it => ({ id: it.id, type: it.type }))
-      };
-    }
+    (submittedValues as any).relationships.attachment = {
+      data:
+        submittedValues.attachment?.map(it => ({
+          id: it.id,
+          type: it.type
+        })) ?? []
+    };
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
 
@@ -209,7 +202,6 @@ export function PcrBatchForm({
     >
       {buttonBar}
       <PcrBatchFormFields />
-      {attachedMetadatasUI}
       {buttonBar}
     </DinaForm>
   );
@@ -217,7 +209,7 @@ export function PcrBatchForm({
 
 /** Re-usable field layout between edit and view pages. */
 export function PcrBatchFormFields() {
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, initialValues } = useDinaFormContext();
   const { openAddPersonModal } = useAddPersonModal();
 
   return (
@@ -288,19 +280,11 @@ export function PcrBatchFormFields() {
         <TextField className="col-md-6" name="reactionVolume" />
         <DateField className="col-md-6" name="reactionDate" />
       </div>
-      {readOnly && (
-        <div className="mb-3">
-          <Field name="id">
-            {({ field: { value: id } }) => (
-              <AttachmentReadOnlySection
-                attachmentPath={`seqdb-api/pcr-batch/${id}/attachment`}
-                detachTotalSelected={true}
-                title={<DinaMessage id="attachments" />}
-              />
-            )}
-          </Field>
-        </div>
-      )}
+      <AttachmentsField
+        name="attachment"
+        attachmentPath={`seqdb-api/pcr-batch/${initialValues.id}/attachment`}
+        title={<DinaMessage id="attachments" />}
+      />
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />

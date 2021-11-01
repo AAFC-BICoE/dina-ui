@@ -82,7 +82,7 @@ export function ReadOnlyResourceLink<TData extends KitsuResource>({
       ids: values.map(it => it.id),
       listPath: model,
       disabled: !valueIsShallowReference
-    }) ?? values;
+    }).data ?? values;
 
   return (
     <Fragment>

@@ -171,9 +171,7 @@ export default function MetadataListPage() {
               <ListPageLayout<Metadata>
                 additionalFilters={filterForm => ({
                   // Apply group filter:
-                  ...(filterForm.group && { bucket: filterForm.group }),
-                  // Filter out the derived objects e.g. thumbnails:
-                  rsql: "acSubtypeId==null"
+                  ...(filterForm.group && { bucket: filterForm.group })
                 })}
                 defaultSort={[
                   {
