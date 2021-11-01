@@ -29,8 +29,6 @@ export interface EventMapOptions {
 }
 
 export interface CollectingEventMapProps {
-  latitude: number;
-  longitude: number;
   geometry: EventMapGeometry;
   symbol: EventMapSymbol;
   map: EventMap;
