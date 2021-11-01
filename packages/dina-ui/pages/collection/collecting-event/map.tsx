@@ -62,8 +62,6 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
       />
       <Nav />
       <CollectingEventMap 
-          latitude={latitude} 
-          longitude={longitude} 
           geometry={{
             type: "point", // autocasts as new Point()
             latitude,

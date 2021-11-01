@@ -38,8 +38,6 @@ export interface CollectingEventMapProps {
 }
 // component function
 export function CollectingEventMap({
-  latitude,
-  longitude,
   geometry,
   symbol,
   map,
