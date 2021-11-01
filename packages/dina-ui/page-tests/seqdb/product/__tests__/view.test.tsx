@@ -21,7 +21,8 @@ const mockGet = jest.fn(async () => {
 const apiContext: any = { apiClient: { get: mockGet } };
 
 jest.mock("next/router", () => ({
-  useRouter: () => ({ query: { id: "100" } })
+  useRouter: () => ({ query: { id: "100" } }),
+  withRouter: fn => fn
 }));
 
 describe("Product details page", () => {

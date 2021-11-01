@@ -24,7 +24,7 @@ const TEST_AGENT: Person = {
 
 const mockBulkGet = jest.fn<any, any>(async paths =>
   paths.map(path => {
-    if (path === "/person/a8fb14f7-cda9-4313-9cc7-f313db653cad") {
+    if (/\/?person\/a8fb14f7-cda9-4313-9cc7-f313db653cad/.test(path)) {
       return TEST_AGENT;
     }
   })
@@ -71,9 +71,9 @@ describe("CollectorGroup details page", () => {
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
-    expect(wrapper.find(".agents-field .field-view").text()).toEqual(
-      "person a"
-    );
+    expect(
+      wrapper.find(".agentIdentifiers-field .read-only-view").text()
+    ).toEqual("person a");
     expect(wrapper.find(".name-field .field-view").text()).toEqual(
       "test collector group"
     );

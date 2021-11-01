@@ -58,14 +58,19 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
     ...(myGroupNames ?? [])
   ]);
 
-  const { response } = useQuery<Group[]>({
-    path: "user-api/group",
-    page: { limit: 1000 },
-    // Get the group from backend when groupName is not within current user's group
-    filter: showAllGroups
-      ? undefined
-      : JSON.stringify({ name: selectableGroupNames })
-  });
+  const { response } = useQuery<Group[]>(
+    {
+      path: "user-api/group",
+      page: { limit: 1000 },
+      // Get the group from backend when groupName is not within current user's group
+      filter: showAllGroups
+        ? undefined
+        : JSON.stringify({ name: selectableGroupNames })
+    },
+    {
+      disabled: readOnly
+    }
+  );
 
   const groupOptions: SelectOption<string>[] | undefined = response?.data?.map(
     group => ({

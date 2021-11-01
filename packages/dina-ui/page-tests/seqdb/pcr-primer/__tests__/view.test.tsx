@@ -28,7 +28,8 @@ const apiContext: any = {
 };
 
 jest.mock("next/router", () => ({
-  useRouter: () => ({ query: { id: "100" } })
+  useRouter: () => ({ query: { id: "100" } }),
+  withRouter: fn => fn
 }));
 
 describe("PcrPrimer details page", () => {
