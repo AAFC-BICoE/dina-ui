@@ -599,7 +599,26 @@ export function CollectingEventFormLayout({
           >
             <TextField name="habitat" />
             <TextField name="host" />
-            <CollectionMethodSelectField name="collectionMethod" />
+            <Field name="group">
+              {({ field: { value: group } }) => (
+                // Collection methods should be filtered by the Collecting Event's group:
+                <CollectionMethodSelectField
+                  name="collectionMethod"
+                  filter={filterBy(["name"], {
+                    extraFilters: group
+                      ? [
+                          {
+                            selector: "group",
+                            comparison: "==",
+                            arguments: group
+                          }
+                        ]
+                      : undefined
+                  })}
+                  shouldUpdate={() => true}
+                />
+              )}
+            </Field>
             <AutoSuggestTextField<CollectingEvent>
               name="substrate"
               query={(searchValue, ctx) => ({
