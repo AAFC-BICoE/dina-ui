@@ -28,7 +28,7 @@ export function ColDataSetDropdown({
         catalogueOfLifeQuery<CatalogueOfLifeDataSetSearchResult>({
           url: "https://api.catalogueoflife.org/dataset",
           params: {
-            q: searchValue,
+            q: searchValue.trim(),
             limit: "10"
           },
           searchValue,
