@@ -457,6 +457,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Select a collector group to pre-poplulate 'Collectors' field",
   selectGroup: "Select Group",
   selectOrType: "Select or Type",
+  selectRuleSet: "Select Rule Set",
   set: "Set",
   setAll: "Set All",
   showing: "Showing",
