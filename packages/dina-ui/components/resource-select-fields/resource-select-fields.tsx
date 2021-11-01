@@ -11,11 +11,12 @@ import { Collection, Institution } from "../../types/collection-api";
 import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
 import { useField } from "formik";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
+import { SetOptional } from "type-fest";
 
-type OmittedProps = "readOnlyLink" | "filter" | "model" | "optionLabel";
+type ProvidedProps = "readOnlyLink" | "filter" | "model" | "optionLabel";
 
 export function CollectionMethodSelectField(
-  props: Omit<ResourceSelectFieldProps<CollectionMethod>, OmittedProps>
+  props: SetOptional<ResourceSelectFieldProps<CollectionMethod>, ProvidedProps>
 ) {
   return (
     <ResourceSelectField<CollectionMethod>
@@ -30,7 +31,7 @@ export function CollectionMethodSelectField(
 
 /** Collection Select Field. Can only be changed if there are multiple Collections to choose from. */
 export function CollectionSelectField(
-  props: Omit<ResourceSelectFieldProps<Collection>, OmittedProps>
+  props: SetOptional<ResourceSelectFieldProps<Collection>, ProvidedProps>
 ) {
   const [{ value }] = useField(props.name);
   const { roles, groupNames } = useAccount();
@@ -80,7 +81,7 @@ export function CollectionSelectField(
 }
 
 export function InstitutionSelectField(
-  props: Omit<ResourceSelectFieldProps<Institution>, OmittedProps>
+  props: SetOptional<ResourceSelectFieldProps<Institution>, ProvidedProps>
 ) {
   return (
     <ResourceSelectField<Institution>
@@ -94,7 +95,7 @@ export function InstitutionSelectField(
 }
 
 export function UserSelectField(
-  props: Omit<ResourceSelectFieldProps<DinaUser>, OmittedProps>
+  props: SetOptional<ResourceSelectFieldProps<DinaUser>, ProvidedProps>
 ) {
   return (
     <ResourceSelectField<DinaUser>
