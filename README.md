@@ -30,7 +30,7 @@ cd dina-compose
 `dev.sh` is just short-hand for `docker-compose` with the dev launch config.
 
 The UI should be available at dina.traefik.me. Note: traefik.me and its subdomains use a DNS server to point to <127.0.0.1> (localhost).
-If you're running DINA in a Virtual Machine or remote machine you may need to change a /etc/hosts so dina.traefik.me and accounts.traefik.me point to your development machine.
+If you're running DINA in a Virtual Machine or remote machine you may need to change /etc/hosts or add forwarded ports (80->80) so dina.traefik.me and accounts.traefik.me point to your development machine.
 
 ### Attaching VS Code debugger to a running Java app:
 
