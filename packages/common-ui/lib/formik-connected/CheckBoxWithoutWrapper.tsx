@@ -1,4 +1,5 @@
 import { FastField } from "formik";
+import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import React, { ChangeEvent } from "react";
 
 export interface CheckBoxWithoutWrapperProps {
@@ -34,6 +35,8 @@ export function CheckBoxWithoutWrapper(props: CheckBoxWithoutWrapperProps) {
     customLayout,
     notTakingFullRow
   } = props;
+  const { formatMessage } = useDinaIntl();
+
   return (
     <FastField {...props}>
       {({ form, field: { value, name } }) => {
@@ -53,6 +56,7 @@ export function CheckBoxWithoutWrapper(props: CheckBoxWithoutWrapperProps) {
                 customLayout ? customLayout[0] : "col-sm-1"
               }`}
               name={name}
+              tabIndex={0}
             />
             <div
               className={`${
@@ -71,7 +75,8 @@ export function CheckBoxWithoutWrapper(props: CheckBoxWithoutWrapperProps) {
             value={value || false}
             className={className}
             name={name}
-            aria-label="selectField"
+            aria-label={formatMessage("select")}
+            tabIndex={0}
           />
         );
       }}
