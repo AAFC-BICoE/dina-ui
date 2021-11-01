@@ -28,7 +28,7 @@ export default function NumberSpinnerField(props: NumberSpinnerFieldProps) {
   const onKeyDown = e => {
     const NUMBER_ALLOWED_CHARS_REGEXP = /[0-9]+/;
     const CTRL_ALLOWED_CHARS_REGEXP =
-      /^(Backspace|Delete|ArrowLeft|ArrowRight)$/;
+      /^(Backspace|Delete|ArrowLeft|ArrowRight|ArrowUp|ArrowDown|Tab)$/;
     if (
       !NUMBER_ALLOWED_CHARS_REGEXP.test(e.key) &&
       !CTRL_ALLOWED_CHARS_REGEXP.test(e.key)

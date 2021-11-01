@@ -18,6 +18,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   backToReadOnlyPage: "Back to read-only page",
   bulkEditorValidationError: "Invalid value on row {row}: {value}",
   cancelButtonText: "Cancel",
+  checkAll: "Check All",
   checkAllTooltipMessage:
     "Check this header box to check all visible items in this page.",
   closeButtonText: "Close",
@@ -77,6 +78,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
     "Write one value per line. Press enter while typing in the field to add a new line.",
   page: "Page",
   previous: "Previous",
+  queryTable: "Query Table",
   queryTableMultiSortExplanation:
     "To sort by multiple columns: Click one column header to sort by that column, then press shift while you click an additional header.",
   queryTableMultiSortTooltipTitle: "Multi-column sorting",
