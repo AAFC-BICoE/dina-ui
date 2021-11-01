@@ -57,6 +57,8 @@ describe("Protocol details page", () => {
     wrapper.debug();
 
     // The protol's kit name should be rendered in a FieldView.
-    expect(wrapper.containsMatchingElement(<div>test kit</div>)).toEqual(true);
+    expect(wrapper.find(".kit-field .read-only-view").text()).toEqual(
+      "test kit"
+    );
   });
 });
