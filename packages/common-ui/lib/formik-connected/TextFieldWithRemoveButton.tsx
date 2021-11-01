@@ -1,6 +1,6 @@
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import React, { ChangeEvent, useState } from "react";
 import { TextField, TextFieldProps } from "./TextField";
+import { useIntl } from "react-intl";
 
 interface TextFieldWithRemoveButtonProps extends TextFieldProps {
   removeItem?: (idx: number) => void;
@@ -13,7 +13,7 @@ export function TextFieldWithRemoveButton(
 ) {
   const [shouldRemove, setShouldRemove] = useState(false);
   const { removeItem, index, hideCloseBtn } = props;
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage } = useIntl();
 
   /* Clear the input value and remove the whole wrapping div */
   const removeEntry = onChange => {
@@ -35,7 +35,7 @@ export function TextFieldWithRemoveButton(
               hideCloseBtn ? "d-none" : ""
             }`}
             style={{ height: "97%" }}
-            aria-label={formatMessage("closeButtonText")}
+            aria-label={formatMessage({ id: "closeButtonText" })}
             onClick={() => removeEntry(inputProps.onChange)}
             type="button"
           >

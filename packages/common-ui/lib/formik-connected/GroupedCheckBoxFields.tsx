@@ -1,10 +1,10 @@
 import { connect, Field } from "formik";
 import { KitsuResource } from "kitsu";
 import { noop, toPairs } from "lodash";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { useRef, useState } from "react";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
+import { useIntl } from "react-intl";
 
 export interface CheckBoxFieldProps<TData extends KitsuResource> {
   resource: TData;
@@ -21,7 +21,7 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
 }: GroupedCheckBoxesParams) {
   const [availableItems, setAvailableItems] = useState<TData[]>([]);
   const lastCheckedItemRef = useRef<TData>();
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage } = useIntl();
 
   function CheckBoxField({ resource }: CheckBoxFieldProps<TData>) {
     const thisBoxFieldName = `${fieldName}[${resource.id}]`;
@@ -61,7 +61,7 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
             <div className="d-flex">
               <div className="mx-auto">
                 <input
-                  aria-label={formatMessage("select")}
+                  aria-label={formatMessage({ id: "select" })}
                   checked={value || false}
                   onClick={onCheckBoxClick}
                   onChange={noop}
@@ -92,7 +92,7 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
 
     return (
       <input
-        aria-label={formatMessage("checkAll")}
+        aria-label={formatMessage({ id: "checkAll" })}
         className="check-all-checkbox"
         onClick={onCheckAllCheckBoxClick}
         style={{ height: "20px", width: "20px", marginLeft: "5px" }}
