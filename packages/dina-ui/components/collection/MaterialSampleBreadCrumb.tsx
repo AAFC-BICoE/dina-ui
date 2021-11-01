@@ -17,12 +17,12 @@ export function MaterialSampleBreadCrumb({
   return (
     <ol
       className="breadcrumb mb-3"
-      style={{ "--bs-breadcrumb-divider": "'>'", fontSize: "2em" } as any}
+      style={{ "--bs-breadcrumb-divider": "'>'" } as any}
     >
       {parentPath.map(node => (
         <li className="breadcrumb-item" key={node.uuid}>
           <Link href={`/collection/material-sample/view?id=${node.uuid}`}>
-            <a target="_blank">{node.name}</a>
+            <a>{node.name}</a>
           </Link>
         </li>
       ))}
@@ -32,7 +32,7 @@ export function MaterialSampleBreadCrumb({
             <Link
               href={`/collection/material-sample/view?id=${materialSample.id}`}
             >
-              <a target="_blank">{displayName}</a>
+              <a>{displayName}</a>
             </Link>
           ) : (
             displayName

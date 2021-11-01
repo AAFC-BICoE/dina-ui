@@ -1,3 +1,4 @@
+import { DinaForm } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { StorageUnit } from "../../../types/collection-api";
@@ -71,7 +72,9 @@ describe("AssignedStorage component", () => {
 
   it("Renders the storage unit path", async () => {
     const wrapper = mountWithAppContext(
-      <AssignedStorage onChange={mockOnChange} value={STORAGE_A_SHALLOW} />,
+      <DinaForm initialValues={{}}>
+        <AssignedStorage onChange={mockOnChange} value={STORAGE_A_SHALLOW} />
+      </DinaForm>,
       { apiContext }
     );
 
@@ -87,7 +90,9 @@ describe("AssignedStorage component", () => {
 
   it("Lets you remove the storage unit", async () => {
     const wrapper = mountWithAppContext(
-      <AssignedStorage onChange={mockOnChange} value={STORAGE_A_SHALLOW} />,
+      <DinaForm initialValues={{}}>
+        <AssignedStorage onChange={mockOnChange} value={STORAGE_A_SHALLOW} />
+      </DinaForm>,
       { apiContext }
     );
 

@@ -25,11 +25,15 @@ interface PcrProfileFormProps {
 export function PcrProfileEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useSeqdbIntl();
+  const title = id ? "editPcrProfileTitle" : "addPcrProfileTitle";
 
   return (
     <div>
-      <Head title={formatMessage("editPcrProfileTitle")} />
-      <Nav />
+      <Head title={formatMessage(title)}
+						lang={formatMessage("languageOfPage")} 
+						creator={formatMessage("agricultureCanada")}
+						subject={formatMessage("subjectTermsForPage")} />
+			<Nav />
       <main className="container-fluid">
         {id ? (
           <div>

@@ -11,6 +11,10 @@ export interface CollectionAttributes {
   createdOn?: string;
   createdBy?: string;
   multilingualDescription?: MultilingualDescription;
+  webpage?: string;
+  contact?: string;
+  address?: string;
+  remarks?: string;
 }
 
 export interface CollectionRelationships {

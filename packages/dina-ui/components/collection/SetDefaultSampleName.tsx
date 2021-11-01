@@ -12,7 +12,10 @@ export function SetDefaultSampleName() {
     const currentName = values.materialSampleName || "";
 
     // When the collection is changed, change the sample
-    if (currentName.startsWith(previousDefaultName.current)) {
+    if (
+      currentName.startsWith(previousDefaultName.current) &&
+      !currentName.startsWith(defaultSampleName)
+    ) {
       setFieldValue(
         "materialSampleName",
         currentName.replace(previousDefaultName.current, defaultSampleName)

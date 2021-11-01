@@ -2,20 +2,16 @@ import { PersistedResource } from "kitsu";
 import { License, Metadata, Person } from "../../../../types/objectstore-api";
 import MetadataEditPage from "../../../../pages/object-store/metadata/single-record-edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import CreatableSelect from "react-select/creatable";
 
 const mockGet = jest.fn(async path => {
-  if (
-    path === "objectstore-api/metadata/25f81de5-bbee-430c-b5fa-71986b70e612"
-  ) {
-    return { data: TEST_METADATA };
-  } else if (path === "objectstore-api/license") {
-    return { data: TEST_LICENSES };
-  } else if (
-    path === "objectstore-api/license/open-government-license-canada"
-  ) {
-    return { data: TEST_LICENSES[0] };
-  } else {
-    return { data: [] };
+  switch (path) {
+    case "objectstore-api/metadata/25f81de5-bbee-430c-b5fa-71986b70e612":
+      return { data: TEST_METADATA };
+    case "objectstore-api/license":
+      return { data: TEST_LICENSES };
+    case "objectstore-api/license/open-government-license-canada":
+      return { data: TEST_LICENSES[0] };
   }
 });
 
@@ -66,6 +62,7 @@ const TEST_LICENSES: PersistedResource<License>[] = [
 ];
 
 const TEST_METADATA: PersistedResource<Metadata> = {
+  acSubtype: "TEST_SUBTYPE",
   dcCreator: {
     displayName: "Mat Poff",
     id: "6e80e42a-bcf6-4062-9db3-946e0f26458f",
@@ -107,6 +104,7 @@ describe("Metadata single record edit page.", () => {
     jest.clearAllMocks();
     mockSave.mockImplementation(args => args.map(({ resource }) => resource));
     mockUseRouter.mockReturnValue({
+      push: () => undefined,
       query: {
         id: "25f81de5-bbee-430c-b5fa-71986b70e612"
       }
@@ -123,17 +121,22 @@ describe("Metadata single record edit page.", () => {
     expect(wrapper.find(".originalFilename-field input").prop("value")).toEqual(
       "test-file.png"
     );
-    expect(wrapper.find(".acTags-field textarea").prop("value")).toEqual(
-      "tag1, tag2, tag3"
-    );
+    expect(
+      wrapper.find(".acTags-field").find(CreatableSelect).prop("value")
+    ).toEqual([
+      { label: "tag1", value: "tag1" },
+      { label: "tag2", value: "tag2" },
+      { label: "tag3", value: "tag3" }
+    ]);
     expect(
       wrapper.find(".managed-attributes-editor input").last().prop("value")
     ).toEqual("test-managed-attribute-value");
 
     // Set new values:
-    wrapper.find(".acTags-field textarea").simulate("change", {
-      target: { name: "acTags", value: "new tag 1, new tag 2" }
-    });
+    wrapper.find(".acTags-field").find(CreatableSelect).prop<any>("onChange")([
+      { label: "new tag 1", value: "new tag 1" },
+      { label: "new tag 2", value: "new tag 2" }
+    ]);
     wrapper
       .find(".managed-attributes-editor input")
       .last()
@@ -153,6 +156,7 @@ describe("Metadata single record edit page.", () => {
       [
         {
           resource: {
+            acSubtype: "TEST_SUBTYPE",
             acTags: ["new tag 1", "new tag 2"],
             bucket: "testbucket",
             dcCreator: {

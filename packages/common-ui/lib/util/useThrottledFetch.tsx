@@ -37,6 +37,7 @@ export function useThrottledFetch<TData>({
     [searchValue],
     () => fetcher(searchValue),
     {
+      shouldRetryOnError: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false
     }
@@ -81,6 +82,7 @@ export function useDebouncedFetch<TData>({
     [searchValue],
     () => fetcher(searchValue),
     {
+      shouldRetryOnError: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false
     }

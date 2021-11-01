@@ -1,7 +1,6 @@
 import { SaveArgs } from "common-ui";
 import { ReactWrapper } from "enzyme";
 import { PersistedResource } from "kitsu";
-import Select from "react-select";
 import ReactSwitch from "react-switch";
 import { StorageLinker } from "../../../../components";
 import { WorkflowTemplateForm } from "../../../../pages/collection/workflow-template/edit";
@@ -99,6 +98,8 @@ async function mountForm(
   const storageSwitch = () => wrapper.find(".enable-storage").find(ReactSwitch);
   const determinationSwitch = () =>
     wrapper.find(".enable-determination").find(ReactSwitch);
+  const scheduledActionsSwitch = () =>
+    wrapper.find(".enable-scheduled-actions").find(ReactSwitch);
 
   async function toggleDataComponent(
     switchElement: ReactWrapper<any>,
@@ -133,16 +134,15 @@ async function mountForm(
     await toggleDataComponent(determinationSwitch(), val);
   }
 
+  async function toggleScheduledActions(val: boolean) {
+    await toggleDataComponent(scheduledActionsSwitch(), val);
+  }
+
   async function fillOutRequiredFields() {
     // Set the name:
     wrapper
       .find(".workflow-main-details .name-field input")
       .simulate("change", { target: { value: "test-config" } });
-    // Set the group:
-    wrapper
-      .find(".workflow-main-details .group-field")
-      .find(Select)
-      .prop<any>("onChange")({ value: TEST_GROUP_1.name });
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -160,9 +160,11 @@ async function mountForm(
     togglePreparations,
     toggleStorage,
     toggleDeterminations,
+    toggleScheduledActions,
     colEventSwitch,
     catalogSwitch,
     storageSwitch,
+    scheduledActionsSwitch,
     determinationSwitch,
     fillOutRequiredFields,
     submitForm
@@ -480,19 +482,64 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Edits an existing action-definition: Renders the form with minimal data.", async () => {
-    const { colEventSwitch, catalogSwitch } = await mountForm({
+  it("Submits a new ADD-type action-definition: Only set the scheduled action template fields.", async () => {
+    const {
+      wrapper,
+      toggleScheduledActions,
+      fillOutRequiredFields,
+      submitForm
+    } = await mountForm();
+
+    await fillOutRequiredFields();
+
+    // Enable the component toggles:
+    await toggleScheduledActions(true);
+
+    // Add default remarks:
+    wrapper
+      .find("#scheduled-actions-section input[type='checkbox']")
+      .last()
+      .simulate("change", { target: { checked: true } });
+    wrapper
+      .find("#scheduled-actions-section .remarks-field textarea")
+      .simulate("change", { target: { value: "default-remarks" } });
+
+    await submitForm();
+
+    expect(mockOnSaved).lastCalledWith({
       actionType: "ADD",
-      formTemplates: {},
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          templateFields: {
+            "scheduledAction.remarks": {
+              defaultValue: "default-remarks",
+              enabled: true
+            }
+          }
+        }
+      },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       type: "material-sample-action-definition"
     });
+  });
+
+  it("Edits an existing action-definition: Renders the form with minimal data.", async () => {
+    const { colEventSwitch, catalogSwitch, scheduledActionsSwitch } =
+      await mountForm({
+        actionType: "ADD",
+        formTemplates: {},
+        group: "test-group-1",
+        id: "123",
+        name: "test-config",
+        type: "material-sample-action-definition"
+      });
 
     // Checkboxes are unchecked:
     expect(colEventSwitch().prop("checked")).toEqual(false);
     expect(catalogSwitch().prop("checked")).toEqual(false);
+    expect(scheduledActionsSwitch().prop("checked")).toEqual(false);
   });
 
   it("Edits an existing action-definition: Can unlink an existing Collecting Event.", async () => {
@@ -650,10 +697,12 @@ describe("Workflow template edit page", () => {
       catalogSwitch,
       storageSwitch,
       determinationSwitch,
+      scheduledActionsSwitch,
       toggleColEvent,
       togglePreparations,
       toggleStorage,
       toggleDeterminations,
+      toggleScheduledActions,
       submitForm
     } = await mountForm({
       actionType: "ADD",
@@ -692,6 +741,10 @@ describe("Workflow template edit page", () => {
               "determination[0].verbatimScientificName": {
                 defaultValue: "test scientific name",
                 enabled: true
+              },
+              "scheduledAction.remarks": {
+                defaultValue: "default-remarks",
+                enabled: true
               }
             }
           }
@@ -708,12 +761,14 @@ describe("Workflow template edit page", () => {
     expect(catalogSwitch().prop("checked")).toEqual(true);
     expect(storageSwitch().prop("checked")).toEqual(true);
     expect(determinationSwitch().prop("checked")).toEqual(true);
+    expect(scheduledActionsSwitch().prop("checked")).toEqual(true);
 
     // Remove all data components:
     await toggleColEvent(false);
     await togglePreparations(false);
     await toggleStorage(false);
     await toggleDeterminations(false);
+    await toggleScheduledActions(false);
 
     await submitForm();
 

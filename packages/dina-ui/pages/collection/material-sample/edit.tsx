@@ -1,31 +1,39 @@
 import {
+  AutoSuggestTextField,
   BackButton,
   ButtonBar,
   DinaForm,
   DinaFormContext,
   DinaFormSection,
   FieldSet,
+  filterBy,
   FormikButton,
   LoadingSpinner,
+  ResourceSelectField,
   StringArrayField,
   SubmitButton,
   TextField,
   withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
+import { padStart } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ReactNode, useContext } from "react";
-import Switch from "react-switch";
+import { ReactNode, useContext, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
 import {
+  AttachmentsField,
   CollectionSelectField,
   Footer,
   GroupSelectField,
   Head,
   MaterialSampleBreadCrumb,
+  MaterialSampleFormNav,
   Nav,
-  StorageLinkerField
+  ScheduledActionsField,
+  StorageLinkerField,
+  TagsAndRestrictionsSection
 } from "../../../components";
 import {
   CollectingEventLinker,
@@ -33,6 +41,7 @@ import {
 } from "../../../components/collection";
 import { DeterminationField } from "../../../components/collection/DeterminationField";
 import { PreparationField } from "../../../components/collection/PreparationField";
+import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import {
   useMaterialSampleQuery,
   useMaterialSampleSave
@@ -40,39 +49,109 @@ import {
 import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { CollectingEvent, MaterialSample } from "../../../types/collection-api";
+import {
+  CollectingEvent,
+  MaterialSample,
+  MaterialSampleType,
+  Vocabulary
+} from "../../../types/collection-api";
+
+export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
 export default function MaterialSampleEditPage() {
   const router = useRouter();
-  const {
-    query: { id }
-  } = router;
+
+  const id = router.query.id?.toString();
+  const copyFromId = router.query.copyFromId?.toString();
+
   const { formatMessage } = useDinaIntl();
-  const materialSampleQuery = useMaterialSampleQuery(id as any);
+
+  const materialSampleQuery = useMaterialSampleQuery(id);
+  const copyFromQuery = useMaterialSampleQuery(copyFromId);
+
+  /** The page to redirect to after saving. */
+  const [saveRedirect, setSaveRedirect] = useState<PostSaveRedirect>("VIEW");
 
   async function moveToViewPage(savedId: string) {
     await router.push(`/collection/material-sample/view?id=${savedId}`);
   }
 
+  async function moveToNextSamplePage(savedId: string) {
+    await router.push(`/collection/material-sample/edit?copyFromId=${savedId}`);
+  }
+
   const title = id ? "editMaterialSampleTitle" : "addMaterialSampleTitle";
+
+  const sampleFormProps = {
+    buttonBar: (
+      <ButtonBar>
+        <BackButton
+          className="me-auto"
+          entityId={id}
+          entityLink="/collection/material-sample"
+        />
+        {!id && (
+          <SubmitButton
+            buttonProps={() => ({
+              style: { width: "12rem" },
+              onClick: () => setSaveRedirect("CREATE_NEXT")
+            })}
+          >
+            <DinaMessage id="saveAndCopyToNext" />
+          </SubmitButton>
+        )}
+        <SubmitButton
+          buttonProps={() => ({ onClick: () => setSaveRedirect("VIEW") })}
+        />
+      </ButtonBar>
+    ),
+    // On save either redirect to the view page or create the next sample with the same values:
+    onSaved:
+      saveRedirect === "CREATE_NEXT" ? moveToNextSamplePage : moveToViewPage
+  };
 
   return (
     <div>
-      <Head title={formatMessage(title)} />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
+        {!id &&
+          !!copyFromId &&
+          withResponse(copyFromQuery, ({ data: originalSample }) => (
+            <SaveAndCopyToNextSuccessAlert
+              id={copyFromId}
+              displayName={
+                !!originalSample.materialSampleName?.length
+                  ? originalSample.materialSampleName
+                  : copyFromId
+              }
+              entityPath={"collection/material-sample"}
+            />
+          ))}
         <h1 id="wb-cont">
           <DinaMessage id={title} />
         </h1>
         {id ? (
-          withResponse(materialSampleQuery, ({ data }) => (
-            <MaterialSampleForm
-              materialSample={data}
-              onSaved={moveToViewPage}
-            />
+          withResponse(materialSampleQuery, ({ data: sample }) => (
+            <MaterialSampleForm {...sampleFormProps} materialSample={sample} />
           ))
+        ) : copyFromId ? (
+          withResponse(copyFromQuery, ({ data: originalSample }) => {
+            const initialValues = nextSampleInitialValues(originalSample);
+            return (
+              <MaterialSampleForm
+                {...sampleFormProps}
+                materialSample={initialValues}
+              />
+            );
+          })
         ) : (
-          <MaterialSampleForm onSaved={moveToViewPage} />
+          <MaterialSampleForm {...sampleFormProps} />
         )}
       </main>
       <Footer />
@@ -135,21 +214,17 @@ export function MaterialSampleForm({
     setColEventId,
     colEventQuery,
     onSubmit,
-    materialSampleAttachmentsUI,
     loading
   } =
     materialSampleSaveHook ??
     useMaterialSampleSave({
       collectingEventAttachmentsConfig: attachmentsConfig?.collectingEvent,
-      materialSampleAttachmentsConfig: attachmentsConfig?.materialSample,
       materialSample,
       collectingEventInitialValues,
       onSaved,
       isTemplate,
       enabledFields
     });
-
-  const { formatMessage } = useDinaIntl();
 
   // CollectingEvent "id" being enabled in the template enabledFields means that the
   // Template links an existing Collecting Event:
@@ -158,57 +233,9 @@ export function MaterialSampleForm({
   );
 
   const mateirialSampleInternal = (
-    <div className="d-flex">
-      <div>
-        <nav
-          className="card card-body sticky-top d-none d-md-block"
-          style={{ width: "20rem" }}
-        >
-          <h2>
-            <DinaMessage id="formNavigation" />
-          </h2>
-          <div className="list-group">
-            {!isTemplate && (
-              <a href="#material-sample-section" className="list-group-item">
-                <DinaMessage id="materialSample" />
-              </a>
-            )}
-            {!isTemplate && (
-              <a href="#identifiers-section" className="list-group-item">
-                <DinaMessage id="identifiers" />
-              </a>
-            )}
-            {dataComponentState.enableCollectingEvent && (
-              <a href="#collecting-event-section" className="list-group-item">
-                <DinaMessage id="collectingEvent" />
-              </a>
-            )}
-            {dataComponentState.enablePreparations && (
-              <a href="#preparations-section" className="list-group-item">
-                <DinaMessage id="preparations" />
-              </a>
-            )}
-            {dataComponentState.enableDetermination && (
-              <a href="#determination-section" className="list-group-item">
-                <DinaMessage id="determination" />
-              </a>
-            )}
-            {dataComponentState.enableStorage && (
-              <a href="#storage-section" className="list-group-item">
-                <DinaMessage id="storage" />
-              </a>
-            )}
-            <a href="#managedAttributes-section" className="list-group-item">
-              <DinaMessage id="managedAttributeListTitle" />
-            </a>
-            <a
-              href="#material-sample-attachments-section"
-              className="list-group-item"
-            >
-              <DinaMessage id="materialSampleAttachments" />
-            </a>
-          </div>
-        </nav>
+    <div className="d-md-flex">
+      <div style={{ minWidth: "20rem" }}>
+        <MaterialSampleFormNav dataComponentState={dataComponentState} />
       </div>
       <div className="flex-grow-1 container-fluid">
         {!isTemplate && materialSample && (
@@ -217,9 +244,10 @@ export function MaterialSampleForm({
             materialSample={materialSample as any}
           />
         )}
-        {!isTemplate && <MaterialSampleMainInfoFormLayout />}
+        {!isTemplate && <MaterialSampleInfoFormLayout />}
+        <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
         <MaterialSampleIdentifiersFormLayout />
-        <DataComponentToggler state={dataComponentState} />
+        <MaterialSampleFormLayout />
         <div className="data-components">
           {dataComponentState.enableCollectingEvent && (
             <FieldSet
@@ -313,7 +341,13 @@ export function MaterialSampleForm({
               </Tabs>
             </FieldSet>
           )}
-          {dataComponentState.enablePreparations && <PreparationField />}
+          {dataComponentState.enablePreparations && (
+            <PreparationField
+              // Use the same attachments config for preparations as the Material Sample:
+              attachmentsConfig={attachmentsConfig?.materialSample}
+            />
+          )}
+          {dataComponentState.enableOrganism && <OrganismStateField />}
           {dataComponentState.enableDetermination && <DeterminationField />}
           {dataComponentState.enableStorage && (
             <FieldSet
@@ -324,6 +358,9 @@ export function MaterialSampleForm({
                 <StorageLinkerField name="storageUnit" removeLabelTag={true} />
               </div>
             </FieldSet>
+          )}
+          {dataComponentState.enableScheduledActions && (
+            <ScheduledActionsField />
           )}
           {!isTemplate && (
             <FieldSet
@@ -345,7 +382,15 @@ export function MaterialSampleForm({
               </DinaFormSection>
             </FieldSet>
           )}
-          {materialSampleAttachmentsUI}
+          <AttachmentsField
+            name="attachment"
+            title={<DinaMessage id="materialSampleAttachments" />}
+            id="material-sample-attachments-section"
+            allowNewFieldName="attachmentsConfig.allowNew"
+            allowExistingFieldName="attachmentsConfig.allowExisting"
+            allowAttachmentsConfig={attachmentsConfig?.materialSample}
+            attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
+          />
         </div>
       </div>
     </div>
@@ -368,18 +413,52 @@ export function MaterialSampleForm({
     </DinaForm>
   );
 }
-export function MaterialSampleMainInfoFormLayout() {
+export function MaterialSampleInfoFormLayout() {
   return (
-    <div id="material-sample-section">
-      <div className="row">
-        <div className="col-md-6">
-          <GroupSelectField name="group" enableStoredDefaultGroup={true} />
-        </div>
+    <div className="row">
+      <div className="col-md-6">
+        <GroupSelectField name="group" enableStoredDefaultGroup={true} />
       </div>
     </div>
   );
 }
 
+export function MaterialSampleFormLayout() {
+  const { locale } = useDinaIntl();
+  return (
+    <FieldSet
+      id="material-sample-section"
+      legend={<DinaMessage id="materialSample" />}
+    >
+      <div className="row">
+        <div className="col-md-6">
+          <ResourceSelectField<MaterialSampleType>
+            name="materialSampleType"
+            filter={filterBy(["name"])}
+            model="collection-api/material-sample-type"
+            optionLabel={it => it.name}
+            readOnlyLink="/collection/material-sample-type/view?id="
+          />
+          <AutoSuggestTextField<Vocabulary>
+            name="materialSampleState"
+            query={() => ({
+              path: "collection-api/vocabulary/materialSampleState"
+            })}
+            suggestion={vocabElement =>
+              vocabElement?.vocabularyElements?.map(
+                it => it?.labels?.[locale] ?? ""
+              ) ?? ""
+            }
+            alwaysShowSuggestions={true}
+          />
+        </div>
+        <div className="col-md-6">
+          <TextField name="materialSampleRemarks" multiLines={true} />
+        </div>
+      </div>
+    </FieldSet>
+  );
+}
 export interface MaterialSampleIdentifiersFormLayoutProps {
   disableSampleName?: boolean;
   hideOtherCatalogNumbers?: boolean;
@@ -391,7 +470,14 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
 export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
   "collection",
   "materialSampleName",
-  "dwcOtherCatalogNumbers"
+  "dwcOtherCatalogNumbers",
+  "barcode"
+];
+
+export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
+  "materialSampleRemarks",
+  "materialSampleState",
+  "materialSampleType"
 ];
 
 /** Fields layout re-useable between view and edit pages. */
@@ -465,58 +551,45 @@ export function CollectingEventBriefDetails({
   );
 }
 
-/** Toggles to enable/disable form sections. */
-function DataComponentToggler({
-  state
-}: {
-  state: ReturnType<typeof useMaterialSampleSave>["dataComponentState"];
-}) {
-  const { formatMessage } = useDinaIntl();
-  return (
-    <FieldSet legend={<DinaMessage id="components" />}>
-      <div className="d-flex gap-5">
-        {[
-          {
-            name: formatMessage("collectingEvent"),
-            className: "enable-collecting-event",
-            enabled: state.enableCollectingEvent,
-            setEnabled: state.setEnableCollectingEvent
-          },
-          {
-            name: formatMessage("preparations"),
-            className: "enable-catalogue-info",
-            enabled: state.enablePreparations,
-            setEnabled: state.setEnablePreparations
-          },
-          {
-            name: formatMessage("determination"),
-            className: "enable-determination",
-            enabled: state.enableDetermination,
-            setEnabled: state.setEnableDetermination
-          },
-          {
-            name: formatMessage("storage"),
-            className: "enable-storage",
-            enabled: state.enableStorage,
-            setEnabled: state.setEnableStorage
-          }
-        ].map(section => (
-          <label
-            className={`${section.className} d-flex align-items-center fw-bold`}
-            key={section.name}
-          >
-            <Switch
-              className="mx-2"
-              checked={section.enabled}
-              onChange={state.dataComponentToggler(
-                section.setEnabled,
-                section.name
-              )}
-            />
-            {section.name}
-          </label>
-        ))}
-      </div>
-    </FieldSet>
+/** Calculates the next sample name based on the previous name's suffix. */
+export function nextSampleName(previousName?: string | null): string {
+  if (!previousName) {
+    return "";
+  }
+
+  const originalNumberSuffix = /\d+$/.exec(previousName)?.[0];
+
+  if (!originalNumberSuffix) {
+    return "";
+  }
+
+  const suffixLength = originalNumberSuffix.length;
+  const nextNumberSuffix = padStart(
+    (Number(originalNumberSuffix) + 1).toString(),
+    suffixLength,
+    "0"
   );
+  const newMaterialSampleName = nextNumberSuffix
+    ? previousName.replace(/\d+$/, nextNumberSuffix)
+    : previousName;
+
+  return newMaterialSampleName;
+}
+
+export function nextSampleInitialValues(
+  originalSample: PersistedResource<MaterialSample>
+) {
+  // Use the copied sample as a base, omitting some fields that shouldn't be copied:
+  const { id, createdOn, createdBy, materialSampleName, ...copiedValues } =
+    originalSample;
+
+  // Calculate the next suffix:
+  const newMaterialSampleName = nextSampleName(materialSampleName);
+
+  const initialValues = {
+    ...copiedValues,
+    materialSampleName: newMaterialSampleName
+  };
+
+  return initialValues;
 }

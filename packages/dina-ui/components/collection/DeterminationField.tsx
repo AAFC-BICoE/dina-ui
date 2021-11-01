@@ -1,17 +1,21 @@
 import {
   AutoSuggestTextField,
   DateField,
+  DinaFormSection,
   FieldSet,
   filterBy,
   FormikButton,
   ResourceSelectField,
   TextField,
   TextFieldWithMultiplicationButton,
-  useDinaFormContext
+  useDinaFormContext,
+  Tooltip
 } from "common-ui";
-import { FieldArray } from "formik";
-import { Accordion } from "react-bootstrap";
-import { VscTriangleDown, VscTriangleRight } from "react-icons/vsc";
+import DOMPurify from "dompurify";
+import { FieldArray, FormikContextType } from "formik";
+import { clamp, get } from "lodash";
+import { useState } from "react";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { CatalogueOfLifeNameField } from ".";
 import { Person } from "../../../dina-ui/types/agent-api/resources/Person";
 import { TypeStatusEnum } from "../../../dina-ui/types/collection-api/resources/TypeStatus";
@@ -42,17 +46,42 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     scientificNameSource: true,
     scientificNameDetails: true,
     scientificName: true,
-    transcriberRemarks: true
+    transcriberRemarks: true,
+    isPrimary: true
   };
 
 /** All fields of the Determination type. */
 export const DETERMINATION_FIELDS = Object.keys(DETERMINATION_FIELDS_OBJECT);
 
 export function DeterminationField({ className }: DeterminationFieldProps) {
-  const { readOnly, isTemplate } = useDinaFormContext();
+  const { readOnly, isTemplate, initialValues } = useDinaFormContext();
   const { openAddPersonModal } = useAddPersonModal();
   const { formatMessage, locale } = useDinaIntl();
   const determinationsPath = "determination";
+
+  // Open the tab with the Primary determination even if it's not the first one.
+  // Defaults to 0 if there's no primary determination.
+  const intialPrimaryDeterminationIndex = Math.max(
+    0,
+    (initialValues as Partial<MaterialSample>).determination?.findIndex(
+      dtmntn => dtmntn?.isPrimary
+    ) ?? 0
+  );
+
+  const [activeTabIdx, setActiveTabIdx] = useState(
+    intialPrimaryDeterminationIndex
+  );
+
+  /** Make this Assertion the Primary. */
+  function makePrimary(formik: FormikContextType<any>, index) {
+    const assertions: Determination[] =
+      get(formik.values, determinationsPath) ?? [];
+
+    assertions.forEach((_, idx) => {
+      formik.setFieldValue(`${determinationsPath}[${idx}].isPrimary`, false);
+    });
+    formik.setFieldValue(`${determinationsPath}[${index}].isPrimary`, true);
+  }
 
   return (
     <div>
@@ -61,17 +90,15 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
           const determinations =
             (form.values.determination as Determination[]) ?? [];
           function addDetermination() {
-            push({});
-            setImmediate(() => {
-              // Scroll to the new accordion item:
-              document
-                .querySelector(".determination-section .accordion:last-child")
-                ?.scrollIntoView({ behavior: "smooth", block: "center" });
-            });
+            push({ isPrimary: determinations?.length === 0 });
+            setActiveTabIdx(determinations.length);
           }
 
           function removeDetermination(index: number) {
-            remove(index);
+            remove(index); // Stay on the current tab number, or reduce if removeing the last element:
+            setActiveTabIdx(current =>
+              clamp(current, 0, determinations.length - 2)
+            );
           }
 
           function determinationInternal(index: number) {
@@ -88,6 +115,30 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
 
             return (
               <div className="row">
+                {!readOnly && !isTemplate && (
+                  <div className="mb-3">
+                    <FormikButton
+                      className="btn btn-primary primary-determinationtion-button"
+                      buttonProps={ctx => {
+                        const isPrimary =
+                          get(
+                            ctx.values,
+                            `${determinationsPath}[${index}].` + "isPrimary"
+                          ) ?? false;
+                        return {
+                          disabled: isPrimary,
+                          children: isPrimary ? (
+                            <DinaMessage id="primary" />
+                          ) : (
+                            <DinaMessage id="makePrimary" />
+                          )
+                        };
+                      }}
+                      onClick={(_, formik) => makePrimary(formik, index)}
+                    />
+                    <Tooltip id="primaryDeterminationButton_tooltip" />
+                  </div>
+                )}
                 <div className="col-md-6">
                   <FieldSet
                     legend={<DinaMessage id="verbatimDeterminationLegend" />}
@@ -190,109 +241,92 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
             <FieldSet
               className={className}
               id="determination-section"
-              legend={
-                <div className="list-inline">
-                  <div className="d-flex gap-3 mb-2">
-                    <DinaMessage id="determinations" />
-                    {!readOnly && !isTemplate && determinations?.length && (
-                      <FormikButton
-                        className="list-inline-item btn btn-primary add-determination-button"
-                        onClick={addDetermination}
-                      >
-                        <DinaMessage id="addAnotherDetermination" />
-                      </FormikButton>
-                    )}
-                  </div>
-                </div>
-              }
+              legend={<DinaMessage id="determinations" />}
             >
               <div className="determination-section">
-                {determinations.length === 1 ? (
-                  determinationInternal(0)
-                ) : (
-                  <div>
-                    {!isTemplate && (
-                      <div
-                        className="d-flex"
-                        style={{ padding: "1rem 1.25rem" }}
-                      >
-                        <div
-                          className="spacer me-3"
-                          style={{ width: "16px" }}
-                        />
-                        <div className="row fw-bold flex-grow-1">
-                          <div className="col-3">
-                            <DinaMessage id="field_verbatimScientificName" />
-                          </div>
-                          <div className="col-3">
-                            <DinaMessage id="field_verbatimDate" />
-                          </div>
-                          <div className="col-3">
-                            <DinaMessage id="field_verbatimDeterminer" />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    <style>{`.accordion-button { padding: 0.5rem 1.25rem !important; }`}</style>
-                    <style>{`
-                    /* Zebra striping: */
-                    .accordion:nth-child(even) .accordion-button { background-color: #f3f3f3 !important; }
-                    .accordion:nth-child(even) .accordion-item { background-color: #f3f3f3 !important; }
-                    .accordion:nth-child(odd) .accordion-button { background-color: #fff !important; }
-                    .accordion:nth-child(odd) .accordion-item { background-color: #fff !important; }
- 
-                    /* Put the accordion arrow on the left side: */
-                    .accordion-button::after { display: none !important; }
-                    .accordion-button.collapsed .down-arrow { display: none !important; }
-                    .accordion-button:not(.collapsed) .right-arrow { display: none !important; }
-                  `}</style>
-                    {isTemplate
-                      ? determinationInternal(0)
-                      : determinations.map((determination, index) => (
-                          <Accordion
-                            key={index}
-                            defaultActiveKey={String(
-                              readOnly ? -1 : determinations.length - 1
-                            )}
+                <Tabs selectedIndex={activeTabIdx} onSelect={setActiveTabIdx}>
+                  {
+                    // Only show the tabs when there is more than 1 assertion:
+                    <TabList
+                      className={`react-tabs__tab-list mb-0 ${
+                        determinations.length === 1 ? "d-none" : ""
+                      }`}
+                    >
+                      {determinations.map((determination, index) => (
+                        <Tab key={index}>
+                          <span className="m-3">
+                            {index + 1}
+                            {determination.isPrimary &&
+                              ` (${formatMessage("primary")})`}
+                          </span>
+                        </Tab>
+                      ))}
+                    </TabList>
+                  }
+                  {determinations.length
+                    ? determinations.map((_, index) => (
+                        <TabPanel key={index}>
+                          <div
+                            className="card-body border-top-0 mb-3"
+                            style={
+                              determinations.length > 1
+                                ? { border: "1px solid rgb(170, 170, 170)" }
+                                : undefined
+                            }
                           >
-                            <Accordion.Item eventKey={String(index)}>
-                              <Accordion.Header className="mt-0">
-                                <VscTriangleDown className="down-arrow me-3" />
-                                <VscTriangleRight className="right-arrow me-3" />
-                                <div className="row align-items-center flex-grow-1 fw-bold">
-                                  <div className="col-3 my-2">
-                                    {determination.verbatimScientificName}
-                                  </div>
-                                  <div className="col-3">
-                                    {determination.verbatimDate}
-                                  </div>
-                                  <div className="col-3">
-                                    {determination.verbatimDeterminer}
-                                  </div>
-                                  <div className="col-3 d-flex">
-                                    {!readOnly && !isTemplate && (
-                                      <button
-                                        type="button"
-                                        className="btn btn-dark mx-auto"
-                                        onClick={event => {
-                                          event.stopPropagation();
-                                          removeDetermination(index);
-                                        }}
-                                      >
-                                        <DinaMessage id="deleteButtonText" />
-                                      </button>
-                                    )}
-                                  </div>
-                                </div>
-                              </Accordion.Header>
-                              <Accordion.Body>
-                                {determinationInternal(index)}
-                              </Accordion.Body>
-                            </Accordion.Item>
-                          </Accordion>
-                        ))}
-                  </div>
+                            {determinationInternal(index)}
+                            {!readOnly && !isTemplate && (
+                              <div className="list-inline">
+                                <FormikButton
+                                  className="list-inline-item btn btn-primary add-determination-button"
+                                  onClick={addDetermination}
+                                >
+                                  <DinaMessage id="addAnotherDetermination" />
+                                </FormikButton>
+                                <FormikButton
+                                  className="list-inline-item btn btn-dark"
+                                  onClick={() => removeDetermination(index)}
+                                >
+                                  <DinaMessage id="removeDeterminationLabel" />
+                                </FormikButton>
+                              </div>
+                            )}
+                          </div>
+                        </TabPanel>
+                      ))
+                    : null}
+                </Tabs>
+                {!determinations.length && !readOnly && !isTemplate && (
+                  <FormikButton
+                    className="btn btn-primary add-determination-button"
+                    onClick={addDetermination}
+                  >
+                    <DinaMessage id="addDetermination" />
+                  </FormikButton>
                 )}
+              </div>
+              <div className="row">
+                <DinaFormSection horizontal="flex">
+                  <AutoSuggestTextField
+                    name="filedAs"
+                    className="col-sm-6"
+                    alwaysShowSuggestions={true}
+                    placeholder={formatMessage(
+                      "typeAnythingOrPickAScientificName"
+                    )}
+                    suggestions={(_, formik) =>
+                      formik.values.determination?.flatMap(det => [
+                        det.verbatimScientificName,
+                        // Scientific name can be html:
+                        det.scientificName &&
+                          new DOMParser().parseFromString(
+                            DOMPurify.sanitize(det.scientificName),
+                            "text/html"
+                          ).documentElement.textContent
+                      ]) ?? []
+                    }
+                  />
+                </DinaFormSection>
               </div>
             </FieldSet>
           );

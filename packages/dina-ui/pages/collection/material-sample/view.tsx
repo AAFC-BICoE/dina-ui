@@ -13,11 +13,19 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
 import {
+  OrganismStateField,
+  ORGANISM_FIELDS
+} from "../../../../dina-ui/components/collection/OrganismStateField";
+import { SamplesView } from "../../../../dina-ui/components/collection/SamplesView";
+import {
   Footer,
   Head,
   MaterialSampleBreadCrumb,
   Nav,
-  StorageLinkerField
+  NotPubliclyReleasableWarning,
+  ScheduledActionsField,
+  StorageLinkerField,
+  TagsAndRestrictionsSection
 } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { DeterminationField } from "../../../components/collection/DeterminationField";
@@ -32,8 +40,8 @@ import { ManagedAttributesViewer } from "../../../components/object-store/manage
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import {
-  MaterialSampleIdentifiersFormLayout,
-  MaterialSampleMainInfoFormLayout
+  MaterialSampleFormLayout,
+  MaterialSampleIdentifiersFormLayout
 } from "./edit";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
@@ -49,18 +57,15 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
   const collectingEvent = colEventQuery.response?.data;
 
-  const buttonBar = (
+  const buttonBar = id && (
     <ButtonBar className="flex">
       <BackButton
-        entityId={id as string}
+        entityId={id}
         entityLink="/collection/material-sample"
         byPassView={true}
         className="flex-grow-1"
       />
-      <EditButton
-        entityId={id as string}
-        entityLink="collection/material-sample"
-      />
+      <EditButton entityId={id} entityLink="collection/material-sample" />
       <Link
         href={`/collection/material-sample/workflows/split-config?id=${id}`}
       >
@@ -68,9 +73,15 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           <DinaMessage id="splitButton" />
         </a>
       </Link>
+      {/* Uncomment if we need copy + create next
+      <Link href={`/collection/material-sample/edit/?copyFromId=${id}`}>
+        <a className="btn btn-info">
+          <DinaMessage id="copyAndCreateNextSample" />
+        </a>
+      </Link> */}
       <DeleteButton
         className="ms-5"
-        id={id as string}
+        id={id}
         options={{ apiBaseUrl: "/collection-api" }}
         postDeleteRedirect="/collection/material-sample/list"
         type="material-sample"
@@ -80,33 +91,54 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("materialSampleViewTitle")} />
+      <Head
+        title={formatMessage("materialSampleViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       {withResponse(materialSampleQuery, ({ data: materialSample }) => {
         const hasPreparations = PREPARATION_FIELDS.some(
           fieldName => materialSample[fieldName]
         );
 
+        const hasOrganism = ORGANISM_FIELDS.some(
+          fieldName => materialSample.organism?.[fieldName]
+        );
+
         const hasDetermination = materialSample?.determination?.some(
           det => !isEmpty(det)
         );
-
         return (
           <main className="container-fluid">
-            {buttonBar}
-            <h1 id="wb-cont">
-              <DinaMessage id="materialSampleViewTitle" />
-            </h1>
             <DinaForm<MaterialSample>
               initialValues={materialSample}
               readOnly={true}
             >
-              <MaterialSampleBreadCrumb
-                materialSample={materialSample}
-                disableLastLink={true}
-              />
-              <MaterialSampleMainInfoFormLayout />
+              <NotPubliclyReleasableWarning />
+              {buttonBar}
+              <h1 id="wb-cont">
+                <MaterialSampleBreadCrumb
+                  materialSample={materialSample}
+                  disableLastLink={true}
+                />
+              </h1>
+              <TagsAndRestrictionsSection />
               <MaterialSampleIdentifiersFormLayout />
+              {materialSample.parentMaterialSample && (
+                <SamplesView
+                  samples={[materialSample.parentMaterialSample]}
+                  fieldSetId={<DinaMessage id="parentMaterialSample" />}
+                />
+              )}
+              {!!materialSample.materialSampleChildren?.length && (
+                <SamplesView
+                  samples={materialSample.materialSampleChildren}
+                  fieldSetId={<DinaMessage id="childMaterialSamples" />}
+                />
+              )}
+              <MaterialSampleFormLayout />
               {collectingEvent && (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                   <DinaForm initialValues={collectingEvent} readOnly={true}>
@@ -124,11 +156,15 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 </FieldSet>
               )}
               {hasPreparations && <PreparationField />}
+              {hasOrganism && <OrganismStateField />}
               {hasDetermination && <DeterminationField />}
               {materialSample.storageUnit && (
                 <div className="card card-body mb-3">
                   <StorageLinkerField name="storageUnit" />
                 </div>
+              )}
+              {!!materialSample?.scheduledActions?.length && (
+                <ScheduledActionsField />
               )}
               <FieldSet
                 legend={<DinaMessage id="materialSampleManagedAttributes" />}

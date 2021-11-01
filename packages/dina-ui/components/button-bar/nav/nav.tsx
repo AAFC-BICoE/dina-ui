@@ -3,8 +3,9 @@ import Link from "next/link";
 import React from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { intlContext } from "../../../../common-ui/lib/intl/IntlSupport";
+import Dropdown from "react-bootstrap/Dropdown";
 
 export function Nav() {
   const { roles } = useAccount();
@@ -17,25 +18,18 @@ export function Nav() {
 
   return (
     <>
-      <nav>
-        <ul id="wb-tphp" className="wb-inv wb-init wb-disable-inited">
-          <li className="wb-slc">
-            <a className="wb-sl" href="#wb-cont">
-              <DinaMessage id="skipToMainContent" />
-            </a>
-          </li>
-          <li className="wb-slc visible-sm visible-md visible-lg">
-            <a className="wb-sl" href="#wb-info">
-              <DinaMessage id="skipToAboutThisApplication" />
-            </a>
-          </li>
-          <li className="wb-slc">
-            <a className="wb-sl" rel="alternate" href="?wbdisable=true">
-              <DinaMessage id="skipToBasicHtmlVersion" />
-            </a>
-          </li>
-        </ul>
-      </nav>
+      <div id="wb-tphp" className="d-flex flex-column align-items-center">
+        <a className="wb-link-inv wb-sl" href="#wb-cont">
+          <DinaMessage id="skipToMainContent" />
+        </a>
+        <a className="wb-link-inv wb-sl" href="#wb-info">
+          <DinaMessage id="skipToAboutThisApplication" />
+        </a>
+        <a className="wb-link-inv wb-sl" rel="alternate" href="?wbdisable=true">
+          <DinaMessage id="skipToBasicHtmlVersion" />
+        </a>
+      </div>
+
       <header className="py-3">
         <div id="wb-bnr" className="container">
           <div className="row d-flex">
@@ -49,7 +43,7 @@ export function Nav() {
                 alt={formatMessage("governmentOfCanada")}
                 property="logo"
               />
-              <span className="wb-inv" property="name" tabIndex={0}>
+              <span className="wb-inv" property="name">
                 <span lang={locale}>
                   <DinaMessage id="governmentOfCanada" />
                 </span>
@@ -80,16 +74,6 @@ export function Nav() {
         <div className="app-bar">
           <div className="container">
             <ul className="list-inline d-flex m-0">
-              <style>
-                {`
-                .dropdown:hover .dropdown-menu {
-                    display: block;
-                }
-                .dropdown a.nav-link {
-                  color: rgb(232, 230, 227);
-                }
-              `}
-              </style>
               <li className="list-inline-item me-4">
                 <Link href="/">
                   <a className="app-name px-0">
@@ -122,249 +106,256 @@ export function Nav() {
   );
 }
 
+function menuDisplayControl() {
+  const [show, setShow] = useState(false);
+  const showDropdown = () => {
+    setShow(true);
+  };
+  const hideDropdown = () => {
+    setShow(false);
+  };
+  function onKeyDown(e) {
+    if (
+      e.key === "ArrowDown" ||
+      e.key === "ArrowUp" ||
+      e.key === "Space" ||
+      e.key === " " ||
+      e.key === "Enter"
+    ) {
+      showDropdown();
+    } else if (e.key === "Escape" || (e.shiftKey && e.key === "Tab")) {
+      hideDropdown();
+    }
+  }
+  function onKeyDownLastItem(e) {
+    if (!e.shiftKey && e.key === "Tab") {
+      hideDropdown();
+    }
+  }
+  return { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem };
+}
+
 /** Object Store links. */
 function NavObjectStoreDropdown() {
+  const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
+    menuDisplayControl();
   return (
-    <div className="dropdown">
-      <a className="nav-link dropdown-toggle" href="#">
+    <Dropdown
+      onMouseOver={showDropdown}
+      onKeyDown={onKeyDown}
+      onMouseLeave={hideDropdown}
+      show={show}
+    >
+      <Dropdown.Toggle className="nav-link">
         <DinaMessage id="objectStoreTitle" />
-      </a>
-      <div className="dropdown-menu m-0">
-        <Link href="/object-store/upload">
-          <a className="dropdown-item">
-            <DinaMessage id="uploadPageTitle" />
-          </a>
-        </Link>
-        <Link href="/object-store/object/list">
-          <a className="dropdown-item">
-            <DinaMessage id="objectListTitle" />
-          </a>
-        </Link>
-        <Link href="/object-store/managedAttributesView/listView">
-          <a className="dropdown-item">
-            <DinaMessage id="managedAttributeListTitle" />
-          </a>
-        </Link>
-        <Link href="/object-store/object-subtype/list">
-          <a className="dropdown-item">
-            <DinaMessage id="objectSubtypeListTitle" />
-          </a>
-        </Link>
-        <Link href="/object-store/revisions-by-user">
-          <a className="dropdown-item">
-            <DinaMessage id="revisionsByUserPageTitle" />
-          </a>
-        </Link>
-      </div>
-    </div>
+      </Dropdown.Toggle>
+      <Dropdown.Menu>
+        <Dropdown.Item href="/object-store/upload">
+          <DinaMessage id="uploadPageTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/object-store/object/list">
+          <DinaMessage id="objectListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/object-store/managedAttributesView/listView">
+          <DinaMessage id="managedAttributeListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/object-store/object-subtype/list">
+          <DinaMessage id="objectSubtypeListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          href="/object-store/revisions-by-user"
+          onKeyDown={onKeyDownLastItem}
+        >
+          <DinaMessage id="revisionsByUserPageTitle" />
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 }
 
 /** Agents links. */
 function NavAgentsDropdown() {
+  const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
+    menuDisplayControl();
   return (
-    <div className="dropdown">
-      <a className="nav-link dropdown-toggle" href="#">
+    <Dropdown
+      show={show}
+      onMouseOver={showDropdown}
+      onMouseLeave={hideDropdown}
+      onKeyDown={onKeyDown}
+    >
+      <Dropdown.Toggle className="nav-link">
         <DinaMessage id="agentsSectionTitle" />
-      </a>
-      <div className="dropdown-menu m-0">
-        <Link href="/person/list">
-          <a className="dropdown-item">
-            <DinaMessage id="personListTitle" />
-          </a>
-        </Link>
-        <Link href="/organization/list">
-          <a className="dropdown-item">
-            <DinaMessage id="organizationListTitle" />
-          </a>
-        </Link>
-      </div>
-    </div>
+      </Dropdown.Toggle>
+      <Dropdown.Menu>
+        <Dropdown.Item href="/person/list">
+          <DinaMessage id="personListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/organization/list" onKeyDown={onKeyDownLastItem}>
+          <DinaMessage id="organizationListTitle" />
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 }
 
 /** Dina User links. */
 function NavDinaUserDropdown() {
   const { subject } = useAccount();
+  const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
+    menuDisplayControl();
 
   return (
-    <div className="dropdown">
-      <a className="nav-link dropdown-toggle" href="#">
+    <Dropdown
+      show={show}
+      onMouseOver={showDropdown}
+      onMouseLeave={hideDropdown}
+      onKeyDown={onKeyDown}
+    >
+      <Dropdown.Toggle className="nav-link">
         <DinaMessage id="dinaUserSectionTitle" />
-      </a>
-      <div className="dropdown-menu m-0">
-        <Link href="/dina-user/list">
-          <a className="dropdown-item">
-            <DinaMessage id="userListTitle" />
-          </a>
-        </Link>
-        <Link href={`/dina-user/view?id=${subject}`}>
-          <a className="dropdown-item">
-            <DinaMessage id="whoAmITitle" />
-          </a>
-        </Link>
-      </div>
-    </div>
+      </Dropdown.Toggle>
+      <Dropdown.Menu>
+        <Dropdown.Item href="/dina-user/list">
+          <DinaMessage id="userListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          href={`/dina-user/view?id=${subject}`}
+          onKeyDown={onKeyDownLastItem}
+        >
+          <DinaMessage id="whoAmITitle" />
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 }
 
 /** Seqdb UI links. */
 function NavSeqDBDropdown() {
+  const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
+    menuDisplayControl();
   return (
-    <div className="dropdown">
-      <a className="nav-link dropdown-toggle" href="#">
+    <Dropdown
+      show={show}
+      onMouseOver={showDropdown}
+      onMouseLeave={hideDropdown}
+      onKeyDown={onKeyDown}
+    >
+      <Dropdown.Toggle className="nav-link" href="#">
         <SeqdbMessage id="seqdbTitle" />
-      </a>
-      <div className="dropdown-menu m-0">
-        <Link href="/seqdb/workflow/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="workflowListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/sanger-workflow/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="sangerWorkflowListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/index-set/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="indexSetListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/pcr-primer/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="pcrPrimerListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/pcr-profile/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="pcrProfileListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/pcr-batch/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="pcrBatchListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/product/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="productListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/protocol/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="protocolListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/region/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="regionListTitle" />
-          </a>
-        </Link>
-        <Link href="/seqdb/molecular-sample/list">
-          <a className="dropdown-item">
-            <SeqdbMessage id="molecularSampleListTitle" />
-          </a>
-        </Link>
-      </div>
-    </div>
+      </Dropdown.Toggle>
+      <Dropdown.Menu>
+        <Dropdown.Item href="/seqdb/workflow/list">
+          <SeqdbMessage id="workflowListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/seqdb/sanger-workflow/list">
+          <SeqdbMessage id="sangerWorkflowListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/seqdb/index-set/list">
+          <SeqdbMessage id="indexSetListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/seqdb/pcr-primer/list">
+          <SeqdbMessage id="pcrPrimerListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/seqdb/pcr-profile/list">
+          <SeqdbMessage id="pcrProfileListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/seqdb/pcr-batch/list">
+          <SeqdbMessage id="pcrBatchListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/seqdb/product/list">
+          <SeqdbMessage id="productListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/seqdb/protocol/list">
+          <SeqdbMessage id="protocolListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/seqdb/region/list">
+          <SeqdbMessage id="regionListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          href="/seqdb/molecular-sample/list"
+          onKeyDown={onKeyDownLastItem}
+        >
+          <SeqdbMessage id="molecularSampleListTitle" />
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 }
 
 /** Collecting event links. */
 function NavCollectionDropdown() {
+  const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
+    menuDisplayControl();
   return (
-    <div className="dropdown">
-      <a className="nav-link dropdown-toggle" href="#">
+    <Dropdown
+      show={show}
+      onMouseOver={showDropdown}
+      onMouseLeave={hideDropdown}
+      onKeyDown={onKeyDown}
+    >
+      <Dropdown.Toggle className="nav-link" href="#">
         <DinaMessage id="collectionSectionTitle" />
-      </a>
-      <div className="dropdown-menu m-0">
-        <div className="d-none">
-          <Link href="/collection/collector-group/list">
-            <a className="dropdown-item">
-              <DinaMessage id="collectorGroupListTitle" />
-            </a>
-          </Link>
-        </div>
-        <Link href="/collection/collection/list">
-          <a className="dropdown-item">
-            <DinaMessage id="collectionListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/collection-method/list">
-          <a className="dropdown-item">
-            <DinaMessage id="collectionMethodListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/institution/list">
-          <a className="dropdown-item">
-            <DinaMessage id="institutionListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/collecting-event/list">
-          <a className="dropdown-item">
-            <DinaMessage id="collectingEventListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/material-sample/list">
-          <a className="dropdown-item">
-            <DinaMessage id="materialSampleListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/material-sample-type/list">
-          <a className="dropdown-item">
-            <DinaMessage id="materialSampleTypeListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/preparation-type/list">
-          <a className="dropdown-item">
-            <DinaMessage id="preparationTypeListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/storage-unit-type/list">
-          <a className="dropdown-item">
-            <DinaMessage id="storageUnitTypeListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/storage-unit/list">
-          <a className="dropdown-item">
-            <DinaMessage id="storageUnitListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/managed-attribute/list">
-          <a className="dropdown-item">
-            <DinaMessage id="managedAttributeListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/workflow-template/list">
-          <a className="dropdown-item">
-            <DinaMessage id="workflowTemplateListTitle" />
-          </a>
-        </Link>
-        <Link href="/collection/revisions-by-user/">
-          <a className="dropdown-item">
-            <DinaMessage id="revisionsByUserPageTitle" />
-          </a>
-        </Link>
-      </div>
-    </div>
+      </Dropdown.Toggle>
+      <Dropdown.Menu>
+        <Dropdown.Item href="/collection/collection/list">
+          <DinaMessage id="collectionListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/collection/collection-method/list">
+          <DinaMessage id="collectionMethodListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/collection/institution/list">
+          <DinaMessage id="institutionListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/collection/collecting-event/list">
+          <DinaMessage id="collectingEventListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/collection/material-sample/list">
+          <DinaMessage id="materialSampleListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/collection/material-sample-type/list">
+          <DinaMessage id="materialSampleTypeListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/collection/preparation-type/list">
+          <DinaMessage id="preparationTypeListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/collection/storage-unit-type/list">
+          <DinaMessage id="storageUnitTypeListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/collection/storage-unit/list">
+          <DinaMessage id="storageUnitListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/collection/managed-attribute/list">
+          <DinaMessage id="managedAttributeListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item href="/collection/workflow-template/list">
+          <DinaMessage id="workflowTemplateListTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          href="/collection/revisions-by-user"
+          onKeyDown={onKeyDownLastItem}
+        >
+          <DinaMessage id="revisionsByUserPageTitle" />
+        </Dropdown.Item>
+        <Dropdown.Item
+          className="d-none"
+          href="/collection/collector-group/list"
+        >
+          <DinaMessage id="collectorGroupListTitle" />
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 }
 
 export function Footer() {
+  const { formatMessage } = useDinaIntl();
   return (
     <footer id="wb-info" className="my-3" style={{ zIndex: 0 }}>
       <div className="brand">
         <div className="container">
           <div className="row">
             <nav className="col-md-10 ftr-urlt-lnk py-3">
-              <style>
-                {`
-                  .ftr-urlt-lnk li {
-                    float: initial !important;
-                  }
-                `}
-              </style>
               <ul>
                 <li>
                   <a href="https://www.canada.ca/en/contact.html">
@@ -394,7 +385,7 @@ export function Footer() {
             <div className="col-6 col-md-3 col-lg-2 text-end">
               <img
                 src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/assets/wmms-blk.svg"
-                alt="Symbol of the Government of Canada"
+                alt={formatMessage("governmentOfCanadaSymbol")}
               />
             </div>
           </div>

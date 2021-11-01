@@ -53,6 +53,9 @@ export interface CollectingEventAttributes {
   substrate?: string;
   remarks?: string;
 
+  publiclyReleasable?: boolean;
+  notPubliclyReleasableReason?: string;
+
   managedAttributeValues?: ManagedAttributeValues;
   managedAttributes?: JsonValue;
 }

@@ -18,8 +18,11 @@ export function InstitutionDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("institution")} />
-      <Nav />
+      <Head title={formatMessage("institution")}
+						lang={formatMessage("languageOfPage")} 
+						creator={formatMessage("agricultureCanada")}
+						subject={formatMessage("subjectTermsForPage")} />
+			<Nav />
       <main className="container">
         {withResponse(institutionQuery, ({ data: institution }) => (
           <DinaForm<Institution>
@@ -38,6 +41,7 @@ export function InstitutionDetailsPage({ router }: WithRouterProps) {
               resource={institution}
               apiBaseUrl="/collection-api"
               resourceBaseUrl="collection/institution"
+              withLeadingSlash={true}
             />
             <InstitutionFormLayout />
           </DinaForm>

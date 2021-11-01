@@ -29,8 +29,24 @@ const mockGet = jest.fn(async (_, { filter }) => {
   return MOCK_GROUPS;
 });
 
+const mockBulkGet = jest.fn(async paths => {
+  if (paths.length === 0) {
+    return [];
+  }
+  return paths.map((path: string) => {
+    const id = path.replace("group/", "");
+    return {
+      // Return a mock group with the supplied ID:
+      id,
+      type: "group",
+      groupName: `${id}-fetched-from-bulkGet`
+    };
+  });
+});
+
 const apiContext: any = {
-  apiClient: { get: mockGet }
+  apiClient: { get: mockGet },
+  bulkGet: mockBulkGet
 };
 
 // Mock out the debounce function to avoid waiting during tests.
@@ -44,7 +60,7 @@ describe("ResourceSelectField component", () => {
       >
         <ResourceSelectField<TestGroup>
           name="group"
-          model="group"
+          model="test-api/group"
           filter={groupName => ({ groupName })}
           optionLabel={group => group.groupName}
         />
@@ -72,7 +88,7 @@ describe("ResourceSelectField component", () => {
           <div>
             <ResourceSelectField<TestGroup>
               name="group"
-              model="group"
+              model="test-api/group"
               filter={groupName => ({ groupName })}
               /* tslint:disable-next-line */
               optionLabel={group => group.groupName}
@@ -96,18 +112,18 @@ describe("ResourceSelectField component", () => {
     wrapper.update();
 
     // The "get" function should have been called with the filter.
-    expect(mockGet).lastCalledWith("group", {
+    expect(mockGet).lastCalledWith("test-api/group", {
       filter: {
         groupName: "Mat"
       }
     });
 
-    const { onChange, options } = wrapper.find(Select).props();
+    const { onChange, options } = wrapper.find<any>(Select).props();
 
     const groupToSelect = options[0];
 
     // Simulate selecting a new option.
-    onChange(groupToSelect, null);
+    onChange(groupToSelect);
 
     // The new selected group's name should be rendered into the value-display div.
     expect(wrapper.find("#value-display").text()).toEqual("Mat's Group");
@@ -120,7 +136,7 @@ describe("ResourceSelectField component", () => {
       <DinaForm initialValues={{ group: { id: 3, groupName: "Mat's Group" } }}>
         <ResourceSelectField<TestGroup>
           name="group"
-          model="group"
+          model="test-api/group"
           filter={groupName => ({ groupName })}
           optionLabel={group => group.groupName}
           onChange={mockOnChange}
@@ -130,10 +146,9 @@ describe("ResourceSelectField component", () => {
     );
 
     // Change the value.
-    wrapper.find(Select).prop("onChange")(
-      { resource: MOCK_GROUPS.data[1] },
-      null
-    );
+    wrapper.find(Select).prop<any>("onChange")({
+      resource: MOCK_GROUPS.data[1]
+    });
 
     expect(mockOnChange).lastCalledWith({
       groupName: "Group 2",
@@ -148,22 +163,22 @@ describe("ResourceSelectField component", () => {
         initialValues={{
           singleGroup: { id: "1", groupName: "Group 1" },
           multipleGroups: [
-            { id: "2", groupName: "Group 2" },
-            { id: "3", groupName: "Group 3" }
+            { id: "2", type: "group", groupName: "Group 2" },
+            { id: "3", type: "group", groupName: "Group 3" }
           ]
         }}
         readOnly={true}
       >
         <ResourceSelectField<TestGroup>
           name="singleGroup"
-          model="group"
+          model="test-api/group"
           filter={groupName => ({ groupName })}
           optionLabel={group => group.groupName}
           readOnlyLink="/group/view?id="
         />
         <ResourceSelectField<TestGroup>
           name="multipleGroups"
-          model="group"
+          model="test-api/group"
           filter={groupName => ({ groupName })}
           optionLabel={group => group.groupName}
           isMulti={true}
@@ -191,5 +206,75 @@ describe("ResourceSelectField component", () => {
         .find(".multipleGroups-field .read-only-view a")
         .map(node => node.prop("href"))
     ).toEqual(["/group/view?id=2", "/group/view?id=3"]);
+  });
+
+  it("Renders the read-only view for a shallow reference by fetching the full object", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{
+          singleGroup: { id: "100", type: "group" },
+          multipleGroups: [
+            { id: "200", type: "group" },
+            { id: "300", type: "group" }
+          ],
+          nullGroup: null
+        }}
+        readOnly={true}
+      >
+        <ResourceSelectField<TestGroup>
+          name="singleGroup"
+          model="test-api/group"
+          filter={groupName => ({ groupName })}
+          optionLabel={group => group.groupName}
+          readOnlyLink="/group/view?id="
+        />
+        <ResourceSelectField<TestGroup>
+          name="multipleGroups"
+          model="test-api/group"
+          filter={groupName => ({ groupName })}
+          optionLabel={group => group.groupName}
+          isMulti={true}
+          readOnlyLink="/group/view?id="
+        />
+        <ResourceSelectField<TestGroup>
+          name="nullGroup"
+          model="test-api/group"
+          filter={groupName => ({ groupName })}
+          optionLabel={group => group.groupName}
+          readOnlyLink="/group/view?id="
+        />
+      </DinaForm>,
+      { apiContext }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockBulkGet.mock.calls).toEqual([
+      [
+        ["group/100"],
+        {
+          apiBaseUrl: "/test-api",
+          returnNullForMissingResource: true
+        }
+      ],
+      [
+        ["group/200", "group/300"],
+        {
+          apiBaseUrl: "/test-api",
+          returnNullForMissingResource: true
+        }
+      ]
+    ]);
+
+    expect(wrapper.find(".singleGroup-field .read-only-view").text()).toEqual(
+      "100-fetched-from-bulkGet"
+    );
+    expect(
+      wrapper.find(".multipleGroups-field .read-only-view").text()
+    ).toEqual("200-fetched-from-bulkGet, 300-fetched-from-bulkGet");
+    expect(wrapper.find(".nullGroup-field .read-only-view").text()).toEqual("");
   });
 });

@@ -1,12 +1,15 @@
+import { FormikButton, withResponse } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { Promisable } from "type-fest";
-import { withResponse } from "../../../common-ui/lib";
+import { StorageUnitContents } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { useStorageUnit } from "../../pages/collection/storage-unit/edit";
 import { StorageUnit } from "../../types/collection-api";
 import { StorageUnitBreadCrumb } from "./StorageUnitBreadCrumb";
 
 export interface AssignedStorageProps {
+  /** ID of the stored object. */
+  contentId?: string;
   readOnly?: boolean;
   value?: PersistedResource<StorageUnit>;
   onChange?: (
@@ -17,6 +20,7 @@ export interface AssignedStorageProps {
 
 /** Displays the currently assigned Storage, and lets you unlink it. */
 export function AssignedStorage({
+  contentId,
   onChange,
   readOnly,
   value,
@@ -28,18 +32,33 @@ export function AssignedStorage({
     <div>
       {withResponse(storageQuery, ({ data: storageUnit }) => (
         <div>
-          <div className="storage-path mb-3">
-            <StorageUnitBreadCrumb storageUnit={storageUnit} />
+          <div className="list-inline mb-3">
+            <div className="storage-path list-inline-item">
+              <StorageUnitBreadCrumb storageUnit={storageUnit} />
+            </div>
+            {storageUnit.storageUnitType?.isInseperable && (
+              <div className="list-inline-item">
+                (<DinaMessage id="keepContentsTogether" />)
+              </div>
+            )}
           </div>
           {!readOnly && (
-            <button
-              type="button"
-              className="remove-storage btn btn-danger"
-              onClick={() => onChange?.({ id: null })}
+            <FormikButton
+              className="remove-storage btn btn-danger mb-3"
+              onClick={async () => await onChange?.({ id: null })}
             >
               <DinaMessage id="removeFromParentStorageUnit" />
-            </button>
+            </FormikButton>
           )}
+          <div>
+            <label>
+              <DinaMessage id="otherContents" />
+            </label>
+            <StorageUnitContents
+              storageId={storageUnit.id}
+              excludeContentId={contentId}
+            />
+          </div>
         </div>
       ))}
     </div>

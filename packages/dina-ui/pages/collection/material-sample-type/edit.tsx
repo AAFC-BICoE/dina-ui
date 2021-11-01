@@ -14,7 +14,7 @@ import {
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { Promisable } from "type-fest";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSampleType } from "../../../types/collection-api";
 
@@ -30,9 +30,7 @@ export default function MaterialSampleTypeEditPage() {
   } = router;
   const { formatMessage } = useDinaIntl();
 
-  const pageTitle = id
-    ? "editMaterialSampleTypeTitle"
-    : "addMaterialSampleTypeTitle";
+  const pageTitle = id ? "editMaterialSampleTypeTitle" : "addMaterialSampleTypeTitle";
 
   const materialSampleTypeQuery = useQuery<MaterialSampleType>(
     { path: `collection-api/material-sample-type/${id}` },
@@ -45,7 +43,10 @@ export default function MaterialSampleTypeEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage(pageTitle)} />
+      <Head title={formatMessage(pageTitle)} 
+						lang={formatMessage("languageOfPage")} 
+						creator={formatMessage("agricultureCanada")}
+						subject={formatMessage("subjectTermsForPage")} />
       <Nav />
       <main className="container">
         <div>
@@ -117,13 +118,6 @@ export function MaterialSampleTypeFormFields() {
 
   return (
     <div>
-      <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-        />
-      </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
       </div>

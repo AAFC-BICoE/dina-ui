@@ -56,7 +56,7 @@ export function CatalogueOfLifeSearchBox({
   const nameResults = searchResult?.result;
 
   return (
-    <div className="card card-body border mb-3">
+    <div className="card card-body border">
       {/* Hide this for now for the demo */}
       {/* <div className="d-flex align-items-center mb-3">
         <label className="pt-2 d-flex align-items-center">

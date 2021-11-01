@@ -14,7 +14,10 @@ export interface TextFieldProps extends LabelWrapperParams {
   numberOnly?: boolean;
   letterOnly?: boolean;
   noSpace?: boolean;
-  customInput?: (inputProps: InputHTMLAttributes<any>) => JSX.Element;
+  customInput?: (
+    inputProps: InputHTMLAttributes<any>,
+    form: FormikProps<any>
+  ) => JSX.Element;
   onChangeExternal?: (
     form: FormikProps<any>,
     name: string,
@@ -76,7 +79,7 @@ export function TextField(props: TextFieldProps) {
         // controlled input that we manually pass the "onChange" and "value" props. Otherwise
         // we will get React's warning about switching from an uncontrolled to controlled input.
         return (
-          customInput?.(inputPropsInternal) ??
+          customInput?.(inputPropsInternal, formik) ??
           (multiLines ? (
             <TextareaAutosize
               minRows={4}

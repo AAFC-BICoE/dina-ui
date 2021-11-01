@@ -198,7 +198,11 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                   dwcDecimalLongitude: -75.701452
                 }
               ],
-              relationships: {},
+              relationships: {
+                attachment: {
+                  data: []
+                }
+              },
               // The template's default value:
               startEventDateTime: "2019-12-21T16:00",
               type: "collecting-event"
@@ -219,14 +223,20 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
-
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
-              determination: [],
-
+              preparationAttachment: undefined,
+              determination: [{ isPrimary: true }],
+              organism: null,
               managedAttributes: {},
-              materialSampleName: "",
-              relationships: {},
+              relationships: {
+                attachment: {
+                  data: []
+                },
+                preparationAttachment: {
+                  data: []
+                }
+              },
               type: "material-sample"
             },
             type: "material-sample"
@@ -303,11 +313,18 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
-              determination: [],
-
+              preparationAttachment: undefined,
+              determination: [{ isPrimary: true }],
+              organism: null,
               managedAttributes: {},
-              materialSampleName: "",
-              relationships: {},
+              relationships: {
+                attachment: {
+                  data: []
+                },
+                preparationAttachment: {
+                  data: []
+                }
+              },
               type: "material-sample"
             },
             type: "material-sample"
@@ -341,6 +358,12 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     ).toEqual(false);
     expect(
       wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".enable-scheduled-actions")
+        .find(ReactSwitch)
+        .prop("checked")
     ).toEqual(false);
 
     // Submit with only the name set:
@@ -361,13 +384,21 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               },
               storageUnit: { id: null, type: "storage-unit" },
               managedAttributes: {},
-              materialSampleName: "",
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
-              determination: [],
+              preparationAttachment: undefined,
+              organism: null,
+              determination: [{ isPrimary: true }],
 
-              relationships: {},
+              relationships: {
+                attachment: {
+                  data: []
+                },
+                preparationAttachment: {
+                  data: []
+                }
+              },
               type: "material-sample"
             },
             type: "material-sample"
@@ -507,5 +538,49 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
     ).toEqual(false);
+  });
+
+  it("Renders the Material Sample form with only the Storage section enabled.", async () => {
+    const wrapper = await getWrapper({
+      id: "1",
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowExisting: false,
+          allowNew: false,
+          templateFields: {
+            ...({
+              "scheduledAction.remarks": {
+                defaultValue: "default-remarks",
+                enabled: true
+              }
+            } as any)
+          }
+        }
+      },
+      group: "test-group",
+      name: "test-definition",
+      type: "material-sample-action-definition"
+    });
+
+    // Only the Scheduled Actions section should be enabled:
+    expect(
+      wrapper
+        .find(".enable-scheduled-actions")
+        .find(ReactSwitch)
+        .prop("checked")
+    ).toEqual(true);
+    expect(
+      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+
+    expect(
+      wrapper
+        .find("#scheduled-actions-section .remarks-field textarea")
+        .prop("value")
+    ).toEqual("default-remarks");
   });
 });

@@ -48,7 +48,26 @@ describe("AutoSuggestTextField", () => {
       "person3"
     ]);
     expect(mockGet).lastCalledWith("agent-api/person", {
-      filter: { rsql: "name==*p*" }
+      filter: { rsql: "name==*p*" },
+      sort: "-createdOn"
     });
+  });
+
+  it("Can render custom suggestions passed via props.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <AutoSuggestTextField<Person>
+          name="examplePersonNameField"
+          suggestions={() => ["suggestion-1", "suggestion-2"]}
+          timeoutMs={0}
+        />
+      </DinaForm>,
+      { apiContext }
+    );
+
+    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
+      "suggestion-1",
+      "suggestion-2"
+    ]);
   });
 });

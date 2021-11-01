@@ -9,12 +9,15 @@ import {
 } from "common-ui";
 import { useRouter } from "next/router";
 import { GroupFieldView, Head, Nav } from "../../../components";
+import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { IndexSet } from "../../../types/seqdb-api";
 
 export default function IndexSetViewPage() {
   const {
     query: { id }
   } = useRouter();
+  
+  const { formatMessage } = useSeqdbIntl();
 
   const { loading, response } = useQuery<IndexSet>({
     path: `seqdb-api/index-set/${id}`
@@ -27,7 +30,10 @@ export default function IndexSetViewPage() {
   if (response) {
     return (
       <>
-        <Head title="Index Set" />
+        <Head title={formatMessage("indexSetViewTitle")}
+						lang={formatMessage("languageOfPage")} 
+						creator={formatMessage("agricultureCanada")}
+						subject={formatMessage("subjectTermsForPage")} />
         <Nav />
         <ButtonBar>
           <BackToListButton entityLink="/seqdb/index-set" />

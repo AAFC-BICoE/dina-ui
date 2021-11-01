@@ -1,0 +1,38 @@
+/* Below css are emulating WET/CDTS css or override as needed */
+
+.wb-inv {
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+}
+
+/* css for the 3 non visible skip links, make the background color same as the app bar */
+a.wb-link-inv:focus {
+  clip: auto;
+  background-color: #26374a;
+  display: block;
+  color: white;
+  text-decoration: none;
+  margin-top: 25px;
+}
+
+a.wb-link-inv {
+  clip: rect(1px, 1px, 1px, 1px);
+  color: transparent;
+  background-color: transparent;
+  height: auto;
+  margin-top: 15px;
+  overflow: hidden;
+  position: absolute;
+  width: auto;
+}
+.wb-sl {
+  background: #26374a;
+  color: #fff;
+  font-weight: 700;
+  padding: 5px;
+  z-index: 501;
+}

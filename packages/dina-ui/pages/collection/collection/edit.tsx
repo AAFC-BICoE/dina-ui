@@ -10,19 +10,22 @@ import {
   useQuery,
   withResponse,
   ResourceSelectField,
-  filterBy
+  filterBy,
+  SelectOption
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
 import {
   GroupSelectField,
   Head,
-  InstitutionSelectField,
-  Nav
+  Nav,
+  IdentifierFields
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Collection, Institution } from "../../../types/collection-api";
 import { toPairs, fromPairs } from "lodash";
+import { Field } from "formik";
+import { CollectionIdentifierType } from "../../../types/collection-api/resources/CollectionIdentifier";
 
 export default function CollectionEditPage() {
   const router = useRouter();
@@ -41,8 +44,11 @@ export default function CollectionEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage(title)} />
-      <Nav />
+      <Head title={formatMessage(title)}
+						lang={formatMessage("languageOfPage")}
+						creator={formatMessage("agricultureCanada")}
+						subject={formatMessage("subjectTermsForPage")} />
+			<Nav />
       <main className="container">
         {id ? (
           withResponse(collectionQuery, ({ data }) => (
@@ -128,6 +134,16 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
 export function CollectionFormFields({ title }) {
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
+  const typeOptions: SelectOption<string | undefined>[] = [
+    {
+      label: CollectionIdentifierType.GRSCICOLL,
+      value: CollectionIdentifierType.GRSCICOLL
+    },
+    {
+      label: CollectionIdentifierType.INDEX_HERBARIORUM,
+      value: CollectionIdentifierType.INDEX_HERBARIORUM
+    }
+  ];
 
   return (
     <div>
@@ -180,6 +196,23 @@ export function CollectionFormFields({ title }) {
           multiLines={true}
         />
       </div>
+      <div className="row">
+        <TextField className="col-md-6" name="webpage" />
+        <TextField className="col-md-6" name="contact" />
+      </div>
+      <div className="row">
+        <TextField className="col-md-6" name="address" multiLines={true} />
+        <TextField className="col-md-6" name="remarks" multiLines={true} />
+      </div>
+      <Field name="identifiers">
+        {({ form: { values: formState } }) =>
+          !readOnly ? (
+            <IdentifierFields typeOptions={typeOptions} />
+          ) : !!formState.identifiers?.length ? (
+            <IdentifierFields typeOptions={typeOptions} />
+          ) : null
+        }
+      </Field>
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />
