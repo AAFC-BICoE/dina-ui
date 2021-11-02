@@ -28,24 +28,23 @@ export function descriptionCell(accessor: string) {
       const language = locale;
 
       // Get the descriptions provided.
-      const multilingualDescription: MultilingualDescription = get(
+      const multilingualDescription: MultilingualDescription | null = get(
         original,
         accessor
       );
 
       // If no descriptions are provided, just leave the cell blank.
       if (
-        multilingualDescription.descriptions == null ||
-        multilingualDescription.descriptions.length === 0
+        multilingualDescription?.descriptions == null ||
+        multilingualDescription?.descriptions.length === 0
       ) {
         return <div />;
       }
 
       // Remove any blank descriptions.
-      const descriptionPairs: MultilingualPair[] =
-        multilingualDescription.descriptions.filter(
-          description => description.desc !== ""
-        );
+      const descriptionPairs = multilingualDescription?.descriptions.filter(
+        description => description.desc !== ""
+      );
 
       // Loop through all of the descriptions provided, the preferred one is always the currently used language.
       for (const description of descriptionPairs) {
