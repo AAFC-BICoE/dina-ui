@@ -386,7 +386,7 @@ export function useMaterialSampleSave({
     });
   });
 
-  const { detectDuplicateSampleName } = useDuplicateSampleNameDetection();
+  const { withDuplicateSampleNameCheck } = useDuplicateSampleNameDetection();
 
   async function onSubmit({
     api: { save },
@@ -398,17 +398,6 @@ export function useMaterialSampleSave({
 
     /** Input to submit to the back-end API. */
     const { ...materialSampleInput } = submittedValues;
-
-    // Check for duplicate materialSampleName on new sample creation:
-    if (!materialSampleInput.id) {
-      const duplicateName = await detectDuplicateSampleName(
-        formik,
-        materialSampleInput.materialSampleName
-      );
-      if (duplicateName) {
-        return;
-      }
-    }
 
     // Only persist the preparation fields if the preparations toggle is enabled:
     if (!enablePreparations) {
@@ -510,14 +499,18 @@ export function useMaterialSampleSave({
       }
     }
     // Save the MaterialSample:
-    const [savedMaterialSample] = await save(
-      [
-        {
-          resource: materialSampleInput,
-          type: "material-sample"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
+    const [savedMaterialSample] = await withDuplicateSampleNameCheck(
+      async () =>
+        await save(
+          [
+            {
+              resource: materialSampleInput,
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ),
+      formik
     );
 
     await onSaved?.(savedMaterialSample.id);

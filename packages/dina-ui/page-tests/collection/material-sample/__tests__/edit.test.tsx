@@ -47,7 +47,7 @@ const TEST_MANAGED_ATTRIBUTE = {
   name: "testAttr"
 };
 
-const mockGet = jest.fn<any, any>(async (path, params) => {
+const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
@@ -57,15 +57,6 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "collection-api/preparation-type":
     case "collection-api/managed-attribute":
     case "collection-api/material-sample":
-      // Return a test sample for when there should be a duplicate detected:
-      if (params?.filter?.materialSampleName?.EQ === "test-duplicate-name") {
-        return {
-          data: [
-            { id: "test-duplicate", materialSampleName: "test-duplicate-name" }
-          ],
-          meta: { totalResourceCount: 1 }
-        };
-      }
     case "collection-api/material-sample-type":
     case "user-api/group":
     case "agent-api/person":
@@ -87,6 +78,15 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
 const mockSave = jest.fn<any, any>(async saves => {
   return saves.map(save => {
     if (save.type === "material-sample") {
+      // Test duplicate name error:
+      if (
+        save.resource.materialSampleName === "test-duplicate-name" &&
+        !save.resource.allowDuplicateName
+      ) {
+        throw new Error(
+          "Data integrity violation: could not execute statement; SQL [n/a]; constraint [unique_material_sample_name]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement"
+        );
+      }
       return testMaterialSample();
     }
     if (save.type === "collecting-event") {
