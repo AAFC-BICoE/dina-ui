@@ -7,7 +7,7 @@ import {
   useQuery
 } from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource, KitsuResource, KitsuResponse } from "kitsu";
+import { InputResource, KitsuResponse } from "kitsu";
 import { cloneDeep, fromPairs, isEmpty, isEqual, pick, toPairs } from "lodash";
 import {
   Dispatch,
@@ -124,53 +124,34 @@ export function useMaterialSampleQuery(id?: string | null) {
           );
         }
         /* Map associated sample to primary id if there is one for display purpose */
-        // if (data.associations) {
-        // const associatedMaterialSamples: MaterialSample[] =
-        //   await bulkGet<MaterialSample>(
-        //     data.associations.map(
-        //       assctn => `/material-sample/${assctn.associatedSample}`
-        //     ),
-        //     {
-        //       apiBaseUrl: "/collection-api",
-        //       returnNullForMissingResource: true
-        //     }
-        //   );
-        // for (const association of associatedMaterialSamples) {
-        //   data.associations
-        //     .filter(assctn => association.id === assctn.associatedSample)
-        //     .map(
-        //       assctn =>
-        //         (assctn.associatedSample = !!association.materialSampleName
-        //           ?.length
-        //           ? association.materialSampleName
-        //           : association.id)
-        //     );
-        // }
-        // getPartialMaterialSamples(data.associations?.map(assctn => assctn.associatedSample as string) as any, true);
-        // }
+        if (data.associations) {
+          const associatedMaterialSamples: MaterialSample[] =
+            await bulkGet<MaterialSample>(
+              data.associations.map(
+                assctn => `/material-sample/${assctn.associatedSample}`
+              ),
+              {
+                apiBaseUrl: "/collection-api",
+                returnNullForMissingResource: true
+              }
+            );
+          for (const association of associatedMaterialSamples) {
+            data.associations
+              .filter(assctn => association.id === assctn.associatedSample)
+              .map(
+                assctn =>
+                  (assctn.associatedSample = !!association.materialSampleName
+                    ?.length
+                    ? association.materialSampleName
+                    : association.id)
+              );
+          }
+        }
       }
     }
   );
 
   return materialSampleQuery;
-}
-
-export function getPartialMaterialSamples(ids: string[], isUUID: boolean) {
-  const rsqlQuery = isUUID
-    ? `id=in='${ids?.join()}'`
-    : `materialSampleName=in='${ids?.join()}'`;
-  const partialMaterialSamples = useQuery<
-    (KitsuResource & { materialSampleName: string })[]
-  >({
-    path: `collection-api/material-sample`,
-    fields: {
-      "material-sample": "id,materialSampleName"
-    },
-    filter: {
-      rsql: rsqlQuery
-    }
-  });
-  return partialMaterialSamples;
 }
 
 export interface UseMaterialSampleSaveParams {
