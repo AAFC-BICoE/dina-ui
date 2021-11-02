@@ -94,7 +94,7 @@ export function QueryTable<TData extends KitsuResource>({
   hideTopPagination,
   reactTableProps
 }: QueryTableProps<TData>) {
-  const { formatMessage, messages } = useIntl();
+  const { formatMessage } = useIntl();
 
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
@@ -201,7 +201,7 @@ export function QueryTable<TData extends KitsuResource>({
       className="query-table-wrapper"
       ref={divWrapperRef}
       role="search"
-      aria-label="Query Table"
+      aria-label={formatMessage({ id: "queryTable" })}
     >
       {!omitPaging && (
         <span>

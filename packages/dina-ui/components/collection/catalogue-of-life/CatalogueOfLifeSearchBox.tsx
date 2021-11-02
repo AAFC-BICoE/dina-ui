@@ -45,7 +45,7 @@ export function CatalogueOfLifeSearchBox({
       catalogueOfLifeQuery<NameUsageSearchResult>({
         url: `https://api.catalogueoflife.org/dataset/${dataSet.key}/nameusage`,
         params: {
-          q: searchValue
+          q: searchValue.trim()
         },
         searchValue,
         fetchJson
