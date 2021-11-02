@@ -570,9 +570,7 @@ describe("Material Sample Edit Page", () => {
           type: "material-sample",
           id: "333",
           materialSampleName: "test-ms",
-          associations: [
-            { associatedSample: "test name", associationType: "host" }
-          ]
+          associations: [{ associatedSample: "1", associationType: "host" }]
         }}
         onSaved={mockOnSaved}
       />,

@@ -206,7 +206,6 @@ export function MaterialSampleForm({
   )
 }: MaterialSampleFormProps) {
   const { isTemplate } = useContext(DinaFormContext) ?? {};
-  const associatedSampleMapRef = useRef(new Map<string, string>());
   const {
     initialValues,
     nestedCollectingEventForm,
@@ -224,8 +223,7 @@ export function MaterialSampleForm({
       collectingEventInitialValues,
       onSaved,
       isTemplate,
-      enabledFields,
-      associatedSampleMapRef
+      enabledFields
     });
 
   // CollectingEvent "id" being enabled in the template enabledFields means that the
@@ -351,11 +349,7 @@ export function MaterialSampleForm({
           )}
           {dataComponentState.enableOrganism && <OrganismStateField />}
           {dataComponentState.enableDetermination && <DeterminationField />}
-          {dataComponentState.enableAssociations && (
-            <AssociationsField
-              associatedSampleMapRef={associatedSampleMapRef}
-            />
-          )}
+          {dataComponentState.enableAssociations && <AssociationsField />}
           {dataComponentState.enableStorage && (
             <FieldSet
               id="storage-section"
