@@ -7,7 +7,7 @@ import {
   useQuery
 } from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource, KitsuResponse } from "kitsu";
+import { InputResource, KitsuResource, KitsuResponse } from "kitsu";
 import { cloneDeep, fromPairs, isEmpty, isEqual, pick, toPairs } from "lodash";
 import {
   Dispatch,
@@ -124,34 +124,53 @@ export function useMaterialSampleQuery(id?: string | null) {
           );
         }
         /* Map associated sample to primary id if there is one for display purpose */
-        if (data.associations) {
-          const associatedMaterialSamples: MaterialSample[] =
-            await bulkGet<MaterialSample>(
-              data.associations.map(
-                assctn => `/material-sample/${assctn.associatedSample}`
-              ),
-              {
-                apiBaseUrl: "/collection-api",
-                returnNullForMissingResource: true
-              }
-            );
-          for (const association of associatedMaterialSamples) {
-            data.associations
-              .filter(assctn => association.id === assctn.associatedSample)
-              .map(
-                assctn =>
-                  (assctn.associatedSample = !!association.materialSampleName
-                    ?.length
-                    ? association.materialSampleName
-                    : association.id)
-              );
-          }
-        }
+        // if (data.associations) {
+        // const associatedMaterialSamples: MaterialSample[] =
+        //   await bulkGet<MaterialSample>(
+        //     data.associations.map(
+        //       assctn => `/material-sample/${assctn.associatedSample}`
+        //     ),
+        //     {
+        //       apiBaseUrl: "/collection-api",
+        //       returnNullForMissingResource: true
+        //     }
+        //   );
+        // for (const association of associatedMaterialSamples) {
+        //   data.associations
+        //     .filter(assctn => association.id === assctn.associatedSample)
+        //     .map(
+        //       assctn =>
+        //         (assctn.associatedSample = !!association.materialSampleName
+        //           ?.length
+        //           ? association.materialSampleName
+        //           : association.id)
+        //     );
+        // }
+        // getPartialMaterialSamples(data.associations?.map(assctn => assctn.associatedSample as string) as any, true);
+        // }
       }
     }
   );
 
   return materialSampleQuery;
+}
+
+export function getPartialMaterialSamples(ids: string[], isUUID: boolean) {
+  const rsqlQuery = isUUID
+    ? `id=in='${ids?.join()}'`
+    : `materialSampleName=in='${ids?.join()}'`;
+  const partialMaterialSamples = useQuery<
+    (KitsuResource & { materialSampleName: string })[]
+  >({
+    path: `collection-api/material-sample`,
+    fields: {
+      "material-sample": "id,materialSampleName"
+    },
+    filter: {
+      rsql: rsqlQuery
+    }
+  });
+  return partialMaterialSamples;
 }
 
 export interface UseMaterialSampleSaveParams {
@@ -451,7 +470,7 @@ export function useMaterialSampleSave({
     /** Input to submit to the back-end API. */
     const { ...materialSampleInput } = submittedValues;
 
-    async function saveAndProceed(mtrSmplIpt) {
+    const saveAndProceed = async mtrSmplIpt => {
       // Save the MaterialSample:
       const [savedMaterialSample] = await save(
         [
@@ -463,7 +482,7 @@ export function useMaterialSampleSave({
         { apiBaseUrl: "/collection-api" }
       );
       await onSaved?.(savedMaterialSample.id);
-    }
+    };
 
     // Only persist the preparation fields if the preparations toggle is enabled:
     if (!enablePreparations) {
@@ -610,7 +629,7 @@ export function useMaterialSampleSave({
       });
 
       // Set the associatedSample to id if it does not exist in the live map
-      Promise.all(promises).then(async results => {
+      await Promise.all(promises).then(results => {
         materialSampleInput.associations?.map(assctn => {
           // Take the first sample whose sampleName match the one about to sent for save
           // duplication is not handled by design for now
@@ -629,7 +648,7 @@ export function useMaterialSampleSave({
         saveAndProceed(materialSampleInput);
       });
     } else {
-      saveAndProceed(materialSampleInput);
+      await saveAndProceed(materialSampleInput);
     }
   }
 
