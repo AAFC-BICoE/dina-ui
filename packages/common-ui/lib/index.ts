@@ -56,6 +56,7 @@ export * from "./resource-select/ResourceSelect";
 export * from "./resource-select/useBulkGet";
 export * from "./table/QueryTable";
 export * from "./table/date-cell";
+export * from "./table/description-cell";
 export * from "./table/stringArray-cell";
 export * from "./text-field-with-coord-buttons/TextFieldWithCoordButtons";
 export * from "./tooltip/Tooltip";
