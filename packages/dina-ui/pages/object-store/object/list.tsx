@@ -89,7 +89,7 @@ export default function MetadataListPage() {
         <CheckBoxField
           key={metadata.id}
           resource={metadata}
-          fileHyperlinkId="original-file-name"
+          fileHyperlinkId={`file-name-${metadata.id}`}
         />
       ),
       Header: CheckBoxHeader,
@@ -98,10 +98,7 @@ export default function MetadataListPage() {
     {
       Cell: ({ original: { id, originalFilename } }) =>
         originalFilename ? (
-          <a
-            href={`/object-store/object/view?id=${id}`}
-            id="original-file-name"
-          >
+          <a href={`/object-store/object/view?id=${id}`} id={`file-name-${id}`}>
             {originalFilename}
           </a>
         ) : null,
