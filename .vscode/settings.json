@@ -5,9 +5,23 @@
     "**/.settings": true,
     "**/.factorypath": true
   },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "java.format.settings.profile": "Twitter",
   "java.format.settings.url": "https://raw.githubusercontent.com/twitter-archive/commons/master/build-support/checkstyle/coding_style.xml",
   "java.configuration.updateBuildConfiguration": "automatic",
+  "prettier.arrowParens": "avoid",
+  "prettier.trailingComma": "none",
   "remote.SSH.defaultForwardedPorts": [
     {
       "localPort": 2015,
