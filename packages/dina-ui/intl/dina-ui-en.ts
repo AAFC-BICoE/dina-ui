@@ -332,6 +332,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   institution: "Institution",
   institutionListTitle: "Institutions",
   keepContentsTogether: "Keep Contents Together",
+  languageDescriptionEnglish: "English",
+  languageDescriptionFrench: "French",
   languageOfPage: "eng",
   largeImg: "Large Image",
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",

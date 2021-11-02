@@ -1,4 +1,9 @@
-import { ButtonBar, CreateButton, ListPageLayout, dateCell } from "common-ui";
+import {
+  ButtonBar,
+  CreateButton,
+  descriptionCell,
+  ListPageLayout
+} from "common-ui";
 import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -12,8 +17,7 @@ const COLLECTION_METHOD_TABLE_COLUMNS = [
     accessor: "name"
   },
   "group",
-  "createdBy",
-  dateCell("createdOn")
+  descriptionCell("multilingualDescription")
 ];
 
 export default function collectionMethodListPage() {
