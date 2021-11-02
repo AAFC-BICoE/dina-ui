@@ -258,6 +258,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeType_text_label: "Text",
   field_materialSampleName: "Primary ID",
   "field_materialSampleType.name": "Material Sample Type",
+  field_materialSampleType_tooltip:
+    "A system-defined term that prescribes the downstream expectations and logic\
+  in how derivative (or child) Material Samples are to be interpreted and digitally managed.",
   "field_materialSampleType.uuid": "Material Sample Type",
   field_materialSample_identifierType_catalogueNumber_label: "Catalogue Number",
   field_materialSample_identifierType_materialSampleId_label:
@@ -325,6 +328,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   institution: "Institution",
   institutionListTitle: "Institutions",
   keepContentsTogether: "Keep Contents Together",
+  languageDescriptionEnglish: "English",
+  languageDescriptionFrench: "French",
   languageOfPage: "eng",
   largeImg: "Large Image",
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",
@@ -449,6 +454,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Select a collector group to pre-poplulate 'Collectors' field",
   selectGroup: "Select Group",
   selectOrType: "Select or Type",
+  selectRuleSet: "Select Rule Set",
   set: "Set",
   setAll: "Set All",
   showing: "Showing",

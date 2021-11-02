@@ -2,12 +2,14 @@ import {
   ApiClientContext,
   BackButton,
   ButtonBar,
+  DateField,
   DinaForm,
   DinaFormOnSubmit,
   LoadingSpinner,
   Query,
   SubmitButton,
-  TextField
+  TextField,
+  useDinaFormContext
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
@@ -135,6 +137,7 @@ export function CollectionMethodForm({
 }
 
 export function CollectionMethodFormLayout() {
+  const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
 
   return (
@@ -169,6 +172,12 @@ export function CollectionMethodFormLayout() {
           multiLines={true}
         />
       </div>
+      {readOnly && (
+        <div className="row">
+          <DateField name="createdOn" />
+          <TextField name="createdBy" />
+        </div>
+      )}
     </div>
   );
 }

@@ -326,6 +326,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   includeAll: "Inclure tous",
   institution: "Établissement",
   institutionListTitle: "Établissements",
+  languageDescriptionEnglish: "Anglais",
+  languageDescriptionFrench: "Français",
   languageOfPage: "fra",
   largeImg: "Grande image",
   latLongAutoSetterButton: "Convertir en décimal Lat/Long",
