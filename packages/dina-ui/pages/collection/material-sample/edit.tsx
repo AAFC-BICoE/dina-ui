@@ -22,6 +22,7 @@ import { useRouter } from "next/router";
 import { ReactNode, useContext, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
+  AttachmentsField,
   CollectionSelectField,
   Footer,
   GroupSelectField,
@@ -211,13 +212,11 @@ export function MaterialSampleForm({
     setColEventId,
     colEventQuery,
     onSubmit,
-    materialSampleAttachmentsUI,
     loading
   } =
     materialSampleSaveHook ??
     useMaterialSampleSave({
       collectingEventAttachmentsConfig: attachmentsConfig?.collectingEvent,
-      materialSampleAttachmentsConfig: attachmentsConfig?.materialSample,
       materialSample,
       collectingEventInitialValues,
       onSaved,
@@ -340,7 +339,12 @@ export function MaterialSampleForm({
               </Tabs>
             </FieldSet>
           )}
-          {dataComponentState.enablePreparations && <PreparationField />}
+          {dataComponentState.enablePreparations && (
+            <PreparationField
+              // Use the same attachments config for preparations as the Material Sample:
+              attachmentsConfig={attachmentsConfig?.materialSample}
+            />
+          )}
           {dataComponentState.enableOrganism && <OrganismStateField />}
           {dataComponentState.enableDetermination && <DeterminationField />}
           {dataComponentState.enableStorage && (
@@ -376,7 +380,15 @@ export function MaterialSampleForm({
               </DinaFormSection>
             </FieldSet>
           )}
-          {materialSampleAttachmentsUI}
+          <AttachmentsField
+            name="attachment"
+            title={<DinaMessage id="materialSampleAttachments" />}
+            id="material-sample-attachments-section"
+            allowNewFieldName="attachmentsConfig.allowNew"
+            allowExistingFieldName="attachmentsConfig.allowExisting"
+            allowAttachmentsConfig={attachmentsConfig?.materialSample}
+            attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
+          />
         </div>
       </div>
     </div>

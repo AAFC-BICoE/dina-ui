@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
-const PREPARATION_TYPE_FILTER_ATTRIBUTES = ["createdBy"];
+const PREPARATION_TYPE_FILTER_ATTRIBUTES = ["name"];
 const PREPARATION_TYPE_TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, name } }) => (
@@ -21,11 +21,13 @@ export default function preparationTypeListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("preparationTypeListTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage("preparationTypeListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="preparationTypeListTitle" />
@@ -42,7 +44,13 @@ export default function preparationTypeListPage() {
           id="preparation-type-list"
           queryTableProps={{
             columns: PREPARATION_TYPE_TABLE_COLUMNS,
-            path: "collection-api/preparation-type"
+            path: "collection-api/preparation-type",
+            defaultSort: [
+              {
+                id: "name",
+                desc: false
+              }
+            ]
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">

@@ -264,6 +264,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeType_text_label: "Text",
   field_materialSampleName: "Primary ID",
   "field_materialSampleType.name": "Material Sample Type",
+  field_materialSampleType_tooltip:
+    "A system-defined term that prescribes the downstream expectations and logic\
+  in how derivative (or child) Material Samples are to be interpreted and digitally managed.",
   "field_materialSampleType.uuid": "Material Sample Type",
   field_materialSample_identifierType_catalogueNumber_label: "Catalogue Number",
   field_materialSample_identifierType_materialSampleId_label:
@@ -414,6 +417,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   personListTitle: "Persons",
   personViewTitle: "Person",
   preparation: "Preparation",
+  preparationProtocols: "Preparation Protocols",
   preparationData: "Preparation Data",
   preparationTypeListTitle: "Preparation Type",
   preparationTypeNameLabel: "Preparation Type Name",
@@ -424,6 +428,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   primary: "Primary",
   primaryButton_tooltip:
     "Make this assertion the primary data point when exported. Only one assertion can be primary",
+  primaryDeterminationButton_tooltip:
+    "Make this determination the primary data point when exported. Only one determination can be primary",
   proceedToCreateMetadata: "Proceed to Create Metadata",
   removeAssertionLabel: "Remove this GeoReference",
   removeComponentData: "Remove {component} data",
@@ -456,6 +462,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Select a collector group to pre-poplulate 'Collectors' field",
   selectGroup: "Select Group",
   selectOrType: "Select or Type",
+  selectRuleSet: "Select Rule Set",
   set: "Set",
   setAll: "Set All",
   showing: "Showing",

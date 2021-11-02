@@ -8,11 +8,12 @@ import {
   ResourceSelectField,
   TextField,
   TextFieldWithMultiplicationButton,
-  useDinaFormContext
+  useDinaFormContext,
+  Tooltip
 } from "common-ui";
 import DOMPurify from "dompurify";
-import { FieldArray } from "formik";
-import { clamp } from "lodash";
+import { FieldArray, FormikContextType } from "formik";
+import { clamp, get } from "lodash";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { CatalogueOfLifeNameField } from "..";
@@ -45,19 +46,42 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     scientificNameSource: true,
     scientificNameDetails: true,
     scientificName: true,
-    transcriberRemarks: true
+    transcriberRemarks: true,
+    isPrimary: true
   };
 
 /** All fields of the Determination type. */
 export const DETERMINATION_FIELDS = Object.keys(DETERMINATION_FIELDS_OBJECT);
 
 export function DeterminationField({ className }: DeterminationFieldProps) {
-  const { readOnly, isTemplate } = useDinaFormContext();
+  const { readOnly, isTemplate, initialValues } = useDinaFormContext();
   const { openAddPersonModal } = useAddPersonModal();
   const { formatMessage, locale } = useDinaIntl();
   const determinationsPath = "determination";
 
-  const [activeTabIdx, setActiveTabIdx] = useState(0);
+  // Open the tab with the Primary determination even if it's not the first one.
+  // Defaults to 0 if there's no primary determination.
+  const intialPrimaryDeterminationIndex = Math.max(
+    0,
+    (initialValues as Partial<MaterialSample>).determination?.findIndex(
+      dtmntn => dtmntn?.isPrimary
+    ) ?? 0
+  );
+
+  const [activeTabIdx, setActiveTabIdx] = useState(
+    intialPrimaryDeterminationIndex
+  );
+
+  /** Make this Assertion the Primary. */
+  function makePrimary(formik: FormikContextType<any>, index) {
+    const assertions: Determination[] =
+      get(formik.values, determinationsPath) ?? [];
+
+    assertions.forEach((_, idx) => {
+      formik.setFieldValue(`${determinationsPath}[${idx}].isPrimary`, false);
+    });
+    formik.setFieldValue(`${determinationsPath}[${index}].isPrimary`, true);
+  }
 
   return (
     <div>
@@ -66,7 +90,7 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
           const determinations =
             (form.values.determination as Determination[]) ?? [];
           function addDetermination() {
-            push({});
+            push({ isPrimary: determinations?.length === 0 });
             setActiveTabIdx(determinations.length);
           }
 
@@ -91,6 +115,30 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
 
             return (
               <div className="row">
+                {!readOnly && !isTemplate && (
+                  <div className="mb-3">
+                    <FormikButton
+                      className="btn btn-primary primary-determinationtion-button"
+                      buttonProps={ctx => {
+                        const isPrimary =
+                          get(
+                            ctx.values,
+                            `${determinationsPath}[${index}].` + "isPrimary"
+                          ) ?? false;
+                        return {
+                          disabled: isPrimary,
+                          children: isPrimary ? (
+                            <DinaMessage id="primary" />
+                          ) : (
+                            <DinaMessage id="makePrimary" />
+                          )
+                        };
+                      }}
+                      onClick={(_, formik) => makePrimary(formik, index)}
+                    />
+                    <Tooltip id="primaryDeterminationButton_tooltip" />
+                  </div>
+                )}
                 <div className="col-md-6">
                   <FieldSet
                     legend={<DinaMessage id="verbatimDeterminationLegend" />}
@@ -204,9 +252,13 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                         determinations.length === 1 ? "d-none" : ""
                       }`}
                     >
-                      {determinations.map((_, index) => (
+                      {determinations.map((determination, index) => (
                         <Tab key={index}>
-                          <span className="m-3">{index + 1}</span>
+                          <span className="m-3">
+                            {index + 1}
+                            {determination.isPrimary &&
+                              ` (${formatMessage("primary")})`}
+                          </span>
                         </Tab>
                       ))}
                     </TabList>

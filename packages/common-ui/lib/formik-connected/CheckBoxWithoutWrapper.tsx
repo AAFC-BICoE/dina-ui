@@ -1,5 +1,6 @@
 import { FastField } from "formik";
 import React, { ChangeEvent } from "react";
+import { useIntl } from "react-intl";
 
 export interface CheckBoxWithoutWrapperProps {
   onClickIncludeAll?: (e, form, id) => void;
@@ -34,6 +35,8 @@ export function CheckBoxWithoutWrapper(props: CheckBoxWithoutWrapperProps) {
     customLayout,
     notTakingFullRow
   } = props;
+  const { formatMessage } = useIntl();
+
   return (
     <FastField {...props}>
       {({ form, field: { value, name } }) => {
@@ -53,6 +56,7 @@ export function CheckBoxWithoutWrapper(props: CheckBoxWithoutWrapperProps) {
                 customLayout ? customLayout[0] : "col-sm-1"
               }`}
               name={name}
+              tabIndex={0}
             />
             <div
               className={`${
@@ -71,7 +75,8 @@ export function CheckBoxWithoutWrapper(props: CheckBoxWithoutWrapperProps) {
             value={value || false}
             className={className}
             name={name}
-            aria-label="selectField"
+            aria-label={formatMessage({ id: "select" })}
+            tabIndex={0}
           />
         );
       }}

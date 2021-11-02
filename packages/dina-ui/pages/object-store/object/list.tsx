@@ -142,11 +142,13 @@ export default function MetadataListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("objectListTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage("objectListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <main className="container-fluid">
         <div className="list-inline">
           <div className="list-inline-item">
@@ -174,9 +176,7 @@ export default function MetadataListPage() {
               <ListPageLayout<Metadata>
                 additionalFilters={filterForm => ({
                   // Apply group filter:
-                  ...(filterForm.group && { bucket: filterForm.group }),
-                  // Filter out the derived objects e.g. thumbnails:
-                  rsql: "acSubtypeId==null"
+                  ...(filterForm.group && { bucket: filterForm.group })
                 })}
                 defaultSort={[
                   {

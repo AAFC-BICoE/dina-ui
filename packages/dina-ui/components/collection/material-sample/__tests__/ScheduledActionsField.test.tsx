@@ -4,6 +4,27 @@ import { ScheduledActionsField } from "../ScheduledActionsField";
 
 const mockOnSubmit = jest.fn();
 
+const mockBulkGet = jest.fn<any, any>(async paths => {
+  if (!paths.length) {
+    return [];
+  }
+});
+
+const testCtx = {
+  apiContext: {
+    apiClient: {
+      get: path => {
+        switch (path) {
+          case "user-api/user":
+          case "collection-api/material-sample":
+            return { data: [] };
+        }
+      }
+    } as any,
+    bulkGet: mockBulkGet
+  }
+};
+
 describe("ScheduledActionsField", () => {
   it("Edits the scheduled actions.", async () => {
     const wrapper = mountWithAppContext(
@@ -12,7 +33,8 @@ describe("ScheduledActionsField", () => {
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
       >
         <ScheduledActionsField defaultDate="2021-10-12" />
-      </DinaForm>
+      </DinaForm>,
+      testCtx
     );
 
     // No actions initially:

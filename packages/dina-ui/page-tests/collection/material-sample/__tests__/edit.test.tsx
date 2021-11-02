@@ -37,7 +37,8 @@ function testMaterialSample(): PersistedResource<MaterialSample> {
     collectingEvent: {
       id: "1",
       type: "collecting-event"
-    } as PersistedResource<CollectingEvent>
+    } as PersistedResource<CollectingEvent>,
+    attachment: [{ id: "attach-1", type: "metadata" }]
   };
 }
 
@@ -92,6 +93,10 @@ const mockSave = jest.fn<any, any>(async saves => {
     if (save.type === "collecting-event") {
       return testCollectionEvent();
     }
+    return {
+      ...save.resource,
+      id: save.resource.id ?? "11111111-1111-1111-1111-111111111111"
+    };
   });
 });
 
@@ -163,7 +168,11 @@ describe("Material Sample Edit Page", () => {
                 }
               ],
               managedAttributes: {},
-              relationships: {},
+              relationships: {
+                attachment: {
+                  data: []
+                }
+              },
               verbatimEventDateTime: "2019-12-21T16:00",
               publiclyReleasable: true, // Default value
               type: "collecting-event"
@@ -179,7 +188,7 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               collectingEvent: {
-                id: "1",
+                id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
@@ -187,7 +196,14 @@ describe("Material Sample Edit Page", () => {
               managedAttributes: {},
               determination: [],
               publiclyReleasable: true, // Default value
-              relationships: {},
+              relationships: {
+                attachment: {
+                  data: []
+                },
+                preparationAttachment: {
+                  data: []
+                }
+              },
               organism: null,
               collection: undefined,
               type: "material-sample"
@@ -254,7 +270,14 @@ describe("Material Sample Edit Page", () => {
               collection: undefined,
               publiclyReleasable: true, // Default value
               type: "material-sample",
-              relationships: {}
+              relationships: {
+                attachment: {
+                  data: []
+                },
+                preparationAttachment: {
+                  data: []
+                }
+              }
             },
             type: "material-sample"
           }
@@ -305,10 +328,23 @@ describe("Material Sample Edit Page", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              preparationAttachment: undefined,
               determination: [],
               organism: null,
               managedAttributes: {},
-              relationships: {}
+              relationships: {
+                attachment: {
+                  data: [
+                    {
+                      id: "attach-1",
+                      type: "metadata"
+                    }
+                  ]
+                },
+                preparationAttachment: {
+                  data: []
+                }
+              }
             },
             type: "material-sample"
           }
@@ -370,7 +406,11 @@ describe("Material Sample Edit Page", () => {
                 }
               ],
               managedAttributes: {},
-              relationships: {},
+              relationships: {
+                attachment: {
+                  data: []
+                }
+              },
               verbatimEventDateTime: "2019-12-21T16:00",
               publiclyReleasable: true, // Default Value
               type: "collecting-event"
@@ -386,7 +426,7 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               collectingEvent: {
-                id: "1",
+                id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
@@ -397,10 +437,21 @@ describe("Material Sample Edit Page", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              preparationAttachment: undefined,
               determination: [],
               managedAttributes: {},
               organism: null,
-              relationships: {}
+              relationships: {
+                attachment: {
+                  data: [
+                    {
+                      id: "attach-1",
+                      type: "metadata"
+                    }
+                  ]
+                },
+                preparationAttachment: { data: [] }
+              }
             },
             type: "material-sample"
           }
@@ -562,9 +613,13 @@ describe("Material Sample Edit Page", () => {
               },
               materialSampleName: "test-ms",
               ...BLANK_PREPARATION,
+              preparationAttachment: undefined,
               determination: [],
               organism: null,
-              relationships: {},
+              relationships: {
+                attachment: { data: [] },
+                preparationAttachment: { data: [] }
+              },
               type: "material-sample"
             },
             type: "material-sample"
@@ -636,15 +691,18 @@ describe("Material Sample Edit Page", () => {
               determination: [
                 {
                   verbatimDeterminer: "test-agent-1",
-                  verbatimScientificName: "test-name-1"
+                  verbatimScientificName: "test-name-1",
+                  isPrimary: true
                 },
                 {
                   verbatimDeterminer: "test-agent-2",
-                  verbatimScientificName: "test-name-2"
+                  verbatimScientificName: "test-name-2",
+                  isPrimary: false
                 },
                 {
                   verbatimDeterminer: "test-agent-3",
-                  verbatimScientificName: "test-name-3"
+                  verbatimScientificName: "test-name-3",
+                  isPrimary: false
                 }
               ],
               type: "material-sample"

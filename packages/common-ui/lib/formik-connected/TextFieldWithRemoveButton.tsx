@@ -1,5 +1,6 @@
-import React, { ChangeEvent, useRef, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { TextField, TextFieldProps } from "./TextField";
+import { useIntl } from "react-intl";
 
 interface TextFieldWithRemoveButtonProps extends TextFieldProps {
   removeItem?: (idx: number) => void;
@@ -12,6 +13,7 @@ export function TextFieldWithRemoveButton(
 ) {
   const [shouldRemove, setShouldRemove] = useState(false);
   const { removeItem, index, hideCloseBtn } = props;
+  const { formatMessage } = useIntl();
 
   /* Clear the input value and remove the whole wrapping div */
   const removeEntry = onChange => {
@@ -33,7 +35,7 @@ export function TextFieldWithRemoveButton(
               hideCloseBtn ? "d-none" : ""
             }`}
             style={{ height: "97%" }}
-            aria-label="Close"
+            aria-label={formatMessage({ id: "closeButtonText" })}
             onClick={() => removeEntry(inputProps.onChange)}
             type="button"
           >

@@ -23,6 +23,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import useSWR from "swr";
 import { GeographySearchBox, GeoReferenceAssertionRow } from "..";
 import {
+  AttachmentsField,
   GroupSelectField,
   NotPubliclyReleasableWarning,
   ParseVerbatimToRangeButton,
@@ -44,7 +45,7 @@ import {
   geographicPlaceSourceUrl,
   SourceAdministrativeLevel
 } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
-import { AttachmentReadOnlySection } from "../../object-store/attachment-list/AttachmentReadOnlySection";
+import { AllowAttachmentsConfig } from "../../object-store/attachment-list/AttachmentSection";
 import { ManagedAttributesEditor } from "../../object-store/managed-attributes/ManagedAttributesEditor";
 import { ManagedAttributesViewer } from "../../object-store/managed-attributes/ManagedAttributesViewer";
 import { CollectionMethodSelectField } from "../../resource-select-fields/resource-select-fields";
@@ -59,12 +60,14 @@ interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
   setDefaultVerbatimSRS?: (newValue: string | undefined | null) => void;
   initialValuesForTemplate?: any;
+  attachmentsConfig?: AllowAttachmentsConfig;
 }
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
 export function CollectingEventFormLayout({
   setDefaultVerbatimCoordSys,
-  setDefaultVerbatimSRS
+  setDefaultVerbatimSRS,
+  attachmentsConfig
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
@@ -595,7 +598,26 @@ export function CollectingEventFormLayout({
           >
             <TextField name="habitat" />
             <TextField name="host" />
-            <CollectionMethodSelectField name="collectionMethod" />
+            <Field name="group">
+              {({ field: { value: group } }) => (
+                // Collection methods should be filtered by the Collecting Event's group:
+                <CollectionMethodSelectField
+                  name="collectionMethod"
+                  filter={filterBy(["name"], {
+                    extraFilters: group
+                      ? [
+                          {
+                            selector: "group",
+                            comparison: "==",
+                            arguments: group
+                          }
+                        ]
+                      : undefined
+                  })}
+                  shouldUpdate={() => true}
+                />
+              )}
+            </Field>
             <AutoSuggestTextField<CollectingEvent>
               name="substrate"
               query={(searchValue, ctx) => ({
@@ -958,19 +980,16 @@ export function CollectingEventFormLayout({
           )}
         </FieldSet>
       )}
-      {readOnly && (
-        <div className="mb-3">
-          <Field name="id">
-            {({ field: { value: id } }) => (
-              <AttachmentReadOnlySection
-                attachmentPath={`collection-api/collecting-event/${id}/attachment`}
-                detachTotalSelected={true}
-                title={<DinaMessage id="collectingEventAttachments" />}
-              />
-            )}
-          </Field>
-        </div>
-      )}
+      <div className="mb-3">
+        <AttachmentsField
+          name="attachment"
+          title={<DinaMessage id="collectingEventAttachments" />}
+          allowNewFieldName="attachmentsConfig.allowNew"
+          allowExistingFieldName="attachmentsConfig.allowExisting"
+          allowAttachmentsConfig={attachmentsConfig}
+          attachmentPath={`collection-api/collecting-event/${initialValues.id}/attachment`}
+        />
+      </div>
     </div>
   );
 }
