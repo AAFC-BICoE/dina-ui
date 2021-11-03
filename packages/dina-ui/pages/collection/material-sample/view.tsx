@@ -100,7 +100,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <Nav />
       {withResponse(materialSampleQuery, ({ data: materialSample }) => {
         const hasPreparations = PREPARATION_FIELDS.some(
-          fieldName => materialSample[fieldName]
+          fieldName => !isEmpty(materialSample[fieldName])
         );
 
         const hasOrganism = ORGANISM_FIELDS.some(
