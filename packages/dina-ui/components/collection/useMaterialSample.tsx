@@ -17,7 +17,6 @@ import {
   useState
 } from "react";
 import { useCollectingEventQuery, useCollectingEventSave } from ".";
-import { SCHEDULEDACTION_FIELDS } from "..";
 import {
   CollectingEvent,
   MaterialSample
@@ -35,6 +34,7 @@ import { DETERMINATION_FIELDS } from "./DeterminationField";
 import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "./MaterialSampleAssociationsField";
 import { ORGANISM_FIELDS } from "./OrganismStateField";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
+import { SCHEDULEDACTION_FIELDS } from "./ScheduledActionsField";
 import { useLastUsedCollection } from "./useLastUsedCollection";
 
 export function useMaterialSampleQuery(id?: string | null) {
@@ -128,56 +128,6 @@ export function useMaterialSampleQuery(id?: string | null) {
 
   return materialSampleQuery;
 }
-// map id to sample name for display associatdSampleName as materialSampleName
-// return true if loading so page can wait for data before render
-export function mapMaterialSampleAssociations(
-  ids: string[],
-  materialSample: MaterialSample,
-  isUUID: boolean
-) {
-  const rsqlQuery = isUUID
-    ? `uuid=in=(${ids?.join()})`
-    : `materialSampleName=in='${ids?.join()}'`;
-  const associatedMaterialSamples = useQuery<
-    (KitsuResource & { materialSampleName: string })[]
-  >(
-    {
-      path: `collection-api/material-sample`,
-      fields: {
-        "material-sample": "id,materialSampleName"
-      },
-      filter: {
-        rsql: rsqlQuery
-      }
-    },
-    { disabled: ids === undefined }
-  );
-
-  if (!ids) return false;
-
-  const associations = materialSample?.associations;
-
-  if (associatedMaterialSamples?.loading) return true;
-
-  const datas = associatedMaterialSamples.response?.data;
-
-  if (!!datas?.length) {
-    for (const associatedData of datas) {
-      associations
-        ?.filter(assctn => associatedData.id === assctn.associatedSample)
-        .map(
-          assctn =>
-            (assctn.associatedSample = !!associatedData.materialSampleName
-              ?.length
-              ? associatedData.materialSampleName
-              : associatedData.id)
-        );
-    }
-  }
-
-  return false;
-}
-
 export interface UseMaterialSampleSaveParams {
   /** Material Sample form initial values. */
   materialSample?: InputResource<MaterialSample>;
