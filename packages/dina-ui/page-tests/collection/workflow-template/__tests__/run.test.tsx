@@ -218,6 +218,8 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
         [
           {
             resource: {
+              associations: [],
+              hostOrganism: null,
               collectingEvent: {
                 id: "2",
                 type: "collecting-event"
@@ -305,6 +307,8 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
         [
           {
             resource: {
+              associations: [],
+              hostOrganism: null,
               collectingEvent: {
                 id: "555",
                 type: "collecting-event"
@@ -378,6 +382,8 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
         [
           {
             resource: {
+              hostOrganism: null,
+              associations: [],
               collectingEvent: {
                 id: null,
                 type: "collecting-event"

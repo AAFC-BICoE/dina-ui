@@ -14,6 +14,7 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { get, mapValues, pick, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
+import { HOSTORGANISM_FIELDS } from "../../../components/collection";
 import React, { useRef } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
@@ -39,6 +40,7 @@ import {
   MaterialSampleForm,
   MATERIALSAMPLE_FIELDSET_FIELDS
 } from "../material-sample/edit";
+import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "../../../components/collection/MaterialSampleAssociationsField";
 
 const workflowMainFieldsSchema = yup.object({
   id: yup.string(),
@@ -62,7 +64,9 @@ export default function PreparationProcessTemplatePage() {
     { disabled: !id }
   );
 
-  const pageTitle = id ? "editWorkflowTemplateTitle" : "createWorkflowTemplateTitle";
+  const pageTitle = id
+    ? "editWorkflowTemplateTitle"
+    : "createWorkflowTemplateTitle";
 
   async function moveToNextPage() {
     await router.push("/collection/workflow-template/list");
@@ -70,11 +74,13 @@ export default function PreparationProcessTemplatePage() {
 
   return (
     <div>
-      <Head title={formatMessage(pageTitle)}
-      			lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage(pageTitle)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id={pageTitle} />
@@ -146,7 +152,8 @@ export function WorkflowTemplateForm({
       enableStorage,
       enableDetermination,
       enableOrganism,
-      enableScheduledActions
+      enableScheduledActions,
+      enableAssociations
     }
   } = materialSampleSaveHook;
 
@@ -198,6 +205,21 @@ export function WorkflowTemplateForm({
         )
       : {};
 
+    const associationTemplateFields = enableAssociations
+      ? {
+          ...pick(
+            enabledTemplateFields,
+            ...HOSTORGANISM_FIELDS.map(field => `hostOrganism.${field}`)
+          ),
+          ...pick(
+            enabledTemplateFields,
+            ...MATERIALSAMPLE_ASSOCIATION_FIELDS.map(
+              field => `association.${field}`
+            )
+          )
+        }
+      : {};
+
     // Construct the template definition to persist based on the form values:
     const definition: InputResource<PreparationProcessDefinition> = {
       ...mainTemplateFields,
@@ -212,7 +234,8 @@ export function WorkflowTemplateForm({
             ...organismTemplateFields,
             ...determinationTemplateFields,
             ...storageTemplateFields,
-            ...scheduledActionsTemplateFields
+            ...scheduledActionsTemplateFields,
+            ...associationTemplateFields
           }
         },
         COLLECTING_EVENT: enableCollectingEvent

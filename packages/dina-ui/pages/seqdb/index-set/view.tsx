@@ -16,7 +16,7 @@ export default function IndexSetViewPage() {
   const {
     query: { id }
   } = useRouter();
-  
+
   const { formatMessage } = useSeqdbIntl();
 
   const { loading, response } = useQuery<IndexSet>({
@@ -30,10 +30,12 @@ export default function IndexSetViewPage() {
   if (response) {
     return (
       <>
-        <Head title={formatMessage("indexSetViewTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
+        <Head
+          title={formatMessage("indexSetViewTitle")}
+          lang={formatMessage("languageOfPage")}
+          creator={formatMessage("agricultureCanada")}
+          subject={formatMessage("subjectTermsForPage")}
+        />
         <Nav />
         <ButtonBar>
           <BackToListButton entityLink="/seqdb/index-set" />

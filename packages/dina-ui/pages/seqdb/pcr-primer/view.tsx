@@ -20,11 +20,13 @@ export function PcrPrimerDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("pcrPrimerViewTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage("pcrPrimerViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="seqdb/pcr-primer" />
         <BackToListButton entityLink="/seqdb/pcr-primer" />

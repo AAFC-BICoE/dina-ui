@@ -26,17 +26,31 @@ export function Head(props: HeadProps) {
       <title>{props.title + " - DINA"}</title>
 
       <meta name="dcterms:title" content={props.title || defaultTitle} />
-      <meta name="dcterms:creator" content={props.creator || defaultCreator}/>
-      <meta name="dcterms:language" title="ISO639-2" content={props.lang || defaultLang} />
-      <meta name="dcterms:subject" title="gccore" content={props.subject || defaultSubject}/>
-      <meta name="dcterms:issued" title="W3CDTF" content="2021-11-01"/>
-      <meta name="dcterms:modified" title="W3CDTF" content="2021-11-01"/>
+      <meta name="dcterms:creator" content={props.creator || defaultCreator} />
+      <meta
+        name="dcterms:language"
+        title="ISO639-2"
+        content={props.lang || defaultLang}
+      />
+      <meta
+        name="dcterms:subject"
+        title="gccore"
+        content={props.subject || defaultSubject}
+      />
+      <meta name="dcterms:issued" title="W3CDTF" content="2021-11-01" />
+      <meta name="dcterms:modified" title="W3CDTF" content="2021-11-01" />
 
-      <meta name="dcterms:description" content={props.description || defaultDescription} />
+      <meta
+        name="dcterms:description"
+        content={props.description || defaultDescription}
+      />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta property="og:url" content={props.url || defaultOGURL} />
       <meta property="og:title" content={props.title || ""} />
-      <meta property="og:description" content={props.description || defaultDescription} />
+      <meta
+        property="og:description"
+        content={props.description || defaultDescription}
+      />
       <meta name="twitter:site" content={props.url || defaultOGURL} />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:image" content={props.ogImage || defaultOGImage} />

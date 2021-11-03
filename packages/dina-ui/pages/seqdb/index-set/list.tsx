@@ -30,11 +30,13 @@ export default function IndexSetListPage() {
 
   return (
     <>
-      <Head title={formatMessage("indexSetListTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage("indexSetListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
           <SeqdbMessage id="indexSetListTitle" />
