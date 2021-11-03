@@ -28,8 +28,10 @@ export function AssociatedMaterialSampleSearchBox(
   }
 
   function onCloseClicked() {
-    if (listRef.current)
+    if (listRef.current) {
       listRef.current.className = listRef.current.className + " d-none";
+    }
+    setShowSearchAssociatedSample(false);
   }
 
   return (
@@ -61,6 +63,12 @@ export function AssociatedMaterialSampleSearchBox(
                 setValue(sample.id);
               }
 
+              /** Clear the input value */
+              function removeEntry() {
+                setValue(null);
+                setShowSearchAssociatedSample(false);
+              }
+
               return (
                 <div className="d-flex flex-column">
                   <div className={"d-flex flex-row"}>
@@ -72,7 +80,7 @@ export function AssociatedMaterialSampleSearchBox(
                     </div>
                     <button
                       className="btn mb-2"
-                      onClick={() => setValue(null)}
+                      onClick={removeEntry}
                       type="button"
                       style={{
                         cursor: "pointer"
@@ -96,11 +104,9 @@ export function AssociatedMaterialSampleSearchBox(
                       >
                         {formatMessage("search")}
                       </span>
-                      <a href="#association" onClick={onCloseClicked}>
-                        <span style={{ fontSize: "1.2em" }}>
-                          {formatMessage("closeButtonText")}{" "}
-                        </span>
-                      </a>
+                      <button className="btn btn-dark" onClick={onCloseClicked}>
+                        {formatMessage("closeButtonText")}
+                      </button>
                     </div>
                     <SampleListLayout
                       onSelect={onAssociatedSampleSelected}
