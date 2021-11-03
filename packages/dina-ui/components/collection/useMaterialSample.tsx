@@ -230,7 +230,7 @@ export function useMaterialSampleSave({
         // Show the preparation section if a field is set or the field is enabled:
         PREPARATION_FIELDS.some(
           prepFieldName =>
-            materialSample?.[prepFieldName] ||
+            !isEmpty(materialSample?.[prepFieldName]) ||
             enabledFields?.materialSample?.includes(prepFieldName)
         )
     )

@@ -530,7 +530,9 @@ describe("Material Sample Edit Page", () => {
         materialSample={{
           type: "material-sample",
           id: "333",
-          materialSampleName: "test-ms"
+          materialSampleName: "test-ms",
+          preparationAttachment: [], // This empty array should be treated as a blank value.
+          attachment: []
         }}
         onSaved={mockOnSaved}
       />,
@@ -542,16 +544,25 @@ describe("Material Sample Edit Page", () => {
 
     // Data components are disabled:
     expect(
+      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
     ).toEqual(false);
     expect(
-      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
+      wrapper.find(".enable-organism-state").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
     ).toEqual(false);
     expect(
       wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
     ).toEqual(false);
     expect(
-      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
+      wrapper
+        .find(".enable-scheduled-actions")
+        .find(ReactSwitch)
+        .prop("checked")
     ).toEqual(false);
   });
 
