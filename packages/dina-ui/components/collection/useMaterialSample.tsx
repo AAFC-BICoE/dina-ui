@@ -129,7 +129,8 @@ export function useMaterialSampleQuery(id?: string | null) {
 
   return materialSampleQuery;
 }
-
+// map id to sample name for display associatdSampleName as materialSampleName
+// return true if loading so page can wait for data before render
 export function mapMaterialSampleAssociations(
   ids: string[],
   materialSample: MaterialSample,
@@ -138,18 +139,22 @@ export function mapMaterialSampleAssociations(
   const rsqlQuery = isUUID
     ? `uuid=in=(${ids?.join()})`
     : `materialSampleName=in='${ids?.join()}'`;
-
   const associatedMaterialSamples = useQuery<
     (KitsuResource & { materialSampleName: string })[]
-  >({
-    path: `collection-api/material-sample`,
-    fields: {
-      "material-sample": "id,materialSampleName"
+  >(
+    {
+      path: `collection-api/material-sample`,
+      fields: {
+        "material-sample": "id,materialSampleName"
+      },
+      filter: {
+        rsql: rsqlQuery
+      }
     },
-    filter: {
-      rsql: rsqlQuery
-    }
-  });
+    { disabled: ids === undefined }
+  );
+
+  if (!ids) return false;
 
   const associations = materialSample?.associations;
 
