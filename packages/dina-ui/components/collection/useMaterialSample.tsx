@@ -7,7 +7,7 @@ import {
   useQuery
 } from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource, KitsuResponse } from "kitsu";
+import { InputResource, KitsuResource, KitsuResponse } from "kitsu";
 import { cloneDeep, fromPairs, isEmpty, isEqual, pick, toPairs } from "lodash";
 import {
   Dispatch,
@@ -123,35 +123,55 @@ export function useMaterialSampleQuery(id?: string | null) {
             }
           );
         }
-        /* Map associated sample to primary id if there is one for display purpose */
-        if (data.associations) {
-          const associatedMaterialSamples: MaterialSample[] =
-            await bulkGet<MaterialSample>(
-              data.associations.map(
-                assctn => `/material-sample/${assctn.associatedSample}`
-              ),
-              {
-                apiBaseUrl: "/collection-api",
-                returnNullForMissingResource: true
-              }
-            );
-          for (const association of associatedMaterialSamples) {
-            data.associations
-              .filter(assctn => association.id === assctn.associatedSample)
-              .map(
-                assctn =>
-                  (assctn.associatedSample = !!association.materialSampleName
-                    ?.length
-                    ? association.materialSampleName
-                    : association.id)
-              );
-          }
-        }
       }
     }
   );
 
   return materialSampleQuery;
+}
+
+export function mapMaterialSampleAssociations(
+  ids: string[],
+  materialSample: MaterialSample,
+  isUUID: boolean
+) {
+  const rsqlQuery = isUUID
+    ? `uuid=in=(${ids?.join()})`
+    : `materialSampleName=in='${ids?.join()}'`;
+
+  const associatedMaterialSamples = useQuery<
+    (KitsuResource & { materialSampleName: string })[]
+  >({
+    path: `collection-api/material-sample`,
+    fields: {
+      "material-sample": "id,materialSampleName"
+    },
+    filter: {
+      rsql: rsqlQuery
+    }
+  });
+
+  const associations = materialSample?.associations;
+
+  if (associatedMaterialSamples?.loading) return true;
+
+  const datas = associatedMaterialSamples.response?.data;
+
+  if (!!datas?.length) {
+    for (const associatedData of datas) {
+      associations
+        ?.filter(assctn => associatedData.id === assctn.associatedSample)
+        .map(
+          assctn =>
+            (assctn.associatedSample = !!associatedData.materialSampleName
+              ?.length
+              ? associatedData.materialSampleName
+              : associatedData.id)
+        );
+    }
+  }
+
+  return false;
 }
 
 export interface UseMaterialSampleSaveParams {
