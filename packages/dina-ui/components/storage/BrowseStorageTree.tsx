@@ -13,7 +13,7 @@ import Pagination from "rc-pagination";
 import { useState } from "react";
 import { FaMinusSquare, FaPlusSquare } from "react-icons/fa";
 import { Promisable } from "type-fest";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
 import { StorageFilter } from "./StorageFilter";
 import {
@@ -156,9 +156,16 @@ function StorageUnitCollapser({
   showPathInName
 }: StorageUnitCollapserProps) {
   const [isOpen, setOpen] = useState(false);
+  const { formatMessage } = useDinaIntl();
 
-  function toggle() {
-    setOpen(current => !current);
+  function toggle(e) {
+    if (
+      e.code === "Enter" ||
+      e.code === "Space" ||
+      e.code === " " ||
+      e.type === "click"
+    )
+      setOpen(current => !current);
   }
 
   const CollapserIcon = isOpen ? FaMinusSquare : FaPlusSquare;
@@ -168,13 +175,16 @@ function StorageUnitCollapser({
   return (
     <div className={`d-flex flex-row gap-2 collapser-for-${storageUnit.id}`}>
       <CollapserIcon
-        className={classNames("storage-collapser-icon align-top", {
+        onKeyPress={toggle}
+        onClick={toggle}
+        tabIndex={0}
+        size="2em"
+        className={classNames("storage-collapser-icon aligh-top", {
           // Hide the expander button when there are no children:
           invisible: !hasChildren
         })}
-        size="2em"
-        onClick={toggle}
         style={{ cursor: "pointer" }}
+        title={isOpen ? formatMessage("collapse") : formatMessage("expand")}
       />
       <div className="flex-grow-1">
         <div className="d-flex flex-row align-items-center gap-2 mb-3">

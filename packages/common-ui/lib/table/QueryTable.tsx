@@ -67,6 +67,8 @@ export interface QueryTableProps<TData extends KitsuResource> {
   reactTableProps?:
     | Partial<TableProps>
     | ((queryState: QueryState<TData[], MetaWithTotal>) => Partial<TableProps>);
+
+  hideTopPagination?: boolean;
 }
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -89,9 +91,10 @@ export function QueryTable<TData extends KitsuResource>({
   onPageSizeChange,
   onSortedChange,
   path,
+  hideTopPagination,
   reactTableProps
 }: QueryTableProps<TData>) {
-  const { formatMessage, messages } = useIntl();
+  const { formatMessage } = useIntl();
 
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
@@ -198,7 +201,7 @@ export function QueryTable<TData extends KitsuResource>({
       className="query-table-wrapper"
       ref={divWrapperRef}
       role="search"
-      aria-label="Query Table"
+      aria-label={formatMessage({ id: "queryTable" })}
     >
       {!omitPaging && (
         <span>
@@ -257,7 +260,7 @@ export function QueryTable<TData extends KitsuResource>({
         onFetchData={onFetchData}
         pageSizeOptions={[25, 50, 100, 200, 500]}
         pages={numberOfPages}
-        showPaginationTop={shouldShowPagination}
+        showPaginationTop={shouldShowPagination && !hideTopPagination}
         showPaginationBottom={shouldShowPagination}
         noDataText={<CommonMessage id="noRowsFound" />}
         ofText={<CommonMessage id="of" />}

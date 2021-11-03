@@ -5,7 +5,7 @@ const LocalStorage = require("node-localstorage").LocalStorage;
 localStorage = new LocalStorage("./scratch");
 
 // Next.js plugins:
-const withTM = require("next-transpile-modules")(["common-ui"]);
+const withTM = require("next-transpile-modules")(["common-ui", "kitsu"]);
 
 const isDevMode = process.env.NODE_ENV === "development";
 const appVersion = `${require("./package.json").version}${

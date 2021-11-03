@@ -69,10 +69,12 @@ export default function ManagedAttributesListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("managedAttributeListTitle")} 
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
+      <Head
+        title={formatMessage("managedAttributeListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">

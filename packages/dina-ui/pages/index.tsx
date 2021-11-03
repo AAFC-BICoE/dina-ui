@@ -6,10 +6,12 @@ import { SeqdbMessage } from "../intl/seqdb-intl";
 
 const Home: React.FunctionComponent = () => (
   <div>
-    <Head title={useDinaIntl().formatMessage("dinaHomeH1")} 
-          lang={useDinaIntl().formatMessage("languageOfPage")}
-          creator={useDinaIntl().formatMessage("agricultureCanada")}
-          subject={useDinaIntl().formatMessage("subjectTermsForPage")} />
+    <Head
+      title={useDinaIntl().formatMessage("dinaHomeH1")}
+      lang={useDinaIntl().formatMessage("languageOfPage")}
+      creator={useDinaIntl().formatMessage("agricultureCanada")}
+      subject={useDinaIntl().formatMessage("subjectTermsForPage")}
+    />
     <Nav />
     <main role="main">
       <div className="container">

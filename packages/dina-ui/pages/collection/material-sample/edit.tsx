@@ -19,9 +19,10 @@ import { InputResource, PersistedResource } from "kitsu";
 import { padStart } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ReactNode, useContext, useState } from "react";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
+import { AssociationsField } from "../../../../dina-ui/components/collection/AssociationsField";
+import { ReactNode, useContext, useState, useRef } from "react";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
   AttachmentsField,
   CollectionSelectField,
@@ -205,7 +206,6 @@ export function MaterialSampleForm({
   )
 }: MaterialSampleFormProps) {
   const { isTemplate } = useContext(DinaFormContext) ?? {};
-
   const {
     initialValues,
     nestedCollectingEventForm,
@@ -349,6 +349,7 @@ export function MaterialSampleForm({
           )}
           {dataComponentState.enableOrganism && <OrganismStateField />}
           {dataComponentState.enableDetermination && <DeterminationField />}
+          {dataComponentState.enableAssociations && <AssociationsField />}
           {dataComponentState.enableStorage && (
             <FieldSet
               id="storage-section"
