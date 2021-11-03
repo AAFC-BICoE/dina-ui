@@ -74,7 +74,7 @@ export function AssociatedMaterialSampleSearchBox(
                   <div className={"d-flex flex-row"}>
                     <div
                       className="flex-md-grow-1 form-control associatedSampleInput"
-                      style={{ backgroundColor: "rgb(35, 38, 39)" }}
+                      style={{ backgroundColor: "#e9ecef" }}
                     >
                       {value && <MaterialSampleLink id={value} />}
                     </div>
