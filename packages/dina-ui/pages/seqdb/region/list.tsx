@@ -30,11 +30,13 @@ export default function RegionListPage() {
 
   return (
     <>
-      <Head title={formatMessage("regionListTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage("regionListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <ButtonBar>
         <CreateButton entityLink="/seqdb/region" />
       </ButtonBar>

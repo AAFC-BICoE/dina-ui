@@ -95,11 +95,13 @@ export default function PcrBatchEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage(title)}
-						lang={formatMessage("languageOfPage")}
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <div className="container">
         <h1 id="wb-cont">
           <SeqdbMessage id={title} />

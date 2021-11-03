@@ -32,11 +32,13 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage(title)}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <main className="container-fluid">
         {id ? (
           <div>

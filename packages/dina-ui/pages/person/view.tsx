@@ -31,11 +31,13 @@ export function PersonDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("personViewTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage("personViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <Query<Person>
         query={{ path: `agent-api/person/${id}?include=organizations` }}
       >
