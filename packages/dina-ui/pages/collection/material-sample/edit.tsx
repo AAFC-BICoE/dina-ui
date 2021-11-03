@@ -578,8 +578,14 @@ export function nextSampleInitialValues(
   originalSample: PersistedResource<MaterialSample>
 ) {
   // Use the copied sample as a base, omitting some fields that shouldn't be copied:
-  const { id, createdOn, createdBy, materialSampleName, ...copiedValues } =
-    originalSample;
+  const {
+    id,
+    createdOn,
+    createdBy,
+    materialSampleName,
+    allowDuplicateName,
+    ...copiedValues
+  } = originalSample;
 
   // Calculate the next suffix:
   const newMaterialSampleName = nextSampleName(materialSampleName);

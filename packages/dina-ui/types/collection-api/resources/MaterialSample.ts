@@ -44,6 +44,7 @@ export interface MaterialSampleAttributes {
   tags?: string[];
 
   scheduledActions?: ScheduledAction[];
+  allowDuplicateName?: boolean;
 }
 
 export interface ScheduledAction {
