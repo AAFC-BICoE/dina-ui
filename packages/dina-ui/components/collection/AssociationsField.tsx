@@ -1,13 +1,11 @@
-import { DinaMessage } from "../../intl/dina-ui-intl";
 import { FieldSet, TextField } from "common-ui";
 import { CatalogueOfLifeNameField } from ".";
+import { HostOrganism } from "../../../dina-ui/types/collection-api";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import {
   MaterialSampleAssociationsField,
   MATERIALSAMPLE_ASSOCIATION_FIELDS_OBJECT
 } from "./MaterialSampleAssociationsField";
-import { HostOrganism } from "../../../dina-ui/types/collection-api";
-
-import { MutableRefObject } from "react";
 
 /** Type-safe object with all hostotganism fields. */
 export const HOSTORGANISM_FIELDS_OBJECT: Required<
@@ -27,13 +25,7 @@ export const ASSOCIATION_FIELDS_OBJECT = {
 /** All fields of the association type. */
 export const ASSOCIATION_FIELDS = Object.keys(ASSOCIATION_FIELDS_OBJECT);
 
-export interface AssociationsFieldProps {
-  associatedSampleMapRef?: MutableRefObject<Map<string, string>>;
-}
-
-export function AssociationsField({
-  associatedSampleMapRef
-}: AssociationsFieldProps) {
+export function AssociationsField() {
   return (
     <FieldSet
       legend={<DinaMessage id="associationsLegend" />}
@@ -50,9 +42,7 @@ export function AssociationsField({
           customName="remarks"
         />
       </FieldSet>
-      <MaterialSampleAssociationsField
-        associatedSampleMapRef={associatedSampleMapRef}
-      />
+      <MaterialSampleAssociationsField />
     </FieldSet>
   );
 }

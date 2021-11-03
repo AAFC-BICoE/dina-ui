@@ -44,7 +44,6 @@ import { DeterminationField } from "../../../components/collection/Determination
 import { PreparationField } from "../../../components/collection/PreparationField";
 import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import {
-  mapMaterialSampleAssociations,
   useMaterialSampleQuery,
   useMaterialSampleSave
 } from "../../../components/collection/useMaterialSample";
@@ -73,22 +72,6 @@ export default function MaterialSampleEditPage() {
 
   /** The page to redirect to after saving. */
   const [saveRedirect, setSaveRedirect] = useState<PostSaveRedirect>("VIEW");
-
-  // use material sample name if not empty, otherwise use id for associations' associatedSample when viewing
-  const ids = materialSampleQuery?.response?.data.associations?.map(
-    assctn => assctn.associatedSample
-  );
-  const materialSampleData = materialSampleQuery?.response?.data;
-
-  // if loading, return
-  if (
-    mapMaterialSampleAssociations(
-      ids as any,
-      materialSampleData as MaterialSample,
-      true
-    )
-  )
-    return null;
 
   async function moveToViewPage(savedId: string) {
     await router.push(`/collection/material-sample/view?id=${savedId}`);
@@ -223,7 +206,6 @@ export function MaterialSampleForm({
   )
 }: MaterialSampleFormProps) {
   const { isTemplate } = useContext(DinaFormContext) ?? {};
-  const associatedSampleMapRef = useRef(new Map<string, string>());
   const {
     initialValues,
     nestedCollectingEventForm,
@@ -241,8 +223,7 @@ export function MaterialSampleForm({
       collectingEventInitialValues,
       onSaved,
       isTemplate,
-      enabledFields,
-      associatedSampleMapRef
+      enabledFields
     });
 
   // CollectingEvent "id" being enabled in the template enabledFields means that the
@@ -368,11 +349,7 @@ export function MaterialSampleForm({
           )}
           {dataComponentState.enableOrganism && <OrganismStateField />}
           {dataComponentState.enableDetermination && <DeterminationField />}
-          {dataComponentState.enableAssociations && (
-            <AssociationsField
-              associatedSampleMapRef={associatedSampleMapRef}
-            />
-          )}
+          {dataComponentState.enableAssociations && <AssociationsField />}
           {dataComponentState.enableStorage && (
             <FieldSet
               id="storage-section"

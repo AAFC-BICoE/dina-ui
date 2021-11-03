@@ -18,6 +18,8 @@ function testMaterialSample(): PersistedResource<MaterialSample> {
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
+    case "collection-api/material-sample/1":
+      return { data: testMaterialSample() };
     case "collection-api/material-sample":
       return { data: [testMaterialSample()] };
     case "collection-api/material-sample-type":
@@ -61,7 +63,7 @@ describe("AssociatedMaterialSampleSearchBox component", () => {
     wrapper.update();
 
     /* click the search button will show the empty associated sample input */
-    expect(wrapper.find("input.associatedSampleInput").length).toBe(1);
+    expect(wrapper.find(".associatedSampleInput").length).toBe(1);
 
     /* select one sample from search result list */
     wrapper.find("button.selectMaterialSample").simulate("click");
@@ -70,7 +72,7 @@ describe("AssociatedMaterialSampleSearchBox component", () => {
     wrapper.update();
 
     /* expected the selected sample is being populated to the sample input */
-    expect(wrapper.find("input.associatedSampleInput").prop("value")).toEqual(
+    expect(wrapper.find(".associatedSampleInput").text()).toEqual(
       "my-sample-name"
     );
   });

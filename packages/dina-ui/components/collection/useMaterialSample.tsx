@@ -7,15 +7,14 @@ import {
   useQuery
 } from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource, KitsuResource, KitsuResponse } from "kitsu";
+import { InputResource, KitsuResource } from "kitsu";
 import { cloneDeep, fromPairs, isEmpty, isEqual, pick, toPairs } from "lodash";
 import {
   Dispatch,
   SetStateAction,
   useLayoutEffect,
   useRef,
-  useState,
-  MutableRefObject
+  useState
 } from "react";
 import { useCollectingEventQuery, useCollectingEventSave } from ".";
 import { SCHEDULEDACTION_FIELDS } from "..";
@@ -30,8 +29,8 @@ import {
 } from "../../../dina-ui/types/objectstore-api";
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { HOSTORGANISM_FIELDS } from "./AssociationsField";
 import { AllowAttachmentsConfig } from "../object-store";
+import { HOSTORGANISM_FIELDS } from "./AssociationsField";
 import { DETERMINATION_FIELDS } from "./DeterminationField";
 import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "./MaterialSampleAssociationsField";
 import { ORGANISM_FIELDS } from "./OrganismStateField";
@@ -205,8 +204,6 @@ export interface UseMaterialSampleSaveParams {
   };
 
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
-
-  associatedSampleMapRef?: MutableRefObject<Map<string, string>>;
 }
 
 export function useMaterialSampleSave({
@@ -218,8 +215,7 @@ export function useMaterialSampleSave({
   enabledFields,
   collectingEventAttachmentsConfig,
   colEventTemplateInitialValues,
-  materialSampleTemplateInitialValues,
-  associatedSampleMapRef
+  materialSampleTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
@@ -466,7 +462,7 @@ export function useMaterialSampleSave({
   });
 
   async function onSubmit({
-    api: { save, apiClient },
+    api: { save },
     formik,
     submittedValues
   }: DinaFormSubmitParams<InputResource<MaterialSample>>) {
@@ -475,20 +471,6 @@ export function useMaterialSampleSave({
 
     /** Input to submit to the back-end API. */
     const { ...materialSampleInput } = submittedValues;
-
-    const saveAndProceed = async mtrSmplIpt => {
-      // Save the MaterialSample:
-      const [savedMaterialSample] = await save(
-        [
-          {
-            resource: mtrSmplIpt,
-            type: "material-sample"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      );
-      await onSaved?.(savedMaterialSample.id);
-    };
 
     // Only persist the preparation fields if the preparations toggle is enabled:
     if (!enablePreparations) {
@@ -609,53 +591,17 @@ export function useMaterialSampleSave({
 
     delete materialSampleInput.association;
 
-    // convert associated material sample from primary id to uuid for saving
-    if (!!materialSampleInput.associations?.length) {
-      const promises: Promise<KitsuResponse<MaterialSample[], undefined>>[] =
-        [];
-      materialSampleInput.associations?.map(async assctn => {
-        const id = associatedSampleMapRef?.current.get(
-          assctn.associatedSample as any
-        );
-        if (id) {
-          assctn.associatedSample = id;
-        } else {
-          promises.push(
-            apiClient.get<MaterialSample[]>("collection-api/material-sample", {
-              fields: {
-                "material-sample": "id,materialSampleName"
-              },
-              filter: {
-                rsql: `materialSampleName==${assctn.associatedSample}`
-              },
-              page: { limit: 1000 }
-            })
-          );
+    const [savedMaterialSample] = await save(
+      [
+        {
+          resource: materialSampleInput,
+          type: "material-sample"
         }
-      });
+      ],
+      { apiBaseUrl: "/collection-api" }
+    );
 
-      // Set the associatedSample to id if it does not exist in the live map
-      await Promise.all(promises).then(results => {
-        materialSampleInput.associations?.map(assctn => {
-          // Take the first sample whose sampleName match the one about to sent for save
-          // duplication is not handled by design for now
-          results.map(result => {
-            if (
-              assctn.associatedSample === result.data?.[0]?.materialSampleName
-            ) {
-              associatedSampleMapRef?.current.set(
-                assctn.associatedSample as string,
-                result?.data?.[0]?.id
-              );
-              assctn.associatedSample = result?.data?.[0]?.id;
-            }
-          });
-        });
-        saveAndProceed(materialSampleInput);
-      });
-    } else {
-      await saveAndProceed(materialSampleInput);
-    }
+    await onSaved?.(savedMaterialSample.id);
   }
 
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */

@@ -34,10 +34,7 @@ import {
   PREPARATION_FIELDS
 } from "../../../components/collection/PreparationField";
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
-import {
-  mapMaterialSampleAssociations,
-  useMaterialSampleQuery
-} from "../../../components/collection/useMaterialSample";
+import { useMaterialSampleQuery } from "../../../components/collection/useMaterialSample";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { ManagedAttributesViewer } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -63,22 +60,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   );
 
   const collectingEvent = colEventQuery.response?.data;
-
-  // use material sample name if not empty, otherwise use id for associations' associatedSample when viewing
-  const ids = materialSampleQuery?.response?.data.associations?.map(
-    assctn => assctn.associatedSample
-  );
-  const materialSampleData = materialSampleQuery?.response?.data;
-
-  // if loading, return
-  if (
-    mapMaterialSampleAssociations(
-      ids as any,
-      materialSampleData as MaterialSample,
-      true
-    )
-  )
-    return null;
 
   const buttonBar = id && (
     <ButtonBar className="flex">

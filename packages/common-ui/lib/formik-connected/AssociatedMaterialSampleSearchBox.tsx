@@ -1,27 +1,25 @@
-import React, { ChangeEvent, MutableRefObject, useRef, useState } from "react";
-import { TextField, TextFieldProps } from "./TextField";
 import classNames from "classnames";
-import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { PersistedResource } from "kitsu";
+import React, { useRef, useState } from "react";
 import { RiDeleteBinLine } from "react-icons/ri";
+import { FieldWrapper, FieldWrapperProps } from "..";
+import { MaterialSampleLink } from "../../../dina-ui/components/collection/MaterialSampleAssociationsField";
+import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list";
 import { MaterialSample } from "../../../dina-ui/types/collection-api/resources/MaterialSample";
-import { FormikContextType } from "formik";
 
-interface AssociatedMaterialSampleSearchBoxProps extends TextFieldProps {
+interface AssociatedMaterialSampleSearchBoxProps extends FieldWrapperProps {
   showSearchAssociatedSampleInit?: boolean;
-  form?: FormikContextType<MaterialSample>;
-  associatedSampleMapRef?: MutableRefObject<Map<string, string>>;
 }
 
 export function AssociatedMaterialSampleSearchBox(
   props: AssociatedMaterialSampleSearchBoxProps
 ) {
-  const { showSearchAssociatedSampleInit, associatedSampleMapRef } = props;
+  const { showSearchAssociatedSampleInit } = props;
   const [showSearchAssociatedSample, setShowSearchAssociatedSample] = useState(
     showSearchAssociatedSampleInit
   );
 
-  const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const { formatMessage } = useDinaIntl();
 
@@ -29,66 +27,12 @@ export function AssociatedMaterialSampleSearchBox(
     setShowSearchAssociatedSample(true);
   }
 
-  /* Clear the input value */
-  const removeEntry = onChange => {
-    onChange?.({
-      target: { value: "" }
-    } as ChangeEvent<HTMLInputElement>);
+  function onCloseClicked() {
+    if (listRef.current) {
+      listRef.current.className = listRef.current.className + " d-none";
+    }
     setShowSearchAssociatedSample(false);
-  };
-
-  const MaterialSampleList = ({ onChange }) => {
-    function onCloseClicked() {
-      if (listRef.current)
-        listRef.current.className = listRef.current.className + " d-none";
-    }
-    return (
-      <div
-        ref={listRef}
-        className={classNames(
-          "p-2 mt-2",
-          !showSearchAssociatedSample && "d-none"
-        )}
-        style={{ borderStyle: "dashed" }}
-      >
-        <div className="mb-4">
-          <span className="me-2 fw-bold" style={{ fontSize: "1.2em" }}>
-            {formatMessage("search")}
-          </span>
-          <a href="#association" onClick={onCloseClicked}>
-            <span style={{ fontSize: "1.2em" }}>
-              {formatMessage("closeButtonText")}{" "}
-            </span>
-          </a>
-        </div>
-        <SampleListLayout
-          onSelect={sample => onAssociatedSampleSelected(sample, onChange)}
-          classNames="btn btn-primary selectMaterialSample"
-          btnMsg={formatMessage("select")}
-          hideTopPagination={true}
-        />
-      </div>
-    );
-  };
-
-  const onAssociatedSampleSelected = (sample, onChange) => {
-    if (inputRef.current) {
-      const sampleId = !!sample.materialSampleName?.length
-        ? sample.materialSampleName
-        : sample.id;
-      inputRef.current.value = sampleId;
-      if (associatedSampleMapRef?.current) {
-        associatedSampleMapRef.current.set(sampleId, sample.id);
-      }
-      // Close the search result list box when a selection is made
-      // so that it is easier for user to see the Add button
-      if (listRef.current)
-        listRef.current.className = listRef.current.className + " d-none";
-      onChange?.({
-        target: { value: sampleId }
-      } as ChangeEvent<HTMLInputElement>);
-    }
-  };
+  }
 
   return (
     <div>
@@ -105,36 +49,76 @@ export function AssociatedMaterialSampleSearchBox(
         </button>
       ) : (
         <div>
-          <TextField
-            {...props}
-            hideLabel={true}
-            customInput={inputProps => (
-              <div className="d-flex flex-column">
-                <div className={"d-flex flex-row"}>
-                  <input
-                    {...inputProps}
-                    type="text"
-                    disabled={true}
-                    className={
-                      "flex-md-grow-1 form-control associatedSampleInput"
-                    }
-                    ref={inputRef}
-                  />
-                  <button
-                    className="btn mb-2"
-                    onClick={() => removeEntry(inputProps.onChange)}
-                    type="button"
-                    style={{
-                      cursor: "pointer"
-                    }}
+          <FieldWrapper {...props} hideLabel={true} disableLabelClick={true}>
+            {({ setValue, value }) => {
+              function onAssociatedSampleSelected(
+                sample: PersistedResource<MaterialSample>
+              ) {
+                // Close the search result list box when a selection is made
+                // so that it is easier for user to see the Add button
+                if (listRef.current) {
+                  listRef.current.className =
+                    listRef.current.className + " d-none";
+                }
+                setValue(sample.id);
+              }
+
+              /** Clear the input value */
+              function removeEntry() {
+                setValue(null);
+                setShowSearchAssociatedSample(false);
+              }
+
+              return (
+                <div className="d-flex flex-column">
+                  <div className={"d-flex flex-row"}>
+                    <div
+                      className="flex-md-grow-1 form-control associatedSampleInput"
+                      style={{ backgroundColor: "#e9ecef" }}
+                    >
+                      {value && <MaterialSampleLink id={value} />}
+                    </div>
+                    <button
+                      className="btn mb-2"
+                      onClick={removeEntry}
+                      type="button"
+                      style={{
+                        cursor: "pointer"
+                      }}
+                    >
+                      <RiDeleteBinLine size="1.8em" className="ms-auto" />
+                    </button>
+                  </div>
+                  <div
+                    ref={listRef}
+                    className={classNames(
+                      "p-2 mt-2",
+                      !showSearchAssociatedSample && "d-none"
+                    )}
+                    style={{ borderStyle: "dashed" }}
                   >
-                    <RiDeleteBinLine size="1.8em" className="ms-auto" />
-                  </button>
+                    <div className="mb-4">
+                      <span
+                        className="me-2 fw-bold"
+                        style={{ fontSize: "1.2em" }}
+                      >
+                        {formatMessage("search")}
+                      </span>
+                      <button className="btn btn-dark" onClick={onCloseClicked}>
+                        {formatMessage("closeButtonText")}
+                      </button>
+                    </div>
+                    <SampleListLayout
+                      onSelect={onAssociatedSampleSelected}
+                      classNames="btn btn-primary selectMaterialSample"
+                      btnMsg={formatMessage("select")}
+                      hideTopPagination={true}
+                    />
+                  </div>
                 </div>
-                <MaterialSampleList onChange={inputProps.onChange} />
-              </div>
-            )}
-          />
+              );
+            }}
+          </FieldWrapper>
         </div>
       )}
     </div>

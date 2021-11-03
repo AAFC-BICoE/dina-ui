@@ -10,7 +10,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
-import { Footer, GroupSelectField, Head, Nav } from "../../../components";
+import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   MaterialSample,
@@ -18,7 +18,7 @@ import {
 } from "../../../types/collection-api";
 
 export interface SampleListLayoutProps {
-  onSelect?: (sample) => void;
+  onSelect?: (sample: PersistedResource<MaterialSample>) => void;
   classNames?: string;
   btnMsg?: string;
   hideTopPagination?: boolean;
