@@ -265,6 +265,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeType_text_label: "Text",
   field_materialSampleName: "Primary ID",
   "field_materialSampleType.name": "Material Sample Type",
+  field_materialSampleState_tooltip:
+    "Represents the state of a material sample when its condition is negatively impacted.",
   field_materialSampleType_tooltip:
     "A system-defined term that prescribes the downstream expectations and logic\
   in how derivative (or child) Material Samples are to be interpreted and digitally managed.",
