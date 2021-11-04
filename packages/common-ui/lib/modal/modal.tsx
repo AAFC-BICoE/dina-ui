@@ -55,24 +55,14 @@ export function ModalProvider({ appElement, children }: ModalProviderProps) {
         // General text added but better to pass in title of window
         contentLabel={"Popup dialog window"}
       >
-        {modals.length && (
-          <style>{`
-            .modal-content {
-              margin: auto;
-              max-height: calc(100vh - 3rem) !important;
-              overflow-y: scroll !important;
-            }
-        `}</style>
-        )}
         {modals.map((modal, index) => (
           <div
             className="dina-modal-wrapper"
             key={index}
             style={{
-              display: index === modals.length - 1 ? undefined : "none"
+              display: index === (modals.length - 1) ? undefined : "none"
             }}
           >
-            <style>{`.modal-dialog { max-width: 500px }`}</style>
             {modal}
           </div>
         ))}

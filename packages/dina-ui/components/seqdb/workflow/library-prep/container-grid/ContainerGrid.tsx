@@ -65,14 +65,10 @@ export function ContainerGrid({
 
   // ReactTable needs a data object in every row.
   const tableData = new Array(containerType.numberOfRows).fill({});
+  
 
   return (
-    <div>
-      <style>{`
-        .rt-td {
-          padding: 0 !important;
-        }
-      `}</style>
+    <div id="containergrid">
       <ReactTable
         columns={columns}
         data={tableData}

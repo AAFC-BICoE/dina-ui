@@ -19,13 +19,6 @@ interface StoredObjectGalleryProps {
   previewMetadataId: string | null;
 }
 
-const GALLERY_STYLE = `
-  .stored-object-gallery .file-viewer-wrapper, .stored-object-gallery img {
-    overflow-x: hidden !important;
-    height: 7rem;
-  }
-`;
-
 const HIGHLIGHT_COLOR = "rgb(222, 252, 222)";
 
 /**
@@ -39,7 +32,6 @@ export function StoredObjectGallery({
 }: StoredObjectGalleryProps) {
   return (
     <div className="stored-object-gallery">
-      <style>{GALLERY_STYLE}</style>
       <ul className="m-3 list-inline">
         {metadatas.map(metadata => {
           return (

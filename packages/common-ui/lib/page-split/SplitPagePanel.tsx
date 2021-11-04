@@ -1,20 +1,19 @@
-import { ReactNode, useCallback, useEffect, useRef } from "react";
-
-const SPLIT_PAGE_CSS = `
-  html, body {
-    margin: 0;
-    height: 100%;
-  }
-  #__next {
-    height: 100%;
-  }
-`;
+import { Children, ReactNode, useCallback, useEffect, useRef } from "react";
 
 /**
  * Component that lets you split a page into independently scrollable sections.
  */
 export function SplitPagePanel({ children }: { children?: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
+  
+  document.documentElement.style.setProperty("height", "100%");
+  document.documentElement.style.setProperty("margin", "0px");
+  
+  document.body.style.setProperty("height", "100%");
+  document.body.style.setProperty("margin", "0px");
+
+  let element1 = document.querySelector('#__next');
+  element1?.setAttribute("style", "height:100%");
 
   // Memoized function that resizes the wrapper div on window resize:
   const resizeWrapper = useCallback(() => {
@@ -27,20 +26,19 @@ export function SplitPagePanel({ children }: { children?: ReactNode }) {
     }
   }, []);
 
-  // On first render, add the resize listener:
-  useEffect(() => {
-    window.addEventListener("resize", resizeWrapper);
-    return () => window.removeEventListener("resize", resizeWrapper);
-  }, []);
+// On first render, add the resize listener:
+useEffect(() => {
+  window.addEventListener("resize", resizeWrapper);
+  return () => window.removeEventListener("resize", resizeWrapper);
+}, []);
 
-  // After every render, resize the wrapper:
-  useEffect(() => {
-    resizeWrapper();
-  });
+// After every render, resize the wrapper:
+useEffect(() => {
+  resizeWrapper();
+});
 
   return (
     <div className="split-page-panel" ref={ref} style={{ overflowY: "scroll" }}>
-      <style>{SPLIT_PAGE_CSS}</style>
       {children}
     </div>
   );

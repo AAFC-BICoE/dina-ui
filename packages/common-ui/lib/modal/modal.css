@@ -1,0 +1,33 @@
+/* reset modal window to width to be 100% assumed to be the inital react property value */
+/* max-width will be customized as required for individual pages */
+.modal-dialog {
+    max-width: 100% !important;
+}
+
+/* set initial content properties for modal dialog window */ 
+.modal-content {
+    margin: auto;
+    max-height: calc(100vh - 3rem) !important;
+    overflow-y: scroll !important;
+}
+
+.modal-AddPerson {
+    max-width: 100rem !important;
+}
+
+.modal-UseValueRuleEditor {
+    max-width: 70rem !important;
+}
+
+.modal-AreYouSure {
+    max-width: 50rem !important;
+}
+
+.modal-UseBulkMetadataEdit, .modal-Attachements {
+    max-width: calc(100vw - 3rem) !important;
+    height: 0% !important;
+}
+
+.modal-GeographySearchDialog {
+    max-width: calc(30vw - 3rem);
+}

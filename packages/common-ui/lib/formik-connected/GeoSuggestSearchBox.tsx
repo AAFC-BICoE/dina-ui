@@ -133,7 +133,6 @@ export function GeoSuggestSearchBox({
 
   return (
     <div className="mb-3 geo-suggest-search-box">
-      <style>{`.autosuggest-highlighted { background-color: #ddd; }`}</style>
       <label className="w-100">
         <div>
           <strong>

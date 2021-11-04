@@ -130,25 +130,22 @@ export function IndexGrid(props: IndexGridProps) {
     return (
       <DinaForm
         initialValues={{ indexI5s: {}, indexI7s: {} }}
-        onSubmit={onSubmit}
+        onSubmit={onSubmit}        
       >
-        <style>{`
-          .rt-td {
-            padding: 0 !important;
-          }
-        `}</style>
         <div className="alert alert-warning d-inline-block">
           <SeqdbMessage id="indexGridInstructions" />
         </div>
         <div>
           <SubmitButton className="mb-3" />
         </div>
-        <ReactTable
-          columns={columns}
-          data={tableData}
-          minRows={0}
-          showPagination={false}
-        />
+        <div id="indexgrid">
+          <ReactTable
+            columns={columns}
+            data={tableData}
+            minRows={0}
+            showPagination={false}
+          />
+        </div>
       </DinaForm>
     );
   }

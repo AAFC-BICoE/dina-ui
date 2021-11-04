@@ -134,10 +134,9 @@ export function useAddPersonModal() {
         closeModal();
         resolve(newPerson);
       }
-
+      
       openModal(
-        <div className="modal-content">
-          <style>{`.modal-dialog { max-width: 100rem; }`}</style>
+        <div className="modal-content modal-dialog modal-AddPerson">
           <div className="modal-header">
             <h2>
               <DinaMessage id="addPersonTitle" />

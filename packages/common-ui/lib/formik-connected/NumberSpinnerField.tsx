@@ -14,16 +14,6 @@ interface NumberSpinnerFieldProps extends LabelWrapperParams {
 export default function NumberSpinnerField(props: NumberSpinnerFieldProps) {
   const { min, max, size, step, onChangeExternal, name } = props;
 
-  const customStyle = (
-    <style>{`
-    /* Making sure under chrome, the spinnig show by default */
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button {  
-       opacity: 1;
-    }    
-  `}</style>
-  );
-
   /* Avoid entries like 'e' for valid number */
   const onKeyDown = e => {
     const NUMBER_ALLOWED_CHARS_REGEXP = /[0-9]+/;
@@ -53,8 +43,8 @@ export default function NumberSpinnerField(props: NumberSpinnerFieldProps) {
 
         return (
           <>
-            {customStyle}
             <input
+              id="numberSpinnerForChildMaterialSamples"
               className="form-control"
               type="number"
               min={min ?? 1}
@@ -64,6 +54,7 @@ export default function NumberSpinnerField(props: NumberSpinnerFieldProps) {
               onKeyDown={onKeyDown}
               onChange={e => onChangeInternal(e.target.value)}
               value={value}
+              tabIndex={1}
             />
           </>
         );

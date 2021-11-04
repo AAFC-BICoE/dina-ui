@@ -13,12 +13,6 @@ interface MetadataPreviewProps {
   metadataId: string;
 }
 
-const METADATA_PREVIEW_STYLE = `
-  .metadata-preview .file-viewer-wrapper img {
-    height: 12rem;
-  }
-`;
-
 /**
  * Metadata preview component to be used on the side panel of the Metadata list page.
  */
@@ -35,7 +29,6 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
     return (
       <div className="metadata-preview">
         <DinaForm initialValues={metadata} readOnly={true}>
-          <style>{METADATA_PREVIEW_STYLE}</style>
           <div className="metadata-edit-link">
             <Link
               href={`/object-store/metadata/single-record-edit?id=${metadataId}`}

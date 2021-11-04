@@ -22,13 +22,6 @@ import {
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
-const OBJECT_DETAILS_PAGE_CSS = `
-  .file-viewer-wrapper img {
-    max-width: 100%;
-    height: auto;
-  }
-`;
-
 export default function MetadataViewPage() {
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
@@ -71,7 +64,6 @@ export default function MetadataViewPage() {
       <div>
         <Head title={metadata.originalFilename} />
         <Nav />
-        <style>{OBJECT_DETAILS_PAGE_CSS}</style>
         <main className="container-fluid">
           <div className="row">
             <div className="col-md-4">

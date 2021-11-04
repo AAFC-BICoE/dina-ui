@@ -107,7 +107,6 @@ export function MaterialSampleFormNav({
 
   return (
     <div className="sticky-md-top material-sample-nav">
-      <style>{`.material-sample-nav .active a { color: inherit !important; }`}</style>
       <ScrollSpyNav
         key={scrollTargets.filter(it => !it.disabled).length}
         scrollTargetIds={scrollTargets
