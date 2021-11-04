@@ -231,14 +231,6 @@ export function QueryTable<TData extends KitsuResource>({
           />
         </span>
       )}
-      {error && (
-        <div
-          className="alert alert-danger"
-          style={{ position: "absolute", zIndex: 1, whiteSpace: "pre-line" }}
-        >
-          {error.errors?.map(e => e.detail).join("\n") ?? String(error)}
-        </div>
-      )}
       <ReactTable
         FilterComponent={({ filter: headerFilter, onChange }) => (
           <input
@@ -248,6 +240,20 @@ export function QueryTable<TData extends KitsuResource>({
             onChange={event => onChange(event.target.value)}
           />
         )}
+        TbodyComponent={({ children }) =>
+          error ? (
+            <div
+              className="alert alert-danger"
+              style={{
+                whiteSpace: "pre-line"
+              }}
+            >
+              {error.errors?.map(e => e.detail).join("\n") ?? String(error)}
+            </div>
+          ) : (
+            children
+          )
+        }
         TdComponent={DefaultTd}
         className="-striped"
         columns={mappedColumns}

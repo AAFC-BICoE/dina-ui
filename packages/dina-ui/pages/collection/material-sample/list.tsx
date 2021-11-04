@@ -72,23 +72,26 @@ export function SampleListLayout({
     { accessor: "materialSampleType.name" },
     "createdBy",
     dateCell("createdOn"),
-    onSelect
-      ? {
-          Cell: ({ original: sample }) => (
-            <div className="d-flex">
-              <button
-                type="button"
-                className={classNames}
-                onClick={() => onSelect(sample)}
-              >
-                {btnMsg}
-              </button>
-            </div>
-          ),
-          Header: formatMessage("actions"),
-          sortable: false
-        }
-      : {}
+    ...(onSelect
+      ? [
+          {
+            Cell: ({ original: sample }) => (
+              <div className="d-flex">
+                <button
+                  type="button"
+                  className={classNames}
+                  onClick={() => onSelect(sample)}
+                >
+                  {btnMsg}
+                </button>
+              </div>
+            ),
+            Header: formatMessage("actions"),
+            sortable: false
+          }
+        ]
+      : []),
+    "undefined"
   ];
 
   return (

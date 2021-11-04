@@ -594,7 +594,7 @@ describe("QueryTable component", () => {
     expect(wrapper.contains("Total matched records: 300")).toEqual(true);
   });
 
-  it("Renders an error overlay when there is a query error.", async () => {
+  it("Renders an error message when there is a query error.", async () => {
     mockGet.mockImplementationOnce(() => {
       throw {
         errors: [{ detail: "error message 1" }, { detail: "error message 2" }]
