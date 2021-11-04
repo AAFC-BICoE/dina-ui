@@ -67,6 +67,8 @@ export interface QueryTableProps<TData extends KitsuResource> {
   reactTableProps?:
     | Partial<TableProps>
     | ((queryState: QueryState<TData[], MetaWithTotal>) => Partial<TableProps>);
+
+  hideTopPagination?: boolean;
 }
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -89,9 +91,10 @@ export function QueryTable<TData extends KitsuResource>({
   onPageSizeChange,
   onSortedChange,
   path,
+  hideTopPagination,
   reactTableProps
 }: QueryTableProps<TData>) {
-  const { formatMessage, messages } = useIntl();
+  const { formatMessage } = useIntl();
 
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
@@ -198,7 +201,7 @@ export function QueryTable<TData extends KitsuResource>({
       className="query-table-wrapper"
       ref={divWrapperRef}
       role="search"
-      aria-label="Query Table"
+      aria-label={formatMessage({ id: "queryTable" })}
     >
       {!omitPaging && (
         <span>
@@ -228,14 +231,6 @@ export function QueryTable<TData extends KitsuResource>({
           />
         </span>
       )}
-      {error && (
-        <div
-          className="alert alert-danger"
-          style={{ position: "absolute", zIndex: 1, whiteSpace: "pre-line" }}
-        >
-          {error.errors?.map(e => e.detail).join("\n") ?? String(error)}
-        </div>
-      )}
       <ReactTable
         FilterComponent={({ filter: headerFilter, onChange }) => (
           <input
@@ -257,7 +252,7 @@ export function QueryTable<TData extends KitsuResource>({
         onFetchData={onFetchData}
         pageSizeOptions={[25, 50, 100, 200, 500]}
         pages={numberOfPages}
-        showPaginationTop={shouldShowPagination}
+        showPaginationTop={shouldShowPagination && !hideTopPagination}
         showPaginationBottom={shouldShowPagination}
         noDataText={<CommonMessage id="noRowsFound" />}
         ofText={<CommonMessage id="of" />}
@@ -269,9 +264,41 @@ export function QueryTable<TData extends KitsuResource>({
         showPagination={!omitPaging && shouldShowPagination}
         {...resolvedReactTableProps}
         pageText={<CommonMessage id="page" />}
+        TbodyComponent={
+          error
+            ? () => (
+                <div
+                  className="alert alert-danger"
+                  style={{
+                    whiteSpace: "pre-line"
+                  }}
+                >
+                  <p>
+                    {error.errors?.map(e => e.detail).join("\n") ??
+                      String(error)}
+                  </p>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => {
+                      const newSort = [{ id: "createdOn", desc: true }];
+                      onSortedChange?.(newSort);
+                      setSortingRules(newSort);
+                    }}
+                  >
+                    <CommonMessage id="resetSort" />
+                  </button>
+                </div>
+              )
+            : resolvedReactTableProps?.TbodyComponent ?? DefaultTBody
+        }
       />
     </div>
   );
+}
+
+function DefaultTBody(props) {
+  return <div {...props} className="rt-tbody" />;
 }
 
 export function DefaultTd({ className, style, children, onClick }) {

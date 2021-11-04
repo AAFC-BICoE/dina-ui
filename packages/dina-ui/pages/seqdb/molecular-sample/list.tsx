@@ -22,10 +22,12 @@ export default function MolecularSampleListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("molecularSampleListTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
+      <Head
+        title={formatMessage("molecularSampleListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">

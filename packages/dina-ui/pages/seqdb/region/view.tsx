@@ -19,11 +19,13 @@ export function RegionDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("regionViewTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage("regionViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="seqdb/region" />
         <BackToListButton entityLink="/seqdb/region" />

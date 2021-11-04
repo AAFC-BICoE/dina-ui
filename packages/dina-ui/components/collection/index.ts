@@ -8,3 +8,4 @@ export * from "./catalogue-of-life/CatalogueOfLifeNameField";
 export * from "./useCollectingEvent";
 export * from "./useLastUsedCollection";
 export * from "./SetDefaultSampleName";
+export * from "./AssociationsField";

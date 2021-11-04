@@ -7,7 +7,7 @@ import {
   useQuery
 } from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource, PersistedResource } from "kitsu";
+import { InputResource, KitsuResource } from "kitsu";
 import { cloneDeep, fromPairs, isEmpty, isEqual, pick, toPairs } from "lodash";
 import {
   Dispatch,
@@ -17,7 +17,6 @@ import {
   useState
 } from "react";
 import { useCollectingEventQuery, useCollectingEventSave } from ".";
-import { SCHEDULEDACTION_FIELDS } from "..";
 import {
   CollectingEvent,
   MaterialSample
@@ -30,9 +29,12 @@ import {
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig } from "../object-store";
+import { HOSTORGANISM_FIELDS } from "./AssociationsField";
 import { DETERMINATION_FIELDS } from "./DeterminationField";
+import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "./MaterialSampleAssociationsField";
 import { ORGANISM_FIELDS } from "./OrganismStateField";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
+import { SCHEDULEDACTION_FIELDS } from "./ScheduledActionsField";
 import { useLastUsedCollection } from "./useLastUsedCollection";
 
 export function useMaterialSampleQuery(id?: string | null) {
@@ -126,7 +128,6 @@ export function useMaterialSampleQuery(id?: string | null) {
 
   return materialSampleQuery;
 }
-
 export interface UseMaterialSampleSaveParams {
   /** Material Sample form initial values. */
   materialSample?: InputResource<MaterialSample>;
@@ -216,6 +217,23 @@ export function useMaterialSampleSave({
       )
     );
 
+  const hasAssociationsTemplate =
+    isTemplate &&
+    (!isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        MATERIALSAMPLE_ASSOCIATION_FIELDS.map(
+          fieldName => `association.${fieldName}`
+        )
+      )
+    ) ||
+      !isEmpty(
+        pick(
+          materialSampleTemplateInitialValues?.templateCheckboxes,
+          HOSTORGANISM_FIELDS.map(fieldName => `hostOrganism.${fieldName}`)
+        )
+      ));
+
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(
       hasColEventTemplate ||
@@ -230,7 +248,7 @@ export function useMaterialSampleSave({
         // Show the preparation section if a field is set or the field is enabled:
         PREPARATION_FIELDS.some(
           prepFieldName =>
-            materialSample?.[prepFieldName] ||
+            !isEmpty(materialSample?.[prepFieldName]) ||
             enabledFields?.materialSample?.includes(prepFieldName)
         )
     )
@@ -281,6 +299,26 @@ export function useMaterialSampleSave({
     )
   );
 
+  const [enableAssociations, setEnableAssociations] = useState(
+    // Show the associations section if the field is set or the template enables it:
+    Boolean(
+      hasAssociationsTemplate ||
+        materialSample?.associations?.length ||
+        HOSTORGANISM_FIELDS.some(
+          organismFieldName =>
+            materialSample?.hostOrganism?.[`${organismFieldName}`] ||
+            enabledFields?.materialSample?.includes(
+              `hostOrganism.${organismFieldName}`
+            )
+        ) ||
+        enabledFields?.materialSample?.some(
+          enabledField =>
+            enabledField.startsWith("association.") ||
+            enabledField.startsWith("hostOrganism.")
+        )
+    )
+  );
+
   // The state describing which Data components (Form sections) are enabled:
   const dataComponentState = {
     enableCollectingEvent,
@@ -295,6 +333,8 @@ export function useMaterialSampleSave({
     setEnableDetermination,
     enableScheduledActions,
     setEnableScheduledActions,
+    enableAssociations,
+    setEnableAssociations,
     /** Wraps the useState setter with an AreYouSure modal when setting to false. */
     dataComponentToggler(
       setBoolean: Dispatch<SetStateAction<boolean>>,
@@ -493,7 +533,14 @@ export function useMaterialSampleSave({
         }
       }
     }
-    // Save the MaterialSample:
+
+    if (!enableAssociations) {
+      materialSampleInput.associations = [];
+      materialSampleInput.hostOrganism = null;
+    }
+
+    delete materialSampleInput.association;
+
     const [savedMaterialSample] = await save(
       [
         {

@@ -38,11 +38,13 @@ export function CollectorGroupDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("collectorGroupViewTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage("collectorGroupViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <ButtonBar>
         <BackButton
           entityId={id as string}

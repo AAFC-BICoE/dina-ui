@@ -1,7 +1,7 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { FieldWrapper, LabelWrapperParams, SelectOption } from "common-ui";
 import Select, { StylesConfig } from "react-select";
-import { DinaMessage } from "../../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import { DefaultValuesConfig } from "./model-types";
 
 export interface DefaultValueConfigSelectProps {
@@ -95,6 +95,7 @@ export function DefaultValuesConfigSelect({
   styles
 }: DefaultValueConfigSelectProps) {
   const { storedDefaultValuesConfigs } = useStoredDefaultValuesConfigs();
+  const { formatMessage } = useDinaIntl();
 
   const ruleConfigOptions = storedDefaultValuesConfigs.map((cfg, index) => ({
     label: cfg.name || `Rule Set ${cfg.createdOn}`,
@@ -111,7 +112,7 @@ export function DefaultValuesConfigSelect({
         "config-select-" +
         document.getElementsByClassName("ReactModalPortal").length
       }
-      aria-label="Select Rule Set"
+      aria-label={formatMessage("selectRuleSet")}
       options={selectOptions}
       onChange={(option: any) => onChangeConfigIndex(option.value)}
       value={ruleConfigOptions[ruleConfigIndex ?? -1] ?? null}

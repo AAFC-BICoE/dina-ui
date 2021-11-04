@@ -21,11 +21,13 @@ export function MolecularSampleDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("molecularSampleViewTitle")}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head
+        title={formatMessage("molecularSampleViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
+      <Nav />
       <main className="container">
         <ButtonBar>
           <BackButton

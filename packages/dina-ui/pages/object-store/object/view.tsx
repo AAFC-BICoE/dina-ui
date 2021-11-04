@@ -69,10 +69,12 @@ export default function MetadataViewPage() {
 
     return (
       <div>
-        <Head title={metadata.originalFilename} 
-              lang={formatMessage("languageOfPage")} 
-              creator={formatMessage("agricultureCanada")}
-              subject={formatMessage("subjectTermsForPage")}/>
+        <Head
+          title={metadata.originalFilename}
+          lang={formatMessage("languageOfPage")}
+          creator={formatMessage("agricultureCanada")}
+          subject={formatMessage("subjectTermsForPage")}
+        />
         <Nav />
         <style>{OBJECT_DETAILS_PAGE_CSS}</style>
         <main className="container-fluid">
