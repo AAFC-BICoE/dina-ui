@@ -220,19 +220,11 @@ export function GeographySearchBox({
         ) : (
           searchResults?.map(place => (
             <div className="list-group-item" key={place.osm_id}>
-              <style>{`
-                .searchResult {
-                  font-size:13pt; font-family:verdana,sans-serif;
-                }     
-                .searchResultCategory {
-                  font-size:13pt; font-family:verdana,sans-serif; color: grey;
-                }                     
-            `}</style>
               <div className="row">
-                <div className="col-md-8 searchResult">
+                <div className="col-md-8 searchGeographyResult">
                   {place.display_name}
                 </div>
-                <div className="col-md-4 searchResultCategory">
+                <div className="col-md-4 searchGeographyResultCategory">
                   {`[category: ${place.category}]`}
                 </div>
               </div>

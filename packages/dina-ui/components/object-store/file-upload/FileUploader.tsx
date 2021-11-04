@@ -14,6 +14,7 @@ import Dropzone, {
   SubmitButton
 } from "react-dropzone-uploader/dist/react-dropzone-uploader";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DraggableSampleBox } from "../../seqdb/workflow/library-prep/container-grid/DraggableSampleBox";
 
 /** FileUploader component props. */
 export interface FileUploaderProps<TValues = any> {
@@ -141,6 +142,7 @@ function CustomPreviewComponent(props) {
   useLayoutEffect(() => {
     const img = ref.current?.querySelector("img.dzu-previewImage");
     if (img) {
+      img.setAttribute("draggable","false");
       // Show the filename to the right of the image:
       const filenameNode = ref.current?.querySelector(".dzu-previewFileName");
       if (!filenameNode) {
@@ -164,22 +166,6 @@ function CustomPreviewComponent(props) {
 
   return (
     <div ref={ref} className="w-100">
-      <style>{`
-        /* Move the preview to the left, and the status container to the right: */
-        .dzu-previewStatusContainer {
-          margin-left: auto !important;
-        }
-
-        /* Make the image non-draggable: */
-        img.dzu-previewImage {
-          user-drag: none; 
-          user-select: none;
-          -moz-user-select: none;
-          -webkit-user-drag: none;
-          -webkit-user-select: none;
-          -ms-user-select: none;
-        }
-      `}</style>
       <Preview {...props} />
     </div>
   );

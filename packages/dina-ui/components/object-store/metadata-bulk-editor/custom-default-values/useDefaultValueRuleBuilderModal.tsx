@@ -15,12 +15,7 @@ export function useDefaultValueRuleEditorModal() {
     onSave
   }: DefaultValueRuleEditorModalParams) {
     openModal(
-      <div className="modal-content">
-        <style>{`
-          .modal-dialog {
-            max-width: 70rem !important;
-          }
-        `}</style>
+      <div className="modal-content modal-UseValueRuleEditor">
         <div className="modal-header">
           <h1 style={{ border: "none" }}>
             <DinaMessage id="defaultValuesConfigs" />

@@ -132,24 +132,6 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
 
   return (
     <>
-      <style>{`
-        .autosuggest-container {
-          position: relative;
-        }
-        .autosuggest .suggestions-container {
-          display: none;
-        }
-        .autosuggest .suggestions-container-open {
-          display: block;
-          position: absolute;
-          width: 100%;
-          z-index: 20;
-        }
-        .autosuggest .suggestion-highlighted { 
-          background-color: #ddd;
-          cursor: pointer;
-        }
-        `}</style>
       <div className="autosuggest">
         <AutoSuggest
           id={id}

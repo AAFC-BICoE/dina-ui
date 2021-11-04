@@ -59,11 +59,6 @@ export function StorageSearchSelector({
 
   return (
     <div className="storage-search-selector">
-      <style>{`
-        .storage-search-selector .rt-tr-group:hover {
-          background-color: rgb(222, 252, 222) !important;
-        }
-      `}</style>
       <StorageFilter onChange={setFilter} />
       <QueryTable
         columns={tableColumns}

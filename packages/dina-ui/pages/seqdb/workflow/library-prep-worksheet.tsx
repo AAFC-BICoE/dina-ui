@@ -39,35 +39,43 @@ export default function LibraryPrepWorksheetPage() {
     sort: "wellRow,wellColumn"
   });
 
+  let element1 = document.querySelector("#lpwp");
+
+  if (element1 == null) {
+    const styletag = document.createElement("style");
+    document.head.append(styletag);
+    styletag.setAttribute("id","lpwp");
+    styletag.innerHTML = `
+      @media print { 
+        body { 
+          padding: 0;
+        }
+        a[href]:after { 
+          content: none !important; 
+        } 
+      } 
+      @media print and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) { 
+        body { 
+          padding-left: 1.5cm; 
+        } 
+        a[href]:after { 
+          content: none !important; 
+        } 
+      }`;
+  }
+
   if (srLoading || prepsLoading) {
-    return <LoadingSpinner loading={true} />;
+      return <LoadingSpinner loading={true} />;
   }
 
   if (srResponse && batch) {
     const chain = srResponse.data.chain;
 
+
     return (
+
       <div style={{ width: "1100px" }}>
         <Head title="Library Prep Worksheet" />
-        <style>{`
-          @media print {
-            body {
-              padding: 0;
-            }
-            a[href]:after {
-              content: none !important;
-            }
-          }
-          
-          @media print and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) {
-            body {
-              padding-left: 1.5cm;
-            }
-            a[href]:after {
-              content: none !important;
-            }
-          }
-        `}</style>
         <main className="container-fluid">
           <div className="mb-3">
             <h2 className="d-inline">Library Prep Worksheet</h2>

@@ -63,13 +63,8 @@ export function RevisionsPageLayout({
     "author"
   ];
 
-  return (
+    return (
     <>
-      <style>{`
-        .rt-expandable, .rt-th:first-child {
-          min-width: 10rem !important;
-        }
-      `}</style>
       <ListPageLayout
         id="metadata-revision-list"
         queryTableProps={{
@@ -81,6 +76,7 @@ export function RevisionsPageLayout({
           },
           path: auditSnapshotPath,
           reactTableProps: {
+            className: "revisiontable",
             ExpanderComponent: ExpanderWithLabel,
             // Pop-out component to show the changes for a single revision:
             SubComponent: ({ original }) => {

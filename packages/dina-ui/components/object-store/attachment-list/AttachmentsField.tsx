@@ -98,15 +98,7 @@ export function AttachmentsEditor({
 
   function openAttachmentsModal() {
     openModal(
-      <div className="modal-content">
-        <style>{`
-          .modal-dialog {
-            max-width: calc(100vw - 3rem);
-          }
-          .ht_master .wtHolder {
-            height: 0% !important;
-          }
-        `}</style>
+      <div className="modal-content modal-Attachements">
         <div className="modal-header">
           <button className="btn btn-dark" onClick={closeModal}>
             <DinaMessage id="cancelButtonText" />

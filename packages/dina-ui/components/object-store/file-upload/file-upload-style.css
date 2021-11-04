@@ -12,5 +12,19 @@
     margin: 2em 0em 0em 2em;
 }
 
+/* Move the preview to the left, and the status container to the right: */
+.dzu-previewStatusContainer {
+  margin-left: auto !important;
+}
+
+/* Make the image non-draggable: */
+img.dzu-previewImage {
+  /* user-drag: none;  */
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
   
   

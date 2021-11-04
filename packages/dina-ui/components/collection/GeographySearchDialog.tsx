@@ -79,13 +79,7 @@ export function GeographySearchDialog({
   }
 
   return (
-    <div className="modal-content">
-      <style>{`
-        .modal-dialog {
-          max-width: calc(30vw - 3rem);          
-        }
-      `}</style>
-
+    <div className="modal-content modal-GeographySearchDialog">
       <div className="modal-header">
         <h2>{pageTitle}</h2>
       </div>

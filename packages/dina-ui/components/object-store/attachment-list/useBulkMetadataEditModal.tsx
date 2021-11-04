@@ -25,15 +25,7 @@ export function useBulkMetadataEditModal() {
     }
 
     openModal(
-      <div className="modal-content">
-        <style>{`
-          .modal-dialog {
-            max-width: calc(100vw - 3rem);
-          }
-          .ht_master .wtHolder {
-            height: 0% !important;
-          }
-        `}</style>
+      <div className="modal-content modal-UseBulkMetadataEdit">
         <div className="modal-header">
           <button className="btn btn-dark" onClick={closeModal}>
             <DinaMessage id="cancelButtonText" />

@@ -24,3 +24,56 @@ input[id^="react-select"] {
 .css-1wa3eu0-placeholder {
   color: #333333 !important;
 }
+
+.file-viewer-wrapper img {
+  max-width: 100%;
+  height: auto;
+}
+
+.metadata-preview .file-viewer-wrapper img {
+  height: 12rem;
+}
+
+.stored-object-gallery .file-viewer-wrapper, .stored-object-gallery img {
+  overflow-x: hidden !important;
+  height: 7rem;
+}
+
+.searchGeographyResult {
+  font-size:13pt; font-family:verdana,sans-serif;
+}
+
+.searchGeographyResultCategory {
+  font-size:13pt; font-family:verdana,sans-serif; color: grey;
+}
+
+.material-sample-nav .active a {
+  color: inherit !important;
+}
+
+.autosuggest-container {
+  position: relative;
+}
+.autosuggest .suggestions-container {
+  display: none;
+}
+.autosuggest .suggestions-container-open {
+  display: block;
+  position: absolute;
+  width: 100%;
+  z-index: 20;
+}
+.autosuggest .suggestion-highlighted { 
+  background-color: #ddd;
+  cursor: pointer;
+}
+
+.autosuggest-highlighted {
+  background-color: #ddd;
+}
+
+/* Making sure under chrome, the spinnig show by default */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {  
+  opacity: 1;
+}
