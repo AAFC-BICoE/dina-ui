@@ -1,10 +1,8 @@
 import { KitsuResource } from "kitsu";
-import { debounce, get, startCase } from "lodash";
+import { get, startCase } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
 import Select, { components, OptionProps } from "react-select";
-import { useApiClient } from "../../../common-ui/lib";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { useAutocompleteSearch } from "./useSearch";
@@ -39,27 +37,14 @@ function getLink(resource: KitsuResource): SearchResult {
 
 /** Autocomplete search box to link to other pages of the application. */
 export function SearchBox() {
-  const { apiClient } = useApiClient();
   const router = useRouter();
   const { formatMessage } = useDinaIntl();
 
-  const [search, setSearch] = useState({
-    /** The user's typed input. */
-    input: "",
-    /** The actual search value, which is updated after a throttle to avoid excessive API requests. */
-    value: ""
-  });
-
-  /** Updates the actual search value passed to the API. */
-  const debouncedSearchUpdate = useCallback(
-    debounce(() => setSearch(({ input }) => ({ input, value: input })), 250),
-    []
-  );
-
-  useEffect(debouncedSearchUpdate, [search.input]);
-
   const { searchResult, isLoading, inputValue, setInputValue } =
-    useAutocompleteSearch();
+    useAutocompleteSearch({
+      indexName: "dina_agent_index",
+      searchField: "displayName"
+    });
 
   const selectOptions =
     searchResult?.map(getLink)?.map(result => ({
@@ -80,11 +65,9 @@ export function SearchBox() {
     <Select
       placeholder={formatMessage("search")}
       options={selectOptions}
-      onInputChange={newVal =>
-        setSearch(current => ({ ...current, input: newVal }))
-      }
+      onInputChange={newVal => setInputValue(newVal)}
       onChange={option => option?.value && router.push(option.value)}
-      inputValue={search.input}
+      inputValue={inputValue}
       isLoading={isLoading}
       value={null}
       styles={customStyle}

@@ -13,6 +13,10 @@ import { Collection, Institution } from "../../types/collection-api";
 import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
 import { Person } from "../../types/objectstore-api";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
+import { useAutocompleteSearch } from "../search/useSearch";
+import { useEffect } from "react";
+import { useAddPersonModal } from "..";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 
 type ProvidedProps = "readOnlyLink" | "filter" | "model" | "optionLabel";
 
@@ -114,12 +118,31 @@ export function UserSelectField(
 export function PersonSelectField(
   props: SetOptional<ResourceSelectFieldProps<Person>, ProvidedProps>
 ) {
+  const { openAddPersonModal } = useAddPersonModal();
+
   return (
     <ResourceSelectField<Person>
+      useCustomQuery={selectInput => {
+        const { setInputValue, isLoading, searchResult } =
+          useAutocompleteSearch<Person>({
+            indexName: "dina_agent_index",
+            searchField: "displayName"
+          });
+
+        useEffect(() => setInputValue(selectInput), [selectInput]);
+
+        return { loading: isLoading, response: { data: searchResult ?? [] } };
+      }}
       readOnlyLink="/dina-user/view?id="
       filter={filterBy(["displayName"])}
       model="agent-api/person"
       optionLabel={person => person.displayName}
+      asyncOptions={[
+        {
+          label: <DinaMessage id="addNewPerson" />,
+          getResource: openAddPersonModal
+        }
+      ]}
       {...props}
     />
   );

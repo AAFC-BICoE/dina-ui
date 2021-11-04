@@ -16,24 +16,31 @@ export interface AutocompleteSearchResponse {
   };
 }
 
-export interface AutocompleteSearchParams {
-  type?: string;
-  autoCompleteField;
-}
+export type AutocompleteSearchParams = Omit<DoSearchParams, "searchValue">;
 
-export function useAutocompleteSearch<T extends KitsuResource>(type?: string) {
+export function useAutocompleteSearch<T extends KitsuResource>({
+  indexName,
+  searchField
+}: AutocompleteSearchParams) {
   const { apiClient } = useApiClient();
 
   return useDebouncedFetch({
-    fetcher: searchValue => doSearch<T>(apiClient.axios, searchValue),
+    fetcher: searchValue =>
+      doSearch<T>(apiClient.axios, { indexName, searchField, searchValue }),
     timeoutMs: 250
   });
+}
+
+export interface DoSearchParams {
+  searchField: string;
+  indexName: string;
+  searchValue?: string;
 }
 
 /** Does the search against the search API. */
 export async function doSearch<T extends KitsuResource>(
   axios: Pick<AxiosInstance, "get">,
-  searchValue?: string
+  { indexName, searchField, searchValue }: DoSearchParams
 ) {
   if (!searchValue) {
     return null;
@@ -44,9 +51,9 @@ export async function doSearch<T extends KitsuResource>(
     {
       params: {
         prefix: searchValue,
-        autoCompleteField: "data.attributes.displayName",
+        autoCompleteField: `data.attributes.${searchField}`,
         additionalField: "",
-        indexName: "dina_document_index"
+        indexName
       }
     }
   );
