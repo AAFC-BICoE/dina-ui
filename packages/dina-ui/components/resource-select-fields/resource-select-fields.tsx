@@ -47,9 +47,12 @@ export function CollectionSelectField(
               comparison: "=in=",
               arguments: (groupNames || []).join(",")
             }
-          ]
+          ],
+          otherFilters: { parentCollection: null }
         }
-      : undefined
+      : {
+          otherFilters: { parentCollection: null }
+        }
   );
 
   const collectionQuery = useQuery<Collection[], MetaWithTotal>({

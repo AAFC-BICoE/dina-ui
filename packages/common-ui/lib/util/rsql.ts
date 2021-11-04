@@ -57,9 +57,10 @@ export function filterBy(
         ...(options?.extraFilters ?? [])
       ]
     });
+
     const combinedFilters = otherFilters
-      ? merge(rsqlFilter, otherFilters)
-      : rsqlFilter;
+      ? merge({ rsql: rsqlFilter }, otherFilters)
+      : { rsql: rsqlFilter };
     return combinedFilters;
   };
 }
