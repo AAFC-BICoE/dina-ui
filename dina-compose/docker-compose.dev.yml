@@ -24,20 +24,6 @@ services:
       -Dspring-boot-maven-plugin.fork=true
       -Dspring-boot.run.jvmArguments=\"
         -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
-        -Dspring.datasource.url=jdbc:postgresql://database/dina?currentSchema=object_store
-        -Dspring.datasource.username=postgres
-        -Dspring.datasource.password=p
-        -Dspring.datasource.continue-on-error=true
-        -Dspring.liquibase.user=postgres
-        -Dspring.liquibase.password=p
-        -Dspring.servlet.multipart.max-file-size=2GB
-        -Dspring.servlet.multipart.max-request-size=2GB
-        -Dminio.host=minio
-        -Dminio.port=9000
-        -Dminio.accessKey=minio
-        -Dminio.secretKey=minio123
-        -Dkeycloak.enabled=true
-        -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
       \"
       spring-boot:run
       "
@@ -65,14 +51,6 @@ services:
       -Dspring-boot-maven-plugin.fork=true
       -Dspring-boot.run.jvmArguments=\"
         -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
-        -Dspring.datasource.url=jdbc:postgresql://database/dina?currentSchema=seqdb
-        -Dspring.datasource.username=postgres
-        -Dspring.datasource.password=p
-        -Dspring.liquibase.user=postgres
-        -Dspring.liquibase.password=p
-        -Dspring.liquibase.contexts=schema-change,initial-data,sample-data
-        -Dkeycloak.enabled=true
-        -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
       \"
       spring-boot:run
       "
@@ -91,23 +69,14 @@ services:
     ports:
       - "5006:5005" # debug port
     # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
+    working_dir: /app
     command: >
       bash -c "
       mvn
-      -f /app/pom.xml
       -Duser.home=/var/maven
       -Dspring-boot-maven-plugin.fork=true
       -Dspring-boot.run.jvmArguments=\"
         -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
-        -Dspring.datasource.url=jdbc:postgresql://database/dina?currentSchema=agent
-        -Dspring.datasource.username=postgres
-        -Dspring.datasource.password=p
-        -Dspring.datasource.continue-on-error=true
-        -Dspring.liquibase.user=postgres
-        -Dspring.liquibase.password=p
-        -Dkeycloak.enabled=true
-        -Dkeycloak.resource=dina
-        -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
       \"
       spring-boot:run
       "
@@ -134,17 +103,6 @@ services:
       -Dspring-boot-maven-plugin.fork=true
       -Dspring-boot.run.jvmArguments=\"
         -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
-        -Dspring.datasource.url=jdbc:postgresql://database/dina?currentSchema=userapi
-        -Dspring.datasource.username=postgres
-        -Dspring.datasource.password=p
-        -Dspring.datasource.continue-on-error=true
-        -Dspring.liquibase.user=postgres
-        -Dspring.liquibase.password=p
-        -Dspring.liquibase.liquibase-schema=userapi
-        -Dkeycloak.enabled=true
-        -Dkeycloak.resource=user-svc
-        -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
-        -Dkeycloak.credentials.secret=120c0b7a-5ed2-4295-9a31-29c2fcbc714f
       \"
       spring-boot:run
       "
@@ -171,16 +129,6 @@ services:
       -Dspring-boot-maven-plugin.fork=true
       -Dspring-boot.run.jvmArguments=\"
         -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
-        -Dspring.datasource.url=jdbc:postgresql://database/dina?currentSchema=collection
-        -Dspring.datasource.username=postgres
-        -Dspring.datasource.password=p
-        -Dspring.datasource.continue-on-error=true
-        -Dspring.liquibase.user=postgres
-        -Dspring.liquibase.password=p
-        -Dspring.jpa.show-sql=true
-        -Dkeycloak.enabled=true
-        -Dkeycloak.resource=dina
-        -Dkeycloak.auth-server-url=http://${KEYCLOAK_DOMAIN}/auth
       \"
       spring-boot:run
       "

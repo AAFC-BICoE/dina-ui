@@ -64,72 +64,96 @@ services:
       - "traefik.http.services.dina-ui.loadbalancer.server.port=8080"
   objectstore-api:
     environment:
-      spring.datasource.url: jdbc:postgresql://database/dina?currentSchema=object_store
-      spring.datasource.username: postgres
-      spring.datasource.password: p
-      spring.datasource.continue-on-error: "true"
-      spring.liquibase.user: postgres
-      spring.liquibase.password: p
-      spring.servlet.multipart.max-file-size: 2GB
-      spring.servlet.multipart.max-request-size: 2GB
-      minio.host: minio
-      minio.port: 9000
-      minio.accessKey: minio
-      minio.secretKey: minio123
-      keycloak.enabled: "true"
-      keycloak.auth-server-url: http://${KEYCLOAK_DOMAIN}/auth
+      SPRING_APPLICATION_JSON: >
+        {
+          "spring.datasource.url": "jdbc:postgresql://database/dina?currentSchema=object_store",
+          "spring.datasource.username": "postgres",
+          "spring.datasource.password": "p",
+          "spring.datasource.continue-on-error": "true",
+          "spring.liquibase.user": "postgres",
+          "spring.liquibase.password": "p",
+          "spring.servlet.multipart.max-file-size": "2GB",
+          "spring.servlet.multipart.max-request-size": "2GB",
+          "minio.host": "minio",
+          "minio.port": "9000",
+          "minio.accessKey": "minio",
+          "minio.secretKey": "minio123",
+          "keycloak.enabled": "true",
+          "keycloak.resource": "dina",
+          "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth"
+        }
     extra_hosts:
       # Resolve the Keycloak domain to Keycloak's static IP:
       - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
   seqdb-api:
     environment:
-      spring.datasource.url: jdbc:postgresql://database/dina?currentSchema=seqdb
-      spring.datasource.username: postgres
-      spring.datasource.password: p
-      spring.datasource.continue-on-error: "true"
-      spring.liquibase.user: postgres
-      spring.liquibase.password: p
+      SPRING_APPLICATION_JSON: >
+        {
+          "spring.datasource.url": "jdbc:postgresql://database/dina?currentSchema=seqdb",
+          "spring.datasource.username": "postgres",
+          "spring.datasource.password": "p",
+          "spring.datasource.continue-on-error": "true",
+          "spring.liquibase.user": "postgres",
+          "spring.liquibase.password": "p",
+          "keycloak.enabled": "true",
+          "keycloak.resource": "dina",
+          "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth"
+        }
     extra_hosts:
       # Resolve the Keycloak domain to Keycloak's static IP:
       - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
   agent-api:
     environment:
-      spring.datasource.url: jdbc:postgresql://database/dina?currentSchema=agent
-      spring.datasource.username: postgres
-      spring.datasource.password: p
-      spring.datasource.continue-on-error: "true"
-      spring.liquibase.user: postgres
-      spring.liquibase.password: p
-      keycloak.enabled: "true"
-      keycloak.auth-server-url: http://${KEYCLOAK_DOMAIN}/auth
+      SPRING_APPLICATION_JSON: >
+        {
+          "spring.datasource.url": "jdbc:postgresql://database/dina?currentSchema=agent",
+          "spring.datasource.username": "postgres",
+          "spring.datasource.password": "p",
+          "spring.datasource.continue-on-error": "true",
+          "spring.liquibase.user": "postgres",
+          "spring.liquibase.password": "p",
+          "keycloak.enabled": "true",
+          "keycloak.resource": "dina",
+          "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth",
+          "rabbitmq.host": "rabbitmq",
+          "messaging.isProducer": "true"
+        }
     extra_hosts:
       # Resolve the Keycloak domain to Keycloak's static IP:
       - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
   collection-api:
     environment:
-      spring.datasource.url: jdbc:postgresql://database/dina?currentSchema=collection
-      spring.datasource.username: postgres
-      spring.datasource.password: p
-      spring.datasource.continue-on-error: "true"
-      spring.liquibase.user: postgres
-      spring.liquibase.password: p
-      keycloak.enabled: "true"
-      keycloak.auth-server-url: http://${KEYCLOAK_DOMAIN}/auth
+      SPRING_APPLICATION_JSON: >
+        {
+          "spring.datasource.url": "jdbc:postgresql://database/dina?currentSchema=collection",
+          "spring.datasource.username": "postgres",
+          "spring.datasource.password": "p",
+          "spring.datasource.continue-on-error": "true",
+          "spring.liquibase.user": "postgres",
+          "spring.liquibase.password": "p",
+          "keycloak.enabled": "true",
+          "keycloak.resource": "dina",
+          "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth"
+        }
     extra_hosts:
       # Resolve the Keycloak domain to Keycloak's static IP:
       - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
   user-api:
     environment:
-      spring.datasource.url: jdbc:postgresql://database/dina?currentSchema=userapi
-      spring.datasource.username: postgres
-      spring.datasource.password: p
-      spring.datasource.continue-on-error: "true"
-      spring.liquibase.user: postgres
-      spring.liquibase.password: p
-      spring.liquibase.liquibase-schema: userapi
-      keycloak.enabled: "true"
-      keycloak.secret: 120c0b7a-5ed2-4295-9a31-29c2fcbc714f
-      keycloak.auth-server-url: http://${KEYCLOAK_DOMAIN}/auth
+      SPRING_APPLICATION_JSON: >
+        {
+          "spring.datasource.url": "jdbc:postgresql://database/dina?currentSchema=userapi",
+          "spring.datasource.username": "postgres",
+          "spring.datasource.password": "p",
+          "spring.datasource.continue-on-error": "true",
+          "spring.liquibase.user": "postgres",
+          "spring.liquibase.password": "p",
+          "keycloak.enabled": "true",
+          "keycloak.resource": "dina",
+          "keycloak.credentials.secret": "120c0b7a-5ed2-4295-9a31-29c2fcbc714f",
+          "keycloak.secret": "120c0b7a-5ed2-4295-9a31-29c2fcbc714f",
+          "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth"
+        }
     extra_hosts:
       # Resolve the Keycloak domain to Keycloak's static IP:
       - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
@@ -141,3 +165,14 @@ services:
     volumes:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+        - 5672:5672
+        - 15672:15672
+    volumes:
+        - rabbitmq-data:/var/lib/rabbitmq/
+
+volumes:
+  rabbitmq-data:
+    driver: local
