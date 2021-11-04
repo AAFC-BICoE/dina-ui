@@ -90,8 +90,7 @@ export function SampleListLayout({
             sortable: false
           }
         ]
-      : []),
-    "undefined"
+      : [])
   ];
 
   return (

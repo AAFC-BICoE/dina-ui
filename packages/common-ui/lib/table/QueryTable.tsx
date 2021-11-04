@@ -240,20 +240,6 @@ export function QueryTable<TData extends KitsuResource>({
             onChange={event => onChange(event.target.value)}
           />
         )}
-        TbodyComponent={({ children }) =>
-          error ? (
-            <div
-              className="alert alert-danger"
-              style={{
-                whiteSpace: "pre-line"
-              }}
-            >
-              {error.errors?.map(e => e.detail).join("\n") ?? String(error)}
-            </div>
-          ) : (
-            children
-          )
-        }
         TdComponent={DefaultTd}
         className="-striped"
         columns={mappedColumns}
@@ -278,9 +264,41 @@ export function QueryTable<TData extends KitsuResource>({
         showPagination={!omitPaging && shouldShowPagination}
         {...resolvedReactTableProps}
         pageText={<CommonMessage id="page" />}
+        TbodyComponent={
+          error
+            ? () => (
+                <div
+                  className="alert alert-danger"
+                  style={{
+                    whiteSpace: "pre-line"
+                  }}
+                >
+                  <p>
+                    {error.errors?.map(e => e.detail).join("\n") ??
+                      String(error)}
+                  </p>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => {
+                      const newSort = [{ id: "createdOn", desc: true }];
+                      onSortedChange?.(newSort);
+                      setSortingRules(newSort);
+                    }}
+                  >
+                    <CommonMessage id="resetSort" />
+                  </button>
+                </div>
+              )
+            : resolvedReactTableProps?.TbodyComponent ?? DefaultTBody
+        }
       />
     </div>
   );
+}
+
+function DefaultTBody(props) {
+  return <div {...props} className="rt-tbody" />;
 }
 
 export function DefaultTd({ className, style, children, onClick }) {
