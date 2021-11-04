@@ -36,24 +36,20 @@ export function CollectionSelectField(
   const [{ value }] = useField(props.name);
   const { roles, groupNames } = useAccount();
 
-  const filter = filterBy(
-    ["name"],
-    !roles.includes("dina-admin")
-      ? {
-          extraFilters: [
-            // Restrict the list to just the user's groups:
-            {
-              selector: "group",
-              comparison: "=in=",
-              arguments: (groupNames || []).join(",")
-            }
-          ],
-          otherFilters: { parentCollection: null }
-        }
-      : {
-          otherFilters: { parentCollection: null }
-        }
-  );
+  const filter = filterBy(["name"], {
+    extraFilters: !roles.includes("dina-admin")
+      ? [
+          // Restrict the list to just the user's groups:
+          {
+            selector: "group",
+            comparison: "=in=",
+            arguments: (groupNames || []).join(",")
+          }
+        ]
+      : [],
+    // Restrict to only top level collections
+    otherFilters: { parentCollection: null }
+  });
 
   const collectionQuery = useQuery<Collection[], MetaWithTotal>({
     path: "collection-api/collection",

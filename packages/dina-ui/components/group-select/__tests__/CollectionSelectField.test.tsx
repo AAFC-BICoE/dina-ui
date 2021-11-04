@@ -78,8 +78,11 @@ describe("CollectionSelectField", () => {
     // Not disabled or filtered:
     expect(wrapper.find(Select).prop("isDisabled")).toEqual(false);
     expect(mockGet.mock.calls).toEqual([
-      ["collection-api/collection", { filter: { rsql: "" } }],
-      ["collection-api/collection", {}]
+      [
+        "collection-api/collection",
+        { filter: { rsql: "", parentCollection: null } }
+      ],
+      ["collection-api/collection", { filter: { parentCollection: null } }]
     ]);
   });
 
@@ -96,8 +99,14 @@ describe("CollectionSelectField", () => {
 
     expect(wrapper.find(Select).prop("isDisabled")).toEqual(true);
     expect(mockGet.mock.calls).toEqual([
-      ["collection-api/collection", { filter: { rsql: "group=in=aafc" } }],
-      ["collection-api/collection", { filter: { rsql: "group=in=aafc" } }]
+      [
+        "collection-api/collection",
+        { filter: { rsql: "group=in=aafc", parentCollection: null } }
+      ],
+      [
+        "collection-api/collection",
+        { filter: { rsql: "group=in=aafc", parentCollection: null } }
+      ]
     ]);
   });
 
@@ -116,9 +125,12 @@ describe("CollectionSelectField", () => {
     expect(mockGet.mock.calls).toEqual([
       [
         "collection-api/collection",
-        { filter: { rsql: "group=in='aafc,cnc'" } }
+        { filter: { rsql: "group=in='aafc,cnc'", parentCollection: null } }
       ],
-      ["collection-api/collection", { filter: { rsql: "group=in='aafc,cnc'" } }]
+      [
+        "collection-api/collection",
+        { filter: { rsql: "group=in='aafc,cnc'", parentCollection: null } }
+      ]
     ]);
   });
 });
